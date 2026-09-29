@@ -53,7 +53,12 @@ export function createInMemoryResolutionLog(turns: InMemoryUsageLog): Resolution
             (c.resolutionAttemptedAt === null || c.resolutionAttemptedAt <= q.attemptedBefore)
           );
         })
-        .sort((a, b) => a.askedAt - b.askedAt)
+        // Never-read asks first, then the oldest — the D1 adapter's order.
+        .sort(
+          (a, b) =>
+            Number(columnsOf(a.turnId).resolutionAttempts > 0) - Number(columnsOf(b.turnId).resolutionAttempts > 0) ||
+            a.askedAt - b.askedAt,
+        )
         .slice(0, q.limit)
         .map((t) => ({
           turnId: t.turnId,

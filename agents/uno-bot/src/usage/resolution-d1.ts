@@ -31,16 +31,20 @@ const RECORD_TASK =
   `UPDATE turns SET resolution = 'task_completed', resolved_at = ?1 ` +
   `WHERE proposal_id = ?2 AND ${PERSON_OPEN} RETURNING turn_id`;
 
+// Never-read asks first, then the oldest: re-reading the unknowns must not
+// starve a new ask of its first read.
 const PENDING =
   `SELECT turn_id, requester_id, ask_ts, asked_at, resolution, resolution_attempts FROM turns ` +
   `WHERE resolution_checked_at IS NULL AND test_traffic = 0 AND asked_at > ?1 AND asked_at <= ?2 ` +
   `AND (resolution_attempted_at IS NULL OR resolution_attempted_at <= ?3) ` +
-  `ORDER BY asked_at LIMIT ?4`;
+  `ORDER BY resolution_attempts > 0, asked_at LIMIT ?4`;
 
 // ?1 at · ?2 escalated (0/1/null) · ?3 resolution (or null) · ?4 settled (0/1) · ?5 turn.
 // The pass's answer replaces only its own (PERSON_OPEN is exactly that set);
 // `resolved_at` moves only when the resolution itself changes, so a re-read to
-// the same verdict writes nothing but the attempt. SQLite evaluates every SET
+// the same verdict writes nothing but the attempt. A later read that overturns
+// a `none` (a person replied after all) leaves `resolution` NULL: legal, and
+// the same row a first read reaching that verdict would have written. SQLite evaluates every SET
 // against the row as it was, so the CASEs all see the old `resolution`.
 const RECORD_PASS =
   `UPDATE turns SET resolution_attempts = resolution_attempts + 1, resolution_attempted_at = ?1, ` +
@@ -77,17 +81,17 @@ const personResolved = (r: unknown): boolean => r === "reaction" || r === "task_
 
 export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): ResolutionLog {
   const { db } = deps;
-  const changedTurnId = async (stmt: ReturnType<ReturnType<ResolutionDatabase["prepare"]>["bind"]>) => {
+  const turnIdIfUpdated = async (stmt: ReturnType<ReturnType<ResolutionDatabase["prepare"]>["bind"]>) => {
     chargeD1Query();
     const row = await stmt.first<{ turn_id: unknown }>();
     return row ? String(row.turn_id) : null;
   };
   return {
     recordReaction(q) {
-      return changedTurnId(db.prepare(RECORD_REACTION).bind(q.at, q.turnId, q.requesterId));
+      return turnIdIfUpdated(db.prepare(RECORD_REACTION).bind(q.at, q.turnId, q.requesterId));
     },
     recordTaskCompleted(proposalId, at) {
-      return changedTurnId(db.prepare(RECORD_TASK).bind(at, proposalId));
+      return turnIdIfUpdated(db.prepare(RECORD_TASK).bind(at, proposalId));
     },
     async pendingPass(q) {
       chargeD1Query();

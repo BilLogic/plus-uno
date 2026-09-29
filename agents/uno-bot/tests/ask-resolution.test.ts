@@ -14,6 +14,7 @@ import {
   isResolvingReaction,
   recordAnswerReaction,
   sameTopic,
+  wholeThread,
   type ResolutionLog,
 } from "../src/usage/resolution";
 import { createInMemoryResolutionLog } from "../src/usage/resolution-in-memory";
@@ -107,6 +108,24 @@ describe("the resolution rules", () => {
     // A top-level post has no thread to map through; a person's message is no answer.
     assert.equal(answeredAskOf("C1", [thread()[1]!], answer), null);
     assert.equal(answeredAskOf("C1", thread(), ASK_TS), null);
+  });
+
+  it("a thread is read whole or not at all: a second page makes it unknown", () => {
+    const messages = thread();
+    assert.deepEqual(wholeThread({ ok: true, messages }), messages);
+    assert.equal(wholeThread({ ok: true, messages, has_more: true }), null);
+    assert.equal(wholeThread({ ok: false }), null);
+    assert.equal(wholeThread({ ok: true, messages: [] }), null);
+  });
+
+  it("a thread too long to read whole leaves the reaction unrecorded", async () => {
+    const { resolutions, turn } = await world();
+    const recorded = await recordAnswerReaction(
+      { channel: "C1", threadRoot: ASK_TS, reactedTs: tsAt(5_000), userId: ASKER },
+      { log: resolutions, threadOf: async () => wholeThread({ ok: true, messages: thread(), has_more: true }), now: () => ASK_MS },
+    );
+    assert.equal(recorded, null);
+    assert.equal((await resolutions.getResolution(turn.turnId))?.resolution, null);
   });
 
   it("a batch completed only when every approved operation came back ok", () => {
@@ -278,6 +297,63 @@ describe("the end-of-day pass", () => {
     await run(ASK_MS + 25 * HOUR + 60_000);
     for (const t of others) assert.equal((await resolutions.getResolution(t.turnId))?.resolution, "no_escalation");
     assert.equal((await resolutions.getResolution(turn.turnId))?.resolutionAttempts, 1);
+  });
+
+  it("re-reading a backlog of unknowns never starves a new ask of its first read", async () => {
+    const usage = createInMemoryUsageLog();
+    const resolutions = createInMemoryResolutionLog(usage);
+    const record = async (offsetMs: number) => {
+      const t = turnRecord({ turnId: `C1:${tsAt(offsetMs)}`, askTs: tsAt(offsetMs), askedAt: ASK_MS + offsetMs, proposalId: null });
+      await usage.record(t);
+      return t;
+    };
+    // A full day of old unknowns, already read once…
+    const backlog = await Promise.all(Array.from({ length: 60 }, (_, i) => record(i * 60_000)));
+    const run = async (now: number) => {
+      for (let job = 0; job < ASK_RESOLUTION_JOBS; job++) {
+        await runResolutionPass({
+          log: resolutions,
+          now: () => now + job * 60_000,
+          leadUserId: LEAD,
+          botUserId: async () => BOT,
+          threadOf: async (_c, askTs) => [{ ts: askTs, user: ASKER, text: "q" }],
+          leadDmsWith: null,
+          announce: job === 0,
+          dryRun: false,
+        });
+      }
+    };
+    await run(ASK_MS + 26 * HOUR);
+    // …then a new ask, the next day, behind all of them by age.
+    const fresh = await record(24 * HOUR);
+    await run(ASK_MS + 50 * HOUR);
+    assert.equal((await resolutions.getResolution(fresh.turnId))?.resolutionAttempts, 1);
+    const reread = await Promise.all(backlog.map((t) => resolutions.getResolution(t.turnId)));
+    assert.equal(reread.filter((r) => r?.resolutionAttempts === 2).length, 59);
+  });
+
+  it("the missing-token line is logged by the announcing job only", async () => {
+    const { resolutions } = await world();
+    const lines: string[] = [];
+    const original = console.log;
+    console.log = (...args: unknown[]) => lines.push(args.join(" "));
+    try {
+      for (const announce of [true, false, false]) {
+        await runResolutionPass({
+          log: resolutions,
+          now: () => ASK_MS + 25 * HOUR,
+          leadUserId: LEAD,
+          botUserId: async () => BOT,
+          threadOf: async () => thread(),
+          leadDmsWith: null,
+          announce,
+          dryRun: true,
+        });
+      }
+    } finally {
+      console.log = original;
+    }
+    assert.equal(lines.filter((l) => l.includes("no connected Slack token")).length, 1);
   });
 
   it("60 unknown asks are all read within one end-of-day run's jobs, and again the next day", async () => {

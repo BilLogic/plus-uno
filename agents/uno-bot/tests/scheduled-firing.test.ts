@@ -14,7 +14,7 @@ import {
   runsForFiring,
   type ScheduledRun,
 } from "../src/scheduled/runs";
-import { enqueueScheduledRun } from "../src/scheduled/jobs";
+import { enqueueScheduledRun, runScheduledJob } from "../src/scheduled/jobs";
 import { internalSubrequestsFor, runMetered } from "../src/net";
 import type { Env } from "../src/types";
 
@@ -134,4 +134,19 @@ test("the enqueue reaches the run's own runner, and costs one charged hop", asyn
   assert.deepEqual(named, ["scheduled-run/end-of-day"]);
   assert.deepEqual(bodies, [run]);
   assert.equal(hops, 1);
+});
+
+test("a dry run rehearses one ask-resolution job, not all of them", async () => {
+  const lines: string[] = [];
+  const original = console.log;
+  console.log = (...args: unknown[]) => lines.push(args.join(" "));
+  try {
+    for (const job of planRun("end-of-day", at(22, 0)).jobs.filter((j) => j.kind === "ask-resolution")) {
+      await runScheduledJob({} as Env, job, { dryRun: true });
+    }
+  } finally {
+    console.log = original;
+  }
+  // Only the first job ran; with no database bound it says so and stops.
+  assert.deepEqual(lines, ["[resolution] no USAGE_DB binding — nothing to check"]);
 });

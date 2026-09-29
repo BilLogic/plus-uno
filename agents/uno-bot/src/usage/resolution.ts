@@ -57,9 +57,22 @@ export interface AskResolution {
 /** A message in a Slack thread, as the bot token reads it. */
 export interface ThreadMessage {
   ts: string;
+  /** The thread's root, on a message in one. */
+  thread_ts?: string;
   user?: string;
   bot_id?: string;
   text?: string;
+}
+
+/**
+ * A thread read, WHOLE or not at all: null when Slack refused it, when it is
+ * empty, or when it runs past the one page read (`has_more`). Judging a reply
+ * or an ask on part of a thread would be a guess, so a longer thread is
+ * unknown. The pass and the reaction path both read through this.
+ */
+export function wholeThread(res: { ok: boolean; messages?: ThreadMessage[]; has_more?: boolean }): ThreadMessage[] | null {
+  if (!res.ok || !Array.isArray(res.messages) || res.messages.length === 0 || res.has_more === true) return null;
+  return res.messages;
 }
 
 /** The asker's ✅ / 👍 on a bot answer, as the reaction door hands it over. */
@@ -118,7 +131,7 @@ export interface ResolutionLog {
   recordTaskCompleted(proposalId: string, at: number): Promise<string | null>;
   /**
    * Non-test asks the pass has not settled, asked inside the window and not
-   * read since `attemptedBefore`, oldest first.
+   * read since `attemptedBefore`: never-read asks first, then oldest first.
    */
   pendingPass(q: {
     askedAfter: number;

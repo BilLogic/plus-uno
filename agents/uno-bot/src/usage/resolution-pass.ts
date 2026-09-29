@@ -21,8 +21,11 @@
 //   - an ask whose DM half is unknown is read again, at most once a day, until
 //     it leaves the window (`PASS_LOOKBACK_MS`) — a `none` becomes a real
 //     answer once the lead's token works;
-//   - a thread that cannot be read is tried `MAX_THREAD_ATTEMPTS` times, a day
-//     apart, then recorded `none` and settled, so it never pins the queue.
+//   - a thread that cannot be read whole (refused, or longer than one page) is
+//     read `MAX_THREAD_ATTEMPTS` times in all, a day apart, then recorded
+//     `none` and settled, so it never pins the queue;
+//   - asks never read go first, then the oldest, so re-reading the unknowns
+//     never starves a new ask of its first read.
 //
 // Nothing read is kept: the texts are compared in memory and dropped.
 //
@@ -59,13 +62,14 @@ export const IM_LIST_PAGES = 3;
  *
  *   D1_QUERY_CAP = 40:  1 pending select + 1 write per ask
  *                       → 1 + n ≤ 40 → n ≤ 39
- *   LOOKUP_CEILING = 38 external: 1 auth.test (cold isolate) + up to
- *                       IM_LIST_PAGES (3) DM-list pages, then per ask at most
- *                       2 thread reads (the ask's, then its root's) + 1 DM
- *                       history → 4 + 3n ≤ 38 → n ≤ 11
+ *   LOOKUP_CEILING = 38 external: 1 auth.test (cold isolate) + 1 token
+ *                       refresh (`oauth.v2.access`, when the lead's token is
+ *                       near expiry) + up to IM_LIST_PAGES (3) DM-list pages,
+ *                       then per ask at most 2 thread reads (the ask's, then
+ *                       its root's) + 1 DM history → 5 + 3n ≤ 38 → n ≤ 11
  *
- * 10 leaves a subrequest's headroom under the tighter one. The token lookup is
- * KV, charged as internal, not against either cap.
+ * 10 leaves a subrequest's headroom under the tighter one. The token's own KV
+ * read is internal, charged against neither cap.
  */
 export const PASS_LIMIT = 10;
 
@@ -100,6 +104,9 @@ export interface ResolutionPassDeps {
   leadDmsWith: LeadDmReader | null;
   /** Reads as it would, writes nothing. */
   dryRun: boolean;
+  /** Log the missing-token line — the run's first job only, so it is one line
+   *  per run. Default true. */
+  announce?: boolean;
 }
 
 export interface ResolutionPassSummary {
@@ -137,11 +144,11 @@ export type SlackRead = (
  * UNKNOWN, NEVER "NO DM", whenever the answer is not complete: a list that
  * cannot be read (a missing scope, an error), a list longer than
  * `IM_LIST_PAGES` that did not name the asker, or a history with more messages
- * in the window than one page. The list failure says so once.
+ * in the window than one page. The list failure says so once, when `announce`.
  *
  * @param read - One Slack read on the lead's own token
  */
-export function createLeadDmReader(read: SlackRead): LeadDmReader {
+export function createLeadDmReader(read: SlackRead, opts: { announce?: boolean } = {}): LeadDmReader {
   let ims: Promise<{ byUser: Map<string, string>; complete: boolean } | null> | undefined;
 
   const listIms = async () => {
@@ -155,7 +162,7 @@ export function createLeadDmReader(read: SlackRead): LeadDmReader {
         ...(cursor ? { cursor } : {}),
       });
       if (!res.ok) {
-        console.log(`[resolution] the lead's DM list is unreadable (${res.error ?? "error"}): DM half recorded unknown`);
+        if (opts.announce !== false) console.log(`[resolution] the lead's DM list is unreadable (${res.error ?? "error"}): DM half recorded unknown`);
         return null;
       }
       for (const c of (res.channels as { id?: string; user?: string }[] | undefined) ?? []) {
@@ -225,8 +232,10 @@ export function decideAsk(
 }
 
 /**
- * What an unreadable thread records: `none` and still queued, until the last
- * attempt, which settles it.
+ * What an unreadable thread records: `none` and still queued, until the ask
+ * has been read `MAX_THREAD_ATTEMPTS` times in all, which settles it. Reads
+ * that found the thread but not the DMs count too: an ask already unknown for
+ * days whose thread then vanishes has nothing left to learn.
  */
 export function unreadableOutcome(ask: PassCandidate): PassOutcome {
   return { resolution: "none", escalatedToLead: null, settled: ask.attempts + 1 >= MAX_THREAD_ATTEMPTS };
@@ -250,7 +259,7 @@ export async function runResolutionPass(deps: ResolutionPassDeps): Promise<Resol
 
   const lead = deps.leadUserId;
   const dmReader = lead ? deps.leadDmsWith : null;
-  if (!dmReader) {
+  if (!dmReader && deps.announce !== false) {
     console.log(
       `[resolution] ${lead ? "no connected Slack token for the lead" : "no LEAD_USER_ID"}: ` +
         `the DM half is unread, so asks it would settle are recorded "none"`,

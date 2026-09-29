@@ -17,6 +17,10 @@
 
 import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
 
+/** The end-of-day run's first `ask-resolution` job: the one that announces a
+ *  missing token, and the one a dry run rehearses. */
+export const FIRST_ASK_RESOLUTION_KEY = "ask-resolution-1";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -75,7 +79,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     // One alarm reads `PASS_LIMIT` asks; the run holds enough jobs for a day's
     // (src/usage/resolution-pass.ts states the budget math).
     ...Array.from({ length: ASK_RESOLUTION_JOBS }, (_, i) => ({
-      key: `ask-resolution-${i + 1}`,
+      key: i === 0 ? FIRST_ASK_RESOLUTION_KEY : `ask-resolution-${i + 1}`,
       kind: "ask-resolution" as const,
     })),
   ],

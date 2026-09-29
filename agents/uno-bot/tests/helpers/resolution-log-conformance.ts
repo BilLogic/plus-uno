@@ -135,12 +135,13 @@ export function runResolutionLogConformance(
 
     const sameRun = await resolutions.pendingPass({ ...everything, attemptedBefore: T0 + 10 * HOUR });
     assert.deepEqual(sameRun.map((c) => c.turnId), [b.turnId]);
+    // Next day both are due: the never-read one first, though it is newer.
     const nextDay = await resolutions.pendingPass({ ...everything, attemptedBefore: T0 + 30 * HOUR });
     assert.deepEqual(
       nextDay.map((c) => [c.turnId, c.attempts]),
       [
-        [a.turnId, 1],
         [b.turnId, 0],
+        [a.turnId, 1],
       ],
     );
   });

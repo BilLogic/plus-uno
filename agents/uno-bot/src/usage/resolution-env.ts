@@ -17,12 +17,18 @@ import { rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
 import { conversationsReplies, getBotIdentity, slackReadAs } from "../slack/api";
 import { createD1ResolutionLog } from "./resolution-d1";
-import { batchCompleted, recordAnswerReaction, type AnswerReaction, type ResolutionLog } from "./resolution";
+import {
+  batchCompleted,
+  recordAnswerReaction,
+  wholeThread,
+  type AnswerReaction,
+  type ResolutionLog,
+  type ThreadMessage,
+} from "./resolution";
 import {
   createLeadDmReader,
   runResolutionPass,
   type LeadDmReader,
-  type ThreadMessage,
 } from "./resolution-pass";
 
 /** A log that keeps nothing — the Worker without `USAGE_DB`. `./production.ts` says so once. */
@@ -58,10 +64,7 @@ export function reactionRecorderFor(env: Env) {
     try {
       await recordAnswerReaction(r, {
         log: resolutionLogFor(env),
-        async threadOf(channel, rootTs) {
-          const res = await conversationsReplies(env, channel, rootTs, 200);
-          return res.ok && Array.isArray(res.messages) ? res.messages : null;
-        },
+        threadOf: (channel, rootTs) => wholeThreadAt(env, channel, rootTs),
         now: () => Date.now(),
       });
     } catch (err) {
@@ -92,41 +95,50 @@ export async function recordTaskCompletion(
 
 // ── the end-of-day pass ──────────────────────────────────────────────────────
 
-/** The ask's whole thread, oldest first, on the bot token; null when unreadable. */
+/** One page of a thread, the most one read returns. */
+const THREAD_PAGE = 200;
+
+/** A thread read on the bot token, whole or not at all (`wholeThread`). */
+async function wholeThreadAt(env: Env, channel: string, ts: string): Promise<ThreadMessage[] | null> {
+  return wholeThread(await conversationsReplies(env, channel, ts, THREAD_PAGE));
+}
+
+/** The ask's whole thread, oldest first, on the bot token; null when unknown. */
 async function threadOf(env: Env, channel: string, askTs: string): Promise<ThreadMessage[] | null> {
-  const first = await conversationsReplies(env, channel, askTs, 200);
-  if (!first.ok || !Array.isArray(first.messages) || first.messages.length === 0) return null;
+  const first = await wholeThreadAt(env, channel, askTs);
   // Asked inside a thread: read from its root so every reply is in view.
-  const root = first.messages[0]!.thread_ts;
-  if (root && root !== first.messages[0]!.ts) {
-    const whole = await conversationsReplies(env, channel, root, 200);
-    return whole.ok && Array.isArray(whole.messages) ? whole.messages : null;
-  }
-  return first.messages;
+  const root = first?.[0]?.thread_ts;
+  if (first && root && root !== first[0]!.ts) return wholeThreadAt(env, channel, root);
+  return first;
 }
 
 /**
  * The asker's DM with the lead, read on the lead's own token. Null when the
  * lead has not connected one: the legacy workspace slot is not the lead's.
  */
-async function leadDmReader(env: Env, leadUserId: string): Promise<LeadDmReader | null> {
+async function leadDmReader(env: Env, leadUserId: string, announce: boolean): Promise<LeadDmReader | null> {
   const stored = await getSlackAccessTokenFor(env, leadUserId).catch((err: unknown) => {
     rethrowIfBudget(err);
     return null;
   });
   if (!stored?.own) return null;
   const token = stored.token;
-  // GET only (`slackReadAs`): the pass never writes on the lead's token.
-  return createLeadDmReader((method, params) => slackReadAs(token, method, params));
+  // `slackReadAs` takes only read methods (its type is the guard): the pass
+  // never writes on the lead's token.
+  return createLeadDmReader((method, params) => slackReadAs(token, method, params), { announce });
 }
 
 /**
  * The `ask-resolution` job: the end-of-day pass, on the Worker's bindings.
  *
  * @param env - The Worker environment
- * @param opts - `dryRun` for the sweep probe: reads, writes nothing
+ * @param opts - `dryRun` for the sweep probe: reads, writes nothing. `announce`
+ *   for the run's first job only, so a missing token is one log line per run.
  */
-export async function runAskResolution(env: Env, opts: { dryRun: boolean }): Promise<{ summary: string }> {
+export async function runAskResolution(
+  env: Env,
+  opts: { dryRun: boolean; announce: boolean },
+): Promise<{ summary: string }> {
   if (!env.USAGE_DB) return { summary: "no USAGE_DB binding — nothing to check" };
   const leadUserId = env.LEAD_USER_ID?.trim() || null;
   return runResolutionPass({
@@ -135,7 +147,8 @@ export async function runAskResolution(env: Env, opts: { dryRun: boolean }): Pro
     leadUserId,
     botUserId: async () => (await getBotIdentity(env))?.userId,
     threadOf: (channel, askTs) => threadOf(env, channel, askTs),
-    leadDmsWith: leadUserId ? await leadDmReader(env, leadUserId) : null,
+    leadDmsWith: leadUserId ? await leadDmReader(env, leadUserId, opts.announce) : null,
     dryRun: opts.dryRun,
+    announce: opts.announce,
   });
 }

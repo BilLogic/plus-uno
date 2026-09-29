@@ -105,16 +105,28 @@ async function slackGet<T extends SlackResponse>(
   method: string,
   params: Record<string, string>,
 ): Promise<T> {
-  return slackReadAs<T>(env.SLACK_BOT_TOKEN, method, params);
+  return slackGetWith<T>(env.SLACK_BOT_TOKEN, method, params);
 }
 
+/** The read methods a person's own token may be used for. */
+export type UserTokenReadMethod = "users.conversations" | "conversations.history" | "conversations.replies";
+
 /**
- * A Slack READ method on a token other than the bot's — a person's own
- * connected one (ADR-020). GET only, so the caller holding a user token can
- * read with it and never write; the transport, parse guard and failure warn
- * are the bot's own.
+ * A Slack read on a token other than the bot's — a person's own connected one
+ * (ADR-020). THE GUARD IS THE METHOD TYPE: Slack accepts GET for write methods
+ * too, so GET is no protection; `UserTokenReadMethod` admits only reads, and a
+ * write cannot be named here. The transport, parse guard and failure warn are
+ * the bot's own.
  */
 export async function slackReadAs<T extends SlackResponse = SlackResponse>(
+  token: string,
+  method: UserTokenReadMethod,
+  params: Record<string, string>,
+): Promise<T> {
+  return slackGetWith<T>(token, method, params);
+}
+
+async function slackGetWith<T extends SlackResponse>(
   token: string,
   method: string,
   params: Record<string, string>,
