@@ -254,6 +254,14 @@ export interface PendingProposal {
    * button on either card resolves that card.
    */
   supersedeKey?: string;
+  /**
+   * On a card keyed apart: what a turn in its thread posts, in place of a
+   * card, when its batch would touch this one — any operation using one of
+   * this card's tools (`revisionRefusal`). A turn's near-copy would otherwise
+   * stay live beside it, and both could run. The weekly DS precedence card
+   * points at `dispute N`, the one way it is revised.
+   */
+  refuseRevision?: string;
 }
 
 /**
@@ -323,6 +331,20 @@ export function supersessionKey(proposal: Pick<PendingProposal, "replyTs" | "thr
  */
 export function revisedBy(pending: PendingProposal | null): PendingProposal | null {
   return pending && pending.supersedeKey === undefined ? pending : null;
+}
+
+/**
+ * The note a turn posts instead of staging `operations`, when the thread's
+ * pending card is keyed apart and the batch would touch it — shares one of its
+ * tools. Null when the turn may stage.
+ */
+export function revisionRefusal(
+  pending: PendingProposal | null,
+  operations: readonly ProposalOperation[],
+): string | null {
+  if (!pending?.supersedeKey || !pending.refuseRevision) return null;
+  const tools = new Set(proposalOperations(pending).map((op) => op.toolName));
+  return operations.some((op) => tools.has(op.toolName)) ? pending.refuseRevision : null;
 }
 
 /**

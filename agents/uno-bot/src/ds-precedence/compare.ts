@@ -236,6 +236,20 @@ function codeValueOf(s: RegistrySet, axis: string, value: string): string {
   return typeof hit?.[1] === "string" ? normValue(hit[1]) : normValue(value);
 }
 
+/**
+ * How many indexed components the library has at all — by the registry's
+ * sets, or by the component's own name — the count the check's floor is held
+ * to. Sets the index does not list (icons, documentation, parts) do not count,
+ * so a library answering only those cannot pass for a real one.
+ */
+export function indexedInLibrary(index: readonly IndexEntry[], registry: PrecedenceRegistry, library: LiveLibrary): number {
+  return index.filter(
+    (entry) =>
+      resolveSets(registry.components?.[entry.name]?.figma?.sets ?? [], library).length > 0 ||
+      library.sets.some((l) => loose(l.name) === loose(entry.name)),
+  ).length;
+}
+
 const ticked = (xs: readonly string[]) => xs.map((x) => `\`${x}\``).join(", ");
 
 export interface CompareInput {

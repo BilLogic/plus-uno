@@ -86,20 +86,28 @@ test("an @mention anywhere still engages", async () => {
   assert.equal(await engages(post({ channel: OTHER, text: `<@${BOT}> what's the token for primary?` })), true);
 });
 
-// ── The weekly DS precedence thread ─────────────────────────────────────────
-// uno-bot's only posts there are its scheduled list and card, which leaves a
-// live card in the thread. People reply to each other about the list, so a
-// reply is not a turn: an @mention or a typed gate emoji engages, and once
-// uno-bot has answered there the follow-up rule resumes.
+// ── The weekly DS precedence list threads ───────────────────────────────────
+// uno-bot posts a list and a card there on a schedule, which leaves a live
+// card and uno-bot's own posts in the thread. People reply to each other about
+// the list, so a reply is not a turn: an @mention or a typed gate emoji
+// engages, and nothing else does — not uno-bot having answered there, not a
+// newer week's thread, not a card that never posted. Every list thread is
+// recorded under its own ts.
 
 const UNIVERSAL = "C072E8SFLKV";
-const WEEKLY = "1759500000.000001";
+const LAST_WEEK = "1759000000.000001";
+const THIS_WEEK = "1759500000.000001";
 
-function weeklyEnv(history: unknown[] = []): Env {
+function weeklyEnv(history: unknown[] = [], recorded: string[] = [LAST_WEEK, THIS_WEEK]): Env {
   return {
     ...ENV,
     PLUS_UNIVERSAL_CHANNEL_ID: UNIVERSAL,
-    HARNESS_KV: { get: async () => ({ channel: UNIVERSAL, ts: WEEKLY }) },
+    HARNESS_KV: {
+      get: async (key: string) => {
+        const ts = recorded.find((t) => key === `ds-precedence:thread:${t}`);
+        return ts ? { channel: UNIVERSAL, ts, cardTs: "" } : null;
+      },
+    },
     THREAD_STATE: {
       idFromName: (name: string) => name,
       get: () => ({
@@ -115,19 +123,29 @@ function weeklyEnv(history: unknown[] = []): Env {
   } as unknown as Env;
 }
 
-const weeklyReply = (text: string) => post({ channel: UNIVERSAL, ts: "1759500100.000001", thread_ts: WEEKLY, text });
+const listReply = (text: string, thread = THIS_WEEK) =>
+  post({ channel: UNIVERSAL, ts: "1759500100.000001", thread_ts: thread, text });
 
-test("a plain reply in the weekly thread does not engage, though a card is live there", async () => {
-  assert.equal(await engages(weeklyReply("agree with 2, the set exists"), weeklyEnv()), false);
+test("a plain reply in a list thread does not engage, though a card is live there", async () => {
+  assert.equal(await engages(listReply("agree with 2, the set exists"), weeklyEnv()), false);
 });
 
-test("an @mention or a typed gate emoji in the weekly thread engages", async () => {
-  assert.equal(await engages(weeklyReply(`<@${BOT}> why is Button listed?`), weeklyEnv()), true);
-  assert.equal(await engages(weeklyReply("✅"), weeklyEnv()), true);
+test("an @mention or a typed gate emoji in a list thread engages", async () => {
+  assert.equal(await engages(listReply(`<@${BOT}> why is Button listed?`), weeklyEnv()), true);
+  assert.equal(await engages(listReply("✅"), weeklyEnv()), true);
 });
 
-test("once uno-bot has answered in the weekly thread, follow-ups engage as anywhere", async () => {
-  assert.equal(await engages(weeklyReply("and item 3?"), weeklyEnv([{ role: "assistant", text: "…" }])), true);
+test("uno-bot having answered in a list thread (a typed ✅, a mention) does not make every reply a turn", async () => {
+  assert.equal(await engages(listReply("and item 3?"), weeklyEnv([{ role: "assistant", content: "…" }])), false);
+});
+
+test("last week's list thread stays exempt after this week's posts", async () => {
+  assert.equal(await engages(listReply("still think 4 is wrong", LAST_WEEK), weeklyEnv()), false);
+});
+
+test("a list thread whose card never posted is still a list thread", async () => {
+  // Recorded when the list posted, before any card: no card, only the list.
+  assert.equal(await engages(listReply("nothing to confirm here?"), weeklyEnv([], [THIS_WEEK])), false);
 });
 
 test("another thread in #plus-universal with a live card keeps the ordinary rule", async () => {

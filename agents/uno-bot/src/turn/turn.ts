@@ -74,6 +74,7 @@ import {
   proposalOperations,
   proposalReplyThread,
   revisedBy,
+  revisionRefusal,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -1076,6 +1077,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       ...(result.previewText ? {} : { note: "(confirmed — executing the proposal)" }),
       telemetry,
     });
+  }
+
+  // A card the Worker staged and keyed apart (the weekly DS precedence card)
+  // is revised only its own way. A batch that would touch it is refused with
+  // the card's note, rather than staged as a near-copy that stays live beside
+  // it — two live cards could both run.
+  const refusal = revisionRefusal(request.pending, result.operations);
+  if (refusal) {
+    await delivery.postNote(refusal);
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
   }
 
   // Gate idempotency (b): the person JUST cancelled this same action, and the

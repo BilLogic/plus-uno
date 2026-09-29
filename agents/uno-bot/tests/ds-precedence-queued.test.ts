@@ -51,11 +51,28 @@ function harness(opts: { disputeThrows?: boolean; engages?: boolean } = {}) {
   const turns: string[] = [];
   const staged: PendingProposal[] = [];
   let posted = 0;
+  // The weekly card, live, under the ts the thread record names.
+  const first: PendingProposal = {
+    operations: [{ toolName: "github_issue_create", input: { title: "t", body: "b" } }],
+    toolName: "github_issue_create",
+    input: { title: "t", body: "b" },
+    channel: CHANNEL,
+    threadTs: THREAD,
+    replyTs: THREAD,
+    userMsgTs: THREAD,
+    proposalTs: record.value!.cardTs,
+    proposalText: "card",
+    requesterUserId: "",
+    ttlMs: PRECEDENCE_CARD_TTL_MS,
+    supersedeKey: `ds-precedence:${THREAD}`,
+  };
+  const ready = threadState.putProposal(first);
   const deps: MessageJobDeps = {
     claim: (key) => threadState.claimRun(key),
     markDone: (key) => threadState.markRunDone(key),
     disputeCandidate: (e) => e.channel === CHANNEL && !!e.thread_ts && disputedItems(e.text ?? "").length > 0,
     dispute: async (e) => {
+      await ready;
       if (opts.disputeThrows) throw new Error("Slack down");
       return disputePrecedenceItems(
         {
@@ -74,7 +91,10 @@ function harness(opts: { disputeThrows?: boolean; engages?: boolean } = {}) {
             await threadState.putProposal(p);
           },
           retire: (ts) => threadState.retireProposal(ts),
-          pending: async () => true,
+          card: async (ts) => {
+            const found = await threadState.getProposalByTs(ts);
+            return found.state === "found" ? found.proposal : null;
+          },
           now: () => NOW,
         },
         { channel: e.channel, threadTs: e.thread_ts!, user: e.user!, text: e.text ?? "" },
@@ -141,17 +161,34 @@ describe("a dispute on the queued path", () => {
     assert.equal(staged[0]!.supersedeKey, staged[1]!.supersedeKey, "the revision supersedes the first");
   });
 
-  it("a dispute the thread declines runs no turn where the reply would not engage", async () => {
+  it("a dispute outside a list thread runs no turn where the reply would not engage", async () => {
     const { deps, record, turns, staged } = harness();
-    // An item not on the list, and a thread that is not the weekly one.
-    await runMessageJob(reply("1759500600.000001", "dispute 9"), deps);
-    await runMessageJob(reply("1759500600.000002", "dispute 1", { thread_ts: "1759400000.000001" }), deps);
+    const elsewhere = "1759400000.000001";
+    await runMessageJob(reply("1759500600.000001", "dispute 1", { thread_ts: elsewhere }), deps);
     assert.deepEqual(turns, []);
     assert.deepEqual(staged, []);
     assert.deepEqual(record.value?.disputed, []);
     // With an @mention it would have engaged anyway, so its turn runs.
-    await runMessageJob(reply("1759500600.000003", "<@UBOT> dispute 9"), deps);
-    assert.deepEqual(turns, ["1759500600.000003"]);
+    await runMessageJob(reply("1759500600.000002", "<@UBOT> dispute 1", { thread_ts: elsewhere }), deps);
+    assert.deepEqual(turns, ["1759500600.000002"]);
+  });
+
+  it("a declined broadcast leaves the message's key alone, so its mention twin arriving second gets its turn", async () => {
+    const { deps, turns } = harness();
+    const elsewhere = "1759400000.000001";
+    const ts = "1759500650.000001";
+    // The broadcast `message` event lands first, and is declined as a dispute.
+    await runMessageJob(reply(ts, "<@UBOT> dispute 1", { thread_ts: elsewhere, subtype: "thread_broadcast" }), deps);
+    assert.deepEqual(turns, []);
+    // Its `app_mention` twin, as `appMentionToMessage` shapes it (no subtype).
+    await runMessageJob(reply(ts, "<@UBOT> dispute 1", { thread_ts: elsewhere }), deps);
+    assert.deepEqual(turns, [ts]);
+  });
+
+  it("a dispute in the list thread that changes nothing is answered there, and runs no turn", async () => {
+    const { deps, turns } = harness();
+    assert.equal(await runMessageJob(reply("1759500660.000001", "<@UBOT> dispute 9"), deps), "handled");
+    assert.deepEqual(turns, []);
   });
 
   it("a reply that only mentions disputing changes nothing", async () => {

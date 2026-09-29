@@ -6,6 +6,7 @@
 // HARNESS_KV beside the library poll's keys.
 
 import type { Env } from "../types";
+import { charge } from "../net";
 import type { SlackMessageEvent } from "../slack/types";
 import { postMessage } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
@@ -27,7 +28,12 @@ import {
 } from "./jobs";
 
 const REPORT_KV_KEY = "ds-precedence:report";
-const THREAD_KV_KEY = "ds-precedence:thread";
+/** Every list thread is recorded under its own ts, so a later week's thread
+ *  never displaces an earlier one's. */
+const THREAD_KV_PREFIX = "ds-precedence:thread:";
+/** How long a list thread stays one: well past its card's six days, so the
+ *  replies people still add to it are not taken as turns. */
+const THREAD_RECORD_TTL_S = 30 * 24 * 60 * 60;
 const INDEX_FILE = "design-system/agent-views/components/index.md";
 
 /**
@@ -80,7 +86,7 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
   return postPrecedenceReport(
     {
       report: kvJson<PrecedenceReport | null>(env, REPORT_KV_KEY, null),
-      thread: kvJson<PostedThread | null>(env, THREAD_KV_KEY, null),
+      recordThread: (thread) => threadRecord(env, thread.ts).write(thread),
       members: () => channelMembers(env, channel),
       async openIntake() {
         const open = (await reads.openIntakes()).find((i) => i.body.includes(PRECEDENCE_MARKER));
@@ -124,11 +130,14 @@ export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent
   const store = threadStateFor(env);
   return disputePrecedenceItems(
     {
-      thread: kvJson<PostedThread | null>(env, THREAD_KV_KEY, null),
+      thread: threadRecord(env, event.thread_ts!),
       post: (message) => post(env, event.channel, message),
       stage: (proposal) => store.putProposal(proposal),
       retire: (ts) => store.retireProposal(ts),
-      pending: async (ts) => (await store.getProposalByTs(ts)).state === "found",
+      card: async (ts) => {
+        const found = await store.getProposalByTs(ts);
+        return found.state === "found" ? found.proposal : null;
+      },
       now: () => Date.now(),
     },
     { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" },
@@ -136,10 +145,10 @@ export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent
 }
 
 /**
- * Whether a #plus-universal thread is the weekly DS precedence thread, where
- * uno-bot posted its scheduled list and card. The engagement gate pairs it
- * with the thread's history: until uno-bot has answered there, those are its
- * only posts. One KV read, and only for a thread reply in that channel.
+ * Whether a #plus-universal thread is a weekly DS precedence list thread —
+ * any week's, for `THREAD_RECORD_TTL_S` after its list posted, whether or not
+ * uno-bot has answered there since. One KV read, and only for a thread reply
+ * in that channel.
  *
  * @param env - Worker bindings
  * @param channel - The reply's channel
@@ -147,8 +156,25 @@ export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent
  */
 export async function isWeeklyPrecedenceThread(env: Env, channel: string, threadTs: string): Promise<boolean> {
   if (!env.HARNESS_KV || channel !== env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()) return false;
-  const thread = await kvJson<PostedThread | null>(env, THREAD_KV_KEY, null).read();
+  const thread = await threadRecord(env, threadTs).read();
   return !!thread && thread.channel === channel && thread.ts === threadTs;
+}
+
+/** One list thread's record in HARNESS_KV, kept `THREAD_RECORD_TTL_S`. */
+function threadRecord(env: Env, threadTs: string): { read(): Promise<PostedThread | null>; write(t: PostedThread | null): Promise<void> } {
+  const key = `${THREAD_KV_PREFIX}${threadTs}`;
+  return {
+    async read() {
+      if (!env.HARNESS_KV) return null;
+      charge(1, "kv");
+      return (await env.HARNESS_KV.get<PostedThread>(key, "json")) ?? null;
+    },
+    async write(thread) {
+      if (!env.HARNESS_KV || !thread) return;
+      charge(1, "kv");
+      await env.HARNESS_KV.put(key, JSON.stringify(thread), { expirationTtl: THREAD_RECORD_TTL_S });
+    },
+  };
 }
 
 async function post(

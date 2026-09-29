@@ -22,6 +22,7 @@ import { disputedItems, PRECEDENCE_MARKER, precedenceOperations } from "../src/d
 import {
   disputePrecedenceItems,
   postPrecedenceReport,
+  type DisputeDeps,
   runPrecedenceCheck,
   PRECEDENCE_CARD_TTL_MS,
   type CheckDeps,
@@ -277,10 +278,14 @@ function postDeps(report: PrecedenceReport | null, openIntake: { number: number;
   const staged: PendingProposal[] = [];
   const reportBox = kv<PrecedenceReport | null>(report);
   const threadBox = kv<PostedThread | null>(null);
+  const recorded: PostedThread[] = [];
   let n = 0;
   const deps: PostDeps = {
     report: reportBox.store,
-    thread: threadBox.store,
+    recordThread: async (thread) => {
+      recorded.push(thread);
+      await threadBox.store.write(thread);
+    },
     members: async () => [...MEMBERS],
     openIntake: async () => openIntake,
     post: async (message) => {
@@ -294,7 +299,7 @@ function postDeps(report: PrecedenceReport | null, openIntake: { number: number;
     channel: CHANNEL,
     now: () => Date.UTC(2026, 9, 5, 14, 0),
   };
-  return { deps, posts, staged, reportBox, threadBox };
+  return { deps, posts, staged, reportBox, threadBox, recorded };
 }
 
 describe("the end-of-day check", () => {
@@ -314,14 +319,18 @@ describe("the end-of-day check", () => {
   });
 
   it("an empty or near-empty library skips the week rather than reporting every component missing", async () => {
-    // Nothing at all, and one set for three indexed components.
-    for (const components of [[], LIBRARY.meta!.components!.slice(0, 1)]) {
-      const stale = kv<PrecedenceReport | null>({ checkedAt: "x", items: [] } as unknown as PrecedenceReport);
+    // Nothing at all; one indexed component of three; and a library padded
+    // with sets the index does not list (icons), which count for nothing.
+    const icons = Array.from({ length: 40 }, (_, i) => variant(`size=${i}`, `9${i}:1`, `Icon ${i}`, `9${i}:9`));
+    for (const components of [[], LIBRARY.meta!.components!.slice(0, 1), icons]) {
+      const waiting = { checkedAt: "2026-09-25T22:00:00.000Z", items: [] } as unknown as PrecedenceReport;
+      const stale = kv<PrecedenceReport | null>(waiting);
       const { deps, report } = checkDeps({ meta: { components } }, stale);
       const result = await runPrecedenceCheck(deps);
       assert.equal(result.found, 0);
       assert.match(result.summary, /week skipped/);
-      assert.equal(report.box.value, null, "nothing is kept for the morning, so nothing posts");
+      assert.equal(report.box.writes, 0, "a report still waiting for its morning is left as it is");
+      assert.equal(report.box.value, waiting);
     }
   });
 
@@ -387,6 +396,18 @@ describe("the morning post", () => {
     assert.equal(ops[0]!.input.issue_number, 900);
     assert.match(String(ops[0]!.input.comment), /TreeSelect/);
     assert.equal(ops.some((o) => o.toolName === "github_issue_create"), false);
+  });
+
+  it("records the list thread before its card, so a card that fails still leaves a list thread", async () => {
+    const { deps, recorded, staged } = postDeps(await weekReport(), null);
+    const post = deps.post;
+    deps.post = async (m) => (m.thread_ts ? { ok: false } : post(m));
+    const result = await postPrecedenceReport(deps);
+    assert.equal(result.posted, true);
+    assert.deepEqual(staged, []);
+    assert.equal(recorded.length, 1);
+    assert.equal(recorded[0]!.ts, "1759500000.000001");
+    assert.equal(recorded[0]!.cardTs, "", "no card, but the thread is known");
   });
 
   it("keeps the report for tomorrow when the members cannot be read", async () => {
@@ -485,103 +506,151 @@ describe("a dispute in the thread", () => {
     assert.deepEqual(disputedItems("dispute 3?"), [], "a question, not a dispute");
   });
 
-  it("revises the card without the disputed item, in the same thread", async () => {
-    const { thread } = await posted();
+  const NOW = Date.UTC(2026, 9, 5, 16, 0);
+
+  /** The posted thread, its first card live in an in-memory ThreadState, and
+   *  the dispute's dependencies over both. */
+  async function world(opts: {
+    postFails?: boolean;
+    stageThrows?: boolean;
+    writeThrows?: boolean;
+    onPost?: (m: Post) => Promise<void>;
+  } = {}) {
+    const { thread, first } = await posted();
+    const threadState = createInMemoryThreadState({ now: () => NOW });
+    await threadState.putProposal(first);
+    const record = kv<PostedThread | null>(thread);
     const posts: Post[] = [];
-    const staged: PendingProposal[] = [];
-    const threadBox = kv<PostedThread | null>(thread);
-    const handled = await disputePrecedenceItems(
-      {
-        thread: threadBox.store,
-        post: async (m) => {
-          posts.push(m);
-          return { ok: true, ts: "1759600000.000001" };
+    let n = 0;
+    const deps: DisputeDeps = {
+      thread: {
+        read: record.store.read,
+        write: async (v) => {
+          if (opts.writeThrows) throw new Error("KV down");
+          await record.store.write(v);
         },
-        stage: async (p) => {
-          staged.push(p);
-        },
-        retire: async () => {},
-        pending: async () => true,
-        now: () => Date.UTC(2026, 9, 5, 16, 0),
       },
-      { channel: CHANNEL, threadTs: thread.ts, user: MEMBERS[0]!, text: "dispute 2 — TreeSelect is on its way" },
-    );
-    assert.equal(handled, true);
-    assert.equal(posts.length, 1);
-    assert.equal(posts[0]!.thread_ts, thread.ts);
-    const p = staged[0]!;
-    assert.equal(p.replyTs, thread.ts, "same reply thread, so the old card is superseded");
-    assert.equal(p.proposalTs, "1759600000.000001");
-    assert.deepEqual(p.confirmers, MEMBERS);
-    const body = String(p.operations![0]!.input.body);
+      post: async (m) => {
+        posts.push(m);
+        await opts.onPost?.(m);
+        n += 1;
+        return opts.postFails && m.blocks ? { ok: false } : { ok: true, ts: `175960000${n}.000001` };
+      },
+      stage: async (p) => {
+        if (opts.stageThrows && p.proposalTs !== first.proposalTs) throw new Error("ThreadState down");
+        await threadState.putProposal(p);
+      },
+      retire: (ts) => threadState.retireProposal(ts),
+      card: async (ts) => {
+        const found = await threadState.getProposalByTs(ts);
+        return found.state === "found" ? found.proposal : null;
+      },
+      now: () => NOW,
+    };
+    const dispute = (text: string, threadTs = thread.ts) =>
+      disputePrecedenceItems(deps, { channel: CHANNEL, threadTs, user: MEMBERS[0]!, text });
+    return { thread, first, threadState, record, posts, deps, dispute };
+  }
+
+  it("revises the card without the disputed item, in the same thread", async () => {
+    const w = await world();
+    assert.equal(await w.dispute("dispute 2 — TreeSelect is on its way"), true);
+    assert.equal(w.posts.length, 1);
+    assert.equal(w.posts[0]!.thread_ts, w.thread.ts);
+    const revised = await w.threadState.getProposalByTs(w.record.box.value!.cardTs);
+    assert.equal(revised.state, "found");
+    const p = revised.state === "found" ? revised.proposal : null;
+    assert.equal(p!.supersedeKey, w.first.supersedeKey, "the revision shares the weekly card's key");
+    assert.deepEqual(p!.confirmers, MEMBERS);
+    const body = String(p!.operations![0]!.input.body);
     assert.match(body, /Button/);
     assert.doesNotMatch(body, /TreeSelect/);
-    assert.ok((p.ttlMs ?? 0) < PRECEDENCE_CARD_TTL_MS, "a revision does not extend the card's life");
-    assert.deepEqual(threadBox.box.value?.disputed, [2]);
+    assert.ok((p!.ttlMs ?? 0) < PRECEDENCE_CARD_TTL_MS, "a revision does not extend the card's life");
+    assert.deepEqual(w.record.box.value?.disputed, [2]);
+    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
   });
 
   it("disputing every item withdraws the card", async () => {
-    const { thread, first } = await posted();
-    const retired: string[] = [];
-    const posts: Post[] = [];
-    const handled = await disputePrecedenceItems(
-      {
-        thread: kv<PostedThread | null>(thread).store,
-        post: async (m) => {
-          posts.push(m);
-          return { ok: true, ts: "1759600000.000002" };
-        },
-        stage: async () => assert.fail("nothing to stage"),
-        retire: async (ts) => {
-          retired.push(ts);
-        },
-        pending: async () => true,
-        now: () => Date.UTC(2026, 9, 5, 16, 0),
-      },
-      { channel: CHANNEL, threadTs: thread.ts, user: MEMBERS[1]!, text: "dispute 1, 2" },
-    );
-    assert.equal(handled, true);
-    assert.deepEqual(retired, [first.proposalTs]);
-    assert.match(posts[0]!.text, /withdrawn/);
+    const w = await world();
+    assert.equal(await w.dispute("dispute 1, 2"), true);
+    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
+    assert.match(w.posts[0]!.text, /withdrawn/);
   });
 
-  it("leaves every other reply to the agent", async () => {
-    const { thread } = await posted();
-    const deps = {
-      thread: kv<PostedThread | null>(thread).store,
-      post: async () => assert.fail("no post"),
-      stage: async () => assert.fail("no stage"),
-      retire: async () => assert.fail("no retire"),
-      pending: async () => true,
-      now: () => Date.UTC(2026, 9, 5, 16, 0),
-    };
-    // Not a dispute; another thread; an item that is not on the list.
-    assert.equal(await disputePrecedenceItems(deps, { channel: CHANNEL, threadTs: thread.ts, user: "U1", text: "thanks!" }), false);
-    assert.equal(await disputePrecedenceItems(deps, { channel: CHANNEL, threadTs: "1.2", user: "U1", text: "dispute 1" }), false);
-    assert.equal(await disputePrecedenceItems(deps, { channel: CHANNEL, threadTs: thread.ts, user: "U1", text: "dispute 9" }), false);
+  it("the old card is retired before the revision posts, so a racing ✅ runs nothing", async () => {
+    const outcomes: string[] = [];
+    const w = await world({
+      onPost: async (m) => {
+        if (!m.blocks) return;
+        const verdict = await resolveSignal(
+          { kind: "reaction", messageTs: w.first.proposalTs, channel: CHANNEL, thread: w.thread.ts, glyph: "white_check_mark", userId: MEMBERS[1]! },
+          { threadState: w.threadState },
+        );
+        outcomes.push(verdict.outcome);
+      },
+    });
+    await w.dispute("dispute 2");
+    assert.equal(outcomes.length, 1);
+    assert.notEqual(outcomes[0], "won", "a confirm on the retired card resolves nothing");
+  });
+
+  it("a revision that fails to post restores the old card", async () => {
+    const w = await world({ postFails: true });
+    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
+    assert.equal(w.record.box.value?.cardTs, w.first.proposalTs);
+    assert.deepEqual(w.record.box.value?.disputed, []);
+  });
+
+  it("a revision that posts but does not stage restores the old card and says so, and later disputes still work", async () => {
+    const w = await world({ stageThrows: true });
+    assert.equal(await w.dispute("dispute 2"), true, "no fall-through to a turn");
+    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
+    assert.equal(w.record.box.value?.cardTs, w.first.proposalTs, "the record names the live card");
+    assert.match(w.posts.at(-1)!.text, /didn't go through/);
+    // The next dispute is judged against the card that is actually live.
+    const posted = w.posts.length;
+    assert.equal(await w.dispute("dispute 9"), true);
+    assert.match(w.posts[posted]!.text, /not on this week's list/);
+  });
+
+  it("a revision whose record does not write restores the old card over it", async () => {
+    const w = await world({ writeThrows: true });
+    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
+    const revisionTs = w.posts.find((m) => m.blocks) ? "1759600001.000001" : "";
+    assert.notEqual((await w.threadState.getProposalByTs(revisionTs)).state, "found", "the revision is not live");
+    assert.match(w.posts.at(-1)!.text, /didn't go through/);
+  });
+
+  it("a dispute that changes nothing says why in one line", async () => {
+    const w = await world();
+    await w.dispute("dispute 9");
+    assert.match(w.posts.at(-1)!.text, /^Item 9 is not on this week's list\.$/);
+    await w.dispute("dispute 2");
+    await w.dispute("dispute 2");
+    assert.match(w.posts.at(-1)!.text, /^Item 2 is already dropped\.$/);
+    assert.deepEqual(w.record.box.value?.disputed, [2]);
   });
 
   it("a dispute after the card is decided revises nothing, so no second intake is filed", async () => {
-    const { thread, first } = await posted();
-    const threadState = createInMemoryThreadState();
-    await threadState.putProposal(first);
+    const w = await world();
     const won = await resolveSignal(
-      { kind: "reaction", messageTs: first.proposalTs, channel: CHANNEL, thread: first.replyTs!, glyph: "white_check_mark", userId: MEMBERS[0]! },
-      { threadState },
+      { kind: "reaction", messageTs: w.first.proposalTs, channel: CHANNEL, thread: w.thread.ts, glyph: "white_check_mark", userId: MEMBERS[0]! },
+      { threadState: w.threadState },
     );
     assert.equal(won.outcome, "won");
-    const handled = await disputePrecedenceItems(
-      {
-        thread: kv<PostedThread | null>(thread).store,
-        post: async () => assert.fail("no revised card"),
-        stage: async () => assert.fail("nothing staged"),
-        retire: async () => assert.fail("nothing retired"),
-        pending: async (ts) => (await threadState.getProposalByTs(ts)).state === "found",
-        now: () => Date.UTC(2026, 9, 5, 16, 0),
-      },
-      { channel: CHANNEL, threadTs: thread.ts, user: MEMBERS[1]!, text: "dispute 2" },
-    );
-    assert.equal(handled, false, "the reply goes to the agent");
+    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal(w.posts.length, 1);
+    assert.match(w.posts[0]!.text, /already been decided or has expired/);
+    assert.equal(w.posts[0]!.blocks, undefined, "no revised card");
+  });
+
+  it("leaves a reply outside a list thread, or one that is no dispute, to the ordinary path", async () => {
+    const w = await world();
+    assert.equal(await w.dispute("thanks!"), false);
+    assert.equal(await w.dispute("dispute 1", "1.2"), false);
+    assert.deepEqual(w.posts, []);
   });
 
   it("the operations a card runs follow the target", () => {

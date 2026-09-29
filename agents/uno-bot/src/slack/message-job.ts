@@ -2,30 +2,29 @@
 // `onMessage` that decides WHAT runs, on named dependencies so the orderings
 // that matter are driven with fakes (tests/ds-precedence-queued.test.ts).
 //
-// A `dispute N` reply in the weekly DS precedence thread is handled HERE, at
-// the head of the thread's own job, and nowhere earlier. Being on the queued
-// path is what makes it safe:
-//   • the `message` event and its `app_mention` twin claim the same run key,
-//     so whichever arrives second finds the first done and the dispute is
-//     handled once;
+// A `dispute N` reply in a weekly DS precedence list thread is handled HERE,
+// at the head of the thread's own job, and nowhere earlier:
+//   • the dispute has its own claim (`dispute:` + channel + ts), so the
+//     `message` event and its `app_mention` twin try it once between them;
+//     one that is handled also marks the message's own key done, so the twin
+//     that lands second runs no turn;
 //   • the thread's runner takes one job at a time, so two quick disputes each
 //     read the thread record the other left;
+//   • a dispute that is NOT handled (not a list thread) leaves the message's
+//     key alone and takes the ordinary path exactly as the message would have
+//     without it: a subtype such as a `thread_broadcast` is skipped unclaimed,
+//     and a reply the engagement gate would not have queued runs nothing —
+//     so an `app_mention` twin arriving second still gets its turn;
 //   • a revision that throws falls through to the ordinary turn in the same
-//     job, so the reply is answered rather than dropped;
-//   • a dispute the thread declines (another thread, an item not on the list,
-//     a card already decided) runs a turn only where the reply would have
-//     engaged uno-bot anyway — queuing a candidate skipped that gate, so it
-//     is asked here.
-// A dispute posted "also send to channel" arrives as a `thread_broadcast`
-// subtype; it is the one subtype let through, and only as a dispute.
+//     job, so the reply is answered rather than dropped.
 
 import type { RunClaim } from "../thread-state/index";
 import type { SlackMessageEvent } from "./types";
 
 export interface MessageJobDeps {
-  /** Claim the message's run key; fails open to "claimed" upstream. */
+  /** Claim a run key; fails open to "claimed" upstream. */
   claim(runKey: string): Promise<RunClaim>;
-  /** Mark the run key done. Best-effort. */
+  /** Mark a run key done. Best-effort. */
   markDone(runKey: string): Promise<void>;
   /** Whether the event could be a weekly-thread dispute — no reads. */
   disputeCandidate(event: SlackMessageEvent): boolean;
@@ -50,16 +49,38 @@ export function isUserTurn(event: SlackMessageEvent): boolean {
  * Run one message job.
  *
  * @param event - The message
- * @param deps - The claim, the dispute and the turn
- * @returns "deferred" while another invocation holds the run's lease
+ * @param deps - The claims, the dispute and the turn
+ * @returns "deferred" while another invocation holds a lease this job needs
  */
 export async function runMessageJob(event: SlackMessageEvent, deps: MessageJobDeps): Promise<"handled" | "deferred"> {
-  const candidate = deps.disputeCandidate(event);
-  if (!isUserTurn(event) && !candidate) {
-    console.log(`[slack] skipping subtype=${event.subtype ?? ""} bot=${event.bot_id ?? ""}`);
-    return "handled";
-  }
   const runKey = `msg:${event.channel}:${event.ts}`;
+  let threw = false;
+  if (deps.disputeCandidate(event)) {
+    const disputeKey = `dispute:${event.channel}:${event.ts}`;
+    const claim = await deps.claim(disputeKey);
+    if (claim === "running") return "deferred";
+    if (claim === "claimed") {
+      let handled = false;
+      try {
+        handled = await deps.dispute(event);
+      } catch (err) {
+        // A failed revision leaves the reply to the turn rather than to nobody.
+        console.error(`[ds-precedence] dispute not handled: ${err instanceof Error ? err.message : String(err)}`);
+        threw = true;
+      }
+      await deps.markDone(disputeKey);
+      if (handled) {
+        await deps.markDone(runKey);
+        return "handled";
+      }
+    }
+    // Not handled: the ordinary path, as if the dispute had never been tried.
+    if (!isUserTurn(event)) return skip(event);
+    if (!threw && !(await deps.engages(event))) return "handled";
+  } else if (!isUserTurn(event)) {
+    return skip(event);
+  }
+
   const claim = await deps.claim(runKey);
   if (claim === "done") {
     console.log(`[slack] dedup: msg ${event.channel}/${event.ts} already handled`);
@@ -70,23 +91,15 @@ export async function runMessageJob(event: SlackMessageEvent, deps: MessageJobDe
     return "deferred";
   }
   try {
-    if (candidate) {
-      let threw = false;
-      const handled = await deps.dispute(event).catch((err: unknown) => {
-        // A failed revision leaves the reply to the turn rather than to nobody.
-        console.error(`[ds-precedence] dispute not handled: ${err instanceof Error ? err.message : String(err)}`);
-        threw = true;
-        return false;
-      });
-      if (handled) return "handled";
-      // A broadcast is let through only as a dispute.
-      if (!isUserTurn(event)) return "handled";
-      if (!threw && !(await deps.engages(event))) return "handled";
-    }
     await deps.turn(event);
   } finally {
     // Also marks done on a throw: the thrown path posts a visible ❌ upstream.
     await deps.markDone(runKey);
   }
+  return "handled";
+}
+
+function skip(event: SlackMessageEvent): "handled" {
+  console.log(`[slack] skipping subtype=${event.subtype ?? ""} bot=${event.bot_id ?? ""}`);
   return "handled";
 }

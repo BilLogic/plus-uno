@@ -3,11 +3,11 @@
 //   • the CHECK — Friday's end-of-day run (`ds-precedence-check`,
 //     src/scheduled/runs.ts): read, compare, and keep the report in KV for the
 //     morning. It posts nothing. A clean week keeps nothing, and clears a
-//     report no morning ever posted, so a stale list never goes out. So does a
-//     library that answers fewer sets than `MIN_LIBRARY_RATIO` of the indexed
-//     components: that is a Figma or token fault, not a library that emptied
+//     report no morning ever posted, so a stale list never goes out. A
+//     library that has fewer than `MIN_LIBRARY_RATIO` of the indexed
+//     components is a Figma or token fault, not a library that emptied
 //     overnight, and reporting every component missing would file a wrong
-//     intake — the week is skipped, logged once.
+//     intake — that week is skipped, logged once, and changes nothing kept.
 //   • the POST — every morning run (`ds-precedence-post`): when a report is
 //     waiting, open ONE thread in #plus-universal — the list — and put the
 //     card in it. The card files the weekly intake, or comments on the one
@@ -23,10 +23,14 @@
 //     and two disputes run one after the other. Every weekly card carries the
 //     thread's own `supersedeKey`: a revision supersedes the old card, so a
 //     late ✅ on it is told it was replaced, while a turn's card in the same
-//     thread and the weekly card leave each other alone. The revision keeps the
-//     old card's expiry. Disputing every item withdraws the card. Only a card
-//     still pending is revised: once it is decided, the intake is filed (or
-//     declined), and a revision would file a second one.
+//     thread and the weekly card leave each other alone, and a turn whose
+//     batch would touch the weekly card is refused with a pointer to
+//     `dispute N`. The revision keeps the old card's expiry. Disputing every
+//     item withdraws the card. Only a card still pending is revised; a dispute
+//     that changes nothing gets one line saying why.
+//     Every list thread is recorded under its own ts (`env.ts`), before its
+//     card posts, so the engagement gate and the dispute find it whichever
+//     week it is and whether or not the card made it.
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
 //   check: the index + the registry from GitHub + the library's /components
@@ -34,7 +38,8 @@
 //          the internal bucket.
 //   post:  members (at most 3 pages) + the open-intake lookup (1) + the list
 //          (1) + the card (1) = 6; the staging is a Durable Object hop.
-//   dispute: one post; the staging and the KV state are internal.
+//   dispute: at most two posts (the revision, and a line if it fails); the
+//          staging and the KV record are internal.
 //
 // `Env` enters in `ds-precedence/env.ts`.
 
@@ -43,6 +48,7 @@ import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render
 import type { FigmaComponentsResponse } from "../figma-poll";
 import {
   findDisagreements,
+  indexedInLibrary,
   liveLibraryFrom,
   parseComponentIndex,
   type Disagreement,
@@ -59,7 +65,8 @@ import {
 
 /** How long the weekly card stays confirmable: gone before next week's. */
 export const PRECEDENCE_CARD_TTL_MS = 6 * 24 * 60 * 60 * 1000;
-/** The fewest published sets per indexed component the check believes. */
+/** The share of indexed components the library must have for the check to
+ *  believe it (`indexedInLibrary`). */
 const MIN_LIBRARY_RATIO = 0.5;
 /** A revision close to expiry still gets this long. */
 const MIN_REVISION_TTL_MS = 60 * 60 * 1000;
@@ -127,15 +134,16 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
   const index = parseComponentIndex(markdown);
   if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
   const library = liveLibraryFrom(components);
-  if (library.sets.length < index.length * MIN_LIBRARY_RATIO) {
+  const present = indexedInLibrary(index, registry, library);
+  if (present < index.length * MIN_LIBRARY_RATIO) {
     // An empty or near-empty answer is a Figma or permissions fault, not a
     // library that lost most of its components overnight: reporting every
-    // component missing would file a wrong intake. The week is skipped.
+    // component missing would file a wrong intake. The week is skipped, and
+    // a report still waiting for its morning is left as it is.
     console.error(
-      `[ds-precedence] the library answered ${library.sets.length} set(s) for ${index.length} indexed components — week skipped`,
+      `[ds-precedence] the library has ${present} of ${index.length} indexed components — week skipped`,
     );
-    if (!opts.dryRun) await deps.report.write(null);
-    return { found: 0, summary: `library near-empty (${library.sets.length} sets) — week skipped` };
+    return { found: 0, summary: `library near-empty (${present} of ${index.length} indexed) — week skipped` };
   }
   const items = findDisagreements({
     index,
@@ -156,7 +164,9 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
 
 export interface PostDeps {
   report: Store<PrecedenceReport | null>;
-  thread: Store<PostedThread | null>;
+  /** Record a posted list thread under its own ts, for as long as its card
+   *  and its replies matter (`env.ts`). */
+  recordThread(thread: PostedThread): Promise<void>;
   /** The channel's member ids, or null when Slack would not say. */
   members(): Promise<string[] | null>;
   /** The open weekly intake, or null when none is open. */
@@ -197,6 +207,9 @@ function stagedCard(
     // Keyed apart from the thread: a turn's card in this thread neither
     // replaces the weekly card nor is replaced by it; its revisions share it.
     supersedeKey: `ds-precedence:${thread.ts}`,
+    refuseRevision:
+      "This is the weekly DS precedence card, and it changes only one way: reply `dispute N` (or `dispute 1, 3`) " +
+      "to drop an item, and I'll post the revised card.",
   };
 }
 
@@ -234,9 +247,10 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
   // The list is up: posting it again tomorrow would make two threads, so the
   // report is handed off whatever happens to the card.
   await deps.report.write(null);
-  const base = {
+  const base: PostedThread = {
     channel: deps.channel,
     ts: list.ts,
+    cardTs: "",
     weekOf,
     items,
     disputed: [],
@@ -244,6 +258,9 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
     confirmers: [...members],
     expiresAt: deps.now() + PRECEDENCE_CARD_TTL_MS,
   };
+  // Recorded before the card: a list thread is one whether or not its card
+  // makes it, so its replies are never all turns.
+  await deps.recordThread(base);
   const sent = await deps.post({ text: card.text, blocks: proposalCardBlocks(card.text), thread_ts: list.ts });
   if (!sent.ok || !sent.ts) {
     console.error("[ds-precedence] the list posted and the card did not");
@@ -253,19 +270,21 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
     await deps.stage(stagedCard(base, sent.ts, card, operations, PRECEDENCE_CARD_TTL_MS));
   } catch (err) {
     console.error(`[ds-precedence] card posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
+    return { posted: true, summary: `posted ${items.length} item(s); the card did not stage` };
   }
-  await deps.thread.write({ ...base, cardTs: sent.ts });
+  await deps.recordThread({ ...base, cardTs: sent.ts });
   return { posted: true, summary: `posted ${items.length} item(s) and a card` };
 }
 
 export interface DisputeDeps {
+  /** The record of the thread the reply is in, or null when it is no list thread. */
   thread: Store<PostedThread | null>;
   post(message: { text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
   stage(proposal: PendingProposal): Promise<void>;
   /** Retire a card so no ✅ runs it. */
   retire(proposalTs: string): Promise<void>;
-  /** Whether the card is still pending — not decided, expired or replaced. */
-  pending(proposalTs: string): Promise<boolean>;
+  /** The card as staged while it is still pending; null once decided, expired or replaced. */
+  card(proposalTs: string): Promise<PendingProposal | null>;
   now(): number;
 }
 
@@ -277,56 +296,79 @@ export interface ThreadReply {
   text: string;
 }
 
-/**
- * The items a reply newly disputes in the live weekly thread — empty when it
- * is not a dispute, not in that thread, after the card expired, or names only
- * items that are not on the list or already dropped.
- *
- * @param thread - The posted thread, or null
- * @param reply - The reply
- * @param now - The time
- */
-export function freshDisputes(thread: PostedThread | null, reply: Omit<ThreadReply, "user">, now: number): number[] {
-  const numbers = disputedItems(reply.text);
-  if (!numbers.length || !thread || thread.channel !== reply.channel || thread.ts !== reply.threadTs) return [];
-  if (now >= thread.expiresAt) return [];
-  return numbers.filter((n) => thread.items.some((i) => i.n === n) && !thread.disputed.includes(n));
-}
+const listed = (ns: readonly number[]) =>
+  ns.length === 1 ? `Item ${ns[0]} is` : `Items ${ns.slice(0, -1).join(", ")} and ${ns[ns.length - 1]} are`;
 
 /**
- * A reply in the weekly thread that disputes items: revise the card without
- * them. Answers whether it handled the reply — false leaves it to the agent.
+ * A reply starting `dispute N` in a list thread: revise its card without the
+ * items. Answers whether it handled the reply — false (not a list thread, or
+ * not a dispute) leaves it to the ordinary path.
  *
- * @param deps - The thread state, the post and the staging
+ * In a list thread every dispute is answered: a revised card, a withdrawn one,
+ * or one line saying why nothing changed — an item not on the list, one
+ * already dropped, or a card already decided or expired.
+ *
+ * The old card is retired BEFORE the revised one posts, as a turn's revision
+ * does, so a ✅ racing the dispute cannot run the list the person just pushed
+ * back on; a revision that fails to post restores it. Anything that fails
+ * after the revised card posts restores the old card too and says so in one
+ * line, so the record and the live card never disagree.
+ *
+ * @param deps - The thread record, the posts, the staging and the card lookup
  * @param reply - The reply
  */
 export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadReply): Promise<boolean> {
-  if (!disputedItems(reply.text).length) return false;
+  const numbers = disputedItems(reply.text);
+  if (!numbers.length) return false;
   const thread = await deps.thread.read();
-  const fresh = freshDisputes(thread, reply, deps.now());
-  if (!thread || !fresh.length || !(await deps.pending(thread.cardTs))) return false;
+  if (!thread || thread.channel !== reply.channel || thread.ts !== reply.threadTs) return false;
+  const say = async (text: string) => {
+    await deps.post({ text, thread_ts: thread.ts });
+    return true;
+  };
+
+  const old = thread.cardTs && deps.now() < thread.expiresAt ? await deps.card(thread.cardTs) : null;
+  if (!old) return say("The card has already been decided or has expired, so there is nothing to revise.");
+  const notListed = numbers.filter((n) => !thread.items.some((i) => i.n === n));
+  const dropped = numbers.filter((n) => thread.disputed.includes(n));
+  const fresh = numbers.filter((n) => !notListed.includes(n) && !dropped.includes(n));
+  if (!fresh.length) {
+    return say(
+      [notListed.length ? `${listed(notListed)} not on this week's list.` : "", dropped.length ? `${listed(dropped)} already dropped.` : ""]
+        .filter(Boolean)
+        .join(" "),
+    );
+  }
 
   const disputed = [...thread.disputed, ...fresh].sort((a, b) => a - b);
   const remaining = thread.items.filter((i) => !disputed.includes(i.n));
+  const ttlMs = Math.max(thread.expiresAt - deps.now(), MIN_REVISION_TTL_MS);
+  const restore = () => deps.stage({ ...old, ttlMs });
+
+  await deps.retire(old.proposalTs);
   if (!remaining.length) {
-    await deps.retire(thread.cardTs);
-    await deps.post({
-      text: `Every item is disputed, so the card is withdrawn and nothing is filed this week (disputed by <@${reply.user}>).`,
-      thread_ts: thread.ts,
-    });
-    await deps.thread.write({ ...thread, disputed });
-    return true;
+    await deps.thread.write({ ...thread, disputed, cardTs: "" });
+    return say(`Every item is disputed, so the card is withdrawn and nothing is filed this week (disputed by <@${reply.user}>).`);
   }
 
   const operations = precedenceOperations(remaining, thread.target, thread.weekOf);
-  const ttlMs = Math.max(thread.expiresAt - deps.now(), MIN_REVISION_TTL_MS);
   const card = renderProposalCard(precedenceCard(remaining, disputed, thread.target, operations, ttlMs / 3_600_000));
   const sent = await deps.post({ text: card.text, blocks: proposalCardBlocks(card.text), thread_ts: thread.ts });
   if (!sent.ok || !sent.ts) {
-    console.error("[ds-precedence] the revised card did not post; the old card stands");
+    console.error("[ds-precedence] the revised card did not post; the old card is restored");
+    await restore();
     return true;
   }
-  await deps.stage(stagedCard(thread, sent.ts, card, operations, ttlMs));
-  await deps.thread.write({ ...thread, disputed, cardTs: sent.ts });
+  try {
+    await deps.stage(stagedCard(thread, sent.ts, card, operations, ttlMs));
+    await deps.thread.write({ ...thread, disputed, cardTs: sent.ts });
+  } catch (err) {
+    console.error(`[ds-precedence] revision posted but not recorded: ${err instanceof Error ? err.message : String(err)}`);
+    // The old card shares the revision's key, so restoring it retires the
+    // revision if it was staged; the record still names the old card.
+    await restore().catch(() => {});
+    await deps.retire(sent.ts).catch(() => {});
+    await say("That revised card didn't go through, so the card before it still stands. Try the `dispute` again.").catch(() => {});
+  }
   return true;
 }

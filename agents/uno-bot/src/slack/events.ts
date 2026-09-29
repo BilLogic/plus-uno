@@ -348,13 +348,12 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
   try {
     const store = threadStateFor(env);
     const ref = { channel: event.channel, thread: event.thread_ts };
-    // A thread whose only uno-bot posts are its own scheduled ones (the weekly
-    // DS precedence list and card) is a place people talk about those posts,
-    // not to uno-bot: engage on an @mention (above) or a typed gate emoji,
-    // until uno-bot has answered in it. `dispute N` is queued on its own.
+    // A weekly DS precedence list thread is a place people talk about the
+    // list, not to uno-bot: for as long as it is recorded as one, engage only
+    // on an @mention (above) or a typed gate emoji — never because uno-bot
+    // has posted or answered there. `dispute N` is queued on its own.
     if (await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts)) {
-      if (typedEmojiDecision(event.text ?? "")) return true;
-      return (await store.readHistory(ref)).length > 0;
+      return typedEmojiDecision(event.text ?? "") !== null;
     }
     const pending = await store.getProposalByThread(ref);
     if (pending) return true;
