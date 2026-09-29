@@ -1,4 +1,5 @@
 import React from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Dropdown from './Dropdown';
 
@@ -232,6 +233,80 @@ Overview.parameters = {
     docs: {
         source: { language: 'jsx', code: webAppSourceSnippets.dropdown }
     }
+};
+
+/* ------------------------------------------------------------------ Escape */
+
+const ESCAPE_ITEMS = [{ text: 'Rename' }, { text: 'Archive' }];
+
+/** Open with the keyboard, Tab into the menu, then Escape: closed, focus on `toggle`. */
+const escapeReturnsFocus = async (canvas, toggle) => {
+    toggle.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    const first = canvas.getByRole('button', { name: 'Rename' });
+    first.focus();
+    await expect(first).toHaveFocus();
+
+    await userEvent.keyboard('{Escape}');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(canvas.queryByRole('button', { name: 'Rename' }), 'the menu is gone').toBeNull();
+    await expect(toggle, 'focus is back on the toggle').toHaveFocus();
+};
+
+/**
+ * Escape closes the menu from inside it and returns focus to the toggle, so a
+ * keyboard user is never left on an item that has disappeared.
+ */
+export const EscapeCloses = () => (
+    <div style={{ padding: '24px 24px 160px' }}>
+        <Dropdown buttonText="Actions" items={ESCAPE_ITEMS} />
+    </div>
+);
+
+EscapeCloses.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await escapeReturnsFocus(canvas, canvas.getByRole('button', { name: 'Actions' }));
+};
+
+/**
+ * In a split button focus goes back to the caret half, not the action half,
+ * on whichever side the caret sits.
+ */
+export const EscapeClosesSplit = () => (
+    <div style={{ display: 'flex', gap: '48px', padding: '24px 24px 160px 240px' }}>
+        <Dropdown split buttonText="Save" items={ESCAPE_ITEMS} />
+        <Dropdown split direction="dropleft" buttonText="Send" items={ESCAPE_ITEMS} />
+    </div>
+);
+
+EscapeClosesSplit.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await escapeReturnsFocus(canvas, canvas.getByRole('button', { name: 'Save options' }));
+    await escapeReturnsFocus(canvas, canvas.getByRole('button', { name: 'Send options' }));
+};
+
+/**
+ * A custom toggle with nothing focusable in it: Escape focuses the wrapper
+ * that was pressed, never the page.
+ */
+export const EscapeClosesCustomToggle = () => (
+    <div style={{ padding: '24px 24px 160px' }}>
+        <Dropdown toggle={<span>Sections</span>} items={ESCAPE_ITEMS} />
+    </div>
+);
+
+EscapeClosesCustomToggle.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByText('Sections'));
+    const first = canvas.getByRole('button', { name: 'Rename' });
+    first.focus();
+
+    await userEvent.keyboard('{Escape}');
+    await expect(canvas.queryByRole('button', { name: 'Rename' })).toBeNull();
+    await expect(document.activeElement, 'focus did not fall to the page').not.toBe(document.body);
+    await expect(document.activeElement).toContainElement(canvas.getByText('Sections'));
 };
 
 export const Interactive = {

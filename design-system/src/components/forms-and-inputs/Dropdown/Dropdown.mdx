@@ -191,12 +191,15 @@ would run off the edge, remeasuring on scroll and resize.
   from `buttonText` plus the word "options", which is why the toggle half of a
   split button renders no visible text.
 - **The menu is not an ARIA menu.** The container is a plain div and each item is
-  a `button`; there is no `role="menu"` or `role="menuitem"`, no arrow-key
-  navigation, and no Escape-to-close. Items are reached by tabbing, which works
-  but does not match the menu pattern a screen-reader user expects.
-- **Closing is mouse-driven.** The outside-click listener is bound to
-  `mousedown` only. A keyboard user leaves the menu by tabbing past it, not by
-  dismissing it.
+  a `button`; there is no `role="menu"` or `role="menuitem"` and no arrow-key
+  navigation. Items are reached by tabbing, which works but does not match the
+  menu pattern a screen-reader user expects.
+- **Escape closes it.** Pressing Escape anywhere in an open dropdown closes the
+  menu and puts focus back on the toggle: the caret button, on whichever side
+  of a split button it sits, or the control inside a custom `toggle`. A custom
+  toggle with nothing focusable in it has its wrapper focused instead, so focus
+  never falls to the page. A click outside, bound to `mousedown`, also closes
+  it.
 - **A custom `toggle` loses keyboard access.** The node you pass is wrapped in a
   `div` with an `onClick` and no role, tabindex or key handler — so it is
   clickable and nothing else. Pass a `Button` as the trigger only if you are

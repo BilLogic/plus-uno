@@ -20,6 +20,10 @@ const Dropdown = ({
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const menuRef = useRef(null);
+    // Where Escape sends focus back to: the built-in toggle, or the wrapper
+    // around a custom one.
+    const toggleRef = useRef(null);
+    const customToggleRef = useRef(null);
     // Viewport-aware placement: the menu flips up when there isn't room below, and right-aligns
     // when a left-aligned menu would spill off the right edge. Only the default vertical dropdown
     // is auto-placed; an explicit `direction` of dropup/dropleft/dropright is honored as authored.
@@ -55,18 +59,20 @@ const Dropdown = ({
     /*
      * Escape closes an open menu and puts focus back on the toggle, so a
      * keyboard user who tabbed into the items is not left inside a menu that
-     * has gone. The toggle is the first focusable element outside the menu:
-     * the built-in button, or whatever control a custom `toggle` renders.
+     * has gone. The toggle is the built-in toggle button (the caret half of a
+     * split button, whichever side it sits on), or the control a custom
+     * `toggle` renders. A custom toggle with nothing focusable in it (a plain
+     * `span`) gets its wrapper focused instead, which is what was pressed to
+     * open the menu: focus never falls to the page.
      */
     const handleKeyDown = (event) => {
         if (event.key !== 'Escape' || !show) return;
         event.stopPropagation();
         closeDropdown();
-        const wrapper = dropdownRef.current;
-        const menu = menuRef.current;
-        if (!wrapper) return;
-        const target = Array.from(wrapper.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])'))
-            .find((el) => !(menu && menu.contains(el)));
+        const custom = customToggleRef.current;
+        const target = toggleRef.current
+            || custom?.querySelector('button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+            || custom;
         target?.focus();
     };
 
@@ -173,6 +179,7 @@ const Dropdown = ({
              * only reads as anything when `buttonText` is a string.
              */
             <button
+                ref={toggleRef}
                 type="button"
                 className={toggleClasses}
                 onClick={toggleDropdown}
@@ -207,7 +214,9 @@ const Dropdown = ({
                 )
             ) : (
                 toggle ? (
-                    <div onClick={toggleDropdown} className="d-inline-block" style={{ cursor: 'pointer' }}>
+                    // `tabIndex={-1}`: never a tab stop, but somewhere Escape can
+                    // return focus when the toggle itself cannot take it.
+                    <div ref={customToggleRef} tabIndex={-1} onClick={toggleDropdown} className="d-inline-block" style={{ cursor: 'pointer' }}>
                         {toggle}
                     </div>
                 ) : (
