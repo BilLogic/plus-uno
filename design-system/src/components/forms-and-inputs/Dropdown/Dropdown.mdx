@@ -197,13 +197,15 @@ would run off the edge, remeasuring on scroll and resize.
 - **Escape closes it.** Pressing Escape anywhere in an open dropdown closes the
   menu and puts focus back on the toggle: the caret button, on whichever side
   of a split button it sits, or the control inside a custom `toggle`. A custom
-  toggle with nothing focusable in it has its wrapper focused instead, so focus
-  never falls to the page. A click outside, bound to `mousedown`, also closes
-  it.
-- **A custom `toggle` loses keyboard access.** The node you pass is wrapped in a
-  `div` with an `onClick` and no role, tabindex or key handler — so it is
-  clickable and nothing else. Pass a `Button` as the trigger only if you are
-  willing to lose that; otherwise use the built-in toggle.
+  toggle with nothing focusable in it returns focus to whatever had it when the
+  menu opened, if that is still on the page, and otherwise leaves focus alone.
+  A click outside, bound to `mousedown`, also closes it.
+- **A custom `toggle` brings its own keyboard access.** The node you pass is
+  wrapped in a `div` with an `onClick` and no role or tabindex, so a control
+  inside it (a `Button`, a Tag) is what a keyboard user presses, and Enter or
+  Space on it opens the menu. Escape then returns focus to that control. A
+  plain `span` is clickable and nothing else, so pass a control, or use the
+  built-in toggle.
 - **Icons are decorative — mostly.** The selected check mark, the multi-select
   checkbox and `leadingIcon` are all `aria-hidden`. `trailingIcon` and the
   submenu caret are not, so an icon font glyph there can leak into the item's

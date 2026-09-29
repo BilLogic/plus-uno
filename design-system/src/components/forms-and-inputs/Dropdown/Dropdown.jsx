@@ -20,10 +20,11 @@ const Dropdown = ({
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const menuRef = useRef(null);
-    // Where Escape sends focus back to: the built-in toggle, or the wrapper
-    // around a custom one.
+    // Where Escape sends focus back to: the built-in toggle, the control in a
+    // custom one, or whatever had focus when the menu opened.
     const toggleRef = useRef(null);
     const customToggleRef = useRef(null);
+    const openerRef = useRef(null);
     // Viewport-aware placement: the menu flips up when there isn't room below, and right-aligns
     // when a left-aligned menu would spill off the right edge. Only the default vertical dropdown
     // is auto-placed; an explicit `direction` of dropup/dropleft/dropright is honored as authored.
@@ -62,19 +63,27 @@ const Dropdown = ({
      * has gone. The toggle is the built-in toggle button (the caret half of a
      * split button, whichever side it sits on), or the control a custom
      * `toggle` renders. A custom toggle with nothing focusable in it (a plain
-     * `span`) gets its wrapper focused instead, which is what was pressed to
-     * open the menu: focus never falls to the page.
+     * `span`) sends focus back to whatever had it when the menu opened, if
+     * that is still on the page; otherwise focus is left alone. It is never
+     * moved to the page itself.
      */
     const handleKeyDown = (event) => {
         if (event.key !== 'Escape' || !show) return;
         event.stopPropagation();
         closeDropdown();
         const custom = customToggleRef.current;
+        const opener = openerRef.current;
         const target = toggleRef.current
             || custom?.querySelector('button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-            || custom;
+            || (opener && opener.isConnected && opener !== document.body ? opener : null);
         target?.focus();
     };
+
+    // What had focus when the menu opened, however it was opened (the toggle,
+    // or a caller that controls `isOpen`).
+    useLayoutEffect(() => {
+        if (show) openerRef.current = document.activeElement;
+    }, [show]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -214,9 +223,7 @@ const Dropdown = ({
                 )
             ) : (
                 toggle ? (
-                    // `tabIndex={-1}`: never a tab stop, but somewhere Escape can
-                    // return focus when the toggle itself cannot take it.
-                    <div ref={customToggleRef} tabIndex={-1} onClick={toggleDropdown} className="d-inline-block" style={{ cursor: 'pointer' }}>
+                    <div ref={customToggleRef} onClick={toggleDropdown} className="d-inline-block" style={{ cursor: 'pointer' }}>
                         {toggle}
                     </div>
                 ) : (

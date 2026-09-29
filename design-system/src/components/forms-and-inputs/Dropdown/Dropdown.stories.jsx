@@ -288,25 +288,32 @@ EscapeClosesSplit.play = async ({ canvasElement }) => {
 };
 
 /**
- * A custom toggle with nothing focusable in it: Escape focuses the wrapper
- * that was pressed, never the page.
+ * A custom toggle with nothing focusable in it, opened by a caller that
+ * controls `isOpen`: Escape returns focus to what had it when the menu opened,
+ * never to the page.
  */
-export const EscapeClosesCustomToggle = () => (
-    <div style={{ padding: '24px 24px 160px' }}>
-        <Dropdown toggle={<span>Sections</span>} items={ESCAPE_ITEMS} />
-    </div>
-);
+export const EscapeClosesCustomToggle = () => {
+    const [open, setOpen] = React.useState(false);
+    return (
+        <div style={{ display: 'flex', gap: '24px', padding: '24px 24px 160px' }}>
+            <button type="button" onClick={() => setOpen(true)}>Open sections</button>
+            <Dropdown toggle={<span>Sections</span>} items={ESCAPE_ITEMS} isOpen={open} onToggle={setOpen} />
+        </div>
+    );
+};
 
 EscapeClosesCustomToggle.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByText('Sections'));
-    const first = canvas.getByRole('button', { name: 'Rename' });
-    first.focus();
+    const opener = canvas.getByRole('button', { name: 'Open sections' });
+    opener.focus();
+    await userEvent.keyboard('{Enter}');
 
+    const first = await canvas.findByRole('button', { name: 'Rename' });
+    first.focus();
     await userEvent.keyboard('{Escape}');
-    await expect(canvas.queryByRole('button', { name: 'Rename' })).toBeNull();
-    await expect(document.activeElement, 'focus did not fall to the page').not.toBe(document.body);
-    await expect(document.activeElement).toContainElement(canvas.getByText('Sections'));
+
+    await expect(canvas.queryByRole('button', { name: 'Rename' }), 'the menu is gone').toBeNull();
+    await expect(opener, 'focus is back on what opened it').toHaveFocus();
 };
 
 export const Interactive = {
