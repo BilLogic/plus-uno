@@ -8,6 +8,9 @@
  */
 
 import React from 'react';
+import { expect } from 'storybook/test';
+
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import OverviewCard from './OverviewCard';
 
 export default {
@@ -387,3 +390,75 @@ export const Overview = () => (
         </div>
     </div>
 );
+
+/**
+ * The token each card type paints its icon glyph in. The five SMART types take
+ * their category hue; the rest keep the header's neutral.
+ */
+const ICON_HUES = {
+    relationships: '--color-relationship',
+    'socio-emotional': '--color-social-emotional',
+    'mastering-content': '--color-mastering-content',
+    advocacy: '--color-advocacy',
+    'technology-tools': '--color-technology-tools',
+    undefined: '--color-on-surface-variant',
+    status: '--color-on-surface-variant',
+};
+
+/**
+ * One definition of an icon glyph for every card type: the default glyph and a
+ * custom glyph in any Font Awesome style (here brands and light) take the
+ * type's hue, and anything else in the icon slot (here text) keeps the header's
+ * neutral. The glyph list is the `icon-glyph` mixin, which `check:text-contrast`
+ * reads to decide what `@contrast: non-text` may hold to 3:1.
+ */
+export const IconColors = () => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', padding: '24px' }}>
+        {Object.keys(ICON_HUES).map((type) => (
+            <React.Fragment key={type}>
+                <OverviewCard data-card={`${type}-default`} type={type} smartData={smartDataSets[type]} title={`${type}, default icon`} />
+                <OverviewCard
+                    data-card={`${type}-custom`}
+                    type={type}
+                    smartData={smartDataSets[type]}
+                    title={`${type}, custom icon`}
+                    icon={(
+                        <>
+                            <i className="fa-brands fa-github" data-glyph="brands" aria-hidden="true" />
+                            <i className="fa-light fa-star" data-glyph="light" aria-hidden="true" />
+                            <span data-glyph="text">A</span>
+                        </>
+                    )}
+                />
+            </React.Fragment>
+        ))}
+    </div>
+);
+
+IconColors.play = async ({ canvasElement }) => {
+    const neutral = tokenColor(canvasElement, '--color-on-surface-variant');
+    for (const [type, token] of Object.entries(ICON_HUES)) {
+        const hue = tokenColor(canvasElement, token);
+        const card = (variant) => canvasElement.querySelector(`[data-card="${type}-${variant}"]`);
+        const colorOf = (el) => getComputedStyle(el).color;
+
+        const glyph = card('default').querySelector('.plus-overview-card__icon i');
+        await expect(colorOf(glyph), `${type}: the default glyph is ${token}`).toBe(hue);
+
+        const custom = card('custom');
+        for (const style of ['brands', 'light']) {
+            const el = custom.querySelector(`[data-glyph="${style}"]`);
+            await expect(colorOf(el), `${type}: a ${style} glyph is ${token}`).toBe(hue);
+        }
+        const text = custom.querySelector('[data-glyph="text"]');
+        await expect(colorOf(text), `${type}: text in the icon slot keeps the neutral`).toBe(neutral);
+    }
+};
+
+IconColors.parameters = {
+    docs: {
+        description: {
+            story: 'Icon glyph colors per card type: the default glyph and a custom glyph in any Font Awesome style take the hue; text in the icon slot stays neutral.'
+        }
+    }
+};

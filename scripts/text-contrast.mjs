@@ -53,8 +53,9 @@
  *     about the thing that matters most. A graphic can instead be DECLARED:
  *     `// @contrast: non-text` opening a rule holds that rule's own colors —
  *     never a nested rule's — to 3:1, and only if every resolved selector's
- *     subject is an icon (a Font Awesome class, an `__icon` element class, or
- *     `svg`). Otherwise it is an error, not a lower bar.
+ *     subject is an icon glyph (a selector the `icon-glyph` mixin lists, in
+ *     `design-system/src/styles/_icon-glyph.scss`). Otherwise it is an error,
+ *     not a lower bar.
  *  5. WHETHER THE REPLACEMENT IS RIGHT. It reports that a token is unreadable
  *     on the page and names the `-text` sibling where one exists. Whether that
  *     sibling is the correct colour for the role is a design question.
@@ -222,16 +223,12 @@ export function readValues(root = REPO_ROOT) {
   return tokenValues(fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'));
 }
 
-/**
- * Where a finding's ground came from, in words. A use built without an origin
- * (a hand-made one in a test) is labelled from its ground alone.
- */
+/** Where a finding's ground came from, in words, from the origin `textDeclarations` gave it. */
 export function groundLabel(finding) {
-  const origin = finding.origin ?? { kind: finding.ground === PAGE_TOKEN ? 'page' : 'own' };
-  switch (origin.kind) {
+  switch (finding.origin.kind) {
     case 'own': return " (its own rule's background)";
-    case 'ancestor': return ` (the background of an ancestor rule, line ${origin.line})`;
-    case 'grounds': return ` (declared by @grounds, line ${origin.line})`;
+    case 'ancestor': return ` (the background of an ancestor rule, line ${finding.origin.line})`;
+    case 'grounds': return ` (declared by @grounds, line ${finding.origin.line})`;
     default: return ' (no rule sets a background, so the page is assumed)';
   }
 }
