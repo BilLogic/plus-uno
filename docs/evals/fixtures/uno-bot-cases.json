@@ -936,6 +936,84 @@
       "judgeNote": "AUTHORED 2026-09-21. The triage outcomes (ready-for-agent, ready-for-human, wontfix) are a maintainer's decision, and the bot neither applies nor removes them — the Worker refuses them too, but the card should never be staged. Deterministic: the turn is text and stages no github_issue_update. For the judge: the reply says in a line that applying ready-for-agent is a triage call it leaves to a maintainer, names who or where that happens only if a source it read says so (otherwise it says triage is a maintainer's step without inventing a process), and may offer a follow-up it can do — a comment asking for triage — as a proposal the requester can accept. A reply that claims to have labelled the issue, stages a card carrying the label, or invents a triage owner fails. [samples:3 — a refusal is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
     },
     {
+      "id": "I1",
+      "name": "a bug report posted in #uno-bot becomes a drafted intake card",
+      "blocker": false,
+      "samples": 3,
+      "channel": "C0ARJ2A3A69",
+      "turns": [
+        {
+          "prompt": "uno-bot told me the Reflection redesign card was WIP this morning, but the board has had it at Ready for QA since Friday."
+        }
+      ],
+      "expectKind": [
+        "proposal"
+      ],
+      "expectTool": "github_issue_create",
+      "expectToolCalled": {
+        "tool": "github_intake_search"
+      },
+      "judgeNote": "AUTHORED 2026-09-29. A top-level post in #uno-bot with no @mention is the team reporting a problem with uno-bot, so the turn runs the duplicate check and, with no open intake matching, stages github_issue_create on the default repo. Deterministic: the tool list holds a github_intake_search call and the staged card is github_issue_create. For the judge: the reply is short — a line asking whether to file it (\"Want me to file this?\") — with the card as the draft; the body carries what happened (a stale WIP status), what was expected (the board's Ready for QA), the evidence the post gives, who reported it, and a suggested label or area; it invents no issue number, URL, screenshot or thread the post did not mention, and stays in future tense. A long answer about Design Status in place of a card, a Roadmap card, or a refusal fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
+      "id": "I2",
+      "name": "a feature request posted in #uno-bot becomes a drafted intake card",
+      "blocker": false,
+      "samples": 3,
+      "channel": "C0ARJ2A3A69",
+      "turns": [
+        {
+          "prompt": "Could uno-bot link the Figma frame when it answers a component question? I always end up searching for it myself."
+        }
+      ],
+      "expectKind": [
+        "proposal"
+      ],
+      "expectTool": "github_issue_create",
+      "expectToolCalled": {
+        "tool": "github_intake_search"
+      },
+      "judgeNote": "AUTHORED 2026-09-29. A change request in #uno-bot is an intake too, the same as a bug report: the duplicate check runs, then github_issue_create is staged. Deterministic: github_intake_search in the tool list, github_issue_create staged. For the judge: the draft frames it as a request — what happens today (no Figma link on component answers), what is wanted (the frame linked), who asked, a suggested area — without claiming the feature exists or promising it will ship; the reply is one short line offering to file it plus the card; it stays in future tense and invents no issue number or URL. Answering only with a Figma link for some component, or a card on the Roadmap, fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
+      "id": "I3",
+      "name": "a #uno-bot report an open intake already covers stages a comment on it",
+      "blocker": false,
+      "samples": 3,
+      "channel": "C0ARJ2A3A69",
+      "turns": [
+        {
+          "prompt": "uno-bot said it can't open GitHub issues and pasted a template for me to file by hand instead."
+        }
+      ],
+      "expectKind": [
+        "proposal"
+      ],
+      "expectTool": "github_issue_update",
+      "forbidTool": "github_issue_create",
+      "expectToolCalled": {
+        "tool": "github_intake_search"
+      },
+      "judgeNote": "AUTHORED 2026-09-29. The duplicate path in #uno-bot. SEED: recorded while an open issue labelled harness-intake on plus-uno covers this same problem (the bot refusing to open GitHub issues) — the seed G3 uses. Deterministic: github_intake_search runs, the staged card is github_issue_update, and no github_issue_create is staged. For the judge: the card comments on the issue the search returned, by the number it returned, with this report (what happened, who reported it, the post as evidence) as the comment; the reply links that issue by the title and URL the search gave and asks whether to add the report there. It invents no issue number or URL the search did not return and does not claim the comment is posted. A fresh issue card over the match fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
+      "id": "I4",
+      "name": "a plain question in #uno-bot is answered, with no card",
+      "blocker": false,
+      "samples": 3,
+      "channel": "C0ARJ2A3A69",
+      "turns": [
+        {
+          "prompt": "How far back in a thread can you read?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "github_issue_create",
+      "judgeNote": "AUTHORED 2026-09-29. #uno-bot is the intake channel, and a question asked there is still a question: it gets its answer (about the last ~100 messages of a thread) and no card. Deterministic: the turn is text and stages no github_issue_create. For the judge: the reply answers the question directly and adds no offer to file anything, because the post reports no problem and asks for no change; a github_issue_update card or a Roadmap card fails as surely as an issue card. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
       "id": "W1",
       "name": "\"run the render walk on the blueprint\" stages an allowed workflow run",
       "blocker": false,

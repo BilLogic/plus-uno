@@ -13,7 +13,7 @@
 // a hand-written copy of it that can quietly stop matching.
 
 import { parseScope, type ScopedRequest } from "../agent/scope-keywords";
-import { buildTurnRequest, type TurnRequest } from "../turn/index";
+import { buildTurnRequest, type IntakeThread, type TurnRequest } from "../turn/index";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import {
   canvasIdsSharedByMessage,
@@ -37,6 +37,9 @@ export interface TurnEnvelope {
   pending: PendingProposal | null;
   /** The Notion PRD carried on the thread root, if any. */
   prd: { id?: string; url?: string } | null;
+  /** Set when the message is in #uno-bot (`turn/intake-channel.ts`), with who
+   *  has posted in its thread. */
+  intakeChannel?: IntakeThread;
 }
 
 /** Nothing visual arrived, so the vision pass never ran. A fresh object each
@@ -103,6 +106,7 @@ export function slackTurnRequest(
     text,
     attachmentsText,
     ...(scoped ? { scopeInstruction: scoped.scope.instruction } : {}),
+    ...(envelope.intakeChannel ? { intakeChannel: envelope.intakeChannel } : {}),
     images: vision.images,
     ...(vision.historicalImages ? { historicalImages: vision.historicalImages } : {}),
     visionNotes: vision.notes,
