@@ -34,6 +34,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * asks each, and the purge — in both runs — keeps text under its 14 days
  * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
  * that records how each ask was resolved (src/usage/resolution-pass.ts).
+ * The end-of-day `proposal-expiry` records every card that aged out untouched
+ * (src/usage/proposal-events.ts).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -42,7 +44,8 @@ export type ScheduledJobKind =
   | "figma-library-track"
   | "usage-classify"
   | "usage-text-purge"
-  | "ask-resolution";
+  | "ask-resolution"
+  | "proposal-expiry";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -98,6 +101,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     })),
     // Not after the classify jobs: the purge holds whether or not they ran.
     { key: "usage-text-purge", kind: "usage-text-purge" },
+    { key: "proposal-expiry", kind: "proposal-expiry" },
   ],
 };
 

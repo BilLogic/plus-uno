@@ -157,6 +157,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // LIVE records are touched: an aged-out card is already answered by
       // "expired".
       const thread = proposalReplyThread(proposal);
+      const retired: string[] = [];
       for (const rec of proposals.values()) {
         if (rec.proposal.proposalTs === proposal.proposalTs) continue;
         // A record already stamped with a successor is settled. One only
@@ -167,18 +168,24 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (rec.proposal.channel !== proposal.channel) continue;
         if (proposalReplyThread(rec.proposal) !== thread) continue;
         rec.supersededBy = proposal.proposalTs;
+        // Reported only if this staging is what took it out of reach.
+        if (!rec.retired) retired.push(rec.proposal.proposalTs);
       }
       // Retire first, then write — a choice, not an accident: the new card is
       // the one a racing ✅ has to be able to find, so it is the last thing to
       // land.
       proposals.set(proposal.proposalTs, { proposal, createdAt: now() });
+      return { retired };
     },
 
     // Retire without consuming — the counterpart to the claim, and why the two
     // are different methods is on the interface (#583).
     async retireProposal(proposalTs) {
       const rec = proposals.get(proposalTs);
-      if (rec) rec.retired = true;
+      if (!rec || rec.retired || rec.supersededBy) return { retired: false };
+      if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return { retired: false };
+      rec.retired = true;
+      return { retired: true };
     },
 
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
