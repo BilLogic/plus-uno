@@ -166,6 +166,14 @@ export interface GateVerdict {
    * own ✅. The door that holds a card builder stages it, after the note.
    */
   restage?: GateRestage;
+  /**
+   * The door the signal came through and the person behind it, when it named
+   * one — facts the signal carried, handed back so whoever applies the verdict
+   * can record who decided the card and how (`usage/proposal-events.ts`).
+   * Absent only on a verdict no signal produced (`cutOffVerdict` taken by a
+   * turn).
+   */
+  by?: { door: GateSignal["kind"]; userId?: string };
 }
 
 /** What a cut-off verdict asks to have staged again. */
@@ -218,6 +226,11 @@ function replyTarget(proposal: PendingProposal): string {
  * run.
  */
 export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise<GateVerdict> {
+  const verdict = await resolve(signal, deps);
+  return { ...verdict, by: { door: signal.kind, ...(signal.userId ? { userId: signal.userId } : {}) } };
+}
+
+async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict> {
   // The model's call has already been validated against the thread's pending
   // state by the loop, and carries the proposal itself — there is nothing to
   // look up, only the claim.

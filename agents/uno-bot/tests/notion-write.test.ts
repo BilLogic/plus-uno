@@ -85,6 +85,7 @@ test("a replace issues the block update Notion expects", async () => {
 
   assert.equal(r.replaced, 1);
   assert.deepEqual(r.refused, []);
+  assert.equal(r.staleStamps, 0);
   // The stamp is read first and the write only follows it.
   assert.deepEqual(
     calls.map((c) => c.method),
@@ -124,6 +125,9 @@ test("a block that moved since the read is refused, and nothing is written", asy
     ["GET"],
   );
   assert.equal(r.refused.length, 1);
+  // Counted as a stale write, which is what the usage record's refused_stale
+  // reads (`usage/proposal-events.ts`).
+  assert.equal(r.staleStamps, 1);
   // The refusal names the block and BOTH stamps, so the person who asked can
   // see it is staleness rather than a failure.
   assert.match(r.refused[0]!, /1f2e3d4c changed since read/);

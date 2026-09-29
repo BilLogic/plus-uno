@@ -56,6 +56,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
     "ask-resolution",
     "ask-resolution",
     "usage-text-purge",
+    "proposal-expiry",
   ]);
 });
 
@@ -118,6 +119,7 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
     ["ask-resolution-6", "ask-resolution", undefined],
     // Waits on nothing, so it runs whether or not the classify jobs did.
     ["usage-text-purge", "usage-text-purge", undefined],
+    ["proposal-expiry", "proposal-expiry", undefined],
   ]);
 });
 

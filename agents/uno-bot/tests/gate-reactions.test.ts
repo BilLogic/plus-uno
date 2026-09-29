@@ -3,7 +3,10 @@
 // The rejection cases below matter more than the accepting ones.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { mapReaction, CONFIRM_REACTIONS } from "../src/gate/reactions";
+import { mapReaction, CANCEL_REACTIONS, CONFIRM_REACTIONS } from "../src/gate/reactions";
+import { resolveSignal } from "../src/gate/index";
+import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
+import { verdictEvents } from "../src/usage/index";
 
 describe("gate reactions", () => {
   it("confirms on the check marks", () => {
@@ -61,6 +64,49 @@ describe("gate reactions", () => {
     // Slack sends the emoji name without colons; a near-miss must not resolve.
     for (const name of [":white_check_mark:", "white_check_mark ", "WHITE_CHECK_MARK"]) {
       assert.equal(mapReaction(name), null, `${name} is not the canonical name`);
+    }
+  });
+});
+
+// What each gesture leaves on the usage record, read off the verdict the
+// executor is handed (`usage/proposal-events.ts`): every confirm glyph a
+// `confirmed`, every cancel glyph a `cancelled`, and anything else nothing —
+// the record agrees with the gate about what a reaction meant.
+describe("gate reactions on the record", () => {
+  const card: PendingProposal = {
+    toolName: "notion_create",
+    input: { title: "A card" },
+    channel: "C1",
+    threadTs: "1700000000.000100",
+    replyTs: "1700000000.000100",
+    userMsgTs: "1700000000.000190",
+    proposalTs: "1700000000.000195",
+    proposalText: "(card)",
+    requesterUserId: "U1",
+  };
+
+  async function react(glyph: string) {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal(card);
+    const verdict = await resolveSignal(
+      { kind: "reaction", messageTs: card.proposalTs, channel: "C1", thread: card.threadTs, glyph, userId: "U2" },
+      { threadState },
+    );
+    return verdictEvents(verdict, 1_000).map((e) => [e.event, e.via, e.actorId]);
+  }
+
+  it("records confirmed for every confirm glyph and cancelled for every cancel glyph", async () => {
+    for (const glyph of CONFIRM_REACTIONS) {
+      assert.deepEqual(await react(glyph), [["confirmed", "reaction", "U2"]], glyph);
+    }
+    for (const glyph of CANCEL_REACTIONS) {
+      assert.deepEqual(await react(glyph), [["cancelled", "reaction", "U2"]], glyph);
+    }
+  });
+
+  it("records nothing for an ordinary reaction on the card", async () => {
+    for (const glyph of ["eyes", "tada", "-1"]) {
+      assert.deepEqual(await react(glyph), [], glyph);
     }
   });
 });
