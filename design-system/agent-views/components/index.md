@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (60)
+## UI components (61)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [Alert](../../src/components/messaging/Alert/index.md)
@@ -59,6 +59,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [SidebarTab](../../src/components/navigation/SidebarTab/index.md)
 - [Spinner](../../src/components/status-and-loading/Spinner/index.md)
 - [StaticBadgeSmart](../../src/components/_internal/StaticBadgeSmart/index.md)
+- [Status](../../src/components/status-and-loading/Status/index.md)
 - [Switch](../../src/components/forms-and-inputs/Switch.md)
 - [Table](../../src/components/_internal/Table/index.md)
 - [Tag](../../src/components/status-and-loading/Tag/index.md)

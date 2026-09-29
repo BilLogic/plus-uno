@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
-import Tag, { TAG_COLORS } from './Tag';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import Tag, { TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
 
 /**
- * `Tag` — a value someone picked (#276).
+ * `Tag` — a category, outlined: color on the border and swatch, neutral text,
+ * one size (22), four behaviors.
  *
- * THE TEST SEAM IS THIS FILE. #276 settled on story `play:` functions run by
- * `check:storybook` in a real browser, and on nothing else: a good assertion
- * here is one a person could make by using the component — that a dismissed tag
- * disappears, that a selected tag says so to assistive technology — and never
- * that a class name is present or an internal function was called.
+ * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
+ * in a real browser. A good assertion here is one a person could make by using
+ * the component or by measuring it: a role, a name, focus order, a computed
+ * height, width or color. Never a class name.
  *
- * The contrast half is already covered elsewhere and is not re-asserted here:
- * the a11y ratchet in `docs/evals/a11y-baseline.json` tracks `color-contrast`
- * over every story rendered, and may fall but never rise.
+ * Hover and press are forced through `withForcedPseudo`, because a synthetic
+ * event never sets `:hover` or `:active`; the browser's own cascade still
+ * decides what the forced state looks like.
+ *
+ * Contrast is not re-asserted: the a11y ratchet tracks `color-contrast` over
+ * every story rendered.
  */
 
 export default {
@@ -24,8 +29,9 @@ export default {
         docs: {
             description: {
                 component:
-                    'A tag is a representation of a value that someone has picked. To show '
-                    + 'system-generated data that people cannot change, use a badge instead.',
+                    'Is it a number? Count. Is it the condition something is in, and can that '
+                    + 'condition change? Status. Otherwise, Tag: a subject, a focus area, a person, '
+                    + 'a category. Outlined, with neutral text and the color on the border and swatch.',
             },
         },
     },
@@ -33,181 +39,444 @@ export default {
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' };
 
-/** Every colour the API offers, so a name with no rule renders as an unstyled tag. */
+/* ------------------------------------------------------------------ helpers */
+
+/** A computed style property of `measured` while `target` is forced into `pseudo`. */
+const whileForced = (target, pseudo, property, measured = target) =>
+    withForcedPseudo(target, pseudo, () => getComputedStyle(measured)[property]);
+
+const CLEAR = 'rgba(0, 0, 0, 0)';
+
+/* ----------------------------------------------------------------- stories */
+
+const HUE_TOKEN = {
+    blue: 'technology-tools',
+    green: 'advocacy',
+    purple: 'mastering-content',
+    magenta: 'relationship',
+    yellow: 'social-emotional',
+    teal: 'tertiary',
+};
+
+/** Every color. The hue is on the border and the swatch; the words stay neutral. */
 export const Colors = () => (
     <div style={row}>
         {TAG_COLORS.map((color) => (
-            <Tag key={color} color={color}>{color}</Tag>
+            <Tag key={color} color={color} data-testid={color}>{color}</Tag>
         ))}
     </div>
 );
 
 /**
- * A colour name paints the colour it names.
- *
- * WHY THIS ASSERTS SOMETHING SO OBVIOUS. It did not. `Tag` shipped with its
- * names and its borrowed tokens transcribed one row out of step, so `blue`
- * painted `#ffd9e4` and `green` painted `#f2daff` — pink and purple. Nothing
- * caught it: the a11y ratchet only asks whether the text can be read on the
- * ground, and every one of these pairs is a real token pair with real contrast,
- * so all seven passed while five of them lied about what they were.
- *
- * That is the defect #276 exists to remove, in the component it added to remove
- * it. The whole case for plain names over `success`/`danger` is that a reader
- * can trust the name, so a name that paints something else is worse than a
- * semantic one — it is wrong AND it looks deliberate.
- *
- * The assertion is hue, not an exact value, because the exact value is #268's
- * to change and this must not break when it does. Which channel dominates is
- * what the NAME claims, and that survives a re-point of the palette.
+ * A color name paints the hue it names, on the border and the swatch, and on
+ * nothing else. The border is the hue's Border Subtle token (grey's is Outline
+ * Variant), the swatch is the hue itself, and the text is the same neutral on
+ * every color.
  */
 Colors.play = async ({ canvasElement }) => {
-    const tags = [...canvasElement.querySelectorAll('.plus-tag')];
-    await expect(tags).toHaveLength(TAG_COLORS.length);
+    const canvas = within(canvasElement);
+    const ink = tokenColor(canvasElement, '--color-on-surface');
 
-    const rgb = (el) => getComputedStyle(el).backgroundColor.match(/\d+/g).map(Number);
+    for (const color of TAG_COLORS) {
+        const tag = canvas.getByTestId(color);
+        const swatch = tag.querySelector('[aria-hidden="true"]');
+        const s = getComputedStyle(tag);
 
-    // Read the FOREGROUND (`--color-on-<x>-container`) rather than the ground.
-    // Both come from the same token family, so both move together — but every
-    // container is a pale tint sitting near white, which compresses the channel
-    // differences to a few points, while the `on-` pair is a deep version of the
-    // same hue and states it plainly. The border is not an option: it is
-    // `transparent` until the tag is selected.
-    const ink = (el) => getComputedStyle(el).color.match(/\d+/g).map(Number);
+        await expect(px(s.height), `${color} is 22 tall`).toBe(22);
+        await expect(px(s.borderTopWidth), `${color} has a 1px border`).toBe(1);
+        await expect(s.color, `${color} text is neutral`).toBe(ink);
 
-    const found = Object.fromEntries(tags.map((t) => [t.textContent.trim(), ink(t)]));
+        const border = color === 'grey'
+            ? tokenColor(canvasElement, '--color-outline-variant')
+            : tokenColor(canvasElement, `--color-${HUE_TOKEN[color]}-border-subtle`);
+        await expect(s.borderTopColor, `${color} border`).toBe(border);
 
-    const [br, bg, bb] = found.blue;
-    await expect(bb).toBeGreaterThan(br);
-    await expect(bb, 'blue must be bluer than it is green').toBeGreaterThan(bg);
+        const hue = color === 'grey'
+            ? tokenColor(canvasElement, '--color-outline')
+            : tokenColor(canvasElement, `--color-${HUE_TOKEN[color]}`);
+        await expect(getComputedStyle(swatch).backgroundColor, `${color} swatch`).toBe(hue);
+        await expect(px(getComputedStyle(swatch).width)).toBe(10);
+        await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
+    }
 
-    const [gr, gg, gb] = found.green;
-    await expect(gg, 'green must be greener than it is red').toBeGreaterThan(gr);
-    await expect(gg, 'green must be greener than it is blue').toBeGreaterThan(gb);
-
-    const [pr, pg, pb] = found.purple;
-    await expect(pr, 'purple carries red and blue over green').toBeGreaterThan(pg);
-    await expect(pb).toBeGreaterThan(pg);
-
-    const [mr, mg, mb] = found.magenta;
-    await expect(mr, 'magenta is red-dominant').toBeGreaterThan(mg);
-    await expect(mb).toBeGreaterThan(mg);
-
-    const [or_, og, ob] = found.orange;
-    await expect(or_, 'orange runs red > green > blue').toBeGreaterThan(og);
-    await expect(og).toBeGreaterThan(ob);
-
-    const [tr, tg, tb] = found.teal;
-    await expect(tg, 'teal carries green and blue over red').toBeGreaterThan(tr);
-    await expect(tb).toBeGreaterThan(tr);
-
-    // Grey is the one name that is not a hue, and must stay that way: a default
-    // that drifted into a colour would have every uncoloured tag claiming a
-    // category nobody gave it.
-    const [yr, yg, yb] = rgb(canvasElement.querySelector('.plus-tag'));
-    await expect(Math.max(yr, yg, yb) - Math.min(yr, yg, yb)).toBeLessThan(12);
+    // Grey is the one name that is not a hue: a default that drifted into a
+    // color would have every uncolored tag claiming a category nobody gave it.
+    const greySwatch = canvas.getByTestId('grey').querySelector('[aria-hidden="true"]');
+    const [r, g, b] = getComputedStyle(greySwatch).backgroundColor.match(/\d+/g).map(Number);
+    await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
 };
 
-export const Variants = () => (
+/** The four behaviors, and the states that change a tag's contents. */
+export const Behaviors = () => (
     <div style={row}>
-        <Tag variant="read-only" color="blue">Read only</Tag>
-        <Tag variant="dismissible" color="green" onRemove={() => {}}>Dismissible</Tag>
-        <Tag variant="selectable" color="purple" isSelected>Selected</Tag>
-        <Tag variant="selectable" color="purple">Unselected</Tag>
-        <Tag variant="operational" color="orange" onClick={() => {}}>Operational</Tag>
+        <Tag color="blue" data-testid="read-only">Read only</Tag>
+        <Tag behavior="removable" color="blue" onRemove={() => {}} data-testid="removable">Removable</Tag>
+        <Tag behavior="selectable" color="blue" data-testid="selectable">Selectable</Tag>
+        <Tag behavior="selectable" color="blue" isSelected count={12} data-testid="selected">Selected</Tag>
+        <Tag behavior="link" color="blue" href="#tag" data-testid="link">Link</Tag>
+        <Tag behavior="link" color="blue" href="#tag" onRemove={() => {}} data-testid="split">Link with remove</Tag>
+        <Tag behavior="removable" color="blue" onRemove={() => {}} isLoading data-testid="saving">Algebra</Tag>
     </div>
 );
 
-/* ------------------------------------------------------------ dismissible */
-
-/**
- * Dismissing removes the value, and the button says WHICH value.
- *
- * The accessible name is the assertion that matters. A row of tags whose remove
- * buttons are all called "Dismiss" gives a screen-reader user a list of
- * identical controls and no way to tell which one drops Science — which is what
- * the existing `Badge` does today, and the reason this is named from the label.
- */
-export const Dismissing = () => {
-    const [subjects, setSubjects] = useState(['Science', 'Mathematics', 'History']);
-    return (
-        <div style={row}>
-            {subjects.map((s) => (
-                <Tag
-                    key={s}
-                    variant="dismissible"
-                    color="blue"
-                    onRemove={() => setSubjects((prev) => prev.filter((x) => x !== s))}
-                >
-                    {s}
-                </Tag>
-            ))}
-        </div>
-    );
-};
-
-Dismissing.play = async ({ canvasElement }) => {
+/** One size: every behavior and state is 22 tall, the count and the × included. */
+Behaviors.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-
-    const remove = canvas.getByRole('button', { name: 'Remove Science' });
-    await expect(remove).toBeInTheDocument();
-
-    await userEvent.click(remove);
-
-    // The value is gone, and only that value.
-    await expect(canvas.queryByText('Science')).toBeNull();
-    await expect(canvas.getByText('Mathematics')).toBeInTheDocument();
-    await expect(canvas.getByText('History')).toBeInTheDocument();
+    for (const id of ['read-only', 'removable', 'selectable', 'selected', 'link', 'split', 'saving']) {
+        await expect(px(getComputedStyle(canvas.getByTestId(id)).height), `${id} is 22 tall`).toBe(22);
+    }
+    await expect(TAG_BEHAVIORS).toEqual(['read-only', 'removable', 'selectable', 'link']);
 };
 
-/**
- * `onRemove` on a tag that is not dismissible renders no remove button.
- *
- * The gate is behaviour, not a type: `propTypes` validates that `onRemove` is a
- * function, never that the combination means anything. A read-only tag that
- * quietly grew an X would make the variant a lie, and the variant is the whole
- * API.
+/* ------------------------------------------------------------------- types */
+
+/*
+ * Avatars for the type stories: inline SVG, so no story depends on a network
+ * image, and a `broken` source that never loads, to exercise the fallback.
  */
-export const RemoveIsGatedToDismissible = () => (
+const svgAvatar = (fill) => `data:image/svg+xml;utf8,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="${fill}"/></svg>`,
+)}`;
+const PHOTO = svgAvatar('#8659a9');
+const BROKEN = 'data:image/png;base64,broken';
+
+/** The avatar box: the one `aria-hidden` element at the front of the tag. */
+const avatarOf = (tag) => tag.querySelector('[aria-hidden="true"]');
+
+/**
+ * The four types. A person, an agent or a team carries a 16 avatar in place of
+ * the swatch: round for a person (and the whole tag is round), a hexagon for an
+ * agent, a square with radius-2 corners for a team. With no `avatar`, initials stand in.
+ */
+export const Types = () => (
     <div style={row}>
-        <Tag variant="read-only" color="grey" onRemove={() => {}}>Read only</Tag>
-        <Tag variant="dismissible" color="grey" onRemove={() => {}}>Dismissible</Tag>
+        <Tag color="blue" data-testid="plain">Algebra</Tag>
+        <Tag type="person" behavior="removable" onRemove={() => {}} data-testid="person">Rosa Chen</Tag>
+        <Tag type="agent" color="purple" behavior="removable" onRemove={() => {}} data-testid="agent">PLUS AI</Tag>
+        <Tag type="team" behavior="removable" onRemove={() => {}} data-testid="team">Math team</Tag>
+        <Tag type="person" avatar={PHOTO} data-testid="person-photo">Kai Brooks</Tag>
+        <Tag type="agent" avatar={PHOTO} data-testid="agent-photo">Tutor bot</Tag>
+        <Tag type="team" avatar={PHOTO} data-testid="team-photo">Science team</Tag>
     </div>
 );
 
-RemoveIsGatedToDismissible.play = async ({ canvasElement }) => {
+/**
+ * Every type is 22 tall with a 16 avatar. A person is fully round, and so is
+ * its ×; an agent's avatar is a hexagon; a team's is a square with radius-2 corners.
+ * The border is neutral on every avatar type, and the color goes to the
+ * avatar's fill.
+ */
+Types.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.queryByRole('button', { name: 'Remove Read only' })).toBeNull();
-    await expect(canvas.getByRole('button', { name: 'Remove Dismissible' })).toBeInTheDocument();
+    const neutral = tokenColor(canvasElement, '--color-outline-variant');
+
+    for (const id of ['plain', 'person', 'agent', 'team', 'person-photo', 'agent-photo', 'team-photo']) {
+        const tag = canvas.getByTestId(id);
+        await expect(px(getComputedStyle(tag).height), `${id} is 22 tall`).toBe(22);
+        if (id === 'plain') continue;
+        const avatar = avatarOf(tag);
+        await expect(px(getComputedStyle(avatar).width), `${id} avatar is 16 wide`).toBe(16);
+        await expect(px(getComputedStyle(avatar).height), `${id} avatar is 16 tall`).toBe(16);
+        await expect(getComputedStyle(tag).borderTopColor, `${id} border is neutral`).toBe(neutral);
+    }
+
+    // A person is fully round: the corner is at least half the height.
+    const person = canvas.getByTestId('person');
+    await expect(px(getComputedStyle(person).borderTopLeftRadius), 'a person tag is round')
+        .toBeGreaterThanOrEqual(11);
+    await expect(px(getComputedStyle(avatarOf(person)).borderTopLeftRadius), 'with a round avatar')
+        .toBeGreaterThanOrEqual(8);
+    const personX = canvas.getByRole('button', { name: 'Remove Rosa Chen' });
+    await expect(px(getComputedStyle(personX).borderTopLeftRadius), 'and a round ×')
+        .toBeGreaterThanOrEqual(8);
+
+    // The other types keep the plain tag's corners.
+    for (const id of ['plain', 'agent', 'team']) {
+        await expect(px(getComputedStyle(canvas.getByTestId(id)).borderTopLeftRadius), `${id} corners`).toBe(4);
+    }
+    await expect(px(getComputedStyle(canvas.getByRole('button', { name: 'Remove Math team' })).borderTopLeftRadius))
+        .toBe(2);
+
+    // An agent is a hexagon: six points, pointed top and bottom.
+    for (const id of ['agent', 'agent-photo']) {
+        const clip = getComputedStyle(avatarOf(canvas.getByTestId(id))).clipPath;
+        await expect(clip, `${id} is clipped to a polygon`).toMatch(/^polygon\(/);
+        await expect(clip.split(',').length, `${id} has six corners`).toBe(6);
+        await expect(clip, 'pointed at the top').toContain('50% 0%');
+    }
+
+    // A team is a square with radius-2 corners; a person photo is round.
+    await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('team'))).borderTopLeftRadius)).toBe(2);
+    await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('team-photo'))).borderTopLeftRadius)).toBe(2);
+    await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('person-photo'))).borderTopLeftRadius))
+        .toBeGreaterThanOrEqual(8);
+
+    // The color fills the avatar: an agent sits on its hue's Container.
+    await expect(getComputedStyle(avatarOf(canvas.getByTestId('agent'))).backgroundColor)
+        .toBe(tokenColor(canvasElement, '--color-mastering-content-container'));
+    await expect(getComputedStyle(avatarOf(canvas.getByTestId('person'))).backgroundColor)
+        .toBe(tokenColor(canvasElement, '--color-surface-container-high'));
+
+    // The avatar is decoration: the words name the tag, and the initials do not.
+    await expect(within(person).getByText('RC')).toBeInTheDocument();
+    await expect(avatarOf(person)).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas.getByTestId('person-photo').querySelector('img')).toHaveAttribute('alt', '');
 };
 
 /**
- * A dismissible tag is not itself a control.
- *
- * Its remove button is, and putting a button inside a button is invalid per
- * ARIA — the same rule the existing `Badge` records for its own dismiss button.
- * So the tag stays a `span`, and exactly one control exists inside it.
+ * A missing or broken avatar falls back to initials in the same 16 box, so a
+ * tag is the same width whether its photo loaded, failed, or was never given.
  */
-export const DismissibleIsNotNestedInteractive = () => (
-    <Tag variant="dismissible" color="teal" onRemove={() => {}}>Science</Tag>
+export const AvatarFallback = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+        {['person', 'agent', 'team'].map((type) => (
+            <div key={type} style={row}>
+                <Tag type={type} avatar={PHOTO} data-testid={`${type}-loaded`}>Rosa Chen</Tag>
+                <Tag type={type} avatar={BROKEN} data-testid={`${type}-broken`}>Rosa Chen</Tag>
+                <Tag type={type} data-testid={`${type}-none`}>Rosa Chen</Tag>
+            </div>
+        ))}
+    </div>
 );
 
-DismissibleIsNotNestedInteractive.play = async ({ canvasElement }) => {
+AvatarFallback.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const buttons = canvas.getAllByRole('button');
-    await expect(buttons).toHaveLength(1);
-    await expect(buttons[0]).toHaveAttribute('aria-label', 'Remove Science');
+    const initials = { person: 'RC', agent: 'R', team: 'R' };
+
+    for (const type of ['person', 'agent', 'team']) {
+        const loaded = canvas.getByTestId(`${type}-loaded`);
+        const broken = canvas.getByTestId(`${type}-broken`);
+        const none = canvas.getByTestId(`${type}-none`);
+
+        // The broken image gives up and shows initials, like the tag with none.
+        await waitFor(() => expect(broken.querySelector('img'), `${type} drops a broken image`).toBeNull());
+        await expect(within(broken).getByText(initials[type])).toBeInTheDocument();
+        await expect(within(none).getByText(initials[type])).toBeInTheDocument();
+
+        const width = loaded.getBoundingClientRect().width;
+        await expect(broken.getBoundingClientRect().width, `${type}: no layout shift`).toBe(width);
+        await expect(none.getBoundingClientRect().width, `${type}: no layout shift`).toBe(width);
+        await expect(px(getComputedStyle(none).height)).toBe(22);
+    }
+};
+
+/**
+ * Every behavior works on every type: the × removes and is named after the
+ * label, a selectable tag toggles, a link follows, saving swaps the avatar for
+ * a spinner without moving the tag, and a disabled field takes the × away.
+ */
+export const TypeBehaviors = {
+    args: { onRemoveSpy: fn(), onFollowSpy: fn() },
+    render: ({ onRemoveSpy, onFollowSpy }) => {
+        const Row = ({ type, label }) => {
+            const [on, setOn] = useState(false);
+            const [saving, setSaving] = useState(false);
+            return (
+                <div style={row} data-testid={`${type}-row`}>
+                    <Tag type={type} behavior="removable" onRemove={() => onRemoveSpy(type)} isLoading={saving} data-testid={`${type}-removable`}>{label}</Tag>
+                    <Tag type={type} behavior="selectable" isSelected={on} onClick={() => setOn((v) => !v)} data-testid={`${type}-selectable`}>{`${label} filter`}</Tag>
+                    <Tag
+                        type={type}
+                        behavior="link"
+                        href={`#${type}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onFollowSpy(type);
+                        }}
+                        onRemove={() => {}}
+                        data-testid={`${type}-link`}
+                    >
+                        {`${label} page`}
+                    </Tag>
+                    <button type="button" onClick={() => setSaving((v) => !v)}>{`Save ${type}`}</button>
+                    <TagContext.Provider value={{ isDisabled: true }}>
+                        <Tag type={type} behavior="removable" onRemove={() => {}} data-testid={`${type}-disabled`}>{`${label} locked`}</Tag>
+                    </TagContext.Provider>
+                </div>
+            );
+        };
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <Row type="person" label="Rosa Chen" />
+                <Row type="agent" label="PLUS AI" />
+                <Row type="team" label="Math team" />
+            </div>
+        );
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const labels = { person: 'Rosa Chen', agent: 'PLUS AI', team: 'Math team' };
+
+        for (const [type, label] of Object.entries(labels)) {
+            for (const kind of ['removable', 'selectable', 'link', 'disabled']) {
+                await expect(px(getComputedStyle(canvas.getByTestId(`${type}-${kind}`)).height), `${type} ${kind} is 22 tall`)
+                    .toBe(22);
+            }
+
+            // Removable: the × is named after the words, never the initials.
+            await userEvent.click(canvas.getByRole('button', { name: `Remove ${label}` }));
+            await expect(args.onRemoveSpy).toHaveBeenLastCalledWith(type);
+
+            // Selectable: a toggle named by its label alone.
+            const toggle = canvas.getByRole('button', { name: `${label} filter`, pressed: false });
+            await userEvent.click(toggle);
+            await expect(canvas.getByRole('button', { name: `${label} filter`, pressed: true })).toBeInTheDocument();
+
+            // Link, with its separate ×: two targets, link first.
+            const link = canvas.getByRole('link', { name: `${label} page` });
+            await userEvent.click(link);
+            await expect(args.onFollowSpy).toHaveBeenLastCalledWith(type);
+            await expect(link.contains(canvas.getByRole('button', { name: `Remove ${label} page` }))).toBe(false);
+
+            // Disabled: no ×, nothing to focus.
+            await expect(canvas.queryByRole('button', { name: `Remove ${label} locked` })).toBeNull();
+
+            // Saving: the spinner takes the avatar's place and the tag keeps its width.
+            const tag = canvas.getByTestId(`${type}-removable`);
+            const before = tag.getBoundingClientRect().width;
+            await expect(within(tag).queryByText(/^[A-Z]{1,2}$/), 'initials at rest').not.toBeNull();
+            await userEvent.click(canvas.getByRole('button', { name: `Save ${type}` }));
+            await expect(tag.getBoundingClientRect().width, `${type}: saving keeps the width`).toBe(before);
+            await expect(within(tag).queryByText(/^[A-Z]{1,2}$/), 'the avatar gives way to the spinner').toBeNull();
+            await expect(px(getComputedStyle(avatarOf(tag)).width), 'in the same 16 box').toBe(16);
+
+            // The avatar spinner is Figma's: a 3/4 arc in on-surface-variant,
+            // 12 across, whatever the tag's color.
+            const spinner = avatarOf(tag).firstElementChild;
+            const ring = spinner.querySelector('circle');
+            const ink = tokenColor(canvasElement, '--color-on-surface-variant');
+            await expect(px(getComputedStyle(spinner).width), 'a 12 spinner').toBe(12);
+            await expect(getComputedStyle(ring).stroke, 'in on-surface-variant').toBe(ink);
+            await expect(px(getComputedStyle(ring).strokeWidth), 'a 1.8 ring').toBeCloseTo(1.8, 5);
+            const [arc, round] = getComputedStyle(ring).strokeDasharray.split(',').map(px);
+            await expect(arc / round, 'three quarters of the ring').toBeCloseTo(0.75, 2);
+            await expect(tag.nextElementSibling, 'announced beside the tag').toHaveAttribute('role', 'status');
+            await expect(tag.nextElementSibling).toHaveTextContent('Saving');
+            await userEvent.click(canvas.getByRole('button', { name: `Save ${type}` }));
+        }
+    },
+};
+
+/**
+ * A person tag's focus ring follows its round shape: the outline is drawn
+ * around the tag's own full radius, and a focused × on it is round too.
+ */
+export const PersonFocusRing = () => (
+    <div style={row}>
+        <Tag type="person" behavior="selectable" color="teal">Rosa Chen</Tag>
+        <Tag type="person" behavior="removable" onRemove={() => {}}>Kai Brooks</Tag>
+    </div>
+);
+
+PersonFocusRing.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const ring = tokenColor(canvasElement, '--color-focus-ring');
+
+    await userEvent.tab();
+    const tag = canvas.getByRole('button', { name: 'Rosa Chen' });
+    await expect(tag).toHaveFocus();
+    const s = getComputedStyle(tag);
+    await expect(s.outlineStyle).toBe('solid');
+    await expect(px(s.outlineWidth)).toBe(2);
+    await expect(px(s.outlineOffset)).toBe(2);
+    await expect(s.outlineColor).toBe(ring);
+    await expect(px(s.borderTopLeftRadius), 'the ring follows a round tag').toBeGreaterThanOrEqual(11);
+
+    await userEvent.tab();
+    const x = canvas.getByRole('button', { name: 'Remove Kai Brooks' });
+    await expect(x).toHaveFocus();
+    await expect(getComputedStyle(x).outlineColor).toBe(ring);
+    await expect(px(getComputedStyle(x).borderTopLeftRadius), 'and a round ×').toBeGreaterThanOrEqual(8);
+};
+
+/**
+ * The × on an agent or team tag keeps the plain 2 corners, and its focus ring
+ * lands on Figma's radius-150: the ring's outer corner is the ×'s 2, plus the
+ * 2 offset, plus the 2 stroke.
+ */
+export const RemoveFocusRingOnTypes = () => (
+    <div style={row}>
+        <Tag type="agent" behavior="removable" onRemove={() => {}}>PLUS AI</Tag>
+        <Tag type="team" behavior="removable" onRemove={() => {}}>Math team</Tag>
+    </div>
+);
+
+RemoveFocusRingOnTypes.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const name of ['Remove PLUS AI', 'Remove Math team']) {
+        await userEvent.tab();
+        const x = canvas.getByRole('button', { name });
+        await expect(x).toHaveFocus();
+        const s = getComputedStyle(x);
+        await expect(s.outlineStyle, name).toBe('solid');
+        const outer = px(s.borderTopLeftRadius) + px(s.outlineOffset) + px(s.outlineWidth);
+        await expect(outer, `${name}: the ring's outer corner is radius-150`).toBe(6);
+    }
+};
+
+/**
+ * The edges of the fallback. Initials are whole characters, so an emoji or an
+ * accented letter is never split, and never more than two, even when a letter
+ * upper-cases to two (ß is SS). A label that is not text has no initials, and
+ * development says so unless an avatar is given. Leading content meant for a
+ * plain tag is ignored on an avatar type, with a warning. A disabled tag that
+ * is saving shows its spinner on a clear ground, not a grey disc.
+ */
+export const AvatarEdgeCases = {
+    render: () => {
+        const [mounted, setMounted] = useState(false);
+        return (
+            <div style={row}>
+                <button type="button" onClick={() => setMounted(true)}>Mount the edge cases</button>
+                {mounted && (
+                    <>
+                        <Tag type="agent" data-testid="emoji">😀 Helper</Tag>
+                        <Tag type="person" data-testid="eszett">ßen Öztürk</Tag>
+                        <Tag type="person" data-testid="node"><em>Rosa Chen</em></Tag>
+                        <Tag type="person" avatar={PHOTO} data-testid="node-with-avatar"><em>Kai Brooks</em></Tag>
+                        <Tag type="team" elemBefore={<i className="fa-solid fa-star" />} data-testid="elem">Math team</Tag>
+                        <Tag type="team" swatchBefore="#ff0000" data-testid="swatch">Science team</Tag>
+                        <TagContext.Provider value={{ isDisabled: true }}>
+                            <Tag type="person" isLoading data-testid="disabled-saving">Rosa Chen</Tag>
+                        </TagContext.Provider>
+                    </>
+                )}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Mount the edge cases' }));
+
+            await expect(avatarOf(canvas.getByTestId('emoji')).textContent, 'an emoji stays whole').toBe('😀');
+            const eszett = avatarOf(canvas.getByTestId('eszett')).textContent;
+            await expect(Array.from(eszett).length, 'never more than two').toBeLessThanOrEqual(2);
+            await expect(eszett).toBe('SS');
+            await expect(avatarOf(canvas.getByTestId('node')).textContent, 'a node has no initials').toBe('');
+
+            const messages = warn.mock.calls.map(([m]) => String(m));
+            await expect(messages.some((m) => m.includes('no initials')), 'a node label with no avatar warns')
+                .toBe(true);
+            await expect(messages.some((m) => m.includes('`elemBefore`'))).toBe(true);
+            await expect(messages.some((m) => m.includes('`swatchBefore`'))).toBe(true);
+
+            // The team keeps its avatar, not the star or the red swatch.
+            await expect(canvas.getByTestId('elem').querySelector('.fa-star')).toBeNull();
+            await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('swatch'))).width)).toBe(16);
+
+            const saving = avatarOf(canvas.getByTestId('disabled-saving'));
+            await expect(getComputedStyle(saving).backgroundColor, 'no grey disc behind the spinner').toBe(CLEAR);
+        } finally {
+            warn.mockRestore();
+        }
+    },
 };
 
 /* -------------------------------------------------------------- selectable */
 
-/**
- * A selectable tag is a toggle, and says so.
- *
- * `aria-pressed` is the difference between a toggle and a button that happens to
- * look different after you press it. Without it the state change is visible only
- * to people who can see the change.
- */
+/** A selectable tag is a toggle, and says so through `aria-pressed`. */
 export const Selecting = () => {
     const [picked, setPicked] = useState(['Science']);
     const toggle = (s) => setPicked((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
@@ -216,7 +485,7 @@ export const Selecting = () => {
             {['Science', 'Mathematics'].map((s) => (
                 <Tag
                     key={s}
-                    variant="selectable"
+                    behavior="selectable"
                     color="magenta"
                     isSelected={picked.includes(s)}
                     onClick={() => toggle(s)}
@@ -241,119 +510,513 @@ Selecting.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('button', { name: 'Science', pressed: false })).toBeInTheDocument();
 };
 
-/**
- * An operational tag acts, so it has no pressed state to report.
- *
- * `aria-pressed="false"` on a control that never toggles tells a screen-reader
- * user there is a state to track when there is not.
- */
-export const OperationalHasNoPressedState = () => (
-    <Tag variant="operational" color="orange" onClick={() => {}}>Add subject</Tag>
+/** The hue's own state layers, in place of a brightness filter. */
+export const StateLayers = () => (
+    <div style={row}>
+        <Tag behavior="selectable" color="blue">Unselected</Tag>
+        <Tag behavior="selectable" color="blue" isSelected>Selected</Tag>
+        <Tag behavior="selectable" color="grey" isSelected>Grey selected</Tag>
+        <Tag behavior="link" color="green" href="#tag">Link</Tag>
+        <Tag behavior="link" color="green" href="#tag" onRemove={() => {}} data-testid="split">Split link</Tag>
+        <Tag behavior="removable" color="purple" onRemove={() => {}} data-testid="removable">Removable</Tag>
+    </div>
 );
 
-OperationalHasNoPressedState.play = async ({ canvasElement }) => {
+/**
+ * Selectable: hover 08, pressed 12; selected is 12 with a full-hue border, and
+ * 16 on hover or press. A link is 08 and 12, and its text underlines on hover
+ * and press only. On a removable tag only the × reacts: 08 on hover, 16
+ * pressed, and the tag's own ground never moves.
+ */
+StateLayers.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const tag = canvas.getByRole('button', { name: 'Add subject' });
-    await expect(tag).not.toHaveAttribute('aria-pressed');
+    const t = (token) => tokenColor(canvasElement, token);
+    const bg = 'backgroundColor';
+
+    const unselected = canvas.getByRole('button', { name: 'Unselected' });
+    await expect(getComputedStyle(unselected)[bg], 'rest is outlined only').toBe(CLEAR);
+    await expect(whileForced(unselected, ':hover', bg)).toBe(t('--color-technology-tools-state-08'));
+    await expect(whileForced(unselected, ':active', bg)).toBe(t('--color-technology-tools-state-12'));
+
+    const selected = canvas.getByRole('button', { name: 'Selected' });
+    await expect(getComputedStyle(selected).borderTopColor, 'selected border is the full hue')
+        .toBe(t('--color-technology-tools'));
+    await expect(getComputedStyle(selected)[bg]).toBe(t('--color-technology-tools-state-12'));
+    await expect(whileForced(selected, ':hover', bg)).toBe(t('--color-technology-tools-state-16'));
+    await expect(whileForced(selected, ':active', bg)).toBe(t('--color-technology-tools-state-16'));
+
+    const grey = canvas.getByRole('button', { name: 'Grey selected' });
+    await expect(getComputedStyle(grey).borderTopColor).toBe(t('--color-outline'));
+    await expect(getComputedStyle(grey)[bg]).toBe(t('--color-on-surface-variant-state-12'));
+
+    // A plain link: the tag is the link.
+    const link = canvas.getByRole('link', { name: 'Link' });
+    const linkText = within(link).getByText('Link');
+    await expect(whileForced(link, ':hover', bg)).toBe(t('--color-advocacy-state-08'));
+    await expect(whileForced(link, ':active', bg)).toBe(t('--color-advocacy-state-12'));
+    await expect(getComputedStyle(linkText).textDecorationLine, 'no underline at rest').toBe('none');
+    await expect(whileForced(link, ':hover', 'textDecorationLine', linkText)).toBe('underline');
+    await expect(whileForced(link, ':active', 'textDecorationLine', linkText)).toBe('underline');
+
+    // A split link: the tag lights up for its link half, and the text underlines.
+    const split = canvas.getByTestId('split');
+    const splitLink = canvas.getByRole('link', { name: 'Split link' });
+    const splitText = within(splitLink).getByText('Split link');
+    await expect(whileForced(splitLink, ':hover', bg, split)).toBe(t('--color-advocacy-state-08'));
+    await expect(whileForced(splitLink, ':active', bg, split)).toBe(t('--color-advocacy-state-12'));
+    await expect(getComputedStyle(splitText).textDecorationLine).toBe('none');
+    await expect(whileForced(splitLink, ':hover', 'textDecorationLine', splitText)).toBe('underline');
+    await expect(whileForced(splitLink, ':active', 'textDecorationLine', splitText)).toBe('underline');
+    const splitX = canvas.getByRole('button', { name: 'Remove Split link' });
+    await expect(whileForced(splitX, ':hover', bg, split), 'hovering the × does not light the link')
+        .toBe(CLEAR);
+
+    const removable = canvas.getByTestId('removable');
+    await expect(whileForced(removable, ':hover', bg), 'a removable tag itself never reacts').toBe(CLEAR);
+    const x = canvas.getByRole('button', { name: 'Remove Removable' });
+    await expect(whileForced(x, ':hover', bg)).toBe(t('--color-on-surface-variant-state-08'));
+    await expect(whileForced(x, ':active', bg)).toBe(t('--color-on-surface-variant-state-16'));
+};
+
+/* ---------------------------------------------------------------- removing */
+
+/**
+ * The × removes the value, and says which value. A row of tags whose × are all
+ * called "Remove" gives a screen-reader user identical controls and no way to
+ * tell which one drops Science.
+ */
+export const Removing = {
+    args: { onRemoveSpy: fn() },
+    render: ({ onRemoveSpy }) => {
+        const Row = () => {
+            const [subjects, setSubjects] = useState(['Science', 'Mathematics', 'History']);
+            return (
+                <div style={row}>
+                    {subjects.map((s) => (
+                        <Tag
+                            key={s}
+                            behavior="removable"
+                            color="blue"
+                            onRemove={() => {
+                                onRemoveSpy(s);
+                                setSubjects((prev) => prev.filter((x) => x !== s));
+                            }}
+                        >
+                            {s}
+                        </Tag>
+                    ))}
+                    <Tag behavior="removable" color="blue" onRemove={() => {}} removeLabel="Drop the maths filter">Maths</Tag>
+                </div>
+            );
+        };
+        return <Row />;
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+
+        const remove = canvas.getByRole('button', { name: 'Remove Science' });
+        await expect(px(getComputedStyle(remove).width), 'the × is the small Remove button').toBe(16);
+        await expect(px(getComputedStyle(remove).height)).toBe(16);
+
+        await userEvent.click(remove);
+        await expect(args.onRemoveSpy).toHaveBeenCalledWith('Science');
+        await expect(canvas.queryByText('Science')).toBeNull();
+        await expect(canvas.getByText('Mathematics')).toBeInTheDocument();
+
+        // `removeLabel` replaces the generated name.
+        await expect(canvas.getByRole('button', { name: 'Drop the maths filter' })).toBeInTheDocument();
+
+        // A removable tag is not itself a control: exactly one button per tag.
+        await expect(canvas.getAllByRole('button')).toHaveLength(3);
+    },
 };
 
 /**
- * A read-only tag exposes no control at all.
- *
- * It is still a tag — the value was chosen by a person, and the pattern signals
- * that the selection becomes editable once the surface does. What it must not do
- * is offer something to press.
+ * A label that is not text gives the × nothing to be named after, so a row of
+ * them would all be "Remove". Development says so unless `removeLabel` is set.
  */
-export const ReadOnlyExposesNoControl = () => (
-    <Tag variant="read-only" color="green">Science</Tag>
-);
-
-ReadOnlyExposesNoControl.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.queryAllByRole('button')).toHaveLength(0);
-    await expect(canvas.queryAllByRole('link')).toHaveLength(0);
-    await expect(canvas.getByText('Science')).toBeInTheDocument();
+export const RemoveNeedsANameForNodeLabels = {
+    render: () => {
+        const [mounted, setMounted] = useState(false);
+        return (
+            <div style={row}>
+                <button type="button" onClick={() => setMounted(true)}>Mount</button>
+                {mounted && (
+                    <>
+                        <Tag behavior="removable" onRemove={() => {}}><em>Unnamed</em></Tag>
+                        <Tag behavior="removable" onRemove={() => {}} removeLabel="Remove Named"><em>Named</em></Tag>
+                    </>
+                )}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Mount' }));
+            await expect(canvas.getByRole('button', { name: 'Remove Named' })).toBeInTheDocument();
+            const calls = warn.mock.calls.filter(([m]) => String(m).includes('Pass `removeLabel`'));
+            await expect(calls.length, 'only the unnamed one warns').toBeGreaterThan(0);
+            await expect(calls.every(([m]) => !String(m).includes('Named'))).toBe(true);
+        } finally {
+            warn.mockRestore();
+        }
+    },
 };
 
-/* ------------------------------------------------------------- truncation */
+/** Keyboard focus: a 2px Focus Ring 2px outside the tag, the link, or the ×. */
+export const FocusRing = () => (
+    <div style={row}>
+        <Tag behavior="selectable" color="teal">Filter</Tag>
+        <Tag behavior="removable" color="teal" onRemove={() => {}}>Chosen</Tag>
+        <Tag behavior="link" color="teal" href="#tag">Go</Tag>
+        <Tag behavior="link" color="teal" href="#tag" onRemove={() => {}} data-testid="split">Split</Tag>
+    </div>
+);
+
+FocusRing.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const ring = tokenColor(canvasElement, '--color-focus-ring');
+    const expectRing = async (el, what) => {
+        const s = getComputedStyle(el);
+        await expect(s.outlineStyle, what).toBe('solid');
+        await expect(px(s.outlineWidth), what).toBe(2);
+        await expect(px(s.outlineOffset), `${what} sits 2px outside`).toBe(2);
+        await expect(s.outlineColor, what).toBe(ring);
+    };
+
+    await userEvent.tab();
+    const tag = canvas.getByRole('button', { name: 'Filter' });
+    await expect(tag).toHaveFocus();
+    await expectRing(tag, 'selectable');
+
+    await userEvent.tab();
+    const x = canvas.getByRole('button', { name: 'Remove Chosen' });
+    await expect(x).toHaveFocus();
+    await expectRing(x, 'the ×');
+    await expect(getComputedStyle(x).backgroundColor, 'with the 12 fill under it')
+        .toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-12'));
+
+    await userEvent.tab();
+    const go = canvas.getByRole('link', { name: 'Go' });
+    await expect(go).toHaveFocus();
+    await expectRing(go, 'a link');
+
+    await userEvent.tab();
+    await expect(canvas.getByRole('link', { name: 'Split' })).toHaveFocus();
+    await expectRing(canvas.getByTestId('split'), 'a split link rings the whole tag');
+};
+
+/* -------------------------------------------------------------------- link */
 
 /**
- * A truncated label keeps its full text.
- *
- * Truncation that loses the text is not truncation, it is deletion — and CSS
- * ellipsis leaves nothing behind for a screen reader or a hover.
+ * A link that can also be removed is two targets, never one inside the other:
+ * the text is the link and the × is its sibling, in that tab order, so
+ * removing it can never follow it.
+ */
+export const LinkWithRemove = {
+    args: { onRemoveSpy: fn(), onFollowSpy: fn() },
+    render: ({ onRemoveSpy, onFollowSpy }) => (
+        <div style={row}>
+            <button type="button">Before</button>
+            <Tag
+                behavior="link"
+                color="purple"
+                href="#algebra"
+                onClick={(e) => {
+                    e.preventDefault();
+                    onFollowSpy();
+                }}
+                onRemove={onRemoveSpy}
+            >
+                Algebra
+            </Tag>
+        </div>
+    ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const link = canvas.getByRole('link', { name: 'Algebra' });
+        const x = canvas.getByRole('button', { name: 'Remove Algebra' });
+
+        await expect(link.contains(x), 'the × is not nested in the link').toBe(false);
+        await expect(x.closest('a'), 'nor inside any link').toBeNull();
+
+        canvas.getByRole('button', { name: 'Before' }).focus();
+        await userEvent.tab();
+        await expect(link).toHaveFocus();
+        await userEvent.tab();
+        await expect(x).toHaveFocus();
+
+        await userEvent.click(x);
+        await expect(args.onRemoveSpy).toHaveBeenCalledTimes(1);
+        await expect(args.onFollowSpy, 'removing never follows the link').not.toHaveBeenCalled();
+    },
+};
+
+/* ---------------------------------------------------------------- disabled */
+
+/**
+ * Disabled comes from the field, through `TagContext`: a neutral fill,
+ * Secondary (Text), no ×, nothing to focus, and no hover.
+ */
+export const DisabledInField = () => (
+    <div style={row}>
+        <button type="button">Before</button>
+        <TagContext.Provider value={{ isDisabled: true }}>
+            <Tag color="blue" data-testid="read-only">Read only</Tag>
+            <Tag behavior="removable" color="blue" onRemove={() => {}} data-testid="removable">Removable</Tag>
+            <Tag behavior="selectable" color="blue" data-testid="selectable">Selectable</Tag>
+            <Tag behavior="selectable" color="blue" isSelected data-testid="selected">Selected</Tag>
+            <Tag behavior="link" color="blue" href="#tag" data-testid="link">Link</Tag>
+        </TagContext.Provider>
+        <button type="button">After</button>
+    </div>
+);
+
+DisabledInField.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.queryByRole('button', { name: /^Remove/ }), 'no ×').toBeNull();
+    await expect(canvas.queryByRole('link'), 'a disabled link is not a link').toBeNull();
+
+    canvas.getByRole('button', { name: 'Before' }).focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'After' }), 'no tag takes focus').toHaveFocus();
+
+    const fill = tokenColor(canvasElement, '--color-on-surface-state-12');
+    const text = tokenColor(canvasElement, '--color-secondary-text');
+    for (const id of ['read-only', 'removable', 'selectable', 'selected', 'link']) {
+        const tag = canvas.getByTestId(id);
+        await expect(getComputedStyle(tag).backgroundColor, `${id} fill`).toBe(fill);
+        await expect(getComputedStyle(tag).color, `${id} text`).toBe(text);
+        await expect(px(getComputedStyle(tag).height)).toBe(22);
+    }
+
+    // Selected stays visible when disabled, as a Secondary (Text) border.
+    await expect(getComputedStyle(canvas.getByTestId('selected')).borderTopColor).toBe(text);
+    await expect(getComputedStyle(canvas.getByTestId('read-only')).borderTopColor).toBe(CLEAR);
+
+    // A disabled link does not answer a pointer: no state layer, no underline.
+    const link = canvas.getByTestId('link');
+    const linkText = within(link).getByText('Link');
+    await expect(whileForced(link, ':hover', 'backgroundColor')).toBe(fill);
+    await expect(whileForced(link, ':active', 'backgroundColor')).toBe(fill);
+    await expect(whileForced(link, ':hover', 'textDecorationLine', linkText)).toBe('none');
+    await expect(whileForced(link, ':active', 'textDecorationLine', linkText)).toBe('none');
+};
+
+/* ------------------------------------------------------------------- count */
+
+/**
+ * A count belongs to a selectable tag, such as a filter's result count. On any
+ * other behavior it is ignored, and development says so.
+ */
+export const CountOnSelectable = {
+    render: () => {
+        const [mounted, setMounted] = useState(false);
+        return (
+            <div style={row}>
+                <Tag behavior="selectable" color="green" count={12}>Science</Tag>
+                <button type="button" onClick={() => setMounted(true)}>Mount a removable with a count</button>
+                {mounted && (
+                    <Tag behavior="removable" color="green" count={34} onRemove={() => {}}>History</Tag>
+                )}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const count = canvas.getByText('12');
+        await expect(px(getComputedStyle(count.parentElement).height), 'a small Count, 16').toBe(16);
+        await expect(canvas.getByRole('button', { name: 'Science 12' })).toBeInTheDocument();
+
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Mount a removable with a count' }));
+            await expect(canvas.getByText('History')).toBeInTheDocument();
+            await expect(canvas.queryByText('34'), 'ignored off selectable').toBeNull();
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`count` is only shown on behavior="selectable"'));
+        } finally {
+            warn.mockRestore();
+        }
+    },
+};
+
+/* ------------------------------------------------------------------ saving */
+
+/**
+ * Saving swaps the swatch for a spinner of the same size, so the tag does not
+ * move, and says so once, through a status beside the tag rather than inside
+ * its name. The × and a link stay in place but do nothing until the save lands.
+ */
+export const Saving = {
+    args: { onRemoveSpy: fn(), onFollowSpy: fn(), onToggleSpy: fn() },
+    render: ({ onRemoveSpy, onFollowSpy, onToggleSpy }) => {
+        const Row = () => {
+            const [saving, setSaving] = useState(false);
+            return (
+                <div style={row}>
+                    <span data-testid="removable-wrap">
+                        <Tag behavior="removable" color="yellow" isLoading={saving} onRemove={onRemoveSpy} data-testid="removable">Geometry</Tag>
+                    </span>
+                    <Tag behavior="selectable" color="yellow" isLoading={saving} onClick={onToggleSpy}>Statistics</Tag>
+                    <Tag
+                        behavior="link"
+                        color="yellow"
+                        href="#calculus"
+                        isLoading={saving}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onFollowSpy();
+                        }}
+                    >
+                        Calculus
+                    </Tag>
+                    <button type="button" onClick={() => setSaving((v) => !v)}>
+                        {saving ? 'Done' : 'Save'}
+                    </button>
+                </div>
+            );
+        };
+        return <Row />;
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const tag = canvas.getByTestId('removable');
+        const status = within(canvas.getByTestId('removable-wrap')).getByRole('status');
+        const before = tag.getBoundingClientRect().width;
+
+        await expect(status, 'the live region is there before anything is said').toHaveTextContent('');
+        await expect(tag.contains(status), 'and sits outside the tag').toBe(false);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Save' }));
+        await expect(tag.getBoundingClientRect().width, 'saving keeps the width').toBe(before);
+        await expect(status).toHaveTextContent('Saving');
+        await expect(within(canvas.getByTestId('removable-wrap')).getAllByRole('status'), 'announced once')
+            .toHaveLength(1);
+
+        // The control's name is its label, not "Saving".
+        const toggle = canvas.getByRole('button', { name: 'Statistics' });
+        await expect(toggle).toHaveAttribute('aria-disabled', 'true');
+        await userEvent.click(toggle);
+        await expect(args.onToggleSpy).not.toHaveBeenCalled();
+
+        const link = canvas.getByRole('link', { name: 'Calculus' });
+        await expect(link).toHaveAttribute('aria-disabled', 'true');
+        await userEvent.click(link);
+        await expect(args.onFollowSpy, 'a saving link does not follow').not.toHaveBeenCalled();
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Remove Geometry' }));
+        await expect(args.onRemoveSpy, 'the × waits for the save').not.toHaveBeenCalled();
+
+        const spinner = tag.querySelector('[aria-hidden="true"]');
+        const hue = tokenColor(canvasElement, '--color-social-emotional');
+        await expect(getComputedStyle(spinner).borderTopColor, 'the spinner is in the tag hue').toBe(hue);
+        await expect(getComputedStyle(spinner).borderBottomColor, 'a 270° arc').toBe(hue);
+        await expect(getComputedStyle(spinner).borderLeftColor).toBe(CLEAR);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Done' }));
+        await expect(status, 'and it goes quiet when the save lands').toHaveTextContent('');
+        await userEvent.click(canvas.getByRole('button', { name: 'Remove Geometry' }));
+        await expect(args.onRemoveSpy).toHaveBeenCalledTimes(1);
+    },
+};
+
+/* -------------------------------------------------------------- truncation */
+
+/**
+ * Every tag caps at 180 wide. A clipped label ellipsizes and its full text is a
+ * tooltip a keyboard can reach: on a span tag the label takes focus while it is
+ * clipped; on a control, the control carries the tooltip. A label that fits
+ * gets no tooltip and no extra tab stop.
  */
 export const Truncation = () => (
     <div style={row}>
-        <Tag color="blue" maxWidth={140}>
-            Social-Emotional Learning and Advocacy
-        </Tag>
+        <Tag color="blue">Social-Emotional Learning and Advocacy for Every Student</Tag>
+        <Tag behavior="selectable" color="blue">Mastering Content Across Every Grade Band</Tag>
+        <Tag color="blue">Short</Tag>
     </div>
 );
 
 Truncation.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const text = canvas.getByTitle('Social-Emotional Learning and Advocacy');
-    await expect(text).toBeInTheDocument();
-    // The box is capped, so the label really is being clipped rather than fitting.
-    await expect(text.scrollWidth).toBeGreaterThan(text.clientWidth);
+    const page = within(canvasElement.ownerDocument.body);
+    const long = canvas.getByText('Social-Emotional Learning and Advocacy for Every Student');
+
+    await expect(long.scrollWidth).toBeGreaterThan(long.clientWidth);
+    await expect(getComputedStyle(long).textOverflow).toBe('ellipsis');
+    await expect(long.parentElement.getBoundingClientRect().width).toBeLessThanOrEqual(180);
+
+    await userEvent.tab();
+    await expect(long, 'a clipped label is reachable by keyboard').toHaveFocus();
+    const tip = await page.findByRole('tooltip', {}, { timeout: 2000 });
+    await expect(tip).toHaveTextContent('Social-Emotional Learning and Advocacy for Every Student');
+
+    await userEvent.tab();
+    const control = canvas.getByRole('button', { name: 'Mastering Content Across Every Grade Band' });
+    await expect(control, 'a control carries its own tooltip, with no second stop').toHaveFocus();
+    await waitFor(() => expect(page.getByRole('tooltip')).toHaveTextContent('Mastering Content Across Every Grade Band'));
+
+    await userEvent.tab();
+    await expect(canvas.getByText('Short'), 'a label that fits takes no focus').not.toHaveFocus();
+    await expect(canvas.getByText('Short')).not.toHaveAttribute('tabindex');
 };
 
-/* ------------------------------------------------------------- decoration */
-
-export const WithLeadingContent = () => (
-    <div style={row}>
-        <Tag color="grey" swatchBefore="#7f3fb1">Series A</Tag>
-        <Tag color="grey" elemBefore={<i className="fa-solid fa-user" aria-hidden="true" />}>Ms Okafor</Tag>
-    </div>
-);
+/* ------------------------------------------------------------- deprecation */
 
 /**
- * A swatch is decoration, not content.
- *
- * It repeats what the tag already says in words. Announcing it would give a
- * screen-reader user "square, Series A" and no extra information.
+ * The old names keep working. `orange` is `yellow` (the hue is a 44° yellow),
+ * and `variant="dismissible"` is `behavior="removable"`; both say so in
+ * development.
  */
-WithLeadingContent.play = async ({ canvasElement }) => {
-    const swatch = canvasElement.querySelector('.plus-tag__swatch');
-    await expect(swatch).toHaveAttribute('aria-hidden', 'true');
-};
-
-export const Loading = () => (
-    <div style={row}>
-        <Tag variant="selectable" color="purple" isLoading>Saving</Tag>
-    </div>
-);
-
-/**
- * A loading tag stands down as a control.
- *
- * A second click while the value is already changing queues a second action
- * against it, which is how a dismissal gets applied twice.
- */
-Loading.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.queryAllByRole('button')).toHaveLength(0);
-    await expect(canvas.getByRole('status', { name: 'Loading' })).toBeInTheDocument();
+export const DeprecatedNames = {
+    render: () => {
+        const [mounted, setMounted] = useState(false);
+        return (
+            <div style={row}>
+                <button type="button" onClick={() => setMounted(true)}>Mount the old names</button>
+                {mounted && (
+                    <>
+                        <Tag color="orange" data-testid="orange">Orange</Tag>
+                        <Tag variant="dismissible" color="yellow" onRemove={() => {}}>Dismissible</Tag>
+                    </>
+                )}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Mount the old names' }));
+            await expect(getComputedStyle(canvas.getByTestId('orange')).borderTopColor)
+                .toBe(tokenColor(canvasElement, '--color-social-emotional-border-subtle'));
+            await expect(canvas.getByRole('button', { name: 'Remove Dismissible' })).toBeInTheDocument();
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('color="orange" is deprecated'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="dismissible" is deprecated'));
+        } finally {
+            warn.mockRestore();
+        }
+    },
 };
 
 /* -------------------------------------------------------------- playground */
 
 /**
- * Interactive playground.
- *
- * `onClick` and `onRemove` are supplied here rather than exposed as controls: a
- * docs control cannot author a function, and `dismissible` renders no remove
- * button without one — which reads as the variant being broken rather than as a
- * missing handler.
+ * Interactive playground. `onRemove` is supplied here rather than exposed as a
+ * control: a docs control cannot author a function, and a removable tag with
+ * no handler renders no ×.
  */
 export const Interactive = (args) => (
-    <Tag {...args} onClick={() => {}} onRemove={() => {}} />
+    <Tag {...args} onClick={(e) => e.preventDefault()} onRemove={() => {}} />
 );
 Interactive.args = {
     text: 'Mathematics',
-    variant: 'read-only',
+    behavior: 'read-only',
     color: 'blue',
+    type: 'plain',
+    href: '#mathematics',
     isSelected: false,
     isLoading: false,
 };
