@@ -118,7 +118,7 @@ ConditionalChildrenAreNotCounted.play = async ({ canvasElement }) => {
 };
 
 /**
- * A dismissible set: the group holds the gaps, the tags hold the values.
+ * A removable set: the group holds the gaps, the tags hold the values.
  */
 export const DismissibleSet = () => {
     const [picked, setPicked] = useState(SUBJECTS.slice(0, 4));
@@ -127,7 +127,7 @@ export const DismissibleSet = () => {
             {picked.map((s) => (
                 <Tag
                     key={s}
-                    variant="dismissible"
+                    behavior="removable"
                     color="purple"
                     onRemove={() => setPicked((prev) => prev.filter((x) => x !== s))}
                 >
@@ -163,7 +163,7 @@ export const CustomOverflowAction = () => {
                 overflowLabel={(n) => `${n} more`}
                 onOverflowClick={() => setOpened((n) => n + 1)}
             >
-                {SUBJECTS.map((s) => <Tag key={s} color="orange">{s}</Tag>)}
+                {SUBJECTS.map((s) => <Tag key={s} color="yellow">{s}</Tag>)}
             </TagGroup>
             <p className="body2-txt">Picker opened {opened} time(s)</p>
         </div>

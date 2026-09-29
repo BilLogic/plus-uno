@@ -306,10 +306,10 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const all = [...found];
 
   // The population itself, so a selector that quietly stops matching is loud
-  // rather than green. 55 components + the one named exception — Tag and
+  // rather than green. 56 components + the one named exception — Tag and
   // TagGroup took it from 48 in #276, AiLabel added one in #269,
-  // BadgeVariants added the last of #276's three, Tile and Count added one
-  // each, and CloseButton added one when Alert's dismiss control became a
+  // BadgeVariants added the last of #276's three, Tile, Count and Status added
+  // one each, and CloseButton added one when Alert's dismiss control became a
   // shared component — the deliberate edit this number is here to force.
   //
   // BadgeVariants is the one component here documented from a FLAT source
@@ -317,9 +317,9 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // is the shape `componentIdentity` already recognises and the shape #276
   // wanted: the new Badge sits BESIDE the old one rather than replacing it, so
   // both are visible in one group while the deprecation runs.
-  if (tabbed.length !== 56) {
+  if (tabbed.length !== 57) {
     all.push(
-      `expected 56 tabbed docs pages (55 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 57 tabbed docs pages (56 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

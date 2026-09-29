@@ -53,7 +53,7 @@ and whether a long set wraps or collapses.
     <DsCanvasQuiet of={TagGroupStories.ConditionalChildrenAreNotCounted} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A dismissible set: the group holds the gaps, the tags hold the values.</>}>
+<DocsCanvasShell description={<>A removable set: the group holds the gaps, the tags hold the values.</>}>
     <DsCanvasQuiet of={TagGroupStories.DismissibleSet} />
 </DocsCanvasShell>
 
@@ -165,9 +165,9 @@ shows, not against the width of the container.
 - **The items are wrapped, not rendered as `li`.** That is what keeps `Tag`
   usable on its own, outside any group, without it carrying list semantics it
   has no right to.
-- **The overflow tag is a real control.** It renders as an `operational` tag,
-  which is a `button`, so it is reachable by keyboard and activated by Enter
-  and Space without any handler of its own.
+- **The overflow tag is a real control.** It renders as a tag that is a
+  `button`, so it is reachable by keyboard and activated by Enter and Space
+  without any handler of its own.
 - **`+n` is not a live region.** Revealing the hidden tags changes the list
   silently. If the reveal is the point of the interaction, move focus into what
   it revealed.

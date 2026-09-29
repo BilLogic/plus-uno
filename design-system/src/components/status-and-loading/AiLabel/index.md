@@ -33,7 +33,7 @@ From `design-system/src/components/status-and-loading/AiLabel/AiLabel.scss`. Ove
 
 ## Related
 
-Same group: `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Tag` · `TagGroup` · `Tile`
+Same group: `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Status` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
