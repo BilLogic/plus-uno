@@ -178,7 +178,13 @@ export type TurnSurface = "channel" | "assistant";
  * the event did not say — an `app_mention` carries no `channel_type` — and
  * unknown is treated as private.
  */
-export type ConversationType = "channel" | "group" | "mpim" | "im";
+export const CONVERSATION_TYPES = ["channel", "group", "mpim", "im"] as const;
+export type ConversationType = (typeof CONVERSATION_TYPES)[number];
+
+/** A value as a `ConversationType`, or undefined when it is not one. */
+export function asConversationType(value: unknown): ConversationType | undefined {
+  return CONVERSATION_TYPES.find((t) => t === value);
+}
 
 export interface TurnRequest {
   // ----- who -----

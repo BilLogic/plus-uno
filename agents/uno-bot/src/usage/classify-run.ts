@@ -10,8 +10,9 @@
 // ask at a time in the same job, so the asks that can be labelled are, and each
 // that still fails has the failure counted against it. After
 // `MAX_CLASSIFY_ATTEMPTS` it is given up on — blank, text nulled — and until
-// then it ranks behind every ask with fewer failures. If no ask can be labelled
-// at all the classifier is down rather than the asks bad: nothing is counted,
+// then it ranks behind every ask with fewer failures. A failure that is not
+// the ask's fault — a rate limit, a server error — is never counted; if the
+// classifier is down outright, nothing is counted,
 // and the job fails, to be tried again by the next run.
 //
 // Pure: the store and the model come in by name, so the Node suite and the
@@ -125,29 +126,51 @@ async function classifyWithFallback(
 
   const labels: AskLabel[] = [];
   const failed: string[] = [];
-  const errors: unknown[] = [];
+  let transientInARow = 0;
+  let lastTransient: unknown;
   // A batch of one has already been tried on its own.
   for (const ask of asks) {
     try {
       if (asks.length === 1) throw batchError;
       const [subType] = await classifyAsks(provider, [ask.text]);
       labels.push(labelOf(ask, subType ?? null));
+      transientInARow = 0;
     } catch (err) {
-      errors.push(err);
-      failed.push(ask.turnId);
-      if (labels.length === 0 && errors.length >= OUTAGE_AFTER && !errors.some(isUnreadable)) break;
+      if (!isTransient(err)) {
+        // Something about THIS ask: count it, so it cannot hold its place.
+        failed.push(ask.turnId);
+        transientInARow = 0;
+        continue;
+      }
+      // A rate limit, a server error, a dropped connection: not the ask's
+      // fault, so never counted against it.
+      lastTransient = err;
+      transientInARow += 1;
+      if (transientInARow >= OUTAGE_AFTER) break;
     }
   }
-  // Nothing labelled, and no answer that was merely unreadable: the model is
-  // failing, not the asks. Count nothing against them; the next run tries again.
-  if (labels.length === 0 && !errors.some(isUnreadable)) {
-    const first = errors[0];
-    throw first instanceof Error ? first : new Error(String(first));
+  // Nothing labelled and nothing that was the asks' fault: the classifier is
+  // down. The next run tries again, with nothing counted.
+  if (labels.length === 0 && failed.length === 0) {
+    throw lastTransient instanceof Error ? lastTransient : new Error(String(lastTransient ?? batchError));
   }
   return { labels, failed };
 }
 
-const isUnreadable = (err: unknown): boolean => err instanceof ClassifyError && err.kind === "unreadable";
+/**
+ * A failure that says nothing about the ask: the classifier unavailable, a
+ * rate limit, a server error, a timeout or a dropped connection. What is left
+ * — an unreadable answer, or a call refused for what it carried (a 400, a
+ * blocked prompt, an empty candidate) — is counted against the ask.
+ */
+export function isTransient(err: unknown): boolean {
+  if (!(err instanceof ClassifyError)) return true;
+  if (err.kind === "unavailable") return true;
+  if (err.kind === "unreadable") return false;
+  return /\b(408|429|5\d\d)\b|timed? ?out|timeout|network|fetch failed|ECONN|overloaded|unavailable|quota|exhausted/i.test(
+    err.message,
+  );
+}
 
 /**
  * Null every text older than the purge cutoff. A dry run clears nothing.

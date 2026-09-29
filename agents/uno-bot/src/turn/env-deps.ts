@@ -35,8 +35,8 @@ import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
-import { classifyAsks, type TurnOrigin } from "../usage/index";
-import { testChannelIdsOf, usageLogFor } from "../usage/production";
+import type { TurnOrigin } from "../usage/index";
+import { classifyAskFor, testChannelIdsOf, usageLogFor } from "../usage/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -171,11 +171,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       log: usageLogFor(env),
       origin: wiring.origin,
       testChannelIds: testChannelIdsOf(env),
-      // An ask's in-turn label, on the same adapter the turn ran on — only
-      // when there is a database to keep it in; otherwise no call is spent.
-      ...(env.USAGE_DB
-        ? { classifyAsk: async (text: string) => (await classifyAsks(selectProvider(env), [text]))[0] ?? null }
-        : {}),
+      // An ask's in-turn label — only when there is a database to keep it in.
+      ...(classifyAskFor(env) ? { classifyAsk: classifyAskFor(env)! } : {}),
     },
 
     // The reads a card needs and Turn may not make itself — shared with the

@@ -18,7 +18,8 @@ import type { ConversationType } from "../turn/turn";
 import type { PainCategory, SubType } from "./categories";
 
 /** One turn, as the `turns` table holds it. Field names are camelCase here and
- *  snake_case in SQL; `./d1.ts` is the one place they are mapped. */
+ *  snake_case in SQL; `./d1.ts` is the one place they are mapped. The
+ *  classifier's writes to the category columns are `./category-store.ts`'s. */
 export interface TurnRecord {
   // ── identity and place ──
   /** `<channel>:<the asker's message ts>` — stable across a retried alarm, so

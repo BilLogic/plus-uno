@@ -20,7 +20,7 @@ import type { AgentImage, HistoricalImages } from "../agent/provider-conversatio
 import type { ModelTier } from "../agent/routing";
 import { proposalReplyThread } from "../thread-state/index";
 import type { HistoryTurn, PendingProposal, VisionReference } from "../thread-state/index";
-import type { ConversationType, TurnRequest, TurnSurface } from "./turn";
+import { asConversationType, type ConversationType, type TurnRequest, type TurnSurface } from "./turn";
 import type { IntakeThread } from "./intake-channel";
 
 /**
@@ -86,10 +86,7 @@ export function turnSurfaceOf(channel: string): TurnSurface {
  * unknown. A value Slack adds later is unknown too, never guessed at.
  */
 export function conversationTypeOf(channel: string, channelType?: string): ConversationType | undefined {
-  if (channelType === "channel" || channelType === "group" || channelType === "mpim" || channelType === "im") {
-    return channelType;
-  }
-  return turnSurfaceOf(channel) === "assistant" ? "im" : undefined;
+  return asConversationType(channelType) ?? (turnSurfaceOf(channel) === "assistant" ? "im" : undefined);
 }
 
 /**
@@ -111,6 +108,7 @@ export function cardThreadOf(facts: { conversationTs: string; replyTs?: string }
 
 /** Envelope facts, as the request a turn takes. */
 export function buildTurnRequest(facts: TurnFacts): TurnRequest {
+  const conversationType = conversationTypeOf(facts.channel, facts.channelType);
   const attachmentsText =
     facts.attachmentsText && facts.attachmentsText !== facts.text ? facts.attachmentsText : undefined;
 
@@ -121,9 +119,7 @@ export function buildTurnRequest(facts: TurnFacts): TurnRequest {
     ...(facts.replyTs ? { replyTs: facts.replyTs } : {}),
     userMsgTs: facts.userMsgTs,
     surface: turnSurfaceOf(facts.channel),
-    ...(conversationTypeOf(facts.channel, facts.channelType)
-      ? { conversationType: conversationTypeOf(facts.channel, facts.channelType)! }
-      : {}),
+    ...(conversationType ? { conversationType } : {}),
     threaded: facts.threaded,
     text: facts.text,
     ...(attachmentsText ? { attachmentsText } : {}),

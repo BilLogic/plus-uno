@@ -295,6 +295,32 @@ export function runCategoryConformance(
     assert.deepEqual(await store.pendingAsks(10), []);
   });
 
+  it("an ask refused for what it carries is counted, so it cannot hold the head of the queue", async () => {
+    const { log, store } = await make();
+    for (let i = 1; i <= 4; i++) await log.record(channelAsk(`C1:${i}`, { askedAt: NOW - DAY + i }));
+    // Every call is refused for its content — never a rate limit.
+    const refusing = fakeProvider({ generateFailMessage: "HTTP 400: prompt blocked" });
+    assert.deepEqual(await runClassifyBatch({ store, provider: refusing, now: () => NOW, dryRun: false }), {
+      labelled: 0,
+      blank: 0,
+      failed: 4,
+      givenUp: 0,
+    });
+    assert.deepEqual(
+      (await store.pendingAsks(10)).map((p) => p.attempts),
+      [1, 1, 1, 1],
+    );
+  });
+
+  it("a retry never puts purged text back", async () => {
+    const { log, store } = await make();
+    const old = channelAsk("C1:old", { askedAt: NOW - PURGE_AFTER_MS - 1 });
+    await log.record(old);
+    await runTextPurge({ store, now: () => NOW, dryRun: false });
+    await log.record(old);
+    assert.equal((await log.get("C1:old"))?.requestText, null);
+  });
+
   it("a classifier that is down counts nothing against the asks", async () => {
     const { log, store } = await make();
     await log.record(channelAsk("C1:1"));

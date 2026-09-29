@@ -10,6 +10,7 @@ import {
   ClassifyError,
   PAIN_CATEGORY_OF_SUB_TYPE,
   classifyMaxTokens,
+  isTransient,
   SUB_TYPES,
   classifyAsks,
   painCategoryOf,
@@ -119,4 +120,14 @@ test("no asks, no call", async () => {
   const fake = fakeProvider();
   assert.deepEqual(await classifyAsks(fake, []), []);
   assert.equal(fake.generated.length, 0);
+});
+
+test("a rate limit or a server error is never the ask's fault; a refusal or an unreadable answer is", () => {
+  for (const msg of ["HTTP 429: quota", "HTTP 503", "HTTP 500: internal", "timed out after 4000 ms", "fetch failed"]) {
+    assert.equal(isTransient(new ClassifyError("failed", msg)), true, msg);
+  }
+  assert.equal(isTransient(new ClassifyError("unavailable", "no key")), true);
+  assert.equal(isTransient(new ClassifyError("failed", "HTTP 400: prompt blocked")), false);
+  assert.equal(isTransient(new ClassifyError("failed", "empty candidate")), false);
+  assert.equal(isTransient(new ClassifyError("unreadable", "12 chars, not a JSON object")), false);
 });

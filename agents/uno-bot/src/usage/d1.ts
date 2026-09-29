@@ -11,7 +11,7 @@
 // run is what exercises it against a real (local) D1.
 
 import { chargeD1Query } from "../net";
-import type { ConversationType } from "../turn/turn";
+import { asConversationType } from "../turn/turn";
 import { subTypeOf, type PainCategory } from "./categories";
 import type { TurnRecord, UsageLog } from "./store";
 
@@ -67,7 +67,10 @@ type Row = Record<(typeof COLUMNS)[number], unknown>;
  *  leaves the stored label, and a classified row never gets its text back —
  *  the rule `./in-memory.ts` `mergeOnRetry` states for a map. */
 const ON_RETRY: Partial<Record<(typeof COLUMNS)[number], string>> = {
-  request_text: "CASE WHEN turns.classified_at IS NULL THEN excluded.request_text ELSE NULL END",
+  // Text is only ever KEPT by a retry, never put back: not on a classified
+  // row, and not on a row the purge has already emptied.
+  request_text:
+    "CASE WHEN turns.classified_at IS NULL AND turns.request_text IS NOT NULL THEN excluded.request_text ELSE NULL END",
   sub_type: "COALESCE(excluded.sub_type, turns.sub_type)",
   pain_category: "COALESCE(excluded.pain_category, turns.pain_category)",
   classified_at: "COALESCE(excluded.classified_at, turns.classified_at)",
@@ -127,9 +130,7 @@ function toRow(r: TurnRecord): unknown[] {
 }
 
 const str = (v: unknown): string => String(v);
-const CONVERSATION_TYPES = ["channel", "group", "mpim", "im"] as const;
-const conversationTypeOf = (v: unknown): ConversationType | null =>
-  CONVERSATION_TYPES.find((t) => t === v) ?? null;
+
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
 const num = (v: unknown): number => Number(v);
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
@@ -167,7 +168,7 @@ function fromRow(row: Row): TurnRecord {
     stopUsed: num(row.stop_used) === 1,
     selfFiledTicketUrl: strOrNull(row.self_filed_ticket_url),
     testTraffic: num(row.test_traffic) === 1,
-    conversationType: conversationTypeOf(row.conversation_type),
+    conversationType: asConversationType(row.conversation_type) ?? null,
     requestText: strOrNull(row.request_text),
     subType: subTypeOf(row.sub_type),
     painCategory: numOrNull(row.pain_category) as PainCategory | null,

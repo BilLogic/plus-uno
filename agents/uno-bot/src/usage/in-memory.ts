@@ -22,13 +22,14 @@ const copy = (r: TurnRecord): TurnRecord => ({
  * What an upsert leaves when a row already exists — the D1 adapter's
  * `ON CONFLICT` clause, stated for a map. The turn's own columns take the new
  * values; the category columns are the classifier's: a null leaves the stored
- * label, and a row already classified never gets its text back.
+ * label, and a row already classified, or already purged, never gets its text
+ * back.
  */
 export function mergeOnRetry(stored: TurnRecord | undefined, incoming: TurnRecord): TurnRecord {
   if (!stored) return copy(incoming);
   return {
     ...copy(incoming),
-    requestText: stored.classifiedAt === null ? incoming.requestText : null,
+    requestText: stored.classifiedAt === null && stored.requestText !== null ? incoming.requestText : null,
     subType: incoming.subType ?? stored.subType,
     painCategory: incoming.painCategory ?? stored.painCategory,
     classifiedAt: incoming.classifiedAt ?? stored.classifiedAt,

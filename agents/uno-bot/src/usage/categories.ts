@@ -5,7 +5,8 @@
 // Notion data source f4f8d4e6-2566-407b-8058-bfa6bb686faa) was retagged by
 // Sub-type, and bot-era asks are tagged on the same axis so the article can
 // compare before and after. `SUB_TYPES` is that data source's option list,
-// checked in: a classifier's answer is exact-matched against it (hard rule 4),
+// checked in: a classifier's answer is exact-matched against it, the way every
+// select value is (`docs/connectors/notion.md`),
 // and anything else is stored as blank. If an option is added or renamed in
 // Notion, it changes here, with its row in the map.
 //

@@ -49,11 +49,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "usage-text-purge": async (env, _job, { dryRun }) => {
     const store = askCategoriesFor(env);
     if (!store) return;
-    if (dryRun) {
-      console.log("[usage] text purge: dry run, nothing cleared");
-      return;
-    }
-    console.log(`[usage] text purge: ${await runTextPurge({ store, now: () => Date.now(), dryRun })} row(s) cleared`);
+    const cleared = await runTextPurge({ store, now: () => Date.now(), dryRun });
+    console.log(`[usage] text purge: ${dryRun ? "dry run, nothing cleared" : `${cleared} row(s) cleared`}`);
   },
 };
 

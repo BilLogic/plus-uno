@@ -108,7 +108,7 @@ export interface CategoryDatabase {
   prepare(sql: string): {
     bind(...values: unknown[]): CategoryStatement;
   };
-  batch(statements: CategoryStatement[]): Promise<{ meta?: { changes?: number } }[]>;
+  batch(statements: CategoryStatement[]): Promise<{ results?: unknown[]; meta?: { changes?: number } }[]>;
 }
 
 interface CategoryStatement {
@@ -177,8 +177,8 @@ export function createD1AskCategories(deps: { db: CategoryDatabase }): AskCatego
           .prepare(`${GIVEN_UP}(${turnIds.map(() => "?").join(", ")})`)
           .bind(at, giveUpAt, ...turnIds),
       ]);
-      const counted = results.at(-1) as unknown as { results?: { n?: unknown }[] } | undefined;
-      return Number(counted?.results?.[0]?.n ?? 0);
+      const [row] = (results.at(-1)?.results ?? []) as { n?: unknown }[];
+      return Number(row?.n ?? 0);
     },
     async purgeTextBefore(cutoff) {
       chargeD1Query();
