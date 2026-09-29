@@ -56,16 +56,32 @@
     }
 }
 
-.plus-alert-dismiss-btn {
+/*
+ * Dismiss column — Figma's "Dismiss" first-line wrapper. The strut is an
+ * invisible character in the first line's text style (h4 with a title,
+ * body2 without), so the column is exactly one line tall; the CloseButton is
+ * centered on it and may overhang a line shorter than its 24px box.
+ */
+.plus-alert-dismiss {
+    position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    /* No padding */
-    color: var(--color-on-surface-variant);
-    background: none;
-    border: none;
+    flex: none;
+    width: 24px; /* the CloseButton's fixed box */
+}
+
+.plus-alert-dismiss-strut {
+    display: block;
+    width: 0;
+    margin: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+.plus-alert-dismiss .plus-close-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /* Alert Style Variants */

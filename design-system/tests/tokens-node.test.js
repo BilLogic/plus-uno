@@ -440,10 +440,12 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * 2026-09-29, when the ten `-border-subtle` label borders added 45% washes of
    * bases already in the corpus; 405 the same day, when ten state-layer bases
    * were re-mixed from their Figma solids and their washes joined those
-   * channels. The number is asserted rather than logged because a migrating
-   * caller's exposure is this number, and a drift in it is news either way.
+   * channels; 411 when `--color-focus-ring-inverse` arrived as another solid
+   * #f9f9fc and paired with the six surface overlays. The number is asserted
+   * rather than logged because a migrating caller's exposure is this number,
+   * and a drift in it is news either way.
    */
-  it('differs from the normaliser on 405 live token pairs', () => {
+  it('differs from the normaliser on 411 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normaliseColour(value) !== null);
@@ -456,7 +458,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(405);
+    expect(pairs).toBe(411);
   });
 
   /*

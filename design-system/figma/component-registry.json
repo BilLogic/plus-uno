@@ -657,6 +657,28 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
       }
     },
+    "CloseButton": {
+      "code": {
+        "import": "@/components/actions",
+        "export": "default",
+        "mdxPath": "design-system/src/components/actions/CloseButton/CloseButton.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/CloseButton"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "close-button",
+            "name": "Close button",
+            "componentSetNodeId": "17827:827",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827"
+      }
+    },
     "Collapse": {
       "code": {
         "import": "@/components/layout-and-structure",

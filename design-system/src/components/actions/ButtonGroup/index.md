@@ -46,7 +46,7 @@ From `design-system/src/components/actions/ButtonGroup/ButtonGroup.scss`. Overri
 
 ## Related
 
-Same group: `Button`
+Same group: `Button` · `CloseButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

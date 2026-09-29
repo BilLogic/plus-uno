@@ -71,7 +71,7 @@ Implemented as `ButtonContent`.
 
 ## Related
 
-Same group: `ButtonGroup`
+Same group: `ButtonGroup` · `CloseButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

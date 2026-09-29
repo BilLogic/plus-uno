@@ -75,7 +75,7 @@ Provide contextual feedback messages for typical user actions with the handful o
     <DsCanvasQuiet of={AlertSubStories.ContentStructure} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Dismiss control.</>}>
+<DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code>, centered on the first line of text.</>}>
     <DsCanvasQuiet of={AlertSubStories.DismissButton} />
 </DocsCanvasShell>
 
@@ -183,8 +183,9 @@ domain colors, because an alert is always saying something about state.
 - **`title` is not a heading element.** It renders through the underlying alert
   heading, which is a `div` carrying an `h4` class. Do not rely on it for
   document structure.
-- **The dismiss button is labelled `Close alert`**, hard-coded, and its icon has
-  no `aria-hidden` — keep the alert's own text carrying the meaning.
+- **The dismiss button is labeled `Close alert`**, hard-coded. It is the
+  shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`, centered
+  on the title line when there is a title and on the first body line otherwise.
 - **Style is colour only.** Six palettes, no icon and no text prefix, so
   `style="danger"` on its own does not say "error". Say it in the children.
 

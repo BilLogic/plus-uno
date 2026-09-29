@@ -31,7 +31,12 @@
  *     which is the right default — the overwhelming majority of `color:` in
  *     this repository is text on a page or on a near-white container — but it
  *     is an assumption, and a finding that contradicts it is the check being
- *     wrong rather than the code.
+ *     wrong rather than the code. The ground is now resolved STRUCTURALLY
+ *     (`scripts/lib/declared-grounds.mjs`, postcss-scss): walking out from the
+ *     declaration's rule, the first rule with a `--color-*` background or a
+ *     `// @grounds: …` annotation decides, and the page if none does. So a
+ *     nested rule on a parent's fill is measured on that fill, and a rule on
+ *     a ground its caller paints declares it and is measured on each one.
  *  2. INLINE STYLES. `style={{ color: 'var(--color-warning)' }}` in JSX is
  *     invisible here. The corpus is stylesheets.
  *  3. `--color-on-*` AND `--color-inverse-*`. Skipped by design: they exist to
@@ -45,7 +50,11 @@
  *     defect. It applies the text threshold to everything and lets the baseline
  *     carry the exemptions with a reason each, because a checker that tried to
  *     infer "is this an inactive graphic?" from a stylesheet would be guessing
- *     about the thing that matters most.
+ *     about the thing that matters most. A graphic can instead be DECLARED:
+ *     `// @contrast: non-text` opening a rule holds that rule's own colors —
+ *     never a nested rule's — to 3:1, and only if every resolved selector's
+ *     subject is an icon (a Font Awesome class, an `__icon` element class, or
+ *     `svg`). Otherwise it is an error, not a lower bar.
  *  5. WHETHER THE REPLACEMENT IS RIGHT. It reports that a token is unreadable
  *     on the page and names the `-text` sibling where one exists. Whether that
  *     sibling is the correct colour for the role is a design question.
@@ -56,6 +65,7 @@ import { fileURLToPath } from 'node:url';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
+import { NON_TEXT, analyzeSheet, groundAt, isNonText } from './lib/declared-grounds.mjs';
 
 import {
   composite,
@@ -86,66 +96,6 @@ export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
 }
 
 /**
- * The innermost `{ … }` a byte offset sits in, with nested blocks blanked out.
- *
- * Blanking rather than removing keeps offsets stable, and it is what makes
- * "does this rule set a background?" answerable: a background declared in a
- * CHILD rule is not this rule's ground, and a substring search would find it.
- */
-export function enclosingBlock(source, offset) {
-  const opens = [];
-  let start = -1;
-  for (let i = 0; i < offset; i += 1) {
-    if (source[i] === '{') opens.push(i);
-    else if (source[i] === '}') opens.pop();
-  }
-  if (!opens.length) return null;
-  start = opens[opens.length - 1];
-
-  let depth = 0;
-  let end = source.length;
-  for (let i = start; i < source.length; i += 1) {
-    if (source[i] === '{') depth += 1;
-    else if (source[i] === '}') {
-      depth -= 1;
-      if (depth === 0) { end = i; break; }
-    }
-  }
-
-  const chars = source.slice(start + 1, end).split('');
-  let nested = 0;
-  for (let i = 0; i < chars.length; i += 1) {
-    if (chars[i] === '{') { nested += 1; chars[i] = ' '; continue; }
-    if (chars[i] === '}') { nested -= 1; chars[i] = ' '; continue; }
-    if (nested > 0) chars[i] = ' ';
-  }
-  return chars.join('');
-}
-
-/**
- * `background[-color]: … var(--color-x`, with the token grammar taken from the
- * module rather than spelled again here (#507). A fresh RegExp per call because
- * the module's pattern carries `/g`, and a shared one keeps `lastIndex`.
- */
-const BACKGROUND_TOKEN = () =>
-  new RegExp(`background(?:-color)?\\s*:\\s*[^;]*?${varReferencePattern('--color-').source}`);
-
-/**
- * The ground a declaration is drawn on: the `background-color` of its own rule
- * if that rule sets one, otherwise the page.
- *
- * Only `--color-*` grounds count. A literal or a gradient leaves the page
- * assumption in place, which is stated rather than silently trusted — see
- * blind spot 1.
- */
-export function groundFor(source, offset, fallback = PAGE_TOKEN) {
-  const block = enclosingBlock(source, offset);
-  if (!block) return fallback;
-  const match = BACKGROUND_TOKEN().exec(block);
-  return match ? match[1] : fallback;
-}
-
-/**
  * Every `color:` declaration naming a `--color-*` token, with the ground its
  * own rule puts it on.
  *
@@ -158,14 +108,34 @@ export function textDeclarations(files, root = REPO_ROOT) {
   const uses = [];
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
+    const sheet = analyzeSheet(source);
     const lines = source.split('\n');
     let offset = 0;
     lines.forEach((line, index) => {
       const declaration = /(^|[\s;{])color\s*:\s*([^;]+);/.exec(line);
       if (declaration) {
-        const ground = groundFor(source, offset);
+        // The ground, resolved structurally: walking out from this rule, the
+        // first rule with a background or a `@grounds` decides; the page if
+        // none does. `scripts/lib/declared-grounds.mjs` states the rules.
+        const at = offset + declaration.index + declaration[1].length;
+        const resolved = groundAt(sheet, at);
+        const declared = resolved.kind === 'grounds' ? { tokens: resolved.tokens, line: resolved.line } : null;
+        const grounds = resolved.kind === 'background'
+          ? [resolved.token]
+          : (declared?.tokens.length ? declared.tokens : [PAGE_TOKEN]);
+        // Where the ground came from, for the report: this rule's own
+        // background, an ancestor's, a declared `@grounds`, or the page.
+        const origin = resolved.kind === 'background'
+          ? { kind: resolved.own ? 'own' : 'ancestor', line: resolved.line }
+          : (declared?.tokens.length ? { kind: 'grounds', line: declared.line } : { kind: 'page' });
+        // `@contrast: non-text` — a graphic, held to 3:1 — counts only on the
+        // declaration's own rule and only with an icon subject. Anywhere else
+        // it is an error and the declaration keeps the text bar.
+        const nonText = isNonText(sheet, at);
         for (const match of declaration[2].matchAll(varReferencePattern('--color-'))) {
-          uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground });
+          for (const ground of grounds) {
+            uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, origin, declared, nonText });
+          }
         }
       }
       offset += line.length + 1;
@@ -233,12 +203,14 @@ export function findings(uses, values, { threshold = AA_TEXT } = {}) {
     // measuring them against a surface they were never for.
     if (OFF_PAGE.test(use.token) && ground === PAGE_TOKEN) continue;
     const measured = ratio(use.token, values, ground);
-    if (measured === null || measured >= threshold) continue;
+    const bar = use.nonText ? NON_TEXT : threshold;
+    if (measured === null || measured >= bar) continue;
     const sibling = textSibling(use.token, values);
     out.push({
       ...use,
       ground,
       ratio: Number(measured.toFixed(2)),
+      bar,
       sibling,
       siblingRatio: sibling ? Number(ratio(sibling, values, ground).toFixed(2)) : null,
     });
@@ -250,22 +222,37 @@ export function readValues(root = REPO_ROOT) {
   return tokenValues(fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'));
 }
 
+/**
+ * Where a finding's ground came from, in words. A use built without an origin
+ * (a hand-made one in a test) is labelled from its ground alone.
+ */
+export function groundLabel(finding) {
+  const origin = finding.origin ?? { kind: finding.ground === PAGE_TOKEN ? 'page' : 'own' };
+  switch (origin.kind) {
+    case 'own': return " (its own rule's background)";
+    case 'ancestor': return ` (the background of an ancestor rule, line ${origin.line})`;
+    case 'grounds': return ` (declared by @grounds, line ${origin.line})`;
+    default: return ' (no rule sets a background, so the page is assumed)';
+  }
+}
+
 export function report(found, { threshold = AA_TEXT } = {}) {
   const lines = found.map(
     (f) =>
       `  ${f.file}:${f.line}\n` +
       `      ${f.source}\n` +
       `      ${f.token} is ${f.ratio}:1 on ${f.ground}` +
-      (f.ground === PAGE_TOKEN ? ' (its rule sets no background, so the page is assumed)' : ' (its own rule)') +
-      ` — AA text needs ${threshold}:1` +
+      groundLabel(f) +
+      (f.bar === NON_TEXT ? ` — a non-text glyph needs ${NON_TEXT}:1` : ` — AA text needs ${threshold}:1`) +
       (f.sibling ? `\n      → ${f.sibling} is ${f.siblingRatio}:1 and exists for exactly this.` : ''),
   );
   return (
     `[text-contrast] ${found.length} text colour${found.length === 1 ? '' : 's'} below AA:\n\n` +
     `${lines.join('\n\n')}\n\n` +
-    `  A ground is read from the declaration's OWN rule. One set by an ancestor is\n` +
-    `  invisible here — if that is what happened, the check is wrong and should learn\n` +
-    `  the ground; do not silence it by moving the declaration.`
+    `  A ground is resolved outward from the declaration's rule: the first rule with a\n` +
+    `  --color-* background or a @grounds decides, and the page if none does. If the\n` +
+    `  real ground is painted somewhere this cannot see, the check is wrong and should\n` +
+    `  learn the ground; do not silence it by moving the declaration.`
   );
 }
 
