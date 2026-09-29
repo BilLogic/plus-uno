@@ -56,11 +56,12 @@
  * families below say nothing about how one token's value relates to another's —
  * deliberately, because within the colour family the names promise a
  * relationship the values do not always keep. `--color-{role}-state-08/12/16`
- * reads as that role at 8/12/16%, and 33 of the 117 overlays are washes of a
- * different colour than their name points at: `--color-primary` is `#0472a8`,
- * `--color-primary-state-08` is 8% of `#00658e` (#644). The eleven divergent
- * bases are pinned in `tokens-node.test.js`, and `colourKey` keeps alpha partly
- * so a comparison across that pairing cannot report an agreement nobody wrote.
+ * reads as that role at 8/12/16%. Today 114 of the 117 overlays are exactly
+ * that, but until 2026-09-29 thirty were washes of a different color than
+ * their name pointed at, because the solids were re-picked in Figma and the
+ * washes never followed. The one remaining exception, shadow, is pinned in
+ * `tokens-node.test.js`, and `colourKey` keeps alpha partly so a comparison
+ * across that pairing cannot report an agreement nobody wrote.
  *
  * So the kind of a value is read off the VALUE — which is also the lesson
  * `check:size-fallbacks` records for itself: it selects dimension tokens by

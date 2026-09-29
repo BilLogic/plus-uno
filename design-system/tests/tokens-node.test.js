@@ -16,9 +16,10 @@
  *                implementation of this module committed and this file guards.
  *   the family   which family a token name belongs to — and, since #644, the
  *                one place the colour family's naming promises MORE than its
- *                values keep: 33 of the 117 `-state-08/12/16` overlays are
- *                washes of a different colour than the role they are named
- *                after, and the eleven bases are pinned so a twelfth fails.
+ *                values keep: a `-state-08/12/16` overlay is a wash of the
+ *                role it is named after, except the three shadow steps, which
+ *                name a role that has no token. That one exception is pinned
+ *                so a second fails.
  *   equality     whether two values are the same value.
  *
  * The third is the one with teeth, in two directions:
@@ -267,29 +268,25 @@ describe('the family map — one statement of which family a name is in', () => 
  *
  * `--color-{role}-state-08/12/16` reads like `--color-{role}` at 8/12/16%, and
  * `design-system/guidelines/foundations/color.md` presents it in the same table
- * as the other `--color-{role}-*` modifiers. For 84 of the 117 overlays it IS
- * that. For 33 of them — eleven bases × three steps — it is an 8/12/16% wash of
- * a DIFFERENT colour, because `_colors.scss` is generated from Figma and the
- * solid roles were re-picked at some point without the washes following:
- * `--color-primary` is `#0472a8`, and `--color-primary-state-08` is 8% of
- * `#00658e`. An implementer assumed the derivation during #592–#625 and took a
- * red test for it, which is what made this worth writing down.
+ * as the other `--color-{role}-*` modifiers. Until 2026-09-29 that held for 84
+ * of the 117 overlays only: for ten bases the solid had been re-picked in Figma
+ * and the washes in `_colors.scss` never followed (`--color-primary` was
+ * `#0472a8` while `--color-primary-state-08` was 8% of `#00658e`). An
+ * implementer assumed the derivation and took a red test for it, which is what
+ * made this worth writing down.
  *
- * WHY THE LIST IS PINNED RATHER THAN CORRECTED. Both are one-line changes and
- * only one of them is reversible. Re-mixing 33 overlays from their named bases
- * repaints hover, pressed and focus washes across the product — 113 stylesheets
- * under `design-system/src` reach for a `-state-08/12/16` token, 70 of them for
- * one of the eleven divergent bases — and it moves measurements that are already
- * recorded: `docs/evals/text-contrast-baseline.json` holds three entries whose
- * ground is `--color-primary-state-08` or `-12`, and the 357 alpha-only pairs
- * asserted further down this file are counted over these same live values, so a
- * re-mix is news there too. Which of the two halves is the intended colour is a
- * Figma question and a visible design change, so it is #268's and Bill's, not a
- * test's. What a test CAN do is make the divergence a recorded fact instead of a
- * trap: the eleven are named here, a twelfth fails, and a base that gets
- * re-mixed to agree fails too so the list cannot outlive the exception.
+ * THE FIGMA SIDE SETTLED IT. Read live from the BS4 Foundation library on
+ * 2026-09-29, every `State-layers/*` variable is its own group's solid at
+ * 8/12/16%, so the ten were re-mixed from their named bases. What is left is
+ * shadow: `--color-shadow-state-*` is black and there is no `--color-shadow`
+ * token for it to agree with. It stays pinned so that a new divergence fails,
+ * and so that minting `--color-shadow` some day has to come past this test.
+ *
+ * Do not re-open the list to get a run green. A wash that stops matching its
+ * base means one side moved without the other: read the Figma variable and
+ * decide which side is right.
  */
-describe('a state overlay is named after a base it is not always mixed from', () => {
+describe('a state overlay is mixed from the base it is named after', () => {
   /** Every `--color-*-state-08/12/16`, aliases resolved, with its named base. */
   const overlays = () => {
     const corpus = tokenCorpus();
@@ -310,33 +307,22 @@ describe('a state overlay is named after a base it is not always mixed from', ()
    * The exception, by BASE rather than by overlay: all three steps of a base
    * diverge together, because they are three alphas over one colour.
    *
-   * `--color-shadow` is in the list for a different reason and is the one row
-   * that is not a drift — there is no `--color-shadow` token at all, and a
-   * shadow wash is black. It is recorded rather than special-cased so that
+   * `--color-shadow` is the only row, and it is not a drift: there is no
+   * `--color-shadow` token at all, and a shadow wash is black. It is recorded rather than special-cased so that
    * minting `--color-shadow` some day has to come past this test.
    */
   const KNOWN = {
-    '--color-primary': '#00658e',
-    '--color-primary-container': '#c7e7ff',
-    '--color-danger': '#be0c16',
-    '--color-warning': '#715c00',
-    '--color-social-emotional': '#7d5700',
-    '--color-social-emotional-container': '#ffdeaa',
-    '--color-mastering-content': '#7f3fb1',
-    '--color-outline': '#71787e',
-    '--color-outline-variant': '#c1c7ce',
-    '--color-on-surface-variant': '#41484d',
     '--color-shadow': '#000000',
   };
 
-  it('mixes 84 of the 117 overlays from the base their name points at', () => {
+  it('mixes 114 of the 117 overlays from the base their name points at', () => {
     const all = overlays();
     expect(all.length).toBe(117);
     const agree = all.filter((o) => o.mixed !== null && o.mixed === o.solid);
     expect(agree.length).toBe(117 - Object.keys(KNOWN).length * 3);
   });
 
-  it('diverges on exactly the eleven recorded bases, and mixes what is recorded', () => {
+  it('diverges on exactly the recorded base, and mixes what is recorded', () => {
     const found = {};
     for (const { base, mixed, solid } of overlays()) {
       if (mixed !== null && mixed === solid) continue;
@@ -432,9 +418,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * ONE PAIR, NAMED. `--color-secondary-state-08` is the 8% overlay of the
    * colour `--color-secondary-border` is; the old normaliser is `parseColour`
    * followed by `toHex`, and `toHex` drops alpha, so it calls them the same
-   * colour. (The state overlays are not all mixed from the base of their own
-   * name — `--color-primary-state-08` is an 8% `#00658e`, not an 8%
-   * `--color-primary` — which is its own finding and not this test's.)
+   * colour.
    */
   it('calls a translucent overlay and its solid DIFFERENT, where the normaliser called them equal', () => {
     const corpus = tokenCorpus();
@@ -453,11 +437,12 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * unordered pair of live colour tokens the old normaliser could read, where
    * it says equal and this key says unequal. 315 on 2026-09-18; 357 on 2026-09-29,
    * when the ten `-border-subtle` label borders added 45% washes of bases
-   * already in the corpus. The number is
+   * already in the corpus; 405 the same day, when ten state-layer bases were
+   * re-mixed from their Figma solids and their washes joined those channels. The number is
    * asserted rather than logged because a migrating caller's exposure is this
    * number, and a drift in it is news either way.
    */
-  it('differs from the normaliser on 357 live token pairs', () => {
+  it('differs from the normaliser on 405 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normaliseColour(value) !== null);
@@ -470,7 +455,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(357);
+    expect(pairs).toBe(405);
   });
 
   /*

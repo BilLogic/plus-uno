@@ -40,7 +40,7 @@
  *   outline / ghost / text   ground = the page        label = TextSafe
  *
  * State layers are 8%-alpha colours, so `tonal` has to be COMPOSITED before it
- * is read. Reading `rgba(113, 92, 0, 0.08)` as if it were solid gives 1.3:1 and
+ * is read. Reading `rgba(159, 130, 5, 0.08)` as if it were solid gives 2.3:1 and
  * a page of failures that are not there — the same arithmetic mistake #268's
  * audit made and had to correct.
  *

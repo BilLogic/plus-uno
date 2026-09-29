@@ -49,9 +49,8 @@
  *
  * WARNING IS THE EXCEPTION and the reason this file has values in it at all.
  * The base falls to 2.87:1 on `--color-surface-container-highest`, under even
- * the 3:1 bar, so warning's icon and border take #715c00 — which is not an
- * invented colour: it is the value `_colors.scss` already names as "the actual
- * warning color from Figma" and uses for the warning state layers. It measures
+ * the 3:1 bar, so warning's border takes #715c00 — which is not an invented
+ * color: it is the value Figma records as `Warning/Warning Border`. It measures
  * 6.50:1 on white and 5.02:1 at its worst, clearing both bars everywhere.
  *
  * THE BORDERS HAVE USERS NOW; THE ICONS DO NOT. On 2026-08-29 the scan behind
@@ -109,8 +108,8 @@
 
     /* Warning — the one exception. The base (#9f8205) measures 2.87:1 on
        --color-surface-container-highest, under even the 3:1 border bar, so the
-       BORDER takes #715c00: the Figma warning value already used by the warning
-       state layers, 5.02:1 at its worst. The icon needs no exception, since
+       BORDER takes #715c00: the value of Figma's Warning/Warning Border, 5.02:1
+       at its worst. The icon needs no exception, since
        --color-warning-text is 6.70:1 at its worst like every other. */
     --color-warning-icon: var(--color-warning-text);
     --color-warning-border: #715c00;

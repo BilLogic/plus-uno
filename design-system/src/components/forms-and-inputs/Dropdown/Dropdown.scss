@@ -152,7 +152,7 @@ $dropdown-themes: (
         &.selected,
         &.active {
             position: relative;
-            background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08));
+            background-color: var(--_Primary-State-layers-Primary-08, rgba(4, 114, 168, 0.08));
             color: var(--color-on-surface);
 
             // Left selection rail (4px)
