@@ -26,7 +26,7 @@ import { preflight } from "../agent/preflight";
 import { reviewDraft } from "../agent/draft-judge";
 import { runAgent, selectProvider, type AgentResult, type TurnDials } from "../agent/run-agent";
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
-import type { GateRestage, GateVerdict } from "../gate/index";
+import type { GateRestage, GateVerdict, OperationOutcome } from "../gate/index";
 import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
@@ -35,6 +35,8 @@ import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
+import type { TurnOrigin } from "../usage/index";
+import { testChannelIdsOf, usageLogFor } from "../usage/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -67,12 +69,15 @@ export interface TurnWiring {
   delivery: Delivery;
   /** What a verdict Gate has already won does — execute the confirmed tool, or
    *  record the decision. The one dependency that performs the irreversible
-   *  thing behind the ✅. */
-  applyVerdict(verdict: GateVerdict): Promise<void>;
+   *  thing behind the ✅. Answers with what the batch ran, when it ran one. */
+  applyVerdict(verdict: GateVerdict): Promise<OperationOutcome[] | void>;
   /** The REAL ts a tool's own posts thread off: the person's message in Slack,
    *  the eval conversation's one ts otherwise. Not the conversation key, which
    *  the request already carries and cancel reads. */
   toolThreadTs: string;
+  /** Where the turn came from, for the usage record's test-traffic rule: a
+   *  person in Slack, or a debug route (the eval transport). */
+  origin: TurnOrigin;
   reporters?: TurnReporters;
 }
 
@@ -158,6 +163,15 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     },
 
     applyVerdict: (verdict) => wiring.applyVerdict(verdict),
+
+    // The usage record: D1 when `USAGE_DB` is bound, nothing when it is not
+    // (`usage/production.ts`). The same log for both callers; the origin is the
+    // caller's own difference.
+    usage: {
+      log: usageLogFor(env),
+      origin: wiring.origin,
+      testChannelIds: testChannelIdsOf(env),
+    },
 
     // The reads a card needs and Turn may not make itself — shared with the
     // doors that re-stage a cut-off run (`restageFor`, below).

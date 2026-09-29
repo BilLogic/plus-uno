@@ -9,9 +9,15 @@
 // real workerd binary, so a pass here is evidence about production rather than
 // about a mock.
 //
-// `include` is a single file. If a second workerd test is ever justified it
+// `include` names each file. If another workerd test is ever justified it
 // should be a deliberate edit here, with a reason, not a glob that quietly
-// grows.
+// grows. The second is the UsageLog conformance suite (ADR-030), for the same
+// reason as the first: what is under test is the D1 adapter against real
+// SQLite with the real migrations applied, which no Node fake is evidence
+// about. Its `USAGE_DB` binding comes from wrangler.toml like the rest;
+// miniflare backs it with a local, per-run D1 and never contacts the account.
+// The migrations are read here, in Node, and handed to the test as the
+// `USAGE_MIGRATIONS` binding, because the Workers runtime has no filesystem.
 //
 // The wrangler config is the source of the bindings: the THREAD_STATE Durable
 // Object binding, the `new_sqlite_classes` migration and
@@ -23,12 +29,22 @@
 // PLUGIN — `cloudflareTest()` in `plugins`, not `defineWorkersConfig` with
 // `test.poolOptions.workers`, which is the pre-0.22 form most examples online
 // still show.
-import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
+import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-pool-workers";
 import { defineConfig } from "vitest/config";
 
+const usageMigrations = await readD1Migrations("./migrations/usage");
+
 export default defineConfig({
-  plugins: [cloudflareTest({ wrangler: { configPath: "./wrangler.toml" } })],
+  plugins: [
+    cloudflareTest({
+      wrangler: { configPath: "./wrangler.toml" },
+      miniflare: { bindings: { USAGE_MIGRATIONS: usageMigrations } },
+    }),
+  ],
   test: {
-    include: ["tests/workerd/thread-state.conformance.test.ts"],
+    include: [
+      "tests/workerd/thread-state.conformance.test.ts",
+      "tests/workerd/usage-log.conformance.test.ts",
+    ],
   },
 });

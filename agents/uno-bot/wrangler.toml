@@ -288,6 +288,12 @@ GEMINI_FALLBACK_MODEL = "gemini-3.7-flash"
 # haiku/opus tiers are fixed in src/agent/routing.ts). Optional — defaults to
 # "claude-sonnet-5".
 CLAUDE_MODEL = "claude-sonnet-5"
+# ── Usage record (src/usage/, ADR-030) ───────────────────────────────────────
+# Channels whose turns are flagged test traffic on the usage record, so they
+# never count toward adoption: #uno-bot-sandbox. Comma-separated channel ids.
+# Every /debug/* and /health/* route (the eval transport included) and a
+# greeting with no ask are test traffic without being listed here.
+TEST_CHANNEL_IDS = ""
 
 # Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
 # GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.
@@ -387,3 +393,14 @@ id = "aa0ba01735c545d1abe887bd81fc98aa"
 [[kv_namespaces]]
 binding = "HARNESS_KV"
 id = "060347fa19cb41398dd516a8f7b8b21a"
+
+# D1 — the usage record: one row per turn (src/usage/, ADR-030). Its schema is
+# migrations/usage/, applied with `wrangler d1 migrations apply uno-bot-usage`
+# (`--local` for a dev database, `--remote` for this one) — migrations/README.md.
+# The Worker tolerates the binding being absent: turns are answered as before
+# and simply not recorded (src/usage/production.ts).
+[[d1_databases]]
+binding = "USAGE_DB"
+database_name = "uno-bot-usage"
+database_id = "484d3e97-11c3-4f20-9597-2f094f196014"
+migrations_dir = "migrations/usage"
