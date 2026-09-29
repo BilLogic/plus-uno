@@ -20,7 +20,8 @@ const plan: ScheduledRun = {
   name: "end-of-day",
   date: "2026-09-29",
   jobs: [
-    { key: "assemble", kind: "noop", after: ["a"] },
+    // Two kinds: a rehearsal runs one job per kind.
+    { key: "assemble", kind: "figma-library-post", after: ["a"] },
     { key: "a", kind: "noop" },
   ],
 };
@@ -83,7 +84,7 @@ test("the rehearsal stops before the invocation's budget is gone", async () => {
   const greedy: ScheduledRun = {
     name: "morning",
     date: "2026-09-29",
-    jobs: [{ key: "a", kind: "noop" }, { key: "b", kind: "noop" }],
+    jobs: [{ key: "a", kind: "noop" }, { key: "b", kind: "figma-library-post" }],
   };
   const report = await runMetered(() =>
     dryRunScheduledRun(greedy, async () => {
@@ -93,7 +94,37 @@ test("the rehearsal stops before the invocation's budget is gone", async () => {
   assert.equal(report.jobs[0]?.subrequests, LOOKUP_CEILING);
   assert.equal(report.jobs[0]?.outcome, "deferred");
   assert.equal(report.jobs[1]?.outcome, "skipped");
+  assert.equal(report.jobs[1]?.skipped_because, "ceiling");
   assert.equal(report.total_subrequests, LOOKUP_CEILING);
+});
+
+test("a rehearsal runs one job of each kind, and reports the repeats as skipped", async () => {
+  // A dry run writes nothing, so five classify jobs would read the same batch
+  // five times and claim five batches' work.
+  const repeats: ScheduledRun = {
+    name: "end-of-day",
+    date: "2026-09-29",
+    jobs: [
+      { key: "usage-classify-1", kind: "usage-classify" },
+      { key: "usage-classify-2", kind: "usage-classify" },
+      { key: "usage-text-purge", kind: "usage-text-purge" },
+    ],
+  };
+  const ran: string[] = [];
+  const report = await runMetered(() =>
+    dryRunScheduledRun(repeats, async (job) => {
+      ran.push(job.key);
+    }),
+  );
+  assert.deepEqual(ran, ["usage-classify-1", "usage-text-purge"]);
+  assert.deepEqual(
+    report.jobs.map((j) => [j.key, j.outcome, j.skipped_because]),
+    [
+      ["usage-classify-1", "handled", undefined],
+      ["usage-classify-2", "skipped", "repeat-of-kind"],
+      ["usage-text-purge", "handled", undefined],
+    ],
+  );
 });
 
 test("the probe dry-runs the named run's jobs", async () => {
@@ -105,10 +136,12 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 2);
+  assert.equal(body.planned.length, 3);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["figma-library-post", "handled", 0],
     ["figma-library-track", "handled", 0],
+    // No usage database bound: nothing to purge, nothing spent.
+    ["usage-text-purge", "handled", 0],
   ]);
 });
 
