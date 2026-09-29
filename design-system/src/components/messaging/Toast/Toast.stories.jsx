@@ -252,37 +252,55 @@ Dismiss.play = async ({ canvasElement }) => {
 };
 
 /**
- * The warning header's title, timestamp and icon use the same content color as
- * the other headers, `--color-on-warning`; the × is CloseButton's inverse tone,
- * as on every header. Title and timestamp: accepted contrast exception,
- * recorded in the text-contrast baseline; do not darken.
+ * Every header draws its title, timestamp and icon in its fill's own content
+ * color, `--color-on-<role>`, as Figma binds them; the × is CloseButton's
+ * inverse tone, as the Dismiss story asserts. On the warning fill, title and
+ * timestamp: accepted contrast exception, recorded in the text-contrast
+ * baseline; do not darken.
  */
-export const WarningHeader = () => (
-    <Toast style="warning" title="Warning toast" timestamp="Just now" show autohide={false} data-testid="warning-header">
-        Header content uses the on-warning color.
-    </Toast>
+export const HeaderContent = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+        {TOAST_STYLES.map((style) => (
+            <Toast
+                key={style}
+                style={style}
+                title={`${style} toast`}
+                timestamp="Just now"
+                show
+                autohide={false}
+                data-testid={`header-${style}`}
+            >
+                {`Header content uses the on-${style} color.`}
+            </Toast>
+        ))}
+    </div>
 );
 
-WarningHeader.parameters = WARNING_HEADER_A11Y_PARAMS;
+HeaderContent.parameters = WARNING_HEADER_A11Y_PARAMS;
 
-WarningHeader.play = async ({ canvasElement }) => {
-    const toast = within(canvasElement).getByTestId('warning-header');
-    const header = toast.querySelector('.toast-header');
-    const onWarning = tokenColor(canvasElement, '--color-on-warning');
-    await expect(getComputedStyle(header).backgroundColor, 'header fill').toBe(tokenColor(canvasElement, '--color-warning'));
+HeaderContent.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const inverse = tokenColor(canvasElement, '--color-surface');
 
-    const parts = {
-        title: toast.querySelector('.plus-toast-title'),
-        timestamp: toast.querySelector('.plus-toast-timestamp'),
-        icon: toast.querySelector('.plus-toast-icon i'),
-    };
-    for (const [part, node] of Object.entries(parts)) {
-        await expect(getComputedStyle(node).color, `warning ${part} is on-warning`).toBe(onWarning);
+    for (const style of TOAST_STYLES) {
+        const toast = canvas.getByTestId(`header-${style}`);
+        const header = toast.querySelector('.toast-header');
+        await expect(getComputedStyle(header).backgroundColor, `${style}: header fill`)
+            .toBe(tokenColor(canvasElement, `--color-${style}`));
+
+        const onRole = tokenColor(canvasElement, `--color-on-${style}`);
+        const parts = {
+            title: toast.querySelector('.plus-toast-title'),
+            timestamp: toast.querySelector('.plus-toast-timestamp'),
+            icon: toast.querySelector('.plus-toast-icon i'),
+        };
+        for (const [part, node] of Object.entries(parts)) {
+            await expect(getComputedStyle(node).color, `${style}: ${part} is on-${style}`).toBe(onRole);
+        }
+
+        const glyph = within(toast).getByRole('button', { name: 'Close' }).querySelector('i');
+        await expect(getComputedStyle(glyph).color, `${style}: × is the inverse tone`).toBe(inverse);
     }
-
-    // The × is the inverse tone, as the Dismiss story asserts on every header.
-    const glyph = within(toast).getByRole('button', { name: 'Close' }).querySelector('i');
-    await expect(getComputedStyle(glyph).color, 'warning × is the inverse tone').toBe(tokenColor(canvasElement, '--color-surface'));
 };
 
 /**

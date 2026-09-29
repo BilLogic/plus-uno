@@ -79,15 +79,22 @@
     }
 
     // --- STYLE VARIANTS ---
-    // Using !important to override base styles
+    // Each header is filled with its role, and its title, timestamp and icon
+    // are drawn in that role's on-color. `!important` overrides the base
+    // header styles above. One block per role, written out:
+    // check:text-contrast reads token names from source, so a loop that
+    // interpolated the role into the token name would hide every pair from it.
     &.danger {
 
         .plus-toast-header,
         .toast-header {
             background-color: var(--color-danger) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-danger) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-danger) !important;
+                }
             }
 
             .plus-toast-title {
@@ -106,8 +113,11 @@
         .toast-header {
             background-color: var(--color-success) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-success) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-success) !important;
+                }
             }
 
             .plus-toast-title {
@@ -152,8 +162,11 @@
         .toast-header {
             background-color: var(--color-info) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-info) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-info) !important;
+                }
             }
 
             .plus-toast-title {
@@ -172,8 +185,11 @@
         .toast-header {
             background-color: var(--color-primary) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-primary) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-primary) !important;
+                }
             }
 
             .plus-toast-title {
@@ -192,8 +208,11 @@
         .toast-header {
             background-color: var(--color-secondary) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-secondary) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-secondary) !important;
+                }
             }
 
             .plus-toast-title {
