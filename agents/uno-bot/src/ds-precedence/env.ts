@@ -11,13 +11,14 @@ import { postMessage } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
 import { githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { FINDINGS_KV_KEY, figmaGet, kvJson, type FigmaComponentsResponse } from "../figma-poll";
-import { channelMembers, TRACKED_KV_KEY } from "../figma-library/env";
+import { channelMembers, REGISTRY_PATH, TRACKED_KV_KEY } from "../figma-library/env";
 import type { LibraryChangeSet } from "../figma-library/draft";
 import type { TrackedPublish } from "../figma-library/track";
 import { inFlightComponents, type PrecedenceRegistry } from "./compare";
 import { disputedItems, PRECEDENCE_MARKER } from "./report";
 import {
   disputePrecedenceItems,
+  freshDisputes,
   postPrecedenceReport,
   runPrecedenceCheck,
   type CheckResult,
@@ -28,8 +29,7 @@ import {
 
 const REPORT_KV_KEY = "ds-precedence:report";
 const THREAD_KV_KEY = "ds-precedence:thread";
-const INDEX_PATH = "design-system/agent-views/components/index.md";
-const REGISTRY_PATH = "design-system/figma/component-registry.json";
+const INDEX_FILE = "design-system/agent-views/components/index.md";
 
 /**
  * The check job on `Env`.
@@ -48,7 +48,7 @@ export async function runDsPrecedenceCheck(env: Env, opts: { dryRun: boolean }):
   return runPrecedenceCheck(
     {
       github: {
-        indexMarkdown: () => reads.rawFile(INDEX_PATH),
+        indexMarkdown: () => reads.rawFile(INDEX_FILE),
         registry: async () => JSON.parse(await reads.rawFile(REGISTRY_PATH)) as PrecedenceRegistry,
       },
       figma: { components: () => figmaGet<FigmaComponentsResponse>(env, `/files/${fileKey}/components`) },
@@ -115,6 +115,7 @@ export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent
       post: (message) => post(env, channel, message),
       stage: (proposal) => store.putProposal(proposal),
       retire: (ts) => store.retireProposal(ts),
+      pending: (ts) => cardPending(env, ts),
       now: () => Date.now(),
     },
     { channel: event.channel, threadTs: event.thread_ts, user: event.user, text: event.text },
@@ -131,9 +132,14 @@ export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent
  * @param event - The mention, as a message
  */
 export async function isDsPrecedenceDispute(env: Env, event: SlackMessageEvent): Promise<boolean> {
-  if (!mayDispute(env, event)) return false;
+  if (!mayDispute(env, event) || !event.thread_ts) return false;
   const thread = await kvJson<PostedThread | null>(env, THREAD_KV_KEY, null).read();
-  return !!thread && thread.channel === event.channel && thread.ts === event.thread_ts;
+  const reply = { channel: event.channel, threadTs: event.thread_ts, text: event.text ?? "" };
+  return !!thread && freshDisputes(thread, reply, Date.now()).length > 0 && (await cardPending(env, thread.cardTs));
+}
+
+async function cardPending(env: Env, proposalTs: string): Promise<boolean> {
+  return (await threadStateFor(env).getProposalByTs(proposalTs)).state === "found";
 }
 
 /** The channel, when the message could be a dispute at all; no read spent. */

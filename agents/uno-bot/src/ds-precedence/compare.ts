@@ -37,7 +37,7 @@
 // fixtures drawn from #339.
 
 import type { FigmaComponentsResponse } from "../figma-poll";
-import { figmaNodeUrl } from "../figma-library/draft";
+import { figmaNodeUrl, type LibraryChangeSet } from "../figma-library/draft";
 
 /** The three DS sources, in precedence order: the first wins. */
 export type DsSource = "code" | "library" | "spec-pages";
@@ -120,7 +120,8 @@ export interface LiveLibrary {
   nodeIds: string[];
 }
 
-const INDEX_PATH = "design-system/agent-views/components/";
+/** The folder the index sits in; its links are relative to it. */
+const INDEX_DIR = "design-system/agent-views/components/";
 const INDEX_ENTRY = /^- \[([^\]]+)\]\(([^)]+)\)(.*)$/;
 /** Registry sets that are not a component's Figma counterpart. */
 const NOT_A_COUNTERPART = new Set(["docs-page", "no-code-equivalent"]);
@@ -137,7 +138,7 @@ export function parseComponentIndex(markdown: string): IndexEntry[] {
   for (const line of markdown.split("\n")) {
     const m = INDEX_ENTRY.exec(line.trim());
     if (!m || /alias of/i.test(m[3]!)) continue;
-    entries.push({ name: m[1]!.trim(), docPath: resolvePath(INDEX_PATH, m[2]!.trim()) });
+    entries.push({ name: m[1]!.trim(), docPath: resolvePath(INDEX_DIR, m[2]!.trim()) });
   }
   return entries;
 }
@@ -357,11 +358,7 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
  */
 export function inFlightComponents(
   tracked: ReadonlyArray<{ implement: string | null }>,
-  findings: ReadonlyArray<{
-    created: ReadonlyArray<{ containingFrame: string; setNodeId?: string }>;
-    modified: ReadonlyArray<{ containingFrame: string; setNodeId?: string }>;
-    deleted: ReadonlyArray<{ containingFrame: string; setNodeId?: string }>;
-  }>,
+  findings: ReadonlyArray<Pick<LibraryChangeSet, "created" | "modified" | "deleted">>,
   registry: PrecedenceRegistry,
 ): Set<string> {
   const names = new Set<string>();

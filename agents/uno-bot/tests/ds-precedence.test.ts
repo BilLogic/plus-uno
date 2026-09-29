@@ -206,7 +206,13 @@ describe("the comparison", () => {
   it("leaves out a component a library publish is still carrying, where code follows", () => {
     const inFlight = inFlightComponents(
       [{ implement: "Button, Tooltip" }],
-      [{ created: [], modified: [{ containingFrame: "Tooltip", setNodeId: "300:1" }], deleted: [] }],
+      [
+        {
+          created: [],
+          modified: [{ key: "k", name: "placement=top", description: "", nodeId: "500:1", containingFrame: "Tooltip", setNodeId: "300:1" }],
+          deleted: [],
+        },
+      ],
       REGISTRY,
     );
     assert.deepEqual([...inFlight].sort(), ["Button", "Tooltip"]);
@@ -447,6 +453,7 @@ describe("a dispute in the thread", () => {
           staged.push(p);
         },
         retire: async () => {},
+        pending: async () => true,
         now: () => Date.UTC(2026, 9, 5, 16, 0),
       },
       { channel: CHANNEL, threadTs: thread.ts, user: MEMBERS[0]!, text: "dispute 2 — TreeSelect is on its way" },
@@ -480,6 +487,7 @@ describe("a dispute in the thread", () => {
         retire: async (ts) => {
           retired.push(ts);
         },
+        pending: async () => true,
         now: () => Date.UTC(2026, 9, 5, 16, 0),
       },
       { channel: CHANNEL, threadTs: thread.ts, user: MEMBERS[1]!, text: "dispute 1, 2" },
@@ -496,12 +504,36 @@ describe("a dispute in the thread", () => {
       post: async () => assert.fail("no post"),
       stage: async () => assert.fail("no stage"),
       retire: async () => assert.fail("no retire"),
+      pending: async () => true,
       now: () => Date.UTC(2026, 9, 5, 16, 0),
     };
     // Not a dispute; another thread; an item that is not on the list.
     assert.equal(await disputePrecedenceItems(deps, { channel: CHANNEL, threadTs: thread.ts, user: "U1", text: "thanks!" }), false);
     assert.equal(await disputePrecedenceItems(deps, { channel: CHANNEL, threadTs: "1.2", user: "U1", text: "dispute 1" }), false);
     assert.equal(await disputePrecedenceItems(deps, { channel: CHANNEL, threadTs: thread.ts, user: "U1", text: "dispute 9" }), false);
+  });
+
+  it("a dispute after the card is decided revises nothing, so no second intake is filed", async () => {
+    const { thread, first } = await posted();
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal(first);
+    const won = await resolveSignal(
+      { kind: "reaction", messageTs: first.proposalTs, channel: CHANNEL, thread: first.replyTs!, glyph: "white_check_mark", userId: MEMBERS[0]! },
+      { threadState },
+    );
+    assert.equal(won.outcome, "won");
+    const handled = await disputePrecedenceItems(
+      {
+        thread: kv<PostedThread | null>(thread).store,
+        post: async () => assert.fail("no revised card"),
+        stage: async () => assert.fail("nothing staged"),
+        retire: async () => assert.fail("nothing retired"),
+        pending: async (ts) => (await threadState.getProposalByTs(ts)).state === "found",
+        now: () => Date.UTC(2026, 9, 5, 16, 0),
+      },
+      { channel: CHANNEL, threadTs: thread.ts, user: MEMBERS[1]!, text: "dispute 2" },
+    );
+    assert.equal(handled, false, "the reply goes to the agent");
   });
 
   it("the operations a card runs follow the target", () => {
@@ -515,10 +547,21 @@ describe("a dispute in the thread", () => {
 });
 
 describe("the Slack hook", () => {
-  const thread = { channel: CHANNEL, ts: "1759500000.000001" } as PostedThread;
-  const env = (reads: string[]) =>
+  const thread = {
+    channel: CHANNEL,
+    ts: "1759500000.000001",
+    items: [{ n: 1 }, { n: 2 }],
+    disputed: [2],
+    expiresAt: Date.now() + PRECEDENCE_CARD_TTL_MS,
+  } as unknown as PostedThread;
+  const env = (reads: string[], cardState = "found") =>
     ({
       PLUS_UNIVERSAL_CHANNEL_ID: CHANNEL,
+      // The ThreadState namespace, as far as the card lookup reaches it.
+      THREAD_STATE: {
+        idFromName: (name: string) => name,
+        get: () => ({ getProposalByTs: async () => ({ state: cardState }) }),
+      },
       HARNESS_KV: {
         get: async (key: string) => {
           reads.push(key);
@@ -541,5 +584,11 @@ describe("the Slack hook", () => {
     assert.equal(await isDsPrecedenceDispute(env([]), msg({})), true);
     assert.equal(await isDsPrecedenceDispute(env([]), msg({ thread_ts: "1.1" })), false);
     assert.equal(await isDsPrecedenceDispute(env([]), msg({ text: "hi" })), false);
+    // A dispute the dispute path would decline — an item not on the list, or
+    // one already dropped — is not stood aside for, so the agent answers it.
+    assert.equal(await isDsPrecedenceDispute(env([]), msg({ text: "dispute 9" })), false);
+    assert.equal(await isDsPrecedenceDispute(env([]), msg({ text: "dispute 2" })), false);
+    // Nor once the card is decided: the dispute path declines it then too.
+    assert.equal(await isDsPrecedenceDispute(env([], "none"), msg({})), false);
   });
 });

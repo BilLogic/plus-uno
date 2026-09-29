@@ -17,7 +17,9 @@
 //     revised card in the same thread without them. Staging it in the same
 //     reply thread supersedes the old card (ThreadState.putProposal), so a
 //     late ✅ on the old one is told it was replaced. The revision keeps the
-//     old card's expiry. Disputing every item withdraws the card.
+//     old card's expiry. Disputing every item withdraws the card. Only a card
+//     still pending is revised: once it is decided, the intake is filed (or
+//     declined), and a revision would file a second one.
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
 //   check: the index + the registry from GitHub + the library's /components
@@ -155,7 +157,7 @@ function stagedCard(
   thread: Omit<PostedThread, "cardTs">,
   cardTs: string,
   card: { text: string },
-  operations: PendingProposal["operations"] & object,
+  operations: NonNullable<PendingProposal["operations"]>,
   ttlMs: number,
 ): PendingProposal {
   return {
@@ -239,6 +241,8 @@ export interface DisputeDeps {
   stage(proposal: PendingProposal): Promise<void>;
   /** Retire a card so no ✅ runs it. */
   retire(proposalTs: string): Promise<void>;
+  /** Whether the card is still pending — not decided, expired or replaced. */
+  pending(proposalTs: string): Promise<boolean>;
   now(): number;
 }
 
@@ -251,6 +255,24 @@ export interface ThreadReply {
 }
 
 /**
+ * The items a reply newly disputes in the live weekly thread — empty when it
+ * is not a dispute, not in that thread, after the card expired, or names only
+ * items that are not on the list or already dropped. Both the dispute and the
+ * @mention guard ask this, so a reply one of them declines the other does too
+ * and the agent answers it.
+ *
+ * @param thread - The posted thread, or null
+ * @param reply - The reply
+ * @param now - The time
+ */
+export function freshDisputes(thread: PostedThread | null, reply: Omit<ThreadReply, "user">, now: number): number[] {
+  const numbers = disputedItems(reply.text);
+  if (!numbers.length || !thread || thread.channel !== reply.channel || thread.ts !== reply.threadTs) return [];
+  if (now >= thread.expiresAt) return [];
+  return numbers.filter((n) => thread.items.some((i) => i.n === n) && !thread.disputed.includes(n));
+}
+
+/**
  * A reply in the weekly thread that disputes items: revise the card without
  * them. Answers whether it handled the reply — false leaves it to the agent.
  *
@@ -258,13 +280,10 @@ export interface ThreadReply {
  * @param reply - The reply
  */
 export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadReply): Promise<boolean> {
-  const numbers = disputedItems(reply.text);
-  if (!numbers.length) return false;
+  if (!disputedItems(reply.text).length) return false;
   const thread = await deps.thread.read();
-  if (!thread || thread.channel !== reply.channel || thread.ts !== reply.threadTs) return false;
-  if (deps.now() >= thread.expiresAt) return false;
-  const fresh = numbers.filter((n) => thread.items.some((i) => i.n === n) && !thread.disputed.includes(n));
-  if (!fresh.length) return false;
+  const fresh = freshDisputes(thread, reply, deps.now());
+  if (!thread || !fresh.length || !(await deps.pending(thread.cardTs))) return false;
 
   const disputed = [...thread.disputed, ...fresh].sort((a, b) => a - b);
   const remaining = thread.items.filter((i) => !disputed.includes(i.n));

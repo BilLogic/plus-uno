@@ -18,7 +18,7 @@ import { postLibraryFindings, type PostResult } from "./post";
 import { trackLibraryIntakes, type TrackedPublish, type TrackResult } from "./track";
 
 export const TRACKED_KV_KEY = "figma-poll:tracked";
-const REGISTRY_PATH = "design-system/figma/component-registry.json";
+export const REGISTRY_PATH = "design-system/figma/component-registry.json";
 /** Pages of 200 members — a channel of up to 600 people. */
 const MEMBER_PAGES = 3;
 
