@@ -32,6 +32,7 @@ import {
   groundLabel,
   keyOf,
   opaqueGround,
+  report,
   ratchetFailures,
   ratio,
   textDeclarations,
@@ -280,4 +281,12 @@ test('a finding names where its ground came from: own rule, ancestor, @grounds, 
     ' (declared by @grounds, line 10)',
     ' (no rule sets a background, so the page is assumed)',
   ]);
+});
+
+test('the report labels a hand-made finding from the origin it carries', () => {
+  const finding = {
+    file: 'a.scss', line: 3, source: 'color: var(--color-warning);', token: '--color-warning',
+    ground: '--color-success', origin: { kind: 'ancestor', line: 1 }, ratio: 1.5, bar: 4.5, sibling: null,
+  };
+  assert.match(report([finding]), /on --color-success \(the background of an ancestor rule, line 1\)/);
 });
