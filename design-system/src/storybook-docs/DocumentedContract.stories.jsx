@@ -132,8 +132,18 @@ function probeValue(name, meta) {
  */
 const VISIBILITY = ['show', 'open', 'isOpen', 'visible'];
 
-function baseProps(props) {
-  const base = {};
+/**
+ * Components whose empty state is to render nothing, and the one value that
+ * gives them something to render. The same reasoning as `show`: a Count with no
+ * number is hidden by contract, so every variant would look broken when it is
+ * simply empty.
+ */
+const RENDERS_WITH = {
+  Count: { value: 1 },
+};
+
+function baseProps(props, componentName) {
+  const base = { ...(RENDERS_WITH[componentName] ?? {}) };
   // Required props only. Handing an OPTIONAL `children` to `ButtonGroup` — which
   // clones each child and pushes `style` onto it — turned a fabricated `<span>`
   // into a React error that had nothing to do with the documented variant.
@@ -237,7 +247,7 @@ export const DocumentedVariantsRender = {
     for (const subject of subjects) {
       if (!subject.variants.size) continue;
       const Component = load(subject.jsxPath, subject.name);
-      const base = baseProps(subject.propTypes);
+      const base = baseProps(subject.propTypes, subject.name);
 
       for (const [prop, values] of subject.variants) {
         const rendered = new Map();
@@ -278,7 +288,7 @@ export const DocumentedPropsAreAccepted = {
     for (const subject of subjects) {
       if (!subject.documentedProps.length) continue;
       const Component = load(subject.jsxPath, subject.name);
-      const base = baseProps(subject.propTypes);
+      const base = baseProps(subject.propTypes, subject.name);
 
       for (const prop of subject.documentedProps) {
         const value = probeValue(prop, subject.propTypes.get(prop));

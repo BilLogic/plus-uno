@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (60)
+## UI components (61)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [Alert](../../src/components/messaging/Alert/index.md)
@@ -24,6 +24,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [ChoiceGrid](../../src/components/forms-and-inputs/ChoiceGrid.md)
 - [CloseButton](../../src/components/actions/CloseButton/index.md)
 - [Collapse](../../src/components/layout-and-structure/Collapse/index.md)
+- [Count](../../src/components/status-and-loading/Count/index.md)
 - [DateAndTimePicker](../../src/components/forms-and-inputs/DateAndTimePicker.md)
 - [DatePicker](../../src/components/forms-and-inputs/DatePicker/index.md)
 - [Divider](../../src/components/layout-and-structure/Divider/index.md)

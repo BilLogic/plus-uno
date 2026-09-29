@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { contrast, parseColour } from '@/lib/tokens.mjs';
+import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import CloseButton from './CloseButton';
 
 export default {
@@ -251,8 +251,8 @@ export const InverseGrounds = () => (
 );
 
 InverseGrounds.play = async ({ canvasElement }) => {
-    // Same WCAG luminance the checks use, from the shared token module.
-    const ratioOf = (a, b) => contrast(parseColour(a), parseColour(b));
+    // Same WCAG luminance the checks use (the shared story contrast util).
+    const ratioOf = contrastRatio;
     for (const ground of INVERSE_GROUNDS) {
         const wrapper = canvasElement.querySelector(`[data-ground="${ground}"]`);
         const button = within(wrapper).getByRole('button');

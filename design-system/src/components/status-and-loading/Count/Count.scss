@@ -1,0 +1,141 @@
+/*
+ * Count — a number on its own, as a pill.
+ *
+ * EVERY COUNT IS A PILL: 20 on its own, 16 for use inside a label, with the
+ * minimum width equal to the height so a single digit is a circle and 9 → 10
+ * grows the pill instead of jumping the layout.
+ *
+ * The two heights have no semantic token yet (label heights 16/20/22/32 are a
+ * token follow-up), so they are local custom properties with the value as the
+ * documented default. The minimum widths and the dot take the spacing
+ * primitives Figma binds them to. Padding is the Element token, which is 4.
+ */
+.plus-count {
+    --plus-count-size: 20px;
+    --plus-count-min: var(--size-spacing-medium-space-400, 20px);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    height: var(--plus-count-size);
+    min-width: var(--plus-count-min);
+    margin: 0;
+    padding: 0 var(--size-element-pad-x-xs, 4px);
+    border-radius: var(--size-element-radius-full, 999px);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.plus-count--small {
+    --plus-count-size: 16px;
+    --plus-count-min: var(--size-spacing-medium-space-300, 16px);
+}
+
+/*
+ * The color map: [ground, ink] per style and appearance.
+ *
+ * subtle   the style's 08 state layer, translucent, so a count inside a tinted
+ *          label reads as a darker shade of it; ink is the style's (Text).
+ * bold     the solid base with its on-color. Warning is the exception: its
+ *          base with white ink fails AA, so bold warning uses Warning Container.
+ * dot      the solid base, which is the whole mark.
+ * Info is Tertiary and discovery is the curriculum palette's purple, the same
+ * mapping Status and Tag use.
+ */
+$count-subtle: (
+    'neutral': (var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08)), var(--color-on-surface-variant, #3f484a)),
+    'success': (var(--color-success-state-08, rgba(62, 105, 26, 0.08)), var(--color-success-text, #2c5609)),
+    'warning': (var(--color-warning-state-08, rgba(113, 92, 0, 0.08)), var(--color-warning-text, #5b4a00)),
+    'danger': (var(--color-danger-state-08, rgba(190, 12, 22, 0.08)), var(--color-danger-text, #9b0606)),
+    'info': (var(--color-info-state-08), var(--color-info-text)),
+    'discovery': (var(--color-mastering-content-state-08, rgba(127, 63, 177, 0.08)), var(--color-mastering-content-text, #673a8b)),
+);
+
+$count-bold: (
+    'neutral': (var(--color-inverse-surface, #2e3133), var(--color-inverse-on-surface, #f0f1f3)),
+    'success': (var(--color-success, #3e691a), var(--color-on-success, #ffffff)),
+    'warning': (var(--color-warning-container, #ffe17a), var(--color-on-warning-container, #231b00)),
+    'danger': (var(--color-danger, #ba1a1a), var(--color-on-danger, #ffffff)),
+    'info': (var(--color-info), var(--color-on-info)),
+    'discovery': (var(--color-mastering-content, #8659a9), var(--color-on-mastering-content, #ffffff)),
+);
+
+$count-dot: (
+    'neutral': var(--color-on-surface-variant, #3f484a),
+    'success': var(--color-success, #3e691a),
+    'warning': var(--color-warning, #9f8205),
+    'danger': var(--color-danger, #ba1a1a),
+    'info': var(--color-info),
+    'discovery': var(--color-mastering-content, #8659a9),
+);
+
+@each $name, $pair in $count-subtle {
+    .plus-count--subtle.plus-count--#{$name} {
+        background-color: nth($pair, 1);
+        color: nth($pair, 2);
+    }
+}
+
+@each $name, $pair in $count-bold {
+    .plus-count--bold.plus-count--#{$name} {
+        background-color: nth($pair, 1);
+        color: nth($pair, 2);
+    }
+}
+
+/*
+ * Inverse is for counts on filled buttons and dark surfaces. It replaces the
+ * three filled counter styles with one: a solid white pill with dark text, so
+ * it passes contrast on any fill rather than depending on the ground beneath
+ * it. It is neutral whatever `style` says.
+ */
+.plus-count--inverse {
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    color: var(--color-on-surface-variant, #3f484a);
+}
+
+/* The dot: 8, solid, no number. Its name comes from `label`. */
+.plus-count--dot {
+    --plus-count-size: var(--size-spacing-small-space-100, 8px);
+
+    width: var(--plus-count-size);
+    min-width: 0;
+    padding: 0;
+}
+
+@each $name, $ground in $count-dot {
+    .plus-count--dot.plus-count--#{$name} {
+        background-color: $ground;
+    }
+}
+
+/*
+ * The ring, for a count pinned to the top right of an icon or avatar. It is a
+ * box-shadow outside the box, as in Figma, so the pill keeps its exact height.
+ */
+.plus-count--ring {
+    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface, #f9f9fc);
+}
+
+/*
+ * The small pill is 16 tall and the B3 line is 20; the flex box centers the
+ * line, and a line height of the pill keeps the digits from being clipped.
+ */
+.plus-count .plus-count__value {
+    line-height: var(--plus-count-size);
+}
+
+/* The accessible name for a numeric count: read, not seen. */
+.plus-count__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

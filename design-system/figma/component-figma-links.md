@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-60 docs-page links + 97 style/variant entries across 63 components.
+61 docs-page links + 98 style/variant entries across 64 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -28,6 +28,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | ChoiceGrid | `13317:2958` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958) |
 | Components | CloseButton | `17827:827` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827) |
 | Components | Collapse | `3497:19499` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499) |
+| Components | Count | `17883:1895` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895) |
 | Components | DateAndTimePicker | `13549:6703` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703) |
 | Components | DatePicker | `13549:6703` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703) |
 | Components | Divider | `4992:30871` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871) |
@@ -103,6 +104,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | ChoiceGrid | Multiple Choice Grid | `13541:9229` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229) | verified |
 | Components | CloseButton | Close button | `17827:827` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827) | verified |
 | Components | Collapse | Collapse | `59:16038` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=59-16038) | verified |
+| Components | Count | Count | `17876:46653` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653) | verified |
 | Components | DateAndTimePicker | Month (Date Picker) | `13574:1150` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150) | verified |
 | Components | DateAndTimePicker | Time (Date Picker) | `16560:4508` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508) | verified |
 | Components | DatePicker | Date & Time Picker | `13549:6703` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703) | verified |
