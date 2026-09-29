@@ -25,7 +25,6 @@
 | `count` | number or string | — | `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. |
 | `elemBefore` | node | — | Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. |
 | `swatchBefore` | string | — | Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. |
-| `hasSwatch` | bool | `true` | `false` drops the swatch from a plain tag that counts rather than names a category, such as TagGroup's `+n`. |
 | `maxWidth` | number or string | `180` | Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. |
 | `href` | string | — | Where a `link` tag goes. |
 | `linkComponent` | elementType | — | Router link to render instead of `<a>` for a `link` tag. |

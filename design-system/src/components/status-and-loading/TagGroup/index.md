@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, MaxVisible, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
+**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, MaxVisible, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx`
 
