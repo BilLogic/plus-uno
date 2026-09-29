@@ -163,7 +163,7 @@ export const CustomOverflowAction = () => {
                 overflowLabel={(n) => `${n} more`}
                 onOverflowClick={() => setOpened((n) => n + 1)}
             >
-                {SUBJECTS.map((s) => <Tag key={s} color="orange">{s}</Tag>)}
+                {SUBJECTS.map((s) => <Tag key={s} color="yellow">{s}</Tag>)}
             </TagGroup>
             <p className="body2-txt">Picker opened {opened} time(s)</p>
         </div>

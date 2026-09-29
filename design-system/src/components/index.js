@@ -40,6 +40,8 @@ export { default as Spinner } from '@/components/status-and-loading/Spinner';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 
 export { default as Tag } from '@/components/status-and-loading/Tag';
+// The disabled state a field or TagGroup hands its tags.
+export { TagContext, useTagContext } from '@/components/status-and-loading/Tag';
 export { default as TagGroup } from '@/components/status-and-loading/TagGroup';
 export { default as Table } from '@/components/_internal/Table';
 export { default as Tile } from '@/components/status-and-loading/Tile';
