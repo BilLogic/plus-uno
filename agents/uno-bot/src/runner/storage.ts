@@ -1,7 +1,8 @@
 // The AgentRunner's storage port, and the in-memory runner behind it.
 //
-// The queue (./queue.ts) needs six calls from a Durable Object's storage: a
-// keyed get, put and delete, a prefix list in key order, and the one alarm.
+// The queue (./queue.ts) needs five calls from a Durable Object's storage: a
+// keyed put and delete, a prefix list in key order, and the one alarm's get and
+// set.
 // Stated here as an interface, the production storage satisfies it as it
 // stands — `DurableObjectStorage` has every one of these, so the runner passes
 // `state.storage` straight in — and the in-memory adapter below satisfies it
@@ -13,7 +14,6 @@
 
 /** The slice of Durable Object storage the runner's queue uses. */
 export interface RunnerStorage {
-  get<T>(key: string): Promise<T | undefined>;
   put<T>(key: string, value: T): Promise<void>;
   delete(key: string): Promise<boolean>;
   /** Entries under `prefix`, in ascending key order, at most `limit`. */
@@ -33,9 +33,6 @@ export function createInMemoryRunnerStorage(): InMemoryRunnerStorage {
   const entries = new Map<string, unknown>();
   let alarm: number | null = null;
   return {
-    async get<T>(key: string) {
-      return entries.get(key) as T | undefined;
-    },
     async put<T>(key: string, value: T) {
       // A structured copy, as Durable Object storage keeps: a caller mutating
       // what it put must not change what is stored.

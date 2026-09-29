@@ -2,22 +2,28 @@
 //
 // The real run spends one alarm per job, each with a fresh 50. A rehearsal
 // runs every job in ONE request, so it cannot give each job the whole ceiling:
-// each job runs under what is left of `LOOKUP_CEILING` after the jobs before
-// it, and once nothing is left the rest are reported `skipped` rather than
-// run into the invocation's hard cap. A job the rehearsal stopped reads
-// `deferred`, exactly as the runner would keep it.
+// the ceiling is on the rehearsal's running count, each job gets what the jobs
+// before it left, and once nothing is left the rest are reported `skipped`
+// rather than run into the invocation's hard cap. A job the ceiling stopped
+// reads `deferred`, exactly as the runner would keep it.
 //
-// Each job runs under its own meter, so its reading is its own: external
-// subrequests (the ones capped at 50), Cloudflare-service hops, and D1
-// queries — the hops charged under the `"d1"` label, which read 0 while no D1
-// database is bound. `cpu_ms` is always null: workerd advances its clocks only
-// across I/O, so CPU time cannot be read from inside an invocation. Workers
-// Logs records it per invocation, which for a real run is per job.
+// Each job is read as the difference in the invocation's own meter across it,
+// so the probe's envelope still counts everything the rehearsal spent
+// (ADR-022): external subrequests (the ones capped at 50), Cloudflare-service
+// hops, and D1 queries — the hops charged under the `"d1"` label, which read 0
+// while no D1 database is bound. `cpu_ms` is always null: workerd advances its
+// clocks only across I/O, so CPU time cannot be read from inside an
+// invocation, and for the same reason `wall_ms` is time spent waiting on I/O —
+// a job that makes no calls reads 0. Workers Logs records CPU time per
+// invocation, which for a real run is one AgentRunner alarm per job.
+//
+// Must run inside a meter — the probe runs inside the Worker's. Outside one
+// the counters read 0 and no ceiling applies.
 //
 // Free of `Env` and Workers globals: the job body is passed in, so the Node
 // suite drives the rehearsal with fakes (tests/sweep-dry-run.test.ts).
 import { LOOKUP_CEILING } from "../agent/loop-policy";
-import { internalSubrequestsFor, internalSubrequestsUsed, runMetered, subrequestsUsed } from "../net";
+import { internalSubrequestsFor, internalSubrequestsUsed, subrequestsUsed } from "../net";
 import { nextRunnable, runWithinCeiling } from "../runner/queue";
 import type { ScheduledJob, ScheduledRun, ScheduledRunName } from "./runs";
 
@@ -48,10 +54,11 @@ export interface DryRunReport {
 }
 
 const CPU_NOTE =
-  "not readable in-invocation (workerd advances clocks only across I/O); Workers Logs records CPU time per invocation, one per job on a real run";
+  "cpu_ms is not readable in-invocation (workerd advances clocks only across I/O, so wall_ms is I/O wait). " +
+  "For CPU time, read cpuTime in Workers Logs on the AgentRunner alarm invocations: one per job on a real run.";
 
 /**
- * Rehearse a run: each job once, in runner order, each metered on its own.
+ * Rehearse a run: each job once, in runner order, each read off the meter.
  *
  * @param run - The planned run
  * @param execute - One job's body, as a dry run
@@ -64,30 +71,30 @@ export async function dryRunScheduledRun(
 ): Promise<DryRunReport> {
   const queue = run.jobs.map((job) => ({ date: run.date, job }));
   const jobs: JobReading[] = [];
-  let spent = 0;
+  const startSubrequests = subrequestsUsed();
 
   while (queue.length > 0) {
     // A plan whose jobs wait on each other would never run them; take them in
     // plan order rather than loop.
     const index = Math.max(nextRunnable(queue), 0);
     const [{ job }] = queue.splice(index, 1) as [{ date: string; job: ScheduledJob }];
-    const left = LOOKUP_CEILING - spent;
-    if (left <= 0) {
+    if (subrequestsUsed() - startSubrequests >= LOOKUP_CEILING) {
       jobs.push(reading(job, "skipped", 0, 0, 0, 0));
       continue;
     }
+    const before = { ext: subrequestsUsed(), internal: internalSubrequestsUsed(), d1: internalSubrequestsFor("d1") };
     const startedAt = now();
-    const measured = await runMetered(async () => {
-      const outcome = await runWithinCeiling(() => execute(job), left);
-      return {
+    const outcome = await runWithinCeiling(() => execute(job), startSubrequests + LOOKUP_CEILING);
+    jobs.push(
+      reading(
+        job,
         outcome,
-        subrequests: subrequestsUsed(),
-        internal: internalSubrequestsUsed(),
-        d1: internalSubrequestsFor("d1"),
-      };
-    });
-    spent += measured.subrequests;
-    jobs.push(reading(job, measured.outcome, measured.subrequests, measured.internal, measured.d1, now() - startedAt));
+        subrequestsUsed() - before.ext,
+        internalSubrequestsUsed() - before.internal,
+        internalSubrequestsFor("d1") - before.d1,
+        now() - startedAt,
+      ),
+    );
   }
 
   return {
@@ -95,7 +102,7 @@ export async function dryRunScheduledRun(
     date: run.date,
     planned: run.jobs.map((j) => ({ key: j.key, kind: j.kind, after: j.after ?? [] })),
     jobs,
-    total_subrequests: spent,
+    total_subrequests: subrequestsUsed() - startSubrequests,
     lookup_ceiling: LOOKUP_CEILING,
     cpu_note: CPU_NOTE,
   };

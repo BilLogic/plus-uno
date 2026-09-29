@@ -65,7 +65,7 @@ export interface RunnerDeps {
   /** A person's turn, a reaction or a cut-off run. */
   runThreadJob(job: RunnerJobPayload): Promise<JobOutcome>;
   /** One scheduled job. Resolving is done; a budget stop is caught here. */
-  runScheduledJob(job: ScheduledJob, run: { name: ScheduledRunName; date: string }): Promise<void>;
+  runScheduledJob(job: ScheduledJob): Promise<void>;
 }
 
 /**
@@ -117,7 +117,9 @@ export async function enqueueRun(storage: RunnerStorage, run: ScheduledRun, now:
 /**
  * The first job that may run now: in queue order, passing over an assemble
  * job while any job it waits on is still pending in its run. A dependency the
- * run does not hold counts as done.
+ * run no longer holds counts as done — including one that failed or was given
+ * up, so an assemble job works with what its run produced rather than waiting
+ * forever.
  *
  * Shared with the dry run, so a rehearsal runs jobs in the order the runner
  * would.
@@ -141,7 +143,8 @@ export function nextRunnable(queue: readonly { date: string; job: ScheduledJob }
  * both sides rather than trusting the catch alone.
  *
  * @param fn - The job body
- * @param limit - The ceiling for this job, `LOOKUP_CEILING` unless less is left
+ * @param limit - The invocation's running-count ceiling: `LOOKUP_CEILING` on an
+ *   alarm's fresh meter, what earlier jobs left in a rehearsal
  * @returns `handled`, `deferred`, or `failed` for any other error (logged)
  */
 export async function runWithinCeiling(
@@ -168,13 +171,13 @@ export async function runWithinCeiling(
 export async function runOneJob(storage: RunnerStorage, deps: RunnerDeps): Promise<void> {
   const threadJobs = await storage.list<RunnerJob>({ prefix: JOB_PREFIX, limit: 1 });
   if (threadJobs.size > 0) {
-    await runThreadJob(storage, deps, threadJobs);
+    await drainThreadJob(storage, deps, threadJobs);
     return;
   }
-  await runScheduledJob(storage, deps);
+  await drainScheduledJob(storage, deps);
 }
 
-async function runThreadJob(storage: RunnerStorage, deps: RunnerDeps, jobs: Map<string, RunnerJob>): Promise<void> {
+async function drainThreadJob(storage: RunnerStorage, deps: RunnerDeps, jobs: Map<string, RunnerJob>): Promise<void> {
   for (const [key, job] of jobs) {
     let outcome: JobOutcome = "handled";
     try {
@@ -199,7 +202,7 @@ async function runThreadJob(storage: RunnerStorage, deps: RunnerDeps, jobs: Map<
   if (remaining.size > 0) await storage.setAlarm(deps.now());
 }
 
-async function runScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Promise<void> {
+async function drainScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Promise<void> {
   const entries = [...(await storage.list<QueuedRunJob>({ prefix: RUN_PREFIX })).entries()];
   const index = nextRunnable(entries.map(([, q]) => q));
   if (index < 0) {
@@ -212,9 +215,7 @@ async function runScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Promis
   }
   const [key, queued] = entries[index]!;
   const label = `${queued.run} ${queued.date} ${queued.job.key}`;
-  const outcome = await runWithinCeiling(() =>
-    deps.runScheduledJob(queued.job, { name: queued.run, date: queued.date }),
-  );
+  const outcome = await runWithinCeiling(() => deps.runScheduledJob(queued.job));
 
   if (outcome === "deferred" && queued.deferrals + 1 < MAX_JOB_DEFERRALS) {
     // Kept under the same key, so it is still first in line: it runs again

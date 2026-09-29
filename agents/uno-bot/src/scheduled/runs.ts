@@ -106,7 +106,8 @@ export interface FiringDeps {
  *
  * Settled side by side, so neither can cost the other: a failed enqueue still
  * polls, and a failed poll still enqueues. Each failure is logged and
- * swallowed, as the poll's always was — a thrown scheduled handler is retried.
+ * swallowed, as the poll's always was: the handler has already handed its work
+ * to `waitUntil`, and nothing downstream would act on a rejection.
  *
  * @param scheduledTime - The firing's scheduled time, epoch ms
  * @param deps - The poll and the enqueue

@@ -13,6 +13,9 @@ import {
   runsForFiring,
   type ScheduledRun,
 } from "../src/scheduled/runs";
+import { enqueueScheduledRun } from "../src/scheduled/jobs";
+import { internalSubrequestsFor, runMetered } from "../src/net";
+import type { Env } from "../src/types";
 
 /** A firing at `hh:mm` UTC on a weekday (2026-09-29 is a Tuesday). */
 const at = (hh: number, mm: number): number => Date.UTC(2026, 8, 29, hh, mm);
@@ -98,4 +101,32 @@ test("a run's runner is never a thread's runner", () => {
     assert.doesNotMatch(runner, /^[A-Z][A-Z0-9]+:\d+(\.\d+)?$/);
     assert.notEqual(runnerNameForRun("morning"), runnerNameForRun("end-of-day"));
   }
+});
+
+test("the enqueue reaches the run's own runner, and costs one charged hop", async () => {
+  const named: string[] = [];
+  const bodies: unknown[] = [];
+  const AGENT_RUNNER = {
+    idFromName: (name: string) => {
+      named.push(name);
+      return name;
+    },
+    get: (id: string) => ({
+      fetch: async (url: string, init: RequestInit) => {
+        assert.equal(url, "https://do/enqueue-run");
+        assert.equal(id, runnerNameForRun("end-of-day"));
+        bodies.push(JSON.parse(String(init.body)));
+        return Response.json({ ok: true, queued: 1 }, { status: 202 });
+      },
+    }),
+  };
+  const env = { AGENT_RUNNER } as unknown as Env;
+  const run = planRun("end-of-day", at(22, 0));
+  const hops = await runMetered(async () => {
+    await enqueueScheduledRun(env, run);
+    return internalSubrequestsFor("agent-runner");
+  });
+  assert.deepEqual(named, ["scheduled-run/end-of-day"]);
+  assert.deepEqual(bodies, [run]);
+  assert.equal(hops, 1);
 });

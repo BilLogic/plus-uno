@@ -168,9 +168,12 @@ export function internalSubrequestsUsed(): number {
 }
 
 /**
- * Internal subrequests spent so far this invocation under one `charge` label —
- * e.g. `"d1"` for D1 queries, which are Cloudflare-service calls like any
- * other. 0 when nothing carried the label, including outside a meter.
+ * Internal subrequests spent so far this invocation under one `charge` label.
+ * 0 when nothing carried the label, including outside a meter.
+ *
+ * D1 queries are Cloudflare-service calls like any other, and `/debug/sweep`
+ * reports a job's D1 count as its `"d1"` charges — so a D1 call site charges
+ * `charge(1, "d1")` per query, or the sweep reads 0 for it.
  *
  * @param label - The label `charge` was given
  */

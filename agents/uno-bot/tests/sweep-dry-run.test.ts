@@ -1,16 +1,17 @@
 // `/debug/sweep?dry_run=1` — a scheduled run, rehearsed in one request.
 //
 // The probe plans a run the way the cron does, then runs each job in the order
-// the runner would, each under its own meter, and reports what each one spent:
-// external subrequests, Cloudflare-service hops, D1 queries, and time. The
-// sum is held under the lookup ceiling, because the rehearsal is ONE
-// invocation where the real run is one alarm per job.
+// the runner would and reads what each one spent off the invocation's meter:
+// external subrequests, Cloudflare-service hops, D1 queries, and time. The sum
+// is held under the lookup ceiling, because the rehearsal is ONE invocation
+// where the real run is one alarm per job — and it stays on that one meter, so
+// the probe's envelope counts it too.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DIAGNOSTIC_ROUTES } from "../src/diagnostics/routes";
 import { sweepProbe } from "../src/diagnostics/probes/sweep";
 import { dryRunScheduledRun } from "../src/scheduled/dry-run";
-import { charge, countedFetch, SubrequestBudgetError } from "../src/net";
+import { charge, countedFetch, internalSubrequestsUsed, runMetered, SubrequestBudgetError, subrequestsUsed } from "../src/net";
 import { LOOKUP_CEILING } from "../src/agent/loop-policy";
 import type { ScheduledRun } from "../src/scheduled/runs";
 import type { Env } from "../src/types";
@@ -24,57 +25,80 @@ const plan: ScheduledRun = {
   ],
 };
 
+/** A fetch that costs one subrequest and never leaves the process. */
+const oneCall = () => countedFetch("data:text/plain,x").then(() => undefined);
+
 test("the sweep probe is a token-gated GET in the route table", () => {
   assert.deepEqual(DIAGNOSTIC_ROUTES.sweep, { method: "GET", path: "/debug/sweep", auth: "debug-token" });
 });
 
 test("a dry run reports the planned jobs and one reading per job, in runner order", async () => {
-  const report = await dryRunScheduledRun(plan, async (job) => {
-    if (job.key === "a") charge(2, "d1");
-  });
+  const report = await runMetered(() =>
+    dryRunScheduledRun(plan, async (job) => {
+      if (job.key === "a") {
+        charge(2, "d1");
+        await oneCall();
+      }
+    }),
+  );
   assert.equal(report.run, "end-of-day");
   assert.equal(report.date, "2026-09-29");
   assert.deepEqual(report.planned.map((j) => j.key), ["assemble", "a"]);
   assert.deepEqual(report.jobs.map((j) => j.key), ["a", "assemble"]);
   const [a, assemble] = report.jobs;
   assert.equal(a?.outcome, "handled");
-  assert.equal(a?.subrequests, 0);
+  assert.equal(a?.subrequests, 1);
   assert.equal(a?.d1_queries, 2);
   assert.equal(a?.internal_subrequests, 2);
+  assert.equal(assemble?.subrequests, 0, "each reading is its own job's");
   assert.equal(assemble?.d1_queries, 0, "no D1 bound is a zero, not a missing field");
   assert.equal(typeof a?.wall_ms, "number");
-  assert.ok("cpu_ms" in (a ?? {}), "every reading carries the CPU field");
+  assert.equal(a?.cpu_ms, null);
+  assert.match(report.cpu_note, /Workers Logs/);
+  assert.equal(report.total_subrequests, 1);
+});
+
+test("what the jobs spent stays on the invocation's meter, which the envelope reads", async () => {
+  const seen = await runMetered(async () => {
+    await dryRunScheduledRun(plan, async () => {
+      await oneCall();
+      charge(1, "d1");
+    });
+    return { external: subrequestsUsed(), internal: internalSubrequestsUsed() };
+  });
+  assert.deepEqual(seen, { external: 2, internal: 2 });
 });
 
 test("a job the budget stops is reported as deferred, not as done", async () => {
-  const report = await dryRunScheduledRun(plan, async (job) => {
-    if (job.key === "a") throw new SubrequestBudgetError(LOOKUP_CEILING);
-  });
+  const report = await runMetered(() =>
+    dryRunScheduledRun(plan, async (job) => {
+      if (job.key === "a") throw new SubrequestBudgetError(LOOKUP_CEILING);
+    }),
+  );
   assert.equal(report.jobs[0]?.outcome, "deferred");
 });
 
 test("the rehearsal stops before the invocation's budget is gone", async () => {
-  // Each job spends the WHOLE ceiling; the second one gets nothing left.
+  // Each job tries to spend past the WHOLE ceiling; the second gets nothing left.
   const greedy: ScheduledRun = {
     name: "morning",
     date: "2026-09-29",
     jobs: [{ key: "a", kind: "noop" }, { key: "b", kind: "noop" }],
   };
-  const report = await dryRunScheduledRun(greedy, async () => {
-    for (let i = 0; i < LOOKUP_CEILING + 5; i++) {
-      await countedFetch("data:text/plain,x").catch((err: unknown) => {
-        if (err instanceof SubrequestBudgetError) throw err;
-      });
-    }
-  });
+  const report = await runMetered(() =>
+    dryRunScheduledRun(greedy, async () => {
+      for (let i = 0; i < LOOKUP_CEILING + 5; i++) await oneCall();
+    }),
+  );
   assert.equal(report.jobs[0]?.subrequests, LOOKUP_CEILING);
   assert.equal(report.jobs[0]?.outcome, "deferred");
   assert.equal(report.jobs[1]?.outcome, "skipped");
+  assert.equal(report.total_subrequests, LOOKUP_CEILING);
 });
 
 test("the probe dry-runs the named run with the no-op job", async () => {
   const url = new URL("https://w/debug/sweep?dry_run=1&run=morning");
-  const report = await sweepProbe({} as Env, url, new Request(url));
+  const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { outcome: string }[] };
   assert.equal(body.ok, true);
