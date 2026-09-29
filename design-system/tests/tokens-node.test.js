@@ -462,27 +462,27 @@ describe('the colour key is finer than the normaliser it replaces', () => {
   });
 
   /*
-   * WHY `check:colour-fallbacks` DID NOT MOVE WHEN #621 PUT IT ON THIS KEY —
-   * and it is a fact about the CAPTURE, not a property of the key, which is
-   * why it is pinned with its mechanism over the whole live corpus rather than
-   * asserted as "output unchanged".
+   * WHAT `check:colour-fallbacks` COMPARES WITH ALPHA — and it is a fact about
+   * the CAPTURE, not a property of the key, which is why it is pinned with its
+   * mechanism over the whole live corpus rather than asserted as "output
+   * unchanged".
    *
-   * THE MECHANISM, CORRECTED. `fallbackUsages` captures the fallback with
-   * `[^),]+`, which admits no comma and no `)`, and then requires the closing
-   * `)` of the `var()`. A whole `rgba()` fallback satisfies neither branch: the
-   * 25 sites writing `var(--color-x, rgba(4, 114, 168, 0.08))` are not captured
-   * with a truncated literal and are not counted incomparable — the regex does
-   * not match them AT ALL, so they never reach the audit in any form. (#620's
-   * docblock had the fragment `rgba(4` arriving in the incomparable count;
-   * measured here the fragment is never produced, and #621 corrected the
-   * docblock to match.)
+   * THE MECHANISM. `fallbackUsages` tries a whole color function —
+   * `rgba(…)`, `rgb(…)`, `hsla(…)`, commas and all — before the plain
+   * `[^),]+` literal. Until it did, the plain literal was the only branch: it
+   * admits no comma and no `)`, so a `var(--color-x, rgba(4, 114, 168, 0.08))`
+   * was not matched AT ALL — not captured, not counted incomparable, simply
+   * not seen. That is how every state-layer wash was written, so a re-mixed
+   * base left its washes stale and nothing said so.
    *
-   * So every colour comparison the check makes is opaque on both sides, and the
-   * 357 pairs above are all outside the compared set. The day the capture is
-   * widened to read a whole `rgba()` fallback, that stops being true, and this
-   * test is what says so.
+   * Measured over the live tree: 85 `var(--color-*, rgba(…))` sites across 20
+   * files, every one captured. 82 name a defined token and are compared with
+   * alpha on both sides; the other 3 name tokens that are defined nowhere,
+   * and are the check's undefined-token finding instead. All 82 agree,
+   * because the disagreeing washes were fixed when the capture widened, and
+   * the test asserts it: a stale wash here is a failure, not a recount.
    */
-  it('makes no live colour comparison with alpha on either side, because the capture refuses a whole rgba()', () => {
+  it('compares every live rgba() color fallback with its alpha, because the capture reads a whole color function', () => {
     const roots = ['design-system/src', '.storybook', 'prototypes'];
     const extensions = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
     const root = resolve('..');
@@ -493,12 +493,13 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       })),
     );
 
-    // The tree really does write `rgba()` fallbacks beside colour tokens — 25
-    // of them, which is the population this test is about.
-    const withRgba = sources.filter((s) =>
-      /var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/.test(s.text),
+    // The population this test is about: every wash written beside a color
+    // token. Counted per SITE, not per file.
+    const washes = sources.reduce(
+      (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
+      0,
     );
-    expect(withRgba.length).toBeGreaterThan(0);
+    expect(washes).toBe(85);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -508,25 +509,27 @@ describe('the colour key is finer than the normaliser it replaces', () => {
     );
     const usages = fallbackUsages(sources, { prefix: '--color-' });
 
-    // Not one of them is captured, in any form.
-    expect(usages.filter((use) => /rgba?\(/i.test(use.literal ?? ''))).toEqual([]);
+    // Every one of them is captured, whole.
+    const captured = usages.filter((use) => /^rgba\(/i.test(use.literal ?? ''));
+    expect(captured.length).toBe(washes);
 
-    // And every comparison the check does make is opaque on both sides. The
-    // count is asserted because a DROP in it is how a capture quietly stops
-    // reading fallbacks at all. A new stylesheet whose opaque fallbacks agree
-    // with their tokens raises it, as Tile's, Count's, Status's and Tag's did,
-    // and Tag's avatar fills and avatar spinner and Skeleton after them.
+    // And compared with alpha. The counts are asserted because a DROP in
+    // either is how a capture quietly stops reading fallbacks at all. A new
+    // stylesheet whose fallbacks agree with their tokens raises them.
     let comparable = 0;
+    let withAlpha = 0;
     for (const use of usages) {
       if (use.literal === null || !tokens.has(use.token)) continue;
       const literal = colourKey(use.literal);
       const tokenValue = colourKey(tokens.get(use.token));
       if (literal === null || tokenValue === null) continue;
       comparable += 1;
-      expect(literal.length, `${use.literal} carries alpha`).toBe(7);
-      expect(tokenValue.length, `${use.token} carries alpha`).toBe(7);
+      if (literal.length !== 9 && tokenValue.length !== 9) continue;
+      withAlpha += 1;
+      expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
     }
-    expect(comparable).toBe(543);
+    expect(withAlpha).toBe(82);
+    expect(comparable).toBe(630);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

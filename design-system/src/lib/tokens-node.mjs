@@ -281,7 +281,20 @@ export function familyOf(name) {
 /* ─── ARE THESE TWO VALUES THE SAME ────────────────────────────────────────── */
 
 const HEX = /^#([0-9a-f]{3,8})$/;
-const FUNCTION = /^(rgba?|hsla?)\(([^)]*)\)$/;
+/**
+ * A whole color function — `rgba(4, 114, 168, 0.08)`, `rgb(4 114 168 / 50%)`,
+ * `HSLA(…)` — as a regex SOURCE, unanchored, with the function name in group
+ * one and its arguments in group two. Exported so the fallback capture in
+ * `scripts/token-fallbacks.mjs` reads exactly the functions this key reads,
+ * and the two cannot drift.
+ *
+ * The name is matched case-insensitively by character class rather than an
+ * `i` flag, because a caller splices this into a larger pattern whose token
+ * names ARE case-sensitive. The arguments admit no parenthesis, so
+ * `rgba(var(--x), 0.5)` is not a color function here.
+ */
+export const COLOR_FUNCTION_SOURCE = '([rR][gG][bB][aA]?|[hH][sS][lL][aA]?)\\(([^()]*)\\)';
+const FUNCTION = new RegExp(`^${COLOR_FUNCTION_SOURCE}$`);
 
 /** `50%` → 0.5, `0.5` → 0.5, anything else → null. */
 function alphaOf(part) {
