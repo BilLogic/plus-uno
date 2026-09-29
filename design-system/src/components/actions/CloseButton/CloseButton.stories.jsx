@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import CloseButton from './CloseButton';
 import { INVERSE_GROUNDS } from './inverseGrounds.js';
 
@@ -62,6 +63,16 @@ function tokenColor(canvasElement, token) {
     return value;
 }
 
+/** The computed background a token paints, for comparing with a state layer. */
+function tokenBackground(canvasElement, token) {
+    const probe = canvasElement.ownerDocument.createElement('span');
+    probe.style.backgroundColor = `var(${token})`;
+    canvasElement.appendChild(probe);
+    const value = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return value;
+}
+
 const box = (element) => element.getBoundingClientRect();
 
 export const Tones = () => (
@@ -92,6 +103,23 @@ Tones.play = async ({ canvasElement }) => {
     for (const name of ['Dismiss inverse example on a dark ground', 'Dismiss inverse example on a colored ground']) {
         const inverse = canvas.getByRole('button', { name });
         await expect(getComputedStyle(inverse.querySelector('i')).color).toBe(surface);
+    }
+
+    // Hover and press paint the tone's state layer: 8% and 16% of the ×'s own
+    // color. A synthetic event never sets :hover or :active, so each state is
+    // forced and the browser's cascade decides what it looks like.
+    const states = [
+        ['Dismiss default example', '--color-on-surface-variant-state-08', '--color-on-surface-variant-state-16'],
+        ['Dismiss inverse example on a dark ground', '--color-surface-state-08', '--color-surface-state-16'],
+        ['Dismiss inverse example on a colored ground', '--color-surface-state-08', '--color-surface-state-16'],
+    ];
+    for (const [name, hoverToken, pressedToken] of states) {
+        const button = canvas.getByRole('button', { name });
+        await expect(getComputedStyle(button).backgroundColor, `${name} at rest`).toBe('rgba(0, 0, 0, 0)');
+        const hover = withForcedPseudo(button, ':hover', () => getComputedStyle(button).backgroundColor);
+        await expect(hover, `${name} on hover`).toBe(tokenBackground(canvasElement, hoverToken));
+        const pressed = withForcedPseudo(button, ':active', () => getComputedStyle(button).backgroundColor);
+        await expect(pressed, `${name} pressed`).toBe(tokenBackground(canvasElement, pressedToken));
     }
 };
 
