@@ -13,7 +13,9 @@ summary: Pillar → channel map (group announcements; all private — uno-bot mu
 |---|---|---|
 | #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
 | #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
-| #uno-bot | `C0ARJ2A3A69` | where the team reports problems with uno-bot and asks for changes to it: a top-level post engages with no @mention, a report or change request becomes a drafted GitHub intake (`harness-intake`, or a comment on the open intake it matches) staged in its thread and filed on ✅, and a plain question is just answered. Also the Figma-sync notifications (docs saying "#figma-sync" mean this channel). #uno-bot-sandbox posts stay test traffic |
+| #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot; Figma-sync notifications (docs saying "#figma-sync" mean this channel) |
+
+#uno-bot is where the team reports problems with uno-bot and asks for changes to it. A top-level post there engages with no @mention. A report or change request becomes a drafted GitHub intake (`harness-intake`), or a comment on the open intake it matches, staged in the post's thread and filed on ✅ under § Two gates; a plain question is simply answered. #uno-bot-sandbox posts stay test traffic.
 
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.

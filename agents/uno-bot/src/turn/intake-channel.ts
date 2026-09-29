@@ -3,9 +3,9 @@
 //
 // Two readers, one rule. The event gate (`slack/events.ts`) engages on a
 // top-level post there with no @mention, and Turn tells the model what such a
-// post is for. Both ask `isIntakeChannel`, so "which channel is #uno-bot" is
-// the Worker's config (`UNO_BOT_CHANNEL_ID`) read in one place, never a
-// literal.
+// post is for. Both ask `isIntakeChannel` against the Worker's config
+// (`UNO_BOT_CHANNEL_ID`), so what counts as a match is decided here and the
+// channel id is never a literal.
 //
 // The drafting itself rides tools that already exist: the duplicate check
 // (`github_intake_search`), the gated `github_issue_create` whose executor
@@ -32,8 +32,8 @@ export function isIntakeChannel(channel: string, configured: string | undefined)
  * in its thread the replier is refining a report someone else opened, so the
  * block names the thread's opener instead.
  */
-export function intakeChannelInstruction(reporter: { userId: string; threaded: boolean }): string {
-  const who = reporter.threaded ? "the person who opened this thread" : `<@${reporter.userId}>`;
+export function intakeChannelInstruction(message: { senderId: string; isReply: boolean }): string {
+  const who = message.isReply ? "the person who opened this thread" : `<@${message.senderId}>`;
   return [
     "(system: INTAKE CHANNEL — this is #uno-bot, where the team reports problems with uno-bot and asks for changes to it.",
     "When the message reports a problem or asks for a change, it is an intake:",

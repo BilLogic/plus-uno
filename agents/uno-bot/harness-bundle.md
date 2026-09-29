@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,792 chars from 16 files**, against an assembled budget of 175,000 (208 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,408 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,853 chars from 16 files**, against an assembled budget of 175,000 (147 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,469 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,897 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,868 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,866 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,858 | 127,766 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 131,019 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,606 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 166,195 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,792 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,919 | 127,827 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 131,080 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,667 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 166,256 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,853 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -889,7 +889,9 @@ Two limits the Worker now handles, worth knowing because they shape what you wri
 |---|---|---|
 | #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
 | #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
-| #uno-bot | `C0ARJ2A3A69` | where the team reports problems with uno-bot and asks for changes to it: a top-level post engages with no @mention, a report or change request becomes a drafted GitHub intake (`harness-intake`, or a comment on the open intake it matches) staged in its thread and filed on ✅, and a plain question is just answered. Also the Figma-sync notifications (docs saying "#figma-sync" mean this channel). #uno-bot-sandbox posts stay test traffic |
+| #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot; Figma-sync notifications (docs saying "#figma-sync" mean this channel) |
+
+#uno-bot is where the team reports problems with uno-bot and asks for changes to it. A top-level post there engages with no @mention. A report or change request becomes a drafted GitHub intake (`harness-intake`), or a comment on the open intake it matches, staged in the post's thread and filed on ✅ under § Two gates; a plain question is simply answered. #uno-bot-sandbox posts stay test traffic.
 
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.

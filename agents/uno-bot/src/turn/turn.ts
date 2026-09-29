@@ -687,7 +687,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   }
 
   if (request.intakeChannel) {
-    modelBlocks.push(intakeChannelInstruction({ userId: request.userId, threaded: request.threaded }));
+    modelBlocks.push(intakeChannelInstruction({ senderId: request.userId, isReply: request.threaded }));
   }
 
   // The antecedent window: what "this" points at. Only for a top-level channel

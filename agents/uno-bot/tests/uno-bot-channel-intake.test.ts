@@ -64,11 +64,12 @@ const sentText = (h: ReturnType<typeof harness>): string =>
 // ── which channel it is ──────────────────────────────────────────────────────
 
 test("#uno-bot is the configured channel, and nothing is when the config is unset", () => {
-  assert.equal(isIntakeChannel("C0UNOBOT", "C0UNOBOT"), true);
-  assert.equal(isIntakeChannel("C0UNOBOT", " C0UNOBOT "), true);
-  assert.equal(isIntakeChannel("C0OTHER", "C0UNOBOT"), false);
-  assert.equal(isIntakeChannel("C0UNOBOT", undefined), false);
-  assert.equal(isIntakeChannel("C0UNOBOT", ""), false);
+  const UNO_BOT = "C0UNOBOT";
+  assert.equal(isIntakeChannel(UNO_BOT, UNO_BOT), true);
+  assert.equal(isIntakeChannel(UNO_BOT, ` ${UNO_BOT} `), true);
+  assert.equal(isIntakeChannel("C0OTHER", UNO_BOT), false);
+  assert.equal(isIntakeChannel(UNO_BOT, undefined), false);
+  assert.equal(isIntakeChannel(UNO_BOT, ""), false);
 });
 
 // ── the turn ─────────────────────────────────────────────────────────────────
@@ -87,7 +88,7 @@ test("a problem report stages one github_issue_create card, in the post's thread
   // The model was told what a post here is for, after the question itself.
   const sent = sentText(h);
   assert.ok(sent.startsWith(REPORT), sent);
-  assert.ok(sent.includes(intakeChannelInstruction({ userId: POSTER, threaded: false })), sent);
+  assert.ok(sent.includes(intakeChannelInstruction({ senderId: POSTER, isReply: false })), sent);
   assert.ok(sent.includes(`<@${POSTER}>`), "the reporter is named for the draft");
 
   // The duplicate check ran, and exactly one card was staged.
@@ -154,9 +155,44 @@ test("a post anywhere else carries no intake instruction", async () => {
 });
 
 test("a reply in the intake thread names the thread's opener as the reporter, not the replier", () => {
-  const block = intakeChannelInstruction({ userId: "U2", threaded: true });
+  const block = intakeChannelInstruction({ senderId: "U2", isReply: true });
   assert.doesNotMatch(block, /<@U2>/);
   assert.match(block, /the person who opened this thread/);
+});
+
+test("a reply in the intake thread that refines the draft stages a revision, which supersedes the card", async () => {
+  const revised = { ...DRAFT, body: `${DRAFT.body}\n\n**Also.** It happened twice today.` };
+  const h = harness({
+    replies: [
+      { text: "Want me to file this?", toolCalls: [{ name: "github_issue_create", args: DRAFT }] },
+      { text: "Updated — want me to file this?", toolCalls: [{ name: "github_issue_create", args: revised }] },
+    ],
+  });
+  const first = await runTurn(intakePost(REPORT), h.deps);
+  const originalTs = first.staged!.proposal.proposalTs;
+  const pending = await h.threadState.getProposalByThread({ channel: CHANNEL, thread: POST_TS });
+
+  const second = await runTurn(
+    request({
+      userId: "U2",
+      conversationTs: POST_TS,
+      replyTs: POST_TS,
+      userMsgTs: "1700000000.000300",
+      threaded: true,
+      text: "add that it happened twice today",
+      pending,
+      intakeChannel: true,
+    }),
+    h.deps,
+  );
+
+  assert.equal(second.disposition, "staged");
+  assert.deepEqual(second.staged!.proposal.input, revised);
+  assert.equal((await h.threadState.getProposalByTs(originalTs)).state, "superseded");
+  const live = await h.threadState.getProposalByThread({ channel: CHANNEL, thread: POST_TS });
+  assert.equal(live?.proposalTs, second.staged!.proposal.proposalTs);
+  // The replier refines; the reporter is still the thread's opener.
+  assert.match(sentText(h), /the person who opened this thread/);
 });
 
 // ── the gate ─────────────────────────────────────────────────────────────────
