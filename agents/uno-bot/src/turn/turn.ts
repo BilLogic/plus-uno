@@ -73,6 +73,7 @@ import {
   inheritedTerms,
   proposalOperations,
   proposalReplyThread,
+  stagingCardOf,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -1301,6 +1302,8 @@ export async function restageExecution(
     input: first.input,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    // The ask's own card, carried across however many re-stagings.
+    originProposalTs: stagingCardOf(original),
   };
   await deps.threadState.putProposal(proposal);
   return { proposal, card };

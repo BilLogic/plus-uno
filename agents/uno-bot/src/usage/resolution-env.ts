@@ -17,7 +17,7 @@ import { rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
 import { conversationsReplies, getBotIdentity, slackReadAs } from "../slack/api";
 import { createD1ResolutionLog } from "./resolution-d1";
-import { batchCompleted, reactionWindow, type AnswerReaction, type ResolutionLog } from "./resolution";
+import { batchCompleted, recordAnswerReaction, type AnswerReaction, type ResolutionLog } from "./resolution";
 import {
   createLeadDmReader,
   runResolutionPass,
@@ -48,17 +48,24 @@ export function resolutionLogFor(env: Pick<Env, "USAGE_DB">): ResolutionLog {
 
 const message = (err: unknown): string => (err instanceof Error ? err.message : String(err));
 
-/** The reaction door's `recordReaction`, bound. Logs and swallows a failed write. */
+/**
+ * The reaction door's `recordReaction`, bound: the answer's thread read on the
+ * bot token, then `recordAnswerReaction`. A budget stop is thrown through, as
+ * everywhere; any other failure is logged and swallowed.
+ */
 export function reactionRecorderFor(env: Env) {
   return async (r: AnswerReaction): Promise<void> => {
     try {
-      await resolutionLogFor(env).recordReaction({
-        channel: r.channel,
-        requesterId: r.userId,
-        ...reactionWindow(r.threadRoot, r.reactedTs),
-        at: Date.now(),
+      await recordAnswerReaction(r, {
+        log: resolutionLogFor(env),
+        async threadOf(channel, rootTs) {
+          const res = await conversationsReplies(env, channel, rootTs, 200);
+          return res.ok && Array.isArray(res.messages) ? res.messages : null;
+        },
+        now: () => Date.now(),
       });
     } catch (err) {
+      rethrowIfBudget(err);
       console.error(`[resolution] reaction not recorded: ${message(err)}`);
     }
   };
@@ -66,7 +73,7 @@ export function reactionRecorderFor(env: Env) {
 
 /**
  * A ✅ batch came back: record `task_completed` on the turn that staged the
- * card, when every approved operation succeeded. Never throws.
+ * card, when every approved operation succeeded. Throws only a budget stop.
  */
 export async function recordTaskCompletion(
   env: Env,
@@ -78,6 +85,7 @@ export async function recordTaskCompletion(
   try {
     await resolutionLogFor(env).recordTaskCompleted(proposalTs, Date.now());
   } catch (err) {
+    rethrowIfBudget(err);
     console.error(`[resolution] task completion not recorded: ${message(err)}`);
   }
 }

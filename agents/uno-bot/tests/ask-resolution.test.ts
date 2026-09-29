@@ -4,18 +4,23 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { runReactionDoor } from "../src/gate/index";
-import { createInMemoryThreadState } from "../src/thread-state/index";
+import { createInMemoryThreadState, stagingCardOf, type PendingProposal } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
+import { restageExecution } from "../src/turn/turn";
 import { createInMemoryUsageLog } from "../src/usage/in-memory";
 import {
+  answeredAskOf,
   batchCompleted,
   isResolvingReaction,
-  reactionWindow,
+  recordAnswerReaction,
   sameTopic,
   type ResolutionLog,
 } from "../src/usage/resolution";
 import { createInMemoryResolutionLog } from "../src/usage/resolution-in-memory";
 import {
+  ASK_RESOLUTION_JOBS,
+  MAX_THREAD_ATTEMPTS,
+  PASS_LIMIT,
   createLeadDmReader,
   runResolutionPass,
   type DmMessage,
@@ -65,12 +70,13 @@ async function pass(
     dms?: DmMessage[] | null;
     lead?: string | null;
     dryRun?: boolean;
+    now?: number;
   } = {},
 ) {
   const dmCalls: string[] = [];
   const summary = await runResolutionPass({
     log: resolutions,
-    now: () => ASK_MS + 25 * HOUR,
+    now: () => opts.now ?? ASK_MS + 25 * HOUR,
     leadUserId: opts.lead === undefined ? LEAD : opts.lead,
     botUserId: async () => BOT,
     threadOf: async () => (opts.thread === undefined ? thread() : opts.thread),
@@ -92,15 +98,15 @@ describe("the resolution rules", () => {
     for (const glyph of ["tada", "eyes", "no_entry", "-1"]) assert.equal(isResolvingReaction(glyph), false);
   });
 
-  it("a reaction looks back to its thread root, or a day when it is in no thread", () => {
-    assert.deepEqual(reactionWindow("1700000000.000000", "1700000100.000000"), {
-      fromMs: 1_700_000_000_000,
-      toMs: 1_700_000_100_000,
-    });
-    assert.deepEqual(reactionWindow("1700000100.000000", "1700000100.000000"), {
-      fromMs: 1_700_000_100_000 - 24 * HOUR,
-      toMs: 1_700_000_100_000,
-    });
+  it("a reacted answer maps to the last person's message before it in its thread", () => {
+    const answer = tsAt(5_000);
+    assert.equal(answeredAskOf("C1", thread(), answer), `C1:${ASK_TS}`);
+    // The bot's interim line between them is not the ask.
+    const withInterim = [thread()[0]!, { ts: tsAt(1_000), user: BOT, bot_id: "B1" }, thread()[1]!];
+    assert.equal(answeredAskOf("C1", withInterim, answer), `C1:${ASK_TS}`);
+    // A top-level post has no thread to map through; a person's message is no answer.
+    assert.equal(answeredAskOf("C1", [thread()[1]!], answer), null);
+    assert.equal(answeredAskOf("C1", thread(), ASK_TS), null);
   });
 
   it("a batch completed only when every approved operation came back ok", () => {
@@ -187,13 +193,7 @@ describe("the end-of-day pass", () => {
 
   it("writes escalated_to_lead on an ask a reaction already resolved, and keeps the reaction", async () => {
     const { resolutions, turn } = await world();
-    await resolutions.recordReaction({
-      channel: "C1",
-      requesterId: ASKER,
-      fromMs: ASK_MS,
-      toMs: ASK_MS + 10_000,
-      at: ASK_MS + 10_000,
-    });
+    await resolutions.recordReaction({ turnId: turn.turnId, requesterId: ASKER, at: ASK_MS + 10_000 });
     await pass(resolutions, { thread: thread({ ts: tsAt(HOUR), user: LEAD, text: "also here" }) });
     const got = await resolutions.getResolution(turn.turnId);
     assert.equal(got?.resolution, "reaction");
@@ -239,11 +239,77 @@ describe("the end-of-day pass", () => {
     assert.equal(got?.resolution, "no_escalation");
   });
 
-  it("an unreadable thread is left for the next pass", async () => {
+  it("an unreadable thread is tried once a day, then recorded none and settled", async () => {
     const { resolutions, turn } = await world();
-    const { summary } = await pass(resolutions, { thread: null });
-    assert.equal(summary.skipped, 1);
-    assert.equal((await resolutions.getResolution(turn.turnId))?.resolutionCheckedAt, null);
+    for (let day = 0; day < MAX_THREAD_ATTEMPTS; day++) {
+      const { summary } = await pass(resolutions, { thread: null, now: ASK_MS + (25 + 24 * day) * HOUR });
+      assert.equal(summary.skipped, 1, `day ${day}`);
+      // Not twice in one run.
+      const again = await pass(resolutions, { thread: null, now: ASK_MS + (26 + 24 * day) * HOUR });
+      assert.equal(again.summary.skipped, 0, `day ${day}, again`);
+    }
+    const got = await resolutions.getResolution(turn.turnId);
+    assert.equal(got?.resolution, "none");
+    assert.equal(got?.resolutionAttempts, MAX_THREAD_ATTEMPTS);
+    assert.notEqual(got?.resolutionCheckedAt, null);
+    const after = await pass(resolutions, { thread: null, now: ASK_MS + (25 + 24 * MAX_THREAD_ATTEMPTS) * HOUR });
+    assert.equal(after.summary.skipped, 0);
+  });
+
+  it("an unreadable thread does not block the asks behind it", async () => {
+    const { usage, resolutions, turn } = await world();
+    const others = Array.from({ length: PASS_LIMIT }, (_, i) =>
+      turnRecord({ turnId: `C1:${tsAt((i + 1) * 60_000)}`, askTs: tsAt((i + 1) * 60_000), askedAt: ASK_MS + (i + 1) * 60_000, proposalId: null }),
+    );
+    for (const t of others) await usage.record(t);
+    const run = async (now: number) =>
+      runResolutionPass({
+        log: resolutions,
+        now: () => now,
+        leadUserId: LEAD,
+        botUserId: async () => BOT,
+        threadOf: async (_c, askTs) => (askTs === ASK_TS ? null : [{ ts: askTs, user: ASKER, text: "q" }]),
+        leadDmsWith: async () => [],
+        dryRun: false,
+      });
+    // The oldest ask is unreadable; the run's second job still reaches the one
+    // the first job's limit left over.
+    await run(ASK_MS + 25 * HOUR);
+    await run(ASK_MS + 25 * HOUR + 60_000);
+    for (const t of others) assert.equal((await resolutions.getResolution(t.turnId))?.resolution, "no_escalation");
+    assert.equal((await resolutions.getResolution(turn.turnId))?.resolutionAttempts, 1);
+  });
+
+  it("60 unknown asks are all read within one end-of-day run's jobs, and again the next day", async () => {
+    const usage = createInMemoryUsageLog();
+    const resolutions = createInMemoryResolutionLog(usage);
+    const asks = Array.from({ length: 60 }, (_, i) =>
+      turnRecord({ turnId: `C1:${tsAt(i * 60_000)}`, askTs: tsAt(i * 60_000), askedAt: ASK_MS + i * 60_000, proposalId: null }),
+    );
+    for (const t of asks) await usage.record(t);
+    const run = async (now: number) =>
+      runResolutionPass({
+        log: resolutions,
+        now: () => now,
+        leadUserId: LEAD,
+        botUserId: async () => BOT,
+        threadOf: async (_c, askTs) => [{ ts: askTs, user: ASKER, text: "q" }],
+        leadDmsWith: null, // no token: every ask stays unknown
+        dryRun: false,
+      });
+    const endOfDay = ASK_MS + 26 * HOUR;
+    for (let job = 0; job < ASK_RESOLUTION_JOBS; job++) {
+      const { checked } = await run(endOfDay + job * 60_000);
+      assert.ok(checked <= PASS_LIMIT);
+    }
+    for (const t of asks) assert.equal((await resolutions.getResolution(t.turnId))?.resolutionAttempts, 1, t.turnId);
+    for (let job = 0; job < ASK_RESOLUTION_JOBS; job++) await run(endOfDay + 24 * HOUR + job * 60_000);
+    for (const t of asks) {
+      const got = await resolutions.getResolution(t.turnId);
+      assert.equal(got?.resolutionAttempts, 2);
+      assert.equal(got?.resolution, "none");
+      assert.equal(got?.resolvedAt, endOfDay + Math.floor(asks.indexOf(t) / PASS_LIMIT) * 60_000);
+    }
   });
 
   it("a dry run reads and writes nothing", async () => {
@@ -343,6 +409,29 @@ describe("the lead's DM reader is read-only", () => {
     assert.equal(slack.calls.length, 1);
   });
 
+  it("a DM list cut off at the page cap is unknown for an asker it did not name", async () => {
+    const slack = fakeSlack({
+      "users.conversations": (params) => ({
+        ok: true,
+        channels: params.cursor === "p2" ? [{ id: "DASKER", user: ASKER }] : [{ id: `D${params.cursor ?? "0"}`, user: `U${params.cursor ?? "0"}` }],
+        response_metadata: { next_cursor: `p${Number((params.cursor ?? "p0").slice(1)) + 1}` },
+      }),
+      "conversations.history": () => ({ ok: true, messages: [] }),
+    });
+    const reader = createLeadDmReader(slack.read);
+    assert.equal(await reader("U-NOT-LISTED", ASK_TS, tsAt(24 * HOUR)), null);
+    // Named inside the pages it did read: that DM is known.
+    assert.deepEqual(await reader(ASKER, ASK_TS, tsAt(24 * HOUR)), []);
+  });
+
+  it("a DM history with more in the window than one page is unknown", async () => {
+    const slack = fakeSlack({
+      "users.conversations": () => IMS,
+      "conversations.history": () => ({ ok: true, messages: [{ ts: tsAt(HOUR), user: ASKER, text: "hi" }], has_more: true }),
+    });
+    assert.equal(await createLeadDmReader(slack.read)(ASKER, ASK_TS, tsAt(24 * HOUR)), null);
+  });
+
   it("a DM history it cannot read is unknown, and the pass records none", async () => {
     const slack = fakeSlack({
       "users.conversations": () => IMS,
@@ -361,73 +450,233 @@ describe("the lead's DM reader is read-only", () => {
     const got = await resolutions.getResolution(turn.turnId);
     assert.equal(got?.resolution, "none");
     assert.equal(got?.escalatedToLead, null);
-    assert.equal(got?.resolutionCheckedAt, null); // read again next pass
+    assert.equal(got?.resolutionCheckedAt, null); // read again next day
   });
 });
 
 describe("the reaction door records the asker's ✅ on an answer", () => {
   const CHANNEL = "C1";
   const ANSWER_TS = tsAt(5_000);
+  const OTHER = "U9";
 
-  async function react(opts: { userId: string; glyph?: string; author?: string }) {
-    const { resolutions, turn } = await world();
+  /** A thread: the reactor's ask, someone else's ask, and the bot's answer to each. */
+  const twoAsks = (): ThreadMessage[] => [
+    { ts: ASK_TS, user: ASKER, text: ASK_TEXT },
+    { ts: tsAt(5_000), user: BOT, bot_id: "B1", text: "It is in Notion." },
+    { ts: tsAt(10_000), user: OTHER, text: "and the fall one?" },
+    { ts: tsAt(15_000), user: BOT, bot_id: "B1", text: "Also in Notion." },
+  ];
+
+  async function react(opts: {
+    userId: string;
+    glyph?: string;
+    author?: string;
+    messageTs?: string;
+    threadRoot?: string;
+    thread?: ThreadMessage[] | null;
+    threadState?: ReturnType<typeof createInMemoryThreadState>;
+  }) {
+    const { usage, resolutions, turn } = await world();
+    const otherTurn = turnRecord({
+      turnId: `C1:${tsAt(10_000)}`,
+      askTs: tsAt(10_000),
+      askedAt: ASK_MS + 10_000,
+      requesterId: OTHER,
+      proposalId: null,
+    });
+    await usage.record(otherTurn);
     const delivery = recordingDelivery();
     const verdicts: unknown[] = [];
+    const recorded: string[] = [];
     await runReactionDoor(
       {
         channel: CHANNEL,
-        messageTs: ANSWER_TS,
+        messageTs: opts.messageTs ?? ANSWER_TS,
         glyph: opts.glyph ?? "white_check_mark",
         userId: opts.userId,
         messageAuthorId: opts.author ?? BOT,
       },
       {
-        threadState: createInMemoryThreadState(),
+        threadState: opts.threadState ?? createInMemoryThreadState(),
         delivery: () => delivery,
-        threadRootOf: async () => ASK_TS,
+        threadRootOf: async () => opts.threadRoot ?? ASK_TS,
         botUserId: async () => BOT,
         applyVerdict: async (v) => {
           verdicts.push(v);
         },
         restage: async () => {},
         async recordReaction(r) {
-          await resolutions.recordReaction({
-            channel: r.channel,
-            requesterId: r.userId,
-            ...reactionWindow(r.threadRoot, r.reactedTs),
-            at: ASK_MS + 10_000,
+          recorded.push(r.reactedTs);
+          await recordAnswerReaction(r, {
+            log: resolutions,
+            threadOf: async () => (opts.thread === undefined ? twoAsks() : opts.thread),
+            now: () => ASK_MS + 20_000,
           });
         },
       },
     );
-    return { got: await resolutions.getResolution(turn.turnId), delivery, verdicts };
+    return {
+      mine: await resolutions.getResolution(turn.turnId),
+      theirs: await resolutions.getResolution(otherTurn.turnId),
+      delivery,
+      verdicts,
+      recorded,
+    };
   }
 
-  it("✅ by the asker records reaction, and resolves no card", async () => {
-    const { got, delivery, verdicts } = await react({ userId: ASKER });
-    assert.equal(got?.resolution, "reaction");
+  it("✅ by the asker on the answer to their ask records reaction, and resolves no card", async () => {
+    const { mine, delivery, verdicts } = await react({ userId: ASKER });
+    assert.equal(mine?.resolution, "reaction");
     assert.deepEqual(verdicts, []);
     assert.deepEqual(delivery.calls, []);
   });
 
   it("👍 by the asker records reaction too", async () => {
-    const { got } = await react({ userId: ASKER, glyph: "+1" });
-    assert.equal(got?.resolution, "reaction");
+    const { mine } = await react({ userId: ASKER, glyph: "+1" });
+    assert.equal(mine?.resolution, "reaction");
   });
 
   it("the same glyph from someone else records nothing, and resolves no card", async () => {
-    const { got, verdicts } = await react({ userId: "U9" });
-    assert.equal(got?.resolution, null);
+    const { mine, theirs, verdicts } = await react({ userId: "U5" });
+    assert.equal(mine?.resolution, null);
+    assert.equal(theirs?.resolution, null);
     assert.deepEqual(verdicts, []);
   });
 
+  it("a 👍 on the answer to someone else's question never resolves the reactor's own ask", async () => {
+    const { mine, theirs } = await react({ userId: ASKER, glyph: "+1", messageTs: tsAt(15_000) });
+    assert.equal(mine?.resolution, null);
+    assert.equal(theirs?.resolution, null);
+  });
+
+  it("the other asker's ✅ on the answer to their question resolves theirs, not the thread's first", async () => {
+    const { mine, theirs } = await react({ userId: OTHER, messageTs: tsAt(15_000) });
+    assert.equal(theirs?.resolution, "reaction");
+    assert.equal(mine?.resolution, null);
+  });
+
+  it("a top-level bot post, or a thread it cannot read, records nothing", async () => {
+    const topLevel = await react({ userId: ASKER, threadRoot: ANSWER_TS });
+    assert.equal(topLevel.mine?.resolution, null);
+    const unreadable = await react({ userId: ASKER, thread: null });
+    assert.equal(unreadable.mine?.resolution, null);
+  });
+
+  it("an ask in another thread of the same channel is never resolved from this one", async () => {
+    // This thread holds only someone else's ask and its answer; the reactor's
+    // own ask (the world's turn) sits in a different thread.
+    const elsewhere: ThreadMessage[] = [
+      { ts: tsAt(10_000), user: OTHER, text: "and the fall one?" },
+      { ts: tsAt(15_000), user: BOT, bot_id: "B1", text: "Also in Notion." },
+    ];
+    const { mine } = await react({ userId: ASKER, threadRoot: tsAt(10_000), messageTs: tsAt(15_000), thread: elsewhere });
+    assert.equal(mine?.resolution, null);
+  });
+
   it("a ✅ on a message the bot did not write records nothing", async () => {
-    const { got } = await react({ userId: ASKER, author: "U9" });
-    assert.equal(got?.resolution, null);
+    const { mine } = await react({ userId: ASKER, author: "U9" });
+    assert.equal(mine?.resolution, null);
   });
 
   it("a party popper records nothing", async () => {
-    const { got } = await react({ userId: ASKER, glyph: "tada" });
-    assert.equal(got?.resolution, null);
+    const { mine } = await react({ userId: ASKER, glyph: "tada" });
+    assert.equal(mine?.resolution, null);
+  });
+
+  describe("when the gate did anything at all, nothing is recorded", () => {
+    const card = (over: Partial<PendingProposal> = {}): PendingProposal => ({
+      toolName: "github_issue_create",
+      input: { title: "t" },
+      channel: CHANNEL,
+      threadTs: ASK_TS,
+      replyTs: ASK_TS,
+      userMsgTs: ASK_TS,
+      proposalTs: tsAt(8_000),
+      proposalText: "card",
+      requesterUserId: ASKER,
+      ...over,
+    });
+
+    it("a ✅ on an answer while a card is live in the thread gets a pointer, and no reaction", async () => {
+      const threadState = createInMemoryThreadState();
+      await threadState.putProposal(card());
+      const { mine, recorded, delivery } = await react({ userId: ASKER, threadState });
+      assert.equal(mine?.resolution, null);
+      assert.deepEqual(recorded, []);
+      assert.ok(delivery.calls.length > 0, "the pointer was posted");
+    });
+
+    it("a refused confirmer's ✅ on the card records no reaction", async () => {
+      const threadState = createInMemoryThreadState();
+      await threadState.putProposal(card({ proposalTs: ANSWER_TS, confirmers: ["U-SOMEONE"] }));
+      const { mine, recorded } = await react({ userId: ASKER, threadState });
+      assert.equal(mine?.resolution, null);
+      assert.deepEqual(recorded, []);
+    });
+
+    it("a ✅ on a card another card replaced records no reaction", async () => {
+      // The reacted message was a card, now superseded: the gate says so.
+      // (A which-card question is asked only of a typed emoji, never a reaction.)
+      const threadState = createInMemoryThreadState();
+      await threadState.putProposal(card({ proposalTs: ANSWER_TS }));
+      await threadState.putProposal(card({ proposalTs: tsAt(9_000) }));
+      const { mine, recorded } = await react({ userId: ASKER, threadState });
+      assert.equal(mine?.resolution, null);
+      assert.deepEqual(recorded, []);
+    });
+  });
+});
+
+describe("a re-staged card still resolves the ask that staged the first one", () => {
+  it("carries the original card through each re-staging, and task_completed lands on the ask", async () => {
+    const usage = createInMemoryUsageLog();
+    const resolutions = createInMemoryResolutionLog(usage);
+    const turn = turnRecord({ turnId: `C1:${ASK_TS}`, askTs: ASK_TS, askedAt: ASK_MS, proposalId: "P0" });
+    await usage.record(turn);
+
+    const original: PendingProposal = {
+      toolName: "github_issue_create",
+      input: { title: "t", body: "b" },
+      operations: [{ toolName: "github_issue_create", input: { title: "t", body: "b" } }],
+      channel: "C1",
+      threadTs: ASK_TS,
+      replyTs: ASK_TS,
+      userMsgTs: ASK_TS,
+      proposalTs: "P0",
+      proposalText: "card",
+      requesterUserId: ASKER,
+    };
+    const deps = {
+      threadState: createInMemoryThreadState(),
+      delivery: recordingDelivery(),
+      cards: {
+        async notionRevision() {
+          return null;
+        },
+        async notionTarget() {
+          return null;
+        },
+        async designPreviewImage() {
+          return null;
+        },
+        async issueTarget() {
+          return { repo: "BilLogic/plus-uno", visibility: "public" as const };
+        },
+        async workflowTarget() {
+          return { repo: "BilLogic/plus-uno", branch: "main" };
+        },
+      },
+    } as unknown as Parameters<typeof restageExecution>[1];
+    const once = await restageExecution({ proposal: original, operations: original.operations! }, deps);
+    assert.ok(once);
+    assert.notEqual(once.proposal.proposalTs, "P0");
+    assert.equal(once.proposal.originProposalTs, "P0");
+    const twice = await restageExecution({ proposal: once.proposal, operations: original.operations! }, deps);
+    assert.equal(twice?.proposal.originProposalTs, "P0");
+
+    // What `runVerdict` records on, for the re-staged card.
+    assert.equal(stagingCardOf(twice!.proposal), "P0");
+    assert.equal(await resolutions.recordTaskCompleted(stagingCardOf(twice!.proposal), ASK_MS + HOUR), turn.turnId);
+    assert.equal(stagingCardOf(original), "P0");
   });
 });

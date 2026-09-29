@@ -3,8 +3,7 @@
 //
 // Same discipline as `./d1.ts`: bound parameters only, and every statement
 // charged to the meter before it is sent (`chargeD1Query`). Each write is one
-// `UPDATE … RETURNING turn_id`, so finding the row and changing it is one
-// statement and one charge.
+// `UPDATE`, so finding the row and changing it is one statement and one charge.
 
 import { chargeD1Query } from "../net";
 import type { AskResolution, PassCandidate, ResolutionLog } from "./resolution";
@@ -21,42 +20,60 @@ export interface ResolutionDatabase {
   };
 }
 
-// First signal wins; `none` gives way to a real one.
-const OPEN = "(resolution IS NULL OR resolution = 'none')";
+// What a person's signal may replace: nothing yet, or the pass's own answer.
+const PERSON_OPEN = "(resolution IS NULL OR resolution IN ('none', 'no_escalation'))";
 
-// The channel's turn ids are the half-open range [`C…:`, `C…;`) — `;` sorts
-// straight after `:` — so the lookup walks the primary key, and a channel id is
-// bound, never matched with LIKE.
 const RECORD_REACTION =
-  `UPDATE turns SET resolution = 'reaction', resolved_at = ? ` +
-  `WHERE turn_id = (SELECT turn_id FROM turns ` +
-  `WHERE turn_id >= ? AND turn_id < ? AND requester_id = ? AND asked_at BETWEEN ? AND ? ` +
-  `ORDER BY asked_at DESC LIMIT 1) AND ${OPEN} RETURNING turn_id`;
+  `UPDATE turns SET resolution = 'reaction', resolved_at = ?1 ` +
+  `WHERE turn_id = ?2 AND requester_id = ?3 AND ${PERSON_OPEN} RETURNING turn_id`;
 
 const RECORD_TASK =
-  `UPDATE turns SET resolution = 'task_completed', resolved_at = ? ` +
-  `WHERE proposal_id = ? AND ${OPEN} RETURNING turn_id`;
+  `UPDATE turns SET resolution = 'task_completed', resolved_at = ?1 ` +
+  `WHERE proposal_id = ?2 AND ${PERSON_OPEN} RETURNING turn_id`;
 
 const PENDING =
-  `SELECT turn_id, requester_id, ask_ts, asked_at, resolution FROM turns ` +
-  `WHERE resolution_checked_at IS NULL AND test_traffic = 0 AND asked_at > ? AND asked_at <= ? ` +
-  `ORDER BY asked_at LIMIT ?`;
+  `SELECT turn_id, requester_id, ask_ts, asked_at, resolution, resolution_attempts FROM turns ` +
+  `WHERE resolution_checked_at IS NULL AND test_traffic = 0 AND asked_at > ?1 AND asked_at <= ?2 ` +
+  `AND (resolution_attempted_at IS NULL OR resolution_attempted_at <= ?3) ` +
+  `ORDER BY asked_at LIMIT ?4`;
 
-// The pass only ever settles an OPEN ask, and `escalated_to_lead` is its own.
-// An ask whose escalation it could not tell stays in the queue.
+// ?1 at · ?2 escalated (0/1/null) · ?3 resolution (or null) · ?4 settled (0/1) · ?5 turn.
+// The pass's answer replaces only its own (PERSON_OPEN is exactly that set);
+// `resolved_at` moves only when the resolution itself changes, so a re-read to
+// the same verdict writes nothing but the attempt. SQLite evaluates every SET
+// against the row as it was, so the CASEs all see the old `resolution`.
 const RECORD_PASS =
-  `UPDATE turns SET resolution_checked_at = CASE WHEN ?2 IS NULL THEN NULL ELSE ?1 END, escalated_to_lead = ?2, ` +
-  `resolved_at = CASE WHEN ?3 IS NOT NULL AND ${OPEN} THEN ?1 ELSE resolved_at END, ` +
-  `resolution = CASE WHEN ?3 IS NOT NULL AND ${OPEN} THEN ?3 ELSE resolution END ` +
-  `WHERE turn_id = ?4`;
+  `UPDATE turns SET resolution_attempts = resolution_attempts + 1, resolution_attempted_at = ?1, ` +
+  `resolution_checked_at = CASE WHEN ?4 = 1 THEN ?1 ELSE resolution_checked_at END, ` +
+  `escalated_to_lead = COALESCE(?2, escalated_to_lead), ` +
+  `resolved_at = CASE WHEN ${PERSON_OPEN} THEN ` +
+  `(CASE WHEN ?3 IS NULL THEN NULL WHEN resolution IS ?3 THEN resolved_at ELSE ?1 END) ELSE resolved_at END, ` +
+  `resolution = CASE WHEN ${PERSON_OPEN} THEN ?3 ELSE resolution END ` +
+  `WHERE turn_id = ?5`;
 
 const GET =
-  `SELECT resolution, resolved_at, escalated_to_lead, resolution_checked_at FROM turns WHERE turn_id = ?`;
+  `SELECT resolution, resolved_at, escalated_to_lead, resolution_checked_at, resolution_attempts, ` +
+  `resolution_attempted_at FROM turns WHERE turn_id = ?`;
 
-type PendingRow = { turn_id: unknown; requester_id: unknown; ask_ts: unknown; asked_at: unknown; resolution: unknown };
-type ResolutionRow = { resolution: unknown; resolved_at: unknown; escalated_to_lead: unknown; resolution_checked_at: unknown };
+type PendingRow = {
+  turn_id: unknown;
+  requester_id: unknown;
+  ask_ts: unknown;
+  asked_at: unknown;
+  resolution: unknown;
+  resolution_attempts: unknown;
+};
+type ResolutionRow = {
+  resolution: unknown;
+  resolved_at: unknown;
+  escalated_to_lead: unknown;
+  resolution_checked_at: unknown;
+  resolution_attempts: unknown;
+  resolution_attempted_at: unknown;
+};
 
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
+const personResolved = (r: unknown): boolean => r === "reaction" || r === "task_completed";
 
 export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): ResolutionLog {
   const { db } = deps;
@@ -67,16 +84,17 @@ export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): Resolut
   };
   return {
     recordReaction(q) {
-      return changedTurnId(
-        db.prepare(RECORD_REACTION).bind(q.at, `${q.channel}:`, `${q.channel};`, q.requesterId, q.fromMs, q.toMs),
-      );
+      return changedTurnId(db.prepare(RECORD_REACTION).bind(q.at, q.turnId, q.requesterId));
     },
     recordTaskCompleted(proposalId, at) {
       return changedTurnId(db.prepare(RECORD_TASK).bind(at, proposalId));
     },
     async pendingPass(q) {
       chargeD1Query();
-      const { results } = await db.prepare(PENDING).bind(q.askedAfter, q.askedBefore, q.limit).all<PendingRow>();
+      const { results } = await db
+        .prepare(PENDING)
+        .bind(q.askedAfter, q.askedBefore, q.attemptedBefore, q.limit)
+        .all<PendingRow>();
       return results.map(
         (r): PassCandidate => ({
           turnId: String(r.turn_id),
@@ -84,14 +102,18 @@ export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): Resolut
           channel: channelOfTurnId(String(r.turn_id)),
           askTs: String(r.ask_ts),
           askedAt: Number(r.asked_at),
-          resolved: r.resolution != null && r.resolution !== "none",
+          resolved: personResolved(r.resolution),
+          attempts: Number(r.resolution_attempts),
         }),
       );
     },
     async recordPass(turnId, outcome, at) {
       chargeD1Query();
       const escalated = outcome.escalatedToLead === null ? null : outcome.escalatedToLead ? 1 : 0;
-      await db.prepare(RECORD_PASS).bind(at, escalated, outcome.resolution, turnId).run();
+      await db
+        .prepare(RECORD_PASS)
+        .bind(at, escalated, outcome.resolution, outcome.settled ? 1 : 0, turnId)
+        .run();
     },
     async getResolution(turnId) {
       chargeD1Query();
@@ -103,6 +125,8 @@ export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): Resolut
         resolvedAt: numOrNull(row.resolved_at),
         escalatedToLead: escalated === null ? null : escalated === 1,
         resolutionCheckedAt: numOrNull(row.resolution_checked_at),
+        resolutionAttempts: Number(row.resolution_attempts ?? 0),
+        resolutionAttemptedAt: numOrNull(row.resolution_attempted_at),
       };
     },
   };

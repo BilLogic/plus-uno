@@ -15,6 +15,8 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -70,7 +72,12 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   ],
   "end-of-day": [
     { key: "figma-library-poll", kind: "figma-library-poll" },
-    { key: "ask-resolution", kind: "ask-resolution" },
+    // One alarm reads `PASS_LIMIT` asks; the run holds enough jobs for a day's
+    // (src/usage/resolution-pass.ts states the budget math).
+    ...Array.from({ length: ASK_RESOLUTION_JOBS }, (_, i) => ({
+      key: `ask-resolution-${i + 1}`,
+      kind: "ask-resolution" as const,
+    })),
   ],
 };
 

@@ -42,7 +42,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   // The dependency set is the whole of what a firing can do.
   const deps: Parameters<typeof onScheduledFiring>[1] = { enqueueRun: async () => {} };
   assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
-  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), ["figma-library-poll", "ask-resolution"]);
+  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs[0]?.kind, "figma-library-poll");
 });
 
 test("14:00 UTC enqueues the morning run and 22:00 UTC the end-of-day run", async () => {
@@ -87,7 +87,13 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
   const endOfDay = planRun("end-of-day", at(22, 0));
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [
     ["figma-library-poll", "figma-library-poll"],
-    ["ask-resolution", "ask-resolution"],
+    // One job per `PASS_LIMIT` asks (src/usage/resolution-pass.ts).
+    ["ask-resolution-1", "ask-resolution"],
+    ["ask-resolution-2", "ask-resolution"],
+    ["ask-resolution-3", "ask-resolution"],
+    ["ask-resolution-4", "ask-resolution"],
+    ["ask-resolution-5", "ask-resolution"],
+    ["ask-resolution-6", "ask-resolution"],
   ]);
 });
 

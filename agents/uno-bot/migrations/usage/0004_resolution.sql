@@ -10,7 +10,7 @@
 ALTER TABLE turns ADD COLUMN resolution TEXT
   CHECK (resolution IN ('reaction', 'task_completed', 'no_escalation', 'none'));
 
--- When the resolving signal arrived.
+-- When the current resolution was first recorded.
 ALTER TABLE turns ADD COLUMN resolved_at INTEGER;
 
 -- True when the lead replied in the thread, or the asker DMed the lead on the
@@ -19,11 +19,17 @@ ALTER TABLE turns ADD COLUMN resolved_at INTEGER;
 ALTER TABLE turns ADD COLUMN escalated_to_lead INTEGER
   CHECK (escalated_to_lead IN (0, 1));
 
--- When the end-of-day pass settled the ask's escalation. Null is its queue: an
--- ask whose DM half it could not read is written and read again next pass.
+-- When the end-of-day pass settled the ask. Null is its queue: an ask whose DM
+-- half it could not read stays queued and is read again, at most once a day.
 ALTER TABLE turns ADD COLUMN resolution_checked_at INTEGER;
 
--- The pass's queue: real asks it has not read. Partial, like the classifier's.
+-- Every read the pass makes, settled or not: how many, and the last. The last
+-- is what moves a pass past what it already read today; the count is what
+-- lets it give up on a thread it cannot read.
+ALTER TABLE turns ADD COLUMN resolution_attempts INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE turns ADD COLUMN resolution_attempted_at INTEGER;
+
+-- The pass's queue: real asks it has not settled. Partial, like the classifier's.
 CREATE INDEX turns_resolution_unchecked ON turns (asked_at)
   WHERE resolution_checked_at IS NULL AND test_traffic = 0;
 

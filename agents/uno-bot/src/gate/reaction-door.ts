@@ -134,12 +134,16 @@ export async function runReactionDoor(
     { threadState: deps.threadState },
   );
 
-  // Not a card, and a bot answer: the self-serve signal. Recorded beside the
-  // verdict, never instead of it — a card is still resolved only by a
-  // reaction placed ON it.
+  // Not a card, and a bot answer: the self-serve signal. Only when the gate did
+  // nothing at all — no claim, nothing to say, no card it points at — so a
+  // refusal, a "not on the card" pointer or a which-card question never also
+  // counts as "that answered it". A card is still resolved only by a reaction
+  // placed ON it.
   if (
     deps.recordReaction &&
     verdict.outcome === "none" &&
+    !verdict.post &&
+    !verdict.proposal &&
     self !== undefined &&
     request.messageAuthorId === self &&
     isResolvingReaction(request.glyph)

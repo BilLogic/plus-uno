@@ -12,6 +12,12 @@
 //
 // `none` is the pass saying it could not tell: without the lead's own token
 // there is no reading the DM half, and a guess would be a false self-serve.
+// The pass's answers are provisional — a later read, or a person's own signal,
+// replaces them — while a person's signal is final.
+//
+// A reaction is mapped to its ask by THREAD (`answeredAskOf`), never by channel
+// and time, so a 👍 on the answer to someone else's question never resolves the
+// reactor's own ask.
 //
 // The same pass writes `escalated_to_lead`: true when the lead replied in the
 // thread, or the asker DMed the lead on the same topic, within 24 h. Self-serve
@@ -36,12 +42,24 @@ export type ResolutionSignal = "reaction" | "task_completed" | "no_escalation" |
 export interface AskResolution {
   /** Null while nothing has resolved the ask. */
   resolution: ResolutionSignal | null;
-  /** When the resolving signal arrived, epoch ms. */
+  /** When the current resolution was first recorded, epoch ms. */
   resolvedAt: number | null;
   /** Null until the pass has read the thread and the DMs, or when it could not. */
   escalatedToLead: boolean | null;
-  /** When the end-of-day pass settled the ask's escalation, epoch ms. */
+  /** When the end-of-day pass settled the ask, epoch ms. Null is its queue. */
   resolutionCheckedAt: number | null;
+  /** How many times the pass has read the ask. */
+  resolutionAttempts: number;
+  /** When the pass last read it, epoch ms. */
+  resolutionAttemptedAt: number | null;
+}
+
+/** A message in a Slack thread, as the bot token reads it. */
+export interface ThreadMessage {
+  ts: string;
+  user?: string;
+  bot_id?: string;
+  text?: string;
 }
 
 /** The asker's ✅ / 👍 on a bot answer, as the reaction door hands it over. */
@@ -64,44 +82,55 @@ export interface PassCandidate {
   askedAt: number;
   /** True when a reaction or a completed task already resolved it. */
   resolved: boolean;
+  /** How many times the pass has read it before. */
+  attempts: number;
 }
 
 /** What the pass decided for one ask. */
 export interface PassOutcome {
-  /** `no_escalation` or `none` for an unresolved ask it could settle; null leaves it as it was. */
+  /**
+   * `no_escalation`, or `none` when it could not tell; null when the ask was
+   * not self-served (a person replied, or the asker went to the lead).
+   */
   resolution: "no_escalation" | "none" | null;
   escalatedToLead: boolean | null;
+  /** Leave the queue: the escalation is known, or the pass has given up. */
+  settled: boolean;
 }
 
 /**
  * Where resolutions are written.
  *
- * FIRST SIGNAL WINS: a resolved ask keeps the signal that resolved it, except
- * `none`, which is the absence of an answer and gives way to a real one. Every
- * write names the row it changed (its turn id), or null when no row matched.
- * A caller treats a throw as a lost record, never as a lost action.
+ * FIRST SIGNAL WINS for the signals a person gives (a reaction, a completed
+ * task): a resolved ask keeps the one that resolved it. The pass's own answers
+ * (`no_escalation`, `none`, or none at all) are provisional until a person's
+ * signal arrives, so a later pass may replace them. Every write names the row it
+ * changed (its turn id), or null when no row matched. A caller treats a throw as
+ * a lost record, never as a lost action.
  */
 export interface ResolutionLog {
   /**
-   * The asker's ✅ / 👍 on an answer: resolves their latest ask in `channel`
-   * made inside the window. Someone else's reaction matches no row.
+   * The asker's ✅ / 👍 on an answer. `turnId` is the ask the answer answers
+   * (`answeredAskOf`); it is resolved only when `requesterId` asked it.
    */
-  recordReaction(q: {
-    channel: string;
-    requesterId: string;
-    fromMs: number;
-    toMs: number;
-    at: number;
-  }): Promise<string | null>;
+  recordReaction(q: { turnId: string; requesterId: string; at: number }): Promise<string | null>;
   /** A ✅-approved batch completed: resolves the turn that staged the card. */
   recordTaskCompleted(proposalId: string, at: number): Promise<string | null>;
-  /** Non-test asks the pass has not handled, asked inside the window, oldest first. */
-  pendingPass(q: { askedAfter: number; askedBefore: number; limit: number }): Promise<PassCandidate[]>;
   /**
-   * The pass's verdict on one ask. It leaves the queue only once its escalation
-   * is known: a verdict with `escalatedToLead: null` (the DM half unread) is
-   * written, and the ask is read again on the next pass, so a `none` becomes a
-   * real answer once the lead's token is connected.
+   * Non-test asks the pass has not settled, asked inside the window and not
+   * read since `attemptedBefore`, oldest first.
+   */
+  pendingPass(q: {
+    askedAfter: number;
+    askedBefore: number;
+    attemptedBefore: number;
+    limit: number;
+  }): Promise<PassCandidate[]>;
+  /**
+   * One read of one ask: counts the attempt, writes the verdict, and takes the
+   * ask off the queue when `settled`. Re-reading to the same verdict changes
+   * nothing but the attempt: `resolvedAt` is when the current resolution was
+   * first recorded.
    */
   recordPass(turnId: string, outcome: PassOutcome, at: number): Promise<void>;
   /** One ask's resolution columns, or null when there is no such turn. */
@@ -128,13 +157,51 @@ export function tsToMs(ts: string): number {
 }
 
 /**
- * Which asks a reaction on an answer can be about: those made in its thread
- * before it — from the thread root to the reacted message. A message in no
- * thread (an unthreaded DM line) looks back one escalation window instead.
+ * The ask a reacted bot answer answers, as a turn id — or null when there is
+ * no safe mapping.
+ *
+ * By THREAD, never by channel and time: the answer is in a reply thread, and
+ * the ask it answers is the last person's message in that thread before it
+ * (the bot's own messages between them are its interim lines). A 👍 on the
+ * answer to someone else's question therefore points at THEIR ask, and the
+ * requester check in `recordReaction` records nothing. A top-level bot post
+ * (the answer is its own thread root) has no thread to read, so no mapping.
+ *
+ * @param channel - Where the answer is
+ * @param thread - The answer's whole thread, oldest first, root included
+ * @param reactedTs - The reacted answer
  */
-export function reactionWindow(threadRoot: string, reactedTs: string): { fromMs: number; toMs: number } {
-  const toMs = tsToMs(reactedTs);
-  return { fromMs: threadRoot === reactedTs ? toMs - ESCALATION_WINDOW_MS : tsToMs(threadRoot), toMs };
+export function answeredAskOf(channel: string, thread: readonly ThreadMessage[], reactedTs: string): string | null {
+  const root = thread[0]?.ts;
+  if (!root || root === reactedTs) return null;
+  const reacted = thread.find((m) => m.ts === reactedTs);
+  if (!reacted?.bot_id) return null;
+  const before = thread.filter((m) => tsToMs(m.ts) < tsToMs(reactedTs) && m.user && !m.bot_id);
+  const ask = before[before.length - 1];
+  return ask ? `${channel}:${ask.ts}` : null;
+}
+
+/**
+ * Record a reaction on an answer: read its thread, find the ask, and resolve it
+ * when the reactor asked it. Records nothing for a top-level post or a thread
+ * it cannot read.
+ *
+ * @param r - The reaction
+ * @param deps - The log, the thread read (null when unreadable) and the clock
+ */
+export async function recordAnswerReaction(
+  r: AnswerReaction,
+  deps: {
+    log: Pick<ResolutionLog, "recordReaction">;
+    threadOf(channel: string, rootTs: string): Promise<ThreadMessage[] | null>;
+    now(): number;
+  },
+): Promise<string | null> {
+  if (r.threadRoot === r.reactedTs) return null;
+  const thread = await deps.threadOf(r.channel, r.threadRoot);
+  if (!thread) return null;
+  const turnId = answeredAskOf(r.channel, thread, r.reactedTs);
+  return turnId ? deps.log.recordReaction({ turnId, requesterId: r.userId, at: deps.now() }) : null;
 }
 
 /**

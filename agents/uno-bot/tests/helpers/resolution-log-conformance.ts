@@ -8,7 +8,7 @@
 import assert from "node:assert/strict";
 
 import type { UsageLog } from "../../src/usage/store";
-import type { ResolutionLog } from "../../src/usage/resolution";
+import type { AskResolution, ResolutionLog } from "../../src/usage/resolution";
 import { turnRecord, type ConformanceRunner } from "./usage-log-conformance";
 
 const HOUR = 60 * 60 * 1000;
@@ -21,6 +21,18 @@ function ask(offsetMs: number, over: Parameters<typeof turnRecord>[0] = {}) {
   return turnRecord({ turnId: `C1:${askTs}`, askTs, askedAt, proposalId: null, ...over });
 }
 
+const EMPTY: AskResolution = {
+  resolution: null,
+  resolvedAt: null,
+  escalatedToLead: null,
+  resolutionCheckedAt: null,
+  resolutionAttempts: 0,
+  resolutionAttemptedAt: null,
+};
+
+/** The whole queue, whatever was attempted when. */
+const everything = { askedAfter: T0 - 1, askedBefore: T0 + 100 * HOUR, attemptedBefore: T0 + 100 * HOUR, limit: 100 };
+
 export function runResolutionLogConformance(
   label: string,
   make: () => { usage: UsageLog; resolutions: ResolutionLog },
@@ -32,49 +44,24 @@ export function runResolutionLogConformance(
     const { usage, resolutions } = make();
     const turn = ask(0);
     await usage.record(turn);
-    assert.deepEqual(await resolutions.getResolution(turn.turnId), {
-      resolution: null,
-      resolvedAt: null,
-      escalatedToLead: null,
-      resolutionCheckedAt: null,
-    });
+    assert.deepEqual(await resolutions.getResolution(turn.turnId), EMPTY);
     assert.equal(await resolutions.getResolution("C1:0"), null);
   });
 
-  it("the asker's reaction resolves their latest ask in the window, and nobody else's", async () => {
+  it("a reaction resolves the named ask only when the reactor asked it", async () => {
     const { usage, resolutions } = make();
-    const earlier = ask(0);
-    const latest = ask(60_000);
-    const someoneElse = ask(90_000, { requesterId: "U2" });
-    const elsewhere = ask(95_000, { turnId: `C9:${((T0 + 95_000) / 1000).toFixed(6)}` });
-    for (const t of [earlier, latest, someoneElse, elsewhere]) await usage.record(t);
+    const turn = ask(0);
+    await usage.record(turn);
+    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U2", at: T0 + HOUR }), null);
+    assert.equal(await resolutions.recordReaction({ turnId: "C1:0", requesterId: "U1", at: T0 + HOUR }), null);
+    assert.equal(await resolutions.getResolution(turn.turnId).then((r) => r?.resolution), null);
 
-    const window = { channel: "C1", fromMs: T0, toMs: T0 + 100_000, at: T0 + 100_000 };
-    assert.equal(await resolutions.recordReaction({ ...window, requesterId: "U3" }), null);
-    assert.equal(await resolutions.recordReaction({ ...window, requesterId: "U1" }), latest.turnId);
-
-    assert.deepEqual(await resolutions.getResolution(latest.turnId), {
+    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", at: T0 + HOUR }), turn.turnId);
+    assert.deepEqual(await resolutions.getResolution(turn.turnId), {
+      ...EMPTY,
       resolution: "reaction",
-      resolvedAt: T0 + 100_000,
-      escalatedToLead: null,
-      resolutionCheckedAt: null,
+      resolvedAt: T0 + HOUR,
     });
-    assert.equal((await resolutions.getResolution(earlier.turnId))?.resolution, null);
-    assert.equal((await resolutions.getResolution(someoneElse.turnId))?.resolution, null);
-    assert.equal((await resolutions.getResolution(elsewhere.turnId))?.resolution, null);
-  });
-
-  it("an ask outside the window is not the one a reaction is about", async () => {
-    const { usage, resolutions } = make();
-    await usage.record(ask(0));
-    const missed = await resolutions.recordReaction({
-      channel: "C1",
-      requesterId: "U1",
-      fromMs: T0 + 1,
-      toMs: T0 + HOUR,
-      at: T0 + HOUR,
-    });
-    assert.equal(missed, null);
   });
 
   it("a completed batch resolves the turn that staged its card", async () => {
@@ -86,20 +73,22 @@ export function runResolutionLogConformance(
     assert.equal((await resolutions.getResolution(staging.turnId))?.resolution, "task_completed");
   });
 
-  it("the first signal wins, and none gives way to a real one", async () => {
+  it("a person's first signal wins, and replaces the pass's provisional answer", async () => {
     const { usage, resolutions } = make();
     const turn = ask(0, { proposalId: "1700000000.000900" });
     await usage.record(turn);
-    await resolutions.recordPass(turn.turnId, { resolution: "none", escalatedToLead: null }, T0 + 25 * HOUR);
+    await resolutions.recordPass(turn.turnId, { resolution: "none", escalatedToLead: null, settled: false }, T0 + 25 * HOUR);
     assert.equal((await resolutions.getResolution(turn.turnId))?.resolution, "none");
 
     assert.equal(await resolutions.recordTaskCompleted("1700000000.000900", T0 + 26 * HOUR), turn.turnId);
-    const window = { channel: "C1", requesterId: "U1", fromMs: T0, toMs: T0 + HOUR, at: T0 + 27 * HOUR };
-    assert.equal(await resolutions.recordReaction(window), null);
+    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", at: T0 + 27 * HOUR }), null);
+    // A later pass does not overwrite a person's signal.
+    await resolutions.recordPass(turn.turnId, { resolution: "no_escalation", escalatedToLead: false, settled: true }, T0 + 49 * HOUR);
 
     const got = await resolutions.getResolution(turn.turnId);
     assert.equal(got?.resolution, "task_completed");
     assert.equal(got?.resolvedAt, T0 + 26 * HOUR);
+    assert.equal(got?.escalatedToLead, false);
   });
 
   it("a turn's own retried write leaves its resolution alone", async () => {
@@ -111,7 +100,7 @@ export function runResolutionLogConformance(
     assert.equal((await resolutions.getResolution(turn.turnId))?.resolution, "task_completed");
   });
 
-  it("the pass queue is real, unchecked asks in the window, oldest first", async () => {
+  it("the pass queue is real, unsettled asks in the window, oldest first", async () => {
     const { usage, resolutions } = make();
     const old = ask(0);
     const resolved = ask(HOUR, { proposalId: "1700000000.000900" });
@@ -120,9 +109,9 @@ export function runResolutionLogConformance(
     for (const t of [tooNew, resolved, test, old]) await usage.record(t);
     await resolutions.recordTaskCompleted("1700000000.000900", T0 + 2 * HOUR);
 
-    const pending = await resolutions.pendingPass({ askedAfter: T0 - 1, askedBefore: T0 + 24 * HOUR, limit: 10 });
-    assert.deepEqual(pending, [
-      { turnId: old.turnId, requesterId: "U1", channel: "C1", askTs: old.askTs, askedAt: old.askedAt, resolved: false },
+    const window = { ...everything, askedBefore: T0 + 24 * HOUR };
+    assert.deepEqual(await resolutions.pendingPass(window), [
+      { turnId: old.turnId, requesterId: "U1", channel: "C1", askTs: old.askTs, askedAt: old.askedAt, resolved: false, attempts: 0 },
       {
         turnId: resolved.turnId,
         requesterId: "U1",
@@ -130,13 +119,33 @@ export function runResolutionLogConformance(
         askTs: resolved.askTs,
         askedAt: resolved.askedAt,
         resolved: true,
+        attempts: 0,
       },
     ]);
-    const one = await resolutions.pendingPass({ askedAfter: T0 - 1, askedBefore: T0 + 24 * HOUR, limit: 1 });
+    const one = await resolutions.pendingPass({ ...window, limit: 1 });
     assert.deepEqual(one.map((c) => c.turnId), [old.turnId]);
   });
 
-  it("the pass settles an open ask, marks it handled, and never overwrites a real resolution", async () => {
+  it("every read counts; the queue skips an ask read since attemptedBefore", async () => {
+    const { usage, resolutions } = make();
+    const a = ask(0);
+    const b = ask(HOUR);
+    for (const t of [a, b]) await usage.record(t);
+    await resolutions.recordPass(a.turnId, { resolution: "none", escalatedToLead: null, settled: false }, T0 + 30 * HOUR);
+
+    const sameRun = await resolutions.pendingPass({ ...everything, attemptedBefore: T0 + 10 * HOUR });
+    assert.deepEqual(sameRun.map((c) => c.turnId), [b.turnId]);
+    const nextDay = await resolutions.pendingPass({ ...everything, attemptedBefore: T0 + 30 * HOUR });
+    assert.deepEqual(
+      nextDay.map((c) => [c.turnId, c.attempts]),
+      [
+        [a.turnId, 1],
+        [b.turnId, 0],
+      ],
+    );
+  });
+
+  it("the pass settles an open ask, and never overwrites a person's signal", async () => {
     const { usage, resolutions } = make();
     const open = ask(0);
     const resolved = ask(HOUR, { proposalId: "1700000000.000900" });
@@ -144,59 +153,76 @@ export function runResolutionLogConformance(
     await resolutions.recordTaskCompleted("1700000000.000900", T0 + 2 * HOUR);
 
     const at = T0 + 30 * HOUR;
-    await resolutions.recordPass(open.turnId, { resolution: "no_escalation", escalatedToLead: false }, at);
-    await resolutions.recordPass(resolved.turnId, { resolution: "no_escalation", escalatedToLead: true }, at);
+    await resolutions.recordPass(open.turnId, { resolution: "no_escalation", escalatedToLead: false, settled: true }, at);
+    await resolutions.recordPass(resolved.turnId, { resolution: null, escalatedToLead: true, settled: true }, at);
 
     assert.deepEqual(await resolutions.getResolution(open.turnId), {
       resolution: "no_escalation",
       resolvedAt: at,
       escalatedToLead: false,
       resolutionCheckedAt: at,
+      resolutionAttempts: 1,
+      resolutionAttemptedAt: at,
     });
     assert.deepEqual(await resolutions.getResolution(resolved.turnId), {
       resolution: "task_completed",
       resolvedAt: T0 + 2 * HOUR,
       escalatedToLead: true,
       resolutionCheckedAt: at,
+      resolutionAttempts: 1,
+      resolutionAttemptedAt: at,
     });
-    const pending = await resolutions.pendingPass({ askedAfter: T0 - 1, askedBefore: at, limit: 10 });
-    assert.deepEqual(pending, []);
+    assert.deepEqual(await resolutions.pendingPass(everything), []);
   });
 
-  it("a pass that leaves an ask open still marks it handled", async () => {
+  it("re-reading an unknown ask is idempotent: none stays none from its first time", async () => {
     const { usage, resolutions } = make();
     const turn = ask(0);
     await usage.record(turn);
-    await resolutions.recordPass(turn.turnId, { resolution: null, escalatedToLead: false }, T0 + 30 * HOUR);
-    assert.deepEqual(await resolutions.getResolution(turn.turnId), {
-      resolution: null,
-      resolvedAt: null,
-      escalatedToLead: false,
-      resolutionCheckedAt: T0 + 30 * HOUR,
-    });
-  });
-
-  it("an ask whose escalation is unknown is written and stays queued", async () => {
-    const { usage, resolutions } = make();
-    const turn = ask(0);
-    await usage.record(turn);
-    await resolutions.recordPass(turn.turnId, { resolution: "none", escalatedToLead: null }, T0 + 30 * HOUR);
+    const unknown = { resolution: "none", escalatedToLead: null, settled: false } as const;
+    await resolutions.recordPass(turn.turnId, unknown, T0 + 25 * HOUR);
+    await resolutions.recordPass(turn.turnId, unknown, T0 + 49 * HOUR);
     assert.deepEqual(await resolutions.getResolution(turn.turnId), {
       resolution: "none",
-      resolvedAt: T0 + 30 * HOUR,
+      resolvedAt: T0 + 25 * HOUR,
       escalatedToLead: null,
       resolutionCheckedAt: null,
+      resolutionAttempts: 2,
+      resolutionAttemptedAt: T0 + 49 * HOUR,
     });
-    const pending = await resolutions.pendingPass({ askedAfter: T0 - 1, askedBefore: T0 + 30 * HOUR, limit: 10 });
-    assert.deepEqual(
-      pending.map((c) => [c.turnId, c.resolved]),
-      [[turn.turnId, false]],
-    );
+  });
 
-    // The next pass reads the DMs, and the real answer replaces `none`.
-    await resolutions.recordPass(turn.turnId, { resolution: "no_escalation", escalatedToLead: false }, T0 + 54 * HOUR);
-    const got = await resolutions.getResolution(turn.turnId);
-    assert.equal(got?.resolution, "no_escalation");
-    assert.equal(got?.resolutionCheckedAt, T0 + 54 * HOUR);
+  it("an escalation learned on a later read is stored as if learned on the first", async () => {
+    const { usage, resolutions } = make();
+    const late = ask(0);
+    const early = ask(HOUR);
+    const lateNull = ask(2 * HOUR);
+    const earlyNull = ask(3 * HOUR);
+    for (const t of [late, early, lateNull, earlyNull]) await usage.record(t);
+    const unknown = { resolution: "none", escalatedToLead: null, settled: false } as const;
+    const selfServed = { resolution: "no_escalation", escalatedToLead: false, settled: true } as const;
+    const escalated = { resolution: null, escalatedToLead: true, settled: true } as const;
+    const at = T0 + 49 * HOUR;
+
+    await resolutions.recordPass(late.turnId, unknown, T0 + 25 * HOUR);
+    await resolutions.recordPass(late.turnId, selfServed, at);
+    await resolutions.recordPass(early.turnId, selfServed, at);
+    await resolutions.recordPass(lateNull.turnId, unknown, T0 + 25 * HOUR);
+    await resolutions.recordPass(lateNull.turnId, escalated, at);
+    await resolutions.recordPass(earlyNull.turnId, escalated, at);
+
+    const shape = async (id: string) => {
+      const { resolutionAttempts: _n, ...rest } = (await resolutions.getResolution(id))!;
+      return rest;
+    };
+    assert.deepEqual(await shape(late.turnId), await shape(early.turnId));
+    assert.deepEqual(await shape(lateNull.turnId), await shape(earlyNull.turnId));
+    assert.deepEqual(await shape(lateNull.turnId), {
+      resolution: null,
+      resolvedAt: null,
+      escalatedToLead: true,
+      resolutionCheckedAt: at,
+      resolutionAttemptedAt: at,
+    });
   });
 }
