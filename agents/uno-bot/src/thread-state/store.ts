@@ -233,6 +233,27 @@ export interface PendingProposal {
    * written rather than read as "unset".
    */
   confirmers?: string[];
+  /**
+   * What a ⛔ still runs, when the card says so. Absent — every turn's card —
+   * a cancel runs nothing. Only a card the Worker stages itself sets it: the
+   * Figma library card files its intake whichever way it is decided and only
+   * the implementation waits on the ✅ (`figma-library/post.ts`). The card's
+   * own copy states it, since a cancel that does something is not what any
+   * other card means by one.
+   */
+  onCancel?: ProposalOperation[];
+}
+
+/**
+ * The proposal a won ⛔ runs as: its `onCancel` batch in place of its own,
+ * with no cancel run of its own — so the execution record, a cut-off note and
+ * any re-staged card all describe what the cancel actually started.
+ */
+export function cancelRunOf(proposal: PendingProposal): PendingProposal | null {
+  const operations = proposal.onCancel;
+  if (!operations?.length) return null;
+  const { onCancel: _onCancel, ...rest } = proposal;
+  return { ...rest, operations, toolName: operations[0]!.toolName, input: operations[0]!.input };
 }
 
 /** A card's own terms: how long it lives and who may confirm it. Both

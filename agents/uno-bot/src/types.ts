@@ -44,13 +44,15 @@ export interface Env {
    *  `integrations/repo-list.mjs`. Unset → `GITHUB_REPO` alone. */
   GITHUB_REPOS?: string;
   FIGMA_ACCESS_TOKEN: string;
-  // Figma library poll (figma-poll.ts, cron-fired). Both optional — unset →
-  // the poll logs a skip and does nothing. FIGMA_FILE_KEY is the DS file
-  // (non-secret: it's in every shared Figma URL); UNO_BOT_CHANNEL_ID is where
-  // the "🎨 Figma Design System Updated" card lands (#uno-bot). It is also the
-  // intake channel (`turn/intake-channel.ts`): a top-level post there engages
-  // with no @mention. Unset → there is no intake channel either.
+  // Figma library jobs (figma-poll.ts at end of day, figma-library/ in the
+  // morning). Both optional — unset → the job logs a skip and does nothing.
+  // FIGMA_FILE_KEY is the DS file (non-secret: it's in every shared Figma URL);
+  // PLUS_UNIVERSAL_CHANNEL_ID is #plus-universal, where a publish's card lands
+  // and whose members may confirm it.
   FIGMA_FILE_KEY?: string;
+  PLUS_UNIVERSAL_CHANNEL_ID?: string;
+  /** #uno-bot, the intake channel (`turn/intake-channel.ts`): a top-level post
+   *  there engages with no @mention. Unset → there is no intake channel. */
   UNO_BOT_CHANNEL_ID?: string;
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;

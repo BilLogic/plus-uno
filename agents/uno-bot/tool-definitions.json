@@ -482,7 +482,7 @@
   },
   {
     "name": "component_implement",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Open a draft PR that implements a named design-system component change, by triggering the figma-implement GitHub Action. Use it when the designer names a specific DS-library component with clear build/update intent ('implement Badge', 'go ahead with the Badge change') — the ask names a component, so the call carries a component name, a PRD and optional notes. Two prerequisites, checked before staging: the component exists under design-system/src/components (github_read confirms it), and a Notion PRD is in hand — the polling bot creates one and posts it in #uno-bot; if that notification is already in the thread the Worker reads it from there, otherwise ask for the PRD link and pass it as notion_prd_url. With either missing, say which and stage nothing. 'Check / look at / compare' a component is a question, answered in words.",
+    "description": "SIDE EFFECT, routed through the confirmation gate. Open a draft PR that implements a named design-system component change, by triggering the figma-implement GitHub Action. Use it when the designer names a specific DS-library component with clear build/update intent ('implement Badge', 'go ahead with the Badge change') — the ask names a component, so the call carries a component name, a PRD and optional notes. Two prerequisites, checked before staging: the component exists under design-system/src/components (github_read confirms it), and a Notion PRD is in hand — if the thread's root links one the Worker reads it from there, otherwise ask for the PRD link and pass it as notion_prd_url. A Figma library publish is not this tool's ask: uno-bot posts its own card for that in #plus-universal. With either missing, say which and stage nothing. 'Check / look at / compare' a component is a question, answered in words.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -496,7 +496,7 @@
         },
         "notion_prd_url": {
           "type": "string",
-          "description": "The Notion PRD link for this change. Usually read automatically from the polling-bot notification in the thread — only set this when the designer pastes a PRD link themselves."
+          "description": "The Notion PRD link for this change. Read automatically when the thread's root links a PRD — only set this when the designer pastes a PRD link themselves."
         },
         "notes": {
           "type": "string",
