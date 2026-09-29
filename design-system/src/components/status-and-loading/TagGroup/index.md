@@ -40,7 +40,7 @@ From `design-system/src/components/status-and-loading/TagGroup/TagGroup.scss`. O
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Tag` · `Tile`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Status` · `Tag` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

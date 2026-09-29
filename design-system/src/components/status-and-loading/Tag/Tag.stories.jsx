@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
-import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Tag, { TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
 
 /**
@@ -39,18 +40,6 @@ export default {
 const row = { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
-
-const px = (v) => parseFloat(v);
-
-/** What a token resolves to as a computed color, read through a probe. */
-const tokenColor = (host, token) => {
-    const probe = document.createElement('span');
-    probe.style.backgroundColor = `var(${token})`;
-    host.appendChild(probe);
-    const value = getComputedStyle(probe).backgroundColor;
-    probe.remove();
-    return value;
-};
 
 /** A computed style property of `measured` while `target` is forced into `pseudo`. */
 const whileForced = (target, pseudo, property, measured = target) =>

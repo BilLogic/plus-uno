@@ -37,6 +37,7 @@ export { default as Sidebar } from './_internal/Sidebar/Sidebar';
 export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 
 export { default as Spinner } from '@/components/status-and-loading/Spinner';
+export { default as Status } from '@/components/status-and-loading/Status';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 
 export { default as Tag } from '@/components/status-and-loading/Tag';

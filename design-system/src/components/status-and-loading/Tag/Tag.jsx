@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useLayoutEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Count from '../Count';
 import Tooltip from '../../overlays/Tooltip';
+import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './Tag.scss';
 
 /**
@@ -67,26 +68,6 @@ const warn = (message) => {
     console.warn(message);
 };
 
-/*
- * Only a label that is really clipped gets a tooltip. With a 180 cap on every
- * tag, a tooltip on every tag would repeat what most of them already show.
- */
-const useTruncated = (ref, deps) => {
-    const [truncated, setTruncated] = useState(false);
-    useLayoutEffect(() => {
-        const el = ref.current;
-        if (!el) return undefined;
-        const measure = () => setTruncated(el.scrollWidth > el.clientWidth);
-        measure();
-        if (typeof ResizeObserver === 'undefined') return undefined;
-        const observer = new ResizeObserver(measure);
-        observer.observe(el);
-        return () => observer.disconnect();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, deps);
-    return truncated;
-};
-
 export const Tag = ({
     text,
     children,
@@ -112,7 +93,9 @@ export const Tag = ({
     const { isDisabled = false } = useTagContext() || {};
     const label = children ?? text;
     const labelRef = useRef(null);
-    const truncated = useTruncated(labelRef, [label, maxWidth]);
+    // Only a clipped label gets a tooltip: with a 180 cap on every tag, a
+    // tooltip on every tag would repeat what most of them already show.
+    const truncated = useIsTruncated(labelRef, [label, maxWidth]);
 
     let resolvedColor = color;
     if (DEPRECATED_COLORS[resolvedColor]) {
