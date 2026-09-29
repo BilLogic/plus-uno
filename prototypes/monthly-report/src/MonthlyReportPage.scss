@@ -359,11 +359,6 @@
     margin-bottom: 0 !important;
 }
 
-.insight-alert-icon {
-    margin-right: var(--size-element-gap-sm);
-    font-size: 20px;
-}
-
 /* ============================================
    TIME ALLOCATION SECTION
    ============================================ */
@@ -1259,10 +1254,6 @@
     border: none;
     border-left: 4px solid var(--color-tertiary, #0e8175);
     border-radius: 4px;
-}
-
-.insight-alert .insight-alert-icon {
-    color: var(--color-on-tertiary-container, var(--color-on-surface));
 }
 
 .training-grid {

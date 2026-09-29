@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import Alert from '@/components/messaging/Alert';
 
 /**
- * Dismissible primary alert banner for login session messages.
+ * Dismissible primary alert banner for login session messages. The Login page
+ * shows it with no title and no leading icon, so the default icon is off.
  *
  * @param {object} props
  * @param {React.ReactNode} props.children - Alert message content.
@@ -13,7 +14,7 @@ import Alert from '@/components/messaging/Alert';
  */
 export default function LoginAlertBanner({ children, dismissable = true }) {
     return (
-        <Alert style="primary" dismissable={dismissable}>
+        <Alert style="primary" leadingVisual={false} dismissable={dismissable}>
             {children}
         </Alert>
     );

@@ -61,8 +61,18 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 ## Appearance
 
-<DocsCanvasShell description={<>Semantic styles with title and dismissible chrome.</>}>
+<DocsCanvasShell description={<>The six styles, each with its default leading icon, a title and the ×.</>}>
     <DsCanvasQuiet of={AlertStories.Styles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Leading icon
+
+<DocsCanvasShell description={<>Each style's default icon on the first line of text, replaced by name or node, and removed with <code>leadingVisual={'{false}'}</code>.</>}>
+    <DsCanvasQuiet of={AlertStories.LeadingIcon} />
 </DocsCanvasShell>
 
 </div>
@@ -115,8 +125,21 @@ notice that a report is out of date, a confirmation that survives a scroll. It
 takes children, so the message can carry a link or emphasis.
 
 Six styles: `primary`, `secondary`, `success`, `danger`, `warning`, `info`. That
-list is shorter than `Button`'s — there is no `tertiary` and there are no SMART
-domain colors, because an alert is always saying something about state.
+list is shorter than `Button`'s — there is no `tertiary`, no `light` or `dark`,
+and there are no SMART domain colors, because an alert is always saying
+something about state.
+
+Each style sets the border and a default leading icon, drawn in the style's
+Icon color on the first line of text:
+
+| Style | Default icon |
+|---|---|
+| `primary` | `circle-info` |
+| `secondary` | `circle-info` |
+| `success` | `circle-check` |
+| `danger` | `circle-exclamation` |
+| `warning` | `triangle-exclamation` |
+| `info` | `circle-info` |
 
 </div>
 
@@ -155,6 +178,21 @@ domain colors, because an alert is always saying something about state.
 <Alert style="warning" dismissible={false}>This term's schedule is provisional.</Alert>
 ```
 
+### Replace the icon through `leadingVisual`, not the children.
+
+```jsx
+// Incorrect — the style's default icon still renders, so this alert has two,
+// and the one in the children sits in the text instead of on the first line.
+<Alert style="success"><i className="fa-solid fa-trophy" /> Goal reached.</Alert>
+
+// Correct — a Font Awesome solid name (or a node) replaces the default.
+<Alert style="success" leadingVisual="trophy">Goal reached.</Alert>
+
+// Correct — `false` removes it, for a short one-line message such as the
+// sign-in alerts on the Login page.
+<Alert style="warning" leadingVisual={false}>Sign-in didn't complete. Please try again.</Alert>
+```
+
 ### Dismissal is one-way.
 
 ```jsx
@@ -186,8 +224,13 @@ domain colors, because an alert is always saying something about state.
 - **The dismiss button is labeled `Close alert`**, hard-coded. It is the
   shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`, centered
   on the title line when there is a title and on the first body line otherwise.
-- **Style is colour only.** Six palettes, no icon and no text prefix, so
-  `style="danger"` on its own does not say "error". Say it in the children.
+- **The leading icon is decorative.** It is `aria-hidden`, whether it is the
+  default or one you pass: the alert's role and its text already say what it
+  is. The icon differs in shape per style, so danger and warning do not rely
+  on color alone to look different, but a screen reader hears neither the
+  icon nor the style.
+- **So say it in the children.** There is no text prefix, so
+  `style="danger"` on its own does not say "error" to a screen reader.
 
 </div>
 

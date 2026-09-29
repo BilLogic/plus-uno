@@ -495,8 +495,7 @@ export default function MonthlyReportContent() {
                                     </div>
                                 </div>
                                 {reportData.keyInsight && (
-                                    <Alert style="tertiary" dismissable={false} className="insight-alert">
-                                        <i className="fa-solid fa-trophy insight-alert-icon"></i>
+                                    <Alert style="tertiary" leadingVisual="trophy" dismissable={false} className="insight-alert">
                                         {reportData.keyInsight}
                                     </Alert>
                                 )}
@@ -559,8 +558,7 @@ export default function MonthlyReportContent() {
                 {/* Peer Average */}
                 {/* Recommended Range Nudge */}
                 <div style={{ marginTop: 'var(--size-element-gap-xs)' }}>
-                    <Alert style="tertiary" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
-                        <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: 'var(--size-element-gap-sm)' }}></i>
+                    <Alert style="tertiary" leadingVisual="lightbulb" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
                         <span>
                             We noticed you spent <strong>18%</strong> of your session time Observing, which is above our recommended range (8-12%).
                             Consider transitioning into guided questioning earlier to keep students actively reasoning.
@@ -600,9 +598,8 @@ export default function MonthlyReportContent() {
 
                     {/* November Growth Banner - appears between title and insights */}
                     {reportData.isHighImprovement && (
-                        <Alert style="success" dismissable={false} className="insight-alert">
+                        <Alert style="success" leadingVisual="seedling" dismissable={false} className="insight-alert">
                             <div style={{ marginBottom: 0 }}>
-                                <i className="fa-solid fa-seedling insight-alert-icon"></i>
                                 This month has several areas for development. Remember, growth takes time and practice—let's focus on one skill at a time. Start with the insight marked "Start Here" below.
                             </div>
                         </Alert>
@@ -610,8 +607,7 @@ export default function MonthlyReportContent() {
 
                     {/* December Empty State */}
                     {reportData.isLowData ? (
-                        <Alert style="tertiary" dismissable={false}>
-                            <i className="fa-solid fa-info-circle insight-alert-icon"></i>
+                        <Alert style="tertiary" leadingVisual="circle-info" dismissable={false}>
                             <div>
                                 <strong>Limited data this month.</strong> We need at least 5 recorded sessions to generate personalized growth insights. Keep up the great work, and we'll have more detailed feedback for you next month!
                             </div>
