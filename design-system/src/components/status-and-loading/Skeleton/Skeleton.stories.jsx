@@ -84,6 +84,10 @@ export const LabelPresets = () => (
             <Skeleton preset="tag" data-testid="tag" />
             <Tag text="Algebra" />
         </span>
+        <span style={pair}>
+            <Skeleton preset="tag-person" data-testid="tag-person" />
+            <Tag type="person">Rosa Chen</Tag>
+        </span>
     </div>
 );
 LabelPresets.play = async ({ canvasElement }) => {
@@ -96,6 +100,7 @@ LabelPresets.play = async ({ canvasElement }) => {
         ['status-spacious', statusLarge],
         ['count', labelOf(canvas.getByText('12'))],
         ['tag', tag],
+        ['tag-person', labelOf(canvas.getByText('Rosa Chen'))],
     ];
 
     for (const [preset, label] of pairs) {
@@ -113,21 +118,9 @@ LabelPresets.play = async ({ canvasElement }) => {
     const count = canvas.getByTestId('count');
     await expect(box(count).width, 'count is a circle').toBe(box(count).height);
     await expect(box(canvas.getByTestId('tag')).height).toBe(22);
-};
-
-/**
- * The person Tag preset on its own: a Tag's height, fully round. It is not
- * paired with a label until the person Tag is in code.
- */
-export const PersonTagPreset = () => (
-    <Skeleton preset="tag-person" data-testid="tag-person" />
-);
-PersonTagPreset.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const person = canvas.getByTestId('tag-person');
-    await expect(box(person).height, 'tag-person is the Tag height, 22').toBe(22);
+    await expect(box(person).height).toBe(22);
     await expect(radius(person), 'tag-person is fully round').toBeGreaterThanOrEqual(box(person).height / 2);
-    await expectInert(person, 'tag-person');
 };
 
 /** A preset wins over `shape`: a label preset is one bar, whatever `shape` and `lines` say. */

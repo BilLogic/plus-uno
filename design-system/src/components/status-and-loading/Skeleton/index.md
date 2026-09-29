@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, PersonTagPreset, PresetWinsOverShape, TagGroupPreset, Shapes, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, IgnoredPropsWarn, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, PresetWinsOverShape, TagGroupPreset, Shapes, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, IgnoredPropsWarn, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx`
 
