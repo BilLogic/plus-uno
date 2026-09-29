@@ -204,4 +204,29 @@ describe("[durable-object] the cut-off alarm", () => {
     await fire();
     expect(await runInDurableObject(stub, (_o, state) => state.storage.get("event:old"))).toBeUndefined();
   });
+
+  // The daily sweep measures a card, and the execution it became, by the
+  // card's own TTL: a 72 h card collected by the default hour would be gone
+  // the first night.
+  it("the daily sweep keeps a 72 h record at 71 h and deletes it at 73 h", async () => {
+    const HOUR_MS = 60 * 60 * 1000;
+    const long: PendingProposal = { ...PROPOSAL, ttlMs: 72 * HOUR_MS };
+    const keys = (stub: ReturnType<typeof namespace.get>) =>
+      runInDurableObject(stub, async (_o, state) => [
+        (await state.storage.get("prop:1700.2")) !== undefined,
+        (await state.storage.get("exec:1700.2")) !== undefined,
+      ]);
+
+    for (const [ageHours, kept] of [
+      [71, true],
+      [73, false],
+    ] as const) {
+      const { store, stub, fire } = fresh(() => Date.now() - ageHours * HOUR_MS);
+      await store.putProposal(long);
+      await store.beginExecution(long);
+      await runInDurableObject(stub, (_o, state) => state.storage.put("gc:next", Date.now() - 1));
+      await fire();
+      expect(await keys(stub)).toEqual([kept, kept]);
+    }
+  });
 });

@@ -229,8 +229,9 @@ export type GateNote =
   | { kind: "said"; text: string }
   /** The lost race: someone else's confirmation got there first. */
   | { kind: "already-resolved" }
-  /** A ✅ on a card that aged out of the store. */
-  | { kind: "expired" }
+  /** A ✅ on a card that aged out of the store. `ttlMs` is the card's own
+   *  lifetime when it set one; absent, it lived the default hour. */
+  | { kind: "expired"; ttlMs?: number }
   /** A ✅ on a card a revision replaced (#573). */
   | { kind: "superseded" }
   /** A reaction that landed somewhere other than the card it claims: say where
@@ -239,6 +240,10 @@ export type GateNote =
   /** A gate emoji typed outside any card's thread, in a DM holding several
    *  live cards: ask which one, and resolve none of them. */
   | { kind: "which-card"; count: number }
+  /** A signal from someone outside the card's confirmer set: resolve
+   *  nothing, and name who can. `userId` is who was refused, when the signal
+   *  carried one. */
+  | { kind: "not-a-confirmer"; confirmers: string[]; userId?: string }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string }
   /**

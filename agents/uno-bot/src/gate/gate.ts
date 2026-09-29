@@ -34,7 +34,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -95,6 +95,13 @@ export type GateSignal =
       pending: PendingProposal;
       decision: Decision;
       messageToUser?: string;
+      /**
+       * The person whose turn the model is acting in — checked against the
+       * card's confirmer set like every other door's `userId`. Optional only
+       * because a card with no set has nothing to check it against; a card
+       * with one refuses a model signal that does not say who is acting.
+       */
+      userId?: string;
     };
 
 // ── The verdict ──────────────────────────────────────────────────────────────
@@ -128,9 +135,10 @@ export interface GateExecution {
  *   `stale` — someone else already resolved it, or it aged out. `post.note`
  *             says which; nothing is executed.
  *   `none`  — there is nothing here to resolve: the glyph carries no decision,
- *             or the reaction sits somewhere other than the card. `post` is
- *             the pointer to the live card when there is one to point at, and
- *             null when silence is the right answer.
+ *             the reaction sits somewhere other than the card, or the signal
+ *             came from someone outside the card's confirmer set. `post` is
+ *             the pointer to the live card, or who can confirm it, when there
+ *             is something to say, and null when silence is the right answer.
  *
  * `decision` is set whenever the signal carried or parsed one, which is how a
  * caller tells "not a gate emoji" (absent) from "a gate emoji that resolved
@@ -205,15 +213,16 @@ function replyTarget(proposal: PendingProposal): string {
  *
  * The order is fixed and is the whole of the gate's policy: read the decision
  * the signal carries, find the proposal it is about (by card ts, then by
- * reply thread, then — for an unthreaded DM line — the whole DM), check a reaction is on the card it claims to be, claim, and
- * only then describe what to run.
+ * reply thread, then — for an unthreaded DM line — the whole DM), check a reaction is on the card it claims to be, check
+ * the signal's person may confirm it, claim, and only then describe what to
+ * run.
  */
 export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise<GateVerdict> {
   // The model's call has already been validated against the thread's pending
   // state by the loop, and carries the proposal itself — there is nothing to
   // look up, only the claim.
   if (signal.kind === "model") {
-    return claim(signal.pending, signal.decision, deps, signal.messageToUser);
+    return claim(signal.pending, signal.decision, signal.userId, deps, signal.messageToUser);
   }
 
   // Parse before any read: a 🎉 in a thread that happens to hold a proposal is
@@ -245,7 +254,12 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
     return {
       outcome: "stale",
       decision,
-      post: { note: { kind: "expired" }, replyTs: replyTargetOf(signal) },
+      post: {
+        // The card's own lifetime rides along when it had one, so the note
+        // says how long it was live rather than assuming the hour.
+        note: { kind: "expired", ...(found.ttlMs !== undefined ? { ttlMs: found.ttlMs } : {}) },
+        replyTs: replyTargetOf(signal),
+      },
     };
   }
 
@@ -306,16 +320,39 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
     };
   }
 
-  return claim(proposal, decision, deps);
+  return claim(proposal, decision, signal.userId, deps);
 }
 
 /** The claim, and the verdict that follows from it. */
 async function claim(
   proposal: PendingProposal,
   decision: Decision,
+  userId: string | undefined,
   deps: GateDeps,
   narrative?: string,
 ): Promise<GateVerdict> {
+  // A card with a confirmer set resolves only for its members, on every door.
+  // Checked BEFORE the claim, because the claim consumes the card: a refused
+  // signal has to leave it exactly as it was for the person who may confirm.
+  // `none`, not `stale` — nobody else resolved it and it has not aged out;
+  // this signal was simply not one the card accepts.
+  if (!mayConfirm(proposal, userId)) {
+    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
+    return {
+      outcome: "none",
+      proposal,
+      decision,
+      post: {
+        note: {
+          kind: "not-a-confirmer",
+          confirmers: [...(proposal.confirmers ?? [])],
+          ...(userId ? { userId } : {}),
+        },
+        replyTs: replyTarget(proposal),
+      },
+    };
+  }
+
   // A person who reacts ✅ and then, unsure it registered, also types "go
   // ahead" runs two handlers that each loaded this same record. Whoever loses
   // here must not post the winner's narrative and above all must not execute.
@@ -447,7 +484,7 @@ async function locate(
 ): Promise<
   | { state: "found"; proposal: PendingProposal }
   | { state: "superseded" }
-  | { state: "expired" }
+  | { state: "expired"; ttlMs?: number }
   | { state: "cut-off"; execution: Execution }
   | { state: "several"; count: number }
   | { state: "none" }
@@ -466,7 +503,7 @@ async function locate(
     // the proposal I am holding", when what actually happened is that the card
     // they acted on was replaced.
     if (byTs.state === "superseded") return { state: "superseded" };
-    if (byTs.state === "expired") return { state: "expired" };
+    if (byTs.state === "expired") return byTs;
     // No card under this ts — and the claim that consumed it may belong to a
     // run that was cut off. Only a gesture ON the stuck card asks this: a
     // reaction anywhere else must not collect another card's note.
