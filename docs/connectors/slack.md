@@ -28,15 +28,16 @@ The Worker's one proactive read of channels, whose rules the bot reads through `
 
 - **Read path.** At the 22:00 UTC end-of-day run, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
   - `conversations.info` first: a private channel is skipped, and a DM or group DM stays unread;
-  - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then.
-  - The cursor lives in D1 (`sweep_cursors`) and moves after each thread, so a job stopped by the budget resumes where it stopped.
+  - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then, also in pages of 200.
+  - The cursor lives in D1 (`sweep_cursors`) and moves after each thread, so a job stopped by the budget resumes where it stopped. A history read that reaches its page cap holds the cursor at the oldest root it read, and a thread past the reply-page cap is left with a note in `sweep_runs`.
   - #uno-bot stays off the read path, whatever the list says.
 - **Audience rule.** A finding reaches only people who could already see its evidence:
   - a public thread's finding is posted in that thread;
   - a private channel's stays there, and a DM's goes back to that DM;
   - findings in no thread go to #plus-universal for the design system and to #plus-design otherwise (`pickDestination` in `agents/uno-bot/src/sweep/finding.ts`).
   - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
-- **Cards** post at the next weekday 14:00 UTC run, one per source thread per day and up to 10 fixes each. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.
+- **Cards** post at the next weekday 14:00 UTC run: one live card per thread, up to 10 fixes, and the rest queued until it resolves. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.
+- **Posted means staged.** A card starts only when the invocation's budget covers it; its items are recorded, it is posted tagged with its key in message metadata, staged, then marked posted. A retry finds a posted-but-unstaged card by that tag and finishes it; a staging that fails outright edits the card to say it did not go through and releases its items.
 <!-- /ide-only -->
 
 ## Share-out post

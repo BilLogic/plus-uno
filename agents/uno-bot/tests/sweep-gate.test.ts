@@ -14,6 +14,7 @@ import { countedFetch, runMetered, subrequestsUsed } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import {
   recordSweepResolution,
+  recordSweepRestage,
   recordSweepRevision,
   runSweepJob,
   type SweepSource,
@@ -170,6 +171,32 @@ test("a ⛔ drops every item; a revision keeps what it kept and drops the rest",
       assert.deepEqual([item.status, item.proposalTs], ["dropped", revised.card.proposalTs]);
     } else {
       assert.deepEqual([item.status, item.proposalTs], ["proposed", revision.proposalTs], item.blockId);
+      assert.equal(item.postedAt, at(30, 15), "the revision's 72 h start when it is staged");
     }
+  }
+});
+
+test("a card staged beside a sweep card, not in its place, moves and drops none of its items", async () => {
+  const { h, card } = await stagedCard(2);
+  const beside: PendingProposal = {
+    ...card,
+    proposalTs: "1790776900.000001",
+    operations: [{ toolName: "github_issue_create", input: { title: "Card copy" } }],
+    sweepRun: undefined,
+  };
+  assert.deepEqual(await recordSweepRevision(h.store, card, beside, at(30, 15)), { kept: 0, dropped: 0 });
+  assert.ok(h.store.items().every((i) => i.status === "proposed" && i.proposalTs === card.proposalTs));
+});
+
+test("a cut-off sweep card re-staged moves the items still to run to the fresh card, and leaves the rest", async () => {
+  const { h, card } = await stagedCard(3);
+  const [done, ...toRun] = card.operations!;
+  const fresh: PendingProposal = { ...card, proposalTs: "1790777000.000001", operations: toRun };
+  assert.equal(await recordSweepRestage(h.store, card, fresh, at(30, 16)), 2);
+  const doneBlock = (done!.input.replace as Array<{ block_id: string }>)[0]!.block_id;
+  for (const item of h.store.items()) {
+    assert.equal(item.status, "proposed");
+    assert.equal(item.proposalTs, item.blockId === doneBlock ? card.proposalTs : fresh.proposalTs, item.blockId);
+    if (item.blockId !== doneBlock) assert.equal(item.postedAt, at(30, 16), "the fresh card's 72 h start now");
   }
 });

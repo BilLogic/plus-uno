@@ -87,7 +87,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
-import { sweepCardInstruction } from "../sweep/cards";
+import { replacedBlocks, sweepCardInstruction } from "../sweep/cards";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -422,6 +422,13 @@ export interface TurnDeps {
      *  default branch could not be read, and the card says so. */
     workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; branch: string | null } | null>;
   };
+
+  /**
+   * Told when a cut-off run is re-staged as a fresh card (`restageExecution`),
+   * so a record kept against the old card's ts can follow it — the sweep's
+   * items do (`sweep/outcomes.ts`). Best-effort; absent, nothing follows.
+   */
+  onRestaged?(from: PendingProposal, to: PendingProposal): Promise<void>;
 
   /**
    * One page of the conversation before this message, for the antecedent
@@ -1115,14 +1122,21 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     );
   }
 
+  // The card this one revises. Every pending card, except a sweep card: a
+  // batch that replaces none of its blocks is some other ask made in the
+  // thread — filing an issue, say — and stages as its own card beside it
+  // (`proposalSlot`), inheriting none of its terms.
+  const replaced =
+    request.pending?.sweepRun && !touchesBlocksOf(result.operations, request.pending) ? null : request.pending;
+
   // A card that names its confirmers is revised only by one of them. A
   // revision keeps the card's confirmer set, so one staged by anyone else could
   // never run — and staging it would still retire the card its owners can
   // confirm. So it is refused, and the card stays live exactly as it was.
   // #uno-bot is the exception: there a reply joins the confirmer set
   // (`intake-channel.ts`).
-  if (request.pending && !request.intakeChannel && !mayConfirm(request.pending, request.userId)) {
-    const refusal = revisionRefusal(request.pending.confirmers ?? [], request.userId);
+  if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId)) {
+    const refusal = revisionRefusal(replaced.confirmers ?? [], request.userId);
     await delivery.postNote(refusal);
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
@@ -1131,7 +1145,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // A sweep card's revision drops fixes and does nothing else: each of its
   // operations must be one of the card's own, as it was. Anything else — a fix
   // rewritten, a stamp changed, one added — is refused and the card stays.
-  if (request.pending?.sweepRun && !isSubsetOf(result.operations, proposalOperations(request.pending))) {
+  if (replaced?.sweepRun && !isSubsetOf(result.operations, proposalOperations(replaced))) {
     const refusal =
       ":lock: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
       "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
@@ -1153,7 +1167,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // the thread's pending card too: this closes the seconds the revision spends
   // being written, during which the old card would otherwise still execute the
   // input the person just pushed back on.
-  if (request.pending) await threadState.retireProposal(request.pending.proposalTs);
+  if (replaced) await threadState.retireProposal(replaced.proposalTs);
 
   const card = await buildCard(
     result,
@@ -1199,11 +1213,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
-    ...inheritedTerms(request.pending),
-    // A revision of a sweep card stays in its card's slot, and stays a sweep
-    // card, so its items are still recorded (`sweep/outcomes.ts`).
-    ...(request.pending?.slot !== undefined ? { slot: request.pending.slot } : {}),
-    ...(request.pending?.sweepRun ? { sweepRun: request.pending.sweepRun } : {}),
+    ...inheritedTerms(replaced),
+    // A revision of a sweep card stays a sweep card, in the sweep's slot, so
+    // its items are still recorded (`sweep/outcomes.ts`).
+    ...(replaced?.sweepRun ? { sweepRun: replaced.sweepRun } : {}),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
     ...(request.intakeChannel
@@ -1316,7 +1329,7 @@ async function settleVerdict(
  */
 export async function restageExecution(
   restage: GateRestage,
-  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards">,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards" | "onRestaged">,
 ): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
   const original = restage.proposal;
   const first = restage.operations[0]!;
@@ -1352,6 +1365,9 @@ export async function restageExecution(
     proposalText: posted.text,
   };
   await deps.threadState.putProposal(proposal);
+  await deps.onRestaged?.(original, proposal).catch((err: unknown) => {
+    console.error(`[turn] re-staged card's records not moved: ${err instanceof Error ? err.message : String(err)}`);
+  });
   return { proposal, card };
 }
 
@@ -1934,15 +1950,21 @@ function caveatsFor(
 
 // ── Small pure helpers ───────────────────────────────────────────────────────
 
-/** Key-order-independent JSON compare, so two generations of the same tool
- *  input register as identical even if the model emitted fields in a different
- *  order. */
 /** Every operation in `revised` is one of `original`'s, byte for byte. */
 function isSubsetOf(revised: readonly ProposalOperation[], original: readonly ProposalOperation[]): boolean {
   const kept = new Set(original.map(stableStringify));
   return revised.length > 0 && revised.every((op) => kept.has(stableStringify(op)));
 }
 
+/** Whether a batch replaces any block the card replaces. */
+function touchesBlocksOf(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
+  const theirs = replacedBlocks(proposalOperations(card));
+  return [...replacedBlocks(operations)].some((b) => theirs.has(b));
+}
+
+/** Key-order-independent JSON compare, so two generations of the same tool
+ *  input register as identical even if the model emitted fields in a different
+ *  order. */
 function stableStringify(v: unknown): string {
   if (Array.isArray(v)) return `[${v.map(stableStringify).join(",")}]`;
   if (v !== null && typeof v === "object") {

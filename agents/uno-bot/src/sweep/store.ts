@@ -40,6 +40,12 @@ export type SweepItemStatus = "proposed" | "confirmed" | "dropped" | "refused_st
 export interface SweepItemRecord {
   /** `<card key>#<block id>`. */
   itemId: string;
+  /** The queued finding it came from (`PendingFinding.id`) — what the morning
+   *  checks before proposing a fix the thread has already had. */
+  findingId: string;
+  /** Where its card lands (`destinationKey`) — what keeps one live card per
+   *  place. */
+  destination: string;
   runDate: string;
   channel: string;
   threadTs: string;
@@ -51,10 +57,12 @@ export interface SweepItemRecord {
    *  went out on; content-derived, so a retry never mistakes one chunk for
    *  another. */
   cardKey: string;
-  /** The live card's ts; a revision moves it to the successor. */
+  /** The live card's ts; a revision moves it to the successor. Null while the
+   *  card is recorded but not yet posted and staged (`markPosted`). */
   proposalTs: string | null;
   driftAt: number;
   detectedAt: number;
+  /** When its card was posted and staged; null until then. */
   postedAt: number | null;
   resolvedAt: number | null;
 }
@@ -87,6 +95,7 @@ export interface SweepRunRecord {
 export interface SweepItemPatch {
   status?: SweepItemStatus;
   proposalTs?: string | null;
+  postedAt?: number | null;
   resolvedAt?: number | null;
 }
 
@@ -98,13 +107,21 @@ export interface SweepRecords {
   /** An upsert on `runId`. */
   recordRun(run: SweepRunRecord): Promise<void>;
   getRun(runId: string): Promise<SweepRunRecord | null>;
-  /** Insert, ignoring an `itemId` already there — a retried post adds nothing. */
+  /** Insert a card's items in ONE statement, ignoring an `itemId` already
+   *  there — a retried post adds nothing. */
   addItems(items: SweepItemRecord[]): Promise<void>;
   itemsOnCard(cardKey: string): Promise<SweepItemRecord[]>;
   itemsForProposal(proposalTs: string): Promise<SweepItemRecord[]>;
-  /** Every item ever carded for one thread — what the morning checks before
-   *  proposing a fix the thread has already had a card for. */
-  itemsInThread(channel: string, threadTs: string): Promise<SweepItemRecord[]>;
+  /** Every item ever carded from these queued findings, in one read. */
+  itemsForFindings(findingIds: string[]): Promise<SweepItemRecord[]>;
+  /** Every item still `proposed` — live cards, lapsed ones, and cards
+   *  recorded but never marked posted. */
+  openItems(): Promise<SweepItemRecord[]>;
+  /** A card went up and was staged: its items take its ts, in one statement. */
+  markPosted(cardKey: string, proposalTs: string, at: number): Promise<void>;
+  /** A card that never went through: its unposted items are deleted, so its
+   *  findings, still queued, are carded again. */
+  releaseCard(cardKey: string): Promise<void>;
   updateItem(itemId: string, patch: SweepItemPatch): Promise<void>;
 }
 

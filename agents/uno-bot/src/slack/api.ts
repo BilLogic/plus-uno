@@ -178,6 +178,14 @@ export interface HistoryMessage {
   thread_ts?: string;
   reply_count?: number;
   latest_reply?: string;
+  /** Present only when the read asked for it (`includeMetadata`). */
+  metadata?: SlackMessageMetadata;
+}
+
+/** Slack message metadata: an app's own tag on a message it posted. */
+export interface SlackMessageMetadata {
+  event_type: string;
+  event_payload: Record<string, unknown>;
 }
 
 /**
@@ -185,7 +193,13 @@ export interface HistoryMessage {
  * bot token — the end-of-day sweep's read (`sweep/env.ts`). Pages of 200; the
  * caller follows `response_metadata.next_cursor` as far as its budget allows.
  */
-export async function conversationsHistorySince(env: Env, channel: string, oldest: string, cursor?: string) {
+export async function conversationsHistorySince(
+  env: Env,
+  channel: string,
+  oldest: string,
+  cursor?: string,
+  opts: { includeMetadata?: boolean } = {},
+) {
   return slackGet<
     SlackResponse & { messages?: HistoryMessage[]; response_metadata?: { next_cursor?: string } }
   >(env, "conversations.history", {
@@ -193,6 +207,7 @@ export async function conversationsHistorySince(env: Env, channel: string, oldes
     oldest,
     limit: "200",
     ...(cursor ? { cursor } : {}),
+    ...(opts.includeMetadata ? { include_all_metadata: "true" } : {}),
   });
 }
 
@@ -204,6 +219,23 @@ export interface PostMessageInput {
   blocks?: unknown[];
   /** Also show this threaded reply in the main conversation. */
   reply_broadcast?: boolean;
+  /** The app's own tag, read back with `include_all_metadata`. */
+  metadata?: SlackMessageMetadata;
+}
+
+/**
+ * Replace one of the bot's own messages — chat.update, which Slack allows a
+ * bot token on the bot's messages only.
+ */
+export async function updateMessage(
+  env: Env,
+  input: { channel: string; ts: string; text: string; blocks?: unknown[]; metadata?: SlackMessageMetadata },
+) {
+  return slackCall<SlackResponse & { ts?: string }>(env, "chat.update", {
+    ...input,
+    text: sanitizeSlackMarkup(toSlackMrkdwn(input.text)),
+    blocks: input.blocks ?? [],
+  });
 }
 
 // NOTE ON THE DISPLAY NAME. The bot presents as "Le Goat" because the bot
@@ -498,8 +530,11 @@ export interface ConversationsRepliesResult extends SlackOk {
     ts: string;
     thread_ts?: string;
     files?: SlackEventFile[];
+    subtype?: string;
+    metadata?: SlackMessageMetadata;
   }>;
   has_more?: boolean;
+  response_metadata?: { next_cursor?: string };
 }
 
 /** Open (or find) the DM channel with a user. Shortcut answers land here rather
@@ -581,6 +616,7 @@ export async function conversationsReplies(
   channel: string,
   thread_ts: string,
   limit = 20,
+  opts: { cursor?: string; includeMetadata?: boolean } = {},
 ) {
   // conversations.replies is a READ method (query params, not a JSON body).
   // slackGet owns the transport, parse-guard, and failure-warn.
@@ -589,6 +625,8 @@ export async function conversationsReplies(
     ts: thread_ts,
     limit: String(limit),
     inclusive: "true",
+    ...(opts.cursor ? { cursor: opts.cursor } : {}),
+    ...(opts.includeMetadata ? { include_all_metadata: "true" } : {}),
   });
 }
 

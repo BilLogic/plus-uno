@@ -31,6 +31,7 @@ import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
+import { recordSweepRestageFor } from "../sweep/env";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
@@ -176,6 +177,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // The reads a card needs and Turn may not make itself — shared with the
     // doors that re-stage a cut-off run (`restageFor`, below).
     cards: cardReadsFor(env),
+    onRestaged: (from, to) => recordSweepRestageFor(env, from, to),
 
     async readAntecedent(channel, beforeTs, limit) {
       const before = await conversationsHistoryBefore(env, channel, beforeTs, limit);
@@ -255,6 +257,11 @@ export function restageFor(
 ): (restage: GateRestage, delivery: Delivery) => Promise<void> {
   const cards = cardReadsFor(env);
   return async (restage, delivery) => {
-    await restageExecution(restage, { threadState, delivery, cards });
+    await restageExecution(restage, {
+      threadState,
+      delivery,
+      cards,
+      onRestaged: (from, to) => recordSweepRestageFor(env, from, to),
+    });
   };
 }

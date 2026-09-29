@@ -116,3 +116,48 @@ test("a detector that could not answer says so, and finds nothing", async () => 
   const result = await detectDrift(provider, { thread: threadOf(trueDrift!), sources: trueDrift!.sources });
   assert.deepEqual(result, { ok: false, error: "429 quota" });
 });
+
+// A replace overwrites the whole block, so the model sees every block it may
+// rewrite whole, and a reply that would lose part of one is refused.
+const LONG = `Launch is planned for October 15. ${"The rollout covers every tutor cohort, with office hours each week. ".repeat(13)}Final sign-off rests with the design lead.`;
+const withLong = (text: string): SweepSource[] => [
+  { ...trueDrift!.sources[0]!, blocks: [{ id: "blk-launch", lastEditedTime: "2026-09-01T10:00:00.000Z", text }] },
+];
+
+test("a 900-character block is shown whole, and its fix keeps its tail", async () => {
+  assert.ok(LONG.length > 900);
+  const fixed = LONG.replace("October 15", "November 1");
+  const provider = fakeProvider({ generateReplies: [reply({ replacement: fixed })] });
+  const result = await detectDrift(provider, { thread: threadOf(trueDrift!), sources: withLong(LONG) });
+  assert.ok(result.ok);
+  assert.ok(provider.generated[0]!.prompt.includes(LONG), "the whole block is in the prompt");
+  assert.equal(result.findings[0]!.replacement, fixed);
+  assert.ok(result.findings[0]!.replacement.endsWith("Final sign-off rests with the design lead."));
+  assert.equal(result.findings[0]!.original, LONG);
+});
+
+test("a reply that truncates a block, or drops most of it unasked, is refused", () => {
+  const sources = withLong(LONG);
+  const parseLong = (replacement: string) => parseDetectorReply(reply({ replacement }), threadOf(trueDrift!), sources);
+  assert.equal(parseLong(`${LONG.slice(0, 400).replace("October 15", "November 1")}…`).length, 0, "a truncation marker");
+  assert.equal(parseLong(LONG.slice(0, 400).replace("October 15", "November 1")).length, 0, "the tail left off");
+  assert.equal(parseLong(LONG.replace("October 15", "November 1")).length, 1, "the control is kept");
+});
+
+test("a removal the thread asked for may shorten a block", () => {
+  const asked = {
+    ...trueDrift!,
+    thread: [trueDrift!.thread[0]!, { ...trueDrift!.thread[1]!, text: "Remove the rollout paragraph, it's no longer true." }],
+  };
+  const short = "Launch is planned for October 15. Final sign-off rests with the design lead.";
+  assert.equal(parseDetectorReply(reply({ replacement: short }), threadOf(asked), withLong(LONG)).length, 1);
+});
+
+test("a block too long to show whole is not offered, and a fix to it is refused", async () => {
+  const huge = "word ".repeat(600).trim();
+  const provider = fakeProvider({ generateReplies: [reply({ replacement: `${huge} more` })] });
+  const result = await detectDrift(provider, { thread: threadOf(trueDrift!), sources: withLong(huge) });
+  assert.ok(result.ok);
+  assert.equal(result.findings.length, 0);
+  assert.ok(!provider.generated[0]!.prompt.includes("blk-launch ·"), "the block is not listed");
+});

@@ -17,13 +17,18 @@ const BOT = "UBOT";
 const UNO_BOT = "C0UNOBOT";
 const OTHER = "C0DESIGN";
 
+const ROOT_ONLY = [{ user: "U1", text: "root", ts: "1700.1" }];
 let slackCalls: string[] = [];
+/** What `conversations.replies` answers; a case may set its own thread. */
+let thread: Array<Record<string, unknown>> = ROOT_ONLY;
+/** The card `getProposalByThread` answers; none unless a case sets one. */
+let pending: Record<string, unknown> | null = null;
 globalThis.fetch = (async (input: unknown) => {
   const url = String(input instanceof Request ? input.url : input);
   slackCalls.push(url.replace("https://slack.com/api/", ""));
   const body = url.endsWith("auth.test")
     ? { ok: true, user_id: BOT, bot_id: "BBOT" }
-    : { ok: true, messages: [{ user: "U1", text: "root", ts: "1700.1" }] };
+    : { ok: true, messages: thread };
   return new Response(JSON.stringify(body), { headers: { "content-type": "application/json" } });
 }) as typeof fetch;
 
@@ -34,7 +39,7 @@ const ENV = {
     idFromName: (name: string) => name,
     get: () => ({
       async getProposalByThread() {
-        return null;
+        return pending;
       },
       async readHistory() {
         return [];
@@ -84,4 +89,52 @@ test("a thread reply in #uno-bot keeps the follow-up rule: no bot in the thread,
 
 test("an @mention anywhere still engages", async () => {
   assert.equal(await engages(post({ channel: OTHER, text: `<@${BOT}> what's the token for primary?` })), true);
+});
+
+// A thread where uno-bot's only post is an end-of-day sweep card is the team's
+// own conversation: a reply engages only when it is addressed to the card.
+const SWEEP_CARD_POST = {
+  user: BOT,
+  bot_id: "BBOT",
+  ts: "1700.5",
+  text: ":mag: *End-of-day sweep* — this thread settled something a linked page still says the old way.",
+  metadata: { event_type: "uno_sweep_card", event_payload: { card_key: "2026-09-30:C0DESIGN:1700.1:blk-1" } },
+};
+const inSweepThread = (text: string) => post({ channel: OTHER, ts: "1700.9", thread_ts: "1700.1", text });
+
+async function withSweepThread<T>(posts: Array<Record<string, unknown>>, fn: () => Promise<T>): Promise<T> {
+  thread = [...ROOT_ONLY, ...posts];
+  pending = { proposalTs: "1700.5", sweepRun: "2026-09-30" };
+  try {
+    return await fn();
+  } finally {
+    thread = ROOT_ONLY;
+    pending = null;
+  }
+}
+
+test("under a sweep card, the thread's own conversation is left alone", async () => {
+  await withSweepThread([SWEEP_CARD_POST], async () => {
+    assert.equal(await engages(inSweepThread("lunch at noon?")), false);
+    assert.equal(await engages(inSweepThread("I'll change the deck before Friday")), false);
+    assert.equal(await engages(inSweepThread("we should fix the onboarding flow")), false);
+  });
+});
+
+test("under a sweep card, a reply about the card, a typed gate emoji or an @mention engages", async () => {
+  await withSweepThread([SWEEP_CARD_POST], async () => {
+    assert.equal(await engages(inSweepThread("drop 2")), true);
+    assert.equal(await engages(inSweepThread("keep the first one, skip the rest")), true);
+    assert.equal(await engages(inSweepThread("can you reword fix 3?")), true);
+    assert.equal(await engages(inSweepThread(":white_check_mark:")), true);
+    assert.equal(await engages(inSweepThread("⛔")), true);
+    assert.equal(await engages(inSweepThread(`<@${BOT}> what does this card change?`)), true);
+  });
+});
+
+test("once uno-bot has said anything else in the thread, every reply engages again", async () => {
+  const answer = { user: BOT, bot_id: "BBOT", ts: "1700.7", text: "Dropped the second fix." };
+  await withSweepThread([SWEEP_CARD_POST, answer], async () => {
+    assert.equal(await engages(inSweepThread("lunch at noon?")), true);
+  });
 });

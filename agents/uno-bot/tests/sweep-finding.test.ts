@@ -3,6 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  changedSpan,
   classifyLink,
   linksIn,
   pickDestination,
@@ -135,4 +136,17 @@ test("links: Slack's <url|label> and bare URLs, each once, classified or left al
   assert.equal(classifyLink("https://plus.slack.com/docs/T0/F0CANVAS"), "canvas");
   assert.equal(classifyLink("https://plus-uno.netlify.app/storybook/?path=/docs/button"), "storybook");
   assert.equal(classifyLink("https://example.com/"), null);
+});
+
+// The card shows what a fix changes — wherever in the block it is — with a
+// little unchanged text either side, not the block's first lines.
+test("a fix is shown as its changed span, before and after, with context", () => {
+  const filler = "Tutors meet weekly and log each session in the portal. ".repeat(10);
+  const original = `${filler}Launch date: October 15, pending review. Owner: design.`;
+  const replacement = `${filler}Launch date: November 1, pending review. Owner: design.`;
+  const { before, after } = changedSpan(original, replacement);
+  assert.match(before, /^….*Launch date: October 15, pending review\. Owner: design\.$/);
+  assert.match(after, /^….*Launch date: November 1, pending review\. Owner: design\.$/);
+  assert.ok(before.length < 120, "context, not the whole block");
+  assert.deepEqual(changedSpan("Owner: design team", "Owner: Bea"), { before: "Owner: design team", after: "Owner: Bea" });
 });

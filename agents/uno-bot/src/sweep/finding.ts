@@ -99,6 +99,8 @@ export interface DriftFinding {
   /** The block to replace, and the stamp the sweep read — null off Notion. */
   blockId: string | null;
   lastEditedTime: string | null;
+  /** The block's whole text as read, so the card can show what changes. */
+  original: string;
   /** What the source says now. */
   sourceSays: string;
   /** What the thread says. */

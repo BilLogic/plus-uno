@@ -9,7 +9,8 @@ import assert from "node:assert/strict";
 
 import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
-import { MAX_ITEMS_PER_CARD, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
+import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
+import { recordSweepResolution } from "../src/sweep/outcomes";
 import {
   at,
   DESIGN,
@@ -172,31 +173,57 @@ test("findings detected at 22:00 are posted at the next weekday 14:00 run, not b
   assert.equal(h.posted.length, 1);
 });
 
-test("12 edits make two cards in one thread, both live", async () => {
-  const blocks = Array.from({ length: 12 }, (_, i) => ({
+/** A page of `n` one-line blocks, and a night that finds a fix in each. */
+function manyEdits(id: string, n: number) {
+  const blocks = Array.from({ length: n }, (_, i) => ({
     id: `blk-${String(i).padStart(2, "0")}`,
     lastEditedTime: "2026-09-01T10:00:00.000Z",
     text: `Line ${i}`,
   }));
-  const page = notionPage("cccccccccccccccccccccccccccccccc", { blocks });
+  const page = notionPage(id.repeat(32).slice(0, 32), { blocks });
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [page.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
-  const h = sweepHarness({
-    channels: channelOf(t),
-    sources: [page],
-    detectorReplies: [
-      reply(...blocks.map((b) => drift({ source: page, block: b.id, evidence: [ts(29, 16)], replacement: `${b.text} (fixed)` }))),
-    ],
-    now: at(29, 22),
-  });
+  const found = reply(...blocks.map((b) => drift({ source: page, block: b.id, evidence: [ts(29, 16)], replacement: `${b.text} (fixed)` })));
+  return { page, t, found };
+}
 
+test("12 edits make one card of ten in the thread, and the other two wait for it to resolve", async () => {
+  const { page, t, found } = manyEdits("c", 12);
+  const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
+
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.clock.now = at(30, 14);
+  const morning = await runSweepJob(MORNING, h.deps);
+
+  assert.deepEqual(h.posted.map((p) => p.threadTs), [t.root.ts], "one live card per thread");
+  assert.equal(h.staged[0]!.operations!.length, MAX_ITEMS_PER_CARD);
+  assert.equal((await h.store.pendingFindings()).length, 2, "the overflow waits in the queue");
+  assert.match(morning.note ?? "", /2 fix\(es\) wait/);
+
+  // The next morning the card is still live: nothing more goes up.
+  h.clock.now = at(31, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1);
+
+  // Once it is resolved, the two that waited go out on the next card.
+  await recordSweepResolution(h.store, h.staged[0]!, undefined, at(31, 15));
+  h.clock.now = at(32, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 2);
+  assert.equal(h.staged[1]!.operations!.length, 2);
+  assert.deepEqual(await h.store.pendingFindings(), []);
+});
+
+test("a card that lapsed unanswered frees its thread for the fixes that waited", async () => {
+  const { page, t, found } = manyEdits("d", 12);
+  const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, h.deps);
   h.clock.now = at(30, 14);
   await runSweepJob(MORNING, h.deps);
 
-  assert.deepEqual(h.posted.map((p) => p.threadTs), [t.root.ts, t.root.ts]);
-  assert.deepEqual(h.staged.map((s) => s.operations!.length), [MAX_ITEMS_PER_CARD, 2]);
-  assert.deepEqual(h.staged.map((s) => s.slot), [0, 1]);
-  for (const s of h.staged) assert.equal((await h.threadState.getProposalByTs(s.proposalTs)).state, "found");
+  h.clock.now = at(30, 14) + SWEEP_CARD_TTL_MS + 60_000;
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 2);
+  assert.equal(h.staged[1]!.operations!.length, 2);
 });
 
 test("owner routing falls through all three rungs", async () => {
@@ -238,7 +265,7 @@ test("owner routing falls through all three rungs", async () => {
   );
 });
 
-test("a fix a thread already had carded is not proposed again, and a new day's card takes the next slot", async () => {
+test("a fix a thread already had carded is not proposed again, and a new day's fix waits for the live card", async () => {
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const first = reply(drift({ source: PAGE_A, block: PAGE_A.blocks[0]!.id, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
   const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [first], now: at(29, 22) });
@@ -247,9 +274,9 @@ test("a fix a thread already had carded is not proposed again, and a new day's c
   await runSweepJob(MORNING, h.deps);
   const dayOne = h.staged[0]!;
 
-  // Wednesday: a reply ("drop 1") is new activity, so the night re-reads the
-  // thread; the detector finds the same drift again, and a new one.
-  const reply2 = msg("U0ADE", ts(30, 16), "drop 1", { thread_ts: t.root.ts });
+  // Wednesday: a reply is new activity, so the night re-reads the thread; the
+  // detector finds the same drift again, and a new one.
+  const reply2 = msg("U0ADE", ts(30, 16), "and the owner changed too", { thread_ts: t.root.ts });
   t.messages.push(reply2);
   t.root.reply_count = 2;
   t.root.latest_reply = reply2.ts;
@@ -264,53 +291,141 @@ test("a fix a thread already had carded is not proposed again, and a new day's c
   h.clock.now = at(31, 14);
   await runSweepJob(MORNING, h.deps);
 
-  assert.equal(h.staged.length, 2);
-  const dayTwo = h.staged[1]!;
+  assert.equal(h.staged.length, 1, "day one's card is still live, so the new fix waits");
+  assert.equal((await h.threadState.getProposalByTs(dayOne.proposalTs)).state, "found");
   assert.deepEqual(
-    dayTwo.operations!.map((op) => (op.input.replace as Array<{ block_id: string }>)[0]!.block_id),
+    (await h.store.pendingFindings()).map((f) => f.blockId),
     [PAGE_A.blocks[1]!.id],
-    "only the new fix",
+    "the repeat left the queue; the new fix stays in it",
   );
-  assert.equal(dayTwo.slot, 1);
-  assert.equal((await h.threadState.getProposalByTs(dayOne.proposalTs)).state, "found", "day one's card is still live");
+
+  // Day one's card is confirmed; the next morning the new fix goes out alone.
+  await recordSweepResolution(h.store, dayOne, [{ ok: true, toolName: "notion_update", input: dayOne.operations![0]!.input, result: "{}" }] as never, at(31, 15));
+  h.clock.now = at(32, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.staged.length, 2);
+  assert.deepEqual(
+    h.staged[1]!.operations!.map((op) => (op.input.replace as Array<{ block_id: string }>)[0]!.block_id),
+    [PAGE_A.blocks[1]!.id],
+  );
   assert.deepEqual(await h.store.pendingFindings(), []);
 });
 
-test("a morning stopped mid-thread posts the rest on its retry, and nothing twice", async () => {
-  const blocks = Array.from({ length: 12 }, (_, i) => ({
-    id: `blk-${String(i).padStart(2, "0")}`,
-    lastEditedTime: "2026-09-01T10:00:00.000Z",
-    text: `Line ${i}`,
-  }));
-  const page = notionPage("ffffffffffffffffffffffffffffffff", { blocks });
-  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [page.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+test("a stop while a card's items are recorded ends, on the retry, in exactly one stageable card", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const h = sweepHarness({
     channels: channelOf(t),
-    sources: [page],
-    detectorReplies: [reply(...blocks.map((b) => drift({ source: page, block: b.id, evidence: [ts(29, 16)], replacement: `${b.text}!` })))],
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
     now: at(29, 22),
   });
   await runSweepJob(END_OF_DAY, h.deps);
 
-  // The budget stops the job as the second card goes out.
-  const post = h.deps.delivery.post;
-  let posts = 0;
-  h.deps.delivery.post = async (to, card) => {
-    posts += 1;
-    if (posts === 2) throw new SubrequestBudgetError(38);
-    return post(to, card);
-  };
+  h.faults.addItems = new SubrequestBudgetError(40);
   h.clock.now = at(30, 14);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
-  assert.equal(h.store.runs().at(-1)?.outcome, "deferred");
+  assert.equal(h.posted.length, 0, "nothing posts before its items are recorded");
 
   h.clock.now = at(30, 14, 2);
   await runSweepJob(MORNING, h.deps);
-  assert.deepEqual(h.staged.map((s) => s.operations!.length), [MAX_ITEMS_PER_CARD, 2]);
-  assert.deepEqual(h.staged.map((s) => s.slot), [0, 1]);
-  assert.equal(h.store.items().length, 12);
-  assert.deepEqual(await h.store.pendingFindings(), []);
+  await assertOneStagedCard(h);
 });
+
+test("a stop after the post, before it is staged, is finished by the retry — not posted again", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+
+  h.faults.post = new SubrequestBudgetError(38);
+  h.clock.now = at(30, 14);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+  assert.equal(h.posted.length, 1);
+  assert.equal(h.staged.length, 0);
+
+  h.clock.now = at(30, 14, 2);
+  const retry = await runSweepJob(MORNING, h.deps);
+  assert.match(retry.note ?? "", /finished staging/);
+  await assertOneStagedCard(h);
+});
+
+test("a stop in stage is finished by the retry, and a stage that fails outright withdraws the card", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const found = reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
+  const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, h.deps);
+
+  h.faults.stage = new SubrequestBudgetError(38);
+  h.clock.now = at(30, 14);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+  h.clock.now = at(30, 14, 2);
+  await runSweepJob(MORNING, h.deps);
+  await assertOneStagedCard(h);
+
+  // Another thread, whose staging fails for good: the card says so, and its
+  // fix stays queued with no item stuck at `proposed`.
+  const other = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, other.deps);
+  other.faults.stage = new Error("ThreadState unavailable");
+  other.clock.now = at(30, 14);
+  const morning = await runSweepJob(MORNING, other.deps);
+  assert.equal(other.posted.length, 1);
+  assert.match(other.posted[0]!.withdrawn ?? "", /didn't go through/);
+  assert.match(morning.note ?? "", /withdrawn/);
+  assert.deepEqual(other.store.items(), [], "its items are released");
+  assert.equal((await other.store.pendingFindings()).length, 1, "and its fix stays queued");
+
+  // A later try that stops after recording its items is never finished onto
+  // the withdrawn card: that card was retagged.
+  other.faults.post = new SubrequestBudgetError(38);
+  other.clock.now = at(30, 14, 5);
+  await assert.rejects(runSweepJob(MORNING, other.deps), isSubrequestBudgetError);
+  other.clock.now = at(30, 14, 7);
+  await runSweepJob(MORNING, other.deps);
+  assert.equal(other.staged.length, 1);
+  assert.notEqual(other.staged[0]!.proposalTs, other.posted[0]!.ts, "the withdrawn card is not the one staged");
+});
+
+test("a card whose budget is not there is not started: the job defers before posting", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+
+  h.headroom.subrequests = 2;
+  h.clock.now = at(30, 14);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+  assert.equal(h.posted.length, 0);
+  assert.deepEqual(h.store.items(), []);
+  assert.equal(h.store.runs().at(-1)?.outcome, "deferred");
+
+  h.headroom.subrequests = Infinity;
+  h.clock.now = at(30, 14, 2);
+  await runSweepJob(MORNING, h.deps);
+  await assertOneStagedCard(h);
+});
+
+/** Exactly one card posted and staged, every item on it, none left without a ts. */
+async function assertOneStagedCard(h: ReturnType<typeof sweepHarness>): Promise<void> {
+  assert.equal(h.posted.length, 1, "posted once");
+  assert.equal(h.posted[0]!.withdrawn, undefined);
+  const card = h.posted[0]!;
+  assert.equal((await h.threadState.getProposalByTs(card.ts)).state, "found", "and stageable");
+  assert.ok(h.store.items().length > 0);
+  assert.ok(
+    h.store.items().every((i) => i.proposalTs === card.ts && i.postedAt !== null),
+    "no item stuck without its card's ts",
+  );
+  assert.deepEqual(await h.store.pendingFindings(), []);
+}
 
 test("a retried job is idempotent", async () => {
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
@@ -335,6 +450,41 @@ test("a retried job is idempotent", async () => {
   assert.equal(h.posted.length, 1);
   assert.equal(h.store.items().length, 1);
   assert.equal(h.store.runs().filter((r) => r.jobKey === END_OF_DAY.key).length, 1, "one row per run date and key");
+});
+
+test("a history that runs past its page cap never moves the cursor past the oldest root it read", async () => {
+  // Newest first, as Slack pages them: 12 roots, 2 a page, 5 pages read.
+  const roots = Array.from({ length: 12 }, (_, i) => msg("U0STARTER", ts(29, 8, i), "morning")).reverse();
+  const h = sweepHarness({ channels: { [DESIGN]: { kind: "public", history: roots } }, now: at(29, 22), pageSize: 2 });
+
+  const night = await runSweepJob(END_OF_DAY, h.deps);
+  const oldestRead = roots[9]!.ts;
+  assert.equal(await h.store.cursor(DESIGN), oldestRead);
+  assert.match(night.note ?? "", /cursor stays at or before/);
+});
+
+test("a long thread is read page by page, and one past the page cap is left with a note", async () => {
+  const replies = Array.from({ length: 5 }, (_, i) => ({ user: "U0ADE", when: ts(29, 16, i) }));
+  const long = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, replies);
+  const h = sweepHarness({
+    channels: channelOf(long),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16, 4)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+    pageSize: 2,
+  });
+  const night = await runSweepJob(END_OF_DAY, h.deps);
+  assert.equal(h.reads.filter((r) => r.startsWith("replies")).length, 3, "three pages of two");
+  assert.equal(night.findings.length, 1, "evidence on the last page counts");
+
+  const tooLong = thread(
+    { user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] },
+    Array.from({ length: MAX_REPLY_PAGES * 2 + 1 }, (_, i) => ({ user: "U0ADE", when: ts(29, 16, i) })),
+  );
+  const h2 = sweepHarness({ channels: channelOf(tooLong), sources: [PAGE_A], now: at(29, 22), pageSize: 2 });
+  const skipped = await runSweepJob(END_OF_DAY, h2.deps);
+  assert.equal(h2.provider.generated.length, 0, "never detected on half a thread");
+  assert.match(skipped.note ?? "", /left unread/);
 });
 
 test("on budget exhaustion the job saves its cursor at the last fully processed thread and defers with its key", async () => {

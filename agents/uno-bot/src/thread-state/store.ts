@@ -253,19 +253,12 @@ export interface PendingProposal {
    */
   onCancel?: ProposalOperation[];
   /**
-   * Which of several cards staged side by side in ONE reply thread this is.
-   * Absent — every turn's card — the thread holds one live card and staging
-   * retires the rest. Present, staging retires only a card in the same slot
-   * (`proposalSlot`): the end-of-day sweep posts more than ten fixes for one
-   * thread as several cards there, each live on its own. A revision keeps its
-   * card's slot.
-   */
-  slot?: number;
-  /**
    * Set on a card the end-of-day sweep staged: the morning it was posted,
    * `YYYY-MM-DD`. What a ✅, a ⛔ or a revision does to such a card is also
-   * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision and
-   * a re-staged card carry it.
+   * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision of
+   * it and a re-staged card carry it. It also gives the card its own slot in
+   * the thread (`proposalSlot`), so a sweep card and a turn's card stay live
+   * side by side.
    */
   sweepRun?: string;
 }
@@ -336,13 +329,15 @@ export function proposalReplyThread(
 }
 
 /**
- * The grain one card retires another at: its reply thread, and within it its
- * `slot` when it has one. Both adapters' `putProposal` compare with this, so
- * cards in different slots of one thread stay live side by side.
+ * The grain one card retires another at: its reply thread, and within it the
+ * sweep's slot for a sweep card (`sweepRun`). Both adapters' `putProposal`
+ * compare with this, so a thread holds one turn card and one sweep card at
+ * most, and staging retires only the card in its own slot — a revision of the
+ * sweep card retires the sweep card, an unrelated ask stages beside it.
  */
-export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "slot">): string {
+export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "sweepRun">): string {
   const thread = proposalReplyThread(proposal);
-  return proposal.slot === undefined ? thread : `${thread}#${proposal.slot}`;
+  return proposal.sweepRun ? `${thread}#sweep` : thread;
 }
 
 /**

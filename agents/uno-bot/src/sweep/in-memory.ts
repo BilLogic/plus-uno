@@ -21,6 +21,9 @@ export interface InMemorySweepStore extends SweepStore {
 }
 
 const copy = <T>(v: T): T => structuredClone(v);
+/** As the D1 reads order them: by item id. */
+const sorted = (list: SweepItemRecord[]): SweepItemRecord[] =>
+  list.map(copy).sort((a, b) => a.itemId.localeCompare(b.itemId));
 
 export function createInMemorySweepStore(): InMemorySweepStore {
   const cursors = new Map<string, string>();
@@ -45,13 +48,25 @@ export function createInMemorySweepStore(): InMemorySweepStore {
       for (const item of added) if (!items.has(item.itemId)) items.set(item.itemId, copy(item));
     },
     async itemsOnCard(cardKey) {
-      return [...items.values()].filter((i) => i.cardKey === cardKey).map(copy);
+      return sorted([...items.values()].filter((i) => i.cardKey === cardKey));
     },
     async itemsForProposal(proposalTs) {
-      return [...items.values()].filter((i) => i.proposalTs === proposalTs).map(copy);
+      return sorted([...items.values()].filter((i) => i.proposalTs === proposalTs));
     },
-    async itemsInThread(channel, threadTs) {
-      return [...items.values()].filter((i) => i.channel === channel && i.threadTs === threadTs).map(copy);
+    async itemsForFindings(findingIds) {
+      const wanted = new Set(findingIds);
+      return sorted([...items.values()].filter((i) => wanted.has(i.findingId)));
+    },
+    async openItems() {
+      return sorted([...items.values()].filter((i) => i.status === "proposed"));
+    },
+    async markPosted(cardKey, proposalTs, at) {
+      for (const [id, item] of items) {
+        if (item.cardKey === cardKey) items.set(id, { ...item, proposalTs, postedAt: at });
+      }
+    },
+    async releaseCard(cardKey) {
+      for (const [id, item] of items) if (item.cardKey === cardKey && item.proposalTs === null) items.delete(id);
     },
     async updateItem(itemId, patch) {
       const item = items.get(itemId);

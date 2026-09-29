@@ -42,6 +42,8 @@ CREATE INDEX sweep_runs_by_date ON sweep_runs (run_date);
 -- still proposed 72 h after posted_at expired unanswered.
 CREATE TABLE sweep_items (
   item_id      TEXT    PRIMARY KEY,              -- "<card key>#<block id>"
+  finding_id   TEXT    NOT NULL,                 -- "<channel>:<thread ts>:<block id>"
+  destination  TEXT    NOT NULL,                 -- where its card lands: "<channel>:<thread ts>", or a team channel
   run_date     TEXT    NOT NULL,                 -- the end-of-day run that found it
   channel_id   TEXT    NOT NULL,
   thread_ts    TEXT    NOT NULL,
@@ -50,22 +52,25 @@ CREATE TABLE sweep_items (
   owner_id     TEXT    NOT NULL,
   status       TEXT    NOT NULL CHECK (status IN ('proposed', 'confirmed', 'dropped', 'refused_stale', 'failed')),
   card_key     TEXT    NOT NULL,                 -- "<post date>:<destination>:<first block id>"
-  proposal_ts  TEXT,                             -- the live card; a revision moves it
+  proposal_ts  TEXT,                             -- the live card; a revision moves it; null until posted and staged
   drift_at     INTEGER NOT NULL,                 -- the thread's first evidence message
   detected_at  INTEGER NOT NULL,
-  posted_at    INTEGER,
+  posted_at    INTEGER,                          -- null until its card is posted and staged
   resolved_at  INTEGER                           -- time from drift to fix = resolved_at - drift_at
 );
 
 -- A ✅, a ⛔ or a revision finds its items by the card they are on.
 CREATE INDEX sweep_items_by_proposal ON sweep_items (proposal_ts);
 
--- A retried morning post asks whether its card already went out.
+-- A card is marked posted, or released, by its key.
 CREATE INDEX sweep_items_by_card ON sweep_items (card_key);
 
--- The morning asks what a thread has already been carded, so a fix that was
--- proposed, dropped or applied is not proposed again, and a new day's card
--- takes the next slot rather than retiring a live one.
-CREATE INDEX sweep_items_by_thread ON sweep_items (channel_id, thread_ts);
+-- The morning asks which queued findings were already carded, so a fix that
+-- was proposed, dropped or applied is not proposed again.
+CREATE INDEX sweep_items_by_finding ON sweep_items (finding_id);
+
+-- The morning reads every open item: a place with a live card gets no second
+-- one, and a card recorded but never marked posted is finished first.
+CREATE INDEX sweep_items_by_status ON sweep_items (status);
 
 PRAGMA optimize;

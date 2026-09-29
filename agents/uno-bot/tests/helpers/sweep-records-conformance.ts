@@ -36,6 +36,8 @@ export function sweepRun(over: Partial<SweepRunRecord> = {}): SweepRunRecord {
 export function sweepItem(over: Partial<SweepItemRecord> = {}): SweepItemRecord {
   return {
     itemId: "2026-09-30:C0DESIGN:1790694000.000000:blk-1#blk-1",
+    findingId: "C0DESIGN:1790694000.000000:blk-1",
+    destination: "C0DESIGN:1790694000.000000",
     runDate: "2026-09-29",
     channel: "C0DESIGN",
     threadTs: "1790694000.000000",
@@ -80,25 +82,54 @@ export function runSweepRecordsConformance(label: string, make: () => SweepRecor
     assert.deepEqual(await records.itemsOnCard(sweepItem().cardKey), [sweepItem()]);
   });
 
-  it("items are found by their card and by their live proposal", async () => {
+  it("items are found by their card, their live proposal and their finding", async () => {
     const records = make();
-    const second = sweepItem({ itemId: `${sweepItem().cardKey}#blk-2`, blockId: "blk-2" });
-    const elsewhere = sweepItem({ itemId: "other#blk-9", cardKey: "other", proposalTs: "1790776800.900002", blockId: "blk-9" });
+    const second = sweepItem({ itemId: `${sweepItem().cardKey}#blk-2`, blockId: "blk-2", findingId: "C0DESIGN:1790694000.000000:blk-2" });
+    const elsewhere = sweepItem({
+      itemId: "other#blk-9",
+      cardKey: "other",
+      proposalTs: "1790776800.900002",
+      blockId: "blk-9",
+      findingId: "C0DESIGN:1790694000.000000:blk-9",
+      status: "dropped",
+    });
     await records.addItems([sweepItem(), second, elsewhere]);
     assert.deepEqual(await records.itemsForProposal("1790776800.900001"), [sweepItem(), second]);
     assert.deepEqual(await records.itemsOnCard("other"), [elsewhere]);
     assert.deepEqual(await records.itemsForProposal("none"), []);
-    assert.deepEqual(await records.itemsInThread("C0DESIGN", "1790694000.000000"), [elsewhere, sweepItem(), second].sort((a, b) => a.itemId.localeCompare(b.itemId)));
-    assert.deepEqual(await records.itemsInThread("C0DESIGN", "1790000000.000000"), []);
+    assert.deepEqual(await records.itemsForFindings([elsewhere.findingId, sweepItem().findingId, "nothing"]), [
+      sweepItem(),
+      elsewhere,
+    ].sort((a, b) => a.itemId.localeCompare(b.itemId)));
+    assert.deepEqual(await records.itemsForFindings([]), []);
+    assert.deepEqual(await records.openItems(), [sweepItem(), second]);
+  });
+
+  it("a card's items are recorded in one call, then marked posted, or released", async () => {
+    const records = make();
+    const unposted = (blockId: string, cardKey: string) =>
+      sweepItem({ itemId: `${cardKey}#${blockId}`, blockId, cardKey, findingId: `C0DESIGN:1:${blockId}`, proposalTs: null, postedAt: null });
+    const cardA = [unposted("a1", "card-a"), unposted("a2", "card-a")];
+    const cardB = [unposted("b1", "card-b")];
+    await records.addItems([...cardA, ...cardB]);
+    await records.markPosted("card-a", "1790776800.900009", 1_790_776_801_000);
+    await records.releaseCard("card-b");
+    // Releasing a posted card deletes nothing: only an unposted item goes.
+    await records.releaseCard("card-a");
+    assert.deepEqual(
+      await records.itemsOnCard("card-a"),
+      cardA.map((i) => ({ ...i, proposalTs: "1790776800.900009", postedAt: 1_790_776_801_000 })),
+    );
+    assert.deepEqual(await records.itemsOnCard("card-b"), []);
   });
 
   it("an update changes only what it names", async () => {
     const records = make();
     await records.addItems([sweepItem()]);
-    await records.updateItem(sweepItem().itemId, { proposalTs: "1790780000.000001" });
+    await records.updateItem(sweepItem().itemId, { proposalTs: "1790780000.000001", postedAt: 1_790_780_000_000 });
     await records.updateItem(sweepItem().itemId, { status: "confirmed", resolvedAt: 1_790_780_400_000 });
     assert.deepEqual(await records.itemsOnCard(sweepItem().cardKey), [
-      sweepItem({ proposalTs: "1790780000.000001", status: "confirmed", resolvedAt: 1_790_780_400_000 }),
+      sweepItem({ proposalTs: "1790780000.000001", postedAt: 1_790_780_000_000, status: "confirmed", resolvedAt: 1_790_780_400_000 }),
     ]);
   });
 }

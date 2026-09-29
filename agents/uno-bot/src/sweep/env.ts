@@ -13,9 +13,11 @@
 //     HARNESS_KV, one key per channel under `sweep:findings:`. Each channel's
 //     job writes only its own key, so two end-of-day jobs a few seconds apart
 //     never overwrite each other's findings through KV's eventual consistency.
-//     A finding older than a week is dropped as the queue is read.
+//     A finding older than 30 days is dropped as the queue is read.
 //   • Delivery: `chat.postMessage` in the destination, the card rendered by the
-//     proposal renderer, and `ThreadState.putProposal`.
+//     proposal renderer and tagged with its key in message metadata, and
+//     `ThreadState.putProposal`. A card is found again by that tag
+//     (`include_all_metadata`), and withdrawn with `chat.update`.
 //
 // THE BUDGET, AT EVERY READ. A read that ran into the lookup ceiling may come
 // back short rather than throw — a paging loop that stopped, an executor that
@@ -27,7 +29,14 @@
 import type { Env } from "../types";
 import { LOOKUP_CEILING } from "../agent/loop-policy";
 import { selectProvider } from "../agent/run-agent";
-import { charge, d1QueriesUsed, SubrequestBudgetError, subrequestBudgetTrips, subrequestsUsed } from "../net";
+import {
+  budgetHeadroom,
+  charge,
+  d1QueriesUsed,
+  SubrequestBudgetError,
+  subrequestBudgetTrips,
+  subrequestsUsed,
+} from "../net";
 import { canonicalNotionUrl, parseNotionPageId, readNotionPage } from "../integrations/notion";
 import {
   conversationsHistorySince,
@@ -36,6 +45,8 @@ import {
   getBotIdentity,
   getPermalink,
   postMessage,
+  updateMessage,
+  type SlackMessageMetadata,
 } from "../slack/api";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
@@ -47,18 +58,23 @@ import type { OperationOutcome } from "../gate/index";
 import type { PendingProposal } from "../thread-state/index";
 import { modelDriftDetector } from "./detector";
 import { createD1SweepRecords } from "./d1";
-import { recordSweepResolution, recordSweepRevision } from "./outcomes";
+import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
+import { SWEEP_CARD_EVENT, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
 import { runSweepJob, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
 /** One key per channel: `sweep:findings:<channel>`. */
 const QUEUE_KV_PREFIX = "sweep:findings:";
-/** A finding not posted within a week is dropped as the queue is read. */
-const QUEUE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+/** A finding not posted within 30 days is dropped as the queue is read — long
+ *  enough for a busy thread's overflow to wait out several live cards; a fix
+ *  that old whose block has moved is refused at the write anyway (ADR-029). */
+const QUEUE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 /** The key itself outlives its newest finding by the same week. */
 const QUEUE_TTL_SECONDS = QUEUE_MAX_AGE_MS / 1000;
 const CONTEXT_TEXT_CAP = 4_000;
+/** Pages read looking for a card by its tag. */
+const FIND_PAGES = 3;
 
 /**
  * One sweep job on `Env`.
@@ -100,9 +116,11 @@ async function sweepDepsFor(
         const next = res.response_metadata?.next_cursor;
         return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
       },
-      async replies(channel, rootTs) {
-        const res = await measured(() => conversationsReplies(env, channel, rootTs, 200));
-        return res.ok ? res.messages : null;
+      async replies(channel, rootTs, cursor) {
+        const res = await measured(() => conversationsReplies(env, channel, rootTs, 200, cursor ? { cursor } : {}));
+        if (!res.ok) return null;
+        const next = res.response_metadata?.next_cursor;
+        return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
       },
     },
     sources: { read: (url, kind) => measured(() => readSource(env, url, kind)) },
@@ -128,19 +146,50 @@ async function sweepDepsFor(
           ...(rendered.followUp?.length ? { followUp: rendered.followUp } : {}),
         };
       },
-      async post(to, card) {
+      async post(to, card, cardKey) {
+        const metadata = tagOf(cardKey);
         for (const text of card.followUp ?? []) {
-          await postMessage(env, { channel: to.channel, text, ...(to.threadTs ? { thread_ts: to.threadTs } : {}) });
+          const sent = await postMessage(env, { channel: to.channel, text, metadata, ...(to.threadTs ? { thread_ts: to.threadTs } : {}) });
+          // A card whose plan did not go up ahead of it is not posted at all.
+          if (!sent.ok) return { ok: false };
         }
         const res = await postMessage(env, {
           channel: to.channel,
           text: card.text,
           blocks: card.blocks,
+          metadata,
           ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
         });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
+      async findPosted(to, cardKey, since) {
+        const isCard = (m: { metadata?: SlackMessageMetadata }) =>
+          m.metadata?.event_type === SWEEP_CARD_EVENT && m.metadata.event_payload.card_key === cardKey;
+        let cursor: string | undefined;
+        for (let i = 0; i < FIND_PAGES; i++) {
+          const res = to.threadTs
+            ? await measured(() =>
+                conversationsReplies(env, to.channel, to.threadTs!, 200, { includeMetadata: true, ...(cursor ? { cursor } : {}) }),
+              )
+            : await measured(() => conversationsHistorySince(env, to.channel, since, cursor, { includeMetadata: true }));
+          if (!res.ok) return null;
+          // The card is the last message with the tag: follow-ups go first.
+          const hit = [...(res.messages ?? [])].filter(isCard).sort((a, b) => Number(b.ts) - Number(a.ts))[0];
+          if (hit) return { ts: hit.ts, text: hit.text ?? "" };
+          cursor = res.response_metadata?.next_cursor;
+          if (!cursor) return null;
+        }
+        return null;
+      },
       stage: (proposal) => threadStateFor(env).putProposal(proposal),
+      async withdraw(channel, ts, text, cardKey) {
+        await updateMessage(env, {
+          channel,
+          ts,
+          text,
+          metadata: { event_type: WITHDRAWN_SWEEP_CARD_EVENT, event_payload: { card_key: cardKey } },
+        });
+      },
       permalink: (channel, ts) => getPermalink(env, channel, ts),
     },
     config: {
@@ -150,7 +199,7 @@ async function sweepDepsFor(
       figmaLibraryKey: env.FIGMA_FILE_KEY?.trim() || undefined,
       botUserId: bot?.userId ?? null,
     },
-    meter: { subrequests: subrequestsUsed, d1Queries: d1QueriesUsed },
+    meter: { subrequests: subrequestsUsed, d1Queries: d1QueriesUsed, headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
   };
@@ -195,6 +244,28 @@ export async function recordSweepRevisionFor(
   } catch (err) {
     console.error(`[sweep] revision of ${replaced.proposalTs} not recorded: ${err instanceof Error ? err.message : String(err)}`);
   }
+}
+
+/**
+ * Move a cut-off sweep card's items to the card re-staged in its place
+ * (`recordSweepRestage`). Best-effort.
+ *
+ * @param env - Carries USAGE_DB
+ * @param from - The card whose run was cut off
+ * @param to - The fresh card
+ */
+export async function recordSweepRestageFor(env: Env, from: PendingProposal, to: PendingProposal): Promise<void> {
+  if (!from.sweepRun || !env.USAGE_DB) return;
+  try {
+    await recordSweepRestage(createD1SweepRecords({ db: env.USAGE_DB }), from, to, Date.now());
+  } catch (err) {
+    console.error(`[sweep] re-stage of ${from.proposalTs} not recorded: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/** The tag a sweep card carries in Slack's message metadata. */
+function tagOf(cardKey: string): SlackMessageMetadata {
+  return { event_type: SWEEP_CARD_EVENT, event_payload: { card_key: cardKey } };
 }
 
 /** A read that tripped the budget is the budget stop, whatever it returned. */

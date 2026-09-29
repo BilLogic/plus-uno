@@ -263,16 +263,15 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
   });
 
-  // The sweep posts more than ten fixes for one thread as several cards there,
-  // each in its own slot: staging one retires only a card in the same slot.
-  it("cards in different slots of one thread stay live side by side", async () => {
+  // A sweep card has its own slot in its thread: a turn's card staged there
+  // leaves it live, and a revision of the sweep card retires only it.
+  it("a sweep card and a turn's card stay live side by side in one thread", async () => {
     const { store } = setup();
-    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, slot: 0 }));
-    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread, slot: 1 }));
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
     assert.equal((await store.getProposalByTs("1700.2")).state, "found");
     assert.equal((await store.getProposalByTs("1700.3")).state, "found");
-    // A revision of one keeps its slot, and retires that card only.
-    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, slot: 0 }));
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
     assert.equal((await store.getProposalByTs("1700.3")).state, "found");
   });

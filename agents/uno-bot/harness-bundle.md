@@ -30,7 +30,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,860 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−6,310 ide-only) | 97,831 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,829 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,092 (−1,506 ide-only) | 127,963 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,092 (−2,074 ide-only) | 127,963 | — |
 | 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 131,216 | — |
 | 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,803 | — |
 | 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 166,392 | — |
@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 46,700 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 47,627 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 3,583 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 4,510 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1731,19 +1731,22 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 ## The card
 
 - **Timing:** the card posts at the next weekday morning run (14:00 UTC), so its 72 h start when people can act on it.
-- **Grouping:** one card per source thread per day. Each card holds up to 10 fixes, and more fixes go on more cards in the same thread. A fix the thread has already had on a card (proposed, dropped or applied) is left off later ones.
-- **Several cards in one thread:** each stays live on its own. A reply revises the newest one, so to change an earlier card, react on it directly.
-- **Each fix** is one `notion_update` in-place replace, stamped with the `last_edited_time` the sweep read (ADR-029). If the block has moved since then, the write is refused and nothing is written.
+- **One live card per thread,** holding up to 10 fixes. More fixes, and a later day's fixes for a thread whose card is still live, wait in the queue until that card is resolved or expires, then go out on the next one. A fix the thread has already had on a card (proposed, dropped or applied) is left off later ones.
+- **Beside a turn's card:** the sweep card has its own slot in the thread, so an unrelated ask made there (filing an issue, say) stages as its own card and leaves the sweep card live.
+- **Each fix** is one `notion_update` in-place replace of a whole block, stamped with the `last_edited_time` the sweep read (ADR-029). If the block has moved since then, the write is refused and nothing is written. The card shows each fix as the text it changes, before → after, with a little context either side.
+- **Whole blocks only:** the detector sees every block it may rewrite in full, and a block too long for that is left alone. A drafted fix that carries a truncation mark, or comes back much shorter than its block when no one in the thread asked for a removal, is discarded.
 - **Owner:** each fix names one owner, who is @-mentioned. That is whoever claimed or did the work in the thread; failing that, the linked card's `Contributor`; failing that, the thread starter.
 - **Who can confirm:** the owners plus everyone who posted in the thread. A ✅ from anyone else gets the note naming who can.
 - **Expiry:** after 72 hours unanswered, the card expires with no re-ping.
 
 ## Dropping, revising, declining
 
+In a thread where uno-bot's only posts are sweep cards, it answers a reply only when the reply is addressed to the card: an @mention, a typed ✅ or ⛔, or words about its fixes ("drop 2", "keep the first one", "reword fix 3"). The rest of the thread's conversation is the team's own.
+
 - **Drop an item:** reply in the thread ("drop 2"). Stage the same batch without that operation, keeping every other operation byte for byte. The revision replaces the card and keeps its TTL and its confirmers.
 - **Drop the last item:** cancel the card through `proposal_resolve`.
-- **Only a confirmer can revise.** Anyone else is told who can, and the card stays as it is.
-- **Change only what was asked:** a revision holds the card's own fixes, minus the dropped ones, each exactly as it was.
+- **Only a confirmer can revise.** Anyone else is told who can, and the card stays as it is. This holds on every card that names its confirmers.
+- **Change only what was asked:** a revision holds the card's own fixes, minus the dropped ones, each exactly as it was. A batch that touches none of the card's blocks is a separate ask, staged beside it.
 - **⛔** declines the whole card.
 
 Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, or failed. An item still proposed 72 h after its card posted is one that expired.

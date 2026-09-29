@@ -91,13 +91,20 @@ export interface SweepHarness {
   provider: FakeProvider;
   /** Detector replies not yet used. */
   replies: string[];
-  posted: Array<{ channel: string; threadTs: string | null; text: string }>;
+  /** Every card posted, with the key it was tagged with; `withdrawn` holds
+   *  the text a withdrawn card was edited to. */
+  posted: Array<{ channel: string; threadTs: string | null; text: string; ts: string; cardKey: string; withdrawn?: string }>;
   staged: PendingProposal[];
   /** Every Slack read, as `method channel [ts]`. */
   reads: string[];
   clock: { now: number };
   /** Replies calls left before the budget stops the job; Infinity for none. */
   budget: { replies: number };
+  /** What the meter says is left; Infinity for no limit. */
+  headroom: { subrequests: number; d1Queries: number };
+  /** One-shot faults: each, when set, is thrown by the next call of its kind
+   *  and cleared. */
+  faults: { post?: Error; stage?: Error; addItems?: Error };
 }
 
 export function sweepHarness(opts: {
@@ -109,6 +116,9 @@ export function sweepHarness(opts: {
   dryRun?: boolean;
   store?: InMemorySweepStore;
   threadState?: ThreadState;
+  /** Messages per `conversations.history` / `.replies` page; all on one page
+   *  when unset. */
+  pageSize?: number;
 }): SweepHarness {
   const clock = { now: opts.now };
   const store = opts.store ?? createInMemorySweepStore();
@@ -127,6 +137,29 @@ export function sweepHarness(opts: {
   const staged: PendingProposal[] = [];
   const reads: string[] = [];
   const budget = { replies: Infinity };
+  const headroom = { subrequests: Infinity, d1Queries: Infinity };
+  const faults: SweepHarness["faults"] = {};
+  const pageSize = opts.pageSize ?? Infinity;
+  const page = <T>(list: T[], cursor: string | undefined): { messages: T[]; nextCursor?: string } => {
+    const from = Number(cursor ?? 0);
+    const to = from + pageSize;
+    return { messages: list.slice(from, to), ...(to < list.length ? { nextCursor: String(to) } : {}) };
+  };
+  const once = (kind: keyof SweepHarness["faults"]): void => {
+    const err = faults[kind];
+    if (err) {
+      delete faults[kind];
+      throw err;
+    }
+  };
+  const records = store;
+  const faultyStore: InMemorySweepStore = {
+    ...records,
+    async addItems(items) {
+      once("addItems");
+      return records.addItems(items);
+    },
+  };
   const sources = new Map((opts.sources ?? []).map((s) => [s.url, s] as const));
   let nextTs = 0;
 
@@ -136,17 +169,18 @@ export function sweepHarness(opts: {
         reads.push(`info ${channel}`);
         return opts.channels[channel]?.kind ?? null;
       },
-      async history(channel, oldest) {
+      async history(channel, oldest, cursor) {
         reads.push(`history ${channel}`);
         const c = opts.channels[channel];
         if (!c) return null;
-        return { messages: c.history.filter((m) => Number(m.ts) > Number(oldest)) };
+        return page(c.history.filter((m) => Number(m.ts) > Number(oldest)), cursor);
       },
-      async replies(channel, rootTs) {
+      async replies(channel, rootTs, cursor) {
         reads.push(`replies ${channel} ${rootTs}`);
         if (budget.replies <= 0) throw new SubrequestBudgetError(38);
         budget.replies -= 1;
-        return opts.channels[channel]?.threads?.[rootTs] ?? null;
+        const thread = opts.channels[channel]?.threads?.[rootTs];
+        return thread ? page(thread, cursor) : null;
       },
     },
     sources: {
@@ -160,30 +194,47 @@ export function sweepHarness(opts: {
       },
     },
     detector: modelDriftDetector(provider),
-    store,
+    store: faultyStore,
     delivery: {
       render(card) {
         const rendered = renderProposalCard(card);
         return { text: rendered.text, blocks: rendered.blocks ?? proposalCardBlocks(rendered.text) };
       },
-      async post(to, card) {
-        posted.push({ channel: to.channel, threadTs: to.threadTs, text: card.text });
+      async post(to, card, cardKey) {
         nextTs += 1;
-        return { ok: true, ts: `${Math.floor(clock.now / 1000)}.${String(900000 + nextTs)}` };
+        const ts = `${Math.floor(clock.now / 1000)}.${String(900000 + nextTs)}`;
+        posted.push({ channel: to.channel, threadTs: to.threadTs, text: card.text, ts, cardKey });
+        // A stop after Slack took the post, before the job heard back.
+        once("post");
+        return { ok: true, ts };
+      },
+      async findPosted(to, cardKey) {
+        const hit = posted.filter((p) => p.channel === to.channel && p.threadTs === to.threadTs && p.cardKey === cardKey).at(-1);
+        return hit ? { ts: hit.ts, text: hit.text } : null;
       },
       async stage(proposal) {
+        once("stage");
         staged.push(proposal);
         await threadState.putProposal(proposal);
+      },
+      async withdraw(channel, messageTs, text, cardKey) {
+        const card = posted.find((p) => p.channel === channel && p.ts === messageTs);
+        if (card) {
+          card.withdrawn = text;
+          // Retagged, as the real edit does: a search by its key passes it over.
+          card.cardKey = `withdrawn:${cardKey}`;
+        }
       },
       async permalink(channel, messageTs) {
         return `https://plus.slack.com/archives/${channel}/p${messageTs.replace(".", "")}`;
       },
     },
     config: { plusDesign: DESIGN, plusUniversal: UNIVERSAL, unoBot: UNO_BOT, botUserId: BOT },
+    meter: { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ ...headroom }) },
     now: () => clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
-  return { deps, store, threadState, provider, replies, posted, staged, reads, clock, budget };
+  return { deps, store, threadState, provider, replies, posted, staged, reads, clock, budget, headroom, faults };
 }
 
 /** A human message. */

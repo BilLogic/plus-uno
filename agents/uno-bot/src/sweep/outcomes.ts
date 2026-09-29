@@ -13,9 +13,10 @@
 //                    integration refused it because the block moved since the
 //                    sweep read it, `failed` for any other error.
 //   ⛔             → every item `dropped`.
-//   a revision    → each item still on the new card moves to it; each one left
-//                    off is `dropped` (a reply dropping an item is how a person
-//                    says "not this one").
+//   a revision    → each item still on the new card moves to it, its 72 h
+//                    restarted with the card's; each one left off is `dropped`
+//                    (a reply dropping an item is how a person says "not this
+//                    one").
 //   no answer     → nothing: an item still `proposed` 72 h after it posted
 //                    expired, and the queries read it that way.
 //
@@ -104,14 +105,20 @@ export async function recordSweepRevision(
   revision: PendingProposal,
   now: number,
 ): Promise<{ kept: number; dropped: number }> {
-  if (!replaced.sweepRun || replaced.proposalTs === revision.proposalTs) return { kept: 0, dropped: 0 };
+  // A card staged beside the sweep card, not in its place, carries no
+  // `sweepRun` (`turn.ts`): it revised nothing.
+  if (!replaced.sweepRun || !revision.sweepRun || replaced.proposalTs === revision.proposalTs) {
+    return { kept: 0, dropped: 0 };
+  }
   const stillThere = new Set(proposalOperations(revision).map(replacedBlockOf).filter((b): b is string => !!b));
   let kept = 0;
   let dropped = 0;
   for (const item of await store.itemsForProposal(replaced.proposalTs)) {
     if (item.status !== "proposed") continue;
     if (stillThere.has(item.blockId)) {
-      await store.updateItem(item.itemId, { proposalTs: revision.proposalTs });
+      // The revision lives its own 72 h from now, and the morning's liveness
+      // check reads it from here.
+      await store.updateItem(item.itemId, { proposalTs: revision.proposalTs, postedAt: now });
       kept += 1;
     } else {
       await store.updateItem(item.itemId, { status: "dropped", resolvedAt: now });
@@ -119,4 +126,31 @@ export async function recordSweepRevision(
     }
   }
   return { kept, dropped };
+}
+
+/**
+ * Record a cut-off sweep card re-staged as a fresh one: each item whose fix
+ * is still to run moves to the new card. The rest stay where they were — the
+ * run that was cut off may have written them, and nothing here knows.
+ *
+ * @param store - The records
+ * @param from - The card whose run was cut off
+ * @param to - The card staged with what it never finished
+ * @param now - Epoch ms: the fresh card's 72 h start here
+ */
+export async function recordSweepRestage(
+  store: Pick<SweepRecords, "itemsForProposal" | "updateItem">,
+  from: PendingProposal,
+  to: PendingProposal,
+  now: number,
+): Promise<number> {
+  if (!from.sweepRun || from.proposalTs === to.proposalTs) return 0;
+  const toRun = new Set(proposalOperations(to).map(replacedBlockOf).filter((b): b is string => !!b));
+  let moved = 0;
+  for (const item of await store.itemsForProposal(from.proposalTs)) {
+    if (item.status !== "proposed" || !toRun.has(item.blockId)) continue;
+    await store.updateItem(item.itemId, { proposalTs: to.proposalTs, postedAt: now });
+    moved += 1;
+  }
+  return moved;
 }

@@ -41,6 +41,8 @@ const RUN_COLUMNS = [
 
 const ITEM_COLUMNS = [
   "item_id",
+  "finding_id",
+  "destination",
   "run_date",
   "channel_id",
   "thread_ts",
@@ -72,10 +74,17 @@ const UPSERT_RUN =
     .map((c) => `${c} = excluded.${c}`)
     .join(", ");
 const SELECT_RUN = `SELECT ${RUN_COLUMNS.join(", ")} FROM sweep_runs WHERE run_id = ?`;
-const INSERT_ITEM =
-  `INSERT INTO sweep_items (${ITEM_COLUMNS.join(", ")}) VALUES (${placeholders(ITEM_COLUMNS.length)}) ` +
+// A card's items in one statement and one bound value: the rows travel as a
+// JSON array and `json_each` unrolls them — ten rows of sixteen columns would
+// be past D1's bound-parameter limit as plain placeholders. `WHERE true` is
+// SQLite's rule for an upsert fed by a SELECT.
+const INSERT_ITEMS =
+  `INSERT INTO sweep_items (${ITEM_COLUMNS.join(", ")}) ` +
+  `SELECT ${ITEM_COLUMNS.map((c) => `json_extract(value, '$.${c}')`).join(", ")} FROM json_each(?) WHERE true ` +
   `ON CONFLICT (item_id) DO NOTHING`;
 const SELECT_ITEMS = `SELECT ${ITEM_COLUMNS.join(", ")} FROM sweep_items`;
+const MARK_POSTED = "UPDATE sweep_items SET proposal_ts = ?, posted_at = ? WHERE card_key = ?";
+const RELEASE_CARD = "DELETE FROM sweep_items WHERE card_key = ? AND proposal_ts IS NULL";
 
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
@@ -118,9 +127,11 @@ function fromRunRow(row: RunRow): SweepRunRecord {
   };
 }
 
-function itemRow(i: SweepItemRecord): unknown[] {
-  const row: ItemRow = {
+function itemRow(i: SweepItemRecord): ItemRow {
+  return {
     item_id: i.itemId,
+    finding_id: i.findingId,
+    destination: i.destination,
     run_date: i.runDate,
     channel_id: i.channel,
     thread_ts: i.threadTs,
@@ -135,12 +146,13 @@ function itemRow(i: SweepItemRecord): unknown[] {
     posted_at: i.postedAt,
     resolved_at: i.resolvedAt,
   };
-  return ITEM_COLUMNS.map((c) => row[c]);
 }
 
 function fromItemRow(row: ItemRow): SweepItemRecord {
   return {
     itemId: String(row.item_id),
+    findingId: String(row.finding_id),
+    destination: String(row.destination),
     runDate: String(row.run_date),
     channel: String(row.channel_id),
     threadTs: String(row.thread_ts),
@@ -185,14 +197,23 @@ export function createD1SweepRecords(deps: { db: SweepDatabase }): SweepRecords 
       return row ? fromRunRow(row) : null;
     },
     async addItems(added) {
-      for (const item of added) {
-        chargeD1Query();
-        await db.prepare(INSERT_ITEM).bind(...itemRow(item)).run();
-      }
+      if (!added.length) return;
+      chargeD1Query();
+      await db.prepare(INSERT_ITEMS).bind(JSON.stringify(added.map(itemRow))).run();
     },
     itemsOnCard: (cardKey) => items("card_key = ?", cardKey),
     itemsForProposal: (proposalTs) => items("proposal_ts = ?", proposalTs),
-    itemsInThread: (channel, threadTs) => items("channel_id = ? AND thread_ts = ?", channel, threadTs),
+    itemsForFindings: async (findingIds) =>
+      findingIds.length ? items("finding_id IN (SELECT value FROM json_each(?))", JSON.stringify(findingIds)) : [],
+    openItems: () => items("status = 'proposed'"),
+    async markPosted(cardKey, proposalTs, at) {
+      chargeD1Query();
+      await db.prepare(MARK_POSTED).bind(proposalTs, at, cardKey).run();
+    },
+    async releaseCard(cardKey) {
+      chargeD1Query();
+      await db.prepare(RELEASE_CARD).bind(cardKey).run();
+    },
     async updateItem(itemId, patch) {
       const sets: string[] = [];
       const values: unknown[] = [];
@@ -203,6 +224,10 @@ export function createD1SweepRecords(deps: { db: SweepDatabase }): SweepRecords 
       if (patch.proposalTs !== undefined) {
         sets.push("proposal_ts = ?");
         values.push(patch.proposalTs);
+      }
+      if (patch.postedAt !== undefined) {
+        sets.push("posted_at = ?");
+        values.push(patch.postedAt);
       }
       if (patch.resolvedAt !== undefined) {
         sets.push("resolved_at = ?");
