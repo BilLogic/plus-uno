@@ -14,7 +14,7 @@ authored half (#166), counted rather than assumed.
 | [Progress](Progress/index.md) | 11 | ✅ | ✕ | ✅ |
 | [Spinner](Spinner/index.md) | 4 | ✅ | ✕ | ✅ |
 | [Status](Status/index.md) | 9 | ✅ | ✕ | ✅ |
-| [Tag](Tag/index.md) | 19 | ✅ | ✕ | ✅ |
+| [Tag](Tag/index.md) | 21 | ✅ | ✕ | ✅ |
 | [TagGroup](TagGroup/index.md) | 8 | ✅ | ✕ | ✅ |
 | [Tile](Tile/index.md) | 10 | ✅ | ✕ | ✅ |
 

@@ -919,6 +919,7 @@ Interactive.args = {
     text: 'Mathematics',
     behavior: 'read-only',
     color: 'blue',
+    type: 'plain',
     href: '#mathematics',
     isSelected: false,
     isLoading: false,
