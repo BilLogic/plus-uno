@@ -13,14 +13,19 @@ import { fileURLToPath } from 'node:url';
 
 import { INVERSE_GROUNDS } from '../../design-system/src/components/actions/CloseButton/inverseGrounds.js';
 import {
+  GLYPH_PARTIAL,
+  GLYPH_SELECTORS,
   analyzeSheet,
   annotationErrors,
+  glyphSelectors,
   groundAt,
   groundsOfSelector,
   hasIconSubject,
   isNonText,
   resolvedSelectors,
 } from './declared-grounds.mjs';
+
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 const VALUES = new Map([
   ['--color-primary', '#0472a8'],
@@ -112,13 +117,13 @@ test('the innermost @grounds wins', () => {
 const icon = (selector, body = 'color: red;') => `${selector} {\n  // @contrast: non-text\n  ${body}\n}\n`;
 
 test('@contrast: non-text is valid only when every selector has an icon subject', () => {
-  for (const selector of ['.a .fa-solid', '.x__icon', 'i.fa-xmark', '.x svg', '.fa', '.x > .fas']) {
+  for (const selector of ['.a .fa-solid', 'i.fa-brands.fa-github', '.x svg', '.fa', '.x > .fas', '.x .fa-light']) {
     assert.deepEqual(errors(icon(selector)), [], selector);
   }
 });
 
 test('reviewer escapes: each is an error, and the text bar stays', () => {
-  for (const selector of ['.label .fa-x, .label', '.label:not(.fa-x)', '.zz svg + .label', '.zz__icon-label']) {
+  for (const selector of ['.label .fa-solid, .label', '.label:not(.fa-solid)', '.zz svg + .label', '.zz__icon-label']) {
     const source = icon(selector);
     assert.match(errors(source).join('\n'), /non-text on a text selector/, selector);
     assert.equal(nonText(source, 'color: red'), false, selector);
@@ -126,7 +131,7 @@ test('reviewer escapes: each is an error, and the text bar stays', () => {
 });
 
 test('@contrast resolves SCSS nesting and `&` before judging the subject', () => {
-  assert.deepEqual(errors('.x {\n  &__icon {\n    // @contrast: non-text\n    color: red;\n  }\n}\n'), []);
+  assert.deepEqual(errors('.x {\n  &.fa-solid {\n    // @contrast: non-text\n    color: red;\n  }\n}\n'), []);
   assert.deepEqual(errors('.x {\n  .fa-solid {\n    // @contrast: non-text\n    color: red;\n  }\n}\n'), []);
   assert.match(errors('.fa-solid {\n  & + .label {\n    // @contrast: non-text\n    color: red;\n  }\n}\n').join('\n'), /text selector/);
 });
@@ -145,6 +150,14 @@ test('`&` expands to the parent literally, even when the parent holds a replacem
   assert.deepEqual(resolved(".a[data-x=\"$'\"] {\n  &:hover { color: red; }\n}\n", '&:hover'), [".a[data-x=\"$'\"]:hover"]);
 });
 
+test('a backslash-escaped `&` is text, not the parent', () => {
+  // `.b\&` is a class named `b&`: no parent reference, so it nests as a descendant.
+  assert.deepEqual(resolved('.a {\n  .b\\& { color: red; }\n}\n', '.b\\&'), ['.a .b\\&']);
+  assert.deepEqual(resolved('.a {\n  &.b\\& { color: red; }\n}\n', '&.b\\&'), ['.a.b\\&']);
+  // An escaped backslash does not escape the `&` after it.
+  assert.deepEqual(resolved('.a {\n  .b\\\\ & { color: red; }\n}\n', '.b\\\\ &'), ['.b\\\\ .a']);
+});
+
 test('an `&` inside a quoted attribute value is text, not the parent', () => {
   assert.deepEqual(resolved('.p {\n  &[data-label="a & b"] { color: red; }\n}\n', '&[data-label="a & b"]'), ['.p[data-label="a & b"]']);
   // No `&` outside the quotes, so the rule nests as a descendant.
@@ -152,25 +165,84 @@ test('an `&` inside a quoted attribute value is text, not the parent', () => {
 });
 
 test('@contrast never reaches a nested rule: nested text keeps the text bar', () => {
-  const source = '.zz .fa-x {\n  // @contrast: non-text\n  color: red;\n  .label { color: green; }\n}\n';
+  const source = '.zz .fa-solid {\n  // @contrast: non-text\n  color: red;\n  .label { color: green; }\n}\n';
   assert.deepEqual(errors(source), []);
   assert.equal(nonText(source, 'color: red'), true);
   assert.equal(nonText(source, 'color: green'), false);
 });
 
 test('@contrast values other than non-text are errors', () => {
-  assert.deepEqual(errors(icon('.x__icon')), []);
-  assert.match(errors('.x__icon {\n  // @contrast: large\n  color: red;\n}\n').join('\n'), /not a known value/);
+  assert.deepEqual(errors(icon('.x .fa-solid')), []);
+  assert.match(errors('.x .fa-solid {\n  // @contrast: large\n  color: red;\n}\n').join('\n'), /not a known value/);
 });
 
 test('icon subjects, directly', () => {
   assert.equal(hasIconSubject('.a .fa-solid'), true);
   assert.equal(hasIconSubject('.fa-solid .label'), false);
-  assert.equal(hasIconSubject('.label:not(.fa-x)'), false);
+  assert.equal(hasIconSubject('.label:not(.fa-solid)'), false);
   assert.equal(hasIconSubject('.zz__icon-label'), false);
 });
 
+test('an icon is a glyph class or svg, not any `fa-*` name and not an `__icon` slot', () => {
+  // An icon name alone does not render; the layers classes hold text; an
+  // `__icon` element names a slot, which can hold text.
+  for (const selector of ['.a .fa-check', '.a .fa-layers-text', '.a .fa-layers-counter', '.a .fa-stack', '.x__icon']) {
+    assert.equal(hasIconSubject(selector), false, selector);
+  }
+});
+
+/* --------------------------------------------------- one definition of icon */
+
+const partial = (body) => `@mixin icon-glyph {\n${body}\n}\n`;
+
+test('the checker reads its glyph list from the icon-glyph mixin, and accepts exactly it', () => {
+  const source = fs.readFileSync(path.join(REPO, GLYPH_PARTIAL), 'utf8');
+  assert.deepEqual(GLYPH_SELECTORS, glyphSelectors(source));
+  for (const selector of GLYPH_SELECTORS) assert.equal(hasIconSubject(`.x ${selector}`), true, selector);
+  // Every Font Awesome style takes the same rule as solid and regular.
+  for (const style of ['.fab', '.fa-brands', '.fa-light', '.fa-thin', '.fa-duotone', '.fa-sharp', '.fal', '.fat', '.fad']) {
+    assert.ok(GLYPH_SELECTORS.includes(style), style);
+  }
+});
+
+test('a glyph mixin the checker cannot read is an error, not an empty list', () => {
+  assert.throws(() => glyphSelectors('.x { color: red; }\n'), /no @mixin icon-glyph/);
+  assert.throws(() => glyphSelectors(partial('  .fa { color: red; }')), /one rule holding @content/);
+  assert.throws(() => glyphSelectors(partial('  .fa .x { @content; }')), /a single class or type/);
+});
+
+test('an `@include icon-glyph` block is measured as the rule it compiles to', () => {
+  const source = '.p {\n  .x__icon {\n    @include icon-glyph {\n      // @contrast: non-text\n      color: red;\n    }\n  }\n}\n';
+  assert.deepEqual(errors(source), []);
+  assert.equal(nonText(source, 'color: red'), true);
+  const sheet = analyzeSheet(source);
+  const [rule] = sheet.glyphRules;
+  assert.deepEqual(resolvedSelectors(rule), GLYPH_SELECTORS.map((g) => `.p .x__icon ${g}`));
+  // A namespaced include is the same mixin.
+  assert.deepEqual(errors(source.replace('icon-glyph', 'icons.icon-glyph')), []);
+});
+
+test('an `@include` of any other mixin is an at-rule: an annotation in it opens nothing', () => {
+  const source = '.x {\n  @include other {\n    // @contrast: non-text\n    color: red;\n  }\n}\n';
+  assert.match(errors(source).join('\n'), /@contrast must open its block/);
+  assert.equal(nonText(source, 'color: red'), false);
+});
+
 /* ------------------------------------------------------------- drift guard */
+
+test('OverviewCard names no glyph by hand: each non-text color opens an icon-glyph include', () => {
+  const file = path.join(REPO, 'design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.scss');
+  const sheet = analyzeSheet(fs.readFileSync(file, 'utf8'));
+  const annotated = [...sheet.annotations].filter(([, own]) => own.contrast).map(([rule]) => rule);
+  assert.equal(annotated.length, 5, 'one per SMART type');
+  for (const rule of annotated) assert.ok(sheet.glyphRules.has(rule), `line ${rule.source.start.line}`);
+  sheet.root.walkRules((rule) => {
+    if (sheet.glyphRules.has(rule)) return;
+    for (const selector of rule.selectors) {
+      assert.equal(hasIconSubject(selector), false, `line ${rule.source.start.line}: \`${selector}\` lists a glyph by hand`);
+    }
+  });
+});
 
 test("CloseButton's exported inverse grounds match the @grounds on its inverse tone", () => {
   const scss = path.resolve(
