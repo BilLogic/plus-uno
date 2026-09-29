@@ -1993,7 +1993,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop."
+            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's TagContext, never a prop."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"

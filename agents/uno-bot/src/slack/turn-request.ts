@@ -103,6 +103,7 @@ export function slackTurnRequest(
     ...(envelope.replyTs ? { replyTs: envelope.replyTs } : {}),
     userMsgTs: event.ts,
     threaded: Boolean(event.thread_ts),
+    ...(event.channel_type ? { channelType: event.channel_type } : {}),
     text,
     attachmentsText,
     ...(scoped ? { scopeInstruction: scoped.scope.instruction } : {}),
