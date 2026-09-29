@@ -41,7 +41,7 @@ From `design-system/src/components/status-and-loading/Progress/Progress.scss`. O
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Spinner` · `Status` · `Tag` · `TagGroup` · `Tile`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

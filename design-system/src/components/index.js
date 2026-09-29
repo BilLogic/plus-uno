@@ -41,6 +41,7 @@ export { default as Spinner } from '@/components/status-and-loading/Spinner';
 export { default as Status } from '@/components/status-and-loading/Status';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 
+export { default as Suggestion } from '@/components/status-and-loading/Suggestion';
 export { default as Tag } from '@/components/status-and-loading/Tag';
 // The disabled state a field hands the tags it wraps in `TagContext.Provider`.
 export { TagContext, useTagContext } from '@/components/status-and-loading/Tag';
