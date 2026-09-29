@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Toast as BootstrapToast, ToastContainer as BootstrapToastContainer } from 'react-bootstrap';
+import CloseButton from '@/components/actions/CloseButton';
 import './Toast.scss';
 
 export const Toast = ({
@@ -19,7 +20,7 @@ export const Toast = ({
     timestamp, // '11 mins ago' etc
     ...props
 }) => {
-    // Icon mapping
+    // Icon mapping, one entry per style.
     const iconMap = {
         'danger': 'fa-triangle-exclamation',
         'success': 'fa-circle-check',
@@ -27,10 +28,13 @@ export const Toast = ({
         'warning': 'fa-circle-exclamation',
         'primary': 'fa-circle',
         'secondary': 'fa-circle',
-        'default': 'fa-circle'
     };
 
-    const iconClass = iconMap[style] || 'fa-circle';
+    // A style outside the list falls back to the default, secondary. The header
+    // is only filled for the listed styles, and the × is inverse, so an unknown
+    // style would otherwise draw a white × on a white header.
+    const toastStyle = Object.hasOwn(iconMap, style) ? style : 'secondary';
+    const iconClass = iconMap[toastStyle];
 
     /*
      * #325. Politeness follows the message. Every toast used to be
@@ -40,7 +44,7 @@ export const Toast = ({
      * everything else waits its turn. `role` and `aria-live` are set together
      * because a mismatched pair is worse than either alone.
      */
-    const isUrgent = style === 'danger' || style === 'warning';
+    const isUrgent = toastStyle === 'danger' || toastStyle === 'warning';
     const liveRole = isUrgent ? 'alert' : 'status';
     const livePoliteness = isUrgent ? 'assertive' : 'polite';
 
@@ -72,7 +76,7 @@ export const Toast = ({
         <BootstrapToast
             ref={toastRef}
             id={id}
-            className={`plus-toast ${style} ${className}`}
+            className={`plus-toast ${toastStyle} ${className}`}
             show={show}
             onClose={onClose}
             delay={delay}
@@ -93,16 +97,12 @@ export const Toast = ({
                 </div>
                 <strong className="plus-toast-title">{title}</strong>
                 {timestamp && <small className="plus-toast-timestamp">{timestamp}</small>}
-                {dismissible && (
-                    <button
-                        type="button"
-                        className="plus-toast-close"
-                        aria-label="Close"
-                        onClick={onClose}
-                    >
-                        <i className="fas fa-xmark"></i>
-                    </button>
-                )}
+                {/*
+                  * The shared CloseButton, inverse on every header color: the
+                  * header is always a filled ground (see Toast.scss). Its name
+                  * stays "Close", the CloseButton default.
+                  */}
+                {dismissible && <CloseButton tone="inverse" onClick={onClose} />}
             </BootstrapToast.Header>
             <div className="plus-toast-divider"></div>
             <BootstrapToast.Body className={`plus-toast-body ${bodyClass}`}>

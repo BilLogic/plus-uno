@@ -42,6 +42,7 @@ import type {
   ModelStop,
   ModelToolCall,
   ModelToolResult,
+  ModelUsage,
   SystemBlock,
   ToolSpec,
 } from "./model-provider";
@@ -224,6 +225,18 @@ export interface LoopInput {
   onDials?: (dials: TurnDials) => void;
   onToolCall?: (call: ToolCall) => void;
   onToolResult?: (result: ToolResultNote) => void;
+  /** Called once, as the turn finishes, with what it ran on and spent — the
+   *  facts of the `[uno-bot] request done` line, for the usage record. */
+  onSpend?: (spend: TurnSpend) => void;
+}
+
+/** What one turn ran on and what it spent, as the provider reported it. */
+export interface TurnSpend {
+  provider: string;
+  model: string;
+  /** True when the turn retried on the backup model. */
+  fallback: boolean;
+  usage: ModelUsage;
 }
 
 // ── The loop ─────────────────────────────────────────────────────────────────
@@ -249,6 +262,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     const { model, detail } = provider.dials();
     input.onDials?.({ tier, route: input.routeReason, model, detail });
     const usage = provider.usage();
+    input.onSpend?.({ provider: provider.name, model, fallback: fellBack, usage });
     // One line per turn, per provider, reading as one named configuration: the
     // tier, why it was chosen, and the dials it resolved to.
     const dialLine = Object.entries(detail)

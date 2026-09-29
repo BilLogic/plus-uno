@@ -15,7 +15,7 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `shape` | oneOf | — | `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. A preset wins over it, with a warning when they disagree. |
+| `shape` | enum | — | `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. A preset wins over it, with a warning when they disagree. |
 | `preset` | oneOf | — | Sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading TagGroup (`tag-group`) or three lines of text (`paragraph`). Sets shape, height and corners together and wins over them. |
 | `width` | number or string | — | Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. A circle takes one size: `width`, or `height` when no width is given. |
 | `height` | number or string | — | Any CSS length, or a number of pixels. Ignored, with a warning, by presets and by several text `lines`, which are always 16 tall. |
@@ -24,6 +24,12 @@
 | `isShimmering` | bool | `true` | The shimmer sweep. Off, it is a flat fill, which is also what reduced motion gets. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
+
+## Variants
+
+**`shape`** — `rect` · `circle` · `text`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 

@@ -16,14 +16,24 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | node (required) | — | The status text, as people say it: "Needs review", "Due tomorrow". |
-| `type` | oneOf | `'state'` | `state` for a condition; `date` for a due or event date, outlined with a fixed icon. |
-| `style` | oneOf | `'neutral'` | The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. |
-| `size` | oneOf | `'medium'` | `medium` (20) in rows, lists and sentences; `large` (32) beside a heading. |
+| `type` | enum | `'state'` | `state` for a condition; `date` for a due or event date, outlined with a fixed icon. |
+| `style` | enum | `'neutral'` | The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. |
+| `size` | enum | `'medium'` | `medium` (20) in rows, lists and sentences; `large` (32) beside a heading. |
 | `leadingVisual` | string or node | — | One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. |
 | `count` | number or string | — | A number nested inside the label as a Count of the same style: small (16) in medium, medium (20) in large. Hidden at 0. |
 | `maxWidth` | number or string | `200` | The widest the Status grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
+
+## Variants
+
+**`type`** — `state` · `date`
+
+**`style`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery`
+
+**`size`** — `medium` · `large`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 

@@ -50,10 +50,12 @@ pages, never for a live dialog.
 
 ## Announcement, and why it is easy to overdo
 
-`Alert` renders `role="alert"` and `Toast` renders `role="alert"` with
-`aria-live="assertive"` and `aria-atomic="true"`. Both interrupt a screen reader.
-That is right for something that just went wrong and heavy-handed for ambient
-information — a count, a timestamp, a "3 sessions this week" line is better as
+`Alert` renders `role="alert"`. A `danger` or `warning` `Toast` renders
+`role="alert"` with `aria-live="assertive"` and `aria-atomic="true"`; every other
+`Toast` style is `role="status"` with `aria-live="polite"` and waits its turn.
+Interrupting is right for something that just went wrong and heavy-handed for
+ambient information — a count, a timestamp, a "3 sessions this week" line is
+better as
 ordinary page text.
 
 Live regions announce *changes*. A message present in the first paint may not be
@@ -64,8 +66,8 @@ Every close control in the group has a hard-coded label: `Close alert` on
 `Alert`, `Close` on `Toast`, `Close modal` on `Modal`. None of them can be
 renamed, so several dismissible messages on one screen expose several
 identically named buttons. `CloseButton`, the shared 24×24 dismiss control that
-`Alert` uses, takes `what` for a "Dismiss {what}" name; `Alert` passes its
-established label instead.
+`Alert` and `Toast` use, takes `what` for a "Dismiss {what}" name; `Alert` passes
+its established label instead, and `Toast` keeps the default "Close".
 
 ## Related
 

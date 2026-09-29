@@ -30,7 +30,7 @@ import type { Env, SlackContext } from "../types";
 import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
 import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
 import { batchResultMessage } from "../slack/batch-result";
-import type { GateVerdict } from "../gate/index";
+import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { isToolName } from "./tool-table";
@@ -46,6 +46,19 @@ import { TOOLS_BY_NAME } from "./tools";
  * happen past a lost race is execution.
  */
 export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<void> {
+  await runVerdict(env, verdict);
+}
+
+/**
+ * `executeVerdict`, answering with what the batch ran — one outcome per
+ * operation — or undefined when nothing ran (a lost race, a decline). Turn's
+ * Slack wiring takes this form: the usage record reads it for a ticket the bot
+ * filed on itself. The doors, which have no use for it, take `executeVerdict`.
+ */
+export async function runVerdict(
+  env: Env,
+  verdict: GateVerdict,
+): Promise<OperationOutcome[] | undefined> {
   if (verdict.outcome !== "won" || !verdict.proposal) return;
   const pending = verdict.proposal;
   const store = threadStateFor(env);
@@ -137,7 +150,7 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
       { channel: run.channel, thread: run.threadTs },
       { role: "assistant", content: batchOutcomeNote(outcomes) },
     );
-    if (fenced) return;
+    if (fenced) return outcomes;
 
     // Say what ran. A batch's partial result is invisible otherwise: the person
     // approved four things and the thread would show one tool's reply.
@@ -173,8 +186,7 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
   // A card the Worker staged itself has no requester to name, and its own
   // channel thread is where the result is followed (the Figma library card),
   // so it asks nobody for a review here.
-  if (!run.requesterUserId) return;
-  for (const outcome of outcomes) {
+  for (const outcome of run.requesterUserId ? outcomes : []) {
     if (!warrantsReviewRequest(outcome.toolName) || !outcome.ok) continue;
     try {
       await postReviewRequest(env, {
@@ -189,6 +201,7 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
       );
     }
   }
+  return outcomes;
 }
 
 /** Pull an artifact URL (PR/Notion link) out of a tool result, if present. */

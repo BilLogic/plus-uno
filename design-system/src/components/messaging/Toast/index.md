@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/messaging/Toast/Toast.jsx`
 
-**Stories:** `design-system/src/components/messaging/Toast/Toast.stories.jsx` — Styles, Overview, Interactive
+**Stories:** `design-system/src/components/messaging/Toast/Toast.stories.jsx` — Styles, Overview, Interactive, Dismiss, UnknownStyle
 
 **Storybook page:** `design-system/src/components/messaging/Toast/Toast.mdx`
 

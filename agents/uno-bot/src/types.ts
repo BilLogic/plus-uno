@@ -145,6 +145,12 @@ export interface Env {
   GEMINI_GRIND_MODEL?: string;
 
   HARNESS_KV?: KVNamespace;
+  /** The `uno-bot-usage` D1 database: one row per turn (src/usage/, ADR-030).
+   *  Optional — unbound, turns are answered as before and recorded nowhere. */
+  USAGE_DB?: D1Database;
+  /** Comma-separated channel ids whose turns are test traffic on the usage
+   *  record — #uno-bot-sandbox. */
+  TEST_CHANNEL_IDS?: string;
   /** "on" enables chat.startStream, on every surface. Shipped off, and the
    *  reason is `wrangler.toml`'s — not the one that used to stand here.
    *  This comment read `invalid_arguments` "even with thread_ts +

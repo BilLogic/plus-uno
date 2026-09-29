@@ -23,6 +23,13 @@ import {
   type TurnRequest,
 } from "../../src/turn/index";
 import { runOperations, type OperationOutcome } from "../../src/gate/index";
+import {
+  createInMemoryUsageLog,
+  type InMemoryUsageLog,
+  type TurnOrigin,
+  type UsageLog,
+} from "../../src/usage/index";
+import type { ModelUsage } from "../../src/agent/model-provider";
 import type { AbsenceContext } from "../../src/agent/absence";
 import {
   createInMemoryThreadState,
@@ -45,6 +52,8 @@ import {
  * remembering to widen a copy.
  */
 export type JudgeCall = Parameters<TurnDeps["reviewDraft"]>[0];
+
+type TurnAgentSpend = NonNullable<Awaited<ReturnType<TurnDeps["runAgent"]>>["spend"]>;
 
 export const CHANNEL = "C1";
 export const CONVERSATION = "1700000000.000100";
@@ -116,6 +125,9 @@ export interface Harness {
   judged: JudgeCall[];
   /** Tool names the loop actually executed. */
   executed: string[];
+  /** The usage records the turn left — the in-memory log, unless the case
+   *  handed in a log of its own (then this one stays empty). */
+  usage: InMemoryUsageLog;
 }
 
 export function harness(opts: {
@@ -160,10 +172,27 @@ export function harness(opts: {
    *  the Worker's resolver and visibility read would answer. Absent, every
    *  intake is on `ISSUE_REPO`, public. */
   issueTarget?: (input: Record<string, unknown>) => IssueTarget;
+  /** Stand in for the usage log — one that throws, say. Absent, the turn
+   *  records into `harness().usage`. */
+  usageLog?: UsageLog;
+  /** Where the turn came from; absent, a person in Slack. */
+  origin?: TurnOrigin;
+  /** `TEST_CHANNEL_IDS`, parsed. Absent, none. */
+  testChannelIds?: string[];
+  /** The model the fake provider reports, and the tokens it reports spending. */
+  providerModel?: string;
+  providerUsage?: Partial<ModelUsage>;
+  /** The turn's clock. Absent, the real one. */
+  now?: () => number;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
-  const provider = fakeProvider({ replies: opts.replies ?? [{ text: "Here is the answer." }] });
+  const provider = fakeProvider({
+    replies: opts.replies ?? [{ text: "Here is the answer." }],
+    ...(opts.providerModel ? { model: opts.providerModel } : {}),
+    ...(opts.providerUsage ? { usage: opts.providerUsage } : {}),
+  });
+  const usage = createInMemoryUsageLog();
   const resolved: Harness["resolved"] = [];
   const ran: OperationOutcome[] = [];
   const judged: JudgeCall[] = [];
@@ -176,6 +205,7 @@ export function harness(opts: {
     // The REAL loop, behind the fake provider: the turn's request reaches a
     // model through the same code production uses.
     async runAgent(req) {
+      let spend: TurnAgentSpend | undefined;
       const result = await runLoop({
         provider,
         deps: {
@@ -204,9 +234,13 @@ export function harness(opts: {
         currentSenderId: req.currentSender.userId,
         cancelKey: opts.cancelKey ?? null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),
+        onSpend: (s) => {
+          spend = s;
+        },
       });
       return {
         result,
+        ...(spend ? { spend } : {}),
         tools: executed.slice(),
         references: [],
         ...(opts.receipt ? { receipt: opts.receipt } : {}),
@@ -228,7 +262,7 @@ export function harness(opts: {
     // turn calls `resolveSignal` itself against the in-memory store, so what
     // arrives here is a verdict that has already won its claim.
     async applyVerdict(verdict) {
-      if (verdict.outcome !== "won" || !verdict.proposal || !verdict.decision) return;
+      if (verdict.outcome !== "won" || !verdict.proposal || !verdict.decision) return undefined;
       resolved.push({
         toolName: verdict.proposal.toolName,
         decision: verdict.decision,
@@ -239,9 +273,23 @@ export function harness(opts: {
       // fake tool table — so "the whole batch runs, in order, past a failure"
       // is asserted through a Turn rather than against a helper.
       if (opts.executeOperation && verdict.execute) {
-        ran.push(...(await runOperations(verdict.execute.operations, opts.executeOperation)));
+        const outcomes = await runOperations(verdict.execute.operations, opts.executeOperation);
+        ran.push(...outcomes);
+        return outcomes;
       }
+      return undefined;
     },
+
+    usage: {
+      log: opts.usageLog ?? usage,
+      origin: opts.origin ?? "slack",
+      testChannelIds: opts.testChannelIds ?? [],
+      // A log that never answers must not make the suite wait out production's
+      // timeout.
+      writeTimeoutMs: 50,
+    },
+
+    ...(opts.now ? { now: opts.now } : {}),
 
     // The three reads a card needs, answering with the STRUCTURES the turn
     // puts on the card — never words, which are the adapter's (#623).
@@ -276,7 +324,7 @@ export function harness(opts: {
     deliveredBody: (text) => text,
   };
 
-  return { deps, delivery, threadState, provider, resolved, ran, judged, executed };
+  return { deps, delivery, threadState, provider, resolved, ran, judged, executed, usage };
 }
 
 /** Posts a person would actually read, in order. */
