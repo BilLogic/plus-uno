@@ -80,9 +80,14 @@
     font-size: var(--font-size-fa-h5, 1rem);
 }
 
-/* Past `maxWidth` the label ends in an ellipsis; the full text is a tooltip. */
+/*
+ * Past `maxWidth` the label ends in an ellipsis; the full text is a tooltip.
+ * The weight is pinned: `.body3-txt` sets none, so a Status inside a `th` or a
+ * heading would otherwise inherit bold. Large overrides it below.
+ */
 .plus-status__label {
     min-width: 0;
+    font-weight: var(--font-weight-body3-regular, 300);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -144,6 +149,6 @@ $status-date: (
 /* Forced colors drop box-shadows; a real border keeps the edge. */
 @media (forced-colors: active) {
     .plus-status {
-        border: 1px solid CanvasText;
+        border: var(--size-element-stroke-sm, 1px) solid CanvasText;
     }
 }

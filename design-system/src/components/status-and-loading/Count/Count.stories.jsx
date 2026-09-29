@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { expect, spyOn, userEvent, within } from 'storybook/test';
 
-import { alpha, contrast, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-
 import Count, { COUNT_APPEARANCES, COUNT_SIZES, COUNT_STYLES } from './Count';
 
 /**
@@ -35,6 +33,36 @@ export default {
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
+
+const px = (v) => parseFloat(v);
+
+/** What a token resolves to as a computed color, read through a probe. */
+const tokenColor = (host, token) => {
+    const probe = document.createElement('span');
+    probe.style.backgroundColor = `var(${token})`;
+    host.appendChild(probe);
+    const value = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return value;
+};
+
+const alpha = (color) => {
+    const parts = color.match(/[\d.]+/g).map(Number);
+    return parts.length === 4 ? parts[3] : 1;
+};
+
+/** WCAG contrast ratio between two opaque computed colors. */
+const contrast = (a, b) => {
+    const lum = (color) => {
+        const [r, g, b2] = color.match(/[\d.]+/g).slice(0, 3).map((v) => {
+            const c = Number(v) / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b2;
+    };
+    const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+};
 
 /** The pill that holds a given piece of text. */
 const pillOf = (canvas, text) => canvas.getByText(text).parentElement;

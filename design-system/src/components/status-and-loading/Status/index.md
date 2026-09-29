@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Status/Status.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Status/Status.stories.jsx` — Styles, Dates, WithCount, LeadingVisual, Truncation, NeverAButton, DateStyleFallback, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Status/Status.stories.jsx` — Styles, Dates, WithCount, LeadingVisual, Truncation, NeverAButton, DateStyleFallback, PinnedWeight, UnknownValuesFallBack, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Status/Status.mdx`
 
@@ -27,7 +27,7 @@
 
 ## Tokens touched
 
-`--color-danger-border-subtle` · `--color-danger-state-08` · `--color-danger-state-16` · `--color-danger-text` · `--color-focus-ring` · `--color-info-state-08` · `--color-info-state-16` · `--color-info-text` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--color-on-surface-variant` · `--color-on-surface-variant-state-16` · `--color-outline-variant` · `--color-success-state-08` · `--color-success-state-16` · `--color-success-text` · `--color-surface-container` · `--color-warning-border-subtle` · `--color-warning-state-08` · `--color-warning-state-16` · `--color-warning-text` · `--font-size-fa-body2` · `--font-size-fa-h5` · `--font-weight-body2-semibold` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--size-border-radius-radius-150` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075`
+`--color-danger-border-subtle` · `--color-danger-state-08` · `--color-danger-state-16` · `--color-danger-text` · `--color-focus-ring` · `--color-info-state-08` · `--color-info-state-16` · `--color-info-text` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--color-on-surface-variant` · `--color-on-surface-variant-state-16` · `--color-outline-variant` · `--color-success-state-08` · `--color-success-state-16` · `--color-success-text` · `--color-surface-container` · `--color-warning-border-subtle` · `--color-warning-state-08` · `--color-warning-state-16` · `--color-warning-text` · `--font-size-fa-body2` · `--font-size-fa-h5` · `--font-weight-body2-semibold` · `--font-weight-body3-regular` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--size-border-radius-radius-150` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075`
 
 From `design-system/src/components/status-and-loading/Status/Status.scss`. Override these through the token layer, never with a literal.
 

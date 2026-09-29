@@ -80,6 +80,16 @@ const glyphOf = (host, iconClass) => {
 
 const iconIn = (el) => el.querySelector('i');
 
+/** What a font-weight token resolves to as a computed weight, read through a probe. */
+const tokenWeight = (host, token) => {
+    const probe = document.createElement('span');
+    probe.style.fontWeight = `var(${token})`;
+    host.appendChild(probe);
+    const value = getComputedStyle(probe).fontWeight;
+    probe.remove();
+    return value;
+};
+
 /* ----------------------------------------------------------------- stories */
 
 /** The six styles at both sizes. Fill is the style's 08 layer, text its (Text), border its 16 layer. */
@@ -218,6 +228,13 @@ export const LeadingVisual = () => (
         <Status style="success" leadingVisual="circle-check" data-testid="medium">Completed</Status>
         <Status style="warning" leadingVisual="triangle-exclamation" data-testid="warning">Needs review</Status>
         <Status style="success" size="large" leadingVisual="circle-check" data-testid="large">Completed</Status>
+        <Status
+            style="info"
+            leadingVisual={<svg width="12" height="12" data-testid="node-visual"><circle cx="6" cy="6" r="6" fill="currentColor" /></svg>}
+            data-testid="node"
+        >
+            Syncing
+        </Status>
     </div>
 );
 LeadingVisual.play = async ({ canvasElement }) => {
@@ -234,6 +251,11 @@ LeadingVisual.play = async ({ canvasElement }) => {
     }
     await expect(getComputedStyle(iconIn(canvas.getByTestId('warning')), '::before').content)
         .toBe(glyphOf(canvasElement, 'fa-triangle-exclamation'));
+
+    // A node visual is hidden too: the wrapper, not the caller, owns that.
+    const node = canvas.getByTestId('node-visual');
+    await expect(node.closest('[aria-hidden="true"]'), 'a node visual is hidden from assistive technology').not.toBeNull();
+    await expect(canvas.getByTestId('node')).toHaveTextContent('Syncing');
 };
 
 /**
@@ -280,7 +302,8 @@ Truncation.play = async ({ canvasElement }) => {
 
 /**
  * A Status is never a button: no button role, no click handler, and it is read
- * as its text. An `onClick` passed to it is dropped with a development warning.
+ * as its text. An `onClick`, a `role` or a `tabIndex` passed to it is dropped
+ * with a development warning; `role="button"` never reaches the DOM.
  */
 export const NeverAButton = () => {
     const [mounted, setMounted] = useState(false);
@@ -290,7 +313,13 @@ export const NeverAButton = () => {
             <button type="button" onClick={() => setMounted(true)}>Mount a Status with onClick</button>
             <span data-testid="clicks">{clicks}</span>
             {mounted && (
-                <Status style="success" data-testid="status" onClick={() => setClicks((n) => n + 1)}>
+                <Status
+                    style="success"
+                    data-testid="status"
+                    onClick={() => setClicks((n) => n + 1)}
+                    role="button"
+                    tabIndex={0}
+                >
                     Completed
                 </Status>
             )}
@@ -303,7 +332,9 @@ NeverAButton.play = async ({ canvasElement }) => {
     try {
         await userEvent.click(canvas.getByRole('button', { name: 'Mount a Status with onClick' }));
         const status = canvas.getByTestId('status');
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('[Status]'));
+        for (const name of ['onClick', 'role', 'tabIndex']) {
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining(`\`${name}\` is ignored`));
+        }
         await expect(canvas.getAllByRole('button'), 'the only button is the story\'s own').toHaveLength(1);
         await expect(status).not.toHaveAttribute('role');
         await expect(status).not.toHaveAttribute('tabindex');
@@ -341,6 +372,86 @@ DateStyleFallback.play = async ({ canvasElement }) => {
         await expect(innerBorder(fallback)).toBe(innerBorder(neutral));
         await expect(getComputedStyle(fallback).color).toBe(getComputedStyle(neutral).color);
         await expect(getComputedStyle(iconIn(fallback), '::before').content).toBe(glyphOf(canvasElement, 'fa-calendar'));
+    } finally {
+        warn.mockRestore();
+    }
+};
+
+/**
+ * The weight is pinned at both sizes: regular (B3) in medium, semibold (B2) in
+ * large. A Status inside a table header or a heading does not inherit bold.
+ */
+export const PinnedWeight = () => (
+    <table>
+        <thead>
+            <tr>
+                <th><Status style="success" data-testid="th-medium">Completed</Status></th>
+                <th><Status style="success" size="large" data-testid="th-large">Completed</Status></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><Status style="success" data-testid="td-medium">Completed</Status></td>
+                <td><Status style="success" size="large" data-testid="td-large">Completed</Status></td>
+            </tr>
+        </tbody>
+    </table>
+);
+PinnedWeight.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const weight = (id) => getComputedStyle(within(canvas.getByTestId(id)).getByText('Completed')).fontWeight;
+    const header = getComputedStyle(canvasElement.querySelector('th')).fontWeight;
+    await expect(Number(header), 'the header around it is bold').toBeGreaterThanOrEqual(600);
+
+    const regular = tokenWeight(canvasElement, '--font-weight-body3-regular');
+    const semibold = tokenWeight(canvasElement, '--font-weight-body2-semibold');
+    for (const where of ['th', 'td']) {
+        await expect(weight(`${where}-medium`), `medium in a ${where} is B3 regular`).toBe(regular);
+        await expect(weight(`${where}-large`), `large in a ${where} is B2 semibold`).toBe(semibold);
+    }
+};
+
+/**
+ * An unknown style falls back to neutral, and an unknown type to state, each
+ * with a development warning, rather than rendering an unstyled label. The
+ * Statuses mount on a button press after the console is watched.
+ */
+export const UnknownValuesFallBack = () => {
+    const [mounted, setMounted] = useState(false);
+    return (
+        <div style={row}>
+            <button type="button" onClick={() => setMounted(true)}>Mount unknown values</button>
+            <Status data-testid="neutral">Not started</Status>
+            {mounted && (
+                <>
+                    <Status style="purple" data-testid="unknown-style">Not started</Status>
+                    <Status type="deadline" style="success" data-testid="unknown-type">Not started</Status>
+                </>
+            )}
+        </div>
+    );
+};
+UnknownValuesFallBack.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const token = (name) => tokenColor(canvasElement, name);
+    const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+        await userEvent.click(canvas.getByRole('button', { name: 'Mount unknown values' }));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="purple" falls back to neutral'));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('type="deadline"'));
+
+        // The unknown style renders exactly as neutral.
+        const neutral = canvas.getByTestId('neutral');
+        const unknownStyle = canvas.getByTestId('unknown-style');
+        await expect(getComputedStyle(unknownStyle).backgroundColor).toBe(token('--color-surface-container'));
+        await expect(getComputedStyle(unknownStyle).color).toBe(getComputedStyle(neutral).color);
+        await expect(innerBorder(unknownStyle)).toBe(innerBorder(neutral));
+
+        // The unknown type is a filled state, keeping its valid style.
+        const unknownType = canvas.getByTestId('unknown-type');
+        await expect(getComputedStyle(unknownType).backgroundColor).toBe(token('--color-success-state-08'));
+        await expect(innerBorder(unknownType)).toBe(token('--color-success-state-16'));
+        await expect(iconIn(unknownType), 'a state has no date icon').toBeNull();
     } finally {
         warn.mockRestore();
     }

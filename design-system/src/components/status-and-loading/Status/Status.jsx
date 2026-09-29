@@ -27,7 +27,8 @@ import './Status.scss';
  * A DATE IS OUTLINED, AND THE APP PICKS ITS STYLE. `type="date"` takes neutral
  * (not close), warning (due soon) and danger (overdue), each with a fixed icon.
  * The style comes from the date and the due-soon window, never from taste; any
- * other style falls back to neutral with a development warning.
+ * other style falls back to neutral with a development warning, as an unknown
+ * style does on a state and an unknown type falls back to state.
  */
 
 export const STATUS_TYPES = ['state', 'date'];
@@ -85,28 +86,49 @@ export const Status = ({
     className = '',
     id,
     onClick,
+    role,
+    tabIndex,
     ...rest
 }) => {
-    if (onClick) {
-        warn('`onClick` is ignored: a Status is never a button. Edit a status through an inline Dropdown in its field.');
+    /*
+     * Anything that would make it a control is dropped, not passed through: a
+     * click handler, a role, a tab stop. Whether it takes focus is decided by
+     * truncation alone.
+     */
+    for (const [name, value] of [['onClick', onClick], ['role', role], ['tabIndex', tabIndex]]) {
+        if (value !== undefined) {
+            warn(`\`${name}\` is ignored: a Status is never a button. Edit a status through an inline Dropdown in its field.`);
+        }
     }
 
-    const isDate = type === 'date';
-    let effectiveStyle = STATUS_STYLES.includes(style) ? style : 'neutral';
-    if (isDate && !STATUS_DATE_STYLES.includes(effectiveStyle)) {
-        warn(`type="date" takes ${STATUS_DATE_STYLES.join(', ')}; style="${style}" falls back to neutral.`);
+    let effectiveType = type;
+    if (!STATUS_TYPES.includes(type)) {
+        warn(`type="${type}" is not one of ${STATUS_TYPES.join(', ')}; it falls back to state.`);
+        effectiveType = 'state';
+    }
+    const isDate = effectiveType === 'date';
+    const allowed = isDate ? STATUS_DATE_STYLES : STATUS_STYLES;
+    let effectiveStyle = style;
+    if (!allowed.includes(style)) {
+        warn(`type="${effectiveType}" takes ${allowed.join(', ')}; style="${style}" falls back to neutral.`);
         effectiveStyle = 'neutral';
     }
 
     const visual = isDate ? STATUS_DATE_ICONS[effectiveStyle] : leadingVisual;
     const hasCount = count !== undefined && count !== null && formatCount(count) !== null;
 
+    /*
+     * A node visual is a new object every render; keying the measurement on it
+     * would rebuild the ResizeObserver each time. Its presence is what changes
+     * the label's width.
+     */
+    const visualKey = typeof visual === 'string' ? visual : Boolean(visual);
     const labelRef = useRef(null);
-    const truncated = useIsTruncated(labelRef, [children, size, maxWidth, visual, hasCount]);
+    const truncated = useIsTruncated(labelRef, [children, size, maxWidth, visualKey, hasCount]);
 
     const classes = [
         'plus-status',
-        `plus-status--${type}`,
+        `plus-status--${effectiveType}`,
         `plus-status--${effectiveStyle}`,
         `plus-status--${size}`,
         hasCount ? 'plus-status--with-count' : '',
@@ -124,11 +146,13 @@ export const Status = ({
                 id={id}
                 className={classes}
                 style={{ maxWidth }}
-                tabIndex={truncated ? 0 : undefined}
                 {...rest}
+                tabIndex={truncated ? 0 : undefined}
             >
                 <span className="plus-status__content">
-                    {visual && <span className="plus-status__visual">{renderVisual(visual)}</span>}
+                    {visual && (
+                        <span className="plus-status__visual" aria-hidden="true">{renderVisual(visual)}</span>
+                    )}
                     <span
                         ref={labelRef}
                         className={`plus-status__label ${size === 'large' ? 'body2-txt' : 'body3-txt'}`}
