@@ -1,11 +1,12 @@
 // Scheduled runs: which firing starts one, what it holds, and where it queues.
 //
 // No cron is added for them. The free plan caps an account at five cron
-// triggers, and the weekday `*/15 13-23 * * 1-5` trigger the Figma poll runs
-// on already fires at the two times a run needs — 14:00 UTC (the morning run)
-// and 22:00 UTC (the end-of-day run). So a firing reads its own scheduled time
-// and enqueues the matching run BESIDE the poll, which still runs on every
-// firing exactly as it did. The wrangler.toml cron comment gives the ET times.
+// triggers, and the weekday `*/15 13-23 * * 1-5` trigger already fires at the
+// two times a run needs — 14:00 UTC (the morning run) and 22:00 UTC (the
+// end-of-day run). So a firing reads its own scheduled time and enqueues the
+// matching run; every other firing does nothing. The Figma library poll that
+// once ran on every firing is the end-of-day run's `figma-library-poll` job.
+// The wrangler.toml cron comment gives the ET times.
 //
 // The handler only ENQUEUES. A scheduled invocation gets about 10 ms of CPU,
 // and a run's work belongs on its runner, where each alarm runs one job with a
@@ -17,8 +18,13 @@
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
-/** What a scheduled job does. `noop` proves the path and does nothing else. */
-export type ScheduledJobKind = "noop";
+/**
+ * What a scheduled job does. `noop` proves the path and does nothing else.
+ * The Figma library's three: the end-of-day poll finds a publish, the morning
+ * post turns it into a card in #plus-universal, and the morning track follows
+ * each posted card to its PR (src/figma-poll.ts, src/figma-library/).
+ */
+export type ScheduledJobKind = "noop" | "figma-library-poll" | "figma-library-post" | "figma-library-track";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -46,10 +52,16 @@ const RUN_HOURS: Record<ScheduledRunName, number> = {
   "end-of-day": 22,
 };
 
-/** Every run's jobs. Each holds the no-op job until a run has real work. */
+/**
+ * Every run's jobs. A publish found at the end of the day is posted the next
+ * morning, like every proactive job; the tracker follows cards already posted.
+ */
 const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
-  morning: [{ key: "noop", kind: "noop" }],
-  "end-of-day": [{ key: "noop", kind: "noop" }],
+  morning: [
+    { key: "figma-library-post", kind: "figma-library-post" },
+    { key: "figma-library-track", kind: "figma-library-track" },
+  ],
+  "end-of-day": [{ key: "figma-library-poll", kind: "figma-library-poll" }],
 };
 
 /** The run names, for a caller that takes one as input. */
@@ -95,35 +107,28 @@ export function runnerNameForRun(name: ScheduledRunName): string {
 
 /** What a firing needs, by name. */
 export interface FiringDeps {
-  /** The Figma library poll, as it has always run. */
-  pollFigma(): Promise<void>;
   /** Put a planned run on its runner. */
   enqueueRun(run: ScheduledRun): Promise<void>;
 }
 
 /**
- * One cron firing: the Figma poll, and the run anchored to this slot if any.
+ * One cron firing: the run anchored to this slot, if any.
  *
- * Settled side by side, so neither can cost the other: a failed enqueue still
- * polls, and a failed poll still enqueues. Each failure is logged and
- * swallowed, as the poll's always was: the handler has already handed its work
+ * A failure is logged and swallowed: the handler has already handed its work
  * to `waitUntil`, and nothing downstream would act on a rejection.
  *
  * @param scheduledTime - The firing's scheduled time, epoch ms
- * @param deps - The poll and the enqueue
+ * @param deps - The enqueue
  */
 export async function onScheduledFiring(scheduledTime: number, deps: FiringDeps): Promise<void> {
   const runs = runsForFiring(scheduledTime).map((name) => planRun(name, scheduledTime));
-  await Promise.all([
-    deps.pollFigma().catch((err: unknown) => {
-      console.error(`[figma-poll] failed: ${message(err)}`);
-    }),
-    ...runs.map((run) =>
+  await Promise.all(
+    runs.map((run) =>
       deps.enqueueRun(run).catch((err: unknown) => {
         console.error(`[scheduled] ${run.name} ${run.date} enqueue failed: ${message(err)}`);
       }),
     ),
-  ]);
+  );
 }
 
 function message(err: unknown): string {

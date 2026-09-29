@@ -120,7 +120,8 @@ function renderPendingBlock(p: PendingContext, sender: SenderContext | null): st
           ),
         ]
       : [`- tool: ${p.toolName}`, `- parameters: ${JSON.stringify(p.input, null, 2)}`]),
-    `- requester: <@${p.requesterUserId}>`,
+    // A card the Worker staged itself (the Figma library card) has no requester.
+    p.requesterUserId ? `- requester: <@${p.requesterUserId}>` : "- requester: none — uno-bot staged this card itself",
     sender ? `- current message sender: <@${sender.userId}>` : "",
     "",
     "Read the user's current message as a reply to this proposal. If it says yes in any words — \"go ahead\", \"sure\", \"ok\", \"sounds good\", \"yep do it\" — invoke `proposal_resolve` with decision \"confirm\". If it says no, cancel. If it asks for a change, or asks something unrelated, reply conversationally; the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",

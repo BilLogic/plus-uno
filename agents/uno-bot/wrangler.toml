@@ -14,19 +14,16 @@ compatibility_flags = ["nodejs_compat"]
 enabled = true
 head_sampling_rate = 1
 
-# Figma library poll (src/figma-poll.ts) — every 15 min during work hours
-# (Mon–Fri, 13:00–23:45 UTC = 9am–7:45pm ET), the SAME cadence the retired
-# figma-library-poll.yml GitHub Action ran on before it was removed (2026-07-09,
-# PR #38). Detects DS publishes, files a PRD, posts the update card to #uno-bot.
-# Scheduled invocations get a fresh subrequest budget + a 15-min wall clock, so
-# the poll never competes with an agent turn. Manual firing: GET /debug/figma-poll.
-#
-# The same trigger anchors the two SCHEDULED RUNS (src/scheduled/runs.ts). No
-# cron is added for them — the free plan caps an account at 5 cron triggers —
-# so the handler reads each firing's scheduled time, and every firing still
-# runs the Figma poll exactly as above:
+# Every 15 min during work hours (Mon–Fri, 13:00–23:45 UTC). The trigger
+# anchors the two SCHEDULED RUNS (src/scheduled/runs.ts); no cron is added for
+# them — the free plan caps an account at 5 cron triggers — so the handler
+# reads each firing's scheduled time and only the two :00 slots do anything:
 #   • 14:00 UTC → the morning run     (10:00 ET in EDT, 09:00 ET in EST)
 #   • 22:00 UTC → the end-of-day run  (18:00 ET in EDT, 17:00 ET in EST)
+# Every other firing is a no-op. The Figma library poll used to run on every
+# firing; it is now the end-of-day run's `figma-library-poll` job, and its
+# findings post in #plus-universal at the next morning run
+# (src/figma-poll.ts, src/figma-library/). Manual poll: GET /debug/figma-poll.
 # Budget: the handler only ENQUEUES the run on its own AgentRunner instance (one
 # DO hop, inside the ~10ms scheduled CPU limit). The runner then runs ONE job
 # per alarm, each on a fresh 50-subrequest budget with lookups under the
@@ -198,15 +195,21 @@ BLUEPRINT_APP_URL = "https://plus-uno.netlify.app/blueprint"
 # search that returned nothing — which is how it denied the Wrap-Up
 # `Future (roadmap)` path that had been indexed since 2026-08-08.
 BLUEPRINT_INDEX = "off"
-# ── Figma library poll (the [triggers] cron above) ──────────────────────────
+# ── Figma library jobs (the scheduled runs on the [triggers] cron above) ────
 # DS design-system Figma file key — non-secret (it's the path segment of every
-# shared Figma URL; see design-system/figma/component-figma-links.md). The poll
-# diffs this file's components/versions against a KV snapshot (HARNESS_KV,
-# key "figma-poll:snapshot"). Leave blank to disable the poll.
+# shared Figma URL; see design-system/figma/component-figma-links.md). The
+# end-of-day poll diffs this file's components/versions against a KV snapshot
+# (HARNESS_KV, key "figma-poll:snapshot"). Leave blank to disable the poll.
 FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
-# #uno-bot channel id — the poll's "🎨 Figma Design System Updated" card lands
-# here (docs/connectors/slack.md: docs saying "#figma-sync" mean this channel).
-# Leave blank → the poll still diffs + files the PRD but skips the Slack post.
+# #plus-universal channel id (private; uno-bot is a member) — the design-ops
+# team's channel. The morning run posts each library publish here as one card
+# (drafted intake + implementation), and its members are who may confirm it.
+# Leave blank → the findings wait in KV and nothing is posted.
+PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
+# #uno-bot channel id — the intake channel (src/turn/intake-channel.ts): a
+# top-level post there engages with no @mention and becomes a drafted intake.
+# Nothing about the Figma library posts here any more. Leave blank → there is
+# no intake channel.
 UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # #plus-design channel id — reviewable artifacts (component_implement /
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
@@ -388,7 +391,9 @@ binding = "SLACK_OAUTH_KV"
 id = "aa0ba01735c545d1abe887bd81fc98aa"
 
 # KV — delivery-alert throttle, the Gemini explicit-cache memo, and the Figma
-# poll's component snapshot under "figma-poll:*" (src/figma-poll.ts). NOT a
+# library's state under "figma-poll:*": the component snapshot, the findings
+# waiting for the morning post, and the posted cards being tracked
+# (src/figma-poll.ts, src/figma-library/env.ts). NOT a
 # harness fallback: the harness is baked into the bundle and skills.ts serves
 # the compiled constant with zero KV access.
 [[kv_namespaces]]
