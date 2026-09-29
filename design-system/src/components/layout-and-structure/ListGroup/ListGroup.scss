@@ -189,7 +189,10 @@
     &--checkbox {
         border-radius: var(--size-element-radius-sm);
 
+        // The check only renders when the indicator is selected, and then the
+        // indicator is filled with primary, not the resting surface.
         .fa-check {
+            // @grounds: --color-primary
             font-size: 10px;
             color: var(--color-on-primary);
         }
