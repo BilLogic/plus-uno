@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useTagContext } from '../Tag';
 import './Suggestion.scss';
 
 /**
@@ -36,6 +37,9 @@ export const Suggestion = ({
     id,
     ...rest
 }) => {
+    // Disabled comes from the field or TagGroup, through the context Tag reads,
+    // so a disabled group can never leave a suggestion in it pressable.
+    const { isDisabled = false } = useTagContext() || {};
     const isPrompt = type === 'prompt';
     // Anything but `prompt` is an insert, so an unknown type still renders one.
     const kind = isPrompt ? 'prompt' : 'insert';
@@ -60,6 +64,9 @@ export const Suggestion = ({
             // the spread, so a stray `aria-label` or `onClick` cannot replace
             // them. A caller's `onClick` still fires, before `onAccept`.
             aria-label={name}
+            // Native `disabled`: out of the tab order, announced as disabled,
+            // and no click reaches `onAccept`. It has no look of its own yet.
+            disabled={isDisabled || undefined}
             onClick={(e) => {
                 onClick?.(e);
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);

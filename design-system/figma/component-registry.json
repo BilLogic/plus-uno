@@ -2224,6 +2224,48 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
       }
     },
+    "TagGroup": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/TagGroup",
+        "props": {
+          "overflow": {
+            "type": "enum",
+            "values": [
+              "wrap",
+              "collapse"
+            ]
+          },
+          "alignment": {
+            "type": "enum",
+            "values": [
+              "left",
+              "right"
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "tag-group",
+            "name": "TagGroup",
+            "componentSetNodeId": "17878:1713",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey Tag with no swatch; code sizes the collapsed row by width, where Figma draws two tags and +n."
+          }
+        ]
+      }
+    },
     "Textarea": {
       "code": {
         "import": "@/components/forms-and-inputs",

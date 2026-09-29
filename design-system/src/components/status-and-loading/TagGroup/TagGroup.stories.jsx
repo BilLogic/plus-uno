@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import { px } from '@/storybook-docs/lib/style-probes.js';
 import Tag from '../Tag';
+import Suggestion from '../Suggestion';
 import TagGroup from './TagGroup';
 
 /**
- * `TagGroup` — the gaps and the wrapping (#276).
+ * `TagGroup` — the gaps, the wrapping, the alignment and the disabled field.
  *
- * The assertions here are about the SET: that it announces itself as a list,
- * that `+n` counts what is actually hidden, and that pressing it reaches the
- * hidden tags rather than only reporting that they exist.
+ * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
+ * in a real browser. The assertions are about the SET, and about what a person
+ * could observe: that it announces itself as a list, where its members land,
+ * that `+n` counts what is really hidden and reaches it from the keyboard, and
+ * that a disabled group leaves nothing to press. Never a class name.
  */
 
 export default {
@@ -19,8 +23,9 @@ export default {
         docs: {
             description: {
                 component:
-                    'Owns what a single tag cannot decide: the gaps between tags, and whether a '
-                    + 'long set wraps or collapses behind a `+n` overflow tag.',
+                    'Owns what a single tag cannot decide: the 8px gap between tags, whether a long '
+                    + 'set wraps or collapses behind a `+n` overflow tag, which edge the tags line up '
+                    + 'on, and whether the whole set is disabled.',
             },
         },
     },
@@ -28,63 +33,234 @@ export default {
 
 const SUBJECTS = ['Science', 'Mathematics', 'History', 'Geography', 'Music', 'Art', 'Drama'];
 
+const box = (el) => el.getBoundingClientRect();
+
+/** Tags whose top edge matches, grouped into rows, top to bottom. */
+const rowsOf = (elements) => {
+    const rows = new Map();
+    for (const el of elements) {
+        const top = Math.round(box(el).top);
+        rows.set(top, [...(rows.get(top) || []), el]);
+    }
+    return [...rows.entries()].sort((a, b) => a[0] - b[0]).map(([, row]) => row);
+};
+
+/* -------------------------------------------------------------------- wrap */
+
 export const Wrapping = () => (
-    <div style={{ maxWidth: '320px' }}>
+    <div style={{ width: '320px' }}>
         <TagGroup label="Subjects">
-            {SUBJECTS.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+            {SUBJECTS.map((s) => <Tag key={s} color="blue" data-testid={`tag-${s}`}>{s}</Tag>)}
         </TagGroup>
     </div>
 );
 
 /**
- * The set announces itself as a list.
+ * The set announces itself as a list, and wraps with 8 between tags in both
+ * directions.
  *
- * Without it a screen reader reads seven unrelated words in a row. With it the
- * person is told there are seven of them and can move through them as a group.
+ * Without the list role a screen reader reads seven unrelated words in a row.
+ * The gap is measured between the tags themselves, so a margin on a tag would
+ * show up here as a gap wider than 8.
  */
 Wrapping.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const list = canvas.getByRole('list', { name: 'Subjects' });
     await expect(within(list).getAllByRole('listitem')).toHaveLength(SUBJECTS.length);
+
+    const tags = SUBJECTS.map((s) => canvas.getByTestId(`tag-${s}`));
+    const rows = rowsOf(tags);
+    await expect(rows.length, 'seven subjects at 320 wrap onto more than one line').toBeGreaterThan(1);
+
+    for (const row of rows) {
+        for (let i = 1; i < row.length; i += 1) {
+            await expect(Math.round(box(row[i]).left - box(row[i - 1]).right), 'gap between tags').toBe(8);
+        }
+    }
+    for (let r = 1; r < rows.length; r += 1) {
+        await expect(Math.round(box(rows[r][0]).top - box(rows[r - 1][0]).bottom), 'gap between rows').toBe(8);
+    }
+    // Rows start at the left edge by default.
+    for (const row of rows) {
+        await expect(Math.round(box(row[0]).left)).toBe(Math.round(box(list).left));
+    }
+};
+
+/* ---------------------------------------------------------------- collapse */
+
+/**
+ * `collapse` keeps one line: as many tags as fit, then a `+n` that opens a menu
+ * of the rest. The container here is a fixed 300 wide, and the play function
+ * resizes it to show that the count follows the width.
+ */
+export const Collapse = () => (
+    <div data-testid="frame" style={{ width: '300px' }}>
+        <TagGroup label="Subjects" overflow="collapse">
+            {SUBJECTS.map((s) => <Tag key={s} color="green" data-testid={`tag-${s}`}>{s}</Tag>)}
+        </TagGroup>
+    </div>
+);
+
+/** How many tags a person can see, and what `+n` says is hidden. */
+const readCollapse = (canvasElement) => {
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('list', { name: 'Subjects' });
+    const more = within(list).queryByRole('button', { name: /more tags$/ });
+    // A tag on the row, not an item in the menu, and not one hidden past the edge.
+    const onRow = (s) => within(list).queryAllByText(s)
+        .some((el) => !el.closest('button') && el.checkVisibility({ visibilityProperty: true }));
+    const shown = SUBJECTS.filter(onRow);
+    return { list, more, shown };
 };
 
 /**
- * `+n` counts what is hidden, and pressing it reaches them.
- *
- * An overflow tag that only reports a number tells a person values exist and
- * gives them no way to see them, which is worse than showing no count at all.
+ * "As many as fit" is checked from both sides: nothing that shows runs past the
+ * edge, and the first hidden tag would not have fit beside `+n`.
  */
-export const Overflow = () => (
-    <div style={{ maxWidth: '420px' }}>
+const expectFits = async (canvasElement) => {
+    const canvas = within(canvasElement);
+    const { list, more, shown } = readCollapse(canvasElement);
+    const right = box(list).right;
+    const hiddenCount = SUBJECTS.length - shown.length;
+
+    await expect(shown.length, 'at least one tag shows').toBeGreaterThan(0);
+    for (const s of shown) {
+        await expect(box(canvas.getByTestId(`tag-${s}`)).right).toBeLessThanOrEqual(right + 0.5);
+        // A tag is only cut short when it is the one tag that shows.
+        if (shown.length > 1) {
+            const words = within(canvas.getByTestId(`tag-${s}`)).getByText(s);
+            await expect(words.scrollWidth, `${s} is not truncated`).toBeLessThanOrEqual(words.clientWidth);
+        }
+    }
+    if (hiddenCount === 0) {
+        await expect(more, 'everything fits, so there is no +n').toBeNull();
+        return;
+    }
+    await expect(more).not.toBeNull();
+    await expect(more).toHaveAccessibleName(`${hiddenCount} more tags`);
+    await expect(more).toHaveTextContent(`+${hiddenCount}`);
+    await expect(box(more).right).toBeLessThanOrEqual(right + 0.5);
+
+    // One more tag, at its own width plus a gap, would have run past the edge.
+    const next = canvas.getByTestId(`tag-${SUBJECTS[shown.length]}`);
+    const lastShown = canvas.getByTestId(`tag-${shown[shown.length - 1]}`);
+    await expect(box(lastShown).right + 8 + box(next).width + 8 + box(more).width).toBeGreaterThan(right);
+};
+
+Collapse.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const frame = canvas.getByTestId('frame');
+
+    await waitFor(() => expectFits(canvasElement));
+    const at300 = readCollapse(canvasElement).shown.length;
+    await expect(at300, 'at 300 some tags are hidden').toBeLessThan(SUBJECTS.length);
+    await expect(px(getComputedStyle(readCollapse(canvasElement).list).height), 'one line').toBe(22);
+
+    // Wider: more tags show, and +n counts fewer.
+    frame.style.width = '480px';
+    await waitFor(() => expect(readCollapse(canvasElement).shown.length).toBeGreaterThan(at300));
+    await waitFor(() => expectFits(canvasElement));
+
+    // Narrow enough that a second tag would only fit by squeezing the first.
+    frame.style.width = '200px';
+    await waitFor(() => expect(readCollapse(canvasElement).shown.length).toBeLessThan(at300));
+    await waitFor(() => expectFits(canvasElement));
+
+    // Narrower than one tag and +n: the first tag still shows, and truncates.
+    frame.style.width = '90px';
+    await waitFor(() => {
+        const { shown, more, list } = readCollapse(canvasElement);
+        expect(shown).toEqual(['Science']);
+        expect(box(more).right).toBeLessThanOrEqual(box(list).right + 0.5);
+    });
+    const science = within(canvas.getByTestId('tag-Science')).getByText('Science');
+    await expect(science.scrollWidth, 'the one tag truncates').toBeGreaterThan(science.clientWidth);
+
+    // Wide enough for all of them: no +n at all.
+    frame.style.width = '800px';
+    await waitFor(() => expect(readCollapse(canvasElement).shown).toHaveLength(SUBJECTS.length));
+    await expect(readCollapse(canvasElement).more).toBeNull();
+
+    frame.style.width = '300px';
+    await waitFor(() => expect(readCollapse(canvasElement).shown).toHaveLength(at300));
+};
+
+/**
+ * The `+n` menu lists the hidden tags and works without a pointer: Enter opens
+ * it, Tab reaches the hidden tags, Escape closes it and puts focus back.
+ */
+export const CollapseMenu = () => (
+    <div style={{ width: '300px', paddingBottom: '240px' }}>
+        <TagGroup label="Subjects" overflow="collapse">
+            {SUBJECTS.map((s) => <Tag key={s} color="green">{s}</Tag>)}
+        </TagGroup>
+    </div>
+);
+
+CollapseMenu.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const { shown, more } = readCollapse(canvasElement);
+    const hidden = SUBJECTS.slice(shown.length);
+
+    await expect(more).toHaveAttribute('aria-expanded', 'false');
+    for (const s of hidden) {
+        await expect(canvas.queryByRole('button', { name: s }), `${s} is not reachable while closed`).toBeNull();
+    }
+
+    more.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(more).toHaveAttribute('aria-expanded', 'true');
+
+    // The menu lists exactly the hidden tags, in order.
+    for (const s of hidden) {
+        await expect(canvas.getByRole('button', { name: s })).toBeVisible();
+    }
+    for (const s of shown) {
+        await expect(canvas.queryByRole('button', { name: s }), `${s} is already on the row`).toBeNull();
+    }
+
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: hidden[0] }), 'Tab reaches the first hidden tag').toHaveFocus();
+
+    await userEvent.keyboard('{Escape}');
+    await expect(more).toHaveAttribute('aria-expanded', 'false');
+    await expect(more, 'Escape returns focus to +n').toHaveFocus();
+    await expect(canvas.queryByRole('button', { name: hidden[0] })).toBeNull();
+
+    // Space opens it too, and choosing an item closes it.
+    await userEvent.keyboard(' ');
+    await expect(more).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.tab();
+    await userEvent.keyboard('{Enter}');
+    await expect(more).toHaveAttribute('aria-expanded', 'false');
+};
+
+/**
+ * `maxVisible` caps the count even when more would fit.
+ */
+export const MaxVisible = () => (
+    <div style={{ width: '600px' }}>
         <TagGroup label="Subjects" overflow="collapse" maxVisible={3}>
             {SUBJECTS.map((s) => <Tag key={s} color="green">{s}</Tag>)}
         </TagGroup>
     </div>
 );
 
-Overflow.play = async ({ canvasElement }) => {
+MaxVisible.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-
     // Three tags plus the overflow tag itself.
-    await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
-    await expect(canvas.queryByText('Music')).toBeNull();
-
-    const more = canvas.getByRole('button', { name: '+4' });
-    await userEvent.click(more);
-
-    await expect(canvas.getAllByRole('listitem')).toHaveLength(SUBJECTS.length);
-    await expect(canvas.getByText('Music')).toBeInTheDocument();
-    await expect(canvas.queryByRole('button', { name: '+4' })).toBeNull();
+    await waitFor(() => expect(canvas.getAllByRole('listitem')).toHaveLength(4));
+    await expect(canvas.getByRole('button', { name: '4 more tags' })).toHaveTextContent('+4');
 };
 
 /**
  * A set short enough to fit shows no overflow tag.
  *
- * `+0` is the failure this guards: an off-by-one in the slice would render an
- * overflow tag claiming nothing is hidden.
+ * `+0` is the failure this guards: an off-by-one would render an overflow tag
+ * claiming nothing is hidden.
  */
 export const NoOverflowWhenItFits = () => (
-    <TagGroup label="Subjects" overflow="collapse" maxVisible={5}>
+    <TagGroup label="Subjects" overflow="collapse">
         {SUBJECTS.slice(0, 3).map((s) => <Tag key={s} color="teal">{s}</Tag>)}
     </TagGroup>
 );
@@ -92,15 +268,14 @@ export const NoOverflowWhenItFits = () => (
 NoOverflowWhenItFits.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getAllByRole('listitem')).toHaveLength(3);
-    await expect(canvas.queryByText(/^\+/)).toBeNull();
+    await expect(canvas.queryByRole('button', { name: /more tags$/ })).toBeNull();
 };
 
 /**
  * Conditional children are skipped, not counted.
  *
  * `{cond && <Tag/>}` is ordinary JSX and yields `false`. Counting those would
- * make `+n` claim tags that do not exist — the count would be right about the
- * array and wrong about the screen.
+ * make `+n` claim tags that do not exist.
  */
 export const ConditionalChildrenAreNotCounted = () => (
     <TagGroup label="Subjects" overflow="collapse" maxVisible={2}>
@@ -114,13 +289,112 @@ export const ConditionalChildrenAreNotCounted = () => (
 ConditionalChildrenAreNotCounted.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
-    await expect(canvas.queryByText(/^\+/)).toBeNull();
+    await expect(canvas.queryByRole('button', { name: /more tags$/ })).toBeNull();
 };
+
+/* --------------------------------------------------------------- alignment */
+
+/**
+ * `alignment="right"` lines the tags up on the right edge, for a right-aligned
+ * table column: every wrapped row, and the `+n` of a collapsed one.
+ */
+export const AlignmentRight = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '320px' }}>
+        <TagGroup label="Wrapped subjects" alignment="right">
+            {SUBJECTS.map((s) => <Tag key={s} color="purple" data-testid={`wrap-${s}`}>{s}</Tag>)}
+        </TagGroup>
+        <TagGroup label="Collapsed subjects" alignment="right" overflow="collapse">
+            {SUBJECTS.map((s) => <Tag key={s} color="purple">{s}</Tag>)}
+        </TagGroup>
+    </div>
+);
+
+AlignmentRight.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const wrapped = canvas.getByRole('list', { name: 'Wrapped subjects' });
+    const rows = rowsOf(SUBJECTS.map((s) => canvas.getByTestId(`wrap-${s}`)));
+    await expect(rows.length).toBeGreaterThan(1);
+    for (const row of rows) {
+        await expect(Math.round(box(row[row.length - 1]).right), 'each row ends on the right edge')
+            .toBe(Math.round(box(wrapped).right));
+    }
+
+    const collapsed = canvas.getByRole('list', { name: 'Collapsed subjects' });
+    const more = await within(collapsed).findByRole('button', { name: /more tags$/ });
+    await expect(Math.round(box(more).right), '+n ends on the right edge').toBe(Math.round(box(collapsed).right));
+};
+
+/* ---------------------------------------------------------------- disabled */
+
+/**
+ * `disabled` disables every tag and suggestion in the group through the same
+ * context a field uses: nothing takes focus, nothing responds, and the group
+ * and its controls are announced as disabled.
+ */
+export const Disabled = {
+    args: { onAccept: fn(), onSelect: fn() },
+    render: ({ onAccept, onSelect }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '360px' }}>
+            <button type="button">Before</button>
+            <TagGroup label="Focus areas" disabled>
+                <Tag color="blue">Read only</Tag>
+                <Tag behavior="removable" color="blue" onRemove={() => {}}>Removable</Tag>
+                <Tag behavior="selectable" color="blue" onClick={onSelect}>Selectable</Tag>
+                <Tag behavior="link" color="blue" href="#tag">Link</Tag>
+                <Suggestion label="Fractions" onAccept={onAccept} />
+                <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
+            </TagGroup>
+            <div style={{ width: '200px' }}>
+                <TagGroup label="Collapsed focus areas" overflow="collapse" disabled>
+                    {SUBJECTS.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+                </TagGroup>
+            </div>
+            <button type="button">After</button>
+        </div>
+    ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+
+        const group = canvas.getByRole('list', { name: 'Focus areas' });
+        await expect(group).toHaveAttribute('aria-disabled', 'true');
+
+        // Every tag is inert: no ×, no link, and the toggle is disabled.
+        await expect(within(group).queryByRole('button', { name: /^Remove/ })).toBeNull();
+        await expect(within(group).queryByRole('link')).toBeNull();
+        await expect(within(group).getByRole('button', { name: 'Selectable' })).toBeDisabled();
+
+        // Suggestions read the same context: still named, announced disabled.
+        const insert = within(group).getByRole('button', { name: 'Add Fractions, suggested' });
+        const prompt = within(group).getByRole('button', { name: 'Summarize, suggested' });
+        await expect(insert).toBeDisabled();
+        await expect(prompt).toBeDisabled();
+
+        // The collapsed group's +n is disabled with the rest.
+        const collapsed = canvas.getByRole('list', { name: 'Collapsed focus areas' });
+        await expect(collapsed).toHaveAttribute('aria-disabled', 'true');
+        await expect(await within(collapsed).findByRole('button', { name: /more tags$/ })).toBeDisabled();
+
+        // Nothing between Before and After takes focus.
+        canvas.getByRole('button', { name: 'Before' }).focus();
+        await userEvent.tab();
+        await expect(canvas.getByRole('button', { name: 'After' })).toHaveFocus();
+
+        // And nothing responds to a press.
+        await userEvent.click(insert, { pointerEventsCheck: 0 });
+        await userEvent.click(prompt, { pointerEventsCheck: 0 });
+        await userEvent.click(within(group).getByRole('button', { name: 'Selectable' }), { pointerEventsCheck: 0 });
+        await expect(args.onAccept).not.toHaveBeenCalled();
+        await expect(args.onSelect).not.toHaveBeenCalled();
+    },
+};
+
+/* ----------------------------------------------------------------- content */
 
 /**
  * A removable set: the group holds the gaps, the tags hold the values.
  */
-export const DismissibleSet = () => {
+export const RemovableSet = () => {
     const [picked, setPicked] = useState(SUBJECTS.slice(0, 4));
     return (
         <TagGroup label="Chosen subjects">
@@ -138,7 +412,7 @@ export const DismissibleSet = () => {
     );
 };
 
-DismissibleSet.play = async ({ canvasElement }) => {
+RemovableSet.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
 
@@ -150,7 +424,7 @@ DismissibleSet.play = async ({ canvasElement }) => {
 };
 
 /**
- * `onOverflowClick` replaces the reveal, for opening a picker instead.
+ * `onOverflowClick` replaces the menu, for opening a picker instead.
  */
 export const CustomOverflowAction = () => {
     const [opened, setOpened] = useState(0);
@@ -172,15 +446,14 @@ export const CustomOverflowAction = () => {
 
 CustomOverflowAction.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const more = canvas.getByRole('button', { name: '5 more' });
+    const more = await canvas.findByRole('button', { name: '5 more tags' });
+    await expect(more).toHaveTextContent('5 more');
 
     await userEvent.click(more);
     await expect(canvas.getByText('Picker opened 1 time(s)')).toBeInTheDocument();
 
-    // The default reveal must NOT also run, or the caller's picker opens onto a
-    // row that has already expanded behind it.
-    await expect(canvas.getByRole('button', { name: '5 more' })).toBeInTheDocument();
-    await expect(canvas.queryByText('Music')).toBeNull();
+    // The menu must NOT also open, or the caller's picker opens over it.
+    await expect(canvas.queryByRole('button', { name: 'History' })).toBeNull();
 };
 
 /* -------------------------------------------------------------- playground */
@@ -189,7 +462,7 @@ CustomOverflowAction.play = async ({ canvasElement }) => {
  * Interactive playground.
  *
  * The tags are fixed so the controls change the SET: whether it wraps or
- * collapses, how many show before the `+n`, and what the group is called.
+ * collapses, which edge it lines up on, and whether it is disabled.
  */
 export const Interactive = (args) => (
     <div style={{ maxWidth: '360px' }}>
@@ -201,5 +474,6 @@ export const Interactive = (args) => (
 Interactive.args = {
     label: 'Subjects',
     overflow: 'wrap',
-    maxVisible: 3,
+    alignment: 'left',
+    disabled: false,
 };

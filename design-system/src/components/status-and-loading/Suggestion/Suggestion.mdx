@@ -165,6 +165,10 @@ sentence. For a prompt, pass the full words as `text` and a short `label`.
   assistive technology; the name already says what the suggestion does.
 - **Focus is a ring, not a fill**: a 2px Focus Ring 2px outside the edge, so
   focus never reads as pressed.
+- **Disabled comes from the field.** Inside a disabled `TagGroup` or field, a
+  suggestion reads the same `TagContext` a Tag does and becomes a disabled
+  button: out of the tab order, announced as disabled, and never accepted. It
+  has no disabled look of its own yet; that waits on the Figma set.
 
 </div>
 

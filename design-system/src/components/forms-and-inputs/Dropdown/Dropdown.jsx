@@ -52,6 +52,24 @@ const Dropdown = ({
         if (show) setOpen(false);
     };
 
+    /*
+     * Escape closes an open menu and puts focus back on the toggle, so a
+     * keyboard user who tabbed into the items is not left inside a menu that
+     * has gone. The toggle is the first focusable element outside the menu:
+     * the built-in button, or whatever control a custom `toggle` renders.
+     */
+    const handleKeyDown = (event) => {
+        if (event.key !== 'Escape' || !show) return;
+        event.stopPropagation();
+        closeDropdown();
+        const wrapper = dropdownRef.current;
+        const menu = menuRef.current;
+        if (!wrapper) return;
+        const target = Array.from(wrapper.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])'))
+            .find((el) => !(menu && menu.contains(el)));
+        target?.focus();
+    };
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -174,7 +192,7 @@ const Dropdown = ({
     );
 
     return (
-        <div id={id} className={wrapperClasses} ref={dropdownRef}>
+        <div id={id} className={wrapperClasses} ref={dropdownRef} onKeyDown={handleKeyDown}>
             {split ? (
                 direction === 'dropleft' ? (
                     <>
