@@ -64,9 +64,10 @@ export const Suggestion = ({
             // the spread, so a stray `aria-label` or `onClick` cannot replace
             // them. A caller's `onClick` still fires, before `onAccept`.
             aria-label={name}
-            // Native `disabled`: out of the tab order, announced as disabled,
-            // and no click reaches `onAccept`. It has no look of its own yet.
-            disabled={isDisabled || undefined}
+            // Native `disabled`, from the field or from the caller's own
+            // `disabled`: out of the tab order, announced as disabled, and no
+            // click reaches `onAccept`. It has no look of its own yet.
+            disabled={isDisabled || rest.disabled || undefined}
             onClick={(e) => {
                 onClick?.(e);
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);

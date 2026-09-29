@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Tag from '../Tag';
+import Tag, { TagContext } from '../Tag';
 import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
 
@@ -270,6 +270,44 @@ AcceptIntoTags.play = async ({ canvasElement }) => {
     await expect(canvas.getByTestId('tag-Relationships')).toBeInTheDocument();
     await expect(canvas.queryByRole('button', { name: 'Add Relationships, suggested' })).toBeNull();
     await expect(canvas.getByRole('button', { name: 'Add Fractions, suggested' })).toBeInTheDocument();
+};
+
+/**
+ * Disabled, from a disabled field's `TagContext` or from the caller's own
+ * `disabled`: a native disabled button either way, still named, out of the tab
+ * order, and never accepted. The look is unchanged until Figma has a disabled
+ * Suggestion.
+ */
+export const Disabled = {
+    args: { onAccept: fn() },
+    render: ({ onAccept }) => (
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button type="button">Before</button>
+            <TagContext.Provider value={{ isDisabled: true }}>
+                <Suggestion label="From the field" onAccept={onAccept} />
+            </TagContext.Provider>
+            <Suggestion label="From the caller" disabled onAccept={onAccept} />
+            <Suggestion label="Live" onAccept={onAccept} />
+        </div>
+    ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const field = canvas.getByRole('button', { name: 'Add From the field, suggested' });
+        const caller = canvas.getByRole('button', { name: 'Add From the caller, suggested' });
+        const live = canvas.getByRole('button', { name: 'Add Live, suggested' });
+
+        await expect(field).toBeDisabled();
+        await expect(caller, "the caller's own disabled is kept").toBeDisabled();
+        await expect(live).toBeEnabled();
+
+        canvas.getByRole('button', { name: 'Before' }).focus();
+        await userEvent.tab();
+        await expect(live, 'both disabled suggestions are skipped').toHaveFocus();
+
+        await userEvent.click(field, { pointerEventsCheck: 0 });
+        await userEvent.click(caller, { pointerEventsCheck: 0 });
+        await expect(args.onAccept).not.toHaveBeenCalled();
+    },
 };
 
 /** Change the props in the docs playground. */

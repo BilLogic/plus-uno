@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { px } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Tag from '../Tag';
 import Suggestion from '../Suggestion';
 import TagGroup from './TagGroup';
@@ -292,6 +293,87 @@ ConditionalChildrenAreNotCounted.play = async ({ canvasElement }) => {
     await expect(canvas.queryByRole('button', { name: /more tags$/ })).toBeNull();
 };
 
+/**
+ * `+n` is the Figma set's: a grey selectable tag with no swatch, hover the
+ * on-surface-variant 08 state layer and pressed its 12. It opens a menu, so it
+ * reports expanded, never pressed.
+ */
+export const OverflowTag = () => (
+    <div style={{ width: '240px' }}>
+        <TagGroup label="Subjects" overflow="collapse" maxVisible={2}>
+            {SUBJECTS.map((s) => <Tag key={s} color="green">{s}</Tag>)}
+        </TagGroup>
+    </div>
+);
+
+OverflowTag.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const more = await canvas.findByRole('button', { name: '5 more tags' });
+
+    await expect(more).toHaveAttribute('aria-expanded', 'false');
+    await expect(more, 'a menu button, not a toggle').not.toHaveAttribute('aria-pressed');
+    await expect(more.textContent).toBe('+5');
+    await expect(px(getComputedStyle(more).height)).toBe(22);
+
+    // No swatch: the label is the only thing inside, so the text starts at
+    // the padding.
+    const words = within(more).getByText('+5');
+    await expect(Math.round(box(words).left - box(more).left)).toBe(
+        Math.round(px(getComputedStyle(more).paddingLeft) + px(getComputedStyle(more).borderLeftWidth)),
+    );
+
+    const bg = (pseudo) => withForcedPseudo(more, pseudo, () => getComputedStyle(more).backgroundColor);
+    await expect(getComputedStyle(more).backgroundColor, 'rest is clear').toBe('rgba(0, 0, 0, 0)');
+    await expect(bg(':hover')).toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-08'));
+    await expect(bg(':active')).toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-12'));
+};
+
+const MANY = Array.from({ length: 14 }, (_, i) => `T${i + 1}`);
+
+/**
+ * Fourteen short tags, so `+n` goes from `+10` to `+9` as the row widens. At
+ * every width across that boundary the count settles after one measurement
+ * and stays settled: it never flips between two values as the label gains or
+ * loses a digit.
+ */
+export const DigitBoundary = () => (
+    <div data-testid="frame" style={{ width: '160px' }}>
+        <TagGroup label="Many" overflow="collapse">
+            {MANY.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+        </TagGroup>
+    </div>
+);
+
+const frames = (n) => new Promise((resolve) => {
+    const step = (left) => (left ? requestAnimationFrame(() => step(left - 1)) : resolve());
+    step(n);
+});
+
+DigitBoundary.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const frame = canvas.getByTestId('frame');
+    const list = canvas.getByRole('list', { name: 'Many' });
+    const label = () => within(list).queryByRole('button', { name: /more tags$/ })?.textContent ?? '';
+
+    const seen = new Set();
+    for (let width = 120; width <= 360; width += 2) {
+        frame.style.width = `${width}px`;
+        await frames(3);
+        const settled = label();
+        // Watch the label for a few more frames: a flip would change it.
+        const flips = [];
+        const watch = new MutationObserver(() => flips.push(label()));
+        watch.observe(list, { subtree: true, characterData: true, childList: true });
+        await frames(4);
+        watch.disconnect();
+        await expect(flips, `at ${width}px the count settled on ${settled}`).toEqual([]);
+        await expect(list.scrollWidth, `at ${width}px nothing runs past the edge`).toBeLessThanOrEqual(list.clientWidth);
+        seen.add(settled);
+    }
+    await expect(seen.has('+10'), 'the sweep reaches +10').toBe(true);
+    await expect(seen.has('+9'), 'and crosses to +9').toBe(true);
+};
+
 /* --------------------------------------------------------------- alignment */
 
 /**
@@ -338,16 +420,16 @@ export const Disabled = {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '360px' }}>
             <button type="button">Before</button>
             <TagGroup label="Focus areas" disabled>
-                <Tag color="blue">Read only</Tag>
-                <Tag behavior="removable" color="blue" onRemove={() => {}}>Removable</Tag>
+                <Tag color="blue" data-testid="read-only">Read only</Tag>
+                <Tag behavior="removable" color="blue" onRemove={() => {}} data-testid="removable">Removable</Tag>
                 <Tag behavior="selectable" color="blue" onClick={onSelect}>Selectable</Tag>
-                <Tag behavior="link" color="blue" href="#tag">Link</Tag>
+                <Tag behavior="link" color="blue" href="#tag" data-testid="link">Link</Tag>
                 <Suggestion label="Fractions" onAccept={onAccept} />
                 <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
             </TagGroup>
             <div style={{ width: '200px' }}>
                 <TagGroup label="Collapsed focus areas" overflow="collapse" disabled>
-                    {SUBJECTS.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+                    {SUBJECTS.map((s) => <Tag key={s} color="blue" data-testid={`collapsed-${s}`}>{s}</Tag>)}
                 </TagGroup>
             </div>
             <button type="button">After</button>
@@ -357,12 +439,15 @@ export const Disabled = {
         const canvas = within(canvasElement);
 
         const group = canvas.getByRole('list', { name: 'Focus areas' });
-        await expect(group).toHaveAttribute('aria-disabled', 'true');
 
-        // Every tag is inert: no ×, no link, and the toggle is disabled.
+        // Every tag is inert and says so itself: no ×, no link, a disabled
+        // toggle, and each tag that is not a button carries aria-disabled.
         await expect(within(group).queryByRole('button', { name: /^Remove/ })).toBeNull();
         await expect(within(group).queryByRole('link')).toBeNull();
         await expect(within(group).getByRole('button', { name: 'Selectable' })).toBeDisabled();
+        for (const id of ['read-only', 'removable', 'link']) {
+            await expect(canvas.getByTestId(id), `${id} is announced disabled`).toHaveAttribute('aria-disabled', 'true');
+        }
 
         // Suggestions read the same context: still named, announced disabled.
         const insert = within(group).getByRole('button', { name: 'Add Fractions, suggested' });
@@ -372,8 +457,8 @@ export const Disabled = {
 
         // The collapsed group's +n is disabled with the rest.
         const collapsed = canvas.getByRole('list', { name: 'Collapsed focus areas' });
-        await expect(collapsed).toHaveAttribute('aria-disabled', 'true');
         await expect(await within(collapsed).findByRole('button', { name: /more tags$/ })).toBeDisabled();
+        await expect(canvas.getByTestId('collapsed-Science')).toHaveAttribute('aria-disabled', 'true');
 
         // Nothing between Before and After takes focus.
         canvas.getByRole('button', { name: 'Before' }).focus();

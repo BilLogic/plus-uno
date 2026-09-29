@@ -26,7 +26,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey Tag with no swatch; code sizes the collapsed row by width, where Figma draws two tags and +n."
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey behavior=selectable Tag with no swatch (hasSwatch false in code); code sizes the collapsed row by width, where Figma draws two tags and +n."
     }
   ]
 };
@@ -68,6 +68,10 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 <DocsCanvasShell description={<>Pressing <code>+n</code> opens a menu of the hidden tags. Enter or Space opens it, Tab reaches the tags, Escape closes it.</>}>
     <DsCanvasQuiet of={TagGroupStories.CollapseMenu} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The <code>+n</code> is a grey selectable tag with no swatch, named "n more tags": hover is the 08 state layer and pressed the 12.</>}>
+    <DsCanvasQuiet of={TagGroupStories.OverflowTag} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<><code>maxVisible</code> caps the count even when more would fit.</>}>
@@ -234,8 +238,9 @@ right-aligned. Everywhere else, tags read from the left.
 - **`+n` is named "n more tags"** and reports whether its menu is open. Enter
   or Space opens it, Tab reaches each hidden tag, and Escape closes it with
   focus back on `+n`.
-- **Disabled is announced.** The group carries `aria-disabled`, every control
-  in it is a disabled button, and nothing in it takes focus.
+- **Disabled is announced per tag.** Every control in a disabled group is a
+  disabled button, every other tag carries `aria-disabled` itself, and nothing
+  in it takes focus.
 
 </div>
 

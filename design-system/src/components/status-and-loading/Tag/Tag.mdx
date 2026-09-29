@@ -276,7 +276,10 @@ and every tag inside follows:
 ### Renamed props.
 
 `variant` is now `behavior` (`dismissible` is `removable`), and `orange` is now
-`yellow`. The old names still work and warn in development.
+`yellow`. The old names still work and warn in development. `operational` has
+no direct replacement: use `behavior="selectable"` with `aria-expanded` or your
+own `aria-pressed`, and `hasSwatch={false}` when the tag counts rather than
+names a category.
 
 </div>
 
@@ -290,7 +293,9 @@ and every tag inside follows:
   `removeLabel` overrides that when the label is not text.
 - **Selectable publishes `aria-pressed`**, so the state is not only visible.
   Selected also changes the border to the full hue, so it does not rest on a
-  change of lightness alone.
+  change of lightness alone. A selectable-looking tag that opens something,
+  such as TagGroup's `+n`, passes `aria-expanded` (or its own `aria-pressed`)
+  and is then not announced as a toggle.
 - **A link with a × is two tab stops**, link then ×, and pressing the × never
   follows the link.
 - **Saving is announced once.** The spinner is hidden; a status region beside
@@ -298,8 +303,9 @@ and every tag inside follows:
   but do nothing until the save lands.
 - **A × needs a name.** When the label is not text, pass `removeLabel`, or the
   × is named only "Remove" and development warns.
-- **Disabled tags take no focus.** They come from a disabled field, so the
-  field is what a keyboard user meets.
+- **Disabled tags take no focus, and say they are disabled.** They come from
+  a disabled field. A selectable tag is a disabled button; every other tag
+  carries `aria-disabled` itself.
 - **A clipped label keeps its full text** in a tooltip that hover and keyboard
   focus both reach. On a control the control carries it; on a plain tag the
   label takes focus while, and only while, it is clipped.

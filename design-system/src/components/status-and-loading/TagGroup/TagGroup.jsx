@@ -19,9 +19,9 @@ import './TagGroup.scss';
  * to undo and nothing to double up.
  *
  * COLLAPSE FITS BY WIDTH. A collapsed group shows as many tags as fit on one
- * line, then a `+n` tag that opens a menu of the rest. It measures on every
- * render and whenever it is resized, so the count follows the container rather
- * than a number picked against today's labels.
+ * line, then a `+n` tag that opens a menu of the rest. It measures when the
+ * children change and whenever the row or a tag is resized, so the count
+ * follows the container rather than a number picked against today's labels.
  *
  * DISABLED IS THE FIELD'S. `disabled` reaches every Tag and Suggestion in the
  * group through `TagContext`, the same context a field uses, so no member can
@@ -89,39 +89,65 @@ export const TagGroup = ({
 
     const listRef = useRef(null);
     const [fit, setFit] = useState({ count: items.length, squeeze: false });
-    // The first tag's width before it was squeezed. A squeezed tag measures
-    // narrower than it is, and counting with that width would let more tags
-    // in beside it, squeezing it further.
-    const firstWidth = useRef(0);
     const [menuOpen, setMenuOpen] = useState(false);
 
     const shown = collapses ? Math.min(fit.count, items.length) : items.length;
     const squeezed = collapses && fit.squeeze;
     const hidden = items.length - shown;
 
+    const format = (n) => (overflowLabel ? overflowLabel(n) : `+${n}`);
+
+    /*
+     * Room for `+n` is measured once per digit count, on a hidden copy whose
+     * label is the widest one that count can have: every digit an 8 (the
+     * body face's figures are all one width, and in faces where they are not,
+     * 8 is among the widest). Reserving that constant width, rather
+     * than the width of whatever `+n` shows right now, makes the count a
+     * function of the container and the tags alone, so one measurement
+     * settles it: the count can never flip between two values as `+9`
+     * becomes `+10` and back.
+     */
+    const digits = String(Math.max(items.length - 1, 1)).length;
+    const widestLabel = format(Number('8'.repeat(digits)));
+
+    // What the last measurement found, read inside `measure` without making
+    // it change identity (and re-subscribe the observer) on every result.
+    const squeezedRef = useRef(false);
+    squeezedRef.current = squeezed;
+    // The first tag's width before it was squeezed, and which tag it was. A
+    // squeezed tag measures narrower than it is, and counting with that width
+    // would let more tags in beside it, squeezing it further.
+    const firstWidth = useRef({ key: null, width: 0 });
+
     const measure = useCallback(() => {
         const list = listRef.current;
         if (!list || !collapses) return;
         const itemEls = Array.from(list.querySelectorAll(':scope > [data-tag-index]'));
-        const moreEl = list.querySelector(':scope > [data-tag-more]');
+        const ghost = list.querySelector(':scope > [data-tag-widest]');
         const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
         const widths = itemEls.map((el) => el.getBoundingClientRect().width);
         if (widths.length) {
-            if (squeezed) widths[0] = Math.max(widths[0], firstWidth.current);
-            else firstWidth.current = widths[0];
+            const key = itemEls[0].getAttribute('data-tag-key');
+            if (squeezedRef.current && firstWidth.current.key === key) {
+                widths[0] = Math.max(widths[0], firstWidth.current.width);
+            } else if (!squeezedRef.current) {
+                firstWidth.current = { key, width: widths[0] };
+            }
         }
-        // Before `+n` exists its width is unknown and taken as 0; the render
-        // that adds it measures again with the real width, and that pass can
-        // only show fewer tags, so the two settle rather than flicker.
-        const overflowWidth = moreEl ? moreEl.getBoundingClientRect().width : 0;
+        const overflowWidth = ghost ? ghost.getBoundingClientRect().width : 0;
         const next = countThatFit(widths, list.clientWidth, gap, overflowWidth, cap);
         setFit((prev) => (prev.count === next.count && prev.squeeze === next.squeeze ? prev : next));
-    }, [collapses, cap, squeezed]);
+    }, [collapses, cap]);
 
-    // Every render: a new child, a new label or a new `+n` digit changes a width.
+    /*
+     * Measured when something that sets a width changes: the children, the
+     * overflow mode or the cap here, and a resize of the row, a tag or the
+     * `+n` copy below (a label that changes, a font that loads). Opening the
+     * menu or any other render of this group measures nothing.
+     */
     useLayoutEffect(() => {
         measure();
-    });
+    }, [measure, children, widestLabel]);
 
     useLayoutEffect(() => {
         const list = listRef.current;
@@ -134,34 +160,49 @@ export const TagGroup = ({
             frame = requestAnimationFrame(measure);
         });
         observer.observe(list);
+        list.querySelectorAll(':scope > [data-tag-index], :scope > [data-tag-widest]')
+            .forEach((el) => observer.observe(el));
         return () => {
             cancelAnimationFrame(frame);
             observer.disconnect();
         };
-    }, [collapses, measure]);
+    }, [collapses, measure, children, widestLabel]);
 
-    const overflowName = `${hidden} more tags`;
-    const overflowText = overflowLabel ? overflowLabel(hidden) : `+${hidden}`;
+    const menuIsOpen = menuOpen && !isDisabled;
+
+    /*
+     * The `+n` is the Figma set's: a grey selectable tag with no swatch. It
+     * opens something rather than toggling, so it reports `aria-expanded` for
+     * its menu, or (when a caller's `onOverflowClick` opens something else)
+     * leaves the toggle state off rather than claim one.
+     */
+    const overflowTag = (label, extra) => (
+        <Tag
+            behavior="selectable"
+            color="grey"
+            hasSwatch={false}
+            className="plus-tag-group__overflow"
+            {...extra}
+        >
+            {label}
+        </Tag>
+    );
 
     let more = null;
     if (collapses && hidden > 0) {
-        more = onOverflowClick ? (
-            <Tag
-                variant="operational"
-                color="grey"
-                aria-label={overflowName}
-                onClick={onOverflowClick}
-                className="plus-tag-group__overflow"
-            >
-                {overflowText}
-            </Tag>
-        ) : (
+        const tag = overflowTag(format(hidden), {
+            'aria-label': `${hidden} more tags`,
+            ...(onOverflowClick
+                ? { onClick: onOverflowClick, 'aria-pressed': undefined }
+                : { 'aria-expanded': menuIsOpen }),
+        });
+        more = onOverflowClick ? tag : (
             // The menu is the library's Dropdown: the hidden tags are its items,
             // so they are reached with Tab and chosen with Enter, and Escape
             // closes it with focus back on `+n`.
             <Dropdown
                 className="plus-tag-group__menu"
-                isOpen={menuOpen && !isDisabled}
+                isOpen={menuIsOpen}
                 onToggle={(next) => setMenuOpen(next && !isDisabled)}
                 items={items.slice(shown).map((child) => {
                     const props = child.props || {};
@@ -172,17 +213,7 @@ export const TagGroup = ({
                         onClick: isToggle ? props.onClick : undefined,
                     };
                 })}
-                toggle={(
-                    <Tag
-                        variant="operational"
-                        color="grey"
-                        aria-label={overflowName}
-                        aria-expanded={menuOpen && !isDisabled}
-                        className="plus-tag-group__overflow"
-                    >
-                        {overflowText}
-                    </Tag>
-                )}
+                toggle={tag}
             />
         );
     }
@@ -198,9 +229,6 @@ export const TagGroup = ({
                 // that `Tag` stays usable on its own, outside any group.
                 role="list"
                 aria-label={label}
-                // Read-only tags have no control to carry a disabled state, so
-                // the group says it once for all of them.
-                aria-disabled={isDisabled ? 'true' : undefined}
                 className={[
                     'plus-tag-group',
                     `plus-tag-group--${collapses ? 'collapse' : 'wrap'}`,
@@ -221,8 +249,9 @@ export const TagGroup = ({
                         ]
                             .filter(Boolean).join(' ')}
                         data-tag-index={i}
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={child.key ?? i}
+                        data-tag-key={child.key}
+                        // `Children.toArray` gives every child a key.
+                        key={child.key}
                     >
                         {child}
                     </div>
@@ -230,6 +259,13 @@ export const TagGroup = ({
                 {more && (
                     <div role="listitem" className="plus-tag-group__item" data-tag-more="">
                         {more}
+                    </div>
+                )}
+                {collapses && items.length > 1 && (
+                    // The widest `+n` this set can show, out of sight and out
+                    // of the list, so its width can be reserved (see above).
+                    <div className="plus-tag-group__item plus-tag-group__item--hidden" data-tag-widest="" aria-hidden="true">
+                        {overflowTag(widestLabel, { tabIndex: -1, 'aria-pressed': undefined })}
                     </div>
                 )}
             </div>
