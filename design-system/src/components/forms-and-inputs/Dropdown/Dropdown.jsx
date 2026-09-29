@@ -239,63 +239,87 @@ const Dropdown = ({
                     ...(placement.horizontal === 'end' ? { left: 'auto', right: 0 } : null),
                 }}
             >
-                {items.map((item, index) => (
-                    <React.Fragment key={index}>
-                        <button
-                            type="button"
-                            className={`dropdown-item ${item.selected ? 'selected' : ''} ${item.disabled ? 'disabled' : ''} ${item.header ? 'dropdown-section-header' : ''}`}
-                            disabled={item.disabled}
-                            onClick={(e) => {
-                                if (item.onClick) item.onClick(e);
-                                if (!item.keepOpen) closeDropdown(); // Allow optional keepOpen for things like multi-select
-                            }}
-                        >
-                            <div className="dropdown-item-inner">
-                                {item.multiSelectCheckbox ? (
-                                    <i
-                                        className={
-                                            item.multiSelectChecked
-                                                ? 'fa-solid fa-square-check'
-                                                : 'fa-regular fa-square'
-                                        }
-                                        style={{
-                                            color: item.multiSelectChecked
-                                                ? 'var(--color-primary)'
-                                                : 'var(--color-on-surface-variant)',
-                                            flexShrink: 0,
-                                        }}
-                                        aria-hidden="true"
-                                    />
-                                ) : (
-                                    <i
-                                        className="fas fa-check selected-icon"
-                                        style={{ opacity: item.selected ? 1 : 0 }}
-                                        aria-hidden="true"
-                                    />
-                                )}
+                {items.map((item, index) => {
+                    const itemClasses = `dropdown-item ${item.selected ? 'selected' : ''} ${item.disabled ? 'disabled' : ''} ${item.header ? 'dropdown-section-header' : ''}`;
+                    const choose = (e) => {
+                        if (item.onClick) item.onClick(e);
+                        if (!item.keepOpen) closeDropdown(); // Allow optional keepOpen for things like multi-select
+                    };
+                    const inner = (
+                        <div className="dropdown-item-inner">
+                            {item.multiSelectCheckbox ? (
+                                <i
+                                    className={
+                                        item.multiSelectChecked
+                                            ? 'fa-solid fa-square-check'
+                                            : 'fa-regular fa-square'
+                                    }
+                                    style={{
+                                        color: item.multiSelectChecked
+                                            ? 'var(--color-primary)'
+                                            : 'var(--color-on-surface-variant)',
+                                        flexShrink: 0,
+                                    }}
+                                    aria-hidden="true"
+                                />
+                            ) : (
+                                <i
+                                    className="fas fa-check selected-icon"
+                                    style={{ opacity: item.selected ? 1 : 0 }}
+                                    aria-hidden="true"
+                                />
+                            )}
 
-                                {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
+                            {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
 
-                                <span className="pdropdown-item-text" style={{ flexGrow: 1, minWidth: 0 }}>
-                                    {item.text || item.label}
+                            <span className="pdropdown-item-text" style={{ flexGrow: 1, minWidth: 0 }}>
+                                {item.text || item.label}
+                            </span>
+
+                            {/* Decorative, like the leading icon: the text names the item. */}
+                            {item.trailingIcon && <i className={`fas fa-${item.trailingIcon}`} aria-hidden="true"></i>}
+
+                            {item.counter !== undefined && (
+                                <span className="pdropdown-counter">
+                                    {item.counter}
                                 </span>
+                            )}
 
-                                {item.trailingIcon && <i className={`fas fa-${item.trailingIcon}`}></i>}
-
-                                {item.counter !== undefined && (
-                                    <span className="pdropdown-counter">
-                                        {item.counter}
-                                    </span>
-                                )}
-
-                                {item.dropright && <i className="fas fa-caret-right"></i>}
-                            </div>
-                        </button>
-                        {item.divider && index < items.length - 1 && (
-                            <div className="pdropdown-divider"></div>
-                        )}
-                    </React.Fragment>
-                ))}
+                            {item.dropright && <i className="fas fa-caret-right"></i>}
+                        </div>
+                    );
+                    /*
+                     * An item with `href` goes somewhere, so it is a link, not
+                     * a button that navigates: it opens in a new tab, shows its
+                     * address and is announced as a link. `linkComponent` is a
+                     * router's link, as Tag takes one.
+                     */
+                    const Link = item.linkComponent || 'a';
+                    return (
+                        <React.Fragment key={index}>
+                            {item.href && !item.disabled ? (
+                                <Link className={itemClasses} href={item.href} onClick={choose}>
+                                    {inner}
+                                </Link>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className={itemClasses}
+                                    disabled={item.disabled}
+                                    // A `toggle` item switches on and off in
+                                    // place, so it says whether it is on.
+                                    aria-pressed={item.toggle ? Boolean(item.selected) : undefined}
+                                    onClick={choose}
+                                >
+                                    {inner}
+                                </button>
+                            )}
+                            {item.divider && index < items.length - 1 && (
+                                <div className="pdropdown-divider"></div>
+                            )}
+                        </React.Fragment>
+                    );
+                })}
             </div>
         </div>
     );
@@ -321,7 +345,15 @@ Dropdown.propTypes = {
         counter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         dropright: PropTypes.bool,
         divider: PropTypes.bool,
-        onClick: PropTypes.func
+        onClick: PropTypes.func,
+        /** Keeps the menu open after the item is chosen. */
+        keepOpen: PropTypes.bool,
+        /** Makes the item a link to this address rather than a button. */
+        href: PropTypes.string,
+        /** Router link to render instead of `<a>` for an item with `href`. */
+        linkComponent: PropTypes.elementType,
+        /** An on/off item: it publishes `selected` as `aria-pressed`. */
+        toggle: PropTypes.bool
     })),
     size: PropTypes.oneOf(['small', 'default', 'large']),
     style: PropTypes.oneOf(['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default']),

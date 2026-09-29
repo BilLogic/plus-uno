@@ -26,7 +26,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n."
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
     }
   ]
 };
@@ -68,6 +68,14 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 <DocsCanvasShell description={<>Pressing <code>+n</code> opens a menu of the hidden tags. Enter or Space opens it, Tab reaches the tags, Escape closes it.</>}>
     <DsCanvasQuiet of={TagGroupStories.CollapseMenu} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Suggestions are never counted into <code>+n</code> and never go into its menu. They stay on the row after <code>+n</code>, and the fit reserves their width before counting tags.</>}>
+    <DsCanvasQuiet of={TagGroupStories.CollapseWithSuggestions} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag toggles and shows selected, a link tag is a link with a trailing arrow, and a read-only or removable tag is a plain item. Remove stays on the row.</>}>
+    <DsCanvasQuiet of={TagGroupStories.MenuKeepsActions} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>The <code>+n</code> is a grey selectable tag with no swatch, named "n more tags": hover is the 08 state layer and pressed the 12.</>}>
@@ -154,8 +162,8 @@ Use `TagGroup` wherever more than one `Tag` appears together: the subjects on a
 profile, the filters above a table, the recipients on a message. It is the
 right wrapper even when the set is short, because what it owns — the spacing,
 the wrapping, the alignment and the disabled state — belongs to the set rather
-than to any tag in it. Suggestions offered for the field go in the same group,
-after the tags.
+than to any tag in it. Suggestions offered for the field go in the same group;
+they always sit at the end of the row, after the tags and `+n`.
 
 A single tag standing alone does not need it.
 
@@ -217,6 +225,16 @@ fewer than fit.
 what keeps the count steady as `+9` becomes `+10`, and it means a row can show
 one tag fewer than would squeeze in beside a narrower `+n`.
 
+Suggestions are offers, not values, so they are never hidden: they are not
+counted into `+n`, never appear in its menu, and always sit after it. Their
+width comes off the row before tags are counted, so a group with suggestions
+shows fewer tags, not fewer suggestions.
+
+In the menu, a hidden tag keeps what it does. A selectable tag toggles there,
+shows selected, and the menu stays open so the change is seen. A link tag is a
+link there, to the same address, with a trailing arrow. A read-only tag is a
+plain item. Remove is only offered on the row, never from the menu.
+
 ### Right-align for a right-aligned column.
 
 `alignment="right"` belongs in a table column whose other cells are
@@ -242,7 +260,10 @@ right-aligned. Everywhere else, tags read from the left.
   them.
 - **`+n` is named "n more tags"** and reports whether its menu is open. Enter
   or Space opens it, Tab reaches each hidden tag, and Escape closes it with
-  focus back on `+n`.
+  focus back on `+n`. A selectable tag in the menu is a toggle button that
+  reports `aria-pressed`; a link tag is a real link, whose arrow is decorative.
+- **Suggestions stay reachable.** They are never behind `+n`, so a keyboard
+  user reaches them on the row, after `+n`, without opening the menu.
 - **Disabled is announced per tag.** A selectable tag, a Suggestion and `+n`
   are native disabled buttons, announced as disabled ("Selectable, toggle
   button, dimmed" or the reader's equivalent). Every other tag is a plain span,

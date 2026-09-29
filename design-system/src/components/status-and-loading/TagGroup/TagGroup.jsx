@@ -1,6 +1,7 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Tag, { TagContext, useTagContext } from '../Tag';
+import Suggestion from '../Suggestion';
 import Dropdown from '../../forms-and-inputs/Dropdown';
 import './TagGroup.scss';
 
@@ -23,6 +24,13 @@ import './TagGroup.scss';
  * children change and whenever the row or a tag is resized, so the count
  * follows the container rather than a number picked against today's labels.
  *
+ * SUGGESTIONS ARE NEVER HIDDEN. A Suggestion is an offer, not a value, so it
+ * is not counted into `+n` and never goes into its menu: it always sits at the
+ * end of the row, after the tags and `+n`, and the fit reserves its width
+ * before counting tags. In the menu, a hidden tag keeps its action: a
+ * selectable tag toggles there, a link tag is a link there, and a read-only
+ * tag is a plain item. Removing stays on the row.
+ *
  * DISABLED IS THE FIELD'S. `disabled` reaches every Tag and Suggestion in the
  * group through `TagContext`, the same context a field uses, so no member can
  * disagree with the one beside it.
@@ -35,6 +43,45 @@ export const TAG_GROUP_ALIGNMENTS = ['left', 'right'];
 const labelOf = (child) => {
     const props = child.props || {};
     return props.children ?? props.text ?? props.label;
+};
+
+/**
+ * What a tag does, resolved as Tag resolves it: `behavior`, else the old
+ * `variant`, else a link when it has `href`.
+ */
+const VARIANT_BEHAVIORS = { selectable: 'selectable', operational: 'action' };
+const behaviorOf = (props) => {
+    if (props.behavior) return props.behavior;
+    if (props.variant) return VARIANT_BEHAVIORS[props.variant] || 'read-only';
+    return props.href ? 'link' : 'read-only';
+};
+
+/**
+ * A hidden tag's line in the `+n` menu, keeping the tag's action. A selectable
+ * tag is a toggle item that shows selected and keeps the menu open, so the
+ * change is seen where it was made. A link tag is a link item to the same
+ * address, with a trailing arrow for "goes somewhere". Anything else is a
+ * plain item: remove is not offered here, only on the row.
+ */
+const menuItemOf = (child) => {
+    const props = child.props || {};
+    const text = labelOf(child);
+    switch (behaviorOf(props)) {
+        case 'selectable':
+            return { text, toggle: true, selected: Boolean(props.isSelected), keepOpen: true, onClick: props.onClick };
+        case 'link':
+            return {
+                text,
+                href: props.href,
+                linkComponent: props.linkComponent,
+                trailingIcon: 'arrow-right',
+                onClick: props.onClick,
+            };
+        case 'action':
+            return { text, onClick: props.onClick };
+        default:
+            return { text };
+    }
 };
 
 /**
@@ -82,7 +129,12 @@ export const TagGroup = ({
 
     // `null`/`false` children are ordinary in JSX (`{cond && <Tag/>}`), and
     // counting them would make `+n` claim tags that do not exist.
-    const items = React.Children.toArray(children).filter(Boolean);
+    const members = React.Children.toArray(children).filter(Boolean);
+    // Suggestions are split off: they are never counted, hidden or listed in
+    // the menu, and they always come last.
+    const isSuggestion = (child) => child.type === Suggestion;
+    const items = members.filter((child) => !isSuggestion(child));
+    const suggestions = members.filter(isSuggestion);
 
     const collapses = overflow === 'collapse';
     const cap = typeof maxVisible === 'number' && maxVisible >= 0 ? maxVisible : Infinity;
@@ -112,7 +164,7 @@ export const TagGroup = ({
 
     // The children's keys, as one string: what the set is, without the
     // identity of a `children` array that every parent render makes anew.
-    const itemKeys = items.map((child) => child.key).join('|');
+    const itemKeys = members.map((child) => child.key).join('|');
 
     const measure = useCallback(() => {
         const list = listRef.current;
@@ -120,6 +172,10 @@ export const TagGroup = ({
         const itemEls = Array.from(list.querySelectorAll(':scope > [data-tag-index]'));
         const ghost = list.querySelector(':scope > [data-tag-widest]');
         const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+        // The suggestions' room, each with the gap before it, comes off the
+        // row before any tag is counted.
+        const reserved = Array.from(list.querySelectorAll(':scope > [data-tag-suggestion]'))
+            .reduce((sum, el) => sum + gap + el.getBoundingClientRect().width, 0);
 
         /*
          * Every width is the tag's own, never a squeezed one: a squeezed first
@@ -136,7 +192,7 @@ export const TagGroup = ({
         if (first) first.style.flexShrink = shrink;
 
         const overflowWidth = ghost ? ghost.getBoundingClientRect().width : 0;
-        const next = countThatFit(widths, list.clientWidth, gap, overflowWidth, cap);
+        const next = countThatFit(widths, list.clientWidth - reserved, gap, overflowWidth, cap);
         setFit((prev) => (prev.count === next.count && prev.squeeze === next.squeeze ? prev : next));
     }, [collapses, cap]);
 
@@ -162,7 +218,7 @@ export const TagGroup = ({
             frame = requestAnimationFrame(measure);
         });
         observer.observe(list);
-        list.querySelectorAll(':scope > [data-tag-index], :scope > [data-tag-widest]')
+        list.querySelectorAll(':scope > [data-tag-index], :scope > [data-tag-suggestion], :scope > [data-tag-widest]')
             .forEach((el) => observer.observe(el));
         return () => {
             cancelAnimationFrame(frame);
@@ -206,15 +262,7 @@ export const TagGroup = ({
                 className="plus-tag-group__menu"
                 isOpen={menuIsOpen}
                 onToggle={(next) => setMenuOpen(next && !isDisabled)}
-                items={items.slice(shown).map((child) => {
-                    const props = child.props || {};
-                    const isToggle = props.behavior === 'selectable' || props.variant === 'selectable';
-                    return {
-                        text: labelOf(child),
-                        selected: isToggle ? Boolean(props.isSelected) : undefined,
-                        onClick: isToggle ? props.onClick : undefined,
-                    };
-                })}
+                items={items.slice(shown).map(menuItemOf)}
                 toggle={tag}
             />
         );
@@ -263,6 +311,12 @@ export const TagGroup = ({
                         {more}
                     </div>
                 )}
+                {suggestions.map((child) => (
+                    // After `+n`, always shown, and never squeezed.
+                    <div role="listitem" className="plus-tag-group__item" data-tag-suggestion="" key={child.key}>
+                        {child}
+                    </div>
+                ))}
                 {collapses && items.length > 1 && (
                     // The widest `+n` this set can show, measured so its width
                     // can be reserved (see above). It is not a list item, and
@@ -277,7 +331,7 @@ export const TagGroup = ({
 };
 
 TagGroup.propTypes = {
-    /** The tags, and any Suggestions offered beside them. `null` and `false` are skipped rather than counted. */
+    /** The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden. `null` and `false` are skipped rather than counted. */
     children: PropTypes.node,
     /** The group's accessible name — what this set of tags is. */
     label: PropTypes.string,

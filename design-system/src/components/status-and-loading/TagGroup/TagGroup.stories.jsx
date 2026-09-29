@@ -237,6 +237,150 @@ CollapseMenu.play = async ({ canvasElement }) => {
 };
 
 /**
+ * Suggestions are never counted into `+n` and never go into its menu. They
+ * stay on the row after `+n`, and the fit reserves their width, so what `+n`
+ * counts is only the tags that did not fit beside them. One is passed among
+ * the tags here to show it still lands at the end.
+ */
+export const CollapseWithSuggestions = {
+    args: { onAccept: fn() },
+    render: ({ onAccept }) => (
+        <div data-testid="frame" style={{ width: '420px', paddingBottom: '240px' }}>
+            <TagGroup label="Subjects" overflow="collapse">
+                {SUBJECTS.slice(0, 2).map((s) => <Tag key={s} color="green" data-testid={`tag-${s}`}>{s}</Tag>)}
+                <Suggestion label="Fractions" onAccept={onAccept} />
+                {SUBJECTS.slice(2).map((s) => <Tag key={s} color="green" data-testid={`tag-${s}`}>{s}</Tag>)}
+                <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
+            </TagGroup>
+        </div>
+    ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const frame = canvas.getByTestId('frame');
+        const list = canvas.getByRole('list', { name: 'Subjects' });
+        const insert = () => within(list).getByRole('button', { name: 'Add Fractions, suggested' });
+        const prompt = () => within(list).getByRole('button', { name: 'Summarize, suggested' });
+
+        const check = async () => {
+            const { more, shown } = readCollapse(canvasElement);
+            await expect(shown.length).toBeLessThan(SUBJECTS.length);
+            await expect(more, 'only the hidden tags are counted')
+                .toHaveAccessibleName(`${SUBJECTS.length - shown.length} more tags`);
+            // Both suggestions show, after +n, in order, and inside the row.
+            await expect(insert()).toBeVisible();
+            await expect(prompt()).toBeVisible();
+            await expect(box(insert()).left, 'the suggestion is after +n').toBeGreaterThan(box(more).right);
+            await expect(box(prompt()).left).toBeGreaterThan(box(insert()).right);
+            await expect(box(prompt()).right, 'the fit reserved their width').toBeLessThanOrEqual(box(list).right + 0.5);
+            await expect(list.scrollWidth).toBeLessThanOrEqual(list.clientWidth);
+            // One more tag would not have fit beside +n and the suggestions.
+            const next = canvas.getByTestId(`tag-${SUBJECTS[shown.length]}`);
+            const lastShown = canvas.getByTestId(`tag-${shown[shown.length - 1]}`);
+            await expect(box(lastShown).right + 8 + box(next).width + 8 + box(list).right - box(more).left)
+                .toBeGreaterThan(box(list).right);
+        };
+
+        await waitFor(check);
+        frame.style.width = '560px';
+        await waitFor(check);
+        // Too narrow for a second tag: the first squeezes, suggestions stay whole.
+        frame.style.width = '330px';
+        await waitFor(() => expect(readCollapse(canvasElement).shown).toEqual(['Science']));
+        await expect(box(prompt()).right).toBeLessThanOrEqual(box(list).right + 0.5);
+        await expect(prompt().scrollWidth, 'a suggestion never truncates').toBeLessThanOrEqual(prompt().clientWidth);
+        frame.style.width = '420px';
+        await waitFor(check);
+
+        // The menu lists the hidden tags only, never a suggestion.
+        const { more, shown } = readCollapse(canvasElement);
+        await userEvent.click(more);
+        await expect(more).toHaveAttribute('aria-expanded', 'true');
+        for (const s of SUBJECTS.slice(shown.length)) {
+            await expect(canvas.getByRole('button', { name: s })).toBeVisible();
+        }
+        await expect(canvas.queryByRole('button', { name: 'Fractions' })).toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Summarize' })).toBeNull();
+        await expect(canvas.getAllByRole('button', { name: /suggested$/ })).toHaveLength(2);
+        await userEvent.keyboard('{Escape}');
+
+        // And they are still pressable.
+        await userEvent.click(insert());
+        await expect(args.onAccept).toHaveBeenCalledWith('Fractions', expect.anything());
+    },
+};
+
+/**
+ * A tag in the `+n` menu keeps its action. A selectable tag toggles there and
+ * shows it; a link tag is a link there, with a trailing arrow; a read-only or
+ * removable tag is a plain item, because removing stays on the row.
+ */
+export const MenuKeepsActions = {
+    args: { onRemove: fn(), onFollow: fn() },
+    render: function Render({ onRemove, onFollow }) {
+        const [picked, setPicked] = useState(false);
+        return (
+            <div style={{ width: '600px', paddingBottom: '240px' }}>
+                <TagGroup label="Filters" overflow="collapse" maxVisible={1}>
+                    <Tag color="blue">Science</Tag>
+                    <Tag behavior="selectable" color="blue" isSelected={picked} onClick={() => setPicked((p) => !p)}>
+                        Mathematics
+                    </Tag>
+                    <Tag
+                        behavior="link"
+                        color="blue"
+                        href="#history"
+                        onClick={(e) => { e.preventDefault(); onFollow(); }}
+                    >
+                        History
+                    </Tag>
+                    <Tag behavior="removable" color="blue" onRemove={onRemove}>Geography</Tag>
+                    <Tag color="blue">Music</Tag>
+                </TagGroup>
+                <p className="body2-txt">{picked ? 'Mathematics picked' : 'Nothing picked'}</p>
+            </div>
+        );
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const more = await canvas.findByRole('button', { name: '4 more tags' });
+        await userEvent.click(more);
+
+        // Selectable: a toggle, off, then on and still in the open menu.
+        const toggle = canvas.getByRole('button', { name: 'Mathematics' });
+        await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+        await userEvent.click(toggle);
+        await expect(canvas.getByText('Mathematics picked')).toBeInTheDocument();
+        await expect(more, 'toggling keeps the menu open').toHaveAttribute('aria-expanded', 'true');
+        await expect(canvas.getByRole('button', { name: 'Mathematics' })).toHaveAttribute('aria-pressed', 'true');
+        // Waited for: the item's background eases in.
+        await waitFor(() => expect(
+            getComputedStyle(canvas.getByRole('button', { name: 'Mathematics' })).backgroundColor,
+            'the item shows the menu\'s selected state',
+        ).toBe(tokenColor(canvasElement, '--color-primary-state-08')));
+
+        // Link: a real link to the tag's href, named by its words, with an
+        // arrow that is not read out. The tag's own onClick still fires.
+        const link = canvas.getByRole('link', { name: 'History' });
+        await expect(link).toHaveAttribute('href', '#history');
+        const arrow = link.querySelector('[aria-hidden="true"]:last-child');
+        await expect(arrow, 'a trailing arrow').not.toBeNull();
+        await expect(box(arrow).left).toBeGreaterThan(box(within(link).getByText('History')).right);
+        await expect(link.tabIndex).toBe(0);
+        await userEvent.click(link);
+        await expect(args.onFollow).toHaveBeenCalledTimes(1);
+
+        // Read-only and removable: plain items, never toggles, never a ×.
+        await userEvent.click(more);
+        for (const s of ['Geography', 'Music']) {
+            const item = canvas.getByRole('button', { name: s });
+            await expect(item).not.toHaveAttribute('aria-pressed');
+        }
+        await expect(canvas.queryByRole('button', { name: /^Remove/ }), 'remove stays on the row').toBeNull();
+        await expect(args.onRemove).not.toHaveBeenCalled();
+    },
+};
+
+/**
  * `maxVisible` caps the count even when more would fit.
  */
 export const MaxVisible = () => (
@@ -523,6 +667,7 @@ export const Disabled = {
             <div style={{ width: '200px' }}>
                 <TagGroup label="Collapsed focus areas" overflow="collapse" disabled>
                     {SUBJECTS.map((s) => <Tag key={s} color="blue" data-testid={`collapsed-${s}`}>{s}</Tag>)}
+                    <Suggestion label="Latin" onAccept={onAccept} />
                 </TagGroup>
             </div>
             <button type="button">After</button>
@@ -557,7 +702,12 @@ export const Disabled = {
 
         // The collapsed group's +n is disabled with the rest.
         const collapsed = canvas.getByRole('list', { name: 'Collapsed focus areas' });
-        await expect(await within(collapsed).findByRole('button', { name: /more tags$/ })).toBeDisabled();
+        const collapsedMore = await within(collapsed).findByRole('button', { name: /more tags$/ });
+        await expect(collapsedMore).toBeDisabled();
+        // Its suggestion stays on the row after +n, disabled with the group.
+        const latin = within(collapsed).getByRole('button', { name: 'Add Latin, suggested' });
+        await expect(latin).toBeDisabled();
+        await expect(box(latin).left).toBeGreaterThan(box(collapsedMore).right);
         await expect(canvas.getByTestId('collapsed-Science')).toHaveTextContent('Science, disabled');
 
         // Nothing between Before and After takes focus.
@@ -568,6 +718,7 @@ export const Disabled = {
         // And nothing responds to a press.
         await userEvent.click(insert, { pointerEventsCheck: 0 });
         await userEvent.click(prompt, { pointerEventsCheck: 0 });
+        await userEvent.click(latin, { pointerEventsCheck: 0 });
         await userEvent.click(within(group).getByRole('button', { name: 'Selectable' }), { pointerEventsCheck: 0 });
         await expect(args.onAccept).not.toHaveBeenCalled();
         await expect(args.onSelect).not.toHaveBeenCalled();

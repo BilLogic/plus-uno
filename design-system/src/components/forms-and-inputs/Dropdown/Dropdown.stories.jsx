@@ -316,6 +316,40 @@ EscapeClosesCustomToggle.play = async ({ canvasElement }) => {
     await expect(opener, 'focus is back on what opened it').toHaveFocus();
 };
 
+/* ------------------------------------------------------ links and toggles */
+
+/**
+ * An item with `href` is a real link, with its trailing icon kept out of its
+ * name. A `toggle` item reports `selected` as `aria-pressed`.
+ */
+export const LinkAndToggleItems = () => (
+    <div style={{ padding: '24px 24px 200px' }}>
+        <Dropdown
+            buttonText="Views"
+            items={[
+                { text: 'Open report', href: '#report', trailingIcon: 'arrow-right' },
+                { text: 'Pinned', toggle: true, selected: true, keepOpen: true },
+                { text: 'Archived', toggle: true, selected: false, keepOpen: true },
+                { text: 'Rename' },
+            ]}
+        />
+    </div>
+);
+
+LinkAndToggleItems.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Views' }));
+
+    const link = canvas.getByRole('link', { name: 'Open report' });
+    await expect(link).toHaveAttribute('href', '#report');
+    await expect(link.tabIndex).toBe(0);
+
+    await expect(canvas.getByRole('button', { name: 'Pinned' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(canvas.getByRole('button', { name: 'Archived' })).toHaveAttribute('aria-pressed', 'false');
+    await expect(canvas.getByRole('button', { name: 'Rename' }), 'a plain item is not a toggle')
+        .not.toHaveAttribute('aria-pressed');
+};
+
 export const Interactive = {
     args: {
         buttonText: 'Dropdown',

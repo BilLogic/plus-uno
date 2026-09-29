@@ -16,6 +16,11 @@ import './Suggestion.scss';
  * proposes words to send or to fill a text box: `onAccept` hands back `text`.
  * The component does not change itself when accepted; the field that owns the
  * value decides what appears next.
+ *
+ * NO `disabled` PROP, as Tag has none. Disabled comes from the field through
+ * `TagContext`, the value a Tag reads, so a suggestion can never disagree
+ * with the tags beside it. Disabled, it is a native disabled button:
+ * out of the tab order, announced as disabled, and never accepted.
  */
 
 export const SUGGESTION_TYPES = ['insert', 'prompt'];
@@ -37,8 +42,6 @@ export const Suggestion = ({
     id,
     ...rest
 }) => {
-    // Disabled comes from the field or TagGroup, through the context Tag reads,
-    // so a disabled group can never leave a suggestion in it pressable.
     const { isDisabled = false } = useTagContext() || {};
     const isPrompt = type === 'prompt';
     // Anything but `prompt` is an insert, so an unknown type still renders one.
@@ -64,10 +67,9 @@ export const Suggestion = ({
             // the spread, so a stray `aria-label` or `onClick` cannot replace
             // them. A caller's `onClick` still fires, before `onAccept`.
             aria-label={name}
-            // Native `disabled`, from the field or from the caller's own
-            // `disabled`: out of the tab order, announced as disabled, and no
-            // click reaches `onAccept`. It has no look of its own yet.
-            disabled={isDisabled || rest.disabled || undefined}
+            // After the spread, so the field's state wins and a stray
+            // `disabled` in `rest` never reaches the button.
+            disabled={isDisabled || undefined}
             onClick={(e) => {
                 onClick?.(e);
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);

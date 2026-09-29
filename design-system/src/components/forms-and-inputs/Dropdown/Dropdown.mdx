@@ -191,7 +191,7 @@ would run off the edge, remeasuring on scroll and resize.
   from `buttonText` plus the word "options", which is why the toggle half of a
   split button renders no visible text.
 - **The menu is not an ARIA menu.** The container is a plain div and each item is
-  a `button`; there is no `role="menu"` or `role="menuitem"` and no arrow-key
+  a `button` (or a link, for an item with `href`); there is no `role="menu"` or `role="menuitem"` and no arrow-key
   navigation. Items are reached by tabbing, which works but does not match the
   menu pattern a screen-reader user expects.
 - **Escape closes it.** Pressing Escape anywhere in an open dropdown closes the
@@ -206,9 +206,13 @@ would run off the edge, remeasuring on scroll and resize.
   Space on it opens the menu. Escape then returns focus to that control. A
   plain `span` is clickable and nothing else, so pass a control, or use the
   built-in toggle.
+- **Links and toggles say what they are.** An item with `href` is a real
+  link (`linkComponent` for a router's), so it is announced as a link and can
+  open in a new tab. An item with `toggle` is a button that reports
+  `selected` as `aria-pressed`; `keepOpen` leaves the menu open after it.
 - **Icons are decorative — mostly.** The selected check mark, the multi-select
-  checkbox and `leadingIcon` are all `aria-hidden`. `trailingIcon` and the
-  submenu caret are not, so an icon font glyph there can leak into the item's
+  checkbox, `leadingIcon` and `trailingIcon` are all `aria-hidden`. The
+  submenu caret is not, so an icon font glyph there can leak into the item's
   announced name. Keep the item's meaning in `text` either way.
 
 ### Give the split treatment a real button when the label must act.
