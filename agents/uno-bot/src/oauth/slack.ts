@@ -72,6 +72,9 @@ const SCOPES = [
   "groups:history",
   "im:history",
   "mpim:history",
+  // The lead's own DM list, for the ask-resolution pass: did the asker take
+  // it to the lead in a DM (users.conversations types=im, a read).
+  "im:read",
   "channels:read",
   "groups:read",
   "users:read",
