@@ -3,13 +3,13 @@
 
 # Alert
 
-Uses the standard React children pattern for content (matching React Bootstrap convention). // Simple alert <Alert style="warning">Warning message here</Alert> // With title <Alert style="info" title="Info">This is an info alert.</Alert> // Rich content <Alert style="danger"> <strong>Error:</strong> Something went wrong. <a href="/help">Get help</a> </Alert>
+Uses the standard React children pattern for content (matching React Bootstrap convention). // Simple alert <Alert style="warning">Warning message here</Alert> // With title <Alert style="info" title="Info">This is an info alert.</Alert> // Rich content <Alert style="danger"> <strong>Error:</strong> Something went wrong. <a href="/help">Get help</a> </Alert> // Leading icon: each style has a default; a name or a node replaces it, false removes it <Alert style="info" leadingVisual="bell">Reminders are on.</Alert> <Alert style="warning" leadingVisual={false}>Sign-in didn't complete. Please try again.</Alert>
 
 **Import:** `import { Alert } from '@/components';`
 
 **Source:** `design-system/src/components/messaging/Alert/Alert.jsx`
 
-**Stories:** `design-system/src/components/messaging/Alert/Alert.stories.jsx` — Styles, Content, Overview, Interactive, DismissPlacement
+**Stories:** `design-system/src/components/messaging/Alert/Alert.stories.jsx` — Styles, Content, Overview, Interactive, DismissPlacement, LeadingIcon, BorderAndText
 
 **Storybook page:** `design-system/src/components/messaging/Alert/Alert.mdx`
 
@@ -22,6 +22,7 @@ Uses the standard React children pattern for content (matching React Bootstrap c
 | `variant` | string | — | React Bootstrap variant (for accessibility attributes) |
 | `title` | string | — | Optional alert title/heading |
 | `children` | node (required) | — | Alert content - supports text, JSX, or React components |
+| `leadingVisual` | bool or string or node | `true` | The leading icon: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it |
 | `dismissible` | bool | `true` | Whether the alert can be dismissed |
 | `dismissable` | bool | — | Whether the alert can be dismissed |
 | `onDismiss` | func | — | Callback when alert is dismissed |
@@ -35,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-` · `--color-on-` · `--font-weight-medium` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-element-border` · `--size-element-gap-sm` · `--size-modal-radius-md`
+`--color-` · `--color-on-surface` · `--font-size-fa-h4-solid` · `--font-weight-medium` · `--size-border-stroke-stroke-300` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-element-gap-sm` · `--size-modal-radius-md`
 
 From `design-system/src/components/messaging/Alert/Alert.scss`. Override these through the token layer, never with a literal.
 

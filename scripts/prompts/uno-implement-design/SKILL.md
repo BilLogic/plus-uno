@@ -40,7 +40,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 **Do NOT use this skill for:**
 
-- DS-library component updates (`Badge.jsx`, `Button.scss`, etc.) — that is `uno-implement`, gated on the polling bot's PRD notification
+- DS-library component updates (`Badge.jsx`, `Button.scss`, etc.) — that is `uno-implement`, run from the Figma library card or a designer's PRD-backed implement
 - Updating an existing prototypes in place — this skill only scaffolds NEW directories; iterating on an existing prototype is an in-IDE task
 - Anything that writes outside `prototypes/{slug}/` (the orchestration handles the single root `package.json` edit for you)
 

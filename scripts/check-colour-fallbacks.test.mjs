@@ -41,6 +41,29 @@ test('a disagreeing colour fallback in a fixture tree is a finding', () => {
   }
 });
 
+test('a stale rgba() wash in a fixture tree is a finding', () => {
+  // The token was re-mixed and the wash beside it was not: same alpha, old base.
+  const { root, done } = policyTree(
+    {
+      'design-system/src/tokens/_colors.scss':
+        ':root { --color-tertiary-state-08: rgba(14, 129, 117, 0.08); }\n',
+      'design-system/src/a.scss':
+        '.a { background: var(--color-tertiary-state-08, rgba(0, 82, 221, 0.08)); }\n',
+      'docs/evals/colour-fallback-baseline.json': BASELINE,
+    },
+    { git: true },
+  );
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /--color-tertiary-state-08/.test(message) && /a\.scss:1/.test(message)),
+      `expected a disagreement finding for the stale wash, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
   const { root, done } = policyTree(
     {

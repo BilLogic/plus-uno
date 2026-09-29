@@ -52,10 +52,16 @@
  *     opens; it never reaches a nested rule, so nested text cannot inherit a
  *     graphic's bar. It is valid only if EVERY selector in the rule's resolved
  *     list (SCSS nesting resolved, `&` expanded) has an icon SUBJECT: the last
- *     compound, after any combinator, contains a class `fa`, `fas`, `far` or
- *     `fa-*`, a class ending in `__icon`, or the type `svg`. Anything inside
- *     `:not()` or another functional pseudo-class is ignored when deciding.
- *     Otherwise it is an error and the declarations keep the text bar.
+ *     compound, after any combinator, contains one of the glyph selectors the
+ *     `icon-glyph` mixin lists (`design-system/src/styles/_icon-glyph.scss`,
+ *     which says why those and no others). Anything inside `:not()` or another
+ *     functional pseudo-class is ignored when deciding. Otherwise it is an
+ *     error and the declarations keep the text bar.
+ *
+ *  4. `@include icon-glyph { … }` is read as the rule it compiles to: a rule
+ *     whose selectors are that mixin's list, nested where the include is. So
+ *     an annotation opening the include's block opens that rule, and the
+ *     stylesheet and this reader share one definition of an icon.
  *
  * WHAT IT REFUSES, each as an error rather than a silent pass: an annotation
  * that does not open its rule, a second one of a kind in a rule, an empty
@@ -68,6 +74,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import postcss from 'postcss';
 import postcssScss from 'postcss-scss';
 import selectorParser from 'postcss-selector-parser';
 
@@ -86,19 +93,82 @@ const ANNOTATION = /^@([a-z-]+)\s*:([\s\S]*)$/;
 const BACKGROUND = /^background(-color)?$/;
 const COLOR_TOKEN = /var\(\s*(--color-[a-z0-9-]+)/;
 
+/** The partial that defines an icon glyph, and the mixin in it. */
+export const GLYPH_PARTIAL = 'design-system/src/styles/_icon-glyph.scss';
+const GLYPH_MIXIN = 'icon-glyph';
+
+/**
+ * The glyph selectors the `icon-glyph` mixin lists. Its body must be one rule
+ * holding `@content`, and each selector a single class or type, because that
+ * is all `hasIconSubject` can match; anything else throws rather than reading
+ * as an empty list, which would refuse every icon.
+ *
+ * @param {string} source  the partial's text
+ */
+export function glyphSelectors(source) {
+  let mixin = null;
+  postcssScss.parse(source).walkAtRules('mixin', (at) => {
+    if (at.params.replace(/\(\s*\)$/, '').trim() === GLYPH_MIXIN) mixin = at;
+  });
+  if (!mixin) throw new Error(`${GLYPH_PARTIAL} defines no @mixin ${GLYPH_MIXIN}`);
+  const body = (mixin.nodes ?? []).filter((node) => node.type !== 'comment');
+  const [rule] = body;
+  const holdsContent = rule?.type === 'rule'
+    && rule.nodes.some((node) => node.type === 'atrule' && node.name === 'content');
+  if (body.length !== 1 || !holdsContent) {
+    throw new Error(`@mixin ${GLYPH_MIXIN} must be one rule holding @content`);
+  }
+  for (const selector of rule.selectors) {
+    if (!/^(\.[a-z][a-z0-9-]*|[a-z]+)$/.test(selector)) {
+      throw new Error(`@mixin ${GLYPH_MIXIN}: \`${selector}\` is not a single class or type`);
+    }
+  }
+  return rule.selectors;
+}
+
+/** The glyph selectors, read once from the partial. */
+export const GLYPH_SELECTORS = glyphSelectors(fs.readFileSync(path.join(REPO_ROOT, GLYPH_PARTIAL), 'utf8'));
+const GLYPH_CLASSES = new Set(GLYPH_SELECTORS.filter((s) => s.startsWith('.')).map((s) => s.slice(1)));
+const GLYPH_TYPES = new Set(GLYPH_SELECTORS.filter((s) => !s.startsWith('.')));
+
+/** `@include icon-glyph`, bare or through a `@use` namespace, with or without `()`. */
+const GLYPH_INCLUDE = new RegExp(`^(?:[\\w-]+\\.)?${GLYPH_MIXIN}\\s*(?:\\(\\s*\\))?$`);
+
+/**
+ * Semantics 4: each `@include icon-glyph { … }` becomes the rule it compiles
+ * to, in place, keeping its source range so `ruleAt` finds it. Returns the
+ * rules made, so a caller can tell them from hand-written ones.
+ */
+function expandGlyphIncludes(root) {
+  const includes = [];
+  root.walkAtRules('include', (at) => {
+    if (at.nodes && GLYPH_INCLUDE.test(at.params.trim())) includes.push(at);
+  });
+  const made = new Set();
+  for (const at of includes) {
+    const rule = postcss.rule({ selector: GLYPH_SELECTORS.join(', '), source: at.source });
+    rule.append([...at.nodes]);
+    at.replaceWith(rule);
+    made.add(rule);
+  }
+  return made;
+}
+
 /** A comment's text as one line: block-comment `*` gutters stripped. */
 function commentBody(comment) {
   return comment.text.split('\n').map((line) => line.replace(/^\s*\*\s?/, '')).join(' ').trim();
 }
 
 /**
- * Parse a stylesheet once: the tree, each rule's annotations, and the
- * placement errors.
+ * Parse a stylesheet once: the tree (with `@include icon-glyph` blocks read as
+ * rules), each rule's annotations, the placement errors, and the rules made
+ * from glyph includes.
  *
  * @param {string} source
  */
 export function analyzeSheet(source) {
   const root = postcssScss.parse(source);
+  const glyphRules = expandGlyphIncludes(root);
   /** @type {Map<import('postcss').Rule, {grounds?: object, contrast?: object}>} */
   const annotations = new Map();
   const errors = [];
@@ -127,7 +197,7 @@ export function analyzeSheet(source) {
     annotations.set(parent, own);
   });
 
-  return { root, annotations, errors };
+  return { root, annotations, errors, glyphRules };
 }
 
 /** The innermost rule whose source range contains `offset`, or null. */
@@ -188,10 +258,11 @@ export function resolvedSelectors(rule) {
 
 /**
  * `selector` with every `&` outside a quoted string replaced by `parent`, or
- * null when it has none (the rule then nests as a descendant). Two traps it
+ * null when it has none (the rule then nests as a descendant). Three traps it
  * avoids: an `&` inside an attribute value such as `[data-label="a & b"]` is
- * text, not the parent; and the parent is inserted as written, never through a
- * `String.replace` replacement string, where `$&`, `$'` and `` $` `` are patterns.
+ * text, not the parent; so is an escaped `\&`, which is part of a name; and
+ * the parent is inserted as written, never through a `String.replace`
+ * replacement string, where `$&`, `$'` and `` $` `` are patterns.
  */
 function expandParent(selector, parent) {
   let out = '';
@@ -203,6 +274,10 @@ function expandParent(selector, parent) {
       out += ch;
       if (ch === '\\' && i + 1 < selector.length) out += selector[++i];
       else if (ch === quote) quote = null;
+    } else if (ch === '\\') {
+      // An escape: the next character is literal, whatever it is.
+      out += ch;
+      if (i + 1 < selector.length) out += selector[++i];
     } else if (ch === '"' || ch === "'") {
       quote = ch;
       out += ch;
@@ -216,9 +291,8 @@ function expandParent(selector, parent) {
   return found ? out : null;
 }
 
-const ICON_CLASS = (name) => name === 'fa' || name === 'fas' || name === 'far' || name.startsWith('fa-') || name.endsWith('__icon');
 
-/** Does this one selector's subject — its last compound — name an icon? */
+/** Does this one selector's subject — its last compound — name an icon glyph? */
 export function hasIconSubject(selector) {
   let answer = false;
   selectorParser((selectors) => {
@@ -229,8 +303,8 @@ export function hasIconSubject(selector) {
     nodes.forEach((node, index) => { if (node.type === 'combinator') start = index + 1; });
     // Only the subject compound's own nodes: classes, tags and pseudos at top
     // level. The contents of `:not()` and friends are never walked.
-    answer = nodes.slice(start).some((node) => (node.type === 'class' && ICON_CLASS(node.value))
-      || (node.type === 'tag' && node.value.toLowerCase() === 'svg'));
+    answer = nodes.slice(start).some((node) => (node.type === 'class' && GLYPH_CLASSES.has(node.value))
+      || (node.type === 'tag' && GLYPH_TYPES.has(node.value.toLowerCase())));
   }).processSync(selector);
   return answer;
 }

@@ -96,15 +96,20 @@ test("the rehearsal stops before the invocation's budget is gone", async () => {
   assert.equal(report.total_subrequests, LOOKUP_CEILING);
 });
 
-test("the probe dry-runs the named run with the no-op job", async () => {
+test("the probe dry-runs the named run's jobs", async () => {
+  // An unconfigured Worker: no channel to post in and no repo to track, so
+  // both morning jobs say so and spend nothing.
   const url = new URL("https://w/debug/sweep?dry_run=1&run=morning");
   const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
-  const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { outcome: string }[] };
+  const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 1);
-  assert.deepEqual(body.jobs.map((j) => j.outcome), ["handled"]);
+  assert.equal(body.planned.length, 2);
+  assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
+    ["figma-library-post", "handled", 0],
+    ["figma-library-track", "handled", 0],
+  ]);
 });
 
 test("the probe refuses a live run and an unknown run name", async () => {

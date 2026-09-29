@@ -151,12 +151,13 @@ export async function usersList(env: Env, cursor?: string) {
   );
 }
 
-/** conversations.members via the bot token — member ids (first page). */
-export async function conversationsMembers(env: Env, channel: string, limit = 100) {
+/** conversations.members via the bot token — one page of member ids, the
+ *  first unless `cursor` names the next. */
+export async function conversationsMembers(env: Env, channel: string, limit = 100, cursor?: string) {
   return slackGet<SlackResponse & { members?: string[]; response_metadata?: { next_cursor?: string } }>(
     env,
     "conversations.members",
-    { channel, limit: String(limit) },
+    { channel, limit: String(limit), ...(cursor ? { cursor } : {}) },
   );
 }
 

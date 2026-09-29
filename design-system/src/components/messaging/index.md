@@ -7,7 +7,7 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Alert](Alert/index.md) | 9 | ✅ | ✕ | ✅ |
+| [Alert](Alert/index.md) | 10 | ✅ | ✕ | ✅ |
 | [Modal](Modal/index.md) | 26 | ✅ | ✕ | ✅ |
 | [Toast](Toast/index.md) | 13 | ✅ | ✕ | ✅ |
 

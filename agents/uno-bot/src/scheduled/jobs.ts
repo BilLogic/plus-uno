@@ -7,6 +7,8 @@
 // under a dry run a body reads and spends as it would but writes nothing.
 import type { Env } from "../types";
 import { charge } from "../net";
+import { runFigmaPoll } from "../figma-poll";
+import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
 
 /** One job kind's work. Resolving is done; a budget stop is thrown through. */
@@ -16,6 +18,19 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Proves the path end to end — the enqueue, one alarm, the done marker —
   // and spends nothing.
   noop: async () => {},
+  // End of day: diff the DS file against the snapshot and keep what changed
+  // for the morning (src/figma-poll.ts).
+  "figma-library-poll": async (env, _job, { dryRun }) => {
+    console.log(`[figma-poll] ${(await runFigmaPoll(env, { dryRun })).summary}`);
+  },
+  // Morning: each change set becomes one card in #plus-universal.
+  "figma-library-post": async (env, _job, { dryRun }) => {
+    console.log(`[figma-library] post: ${(await runLibraryPost(env, { dryRun })).summary}`);
+  },
+  // Morning: link each posted card's PR, and close its intake on merge.
+  "figma-library-track": async (env, _job, { dryRun }) => {
+    console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
 };
 
 /**

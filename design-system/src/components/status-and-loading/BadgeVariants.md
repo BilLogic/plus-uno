@@ -15,8 +15,8 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | oneOf | `'status'` | What kind of system-generated value this is. |
-| `appearance` | oneOf | `'neutral'` | `status` only: one of the closed set of five. Ignored on `custom`. |
+| `variant` | enum | `'status'` | What kind of system-generated value this is. |
+| `appearance` | enum | `'neutral'` | `status` only: one of the closed set of five. Ignored on `custom`. |
 | `spacing` | enum | `'default'` | `status` and `date` only. Padding, never type. |
 | `children` | node | — | — |
 | `text` | string or number | — | — |
@@ -32,6 +32,10 @@
 | `id` | string | — | — |
 
 ## Variants
+
+**`variant`** — `status` · `counter` · `date` · `custom`
+
+**`appearance`** — `positive` · `negative` · `neutral` · `information` · `discovery`
 
 **`spacing`** — `default` · `spacious`
 

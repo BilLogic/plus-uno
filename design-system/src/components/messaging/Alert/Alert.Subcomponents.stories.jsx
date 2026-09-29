@@ -13,7 +13,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Documentation for the internal subcomponents of the Alert (Dismiss Button, Content Layout).',
+                component: 'Documentation for the internal subcomponents of the Alert (Leading Icon, Dismiss Button, Content Layout).',
             },
         },
     },
