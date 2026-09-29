@@ -1259,12 +1259,11 @@
 }
 
 /*
- * The insight ink on a tertiary insight's icon. A warning or success alert
- * keeps its own ground (`.plus-alert.<style>` outranks `.insight-alert`), so
- * its icon keeps its own style's color and does not take this class.
+ * The tertiary Icon role on a tertiary insight's icon. A warning or success
+ * alert keeps its own style's Icon color and does not take this class.
  */
 .insight-alert .insight-alert-icon {
-    color: var(--color-on-tertiary-container, var(--color-on-surface));
+    color: var(--color-tertiary-icon);
 }
 
 .training-grid {

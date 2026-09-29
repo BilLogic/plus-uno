@@ -136,7 +136,6 @@ $alert-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
     .plus-alert.#{$theme} {
         background-color: var(--color-#{$theme}-state-08);
         border-color: var(--color-#{$theme}-border);
-        color: var(--color-on-surface);
 
         .plus-alert-leading {
             color: var(--color-#{$theme}-icon);

@@ -340,7 +340,6 @@ LeadingIcon.play = async ({ canvasElement }) => {
     await expect(canvas.queryByTestId('icon-none')).toBeNull();
 };
 
-
 /**
  * The border and the text. Each style draws one 3px border on the left, in its
  * Border color, and nothing on the other three sides. The title, the body and
@@ -351,7 +350,13 @@ LeadingIcon.play = async ({ canvasElement }) => {
 export const BorderAndText = () => (
     <div
         data-testid="border-ground"
-        style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '24px', background: 'var(--color-surface-container-highest)' }}
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-lg)',
+            padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)',
+            background: 'var(--color-surface-container-highest)',
+        }}
     >
         {ALERT_STYLES.map((style) => (
             <Alert key={style} style={style} title="Title" data-testid={`border-${style}`}>
