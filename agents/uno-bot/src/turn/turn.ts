@@ -84,6 +84,14 @@ import {
 } from "../thread-state/index";
 import {
   buildTurnRecord,
+  isTestTraffic,
+  quietly,
+  recordProposalEvents,
+  storesChannel,
+  stagedEvent,
+  supersededEvents,
+  turnIdOf,
+  type ProposalEventLog,
   withAskLabel,
   type SubType,
   type TurnOrigin,
@@ -380,6 +388,9 @@ export interface TurnUsage {
   origin: TurnOrigin;
   /** `TEST_CHANNEL_IDS`, parsed: #uno-bot-sandbox. */
   testChannelIds: readonly string[];
+  /** Where the cards this turn stages, and the one a revision replaces, are
+   *  recorded (`usage/proposal-events.ts`). */
+  proposalEvents: ProposalEventLog;
   /** Overrides `USAGE_WRITE_TIMEOUT_MS`; a test's way to not wait it out. */
   writeTimeoutMs?: number;
   /**
@@ -613,9 +624,24 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     firstAnswerAt ??= clock();
   });
 
+  // What a card this turn stages is recorded with, known before it runs: the
+  // row it joins to, and the test-traffic rule as it reads for a staging turn.
+  const staging: StagingFacts = {
+    turnId: turnIdOf(request.channel, request.userMsgTs, startedAt),
+    channelStored: storesChannel(request.surface, request.conversationType),
+    now: clock,
+    testTraffic: isTestTraffic({
+      origin: deps.usage.origin,
+      channel: request.channel,
+      testChannelIds: deps.usage.testChannelIds,
+      disposition: "staged",
+      question: request.text,
+    }),
+  };
+
   const outcome = await withWorkingSignal(
     delivery,
-    (watched) => turnBody(request, { ...deps, delivery: watched }),
+    (watched) => turnBody(request, { ...deps, delivery: watched }, staging),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
 
@@ -644,8 +670,27 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
     ...(outcome.executed ? { executed: outcome.executed } : {}),
   });
+  // A ticket a reaction or button ✅ on this turn's card filed before this row
+  // existed was kept on the card's staged row; it lands here.
+  if (outcome.staged && record.selfFiledTicketUrl === null) {
+    const staged = outcome.staged.proposal.proposalTs;
+    await quietly(`self-filed ticket for ${staged}`, async () => {
+      record.selfFiledTicketUrl = await deps.usage.proposalEvents.ticketFor(staged);
+    }, deps.usage.writeTimeoutMs);
+  }
   await recordTurn(await labelInTurn(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
+}
+
+/** What a card this turn stages is recorded with (`usage/proposal-events.ts`). */
+interface StagingFacts {
+  /** This turn's row — the staged event's join to `turns`. */
+  turnId: string;
+  testTraffic: boolean;
+  /** Whether the card may name its channel: `turns`' rule for DMs. */
+  channelStored: boolean;
+  /** The turn's clock. */
+  now: () => number;
 }
 
 /**
@@ -729,7 +774,7 @@ async function withTimeout<T>(work: Promise<T>, timeoutMs: number): Promise<T> {
   }
 }
 
-async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
+async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFacts): Promise<TurnOutcome> {
   const { delivery, threadState } = deps;
 
   // When this turn began, which is what scopes a stop press to it. Taken HERE
@@ -1207,7 +1252,20 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // the thread's pending card too: this closes the seconds the revision spends
   // being written, during which the old card would otherwise still execute the
   // input the person just pushed back on.
-  if (request.pending) await threadState.retireProposal(request.pending.proposalTs);
+  const retiredAhead =
+    request.pending && (await threadState.retireProposal(request.pending.proposalTs)).retired
+      ? [request.pending.proposalTs]
+      : [];
+  // On the record only when a retire took a live card out of reach — not one
+  // a ✅ claimed meanwhile, which has its own outcome — and at once, so a card
+  // whose revision then fails to post is not later read as aged out.
+  const recordSuperseded = (retired: readonly string[]) =>
+    recordProposalEvents(
+      deps.usage.proposalEvents,
+      supersededEvents(retired, staging.now(), "revision"),
+      deps.usage.writeTimeoutMs,
+    );
+  await recordSuperseded(retiredAhead);
 
   const card = await buildCard(
     result,
@@ -1260,7 +1318,26 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
       : {}),
   };
-  await threadState.putProposal(proposal);
+  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  // On the record as soon as it is stored, so a ✅ that lands before the turn
+  // finishes finds the staged row and the turn id it joins to; a ticket that
+  // ✅ files waits on that row until the turn writes its own (`runTurn`).
+  await recordSuperseded(retiredByStaging);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    [
+      stagedEvent({
+        proposal,
+        at: staging.now(),
+        via: "turn",
+        channelStored: staging.channelStored,
+        turnId: staging.turnId,
+        testTraffic: staging.testTraffic,
+        askText: request.text,
+      }),
+    ],
+    deps.usage.writeTimeoutMs,
+  );
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
@@ -1319,7 +1396,12 @@ async function settleVerdict(
   }
   // A cut-off run's leftovers go back on a card of their own, after the note
   // that explains them — the card holds the buttons, so it comes last.
-  const staged = verdict.restage ? await restageExecution(verdict.restage, ctx.deps) : null;
+  const staged = verdict.restage
+    ? await restageExecution(verdict.restage, {
+        ...ctx.deps,
+        proposalEvents: ctx.deps.usage.proposalEvents,
+      })
+    : null;
   if (staged) await ctx.memory.remember(staged.proposal.proposalText);
   return {
     disposition: staged ? "staged" : "resolved",
@@ -1351,7 +1433,10 @@ async function settleVerdict(
  */
 export async function restageExecution(
   restage: GateRestage,
-  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards">,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards"> & {
+    /** Where the fresh card's staging is recorded. */
+    proposalEvents: ProposalEventLog;
+  },
 ): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
   const original = restage.proposal;
   const first = restage.operations[0]!;
@@ -1388,7 +1473,19 @@ export async function restageExecution(
     // The ask's own card, carried across however many re-stagings.
     originProposalTs: stagingCardOf(original),
   };
-  await deps.threadState.putProposal(proposal);
+  const { retired } = await deps.threadState.putProposal(proposal);
+  // The fresh card is the ask's card's successor on the record: through
+  // `originProposalTs` it takes that card's turn, channel and test-traffic
+  // flag, so a ticket its ✅ files still finds the turn that asked for it.
+  await recordProposalEvents(deps.proposalEvents, [
+    ...supersededEvents(retired, Date.now(), "restage"),
+    stagedEvent({
+      proposal,
+      at: Date.now(),
+      via: "restage",
+      channelStored: false,
+    }),
+  ]);
   return { proposal, card };
 }
 

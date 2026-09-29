@@ -74,12 +74,15 @@ const ON_RETRY: Partial<Record<(typeof COLUMNS)[number], string>> = {
   sub_type: "COALESCE(excluded.sub_type, turns.sub_type)",
   pain_category: "COALESCE(excluded.pain_category, turns.pain_category)",
   classified_at: "COALESCE(excluded.classified_at, turns.classified_at)",
+  self_filed_ticket_url: "COALESCE(excluded.self_filed_ticket_url, turns.self_filed_ticket_url)",
 };
 
 // An upsert that rewrites THIS record's columns only: a retried turn replaces
 // its own values, the classifier's columns follow `ON_RETRY`, and columns a
 // later migration adds for another writer survive it by being left out.
 // `INSERT OR REPLACE` would delete the row first and lose them.
+// A ticket another writer already put on the row (a reaction ✅ on the card
+// this turn staged, `noteSelfFiledTicket`) survives a rewrite that names none.
 const UPSERT =
   `INSERT INTO turns (${COLUMNS.join(", ")}) VALUES (${COLUMNS.map(() => "?").join(", ")}) ` +
   `ON CONFLICT (turn_id) DO UPDATE SET ` +

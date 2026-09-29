@@ -55,6 +55,7 @@ import {
 } from "../src/turn/index";
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
 import { STALE_POST, renderGateNote } from "../src/slack/gate-note";
+import { verdictEvents } from "../src/usage/index";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
 
@@ -157,10 +158,60 @@ describe("four signals, one verdict", () => {
       );
     }
 
-    // Not "each looks right" but "all four are the same verdict".
+    // Not "each looks right" but "all four are the same verdict" — past the
+    // door it came through, which each one names for the record.
+    const { by: _first, ...first } = verdicts[0]!;
     for (const verdict of verdicts.slice(1)) {
-      assert.deepEqual(verdict, verdicts[0]);
+      const { by: _by, ...rest } = verdict;
+      assert.deepEqual(rest, first);
     }
+    assert.deepEqual(
+      verdicts.map((v) => v.by),
+      [
+        { door: "reaction", userId: "U2" },
+        { door: "button", userId: "U2" },
+        { door: "typed", userId: "U2" },
+        { door: "model" },
+      ],
+    );
+  });
+
+  it("leaves one confirmed event per door, naming the door and who confirmed", async () => {
+    // What the executor every door hands its verdict to records
+    // (`agent/resolve-proposal.ts`): the event is read off the verdict alone.
+    for (const door of DOORS) {
+      const verdict = await resolveSignal(door.signal, { threadState: await staged() });
+      const events = verdictEvents(verdict, 1_000);
+      const via = door.signal.kind;
+      const actor = door.signal.kind === "model" ? null : "U2";
+      assert.deepEqual(
+        events.map((e) => [e.proposalId, e.event, e.via, e.actorId, e.confirmedByOther]),
+        [[CARD_TS, "confirmed", via, actor, actor === null ? null : true]],
+        door.name,
+      );
+    }
+  });
+
+  it("leaves a cancelled event for a ⛔ on every door, and none for a lost race", async () => {
+    const cancels: GateSignal[] = [
+      reaction({ glyph: "no_entry" }),
+      button("cancel"),
+      typed("⛔"),
+      { kind: "model", pending: PROPOSAL, decision: "cancel", userId: "U1" },
+    ];
+    for (const signal of cancels) {
+      const verdict = await resolveSignal(signal, { threadState: await staged() });
+      assert.deepEqual(
+        verdictEvents(verdict, 1_000).map((e) => [e.event, e.via, e.confirmedByOther]),
+        [["cancelled", signal.kind, null]],
+        signal.kind,
+      );
+    }
+    const threadState = await staged();
+    await resolveSignal(reaction(), { threadState });
+    const lost = await resolveSignal(typed(), { threadState });
+    assert.equal(lost.outcome, "stale");
+    assert.deepEqual(verdictEvents(lost, 1_000), []);
   });
 
   it("carries the model's own words when it brought some", async () => {
@@ -731,6 +782,14 @@ describe("the reaction door", () => {
     ]);
   });
 
+  it("hands the executor a verdict that records the reactor's ✅ as the reaction's", async () => {
+    const { ran } = await drive();
+    assert.deepEqual(
+      verdictEvents(ran[0]!, 1_000).map((e) => [e.event, e.via, e.actorId, e.confirmedByOther]),
+      [["confirmed", "reaction", "U2", true]],
+    );
+  });
+
   it("settles the signal when the tool dies, and says so in the thread", async () => {
     // The failure this whole path fights: a ✅ that did nothing and said
     // nothing (live 2026-07-13). The door answers in the thread, and the
@@ -886,6 +945,14 @@ describe("the button door", () => {
     assert.deepEqual(targets, [
       { channel: CHANNEL, replyTs: THREAD, userMsgTs: PROPOSAL.userMsgTs, userId: "U2" },
     ]);
+  });
+
+  it("hands the executor a verdict that records the presser's ✅ as the button's", async () => {
+    const { ran } = await drive({ userId: "U1" });
+    assert.deepEqual(
+      verdictEvents(ran[0]!, 1_000).map((e) => [e.event, e.via, e.actorId, e.confirmedByOther]),
+      [["confirmed", "button", "U1", false]],
+    );
   });
 
   it("answers a losing press where the person is looking, and raises nothing", async () => {

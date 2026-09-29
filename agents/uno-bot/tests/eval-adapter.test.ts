@@ -38,7 +38,7 @@ import {
 import { evalTurnWiring } from "../src/eval/turn-adapter";
 import { slackTurnRequest, type TurnEnvelope } from "../src/slack/turn-request";
 import { slackTurnWiring } from "../src/slack/turn-adapter";
-import { createInMemoryUsageLog } from "../src/usage/index";
+import { createInMemoryProposalEventLog, createInMemoryUsageLog } from "../src/usage/index";
 import { buildTurnDeps } from "../src/turn/env-deps";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
@@ -151,7 +151,12 @@ function harness(
 
     // Every eval turn is test traffic on the usage record; this harness keeps
     // the records it would have written, and asserts nothing about them.
-    usage: { log: createInMemoryUsageLog(), origin: "debug", testChannelIds: [] },
+    usage: {
+      log: createInMemoryUsageLog(),
+      proposalEvents: createInMemoryProposalEventLog(),
+      origin: "debug",
+      testChannelIds: [],
+    },
 
     // Structures, not words — the reads a card needs, as the port takes them
     // since #623.
