@@ -31,6 +31,7 @@ export const Suggestion = ({
     value,
     text,
     onAccept,
+    onClick,
     className = '',
     id,
     ...rest
@@ -49,14 +50,18 @@ export const Suggestion = ({
 
     return (
         <button
+            {...rest}
             type="button"
             id={id}
             className={classes}
+            // The name and the press are the component's own: they come after
+            // the spread, so a stray `aria-label` or `onClick` cannot replace
+            // them. A caller's `onClick` still fires, before `onAccept`.
             aria-label={name}
             onClick={(e) => {
+                onClick?.(e);
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);
             }}
-            {...rest}
         >
             <i className={`fa-solid ${ICONS[isPrompt ? 'prompt' : 'insert']} plus-suggestion__icon`} aria-hidden="true" />
             <span className="plus-suggestion__label body3-txt">{label}</span>
@@ -75,6 +80,8 @@ Suggestion.propTypes = {
     text: PropTypes.string,
     /** Called with the value (insert) or the text (prompt), then the click event. */
     onAccept: PropTypes.func,
+    /** Fires on press, before `onAccept`. It never replaces `onAccept`. */
+    onClick: PropTypes.func,
     className: PropTypes.string,
     id: PropTypes.string,
 };

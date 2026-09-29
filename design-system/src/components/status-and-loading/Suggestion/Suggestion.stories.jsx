@@ -127,10 +127,16 @@ InATagRow.play = async ({ canvasElement }) => {
 
 /** What each type hands back when it is pressed. */
 export const Callbacks = {
-    args: { onInsert: fn(), onPrompt: fn() },
-    render: ({ onInsert, onPrompt }) => (
+    args: { onInsert: fn(), onPrompt: fn(), onClick: fn() },
+    render: ({ onInsert, onPrompt, onClick }) => (
         <div style={row}>
-            <Suggestion label="Relationships" value="focus-relationships" onAccept={onInsert} />
+            <Suggestion
+                label="Relationships"
+                value="focus-relationships"
+                onAccept={onInsert}
+                onClick={onClick}
+                aria-label="Something else"
+            />
             <Suggestion label="Fractions" onAccept={onInsert} />
             <Suggestion
                 type="prompt"
@@ -144,14 +150,19 @@ export const Callbacks = {
 
 /**
  * Insert calls back with the value, which defaults to the label; prompt calls
- * back with the text, which also defaults to the label. The keyboard presses
- * it like any button.
+ * back with the text, which also defaults to the label. A caller's `onClick`
+ * fires too. The keyboard presses it like any button.
  */
 Callbacks.play = async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
 
+    // A caller's own onClick and aria-label never replace what the component
+    // owns: the name stays "Add {label}, suggested", and onClick fires as well
+    // as onAccept, not instead of it.
     await userEvent.click(canvas.getByRole('button', { name: 'Add Relationships, suggested' }));
     await expect(args.onInsert).toHaveBeenLastCalledWith('focus-relationships', expect.anything());
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expect(canvas.queryByRole('button', { name: 'Something else' })).toBeNull();
 
     await userEvent.click(canvas.getByRole('button', { name: 'Add Fractions, suggested' }));
     await expect(args.onInsert).toHaveBeenLastCalledWith('Fractions', expect.anything());
@@ -192,7 +203,11 @@ StateLayers.play = async ({ canvasElement }) => {
     }
 };
 
-/** Keyboard focus: a 2px Focus Ring 3px outside the dashed edge. */
+/**
+ * Keyboard focus: a 2px Focus Ring 2px outside the dashed edge, as Tag's is.
+ * The ring's outer corner is the 4 radius plus the 2 gap plus the 2 stroke: 8,
+ * the radius-lg the Figma ring draws.
+ */
 export const FocusRing = () => (
     <div style={row}>
         <Suggestion label="Relationships" onAccept={() => {}} />
@@ -211,7 +226,11 @@ FocusRing.play = async ({ canvasElement }) => {
         const s = getComputedStyle(el);
         await expect(s.outlineStyle, name).toBe('solid');
         await expect(px(s.outlineWidth), `${name}: 2px ring`).toBe(2);
-        await expect(px(s.outlineOffset), `${name}: 3px outside the edge`).toBe(3);
+        await expect(px(s.outlineOffset), `${name}: 2px outside the edge`).toBe(2);
+        await expect(
+            px(s.borderTopLeftRadius) + px(s.outlineOffset) + px(s.outlineWidth),
+            `${name}: the ring's outer corner is 8`,
+        ).toBe(8);
         await expect(s.outlineColor, name).toBe(ring);
         // Focus is a ring, not a fill: the dashed edge and clear ground stay.
         await expect(s.borderTopStyle).toBe('dashed');
