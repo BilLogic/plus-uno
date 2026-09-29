@@ -120,8 +120,9 @@
         }
     }
 
-    // Title and timestamp: accepted contrast exception, recorded in the
-    // text-contrast baseline; do not darken.
+    // The same content color as the other headers. Title and timestamp:
+    // accepted contrast exception, recorded in the text-contrast baseline; do
+    // not darken.
     &.warning {
 
         .plus-toast-header,
@@ -131,16 +132,16 @@
             .plus-toast-icon {
                 @include icon-glyph {
                     // @contrast: non-text
-                    color: var(--color-surface) !important;
+                    color: var(--color-on-warning) !important;
                 }
             }
 
             .plus-toast-title {
-                color: var(--color-surface) !important;
+                color: var(--color-on-warning) !important;
             }
 
             .plus-toast-timestamp {
-                color: var(--color-surface) !important;
+                color: var(--color-on-warning) !important;
             }
         }
     }

@@ -208,6 +208,8 @@ export const Dismiss = () => {
     );
 };
 
+Dismiss.parameters = WARNING_HEADER_A11Y_PARAMS;
+
 Dismiss.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const surface = tokenColor(canvasElement, '--color-surface');
@@ -250,13 +252,14 @@ Dismiss.play = async ({ canvasElement }) => {
 };
 
 /**
- * The warning header's title, timestamp, icon and × are the surface color, as
- * on every header in Figma. Title and timestamp: accepted contrast exception,
+ * The warning header's title, timestamp and icon use the same content color as
+ * the other headers, `--color-on-warning`; the × is CloseButton's inverse tone,
+ * as on every header. Title and timestamp: accepted contrast exception,
  * recorded in the text-contrast baseline; do not darken.
  */
 export const WarningHeader = () => (
     <Toast style="warning" title="Warning toast" timestamp="Just now" show autohide={false} data-testid="warning-header">
-        Header content is the surface color.
+        Header content uses the on-warning color.
     </Toast>
 );
 
@@ -265,18 +268,21 @@ WarningHeader.parameters = WARNING_HEADER_A11Y_PARAMS;
 WarningHeader.play = async ({ canvasElement }) => {
     const toast = within(canvasElement).getByTestId('warning-header');
     const header = toast.querySelector('.toast-header');
-    const surface = tokenColor(canvasElement, '--color-surface');
+    const onWarning = tokenColor(canvasElement, '--color-on-warning');
     await expect(getComputedStyle(header).backgroundColor, 'header fill').toBe(tokenColor(canvasElement, '--color-warning'));
 
     const parts = {
         title: toast.querySelector('.plus-toast-title'),
         timestamp: toast.querySelector('.plus-toast-timestamp'),
         icon: toast.querySelector('.plus-toast-icon i'),
-        close: within(toast).getByRole('button', { name: 'Close' }).querySelector('i'),
     };
     for (const [part, node] of Object.entries(parts)) {
-        await expect(getComputedStyle(node).color, `warning ${part} is the surface color`).toBe(surface);
+        await expect(getComputedStyle(node).color, `warning ${part} is on-warning`).toBe(onWarning);
     }
+
+    // The × is the inverse tone, as the Dismiss story asserts on every header.
+    const glyph = within(toast).getByRole('button', { name: 'Close' }).querySelector('i');
+    await expect(getComputedStyle(glyph).color, 'warning × is the inverse tone').toBe(tokenColor(canvasElement, '--color-surface'));
 };
 
 /**
