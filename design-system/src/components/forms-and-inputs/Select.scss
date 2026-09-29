@@ -387,7 +387,7 @@
 
         &.selected {
             position: relative;
-            background-color: var(--_Primary-State-layers-Primary-08, rgba(4, 114, 168, 0.08));
+            background-color: var(--color-primary-state-08, rgba(4, 114, 168, 0.08));
             color: var(--color-on-surface);
             font-weight: var(--font-weight-normal) !important;
             border: none !important;
@@ -447,7 +447,7 @@
         &.active {
             position: relative;
             /* Override OptionList active background to match single-select selected */
-            background-color: var(--_Primary-State-layers-Primary-08, rgba(4, 114, 168, 0.08)) !important;
+            background-color: var(--color-primary-state-08, rgba(4, 114, 168, 0.08)) !important;
             font-weight: var(--font-weight-normal) !important;
             padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
             margin: 0 !important;

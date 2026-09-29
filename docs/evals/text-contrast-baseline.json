@@ -9,7 +9,7 @@
     "design-system/src/components/forms-and-inputs/DateAndTimePicker.scss|--color-primary|--color-primary-state-12": {
       "count": 1,
       "ratio": 4.27,
-      "why": "LIVE, MARGINAL — 4.27:1 against primary's own 12% wash, a hair under 4.5. --color-primary is 5.02:1 on the page and fails here only because the wash lightens the ground; the 8% wash now passes. The fix is a token decision (#268 — --color-primary-text at 7.78:1 is the darker text sibling), not a per-call-site edit."
+      "why": "LIVE, MARGINAL — 4.27:1 against primary's own 12% wash, a hair under 4.5. --color-primary is 5.02:1 on the page and fails here only because the wash lightens the ground; the 8% wash now passes. The fix is a token decision (--color-primary-text at 7.78:1 is the darker text sibling), not a per-call-site edit."
     },
     "design-system/src/components/forms-and-inputs/Rating.scss|--color-outline-variant|--color-surface": {
       "count": 1,

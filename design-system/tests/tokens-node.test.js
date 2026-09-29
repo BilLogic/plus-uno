@@ -308,8 +308,9 @@ describe('a state overlay is mixed from the base it is named after', () => {
    * diverge together, because they are three alphas over one colour.
    *
    * `--color-shadow` is the only row, and it is not a drift: there is no
-   * `--color-shadow` token at all, and a shadow wash is black. It is recorded rather than special-cased so that
-   * minting `--color-shadow` some day has to come past this test.
+   * `--color-shadow` token at all, and a shadow wash is black. It is recorded
+   * rather than special-cased so that minting `--color-shadow` some day has to
+   * come past this test.
    */
   const KNOWN = {
     '--color-shadow': '#000000',
@@ -435,12 +436,12 @@ describe('the colour key is finer than the normaliser it replaces', () => {
   /*
    * AND HOW MANY OF THEM THERE ARE, counted rather than recalled: every
    * unordered pair of live colour tokens the old normaliser could read, where
-   * it says equal and this key says unequal. 315 on 2026-09-18; 357 on 2026-09-29,
-   * when the ten `-border-subtle` label borders added 45% washes of bases
-   * already in the corpus; 405 the same day, when ten state-layer bases were
-   * re-mixed from their Figma solids and their washes joined those channels. The number is
-   * asserted rather than logged because a migrating caller's exposure is this
-   * number, and a drift in it is news either way.
+   * it says equal and this key says unequal. 315 on 2026-09-18; 357 on
+   * 2026-09-29, when the ten `-border-subtle` label borders added 45% washes of
+   * bases already in the corpus; 405 the same day, when ten state-layer bases
+   * were re-mixed from their Figma solids and their washes joined those
+   * channels. The number is asserted rather than logged because a migrating
+   * caller's exposure is this number, and a drift in it is news either way.
    */
   it('differs from the normaliser on 405 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
