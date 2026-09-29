@@ -77,7 +77,7 @@ const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
  * Read a token as it renders, compositing translucency over the page.
  *
  * The compositing is the point for half these tokens: `--color-primary-state-08`
- * is `rgba(0, 101, 142, 0.08)`, and its raw channels are primary's own. Read
+ * is `rgba(4, 114, 168, 0.08)`, and its raw channels are primary's own. Read
  * without the ground it looks like a strong blue; drawn on the page it is a
  * whisper.
  */

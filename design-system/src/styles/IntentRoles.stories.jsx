@@ -235,8 +235,8 @@ export const RolesAndBars = () => {
                 3:1 is the right bar.
                 <strong> Warning is the exception</strong>: its base falls to 2.87:1 on the darkest
                 ground, under even the border bar, so its <em>border</em> takes
-                <code> #715c00</code> — the Figma warning value already used by the warning state
-                layers. Its icon needs no exception.
+                <code> #715c00</code> — the value Figma records as <code>Warning/Warning Border</code>.
+                Its icon needs no exception.
             </p>
             <Matrix rows={icon} bar={AA_NON_TEXT} caption="`-icon`" />
             <Matrix rows={border} bar={AA_NON_TEXT} caption="`-border`" />

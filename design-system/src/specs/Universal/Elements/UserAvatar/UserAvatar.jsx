@@ -59,7 +59,7 @@ const UserAvatar = ({
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        backgroundColor: 'var(--color-primary-state-08, rgba(0, 101, 142, 0.08))',
+                        backgroundColor: 'var(--color-primary-state-08, rgba(4, 114, 168, 0.08))',
                         flexShrink: 0
                     }}
                 >
@@ -127,7 +127,7 @@ const UserAvatar = ({
                         minWidth: '12px',
                         padding: '0 var(--size-element-pad-x-sm)',
                         borderRadius: '999px',
-                        backgroundColor: 'rgba(190, 12, 22, 0.08)',
+                        backgroundColor: 'var(--color-danger-state-08, rgba(186, 26, 26, 0.08))',
                         flexShrink: 0
                     }}
                 >

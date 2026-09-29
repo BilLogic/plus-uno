@@ -2,6 +2,12 @@
  * Material Design 3 Color Tokens
  * Generated from Figma design system
  * Follows M3 color role guidance: https://m3.material.io/styles/color/roles
+ *
+ * Hand-edited 2026-09-29: ten of the state-layer bases (the -state-08/12/16
+ * washes) were set by hand to match the Figma State-layers variables, because
+ * the color source JSON lags Figma and the generator refuses to run against it.
+ * Carry these values into the source before the generator next runs, or it
+ * will revert them.
  */
 
 :root {
@@ -22,13 +28,14 @@
    --color-inverse-primary: #84cfff;
 
    /* Primary State Layers */
-   /* Using actual primary color #0472a8 = rgb(0, 101, 142) from Figma */
-   --color-primary-state-08: rgba(0, 101, 142, 0.08);
-   --color-primary-state-12: rgba(0, 101, 142, 0.12);
-   --color-primary-state-16: rgba(0, 101, 142, 0.16);
-   --color-primary-container-state-08: rgba(199, 231, 255, 0.08);
-   --color-primary-container-state-12: rgba(199, 231, 255, 0.12);
-   --color-primary-container-state-16: rgba(199, 231, 255, 0.16);
+   /* Figma: Primary/State-layers/Primary 08/12/16 - #0472a8 at 8/12/16% */
+   --color-primary-state-08: rgba(4, 114, 168, 0.08);
+   --color-primary-state-12: rgba(4, 114, 168, 0.12);
+   --color-primary-state-16: rgba(4, 114, 168, 0.16);
+   /* Figma: Primary/State-layers/Primary Container 08/12/16 - #61b5cf at 8/12/16% */
+   --color-primary-container-state-08: rgba(97, 181, 207, 0.08);
+   --color-primary-container-state-12: rgba(97, 181, 207, 0.12);
+   --color-primary-container-state-16: rgba(97, 181, 207, 0.16);
 
    /* Secondary Colors */
    --color-secondary: #445c6a;
@@ -77,10 +84,10 @@
    /* Figma: Danger/Danger Border Subtle - Danger at 45%, the border of an outlined label */
 
    /* Danger State Layers */
-   /* Using actual danger color from Figma: rgb(190, 12, 22) */
-   --color-danger-state-08: rgba(190, 12, 22, 0.08);
-   --color-danger-state-12: rgba(190, 12, 22, 0.12);
-   --color-danger-state-16: rgba(190, 12, 22, 0.16);
+   /* Figma: Danger/State-layers/Danger 08/12/16 - #ba1a1a at 8/12/16% */
+   --color-danger-state-08: rgba(186, 26, 26, 0.08);
+   --color-danger-state-12: rgba(186, 26, 26, 0.12);
+   --color-danger-state-16: rgba(186, 26, 26, 0.16);
    --color-danger-container-state-08: rgba(255, 218, 214, 0.08);
    --color-danger-container-state-12: rgba(255, 218, 214, 0.12);
    --color-danger-container-state-16: rgba(255, 218, 214, 0.16);
@@ -116,10 +123,10 @@
    /* Figma: Warning/Warning Border Subtle - Warning at 45%, the border of an outlined label */
 
    /* Warning State Layers */
-   /* Using actual warning color from Figma: rgb(113, 92, 0) */
-   --color-warning-state-08: rgba(113, 92, 0, 0.08);
-   --color-warning-state-12: rgba(113, 92, 0, 0.12);
-   --color-warning-state-16: rgba(113, 92, 0, 0.16);
+   /* Figma: Warning/State-layers/Warning 08/12/16 - #9f8205 at 8/12/16% */
+   --color-warning-state-08: rgba(159, 130, 5, 0.08);
+   --color-warning-state-12: rgba(159, 130, 5, 0.12);
+   --color-warning-state-16: rgba(159, 130, 5, 0.16);
    --color-warning-container-state-08: rgba(255, 225, 122, 0.08);
    --color-warning-container-state-12: rgba(255, 225, 122, 0.12);
    --color-warning-container-state-16: rgba(255, 225, 122, 0.16);
@@ -153,12 +160,14 @@
    /* Figma: Social-Emotional/Social-Emotional Border Subtle - Social-Emotional at 45%, the border of an outlined label */
 
    /* Social-Emotional State Layers */
-   --color-social-emotional-state-08: rgba(125, 87, 0, 0.08);
-   --color-social-emotional-state-12: rgba(125, 87, 0, 0.12);
-   --color-social-emotional-state-16: rgba(125, 87, 0, 0.16);
-   --color-social-emotional-container-state-08: rgba(255, 222, 170, 0.08);
-   --color-social-emotional-container-state-12: rgba(255, 222, 170, 0.12);
-   --color-social-emotional-container-state-16: rgba(255, 222, 170, 0.16);
+   /* Figma: Social-Emotional/State-layers/Social-Emotional 08/12/16 - #8c6600 at 8/12/16% */
+   --color-social-emotional-state-08: rgba(140, 102, 0, 0.08);
+   --color-social-emotional-state-12: rgba(140, 102, 0, 0.12);
+   --color-social-emotional-state-16: rgba(140, 102, 0, 0.16);
+   /* Figma: Social-Emotional/State-layers/Social-Emotional Container 08/12/16 - #ffdea0 at 8/12/16% */
+   --color-social-emotional-container-state-08: rgba(255, 222, 160, 0.08);
+   --color-social-emotional-container-state-12: rgba(255, 222, 160, 0.12);
+   --color-social-emotional-container-state-16: rgba(255, 222, 160, 0.16);
 
    /* Mastering Content Colors */
    --color-mastering-content: #8659a9;
@@ -171,9 +180,10 @@
    /* Figma: Mastering-Content/Mastering-Content Border Subtle - Mastering-Content at 45%, the border of an outlined label */
 
    /* Mastering Content State Layers */
-   --color-mastering-content-state-08: rgba(127, 63, 177, 0.08);
-   --color-mastering-content-state-12: rgba(127, 63, 177, 0.12);
-   --color-mastering-content-state-16: rgba(127, 63, 177, 0.16);
+   /* Figma: Mastering-Content/State-layers/Mastering-Content 08/12/16 - #8659a9 at 8/12/16% */
+   --color-mastering-content-state-08: rgba(134, 89, 169, 0.08);
+   --color-mastering-content-state-12: rgba(134, 89, 169, 0.12);
+   --color-mastering-content-state-16: rgba(134, 89, 169, 0.16);
    --color-mastering-content-container-state-08: rgba(242, 218, 255, 0.08);
    --color-mastering-content-container-state-12: rgba(242, 218, 255, 0.12);
    --color-mastering-content-container-state-16: rgba(242, 218, 255, 0.16);
@@ -275,9 +285,10 @@
    --color-surface-state-16: rgba(249, 249, 252, 0.16);
 
    /* Outline State Layers */
-   --color-outline-state-08: rgba(113, 120, 126, 0.08);
-   --color-outline-state-12: rgba(113, 120, 126, 0.12);
-   --color-outline-state-16: rgba(113, 120, 126, 0.16);
+   /* Figma: State-layers/outline/opacity-0_08/12/16 - #6f797a at 8/12/16% */
+   --color-outline-state-08: rgba(111, 121, 122, 0.08);
+   --color-outline-state-12: rgba(111, 121, 122, 0.12);
+   --color-outline-state-16: rgba(111, 121, 122, 0.16);
 
    /* Surface Variant State Layers */
    --color-surface-variant-state-08: rgba(221, 227, 234, 0.08);
@@ -295,9 +306,10 @@
    --color-shadow-state-16: rgba(0, 0, 0, 0.16);
 
    /* Outline Variant State Layers */
-   --color-outline-variant-state-08: rgba(193, 199, 206, 0.08);
-   --color-outline-variant-state-12: rgba(193, 199, 206, 0.12);
-   --color-outline-variant-state-16: rgba(193, 199, 206, 0.16);
+   /* Figma: State-layers/outline-variant/opacity-0_08/12/16 - #bec8ca at 8/12/16% */
+   --color-outline-variant-state-08: rgba(190, 200, 202, 0.08);
+   --color-outline-variant-state-12: rgba(190, 200, 202, 0.12);
+   --color-outline-variant-state-16: rgba(190, 200, 202, 0.16);
 
    /* Surface Container State Layers */
    --color-surface-container-highest-state-08: rgba(226, 226, 229, 0.08);
@@ -336,7 +348,8 @@
    --color-on-surface-state-16: rgba(25, 28, 30, 0.16);
 
    /* On Surface Variant State Layers */
-   --color-on-surface-variant-state-08: rgba(65, 72, 77, 0.08);
-   --color-on-surface-variant-state-12: rgba(65, 72, 77, 0.12);
-   --color-on-surface-variant-state-16: rgba(65, 72, 77, 0.16);
+   /* Figma: State-layers/on surface variant/opacity-0_08/12/16 - #3f484a at 8/12/16% */
+   --color-on-surface-variant-state-08: rgba(63, 72, 74, 0.08);
+   --color-on-surface-variant-state-12: rgba(63, 72, 74, 0.12);
+   --color-on-surface-variant-state-16: rgba(63, 72, 74, 0.16);
 }

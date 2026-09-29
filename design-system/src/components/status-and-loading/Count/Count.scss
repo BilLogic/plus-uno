@@ -48,12 +48,12 @@
  * mapping Status and Tag use.
  */
 $count-subtle: (
-    'neutral': (var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08)), var(--color-on-surface-variant, #3f484a)),
+    'neutral': (var(--color-on-surface-variant-state-08, rgba(63, 72, 74, 0.08)), var(--color-on-surface-variant, #3f484a)),
     'success': (var(--color-success-state-08, rgba(62, 105, 26, 0.08)), var(--color-success-text, #2c5609)),
-    'warning': (var(--color-warning-state-08, rgba(113, 92, 0, 0.08)), var(--color-warning-text, #5b4a00)),
-    'danger': (var(--color-danger-state-08, rgba(190, 12, 22, 0.08)), var(--color-danger-text, #9b0606)),
+    'warning': (var(--color-warning-state-08, rgba(159, 130, 5, 0.08)), var(--color-warning-text, #5b4a00)),
+    'danger': (var(--color-danger-state-08, rgba(186, 26, 26, 0.08)), var(--color-danger-text, #9b0606)),
     'info': (var(--color-info-state-08), var(--color-info-text)),
-    'discovery': (var(--color-mastering-content-state-08, rgba(127, 63, 177, 0.08)), var(--color-mastering-content-text, #673a8b)),
+    'discovery': (var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)), var(--color-mastering-content-text, #673a8b)),
 );
 
 $count-bold: (

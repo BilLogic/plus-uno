@@ -8,8 +8,8 @@ import './UserAvatar.scss';
  * Per Figma spec: node-id=111-227876
  * 
  * Colors:
- * - Initial circle: primary-08 bg (#rgba(0,101,142,0.08)), primary-text color (#00547e)
- * - Counter: danger-08 bg (#rgba(190,12,22,0.08)), danger-text color (#9b0606)
+ * - Initial circle: primary-08 bg (rgba(4, 114, 168, 0.08)), primary-text color (#00547e)
+ * - Counter: danger-08 bg (rgba(186, 26, 26, 0.08)), danger-text color (#9b0606)
  * - Hover: on-surface-08 overlay
  */
 const UserAvatar = ({
@@ -63,7 +63,7 @@ const UserAvatar = ({
                         width: '32px',  // Forced width
                         height: '32px', // Forced height to match
                         borderRadius: '50%', // Perfect circle
-                        backgroundColor: 'var(--color-primary-state-08, rgba(0, 101, 142, 0.08))',
+                        backgroundColor: 'var(--color-primary-state-08, rgba(4, 114, 168, 0.08))',
                         flexShrink: 0
                     }}
                 >

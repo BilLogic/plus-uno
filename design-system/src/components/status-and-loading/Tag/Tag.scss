@@ -30,9 +30,9 @@ $tag-colors: (
     'grey': (
         var(--color-outline-variant, #bec8ca),
         var(--color-outline, #6f797a),
-        var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08)),
-        var(--color-on-surface-variant-state-12, rgba(65, 72, 77, 0.12)),
-        var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16)),
+        var(--color-on-surface-variant-state-08, rgba(63, 72, 74, 0.08)),
+        var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12)),
+        var(--color-on-surface-variant-state-16, rgba(63, 72, 74, 0.16)),
         var(--color-surface-container-high, #e7e8eb),
     ),
     'blue': (
@@ -54,9 +54,9 @@ $tag-colors: (
     'purple': (
         var(--color-mastering-content-border-subtle, rgba(134, 89, 169, 0.45)),
         var(--color-mastering-content, #8659a9),
-        var(--color-mastering-content-state-08, rgba(127, 63, 177, 0.08)),
-        var(--color-mastering-content-state-12, rgba(127, 63, 177, 0.12)),
-        var(--color-mastering-content-state-16, rgba(127, 63, 177, 0.16)),
+        var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)),
+        var(--color-mastering-content-state-12, rgba(134, 89, 169, 0.12)),
+        var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.16)),
         var(--color-mastering-content-container, #f2daff),
     ),
     'magenta': (
@@ -70,9 +70,9 @@ $tag-colors: (
     'yellow': (
         var(--color-social-emotional-border-subtle, rgba(140, 102, 0, 0.45)),
         var(--color-social-emotional, #8c6600),
-        var(--color-social-emotional-state-08, rgba(125, 87, 0, 0.08)),
-        var(--color-social-emotional-state-12, rgba(125, 87, 0, 0.12)),
-        var(--color-social-emotional-state-16, rgba(125, 87, 0, 0.16)),
+        var(--color-social-emotional-state-08, rgba(140, 102, 0, 0.08)),
+        var(--color-social-emotional-state-12, rgba(140, 102, 0, 0.12)),
+        var(--color-social-emotional-state-16, rgba(140, 102, 0, 0.16)),
         var(--color-social-emotional-container, #ffdea0),
     ),
     'teal': (
@@ -353,11 +353,11 @@ $tag-colors: (
 }
 
 .plus-tag__remove:hover {
-    background-color: var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08));
+    background-color: var(--color-on-surface-variant-state-08, rgba(63, 72, 74, 0.08));
 }
 
 .plus-tag__remove:active {
-    background-color: var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16));
+    background-color: var(--color-on-surface-variant-state-16, rgba(63, 72, 74, 0.16));
 }
 
 /* Round on a person tag, as its host is. */
@@ -367,7 +367,7 @@ $tag-colors: (
 
 /* Focus: the 12 fill plus a 2px Focus Ring 2px outside the ×. */
 .plus-tag__remove:focus-visible {
-    background-color: var(--color-on-surface-variant-state-12, rgba(65, 72, 77, 0.12));
+    background-color: var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12));
     outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
