@@ -598,7 +598,7 @@ export default function MonthlyReportContent() {
 
                     {/* November Growth Banner - appears between title and insights */}
                     {reportData.isHighImprovement && (
-                        <Alert style="success" leadingVisual={<i className="fa-solid fa-seedling insight-alert-icon" />} dismissable={false} className="insight-alert">
+                        <Alert style="success" leadingVisual="seedling" dismissable={false} className="insight-alert">
                             <div style={{ marginBottom: 0 }}>
                                 This month has several areas for development. Remember, growth takes time and practice—let's focus on one skill at a time. Start with the insight marked "Start Here" below.
                             </div>

@@ -24,6 +24,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { documents } from './lib/corpus.mjs';
+import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -199,18 +200,18 @@ function parsePropTypes(source, name) {
     if (!cleaned) continue;
     const m = cleaned.match(/^([A-Za-z_$][\w$]*)\s*:\s*([\s\S]+)$/);
     if (!m) continue;
-    // `PropTypes.oneOf(STYLES)` names an array declared in the same file; read
-    // the array so the enum is documented as if it were written inline.
-    const type = m[2].replace(/\s+/g, ' ').trim().replace(/PropTypes\.oneOf\(([A-Za-z_$][\w$]*)\)/, (all, id) => {
-      const decl = source.match(new RegExp(`const\\s+${id}\\s*=\\s*(\\[[^\\]]*\\])`));
-      return decl ? `PropTypes.oneOf(${decl[1].replace(/\s+/g, ' ')})` : all;
-    });
+    // `PropTypes.oneOf(STYLES)` names an array; when this file declares it and
+    // every element is a literal, it is documented as if written inline. An
+    // array that cannot be read (a spread, an import) stays `oneOf(NAME)`.
+    const type = resolveNamedOneOf(m[2].replace(/\s+/g, ' ').trim(), source);
     const oneOf = type.match(/PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
     props.push({
       name: m[1],
       type: prettyType(type),
       description,
-      enumValues: oneOf ? [...oneOf[1].matchAll(/'([^']+)'/g)].map((v) => v[1]) : null,
+      enumValues: oneOf
+        ? [...oneOf[1].matchAll(/'([^']+)'|(?<![\w.'])(-?\d+(?:\.\d+)?)(?![\w.'])/g)].map((v) => v[1] ?? v[2])
+        : null,
     });
   }
   return props;

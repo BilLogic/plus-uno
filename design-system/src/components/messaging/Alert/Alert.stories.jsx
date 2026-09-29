@@ -320,6 +320,8 @@ LeadingIcon.play = async ({ canvasElement }) => {
     const node = leadingIconOf(canvas.getByTestId('icon-node'));
     await expect(getComputedStyle(node, '::before').content).toBe(glyphOf(canvasElement, 'fa-star'));
     await expect(node.closest('[aria-hidden="true"]')).not.toBeNull();
+    await expect(px(getComputedStyle(node).fontSize), 'a passed node is drawn at 20px').toBe(20);
+    await expect(Math.round(node.getBoundingClientRect().width), 'a passed node is a 20-wide box').toBe(20);
     await expect(canvas.getByTestId('icon-node').querySelectorAll('i:not(button i)').length, 'the node is the only leading icon').toBe(1);
 
     // `false` removes it: the text starts at the alert's padding edge.

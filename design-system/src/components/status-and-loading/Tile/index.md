@@ -30,6 +30,8 @@
 
 **`content`** — `icon` · `logo` · `image`
 
+**`size`** — `16` · `20` · `24` · `32` · `40` · `48`
+
 **`appearance`** — `subtle` · `bold`
 
 Anything not listed is not a valid value.
