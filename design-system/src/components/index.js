@@ -41,6 +41,8 @@ export { default as Status } from '@/components/status-and-loading/Status';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 
 export { default as Tag } from '@/components/status-and-loading/Tag';
+// The disabled state a field hands the tags it wraps in `TagContext.Provider`.
+export { TagContext, useTagContext } from '@/components/status-and-loading/Tag';
 export { default as TagGroup } from '@/components/status-and-loading/TagGroup';
 export { default as Table } from '@/components/_internal/Table';
 export { default as Tile } from '@/components/status-and-loading/Tile';

@@ -7,13 +7,13 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
-    "variant": {
+    "behavior": {
       "type": "enum",
-      "values": ["read-only", "dismissible", "selectable", "operational"]
+      "values": ["read-only", "removable", "selectable", "link"]
     },
     "color": {
       "type": "enum",
-      "values": ["grey", "blue", "green", "purple", "magenta", "orange", "teal"]
+      "values": ["grey", "blue", "green", "purple", "magenta", "yellow", "teal"]
     },
     "isSelected": { "type": "boolean" },
     "isLoading": { "type": "boolean" }
@@ -22,16 +22,26 @@ export const figmaMeta = {
     {
       "id": "tag",
       "name": "Tag",
-      "componentSetNodeId": "17558:1218",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218",
+      "componentSetNodeId": "17877:47506",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17877-47506",
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
       "variantProps": {
-        "variant": "trailing + selected",
-        "isSelected": "selected"
+        "isSelected": "selected",
+        "isLoading": "state=saving"
       },
-      "notes": "Created 2026-08-29 on the Badge page, BESIDE Dismissible Badges rather than instead of it (#276, #339 finding 2). The code's `variant` axis does not map one-to-one: read-only and operational are both trailing=none/selected=false, dismissible is trailing=dismiss, selectable is the selected axis \u2014 three of the four look identical at rest. Published: all 28 variants (7 colours × trailing × selected) present in the 2026-09-15 components snapshot."
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. The type axis (person, agent, team) and elevated=true are later work and not in code yet."
+    },
+    {
+      "id": "remove-button",
+      "name": "Remove button",
+      "componentSetNodeId": "17827:846",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the Button page. Tag uses size small (16, 12px ×); its states are the × inside a removable tag. Medium and large are not built in code yet."
     }
   ]
 };
@@ -39,15 +49,16 @@ export const figmaMeta = {
 <Meta of={TagStories} />
 
 <Title />
-A tag is a representation of a value that someone has picked. To show
-system-generated data that people can't change, use a badge instead.
+Is it a number? Count. Is it the condition something is in, and can that
+condition change? Status. Otherwise, Tag: a subject, a focus area, a person, a
+category.
 
 <DocsTabs of={TagStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -59,8 +70,8 @@ system-generated data that people can't change, use a badge instead.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>The four variants. What separates them is what the person can do to the value once it is on screen.</>}>
-    <Canvas of={TagStories.Variants} story={{ inline: true }} layout="padded" sourceState="hidden" />
+<DocsCanvasShell attachSourceBelow description={<>The four behaviors: read-only, removable, selectable and link. Every one is 22 tall, outlined, with neutral text and the color on the border and swatch.</>}>
+    <Canvas of={TagStories.Behaviors} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -69,18 +80,8 @@ system-generated data that people can't change, use a badge instead.
 
 ## Colors
 
-<DocsCanvasShell description={<>Every colour the API offers. A tag's colour is a category, never a status — there is deliberately no <code>success</code> or <code>danger</code>.</>}>
+<DocsCanvasShell description={<>Seven colors. A tag's color is a category, never a status, so there is no <code>success</code> or <code>danger</code>. Grey is the default.</>}>
     <DsCanvasQuiet of={TagStories.Colors} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>A swatch for a legend entry, an avatar or icon for a person or an app.</>}>
-    <DsCanvasQuiet of={TagStories.WithLeadingContent} />
 </DocsCanvasShell>
 
 </div>
@@ -89,28 +90,30 @@ system-generated data that people can't change, use a badge instead.
 
 ## Selection
 
-<DocsCanvasShell description={<>A selectable tag is a toggle, and publishes <code>aria-pressed</code>. An operational tag acts once and has no pressed state to report.</>}>
+<DocsCanvasShell description={<>A selectable tag is a toggle and publishes <code>aria-pressed</code>. Selected is a full-color border as well as a fill.</>}>
     <DsCanvasQuiet of={TagStories.Selecting} />
 </DocsCanvasShell>
 
-</div>
+<DocsCanvasShell description={<>States use the hue's state layers: hover 08, pressed 12, selected 12, and 16 on a selected tag's hover or press. On a removable tag only the × reacts.</>}>
+    <DsCanvasQuiet of={TagStories.StateLayers} />
+</DocsCanvasShell>
 
-<div className="sb-ds-doc-section">
-
-## Dismissal
-
-<DocsCanvasShell description={<>The remove button is named from the label, so a row of tags does not expose a row of identically named controls.</>}>
-    <DsCanvasQuiet of={TagStories.Dismissing} />
+<DocsCanvasShell description={<><code>count</code> adds a small neutral Count to a selectable tag, such as a filter's result count. On any other behavior it is ignored.</>}>
+    <DsCanvasQuiet of={TagStories.CountOnSelectable} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Truncation
+## Removing
 
-<DocsCanvasShell description={<>A capped tag keeps its full text in <code>title</code>, which is the one place a pointer and a screen reader both reach.</>}>
-    <DsCanvasQuiet of={TagStories.Truncation} />
+<DocsCanvasShell description={<>The × is named from the label, so a row of tags does not expose a row of identical controls.</>}>
+    <DsCanvasQuiet of={TagStories.Removing} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A link with <code>onRemove</code> is two targets: the text is the link, the × is its sibling, and the tab order is link, then ×.</>}>
+    <DsCanvasQuiet of={TagStories.LinkWithRemove} />
 </DocsCanvasShell>
 
 </div>
@@ -119,8 +122,20 @@ system-generated data that people can't change, use a badge instead.
 
 ## States
 
-<DocsCanvasShell description={<>A loading tag stands down as a control while the value it represents is still changing.</>}>
-    <DsCanvasQuiet of={TagStories.Loading} />
+<DocsCanvasShell description={<>Focus is a 2px Focus Ring 2px outside the tag, or outside the ×.</>}>
+    <DsCanvasQuiet of={TagStories.FocusRing} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Saving: a spinner replaces the swatch, so the tag keeps its width, and the × waits for the save.</>}>
+    <DsCanvasQuiet of={TagStories.Saving} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled comes from the field through <code>TagContext</code>: a neutral fill, no ×, and nothing to focus.</>}>
+    <DsCanvasQuiet of={TagStories.DisabledInField} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Every tag caps at 180 wide, and narrower in a narrower container. A clipped label ellipsizes, and its full text is a tooltip that hover and keyboard focus both reach.</>}>
+    <DsCanvasQuiet of={TagStories.Truncation} />
 </DocsCanvasShell>
 
 </div>
@@ -153,15 +168,13 @@ system-generated data that people can't change, use a badge instead.
 
 ## When to use
 
-Use `Tag` for a value a person chose: the subjects on a tutor's profile, the
-filters someone applied to a table, the recipients they added to a message. The
-test is authorship — who put the value there — and not whether the control can
-be clicked.
+- **Is it a number?** Count.
+- **Is it the condition something is in, and can that condition change?** Status.
+- **Otherwise** (a subject, a focus area, a person, a category): Tag.
 
-That test is what survives the edge case. A `read-only` tag is still a tag,
-because the pattern tells the reader the selection becomes editable again once
-the surface does. `Badge` is what to reach for when the system produced the
-value and nobody can change it: a session's status, an unread count.
+Who set the value no longer decides. A tag is outlined and a status is filled,
+so a reader tells a category from a meaning without reading the words. Until
+Status lands, a state is a `BadgeVariants` status.
 
 </div>
 
@@ -169,43 +182,58 @@ value and nobody can change it: a session's status, an unread count.
 
 ## Usage notes
 
-### Colour is a category, not a status.
-
-`color` takes plain names, and that is deliberate. There is no `success` and no
-`danger`, because a green tag would be read as "this went well" the moment one
-appears next to a red one.
+### Color is a category, not a status.
 
 ```jsx
-// Incorrect — the colour is doing the work the label should do, and it is
-// doing it wrongly: `green` here means "Biology", not "passed".
-<Tag color="green">Biology</Tag>
-<Tag color="orange">Chemistry</Tag>
+// Incorrect — green reads as "went well" beside anything red.
+<Tag color="green">Passed</Tag>
 
-// Correct — pick a colour per category and keep it stable across the app, or
-// leave every tag `grey` and let the words carry the meaning.
+// Correct — pick a color per category and keep it stable, or leave every tag grey.
 <Tag color="blue">Biology</Tag>
 <Tag color="blue">Chemistry</Tag>
 ```
 
-### `onRemove` belongs to `dismissible`, and nothing else.
-
-The gate is behaviour, not a type. `propTypes` will accept the function on any
-variant; the component renders the remove button on one.
+### Pick the behavior, not the look.
 
 ```jsx
-// Incorrect — no X renders, and the value stays put. The tag is read-only
-// because that is what `variant` says, whatever handler is attached.
-<Tag variant="read-only" onRemove={drop}>Grade 4</Tag>
+// Read-only, the default: a value on show.
+<Tag>Grade 4</Tag>
 
-// Correct — the variant is the API.
-<Tag variant="dismissible" onRemove={drop}>Grade 4</Tag>
+// Removable: a value the person can take out.
+<Tag behavior="removable" onRemove={drop}>Grade 4</Tag>
+
+// Selectable: a filter, with its result count.
+<Tag behavior="selectable" isSelected={on} onClick={toggle} count={12}>Science</Tag>
+
+// Link, and a link with a separate ×.
+<Tag behavior="link" href="/subjects/algebra">Algebra</Tag>
+<Tag behavior="link" href="/subjects/algebra" onRemove={drop}>Algebra</Tag>
 ```
+
+`count` is for selectable tags only; anywhere else it is ignored with a warning.
+
+### Disable the field, not the tag.
+
+There is no `disabled` prop. A field or group that is disabled says so once,
+and every tag inside follows:
+
+```jsx
+<TagContext.Provider value={{ isDisabled: true }}>
+    <Tag behavior="removable" onRemove={drop}>Grade 4</Tag>
+</TagContext.Provider>
+```
+
+`useTagContext()` reads the same value from inside a custom tag.
 
 ### Let the group own the gaps.
 
 `Tag` sets no margin of its own. A row of tags is a `TagGroup`, which sets
-`gap` once for the set; spacing a row by hand means every future change to the
-rhythm has to find each place it was done.
+`gap` once for the set.
+
+### Renamed props.
+
+`variant` is now `behavior` (`dismissible` is `removable`), and `orange` is now
+`yellow`. The old names still work and warn in development.
 
 </div>
 
@@ -213,25 +241,26 @@ rhythm has to find each place it was done.
 
 ## Accessibility
 
-- **A dismissible tag is not itself a control.** Its remove button is, and a
-  button inside a button is invalid per ARIA. So the tag renders as a `span`
-  and exactly one control exists inside it.
-- **The remove button is named from the label.** It announces `Remove Science`,
-  not `Remove` — `removeLabel` overrides that string when the label is not
-  text. This is the defect `Badge` still carries: its dismiss control is
-  hard-coded to one word, so a row of them exposes identical names.
-- **`selectable` publishes `aria-pressed`; `operational` does not.** A toggle
-  reports its state, and a control that acts once has no state to report.
-  Saying `aria-pressed="false"` on the latter tells a screen-reader user to
-  track something that never changes.
-- **A truncated label keeps its full text.** `maxWidth` puts the label in
-  `title`, because a CSS ellipsis alone deletes the value for anyone not
-  looking at the pixels.
-- **`swatchBefore` is decoration and is hidden.** It repeats what the tag
-  already says in words; announcing it would produce "square, Series A".
-- **A loading tag exposes no control.** `isLoading` stands the tag down so a
-  second press cannot queue a second action against a value that is already
-  changing.
+- **A removable tag is not itself a control.** The × is, and a button inside a
+  button is invalid, so the tag is a `span` with one button in it.
+- **The × is named from the label.** It announces `Remove Science`;
+  `removeLabel` overrides that when the label is not text.
+- **Selectable publishes `aria-pressed`**, so the state is not only visible.
+  Selected also changes the border to the full hue, so it does not rest on a
+  change of lightness alone.
+- **A link with a × is two tab stops**, link then ×, and pressing the × never
+  follows the link.
+- **Saving is announced once.** The spinner is hidden; a status region beside
+  the tag, outside its name, says "Saving". The × and a link stay focusable
+  but do nothing until the save lands.
+- **A × needs a name.** When the label is not text, pass `removeLabel`, or the
+  × is named only "Remove" and development warns.
+- **Disabled tags take no focus.** They come from a disabled field, so the
+  field is what a keyboard user meets.
+- **A clipped label keeps its full text** in a tooltip that hover and keyboard
+  focus both reach. On a control the control carries it; on a plain tag the
+  label takes focus while, and only while, it is clipped.
+- **The swatch is decoration** and is hidden from assistive technology.
 
 </div>
 
@@ -239,10 +268,10 @@ rhythm has to find each place it was done.
 
 ## Related
 
-- For a set of tags, use `TagGroup` — it owns the gaps and the overflow.
+- For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
+- For a number on its own, use `Count`.
 - For a field where the person types values in and takes them out, use `TagInput`.
-- For system-generated data nobody can change, use `Badge`.
-- For choosing from a fixed list rather than showing what was chosen, use `Select` or `Checkbox`.
+- For a state, use `BadgeVariants` until Status lands.
 
 </div>
 

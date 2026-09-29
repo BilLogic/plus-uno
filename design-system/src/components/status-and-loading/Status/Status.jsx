@@ -1,8 +1,9 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import Count, { formatCount } from '../Count/Count';
 import Tooltip from '../../overlays/Tooltip';
+import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './Status.scss';
 
 /**
@@ -54,26 +55,6 @@ const warn = (message) => {
 const renderVisual = (visual) => (typeof visual === 'string'
     ? <i className={`fa-solid fa-${visual}`} aria-hidden="true" />
     : visual);
-
-/**
- * Whether the label is clipped. Measured after layout and again whenever the
- * label resizes, because the width it has depends on the page around it.
- */
-const useIsTruncated = (ref, deps) => {
-    const [truncated, setTruncated] = useState(false);
-    useLayoutEffect(() => {
-        const el = ref.current;
-        if (!el) return undefined;
-        const measure = () => setTruncated(el.scrollWidth > el.clientWidth);
-        measure();
-        if (typeof ResizeObserver === 'undefined') return undefined;
-        const observer = new ResizeObserver(measure);
-        observer.observe(el);
-        return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, deps);
-    return truncated;
-};
 
 export const Status = ({
     children,

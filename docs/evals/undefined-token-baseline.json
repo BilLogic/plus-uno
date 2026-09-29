@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 90,
-    "uses": 270,
+    "names": 89,
+    "uses": 267,
     "bare": 5
   },
   "tokens": {
@@ -169,7 +169,7 @@
       "bare": 0
     },
     "--font-weight-semibold": {
-      "uses": 2,
+      "uses": 1,
       "bare": 0
     },
     "--line-height-h4": {
@@ -226,10 +226,6 @@
     },
     "--size-element-radius-pill": {
       "uses": 1,
-      "bare": 0
-    },
-    "--size-element-target-sm": {
-      "uses": 2,
       "bare": 0
     },
     "--size-modal-min-height-md": {

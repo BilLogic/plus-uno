@@ -1,80 +1,106 @@
-@use "sass:map";
-
 /*
- * Tag — a value someone picked (#276).
+ * Tag — a category, outlined.
  *
- * THE COLOUR MAP IS THE POINT. `Tag`'s API offers plain colour names because a
- * tag's colour is a category, not a status: offering `success` would invite a
- * green tag that reads as "went well" on a screen where it only means "Science".
- * The repo has no plain-name colour tokens, so each name borrows a container
- * pair that already exists. The curriculum palette is the only non-semantic set
- * in the system, which is why five of the seven come from it — the same reason
- * #276 gives for letting Badge's `discovery` borrow its purple.
+ * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
+ * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
+ * 22 is a local custom property with its value as the default, as Count does.
+ * The swatch 10, radius 2 and × 16 are Figma-bound spacing and radius
+ * primitives, because no Element token names them.
  *
- * Measured hues, so the names are not a guess:
- *   blue     technology-tools    #005cbd  rgb(0, 92, 189)
- *   green    advocacy            #167745  rgb(22, 119, 69)
- *   purple   mastering-content   #8659a9  rgb(134, 89, 169)
- *   magenta  relationship        #c70b77  rgb(199, 11, 119)
- *   orange   social-emotional    #8c6600  rgb(140, 102, 0)
- *   teal     tertiary            #0e8175  rgb(14, 129, 117)
- *   grey     surface-container   — the default, and the only one that is not a hue
+ * THE COLOR MAP. Per name: the subtle border, the hue (swatch, spinner and the
+ * selected border), and the hue's 08, 12 and 16 state layers. Each hue borrows
+ * the curriculum token whose color it names; teal is Tertiary, never Info.
+ * Grey is not a hue: its border is Outline Variant, its swatch and selected
+ * border are Outline, and its state layers are on-surface-variant.
+ * The map holds whole `var()` references so the generated docs list them.
  *
- * WHY THIS TABLE MOVED. The hues above were right from the start and the token
- * names beside them were not: the two columns were transcribed one row out of
- * step, and the map below followed the token column. So every name but `grey`
- * and `teal` painted a colour it is not — `blue` rendered `#ffd9e4` (pink),
- * `green` rendered `#f2daff` (purple), `purple` rendered amber, `magenta`
- * rendered green, `orange` rendered blue.
- *
- * That is #276's own defect, in the component the ticket added to fix it: the
- * whole argument for plain names over semantic ones is that the reader can
- * trust what the name says, and a `blue` that paints pink is a colour signalling
- * nothing. The spec catches it in its own text too — it calls
- * `mastering-content` "the curriculum palette's purple" when it maps Badge's
- * `discovery`, while this file was calling the same token `green`.
- *
- * Each name now points at the container whose hue matches it, which is exactly
- * the hue column above and so changes no decision — only which token carries it.
- *
- * `grey` is the default deliberately: a tag with no colour chosen must not claim
- * a category it was not given.
+ *   blue     technology-tools
+ *   green    advocacy
+ *   purple   mastering-content
+ *   magenta  relationship
+ *   yellow   social-emotional
+ *   teal     tertiary
  */
 $tag-colors: (
-    'grey': (--color-surface-container, --color-on-surface-variant, --color-outline-variant),
-    'blue': (--color-technology-tools-container, --color-on-technology-tools-container, --color-technology-tools),
-    'green': (--color-advocacy-container, --color-on-advocacy-container, --color-advocacy),
-    'purple': (--color-mastering-content-container, --color-on-mastering-content-container, --color-mastering-content),
-    'magenta': (--color-relationship-container, --color-on-relationship-container, --color-relationship),
-    'orange': (--color-social-emotional-container, --color-on-social-emotional-container, --color-social-emotional),
-    'teal': (--color-tertiary-container, --color-on-tertiary-container, --color-tertiary),
+    'grey': (
+        var(--color-outline-variant, #bec8ca),
+        var(--color-outline, #6f797a),
+        var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08)),
+        var(--color-on-surface-variant-state-12, rgba(65, 72, 77, 0.12)),
+        var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16)),
+    ),
+    'blue': (
+        var(--color-technology-tools-border-subtle, rgba(0, 92, 189, 0.45)),
+        var(--color-technology-tools, #005cbd),
+        var(--color-technology-tools-state-08, rgba(0, 92, 189, 0.08)),
+        var(--color-technology-tools-state-12, rgba(0, 92, 189, 0.12)),
+        var(--color-technology-tools-state-16, rgba(0, 92, 189, 0.16)),
+    ),
+    'green': (
+        var(--color-advocacy-border-subtle, rgba(22, 119, 69, 0.45)),
+        var(--color-advocacy, #167745),
+        var(--color-advocacy-state-08, rgba(22, 119, 69, 0.08)),
+        var(--color-advocacy-state-12, rgba(22, 119, 69, 0.12)),
+        var(--color-advocacy-state-16, rgba(22, 119, 69, 0.16)),
+    ),
+    'purple': (
+        var(--color-mastering-content-border-subtle, rgba(134, 89, 169, 0.45)),
+        var(--color-mastering-content, #8659a9),
+        var(--color-mastering-content-state-08, rgba(127, 63, 177, 0.08)),
+        var(--color-mastering-content-state-12, rgba(127, 63, 177, 0.12)),
+        var(--color-mastering-content-state-16, rgba(127, 63, 177, 0.16)),
+    ),
+    'magenta': (
+        var(--color-relationship-border-subtle, rgba(199, 11, 119, 0.45)),
+        var(--color-relationship, #c70b77),
+        var(--color-relationship-state-08, rgba(199, 11, 119, 0.08)),
+        var(--color-relationship-state-12, rgba(199, 11, 119, 0.12)),
+        var(--color-relationship-state-16, rgba(199, 11, 119, 0.16)),
+    ),
+    'yellow': (
+        var(--color-social-emotional-border-subtle, rgba(140, 102, 0, 0.45)),
+        var(--color-social-emotional, #8c6600),
+        var(--color-social-emotional-state-08, rgba(125, 87, 0, 0.08)),
+        var(--color-social-emotional-state-12, rgba(125, 87, 0, 0.12)),
+        var(--color-social-emotional-state-16, rgba(125, 87, 0, 0.16)),
+    ),
+    'teal': (
+        var(--color-tertiary-border-subtle, rgba(14, 129, 117, 0.45)),
+        var(--color-tertiary, #0e8175),
+        var(--color-tertiary-state-08, rgba(14, 129, 117, 0.08)),
+        var(--color-tertiary-state-12, rgba(14, 129, 117, 0.12)),
+        var(--color-tertiary-state-16, rgba(14, 129, 117, 0.16)),
+    ),
 );
 
 .plus-tag {
+    --plus-tag-height: 22px;
+
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
-    max-width: 100%;
-    min-width: 0;
+    gap: var(--size-element-gap-xs, 4px);
     box-sizing: border-box;
+    height: var(--plus-tag-height);
+    /* The cap from `maxWidth`, still clamped by a container narrower than it. */
+    max-width: min(var(--plus-tag-max, 180px), 100%);
+    min-width: 0;
+    vertical-align: middle;
 
     /*
-     * NO DENSITY PROP, and no vertical padding tier either. #276 puts spacing at
-     * the group level: a tag that carried its own margin would force
-     * `TagGroup` to switch it off whenever it used `gap`, which is exactly the
-     * escape hatch Atlassian's `hasMargin` exists to undo. So this sets padding
-     * and nothing outside its own box.
+     * No margin: TagGroup owns the gaps between tags, so there is nothing to
+     * switch off when a parent sets `gap`.
      */
     margin: 0;
-    padding: 0 var(--size-element-pad-x-sm);
-    border: var(--size-element-border) solid transparent;
-    border-radius: var(--size-element-radius-md);
+    padding: 0 var(--size-element-pad-x-xs, 4px);
+    border: var(--size-element-border, 1px) solid var(--plus-tag-border);
+    border-radius: var(--size-element-radius-md, 4px);
+    background-color: transparent;
+    appearance: none;
 
-    /*
-     * Type comes from `.body2-txt` in the JSX — the design system's own class —
-     * and is NOT restated here. #276's rule is that density changes padding and
-     * never type size, so a tag can never disagree with the text beside it.
-     */
+    /* Neutral text on every color: the hue is on the border and swatch. */
+    color: var(--color-on-surface, #191c1e);
+    font: inherit;
     text-align: left;
     text-decoration: none;
     white-space: nowrap;
@@ -82,60 +108,34 @@ $tag-colors: (
 
 @each $name, $tokens in $tag-colors {
     .plus-tag--#{$name} {
-        background-color: var(#{nth($tokens, 1)});
-        color: var(#{nth($tokens, 2)});
+        --plus-tag-border: #{nth($tokens, 1)};
+        --plus-tag-hue: #{nth($tokens, 2)};
+        --plus-tag-08: #{nth($tokens, 3)};
+        --plus-tag-12: #{nth($tokens, 4)};
+        --plus-tag-16: #{nth($tokens, 5)};
     }
 }
 
-/* The tag itself is the control. */
-.plus-tag--selectable,
-.plus-tag--operational {
-    cursor: pointer;
-    appearance: none;
-}
-
-/*
- * A selected tag needs a signal that is not only its background, because the
- * unselected and selected grounds of one colour differ by lightness alone and
- * that is the axis that collapses under low vision and low-quality displays.
- * The outline is the second channel.
- */
-.plus-tag--selected {
-    border-color: currentColor;
-    font-weight: var(--font-weight-semibold, 600);
-}
-
-.plus-tag--selectable:hover,
-.plus-tag--operational:hover {
-    filter: brightness(0.96);
-}
-
-.plus-tag:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-primary);
-    outline-offset: var(--size-element-gap-xs, 4px);
-}
-
-/* Truncation. The full text stays reachable through `title` — set in the JSX,
-   because CSS cannot put the label anywhere a screen reader will find it. */
-.plus-tag--truncated .plus-tag__text {
+.plus-tag__label {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    min-width: 0;
+    color: inherit;
 }
 
-.plus-tag__text {
-    min-width: 0;
-}
-
+/* The swatch: 10 square, radius 2, in the hue. */
 .plus-tag__swatch {
     flex: none;
-    width: var(--size-element-gap-md, 10px);
-    height: var(--size-element-gap-md, 10px);
-    border-radius: var(--size-element-radius-sm, 2px);
-    /* The swatch carries an arbitrary series colour, which may be near the tag's
-       own ground. An outline keeps it a shape rather than a smudge. */
-    box-shadow: inset 0 0 0 1px var(--color-outline-variant);
+    width: var(--size-spacing-small-space-150, 10px);
+    height: var(--size-spacing-small-space-150, 10px);
+    border-radius: var(--size-border-radius-radius-50, 2px);
+    background-color: var(--plus-tag-hue);
+}
+
+/* A legend swatch carries any series color, which may sit near the ground. */
+.plus-tag__swatch--custom {
+    box-shadow: inset 0 0 0 1px var(--color-outline-variant, #bec8ca);
 }
 
 .plus-tag__elem-before {
@@ -144,66 +144,189 @@ $tag-colors: (
     flex: none;
 }
 
+/* ------------------------------------------------------------ interactive */
+
+/* Selectable (and the deprecated operational) tag: the tag is the button. */
+.plus-tag--selectable,
+.plus-tag--action {
+    appearance: none;
+    cursor: pointer;
+}
+
+.plus-tag--selectable:hover,
+.plus-tag--action:hover,
+.plus-tag--link:not(.plus-tag--split):hover,
+.plus-tag--split:has(> .plus-tag__link:hover) {
+    background-color: var(--plus-tag-08);
+}
+
+.plus-tag--selectable:active,
+.plus-tag--action:active,
+.plus-tag--link:not(.plus-tag--split):active,
+.plus-tag--split:has(> .plus-tag__link:active) {
+    background-color: var(--plus-tag-12);
+}
+
 /*
- * The remove button. It is a real button inside a non-interactive tag — which is
- * why `dismissible` is NOT rendered as a control itself: nesting one interactive
- * element inside another is invalid per ARIA, the same rule Badge records for
- * its own dismiss button.
+ * Selected is a full-color border as well as a fill, so the choice is not
+ * carried by a change of lightness alone.
+ */
+.plus-tag--selected {
+    border-color: var(--plus-tag-hue);
+    background-color: var(--plus-tag-12);
+}
+
+.plus-tag--selected:hover,
+.plus-tag--selected:active {
+    background-color: var(--plus-tag-16);
+}
+
+/* A link underlines on hover and press only, never at rest. */
+.plus-tag--link {
+    cursor: pointer;
+}
+
+.plus-tag--link:not(.plus-tag--split):hover .plus-tag__label,
+.plus-tag--link:not(.plus-tag--split):active .plus-tag__label,
+.plus-tag__link:hover .plus-tag__label,
+.plus-tag__link:active .plus-tag__label {
+    text-decoration: underline;
+}
+
+/* The link half of a link with a separate ×. The outer tag draws the box. */
+.plus-tag__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    outline: none;
+}
+
+/* Focus: a 2px Focus Ring 2px outside the tag. */
+.plus-tag:focus-visible,
+.plus-tag--split:has(> .plus-tag__link:focus-visible) {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+}
+
+/* --------------------------------------------------------------- remove × */
+
+/*
+ * The Remove button, small: 16 square, 12px ×, radius 2. Only the × reacts on
+ * a removable tag. It is neutral on every color, since the hue belongs to the
+ * border and the swatch.
  */
 .plus-tag__remove {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex: none;
-    appearance: none;
-    border: 0;
+    box-sizing: border-box;
+    width: var(--size-spacing-medium-space-300, 16px);
+    height: var(--size-spacing-medium-space-300, 16px);
+    margin: 0;
     padding: 0;
+    border: 0;
+    border-radius: var(--size-border-radius-radius-50, 2px);
+    appearance: none;
     background: transparent;
-    color: inherit;
+    color: var(--color-on-surface-variant, #3f484a);
+    font-size: var(--font-size-fa-body2, 12px);
+    line-height: 1;
     cursor: pointer;
-    /*
-     * 24px, not the icon's own size. WCAG 2.5.8 asks for a 24×24 target, and an
-     * X glyph at body2 is about half that — the most common way a dismissible
-     * chip fails to be usable with a finger or an unsteady hand.
-     */
-    inline-size: var(--size-element-target-sm, 24px);
-    block-size: var(--size-element-target-sm, 24px);
-    margin-right: calc(var(--size-element-pad-x-sm) * -1);
-    border-radius: var(--size-element-radius-sm, 2px);
+}
+
+.plus-tag__remove > i {
+    font-size: var(--font-size-fa-body2, 12px);
+    line-height: 1;
 }
 
 .plus-tag__remove:hover {
-    background-color: var(--color-on-surface-state-08);
+    background-color: var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08));
 }
 
+.plus-tag__remove:active {
+    background-color: var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16));
+}
+
+/* Focus: the 12 fill plus a 2px Focus Ring 2px outside the ×. */
 .plus-tag__remove:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-primary);
-    outline-offset: -2px;
+    background-color: var(--color-on-surface-variant-state-12, rgba(65, 72, 77, 0.12));
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline-offset: var(--size-element-stroke-lg, 2px);
 }
 
-/* Loading. The tag stands down as a control while it spins, so a second click
-   cannot queue a second action against a value that is already changing. */
-.plus-tag--loading {
-    cursor: default;
+/* ---------------------------------------------------------------- saving */
+
+.plus-tag--loading,
+.plus-tag--loading .plus-tag__remove {
+    cursor: progress;
 }
 
+/* The spinner takes the swatch's box exactly, so saving keeps the width. */
 .plus-tag__spinner {
     flex: none;
-    inline-size: var(--size-element-gap-md, 10px);
-    block-size: var(--size-element-gap-md, 10px);
-    border: 2px solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: plus-tag-spin 0.7s linear infinite;
+    box-sizing: border-box;
+    width: var(--size-spacing-small-space-150, 10px);
+    height: var(--size-spacing-small-space-150, 10px);
+    border: var(--size-element-stroke-md, 1.5px) solid transparent;
+    /* Three quarters of the ring: a 270° arc. */
+    border-top-color: var(--plus-tag-hue);
+    border-right-color: var(--plus-tag-hue);
+    border-bottom-color: var(--plus-tag-hue);
+    border-radius: var(--size-element-radius-full, 999px);
+    animation: plus-tag-spin 0.8s linear infinite;
 }
 
 @keyframes plus-tag-spin {
     to { transform: rotate(360deg); }
 }
 
-/* Honour a stated preference; a spinning ring is exactly the motion this is for. */
 @media (prefers-reduced-motion: reduce) {
     .plus-tag__spinner {
         animation-duration: 2.4s;
     }
+}
+
+/* Heard once, never seen: the spinner is the visible half. */
+.plus-tag__status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* -------------------------------------------------------------- disabled */
+
+/*
+ * Disabled comes from the field. A neutral fill (on-surface 12, as Button),
+ * Secondary (Text) for the words and the swatch, no border unless selected,
+ * no ×, and no focus: the tag is a span, or a disabled button.
+ */
+.plus-tag--disabled,
+.plus-tag--disabled:hover,
+.plus-tag--disabled:active {
+    border-color: transparent;
+    background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+    color: var(--color-secondary-text, #3b525f);
+    cursor: default;
+}
+
+.plus-tag--disabled .plus-tag__swatch {
+    background-color: var(--color-secondary-text, #3b525f);
+}
+
+.plus-tag--disabled.plus-tag--selected {
+    border-color: var(--color-secondary-text, #3b525f);
+}
+
+.plus-tag--disabled .plus-tag__label {
+    text-decoration: none;
 }

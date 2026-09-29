@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Variants, Dismissing, RemoveIsGatedToDismissible, DismissibleIsNotNestedInteractive, Selecting, OperationalHasNoPressedState, ReadOnlyExposesNoControl, Truncation, WithLeadingContent, Loading, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Behaviors, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, DeprecatedNames, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Tag/Tag.mdx`
 
@@ -17,24 +17,27 @@
 |------|------|---------|-------------|
 | `text` | string | — | The label (alternative to children). |
 | `children` | node | — | The label (takes precedence over `text`). |
-| `variant` | oneOf | `'read-only'` | What kind of tag this is. `read-only` is still a tag — see the note above. |
-| `color` | oneOf | `'grey'` | A category colour. Plain names only: a tag's colour is never a status. |
-| `elemBefore` | node | — | Leading content — an avatar for a person, a logo for an app. |
-| `swatchBefore` | string | — | A colour square, for a tag acting as a chart legend entry. Any CSS colour. |
-| `maxWidth` | number or string | — | Caps the tag and truncates the label, which then carries its full text in `title`. |
-| `href` | string | — | Navigates. Ignored on `selectable` and `operational`, which are already controls. |
-| `linkComponent` | elementType | — | Router link to render instead of `<a>` when `href` is set. |
+| `behavior` | oneOf | — | What a person can do with the tag. `read-only` by default; `link` needs `href`. |
+| `variant` | oneOf | — | Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. |
+| `color` | oneOf | `'grey'` | A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. |
+| `count` | number or string | — | `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. |
+| `elemBefore` | node | — | Leading content in place of the swatch, such as an icon. |
+| `swatchBefore` | string | — | Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. |
+| `maxWidth` | number or string | `180` | Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. |
+| `href` | string | — | Where a `link` tag goes. |
+| `linkComponent` | elementType | — | Router link to render instead of `<a>` for a `link` tag. |
 | `isSelected` | bool | `false` | `selectable` only: the toggle's state, published as `aria-pressed`. |
-| `isLoading` | bool | `false` | Shows a spinner and stands the tag down as a control. |
-| `onClick` | func | — | Fires on `selectable`, `operational`, and a link. |
-| `onRemove` | func | — | `dismissible` only. On any other variant no remove button renders. |
-| `removeLabel` | string | — | Overrides the remove button's accessible name. Defaults to `Remove <label>`. |
+| `isLoading` | bool | `false` | Saving: a spinner replaces the swatch and the tag ignores presses until it is done. |
+| `onClick` | func | — | Fires on `selectable`, and on a `link`. |
+| `onRemove` | func | — | `removable`, or a `link` with a separate ×: called when the × is pressed. |
+| `removeLabel` | string | — | Overrides the ×'s accessible name. Defaults to `Remove <label>`. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
+| `style` | object | — | — |
 
 ## Tokens touched
 
-`--color-on-surface-state-08` · `--color-outline-variant` · `--color-primary` · `--font-weight-semibold` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-sm` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-target-sm`
+`--color-advocacy` · `--color-advocacy-border-subtle` · `--color-advocacy-state-08` · `--color-advocacy-state-12` · `--color-advocacy-state-16` · `--color-focus-ring` · `--color-mastering-content` · `--color-mastering-content-border-subtle` · `--color-mastering-content-state-08` · `--color-mastering-content-state-12` · `--color-mastering-content-state-16` · `--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-surface-variant-state-12` · `--color-on-surface-variant-state-16` · `--color-outline` · `--color-outline-variant` · `--color-relationship` · `--color-relationship-border-subtle` · `--color-relationship-state-08` · `--color-relationship-state-12` · `--color-relationship-state-16` · `--color-secondary-text` · `--color-social-emotional` · `--color-social-emotional-border-subtle` · `--color-social-emotional-state-08` · `--color-social-emotional-state-12` · `--color-social-emotional-state-16` · `--color-technology-tools` · `--color-technology-tools-border-subtle` · `--color-technology-tools-state-08` · `--color-technology-tools-state-12` · `--color-technology-tools-state-16` · `--color-tertiary` · `--color-tertiary-border-subtle` · `--color-tertiary-state-08` · `--color-tertiary-state-12` · `--color-tertiary-state-16` · `--font-size-fa-body2` · `--plus-tag-08` · `--plus-tag-12` · `--plus-tag-16` · `--plus-tag-border` · `--plus-tag-height` · `--plus-tag-hue` · `--plus-tag-max` · `--size-border-radius-radius-50` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-150`
 
 From `design-system/src/components/status-and-loading/Tag/Tag.scss`. Override these through the token layer, never with a literal.
 
