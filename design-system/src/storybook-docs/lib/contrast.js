@@ -23,3 +23,20 @@ export function contrastRatio(foreground, background) {
     if (!back || !front) throw new Error(`cannot read ${foreground} on ${background}`);
     return contrast(front.a < 1 ? composite(front, back) : front, back);
 }
+
+/**
+ * A translucent COMPUTED color laid over an opaque one, as the opaque
+ * `rgb(…)` it paints — the ground a border or text next to a tinted fill
+ * actually sits on.
+ *
+ * @param {string} color
+ * @param {string} background  must be opaque
+ * @returns {string}
+ */
+export function paintedOver(color, background) {
+    const back = parseColour(background);
+    const front = parseColour(color);
+    if (!back || !front) throw new Error(`cannot read ${color} on ${background}`);
+    const { r, g, b } = front.a < 1 ? composite(front, back) : front;
+    return `rgb(${r}, ${g}, ${b})`;
+}

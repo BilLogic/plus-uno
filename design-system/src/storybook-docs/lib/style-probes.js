@@ -20,6 +20,17 @@ export const tokenColor = (host, token) => {
     return value;
 };
 
+/** What a length token resolves to, in pixels, read through a probe. */
+export const tokenLength = (host, token) => {
+    const probe = document.createElement('span');
+    probe.style.display = 'block';
+    probe.style.width = `var(${token})`;
+    host.appendChild(probe);
+    const value = px(getComputedStyle(probe).width);
+    probe.remove();
+    return value;
+};
+
 /** The alpha channel of a computed color; 1 when it has none. */
 export const alpha = (color) => {
     const parts = color.match(/[\d.]+/g).map(Number);

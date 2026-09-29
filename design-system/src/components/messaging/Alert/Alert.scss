@@ -7,19 +7,17 @@
     display: flex !important;
     /* Override Bootstrap display: block    display: flex; */
     align-items: flex-start;
-    border-radius: var(--size-modal-radius-md);
+    /*
+     * 4px corners. Figma binds the primitive `Border/Radius/radius-100` here
+     * rather than a semantic radius, so the Alert reads the same primitive.
+     */
+    border-radius: var(--size-border-radius-radius-100);
     width: 100%;
     /* Full width - responsive */
     max-width: 100%;
-    /*
-     * One border, on the left: Figma's `Element/stroke-xl`. That variable is
-     * 3px in Figma (stroke-300), but the code token `--size-element-stroke-xl`
-     * still resolves to 2.5px (stroke-250), and Divider's xl reads it too. Until
-     * the token is settled for both, the Alert takes the 3px primitive directly
-     * rather than moving Divider with it.
-     */
+    /* One border, on the left: Figma's `Element/stroke-xl` (3px). */
     border: 0 solid;
-    border-left-width: var(--size-border-stroke-stroke-300);
+    border-left-width: var(--size-element-stroke-xl);
     color: var(--color-on-surface);
     box-sizing: border-box;
     /* Figma: Padding on container (16px), Gap between content and dismiss (variable) */
@@ -134,7 +132,8 @@ $alert-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
 
 @each $theme in $alert-themes {
     .plus-alert.#{$theme} {
-        background-color: var(--color-#{$theme}-state-08);
+        // Figma's `<Style> Container 08` state layer.
+        background-color: var(--color-#{$theme}-container-state-08);
         border-color: var(--color-#{$theme}-border);
 
         .plus-alert-leading {
