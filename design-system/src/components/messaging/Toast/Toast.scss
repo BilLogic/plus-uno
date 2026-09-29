@@ -32,7 +32,8 @@
             justify-content: center;
             flex-shrink: 0;
 
-            i {
+            @include icon-glyph {
+                // @contrast: non-text
                 font-size: var(--font-size-fa-body1-solid);
                 color: var(--color-on-surface-variant);
             }
@@ -130,9 +131,8 @@
         }
     }
 
-    // The same content color as the other headers. Title and timestamp:
-    // accepted contrast exception, recorded in the text-contrast baseline; do
-    // not darken.
+    // Title and timestamp: accepted contrast exception, recorded in the
+    // text-contrast baseline; do not darken.
     &.warning {
 
         .plus-toast-header,

@@ -178,6 +178,26 @@ Interactive.parameters = {
 const TOAST_STYLES = ['primary', 'secondary', 'danger', 'success', 'info', 'warning'];
 
 /**
+ * One toast per header color, stacked. `toastProps(style)` supplies what
+ * differs per story (test id, visibility, body); `children` follows the stack.
+ */
+const ToastPerStyle = ({ toastProps, children }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+        {TOAST_STYLES.map((style) => (
+            <Toast
+                key={style}
+                style={style}
+                title={`${style} toast`}
+                timestamp="Just now"
+                autohide={false}
+                {...toastProps(style)}
+            />
+        ))}
+        {children}
+    </div>
+);
+
+/**
  * The × on every header color. It is the shared `CloseButton` in its inverse
  * tone, so its size and focus ring are CloseButton's own tests; what is tested
  * here is how the Toast uses it. It sits one header gap after the timestamp, as
@@ -188,23 +208,16 @@ const TOAST_STYLES = ['primary', 'secondary', 'danger', 'success', 'info', 'warn
 export const Dismiss = () => {
     const [closed, setClosed] = useState([]);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
-            {TOAST_STYLES.map((style) => (
-                <Toast
-                    key={style}
-                    style={style}
-                    title={`${style} toast`}
-                    timestamp="Just now"
-                    show={!closed.includes(style)}
-                    autohide={false}
-                    onClose={() => setClosed((list) => [...list, style])}
-                    data-testid={`dismiss-${style}`}
-                >
-                    Press the × to close it.
-                </Toast>
-            ))}
+        <ToastPerStyle
+            toastProps={(style) => ({
+                show: !closed.includes(style),
+                onClose: () => setClosed((list) => [...list, style]),
+                'data-testid': `dismiss-${style}`,
+                children: 'Press the × to close it.',
+            })}
+        >
             <span className="body2-txt" data-testid="dismiss-closed">{closed.join(' ')}</span>
-        </div>
+        </ToastPerStyle>
     );
 };
 
@@ -259,21 +272,13 @@ Dismiss.play = async ({ canvasElement }) => {
  * baseline; do not darken.
  */
 export const HeaderContent = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
-        {TOAST_STYLES.map((style) => (
-            <Toast
-                key={style}
-                style={style}
-                title={`${style} toast`}
-                timestamp="Just now"
-                show
-                autohide={false}
-                data-testid={`header-${style}`}
-            >
-                {`Header content uses the on-${style} color.`}
-            </Toast>
-        ))}
-    </div>
+    <ToastPerStyle
+        toastProps={(style) => ({
+            show: true,
+            'data-testid': `header-${style}`,
+            children: `Header content uses the on-${style} color.`,
+        })}
+    />
 );
 
 HeaderContent.parameters = WARNING_HEADER_A11Y_PARAMS;
