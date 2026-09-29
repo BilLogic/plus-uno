@@ -199,7 +199,12 @@ function parsePropTypes(source, name) {
     if (!cleaned) continue;
     const m = cleaned.match(/^([A-Za-z_$][\w$]*)\s*:\s*([\s\S]+)$/);
     if (!m) continue;
-    const type = m[2].replace(/\s+/g, ' ').trim();
+    // `PropTypes.oneOf(STYLES)` names an array declared in the same file; read
+    // the array so the enum is documented as if it were written inline.
+    const type = m[2].replace(/\s+/g, ' ').trim().replace(/PropTypes\.oneOf\(([A-Za-z_$][\w$]*)\)/, (all, id) => {
+      const decl = source.match(new RegExp(`const\\s+${id}\\s*=\\s*(\\[[^\\]]*\\])`));
+      return decl ? `PropTypes.oneOf(${decl[1].replace(/\s+/g, ' ')})` : all;
+    });
     const oneOf = type.match(/PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
     props.push({
       name: m[1],

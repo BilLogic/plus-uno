@@ -69,7 +69,8 @@ const Alert = ({
     // The leading icon and the × center on the first line of text: the title
     // line when there is a title, otherwise the first body line. An invisible
     // strut in that line's text style gives each column exactly one line of
-    // height; the icon stays 20px and the button 24×24 whatever the text size.
+    // height; the icon stays a 20px square (the column's width) and the button
+    // 24×24 whatever the text size.
     const firstLineClass = title ? 'h4' : 'body2-txt';
     const strut = <span className={`plus-alert-strut ${firstLineClass}`} aria-hidden="true">{'\u200B'}</span>;
 
@@ -115,7 +116,7 @@ Alert.propTypes = {
     /** Unique identifier for the alert element */
     id: PropTypes.string,
     /** Color style variant */
-    style: PropTypes.oneOf(['primary', 'secondary', 'success', 'danger', 'warning', 'info']),
+    style: PropTypes.oneOf(ALERT_STYLES),
     /** React Bootstrap variant (for accessibility attributes) */
     variant: PropTypes.string,
     /** Optional title/heading for the alert */

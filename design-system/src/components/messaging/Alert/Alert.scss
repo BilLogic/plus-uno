@@ -90,15 +90,18 @@
  * The leading icon is Figma's 20px solid icon (Icon size=h4). There is no
  * icon-size token, so it borrows `--font-size-fa-h4-solid`, and the column is
  * as wide as the icon. Its color is the style's Icon role, set per style below.
- * The icon's own 1 line height is raw on purpose: the box is centered on the
- * first line, so it must be exactly the glyph's height.
+ * The icon's 1 line height and 1em width are raw on purpose: the box is
+ * centered on the first line and fills the column, so it must be exactly the
+ * 20px square the glyph is drawn in.
  */
 .plus-alert-leading {
     width: var(--font-size-fa-h4-solid);
 }
 
 // Two classes deep, to beat the typography classes' `body .fa-solid` icon
-// sizing; a passed Font Awesome node gets the same 20px.
+// sizing; a passed Font Awesome node gets the same 20px. Font Awesome 7 draws
+// every icon 1.25em wide; `--fa-width: 1em` makes the box the 20px square the
+// column is, so it does not overhang it.
 .plus-alert-leading .plus-alert-leading-icon {
     display: inline-flex;
     align-items: center;
@@ -106,6 +109,8 @@
 
     &,
     :is(.fa-solid, .fa-regular, .fas, .far) {
+        --fa-width: 1em;
+        width: 1em;
         font-size: var(--font-size-fa-h4-solid);
         line-height: 1;
     }

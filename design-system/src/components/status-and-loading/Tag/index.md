@@ -17,10 +17,10 @@
 |------|------|---------|-------------|
 | `text` | string | — | The label (alternative to children). |
 | `children` | node | — | The label (takes precedence over `text`). |
-| `behavior` | oneOf | — | What a person can do with the tag. `read-only` by default; `link` needs `href`. |
-| `variant` | oneOf | — | Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. |
-| `color` | oneOf | `'grey'` | A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. |
-| `type` | oneOf | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
+| `behavior` | enum | — | What a person can do with the tag. `read-only` by default; `link` needs `href`. |
+| `variant` | enum | — | Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. |
+| `color` | enum | `'grey'` | A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. |
+| `type` | enum | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
 | `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |
 | `count` | number or string | — | `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. |
 | `elemBefore` | node | — | Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. |
@@ -36,6 +36,18 @@
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 | `style` | object | — | — |
+
+## Variants
+
+**`behavior`** — `read-only` · `removable` · `selectable` · `link`
+
+**`variant`** — `read-only` · `dismissible` · `selectable` · `operational`
+
+**`color`** — `grey` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `orange`
+
+**`type`** — `plain`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 

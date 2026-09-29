@@ -15,9 +15,9 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `content` | oneOf | `'icon'` | What the tile frames. Icons and logos are inset; an image fills and crops. |
-| `size` | oneOf | `32` | 16, 20, 24, 32, 40 or 48, for every kind of content. |
-| `appearance` | oneOf | `'subtle'` | Icons only. `subtle` is the color's container; `bold` is the solid color. |
+| `content` | enum | `'icon'` | What the tile frames. Icons and logos are inset; an image fills and crops. |
+| `size` | enum | `32` | 16, 20, 24, 32, 40 or 48, for every kind of content. |
+| `appearance` | enum | `'subtle'` | Icons only. `subtle` is the color's container; `bold` is the solid color. |
 | `color` | oneOf | — | A category color from the Tag set. `white` is for logos. Defaults to white for a logo, grey otherwise. `orange` is a deprecated alias for `yellow`. |
 | `icon` | string or node | — | `icon` only: a Font Awesome Free name (`book-open`), a class list, or a node. |
 | `src` | string | — | `logo` or `image`: the picture's URL. |
@@ -25,6 +25,14 @@
 | `hasBorder` | bool | `false` | Adds a 1px outline-variant border inside the tile. |
 | `label` | string | — | Makes the tile an image with this name. Without it the tile is decorative and hidden. |
 | `className` | string | `''` | — |
+
+## Variants
+
+**`content`** — `icon` · `logo` · `image`
+
+**`appearance`** — `subtle` · `bold`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 

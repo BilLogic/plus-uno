@@ -1256,6 +1256,11 @@
     border-radius: 4px;
 }
 
+/* An insight keeps the insight ink on its icon, whatever the alert's style. */
+.insight-alert .insight-alert-icon {
+    color: var(--color-on-tertiary-container, var(--color-on-surface));
+}
+
 .training-grid {
     display: flex;
     overflow-x: auto;

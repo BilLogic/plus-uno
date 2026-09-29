@@ -495,7 +495,7 @@ export default function MonthlyReportContent() {
                                     </div>
                                 </div>
                                 {reportData.keyInsight && (
-                                    <Alert style="tertiary" leadingVisual="trophy" dismissable={false} className="insight-alert">
+                                    <Alert style="tertiary" leadingVisual={<i className="fa-solid fa-trophy insight-alert-icon" />} dismissable={false} className="insight-alert">
                                         {reportData.keyInsight}
                                     </Alert>
                                 )}
@@ -558,7 +558,7 @@ export default function MonthlyReportContent() {
                 {/* Peer Average */}
                 {/* Recommended Range Nudge */}
                 <div style={{ marginTop: 'var(--size-element-gap-xs)' }}>
-                    <Alert style="tertiary" leadingVisual="lightbulb" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
+                    <Alert style="tertiary" leadingVisual={<i className="fa-solid fa-lightbulb insight-alert-icon" />} dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
                         <span>
                             We noticed you spent <strong>18%</strong> of your session time Observing, which is above our recommended range (8-12%).
                             Consider transitioning into guided questioning earlier to keep students actively reasoning.
@@ -598,7 +598,7 @@ export default function MonthlyReportContent() {
 
                     {/* November Growth Banner - appears between title and insights */}
                     {reportData.isHighImprovement && (
-                        <Alert style="success" leadingVisual="seedling" dismissable={false} className="insight-alert">
+                        <Alert style="success" leadingVisual={<i className="fa-solid fa-seedling insight-alert-icon" />} dismissable={false} className="insight-alert">
                             <div style={{ marginBottom: 0 }}>
                                 This month has several areas for development. Remember, growth takes time and practice—let's focus on one skill at a time. Start with the insight marked "Start Here" below.
                             </div>

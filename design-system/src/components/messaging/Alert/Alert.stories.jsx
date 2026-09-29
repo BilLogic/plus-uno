@@ -292,6 +292,10 @@ LeadingIcon.play = async ({ canvasElement }) => {
             .toBe(glyphOf(canvasElement, `fa-${ALERT_ICONS[style]}`));
         await expect(getComputedStyle(icon).color, `${id} icon color`).toBe(tokenColor(canvasElement, `--color-${style}-icon`));
         await expect(px(getComputedStyle(icon).fontSize), `${id} icon size`).toBe(20);
+        const box = icon.getBoundingClientRect();
+        await expect(Math.round(box.width), `${id} icon box is 20 wide, the column's width`).toBe(20);
+        await expect(Math.round(box.width), `${id} icon fills its column exactly`)
+            .toBe(Math.round(icon.parentElement.getBoundingClientRect().width));
         await expect(icon.closest('[aria-hidden="true"]'), `${id} icon is decorative`).not.toBeNull();
 
         // The icon comes before the message, the × after it.
