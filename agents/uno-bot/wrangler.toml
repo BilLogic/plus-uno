@@ -17,10 +17,10 @@ head_sampling_rate = 1
 # Every 15 min during work hours (Mon–Fri, 13:00–23:45 UTC). The trigger
 # anchors the two SCHEDULED RUNS (src/scheduled/runs.ts); no cron is added for
 # them — the free plan caps an account at 5 cron triggers — so the handler
-# reads each firing's scheduled time and only the two :00 slots do anything:
-#   • 14:00 UTC → the morning run     (10:00 ET in EDT, 09:00 ET in EST)
-#   • 22:00 UTC → the end-of-day run  (18:00 ET in EDT, 17:00 ET in EST)
-# Every other firing is a no-op. The Figma library poll used to run on every
+# reads each firing's scheduled time in ET and only the two :00 slots do anything:
+#   • 10:00 ET → the morning run     (14:00 UTC in EDT, 15:00 UTC in EST)
+#   • 18:00 ET → the end-of-day run  (22:00 UTC in EDT, 23:00 UTC in EST)
+# Every other firing is a no-op, so each run is once a day all year. The Figma library poll used to run on every
 # firing; it is now the end-of-day run's `figma-library-poll` job, and its
 # findings post in #plus-universal at the next morning run
 # (src/figma-poll.ts, src/figma-library/). Manual poll: GET /debug/figma-poll.

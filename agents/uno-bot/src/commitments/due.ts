@@ -15,7 +15,9 @@
 //
 // PURE: no `Env`, no Slack, no Workers global.
 
-import { MORNING_RUN_HOUR_UTC, postableAt } from "../sweep/schedule";
+import { etDayOf, etParts, MORNING_RUN_HOUR_ET, postableAt } from "../sweep/schedule";
+
+export { etDayOf };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -29,29 +31,8 @@ export const MAX_SNOOZES = 2;
  *  ⏳ or a follow-up can still bring finds it. */
 export const TEXT_KEEP_MS = 30 * DAY_MS;
 
-const TEAM_ZONE = "America/New_York";
-const ET = new Intl.DateTimeFormat("en-US", {
-  timeZone: TEAM_ZONE,
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  hour: "numeric",
-  hourCycle: "h23",
-});
-
 const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
-
-function etParts(at: number): { y: number; m: number; d: number; h: number } {
-  const parts = Object.fromEntries(ET.formatToParts(new Date(at)).map((p) => [p.type, p.value]));
-  return { y: Number(parts.year), m: Number(parts.month), d: Number(parts.day), h: Number(parts.hour) };
-}
-
-/** The ET calendar day `at` falls on. */
-export function etDayOf(at: number): number {
-  const { y, m, d } = etParts(at);
-  return Date.UTC(y, m - 1, d);
-}
 
 /** The instant an ET day ends: the next ET midnight, 04:00 or 05:00 UTC. */
 export function endOfEtDay(day: number): number {
@@ -192,12 +173,11 @@ export function nudgeAt(dueAt: number): number {
 
 /**
  * True only while a weekday's morning run is going: Monday to Friday, in the
- * 14:00 UTC hour. Nothing is sent outside it, whatever job asks.
+ * 10:00 ET hour. Nothing is sent outside it, whatever job asks.
  */
 export function isMorningRunTime(now: number): boolean {
-  const d = new Date(now);
-  const wd = d.getUTCDay();
-  return wd >= 1 && wd <= 5 && d.getUTCHours() === MORNING_RUN_HOUR_UTC;
+  const wd = new Date(etDayOf(now)).getUTCDay();
+  return wd >= 1 && wd <= 5 && etParts(now).h === MORNING_RUN_HOUR_ET;
 }
 
 /**
