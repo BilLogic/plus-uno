@@ -13,7 +13,8 @@
   "componentGroups": {
     "Actions": [
       "Button",
-      "Button group"
+      "Button group",
+      "Close button"
     ],
     "Forms and inputs": [
       "Cascader",
@@ -120,7 +121,8 @@
       "Actions",
       [
         "Button",
-        "Button group"
+        "Button group",
+        "Close button"
       ],
       "Forms and inputs",
       [

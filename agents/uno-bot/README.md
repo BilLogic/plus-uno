@@ -49,7 +49,9 @@ Deleting the second loop is what made `/stop` work on Claude (#496): `claude-age
 
 **Can, behind the ✅ gate (proposal card, 60-min expiry, anyone in the thread may confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`), file an intake as a GitHub issue on the listed repo whose purpose matches (`github_issue_create` — the Worker resolves the repo against `GITHUB_REPOS`, fixes the `harness-intake` + `needs-triage` labels and adds a footer naming the requester and linking the thread; the card names the repo and says whether it is public), follow up on an issue in a listed repo (`github_issue_update` — comment, close as completed / not planned or reopen, add or remove existing labels; every comment carries the same footer, and the triage outcomes `ready-for-agent` / `ready-for-human` / `wontfix` are refused), run a workflow the `GITHUB_REPOS` entry allows on a listed repo (`github_workflow_run` — always on the default branch; the card names repo, workflow and branch; the thread gets the runs page). Confirmed implement/scaffold dispatches also carry the **full triggering-thread transcript** (names resolved, last ~50 messages / ~10k chars, truncation noted) in the `client_payload` (`thread_transcript`), so the Actions runner sees the whole discussion — the bot itself still never edits repos.
 
-**Autonomous (no ask, no gate — cron):** the **Figma library poll** (`agents/uno-bot/src/figma-poll.ts`, `[triggers]` in `agents/uno-bot/wrangler.toml`) checks the DS Figma file every 15 min during work hours, and on a publish files a PRD on the Roadmap board and posts the "🎨 Figma Design System Updated" card to `#uno-bot` — reply `implement <component>` in that thread to kick off the gated implement flow. (This is the v1 `figma-library-poll.yml` automation, re-homed in the Worker 2026-07-16.)
+**Autonomous (no ask — scheduled runs):** the **Figma library poll** (`agents/uno-bot/src/figma-poll.ts`) checks the DS Figma file once a weekday, as the end-of-day run's job. A publish it finds is posted at the next morning run (`agents/uno-bot/src/figma-library/`) as one message in `#plus-universal`: a drafted `harness-intake` issue behind a proposal card that any channel member can decide for 72 hours — ✅ files the intake and dispatches `figma-implement.yml` for every mapped component, ⛔ files the intake only. A morning tracker then links the Action's PR in the intake and the thread, and closes the intake when the PR merges. The **weekly DS precedence check** (`agents/uno-bot/src/ds-precedence/`) runs on Friday's end-of-day run: when no publish is carrying a component, it compares the component index and the registry's props with the library, and the next morning run opens one thread in `#plus-universal` listing each disagreement with the side DS precedence says loses. Its card files one `harness-intake` issue, or comments on the one already open; a `dispute N` reply revises the card without item N; a clean week posts nothing. Details: `docs/connectors/figma.md`.
+
+The end-of-day run also tags asks on the **usage record** with the corpus Sub-type and its pain_category (1–7; 7 is a turn that staged a card or intake — `agents/uno-bot/src/usage/categories.ts`): one `chill` call per batch of channel asks, whose text is nulled in the same write; a batch that fails is retried one ask at a time, and an ask that fails three times is stored blank. Only an ask in a conversation Slack typed as a channel keeps its text for that; a DM, a group DM, or a mention whose event carried no channel type is labelled during its turn and never stored as text. Both weekday runs purge text older than 11 days less two hours, so none outlives 14 across a weekend, one missed run and a purge that starts late. Bill's spot-check is `agents/uno-bot/queries/usage/categories-spot-check.sql`.
 
 **Quality loop, pre-send:** substantive text drafts (≥1500 chars — deliverable-shaped output, not ordinary replies) get ONE cheap judge call against a condensed D1–D9 rubric (`agents/uno-bot/src/agent/draft-judge.ts`) and are revised once if flagged; short replies skip it, and any judge error/timeout ships the original draft (fail open). Verdicts land in the telemetry stream as `[uno-bot] draft-judge …` lines.
 
@@ -73,7 +75,7 @@ uno-bot/
     │                     /slack/{events,commands,interactive} · /oauth/slack/{start,callback} ·
     │                     everything diagnostic → src/diagnostics — plus the cron scheduled() handler
     ├── diagnostics/      Every probe, behind one token gate and one report envelope: the public
-    │                     /health/blueprint contract probe + eleven /debug/* probes (routes.ts is
+    │                     /health/blueprint contract probe + twelve /debug/* probes (routes.ts is
     │                     the route table; probes/ holds the bodies)
     ├── agent/            loop.ts (THE agent loop) · model-provider.ts (the ModelProvider
     │                     seam) · providers/ (gemini · claude · fake) · loop-policy.ts (the
@@ -89,8 +91,12 @@ uno-bot/
     ├── tools/            Local tool implementations (dispatcher + one file per tool family)
     ├── integrations/     notion · figma · blueprint (Supabase) · github · gmail · ds-components
     ├── oauth/            Slack OAuth (static client) — the user token slack_search needs
-    ├── figma-poll.ts     Cron: DS-publish detection → Roadmap PRD → #uno-bot card
-    │                     (KV snapshot diffing; v1's poll-figma-library.js, Worker-native)
+    ├── figma-poll.ts     End-of-day job: DS-publish detection (KV snapshot diffing;
+    │                     v1's poll-figma-library.js, Worker-native) → findings in KV
+    ├── figma-library/    Morning jobs: findings → drafted intake + #plus-universal
+    │                     card; tracker links the PR and closes the intake on merge
+    ├── ds-precedence/    Weekly check (Friday end of day): code vs the library under
+    │                     DS precedence → one #plus-universal thread + intake card
     ├── thread-state/     ThreadState: ONE typed interface for everything a turn
     │                     remembers (history · proposals · assistant context · cancel ·
     │                     the run lease), its timings, and three adapters — Durable
@@ -100,6 +106,10 @@ uno-bot/
     │                     methods that ARE the interface above. No HTTP routes
     ├── agent-runner.ts   Durable Object: runs the agent turn in an alarm — outlives the ~30s
     │                     waitUntil() cancellation window that killed long runs
+    ├── runner/           The runner's scheduling over a storage port: one job per alarm, the
+    │                     deferred retry, a scheduled run's order and idempotency (+ in-memory runner)
+    ├── scheduled/        The morning (10:00 ET) and end-of-day (18:00 ET) runs the cron
+    │                     enqueues, their job bodies, and the /debug/sweep dry run
     └── version.ts        BUILD string returned by /health
 ```
 
@@ -119,9 +129,9 @@ curl http://localhost:8787/health
 
 ## Config
 
-**Plain vars** (`agents/uno-bot/wrangler.toml` `[vars]` — commented inline there): `GITHUB_REPO` (must point at the harness repo, `BilLogic/plus-uno` — the Worker dispatches `repository_dispatch` against it) · `GITHUB_REPOS` (the repos the GitHub tools may reach, each with a purpose and its dispatchable workflows; `check:secrets` fails a list the Worker would refuse) · `MODEL_PROVIDER` + `GEMINI_PROJECT_ID` / `GEMINI_REGION` / `GEMINI_MODEL` / `CLAUDE_MODEL` · Notion DB ids · `SUPABASE_URL` · Slack channel ids (`UNO_BOT_CHANNEL_ID`, `PLUS_DESIGN_CHANNEL_ID`, `PLUS_DESIGN_FEEDBACK_CHANNEL_ID`) · `FIGMA_FILE_KEY` (the DS file the library poll watches) · `SLACK_SEARCH_PRIVATE_ALLOWLIST` (the privacy firewall) · `SLACK_MCP_CLIENT_ID` + `SLACK_OAUTH_REDIRECT_URI` (the slack_search login) · `SLACK_STREAMING` / `SLACK_STREAM_PLAN` (off; refused unless `SLACK_STREAM_MARKUP_PROBE` records `pass:YYYY-MM-DD` from the markup probe below).
+**Plain vars** (`agents/uno-bot/wrangler.toml` `[vars]` — commented inline there): `GITHUB_REPO` (must point at the harness repo, `BilLogic/plus-uno` — the Worker dispatches `repository_dispatch` against it) · `GITHUB_REPOS` (the repos the GitHub tools may reach, each with a purpose and its dispatchable workflows; `check:secrets` fails a list the Worker would refuse) · `MODEL_PROVIDER` + `GEMINI_PROJECT_ID` / `GEMINI_REGION` / `GEMINI_MODEL` / `CLAUDE_MODEL` · Notion DB ids · `SUPABASE_URL` · Slack channel ids (`UNO_BOT_CHANNEL_ID` (the #uno-bot intake channel), `PLUS_UNIVERSAL_CHANNEL_ID` (where a library publish is posted, and whose members decide it), `PLUS_DESIGN_CHANNEL_ID`, `PLUS_DESIGN_FEEDBACK_CHANNEL_ID`) · `FIGMA_FILE_KEY` (the DS file the library poll watches) · `SLACK_SEARCH_PRIVATE_ALLOWLIST` (the privacy firewall) · `SLACK_MCP_CLIENT_ID` + `SLACK_OAUTH_REDIRECT_URI` (the slack_search login) · `SLACK_STREAMING` / `SLACK_STREAM_PLAN` (off; refused unless `SLACK_STREAM_MARKUP_PROBE` records `pass:YYYY-MM-DD` from the markup probe below) · `TEST_CHANNEL_IDS` (#uno-bot-sandbox — its turns are test traffic on the usage record) · `LEAD_USER_ID` (the lead whose thread replies and DMs mark an ask escalated; the end-of-day pass reads the DM half on their own connected token).
 
-**Bindings:** Durable Objects `THREAD_STATE` + `AGENT_RUNNER`; KV `HARNESS_KV` (general-purpose Worker KV — the Figma-poll snapshot and delivery alert state; NOT a harness fallback, the harness is a compiled constant), `SLACK_OAUTH_KV` (slack_search user token).
+**Bindings:** Durable Objects `THREAD_STATE` + `AGENT_RUNNER`; KV `HARNESS_KV` (general-purpose Worker KV — the Figma-poll snapshot and delivery alert state; NOT a harness fallback, the harness is a compiled constant), `SLACK_OAUTH_KV` (slack_search user token); D1 `USAGE_DB` (`uno-bot-usage` — one row per turn, ADR-030; schema and how to apply it in `migrations/README.md`; optional — unbound, turns are simply not recorded).
 
 **Secrets** (`wrangler secret put <NAME>`, persist across redeploys):
 
@@ -155,11 +165,44 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider health (all auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) · `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run before flipping `MODEL_PROVIDER="vertex-claude"`) · `GET /debug/gemini-cache` (no model call: reports whether the Gemini adapter's system prompt is served from a Vertex `cachedContents` resource, and the exact reason when it isn't — on `GEMINI_REGION = "global"` it never can be, see wrangler.toml).
-- **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV/Notion/Slack. Drop `dry_run` to fire the real thing (posts to `#uno-bot`, files a PRD). First-ever run (empty KV) seeds the snapshot and notifies nothing.
+- **Scheduled runs (auth-gated by `DEBUG_TOKEN`):** `GET /debug/sweep?dry_run=1&run=morning|end-of-day` (default end-of-day), optionally `&weekday=sun…sat` to plan another day's jobs (`&weekday=fri` rehearses the weekly DS precedence check on any day) — plans the run the cron would enqueue and dry-runs each job in the request, reporting the planned jobs and, per job, its subrequests, Cloudflare-service hops, D1 queries and wall time. Dry runs only; the runs fire from the cron, one alarm per job.
+- **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV. Drop `dry_run` to fire the real thing: it advances the snapshot and queues what changed for the next morning run's post — it posts nothing itself. First-ever run (empty KV) seeds the snapshot and finds nothing. `GET /debug/sweep?dry_run=1&run=morning` rehearses the post and the tracker without posting.
 - **Stream / markup probe (auth-gated by `DEBUG_TOKEN`):** `GET /debug/slack-stream?channel=…&thread_ts=…&user=…&team=…` opens a stream and returns Slack's raw verdict (`&stop=<ts>` closes it). Add `&text=<url-encoded>` to append that text raw and close: the markup probe in `docs/connectors/slack.md` § Streamed text. `text=` goes only to a DM (`D…`) or the alert channel, at most 2,000 chars; `appended` reports whether the append landed.
 - **Every probe's report** carries the same envelope beside its own payload: `build`, `ms`, and the subrequest accounting `subrequests` / `subrequest_hosts` / `internal_subrequests` / `budget_trips` (ADR-022), so a probe says how close the invocation came to Cloudflare's cap and whether any read was cut short. An unauthorized probe and an unknown path answer alike (`404 not found`).
 - **Blueprint contract (public, no token):** `GET /health/blueprint` — booleans only, no row data: every table and select the bot reads, so the product repository's CI fails loudly on a schema change. `GET /debug/blueprint`, `/debug/blueprint-search?q=…` and `/debug/blueprint-subject?need=…` are the token-gated, sample-carrying versions the retrieval evals read.
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/<slug>/` + a root `dev:<slug>` script; `npm install && npm run dev:test-prototype` boots it.
+
+## Metrics
+
+Every success metric published from the usage record is one query file in `queries/usage/`, named after the metric. The file is the metric's definition: its header gives the definition, the window it reads and the caveats, and links to *Final — metrics* in Notion. `npm run test:workerd` runs each one against a seeded local D1 and asserts its numbers (`tests/workerd/metric-queries.test.ts`).
+
+**Run one** from `agents/uno-bot/`. `npm run metric` renders the file with your window and prints the statement; it sends nothing. Then you run it, read-only, against the deployed database:
+
+```bash
+npm run metric -- responsiveness --from 2026-09-01 --to 2026-10-01 --out /tmp/responsiveness.sql
+npx wrangler d1 execute uno-bot-usage --remote --file /tmp/responsiveness.sql
+```
+
+The window is UTC dates, start inclusive, end exclusive. Left out, the dates written in the file stand.
+
+Four files read something that is not in the database, and render it in as a table that exists only in the statement:
+
+- `responsiveness`, `answer-accuracy`, `cost-per-correct-answer` and `gated-writes` read the graded answers, `queries/usage/graded-answers.csv` (`turn_id,grade,grader,note`, grade `correct`, `partial` or `wrong`, one row per turn). Grade answers only, meaning turns with disposition `answered`: cards and clarifying questions are not in the divisor that the accuracy scales. Add rows there and commit them, so a grading can be re-run and cited. `--graded <csv>` reads another file.
+- `self-improvement-loop` reads whether the bot's own tickets closed, exported from GitHub when you run it: `gh issue list --repo BilLogic/plus-uno --state all --json url,closedAt --limit 500 > /tmp/closures.json`, then `--closures /tmp/closures.json`.
+- `responsiveness-baseline` reads the Coordination Request Corpus export (`thread_id,asked_at,first_reply_at,lead_replied_first`, times as epoch milliseconds or as ISO 8601 with a zone; epoch seconds and zone-less times are refused) with `--corpus <csv>`. It has no window.
+
+A file that reads an input fails with `no such table` if you run it without rendering, so an ungraded run cannot pass for a graded one.
+
+**Cite a result** with:
+
+- the query file and the commit it was run from (`git rev-parse --short HEAD`);
+- the window;
+- the graded-answers commit, when the query reads the grading;
+- the date it was run.
+
+**Asks and turns.** A turn is one row per message the bot answered, follow-ups included. An ask is a turn whose own message opened a thread, which is the unit to set against the inbox count. `self-serve-rate`, `where-lead-time-goes`, `load-on-lead` and `repeats-reaching-lead` print one of each, labelled in a `unit` column, and `return-rate` counts asks with the turns beside them. The usage record keeps no thread root, so the ask count is an approximation, and each header says which way it leans.
+
+Numbers taken while the window is still open move as the end-of-day pass settles the last day's asks, so cite a closed window when you can. The known limits are in each file's header. Two of them apply to several files: the expired count is a lower bound, and a ticket's role reads `unknown` when its requester is not on the role map (`agents/uno-bot/src/usage/roles.ts`, synced daily from Team Members), and for every card staged before the map was first synced.
 
 ## Gotchas
 

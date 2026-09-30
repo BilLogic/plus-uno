@@ -3,7 +3,7 @@
 
 # UserAvatar
 
-Per Figma spec: node-id=111-227876 Colors: - Initial circle: primary-08 bg (#rgba(0,101,142,0.08)), primary-text color (#00547e) - Counter: danger-08 bg (#rgba(190,12,22,0.08)), danger-text color (#9b0606) - Hover: on-surface-08 overlay
+Per Figma spec: node-id=111-227876 Colors: - Initial circle: primary-08 bg (rgba(4, 114, 168, 0.08)), primary-text color (#00547e) - Counter: danger-08 bg (rgba(186, 26, 26, 0.08)), danger-text color (#9b0606) - Hover: on-surface-08 overlay
 
 **Import:** `import { UserAvatar } from '@/components';`
 

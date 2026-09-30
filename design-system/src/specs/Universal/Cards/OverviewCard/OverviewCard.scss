@@ -7,6 +7,8 @@
  * 2. Metric Cards - with donut chart visualization
  */
 
+@use '../../../../styles/icon-glyph' as *;
+
 .plus-overview-card {
     // Base dimensions from Figma
     width: var(--columns-col-5, 275px);
@@ -56,8 +58,7 @@
         color: var(--color-on-surface-variant, #3f484a);
         flex-shrink: 0;
 
-        i,
-        svg {
+        @include icon-glyph {
             font-size: inherit;
             color: inherit;
         }
@@ -175,6 +176,10 @@
     // =============================================
     // SMART TYPE VARIANTS
     // =============================================
+    // Each SMART type paints its icon GLYPH in its hue, never the icon slot:
+    // a custom icon in any Font Awesome style or an svg takes the hue, and
+    // anything else in the slot keeps the header's neutral. The hue is held to
+    // the non-text 3:1, which only a glyph may be (`_icon-glyph.scss`).
 
     &--relationships {
         background: linear-gradient(90deg, rgba(199, 11, 119, 0.08) 0%, rgba(199, 11, 119, 0.08) 100%),
@@ -187,12 +192,17 @@
         }
 
         .plus-overview-card__icon {
-            color: var(--color-relationship, #c70b77);
+            @include icon-glyph {
+                // @contrast: non-text
+                color: var(--color-relationship, #c70b77);
+            }
         }
     }
 
     &--socio-emotional {
-        background: linear-gradient(90deg, rgba(125, 87, 0, 0.08) 0%, rgba(125, 87, 0, 0.08) 100%),
+        background:
+            linear-gradient(90deg, var(--color-social-emotional-state-08, rgba(140, 102, 0, 0.08)) 0%,
+                var(--color-social-emotional-state-08, rgba(140, 102, 0, 0.08)) 100%),
             linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
@@ -202,12 +212,17 @@
         }
 
         .plus-overview-card__icon {
-            color: var(--color-social-emotional, #8c6600);
+            @include icon-glyph {
+                // @contrast: non-text
+                color: var(--color-social-emotional, #8c6600);
+            }
         }
     }
 
     &--mastering-content {
-        background: linear-gradient(90deg, rgba(127, 63, 177, 0.08) 0%, rgba(127, 63, 177, 0.08) 100%),
+        background:
+            linear-gradient(90deg, var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)) 0%,
+                var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)) 100%),
             linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
@@ -217,7 +232,10 @@
         }
 
         .plus-overview-card__icon {
-            color: var(--color-mastering-content, #8659a9);
+            @include icon-glyph {
+                // @contrast: non-text
+                color: var(--color-mastering-content, #8659a9);
+            }
         }
     }
 
@@ -232,7 +250,10 @@
         }
 
         .plus-overview-card__icon {
-            color: var(--color-advocacy, #167745);
+            @include icon-glyph {
+                // @contrast: non-text
+                color: var(--color-advocacy, #167745);
+            }
         }
     }
 
@@ -247,7 +268,10 @@
         }
 
         .plus-overview-card__icon {
-            color: var(--color-technology-tools, #005cbd);
+            @include icon-glyph {
+                // @contrast: non-text
+                color: var(--color-technology-tools, #005cbd);
+            }
         }
     }
 

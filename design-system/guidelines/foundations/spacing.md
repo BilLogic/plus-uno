@@ -26,6 +26,7 @@ For buttons, badges, inputs, and other small components:
 
 | Token | Value | Usage |
 |-------|-------|-------|
+| `--size-element-pad-x-xs` | 4px | Extra small horizontal padding: labels (Status, Count, Tag) and the trailing side of a pill that ends in a Remove button |
 | `--size-element-pad-x-sm` | 8px | Small horizontal padding |
 | `--size-element-pad-x-md` | 12px | Medium horizontal padding |
 | `--size-element-pad-x-lg` | 16px | Large horizontal padding |

@@ -1,0 +1,217 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as CountStories from './Count.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "appearance": { "type": "enum", "values": ["subtle", "bold", "inverse", "dot"] },
+    "style": { "type": "enum", "values": ["neutral", "success", "warning", "danger", "info", "discovery"] },
+    "size": { "type": "enum", "values": ["medium", "small"] },
+    "ring": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "count",
+      "name": "Count",
+      "componentSetNodeId": "17876:46653",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the Status, Count & Tag page, beside the Counter set it replaces. Figma values carry a (default) suffix on subtle, neutral and medium; ring? is ring in code. Inverse exists in neutral only, and dot in medium only. Docs page: node 17883:1895."
+    }
+  ]
+};
+
+<Meta of={CountStories} />
+
+<Title />
+Is it a number? Count. Is it the condition something is in, and can that
+condition change? Status. Otherwise, Tag. A Count is a number on its own: unread
+items, results, errors.
+
+<DocsTabs of={CountStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Count"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Subtle by default; bold when it asks for action now; inverse on filled buttons and dark surfaces; dot for presence without a number.</>}>
+    <Canvas of={CountStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+<DocsCanvasShell description={<>Medium (20) on its own; small (16) for use inside a label. The minimum width equals the height, so one digit is a circle and more digits grow the pill.</>}>
+    <DsCanvasQuiet of={CountStories.Sizes} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The six styles, subtle and bold, and the dot. Use a style only when the number carries it. Bold warning uses Warning Container.</>}>
+    <DsCanvasQuiet of={CountStories.Styles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<><code>max</code> caps the number with a <code>+</code>; the default is 99.</>}>
+    <DsCanvasQuiet of={CountStories.Max} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A count of 0 renders nothing, unless <code>showZero</code> is set.</>}>
+    <DsCanvasQuiet of={CountStories.Zero} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<><code>ring</code> adds a 2px surface ring for a count pinned to an icon or avatar, numeric or dot.</>}>
+    <DsCanvasQuiet of={CountStories.Ring} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>With <code>label</code>, a number is read as information rather than a bare digit.</>}>
+    <DsCanvasQuiet of={CountStories.LabeledNumber} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A dot needs <code>label</code>. Without one it warns in development.</>}>
+    <DsCanvasQuiet of={CountStories.DotNeedsALabel} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CountStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Count` for a number on its own: unread messages on a nav item, results on a
+tab, errors in a section header, a notification on a bell. It replaces the
+hand-built counters inside nav and tabs, the BadgeVariants `counter` variant and
+Badge's `counter` prop.
+
+- **Is it a number?** Count.
+- **Is it the condition something is in, and can that condition change?** Status.
+- **Otherwise** (a subject, a person, a category): Tag.
+
+`size="small"` (16) is for use inside a label: Status nests it through its
+`count` prop, and Tag will when it is rebuilt.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Keep most counts quiet.
+
+Subtle neutral is the default. Bold asks for action now, so use at most one bold
+count per area.
+
+```jsx
+// Incorrect — every tab shouts, so none of them does.
+<Count value={4} appearance="bold" style="danger" />
+<Count value={12} appearance="bold" style="info" />
+
+// Correct — quiet by default, bold only where something needs doing now.
+<Count value={12} />
+<Count value={3} appearance="bold" style="danger" label="3 errors" />
+```
+
+### Let the component decide zero and overflow.
+
+```jsx
+// Incorrect — the caller re-implements what Count already does.
+{unread > 0 && <Count value={unread > 99 ? '99+' : unread} />}
+
+// Correct — hidden at 0, capped at max.
+<Count value={unread} />
+```
+
+### Use inverse on filled buttons and dark surfaces.
+
+Inverse is a solid white pill with dark text, so it passes contrast on any fill.
+On a light surface it barely separates from the page; use subtle there.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A dot needs a name.** It has no number, so `label` is its accessible name,
+  exposed as an image with that name. Without one it is announced as nothing,
+  and the component warns in development.
+- **A label turns a digit into information.** "Messages 4" is ambiguous; with
+  `label="4 unread"` a screen reader hears "Messages 4 unread", while the pill
+  still shows 4.
+- **The count is not a control.** It is a `span` that sits inside buttons, tabs
+  and nav items; whatever is pressable is the thing around it.
+- **Contrast.** Subtle uses each style's (Text) color, and bold warning uses the
+  Warning Container pair because warning with white text fails AA. Inverse
+  is a solid white pill with dark text, so it clears AA on any fill, including
+  a primary button.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the condition something is in, use `Status`; `count` nests a Count inside it.
+- For a category, a subject or a person, use `Tag`.
+- The BadgeVariants `counter` variant and Badge's `counter` prop are the counters this
+  replaces; their callers move in a later change.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

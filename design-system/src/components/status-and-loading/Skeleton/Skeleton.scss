@@ -1,0 +1,169 @@
+/*
+ * Skeleton — a gray placeholder shape while content loads.
+ *
+ * THE LOOK. Fill is surface-container, so it keeps its contrast in any theme.
+ * The shimmer is a band of surface-container-lowest swept across the fill.
+ * There are no motion tokens yet, so the one duration is declared here.
+ * Under `prefers-reduced-motion: reduce` there is no animation, only the flat
+ * fill, which is also what `isShimmering={false}` gives.
+ *
+ * THE SIZES. Every shape reads three custom properties: width, height and
+ * radius. A shape or preset sets their defaults, and the component's `width`,
+ * `height` and `radius` props override them inline. The label presets take
+ * their heights from `_label-heights.scss`, the file Status, Count and Tag
+ * read theirs from, and their corners from the same tokens the labels use, so
+ * a preset is always the size of its label. The widths are stand-ins for the
+ * text; 72, 56 and 88 have no spacing primitive, so they are literals.
+ *
+ * THE SPACING PRIMITIVES. The rest of the sizes are Figma-bound spacing
+ * primitives, because no Element token names them: space-900 (64) for the
+ * default height and the status width, space-600 (32) for the circle,
+ * space-300 (16) for the text bar's height, and space-1000 (80) for the
+ * tag-person width. The status-spacious corner is the radius-150 primitive
+ * (6) for the same reason, as Status's large size is.
+ *
+ * NOT A TARGET. No pointer events and no selection: a placeholder cannot be
+ * clicked, and the component renders it `aria-hidden` with no focus.
+ */
+@use '../label-heights' as label;
+
+.plus-skeleton {
+    --plus-skeleton-width: 100%;
+    --plus-skeleton-height: var(--size-spacing-large-space-900, 64px);
+    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+    --plus-skeleton-duration: 1.6s;
+
+    display: inline-block;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--plus-skeleton-width);
+    max-width: 100%;
+    height: var(--plus-skeleton-height);
+    margin: 0;
+    border-radius: var(--plus-skeleton-radius);
+    vertical-align: middle;
+    background-color: var(--color-surface-container, #edeef0);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* ------------------------------------------------------------------ shapes */
+
+.plus-skeleton--circle {
+    --plus-skeleton-width: var(--size-spacing-large-space-600, 32px);
+    --plus-skeleton-height: var(--size-spacing-large-space-600, 32px);
+    --plus-skeleton-radius: var(--size-element-radius-full, 999px);
+}
+
+/* A text bar: 16 tall, radius 4, filling the line unless given a width. */
+.plus-skeleton--text {
+    --plus-skeleton-height: var(--size-spacing-medium-space-300, 16px);
+    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+}
+
+/* ----------------------------------------------------------- label presets */
+
+.plus-skeleton--status {
+    --plus-skeleton-width: var(--size-spacing-large-space-900, 64px);
+    --plus-skeleton-height: #{label.$status-height};
+    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+}
+
+.plus-skeleton--status-spacious {
+    --plus-skeleton-width: 88px;
+    --plus-skeleton-height: #{label.$status-height-large};
+    --plus-skeleton-radius: var(--size-border-radius-radius-150, 6px);
+}
+
+.plus-skeleton--count {
+    --plus-skeleton-width: #{label.$count-height};
+    --plus-skeleton-height: #{label.$count-height};
+    --plus-skeleton-radius: var(--size-element-radius-full, 999px);
+}
+
+.plus-skeleton--tag {
+    --plus-skeleton-width: 72px;
+    --plus-skeleton-height: #{label.$tag-height};
+    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+}
+
+.plus-skeleton--tag-person {
+    --plus-skeleton-width: var(--size-spacing-large-space-1000, 80px);
+    --plus-skeleton-height: #{label.$tag-height};
+    --plus-skeleton-radius: var(--size-element-radius-full, 999px);
+}
+
+/* ------------------------------------------------------------------ groups */
+
+/* Lines: a column of text bars at the Element sm gap, the last one shorter. */
+.plus-skeleton-group--lines {
+    --plus-skeleton-width: 100%;
+
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm, 8px);
+    width: var(--plus-skeleton-width);
+    max-width: 100%;
+    vertical-align: middle;
+    pointer-events: none;
+
+    > .plus-skeleton {
+        width: 100%;
+    }
+
+    > .plus-skeleton:last-child {
+        width: 66.667%;
+    }
+}
+
+/* A tag group: three tag shapes at the TagGroup gap, as Figma draws them. */
+.plus-skeleton-group--tags {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm, 8px);
+    vertical-align: middle;
+    pointer-events: none;
+}
+
+.plus-skeleton--tag-narrow {
+    --plus-skeleton-width: 56px;
+}
+
+.plus-skeleton--tag-widest {
+    --plus-skeleton-width: 88px;
+}
+
+/* ----------------------------------------------------------------- shimmer */
+
+.plus-skeleton--shimmer {
+    background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-surface-container-lowest, #ffffff) 50%,
+        transparent 100%
+    );
+    background-repeat: no-repeat;
+    background-size: 50% 100%;
+    animation: plus-skeleton-sweep var(--plus-skeleton-duration) ease-in-out infinite;
+}
+
+/* The band enters at the left edge and leaves past the right one. */
+@keyframes plus-skeleton-sweep {
+    from { background-position: -100% 0; }
+    to { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-skeleton--shimmer {
+        animation: none;
+        background-image: none;
+    }
+}
+
+/* Forced colors drop the fill; an outline keeps the shape without changing its size. */
+@media (forced-colors: active) {
+    .plus-skeleton {
+        outline: var(--size-element-stroke-sm, 1px) solid GrayText;
+        outline-offset: calc(-1 * var(--size-element-stroke-sm, 1px));
+    }
+}

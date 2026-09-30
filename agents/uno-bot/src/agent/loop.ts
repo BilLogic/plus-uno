@@ -42,6 +42,7 @@ import type {
   ModelStop,
   ModelToolCall,
   ModelToolResult,
+  ModelUsage,
   SystemBlock,
   ToolSpec,
 } from "./model-provider";
@@ -121,6 +122,11 @@ export type AgentResult =
        *  leaves the contract when mid-turn effects move behind the Delivery
        *  port and `slack/events.ts` stops reading the result's fields directly. */
       previewText?: string;
+      /** What the MODEL wrote beside the call, and nothing the Worker added —
+       *  `previewText` also carries the "I could not stage …" note. `""` when
+       *  the model wrote nothing; absent on a proposal no model turn produced
+       *  (a restage, a sweep revision), which gets no fallback lead. */
+      replyText?: string;
     }
   | {
       kind: "resolved";
@@ -224,6 +230,18 @@ export interface LoopInput {
   onDials?: (dials: TurnDials) => void;
   onToolCall?: (call: ToolCall) => void;
   onToolResult?: (result: ToolResultNote) => void;
+  /** Called once, as the turn finishes, with what it ran on and spent — the
+   *  facts of the `[uno-bot] request done` line, for the usage record. */
+  onSpend?: (spend: TurnSpend) => void;
+}
+
+/** What one turn ran on and what it spent, as the provider reported it. */
+export interface TurnSpend {
+  provider: string;
+  model: string;
+  /** True when the turn retried on the backup model. */
+  fallback: boolean;
+  usage: ModelUsage;
 }
 
 // ── The loop ─────────────────────────────────────────────────────────────────
@@ -249,6 +267,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     const { model, detail } = provider.dials();
     input.onDials?.({ tier, route: input.routeReason, model, detail });
     const usage = provider.usage();
+    input.onSpend?.({ provider: provider.name, model, fallback: fellBack, usage });
     // One line per turn, per provider, reading as one named configuration: the
     // tier, why it was chosen, and the dials it resolved to.
     const dialLine = Object.entries(detail)
@@ -278,7 +297,11 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       // Fires when the lookup ceiling is already reached, or the tool-count
       // backstop is hit. LOOKUPS only — side-effect tools are peeled off by the
       // caller and stay allowed even when the lookup budget is spent.
-      if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
+      if (rowFor(call.name)?.access === "worker") {
+        // Only the Worker stages a `worker` tool; the model is never offered
+        // one, so a call to it is refused here, before any dispatch.
+        text = JSON.stringify({ ok: false, error: `'${call.name}' is not a tool you can call` });
+      } else if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
         text = budgetRefusedResult();
       } else {
         toolCallsUsed++;
@@ -591,6 +614,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         toolName: operations[0]!.toolName,
         input: operations[0]!.input,
         previewText: preview || undefined,
+        replyText: (reply.text || "").trim(),
       });
     }
 

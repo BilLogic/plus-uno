@@ -1,0 +1,17 @@
+/*
+ * Label heights — written down once, for the labels and their skeletons.
+ *
+ * Status, Count and Tag have no semantic height token yet (label heights
+ * 16/20/22/32 are a token follow-up). Each label sets its own height custom
+ * property from these values, and Skeleton's presets read the same values, so
+ * a label and its placeholder cannot drift apart. The compiled CSS of each
+ * label is unchanged: it still declares the same pixel value.
+ *
+ * When the height tokens exist, they replace these values here and nowhere
+ * else.
+ */
+$status-height: 20px;
+$status-height-large: 32px;
+$count-height: 20px;
+$count-height-small: 16px;
+$tag-height: 22px;

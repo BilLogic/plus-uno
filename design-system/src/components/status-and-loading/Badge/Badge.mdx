@@ -97,7 +97,7 @@ export const figmaMeta = {
 <Meta of={BadgeStories} />
 
 <Title />
-Static visual identifiers used to categorize or describe elements. They are used for displaying the status, type, or other relevant information about an element.
+Deprecated: use Status for a state, Count for a number and Tag for a category. Static visual identifiers used to categorize or describe elements. They are used for displaying the status, type, or other relevant information about an element.
 
 <DocsTabs of={BadgeStories}>
 
@@ -188,28 +188,24 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 ## When to use
 
-**In new code, prefer `BadgeVariants` or `Tag`.** #276 split this component in
-two along one rule: *a tag is a representation of a value that someone has
-picked; to show system-generated data that people can't change, use a badge
-instead.* `Badge` does both jobs at once — `counter` is system-generated,
-`dismissible` and `onDismiss` are a value a person picked and can remove — and
-that is what the split undoes.
+**Deprecated. In new code, pick one of three labels.** Is it a number? `Count`.
+Is it the condition something is in, and can that condition change? `Status`.
+Otherwise, `Tag`. `Badge` does all three jobs in one component, with a color
+that can mean nothing, which is what the three undo.
 
-`Badge` is **deprecated, not removed**, and nothing here has stopped working.
-Every prop it ships still behaves exactly as documented on this page, and the
-182 call sites across 79 files need no change to keep rendering. The deprecation
-is a direction for new code, not a deadline on existing code: the migration
-sweep is explicitly out of scope for #276, and no ticket removes anything from
-this API yet.
-
-Where to go instead:
+`Badge` still renders exactly as documented on this page, so no call site needs
+a change to keep working. In development every render warns with the
+replacement for the props it was given, so a call moves by copying what the
+console says:
 
 | This badge | Becomes |
 |---|---|
-| `dismissible` / `onDismiss` | `Tag variant="dismissible"` — a person picked the value |
-| `counter` | `BadgeVariants variant="counter"` |
-| `style` | `BadgeVariants` `appearance`, on the closed set of five |
-| `size` | nothing — `BadgeVariants` has no `size`, by design. Use `spacing` for presence |
+| `style` success, warning, danger or info | `Status` with the same `style` |
+| `style` primary, secondary or tertiary | `Status` for a state (these colors carry no meaning, so pick the one that does), or `Tag` for a category |
+| a curriculum `style` (advocacy, relationship, …) | `Tag` in the color that borrows that hue |
+| `dismissible` / `onDismiss` | `Tag behavior="removable"` |
+| `counter` | the Status's `count`, or a `Count` on its own |
+| `size` | nothing: each label has its own sizes, and none of them follows the type scale |
 
 Until then, use `Badge` to label something that is already on screen — a
 session's status, a tutor's competency domain, an unread count beside a nav
@@ -301,7 +297,7 @@ that follows it. It is not a width or a height, and two badges at the same
 
 ## Related
 
-- For system-generated data in new code, use `BadgeVariants` — the #276 API this page is deprecated in favour of.
+- For a state, use `Status`; for a number, use `Count`; for a category, use `Tag`. This page is deprecated in their favor.
 - For a value a person picked and can remove, use `Tag`; that is what `dismissible` here becomes.
 - For a set of tags, use `TagGroup` — it owns the gaps and the overflow.
 - To act on a status rather than show it, use `Button`.

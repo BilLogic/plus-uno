@@ -41,6 +41,7 @@ import {
   typedEmojiDecision,
 } from "../src/gate/reactions";
 import {
+  EXECUTION_CUTOFF_MS,
   PROPOSAL_TTL_MS,
   createInMemoryThreadState,
   type PendingProposal,
@@ -53,7 +54,8 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
-import { STALE_POST } from "../src/slack/gate-note";
+import { STALE_POST, renderGateNote } from "../src/slack/gate-note";
+import { verdictEvents } from "../src/usage/index";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
 
@@ -156,10 +158,60 @@ describe("four signals, one verdict", () => {
       );
     }
 
-    // Not "each looks right" but "all four are the same verdict".
+    // Not "each looks right" but "all four are the same verdict" — past the
+    // door it came through, which each one names for the record.
+    const { by: _first, ...first } = verdicts[0]!;
     for (const verdict of verdicts.slice(1)) {
-      assert.deepEqual(verdict, verdicts[0]);
+      const { by: _by, ...rest } = verdict;
+      assert.deepEqual(rest, first);
     }
+    assert.deepEqual(
+      verdicts.map((v) => v.by),
+      [
+        { door: "reaction", userId: "U2" },
+        { door: "button", userId: "U2" },
+        { door: "typed", userId: "U2" },
+        { door: "model" },
+      ],
+    );
+  });
+
+  it("leaves one confirmed event per door, naming the door and who confirmed", async () => {
+    // What the executor every door hands its verdict to records
+    // (`agent/resolve-proposal.ts`): the event is read off the verdict alone.
+    for (const door of DOORS) {
+      const verdict = await resolveSignal(door.signal, { threadState: await staged() });
+      const events = verdictEvents(verdict, 1_000);
+      const via = door.signal.kind;
+      const actor = door.signal.kind === "model" ? null : "U2";
+      assert.deepEqual(
+        events.map((e) => [e.proposalId, e.event, e.via, e.actorId, e.confirmedByOther]),
+        [[CARD_TS, "confirmed", via, actor, actor === null ? null : true]],
+        door.name,
+      );
+    }
+  });
+
+  it("leaves a cancelled event for a ⛔ on every door, and none for a lost race", async () => {
+    const cancels: GateSignal[] = [
+      reaction({ glyph: "no_entry" }),
+      button("cancel"),
+      typed("⛔"),
+      { kind: "model", pending: PROPOSAL, decision: "cancel", userId: "U1" },
+    ];
+    for (const signal of cancels) {
+      const verdict = await resolveSignal(signal, { threadState: await staged() });
+      assert.deepEqual(
+        verdictEvents(verdict, 1_000).map((e) => [e.event, e.via, e.confirmedByOther]),
+        [["cancelled", signal.kind, null]],
+        signal.kind,
+      );
+    }
+    const threadState = await staged();
+    await resolveSignal(reaction(), { threadState });
+    const lost = await resolveSignal(typed(), { threadState });
+    assert.equal(lost.outcome, "stale");
+    assert.deepEqual(verdictEvents(lost, 1_000), []);
   });
 
   it("carries the model's own words when it brought some", async () => {
@@ -238,7 +290,164 @@ describe("four signals, one verdict", () => {
   });
 });
 
+// A card may name who can confirm it. Every door is held to that set, and a
+// refused signal leaves the card exactly as it was for someone who may.
+describe("a card with a confirmer set", () => {
+  const OWNER = "U7";
+  const OUTSIDER = "U2";
+
+  async function stagedFor(confirmers: string[]): Promise<ThreadState> {
+    const store = createInMemoryThreadState();
+    await store.putProposal({ ...PROPOSAL, confirmers });
+    return store;
+  }
+
+  /** Each door, from one person. The model's signal names the turn's person. */
+  const doorsFrom = (userId: string): Array<{ name: string; signal: GateSignal }> => [
+    { name: "reaction on the card", signal: reaction({ userId }) },
+    { name: "the card's ✅ button", signal: { kind: "button", messageTs: CARD_TS, decision: "confirm", userId } },
+    { name: "the emoji typed alone", signal: { kind: "typed", channel: CHANNEL, thread: THREAD, text: "✅", userId } },
+    {
+      name: "the model's proposal_resolve",
+      signal: { kind: "model", pending: { ...PROPOSAL, confirmers: [OWNER] }, decision: "confirm", userId },
+    },
+  ];
+
+  it("refuses someone outside the set on every door, names who can, and leaves the card", async () => {
+    for (const door of doorsFrom(OUTSIDER)) {
+      const threadState = await stagedFor([OWNER]);
+      const verdict = await resolveSignal(door.signal, { threadState });
+      assert.equal(verdict.outcome, "none", door.name);
+      assert.equal(verdict.execute, undefined, door.name);
+      assert.deepEqual(
+        verdict.post,
+        { note: { kind: "not-a-confirmer", confirmers: [OWNER], userId: OUTSIDER }, replyTs: THREAD },
+        door.name,
+      );
+      assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found", door.name);
+    }
+  });
+
+  it("lets a listed confirmer win on every door", async () => {
+    for (const door of doorsFrom(OWNER)) {
+      const verdict = await resolveSignal(door.signal, { threadState: await stagedFor([OWNER]) });
+      assert.equal(verdict.outcome, "won", door.name);
+      assert.notEqual(verdict.execute, undefined, door.name);
+    }
+  });
+
+  it("refuses the model's signal when it does not say who is acting", async () => {
+    const pending = { ...PROPOSAL, confirmers: [OWNER] };
+    const threadState = await stagedFor([OWNER]);
+    const verdict = await resolveSignal({ kind: "model", pending, decision: "confirm" }, { threadState });
+    assert.equal(verdict.outcome, "none");
+    assert.deepEqual(verdict.post?.note, { kind: "not-a-confirmer", confirmers: [OWNER] });
+    assert.equal(await threadState.claimProposal(CARD_TS), true);
+  });
+
+  it("a refused ⛔ cancels nothing either", async () => {
+    const threadState = await stagedFor([OWNER]);
+    const verdict = await resolveSignal(reaction({ glyph: "no_entry", userId: OUTSIDER }), { threadState });
+    assert.equal(verdict.outcome, "none");
+    assert.equal(verdict.decision, "cancel");
+    assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
+  });
+
+  it("names the confirmers in Slack, and the person who was refused", () => {
+    assert.equal(
+      renderGateNote({ kind: "not-a-confirmer", confirmers: ["U0000007", "U0000008"], userId: "U0000002" }),
+      ":lock: <@U0000002> Only <@U0000007> or <@U0000008> can confirm or cancel this proposal — nothing was executed.",
+    );
+    assert.equal(
+      renderGateNote({ kind: "not-a-confirmer", confirmers: [] }),
+      ":lock: Nobody here can confirm or cancel this proposal — nothing was executed.",
+    );
+  });
+});
+
+// A card the Worker stages itself may say what a ⛔ still runs — the library
+// card files its intake either way. A turn's card never sets it, so a cancel
+// there still runs nothing (the describe above).
+describe("a card that names what a cancel still runs", () => {
+  const INTAKE = { toolName: "github_issue_create", input: { title: "Figma publish", body: "…" } };
+  const DISPATCH = { toolName: "component_implement", input: { component: "Badge" } };
+  const CARD: PendingProposal = {
+    ...PROPOSAL,
+    toolName: INTAKE.toolName,
+    input: INTAKE.input,
+    operations: [INTAKE, DISPATCH],
+    onCancel: [INTAKE],
+  };
+
+  async function stagedCard(): Promise<ThreadState> {
+    const store = createInMemoryThreadState();
+    await store.putProposal(CARD);
+    return store;
+  }
+
+  it("runs only those operations on a ⛔, on every door, and says so", async () => {
+    const cancels: Array<{ name: string; signal: GateSignal }> = [
+      { name: "reaction", signal: reaction({ glyph: "no_entry" }) },
+      { name: "button", signal: button("cancel") },
+      { name: "typed", signal: typed("⛔") },
+      { name: "model", signal: { kind: "model", pending: CARD, decision: "cancel" } },
+    ];
+    for (const door of cancels) {
+      const verdict = await resolveSignal(door.signal, { threadState: await stagedCard() });
+      assert.equal(verdict.outcome, "won", door.name);
+      assert.equal(verdict.decision, "cancel", door.name);
+      assert.deepEqual(verdict.execute?.operations, [INTAKE], door.name);
+      if (door.signal.kind !== "model") {
+        assert.deepEqual(
+          verdict.post?.note,
+          { kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"] },
+          door.name,
+        );
+      }
+    }
+  });
+
+  it("runs the whole batch on a ✅", async () => {
+    const verdict = await resolveSignal(button("confirm"), { threadState: await stagedCard() });
+    assert.deepEqual(verdict.execute?.operations, [INTAKE, DISPATCH]);
+  });
+
+  it("records the cancel's run as the execution, so a cut-off one offers back only it", async () => {
+    let clock = 1_000_000;
+    const threadState = createInMemoryThreadState({ now: () => clock });
+    await threadState.putProposal(CARD);
+    await resolveSignal(button("cancel"), { threadState });
+    clock += EXECUTION_CUTOFF_MS + 1;
+    const execution = await threadState.takeCutOffExecution(CARD_TS);
+    assert.ok(execution);
+    assert.deepEqual(execution.proposal.operations, [INTAKE]);
+    assert.equal(execution.proposal.onCancel, undefined);
+  });
+
+  it("says in Slack what the cancel still does", () => {
+    assert.equal(
+      renderGateNote({ kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"] }),
+      "Cancelled — this card still files an issue on a cancel, so that part goes ahead.",
+    );
+  });
+});
+
 describe("a card that is no longer there", () => {
+  it("tells a card with its own lifetime how long it was live", async () => {
+    const HOUR_MS = 60 * 60 * 1000;
+    let clock = 1_000_000;
+    const threadState = createInMemoryThreadState({ now: () => clock });
+    await threadState.putProposal({ ...PROPOSAL, ttlMs: 72 * HOUR_MS });
+    clock += 73 * HOUR_MS;
+
+    const verdict = await resolveSignal(reaction(), { threadState });
+    assert.equal(verdict.outcome, "stale");
+    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS });
+    assert.match(renderGateNote(verdict.post!.note), /It stayed live for 72 hours\./);
+    // And the default card still reads as the hour.
+    assert.match(renderGateNote({ kind: "expired" }), /It stayed live for an hour\./);
+  });
+
   it("reports an expired proposal as stale, in the expired wording", async () => {
     let clock = 1_000_000;
     const threadState = await staged({ at: () => clock });
@@ -573,6 +782,14 @@ describe("the reaction door", () => {
     ]);
   });
 
+  it("hands the executor a verdict that records the reactor's ✅ as the reaction's", async () => {
+    const { ran } = await drive();
+    assert.deepEqual(
+      verdictEvents(ran[0]!, 1_000).map((e) => [e.event, e.via, e.actorId, e.confirmedByOther]),
+      [["confirmed", "reaction", "U2", true]],
+    );
+  });
+
   it("settles the signal when the tool dies, and says so in the thread", async () => {
     // The failure this whole path fights: a ✅ that did nothing and said
     // nothing (live 2026-07-13). The door answers in the thread, and the
@@ -619,6 +836,19 @@ describe("the reaction door", () => {
     });
     assert.deepEqual(kindsOf(delivery), []);
     assert.deepEqual(ran, []);
+  });
+
+  it("answers a reaction from outside the confirmer set with who can confirm, and runs nothing", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal({ ...PROPOSAL, confirmers: ["U7"] });
+    const { delivery, ran } = await drive({ threadState, userId: "U2" });
+    assert.deepEqual(delivery.gateNotes, [{ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }]);
+    assert.equal(ran.some((v) => v.outcome === "won"), false);
+    assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
+
+    const owner = await drive({ threadState, userId: "U7" });
+    assert.deepEqual(owner.delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
+    assert.equal(owner.ran[0]?.outcome, "won");
   });
 });
 
@@ -717,6 +947,14 @@ describe("the button door", () => {
     ]);
   });
 
+  it("hands the executor a verdict that records the presser's ✅ as the button's", async () => {
+    const { ran } = await drive({ userId: "U1" });
+    assert.deepEqual(
+      verdictEvents(ran[0]!, 1_000).map((e) => [e.event, e.via, e.actorId, e.confirmedByOther]),
+      [["confirmed", "button", "U1", false]],
+    );
+  });
+
   it("answers a losing press where the person is looking, and raises nothing", async () => {
     // Expired, already resolved, or a press that lost the race. Never silence,
     // and never a working signal to strand either.
@@ -780,6 +1018,21 @@ describe("the button door", () => {
       ["working", "working-clear"],
     );
     assert.equal(delivery.calls.find((c) => c.kind === "working-clear")?.settlement, "idle");
+  });
+
+  it("answers a press from outside the confirmer set with who can confirm, and keeps the card", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal({ ...PROPOSAL, confirmers: ["U7"] });
+    const { ephemerals, replacements, ran } = await drive({ threadState, userId: "U2" });
+    assert.deepEqual(ephemerals, [
+      renderGateNote({ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }),
+    ]);
+    assert.deepEqual(ran, []);
+    assert.deepEqual(replacements, []);
+    assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
+
+    const owner = await drive({ threadState, userId: "U7" });
+    assert.equal(owner.ran[0]?.outcome, "won");
   });
 });
 

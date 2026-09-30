@@ -19,7 +19,7 @@
 // `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
 import { escapeSlackText } from "./mrkdwn";
-import type { CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
+import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
@@ -126,7 +126,8 @@ export function renderProposalCard(card: ProposalCard): RenderedCard {
   // fallback copy, and as what the button handler re-renders from. A
   // `prototype_scaffold` is a single operation, so there is no plan to lose.
   const blocks: unknown[] = [];
-  if (card.lead) blocks.push({ type: "section", text: { type: "mrkdwn", text: card.lead } });
+  const lead = cardLead(card);
+  if (lead) blocks.push({ type: "section", text: { type: "mrkdwn", text: lead } });
   blocks.push({
     type: "image",
     image_url: card.previewImageUrl,
@@ -145,15 +146,46 @@ function aboutTo(card: ProposalCard): string {
   return `:warning: About to *${card.verb}*:`;
 }
 
+/** The line a card opens with: the model's own reply, or else the Worker's
+ *  ask — above whatever note the Worker added, which is not a reply. */
+export function cardLead(card: ProposalCard): string | undefined {
+  if (!card.ask) return card.lead;
+  return card.lead ? `${askText(card.ask)}\n\n${card.lead}` : askText(card.ask);
+}
+
+/** The card's heading as posted — absent on a `revision` card, which has none. */
+export function cardHeading(card: ProposalCard): string | undefined {
+  return card.kind === "confirm" ? aboutTo(card) : undefined;
+}
+
+/** The Worker's ask, in words: where the ✅ writes, and a question. The names
+ *  come from a read, so they are escaped. */
+function askText(ask: CardAsk): string {
+  switch (ask.kind) {
+    case "file-issue":
+      return `I'll file this on ${escapeSlackText(ask.repo)} — want me to?`;
+    case "roadmap-intake":
+      return "I'll add this to the Roadmap as an intake — want me to?";
+    case "update-issue": {
+      const issues = ask.issues.map(escapeSlackText).join(", ");
+      if (ask.verb === "add") return `I'll add this to ${issues} — want me to?`;
+      return `I'll ${ask.verb} ${issues} — want me to?`;
+    }
+  }
+}
+
 /** The ⚠️ card every gated tool but `notion_update` gets. */
 function confirmText(card: ProposalCard): string {
   const lines: string[] = [];
-  if (card.lead) lines.push(card.lead, "");
+  const lead = cardLead(card);
+  if (lead) lines.push(lead, "");
   lines.push(aboutTo(card));
   // The resolved target above the raw params, so the approver of a write sees
   // the CONCRETE page it will touch, not just an opaque id.
   if (card.target) lines.push(`• *Target:* ${targetWords(card.target)}`);
-  lines.push(renderFields(card.fields));
+  // A card whose lead says everything — a Worker's card — has no parameter
+  // line to show.
+  if (card.fields.length || !lead) lines.push(renderFields(card.fields));
   for (const caveat of card.caveats) lines.push(caveatText(caveat));
   lines.push(CONFIRM_FOOTER);
   return lines.join("\n");
@@ -163,7 +195,8 @@ function confirmText(card: ProposalCard): string {
  *  lead, the named page and the `current → new` diff say it better. */
 function revisionText(card: ProposalCard): string {
   const lines: string[] = [];
-  if (card.lead) lines.push(card.lead, "");
+  const lead = cardLead(card);
+  if (lead) lines.push(lead, "");
   const body = card.revision ? revisionBody(card.revision) : "";
   if (body) lines.push(body);
   for (const caveat of card.caveats) lines.push(caveatText(caveat));
@@ -172,38 +205,43 @@ function revisionText(card: ProposalCard): string {
 }
 
 function targetWords(target: { title: string; parent?: string }): string {
-  return target.parent ? `${target.title} — in ${target.parent}` : target.title;
+  const title = escapeSlackText(target.title);
+  return target.parent ? `${title} — in ${escapeSlackText(target.parent)}` : title;
 }
 
 function revisionBody(revision: CardRevision): string {
   const lines: string[] = [];
   const { page } = revision;
+  // Every word below is the page's or the request's, so each is escaped: a
+  // title or value holding `<!channel>` is text on the card, never a ping.
+  const esc = escapeSlackText;
   if (page) {
     // Named + linked card — `<url|Title> — in <ParentDB>`, never a bare hex URL.
     lines.push(
       page.title
-        ? `*<${page.url}|${page.title}>*${page.parent ? ` — in ${page.parent}` : ""}`
+        ? `*<${page.url}|${esc(page.title)}>*${page.parent ? ` — in ${esc(page.parent)}` : ""}`
         : `*<${page.url}|this Notion page>*`,
     );
   }
   // One bullet per changed field, always — `current → new`, values backticked.
   for (const p of revision.properties) {
+    const label = esc(p.label);
     lines.push(
-      p.from ? `• *${p.label}:* \`${p.from}\` → \`${p.to}\`` : `• *${p.label}:* \`${p.to}\``,
+      p.from ? `• *${label}:* \`${esc(p.from)}\` → \`${esc(p.to)}\`` : `• *${label}:* \`${esc(p.to)}\``,
     );
   }
   if (revision.rewrite) {
     const { blocks, previews } = revision.rewrite;
     const head = `• *Rewriting ${blocks} block(s) in place* (the rest of the page is untouched).`;
     lines.push(
-      previews.length ? `${head}\n${previews.map((t) => `    ↳ _${t}_`).join("\n")}` : head,
+      previews.length ? `${head}\n${previews.map((t) => `    ↳ _${esc(t)}_`).join("\n")}` : head,
     );
   }
   if (revision.append) {
     const { headings } = revision.append;
     lines.push(
       headings.length
-        ? `• *Appending:* ${headings.map((h) => `_${h}_`).join(", ")}`
+        ? `• *Appending:* ${headings.map((h) => `_${esc(h)}_`).join(", ")}`
         : `• *Appending a note to the page.*`,
     );
   }
@@ -534,13 +572,23 @@ export function operationKinds(
   if (fields.length) {
     kinds.push({
       label: "set properties",
-      details: fields.map(([k, v]) => `${humanizeParamKey(k)} → \`${String(v)}\``),
+      details: fields.map(([k, v]) => `${escapeSlackText(humanizeParamKey(k))} → \`${escapeSlackText(String(v))}\``),
     });
   }
   const replaces = Array.isArray(op.input.replace)
     ? (op.input.replace.filter((r) => r && typeof r === "object") as Record<string, unknown>[])
     : [];
   if (replaces.length) kinds.push({ label: "replace in place", details: replaces.map(replaceGist) });
+  // The sweep's added answers: new text after a named block, nothing replaced.
+  const inserts = Array.isArray(op.input.insert)
+    ? (op.input.insert.filter((r) => r && typeof r === "object") as Record<string, unknown>[])
+    : [];
+  if (inserts.length) {
+    kinds.push({
+      label: "add after a block",
+      details: inserts.map(insertGist),
+    });
+  }
   const append = appendDetail(op.input.append);
   if (append) kinds.push({ label: "append", details: [append] });
   return kinds.length ? kinds : [{ label: kind, details: [] }];
@@ -574,13 +622,26 @@ function replaceGist(replace: Record<string, unknown>): string {
   };
   const before = pick("before", "current", "current_text", "block_text", "was");
   const blockId = pick("block_id", "blockId");
-  const after = firstLine(pick("content"));
+  // The page's words and the replacement's are text, never markup.
+  const after = escapeSlackText(firstLine(pick("content")));
   const from = before
-    ? `_${firstLine(before)}_`
+    ? `_${escapeSlackText(firstLine(before))}_`
     : blockId
       ? `block \`${blockId}\``
       : "_(the cited block)_";
   return after ? `${from} → _${after}_` : from;
+}
+
+/** An added answer, as text: its line, under its new heading when it opens a
+ *  section — never markup. */
+function insertGist(insert: Record<string, unknown>): string {
+  const lines = String(insert.content ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const heading = lines[0]?.startsWith("#") ? lines.shift()!.replace(/^#+\s*/, "") : "";
+  const line = `_${escapeSlackText(firstLine(lines[0] ?? ""))}_`;
+  return heading ? `new section *${escapeSlackText(firstLine(heading))}*: ${line}` : line;
 }
 
 function firstLine(text: string): string {
@@ -596,7 +657,7 @@ function appendDetail(append: unknown): string | null {
       s && typeof s === "object" ? String((s as Record<string, unknown>).heading ?? "").trim() : "",
     )
     .filter(Boolean);
-  if (headings.length) return headings.map((h) => `_${h}_`).join(", ");
+  if (headings.length) return headings.map((h) => `_${escapeSlackText(h)}_`).join(", ");
   if (typeof o.text === "string" && o.text.trim()) return "_a note on the page_";
   return null;
 }

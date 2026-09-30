@@ -5,24 +5,19 @@
 
 :root {
     /* Breakpoints */
-    /* Breakpoints */
     --breakpoint-md-min: 768px;
     --breakpoint-md-max: 1023.98px;
-    /* Up to Desktop Large start */
     --breakpoint-lg-min: 1024px;
-    /* Size=02 Desktop (Large) */
     --breakpoint-lg-max: 1439.98px;
     --breakpoint-xl-min: 1440px;
-    /* Size=01 Desktop HD (Extra large) */
     --breakpoint-xl-max: 1919.98px;
     --breakpoint-xxl-min: 1920px;
-    /* Assuming next generic step or keep open */
 
-    /* App shell + content grid (mirrors the Figma size/layout collection) */
-    --layout-sidebar-width: 164px; /* SideNav fixed width */
-    --layout-grid-gap: 8px; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */
+    /* App shell + content grid */
+    --layout-sidebar-width: 164px; /* SideNav fixed width; not a Figma variable (CODE_ONLY_LAYOUT) */
+    --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --size-element-gap-sm); col-* spans assume this */
 
-    /* Content-grid column spans — MD (768) values; LG/XL override below */
+    /* Content-grid column spans — MD values; wider breakpoints override below */
     --col-1: 48.67px;
     --col-2: 105.33px;
     --col-3: 162px;

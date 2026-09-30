@@ -16,19 +16,15 @@ Each color role has multiple variants:
 - `--color-on-{role}` - Content color on filled backgrounds
 - `--color-{role}-container` - Container/background version
 - `--color-{role}-state-08/12/16` - State layers for hover/active states
+- `--color-{role}-border-subtle` - The role at 45%: the pale border of an outlined label (Tag, date Status). Figma names it `{Role}/{Role} Border Subtle`, beside the 3:1 `{Role} Border` role, which is `--color-{role}-border`. Success, Warning, Danger, Tertiary and the five SMART hues have one; Info aliases Tertiary's, and Primary and Secondary have none, because no label uses them.
 
-**`-state-NN` names an overlay; it does not derive one.** The suffix reads as
-"`--color-{role}` at 8/12/16%", and for 84 of the 117 overlays that is what it
-is. For 33 of them — eleven bases × three steps — it is not: thirty are washed
-from a different colour than the role they name, and three — the shadow steps —
-name a role that has no token at all and are simply black. `--color-primary` is
-`#0472a8` and `--color-primary-state-08` is 8% of `#00658e`: the solid was
-re-picked in Figma without the wash following. Do not compute an overlay from
-its base, and do not assume a `-state-NN` token and its role share channels.
-The eleven bases are named in
-`design-system/tests/tokens-node.test.js`, which fails on a twelfth and on a
-base that gets re-mixed to agree; whether the solid or the wash is the intended
-colour is a visible design change and belongs to #268.
+**`-state-NN` is the role at 8/12/16%.** Each overlay is its role's solid at
+that alpha, matching the `State-layers` variables in Figma. The one exception is
+shadow: `--color-shadow-state-08/12/16` are black washes with no solid shadow
+role beside them. Still read the overlay token rather than computing it from
+the base, and if a wash ever stops matching its base, check the Figma variable
+before you choose a side. `design-system/tests/tokens-node.test.js` fails on
+any new divergence.
 
 ## Accent Colors
 
@@ -92,3 +88,11 @@ Use state layer tokens for interactive states:
 2. **Use state layers for interaction** - Never hardcode hover/active colors
 3. **Use `-container` for backgrounds** - Container tokens for subtle background fills
 4. **Info equals Tertiary** - Info colors are aliases to Tertiary tokens
+
+### Exception: grey team avatars
+
+A grey Tag of type `team` fills its avatar with
+`--color-technology-tools-state-08` at rest, against rule 3 and the intent of
+rule 2. The Figma set binds that variable on every team variant: an 08 wash is
+paler than any Container, so a grey team never reads as a person's neutral
+disc. The avatar is never interactive, so no hover layer stacks on it.

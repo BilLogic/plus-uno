@@ -108,12 +108,13 @@ export async function updateGithubIssue(
   if (update.comment) {
     const text = update.comment;
     steps.push(["comment", async () => {
+      // A private place's link is never fetched: the repo may be public.
+      const privatePlace = await deps.requestedPrivately();
       const [requester, permalink] = await Promise.all([
         deps.requesterName(),
-        // A DM's link is never fetched: the repo may be public and a DM stays a DM.
-        deps.requestedInDm ? null : deps.threadPermalink(),
+        privatePlace ? null : deps.threadPermalink(),
       ]);
-      commentUrl = (await github.comment(update.issue, renderCommentBody(text, { requester, permalink, dm: deps.requestedInDm }))).url;
+      commentUrl = (await github.comment(update.issue, renderCommentBody(text, { requester, permalink, privatePlace }))).url;
     }]);
   }
   if (addLabels.length) steps.push([`add ${codeList(addLabels)}`, () => github.addLabels(update.issue, addLabels)]);

@@ -93,14 +93,17 @@
     "--color-border",
     "--color-error",
     "--color-error-container",
-    "--color-mastering-content-state-28",
     "--color-muted",
     "--color-neutral-container",
+    "--color-neutral-text",
     "--color-on-background",
     "--color-on-error-container",
     "--color-on-surface-variant-2",
     "--color-on-surface-variant-3",
     "--color-on-surface-variant-light",
-    "--color-progress-ring-fill"
+    "--color-primary-state-04",
+    "--color-progress-ring-fill",
+    "--color-surface-container-active",
+    "--color-surface-container-hover"
   ]
 }

@@ -14,12 +14,23 @@ compatibility_flags = ["nodejs_compat"]
 enabled = true
 head_sampling_rate = 1
 
-# Figma library poll (src/figma-poll.ts) — every 15 min during work hours
-# (Mon–Fri, 13:00–23:45 UTC = 9am–7:45pm ET), the SAME cadence the retired
-# figma-library-poll.yml GitHub Action ran on before it was removed (2026-07-09,
-# PR #38). Detects DS publishes, files a PRD, posts the update card to #uno-bot.
-# Scheduled invocations get a fresh subrequest budget + a 15-min wall clock, so
-# the poll never competes with an agent turn. Manual firing: GET /debug/figma-poll.
+# Every 15 min during work hours (Mon–Fri, 13:00–23:45 UTC). The trigger
+# anchors the two SCHEDULED RUNS (src/scheduled/runs.ts); no cron is added for
+# them — the free plan caps an account at 5 cron triggers — so the handler
+# reads each firing's scheduled time in ET and only the two :00 slots do
+# anything:
+#   • 10:00 ET → the morning run     (14:00 UTC in EDT, 15:00 UTC in EST)
+#   • 18:00 ET → the end-of-day run  (22:00 UTC in EDT, 23:00 UTC in EST)
+# Every other firing is a no-op, so each run is once a day all year. The Figma
+# library poll used to run on every firing; it is now the end-of-day run's
+# `figma-library-poll` job, and its
+# findings post in #plus-universal at the next morning run
+# (src/figma-poll.ts, src/figma-library/). Manual poll: GET /debug/figma-poll.
+# Budget: the handler only ENQUEUES the run on its own AgentRunner instance (one
+# DO hop, inside the ~10ms scheduled CPU limit). The runner then runs ONE job
+# per alarm, each on a fresh 50-subrequest budget with lookups under the
+# ceiling (ADR-022, LOOKUP_CEILING = 38); a job the ceiling cuts short keeps its
+# place and retries. Dry run: GET /debug/sweep?dry_run=1&run=morning|end-of-day.
 [triggers]
 crons = ["*/15 13-23 * * 1-5"]
 
@@ -186,20 +197,41 @@ BLUEPRINT_APP_URL = "https://plus-uno.netlify.app/blueprint"
 # search that returned nothing — which is how it denied the Wrap-Up
 # `Future (roadmap)` path that had been indexed since 2026-08-08.
 BLUEPRINT_INDEX = "off"
-# ── Figma library poll (the [triggers] cron above) ──────────────────────────
+# ── Figma library jobs (the scheduled runs on the [triggers] cron above) ────
 # DS design-system Figma file key — non-secret (it's the path segment of every
-# shared Figma URL; see design-system/figma/component-figma-links.md). The poll
-# diffs this file's components/versions against a KV snapshot (HARNESS_KV,
-# key "figma-poll:snapshot"). Leave blank to disable the poll.
+# shared Figma URL; see design-system/figma/component-figma-links.md). The
+# end-of-day poll diffs this file's components/versions against a KV snapshot
+# (HARNESS_KV, key "figma-poll:snapshot"). Leave blank to disable the poll.
 FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
-# #uno-bot channel id — the poll's "🎨 Figma Design System Updated" card lands
-# here (docs/connectors/slack.md: docs saying "#figma-sync" mean this channel).
-# Leave blank → the poll still diffs + files the PRD but skips the Slack post.
+# #plus-universal channel id (private; uno-bot is a member) — the design-ops
+# team's channel. The morning run posts each library publish here as one card
+# (drafted intake + implementation), and its members are who may confirm it.
+# Leave blank → the findings wait in KV and nothing is posted.
+PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
+# #uno-bot channel id — the intake channel (src/turn/intake-channel.ts): a
+# top-level post there engages with no @mention and becomes a drafted intake.
+# Nothing about the Figma library posts here any more. Leave blank → there is
+# no intake channel.
 UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # #plus-design channel id — reviewable artifacts (component_implement /
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
+# ── End-of-day sweep (src/sweep/) ────────────────────────────────────────────
+# The channels the end-of-day run reads for Notion drift, one job per channel:
+# comma-separated channel ids. THIS IS THE ONE LINE TO GROW — add a design
+# channel's id here once uno-bot is a member, and the next end-of-day run sweeps
+# it. Findings post at the next weekday morning run, in the thread the evidence
+# is in. #uno-bot is never swept whatever this says, and DMs are never read. A
+# private channel listed here is read only when it is ALSO on
+# SLACK_SEARCH_PRIVATE_ALLOWLIST below, and its findings stay in it (ADR-031).
+# The group DMs uno-bot is in are swept by one more end-of-day job while this
+# list is not blank, and their findings are posted back in them. Its cursors and
+# records live in USAGE_DB (migrations/usage/0002_sweep.sql); the findings wait
+# for the morning in HARNESS_KV under "sweep:findings:<channel>". Leave blank → nothing
+# is swept. Dry run: GET /debug/sweep?dry_run=1.
+#   plus-design C03FC8AS69K · plus-design-feedback C074QG2V7DJ (private)
+SWEEP_CHANNELS = "C03FC8AS69K,C074QG2V7DJ"
 # #plus-design-feedback channel id — shareout_post drops feedback bundles here
 # (distinct from the reviews channel above). Leave blank → shareout falls back
 # to the origin thread.
@@ -276,6 +308,19 @@ GEMINI_FALLBACK_MODEL = "gemini-3.7-flash"
 # haiku/opus tiers are fixed in src/agent/routing.ts). Optional — defaults to
 # "claude-sonnet-5".
 CLAUDE_MODEL = "claude-sonnet-5"
+# ── Usage record (src/usage/, ADR-030) ───────────────────────────────────────
+# Channels whose turns are flagged test traffic on the usage record, so they
+# never count toward adoption: #uno-bot-sandbox. Comma-separated channel ids.
+# Every /debug/* and /health/* route (the eval transport included) and a
+# greeting with no ask are test traffic without being listed here.
+#   uno-bot-sandbox C0B4QBWAUJU
+TEST_CHANNEL_IDS = "C0B4QBWAUJU"
+# The lead: a reply of theirs in an ask's thread, or a DM to them from the asker
+# on the same topic within 24 h, marks the ask escalated (src/usage/resolution.ts).
+# The end-of-day pass reads that DM half on the lead's OWN connected token
+# (/oauth/slack/start, ADR-020); unconnected, it records "none" instead.
+#   Bill U03FYQJRQHX
+LEAD_USER_ID = "U03FYQJRQHX"
 
 # Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
 # GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.
@@ -369,9 +414,24 @@ binding = "SLACK_OAUTH_KV"
 id = "aa0ba01735c545d1abe887bd81fc98aa"
 
 # KV — delivery-alert throttle, the Gemini explicit-cache memo, and the Figma
-# poll's component snapshot under "figma-poll:*" (src/figma-poll.ts). NOT a
+# library's state under "figma-poll:*": the component snapshot, the findings
+# waiting for the morning post, and the posted cards being tracked
+# (src/figma-poll.ts, src/figma-library/env.ts) — and the sweep's findings
+# waiting for the morning under "sweep:findings:*" (src/sweep/env.ts). NOT a
 # harness fallback: the harness is baked into the bundle and skills.ts serves
 # the compiled constant with zero KV access.
 [[kv_namespaces]]
 binding = "HARNESS_KV"
 id = "060347fa19cb41398dd516a8f7b8b21a"
+
+# D1 — the usage record: one row per turn (src/usage/, ADR-030), and the
+# end-of-day sweep's cursors, runs and items (src/sweep/). Its schema is
+# migrations/usage/, applied with `wrangler d1 migrations apply uno-bot-usage`
+# (`--local` for a dev database, `--remote` for this one) — migrations/README.md.
+# The Worker tolerates the binding being absent: turns are answered as before
+# and simply not recorded (src/usage/production.ts).
+[[d1_databases]]
+binding = "USAGE_DB"
+database_name = "uno-bot-usage"
+database_id = "484d3e97-11c3-4f20-9597-2f094f196014"
+migrations_dir = "migrations/usage"

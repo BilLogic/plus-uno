@@ -14,23 +14,24 @@
  *   the corpus   where tokens live, read once, aliases followed — and read
  *                THROUGH the one reader, which is the defect a first
  *                implementation of this module committed and this file guards.
- *   the family   which family a token name belongs to — and, since #644, the
- *                one place the colour family's naming promises MORE than its
- *                values keep: 33 of the 117 `-state-08/12/16` overlays are
- *                washes of a different colour than the role they are named
- *                after, and the eleven bases are pinned so a twelfth fails.
+ *   the family   which family a token name belongs to — and the one place
+ *                the color family's naming promises MORE than its
+ *                values keep: a `-state-08/12/16` overlay is a wash of the
+ *                role it is named after, except the three shadow steps, which
+ *                name a role that has no token. That one exception is pinned
+ *                so a second fails.
  *   equality     whether two values are the same value.
  *
  * The third is the one with teeth, in two directions:
  *
- *   WIDER than `parseColour`: two harness checks each carried their own colour
+ *   WIDER than `parseColour`: two harness checks each carried their own color
  *   key. #621 retired the fallback checks' rival; #622 retired the docs
  *   check's. Both are spelled below, so the parity stays a measurement against
  *   the implementations that were deleted rather than against the module
  *   agreeing with itself.
  *
  *   FINER than `normaliseColour`: alpha is part of this key and is not part of
- *   that one. Over the live corpus that is 315 token pairs, and the two tests
+ *   that one. Over the live corpus that is 357 token pairs, and the two tests
  *   under "finer than the normaliser" assert the difference directly and then
  *   pin the narrow reason today's output does not move — rather than asserting
  *   "output unchanged", which is a property of the fallback CAPTURE and not of
@@ -267,29 +268,25 @@ describe('the family map — one statement of which family a name is in', () => 
  *
  * `--color-{role}-state-08/12/16` reads like `--color-{role}` at 8/12/16%, and
  * `design-system/guidelines/foundations/color.md` presents it in the same table
- * as the other `--color-{role}-*` modifiers. For 84 of the 117 overlays it IS
- * that. For 33 of them — eleven bases × three steps — it is an 8/12/16% wash of
- * a DIFFERENT colour, because `_colors.scss` is generated from Figma and the
- * solid roles were re-picked at some point without the washes following:
- * `--color-primary` is `#0472a8`, and `--color-primary-state-08` is 8% of
- * `#00658e`. An implementer assumed the derivation during #592–#625 and took a
- * red test for it, which is what made this worth writing down.
+ * as the other `--color-{role}-*` modifiers. Until 2026-09-29 that held for 84
+ * of the 117 overlays only: for ten bases the solid had been re-picked in Figma
+ * and the washes in `_colors.scss` never followed (`--color-primary` was
+ * `#0472a8` while `--color-primary-state-08` was 8% of `#00658e`). An
+ * implementer assumed the derivation and took a red test for it, which is what
+ * made this worth writing down.
  *
- * WHY THE LIST IS PINNED RATHER THAN CORRECTED. Both are one-line changes and
- * only one of them is reversible. Re-mixing 33 overlays from their named bases
- * repaints hover, pressed and focus washes across the product — 113 stylesheets
- * under `design-system/src` reach for a `-state-08/12/16` token, 70 of them for
- * one of the eleven divergent bases — and it moves measurements that are already
- * recorded: `docs/evals/text-contrast-baseline.json` holds three entries whose
- * ground is `--color-primary-state-08` or `-12`, and the 315 alpha-only pairs
- * asserted further down this file are counted over these same live values, so a
- * re-mix is news there too. Which of the two halves is the intended colour is a
- * Figma question and a visible design change, so it is #268's and Bill's, not a
- * test's. What a test CAN do is make the divergence a recorded fact instead of a
- * trap: the eleven are named here, a twelfth fails, and a base that gets
- * re-mixed to agree fails too so the list cannot outlive the exception.
+ * THE FIGMA SIDE SETTLED IT. Read live from the BS4 Foundation library on
+ * 2026-09-29, every `State-layers/*` variable is its own group's solid at
+ * 8/12/16%, so the ten were re-mixed from their named bases. What is left is
+ * shadow: `--color-shadow-state-*` is black and there is no `--color-shadow`
+ * token for it to agree with. It stays pinned so that a new divergence fails,
+ * and so that minting `--color-shadow` some day has to come past this test.
+ *
+ * Do not re-open the list to get a run green. A wash that stops matching its
+ * base means one side moved without the other: read the Figma variable and
+ * decide which side is right.
  */
-describe('a state overlay is named after a base it is not always mixed from', () => {
+describe('a state overlay is mixed from the base it is named after', () => {
   /** Every `--color-*-state-08/12/16`, aliases resolved, with its named base. */
   const overlays = () => {
     const corpus = tokenCorpus();
@@ -308,35 +305,25 @@ describe('a state overlay is named after a base it is not always mixed from', ()
 
   /**
    * The exception, by BASE rather than by overlay: all three steps of a base
-   * diverge together, because they are three alphas over one colour.
+   * diverge together, because they are three alphas over one color.
    *
-   * `--color-shadow` is in the list for a different reason and is the one row
-   * that is not a drift — there is no `--color-shadow` token at all, and a
-   * shadow wash is black. It is recorded rather than special-cased so that
-   * minting `--color-shadow` some day has to come past this test.
+   * `--color-shadow` is the only row, and it is not a drift: there is no
+   * `--color-shadow` token at all, and a shadow wash is black. It is recorded
+   * rather than special-cased so that minting `--color-shadow` some day has to
+   * come past this test.
    */
   const KNOWN = {
-    '--color-primary': '#00658e',
-    '--color-primary-container': '#c7e7ff',
-    '--color-danger': '#be0c16',
-    '--color-warning': '#715c00',
-    '--color-social-emotional': '#7d5700',
-    '--color-social-emotional-container': '#ffdeaa',
-    '--color-mastering-content': '#7f3fb1',
-    '--color-outline': '#71787e',
-    '--color-outline-variant': '#c1c7ce',
-    '--color-on-surface-variant': '#41484d',
     '--color-shadow': '#000000',
   };
 
-  it('mixes 84 of the 117 overlays from the base their name points at', () => {
+  it('mixes 114 of the 117 overlays from the base their name points at', () => {
     const all = overlays();
     expect(all.length).toBe(117);
     const agree = all.filter((o) => o.mixed !== null && o.mixed === o.solid);
     expect(agree.length).toBe(117 - Object.keys(KNOWN).length * 3);
   });
 
-  it('diverges on exactly the eleven recorded bases, and mixes what is recorded', () => {
+  it('diverges on exactly the recorded base, and mixes what is recorded', () => {
     const found = {};
     for (const { base, mixed, solid } of overlays()) {
       if (mixed !== null && mixed === solid) continue;
@@ -430,11 +417,9 @@ describe('the colour key — every form the checks accept', () => {
 describe('the colour key is finer than the normaliser it replaces', () => {
   /*
    * ONE PAIR, NAMED. `--color-secondary-state-08` is the 8% overlay of the
-   * colour `--color-secondary-border` is; the old normaliser is `parseColour`
+   * color `--color-secondary-border` is; the old normaliser is `parseColour`
    * followed by `toHex`, and `toHex` drops alpha, so it calls them the same
-   * colour. (The state overlays are not all mixed from the base of their own
-   * name — `--color-primary-state-08` is an 8% `#00658e`, not an 8%
-   * `--color-primary` — which is its own finding and not this test's.)
+   * color.
    */
   it('calls a translucent overlay and its solid DIFFERENT, where the normaliser called them equal', () => {
     const corpus = tokenCorpus();
@@ -450,12 +435,17 @@ describe('the colour key is finer than the normaliser it replaces', () => {
 
   /*
    * AND HOW MANY OF THEM THERE ARE, counted rather than recalled: every
-   * unordered pair of live colour tokens the old normaliser could read, where
-   * it says equal and this key says unequal. 315 on 2026-09-18. The number is
-   * asserted rather than logged because a migrating caller's exposure is this
-   * number, and a drift in it is news either way.
+   * unordered pair of live color tokens the old normaliser could read, where
+   * it says equal and this key says unequal. 315 on 2026-09-18; 357 on
+   * 2026-09-29, when the ten `-border-subtle` label borders added 45% washes of
+   * bases already in the corpus; 405 the same day, when ten state-layer bases
+   * were re-mixed from their Figma solids and their washes joined those
+   * channels; 411 when `--color-focus-ring-inverse` arrived as another solid
+   * #f9f9fc and paired with the six surface overlays. The number is asserted
+   * rather than logged because a migrating caller's exposure is this number,
+   * and a drift in it is news either way.
    */
-  it('differs from the normaliser on 315 live token pairs', () => {
+  it('differs from the normaliser on 411 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normaliseColour(value) !== null);
@@ -468,31 +458,31 @@ describe('the colour key is finer than the normaliser it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(315);
+    expect(pairs).toBe(411);
   });
 
   /*
-   * WHY `check:colour-fallbacks` DID NOT MOVE WHEN #621 PUT IT ON THIS KEY —
-   * and it is a fact about the CAPTURE, not a property of the key, which is
-   * why it is pinned with its mechanism over the whole live corpus rather than
-   * asserted as "output unchanged".
+   * WHAT `check:colour-fallbacks` COMPARES WITH ALPHA — and it is a fact about
+   * the CAPTURE, not a property of the key, which is why it is pinned with its
+   * mechanism over the whole live corpus rather than asserted as "output
+   * unchanged".
    *
-   * THE MECHANISM, CORRECTED. `fallbackUsages` captures the fallback with
-   * `[^),]+`, which admits no comma and no `)`, and then requires the closing
-   * `)` of the `var()`. A whole `rgba()` fallback satisfies neither branch: the
-   * 25 sites writing `var(--color-x, rgba(4, 114, 168, 0.08))` are not captured
-   * with a truncated literal and are not counted incomparable — the regex does
-   * not match them AT ALL, so they never reach the audit in any form. (#620's
-   * docblock had the fragment `rgba(4` arriving in the incomparable count;
-   * measured here the fragment is never produced, and #621 corrected the
-   * docblock to match.)
+   * THE MECHANISM. `fallbackUsages` tries a whole color function —
+   * `rgba(…)`, `rgb(…)`, `hsla(…)`, commas and all — before the plain
+   * `[^),]+` literal. Until it did, the plain literal was the only branch: it
+   * admits no comma and no `)`, so a `var(--color-x, rgba(4, 114, 168, 0.08))`
+   * was not matched AT ALL — not captured, not counted incomparable, simply
+   * not seen. That is how every state-layer wash was written, so a re-mixed
+   * base left its washes stale and nothing said so.
    *
-   * So every colour comparison the check makes is opaque on both sides, and the
-   * 315 pairs above are all outside the compared set. The day the capture is
-   * widened to read a whole `rgba()` fallback, that stops being true, and this
-   * test is what says so.
+   * Measured over the live tree: 90 `var(--color-*, rgba(…))` sites across 20
+   * files, every one captured. 87 name a defined token and are compared with
+   * alpha on both sides; the other 3 name tokens that are defined nowhere,
+   * and are the check's undefined-token finding instead. All 87 agree,
+   * because the disagreeing washes were fixed when the capture widened, and
+   * the test asserts it: a stale wash here is a failure, not a recount.
    */
-  it('makes no live colour comparison with alpha on either side, because the capture refuses a whole rgba()', () => {
+  it('compares every live rgba() color fallback with its alpha, because the capture reads a whole color function', () => {
     const roots = ['design-system/src', '.storybook', 'prototypes'];
     const extensions = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
     const root = resolve('..');
@@ -503,12 +493,13 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       })),
     );
 
-    // The tree really does write `rgba()` fallbacks beside colour tokens — 25
-    // of them, which is the population this test is about.
-    const withRgba = sources.filter((s) =>
-      /var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/.test(s.text),
+    // The population this test is about: every wash written beside a color
+    // token. Counted per SITE, not per file.
+    const washes = sources.reduce(
+      (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
+      0,
     );
-    expect(withRgba.length).toBeGreaterThan(0);
+    expect(washes).toBe(90);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -518,23 +509,27 @@ describe('the colour key is finer than the normaliser it replaces', () => {
     );
     const usages = fallbackUsages(sources, { prefix: '--color-' });
 
-    // Not one of them is captured, in any form.
-    expect(usages.filter((use) => /rgba?\(/i.test(use.literal ?? ''))).toEqual([]);
+    // Every one of them is captured, whole.
+    const captured = usages.filter((use) => /^rgba\(/i.test(use.literal ?? ''));
+    expect(captured.length).toBe(washes);
 
-    // And every comparison the check does make is opaque on both sides. The
-    // count is asserted because a DROP in it is how a capture quietly stops
-    // reading fallbacks at all.
+    // And compared with alpha. The counts are asserted because a DROP in
+    // either is how a capture quietly stops reading fallbacks at all. A new
+    // stylesheet whose fallbacks agree with their tokens raises them.
     let comparable = 0;
+    let withAlpha = 0;
     for (const use of usages) {
       if (use.literal === null || !tokens.has(use.token)) continue;
       const literal = colourKey(use.literal);
       const tokenValue = colourKey(tokens.get(use.token));
       if (literal === null || tokenValue === null) continue;
       comparable += 1;
-      expect(literal.length, `${use.literal} carries alpha`).toBe(7);
-      expect(tokenValue.length, `${use.token} carries alpha`).toBe(7);
+      if (literal.length !== 9 && tokenValue.length !== 9) continue;
+      withAlpha += 1;
+      expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
     }
-    expect(comparable).toBe(475);
+    expect(withAlpha).toBe(87);
+    expect(comparable).toBe(646);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

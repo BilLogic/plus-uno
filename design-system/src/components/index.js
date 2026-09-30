@@ -3,8 +3,8 @@ import '../styles/main.scss';
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
 export { default as Alert } from '@/components/messaging/Alert';
 export { default as Badge } from '@/components/status-and-loading/Badge';
-// #276's Badge. A separate export through the deprecation period: 84 call sites
-// pass `size`, which that API removes. See BadgeVariants.jsx for why.
+// Deprecated, beside Badge: a thin wrapper that renders Status, Count and Tag
+// while its calls move. See BadgeVariants.jsx.
 export { default as BadgeVariants } from '@/components/status-and-loading/BadgeVariants';
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 
@@ -12,7 +12,9 @@ export { default as Button } from '@/components/actions/Button';
 export { default as ButtonGroup } from '@/components/actions/ButtonGroup';
 export { default as Card } from '@/components/layout-and-structure/Card';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
+export { default as CloseButton } from '@/components/actions/CloseButton';
 export { default as Collapse } from '@/components/layout-and-structure/Collapse';
+export { default as Count } from '@/components/status-and-loading/Count';
 export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Dropdown } from '@/components/forms-and-inputs/Dropdown';
 export { default as Footer } from '@/components/_internal/Footer/Footer';
@@ -35,12 +37,18 @@ export { default as Scrollspy } from '@/components/navigation/Scrollspy';
 export { default as Sidebar } from './_internal/Sidebar/Sidebar';
 export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 
+export { default as Skeleton } from '@/components/status-and-loading/Skeleton';
 export { default as Spinner } from '@/components/status-and-loading/Spinner';
+export { default as Status } from '@/components/status-and-loading/Status';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 
+export { default as Suggestion } from '@/components/status-and-loading/Suggestion';
 export { default as Tag } from '@/components/status-and-loading/Tag';
+// The disabled state a field hands the tags it wraps in `TagContext.Provider`.
+export { TagContext, useTagContext } from '@/components/status-and-loading/Tag';
 export { default as TagGroup } from '@/components/status-and-loading/TagGroup';
 export { default as Table } from '@/components/_internal/Table';
+export { default as Tile } from '@/components/status-and-loading/Tile';
 export { default as Toast } from '@/components/messaging/Toast';
 export { default as Tooltip } from '@/components/overlays/Tooltip';
 export { default as UserAvatar } from '@/components/_internal/UserAvatar';

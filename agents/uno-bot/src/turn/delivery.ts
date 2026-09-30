@@ -106,6 +106,20 @@ export type CardCaveat =
       fromDm?: true;
     };
 
+/**
+ * The line an intake card leads with when the model staged it and wrote
+ * nothing: where the ✅ writes, and whether to. The live evals found the card
+ * alone in 27 of 28 staged turns on Gemini flash — correct, and saying nothing
+ * to the requester — so the Worker supplies the line the model skipped.
+ */
+export type CardAsk =
+  | { kind: "file-issue"; repo: string }
+  | { kind: "roadmap-intake" }
+  /** Each issue as `repo#number`, in the order the batch runs. `verb` is what
+   *  happens to them: `add` when every update is a comment alone, `close`
+   *  when every update is a close alone, `update` for anything else. */
+  | { kind: "update-issue"; verb: "add" | "close" | "update"; issues: string[] };
+
 /** Who can read a listed repo's issues; `unknown` when GitHub would not say,
  *  which the card words as "may be public". The same union as
  *  `RepoVisibility` in `integrations/github.ts`, restated so the turn imports
@@ -184,6 +198,15 @@ export interface ProposalCard {
   /** The model's own lead line, when it wrote one. Prose, so it passes
    *  through: this is the one thing on the card the turn did not decide. */
   lead?: string;
+  /** The Worker's own lead, set only when the model wrote none beside an
+   *  intake: which target the ✅ writes to, and a question. A meaning, so the
+   *  adapter spells and escapes it. */
+  ask?: CardAsk;
+  /** Who wrote the line the card opens with: the model's own reply, or the
+   *  Worker (its ask, its note, its PRD line). Absent when the card has no
+   *  lead. Not rendered — the eval envelope reports it, so a judge can tell a
+   *  model that followed the reply rule from a Worker that covered for it. */
+  leadBy?: "model" | "worker";
   /** The concrete page a write lands on, where a read resolved one. */
   target?: CardTarget;
   /** The diff, on a `revision` card. */
@@ -205,6 +228,10 @@ export interface ProposalCard {
    *  could be fetched. A URL, not a block: what Slack does with an image is
    *  the adapter's. */
   previewImageUrl?: string;
+  /** The Worker's own tag on the card's message, read back later to tell
+   *  what kind of card it is — a revised end-of-day sweep card carries the
+   *  sweep's (`sweep/cards.ts` `asSweepRevision`). */
+  tag?: { eventType: string; payload: Record<string, string> };
 }
 
 // ── What Gate's verdict says ─────────────────────────────────────────────────
@@ -222,15 +249,18 @@ export interface ProposalCard {
  * `slack/gate-note.ts` is where each becomes a line.
  */
 export type GateNote =
-  /** The claim was won and the signal brought no words of its own. */
-  | { kind: "resolved"; decision: "confirm" | "cancel" }
+  /** The claim was won and the signal brought no words of its own.
+   *  `stillRuns` names what a won ⛔ runs anyway, on a card that said a
+   *  cancel would (`PendingProposal.onCancel`). */
+  | { kind: "resolved"; decision: "confirm" | "cancel"; stillRuns?: string[] }
   /** The claim was won and the model said what it was doing. Prose, so it
    *  passes through — the same exemption `ProposalCard.lead` gets. */
   | { kind: "said"; text: string }
   /** The lost race: someone else's confirmation got there first. */
   | { kind: "already-resolved" }
-  /** A ✅ on a card that aged out of the store. */
-  | { kind: "expired" }
+  /** A ✅ on a card that aged out of the store. `ttlMs` is the card's own
+   *  lifetime when it set one; absent, it lived the default hour. */
+  | { kind: "expired"; ttlMs?: number }
   /** A ✅ on a card a revision replaced (#573). */
   | { kind: "superseded" }
   /** A reaction that landed somewhere other than the card it claims: say where
@@ -239,6 +269,10 @@ export type GateNote =
   /** A gate emoji typed outside any card's thread, in a DM holding several
    *  live cards: ask which one, and resolve none of them. */
   | { kind: "which-card"; count: number }
+  /** A signal from someone outside the card's confirmer set: resolve
+   *  nothing, and name who can. `userId` is who was refused, when the signal
+   *  carried one. */
+  | { kind: "not-a-confirmer"; confirmers: string[]; userId?: string }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string }
   /**
@@ -332,8 +366,9 @@ export interface Delivery {
   postAnswer(text: string): Promise<PostResult>;
 
   /** A note that is not an answer: a clarifying question, a cancellation, a
-   *  "you just cancelled that" bounce. No footer, no confidence pre-check. */
-  postNote(text: string): Promise<PostResult>;
+   *  "you just cancelled that" bounce. No footer, no confidence pre-check.
+   *  `tag` is the Worker's own tag on the message, as on a card. */
+  postNote(text: string, tag?: ProposalCard["tag"]): Promise<PostResult>;
 
   /**
    * Say what a gate signal came to.
@@ -383,7 +418,7 @@ export type DeliveryCall =
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string }
   | { kind: "answer"; text: string }
-  | { kind: "note"; text: string }
+  | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote }
   | { kind: "proposal"; card: ProposalCard }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string };
@@ -508,8 +543,8 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts: `answer-${calls.length}` };
     },
 
-    async postNote(text) {
-      calls.push({ kind: "note", text });
+    async postNote(text, tag) {
+      calls.push({ kind: "note", text, ...(tag ? { tag } : {}) });
       if (opts.noteFails) return { ok: false, text };
       posted.push(text);
       return { ok: true, text, ts: `note-${calls.length}` };
@@ -565,11 +600,18 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
 export function describeCard(card: ProposalCard): string {
   const parts = [`card(${card.kind}): ${card.verb}`];
   if (card.lead) parts.push(`lead: ${card.lead}`);
+  if (card.ask) parts.push(`ask: ${[card.ask.kind, ...askTargets(card.ask)].join(" ")}`);
   if (card.target) parts.push(`target: ${card.target.title}`);
   for (const field of card.fields) parts.push(describeField(field));
   for (const caveat of card.caveats) parts.push(`caveat: ${caveat.kind}`);
   if (card.operations.length > 1) parts.push(`${card.operations.length} operations`);
   return parts.join("\n");
+}
+
+function askTargets(ask: CardAsk): string[] {
+  if (ask.kind === "file-issue") return [ask.repo];
+  if (ask.kind === "update-issue") return [ask.verb, ...ask.issues];
+  return [];
 }
 
 function describeField(field: CardField): string {

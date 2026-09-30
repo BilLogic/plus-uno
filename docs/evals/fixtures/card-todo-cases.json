@@ -1,0 +1,59 @@
+{
+  "_readme": "Eval cases for the card to-do detector (agents/uno-bot/src/follow-through/todo.ts), scenario F3 of the Follow through job. Each case is one swept thread, the channel cursor its new messages come after, the detector reply recorded for it, and what the parse must keep. `recording.source` says whether the reply was authored or captured, as the turn recordings do. tests/card-todo-detector.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The shapes it must tell apart: a to-do to create a card (someone named, and nobody named) against a to-do that is not about a card, and talk about a card that already exists. Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
+  "cases": [
+    {
+      "id": "CT1",
+      "name": "a card to-do with an assignee: Bea asks Maya to create a card for the facelift's last stage",
+      "judgeNote": "Bea asks Maya, by mention, to create a Roadmap card. One to-do on Bea's message, Maya as assignee (she is mentioned in the thread), and the card's subject in a short noun phrase.",
+      "since": "1790690000.000000",
+      "thread": [
+        { "ts": "1790694000.000100", "user": "U0BEA", "text": "Facelift review notes are in the doc." },
+        { "ts": "1790694600.000200", "user": "U0BEA", "text": "<@U0MAYA> can you create a card for the facelift last stage?" }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "```json\n{\"todos\": [{\"message_ts\": \"1790694600.000200\", \"assignee\": \"U0MAYA\", \"what\": \"the facelift last stage\", \"confidence\": 0.9}]}\n```"
+      },
+      "expect": { "todos": [{ "messageTs": "1790694600.000200", "assignee": "U0MAYA", "what": "the facelift last stage" }] }
+    },
+    {
+      "id": "CT2",
+      "name": "a card to-do with nobody named: can someone make a card for this",
+      "judgeNote": "Ade asks the channel for a card with nobody named. One to-do, assignee null, so the owner falls to the thread's starter; the subject is what the thread is about.",
+      "since": "1790690000.000000",
+      "thread": [
+        { "ts": "1790694000.000100", "user": "U0ADE", "text": "The booking empty states still show the old illustration." },
+        { "ts": "1790694600.000200", "user": "U0ADE", "text": "can someone make a card for this?" }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "{\"todos\": [{\"message_ts\": \"1790694600.000200\", \"assignee\": null, \"what\": \"the booking empty state illustration\", \"confidence\": 0.85}]}"
+      },
+      "expect": { "todos": [{ "messageTs": "1790694600.000200", "assignee": null, "what": "the booking empty state illustration" }] }
+    },
+    {
+      "id": "CT3",
+      "name": "a to-do that is not about a card: Maya will add the specs to the existing card's PRD",
+      "judgeNote": "Maya takes on a task that mentions a card, but the task is updating a PRD, not creating a card. That is a promise for commitment reminders, not a card to-do: nothing is kept.",
+      "since": "1790690000.000000",
+      "thread": [
+        { "ts": "1790694000.000100", "user": "U0BEA", "text": "Dev is asking for the spacing specs on the facelift." },
+        { "ts": "1790694600.000200", "user": "U0MAYA", "text": "I'll add the spacing specs to the PRD on the facelift card by Thu." }
+      ],
+      "recording": { "source": "authored", "reply": "{\"todos\": []}" },
+      "expect": { "todos": [] }
+    },
+    {
+      "id": "CT4",
+      "name": "talk about a card that exists: the card is open and in WIP",
+      "judgeNote": "Bea reports that the card already exists and was moved. No new card is asked for: nothing is kept, even though card words are there.",
+      "since": "1790690000.000000",
+      "thread": [
+        { "ts": "1790694000.000100", "user": "U0ADE", "text": "Is anyone tracking the tutor filters work?" },
+        { "ts": "1790694600.000200", "user": "U0BEA", "text": "Yes, I opened the card last week and put it in WIP." }
+      ],
+      "recording": { "source": "authored", "reply": "{\"todos\": []}" },
+      "expect": { "todos": [] }
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+/*
+ * Status — the condition something is in.
+ *
+ * THE BOX. Medium is 20 tall (B3 12, icon 12, radius 4); large is 32 (B2 14
+ * semibold, icon 16, radius 6). The two heights have no semantic token yet
+ * (label heights 16/20/22/32 are a token follow-up), so they are local custom
+ * properties set from `_label-heights.scss`, which Skeleton reads too.
+ *
+ * THE PADDING, AS FIGMA BUILDS IT. The label and icon sit in an inner wrapper
+ * (`__content`) whose right padding, added to the outer right padding, makes
+ * the label's right inset equal its left one: 4 in medium, 12 in large. A
+ * nested count is the outer box's last child, so it sits at the outer right
+ * padding — 2 in medium, 6 in large — which, centered in the height, is the
+ * same inset from the top. The 2 and 6 have no Element token, so they take the
+ * spacing primitives Figma binds; the 6 radius is the radius-150 primitive for
+ * the same reason.
+ *
+ * THE BORDER IS AN INSET SHADOW. A 1px inside border that takes no layout, as
+ * a Figma inside stroke does, so the height and the padding stay exact.
+ */
+@use '../label-heights' as label;
+
+.plus-status {
+    --plus-status-height: #{label.$status-height};
+    --plus-status-icon-box: 20px;
+
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    box-sizing: border-box;
+    height: var(--plus-status-height);
+    min-width: 0;
+    /* The cap from `maxWidth` (200 by default), never wider than the container. */
+    max-width: min(var(--plus-status-max, 200px), 100%);
+    margin: 0;
+    padding: 0 var(--size-spacing-small-space-025, 2px) 0 var(--size-element-pad-x-xs, 4px);
+    gap: var(--size-spacing-small-space-025, 2px);
+    border-radius: var(--size-element-radius-md, 4px);
+    vertical-align: middle;
+    white-space: nowrap;
+    box-shadow: inset 0 0 0 var(--size-element-stroke-sm, 1px) var(--plus-status-edge);
+}
+
+.plus-status__content {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    padding-right: var(--size-spacing-small-space-025, 2px);
+    gap: var(--size-element-gap-xs, 4px);
+}
+
+.plus-status--large {
+    --plus-status-height: #{label.$status-height-large};
+    --plus-status-icon-box: 22px;
+
+    padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--size-element-pad-x-md, 12px);
+    gap: 0;
+    border-radius: var(--size-border-radius-radius-150, 6px);
+
+    .plus-status__content {
+        padding-right: var(--size-spacing-small-space-075, 6px);
+        gap: var(--size-spacing-small-space-075, 6px);
+    }
+
+    .plus-status__label {
+        font-weight: var(--font-weight-body2-semibold, 400);
+    }
+}
+
+.plus-status__visual {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    height: var(--plus-status-icon-box);
+
+    > i {
+        font-size: var(--font-size-fa-body2, 0.75rem);
+        line-height: 1;
+    }
+}
+
+.plus-status--large .plus-status__visual > i {
+    font-size: var(--font-size-fa-h5, 1rem);
+}
+
+/*
+ * Past `maxWidth` the label ends in an ellipsis; the full text is a tooltip.
+ * The weight is pinned: `.body3-txt` sets none, so a Status inside a `th` or a
+ * heading would otherwise inherit bold. Large overrides it below.
+ */
+.plus-status__label {
+    min-width: 0;
+    font-weight: var(--font-weight-body3-regular, 300);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+ * The color map: [fill, text, inside border] per style for `state`.
+ *
+ * fill    the style's 08 state layer; neutral is surface-container.
+ * text    the style's (Text) color; neutral is on-surface-variant.
+ * border  the style's 16 state layer.
+ * Info is Tertiary and discovery is the curriculum palette's purple, the same
+ * mapping Count and Tag use.
+ */
+$status-state: (
+    'neutral': (var(--color-surface-container, #edeef0), var(--color-on-surface-variant, #3f484a), var(--color-on-surface-variant-state-16, rgba(63, 72, 74, 0.16))),
+    'success': (var(--color-success-state-08, rgba(62, 105, 26, 0.08)), var(--color-success-text, #2c5609), var(--color-success-state-16, rgba(62, 105, 26, 0.16))),
+    'warning': (var(--color-warning-state-08, rgba(159, 130, 5, 0.08)), var(--color-warning-text, #5b4a00), var(--color-warning-state-16, rgba(159, 130, 5, 0.16))),
+    'danger': (var(--color-danger-state-08, rgba(186, 26, 26, 0.08)), var(--color-danger-text, #9b0606), var(--color-danger-state-16, rgba(186, 26, 26, 0.16))),
+    'info': (var(--color-info-state-08, rgba(14, 129, 117, 0.08)), var(--color-info-text, #005a50), var(--color-info-state-16, rgba(14, 129, 117, 0.16))),
+    'discovery': (var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)), var(--color-mastering-content-text, #673a8b), var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.16))),
+);
+
+/*
+ * `date` is outlined: no fill, [text, border] per style. The border is
+ * outline-variant for neutral and the style's Border Subtle (the hue at 45%)
+ * for warning and danger, the border every outlined label uses.
+ */
+$status-date: (
+    'neutral': (var(--color-on-surface-variant, #3f484a), var(--color-outline-variant, #bec8ca)),
+    'warning': (var(--color-warning-text, #5b4a00), var(--color-warning-border-subtle, rgba(159, 130, 5, 0.45))),
+    'danger': (var(--color-danger-text, #9b0606), var(--color-danger-border-subtle, rgba(186, 26, 26, 0.45))),
+);
+
+@each $name, $look in $status-state {
+    .plus-status--state.plus-status--#{$name} {
+        --plus-status-edge: #{nth($look, 3)};
+
+        background-color: nth($look, 1);
+        color: nth($look, 2);
+    }
+}
+
+@each $name, $look in $status-date {
+    .plus-status--date.plus-status--#{$name} {
+        --plus-status-edge: #{nth($look, 2)};
+
+        background-color: transparent;
+        color: nth($look, 1);
+    }
+}
+
+/* Focusable only while truncated, as the tooltip's trigger. */
+.plus-status:focus-visible {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+}
+
+/* Forced colors drop box-shadows; a real border keeps the edge. */
+@media (forced-colors: active) {
+    .plus-status {
+        border: var(--size-element-stroke-sm, 1px) solid CanvasText;
+    }
+}

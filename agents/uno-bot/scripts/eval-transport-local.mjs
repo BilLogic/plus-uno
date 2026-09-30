@@ -246,7 +246,7 @@ export function ensureTestBuild({ pkg = PKG, log = console.log } = {}) {
  *  `module.exports`. */
 async function loadModules(buildDir = BUILD_DIR) {
   const load = async (rel) => (await import(pathToFileURL(join(buildDir, rel)).href)).default;
-  const [turn, evalCase, threadState, loop, fake, conversation, geminiTiers, proposalRender, gateNote] =
+  const [turn, evalCase, threadState, loop, fake, conversation, geminiTiers, proposalRender, gateNote, usage] =
     await Promise.all([
       load("src/turn/index.js"),
       load("src/eval/turn-case.js"),
@@ -257,6 +257,7 @@ async function loadModules(buildDir = BUILD_DIR) {
       load("src/agent/gemini-tiers.js"),
       load("src/slack/proposal-render.js"),
       load("src/slack/gate-note.js"),
+      load("src/usage/index.js"),
     ]);
   return {
     turn,
@@ -268,6 +269,7 @@ async function loadModules(buildDir = BUILD_DIR) {
     geminiTiers,
     proposalRender,
     gateNote,
+    usage,
   };
 }
 
@@ -382,6 +384,7 @@ export function localTransport({
           geminiTiers,
           proposalRender,
           gateNote,
+          usage,
         } = modules;
 
         const index = turnIndexOf(history);
@@ -530,6 +533,10 @@ export function localTransport({
           },
 
           describeAssistantContext: () => null,
+
+          // The Worker's eval route records its turns as test traffic; with no
+          // database here, the record is kept in memory and dropped with the run.
+          usage: { log: usage.createInMemoryUsageLog(), origin: "debug", testChannelIds: [] },
         });
 
         return evalCase.evalTurnResponse({

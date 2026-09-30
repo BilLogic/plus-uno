@@ -657,6 +657,28 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
       }
     },
+    "CloseButton": {
+      "code": {
+        "import": "@/components/actions",
+        "export": "default",
+        "mdxPath": "design-system/src/components/actions/CloseButton/CloseButton.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/CloseButton"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "close-button",
+            "name": "Close button",
+            "componentSetNodeId": "17827:827",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827"
+      }
+    },
     "Collapse": {
       "code": {
         "import": "@/components/layout-and-structure",
@@ -677,6 +699,62 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499"
+      }
+    },
+    "Count": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Count/Count.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Count",
+        "props": {
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "subtle",
+              "bold",
+              "inverse",
+              "dot"
+            ]
+          },
+          "style": {
+            "type": "enum",
+            "values": [
+              "neutral",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "discovery"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "medium",
+              "small"
+            ]
+          },
+          "ring": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "count",
+            "name": "Count",
+            "componentSetNodeId": "17876:46653",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Status, Count & Tag page, beside the Counter set it replaces. Figma values carry a (default) suffix on subtle, neutral and medium; ring? is ring in code. Inverse exists in neutral only, and dot in medium only. Docs page: node 17883:1895."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895"
       }
     },
     "DateAndTimePicker": {
@@ -1690,6 +1768,55 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120"
       }
     },
+    "Skeleton": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Skeleton",
+        "props": {
+          "shape": {
+            "type": "enum",
+            "values": [
+              "rect",
+              "circle",
+              "text"
+            ]
+          },
+          "preset": {
+            "type": "enum",
+            "values": [
+              "status",
+              "status-spacious",
+              "count",
+              "tag",
+              "tag-person",
+              "tag-group",
+              "paragraph"
+            ]
+          },
+          "isShimmering": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "skeleton",
+            "name": "Skeleton",
+            "componentSetNodeId": "17878:1851",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1851",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code splits it into shape and preset. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731"
+      }
+    },
     "SmartBadges": {
       "code": {
         "import": "@/specs/Universal/Elements/SmartBadges/SmartBadges",
@@ -1780,6 +1907,96 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
+      }
+    },
+    "Status": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Status/Status.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Status",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "state",
+              "date"
+            ]
+          },
+          "style": {
+            "type": "enum",
+            "values": [
+              "neutral",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "discovery"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "medium",
+              "large"
+            ]
+          },
+          "leadingVisual": {
+            "type": "boolean"
+          },
+          "count": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "status",
+            "name": "Status",
+            "componentSetNodeId": "17876:1653",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Status, Count & Tag page, beside the Static Badges it replaces. Figma values carry a (default) suffix on state, neutral and medium. leadingVisual? and count? are booleans in Figma; in code leadingVisual takes the icon and count takes the number. Figma's label text is children. Date exists in neutral, warning and danger only. Docs page: node 17882:1647."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647"
+      }
+    },
+    "Suggestion": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Suggestion/Suggestion.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Suggestion",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "insert",
+              "prompt"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "suggestion",
+            "name": "Suggestion",
+            "componentSetNodeId": "17878:1769",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's or TagGroup's TagContext, never a prop."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
       }
     },
     "Switch": {
@@ -1938,13 +2155,13 @@
         "mdxPath": "design-system/src/components/status-and-loading/Tag/Tag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag",
         "props": {
-          "variant": {
+          "behavior": {
             "type": "enum",
             "values": [
               "read-only",
-              "dismissible",
+              "removable",
               "selectable",
-              "operational"
+              "link"
             ]
           },
           "color": {
@@ -1955,14 +2172,26 @@
               "green",
               "purple",
               "magenta",
-              "orange",
+              "yellow",
               "teal"
+            ]
+          },
+          "type": {
+            "type": "enum",
+            "values": [
+              "plain",
+              "person",
+              "agent",
+              "team"
             ]
           },
           "isSelected": {
             "type": "boolean"
           },
           "isLoading": {
+            "type": "boolean"
+          },
+          "isElevated": {
             "type": "boolean"
           }
         }
@@ -1973,19 +2202,72 @@
           {
             "id": "tag",
             "name": "Tag",
-            "componentSetNodeId": "17558:1218",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218",
+            "componentSetNodeId": "17877:47506",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17877-47506",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
             "variantProps": {
-              "variant": "trailing + selected",
-              "isSelected": "selected"
+              "isSelected": "selected",
+              "isLoading": "state=saving",
+              "isElevated": "elevated"
             },
-            "notes": "Created 2026-08-29 on the Badge page, BESIDE Dismissible Badges rather than instead of it (#276, #339 finding 2). The code's `variant` axis does not map one-to-one: read-only and operational are both trailing=none/selected=false, dismissible is trailing=dismiss, selectable is the selected axis — three of the four look identical at rest. Published: all 28 variants (7 colours × trailing × selected) present in the 2026-09-15 components snapshot."
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
+          },
+          {
+            "id": "remove-button",
+            "name": "Remove button",
+            "componentSetNodeId": "17827:846",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Button page. Tag uses size small (16, 12px ×); its states are the × inside a removable tag. Medium and large are not built in code yet."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
+      }
+    },
+    "TagGroup": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/TagGroup",
+        "props": {
+          "overflow": {
+            "type": "enum",
+            "values": [
+              "wrap",
+              "collapse"
+            ]
+          },
+          "alignment": {
+            "type": "enum",
+            "values": [
+              "left",
+              "right"
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "tag-group",
+            "name": "TagGroup",
+            "componentSetNodeId": "17878:1713",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
+          }
+        ]
       }
     },
     "Textarea": {
@@ -2065,6 +2347,77 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904"
+      }
+    },
+    "Tile": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Tile/Tile.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tile",
+        "props": {
+          "content": {
+            "type": "enum",
+            "values": [
+              "icon",
+              "logo",
+              "image"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "16",
+              "20",
+              "24",
+              "32",
+              "40",
+              "48"
+            ]
+          },
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "subtle",
+              "bold"
+            ]
+          },
+          "color": {
+            "type": "enum",
+            "values": [
+              "grey",
+              "blue",
+              "green",
+              "purple",
+              "magenta",
+              "yellow",
+              "teal",
+              "white"
+            ]
+          },
+          "hasBorder": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "tile",
+            "name": "Tile",
+            "componentSetNodeId": "17878:1928",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1928",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "variantProps": {
+              "hasBorder": "border?"
+            },
+            "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"grey (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for grey only, since the picture covers the ground."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17906-48560"
       }
     },
     "Toast": {

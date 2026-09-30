@@ -13,6 +13,7 @@ import {
   notionUpdate,
   normalizeName,
   parseNotionPageId,
+  type NotionBlockInsertion,
   type NotionBlockReplacement,
   type PrdSection,
 } from "../integrations/notion";
@@ -78,6 +79,26 @@ function parseReplace(v: unknown): NotionBlockReplacement[] | undefined {
   return ops.length ? ops : undefined;
 }
 
+/**
+ * `insert` as the Worker stages it for the sweep — the block to follow and its
+ * stamp, snake_case like `replace` — into the integration's shape. An entry
+ * missing either half is dropped, for the same reason a replace is.
+ */
+function parseInsert(v: unknown): NotionBlockInsertion[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const ops = v
+    .map((entry) => {
+      const o = (entry ?? {}) as Record<string, unknown>;
+      return {
+        afterBlockId: asString(o.after_block_id) || asString(o.afterBlockId),
+        lastEditedTime: asString(o.last_edited_time) || asString(o.lastEditedTime),
+        content: asString(o.content),
+      };
+    })
+    .filter((o) => o.afterBlockId && o.lastEditedTime && o.content);
+  return ops.length ? ops : undefined;
+}
+
 export async function executeNotionUpdate(
   env: Env,
   input: Record<string, unknown>,
@@ -99,8 +120,9 @@ export async function executeNotionUpdate(
       : undefined;
   const append = parseAppend(input.append);
   const replace = parseReplace(input.replace);
+  const insert = parseInsert(input.insert);
 
-  if ((!properties || !Object.keys(properties).length) && !append && !replace) {
+  if ((!properties || !Object.keys(properties).length) && !append && !replace && !insert) {
     return JSON.stringify({
       ok: false,
       error:
@@ -109,12 +131,13 @@ export async function executeNotionUpdate(
   }
 
   try {
-    const r = await notionUpdate(env, pageId, { properties, append, replace });
+    const r = await notionUpdate(env, pageId, { properties, append, replace, insert });
     const parts: string[] = [];
     // Name each concrete change with its NEW value codified, e.g.
     // "set *Dev Status* → `Ready for Dev`" — not a bare property name (2026-07-14).
     if (r.updated.length) parts.push(`set ${r.updated.map((u) => echoUpdatedField(u, properties)).join(", ")}`);
     if (r.replaced) parts.push(`replaced ${r.replaced} block(s)`);
+    if (r.inserted) parts.push(`added ${r.inserted} block(s)`);
     if (r.appended) parts.push(`appended ${r.appended} block(s)`);
     const skippedNote = r.skipped.length ? ` — couldn't set: ${r.skipped.join("; ")}` : "";
     // A refused replace is NOT a quiet no-op: the page still says what it said,
@@ -124,7 +147,7 @@ export async function executeNotionUpdate(
     // Nothing landed (every requested property was skipped): report a FAILURE,
     // never a quiet "no changes" — so the bot doesn't claim a move it didn't make
     // (live 2026-07-13: "Dev_Status" was skipped and the run read as done).
-    if (!r.updated.length && !r.appended && !r.replaced) {
+    if (!r.updated.length && !r.appended && !r.replaced && !r.inserted) {
       await postMessage(env, {
         channel: slack.channel,
         thread_ts: slack.threadTs,

@@ -4,12 +4,39 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as TagGroupStories from './TagGroup.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "overflow": {
+      "type": "enum",
+      "values": ["wrap", "collapse"]
+    },
+    "alignment": {
+      "type": "enum",
+      "values": ["left", "right"]
+    },
+    "disabled": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "tag-group",
+      "name": "TagGroup",
+      "componentSetNodeId": "17878:1713",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
+    }
+  ]
+};
+
 <Meta of={TagGroupStories} />
 
 <Title />
-A tag is a representation of a value that someone has picked; a tag group is
-the set of them. It owns what no single tag can decide — the gaps between them,
-and whether a long set wraps or collapses.
+A tag group is a set of tags, and the Suggestions offered beside them. It owns
+what no single tag can decide: the 8px gap between them, whether a long set
+wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 <DocsTabs of={TagGroupStories}>
 
@@ -25,7 +52,7 @@ and whether a long set wraps or collapses.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>The default. Tags flow onto as many lines as they need, and the set announces itself as a list.</>}>
+<DocsCanvasShell attachSourceBelow description={<>The default. Tags flow onto as many lines as they need, 8 apart in both directions, and the set announces itself as a list.</>}>
     <Canvas of={TagGroupStories.Wrapping} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -35,12 +62,56 @@ and whether a long set wraps or collapses.
 
 ## Overflow
 
-<DocsCanvasShell description={<>One line, with a <code>+n</code> that counts what is hidden. Pressing it reveals them — a count with no way to reach the values is worse than no count.</>}>
-    <DsCanvasQuiet of={TagGroupStories.Overflow} />
+<DocsCanvasShell description={<>One line: as many tags as fit, then a <code>+n</code> for the rest. The count follows the width of the container.</>}>
+    <DsCanvasQuiet of={TagGroupStories.Collapse} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressing <code>+n</code> opens a menu of the hidden tags. Enter or Space opens it, Tab reaches the tags, Escape closes it.</>}>
+    <DsCanvasQuiet of={TagGroupStories.CollapseMenu} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Suggestions are never counted into <code>+n</code> and never go into its menu. They stay on the row after <code>+n</code>, and the fit reserves their width before counting tags.</>}>
+    <DsCanvasQuiet of={TagGroupStories.CollapseWithSuggestions} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag is led by a checkbox, empty when off and checked and selected when on, and toggles in place; a link tag is a link with a trailing arrow; a tag still saving, whatever its behavior, is a disabled, busy row; and a read-only or removable tag is a static row with nothing to press. Remove stays on the row.</>}>
+    <DsCanvasQuiet of={TagGroupStories.MenuKeepsActions} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The <code>+n</code> is a grey selectable tag with no swatch, named by its label and count ("+3 more tags"): hover is the 08 state layer and pressed the 12.</>}>
+    <DsCanvasQuiet of={TagGroupStories.OverflowTag} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>maxVisible</code> caps the count even when more would fit.</>}>
+    <DsCanvasQuiet of={TagGroupStories.MaxVisible} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The cap never squeezes a tag: <code>maxVisible={'{0}'}</code> puts every tag behind <code>+n</code>, and a cap of 1 with room shows its tag whole.</>}>
+    <DsCanvasQuiet of={TagGroupStories.CapNeverSqueezes} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>A set short enough to fit shows no overflow tag at all.</>}>
     <DsCanvasQuiet of={TagGroupStories.NoOverflowWhenItFits} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alignment
+
+<DocsCanvasShell description={<><code>alignment="right"</code> lines every row, and the <code>+n</code> of a collapsed row, up on the right edge, for a right-aligned table column.</>}>
+    <DsCanvasQuiet of={TagGroupStories.AlignmentRight} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Disabled
+
+<DocsCanvasShell description={<><code>disabled</code> disables every Tag and Suggestion in the group, as a disabled field does: no ×, nothing to focus, nothing to press.</>}>
+    <DsCanvasQuiet of={TagGroupStories.Disabled} />
 </DocsCanvasShell>
 
 </div>
@@ -53,8 +124,12 @@ and whether a long set wraps or collapses.
     <DsCanvasQuiet of={TagGroupStories.ConditionalChildrenAreNotCounted} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A dismissible set: the group holds the gaps, the tags hold the values.</>}>
-    <DsCanvasQuiet of={TagGroupStories.DismissibleSet} />
+<DocsCanvasShell description={<>A removable set: the group holds the gaps, the tags hold the values.</>}>
+    <DsCanvasQuiet of={TagGroupStories.RemovableSet} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>onOverflowClick</code> replaces the menu, for opening a picker instead.</>}>
+    <DsCanvasQuiet of={TagGroupStories.CustomOverflowAction} />
 </DocsCanvasShell>
 
 </div>
@@ -89,9 +164,10 @@ and whether a long set wraps or collapses.
 
 Use `TagGroup` wherever more than one `Tag` appears together: the subjects on a
 profile, the filters above a table, the recipients on a message. It is the
-right wrapper even when the set is short, because the two decisions it owns —
-the spacing and the wrapping — are properties of the set rather than of any tag
-in it.
+right wrapper even when the set is short, because what it owns — the spacing,
+the wrapping, the alignment and the disabled state — belongs to the set rather
+than to any tag in it. Suggestions offered for the field go in the same group;
+they always sit at the end of the row, after the tags and `+n`.
 
 A single tag standing alone does not need it.
 
@@ -123,32 +199,60 @@ this sets `gap`, so there is nothing to undo and nothing to double up.
 </TagGroup>
 ```
 
-### `collapse` needs somewhere for the hidden tags to go.
+### Disable the group, not the tags.
 
-The default reveal expands the group in place. Replace it with
-`onOverflowClick` when the values belong somewhere else — a popover, a filter
-panel — but replacing it with a handler that only counts leaves the person
-told that values exist and unable to see them.
+A tag has no `disabled` prop. When the field is disabled, say so once on the
+group and every Tag and Suggestion in it follows.
 
 ```jsx
-// Incorrect — the overflow tag is now a dead end. It counts, it logs, and it
-// shows nobody the values it is counting.
-<TagGroup overflow="collapse" maxVisible={3} onOverflowClick={() => logEvent('overflow')}>
-  {subjects.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+// Incorrect — there is no disabled prop on Tag, so these stay live.
+<TagGroup label="Focus areas">
+  <Tag disabled color="blue">Fractions</Tag>
 </TagGroup>
 
-// Correct — either drop the handler and let it reveal in place, or send the
-// person somewhere they can look.
-<TagGroup overflow="collapse" maxVisible={3} onOverflowClick={openFilterPanel}>
-  {subjects.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+// Correct — the group passes it to every member.
+<TagGroup label="Focus areas" disabled={!canEdit}>
+  <Tag color="blue">Fractions</Tag>
+  <Suggestion label="Ratios" onAccept={add} />
 </TagGroup>
 ```
 
-### `maxVisible` counts tags, not pixels.
+### Collapse for a fixed-height spot.
 
-It slices the children, so a set of long labels can still overflow its line at
-`maxVisible={5}`. Pick the number against the labels the surface actually
-shows, not against the width of the container.
+`collapse` counts what fits by width, so it suits a table cell or a card
+header where a second line would break the layout. Give the group a width to
+fit into: a group that can grow shows everything. Use `maxVisible` only to show
+fewer than fit. The cap never squeezes a tag: `maxVisible={0}` puts every tag
+behind `+n`. Only a row too narrow for its first tag squeezes that tag.
+
+`+n` reserves room for the widest label it could show at its number of digits
+(`+88` when up to 99 tags are hidden), not for the label it shows now. That is
+what keeps the count steady as `+9` becomes `+10`, and it means a row can show
+one tag fewer than would squeeze in beside a narrower `+n`.
+
+Suggestions are offers, not values, so they are never hidden: they are not
+counted into `+n`, never appear in its menu, and always sit after it. Their
+width comes off the row before tags are counted, so a group with suggestions
+shows fewer tags, not fewer suggestions.
+
+A Suggestion is recognized by a marker on the component, so pass Suggestions
+as direct children of the group. A memoized Suggestion works as is; a wrapper
+component of your own must copy the marker
+(`MySuggestion.isSuggestion = Suggestion.isSuggestion`), or it is counted as a
+tag.
+
+In the menu, a hidden tag keeps what it does. A selectable tag toggles there,
+led by the Dropdown's multi-select checkbox: empty when off, checked and in the
+selected state when on, and the menu stays open so the change is seen. A link
+tag is a link there, to the same address, with a trailing arrow. A tag still
+saving, whatever its behavior, is a disabled, busy row that cannot be pressed.
+A read-only or removable tag is a static row that only says its words. Remove is only offered on the row, never from the
+menu.
+
+### Right-align for a right-aligned column.
+
+`alignment="right"` belongs in a table column whose other cells are
+right-aligned. Everywhere else, tags read from the left.
 
 </div>
 
@@ -165,12 +269,27 @@ shows, not against the width of the container.
 - **The items are wrapped, not rendered as `li`.** That is what keeps `Tag`
   usable on its own, outside any group, without it carrying list semantics it
   has no right to.
-- **The overflow tag is a real control.** It renders as an `operational` tag,
-  which is a `button`, so it is reachable by keyboard and activated by Enter
-  and Space without any handler of its own.
-- **`+n` is not a live region.** Revealing the hidden tags changes the list
-  silently. If the reveal is the point of the interaction, move focus into what
-  it revealed.
+- **Hidden tags leave the list.** A collapsed group's hidden tags are out of
+  sight, out of the tab order and out of the list's count until the menu shows
+  them.
+- **`+n`'s name starts with what it shows**, so a person who says the label
+  they see can press it: "+3 more tags", "+1 more tag" for one, and with a
+  custom `overflowLabel` the label then the count ("3 more, 3 more tags"). It
+  reports whether its menu is open. Enter or Space opens it, Tab reaches each
+  hidden tag that does something, and Escape closes it with focus back on
+  `+n`. A selectable tag in the menu is a toggle button that reports
+  `aria-pressed`, and its checkbox is decorative; a link tag is a real link,
+  whose arrow is decorative; a tag still saving, of any behavior, is a
+  disabled button with `aria-busy`, out of the tab order; a read-only or removable
+  tag is a static row, not a control and not in the tab order.
+- **Suggestions stay reachable.** They are never behind `+n`, so a keyboard
+  user reaches them on the row, after `+n`, without opening the menu.
+- **Disabled is announced per tag.** A selectable tag, a Suggestion and `+n`
+  are native disabled buttons, announced as disabled ("Selectable, toggle
+  button, dimmed" or the reader's equivalent). Every other tag is a plain span,
+  which has no disabled state a screen reader announces, so it carries
+  visually hidden text and is read as "Science, disabled". Nothing in a
+  disabled group takes focus.
 
 </div>
 
@@ -179,8 +298,8 @@ shows, not against the width of the container.
 ## Related
 
 - For one value rather than a set, use `Tag`.
+- For a value the system proposes, put a `Suggestion` in the group.
 - For a field where the person types values in and takes them out, use `TagInput`.
-- For system-generated data nobody can change, use `Badge`.
 - For a long set that needs paging rather than an overflow count, use `Pagination`.
 
 </div>

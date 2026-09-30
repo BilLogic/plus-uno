@@ -177,7 +177,8 @@ const preview = {
             "Actions",
             [
               "Button",
-              "Button group"
+              "Button group",
+              "Close button"
             ],
             "Forms and inputs",
             [

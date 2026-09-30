@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Badge/Badge.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Badge/Badge.stories.jsx` — Sizes, Styles, Content, Overview, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Badge/Badge.stories.jsx` — Sizes, Styles, Content, Overview, Interactive, DeprecationWarning
 
 **Storybook page:** `design-system/src/components/status-and-loading/Badge/Badge.mdx`
 
@@ -43,7 +43,7 @@ From `design-system/src/components/status-and-loading/Badge/Badge.scss`. Overrid
 
 ## Related
 
-Same group: `AiLabel` · `BadgeVariants` · `Progress` · `Spinner` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `BadgeVariants` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

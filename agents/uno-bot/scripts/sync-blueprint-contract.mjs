@@ -13,7 +13,7 @@
 //
 // The blueprint's agent-facing account of itself — `docs/agents/blueprint.md`
 // (the core: shape, status vocabulary, retrieval, the schema rendered from the
-// live catalog) and `docs/agents/blueprint-direct-access.md` (query recipes
+// live catalog — vendored as two docs, see splitSchema) and `docs/agents/blueprint-direct-access.md` (query recipes
 // and service-key notes for an agent with SQL) — is written in the blueprint
 // repo, where a column rename and the sentence describing it are one commit.
 // uno-bot vendors both through THIS script, into `docs/connectors/supabase/`,
@@ -78,7 +78,31 @@ const TARGETS = [
     source: resolve(APP, ACCOUNT_DIR, "blueprint.md"),
     target: resolve(REPO, "docs/connectors/supabase/blueprint.md"),
     shown: "docs/connectors/supabase/blueprint.md",
-    render: (text, rev) => renderAccount(text, rev, { file: "blueprint.md", embodiment: "all" }),
+    render: (text, rev) =>
+      renderAccount(splitSchema(text).core, rev, {
+        file: "blueprint.md",
+        embodiment: "all",
+        note:
+          "Its closing schema section is not upstream's: this repo's sync writes it (SCHEMA_POINTER) in place of the schema, which it vendors as blueprint-schema.md.",
+        summary:
+          "What this blueprint is, how to retrieve from it, what absence and status mean, how paths relate to a scenario's main route, and the vocabulary — the hand-written core, always loaded; the schema is blueprint-schema.md beside it",
+      }),
+  },
+  {
+    // The same source's schema section, split out so the Worker reads it by
+    // name instead of carrying it on every turn — see splitSchema.
+    label: "blueprint-schema.md",
+    source: resolve(APP, ACCOUNT_DIR, "blueprint.md"),
+    target: resolve(REPO, "docs/connectors/supabase/blueprint-schema.md"),
+    shown: "docs/connectors/supabase/blueprint-schema.md",
+    render: (text, rev) =>
+      renderAccount(splitSchema(text).schema, rev, {
+        file: "blueprint.md",
+        embodiment: "all",
+        disclosure: "reference",
+        summary:
+          "Every blueprint table and column as the database catalog describes it, and the tables only a service key reads — the schema section of blueprint.md, disclosed",
+      }),
   },
   {
     label: "blueprint-direct-access.md",
@@ -99,6 +123,43 @@ const TARGETS = [
 ];
 
 /**
+ * The schema section of the account, and everything else.
+ *
+ * The account's rendered schema is ~25k chars of column comments, and the
+ * bundle carried all of it on every turn while the Worker reads blueprint rows
+ * through `search_blueprint`, never SQL, so a column's meaning matters only on
+ * the turns an answer turns on one (#858). The hand-written core — shape,
+ * retrieval, absence, status, paths, vocabulary — stays in the prompt, because
+ * un-guided blueprint reads fail on exactly those; the schema moves to
+ * `blueprint-schema.md` with `disclosure: reference`, and the core carries the
+ * pointer in its place. The split is by heading, so a source that renames the
+ * heading fails the sync rather than silently putting the schema back.
+ */
+const SCHEMA_HEADING = "## The schema, as the catalog describes it\n";
+const SCHEMA_POINTER =
+  "## The schema, as the catalog describes it\n\n" +
+  "Every table and column in the catalog's own comments, and the tables only a service key reads, is " +
+  "`docs/connectors/supabase/blueprint-schema` — `read_reference` it in Slack, open the `.md` in an IDE. " +
+  "Read it when an answer turns on what a column means: a field a row carries that the sections above " +
+  "leave unexplained, or a table the question names.\n";
+
+function splitSchema(text) {
+  const { body } = splitFrontmatter(text);
+  const start = body.indexOf(`\n${SCHEMA_HEADING}`);
+  if (start === -1) {
+    throw new SchemaSplitError(`the account has no "${SCHEMA_HEADING.trim()}" heading to split the schema at`);
+  }
+  const next = body.indexOf("\n## ", start + 1 + SCHEMA_HEADING.length);
+  const end = next === -1 ? body.length : next + 1;
+  return {
+    core: body.slice(0, start + 1) + SCHEMA_POINTER + (end < body.length ? "\n" + body.slice(end) : ""),
+    schema: body.slice(start + 1, end),
+  };
+}
+
+class SchemaSplitError extends Error {}
+
+/**
  * The vendored account. Frontmatter is this repo's (`embodiment` as the map
  * says; the source's `summary` is kept so INDEX.md can route it, unless the
  * map supplies its own routing line), followed by
@@ -111,20 +172,23 @@ const TARGETS = [
  * not, so any revision derived from git differs between the two and a
  * comparison that included it would drift on every commit to the app.
  */
-function renderAccount(text, rev, { file, embodiment, summary }) {
+function renderAccount(text, rev, { file, embodiment, disclosure, summary, note }) {
   const { meta, body } = splitFrontmatter(text);
   const origin = `${ACCOUNT_REPO} ${ACCOUNT_DIR}/${file}`;
   const routing = summary ?? meta.summary;
   const front =
     "---\n" +
     `embodiment: ${embodiment}\n` +
+    (disclosure ? `disclosure: ${disclosure}\n` : "") +
     (routing ? `summary: ${routing}\n` : "") +
     `vendored_from: ${origin}\n` +
     `vendored_revision: ${rev}\n` +
     "---\n\n";
   const header =
     `<!-- VENDORED from ${origin} by agents/uno-bot/scripts/sync-blueprint-contract.mjs. ` +
-    "Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->\n\n";
+    "Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift." +
+    (note ? ` ${note}` : "") +
+    " -->\n\n";
   return front + header + rewriteLinks(body, file);
 }
 
@@ -262,7 +326,15 @@ const drifted = [];
 let synced = 0;
 for (const t of TARGETS) {
   const source = readFileSync(t.source, "utf8");
-  const want = t.render(source, check ? recordedRevision(t.target) : rev);
+  let want;
+  try {
+    want = t.render(source, check ? recordedRevision(t.target) : rev);
+  } catch (err) {
+    if (!(err instanceof SchemaSplitError)) throw err;
+    console.error(`cannot render ${t.shown}: ${err.message}`);
+    announce("error", `${t.shown} cannot be rendered: ${err.message}. Update SCHEMA_HEADING to the source's heading.`);
+    process.exit(1);
+  }
   const same = existsSync(t.target) && readFileSync(t.target, "utf8") === want;
   if (same) continue;
   if (check) {

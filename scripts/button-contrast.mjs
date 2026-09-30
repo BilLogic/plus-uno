@@ -1,7 +1,7 @@
 /**
  * The pure half of `check:button-contrast` (#312).
  *
- * THE MATHS IS NO LONGER HERE. Luminance, contrast, compositing, colour
+ * THE MATHS IS NO LONGER HERE. Luminance, contrast, compositing, color
  * parsing, the token grammar and token resolution moved to
  * `design-system/src/lib/tokens.mjs` (#506), because this file imports `node:fs`
  * and so could never be imported by a Storybook story — which is why five
@@ -27,7 +27,7 @@
  * story exists.
  *
  * The second assertion has no accessibility rule behind it at all. `tertiary`
- * and `info` resolve to the same colour on every fill, so two names render one
+ * and `info` resolve to the same color on every fill, so two names render one
  * appearance and a caller choosing between them is making a distinction the
  * interface does not draw. No tool compares two token values for equality
  * because no tool knows they were meant to differ. The map is where that
@@ -39,10 +39,10 @@
  *   tonal                    ground = StateLayer over the page  label = TextSafe
  *   outline / ghost / text   ground = the page        label = TextSafe
  *
- * State layers are 8%-alpha colours, so `tonal` has to be COMPOSITED before it
- * is read. Reading `rgba(113, 92, 0, 0.08)` as if it were solid gives 1.3:1 and
- * a page of failures that are not there — the same arithmetic mistake #268's
- * audit made and had to correct.
+ * State layers are 8%-alpha colors, so `tonal` has to be COMPOSITED before it
+ * is read. Reading `rgba(159, 130, 5, 0.08)` as if it were solid gives 2.3:1 and
+ * a page of failures that are not there — the same arithmetic mistake the
+ * fallback audit made and had to correct.
  *
  * Exported piece by piece so the tests can drive each step over hand-built
  * input rather than over the repo, which is what lets them assert the failures

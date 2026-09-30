@@ -233,6 +233,37 @@ test("a turn that errors fails the case, and a transient error is retried first"
   assert.equal(dead.calls.length, 3, "a non-transient error is not retried; three samples still ran");
 });
 
+test("a turn that came back as an error page or a server error is retried once, and the transcript says so", async () => {
+  // Live run 36694075577: Cloudflare HTML pages and a `gemini 502` each failed
+  // a sample outright. One retry absorbs a moment's failure; the label keeps a
+  // retried pass from reading like a clean one.
+  const page = {
+    ok: false,
+    error: "HTTP 503, not JSON — Cloudflare error 1102 (Worker exceeded resource limits)",
+    http: { status: 503, nonJson: true, cfError: "1102", ms: 7000 },
+  };
+  for (const first of [page, { ok: false, error: "agent: gemini 502: generateContent failed" }]) {
+    let attempts = 0;
+    const transport = fakeTransport([() => (++attempts === 1 ? first : R3_OK)]);
+    const { summary, lines, waits } = await run(fixtureOf([caseById("R3")]), transport);
+    assert.equal(summary.passed, 1, `the retry absorbed ${first.error}`);
+    assert.equal(transport.calls.length, 4, "three samples, one of them sent twice");
+    assert.ok(waits.includes(15_000), "the retry waits a short beat, not the quota window");
+    assert.ok(lines.some((l) => /retrying once/.test(l) && l.includes(first.error.slice(0, 40))), `the log names the retry: ${lines.join(" | ")}`);
+    const retried = summary.results[0].transcript.turns.filter((t) => t.retriedAfter);
+    // The representative transcript is sample 1's, the one that was retried.
+    assert.deepEqual(retried.map((t) => t.retriedAfter), [first.error]);
+  }
+
+  // Once, not twice: a turn that fails the same way again fails the sample,
+  // and the failure says it was already retried.
+  const down = fakeTransport([() => page]);
+  const { summary: s2 } = await run(fixtureOf([caseById("R3")]), down);
+  assert.equal(s2.failed, 1);
+  assert.equal(down.calls.length, 6, "each of three samples sent twice");
+  assert.match(s2.results[0].failures[0], /turn errored: HTTP 503, not JSON .* \(retried once\)$/);
+});
+
 // ── C1: two turns, and the history the runner SENDS to the second ────────────
 
 test("a two-turn case threads the reference receipt into turn 2's history", async () => {
@@ -338,7 +369,9 @@ test("a fixture case scores identically through the local transport and a Worker
   const recording = {
     ...local,
     async runTurn(req) {
-      const resp = await local.runTurn(req);
+      // As the wire carries it: the Worker's reply is JSON text, which drops
+      // the `undefined` fields an in-process object still holds.
+      const resp = JSON.parse(JSON.stringify(await local.runTurn(req)));
       responses.push(resp);
       return resp;
     },
@@ -355,7 +388,7 @@ test("a fixture case scores identically through the local transport and a Worker
     fetchImpl: async (url, init) => {
       assert.match(String(url), /\/debug\/eval$/);
       assert.equal(JSON.parse(init.body).prompt, c.turns[0].prompt);
-      return { json: async () => responses[served++] };
+      return { status: 200, text: async () => JSON.stringify(responses[served++]) };
     },
   });
   const fromWorker = await run(path, worker);

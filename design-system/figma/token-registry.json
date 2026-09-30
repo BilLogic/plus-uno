@@ -23,6 +23,8 @@
       "On Surface Variant": "var(--color-on-surface-variant)",
       "Outline": "var(--color-outline)",
       "Outline Variant": "var(--color-outline-variant)",
+      "Focus / Focus Ring": "var(--color-focus-ring)",
+      "Focus / Focus Ring Inverse": "var(--color-focus-ring-inverse)",
       "Mastering Content": "var(--color-mastering-content)",
       "Relationship": "var(--color-relationship)",
       "Social Emotional": "var(--color-social-emotional)",
@@ -437,7 +439,7 @@
     }
   },
   "validation": {
-    "scssTokenCount": 494,
+    "scssTokenCount": 506,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 361,

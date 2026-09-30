@@ -9,9 +9,9 @@
  * filesystem" — and for two releases the file did not exist, so every check
  * answered the three questions below privately: seventeen hardcoded the token
  * directory, the family map was restated beside them, and `scripts/` carried
- * two colour keys and two dimension normalisers that agreed neither with each
+ * two color keys and two dimension normalisers that agreed neither with each
  * other nor with `parseColour`. #621 moved the checks and the generators on to
- * this file; #622 retired the docs check's remaining colour key, alias
+ * this file; #622 retired the docs check's remaining color key, alias
  * resolver and declaration regex, and replaced the registry generator's
  * `var()` — the loosest in the tree.
  *
@@ -47,27 +47,28 @@
  * ─── WHY A FAMILY IS A NAME QUESTION AND A KIND IS A VALUE QUESTION ─────────
  *
  * `familyOf` classifies by prefix and stops there; nothing here says a family
- * "is" a colour or "is" a dimension, because two of them are not. `--surface-*`
- * holds `--surface-raised` (a colour alias) and `--surface-raised-shadow` (an
+ * "is" a color or "is" a dimension, because two of them are not. `--surface-*`
+ * holds `--surface-raised` (a color alias) and `--surface-raised-shadow` (an
  * elevation), and `--type-*` holds a whole `font` shorthand. A kind table keyed
  * on the family would be wrong for those the day it was written.
  *
  * AND A NAME SUFFIX IS NOT A DERIVATION. `familyOf` reads a prefix, and the
  * families below say nothing about how one token's value relates to another's —
- * deliberately, because within the colour family the names promise a
+ * deliberately, because within the color family the names promise a
  * relationship the values do not always keep. `--color-{role}-state-08/12/16`
- * reads as that role at 8/12/16%, and 33 of the 117 overlays are washes of a
- * different colour than their name points at: `--color-primary` is `#0472a8`,
- * `--color-primary-state-08` is 8% of `#00658e` (#644). The eleven divergent
- * bases are pinned in `tokens-node.test.js`, and `colourKey` keeps alpha partly
- * so a comparison across that pairing cannot report an agreement nobody wrote.
+ * reads as that role at 8/12/16%. Today 114 of the 117 overlays are exactly
+ * that, but until 2026-09-29 thirty were washes of a different color than
+ * their name pointed at, because the solids were re-picked in Figma and the
+ * washes never followed. The one remaining exception, shadow, is pinned in
+ * `tokens-node.test.js`, and `colourKey` keeps alpha partly so a comparison
+ * across that pairing cannot report an agreement nobody wrote.
  *
  * So the kind of a value is read off the VALUE — which is also the lesson
  * `check:size-fallbacks` records for itself: it selects dimension tokens by
  * what they resolve to rather than by a prefix list, "so a new family is
  * covered the day it is minted". `valueKey` is that rule, once.
  *
- * ─── THE COLOUR KEY IS WIDER THAN `parseColour` AND FINER THAN THE NORMALISER
+ * ─── THE COLOR KEY IS WIDER THAN `parseColour` AND FINER THAN THE NORMALISER
  *
  * WIDER. `parseColour` in the browser half reads `#rgb`, `#rrggbb`, `rgb()`
  * and `rgba()`, and null for anything else — right for it, since what it feeds
@@ -78,13 +79,13 @@
  * reads, and canonicalises rather than spelling: `hsl(0, 100%, 50%)`,
  * `rgb(100%, 0%, 0%)`, `#f00` and `#FF0000` all key as `#ff0000`, where the
  * docs check's retired key is syntactic and called the first two of those
- * different colours.
+ * different colors.
  *
  * FINER, AND THE NUMBER IS MEASURED. Alpha is part of this key and was not
  * part of `normaliseColour`, the normaliser `scripts/token-fallbacks.mjs`
  * carried until #621 moved the fallback checks here: `parseColour` followed by
  * `toHex`, and `toHex` drops alpha. Over the live token corpus that is not a
- * rounding difference: 315 pairs of colour tokens are EQUAL under the old
+ * rounding difference: 315 pairs of color tokens are EQUAL under the old
  * normaliser and UNEQUAL under this key — every one of them a translucent
  * state overlay keyed against a solid of the same channels, such
  * as `--color-secondary-state-08` (`rgba(68, 92, 106, 0.08)`) against
@@ -107,13 +108,13 @@
  * `#00000080`, because a state overlay compared against a solid by a key that
  * forgot alpha reports agreement with something nobody wrote.
  *
- * OUT OF RANGE IS NOT A COLOUR. `rgb(300, 0, 0)` keys as null rather than
+ * OUT OF RANGE IS NOT A COLOR. `rgb(300, 0, 0)` keys as null rather than
  * clamping to red, which is `parseColour`'s rule and for its reason: a typo
  * that clamped would report agreement with something nobody wrote.
  *
- * NAMED COLOURS ARE NOT READ. `white` and `transparent` key as null. Neither
+ * NAMED COLORS ARE NOT READ. `white` and `transparent` key as null. Neither
  * rival reads them either — both scan for `#`, `rgb` or `hsl` — and the 148 CSS
- * colour names are a table this module would have to carry and keep.
+ * color names are a table this module would have to carry and keep.
  */
 
 import { REPO_ROOT, documents, text } from '../../../scripts/lib/corpus.mjs';
@@ -280,7 +281,20 @@ export function familyOf(name) {
 /* ─── ARE THESE TWO VALUES THE SAME ────────────────────────────────────────── */
 
 const HEX = /^#([0-9a-f]{3,8})$/;
-const FUNCTION = /^(rgba?|hsla?)\(([^)]*)\)$/;
+/**
+ * A whole color function — `rgba(4, 114, 168, 0.08)`, `rgb(4 114 168 / 50%)`,
+ * `HSLA(…)` — as a regex SOURCE, unanchored, with the function name in group
+ * one and its arguments in group two. Exported so the fallback capture in
+ * `scripts/token-fallbacks.mjs` reads exactly the functions this key reads,
+ * and the two cannot drift.
+ *
+ * The name is matched case-insensitively by character class rather than an
+ * `i` flag, because a caller splices this into a larger pattern whose token
+ * names ARE case-sensitive. The arguments admit no parenthesis, so
+ * `rgba(var(--x), 0.5)` is not a color function here.
+ */
+export const COLOR_FUNCTION_SOURCE = '([rR][gG][bB][aA]?|[hH][sS][lL][aA]?)\\(([^()]*)\\)';
+const FUNCTION = new RegExp(`^${COLOR_FUNCTION_SOURCE}$`);
 
 /** `50%` → 0.5, `0.5` → 0.5, anything else → null. */
 function alphaOf(part) {

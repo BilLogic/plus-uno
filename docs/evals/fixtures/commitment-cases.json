@@ -1,0 +1,121 @@
+{
+  "_readme": "Eval cases for commitment reminders' detector (agents/uno-bot/src/commitments/detector.ts). Each case is one swept thread, the channel cursor its new messages come after, the detector reply recorded for it, and what the parse must keep. `recording.source` says whether the reply was authored or captured, as the turn recordings do. tests/commitment-detector.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The four shapes the detector must tell apart: a real promise, a request answered yes, a hypothetical, and a joke. Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
+  "cases": [
+    {
+      "id": "CM1",
+      "name": "a real promise: Maya will share the Figma link by Thursday",
+      "judgeNote": "Maya takes on a specific task herself with a named day. One commitment on her message, Maya as promiser, Bea as requester (she asked for the link), a short paraphrase of the task, and 'Thu' as the deadline.",
+      "since": "1790690000.000000",
+      "thread": [
+        {
+          "ts": "1790694000.000100",
+          "user": "U0BEA",
+          "text": "Where are the updated reflection screens? Dev wants to start Monday."
+        },
+        {
+          "ts": "1790694600.000200",
+          "user": "U0MAYA",
+          "text": "Still polishing the empty states. I'll share the Figma link here by Thu."
+        }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "```json\n{\"commitments\": [{\"message_ts\": \"1790694600.000200\", \"promiser\": \"U0MAYA\", \"requester\": \"U0BEA\", \"what\": \"share the Figma link for the reflection screens\", \"deadline\": \"Thu\", \"confidence\": 0.92}]}\n```"
+      },
+      "expect": {
+        "commitments": [
+          {
+            "messageTs": "1790694600.000200",
+            "promiser": "U0MAYA",
+            "requester": "U0BEA",
+            "what": "share the Figma link for the reflection screens",
+            "deadline": "Thu"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CM2",
+      "name": "a request answered yes: Ade agrees to update the PRD",
+      "judgeNote": "Bea asks Ade to update the PRD and Ade answers yes. The promise is Ade's, made by the 'yep' message; Bea is the requester; no deadline was named, so the deadline is null and the default of two working days applies.",
+      "since": "1790690000.000000",
+      "thread": [
+        {
+          "ts": "1790694000.000100",
+          "user": "U0BEA",
+          "text": "We settled on Nov 1 for launch. <@U0ADE> can you update the PRD?"
+        },
+        {
+          "ts": "1790694600.000200",
+          "user": "U0ADE",
+          "text": "yep, will do"
+        }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "```json\n{\"commitments\": [{\"message_ts\": \"1790694600.000200\", \"promiser\": \"U0ADE\", \"requester\": \"U0BEA\", \"what\": \"update the PRD with the Nov 1 launch date\", \"deadline\": null, \"confidence\": 0.88}]}\n```"
+      },
+      "expect": {
+        "commitments": [
+          {
+            "messageTs": "1790694600.000200",
+            "promiser": "U0ADE",
+            "requester": "U0BEA",
+            "what": "update the PRD with the Nov 1 launch date",
+            "deadline": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "CM3",
+      "name": "a hypothetical: Kai might look at it if he has time",
+      "judgeNote": "Kai says he might look at the tokens if he gets time — a maybe, not a task taken on. The model rates it low and the confidence floor drops it: no commitment.",
+      "since": "1790690000.000000",
+      "thread": [
+        {
+          "ts": "1790694000.000100",
+          "user": "U0BEA",
+          "text": "The spacing tokens feel off on mobile."
+        },
+        {
+          "ts": "1790694600.000200",
+          "user": "U0KAI",
+          "text": "If I get time next week I'll maybe take a look at the tokens, no promises."
+        }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "```json\n{\"commitments\": [{\"message_ts\": \"1790694600.000200\", \"promiser\": \"U0KAI\", \"requester\": null, \"what\": \"look at the spacing tokens\", \"deadline\": \"next week\", \"confidence\": 0.3}]}\n```"
+      },
+      "expect": {
+        "commitments": []
+      }
+    },
+    {
+      "id": "CM4",
+      "name": "a joke: Lee will eat his hat if it ships Friday",
+      "judgeNote": "Lee's line is a joke about the launch date, not a task he takes on. No commitment.",
+      "since": "1790690000.000000",
+      "thread": [
+        {
+          "ts": "1790694000.000100",
+          "user": "U0BEA",
+          "text": "Eng says the redesign ships Friday."
+        },
+        {
+          "ts": "1790694600.000200",
+          "user": "U0LEE",
+          "text": "I'll eat my hat if that ships Friday 😂"
+        }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "```json\n{\"commitments\": []}\n```"
+      },
+      "expect": {
+        "commitments": []
+      }
+    }
+  ]
+}

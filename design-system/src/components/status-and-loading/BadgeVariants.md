@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/BadgeVariants.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, Truncation, WithIcon, CustomStaysReadable, Interactive
+**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, DateWithAStateAppearance, LabelledStatus, Truncation, WithIcon, DeprecationWarnings, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/BadgeVariants.mdx`
 
@@ -15,37 +15,35 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | oneOf | `'status'` | What kind of system-generated value this is. |
-| `appearance` | oneOf | `'neutral'` | `status` only: one of the closed set of five. Ignored on `custom`. |
-| `spacing` | enum | `'default'` | `status` and `date` only. Padding, never type. |
+| `variant` | enum | `'status'` | Which label this renders: `status` and `date` are a Status, `counter` a Count, `custom` a read-only Tag. |
+| `appearance` | enum | `'neutral'` | The Status or Count style. `positive`, `negative` and `information` are aliases for `success`, `danger` and `info`. A date takes neutral, warning and danger. Ignored on `custom`. |
+| `spacing` | enum | `'default'` | `status` and `date` only: `default` is Status size medium (20), `spacious` is large (32). |
 | `children` | node | — | — |
 | `text` | string or number | — | — |
-| `color` | string | — | `custom` only: the escape hatch, a non-semantic colour. |
-| `textColor` | string | — | `custom` only: overrides the foreground derived from `color`. |
-| `iconBefore` | node | — | A glyph, for where colour alone cannot carry the state. |
-| `trailingMetric` | string or number | — | `status` only: a count attached to the state — "In progress · 12". |
-| `max` | number | — | `counter` only: the cap. 1204 with max 99 reads `99+`. |
-| `maxWidth` | number or string | — | Caps the badge and truncates, keeping the full text in `title`. |
-| `isBold` | bool | `false` | — |
-| `label` | string | — | An accessible name. Required in practice for a dot, which has no text. |
-| `className` | string | `''` | — |
+| `color` | string | — | `custom` only: shown on the Tag's swatch. |
+| `textColor` | string | — | `custom` only: ignored. A Tag's text is always neutral. |
+| `iconBefore` | node | — | A glyph before the label: Status `leadingVisual`, or on `custom` the Tag's leading content in place of the swatch. A date has its own. |
+| `trailingMetric` | string or number | — | `status` only: Status `count`, nested inside the label and capped at 99. |
+| `max` | number | — | `counter` only: the cap (99 by default). 1204 with max 99 reads `99+`. |
+| `maxWidth` | number or string | — | Caps the label, which ends in an ellipsis and shows its full text as a tooltip. 200 by default on a Status, 180 on a Tag. |
+| `isBold` | bool | `false` | `counter` only: Count's bold appearance, for a count that asks for action now. |
+| `label` | string | — | What a screen reader says instead of the visible text. A dot is named by it ("New" by default); on a number it replaces the bare digits; on a status it is visually hidden text that replaces the words. |
+| `className` | string | — | — |
 | `id` | string | — | — |
 
 ## Variants
+
+**`variant`** — `status` · `counter` · `date` · `custom`
+
+**`appearance`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery` · `positive` · `negative` · `information`
 
 **`spacing`** — `default` · `spacious`
 
 Anything not listed is not a valid value.
 
-## Tokens touched
-
-`--font-weight-semibold` · `--size-border-radius-radius-150` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-radius-md` · `--size-spacing-small-space-050`
-
-From `design-system/src/components/status-and-loading/BadgeVariants.scss`. Override these through the token layer, never with a literal.
-
 ## Related
 
-Same group: `AiLabel` · `Badge` · `Progress` · `Spinner` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `Badge` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

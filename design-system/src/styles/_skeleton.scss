@@ -1,6 +1,12 @@
 /**
  * Shared skeleton/shimmer loading style for plus-ds.
  * Used by Sidebar loading state and can be used by prototypes for consistent loading UI.
+ *
+ * DEPRECATED: `.plus-skeleton-block` is replaced by the `Skeleton` component
+ * (components/status-and-loading/Skeleton), which uses the theme's surface
+ * tokens and label presets. New code uses Skeleton; the existing callers move
+ * in a later change. Its keyframe keeps its own name, which Skeleton does not
+ * reuse.
  */
 
 @keyframes plus-skeleton-shimmer {

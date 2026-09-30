@@ -1,0 +1,90 @@
+{
+  "_readme": "Eval cases for the end-of-day sweep's drift detector (agents/uno-bot/src/sweep/detector.ts). Each case is one Slack thread and the sources it links, the detector reply recorded for it, and what the parse must keep. `recording.source` says whether the reply was authored or captured, as the turn recordings do. tests/sweep-detector.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The three shapes the detector must tell apart: true drift (the thread settled a change the page still states the old way), agreement (the page already says what the thread says), and a near-miss (a proposal nobody settled). Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
+  "cases": [
+    {
+      "id": "SW1",
+      "name": "true drift: the thread moved the launch date and the PRD still says October 15",
+      "judgeNote": "The thread settles a new date (Bea proposes it, Ade agrees and says she will update the PRD). The linked PRD's block still says October 15. One finding on that block, with Ade as the claimant, both messages as evidence, and a replacement that changes only the date.",
+      "thread": [
+        { "ts": "1790694000.000100", "user": "U0BEA", "text": "Engineering can't make Oct 15 for the reflection redesign. Can we move launch to Nov 1? <https://www.notion.so/Reflection-PRD-11111111111111111111111111111111|PRD>" },
+        { "ts": "1790694600.000200", "user": "U0ADE", "text": "Agreed, Nov 1 it is. I'll update the PRD." }
+      ],
+      "sources": [
+        {
+          "url": "https://www.notion.so/Reflection-PRD-11111111111111111111111111111111",
+          "kind": "notion",
+          "writable": true,
+          "title": "Reflection redesign PRD",
+          "blocks": [
+            { "id": "blk-launch", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Launch date: October 15" },
+            { "id": "blk-owner", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Owner: Ade" }
+          ],
+          "text": "",
+          "pillars": ["Toolkit"],
+          "contributors": ["Ade Okafor"]
+        }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "```json\n{\"findings\":[{\"source_url\":\"https://www.notion.so/Reflection-PRD-11111111111111111111111111111111\",\"block_id\":\"blk-launch\",\"source_says\":\"Launch is October 15.\",\"thread_says\":\"Launch moved to November 1.\",\"replacement\":\"Launch date: November 1\",\"evidence_ts\":[\"1790694000.000100\",\"1790694600.000200\"],\"claimed_by\":\"U0ADE\",\"confidence\":0.92}]}\n```"
+      },
+      "expect": {
+        "findings": [
+          { "blockId": "blk-launch", "lastEditedTime": "2026-09-01T10:00:00.000Z", "replacement": "Launch date: November 1", "claimedBy": "U0ADE", "evidenceTs": ["1790694000.000100", "1790694600.000200"] }
+        ]
+      }
+    },
+    {
+      "id": "SW2",
+      "name": "agreement: the thread repeats what the PRD already says",
+      "judgeNote": "The thread confirms November 1 and the PRD already says November 1. Nothing drifts. The recorded reply reports it anyway, with a replacement identical to the block's text — the parse must drop a replacement that changes nothing.",
+      "thread": [
+        { "ts": "1790694000.000100", "user": "U0BEA", "text": "Still on for Nov 1? <https://www.notion.so/Reflection-PRD-22222222222222222222222222222222>" },
+        { "ts": "1790694600.000200", "user": "U0ADE", "text": "Yep, Nov 1, same as the PRD." }
+      ],
+      "sources": [
+        {
+          "url": "https://www.notion.so/Reflection-PRD-22222222222222222222222222222222",
+          "kind": "notion",
+          "writable": true,
+          "title": "Reflection redesign PRD",
+          "blocks": [{ "id": "blk-launch", "lastEditedTime": "2026-09-20T10:00:00.000Z", "text": "Launch date: November 1" }],
+          "text": "",
+          "pillars": [],
+          "contributors": []
+        }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "{\"findings\":[{\"source_url\":\"https://www.notion.so/Reflection-PRD-22222222222222222222222222222222\",\"block_id\":\"blk-launch\",\"source_says\":\"Launch is November 1.\",\"thread_says\":\"Launch is November 1.\",\"replacement\":\"Launch date: November 1\",\"evidence_ts\":[\"1790694600.000200\"],\"claimed_by\":null,\"confidence\":0.8}]}"
+      },
+      "expect": { "findings": [] }
+    },
+    {
+      "id": "SW3",
+      "name": "near-miss: a proposal nobody settled",
+      "judgeNote": "Bea floats moving the date; nobody agrees and the thread ends on an open question. Not drift. The recorded reply reports it at low confidence — the parse must drop anything under the confidence floor.",
+      "thread": [
+        { "ts": "1790694000.000100", "user": "U0BEA", "text": "What if we pushed launch to Nov 1? <https://www.notion.so/Reflection-PRD-33333333333333333333333333333333>" },
+        { "ts": "1790694600.000200", "user": "U0ADE", "text": "Maybe — let's ask eng on Thursday." }
+      ],
+      "sources": [
+        {
+          "url": "https://www.notion.so/Reflection-PRD-33333333333333333333333333333333",
+          "kind": "notion",
+          "writable": true,
+          "title": "Reflection redesign PRD",
+          "blocks": [{ "id": "blk-launch", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Launch date: October 15" }],
+          "text": "",
+          "pillars": [],
+          "contributors": []
+        }
+      ],
+      "recording": {
+        "source": "authored",
+        "reply": "{\"findings\":[{\"source_url\":\"https://www.notion.so/Reflection-PRD-33333333333333333333333333333333\",\"block_id\":\"blk-launch\",\"source_says\":\"Launch is October 15.\",\"thread_says\":\"Someone suggested November 1.\",\"replacement\":\"Launch date: November 1\",\"evidence_ts\":[\"1790694000.000100\"],\"claimed_by\":null,\"confidence\":0.35}]}"
+      },
+      "expect": { "findings": [] }
+    }
+  ]
+}

@@ -29,6 +29,8 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | On Surface Variant | `var(--color-on-surface-variant)` | Secondary text |
 | Outline | `var(--color-outline)` | Borders, dividers |
 | Outline Variant | `var(--color-outline-variant)` | Subtle borders |
+| Focus / Focus Ring | `var(--color-focus-ring)` | Every focus indicator on a neutral ground |
+| Focus / Focus Ring Inverse | `var(--color-focus-ring-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
 
 ### SMART Competency Colors
 | Figma | PLUS CSS Token |
@@ -41,6 +43,9 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 
 ### State Opacity Convention
 Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity variants. Use `-container` tokens instead for elevated or filled surfaces.
+
+### Label Border Convention
+`<Hue>/<Hue> Border Subtle` is the hue at 45%, the border of an outlined label (Tag, date Status), and maps to `var(--color-<hue>-border-subtle)`. It is not `<Hue> Border`, the 3:1 role that maps to `var(--color-<hue>-border)`. Success, Warning, Danger, Tertiary and the five SMART hues have one.
 
 ## Typography Tokens
 
@@ -65,7 +70,7 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Card padding | `var(--size-card-pad-{x\|y}-{sm\|md\|lg})` |
 | Card gap | `var(--size-card-gap-{sm\|md\|lg})` |
 | Card radius | `var(--size-card-radius-{sm\|md\|full})` |
-| Element padding | `var(--size-element-pad-{x\|y}-{sm\|md\|lg})` |
+| Element padding | `var(--size-element-pad-{x\|y}-{sm\|md\|lg})`, plus `var(--size-element-pad-x-xs)` (4) |
 | Element gap | `var(--size-element-gap-{xs\|sm\|md\|lg})` |
 | Element radius | `var(--size-element-radius-{sm\|md\|lg\|full})` |
 | Modal padding | `var(--size-modal-pad-{x\|y}-{sm\|md\|lg})` |

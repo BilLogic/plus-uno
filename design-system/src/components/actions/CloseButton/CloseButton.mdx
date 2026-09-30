@@ -1,0 +1,191 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as CloseButtonStories from './CloseButton.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "close-button",
+      "name": "Close button",
+      "componentSetNodeId": "17827:827",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={CloseButtonStories} />
+
+<Title />
+The one dismiss control for surfaces that close as a whole: a fixed 24×24 hit area with a 16px ×.
+
+<DocsTabs of={CloseButtonStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/CloseButton"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A 24×24 box with a 16px × in <code>on-surface-variant</code>.</>}>
+    <Canvas of={CloseButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<><code>default</code> on neutral surfaces; <code>inverse</code> on colored or dark grounds.</>}>
+    <DsCanvasQuiet of={CloseButtonStories.Tones} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>inverse</code> on each ground it is declared for.</>}>
+    <DsCanvasQuiet of={CloseButtonStories.InverseGrounds} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The same size beside text of any size — it never scales with its surroundings.</>}>
+    <DsCanvasQuiet of={CloseButtonStories.FixedSize} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CloseButtonStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `CloseButton` to close a surface as a whole — an `Alert`, a `Toast`, a
+`Modal`. It is a fixed 24×24 box with a 16px ×, the WCAG 2.2 minimum target
+size, and it keeps that size whatever text sits beside it. Where it sits on a
+line of text is the parent's job: `Alert` centers it on its first line, and
+`Toast` places it at the end of its header.
+
+Two tones: `default` for neutral surfaces, and `inverse` for colored or dark
+grounds, where the × and its focus ring take the light surface color. `inverse`
+is only for these grounds: `--color-inverse-surface`, `--color-primary`,
+`--color-secondary`, `--color-success`, `--color-danger`, `--color-tertiary`,
+`--color-info` and `--color-warning`. Each is declared on the tone and
+measured by `check:focus-ring` for the ring and by `check:text-contrast` for
+the ×. The × is an icon glyph, so it is held to WCAG's non-text 3:1, not
+text's 4.5:1. Warning is the tightest at 3.52:1 for both, and the Figma warning
+Toast already puts the inverse × on it. There is
+no disabled state and there are no color variants: a close control is always
+available, and the × is neutral on every intent.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Say what closes when there is more than one.
+
+```jsx
+// Incorrect — three dismissible messages expose three buttons all called
+// "Close", and a screen reader user cannot tell them apart.
+<CloseButton onClick={dismissReminder} />
+
+// Correct — the name becomes "Dismiss session reminder".
+<CloseButton what="session reminder" onClick={dismissReminder} />
+```
+
+### Size it with the component, not with text.
+
+```jsx
+// Incorrect — a typography class on the button does nothing to the ×, and
+// wrapping it in one does not either; the box is fixed at 24×24.
+<CloseButton className="h4" onClick={close} />
+
+// Correct — place it, and let the parent align it to the line it belongs to.
+<div className="my-header">
+  <h2 className="h4">Session notes</h2>
+  <CloseButton what="session notes" onClick={close} />
+</div>
+```
+
+### `inverse` is for grounds that are not the page.
+
+```jsx
+// Incorrect — a light × and a light focus ring on the light page are invisible.
+<CloseButton tone="inverse" onClick={close} />
+
+// Correct — only on one of the declared grounds, painted by the caller.
+<div style={{ background: 'var(--color-inverse-surface)' }}>
+  <CloseButton tone="inverse" onClick={close} />
+</div>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Its name is "Close" by default**, or "Dismiss {what}" when `what` is passed.
+  An explicit `aria-label` overrides both, for call sites with an established
+  label — `Alert` keeps `Close alert`.
+- **The × is `aria-hidden`.** The name is the whole of what is announced.
+- **The focus ring** is `--color-focus-ring`, 2px, drawn 2px outside the box
+  with radius `--size-element-radius-lg`, over a 12% state layer. On `inverse`
+  it is `--color-focus-ring-inverse`, which aliases surface. It is at least
+  3:1 on every declared ground, from 3.52:1 on `--color-warning` to 12.46:1 on
+  `--color-inverse-surface`. The *Inverse grounds* story renders each one and
+  measures the ring and the × as the browser paints them.
+- **It is a real `<button type="button">`**, so Enter and Space press it and it
+  never submits a surrounding form.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `Alert` uses it for its dismiss control, in the `default` tone.
+- `Toast` uses it in the `inverse` tone on every header color, named "Close".
+- For an action with a label, use `Button`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

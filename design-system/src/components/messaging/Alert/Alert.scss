@@ -7,11 +7,14 @@
     display: flex !important;
     /* Override Bootstrap display: block    display: flex; */
     align-items: flex-start;
-    border-radius: var(--size-modal-radius-md);
+    border-radius: var(--size-modal-radius-sm);
     width: 100%;
     /* Full width - responsive */
     max-width: 100%;
-    border: var(--size-element-border) solid;
+    /* One border, on the left: Figma's `Element/stroke-xl` (3px). */
+    border: 0 solid;
+    border-left-width: var(--size-element-stroke-xl);
+    color: var(--color-on-surface);
     box-sizing: border-box;
     /* Figma: Padding on container (16px), Gap between content and dismiss (variable) */
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
@@ -46,9 +49,8 @@
     white-space: pre-wrap;
     margin: 0;
 
-    // Links inherit the alert's on-container text color (already tuned for
-    // contrast against each theme's background) instead of Bootstrap's
-    // default link blue, which can fail contrast on light theme backgrounds.
+    // Links inherit the alert's on-surface text color instead of Bootstrap's
+    // default link blue, which can fail contrast on the tinted ground.
     a {
         color: inherit;
         text-decoration: underline;
@@ -56,16 +58,68 @@
     }
 }
 
-.plus-alert-dismiss-btn {
+/*
+ * First-line columns — Figma's "Leading" and "Dismiss" wrappers. Each holds a
+ * strut: an invisible character in the first line's text style (h4 with a
+ * title, body2 without), so the column is exactly one line tall. The icon and
+ * the CloseButton are centered on it, and the CloseButton may overhang a line
+ * shorter than its 24px box.
+ */
+.plus-alert-leading,
+.plus-alert-dismiss {
+    position: relative;
     display: flex;
+    flex: none;
+}
+
+.plus-alert-strut {
+    display: block;
+    width: 0;
+    margin: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+.plus-alert-leading-icon,
+.plus-alert-dismiss .plus-close-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/*
+ * The leading icon is Figma's 20px solid icon (Icon size=h4). There is no
+ * icon-size token, so it borrows `--font-size-fa-h4-solid`, and the column is
+ * as wide as the icon. Its color is the style's Icon role, set per style below.
+ * The icon's 1 line height and 1em width are raw on purpose: the box is
+ * centered on the first line and fills the column, so it must be exactly the
+ * 20px square the glyph is drawn in.
+ */
+.plus-alert-leading {
+    width: var(--font-size-fa-h4-solid);
+}
+
+// Two classes deep, to beat the typography classes' `body .fa-solid` icon
+// sizing; a passed Font Awesome node gets the same 20px. Font Awesome 7 draws
+// every icon 1.25em wide; `--fa-width: 1em` makes the box the 20px square the
+// column is, so it does not overhang it.
+.plus-alert-leading .plus-alert-leading-icon {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    /* No padding */
-    color: var(--color-on-surface-variant);
-    background: none;
-    border: none;
+
+    &,
+    :is(.fa-solid, .fa-regular, .fas, .far) {
+        --fa-width: 1em;
+        width: 1em;
+        font-size: var(--font-size-fa-h4-solid);
+        line-height: 1;
+    }
+}
+
+.plus-alert-dismiss {
+    width: 24px; /* the CloseButton's fixed box */
 }
 
 /* Alert Style Variants */
@@ -74,8 +128,12 @@ $alert-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
 
 @each $theme in $alert-themes {
     .plus-alert.#{$theme} {
-        background-color: var(--color-#{$theme}-state-08);
-        border-color: var(--color-#{$theme});
-        color: var(--color-on-#{$theme}-container);
+        // Figma's `<Style> Container 08` state layer.
+        background-color: var(--color-#{$theme}-container-state-08);
+        border-color: var(--color-#{$theme}-border);
+
+        .plus-alert-leading {
+            color: var(--color-#{$theme}-icon);
+        }
     }
 }

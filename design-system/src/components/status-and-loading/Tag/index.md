@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Variants, Dismissing, RemoveIsGatedToDismissible, DismissibleIsNotNestedInteractive, Selecting, OperationalHasNoPressedState, ReadOnlyExposesNoControl, Truncation, WithLeadingContent, Loading, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, DeprecatedNames, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Tag/Tag.mdx`
 
@@ -17,30 +17,46 @@
 |------|------|---------|-------------|
 | `text` | string | — | The label (alternative to children). |
 | `children` | node | — | The label (takes precedence over `text`). |
-| `variant` | oneOf | `'read-only'` | What kind of tag this is. `read-only` is still a tag — see the note above. |
-| `color` | oneOf | `'grey'` | A category colour. Plain names only: a tag's colour is never a status. |
-| `elemBefore` | node | — | Leading content — an avatar for a person, a logo for an app. |
-| `swatchBefore` | string | — | A colour square, for a tag acting as a chart legend entry. Any CSS colour. |
-| `maxWidth` | number or string | — | Caps the tag and truncates the label, which then carries its full text in `title`. |
-| `href` | string | — | Navigates. Ignored on `selectable` and `operational`, which are already controls. |
-| `linkComponent` | elementType | — | Router link to render instead of `<a>` when `href` is set. |
+| `behavior` | enum | — | What a person can do with the tag. `read-only` by default; `link` needs `href`. |
+| `variant` | enum | — | Deprecated: use `behavior`. `dismissible` is `removable`. `operational` still renders a plain button but warns: use `behavior="selectable"` with `aria-expanded`. |
+| `color` | enum | `'grey'` | A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. |
+| `type` | oneOf | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
+| `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |
+| `count` | number or string | — | `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. |
+| `elemBefore` | node | — | Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. |
+| `swatchBefore` | string | — | Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. |
+| `maxWidth` | number or string | `180` | Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. |
+| `href` | string | — | Where a `link` tag goes. |
+| `linkComponent` | elementType | — | Router link to render instead of `<a>` for a `link` tag. |
 | `isSelected` | bool | `false` | `selectable` only: the toggle's state, published as `aria-pressed`. |
-| `isLoading` | bool | `false` | Shows a spinner and stands the tag down as a control. |
-| `onClick` | func | — | Fires on `selectable`, `operational`, and a link. |
-| `onRemove` | func | — | `dismissible` only. On any other variant no remove button renders. |
-| `removeLabel` | string | — | Overrides the remove button's accessible name. Defaults to `Remove <label>`. |
+| `isLoading` | bool | `false` | Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done. |
+| `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. `read-only` and `link` only, on every type; ignored with a warning on `removable` and `selectable`. |
+| `onClick` | func | — | Fires on `selectable`, and on a `link`. |
+| `onRemove` | func | — | `removable`, or a `link` with a separate ×: called when the × is pressed. |
+| `removeLabel` | string | — | Overrides the ×'s accessible name. Defaults to `Remove <label>`. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
+| `style` | object | — | — |
+
+## Variants
+
+**`behavior`** — `read-only` · `removable` · `selectable` · `link`
+
+**`variant`** — `read-only` · `dismissible` · `selectable` · `operational`
+
+**`color`** — `grey` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `orange`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-state-08` · `--color-outline-variant` · `--color-primary` · `--font-weight-semibold` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-sm` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-target-sm`
+`--color-advocacy` · `--color-advocacy-border-subtle` · `--color-advocacy-container` · `--color-advocacy-state-08` · `--color-advocacy-state-12` · `--color-advocacy-state-16` · `--color-focus-ring` · `--color-mastering-content` · `--color-mastering-content-border-subtle` · `--color-mastering-content-container` · `--color-mastering-content-state-08` · `--color-mastering-content-state-12` · `--color-mastering-content-state-16` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-surface-variant-state-12` · `--color-on-surface-variant-state-16` · `--color-outline` · `--color-outline-variant` · `--color-relationship` · `--color-relationship-border-subtle` · `--color-relationship-container` · `--color-relationship-state-08` · `--color-relationship-state-12` · `--color-relationship-state-16` · `--color-secondary-text` · `--color-social-emotional` · `--color-social-emotional-border-subtle` · `--color-social-emotional-container` · `--color-social-emotional-state-08` · `--color-social-emotional-state-12` · `--color-social-emotional-state-16` · `--color-surface-container-high` · `--color-surface-container-lowest` · `--color-technology-tools` · `--color-technology-tools-border-subtle` · `--color-technology-tools-container` · `--color-technology-tools-state-08` · `--color-technology-tools-state-12` · `--color-technology-tools-state-16` · `--color-tertiary` · `--color-tertiary-border-subtle` · `--color-tertiary-container` · `--color-tertiary-state-08` · `--color-tertiary-state-12` · `--color-tertiary-state-16` · `--elevation-light-2` · `--font-family-header` · `--font-size-fa-body2` · `--font-weight-semibold-2` · `--plus-tag-08` · `--plus-tag-12` · `--plus-tag-16` · `--plus-tag-avatar` · `--plus-tag-border` · `--plus-tag-height` · `--plus-tag-hue` · `--plus-tag-max` · `--size-border-radius-radius-50` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-150`
 
 From `design-system/src/components/status-and-loading/Tag/Tag.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Progress` · `Spinner` · `TagGroup`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

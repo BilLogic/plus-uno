@@ -104,11 +104,26 @@ test('the seven intents all still carry the same shape', () => {
   // shape is eleven now and the ratchet rows sit at 7. What the assertion is
   // for is unchanged: all seven must move TOGETHER. An intent that grows a role
   // the others lack is a vocabulary that only some of the system can use.
+  //
+  // One role sits outside the shared eleven on purpose: `-border-subtle`, the
+  // intent at 45% that an outlined label (Tag, date Status) draws its border
+  // with. Labels speak tertiary, danger, success, warning and info, never
+  // primary or secondary, and BS4 Foundation has no `Border Subtle` variable for
+  // those two. So the five label intents move together on it, and the two
+  // action intents are held to not having it.
   const tokens = ourTokens(REPO_ROOT);
   const intents = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
+  const labelIntents = new Set(['tertiary', 'danger', 'success', 'warning', 'info']);
   for (const name of intents) {
-    const own = tokens.filter((t) => t.startsWith(`--color-${name}-`) || t === `--color-${name}`);
+    const own = tokens.filter(
+      (t) => (t.startsWith(`--color-${name}-`) || t === `--color-${name}`) && t !== `--color-${name}-border-subtle`,
+    );
     assert.equal(own.length, 11, `${name} has ${own.length} tokens, not the shared 11`);
+    assert.equal(
+      tokens.includes(`--color-${name}-border-subtle`),
+      labelIntents.has(name),
+      labelIntents.has(name) ? `${name} has no -border-subtle` : `${name} is not a label intent and has a -border-subtle`,
+    );
     for (const role of ['text', 'container', 'icon', 'border']) {
       assert.ok(own.includes(`--color-${name}-${role}`), `${name} has no -${role}`);
     }

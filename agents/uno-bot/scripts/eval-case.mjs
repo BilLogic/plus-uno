@@ -32,6 +32,8 @@ import { readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { problemsWithSeed } from "./eval-seed.mjs";
+
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 /** The repository's fixture, from this file — so no caller repeats the path. */
@@ -71,6 +73,7 @@ export const CASE_KEYS = [
   "judgeNote",
   "turns",
   "subject",
+  "seed",
   "channel",
   "requestedBy",
   ...CASE_SPEC_KEYS,
@@ -103,6 +106,7 @@ export function problemsWithCase(c, where = "case") {
   for (const k of Object.keys(c)) {
     if (!CASE_KEYS.includes(k)) problems.push(`${at} carries unknown key '${k}'`);
   }
+  if ("seed" in c) problems.push(...problemsWithSeed(c.seed, at));
   if (!Array.isArray(c.turns) || c.turns.length === 0) {
     problems.push(`${at} has no 'turns'`);
     return problems;

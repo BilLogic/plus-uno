@@ -3,8 +3,9 @@ name: Implement Figma Changes
 on:
   repository_dispatch:
     types: [implement-figma-changes]
-    # Triggered from Slack via Pipedream
-    # client_payload: { component: "Badge", thread_ts: "...", notion_prd_id: "...", notion_prd_url: "..." }
+    # Triggered from Slack by the uno-bot Worker, past a ✅
+    # client_payload: { component: "Badge" | "Badge, Button", thread_ts, channel, message_ts,
+    #                   notion_prd_id?, notion_prd_url?, figma_version_id? (a library publish) }
   workflow_dispatch:
     inputs:
       component:
@@ -19,6 +20,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: read # a Figma library run reads its intake as the spec
 
 jobs:
   implement:
@@ -41,6 +43,7 @@ jobs:
           CP_THREAD_TS: ${{ github.event.client_payload.thread_ts }}
           CP_CHANNEL: ${{ github.event.client_payload.channel }}
           CP_MESSAGE_TS: ${{ github.event.client_payload.message_ts }}
+          CP_FIGMA_VERSION_ID: ${{ github.event.client_payload.figma_version_id }}
         run: |
           if [ "$EV_NAME" = "workflow_dispatch" ]; then
             printf 'component=%s\n' "$IN_COMPONENT" >> "$GITHUB_OUTPUT"
@@ -53,6 +56,12 @@ jobs:
             printf 'thread_ts=%s\n' "$CP_THREAD_TS" >> "$GITHUB_OUTPUT"
             printf 'channel=%s\n' "$CP_CHANNEL" >> "$GITHUB_OUTPUT"
             printf 'message_ts=%s\n' "$CP_MESSAGE_TS" >> "$GITHUB_OUTPUT"
+            # A library publish's run: its spec is the intake uno-bot filed.
+            # Digits only; anything else is dropped rather than passed on.
+            case "$CP_FIGMA_VERSION_ID" in
+              ''|*[!0-9]*) printf 'figma_version_id=\n' >> "$GITHUB_OUTPUT" ;;
+              *) printf 'figma_version_id=%s\n' "$CP_FIGMA_VERSION_ID" >> "$GITHUB_OUTPUT" ;;
+            esac
           fi
 
       - name: React to Slack message (working)
@@ -108,6 +117,10 @@ jobs:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           NOTION_PRD_ID: ${{ steps.payload.outputs.notion_prd_id }}
+          # Set on a Figma library run: the script reads the publish's intake
+          # (found by its marker) as the spec, with the job's own token.
+          FIGMA_VERSION_ID: ${{ steps.payload.outputs.figma_version_id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_TITLE: "feat: Figma DS update — ${{ steps.payload.outputs.component }}"
         run: node scripts/implement-figma-changes.js
 

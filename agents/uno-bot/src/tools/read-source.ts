@@ -121,10 +121,14 @@ export async function executeReadSource(
         // "[block:… · edited …]" through `content` would put markers into the
         // text the bot quotes back into Slack; a trailing index keeps the page
         // readable and still gives every line an id to cite.
+        // `formatted` marks a block whose rich text a text replace would lose
+        // part of (a link, a mention, bold…): notion_update refuses those at
+        // the ✅, so the model is told here, before it stages one.
         blocks: page.blocks.map(
-          (b) => `${b.id} · ${b.type} · edited ${b.lastEditedTime} · ${b.text.slice(0, BLOCK_INDEX_PREVIEW)}`,
+          (b) =>
+            `${b.id} · ${b.type}${b.plain ? "" : " · formatted"} · edited ${b.lastEditedTime} · ${b.text.slice(0, BLOCK_INDEX_PREVIEW)}`,
         ),
-        note: "Answer from THIS page's content/properties and cite it. If asked who owns/reviews it, use the people/Owner property here — do not guess from roles or LinkedIn. `blocks` lists this page's body blocks in order as `id · type · edited <stamp> · text`; to correct one in place pass its id and that exact stamp to notion_update's `replace` (✅-gated) rather than appending a contradicting section.",
+        note: "Answer from THIS page's content/properties and cite it. If asked who owns/reviews it, use the people/Owner property here — do not guess from roles or LinkedIn. `blocks` lists this page's body blocks in order as `id · type · edited <stamp> · text`; to correct one in place pass its id and that exact stamp to notion_update's `replace` (✅-gated) rather than appending a contradicting section. A block marked `formatted` has links, mentions or formatting a text replace would drop, so it can't be replaced: point it out for the person to edit in Notion instead.",
       });
     }
 

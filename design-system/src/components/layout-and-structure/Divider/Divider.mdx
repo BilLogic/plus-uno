@@ -109,7 +109,10 @@ list of unlike things. It is a rule and a rule only: no text, no label, no
 padding of its own beyond its own height.
 
 `size` sets the thickness and accepts either the `sm`–`xl` names or the pixel
-strings that alias them, so `"1.5px"` and `"md"` are the same divider. `style`
+strings that alias them, so `"1.5px"` and `"md"` are the same divider. `xl` is
+3px, the `Element/stroke-xl` token. `"2.5px"` is deprecated: it still maps to
+`xl` and draws 3px, but its name no longer says so, and development warns to
+use `size="xl"`. `style`
 is `light` (`--color-outline-variant`) or `dark` (`--color-outline`); `width`
 takes any CSS length for a rule that does not span its container.
 

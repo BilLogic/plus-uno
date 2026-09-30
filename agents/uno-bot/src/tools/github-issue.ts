@@ -14,12 +14,12 @@
 // added here so the model can neither choose a label nor leave the footer out.
 //
 // IT TAKES NAMED DEPENDENCIES — the GitHub client, the requester's name,
-// whether the ask came from a DM, the thread permalink and the thread post — so `fileGithubIssue` is driven in
+// whether the ask came from a private place, the thread permalink and the thread post — so `fileGithubIssue` is driven in
 // `tests/github-intake.test.ts` with a fake client, and `Env` enters only in
 // `executeGithubIssueCreate`, the binding at the foot of this file.
 
 import type { Env, SlackContext } from "../types";
-import { getPermalink, postMessage, usersInfo } from "../slack/api";
+import { conversationsInfo, getPermalink, postMessage, usersInfo } from "../slack/api";
 import { escapeSlackText } from "../slack/mrkdwn";
 import {
   GithubRequestError,
@@ -40,9 +40,10 @@ export interface GithubIssueDeps {
   github: GithubIssueClient;
   /** The requester's display name, for the footer. */
   requesterName(): Promise<string>;
-  /** Whether the request came from a DM — whose link stays out of a public
-   *  issue. */
-  requestedInDm: boolean;
+  /** Whether the request came from anywhere but a public channel — a private
+   *  channel, a group DM or a DM — whose link stays out of a public issue.
+   *  Answers true when it cannot tell. */
+  requestedPrivately(): Promise<boolean>;
   /** The source thread's permalink, or null when Slack would not give one. */
   threadPermalink(): Promise<string | null>;
   /** Say what happened, in the thread the card was approved in. */
@@ -67,14 +68,16 @@ export async function fileGithubIssue(
   const repo = deps.github.repo;
   let issue: CreatedIssue;
   try {
-    // A DM's link is never fetched: the issue may be public and a DM stays a DM.
+    // A private place's link is never fetched: the issue may be public, and a
+    // private channel, a group DM or a DM stays where it is.
+    const privatePlace = await deps.requestedPrivately();
     const [requester, permalink] = await Promise.all([
       deps.requesterName(),
-      deps.requestedInDm ? null : deps.threadPermalink(),
+      privatePlace ? null : deps.threadPermalink(),
     ]);
     issue = await deps.github.createIssue({
       title: draft.title,
-      body: renderIssueBody(draft, { requester, permalink, dm: deps.requestedInDm }),
+      body: renderIssueBody(draft, { requester, permalink, privatePlace }),
       labels: INTAKE_LABELS,
     });
   } catch (err) {
@@ -156,7 +159,24 @@ export async function executeGithubIssueCreate(
 /** The Slack half of a GitHub write's dependencies — who asked, whether it was
  *  a DM, the thread's link, and the post back — shared by every executor that
  *  writes to GitHub on a requester's behalf. */
-export type SlackFilingDeps = Pick<GithubIssueDeps, "requesterName" | "requestedInDm" | "threadPermalink" | "postToThread">;
+export type SlackFilingDeps = Pick<GithubIssueDeps, "requesterName" | "requestedPrivately" | "threadPermalink" | "postToThread">;
+
+/**
+ * Whether a conversation is anything but a public channel, by its kind — not
+ * its id's first letter: a private channel's id starts with C like a public
+ * one's. A DM's id is taken as it stands; anything else asks Slack, and a
+ * conversation Slack will not describe is treated as private, since a public
+ * issue can only link what it knows is public.
+ *
+ * @param env - Worker bindings
+ * @param channel - The conversation id
+ */
+export async function isPrivateConversation(env: Env, channel: string): Promise<boolean> {
+  if (channel.startsWith("D")) return true;
+  const res = await conversationsInfo(env, channel).catch(() => null);
+  if (!res?.ok || !res.channel) return true;
+  return !!(res.channel.is_private || res.channel.is_im || res.channel.is_mpim);
+}
 
 /**
  * The binding for `SlackFilingDeps`: `Env` and the thread, turned into the four
@@ -165,6 +185,7 @@ export type SlackFilingDeps = Pick<GithubIssueDeps, "requesterName" | "requested
  * @param slack - Thread context: where to post, and who asked
  */
 export function slackFilingDeps(env: Env, slack: SlackContext): SlackFilingDeps {
+  let privately: Promise<boolean> | undefined;
   return {
     async requesterName() {
       if (!slack.requestedBy) return "a Slack teammate";
@@ -172,8 +193,8 @@ export function slackFilingDeps(env: Env, slack: SlackContext): SlackFilingDeps 
       const user = res?.ok ? res.user : undefined;
       return user?.profile?.display_name || user?.real_name || user?.name || "a Slack teammate";
     },
-    // Slack's DM (im) conversation ids start with D.
-    requestedInDm: slack.channel.startsWith("D"),
+    // By the conversation's kind, read once per filing.
+    requestedPrivately: () => (privately ??= isPrivateConversation(env, slack.channel)),
     async threadPermalink() {
       // The request message's own link opens the thread around it.
       return getPermalink(env, slack.channel, slack.userMsgTs).catch(() => null);

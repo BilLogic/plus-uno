@@ -1,7 +1,7 @@
 /**
  * TagInput Component Styles
- * Implements tag input component with dashed border container
- * using Design System tokens.
+ * The field: a dashed container around its tags. The tags are Tag, in a
+ * TagGroup that owns their gaps and wrapping, so nothing here styles a chip.
  */
 
 .plus-form-tag-input-wrapper {
@@ -40,94 +40,24 @@
     }
 }
 
+/*
+ * Disabled is carried by the tags, which TagGroup disables: a neutral fill and
+ * Secondary (Text), as every disabled tag shows. The field only quiets its
+ * dashed edge. An opacity here would dim those tags a second time, past what
+ * can be read.
+ */
 .plus-form-tag-input-disabled {
-    opacity: 0.38;
+    border-color: var(--color-outline-variant);
     cursor: not-allowed;
-    pointer-events: none;
-}
-
-// Tag Item Styles
-.plus-form-tag-item {
-    display: flex;
-    align-items: center;
-    gap: var(--size-element-gap-sm, 8px);
-    padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px);
-    
-    .plus-form-tag-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 16px;
-        height: 16px;
-        background-color: currentColor;
-        border-radius: 2px;
-        flex-shrink: 0;
-        
-        i {
-            font-size: 10px;
-            color: #ffffff;
-        }
-    }
-    
-    .plus-form-tag-text {
-        flex: 1;
-    }
-}
-
-// Color Variants for Tags
-.plus-form-tag-item-default {
-    color: var(--color-on-surface);
-}
-
-.plus-form-tag-item-success {
-    color: var(--color-success);
-}
-
-.plus-form-tag-item-danger {
-    color: var(--color-danger);
-}
-
-.plus-form-tag-item-warning {
-    color: var(--color-warning-text);
-}
-
-.plus-form-tag-item-info {
-    color: var(--color-info);
 }
 
 // Size Variants
 .plus-form-tag-input-small {
     min-height: 40px;
     padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
-    
-    .plus-form-tag-item {
-        padding: var(--size-element-pad-y-xs, 2px) var(--size-element-pad-x-xs, 6px);
-        
-        .plus-form-tag-icon {
-            width: 14px;
-            height: 14px;
-            
-            i {
-                font-size: 9px;
-            }
-        }
-    }
 }
 
 .plus-form-tag-input-large {
     min-height: 56px;
     padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px);
-    
-    .plus-form-tag-item {
-        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
-        
-        .plus-form-tag-icon {
-            width: 18px;
-            height: 18px;
-            
-            i {
-                font-size: 11px;
-            }
-        }
-    }
 }

@@ -89,33 +89,63 @@
  * about FALLBACKS — capturing the literal beside a token, auditing a FAMILY's
  * uses against their tokens, and the wording of the two reports.
  *
- * THE NEW KEY IS FINER THAN THE ONE IT REPLACES, and the migration was measured
- * rather than assumed. `colourKey` keeps alpha where `normaliseColour`
- * (`parseColour` then `toHex`) dropped it, which over the live corpus is 315
- * token pairs called equal before and unequal after. None of them reaches a
- * comparison here, and the reason is `fallbackUsages` below rather than
- * anything about the key: the fallback literal is captured with `[^),]+`, which
- * admits neither a comma nor a `)`, and the pattern then demands the `var()`'s
- * own `)`. A whole `rgba()` fallback satisfies neither, so the 25 sites writing
- * `var(--color-x, rgba(…))` are not matched at all — not captured, not counted
- * incomparable, simply not seen. Of the 476 comparable colour comparisons that
- * are left in this tree, zero carry alpha on either side.
- * `design-system/tests/tokens-node.test.js` pins that mechanism, so a check
- * that one day widens the capture is told what it has changed.
+ * THE KEY KEEPS ALPHA, AND THE CAPTURE NOW READS IT. `colourKey` keeps alpha
+ * where the `normaliseColour` it replaced (`parseColour` then `toHex`) dropped
+ * it. For a long time that reached no comparison here, because the fallback
+ * literal was captured with `[^),]+` alone: it admits neither a comma nor a
+ * `)`, so a whole `var(--color-x, rgba(…))` was not matched at all — not
+ * captured, not counted incomparable, simply not seen. Every state-layer wash
+ * is written that way, so when the state-layer bases were re-mixed the stale
+ * washes beside them went unreported.
+ *
+ * `fallbackUsages` below now tries a whole color function before the plain
+ * literal, using the pattern source `colourKey` itself reads with. Measured
+ * over the live tree, that is 85 `rgba()` fallback sites across 20 files, all
+ * captured; 82 name a defined token and are compared with alpha on both
+ * sides, and 3 name a token defined nowhere. Widening the capture found 12
+ * disagreeing sites across 8 token/value pairs, all stale and all fixed rather
+ * than recorded. `design-system/tests/tokens-node.test.js` pins those counts,
+ * so a capture that quietly stops reading washes is told what it has changed.
  */
 
-import { colourKey } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_FUNCTION_SOURCE, colourKey } from '../design-system/src/lib/tokens-node.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+
+/**
+ * A nested `var()` fallback, one level of parentheses deep inside it, so
+ * `var(--b, #fff)` and `var(--b, rgba(0, 0, 0, 0.5))` are read whole. Deeper
+ * nesting falls through to the plain literal and the outer `var()` is not
+ * matched, which is the one shape this capture still does not see.
+ */
+const NESTED_VAR = 'var\\((?:[^()]|\\([^()]*\\))*\\)';
+
+/**
+ * The fallback, in the order its branches are tried: a nested `var()`, then a
+ * whole color function (the shared source, so the capture reads exactly what
+ * `colourKey` reads), then a plain literal. The color function comes before
+ * the plain literal because the plain literal stops at the first comma, and
+ * every state-layer wash is written with commas. The fallback is read from
+ * the named group, so the shared source's own numbered groups, which come
+ * after the token name's, shift nothing a caller reads.
+ */
+const FALLBACK = `(?<literal>${NESTED_VAR}|${COLOR_FUNCTION_SOURCE}|[^),]+)`;
 
 /**
  * Every `var(--color-*, …)` in the given files, with the file and line.
  *
- * A nested `var()` fallback is captured with `literal: null` rather than
- * skipped: it is not comparable, but a check that silently dropped it would be
- * unable to say how much of the corpus it actually looked at.
+ * A nested `var()` fallback is captured with that inner `var()` as its
+ * literal, which the audit counts as not comparable rather than dropping: a
+ * check that silently skipped it could not say how much of the corpus it
+ * actually looked at. The inner `var()` is captured in its own right as well,
+ * so its fallback is still compared against its own token.
  *
- * The `var(--name` half is the module's `varReferencePattern` (#507); the tail
- * that captures the fallback literal is this check's, because the module
+ * A color function whose arguments hold a `var()`, such as
+ * `rgba(var(--x), 0.5)`, is not a color function to the shared source, so it
+ * falls through to the plain literal and arrives as the fragment
+ * `rgba(var(--x`, which the audit counts as not comparable.
+ *
+ * The `var(--name` half is the module's `varReferencePattern`; the tail that
+ * captures the fallback literal is this check's, because the module
  * deliberately stops at the name.
  *
  * @param {{path: string, text: string}[]} files
@@ -123,13 +153,17 @@ import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
  */
 export function fallbackUsages(files, { prefix = '--color-' } = {}) {
   const uses = [];
-  const call = new RegExp(`${varReferencePattern(prefix).source}\\s*(?:,\\s*([^),]+))?\\)`, 'g');
+  const call = new RegExp(`${varReferencePattern(prefix).source}\\s*(?:,\\s*${FALLBACK})?\\s*\\)`, 'g');
+  const scan = (path, line, text) => {
+    for (const m of text.matchAll(call)) {
+      const literal = m.groups.literal ? m.groups.literal.trim() : null;
+      uses.push({ path, line, token: m[1], literal });
+      // A match consumes its nested `var()`, so read that one as well.
+      if (literal?.startsWith('var(')) scan(path, line, literal);
+    }
+  };
   for (const { path, text } of files) {
-    text.split('\n').forEach((line, i) => {
-      for (const m of line.matchAll(call)) {
-        uses.push({ path, line: i + 1, token: m[1], literal: m[2] ? m[2].trim() : null });
-      }
-    });
+    text.split('\n').forEach((line, i) => scan(path, i + 1, line));
   }
   return uses;
 }

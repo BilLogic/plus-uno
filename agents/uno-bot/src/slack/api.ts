@@ -105,11 +105,37 @@ async function slackGet<T extends SlackResponse>(
   method: string,
   params: Record<string, string>,
 ): Promise<T> {
+  return slackGetWith<T>(env.SLACK_BOT_TOKEN, method, params);
+}
+
+/** The read methods a person's own token may be used for. */
+export type UserTokenReadMethod = "users.conversations" | "conversations.history" | "conversations.replies";
+
+/**
+ * A Slack read on a token other than the bot's — a person's own connected one
+ * (ADR-020). THE GUARD IS THE METHOD TYPE: Slack accepts GET for write methods
+ * too, so GET is no protection; `UserTokenReadMethod` admits only reads, and a
+ * write cannot be named here. The transport, parse guard and failure warn are
+ * the bot's own.
+ */
+export async function slackReadAs<T extends SlackResponse = SlackResponse>(
+  token: string,
+  method: UserTokenReadMethod,
+  params: Record<string, string>,
+): Promise<T> {
+  return slackGetWith<T>(token, method, params);
+}
+
+async function slackGetWith<T extends SlackResponse>(
+  token: string,
+  method: string,
+  params: Record<string, string>,
+): Promise<T> {
   const qs = new URLSearchParams(params).toString();
   let res: Response;
   try {
     res = await countedFetch(`https://slack.com/api/${method}?${qs}`, {
-      headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
+      headers: { authorization: `Bearer ${token}` },
     });
   } catch (err) {
     // A budget stop is not a network error — let the loop report it as one and
@@ -151,13 +177,74 @@ export async function usersList(env: Env, cursor?: string) {
   );
 }
 
-/** conversations.members via the bot token — member ids (first page). */
-export async function conversationsMembers(env: Env, channel: string, limit = 100) {
+/** conversations.members via the bot token — one page of member ids, the
+ *  first unless `cursor` names the next. */
+export async function conversationsMembers(env: Env, channel: string, limit = 100, cursor?: string) {
   return slackGet<SlackResponse & { members?: string[]; response_metadata?: { next_cursor?: string } }>(
     env,
     "conversations.members",
-    { channel, limit: String(limit) },
+    { channel, limit: String(limit), ...(cursor ? { cursor } : {}) },
   );
+}
+
+/** users.conversations via the bot token — one page of the conversations of
+ *  `types` uno-bot is a member of, the first unless `cursor` names the next. */
+export async function botConversations(env: Env, types: string, cursor?: string) {
+  return slackGet<SlackResponse & { channels?: { id?: string }[]; response_metadata?: { next_cursor?: string } }>(
+    env,
+    "users.conversations",
+    { types, exclude_archived: "true", limit: "200", ...(cursor ? { cursor } : {}) },
+  );
+}
+
+/** conversations.info via the bot token — what kind of conversation this is. */
+export async function conversationsInfo(env: Env, channel: string) {
+  return slackGet<
+    SlackResponse & { channel?: { id?: string; is_private?: boolean; is_im?: boolean; is_mpim?: boolean } }
+  >(env, "conversations.info", { channel });
+}
+
+/** One message as conversations.history returns it, threads summarised. */
+export interface HistoryMessage {
+  ts: string;
+  user?: string;
+  bot_id?: string;
+  subtype?: string;
+  text?: string;
+  thread_ts?: string;
+  reply_count?: number;
+  latest_reply?: string;
+  /** Present only when the read asked for it (`includeMetadata`). */
+  metadata?: SlackMessageMetadata;
+}
+
+/** Slack message metadata: an app's own tag on a message it posted. */
+export interface SlackMessageMetadata {
+  event_type: string;
+  event_payload: Record<string, unknown>;
+}
+
+/**
+ * One page of a channel's top-level messages posted after `oldest`, via the
+ * bot token — the end-of-day sweep's read (`sweep/env.ts`). Pages of 200; the
+ * caller follows `response_metadata.next_cursor` as far as its budget allows.
+ */
+export async function conversationsHistorySince(
+  env: Env,
+  channel: string,
+  oldest: string,
+  cursor?: string,
+  opts: { includeMetadata?: boolean } = {},
+) {
+  return slackGet<
+    SlackResponse & { messages?: HistoryMessage[]; response_metadata?: { next_cursor?: string } }
+  >(env, "conversations.history", {
+    channel,
+    oldest,
+    limit: "200",
+    ...(cursor ? { cursor } : {}),
+    ...(opts.includeMetadata ? { include_all_metadata: "true" } : {}),
+  });
 }
 
 export interface PostMessageInput {
@@ -168,6 +255,23 @@ export interface PostMessageInput {
   blocks?: unknown[];
   /** Also show this threaded reply in the main conversation. */
   reply_broadcast?: boolean;
+  /** The app's own tag, read back with `include_all_metadata`. */
+  metadata?: SlackMessageMetadata;
+}
+
+/**
+ * Replace one of the bot's own messages — chat.update, which Slack allows a
+ * bot token on the bot's messages only.
+ */
+export async function updateMessage(
+  env: Env,
+  input: { channel: string; ts: string; text: string; blocks?: unknown[]; metadata?: SlackMessageMetadata },
+) {
+  return slackCall<SlackResponse & { ts?: string }>(env, "chat.update", {
+    ...input,
+    text: sanitizeSlackMarkup(toSlackMrkdwn(input.text)),
+    blocks: input.blocks ?? [],
+  });
 }
 
 // NOTE ON THE DISPLAY NAME. The bot presents as "Le Goat" because the bot
@@ -462,8 +566,11 @@ export interface ConversationsRepliesResult extends SlackOk {
     ts: string;
     thread_ts?: string;
     files?: SlackEventFile[];
+    subtype?: string;
+    metadata?: SlackMessageMetadata;
   }>;
   has_more?: boolean;
+  response_metadata?: { next_cursor?: string };
 }
 
 /** Open (or find) the DM channel with a user. Shortcut answers land here rather
@@ -545,6 +652,7 @@ export async function conversationsReplies(
   channel: string,
   thread_ts: string,
   limit = 20,
+  opts: { cursor?: string; includeMetadata?: boolean } = {},
 ) {
   // conversations.replies is a READ method (query params, not a JSON body).
   // slackGet owns the transport, parse-guard, and failure-warn.
@@ -553,6 +661,8 @@ export async function conversationsReplies(
     ts: thread_ts,
     limit: String(limit),
     inclusive: "true",
+    ...(opts.cursor ? { cursor: opts.cursor } : {}),
+    ...(opts.includeMetadata ? { include_all_metadata: "true" } : {}),
   });
 }
 

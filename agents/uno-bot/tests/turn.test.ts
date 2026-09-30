@@ -19,6 +19,7 @@ import { resolve } from "node:path";
 
 import {
   recordingDelivery,
+  restageExecution,
   runTurn,
   HISTORY_COMPACT_AT,
   HISTORY_KEEP_RECENT,
@@ -30,6 +31,8 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
+import { PRECEDENCE_INTAKE_TITLE } from "../src/ds-precedence/report";
+import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
@@ -563,6 +566,168 @@ test("an intake card says a private repo is private, and a repo it couldn't chec
   }
 });
 
+// A card staged with no reply beside it left the requester a card and no line
+// naming where it goes or asking whether to file (live evals G2, G5, G6, I1,
+// I2). The model writes that line most of the time; when it writes none, the
+// card leads with a short one of the Worker's own, marked as the Worker's.
+test("an intake card staged with no reply leads with a line naming the target and asking", async () => {
+  const issue = `${ISSUE_REPO}#688`;
+  const cases = [
+    {
+      calls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }],
+      ask: { kind: "file-issue", repo: ISSUE_REPO },
+      line: `I'll file this on ${ISSUE_REPO} — want me to?`,
+    },
+    {
+      calls: [{ name: "notion_create", args: { surface: "intake", title: "A gap" } }],
+      ask: { kind: "roadmap-intake" },
+      line: "I'll add this to the Roadmap as an intake — want me to?",
+    },
+    // An issue follow-up says what happens to the issue: a comment is added to
+    // it, a close closes it, and anything else — a relabel, a reopen, a comment
+    // with a close — updates it.
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, comment: "Another repro." } }],
+      ask: { kind: "update-issue", verb: "add", issues: [issue] },
+      line: `I'll add this to ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, state: "closed_completed" } }],
+      ask: { kind: "update-issue", verb: "close", issues: [issue] },
+      line: `I'll close ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, add_labels: ["bug"] } }],
+      ask: { kind: "update-issue", verb: "update", issues: [issue] },
+      line: `I'll update ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, state: "open" } }],
+      ask: { kind: "update-issue", verb: "update", issues: [issue] },
+      line: `I'll update ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, comment: "Fixed.", state: "closed_completed" } }],
+      ask: { kind: "update-issue", verb: "update", issues: [issue] },
+      line: `I'll update ${issue} — want me to?`,
+    },
+    {
+      calls: [
+        { name: "github_issue_update", args: { issue_number: 688, comment: "Same repro." } },
+        { name: "github_issue_update", args: { issue_number: 689, state: "closed_completed" } },
+      ],
+      ask: { kind: "update-issue", verb: "update", issues: [issue, `${ISSUE_REPO}#689`] },
+      line: `I'll update ${issue}, ${ISSUE_REPO}#689 — want me to?`,
+    },
+  ] as const;
+  for (const { calls, ask, line } of cases) {
+    const h = harness({ replies: [{ toolCalls: [...calls] }] });
+    const outcome = await runTurn(request({ text: "track this" }), h.deps);
+    assert.equal(outcome.disposition, "staged", line);
+    const card = outcome.staged!.card;
+    assert.equal(card.lead, undefined, line);
+    assert.deepEqual(card.ask, ask, line);
+    assert.equal(card.leadBy, "worker", line);
+    const text = renderProposalCard(card).text;
+    assert.ok(text.startsWith(`${line}\n`), text);
+  }
+});
+
+// A mixed batch has no one line that is true of it, so it gets none.
+test("a batch across tools or repos gets no fallback line", async () => {
+  const batches = [
+    [
+      { name: "github_issue_update", args: { issue_number: 688, comment: "Another repro." } },
+      { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+    ],
+    [
+      { name: "github_issue_create", args: { title: "A gap", body: "Details.", repo: "BilLogic/plus-uno" } },
+      { name: "github_issue_create", args: { title: "A bug", body: "Details.", repo: "BilLogic/plus-marketing-website" } },
+    ],
+    [
+      { name: "notion_create", args: { surface: "intake", title: "A gap" } },
+      { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+    ],
+  ];
+  for (const calls of batches) {
+    const h = harness({
+      replies: [{ toolCalls: calls }],
+      issueTarget: (staged) => ({ repo: String(staged.repo ?? ISSUE_REPO), visibility: "public" }),
+    });
+    const outcome = await runTurn(request({ text: "track these" }), h.deps);
+    const label = calls.map((c) => c.name).join("+");
+    assert.equal(outcome.disposition, "staged", label);
+    assert.equal(outcome.staged!.card.ask, undefined, label);
+    assert.equal(outcome.staged!.card.leadBy, undefined, label);
+    assert.doesNotMatch(renderProposalCard(outcome.staged!.card).text, /want me to\?/, label);
+  }
+  // Two creates on the SAME repo are one target, and still get the line.
+  const same = harness({
+    replies: [
+      {
+        toolCalls: [
+          { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+          { name: "github_issue_create", args: { title: "A bug", body: "Details." } },
+        ],
+      },
+    ],
+  });
+  const card = (await runTurn(request({ text: "track these" }), same.deps)).staged!.card;
+  assert.deepEqual(card.ask, { kind: "file-issue", repo: ISSUE_REPO });
+});
+
+test("the model's own reply leads the card, and no fallback line is added", async () => {
+  const h = harness({
+    replies: [
+      { text: "Filing it on the harness repo — ok?", toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] },
+    ],
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.equal(card.lead, "Filing it on the harness repo — ok?");
+  assert.equal(card.ask, undefined);
+  assert.equal(card.leadBy, "model");
+  assert.doesNotMatch(renderProposalCard(card).text, /want me to\?/);
+});
+
+// The Worker's "I could not stage …" note rides the preview, but it is not
+// the model's reply: it neither suppresses the ask nor reads as the model's.
+test("a Worker note in the preview does not stand in for the model's reply", async () => {
+  const h = harness({
+    replies: [
+      {
+        toolCalls: [
+          { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+          { name: "github_issue_create", args: [] as unknown as Record<string, unknown> },
+        ],
+      },
+    ],
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.match(card.lead ?? "", /I could not stage/);
+  assert.deepEqual(card.ask, { kind: "file-issue", repo: ISSUE_REPO });
+  assert.equal(card.leadBy, "worker");
+  const text = renderProposalCard(card).text;
+  assert.ok(text.startsWith(`I'll file this on ${ISSUE_REPO} — want me to?\n\nI could not stage`), text);
+});
+
+test("a card whose heading already asks gets no fallback line", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "notion_create", args: { surface: "decision", title: "A title", properties: { roadmap_card: "https://www.notion.so/plus/rm-1" } } }] }],
+  });
+  const card = (await runTurn(request({ text: "log this decision" }), h.deps)).staged!.card;
+  assert.equal(card.ask, undefined);
+  assert.doesNotMatch(renderProposalCard(card).text, /want me to\?/);
+});
+
+test("the fallback line escapes the repo it names", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] }],
+    issueTarget: () => ({ repo: "org/<a&b>", visibility: "public" }),
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.ok(renderProposalCard(card).text.startsWith("I'll file this on org/&lt;a&amp;b&gt; — want me to?"));
+});
+
 
 // A follow-up on an issue writes to the same repos an intake does, so its card
 // shows what will happen — the resolved issue, each operation, and the comment
@@ -785,6 +950,588 @@ test("staging a revised card supersedes the one it replaces", async () => {
   assert.equal((await h.threadState.getProposalByTs(PENDING.proposalTs)).state, "superseded");
   // And the thread's live card is the new one.
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, revisedTs);
+});
+
+// A card with its own lifetime and confirmer set keeps both through a
+// revision: pushing back on the content is not a way round the gate.
+test("a revised card inherits the lifetime and confirmer set of the card it replaces", async () => {
+  const held: PendingProposal = { ...PENDING, ttlMs: 72 * 60 * 60 * 1000, confirmers: ["U7", "U8"] };
+  const h = harness({
+    replies: [
+      {
+        text: "Filing the revised card.",
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(held);
+
+  const outcome = await runTurn(
+    request({ text: "make it about reflections only", pending: held, userId: "U7" }),
+    h.deps,
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.ttlMs, held.ttlMs);
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U7", "U8"]);
+  const stored = await h.threadState.getProposalByThread(REF);
+  assert.equal(stored?.ttlMs, held.ttlMs);
+  assert.deepEqual(stored?.confirmers, ["U7", "U8"]);
+});
+
+// A card the Worker keyed apart (the weekly DS precedence card) is revised
+// only its own way: a turn whose batch would touch it — uses one of its tools —
+// posts the card's note and stages nothing, so the two can never both be live.
+test("a batch touching a keyed-apart card is refused with its note, and only that card stays live", async () => {
+  const weekly: PendingProposal = {
+    ...PENDING,
+    supersedeKey: "ds-precedence",
+    refuseRevision: "Reply `dispute N` to drop an item.",
+  };
+  const h = harness({
+    replies: [
+      {
+        text: "Here is the card without Button.",
+        toolCalls: [{ name: "notion_create", args: { title: "Weekly intake minus Button" } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(weekly);
+
+  const outcome = await runTurn(request({ text: "drop Button from the card", pending: weekly }), h.deps);
+
+  assert.equal(outcome.disposition, "asked");
+  assert.equal(outcome.staged, undefined);
+  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.equal((await h.threadState.getProposalByTs(weekly.proposalTs)).state, "found");
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, weekly.proposalTs, "no second live card");
+});
+
+// The weekly card is touched only by a batch aimed at its own intake: the same
+// issue for a week that comments, the same title for one that files. Anything
+// else that shares its tool — a separate intake, a comment on another issue —
+// is some other ask, and stages beside it with both left live.
+const WEEKLY_UPDATE: PendingProposal = {
+  ...PENDING,
+  toolName: "github_issue_update",
+  input: { issue_number: 812, comment: "### Week of 2026-10-02" },
+  operations: [{ toolName: "github_issue_update", input: { issue_number: 812, comment: "### Week of 2026-10-02" } }],
+  supersedeKey: "ds-precedence",
+  refuseRevision: "Reply `dispute N` to drop an item.",
+};
+const WEEKLY_CREATE: PendingProposal = {
+  ...WEEKLY_UPDATE,
+  toolName: "github_issue_create",
+  input: { title: PRECEDENCE_INTAKE_TITLE, body: "the list" },
+  operations: [{ toolName: "github_issue_create", input: { title: PRECEDENCE_INTAKE_TITLE, body: "the list" } }],
+};
+
+async function inWeeklyThread(weekly: PendingProposal, call: { name: string; args: Record<string, unknown> }) {
+  const h = harness({ replies: [{ text: "Staging it.", toolCalls: [call] }] });
+  await h.threadState.putProposal(weekly);
+  const outcome = await runTurn(request({ text: "@uno-bot do the thing", pending: weekly }), h.deps);
+  return { h, outcome };
+}
+
+test("a comment on another issue in a commenting week's thread stages beside the weekly card, both live", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_UPDATE, {
+    name: "github_issue_update",
+    args: { issue_number: 700, comment: "Seen again this week." },
+  });
+
+  assert.equal(outcome.disposition, "staged");
+  const staged = outcome.staged!.proposal;
+  assert.equal(staged.supersedeKey, undefined, "its own card, in the thread's slot");
+  assert.equal((await h.threadState.getProposalByTs(WEEKLY_UPDATE.proposalTs)).state, "found", "the weekly card stays live");
+  assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
+});
+
+test("a comment on the weekly intake itself is still refused with the card's note", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_UPDATE, {
+    name: "github_issue_update",
+    args: { issue_number: 812, comment: "Without Button." },
+  });
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_UPDATE.proposalTs, "no second live card");
+});
+
+test("a separate intake in a filing week's thread stages beside the weekly card, both live", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_CREATE, {
+    name: "github_issue_create",
+    args: { title: "Tooltip colour differs between code and Figma", body: "Seen in the list." },
+  });
+
+  assert.equal(outcome.disposition, "staged");
+  const staged = outcome.staged!.proposal;
+  assert.equal(staged.toolName, "github_issue_create");
+  assert.equal((await h.threadState.getProposalByTs(WEEKLY_CREATE.proposalTs)).state, "found", "the weekly card stays live");
+  assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
+});
+
+test("a batch filing the weekly intake's own title is still refused with the card's note", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_CREATE, {
+    name: "github_issue_create",
+    args: { title: PRECEDENCE_INTAKE_TITLE, body: "the list without Button" },
+  });
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_CREATE.proposalTs, "no second live card");
+});
+
+// Every keyed card's revision stays in its slot: the key goes with it, whether
+// or not the card is a sweep card.
+test("a revision of a keyed card that is no sweep card keeps its key", async () => {
+  const keyed: PendingProposal = { ...PENDING, supersedeKey: "library" };
+  const h = harness({
+    replies: [{ text: "Revised.", toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }] }],
+  });
+  await h.threadState.putProposal(keyed);
+
+  const outcome = await runTurn(request({ text: "make it v2", pending: keyed }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.supersedeKey, "library");
+  assert.equal((await h.threadState.getProposalByTs(keyed.proposalTs)).state, "superseded");
+});
+
+// Someone outside the confirmer set could stage a revision nobody could then
+// run on their word — and staging it would retire the card its confirmers
+// can. Refused instead: the card stays live exactly as it was, and the person
+// is told who can change it.
+test("a revision from outside the confirmer set is refused and leaves the card live", async () => {
+  const held: PendingProposal = {
+    ...PENDING,
+    ttlMs: 72 * 60 * 60 * 1000,
+    confirmers: ["U0OWNER", "U0POSTER"],
+  };
+  const h = harness({
+    replies: [
+      {
+        text: "Filing the revised card.",
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(held);
+
+  const outcome = await runTurn(
+    request({ text: "drop the second one", pending: held, userId: "U0BYSTANDER" }),
+    h.deps,
+  );
+
+  assert.equal(outcome.disposition, "asked");
+  assert.equal(outcome.staged, undefined);
+  assert.match(outcome.posted ?? "", /^:lock: <@U0BYSTANDER> Only <@U0OWNER> or <@U0POSTER> can change this proposal/);
+  assert.equal((await h.threadState.getProposalByTs(held.proposalTs)).state, "found");
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, held.proposalTs);
+});
+
+const FIX_ONE = {
+  page_url: "https://www.notion.so/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  replace: [{ block_id: "blk-1", last_edited_time: "2026-09-01T10:00:00.000Z", content: "Launch date: November 1" }],
+};
+const FIX_TWO = {
+  page_url: "https://www.notion.so/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  replace: [{ block_id: "blk-2", last_edited_time: "2026-09-01T10:00:00.000Z", content: "Owner: Bea" }],
+};
+const SWEEP_CARD: PendingProposal = {
+  ...PENDING,
+  operations: [
+    { toolName: "notion_update", input: FIX_ONE },
+    { toolName: "notion_update", input: FIX_TWO },
+  ],
+  toolName: "notion_update",
+  input: FIX_ONE,
+  ttlMs: 72 * 60 * 60 * 1000,
+  confirmers: ["U0OWNER"],
+  sweepRun: "2026-09-30",
+};
+
+// A confirmer's revision of a sweep card stays a sweep card, in the sweep's
+// slot — and the model is told what a reply under one usually means.
+test("a confirmer's revision of a sweep card keeps its sweep run and retires the card", async () => {
+  const h = harness({
+    replies: [{ text: "Dropped the second fix.", toolCalls: [{ name: "notion_update", args: FIX_ONE }] }],
+  });
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(request({ text: "leave out the owner one", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.sweepRun, "2026-09-30");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
+  assert.deepEqual(outcome.staged!.proposal.operations, [{ toolName: "notion_update", input: FIX_ONE }]);
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "superseded");
+  assert.match(h.provider.started?.conversation.at(-1)?.text ?? "", /SWEEP CARD/);
+});
+
+// Dropping is all a revision of a sweep card may do: a fix rewritten on the
+// way through would run text nobody on the thread settled.
+test("a sweep card's revision that rewrites a fix is refused, and the card stays", async () => {
+  const rewritten = { ...FIX_ONE, replace: [{ ...FIX_ONE.replace[0]!, content: "Launch date: never" }] };
+  const h = harness({
+    replies: [{ text: "Changed it.", toolCalls: [{ name: "notion_update", args: rewritten }] }],
+  });
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(request({ text: "make it never", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /rather than drop one/);
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
+// A card that adds an answer holds an `insert` the model cannot restage, so a
+// worded revision is refused rather than staged without the added text.
+test("a worded revision of a sweep card holding an added answer is refused, and the card stays", async () => {
+  const ADD = {
+    page_url: "https://www.notion.so/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    insert: [{ after_block_id: "blk-3", last_edited_time: "2026-09-01T10:00:00.000Z", content: "Ratio is 1 tutor to 4–5 students." }],
+  };
+  const card: PendingProposal = {
+    ...SWEEP_CARD,
+    operations: [
+      { toolName: "notion_update", input: FIX_ONE },
+      { toolName: "notion_update", input: ADD },
+    ],
+  };
+  const h = harness({
+    replies: [{ text: "Dropped the ratio.", toolCalls: [{ name: "notion_update", args: FIX_ONE }] }],
+  });
+  await h.threadState.putProposal(card);
+
+  const outcome = await runTurn(request({ text: "leave out the ratio one", pending: card, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "asked");
+  assert.equal(outcome.staged, undefined);
+  assert.match(outcome.posted ?? "", /reply `drop N`/i);
+  assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+
+  // `drop 1` still revises it, by index, keeping the added answer byte for byte.
+  const dropped = await runTurn(request({ text: "drop 1", pending: card, userId: "U0OWNER" }), h.deps);
+  assert.equal(dropped.disposition, "staged");
+  assert.deepEqual(dropped.staged!.proposal.operations, [{ toolName: "notion_update", input: ADD }]);
+});
+
+// "drop N" is read by index: the revision is the card's own operations minus
+// the dropped one, byte for byte, with no model call to reproduce them.
+test("a confirmer's \"drop 2\" revises a sweep card by index, without the model", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.operations, [{ toolName: "notion_update", input: FIX_ONE }]);
+  assert.equal(outcome.staged!.proposal.sweepRun, "2026-09-30");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
+  assert.equal(h.provider.sends.length, 0, "no model call");
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "superseded");
+});
+
+// A file-drift card holds one intake per file and is read the same way: "drop
+// 2" leaves the second file out, in the card's own slot, with its confirmers.
+test("a confirmer's \"drop 2\" leaves a file off a file-drift card, without the model", async () => {
+  const h = harness();
+  const figma = { toolName: "notion_create", input: { surface: "prd", title: "Update Recap in Figma" } };
+  const code = { toolName: "github_issue_create", input: { title: "Update Button.jsx in code", body: "b" } };
+  const driftCard: PendingProposal = {
+    ...PENDING,
+    operations: [figma, code],
+    toolName: figma.toolName,
+    input: figma.input,
+    ttlMs: 72 * 60 * 60 * 1000,
+    confirmers: ["U0OWNER"],
+    supersedeKey: "figma-drift",
+  };
+  await h.threadState.putProposal(driftCard);
+
+  const outcome = await runTurn(request({ text: "drop 2", pending: driftCard, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.operations, [figma]);
+  assert.equal(outcome.staged!.proposal.supersedeKey, "figma-drift", "it stays in the drift card's slot");
+  assert.equal(outcome.staged!.proposal.sweepRun, undefined, "it is not a sweep card");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
+  assert.equal(h.provider.sends.length, 0, "no model call");
+  assert.equal((await h.threadState.getProposalByTs(driftCard.proposalTs)).state, "superseded");
+});
+
+// A drop is a revision on the usage record like any other: the card it
+// replaces is superseded, the revision has a staged row, and that row names the
+// Worker's own card as its root. And the revision carries the sweep's mark and
+// tag, so replies under it are read by the sweep's rule.
+test("a \"drop 2\" revision is superseded-and-staged on the record, rooted at the sweep card, and marked as one", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+
+  const revision = outcome.staged!.proposal;
+  assert.equal(revision.originProposalTs, SWEEP_CARD.proposalTs);
+  // Its key named on the record itself, not left to the slot's fallback.
+  assert.equal(revision.supersedeKey, "sweep");
+  assert.deepEqual(
+    (await h.proposalEvents.eventsOf(SWEEP_CARD.proposalTs)).map((e) => [e.event, e.via]),
+    [["superseded", "revision"]],
+  );
+  const [staged] = await h.proposalEvents.eventsOf(revision.proposalTs);
+  assert.equal(staged?.event, "staged");
+  assert.equal(staged?.originProposalId, SWEEP_CARD.proposalTs);
+  assert.match(outcome.staged!.card.lead ?? "", /End-of-day sweep/);
+  assert.equal(outcome.staged!.card.tag?.eventType, "uno_sweep_card");
+  assert.equal(outcome.staged!.card.tag?.payload.role, "revision");
+});
+
+// A revision lives only as long as the card it replaces had left: dropping
+// again and again, or asking the model for a revision, never extends a card.
+test("a sweep card's revisions inherit its deadline rather than a fresh lifetime", async () => {
+  const HOUR = 3_600_000;
+  const clock = { now: 1_800_000_000_000 };
+  const threadState = createInMemoryThreadState({ now: () => clock.now });
+  const three: PendingProposal = {
+    ...SWEEP_CARD,
+    operations: [...SWEEP_CARD.operations!, { toolName: "notion_update", input: { ...FIX_TWO, replace: [{ ...FIX_TWO.replace[0]!, block_id: "blk-3" }] } }],
+  };
+  await threadState.putProposal(three);
+
+  clock.now += 10 * HOUR;
+  const first = await runTurn(
+    request({ text: "drop 3", pending: three, userId: "U0OWNER" }),
+    harness({ threadState, now: () => clock.now }).deps,
+  );
+  assert.equal(first.staged!.proposal.ttlMs, 62 * HOUR);
+
+  clock.now += 10 * HOUR;
+  const second = await runTurn(
+    request({ text: "leave out the owner one", pending: first.staged!.proposal, userId: "U0OWNER" }),
+    harness({
+      threadState,
+      now: () => clock.now,
+      replies: [{ text: "Dropped the owner fix.", toolCalls: [{ name: "notion_update", args: FIX_ONE }] }],
+    }).deps,
+  );
+  assert.equal(second.disposition, "staged");
+  assert.equal(second.staged!.proposal.ttlMs, 52 * HOUR);
+  assert.match(second.staged!.card.lead ?? "", /End-of-day sweep/);
+});
+
+test("\"keep 2\" keeps only that fix; dropping every fix cancels the card", async () => {
+  const kept = harness();
+  await kept.threadState.putProposal(SWEEP_CARD);
+  const keep = await runTurn(request({ text: "keep 2", pending: SWEEP_CARD, userId: "U0OWNER" }), kept.deps);
+  assert.deepEqual(keep.staged!.proposal.operations, [{ toolName: "notion_update", input: FIX_TWO }]);
+
+  const all = harness();
+  await all.threadState.putProposal(SWEEP_CARD);
+  const dropped = await runTurn(request({ text: "drop 1 and 2", pending: SWEEP_CARD, userId: "U0OWNER" }), all.deps);
+  assert.equal(dropped.disposition, "resolved");
+  assert.equal(dropped.staged, undefined);
+  assert.equal(all.provider.sends.length, 0);
+  assert.notEqual((await all.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
+test("a fix number the sweep card does not have goes to the model", async () => {
+  const h = harness({ replies: [{ text: "There are only two fixes on that card." }] });
+  await h.threadState.putProposal(SWEEP_CARD);
+  const outcome = await runTurn(request({ text: "drop 7", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+  assert.notEqual(outcome.disposition, "staged");
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
+// A bystander dropping a fix is changing the owners' card: refused, as on any
+// card that names its confirmers.
+test("a bystander's revision of a sweep card is refused, and the card stays", async () => {
+  const h = harness({
+    replies: [{ text: "Dropped it.", toolCalls: [{ name: "notion_update", args: FIX_ONE }] }],
+  });
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0BYSTANDER" }), h.deps);
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /Only <@U0OWNER> can change this proposal/);
+  // Tagged as the sweep's, as the card is: a note answering the card.
+  const note = h.delivery.calls.find((c) => c.kind === "note");
+  assert.deepEqual(note && "tag" in note ? note.tag : undefined, { eventType: "uno_sweep_card", payload: { role: "note" } });
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
+// An ask in a sweep card's thread that touches none of its fixes is not a
+// revision of it: it stages as its own card, beside the sweep card, with the
+// default terms — whoever asks.
+test("an unrelated ask in a sweep card's thread stages as its own card and leaves the sweep card live", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "Filing it.",
+        toolCalls: [{ name: "github_issue_create", args: { title: "Sweep card copy is long", body: "It wraps on mobile." } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(
+    request({ text: "file an issue: the card copy is long", pending: SWEEP_CARD, userId: "U0BYSTANDER" }),
+    h.deps,
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  const staged = outcome.staged!.proposal;
+  assert.equal(staged.toolName, "github_issue_create");
+  assert.equal(staged.sweepRun, undefined);
+  assert.equal("confirmers" in staged, false);
+  assert.equal("ttlMs" in staged, false);
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found", "the sweep card stays live");
+  assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
+});
+
+// A cut-off sweep card comes back as a fresh card with what never ran; the
+// records kept against the old card follow it (`onRestaged`).
+test("re-staging a cut-off sweep card tells onRestaged which card replaced which", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+  const moved: Array<[string, string, string | undefined]> = [];
+  const staged = await restageExecution(
+    { proposal: SWEEP_CARD, operations: [{ toolName: "notion_update", input: FIX_TWO }] },
+    {
+      ...h.deps,
+      proposalEvents: h.deps.usage.proposalEvents,
+      onRestaged: async (from, to) => {
+        moved.push([from.proposalTs, to.proposalTs, to.sweepRun]);
+      },
+    },
+  );
+  assert.ok(staged);
+  assert.deepEqual(moved, [[SWEEP_CARD.proposalTs, staged.proposal.proposalTs, "2026-09-30"]]);
+});
+
+// A group DM's share is offered only after the card people were shown: a
+// revision or a re-staged card carries no pages to share, so its ✅ applies
+// the fix and never leads to a share card.
+test("a revised or re-staged group-DM sweep card carries no share", async () => {
+  const GROUP_DM_CARD: PendingProposal = {
+    ...SWEEP_CARD,
+    sweepShare: { pages: [{ url: FIX_ONE.page_url, title: "Launch plan", to: "plus-design" }] },
+  };
+  const applied = [
+    { toolName: "notion_update", input: FIX_ONE, ok: true, result: JSON.stringify({ ok: true }), message: "updated" },
+  ];
+  const channels = { plusDesign: "C0DESIGN" };
+  assert.ok(sweepShareOffer(GROUP_DM_CARD.sweepShare, applied, channels), "the card as shown would offer one");
+
+  const h = harness();
+  await h.threadState.putProposal(GROUP_DM_CARD);
+  const revised = await runTurn(request({ text: "drop 2", pending: GROUP_DM_CARD, userId: "U0OWNER" }), h.deps);
+  assert.equal(revised.disposition, "staged");
+  assert.equal(revised.staged!.proposal.sweepShare, undefined);
+  assert.equal(sweepShareOffer(revised.staged!.proposal.sweepShare, applied, channels), null);
+
+  const again = harness();
+  await again.threadState.putProposal(GROUP_DM_CARD);
+  const restaged = await restageExecution(
+    { proposal: GROUP_DM_CARD, operations: [{ toolName: "notion_update", input: FIX_ONE }] },
+    { ...again.deps, proposalEvents: again.deps.usage.proposalEvents },
+  );
+  assert.ok(restaged);
+  assert.equal(restaged.proposal.sweepShare, undefined);
+  assert.equal(sweepShareOffer(restaged.proposal.sweepShare, applied, channels), null);
+});
+
+// `sweep_share_post` is the Worker's alone: a model that names it anyway is
+// refused before any dispatch, and nothing is staged.
+test("a model call to sweep_share_post is refused and nothing is staged", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "Posting it.",
+        toolCalls: [{ name: "sweep_share_post", args: { channel: "C0DESIGN", text: "<!channel> hello" } }],
+      },
+      { text: "I can't post that." },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "post a note in #plus-design" }), h.deps);
+  assert.notEqual(outcome.disposition, "staged");
+  assert.equal(outcome.staged, undefined);
+  assert.deepEqual(h.executed, [], "never dispatched");
+  const results = h.provider.transcript.flatMap((e) => (e.kind === "results" ? e.results : []));
+  assert.ok(results.some((r) => r.name === "sweep_share_post" && /not a tool you can call/.test(r.text)), JSON.stringify(results));
+  assert.equal((await h.threadState.getProposalByThread({ channel: PENDING.channel, thread: PENDING.threadTs })), null);
+});
+
+// A share card cut off part-way comes back quoting the exact note, as the
+// first card did — not a generic card of its first operation.
+test("a re-staged share card still quotes the exact note it posts", async () => {
+  const note = ":mag: End-of-day sweep: a group conversation settled something the Notion page “Launch plan” still said the old way, and the page is now up to date: https://www.notion.so/aaaa";
+  const operations = [{ toolName: "sweep_share_post", input: { channel: "C0DESIGN", channel_name: "#plus-design", text: note } }];
+  const share: PendingProposal = {
+    ...PENDING,
+    operations,
+    toolName: "sweep_share_post",
+    input: operations[0]!.input,
+    requesterUserId: "",
+    ttlMs: 72 * 60 * 60 * 1000,
+    confirmers: ["U0OWNER"],
+    supersedeKey: SWEEP_SHARE_KEY,
+  };
+  const h = harness();
+  await h.threadState.putProposal(share);
+  const restaged = await restageExecution({ proposal: share, operations }, { ...h.deps, proposalEvents: h.deps.usage.proposalEvents });
+  assert.ok(restaged);
+  const text = renderProposalCard(restaged.card).text;
+  assert.ok(text.includes(`> ${note}`), text);
+  assert.match(text, /#plus-design/);
+  assert.match(text, /cut off/, "it still says an earlier run was cut off");
+  assert.equal(restaged.proposal.supersedeKey, SWEEP_SHARE_KEY);
+});
+
+test("a fresh card carries neither a lifetime nor a confirmer set of its own", async () => {
+  const h = harness({
+    replies: [{ text: "Filing it.", toolCalls: [{ name: "notion_create", args: { title: "One" } }] }],
+  });
+  const outcome = await runTurn(request({ text: "file a card" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  assert.equal("ttlMs" in outcome.staged!.proposal, false);
+  assert.equal("confirmers" in outcome.staged!.proposal, false);
+});
+
+// The turn's two gate doors are held to the confirmer set too: the person
+// whose turn it is is the one checked, on the typed emoji and on the model's
+// own `proposal_resolve`.
+test("a typed ✅ from outside the confirmer set runs nothing and names who can confirm", async () => {
+  const held: PendingProposal = { ...PENDING, confirmers: ["U7"] };
+  const h = harness();
+  await h.threadState.putProposal(held);
+
+  const outcome = await runTurn(request({ text: ":white_check_mark:", pending: held, userId: "U2" }), h.deps);
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(h.resolved, []);
+  assert.deepEqual(h.delivery.gateNotes, [{ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }]);
+  assert.equal(h.provider.sends.length, 0);
+  assert.equal((await h.threadState.getProposalByTs(held.proposalTs)).state, "found");
+});
+
+test("the model's proposal_resolve in an outsider's turn runs nothing; in a confirmer's it wins", async () => {
+  const held: PendingProposal = { ...PENDING, confirmers: ["U7"] };
+  const resolveReply = {
+    toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm", message_to_user: "Filing it now." } }],
+  };
+  const h = harness({ replies: [resolveReply, resolveReply] });
+  await h.threadState.putProposal(held);
+
+  await runTurn(request({ text: "yes please", pending: held, userId: "U2" }), h.deps);
+  assert.deepEqual(h.resolved, []);
+  assert.deepEqual(h.delivery.gateNotes, [{ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }]);
+  assert.equal((await h.threadState.getProposalByTs(held.proposalTs)).state, "found");
+
+  await runTurn(request({ text: "yes please", pending: held, userId: "U7" }), h.deps);
+  assert.deepEqual(h.resolved, [
+    { toolName: "notion_create", decision: "confirm", note: { kind: "said", text: "Filing it now." }, executed: true },
+  ]);
 });
 
 test("a rewrite ask stages a replace, and never a silent append", async () => {

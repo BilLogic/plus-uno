@@ -13,7 +13,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Documentation for the internal subcomponents of the Alert (Dismiss Button, Content Layout).',
+                component: 'Documentation for the internal subcomponents of the Alert (Leading Icon, Dismiss Button, Content Layout).',
             },
         },
     },
@@ -34,16 +34,12 @@ export const ContentStructure = () => (
 
 /**
  * Dismiss Button
- * The standard dismiss action button used within the alert.
+ * The shared CloseButton, placed on the first line of text: the title line
+ * with a title, the first body line without.
  */
 export const DismissButton = () => (
-    <div style={{ display: 'inline-block' }}>
-        <button
-            type="button"
-            className="plus-alert-dismiss-btn h4"
-            aria-label="Close alert"
-        >
-            <i className="fa-solid fa-xmark"></i>
-        </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Alert style="primary" title="With a title">The × centers on the title line.</Alert>
+        <Alert style="primary">Without a title the × centers on the first body line.</Alert>
     </div>
 );

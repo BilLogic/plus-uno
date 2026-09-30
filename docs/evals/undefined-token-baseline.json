@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 91,
-    "uses": 271,
+    "names": 86,
+    "uses": 264,
     "bare": 5
   },
   "tokens": {
@@ -38,10 +38,6 @@
     },
     "--color-error-container": {
       "uses": 2,
-      "bare": 0
-    },
-    "--color-mastering-content-state-28": {
-      "uses": 1,
       "bare": 0
     },
     "--color-neutral-container": {
@@ -168,10 +164,6 @@
       "uses": 1,
       "bare": 0
     },
-    "--font-weight-semibold": {
-      "uses": 2,
-      "bare": 0
-    },
     "--line-height-h4": {
       "uses": 1,
       "bare": 0
@@ -220,20 +212,8 @@
       "uses": 9,
       "bare": 0
     },
-    "--size-element-pad-x-xs": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-element-pad-y-xs": {
-      "uses": 1,
-      "bare": 0
-    },
     "--size-element-radius-pill": {
       "uses": 1,
-      "bare": 0
-    },
-    "--size-element-target-sm": {
-      "uses": 2,
       "bare": 0
     },
     "--size-modal-min-height-md": {

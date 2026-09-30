@@ -52,7 +52,8 @@ export const MAX_HISTORY_TURNS = 50;
 /** How long a conversation is remembered. */
 export const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** How long a staged proposal stays confirmable. 60 min, not 15: the gate waits
+/** How long a staged proposal stays confirmable, unless it carries its own
+ *  `ttlMs` — read it through `proposalTtlMs`. 60 min, not 15: the gate waits
  *  on a HUMAN, and live 2026-07-10 a designer's delayed ✅ landed on an expired
  *  card and nothing happened. An hour tolerates meetings; the gate — not the
  *  clock — is still the safety. */
@@ -93,7 +94,7 @@ export const CANCEL_TTL_MS = 5 * 60_000;
  * operation and stops, telling nothing, once it is set
  * (`ThreadState.settleOperation`). The note and the re-staged card are then
  * the only account. Five minutes is how long a person waits to be told; it is
- * short against the hour a re-staged card stays useful.
+ * short against the TTL a re-staged card stays useful.
  */
 export const EXECUTION_CUTOFF_MS = 5 * 60 * 1000;
 
@@ -106,6 +107,16 @@ export const CUT_OFF_SWEEP_SLACK_MS = 30_000;
  *  still untold — a hand-off that never arrived, or a note that did not post.
  *  Until the record's hour is up, or its attempts are spent. */
 export const CUT_OFF_SWEEP_RETRY_MS = 2 * 60 * 1000;
+
+/**
+ * How long the alarm keeps looking at one cut-off run, whatever the card's own
+ * TTL: the hour, or the TTL when that is shorter. Each look re-arms the alarm
+ * `CUT_OFF_SWEEP_RETRY_MS` out, so a 72 h card measured by its TTL would be
+ * retried about 2,160 times on a hand-off that keeps failing; capped, about 30.
+ * A person's own look — a press, a reaction, the next turn in the thread — can
+ * still take the record for the card's whole TTL.
+ */
+export const CUT_OFF_SWEEP_WINDOW_MS = 60 * 60 * 1000;
 
 /**
  * How many times a cut-off note is tried before the teller gives up.
@@ -207,12 +218,151 @@ export interface PendingProposal {
   userMsgTs: string;
   proposalTs: string;
   proposalText: string;
-  /** Who asked. Kept for the record; anyone in the thread may confirm (lock removed 2026-07-14, see gate/reaction-door.ts). */
+  /** Who asked. Kept for the record, not a lock: who may confirm is
+   *  `confirmers` (the requester-only lock was removed 2026-07-14, see
+   *  gate/reaction-door.ts). */
   requesterUserId: string;
   /** Notion PRD resolved at proposal time, carried so it survives the
    *  proposal→confirm round trip and reaches the executor. */
   notionPrdId?: string;
   notionPrdUrl?: string;
+  /**
+   * How long this card stays confirmable, when it is not the hour every turn's
+   * card gets (`PROPOSAL_TTL_MS`). Read through `proposalTtlMs`, and by every
+   * TTL decision the module makes about the record: the lookups, the cut-off
+   * window of the execution it becomes, and the garbage collection — which
+   * runs daily, so a longer-lived card measured by the default would be
+   * deleted an hour in. A card that has to wait out a weekend is the case.
+   */
+  ttlMs?: number;
+  /**
+   * The Slack user ids allowed to resolve this card. Absent, anyone in the
+   * thread may, as every turn's card allows. Present, Gate refuses every
+   * other person's signal on all four doors and names these instead
+   * (`mayConfirm`). An empty list admits nobody: the set is enforced as
+   * written rather than read as "unset".
+   */
+  confirmers?: string[];
+  /**
+   * What a ⛔ still runs, when the card says so. Absent — every turn's card —
+   * a cancel runs nothing. Only a card the Worker stages itself sets it: the
+   * Figma library card files its intake whichever way it is decided and only
+   * the implementation waits on the ✅ (`figma-library/post.ts`). The card's
+   * own copy states it, since a cancel that does something is not what any
+   * other card means by one.
+   */
+  onCancel?: ProposalOperation[];
+  /**
+   * Set on a card the end-of-day sweep staged: the morning it was posted,
+   * `YYYY-MM-DD`. What a ✅, a ⛔ or a revision does to such a card is also
+   * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision of
+   * it and a re-staged card carry it. Its slot in the thread is its
+   * `supersedeKey`, `"sweep"`.
+   */
+  sweepRun?: string;
+  /**
+   * Set on a sweep card the morning staged in a group DM: the pages its fixes
+   * touch, and the team channel a reworded note about each would go to. Once
+   * its ✅ has written one, the Worker stages a separate share card offering
+   * that note (`sweep/share.ts`). A revision or a re-staged card never carries
+   * it, so only the card people were shown offers a share.
+   */
+  sweepShare?: SweepShare;
+  /**
+   * The card's own slot within its reply thread (`proposalSlot`). Absent —
+   * every turn's card — the card holds the thread's slot, and cards there
+   * replace one another. A card the Worker stages into a thread people also
+   * talk in sets one — `"sweep"` for an end-of-day sweep card, `"ds-precedence"`
+   * for the weekly DS precedence card — so it and a turn's card stay live side
+   * by side, and only a card with the same key replaces it. A turn's batch
+   * revises it only when it touches it (`turn/turn.ts`); while both are live,
+   * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
+   * always answers, and a reaction or button resolves the card it is on.
+   */
+  supersedeKey?: string;
+  /**
+   * On a keyed card: what a turn in its thread posts, in place of a card,
+   * when its batch would touch this one. A near-copy would otherwise stay live
+   * beside it, and both could run. The weekly DS precedence card points at
+   * `dispute N`, the one way it is revised.
+   */
+  refuseRevision?: string;
+  /**
+   * The card a person's ask first staged, when this one re-stages it after a
+   * cut-off run (`turn/turn.ts` `restageExecution`), or the sweep card the
+   * Worker staged, when this one revises it. Absent on every other card. The
+   * usage record keys the staging ask on its card, so a ✅ on the
+   * re-staged card still resolves the ask that started it (`stagingCardOf`).
+   */
+  originProposalTs?: string;
+}
+
+/** The card the ask behind this proposal staged: its origin, or itself. */
+export function stagingCardOf(proposal: Pick<PendingProposal, "proposalTs" | "originProposalTs">): string {
+  return proposal.originProposalTs ?? proposal.proposalTs;
+}
+
+/**
+ * The proposal a won ⛔ runs as: its `onCancel` batch in place of its own,
+ * with no cancel run of its own — so the execution record, a cut-off note and
+ * any re-staged card all describe what the cancel actually started.
+ */
+export function cancelRunOf(proposal: PendingProposal): PendingProposal | null {
+  const operations = proposal.onCancel;
+  if (!operations?.length) return null;
+  const { onCancel: _onCancel, ...rest } = proposal;
+  return { ...rest, operations, toolName: operations[0]!.toolName, input: operations[0]!.input };
+}
+
+/** What a staging did beside storing the card: the ts of each live card in
+ *  the same reply thread it retired (`ThreadState.putProposal`). */
+export interface StagingReport {
+  retired: string[];
+}
+
+/** A card's own terms: how long it lives and who may confirm it. Both
+ *  optional, and a card with neither is held to the defaults. */
+/** A group-DM sweep card's share (`PendingProposal.sweepShare`). */
+export interface SweepShare {
+  pages: Array<{ url: string; title: string; to: "plus-universal" | "plus-design" }>;
+}
+
+export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;
+
+/** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */
+export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number {
+  return proposal.ttlMs ?? PROPOSAL_TTL_MS;
+}
+
+/** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
+ *  card on the default hour, so that answer reads exactly as it always has. */
+export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: number } {
+  return proposal.ttlMs !== undefined ? { ttlMs: proposal.ttlMs } : {};
+}
+
+/**
+ * Whether this person may resolve this card. No confirmer set, anyone may;
+ * with one, only its members — and a signal with no person behind it is
+ * refused, since the set cannot be checked against it.
+ */
+export function mayConfirm(
+  proposal: Pick<PendingProposal, "confirmers">,
+  userId: string | undefined,
+): boolean {
+  if (!proposal.confirmers) return true;
+  return userId !== undefined && proposal.confirmers.includes(userId);
+}
+
+/**
+ * What a revision inherits from the card it replaces: its lifetime and who
+ * may confirm it. A person pushing back on a card is asking for different
+ * content, not a different gate, so the revision is held to the same terms.
+ */
+export function inheritedTerms(replaced: ProposalTerms | null | undefined): ProposalTerms {
+  return {
+    ...(replaced?.ttlMs !== undefined ? { ttlMs: replaced.ttlMs } : {}),
+    ...(replaced?.confirmers ? { confirmers: [...replaced.confirmers] } : {}),
+  };
 }
 
 /**
@@ -226,6 +376,31 @@ export function proposalReplyThread(
   proposal: Pick<PendingProposal, "replyTs" | "threadTs">,
 ): string {
   return proposal.replyTs ?? proposal.threadTs;
+}
+
+/**
+ * The grain one card retires another at: its reply thread, and within it the
+ * card's own slot when it has a key (`supersedeKey`). Both adapters'
+ * `putProposal` compare with this, so a thread holds one turn card and one
+ * card per key at most, and staging retires only the card in its own slot —
+ * a revision of a keyed card retires that card, an unrelated ask stages beside
+ * it. The one supersession mechanism in the module.
+ *
+ * A sweep card staged before the key existed carries `sweepRun` and no key,
+ * and is read as keyed `"sweep"` so it keeps its slot until it expires.
+ */
+export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "supersedeKey" | "sweepRun">): string {
+  const thread = proposalReplyThread(proposal);
+  const key = slotKeyOf(proposal);
+  return key ? `${thread}#${key}` : thread;
+}
+
+/** The end-of-day sweep card's slot key. */
+export const SWEEP_KEY = "sweep";
+
+/** A card's slot key, or undefined for a card holding its thread's slot. */
+export function slotKeyOf(proposal: Pick<PendingProposal, "supersedeKey" | "sweepRun">): string | undefined {
+  return proposal.supersedeKey ?? (proposal.sweepRun ? SWEEP_KEY : undefined);
 }
 
 /**
@@ -253,10 +428,12 @@ export function proposalOperations(
  * claim is won, each operation is marked as it comes back, and it is removed
  * once the outcome has been told. One still here past `EXECUTION_CUTOFF_MS`
  * is a run that never told anyone; once taken, it stays as the fence until
- * its hour is up.
+ * its TTL is up.
  */
 export interface Execution {
-  /** The approved card, whole — its operations are the batch that was run. */
+  /** The approved card, whole — its operations are the batch that was run,
+   *  and its `ttlMs` and `confirmers` are the execution's own: the cut-off
+   *  window and the GC measure this record by `proposalTtlMs(proposal)`. */
   proposal: PendingProposal;
   startedAt: number;
   /** One entry per operation that came back, ok or not, by its index in the
@@ -279,13 +456,13 @@ export interface Execution {
 export type CutOffNoteReport = "told" | "owed" | "given-up";
 
 /**
- * Whether a look may take this execution now: cut off and inside its hour,
+ * Whether a look may take this execution now: cut off and inside its TTL,
  * and either never taken or owed a note a teller failed to post. Both
  * adapters decide with this, so find and take cannot disagree.
  */
 export function cutOffTakeable(execution: Execution, now: number): boolean {
   const age = now - execution.startedAt;
-  if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) return false;
+  if (age <= EXECUTION_CUTOFF_MS || age > proposalTtlMs(execution.proposal)) return false;
   return execution.takenAt === undefined || execution.noteOwed === true;
 }
 
@@ -302,7 +479,8 @@ export function afterFailedNote(execution: Execution): { record: Execution; repo
 /**
  * When the ThreadState alarm should next fire for this execution, or null
  * when it never needs to: a taken record owed no note has a teller, and one past
- * its hour is the GC's. One not yet cut off is due just past the threshold;
+ * `CUT_OFF_SWEEP_WINDOW_MS` (or its TTL, when shorter) is left to a person's
+ * look and then the GC. One not yet cut off is due just past the threshold;
  * one already past it is what `findCutOffExecutions` found and the alarm
  * handed over, and is looked at again in `CUT_OFF_SWEEP_RETRY_MS` in case
  * nobody took it.
@@ -310,7 +488,7 @@ export function afterFailedNote(execution: Execution): { record: Execution; repo
 export function cutOffSweepAt(execution: Execution, now: number): number | null {
   if (execution.takenAt !== undefined && !execution.noteOwed) return null;
   const age = now - execution.startedAt;
-  if (age > PROPOSAL_TTL_MS) return null;
+  if (age > Math.min(proposalTtlMs(execution.proposal), CUT_OFF_SWEEP_WINDOW_MS)) return null;
   if (age > EXECUTION_CUTOFF_MS) return now + CUT_OFF_SWEEP_RETRY_MS;
   return execution.startedAt + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS;
 }
@@ -357,10 +535,12 @@ export type ProposalLookup =
   | { state: "found"; proposal: PendingProposal; createdAt: number }
   /** Retired by a newer card staged in the same reply thread, or retired ahead
    *  of one by `retireProposal` — in which case it reads this way from the
-   *  moment of retirement, and for the rest of its hour if the revision it made
+   *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. */
   | { state: "superseded" }
-  | { state: "expired" }
+  /** `ttlMs` is the card's own lifetime when it set one, so the person can be
+   *  told how long it was live; absent, it lived the default hour. */
+  | { state: "expired"; ttlMs?: number }
   | { state: "none" };
 
 /**
@@ -449,8 +629,13 @@ export interface ThreadState {
    * surfaces: in a channel the two are the same value anyway, and in a DM the
    * fallback only ever compares a pre-migration record, which had no per-ask
    * thread to be told apart by in the first place.
+   *
+   * Answers with the cards THIS staging retired — live ones it found and
+   * stamped, not ones a caller had already retired through `retireProposal`
+   * (that call reported them) — so the usage record can say a card was
+   * replaced only when it was.
    */
-  putProposal(proposal: PendingProposal): Promise<void>;
+  putProposal(proposal: PendingProposal): Promise<StagingReport>;
 
   /**
    * Retire a card because a revision is about to take its place — keeping the
@@ -484,13 +669,17 @@ export interface ThreadState {
    * THE COST, WHEN THE REVISION NEVER ARRIVES. One exit retires a card and then
    * fails to post its replacement (`disposition: "failed"`), leaving a retired
    * record with no successor. A ✅ on it is told to confirm on the thread's
-   * newest card when there is none, for the hour until its TTL turns the answer
+   * newest card when there is none, until its TTL turns the answer
    * back into "expired". That is the better of the two available wrongs — the
    * claim-and-delete it replaces answered "already resolved, another
    * confirmation got there first", which invents a second person — and it is
    * bounded, so it is accepted rather than fixed.
+   *
+   * `retired` is true only when THIS call took a live card out of reach: a
+   * card already claimed (so gone), already retired or replaced, or aged out
+   * answers false — nothing was replaced by this revision.
    */
-  retireProposal(proposalTs: string): Promise<void>;
+  retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
 
   /** Look one up by the ts of its card. */
   getProposalByTs(proposalTs: string): Promise<ProposalLookup>;
@@ -593,9 +782,10 @@ export interface ThreadState {
    * it, and a taken execution is never taken again.
    *
    * An execution younger than `EXECUTION_CUTOFF_MS` is left alone and reads as
-   * null: it may simply still be running. One older than `PROPOSAL_TTL_MS` is
-   * dropped and reads as null too — the same hour a card is confirmable is the
-   * hour an offer to re-stage it stays worth making.
+   * null: it may simply still be running. One older than its card's TTL
+   * (`proposalTtlMs`) is dropped and reads as null too — the same window a
+   * card is confirmable is the window an offer to re-stage it stays worth
+   * making.
    */
   takeCutOffExecution(proposalTs: string): Promise<Execution | null>;
   // (A taken execution whose note failed is taken once more by the next look,
@@ -623,7 +813,7 @@ export interface ThreadState {
    * fence never re-opens, so a run that is only slow cannot resume work a
    * later card would offer again — and is marked owed, so the next take tells
    * it again with the same functions. After `CUT_OFF_NOTE_ATTEMPTS` failed
-   * notes it is "given-up": still taken, owed nothing, gone with its hour. An
+   * notes it is "given-up": still taken, owed nothing, gone with its TTL. An
    * unknown or untaken ts reports "told": there is nothing to owe.
    */
   reportCutOffNote(proposalTs: string, posted: boolean): Promise<CutOffNoteReport>;
