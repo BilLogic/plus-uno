@@ -67,12 +67,12 @@ const CPU_NOTE =
  * Rehearse a run: each job once, in runner order, each read off the meter.
  *
  * @param run - The planned run
- * @param execute - One job's body, as a dry run
+ * @param execute - One job's body, as a dry run, with the run's date
  * @param now - Clock seam
  */
 export async function dryRunScheduledRun(
   run: ScheduledRun,
-  execute: (job: ScheduledJob) => Promise<unknown>,
+  execute: (job: ScheduledJob, runDate: string) => Promise<unknown>,
   now: () => number = () => Date.now(),
 ): Promise<DryRunReport> {
   const queue = run.jobs.map((job) => ({ date: run.date, job }));
@@ -100,7 +100,7 @@ export async function dryRunScheduledRun(
     const startedAt = now();
     let detail: unknown;
     const outcome = await runWithinCeiling(async () => {
-      detail = await execute(job);
+      detail = await execute(job, run.date);
     }, startSubrequests + LOOKUP_CEILING);
     jobs.push({
       ...reading(

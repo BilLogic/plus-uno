@@ -264,7 +264,7 @@ test("a dry run rehearses one ask-resolution job, not all of them", async () => 
   console.log = (...args: unknown[]) => lines.push(args.join(" "));
   try {
     for (const job of planRun("end-of-day", at(22, 0)).jobs.filter((j) => j.kind === "ask-resolution")) {
-      await runScheduledJob({} as Env, job, { dryRun: true });
+      await runScheduledJob({} as Env, job, { dryRun: true, runDate: "2026-09-22" });
     }
   } finally {
     console.log = original;

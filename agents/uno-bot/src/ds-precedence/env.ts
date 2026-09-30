@@ -18,6 +18,7 @@ import { FINDINGS_KV_KEY, figmaGet, kvJson, type FigmaComponentsResponse } from 
 import { channelMembers, REGISTRY_PATH, TRACKED_KV_KEY } from "../figma-library/env";
 import type { LibraryChangeSet } from "../figma-library/draft";
 import type { TrackedPublish } from "../figma-library/track";
+import type { JobContext } from "../scheduled/runs";
 import { inFlightComponents, type PrecedenceRegistry } from "./compare";
 import { disputedItems, PRECEDENCE_MARKER } from "./report";
 import {
@@ -45,9 +46,9 @@ const INDEX_FILE = "design-system/agent-views/components/index.md";
 /**
  * The check job on `Env`.
  * @param env - Worker bindings
- * @param opts - `dryRun` writes nothing
+ * @param opts - `dryRun` writes nothing; `runDate` is the week the report is labelled with
  */
-export async function runDsPrecedenceCheck(env: Env, opts: { dryRun: boolean }): Promise<CheckResult> {
+export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<CheckResult> {
   if (!env.FIGMA_ACCESS_TOKEN || !env.FIGMA_FILE_KEY) {
     return { found: 0, summary: "FIGMA_ACCESS_TOKEN / FIGMA_FILE_KEY not configured — check skipped" };
   }
@@ -73,6 +74,7 @@ export async function runDsPrecedenceCheck(env: Env, opts: { dryRun: boolean }):
       fileKey,
       repo: target.entry.repo,
       now: () => Date.now(),
+      runDate: opts.runDate,
     },
     opts,
   );

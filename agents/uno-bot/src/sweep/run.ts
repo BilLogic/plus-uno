@@ -84,7 +84,7 @@ import type { HistoryMessage } from "../slack/api";
 import { proposalReplyThread, SWEEP_KEY, type PendingProposal, type ThreadState } from "../thread-state/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
 import type { ProposalCard } from "../turn/index";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import {
   cardPlan,
   destinationKey,
@@ -261,7 +261,7 @@ export interface SweepConfig {
   teamSurfaceDbs?: readonly string[];
 }
 
-export interface SweepDeps {
+export interface SweepDeps extends Pick<JobContext, "runDate"> {
   slack: SweepSlack;
   sources: { read(url: string, kind: TargetKind): Promise<SweepSource | null> };
   /** A Contributor's name as a Slack id, when exactly one person has it. */
@@ -408,7 +408,7 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
     const note = "the group DMs uno-bot is in could not be listed";
     return { ...base, outcome: "skipped", note, threads: 0, findings: [], cards: [], summary: note };
   }
-  const runDate = dateOf(deps.now());
+  const runDate = deps.runDate;
   const reports: SweepJobReport[] = [];
   let done = 0;
   const failed: string[] = [];
@@ -486,7 +486,7 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKi
   const now = deps.now();
   const cursor = (await deps.store.cursor(channel)) ?? tsOf(now - FIRST_SWEEP_WINDOW_MS);
   const oldest = tsOf(msOf(cursor) - ACTIVE_THREAD_LOOKBACK_MS);
-  const runDate = dateOf(now);
+  const runDate = deps.runDate;
   const kept: PendingFinding[] = [];
   let threads = 0;
   let readOnly = 0;
@@ -901,7 +901,7 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
   const startedAt = deps.now();
   const meterStart = readMeter(deps);
   const now = deps.now();
-  const postDate = dateOf(now);
+  const postDate = deps.runDate;
   const cards: SweepCardReport[] = [];
   const carded: PendingFinding[] = [];
   const notes: string[] = [];
@@ -1480,7 +1480,7 @@ export async function recordRun(
   },
 ): Promise<void> {
   if (deps.dryRun) return;
-  const runDate = dateOf(r.startedAt);
+  const runDate = deps.runDate;
   const spent = readMeter(deps);
   const { meterStart, ...rest } = r;
   await deps.store.recordRun({

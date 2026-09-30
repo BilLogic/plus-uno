@@ -5,9 +5,9 @@
 // two times a run needs — 10:00 ET (the morning run) and 18:00 ET (the
 // end-of-day run), whether ET is UTC-4 or UTC-5. So a firing reads its own
 // scheduled time in ET and enqueues the matching run; every other firing does
-// nothing. The Figma library poll that
-// once ran on every firing is the end-of-day run's `figma-library-poll` job.
-// The wrangler.toml cron comment gives the ET times.
+// nothing. The Figma library poll that once ran on every firing is the
+// end-of-day run's `figma-library-poll` job. The wrangler.toml cron comment
+// gives the ET times.
 //
 // The handler only ENQUEUES. A scheduled invocation gets about 10 ms of CPU,
 // and a run's work belongs on its runner, where each alarm runs one job with a
@@ -107,6 +107,21 @@ export interface ScheduledJob {
   /** The UTC weekday (0 Sunday … 6 Saturday) the job is planned on; absent,
    *  every day its run fires. */
   readonly weekday?: number;
+}
+
+/**
+ * What every job body is handed beside its job.
+ *
+ * `runDate` is the date the job's records, skips and labels carry, however
+ * late it runs. Under EST the end-of-day run starts at 23:00 UTC, so a job
+ * deferred on a budget stop can run past 00:00 UTC; a date read off the clock
+ * would put it — and the retry of a half-done job — under the next day.
+ */
+export interface JobContext {
+  /** Reads and spends as a real run does, and writes nothing. */
+  readonly dryRun: boolean;
+  /** The date of the run the job was queued under (`ScheduledRun.date`). */
+  readonly runDate: string;
 }
 
 /** A run, planned for one date. */

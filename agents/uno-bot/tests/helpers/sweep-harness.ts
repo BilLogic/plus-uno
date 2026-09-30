@@ -42,6 +42,12 @@ export function at(day: number, hh: number, mm = 0): number {
   return Date.UTC(2026, 8, day, hh, mm);
 }
 
+/** Epoch ms as its UTC date, `YYYY-MM-DD` — a run's date, for a test whose
+ *  run is the day its clock reads. */
+export function utcDay(ms: number): string {
+  return new Date(ms).toISOString().slice(0, 10);
+}
+
 export function notionPage(id: string, over: Partial<SweepSource> = {}): SweepSource {
   return {
     url: `https://www.notion.so/${id}`,
@@ -151,6 +157,9 @@ export function sweepHarness(opts: {
   detectorReplies?: string[];
   people?: Record<string, string>;
   now: number;
+  /** The date of the run the jobs were queued under; unset, the clock's UTC
+   *  date whenever it is read. */
+  runDate?: string;
   dryRun?: boolean;
   store?: InMemorySweepStore;
   threadState?: ThreadState;
@@ -380,6 +389,9 @@ export function sweepHarness(opts: {
     },
     meter: { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ ...headroom }) },
     now: () => clock.now,
+    get runDate() {
+      return opts.runDate ?? utcDay(clock.now);
+    },
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
   return {

@@ -40,7 +40,7 @@ const noop = (key: string, after?: string[]): ScheduledJob =>
   after ? { key, kind: "noop", after } : { key, kind: "noop" };
 
 /** A runner the test drives: storage, a clock, and a log of what each job did. */
-function harness(execute?: (job: ScheduledJob) => Promise<void>) {
+function harness(execute?: (job: ScheduledJob, runDate: string) => Promise<void>) {
   const storage = createInMemoryRunnerStorage();
   const clock = { t: 1_000_000 };
   const ran: string[] = [];
@@ -51,9 +51,9 @@ function harness(execute?: (job: ScheduledJob) => Promise<void>) {
       threadRan.push(job.kind);
       return "handled";
     },
-    runScheduledJob: async (job) => {
+    runScheduledJob: async (job, runDate) => {
       ran.push(job.key);
-      await execute?.(job);
+      await execute?.(job, runDate);
     },
   };
   return { storage, clock, ran, threadRan, deps };
@@ -116,6 +116,25 @@ test("a job cut short by the budget keeps its key and runs before later jobs", a
   assert.equal(await drain(h), 4, "three jobs and one retry");
   assert.deepEqual(h.ran, ["a", "b", "b", "c"]);
   assert.ok(h.clock.t >= before + DEFER_RETRY_MS, "the retry waited the deferred interval");
+});
+
+test("a job is handed its run's date, also when its retry runs past 00:00 UTC", async () => {
+  // Under EST the end-of-day run starts at 23:00 UTC: a job the budget stops
+  // near midnight retries on the next UTC day, still under its run's date.
+  const dates: string[] = [];
+  let tripped = false;
+  const h = harness(async (job, runDate) => {
+    dates.push(`${job.key} ${runDate}`);
+    if (!tripped) {
+      tripped = true;
+      throw new SubrequestBudgetError(38);
+    }
+  });
+  h.clock.t = Date.UTC(2026, 11, 1, 23, 58);
+  await enqueueRun(h.storage, run([noop("sweep")], "2026-12-01"), h.clock.t);
+  await drain(h);
+  assert.ok(h.clock.t >= Date.UTC(2026, 11, 2), "the retry ran on the next UTC day");
+  assert.deepEqual(dates, ["sweep 2026-12-01", "sweep 2026-12-01"]);
 });
 
 test("a read the ceiling stopped without throwing still defers the job", async () => {
