@@ -136,7 +136,7 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 7);
+  assert.equal(body.planned.length, 8);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["figma-library-post", "handled", 0],
     ["figma-library-track", "handled", 0],
@@ -144,6 +144,8 @@ test("the probe dry-runs the named run's jobs", async () => {
     ["ds-precedence-post", "handled", 0],
     ["commitment-nudge", "handled", 0],
     ["figma-drift-post", "handled", 0],
+    // No Notion key: the roster read refuses before spending anything.
+    ["team-roles-sync", "handled", 0],
     // No usage database bound: nothing to purge, nothing spent.
     ["usage-text-purge", "handled", 0],
   ]);

@@ -475,10 +475,10 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 91 `var(--color-*, rgba(…))` sites across 20
-   * files, every one captured. 88 name a defined token and are compared with
+   * Measured over the live tree: 90 `var(--color-*, rgba(…))` sites across 20
+   * files, every one captured. 87 name a defined token and are compared with
    * alpha on both sides; the other 3 name tokens that are defined nowhere,
-   * and are the check's undefined-token finding instead. All 88 agree,
+   * and are the check's undefined-token finding instead. All 87 agree,
    * because the disagreeing washes were fixed when the capture widened, and
    * the test asserts it: a stale wash here is a failure, not a recount.
    */
@@ -499,7 +499,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(91);
+    expect(washes).toBe(90);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -528,8 +528,8 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       withAlpha += 1;
       expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
     }
-    expect(withAlpha).toBe(88);
-    expect(comparable).toBe(648);
+    expect(withAlpha).toBe(87);
+    expect(comparable).toBe(647);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

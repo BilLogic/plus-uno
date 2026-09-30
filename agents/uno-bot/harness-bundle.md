@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 53,927 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 54,331 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 10,810 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 11,214 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1780,6 +1780,7 @@ The same end-of-day read also looks for **commitments**: someone in a swept thre
 - **Where:** a reply in the promise's own thread, mentioning only the promiser. It follows `pickDestination` like every proactive job, so it stays out of #uno-bot and mentions the promiser rather than the lead.
 - **Answers,** from the promiser, as reactions on the reminder: 🙌 done, ⏳ soon (due again two working days out, at most twice), 🙅 not doing it, 🤔 not a promise. The answer replaces the legend in place and sends no new ping. Anyone else's reaction, and any other emoji (✅ included), changes nothing.
 - **One follow-up:** a reminder nobody answers gets one more, "Still on your list?", two working days later. If that one also goes unanswered, the commitment lapses silently. Those two posts are the whole allowance: a ⏳ moves the date and adds no post, and every reminder posted stays answerable.
+- **Learns from answers:** the detector is shown the three newest 🤔 and the three newest 🙌 commitments, as short summaries and at most one per person, so it misreads fewer messages as promises. They come only from public channels and the swept channel itself, so a DM's or another private channel's stay out. There is no fine-tuning and no prompt edit, and with no answers yet the prompt is unchanged.
 - **Said again:** a new promise by the same person in the same thread ("sorry, will do by Fri") is the same task. It adds no reminder, and a later day it names moves the due date the way a ⏳ does.
 - **Limits:** at most two reminders per person each morning; the rest wait for the next one. A commitment left unchecked or unposted three mornings running (an archived channel, a deleted thread) lapses.
 - **Stored:** a `commitments` row in the usage database holds ids, times, the state and two counts. The short summary of what was promised stays in KV with an expiry, and message text and links stay out of the database (ADR-030).

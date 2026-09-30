@@ -50,6 +50,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * The morning `figma-drift-post` asks each thread whose decision may have left
  * a Figma file or code stale whether it is up to date, with a drafted intake
  * (src/figma-drift/).
+ * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
+ * Team Members database (src/usage/team-roles-sync.ts).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -66,7 +68,8 @@ export type ScheduledJobKind =
   | "ds-precedence-check"
   | "ds-precedence-post"
   | "commitment-nudge"
-  | "figma-drift-post";
+  | "figma-drift-post"
+  | "team-roles-sync";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -122,6 +125,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
     { key: "commitment-nudge", kind: "commitment-nudge" },
     { key: "figma-drift-post", kind: "figma-drift-post" },
+    { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },

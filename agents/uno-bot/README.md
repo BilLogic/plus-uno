@@ -172,6 +172,38 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 - **Blueprint contract (public, no token):** `GET /health/blueprint` — booleans only, no row data: every table and select the bot reads, so the product repository's CI fails loudly on a schema change. `GET /debug/blueprint`, `/debug/blueprint-search?q=…` and `/debug/blueprint-subject?need=…` are the token-gated, sample-carrying versions the retrieval evals read.
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/<slug>/` + a root `dev:<slug>` script; `npm install && npm run dev:test-prototype` boots it.
 
+## Metrics
+
+Every success metric published from the usage record is one query file in `queries/usage/`, named after the metric. The file is the metric's definition: its header gives the definition, the window it reads and the caveats, and links to *Final — metrics* in Notion. `npm run test:workerd` runs each one against a seeded local D1 and asserts its numbers (`tests/workerd/metric-queries.test.ts`).
+
+**Run one** from `agents/uno-bot/`. `npm run metric` renders the file with your window and prints the statement; it sends nothing. Then you run it, read-only, against the deployed database:
+
+```bash
+npm run metric -- responsiveness --from 2026-09-01 --to 2026-10-01 --out /tmp/responsiveness.sql
+npx wrangler d1 execute uno-bot-usage --remote --file /tmp/responsiveness.sql
+```
+
+The window is UTC dates, start inclusive, end exclusive. Left out, the dates written in the file stand.
+
+Four files read something that is not in the database, and render it in as a table that exists only in the statement:
+
+- `responsiveness`, `answer-accuracy`, `cost-per-correct-answer` and `gated-writes` read the graded answers, `queries/usage/graded-answers.csv` (`turn_id,grade,grader,note`, grade `correct`, `partial` or `wrong`, one row per turn). Grade answers only, meaning turns with disposition `answered`: cards and clarifying questions are not in the divisor that the accuracy scales. Add rows there and commit them, so a grading can be re-run and cited. `--graded <csv>` reads another file.
+- `self-improvement-loop` reads whether the bot's own tickets closed, exported from GitHub when you run it: `gh issue list --repo BilLogic/plus-uno --state all --json url,closedAt --limit 500 > /tmp/closures.json`, then `--closures /tmp/closures.json`.
+- `responsiveness-baseline` reads the Coordination Request Corpus export (`thread_id,asked_at,first_reply_at,lead_replied_first`, times as epoch milliseconds or as ISO 8601 with a zone; epoch seconds and zone-less times are refused) with `--corpus <csv>`. It has no window.
+
+A file that reads an input fails with `no such table` if you run it without rendering, so an ungraded run cannot pass for a graded one.
+
+**Cite a result** with:
+
+- the query file and the commit it was run from (`git rev-parse --short HEAD`);
+- the window;
+- the graded-answers commit, when the query reads the grading;
+- the date it was run.
+
+**Asks and turns.** A turn is one row per message the bot answered, follow-ups included. An ask is a turn whose own message opened a thread, which is the unit to set against the inbox count. `self-serve-rate`, `where-lead-time-goes`, `load-on-lead` and `repeats-reaching-lead` print one of each, labelled in a `unit` column, and `return-rate` counts asks with the turns beside them. The usage record keeps no thread root, so the ask count is an approximation, and each header says which way it leans.
+
+Numbers taken while the window is still open move as the end-of-day pass settles the last day's asks, so cite a closed window when you can. The known limits are in each file's header. Two of them apply to several files: the expired count is a lower bound, and a ticket's role reads `unknown` when its requester is not on the role map (`agents/uno-bot/src/usage/roles.ts`, synced daily from Team Members), and for every card staged before the map was first synced.
+
 ## Gotchas
 
 - **`repository_dispatch` + default branch:** the implement workflows (`figma-implement.yml`, `figma-implement-design.yml`) only fire when they exist on `main`, or a confirmed proposal silently no-ops.
