@@ -254,29 +254,35 @@ export function isSweepCardPost(post: { text?: string; metadata?: { event_type?:
   return tag === SWEEP_CARD_EVENT || tag === WITHDRAWN_SWEEP_CARD_EVENT || (post.text ?? "").includes(SWEEP_CARD_MARK);
 }
 
-/** A reply that names a card's fixes by number: a drop / keep / change
- *  followed by numbers ("drop 2", "keep 1 and 3"), or a fix named by number
- *  ("item 2", "fix #3"). Words alone — "keep it simple", "change the header
- *  for all breakpoints" — are the thread's own conversation. */
-const NAMES_A_FIX = [
-  /\b(drop|keep|skip|remove|exclude|leave out|change|edit|reword|revise|rewrite)(\s+only)?\s+#?\d{1,2}(\s*(,|and|&)\s*#?\d{1,2})*(?![\d:./%])\b/i,
-  /\b(fix|item|number|no\.?)\s*#?\d{1,2}(?![\d:./%])\b/i,
-];
+/** "drop 2", "remove 1, 3 and 4", "keep 1 and 3", "keep only 2" — the whole
+ *  reply, fix numbers only. A sentence that happens to hold a verb and a
+ *  number ("change 2 buttons to secondary", "remove 2 of the variants") is
+ *  the thread's own conversation. */
+const PICK = /^\s*(drop|remove|keep(?: only)?)\s+((?:#?\d{1,2})(?:\s*(?:,|and|&)\s*#?\d{1,2})*)\s*\.?\s*$/i;
 
 /**
  * Whether a reply with no @mention, in a thread where uno-bot's only posts are
  * sweep cards, is addressed to the card by what it says: a typed gate emoji, or
- * a fix named by its number. The Slack side also engages on a reply posted
- * straight after the card (`slack/events.ts`). Anything else is the thread's
+ * a whole-message pick of its fixes by number. Anything else is the thread's
  * own conversation, and is left alone.
  */
 export function engagesOnSweepCard(text: string): boolean {
-  return typedEmojiDecision(text) !== null || NAMES_A_FIX.some((re) => re.test(text));
+  return typedEmojiDecision(text) !== null || PICK.test(text.trim());
 }
 
-/** "drop 2", "remove 1, 3 and 4", "keep 1 and 3", "keep only 2" — the whole
- *  reply, fix numbers only. */
-const PICK = /^\W*(drop|remove|keep(?: only)?)\s+((?:#?\d{1,2})(?:\s*(?:,|and|&)\s*#?\d{1,2})*)\W*$/i;
+/**
+ * A sweep card's revision as a sweep card still: the sweep's mark leads it and
+ * it carries the sweep's tag, so a reply under it is read by the same rule as
+ * one under the card it replaced (`engagesOnSweepCard`). Its role is
+ * `revision`, which the search for the card's own message passes over.
+ */
+export function asSweepRevision(card: ProposalCard): ProposalCard {
+  return {
+    ...card,
+    lead: `:mag: **${SWEEP_CARD_MARK}** — revised${card.lead ? `: ${card.lead}` : "."}`,
+    tag: { eventType: SWEEP_CARD_EVENT, payload: { role: "revision" } },
+  };
+}
 
 /**
  * Which of a sweep card's fixes a "drop N" / "keep N" reply leaves, by index

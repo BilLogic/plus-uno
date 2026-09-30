@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { resolveSignal, runOperations, type GateVerdict } from "../src/gate/index";
+import { recordProposalEvents, verdictEvents } from "../src/usage/index";
 import { countedFetch, runMetered, subrequestsUsed } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import {
@@ -105,6 +106,27 @@ test("a ✅ from someone neither an owner nor in the thread executes nothing", a
   });
   assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "still live for its confirmers");
 });
+
+// The Worker stages a sweep card, so the Worker puts it on the usage record:
+// its ✅ or ⛔ then pairs with a staged row, as any card's does.
+for (const [glyph, outcome] of [
+  ["white_check_mark", "confirmed"],
+  ["no_entry", "cancelled"],
+] as const) {
+  test(`a sweep card has a staged row, and its ${outcome === "confirmed" ? "✅" : "⛔"} pairs with it`, async () => {
+    const { h, card } = await stagedCard(2);
+    const [staged] = await h.proposalEvents.eventsOf(card.proposalTs);
+    assert.equal(staged?.event, "staged");
+    assert.equal(staged?.via, "worker");
+    const verdict = await resolveSignal(react(card, "U0ADE", glyph), { threadState: h.threadState });
+    assert.equal(verdict.outcome, "won");
+    await recordProposalEvents(h.proposalEvents, verdictEvents(verdict, h.clock.now + 60_000));
+    assert.deepEqual(
+      (await h.proposalEvents.eventsOf(card.proposalTs)).map((e) => e.event),
+      ["staged", outcome],
+    );
+  });
+}
 
 test("a thread participant's ✅ executes", async () => {
   const { h, card } = await stagedCard(2);

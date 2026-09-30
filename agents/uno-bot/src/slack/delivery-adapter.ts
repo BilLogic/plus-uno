@@ -62,6 +62,7 @@
 
 import { turnSurfaceOf } from "../turn/request";
 import type { FooterKind } from "./footer-kind";
+import type { SlackMessageMetadata } from "./api";
 import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { renderGateNote } from "./gate-note";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
@@ -133,6 +134,7 @@ export interface SlackDeliveryClient {
     text: string;
     thread_ts?: string;
     blocks?: unknown[];
+    metadata?: SlackMessageMetadata;
   }): Promise<{ ok: boolean; ts?: string }>;
   /** The answer, rendered, footered, split across messages and verified —
    *  `slack/delivery.ts` § `postTextVerified`. Reports what it POSTED, which
@@ -577,11 +579,13 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // kept alongside as the notification/fallback copy, and it is what the
       // button handler re-renders the card from.
       const blocks = rendered.blocks ?? proposalCardBlocks(rendered.text);
+      const metadata = card.tag ? { event_type: card.tag.eventType, event_payload: card.tag.payload } : undefined;
       let posted = await slack.postMessage({
         channel,
         thread_ts: replyTs,
         text: rendered.text,
         blocks,
+        ...(metadata ? { metadata } : {}),
       });
       // If Slack rejected the blocks (it could not fetch the Figma image_url,
       // or a section overflowed), retry text-only so the confirmation gate
@@ -589,7 +593,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // the same.
       if (!posted.ok) {
         console.warn("[slack] proposal with blocks failed; retrying text-only");
-        posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text });
+        posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text, ...(metadata ? { metadata } : {}) });
       }
       return {
         ok: !!posted.ok,

@@ -358,8 +358,13 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
     const pending = await store.getProposalByThread(ref);
     if (pending && !pending.sweepRun) return true;
 
-    const history = await store.readHistory(ref);
-    if (history.length > 0) return true;
+    // Under a live sweep card the history may hold only the card's own turns
+    // (a drop, a refusal), which is no invitation; the live thread below says
+    // whether anyone has talked to the bot there.
+    if (!pending) {
+      const history = await store.readHistory(ref);
+      if (history.length > 0) return true;
+    }
 
     const aboutTheCard = engagesOnSweepCard(event.text ?? "");
     if (identity) {
@@ -375,13 +380,7 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
         (m) => m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId),
       );
       if (botPosts.some((m) => !isSweepCardPost(m))) return true;
-      if (botPosts.length) {
-        // A reply posted straight after the card, with nothing in between, is
-        // answering it.
-        const before = msgs.filter((m) => Number(m.ts) < Number(event.ts)).at(-1);
-        const underTheCard = !!before && botPosts.includes(before);
-        return aboutTheCard || underTheCard;
-      }
+      if (botPosts.length) return aboutTheCard;
     }
     return pending ? aboutTheCard : false;
   } catch (err) {

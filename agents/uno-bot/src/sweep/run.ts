@@ -54,7 +54,8 @@
 
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
-import type { PendingProposal } from "../thread-state/index";
+import type { PendingProposal, ThreadState } from "../thread-state/index";
+import { recordProposalEvents, stagedEvent, supersededEvents, type ProposalEventLog } from "../usage/index";
 import type { ProposalCard } from "../turn/index";
 import type { ScheduledJob } from "../scheduled/runs";
 import {
@@ -872,6 +873,24 @@ async function sortOutCarded(
       .map((i) => i.findingId),
   );
   return { fresh: due.filter((f) => !had.has(f.id)), already: due.filter((f) => had.has(f.id)) };
+}
+
+/**
+ * Stage a sweep card the Worker posted, and put it on the usage record like
+ * any card: a staged row (via the Worker, in the channel it posted to), and a
+ * superseded row for any card the staging retired. Its later ✅ or ⛔ pairs
+ * with that staged row.
+ */
+export async function stageSweepCard(
+  proposal: PendingProposal,
+  deps: { threadState: Pick<ThreadState, "putProposal">; proposalEvents: ProposalEventLog },
+  now: number,
+): Promise<void> {
+  const { retired } = await deps.threadState.putProposal(proposal);
+  await recordProposalEvents(deps.proposalEvents, [
+    ...supersededEvents(retired, now, "worker"),
+    stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
+  ]);
 }
 
 /** The card as ThreadState stages it: no Turn behind it, its own terms. */

@@ -205,6 +205,10 @@ export interface ProposalCard {
    *  could be fetched. A URL, not a block: what Slack does with an image is
    *  the adapter's. */
   previewImageUrl?: string;
+  /** The Worker's own tag on the card's message, read back later to tell
+   *  what kind of card it is — a revised end-of-day sweep card carries the
+   *  sweep's (`sweep/cards.ts` `asSweepRevision`). */
+  tag?: { eventType: string; payload: Record<string, string> };
 }
 
 // ── What Gate's verdict says ─────────────────────────────────────────────────

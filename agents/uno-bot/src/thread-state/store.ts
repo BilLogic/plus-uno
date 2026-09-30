@@ -263,8 +263,9 @@ export interface PendingProposal {
   sweepRun?: string;
   /**
    * The card a person's ask first staged, when this one re-stages it after a
-   * cut-off run (`turn/turn.ts` `restageExecution`). Absent on every other
-   * card. The usage record keys the staging ask on its card, so a ✅ on the
+   * cut-off run (`turn/turn.ts` `restageExecution`), or the sweep card the
+   * Worker staged, when this one revises it. Absent on every other card. The
+   * usage record keys the staging ask on its card, so a ✅ on the
    * re-staged card still resolves the ask that started it (`stagingCardOf`).
    */
   originProposalTs?: string;

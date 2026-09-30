@@ -23,6 +23,7 @@ let slackCalls: string[] = [];
 let thread: Array<Record<string, unknown>> = ROOT_ONLY;
 /** The card `getProposalByThread` answers; none unless a case sets one. */
 let pending: Record<string, unknown> | null = null;
+let history: unknown[] = [];
 globalThis.fetch = (async (input: unknown) => {
   const url = String(input instanceof Request ? input.url : input);
   slackCalls.push(url.replace("https://slack.com/api/", ""));
@@ -42,7 +43,7 @@ const ENV = {
         return pending;
       },
       async readHistory() {
-        return [];
+        return history;
       },
     }),
   },
@@ -110,6 +111,7 @@ async function withSweepThread<T>(posts: Array<Record<string, unknown>>, fn: () 
   } finally {
     thread = ROOT_ONLY;
     pending = null;
+    history = [];
   }
 }
 
@@ -128,21 +130,55 @@ test("under a sweep card, the thread's own conversation is left alone", async ()
   });
 });
 
-test("under a sweep card, a reply naming fixes by number, a typed gate emoji or an @mention engages", async () => {
+// A sentence that holds a verb and a number is still the thread's own talk:
+// only a whole-message pick of the card's fixes is addressed to it.
+const NUMBERED_TALK = [
+  "change 2 buttons to secondary",
+  "fix 2 bugs before Friday",
+  "we should keep 3 columns on mobile",
+  "item 4 in the spec is outdated",
+  "remove 2 of the variants",
+];
+
+test("under a sweep card, a sentence with a number in it is left alone", async () => {
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY], async () => {
+    for (const text of NUMBERED_TALK) assert.equal(await engages(inSweepThread(text)), false, text);
+  });
+});
+
+test("under a sweep card, a whole-message pick, a typed gate emoji or an @mention engages", async () => {
   await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY], async () => {
     assert.equal(await engages(inSweepThread("drop 2")), true);
     assert.equal(await engages(inSweepThread("keep 1 and 3")), true);
-    assert.equal(await engages(inSweepThread("item 2 is wrong")), true);
-    assert.equal(await engages(inSweepThread("can you reword fix 3?")), true);
+    assert.equal(await engages(inSweepThread("remove 1, 3 and 4.")), true);
+    assert.equal(await engages(inSweepThread("keep only 2")), true);
     assert.equal(await engages(inSweepThread(":white_check_mark:")), true);
     assert.equal(await engages(inSweepThread("⛔")), true);
     assert.equal(await engages(inSweepThread(`<@${BOT}> what does this card change?`)), true);
   });
 });
 
-test("a reply posted straight after the sweep card is answering it", async () => {
+test("a reply posted straight after the sweep card is read by the same rule as any other", async () => {
   await withSweepThread([SWEEP_CARD_POST], async () => {
-    assert.equal(await engages(inSweepThread("Keep it simple")), true);
+    assert.equal(await engages(inSweepThread("Keep it simple")), false);
+    assert.equal(await engages(inSweepThread("drop 1")), true);
+  });
+});
+
+// A revision of a sweep card carries the sweep's mark and tag, and the turn
+// that staged it leaves history behind: neither makes the thread the bot's.
+test("under a revised sweep card, with the drop's turn in history, the same rule holds", async () => {
+  const revision = {
+    user: BOT,
+    bot_id: "BBOT",
+    ts: "1700.8",
+    text: ":mag: *End-of-day sweep* — revised.",
+    metadata: { event_type: "uno_sweep_card", event_payload: { role: "revision" } },
+  };
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY, { user: "U2", ts: "1700.75", text: "drop 2" }, revision], async () => {
+    history = [{ role: "user", text: "drop 2" }, { role: "assistant", text: revision.text }];
+    for (const text of NUMBERED_TALK) assert.equal(await engages(inSweepThread(text)), false, text);
+    assert.equal(await engages(inSweepThread("drop 1")), true);
   });
 });
 

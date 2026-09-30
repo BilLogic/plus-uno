@@ -74,6 +74,7 @@ import {
   mayConfirm,
   proposalOperations,
   proposalReplyThread,
+  proposalTtlMs,
   stagingCardOf,
   type AssistantContext,
   type HistoryTurn,
@@ -103,7 +104,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
-import { replacedBlocks, sweepCardInstruction, sweepCardPick } from "../sweep/cards";
+import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick } from "../sweep/cards";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -878,7 +879,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // model, and its revision is still held to the subset rule below.
   if (request.pending?.sweepRun) {
     const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
-    if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread);
+    if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
   }
 
   // ── A cut-off run in this thread ───────────────────────────────────────────
@@ -1293,6 +1294,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
   }
+  // And it keeps the card's deadline, read before the card is retired.
+  const sweepLeftMs = replaced?.sweepRun ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  if (sweepLeftMs !== undefined && sweepLeftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED);
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
 
   // A different proposal is already pending: retire it, because the card about
   // to go up replaces it. RETIRE, never claim (#583): a claim DELETES, and the
@@ -1320,12 +1328,15 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   await recordSuperseded(retiredAhead);
 
-  const card = await buildCard(
+  const built = await buildCard(
     result,
     deps,
     implementPrdUrlFor(result.toolName, result.input, prd),
     request.surface === "assistant",
   );
+  // A revision of a sweep card is still one, so replies under it are read by
+  // the sweep's rule.
+  const card = replaced?.sweepRun ? asSweepRevision(built) : built;
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
@@ -1366,8 +1377,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // and who may confirm it. A fresh card has none and gets the defaults.
     ...inheritedTerms(replaced),
     // A revision of a sweep card stays a sweep card, in the sweep's slot, so
-    // its items are still recorded (`sweep/outcomes.ts`).
-    ...(replaced?.sweepRun ? { sweepRun: replaced.sweepRun } : {}),
+    // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
+    // deadline, and its outcome joins the row the Worker's staging wrote.
+    ...(replaced?.sweepRun
+      ? { sweepRun: replaced.sweepRun, ttlMs: sweepLeftMs, originProposalTs: stagingCardOf(replaced) }
+      : {}),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
     ...(request.intakeChannel
@@ -1408,10 +1422,29 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   };
 }
 
+/** What a revision of a sweep card that has closed meanwhile is told. */
+const CARD_CLOSED = "That card is no longer open, so it stays as it was.";
+
+/**
+ * How long a live card has left before its deadline — its staging time plus
+ * its own lifetime — or 0 once it is no longer live. A sweep card's revision
+ * lives for this rather than a fresh lifetime.
+ */
+async function timeLeftOn(
+  card: PendingProposal,
+  threadState: TurnDeps["threadState"],
+  now: number,
+): Promise<number> {
+  const live = await threadState.getProposalByTs(card.proposalTs);
+  return live.state === "found" ? Math.max(0, live.createdAt + proposalTtlMs(card) - now) : 0;
+}
+
 /**
  * Stage a sweep card without the fixes a "drop N" left out — or, with none
  * left, cancel it through the gate as a typed ⛔ would. Held to the card's
- * confirmer set, like any revision.
+ * confirmer set, like any revision, and to its deadline: the revision lives
+ * only as long as the card it replaces had left, so dropping again and again
+ * never extends a card.
  */
 async function dropFromSweepCard(
   request: TurnRequest,
@@ -1419,6 +1452,7 @@ async function dropFromSweepCard(
   memory: ThreadMemory,
   kept: number[],
   cardThread: string,
+  staging: StagingFacts,
 ): Promise<TurnOutcome> {
   const { delivery, threadState } = deps;
   const pending = request.pending!;
@@ -1447,12 +1481,29 @@ async function dropFromSweepCard(
   const all = proposalOperations(pending);
   const operations = kept.map((i) => all[i]!);
   const first = operations[0]!;
-  await threadState.retireProposal(pending.proposalTs);
-  const card = await buildCard(
-    { kind: "proposal", operations, toolName: first.toolName, input: first.input },
-    deps,
-    undefined,
-    request.surface === "assistant",
+  // The card's own deadline, read before it is retired: what the revision
+  // inherits in place of a fresh lifetime.
+  const leftMs = await timeLeftOn(pending, threadState, staging.now());
+  if (leftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED);
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
+  const retiredAhead = (await threadState.retireProposal(pending.proposalTs)).retired ? [pending.proposalTs] : [];
+  const recordSuperseded = (retired: readonly string[]) =>
+    recordProposalEvents(
+      deps.usage.proposalEvents,
+      supersededEvents(retired, staging.now(), "revision"),
+      deps.usage.writeTimeoutMs,
+    );
+  await recordSuperseded(retiredAhead);
+  const card = asSweepRevision(
+    await buildCard(
+      { kind: "proposal", operations, toolName: first.toolName, input: first.input },
+      deps,
+      undefined,
+      request.surface === "assistant",
+    ),
   );
   const posted = await delivery.card(card);
   if (!posted.ok || !posted.ts) {
@@ -1471,9 +1522,29 @@ async function dropFromSweepCard(
     proposalText: posted.text,
     requesterUserId: request.userId,
     ...inheritedTerms(pending),
+    ttlMs: leftMs,
     sweepRun: pending.sweepRun!,
+    // The Worker staged the card this revises: its usage row is the root
+    // every later outcome joins to.
+    originProposalTs: stagingCardOf(pending),
   };
-  await threadState.putProposal(proposal);
+  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  await recordSuperseded(retiredByStaging);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    [
+      stagedEvent({
+        proposal,
+        at: staging.now(),
+        via: "turn",
+        channelStored: staging.channelStored,
+        turnId: staging.turnId,
+        testTraffic: staging.testTraffic,
+        askText: request.text,
+      }),
+    ],
+    deps.usage.writeTimeoutMs,
+  );
   await memory.remember(posted.text);
   return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
 }

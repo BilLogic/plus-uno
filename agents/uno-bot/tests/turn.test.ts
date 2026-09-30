@@ -918,6 +918,63 @@ test("a confirmer's \"drop 2\" revises a sweep card by index, without the model"
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "superseded");
 });
 
+// A drop is a revision on the usage record like any other: the card it
+// replaces is superseded, the revision has a staged row, and that row names the
+// Worker's own card as its root. And the revision carries the sweep's mark and
+// tag, so replies under it are read by the sweep's rule.
+test("a \"drop 2\" revision is superseded-and-staged on the record, rooted at the sweep card, and marked as one", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+
+  const revision = outcome.staged!.proposal;
+  assert.equal(revision.originProposalTs, SWEEP_CARD.proposalTs);
+  assert.deepEqual(
+    (await h.proposalEvents.eventsOf(SWEEP_CARD.proposalTs)).map((e) => [e.event, e.via]),
+    [["superseded", "revision"]],
+  );
+  const [staged] = await h.proposalEvents.eventsOf(revision.proposalTs);
+  assert.equal(staged?.event, "staged");
+  assert.equal(staged?.originProposalId, SWEEP_CARD.proposalTs);
+  assert.match(outcome.staged!.card.lead ?? "", /End-of-day sweep/);
+  assert.equal(outcome.staged!.card.tag?.eventType, "uno_sweep_card");
+  assert.equal(outcome.staged!.card.tag?.payload.role, "revision");
+});
+
+// A revision lives only as long as the card it replaces had left: dropping
+// again and again, or asking the model for a revision, never extends a card.
+test("a sweep card's revisions inherit its deadline rather than a fresh lifetime", async () => {
+  const HOUR = 3_600_000;
+  const clock = { now: 1_800_000_000_000 };
+  const threadState = createInMemoryThreadState({ now: () => clock.now });
+  const three: PendingProposal = {
+    ...SWEEP_CARD,
+    operations: [...SWEEP_CARD.operations!, { toolName: "notion_update", input: { ...FIX_TWO, replace: [{ ...FIX_TWO.replace[0]!, block_id: "blk-3" }] } }],
+  };
+  await threadState.putProposal(three);
+
+  clock.now += 10 * HOUR;
+  const first = await runTurn(
+    request({ text: "drop 3", pending: three, userId: "U0OWNER" }),
+    harness({ threadState, now: () => clock.now }).deps,
+  );
+  assert.equal(first.staged!.proposal.ttlMs, 62 * HOUR);
+
+  clock.now += 10 * HOUR;
+  const second = await runTurn(
+    request({ text: "leave out the owner one", pending: first.staged!.proposal, userId: "U0OWNER" }),
+    harness({
+      threadState,
+      now: () => clock.now,
+      replies: [{ text: "Dropped the owner fix.", toolCalls: [{ name: "notion_update", args: FIX_ONE }] }],
+    }).deps,
+  );
+  assert.equal(second.disposition, "staged");
+  assert.equal(second.staged!.proposal.ttlMs, 52 * HOUR);
+  assert.match(second.staged!.card.lead ?? "", /End-of-day sweep/);
+});
+
 test("\"keep 2\" keeps only that fix; dropping every fix cancels the card", async () => {
   const kept = harness();
   await kept.threadState.putProposal(SWEEP_CARD);

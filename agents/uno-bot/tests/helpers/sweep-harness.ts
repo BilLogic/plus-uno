@@ -11,6 +11,7 @@ import { proposalCardBlocks, renderProposalCard } from "../../src/slack/proposal
 import {
   createInMemorySweepStore,
   modelDriftDetector,
+  stageSweepCard,
   type ChannelKind,
   type InMemorySweepStore,
   type SweepDeps,
@@ -18,6 +19,7 @@ import {
   type SweepSource,
 } from "../../src/sweep/index";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../../src/thread-state/index";
+import { createInMemoryProposalEventLog } from "../../src/usage/index";
 
 export const DESIGN = "C0DESIGN";
 export const UNIVERSAL = "C0UNIVERSAL";
@@ -136,6 +138,7 @@ export function sweepHarness(opts: {
   const clock = { now: opts.now };
   const store = opts.store ?? createInMemorySweepStore();
   const threadState = opts.threadState ?? createInMemoryThreadState({ now: () => clock.now });
+  const proposalEvents = createInMemoryProposalEventLog();
   // Recorded replies, in order; a test may add the next night's before running it.
   const replies = [...(opts.detectorReplies ?? [])];
   const base = fakeProvider();
@@ -238,7 +241,8 @@ export function sweepHarness(opts: {
       async stage(proposal) {
         once("stage");
         staged.push(proposal);
-        await threadState.putProposal(proposal);
+        // The production staging: the card, and its rows on the usage record.
+        await stageSweepCard(proposal, { threadState, proposalEvents }, clock.now);
       },
       async withdraw(channel, messageTs, text, cardKey) {
         const card = posted.find((p) => p.channel === channel && p.ts === messageTs);
@@ -257,7 +261,23 @@ export function sweepHarness(opts: {
     now: () => clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
-  return { deps, store, threadState, provider, replies, posted, staged, reads, clock, budget, headroom, faults, broken, unknownSearches };
+  return {
+    deps,
+    store,
+    threadState,
+    proposalEvents,
+    provider,
+    replies,
+    posted,
+    staged,
+    reads,
+    clock,
+    budget,
+    headroom,
+    faults,
+    broken,
+    unknownSearches,
+  };
 }
 
 /** A human message. */

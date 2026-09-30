@@ -53,6 +53,7 @@ import {
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
+import { proposalEventLogFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import type { ScheduledJob } from "../scheduled/runs";
@@ -63,7 +64,7 @@ import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
 import { SWEEP_CARD_EVENT, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
-import { FIND_POSTED_PAGES, runSweepJob, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
+import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
 /** One key per channel: `sweep:findings:<channel>`. */
@@ -195,7 +196,11 @@ async function sweepDepsFor(
         return { state: "unknown", why: `more than ${FIND_POSTED_PAGES} pages to search` };
       },
       async stage(proposal) {
-        await threadStateFor(env).putProposal(proposal);
+        await stageSweepCard(
+          proposal,
+          { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) },
+          Date.now(),
+        );
       },
       async withdraw(channel, ts, text, cardKey) {
         await updateMessage(env, {
