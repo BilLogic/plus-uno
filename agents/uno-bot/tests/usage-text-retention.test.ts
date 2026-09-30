@@ -5,7 +5,10 @@
 // every day. These cases walk the real schedule hour by hour — which firings
 // start a run, and which runs hold the purge job, read from `runs.ts` itself —
 // and the real purge job, over a store holding one ask, and check that the
-// text is gone before it is 14 days old.
+// text is gone before it is 14 days old. The purge is the last job of its run
+// and may start up to `PURGE_LATE_MS` after its firing, so each case takes the
+// worst of that spread: every purge decides at its firing time, and the one
+// that clears the text is counted as running late.
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -15,6 +18,8 @@ import type { AskCategoryStore } from "../src/usage/category-store";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
+/** How late the purge may start after its run's firing. */
+const PURGE_LATE_MS = HOUR;
 
 /** A store holding one ask's text, and nothing else the purge can see. */
 function oneAsk(askedAt: number): AskCategoryStore & { held(): boolean } {
@@ -54,13 +59,14 @@ function purgeFirings(from: number, days: number): number[] {
 }
 
 /** How old the ask's text is when a purge finally clears it, with `skip`
- *  (a firing time) missed. */
-async function ageWhenCleared(askedAt: number, skip?: number): Promise<number> {
+ *  (a firing time) missed and the clearing purge `late` after its firing. A
+ *  purge that ran late would clear no less, so each decides at its firing. */
+async function ageWhenCleared(askedAt: number, skip?: number, late = PURGE_LATE_MS): Promise<number> {
   const store = oneAsk(askedAt);
   for (const t of purgeFirings(askedAt, 21)) {
     if (t === skip) continue;
     await runTextPurge({ store, now: () => t, dryRun: false });
-    if (!store.held()) return t - askedAt;
+    if (!store.held()) return t + late - askedAt;
   }
   throw new Error("never cleared");
 }
@@ -77,7 +83,7 @@ test("both weekday runs purge", () => {
 });
 
 test("a Friday-evening ask's text is gone before it is 14 days old", async () => {
-  const age = await ageWhenCleared(FRIDAY_EVENING);
+  const age = await ageWhenCleared(FRIDAY_EVENING, undefined, 0);
   assert.ok(age >= PURGE_AFTER_MS, "not before the cutoff");
   assert.ok(age <= TEXT_RETENTION_MS, `cleared at ${age / DAY} days`);
 });
@@ -102,7 +108,7 @@ test("any ask hour in a week, with any one run missed, is cleared within 14 days
   }
 });
 
-test("the weekend the clocks go back, with one run missed, still clears within 14 days", async () => {
+test("the weekend the clocks go back, with one run missed and the purge late, still clears within 14 days", async () => {
   // Fri 30 Oct's end-of-day run is 22:00 UTC (EDT) and Mon 2 Nov's runs are
   // 15:00 and 23:00 UTC (EST): the weekend gap is an hour longer than usual.
   const fridayRun = Date.UTC(2026, 9, 30, 22);

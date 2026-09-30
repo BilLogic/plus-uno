@@ -54,7 +54,7 @@ import {
   type FollowThroughConfig,
   type ScanDeps,
 } from "../src/follow-through/index";
-import { at, BOT, DESIGN, NOTES_DB, notionPage, sweepHarness, ts, UNIVERSAL, UNO_BOT } from "./helpers/sweep-harness";
+import { at, BOT, DESIGN, NOTES_DB, notionPage, sweepHarness, ts, UNIVERSAL, UNO_BOT, utcDay } from "./helpers/sweep-harness";
 
 const SCAN: ScheduledJob = { key: "card-follow-through", kind: "card-follow-through" };
 const NUDGE: ScheduledJob = { key: "commitment-nudge", kind: "commitment-nudge" };
@@ -119,7 +119,7 @@ function roadmap(
 }
 
 function scanDeps(store: InMemoryCommitmentStore, rm: ReturnType<typeof roadmap>, now = EOD): ScanDeps {
-  return { reads: rm.reads, people: rm.people, store, config: CONFIG, now: () => now };
+  return { reads: rm.reads, people: rm.people, store, config: CONFIG, now: () => now, runDate: utcDay(now) };
 }
 
 /** A morning's Slack, and the commitment job with the card handler. */
@@ -157,6 +157,7 @@ function morning(store: InMemoryCommitmentStore, rm: ReturnType<typeof roadmap>,
     markThread: async () => {},
     config: { unoBot: UNO_BOT, botUserId: BOT },
     now: () => now,
+    runDate: utcDay(now),
     cards: cardFollowUps(due),
   };
   return { run: () => runCommitmentNudges(NUDGE, deps), posts, marked };
@@ -220,6 +221,7 @@ async function keptTodo(store = createInMemoryCommitmentStore(), reply?: string)
     store,
     config: CONFIG,
     now: () => EOD,
+    runDate: utcDay(EOD),
   });
   return { store, rows, provider };
 }
@@ -318,7 +320,7 @@ describe("F3: a to-do to make a card", () => {
         takers: [BEA, ADE],
         todos: [{ blockId: "b1", assignee: null, what: "the booking empty states" }],
       },
-      { store, config: CONFIG, now: () => EOD },
+      { store, config: CONFIG, now: () => EOD, runDate: utcDay(EOD) },
     );
     const row = only(store);
     assert.equal(row.channel, DESIGN);
@@ -733,6 +735,7 @@ describe("beside \"remind me\"", () => {
       markThread: async () => {},
       config: { unoBot: UNO_BOT, botUserId: BOT },
       now: () => at(31, 14),
+      runDate: utcDay(at(31, 14)),
       cards: { due: async (c) => (seen.push(c.id), { id: c.id, action: "auto_done" }) },
     };
     await runCommitmentNudges(NUDGE, deps);
@@ -957,6 +960,7 @@ describe("one message, one row", () => {
       store,
       config: CONFIG,
       now: () => EOD,
+      runDate: utcDay(EOD),
     });
     const promiseHook = commitmentThreadHook({
       detector: modelCommitmentDetector(
@@ -965,6 +969,7 @@ describe("one message, one row", () => {
       store,
       config: { unoBot: UNO_BOT },
       now: () => EOD,
+      runDate: utcDay(EOD),
     });
     await cardHook(thread, ts(29, 0));
     await promiseHook(thread, ts(29, 0));
@@ -1015,6 +1020,7 @@ describe("F3 answers", () => {
       store,
       config: CONFIG,
       now: () => EOD,
+      runDate: utcDay(EOD),
     });
     const rm = roadmap();
     await morning(store, rm, at(32, 14)).run();
@@ -1034,6 +1040,7 @@ describe("F3 answers", () => {
       store,
       config: CONFIG,
       now: () => EOD,
+      runDate: utcDay(EOD),
     });
     await morning(store, roadmap(), at(32, 14)).run();
     const row = only(store);
@@ -1098,6 +1105,7 @@ describe("running notes", () => {
         people: roadmap().people,
         config: CONFIG,
         now: () => EOD,
+        runDate: utcDay(EOD),
       });
       await hook({ pageId: NOTE_ID, url: `https://www.notion.so/${NOTE_ID}`, entries: [{ id: "n-todo", text: "Maya to create a card for the facelift last stage", at: at(29, 17) }], takers: [BEA, ADE] });
       const row = only(store);
@@ -1111,19 +1119,19 @@ describe("wiring", () => {
   const env = { USAGE_DB: {}, HARNESS_KV: {} } as unknown as Env;
 
   it("the channel read feeds the thread hooks, the notes job the note hook, and no other sweep kind either", () => {
-    const channel = sweepHooks(env, { key: "sweep:C0DESIGN", kind: "sweep-channel", channel: "C0DESIGN" }, false);
+    const channel = sweepHooks(env, { key: "sweep:C0DESIGN", kind: "sweep-channel", channel: "C0DESIGN" }, { dryRun: false, runDate: utcDay(EOD) });
     assert.deepEqual(Object.keys(channel), ["onThread"]);
-    const notes = sweepHooks(env, { key: "sweep:notes", kind: "sweep-notes" }, false);
+    const notes = sweepHooks(env, { key: "sweep:notes", kind: "sweep-notes" }, { dryRun: false, runDate: utcDay(EOD) });
     assert.deepEqual(Object.keys(notes), ["onNote"]);
-    assert.deepEqual(sweepHooks(env, { key: "sweep:cards", kind: "sweep-cards" }, false), {});
-    assert.deepEqual(sweepHooks(env, { key: "sweep:group-dms", kind: "sweep-group-dms" }, false), {});
+    assert.deepEqual(sweepHooks(env, { key: "sweep:cards", kind: "sweep-cards" }, { dryRun: false, runDate: utcDay(EOD) }), {});
+    assert.deepEqual(sweepHooks(env, { key: "sweep:group-dms", kind: "sweep-group-dms" }, { dryRun: false, runDate: utcDay(EOD) }), {});
   });
 
   it("with no usage database there are no hooks at all", () => {
     const bare = {} as Env;
-    assert.deepEqual(sweepHooks(bare, { key: "sweep:C0DESIGN", kind: "sweep-channel", channel: "C0DESIGN" }, false), {});
-    assert.deepEqual(sweepHooks(bare, { key: "sweep:notes", kind: "sweep-notes" }, false), {});
-    assert.equal(threadHooks(bare, false), undefined);
+    assert.deepEqual(sweepHooks(bare, { key: "sweep:C0DESIGN", kind: "sweep-channel", channel: "C0DESIGN" }, { dryRun: false, runDate: utcDay(EOD) }), {});
+    assert.deepEqual(sweepHooks(bare, { key: "sweep:notes", kind: "sweep-notes" }, { dryRun: false, runDate: utcDay(EOD) }), {});
+    assert.equal(threadHooks(bare, { dryRun: false, runDate: utcDay(EOD) }), undefined);
   });
 
   it("the message job tries the DS dispute first, then a drift answer, then the card follow-up reply", () => {
@@ -1190,6 +1198,7 @@ function quietMorning(store: InMemoryCommitmentStore, now: number, cards?: Nudge
     markThread: async () => {},
     config: { unoBot: UNO_BOT, botUserId: BOT },
     now: () => now,
+    runDate: utcDay(now),
     ...(cards ? { cards } : {}),
   };
   return { posts, run: () => runCommitmentNudges(NUDGE, deps) };
