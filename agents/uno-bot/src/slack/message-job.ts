@@ -18,6 +18,7 @@
 //   • a revision that throws falls through to the ordinary turn in the same
 //     job, so the reply is answered rather than dropped.
 
+import { rethrowIfBudget } from "../net";
 import type { RunClaim } from "../thread-state/index";
 import type { SlackMessageEvent } from "./types";
 
@@ -34,6 +35,41 @@ export interface MessageJobDeps {
   engages(event: SlackMessageEvent): Promise<boolean>;
   /** The ordinary turn. */
   turn(event: SlackMessageEvent): Promise<void>;
+}
+
+/** One reply handled ahead of the turn: a shape check that reads nothing, and
+ *  the handler, true when the reply was its. */
+export interface ReplyHandler {
+  name: string;
+  candidate(event: SlackMessageEvent): boolean;
+  handle(event: SlackMessageEvent): Promise<boolean>;
+}
+
+/**
+ * Several ahead-of-the-turn handlers as the job's one dispute door: a reply is
+ * a candidate when any handler says so, and the first whose candidate it is
+ * and which handles it wins. A handler that throws anything but a budget stop
+ * is logged and read as "not mine", so one failing handler never reaches the
+ * job's own catch — which would run the turn with no engagement check.
+ *
+ * @param handlers - In the order tried
+ */
+export function chainReplyHandlers(handlers: readonly ReplyHandler[]): Pick<MessageJobDeps, "disputeCandidate" | "dispute"> {
+  return {
+    disputeCandidate: (event) => handlers.some((h) => h.candidate(event)),
+    async dispute(event) {
+      for (const h of handlers) {
+        if (!h.candidate(event)) continue;
+        try {
+          if (await h.handle(event)) return true;
+        } catch (err) {
+          rethrowIfBudget(err);
+          console.error(`[${h.name}] reply not handled: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
+      return false;
+    },
+  };
 }
 
 /** A person's own plain message: no bot, no subtype, some text. */

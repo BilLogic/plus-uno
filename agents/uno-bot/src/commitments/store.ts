@@ -47,6 +47,9 @@ export const LIVE_STATES: readonly CommitmentState[] = ["open", "nudged", "snooz
 /**
  * What made the row:
  *   • `thread_promise` — a promise read in a swept thread;
+ *   • `self_reminder` — a "remind me" a person asked uno-bot for in the turn
+ *     (`./remind.ts`) — a commitment made to themselves, so its promiser and
+ *     requester are the same person;
  *   • `card_todo` — a to-do to make a Roadmap card, from a thread or a running
  *     note, whose evidence is a matching card;
  *   • `card_unowned` — an active card with no Contributor;
@@ -55,10 +58,22 @@ export const LIVE_STATES: readonly CommitmentState[] = ["open", "nudged", "snooz
  * this module stores and schedules them, and hands their morning and their
  * answers to it.
  */
-export type CommitmentKind = "thread_promise" | "card_todo" | "card_unowned" | "card_stale";
+export type CommitmentKind = "thread_promise" | "self_reminder" | "card_todo" | "card_unowned" | "card_stale";
 
 /** The card kinds, which the follow-through module handles. */
 export const CARD_KINDS: readonly CommitmentKind[] = ["card_todo", "card_unowned", "card_stale"];
+
+/** Whether a row is a card follow-up's. */
+export function isCardKind(kind: CommitmentKind): boolean {
+  return CARD_KINDS.includes(kind);
+}
+
+/** A thread card to-do's id: its message's, marked. One message is either a
+ *  card to-do or a promise, never both — the promise hook passes over a
+ *  message this id is already kept for. */
+export function cardTodoId(channel: string, messageTs: string): string {
+  return `${channel}:${messageTs}:card`;
+}
 
 /** One promise, as `commitments` holds it. */
 export interface CommitmentRecord {
@@ -131,20 +146,21 @@ export interface CommitmentRecords {
   nextDue(now: number, runDate: string, skip?: readonly string[]): Promise<CommitmentRecord | null>;
   /** How many commitments each promiser was reminded of on `runDate`. */
   remindedOn(runDate: string): Promise<Record<string, number>>;
-  /** A live promise (`thread_promise`) of this promiser's in this thread, or
-   *  null. */
+  /** A live thread promise of this promiser's in this thread, or null — a
+   *  "remind me" there is never the same task said again. */
   liveInThread(channel: string, threadTs: string, promiserId: string): Promise<CommitmentRecord | null>;
   /** The commitment a reminder with this ts belongs to — its first reminder or
    *  its follow-up. */
   byReminderTs(ts: string): Promise<CommitmentRecord | null>;
   update(id: string, patch: CommitmentPatch): Promise<void>;
-  /** The newest `done` promises and the newest `not_promise` ones, at most
-   *  `limit` of each, newest answer first — those made in a public channel or in
-   *  `channel` itself, never another private place's or a DM's. */
+  /** The newest `done` rows and the newest `not_promise` rows, at most `limit`
+   *  of each, newest answer first — thread promises made in a public channel
+   *  or in `channel` itself, never another private place's, a DM's, or a
+   *  "remind me". */
   latestAnswers(channel: string, limit: number): Promise<CommitmentRecord[]>;
-  /** The follow-up for this Roadmap card detected last, of any card kind, or
-   *  null. */
-  latestForCard(cardId: string): Promise<CommitmentRecord | null>;
+  /** For each of these Roadmap cards that has one, the follow-up detected
+   *  last, of any card kind — one read for a night's candidates. */
+  latestForCards(cardIds: readonly string[]): Promise<Record<string, CommitmentRecord>>;
 }
 
 /** What one commitment's wording is, kept beside its row. */
@@ -161,9 +177,12 @@ export interface CommitmentText {
   card?: { title: string; url: string; status: string | null };
   /** Where a card to-do was read: the thread's permalink or the note's link. */
   sourceUrl?: string;
+  /** A thread card to-do's other posters, who may ask for the draft too. */
+  participants?: string[];
   /** A stuck card whose owner answered 🙌 or 🙅: the Design Status options
-   *  offered, in the order shown, until one is picked and staged. */
-  choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean };
+   *  offered, in the order shown, until one is picked and staged or the
+   *  choice lapses; `reposted` once the list went up a second time. */
+  choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean; listedAt: number; reposted: boolean };
 }
 
 /** The KV half. */

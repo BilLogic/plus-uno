@@ -13,9 +13,12 @@
 //
 // PURE: no `Env`, no Slack module, no Workers global.
 
-import { mapReaction } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { reminderAnswer } from "../commitments/copy";
+
+/** F3's draft is asked for with ✅ (or ✔️) alone — not 👍, which reads as a
+ *  nod rather than "draft it". */
+const DRAFT_GLYPHS: ReadonlySet<string> = new Set(["white_check_mark", "heavy_check_mark"]);
 
 /** What an answer to a card follow-up means. */
 export type CardAnswer = "draft" | "done" | "still_on_it" | "drop";
@@ -29,7 +32,7 @@ export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", gl
   const bare = glyph.replace(/::skin-tone-\d$/, "");
   const reminder = reminderAnswer(bare);
   if (kind === "card_todo") {
-    if (mapReaction(bare) === "confirm") return "draft";
+    if (DRAFT_GLYPHS.has(bare)) return "draft";
     return reminder === "not_doing" ? "drop" : null;
   }
   if (kind === "card_stale") {
@@ -43,7 +46,7 @@ export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", gl
 /** The legend under each kind's first message and its follow-up. */
 export const CARD_LEGENDS = {
   card_todo: "✅ Draft it · 🙅 Drop it",
-  card_unowned: "Reply here with an @mention and I'll draft the Contributor change",
+  card_unowned: "Reply here with an @mention, or \"me\", and I'll draft the Contributor change",
   card_stale: "🙌 Done · ⏳ Still on it · 🙅 Drop it",
 } as const;
 
@@ -106,7 +109,7 @@ export function cardFollowUpText(kind: "card_todo" | "card_unowned" | "card_stal
     case "card_todo":
       return `${mentionsOf(people)} Still want that card drafted? A ✅ or a 🙅 is all I need.`;
     case "card_unowned":
-      return `${mentionsOf(people)} Still looking for someone to take this card. Reply with an @mention and I'll draft the change.`;
+      return `${mentionsOf(people)} Still looking for someone to take this card. Reply with an @mention, or "me", and I'll draft the change.`;
     case "card_stale":
       return `${mentionsOf(people)} Still moving? A reaction is all I need.`;
   }

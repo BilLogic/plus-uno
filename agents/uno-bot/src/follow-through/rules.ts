@@ -4,8 +4,9 @@
 //   • F3 — a to-do to make a card ("Bill to create a card for the facelift's
 //     last stage") with no matching card two working days on. A card matches
 //     when its title carries the to-do's own words (`matchesTodo`).
-//   • F4 — an active card (`ACTIVE_DESIGN_STATUSES`) with no Contributor for
-//     `UNOWNED_AFTER_MS`.
+//   • F4 — a card being worked (`UNOWNED_STATUSES`: WIP, Under Review) with no
+//     Contributor for `UNOWNED_AFTER_MS`. Ready for Design and Need PRD are
+//     queue states, where no owner yet is expected.
 //   • F5 — an active card with a Contributor that has sat in one Design Status
 //     for `STALE_AFTER_MS` with no comment in that time.
 //
@@ -26,7 +27,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** The Design Status options a card is being worked in, exact. */
 export const ACTIVE_DESIGN_STATUSES: readonly string[] = ["Ready for Design", "WIP", "Under Review"];
-/** F4: an active card with no Contributor, unedited this long. */
+/** F4's statuses, exact: work under way, where a card should have an owner. */
+export const UNOWNED_STATUSES: readonly string[] = ["WIP", "Under Review"];
+/** F4: a card in one of those with no Contributor, unedited this long. */
 export const UNOWNED_AFTER_MS = 7 * DAY_MS;
 /** F5: an active card, unedited and uncommented this long. */
 export const STALE_AFTER_MS = 21 * DAY_MS;
@@ -35,8 +38,12 @@ export const CARD_MESSAGE_GAP_MS = 7 * DAY_MS;
 /** Working days a card follow-up's one follow-up waits: a week, so a card
  *  never gets two messages in one. */
 export const CARD_REARM_WORKING_DAYS = 5;
-/** F4 and F5 follow-ups one channel gets in one morning; the rest wait. */
-export const MAX_CARD_POSTS_PER_CHANNEL = 5;
+/** New top-level card questions one channel gets in one morning; the rest
+ *  wait a morning. */
+export const MAX_CARD_POSTS_PER_CHANNEL = 2;
+/** How long an F5 owner's choice of Design Status stays open: a proposal
+ *  card's life. */
+export const CHOICE_TTL_MS = 72 * 60 * 60 * 1000;
 
 /** An active Roadmap card, as the end of day reads it. */
 export interface ActiveCard {
@@ -69,7 +76,10 @@ export function isActive(card: Pick<ActiveCard, "designStatus" | "archived">): b
  */
 export function maybeCondition(card: ActiveCard, now: number): CardCondition | null {
   if (!isActive(card)) return null;
-  if (!card.contributors.length) return card.lastEditedAt <= now - UNOWNED_AFTER_MS ? "unowned" : null;
+  if (!card.contributors.length) {
+    const working = card.designStatus !== null && UNOWNED_STATUSES.includes(card.designStatus);
+    return working && card.lastEditedAt <= now - UNOWNED_AFTER_MS ? "unowned" : null;
+  }
   return card.lastEditedAt <= now - STALE_AFTER_MS ? "stale" : null;
 }
 

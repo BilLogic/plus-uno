@@ -38,7 +38,14 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
     },
     async liveInThread(channel, threadTs, promiserId) {
       const live = [...rows.values()]
-        .filter((r) => r.kind === "thread_promise" && r.channel === channel && r.threadTs === threadTs && r.promiserId === promiserId && LIVE_STATES.includes(r.state))
+        .filter(
+          (r) =>
+            r.kind === "thread_promise" &&
+            r.channel === channel &&
+            r.threadTs === threadTs &&
+            r.promiserId === promiserId &&
+            LIVE_STATES.includes(r.state),
+        )
         .sort((a, b) => a.promisedAt - b.promisedAt);
       return copy(live[0]);
     },
@@ -59,11 +66,11 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
         [...rows.values()].filter((r) => r.state === state && seen(r)).sort(newest).slice(0, Math.max(0, limit));
       return [...of("done"), ...of("not_promise")].sort(newest).map((r) => ({ ...r }));
     },
-    async latestForCard(cardId) {
-      const mine = [...rows.values()]
-        .filter((r) => r.cardId === cardId)
-        .sort((a, b) => b.detectedAt - a.detectedAt || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0));
-      return copy(mine[0]);
+    async latestForCards(cardIds) {
+      const latest: Record<string, CommitmentRecord> = {};
+      const newestFirst = [...rows.values()].sort((a, b) => b.detectedAt - a.detectedAt || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0));
+      for (const r of newestFirst) if (r.cardId && cardIds.includes(r.cardId) && !latest[r.cardId]) latest[r.cardId] = { ...r };
+      return latest;
     },
     async text(id) {
       const kept = texts.get(id);

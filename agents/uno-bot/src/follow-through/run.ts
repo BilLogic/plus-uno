@@ -7,18 +7,21 @@
 // across promises and cards alike. The commitment job schedules them and
 // hands each to this module (`CardFollowUps`).
 //
-// FIVE ENTRY POINTS:
+// THE ENTRY POINTS:
 //
 //   `runCardFollowThroughScan` — the end-of-day `card-follow-through` job. It
-//   reads the Roadmap's active cards in one query and keeps a row for each
-//   that is F4's (no Contributor, a week untouched) or F5's (three weeks
-//   untouched and uncommented) — at most `MAX_NEW_PER_NIGHT` a night, and never
-//   a card that had a message in the past week (`mayFollowUpCard`).
+//   reads the Roadmap's active cards in one query, looks up what each
+//   candidate last had in one D1 read, and keeps a row for each that is F4's
+//   (in WIP or Under Review with no Contributor, a week untouched) or F5's
+//   (active, three weeks untouched and uncommented) — at most
+//   `MAX_NEW_PER_NIGHT` a night, never a card that had a message in the past
+//   week (`mayFollowUpCard`), and never one uno-bot's integration created.
 //
-//   `cardTodoThreadHook` — the sweep's per-thread hook, beside commitment
+//   `cardTodoThreadHook` — the sweep's per-thread hook, run before commitment
 //   reminders': a thread's to-do to make a card becomes an F3 row, due two
-//   working days on. `recordNoteCardTodos` keeps a running note's to-dos the
-//   same way, for the note reader to hand them to.
+//   working days on, and the promise hook passes over its message.
+//   `cardTodoNoteHook` does the same for a team running note the capture
+//   sweep read, after its team-note guard (`recordNoteCardTodos`).
 //
 //   `cardFollowUpDue` — the morning, for one due row. It looks for the
 //   evidence first: a Roadmap card matching the to-do, a Contributor now set,
@@ -32,10 +35,13 @@
 //   🙌 and 🙅 from the owner list the card's live Design Status options, the
 //   likely ones first, and ⏳ leaves the card be.
 //
-//   `handleCardReply` — a reply under a follow-up: under F4's question, one
-//   naming someone ("@Maya") stages the Contributor change; under F5's list,
-//   the owner's pick — a number or a name typed whole — stages the Design
-//   Status change, and anything else gets the list again and stages nothing.
+//   `handleCardReply` — a reply in a thread marked when an F4 question or an
+//   F5 list went up (an unmarked thread costs no D1 read): under F4's
+//   question, one naming exactly one person ("@Maya", or "me") stages the
+//   Contributor change, and the row settles once the card shows it; under
+//   F5's list, the owner's pick — a number or a name typed whole — stages the
+//   Design Status change, and anything else gets the list again once and then
+//   is the thread's own. `handleCardReplySafely` never throws.
 //
 // WHERE IT POSTS: `pickDestination`, as every proactive job. A thread's to-do
 // is answered in that thread (a private channel's stays there); a card has no
@@ -44,8 +50,9 @@
 // comment, never the lead by default.
 //
 // PROPOSAL CARDS are staged the sweep's way (`stageSweepCard`, via the `stage`
-// port): in the follow-up's thread, in their own `"follow-through"` slot, for
-// 72 hours, confirmable by the owners and whoever answered. Every write waits
+// port): in the follow-up's thread, in a slot of their own per follow-up
+// (`"follow-through:<row id>"`, so two drafts in one thread stand side by
+// side), for 72 hours, confirmable by the owners and whoever answered. Every write waits
 // for that ✅, and every select value in it is exact-matched against the
 // Roadmap's own options (hard rule 4): a pillar only when the database has
 // it, a status only when it is one of the board's.
@@ -55,14 +62,14 @@
 
 import { D1QueryBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { ScheduledJob } from "../scheduled/runs";
-import { pickDestination, resolveDestination, routeOwner, type SweepThread } from "../sweep/finding";
+import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type SweepMessage, type SweepThread } from "../sweep/finding";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalCard } from "../turn/index";
 import type { PendingProposal, ProposalOperation } from "../thread-state/index";
 import { reminderBlocks } from "../commitments/copy";
-import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf } from "../commitments/due";
-import { TEXT_KEEP_MS, type CommitmentAction } from "../commitments/run";
-import { LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
+import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, TEXT_KEEP_MS } from "../commitments/due";
+import type { CommitmentAction } from "../commitments/run";
+import { cardTodoId, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
 import {
   cardAcknowledgement,
   cardAnswer,
@@ -77,6 +84,7 @@ import {
 } from "./copy";
 import {
   CARD_REARM_WORKING_DAYS,
+  CHOICE_TTL_MS,
   cardCondition,
   cardFollowUpId,
   isActive,
@@ -100,8 +108,11 @@ export const MAX_NEW_PER_NIGHT = 15;
 export const CARD_SCAN_COST = { subrequests: 4, d1Queries: 2 };
 /** How long a proposal card a follow-up stages stays confirmable. */
 export const FOLLOW_THROUGH_CARD_TTL_MS = 72 * 60 * 60 * 1000;
-/** The thread slot those cards hold (`PendingProposal.supersedeKey`). */
+/** The thread slot those cards hold (`PendingProposal.supersedeKey`), one per
+ *  follow-up: `follow-through:<row id>`. */
 export const FOLLOW_THROUGH_KEY = "follow-through";
+/** How long an F4 question's thread takes replies: past its follow-up. */
+export const OWNER_REPLY_TTL_MS = 21 * 24 * 60 * 60 * 1000;
 
 type CardKind = "card_todo" | "card_unowned" | "card_stale";
 
@@ -119,6 +130,8 @@ export interface CardReads {
   pillarOptions(): Promise<string[]>;
   /** The Roadmap's `Design Status` options, exactly and in the schema's order. */
   statusOptions(): Promise<string[]>;
+  /** uno-bot's own Notion integration user, whose cards it never asks about. */
+  botUserId(): Promise<string | null>;
 }
 
 /** Who is who, across Notion and Slack; null when not exactly one person. */
@@ -140,8 +153,16 @@ export interface FollowThroughConfig {
 export interface CardProposal {
   card: ProposalCard;
   channel: string;
+  channelKind: ChannelKind;
   threadTs: string;
   confirmers: string[];
+  /** Its slot in the thread (`PendingProposal.supersedeKey`). */
+  slot: string;
+}
+
+/** A follow-up's proposal slot. */
+export function proposalSlotFor(c: Pick<CommitmentRecord, "id">): string {
+  return `${FOLLOW_THROUGH_KEY}:${c.id}`;
 }
 
 export interface FollowUpMessage {
@@ -152,7 +173,7 @@ export interface FollowUpMessage {
 // ── End of day: the Roadmap scan (F4, F5) ───────────────────────────────────
 
 export interface ScanDeps {
-  reads: Pick<CardReads, "activeCards" | "lastCommentAt">;
+  reads: Pick<CardReads, "activeCards" | "lastCommentAt" | "botUserId">;
   people: Pick<CardPeople, "slackIdForNotionUser" | "slackIdForName">;
   store: CommitmentStore;
   config: FollowThroughConfig;
@@ -186,12 +207,23 @@ export async function runCardFollowThroughScan(job: ScheduledJob, deps: ScanDeps
     const note = notes.length ? ` — ${notes.join("; ")}` : "";
     return { kind: "card-follow-through", key: job.key, rows, notes, summary: `${verb} ${rows.length} card follow-up(s)${note}` };
   };
-  ensureHeadroom(deps, { subrequests: 2, d1Queries: 1 });
+  ensureHeadroom(deps, { subrequests: 3, d1Queries: 1 });
   const { cards, truncated } = await deps.reads.activeCards();
   if (truncated) notes.push("the active cards did not fit one read; the rest wait for a later night");
-  const candidates = cards
+  const bot = await deps.reads.botUserId();
+  const maybe = cards
     .map((card) => ({ card, maybe: maybeCondition(card, now) }))
     .filter((c): c is { card: ActiveCard; maybe: CardCondition } => c.maybe !== null)
+    // A card uno-bot's own integration made has no person to ask.
+    .filter((c) => !(bot && c.card.creatorId === bot));
+  // What every candidate last had, in one read, so a card asked about and
+  // still untouched never takes a place in the night's count.
+  const latest = maybe.length ? await deps.store.latestForCards(maybe.map((c) => c.card.pageId)) : {};
+  const candidates = maybe
+    .filter(({ card, maybe }) => {
+      const last = latest[card.pageId] ?? null;
+      return last?.id !== cardFollowUpId(card.pageId, maybe, card.lastEditedAt) && mayFollowUpCard(last, now);
+    })
     .sort((a, b) => a.card.lastEditedAt - b.card.lastEditedAt || a.card.pageId.localeCompare(b.card.pageId));
   for (const { card, maybe } of candidates) {
     if (rows.length >= MAX_NEW_PER_NIGHT) {
@@ -200,8 +232,6 @@ export async function runCardFollowThroughScan(job: ScheduledJob, deps: ScanDeps
     }
     ensureHeadroom(deps, CARD_SCAN_COST);
     const id = cardFollowUpId(card.pageId, maybe, card.lastEditedAt);
-    const latest = await deps.store.latestForCard(card.pageId);
-    if (latest?.id === id || !mayFollowUpCard(latest, now)) continue;
     const condition = maybe === "stale" ? cardCondition(card, await deps.reads.lastCommentAt(card.pageId), now) : maybe;
     if (!condition) continue;
     const place = cardPlace(card, deps.config);
@@ -244,12 +274,14 @@ export async function runCardFollowThroughScan(job: ScheduledJob, deps: ScanDeps
     };
     rows.push(row);
     if (deps.dryRun) continue;
-    await deps.store.addCommitments([row]);
+    // The wording first: a stop between the two leaves wording with no row,
+    // which expires, never a row with no wording, which would lapse unasked.
     await deps.store.saveText(
       id,
       { what: card.title, bodies: {}, mentions: people.slice(1), card: { title: card.title, url: card.url, status: card.designStatus } },
       now + TEXT_KEEP_MS,
     );
+    await deps.store.addCommitments([row]);
   }
   return report();
 }
@@ -312,7 +344,7 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
     const owner = todo.assignee ?? routeOwner({ claimedBy: null, participants, contributorIds: [], starter }).owner;
     if (!owner) continue;
     const promisedAt = Math.round(Number(todo.messageTs) * 1000);
-    const id = `${thread.channel}:${todo.messageTs}:card`;
+    const id = cardTodoId(thread.channel, todo.messageTs);
     rows.push({
       id,
       kind: "card_todo",
@@ -338,7 +370,7 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
       remindedOn: null,
       resolvedAt: null,
     });
-    texts[id] = { what: todo.what, bodies: {} };
+    texts[id] = { what: todo.what, bodies: {}, participants: participants.filter((p) => p !== owner) };
   }
   if (deps.dryRun || !rows.length) return rows;
   await keepRows(deps.store, rows, texts);
@@ -428,12 +460,62 @@ export async function recordNoteCardTodos(
 }
 
 async function keepRows(store: CommitmentStore, rows: CommitmentRecord[], texts: Record<string, CommitmentText>): Promise<void> {
-  await store.addCommitments(rows);
+  // The wording first, so a stop between never leaves a row with none. A row
+  // already there keeps its wording and its reminder bodies.
   for (const row of rows) {
-    // A row already there keeps its wording and its reminder bodies.
     if (await store.text(row.id)) continue;
     await store.saveText(row.id, texts[row.id]!, row.dueAt + TEXT_KEEP_MS);
   }
+  await store.addCommitments(rows);
+}
+
+/** A team running note the capture sweep read: its entries edited since the
+ *  cursor, and its Note Takers as Slack ids. */
+export interface ReadNote {
+  pageId: string;
+  url: string;
+  entries: Array<{ id: string; text: string; at: number }>;
+  takers: string[];
+}
+
+/**
+ * The capture sweep's per-note hook for card to-dos: the note's new entries
+ * shown to the card to-do detector as one thread, each to-do kept as an F3
+ * row (`recordNoteCardTodos`) naming its assignee when the name matches one
+ * Slack member, else the takers. Called only for a note past the capture
+ * sweep's team-note guard. A budget stop throws through; any other failure is
+ * logged.
+ */
+export function cardTodoNoteHook(
+  deps: Pick<TodoDeps, "detector" | "store" | "now" | "dryRun"> & {
+    config: FollowThroughConfig;
+    people: Pick<CardPeople, "slackIdForName">;
+  },
+): (note: ReadNote) => Promise<void> {
+  return async (note) => {
+    try {
+      if (!note.entries.length) return;
+      const messages: SweepMessage[] = note.entries.map((e, i) => ({ ts: `${i + 1}.000000`, user: "note", text: e.text }));
+      const found = await deps.detector.detect({ thread: { channel: "notes", channelKind: "public", rootTs: messages[0]!.ts, messages }, since: "0" });
+      if (!found.ok) throw new Error(`the card to-do detector did not answer (${found.error})`);
+      const todos: NoteCardTodos["todos"] = [];
+      for (const t of found.todos) {
+        const entry = note.entries[Number(t.messageTs.split(".")[0]) - 1];
+        if (!entry) continue;
+        const assignee = t.assigneeName ? await deps.people.slackIdForName(t.assigneeName) : null;
+        todos.push({ blockId: entry.id, assignee, what: t.what });
+      }
+      const meetingAt = Math.min(...note.entries.map((e) => e.at).filter(Number.isFinite));
+      const rows = await recordNoteCardTodos(
+        { pageId: note.pageId, url: note.url, meetingAt: Number.isFinite(meetingAt) ? meetingAt : deps.now(), takers: note.takers, todos },
+        deps,
+      );
+      if (rows.length) console.log(`[follow-through] note ${note.pageId}: ${rows.length} card to-do(s)`);
+    } catch (err) {
+      rethrowIfBudget(err);
+      console.warn(`[follow-through] note ${note.pageId}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
 }
 
 // ── Morning: check, then ask ─────────────────────────────────────────────────
@@ -446,6 +528,8 @@ export interface DueDeps {
   };
   store: CommitmentStore;
   markThread(channel: string, thread: string): Promise<void>;
+  /** Mark a thread whose replies may answer a follow-up, for `ttlMs`. */
+  markReplyThread(channel: string, thread: string, ttlMs: number): Promise<void>;
   config: FollowThroughConfig;
   dryRun?: boolean;
 }
@@ -537,6 +621,8 @@ export async function cardFollowUpDue(
   });
   await deps.store.saveText(c.id, { ...text, bodies: { ...text.bodies, [sent.ts]: body } }, now + TEXT_KEEP_MS);
   await deps.markThread(c.channel, to.threadTs ?? sent.ts);
+  // Replies under F4's question may name its owner.
+  if (first && c.kind === "card_unowned") await deps.markReplyThread(c.channel, sent.ts, OWNER_REPLY_TTL_MS);
   return { id: c.id, action, text: body, ts: sent.ts };
 }
 
@@ -599,6 +685,10 @@ export interface AnswerDeps {
   post(to: { channel: string; threadTs: string }, text: string): Promise<void>;
   /** Post a proposal card in a follow-up's thread and stage it. */
   stage(proposal: CardProposal): Promise<boolean>;
+  /** Mark a thread whose replies may answer a follow-up, for `ttlMs`; and ask
+   *  whether one is marked — the gate on any D1 read for a reply. */
+  markReplyThread(channel: string, thread: string, ttlMs: number): Promise<void>;
+  isReplyThread(channel: string, thread: string): Promise<boolean>;
   config: FollowThroughConfig;
   now(): number;
 }
@@ -626,17 +716,18 @@ export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, d
   if (!answer || !LIVE_STATES.includes(c.state) || r.userId === deps.config.botUserId) return;
   const text = await deps.store.text(c.id);
   const people = [c.promiserId, ...(text?.mentions ?? [])];
-  // Drafting writes nothing, so anyone may ask for the draft; every other
-  // answer is its owners'.
-  if (answer !== "draft" && !people.includes(r.userId)) return;
+  // The owners answer; the draft may also be asked for by anyone who posted
+  // in the to-do's thread.
+  const allowed = answer === "draft" ? [...people, ...(text?.participants ?? [])] : people;
+  if (!allowed.includes(r.userId)) return;
   const now = deps.now();
-  const thread = { channel: r.channel, threadTs: c.threadTs || c.nudgeTs || r.messageTs };
+  const thread = { channel: r.channel, channelKind: c.channelKind, threadTs: c.threadTs || c.nudgeTs || r.messageTs };
   const confirmers = [...new Set([...people, r.userId])];
 
   let staged = false;
   if (answer === "draft") {
     if (!text) return;
-    staged = await deps.stage({ card: await draftCard(c, text, deps), ...thread, confirmers });
+    staged = await deps.stage({ card: await draftCard(c, text, deps), ...thread, confirmers, slot: proposalSlotFor(c) });
     if (!staged) return;
     await deps.store.update(c.id, { state: "done", resolvedAt: now });
   } else if (answer === "still_on_it") {
@@ -650,7 +741,8 @@ export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, d
     const options = text?.card ? orderStatusOptions(await deps.reads.statusOptions(), choice, text.card.status) : [];
     if (text?.card && options.length) {
       await deps.post(thread, statusChoiceText({ owner: r.userId, card: text.card, options }));
-      await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false } }, now + TEXT_KEEP_MS);
+      await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false, listedAt: now, reposted: false } }, now + TEXT_KEEP_MS);
+      await deps.markReplyThread(thread.channel, thread.threadTs, CHOICE_TTL_MS);
       staged = true;
     }
     await deps.store.update(c.id, { state: answer === "done" ? "done" : "dropped", resolvedAt: now });
@@ -737,19 +829,19 @@ export interface CardReply {
   text: string;
 }
 
+type ReplyDeps = Pick<AnswerDeps, "store" | "people" | "update" | "post" | "stage" | "markReplyThread" | "isReplyThread" | "config" | "now">;
+
 /**
  * A reply under a card follow-up: F4's owner, or F5's pick of Design Status.
  * False when the thread holds neither, or the reply is not one — it then
- * takes its ordinary path.
+ * takes its ordinary path. A thread with no follow-up mark costs no D1 read.
  *
  * @param reply - The reply
  * @param deps - The store, the people, the posts and the staging
  */
-export async function handleCardReply(
-  reply: CardReply,
-  deps: Pick<AnswerDeps, "store" | "people" | "update" | "post" | "stage" | "config" | "now">,
-): Promise<boolean> {
+export async function handleCardReply(reply: CardReply, deps: ReplyDeps): Promise<boolean> {
   if (reply.user === deps.config.botUserId) return false;
+  if (!(await deps.isReplyThread(reply.channel, reply.threadTs))) return false;
   const c = await deps.store.byReminderTs(reply.threadTs);
   if (!c || c.channel !== reply.channel) return false;
   if (c.kind === "card_unowned") return ownerReply(c, reply, deps);
@@ -757,19 +849,48 @@ export async function handleCardReply(
   return false;
 }
 
-/** Under F4's question, a reply naming someone stages the Contributor change. */
-async function ownerReply(
-  c: CommitmentRecord,
-  reply: CardReply,
-  deps: Pick<AnswerDeps, "store" | "people" | "update" | "post" | "stage" | "config" | "now">,
-): Promise<boolean> {
-  const named = [...reply.text.matchAll(/<@([UW][A-Z0-9]+)(?:\|[^>]*)?>/g)]
-    .map((m) => m[1]!)
-    .find((id) => id !== deps.config.botUserId);
+/**
+ * `handleCardReply`, never throwing: any failure but a budget stop is logged
+ * and read as "not a follow-up reply", so the reply takes its ordinary path —
+ * the engagement check included — and never a turn it would not have had.
+ */
+export async function handleCardReplySafely(reply: CardReply, deps: ReplyDeps): Promise<boolean> {
+  try {
+    return await handleCardReply(reply, deps);
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.error(`[follow-through] reply ${reply.channel} ${reply.threadTs} not handled: ${err instanceof Error ? err.message : String(err)}`);
+    return false;
+  }
+}
+
+/** A reply that takes the card itself: "me", "mine", "I'll take it". */
+const TAKES_IT = /^\s*(me|mine|i['’]?ll take it|i will take it|i can take it|i['’]?ll take this|i['’]?ll do it)\s*[.!]*\s*$/i;
+
+/**
+ * Who a reply under F4's question names: its one human mention, or the
+ * replier when it takes the card itself. Null for none, several, or a
+ * mention of uno-bot.
+ */
+export function namedOwner(text: string, replier: string, botUserId: string | null | undefined): string | null {
+  const mentioned = [...new Set([...text.matchAll(/<@([UW][A-Z0-9]+)(?:\|[^>]*)?>/g)].map((m) => m[1]!))];
+  if (botUserId && mentioned.includes(botUserId)) return null;
+  if (mentioned.length === 1) return mentioned[0]!;
+  if (!mentioned.length && TAKES_IT.test(text)) return replier;
+  return null;
+}
+
+/**
+ * Under F4's question, a reply naming exactly one person stages the
+ * Contributor change. The row stays live: it settles when the card shows a
+ * Contributor, so a change nobody applies lets the follow-up ask again.
+ */
+async function ownerReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps): Promise<boolean> {
+  const named = namedOwner(reply.text, reply.user, deps.config.botUserId);
   if (!named || !LIVE_STATES.includes(c.state)) return false;
   const text = await deps.store.text(c.id);
   if (!text?.card) return false;
-  const thread = { channel: reply.channel, threadTs: reply.threadTs };
+  const thread = { channel: reply.channel, channelKind: c.channelKind, threadTs: reply.threadTs };
   const notionUser = await deps.people.notionUserForSlack(named);
   if (!notionUser) {
     await deps.post(thread, `I can't match <@${named}> to one Notion person, so the Contributor needs setting on the card itself.`);
@@ -779,42 +900,43 @@ async function ownerReply(
     card: contributorCard(text.card, named, notionUser),
     ...thread,
     confirmers: [...new Set([c.promiserId, ...(text.mentions ?? []), reply.user, named])],
+    slot: proposalSlotFor(c),
   });
   if (!staged) return true;
-  await deps.store.update(c.id, { state: "done", resolvedAt: deps.now() });
   await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, cardAcknowledgement("owner", true));
   return true;
 }
 
 /**
  * Under F5's list, the owner's pick stages the Design Status change — only the
- * owner's reply counts. A reply that is no listed option gets the options
- * again, on one line, and stages nothing. The value staged is the schema's
+ * owner's reply counts, and only while the choice is open (`CHOICE_TTL_MS`).
+ * A reply that is no listed option gets the options again, on one line, once;
+ * after that, replies are the thread's own. The value staged is the schema's
  * own spelling, and `notion_update` exact-matches it again when it runs.
  */
-async function statusReply(
-  c: CommitmentRecord,
-  reply: CardReply,
-  deps: Pick<AnswerDeps, "store" | "post" | "stage" | "update" | "now">,
-): Promise<boolean> {
+async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps): Promise<boolean> {
   const text = await deps.store.text(c.id);
   const choosing = text?.choosing;
-  if (!text?.card || !choosing || choosing.staged) return false;
+  if (!text?.card || !choosing || choosing.staged || deps.now() > choosing.listedAt + CHOICE_TTL_MS) return false;
   const owners = [c.promiserId, ...(text.mentions ?? [])];
   if (!owners.includes(reply.user)) return false;
-  const thread = { channel: reply.channel, threadTs: reply.threadTs };
+  const thread = { channel: reply.channel, channelKind: c.channelKind, threadTs: reply.threadTs };
   const status = pickStatus(reply.text, choosing.options);
+  const keep = choosing.listedAt + CHOICE_TTL_MS + TEXT_KEEP_MS;
   if (!status) {
+    if (choosing.reposted) return false;
     await deps.post(thread, statusRetryText(choosing.options));
+    await deps.store.saveText(c.id, { ...text, choosing: { ...choosing, reposted: true } }, keep);
     return true;
   }
   const staged = await deps.stage({
     card: statusCard(text.card, status, choosing.answer),
     ...thread,
     confirmers: [...new Set([...owners, reply.user])],
+    slot: proposalSlotFor(c),
   });
   if (!staged) return true;
-  await deps.store.saveText(c.id, { ...text, choosing: { ...choosing, staged: true } }, deps.now() + TEXT_KEEP_MS);
+  await deps.store.saveText(c.id, { ...text, choosing: { ...choosing, staged: true } }, keep);
   await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, cardAcknowledgement("status", true));
   return true;
 }
@@ -842,7 +964,7 @@ export function followThroughProposal(p: CardProposal, posted: { ts: string; tex
     requesterUserId: "",
     ttlMs: FOLLOW_THROUGH_CARD_TTL_MS,
     confirmers: [...p.confirmers],
-    supersedeKey: FOLLOW_THROUGH_KEY,
+    supersedeKey: p.slot,
   };
 }
 

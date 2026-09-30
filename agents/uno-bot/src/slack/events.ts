@@ -39,9 +39,9 @@ import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
 import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
-import { handleCardReplyOnEnv, isCardReplyCandidate } from "../follow-through/env";
+import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
 import { typedEmojiDecision } from "../gate/reactions";
-import { isUserTurn, runMessageJob } from "./message-job";
+import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
 
 // Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
 export type {
@@ -85,7 +85,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       const msg = event as SlackMessageEvent;
       // A `dispute N` reply in the weekly DS precedence thread is queued like a
       // turn, and handled at the head of the thread's job (`message-job.ts`).
-      if (isDsPrecedenceCandidate(env, msg) || isCardReplyCandidate(env, msg) || (await shouldHandleMessage(env, msg))) {
+      if (isDsPrecedenceCandidate(env, msg) || (await mayBeCardReply(env, msg)) || (await shouldHandleMessage(env, msg))) {
         await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
@@ -433,13 +433,20 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // exit it has (#555); the in-thread stop door (#576) is the one other
     // settler, and it settles by the same card-based rule.
     markDone: (runKey) => store.markRunDone(runKey).catch(() => {}),
-    // Two replies are handled ahead of the turn: a weekly DS precedence
-    // dispute, and an answer under a card follow-up (an owner, a status).
-    disputeCandidate: (e) => isDsPrecedenceCandidate(env, e) || isCardReplyCandidate(env, e),
-    dispute: async (e) => (await handleDsPrecedenceReply(env, e)) || (await handleCardReplyOnEnv(env, e)),
+    ...chainReplyHandlers(replyHandlersFor(env)),
     engages: (e) => shouldHandleMessage(env, e),
     turn: (e) => handleUserMessage(env, e),
   });
+}
+
+/** The replies handled ahead of the turn, in the order tried, each never
+ *  throwing: a weekly DS precedence dispute, and an answer under a card
+ *  follow-up. */
+export function replyHandlersFor(env: Env): ReplyHandler[] {
+  return [
+    { name: "ds-precedence", candidate: (e) => isDsPrecedenceCandidate(env, e), handle: (e) => handleDsPrecedenceReply(env, e) },
+    { name: "follow-through", candidate: (e) => isCardReplyCandidate(env, e), handle: (e) => handleCardReplyOnEnv(env, e) },
+  ];
 }
 
 async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<void> {

@@ -1,7 +1,7 @@
 // The D1 commitment records — `commitments` in the usage database
-// (migrations/usage/0006_commitments.sql, and 0007_commitment_answers.sql for
-// where each promise was made, and 0011_card_follow_ups.sql for card
-// follow-ups and their card id).
+// (migrations/usage/0006_commitments.sql, 0007_commitment_answers.sql for
+// where each promise was made, 0008_self_reminders.sql for "remind me", and
+// 0009_card_follow_ups.sql for card follow-ups and their card id).
 //
 // As the sweep's records do (`sweep/d1.ts`): every statement prepared with
 // bound parameters and charged to the meter BEFORE it is sent
@@ -71,15 +71,18 @@ const NEXT_DUE =
   `AND promiser_id NOT IN (SELECT value FROM json_each(?)) ORDER BY due_at, commitment_id LIMIT 1`;
 const REMINDED_ON = "SELECT promiser_id, COUNT(*) AS n FROM commitments WHERE reminded_on = ? GROUP BY promiser_id";
 const LIVE_IN_THREAD =
-  `${SELECT} WHERE kind = 'thread_promise' AND channel_id = ? AND thread_ts = ? AND promiser_id = ? AND state IN (${LIVE}) ` +
+  `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND kind = 'thread_promise' AND state IN (${LIVE}) ` +
   `ORDER BY promised_at, commitment_id LIMIT 1`;
 // One statement for both answers: each capped on its own, then merged newest
-// first. A row from a DM or another private place never matches.
+// first. A row from a DM or another private place never matches, nor does a
+// "remind me", which is no promise the detector should learn from.
 const answers = (state: "done" | "not_promise") =>
-  `SELECT * FROM (${SELECT} WHERE kind = 'thread_promise' AND state = '${state}' AND (channel_kind = 'public' OR channel_id = ?) ` +
+  `SELECT * FROM (${SELECT} WHERE state = '${state}' AND kind = 'thread_promise' AND (channel_kind = 'public' OR channel_id = ?) ` +
   `ORDER BY resolved_at DESC, commitment_id DESC LIMIT ?)`;
 const LATEST_ANSWERS = `${answers("done")} UNION ALL ${answers("not_promise")} ORDER BY resolved_at DESC, commitment_id DESC`;
-const LATEST_FOR_CARD = `${SELECT} WHERE card_id = ? ORDER BY detected_at DESC, commitment_id DESC LIMIT 1`;
+// Every row of the night's candidate cards in one statement; the newest per
+// card is picked in the Worker.
+const FOR_CARDS = `${SELECT} WHERE card_id IN (SELECT value FROM json_each(?)) ORDER BY card_id, detected_at DESC, commitment_id DESC`;
 const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
@@ -166,7 +169,14 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
     },
     liveInThread: (channel, threadTs, promiserId) => first(LIVE_IN_THREAD, channel, threadTs, promiserId),
     byReminderTs: (ts) => first(BY_REMINDER, ts, ts),
-    latestForCard: (cardId) => first(LATEST_FOR_CARD, cardId),
+    async latestForCards(cardIds) {
+      if (!cardIds.length) return {};
+      chargeD1Query();
+      const { results } = await db.prepare(FOR_CARDS).bind(JSON.stringify([...new Set(cardIds)])).all<Row>();
+      const latest: Record<string, CommitmentRecord> = {};
+      for (const row of results.map(fromRow)) if (row.cardId && !latest[row.cardId]) latest[row.cardId] = row;
+      return latest;
+    },
     async latestAnswers(channel, limit) {
       if (limit <= 0) return [];
       chargeD1Query();

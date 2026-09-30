@@ -40,7 +40,7 @@ export const CARD_TODO_SYSTEM = [
   "Reply with JSON only, no prose, in exactly this shape:",
   '{"todos":[{"message_ts":"…","assignee":"U…"|null,"what":"…","confidence":0.0}]}',
   "- message_ts: the ts of the NEW message that holds the to-do.",
-  "- assignee: the Slack user id who is to make the card — named, volunteering, or asked — or null when nobody was.",
+  "- assignee: the Slack user id who is to make the card — named, volunteering, or asked — or null when nobody was. In a running note, where people appear by name, the name as written.",
   "- what: what the card is for, as it would follow \"the card for\" — a short noun phrase, at most 10 words, no quotes, no names.",
   "- confidence: 0 to 1 that this is a real to-do to create a card.",
   'None → {"todos":[]}.',
@@ -49,7 +49,11 @@ export const CARD_TODO_SYSTEM = [
 /** One validated card to-do. */
 export interface DetectedCardTodo {
   messageTs: string;
+  /** A Slack id the thread shows; null otherwise. */
   assignee: string | null;
+  /** The assignee as written when it is a name, not an id — how a running
+   *  note names people; the caller matches it to one Slack member or none. */
+  assigneeName?: string;
   /** Cleaned (`cleanWhat`). */
   what: string;
   confidence: number;
@@ -118,7 +122,16 @@ export function parseCardTodoReply(text: string, shown: readonly SweepMessage[],
     if (!what) continue;
     if (out.some((o) => o.messageTs === message.ts)) continue;
     const assignee = str(t.assignee);
-    out.push({ messageTs: message.ts, assignee: assignee && seen.has(assignee) ? assignee : null, what, confidence });
+    const isId = /^[UW][A-Z0-9]+$/.test(assignee);
+    // A name keeps its case: the role map matches it as written.
+    const name = !isId && assignee ? assignee.replace(/[<>@#*_~`]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80) : "";
+    out.push({
+      messageTs: message.ts,
+      assignee: isId && seen.has(assignee) ? assignee : null,
+      ...(name ? { assigneeName: name } : {}),
+      what,
+      confidence,
+    });
   }
   return out;
 }

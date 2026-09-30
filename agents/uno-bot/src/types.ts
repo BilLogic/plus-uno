@@ -20,6 +20,9 @@ export interface SlackContext {
   batched?: boolean;
   userMsgTs: string;
   requestedBy?: string;
+  /** Slack's kind of conversation for the turn, when known — `channel`,
+   *  `group`, `mpim` or `im` (`turn/request.ts` § `conversationTypeOf`). */
+  conversationType?: string;
   /** Slack's per-event action token, forwarded from the triggering message.
    *  assistant.search.context requires it for BOT-token calls, which is why a
    *  bot-token search cannot run outside an event-driven turn (no cron, no

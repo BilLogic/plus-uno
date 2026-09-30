@@ -4,26 +4,27 @@
 -- `commitments` row of its own kind, nudged at the weekday morning run like a
 -- promise.
 --
--- WIDEN-ONLY REBUILD, NOT ADDITIVE. SQLite cannot alter a CHECK, and 0006's
--- `kind` CHECK allowed 'thread_promise' alone. The table is rebuilt with every
--- row and every column it had, the `kind` CHECK dropped — the adapter
--- (src/commitments/d1.ts) and the TypeScript union name the kinds, so a later
--- kind needs no rebuild — and one new nullable column. Nothing a Worker built
--- before this reads or writes changes, so it may run before or after the
--- deploy.
+-- SQLite cannot widen a CHECK in place, so the table is rebuilt from 0008's
+-- exactly: the same columns in the same order, the same checks with `kind`'s
+-- list widened to the three card kinds, 'thread_promise' and 'self_reminder'
+-- still valid, every row copied as it is, and the same indexes recreated —
+-- plus one new nullable column and its index. Nothing is dropped or
+-- reinterpreted, so a Worker built before this runs on unchanged. Apply it
+-- before deploying the Worker that writes card_id and the card kinds: that
+-- Worker's commitment writes fail on the old table.
 --
 -- card_id is a Notion page id, never a link or a title (ADR-030): a card's
 -- title and URL wait in KV with the rest of the follow-up's wording.
 --
 -- Applied with `wrangler d1 migrations apply uno-bot-usage` — see README.md.
 
-CREATE TABLE commitments_next (
+CREATE TABLE commitments_rebuilt (
   commitment_id    TEXT    PRIMARY KEY,
-  kind             TEXT    NOT NULL,              -- thread_promise | card_todo | card_unowned | card_stale
+  kind             TEXT    NOT NULL CHECK (kind IN ('thread_promise', 'self_reminder', 'card_todo', 'card_unowned', 'card_stale')),
   channel_id       TEXT    NOT NULL,
   thread_ts        TEXT    NOT NULL,              -- '' for a card follow-up posted at a channel's top
   message_ts       TEXT    NOT NULL,              -- '' when no message made it
-  promiser_id      TEXT    NOT NULL,              -- the one person a reminder is for
+  promiser_id      TEXT    NOT NULL,              -- a self_reminder's requester, the one person it mentions
   requester_id     TEXT,
   deadline_at      INTEGER,
   due_at           INTEGER NOT NULL,
@@ -45,7 +46,7 @@ CREATE TABLE commitments_next (
   card_id          TEXT                            -- the Roadmap card's Notion page id, for a card follow-up
 );
 
-INSERT INTO commitments_next (
+INSERT INTO commitments_rebuilt (
   commitment_id, kind, channel_id, thread_ts, message_ts, promiser_id, requester_id, deadline_at, due_at, state,
   nudges, snoozes, confidence, promised_at, detected_at, run_date, nudge_ts, followup_ts, checked_on, holds,
   reminded_on, resolved_at, channel_kind
@@ -57,9 +58,8 @@ SELECT
 FROM commitments;
 
 DROP TABLE commitments;
-ALTER TABLE commitments_next RENAME TO commitments;
+ALTER TABLE commitments_rebuilt RENAME TO commitments;
 
--- 0006's and 0007's indexes, as they were.
 CREATE INDEX commitments_by_due ON commitments (state, due_at);
 CREATE INDEX commitments_by_nudge ON commitments (nudge_ts);
 CREATE INDEX commitments_by_followup ON commitments (followup_ts);

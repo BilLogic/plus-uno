@@ -17,8 +17,9 @@ import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
-import { cardTodoThreadHookFor, runCardFollowThroughOnEnv } from "../follow-through/env";
+import { cardTodoNoteHookFor, cardTodoThreadHookFor, runCardFollowThroughOnEnv } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
+import type { SweepDeps } from "../sweep/run";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
 import {
@@ -34,20 +35,35 @@ import {
 export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
 
 /** Every sweep kind: one body, since `runSweepJob` tells them apart. The
- *  end-of-day channel read hands each thread to commitment reminders and to
- *  card to-dos too — that kind only: both cover channel threads, not group
- *  DMs or any other conversation a sweep kind may read. */
+ *  end-of-day channel read hands each thread to card to-dos and commitment
+ *  reminders too — that kind only: both cover channel threads, not group DMs
+ *  or any other conversation a sweep kind may read. The notes job hands each
+ *  team note to card to-dos. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
-  const onThread = job.kind === "sweep-channel" ? threadHooks(env, dryRun) : undefined;
-  const report = await runSweepJobOnEnv(env, job, { dryRun }, onThread ? { onThread } : {});
+  const report = await runSweepJobOnEnv(env, job, { dryRun }, sweepHooks(env, job, dryRun));
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
 
+/** The hooks a sweep job feeds: per thread for a channel read, per note for
+ *  the notes job, none otherwise. */
+export function sweepHooks(env: Env, job: ScheduledJob, dryRun: boolean): Pick<SweepDeps, "onThread" | "onNote"> {
+  if (job.kind === "sweep-channel") {
+    const onThread = threadHooks(env, dryRun);
+    return onThread ? { onThread } : {};
+  }
+  if (job.kind === "sweep-notes") {
+    const onNote = cardTodoNoteHookFor(env, { dryRun });
+    return onNote ? { onNote } : {};
+  }
+  return {};
+}
+
 /** The per-thread hooks the end-of-day channel read feeds, one after the
- *  other; each swallows its own failures and throws only a budget stop. */
-function threadHooks(env: Env, dryRun: boolean): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
-  const hooks = [commitmentThreadHookFor(env, { dryRun }), cardTodoThreadHookFor(env, { dryRun })].filter(
+ *  other; each swallows its own failures and throws only a budget stop. Card
+ *  to-dos first, so a message kept as one is passed over as a promise. */
+export function threadHooks(env: Env, dryRun: boolean): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
+  const hooks = [cardTodoThreadHookFor(env, { dryRun }), commitmentThreadHookFor(env, { dryRun })].filter(
     (h): h is (thread: SweepThread, since: string) => Promise<void> => !!h,
   );
   if (!hooks.length) return undefined;
@@ -78,6 +94,10 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "sweep-channel": sweepBody,
   // End of day: the same, for every group DM uno-bot is in.
   "sweep-group-dms": sweepBody,
+  // End of day: decisions recorded in the running notes and on Roadmap cards
+  // edited that day (src/sweep/records.ts).
+  "sweep-notes": sweepBody,
+  "sweep-cards": sweepBody,
   // Morning: the findings whose morning has come become proposal cards.
   "sweep-post": sweepBody,
   // End of day: label one batch of the channel asks still holding text, and

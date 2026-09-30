@@ -11,7 +11,14 @@
 //     through `source_read`'s own executor, as read-only context.
 //   • People: a Contributor's name through the Slack directory lookup the
 //     relayed DM uses — one exact match or nobody.
-//   • The detector: `selectProvider(env)`, the Worker's one ModelProvider.
+//   • The detectors: `selectProvider(env)`, the Worker's one ModelProvider —
+//     drift, and the Capture two beside it (`./capture-detector.ts`).
+//   • Search: `notionSearch` for a page a thread, note or card names without
+//     linking, then GitHub code search in the default repo (`./search.ts`).
+//     Slack search is not used: its bot mode needs a triggering event's action
+//     token, and a scheduled run has none (ADR-031 keeps the rest out).
+//   • Notes and cards: `queryEditedSince` on `NOTION_RUNNING_NOTES_DB_ID` and
+//     `NOTION_ROADMAP_DB_ID`, and `listPageComments` for a card (`./records.ts`).
 //   • The store: the records in the usage database (`USAGE_DB`), the queue in
 //     HARNESS_KV, one key per channel under `sweep:findings:`. Each channel's
 //     job writes only its own key, so two end-of-day jobs a few seconds apart
@@ -45,7 +52,16 @@ import {
   subrequestBudgetTrips,
   subrequestsUsed,
 } from "../net";
-import { canonicalNotionUrl, parseNotionPageId, readNotionPage, stripBlockPrefix } from "../integrations/notion";
+import {
+  canonicalNotionUrl,
+  listPageComments,
+  notionSearch,
+  parseNotionPageId,
+  queryEditedSince,
+  readNotionPage,
+  stripBlockPrefix,
+} from "../integrations/notion";
+import { githubSearchCode, resolveRepoFor } from "../integrations/github";
 import {
   botConversations,
   conversationsHistorySince,
@@ -68,10 +84,13 @@ import type { ScheduledJob } from "../scheduled/runs";
 import type { OperationOutcome } from "../gate/index";
 import type { PendingProposal } from "../thread-state/index";
 import { modelDriftDetector } from "./detector";
+import { modelCaptureDetector } from "./capture-detector";
+import type { SweepNotion } from "./records";
+import type { SearchHit, SourceSearch } from "./search";
 import { markSweepThread } from "./thread-mark";
 import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
-import type { ChannelKind, SweepSource, TargetKind } from "./finding";
+import { classifyLink, type ChannelKind, type SweepSource, type TargetKind } from "./finding";
 import { SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
 import { stageSweepShare } from "./share";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
@@ -90,6 +109,10 @@ const QUEUE_TTL_SECONDS = QUEUE_MAX_AGE_MS / 1000;
 const CONTEXT_TEXT_CAP = 4_000;
 /** Pages of 200 read for a member list or the bot's group DMs. */
 const LIST_PAGES = 5;
+/** Search hits weighed per query: the top one is all the sweep keeps. */
+const SEARCH_HITS = 5;
+/** Notes or cards read per job: one query page. */
+const RECORDS_PER_JOB = 25;
 
 
 /**
@@ -104,7 +127,7 @@ export async function runSweepJobOnEnv(
   env: Env,
   job: ScheduledJob,
   opts: { dryRun: boolean },
-  extra: Pick<SweepDeps, "onThread"> = {},
+  extra: Pick<SweepDeps, "onThread" | "onNote"> = {},
 ): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
     // No cursor store means every run would re-read the day; nothing is safer.
@@ -175,6 +198,7 @@ async function sweepDepsFor(
 ): Promise<SweepDeps> {
   const provider = selectProvider(env);
   const detector = modelDriftDetector(provider);
+  const capture = modelCaptureDetector(provider);
   const store: SweepStore = { ...createD1SweepRecords({ db }), ...kvQueue(kv) };
   const directory = slackDirectoryFor(env);
   const bot = await measured(() => getBotIdentity(env));
@@ -193,6 +217,12 @@ async function sweepDepsFor(
       },
     },
     detector: { detect: (input) => measured(() => detector.detect(input)) },
+    capture: {
+      answers: (input) => measured(() => capture.answers(input)),
+      record: (input) => measured(() => capture.record(input)),
+    },
+    search: sweepSearchFor(env),
+    notion: sweepNotionFor(env),
     store,
     delivery: {
       render(card) {
@@ -284,6 +314,17 @@ async function sweepDepsFor(
       unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
       figmaLibraryKey: env.FIGMA_FILE_KEY?.trim() || undefined,
       botUserId: bot?.userId ?? null,
+      runningNotesDb: env.NOTION_RUNNING_NOTES_DB_ID?.trim() || undefined,
+      roadmapDb: env.NOTION_ROADMAP_DB_ID?.trim() || undefined,
+      // Where a search hit may come from: the specs and the answers the team
+      // keeps (`./surfaces.ts`).
+      teamSurfaceDbs: [
+        env.NOTION_ROADMAP_DB_ID,
+        env.NOTION_HELP_TUTORS_DB_ID,
+        env.NOTION_HELP_TEACHERS_DB_ID,
+        env.NOTION_DECISIONS_DB_ID,
+        env.NOTION_MARKETPLACE_DB_ID,
+      ].flatMap((id) => (id?.trim() ? [id.trim()] : [])),
       privateAllowlist: (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
         .split(",")
         .map((id) => id.trim())
@@ -292,6 +333,38 @@ async function sweepDepsFor(
     meter: { subrequests: subrequestsUsed, d1Queries: d1QueriesUsed, headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
+  };
+}
+
+/** The sweep's searches on `Env`, each measured: Notion, then GitHub code in
+ *  the default repo when the Worker has a token for it. */
+function sweepSearchFor(env: Env): SourceSearch {
+  const repo = env.GITHUB_TOKEN ? resolveRepoFor(env, undefined) : null;
+  return {
+    async notion(query) {
+      const hits = await measured(() => notionSearch(env, query, SEARCH_HITS));
+      return hits.map((h): SearchHit => ({ url: h.url, title: h.title, kind: "notion", parentDatabaseId: h.parentDatabaseId, parentType: h.parentType }));
+    },
+    ...(repo?.ok
+      ? {
+          async github(query: string) {
+            const hits = await measured(() => githubSearchCode(env, repo.entry, query));
+            return hits.slice(0, SEARCH_HITS).flatMap((h): SearchHit[] => {
+              const kind = classifyLink(h.url);
+              return kind ? [{ url: h.url, title: h.path, kind }] : [];
+            });
+          },
+        }
+      : {}),
+  };
+}
+
+/** The notes and cards reads on `Env`, each measured. */
+function sweepNotionFor(env: Env): SweepNotion {
+  return {
+    edited: (databaseId, since, after) =>
+      measured(() => queryEditedSince(env, databaseId, since, RECORDS_PER_JOB, after)),
+    comments: (pageId) => measured(() => listPageComments(env, pageId)),
   };
 }
 
@@ -436,10 +509,16 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
         text: stripBlockPrefix(b.type, b.text),
         type: b.type,
         plain: b.plain,
+        links: b.links,
+        byBot: b.byBot,
       })),
       text: page.text.slice(0, CONTEXT_TEXT_CAP),
       pillars: splitList(page.properties["Product Pillar"]),
       contributors: page.people["Contributor"] ?? [],
+      parentDatabaseId: page.parentDatabaseId,
+      parentType: page.parentType,
+      properties: page.properties,
+      truncated: page.truncated,
     };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;

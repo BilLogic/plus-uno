@@ -195,8 +195,11 @@ export function runCommitmentRecordsConformance(
     const later = commitmentRow({ ...card, id: "card:p1:stale:200", kind: "card_stale", detectedAt: 200 });
     await records.addCommitments([card, later, commitmentRow({ id: "card:p2:stale:300", kind: "card_stale", cardId: "p2", detectedAt: 300 })]);
     assert.deepEqual(await records.get(card.id), card);
-    assert.equal((await records.latestForCard("p1"))?.id, later.id);
-    assert.equal(await records.latestForCard("p9"), null);
+    const latest = await records.latestForCards(["p1", "p2", "p9"]);
+    assert.deepEqual(Object.keys(latest).sort(), ["p1", "p2"]);
+    assert.equal(latest.p1?.id, later.id);
+    assert.equal(latest.p2?.id, "card:p2:stale:300");
+    assert.deepEqual(await records.latestForCards([]), {});
     assert.equal("cardId" in (await records.get(commitmentRow().id) ?? commitmentRow()), false);
   });
 
@@ -209,5 +212,17 @@ export function runCommitmentRecordsConformance(
     const row = commitmentRow();
     assert.equal(await records.liveInThread(row.channel, row.threadTs, row.promiserId), null);
     assert.deepEqual(await records.latestAnswers("C0DESIGN", 5), []);
+  });
+
+  it("a \"remind me\" keeps its kind, and is neither a live promise in its thread nor a detector example", async () => {
+    const records = make();
+    const self = commitmentRow({ id: "C:self", kind: "self_reminder", requesterId: "U0MAYA", state: "done", resolvedAt: 99 });
+    const live = commitmentRow({ id: "C:self-live", kind: "self_reminder", requesterId: "U0MAYA", state: "open" });
+    await records.addCommitments([self, live]);
+    assert.deepEqual(await records.get(self.id), self);
+    assert.equal(await records.liveInThread(self.channel, self.threadTs, "U0MAYA"), null);
+    assert.deepEqual(await records.latestAnswers(self.channel, 3), []);
+    // It is due like any other.
+    assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01"))?.id, live.id);
   });
 }

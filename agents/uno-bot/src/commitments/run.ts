@@ -37,6 +37,11 @@
 //   else goes on to the gate untouched, and so does every reaction when the
 //   reminder store cannot be read: it fails open.
 //
+// "REMIND ME". A `self_reminder` row (`./remind.ts`, set in the turn) rides
+// the same morning job, cap and reaction door: it is posted in its DM or
+// thread with no evidence check, answers to 🙌 and ⏳ only, gets no follow-up,
+// and a ⏳ brings it back once at the morning run two working days out.
+//
 // WHERE IT POSTS. `pickDestination`, as every proactive job: a promise is a
 // message in a thread, so the reminder goes to that thread — back into a
 // private place only when the evidence was there. Never #uno-bot, never the
@@ -64,6 +69,10 @@ import {
   reminderAnswer,
   reminderBlocks,
   reminderText,
+  SELF_REMINDER_LAST_LEGEND,
+  SELF_REMINDER_LEGEND,
+  selfReminderText,
+  snoozeAcknowledgement,
 } from "./copy";
 import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample } from "./detector";
 import {
@@ -75,8 +84,10 @@ import {
   maySnooze,
   nudgeAt,
   rearmedDueAt,
+  TEXT_KEEP_MS,
 } from "./due";
-import { LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "./store";
+import { snoozedRunAt } from "./remind";
+import { cardTodoId, isCardKind, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "./store";
 
 /** What one commitment may spend before it starts: the evidence reads, the
  *  judge, the permalink and the post, and the D1 statements around them. */
@@ -87,9 +98,6 @@ export const MAX_EVIDENCE_REPLY_PAGES = 3;
 export const MAX_EVIDENCE_HISTORY_PAGES = 2;
 /** Linked Notion and GitHub pages read looking for completion. */
 export const MAX_EVIDENCE_SOURCES = 2;
-/** A commitment's wording outlives its due date by this, so every nudge a
- *  ⏳ or a follow-up can still bring finds it. */
-export const TEXT_KEEP_MS = 30 * 24 * 60 * 60 * 1000;
 /** Reminders one promiser gets in one morning run; the rest wait a morning. */
 export const MAX_REMINDERS_PER_PERSON = 2;
 /** Mornings running a commitment may be held before it lapses. */
@@ -173,6 +181,9 @@ export async function recordThreadCommitments(
   const rows: CommitmentRecord[] = [];
   const texts: Record<string, string> = {};
   for (const c of found.commitments) {
+    // "I'll file a card for X" is a card to-do, read first and kept once:
+    // no promise row beside it, so its person is asked once.
+    if (await deps.store.get(cardTodoId(thread.channel, c.messageTs))) continue;
     const promisedAt = msOf(c.messageTs);
     const due = commitmentDueAt(promisedAt, c.deadline);
     const id = `${thread.channel}:${c.messageTs}`;
@@ -389,10 +400,16 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
 }
 
 async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> {
-  if (c.kind !== "thread_promise") {
+  if (isCardKind(c.kind)) {
     if (deps.cards) return deps.cards.due(c, now, runDate);
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate });
     return { id: c.id, action: "held", note: "no handler for card follow-ups on this run" };
+  }
+  if (c.kind !== "thread_promise" && c.kind !== "self_reminder") {
+    // A kind this Worker does not know — a row a newer one wrote: left alone.
+    console.warn(`[commitments] ${c.id}: unknown kind ${String(c.kind)}, held`);
+    if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate });
+    return { id: c.id, action: "held", note: `unknown kind ${String(c.kind)}` };
   }
   const settle = async (patch: Parameters<CommitmentStore["update"]>[1]): Promise<void> => {
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate, ...patch });
@@ -415,6 +432,12 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
     await settle({ state: "lapsed", resolvedAt: now });
     return { id: c.id, action: "lapsed", note: "its reminder and follow-up are spent" };
   }
+  // A "remind me" nobody answered gets no follow-up: the person asked for one
+  // reminder, and only a ⏳ brings it back.
+  if (c.kind === "self_reminder" && c.state === "nudged") {
+    await settle({ state: "lapsed", resolvedAt: now });
+    return { id: c.id, action: "lapsed", note: "its reminder went unanswered" };
+  }
   const place = destinationOf(c, deps.config);
   if (!place) {
     await settle({ state: "lapsed", resolvedAt: now });
@@ -425,6 +448,7 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
     await settle({ state: "lapsed", resolvedAt: now });
     return { id: c.id, action: "lapsed", note: "its wording expired" };
   }
+  if (c.kind === "self_reminder") return remindSelf(deps, c, text, place, now, runDate, settle, hold);
 
   const evidence = await checkEvidence(deps, c, text);
   if (evidence === "unknown") return hold("its thread or the judge could not be read");
@@ -459,6 +483,41 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   await keepText(deps, c.id, { ...text, bodies: { ...text.bodies, [posted.ts]: body } }, now);
   await deps.markThread(place.channel, place.threadTs ?? posted.ts);
   return { id: c.id, action, text: body, ts: posted.ts };
+}
+
+/**
+ * A "remind me", delivered: no evidence check (nothing was promised to anyone,
+ * so there is nothing to find done) and no thread mark (the person invited
+ * uno-bot there). Its first post, and one more if a ⏳ brings it back — the
+ * two posts every commitment is allowed.
+ */
+async function remindSelf(
+  deps: NudgeDeps,
+  c: CommitmentRecord,
+  text: CommitmentText,
+  place: { channel: string; threadTs: string | null },
+  now: number,
+  runDate: string,
+  settle: (patch: Parameters<CommitmentStore["update"]>[1]) => Promise<void>,
+  hold: (note: string) => Promise<CommitmentAction>,
+): Promise<CommitmentAction> {
+  const first = c.nudges === 0;
+  const body = selfReminderText({ requester: c.promiserId, what: text.what, permalink: await deps.slack.permalink(c.channel, c.messageTs) });
+  if (deps.dryRun) return { id: c.id, action: "nudged", text: body };
+  const legend = c.nudges + 1 < 2 && maySnooze(c.snoozes) ? SELF_REMINDER_LEGEND : SELF_REMINDER_LAST_LEGEND;
+  const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, legend) });
+  if (!posted.ok || !posted.ts) return hold("Slack refused the post");
+  await settle({
+    state: "nudged",
+    nudges: c.nudges + 1,
+    holds: 0,
+    remindedOn: runDate,
+    // Unanswered by then, it lapses (above).
+    dueAt: rearmedDueAt(now),
+    ...(first ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
+  });
+  await keepText(deps, c.id, { ...text, bodies: { ...text.bodies, [posted.ts]: body } }, now);
+  return { id: c.id, action: "nudged", text: body, ts: posted.ts };
 }
 
 /** Where a commitment's reminder goes, or null when that is nowhere this job
@@ -578,7 +637,7 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
   if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return false;
   const c = await deps.store.byReminderTs(r.messageTs);
   if (!c || c.channel !== r.channel) return false;
-  if (c.kind !== "thread_promise") {
+  if (isCardKind(c.kind)) {
     // Whatever the glyph, a card follow-up's own: its ✅ drafts a card, and
     // never reaches the gate.
     if (deps.cards) await deps.cards(c, r);
@@ -588,7 +647,19 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
   if (!answer || r.userId !== c.promiserId || !LIVE_STATES.includes(c.state)) return true;
   const now = deps.now();
   let ack: string;
-  if (answer === "soon") {
+  if (c.kind === "self_reminder") {
+    // 🙌 and ⏳ only; a ⏳ only while a post is left to bring it back.
+    if (answer === "done") {
+      await deps.store.update(c.id, { state: "done", resolvedAt: now });
+      ack = acknowledgement("done");
+    } else if (answer === "soon" && c.nudges < 2 && maySnooze(c.snoozes)) {
+      const dueAt = snoozedRunAt(now);
+      await deps.store.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt });
+      ack = snoozeAcknowledgement(dayLabel(etDayOf(dueAt), etDayOf(now)));
+    } else {
+      return true;
+    }
+  } else if (answer === "soon") {
     // Capped: a third ⏳ leaves the commitment where it is.
     if (!maySnooze(c.snoozes)) return true;
     const dueAt = rearmedDueAt(now);

@@ -18,6 +18,23 @@ const bindings = env as unknown as {
   USAGE_MIGRATIONS: Parameters<typeof applyD1Migrations>[1];
 };
 
+/** A row as a Worker before 0009 wrote it: every column but `card_id`, which
+ *  that schema lacks — the adapter names it, so it cannot write the old table. */
+async function insertAsBefore0009(row: ReturnType<typeof commitmentRow>): Promise<void> {
+  const cols = {
+    commitment_id: row.id, kind: row.kind, channel_id: row.channel, channel_kind: row.channelKind, thread_ts: row.threadTs,
+    message_ts: row.messageTs, promiser_id: row.promiserId, requester_id: row.requesterId, deadline_at: row.deadlineAt,
+    due_at: row.dueAt, state: row.state, nudges: row.nudges, snoozes: row.snoozes, confidence: row.confidence,
+    promised_at: row.promisedAt, detected_at: row.detectedAt, run_date: row.runDate, nudge_ts: row.nudgeTs,
+    followup_ts: row.followupTs, checked_on: row.checkedOn, holds: row.holds, reminded_on: row.remindedOn,
+    resolved_at: row.resolvedAt,
+  };
+  const names = Object.keys(cols);
+  await bindings.USAGE_DB.prepare(`INSERT INTO commitments (${names.join(", ")}) VALUES (${names.map(() => "?").join(", ")})`)
+    .bind(...Object.values(cols))
+    .run();
+}
+
 beforeAll(async () => {
   await applyD1Migrations(bindings.USAGE_DB, bindings.USAGE_MIGRATIONS);
 });
@@ -73,6 +90,67 @@ describe("[d1] the commitments migration", () => {
     expect((await records.get("C0UNKNOWN:1"))?.channelKind).toBe("private");
     // Leave the table as the other cases find it: empty, and planned as empty
     // (0007's PRAGMA optimize just measured these three rows).
+    await bindings.USAGE_DB.prepare("DELETE FROM commitments").run();
+    await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
+  });
+
+  it("0008 rebuilds the table for \"remind me\" and copies every row as it was", async () => {
+    const all = bindings.USAGE_MIGRATIONS;
+    await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
+    await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+    await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0008"));
+    const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
+    const before = commitmentRow({ state: "nudged", nudges: 1, nudgeTs: "111.1", checkedOn: "2026-10-01", remindedOn: "2026-10-01", holds: 1 });
+    await insertAsBefore0009(before);
+    await expect(insertAsBefore0009(commitmentRow({ id: "C:self", kind: "self_reminder" }))).rejects.toThrow(/CHECK/);
+    await applyD1Migrations(bindings.USAGE_DB, all);
+    expect(await records.get(before.id)).toEqual(before);
+    await records.addCommitments([commitmentRow({ id: "C:self", kind: "self_reminder" })]);
+    expect((await records.get("C:self"))?.kind).toBe("self_reminder");
+    await expect(records.addCommitments([commitmentRow({ id: "C:odd", kind: "other" as never })])).rejects.toThrow(/CHECK/);
+    await bindings.USAGE_DB.prepare("DELETE FROM commitments").run();
+    await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
+  });
+
+  it("0009 rebuilds the table for card follow-ups: both earlier kinds read back unchanged, and the card kinds are valid", async () => {
+    const all = bindings.USAGE_MIGRATIONS;
+    await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
+    await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+    await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0009"));
+    const promise = commitmentRow({ state: "nudged", nudges: 1, nudgeTs: "111.1", checkedOn: "2026-10-01", remindedOn: "2026-10-01", holds: 1 });
+    const self = commitmentRow({ id: "D0MAYA:222.2", kind: "self_reminder", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA", state: "snoozed", snoozes: 1 });
+    await insertAsBefore0009(promise);
+    await insertAsBefore0009(self);
+    await expect(insertAsBefore0009(commitmentRow({ id: "card:p1", kind: "card_stale" }))).rejects.toThrow(/CHECK/);
+    await applyD1Migrations(bindings.USAGE_DB, all);
+    const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
+    expect(await records.get(promise.id)).toEqual(promise);
+    expect(await records.get(self.id)).toEqual(self);
+    const { results } = await bindings.USAGE_DB.prepare("SELECT card_id FROM commitments").all<{ card_id: unknown }>();
+    expect(results.map((r) => r.card_id)).toEqual([null, null]);
+    for (const kind of ["card_todo", "card_unowned", "card_stale"] as const) {
+      const row = commitmentRow({ id: `card:${kind}`, kind, cardId: "p1" });
+      await records.addCommitments([row]);
+      expect(await records.get(row.id)).toEqual(row);
+    }
+    // Widened, not dropped: a kind outside the list is still refused, and a
+    // place still defaults to private.
+    await expect(records.addCommitments([commitmentRow({ id: "C:odd", kind: "other" as never })])).rejects.toThrow(/CHECK/);
+    const { results: cols } = await bindings.USAGE_DB.prepare("SELECT name, dflt_value FROM pragma_table_info('commitments')").all<{
+      name: string;
+      dflt_value: string | null;
+    }>();
+    expect(cols.find((c) => c.name === "channel_kind")?.dflt_value).toBe("'private'");
+    const { results: indexes } = await bindings.USAGE_DB.prepare("SELECT name FROM pragma_index_list('commitments')").all<{ name: string }>();
+    expect(indexes.map((i) => i.name).filter((n) => n.startsWith("commitments_by_")).sort()).toEqual([
+      "commitments_by_answer",
+      "commitments_by_card",
+      "commitments_by_due",
+      "commitments_by_followup",
+      "commitments_by_nudge",
+      "commitments_by_reminded",
+      "commitments_by_thread",
+    ]);
     await bindings.USAGE_DB.prepare("DELETE FROM commitments").run();
     await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
   });
