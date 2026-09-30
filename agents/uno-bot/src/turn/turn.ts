@@ -1270,7 +1270,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // the thread — filing an issue under a sweep card, say — and stages as its
   // own card beside it (`proposalSlot`), inheriting none of its terms. A sweep
   // card is touched by a batch replacing one of its blocks; any other keyed
-  // card by a batch using one of its tools.
+  // card by a batch aiming one of its tools at the same target — the weekly
+  // card's own intake, not a separate issue filed or commented on beside it.
   const replaced =
     request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
 
@@ -1390,6 +1391,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
     ...inheritedTerms(replaced),
+    // A revision of a keyed card stays in the card's slot.
+    ...(replaced?.supersedeKey ? { supersedeKey: replaced.supersedeKey } : {}),
     // A revision of a sweep card stays a sweep card, in the sweep's slot, so
     // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
     // deadline, and its outcome joins the row the Worker's staging wrote.
@@ -1544,6 +1547,7 @@ async function dropFromSweepCard(
     ...inheritedTerms(pending),
     ttlMs: leftMs,
     sweepRun: pending.sweepRun!,
+    supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
     ...(pending.sweepShare ? { sweepShare: pending.sweepShare } : {}),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.
@@ -2318,12 +2322,27 @@ function touchesBlocksOf(operations: readonly ProposalOperation[], card: Pending
 
 /**
  * Whether a batch touches a keyed card: for a sweep card, replaces one of its
- * blocks; for any other, uses one of its tools.
+ * blocks; for any other, aims one of its tools at the same target.
  */
 function touchesCard(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
   if (card.sweepRun) return touchesBlocksOf(operations, card);
-  const tools = new Set(proposalOperations(card).map((op) => op.toolName));
-  return operations.some((op) => tools.has(op.toolName));
+  const theirs = proposalOperations(card);
+  return operations.some((op) => theirs.some((own) => sameTarget(op, own)));
+}
+
+/**
+ * Whether two operations use the same tool on the same target: an issue update
+ * on the same `issue_number`, an issue create under the same title. Any other
+ * tool is matched by the tool alone.
+ */
+function sameTarget(a: ProposalOperation, b: ProposalOperation): boolean {
+  if (a.toolName !== b.toolName) return false;
+  if (a.toolName === "github_issue_update") return String(a.input.issue_number) === String(b.input.issue_number);
+  if (a.toolName === "github_issue_create") {
+    const title = (op: ProposalOperation) => String(op.input.title ?? "").trim().toLowerCase();
+    return title(a) === title(b);
+  }
+  return true;
 }
 
 /** Key-order-independent JSON compare, so two generations of the same tool
