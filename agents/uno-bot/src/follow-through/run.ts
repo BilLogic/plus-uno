@@ -106,6 +106,13 @@ export const MAX_NEW_PER_NIGHT = 15;
 /** What one card costs at the end of day: its comments, a creator's name, a
  *  Slack lookup, and the D1 reads and write around them. */
 export const CARD_SCAN_COST = { subrequests: 4, d1Queries: 2 };
+/** What the scan spends before its first card: up to three Roadmap pages,
+ *  uno-bot's Notion user, the skip marks, and the one D1 read of the
+ *  candidates' rows — and one subrequest kept for writing the marks back. */
+export const SCAN_START_COST = { subrequests: 6, d1Queries: 1 };
+/** How long a card with nobody to ask, or no channel, is passed over before
+ *  the scan looks again. */
+export const SKIP_RECHECK_MS = 7 * 24 * 60 * 60 * 1000;
 /** How long a proposal card a follow-up stages stays confirmable. */
 export const FOLLOW_THROUGH_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 /** The thread slot those cards hold (`PendingProposal.supersedeKey`), one per
@@ -172,10 +179,18 @@ export interface FollowUpMessage {
 
 // ── End of day: the Roadmap scan (F4, F5) ───────────────────────────────────
 
+/** The scan's skip marks (`reply-mark.ts`): follow-up id → epoch ms it may be
+ *  looked at again. */
+export interface ScanSkips {
+  read(): Promise<Record<string, number>>;
+  write(marks: Record<string, number>): Promise<void>;
+}
+
 export interface ScanDeps {
   reads: Pick<CardReads, "activeCards" | "lastCommentAt" | "botUserId">;
   people: Pick<CardPeople, "slackIdForNotionUser" | "slackIdForName">;
   store: CommitmentStore;
+  skips?: ScanSkips;
   config: FollowThroughConfig;
   meter?: { headroom(): { subrequests: number; d1Queries: number } };
   now(): number;
@@ -207,15 +222,19 @@ export async function runCardFollowThroughScan(job: ScheduledJob, deps: ScanDeps
     const note = notes.length ? ` — ${notes.join("; ")}` : "";
     return { kind: "card-follow-through", key: job.key, rows, notes, summary: `${verb} ${rows.length} card follow-up(s)${note}` };
   };
-  ensureHeadroom(deps, { subrequests: 3, d1Queries: 1 });
+  ensureHeadroom(deps, SCAN_START_COST);
   const { cards, truncated } = await deps.reads.activeCards();
   if (truncated) notes.push("the active cards did not fit one read; the rest wait for a later night");
   const bot = await deps.reads.botUserId();
+  const skips = deps.skips ? await deps.skips.read() : {};
+  const skipsAtStart = JSON.stringify(skips);
   const maybe = cards
     .map((card) => ({ card, maybe: maybeCondition(card, now) }))
     .filter((c): c is { card: ActiveCard; maybe: CardCondition } => c.maybe !== null)
     // A card uno-bot's own integration made has no person to ask.
-    .filter((c) => !(bot && c.card.creatorId === bot));
+    .filter((c) => !(bot && c.card.creatorId === bot))
+    // Passed over lately with nothing to keep: not read again until its mark ends.
+    .filter((c) => !((skips[cardFollowUpId(c.card.pageId, c.maybe, c.card.lastEditedAt)] ?? 0) > now));
   // What every candidate last had, in one read, so a card asked about and
   // still untouched never takes a place in the night's count.
   const latest = maybe.length ? await deps.store.latestForCards(maybe.map((c) => c.card.pageId)) : {};
@@ -225,65 +244,100 @@ export async function runCardFollowThroughScan(job: ScheduledJob, deps: ScanDeps
       return last?.id !== cardFollowUpId(card.pageId, maybe, card.lastEditedAt) && mayFollowUpCard(last, now);
     })
     .sort((a, b) => a.card.lastEditedAt - b.card.lastEditedAt || a.card.pageId.localeCompare(b.card.pageId));
-  for (const { card, maybe } of candidates) {
-    if (rows.length >= MAX_NEW_PER_NIGHT) {
-      notes.push(`more than ${MAX_NEW_PER_NIGHT} cards due; the rest wait a night`);
-      break;
+  try {
+    for (const { card, maybe } of candidates) {
+      if (rows.length >= MAX_NEW_PER_NIGHT) {
+        notes.push(`more than ${MAX_NEW_PER_NIGHT} cards due; the rest wait a night`);
+        break;
+      }
+      // One more kept back for writing the skip marks, should this be the last.
+      ensureHeadroom(deps, { ...CARD_SCAN_COST, subrequests: CARD_SCAN_COST.subrequests + (deps.skips ? 1 : 0) });
+      const kept = await scanCard(card, maybe, deps, now, notes, skips);
+      if (kept) rows.push(kept);
     }
-    ensureHeadroom(deps, CARD_SCAN_COST);
-    const id = cardFollowUpId(card.pageId, maybe, card.lastEditedAt);
-    const condition = maybe === "stale" ? cardCondition(card, await deps.reads.lastCommentAt(card.pageId), now) : maybe;
-    if (!condition) continue;
-    const place = cardPlace(card, deps.config);
-    if (!place) {
-      notes.push(`${card.pageId}: its channel is not configured`);
-      continue;
+  } finally {
+    // Kept on a budget stop too, so the retry passes over what this run did.
+    if (deps.skips && !deps.dryRun && JSON.stringify(skips) !== skipsAtStart) {
+      await deps.skips.write(skips).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        console.error(`[follow-through] skip marks not written: ${err instanceof Error ? err.message : String(err)}`);
+      });
     }
-    const people = await ownersOf(card, condition, deps.people);
-    if (!people.length) {
-      // Never a default to the lead: nobody to ask is no message.
-      notes.push(`${card.pageId}: no ${condition === "unowned" ? "creator" : "Contributor"} found in Slack`);
-      continue;
-    }
-    const row: CommitmentRecord = {
-      id,
-      kind: condition === "unowned" ? "card_unowned" : "card_stale",
-      channel: place,
-      channelKind: "public",
-      threadTs: "",
-      messageTs: "",
-      promiserId: people[0]!,
-      requesterId: null,
-      deadlineAt: null,
-      // Due now: the next weekday morning run posts it.
-      dueAt: now,
-      state: "open",
-      nudges: 0,
-      snoozes: 0,
-      confidence: 1,
-      promisedAt: card.lastEditedAt,
-      detectedAt: now,
-      runDate: dateOf(now),
-      nudgeTs: null,
-      followupTs: null,
-      checkedOn: null,
-      holds: 0,
-      remindedOn: null,
-      resolvedAt: null,
-      cardId: card.pageId,
-    };
-    rows.push(row);
-    if (deps.dryRun) continue;
-    // The wording first: a stop between the two leaves wording with no row,
-    // which expires, never a row with no wording, which would lapse unasked.
-    await deps.store.saveText(
-      id,
-      { what: card.title, bodies: {}, mentions: people.slice(1), card: { title: card.title, url: card.url, status: card.designStatus } },
-      now + TEXT_KEEP_MS,
-    );
-    await deps.store.addCommitments([row]);
   }
   return report();
+}
+
+/**
+ * One candidate card: its row, kept (or rehearsed), or null when it is passed
+ * over — with a skip mark saying until when.
+ */
+async function scanCard(
+  card: ActiveCard,
+  maybe: CardCondition,
+  deps: ScanDeps,
+  now: number,
+  notes: string[],
+  skips: Record<string, number>,
+): Promise<CommitmentRecord | null> {
+  const id = cardFollowUpId(card.pageId, maybe, card.lastEditedAt);
+  let comment: number | null = null;
+  if (maybe === "stale") comment = await deps.reads.lastCommentAt(card.pageId);
+  const condition = maybe === "stale" ? cardCondition(card, comment, now) : maybe;
+  if (!condition) {
+    // A recent comment: stale again only once it is as old as the rule.
+    if (comment !== null) skips[id] = comment + STALE_AFTER_MS;
+    return null;
+  }
+  const place = cardPlace(card, deps.config);
+  if (!place) {
+    notes.push(`${card.pageId}: its channel is not configured`);
+    skips[id] = now + SKIP_RECHECK_MS;
+    return null;
+  }
+  const people = await ownersOf(card, condition, deps.people);
+  if (!people.length) {
+    // Never a default to the lead: nobody to ask is no message.
+    notes.push(`${card.pageId}: no ${condition === "unowned" ? "creator" : "Contributor"} found in Slack`);
+    skips[id] = now + SKIP_RECHECK_MS;
+    return null;
+  }
+  const row: CommitmentRecord = {
+    id,
+    kind: condition === "unowned" ? "card_unowned" : "card_stale",
+    channel: place,
+    channelKind: "public",
+    threadTs: "",
+    messageTs: "",
+    promiserId: people[0]!,
+    requesterId: null,
+    deadlineAt: null,
+    // Due now: the next weekday morning run posts it.
+    dueAt: now,
+    state: "open",
+    nudges: 0,
+    snoozes: 0,
+    confidence: 1,
+    promisedAt: card.lastEditedAt,
+    detectedAt: now,
+    runDate: dateOf(now),
+    nudgeTs: null,
+    followupTs: null,
+    checkedOn: null,
+    holds: 0,
+    remindedOn: null,
+    resolvedAt: null,
+    cardId: card.pageId,
+  };
+  if (deps.dryRun) return row;
+  // The wording first: a stop between the two leaves wording with no row,
+  // which expires, never a row with no wording, which would lapse unasked.
+  await deps.store.saveText(
+    id,
+    { what: card.title, bodies: {}, mentions: people.slice(1), card: { title: card.title, url: card.url, status: card.designStatus } },
+    now + TEXT_KEEP_MS,
+  );
+  await deps.store.addCommitments([row]);
+  return row;
 }
 
 /** The channel a card's follow-up goes to: `pickDestination` with no thread,
@@ -850,15 +904,15 @@ export async function handleCardReply(reply: CardReply, deps: ReplyDeps): Promis
 }
 
 /**
- * `handleCardReply`, never throwing: any failure but a budget stop is logged
- * and read as "not a follow-up reply", so the reply takes its ordinary path —
- * the engagement check included — and never a turn it would not have had.
+ * `handleCardReply`, never throwing: any failure, a budget stop included, is
+ * logged and read as "not a follow-up reply", so the reply takes its ordinary
+ * path — the engagement check included — and never a turn it would not have
+ * had.
  */
 export async function handleCardReplySafely(reply: CardReply, deps: ReplyDeps): Promise<boolean> {
   try {
     return await handleCardReply(reply, deps);
   } catch (err) {
-    rethrowIfBudget(err);
     console.error(`[follow-through] reply ${reply.channel} ${reply.threadTs} not handled: ${err instanceof Error ? err.message : String(err)}`);
     return false;
   }
@@ -874,22 +928,25 @@ const TAKES_IT = /^\s*(me|mine|i['’]?ll take it|i will take it|i can take it|i
  */
 export function namedOwner(text: string, replier: string, botUserId: string | null | undefined): string | null {
   const mentioned = [...new Set([...text.matchAll(/<@([UW][A-Z0-9]+)(?:\|[^>]*)?>/g)].map((m) => m[1]!))];
-  if (botUserId && mentioned.includes(botUserId)) return null;
+  // With uno-bot's own id unknown, a mention might be uno-bot's: none counts.
+  if (mentioned.length && (!botUserId || mentioned.includes(botUserId))) return null;
   if (mentioned.length === 1) return mentioned[0]!;
   if (!mentioned.length && TAKES_IT.test(text)) return replier;
   return null;
 }
 
 /**
- * Under F4's question, a reply naming exactly one person stages the
- * Contributor change. The row stays live: it settles when the card shows a
- * Contributor, so a change nobody applies lets the follow-up ask again.
+ * Under F4's question, a reply from someone it asked (the card's creator)
+ * naming exactly one person stages the Contributor change. The row stays
+ * live: it settles when the card shows a Contributor, so a change nobody
+ * applies lets the follow-up ask again.
  */
 async function ownerReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps): Promise<boolean> {
   const named = namedOwner(reply.text, reply.user, deps.config.botUserId);
   if (!named || !LIVE_STATES.includes(c.state)) return false;
   const text = await deps.store.text(c.id);
   if (!text?.card) return false;
+  if (![c.promiserId, ...(text.mentions ?? [])].includes(reply.user)) return false;
   const thread = { channel: reply.channel, channelKind: c.channelKind, threadTs: reply.threadTs };
   const notionUser = await deps.people.notionUserForSlack(named);
   if (!notionUser) {

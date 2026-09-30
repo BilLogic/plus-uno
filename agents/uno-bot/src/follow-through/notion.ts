@@ -38,15 +38,13 @@ const COMMENT_PAGE = 100;
 
 /** A Roadmap row as a card follow-up reads it. */
 export function toActiveCard(row: EditedRow): ActiveCard {
-  const names = row.people.Contributor ?? [];
-  const ids = row.peopleIds.Contributor ?? [];
   return {
     pageId: row.id,
     url: row.url,
     title: row.title,
     designStatus: row.values["Design Status"]?.[0] ?? null,
     pillars: row.values["Product Pillar"] ?? [],
-    contributors: ids.map((id, i) => ({ id, name: names[i] ?? "" })),
+    contributors: row.persons.Contributor ?? [],
     creatorId: row.createdById,
     lastEditedAt: Date.parse(row.lastEditedTime) || 0,
     archived: false,

@@ -14,13 +14,15 @@ import { runSweepJob, type SweepThread } from "../src/sweep/index";
 import { chainReplyHandlers, runMessageJob } from "../src/slack/message-job";
 import type { SlackMessageEvent } from "../src/slack/types";
 import { sweepHooks, threadHooks } from "../src/scheduled/jobs";
-import { replyHandlersFor } from "../src/slack/events";
+import { replyHandlerAt, replyHandlersFor } from "../src/slack/events";
+import { toActiveCard } from "../src/follow-through/notion";
 import type { Env } from "../src/types";
 import {
   answerReminder,
   cardTodoId,
   commitmentThreadHook,
   createInMemoryCommitmentStore,
+  MAX_CARD_REMINDERS_PER_PERSON,
   modelCommitmentDetector,
   runCommitmentNudges,
   setSelfReminder,
@@ -454,11 +456,29 @@ describe("F4: an active card with no owner", () => {
     assert.equal(await reply(BEA, `<@${BOT}> <@U0MAYA>`), false);
     assert.equal(await reply(BEA, "someone should"), false);
     assert.equal(a.staged.length, 0);
-    assert.equal(await reply(MAYA, "I'll take it"), true);
-    assert.equal(a.staged[0]!.card.operations[0]!.input.properties && (a.staged[0]!.card.operations[0]!.input.properties as Record<string, string>).Contributor, "n-maya");
+    assert.equal(await reply(BEA, "I'll take it"), true);
+    assert.equal((a.staged[0]!.card.operations[0]!.input.properties as Record<string, string>).Contributor, "n-bea");
     assert.equal(namedOwner("mine", MAYA, BOT), MAYA);
     assert.equal(namedOwner("me!", MAYA, BOT), MAYA);
     assert.equal(namedOwner("not me", MAYA, BOT), null);
+  });
+
+  it("only someone the question asked may name the owner", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({ cards: [card()] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const m = morning(store, rm, at(30, 14));
+    await m.run();
+    const a = answers(store, rm);
+    // The card's creator (Bea) was asked; Maya and Ade were not.
+    assert.equal(await handleCardReply({ channel: DESIGN, threadTs: m.posts[0]!.ts, user: MAYA, text: "I'll take it" }, a.deps), false);
+    assert.equal(await handleCardReply({ channel: DESIGN, threadTs: m.posts[0]!.ts, user: ADE, text: "<@U0MAYA>" }, a.deps), false);
+    assert.equal(a.staged.length, 0);
+  });
+
+  it("with uno-bot's own id unknown, no mention names an owner", () => {
+    assert.equal(namedOwner("<@U0MAYA>", BEA, null), null);
+    assert.equal(namedOwner("me", BEA, null), BEA);
   });
 
   it("a named person with no Notion match gets a plain answer and no card", async () => {
@@ -763,25 +783,86 @@ describe("replies under a follow-up", () => {
     assert.equal(turns, 0);
   });
 
-  it("the reply chain tries each handler in order, reads a thrower as not its, and passes a budget stop", async () => {
+  it("the reply chain tries each fitting handler in order, and a throw reaches the job, which runs the turn", async () => {
     const tried: string[] = [];
     const event = { type: "message", channel: DESIGN, ts: "1.1", user: MAYA, text: "x" } as SlackMessageEvent;
     const chain = chainReplyHandlers([
       { name: "a", candidate: () => true, handle: async () => (tried.push("a"), false) },
       { name: "b", candidate: () => false, handle: async () => (tried.push("b"), true) },
-      { name: "c", candidate: () => true, handle: async () => (tried.push("c"), Promise.reject(new Error("boom"))) },
+      { name: "c", candidate: () => true, handle: async () => (tried.push("c"), true) },
       { name: "d", candidate: () => true, handle: async () => (tried.push("d"), true) },
     ]);
     assert.equal(chain.disputeCandidate(event), true);
     assert.equal(await chain.dispute(event), true);
-    assert.deepEqual(tried, ["a", "c", "d"]);
-    const stop = chainReplyHandlers([{ name: "s", candidate: () => true, handle: async () => Promise.reject(new SubrequestBudgetError(1)) }]);
-    await assert.rejects(stop.dispute(event), SubrequestBudgetError);
-    assert.equal(chainReplyHandlers([{ name: "n", candidate: () => false, handle: async () => true }]).disputeCandidate(event), false);
+    assert.deepEqual(tried, ["a", "c"]);
+    const throwing = chainReplyHandlers([{ name: "ds-precedence", candidate: () => true, handle: async () => Promise.reject(new Error("Slack down")) }]);
+    await assert.rejects(throwing.dispute(event), /Slack down/);
+    let turns = 0;
+    await runMessageJob(event, {
+      claim: async () => "claimed",
+      markDone: async () => {},
+      ...throwing,
+      engages: async () => false,
+      turn: async () => void turns++,
+    });
+    assert.equal(turns, 1, "as on main: a DS revision that throws leaves the reply to the turn");
   });
-});
 
-describe("the nightly scan", () => {
+  it("the job tries only the handler the message was queued for, and none when it was queued for none", async () => {
+    const tried: string[] = [];
+    const handlers = [
+      { name: "ds-precedence", candidate: () => true, handle: async () => (tried.push("ds"), false) },
+      { name: "follow-through", candidate: () => true, handle: async () => (tried.push("card"), true) },
+    ];
+    const event = { type: "message", channel: DESIGN, thread_ts: "1.0", ts: "1.1", user: MAYA, text: "Shipped" } as SlackMessageEvent;
+    assert.equal(await chainReplyHandlers(handlers, "follow-through").dispute(event), true);
+    assert.deepEqual(tried, ["card"]);
+    assert.equal(chainReplyHandlers(handlers, null).disputeCandidate(event), false);
+    // Queued before the choice rode on the job: every fitting handler, by shape.
+    assert.equal(chainReplyHandlers(handlers).disputeCandidate(event), true);
+  });
+
+  it("an unmarked short reply is queued for no handler, and its job makes no extra claim or engagement check", async () => {
+    const kv = { get: async () => null, put: async () => {} };
+    const env = { PLUS_DESIGN_CHANNEL_ID: DESIGN, USAGE_DB: {}, HARNESS_KV: kv } as unknown as Env;
+    const event = { type: "message", channel: DESIGN, thread_ts: "1790700000.000100", ts: "1790700100.000100", user: MAYA, text: "Shipped" } as SlackMessageEvent;
+    const reply = await replyHandlerAt(env, event);
+    assert.equal(reply, null);
+    const claims: string[] = [];
+    let engaged = 0;
+    let turns = 0;
+    await runMessageJob(event, {
+      claim: async (key) => (claims.push(key), "claimed"),
+      markDone: async () => {},
+      ...chainReplyHandlers(replyHandlersFor(env), reply),
+      engages: async () => (engaged++, true),
+      turn: async () => void turns++,
+    });
+    assert.deepEqual(claims, [`msg:${DESIGN}:1790700100.000100`], "no dispute claim");
+    assert.equal(engaged, 0, "the dispatch already asked");
+    assert.equal(turns, 1);
+  });
+
+  it("a budget stop in the card handler runs no turn in a thread that does not otherwise engage", async () => {
+    const rm = roadmap();
+    rm.marks.add(`${DESIGN}:1790700000.000100`);
+    const a = answers(createInMemoryCommitmentStore(), rm);
+    const stopping = { ...a.deps.store, byReminderTs: async () => Promise.reject(new SubrequestBudgetError(1)) };
+    const event = { type: "message", channel: DESIGN, thread_ts: "1790700000.000100", ts: "1790700100.000100", user: MAYA, text: "Shipped" } as SlackMessageEvent;
+    let turns = 0;
+    await runMessageJob(event, {
+      claim: async () => "claimed",
+      markDone: async () => {},
+      ...chainReplyHandlers(
+        [{ name: "follow-through", candidate: () => true, handle: () => handleCardReplySafely({ channel: DESIGN, threadTs: event.thread_ts!, user: MAYA, text: "Shipped" }, { ...a.deps, store: stopping }) }],
+        "follow-through",
+      ),
+      engages: async () => false,
+      turn: async () => void turns++,
+    });
+    assert.equal(turns, 0);
+  });
+
   it("reaches a new card past fifty asked and untouched ones, in one D1 read", async () => {
     const store = createInMemoryCommitmentStore();
     const old = Array.from({ length: 50 }, (_, i) => card({ pageId: `old${i}`, lastEditedAt: EOD - (30 + i) * DAY }));
@@ -1031,5 +1112,155 @@ describe("wiring", () => {
     const reply = { type: "message", channel: DESIGN, thread_ts: "1790700000.000100", ts: "1790700100.000100", user: MAYA, text: "Shipped" } as SlackMessageEvent;
     assert.equal(card.candidate(reply), true, "a short reply in a design thread is the card handler's to check");
     assert.equal(card.candidate({ ...reply, thread_ts: undefined }), false, "a top-level message is never a follow-up reply");
+  });
+});
+
+// ── Re-review ────────────────────────────────────────────────────────────────
+
+/** A card row due at `dueAt`, for the morning's budgets. */
+function cardRow(id: string, over: Partial<CommitmentRecord> = {}): CommitmentRecord {
+  return {
+    id,
+    kind: "card_stale",
+    channel: DESIGN,
+    channelKind: "public",
+    threadTs: "",
+    messageTs: "",
+    promiserId: MAYA,
+    requesterId: null,
+    deadlineAt: null,
+    dueAt: at(29, 22),
+    state: "open",
+    nudges: 0,
+    snoozes: 0,
+    confidence: 1,
+    promisedAt: at(1, 12),
+    detectedAt: at(29, 22),
+    runDate: "2026-09-29",
+    nudgeTs: null,
+    followupTs: null,
+    checkedOn: null,
+    holds: 0,
+    remindedOn: null,
+    resolvedAt: null,
+    cardId: id,
+    ...over,
+  };
+}
+
+/** A morning's commitment job over a quiet Slack, with a card handler. */
+function quietMorning(store: InMemoryCommitmentStore, now: number, cards?: NudgeDeps["cards"]) {
+  const posts: Array<{ channel: string; ts: string }> = [];
+  const deps: NudgeDeps = {
+    slack: {
+      replies: async () => ({ messages: [] }),
+      history: async () => ({ messages: [] }),
+      permalink: async () => null,
+      async post(to) {
+        const posted = { channel: to.channel, ts: `${posts.length + 1}.000001` };
+        posts.push(posted);
+        return { ok: true, ts: posted.ts };
+      },
+      update: async () => true,
+    },
+    sources: { read: async () => null },
+    judge: { judge: async () => ({ ok: true, done: false, evidenceTs: [] }) },
+    store,
+    markThread: async () => {},
+    config: { unoBot: UNO_BOT, botUserId: BOT },
+    now: () => now,
+    ...(cards ? { cards } : {}),
+  };
+  return { posts, run: () => runCommitmentNudges(NUDGE, deps) };
+}
+
+describe("the morning's two budgets", () => {
+  it("a person with five card follow-ups and a \"remind me\" due gets the reminder this morning, and two card posts beside it", async () => {
+    const store = createInMemoryCommitmentStore();
+    await store.addCommitments([1, 2, 3, 4, 5].map((n) => cardRow(`card:c${n}`)));
+    const place = { channel: "D0MAYA", channelKind: "dm" as const, threadTs: ts(29, 18), messageTs: ts(29, 18), userId: MAYA };
+    const set = await setSelfReminder({ when: "Thu", what: "review the PRD" }, place, { store, now: () => at(29, 18) });
+    assert.ok(set.ok);
+    const asked: string[] = [];
+    const m = quietMorning(store, at(31, 14), {
+      async due(c, _now, runDate) {
+        asked.push(c.id);
+        await store.update(c.id, { state: "nudged", nudges: 1, checkedOn: runDate, remindedOn: runDate });
+        return { id: c.id, action: "nudged" };
+      },
+    });
+    await m.run();
+    const reminder = [...store.rows.values()].find((r) => r.kind === "self_reminder")!;
+    assert.equal(reminder.state, "nudged", "the reminder went out");
+    assert.equal(m.posts[0]!.channel, "D0MAYA", "and before any card");
+    assert.equal(asked.length, MAX_CARD_REMINDERS_PER_PERSON);
+  });
+});
+
+describe("a kind this Worker does not know", () => {
+  it("is held, and lapses after three held mornings like any other hold", async () => {
+    const store = createInMemoryCommitmentStore();
+    await store.addCommitments([cardRow("x:1", { kind: "card_future" as CommitmentRecord["kind"], cardId: null })]);
+    for (const day of [1, 2, 5]) await quietMorning(store, Date.UTC(2026, 9, day, 14)).run();
+    const row = [...store.rows.values()][0]!;
+    assert.equal(row.state, "lapsed");
+    assert.equal(row.holds, 3);
+  });
+});
+
+describe("the nightly scan's skip marks", () => {
+  it("fifty cards with nobody to ask and one new card: a budget stop keeps its marks, the retry reads none of them again and reaches the new card", async () => {
+    const store = createInMemoryCommitmentStore();
+    const ghosts = Array.from({ length: 50 }, (_, i) => card({ pageId: `g${String(i).padStart(2, "0")}`, creatorId: "n-ghost", lastEditedAt: EOD - (40 - i / 10) * DAY }));
+    const rm = roadmap({ cards: [...ghosts, card({ pageId: "fresh", lastEditedAt: EOD - 8 * DAY })] });
+    const looked: string[] = [];
+    const people = { ...rm.people, slackIdForNotionUser: async (id: string) => (looked.push(id), rm.people.slackIdForNotionUser(id)) };
+    let marks: Record<string, number> = {};
+    const skips = { read: async () => ({ ...marks }), write: async (m: Record<string, number>) => void (marks = { ...m }) };
+    let left = 40;
+    const meter = { headroom: () => ({ subrequests: left--, d1Queries: 40 }) };
+    await assert.rejects(runCardFollowThroughScan(SCAN, { ...scanDeps(store, rm), people, skips, meter }), SubrequestBudgetError);
+    const firstRun = looked.length;
+    assert.ok(firstRun > 0 && firstRun < 50);
+    assert.equal(Object.keys(marks).length, firstRun, "every card passed over is marked");
+    looked.length = 0;
+    const report = await runCardFollowThroughScan(SCAN, { ...scanDeps(store, rm), people, skips });
+    assert.equal(looked.length, 51 - firstRun, "the marked cards are not read again");
+    assert.deepEqual(report.rows.map((r) => r.cardId), ["fresh"]);
+    looked.length = 0;
+    await runCardFollowThroughScan(SCAN, { ...scanDeps(store, rm), people, skips });
+    assert.equal(looked.length, 0, "the next night reads none of them either");
+  });
+
+  it("a stale card with a recent comment is passed over until the comment is three weeks old", async () => {
+    const store = createInMemoryCommitmentStore();
+    const stale = card({ contributors: [{ id: "n-maya", name: "Maya Chen" }], lastEditedAt: EOD - 30 * DAY });
+    const commented = EOD - 2 * DAY;
+    const rm = roadmap({ cards: [stale], comments: { p1: commented } });
+    let marks: Record<string, number> = {};
+    const skips = { read: async () => ({ ...marks }), write: async (m: Record<string, number>) => void (marks = { ...m }) };
+    await runCardFollowThroughScan(SCAN, { ...scanDeps(store, rm), skips });
+    assert.deepEqual(Object.values(marks), [commented + 21 * DAY]);
+  });
+});
+
+describe("a card's Contributors", () => {
+  it("keep each id beside its own name, whatever has no name", () => {
+    const row = {
+      id: "p1",
+      url: "https://www.notion.so/p1",
+      title: "Card",
+      lastEditedTime: "2026-09-20T12:00:00.000Z",
+      parentDatabaseId: null,
+      properties: {},
+      people: { Contributor: ["Maya Chen"] },
+      persons: { Contributor: [{ id: "n-bot", name: "" }, { id: "n-maya", name: "Maya Chen" }] },
+      values: {},
+      createdById: null,
+    };
+    assert.deepEqual(toActiveCard(row).contributors, [
+      { id: "n-bot", name: "" },
+      { id: "n-maya", name: "Maya Chen" },
+    ]);
   });
 });

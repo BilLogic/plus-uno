@@ -68,6 +68,22 @@ export function isCardKind(kind: CommitmentKind): boolean {
   return CARD_KINDS.includes(kind);
 }
 
+/**
+ * The two morning budgets a promiser's reminders count against: `asked`, what
+ * a person asked for or promised (thread promises, "remind me"), and `cards`,
+ * the card follow-ups uno-bot raises on its own. A card backlog spends only
+ * its own budget, so it never pushes a person's own reminder back a morning.
+ */
+export type ReminderBudget = "asked" | "cards";
+
+/** The budget a kind's reminders count against. */
+export function budgetOf(kind: CommitmentKind): ReminderBudget {
+  return isCardKind(kind) ? "cards" : "asked";
+}
+
+/** The promisers passed over for each budget. */
+export type ReminderSkip = Partial<Record<ReminderBudget, readonly string[]>>;
+
 /** A thread card to-do's id: its message's, marked. One message is either a
  *  card to-do or a promise, never both — the promise hook passes over a
  *  message this id is already kept for. */
@@ -141,11 +157,14 @@ export interface CommitmentRecords {
    *  the state it has reached. */
   addCommitments(rows: CommitmentRecord[]): Promise<void>;
   get(id: string): Promise<CommitmentRecord | null>;
-  /** The live commitment due soonest at `now` that `runDate`'s morning has not
-   *  yet looked at, passing over the promisers in `skip`, or null. */
-  nextDue(now: number, runDate: string, skip?: readonly string[]): Promise<CommitmentRecord | null>;
-  /** How many commitments each promiser was reminded of on `runDate`. */
-  remindedOn(runDate: string): Promise<Record<string, number>>;
+  /** The live commitment `runDate`'s morning has not yet looked at, a
+   *  person's own asks (promises, "remind me") before card follow-ups and then
+   *  soonest due, passing over the promisers `skip` names for its budget, or
+   *  null. */
+  nextDue(now: number, runDate: string, skip?: ReminderSkip): Promise<CommitmentRecord | null>;
+  /** How many commitments each promiser was reminded of on `runDate`, per
+   *  budget. */
+  remindedOn(runDate: string): Promise<Record<ReminderBudget, Record<string, number>>>;
   /** A live thread promise of this promiser's in this thread, or null — a
    *  "remind me" there is never the same task said again. */
   liveInThread(channel: string, threadTs: string, promiserId: string): Promise<CommitmentRecord | null>;

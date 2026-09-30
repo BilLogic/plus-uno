@@ -88,13 +88,11 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       // up to date" in a thread asked about a file, and an answer under a card
       // follow-up are queued like a turn and handled at the head of the
       // thread's job (`message-job.ts`).
-      if (
-        isDsPrecedenceCandidate(env, msg) ||
-        (await isDriftAnswerFor(env, msg)) ||
-        (await mayBeCardReply(env, msg)) ||
-        (await shouldHandleMessage(env, msg))
-      ) {
-        await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
+      // The handler chosen here rides on the job, so the job re-derives
+      // nothing and a reply no handler wants pays no claim there.
+      const reply = await replyHandlerAt(env, msg);
+      if (reply || (await shouldHandleMessage(env, msg))) {
+        await enqueueAgentJob(env, { kind: "message", event: msg, reply }, conversationKey(msg));
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
       }
@@ -103,7 +101,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "app_mention": {
       // Explicit @mention always engages.
       const msg = appMentionToMessage(event as SlackAppMentionEvent);
-      await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
+      await enqueueAgentJob(env, { kind: "message", event: msg, reply: await replyHandlerAt(env, msg) }, conversationKey(msg));
       return;
     }
     case "reaction_added": {
@@ -234,7 +232,7 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"han
     await handleReaction(env, job.event);
     return "handled";
   }
-  return onMessageVisiblyFailing(env, job.event);
+  return onMessageVisiblyFailing(env, job.event, job.reply);
 }
 
 // Outermost catch WITH channel/thread context. onMessage already posts a
@@ -243,9 +241,9 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"han
 // used to bubble to the waitUntil catch in index.ts — logged, invisible to the
 // user ("reacted 👀 then silence"). Backstop it here, best-effort; never throw
 // from the catch.
-async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promise<"handled" | "deferred"> {
+async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent, reply?: string | null): Promise<"handled" | "deferred"> {
   try {
-    return await onMessage(env, msg);
+    return await onMessage(env, msg, reply);
   } catch (err) {
     console.error(`[slack] onMessage failed: ${err instanceof Error ? err.message : String(err)}`);
     await postMessage(env, {
@@ -412,7 +410,7 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
   }
 }
 
-async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" | "deferred"> {
+async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | null): Promise<"handled" | "deferred"> {
   // Per-message dedup: Slack delivers app_mention AND message.channels for the
   // same message when the bot is @-mentioned in a channel it has history for.
   // Both events have different event_ids so the envelope-level dedup misses
@@ -441,15 +439,32 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // exit it has (#555); the in-thread stop door (#576) is the one other
     // settler, and it settles by the same card-based rule.
     markDone: (runKey) => store.markRunDone(runKey).catch(() => {}),
-    ...chainReplyHandlers(replyHandlersFor(env)),
+    ...chainReplyHandlers(replyHandlersFor(env), reply),
     engages: (e) => shouldHandleMessage(env, e),
     turn: (e) => handleUserMessage(env, e),
   });
 }
 
-/** The replies handled ahead of the turn, in the order tried, each never
- *  throwing: a weekly DS precedence dispute, an answer about a file's drift,
- *  and an answer under a card follow-up. */
+/**
+ * The ahead-of-the-turn handler a message is for, decided once when it is
+ * queued: a weekly DS precedence dispute (by shape), a "yes, it's up to date"
+ * in a thread asked about a file, or an answer in a thread holding a card
+ * follow-up (each one KV read, and only for a message of the right shape).
+ * Null for none.
+ *
+ * @param env - Worker bindings
+ * @param msg - The message
+ */
+export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<string | null> {
+  if (isDsPrecedenceCandidate(env, msg)) return "ds-precedence";
+  if (await isDriftAnswerFor(env, msg)) return "figma-drift";
+  if (await mayBeCardReply(env, msg)) return "follow-through";
+  return null;
+}
+
+/** The replies handled ahead of the turn, in the order tried: a weekly DS
+ *  precedence dispute (a throw runs the turn), an answer about a file's drift,
+ *  and an answer under a card follow-up (both catch their own failures). */
 export function replyHandlersFor(env: Env): ReplyHandler[] {
   return [
     { name: "ds-precedence", candidate: (e) => isDsPrecedenceCandidate(env, e), handle: (e) => handleDsPrecedenceReply(env, e) },

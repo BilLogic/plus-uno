@@ -506,7 +506,7 @@ test("the edited-since read asks for rows at or after the cursor, a page at a ti
       parentDatabaseId: "3ee43141b0ce4517badccb52a7b97bdb",
       properties: { Type: "Team" },
       people: { "Note Takers": ["Ade Okafor"] },
-      peopleIds: { "Note Takers": ["u-ade"] },
+      persons: { "Note Takers": [{ id: "u-ade", name: "Ade Okafor" }] },
       values: { Type: ["Team"] },
       createdById: null,
     },
@@ -553,7 +553,7 @@ test("the Roadmap reads: rows by status, one row again, a property's options, th
   assert.equal(more, false);
   assert.equal(rows[0]!.title, "Tutor filters");
   assert.deepEqual(rows[0]!.values, { "Design Status": ["WIP"], Pillar: ["Tutor", "Universal"] });
-  assert.deepEqual(rows[0]!.peopleIds, { Contributor: ["u-maya"] });
+  assert.deepEqual(rows[0]!.persons, { Contributor: [{ id: "u-maya", name: "Maya Chen" }] });
   assert.equal(rows[0]!.createdById, "u-bea");
   assert.equal(await readPageRow(ENV, PAGE), null, "a page gone or unshared reads as none");
   assert.deepEqual(await databaseOptions(ENV, DB, "Design Status"), ["Ready for Design", "WIP", "Shipped"]);

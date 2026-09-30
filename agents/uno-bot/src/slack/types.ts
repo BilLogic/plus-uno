@@ -176,7 +176,9 @@ export type SlackEnvelope = SlackEventCallback | SlackUrlVerification | { type: 
 
 // The per-thread work the AgentRunner DO processes (one job per alarm).
 export type RunnerJobPayload =
-  | { kind: "message"; event: SlackMessageEvent }
+  /** `reply`: the ahead-of-the-turn handler chosen when it was queued, null
+   *  for none, absent on a job queued before it was carried. */
+  | { kind: "message"; event: SlackMessageEvent; reply?: string | null }
   | { kind: "reaction"; event: SlackReactionAddedEvent }
   /** A cut-off run the ThreadState alarm found and nobody has looked at. */
   | { kind: "cut-off"; proposalTs: string };

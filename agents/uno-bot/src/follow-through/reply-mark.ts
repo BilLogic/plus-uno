@@ -36,3 +36,38 @@ export async function isReplyThread(kv: ReplyMarkKv, channel: string, thread: st
   charge(1, "kv");
   return (await kv.get(`${PREFIX}${channel}:${thread}`)) !== null;
 }
+
+const SKIPS_KEY = "follow-through:skipped";
+
+/**
+ * The end-of-day scan's skip marks: follow-up ids (a page id and a timestamp,
+ * never a title or a link — ADR-030) it passed over without keeping a row,
+ * each with the time it may be looked at again. One key, read once a night,
+ * so a card with nobody to ask costs no re-read on every night and retry.
+ */
+export async function readScanSkips(kv: ReplyMarkKv): Promise<Record<string, number>> {
+  charge(1, "kv");
+  const raw = await kv.get(SKIPS_KEY);
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    return Object.fromEntries(Object.entries(parsed).filter((e): e is [string, number] => typeof e[1] === "number"));
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Write the scan's skip marks, the expired dropped; the key lives as long as
+ * its latest mark.
+ *
+ * @param kv - The harness KV namespace
+ * @param marks - Follow-up id → epoch ms it may be looked at again
+ * @param now - Now, epoch ms
+ */
+export async function writeScanSkips(kv: ReplyMarkKv, marks: Record<string, number>, now: number): Promise<void> {
+  const live = Object.fromEntries(Object.entries(marks).filter(([, until]) => until > now));
+  const last = Math.max(now, ...Object.values(live));
+  charge(1, "kv");
+  await kv.put(SKIPS_KEY, JSON.stringify(live), { expirationTtl: Math.max(60, Math.ceil((last - now) / 1000)) });
+}

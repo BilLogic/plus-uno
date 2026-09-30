@@ -21,7 +21,7 @@
 
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
-import { budgetHeadroom, rethrowIfBudget } from "../net";
+import { budgetHeadroom } from "../net";
 import { getBotIdentity, getPermalink, postMessage, updateMessage, usersInfo } from "../slack/api";
 import type { SlackMessageEvent } from "../slack/types";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
@@ -36,7 +36,7 @@ import { measured } from "../sweep/env";
 import { stageSweepCard } from "../sweep/run";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { SweepThread } from "../sweep/finding";
-import { isReplyThread, markReplyThread } from "./reply-mark";
+import { isReplyThread, markReplyThread, readScanSkips, writeScanSkips } from "./reply-mark";
 import {
   lastCommentAt,
   notionBotUserId,
@@ -135,10 +135,12 @@ export async function runCardFollowThroughOnEnv(env: Env, job: ScheduledJob, opt
   const store = storeFor(env);
   if (!store) return { summary: "USAGE_DB or HARNESS_KV not bound — no card follow-ups" };
   if (!env.NOTION_ROADMAP_DB_ID) return { summary: "NOTION_ROADMAP_DB_ID not set — no card follow-ups" };
+  const kv = env.HARNESS_KV!;
   return runCardFollowThroughScan(job, {
     reads: readsFor(env),
     people: peopleFor(env),
     store,
+    skips: { read: () => readScanSkips(kv), write: (marks) => writeScanSkips(kv, marks, Date.now()) },
     config: configFor(env),
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
@@ -314,8 +316,9 @@ export async function mayBeCardReply(env: Env, event: SlackMessageEvent): Promis
 
 /**
  * A queued reply under a card follow-up (`handleCardReplySafely`). True when
- * it was one, and the turn is then skipped. Never throws but a budget stop: a
- * failure reads as "not one", and the reply takes its ordinary path.
+ * it was one, and the turn is then skipped. Never throws, a budget stop
+ * included: a failure reads as "not one", and the reply takes its ordinary
+ * path, engagement check and all.
  *
  * @param env - Worker bindings
  * @param event - The message
@@ -327,7 +330,6 @@ export async function handleCardReplyOnEnv(env: Env, event: SlackMessageEvent): 
     if (!deps) return false;
     return await handleCardReplySafely({ channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" }, deps);
   } catch (err) {
-    rethrowIfBudget(err);
     console.error(`[follow-through] reply not handled: ${err instanceof Error ? err.message : String(err)}`);
     return false;
   }

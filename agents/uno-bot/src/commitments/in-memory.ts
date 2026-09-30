@@ -3,7 +3,7 @@
 //
 // PURE: no `Env`, no Workers global.
 
-import { LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "./store";
+import { budgetOf, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText, type ReminderBudget } from "./store";
 
 export interface InMemoryCommitmentStore extends CommitmentStore {
   /** Every row, by id — what a test reads back. */
@@ -25,15 +25,23 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
     async get(id) {
       return copy(rows.get(id));
     },
-    async nextDue(now, runDate, skip = []) {
+    async nextDue(now, runDate, skip = {}) {
+      const rank = (r: CommitmentRecord) => (budgetOf(r.kind) === "cards" ? 1 : 0);
       const due = [...rows.values()]
-        .filter((r) => LIVE_STATES.includes(r.state) && r.dueAt <= now && r.checkedOn !== runDate && !skip.includes(r.promiserId))
-        .sort((a, b) => a.dueAt - b.dueAt || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+        .filter(
+          (r) =>
+            LIVE_STATES.includes(r.state) && r.dueAt <= now && r.checkedOn !== runDate && !(skip[budgetOf(r.kind)] ?? []).includes(r.promiserId),
+        )
+        .sort((a, b) => rank(a) - rank(b) || a.dueAt - b.dueAt || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
       return copy(due[0]);
     },
     async remindedOn(runDate) {
-      const counts: Record<string, number> = {};
-      for (const r of rows.values()) if (r.remindedOn === runDate) counts[r.promiserId] = (counts[r.promiserId] ?? 0) + 1;
+      const counts: Record<ReminderBudget, Record<string, number>> = { asked: {}, cards: {} };
+      for (const r of rows.values()) {
+        if (r.remindedOn !== runDate) continue;
+        const b = counts[budgetOf(r.kind)];
+        b[r.promiserId] = (b[r.promiserId] ?? 0) + 1;
+      }
       return counts;
     },
     async liveInThread(channel, threadTs, promiserId) {

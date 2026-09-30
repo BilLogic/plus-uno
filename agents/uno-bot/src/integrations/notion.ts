@@ -894,8 +894,9 @@ export interface EditedRow {
   properties: Record<string, string>;
   /** People-typed properties → names. */
   people: Record<string, string[]>;
-  /** People-typed properties → Notion user ids, in the same order. */
-  peopleIds: Record<string, string[]>;
+  /** People-typed properties → each person's Notion user id and name, paired
+   *  as Notion lists them (a name may be ""), those without an id left out. */
+  persons: Record<string, Array<{ id: string; name: string }>>;
   /** Select, multi-select and status values by property name, one per option. */
   values: Record<string, string[]>;
   /** Who created the row, as a Notion user id. */
@@ -911,13 +912,13 @@ function toEditedRow(r: RawRow & { in_trash?: boolean }): EditedRow | null {
   let title = "(untitled)";
   const properties: Record<string, string> = {};
   const people: Record<string, string[]> = {};
-  const peopleIds: Record<string, string[]> = {};
+  const persons: Record<string, Array<{ id: string; name: string }>> = {};
   const values: Record<string, string[]> = {};
   for (const [name, prop] of Object.entries(r.properties ?? {})) {
     if (prop.type === "title") title = plain(prop.title) || title;
     else if (prop.type === "people") {
       people[name] = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
-      peopleIds[name] = (prop.people ?? []).map((u) => u.id ?? "").filter(Boolean);
+      persons[name] = (prop.people ?? []).filter((u) => u.id).map((u) => ({ id: u.id!, name: u.name ?? "" }));
     } else if (prop.type === "select" || prop.type === "multi_select" || prop.type === "status") {
       const value = renderProperty(prop);
       if (value) properties[name] = value;
@@ -933,7 +934,7 @@ function toEditedRow(r: RawRow & { in_trash?: boolean }): EditedRow | null {
     parentDatabaseId: r.parent?.database_id?.replace(/-/g, "") ?? null,
     properties,
     people,
-    peopleIds,
+    persons,
     values,
     createdById: r.created_by?.id ?? null,
   };
