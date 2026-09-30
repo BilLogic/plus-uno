@@ -60,6 +60,12 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
     async byReminderTs(ts) {
       return copy([...rows.values()].find((r) => r.nudgeTs === ts) ?? [...rows.values()].find((r) => r.followupTs === ts));
     },
+    async byIdPrefix(prefix) {
+      return [...rows.values()]
+        .filter((r) => prefix && r.id.startsWith(prefix))
+        .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+        .map((r) => ({ ...r }));
+    },
     async update(id, patch) {
       const row = rows.get(id);
       if (!row) return;

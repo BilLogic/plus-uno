@@ -1,0 +1,32 @@
+{
+  "case": "DQ1",
+  "source": "authored",
+  "recordedAt": "2026-09-30",
+  "note": "AUTHORED with #795, not captured off the Worker. The draw is the turn the case expects; it proves the turn, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=DQ1`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "What tutor-to-student ratio did we set for the spring 2027 reading pilot?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "spring 2027 reading pilot tutor ratio"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I couldn't find the tutor-to-student ratio for the spring 2027 reading pilot. I searched Notion for the pilot and its staffing, and nothing I can read states a ratio for it.\n\nIf someone has it, a link or the number would help, and I can suggest where it belongs."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "notion_search",
+          "text": "{\"ok\": true, \"results\": []}"
+        }
+      ]
+    }
+  ]
+}

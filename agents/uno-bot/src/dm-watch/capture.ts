@@ -44,7 +44,7 @@ import type { ProposalCard } from "../turn/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { isMorningRunTime } from "../commitments/due";
-import { changedSpan, itemOperation, MAX_ITEMS_PER_CARD, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS } from "../sweep/cards";
+import { changedSpan, itemOperation, MAX_ITEMS_PER_CARD, SWEEP_CARD_EVENT, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS } from "../sweep/cards";
 import type { CaptureDetector } from "../sweep/capture-detector";
 import type { DriftDetector } from "../sweep/detector";
 import { classifyLink, linksIn, type FindingAddition, type FindingTarget, type SweepMessage, type SweepSource, type TargetKind } from "../sweep/finding";
@@ -135,7 +135,10 @@ export type DmCapturePostDeps = Common & {
   bot: {
     /** The owner's DM with uno-bot. */
     dmChannel(userId: string): Promise<string | null>;
-    post(channel: string, message: { text: string; blocks: unknown[] }): Promise<{ ok: boolean; ts?: string }>;
+    post(
+      channel: string,
+      message: { text: string; blocks: unknown[]; metadata: { event_type: string; event_payload: Record<string, string> } },
+    ): Promise<{ ok: boolean; ts?: string }>;
     /** Say on a posted card that it did not go through. */
     withdraw(channel: string, ts: string): Promise<void>;
   };
@@ -397,7 +400,12 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
   // anyone else.
   const dm = await deps.bot.dmChannel(user);
   if (!dm) return report("handled", "the owner's DM with uno-bot could not be opened — kept for tomorrow");
-  const posted = await deps.bot.post(dm, rendered);
+  // Tagged as a sweep card, so the DM's own reads take it as uno-bot's post —
+  // context, never something the person said.
+  const posted = await deps.bot.post(dm, {
+    ...rendered,
+    metadata: { event_type: SWEEP_CARD_EVENT, event_payload: { role: "card", card_key: `${deps.runDate}:dm-capture:${user}` } },
+  });
   if (!posted.ok || !posted.ts) return report("handled", "Slack refused the post — kept for tomorrow");
   const proposal = dmCaptureProposal(card, { owner: user, channel: dm, ts: posted.ts, text: rendered.text, runDate: deps.runDate });
   try {

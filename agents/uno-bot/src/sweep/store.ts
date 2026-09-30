@@ -64,6 +64,9 @@ export interface SweepItemRecord {
   /** When its card was posted and staged; null until then. */
   postedAt: number | null;
   resolvedAt: number | null;
+  /** `dm` for an item found in a person's DM with uno-bot; absent for a
+   *  channel's, a group DM's, a note's or a card's. */
+  surface?: "dm";
 }
 
 export type SweepRunOutcome = "handled" | "deferred" | "skipped";
@@ -106,6 +109,9 @@ export interface SweepRecords {
   /** An upsert on `runId`. */
   recordRun(run: SweepRunRecord): Promise<void>;
   getRun(runId: string): Promise<SweepRunRecord | null>;
+  /** Of these runs, the ones recorded `handled` — one read for many, so a
+   *  retried job passes over its done places without a query each. */
+  handledRuns(runIds: readonly string[]): Promise<string[]>;
   /** Insert a card's items in ONE statement, ignoring an `itemId` already
    *  there — a retried post adds nothing. */
   addItems(items: SweepItemRecord[]): Promise<void>;

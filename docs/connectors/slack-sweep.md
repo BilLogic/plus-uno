@@ -1,12 +1,12 @@
 ---
 embodiment: all
 disclosure: reference
-summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, how it asks about a read-only file, how its commitment reminders nudge a promiser, and its card follow-ups.
+summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, how it asks about a read-only file, how its commitment reminders nudge a promiser, its card follow-ups, and what it asks in a person's DM with uno-bot.
 ---
 
 # The end-of-day sweep
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #750, #751 and #764 · the code is agents/uno-bot/src/sweep/. -->
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #750, #751, #764 and #795 · the code is agents/uno-bot/src/sweep/. -->
 
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a proposal card until a person confirms it. Every write waits for that ✅.
 
@@ -15,7 +15,8 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Channels:** only those on `SWEEP_CHANNELS` in `agents/uno-bot/wrangler.toml` (#plus-design and #plus-design-feedback), the one line to grow. #uno-bot stays off the list whatever it says.
 - **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job.
-- **DMs:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and the fix goes on a card in their DM with uno-bot that only they can confirm (ADR-032).
+- **DMs with uno-bot:** each 1:1 DM uno-bot answered in lately, read by one more end-of-day job with no opt-in, since uno-bot is a party to it (§ DMs with uno-bot).
+- **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and the fix goes on a card in their DM with uno-bot that only they can confirm (ADR-032).
 - **When:** each weekday's end-of-day run (6 pm ET) reads each channel since its cursor, which lives in the usage database.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
 - **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
@@ -34,7 +35,8 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
 - **Group DM:** the card goes back in that group DM, and its ✅ applies the fix only. Once that batch has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. Its ✅ posts that note; its ⛔ drops it. It has the fix card's confirmers and 72 h. A revised or re-staged fix card offers no share.
-- **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private card.
+- **DM with uno-bot:** the card goes back in that DM, for its person alone (§ DMs with uno-bot).
+- **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private card. A DM with uno-bot is the exception: it takes nothing off a channel card.
 
 ## The card
 
@@ -109,3 +111,14 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 - **Proposal cards** sit in the follow-up's thread for 72 h, in their own slot, confirmable by the people it names and whoever answered. Select values are exact-matched: a pillar only when the Roadmap offers it, a status refused rather than created.
 - **Stored:** a `commitments` row of kind `card_todo`, `card_unowned` or `card_stale`, keyed to the card's page id. Titles and links stay in KV (ADR-030).
 
+## DMs with uno-bot
+
+About half the asks happen in people's 1:1 DMs with uno-bot. The end-of-day run reads each DM someone asked uno-bot something in since its last read, both sides of each thread, with the bot token. Everything it finds goes back **only into that same DM thread**, at the next weekday morning run (10 am ET). The code is `agents/uno-bot/src/dm-sweep/`.
+
+- **F6, a question uno-bot could not answer.** uno-bot's answer said it could not find it, or was not sure. The next morning, once: "Yesterday I couldn't find <X>. Did you get it?" An answer given with a source gets none. A reply with the answer or a link is read that night like an answered question in a channel (§ Answers and decisions no page holds yet), and its placement card lands in the DM. 🙅 on the ask drops it. Unanswered, it lapses.
+- **C6, a disagreement uno-bot noticed.** uno-bot's answer said two sources disagree (Figma and code on the warning colour). The next morning, a card: "Yesterday I noticed Figma and the code disagree on the warning colour. Want me to post a note about it in #plus-universal?" (#plus-design when it is not the design system). Its ✅ posts that one reworded note: uno-bot's own summary, with no quote of the DM and no name. ⛔ drops it. The note names no owner and files no intake; whoever owns it picks it up in the channel. One raise a thread, and none about the same two sources in that person's DM for 14 days after an earlier one, whatever became of it.
+- **C7, a decision told to uno-bot.** The person states a team decision ("we decided the recap goes weekly"); an opinion or a wish is not one. That night the thread gets the drift read, following the links uno-bot's own answers carried too, and the next morning brings a proposal card with the page edit, in the DM.
+- **Own posts:** uno-bot tags every post it makes in a DM (the ask, the raise card and its result, a sweep card), and the next night reads those as context only, so a card is only ever read as its own post.
+- **Leaving the DM:** C6's ✅, by the person the DM is with, is the only way anything found in a DM reaches a channel. Every card here is theirs alone to confirm, and a channel card for the same fix still goes up in its own thread.
+- **Limits:** F6 and C6 spend the budget uno-bot's own follow-ups share (two a person a morning, after the person's own reminders), so on a busy morning one can slip to the next. Each is asked once.
+- **Stored:** F6 and C6 are `commitments` rows of kind `dm_unanswered` and `dm_disagreement`, and C7's fixes are `sweep_items` rows with `surface = 'dm'`. What uno-bot could not find and what disagrees stay in KV with an expiry, in uno-bot's words (ADR-030). Nothing from a DM feeds another person's job or the commitment detector's examples.

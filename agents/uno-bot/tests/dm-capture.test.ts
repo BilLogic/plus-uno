@@ -73,7 +73,7 @@ interface World {
   kv: Map<string, DmCaptureFinding[]>;
   progress: Map<string, { latest: string }>;
   logs: string[];
-  posts: { channel: string; text: string; ts: string }[];
+  posts: { channel: string; text: string; ts: string; tag: string }[];
   staged: PendingProposal[];
   threadState: ReturnType<typeof createInMemoryThreadState>;
   events: ReturnType<typeof createInMemoryProposalEventLog>;
@@ -202,7 +202,7 @@ function postDeps(w: World, now = WED): DmCapturePostDeps {
       async post(channel, message) {
         n += 1;
         const posted = `${now / 1000}.00000${n}`;
-        w.posts.push({ channel, text: message.text, ts: posted });
+        w.posts.push({ channel, text: message.text, ts: posted, tag: message.metadata.event_type });
         return { ok: true, ts: posted };
       },
       withdraw: async () => undefined,
@@ -311,6 +311,7 @@ describe("a DM finding", () => {
     assert.ok(!card.text.includes("keep it between us"), "never quoted");
     assert.ok(!card.text.includes(BEA), "the other person is never named or mentioned");
     assert.ok(!card.text.includes("<!channel>"), "a page title pings nobody");
+    assert.equal(card.tag, "uno_sweep_card", "tagged, so the DM's own reads take it as uno-bot's post");
 
     assert.equal(w.staged.length, 1);
     const staged = w.staged[0]!;

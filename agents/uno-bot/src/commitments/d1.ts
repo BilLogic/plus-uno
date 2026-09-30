@@ -1,7 +1,8 @@
 // The D1 commitment records — `commitments` in the usage database
 // (migrations/usage/0006_commitments.sql, 0007_commitment_answers.sql for
 // where each promise was made, 0008_self_reminders.sql for "remind me", and
-// 0009_card_follow_ups.sql for card follow-ups and their card id).
+// 0009_card_follow_ups.sql for card follow-ups and their card id, and
+// 0010_dm_sources.sql for the DM sweep's two kinds).
 //
 // As the sweep's records do (`sweep/d1.ts`): every statement prepared with
 // bound parameters and charged to the meter BEFORE it is sent
@@ -12,7 +13,7 @@
 
 import { chargeD1Query } from "../net";
 import type { SweepDatabase } from "../sweep/d1";
-import { CARD_KINDS, LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentRecords, type ReminderBudget } from "./store";
+import { LIVE_STATES, RAISED_KINDS, type CommitmentPatch, type CommitmentRecord, type CommitmentRecords, type ReminderBudget } from "./store";
 
 const COLUMNS = [
   "commitment_id",
@@ -66,9 +67,10 @@ const INSERT =
   `SELECT ${COLUMNS.map((c) => `json_extract(value, '$.${c}')`).join(", ")} FROM json_each(?) WHERE true ` +
   `ON CONFLICT (commitment_id) DO NOTHING`;
 const LIVE = LIVE_STATES.map((s) => `'${s}'`).join(", ");
-const IS_CARD = `kind IN (${CARD_KINDS.map((k) => `'${k}'`).join(", ")})`;
-// A person's own asks first, then card follow-ups; each passes over the
-// promisers its own budget has spent (`ReminderBudget`).
+const IS_CARD = `kind IN (${RAISED_KINDS.map((k) => `'${k}'`).join(", ")})`;
+// A person's own asks first, then what uno-bot raises on its own (card
+// follow-ups, DM asks); each passes over the promisers its own budget has
+// spent (`ReminderBudget`).
 const NEXT_DUE =
   `${SELECT} WHERE state IN (${LIVE}) AND due_at <= ? AND (checked_on IS NULL OR checked_on <> ?) ` +
   `AND CASE WHEN ${IS_CARD} THEN promiser_id NOT IN (SELECT value FROM json_each(?)) ` +
@@ -190,6 +192,18 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
       if (limit <= 0) return [];
       chargeD1Query();
       const { results } = await db.prepare(LATEST_ANSWERS).bind(channel, limit, channel, limit).all<Row>();
+      return results.map(fromRow);
+    },
+    async byIdPrefix(prefix) {
+      if (!prefix) return [];
+      // A range on the primary key: every id from the prefix up to the next
+      // string that no longer starts with it.
+      const upper = prefix.slice(0, -1) + String.fromCharCode(prefix.charCodeAt(prefix.length - 1) + 1);
+      chargeD1Query();
+      const { results } = await db
+        .prepare(`${SELECT} WHERE commitment_id >= ? AND commitment_id < ? ORDER BY commitment_id`)
+        .bind(prefix, upper)
+        .all<Row>();
       return results.map(fromRow);
     },
     async update(id, patch) {

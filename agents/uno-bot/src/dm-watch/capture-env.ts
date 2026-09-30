@@ -82,7 +82,7 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
     bot: {
       dmChannel: (userId) => conversationsOpen(env, userId),
       async post(channel, message) {
-        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
+        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, metadata: message.metadata });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       async withdraw(channel, ts) {
