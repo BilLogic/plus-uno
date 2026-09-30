@@ -42,7 +42,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## Tool routing — cross-tool rules (each tool's description says when to use it)
 
-**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send` · `dm_relay` · `github_issue_create` · `github_issue_update` · `github_workflow_run`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
+**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send` · `dm_relay` · `github_issue_create` · `github_issue_update` · `github_workflow_run`. Direct, ungated: `slack_react` · `reminder_set`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
 
 **Collision traps (each has bitten live):**
 - A pasted Figma URL → `prototype_scaffold`; `component_implement` takes a component name, so a Figma URL is a scaffold ask.
