@@ -261,6 +261,13 @@ export interface PendingProposal {
    */
   sweepRun?: string;
   /**
+   * Set on a sweep card staged in a group DM: the pages its fixes touch, and
+   * the team channel a reworded note about each goes to once a ✅ applies it
+   * (`sweep/share.ts`). The note names the page and nothing else: no quote,
+   * no names. A revision of it and a re-staged card carry it.
+   */
+  sweepShare?: SweepShare;
+  /**
    * The card's own slot within its reply thread (`proposalSlot`). Absent —
    * every turn's card — the card holds the thread's slot, and cards there
    * replace one another. A card the Worker stages into a thread people also
@@ -314,6 +321,11 @@ export interface StagingReport {
 
 /** A card's own terms: how long it lives and who may confirm it. Both
  *  optional, and a card with neither is held to the defaults. */
+/** A group-DM sweep card's share (`PendingProposal.sweepShare`). */
+export interface SweepShare {
+  pages: Array<{ url: string; title: string; to: "plus-universal" | "plus-design" }>;
+}
+
 export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;
 
 /** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */

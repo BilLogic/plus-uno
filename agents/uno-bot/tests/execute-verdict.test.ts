@@ -236,6 +236,66 @@ test("a sweep card's batch result carries the sweep's tag", async () => {
   assert.deepEqual(result?.metadata, { event_type: "uno_sweep_card", event_payload: { role: "result" } });
 });
 
+const SHARED_PAGE = "https://www.notion.so/0123456789abcdef0123456789abcdef";
+const SHARE_ENV = { PLUS_DESIGN_CHANNEL_ID: "C0DESIGN", PLUS_UNIVERSAL_CHANNEL_ID: "C0UNIVERSAL", UNO_BOT_CHANNEL_ID: "C0UNOBOT" };
+
+test("a group DM's sweep card whose write was refused shares nothing", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([
+    {
+      toolName: "notion_update",
+      input: {
+        page_url: SHARED_PAGE,
+        replace: [{ block_id: "0123456789abcdef0123456789abcd01", last_edited_time: "2026-09-01T10:00:00.000Z", content: "x" }],
+      },
+    },
+  ]);
+  const proposal = {
+    ...verdict.proposal!,
+    channel: "G0MPIM",
+    sweepRun: "2026-09-30",
+    sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" as const }] },
+  };
+  await run(env({ ...SHARE_ENV, NOTION_TOKEN: "secret_test" }), { ...verdict, proposal });
+  assert.equal(posts().filter((p) => p.channel === "C0DESIGN").length, 0, "the block had moved, so nothing was applied");
+});
+
+test("a group DM's applied fix is shared once in its team channel, and never in #uno-bot", async () => {
+  const { shareSweepSummaryFor } = await import("../src/sweep/env.js");
+  const applied = {
+    toolName: "notion_update",
+    input: { page_url: SHARED_PAGE },
+    ok: true,
+    result: JSON.stringify({ ok: true }),
+    message: "updated",
+  };
+  const proposal = won([applied]).proposal!;
+  calls = [];
+  await shareSweepSummaryFor(
+    env(SHARE_ENV),
+    { ...proposal, channel: "G0MPIM", sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" }] } },
+    [applied],
+  );
+  assert.deepEqual(posts().map((p) => p.channel), ["C0DESIGN"]);
+  assert.match(String(posts()[0]!.text), /Launch plan/);
+  assert.doesNotMatch(String(posts()[0]!.text), /<@|G0MPIM/);
+
+  // The team channel set to #uno-bot, or not set: nothing goes anywhere.
+  calls = [];
+  await shareSweepSummaryFor(
+    env({ ...SHARE_ENV, PLUS_DESIGN_CHANNEL_ID: "C0UNOBOT" }),
+    { ...proposal, sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" }] } },
+    [applied],
+  );
+  await shareSweepSummaryFor(env(), { ...proposal, sweepShare: { pages: [{ url: SHARED_PAGE, title: "x", to: "plus-design" }] } }, [
+    applied,
+  ]);
+  // A card from anywhere else has no share.
+  await shareSweepSummaryFor(env(SHARE_ENV), proposal, [applied]);
+  assert.deepEqual(posts(), []);
+});
+
 const EMAIL = {
   toolName: "email_send",
   input: { to: ["sme@example.edu"], subject: "Calendar Sync", body: "A real message body, long enough to send." },

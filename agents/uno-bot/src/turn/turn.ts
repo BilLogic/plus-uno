@@ -1396,6 +1396,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(replaced?.sweepRun
       ? {
           sweepRun: replaced.sweepRun,
+          ...(replaced.sweepShare ? { sweepShare: replaced.sweepShare } : {}),
           supersedeKey: replaced.supersedeKey ?? SWEEP_KEY,
           ttlMs: sweepLeftMs,
           originProposalTs: stagingCardOf(replaced),
@@ -1543,6 +1544,7 @@ async function dropFromSweepCard(
     ...inheritedTerms(pending),
     ttlMs: leftMs,
     sweepRun: pending.sweepRun!,
+    ...(pending.sweepShare ? { sweepShare: pending.sweepShare } : {}),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.
     originProposalTs: stagingCardOf(pending),

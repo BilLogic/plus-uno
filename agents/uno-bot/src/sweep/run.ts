@@ -1,6 +1,6 @@
 // `runSweepJob(job, deps)` — the end-of-day sweep, one scheduled job at a time.
 //
-// TWO JOB KINDS, one module:
+// THREE JOB KINDS, one module:
 //
 //   `sweep-channel` (end of day, one per channel on `SWEEP_CHANNELS`) reads the
 //   channel since its cursor with the bot token — `conversations.history` in
@@ -8,6 +8,10 @@
 //   the links each thread carries through the existing source reads, asks the
 //   detector, routes each finding to its owner, and queues it for the morning.
 //   It posts nothing.
+//
+//   `sweep-group-dms` (end of day, one job) does the same for every group DM
+//   uno-bot is in, as the bot's own conversation list names them, one after
+//   another on the job's budget; each keeps its own cursor and run record.
 //
 //   `sweep-post` (the weekday morning run) takes the findings whose morning has
 //   come (`postableAt`), groups them by destination (`pickDestination`), and
@@ -17,10 +21,21 @@
 //   live gets none, and what does not fit waits in the queue. A quiet day
 //   posts nothing.
 //
-// THE AUDIENCE RULE. A finding only reaches people who could already see its
-// evidence. In this job every finding comes from a public channel and is
-// posted in its own thread; a private channel on the list is skipped, a DM or
-// group DM is never read, and #uno-bot is never swept and never posted in.
+// THE AUDIENCE RULE (ADR-031). A run with no requester has no one whose
+// visibility bounds it, so the evidence's own audience does: a finding only
+// reaches people who could already see its evidence.
+//   • A public channel's finding is posted in its own thread.
+//   • A private channel is read only when it is on `SWEEP_CHANNELS` AND on the
+//     team's private allowlist (`SLACK_SEARCH_PRIVATE_ALLOWLIST`); off the
+//     allowlist it is never read, whatever the sweep list says. Its finding
+//     stays in its thread, its owner is someone in the channel, and nothing of
+//     it — text, link or name — reaches any other message.
+//   • A group DM uno-bot is in is read the same way and its finding posted
+//     back in it. Its card says that a ✅ also posts a reworded note in the
+//     team channel — the page's name, no quote, no names (`./share.ts`).
+//   • A fix found both in a public thread and in a private place is private:
+//     it goes on the private card, and the public copy leaves the queue.
+//   • A DM is never read, and #uno-bot is never swept and never posted in.
 //
 // THE BUDGET. Each alarm runs one job on a fresh subrequest budget, under the
 // lookup ceiling (ADR-022). A channel's threads are processed oldest activity
@@ -64,6 +79,7 @@ import {
   operationsDigest,
   planSweepCards,
   sweepCard,
+  sweepShareOf,
   SWEEP_CARD_TTL_MS,
   type SweepCardPlan,
 } from "./cards";
@@ -141,6 +157,11 @@ export interface SweepSlack {
     rootTs: string,
     cursor?: string,
   ): Promise<{ messages: SweepSlackMessage[]; nextCursor?: string } | null>;
+  /** A private place's members, or null when Slack would not say. Absent, no
+   *  Contributor counts as one. */
+  members?(channel: string): Promise<string[] | null>;
+  /** The group DMs uno-bot is in, or null when the list cannot be read. */
+  groupDms?(): Promise<string[] | null>;
 }
 
 /** A card as Slack will post it. */
@@ -204,6 +225,9 @@ export interface SweepConfig {
   figmaLibraryKey?: string;
   /** The bot's own user id, whose messages are not evidence. */
   botUserId?: string | null;
+  /** The private channels the team cleared (`SLACK_SEARCH_PRIVATE_ALLOWLIST`):
+   *  the only ones the sweep reads. */
+  privateAllowlist?: readonly string[];
 }
 
 export interface SweepDeps {
@@ -240,7 +264,7 @@ export interface SweepCardReport {
 
 /** What one job came to. */
 export interface SweepJobReport {
-  kind: "sweep-channel" | "sweep-post";
+  kind: "sweep-channel" | "sweep-group-dms" | "sweep-post";
   key: string;
   outcome: SweepRunOutcome;
   note: string | null;
@@ -262,12 +286,45 @@ export interface SweepJobReport {
  */
 export function runSweepJob(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
   if (job.kind === "sweep-post") return postFindings(job, deps);
+  if (job.kind === "sweep-group-dms") return sweepGroupDms(job, deps);
   return sweepChannel(job, deps);
 }
 
 // ── End of day: read, detect, queue ──────────────────────────────────────────
 
-async function sweepChannel(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
+/**
+ * Every group DM uno-bot is in, one after another on this job's budget. Each
+ * is swept as a channel is — its own cursor, its own run record under
+ * `<job key>:<channel>` — so a budget stop part-way keeps what is done, and
+ * the retried job skips it.
+ */
+async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
+  const base = { kind: "sweep-group-dms" as const, key: job.key };
+  const listed = deps.slack.groupDms ? await deps.slack.groupDms() : null;
+  if (!listed) {
+    const note = "the group DMs uno-bot is in could not be listed";
+    return { ...base, outcome: "skipped", note, threads: 0, findings: [], cards: [], summary: note };
+  }
+  const reports: SweepJobReport[] = [];
+  for (const channel of listed.filter((c) => c && c !== deps.config.unoBot)) {
+    reports.push(await sweepChannel({ key: `${job.key}:${channel}`, kind: "sweep-channel", channel }, deps, "group-dm"));
+  }
+  const threads = reports.reduce((n, r) => n + r.threads, 0);
+  const findings = reports.flatMap((r) => r.findings);
+  const cards = reports.flatMap((r) => r.cards);
+  const notes = reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`);
+  const note = notes.length ? notes.join("; ") : null;
+  const counted = `${reports.length} group DM(s), ${threads} thread(s) read, ${findings.length} finding(s) kept for the morning`;
+  return { ...base, outcome: "handled", note, threads, findings, cards, summary: note ? `${counted} — ${note}` : counted };
+}
+
+/**
+ * One channel's end of day.
+ *
+ * @param only - Sweep it only when Slack says it is this kind — how the
+ *   group-DM job holds itself to group DMs
+ */
+async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKind): Promise<SweepJobReport> {
   const startedAt = deps.now();
   const meterStart = readMeter(deps);
   const channel = job.channel ?? "";
@@ -299,8 +356,11 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
   if (channel === deps.config.unoBot) return finish("skipped", "#uno-bot is never swept", 0, []);
   const kind = await deps.slack.channelKind(channel);
   if (kind === null) return finish("skipped", "Slack would not describe the channel", 0, []);
-  if (kind === "dm" || kind === "group-dm") return finish("skipped", "DMs and group DMs are never read", 0, []);
-  if (kind === "private") return finish("skipped", "private channels are not swept yet", 0, []);
+  if (kind === "dm") return finish("skipped", "DMs are never read", 0, []);
+  if (only && kind !== only) return finish("skipped", `not a ${only}`, 0, []);
+  if (kind === "private" && !(deps.config.privateAllowlist ?? []).includes(channel)) {
+    return finish("skipped", "a private channel off the private allowlist is never read", 0, []);
+  }
 
   const now = deps.now();
   const cursor = (await deps.store.cursor(channel)) ?? tsOf(now - FIRST_SWEEP_WINDOW_MS);
@@ -312,6 +372,13 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
   let reached = cursor;
   const notes: string[] = [];
   const resolved = new Map<string, string | null>();
+  // A private place's members, read once, the first time a Contributor is
+  // about to be named owner there.
+  let members: Promise<ReadonlySet<string>> | undefined;
+  const membersOf = (): Promise<ReadonlySet<string>> =>
+    (members ??= (deps.slack.members ? deps.slack.members(channel) : Promise.resolve(null)).then(
+      (m) => new Set(m ?? []),
+    ));
 
   try {
     const { units, readTo } = await activeThreads(deps, channel, oldest, cursor);
@@ -340,7 +407,16 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
       } else if (messages !== "too-long") {
         const humans = messages.filter((m) => isHuman(m, deps.config.botUserId)).map(toSweepMessage);
         threads += 1;
-        const found = await sweepThread(deps, { channel, rootTs: unit.root.ts, humans, runDate, now, resolved });
+        const found = await sweepThread(deps, {
+          channel,
+          channelKind: kind,
+          rootTs: unit.root.ts,
+          humans,
+          runDate,
+          now,
+          resolved,
+          membersOf,
+        });
         if (!found.ok) {
           if ((await failed(unit.root.ts, found.error, found.counts)) === "hold") {
             return finish("handled", `stopped at ${reached}: ${found.error}`, threads, kept);
@@ -437,11 +513,14 @@ async function sweepThread(
   deps: SweepDeps,
   t: {
     channel: string;
+    channelKind: ChannelKind;
     rootTs: string;
     humans: SweepMessage[];
     runDate: string;
     now: number;
     resolved: Map<string, string | null>;
+    /** The place's members — read only for a place that is not public. */
+    membersOf: () => Promise<ReadonlySet<string>>;
   },
 ): Promise<
   | { ok: true; findings: PendingFinding[]; readOnly: number; trimmed: number }
@@ -479,7 +558,7 @@ async function sweepThread(
 
   const shown = withinThreadBudget(t.humans, root.ts);
   const detected = await deps.detector.detect({
-    thread: { channel: t.channel, channelKind: "public", rootTs: t.rootTs, messages: shown.messages },
+    thread: { channel: t.channel, channelKind: t.channelKind, rootTs: t.rootTs, messages: shown.messages },
     sources,
   });
   if (!detected.ok) {
@@ -502,7 +581,11 @@ async function sweepThread(
     const cardContributors = d.source.contributors.length
       ? d.source.contributors
       : sources.flatMap((s) => s.contributors);
-    const contributorIds = claimed ? [] : await contributorsOf(deps, cardContributors, t.resolved);
+    const named = claimed ? [] : await contributorsOf(deps, cardContributors, t.resolved);
+    // In a private place the owner is someone in it: a Contributor outside it
+    // could not see the card, and naming them there would reach past it.
+    const contributorIds =
+      t.channelKind === "public" || !named.length ? named : await inPlace(named, t.membersOf);
     const { owner } = routeOwner({ claimedBy: d.claimedBy, participants, contributorIds, starter: root.user });
     findings.push({
       id: `${t.channel}:${t.rootTs}:${d.blockId}`,
@@ -522,7 +605,7 @@ async function sweepThread(
       sourceSays: d.sourceSays,
       threadSays: d.threadSays,
       replacement: d.replacement,
-      evidence: { channel: t.channel, channelKind: "public", threadTs: t.rootTs, messageTs: d.evidenceTs, permalinks: [] },
+      evidence: { channel: t.channel, channelKind: t.channelKind, threadTs: t.rootTs, messageTs: d.evidenceTs, permalinks: [] },
       owner,
       confidence: d.confidence,
       participants,
@@ -552,6 +635,12 @@ function withinThreadBudget(messages: SweepMessage[], rootTs: string): { message
   }
   const shown = root ? [root, ...kept] : kept;
   return { messages: shown, trimmed: messages.length - shown.length };
+}
+
+/** The ids that are members of the place, in order. */
+async function inPlace(ids: readonly string[], membersOf: () => Promise<ReadonlySet<string>>): Promise<string[]> {
+  const members = await membersOf();
+  return ids.filter((id) => members.has(id));
 }
 
 /** The card's Contributors as Slack ids, each name looked up once per job. */
@@ -616,7 +705,15 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
     for (const place of await placesLiveInThreadState(deps, open, live)) live.add(place);
 
     const stillDue = due.filter((f) => !carded.some((c) => c.id === f.id) && !held.has(f.id));
-    const { fresh, already } = await sortOutCarded(deps, stillDue);
+    const shadowed = shadowedByPrivate(stillDue, queued);
+    if (shadowed.length) {
+      notes.push(`${shadowed.length} fix(es) also found in a private place go only on its card`);
+      if (!deps.dryRun) await deps.store.removeFindings(shadowed.map((f) => f.id));
+    }
+    const { fresh, already } = await sortOutCarded(
+      deps,
+      stillDue.filter((f) => !shadowed.includes(f)),
+    );
     if (already.length && !deps.dryRun) await deps.store.removeFindings(already.map((f) => f.id));
 
     const plans = planSweepCards(fresh, postDate, (where) => live.has(where));
@@ -901,6 +998,25 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
   return "live";
 }
 
+/** One fix, wherever it was found: the page and the block it rewrites. */
+function fixKey(f: Pick<PendingFinding, "target" | "blockId">): string {
+  return `${f.target.url}#${f.blockId ?? ""}`;
+}
+
+/**
+ * The public findings whose fix the queue also holds from a private channel,
+ * a group DM or a DM. Evidence that spans both is private (ADR-031): the fix
+ * goes only on the private card, and the public copy is never carded — a
+ * public card would show a change only the private place could see.
+ *
+ * @param due - This morning's findings
+ * @param queued - Every finding in the queue, due or not
+ */
+export function shadowedByPrivate(due: readonly PendingFinding[], queued: readonly PendingFinding[]): PendingFinding[] {
+  const privateFixes = new Set(queued.filter((f) => f.evidence.channelKind !== "public").map(fixKey));
+  return due.filter((f) => f.evidence.channelKind === "public" && privateFixes.has(fixKey(f)));
+}
+
 /** An item in one of these states means the thread has had this fix. */
 const CARDED: readonly SweepItemStatus[] = ["proposed", "dropped", "confirmed", "refused_unwritable"];
 
@@ -1041,6 +1157,7 @@ export function sweepProposal(
   posted: { channel: string; root: string; ts: string; text: string; postDate: string },
 ): PendingProposal {
   const first = plan.operations[0]!;
+  const share = sweepShareOf(plan.items);
   return {
     operations: plan.operations,
     toolName: first.toolName,
@@ -1058,6 +1175,8 @@ export function sweepProposal(
     sweepRun: posted.postDate,
     // Its own slot in the thread, beside any turn's card (`proposalSlot`).
     supersedeKey: SWEEP_KEY,
+    // A group DM's card: what its ✅ shares, as the card said (`./share.ts`).
+    ...(share ? { sweepShare: share } : {}),
   };
 }
 

@@ -27,13 +27,15 @@ Pillar → channel map (group announcements; **all private — uno-bot must be i
 The Worker's one proactive read of channels, whose rules the bot reads through `read_reference` (`docs/connectors/slack-sweep.md`):
 
 - **Read path.** At the 22:00 UTC end-of-day run, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
-  - `conversations.info` first: a private channel is skipped, and a DM or group DM stays unread;
+  - `conversations.info` first: a private channel is read only when it is also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`, and a DM stays unread;
+  - one more job reads every group DM uno-bot is in (`users.conversations`, `types=mpim`);
   - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then, also in pages of 200.
   - The cursor lives in D1 (`sweep_cursors`) and moves after each thread, so a job stopped by the budget resumes where it stopped. A history read that reaches its page cap holds the cursor at the oldest root it read, and a thread past the reply-page cap is left with a note in `sweep_runs`.
   - #uno-bot stays off the read path, whatever the list says.
 - **Audience rule.** A finding reaches only people who could already see its evidence:
   - a public thread's finding is posted in that thread;
-  - a private channel's stays there, and a DM's goes back to that DM;
+  - a private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM — whose ✅ also posts a reworded note (page name only, no quote, no names) at rung 3 or 4;
+  - a fix found in both a public thread and a private place goes only on the private card (ADR-031);
   - findings in no thread go to #plus-universal for the design system and to #plus-design otherwise (`pickDestination` in `agents/uno-bot/src/sweep/finding.ts`).
   - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
 - **Cards** post at the next weekday 14:00 UTC run: one live card per thread, up to 10 fixes, and the rest queued until it resolves. A thread is taken while its card is live by the records or in ThreadState, a revision or re-staged card included. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.

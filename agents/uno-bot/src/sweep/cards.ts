@@ -17,13 +17,18 @@
 // the card lives 72 hours, with no re-ping when it lapses. Each item names its
 // owner, who is @-mentioned; nobody else is.
 //
+// A GROUP DM'S CARD also says what its ✅ shares outside the group DM: a
+// reworded note naming the pages it brought up to date, in the team channel
+// the fix would go to with its evidence set aside (`sweepShareOf`,
+// `./share.ts`). A private channel's card shares nothing.
+//
 // PURE: no `Env`, no Slack call. The card is data (`ProposalCard`); Slack
 // renders it (`slack/proposal-render.ts`).
 
 import { typedEmojiDecision } from "../gate/reactions";
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, SweepShare } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
-import { pickDestination, type Destination } from "./finding";
+import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
 
 /** How long a sweep card stays confirmable. */
@@ -152,6 +157,29 @@ function stable(v: unknown): string {
   return JSON.stringify(v);
 }
 
+/** Slack's names for the two team channels a group DM's share goes to. */
+export const SHARE_CHANNEL_NAMES: Record<SweepShare["pages"][number]["to"], string> = {
+  "plus-universal": "#plus-universal",
+  "plus-design": "#plus-design",
+};
+
+/**
+ * The share a group-DM card carries, or undefined for a card from anywhere
+ * else: each page its fixes touch, once, in item order, with the team channel
+ * a note about it goes to (`shareDestination`).
+ *
+ * @param items - The card's findings
+ */
+export function sweepShareOf(items: readonly PendingFinding[]): SweepShare | undefined {
+  if (!items.length || !items.every((f) => f.evidence.channelKind === "group-dm")) return undefined;
+  const pages: SweepShare["pages"] = [];
+  for (const f of items) {
+    if (pages.some((p) => p.url === f.target.url)) continue;
+    pages.push({ url: f.target.url, title: f.target.title, to: shareDestination(f.target).channel });
+  }
+  return { pages };
+}
+
 /** One key per place a card can land: a thread, or a team channel. */
 export function destinationKey(d: Destination): string {
   return d.rung === "private" || d.rung === "thread" ? `${d.channel}:${d.threadTs ?? ""}` : d.channel;
@@ -184,6 +212,15 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
       "The owners named above and anyone who posted in this thread can confirm. " +
       `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   );
+  const share = sweepShareOf(plan.items);
+  if (share) {
+    const where = [...new Set(share.pages.map((p) => SHARE_CHANNEL_NAMES[p.to]))].join(" and ");
+    lines.push(
+      "",
+      `Nothing from this conversation leaves it but this: the ✅ also posts a short note in ${where} ` +
+        "naming the page it brought up to date — no quote, and no names.",
+    );
+  }
   return {
     kind: "confirm",
     verb: n === 1 ? "apply this Notion fix" : `apply these ${n} Notion fixes`,

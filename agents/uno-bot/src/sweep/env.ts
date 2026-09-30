@@ -2,7 +2,10 @@
 //
 // What each port becomes:
 //   • Slack reads: `conversations.info` for the channel's kind, and
-//     `conversations.history` / `.replies` with the bot token.
+//     `conversations.history` / `.replies` with the bot token; for a private
+//     place, `conversations.members` when a Contributor is about to be named
+//     owner there; and `users.conversations` (`types=mpim`) for the group DMs
+//     uno-bot is in. The private allowlist is `SLACK_SEARCH_PRIVATE_ALLOWLIST`.
 //   • Source reads: Notion through `readNotionPage`, which keeps each block's
 //     id and `last_edited_time` for the replace; GitHub, Figma and canvases
 //     through `source_read`'s own executor, as read-only context.
@@ -20,6 +23,8 @@
 //     proposal renderer and tagged with its key in message metadata, and
 //     `ThreadState.putProposal`. A card is found again by that tag
 //     (`include_all_metadata`), and withdrawn with `chat.update`.
+//   • A group DM's share: once its card's ✅ has run, `chat.postMessage` of
+//     each reworded note in its team channel (`shareSweepSummaryFor`).
 //
 // THE BUDGET, AT EVERY READ. A read that ran into the lookup ceiling may come
 // back short rather than throw — a paging loop that stopped, an executor that
@@ -41,8 +46,10 @@ import {
 } from "../net";
 import { canonicalNotionUrl, parseNotionPageId, readNotionPage, stripBlockPrefix } from "../integrations/notion";
 import {
+  botConversations,
   conversationsHistorySince,
   conversationsInfo,
+  conversationsMembers,
   conversationsReplies,
   getBotIdentity,
   getPermalink,
@@ -64,7 +71,8 @@ import { markSweepThread } from "./thread-mark";
 import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
-import { SWEEP_CARD_EVENT, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
+import { SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
+import { sweepShareNotes } from "./share";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
@@ -79,6 +87,8 @@ const QUEUE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 /** The key itself outlives its newest finding by the same week. */
 const QUEUE_TTL_SECONDS = QUEUE_MAX_AGE_MS / 1000;
 const CONTEXT_TEXT_CAP = 4_000;
+/** Pages of 200 read for a member list or the bot's group DMs. */
+const LIST_PAGES = 5;
 
 
 /**
@@ -126,6 +136,31 @@ async function sweepDepsFor(
         if (!res.ok) return null;
         const next = res.response_metadata?.next_cursor;
         return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
+      },
+      async members(channel) {
+        const ids: string[] = [];
+        let cursor: string | undefined;
+        for (let i = 0; i < LIST_PAGES; i++) {
+          const res = await measured(() => conversationsMembers(env, channel, 200, cursor));
+          if (!res.ok) return null;
+          ids.push(...(res.members ?? []));
+          cursor = res.response_metadata?.next_cursor;
+          if (!cursor) return ids;
+        }
+        // Cut off: the list is partial, and a partial list names no one outside it.
+        return ids;
+      },
+      async groupDms() {
+        const ids: string[] = [];
+        let cursor: string | undefined;
+        for (let i = 0; i < LIST_PAGES; i++) {
+          const res = await measured(() => botConversations(env, "mpim", cursor));
+          if (!res.ok) return null;
+          ids.push(...(res.channels ?? []).map((c) => c.id ?? "").filter(Boolean));
+          cursor = res.response_metadata?.next_cursor;
+          if (!cursor) break;
+        }
+        return ids;
       },
     },
     sources: { read: (url, kind) => measured(() => readSource(env, url, kind)) },
@@ -231,6 +266,10 @@ async function sweepDepsFor(
       unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
       figmaLibraryKey: env.FIGMA_FILE_KEY?.trim() || undefined,
       botUserId: bot?.userId ?? null,
+      privateAllowlist: (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean),
     },
     meter: { subrequests: subrequestsUsed, d1Queries: d1QueriesUsed, headroom: budgetHeadroom },
     now: () => Date.now(),
@@ -256,6 +295,38 @@ export async function recordSweepResolutionFor(
     await recordSweepResolution(createD1SweepRecords({ db: env.USAGE_DB }), proposal, outcomes, Date.now());
   } catch (err) {
     console.error(`[sweep] outcome of ${proposal.proposalTs} not recorded: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/**
+ * Post a group-DM card's reworded notes once its ✅ has run (`sweepShareNotes`):
+ * one per team channel, naming the pages the batch brought up to date. Never
+ * in #uno-bot, and nothing when the channel is not configured. Best-effort: a
+ * failed post is logged and never reaches the person.
+ *
+ * @param env - Carries the team channels' ids
+ * @param proposal - The confirmed card
+ * @param outcomes - What its batch ran
+ */
+export async function shareSweepSummaryFor(
+  env: Env,
+  proposal: PendingProposal,
+  outcomes: readonly OperationOutcome[],
+): Promise<void> {
+  if (!proposal.sweepShare) return;
+  const channels = {
+    "plus-universal": env.PLUS_UNIVERSAL_CHANNEL_ID?.trim(),
+    "plus-design": env.PLUS_DESIGN_CHANNEL_ID?.trim(),
+  };
+  for (const note of sweepShareNotes(proposal.sweepShare, outcomes)) {
+    const channel = channels[note.to];
+    if (!channel || channel === env.UNO_BOT_CHANNEL_ID?.trim()) continue;
+    try {
+      const sent = await postMessage(env, { channel, text: note.text, metadata: sweepPostMetadata("note") });
+      if (!sent.ok) console.warn(`[sweep] share of ${proposal.proposalTs} not posted: ${sent.error ?? "no"}`);
+    } catch (err) {
+      console.error(`[sweep] share of ${proposal.proposalTs} not posted: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 }
 

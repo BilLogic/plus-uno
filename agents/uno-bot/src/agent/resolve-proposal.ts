@@ -33,7 +33,7 @@ import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations, stagingCardOf, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
-import { recordSweepResolutionFor } from "../sweep/env";
+import { recordSweepResolutionFor, shareSweepSummaryFor } from "../sweep/env";
 import { sweepPostMetadata } from "../sweep/cards";
 import {
   executionEvents,
@@ -204,6 +204,9 @@ async function runWonVerdict(
   // refused because the block moved since the read, or failed. Best-effort,
   // and before anything below can return early.
   await recordSweepResolutionFor(env, pending, outcomes);
+  // A group DM's sweep card: the ✅ also shares the reworded note its card
+  // named, for the pages the batch brought up to date. Best-effort.
+  await shareSweepSummaryFor(env, pending, outcomes);
   await onBatchBack(outcomes);
 
   // Past the batch every operation has come back, or the fence stopped it, so

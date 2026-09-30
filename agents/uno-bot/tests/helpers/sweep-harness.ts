@@ -85,6 +85,8 @@ export interface FakeChannel {
   history: SweepSlackMessage[];
   /** Thread messages by root ts, root first. */
   threads?: Record<string, SweepSlackMessage[]>;
+  /** Its members, as `conversations.members` lists them; absent, the read fails. */
+  members?: string[];
 }
 
 export interface SweepHarness {
@@ -141,6 +143,11 @@ export function sweepHarness(opts: {
   /** Messages per `conversations.history` / `.replies` page; all on one page
    *  when unset. */
   pageSize?: number;
+  /** `SLACK_SEARCH_PRIVATE_ALLOWLIST`: the private channels the sweep may read. */
+  privateAllowlist?: string[];
+  /** The group DMs uno-bot is in, as the bot's own conversation list names
+   *  them; null when that list cannot be read. Unset, none. */
+  groupDms?: string[] | null;
 }): SweepHarness {
   const clock = { now: opts.now };
   const store = opts.store ?? createInMemorySweepStore();
@@ -216,6 +223,14 @@ export function sweepHarness(opts: {
         const thread = opts.channels[channel]?.threads?.[rootTs];
         return thread ? page(thread, cursor) : null;
       },
+      async members(channel) {
+        reads.push(`members ${channel}`);
+        return opts.channels[channel]?.members ?? null;
+      },
+      async groupDms() {
+        reads.push("group-dms");
+        return opts.groupDms === undefined ? [] : opts.groupDms;
+      },
     },
     sources: {
       async read(url) {
@@ -284,7 +299,13 @@ export function sweepHarness(opts: {
         return `https://plus.slack.com/archives/${channel}/p${messageTs.replace(".", "")}`;
       },
     },
-    config: { plusDesign: DESIGN, plusUniversal: UNIVERSAL, unoBot: UNO_BOT, botUserId: BOT },
+    config: {
+      plusDesign: DESIGN,
+      plusUniversal: UNIVERSAL,
+      unoBot: UNO_BOT,
+      botUserId: BOT,
+      ...(opts.privateAllowlist ? { privateAllowlist: opts.privateAllowlist } : {}),
+    },
     meter: { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ ...headroom }) },
     now: () => clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),

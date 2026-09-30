@@ -190,8 +190,21 @@ export function pickDestination(finding: Pick<DriftFinding, "evidence" | "target
     return { rung: "private", channel: evidence.channel, threadTs: evidence.threadTs };
   }
   if (evidence.threadTs) return { rung: "thread", channel: evidence.channel, threadTs: evidence.threadTs };
-  if (isDesignSystemTarget(finding.target)) return { rung: "design-system", channel: "plus-universal" };
-  return { rung: "design", channel: "plus-design" };
+  return shareDestination(finding.target);
+}
+
+/**
+ * Where a group-DM finding's reworded note goes once someone in the group DM
+ * ✅s it: the rung the finding would take with its evidence set aside — rung 3
+ * or 4, by its target alone. Never a thread, never the group DM, never
+ * #uno-bot.
+ */
+export function shareDestination(
+  target: Pick<FindingTarget, "kind" | "pillars">,
+): Extract<Destination, { rung: "design-system" | "design" }> {
+  return isDesignSystemTarget(target)
+    ? { rung: "design-system", channel: "plus-universal" }
+    : { rung: "design", channel: "plus-design" };
 }
 
 /** The Worker's channel ids for the two roles `pickDestination` names. */
