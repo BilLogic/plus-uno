@@ -34,6 +34,7 @@ import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations, stagingCardOf, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { recordSweepResolutionFor } from "../sweep/env";
+import { sweepPostMetadata } from "../sweep/cards";
 import {
   executionEvents,
   quietly,
@@ -242,6 +243,8 @@ async function runWonVerdict(
           channel: run.channel,
           text: resultMessage,
           ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
+          // A sweep card's result carries the sweep's tag, as the card does.
+          ...(pending.sweepRun ? { metadata: sweepPostMetadata("result") } : {}),
         });
       }
     }

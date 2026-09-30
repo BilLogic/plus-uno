@@ -270,6 +270,20 @@ export function engagesOnSweepCard(text: string): boolean {
   return typedEmojiDecision(text) !== null || PICK.test(text.trim());
 }
 
+/** The sweep's tag on a post that answers a sweep card — its batch result,
+ *  a note — as the port carries it (`ProposalCard.tag`). */
+export function sweepTag(role: "revision" | "result" | "note"): { eventType: string; payload: Record<string, string> } {
+  return { eventType: SWEEP_CARD_EVENT, payload: { role } };
+}
+
+/** The same tag as Slack message metadata. */
+export function sweepPostMetadata(role: "revision" | "result" | "note"): {
+  event_type: string;
+  event_payload: Record<string, string>;
+} {
+  return { event_type: SWEEP_CARD_EVENT, event_payload: { role } };
+}
+
 /**
  * A sweep card's revision as a sweep card still: the sweep's mark leads it and
  * it carries the sweep's tag, so a reply under it is read by the same rule as
@@ -280,7 +294,7 @@ export function asSweepRevision(card: ProposalCard): ProposalCard {
   return {
     ...card,
     lead: `:mag: **${SWEEP_CARD_MARK}** — revised${card.lead ? `: ${card.lead}` : "."}`,
-    tag: { eventType: SWEEP_CARD_EVENT, payload: { role: "revision" } },
+    tag: sweepTag("revision"),
   };
 }
 

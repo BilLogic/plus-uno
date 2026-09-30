@@ -121,7 +121,9 @@ export interface SweepHarness {
   headroom: { subrequests: number; d1Queries: number };
   /** One-shot faults: each, when set, is thrown by the next call of its kind
    *  and cleared. */
-  faults: { post?: Error; stage?: Error; addItems?: Error; markPosted?: Error };
+  faults: { post?: Error; stage?: Error; afterStage?: Error; addItems?: Error; markPosted?: Error };
+  /** Threads marked as entered through a sweep card, as `channel:thread`. */
+  marked: Set<string>;
   /** Morning searches for a posted card left that answer "unknown", as a
    *  failed Slack read would. */
   unknownSearches: { left: number };
@@ -164,6 +166,7 @@ export function sweepHarness(opts: {
   const headroom = { subrequests: Infinity, d1Queries: Infinity };
   const broken = new Set<string>();
   const rateLimited = new Set<string>();
+  const marked = new Set<string>();
   const unknownSearches = { left: 0 };
   const faults: SweepHarness["faults"] = {};
   const pageSize = opts.pageSize ?? Infinity;
@@ -253,7 +256,13 @@ export function sweepHarness(opts: {
         once("stage");
         staged.push(proposal);
         // The production staging: the card, and its rows on the usage record.
-        await stageSweepCard(proposal, { threadState, proposalEvents }, clock.now);
+        await stageSweepCard(
+          proposal,
+          { threadState, proposalEvents, markThread: async (channel, thread) => void marked.add(`${channel}:${thread}`) },
+          clock.now,
+        );
+        // A stop after the card is in ThreadState, before the job heard back.
+        once("afterStage");
       },
       async cardState(proposalTs) {
         return sweepCardState(proposalTs, { threadState, proposalEvents });
@@ -262,6 +271,7 @@ export function sweepHarness(opts: {
         return (await threadState.getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
       },
       async withdraw(channel, messageTs, text, cardKey) {
+        await threadState.retireProposal(messageTs);
         const card = posted.find((p) => p.channel === channel && p.ts === messageTs);
         if (card) {
           card.withdrawn = text;
@@ -294,6 +304,7 @@ export function sweepHarness(opts: {
     faults,
     broken,
     rateLimited,
+    marked,
     unknownSearches,
   };
 }

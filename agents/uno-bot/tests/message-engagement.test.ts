@@ -24,6 +24,8 @@ let thread: Array<Record<string, unknown>> = ROOT_ONLY;
 /** The card `getProposalByThread` answers; none unless a case sets one. */
 let pending: Record<string, unknown> | null = null;
 let history: unknown[] = [];
+/** Threads marked as entered through a sweep card (`sweep/thread-mark.ts`). */
+const marks = new Set<string>();
 globalThis.fetch = (async (input: unknown) => {
   const url = String(input instanceof Request ? input.url : input);
   slackCalls.push(url.replace("https://slack.com/api/", ""));
@@ -35,6 +37,14 @@ globalThis.fetch = (async (input: unknown) => {
 
 const ENV = {
   SLACK_BOT_TOKEN: "xoxb-test",
+  HARNESS_KV: {
+    async get(key: string) {
+      return marks.has(key) ? "1" : null;
+    },
+    async put(key: string) {
+      marks.add(key);
+    },
+  },
   UNO_BOT_CHANNEL_ID: UNO_BOT,
   THREAD_STATE: {
     idFromName: (name: string) => name,
@@ -182,9 +192,46 @@ test("under a revised sweep card, with the drop's turn in history, the same rule
   });
 });
 
-test("once uno-bot has said anything else in the thread, every reply engages again", async () => {
+// An ordinary thread — one the bot was not marked as entering through a sweep
+// card — keeps the follow-up rule: once uno-bot has said anything else there,
+// every reply engages again.
+test("in an unmarked thread, once uno-bot has said anything else, every reply engages again", async () => {
   const answer = { user: BOT, bot_id: "BBOT", ts: "1700.7", text: "Dropped the second fix." };
   await withSweepThread([SWEEP_CARD_POST, answer], async () => {
     assert.equal(await engages(inSweepThread("lunch at noon?")), true);
   });
+});
+
+test("an ordinary bot thread, with history and no card, engages on every reply", async () => {
+  thread = [...ROOT_ONLY, { user: BOT, bot_id: "BBOT", ts: "1700.3", text: "Here's the token." }];
+  history = [{ role: "assistant", text: "Here's the token." }];
+  try {
+    assert.equal(await engages(inSweepThread("and for secondary?")), true);
+  } finally {
+    thread = ROOT_ONLY;
+    history = [];
+  }
+});
+
+// A thread the bot entered through a sweep card stays the team's after the
+// card is decided: the batch result, the notes and the history the ✅ left
+// behind invite nothing. Only a pick, a typed gate emoji or an @mention does.
+test("in a thread entered through a sweep card, a decided card's result, notes and history invite nothing", async () => {
+  const result = { user: BOT, bot_id: "BBOT", ts: "1700.7", text: "Applied 2 fixes." };
+  const lock = { user: BOT, bot_id: "BBOT", ts: "1700.8", text: ":lock: Only <@U0OWNER> can change this proposal." };
+  marks.add(`sweep:thread:${OTHER}:1700.1`);
+  thread = [...ROOT_ONLY, SWEEP_CARD_POST, result, lock];
+  history = [{ role: "assistant", text: "(Ran 2 operations.)" }];
+  try {
+    for (const text of ["lunch at noon?", "thanks!", ...NUMBERED_TALK]) {
+      assert.equal(await engages(inSweepThread(text)), false, text);
+    }
+    assert.equal(await engages(inSweepThread("drop 1")), true);
+    assert.equal(await engages(inSweepThread("✅")), true);
+    assert.equal(await engages(inSweepThread(`<@${BOT}> what changed?`)), true);
+  } finally {
+    marks.clear();
+    thread = ROOT_ONLY;
+    history = [];
+  }
 });

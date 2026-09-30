@@ -3,6 +3,7 @@ import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
 import { DM_CONVERSATION, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { engagesOnSweepCard, isSweepCardPost } from "../sweep/cards";
+import { isSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
@@ -353,6 +354,13 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
   // On any lookup error, FAIL OPEN for a thread reply: silently dropping a
   // follow-up (a "frozen" bot) is worse than an occasional extra reply.
   try {
+    // A thread the bot entered through a sweep card stays the team's: there
+    // only an @mention (above), a whole-message pick of the card's fixes or a
+    // typed gate emoji engages — not the batch result, the notes or the
+    // history the card's own resolution left (`sweep/thread-mark.ts`).
+    if (env.HARNESS_KV && (await isSweepThread(env.HARNESS_KV, event.channel, event.thread_ts))) {
+      return engagesOnSweepCard(event.text ?? "");
+    }
     const store = threadStateFor(env);
     const ref = { channel: event.channel, thread: event.thread_ts };
     const pending = await store.getProposalByThread(ref);

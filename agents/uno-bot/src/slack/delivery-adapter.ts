@@ -415,9 +415,14 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
    *  A throw reads as `ok: false`, including a timeout after Slack accepted
    *  the post — so a caller that retries on failure can post twice. The
    *  cut-off note's retry is capped at `CUT_OFF_NOTE_ATTEMPTS` for that. */
-  const postNote = async (text: string): Promise<PostResult> => {
+  const postNote = async (text: string, tag?: ProposalCard["tag"]): Promise<PostResult> => {
     const posted = await slack
-      .postMessage({ channel, thread_ts: replyTs, text })
+      .postMessage({
+        channel,
+        thread_ts: replyTs,
+        text,
+        ...(tag ? { metadata: { event_type: tag.eventType, event_payload: tag.payload } } : {}),
+      })
       .catch(() => ({ ok: false as const }));
     return {
       ok: !!posted.ok,

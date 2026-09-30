@@ -60,6 +60,7 @@ import type { ScheduledJob } from "../scheduled/runs";
 import type { OperationOutcome } from "../gate/index";
 import type { PendingProposal } from "../thread-state/index";
 import { modelDriftDetector } from "./detector";
+import { markSweepThread } from "./thread-mark";
 import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
@@ -198,7 +199,11 @@ async function sweepDepsFor(
       async stage(proposal) {
         await stageSweepCard(
           proposal,
-          { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) },
+          {
+            threadState: threadStateFor(env),
+            proposalEvents: proposalEventLogFor(env),
+            markThread: (channel, thread) => markSweepThread(kv, channel, thread),
+          },
           Date.now(),
         );
       },
@@ -209,6 +214,8 @@ async function sweepDepsFor(
         return (await threadStateFor(env).getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
       },
       async withdraw(channel, ts, text, cardKey) {
+        // Out of reach first: a card that says it didn't go through can't be ✅'d.
+        await threadStateFor(env).retireProposal(ts);
         await updateMessage(env, {
           channel,
           ts,

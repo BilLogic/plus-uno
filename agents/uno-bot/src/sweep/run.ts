@@ -189,8 +189,9 @@ export interface SweepDelivery {
    *  it, `decided` once it left — ✅, ⛔, revised, aged out, or any row on
    *  the usage record — and `unstaged` when neither knows it. */
   cardState(proposalTs: string): Promise<"live" | "decided" | "unstaged">;
-  /** Replace a posted card's text, remove its buttons, and retag it so a
-   *  later search by its key passes it over. */
+  /** Retire the card in ThreadState so it can't be ✅'d, replace its text,
+   *  remove its buttons, and retag it so a later search by its key passes it
+   *  over. */
   withdraw(channel: string, ts: string, text: string, cardKey: string): Promise<void>;
   permalink(channel: string, ts: string): Promise<string | null>;
 }
@@ -916,12 +917,30 @@ async function sortOutCarded(
  * any card: a staged row (via the Worker, in the channel it posted to), and a
  * superseded row for any card the staging retired. Its later ✅ or ⛔ pairs
  * with that staged row.
+ *
+ * A thread the bot had no history in is marked as entered through the card
+ * (`thread-mark.ts`), so what the bot posts there answering the card never
+ * makes the team's later replies its conversation. Best-effort: an unmarked
+ * thread reads by the ordinary rules.
  */
 export async function stageSweepCard(
   proposal: PendingProposal,
-  deps: { threadState: Pick<ThreadState, "putProposal">; proposalEvents: ProposalEventLog },
+  deps: {
+    threadState: Pick<ThreadState, "putProposal" | "readHistory">;
+    proposalEvents: ProposalEventLog;
+    markThread?: (channel: string, thread: string) => Promise<void>;
+  },
   now: number,
 ): Promise<void> {
+  if (deps.markThread) {
+    const ref = { channel: proposal.channel, thread: proposal.threadTs };
+    try {
+      if (!(await deps.threadState.readHistory(ref)).length) await deps.markThread(ref.channel, ref.thread);
+    } catch (err) {
+      rethrowIfBudget(err);
+      console.warn(`[sweep] thread ${ref.channel}:${ref.thread} not marked: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
   const { retired } = await deps.threadState.putProposal(proposal);
   await recordProposalEvents(deps.proposalEvents, [
     ...supersededEvents(retired, now, "worker"),

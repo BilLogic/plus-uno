@@ -104,7 +104,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
-import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick } from "../sweep/cards";
+import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick, sweepTag } from "../sweep/cards";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -746,7 +746,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
   return {
     ...delivery,
     postAnswer: (text) => noted(delivery.postAnswer(text)),
-    postNote: (text) => noted(delivery.postNote(text)),
+    postNote: (text, tag) => noted(delivery.postNote(text, tag)),
     postGateNote: (note) => noted(delivery.postGateNote(note)),
     card: (proposal) => noted(delivery.card(proposal)),
   };
@@ -1278,7 +1278,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // (`intake-channel.ts`).
   if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId)) {
     const refusal = revisionRefusal(replaced.confirmers ?? [], request.userId);
-    await delivery.postNote(refusal);
+    await delivery.postNote(refusal, replaced.sweepRun ? sweepTag("note") : undefined);
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
   }
@@ -1290,14 +1290,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     const refusal =
       ":lock: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
       "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
-    await delivery.postNote(refusal);
+    await delivery.postNote(refusal, sweepTag("note"));
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
   }
   // And it keeps the card's deadline, read before the card is retired.
   const sweepLeftMs = replaced?.sweepRun ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
   if (sweepLeftMs !== undefined && sweepLeftMs <= 0) {
-    await delivery.postNote(CARD_CLOSED);
+    await delivery.postNote(CARD_CLOSED, sweepTag("note"));
     await memory.remember(CARD_CLOSED);
     return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
   }
@@ -1467,7 +1467,7 @@ async function dropFromSweepCard(
   };
   if (!request.intakeChannel && !mayConfirm(pending, request.userId)) {
     const refusal = revisionRefusal(pending.confirmers ?? [], request.userId);
-    await delivery.postNote(refusal);
+    await delivery.postNote(refusal, sweepTag("note"));
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
   }
@@ -1485,7 +1485,7 @@ async function dropFromSweepCard(
   // inherits in place of a fresh lifetime.
   const leftMs = await timeLeftOn(pending, threadState, staging.now());
   if (leftMs <= 0) {
-    await delivery.postNote(CARD_CLOSED);
+    await delivery.postNote(CARD_CLOSED, sweepTag("note"));
     await memory.remember(CARD_CLOSED);
     return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
   }

@@ -471,6 +471,47 @@ for (const [glyph, name] of [
   });
 }
 
+test("a card staged into a thread the bot had no history in marks the thread; one with history is left unmarked", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const found = reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
+
+  const fresh = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, fresh.deps);
+  fresh.clock.now = at(30, 14);
+  await runSweepJob(MORNING, fresh.deps);
+  assert.deepEqual([...fresh.marked], [`${DESIGN}:${t.root.ts}`]);
+
+  const talked = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
+  await talked.threadState.appendHistory({ channel: DESIGN, thread: t.root.ts }, { role: "assistant", content: "Here's the PRD." });
+  await runSweepJob(END_OF_DAY, talked.deps);
+  talked.clock.now = at(30, 14);
+  await runSweepJob(MORNING, talked.deps);
+  assert.equal(talked.staged.length, 1);
+  assert.deepEqual([...talked.marked], [], "a thread already the bot's conversation stays one");
+});
+
+// A staging that fails after the card reached ThreadState withdraws the card;
+// the withdrawal retires it, so the card that says it didn't go through
+// can't be ✅'d.
+test("a withdrawn card is out of reach of a ✅", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const found = reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
+  const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.faults.afterStage = new Error("the staging's reply was lost");
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+
+  const card = h.posted[0]!;
+  assert.match(card.withdrawn ?? "", /didn't go through/);
+  assert.notEqual((await h.threadState.getProposalByTs(card.ts)).state, "found");
+  const verdict = await resolveSignal(
+    { kind: "typed", channel: DESIGN, thread: t.root.ts, text: "✅", userId: "U0ADE" },
+    { threadState: h.threadState },
+  );
+  assert.notEqual(verdict.outcome, "won");
+});
+
 test("a card staged by a stopped try and still live is recorded on the retry, not staged twice", async () => {
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const found = reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));

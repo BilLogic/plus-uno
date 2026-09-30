@@ -1010,6 +1010,9 @@ test("a bystander's revision of a sweep card is refused, and the card stays", as
 
   assert.equal(outcome.disposition, "asked");
   assert.match(outcome.posted ?? "", /Only <@U0OWNER> can change this proposal/);
+  // Tagged as the sweep's, as the card is: a note answering the card.
+  const note = h.delivery.calls.find((c) => c.kind === "note");
+  assert.deepEqual(note && "tag" in note ? note.tag : undefined, { eventType: "uno_sweep_card", payload: { role: "note" } });
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
 });
 
