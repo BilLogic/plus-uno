@@ -36,7 +36,7 @@ test("a ✅ from the person posts exactly the raise note in the team channel: no
   const store = createInMemoryCommitmentStore();
   const threadState = createInMemoryThreadState({ now: () => now });
   const root = "1790694000.000100";
-  const id = raiseId(DM, root, "the warning colour");
+  const id = raiseId(DM, ["Figma", "the code"], root);
   await store.addCommitments([
     {
       id,
@@ -111,4 +111,21 @@ test("a ✅ from the person posts exactly the raise note in the team channel: no
   assert.match(text, /Figma and the code disagree on the warning colour/);
   assert.ok(posts[0]!.includes(String(ops[0]!.input.text)), "the card showed exactly this note");
   for (const leak of [MAYA, "<@", DM, "alert banner", "#FFB020"]) assert.equal(text.includes(leak), false, `no ${leak}`);
+});
+
+test("the raise card's batch result is tagged as uno-bot's own post; other results keep theirs", async () => {
+  const { resultMetadataFor } = await import("../src/agent/resolve-proposal.js");
+  const { raiseSlot, DM_RAISE_EVENT } = await import("../src/dm-sweep/index.js");
+  assert.equal(resultMetadataFor({ supersedeKey: raiseSlot("D0MAYA:raise:abc:1.0") }).metadata?.event_type, DM_RAISE_EVENT);
+  assert.equal(resultMetadataFor({ sweepRun: { key: "k" } as never }).metadata?.event_type, "uno_sweep_card");
+  assert.deepEqual(resultMetadataFor({}), {});
+  assert.deepEqual(resultMetadataFor({ supersedeKey: "sweep-share" }), {});
+});
+
+test("a raise id holds the DM and a hash of the source pair — no topic, no source name", async () => {
+  const { raiseId } = await import("../src/dm-sweep/index.js");
+  const a = raiseId(DM, ["Figma", "the code"], "1.0");
+  assert.equal(a, raiseId(DM, ["code", "figma"], "1.0"), "the same pair, however named or ordered");
+  assert.notEqual(a, raiseId(DM, ["Figma", "Storybook"], "1.0"));
+  assert.match(a, /^D0MAYA:raise:[0-9a-f]{8}:1\.0$/);
 });

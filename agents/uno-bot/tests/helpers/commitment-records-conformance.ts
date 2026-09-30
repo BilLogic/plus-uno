@@ -265,4 +265,16 @@ export function runCommitmentRecordsConformance(
     await records.update(miss.id, { state: "done", resolvedAt: 5 });
     assert.deepEqual(await records.latestAnswers(miss.channel, 3), []);
   });
+
+  it("rows are read by id prefix, in id order, and only those", async () => {
+    const records = make();
+    const a = commitmentRow({ id: "D0MAYA:raise:aaaa0000:2.0", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm" });
+    const b = commitmentRow({ id: "D0MAYA:raise:aaaa0000:1.0", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm" });
+    const other = commitmentRow({ id: "D0MAYA:raise:bbbb0000:1.0", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm" });
+    const elsewhere = commitmentRow({ id: "D0MAYB:raise:aaaa0000:1.0", kind: "dm_disagreement", channel: "D0MAYB", channelKind: "dm" });
+    await records.addCommitments([a, b, other, elsewhere]);
+    assert.deepEqual((await records.byIdPrefix("D0MAYA:raise:aaaa0000:")).map((r) => r.id), [b.id, a.id]);
+    assert.deepEqual((await records.byIdPrefix("D0MAYA:raise:")).map((r) => r.id), [b.id, a.id, other.id]);
+    assert.deepEqual(await records.byIdPrefix("D0NOBODY:"), []);
+  });
 }

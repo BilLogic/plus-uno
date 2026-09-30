@@ -194,6 +194,18 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
       const { results } = await db.prepare(LATEST_ANSWERS).bind(channel, limit, channel, limit).all<Row>();
       return results.map(fromRow);
     },
+    async byIdPrefix(prefix) {
+      if (!prefix) return [];
+      // A range on the primary key: every id from the prefix up to the next
+      // string that no longer starts with it.
+      const upper = prefix.slice(0, -1) + String.fromCharCode(prefix.charCodeAt(prefix.length - 1) + 1);
+      chargeD1Query();
+      const { results } = await db
+        .prepare(`${SELECT} WHERE commitment_id >= ? AND commitment_id < ? ORDER BY commitment_id`)
+        .bind(prefix, upper)
+        .all<Row>();
+      return results.map(fromRow);
+    },
     async update(id, patch) {
       const sets: string[] = [];
       const values: unknown[] = [];

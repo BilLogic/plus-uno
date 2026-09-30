@@ -31,10 +31,11 @@
 //   #plus-universal for the design system, #plus-design otherwise
 //   (`shareDestination`), and its ⛔ drops it. That ✅, by the person the DM is
 //   with, is the only way anything found in a DM reaches a channel. Each raise
-//   card holds a slot of its own (`raiseSlot`), and a topic is offered once a
-//   thread (`raiseId`). Every post here is tagged (`DM_ASK_EVENT`,
-//   `DM_RAISE_EVENT`), so the next night reads it as uno-bot's own post and
-//   never as an answer (`detector.ts` § isFresh).
+//   card holds a slot of its own (`raiseSlot`). A thread gets one raise, and a
+//   pair of sources is raised once in a person's DM for `RAISE_QUIET_MS`
+//   whatever became of it (`raisePrefix`). Every post here, the raise card's
+//   result included, is tagged (`DM_ASK_EVENT`, `DM_RAISE_EVENT`), so the next
+//   night reads it as uno-bot's own post (`detector.ts` § isFresh).
 //
 //   `answerDmAsk` — the reaction door's hand-off for a DM row: 🙅 on the F6
 //   ask from its person drops it. Any other glyph does nothing. The raise
@@ -53,7 +54,7 @@ import { rethrowIfBudget } from "../net";
 import { reminderAnswer, reminderBlocks } from "../commitments/copy";
 import { dayLabel, etDayOf, rearmedDueAt, TEXT_KEEP_MS } from "../commitments/due";
 import { MAX_HOLDS, type CommitmentAction, type ReminderReaction } from "../commitments/run";
-import type { CommitmentPatch, CommitmentRecord, CommitmentStore, CommitmentText } from "../commitments/store";
+import { LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
 import { shareDestination } from "../sweep/finding";
 import { SWEEP_CARD_TTL_MS } from "../sweep/cards";
 import type { DmThread, DmThreadVerdict } from "../sweep/run";
@@ -85,22 +86,56 @@ export function raiseSlot(id: string): string {
 }
 
 /**
- * A disagreement's row id: one per topic per thread, so uno-bot saying the
- * same thing again — or a model reading it again — offers nothing new. The
- * topic enters as a hash, never as words (ADR-030: no text in D1).
+ * The tag a proposal's batch result posts with, when it has one: a raise
+ * card's result is uno-bot's own post in the DM, read as context that night
+ * (`detector.ts` § isFresh). Undefined for any other proposal.
+ *
+ * @param p - The resolved proposal
+ */
+export function dmResultTag(p: { supersedeKey?: string }): { event_type: string; event_payload: Record<string, unknown> } | undefined {
+  return p.supersedeKey?.startsWith(`${DM_RAISE_KEY}:`) ? { event_type: DM_RAISE_EVENT, event_payload: { role: "result" } } : undefined;
+}
+
+/** How long an earlier raise about the same two sources keeps a new one
+ *  from being offered, whatever became of it (⛔, ✅ or lapsed). */
+export const RAISE_QUIET_MS = 14 * 24 * 60 * 60 * 1000;
+
+/**
+ * The prefix every raise about one pair of sources shares in one person's DM
+ * (a 1:1 DM is one person's): the DM, then the pair, sorted and normalised
+ * ("Figma" and "the code" → `code|figma`) and hashed, so no source name and no
+ * topic wording reaches D1 (ADR-030). Keyed by the pair rather than the topic,
+ * so the same disagreement reworded ("the warning colour", "the warning
+ * token") is the same raise.
  *
  * @param channel - The DM
- * @param rootTs - The thread
- * @param topic - The detector's topic
+ * @param sources - The detector's two source names
  */
-export function raiseId(channel: string, rootTs: string, topic: string): string {
-  const key = topic.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+export function raisePrefix(channel: string, sources: readonly [string, string]): string {
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim()
+      .replace(/^(the|a|an|our)\s+/, "");
+  const key = sources.map(norm).sort().join("|");
   let h = 0x811c9dc5;
   for (let i = 0; i < key.length; i++) {
     h ^= key.charCodeAt(i);
     h = Math.imul(h, 0x01000193) >>> 0;
   }
-  return `${channel}:${rootTs}:raise:${h.toString(16).padStart(8, "0")}`;
+  return `${channel}:raise:${h.toString(16).padStart(8, "0")}:`;
+}
+
+/**
+ * A disagreement's row id: its pair's prefix (`raisePrefix`), then the thread.
+ *
+ * @param channel - The DM
+ * @param sources - The detector's two source names
+ * @param rootTs - The thread
+ */
+export function raiseId(channel: string, sources: readonly [string, string], rootTs: string): string {
+  return `${raisePrefix(channel, sources)}${rootTs}`;
 }
 
 // ── End of day ───────────────────────────────────────────────────────────────
@@ -201,25 +236,41 @@ async function keep(thread: DmThread, found: Extract<DmDetection, { ok: true }>,
     rows.push(row(id, "dm_unanswered", miss.answerTs, miss.confidence));
     texts[id] = { what: miss.what, bodies: {} };
   }
-  for (const d of found.disagreements) {
-    // One offer a topic a thread, however often uno-bot says it again.
-    const id = raiseId(thread.channel, thread.rootTs, d.topic);
-    if (rows.some((r) => r.id === id)) continue;
-    const to: RaiseTo = shareDestination({ kind: d.designSystem ? "design-system-code" : "notion", pillars: [] }).channel;
-    rows.push(row(id, "dm_disagreement", d.answerTs, d.confidence));
-    texts[id] = { what: d.topic, bodies: {}, raise: { sources: d.sources, to } };
+  // At most one raise a thread, and none about a pair of sources this person
+  // was already asked about: still live, or answered or lapsed within
+  // `RAISE_QUIET_MS`. One read covers both — every raise in this DM.
+  const d = found.disagreements[0];
+  if (d) {
+    const earlier = await deps.store.byIdPrefix(`${thread.channel}:raise:`);
+    const live = (r: CommitmentRecord) => LIVE_STATES.includes(r.state);
+    const recent = (r: CommitmentRecord) => live(r) || Math.max(r.detectedAt, r.resolvedAt ?? 0) > now - RAISE_QUIET_MS;
+    const prefix = raisePrefix(thread.channel, d.sources);
+    const quiet = earlier.some((r) => r.kind === "dm_disagreement" && ((r.threadTs === thread.rootTs && live(r)) || (r.id.startsWith(prefix) && recent(r))));
+    if (!quiet) {
+      const id = raiseId(thread.channel, d.sources, thread.rootTs);
+      const to: RaiseTo = shareDestination({ kind: d.designSystem ? "design-system-code" : "notion", pillars: [] }).channel;
+      rows.push(row(id, "dm_disagreement", d.answerTs, d.confidence));
+      texts[id] = { what: d.topic, bodies: {}, raise: { sources: d.sources, to } };
+    }
   }
   if (!rows.length || deps.dryRun) return rows.length;
-  let fresh = 0;
-  for (const r of rows) if (!(await deps.store.get(r.id))) fresh += 1;
+  // Only a new row, or a live one missing its wording, takes wording: one
+  // that is answered or lapsed keeps none for nothing.
+  const wanted: CommitmentRecord[] = [];
+  const fresh: CommitmentRecord[] = [];
+  for (const r of rows) {
+    const had = await deps.store.get(r.id);
+    if (!had) fresh.push(r);
+    if (!had || LIVE_STATES.includes(had.state)) wanted.push(r);
+  }
   // The wording first, so a row is never kept without it: a stop between
   // the two leaves only wording that expires. Wording already there stays.
-  for (const r of rows) {
+  for (const r of wanted) {
     if (await deps.store.text(r.id)) continue;
     await deps.store.saveText(r.id, texts[r.id]!, now + TEXT_KEEP_MS);
   }
-  if (fresh) await deps.store.addCommitments(rows);
-  return fresh;
+  if (fresh.length) await deps.store.addCommitments(fresh);
+  return fresh.length;
 }
 
 // ── Morning ──────────────────────────────────────────────────────────────────

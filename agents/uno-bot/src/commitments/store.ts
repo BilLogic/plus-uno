@@ -196,6 +196,9 @@ export interface CommitmentRecords {
    *  its follow-up. */
   byReminderTs(ts: string): Promise<CommitmentRecord | null>;
   update(id: string, patch: CommitmentPatch): Promise<void>;
+  /** Every row whose id starts with `prefix`, in id order — one range read on
+   *  the key (the DM sweep's raises in one DM). */
+  byIdPrefix(prefix: string): Promise<CommitmentRecord[]>;
   /** The newest `done` rows and the newest `not_promise` rows, at most `limit`
    *  of each, newest answer first — thread promises made in a public channel
    *  or in `channel` itself, never another private place's, a DM's, or a

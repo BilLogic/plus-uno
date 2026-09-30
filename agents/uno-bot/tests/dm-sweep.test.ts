@@ -11,7 +11,7 @@
 import { beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { fakeProvider } from "../src/agent/providers/fake";
+import { fakeProvider, type FakeProvider } from "../src/agent/providers/fake";
 import {
   answerReminder,
   createInMemoryCommitmentStore,
@@ -64,7 +64,17 @@ function world(opts: {
   extraChannels?: Record<string, FakeChannel>;
 }) {
   const store = createInMemoryCommitmentStore();
-  const dmProvider = fakeProvider({ generateReplies: opts.dmReplies });
+  // Recorded DM detector replies, in call order; a case may add the next
+  // night's before running it.
+  const dmReplies = [...opts.dmReplies];
+  const baseProvider = fakeProvider();
+  const dmProvider: FakeProvider = {
+    ...baseProvider,
+    async generate(prompt) {
+      (baseProvider.generated as unknown[]).push(prompt);
+      return { ok: true, model: "recorded", text: dmReplies.shift() ?? "" };
+    },
+  };
   const h = sweepHarness({
     channels: { [DM]: opts.dm, ...(opts.extraChannels ?? {}) },
     sources: opts.sources ?? [],
@@ -149,6 +159,7 @@ function world(opts: {
     h,
     store,
     dmProvider,
+    dmReplies,
     posts,
     updates,
     staged,
@@ -647,25 +658,61 @@ describe("uno-bot never reads its own posts back as new", () => {
     assert.equal(w.h.posted.length, 1, "never proposed again");
   });
 
-  it("a second raise in a thread keeps the first card live", async () => {
+  it("one raise a thread; raises in two threads each hold their own slot", async () => {
     const both = bot(ts(29, 15, 1), "Figma and the code disagree on warning, and the PRD and the card disagree on the launch date.", { thread_ts: root.ts });
+    const root2 = msg(MAYA, ts(29, 16), "When do we launch?", { reply_count: 1, latest_reply: ts(29, 16, 1) });
+    const other = bot(ts(29, 16, 1), "The PRD says Oct 15, the Roadmap card says Nov 1.", { thread_ts: root2.ts });
+    const launch = { topic: "the launch date", sources: ["the PRD", "the Roadmap card"], design_system: false, confidence: 0.9 };
     const w = world({
-      dm: { kind: "dm", history: [root], threads: { [root.ts]: [root, both] } },
+      dm: { kind: "dm", history: [root, root2], threads: { [root.ts]: [root, both], [root2.ts]: [root2, other] } },
       dmReplies: [
-        dmReply({
-          disagreements: [
-            { answer_ts: both.ts, ...warning },
-            { answer_ts: both.ts, topic: "the launch date", sources: ["the PRD", "the Roadmap card"], design_system: false, confidence: 0.9 },
-          ],
-        }),
+        dmReply({ disagreements: [{ answer_ts: both.ts, ...warning }, { answer_ts: both.ts, ...launch, sources: ["Figma", "Storybook"] }] }),
+        dmReply({ disagreements: [{ answer_ts: other.ts, ...launch }] }),
       ],
       now: at(29, 22),
     });
     await w.endOfDay();
+    assert.equal(rowsOf(w.store).length, 2, "one a thread");
     w.h.clock.now = at(30, 14, 5);
     await w.morning();
     assert.equal(w.staged.length, 2);
     for (const p of w.staged) assert.equal((await w.h.threadState.getProposalByTs(p.proposalTs)).state, "found");
+  });
+
+  it("a ⛔'d raise is not offered again for 14 days, however the topic is reworded, in its thread or a new one", async () => {
+    const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
+    const w = world({ dm, dmReplies: [dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] })], now: at(29, 22) });
+    await w.endOfDay();
+    w.h.clock.now = at(30, 14, 5);
+    await w.morning();
+    const proposal = w.staged[0]!;
+    await resolveSignal(
+      { kind: "reaction", messageTs: proposal.proposalTs, channel: DM, thread: proposal.replyTs!, glyph: "no_entry", userId: MAYA },
+      { threadState: w.h.threadState },
+    );
+    // That day: asked again in the same thread, and in a new one; uno-bot says
+    // it again in other words, naming the sources a little differently.
+    const again = msg(MAYA, ts(30, 14, 30), "so which is right?", { thread_ts: root.ts });
+    const reworded = bot(ts(30, 14, 31), "The warning token differs: Figma says #FFB020, code says #715C00.", { thread_ts: root.ts });
+    dm.threads![root.ts] = [root, answer, again, reworded];
+    root.latest_reply = reworded.ts;
+    const root2 = msg(MAYA, ts(30, 15), "What hex is warning?", { reply_count: 1, latest_reply: ts(30, 15, 1) });
+    const fresh = bot(ts(30, 15, 1), "Figma and the codebase disagree on the warning token.", { thread_ts: root2.ts });
+    dm.history.push(root2);
+    dm.threads![root2.ts] = [root2, fresh];
+    w.dmReplies.push(
+      dmReply({ disagreements: [{ answer_ts: reworded.ts, ...warning, topic: "the warning token", sources: ["the code", "Figma"] }] }),
+      dmReply({ disagreements: [{ answer_ts: fresh.ts, ...warning, topic: "the warning token hex", sources: ["figma", "Code"] }] }),
+    );
+    w.h.clock.now = at(30, 22);
+    await w.endOfDay();
+    assert.equal(w.dmProvider.generated.length, 3, "both threads were read");
+    assert.equal(rowsOf(w.store).length, 1, "no second raise");
+    for (const day of [31, 32, 35, 36]) {
+      w.h.clock.now = at(day, 14, 5);
+      await w.morning();
+    }
+    assert.equal(w.posts.length, 1, "no new card");
   });
 });
 
