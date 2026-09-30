@@ -28,7 +28,7 @@ import { measured } from "../sweep/env";
 import type { SweepSlackMessage } from "../sweep/run";
 import { modelCommitmentDetector, modelEvidenceJudge } from "../commitments/detector";
 import { createD1DmWatchRecords } from "./d1";
-import { dropDmCapture, type DmCaptureFinding, type DmCaptureQueue } from "./capture";
+import { dropDmCapture, type DmCaptureFinding, type DmCaptureQueue, type DmHolds } from "./capture";
 import {
   accessOf,
   answerDmReminder,
@@ -48,6 +48,8 @@ const PROGRESS_TTL_S = 2 * 24 * 60 * 60;
  *  under the sweep's `sweep:findings:`, so the channel sweep's morning never
  *  sees a DM finding. */
 const CAPTURE_KV_PREFIX = "dm-watch:capture:";
+/** A DM's held nights: `dm-watch:capture-holds:<user>`. */
+const CAPTURE_HOLDS_KV_PREFIX = "dm-watch:capture-holds:";
 /** A DM finding, carded or not, is forgotten after two weeks: long enough to
  *  wait out a live card, and to keep a carded fix from being offered twice. */
 const CAPTURE_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
@@ -250,6 +252,25 @@ export function dmReminderDoorFor(env: Env): ((r: DmReminderReaction) => Promise
     });
 }
 
+/** How many nights each of a person's DMs has been held on a page, in
+ *  HARNESS_KV beside the queue, or null when unbound. */
+export function dmCaptureHoldsFor(env: Env): { load(owner: string): Promise<DmHolds>; save(owner: string, holds: DmHolds): Promise<void> } | null {
+  const kv = env.HARNESS_KV;
+  if (!kv) return null;
+  const key = (owner: string) => `${CAPTURE_HOLDS_KV_PREFIX}${owner}`;
+  return {
+    async load(owner) {
+      charge(1, "kv");
+      return (await kv.get<DmHolds>(key(owner), "json")) ?? {};
+    },
+    async save(owner, holds) {
+      charge(1, "kv");
+      if (Object.keys(holds).length) await kv.put(key(owner), JSON.stringify(holds), { expirationTtl: CAPTURE_MAX_AGE_MS / 1000 });
+      else await kv.delete(key(owner));
+    },
+  };
+}
+
 /** DM Capture's queue in HARNESS_KV (text, with an expiry — never D1), or
  *  null when unbound. */
 export function dmCaptureQueueFor(env: Env): DmCaptureQueue | null {
@@ -277,8 +298,10 @@ export function dmCaptureQueueFor(env: Env): DmCaptureQueue | null {
 /** Take a DM Capture card back: out of reach in ThreadState first, so it
  *  can't be ✅'d, then edited to say why. */
 export async function withdrawCaptureCard(env: Env, channel: string, ts: string, text: string): Promise<void> {
-  await threadStateFor(env).retireProposal(ts);
-  await updateMessage(env, { channel, ts, text });
+  // Edited only when it was this call that took it out of reach: a card
+  // already claimed, running or gone keeps what it says.
+  const { retired } = await threadStateFor(env).retireProposal(ts);
+  if (retired) await updateMessage(env, { channel, ts, text });
 }
 
 /** Take a DM Capture card back entirely: retired, then deleted. */

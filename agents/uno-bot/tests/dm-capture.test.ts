@@ -15,7 +15,7 @@ import assert from "node:assert/strict";
 import { SubrequestBudgetError } from "../src/net";
 import { planRun, type ScheduledJob } from "../src/scheduled/runs";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
-import { stageSweepCard } from "../src/sweep/run";
+import { MAX_FAILED_NIGHTS, stageSweepCard, sweepCardState } from "../src/sweep/run";
 import type { DriftDetector } from "../src/sweep/detector";
 import type { CaptureDetector } from "../src/sweep/capture-detector";
 import type { SweepSlackMessage } from "../src/sweep/run";
@@ -40,6 +40,7 @@ import {
   type DmCaptureFinding,
   type DmCapturePostDeps,
   type DmCaptureReadDeps,
+  type DmHolds,
   type DmWatchFeature,
   type InMemoryDmWatchRecords,
   type OwnerSlack,
@@ -95,8 +96,9 @@ interface World {
   detected: { channel: string; firstTs: string }[];
   /** Detector windows the budget still covers; past them the meter says no. */
   windows: number;
-  /** Page URLs whose read throws, as a Notion 429 or 5xx would. */
-  broken: Set<string>;
+  /** Page URLs whose read throws, with the status Notion answers. */
+  broken: Map<string, number>;
+  holds: Map<string, DmHolds>;
   /** The detector's replacement quotes the DM. */
   quoting: boolean;
   /** Run inside the detector — a switch turned off mid-run, say. */
@@ -122,7 +124,8 @@ function world(): World {
     events: createInMemoryProposalEventLog(),
     detected: [],
     windows: Infinity,
-    broken: new Set(),
+    broken: new Map(),
+    holds: new Map(),
     quoting: false,
   };
 }
@@ -237,9 +240,14 @@ function readDeps(w: World, now = EOD): DmCaptureReadDeps {
     },
     sources: {
       async read(url) {
-        if (w.broken.has(url)) throw new Error("Notion answered 503");
+        const status = w.broken.get(url);
+        if (status) throw new Error(`Notion ${status} ${status === 404 ? "object_not_found" : "service_unavailable"}: no`);
         return url === PAGE.url ? PAGE : null;
       },
+    },
+    holds: {
+      load: async (owner) => ({ ...(w.holds.get(owner) ?? {}) }),
+      save: async (owner, holds) => void w.holds.set(owner, { ...holds }),
     },
     surfaces: {},
     detector: detector(w),
@@ -283,6 +291,7 @@ function postDeps(w: World, now = WED, over: Partial<DmCapturePostDeps> = {}): D
       await stageSweepCard(proposal, { threadState: w.threadState, proposalEvents: w.events }, now, "dm");
     },
     liveCards: (channel) => w.threadState.getProposalsByChannel(channel),
+    cardState: (proposalTs) => sweepCardState(proposalTs, { threadState: w.threadState, proposalEvents: w.events }),
     ...over,
   };
 }
@@ -575,6 +584,41 @@ describe("the morning post", () => {
   });
 });
 
+describe("the morning post, retried", () => {
+  it("a card the owner ✅'d after the earlier try staged it is recorded, never staged again or deleted", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    const first = postDeps(w);
+    // Staged, then the queue's record of it fails.
+    await assert.rejects(
+      runDmCapturePost(postJob(MAYA), { ...first, queue: { ...first.queue, save: async () => { throw new SubrequestBudgetError(1); } } }),
+      SubrequestBudgetError,
+    );
+    const card = w.posts[0]!.ts;
+    // Maya ✅s it: the card is claimed.
+    assert.equal(await w.threadState.claimProposal(card), true);
+    await runDmCapturePost(postJob(MAYA), postDeps(w, WED + 60_000));
+    assert.equal(w.staged.length, 1, "not staged again");
+    assert.deepEqual(w.removed, [], "not deleted");
+    assert.equal(w.posts.length, 1);
+    assert.deepEqual(w.kv.get(MAYA)?.map((f) => [f.state, f.proposalTs]), [["proposed", card]]);
+  });
+
+  it("turning the switch off still drops the queue when a card will not withdraw", async () => {
+    const w = world();
+    w.kv.set(MAYA, [{ ...({} as DmCaptureFinding), id: "x", state: "proposed", cardChannel: "D-UNO", proposalTs: "1.1" }]);
+    await dropDmCapture(MAYA, {
+      queue: common(w, WED).queue,
+      liveCards: async () => [{ sweepRun: "2026-09-30", proposalTs: "1.1", threadTs: "1.1", replyTs: "1.1" } as PendingProposal],
+      withdraw: async () => {
+        throw new Error("Slack said no");
+      },
+    });
+    assert.equal(w.kv.has(MAYA), false);
+  });
+});
+
 describe("reading", () => {
   it("keeps its own positions: a promise read the same night leaves the DM unread for Capture", async () => {
     const w = world();
@@ -591,13 +635,44 @@ describe("reading", () => {
   it("a linked page that fails to read holds the DM there; the next night finds the decision", async () => {
     const w = world();
     await turnOn(w, MAYA, [CAPTURE_FEATURE]);
-    w.broken.add(PAGE.url);
+    w.broken.set(PAGE.url, 503);
     await runDmCaptureRead(readJob(MAYA), readDeps(w));
     assert.equal(w.kv.has(MAYA), false);
     assert.deepEqual(await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)), {}, "not read past the window");
     w.broken.clear();
     await runDmCaptureRead(readJob(MAYA), readDeps(w, at(30, 22)));
     assert.equal(w.kv.get(MAYA)?.length, 1);
+  });
+
+  it("a page the integration cannot open (a 404) is set aside at once: the DM is not held, and its decisions are found", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    const unshared = "https://www.notion.so/0badbeef0badbeef0badbeef0badbeef";
+    w.broken.set(unshared, 404);
+    w.messages.get(DM_BEA)!.unshift({ ts: ts(29, 16, 50), user: BEA, text: `old notes ${unshared}` });
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    assert.equal(w.kv.get(MAYA)?.length, 1, "the decision on the page it can open is found");
+    assert.ok(Number((await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)))[DM_BEA]?.through) >= Number(DECIDED), "read through");
+    assert.deepEqual(w.holds.get(MAYA) ?? {}, {});
+    // A later decision in the same DM, still beside the unopenable link.
+    w.messages.get(DM_BEA)!.push({ ts: ts(30, 16), user: BEA, text: `and the owner is now Kai ${PAGE.url} ${unshared}` });
+    await runDmCaptureRead(readJob(MAYA), readDeps(w, at(30, 22)));
+    assert.deepEqual(w.kv.get(MAYA)?.map((f) => f.blockId), [PAGE.blocks[0]!.id, PAGE.blocks[1]!.id]);
+  });
+
+  it(`a page that keeps failing (a 503) holds the DM for ${MAX_FAILED_NIGHTS} nights at most, then is set aside`, async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    w.broken.set(PAGE.url, 503);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    // A retry the same night counts no second night.
+    await runDmCaptureRead(readJob(MAYA), readDeps(w, EOD + 60_000));
+    assert.deepEqual(w.holds.get(MAYA), { [DM_BEA]: { nights: 1, runDate: "2026-09-29" } });
+    assert.deepEqual(await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)), {}, "held");
+    await runDmCaptureRead(readJob(MAYA), readDeps(w, at(30, 22)));
+    assert.ok(Number((await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)))[DM_BEA]?.through) >= Number(DECIDED), "released: read on");
+    assert.deepEqual(w.holds.get(MAYA) ?? {}, {});
+    assert.ok(w.logs.some((l) => l.includes("set aside")));
   });
 
   it("a page named without a link is searched for in Notion only — the DM's words never reach GitHub", async () => {

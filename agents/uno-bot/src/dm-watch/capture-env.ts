@@ -25,9 +25,9 @@ import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { modelCaptureDetector } from "../sweep/capture-detector";
 import { modelDriftDetector } from "../sweep/detector";
 import { measured, readSource, sweepSearchFor } from "../sweep/env";
-import { stageSweepCard } from "../sweep/run";
+import { stageSweepCard, sweepCardState } from "../sweep/run";
 import { runDmCapturePost, runDmCaptureRead, type DmCaptureReport } from "./capture";
-import { dmCaptureQueueFor, dmWatchRecordsFor, ownerSlackFor, progressIn, removeCaptureCard, withdrawCaptureCard } from "./env";
+import { dmCaptureHoldsFor, dmCaptureQueueFor, dmWatchRecordsFor, ownerSlackFor, progressIn, removeCaptureCard, withdrawCaptureCard } from "./env";
 import { CAPTURE_FEATURE } from "./store";
 
 /** Everyone with DM Capture on, for the scheduled firing; none when unbound. */
@@ -39,7 +39,8 @@ export async function dmCapturersFor(env: Env): Promise<string[]> {
 export async function runDmCaptureReadOnEnv(env: Env, job: ScheduledJob, opts: JobContext): Promise<DmCaptureReport | { summary: string }> {
   const records = dmWatchRecordsFor(env);
   const queue = dmCaptureQueueFor(env);
-  if (!records || !queue || !env.HARNESS_KV) return { summary: "USAGE_DB or HARNESS_KV not bound — no DM Capture" };
+  const holds = dmCaptureHoldsFor(env);
+  if (!records || !queue || !holds || !env.HARNESS_KV) return { summary: "USAGE_DB or HARNESS_KV not bound — no DM Capture" };
   const provider = selectProvider(env);
   const detector = modelDriftDetector(provider);
   const capture = modelCaptureDetector(provider);
@@ -50,6 +51,7 @@ export async function runDmCaptureReadOnEnv(env: Env, job: ScheduledJob, opts: J
     ownerSlack: ownerSlackFor(env),
     botUserId: bot?.userId ?? null,
     progress: progressIn(env.HARNESS_KV),
+    holds,
     sources: { read: (url, kind) => measured(() => readSource(env, url, kind)) },
     surfaces: {
       runningNotesDb: env.NOTION_RUNNING_NOTES_DB_ID?.trim() || undefined,
@@ -115,6 +117,7 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
     stage: (proposal) =>
       stageSweepCard(proposal, { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) }, Date.now(), "dm"),
     liveCards: (channel) => threadStateFor(env).getProposalsByChannel(channel),
+    cardState: (proposalTs) => sweepCardState(proposalTs, { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) }),
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
