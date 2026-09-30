@@ -1,6 +1,9 @@
 // App Home — the "Home" tab landing page. Published via views.publish whenever a
 // user opens the tab (app_home_opened with tab==="home"). Republishing on every
-// open is idempotent and keeps the view fresh; there's no per-user state here.
+// open is idempotent and keeps the view fresh. It is a per-user view: someone
+// who has not connected their own Slack sees the link prompt, and someone who
+// has sees their own DM watch switches, ticked as they left them
+// (`dm-watch/home.ts`), in place of it.
 //
 // Design constraints:
 //   • Only links to surfaces known to exist (Storybook, blueprint, repo). A
@@ -17,6 +20,8 @@ import type { SlackAppHomeOpenedEvent } from "./types";
 import { slackCall } from "./api";
 import { SUGGESTED_PROMPTS } from "./assistant";
 import { slackConnectUrl } from "../oauth/slack";
+import { dmWatchHomeBlocks, type DmAccess, type DmWatchFeature } from "../dm-watch/index";
+import { dmWatchHomeStateFor } from "../dm-watch/env";
 
 // The Home view is a Block Kit document built per publish (cheap — no state,
 // just env-derived links) — typed loosely (Slack's block schema is large and
@@ -140,8 +145,7 @@ const HOME_BODY = [
     },
   ];
 
-// ADR-020 onboarding. Static per env — we don't check per-user token state
-// here; the view is documentation, and the DM welcome does the targeted nudge.
+// ADR-020 onboarding, shown to someone who has not connected their own Slack.
 //
 // Without a link, searches run on the workspace-filtered credential: public
 // channels plus the team-allowlisted private ones. Say what linking BUYS
@@ -171,23 +175,40 @@ const connectBlocks = (url: string) => [
   },
 ];
 
-function buildHomeView(env: Env) {
-  const url = slackConnectUrl(env);
-  return {
-    type: "home",
-    blocks: [...HOME_INTRO, ...(url ? connectBlocks(url) : []), ...HOME_BODY],
-  };
+/**
+ * One person's Home view: the link prompt until they connect their own Slack,
+ * then their DM watch switches in its place.
+ *
+ * @param input.connectUrl - Where to connect, or null when OAuth is not set up
+ * @param input.viewer - Whether this person has connected, and their switches
+ */
+export function homeView(input: {
+  connectUrl: string | null;
+  viewer: { connected: boolean; on: readonly DmWatchFeature[]; refused?: Exclude<DmAccess, { ok: true }> };
+}) {
+  const { viewer, connectUrl } = input;
+  const notice = viewer.refused ? { refused: viewer.refused, connectUrl } : undefined;
+  const personal = viewer.connected ? dmWatchHomeBlocks(viewer.on, notice) : connectUrl ? connectBlocks(connectUrl) : [];
+  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...HOME_BODY] };
 }
 
-async function publishHomeView(env: Env, userId: string): Promise<void> {
-  await slackCall(env, "views.publish", { user_id: userId, view: buildHomeView(env) });
+async function buildHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
+  const viewer = await dmWatchHomeStateFor(env, userId);
+  return homeView({ connectUrl: slackConnectUrl(env), viewer: refused ? { ...viewer, refused } : viewer });
+}
+
+/** Publish this person's Home view — on opening the tab, and again after they
+ *  change a switch, so the ticks show what was saved and a switch that stayed
+ *  off says why. */
+export async function publishHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>): Promise<void> {
+  await slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId, refused) });
 }
 
 /** Same publish, but hands Slack's verdict back. Nothing in the event path
  *  reads it — a rejected view just leaves the old one up — so /debug/home is
  *  the only way to find out whether a block is valid. */
 export async function publishHomeViewForDebug(env: Env, userId: string): Promise<unknown> {
-  return slackCall(env, "views.publish", { user_id: userId, view: buildHomeView(env) });
+  return slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId) });
 }
 
 export async function handleAppHomeOpened(env: Env, event: SlackAppHomeOpenedEvent): Promise<void> {

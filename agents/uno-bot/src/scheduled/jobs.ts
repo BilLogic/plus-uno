@@ -26,6 +26,7 @@ import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv } from "../figma-drift/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
+import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
 import { runAskResolution } from "../usage/resolution-env";
 import {
   FIRST_ASK_RESOLUTION_KEY,
@@ -182,6 +183,20 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "card-follow-through": async (env, job, ctx) => {
     const report = await runCardFollowThroughOnEnv(env, job, ctx);
     console.log(`[follow-through] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // End of day, one per person with a DM watch switch on: their own DMs, read
+  // with their own token, for promises (src/dm-watch/). Counts only in the log.
+  "dm-promise-read": async (env, job, ctx) => {
+    const report = await runDmPromiseReadOnEnv(env, job, ctx);
+    console.log(`[dm-watch] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning, one per person: each due DM promise re-read from its permalink,
+  // then a reminder in their DM with uno-bot (src/dm-watch/).
+  "dm-promise-nudge": async (env, job, ctx) => {
+    const report = await runDmPromiseNudgesOnEnv(env, job, ctx);
+    console.log(`[dm-watch] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.
