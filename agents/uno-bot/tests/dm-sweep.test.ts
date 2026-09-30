@@ -29,6 +29,7 @@ import {
   dmThreadHook,
   modelDmDetector,
   RAISE_TOOL,
+  raiseId,
 } from "../src/dm-sweep/index";
 import { runSweepJob, shadowedByPrivate, type PendingFinding, type SweepSource } from "../src/sweep/index";
 import type { ScheduledJob } from "../src/scheduled/runs";
@@ -713,6 +714,43 @@ describe("uno-bot never reads its own posts back as new", () => {
       await w.morning();
     }
     assert.equal(w.posts.length, 1, "no new card");
+  });
+
+  /** Offer the warning raise tonight, ⛔ it tomorrow morning, and open a new
+   *  thread that afternoon whose answer the detector reads as `later`. */
+  async function vetoThenAsk(later: Array<Record<string, unknown>>) {
+    const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
+    const w = world({ dm, dmReplies: [dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] })], now: at(29, 22) });
+    await w.endOfDay();
+    w.h.clock.now = at(30, 14, 5);
+    await w.morning();
+    const proposal = w.staged[0]!;
+    await resolveSignal(
+      { kind: "reaction", messageTs: proposal.proposalTs, channel: DM, thread: proposal.replyTs!, glyph: "no_entry", userId: MAYA },
+      { threadState: w.h.threadState },
+    );
+    const root2 = msg(MAYA, ts(30, 15), "What hex is warning, and when do we launch?", { reply_count: 1, latest_reply: ts(30, 15, 1) });
+    const reply = bot(ts(30, 15, 1), "The Figma library and the codebase disagree on warning; the PRD and the Roadmap card disagree on the date.", { thread_ts: root2.ts });
+    dm.history.push(root2);
+    dm.threads![root2.ts] = [root2, reply];
+    w.dmReplies.push(dmReply({ disagreements: later.map((d) => ({ answer_ts: reply.ts, ...d })) }));
+    w.h.clock.now = at(30, 22);
+    await w.endOfDay();
+    return { w, root2 };
+  }
+
+  it("a ⛔'d raise stays quiet when a later answer names the sources differently", async () => {
+    const { w } = await vetoThenAsk([{ ...warning, topic: "the warning token", sources: ["the Figma library", "the codebase"] }]);
+    assert.equal(rowsOf(w.store).length, 1, "the Figma library is Figma, the codebase is the code");
+  });
+
+  it("a new pair behind a quiet one in the same answer is raised", async () => {
+    const launch = { topic: "the launch date", sources: ["the PRD", "the Roadmap card"], design_system: false, confidence: 0.9 };
+    const { w, root2 } = await vetoThenAsk([{ ...warning, sources: ["Figma file", "the repo"] }, launch]);
+    const rows = rowsOf(w.store);
+    assert.equal(rows.length, 2);
+    const added = rows.find((r) => r.threadTs === root2.ts)!;
+    assert.equal(added.id, raiseId(DM, ["the PRD", "the Roadmap card"], root2.ts), "the launch date, not the quiet warning colour");
   });
 });
 

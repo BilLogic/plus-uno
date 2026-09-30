@@ -101,23 +101,43 @@ export function dmResultTag(p: { supersedeKey?: string }): { event_type: string;
 export const RAISE_QUIET_MS = 14 * 24 * 60 * 60 * 1000;
 
 /**
+ * The names the detector gives the estates, each to one canonical name, so
+ * "the Figma library" and "Figma", or "the codebase" and "the code", are one
+ * source. Matched after `raisePrefix` normalises (lower case, no punctuation,
+ * no leading article); a name not here keeps its normalised self.
+ */
+const SOURCE_ALIASES: Readonly<Record<string, readonly string[]>> = {
+  figma: ["figma", "figma library", "figma file", "figma design", "figma designs", "figma spec"],
+  code: ["code", "codebase", "code base", "repo", "repository", "source code"],
+  storybook: ["storybook", "storybook docs", "storybook story"],
+  notion: ["notion", "notion page", "notion doc"],
+  blueprint: ["blueprint", "service blueprint", "uno blueprint"],
+  prd: ["prd", "prd page"],
+  roadmap: ["roadmap", "roadmap card"],
+};
+const CANONICAL_SOURCE = new Map(Object.entries(SOURCE_ALIASES).flatMap(([canon, names]) => names.map((n) => [n, canon] as const)));
+
+/**
  * The prefix every raise about one pair of sources shares in one person's DM
- * (a 1:1 DM is one person's): the DM, then the pair, sorted and normalised
- * ("Figma" and "the code" → `code|figma`) and hashed, so no source name and no
- * topic wording reaches D1 (ADR-030). Keyed by the pair rather than the topic,
- * so the same disagreement reworded ("the warning colour", "the warning
- * token") is the same raise.
+ * (a 1:1 DM is one person's): the DM, then the pair, normalised, mapped to
+ * its canonical names (`SOURCE_ALIASES`: "the Figma library" and "the code"
+ * → `code|figma`), sorted and hashed, so no source name and no topic wording
+ * reaches D1 (ADR-030). Keyed by the pair rather than the topic, so the same
+ * disagreement reworded ("the warning colour", "the warning token") is the
+ * same raise.
  *
  * @param channel - The DM
  * @param sources - The detector's two source names
  */
 export function raisePrefix(channel: string, sources: readonly [string, string]): string {
-  const norm = (s: string) =>
-    s
+  const norm = (s: string) => {
+    const n = s
       .toLowerCase()
       .replace(/[^\p{L}\p{N}]+/gu, " ")
       .trim()
       .replace(/^(the|a|an|our)\s+/, "");
+    return CANONICAL_SOURCE.get(n) ?? n;
+  };
   const key = sources.map(norm).sort().join("|");
   let h = 0x811c9dc5;
   for (let i = 0; i < key.length; i++) {
@@ -238,15 +258,20 @@ async function keep(thread: DmThread, found: Extract<DmDetection, { ok: true }>,
   }
   // At most one raise a thread, and none about a pair of sources this person
   // was already asked about: still live, or answered or lapsed within
-  // `RAISE_QUIET_MS`. One read covers both — every raise in this DM.
-  const d = found.disagreements[0];
-  if (d) {
-    const earlier = await deps.store.byIdPrefix(`${thread.channel}:raise:`);
+  // `RAISE_QUIET_MS`. The first disagreement whose pair is not quiet is the
+  // one raised. One read covers both — every raise in this DM.
+  if (found.disagreements.length) {
+    const earlier = (await deps.store.byIdPrefix(`${thread.channel}:raise:`)).filter((r) => r.kind === "dm_disagreement");
     const live = (r: CommitmentRecord) => LIVE_STATES.includes(r.state);
     const recent = (r: CommitmentRecord) => live(r) || Math.max(r.detectedAt, r.resolvedAt ?? 0) > now - RAISE_QUIET_MS;
-    const prefix = raisePrefix(thread.channel, d.sources);
-    const quiet = earlier.some((r) => r.kind === "dm_disagreement" && ((r.threadTs === thread.rootTs && live(r)) || (r.id.startsWith(prefix) && recent(r))));
-    if (!quiet) {
+    const threadHasOne = earlier.some((r) => r.threadTs === thread.rootTs && live(r));
+    const d = threadHasOne
+      ? undefined
+      : found.disagreements.find((x) => {
+          const prefix = raisePrefix(thread.channel, x.sources);
+          return !earlier.some((r) => r.id.startsWith(prefix) && recent(r));
+        });
+    if (d) {
       const id = raiseId(thread.channel, d.sources, thread.rootTs);
       const to: RaiseTo = shareDestination({ kind: d.designSystem ? "design-system-code" : "notion", pillars: [] }).channel;
       rows.push(row(id, "dm_disagreement", d.answerTs, d.confidence));
