@@ -1,11 +1,11 @@
 ---
 embodiment: all
-summary: uno-bot's voice over the blueprint — citation shape, confidence language, absence behaviour and source routing; the blueprint's own account of its shape and schema is blueprint.md beside this file
+summary: uno-bot's voice over the blueprint — citation shape, confidence language, absence behaviour and source routing; the blueprint's own account of its shape is blueprint.md beside this file, its schema blueprint-schema.md
 ---
 
 # uno-blueprint — Answering Guide
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (bundled) · cut to voice 2026-09-05 (#412). Shape, status vocabulary, retrieval modes and schema: `blueprint.md` beside this file, vendored from plus-uno-blueprint, which owns every such claim. SQL and PostgREST recipes: `blueprint-direct-access.md`. This file is uno-bot's voice. -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (bundled) · cut to voice 2026-09-05 (#412). Shape, status vocabulary and retrieval modes: `blueprint.md` beside this file, its schema `blueprint-schema.md`, both vendored from plus-uno-blueprint, which owns every such claim. SQL and PostgREST recipes: `blueprint-direct-access.md`. This file is uno-bot's voice. -->
 
 Query the **database**; the Netlify front end is the human viewer. Cite its URL to readers (`https://plus-uno.netlify.app/blueprint/`) while grounding in rows.
 

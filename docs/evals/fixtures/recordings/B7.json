@@ -1,0 +1,30 @@
+{
+  "case": "B7",
+  "source": "authored",
+  "recordedAt": "2026-09-30",
+  "note": "AUTHORED with #858, when the blueprint schema moved behind read_reference; not yet captured off the Worker. The draw is the turn the case expects: one read_reference of the disclosed schema, then the answer from its `cells.cell_key` comment. It proves the turn serves the reference and threads its receipt, and nothing about whether Gemini takes the pointer. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=B7`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "In the service blueprint, what is a cell's `cell_key`? What format does it follow, and is the phase one of its parts?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "docs/connectors/supabase/blueprint-schema"
+              }
+            }
+          ]
+        },
+        {
+          "text": "A cell's `cell_key` is its stable identity in the blueprint, and it survives a re-import. It has five slugified parts, in this order: service / scenario / path / lane / step. For example: `plus-application/before-students-join/happy-path/back-stage-actions/open-session`.\n\nThe phase is not one of the parts. A scenario sits inside a phase, but the key skips it.\n\nSource: the blueprint schema's own comment on `cells.cell_key`."
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "docs/connectors/supabase/blueprint-schema"
+      ]
+    }
+  ]
+}

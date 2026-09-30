@@ -744,6 +744,28 @@
       "judgeNote": "AUTHORED 2026-09-05 (#415). The cell is real and chosen from the live board; the QUESTION is not answerable, because `cells` has no duration field — the route checks that against the contract's column list before offering this subject, so the premise is verified rather than remembered. The reply must say the blueprint does not record how long things take, name what it DOES record for that cell (what happens, the lane, the owner, its resources), and offer the next-best source if there is one. The deterministic half rejects any stated duration — a number or a spelled-out number followed by minutes/hours/seconds — because the failure this case exists to catch is a plausible figure improvised to fill the gap. NOTE FOR A REVIEWER READING THIS RED: the check cannot tell an invented figure from one quoted out of a cell's own prose. If it fires, read the transcript — a duration the blueprint genuinely wrote down in a cell's summary is a finding about that cell, not about the bot. Absence must be stated, not staged: proposing a Notion write to 'capture' the missing duration is a fail, and so is any invented number. [samples:3 — absence behaviour is phrasing, and phrasing is what sampling measures.]"
     },
     {
+      "id": "B7",
+      "name": "a column question reads the disclosed blueprint schema by pointer (#858)",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "In the service blueprint, what is a cell's `cell_key`? What format does it follow, and is the phase one of its parts?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "notion_create",
+      "expectToolCalled": {
+        "tool": "read_reference",
+        "args": {
+          "name": "docs/connectors/supabase/blueprint-schema"
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-30 (#858). The blueprint account's rendered schema left the always-loaded prompt for the reference map as `docs/connectors/supabase/blueprint-schema`, and the core carries a pointer in its place that fires when an answer turns on what a column means. This case proves a column question reaches the schema through that pointer. `cells.cell_key` is picked because the core never explains it: only the schema's column comment says what it is. Deterministic: the route's tool list holds a read_reference call whose name is exactly `docs/connectors/supabase/blueprint-schema`; an answer written from the prompt alone, or from a search_blueprint row, fails here however plausible it reads. For the judge: the reply says `cell_key` is the cell's stable identity, five slugified segments in the order service / scenario / path / lane / step, and that the phase is NOT one of them; an example key in that shape is welcome. A reply that includes the phase as a segment, invents a different segment order, or proposes a write fails. Non-blocking until a live run (`uno-bot-evals.yml`) confirms the model takes the pointer; promote it to a blocker then."
+    },
+    {
       "id": "G1",
       "name": "\"track this on GitHub\" stages an issue, not a refusal",
       "blocker": false,

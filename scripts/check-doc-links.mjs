@@ -111,6 +111,7 @@ const VENDORED_POINTERS = [
   /^design-system\/guidelines\/components\/overview\.md$/,
   /^docs\/connectors\/supabase\/blueprint\.md$/,
   /^docs\/connectors\/supabase\/blueprint-direct-access\.md$/,
+  /^docs\/connectors\/supabase\/blueprint-schema\.md$/,
 ];
 
 /** A bare filename: no slash, no space, and a `.md` tail. */
