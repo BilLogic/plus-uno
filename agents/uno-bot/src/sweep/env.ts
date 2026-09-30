@@ -64,7 +64,7 @@ import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
 import { SWEEP_CARD_EVENT, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
-import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
+import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
 /** One key per channel: `sweep:findings:<channel>`. */
@@ -201,6 +201,12 @@ async function sweepDepsFor(
           { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) },
           Date.now(),
         );
+      },
+      async cardState(proposalTs) {
+        return sweepCardState(proposalTs, { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) });
+      },
+      async liveCards(channel) {
+        return (await threadStateFor(env).getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
       },
       async withdraw(channel, ts, text, cardKey) {
         await updateMessage(env, {

@@ -54,7 +54,7 @@
 
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
-import type { PendingProposal, ThreadState } from "../thread-state/index";
+import { proposalReplyThread, type PendingProposal, type ThreadState } from "../thread-state/index";
 import { recordProposalEvents, stagedEvent, supersededEvents, type ProposalEventLog } from "../usage/index";
 import type { ProposalCard } from "../turn/index";
 import type { ScheduledJob } from "../scheduled/runs";
@@ -182,6 +182,13 @@ export interface SweepDelivery {
   findPosted(to: CardPlace, cardKey: string, since: string): Promise<PostedCard>;
   /** Stage the card, as a turn's staging does. */
   stage(proposal: PendingProposal): Promise<void>;
+  /** The sweep cards ThreadState holds live in a channel — a revision or a
+   *  re-staged card among them, whether or not the records caught up. */
+  liveCards(channel: string): Promise<PendingProposal[]>;
+  /** Whether a posted card was ever staged: `live` while ThreadState holds
+   *  it, `decided` once it left — ✅, ⛔, revised, aged out, or any row on
+   *  the usage record — and `unstaged` when neither knows it. */
+  cardState(proposalTs: string): Promise<"live" | "decided" | "unstaged">;
   /** Replace a posted card's text, remove its buttons, and retag it so a
    *  later search by its key passes it over. */
   withdraw(channel: string, ts: string, text: string, cardKey: string): Promise<void>;
@@ -460,9 +467,12 @@ async function sweepThread(
       if (source) sources.push(source);
     } catch (err) {
       // A page that failed to read is not a page with nothing on it: the
-      // thread is held, like a budget stop, and the failure is counted.
+      // thread is held, like a budget stop, and the failure is counted —
+      // unless the service said to slow down, which is the quota's, as a
+      // model 429 is.
       rethrowIfBudget(err);
-      return { ok: false, error: `a linked page could not be read (${err instanceof Error ? err.message : String(err)})`, counts: true };
+      const why = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `a linked page could not be read (${why})`, counts: !QUOTA.test(why) };
     }
   }
   if (!sources.some((s) => s.writable)) return none;
@@ -473,7 +483,7 @@ async function sweepThread(
     sources,
   });
   if (!detected.ok) {
-    return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !MODEL_QUOTA.test(detected.error) };
+    return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !QUOTA.test(detected.error) };
   }
 
   const participants = [...new Set(t.humans.map((m) => m.user))];
@@ -521,8 +531,9 @@ async function sweepThread(
   return { ok: true, findings, readOnly, trimmed: shown.trimmed };
 }
 
-/** A model stop that is the quota's, not the thread's: held, never counted. */
-const MODEL_QUOTA = /\b429\b|quota|rate.?limit|resource.?exhausted/i;
+/** A stop that is a quota's — the model's or a source's — not the thread's:
+ *  held, never counted. */
+const QUOTA = /\b429\b|quota|rate.?limit|resource.?exhausted/i;
 
 /**
  * The thread as the detector sees it: the root, then the newest replies that
@@ -596,12 +607,13 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
     for (const [cardKey, items] of groupBy(open.filter((i) => i.proposalTs === null), (i) => i.cardKey)) {
       const outcome = await finishUnposted(ctx, cardKey);
       // A card finished, or held for a later try, still occupies its place.
-      if (outcome !== "released") live.add(items[0]!.destination);
+      if (outcome === "live" || outcome === "held") live.add(items[0]!.destination);
       if (outcome === "held") for (const i of items) held.add(i.findingId);
     }
     for (const i of open) {
       if (i.proposalTs !== null && (i.postedAt ?? 0) + SWEEP_CARD_TTL_MS > now) live.add(i.destination);
     }
+    for (const place of await placesLiveInThreadState(deps, open, live)) live.add(place);
 
     const stillDue = due.filter((f) => !carded.some((c) => c.id === f.id) && !held.has(f.id));
     const { fresh, already } = await sortOutCarded(deps, stillDue);
@@ -786,11 +798,15 @@ export const WITHDRAWN_TEXT =
  *   • posted, but with no snapshot or a digest that differs → withdrawn and
  *     released: staging it would run text nobody was shown;
  *   • not known (a failed read, or too many pages) → held for the next try,
- *     and released once its 72 h would have run out anyway.
+ *     and released once its 72 h would have run out anyway;
+ *   • posted and already staged — the earlier try got that far — → recorded
+ *     as posted and never staged again: a card someone ✅'d or ⛔'d meanwhile
+ *     staged afresh would run, or offer, what was already decided.
  *
- * @returns `live` when it is staged, `held` when it waits, `released`
+ * @returns `live` when it is staged, `held` when it waits, `decided` when it
+ *   was staged and has since been resolved, `released`
  */
-async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" | "held" | "released"> {
+async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" | "held" | "decided" | "released"> {
   const { deps, notes, now } = ctx;
   const snapshot = await deps.store.cardSnapshot(cardKey);
   const destination = snapshot?.destination ?? null;
@@ -829,6 +845,26 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
     await release(deps, cardKey);
     notes.push(`${cardKey}: the posted card shows other fixes than its snapshot — withdrawn`);
     return "released";
+  }
+  let state: "live" | "decided" | "unstaged";
+  try {
+    state = await deps.delivery.cardState(posted.ts);
+  } catch (err) {
+    rethrowIfBudget(err);
+    notes.push(`${cardKey}: could not tell whether it was already staged (${err instanceof Error ? err.message : String(err)}) — held for the next try`);
+    return "held";
+  }
+  if (state !== "unstaged") {
+    // Staged by the earlier try: record it as posted when it went up, so its
+    // deadline is the card's own, and stage nothing.
+    const postedAt = msOf(posted.ts);
+    await deps.store.markPosted(cardKey, posted.ts, Number.isFinite(postedAt) ? postedAt : now);
+    await deps.store.dropCard(cardKey);
+    await deps.store.removeFindings(plan.items.map((f) => f.id));
+    notes.push(`${cardKey}: already staged by an earlier try${state === "decided" ? ", and resolved since" : ""} — recorded, not staged again`);
+    if (state === "decided") return "decided";
+    ctx.carded.push(...plan.items);
+    return "live";
   }
   const staged = await stageOrWithdraw(ctx, plan, {
     channel: to.channel,
@@ -891,6 +927,69 @@ export async function stageSweepCard(
     ...supersededEvents(retired, now, "worker"),
     stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
   ]);
+}
+
+/**
+ * The places whose card the records call lapsed but ThreadState still holds
+ * live: a revision or a re-staged card whose record never landed. A card
+ * lives in its place's reply thread — a thread place's own thread, or the
+ * first card's thread for one posted at a channel's top — so any live sweep
+ * card in that thread occupies the place. A failed read leaves the records'
+ * answer standing.
+ */
+async function placesLiveInThreadState(
+  deps: SweepDeps,
+  open: readonly SweepItemRecord[],
+  live: ReadonlySet<string>,
+): Promise<string[]> {
+  const lapsed = open.filter((i) => i.proposalTs !== null && !live.has(i.destination));
+  if (!lapsed.length) return [];
+  const byChannel = new Map<string, PendingProposal[]>();
+  const cardsIn = async (channel: string): Promise<PendingProposal[]> => {
+    if (!byChannel.has(channel)) {
+      try {
+        byChannel.set(channel, await deps.delivery.liveCards(channel));
+      } catch (err) {
+        rethrowIfBudget(err);
+        console.warn(`[sweep] live cards in ${channel} unread: ${err instanceof Error ? err.message : String(err)}`);
+        byChannel.set(channel, []);
+      }
+    }
+    return byChannel.get(channel)!;
+  };
+  const places: string[] = [];
+  for (const item of lapsed) {
+    const place = placeOf(item.destination, deps.config);
+    if (!place) continue;
+    const threads = new Set([item.proposalTs!, ...(place.threadTs ? [place.threadTs] : [])]);
+    const cards = await cardsIn(place.channel);
+    if (cards.some((c) => threads.has(proposalReplyThread(c)) || threads.has(c.proposalTs))) places.push(item.destination);
+  }
+  return places;
+}
+
+/** A place's channel and thread, back from its key (`destinationKey`). */
+function placeOf(key: string, config: SweepConfig): { channel: string; threadTs: string | null } | null {
+  if (key === "plus-design") return config.plusDesign ? { channel: config.plusDesign, threadTs: null } : null;
+  if (key === "plus-universal") return config.plusUniversal ? { channel: config.plusUniversal, threadTs: null } : null;
+  const [channel, threadTs] = key.split(":");
+  return channel ? { channel, threadTs: threadTs || null } : null;
+}
+
+/**
+ * Whether a posted card was ever staged, from what ThreadState and the usage
+ * record hold (`SweepDelivery.cardState`): live while ThreadState holds it;
+ * decided once it is revised or aged out, or gone from ThreadState with any
+ * row on the record — its staged row, or the ✅ or ⛔ that claimed it.
+ */
+export async function sweepCardState(
+  proposalTs: string,
+  deps: { threadState: Pick<ThreadState, "getProposalByTs">; proposalEvents: Pick<ProposalEventLog, "eventsOf"> },
+): Promise<"live" | "decided" | "unstaged"> {
+  const lookup = await deps.threadState.getProposalByTs(proposalTs);
+  if (lookup.state === "found") return "live";
+  if (lookup.state !== "none") return "decided";
+  return (await deps.proposalEvents.eventsOf(proposalTs)).length ? "decided" : "unstaged";
 }
 
 /** The card as ThreadState stages it: no Turn behind it, its own terms. */

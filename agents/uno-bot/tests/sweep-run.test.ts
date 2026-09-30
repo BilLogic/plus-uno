@@ -11,6 +11,8 @@ import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
 import { recordSweepResolution } from "../src/sweep/outcomes";
+import { resolveSignal } from "../src/gate/index";
+import { recordProposalEvents, verdictEvents } from "../src/usage/index";
 import {
   at,
   DESIGN,
@@ -226,6 +228,47 @@ test("a card that lapsed unanswered frees its thread for the fixes that waited",
   assert.equal(h.staged[1]!.operations!.length, 2);
 });
 
+// A revision whose record never landed leaves the items on the card it
+// replaced. The place is still taken: the revision keeps that card's deadline,
+// and ThreadState holds it live.
+test("a place whose revision was never recorded is still live the next morning", async () => {
+  const { page, t, found } = manyEdits("r", 12);
+  const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+  const card = h.staged[0]!;
+
+  // A drop, staged as the turn stages it, with its record lost.
+  h.clock.now = at(30, 16);
+  await h.threadState.retireProposal(card.proposalTs);
+  await h.threadState.putProposal({ ...card, proposalTs: ts(30, 16), ttlMs: SWEEP_CARD_TTL_MS - 2 * 3_600_000, operations: card.operations!.slice(1) });
+
+  h.clock.now = at(31, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1, "the two that wait keep waiting");
+});
+
+// A re-staged card starts a fresh lifetime; with its record lost, the items
+// still carry the first card's posted time. ThreadState's live card is what
+// says the place is taken.
+test("a place is live while ThreadState holds its card, even after the records' deadline", async () => {
+  const { page, t, found } = manyEdits("s", 12);
+  const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+  const card = h.staged[0]!;
+
+  h.clock.now = at(32, 14);
+  await h.threadState.retireProposal(card.proposalTs);
+  await h.threadState.putProposal({ ...card, proposalTs: ts(32, 14) });
+
+  h.clock.now = at(30, 14) + SWEEP_CARD_TTL_MS + 60_000;
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1, "the re-staged card still holds the thread");
+});
+
 test("owner routing falls through all three rungs", async () => {
   // Thread one links a doc and the Roadmap card beside it; thread two links a
   // doc alone.
@@ -388,6 +431,59 @@ test("a stop in stage is finished by the retry, and a stage that fails outright 
   await runSweepJob(MORNING, other.deps);
   assert.equal(other.staged.length, 1);
   assert.notEqual(other.staged[0]!.proposalTs, other.posted[0]!.ts, "the withdrawn card is not the one staged");
+});
+
+// A try that staged its card and stopped before recording it as posted: the
+// retry finds the card staged. Resolved meanwhile, it stays resolved — staged
+// afresh, a ✅'d card could run twice and a ⛔'d one would come back.
+for (const [glyph, name] of [
+  ["✅", "confirmed"],
+  ["⛔", "cancelled"],
+] as const) {
+  test(`a card ${name} between a stopped try and its retry is recorded, never staged again`, async () => {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const found = reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
+    const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
+    await runSweepJob(END_OF_DAY, h.deps);
+
+    h.faults.markPosted = new SubrequestBudgetError(38);
+    h.clock.now = at(30, 14);
+    await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+    const card = h.staged[0]!;
+
+    // Resolved through the gate, as a typed emoji would: the claim takes it
+    // out of ThreadState, and the decision goes on the record.
+    const verdict = await resolveSignal(
+      { kind: "typed", channel: card.channel, thread: t.root.ts, text: glyph, userId: "U0ADE" },
+      { threadState: h.threadState },
+    );
+    assert.equal(verdict.outcome, "won");
+    await recordProposalEvents(h.proposalEvents, verdictEvents(verdict, at(30, 15)));
+
+    h.clock.now = at(30, 16);
+    const retry = await runSweepJob(MORNING, h.deps);
+    assert.equal(h.staged.length, 1, "not staged again");
+    assert.equal(h.posted.length, 1, "nor posted again");
+    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+    assert.match(retry.note ?? "", /already staged by an earlier try, and resolved since/);
+    assert.ok(h.store.items().every((i) => i.proposalTs === card.proposalTs), "its items are recorded on the card");
+    assert.deepEqual(await h.store.pendingFindings(), [], "its fix is not queued to come back");
+  });
+}
+
+test("a card staged by a stopped try and still live is recorded on the retry, not staged twice", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const found = reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
+  const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.faults.markPosted = new SubrequestBudgetError(38);
+  h.clock.now = at(30, 14);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+
+  h.clock.now = at(30, 16);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.staged.length, 1);
+  await assertOneStagedCard(h);
 });
 
 test("a card whose budget is not there is not started: the job defers before posting", async () => {
@@ -692,6 +788,20 @@ test("a model quota stop holds the cursor every night without counting toward a 
     detectorReplies: ["FAIL: 429 quota exceeded", "FAIL: 429 quota exceeded", "FAIL: 429 quota exceeded"],
     now: at(29, 22),
   });
+  await h.store.saveCursor(DESIGN, ts(29, 0), 0);
+  for (const day of [29, 30, 31]) {
+    h.clock.now = at(day, 22);
+    const report = await runSweepJob(END_OF_DAY, h.deps);
+    assert.match(report.note ?? "", /429/);
+    assert.doesNotMatch(report.note ?? "", /skipped/);
+  }
+  assert.equal(await h.store.cursor(DESIGN), ts(29, 0));
+});
+
+test("a Notion 429 holds the cursor every night without counting toward a skip", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], now: at(29, 22) });
+  h.rateLimited.add(PAGE_A.url);
   await h.store.saveCursor(DESIGN, ts(29, 0), 0);
   for (const day of [29, 30, 31]) {
     h.clock.now = at(day, 22);

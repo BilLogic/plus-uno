@@ -116,9 +116,9 @@ export async function recordSweepRevision(
   for (const item of await store.itemsForProposal(replaced.proposalTs)) {
     if (item.status !== "proposed") continue;
     if (stillThere.has(item.blockId)) {
-      // The revision lives its own 72 h from now, and the morning's liveness
-      // check reads it from here.
-      await store.updateItem(item.itemId, { proposalTs: revision.proposalTs, postedAt: now });
+      // The revision keeps the card's deadline (`turn.ts`), so the item keeps
+      // its posted time: the morning's liveness check reads the same deadline.
+      await store.updateItem(item.itemId, { proposalTs: revision.proposalTs });
       kept += 1;
     } else {
       await store.updateItem(item.itemId, { status: "dropped", resolvedAt: now });

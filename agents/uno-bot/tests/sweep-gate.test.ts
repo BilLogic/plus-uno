@@ -193,7 +193,7 @@ test("a ⛔ drops every item; a revision keeps what it kept and drops the rest",
       assert.deepEqual([item.status, item.proposalTs], ["dropped", revised.card.proposalTs]);
     } else {
       assert.deepEqual([item.status, item.proposalTs], ["proposed", revision.proposalTs], item.blockId);
-      assert.equal(item.postedAt, at(30, 15), "the revision's 72 h start when it is staged");
+      assert.equal(item.postedAt, at(30, 14), "the revision keeps the card's deadline, so its posted time stands");
     }
   }
 });

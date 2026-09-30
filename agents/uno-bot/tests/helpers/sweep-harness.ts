@@ -12,6 +12,7 @@ import {
   createInMemorySweepStore,
   modelDriftDetector,
   stageSweepCard,
+  sweepCardState,
   type ChannelKind,
   type InMemorySweepStore,
   type SweepDeps,
@@ -19,7 +20,7 @@ import {
   type SweepSource,
 } from "../../src/sweep/index";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../../src/thread-state/index";
-import { createInMemoryProposalEventLog } from "../../src/usage/index";
+import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
 
 export const DESIGN = "C0DESIGN";
 export const UNIVERSAL = "C0UNIVERSAL";
@@ -90,6 +91,8 @@ export interface SweepHarness {
   deps: SweepDeps;
   store: InMemorySweepStore;
   threadState: ThreadState;
+  /** The usage record's proposal events, which staging writes to. */
+  proposalEvents: InMemoryProposalEventLog;
   provider: FakeProvider;
   /** Detector replies not yet used. */
   replies: string[];
@@ -112,11 +115,13 @@ export interface SweepHarness {
   budget: { replies: number };
   /** Source URLs whose read throws, as a Notion 5xx would. */
   broken: Set<string>;
+  /** Source URLs whose read Notion answers with a 429. */
+  rateLimited: Set<string>;
   /** What the meter says is left; Infinity for no limit. */
   headroom: { subrequests: number; d1Queries: number };
   /** One-shot faults: each, when set, is thrown by the next call of its kind
    *  and cleared. */
-  faults: { post?: Error; stage?: Error; addItems?: Error };
+  faults: { post?: Error; stage?: Error; addItems?: Error; markPosted?: Error };
   /** Morning searches for a posted card left that answer "unknown", as a
    *  failed Slack read would. */
   unknownSearches: { left: number };
@@ -158,6 +163,7 @@ export function sweepHarness(opts: {
   const budget = { replies: Infinity };
   const headroom = { subrequests: Infinity, d1Queries: Infinity };
   const broken = new Set<string>();
+  const rateLimited = new Set<string>();
   const unknownSearches = { left: 0 };
   const faults: SweepHarness["faults"] = {};
   const pageSize = opts.pageSize ?? Infinity;
@@ -179,6 +185,10 @@ export function sweepHarness(opts: {
     async addItems(items) {
       once("addItems");
       return records.addItems(items);
+    },
+    async markPosted(cardKey, proposalTs, at) {
+      once("markPosted");
+      return records.markPosted(cardKey, proposalTs, at);
     },
   };
   const sources = new Map((opts.sources ?? []).map((s) => [s.url, s] as const));
@@ -207,6 +217,7 @@ export function sweepHarness(opts: {
     sources: {
       async read(url) {
         if (broken.has(url)) throw new Error("Notion 503: service unavailable");
+        if (rateLimited.has(url)) throw new Error("Notion 429 rate_limited: Rate limited");
         return sources.get(url) ?? null;
       },
     },
@@ -244,6 +255,12 @@ export function sweepHarness(opts: {
         // The production staging: the card, and its rows on the usage record.
         await stageSweepCard(proposal, { threadState, proposalEvents }, clock.now);
       },
+      async cardState(proposalTs) {
+        return sweepCardState(proposalTs, { threadState, proposalEvents });
+      },
+      async liveCards(channel) {
+        return (await threadState.getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
+      },
       async withdraw(channel, messageTs, text, cardKey) {
         const card = posted.find((p) => p.channel === channel && p.ts === messageTs);
         if (card) {
@@ -276,6 +293,7 @@ export function sweepHarness(opts: {
     headroom,
     faults,
     broken,
+    rateLimited,
     unknownSearches,
   };
 }
