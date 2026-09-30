@@ -31,6 +31,7 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
+import { PRECEDENCE_INTAKE_TITLE } from "../src/ds-precedence/report";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
@@ -843,6 +844,96 @@ test("a batch touching a keyed-apart card is refused with its note, and only tha
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, weekly.proposalTs, "no second live card");
 });
 
+// The weekly card is touched only by a batch aimed at its own intake: the same
+// issue for a week that comments, the same title for one that files. Anything
+// else that shares its tool — a separate intake, a comment on another issue —
+// is some other ask, and stages beside it with both left live.
+const WEEKLY_UPDATE: PendingProposal = {
+  ...PENDING,
+  toolName: "github_issue_update",
+  input: { issue_number: 812, comment: "### Week of 2026-10-02" },
+  operations: [{ toolName: "github_issue_update", input: { issue_number: 812, comment: "### Week of 2026-10-02" } }],
+  supersedeKey: "ds-precedence",
+  refuseRevision: "Reply `dispute N` to drop an item.",
+};
+const WEEKLY_CREATE: PendingProposal = {
+  ...WEEKLY_UPDATE,
+  toolName: "github_issue_create",
+  input: { title: PRECEDENCE_INTAKE_TITLE, body: "the list" },
+  operations: [{ toolName: "github_issue_create", input: { title: PRECEDENCE_INTAKE_TITLE, body: "the list" } }],
+};
+
+async function inWeeklyThread(weekly: PendingProposal, call: { name: string; args: Record<string, unknown> }) {
+  const h = harness({ replies: [{ text: "Staging it.", toolCalls: [call] }] });
+  await h.threadState.putProposal(weekly);
+  const outcome = await runTurn(request({ text: "@uno-bot do the thing", pending: weekly }), h.deps);
+  return { h, outcome };
+}
+
+test("a comment on another issue in a commenting week's thread stages beside the weekly card, both live", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_UPDATE, {
+    name: "github_issue_update",
+    args: { issue_number: 700, comment: "Seen again this week." },
+  });
+
+  assert.equal(outcome.disposition, "staged");
+  const staged = outcome.staged!.proposal;
+  assert.equal(staged.supersedeKey, undefined, "its own card, in the thread's slot");
+  assert.equal((await h.threadState.getProposalByTs(WEEKLY_UPDATE.proposalTs)).state, "found", "the weekly card stays live");
+  assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
+});
+
+test("a comment on the weekly intake itself is still refused with the card's note", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_UPDATE, {
+    name: "github_issue_update",
+    args: { issue_number: 812, comment: "Without Button." },
+  });
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_UPDATE.proposalTs, "no second live card");
+});
+
+test("a separate intake in a filing week's thread stages beside the weekly card, both live", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_CREATE, {
+    name: "github_issue_create",
+    args: { title: "Tooltip colour differs between code and Figma", body: "Seen in the list." },
+  });
+
+  assert.equal(outcome.disposition, "staged");
+  const staged = outcome.staged!.proposal;
+  assert.equal(staged.toolName, "github_issue_create");
+  assert.equal((await h.threadState.getProposalByTs(WEEKLY_CREATE.proposalTs)).state, "found", "the weekly card stays live");
+  assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
+});
+
+test("a batch filing the weekly intake's own title is still refused with the card's note", async () => {
+  const { h, outcome } = await inWeeklyThread(WEEKLY_CREATE, {
+    name: "github_issue_create",
+    args: { title: PRECEDENCE_INTAKE_TITLE, body: "the list without Button" },
+  });
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_CREATE.proposalTs, "no second live card");
+});
+
+// Every keyed card's revision stays in its slot: the key goes with it, whether
+// or not the card is a sweep card.
+test("a revision of a keyed card that is no sweep card keeps its key", async () => {
+  const keyed: PendingProposal = { ...PENDING, supersedeKey: "library" };
+  const h = harness({
+    replies: [{ text: "Revised.", toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }] }],
+  });
+  await h.threadState.putProposal(keyed);
+
+  const outcome = await runTurn(request({ text: "make it v2", pending: keyed }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.supersedeKey, "library");
+  assert.equal((await h.threadState.getProposalByTs(keyed.proposalTs)).state, "superseded");
+});
+
 // Someone outside the confirmer set could stage a revision nobody could then
 // run on their word — and staging it would retire the card its confirmers
 // can. Refused instead: the card stays live exactly as it was, and the person
@@ -958,6 +1049,8 @@ test("a \"drop 2\" revision is superseded-and-staged on the record, rooted at th
 
   const revision = outcome.staged!.proposal;
   assert.equal(revision.originProposalTs, SWEEP_CARD.proposalTs);
+  // Its key named on the record itself, not left to the slot's fallback.
+  assert.equal(revision.supersedeKey, "sweep");
   assert.deepEqual(
     (await h.proposalEvents.eventsOf(SWEEP_CARD.proposalTs)).map((e) => [e.event, e.via]),
     [["superseded", "revision"]],

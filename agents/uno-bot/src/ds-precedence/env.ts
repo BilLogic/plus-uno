@@ -22,7 +22,10 @@ import { inFlightComponents, type PrecedenceRegistry } from "./compare";
 import { disputedItems, PRECEDENCE_MARKER } from "./report";
 import {
   disputePrecedenceItems,
+  followRestagedCard,
   postPrecedenceReport,
+  precedenceChannel,
+  PRECEDENCE_KEY,
   runPrecedenceCheck,
   type CheckResult,
   type PostedThread,
@@ -81,7 +84,10 @@ export async function runDsPrecedenceCheck(env: Env, opts: { dryRun: boolean }):
  * @param opts - `dryRun` posts, stages and writes nothing
  */
 export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): Promise<PostResult> {
-  const channel = env.PLUS_UNIVERSAL_CHANNEL_ID?.trim();
+  const channel = precedenceChannel({
+    plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
+    plusDesign: env.PLUS_DESIGN_CHANNEL_ID?.trim() || undefined,
+  });
   if (!channel) return { posted: false, summary: "PLUS_UNIVERSAL_CHANNEL_ID not set — nothing posted" };
   const target = resolveRepoFor(env, undefined);
   if (!target.ok) return { posted: false, summary: `no repo: ${target.error}` };
@@ -170,6 +176,20 @@ export async function isWeeklyPrecedenceThread(env: Env, channel: string, thread
   if (!env.HARNESS_KV || channel !== env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()) return false;
   const thread = await threadRecord(env, threadTs).read();
   return !!thread && thread.channel === channel && thread.ts === threadTs;
+}
+
+/**
+ * A cut-off run's fresh card, when it re-stages a weekly card: its list
+ * thread's record follows it (`followRestagedCard`). Any other card reads
+ * nothing.
+ *
+ * @param env - Worker bindings
+ * @param from - The card re-staged
+ * @param to - The fresh card
+ */
+export async function recordPrecedenceRestageFor(env: Env, from: PendingProposal, to: PendingProposal): Promise<void> {
+  if (from.supersedeKey !== PRECEDENCE_KEY) return;
+  await followRestagedCard(threadRecord(env, from.replyTs ?? from.threadTs), from, to);
 }
 
 /**
