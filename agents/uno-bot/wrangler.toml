@@ -220,13 +220,16 @@ PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # comma-separated channel ids. THIS IS THE ONE LINE TO GROW — add a design
 # channel's id here once uno-bot is a member, and the next end-of-day run sweeps
 # it. Findings post at the next weekday morning run, in the thread the evidence
-# is in. #uno-bot is never swept whatever this says, DMs and group DMs are never
-# read, and a private channel listed here is skipped for now. Its cursors and
+# is in. #uno-bot is never swept whatever this says, and DMs are never read. A
+# private channel listed here is read only when it is ALSO on
+# SLACK_SEARCH_PRIVATE_ALLOWLIST below, and its findings stay in it (ADR-031).
+# The group DMs uno-bot is in are swept by one more end-of-day job while this
+# list is not blank, and their findings are posted back in them. Its cursors and
 # records live in USAGE_DB (migrations/usage/0002_sweep.sql); the findings wait
 # for the morning in HARNESS_KV under "sweep:findings:<channel>". Leave blank → nothing
 # is swept. Dry run: GET /debug/sweep?dry_run=1.
-#   plus-design C03FC8AS69K
-SWEEP_CHANNELS = "C03FC8AS69K"
+#   plus-design C03FC8AS69K · plus-design-feedback C074QG2V7DJ (private)
+SWEEP_CHANNELS = "C03FC8AS69K,C074QG2V7DJ"
 # #plus-design-feedback channel id — shareout_post drops feedback bundles here
 # (distinct from the reviews channel above). Leave blank → shareout falls back
 # to the origin thread.

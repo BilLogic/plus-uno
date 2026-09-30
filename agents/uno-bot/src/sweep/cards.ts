@@ -17,13 +17,19 @@
 // the card lives 72 hours, with no re-ping when it lapses. Each item names its
 // owner, who is @-mentioned; nobody else is.
 //
+// A GROUP DM'S CARD carries the pages it fixes (`sweepShareOf`), so that once
+// its ✅ has written one, a separate share card can offer a reworded note
+// (`./share.ts`). Its own ✅ applies the fix and nothing more. A private
+// channel's card carries nothing to share.
+//
 // PURE: no `Env`, no Slack call. The card is data (`ProposalCard`); Slack
 // renders it (`slack/proposal-render.ts`).
 
 import { typedEmojiDecision } from "../gate/reactions";
-import type { ProposalOperation } from "../thread-state/index";
+import { escapeSlackText } from "../slack/mrkdwn";
+import type { ProposalOperation, SweepShare } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
-import { pickDestination, type Destination } from "./finding";
+import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
 
 /** How long a sweep card stays confirmable. */
@@ -152,6 +158,29 @@ function stable(v: unknown): string {
   return JSON.stringify(v);
 }
 
+/** Slack's names for the two team channels a group DM's share goes to. */
+export const SHARE_CHANNEL_NAMES: Record<SweepShare["pages"][number]["to"], string> = {
+  "plus-universal": "#plus-universal",
+  "plus-design": "#plus-design",
+};
+
+/**
+ * The share a group-DM card carries, or undefined for a card from anywhere
+ * else: each page its fixes touch, once, in item order, with the team channel
+ * a note about it goes to (`shareDestination`).
+ *
+ * @param items - The card's findings
+ */
+export function sweepShareOf(items: readonly PendingFinding[]): SweepShare | undefined {
+  if (!items.length || !items.every((f) => f.evidence.channelKind === "group-dm")) return undefined;
+  const pages: SweepShare["pages"] = [];
+  for (const f of items) {
+    if (pages.some((p) => p.url === f.target.url)) continue;
+    pages.push({ url: f.target.url, title: f.target.title, to: shareDestination(f.target).channel });
+  }
+  return { pages };
+}
+
 /** One key per place a card can land: a thread, or a team channel. */
 export function destinationKey(d: Destination): string {
   return d.rung === "private" || d.rung === "thread" ? `${d.channel}:${d.threadTs ?? ""}` : d.channel;
@@ -171,11 +200,14 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
   plan.items.forEach((item, i) => {
     const evidence = item.evidence.permalinks[0] ? ` ([where](${item.evidence.permalinks[0]}))` : "";
     const { before, after } = changedSpan(item.original, item.replacement);
+    // Page and thread words are text: a title or block holding `<!channel>`
+    // pings nobody. The link is Slack's own `<url|label>`, so a `]` in a title
+    // cannot break a Markdown one.
     lines.push(
-      `${i + 1}. <@${item.owner}> · [${item.target.title}](${item.target.url})`,
-      `   - page says: “${quote(item.sourceSays)}”`,
-      `   - thread says: “${quote(item.threadSays)}”${evidence}`,
-      `   - change: “${before}” → “${after}”`,
+      `${i + 1}. <@${item.owner}> · <${item.target.url}|${escapeSlackText(flat(item.target.title) || "untitled")}>`,
+      `   - page says: “${escapeSlackText(quote(item.sourceSays))}”`,
+      `   - thread says: “${escapeSlackText(quote(item.threadSays))}”${evidence}`,
+      `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
     );
   });
   lines.push(
