@@ -1,0 +1,62 @@
+# Throwaway: probes which Figma scopes FIGMA_ACCESS_TOKEN carries. Never merged.
+# Read-only GETs, plus two POSTs with empty bodies that fail validation and
+# create nothing, to tell "scope missing" (403) from "bad request" (400).
+name: figma-scope-probe
+on:
+  pull_request:
+    paths: [".github/workflows/figma-scope-probe.yml"]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe
+        env:
+          T: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          F: ${{ secrets.FIGMA_FILE_KEY }}
+          TEAM: ${{ secrets.FIGMA_TEAM_ID }}
+        run: |
+          node - <<'JS'
+          const { T, F, TEAM } = process.env;
+          const h = { "X-Figma-Token": T, "Content-Type": "application/json" };
+          const probes = [
+            ["me (current_user:read)", "GET", "/v1/me"],
+            ["file nodes (file_content:read)", "GET", `/v1/files/${F}?depth=1`],
+            ["file versions (file_versions:read)", "GET", `/v1/files/${F}/versions`],
+            ["file components (library_content:read)", "GET", `/v1/files/${F}/components`],
+            ["team components (team_library_content:read)", "GET", `/v1/teams/${TEAM}/components?page_size=1`],
+            ["team projects (projects:read)", "GET", `/v1/teams/${TEAM}/projects`],
+            ["file comments (file_comments:read)", "GET", `/v1/files/${F}/comments`],
+            ["dev resources read (file_dev_resources:read)", "GET", `/v1/files/${F}/dev_resources`],
+            ["variables (file_variables:read)", "GET", `/v1/files/${F}/variables/local`],
+            ["library analytics (library_analytics:read)", "GET", `/v1/analytics/libraries/${F}/component/usages?group_by=component`],
+            ["webhooks list, team (webhooks:read)", "GET", `/v2/webhooks?context=team&context_id=${TEAM}`],
+            ["webhooks list, legacy team", "GET", `/v2/teams/${TEAM}/webhooks`],
+            ["webhooks create, EMPTY body (webhooks:write?)", "POST", "/v2/webhooks", "{}"],
+            ["dev resources create, EMPTY list (file_dev_resources:write?)", "POST", "/v1/dev_resources", '{"dev_resources":[]}'],
+            ["comments create? skipped — would post", null],
+          ];
+          for (const [name, method, path, body] of probes) {
+            if (!method) { console.log(`SKIP  ${name}`); continue; }
+            try {
+              const r = await fetch("https://api.figma.com" + path, { method, headers: h, body });
+              const text = await r.text();
+              let note = "";
+              try {
+                const j = JSON.parse(text);
+                if (r.ok) {
+                  if (path === "/v1/me") note = `handle=${j.handle}`;
+                  else if (j.webhooks) note = `${j.webhooks.length} webhook(s): ` + j.webhooks.map((w) => `${w.event_type}/${w.status}/${w.context ?? "team"}`).join(", ");
+                  else if (j.projects) note = `${j.projects.length} project(s)`;
+                  else if (j.comments) note = `${j.comments.length} comment(s)`;
+                  else if (j.versions) note = `${j.versions.length} version(s)`;
+                  else if (j.meta?.components) note = `${j.meta.components.length} component(s)`;
+                  else if (j.dev_resources) note = `${j.dev_resources.length} dev resource(s)`;
+                  else note = "ok";
+                } else note = (j.err || j.message || JSON.stringify(j)).toString().slice(0, 200);
+              } catch { note = text.slice(0, 120); }
+              console.log(`${String(r.status).padEnd(5)} ${name} — ${note}`);
+            } catch (e) { console.log(`ERR   ${name} — ${e.message}`); }
+          }
+          JS
