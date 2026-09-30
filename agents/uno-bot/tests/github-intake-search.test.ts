@@ -114,16 +114,28 @@ test("a likely duplicate comes back with its title and link, and the note offers
   assert.match(result.note!, /title and link/i);
   assert.match(result.note!, /file (?:a new one )?anyway/i);
   assert.match(result.note!, /github_issue_create/);
+  // Adding to the match is a follow-up on it, and the note names that tool —
+  // staged at once in the #uno-bot intake channel, asked in words elsewhere.
+  assert.match(result.note!, /add this to that issue instead/);
+  assert.match(result.note!, /#uno-bot intake channel, stage github_issue_update/);
+  assert.match(result.note!, /elsewhere ask in text first/);
+  assert.match(result.note!, /Never stage github_issue_create over the match/);
+  assert.match(result.note!, /where the repo is clear, or ask\.$/);
 });
 
-test("no match says so, and clears the way to stage the card", async () => {
+test("no match says so, and leaves the route to the repo rather than prescribing a card", async () => {
   const result = await run({ keywords: "slack canvas timeout" }, fakeSearch(() => []));
 
   assert.equal(result.ok, true);
   assert.equal(result.count, 0);
   assert.deepEqual(result.matches, []);
   assert.match(result.note!, /no open intake/i);
-  assert.match(result.note!, /github_issue_create/);
+  // Live eval G7: a note that said "Stage github_issue_create" was followed
+  // even when the repo was unclear. No match is not a routing decision: file
+  // where the repo is clear, and ask which repo where it is not.
+  assert.doesNotMatch(result.note!, /github_issue_create/);
+  assert.match(result.note!, /clear/i);
+  assert.match(result.note!, /ask which repo/i);
 });
 
 test("a qualifier in the keywords cannot aim the search elsewhere", () => {
@@ -174,7 +186,9 @@ test("a failed search is reported, and does not block filing", async () => {
   assert.match(result.error!, /403/);
   // The check is a courtesy to the tracker, not a gate on the request.
   assert.match(result.note!, /couldn't check/i);
-  assert.match(result.note!, /github_issue_create/);
+  assert.match(result.note!, /Where the repo is clear, stage github_issue_create anyway/);
+  // An unclear repo still gets a question, search or no search.
+  assert.match(result.note!, /ask which repo first/);
 });
 
 test("a spent rate limit is named as such, and still does not block filing", async () => {
@@ -184,4 +198,5 @@ test("a spent rate limit is named as such, and still does not block filing", asy
   assert.equal(result.ok, false);
   assert.match(result.note!, /rate limit/i);
   assert.match(result.note!, /github_issue_create/);
+  assert.match(result.note!, /ask which repo first/);
 });

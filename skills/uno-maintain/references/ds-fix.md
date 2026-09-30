@@ -65,7 +65,7 @@ Files to modify: {paths}
 | `scripts/generate-all-tokens.js` | `npm run generate:tokens` | regenerate SCSS from token source |
 | `scripts/storybook-networkinterfaces-fix.cjs` | auto via `npm run storybook` | Storybook startup stability |
 | `scripts/poll-figma-library.js` | `npm run figma:poll` | Figma library change detection — see automations registry. Notifies (Notion PRD + Slack) as well as recording; use the two below when you only want the snapshot re-recorded |
-| `scripts/snapshot-figma-components.mjs` | `npm run snapshot:figma-components` | re-record the published-component snapshot; needs `FIGMA_ACCESS_TOKEN`, publishes nothing |
+| `scripts/snapshot-figma-components.mjs` | `npm run snapshot:figma-components` | re-record the published-component snapshot; needs `FIGMA_ACCESS_TOKEN`, publishes nothing. Without the token locally, dispatch `figma-snapshot-refresh.yml`, which runs it with the repo secret and opens a draft PR |
 | `scripts/snapshot-figma-variables.mjs` | `npm run snapshot:figma-variables` | re-record the Figma-variable snapshot; prints a probe to run in Figma, then `-- --write <probe.json>` |
 | `scripts/generate-component-registry-from-storybook.js` | `npm run generate:component-registry` | regenerate the Figma component registry from MDX `figmaMeta` |
 | `scripts/generate-token-registry.mjs` | `npm run generate:token-registry` / `check:token-registry` | regenerate / drift-check the Figma token registry |

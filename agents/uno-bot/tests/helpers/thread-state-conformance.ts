@@ -263,6 +263,33 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
   });
 
+  // A sweep card has its own slot in its thread: a turn's card staged there
+  // leaves it live, and a revision of the sweep card retires only it.
+  it("a sweep card and a turn's card stay live side by side in one thread", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+  });
+
+  // Every keyed card holds its own slot: a card with another key, or none,
+  // leaves it live, and only a card with the same key replaces it.
+  it("a card with a supersedeKey is replaced only by its own key", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    await store.putProposal(proposal({ proposalTs: "1700.5", replyTs: THREAD.thread, supersedeKey: "sweep", sweepRun: "2026-09-30" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found", "a turn's card and a sweep card leave it live");
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found", "it leaves the turn's card live");
+    assert.equal((await store.getProposalByTs("1700.5")).state, "found", "and the sweep card");
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded", "its revision replaces it");
+  });
+
   // "superseded" and "expired" are different things to say to a person: one card
   // was replaced two seconds ago, the other aged out an hour ago.
   it("a superseded ts is not reported as expired", async () => {
@@ -290,6 +317,44 @@ export function runThreadStateConformance(
     clock.advance(PROPOSAL_TTL_MS + 1);
     await store.putProposal(proposal({ proposalTs: "1700.3" }));
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  // What a staging and a retire REPORT: the usage record says a card was
+  // replaced only when one of these calls is what took it out of reach.
+  it("staging reports the live card it retired, and nothing else", async () => {
+    const { store, clock } = setup();
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.2" })), { retired: [] });
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.3" })), { retired: ["1700.2"] });
+    // Another thread's card, and an aged-out one, are not this staging's.
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread, replyTs: OTHER.thread }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.5" })), { retired: [] });
+  });
+
+  it("a staging does not report a card its caller already retired", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: true });
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.3" })), { retired: [] });
+  });
+
+  it("a retire reports false for a card claimed, already retired, replaced, aged out or unknown", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.claimProposal("1700.2"), true);
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: false });
+
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.deepEqual(await store.retireProposal("1700.3"), { retired: true });
+    assert.deepEqual(await store.retireProposal("1700.3"), { retired: false });
+
+    await store.putProposal(proposal({ proposalTs: "1700.4" }));
+    await store.putProposal(proposal({ proposalTs: "1700.5" })); // replaces 1700.4
+    assert.deepEqual(await store.retireProposal("1700.4"), { retired: false });
+
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await store.retireProposal("1700.5"), { retired: false });
+    assert.deepEqual(await store.retireProposal("9999.9"), { retired: false });
   });
 
   // A card that was replaced AND has since aged out reads as superseded while
@@ -924,5 +989,83 @@ export function runThreadStateConformance(
     const { store } = setup();
     assert.equal(await store.claimRun("Ev1"), "claimed");
     assert.equal((await store.checkAndRecordEvent("Ev1")).seen, true);
+  });
+
+  // ----- a record's own lifetime -----
+  //
+  // A proposal may carry its own `ttlMs`, and every TTL read honours it: the
+  // lookups, the claim, the cut-off window. 72 h is the case it exists for —
+  // a card that has to outlive a weekend — and 71 h / 73 h put it either side
+  // of the line, both far past the hour every other card lives by.
+
+  const HOUR_MS = 60 * 60 * 1000;
+  const LONG_TTL_MS = 72 * HOUR_MS;
+
+  it("a proposal with its own TTL is found and claimable at 71 h", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ ttlMs: LONG_TTL_MS }));
+    clock.advance(LONG_TTL_MS - HOUR_MS);
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state, "found");
+    assert.equal(found.state === "found" && found.proposal.ttlMs, LONG_TTL_MS);
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.2");
+    assert.deepEqual(
+      (await store.getProposalsByChannel(THREAD.channel)).map((p) => p.proposalTs),
+      ["1700.2"],
+    );
+    assert.equal(await store.claimProposal("1700.2"), true);
+  });
+
+  it("a proposal with its own TTL is expired at 73 h", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ ttlMs: LONG_TTL_MS }));
+    clock.advance(LONG_TTL_MS + HOUR_MS);
+    assert.equal(await store.getProposalByThread(THREAD), null);
+    assert.deepEqual(await store.getProposalsByChannel(THREAD.channel), []);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  it("a proposal without its own TTL still expires after the hour", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS }));
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.4")).state, "expired");
+  });
+
+  // The successor's own TTL decides whether it is still live to point at.
+  it("a successor with its own TTL keeps its predecessor superseded at 71 h", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
+    clock.advance(LONG_TTL_MS - HOUR_MS);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    clock.advance(2 * HOUR_MS);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {
+    const early = setup();
+    await early.store.beginExecution(proposal({ ttlMs: LONG_TTL_MS }));
+    early.clock.advance(LONG_TTL_MS - HOUR_MS);
+    assert.deepEqual(
+      (await early.store.findCutOffExecutions()).map((e) => e.proposal.proposalTs),
+      ["1700.2"],
+    );
+    assert.notEqual(await early.store.takeCutOffExecution("1700.2"), null);
+
+    const late = setup();
+    await late.store.beginExecution(proposal({ ttlMs: LONG_TTL_MS }));
+    late.clock.advance(LONG_TTL_MS + HOUR_MS);
+    assert.deepEqual(await late.store.findCutOffExecutions(), []);
+    assert.equal(await late.store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a proposal keeps the confirmer set it was staged with", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ confirmers: ["U7", "U8"] }));
+    const found = await store.getProposalByTs("1700.2");
+    assert.deepEqual(found.state === "found" && found.proposal.confirmers, ["U7", "U8"]);
   });
 }

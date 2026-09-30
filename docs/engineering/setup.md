@@ -99,14 +99,28 @@ When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` �
 ## Token Workflow
 
 ```
-Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
+Figma export → design-system/src/tokens/source/*.json → npm run generate:tokens → commit SCSS
 ```
 
+- The source JSON is exported from the BS4 Foundation library through the
+  Figma MCP, read-only: one file per collection (`colors _ accent.json`,
+  `colors _ neutral.json`, `size _ primitive.json`, `size _ semantics.json`,
+  `size _ layout.json`). Each is `{ modes, variables }`, and every variable
+  carries `id`, `name`, `resolvedType`, `valuesByMode` (aliases kept as
+  `VARIABLE_ALIAS`) and `resolvedValuesByMode` (every alias resolved to its
+  final value).
+- Known gap: `npm run sync:tokens` (`scripts/sync-figma-tokens.js`) writes to
+  `new tokens/` and resolves only one alias level, so until it is fixed these
+  files come from the MCP export.
 - Never edit generated token files (`_colors.scss`, `_spacing_semantics.scss`, etc.) directly
-- Exception, 2026-09-29: ten of the state-layer bases in `_colors.scss` were
-  hand-set to match the Figma `State-layers` variables, because the color
-  source JSON lags Figma. Carry them into the source before the generator next
-  runs.
+- Where a token deliberately differs from Figma, or is not in Figma, the
+  generator says so in a named constant (`SEMANTIC_OVERRIDES`,
+  `CODE_ONLY_PRIMITIVES`, `CODE_ONLY_LAYOUT` and their neighbors in
+  `scripts/generate-all-tokens.js`). The Info tokens are the one other case:
+  `ALIASED_FAMILIES` writes every Info token as an alias of its Tertiary twin,
+  including `--color-info-border-subtle`, which Figma has no variable for. The
+  generator refuses to write when a constant has gone stale: an override Figma
+  now agrees with, or a code-only name Figma now has
 - Token source is Figma; SCSS is generated output
 - Figma mapping tables: `design-system/guidelines/figma/token-mapping.md`
 - Refresh agent views: `npm run generate:agent`
@@ -222,7 +236,8 @@ in a file.
 `.github/workflows/uno-bot-checks.yml` runs three jobs on every pull request —
 `typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`), `tests` (the Worker's
 unit suite, the largest in this repository) and `conformance` (`test:workerd`,
-the ThreadState suite against a real Durable Object under workerd). All three
+the ThreadState suite against a real Durable Object under workerd, and the
+UsageLog suite against a local D1 with the real migrations applied). All three
 are registry rows; the first two are composed into `check:harness` as well, so
 the pre-push command stays whole. The jobs exist for their NAMES. A red
 `check:harness` is one GitHub check covering the whole composite, so
@@ -234,8 +249,8 @@ All three commands are in the `npm run deploy` chain too, so a push straight to
 `main` — unprotected, and 19 people can make one — meets the same gates on the
 way to production. None reads a secret: `tsc` reads the checkout, the unit suite
 is pure functions plus mocked `fetch`, and `conformance` boots workerd locally
-from the `wrangler` already in devDependencies, against a Durable Object
-miniflare creates in a temporary directory. So a fork PR runs all three.
+from the `wrangler` already in devDependencies, against a Durable Object and a
+D1 database miniflare creates in a temporary directory. So a fork PR runs all three.
 
 `conformance` is the one that costs a runtime, which is why it is a job of its
 own rather than a member of the fast composite: 3.1s warm and 4.5s cold locally,

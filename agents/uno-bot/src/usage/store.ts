@@ -1,0 +1,119 @@
+// The usage record: one durable row per uno-bot turn, behind one port.
+//
+// WHAT IT IS FOR. The metrics #742 publishes are recomputed from it with
+// checked-in queries, and operations (cost, latency, stop usage) read it too. The
+// `[uno-bot] request done` log line it replaces as evidence lives in Workers
+// Logs, which sample and expire. What the database is for, what it never
+// stores, and why it is D1 rather than Analytics Engine: ADR-030.
+//
+// THE SAME SHAPE AS ThreadState. A port (`UsageLog`), an in-memory adapter the
+// Node suite drives Turn against, a D1 adapter production writes through, and
+// one conformance suite that holds the two equal
+// (`tests/helpers/usage-log-conformance.ts`, run under `node --test` and again
+// under workerd against a local D1).
+//
+// PURE: no `Env`, no Workers global. `Env` stops in `./production.ts` (and, for
+// the resolution columns, `./resolution-env.ts`).
+
+import type { ConversationType } from "../turn/turn";
+import type { PainCategory, SubType } from "./categories";
+
+/** One turn, as the `turns` table holds it. Field names are camelCase here and
+ *  snake_case in SQL; `./d1.ts` is the one place they are mapped. The
+ *  classifier's writes to the category columns are `./category-store.ts`'s. */
+export interface TurnRecord {
+  // ── identity and place ──
+  /** `<channel>:<the asker's message ts>` — stable across a retried alarm, so
+   *  a turn that runs twice still leaves one row. An ask with no Slack ts (an
+   *  eval conversation) adds `@<when it began>` (`./record.ts` `turnIdOf`). */
+  turnId: string;
+  /** The deployed build stamp (`version.ts`). */
+  build: string;
+  /** Slack user id of the asker. */
+  requesterId: string;
+  /** The code's surface: `assistant` is the app DM, `channel` everything else
+   *  — a group DM included, since it is delivered like a channel. Who the
+   *  conversation belongs to is `conversationType`. */
+  surface: "assistant" | "channel";
+  /** `channel` · `group` (private channel) · `mpim` (group DM) · `im` (app DM);
+   *  null when the event did not say (an `app_mention`). */
+  conversationType: ConversationType | null;
+  /** True when the ask arrived inside an existing thread. */
+  inThread: boolean;
+  /** The channel id, for channel turns only — null for a DM or group DM. */
+  channelId: string | null;
+
+  // ── timing ──
+  /** The asker's message ts, as Slack spells it. */
+  askTs: string;
+  /** When the ask was made, epoch ms. */
+  askedAt: number;
+  /** When the first answer, card or note reached the person, epoch ms; null
+   *  when the turn put nothing in front of them. */
+  firstAnswerAt: number | null;
+  /** `firstAnswerAt - askedAt`, or null with it. */
+  latencyMs: number | null;
+
+  // ── model ──
+  tier: string;
+  routeReason: string;
+  /** The adapter that answered; null when no model ran (a typed ✅, say). */
+  provider: string | null;
+  model: string | null;
+  fallbackUsed: boolean;
+  tokensIn: number;
+  tokensOut: number;
+  tokensThinking: number;
+  tokensCached: number;
+  /** Estimated from the checked-in price table (`./prices.ts`); null when the
+   *  model is not on it, so an unpriced turn is findable rather than free. */
+  costUsd: number | null;
+
+  // ── behaviour ──
+  /** Ungated tools the loop ran, in call order. */
+  toolsCalled: string[];
+  /** Which kinds of source the answer linked to (`./record.ts` `sourcesCitedIn`). */
+  sourcesCited: string[];
+  /** How the turn ended — `TurnDisposition` in `turn/turn.ts`. */
+  disposition: string;
+
+  // ── proposal ──
+  /** The ts of the card this turn staged; later proposal events key on it. */
+  proposalId: string | null;
+
+  // ── other ──
+  stopUsed: boolean;
+  /** A GitHub issue this turn filed on the bot's own repo. */
+  selfFiledTicketUrl: string | null;
+  /** Evals, debug probes, the sandbox channel, bare greetings (`./record.ts`). */
+  testTraffic: boolean;
+
+  // ── corpus categories (`./categories.ts`) ──
+  /** What a CHANNEL ask said, kept only until the end-of-day classifier labels
+   *  it, and never past 14 days (ADR-030). Null — at every point — unless the
+   *  conversation is known to be a channel (`keepsRequestText`), and for test
+   *  traffic. */
+  requestText: string | null;
+  /** The corpus Sub-type, exact-matched to the options; null is blank. */
+  subType: SubType | null;
+  /** 1–7 (`painCategoryOf`); 7 is a turn that staged a card or intake. */
+  painCategory: PainCategory | null;
+  /** When a classifier labelled the ask, epoch ms; null until one has. */
+  classifiedAt: number | null;
+}
+
+/**
+ * Where a finished turn is written.
+ *
+ * `record` is an UPSERT on `turnId`: a turn retried by the runner rewrites its
+ * own row rather than adding a second. The category columns are the
+ * classifier's once it has run: a retry never blanks a label (a null leaves
+ * the stored one), and never brings text back to a row already classified.
+ * A caller must treat a throw as a lost record, never as a lost turn — Turn
+ * logs and swallows it.
+ */
+export interface UsageLog {
+  record(turn: TurnRecord): Promise<void>;
+  /** The row for one turn, or null. */
+  get(turnId: string): Promise<TurnRecord | null>;
+}

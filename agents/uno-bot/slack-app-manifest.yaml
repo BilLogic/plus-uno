@@ -219,6 +219,7 @@ oauth_config:
       - groups:read
       - groups:write
       - im:history
+      - im:read
       - im:write
       - mpim:history
       - mpim:read
@@ -261,6 +262,7 @@ oauth_config:
       - mcp:connect
       - metadata.message:read
       - mpim:history
+      - mpim:read
       - reactions:read
       - reactions:write
       - search:read.files

@@ -32,6 +32,7 @@ import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
 import { executeSlackReact } from "../tools/slack-react";
+import { executeReminderSet } from "../tools/reminder-set";
 import { readReference } from "../tools/read-reference";
 import { executeImplement } from "../tools/implement";
 import { executeImplementDesign } from "../tools/implement-design";
@@ -44,6 +45,7 @@ import { executeRelayDm, relayMemoryFor, relaySlackFor } from "../tools/relay-dm
 import { executeGithubIssueCreate } from "../tools/github-issue";
 import { executeGithubIssueUpdate } from "../tools/github-issue-update";
 import { executeGithubWorkflowRun } from "../tools/github-workflow";
+import { executeSweepSharePost } from "../tools/sweep-share-post";
 import type { ToolName } from "./tool-table";
 
 /**
@@ -71,6 +73,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   slack_channel_members: (env, input) => executeSlackChannelMembers(env, input),
   slack_thread_read: (env, input) => executeSlackThreadRead(env, input),
   slack_react: (env, input, slack) => executeSlackReact(env, input, slack),
+  reminder_set: (env, input, slack) => executeReminderSet(env, input, slack),
   slack_search: (env, input, slack) => executeSlackSearch(env, input, slack),
   read_reference: async (_env, input) => readReference(input),
   notion_create: (env, input, slack) => executeNotionCreate(env, input, slack),
@@ -84,6 +87,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   github_issue_create: (env, input, slack) => executeGithubIssueCreate(env, input, slack),
   github_issue_update: (env, input, slack) => executeGithubIssueUpdate(env, input, slack),
   github_workflow_run: (env, input, slack) => executeGithubWorkflowRun(env, input, slack),
+  sweep_share_post: (env, input) => executeSweepSharePost(env, input),
   // `control`, and so the one row whose body is never reached: the loop
   // intercepts `proposal_resolve` and validates it against the standing card
   // before any dispatch. The row still carries a body because the pairing is

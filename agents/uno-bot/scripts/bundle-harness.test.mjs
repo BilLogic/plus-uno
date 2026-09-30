@@ -521,11 +521,17 @@ test("the companion carries each disclosed reference verbatim, after the prompt"
 test("the census names the disclosed count beside the bundled and ide-only ones", () => {
   // The expected count is read off the docs themselves, so a method moving in
   // or out of the map (#423 moved one, #424 four more) changes this test's
-  // expectation and the bundler's answer together.
-  const disclosedOnDisk = readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
+  // expectation and the bundler's answer together. A connector doc can be
+  // disclosed too (the sweep's rules are), so the docs roots are read as well.
+  const disclosed = (abs) => existsSync(abs) && /^disclosure:\s*reference$/m.test(readFileSync(abs, "utf8"));
+  const methods = readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
     .filter((d) => d.isDirectory() && d.name.startsWith("uno-"))
     .map((d) => path.join(repoRoot, "skills", d.name, "references", "method.md"))
-    .filter((abs) => existsSync(abs) && /^disclosure:\s*reference$/m.test(readFileSync(abs, "utf8"))).length;
+    .filter(disclosed).length;
+  const docs = ["docs/connectors", "docs/engineering", "docs/conventions"]
+    .flatMap((root) => Object.keys(treeSnapshot(repoRoot, root)))
+    .filter((rel) => rel.endsWith(".md") && disclosed(path.join(repoRoot, rel))).length;
+  const disclosedOnDisk = methods + docs;
   assert.ok(disclosedOnDisk >= 1, "expected at least one disclosed method on disk");
   const result = runBundler(["--check"]);
   assert.equal(result.code, 0, result.out);

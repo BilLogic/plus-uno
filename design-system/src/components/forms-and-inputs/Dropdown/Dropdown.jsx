@@ -1,6 +1,53 @@
-import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import './Dropdown.scss';
+
+/** What in a custom toggle can take focus back after Escape. */
+const FOCUSABLE = [
+    'button:not([disabled])',
+    'a[href]',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
+/**
+ * Where Escape asked focus to go, held until the menu has really closed, and
+ * the one owner of the rule for forgetting it. Focus moves once the menu has
+ * closed, not when Escape asks, because a caller that controls `isOpen` may
+ * refuse. A refused Escape is then forgotten, so a close much later (the
+ * caller changing `isOpen` itself) never pulls focus back to the toggle. It is
+ * forgotten on any render where the menu is still open (here), and by the
+ * caller of `clear`: on any open or close request, on the next key, and when
+ * focus moves to another element. `take` hands it over once, on close.
+ */
+const usePendingEscapeFocus = (show) => {
+    const pending = useRef(null);
+    useLayoutEffect(() => {
+        if (show) pending.current = null;
+    });
+    return useMemo(() => ({
+        set: (target) => { pending.current = target; },
+        clear: () => { pending.current = null; },
+        take: () => {
+            const target = pending.current;
+            pending.current = null;
+            return target;
+        },
+    }), []);
+};
+
+/**
+ * The check in a checked multi-select box, drawn as Figma's `_Form Checkbox
+ * Button` draws it (its vector, on the box's 12px grid). It takes its color
+ * from the box (`currentColor`).
+ */
+const CheckGlyph = () => (
+    <svg viewBox="0 0 12 12" focusable="false">
+        <path d="M2.29 6.62 3.53 5.38 6 7.86 4.76 9.09Z M8.48 2.91 9.71 4.14 6 7.86 4.76 6.62Z" />
+    </svg>
+);
 
 const Dropdown = ({
     id,
@@ -20,6 +67,11 @@ const Dropdown = ({
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const menuRef = useRef(null);
+    // Where Escape sends focus back to: the built-in toggle, the control in a
+    // custom one, or whatever had focus when the menu opened.
+    const toggleRef = useRef(null);
+    const customToggleRef = useRef(null);
+    const openerRef = useRef(null);
     // Viewport-aware placement: the menu flips up when there isn't room below, and right-aligns
     // when a left-aligned menu would spill off the right edge. Only the default vertical dropdown
     // is auto-placed; an explicit `direction` of dropup/dropleft/dropright is honored as authored.
@@ -28,6 +80,7 @@ const Dropdown = ({
     // Determine if controlled or uncontrolled
     const isControlled = controlledIsOpen !== undefined;
     const show = isControlled ? controlledIsOpen : internalIsOpen;
+    const escapeFocus = usePendingEscapeFocus(show);
 
     /**
      * Every open/close goes through here (#207). Before it existed, a caller
@@ -38,6 +91,8 @@ const Dropdown = ({
      * is what makes the controlled half usable.
      */
     const setOpen = (next) => {
+        // Any open or close supersedes an Escape still waiting to land.
+        escapeFocus.clear();
         if (!isControlled) {
             setInternalIsOpen(next);
         }
@@ -50,6 +105,53 @@ const Dropdown = ({
 
     const closeDropdown = () => {
         if (show) setOpen(false);
+    };
+
+    /*
+     * Escape closes an open menu and puts focus back on the toggle, so a
+     * keyboard user who tabbed into the items is not left inside a menu that
+     * has gone. The toggle is the built-in toggle button (the caret half of a
+     * split button, whichever side it sits on), or the control a custom
+     * `toggle` renders. A custom toggle with nothing focusable in it (a plain
+     * `span`) sends focus back to whatever had it when the menu opened, if
+     * that is still on the page; otherwise focus is left alone. It is never
+     * moved to the page itself.
+     *
+     * Escape stops here: an enclosing Modal or panel does not also close on
+     * the key that closed this menu. Focus moves once the menu has closed
+     * (see `usePendingEscapeFocus`).
+     */
+    const handleKeyDown = (event) => {
+        if (event.key !== 'Escape') {
+            // Any other key after a refused Escape is the person moving on.
+            escapeFocus.clear();
+            return;
+        }
+        if (!show) return;
+        event.stopPropagation();
+        const custom = customToggleRef.current;
+        const opener = openerRef.current;
+        const target = toggleRef.current
+            || custom?.querySelector(FOCUSABLE)
+            || (opener && opener.isConnected && opener !== document.body ? opener : null);
+        closeDropdown();
+        escapeFocus.set(target);
+    };
+
+    // Opening records what had focus, however it was opened (the toggle, or a
+    // caller that controls `isOpen`). Closing after an Escape moves focus.
+    useLayoutEffect(() => {
+        if (show) {
+            openerRef.current = document.activeElement;
+            return;
+        }
+        escapeFocus.take()?.focus();
+    }, [show, escapeFocus]);
+
+    const handleBlur = (event) => {
+        // A focused item that is hidden has no next element; that is the
+        // menu closing, not the person moving on.
+        if (event.relatedTarget) escapeFocus.clear();
     };
 
     useEffect(() => {
@@ -155,6 +257,7 @@ const Dropdown = ({
              * only reads as anything when `buttonText` is a string.
              */
             <button
+                ref={toggleRef}
                 type="button"
                 className={toggleClasses}
                 onClick={toggleDropdown}
@@ -174,7 +277,7 @@ const Dropdown = ({
     );
 
     return (
-        <div id={id} className={wrapperClasses} ref={dropdownRef}>
+        <div id={id} className={wrapperClasses} ref={dropdownRef} onKeyDown={handleKeyDown} onBlur={handleBlur}>
             {split ? (
                 direction === 'dropleft' ? (
                     <>
@@ -189,7 +292,7 @@ const Dropdown = ({
                 )
             ) : (
                 toggle ? (
-                    <div onClick={toggleDropdown} className="d-inline-block" style={{ cursor: 'pointer' }}>
+                    <div ref={customToggleRef} onClick={toggleDropdown} className="d-inline-block" style={{ cursor: 'pointer' }}>
                         {toggle}
                     </div>
                 ) : (
@@ -205,63 +308,95 @@ const Dropdown = ({
                     ...(placement.horizontal === 'end' ? { left: 'auto', right: 0 } : null),
                 }}
             >
-                {items.map((item, index) => (
-                    <React.Fragment key={index}>
-                        <button
-                            type="button"
-                            className={`dropdown-item ${item.selected ? 'selected' : ''} ${item.disabled ? 'disabled' : ''} ${item.header ? 'dropdown-section-header' : ''}`}
-                            disabled={item.disabled}
-                            onClick={(e) => {
-                                if (item.onClick) item.onClick(e);
-                                if (!item.keepOpen) closeDropdown(); // Allow optional keepOpen for things like multi-select
-                            }}
-                        >
-                            <div className="dropdown-item-inner">
-                                {item.multiSelectCheckbox ? (
-                                    <i
-                                        className={
-                                            item.multiSelectChecked
-                                                ? 'fa-solid fa-square-check'
-                                                : 'fa-regular fa-square'
-                                        }
-                                        style={{
-                                            color: item.multiSelectChecked
-                                                ? 'var(--color-primary)'
-                                                : 'var(--color-on-surface-variant)',
-                                            flexShrink: 0,
-                                        }}
-                                        aria-hidden="true"
-                                    />
-                                ) : (
-                                    <i
-                                        className="fas fa-check selected-icon"
-                                        style={{ opacity: item.selected ? 1 : 0 }}
-                                        aria-hidden="true"
-                                    />
-                                )}
-
-                                {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
-
-                                <span className="pdropdown-item-text" style={{ flexGrow: 1, minWidth: 0 }}>
-                                    {item.text || item.label}
+                {items.map((item, index) => {
+                    const itemClasses = `dropdown-item ${item.selected ? 'selected' : ''} ${item.disabled ? 'disabled' : ''} ${item.header ? 'dropdown-section-header' : ''}`;
+                    const choose = (e) => {
+                        if (item.onClick) item.onClick(e);
+                        if (!item.keepOpen) closeDropdown(); // Allow optional keepOpen for things like multi-select
+                    };
+                    const inner = (
+                        <div className="dropdown-item-inner">
+                            {/*
+                              * The multi-select checkbox, Figma's `_Form
+                              * Checkbox Button`. Decorative: a toggle row says
+                              * whether it is on through `aria-pressed`. A row
+                              * without it has nothing before its leading icon
+                              * or words, so its words start at the padding.
+                              */}
+                            {item.multiSelectCheckbox && (
+                                <span
+                                    className={`pdropdown-checkbox${item.multiSelectChecked ? ' is-checked' : ''}`}
+                                    aria-hidden="true"
+                                >
+                                    {item.multiSelectChecked && <CheckGlyph />}
                                 </span>
+                            )}
 
-                                {item.trailingIcon && <i className={`fas fa-${item.trailingIcon}`}></i>}
+                            {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
 
-                                {item.counter !== undefined && (
-                                    <span className="pdropdown-counter">
-                                        {item.counter}
-                                    </span>
-                                )}
+                            <span className="pdropdown-item-text" style={{ flexGrow: 1, minWidth: 0 }}>
+                                {item.text || item.label}
+                            </span>
 
-                                {item.dropright && <i className="fas fa-caret-right"></i>}
-                            </div>
-                        </button>
-                        {item.divider && index < items.length - 1 && (
-                            <div className="pdropdown-divider"></div>
-                        )}
-                    </React.Fragment>
-                ))}
+                            {/* Decorative, like the leading icon: the text names the item. */}
+                            {item.trailingIcon && <i className={`fas fa-${item.trailingIcon}`} aria-hidden="true"></i>}
+
+                            {item.counter !== undefined && (
+                                <span className="pdropdown-counter">
+                                    {item.counter}
+                                </span>
+                            )}
+
+                            {item.dropright && <i className="fas fa-caret-right"></i>}
+                        </div>
+                    );
+                    /*
+                     * An item with `href` goes somewhere, so it is a link, not
+                     * a button that navigates: it opens in the same tab, as
+                     * Tag's link does, can be opened in a new one, and is
+                     * announced as a link. `linkComponent` is a
+                     * router's link, as Tag takes one.
+                     */
+                    const ItemLink = item.linkComponent || 'a';
+                    // An `isStatic` item only says its words: a row, not a
+                    // control, so nothing to press or focus, and a press on it
+                    // leaves the menu open.
+                    const renderControl = () => {
+                        if (item.isStatic) {
+                            return <div className={`${itemClasses} pdropdown-item-static`}>{inner}</div>;
+                        }
+                        if (item.href && !item.disabled) {
+                            return (
+                                <ItemLink className={itemClasses} href={item.href} onClick={choose}>
+                                    {inner}
+                                </ItemLink>
+                            );
+                        }
+                        return (
+                            <button
+                                type="button"
+                                className={itemClasses}
+                                disabled={item.disabled}
+                                // An `isToggle` item switches on and off in
+                                // place, so it says whether it is on.
+                                aria-pressed={item.isToggle ? Boolean(item.selected) : undefined}
+                                // `isBusy`: still working, so it says so.
+                                aria-busy={item.isBusy ? 'true' : undefined}
+                                onClick={choose}
+                            >
+                                {inner}
+                            </button>
+                        );
+                    };
+                    return (
+                        <React.Fragment key={index}>
+                            {renderControl()}
+                            {item.divider && index < items.length - 1 && (
+                                <div className="pdropdown-divider"></div>
+                            )}
+                        </React.Fragment>
+                    );
+                })}
             </div>
         </div>
     );
@@ -274,6 +409,7 @@ Dropdown.propTypes = {
     buttonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** The toggle's accessible name. Needed whenever `buttonText` is an icon. */
     ariaLabel: PropTypes.string,
+    /** The menu's items, in order: a button each by default, or a link (`href`), an on/off toggle (`isToggle`), a static row (`isStatic`) or a header. */
     items: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string,
         label: PropTypes.string,
@@ -287,7 +423,19 @@ Dropdown.propTypes = {
         counter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         dropright: PropTypes.bool,
         divider: PropTypes.bool,
-        onClick: PropTypes.func
+        onClick: PropTypes.func,
+        /** Keeps the menu open after the item is chosen. */
+        keepOpen: PropTypes.bool,
+        /** Makes the item a link to this address rather than a button. */
+        href: PropTypes.string,
+        /** Router link to render instead of `<a>` for an item with `href`. */
+        linkComponent: PropTypes.elementType,
+        /** A row that only says its words: not a control, not focusable, never closes the menu. */
+        isStatic: PropTypes.bool,
+        /** Still working: published as `aria-busy`. Pair it with `disabled`. */
+        isBusy: PropTypes.bool,
+        /** An on/off item: it publishes `selected` as `aria-pressed`. */
+        isToggle: PropTypes.bool
     })),
     size: PropTypes.oneOf(['small', 'default', 'large']),
     style: PropTypes.oneOf(['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default']),

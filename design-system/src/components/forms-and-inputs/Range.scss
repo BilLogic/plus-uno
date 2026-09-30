@@ -105,12 +105,12 @@
     // Hover state
     &:hover {
         &::-webkit-slider-thumb {
-            background: var(--color-primary-state-12, var(--color-primary));
+            background: var(--color-primary-state-12, rgba(4, 114, 168, 0.12));
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
         
         &::-moz-range-thumb {
-            background: var(--color-primary-state-12, var(--color-primary));
+            background: var(--color-primary-state-12, rgba(4, 114, 168, 0.12));
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
     }
@@ -131,12 +131,12 @@
     // Active/dragging state
     &:active {
         &::-webkit-slider-thumb {
-            background: var(--color-primary-state-16, var(--color-primary));
+            background: var(--color-primary-state-16, rgba(4, 114, 168, 0.16));
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         }
         
         &::-moz-range-thumb {
-            background: var(--color-primary-state-16, var(--color-primary));
+            background: var(--color-primary-state-16, rgba(4, 114, 168, 0.16));
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         }
     }

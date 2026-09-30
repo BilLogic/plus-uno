@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect, spyOn } from 'storybook/test';
+import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Divider from '@/components/layout-and-structure/Divider';
 
@@ -7,6 +9,11 @@ export default {
     component: Divider,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'changed', summary: '`xl` is 3px instead of 2.5px: `--size-element-stroke-xl` now resolves to stroke-300, as Figma\'s Element/stroke-xl does.' },
+            { date: '2026-09-29', kind: 'changed', summary: '`size="2.5px"` now draws 3px: the alias still maps to `xl`.' },
+            { date: '2026-09-29', kind: 'deprecated', summary: '`size="2.5px"` was deprecated in favor of `size="xl"`; it still draws 3px.' },
+        ],
         docs: {
             description: {
                 component: 'Divider component for visually separating content sections. Supports different thicknesses and styles.'
@@ -21,7 +28,6 @@ export default {
         size: {
             control: 'select',
             options: ['sm', 'md', 'lg', 'xl'],
-            description: 'Divider thickness',
             table: { category: 'Design' }
         },
         opacity10: {
@@ -57,24 +63,24 @@ function DividerSizesDemos() {
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
-                Dividers come in four thicknesses: sm (1px), md (1.5px), lg (2px), and xl (2.5px).
+                Dividers come in four thicknesses: sm (1px), md (1.5px), lg (2px), and xl (3px).
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 <div>
                     <span className="plus-label" style={{ fontSize: '12px', marginBottom: '8px', display: 'block' }}>Small (sm)</span>
-                    <Divider size="sm" />
+                    <Divider size="sm" id="divider-size-sm" />
                 </div>
                 <div>
                     <span className="plus-label" style={{ fontSize: '12px', marginBottom: '8px', display: 'block' }}>Medium (md) - Default</span>
-                    <Divider size="md" />
+                    <Divider size="md" id="divider-size-md" />
                 </div>
                 <div>
                     <span className="plus-label" style={{ fontSize: '12px', marginBottom: '8px', display: 'block' }}>Large (lg)</span>
-                    <Divider size="lg" />
+                    <Divider size="lg" id="divider-size-lg" />
                 </div>
                 <div>
                     <span className="plus-label" style={{ fontSize: '12px', marginBottom: '8px', display: 'block' }}>Extra Large (xl)</span>
-                    <Divider size="xl" />
+                    <Divider size="xl" id="divider-size-xl" />
                 </div>
             </div>
         </section>
@@ -157,6 +163,45 @@ export const Sizes = () => (
         <DividerSizesDemos />
     </div>
 );
+
+/** Each size draws its line at its Element stroke token: 1, 1.5, 2 and 3px. */
+Sizes.play = async ({ canvasElement }) => {
+    const expected = { sm: 1, md: 1.5, lg: 2, xl: 3 };
+    for (const [size, height] of Object.entries(expected)) {
+        const line = canvasElement.querySelector(`#divider-size-${size} .plus-divider-line`);
+        const drawn = px(getComputedStyle(line).height);
+        await expect(drawn, `${size}: line is ${height}px`).toBe(height);
+        await expect(drawn, `${size}: line is the stroke-${size} token`)
+            .toBe(tokenLength(canvasElement, `--size-element-stroke-${size}`));
+    }
+};
+
+/**
+ * The old `size="2.5px"` alias keeps working and draws `xl` (3px), but its name
+ * no longer says what it draws, so development says to use `size="xl"`.
+ * Production stays quiet.
+ */
+export const DeprecatedSize = {
+    render: () => (
+        <div style={dividerCol}>
+            <Divider size="2.5px" id="divider-deprecated" />
+        </div>
+    ),
+    // The spy goes in before the story renders, so the render's warning is caught.
+    beforeEach: () => {
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        return () => warn.mockRestore();
+    },
+    play: async ({ canvasElement }) => {
+        const line = canvasElement.querySelector('#divider-deprecated .plus-divider-line');
+        const drawn = px(getComputedStyle(line).height);
+        await expect(drawn, '2.5px draws 3px').toBe(3);
+        await expect(drawn, '2.5px draws the stroke-xl token')
+            .toBe(tokenLength(canvasElement, '--size-element-stroke-xl'));
+        await expect(console.warn, 'development names the replacement')
+            .toHaveBeenCalledWith(expect.stringContaining('size="2.5px" is deprecated; use size="xl"'));
+    },
+};
 
 export const Styles = () => (
     <div style={dividerCol}>

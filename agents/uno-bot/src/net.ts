@@ -10,6 +10,11 @@
 // a 1,000 cap — see charge() below. They are tracked, not counted against the
 // 50, because mixing the two made the gate refuse lookups the turn could afford.
 //
+// D1 has a cap of its own ON TOP of that: 50 queries per invocation on the Free
+// plan (Cloudflare changelog 2026-02-11), separate from both buckets. A D1 query
+// is charged to the internal bucket like any Cloudflare-service call AND counted
+// against `D1_QUERY_CAP` — see chargeD1Query() below.
+//
 // The counter lives in AsyncLocalStorage, so it is per-invocation without every
 // integration having to thread a context object through its signature. Metered
 // entry points are the Worker fetch handler (index.ts, which covers the Slack
@@ -17,6 +22,7 @@
 // agent turn, and the cron. Outside one — a direct integration call from a test
 // — countedFetch is a plain fetch and the counters stay at zero.
 import { AsyncLocalStorage } from "node:async_hooks";
+import { SUBREQUEST_CAP } from "./agent/loop-policy";
 
 interface Meter {
   /** EXTERNAL subrequests — the ones capped at 50. */
@@ -32,6 +38,8 @@ interface Meter {
    */
   internal: number;
   internalByLabel: Record<string, number>;
+  /** D1 queries — also in `internal`, and capped on their own at D1_QUERY_CAP. */
+  d1: number;
   /** When set, countedFetch refuses the call that would cross it. */
   limit?: number;
   /**
@@ -133,7 +141,10 @@ export async function withSubrequestLimit<T>(limit: number, fn: () => Promise<T>
  * @param fn - The invocation body
  */
 export function runMetered<T>(fn: () => Promise<T>): Promise<T> {
-  return meterStore.run({ count: 0, byHost: {}, internal: 0, internalByLabel: {}, trips: 0 }, fn);
+  return meterStore.run(
+    { count: 0, byHost: {}, internal: 0, internalByLabel: {}, d1: 0, trips: 0 },
+    fn,
+  );
 }
 
 /** Subrequests spent so far in this invocation (0 outside a metered context). */
@@ -162,9 +173,86 @@ export function charge(n: number, label: string): void {
   m.internalByLabel[label] = (m.internalByLabel[label] ?? 0) + n;
 }
 
+/**
+ * D1 queries allowed per invocation — below the Free plan's 50, so the query
+ * the meter refuses is ours to handle rather than the runtime's to kill.
+ *
+ * The headroom is for what the meter cannot see: a query issued outside a
+ * metered context still spends the runtime's 50.
+ */
+export const D1_QUERY_CAP = 40;
+
+/**
+ * Thrown by chargeD1Query when the next query would cross `D1_QUERY_CAP`.
+ *
+ * A SUBCLASS of the subrequest stop, on purpose: every handler that already
+ * tells a budget stop from an upstream failure (`isSubrequestBudgetError`,
+ * `rethrowIfBudget`) treats a D1 refusal the same way, so running out of queries
+ * can never be read as "there is nothing there".
+ */
+export class D1QueryBudgetError extends SubrequestBudgetError {
+  constructor(cap: number) {
+    super(cap);
+    this.message = `D1 query budget exhausted (cap ${cap})`;
+    this.name = "D1QueryBudgetError";
+  }
+}
+
+/**
+ * Charge one D1 query, or refuse it. Call it BEFORE the query, once per
+ * statement sent — a `batch()` counts as one call here until measured
+ * otherwise.
+ *
+ * Counts toward the internal bucket under the `d1` label, so the scheduled
+ * run's dry run and the `[budget]` line both see it, and toward the D1 cap.
+ *
+ * @throws D1QueryBudgetError when this invocation has already spent the cap
+ */
+export function chargeD1Query(): void {
+  const m = meterStore.getStore();
+  if (!m) return;
+  if (m.d1 >= D1_QUERY_CAP) {
+    m.trips += 1;
+    throw new D1QueryBudgetError(D1_QUERY_CAP);
+  }
+  m.d1 += 1;
+  charge(1, "d1");
+}
+
+/** D1 queries spent so far this invocation (0 outside a metered context). */
+export function d1QueriesUsed(): number {
+  return meterStore.getStore()?.d1 ?? 0;
+}
+
+/**
+ * What is left before a call is refused: external subrequests under the active
+ * limit (the free-plan cap when none is set), and D1 queries under
+ * `D1_QUERY_CAP`. Unbounded outside a metered context. For a step that must
+ * not start unless it can finish — the sweep's post-then-stage.
+ */
+export function budgetHeadroom(): { subrequests: number; d1Queries: number } {
+  const m = meterStore.getStore();
+  if (!m) return { subrequests: Infinity, d1Queries: Infinity };
+  return { subrequests: (m.limit ?? SUBREQUEST_CAP) - m.count, d1Queries: D1_QUERY_CAP - m.d1 };
+}
+
 /** Internal (Cloudflare-service) subrequests spent so far this invocation. */
 export function internalSubrequestsUsed(): number {
   return meterStore.getStore()?.internal ?? 0;
+}
+
+/**
+ * Internal subrequests spent so far this invocation under one `charge` label.
+ * 0 when nothing carried the label, including outside a meter.
+ *
+ * D1 queries are Cloudflare-service calls like any other, and `/debug/sweep`
+ * reports a job's D1 count as its `"d1"` charges — so a D1 call site charges
+ * `charge(1, "d1")` per query, or the sweep reads 0 for it.
+ *
+ * @param label - The label `charge` was given
+ */
+export function internalSubrequestsFor(label: string): number {
+  return meterStore.getStore()?.internalByLabel[label] ?? 0;
 }
 
 /** Compact breakdown, e.g. `api.notion.com:7 slack.com:4 | internal do:2 kv:1`. */

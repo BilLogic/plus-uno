@@ -20,6 +20,9 @@ export interface SlackContext {
   batched?: boolean;
   userMsgTs: string;
   requestedBy?: string;
+  /** Slack's kind of conversation for the turn, when known — `channel`,
+   *  `group`, `mpim` or `im` (`turn/request.ts` § `conversationTypeOf`). */
+  conversationType?: string;
   /** Slack's per-event action token, forwarded from the triggering message.
    *  assistant.search.context requires it for BOT-token calls, which is why a
    *  bot-token search cannot run outside an event-driven turn (no cron, no
@@ -44,11 +47,15 @@ export interface Env {
    *  `integrations/repo-list.mjs`. Unset → `GITHUB_REPO` alone. */
   GITHUB_REPOS?: string;
   FIGMA_ACCESS_TOKEN: string;
-  // Figma library poll (figma-poll.ts, cron-fired). Both optional — unset →
-  // the poll logs a skip and does nothing. FIGMA_FILE_KEY is the DS file
-  // (non-secret: it's in every shared Figma URL); UNO_BOT_CHANNEL_ID is where
-  // the "🎨 Figma Design System Updated" card lands (#uno-bot).
+  // Figma library jobs (figma-poll.ts at end of day, figma-library/ in the
+  // morning). Both optional — unset → the job logs a skip and does nothing.
+  // FIGMA_FILE_KEY is the DS file (non-secret: it's in every shared Figma URL);
+  // PLUS_UNIVERSAL_CHANNEL_ID is #plus-universal, where a publish's card lands
+  // and whose members may confirm it.
   FIGMA_FILE_KEY?: string;
+  PLUS_UNIVERSAL_CHANNEL_ID?: string;
+  /** #uno-bot, the intake channel (`turn/intake-channel.ts`): a top-level post
+   *  there engages with no @mention. Unset → there is no intake channel. */
   UNO_BOT_CHANNEL_ID?: string;
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
@@ -79,6 +86,9 @@ export interface Env {
   // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
   // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;
+  /** The channels the end-of-day sweep reads, comma-separated ids
+   *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
+  SWEEP_CHANNELS?: string;
   // #plus-design-feedback — shareout_post posts feedback bundles here (distinct
   // from the reviews channel above). Optional — unset → shareout_post falls back
   // to the origin thread.
@@ -141,6 +151,16 @@ export interface Env {
   GEMINI_GRIND_MODEL?: string;
 
   HARNESS_KV?: KVNamespace;
+  /** The `uno-bot-usage` D1 database: one row per turn (src/usage/, ADR-030).
+   *  Optional — unbound, turns are answered as before and recorded nowhere. */
+  USAGE_DB?: D1Database;
+  /** Comma-separated channel ids whose turns are test traffic on the usage
+   *  record — #uno-bot-sandbox. */
+  TEST_CHANNEL_IDS?: string;
+  /** Slack user id of the lead: whose thread replies, and DMs from an asker,
+   *  count as an ask escalated (src/usage/resolution.ts). Their own connected
+   *  token reads the DM half (ADR-020). */
+  LEAD_USER_ID?: string;
   /** "on" enables chat.startStream, on every surface. Shipped off, and the
    *  reason is `wrangler.toml`'s — not the one that used to stand here.
    *  This comment read `invalid_arguments` "even with thread_ts +

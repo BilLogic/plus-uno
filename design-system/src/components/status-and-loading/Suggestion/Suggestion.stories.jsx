@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Tag from '../Tag';
+import Tag, { TagContext } from '../Tag';
 import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
 
@@ -29,6 +29,9 @@ export default {
     title: 'Components/Status and loading/Suggestion',
     component: Suggestion,
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'added', summary: 'Suggestion carried a public `Suggestion.isSuggestion` marker that TagGroup used to keep it out of `+n` and at the end of the row, a wrapper had to copy it, and a disabled TagGroup disabled the Suggestions in it.' },
+        ],
         docs: {
             description: {
                 component:
@@ -236,6 +239,86 @@ FocusRing.play = async ({ canvasElement }) => {
         await expect(s.borderTopStyle).toBe('dashed');
         await expect(s.backgroundColor).toBe(CLEAR);
     }
+};
+
+/**
+ * Disabled, beside disabled Tags, from the field's `TagContext` only. Its
+ * ground and words are asserted equal to the disabled Tag's, because the two
+ * stylesheets each name the pair. There is no `disabled` prop, so a stray one
+ * outside a disabled field changes nothing.
+ */
+const onStray = fn();
+
+export const DisabledBesideTags = {
+    args: { onAccept: fn() },
+    render: ({ onAccept }) => (
+        <div style={row}>
+            <button type="button">Before</button>
+            <TagContext.Provider value={{ isDisabled: true }}>
+                <Tag color="blue" data-testid="tag">Algebra</Tag>
+                <Tag behavior="removable" color="blue" onRemove={() => {}}>Advocacy</Tag>
+                <Suggestion label="Relationships" onAccept={onAccept} />
+                <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
+            </TagContext.Provider>
+            <button type="button">After</button>
+            <Suggestion label="Fractions" disabled onAccept={onStray} />
+        </div>
+    ),
+};
+
+DisabledBesideTags.play = async ({ canvasElement, args }) => {
+    onStray.mockClear();
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const fill = t('--color-on-surface-state-12');
+    const edge = t('--color-outline-variant');
+    const ink = t('--color-secondary-text');
+    const tag = canvas.getByTestId('tag');
+
+    const names = ['Add Relationships, suggested', 'Summarize, suggested'];
+    for (const name of names) {
+        // The name is unchanged, and the disabled state reaches assistive tech.
+        const el = canvas.getByRole('button', { name });
+        await expect(el, name).toBeDisabled();
+
+        const s = getComputedStyle(el);
+        await expect(s.backgroundColor, `${name}: on-surface 12`).toBe(fill);
+        await expect(s.backgroundColor, `${name}: the disabled Tag's ground`)
+            .toBe(getComputedStyle(tag).backgroundColor);
+        await expect(s.borderTopStyle, `${name}: still dashed`).toBe('dashed');
+        await expect(s.borderTopColor, `${name}: Outline Variant edge`).toBe(edge);
+        await expect(s.color, `${name}: Secondary (Text) words`).toBe(ink);
+        await expect(s.color, `${name}: the disabled Tag's words`)
+            .toBe(getComputedStyle(tag).color);
+        await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and glyph`).toBe(ink);
+        await expect(px(s.height), `${name}: the box does not move`).toBe(22);
+
+        // No hover or press: the ground never changes under a pointer.
+        await expect(whileForced(el, ':hover', 'backgroundColor'), `${name}: no hover`).toBe(fill);
+        await expect(whileForced(el, ':active', 'backgroundColor'), `${name}: no press`).toBe(fill);
+    }
+
+    // Not focusable: Tab goes straight past every disabled tag and suggestion.
+    canvas.getByRole('button', { name: 'Before' }).focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'After' })).toHaveFocus();
+
+    // Never accepted: a click on a disabled button does not reach `onAccept`.
+    // (Tab never reaches it, so there is no keyboard press to test.)
+    for (const name of names) {
+        await userEvent.click(canvas.getByRole('button', { name }), { pointerEventsCheck: 0 });
+    }
+    await expect(args.onAccept).not.toHaveBeenCalled();
+
+    // A stray `disabled` outside a disabled field is not a prop: the
+    // suggestion stays live, takes focus and is accepted.
+    const stray = canvas.getByRole('button', { name: 'Add Fractions, suggested' });
+    await expect(stray).toBeEnabled();
+    canvas.getByRole('button', { name: 'After' }).focus();
+    await userEvent.tab();
+    await expect(stray).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(onStray).toHaveBeenCalledWith('Fractions', expect.anything());
 };
 
 /**

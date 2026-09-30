@@ -1,8 +1,74 @@
 ---
-summary: The bot's semantic-retrieval schema — semanticsearch (corpuschunks, blueprintchunkssrc, matchcorpuschunks) — used to be authored here as 0001..0004 and hand-applied to the hosted p
+summary: The Worker's own database migrations — the uno-bot-usage D1 schema under usage/ and how to apply it — and why the blueprint's retrieval schema is not here.
 ---
 
-# There are no migrations here. The DDL lives in the app repo.
+# Migrations
+
+One schema lives here: the **usage record**, the `uno-bot-usage` D1 database
+bound as `USAGE_DB` (`agents/uno-bot/src/usage/`, ADR-030). The end-of-day sweep's cursors,
+runs and items share it (`0002_sweep.sql`, `agents/uno-bot/src/sweep/store.ts`), and so do
+commitment reminders (`0006_commitments.sql`, `0007_commitment_answers.sql`, `0008_self_reminders.sql`, `agents/uno-bot/src/commitments/store.ts`), with card follow-ups in the same table since `0009_card_follow_ups.sql` and the DM sweep's asks since `0010_dm_sources.sql`, which also flags a DM's sweep items (`surface`). 0007's
+note that group DMs and DMs keep no commitments holds only for thread promises:
+since 0008 a self-reminder asked for in a DM or group DM is kept, and posted
+back only there. DM watch keeps its Home-tab switches and the promises read
+in a person's own DMs, and how far each DM was read, in three tables of its own (`0011_dm_watch.sql`,
+`agents/uno-bot/src/dm-watch/store.ts`): a row there holds a permalink, which
+that ticket allows, and no summary and no id of the other person. The bot's
+semantic-retrieval schema does **not** — see the second half.
+
+## The usage database (`usage/`)
+
+`usage/` is the D1 binding's `migrations_dir` in `wrangler.toml`. Files are
+numbered `NNNN_name.sql` and applied in order; D1 records which have run in its
+own `d1_migrations` table.
+
+**Apply them** from `agents/uno-bot/`:
+
+```bash
+# a local database, for `wrangler dev`
+npx wrangler d1 migrations apply uno-bot-usage --local
+
+# the deployed one — after the migration has merged to main
+npx wrangler d1 migrations list  uno-bot-usage --remote   # what has not run yet
+npx wrangler d1 migrations apply uno-bot-usage --remote
+```
+
+Apply a new migration to the remote database **before** deploying code that
+writes its columns: a Worker writing a column the table lacks loses every record
+until the migration runs (the turn itself is unaffected — a failed write is
+logged and dropped). A deploy with no pending migration needs no step.
+
+**Rules for a new one:**
+
+- Never edit a migration that has run anywhere. Add the next number.
+- Additive only: new tables, new nullable columns, new indexes. Widening a
+  CHECK is the exception: SQLite can only do it by rebuilding the table with
+  every column, index and row carried over as it is (`0008_self_reminders.sql`,
+  `0009_card_follow_ups.sql`, which adds a nullable column in the same
+  rebuild, and `0010_dm_sources.sql`). A column the
+  Worker writes is also mapped in its table's adapter — `agents/uno-bot/src/usage/d1.ts`
+  for `turns`, `proposal-events-d1.ts` for `proposal_events` — the one place per
+  table where record fields become SQL columns; the columns only the classifier
+  writes (the categories, the attempt count, the text purge) are mapped in
+  `agents/uno-bot/src/usage/category-store.ts`, the resolution columns written
+  after the turn in `agents/uno-bot/src/usage/resolution-d1.ts`, and a ticket
+  filed from a card's reaction or button onto its staging turn by
+  `proposal-events-d1.ts`. The sweep's tables are mapped in
+  `agents/uno-bot/src/sweep/d1.ts`, `commitments` in
+  `agents/uno-bot/src/commitments/d1.ts`, and DM watch's three in
+  `agents/uno-bot/src/dm-watch/d1.ts`.
+- Bound parameters in the Worker, always; nothing is assembled into SQL from a
+  value.
+- What the database never stores — message text past classification, any DM
+  text (a DM ask keeps only its category labels), secrets — is ADR-030's, and a
+  migration does not widen it.
+
+**Tested** by `npm run test:workerd`: the UsageLog, ProposalEventLog, sweep
+records and commitment records conformance suites apply every file here to a local D1 before they
+run, so a migration that fails to apply, or a column an adapter names and the
+schema lacks, fails there.
+
+## The retrieval schema is in the app repo
 
 The bot's semantic-retrieval schema — `semantic_search` (`corpus_chunks`,
 `blueprint_chunks_src`, `match_corpus_chunks`) — used to be authored here as
@@ -14,7 +80,7 @@ The definition now lives, once, in the repo that owns the database:
       20260817000000_semantic_search_blueprint_chunks_phase.sql
                                                     -- current blueprint_chunks_src
 
-## Why it moved
+### Why it moved
 
 `uno-blueprint` owns the Supabase project, and `supabase db reset` there
 replays **only** that repo's `supabase/migrations/`. A copy living here was not
@@ -27,7 +93,7 @@ The bot is a **consumer** of that schema, not its author. It calls
 `semantic_search.match_corpus_chunks` and reads the breadcrumb shape the view
 emits; it does not define either.
 
-## How to change the retrieval schema
+### How to change the retrieval schema
 
 1. Open a PR in `uno-blueprint` adding a new, properly-timestamped migration
    under `supabase/migrations/`. Never rewrite an already-applied one.

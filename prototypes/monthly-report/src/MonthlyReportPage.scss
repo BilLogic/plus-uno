@@ -359,11 +359,6 @@
     margin-bottom: 0 !important;
 }
 
-.insight-alert-icon {
-    margin-right: var(--size-element-gap-sm);
-    font-size: 20px;
-}
-
 /* ============================================
    TIME ALLOCATION SECTION
    ============================================ */
@@ -1253,16 +1248,22 @@
     flex-wrap: nowrap;
 }
 
+/*
+ * Alert has no tertiary style, so a tertiary insight supplies the ground and
+ * the Border role here. The shape (a 3px left border) and the on-surface text
+ * come from Alert itself, as they do for the warning and success insights.
+ */
 .insight-alert {
-    background: var(--color-tertiary-state-08, rgba(14, 129, 117, 0.08));
-    color: var(--color-on-tertiary-container, var(--color-on-surface));
-    border: none;
-    border-left: 4px solid var(--color-tertiary, #0e8175);
-    border-radius: 4px;
+    background: var(--color-tertiary-container-state-08);
+    border-color: var(--color-tertiary-border);
 }
 
+/*
+ * The tertiary Icon role on a tertiary insight's icon. A warning or success
+ * alert keeps its own style's Icon color and does not take this class.
+ */
 .insight-alert .insight-alert-icon {
-    color: var(--color-on-tertiary-container, var(--color-on-surface));
+    color: var(--color-tertiary-icon);
 }
 
 .training-grid {

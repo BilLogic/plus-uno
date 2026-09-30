@@ -455,19 +455,63 @@ function dedupe(list, key) {
  * The two ways to get there are an import, and an array whose contents this
  * regex mis-slices — a value containing a `]`, say — so both end at `null`.
  *
+ * EVERY ELEMENT OR NONE. Each element must be a string or number literal. A
+ * spread (`['plain', ...AVATAR_TAG_TYPES]`), an identifier or a template makes
+ * the whole array `null` rather than a list of the literals around it, which
+ * would document Tag's `type` as `plain` alone. Same-file spreads are not
+ * followed: `null` is the safe answer, and no enum needs them resolved yet.
+ * Numbers are listed as their source text (Tile's `size`: `16`, `20`, ...).
+ *
  * @param {string} source The component's source text.
  * @param {string} name The constant's identifier.
- * @returns {string[] | null} The string values, or `null` when it cannot be read here.
+ * @returns {string[] | null} The values, or `null` when it cannot be read here.
  */
 export function namedEnumValues(source, name) {
+  const literals = namedLiterals(source, name);
+  return literals && literals.map((l) => l.value);
+}
+
+/** `name`'s array as `{ value, numeric }` literals, or `null` as above. */
+function namedLiterals(source, name) {
   // `name` reaches here from a `[A-Za-z_$][\w$]*` match, so `$` is the one
   // regex metacharacter it can carry — and an unescaped `$` is an anchor, which
   // silently matches nothing.
   const escaped = name.replace(/\$/g, '\\$');
   const decl = new RegExp(`(?:export\\s+)?const\\s+${escaped}\\s*=\\s*\\[([^\\]]*)\\]`).exec(source);
   if (!decl) return null;
-  const values = [...decl[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((v) => v[1] ?? v[2]);
-  return values.length ? values : null;
+  const body = decl[1].replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+  const element = /\s*(?:'([^'\\]*)'|"([^"\\]*)"|(-?\d+(?:\.\d+)?))\s*(,|$)/y;
+  const literals = [];
+  let at = 0;
+  while (body.slice(at).trim()) {
+    element.lastIndex = at;
+    const m = element.exec(body);
+    if (!m) return null;
+    literals.push(m[3] !== undefined ? { value: m[3], numeric: true } : { value: m[1] ?? m[2], numeric: false });
+    at = element.lastIndex;
+    if (m[4] !== ',') break;
+  }
+  if (body.slice(at).trim()) return null;
+  return literals.length ? literals : null;
+}
+
+/**
+ * A propTypes type string with every `PropTypes.oneOf(NAME)` whose array this
+ * file declares written out inline: strings quoted, numbers bare. A name that
+ * cannot be read (`namedEnumValues` is `null`) is left as written.
+ *
+ * @param {string} type The prop's type expression.
+ * @param {string} source The component's source text.
+ * @returns {string}
+ */
+export function resolveNamedOneOf(type, source) {
+  return type.replace(/PropTypes\.oneOf\(\s*([A-Za-z_$][\w$]*)\s*\)/g, (all, name) => {
+    const literals = namedLiterals(source, name);
+    // A value holding a `'` would end the quoted form early; leave it unread.
+    if (!literals || literals.some((l) => l.value.includes("'"))) return all;
+    const inline = literals.map((l) => (l.numeric ? l.value : `'${l.value}'`));
+    return `PropTypes.oneOf([${inline.join(', ')}])`;
+  });
 }
 
 /** `<Name>.propTypes = { ... }` → [{ name, enumValues }]. */

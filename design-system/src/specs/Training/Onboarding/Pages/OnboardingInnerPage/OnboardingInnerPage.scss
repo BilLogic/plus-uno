@@ -44,7 +44,7 @@
     &__illustration-placeholder {
         position: absolute;
         inset: 0;
-        background-color: var(--color-tertiary-state-08, rgba(0, 128, 128, 0.08));
+        background-color: var(--color-tertiary-state-08, rgba(14, 129, 117, 0.08));
         border-radius: var(--size-element-radius-sm, 4px);
         opacity: 0.38;
     }
@@ -111,7 +111,7 @@
     &__scrim {
         position: absolute;
         inset: 0;
-        background-color: var(--color-scrim, rgba(0, 0, 0, 0.5));
+        background-color: var(--color-scrim, rgba(0, 0, 0, 0.32));
         display: flex;
         flex-direction: column;
         gap: 10px;

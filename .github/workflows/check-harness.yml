@@ -102,46 +102,39 @@ jobs:
       # The second scoped install (see the header). The three packages and
       # every package they depend on, each at the version package-lock.json
       # resolves, so nothing here is chosen by the registry on the day.
-      # `--ignore-scripts`, because none of them needs an install script. The
-      # link step refuses to replace anything already in `node_modules`: a
-      # name there is a package this job did not expect, and shadowing it
-      # would be a silent change of what the checks run against.
+      # `scripts/lock-closure.mjs` walks the lock the way npm resolves it —
+      # nested under the dependent, then up through each ancestor, then the
+      # top level — and refuses two versions of one name, since this install
+      # is flat. `--ignore-scripts`, because none of them needs an install
+      # script. The link step walks scoped packages as `@scope/name`, never
+      # as `@scope`, and refuses to replace anything already in
+      # `node_modules`: a name there is a package this job did not expect,
+      # and shadowing it would be a silent change of what the checks run
+      # against.
       - name: Install the stylesheet parser for the contrast checks
         run: |
-          pins=$(node -e "
-            const lock = require('./package-lock.json').packages;
-            const pinned = new Map();
-            const queue = ['postcss', 'postcss-scss', 'postcss-selector-parser'].map((name) => ['node_modules/' + name, name]);
-            while (queue.length) {
-              const [at, name] = queue.shift();
-              // A dependency resolves where npm would: nested under its parent
-              // first, then at the top level.
-              const key = [at, 'node_modules/' + name].find((k) => lock[k]);
-              if (!key) throw new Error(name + ' is not in package-lock.json');
-              const { version, dependencies = {} } = lock[key];
-              if (pinned.has(name)) {
-                if (pinned.get(name) !== version) throw new Error('two versions of ' + name + ' in the lock; this step installs one');
-                continue;
-              }
-              pinned.set(name, version);
-              queue.push(...Object.keys(dependencies).map((dep) => [key + '/node_modules/' + dep, dep]));
-            }
-            console.log([...pinned].map(([name, version]) => name + '@' + version).join(' '));
-          ")
+          pins=$(node scripts/lock-closure.mjs postcss postcss-scss postcss-selector-parser)
           echo "Pinned: $pins"
           npm install --prefix "$RUNNER_TEMP/grounds" --no-save --no-audit --no-fund --ignore-scripts $pins
           mkdir -p node_modules
           for dir in "$RUNNER_TEMP"/grounds/node_modules/*; do
-            name=$(basename "$dir")
-            case " $pins " in
-              *" $name@"*) ;;
-              *) echo "::error::$name was installed but is not one of the pinned packages: $pins"; exit 1 ;;
+            case "$(basename "$dir")" in
+              @*) set -- "$dir"/* ;;
+              *) set -- "$dir" ;;
             esac
-            if [ -e "node_modules/$name" ] || [ -L "node_modules/$name" ]; then
-              echo "::error::node_modules/$name already exists; refusing to replace it with the pinned $name"
-              exit 1
-            fi
-            ln -s "$dir" "node_modules/$name"
+            for pkg in "$@"; do
+              name=${pkg#"$RUNNER_TEMP/grounds/node_modules/"}
+              case " $pins " in
+                *" $name@"*) ;;
+                *) echo "::error::$name was installed but is not one of the pinned packages: $pins"; exit 1 ;;
+              esac
+              if [ -e "node_modules/$name" ] || [ -L "node_modules/$name" ]; then
+                echo "::error::node_modules/$name already exists; refusing to replace it with the pinned $name"
+                exit 1
+              fi
+              mkdir -p "$(dirname "node_modules/$name")"
+              ln -s "$pkg" "node_modules/$name"
+            done
           done
 
       # One command, one exit code. The composite names every sub-check that

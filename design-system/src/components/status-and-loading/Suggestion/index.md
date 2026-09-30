@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, AcceptIntoTags, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, DisabledBesideTags, AcceptIntoTags, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.mdx`
 
@@ -16,7 +16,7 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | string (required) | — | The proposed value's words. The accessible name is built from it. |
-| `type` | oneOf | `'insert'` | `insert` adds a value to the field; `prompt` sends or fills text. |
+| `type` | enum | `'insert'` | `insert` adds a value to the field; `prompt` sends or fills text. |
 | `value` | any | — | `insert` only: what `onAccept` receives. Defaults to `label`. |
 | `text` | string | — | `prompt` only: the text `onAccept` receives. Defaults to `label`. |
 | `onAccept` | func | — | Called with the value (insert) or the text (prompt), then the click event. |
@@ -24,9 +24,15 @@
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 
+## Variants
+
+**`type`** — `insert` · `prompt`
+
+Anything not listed is not a valid value.
+
 ## Tokens touched
 
-`--color-focus-ring` · `--color-mastering-content-border-subtle` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--font-size-fa-body2` · `--plus-suggestion-height` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg`
+`--color-focus-ring` · `--color-mastering-content-border-subtle` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--color-on-surface-state-12` · `--color-outline-variant` · `--color-secondary-text` · `--font-size-fa-body2` · `--plus-suggestion-height` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg`
 
 From `design-system/src/components/status-and-loading/Suggestion/Suggestion.scss`. Override these through the token layer, never with a literal.
 

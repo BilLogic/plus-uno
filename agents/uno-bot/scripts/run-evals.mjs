@@ -93,6 +93,7 @@ import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
 import { workerTransport } from "./eval-transport.mjs";
 import { localTransport } from "./eval-transport-local.mjs";
+import { readGithubIssue, seedWarnings } from "./eval-seed.mjs";
 import { describeTally, judgeFromEnv, judgeSkipped, judgeTally, noJudge } from "./eval-judge.mjs";
 
 const {
@@ -104,6 +105,7 @@ const {
 const PAUSE_BETWEEN_CASES_MS = 10_000; // stay clear of per-minute model quotas
 const TRANSIENT_RETRIES = 2; // extra attempts per turn on 429/quota/overload
 const TRANSIENT_BACKOFF_MS = 65_000; // sit out the per-minute quota window
+const SERVER_ERROR_BACKOFF_MS = 15_000; // one retry on an error page or a 5xx
 
 function required(name, v) {
   if (!v) {
@@ -119,18 +121,43 @@ function required(name, v) {
 // 429/quota/overload with a long backoff instead of failing the case (first
 // live run 2026-07-16: every case "failed" on a starved model quota), and that
 // is true of any transport that reaches a model.
+//
+// A SERVER ERROR is retried ONCE, after a short beat, and labelled. Live run
+// 36694075577 lost samples to Cloudflare's HTML error page and to an upstream
+// `gemini 502` the Worker reported in JSON — a moment's failure, not the bot's
+// answer, and not a quota either, so the long backoff does not fit it. Once and
+// not more: a turn that fails the same way twice is the Worker's state, and the
+// case should say so. The turn record carries `retriedAfter`, so a pass that
+// needed the retry does not read like a clean one.
 async function evalTurn(transport, req, { log, sleep }) {
+  let retriedAfter;
   for (let attempt = 0; ; attempt++) {
     const resp = await transport.runTurn(req).catch((err) => ({
       ok: false,
       error: String(err?.message ?? err),
     }));
     const msg = String(resp?.error ?? "");
-    const transient = /429|quota|exhaust|rate.?limit|overload|503|529/i.test(msg);
-    if (resp?.ok || !transient || attempt >= TRANSIENT_RETRIES) return resp;
+    if (resp?.ok) return { resp, retriedAfter };
+    if (!retriedAfter && isServerError(resp)) {
+      retriedAfter = msg;
+      log(`  … server error (${msg.slice(0, 100)}) — retrying once in ${SERVER_ERROR_BACKOFF_MS / 1000}s`);
+      await sleep(SERVER_ERROR_BACKOFF_MS);
+      continue;
+    }
+    // The quota words are the Worker's own reading of a model failure; a page
+    // that is not the envelope already had its one retry above.
+    const transient = !resp?.http?.nonJson && /429|quota|exhaust|rate.?limit|overload|503|529/i.test(msg);
+    if (!transient || attempt >= TRANSIENT_RETRIES) return { resp, retriedAfter };
     log(`  … transient model error (${msg.slice(0, 80)}) — retrying in ${TRANSIENT_BACKOFF_MS / 1000}s`);
     await sleep(TRANSIENT_BACKOFF_MS);
   }
+}
+
+/** A reply that is not the envelope, a 5xx status, or an upstream model's 5xx
+ *  the Worker reported in JSON (`agent: gemini 502: …`). */
+function isServerError(resp) {
+  if (resp?.http?.nonJson || resp?.http?.status >= 500) return true;
+  return /\b(gemini|claude|vertex)\b[^\n]*?\b5\d\d\b/i.test(String(resp?.error ?? ""));
 }
 
 // ── Deterministic checks ──────────────────────────────────────────────────────
@@ -337,7 +364,7 @@ export async function runEvals({
       const requestedBy = turn.requestedBy ?? c.requestedBy;
       if (channel) surface.channel = channel;
       if (requestedBy) surface.requestedBy = requestedBy;
-      const resp = await evalTurn(
+      const { resp, retriedAfter } = await evalTurn(
         transport,
         {
           prompt: turn.prompt,
@@ -350,11 +377,12 @@ export async function runEvals({
       // `sent` is the compact record of what this turn was handed — size and
       // reference receipts — so a reviewer can read the clearing case's
       // evidence off the transcript without the judge paying for the history.
-      transcript.turns.push({ prompt: turn.prompt, sent: sentSummary(history), response: resp });
+      transcript.turns.push({ prompt: turn.prompt, sent: sentSummary(history), response: resp, ...(retriedAfter ? { retriedAfter } : {}) });
       // Per-turn checks: turn-level spec if present, else the case-level spec on
       // the final turn only. `history` here is still what the route received.
       const spec = hasOwnSpec(turn) ? turn : (turn === c.turns[c.turns.length - 1] ? c : {});
-      failures.push(...checkTurn(spec, resp, history).map((f) => `${c.id}${c.turns.length > 1 ? ` t${transcript.turns.length}` : ""}: ${f}`));
+      const retried = (f) => (retriedAfter && f.startsWith("turn errored:") ? `${f} (retried once)` : f);
+      failures.push(...checkTurn(spec, resp, history).map((f) => `${c.id}${c.turns.length > 1 ? ` t${transcript.turns.length}` : ""}: ${retried(f)}`));
       // Thread state forward for multi-turn cases, the way production records
       // a turn: reply text or outcome marker, and the reference RECEIPT on the
       // user turn — never the reference text (eval-history.mjs).
@@ -517,6 +545,14 @@ async function main() {
   const transport = TRANSPORTS[opts.transport]();
   const judge = await judgeFromEnv();
   console.log(`[evals] judge ${judge.name}`);
+  // A live run checks the tracker issues its duplicate cases assume, and says
+  // so loudly when one closed (scripts/eval-seed.mjs). The local transport
+  // replays recordings and reaches no tracker, so it skips this.
+  if (opts.transport === "worker") {
+    for (const w of await seedWarnings(loadCases(CASES_PATH).cases, (repo, issue) => readGithubIssue(repo, issue))) {
+      console.warn(`[evals] ${w}`);
+    }
+  }
 
   const summary = await runEvals({
     transport,

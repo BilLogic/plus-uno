@@ -1,0 +1,600 @@
+{
+ "_readme": "Eval cases for the sweep's two Capture detectors beside drift (agents/uno-bot/src/sweep/capture-detector.ts): undocumented answers (C3) and decisions in running notes and Roadmap cards (C4). Each case is one thread or record and the pages it reaches, the detector reply recorded for it, and what the parse must keep. tests/sweep-capture-detector.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The shapes to tell apart: an answer given only in chat versus one a page already states; the section an answer belongs under, or a new section when none fits; and a decision in a note versus discussion. Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
+ "cases": [
+  {
+   "id": "SC1",
+   "detector": "answers",
+   "name": "answer in chat: the ratio was answered in the thread and no page has it",
+   "judgeNote": "The thread asks a question and a teammate answers it as settled. The Tutor Training PRD (found by search) has a Session setup section that does not state the ratio. One answer, under Session setup, placed after that section's last block, answered by U0ANS.",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0ASK",
+     "text": "What's the tutor to student ratio for training sessions?"
+    },
+    {
+     "ts": "1790694600.000200",
+     "user": "U0ANS",
+     "text": "1 tutor to 4–5 students — we settled that last week."
+    }
+   ],
+   "sources": [
+    {
+     "url": "https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222",
+     "kind": "notion",
+     "writable": true,
+     "title": "Tutor Training PRD",
+     "blocks": [
+      {
+       "id": "h-sched",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Scheduling",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-sched-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Sessions run weekly on Tuesdays.",
+       "type": "paragraph"
+      },
+      {
+       "id": "b-sched-2",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors confirm by Monday noon.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-setup",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Session setup",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-setup-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Each session opens with a 5-minute check-in.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-pay",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Payments",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-pay-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors are paid per session.",
+       "type": "paragraph"
+      }
+     ],
+     "text": "",
+     "pillars": [
+      "Toolkit"
+     ],
+     "contributors": [
+      "Ade Okafor"
+     ],
+     "foundBy": "search"
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"answers\": [{\"question_ts\": \"1790694000.000100\", \"answer_ts\": [\"1790694600.000200\"], \"answered_by\": \"U0ANS\", \"documented\": false, \"source_url\": \"https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222\", \"section_block_id\": \"h-setup\", \"new_section\": null, \"text\": \"Ratio is 1 tutor to 4–5 students.\", \"confidence\": 0.9}]}\n```"
+   },
+   "expect": {
+    "answers": [
+     {
+      "anchorId": "b-setup-1",
+      "section": "Session setup",
+      "newSection": null,
+      "text": "Ratio is 1 tutor to 4–5 students.",
+      "answeredBy": "U0ANS",
+      "evidenceTs": [
+       "1790694000.000100",
+       "1790694600.000200"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "SC2",
+   "detector": "answers",
+   "name": "answer already documented: the page states the ratio",
+   "judgeNote": "Same thread, but the page's Session setup section already says the ratio. The model reports it as documented; nothing is proposed.",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0ASK",
+     "text": "What's the tutor to student ratio for training sessions?"
+    },
+    {
+     "ts": "1790694600.000200",
+     "user": "U0ANS",
+     "text": "1 tutor to 4–5 students — we settled that last week."
+    }
+   ],
+   "sources": [
+    {
+     "url": "https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222",
+     "kind": "notion",
+     "writable": true,
+     "title": "Tutor Training PRD",
+     "blocks": [
+      {
+       "id": "h-sched",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Scheduling",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-sched-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Sessions run weekly on Tuesdays.",
+       "type": "paragraph"
+      },
+      {
+       "id": "b-sched-2",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors confirm by Monday noon.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-setup",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Session setup",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-setup-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Each session opens with a 5-minute check-in.",
+       "type": "paragraph"
+      },
+      {
+       "id": "b-setup-2",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Ratio is 1 tutor to 4–5 students.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-pay",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Payments",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-pay-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors are paid per session.",
+       "type": "paragraph"
+      }
+     ],
+     "text": "",
+     "pillars": [
+      "Toolkit"
+     ],
+     "contributors": [
+      "Ade Okafor"
+     ],
+     "foundBy": "search"
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"answers\": [{\"question_ts\": \"1790694000.000100\", \"answer_ts\": [\"1790694600.000200\"], \"answered_by\": \"U0ANS\", \"documented\": true, \"source_url\": \"https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222\", \"section_block_id\": \"h-setup\", \"new_section\": null, \"text\": \"Ratio is 1 tutor to 4–5 students.\", \"confidence\": 0.9}]}\n```"
+   },
+   "expect": {
+    "answers": []
+   }
+  },
+  {
+   "id": "SC3",
+   "detector": "answers",
+   "name": "answer already documented, reply says otherwise: the parse finds the line on the page",
+   "judgeNote": "The model missed that the page already holds the line and proposes it again. The parse compares words and drops it: a page that says it needs nothing added.",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0ASK",
+     "text": "What's the tutor to student ratio for training sessions?"
+    },
+    {
+     "ts": "1790694600.000200",
+     "user": "U0ANS",
+     "text": "1 tutor to 4–5 students — we settled that last week."
+    }
+   ],
+   "sources": [
+    {
+     "url": "https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222",
+     "kind": "notion",
+     "writable": true,
+     "title": "Tutor Training PRD",
+     "blocks": [
+      {
+       "id": "h-sched",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Scheduling",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-sched-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Sessions run weekly on Tuesdays.",
+       "type": "paragraph"
+      },
+      {
+       "id": "b-sched-2",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors confirm by Monday noon.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-setup",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Session setup",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-setup-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Each session opens with a 5-minute check-in.",
+       "type": "paragraph"
+      },
+      {
+       "id": "b-setup-2",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Ratio is 1 tutor to 4–5 students.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-pay",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Payments",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-pay-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors are paid per session.",
+       "type": "paragraph"
+      }
+     ],
+     "text": "",
+     "pillars": [
+      "Toolkit"
+     ],
+     "contributors": [
+      "Ade Okafor"
+     ],
+     "foundBy": "search"
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"answers\": [{\"question_ts\": \"1790694000.000100\", \"answer_ts\": [\"1790694600.000200\"], \"answered_by\": \"U0ANS\", \"documented\": false, \"source_url\": \"https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222\", \"section_block_id\": \"h-setup\", \"new_section\": null, \"text\": \"Ratio is 1 tutor to 4–5 students.\", \"confidence\": 0.9}]}\n```"
+   },
+   "expect": {
+    "answers": []
+   }
+  },
+  {
+   "id": "SC4",
+   "detector": "answers",
+   "name": "right section: a cancellation rule goes under Scheduling, not Session setup",
+   "judgeNote": "The answer is about when a tutor may cancel, which is scheduling. It goes after the last block of Scheduling (Tutors confirm by Monday noon.), before the Session setup heading.",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0ASK",
+     "text": "How late can a tutor cancel a session without penalty?"
+    },
+    {
+     "ts": "1790694600.000200",
+     "user": "U0ANS",
+     "text": "Up to 24 hours before — Bea confirmed with ops."
+    }
+   ],
+   "sources": [
+    {
+     "url": "https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222",
+     "kind": "notion",
+     "writable": true,
+     "title": "Tutor Training PRD",
+     "blocks": [
+      {
+       "id": "h-sched",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Scheduling",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-sched-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Sessions run weekly on Tuesdays.",
+       "type": "paragraph"
+      },
+      {
+       "id": "b-sched-2",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors confirm by Monday noon.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-setup",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Session setup",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-setup-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Each session opens with a 5-minute check-in.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-pay",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Payments",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-pay-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors are paid per session.",
+       "type": "paragraph"
+      }
+     ],
+     "text": "",
+     "pillars": [
+      "Toolkit"
+     ],
+     "contributors": [
+      "Ade Okafor"
+     ],
+     "foundBy": "search"
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"answers\": [{\"question_ts\": \"1790694000.000100\", \"answer_ts\": [\"1790694600.000200\"], \"answered_by\": \"U0ANS\", \"documented\": false, \"source_url\": \"https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222\", \"section_block_id\": \"h-sched\", \"new_section\": null, \"text\": \"Tutors may cancel up to 24 hours before a session without penalty.\", \"confidence\": 0.9}]}\n```"
+   },
+   "expect": {
+    "answers": [
+     {
+      "anchorId": "b-sched-2",
+      "section": "Scheduling",
+      "newSection": null,
+      "text": "Tutors may cancel up to 24 hours before a session without penalty.",
+      "answeredBy": "U0ANS",
+      "evidenceTs": [
+       "1790694000.000100",
+       "1790694600.000200"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "SC5",
+   "detector": "answers",
+   "name": "no section fits: captions open a new section at the end of the closest page",
+   "judgeNote": "None of Scheduling, Session setup or Payments fits a captioning rule. The answer opens a new Accessibility section on the page, after its last block.",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0ASK",
+     "text": "Do training videos need captions?"
+    },
+    {
+     "ts": "1790694600.000200",
+     "user": "U0ANS",
+     "text": "Yes, every training video ships with captions."
+    }
+   ],
+   "sources": [
+    {
+     "url": "https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222",
+     "kind": "notion",
+     "writable": true,
+     "title": "Tutor Training PRD",
+     "blocks": [
+      {
+       "id": "h-sched",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Scheduling",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-sched-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Sessions run weekly on Tuesdays.",
+       "type": "paragraph"
+      },
+      {
+       "id": "b-sched-2",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors confirm by Monday noon.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-setup",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Session setup",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-setup-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Each session opens with a 5-minute check-in.",
+       "type": "paragraph"
+      },
+      {
+       "id": "h-pay",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Payments",
+       "type": "heading_2"
+      },
+      {
+       "id": "b-pay-1",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Tutors are paid per session.",
+       "type": "paragraph"
+      }
+     ],
+     "text": "",
+     "pillars": [
+      "Toolkit"
+     ],
+     "contributors": [
+      "Ade Okafor"
+     ],
+     "foundBy": "search"
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"answers\": [{\"question_ts\": \"1790694000.000100\", \"answer_ts\": [\"1790694600.000200\"], \"answered_by\": \"U0ANS\", \"documented\": false, \"source_url\": \"https://www.notion.so/Tutor-Training-PRD-22222222222222222222222222222222\", \"section_block_id\": null, \"new_section\": \"Accessibility\", \"text\": \"Every training video ships with captions.\", \"confidence\": 0.9}]}\n```"
+   },
+   "expect": {
+    "answers": [
+     {
+      "anchorId": "b-pay-1",
+      "section": null,
+      "newSection": "Accessibility",
+      "text": "Every training video ships with captions.",
+      "answeredBy": "U0ANS",
+      "evidenceTs": [
+       "1790694000.000100",
+       "1790694600.000200"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "SR1",
+   "detector": "record",
+   "name": "decision in a note: the design sync moved launch to November 1",
+   "judgeNote": "The note records a decision (Decided: launch moves to Nov 1) that the linked PRD still states the old way. One finding on the launch block, citing the decision block.",
+   "record": {
+    "kind": "note",
+    "url": "https://www.notion.so/Design-sync-2026-09-29-33333333333333333333333333333333",
+    "title": "Design sync 2026-09-29",
+    "entries": [
+     {
+      "id": "n-1",
+      "text": "Reflection redesign: eng can't make Oct 15."
+     },
+     {
+      "id": "n-2",
+      "text": "Decided: launch moves to Nov 1. Ade owns the PRD update."
+     }
+    ]
+   },
+   "sources": [
+    {
+     "url": "https://www.notion.so/Reflection-PRD-11111111111111111111111111111111",
+     "kind": "notion",
+     "writable": true,
+     "title": "Reflection redesign PRD",
+     "blocks": [
+      {
+       "id": "blk-launch",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Launch date: October 15",
+       "type": "paragraph"
+      },
+      {
+       "id": "blk-owner",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Owner: Ade",
+       "type": "paragraph"
+      }
+     ],
+     "text": "",
+     "pillars": [
+      "Toolkit"
+     ],
+     "contributors": [
+      "Ade Okafor"
+     ]
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "{\"findings\":[{\"source_url\":\"https://www.notion.so/Reflection-PRD-11111111111111111111111111111111\",\"block_id\":\"blk-launch\",\"source_says\":\"Launch is October 15.\",\"record_says\":\"Launch moved to November 1.\",\"replacement\":\"Launch date: November 1\",\"evidence_ids\":[\"n-2\"],\"confidence\":0.9}]}"
+   },
+   "expect": {
+    "findings": [
+     {
+      "blockId": "blk-launch",
+      "replacement": "Launch date: November 1",
+      "evidenceIds": [
+       "n-2"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "SR2",
+   "detector": "record",
+   "name": "discussion in a note: options weighed, nothing decided",
+   "judgeNote": "The note lists options for the launch date and an action item to check with eng. Nothing was decided, so there is no drift.",
+   "record": {
+    "kind": "note",
+    "url": "https://www.notion.so/Design-sync-2026-09-29-33333333333333333333333333333333",
+    "title": "Design sync 2026-09-29",
+    "entries": [
+     {
+      "id": "n-1",
+      "text": "Reflection launch: Oct 15 vs Nov 1? Pros and cons discussed."
+     },
+     {
+      "id": "n-2",
+      "text": "AI: Ade to check eng capacity before we pick a date."
+     }
+    ]
+   },
+   "sources": [
+    {
+     "url": "https://www.notion.so/Reflection-PRD-11111111111111111111111111111111",
+     "kind": "notion",
+     "writable": true,
+     "title": "Reflection redesign PRD",
+     "blocks": [
+      {
+       "id": "blk-launch",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Launch date: October 15",
+       "type": "paragraph"
+      },
+      {
+       "id": "blk-owner",
+       "lastEditedTime": "2026-09-01T10:00:00.000Z",
+       "text": "Owner: Ade",
+       "type": "paragraph"
+      }
+     ],
+     "text": "",
+     "pillars": [
+      "Toolkit"
+     ],
+     "contributors": [
+      "Ade Okafor"
+     ]
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "{\"findings\":[]}"
+   },
+   "expect": {
+    "findings": []
+   }
+  }
+ ]
+}

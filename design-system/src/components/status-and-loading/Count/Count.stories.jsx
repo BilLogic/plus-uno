@@ -21,6 +21,9 @@ export default {
     title: 'Components/Status and loading/Count',
     component: Count,
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'deprecated', summary: '`style` started accepting `positive`, `negative` and `information` as deprecated aliases for `success`, `danger` and `info`, rendering the same and warning in development.' },
+        ],
         docs: {
             description: {
                 component:
@@ -322,6 +325,51 @@ LabeledNumber.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('button', { name: 'Messages 4 unread' })).toBeInTheDocument();
     await expect(canvas.queryByRole('img')).toBeNull();
+};
+
+/**
+ * The old names keep working. `positive`, `negative` and `information` render
+ * exactly as `success`, `danger` and `info`, with a development warning that
+ * names the replacement. The counts mount on a button press after the console
+ * is watched.
+ */
+export const DeprecatedStyleNames = () => {
+    const [mounted, setMounted] = useState(false);
+    return (
+        <div style={{ display: 'grid', gap: '12px' }}>
+            <button type="button" onClick={() => setMounted(true)}>Mount the old names</button>
+            <div style={row}>
+                <Count value={1} appearance="bold" style="success" data-testid="success" />
+                <Count value={2} appearance="bold" style="danger" data-testid="danger" />
+                <Count value={3} style="info" data-testid="info" />
+            </div>
+            {mounted && (
+                <div style={row}>
+                    <Count value={1} appearance="bold" style="positive" data-testid="positive" />
+                    <Count value={2} appearance="bold" style="negative" data-testid="negative" />
+                    <Count value={3} style="information" data-testid="information" />
+                </div>
+            )}
+        </div>
+    );
+};
+DeprecatedStyleNames.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+        await userEvent.click(canvas.getByRole('button', { name: 'Mount the old names' }));
+        for (const [old, current] of [['positive', 'success'], ['negative', 'danger'], ['information', 'info']]) {
+            const a = getComputedStyle(canvas.getByTestId(old));
+            const b = getComputedStyle(canvas.getByTestId(current));
+            await expect(a.backgroundColor, `${old} fills as ${current}`).toBe(b.backgroundColor);
+            await expect(a.color, `${old} reads as ${current}`).toBe(b.color);
+        }
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="positive" is deprecated; use style="success"'));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="negative" is deprecated; use style="danger"'));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="information" is deprecated; use style="info"'));
+    } finally {
+        warn.mockRestore();
+    }
 };
 
 /* -------------------------------------------------------------- playground */

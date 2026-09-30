@@ -19,6 +19,7 @@ import assert from "node:assert/strict";
 
 import type { Env } from "../src/types";
 import type { GateVerdict } from "../src/gate/index";
+import type { ProposalEventLog } from "../src/usage/index";
 
 interface Call {
   url: string;
@@ -48,6 +49,13 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     const ts = (u.searchParams.get("message_ts") ?? "").replace(".", "");
     return reply({ ok: true, permalink: `https://plus.slack.com/archives/${channel}/p${ts}` });
   }
+  if (url.includes("slack.com/api/conversations.info")) {
+    // A channel's kind by its test id: C0PRIV… private, G0… a group DM, any
+    // other C… public, and C0UNKNOWN one Slack will not describe.
+    const id = new URL(url).searchParams.get("channel") ?? "";
+    if (id === "C0UNKNOWN") return reply({ ok: false, error: "channel_not_found" });
+    return reply({ ok: true, channel: { id, is_private: id.startsWith("C0PRIV"), is_mpim: id.startsWith("G0"), is_im: false } });
+  }
   if (url.includes("slack.com/api/conversations.open")) {
     return reply({ ok: true, channel: { id: `D-${String(body?.users)}` } });
   }
@@ -69,6 +77,14 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     );
   }
   if (/^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/]+\/issues\/\d+$/.test(url)) return reply({ number: 688 });
+  // A Notion block someone edited after the bot read it: its stamp has moved.
+  if (url.startsWith("https://api.notion.com/v1/blocks/") && !init?.method) {
+    return reply({
+      id: url.split("/").pop(),
+      last_edited_time: "2026-09-15T16:40:00.000Z",
+      parent: { type: "page_id", page_id: "0123456789abcdef0123456789abcdef" },
+    });
+  }
   if (url.includes("oauth2.googleapis.com/token")) return reply({ access_token: "ya29.test" });
   if (url.includes("gmail.googleapis.com")) return reply({ id: "msg-1" });
   throw new Error(`no stub route for ${url}`);
@@ -101,12 +117,12 @@ function env(over: Partial<Record<string, string>> = {}): Env {
 
 /** A won ✅ on a card staged in the requester's own DM — where the
  *  conversation key is not a ts Slack accepts, and the reply ts is. */
-function won(operations: Array<{ toolName: string; input: Record<string, unknown> }>): GateVerdict {
+function won(operations: Array<{ toolName: string; input: Record<string, unknown> }>, channel = "D0REQUESTER"): GateVerdict {
   const proposal = {
     operations,
     toolName: operations[0]!.toolName,
     input: operations[0]!.input,
-    channel: "D0REQUESTER",
+    channel,
     threadTs: "dm",
     replyTs: "1700000000.000100",
     userMsgTs: "1700000000.000200",
@@ -213,6 +229,78 @@ test("a multi-recipient relay tells the thread once", async () => {
   assert.match(String(inThread[0]!.text), /<@U0MERYEM01>/);
 });
 
+// A sweep card's batch result answers the card, so it carries the sweep's
+// tag, as the card does: the thread's later replies read by the sweep's rule.
+test("a sweep card's batch result carries the sweep's tag", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([
+    { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+    { toolName: "dm_relay", input: { recipient: "U0MERYEM01", text: "hi" } },
+  ]);
+  await run(env(), { ...verdict, proposal: { ...verdict.proposal!, sweepRun: "2026-09-30" } });
+  const result = posts().find((p) => p.channel === "D0REQUESTER");
+  assert.deepEqual(result?.metadata, { event_type: "uno_sweep_card", event_payload: { role: "result" } });
+});
+
+const SHARED_PAGE = "https://www.notion.so/0123456789abcdef0123456789abcdef";
+const SHARE_ENV = { PLUS_DESIGN_CHANNEL_ID: "C0DESIGN", PLUS_UNIVERSAL_CHANNEL_ID: "C0UNIVERSAL", UNO_BOT_CHANNEL_ID: "C0UNOBOT" };
+
+test("a group DM's sweep card whose write was refused shares nothing", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([
+    {
+      toolName: "notion_update",
+      input: {
+        page_url: SHARED_PAGE,
+        replace: [{ block_id: "0123456789abcdef0123456789abcd01", last_edited_time: "2026-09-01T10:00:00.000Z", content: "x" }],
+      },
+    },
+  ]);
+  const proposal = {
+    ...verdict.proposal!,
+    channel: "G0MPIM",
+    sweepRun: "2026-09-30",
+    sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" as const }] },
+  };
+  await run(env({ ...SHARE_ENV, NOTION_TOKEN: "secret_test" }), { ...verdict, proposal });
+  assert.equal(posts().filter((p) => p.channel === "C0DESIGN").length, 0, "the block had moved, so nothing was applied");
+});
+
+test("a share card's ✅ posts exactly its note to its channel, and nothing to #uno-bot or elsewhere", async () => {
+  const note = ":mag: End-of-day sweep: a group conversation settled something the Notion page “Launch plan” still said the old way, and the page is now up to date: " + SHARED_PAGE;
+  const share = (channel: string) => ({ toolName: "sweep_share_post", input: { channel, channel_name: "#plus-design", text: note } });
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([share("C0DESIGN")]);
+  await run(env(SHARE_ENV), { ...verdict, proposal: { ...verdict.proposal!, channel: "G0MPIM", supersedeKey: "sweep-share" } });
+  const inDesign = posts().filter((p) => p.channel === "C0DESIGN");
+  assert.equal(inDesign.length, 1);
+  assert.equal(inDesign[0]!.text, note, "exactly the text the card showed");
+
+  // A card aimed anywhere else — #uno-bot, a private channel — posts nothing there.
+  for (const elsewhere of ["C0UNOBOT", "G0SECRET"]) {
+    calls = [];
+    const aimed = won([share(elsewhere)]);
+    await run(env(SHARE_ENV), { ...aimed, proposal: { ...aimed.proposal!, channel: "G0MPIM" } });
+    assert.equal(posts().filter((p) => p.channel === elsewhere).length, 0, elsewhere);
+  }
+});
+
+test("a group DM's fix ✅ posts nothing outside the group DM", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([{ toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } }]);
+  const proposal = {
+    ...verdict.proposal!,
+    sweepRun: "2026-09-30",
+    sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" as const }] },
+  };
+  await run(env(SHARE_ENV), { ...verdict, proposal });
+  assert.equal(posts().filter((p) => p.channel === "C0DESIGN" || p.channel === "C0UNIVERSAL").length, 0);
+});
+
 const EMAIL = {
   toolName: "email_send",
   input: { to: ["sme@example.edu"], subject: "Calendar Sync", body: "A real message body, long enough to send." },
@@ -254,7 +342,7 @@ test("an approved GitHub intake names who asked in its footer, and links the iss
   // The requester of record, resolved to a name — not whoever pressed ✅.
   assert.match(body, /on behalf of Bill Guo/);
   // Asked in a DM, so the public issue carries no link into it.
-  assert.match(body, /filed from a DM/);
+  assert.match(body, /filed from a private conversation/);
   assert.doesNotMatch(body, /slack\.com/);
   assert.deepEqual(filed.body?.labels, ["harness-intake", "needs-triage"]);
 
@@ -262,6 +350,40 @@ test("an approved GitHub intake names who asked in its footer, and links the iss
   assert.ok(note, "the issue link came back to the requesting conversation");
   assert.equal(note.channel, "D0REQUESTER");
   assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
+});
+
+// The repo is public: a card staged anywhere but a public channel files no
+// link back into its conversation — decided by the conversation's kind, since
+// a private channel's id starts with C like a public one's.
+for (const [place, channel] of [
+  ["a private channel", "C0PRIVATE01"],
+  ["a group DM", "G0GROUPDM01"],
+  ["a conversation Slack will not describe", "C0UNKNOWN"],
+] as const) {
+  test(`an approved GitHub intake staged in ${place} carries no permalink footer`, async () => {
+    calls = [];
+    const run = await executeVerdict();
+    await run(
+      env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" }),
+      won([{ toolName: "github_issue_create", input: { title: "A bot gap", body: "What went wrong." } }], channel),
+    );
+    const filed = calls.find((c) => c.url === "https://api.github.com/repos/BilLogic/plus-uno/issues");
+    const body = String(filed?.body?.body);
+    assert.match(body, /filed from a private conversation/);
+    assert.doesNotMatch(body, /slack\.com/);
+    assert.ok(!calls.some((c) => c.url.includes("chat.getPermalink")), "its permalink is never fetched");
+  });
+}
+
+test("an approved GitHub intake staged in a public channel links its source thread", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" }),
+    won([{ toolName: "github_issue_create", input: { title: "A bot gap", body: "What went wrong." } }], "C0PUBLIC01"),
+  );
+  const filed = calls.find((c) => c.url === "https://api.github.com/repos/BilLogic/plus-uno/issues");
+  assert.match(String(filed?.body?.body), /Source thread: https:\/\/plus\.slack\.com\/archives\/C0PUBLIC01\//);
 });
 
 test("an approved issue follow-up comments with the requester's footer, then closes with its reason", async () => {
@@ -283,7 +405,7 @@ test("an approved issue follow-up comments with the requester's footer, then clo
   );
   const comment = String(github[0]!.body?.body);
   assert.ok(comment.startsWith("Fixed in r384."), comment);
-  assert.match(comment, /Posted from Slack by uno-bot on behalf of Bill Guo, posted from a DM/);
+  assert.match(comment, /Posted from Slack by uno-bot on behalf of Bill Guo, posted from a private conversation/);
   assert.doesNotMatch(comment, /slack\.com/);
   assert.deepEqual(github[1]!.body, { state: "closed", state_reason: "completed" });
 
@@ -415,4 +537,239 @@ test("a run a later look has taken stops at its next operation and tells no outc
     [],
     "the note and the re-staged card are the thread's account, not a batch result",
   );
+});
+
+// ── What a verdict leaves on the usage record ────────────────────────────────
+//
+// Every door hands its verdict here, so this is where a verdict's proposal
+// events are written (`usage/proposal-events.ts`): the door and the person
+// come on the verdict from Gate, and the executor records them.
+
+const CLOCK = () => 1_700_000_500_000;
+
+/** Loaded lazily, like the executor: the usage module reaches `net.ts`. */
+function usage(): Promise<typeof import("../src/usage/index")> {
+  return import("../src/usage/index.js");
+}
+
+function by(verdict: GateVerdict, door: NonNullable<GateVerdict["by"]>["door"], userId?: string): GateVerdict {
+  return { ...verdict, by: { door, ...(userId ? { userId } : {}) } };
+}
+
+const intake = [{ toolName: "github_issue_create", input: { title: "A bot gap", body: "What went wrong." } }];
+const githubEnv = () => env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" });
+
+test("a won ✅ is recorded confirmed, with the door and whether someone other than the requester pressed it", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  await run(githubEnv(), by(won(intake), "reaction", "U0PRESSER1"), { events, now: CLOCK });
+  assert.deepEqual(
+    events.events().map((e) => [e.proposalId, e.event, e.via, e.actorId, e.confirmedByOther, e.at]),
+    [["1700000000.000300", "confirmed", "reaction", "U0PRESSER1", true, CLOCK()]],
+  );
+});
+
+test("a won ⛔ is recorded cancelled, and runs nothing", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  const { execute: _none, ...declined } = won(intake);
+  await run(env(), by({ ...declined, decision: "cancel" }, "button", "U0REQUESTR1"), { events, now: CLOCK });
+  assert.deepEqual(events.events().map((e) => [e.event, e.via, e.confirmedByOther]), [["cancelled", "button", null]]);
+  assert.equal(calls.some((c) => c.url.includes("api.github.com")), false);
+});
+
+test("a lost race records nothing", async () => {
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  await run(env(), { ...by(won(intake), "typed", "U0PRESSER1"), outcome: "stale" }, { events, now: CLOCK });
+  assert.deepEqual(events.events(), []);
+});
+
+test("a write refused because its page moved is recorded refused_stale, once for the batch", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  const stale = (block: string) => ({
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/A-page-0123456789abcdef0123456789abcdef",
+      replace: [{ block_id: block, last_edited_time: "2026-09-15T14:02:00.000Z", content: "the correction" }],
+    },
+  });
+  await run(
+    env({ NOTION_API_KEY: "secret_test" }),
+    by(won([stale("1f2e3d4c5b6a79881f2e3d4c5b6a7988"), stale("2f2e3d4c5b6a79881f2e3d4c5b6a7988")]), "model"),
+    { events, now: CLOCK },
+  );
+  // Nothing was written: the only Notion calls are the two stamp reads.
+  assert.deepEqual(
+    calls.filter((c) => c.url.startsWith("https://api.notion.com/")).map((c) => c.body),
+    [null, null],
+  );
+  assert.deepEqual(events.events().map((e) => [e.event, e.via]), [
+    ["confirmed", "model"],
+    ["refused_stale", "executor"],
+  ]);
+});
+
+test("what the batch leaves on the record is written before the history note, so a throw there cannot drop it", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  const failingHistory = {
+    idFromName: () => "thread-state",
+    get: () => ({
+      ...THREAD_STATE.get(),
+      appendHistory: async () => {
+        throw new Error("history write refused");
+      },
+    }),
+  };
+  const stale = {
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/A-page-0123456789abcdef0123456789abcdef",
+      replace: [{ block_id: "1f2e3d4c5b6a79881f2e3d4c5b6a7988", last_edited_time: "2026-09-15T14:02:00.000Z", content: "x" }],
+    },
+  };
+  await assert.rejects(
+    run(
+      { ...env({ NOTION_API_KEY: "secret_test" }), THREAD_STATE: failingHistory } as unknown as Env,
+      by(won([stale]), "reaction", "U0PRESSER1"),
+      { events, now: CLOCK },
+    ),
+    /history write refused/,
+  );
+  assert.deepEqual(events.events().map((e) => e.event), ["confirmed", "refused_stale"]);
+});
+
+test("a ✅ on a reaction or a button that files a ticket on the bot puts it on the staging turn's row", async () => {
+  for (const door of ["reaction", "button"] as const) {
+    calls = [];
+    const turns = (await usage()).createInMemoryUsageLog();
+    const events = (await usage()).createInMemoryProposalEventLog({ turns });
+    await turns.record(stagingTurn());
+    await events.record(await stagedFor("C1:1700000000.000200"));
+    const run = await executeVerdict();
+    await run(githubEnv(), by(won(intake), door, "U0PRESSER1"), { events, now: CLOCK });
+    assert.equal(
+      (await turns.get("C1:1700000000.000200"))?.selfFiledTicketUrl,
+      "https://github.com/BilLogic/plus-uno/issues/701",
+      door,
+    );
+  }
+});
+
+test("a typed or model ✅ leaves the ticket to the turn it ran in", async () => {
+  // That turn's own row carries it (`usage/record.ts`); the staging turn's row
+  // carrying it too would count one ticket twice.
+  for (const door of ["typed", "model"] as const) {
+    calls = [];
+    const turns = (await usage()).createInMemoryUsageLog();
+    const events = (await usage()).createInMemoryProposalEventLog({ turns });
+    await turns.record(stagingTurn());
+    await events.record(await stagedFor("C1:1700000000.000200"));
+    const run = await executeVerdict();
+    await run(githubEnv(), by(won(intake), door, "U0PRESSER1"), { events, now: CLOCK });
+    assert.equal((await turns.get("C1:1700000000.000200"))?.selfFiledTicketUrl, null, door);
+  }
+});
+
+test("if recording fails, the proposal still resolves normally", async () => {
+  calls = [];
+  appended = [];
+  const broken: ProposalEventLog = {
+    ...(await usage()).createInMemoryProposalEventLog(),
+    async record() {
+      throw new Error("D1 unavailable");
+    },
+    async noteSelfFiledTicket() {
+      throw new Error("D1 unavailable");
+    },
+  };
+  const run = await executeVerdict();
+  await run(githubEnv(), by(won(intake), "reaction", "U0PRESSER1"), { events: broken, now: CLOCK });
+  assert.ok(calls.some((c) => c.url === "https://api.github.com/repos/BilLogic/plus-uno/issues"), "the issue was filed");
+  assert.ok(posts().some((p) => String(p.text).includes("issues/701")), "and the thread was told");
+  assert.equal(appended.length, 1, "and the outcome was remembered");
+});
+
+function stagingTurn() {
+  return {
+    turnId: "C1:1700000000.000200",
+    build: "r-test",
+    requesterId: "U0REQUESTR1",
+    surface: "channel" as const,
+    inThread: true,
+    channelId: "C1",
+    askTs: "1700000000.000200",
+    askedAt: 1_700_000_000_200,
+    firstAnswerAt: 1_700_000_000_900,
+    latencyMs: 700,
+    tier: "default",
+    routeReason: "default",
+    provider: null,
+    model: null,
+    fallbackUsed: false,
+    tokensIn: 0,
+    tokensOut: 0,
+    tokensThinking: 0,
+    tokensCached: 0,
+    costUsd: 0,
+    toolsCalled: [],
+    sourcesCited: [],
+    disposition: "staged",
+    proposalId: "1700000000.000300",
+    stopUsed: false,
+    selfFiledTicketUrl: null,
+    testTraffic: false,
+    conversationType: "channel" as const,
+    requestText: null,
+    subType: null,
+    painCategory: null,
+    classifiedAt: null,
+  };
+}
+
+async function stagedFor(turnId: string) {
+  const verdict = won(intake);
+  return { ...(await usage()).stagedEvent({ proposal: verdict.proposal!, at: 0, via: "turn" as const, channelStored: true }), turnId };
+}
+
+// ── The self-serve record, after the person has been told ───────────────────
+
+test("a budget stop in the task-completion write still posts the result and the history note", async () => {
+  calls = [];
+  appended = [];
+  executionCalls = [];
+  const { D1QueryBudgetError } = await import("../src/net.js");
+  const writes: string[] = [];
+  const USAGE_DB = {
+    prepare: () => ({
+      bind: () => ({
+        run: async () => ({}),
+        all: async () => ({ results: [] }),
+        first: async () => {
+          writes.push(`task_completed after ${posts().filter((p) => p.channel === "D0REQUESTER").length} result post(s)`);
+          throw new D1QueryBudgetError(40);
+        },
+      }),
+    }),
+  };
+  const run = await executeVerdict();
+  await run(
+    { ...env(), USAGE_DB } as unknown as Env,
+    won([
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "one" } },
+      { toolName: "dm_relay", input: { recipient: "U0COCO0002", text: "two" } },
+    ]),
+  );
+  const result = posts().filter((p) => p.channel === "D0REQUESTER");
+  assert.equal(result.length, 1, "the batch result was posted");
+  assert.equal(result[0]!.thread_ts, "1700000000.000100");
+  assert.ok(appended.some((a) => a.ref.channel === "D0REQUESTER"), "the history note was written");
+  assert.deepEqual(writes, ["task_completed after 1 result post(s)"], "the write was tried, last");
+  assert.ok(executionCalls.includes("end 1700000000.000300"));
 });

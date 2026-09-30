@@ -13,10 +13,35 @@ summary: Pillar → channel map (group announcements; all private — uno-bot mu
 |---|---|---|
 | #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
 | #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
-| #uno-bot | `C0ARJ2A3A69` | Figma-sync notifications (docs saying "#figma-sync" mean this channel) |
+| #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot |
+| #plus-universal | `C072E8SFLKV` | Figma library publish cards |
+
+#uno-bot is where the team reports problems with uno-bot and asks for changes. A top-level post engages with no @mention. A report or change request becomes a drafted GitHub intake (`harness-intake`), or a comment on the open intake it matches, staged in the post's thread; a ✅ from the poster or anyone who has replied there files it. A plain question is just answered. #uno-bot-sandbox posts stay test traffic.
 
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
+
+<!-- ide-only -->
+## The end-of-day sweep — read path and audience rule
+
+The Worker's one proactive read of channels, whose rules the bot reads through `read_reference` (`docs/connectors/slack-sweep.md`):
+
+- **Read path.** At the 6 pm ET end-of-day run, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
+  - `conversations.info` first: a private channel is read only when it is also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`, and a DM stays unread;
+  - one more job reads every group DM uno-bot is in (`users.conversations`, `types=mpim`); a retry passes over those already handled today, and one that fails is counted while the rest are read;
+  - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then, also in pages of 200.
+  - The cursor lives in D1 (`sweep_cursors`) and moves after each thread, so a job stopped by the budget resumes where it stopped. A history read that reaches its page cap holds the cursor at the oldest root it read, and a thread past the reply-page cap is left with a note in `sweep_runs`.
+  - #uno-bot stays off the read path, whatever the list says.
+- **Audience rule.** A finding reaches only people who could already see its evidence:
+  - a public thread's finding is posted in that thread;
+  - a private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM. After a group-DM fix writes a page, a separate share card there offers a reworded note (page name only, no quote, no names) for rung 3 or 4, and only its own ✅ posts it (`sweep_share_post`, a `worker` tool only the Worker stages);
+  - a fix found in both a public thread and a private place goes only on the private card (ADR-031);
+  - findings in no thread go to #plus-universal for the design system and to #plus-design otherwise (`pickDestination` in `agents/uno-bot/src/sweep/finding.ts`).
+  - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
+- **Cards** post at the next weekday 10 am ET run: one live card per thread, up to 10 fixes, and the rest queued until it resolves. A thread is taken while its card is live by the records or in ThreadState, a revision or re-staged card included. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.
+- **Posted means staged.** A card starts only when the invocation's budget covers it. Its snapshot (the fixes as shown) goes to KV and its items to D1; it is posted tagged with its key and its operations' digest in message metadata, staged, then marked posted. A retry stages only from the snapshot, and only when the posted card's digest matches; a card the search comes back unsure about is held, and a card the earlier try already staged is recorded as posted and left as it is, resolved or live. Staging puts the card on the proposal record, as any card's staging does. A staging that fails outright edits the card to say it did not go through and releases its items.
+- **A failing thread** (replies, a linked page, or the detector) holds the cursor; on its second night running it is skipped with a note, so one thread holds a channel back two nights at most. A quota stop, the model's or Notion's 429, holds without counting.
+<!-- /ide-only -->
 
 ## Share-out post
 
@@ -43,7 +68,7 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card.
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.

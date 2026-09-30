@@ -24,6 +24,15 @@ export const COUNT_STYLES = ['neutral', 'success', 'warning', 'danger', 'info', 
 export const COUNT_SIZES = ['medium', 'small'];
 
 /**
+ * The names Badge variants used, still accepted, and the library word each one
+ * now means. Defined once here and shared by Status and BadgeVariants, which
+ * already build on Count. The literal list beside it is what propTypes checks,
+ * because the docs generator reads the values from source.
+ */
+export const DEPRECATED_STYLE_ALIASES = Object.freeze({ positive: 'success', negative: 'danger', information: 'info' });
+const ACCEPTED_STYLES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery', 'positive', 'negative', 'information'];
+
+/**
  * What the pill shows for a value. `null` means "render nothing": a count of
  * zero is an empty tab, and an empty tab showing "0" is noise unless the caller
  * asks for it.
@@ -50,6 +59,15 @@ export const Count = ({
 }) => {
     const isDot = appearance === 'dot';
 
+    let resolvedStyle = style;
+    if (Object.hasOwn(DEPRECATED_STYLE_ALIASES, style)) {
+        if (process.env.NODE_ENV !== 'production') {
+            // eslint-disable-next-line no-console
+            console.warn(`[Count] style="${style}" is deprecated; use style="${DEPRECATED_STYLE_ALIASES[style]}".`);
+        }
+        resolvedStyle = DEPRECATED_STYLE_ALIASES[style];
+    }
+
     /*
      * A dot has no number, so without a label it is a colored circle announced
      * as nothing. Warn in development rather than throw: the dot still renders,
@@ -66,7 +84,7 @@ export const Count = ({
     const classes = [
         'plus-count',
         `plus-count--${appearance}`,
-        `plus-count--${style}`,
+        `plus-count--${resolvedStyle}`,
         isDot ? '' : `plus-count--${size}`,
         ring ? 'plus-count--ring' : '',
         className,
@@ -108,8 +126,8 @@ Count.propTypes = {
     showZero: PropTypes.bool,
     /** `subtle` by default; `bold` asks for action now (at most one per area); `inverse` is a solid white pill for filled buttons and dark surfaces; `dot` is presence without a number. */
     appearance: PropTypes.oneOf(COUNT_APPEARANCES),
-    /** The intent. Use one only when the number carries it. `inverse` is always neutral. */
-    style: PropTypes.oneOf(COUNT_STYLES),
+    /** The intent. Use one only when the number carries it. `inverse` is always neutral. `positive`, `negative` and `information` are deprecated aliases for `success`, `danger` and `info`. */
+    style: PropTypes.oneOf(ACCEPTED_STYLES),
     /** `medium` (20) on its own; `small` (16) is for use inside a label. A dot is always 8. */
     size: PropTypes.oneOf(COUNT_SIZES),
     /** A 2px surface ring, for a count pinned to the corner of an icon or avatar. */

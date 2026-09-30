@@ -85,7 +85,7 @@ import {
   withSubrequestLimit,
 } from "../net";
 import { claudeVertexConfigured, claudeVertexRaw } from "../vertex/claude";
-import { runLoop, type AgentResult, type LoopBudget, type TurnDials } from "./loop";
+import { runLoop, type AgentResult, type LoopBudget, type TurnDials, type TurnSpend } from "./loop";
 import { geminiProvider } from "./providers/gemini";
 import { claudeProvider } from "./providers/claude";
 import type { ModelTier } from "./routing";
@@ -95,7 +95,7 @@ import { isToolName, type ToolName } from "./tool-table";
 import { TOOLS, TOOLS_BY_NAME } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
 
-export type { AgentResult, TurnDials } from "./loop";
+export type { AgentResult, TurnDials, TurnSpend } from "./loop";
 
 // ── The provider-neutral contract (input of one agent turn) ──────────────────
 
@@ -209,6 +209,9 @@ export interface AgentRun {
   receipt?: RetrievalReceipt;
   /** Set only when a `slack_search` this turn came back EMPTY. */
   absence?: AbsenceContext;
+  /** What the turn ran on and spent — absent only when the loop never reached
+   *  its end (it threw). The usage record's model and token columns. */
+  spend?: TurnSpend;
 }
 
 // ── The entry ────────────────────────────────────────────────────────────────
@@ -244,11 +247,10 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
   // refuses a schema with no row and a row with no schema, and building the
   // model's roster through it is what makes that refusal reach a deployment.
   // `tool-definitions.json` is still where every schema is written.
-  const tools: ToolSpec[] = TOOLS.map((t) => ({
-    name: t.name,
-    description: t.schema.description,
-    input_schema: t.schema.input_schema,
-  }));
+  // A `worker` row has no schema and is offered to no one.
+  const tools: ToolSpec[] = TOOLS.flatMap((t) =>
+    t.schema ? [{ name: t.name, description: t.schema.description, input_schema: t.schema.input_schema }] : [],
+  );
 
   // Keyed like the CONVERSATION, not the thread. `/stop` arrives carrying only
   // a channel, so the key it can compute is the one this must read: a DM
@@ -265,7 +267,8 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
   // The turn scope, opened HERE rather than by the caller (#625): everything
   // the loop's frames record about what this turn retrieved comes back below,
   // in the return value, so no adapter can get an answer without it.
-  return withTurnScope({ correction: input.correction }, () =>
+  let spend: TurnSpend | undefined;
+  const run = await withTurnScope({ correction: input.correction }, () =>
     runLoop({
       provider: selectProvider(env),
       deps: {
@@ -287,8 +290,12 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
       onDials: input.onDials,
       onToolCall: input.onToolCall,
       onToolResult: input.onToolResult,
+      onSpend: (s) => {
+        spend = s;
+      },
     }),
   );
+  return spend ? { ...run, spend } : run;
 }
 
 /**

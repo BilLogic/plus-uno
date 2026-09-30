@@ -6,124 +6,185 @@ import { compare, refusals } from './token-generation.mjs';
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
- * Both hang off `TOKEN_DIR` (#620/#621) rather than being spelled seven times,
- * so moving the token directory is one edit and the generator cannot end up
- * reading one tree and writing another.
+ * Both hang off `TOKEN_DIR` rather than being spelled seven times, so moving
+ * the token directory is one edit and the generator cannot end up reading one
+ * tree and writing another.
  */
 const SOURCE_DIR = `${TOKEN_DIR}/source`;
 
 /**
- * Convert RGB to hex/rgba
+ * One export from `SOURCE_DIR` and its mode ids. `oneMode` is for the
+ * collections this generator reads a single value from: a second mode there is
+ * a refusal, not a silent read of whichever mode happens to come first.
  */
-function rgbToHex(r, g, b, a = 1) {
-    const toHex = (n) => Math.round(n * 255).toString(16).padStart(2, '0');
-    if (a < 1 && a > 0) {
-        return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
+function readSource(file, { oneMode = false } = {}) {
+    const json = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/${file}`, 'utf8'));
+    const modes = Object.keys(json.modes);
+    if (oneMode && modes.length !== 1) {
+        throw new Error(
+            `${file}: ${modes.length} modes (${Object.values(json.modes).join(', ')}). ` +
+            'This collection is written as one set of values; say which mode is the stylesheet before reading it.',
+        );
     }
-    return '#' + toHex(r) + toHex(g) + toHex(b);
+    return { json, modes };
 }
 
 /**
- * Convert Figma variable name to Material Design 3 CSS variable name
+ * Every exception constant below is checked against the export it excuses.
+ * An override Figma now agrees with, or a code-only name Figma now has, is
+ * no longer an exception, and keeping it would hide the next real difference.
+ * Each such case lands here and the run refuses before writing anything.
  */
-function toM3ColorName(name) {
-    // Remove known Figma group prefixes to simplify the name
-    let normalized = name
-        .replace(/^_/, '')
-        .replace(/^ColorsElevations\/MaterialDesign-ColorRoles\//, '')
-        .replace(/^ColorsElevations\/colors,guidance\//, '')
-        .replace(/^ColorsElevations\/PLUSBrandcolors,updatedJune2025\//, '')
-        .replace(/^ColorsElevations\//, '')
-        .replace(/\//g, '-')
-        .toLowerCase()
-        .trim();
+const staleExceptions = [];
+const stale = (constant, message) => staleExceptions.push(`${constant}: ${message}`);
 
-    // Material Design 3 specific mappings
-    const mappings = {
-        'primary': 'primary', // Direct match after stripping
-        'on-primary': 'on-primary',
-        'primary-container': 'primary-container',
-        'on-primary-container': 'on-primary-container',
-        'inverse-primary': 'inverse-primary',
-        'secondary': 'secondary',
-        'on-secondary': 'on-secondary',
-        'secondary-container': 'secondary-container',
-        'on-secondary-container': 'on-secondary-container',
-        'tertiary': 'tertiary',
-        'on-tertiary': 'on-tertiary',
-        'tertiary-container': 'tertiary-container',
-        'on-tertiary-container': 'on-tertiary-container',
-        'danger': 'danger',
-        'error': 'danger', // Map Error to Danger
-        'on-danger': 'on-danger',
-        'on-error': 'on-danger',
-        'danger-container': 'danger-container',
-        'error-container': 'danger-container',
-        'on-danger-container': 'on-danger-container',
-        'on-error-container': 'on-danger-container',
-        'success': 'success',
-        'on-success': 'on-success',
-        // Map Add-on to Success for now if needed, or keep separate
-        'add-on': 'success',
-        'warning': 'warning',
-        'on-warning': 'on-warning',
-        'info': 'info',
-        'on-info': 'on-info',
-        'surface': 'surface',
-        'on-surface': 'on-surface',
-        'surface-variant': 'surface-variant',
-        'on-surface-variant': 'on-surface-variant',
-        'outline': 'outline',
-        'outline-variant': 'outline-variant',
-        'background': 'background',
-        'on-background': 'on-background',
+/**
+ * A name as a token: `Social-Emotional` -> `social-emotional`,
+ * `Spacing/Small/space-000` -> `spacing-small-space-000`.
+ */
+const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-');
 
-        // Legacy/Messy mappings
-        'primary-primary': 'primary',
-        'primary-on-primary': 'on-primary',
-        'secondary-secondary': 'secondary',
+/** The state-layer opacities, in the order they are written. */
+const STATE_LEVELS = ['08', '12', '16'];
+
+/**
+ * A Figma color ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`
+ * with the alpha at up to three places otherwise (0.08, not 0.080).
+ */
+function cssColor({ r, g, b, a = 1 }) {
+    const byte = (n) => Math.round(n * 255);
+    if (a < 1) return `rgba(${byte(r)}, ${byte(g)}, ${byte(b)}, ${+a.toFixed(3)})`;
+    return '#' + [r, g, b].map((n) => byte(n).toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * The accent families in the `colors / accent` collection, in the order the
+ * stylesheet lists them.
+ */
+const ACCENT_FAMILIES = [
+    'Primary', 'Secondary', 'Tertiary', 'Danger', 'Success', 'Warning', 'Info',
+    'Social-Emotional', 'Mastering-Content', 'Advocacy', 'Relationship', 'Technology-Tools',
+];
+
+/**
+ * Info is Tertiary under another name: Figma aliases `Info/*` to `Tertiary/*`,
+ * so every Info token is written as a `var()` of its Tertiary twin. That also
+ * covers the two Figma leaves as literals or not at all (`Info 08` is a literal
+ * of the same value; there is no `Info Border Subtle`), and the generator
+ * refuses if any Info variable stops resolving to its Tertiary twin's color.
+ */
+const ALIASED_FAMILIES = { Info: 'Tertiary' };
+
+/**
+ * `Primary/Primary (Text)` -> `primary-text`, `Primary/State-layers/Primary
+ * Container 08` -> `primary-container-state-08`, and so on, or `null` for a
+ * variable this file does not carry: the `-icon`/`-border` roles and focus
+ * rings (hand-maintained in `_color_roles.scss`), the `Proposal/*` candidates,
+ * and stray leaves such as `Advocacy/on-surface` and the `Content` string.
+ */
+function accentToken(name) {
+    const [family, ...rest] = name.split('/');
+    if (!ACCENT_FAMILIES.includes(family) || rest.length === 0) return null;
+    const f = slug(family);
+    const leaf = rest.join('/');
+
+    const state = leaf.match(new RegExp(`^State-layers/(.+) (${STATE_LEVELS.join('|')})$`));
+    if (state) {
+        if (state[1] === family) return `${f}-state-${state[2]}`;
+        if (state[1] === `${family} Container`) return `${f}-container-state-${state[2]}`;
+        return null;
+    }
+
+    const roles = {
+        [family]: f,
+        [`${family} (Text)`]: `${f}-text`,
+        [`On ${family}`]: `on-${f}`,
+        [`${family} Container`]: `${f}-container`,
+        [`On ${family} Container`]: `on-${f}-container`,
+        [`Inverse ${family}`]: `inverse-${f}`,
+        [`${family} Border Subtle`]: `${f}-border-subtle`,
     };
+    return roles[leaf] ?? null;
+}
 
-    // Check direct mapping first
-    if (mappings[normalized]) {
-        return mappings[normalized];
+/** The order a family's tokens are written in, base roles then state layers. */
+function familyOrder(f) {
+    return {
+        roles: [f, `${f}-text`, `on-${f}`, `${f}-container`, `on-${f}-container`, `inverse-${f}`, `${f}-border-subtle`],
+        states: [...STATE_LEVELS.map((l) => `${f}-state-${l}`), ...STATE_LEVELS.map((l) => `${f}-container-state-${l}`)],
+    };
+}
+
+/**
+ * `Neutral Colors/Alternative/surface-dim` -> `surface-dim`,
+ * `State-layers/on surface/opacity-0_08` -> `on-surface-state-08`, or `null`
+ * for the `Surface roles/*` aliases, which are not part of this file.
+ */
+function neutralToken(name) {
+    const state = name.match(new RegExp(`^State-layers/(.+)/opacity-0_(${STATE_LEVELS.join('|')})$`));
+    if (state) return `${slug(state[1])}-state-${state[2]}`;
+    const role = name.match(/^Neutral Colors\/(?:Surface container\/|Alternative\/)?([^/]+)$/);
+    return role ? slug(role[1]) : null;
+}
+
+const NEUTRAL_GROUPS = {
+    'Surface': ['surface', 'on-surface'],
+    'Surface Variant': ['surface-variant', 'on-surface-variant'],
+    'Outline': ['outline', 'outline-variant'],
+    'Surface Containers': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
+    'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'disabled-opacity', 'inverse-surface', 'inverse-on-surface'],
+};
+
+const NEUTRAL_STATE_BASES = [
+    'surface', 'outline', 'surface-variant', 'inverse-surface', 'shadow', 'outline-variant',
+    'surface-container-highest', 'surface-container-high', 'surface-container',
+    'surface-container-low', 'surface-container-lowest', 'surface-bright', 'surface-dim',
+    'on-surface', 'on-surface-variant',
+];
+
+/**
+ * Not a Figma variable: the M3 disabled-content opacity. Figma applies it as
+ * a layer opacity rather than a variable, and components read it from here.
+ */
+const CODE_ONLY_NEUTRALS = { 'disabled-opacity': '0.38' };
+
+/**
+ * `{token: cssValue}` for one collection, through `toToken`. Two variables that
+ * land on one token must agree (`Neutral Colors/on-surface` and `Neutral
+ * Colors/Surface container/on-surface` do); a disagreement is a refusal, not a
+ * last-one-wins.
+ */
+function collectColors(file, toToken) {
+    const { json, modes: [mode] } = readSource(file, { oneMode: true });
+    const map = {};
+    for (const v of json.variables) {
+        if (v.resolvedType !== 'COLOR') continue;
+        const token = toToken(v.name);
+        if (!token) continue;
+        const resolved = v.resolvedValuesByMode[mode];
+        if (!resolved || resolved.r === undefined) {
+            throw new Error(`${file}: ${v.name} has no resolved color. Export it with every alias resolved.`);
+        }
+        const value = cssColor(resolved);
+        if (map[token] !== undefined && map[token] !== value) {
+            throw new Error(`${file}: two variables map to --color-${token} with different values (${map[token]}, ${value}).`);
+        }
+        map[token] = value;
     }
-
-    // Handle state layers
-    if (normalized.includes('state-layers')) {
-        normalized = normalized
-            .replace('primary-state-layers-primary-08', 'primary-state-08')
-            .replace('primary-state-layers-primary-12', 'primary-state-12')
-            .replace('primary-state-layers-primary-16', 'primary-state-16')
-            .replace('primary-state-layers-primary-container-08', 'primary-container-state-08')
-            .replace('primary-state-layers-primary-container-12', 'primary-container-state-12')
-            .replace('primary-state-layers-primary-container-16', 'primary-container-state-16')
-            .replace('secondary-state-layers-secondary-08', 'secondary-state-08')
-            .replace('secondary-state-layers-secondary-12', 'secondary-state-12')
-            .replace('secondary-state-layers-secondary-16', 'secondary-state-16')
-            .replace('secondary-state-layers-secondary-container-08', 'secondary-container-state-08')
-            .replace('secondary-state-layers-secondary-container-12', 'secondary-container-state-12')
-            .replace('secondary-state-layers-secondary-container-16', 'secondary-container-state-16')
-            .replace('tertiary-state-layers-tertiary-08', 'tertiary-state-08')
-            .replace('tertiary-state-layers-tertiary-12', 'tertiary-state-12')
-            .replace('tertiary-state-layers-tertiary-16', 'tertiary-state-16')
-            .replace('tertiary-state-layers-tertiary-container-08', 'tertiary-container-state-08')
-            .replace('tertiary-state-layers-tertiary-container-12', 'tertiary-container-state-12')
-            .replace('tertiary-state-layers-tertiary-container-16', 'tertiary-container-state-16');
-    }
-
-    return mappings[normalized] || normalized;
+    return map;
 }
 
 /**
  * Process and generate colors SCSS
  */
 function generateColorsSCSS() {
-    const accent = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ accent.json`, 'utf8'));
-    const neutral = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ neutral.json`, 'utf8'));
+    const accentMap = collectColors('colors _ accent.json', accentToken);
+    const neutralMap = collectColors('colors _ neutral.json', neutralToken);
 
-    const accentMode = Object.keys(accent.modes)[0];
-    const neutralMode = Object.keys(neutral.modes)[0];
+    const neutralNames = new Set(readSource('colors _ neutral.json').json.variables.map((v) => neutralToken(v.name)));
+    for (const key of Object.keys(CODE_ONLY_NEUTRALS)) {
+        if (neutralNames.has(key)) stale('CODE_ONLY_NEUTRALS', `--color-${key} is now a Figma variable; read it from the export.`);
+    }
 
     let scss = `/**
  * Material Design 3 Color Tokens
@@ -135,248 +196,265 @@ function generateColorsSCSS() {
     /* ============================================
        ACCENT COLORS - Material Design 3 Roles
        ============================================ */
-    
-    /* Primary Colors */
 `;
 
-    // Process accent colors
-    const colorMap = {};
-    accent.variables.forEach(v => {
-        const val = v.valuesByMode[accentMode];
-        if (!val) return;
-
-        let colorValue;
-        if (val.type === 'VARIABLE_ALIAS') {
-            // For aliases, we'll resolve them later
-            const resolved = v.resolvedValuesByMode[accentMode];
-            if (resolved && resolved.r !== undefined) {
-                colorValue = rgbToHex(resolved.r, resolved.g, resolved.b, resolved.a);
-            } else {
-                return; // Skip if we can't resolve
+    for (const family of ACCENT_FAMILIES) {
+        const f = slug(family);
+        const { roles, states } = familyOrder(f);
+        const target = ALIASED_FAMILIES[family];
+        const line = (token) => {
+            if (!target) return accentMap[token] === undefined ? '' : `    --color-${token}: ${accentMap[token]};\n`;
+            const twin = token.replace(f, slug(target));
+            if (accentMap[twin] === undefined) return '';
+            if (accentMap[token] !== undefined && accentMap[token] !== accentMap[twin]) {
+                throw new Error(
+                    `colors _ accent.json: --color-${token} is ${accentMap[token]} but --color-${twin} is ` +
+                    `${accentMap[twin]}. ${family} is written as an alias of ${target}; they have to agree.`,
+                );
             }
-        } else if (typeof val === 'string') {
-            // Check if it's a hex string
-            colorValue = val;
-        } else if (val.r !== undefined) {
-            colorValue = rgbToHex(val.r, val.g, val.b, val.a);
-        } else {
-            return;
-        }
+            return `    --color-${token}: var(--color-${twin});\n`;
+        };
+        const note = target ? `    /* ${family} aliases to ${target} */\n` : '';
+        scss += `\n    /* ${family} Colors */\n${note}${roles.map(line).join('')}`;
+        scss += `\n    /* ${family} State Layers */\n${note}${states.map(line).join('')}`;
+    }
 
-        const cssName = toM3ColorName(v.name);
-        colorMap[cssName] = colorValue;
-    });
-
-    // Organize and output accent colors by category
-    const categories = {
-        'Primary': ['primary', 'on-primary', 'primary-container', 'on-primary-container', 'inverse-primary'],
-        'Primary State Layers': Object.keys(colorMap).filter(k => k.startsWith('primary-state') || k.startsWith('primary-container-state')),
-        'Secondary': ['secondary', 'on-secondary', 'secondary-container', 'on-secondary-container'],
-        'Secondary State Layers': Object.keys(colorMap).filter(k => k.startsWith('secondary-state') || k.startsWith('secondary-container-state')),
-        'Tertiary': ['tertiary', 'on-tertiary', 'tertiary-container', 'on-tertiary-container'],
-        'Tertiary State Layers': Object.keys(colorMap).filter(k => k.startsWith('tertiary-state') || k.startsWith('tertiary-container-state')),
-        'Danger': ['danger', 'on-danger', 'danger-container', 'on-danger-container'],
-        'Danger State Layers': Object.keys(colorMap).filter(k => k.startsWith('danger-state') || k.startsWith('danger-container-state')),
-        'Success': ['success', 'on-success', 'success-container', 'on-success-container'],
-        'Success State Layers': Object.keys(colorMap).filter(k => k.startsWith('success-state') || k.startsWith('success-container-state')),
-        'Warning': ['warning', 'on-warning', 'warning-container', 'on-warning-container'],
-        'Warning State Layers': Object.keys(colorMap).filter(k => k.startsWith('warning-state') || k.startsWith('warning-container-state')),
-        'Info': ['info', 'on-info', 'info-container', 'on-info-container'],
-        'Info State Layers': Object.keys(colorMap).filter(k => k.startsWith('info-state') || k.startsWith('info-container-state')),
-        'Social-Emotional': ['social-emotional', 'on-social-emotional', 'social-emotional-container', 'on-social-emotional-container'],
-        'Social-Emotional State Layers': Object.keys(colorMap).filter(k => k.startsWith('social-emotional-state') || k.startsWith('social-emotional-container-state')),
-        'Mastering Content': ['mastering-content', 'on-mastering-content', 'mastering-content-container', 'on-mastering-content-container'],
-        'Mastering Content State Layers': Object.keys(colorMap).filter(k => k.startsWith('mastering-content-state') || k.startsWith('mastering-content-container-state')),
-        'Advocacy': ['advocacy', 'on-advocacy', 'advocacy-container', 'on-advocacy-container'],
-        'Advocacy State Layers': Object.keys(colorMap).filter(k => k.startsWith('advocacy-state') || k.startsWith('advocacy-container-state')),
-        'Relationship': ['relationship', 'on-relationship', 'relationship-container', 'on-relationship-container'],
-        'Relationship State Layers': Object.keys(colorMap).filter(k => k.startsWith('relationship-state') || k.startsWith('relationship-container-state')),
-        'Technology Tools': ['technology-tools', 'on-technology-tools', 'technology-tools-container', 'on-technology-tools-container'],
-        'Technology Tools State Layers': Object.keys(colorMap).filter(k => k.startsWith('technology-tools-state') || k.startsWith('technology-tools-container-state')),
-    };
-
-    Object.entries(categories).forEach(([category, keys]) => {
-        if (keys.length > 0 && keys.some(k => colorMap[k])) {
-            scss += `\n    /* ${category} */\n`;
-            keys.forEach(key => {
-                if (colorMap[key]) {
-                    scss += `    --color-${key}: ${colorMap[key]};\n`;
-                }
-            });
-        }
-    });
-
-    // Process neutral colors
-    scss += `\n    /* ============================================
+    scss += `
+    /* ============================================
        NEUTRAL COLORS - Material Design 3
        ============================================ */
-    
-    /* Surface Colors */\n`;
+`;
 
-    const neutralMap = {};
-    neutral.variables.forEach(v => {
-        const val = v.valuesByMode[neutralMode];
-        if (!val) return;
-
-        let colorValue;
-        if (val.type === 'VARIABLE_ALIAS') {
-            const resolved = v.resolvedValuesByMode[neutralMode];
-            if (resolved && resolved.r !== undefined) {
-                colorValue = rgbToHex(resolved.r, resolved.g, resolved.b, resolved.a);
-            } else {
-                return;
-            }
-        } else if (typeof val === 'string') {
-            colorValue = val;
-        } else if (val.r !== undefined) {
-            colorValue = rgbToHex(val.r, val.g, val.b, val.a);
-        } else {
-            return;
+    const neutralValues = { ...neutralMap, ...CODE_ONLY_NEUTRALS };
+    for (const [group, keys] of Object.entries(NEUTRAL_GROUPS)) {
+        scss += `\n    /* ${group} */\n`;
+        for (const key of keys) {
+            if (neutralValues[key] !== undefined) scss += `    --color-${key}: ${neutralValues[key]};\n`;
         }
+    }
 
-        let cssName = v.name
-            .replace(/^Neutral Colors\//i, '')
-            .replace(/^State-layers\//i, '')
-            .replace(/\//g, '-')
-            .toLowerCase()
-            .trim();
+    scss += `
+    /* ============================================
+       NEUTRAL STATE LAYERS
+       ============================================ */
+`;
+    for (const base of NEUTRAL_STATE_BASES) {
+        const keys = STATE_LEVELS.map((l) => `${base}-state-${l}`).filter((k) => neutralMap[k] !== undefined);
+        if (!keys.length) continue;
+        scss += `\n    /* ${base} */\n`;
+        for (const key of keys) scss += `    --color-${key}: ${neutralMap[key]};\n`;
+    }
 
-        // Map to M3 names
-        if (cssName === 'surface') cssName = 'surface';
-        else if (cssName === 'on-surface') cssName = 'on-surface';
-        else if (cssName === 'outline') cssName = 'outline';
-        else if (cssName === 'outline-variant') cssName = 'outline-variant';
-        else if (cssName === 'surface-container-surface-container-high') cssName = 'surface-container-high';
-        else if (cssName === 'surface-container-surface-container') cssName = 'surface-container';
-        else if (cssName === 'surface-container-surface-container-low') cssName = 'surface-container-low';
-        else if (cssName === 'surface-container-surface-container-lowest') cssName = 'surface-container-lowest';
-        else if (cssName === 'alternative-surface-dim') cssName = 'surface-dim';
-        else if (cssName === 'alternative-surface-bright') cssName = 'surface-bright';
-        else if (cssName === 'alternative-surface-variant') cssName = 'surface-variant';
-        else if (cssName === 'alternative-scrim') cssName = 'scrim';
-        else if (cssName === 'alternative-inverse-surface') cssName = 'inverse-surface';
-        else if (cssName === 'alternative-inverse-on-surface') cssName = 'inverse-on-surface';
-        else if (cssName === 'on-surface-variant') cssName = 'on-surface-variant';
-        else if (cssName.includes('surface-container-surface-container-highest')) cssName = 'surface-container-highest';
-        else if (cssName.startsWith('surface-container-on-surface')) cssName = 'on-surface';
-
-        // Skip state layers for now (they're handled separately if needed)
-        if (cssName.includes('opacity') || cssName.includes('state-layers')) {
-            return;
-        }
-
-        neutralMap[cssName] = colorValue;
-    });
-
-    // Output neutral colors in organized groups
-    const neutralGroups = {
-        'Surface': ['surface', 'on-surface'],
-        'Surface Variant': ['surface-variant', 'on-surface-variant'],
-        'Outline': ['outline', 'outline-variant'],
-        'Surface Containers': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
-        'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'inverse-surface', 'inverse-on-surface'],
-    };
-
-    Object.entries(neutralGroups).forEach(([group, keys]) => {
-        const existingKeys = keys.filter(k => neutralMap[k]);
-        if (existingKeys.length > 0) {
-            scss += `\n    /* ${group} */\n`;
-            existingKeys.forEach(key => {
-                scss += `    --color-${key}: ${neutralMap[key]};\n`;
-            });
-        }
-    });
+    /*
+     * Anything the maps produced that no list above placed. Written rather than
+     * dropped, so a new Figma role shows up in the diff instead of vanishing.
+     */
+    const placed = new Set([
+        ...ACCENT_FAMILIES.flatMap((f) => Object.values(familyOrder(slug(f))).flat()),
+        ...Object.values(NEUTRAL_GROUPS).flat(),
+        ...NEUTRAL_STATE_BASES.flatMap((b) => STATE_LEVELS.map((l) => `${b}-state-${l}`)),
+    ]);
+    const unplaced = Object.entries({ ...accentMap, ...neutralMap }).filter(([k]) => !placed.has(k));
+    if (unplaced.length) {
+        scss += `\n    /* Unsorted (add these to an order list in generate-all-tokens.js) */\n`;
+        for (const [key, value] of unplaced) scss += `    --color-${key}: ${value};\n`;
+    }
 
     scss += `}\n`;
 
     return scss;
+}
+
+/*
+ * SIZE TOKENS
+ *
+ * The three `size / *` collections are exported whole. Where the stylesheets
+ * and Figma disagree, the stylesheets win for now and the disagreement is
+ * written down here, one constant per kind, so that it is a stated exception
+ * rather than a silent one. Each is a known difference from Figma, not a
+ * decision that Figma is wrong.
+ */
+
+/** A size in CSS: `8px`, `1.5px`, `1023.98px`. */
+const px = (n) => `${+Number(n).toFixed(2)}px`;
+
+/**
+ * Primitives the stylesheet declares that Figma does not have. They are kept
+ * because components read them (the larger spacing steps and the column-width
+ * proxies each have a user).
+ */
+const CODE_ONLY_PRIMITIVES = {
+    spacing: {
+        'spacing-large-space-1200': 96,
+        'spacing-large-space-1500': 120,
+        'spacing-xlarge-space-2000': 160,
+        'spacing-xlarge-space-2500': 200,
+        'spacing-xlarge-space-5000': 400,
+    },
+    column: { 'column-xs': 60, 'column-sm': 80, 'column-md': 100, 'column-lg': 120 },
+};
+
+/** `{id: {token, value}}` for every Figma primitive, keyed by variable id so semantics can point at them. */
+function primitiveTokens() {
+    const { json, modes: [mode] } = readSource('size _ primitive.json', { oneMode: true });
+    const byId = {};
+    for (const v of json.variables) {
+        const value = v.resolvedValuesByMode[mode];
+        if (typeof value !== 'number') throw new Error(`size _ primitive.json: ${v.name} has no numeric value.`);
+        byId[v.id] = { token: slug(v.name), value };
+    }
+    return byId;
 }
 
 /**
  * Generate primitives SCSS
  */
 function generatePrimitivesSCSS() {
-    const primitives = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ primitive.json`, 'utf8'));
-    const mode = Object.keys(primitives.modes)[0];
+    const primitives = Object.values(primitiveTokens());
+    const figmaNames = new Set(primitives.map((p) => p.token));
+    for (const token of Object.values(CODE_ONLY_PRIMITIVES).flatMap(Object.keys)) {
+        if (figmaNames.has(token)) stale('CODE_ONLY_PRIMITIVES', `--size-${token} is now a Figma variable; read it from the export.`);
+    }
 
-    let scss = `/**
+    const groups = { spacing: [], radius: [], stroke: [] };
+    for (const { token, value } of primitives) {
+        const group = token.startsWith('spacing-') ? 'spacing' : token.includes('-radius-') ? 'radius' : token.includes('-stroke-') ? 'stroke' : null;
+        if (!group) throw new Error(`size _ primitive.json: no group for --size-${token}.`);
+        groups[group].push({ token, value });
+    }
+    for (const [token, value] of Object.entries(CODE_ONLY_PRIMITIVES.spacing)) groups.spacing.push({ token, value });
+
+    const step = ({ token }) => parseFloat(token.match(/(\d+(?:\.\d+)?)$/)[1]);
+    const lines = (items) => items.sort((a, b) => step(a) - step(b)).map(({ token, value }) => `    --size-${token}: ${px(value)};\n`).join('');
+
+    return `/**
  * Primitive Size Tokens
  * Base values used to build semantic tokens
  * DO NOT USE DIRECTLY - Use semantic tokens instead
  */
 
 :root {
-    /* Spacing Primitives */\n`;
-
-    const spacing = [];
-    const radius = [];
-    const stroke = [];
-
-    primitives.variables.forEach(v => {
-        const val = v.valuesByMode[mode];
-        if (val === undefined || val === null) return;
-
-        const resolved = v.resolvedValuesByMode[mode];
-        const value = resolved?.resolvedValue ?? val;
-
-        const name = v.name.toLowerCase().replace(/\//g, '-');
-
-        if (name.includes('spacing') || name.includes('space-')) {
-            spacing.push({ name, value });
-        } else if (name.includes('radius')) {
-            radius.push({ name, value });
-        } else if (name.includes('stroke')) {
-            stroke.push({ name, value });
-        }
-    });
-
-    // Sort and output spacing
-    spacing.sort((a, b) => {
-        const numA = parseInt(a.name.match(/\d+/)?.[0] || '0');
-        const numB = parseInt(b.name.match(/\d+/)?.[0] || '0');
-        return numA - numB;
-    });
-
-    spacing.forEach(item => {
-        const varName = item.name.replace(/^spacing\//, '').replace(/^small\//, '').replace(/^medium\//, '').replace(/^large\//, '');
-        scss += `    --size-${varName}: ${item.value}px;\n`;
-    });
-
-    scss += `\n    /* Border Radius Primitives */\n`;
-    radius.sort((a, b) => {
-        const numA = parseInt(a.name.match(/\d+/)?.[0] || '0');
-        const numB = parseInt(b.name.match(/\d+/)?.[0] || '0');
-        return numA - numB;
-    });
-
-    radius.forEach(item => {
-        const varName = item.name.replace(/^border\/radius\//, '').replace(/^border\/radius\//, '');
-        scss += `    --size-${varName}: ${item.value}px;\n`;
-    });
-
-    scss += `\n    /* Stroke/Border Width Primitives */\n`;
-    stroke.sort((a, b) => {
-        const numA = parseFloat(a.name.match(/\d+\.?\d*/)?.[0] || '0');
-        const numB = parseFloat(b.name.match(/\d+\.?\d*/)?.[0] || '0');
-        return numA - numB;
-    });
-
-    stroke.forEach(item => {
-        const varName = item.name.replace(/^border\/stroke\//, '');
-        scss += `    --size-${varName}: ${item.value}px;\n`;
-    });
-
-    scss += `}\n`;
-
-    return scss;
+    /* Spacing Primitives */
+${lines(groups.spacing)}
+    /* Column Width Proxies (not Figma variables; see CODE_ONLY_PRIMITIVES) */
+${Object.entries(CODE_ONLY_PRIMITIVES.column).map(([token, value]) => `    --size-${token}: ${px(value)};\n`).join('')}
+    /* Border Radius Primitives */
+${lines(groups.radius)}
+    /* Stroke/Border Width Primitives */
+${lines(groups.stroke)}}
+`;
 }
+
+/**
+ * Semantic tokens whose value differs from Figma's alias: token -> the
+ * primitive it points at instead. `element-radius-sm` is radius-100 (4px)
+ * where Figma's `Element/radius-sm` is radius-50 (2px); `surface-container-
+ * gap-md` is space-300 (16px) where Figma's `Surface Container/gap-md` is
+ * space-600 (32px).
+ */
+const SEMANTIC_OVERRIDES = {
+    'element-radius-sm': 'border-radius-radius-100',
+    'surface-container-gap-md': 'spacing-medium-space-300',
+};
+
+/** Semantic tokens the stylesheet declares that Figma does not have. */
+const CODE_ONLY_SEMANTICS = {
+    'surface-container-pad-x': 'spacing-medium-space-300',
+    'surface-container-pad-y': 'spacing-medium-space-200',
+    'table-radius-md': 'border-radius-radius-200',
+    'table-radius-sm': 'border-radius-radius-150',
+};
+
+/**
+ * Figma semantic variables not written yet. The Surface Container set is named
+ * differently from the stylesheet's, and `Table/row-radius` aliases a spacing
+ * primitive where the stylesheet has two radius tokens; adding them is a
+ * separate change.
+ */
+const SEMANTICS_NOT_WRITTEN = new Set([
+    'surface-container-pad-x-sm', 'surface-container-pad-x-md',
+    'surface-container-pad-y-sm', 'surface-container-pad-y-md',
+    'surface-container-gap-sm', 'surface-container-border',
+    'table-row-radius',
+]);
+
+/** The semantic layers in the order they are written. */
+const SEMANTIC_LAYERS = [
+    { prefix: 'element', heading: 'Elements Layer' },
+    { prefix: 'card', heading: 'Cards Layer' },
+    { prefix: 'section', heading: 'Sections Layer' },
+    { prefix: 'modal', heading: 'Modals Layer' },
+    { prefix: 'surface', heading: 'Surfaces Layer' },
+    { prefix: 'surface-container', heading: 'Surface Containers Layer' },
+    { prefix: 'table', heading: 'Table Tokens' },
+];
+
+/**
+ * Within a layer, tokens are written by kind in this order, then by size with
+ * `-full` last. A token of a kind not listed here is a refusal.
+ */
+const SEMANTIC_KINDS = ['cell-x', 'cell-y', 'cell-gap', 'pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
 
 /**
  * Generate semantic tokens SCSS
  */
 function generateSemanticsSCSS() {
-    const semantics = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ semantics.json`, 'utf8'));
-    const mode = Object.keys(semantics.modes)[0];
+    const primitives = primitiveTokens();
+    const primitiveNames = new Set(Object.values(primitives).map((p) => p.token));
+    const { json, modes: [mode] } = readSource('size _ semantics.json', { oneMode: true });
+
+    const figmaNames = new Set(json.variables.map((v) => slug(v.name)));
+    for (const token of SEMANTICS_NOT_WRITTEN) {
+        if (!figmaNames.has(token)) stale('SEMANTICS_NOT_WRITTEN', `Figma no longer has ${token}; drop it from the list.`);
+    }
+    for (const token of Object.keys(CODE_ONLY_SEMANTICS)) {
+        if (figmaNames.has(token)) stale('CODE_ONLY_SEMANTICS', `--size-${token} is now a Figma variable; read it from the export.`);
+    }
+
+    const values = {};
+    for (const v of json.variables) {
+        const token = slug(v.name);
+        if (SEMANTICS_NOT_WRITTEN.has(token)) continue;
+        const val = v.valuesByMode[mode];
+        if (val?.type === 'VARIABLE_ALIAS') {
+            const target = primitives[val.id];
+            if (!target) throw new Error(`size _ semantics.json: ${v.name} aliases ${val.id}, which is not a primitive.`);
+            values[token] = `var(--size-${target.token})`;
+        } else if (typeof val === 'number') {
+            values[token] = px(val);
+        } else {
+            throw new Error(`size _ semantics.json: ${v.name} has neither an alias nor a number.`);
+        }
+    }
+    for (const [token, primitive] of Object.entries(SEMANTIC_OVERRIDES)) {
+        if (values[token] === undefined) {
+            stale('SEMANTIC_OVERRIDES', `Figma has no ${token}; it belongs in CODE_ONLY_SEMANTICS.`);
+        } else if (values[token] === `var(--size-${primitive})`) {
+            stale('SEMANTIC_OVERRIDES', `Figma's ${token} is now ${values[token]}, the same as the override; delete the override.`);
+        }
+    }
+    for (const [token, primitive] of Object.entries({ ...CODE_ONLY_SEMANTICS, ...SEMANTIC_OVERRIDES })) {
+        if (!primitiveNames.has(primitive) && !(primitive in CODE_ONLY_PRIMITIVES.spacing)) {
+            throw new Error(`generate-all-tokens.js: --size-${token} points at --size-${primitive}, which is not generated.`);
+        }
+        values[token] = `var(--size-${primitive})`;
+    }
+
+    const byLayer = Object.fromEntries(SEMANTIC_LAYERS.map(({ prefix }) => [prefix, []]));
+    for (const token of Object.keys(values)) {
+        // Longest prefix first, so `surface-container-*` is not read as `surface-*`.
+        const layer = SEMANTIC_LAYERS.filter(({ prefix }) => token.startsWith(`${prefix}-`))
+            .sort((a, b) => b.prefix.length - a.prefix.length)[0];
+        if (!layer) throw new Error(`size _ semantics.json: no layer for --size-${token}.`);
+        byLayer[layer.prefix].push(token);
+    }
+    const kind = (token, prefix) => {
+        const rest = token.slice(prefix.length + 1);
+        const index = SEMANTIC_KINDS.findIndex((k) => rest === k || rest.startsWith(`${k}-`));
+        if (index < 0) throw new Error(`size _ semantics.json: --size-${token} is none of SEMANTIC_KINDS.`);
+        return index;
+    };
+    const full = (t) => (t.endsWith('-full') ? 1 : 0);
 
     let scss = `/**
  * Semantic Spacing Tokens
@@ -386,130 +464,97 @@ function generateSemanticsSCSS() {
 
 :root {
 `;
-
-    // Organize by layer
-    const layers = {
-        'element': [],
-        'card': [],
-        'section': [],
-        'modal': [],
-        'surface': [],
-        'surface-container': [],
-        'table': [],
-    };
-
-    semantics.variables.forEach(v => {
-        const val = v.valuesByMode[mode];
-        if (!val) return;
-
-        const resolved = v.resolvedValuesByMode[mode];
-        let value;
-
-        if (val.type === 'VARIABLE_ALIAS') {
-            value = resolved?.resolvedValue;
-        } else {
-            value = val;
-        }
-
-        if (value === undefined || value === null) return;
-
-        const name = v.name.toLowerCase().replace(/\//g, '-');
-        let layer = null;
-
-        if (name.startsWith('element')) layer = 'element';
-        else if (name.startsWith('card')) layer = 'card';
-        else if (name.startsWith('section')) layer = 'section';
-        else if (name.startsWith('modal')) layer = 'modal';
-        else if (name.startsWith('surface-container')) layer = 'surface-container';
-        else if (name.startsWith('surface') && !name.includes('container')) layer = 'surface';
-        else if (name.startsWith('table')) layer = 'table';
-
-        if (layer && layers[layer]) {
-            layers[layer].push({ name, value });
-        }
-    });
-
-    // Add missing semantic tokens (additive only - never modify existing)
-    // Check if element-radius-pill exists, if not add it
-    const elementLayer = layers['element'] || [];
-    const hasRadiusPill = elementLayer.some(item =>
-        item.name.includes('element-radius-pill') ||
-        item.name.includes('radius-pill') ||
-        item.name === 'element-radius-pill'
-    );
-
-    if (!hasRadiusPill) {
-        // Get primitive value for radius-1000 (999px)
-        let radiusPillValue = 999; // Default fallback
-        try {
-            const primitives = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ primitive.json`, 'utf8'));
-            const primitiveMode = Object.keys(primitives.modes)[0];
-            const radius1000 = primitives.variables.find(v => {
-                const name = v.name.toLowerCase();
-                return name.includes('radius-1000') || name.includes('radius/radius-1000');
-            });
-            if (radius1000) {
-                const val = radius1000.valuesByMode[primitiveMode];
-                const resolved = radius1000.resolvedValuesByMode[primitiveMode];
-                radiusPillValue = resolved?.resolvedValue ?? val ?? 999;
-            }
-        } catch (e) {
-            console.warn('Warning: Could not read primitives file, using default 999px for radius-pill');
-        }
-
-        // Add to element layer array so it gets processed naturally
-        layers['element'].push({
-            name: 'element-radius-pill',
-            value: radiusPillValue
-        });
+    for (const { prefix, heading } of SEMANTIC_LAYERS) {
+        const tokens = byLayer[prefix].sort((a, b) => kind(a, prefix) - kind(b, prefix) || full(a) - full(b) || a.localeCompare(b));
+        if (!tokens.length) continue;
+        scss += `\n    /* ${heading} */\n`;
+        for (const token of tokens) scss += `    --size-${token}: ${values[token]};\n`;
     }
-
-    // Output by layer
-    const layerOrder = ['element', 'card', 'section', 'modal', 'surface', 'surface-container', 'table'];
-    const layerLabels = {
-        'element': 'Elements Layer',
-        'card': 'Cards Layer',
-        'section': 'Sections Layer',
-        'modal': 'Modals Layer',
-        'surface': 'Surfaces Layer',
-        'surface-container': 'Surface Containers Layer',
-        'table': 'Table Tokens',
-    };
-
-    layerOrder.forEach(layer => {
-        if (layers[layer].length > 0) {
-            scss += `\n    /* ${layerLabels[layer]} */\n`;
-
-            // Sort: padding first, then gap, then radius, then border
-            const sorted = layers[layer].sort((a, b) => {
-                const order = ['pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
-                const aType = order.findIndex(o => a.name.includes(o));
-                const bType = order.findIndex(o => b.name.includes(o));
-                if (aType !== bType) return aType - bType;
-                return a.name.localeCompare(b.name);
-            });
-
-            sorted.forEach(item => {
-                const varName = item.name;
-                // Add comment for radius-pill token
-                const comment = varName === 'element-radius-pill'
-                    ? ' /* Fully rounded (pill shape) */'
-                    : '';
-                scss += `    --size-${varName}: ${item.value}px;${comment}\n`;
-            });
-        }
-    });
-
     scss += `}\n`;
-
     return scss;
 }
 
+/** Figma's layout mode names to breakpoint keys. */
+const BREAKPOINT_KEYS = { 'Medium (768px)': 'md', 'Large (1024px)': 'lg', 'X-Large (1440px)': 'xl' };
+
+/**
+ * Breakpoints that differ from Figma or are not in it: Figma's X-Large ends at
+ * 1800, the stylesheet at 1919.98 with an XXL step from 1920.
+ */
+const BREAKPOINT_OVERRIDES = { 'xl-max': 1919.98 };
+const CODE_ONLY_BREAKPOINTS = { 'xxl-min': 1920 };
+
+/**
+ * Layout tokens the stylesheet declares that Figma does not have, with the
+ * comment each is written with and `figmaName`, the slug the variable would
+ * have in `size / layout` (whose names slug to `grid-*`, `breakpoints-*` and
+ * so on, never `layout-*`). The SideNav is a fixed 164px wide; Figma draws it
+ * at that width but has no variable for it.
+ */
+const CODE_ONLY_LAYOUT = {
+    'layout-sidebar-width': { value: 164, note: 'SideNav fixed width', figmaName: 'grid-sidebar-width' },
+};
+
+/**
+ * The semantic token the grid gutter is documented as equal to. The note is
+ * checked, not trusted: Figma's `Grid/content-gutter` and this token's
+ * resolved value have to match.
+ */
+const GRID_GAP_EQUALS = 'element-gap-sm';
+
 /**
  * Generate layout tokens SCSS
+ *
+ * Reads `Breakpoints/*`, `Columns/*` and `Grid/content-gutter`. Not written
+ * yet: `Display/*`, `Grid/columns`, `Grid/viewport-gutter`,
+ * `Grid/viewport-margin` and `Min Heights/*`.
  */
 function generateLayoutSCSS() {
-    const layout = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ layout.json`, 'utf8'));
+    const { json } = readSource('size _ layout.json');
+    const figmaNames = new Set(json.variables.map((v) => slug(v.name)));
+    const modes = Object.entries(json.modes).map(([id, name]) => {
+        if (!BREAKPOINT_KEYS[name]) throw new Error(`size _ layout.json: unknown mode "${name}".`);
+        return { id, key: BREAKPOINT_KEYS[name] };
+    });
+    const variable = (name) => {
+        const v = json.variables.find((x) => x.name === name);
+        if (!v) throw new Error(`size _ layout.json: no ${name}.`);
+        return (mode) => v.resolvedValuesByMode[mode.id];
+    };
+
+    const breakpoints = {};
+    const min = variable('Breakpoints/min width');
+    const max = variable('Breakpoints/max width');
+    for (const mode of modes) {
+        breakpoints[`${mode.key}-min`] = min(mode);
+        breakpoints[`${mode.key}-max`] = max(mode);
+    }
+    for (const [key, value] of Object.entries(BREAKPOINT_OVERRIDES)) {
+        if (breakpoints[key] === undefined) stale('BREAKPOINT_OVERRIDES', `Figma has no ${key}; it belongs in CODE_ONLY_BREAKPOINTS.`);
+        else if (breakpoints[key] === value) stale('BREAKPOINT_OVERRIDES', `Figma's ${key} is now ${value}, the same as the override; delete the override.`);
+    }
+    for (const key of Object.keys(CODE_ONLY_BREAKPOINTS)) {
+        if (breakpoints[key] !== undefined) stale('CODE_ONLY_BREAKPOINTS', `Figma now has ${key}; read it from the export.`);
+    }
+    for (const [token, { figmaName }] of Object.entries(CODE_ONLY_LAYOUT)) {
+        if (figmaNames.has(figmaName)) stale('CODE_ONLY_LAYOUT', `Figma now has ${figmaName}; read --${token} from the export.`);
+    }
+    Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
+
+    const gutter = variable('Grid/content-gutter');
+    const gutters = new Set(modes.map(gutter));
+    if (gutters.size !== 1) throw new Error('size _ layout.json: Grid/content-gutter differs by mode; --layout-grid-gap is one value.');
+    const gridGap = [...gutters][0];
+
+    const semantics = readSource('size _ semantics.json', { oneMode: true });
+    const twin = semantics.json.variables.find((v) => slug(v.name) === GRID_GAP_EQUALS);
+    const twinValue = twin?.resolvedValuesByMode[semantics.modes[0]];
+    if (twinValue !== gridGap) {
+        stale('GRID_GAP_EQUALS', `Grid/content-gutter is ${gridGap} but ${GRID_GAP_EQUALS} is ${twinValue}; the note no longer holds.`);
+    }
+
+    const columns = (mode, indent) =>
+        Array.from({ length: 12 }, (_, i) => `${indent}--col-${i + 1}: ${px(variable(`Columns/col-${i + 1}`)(mode))};\n`).join('');
 
     let scss = `/**
  * Layout Tokens
@@ -517,81 +562,20 @@ function generateLayoutSCSS() {
  */
 
 :root {
-    /* Breakpoints */\n`;
+    /* Breakpoints */
+${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\n`).join('')}
+    /* App shell + content grid */
+${Object.entries(CODE_ONLY_LAYOUT).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note}; not a Figma variable (CODE_ONLY_LAYOUT) */\n`).join('')}\
+    --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --size-${GRID_GAP_EQUALS}); col-* spans assume this */
 
-    // Extract breakpoints
-    const breakpoints = {};
-    layout.variables.forEach(v => {
-        if (v.name.includes('Breakpoints')) {
-            const modes = v.valuesByMode;
-            Object.entries(modes).forEach(([modeKey, value]) => {
-                if (typeof value === 'number') {
-                    const modeName = layout.modes[modeKey];
-                    if (!breakpoints[modeName]) breakpoints[modeName] = {};
-                    if (v.name.includes('min')) {
-                        breakpoints[modeName].min = value;
-                    } else if (v.name.includes('max')) {
-                        breakpoints[modeName].max = value;
-                    }
-                }
-            });
-        }
-    });
-
-    // Output breakpoints
-    Object.entries(breakpoints).forEach(([mode, { min, max }]) => {
-        if (min) scss += `    --breakpoint-${mode.toLowerCase()}-min: ${min}px;\n`;
-        if (max) scss += `    --breakpoint-${mode.toLowerCase()}-max: ${max}px;\n`;
-    });
-
-    scss += `\n    /* App shell + content grid (mirrors the Figma size/layout collection) */\n`;
-    scss += `    --layout-sidebar-width: 164px; /* SideNav fixed width */\n`;
-    scss += `    --layout-grid-gap: 8px; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */\n`;
-
-    // Content-grid column spans (12 cols, 8px gutter) at each breakpoint minimum.
-    // Main content width: MD 672 / LG 748 / XL 1164 (= viewport − outer pad − SideNav − gap − surface pad).
-    const contentWidths = { md: 672, lg: 748, xl: 1164 };
-    const colSpans = (w) => {
-        const col1 = (w - 8 * 11) / 12;
-        return Array.from({ length: 12 }, (_, i) => +(col1 * (i + 1) + 8 * i).toFixed(2));
-    };
-    scss += `\n    /* Content-grid column spans — MD (768) values; LG/XL override below */\n`;
-    colSpans(contentWidths.md).forEach((v, i) => { scss += `    --col-${i + 1}: ${v}px;\n`; });
-    scss += `}\n`;
-    scss += `\n@media (min-width: 1024px) {\n    :root {\n`;
-    colSpans(contentWidths.lg).forEach((v, i) => { scss += `        --col-${i + 1}: ${v}px;\n`; });
-    scss += `    }\n}\n`;
-    scss += `\n@media (min-width: 1440px) {\n    :root {\n`;
-    colSpans(contentWidths.xl).forEach((v, i) => { scss += `        --col-${i + 1}: ${v}px;\n`; });
-    scss += `    }\n}\n`;
-
+    /* Content-grid column spans — ${modes[0].key.toUpperCase()} values; wider breakpoints override below */
+${columns(modes[0], '    ')}}
+`;
+    for (const mode of modes.slice(1)) {
+        scss += `\n@media (min-width: ${px(breakpoints[`${mode.key}-min`])}) {\n    :root {\n${columns(mode, '        ')}    }\n}\n`;
+    }
     return scss;
 }
-
-/**
- * Validate generated SCSS files to ensure no primitive tokens are used
- */
-function validateSemanticTokens(scssContent, filename) {
-    // List of primitive token patterns that should NOT appear in semantic files
-    const primitivePatterns = [
-        /--size-spacing-/,
-        /--size-border-radius-radius-/,
-        /--size-border-stroke-stroke-/,
-    ];
-
-    const errors = [];
-    primitivePatterns.forEach(pattern => {
-        const matches = scssContent.match(new RegExp(pattern, 'g'));
-        if (matches) {
-            matches.forEach(match => {
-                errors.push(`Primitive token found in ${filename}: ${match}`);
-            });
-        }
-    });
-
-    return errors;
-}
-
 
 // Generate all files
 //
@@ -604,12 +588,30 @@ function validateSemanticTokens(scssContent, filename) {
 console.log('Generating token SCSS files...');
 
 const OUT_DIR = TOKEN_DIR;
-const built = [
-    { file: '_colors.scss', generated: generateColorsSCSS() },
-    { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
-    { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
-    { file: '_layout.scss', generated: generateLayoutSCSS() },
-].map((entry) => ({
+let generated;
+try {
+    generated = [
+        { file: '_colors.scss', generated: generateColorsSCSS() },
+        { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
+        { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
+        { file: '_layout.scss', generated: generateLayoutSCSS() },
+    ];
+} catch (error) {
+    console.error(`\n❌ Generation failed. ${error.message}\n   Nothing was written.\n`);
+    process.exit(1);
+}
+
+if (staleExceptions.length) {
+    console.error('\n❌ Stale exception. These exceptions no longer describe a difference from Figma:\n');
+    for (const line of staleExceptions) console.error(`   ${line}`);
+    console.error(
+        '\n   Update the constant in scripts/generate-all-tokens.js so it only lists\n' +
+        '   real differences, then run this again. Nothing was written.\n',
+    );
+    process.exit(1);
+}
+
+const built = generated.map((entry) => ({
     ...entry,
     committed: fs.existsSync(path.join(OUT_DIR, entry.file))
         ? fs.readFileSync(path.join(OUT_DIR, entry.file), 'utf8')
@@ -655,15 +657,4 @@ if (refused.length && force) {
 }
 
 console.log('\n✅ All token files generated successfully!');
-/*
- * `validateSemanticTokens` is still not run — see the commented-out block above.
- * This line used to read "✅ Validation passed: No primitive tokens found in
- * semantic files", printed unconditionally beside a validation that had been
- * commented out, which is a claim rather than a result. The validation would
- * report 48 findings today: `_spacing_semantics.scss` uses `--size-spacing-*`
- * throughout, which is the pattern it forbids. Turning it on means deciding
- * whether that pattern is wrong or the rule is; neither is decided here, and
- * neither is served by printing that it passed.
- */
-console.log('ℹ️  Semantic-token validation is DISABLED (48 known findings). Not run, not passed.');
 

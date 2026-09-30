@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Dropdown from './Dropdown';
 
@@ -7,6 +9,12 @@ export default {
     component: Dropdown,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'changed', summary: 'Menu rows matched Figma: the multi-select checkbox became the `_Form Checkbox Button` box, a selected row took the primary-container 16 ground with a stroke-xl left edge, and a row with no leading visual lost its leading gap.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'Escape inside an open menu closed it, returned focus to the toggle once it had closed, and stopped propagating, so an enclosing Modal no longer closed on the same key.' },
+            { date: '2026-09-29', kind: 'added', summary: 'Items took `href` (and `linkComponent`) to render as a link, `isToggle` to report `selected` as `aria-pressed`, `isStatic` for a row that is not a control, and `isBusy` for an item still working.' },
+            { date: '2026-09-29', kind: 'fixed', summary: '`trailingIcon` became decorative (`aria-hidden`), like `leadingIcon`, so its glyph no longer leaked into the item name.' },
+        ],
         docs: {
             description: {
                 component: 'Dropdown component for displaying actionable lists and menus. Supports multi-select, icons, dividers, and different directions.'
@@ -232,6 +240,258 @@ Overview.parameters = {
     docs: {
         source: { language: 'jsx', code: webAppSourceSnippets.dropdown }
     }
+};
+
+/* ------------------------------------------------------------------ Escape */
+
+const ESCAPE_ITEMS = [{ text: 'Rename' }, { text: 'Archive' }];
+
+/** Open with the keyboard, Tab into the menu, then Escape: closed, focus on `toggle`. */
+const escapeReturnsFocus = async (canvas, toggle) => {
+    toggle.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    const first = canvas.getByRole('button', { name: 'Rename' });
+    first.focus();
+    await expect(first).toHaveFocus();
+
+    await userEvent.keyboard('{Escape}');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(canvas.queryByRole('button', { name: 'Rename' }), 'the menu is gone').toBeNull();
+    await expect(toggle, 'focus is back on the toggle').toHaveFocus();
+};
+
+/**
+ * Escape closes the menu from inside it and returns focus to the toggle, so a
+ * keyboard user is never left on an item that has disappeared.
+ */
+export const EscapeCloses = () => (
+    <div style={{ padding: '24px 24px 160px' }}>
+        <Dropdown buttonText="Actions" items={ESCAPE_ITEMS} />
+    </div>
+);
+
+EscapeCloses.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await escapeReturnsFocus(canvas, canvas.getByRole('button', { name: 'Actions' }));
+};
+
+/**
+ * In a split button focus goes back to the caret half, not the action half,
+ * on whichever side the caret sits.
+ */
+export const EscapeClosesSplit = () => (
+    <div style={{ display: 'flex', gap: '48px', padding: '24px 24px 160px 240px' }}>
+        <Dropdown split buttonText="Save" items={ESCAPE_ITEMS} />
+        <Dropdown split direction="dropleft" buttonText="Send" items={ESCAPE_ITEMS} />
+    </div>
+);
+
+EscapeClosesSplit.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await escapeReturnsFocus(canvas, canvas.getByRole('button', { name: 'Save options' }));
+    await escapeReturnsFocus(canvas, canvas.getByRole('button', { name: 'Send options' }));
+};
+
+/**
+ * A custom toggle with nothing focusable in it, opened by a caller that
+ * controls `isOpen`: Escape returns focus to what had it when the menu opened,
+ * never to the page.
+ */
+export const EscapeClosesCustomToggle = () => {
+    const [open, setOpen] = React.useState(false);
+    return (
+        <div style={{ display: 'flex', gap: '24px', padding: '24px 24px 160px' }}>
+            <button type="button" onClick={() => setOpen(true)}>Open sections</button>
+            <Dropdown toggle={<span>Sections</span>} items={ESCAPE_ITEMS} isOpen={open} onToggle={setOpen} />
+        </div>
+    );
+};
+
+EscapeClosesCustomToggle.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const opener = canvas.getByRole('button', { name: 'Open sections' });
+    opener.focus();
+    await userEvent.keyboard('{Enter}');
+
+    const first = await canvas.findByRole('button', { name: 'Rename' });
+    first.focus();
+    await userEvent.keyboard('{Escape}');
+
+    await expect(canvas.queryByRole('button', { name: 'Rename' }), 'the menu is gone').toBeNull();
+    await expect(opener, 'focus is back on what opened it').toHaveFocus();
+};
+
+/* ------------------------------------------------------ links and toggles */
+
+/**
+ * An item with `href` is a real link, with its trailing icon kept out of its
+ * name. A `toggle` item reports `selected` as `aria-pressed`.
+ */
+export const LinkAndToggleItems = () => (
+    <div style={{ padding: '24px 24px 200px' }}>
+        <Dropdown
+            buttonText="Views"
+            items={[
+                { text: 'Open report', href: '#report', trailingIcon: 'arrow-right' },
+                { text: 'Pinned', isToggle: true, selected: true, keepOpen: true },
+                { text: 'Archived', isToggle: true, selected: false, keepOpen: true },
+                { text: 'Rename' },
+            ]}
+        />
+    </div>
+);
+
+LinkAndToggleItems.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Views' }));
+
+    const link = canvas.getByRole('link', { name: 'Open report' });
+    await expect(link).toHaveAttribute('href', '#report');
+    await expect(link.tabIndex).toBe(0);
+
+    await expect(canvas.getByRole('button', { name: 'Pinned' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(canvas.getByRole('button', { name: 'Archived' })).toHaveAttribute('aria-pressed', 'false');
+    await expect(canvas.getByRole('button', { name: 'Rename' }), 'a plain item is not a toggle')
+        .not.toHaveAttribute('aria-pressed');
+};
+
+/**
+ * A controlled caller that keeps the menu open when Escape asks to close it:
+ * focus stays where it is, on the item, and does not jump to the toggle of a
+ * menu that is still open.
+ */
+export const EscapeIgnoredWhenControlledStaysOpen = () => (
+    <div style={{ padding: '24px 24px 160px' }}>
+        <Dropdown buttonText="Pinned open" items={ESCAPE_ITEMS} isOpen onToggle={() => {}} />
+    </div>
+);
+
+EscapeIgnoredWhenControlledStaysOpen.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('button', { name: 'Rename' });
+    first.focus();
+    await userEvent.keyboard('{Escape}');
+    await expect(canvas.getByRole('button', { name: 'Rename' }), 'the menu is still open').toBeVisible();
+    await expect(first, 'focus stays on the item').toHaveFocus();
+};
+
+/**
+ * The caller refuses Escape, the person moves on, and later the caller closes
+ * the menu itself. Focus stays where the person went: the refused Escape is
+ * not remembered and replayed onto the toggle.
+ */
+export const EscapeRefusedThenParentCloses = () => {
+    const [open, setOpen] = React.useState(true);
+    return (
+        <div style={{ display: 'flex', gap: '24px', padding: '24px 24px 160px' }}>
+            <Dropdown buttonText="Held open" items={ESCAPE_ITEMS} isOpen={open} onToggle={() => {}} />
+            <button type="button" onClick={() => setOpen(false)}>Close from outside</button>
+        </div>
+    );
+};
+
+EscapeRefusedThenParentCloses.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('button', { name: 'Rename' });
+    first.focus();
+    await userEvent.keyboard('{Escape}');
+    await expect(first, 'the refused Escape leaves focus on the item').toHaveFocus();
+
+    const closer = canvas.getByRole('button', { name: 'Close from outside' });
+    closer.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.queryByRole('button', { name: 'Rename' }), 'the caller closed it').toBeNull();
+    await expect(closer, 'focus does not jump to the toggle').toHaveFocus();
+};
+
+/* ------------------------------------------------------------- menu rows */
+
+/**
+ * The rows as Figma's Dropdown list Item set draws them. A row with no
+ * leading visual starts its words at the padding. A selected row is the
+ * primary-container 16 ground with a primary-container stroke on its left
+ * edge. A multi-select row leads with the `_Form Checkbox Button` box:
+ * an on-primary box with a primary-border stroke when unchecked, a primary
+ * box with an on-primary check when checked, and a surface box with an
+ * on-surface stroke on a disabled row. The box is decorative: the row says
+ * whether it is on through `aria-pressed`.
+ */
+export const MenuRows = () => (
+    <div style={{ padding: '24px 24px 280px' }}>
+        <Dropdown
+            buttonText="Rows"
+            items={[
+                { text: 'Plain', keepOpen: true },
+                { text: 'Chosen', selected: true, keepOpen: true },
+                { text: 'Unchecked', isToggle: true, multiSelectCheckbox: true, multiSelectChecked: false, keepOpen: true },
+                { text: 'Checked', isToggle: true, selected: true, multiSelectCheckbox: true, multiSelectChecked: true, keepOpen: true },
+                { text: 'Unavailable', disabled: true, multiSelectCheckbox: true, multiSelectChecked: false },
+            ]}
+        />
+    </div>
+);
+
+MenuRows.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Rows' }));
+    const row = (name) => canvas.getByRole('button', { name });
+    const words = (item) => within(item).getByText(item.textContent.trim());
+    const checkboxOf = (item) => item.querySelector('.pdropdown-checkbox');
+    const color = (token) => tokenColor(canvasElement, token);
+    const length = (token) => tokenLength(canvasElement, token);
+
+    // No leading gap: the words start at the row's left padding.
+    for (const name of ['Plain', 'Chosen']) {
+        const item = row(name);
+        const inset = words(item).getBoundingClientRect().left - item.getBoundingClientRect().left;
+        await expect(inset, `${name} starts at the padding`).toBeCloseTo(length('--size-element-pad-x-md'), 0);
+    }
+
+    // Selected: the primary-container 16 ground and a primary-container
+    // stroke of stroke-xl on the left edge. Read once, outside the wait, so
+    // the probe does not wake the wait's own mutation observer.
+    const selectedGround = color('--color-primary-container-state-16');
+    await waitFor(() => expect(getComputedStyle(row('Chosen')).backgroundColor, 'selected ground')
+        .toBe(selectedGround));
+    const rail = getComputedStyle(row('Chosen'), '::before');
+    await expect(px(rail.width), 'the left stroke is stroke-xl').toBe(length('--size-element-stroke-xl'));
+    await expect(rail.backgroundColor, 'the left stroke is primary-container').toBe(color('--color-primary-container'));
+
+    // The checkbox: a 12px box (Figma's fixed frame) with radius-50 corners.
+    const off = checkboxOf(row('Unchecked'));
+    const on = checkboxOf(row('Checked'));
+    const disabled = checkboxOf(row('Unavailable'));
+    for (const box of [off, on, disabled]) {
+        await expect(box, 'a checkbox leads the row').not.toBeNull();
+        await expect(box, 'the box is decorative').toHaveAttribute('aria-hidden', 'true');
+        const s = getComputedStyle(box);
+        await expect([px(s.width), px(s.height)], 'a 12px box').toEqual([12, 12]);
+        await expect(px(s.borderTopLeftRadius), 'radius-50 corners').toBe(length('--size-border-radius-radius-50'));
+    }
+    await expect(row('Unchecked'), 'the row carries the state').toHaveAttribute('aria-pressed', 'false');
+    await expect(row('Checked')).toHaveAttribute('aria-pressed', 'true');
+
+    // Unchecked: on-primary with a primary-border stroke, and no check.
+    const offStyle = getComputedStyle(off);
+    await expect(offStyle.backgroundColor, 'unchecked fill').toBe(color('--color-on-primary'));
+    await expect(px(offStyle.borderTopWidth), 'unchecked stroke width').toBe(length('--size-element-stroke-sm'));
+    await expect(offStyle.borderTopColor, 'unchecked stroke').toBe(color('--color-primary-border'));
+    await expect(off.querySelector('svg'), 'no check while off').toBeNull();
+
+    // Checked: a primary box with no stroke and an on-primary check.
+    const onStyle = getComputedStyle(on);
+    await expect(onStyle.backgroundColor, 'checked fill').toBe(color('--color-primary'));
+    await expect(px(onStyle.borderTopWidth), 'no stroke when checked').toBe(0);
+    const check = on.querySelector('svg');
+    await expect(check, 'a check is drawn').not.toBeNull();
+    await expect(getComputedStyle(check).color, 'the check is on-primary').toBe(color('--color-on-primary'));
+
+    // Disabled: surface with an on-surface stroke.
+    const disabledStyle = getComputedStyle(disabled);
+    await expect(disabledStyle.backgroundColor, 'disabled fill').toBe(color('--color-surface'));
+    await expect(disabledStyle.borderTopColor, 'disabled stroke').toBe(color('--color-on-surface'));
 };
 
 export const Interactive = {

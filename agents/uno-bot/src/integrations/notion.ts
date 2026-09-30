@@ -14,6 +14,7 @@
 
 import type { Env } from "../types";
 import { countedFetch, subrequestBudgetSpent, rethrowIfBudget } from "../net";
+import { isPlainRichText, RICH_TEXT_TYPES, richTextLinks, type RichTextRun } from "./notion-rich-text";
 import {
   chunkBlocks,
   markdownToNotionBlocks,
@@ -575,6 +576,14 @@ export interface NotionPageContent {
    * never saw (ADR-029). Same order as `text`, one entry per rendered line.
    */
   blocks: NotionPageBlock[];
+  /** The database the page is a row of, dashes removed; null for a page that
+   *  is no database's row. */
+  parentDatabaseId: string | null;
+  /** Notion's `parent.type`: `workspace` for a top-level page. */
+  parentType: string | null;
+  /** More top-level blocks follow the last one read: `blocks` stops short of
+   *  the page's end. */
+  truncated: boolean;
 }
 
 export interface NotionPageBlock {
@@ -585,6 +594,13 @@ export interface NotionPageBlock {
   lastEditedTime: string;
   /** The block's rendered text — the line it contributed to `text`. */
   text: string;
+  /** Words only: no link, mention, equation or formatting a text replace
+   *  would drop (`isPlainRichText`). */
+  plain: boolean;
+  /** The URLs its rich text links or mentions (`richTextLinks`). */
+  links: string[];
+  /** Its last edit was an integration's — uno-bot's own write, as a rule. */
+  byBot: boolean;
 }
 
 interface NotionProperty {
@@ -620,22 +636,51 @@ function renderProperty(p: NotionProperty): string {
   }
 }
 
+/** The mark a block's rendered line leads with, by type: what a reader of
+ *  `text` sees, and never part of the block's own rich text. */
+function displayPrefix(type: string): string {
+  if (type === "bulleted_list_item" || type === "numbered_list_item") return "• ";
+  if (type === "to_do") return "☐ ";
+  return "";
+}
+
+/**
+ * A block's text without the mark its rendered line leads with — the text an
+ * in-place replacement writes back, so a fix drafted from `• Owner: Ade`
+ * writes `Owner: Ade` into the list item rather than a second bullet.
+ *
+ * @param type - Notion's block type
+ * @param text - The rendered line, or a replacement drafted from one
+ */
+export function stripBlockPrefix(type: string, text: string): string {
+  const prefix = displayPrefix(type);
+  return prefix && text.startsWith(prefix) ? text.slice(prefix.length) : text;
+}
+
 function blockText(block: Record<string, unknown>): string {
   const type = block.type as string;
   const body = block[type] as { rich_text?: NotionRichText } | undefined;
   const txt = plain(body?.rich_text);
   if (!txt) return "";
-  if (type === "bulleted_list_item" || type === "numbered_list_item") return `• ${txt}`;
-  if (type === "to_do") return `☐ ${txt}`;
   if (type.startsWith("heading")) return `\n${txt}`;
-  return txt;
+  return `${displayPrefix(type)}${txt}`;
 }
 
 /**
  * Read a Notion page: title + rendered properties (incl. people/Owner) + block
  * text. Throws on failure so read_source can report it honestly. Read-only.
+ *
+ * A children page that fails, or a budget that runs out mid-read, leaves the
+ * blocks already read — what `read_source` shows — and that partial read is
+ * not cached. With `complete`, either throws instead (a failed page as
+ * `Notion <status>`): the sweep reads a page to judge all of it, and a page
+ * read as empty would pass its thread by.
  */
-export async function readNotionPage(env: Env, pageId: string): Promise<NotionPageContent> {
+export async function readNotionPage(
+  env: Env,
+  pageId: string,
+  opts: { complete?: boolean } = {},
+): Promise<NotionPageContent> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
 
   // Serve a fresh cached read (0 subrequests) if we read this page recently.
@@ -649,6 +694,7 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
     const pageRes = await countedFetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
     const page = (await pageRes.json()) as {
       id?: string; message?: string; code?: string;
+      parent?: { type?: string; database_id?: string };
       properties?: Record<string, NotionProperty>;
     };
     if (!pageRes.ok || !page.id) {
@@ -671,12 +717,26 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
     const lines: string[] = [];
     const blocks: NotionPageBlock[] = [];
     let cursor: string | undefined;
+    let partial = false;
+    let truncated = false;
     for (let i = 0; i < READ_BLOCK_PAGES; i++) {
-      if (subrequestBudgetSpent()) break; // keep the blocks already read
+      // Keep the blocks already read; a complete read lets the fetch below
+      // throw the budget's own error instead.
+      if (!opts.complete && subrequestBudgetSpent()) {
+        partial = true;
+        break;
+      }
       const qs = new URLSearchParams({ page_size: "100" });
       if (cursor) qs.set("start_cursor", cursor);
       const bRes = await countedFetch(`${NOTION_API}/blocks/${pageId}/children?${qs.toString()}`, { headers, signal: controller.signal });
-      if (!bRes.ok) break;
+      if (!bRes.ok) {
+        if (opts.complete) {
+          const err = (await bRes.json().catch(() => ({}))) as { code?: string; message?: string };
+          throw notionError(bRes.status, err, "the page's blocks could not be read");
+        }
+        partial = true;
+        break;
+      }
       const bData = (await bRes.json()) as {
         results?: Record<string, unknown>[]; has_more?: boolean; next_cursor?: string;
       };
@@ -686,15 +746,21 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
         lines.push(line);
         // Identity travels with the text, not beside it: the model can only
         // cite a block it was told the id of, and it can only be told here.
+        const type = String(block.type ?? "");
+        const runs = (block[type] as { rich_text?: RichTextRun[] } | undefined)?.rich_text;
         blocks.push({
           id: String(block.id ?? ""),
-          type: String(block.type ?? ""),
+          type,
           lastEditedTime: String(block.last_edited_time ?? ""),
           text: line.trim(),
+          plain: isPlainRichText(runs),
+          links: richTextLinks(runs),
+          byBot: (block.last_edited_by as { type?: string } | undefined)?.type === "bot",
         });
       }
       if (!bData.has_more || !bData.next_cursor) break;
       cursor = bData.next_cursor;
+      if (i === READ_BLOCK_PAGES - 1) truncated = true;
     }
 
     const result: NotionPageContent = {
@@ -704,9 +770,14 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
       people,
       text: lines.join("\n").slice(0, READ_TEXT_CAP),
       blocks,
+      parentDatabaseId: page.parent?.database_id?.replace(/-/g, "") ?? null,
+      parentType: page.parent?.type ?? null,
+      truncated: truncated || partial,
     };
-    // Cache only successful reads (never a throw). Clear when full — a long-lived
-    // isolate shouldn't grow this unbounded; simple beats an LRU here.
+    // Cache only whole reads (never a throw or a partial one). Clear when
+    // full — a long-lived isolate shouldn't grow this unbounded; simple beats
+    // an LRU here.
+    if (partial) return result;
     if (readCache.size >= READ_CACHE_MAX) readCache.clear();
     readCache.set(pageId, { at: Date.now(), value: result });
     return result;
@@ -726,6 +797,12 @@ export interface NotionSearchHit {
   id: string;
   title: string;
   url: string;
+  /** The database a page hit is a row of, dashes removed; null for a page
+   *  that is none's, or for a database hit. */
+  parentDatabaseId: string | null;
+  /** Notion's `parent.type`: `workspace`, `page_id`, `block_id`,
+   *  `database_id`; null when Notion gave none. */
+  parentType: string | null;
 }
 
 export async function notionSearch(
@@ -755,6 +832,7 @@ export async function notionSearch(
         id?: string;
         url?: string;
         title?: NotionRichText;
+        parent?: { type?: string; database_id?: string };
         properties?: Record<string, NotionProperty>;
       }>;
       message?: string;
@@ -780,9 +858,282 @@ export async function notionSearch(
         }
       }
       const bareId = r.id.replace(/-/g, "");
-      hits.push({ id: bareId, title, url: canonicalNotionUrl(r.url, bareId) });
+      hits.push({
+        id: bareId,
+        title,
+        url: canonicalNotionUrl(r.url, bareId),
+        parentDatabaseId: r.object === "page" ? (r.parent?.database_id?.replace(/-/g, "") ?? null) : null,
+        parentType: r.parent?.type ?? null,
+      });
     }
     return hits;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ─── Rows edited since a time, and a page's comments (for the sweep) ─────────
+// The end-of-day sweep reads the running notes and the Roadmap cards changed
+// since its cursor. One query page, oldest edit first, so a job that stops
+// part-way keeps its place by the last row it finished. Card follow-ups read
+// the Roadmap's cards in its active Design Status values, and one card again,
+// as the same row. Read-only.
+
+/** A database row, as the sweep's and card follow-ups' reads return it. */
+export interface EditedRow {
+  /** Dashes removed. */
+  id: string;
+  url: string;
+  title: string;
+  /** ISO-8601, as Notion reports it. */
+  lastEditedTime: string;
+  /** The database the row belongs to, dashes removed — as Notion reports it
+   *  on the row, never assumed from the query. */
+  parentDatabaseId: string | null;
+  /** Select, multi-select and status values by property name, joined by ", ". */
+  properties: Record<string, string>;
+  /** People-typed properties → names. */
+  people: Record<string, string[]>;
+  /** People-typed properties → each person's Notion user id and name, paired
+   *  as Notion lists them (a name may be ""), those without an id left out. */
+  persons: Record<string, Array<{ id: string; name: string }>>;
+  /** Select, multi-select and status values by property name, one per option. */
+  values: Record<string, string[]>;
+  /** Who created the row, as a Notion user id. */
+  createdById: string | null;
+}
+
+type RawRow = DbQueryRow & { last_edited_time?: string; parent?: { database_id?: string }; created_by?: { id?: string } };
+
+/** One raw database row as an `EditedRow`, or null when it is archived. */
+function toEditedRow(r: RawRow & { in_trash?: boolean }): EditedRow | null {
+  if (!r.id || r.archived || r.in_trash) return null;
+  const bareId = r.id.replace(/-/g, "");
+  let title = "(untitled)";
+  const properties: Record<string, string> = {};
+  const people: Record<string, string[]> = {};
+  const persons: Record<string, Array<{ id: string; name: string }>> = {};
+  const values: Record<string, string[]> = {};
+  for (const [name, prop] of Object.entries(r.properties ?? {})) {
+    if (prop.type === "title") title = plain(prop.title) || title;
+    else if (prop.type === "people") {
+      people[name] = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
+      persons[name] = (prop.people ?? []).filter((u) => u.id).map((u) => ({ id: u.id!, name: u.name ?? "" }));
+    } else if (prop.type === "select" || prop.type === "multi_select" || prop.type === "status") {
+      const value = renderProperty(prop);
+      if (value) properties[name] = value;
+      const list = prop.type === "multi_select" ? (prop.multi_select ?? []).map((o) => o.name ?? "") : [(prop.type === "status" ? prop.status : prop.select)?.name ?? ""];
+      values[name] = list.filter(Boolean);
+    }
+  }
+  return {
+    id: bareId,
+    url: canonicalNotionUrl(r.url, bareId),
+    title,
+    lastEditedTime: r.last_edited_time ?? "",
+    parentDatabaseId: r.parent?.database_id?.replace(/-/g, "") ?? null,
+    properties,
+    people,
+    persons,
+    values,
+    createdById: r.created_by?.id ?? null,
+  };
+}
+
+/** One page of a database query, as `EditedRow`s. One subrequest. */
+async function queryRowPage(
+  env: Env,
+  databaseId: string,
+  body: Record<string, unknown>,
+  label: string,
+): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await countedFetch(`${NOTION_API}/databases/${databaseId.replace(/-/g, "")}/query`, {
+      method: "POST",
+      headers: notionHeaders(env, { write: true }),
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    const data = (await res.json()) as { results?: RawRow[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
+    if (!res.ok) throw notionError(res.status, data, label);
+    const rows = (data.results ?? []).map(toEditedRow).filter((r): r is EditedRow => r !== null);
+    return { rows, more: data.has_more === true, next: data.next_cursor ?? null };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * The rows of one database whose status property holds one of `statuses`:
+ * one query page of at most `limit`, whether more wait past it, and where the
+ * next page starts. One subrequest. Throws on failure.
+ *
+ * @param env - Carries NOTION_API_KEY
+ * @param databaseId - The database to read
+ * @param property - A status property, by its exact name
+ * @param statuses - Its option names, exact
+ * @param limit - Rows per read, 1–100
+ * @param after - The `next` of the page before
+ */
+export async function queryRowsWithStatus(
+  env: Env,
+  databaseId: string,
+  property: string,
+  statuses: readonly string[],
+  limit = 100,
+  after?: string,
+): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
+  return queryRowPage(
+    env,
+    databaseId,
+    {
+      page_size: Math.min(Math.max(limit, 1), 100),
+      filter: { or: statuses.map((s) => ({ property, status: { equals: s } })) },
+      ...(after ? { start_cursor: after } : {}),
+    },
+    "status query failed",
+  );
+}
+
+/** One database row read again, or null when it is gone or unshared. One
+ *  subrequest. */
+export async function readPageRow(env: Env, pageId: string): Promise<EditedRow | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await countedFetch(`${NOTION_API}/pages/${pageId}`, { headers: notionHeaders(env), signal: controller.signal });
+    const data = (await res.json()) as RawRow & { in_trash?: boolean; message?: string; code?: string };
+    if (res.status === 404) return null;
+    if (!res.ok) throw notionError(res.status, data, "page read failed");
+    return toEditedRow(data);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** The integration's own Notion bot user id — what `created_by` holds on a
+ *  page uno-bot made — or null when Notion would not say. One subrequest. */
+export async function notionBotUserId(env: Env): Promise<string | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const res = await countedFetch(`${NOTION_API}/users/me`, { headers: notionHeaders(env) });
+  const data = (await res.json()) as { id?: string };
+  return res.ok && data.id ? data.id : null;
+}
+
+/** A Notion person's name, or null for a bot or an unknown id. One subrequest. */
+export async function notionUserName(env: Env, userId: string): Promise<string | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const res = await countedFetch(`${NOTION_API}/users/${userId}`, { headers: notionHeaders(env) });
+  const data = (await res.json()) as { name?: string | null; type?: string };
+  if (!res.ok || data.type !== "person") return null;
+  return data.name?.trim() || null;
+}
+
+/** Notion users pages read looking for a name. */
+const USER_LIST_PAGES = 3;
+
+/**
+ * The one Notion person whose name, compared by `normalise`, is this one; null
+ * for none or several. Up to `USER_LIST_PAGES` subrequests.
+ */
+export async function notionUserIdForName(env: Env, name: string, normalise: (s: string) => string): Promise<string | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const wanted = normalise(name);
+  if (!wanted) return null;
+  const hits = new Set<string>();
+  let cursor: string | undefined;
+  for (let page = 0; page < USER_LIST_PAGES; page++) {
+    const q = new URLSearchParams({ page_size: "100", ...(cursor ? { start_cursor: cursor } : {}) });
+    const res = await countedFetch(`${NOTION_API}/users?${q.toString()}`, { headers: notionHeaders(env) });
+    const data = (await res.json()) as { results?: { id?: string; name?: string; type?: string }[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
+    if (!res.ok) throw notionError(res.status, data, "user list failed");
+    for (const u of data.results ?? []) if (u.id && u.type === "person" && u.name && normalise(u.name) === wanted) hits.add(u.id);
+    if (!data.has_more || !data.next_cursor) break;
+    cursor = data.next_cursor;
+  }
+  return hits.size === 1 ? [...hits][0]! : null;
+}
+
+/**
+ * The rows of one database edited at or after `since` — Notion rounds the
+ * stamp to the minute, so the caller passes over what it already handled —
+ * oldest edit first: one query page of at most `limit`, whether more wait past
+ * it, and where the next page starts. One subrequest. Throws on failure.
+ *
+ * @param env - Carries NOTION_API_KEY
+ * @param databaseId - The database to read
+ * @param since - ISO-8601; rows edited before it are left out
+ * @param limit - Rows per read, 1–100
+ * @param after - The `next` of the page before, to read the one after it
+ */
+export async function queryEditedSince(
+  env: Env,
+  databaseId: string,
+  since: string,
+  limit = 25,
+  after?: string,
+): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
+  return queryRowPage(
+    env,
+    databaseId,
+    {
+      page_size: Math.min(Math.max(limit, 1), 100),
+      filter: { timestamp: "last_edited_time", last_edited_time: { on_or_after: since } },
+      sorts: [{ timestamp: "last_edited_time", direction: "ascending" }],
+      ...(after ? { start_cursor: after } : {}),
+    },
+    "edited-since query failed",
+  );
+}
+
+/** One comment on a page. */
+export interface PageComment {
+  id: string;
+  /** ISO-8601. */
+  createdTime: string;
+  text: string;
+  /** The URLs it links or mentions. */
+  links: string[];
+  /** Made by an integration — uno-bot's own, as a rule. */
+  byBot: boolean;
+}
+
+/**
+ * A page's open comments, oldest first: one page of up to 100. One
+ * subrequest. Throws on failure.
+ *
+ * @param env - Carries NOTION_API_KEY
+ * @param pageId - The page
+ */
+export async function listPageComments(env: Env, pageId: string): Promise<PageComment[]> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const qs = new URLSearchParams({ block_id: pageId, page_size: "100" });
+    const res = await countedFetch(`${NOTION_API}/comments?${qs.toString()}`, {
+      headers: notionHeaders(env),
+      signal: controller.signal,
+    });
+    const data = (await res.json()) as {
+      results?: Array<{ id?: string; created_time?: string; created_by?: { type?: string }; rich_text?: RichTextRun[] & NotionRichText }>;
+      message?: string;
+      code?: string;
+    };
+    if (!res.ok) throw notionError(res.status, data, "comments could not be read");
+    return (data.results ?? [])
+      .filter((c) => c.id)
+      .map((c) => ({
+        id: String(c.id),
+        createdTime: c.created_time ?? "",
+        text: plain(c.rich_text),
+        links: richTextLinks(c.rich_text),
+        byBot: c.created_by?.type === "bot",
+      }));
   } finally {
     clearTimeout(timer);
   }
@@ -967,6 +1318,43 @@ export async function notionCreate(
   }
 }
 
+/**
+ * The options a database's select, status or multi-select property offers, in
+ * their stored spelling — what a write exact-matches against, since Notion
+ * silently creates any option it is handed (`docs/connectors/notion.md`).
+ * Null when the property is not one of those types or is not on the schema.
+ *
+ * @param env - Worker bindings
+ * @param databaseId - The database, dashes optional
+ * @param property - The property's exact name
+ * @throws When the schema read fails
+ */
+export async function databaseOptions(env: Env, databaseId: string, property: string): Promise<string[] | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await countedFetch(`${NOTION_API}/databases/${databaseId.replace(/-/g, "")}`, {
+      headers: notionHeaders(env),
+      signal: controller.signal,
+    });
+    const db = (await res.json()) as {
+      message?: string;
+      code?: string;
+      properties?: Record<string, { select?: OptionList; status?: OptionList; multi_select?: OptionList }>;
+    };
+    if (!res.ok) throw notionError(res.status, db, "database schema fetch failed");
+    const def = db.properties?.[property];
+    const list = def?.select ?? def?.status ?? def?.multi_select;
+    if (!list) return null;
+    return (list.options ?? []).map((o) => o.name ?? "").filter(Boolean);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+type OptionList = { options?: { name?: string }[] };
+
 // ─── Update an existing page: schema-aware property writes + narrative append ──
 // (notion_update). Property writes introspect the page's PARENT DATABASE schema,
 // so the tool can set ANY property by its real Notion type — no hardcoded
@@ -1088,6 +1476,21 @@ export interface NotionUpdateInput {
   append?: { sections?: PrdSection[]; text?: string };
   /** In-place rewrites, each keyed to a block id + the stamp seen at read. */
   replace?: NotionBlockReplacement[];
+  /** New blocks placed right after a named block, on the same stamp check. */
+  insert?: NotionBlockInsertion[];
+}
+
+/**
+ * New blocks, written right after one block of the page — how the sweep adds
+ * an answer under its section. `lastEditedTime` is that block's stamp at the
+ * read: the text was placed against the section as read, so a block that
+ * moved since is left alone and reported (ADR-029).
+ */
+export interface NotionBlockInsertion {
+  afterBlockId: string;
+  lastEditedTime: string;
+  /** Markdown, the same authoring shape as an `append` section body. */
+  content: string;
 }
 
 /**
@@ -1112,8 +1515,14 @@ export interface NotionUpdateResult {
   appended: number;
   /** Blocks rewritten in place. */
   replaced: number;
+  /** Blocks placed after a named block (`insert`). */
+  inserted: number;
   /** Replacements that wrote NOTHING, each saying which block and why. */
   refused: string[];
+  /** How many of `refused` were refused because the block's stamp had moved
+   *  since it was read (ADR-029) — what the usage record counts as a stale
+   *  write refused. */
+  staleStamps: number;
 }
 
 // Fetch a page's title + its PARENT DATABASE property schema (real names, types,
@@ -1318,7 +1727,7 @@ async function replaceBlock(
   op: NotionBlockReplacement,
   headers: Record<string, string>,
   signal: AbortSignal,
-): Promise<{ replaced: number; refusal?: string }> {
+): Promise<{ replaced: number; refusal?: string; stale?: true }> {
   const label = shortBlockId(op.blockId);
   const rendered = markdownToNotionBlocks(op.content);
   if (!rendered.length) {
@@ -1334,9 +1743,9 @@ async function replaceBlock(
 
   const getRes = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, { headers, signal });
   const live = (await getRes.json().catch(() => ({}))) as {
-    id?: string; last_edited_time?: string; message?: string; code?: string;
+    id?: string; type?: string; last_edited_time?: string; message?: string; code?: string;
     parent?: { type?: string; page_id?: string; block_id?: string };
-  };
+  } & Record<string, unknown>;
   if (!getRes.ok || !live.id) {
     throw notionError(getRes.status, live, `block ${label} not found`);
   }
@@ -1349,13 +1758,34 @@ async function replaceBlock(
     return {
       replaced: 0,
       refusal: `${label} changed since read (read ${seen || "no stamp cited"}, now ${now || "unknown"})`,
+      stale: true,
     };
   }
 
+  // Notion refuses a PATCH that changes a block's type. A text block keeps
+  // its own type and state — the list item stays a list item, the to-do its
+  // tick, the heading its level — and only its rich text is rewritten, with
+  // the line's display mark taken off the replacement first.
+  const liveType = live.type ?? "";
+  const keepType = RICH_TEXT_TYPES.has(liveType);
+  // A text replace writes words only. A block whose rich text carries a link,
+  // a mention, an equation or formatting would lose it, so it is refused —
+  // unwritten, as a moved block is — rather than quietly flattened.
+  const liveText = (live[liveType] as { rich_text?: RichTextRun[] } | undefined)?.rich_text;
+  if (keepType && !isPlainRichText(liveText)) {
+    return {
+      replaced: 0,
+      refusal: `${label} (this block has links, mentions or formatting that a text replace would drop — edit it in Notion)`,
+    };
+  }
+  const written = keepType ? markdownToNotionBlocks(stripBlockPrefix(liveType, op.content)) : rendered;
+  const head = written[0] ?? first;
+  const headText = (head[head.type] as { rich_text?: unknown } | undefined)?.rich_text;
+  const payload = keepType && Array.isArray(headText) ? { [liveType]: { rich_text: headText } } : { [head.type]: head[head.type] };
   const res = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, {
     method: "PATCH",
     headers,
-    body: JSON.stringify({ [first.type]: first[first.type] }),
+    body: JSON.stringify(payload),
     signal,
   });
   if (!res.ok) {
@@ -1363,7 +1793,7 @@ async function replaceBlock(
     throw notionError(res.status, err, `block ${label} update failed`);
   }
 
-  const rest = rendered.slice(1);
+  const rest = written.slice(1);
   if (!rest.length) return { replaced: 1 };
 
   const parentId = live.parent?.page_id ?? live.parent?.block_id;
@@ -1400,6 +1830,64 @@ async function replaceBlock(
   return { replaced: 1 + placed };
 }
 
+/**
+ * Place new blocks right after one block, after checking that block is still
+ * the one that was read — the same GET-and-compare `replaceBlock` does. The
+ * anchor itself is never changed. Returns how many blocks landed, plus a
+ * refusal line when something did not.
+ */
+async function insertAfter(
+  pageId: string,
+  op: NotionBlockInsertion,
+  headers: Record<string, string>,
+  signal: AbortSignal,
+): Promise<{ inserted: number; refusal?: string; stale?: true }> {
+  const label = shortBlockId(op.afterBlockId);
+  const rendered = markdownToNotionBlocks(op.content);
+  if (!rendered.length) return { inserted: 0, refusal: `after ${label} (the text to add is empty)` };
+  const getRes = await countedFetch(`${NOTION_API}/blocks/${op.afterBlockId}`, { headers, signal });
+  const live = (await getRes.json().catch(() => ({}))) as {
+    id?: string; last_edited_time?: string; message?: string; code?: string;
+    parent?: { page_id?: string; block_id?: string };
+  };
+  if (!getRes.ok || !live.id) throw notionError(getRes.status, live, `block ${label} not found`);
+  const seen = op.lastEditedTime.trim();
+  const now = live.last_edited_time ?? "";
+  if (!seen || seen !== now) {
+    return {
+      inserted: 0,
+      refusal: `after ${label}: it changed since read (read ${seen || "no stamp cited"}, now ${now || "unknown"})`,
+      stale: true,
+    };
+  }
+  // The anchor must sit on the page the card names, at its top level: a block
+  // id from elsewhere never carries the text to another page.
+  const parentId = live.parent?.page_id;
+  if (!parentId || parentId.replace(/-/g, "") !== pageId.replace(/-/g, "")) {
+    return { inserted: 0, refusal: `after ${label} (that block is not on this page)` };
+  }
+  let placed = 0;
+  let after = op.afterBlockId;
+  for (const batch of chunkBlocks(rendered, MAX_BLOCKS_PER_REQUEST)) {
+    const res = await countedFetch(`${NOTION_API}/blocks/${parentId}/children`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ children: batch, after }),
+      signal,
+    });
+    if (!res.ok) {
+      const err = (await res.json().catch(() => ({}))) as { message?: string; code?: string };
+      if (!placed) throw notionError(res.status, err, `adding after block ${label} failed`);
+      return { inserted: placed, refusal: `after ${label} (${rendered.length - placed} block(s) didn't land: ${err.message ?? res.status})` };
+    }
+    const body = (await res.json().catch(() => ({}))) as { results?: { id?: string }[] };
+    const lastId = body.results?.at(-1)?.id;
+    if (lastId) after = lastId;
+    placed += batch.length;
+  }
+  return { inserted: placed };
+}
+
 export async function notionUpdate(
   env: Env,
   pageId: string,
@@ -1410,8 +1898,10 @@ export async function notionUpdate(
   const updated: string[] = [];
   const skipped: string[] = [];
   const refused: string[] = [];
+  let staleStamps = 0;
   let appended = 0;
   let replaced = 0;
+  let inserted = 0;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -1464,6 +1954,19 @@ export async function notionUpdate(
       const r = await replaceBlock(env, op, headers, controller.signal);
       replaced += r.replaced;
       if (r.refusal) refused.push(r.refusal);
+      if (r.stale) staleStamps++;
+    }
+
+    // 2b) Insertions after a named block, on the same stamp check.
+    for (const op of input.insert ?? []) {
+      if (!op?.afterBlockId?.trim() || !op.content?.trim()) {
+        refused.push("(an insert needs a block to follow and content)");
+        continue;
+      }
+      const r = await insertAfter(pageId, op, headers, controller.signal);
+      inserted += r.inserted;
+      if (r.refusal) refused.push(r.refusal);
+      if (r.stale) staleStamps++;
     }
 
     // 3) Narrative append.
@@ -1498,9 +2001,9 @@ export async function notionUpdate(
     }
 
     // Drop any cached read so the next read reflects this write, not a stale copy.
-    if (updated.length || appended || replaced) evictReadCache(pageId);
+    if (updated.length || appended || replaced || inserted) evictReadCache(pageId);
 
-    return { id: pageId, updated, skipped, appended, replaced, refused };
+    return { id: pageId, updated, skipped, appended, replaced, inserted, refused, staleStamps };
   } finally {
     clearTimeout(timer);
   }

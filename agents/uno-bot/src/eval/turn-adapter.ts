@@ -91,7 +91,7 @@ export async function handleEvalTurn(request: Request, env: Env): Promise<Respon
     return Response.json({ ok: false, error: "bad json" }, { status: 400 });
   }
 
-  const built = evalTurnRequest(body);
+  const built = evalTurnRequest(body, env.UNO_BOT_CHANNEL_ID);
   if (!built.ok) return Response.json({ ok: false, error: built.error }, { status: 400 });
   const turnRequest = built.request;
 
@@ -190,7 +190,7 @@ export interface EvalCollectors {
 }
 
 /**
- * The eval suite's four differences, and nothing else.
+ * The eval suite's five differences, and nothing else.
  *
  * Exported so the parity test can build the real wiring on both sides: a
  * dependency added to `turn/env-deps.ts` reaches both callers or neither, and
@@ -225,6 +225,10 @@ export function evalTurnWiring(request: TurnRequest, collectors: EvalCollectors)
     // The synthetic ts the eval conversation has: a tool that posts has nowhere
     // to post, which is the same truth the recording Delivery tells.
     toolThreadTs: request.conversationTs,
+
+    // Reached through `/debug/eval`: every eval turn is test traffic on the
+    // usage record, and recorded as such rather than left out.
+    origin: "debug",
 
     reporters: {
       onDials: (dials) => {

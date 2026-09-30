@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import Count, { formatCount } from '../Count/Count';
+import Count, { DEPRECATED_STYLE_ALIASES, formatCount } from '../Count/Count';
 import Tooltip from '../../overlays/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './Status.scss';
@@ -36,6 +36,13 @@ export const STATUS_TYPES = ['state', 'date'];
 export const STATUS_STYLES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery'];
 export const STATUS_DATE_STYLES = ['neutral', 'warning', 'danger'];
 export const STATUS_SIZES = ['medium', 'large'];
+
+/**
+ * Every name `style` accepts: the six, then the deprecated aliases Count
+ * defines (`DEPRECATED_STYLE_ALIASES`). A literal, because the docs generator
+ * reads the values from source.
+ */
+const ACCEPTED_STYLES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery', 'positive', 'negative', 'information'];
 
 /** The fixed icon of each date style: calendar, clock, alert. */
 export const STATUS_DATE_ICONS = {
@@ -90,7 +97,11 @@ export const Status = ({
     const isDate = effectiveType === 'date';
     const allowed = isDate ? STATUS_DATE_STYLES : STATUS_STYLES;
     let effectiveStyle = style;
-    if (!allowed.includes(style)) {
+    if (Object.hasOwn(DEPRECATED_STYLE_ALIASES, style)) {
+        warn(`style="${style}" is deprecated; use style="${DEPRECATED_STYLE_ALIASES[style]}".`);
+        effectiveStyle = DEPRECATED_STYLE_ALIASES[style];
+    }
+    if (!allowed.includes(effectiveStyle)) {
         warn(`type="${effectiveType}" takes ${allowed.join(', ')}; style="${style}" falls back to neutral.`);
         effectiveStyle = 'neutral';
     }
@@ -162,8 +173,8 @@ Status.propTypes = {
     children: PropTypes.node.isRequired,
     /** `state` for a condition; `date` for a due or event date, outlined with a fixed icon. */
     type: PropTypes.oneOf(STATUS_TYPES),
-    /** The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. */
-    style: PropTypes.oneOf(STATUS_STYLES),
+    /** The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. `positive`, `negative` and `information` are deprecated aliases for `success`, `danger` and `info`. */
+    style: PropTypes.oneOf(ACCEPTED_STYLES),
     /** `medium` (20) in rows, lists and sentences; `large` (32) beside a heading. */
     size: PropTypes.oneOf(STATUS_SIZES),
     /** One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. */

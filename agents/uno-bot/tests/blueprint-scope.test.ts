@@ -79,7 +79,7 @@ test("the exact-match filters enumerate the values the account lists", () => {
   // rows). The schema enumerates the values so the model cannot mis-case them,
   // and the enums are read back against the vendored account's catalog — the
   // one place those vocabularies are rendered from the live schema.
-  const account = readFileSync(resolve(process.cwd(), "..", "..", "docs", "connectors", "supabase", "blueprint.md"), "utf8");
+  const account = readFileSync(resolve(process.cwd(), "..", "..", "docs", "connectors", "supabase", "blueprint-schema.md"), "utf8");
   const props = searchTool().input_schema.properties as Record<string, { enum?: string[] }>;
   const kinds = props[PARAM.filterPathKind]!.enum!;
   const roles = props[PARAM.filterLaneRole]!.enum!;
@@ -188,7 +188,7 @@ test("the description shed its schema vocabulary and did not grow past the pre-#
   // 2,254 chars on 2026-09-05, before the five parameters were added.
   assert.ok(description.length <= 2254, `description is ${description.length} chars`);
   // Status values and the phase › scenario › path › step hierarchy now live in
-  // docs/connectors/supabase/blueprint.md, which rides in the prompt.
+  // docs/connectors/supabase/blueprint.md, whose core rides in the prompt.
   assert.ok(!description.includes("`at_risk`"), "status values belong to the vendored account");
   assert.ok(!description.includes("›"), "the hierarchy belongs to the vendored account");
   // What it keeps: mode selection, confidence reading, source-conflict routing.

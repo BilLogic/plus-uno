@@ -21,11 +21,13 @@ import {
   EVENT_DEDUP_TTL_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
-  PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
   afterFailedNote,
   cutOffTakeable,
+  ownTtl,
   proposalReplyThread,
+  proposalSlot,
+  proposalTtlMs,
   type Execution,
   type HistoryTurn,
   type PendingProposal,
@@ -89,7 +91,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   function takeIfCutOff(ts: string): Execution | null {
     const rec = executions.get(ts);
     if (!rec) return null;
-    if (now() - rec.startedAt > PROPOSAL_TTL_MS) {
+    if (now() - rec.startedAt > proposalTtlMs(rec.proposal)) {
       executions.delete(ts);
       return null;
     }
@@ -120,7 +122,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
    *  retirement does not matter: a chain still ends in a live newest card. */
   function successorIsLive(ts: string): boolean {
     const rec = proposals.get(ts);
-    return !!rec && now() - rec.createdAt <= PROPOSAL_TTL_MS;
+    return !!rec && now() - rec.createdAt <= proposalTtlMs(rec.proposal);
   }
 
   return {
@@ -155,29 +157,36 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // grain, and why a DM needs it, are in `putProposal`'s contract. Only
       // LIVE records are touched: an aged-out card is already answered by
       // "expired".
-      const thread = proposalReplyThread(proposal);
+      const slot = proposalSlot(proposal);
+      const retired: string[] = [];
       for (const rec of proposals.values()) {
         if (rec.proposal.proposalTs === proposal.proposalTs) continue;
         // A record already stamped with a successor is settled. One only
         // RETIRED still wants this ts — that is the caller who retired it
         // ahead of staging this very card.
         if (rec.supersededBy) continue;
-        if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
+        if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) continue;
         if (rec.proposal.channel !== proposal.channel) continue;
-        if (proposalReplyThread(rec.proposal) !== thread) continue;
+        if (proposalSlot(rec.proposal) !== slot) continue;
         rec.supersededBy = proposal.proposalTs;
+        // Reported only if this staging is what took it out of reach.
+        if (!rec.retired) retired.push(rec.proposal.proposalTs);
       }
       // Retire first, then write — a choice, not an accident: the new card is
       // the one a racing ✅ has to be able to find, so it is the last thing to
       // land.
       proposals.set(proposal.proposalTs, { proposal, createdAt: now() });
+      return { retired };
     },
 
     // Retire without consuming — the counterpart to the claim, and why the two
     // are different methods is on the interface (#583).
     async retireProposal(proposalTs) {
       const rec = proposals.get(proposalTs);
-      if (rec) rec.retired = true;
+      if (!rec || rec.retired || rec.supersededBy) return { retired: false };
+      if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return { retired: false };
+      rec.retired = true;
+      return { retired: true };
     },
 
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
@@ -186,9 +195,9 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // A live successor beats the TTL — the ordering, and the third card it
       // stops the person from asking for, are in `ProposalLookup`.
       if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded" };
-      if (now() - rec.createdAt > PROPOSAL_TTL_MS) {
+      if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
         proposals.delete(proposalTs);
-        return { state: "expired" };
+        return { state: "expired", ...ownTtl(rec.proposal) };
       }
       if (rec.supersededBy || rec.retired) return { state: "superseded" };
       return { state: "found", proposal: rec.proposal, createdAt: rec.createdAt };
@@ -196,10 +205,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     async getProposalByThread(ref) {
       // Scans the staged set, as the Durable Object does: proposals expire
-      // after an hour, so the live cardinality stays small.
+      // by their TTL, so the live cardinality stays small.
       let best: ProposalRecord | null = null;
       for (const rec of proposals.values()) {
-        if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
+        if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) continue;
         if (rec.supersededBy || rec.retired) continue; // retired, so never the thread's live card
         if (rec.proposal.channel !== ref.channel) continue;
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue; // keyed on the card's thread
@@ -210,7 +219,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     async getProposalsByChannel(channel) {
       return [...proposals.values()]
-        .filter((rec) => now() - rec.createdAt <= PROPOSAL_TTL_MS)
+        .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
         .filter((rec) => !rec.supersededBy && !rec.retired)
         .filter((rec) => rec.proposal.channel === channel)
         .sort((a, b) => b.createdAt - a.createdAt)
