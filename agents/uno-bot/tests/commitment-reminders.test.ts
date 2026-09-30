@@ -37,7 +37,7 @@ const EOD: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", chann
 
 const BEA = "U0BEA";
 const MAYA = "U0MAYA";
-const ROOT = ts(29, 14); // Tue 2026-09-29, 10:00 ET
+const ROOT = ts(29, 13); // Tue 2026-09-29, 09:00 ET
 const PROMISE = ts(29, 15); // Tue 11:00 ET
 
 const promiseReply = (over: Record<string, unknown> = {}) =>
@@ -201,7 +201,7 @@ describe("the end of day reads a promise", () => {
 describe("the morning run", () => {
   it("does nothing before a commitment is due", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(31, 14) }); // Thu 14:00: due tonight
+    const m = mornings({ store, now: at(31, 13) }); // Thu 09:00 ET: due tonight
     const report = await m.run();
     assert.equal(report.summary, "nothing due");
     assert.equal(m.posts.length, 0);
@@ -212,7 +212,7 @@ describe("the morning run", () => {
     const link = msg(MAYA, ts(30, 18), "Here you go: <https://www.figma.com/file/abc/Reflection|Figma>");
     const m = mornings({
       store,
-      now: at(32, 14), // Fri 2026-10-02 14:00
+      now: at(32, 13), // Fri 2026-10-02 09:00 ET
       thread: [msg(BEA, ROOT, "Where are the screens?"), msg(MAYA, PROMISE, "I'll share it by Thu."), link],
       judgeReplies: [JSON.stringify({ done: true, evidence_ts: [link.ts], confidence: 0.9 })],
     });
@@ -227,7 +227,7 @@ describe("the morning run", () => {
 
   it("a due commitment gets exactly one nudge, in its thread, mentioning only the promiser", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(32, 14) });
+    const m = mornings({ store, now: at(32, 13) });
     await m.run();
     // The same morning's job again — a retried alarm — posts nothing more.
     await m.run();
@@ -254,34 +254,34 @@ describe("the morning run", () => {
   it("with no stated deadline, the nudge names the day of the promise", async () => {
     const { store } = await sweptPromise({ reply: promiseReply({ deadline: null }) });
     // Tue + two working days: due Thursday night, nudged Friday.
-    const m = mornings({ store, now: at(32, 14) });
+    const m = mornings({ store, now: at(32, 13) });
     await m.run();
     assert.match(m.posts[0]!.text, new RegExp(`^Hey <@${MAYA}>, on Tue you said you'd share the Figma link for the reflection screens\\. Did it happen\\?`));
   });
 
   it("no answer brings one follow-up, then the commitment lapses", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(32, 14) });
+    const m = mornings({ store, now: at(32, 13) });
     await m.run(); // Fri: the nudge
-    m.clock.now = at(33 + 2, 14); // Mon: re-armed to Tuesday night, not due
+    m.clock.now = at(33 + 2, 13); // Mon: re-armed to Tuesday night, not due
     await m.run();
     assert.equal(m.posts.length, 1);
-    m.clock.now = at(37, 14); // Wed: the follow-up
+    m.clock.now = at(37, 13); // Wed: the follow-up
     await m.run();
     assert.equal(m.posts.length, 2);
     assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
     assert.equal(m.posts[1]!.threadTs, ROOT);
     assert.equal(only(store).followupTs, m.posts[1]!.ts);
-    m.clock.now = at(42, 14); // the Monday after: lapsed, silently
+    m.clock.now = at(42, 13); // the Monday after: lapsed, silently
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["lapsed"]);
     assert.equal(only(store).state, "lapsed");
     assert.equal(m.posts.length, 2);
   });
 
-  it("sends nothing outside the weekday 10:00 ET run", async () => {
+  it("sends nothing outside the weekday 09:00 ET run", async () => {
     const { store } = await sweptPromise();
-    for (const now of [at(32, 22), at(32, 15), at(33, 14), at(34, 14)]) {
+    for (const now of [at(32, 22), at(32, 15), at(33, 13), at(34, 13)]) {
       const m = mornings({ store, now });
       const report = await m.run();
       assert.equal(report.outcome, "skipped");
@@ -302,7 +302,7 @@ describe("the morning run", () => {
 
   it("stops as the budget does before a commitment it cannot finish, having written nothing", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(32, 14), headroom: { subrequests: 4, d1Queries: 40 } });
+    const m = mornings({ store, now: at(32, 13), headroom: { subrequests: 4, d1Queries: 40 } });
     await assert.rejects(m.run(), SubrequestBudgetError);
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).checkedOn, null);
@@ -314,7 +314,7 @@ describe("the morning run", () => {
     const row = only(swept);
     await store.addCommitments([{ ...row, id: `${UNO_BOT}:${PROMISE}`, channel: UNO_BOT }]);
     await store.saveText(`${UNO_BOT}:${PROMISE}`, { what: "share it", bodies: {} }, Infinity);
-    const m = mornings({ store, now: at(32, 14) });
+    const m = mornings({ store, now: at(32, 13) });
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["refused"]);
     assert.equal(m.posts.length, 0);
@@ -325,7 +325,7 @@ describe("answers", () => {
   /** A commitment nudged on Friday morning, and the reaction door's deps. */
   async function nudged() {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(32, 14) });
+    const m = mornings({ store, now: at(32, 13) });
     await m.run();
     const reminderTs = m.posts[0]!.ts;
     const react = (glyph: string, userId = MAYA, messageTs = reminderTs) =>
@@ -370,7 +370,7 @@ describe("answers", () => {
     let row = only(store);
     assert.equal(new Date(row.dueAt).toISOString(), "2026-10-07T04:00:00.000Z");
     assert.equal(row.snoozes, 1);
-    m.clock.now = at(37, 14); // Wed
+    m.clock.now = at(37, 13); // Wed
     await m.run();
     const followUp = m.posts[1]!.ts;
     assert.equal(await react("hourglass_flowing_sand", MAYA, followUp), true);
@@ -389,12 +389,12 @@ describe("answers", () => {
   it("a ⏳ moves the date but adds no ping: the reminder and one follow-up, then lapsed", async () => {
     const { store, m, react } = await nudged();
     await react("hourglass_flowing_sand"); // Fri
-    m.clock.now = at(37, 14); // Wed: the follow-up, not a second first reminder
+    m.clock.now = at(37, 13); // Wed: the follow-up, not a second first reminder
     await m.run();
     assert.equal(m.posts.length, 2);
     assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
     await react("hourglass_flowing_sand", MAYA, m.posts[1]!.ts);
-    m.clock.now = at(42, 14); // the Monday after: due again, and spent
+    m.clock.now = at(42, 13); // the Monday after: due again, and spent
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["lapsed"]);
     assert.equal(m.posts.length, 2);
@@ -403,7 +403,7 @@ describe("answers", () => {
   it("every reminder a commitment posted stays answerable", async () => {
     const { store, m, reminderTs, react } = await nudged();
     await react("hourglass_flowing_sand"); // Fri, on the first reminder
-    m.clock.now = at(37, 14);
+    m.clock.now = at(37, 13);
     await m.run(); // the follow-up
     assert.notEqual(m.posts[1]!.ts, reminderTs);
     // 🙌 on the FIRST reminder still lands.
@@ -442,7 +442,7 @@ describe("a promise said again", () => {
 
   it("a reply under a reminder adds no row, and a later day it names moves the date as a ⏳", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(32, 14) });
+    const m = mornings({ store, now: at(32, 13) });
     await m.run(); // Fri: the reminder
     const reply = msg(MAYA, REPLY, "Sorry! Will do by Wed.");
     await sweptPromise({
@@ -459,11 +459,11 @@ describe("a promise said again", () => {
     assert.equal(new Date(row.dueAt).toISOString(), "2026-10-08T04:00:00.000Z");
     assert.equal(row.deadlineAt, row.dueAt);
     // One task, two pings at most: Thursday's follow-up, then the lapse.
-    m.clock.now = at(38, 14); // Thu 8th
+    m.clock.now = at(38, 13); // Thu 8th
     await m.run();
-    m.clock.now = at(42, 14);
+    m.clock.now = at(42, 13);
     await m.run();
-    m.clock.now = at(44, 14);
+    m.clock.now = at(44, 13);
     await m.run();
     assert.equal(m.posts.length, 2);
     assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
@@ -486,10 +486,10 @@ describe("a promise said again", () => {
 describe("the morning's limits", () => {
   it("a row held three mornings running lapses", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(32, 14), unreadable: true });
+    const m = mornings({ store, now: at(32, 13), unreadable: true });
     const seen: string[] = [];
     for (const day of [32, 35, 36]) {
-      m.clock.now = at(day, 14);
+      m.clock.now = at(day, 13);
       const report = await m.run();
       seen.push(...report.actions.map((a) => a.action));
     }
@@ -501,10 +501,10 @@ describe("the morning's limits", () => {
 
   it("a row that posts after a hold starts its count again", async () => {
     const { store } = await sweptPromise();
-    const held = mornings({ store, now: at(32, 14), unreadable: true });
+    const held = mornings({ store, now: at(32, 13), unreadable: true });
     await held.run();
     assert.equal(only(store).holds, 1);
-    const m = mornings({ store, now: at(35, 14) });
+    const m = mornings({ store, now: at(35, 13) });
     await m.run();
     assert.equal(m.posts.length, 1);
     assert.equal(only(store).holds, 0);
@@ -514,13 +514,13 @@ describe("the morning's limits", () => {
     const { store: swept } = await sweptPromise();
     const base = only(swept);
     const store = createInMemoryCommitmentStore();
-    const threads = [ts(29, 14, 1), ts(29, 14, 2), ts(29, 14, 3)];
+    const threads = [ts(29, 13, 1), ts(29, 13, 2), ts(29, 13, 3)];
     for (const [i, thread] of threads.entries()) {
       const id = `${DESIGN}:${thread}`;
       await store.addCommitments([{ ...base, id, threadTs: thread, messageTs: thread, dueAt: base.dueAt + i }]);
       await store.saveText(id, { what: `task ${i + 1}`, bodies: {} }, Infinity);
     }
-    const m = mornings({ store, now: at(32, 14) });
+    const m = mornings({ store, now: at(32, 13) });
     await m.run();
     assert.equal(m.posts.length, 2);
     // A retried alarm the same morning still holds the cap.
@@ -530,7 +530,7 @@ describe("the morning's limits", () => {
     assert.equal(waiting.state, "open");
     assert.equal(waiting.checkedOn, null);
     assert.equal(waiting.holds, 0);
-    m.clock.now = at(35, 14); // Monday
+    m.clock.now = at(35, 13); // Monday
     await m.run();
     assert.equal(m.posts.length, 3);
     assert.equal(m.posts[2]!.threadTs, threads[2]);

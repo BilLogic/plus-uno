@@ -21,9 +21,9 @@ import { dmCapturersFor } from "./dm-watch/capture-env";
 import * as diagnostics from "./diagnostics";
 
 export default {
-  // Cron (wrangler.toml [triggers]). The 10:00 and 18:00 ET firings enqueue
+  // Cron (wrangler.toml [triggers]). The 09:00 and 00:00 ET firings enqueue
   // the morning and end-of-day runs on their own AgentRunner, one job per
-  // alarm (src/scheduled/runs.ts); every other firing does nothing. The Figma
+  // alarm (src/scheduled/runs.ts); the firing an hour off does nothing. The Figma
   // library poll is one of those jobs now, not work done on every firing.
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     // Metered like every other invocation: the enqueue is a Durable Object hop

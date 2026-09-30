@@ -26,7 +26,7 @@ Pillar → channel map (group announcements; **all private — uno-bot must be i
 
 The Worker's one proactive read of channels, whose rules the bot reads through `read_reference` (`docs/connectors/slack-sweep.md`):
 
-- **Read path.** At the 6 pm ET end-of-day run, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
+- **Read path.** At the 00:00 ET end-of-day run, dated to the workday that just ended, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
   - `conversations.info` first: a private channel is read only when it is also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`, and a DM stays unread;
   - one more job reads every group DM uno-bot is in (`users.conversations`, `types=mpim`); a retry passes over those already handled today, and one that fails is counted while the rest are read;
   - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then, also in pages of 200.
@@ -38,7 +38,7 @@ The Worker's one proactive read of channels, whose rules the bot reads through `
   - a fix found in both a public thread and a private place goes only on the private card (ADR-031);
   - findings in no thread go to #plus-universal for the design system and to #plus-design otherwise (`pickDestination` in `agents/uno-bot/src/sweep/finding.ts`).
   - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
-- **Cards** post at the next weekday 10 am ET run: one live card per thread, up to 10 fixes, and the rest queued until it resolves. A thread is taken while its card is live by the records or in ThreadState, a revision or re-staged card included. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.
+- **Cards** post at the next weekday 9 am ET run: one live card per thread, up to 10 fixes, and the rest queued until it resolves. A thread is taken while its card is live by the records or in ThreadState, a revision or re-staged card included. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.
 - **Posted means staged.** A card starts only when the invocation's budget covers it. Its snapshot (the fixes as shown) goes to KV and its items to D1; it is posted tagged with its key and its operations' digest in message metadata, staged, then marked posted. A retry stages only from the snapshot, and only when the posted card's digest matches; a card the search comes back unsure about is held, and a card the earlier try already staged is recorded as posted and left as it is, resolved or live. Staging puts the card on the proposal record, as any card's staging does. A staging that fails outright edits the card to say it did not go through and releases its items.
 - **A failing thread** (replies, a linked page, or the detector) holds the cursor; on its second night running it is skipped with a note, so one thread holds a channel back two nights at most. A quota stop, the model's or Notion's 429, holds without counting.
 <!-- /ide-only -->

@@ -45,8 +45,8 @@ const DM_BEA = "D0BEA";
 const URL = "https://plus.slack.com/";
 const ON_AT = at(28, 15);
 const EOD = at(29, 22);
-const THU = at(31, 14);
-const FRI = at(32, 14);
+const THU = at(31, 13);
+const FRI = at(32, 13);
 const READ: ScheduledJob = { key: `dm-promise-read:${MAYA}`, kind: "dm-promise-read", user: MAYA };
 const NUDGE: ScheduledJob = { key: `dm-promise-nudge:${MAYA}`, kind: "dm-promise-nudge", user: MAYA };
 
@@ -243,7 +243,7 @@ describe("the switches", () => {
     assert.deepEqual(byKind, { made: "open", made_to: "lapsed" });
     assert.deepEqual(w.posts, []);
 
-    await turnOn(w, [], at(30, 13));
+    await turnOn(w, [], at(30, 12));
     assert.ok(w.records.rows().every((r) => r.state === "lapsed"));
     assert.deepEqual(w.posts, []);
     // No switch on: no job in either run.
@@ -272,9 +272,11 @@ describe("the switches", () => {
       onScheduledFiring(time, { enqueueRun: async (run) => void runs.push(run), dmWatchers: () => ((reads += 1), watchers()) });
     await fire(at(29, 15, 15), async () => [MAYA]);
     assert.equal(reads, 0);
-    await fire(EOD, async () => [MAYA]);
+    // Wed 00:00 ET: the end-of-day run that sweeps Tuesday.
+    const midnight = at(30, 4);
+    await fire(midnight, async () => [MAYA]);
     assert.deepEqual(runs.pop()?.jobs.filter((j) => j.user).map((j) => j.key), [`dm-promise-read:${MAYA}`]);
-    await fire(EOD, async () => {
+    await fire(midnight, async () => {
       throw new Error("D1 down");
     });
     const run = runs.pop();
@@ -359,12 +361,12 @@ describe("the morning reminder", () => {
     assert.equal(w.posts.length, 1);
     assert.match(w.posts[0]!.text, new RegExp(`^Hey <@${MAYA}>, on Tue you said you'd review the PRD\\. Did it happen\\?`));
     // Re-armed to the end of Tue Oct 6: the follow-up goes on Wed.
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 14)));
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13)));
     assert.equal(w.posts.length, 1);
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(37, 14)));
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(37, 13)));
     assert.equal(w.posts.length, 2);
     assert.match(w.posts[1]!.text, /Still on your list\?/);
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(42, 14))); // Mon Oct 12
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(42, 13))); // Mon Oct 12
     assert.equal(w.posts.length, 2);
     assert.equal(w.records.rows()[0]!.state, "lapsed");
     assert.ok(w.posts.every((p) => p.channel === `D-UNO-${MAYA}`));
@@ -590,7 +592,7 @@ describe("reaching every DM, and every message in it", () => {
     assert.equal(w.records.rows().length, 1);
   });
 
-  it("a retry after midnight UTC resumes the night it belongs to, by the run's date", async () => {
+  it("a retry later in the night resumes the run it belongs to, by the run's date", async () => {
     const w = world();
     await turnOn(w, ["promises_to_me"]);
     const stopped = { ...readDeps(w, EOD, "2026-09-29"), meter: { headroom: () => ({ subrequests: 0, d1Queries: 40 }) } };
@@ -637,16 +639,16 @@ describe("⏳, token refusals and the scopes a switch needs", () => {
   it("⏳ on the follow-up brings the check-back it promises, twice at most, and the last post offers no ⏳", async () => {
     const w = await toBeaReminded();
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU)); // the reminder
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 14))); // Tue Oct 6: the follow-up
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13))); // Tue Oct 6: the follow-up
     assert.equal(w.posts.length, 2);
     assert.match(w.posts[1]!.text, /Still waiting on this one\?/);
     assert.equal(await react(w, "hourglass_flowing_sand", at(36, 15)), true);
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 14))); // Fri Oct 9: the check-back
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 13))); // Fri Oct 9: the check-back
     assert.equal(w.posts.length, 3);
     assert.match(w.posts[2]!.text, /^Bea said they'd send the tokens doc/);
     assert.equal(legendOf(w.posts[2]!), MADE_TO_LEGEND);
     await react(w, "hourglass_flowing_sand", at(39, 15));
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(44, 14))); // Wed Oct 14: the second check-back
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(44, 13))); // Wed Oct 14: the second check-back
     assert.equal(w.posts.length, 4);
     assert.equal(legendOf(w.posts[3]!), MADE_TO_LAST_LEGEND);
     // A third ⏳ changes nothing.
@@ -657,7 +659,7 @@ describe("⏳, token refusals and the scopes a switch needs", () => {
   it("a token Slack refuses holds the morning's rows like no token, and they lapse", async () => {
     const w = await toBeaReminded();
     w.slack.refused = true;
-    for (const day of [31, 32, 35]) await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(day, 14)));
+    for (const day of [31, 32, 35]) await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(day, 13)));
     assert.deepEqual(w.posts, []);
     assert.equal(w.records.rows()[0]!.state, "lapsed");
   });
@@ -760,13 +762,13 @@ describe("the detector's window", () => {
     await turnOn(w, ["promises_to_me"]);
     await runDmPromiseRead(READ, readDeps(w, EOD));
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU));
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 14)));
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13)));
     const followUp = w.posts[1]!.ts;
     await answerDmReminder(
       { channel: `D-UNO-${MAYA}`, messageTs: followUp, glyph: "hourglass_flowing_sand", userId: MAYA, messageAuthorId: BOT },
       { records: w.records, reminderBody: async () => "body", update: async () => true, botUserId: async () => BOT, now: () => at(36, 15) },
     );
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 14)));
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 13)));
     assert.equal(w.posts.length, 3);
     const answered = await answerDmReminder(
       { channel: `D-UNO-${MAYA}`, messageTs: followUp, glyph: "raised_hands", userId: MAYA, messageAuthorId: BOT },

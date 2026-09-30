@@ -30,7 +30,7 @@
 //   more on a budget of their own, a person's own asks first — the rest
 //   wait, which is no hold — and a row held
 //   `MAX_HOLDS` mornings running lapses. Nothing is sent outside the weekday
-//   10:00 ET run (`isMorningRunTime`).
+//   09:00 ET run (`isMorningRunTime`).
 //
 //   `answerReminder` — the reaction door's first look. A reaction on a
 //   reminder is the reminder's, whatever the glyph: 🙌 ⏳ 🙅 🤔 from the

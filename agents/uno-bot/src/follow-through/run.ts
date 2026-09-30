@@ -2,7 +2,7 @@
 //
 // Each is a `commitments` row of its own kind (`../commitments/store.ts`), so
 // it shares a promise's life: detected at the end of the day, nudged at the
-// next weekday morning run (10 am ET), one follow-up at most, then `lapsed`,
+// next weekday morning run (9 am ET), one follow-up at most, then `lapsed`,
 // and at most `MAX_REMINDERS_PER_PERSON` reminders a person a morning, counted
 // across promises and cards alike. The commitment job schedules them and
 // hands each to this module (`CardFollowUps`).
