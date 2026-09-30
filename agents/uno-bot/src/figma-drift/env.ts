@@ -25,7 +25,7 @@ import { getPermalink, postMessage, updateMessage, type SlackMessageMetadata } f
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import type { SlackMessageEvent } from "../slack/types";
 import { threadStateFor } from "../thread-state/production";
-import { proposalReplyThread } from "../thread-state/index";
+import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { proposalEvent, recordProposalEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { databaseOptions } from "../integrations/notion";
@@ -126,6 +126,9 @@ export async function runDriftAsksOnEnv(
     async cardLive(ts) {
       return (await threadState.getProposalByTs(ts)).state === "found";
     },
+    async threadBusy(channel, threadTs) {
+      return !!(await driftCardIn(env, channel, threadTs));
+    },
     async publisher(fileKey) {
       if (!env.FIGMA_ACCESS_TOKEN) return null;
       const [newest] = versionsFrom(
@@ -187,13 +190,16 @@ export async function handleDriftAnswer(env: Env, event: SlackMessageEvent): Pro
   if (!env.HARNESS_KV || !isDriftAnswerCandidate(event)) return false;
   const store = kvDriftStore(env.HARNESS_KV);
   const threadState = threadStateFor(env);
+  // `answerDriftAsk` catches its own failures but a budget stop, so a reply
+  // it could not read takes the ordinary engagement rule, never a turn.
   return answerDriftAsk(
     { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" },
     {
       asked: (channel, threadTs) => store.asked(channel, threadTs),
-      async liveCard(channel, thread) {
+      liveCard: (channel, thread) => driftCardIn(env, channel, thread),
+      async hasTurnCard(channel, thread) {
         const cards = await threadState.getProposalsByChannel(channel);
-        return cards.find((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
+        return cards.some((p) => !p.supersedeKey && !p.sweepRun && proposalReplyThread(p) === thread);
       },
       async retire(ts) {
         return (await threadState.retireProposal(ts)).retired;
@@ -211,6 +217,12 @@ export async function handleDriftAnswer(env: Env, event: SlackMessageEvent): Pro
       },
     },
   );
+}
+
+/** The live drift card in a thread, a revision of it included. */
+async function driftCardIn(env: Env, channel: string, thread: string): Promise<PendingProposal | null> {
+  const cards = await threadStateFor(env).getProposalsByChannel(channel);
+  return cards.find((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
 }
 
 /** The sweep's tag, with this job's role: a reply under it is read by the

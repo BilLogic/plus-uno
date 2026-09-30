@@ -108,6 +108,7 @@ import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./anteceden
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick, sweepTag } from "../sweep/cards";
+import { DRIFT_KEY } from "../figma-drift/finding";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
@@ -896,7 +897,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // operations minus the dropped ones, byte for byte, so there is nothing for
   // a model to reproduce. Anything else said under the card still goes to the
   // model, and its revision is still held to the subset rule below.
-  if (request.pending?.sweepRun) {
+  // A file-drift card (`figma-drift/`) holds one intake per file and is read
+  // the same way: "drop 2" leaves a file out.
+  if (request.pending?.sweepRun || request.pending?.supersedeKey === DRIFT_KEY) {
     const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
     if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
   }
@@ -1563,7 +1566,7 @@ async function dropFromSweepCard(
     requesterUserId: request.userId,
     ...inheritedTerms(pending),
     ttlMs: leftMs,
-    sweepRun: pending.sweepRun!,
+    ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.

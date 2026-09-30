@@ -35,9 +35,10 @@ export interface IssueFiling {
   requester: string;
   /** The source thread's permalink, or null when Slack would not give one. */
   permalink: string | null;
-  /** Asked for in a DM: the footer says so and links nothing, because a DM
-   *  stays a DM and the issue may be public. */
-  dm?: boolean;
+  /** Asked for in a private channel, a group DM or a DM: the footer says so
+   *  and links nothing, because the place stays private and the issue may be
+   *  public. */
+  privatePlace?: boolean;
 }
 
 /**
@@ -70,11 +71,11 @@ export function renderCommentBody(text: string, filing: IssueFiling): string {
   return withSlackFooter(text, filing, "Posted");
 }
 
-/** The words, a rule, then who asked and where. A DM's footer says so and
- *  links nothing: the repo is public and a DM stays a DM. */
+/** The words, a rule, then who asked and where. A private place's footer says
+ *  so and links nothing: the repo is public and the place stays private. */
 function withSlackFooter(text: string, filing: IssueFiling, verb: "Filed" | "Posted"): string {
-  const footer = filing.dm
-    ? [`${verb} from Slack by uno-bot on behalf of ${filing.requester}, ${verb.toLowerCase()} from a DM.`]
+  const footer = filing.privatePlace
+    ? [`${verb} from Slack by uno-bot on behalf of ${filing.requester}, ${verb.toLowerCase()} from a private conversation.`]
     : [
         `${verb} from Slack by uno-bot on behalf of ${filing.requester}.`,
         `Source thread: ${filing.permalink ?? "(thread link unavailable)"}`,

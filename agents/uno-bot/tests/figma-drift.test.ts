@@ -20,8 +20,8 @@ import {
   type DriftAnswerDeps,
   type DriftPostDeps,
 } from "../src/figma-drift/run";
-import { askLine, DRIFT_CARD_TTL_MS, isUpToDateReply, publisherLine } from "../src/figma-drift/copy";
-import { matchPillar } from "../src/figma-drift/draft";
+import { askLine, DRIFT_CARD_TTL_MS, isUpToDateReply, publisherLine, upToDateAnswer } from "../src/figma-drift/copy";
+import { fileKeyOfOperation, githubInert, matchPillar, NEUTRAL_SETTLED } from "../src/figma-drift/draft";
 import { DRIFT_KEY, fileKeyOf } from "../src/figma-drift/finding";
 import { proposalReplyThread } from "../src/thread-state/index";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
@@ -155,6 +155,10 @@ function morning(
     async cardLive(ts) {
       return (await h.threadState.getProposalByTs(ts)).state === "found";
     },
+    async threadBusy(channel, threadTs) {
+      const cards = await h.threadState.getProposalsByChannel(channel);
+      return cards.some((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === threadTs);
+    },
     async publisher() {
       return opts.publisher === undefined ? { handle: "bea.designs", at: "2026-09-20T10:00:00Z" } : opts.publisher;
     },
@@ -174,6 +178,10 @@ function answerDeps(h: SweepHarness, drifts: InMemoryDriftStore, posted: Posted[
   return {
     notes,
     asked: (channel, threadTs) => drifts.asked(channel, threadTs),
+    async hasTurnCard(channel, thread) {
+      const cards = await h.threadState.getProposalsByChannel(channel);
+      return cards.some((p) => !p.supersedeKey && !p.sweepRun && proposalReplyThread(p) === thread);
+    },
     async liveCard(channel, thread) {
       const cards = await h.threadState.getProposalsByChannel(channel);
       return cards.find((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
@@ -219,7 +227,7 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(card!.channel, DESIGN);
     assert.equal(card!.threadTs, t.root.ts, "in the thread the evidence is in");
     assert.ok(m.posted.every((p) => p.channel !== UNO_BOT && p.channel !== "C0PLUSDESIGN"));
-    assert.match(card!.text, /<@U0BEA> <@U0STARTER> <@U0ADE> you talked about <https:\/\/www\.figma\.com\/design\/AbC123xyz\/Session-Recap\?node-id=1-2\|Session Recap> — is the Figma up to date\?/);
+    assert.match(card!.text, /^:art: <@U0BEA> you talked about <https:\/\/www\.figma\.com\/design\/AbC123xyz\/Session-Recap\?node-id=1-2\|Session Recap> — is the Figma up to date\?/);
     assert.match(card!.text, /Last published by \*bea\.designs\* on 2026-09-20\./);
     assert.doesNotMatch(card!.text, /<@bea/, "the publisher is never @-mentioned");
     assert.match(card!.text, /reply `yes` and I'll withdraw this/);
@@ -270,7 +278,8 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(staged.length, 1, "one intake for the file");
     assert.match(m.posted[1]!.text, /is the Figma up to date\?/);
     assert.match(m.posted[1]!.text, /I've drafted the intake <https:\/\/plus\.slack\.com\/archives\/C0DESIGN\/p\d+\|in another thread>/);
-    assert.match(m.posted[1]!.text, /<@U0BEA> <@U0CY>/);
+    assert.match(m.posted[1]!.text, /^:art: <@U0BEA> you talked about/, "the owner is mentioned");
+    assert.doesNotMatch(m.posted[1]!.text, /<@U0CY>/, "the thread's other posters are not pinged");
     assert.deepEqual(staged[0]!.confirmers, ["U0STARTER", "U0ADE", "U0BEA", "U0CY"], "both threads' people may decide");
     assert.ok(m.marked.includes(`${DESIGN}:${two.root.ts}`), "the asked thread is marked, so its replies stay the team's");
   });
@@ -470,15 +479,185 @@ describe("a yes in an asked thread", () => {
   });
 });
 
+const CODE: SweepSource = {
+  url: "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/Button/Button.jsx",
+  kind: "design-system-code",
+  writable: false,
+  title: "Button.jsx",
+  blocks: [],
+  text: "export function Button({ variant = 'primary' })",
+  pillars: [],
+  contributors: [],
+};
+
+describe("two files discussed in one thread", () => {
+  async function twoFiles() {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url, CODE.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({
+      threads: [t],
+      sources: [FIGMA_A, CODE],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)], "U0ADE"), fileDrift(CODE, [ts(29, 16)], "U0ADE"))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 14);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    return { h, drifts, m, t };
+  }
+
+  it("make one card with one operation per file, and one ask naming both", async () => {
+    const { h, m, t } = await twoFiles();
+    assert.equal(m.posted.length, 1, "one ask for the thread");
+    assert.equal(m.posted[0]!.threadTs, t.root.ts);
+    assert.match(m.posted[0]!.text, /you talked about <[^>]+\|Session Recap> and <[^>]+\|Button\.jsx> — are they up to date\?/);
+    assert.match(m.posted[0]!.text, /reply `drop 2` to leave one out/);
+    const cards = await h.threadState.getProposalsByChannel(DESIGN);
+    assert.equal(cards.length, 1, "one card, so neither retires the other");
+    assert.deepEqual(cards[0]!.operations!.map((op) => op.toolName), ["notion_create", "github_issue_create"]);
+    assert.deepEqual(cards[0]!.operations!.map(fileKeyOfOperation), [`figma:${FILE_KEY}`, fileKeyOf(CODE.url, CODE.kind)]);
+    assert.deepEqual(cards[0]!.confirmers, ["U0ADE", "U0STARTER"]);
+  });
+
+  it("wait while the thread's card is live, rather than stage a second card over it", async () => {
+    const { h, drifts, m, t } = await twoFiles();
+    const other = figmaFile("9-9", { url: "https://www.figma.com/design/ZzOther9/Onboarding?node-id=9-9", title: "Onboarding" });
+    // The same thread, the next day, on another file.
+    const again = thread({ user: "U0STARTER", when: t.root.ts, urls: [other.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const found = await pendingOf(h, drifts, again, other);
+    assert.ok(found);
+    await drifts.add([{ ...found, detectedAt: at(30, 22) }]);
+    h.clock.now = at(31, 14);
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.posted.length, 1, "nothing new in a thread whose card is live");
+    assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 1);
+    assert.equal((await drifts.pending()).length, 1, "the new file waits in the queue");
+  });
+
+  it("stays on a yes from a thread that discussed only one of its files, and says which to drop", async () => {
+    const { h, drifts, m } = await twoFiles();
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    // A second thread asked about the code file alone.
+    const second = ts(29, 19);
+    await drifts.saveAsked(DESIGN, second, {
+      [fileKeyOf(CODE.url, CODE.kind)]: { cardChannel: DESIGN, cardThread: card!.replyTs!, people: ["U0CY"], kind: CODE.kind, askedAt: at(30, 14) },
+    });
+    const deps = answerDeps(h, drifts, m.posted);
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: second, user: "U0CY", text: "yes" }, deps), true);
+    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "the card stays");
+    assert.match(deps.notes[0]!, /Reply `drop 2` under it/);
+  });
+});
+
+describe("what a GitHub issue carries from a private place", () => {
+  it("files neither the thread's words nor a link from a private channel", async () => {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [CODE.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({ threads: [t], sources: [CODE], replies: [reply(fileDrift(CODE, [ts(29, 16)], "U0ADE"))], channelKind: "private" });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 14);
+    await runDriftAsks(MORNING, morning(h, drifts).deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    const input = card!.operations![0]!.input as { title: string; body: string };
+    assert.equal(input.title, "Update Button.jsx in code");
+    assert.ok(input.body.includes(NEUTRAL_SETTLED));
+    assert.doesNotMatch(input.body, /Share button|Share with tutor/, "no thread or file paraphrase");
+    assert.doesNotMatch(input.body, /slack\.com/, "no link back to the channel");
+    assert.ok(input.body.includes(CODE.url), "the file itself is named");
+  });
+
+  it("sets any @handle in a public thread's paraphrase in code, so the issue pings nobody", async () => {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [CODE.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const mention = { ...fileDrift(CODE, [ts(29, 16)], "U0ADE"), thread_says: "@octocat owns the Button change now." };
+    const { h, drifts } = night({ threads: [t], sources: [CODE], replies: [reply(mention)] });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 14);
+    await runDriftAsks(MORNING, morning(h, drifts).deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    const input = card!.operations![0]!.input as { title: string; body: string };
+    assert.doesNotMatch(input.body, /(^|[^`])@octocat/);
+    assert.match(input.body, /`@octocat` owns the Button change now\./);
+    assert.match(input.title, /`@octocat`/);
+    assert.equal(githubInert("mail me at bill@plus.org, or ping @bea-d"), "mail me at bill@plus.org, or ping `@bea-d`");
+  });
+});
+
+describe("a yes that cannot be read", () => {
+  it("answers false, without throwing, when the ask record cannot be read", async () => {
+    const deps: DriftAnswerDeps = {
+      asked: async () => {
+        throw new Error("KV down");
+      },
+      liveCard: async () => null,
+      hasTurnCard: async () => false,
+      retire: async () => true,
+      edit: async () => {},
+      post: async () => {},
+      recordWithdrawn: async () => {},
+    };
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: "1.0", user: "U0ADE", text: "yes" }, deps), false);
+  });
+
+  it("still records the withdrawal when the edit fails after the card was retired", async () => {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 14);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    h.clock.now = at(30, 15);
+    const deps = answerDeps(h, drifts, m.posted);
+    deps.edit = async () => {
+      throw new Error("chat.update 500");
+    };
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "yes" }, deps), true);
+    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+    const events = await h.proposalEvents.eventsOf(card!.proposalTs);
+    assert.deepEqual(events.map((e) => e.event), ["staged", "cancelled"]);
+  });
+
+  it("leaves a bare yes to a live turn card in the same thread, but takes an explicit one", async () => {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 14);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    // Someone asked uno-bot for something in the thread: a turn's card.
+    await h.threadState.putProposal({
+      ...card!,
+      proposalTs: ts(30, 15),
+      supersedeKey: undefined,
+      confirmers: undefined,
+      operations: [{ toolName: "github_issue_create", input: { title: "x", body: "y" } }],
+    });
+    const deps = answerDeps(h, drifts, m.posted);
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "yes" }, deps), false);
+    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "the Figma is up to date" }, deps), true);
+    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+  });
+});
+
 describe("the ask's words", () => {
   it("names the file by its title, linked, and escapes it", () => {
     assert.equal(
-      askLine({ mentions: ["U0BEA", "U0ADE"], title: "Recap <!channel>", url: "https://www.figma.com/design/K/x", kind: "figma" }),
-      "<@U0BEA> <@U0ADE> you talked about <https://www.figma.com/design/K/x|Recap &lt;!channel&gt;> — is the Figma up to date?",
+      askLine({ mentions: ["U0BEA"], files: [{ title: "Recap <!channel>", url: "https://www.figma.com/design/K/x", kind: "figma" }] }),
+      "<@U0BEA> you talked about <https://www.figma.com/design/K/x|Recap &lt;!channel&gt;> — is the Figma up to date?",
     );
     assert.equal(
-      askLine({ mentions: ["U0BEA"], title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" }),
+      askLine({ mentions: ["U0BEA"], files: [{ title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" }] }),
       "<@U0BEA> you talked about <https://github.com/o/r/blob/main/b.jsx|Button.jsx> — is the code up to date?",
+    );
+    assert.equal(
+      askLine({
+        mentions: ["U0BEA"],
+        files: [
+          { title: "Recap", url: "https://www.figma.com/design/K/x", kind: "figma" },
+          { title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" },
+        ],
+      }),
+      "<@U0BEA> you talked about <https://www.figma.com/design/K/x|Recap> and <https://github.com/o/r/blob/main/b.jsx|Button.jsx> — are they up to date?",
     );
   });
 
@@ -487,13 +666,35 @@ describe("the ask's words", () => {
     assert.equal(publisherLine(null), null);
   });
 
-  it("reads a short yes, or 'up to date', as the answer — and nothing else", () => {
-    for (const yes of ["yes", "Yes!", "yep", "yeah it's current", "It's up to date", "already updated :white_check_mark:", "<@U0BOT> yes"]) {
-      assert.equal(isUpToDateReply(yes), true, yes);
+  it("reads a bare affirmative or an explicit 'the file is current' as the answer", () => {
+    const bare = ["yes", "Yes!", "yep", "yes it is", "yes, up to date", "it's up to date", "It’s up to date.", "already updated", "already updated :white_check_mark:", "<@U0BOT> yes"];
+    for (const text of bare) assert.equal(upToDateAnswer(text), "bare", text);
+    for (const text of ["the Figma is up to date", "Figma's updated", "yep, the file is current", "code is up to date now"]) {
+      assert.equal(upToDateAnswer(text), "explicit", text);
     }
-    for (const no of ["no", "not yet", "isn't up to date", "is it up to date?", "yes but the spacing still needs work, and the header copy and the footer too, so not quite", "lunch?", "I'll update it tomorrow"]) {
-      assert.equal(isUpToDateReply(no), false, no);
-    }
+  });
+
+  it("reads an approval, a plan or a question as the thread's own conversation", () => {
+    const not = [
+      "yes please file it",
+      "yes, go ahead",
+      "yeah we should update the figma",
+      "correct, ship it Friday",
+      "all good, merging now",
+      "yes let's do option B",
+      "yes, file the Roadmap card",
+      "please update it",
+      "no",
+      "not yet",
+      "isn't up to date",
+      "is it up to date?",
+      "lunch?",
+      "I'll update it tomorrow",
+      "correct",
+      "yes but the spacing still needs work",
+    ];
+    for (const text of not) assert.equal(upToDateAnswer(text), null, text);
+    assert.equal(isUpToDateReply("yes"), true);
     assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", user: "U0ADE", text: "yes" }), true);
     assert.equal(isDriftAnswerCandidate({ user: "U0ADE", text: "yes" }), false, "a top-level message answers nothing");
     assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", bot_id: "B1", user: "U0BOT", text: "yes" }), false);
