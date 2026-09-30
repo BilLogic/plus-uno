@@ -822,6 +822,27 @@ describe("replies under a follow-up", () => {
     assert.equal(chainReplyHandlers(handlers).disputeCandidate(event), true);
   });
 
+  it("a job queued for a handler this code does not have tries every fitting handler, then the engagement check", async () => {
+    const tried: string[] = [];
+    const handlers = [
+      { name: "ds-precedence", candidate: () => false, handle: async () => (tried.push("ds"), false) },
+      { name: "follow-through", candidate: () => true, handle: async () => (tried.push("card"), false) },
+    ];
+    const event = { type: "message", channel: DESIGN, thread_ts: "1.0", ts: "1.1", user: MAYA, text: "Shipped" } as SlackMessageEvent;
+    let engaged = 0;
+    let turns = 0;
+    await runMessageJob(event, {
+      claim: async () => "claimed",
+      markDone: async () => {},
+      ...chainReplyHandlers(handlers, "from-a-later-version"),
+      engages: async () => (engaged++, false),
+      turn: async () => void turns++,
+    });
+    assert.deepEqual(tried, ["card"]);
+    assert.equal(engaged, 1, "the reply takes the engagement check");
+    assert.equal(turns, 0, "and runs no turn it would not have had");
+  });
+
   it("an unmarked short reply is queued for no handler, and its job makes no extra claim or engagement check", async () => {
     const kv = { get: async () => null, put: async () => {} };
     const env = { PLUS_DESIGN_CHANNEL_ID: DESIGN, USAGE_DB: {}, HARNESS_KV: kv } as unknown as Env;

@@ -463,8 +463,9 @@ export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<
 }
 
 /** The replies handled ahead of the turn, in the order tried: a weekly DS
- *  precedence dispute (a throw runs the turn), an answer about a file's drift,
- *  and an answer under a card follow-up (both catch their own failures). */
+ *  precedence dispute (a throw runs the turn), an answer about a file's drift
+ *  (it catches its own failures but a budget stop, as on main), and an answer
+ *  under a card follow-up (it catches every failure). */
 export function replyHandlersFor(env: Env): ReplyHandler[] {
   return [
     { name: "ds-precedence", candidate: (e) => isDsPrecedenceCandidate(env, e), handle: (e) => handleDsPrecedenceReply(env, e) },

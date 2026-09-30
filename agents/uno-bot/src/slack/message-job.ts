@@ -21,8 +21,9 @@
 //     so an `app_mention` twin arriving second still gets its turn;
 //   • a handler that throws falls through to the ordinary turn in the same
 //     job, so the reply is answered rather than dropped. The DS revision
-//     relies on this; the drift and card handlers catch their own failures
-//     and never throw.
+//     relies on this. The drift handler catches its own failures but a
+//     budget stop, which it re-throws as on main; the card handler catches
+//     every failure, a budget stop included.
 
 import type { RunClaim } from "../thread-state/index";
 import type { SlackMessageEvent } from "./types";
@@ -57,9 +58,10 @@ export interface ReplyHandler {
  * Several ahead-of-the-turn handlers as the job's one dispute door. `matched`
  * is the handler the message was queued for (its name), or null for none —
  * the job then tries no handler at all. Left out (a job queued before this
- * was carried), every handler whose shape fits is a candidate, first to
- * handle it wins. A throw propagates as it did from one handler, so the job
- * runs the turn.
+ * was carried), or naming a handler this code does not have (a job queued by
+ * another version), every handler whose shape fits is a candidate, first to
+ * handle it wins, and an unhandled reply takes the engagement check. A throw
+ * propagates as it did from one handler, so the job runs the turn.
  *
  * @param handlers - In the order tried
  * @param matched - The handler chosen when the message was queued
@@ -68,7 +70,8 @@ export function chainReplyHandlers(
   handlers: readonly ReplyHandler[],
   matched?: string | null,
 ): Pick<MessageJobDeps, "disputeCandidate" | "dispute"> {
-  const tried = matched === undefined ? handlers : handlers.filter((h) => h.name === matched);
+  const known = matched != null && handlers.some((h) => h.name === matched);
+  const tried = matched === null ? [] : known ? handlers.filter((h) => h.name === matched) : handlers;
   return {
     disputeCandidate: (event) => tried.some((h) => h.candidate(event)),
     async dispute(event) {
