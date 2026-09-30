@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/layout-and-structure/Divider/Divider.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Divider/Divider.stories.jsx` — Sizes, Styles, Layout, Overview, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/Divider/Divider.stories.jsx` — Sizes, DeprecatedSize, Styles, Layout, Overview, Interactive
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Divider/Divider.mdx`
 
@@ -15,7 +15,7 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `size` | enum | `'md'` | Thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names; "2.5px" maps to xl and draws 3px. |
+| `size` | enum | `'md'` | Thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names. `2.5px` is a deprecated alias for `xl`: it draws 3px; use `xl`. |
 | `style` | enum | `'light'` | — |
 | `opacity10` | bool | `false` | Apply 10% opacity for subtle separation |
 | `id` | string | — | — |
