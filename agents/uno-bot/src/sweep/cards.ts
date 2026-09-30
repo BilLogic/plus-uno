@@ -26,6 +26,7 @@
 // renders it (`slack/proposal-render.ts`).
 
 import { typedEmojiDecision } from "../gate/reactions";
+import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalOperation, SweepShare } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { pickDestination, shareDestination, type Destination } from "./finding";
@@ -199,11 +200,14 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
   plan.items.forEach((item, i) => {
     const evidence = item.evidence.permalinks[0] ? ` ([where](${item.evidence.permalinks[0]}))` : "";
     const { before, after } = changedSpan(item.original, item.replacement);
+    // Page and thread words are text: a title or block holding `<!channel>`
+    // pings nobody. The link is Slack's own `<url|label>`, so a `]` in a title
+    // cannot break a Markdown one.
     lines.push(
-      `${i + 1}. <@${item.owner}> · [${item.target.title}](${item.target.url})`,
-      `   - page says: “${quote(item.sourceSays)}”`,
-      `   - thread says: “${quote(item.threadSays)}”${evidence}`,
-      `   - change: “${before}” → “${after}”`,
+      `${i + 1}. <@${item.owner}> · <${item.target.url}|${escapeSlackText(flat(item.target.title) || "untitled")}>`,
+      `   - page says: “${escapeSlackText(quote(item.sourceSays))}”`,
+      `   - thread says: “${escapeSlackText(quote(item.threadSays))}”${evidence}`,
+      `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
     );
   });
   lines.push(
