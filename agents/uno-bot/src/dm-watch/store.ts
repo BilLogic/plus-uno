@@ -81,6 +81,9 @@ export interface DmCommitmentRecord {
    *  follow-up). */
   nudgeTs: string | null;
   followupTs: string | null;
+  /** Every earlier post after the first, before `followupTs` replaced it —
+   *  a reaction on any of them still finds the row. */
+  earlierFollowupTs: string[];
   checkedOn: string | null;
   holds: number;
   remindedOn: string | null;
@@ -90,9 +93,27 @@ export interface DmCommitmentRecord {
 export type DmCommitmentPatch = Partial<
   Pick<
     DmCommitmentRecord,
-    "state" | "dueAt" | "nudges" | "snoozes" | "reminderChannel" | "nudgeTs" | "followupTs" | "checkedOn" | "holds" | "remindedOn" | "resolvedAt"
+    | "state"
+    | "dueAt"
+    | "nudges"
+    | "snoozes"
+    | "reminderChannel"
+    | "nudgeTs"
+    | "followupTs"
+    | "earlierFollowupTs"
+    | "checkedOn"
+    | "holds"
+    | "remindedOn"
+    | "resolvedAt"
   >
 >;
+
+/** How far one DM has been read: everything up to `through`; and, while a
+ *  backlog drains from its oldest end, where the next read stops (`upTo`). */
+export interface DmReadPosition {
+  through: string;
+  upTo: string | null;
+}
 
 export interface DmWatchRecords {
   /** The switches this person has on. */
@@ -103,9 +124,9 @@ export interface DmWatchRecords {
   /** Everyone with at least one switch on — one scheduled job each. */
   watchers(): Promise<string[]>;
   /** How far each DM of theirs has been read, by DM id. */
-  positions(userId: string): Promise<Record<string, string>>;
+  positions(userId: string): Promise<Record<string, DmReadPosition>>;
   /** Record how far these DMs have been read, in one statement. */
-  savePositions(userId: string, positions: Readonly<Record<string, string>>): Promise<void>;
+  savePositions(userId: string, positions: Readonly<Record<string, DmReadPosition>>): Promise<void>;
   /** Forget how far their DMs were read — their last switch went off. */
   clearPositions(userId: string): Promise<void>;
 
@@ -117,7 +138,8 @@ export interface DmWatchRecords {
   nextDue(ownerId: string, now: number, runDate: string): Promise<DmCommitmentRecord | null>;
   /** How many reminders this owner got on `runDate`. */
   remindedCount(ownerId: string, runDate: string): Promise<number>;
-  /** The row a reminder posted in `channel` with this ts belongs to. */
+  /** The row a reminder posted in `channel` with this ts belongs to — its
+   *  first, its latest, or any earlier follow-up or check-back. */
   byReminderTs(channel: string, ts: string): Promise<DmCommitmentRecord | null>;
   update(id: string, patch: DmCommitmentPatch): Promise<void>;
   /** Every live row of this owner's of these kinds becomes `lapsed`, in one

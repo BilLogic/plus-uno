@@ -27,6 +27,7 @@ export function dmRow(over: Partial<DmCommitmentRecord> = {}): DmCommitmentRecor
     reminderChannel: null,
     nudgeTs: null,
     followupTs: null,
+    earlierFollowupTs: [],
     checkedOn: null,
     holds: 0,
     remindedOn: null,
@@ -69,14 +70,15 @@ export function runDmWatchRecordsConformance(label: string, make: () => DmWatchR
   it("keeps how far each DM was read, per person, upserted in one go, and forgets them on request", async () => {
     const r = make();
     assert.deepEqual(await r.positions("U0MAYA"), {});
-    await r.savePositions("U0MAYA", { D0BEA: "10.000000", D0KAI: "20.000000" });
-    await r.savePositions("U0MAYA", { D0BEA: "30.000000" });
-    await r.savePositions("U0BEA", { D0MAYA: "5.000000" });
+    const at = (through: string, upTo: string | null = null) => ({ through, upTo });
+    await r.savePositions("U0MAYA", { D0BEA: at("10.000000", "15.000000"), D0KAI: at("20.000000") });
+    await r.savePositions("U0MAYA", { D0BEA: at("30.000000") });
+    await r.savePositions("U0BEA", { D0MAYA: at("5.000000", "9.000000") });
     await r.savePositions("U0MAYA", {});
-    assert.deepEqual(await r.positions("U0MAYA"), { D0BEA: "30.000000", D0KAI: "20.000000" });
+    assert.deepEqual(await r.positions("U0MAYA"), { D0BEA: at("30.000000"), D0KAI: at("20.000000") });
     await r.clearPositions("U0MAYA");
     assert.deepEqual(await r.positions("U0MAYA"), {});
-    assert.deepEqual(await r.positions("U0BEA"), { D0MAYA: "5.000000" });
+    assert.deepEqual(await r.positions("U0BEA"), { D0MAYA: at("5.000000", "9.000000") });
   });
 
   it("a row reads back field for field, and a second insert keeps the first", async () => {
@@ -117,6 +119,11 @@ export function runDmWatchRecordsConformance(label: string, make: () => DmWatchR
     assert.equal((await r.byReminderTs("D0UNO", "111.1"))?.id, "a");
     assert.equal((await r.byReminderTs("D0UNO", "222.2"))?.id, "b");
     assert.equal(await r.byReminderTs("D0UNO", "333.3"), null);
+    // A follow-up replaced by a later post still finds its row.
+    await r.update("b", { followupTs: "444.4", earlierFollowupTs: ["222.2", "333.3"] });
+    assert.equal((await r.byReminderTs("D0UNO", "333.3"))?.id, "b");
+    assert.equal((await r.byReminderTs("D0UNO", "444.4"))?.id, "b");
+    assert.deepEqual((await r.get("b"))?.earlierFollowupTs, ["222.2", "333.3"]);
     // The same ts in another conversation is not this reminder.
     assert.equal(await r.byReminderTs("D0ELSE", "111.1"), null);
     const a = await r.get("a");

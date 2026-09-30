@@ -12,12 +12,13 @@ import assert from "node:assert/strict";
 
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { onScheduledFiring, planRun, type ScheduledRun } from "../src/scheduled/runs";
-import type { CommitmentDetector, EvidenceJudge } from "../src/commitments/detector";
+import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type EvidenceJudge } from "../src/commitments/detector";
 import type { SweepSlackMessage } from "../src/sweep/run";
 import {
   accessOf,
   answerDmReminder,
   createInMemoryDmWatchRecords,
+  detectorWindows,
   DM_WATCH_ACTION_ID,
   MADE_TO_LAST_LEGEND,
   MADE_TO_LEGEND,
@@ -135,7 +136,7 @@ interface World {
   slack: FakeSlack;
   hasToken: boolean;
   logs: string[];
-  posts: { channel: string; text: string; blocks: unknown[] }[];
+  posts: { channel: string; text: string; blocks: unknown[]; ts: string }[];
   progress: Map<string, { latest: string }>;
 }
 
@@ -175,9 +176,10 @@ function nudgeDeps(w: World, now: number, judge: EvidenceJudge = notDone): DmNud
     bot: {
       dmChannel: async (user) => `D-UNO-${user}`,
       async post(channel, message) {
-        w.posts.push({ channel, ...message });
         n += 1;
-        return { ok: true, ts: `${now / 1000}.00000${n}` };
+        const ts = `${now / 1000}.00000${n}`;
+        w.posts.push({ channel, ...message, ts });
+        return { ok: true, ts };
       },
       userName: async (id) => (id === BEA ? "Bea" : null),
     },
@@ -312,14 +314,14 @@ describe("the end-of-day read", () => {
     w.slack.messages.get(DM_BEA)!.push({ ts: ts(30, 17), user: BEA, text: "PROMISE: share the Figma file" });
     await runDmPromiseRead(READ, readDeps(w, at(30, 22)));
     assert.equal(w.records.rows().length, 2);
-    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: (at(30, 22) / 1000).toFixed(6) });
+    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: { through: (at(30, 22) / 1000).toFixed(6), upTo: null } });
   });
 
   it("a budget stop saves where it got to, and the retry picks up there", async () => {
     const w = world();
     await turnOn(w, ["promises_made"]);
     const deps = readDeps(w, EOD);
-    await assert.rejects(runDmPromiseRead(READ, { ...deps, meter: { headroom: () => ({ subrequests: 1, d1Queries: 40 }) } }), /budget/);
+    await assert.rejects(runDmPromiseRead(READ, { ...deps, meter: { headroom: () => ({ subrequests: 0, d1Queries: 40 }) } }), /budget/);
     assert.deepEqual([...w.progress.values()], [{ latest: (EOD / 1000).toFixed(6) }]);
     await runDmPromiseRead(READ, deps);
     assert.equal(w.records.rows().length, 1);
@@ -504,14 +506,14 @@ describe("reaching every DM, and every message in it", () => {
       w.slack.messages.set(c, m);
     }
     let checks = 0;
-    const stopping = { ...readDeps(w, EOD), meter: { headroom: () => (++checks > 2 ? { subrequests: 0, d1Queries: 40 } : { subrequests: 50, d1Queries: 40 }) } };
+    const stopping = { ...readDeps(w, EOD), meter: { headroom: () => (++checks > 4 ? { subrequests: 0, d1Queries: 40 } : { subrequests: 50, d1Queries: 40 }) } };
     await assert.rejects(runDmPromiseRead(READ, stopping), /budget/);
     const latest = (EOD / 1000).toFixed(6);
-    assert.deepEqual(await w.records.positions(MAYA), { D0A: latest, D0B: latest });
+    assert.deepEqual(await w.records.positions(MAYA), { D0A: { through: latest, upTo: null }, D0B: { through: latest, upTo: null } });
     w.slack.calls.length = 0;
     await runDmPromiseRead(READ, readDeps(w, at(29, 22, 2)));
     assert.deepEqual(w.slack.calls.filter((c) => c.startsWith("history:")), ["history:D0C"]);
-    assert.deepEqual(await w.records.positions(MAYA), { D0A: latest, D0B: latest, D0C: latest });
+    assert.deepEqual(await w.records.positions(MAYA), { D0A: { through: latest, upTo: null }, D0B: { through: latest, upTo: null }, D0C: { through: latest, upTo: null } });
     assert.equal(w.records.rows().length, 3);
   });
 
@@ -522,19 +524,43 @@ describe("reaching every DM, and every message in it", () => {
     w.slack.messages.set(DM_BEA, [{ ts: ts(29, 17), user: BEA, text: "PROMISE: send the tokens doc|Wed" }, ...chatter]);
     await runDmPromiseRead(READ, readDeps(w, EOD));
     assert.deepEqual(w.records.rows().map((r) => r.kind), ["made_to"]);
-    assert.equal(w.slack.calls.filter((c) => c === `history:${DM_BEA}`).length, 3);
-    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: (EOD / 1000).toFixed(6) });
+    assert.equal(w.slack.calls.filter((c) => c === `history:${DM_BEA}`).length, 2);
+    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: { through: (EOD / 1000).toFixed(6), upTo: null } });
   });
 
-  it("a DM too busy to read whole keeps its place, says so, and is read first another night", async () => {
+  it("350 new messages with the promise at the oldest end: found, and the position ends at the head", async () => {
     const w = world();
     await turnOn(w, ["promises_to_me"]);
-    const chatter = Array.from({ length: 350 }, (_, i) => ({ ts: ts(29, 18, 0, i + 1), user: BEA, text: `note ${i}` }));
+    const chatter = Array.from({ length: 349 }, (_, i) => ({ ts: ts(29, 18, 0, i + 1), user: BEA, text: `note ${i}` }));
     w.slack.messages.set(DM_BEA, [{ ts: ts(29, 17), user: BEA, text: "PROMISE: send the tokens doc|Wed" }, ...chatter]);
-    const report = await runDmPromiseRead(READ, readDeps(w, EOD));
-    assert.deepEqual(await w.records.positions(MAYA), {});
-    assert.match(report.summary, /1 too busy to finish/);
-    assert.ok(w.logs.some((l) => l.includes("keeps its place")));
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    if (!w.records.rows().length) await runDmPromiseRead(READ, readDeps(w, at(30, 22)));
+    assert.deepEqual(w.records.rows().map((r) => r.permalink), [permalinkOf(URL, DM_BEA, ts(29, 17))]);
+    const through = (await w.records.positions(MAYA))[DM_BEA];
+    assert.ok(through && through.upTo === null && Number(through.through) >= EOD / 1000);
+  });
+
+  it("a backlog longer than a night's reads drains from its oldest end over nights, never skipping", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const base = Date.UTC(2026, 8, 29, 12, 0) / 1000;
+    const backlog = Array.from({ length: 1400 }, (_, i) => ({ ts: `${base + i * 10}.000000`, user: BEA, text: i === 0 ? "PROMISE: send the tokens doc" : `note ${i}` }));
+    w.slack.messages.set(DM_BEA, backlog);
+    const first = await runDmPromiseRead(READ, readDeps(w, EOD));
+    assert.match(first.summary, /1 with a backlog left/);
+    // Nothing the detector did not see is passed: the position has not moved
+    // past where the switch was turned on, and the next read is bounded.
+    const kept = (await w.records.positions(MAYA))[DM_BEA];
+    assert.equal(kept?.through, (ON_AT / 1000).toFixed(6));
+    assert.ok(kept?.upTo);
+    assert.equal(w.records.rows().length, 0);
+    let nights = 1;
+    while ((await w.records.positions(MAYA))[DM_BEA]?.upTo !== null || !(await w.records.positions(MAYA))[DM_BEA]) {
+      nights += 1;
+      assert.ok(nights <= 6, "the backlog drains within a few nights");
+      await runDmPromiseRead(READ, readDeps(w, at(29 + nights - 1, 22)));
+    }
+    assert.deepEqual(w.records.rows().map((r) => r.permalink), [permalinkOf(URL, DM_BEA, `${base}.000000`)]);
   });
 
   it("more DMs than a night reads: the ones not reached come first the next night, their messages intact", async () => {
@@ -571,7 +597,7 @@ describe("reaching every DM, and every message in it", () => {
     await assert.rejects(runDmPromiseRead(READ, stopped), /budget/);
     // Retried at 00:30 UTC on the 30th, still the 29th's run.
     await runDmPromiseRead(READ, readDeps(w, at(30, 0, 30), "2026-09-29"));
-    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: (EOD / 1000).toFixed(6) });
+    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: { through: (EOD / 1000).toFixed(6), upTo: null } });
     assert.equal(w.progress.size, 0);
   });
 
@@ -669,5 +695,84 @@ describe("⏳, token refusals and the scopes a switch needs", () => {
       save: async () => assert.fail("saved with no user"),
       publish: async () => assert.fail("published with no user"),
     });
+  });
+});
+
+describe("the detector's window", () => {
+  /** A detector that sees what the real one sees: the root and the newest
+   *  messages that fit `MAX_COMMITMENT_THREAD_CHARS`, the middle dropped. */
+  const capped: CommitmentDetector = {
+    async detect({ thread, since }) {
+      const root = thread.messages[0]!;
+      let left = MAX_COMMITMENT_THREAD_CHARS - detectorChars(root);
+      const kept: typeof thread.messages = [];
+      for (const m of [...thread.messages.slice(1)].reverse()) {
+        if (detectorChars(m) > left) break;
+        left -= detectorChars(m);
+        kept.unshift(m);
+      }
+      return detector.detect({ thread: { ...thread, messages: [root, ...kept] }, since });
+    },
+  };
+
+  it("a promise in the middle of a long day is shown to the detector, and found", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const pad = "x".repeat(480);
+    const day = Array.from({ length: 150 }, (_, i) => ({
+      ts: ts(29, 16, 0, i + 1),
+      user: BEA,
+      text: i === 20 ? `PROMISE: send the tokens doc ${pad}` : `note ${i} ${pad}`,
+    }));
+    w.slack.messages.set(DM_BEA, day);
+    await runDmPromiseRead(READ, { ...readDeps(w, EOD), detector: capped });
+    assert.deepEqual(w.records.rows().map((r) => r.permalink), [permalinkOf(URL, DM_BEA, ts(29, 16, 0, 21))]);
+  });
+
+  it("windows fit the detector's cap and cover every new message once, with context ahead", () => {
+    const pad = "y".repeat(900);
+    const messages = Array.from({ length: 40 }, (_, i) => ({ ts: ts(29, 16, 0, i + 1), user: BEA, text: `${i} ${pad}` }));
+    const windows = detectorWindows(messages, "0");
+    const newOnes = windows.flatMap((win) => win.messages.filter((m) => Number(m.ts) > Number(win.since)).map((m) => m.ts));
+    assert.deepEqual(newOnes, messages.map((m) => m.ts));
+    for (const win of windows) assert.ok(win.messages.reduce((n, m) => n + detectorChars(m), 0) <= MAX_COMMITMENT_THREAD_CHARS);
+    assert.ok(windows.length > 1 && windows[1]!.messages.length > windows[1]!.messages.filter((m) => Number(m.ts) > Number(windows[1]!.since)).length);
+  });
+
+  it("the last switch going off while a read runs: the read does not bring the positions back", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const racing: DmReadDeps = {
+      ...readDeps(w, EOD),
+      detector: {
+        async detect(input) {
+          await setDmWatch(MAYA, [], { records: w.records, access: async () => ({ ok: false, reason: "no-token" }), now: () => EOD });
+          return detector.detect(input);
+        },
+      },
+    };
+    await runDmPromiseRead(READ, racing);
+    assert.deepEqual(await w.records.positions(MAYA), {});
+  });
+
+  it("🙌 on an earlier follow-up still finds its row after a later post", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU));
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 14)));
+    const followUp = w.posts[1]!.ts;
+    await answerDmReminder(
+      { channel: `D-UNO-${MAYA}`, messageTs: followUp, glyph: "hourglass_flowing_sand", userId: MAYA, messageAuthorId: BOT },
+      { records: w.records, reminderBody: async () => "body", update: async () => true, botUserId: async () => BOT, now: () => at(36, 15) },
+    );
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 14)));
+    assert.equal(w.posts.length, 3);
+    const answered = await answerDmReminder(
+      { channel: `D-UNO-${MAYA}`, messageTs: followUp, glyph: "raised_hands", userId: MAYA, messageAuthorId: BOT },
+      { records: w.records, reminderBody: async () => "body", update: async () => true, botUserId: async () => BOT, now: () => at(39, 15) },
+    );
+    assert.equal(answered, true);
+    assert.equal(w.records.rows()[0]!.state, "done");
   });
 });

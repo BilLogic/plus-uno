@@ -18,10 +18,12 @@
 //   Before any read it checks the token's granted scopes against Slack; a
 //   missing scope skips the job with one log line. Then it lists every one of
 //   the person's DMs, page by page, and reads the ones read longest ago first
-//   — each from where it was last read to where tonight stops — up to
-//   `MAX_DMS_PER_NIGHT`. A DM's position moves only when all of its new
-//   messages were read, so a DM not reached tonight, or too busy to read
-//   whole, loses nothing: it comes first another night. Each promise the
+//   — each forward from where it was last read toward where tonight stops —
+//   up to `MAX_DMS_PER_NIGHT`. The new messages go to the detector in windows
+//   it sees whole (`detectorWindows`), and a DM's position moves only past
+//   messages the detector was shown, so a DM not reached tonight, or with a
+//   backlog, loses nothing: the rest is read, oldest first, another night.
+//   Each promise the
 //   person made (`made`) or was made to them (`made_to`), for a switch that is
 //   on, is kept as a row holding the permalink, `due_at` and the state — no
 //   summary, no id of the other person. It posts nothing.
@@ -56,7 +58,7 @@ import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
 import { acknowledgement, REMINDER_LEGEND, reminderAnswer, reminderBlocks, reminderText } from "../commitments/copy";
-import type { CommitmentDetector, DetectedCommitment, EvidenceJudge } from "../commitments/detector";
+import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type DetectedCommitment, type EvidenceJudge } from "../commitments/detector";
 import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnooze, nudgeAt, rearmedDueAt } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
 import { madeFollowUpText, madeToAcknowledgement, MADE_LAST_LEGEND, MADE_TO_LAST_LEGEND, MADE_TO_LEGEND, madeToFollowUpText, madeToText } from "./copy";
@@ -68,6 +70,7 @@ import {
   type DmCommitmentKind,
   type DmCommitmentPatch,
   type DmCommitmentRecord,
+  type DmReadPosition,
   type DmWatchFeature,
   type DmWatchRecords,
 } from "./store";
@@ -80,11 +83,15 @@ export const MAX_DMS_PER_NIGHT = 80;
 /** `users.conversations` pages of 200 read for the DM list; a list longer
  *  than this is reported incomplete. */
 export const MAX_IM_PAGES = 5;
-/** Messages per history page. */
-export const DM_HISTORY_LIMIT = 100;
-/** History pages one DM may take in a night; past it the DM keeps its
- *  position and is read first another night. */
-export const MAX_HISTORY_PAGES = 3;
+/** Messages per history read. */
+export const DM_HISTORY_LIMIT = 200;
+/** History reads one DM may take in a night, a window halved counting as one;
+ *  what they did not reach is read first another night, from the oldest end. */
+export const MAX_HISTORY_PAGES = 5;
+/** Messages ahead of a detector window, for context. */
+export const WINDOW_CONTEXT = 2;
+/** The longest a message counts toward a window — the detector's own cap. */
+const MAX_MESSAGE_WINDOW_CHARS = 1_200;
 /** Messages up to and including the promise, read again at nudge time. */
 export const CONTEXT_MESSAGES = 8;
 /** Messages after the promise the morning judges for completion. */
@@ -93,9 +100,12 @@ export const EVIDENCE_MESSAGES = 50;
 export const MAX_DM_REMINDERS_PER_MORNING = 2;
 /** Mornings running a row may be held before it lapses. */
 export const MAX_DM_HOLDS = 3;
-/** What one history page of a DM may spend: the page and the detector, the
- *  insert and the positions saved at a stop. */
-export const DM_READ_COST = { subrequests: 2, d1Queries: 2 };
+/** What one history read may spend, with what a stop saves (the switch
+ *  check and the positions). */
+export const DM_READ_COST = { subrequests: 1, d1Queries: 2 };
+/** What one detector window may spend: the model call, the insert, and what a
+ *  stop saves. */
+export const DM_DETECT_COST = { subrequests: 1, d1Queries: 3 };
 /** What one reminder may spend: two DM reads, the detector, the judge, the
  *  name, the bot DM and the post, and the D1 statements around them. */
 export const DM_NUDGE_COST = { subrequests: 8, d1Queries: 3 };
@@ -272,7 +282,7 @@ export async function runDmPromiseRead(job: ScheduledJob, deps: DmReadDeps): Pro
   const people = listed.channels.filter((c) => c.user !== user && c.user !== deps.botUserId && c.user !== "USLACKBOT");
   const positions = await deps.records.positions(user);
   const from = (id: string) => {
-    const p = positions[id];
+    const p = positions[id]?.through;
     return p && Number(p) > Number(floor) ? p : floor;
   };
   // Read at an earlier alarm of this same night.
@@ -283,44 +293,62 @@ export async function runDmPromiseRead(job: ScheduledJob, deps: DmReadDeps): Pro
     .sort((a, b) => Number(from(a.id)) - Number(from(b.id)) || a.id.localeCompare(b.id));
   const tonight = waiting.slice(0, Math.max(0, MAX_DMS_PER_NIGHT - doneTonight));
   const counts = { read: 0, busy: 0, unreadable: 0, made: 0, made_to: 0 };
-  const finished: Record<string, string> = {};
+  const finished: Record<string, DmReadPosition> = {};
+  // Saved only while a promise switch is still on: a read already running
+  // when the last switch went off must not bring the positions back.
   const save = async () => {
-    if (!deps.dryRun) await deps.records.savePositions(user, finished);
+    if (deps.dryRun || !Object.keys(finished).length) return;
+    const still = await deps.records.switches(user);
+    if (still.some((s) => PROMISE_KINDS.some((k) => featureOf(k) === s.feature))) await deps.records.savePositions(user, finished);
   };
   try {
     for (const im of tonight) {
       const since = from(im.id);
-      const read = await readDm(slack.api, im.id, since, latest, deps);
+      const read = await readForward(slack.api, im.id, { since, upTo: positions[im.id]?.upTo ?? null, latest }, deps);
       if (!read) {
         counts.unreadable += 1;
         continue;
       }
-      if (read.messages.length) {
+      // Each window is one the detector sees whole; the position follows the
+      // windows it has seen, and nothing past them.
+      let through = since;
+      let stopped = false;
+      for (const window of detectorWindows(read.messages, since)) {
+        ensureHeadroom(deps, DM_DETECT_COST);
         const found = await deps.detector.detect({
-          thread: { channel: im.id, channelKind: "dm", rootTs: read.messages[0]!.ts, messages: read.messages },
-          since,
+          thread: { channel: im.id, channelKind: "dm", rootTs: window.messages[0]!.ts, messages: window.messages },
+          since: window.since,
         });
         if (!found.ok) {
-          // Its position stays: read again another night.
-          counts.unreadable += 1;
-          continue;
+          stopped = true;
+          break;
         }
         const rows = found.commitments.flatMap((c) => rowFor(c, { user, channel: im.id, url: slack.url, switches, now }));
         for (const row of rows) counts[row.kind] += 1;
         if (rows.length && !deps.dryRun) await deps.records.addCommitments(rows);
+        through = window.through;
+        // Seen by the detector: past here is never read again; the backlog
+        // bound stays until the read reaches it.
+        finished[im.id] = { through, upTo: read.upTo };
       }
-      if (read.complete) {
+      if (stopped) {
+        // What was seen stays seen; the rest is read again another night.
+        counts.unreadable += 1;
+        continue;
+      }
+      through = read.through;
+      if (Number(through) > Number(since) || read.upTo !== (positions[im.id]?.upTo ?? null)) finished[im.id] = { through, upTo: read.upTo };
+      if (through === latest) {
         counts.read += 1;
-        finished[im.id] = latest;
       } else {
         counts.busy += 1;
-        log(deps, `[dm-watch] ${user}: a DM had more than ${MAX_HISTORY_PAGES} pages since it was last read; it keeps its place`);
+        log(deps, `[dm-watch] ${user}: a DM has a backlog; its oldest part was read, the rest waits for another night`);
       }
     }
   } catch (err) {
     if (isSubrequestBudgetError(err)) {
       // What finished stays finished; a save the budget refuses only means
-      // those DMs are read again, which keeps no row twice.
+      // those messages are read again, which keeps no row twice.
       await save().catch(() => undefined);
     }
     throw err;
@@ -340,7 +368,7 @@ export async function runDmPromiseRead(job: ScheduledJob, deps: DmReadDeps): Pro
   return report(
     "handled",
     notes.length ? notes.join("; ") : null,
-    `${counts.read} DM(s) read, ${counts.busy} too busy to finish, ${counts.unreadable} unreadable; ${counts.made} made, ${counts.made_to} made to them ${deps.dryRun ? "would be kept" : "kept"}`,
+    `${counts.read} DM(s) read, ${counts.busy} with a backlog left, ${counts.unreadable} unreadable; ${counts.made} made, ${counts.made_to} made to them ${deps.dryRun ? "would be kept" : "kept"}`,
   );
 }
 
@@ -360,30 +388,85 @@ async function listIms(api: OwnerSlack): Promise<{ channels: { id: string; user:
 }
 
 /**
- * One DM's messages after `since` up to `latest`, oldest first: `complete`
- * when every page was read, so its position may move to `latest`. Null when
- * Slack would not say.
+ * One DM's messages after `since`, oldest first, read FORWARD so a backlog
+ * drains from its oldest end. Slack pages a window newest first, so a window
+ * `(since, bound]` is walked down page by page, each next page's window ending
+ * at the oldest message of the last; reaching its bottom means every message
+ * in it was read, and the next window starts where it ended. `bound` is the
+ * backlog's `upTo` when one is kept, else tonight's `latest`. When the reads
+ * run out before a window's bottom, nothing of it counts: its oldest page
+ * seen becomes `upTo`, so the next read is that much shorter and a backlog of
+ * any length drains over nights. At most `MAX_HISTORY_PAGES` reads. Null when
+ * Slack would not say and nothing was read.
  */
-async function readDm(
+async function readForward(
   api: OwnerSlack,
   channel: string,
-  since: string,
-  latest: string,
+  at: { since: string; upTo: string | null; latest: string },
   deps: Pick<Common, "botUserId" | "meter">,
-): Promise<{ messages: SweepMessage[]; complete: boolean } | null> {
-  const all: SweepSlackMessage[] = [];
-  let cursor: string | undefined;
-  for (let page = 0; page < MAX_HISTORY_PAGES; page++) {
-    ensureHeadroom(deps, DM_READ_COST);
-    const res = await api.history(channel, { oldest: since, latest, limit: DM_HISTORY_LIMIT, ...(cursor ? { cursor } : {}) });
-    if (!res) return null;
-    all.push(...res.messages);
-    cursor = res.hasMore ? res.nextCursor : undefined;
-    // Slack says more with no cursor to reach it: not complete.
-    if (res.hasMore && !cursor) return { messages: humans(all, deps.botUserId), complete: false };
-    if (!cursor) return { messages: humans(all, deps.botUserId), complete: true };
+): Promise<{ messages: SweepMessage[]; through: string; upTo: string | null } | null> {
+  const got: SweepSlackMessage[] = [];
+  let lo = at.since;
+  let bound = at.upTo && Number(at.upTo) > Number(lo) && Number(at.upTo) < Number(at.latest) ? at.upTo : at.latest;
+  let reads = 0;
+  const done = (upTo: string | null) => ({ messages: humans(got, deps.botUserId), through: lo, upTo });
+  while (Number(lo) < Number(at.latest)) {
+    const window = new Map<string, SweepSlackMessage>();
+    let hi = bound;
+    for (;;) {
+      if (reads >= MAX_HISTORY_PAGES) return done(bound === at.latest && hi === bound ? null : hi);
+      ensureHeadroom(deps, DM_READ_COST);
+      reads += 1;
+      const res = await api.history(channel, { oldest: lo, latest: hi, inclusive: true, limit: DM_HISTORY_LIMIT });
+      if (!res) return got.length || lo !== at.since ? done(bound === at.latest ? null : bound) : null;
+      for (const m of res.messages) if (Number(m.ts) > Number(lo) && Number(m.ts) <= Number(hi)) window.set(m.ts, m);
+      const oldest = res.messages.reduce<string | null>((o, m) => (o === null || Number(m.ts) < Number(o) ? m.ts : o), null);
+      if (!res.hasMore || oldest === null || Number(oldest) >= Number(hi)) break;
+      hi = oldest;
+    }
+    got.push(...window.values());
+    lo = bound;
+    bound = at.latest;
   }
-  return { messages: humans(all, deps.botUserId), complete: false };
+  return done(null);
+}
+
+/**
+ * A DM's new messages as windows the detector sees whole: each window's new
+ * messages, led by up to `WINDOW_CONTEXT` messages before them for context
+ * (a "yes" needs its question), all within `MAX_COMMITMENT_THREAD_CHARS` by
+ * the detector's own measure. The detector keeps a thread's root and newest
+ * messages and drops the middle, so a longer window would hide promises.
+ */
+export function detectorWindows(
+  messages: readonly SweepMessage[],
+  since: string,
+): { messages: SweepMessage[]; since: string; through: string }[] {
+  const reserve = WINDOW_CONTEXT * (MAX_MESSAGE_WINDOW_CHARS + 40);
+  const limit = MAX_COMMITMENT_THREAD_CHARS - reserve;
+  const windows: { messages: SweepMessage[]; since: string; through: string }[] = [];
+  let i = 0;
+  while (i < messages.length) {
+    const start = i;
+    let size = 0;
+    while (i < messages.length && (i === start || size + detectorChars(messages[i]!) <= limit)) {
+      size += detectorChars(messages[i]!);
+      i += 1;
+    }
+    const context: SweepMessage[] = [];
+    for (let j = start - 1; j >= 0 && context.length < WINDOW_CONTEXT; j--) {
+      const m = messages[j]!;
+      if (size + detectorChars(m) > MAX_COMMITMENT_THREAD_CHARS) break;
+      size += detectorChars(m);
+      context.unshift(m);
+    }
+    windows.push({
+      messages: [...context, ...messages.slice(start, i)],
+      since: start > 0 ? messages[start - 1]!.ts : since,
+      through: messages[i - 1]!.ts,
+    });
+  }
+  return windows;
 }
 
 /** A detected promise as a row, when its switch is on and it is new to it. */
@@ -408,6 +491,7 @@ function rowFor(
       reminderChannel: null,
       nudgeTs: null,
       followupTs: null,
+      earlierFollowupTs: [],
       checkedOn: null,
       holds: 0,
       remindedOn: null,
@@ -547,7 +631,9 @@ async function remind(
     remindedOn: runDate,
     dueAt: rearmedDueAt(now),
     reminderChannel: dm,
-    ...(c.nudges === 0 ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
+    ...(c.nudges === 0
+      ? { nudgeTs: posted.ts }
+      : { followupTs: posted.ts, earlierFollowupTs: c.followupTs ? [...c.earlierFollowupTs, c.followupTs] : c.earlierFollowupTs }),
   });
   return action;
 }

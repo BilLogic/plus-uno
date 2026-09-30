@@ -15,7 +15,10 @@
 -- `dm_read_positions` is how far each of a person's DMs has been read, one row
 -- per DM actually read. A night that cannot reach every DM reads the ones read
 -- longest ago first, so every DM is reached across nights and no message is
--- skipped. Deleted when the person's last switch goes off.
+-- skipped. A DM with a backlog too long to read in one night is read forward
+-- from its oldest end: `up_to` bounds the next read to the part not yet
+-- reached, so the backlog drains night by night. Deleted when the person's
+-- last switch goes off.
 --
 -- `dm_commitments` is one row per promise found in those DMs: made by the
 -- person (`made`) or made to them (`made_to`). A row holds the permalink,
@@ -37,6 +40,7 @@ CREATE TABLE IF NOT EXISTS dm_read_positions (
   user_id       TEXT    NOT NULL,              -- whose DMs
   channel_id    TEXT    NOT NULL,              -- one of their DMs (D…)
   read_through  TEXT    NOT NULL,              -- Slack ts everything in it is read up to
+  up_to         TEXT,                          -- a backlog: the next read stops here; null, it reads to the night's end
   PRIMARY KEY (user_id, channel_id)
 );
 
@@ -53,6 +57,7 @@ CREATE TABLE IF NOT EXISTS dm_commitments (
   reminder_channel TEXT,                        -- the owner's DM with uno-bot, where the reminders are
   nudge_ts       TEXT,                          -- the first reminder
   followup_ts    TEXT,                          -- the latest one after it: a check-back after ⏳, or the follow-up
+  earlier_followup_ts TEXT NOT NULL DEFAULT '[]', -- JSON list of the ones before the latest, so a reaction on any still lands
   checked_on     TEXT,                          -- YYYY-MM-DD: the morning that last looked
   holds          INTEGER NOT NULL DEFAULT 0,    -- consecutive mornings it could not be read or posted
   reminded_on    TEXT,                          -- YYYY-MM-DD: the morning its last reminder went up

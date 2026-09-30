@@ -2,7 +2,7 @@
 // adapter by `tests/helpers/dm-watch-records-conformance.ts`.
 
 import { LIVE_STATES } from "../commitments/store";
-import type { DmCommitmentRecord, DmWatchFeature, DmWatchRecords, DmWatchSwitch } from "./store";
+import type { DmReadPosition, DmCommitmentRecord, DmWatchFeature, DmWatchRecords, DmWatchSwitch } from "./store";
 
 export type InMemoryDmWatchRecords = DmWatchRecords & {
   /** Every row, for a test to inspect. */
@@ -12,7 +12,7 @@ export type InMemoryDmWatchRecords = DmWatchRecords & {
 export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
   const switches = new Map<string, Map<DmWatchFeature, DmWatchSwitch>>();
   const rows = new Map<string, DmCommitmentRecord>();
-  const read = new Map<string, Record<string, string>>();
+  const read = new Map<string, Record<string, DmReadPosition>>();
   const live = (r: DmCommitmentRecord) => LIVE_STATES.includes(r.state);
   return {
     rows: () => [...rows.values()].map((r) => ({ ...r })),
@@ -32,7 +32,7 @@ export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
       return [...switches.keys()].sort();
     },
     async positions(userId) {
-      return { ...(read.get(userId) ?? {}) };
+      return Object.fromEntries(Object.entries(read.get(userId) ?? {}).map(([k, v]) => [k, { ...v }]));
     },
     async savePositions(userId, positions) {
       if (Object.keys(positions).length) read.set(userId, { ...(read.get(userId) ?? {}), ...positions });
@@ -45,7 +45,7 @@ export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
     },
     async get(id) {
       const r = rows.get(id);
-      return r ? { ...r } : null;
+      return r ? { ...r, earlierFollowupTs: [...r.earlierFollowupTs] } : null;
     },
     async nextDue(ownerId, now, runDate) {
       const due = [...rows.values()]
@@ -58,7 +58,7 @@ export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
     },
     async byReminderTs(channel, ts) {
       const mine = [...rows.values()].filter((x) => x.reminderChannel === channel);
-      const r = mine.find((x) => x.nudgeTs === ts) ?? mine.find((x) => x.followupTs === ts);
+      const r = mine.find((x) => x.nudgeTs === ts || x.followupTs === ts || x.earlierFollowupTs.includes(ts));
       return r ? { ...r } : null;
     },
     async update(id, patch) {

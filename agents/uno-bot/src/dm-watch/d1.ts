@@ -10,7 +10,7 @@
 import { chargeD1Query } from "../net";
 import type { SweepDatabase } from "../sweep/d1";
 import { LIVE_STATES } from "../commitments/store";
-import { isDmWatchFeature, type DmCommitmentPatch, type DmCommitmentRecord, type DmWatchRecords, type DmWatchSwitch } from "./store";
+import { isDmWatchFeature, type DmReadPosition, type DmCommitmentPatch, type DmCommitmentRecord, type DmWatchRecords, type DmWatchSwitch } from "./store";
 
 const COLUMNS = [
   "commitment_id",
@@ -25,6 +25,7 @@ const COLUMNS = [
   "reminder_channel",
   "nudge_ts",
   "followup_ts",
+  "earlier_followup_ts",
   "checked_on",
   "holds",
   "reminded_on",
@@ -41,6 +42,7 @@ const PATCH_COLUMNS: Record<keyof DmCommitmentPatch, (typeof COLUMNS)[number]> =
   reminderChannel: "reminder_channel",
   nudgeTs: "nudge_ts",
   followupTs: "followup_ts",
+  earlierFollowupTs: "earlier_followup_ts",
   checkedOn: "checked_on",
   holds: "holds",
   remindedOn: "reminded_on",
@@ -57,11 +59,12 @@ const NEXT_DUE =
   `${SELECT} WHERE owner_id = ? AND state IN (${LIVE}) AND due_at <= ? AND (checked_on IS NULL OR checked_on <> ?) ` +
   `ORDER BY due_at, commitment_id LIMIT 1`;
 const BY_REMINDER =
-  `${SELECT} WHERE reminder_channel = ? AND nudge_ts = ? UNION ALL ${SELECT} WHERE reminder_channel = ? AND followup_ts = ? LIMIT 1`;
+  `${SELECT} WHERE reminder_channel = ? AND (nudge_ts = ? OR followup_ts = ? ` +
+  `OR EXISTS (SELECT 1 FROM json_each(dm_commitments.earlier_followup_ts) WHERE value = ?)) LIMIT 1`;
 const SAVE_POSITIONS =
-  `INSERT INTO dm_read_positions (user_id, channel_id, read_through) ` +
-  `SELECT ?, key, value FROM json_each(?) WHERE true ` +
-  `ON CONFLICT (user_id, channel_id) DO UPDATE SET read_through = excluded.read_through`;
+  `INSERT INTO dm_read_positions (user_id, channel_id, read_through, up_to) ` +
+  `SELECT ?, key, json_extract(value, '$.through'), json_extract(value, '$.upTo') FROM json_each(?) WHERE true ` +
+  `ON CONFLICT (user_id, channel_id) DO UPDATE SET read_through = excluded.read_through, up_to = excluded.up_to`;
 const LAPSE_LIVE =
   `UPDATE dm_commitments SET state = 'lapsed', resolved_at = ? ` +
   `WHERE owner_id = ? AND state IN (${LIVE}) AND kind IN (SELECT value FROM json_each(?))`;
@@ -72,6 +75,14 @@ const SWITCH_ON =
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
+const listOf = (v: unknown): string[] => {
+  try {
+    const parsed: unknown = JSON.parse(String(v ?? "[]"));
+    return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return [];
+  }
+};
 
 function toRow(r: DmCommitmentRecord): Row {
   return {
@@ -87,6 +98,7 @@ function toRow(r: DmCommitmentRecord): Row {
     reminder_channel: r.reminderChannel,
     nudge_ts: r.nudgeTs,
     followup_ts: r.followupTs,
+    earlier_followup_ts: JSON.stringify(r.earlierFollowupTs),
     checked_on: r.checkedOn,
     holds: r.holds,
     reminded_on: r.remindedOn,
@@ -108,6 +120,7 @@ function fromRow(row: Row): DmCommitmentRecord {
     reminderChannel: strOrNull(row.reminder_channel),
     nudgeTs: strOrNull(row.nudge_ts),
     followupTs: strOrNull(row.followup_ts),
+    earlierFollowupTs: listOf(row.earlier_followup_ts),
     checkedOn: strOrNull(row.checked_on),
     holds: Number(row.holds ?? 0),
     remindedOn: strOrNull(row.reminded_on),
@@ -151,10 +164,10 @@ export function createD1DmWatchRecords(deps: { db: SweepDatabase }): DmWatchReco
     async positions(userId) {
       chargeD1Query();
       const { results } = await db
-        .prepare("SELECT channel_id, read_through FROM dm_read_positions WHERE user_id = ?")
+        .prepare("SELECT channel_id, read_through, up_to FROM dm_read_positions WHERE user_id = ?")
         .bind(userId)
-        .all<{ channel_id: unknown; read_through: unknown }>();
-      return Object.fromEntries(results.map((r) => [String(r.channel_id), String(r.read_through)]));
+        .all<{ channel_id: unknown; read_through: unknown; up_to: unknown }>();
+      return Object.fromEntries(results.map((r) => [String(r.channel_id), { through: String(r.read_through), upTo: strOrNull(r.up_to) }]));
     },
     async savePositions(userId, positions) {
       if (!Object.keys(positions).length) return;
@@ -175,14 +188,14 @@ export function createD1DmWatchRecords(deps: { db: SweepDatabase }): DmWatchReco
         .first<{ n: unknown }>();
       return Number(row?.n ?? 0);
     },
-    byReminderTs: (channel, ts) => first(BY_REMINDER, channel, ts, channel, ts),
+    byReminderTs: (channel, ts) => first(BY_REMINDER, channel, ts, ts, ts),
     async update(id, patch) {
       const sets: string[] = [];
       const values: unknown[] = [];
       for (const [field, column] of Object.entries(PATCH_COLUMNS) as [keyof DmCommitmentPatch, string][]) {
         if (patch[field] === undefined) continue;
         sets.push(`${column} = ?`);
-        values.push(patch[field]);
+        values.push(field === "earlierFollowupTs" ? JSON.stringify(patch[field]) : patch[field]);
       }
       if (!sets.length) return;
       await run(`UPDATE dm_commitments SET ${sets.join(", ")} WHERE commitment_id = ?`, ...values, id);
