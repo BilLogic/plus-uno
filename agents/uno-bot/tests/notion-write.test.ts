@@ -233,8 +233,28 @@ test("a page read hands back every block's id and last-edited stamp", async () =
 
   assert.equal(page.text, "Sync runs nightly.");
   assert.deepEqual(page.blocks, [
-    { id: BLOCK, type: "paragraph", lastEditedTime: READ_STAMP, text: "Sync runs nightly.", plain: true },
+    { id: BLOCK, type: "paragraph", lastEditedTime: READ_STAMP, text: "Sync runs nightly.", plain: true, links: [], byBot: false },
   ]);
+  assert.equal(page.truncated, false);
+});
+
+test("a page longer than the read says so, so its last block read is never taken for its end", async () => {
+  const LONG = "3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b";
+  serve({
+    [`GET /pages/${LONG}`]: { body: { id: LONG, properties: {} } },
+    [`GET /blocks/${LONG}/children`]: {
+      body: {
+        has_more: true,
+        next_cursor: "more",
+        results: [{ id: "b", type: "paragraph", last_edited_time: READ_STAMP, paragraph: { rich_text: [{ plain_text: "One of many." }] } }],
+      },
+    },
+  });
+  const { readNotionPage } = await notion();
+
+  const page = await readNotionPage(ENV, LONG, { complete: true });
+
+  assert.equal(page.truncated, true);
 });
 
 // A blocks page Notion refuses — a 429, a 5xx — is not a page with no blocks.
@@ -378,4 +398,145 @@ test("a read's display mark comes off a block's text by its type, and only its o
   assert.equal(stripBlockPrefix("bulleted_list_item", "• Owner: Ade"), "Owner: Ade");
   assert.equal(stripBlockPrefix("to_do", "☐ Ship it"), "Ship it");
   assert.equal(stripBlockPrefix("paragraph", "• a bullet typed as text"), "• a bullet typed as text");
+});
+
+test("an insert places its blocks right after the block it names, once that block's stamp still matches", async () => {
+  serve({
+    [`GET /blocks/${BLOCK}`]: {
+      body: { id: BLOCK, last_edited_time: READ_STAMP, parent: { type: "page_id", page_id: PAGE } },
+    },
+    [`PATCH /blocks/${PAGE}/children`]: { body: { results: [{ id: "new-1" }, { id: "new-2" }] } },
+  });
+  const { notionUpdate } = await notion();
+
+  const r = await notionUpdate(ENV, PAGE, {
+    insert: [{ afterBlockId: BLOCK, lastEditedTime: READ_STAMP, content: "## Accessibility\nEvery training video ships with captions." }],
+  });
+
+  assert.equal(r.inserted, 2);
+  assert.deepEqual(r.refused, []);
+  assert.deepEqual(calls.map((c) => c.method), ["GET", "PATCH"], "the anchor itself is never patched");
+  const patch = calls[1]!;
+  assert.equal(patch.body!.after, BLOCK);
+  assert.deepEqual(
+    (patch.body!.children as { type: string }[]).map((b) => b.type),
+    ["heading_3", "paragraph"],
+  );
+});
+
+test("an insert after a block that moved since the read is refused as stale, and nothing is written", async () => {
+  serve({
+    [`GET /blocks/${BLOCK}`]: {
+      body: { id: BLOCK, last_edited_time: "2026-09-15T16:40:00.000Z", parent: { type: "page_id", page_id: PAGE } },
+    },
+  });
+  const { notionUpdate } = await notion();
+
+  const r = await notionUpdate(ENV, PAGE, {
+    insert: [{ afterBlockId: BLOCK, lastEditedTime: READ_STAMP, content: "Ratio is 1 tutor to 4–5 students." }],
+  });
+
+  assert.equal(r.inserted, 0);
+  assert.equal(r.staleStamps, 1);
+  assert.match(r.refused[0]!, /after 1f2e3d4c: it changed since read/);
+  assert.deepEqual(calls.map((c) => c.method), ["GET"]);
+});
+
+test("an insert after a block on another page is refused, and nothing is written", async () => {
+  serve({
+    [`GET /blocks/${BLOCK}`]: {
+      body: { id: BLOCK, last_edited_time: READ_STAMP, parent: { type: "page_id", page_id: "4c4c4c4c-4c4c-4c4c-4c4c-4c4c4c4c4c4c" } },
+    },
+  });
+  const { notionUpdate } = await notion();
+
+  const r = await notionUpdate(ENV, PAGE, {
+    insert: [{ afterBlockId: BLOCK, lastEditedTime: READ_STAMP, content: "Ratio is 1 tutor to 4–5 students." }],
+  });
+
+  assert.equal(r.inserted, 0);
+  assert.match(r.refused[0]!, /not on this page/);
+  assert.deepEqual(calls.map((c) => c.method), ["GET"]);
+});
+
+test("the edited-since read asks for rows at or after the cursor, a page at a time, oldest edit first, and keeps each row's own parent", async () => {
+  const DB = "3ee43141-b0ce-4517-badc-cb52a7b97bdb";
+  serve({
+    [`POST /databases/3ee43141b0ce4517badccb52a7b97bdb/query`]: {
+      body: {
+        has_more: true,
+        next_cursor: "cur-2",
+        results: [
+          {
+            id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url: "https://www.notion.so/Design-sync-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            last_edited_time: "2026-09-29T20:00:00.000Z",
+            parent: { type: "database_id", database_id: DB },
+            properties: {
+              Name: { type: "title", title: [{ plain_text: "Design sync" }] },
+              "Note Takers": { type: "people", people: [{ name: "Ade Okafor" }] },
+              Type: { type: "select", select: { name: "Team" } },
+            },
+          },
+        ],
+      },
+    },
+  });
+  const { queryEditedSince } = await notion();
+
+  const { rows, more, next } = await queryEditedSince(ENV, DB, "2026-09-28T22:00:00.000Z", 10);
+
+  assert.equal(more, true);
+  assert.equal(next, "cur-2");
+  // At or after: Notion rounds the stamp to the minute, so the cursor's own
+  // minute is read again and the caller passes over what it handled.
+  assert.deepEqual(calls[0]!.body, {
+    page_size: 10,
+    filter: { timestamp: "last_edited_time", last_edited_time: { on_or_after: "2026-09-28T22:00:00.000Z" } },
+    sorts: [{ timestamp: "last_edited_time", direction: "ascending" }],
+  });
+  await queryEditedSince(ENV, DB, "2026-09-28T22:00:00.000Z", 10, "cur-2");
+  assert.equal(calls[1]!.body!.start_cursor, "cur-2", "the next page starts where the last one ended");
+  assert.deepEqual(rows, [
+    {
+      id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      url: "https://www.notion.so/Design-sync-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      title: "Design sync",
+      lastEditedTime: "2026-09-29T20:00:00.000Z",
+      parentDatabaseId: "3ee43141b0ce4517badccb52a7b97bdb",
+      properties: { Type: "Team" },
+      people: { "Note Takers": ["Ade Okafor"] },
+    },
+  ]);
+});
+
+test("a page's comments come back with their text, time and the pages they mention", async () => {
+  serve({
+    [`GET /comments?block_id=${PAGE}`]: {
+      body: {
+        results: [
+          {
+            id: "c-1",
+            created_time: "2026-09-29T18:00:00.000Z",
+            created_by: { object: "user", id: "u-1" },
+            rich_text: [
+              { type: "text", plain_text: "Decided: secondary buttons, see " },
+              { type: "mention", plain_text: "Button spec", href: "https://www.notion.so/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" },
+            ],
+          },
+        ],
+      },
+    },
+  });
+  const { listPageComments } = await notion();
+
+  assert.deepEqual(await listPageComments(ENV, PAGE), [
+    {
+      id: "c-1",
+      createdTime: "2026-09-29T18:00:00.000Z",
+      text: "Decided: secondary buttons, see Button spec",
+      links: ["https://www.notion.so/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+      byBot: false,
+    },
+  ]);
 });

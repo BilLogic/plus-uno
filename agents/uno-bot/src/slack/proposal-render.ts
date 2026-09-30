@@ -548,6 +548,16 @@ export function operationKinds(
     ? (op.input.replace.filter((r) => r && typeof r === "object") as Record<string, unknown>[])
     : [];
   if (replaces.length) kinds.push({ label: "replace in place", details: replaces.map(replaceGist) });
+  // The sweep's added answers: new text after a named block, nothing replaced.
+  const inserts = Array.isArray(op.input.insert)
+    ? (op.input.insert.filter((r) => r && typeof r === "object") as Record<string, unknown>[])
+    : [];
+  if (inserts.length) {
+    kinds.push({
+      label: "add after a block",
+      details: inserts.map(insertGist),
+    });
+  }
   const append = appendDetail(op.input.append);
   if (append) kinds.push({ label: "append", details: [append] });
   return kinds.length ? kinds : [{ label: kind, details: [] }];
@@ -589,6 +599,18 @@ function replaceGist(replace: Record<string, unknown>): string {
       ? `block \`${blockId}\``
       : "_(the cited block)_";
   return after ? `${from} → _${after}_` : from;
+}
+
+/** An added answer, as text: its line, under its new heading when it opens a
+ *  section — never markup. */
+function insertGist(insert: Record<string, unknown>): string {
+  const lines = String(insert.content ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const heading = lines[0]?.startsWith("#") ? lines.shift()!.replace(/^#+\s*/, "") : "";
+  const line = `_${escapeSlackText(firstLine(lines[0] ?? ""))}_`;
+  return heading ? `new section *${escapeSlackText(firstLine(heading))}*: ${line}` : line;
 }
 
 function firstLine(text: string): string {

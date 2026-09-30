@@ -29,6 +29,7 @@ import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalOperation, SweepShare } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
+import { addedContent, captureConfirmers, captureItemLines, captureLead } from "./capture-lines";
 import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
 
@@ -66,7 +67,20 @@ export interface SweepCardPlan {
 }
 
 /** The operation one item runs. */
-export function itemOperation(item: Pick<PendingFinding, "target" | "blockId" | "lastEditedTime" | "replacement">): ProposalOperation {
+export function itemOperation(
+  item: Pick<PendingFinding, "target" | "blockId" | "lastEditedTime" | "replacement" | "add">,
+): ProposalOperation {
+  // An undocumented answer goes in after its section's last block, on that
+  // block's stamp (`./capture-lines.ts`).
+  if (item.add) {
+    return {
+      toolName: "notion_update",
+      input: {
+        page_url: item.target.url,
+        insert: [{ after_block_id: item.blockId, last_edited_time: item.lastEditedTime, content: addedContent(item) }],
+      },
+    };
+  }
   return {
     toolName: "notion_update",
     input: {
@@ -194,12 +208,14 @@ export function destinationKey(d: Destination): string {
 export function sweepCard(plan: SweepCardPlan): ProposalCard {
   const n = plan.items.length;
   const lines = [
-    `:mag: **${SWEEP_CARD_MARK}** — this thread settled ${n === 1 ? "something" : `${n} things`} a linked page still says the old way.`,
+    `:mag: **${SWEEP_CARD_MARK}** — ${captureLead(plan.items) ?? `this thread settled ${n === 1 ? "something" : `${n} things`} a linked page still says the old way.`}`,
     "",
   ];
   plan.items.forEach((item, i) => {
     const evidence = item.evidence.permalinks[0] ? ` ([where](${item.evidence.permalinks[0]}))` : "";
     const { before, after } = changedSpan(item.original, item.replacement);
+    const capture = captureItemLines(item, i, { before, after });
+    if (capture) return void lines.push(...capture);
     // Page and thread words are text: a title or block holding `<!channel>`
     // pings nobody. The link is Slack's own `<url|label>`, so a `]` in a title
     // cannot break a Markdown one.
@@ -213,7 +229,7 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
   lines.push(
     "",
     `One ✅ applies ${n === 1 ? "it" : `all ${n}`}; reply \`drop 2\` to leave one out. ` +
-      "The owners named above and anyone who posted in this thread can confirm. " +
+      `${captureConfirmers(plan.items) ?? "The owners named above and anyone who posted in this thread can confirm."} ` +
       `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   );
   return {
@@ -270,14 +286,31 @@ function quote(text: string): string {
 export function replacedBlocks(operations: readonly Pick<ProposalOperation, "toolName" | "input">[]): Set<string> {
   const blocks = new Set<string>();
   for (const op of operations) {
-    if (op.toolName !== "notion_update" || !Array.isArray(op.input.replace)) continue;
-    for (const entry of op.input.replace as Record<string, unknown>[]) {
+    if (op.toolName !== "notion_update") continue;
+    for (const entry of (Array.isArray(op.input.replace) ? op.input.replace : []) as Record<string, unknown>[]) {
       const id = entry?.block_id ?? entry?.blockId;
+      if (typeof id === "string" && id) blocks.add(id);
+    }
+    // An added answer is keyed by the block it goes in after.
+    for (const entry of (Array.isArray(op.input.insert) ? op.input.insert : []) as Record<string, unknown>[]) {
+      const id = entry?.after_block_id ?? entry?.afterBlockId;
       if (typeof id === "string" && id) blocks.add(id);
     }
   }
   return blocks;
 }
+
+/** Whether a card's operations add an answer (`insert`) — a card only
+ *  `drop N` revises, since `notion_update` offers the model no `insert` to
+ *  restage it with. */
+export function holdsInsert(operations: readonly Pick<ProposalOperation, "toolName" | "input">[]): boolean {
+  return operations.some((op) => op.toolName === "notion_update" && Array.isArray(op.input.insert) && op.input.insert.length > 0);
+}
+
+/** What a worded revision of a card holding an added answer is told. */
+export const INSERT_CARD_REFUSAL =
+  ":lock: This sweep card adds text after a block, which a reply in words can't restage exactly, so the card stays as it is. " +
+  "Reply `drop N` to leave a fix out, or ⛔ the card and ask me.";
 
 /** Whether a bot post is part of a sweep card: tagged as one, or — read
  *  without its metadata — opening as one does. */
@@ -356,7 +389,7 @@ export function sweepCardPick(text: string, count: number): number[] | null {
  */
 export function sweepCardInstruction(): string {
   return [
-    "(system: SWEEP CARD — the pending card is an end-of-day sweep card: one `notion_update` per fix, each an in-place replace.",
+    "(system: SWEEP CARD — the pending card is an end-of-day sweep card: one `notion_update` per fix, each an in-place replace, or an `insert` that adds an answer after a block. A card holding an `insert` is revised only by `drop N`: do not restage it, tell them to reply `drop N`.",
     "A reply that drops an item in words (\"not the second one\"; a bare \"drop 2\" is applied before you see it) → stage the SAME batch without that operation, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.",
     "Change only what the reply asked for: the revision holds the card's own fixes, minus the dropped ones. For anything more, `read_reference` `docs/connectors/slack-sweep`.)",
   ].join("\n");

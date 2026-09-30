@@ -20,12 +20,17 @@ import {
   type SweepSource,
 } from "../../src/sweep/index";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../../src/thread-state/index";
+import { modelCaptureDetector } from "../../src/sweep/capture-detector";
+import type { EditedRecordRow, RecordComment } from "../../src/sweep/records";
+import type { SearchHit } from "../../src/sweep/search";
 import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
 
 export const DESIGN = "C0DESIGN";
 export const UNIVERSAL = "C0UNIVERSAL";
 export const UNO_BOT = "C0UNOBOT";
 export const BOT = "U0BOT";
+export const NOTES_DB = "3ee43141b0ce4517badccb52a7b97bdb";
+export const ROADMAP_DB = "2fc012411bb54770af51d5a050bddb75";
 
 /** A Slack ts on 2026-09-`day` at hh:mm UTC (2026-09-29 is a Tuesday). */
 export function ts(day: number, hh: number, mm = 0, seq = 0): string {
@@ -50,6 +55,9 @@ export function notionPage(id: string, over: Partial<SweepSource> = {}): SweepSo
     text: "Launch date: October 15\nOwner: design team",
     pillars: [],
     contributors: [],
+    // A top-level workspace page: no database's row.
+    parentDatabaseId: null,
+    parentType: "workspace",
     ...over,
   };
 }
@@ -131,6 +139,10 @@ export interface SweepHarness {
   /** Morning searches for a posted card left that answer "unknown", as a
    *  failed Slack read would. */
   unknownSearches: { left: number };
+  /** Every source read, by URL, in order. */
+  sourceReads: string[];
+  /** Every search, as `notion <query>` or `github <query>`. */
+  searches: string[];
 }
 
 export function sweepHarness(opts: {
@@ -150,6 +162,21 @@ export function sweepHarness(opts: {
   /** The group DMs uno-bot is in, as the bot's own conversation list names
    *  them; null when that list cannot be read. Unset, none. */
   groupDms?: string[] | null;
+  /** Search results by query; a query not listed finds nothing. Unset, the
+   *  sweep has no search wired. */
+  search?: Record<string, SearchHit[]>;
+  /** Wire the Capture detectors (answers, notes and cards) over the same
+   *  recorded replies as the drift detector, in call order. */
+  capture?: boolean;
+  /** The running-notes and Roadmap rows edited since any cursor, and each
+   *  card's comments by page id. Unset, those reads are not wired. */
+  notion?: {
+    notes?: EditedRecordRow[];
+    cards?: EditedRecordRow[];
+    comments?: Record<string, RecordComment[]>;
+    /** Rows per query page; 25 unless set. */
+    pageSize?: number;
+  };
 }): SweepHarness {
   const clock = { now: opts.now };
   const store = opts.store ?? createInMemorySweepStore();
@@ -204,6 +231,8 @@ export function sweepHarness(opts: {
     },
   };
   const sources = new Map((opts.sources ?? []).map((s) => [s.url, s] as const));
+  const sourceReads: string[] = [];
+  const searches: string[] = [];
   let nextTs = 0;
 
   const deps: SweepDeps = {
@@ -237,6 +266,7 @@ export function sweepHarness(opts: {
     },
     sources: {
       async read(url) {
+        sourceReads.push(url);
         // What a complete read throws when the page's blocks page fails.
         if (broken.has(url)) throw new Error("Notion 503 service_unavailable: slow down");
         if (rateLimited.has(url)) throw new Error("Notion 429 rate_limited: slow down");
@@ -249,6 +279,41 @@ export function sweepHarness(opts: {
       },
     },
     detector: modelDriftDetector(provider),
+    ...(opts.capture ? { capture: modelCaptureDetector(provider) } : {}),
+    ...(opts.search
+      ? {
+          search: {
+            async notion(query: string) {
+              searches.push(`notion ${query}`);
+              return (opts.search![query] ?? []).filter((h) => h.kind === "notion");
+            },
+            async github(query: string) {
+              searches.push(`github ${query}`);
+              return (opts.search![query] ?? []).filter((h) => h.kind !== "notion");
+            },
+          },
+        }
+      : {}),
+    ...(opts.notion
+      ? {
+          notion: {
+            // Notion's own shape: rows at or after the cursor, oldest edit
+            // first, one page at a time, `next` naming where the next starts.
+            async edited(databaseId: string, since: string, after?: string) {
+              const all = (databaseId === NOTES_DB ? (opts.notion!.notes ?? []) : (opts.notion!.cards ?? []))
+                .filter((r) => r.lastEditedTime >= since)
+                .sort((a, b) => a.lastEditedTime.localeCompare(b.lastEditedTime));
+              const size = opts.notion!.pageSize ?? 25;
+              const from = after ? Number(after) : 0;
+              const more = from + size < all.length;
+              return { rows: all.slice(from, from + size), more, next: more ? String(from + size) : null };
+            },
+            async comments(pageId: string) {
+              return opts.notion!.comments?.[pageId] ?? [];
+            },
+          },
+        }
+      : {}),
     store: faultyStore,
     delivery: {
       render(card) {
@@ -308,6 +373,9 @@ export function sweepHarness(opts: {
       plusUniversal: UNIVERSAL,
       unoBot: UNO_BOT,
       botUserId: BOT,
+      runningNotesDb: NOTES_DB,
+      roadmapDb: ROADMAP_DB,
+      teamSurfaceDbs: [ROADMAP_DB],
       ...(opts.privateAllowlist ? { privateAllowlist: opts.privateAllowlist } : {}),
     },
     meter: { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ ...headroom }) },
@@ -332,6 +400,8 @@ export function sweepHarness(opts: {
     rateLimited,
     marked,
     unknownSearches,
+    sourceReads,
+    searches,
   };
 }
 
