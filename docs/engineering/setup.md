@@ -110,8 +110,8 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   `VARIABLE_ALIAS`) and `resolvedValuesByMode` (every alias resolved to its
   final value).
 - Known gap: `npm run sync:tokens` (`scripts/sync-figma-tokens.js`) writes to
-  `new tokens/` and resolves only one alias level, so it cannot produce these
-  files yet. Use the MCP export until it is fixed.
+  `new tokens/` and resolves only one alias level, so until it is fixed these
+  files come from the MCP export.
 - Never edit generated token files (`_colors.scss`, `_spacing_semantics.scss`, etc.) directly
 - Where a token deliberately differs from Figma, or is not in Figma, the
   generator says so in a named constant (`SEMANTIC_OVERRIDES`,
