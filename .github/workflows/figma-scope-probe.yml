@@ -1,0 +1,33 @@
+# Throwaway: can FIGMA_ACCESS_TOKEN reach the six PLUS teams? Read-only. Never merged.
+name: figma-scope-probe
+on:
+  pull_request:
+    paths: [".github/workflows/figma-scope-probe.yml"]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe
+        env:
+          T: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          F: ${{ secrets.FIGMA_FILE_KEY }}
+        run: |
+          node - <<'JS'
+          const h = { "X-Figma-Token": process.env.T };
+          const teams = { Universal: "1279226364199713409", Training: "1279227480162592555", Toolkit: "1279227565411025715",
+            Admin: "1279229084983452695", Others: "1279227354789670676", MISC: "1279241534978917312", "PLUS (old)": "983479156525170275" };
+          const get = async (p) => { const r = await fetch("https://api.figma.com" + p, { headers: h }); let j = {}; try { j = await r.json(); } catch {} return [r.status, j]; };
+          for (const [name, id] of Object.entries(teams)) {
+            const [s, j] = await get(`/v1/teams/${id}/projects`);
+            const [ws, wj] = await get(`/v2/webhooks?context=team&context_id=${id}`);
+            const [cs, cj] = await get(`/v1/teams/${id}/components?page_size=1`);
+            console.log(`TEAM ${name}: projects ${s} (${(j.projects||[]).length}: ${(j.projects||[]).map(p=>p.name).join(" | ").slice(0,300)}) · webhooks ${ws} (${(wj.webhooks||[]).length}) · team library ${cs}${s!==200?" "+(j.err||j.message||""):""}`);
+          }
+          for (const key of [process.env.F, "W0qzhXWxFsMwSJzkdV2yal"]) {
+            const [s, j] = await get(`/v1/files/${key}/meta`);
+            const f = j.file || {};
+            console.log(`FILE ${f.name ?? key.slice(0,4)}: ${s} folder=${f.folder_name ?? "?"} team=${f.team_id ?? f.project?.team_id ?? "?"}`);
+          }
+          JS
