@@ -353,7 +353,7 @@ const Dropdown = ({
                      * announced as a link. `linkComponent` is a
                      * router's link, as Tag takes one.
                      */
-                    const Link = item.linkComponent || 'a';
+                    const ItemLink = item.linkComponent || 'a';
                     // An `isStatic` item only says its words: a row, not a
                     // control, so nothing to press or focus, and a press on it
                     // leaves the menu open.
@@ -363,9 +363,9 @@ const Dropdown = ({
                         }
                         if (item.href && !item.disabled) {
                             return (
-                                <Link className={itemClasses} href={item.href} onClick={choose}>
+                                <ItemLink className={itemClasses} href={item.href} onClick={choose}>
                                     {inner}
-                                </Link>
+                                </ItemLink>
                             );
                         }
                         return (

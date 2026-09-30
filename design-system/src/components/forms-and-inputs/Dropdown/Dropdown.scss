@@ -178,8 +178,9 @@ $dropdown-themes: (
             cursor: not-allowed;
         }
 
-        // A static row says its words and is not a control: no pointer, and
-        // no hover, press or focus layer to suggest it can be pressed.
+        // A static row says its words and is not a control: a default cursor,
+        // and no hover or press layer. It takes no focus, so it needs no focus
+        // reset.
         &.pdropdown-item-static {
             cursor: default;
 

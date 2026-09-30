@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Tag, { TagContext, resolveTagBehavior, useTagContext } from '../Tag';
+import Tag, { TAG_BEHAVIOR, TagContext, resolveTagBehavior, useTagContext } from '../Tag';
 import Dropdown from '../../forms-and-inputs/Dropdown';
 import './TagGroup.scss';
 
@@ -81,7 +81,7 @@ const menuItemOf = (child) => {
         return { text, disabled: true, isBusy: true };
     }
     switch (behavior) {
-        case 'selectable':
+        case TAG_BEHAVIOR.SELECTABLE:
             return {
                 text,
                 isToggle: true,
@@ -93,7 +93,7 @@ const menuItemOf = (child) => {
                 keepOpen: true,
                 onClick: props.onClick,
             };
-        case 'link':
+        case TAG_BEHAVIOR.LINK:
             return {
                 text,
                 href: props.href,
@@ -101,7 +101,7 @@ const menuItemOf = (child) => {
                 trailingIcon: 'arrow-right',
                 onClick: props.onClick,
             };
-        case 'action':
+        case TAG_BEHAVIOR.ACTION:
             return { text, onClick: props.onClick };
         default:
             return { text, isStatic: true };

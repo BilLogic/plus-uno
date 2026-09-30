@@ -44,7 +44,22 @@ import './Tag.scss';
  */
 export const TAG_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
 
+/*
+ * A literal array, because the docs generator and check:doc-identifiers read
+ * the values from source. `TAG_BEHAVIOR` names the same values for code that
+ * compares against them, so a renamed behavior fails loudly instead of
+ * falling through.
+ */
 export const TAG_BEHAVIORS = ['read-only', 'removable', 'selectable', 'link'];
+
+export const TAG_BEHAVIOR = Object.freeze({
+    READ_ONLY: 'read-only',
+    REMOVABLE: 'removable',
+    SELECTABLE: 'selectable',
+    LINK: 'link',
+    // What the deprecated `operational` variant resolves to; not a public behavior.
+    ACTION: 'action',
+});
 
 /** The types that lead with a 16 avatar: a person, an agent or a team. */
 export const AVATAR_TAG_TYPES = ['person', 'agent', 'team'];
@@ -68,10 +83,10 @@ const ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow',
  * something is a selectable tag given `aria-expanded`, as TagGroup's `+n` is.
  */
 const DEPRECATED_VARIANTS = {
-    'read-only': 'read-only',
-    dismissible: 'removable',
-    selectable: 'selectable',
-    operational: 'action',
+    'read-only': TAG_BEHAVIOR.READ_ONLY,
+    dismissible: TAG_BEHAVIOR.REMOVABLE,
+    selectable: TAG_BEHAVIOR.SELECTABLE,
+    operational: TAG_BEHAVIOR.ACTION,
 };
 
 /**
@@ -83,7 +98,7 @@ const DEPRECATED_VARIANTS = {
 export const resolveTagBehavior = ({ behavior, variant, href } = {}) => {
     if (behavior) return behavior;
     if (variant) return DEPRECATED_VARIANTS[variant];
-    return href ? 'link' : 'read-only';
+    return href ? TAG_BEHAVIOR.LINK : TAG_BEHAVIOR.READ_ONLY;
 };
 
 /**
@@ -238,9 +253,9 @@ export const Tag = ({
         warn(`[Tag] the label is not text, so a type="${type}" tag has no initials to fall back on. Pass \`avatar\`.`);
     }
 
-    const isSelectable = resolved === 'selectable';
-    const isAction = resolved === 'action';
-    const isLink = resolved === 'link';
+    const isSelectable = resolved === TAG_BEHAVIOR.SELECTABLE;
+    const isAction = resolved === TAG_BEHAVIOR.ACTION;
+    const isLink = resolved === TAG_BEHAVIOR.LINK;
 
     // A count is a filter's result count, so it belongs to selectable only. On
     // a removable tag it would crowd the ×; elsewhere it would read as a Count
@@ -259,7 +274,7 @@ export const Tag = ({
 
     // The × renders for removable, and for a link with `onRemove`. Never in a
     // disabled field: a value you cannot change has nothing to remove.
-    const hasRemove = (resolved === 'removable' || isLink)
+    const hasRemove = (resolved === TAG_BEHAVIOR.REMOVABLE || isLink)
         && typeof onRemove === 'function'
         && !isDisabled;
 
