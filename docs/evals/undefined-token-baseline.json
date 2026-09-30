@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 88,
-    "uses": 266,
+    "names": 86,
+    "uses": 264,
     "bare": 5
   },
   "tokens": {
@@ -164,10 +164,6 @@
       "uses": 1,
       "bare": 0
     },
-    "--font-weight-semibold": {
-      "uses": 1,
-      "bare": 0
-    },
     "--line-height-h4": {
       "uses": 1,
       "bare": 0
@@ -214,10 +210,6 @@
     },
     "--size-ele-gap-xs": {
       "uses": 9,
-      "bare": 0
-    },
-    "--size-element-pad-y-xs": {
-      "uses": 1,
       "bare": 0
     },
     "--size-element-radius-pill": {
