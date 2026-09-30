@@ -283,7 +283,7 @@
   },
   {
     "name": "reminder_set",
-    "description": "Direct, ungated. When the person asks you to remind THEM of something ('remind me Thursday to review the PRD', 'remind me in 2 days about this thread'), set it here. Pass `when` as they said it and `what` as a short verb phrase in your own words, no quote ('review the PRD', 'come back to this thread'). It is delivered at the first weekday 9 am ET run on or after that day, in this DM or thread, mentioning only them; they answer 🙌 done or ⏳ snooze. On ok, reply with exactly `confirm` (\"Got it, Thu 10 am ET.\") and nothing else. On `ask`, nothing was set: ask that one question, then call again with their answer. Only for the asker: never set one for someone else. No proposal card.",
+    "description": "Direct, ungated. When the person asks you to remind THEM of something ('remind me Thursday to review the PRD', 'remind me in 2 days about this thread'), set it here. Pass `when` as they said it and `what` as a short verb phrase in your own words, no quote ('review the PRD', 'come back to this thread'). It is delivered at the first weekday 9 am ET run on or after that day, in this DM or thread, mentioning only them; they answer 🙌 done or ⏳ snooze. On ok, reply with exactly `confirm` (\"Got it, Thu 9 am ET.\") and nothing else. On `ask`, nothing was set: ask that one question, then call again with their answer. Only for the asker: never set one for someone else. No proposal card.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
