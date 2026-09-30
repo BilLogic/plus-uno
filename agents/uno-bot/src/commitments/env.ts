@@ -8,23 +8,22 @@
 //     context.
 //   • The detector and the judge: `selectProvider(env)`, the Worker's one
 //     ModelProvider.
-//   • The store: the records in the usage database (`USAGE_DB`), the wording in
-//     HARNESS_KV under `commitment:text:<id>`, each with an expiry past the
-//     commitment's last possible reminder.
+//   • The store: `./store-env.ts` — the records in the usage database, the
+//     wording in HARNESS_KV with an expiry.
 //   • The thread mark: the sweep card's (`markSweepThread`).
 //
 // A Worker with either binding missing keeps no commitments and sends nothing.
 
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
-import { budgetHeadroom, charge } from "../net";
+import { budgetHeadroom } from "../net";
 import { getBotIdentity, getPermalink, postMessage, updateMessage } from "../slack/api";
 import type { ScheduledJob } from "../scheduled/runs";
 import { measured, readSource, sweepSlackFor } from "../sweep/env";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { SweepThread } from "../sweep/finding";
 import { modelCommitmentDetector, modelEvidenceJudge } from "./detector";
-import { createD1CommitmentRecords } from "./d1";
+import { commitmentStoreFor } from "./store-env";
 import {
   answerReminder,
   commitmentThreadHook,
@@ -34,9 +33,6 @@ import {
   type NudgeDeps,
   type ReminderReaction,
 } from "./run";
-import type { CommitmentStore, CommitmentText, CommitmentTexts } from "./store";
-
-const TEXT_KV_PREFIX = "commitment:text:";
 
 /**
  * The end-of-day sweep's per-thread hook, or undefined when the bindings are
@@ -49,7 +45,7 @@ export function commitmentThreadHookFor(
   env: Env,
   opts: { dryRun: boolean },
 ): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
-  const store = storeFor(env);
+  const store = commitmentStoreFor(env);
   if (!store) return undefined;
   const provider = selectProvider(env);
   const detector = modelCommitmentDetector(provider);
@@ -74,7 +70,7 @@ export async function runCommitmentNudgesOnEnv(
   job: ScheduledJob,
   opts: { dryRun: boolean },
 ): Promise<CommitmentJobReport | { summary: string }> {
-  const store = storeFor(env);
+  const store = commitmentStoreFor(env);
   if (!store || !env.HARNESS_KV) return { summary: "USAGE_DB or HARNESS_KV not bound — no commitments to nudge" };
   const kv = env.HARNESS_KV;
   const provider = selectProvider(env);
@@ -118,7 +114,7 @@ export async function runCommitmentNudgesOnEnv(
  * @param env - Worker bindings
  */
 export function reminderDoorFor(env: Env): ((r: ReminderReaction) => Promise<boolean>) | undefined {
-  const store = storeFor(env);
+  const store = commitmentStoreFor(env);
   if (!store) return undefined;
   return (r) =>
     answerReminder(r, {
@@ -136,25 +132,4 @@ async function updateReminder(env: Env, channel: string, ts: string, message: { 
 
 function pick(slack: ReturnType<typeof sweepSlackFor>): Pick<CommitmentDeps["slack"], "replies" | "history"> {
   return { replies: slack.replies, history: slack.history };
-}
-
-function storeFor(env: Env): CommitmentStore | null {
-  if (!env.USAGE_DB || !env.HARNESS_KV) return null;
-  return { ...createD1CommitmentRecords({ db: env.USAGE_DB }), ...kvTexts(env.HARNESS_KV) };
-}
-
-/** The wording in KV, one key per commitment, each with its own expiry. */
-function kvTexts(kv: KVNamespace): CommitmentTexts {
-  return {
-    async text(id) {
-      charge(1, "kv");
-      return (await kv.get<CommitmentText>(`${TEXT_KV_PREFIX}${id}`, "json")) ?? null;
-    },
-    async saveText(id, text, until) {
-      charge(1, "kv");
-      // KV takes an absolute expiry in seconds, at least a minute out.
-      const expiration = Math.max(Math.ceil(until / 1000), Math.ceil(Date.now() / 1000) + 120);
-      await kv.put(`${TEXT_KV_PREFIX}${id}`, JSON.stringify(text), { expiration });
-    },
-  };
 }

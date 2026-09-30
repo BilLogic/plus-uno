@@ -1,6 +1,6 @@
 // The D1 commitment records — `commitments` in the usage database
-// (migrations/usage/0006_commitments.sql, and 0007_commitment_answers.sql for
-// where each promise was made).
+// (migrations/usage/0006_commitments.sql, 0007_commitment_answers.sql for
+// where each promise was made, and 0008_self_reminders.sql for "remind me").
 //
 // As the sweep's records do (`sweep/d1.ts`): every statement prepared with
 // bound parameters and charged to the meter BEFORE it is sent
@@ -69,12 +69,13 @@ const NEXT_DUE =
   `AND promiser_id NOT IN (SELECT value FROM json_each(?)) ORDER BY due_at, commitment_id LIMIT 1`;
 const REMINDED_ON = "SELECT promiser_id, COUNT(*) AS n FROM commitments WHERE reminded_on = ? GROUP BY promiser_id";
 const LIVE_IN_THREAD =
-  `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND state IN (${LIVE}) ` +
+  `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND kind = 'thread_promise' AND state IN (${LIVE}) ` +
   `ORDER BY promised_at, commitment_id LIMIT 1`;
 // One statement for both answers: each capped on its own, then merged newest
-// first. A row from a DM or another private place never matches.
+// first. A row from a DM or another private place never matches, nor does a
+// "remind me", which is no promise the detector should learn from.
 const answers = (state: "done" | "not_promise") =>
-  `SELECT * FROM (${SELECT} WHERE state = '${state}' AND (channel_kind = 'public' OR channel_id = ?) ` +
+  `SELECT * FROM (${SELECT} WHERE state = '${state}' AND kind = 'thread_promise' AND (channel_kind = 'public' OR channel_id = ?) ` +
   `ORDER BY resolved_at DESC, commitment_id DESC LIMIT ?)`;
 const LATEST_ANSWERS = `${answers("done")} UNION ALL ${answers("not_promise")} ORDER BY resolved_at DESC, commitment_id DESC`;
 const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;

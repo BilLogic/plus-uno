@@ -7,8 +7,11 @@ summary: The Worker's own database migrations — the uno-bot-usage D1 schema un
 One schema lives here: the **usage record**, the `uno-bot-usage` D1 database
 bound as `USAGE_DB` (`agents/uno-bot/src/usage/`, ADR-030). The end-of-day sweep's cursors,
 runs and items share it (`0002_sweep.sql`, `agents/uno-bot/src/sweep/store.ts`), and so do
-commitment reminders (`0006_commitments.sql`, `0007_commitment_answers.sql`, `agents/uno-bot/src/commitments/store.ts`). The bot's
-semantic-retrieval schema does **not** — see the second half.
+commitment reminders (`0006_commitments.sql`, `0007_commitment_answers.sql`, `0008_self_reminders.sql`, `agents/uno-bot/src/commitments/store.ts`). 0007's
+note that group DMs and DMs keep no commitments holds only for thread promises:
+since 0008 a self-reminder asked for in a DM or group DM is kept, and posted
+back only there. The bot's semantic-retrieval schema does **not** — see the
+second half.
 
 ## The usage database (`usage/`)
 
@@ -35,7 +38,9 @@ logged and dropped). A deploy with no pending migration needs no step.
 **Rules for a new one:**
 
 - Never edit a migration that has run anywhere. Add the next number.
-- Additive only: new tables, new nullable columns, new indexes. A column the
+- Additive only: new tables, new nullable columns, new indexes. The one
+  exception is widening a CHECK, which SQLite can only do by rebuilding the
+  table with every row copied as it is (`0008_self_reminders.sql`). A column the
   Worker writes is also mapped in its table's adapter — `agents/uno-bot/src/usage/d1.ts`
   for `turns`, `proposal-events-d1.ts` for `proposal_events` — the one place per
   table where record fields become SQL columns; the columns only the classifier

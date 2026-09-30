@@ -32,6 +32,7 @@ import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
 import { executeSlackReact } from "../tools/slack-react";
+import { executeReminderSet } from "../tools/reminder-set";
 import { readReference } from "../tools/read-reference";
 import { executeImplement } from "../tools/implement";
 import { executeImplementDesign } from "../tools/implement-design";
@@ -72,6 +73,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   slack_channel_members: (env, input) => executeSlackChannelMembers(env, input),
   slack_thread_read: (env, input) => executeSlackThreadRead(env, input),
   slack_react: (env, input, slack) => executeSlackReact(env, input, slack),
+  reminder_set: (env, input, slack) => executeReminderSet(env, input, slack),
   slack_search: (env, input, slack) => executeSlackSearch(env, input, slack),
   read_reference: async (_env, input) => readReference(input),
   notion_create: (env, input, slack) => executeNotionCreate(env, input, slack),
