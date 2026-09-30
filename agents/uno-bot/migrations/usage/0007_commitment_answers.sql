@@ -5,8 +5,11 @@
 -- that channel itself: a DM's or another private place's never reach it.
 --
 -- Additive: one column with a default, and one index. Every row already here
--- came from a public channel — the sweep has skipped private channels, group
--- DMs and DMs so far — so the default is true of all of them. Applied
+-- came from a public channel, so the default is true of all of them: the
+-- sweep's allowlisted private channels reach production in the same deploy as
+-- this migration, and from then on every insert names its place — 'private'
+-- for a promise in a private sweep channel. Group DMs and DMs keep no
+-- commitments. Applied
 -- with `wrangler d1 migrations apply uno-bot-usage` — see migrations/README.md.
 --
 -- Still no message text or link (ADR-030): an example's short summary is read

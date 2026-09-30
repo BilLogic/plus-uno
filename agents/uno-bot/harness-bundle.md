@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,936 chars from 16 files**, against an assembled budget of 175,000 (64 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,552 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,932 chars from 16 files**, against an assembled budget of 175,000 (68 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,548 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,172 (−7,617 ide-only) | 10,172 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,995 | 30,195 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,125 | 57,361 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,754 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,972 | 70,771 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,484 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,771 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,470 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,872 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−6,678 ide-only) | 97,843 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,841 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,092 (−2,760 ide-only) | 127,975 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 131,228 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,815 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 166,404 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,484 (−605 ide-only) | 174,936 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,991 | 30,191 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,125 | 57,357 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,750 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,972 | 70,767 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,480 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,767 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,466 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,868 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−6,678 ide-only) | 97,839 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,837 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,092 (−3,389 ide-only) | 127,971 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 131,224 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,811 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 166,400 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,484 (−605 ide-only) | 174,932 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 51,453 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 52,296 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 8,336 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 9,179 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -221,7 +221,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **leading word** | a compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers | — |
 | **ThreadState** | uno-bot's per-thread memory behind one typed interface (`agents/uno-bot/src/thread-state/`): history, the pending proposal, assistant context, the cancel flag, event dedup and the run lease. Its one cancel flag is raised by three stop doors (`slack/stop-doors.ts`) and read by the loop at a tool boundary. Two adapters — the Durable Object in production, in-memory in tests — held equal by one conformance suite. A caller hands in channel and thread; the Durable Object id and the routes stay inside the module | "the DO", "thread-state client" (deleted 2026-09) |
 | **ModelProvider** | uno-bot's seam between its one agent loop (`agents/uno-bot/src/agent/loop.ts`) and a model. An adapter takes a neutral conversation, a tool roster and an opaque tier name and returns text, tool calls, usage and a stop kind; the wire format, the tier's model and dials, the cache and the backup model stay inside. Its second call is one-shot `generate` — a tier, a system prompt, a prompt, text out, no tools — for a caller wanting an answer, not a turn: the draft judge; its reply has three dispositions, "never asked, no credential" among them, adapter-side. Gemini is production's adapter, Claude-on-Vertex the opt-in second, the fake for its own tests. Above the seam its public surface is one function, `runAgent(input)` in `agent/run-agent.ts`, whose arguments are all required (#624), whose return carries the tool ledger, receipt and references, not a caller's scope (#625), and whose `selectProvider` is the one place `MODEL_PROVIDER` is read | "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row) |
-| **tool table** | what a uno-bot tool IS, as one typed row per tool (`agents/uno-bot/src/agent/tool-table.ts`): its **access** — `ungated` · `gated` · `control`, the DISPATCH distinction and not a read/write one — plus the columns its five readers answer from — retrieval, review-request, the gated row’s card words (#598). A row is joined to its schema from `tool-definitions.json`, the schema’s source, and to its body in `tool-bodies.ts`; `tools.ts` is the join. Paired the way **Diagnostics** pairs a route with its probe: a row with no body or a body with no row fails `tsc`. Running a tool IS the lookup (#597): `agent/run-agent.ts` runs the `ungated` rows inside the turn; `agent/resolve-proposal.ts` runs the `gated` row past the **Gate**; `control` is intercepted by the loop before either. No dispatch arm and no private roster left to forget | "the tool registry", "the tool list" |
+| **tool table** | what a uno-bot tool IS, as one typed row per tool (`agents/uno-bot/src/agent/tool-table.ts`): its **access** — `ungated` · `gated` · `worker` (no schema; only the Worker stages it) · `control`, the DISPATCH distinction and not a read/write one — plus the columns its five readers answer from — retrieval, review-request, the gated row’s card words. A row is joined to its schema from `tool-definitions.json`, the schema’s source, and to its body in `tool-bodies.ts`; `tools.ts` is the join. Paired the way **Diagnostics** pairs a route with its probe: a row with no body or a body with no row fails `tsc`. Running a tool IS the lookup: `agent/run-agent.ts` runs the `ungated` rows inside the turn; `agent/resolve-proposal.ts` runs the `gated` and `worker` rows past the **Gate**; `control` is intercepted by the loop before either | "the tool registry", "the tool list" |
 | **Turn** | one uno-bot turn as a module (`agents/uno-bot/src/turn/`): one request in — who, where, the text, the images as bytes, the pending proposal — and one outcome out — what was posted, what is staged, what the conversation remembers, plus telemetry. Tier routing (once, here), the conversation the model reads (assembled once), the draft judges, the card and the history write are its implementation; what a person sees WHILE it runs — the 👀, the **working signal**, the narration, the card — goes through its **Delivery** port: a recording adapter every turn test runs on, and Slack's, which takes its client BY NAME (`slack/delivery-adapter.ts`, `Env` stopping at `slack/slack-delivery.ts`) — THE PATTERN every seam here keeps: dependencies by name, `Env` behind the envelope, the Node suite driving the module rather than matching its source (#594). TWO CALLERS, ONE WIRING: the Slack envelope adapter (`src/slack/turn-adapter.ts`, its pure half `src/slack/turn-request.ts`) and the eval adapter (`src/eval/turn-adapter.ts`) build the request through `src/turn/request.ts` and the dependencies through `src/turn/env-deps.ts`, and each holds only its own differences: store, Delivery, what a won verdict does, the ts its tool-side posts thread off, and (eval only) its reporters. One parity test drives both real builders (`tests/eval-adapter.test.ts`), as **ThreadState**'s two adapters are by its conformance suite | "the handler", "the message pipeline" |
 | **Gate** | the one place a staged proposal is resolved (`agents/uno-bot/src/gate/`): four signals in — a reaction on the card, the card's ✅/⛔ button, the same emoji typed alone, the model's validated `proposal_resolve` — and one verdict out: won, stale or none, plus a structured note and the confirmed tool to run. The lookup (card ts, reply thread, then whole DM), what an emoji means, and the claim whose delete IS the lock are its implementation; each door posts the verdict through **Turn**'s Delivery and hands the tool to the executor, taking both by name (`gate/reaction-door.ts` first, #592) — Slack spells the note (#623), which keeps Gate clear of Slack | "the confirmation gate", "the ✅ handler" |
 | **proposal card** | the ⚠️ card uno-bot posts to hold a side-effect tool call until a person approves it — the thing **Gate**'s four signals resolve; its message ts is the proposal's identity in **ThreadState** | "confirmation dialog", "prompt" |
@@ -1707,13 +1707,15 @@ THE standing-automation registry. An automation absent from the table below is u
 
 # The end-of-day sweep
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments) and #749 · the code is agents/uno-bot/src/sweep/. -->
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749 and #751 · the code is agents/uno-bot/src/sweep/. -->
 
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a proposal card until a person confirms it. Every write waits for that ✅.
 
 ## What it reads
 
-- **Channels:** only those on `SWEEP_CHANNELS` in `agents/uno-bot/wrangler.toml`, which starts with #plus-design and is the one line to grow. #uno-bot stays off the list whatever it says. Private channels are skipped for now, and DMs and group DMs stay unread.
+- **Channels:** only those on `SWEEP_CHANNELS` in `agents/uno-bot/wrangler.toml` (#plus-design and #plus-design-feedback), the one line to grow. #uno-bot stays off the list whatever it says.
+- **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
+- **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job. DMs stay unread.
 - **When:** each weekday's end-of-day run (22:00 UTC) reads each channel since its cursor, which lives in the usage database.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place, so a thread with no Notion link is passed over.
 
@@ -1726,7 +1728,11 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 3. A design-system target (the Figma library, `design-system/` code, Storybook, a `Universal`-pillar card) → #plus-universal.
 4. Anything else → #plus-design.
 
-#uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence. Every sweep card today comes from a public thread and is posted in that thread.
+#uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
+
+- **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
+- **Group DM:** the card goes back in that group DM, and its ✅ applies the fix only. Once that batch has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. Its ✅ posts that note; its ⛔ drops it. It has the fix card's confirmers and 72 h. A revised or re-staged fix card offers no share.
+- **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private card.
 
 ## The card
 

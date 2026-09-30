@@ -6,13 +6,15 @@ summary: The end-of-day sweep — what it reads, where its drift cards go, who m
 
 # The end-of-day sweep
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments) and #749 · the code is agents/uno-bot/src/sweep/. -->
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749 and #751 · the code is agents/uno-bot/src/sweep/. -->
 
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a proposal card until a person confirms it. Every write waits for that ✅.
 
 ## What it reads
 
-- **Channels:** only those on `SWEEP_CHANNELS` in `agents/uno-bot/wrangler.toml`, which starts with #plus-design and is the one line to grow. #uno-bot stays off the list whatever it says. Private channels are skipped for now, and DMs and group DMs stay unread.
+- **Channels:** only those on `SWEEP_CHANNELS` in `agents/uno-bot/wrangler.toml` (#plus-design and #plus-design-feedback), the one line to grow. #uno-bot stays off the list whatever it says.
+- **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
+- **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job. DMs stay unread.
 - **When:** each weekday's end-of-day run (22:00 UTC) reads each channel since its cursor, which lives in the usage database.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place, so a thread with no Notion link is passed over.
 
@@ -25,7 +27,11 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 3. A design-system target (the Figma library, `design-system/` code, Storybook, a `Universal`-pillar card) → #plus-universal.
 4. Anything else → #plus-design.
 
-#uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence. Every sweep card today comes from a public thread and is posted in that thread.
+#uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
+
+- **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
+- **Group DM:** the card goes back in that group DM, and its ✅ applies the fix only. Once that batch has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. Its ✅ posts that note; its ⛔ drops it. It has the fix card's confirmers and 72 h. A revised or re-staged fix card offers no share.
+- **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private card.
 
 ## The card
 

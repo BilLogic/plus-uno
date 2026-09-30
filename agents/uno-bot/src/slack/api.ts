@@ -187,6 +187,16 @@ export async function conversationsMembers(env: Env, channel: string, limit = 10
   );
 }
 
+/** users.conversations via the bot token — one page of the conversations of
+ *  `types` uno-bot is a member of, the first unless `cursor` names the next. */
+export async function botConversations(env: Env, types: string, cursor?: string) {
+  return slackGet<SlackResponse & { channels?: { id?: string }[]; response_metadata?: { next_cursor?: string } }>(
+    env,
+    "users.conversations",
+    { types, exclude_archived: "true", limit: "200", ...(cursor ? { cursor } : {}) },
+  );
+}
+
 /** conversations.info via the bot token — what kind of conversation this is. */
 export async function conversationsInfo(env: Env, channel: string) {
   return slackGet<

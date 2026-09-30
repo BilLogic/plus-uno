@@ -236,6 +236,64 @@ test("a sweep card's batch result carries the sweep's tag", async () => {
   assert.deepEqual(result?.metadata, { event_type: "uno_sweep_card", event_payload: { role: "result" } });
 });
 
+const SHARED_PAGE = "https://www.notion.so/0123456789abcdef0123456789abcdef";
+const SHARE_ENV = { PLUS_DESIGN_CHANNEL_ID: "C0DESIGN", PLUS_UNIVERSAL_CHANNEL_ID: "C0UNIVERSAL", UNO_BOT_CHANNEL_ID: "C0UNOBOT" };
+
+test("a group DM's sweep card whose write was refused shares nothing", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([
+    {
+      toolName: "notion_update",
+      input: {
+        page_url: SHARED_PAGE,
+        replace: [{ block_id: "0123456789abcdef0123456789abcd01", last_edited_time: "2026-09-01T10:00:00.000Z", content: "x" }],
+      },
+    },
+  ]);
+  const proposal = {
+    ...verdict.proposal!,
+    channel: "G0MPIM",
+    sweepRun: "2026-09-30",
+    sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" as const }] },
+  };
+  await run(env({ ...SHARE_ENV, NOTION_TOKEN: "secret_test" }), { ...verdict, proposal });
+  assert.equal(posts().filter((p) => p.channel === "C0DESIGN").length, 0, "the block had moved, so nothing was applied");
+});
+
+test("a share card's ✅ posts exactly its note to its channel, and nothing to #uno-bot or elsewhere", async () => {
+  const note = ":mag: End-of-day sweep: a group conversation settled something the Notion page “Launch plan” still said the old way, and the page is now up to date: " + SHARED_PAGE;
+  const share = (channel: string) => ({ toolName: "sweep_share_post", input: { channel, channel_name: "#plus-design", text: note } });
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([share("C0DESIGN")]);
+  await run(env(SHARE_ENV), { ...verdict, proposal: { ...verdict.proposal!, channel: "G0MPIM", supersedeKey: "sweep-share" } });
+  const inDesign = posts().filter((p) => p.channel === "C0DESIGN");
+  assert.equal(inDesign.length, 1);
+  assert.equal(inDesign[0]!.text, note, "exactly the text the card showed");
+
+  // A card aimed anywhere else — #uno-bot, a private channel — posts nothing there.
+  for (const elsewhere of ["C0UNOBOT", "G0SECRET"]) {
+    calls = [];
+    const aimed = won([share(elsewhere)]);
+    await run(env(SHARE_ENV), { ...aimed, proposal: { ...aimed.proposal!, channel: "G0MPIM" } });
+    assert.equal(posts().filter((p) => p.channel === elsewhere).length, 0, elsewhere);
+  }
+});
+
+test("a group DM's fix ✅ posts nothing outside the group DM", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([{ toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } }]);
+  const proposal = {
+    ...verdict.proposal!,
+    sweepRun: "2026-09-30",
+    sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" as const }] },
+  };
+  await run(env(SHARE_ENV), { ...verdict, proposal });
+  assert.equal(posts().filter((p) => p.channel === "C0DESIGN" || p.channel === "C0UNIVERSAL").length, 0);
+});
+
 const EMAIL = {
   toolName: "email_send",
   input: { to: ["sme@example.edu"], subject: "Calendar Sync", body: "A real message body, long enough to send." },

@@ -203,6 +203,49 @@ describe("the detector learns from people's answers", () => {
     assert.equal([...store.rows.values()][0]?.channelKind, "private");
   });
 
+  it("a promise from a private sweep channel is kept as private, and never teaches a public channel's job", async () => {
+    const PRIV = "C074QG2V7DJ";
+    const store = createInMemoryCommitmentStore();
+    const provider = fakeProvider({
+      generateReplies: [
+        JSON.stringify({ commitments: [{ message_ts: PROMISE, promiser: MAYA, requester: BEA, what: "send the private feedback deck", deadline: null, confidence: 0.9 }] }),
+      ],
+    });
+    const h = sweepHarness({
+      channels: {
+        [PRIV]: {
+          kind: "private",
+          members: [BEA, MAYA],
+          history: [msg(BEA, ROOT, "Can someone send the feedback deck?", { reply_count: 1, latest_reply: PROMISE })],
+          threads: { [ROOT]: [msg(BEA, ROOT, "Can someone send the feedback deck?"), msg(MAYA, PROMISE, "I'll send it.")] },
+        },
+      },
+      privateAllowlist: [PRIV],
+      now: at(29, 22),
+    });
+    h.deps.onThread = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: { unoBot: UNO_BOT }, now: () => h.clock.now });
+    await runSweepJob({ key: `sweep:${PRIV}`, kind: "sweep-channel", channel: PRIV }, h.deps);
+    const row = store.rows.get(`${PRIV}:${PROMISE}`);
+    assert.equal(row?.channelKind, "private");
+
+    // Its promiser answers 🙌; #design's next job still never sees it.
+    await store.update(row!.id, { state: "done", resolvedAt: at(30, 15) });
+    const publicPrompt = promptOf(await sweep(store));
+    assert.ok(!publicPrompt.includes("private feedback deck"));
+    assert.ok(publicPrompt.startsWith("THREAD ("));
+  });
+
+  it("a group DM's or a DM's thread keeps no commitment", async () => {
+    for (const channelKind of ["group-dm", "dm"] as const) {
+      const store = createInMemoryCommitmentStore();
+      const provider = fakeProvider({ generateReplies: [] });
+      const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: {}, now: () => at(29, 22) });
+      await hook({ channel: "C0GROUP", channelKind, rootTs: ROOT, messages: [{ ts: PROMISE, user: MAYA, text: "I'll do it" }] }, ROOT);
+      assert.equal(store.rows.size, 0);
+      assert.equal(provider.generated.length, 0);
+    }
+  });
+
   it("at the cap, the block stays small", () => {
     // Twelve words is the most a summary may be (COMMITMENT_DETECTOR_SYSTEM).
     const twelve = "update the reflection screens prototype with the new onboarding copy and states";

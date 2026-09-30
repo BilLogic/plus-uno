@@ -161,6 +161,8 @@ export async function recordThreadCommitments(
   },
 ): Promise<{ rows: CommitmentRecord[]; texts: Record<string, string> }> {
   if (thread.channel === deps.config.unoBot) return { rows: [], texts: {} };
+  // Channel threads only, public or private; a group DM or a DM keeps none.
+  if (thread.channelKind !== "public" && thread.channelKind !== "private") return { rows: [], texts: {} };
   // The detector's own gate, first, so a thread it would not ask about reads
   // no examples either.
   if (!mayHoldPromise(thread.messages, since)) return { rows: [], texts: {} };
