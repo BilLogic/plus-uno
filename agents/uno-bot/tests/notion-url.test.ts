@@ -155,6 +155,46 @@ test("when the page read fails, the card still links the page that opens", async
   assert.deepEqual(revision.page, { url: OPENS });
 });
 
+// A block a text replace would lose part of — a link, a mention, bold — is
+// marked `formatted` in the index, and the note says to point it out rather
+// than stage a replace notion_update would refuse at the ✅.
+test("source_read's block index marks a formatted block, and its note says to point it out", async () => {
+  const run = (text: string, extra: Record<string, unknown> = {}) => ({
+    type: "text",
+    plain_text: text,
+    text: { content: text, link: null },
+    href: null,
+    ...extra,
+  });
+  serve({
+    "GET /v1/pages/": { body: { id: "5b2c7cca498281009b41000000000730", properties: { Name: title("Launch plan") } } },
+    "GET /v1/blocks/": {
+      body: {
+        has_more: false,
+        results: [
+          { id: "b-plain", type: "paragraph", paragraph: { rich_text: [run("Launch is Nov 1.")] } },
+          { id: "b-link", type: "paragraph", paragraph: { rich_text: [run("See the spec", { href: "https://example.test" })] } },
+          {
+            id: "b-bold",
+            type: "bulleted_list_item",
+            bulleted_list_item: { rich_text: [run("Owner: Bea", { annotations: { bold: true, color: "default" } })] },
+          },
+        ],
+      },
+    },
+  });
+  const { executeReadSource } = await import("../src/tools/read-source.js");
+
+  const r = JSON.parse(
+    await executeReadSource(ENV, { url: "https://www.notion.so/Launch-plan-5b2c7cca498281009b41000000000730" }),
+  ) as { blocks: string[]; note: string };
+
+  assert.match(r.blocks[0]!, /^b-plain · paragraph · edited/);
+  assert.match(r.blocks[1]!, /^b-link · paragraph · formatted · edited/);
+  assert.match(r.blocks[2]!, /^b-bold · bulleted_list_item · formatted · edited/);
+  assert.match(r.note, /marked `formatted`.*can't be replaced/);
+});
+
 test("source_read reads an app.notion.com link through the Notion API, not the generic web fetch", async () => {
   serve({
     "GET /v1/pages/": { body: { id: ID, properties: { Name: title("Running Notes") } } },

@@ -222,6 +222,20 @@ test("a multi-recipient relay tells the thread once", async () => {
   assert.match(String(inThread[0]!.text), /<@U0MERYEM01>/);
 });
 
+// A sweep card's batch result answers the card, so it carries the sweep's
+// tag, as the card does: the thread's later replies read by the sweep's rule.
+test("a sweep card's batch result carries the sweep's tag", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([
+    { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+    { toolName: "dm_relay", input: { recipient: "U0MERYEM01", text: "hi" } },
+  ]);
+  await run(env(), { ...verdict, proposal: { ...verdict.proposal!, sweepRun: "2026-09-30" } });
+  const result = posts().find((p) => p.channel === "D0REQUESTER");
+  assert.deepEqual(result?.metadata, { event_type: "uno_sweep_card", event_payload: { role: "result" } });
+});
+
 const EMAIL = {
   toolName: "email_send",
   input: { to: ["sme@example.edu"], subject: "Calendar Sync", body: "A real message body, long enough to send." },

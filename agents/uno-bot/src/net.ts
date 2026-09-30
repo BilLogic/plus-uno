@@ -22,6 +22,7 @@
 // agent turn, and the cron. Outside one — a direct integration call from a test
 // — countedFetch is a plain fetch and the counters stay at zero.
 import { AsyncLocalStorage } from "node:async_hooks";
+import { SUBREQUEST_CAP } from "./agent/loop-policy";
 
 interface Meter {
   /** EXTERNAL subrequests — the ones capped at 50. */
@@ -221,6 +222,18 @@ export function chargeD1Query(): void {
 /** D1 queries spent so far this invocation (0 outside a metered context). */
 export function d1QueriesUsed(): number {
   return meterStore.getStore()?.d1 ?? 0;
+}
+
+/**
+ * What is left before a call is refused: external subrequests under the active
+ * limit (the free-plan cap when none is set), and D1 queries under
+ * `D1_QUERY_CAP`. Unbounded outside a metered context. For a step that must
+ * not start unless it can finish — the sweep's post-then-stage.
+ */
+export function budgetHeadroom(): { subrequests: number; d1Queries: number } {
+  const m = meterStore.getStore();
+  if (!m) return { subrequests: Infinity, d1Queries: Infinity };
+  return { subrequests: (m.limit ?? SUBREQUEST_CAP) - m.count, d1Queries: D1_QUERY_CAP - m.d1 };
 }
 
 /** Internal (Cloudflare-service) subrequests spent so far this invocation. */

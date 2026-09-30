@@ -83,6 +83,9 @@ export interface Env {
   // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
   // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;
+  /** The channels the end-of-day sweep reads, comma-separated ids
+   *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
+  SWEEP_CHANNELS?: string;
   // #plus-design-feedback — shareout_post posts feedback bundles here (distinct
   // from the reviews channel above). Optional — unset → shareout_post falls back
   // to the origin thread.

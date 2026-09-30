@@ -36,6 +36,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * that records how each ask was resolved (src/usage/resolution-pass.ts).
  * The end-of-day `proposal-expiry` records every card that aged out untouched
  * (src/usage/proposal-events.ts).
+ * The sweep's two: one end-of-day `sweep-channel` job per swept channel reads
+ * the day and keeps its drift findings, and the morning `sweep-post` stages
+ * them as proposal cards (src/sweep/).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -45,7 +48,9 @@ export type ScheduledJobKind =
   | "usage-classify"
   | "usage-text-purge"
   | "ask-resolution"
-  | "proposal-expiry";
+  | "proposal-expiry"
+  | "sweep-channel"
+  | "sweep-post";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -57,6 +62,8 @@ export interface ScheduledJob {
    * be done first. The runner passes over it while any of them is pending.
    */
   readonly after?: readonly string[];
+  /** The channel a `sweep-channel` job reads. */
+  readonly channel?: string;
 }
 
 /** A run, planned for one date. */
@@ -81,6 +88,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
+    { key: "sweep-post", kind: "sweep-post" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },
@@ -124,13 +132,44 @@ export function runsForFiring(scheduledTime: number): ScheduledRunName[] {
 }
 
 /**
- * A run, planned for the UTC date of `at`.
+ * A run, planned for the UTC date of `at`. The end-of-day run adds one
+ * `sweep-channel` job per swept channel after its fixed jobs, keyed
+ * `sweep:<channel>`.
  *
  * @param name - Which run
  * @param at - When it fires, epoch ms
+ * @param sweepChannels - The channels to sweep (`sweepChannelsFrom`)
  */
-export function planRun(name: ScheduledRunName, at: number): ScheduledRun {
-  return { name, date: new Date(at).toISOString().slice(0, 10), jobs: RUN_PLANS[name] };
+export function planRun(name: ScheduledRunName, at: number, sweepChannels: readonly string[] = []): ScheduledRun {
+  const sweeps: ScheduledJob[] =
+    name === "end-of-day"
+      ? sweepChannels.map((channel) => ({ key: `sweep:${channel}`, kind: "sweep-channel", channel }))
+      : [];
+  // The sweep jobs go before the purge, which stays last in every run.
+  const plan = RUN_PLANS[name];
+  const purge = plan.findIndex((j) => j.kind === "usage-text-purge");
+  const jobs = purge < 0 ? [...plan, ...sweeps] : [...plan.slice(0, purge), ...sweeps, ...plan.slice(purge)];
+  return { name, date: new Date(at).toISOString().slice(0, 10), jobs };
+}
+
+/**
+ * The channels the end-of-day sweep reads, from `SWEEP_CHANNELS` — a
+ * comma-separated list of channel ids, and the one line to grow when uno-bot
+ * joins another design channel. #uno-bot is never swept, whatever the list
+ * says: it is where the team reports problems with uno-bot, not a design
+ * channel. A DM id (`D…`) is never read either; a private channel on the list
+ * is refused by the job itself, which is the one that can ask Slack.
+ *
+ * @param value - `SWEEP_CHANNELS`
+ * @param unoBotChannel - `UNO_BOT_CHANNEL_ID`
+ */
+export function sweepChannelsFrom(value: string | undefined, unoBotChannel?: string): string[] {
+  const never = unoBotChannel?.trim();
+  const ids = (value ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => id && id !== never && !id.startsWith("D"));
+  return [...new Set(ids)];
 }
 
 /**
@@ -150,6 +189,8 @@ export function runnerNameForRun(name: ScheduledRunName): string {
 export interface FiringDeps {
   /** Put a planned run on its runner. */
   enqueueRun(run: ScheduledRun): Promise<void>;
+  /** The channels the end-of-day run sweeps (`sweepChannelsFrom`). */
+  sweepChannels?: readonly string[];
 }
 
 /**
@@ -162,7 +203,7 @@ export interface FiringDeps {
  * @param deps - The enqueue
  */
 export async function onScheduledFiring(scheduledTime: number, deps: FiringDeps): Promise<void> {
-  const runs = runsForFiring(scheduledTime).map((name) => planRun(name, scheduledTime));
+  const runs = runsForFiring(scheduledTime).map((name) => planRun(name, scheduledTime, deps.sweepChannels));
   await Promise.all(
     runs.map((run) =>
       deps.enqueueRun(run).catch((err: unknown) => {
