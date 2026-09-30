@@ -178,4 +178,16 @@ export function runCommitmentRecordsConformance(
     const [first] = await records.latestAnswers("C0PRIV", 1);
     assert.equal(first?.channelKind, "private");
   });
+
+  it("a \"remind me\" keeps its kind, and is neither a live promise in its thread nor a detector example", async () => {
+    const records = make();
+    const self = commitmentRow({ id: "C:self", kind: "self_reminder", requesterId: "U0MAYA", state: "done", resolvedAt: 99 });
+    const live = commitmentRow({ id: "C:self-live", kind: "self_reminder", requesterId: "U0MAYA", state: "open" });
+    await records.addCommitments([self, live]);
+    assert.deepEqual(await records.get(self.id), self);
+    assert.equal(await records.liveInThread(self.channel, self.threadTs, "U0MAYA"), null);
+    assert.deepEqual(await records.latestAnswers(self.channel, 3), []);
+    // It is due like any other.
+    assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01"))?.id, live.id);
+  });
 }

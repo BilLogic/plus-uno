@@ -77,6 +77,24 @@ describe("[d1] the commitments migration", () => {
     await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
   });
 
+  it("0010 rebuilds the table for \"remind me\" and copies every row as it was", async () => {
+    const all = bindings.USAGE_MIGRATIONS;
+    await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
+    await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+    await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0010"));
+    const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
+    const before = commitmentRow({ state: "nudged", nudges: 1, nudgeTs: "111.1", checkedOn: "2026-10-01", remindedOn: "2026-10-01", holds: 1 });
+    await records.addCommitments([before]);
+    await expect(records.addCommitments([commitmentRow({ id: "C:self", kind: "self_reminder" })])).rejects.toThrow(/CHECK/);
+    await applyD1Migrations(bindings.USAGE_DB, all);
+    expect(await records.get(before.id)).toEqual(before);
+    await records.addCommitments([commitmentRow({ id: "C:self", kind: "self_reminder" })]);
+    expect((await records.get("C:self"))?.kind).toBe("self_reminder");
+    await expect(records.addCommitments([commitmentRow({ id: "C:odd", kind: "other" as never })])).rejects.toThrow(/CHECK/);
+    await bindings.USAGE_DB.prepare("DELETE FROM commitments").run();
+    await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
+  });
+
   it("refuses a state outside the lifecycle", async () => {
     const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
     await expect(records.addCommitments([commitmentRow({ state: "expired" as never })])).rejects.toThrow(/CHECK/);

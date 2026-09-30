@@ -25,6 +25,9 @@ export const DEFAULT_WORKING_DAYS = 2;
 export const REARM_WORKING_DAYS = 2;
 /** ⏳ re-arms a commitment at most this many times. */
 export const MAX_SNOOZES = 2;
+/** A commitment's wording outlives its due date by this, so every nudge a
+ *  ⏳ or a follow-up can still bring finds it. */
+export const TEXT_KEEP_MS = 30 * DAY_MS;
 
 const TEAM_ZONE = "America/New_York";
 const ET = new Intl.DateTimeFormat("en-US", {

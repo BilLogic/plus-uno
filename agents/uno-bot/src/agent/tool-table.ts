@@ -140,6 +140,9 @@ export const TOOL_TABLE = {
   slack_channel_members: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_thread_read: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_react: { access: "ungated", retrieval: false, reviewRequest: null },
+  // "Remind me": writes only uno-bot's own record, posted back to the asker
+  // alone at a morning run (`commitments/remind.ts`).
+  reminder_set: { access: "ungated", retrieval: false, reviewRequest: null },
   slack_search: { access: "ungated", retrieval: true, reviewRequest: null },
   read_reference: { access: "ungated", retrieval: false, reviewRequest: null },
   notion_create: {

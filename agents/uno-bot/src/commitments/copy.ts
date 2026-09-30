@@ -115,3 +115,30 @@ export function reminderBlocks(body: string, footer: string): unknown[] {
     { type: "context", elements: [{ type: "mrkdwn", text: footer }] },
   ];
 }
+
+// ── "Remind me" ──────────────────────────────────────────────────────────────
+//
+// A reminder a person asked for answers to two glyphs only: 🙌 done and ⏳
+// snooze. Its last allowed post offers 🙌 alone, since a ⏳ there could bring
+// nothing more.
+
+/** The legend under a "remind me" while a ⏳ can still bring it back. */
+export const SELF_REMINDER_LEGEND = "🙌 Done · ⏳ Snooze 2 days";
+/** The legend under its last allowed post. */
+export const SELF_REMINDER_LAST_LEGEND = "🙌 Done";
+
+/**
+ * The reminder a person asked for, mentioning only them.
+ *
+ * @param input.requester - The one Slack user id it mentions
+ * @param input.what - The cleaned summary (`cleanWhat`)
+ * @param input.permalink - The asking message's permalink, when fetched
+ */
+export function selfReminderText(input: { requester: string; what: string; permalink: string | null }): string {
+  return `Hey <@${input.requester}>, here's your reminder: ${input.what}.${original(input.permalink)}`;
+}
+
+/** What replaces the legend once a ⏳ moves a "remind me". */
+export function snoozeAcknowledgement(day: string): string {
+  return `Got it. I'll remind you again ${day}.`;
+}

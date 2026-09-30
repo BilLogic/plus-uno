@@ -38,7 +38,14 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
     },
     async liveInThread(channel, threadTs, promiserId) {
       const live = [...rows.values()]
-        .filter((r) => r.channel === channel && r.threadTs === threadTs && r.promiserId === promiserId && LIVE_STATES.includes(r.state))
+        .filter(
+          (r) =>
+            r.kind === "thread_promise" &&
+            r.channel === channel &&
+            r.threadTs === threadTs &&
+            r.promiserId === promiserId &&
+            LIVE_STATES.includes(r.state),
+        )
         .sort((a, b) => a.promisedAt - b.promisedAt);
       return copy(live[0]);
     },
@@ -52,7 +59,7 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
       rows.set(id, { ...row, ...defined });
     },
     async latestAnswers(channel, limit) {
-      const seen = (r: CommitmentRecord) => r.channelKind === "public" || r.channel === channel;
+      const seen = (r: CommitmentRecord) => r.kind === "thread_promise" && (r.channelKind === "public" || r.channel === channel);
       const newest = (a: CommitmentRecord, b: CommitmentRecord) =>
         (b.resolvedAt ?? 0) - (a.resolvedAt ?? 0) || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0);
       const of = (state: CommitmentRecord["state"]) =>
