@@ -231,91 +231,169 @@ function generateColorsSCSS() {
     return scss;
 }
 
+/*
+ * SIZE TOKENS
+ *
+ * The three `size / *` collections are exported whole. Where the stylesheets
+ * and Figma disagree, the stylesheets win for now and the disagreement is
+ * written down here, one constant per kind, so that it is a stated exception
+ * rather than a silent one. Each is a known difference from Figma, not a
+ * decision that Figma is wrong.
+ */
+
+/** `Spacing/Small/space-000` -> `spacing-small-space-000`, `Surface Container/pad-x-sm` -> `surface-container-pad-x-sm`. */
+const sizeSlug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-');
+
+/** A size in CSS: `8px`, `1.5px`, `1023.98px`. */
+const px = (n) => `${+Number(n).toFixed(2)}px`;
+
+function readSource(file) {
+    const json = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/${file}`, 'utf8'));
+    return { json, modes: Object.keys(json.modes) };
+}
+
+/**
+ * Primitives the stylesheet declares that Figma does not have. They are kept
+ * because components read them (the larger spacing steps and the column-width
+ * proxies each have a user).
+ */
+const CODE_ONLY_PRIMITIVES = {
+    spacing: {
+        'spacing-large-space-1200': 96,
+        'spacing-large-space-1500': 120,
+        'spacing-xlarge-space-2000': 160,
+        'spacing-xlarge-space-2500': 200,
+        'spacing-xlarge-space-5000': 400,
+    },
+    column: { 'column-xs': 60, 'column-sm': 80, 'column-md': 100, 'column-lg': 120 },
+};
+
+/** `{id: {token, value}}` for every Figma primitive, keyed by variable id so semantics can point at them. */
+function primitiveTokens() {
+    const { json, modes } = readSource('size _ primitive.json');
+    const byId = {};
+    for (const v of json.variables) {
+        const value = v.resolvedValuesByMode[modes[0]];
+        if (typeof value !== 'number') throw new Error(`size _ primitive.json: ${v.name} has no numeric value.`);
+        byId[v.id] = { token: sizeSlug(v.name), value };
+    }
+    return byId;
+}
+
 /**
  * Generate primitives SCSS
  */
 function generatePrimitivesSCSS() {
-    const primitives = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ primitive.json`, 'utf8'));
-    const mode = Object.keys(primitives.modes)[0];
+    const groups = { spacing: [], radius: [], stroke: [] };
+    for (const { token, value } of Object.values(primitiveTokens())) {
+        const group = token.startsWith('spacing-') ? 'spacing' : token.includes('-radius-') ? 'radius' : token.includes('-stroke-') ? 'stroke' : null;
+        if (!group) throw new Error(`size _ primitive.json: no group for --size-${token}.`);
+        groups[group].push({ token, value });
+    }
+    for (const [token, value] of Object.entries(CODE_ONLY_PRIMITIVES.spacing)) groups.spacing.push({ token, value });
 
-    let scss = `/**
+    const step = ({ token }) => parseFloat(token.match(/(\d+(?:\.\d+)?)$/)[1]);
+    const lines = (items) => items.sort((a, b) => step(a) - step(b)).map(({ token, value }) => `    --size-${token}: ${px(value)};\n`).join('');
+
+    return `/**
  * Primitive Size Tokens
  * Base values used to build semantic tokens
  * DO NOT USE DIRECTLY - Use semantic tokens instead
  */
 
 :root {
-    /* Spacing Primitives */\n`;
-
-    const spacing = [];
-    const radius = [];
-    const stroke = [];
-
-    primitives.variables.forEach(v => {
-        const val = v.valuesByMode[mode];
-        if (val === undefined || val === null) return;
-
-        const resolved = v.resolvedValuesByMode[mode];
-        const value = resolved?.resolvedValue ?? val;
-
-        const name = v.name.toLowerCase().replace(/\//g, '-');
-
-        if (name.includes('spacing') || name.includes('space-')) {
-            spacing.push({ name, value });
-        } else if (name.includes('radius')) {
-            radius.push({ name, value });
-        } else if (name.includes('stroke')) {
-            stroke.push({ name, value });
-        }
-    });
-
-    // Sort and output spacing
-    spacing.sort((a, b) => {
-        const numA = parseInt(a.name.match(/\d+/)?.[0] || '0');
-        const numB = parseInt(b.name.match(/\d+/)?.[0] || '0');
-        return numA - numB;
-    });
-
-    spacing.forEach(item => {
-        const varName = item.name.replace(/^spacing\//, '').replace(/^small\//, '').replace(/^medium\//, '').replace(/^large\//, '');
-        scss += `    --size-${varName}: ${item.value}px;\n`;
-    });
-
-    scss += `\n    /* Border Radius Primitives */\n`;
-    radius.sort((a, b) => {
-        const numA = parseInt(a.name.match(/\d+/)?.[0] || '0');
-        const numB = parseInt(b.name.match(/\d+/)?.[0] || '0');
-        return numA - numB;
-    });
-
-    radius.forEach(item => {
-        const varName = item.name.replace(/^border\/radius\//, '').replace(/^border\/radius\//, '');
-        scss += `    --size-${varName}: ${item.value}px;\n`;
-    });
-
-    scss += `\n    /* Stroke/Border Width Primitives */\n`;
-    stroke.sort((a, b) => {
-        const numA = parseFloat(a.name.match(/\d+\.?\d*/)?.[0] || '0');
-        const numB = parseFloat(b.name.match(/\d+\.?\d*/)?.[0] || '0');
-        return numA - numB;
-    });
-
-    stroke.forEach(item => {
-        const varName = item.name.replace(/^border\/stroke\//, '');
-        scss += `    --size-${varName}: ${item.value}px;\n`;
-    });
-
-    scss += `}\n`;
-
-    return scss;
+    /* Spacing Primitives */
+${lines(groups.spacing)}
+    /* Column Width Proxies (not Figma variables; see CODE_ONLY_PRIMITIVES) */
+${Object.entries(CODE_ONLY_PRIMITIVES.column).map(([token, value]) => `    --size-${token}: ${px(value)};\n`).join('')}
+    /* Border Radius Primitives */
+${lines(groups.radius)}
+    /* Stroke/Border Width Primitives */
+${lines(groups.stroke)}}
+`;
 }
+
+/**
+ * Semantic tokens whose value differs from Figma's alias: token -> the
+ * primitive it points at instead. `element-radius-sm` is radius-100 (4px)
+ * where Figma's `Element/radius-sm` is radius-50 (2px); `surface-container-
+ * gap-md` is space-300 (16px) where Figma's `Surface Container/gap-md` is
+ * space-600 (32px).
+ */
+const SEMANTIC_OVERRIDES = {
+    'element-radius-sm': 'border-radius-radius-100',
+    'surface-container-gap-md': 'spacing-medium-space-300',
+};
+
+/** Semantic tokens the stylesheet declares that Figma does not have. */
+const CODE_ONLY_SEMANTICS = {
+    'surface-container-pad-x': 'spacing-medium-space-300',
+    'surface-container-pad-y': 'spacing-medium-space-200',
+    'table-radius-md': 'border-radius-radius-200',
+    'table-radius-sm': 'border-radius-radius-150',
+};
+
+/**
+ * Figma semantic variables not written yet. The Surface Container set is named
+ * differently from the stylesheet's, and `Table/row-radius` aliases a spacing
+ * primitive where the stylesheet has two radius tokens; adding them is a
+ * separate change.
+ */
+const SEMANTICS_NOT_WRITTEN = new Set([
+    'surface-container-pad-x-sm', 'surface-container-pad-x-md',
+    'surface-container-pad-y-sm', 'surface-container-pad-y-md',
+    'surface-container-gap-sm', 'surface-container-border',
+    'table-row-radius',
+]);
 
 /**
  * Generate semantic tokens SCSS
  */
 function generateSemanticsSCSS() {
-    const semantics = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ semantics.json`, 'utf8'));
-    const mode = Object.keys(semantics.modes)[0];
+    const primitives = primitiveTokens();
+    const primitiveNames = new Set(Object.values(primitives).map((p) => p.token));
+    const { json, modes } = readSource('size _ semantics.json');
+
+    const values = {};
+    for (const v of json.variables) {
+        const token = sizeSlug(v.name);
+        if (SEMANTICS_NOT_WRITTEN.has(token)) continue;
+        const val = v.valuesByMode[modes[0]];
+        if (val?.type === 'VARIABLE_ALIAS') {
+            const target = primitives[val.id];
+            if (!target) throw new Error(`size _ semantics.json: ${v.name} aliases ${val.id}, which is not a primitive.`);
+            values[token] = `var(--size-${target.token})`;
+        } else if (typeof val === 'number') {
+            values[token] = px(val);
+        } else {
+            throw new Error(`size _ semantics.json: ${v.name} has neither an alias nor a number.`);
+        }
+    }
+    for (const [token, primitive] of Object.entries({ ...CODE_ONLY_SEMANTICS, ...SEMANTIC_OVERRIDES })) {
+        if (!primitiveNames.has(primitive) && !(primitive in CODE_ONLY_PRIMITIVES.spacing)) {
+            throw new Error(`generate-all-tokens.js: --size-${token} points at --size-${primitive}, which is not generated.`);
+        }
+        values[token] = `var(--size-${primitive})`;
+    }
+
+    const layers = [
+        ['element', 'Elements Layer'],
+        ['card', 'Cards Layer'],
+        ['section', 'Sections Layer'],
+        ['modal', 'Modals Layer'],
+        ['surface-container', 'Surface Containers Layer'],
+        ['surface', 'Surfaces Layer'],
+        ['table', 'Table Tokens'],
+    ];
+    const order = ['cell', 'pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
+    const kind = (token) => order.findIndex((o) => token.includes(`-${o}`));
+
+    const byLayer = Object.fromEntries(layers.map(([layer]) => [layer, []]));
+    for (const token of Object.keys(values)) {
+        const layer = layers.find(([l]) => token.startsWith(`${l}-`));
+        if (!layer) throw new Error(`size _ semantics.json: no layer for --size-${token}.`);
+        byLayer[layer[0]].push(token);
+    }
 
     let scss = `/**
  * Semantic Spacing Tokens
@@ -325,130 +403,62 @@ function generateSemanticsSCSS() {
 
 :root {
 `;
-
-    // Organize by layer
-    const layers = {
-        'element': [],
-        'card': [],
-        'section': [],
-        'modal': [],
-        'surface': [],
-        'surface-container': [],
-        'table': [],
-    };
-
-    semantics.variables.forEach(v => {
-        const val = v.valuesByMode[mode];
-        if (!val) return;
-
-        const resolved = v.resolvedValuesByMode[mode];
-        let value;
-
-        if (val.type === 'VARIABLE_ALIAS') {
-            value = resolved?.resolvedValue;
-        } else {
-            value = val;
-        }
-
-        if (value === undefined || value === null) return;
-
-        const name = v.name.toLowerCase().replace(/\//g, '-');
-        let layer = null;
-
-        if (name.startsWith('element')) layer = 'element';
-        else if (name.startsWith('card')) layer = 'card';
-        else if (name.startsWith('section')) layer = 'section';
-        else if (name.startsWith('modal')) layer = 'modal';
-        else if (name.startsWith('surface-container')) layer = 'surface-container';
-        else if (name.startsWith('surface') && !name.includes('container')) layer = 'surface';
-        else if (name.startsWith('table')) layer = 'table';
-
-        if (layer && layers[layer]) {
-            layers[layer].push({ name, value });
-        }
-    });
-
-    // Add missing semantic tokens (additive only - never modify existing)
-    // Check if element-radius-pill exists, if not add it
-    const elementLayer = layers['element'] || [];
-    const hasRadiusPill = elementLayer.some(item =>
-        item.name.includes('element-radius-pill') ||
-        item.name.includes('radius-pill') ||
-        item.name === 'element-radius-pill'
-    );
-
-    if (!hasRadiusPill) {
-        // Get primitive value for radius-1000 (999px)
-        let radiusPillValue = 999; // Default fallback
-        try {
-            const primitives = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ primitive.json`, 'utf8'));
-            const primitiveMode = Object.keys(primitives.modes)[0];
-            const radius1000 = primitives.variables.find(v => {
-                const name = v.name.toLowerCase();
-                return name.includes('radius-1000') || name.includes('radius/radius-1000');
-            });
-            if (radius1000) {
-                const val = radius1000.valuesByMode[primitiveMode];
-                const resolved = radius1000.resolvedValuesByMode[primitiveMode];
-                radiusPillValue = resolved?.resolvedValue ?? val ?? 999;
-            }
-        } catch (e) {
-            console.warn('Warning: Could not read primitives file, using default 999px for radius-pill');
-        }
-
-        // Add to element layer array so it gets processed naturally
-        layers['element'].push({
-            name: 'element-radius-pill',
-            value: radiusPillValue
-        });
+    // Surfaces before Surface Containers in the output, as the stylesheet always had them.
+    for (const layer of ['element', 'card', 'section', 'modal', 'surface', 'surface-container', 'table']) {
+        const full = (t) => (t.endsWith('-full') ? 1 : 0);
+        const tokens = byLayer[layer].sort((a, b) => kind(a) - kind(b) || full(a) - full(b) || a.localeCompare(b));
+        if (!tokens.length) continue;
+        scss += `\n    /* ${layers.find(([l]) => l === layer)[1]} */\n`;
+        for (const token of tokens) scss += `    --size-${token}: ${values[token]};\n`;
     }
-
-    // Output by layer
-    const layerOrder = ['element', 'card', 'section', 'modal', 'surface', 'surface-container', 'table'];
-    const layerLabels = {
-        'element': 'Elements Layer',
-        'card': 'Cards Layer',
-        'section': 'Sections Layer',
-        'modal': 'Modals Layer',
-        'surface': 'Surfaces Layer',
-        'surface-container': 'Surface Containers Layer',
-        'table': 'Table Tokens',
-    };
-
-    layerOrder.forEach(layer => {
-        if (layers[layer].length > 0) {
-            scss += `\n    /* ${layerLabels[layer]} */\n`;
-
-            // Sort: padding first, then gap, then radius, then border
-            const sorted = layers[layer].sort((a, b) => {
-                const order = ['pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
-                const aType = order.findIndex(o => a.name.includes(o));
-                const bType = order.findIndex(o => b.name.includes(o));
-                if (aType !== bType) return aType - bType;
-                return a.name.localeCompare(b.name);
-            });
-
-            sorted.forEach(item => {
-                const varName = item.name;
-                // Add comment for radius-pill token
-                const comment = varName === 'element-radius-pill'
-                    ? ' /* Fully rounded (pill shape) */'
-                    : '';
-                scss += `    --size-${varName}: ${item.value}px;${comment}\n`;
-            });
-        }
-    });
-
     scss += `}\n`;
-
     return scss;
 }
 
+/** Figma's layout mode names to breakpoint keys. */
+const BREAKPOINT_KEYS = { 'Medium (768px)': 'md', 'Large (1024px)': 'lg', 'X-Large (1440px)': 'xl' };
+
+/**
+ * Breakpoints that differ from Figma or are not in it: Figma's X-Large ends at
+ * 1800, the stylesheet at 1919.98 with an XXL step from 1920.
+ */
+const BREAKPOINT_OVERRIDES = { 'xl-max': 1919.98 };
+const CODE_ONLY_BREAKPOINTS = { 'xxl-min': 1920 };
+
 /**
  * Generate layout tokens SCSS
+ *
+ * Reads `Breakpoints/*`, `Columns/*` and `Grid/content-gutter`. Not written
+ * yet: `Display/*`, `Grid/columns`, `Grid/viewport-gutter`,
+ * `Grid/viewport-margin` and `Min Heights/*`.
  */
 function generateLayoutSCSS() {
-    const layout = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ layout.json`, 'utf8'));
+    const { json } = readSource('size _ layout.json');
+    const modes = Object.entries(json.modes).map(([id, name]) => {
+        if (!BREAKPOINT_KEYS[name]) throw new Error(`size _ layout.json: unknown mode "${name}".`);
+        return { id, key: BREAKPOINT_KEYS[name] };
+    });
+    const variable = (name) => {
+        const v = json.variables.find((x) => x.name === name);
+        if (!v) throw new Error(`size _ layout.json: no ${name}.`);
+        return (mode) => v.resolvedValuesByMode[mode.id];
+    };
+
+    const breakpoints = {};
+    const min = variable('Breakpoints/min width');
+    const max = variable('Breakpoints/max width');
+    for (const mode of modes) {
+        breakpoints[`${mode.key}-min`] = min(mode);
+        breakpoints[`${mode.key}-max`] = max(mode);
+    }
+    Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
+
+    const gutter = variable('Grid/content-gutter');
+    const gutters = new Set(modes.map(gutter));
+    if (gutters.size !== 1) throw new Error('size _ layout.json: Grid/content-gutter differs by mode; --layout-grid-gap is one value.');
+
+    const columns = (mode, indent) =>
+        Array.from({ length: 12 }, (_, i) => `${indent}--col-${i + 1}: ${px(variable(`Columns/col-${i + 1}`)(mode))};\n`).join('');
 
     let scss = `/**
  * Layout Tokens
@@ -456,54 +466,18 @@ function generateLayoutSCSS() {
  */
 
 :root {
-    /* Breakpoints */\n`;
+    /* Breakpoints */
+${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\n`).join('')}
+    /* App shell + content grid (mirrors the Figma size/layout collection) */
+    --layout-sidebar-width: 164px; /* SideNav fixed width */
+    --layout-grid-gap: ${px([...gutters][0])}; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */
 
-    // Extract breakpoints
-    const breakpoints = {};
-    layout.variables.forEach(v => {
-        if (v.name.includes('Breakpoints')) {
-            const modes = v.valuesByMode;
-            Object.entries(modes).forEach(([modeKey, value]) => {
-                if (typeof value === 'number') {
-                    const modeName = layout.modes[modeKey];
-                    if (!breakpoints[modeName]) breakpoints[modeName] = {};
-                    if (v.name.includes('min')) {
-                        breakpoints[modeName].min = value;
-                    } else if (v.name.includes('max')) {
-                        breakpoints[modeName].max = value;
-                    }
-                }
-            });
-        }
-    });
-
-    // Output breakpoints
-    Object.entries(breakpoints).forEach(([mode, { min, max }]) => {
-        if (min) scss += `    --breakpoint-${mode.toLowerCase()}-min: ${min}px;\n`;
-        if (max) scss += `    --breakpoint-${mode.toLowerCase()}-max: ${max}px;\n`;
-    });
-
-    scss += `\n    /* App shell + content grid (mirrors the Figma size/layout collection) */\n`;
-    scss += `    --layout-sidebar-width: 164px; /* SideNav fixed width */\n`;
-    scss += `    --layout-grid-gap: 8px; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */\n`;
-
-    // Content-grid column spans (12 cols, 8px gutter) at each breakpoint minimum.
-    // Main content width: MD 672 / LG 748 / XL 1164 (= viewport − outer pad − SideNav − gap − surface pad).
-    const contentWidths = { md: 672, lg: 748, xl: 1164 };
-    const colSpans = (w) => {
-        const col1 = (w - 8 * 11) / 12;
-        return Array.from({ length: 12 }, (_, i) => +(col1 * (i + 1) + 8 * i).toFixed(2));
-    };
-    scss += `\n    /* Content-grid column spans — MD (768) values; LG/XL override below */\n`;
-    colSpans(contentWidths.md).forEach((v, i) => { scss += `    --col-${i + 1}: ${v}px;\n`; });
-    scss += `}\n`;
-    scss += `\n@media (min-width: 1024px) {\n    :root {\n`;
-    colSpans(contentWidths.lg).forEach((v, i) => { scss += `        --col-${i + 1}: ${v}px;\n`; });
-    scss += `    }\n}\n`;
-    scss += `\n@media (min-width: 1440px) {\n    :root {\n`;
-    colSpans(contentWidths.xl).forEach((v, i) => { scss += `        --col-${i + 1}: ${v}px;\n`; });
-    scss += `    }\n}\n`;
-
+    /* Content-grid column spans — ${modes[0].key.toUpperCase()} values; wider breakpoints override below */
+${columns(modes[0], '    ')}}
+`;
+    for (const mode of modes.slice(1)) {
+        scss += `\n@media (min-width: ${px(breakpoints[`${mode.key}-min`])}) {\n    :root {\n${columns(mode, '        ')}    }\n}\n`;
+    }
     return scss;
 }
 
