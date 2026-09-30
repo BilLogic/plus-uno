@@ -1,6 +1,6 @@
 // The D1 commitment records — `commitments` in the usage database
 // (migrations/usage/0006_commitments.sql, 0007_commitment_answers.sql for
-// where each promise was made, and 0010_self_reminders.sql for "remind me").
+// where each promise was made, and 0008_self_reminders.sql for "remind me").
 //
 // As the sweep's records do (`sweep/d1.ts`): every statement prepared with
 // bound parameters and charged to the meter BEFORE it is sent

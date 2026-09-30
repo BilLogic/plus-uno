@@ -55,13 +55,17 @@ export const MAX_WHAT_CHARS = 140;
 
 /**
  * A summary made safe to store and to repeat: no Slack markup (so no mention,
- * no link, no channel ping), no surrounding quotes, one line, capped. Empty
+ * no link, no channel ping), no bare URL or domain Slack would link, no
+ * surrounding quotes, one line, capped. Empty
  * when nothing is left.
  */
 export function cleanWhat(raw: string): string {
   const text = raw
     .replace(/<(?:https?:)[^|>]*\|([^>]*)>/g, "$1") // a link keeps its label
     .replace(/<[^>]*>/g, " ")
+    // A bare URL, or a bare domain Slack would link, never reaches a post.
+    .replace(/\b(?:https?:\/\/|www\.)\S+/gi, " ")
+    .replace(/\b(?:[a-z0-9-]+\.)+(?:com|net|org|io|co|app|dev|ai|me|ly|gg|xyz|info|link|site|so|us)\b\S*/gi, " ")
     .replace(/[@#]\S+/g, " ")
     .replace(/[<>&*_~`]/g, " ")
     .replace(/\s+/g, " ")

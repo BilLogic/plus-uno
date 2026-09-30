@@ -17,6 +17,7 @@ import {
   SELF_REMINDER_LAST_LEGEND,
   SELF_REMINDER_LEGEND,
   setSelfReminder,
+  ONE_PER_MESSAGE,
   type InMemoryCommitmentStore,
   type NudgeDeps,
   type ReminderMessage,
@@ -43,6 +44,8 @@ describe("reading the time", () => {
     ["tomorrow", ASKED, "2026-09-30T14:00:00.000Z"],
     ["tomorrow morning", ASKED, "2026-09-30T14:00:00.000Z"],
     ["Thu at 3pm", ASKED, "2026-10-01T14:00:00.000Z"],
+    ["thursday at 3", ASKED, "2026-10-01T14:00:00.000Z"],
+    ["Thu at 3:30", ASKED, "2026-10-01T14:00:00.000Z"],
     ["in 2 days", ASKED, "2026-10-01T14:00:00.000Z"],
     ["in two days", ASKED, "2026-10-01T14:00:00.000Z"],
     ["2 days from now", ASKED, "2026-10-01T14:00:00.000Z"],
@@ -75,6 +78,8 @@ describe("reading the time", () => {
     ["Tuesday", ASKED, /Today, or next Tue Oct 6/],
     ["today", ASKED, /already gone/],
     ["2026-09-01", ASKED, /passed/],
+    // A date with no year that has passed rolls to next year only when close.
+    ["9/1", ASKED, /Sep 1 has passed this year\. Did you mean Sep 1, 2027/],
     ["later", ASKED, /When should I remind you/],
     ["soon", ASKED, /When should I remind you/],
     ["", ASKED, /When should I remind you/],
@@ -86,6 +91,17 @@ describe("reading the time", () => {
       assert.match("ask" in when ? when.ask : "", question);
     });
   }
+
+  it("a date with no year rolled into next year, close by, is placed and named with its year", async () => {
+    const dec20 = at(111, 18); // Sun 2026-12-20
+    const when = parseReminderWhen("1/5", dec20);
+    assert.ok(when.ok && when.rolledYear);
+    assert.equal(iso(when.runAt), "2027-01-05T14:00:00.000Z");
+    const store = createInMemoryCommitmentStore();
+    const result = await setSelfReminder({ when: "1/5", what: "renew the license" }, dmPlace, { store, now: () => dec20 });
+    assert.ok(result.ok);
+    assert.equal(result.confirm, "Got it, Jan 5, 2027 10 am ET.");
+  });
 
   it("names a place's kind fail-closed", () => {
     assert.equal(channelKindFor("C1", "channel"), "public");
@@ -133,12 +149,36 @@ describe("setting a reminder in the turn", () => {
     assert.equal(store.texts.size, 0);
   });
 
-  it("asked again from the same message, moves the one reminder", async () => {
+  it("the same reminder set again from the same message moves it and starts it over", async () => {
     const store = createInMemoryCommitmentStore();
     await asked(store, "Thu");
-    await asked(store, "Mon", dmPlace, "review the PRD");
+    await store.update(`${DM}:${ASK_TS}`, { state: "snoozed", nudges: 1, snoozes: 1 });
+    const again = await asked(store, "Mon", dmPlace, "review the PRD for reflections.");
+    assert.ok(again.ok);
     assert.equal(store.rows.size, 1);
-    assert.equal(iso([...store.rows.values()][0]!.dueAt), "2026-10-05T14:00:00.000Z");
+    const row = [...store.rows.values()][0]!;
+    assert.equal(iso(row.dueAt), "2026-10-05T14:00:00.000Z");
+    assert.equal(row.state, "open");
+    assert.equal(row.nudges, 0);
+    assert.equal(row.snoozes, 0);
+  });
+
+  it("a second, different reminder from the same message is refused in one line and changes nothing", async () => {
+    const store = createInMemoryCommitmentStore();
+    await asked(store, "Thu");
+    const second = await asked(store, "Mon", dmPlace, "book the usability room");
+    assert.deepEqual(second, { ok: false, error: ONE_PER_MESSAGE });
+    const row = [...store.rows.values()][0]!;
+    assert.equal(iso(row.dueAt), "2026-10-01T14:00:00.000Z");
+    assert.equal(store.texts.get(row.id)?.text.what, "review the PRD for reflections");
+  });
+
+  it("strips bare URLs and linkable domains from what the reminder repeats", async () => {
+    const store = createInMemoryCommitmentStore();
+    await asked(store, "Thu", dmPlace, "check https://evil.example/login and www.bad.io then evil.com/x before the review");
+    const what = store.texts.get(`${DM}:${ASK_TS}`)!.text.what;
+    assert.doesNotMatch(what, /https?:|www\.|evil\.com|bad\.io|evil\.example/);
+    assert.match(what, /before the review/);
   });
 
   it("is never set in #uno-bot", async () => {

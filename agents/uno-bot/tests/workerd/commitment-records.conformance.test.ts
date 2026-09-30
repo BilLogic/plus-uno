@@ -77,11 +77,11 @@ describe("[d1] the commitments migration", () => {
     await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
   });
 
-  it("0010 rebuilds the table for \"remind me\" and copies every row as it was", async () => {
+  it("0008 rebuilds the table for \"remind me\" and copies every row as it was", async () => {
     const all = bindings.USAGE_MIGRATIONS;
     await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
     await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
-    await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0010"));
+    await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0008"));
     const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
     const before = commitmentRow({ state: "nudged", nudges: 1, nudgeTs: "111.1", checkedOn: "2026-10-01", remindedOn: "2026-10-01", holds: 1 });
     await records.addCommitments([before]);

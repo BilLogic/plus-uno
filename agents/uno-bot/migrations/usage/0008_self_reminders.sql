@@ -4,6 +4,12 @@
 -- kind, 'self_reminder', and delivered by the same morning job in the same DM
 -- or thread.
 --
+-- DMs NOW KEEP COMMITMENTS. 0007's note that group DMs and DMs keep no
+-- commitments still holds for thread promises, which the sweep reads only in
+-- channels. It no longer holds for self-reminders: one asked for in a DM or a
+-- group DM is kept with channel_kind 'dm' or 'group-dm' and posted back only
+-- there.
+--
 -- SQLite cannot widen a CHECK in place, so the table is rebuilt: the same
 -- columns in the same order, the same checks but `kind`'s, every row copied as
 -- it is, and the same indexes recreated. Nothing is dropped or reinterpreted.
@@ -11,7 +17,8 @@
 -- migrations/README.md.
 --
 -- Still no message text or link (ADR-030): what the reminder is about waits in
--- KV with an expiry, and the permalink is fetched when the reminder is written.
+-- KV with an expiry, and the permalink is fetched at delivery, when the morning
+-- run posts the reminder.
 
 CREATE TABLE commitments_rebuilt (
   commitment_id    TEXT    PRIMARY KEY,

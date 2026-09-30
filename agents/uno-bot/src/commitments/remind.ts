@@ -28,8 +28,14 @@ const HOUR_MS = 60 * 60 * 1000;
 /** Working days a ⏳ on a reminder moves it by. */
 export const SNOOZE_WORKING_DAYS = 2;
 
-/** Where a time was placed: the ET day, and the morning run it is delivered at. */
-export type ReminderWhen = { ok: true; day: number; runAt: number } | { ok: false; ask: string };
+/** Where a time was placed: the ET day, and the morning run it is delivered at.
+ *  `rolledYear` when a date said with no year had passed this year and was
+ *  read as next year's — the confirmation then names the year. */
+export type ReminderWhen = { ok: true; day: number; runAt: number; rolledYear?: boolean } | { ok: false; ask: string };
+
+/** A date said with no year that has passed this year is read as next year's
+ *  only this close; further out, it is asked about. */
+export const MAX_ROLLED_DAYS = 60;
 
 const WEEKDAYS: Record<string, number> = {
   sun: 0, sunday: 0,
@@ -63,8 +69,12 @@ function weekdayOnOrAfter(day: number): number {
 }
 
 function dateLabel(day: number): string {
+  return `${WEEKDAY_NAMES[new Date(day).getUTCDay()]!} ${monthDay(day)}`;
+}
+
+function monthDay(day: number): string {
   const d = new Date(day);
-  return `${WEEKDAY_NAMES[d.getUTCDay()]!} ${MONTH_NAMES[d.getUTCMonth()]!} ${d.getUTCDate()}`;
+  return `${MONTH_NAMES[d.getUTCMonth()]!} ${d.getUTCDate()}`;
 }
 
 /**
@@ -89,6 +99,7 @@ export function parseReminderWhen(when: string, now: number): ReminderWhen {
     .toLowerCase()
     .replace(/[.,!?]+/g, " ")
     .replace(/\b(at\s+)?\d{1,2}(:\d{2})?\s*(am|pm)\b/g, " ")
+    .replace(/\bat\s+\d{1,2}(:\d{2})?\b/g, " ")
     .replace(/\b(at\s+)?noon\b/g, " ")
     .replace(/\b(first thing\s+)?(in the\s+)?(morning|afternoon|evening|night)\b/g, " ")
     .replace(/\s+/g, " ")
@@ -134,6 +145,14 @@ export function parseReminderWhen(when: string, now: number): ReminderWhen {
 
   if (/\d/.test(said)) {
     const day = deadlineDay(said, now);
+    const namedYear = /\b\d{4}\b|\d\/\d{1,2}\/\d{2}/.test(said);
+    if (day !== null && !namedYear && new Date(day).getUTCFullYear() > new Date(today).getUTCFullYear()) {
+      if (day - today > MAX_ROLLED_DAYS * DAY_MS) {
+        return { ok: false, ask: `${monthDay(day)} has passed this year. Did you mean ${monthDay(day)}, ${new Date(day).getUTCFullYear()}, or another day?` };
+      }
+      const placed = place(day);
+      return placed.ok ? { ...placed, rolledYear: true } : placed;
+    }
     if (day !== null) return place(day);
     return { ok: false, ask: "I couldn't place that date, or it has passed. Which day did you mean?" };
   }
@@ -146,10 +165,15 @@ function nextWeekday(today: number, weekday: number): number {
   return day;
 }
 
-/** The one line the model confirms with: "Got it, Thu 10 am ET." */
-export function reminderConfirmation(day: number, now: number): string {
-  return `Got it, ${dayLabel(day, etDayOf(now))} 10 am ET.`;
+/** The one line the model confirms with: "Got it, Thu 10 am ET." — with the
+ *  year ("Jan 5, 2027") when a date said without one was read as next year's. */
+export function reminderConfirmation(day: number, now: number, withYear = false): string {
+  const label = withYear ? `${monthDay(day)}, ${new Date(day).getUTCFullYear()}` : dayLabel(day, etDayOf(now));
+  return `Got it, ${label} 10 am ET.`;
 }
+
+/** The answer to a second, different reminder asked from one message. */
+export const ONE_PER_MESSAGE = "One reminder per message: send the other one as its own message.";
 
 /** Where a ⏳ moves a reminder: the morning run two working days out. */
 export function snoozedRunAt(now: number): number {
@@ -195,8 +219,9 @@ export type SetReminderResult =
 
 /**
  * Keep a "remind me" as a `self_reminder` commitment, or say what to ask.
- * Asked again from the same message — a retried call, or a second call in the
- * turn — it moves that reminder rather than keeping another.
+ * One per message: the same reminder asked again from it — a retried call, a
+ * corrected time — starts that reminder over; a different one is refused
+ * (`ONE_PER_MESSAGE`).
  *
  * @param input - `when` as said, `what` as the model summarised it
  * @param place - Where it was asked, and by whom
@@ -221,7 +246,20 @@ export async function setSelfReminder(
   const existing = await deps.store.get(id);
   if (existing) {
     if (existing.kind !== "self_reminder") return { ok: false, error: "that message already holds a commitment" };
-    await deps.store.update(id, { dueAt: when.runAt, deadlineAt: when.runAt, state: "open", checkedOn: null });
+    // The same reminder set again (a retried call, a corrected time) starts
+    // over; a different one from the same message is refused.
+    const kept = (await deps.store.text(id))?.what;
+    if (kept && kept.toLowerCase() !== what.toLowerCase()) return { ok: false, error: ONE_PER_MESSAGE };
+    await deps.store.update(id, {
+      dueAt: when.runAt,
+      deadlineAt: when.runAt,
+      state: "open",
+      nudges: 0,
+      snoozes: 0,
+      holds: 0,
+      checkedOn: null,
+      resolvedAt: null,
+    });
   } else {
     const row: CommitmentRecord = {
       id,
@@ -251,5 +289,5 @@ export async function setSelfReminder(
     await deps.store.addCommitments([row]);
   }
   await deps.store.saveText(id, { what, bodies: {} }, until);
-  return { ok: true, confirm: reminderConfirmation(when.day, now), runAt: new Date(when.runAt).toISOString() };
+  return { ok: true, confirm: reminderConfirmation(when.day, now, when.rolledYear), runAt: new Date(when.runAt).toISOString() };
 }
