@@ -25,11 +25,22 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
     async get(id) {
       return copy(rows.get(id));
     },
-    async nextDue(now, runDate) {
+    async nextDue(now, runDate, skip = []) {
       const due = [...rows.values()]
-        .filter((r) => LIVE_STATES.includes(r.state) && r.dueAt <= now && r.checkedOn !== runDate)
+        .filter((r) => LIVE_STATES.includes(r.state) && r.dueAt <= now && r.checkedOn !== runDate && !skip.includes(r.promiserId))
         .sort((a, b) => a.dueAt - b.dueAt || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
       return copy(due[0]);
+    },
+    async remindedOn(runDate) {
+      const counts: Record<string, number> = {};
+      for (const r of rows.values()) if (r.remindedOn === runDate) counts[r.promiserId] = (counts[r.promiserId] ?? 0) + 1;
+      return counts;
+    },
+    async liveInThread(channel, threadTs, promiserId) {
+      const live = [...rows.values()]
+        .filter((r) => r.channel === channel && r.threadTs === threadTs && r.promiserId === promiserId && LIVE_STATES.includes(r.state))
+        .sort((a, b) => a.promisedAt - b.promisedAt);
+      return copy(live[0]);
     },
     async byReminderTs(ts) {
       return copy([...rows.values()].find((r) => r.nudgeTs === ts) ?? [...rows.values()].find((r) => r.followupTs === ts));

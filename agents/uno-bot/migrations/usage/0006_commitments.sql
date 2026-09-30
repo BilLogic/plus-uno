@@ -21,7 +21,7 @@ CREATE TABLE commitments (
   deadline_at      INTEGER,                       -- the end of the day the promiser named; null when none
   due_at           INTEGER NOT NULL,              -- the next step: nudge, follow-up or lapse
   state            TEXT    NOT NULL CHECK (state IN ('open', 'nudged', 'snoozed', 'done', 'dropped', 'not_promise', 'auto_done', 'lapsed')),
-  nudges           INTEGER NOT NULL DEFAULT 0,    -- reminders since the last answer
+  nudges           INTEGER NOT NULL DEFAULT 0,    -- reminders posted, at most two: the reminder and one follow-up
   snoozes          INTEGER NOT NULL DEFAULT 0,    -- ⏳ answers, at most two
   confidence       REAL    NOT NULL,
   promised_at      INTEGER NOT NULL,
@@ -30,6 +30,8 @@ CREATE TABLE commitments (
   nudge_ts         TEXT,                          -- the first reminder
   followup_ts      TEXT,                          -- the one follow-up
   checked_on       TEXT,                          -- YYYY-MM-DD: the morning that last looked
+  holds            INTEGER NOT NULL DEFAULT 0,    -- consecutive mornings it could not be checked or posted
+  reminded_on      TEXT,                          -- YYYY-MM-DD: the morning its last reminder went up
   resolved_at      INTEGER
 );
 
@@ -39,5 +41,11 @@ CREATE INDEX commitments_by_due ON commitments (state, due_at);
 -- A reaction finds its commitment by the reminder it landed on.
 CREATE INDEX commitments_by_nudge ON commitments (nudge_ts);
 CREATE INDEX commitments_by_followup ON commitments (followup_ts);
+
+-- A new promise finds a live one by the same person in the same thread.
+CREATE INDEX commitments_by_thread ON commitments (channel_id, thread_ts, promiser_id);
+
+-- The morning counts each promiser's reminders so far.
+CREATE INDEX commitments_by_reminded ON commitments (reminded_on);
 
 PRAGMA optimize;

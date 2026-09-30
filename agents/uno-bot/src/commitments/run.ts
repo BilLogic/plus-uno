@@ -9,7 +9,9 @@
 //   the commitment detector about the thread's new messages and keeps each
 //   promise as an `open` row, due at its stated deadline or two working days
 //   out (`commitmentDueAt`). It posts nothing. A thread whose new messages
-//   carry no promise words costs no model call.
+//   carry no promise words costs no model call. A promise by someone with a
+//   live commitment in the same thread is that task said again: no new row,
+//   and a later day it names moves the due date as a ⏳ would.
 //
 //   `runCommitmentNudges` — the morning's `commitment-nudge` job. It takes the
 //   live commitments due now, soonest first, one at a time, each only once a
@@ -19,14 +21,18 @@
 //   `auto_done` and nothing is sent. Otherwise the reminder goes up as a reply
 //   in the promise's thread, mentioning the promiser only, and `due_at` is
 //   re-armed two working days out for its one follow-up; a follow-up nobody
-//   answers makes the row `lapsed`. Nothing is sent outside the weekday
+//   answers makes the row `lapsed`. Two posts per commitment in all: a ⏳
+//   moves the date and adds none. At most `MAX_REMINDERS_PER_PERSON` a
+//   promiser a morning — the rest wait, which is no hold — and a row held
+//   `MAX_HOLDS` mornings running lapses. Nothing is sent outside the weekday
 //   14:00 UTC run (`isMorningRunTime`).
 //
 //   `answerReminder` — the reaction door's first look. A reaction on a
 //   reminder is the reminder's, whatever the glyph: 🙌 ⏳ 🙅 🤔 from the
 //   promiser set the state and replace the legend in place with no new ping,
 //   and anything else — a ✅ among them — does nothing. A reaction on anything
-//   else goes on to the gate untouched.
+//   else goes on to the gate untouched, and so does every reaction when the
+//   reminder store cannot be read: it fails open.
 //
 // WHERE IT POSTS. `pickDestination`, as every proactive job: a promise is a
 // message in a thread, so the reminder goes to that thread — back into a
@@ -81,6 +87,10 @@ export const MAX_EVIDENCE_SOURCES = 2;
 /** A commitment's wording outlives its due date by this, so every nudge a
  *  ⏳ or a follow-up can still bring finds it. */
 export const TEXT_KEEP_MS = 30 * 24 * 60 * 60 * 1000;
+/** Reminders one promiser gets in one morning run; the rest wait a morning. */
+export const MAX_REMINDERS_PER_PERSON = 2;
+/** Mornings running a commitment may be held before it lapses. */
+export const MAX_HOLDS = 3;
 
 const EVIDENCE_KINDS: ReadonlySet<TargetKind> = new Set(["notion", "github", "design-system-code"]);
 
@@ -168,18 +178,53 @@ export async function recordThreadCommitments(
       nudgeTs: null,
       followupTs: null,
       checkedOn: null,
+      holds: 0,
+      remindedOn: null,
       resolvedAt: null,
     });
     texts[id] = c.what;
   }
-  if (deps.dryRun || !rows.length) return { rows, texts };
-  await deps.store.addCommitments(rows);
-  for (const row of rows) {
+  const kept = await foldRepromises(rows, deps);
+  if (deps.dryRun || !kept.length) return { rows: kept, texts };
+  await deps.store.addCommitments(kept);
+  for (const row of kept) {
     // A row already there keeps its wording, and the reminder bodies with it.
     if (await deps.store.text(row.id)) continue;
     await deps.store.saveText(row.id, { what: texts[row.id]!, bodies: {} }, row.dueAt + TEXT_KEEP_MS);
   }
-  return { rows, texts };
+  return { rows: kept, texts };
+}
+
+/**
+ * The new rows that are new commitments. A promise by someone who already has
+ * a live one in the same thread — "sorry, will do by Fri" under a reminder —
+ * is the same task said again, so it adds no row and restarts no reminders.
+ * When it names a later day than the live one is due, it counts as a ⏳: the
+ * due date moves (a snooze, capped, once a reminder is up) and no ping is
+ * added. Two promises by one person in one thread on one night: the first
+ * stands.
+ */
+async function foldRepromises(
+  rows: CommitmentRecord[],
+  deps: Pick<CommitmentDeps, "store" | "dryRun">,
+): Promise<CommitmentRecord[]> {
+  const kept: CommitmentRecord[] = [];
+  for (const row of rows) {
+    if (kept.some((k) => k.promiserId === row.promiserId)) continue;
+    const live = await deps.store.liveInThread(row.channel, row.threadTs, row.promiserId);
+    // None, or this very promise read again by a retried job.
+    if (!live || live.id === row.id) {
+      kept.push(row);
+      continue;
+    }
+    if (row.deadlineAt === null || row.dueAt <= live.dueAt || deps.dryRun) continue;
+    if (live.nudges === 0) {
+      await deps.store.update(live.id, { dueAt: row.dueAt, deadlineAt: row.deadlineAt });
+    } else if (maySnooze(live.snoozes)) {
+      await deps.store.update(live.id, { state: "snoozed", snoozes: live.snoozes + 1, dueAt: row.dueAt, deadlineAt: row.deadlineAt });
+    }
+  }
+  return kept;
 }
 
 /**
@@ -250,11 +295,17 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   if (!deps.dryRun && !isMorningRunTime(now)) return report("skipped", "outside the weekday morning run");
 
   const runDate = dateOf(now);
+  ensureHeadroom(deps, COMMITMENT_COST);
+  // Read again by a retried job, so the cap holds across its alarms.
+  const reminded = await deps.store.remindedOn(runDate);
+  const capped = () => Object.keys(reminded).filter((p) => reminded[p]! >= MAX_REMINDERS_PER_PERSON);
   for (;;) {
     ensureHeadroom(deps, COMMITMENT_COST);
-    const c = await deps.store.nextDue(now, runDate);
+    const c = await deps.store.nextDue(now, runDate, capped());
     if (!c) break;
-    actions.push(await handleDue(deps, c, now, runDate));
+    const action = await handleDue(deps, c, now, runDate);
+    if (action.action === "nudged" || action.action === "followed-up") reminded[c.promiserId] = (reminded[c.promiserId] ?? 0) + 1;
+    actions.push(action);
     // A rehearsal marks nothing, so the same row would come back: it shows one.
     if (deps.dryRun) break;
   }
@@ -265,9 +316,23 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   const settle = async (patch: Parameters<CommitmentStore["update"]>[1]): Promise<void> => {
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate, ...patch });
   };
+  // Held on too many mornings running — an archived channel, a removed bot,
+  // a deleted thread — it lapses rather than being tried forever.
+  const hold = async (note: string): Promise<CommitmentAction> => {
+    const holds = c.holds + 1;
+    if (holds < MAX_HOLDS) {
+      await settle({ holds });
+      return { id: c.id, action: "held", note: `${note}; tried again tomorrow` };
+    }
+    await settle({ state: "lapsed", holds, resolvedAt: now });
+    console.warn(`[commitments] ${c.id} lapsed after ${holds} held mornings: ${note}`);
+    return { id: c.id, action: "lapsed", note: `held ${holds} mornings running (${note})` };
+  };
+  // The reminder and its one follow-up are all a commitment gets, whatever
+  // ⏳ moved its date.
   if (c.nudges >= 2) {
     await settle({ state: "lapsed", resolvedAt: now });
-    return { id: c.id, action: "lapsed", note: "its follow-up went unanswered" };
+    return { id: c.id, action: "lapsed", note: "its reminder and follow-up are spent" };
   }
   const place = destinationOf(c, deps.config);
   if (!place) {
@@ -281,10 +346,7 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   }
 
   const evidence = await checkEvidence(deps, c, text);
-  if (evidence === "unknown") {
-    await settle({});
-    return { id: c.id, action: "held", note: "its thread or the judge could not be read; tried again tomorrow" };
-  }
+  if (evidence === "unknown") return hold("its thread or the judge could not be read");
   if (evidence === "done") {
     await settle({ state: "auto_done", resolvedAt: now });
     return { id: c.id, action: "auto_done" };
@@ -304,13 +366,12 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   if (deps.dryRun) return { id: c.id, action, text: body };
 
   const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, REMINDER_LEGEND) });
-  if (!posted.ok || !posted.ts) {
-    await settle({});
-    return { id: c.id, action: "held", note: "Slack refused the post; tried again tomorrow" };
-  }
+  if (!posted.ok || !posted.ts) return hold("Slack refused the post");
   await settle({
     state: "nudged",
     nudges: c.nudges + 1,
+    holds: 0,
+    remindedOn: runDate,
     dueAt: rearmedDueAt(now),
     ...(first ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
   });
@@ -414,6 +475,18 @@ export interface ReminderDoorDeps {
  * @param deps - The store, the in-place edit, the bot's id, the clock
  */
 export async function answerReminder(r: ReminderReaction, deps: ReminderDoorDeps): Promise<boolean> {
+  try {
+    return await answerOrThrow(r, deps);
+  } catch (err) {
+    // Fail open: a reminder store that cannot be read (a D1 error, a table
+    // not yet migrated) must never keep a card's ✅ or ⛔ from the gate.
+    rethrowIfBudget(err);
+    console.error(`[commitments] reminder lookup for ${r.channel} ${r.messageTs} failed, passing to the gate: ${err instanceof Error ? err.message : String(err)}`);
+    return false;
+  }
+}
+
+async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promise<boolean> {
   const answer = reminderAnswer(r.glyph);
   // Only a reminder glyph, or a gate glyph a reminder must swallow, is worth
   // the lookup: every 🎉 in every channel arrives here.
@@ -430,7 +503,8 @@ export async function answerReminder(r: ReminderReaction, deps: ReminderDoorDeps
     // Capped: a third ⏳ leaves the commitment where it is.
     if (!maySnooze(c.snoozes)) return true;
     const dueAt = rearmedDueAt(now);
-    await deps.store.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, nudges: 0, dueAt });
+    // The date moves; the reminder and its follow-up stay the only two posts.
+    await deps.store.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt });
     ack = acknowledgement("soon", dayLabel(etDayOf(nudgeAt(dueAt)), etDayOf(now)));
   } else {
     const state = answer === "done" ? "done" : answer === "not_doing" ? "dropped" : "not_promise";

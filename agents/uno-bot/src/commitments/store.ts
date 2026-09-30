@@ -65,7 +65,8 @@ export interface CommitmentRecord {
   /** When the next step is due: the nudge, the follow-up, or the lapse. */
   dueAt: number;
   state: CommitmentState;
-  /** Reminders posted since the last answer: 0, 1 or 2. */
+  /** Reminders posted: 0, 1 or 2 — the reminder and its one follow-up,
+   *  across every ⏳. */
   nudges: number;
   /** ⏳ answers so far. */
   snoozes: number;
@@ -82,12 +83,19 @@ export interface CommitmentRecord {
   /** The morning run date that last looked at it, so one morning's retried job
    *  never looks twice. */
   checkedOn: string | null;
+  /** Consecutive mornings it was held — not read, or not posted. */
+  holds: number;
+  /** The morning run date its last reminder went up. */
+  remindedOn: string | null;
   resolvedAt: number | null;
 }
 
 /** A change to one commitment. */
 export type CommitmentPatch = Partial<
-  Pick<CommitmentRecord, "state" | "dueAt" | "nudges" | "snoozes" | "nudgeTs" | "followupTs" | "checkedOn" | "resolvedAt">
+  Pick<
+    CommitmentRecord,
+    "state" | "dueAt" | "deadlineAt" | "nudges" | "snoozes" | "nudgeTs" | "followupTs" | "checkedOn" | "holds" | "remindedOn" | "resolvedAt"
+  >
 >;
 
 /** The D1 half. */
@@ -97,8 +105,12 @@ export interface CommitmentRecords {
   addCommitments(rows: CommitmentRecord[]): Promise<void>;
   get(id: string): Promise<CommitmentRecord | null>;
   /** The live commitment due soonest at `now` that `runDate`'s morning has not
-   *  yet looked at, or null. */
-  nextDue(now: number, runDate: string): Promise<CommitmentRecord | null>;
+   *  yet looked at, passing over the promisers in `skip`, or null. */
+  nextDue(now: number, runDate: string, skip?: readonly string[]): Promise<CommitmentRecord | null>;
+  /** How many commitments each promiser was reminded of on `runDate`. */
+  remindedOn(runDate: string): Promise<Record<string, number>>;
+  /** A live commitment of this promiser's in this thread, or null. */
+  liveInThread(channel: string, threadTs: string, promiserId: string): Promise<CommitmentRecord | null>;
   /** The commitment a reminder with this ts belongs to — its first reminder or
    *  its follow-up. */
   byReminderTs(ts: string): Promise<CommitmentRecord | null>;

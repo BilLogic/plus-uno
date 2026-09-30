@@ -35,6 +35,8 @@ export function commitmentRow(over: Partial<CommitmentRecord> = {}): CommitmentR
     nudgeTs: null,
     followupTs: null,
     checkedOn: null,
+    holds: 0,
+    remindedOn: null,
     resolvedAt: null,
     ...over,
   };
@@ -90,6 +92,41 @@ export function runCommitmentRecordsConformance(
     assert.deepEqual(order, ["C:soon", "C:nudged", "C:snoozed", "C:late"]);
     // Tomorrow's morning looks again.
     assert.equal((await records.nextDue(500, "2026-10-02"))?.id, "C:soon");
+  });
+
+  it("the next due passes over the promisers it is told to", async () => {
+    const records = make();
+    await records.addCommitments([
+      commitmentRow({ id: "C:maya", dueAt: 100, promiserId: "U0MAYA" }),
+      commitmentRow({ id: "C:ade", dueAt: 200, promiserId: "U0ADE" }),
+    ]);
+    assert.equal((await records.nextDue(500, "2026-10-01", ["U0MAYA"]))?.id, "C:ade");
+    assert.equal(await records.nextDue(500, "2026-10-01", ["U0MAYA", "U0ADE"]), null);
+    assert.equal((await records.nextDue(500, "2026-10-01", []))?.id, "C:maya");
+  });
+
+  it("counts each promiser's reminders on a morning", async () => {
+    const records = make();
+    await records.addCommitments([
+      commitmentRow({ id: "C:1", remindedOn: "2026-10-01" }),
+      commitmentRow({ id: "C:2", remindedOn: "2026-10-01" }),
+      commitmentRow({ id: "C:3", remindedOn: "2026-09-30" }),
+      commitmentRow({ id: "C:4", remindedOn: "2026-10-01", promiserId: "U0ADE" }),
+    ]);
+    assert.deepEqual(await records.remindedOn("2026-10-01"), { U0MAYA: 2, U0ADE: 1 });
+    assert.deepEqual(await records.remindedOn("2026-10-02"), {});
+  });
+
+  it("finds a promiser's live commitment in a thread, and only a live one", async () => {
+    const records = make();
+    await records.addCommitments([
+      commitmentRow({ id: "C:done", state: "done", promisedAt: 1 }),
+      commitmentRow({ id: "C:live", state: "nudged", promisedAt: 2 }),
+      commitmentRow({ id: "C:other", promiserId: "U0ADE", promisedAt: 0 }),
+    ]);
+    const row = commitmentRow();
+    assert.equal((await records.liveInThread(row.channel, row.threadTs, "U0MAYA"))?.id, "C:live");
+    assert.equal(await records.liveInThread(row.channel, "999.9", "U0MAYA"), null);
   });
 
   it("a reminder's ts finds its commitment, first reminder or follow-up", async () => {

@@ -32,6 +32,8 @@ const COLUMNS = [
   "nudge_ts",
   "followup_ts",
   "checked_on",
+  "holds",
+  "reminded_on",
   "resolved_at",
 ] as const;
 
@@ -41,11 +43,14 @@ type Row = Record<(typeof COLUMNS)[number], unknown>;
 const PATCH_COLUMNS: Record<keyof CommitmentPatch, (typeof COLUMNS)[number]> = {
   state: "state",
   dueAt: "due_at",
+  deadlineAt: "deadline_at",
   nudges: "nudges",
   snoozes: "snoozes",
   nudgeTs: "nudge_ts",
   followupTs: "followup_ts",
   checkedOn: "checked_on",
+  holds: "holds",
+  remindedOn: "reminded_on",
   resolvedAt: "resolved_at",
 };
 
@@ -59,7 +64,11 @@ const INSERT =
 const LIVE = LIVE_STATES.map((s) => `'${s}'`).join(", ");
 const NEXT_DUE =
   `${SELECT} WHERE state IN (${LIVE}) AND due_at <= ? AND (checked_on IS NULL OR checked_on <> ?) ` +
-  `ORDER BY due_at, commitment_id LIMIT 1`;
+  `AND promiser_id NOT IN (SELECT value FROM json_each(?)) ORDER BY due_at, commitment_id LIMIT 1`;
+const REMINDED_ON = "SELECT promiser_id, COUNT(*) AS n FROM commitments WHERE reminded_on = ? GROUP BY promiser_id";
+const LIVE_IN_THREAD =
+  `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND state IN (${LIVE}) ` +
+  `ORDER BY promised_at, commitment_id LIMIT 1`;
 const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
@@ -86,6 +95,8 @@ function toRow(r: CommitmentRecord): Row {
     nudge_ts: r.nudgeTs,
     followup_ts: r.followupTs,
     checked_on: r.checkedOn,
+    holds: r.holds,
+    reminded_on: r.remindedOn,
     resolved_at: r.resolvedAt,
   };
 }
@@ -111,6 +122,8 @@ function fromRow(row: Row): CommitmentRecord {
     nudgeTs: strOrNull(row.nudge_ts),
     followupTs: strOrNull(row.followup_ts),
     checkedOn: strOrNull(row.checked_on),
+    holds: Number(row.holds ?? 0),
+    remindedOn: strOrNull(row.reminded_on),
     resolvedAt: numOrNull(row.resolved_at),
   };
 }
@@ -129,7 +142,13 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
       await db.prepare(INSERT).bind(JSON.stringify(rows.map(toRow))).run();
     },
     get: (id) => first(`${SELECT} WHERE commitment_id = ?`, id),
-    nextDue: (now, runDate) => first(NEXT_DUE, now, runDate),
+    nextDue: (now, runDate, skip = []) => first(NEXT_DUE, now, runDate, JSON.stringify(skip)),
+    async remindedOn(runDate) {
+      chargeD1Query();
+      const { results } = await db.prepare(REMINDED_ON).bind(runDate).all<{ promiser_id: unknown; n: unknown }>();
+      return Object.fromEntries(results.map((r) => [String(r.promiser_id), Number(r.n)]));
+    },
+    liveInThread: (channel, threadTs, promiserId) => first(LIVE_IN_THREAD, channel, threadTs, promiserId),
     byReminderTs: (ts) => first(BY_REMINDER, ts, ts),
     async update(id, patch) {
       const sets: string[] = [];

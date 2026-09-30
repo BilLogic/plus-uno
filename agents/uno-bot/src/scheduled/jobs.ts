@@ -32,7 +32,9 @@ import {
 export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
 
 /** Both sweep kinds: one body, since `runSweepJob` tells them apart. The
- *  end-of-day read hands each thread to commitment reminders too. */
+ *  end-of-day channel read hands each thread to commitment reminders too —
+ *  that kind only: commitment reminders cover channel threads, not group DMs
+ *  or any other conversation a sweep kind may read. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
   const onThread = job.kind === "sweep-channel" ? commitmentThreadHookFor(env, { dryRun }) : undefined;
   const report = await runSweepJobOnEnv(env, job, { dryRun }, onThread ? { onThread } : {});

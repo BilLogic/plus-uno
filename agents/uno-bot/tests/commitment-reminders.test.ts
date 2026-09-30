@@ -56,24 +56,29 @@ const promiseReply = (over: Record<string, unknown> = {}) =>
   });
 
 /** The promise, read by Tuesday's end-of-day sweep. */
-async function sweptPromise(opts: { store?: InMemoryCommitmentStore; channel?: string; reply?: string } = {}) {
+async function sweptPromise(
+  opts: { store?: InMemoryCommitmentStore; channel?: string; reply?: string; later?: SweepSlackMessage[]; now?: number } = {},
+) {
   const store = opts.store ?? createInMemoryCommitmentStore();
   const channel = opts.channel ?? DESIGN;
   const provider = fakeProvider({ generateReplies: [opts.reply ?? promiseReply()] });
+  const later = opts.later ?? [];
+  const latest = later.at(-1)?.ts ?? PROMISE;
   const h = sweepHarness({
     channels: {
       [channel]: {
         kind: "public",
-        history: [msg(BEA, ROOT, "Where are the updated reflection screens?", { reply_count: 1, latest_reply: PROMISE })],
+        history: [msg(BEA, ROOT, "Where are the updated reflection screens?", { reply_count: 1 + later.length, latest_reply: latest })],
         threads: {
           [ROOT]: [
             msg(BEA, ROOT, "Where are the updated reflection screens?"),
             msg(MAYA, PROMISE, "Still polishing. I'll share the Figma link by Thu."),
+            ...later,
           ],
         },
       },
     },
-    now: at(29, 22),
+    now: opts.now ?? at(29, 22),
   });
   h.deps.onThread = commitmentThreadHook({
     detector: modelCommitmentDetector(provider),
@@ -95,6 +100,8 @@ function mornings(opts: {
   judgeReplies?: string[];
   headroom?: { subrequests: number; d1Queries: number };
   dryRun?: boolean;
+  /** The promise's thread cannot be read — archived, deleted, the bot removed. */
+  unreadable?: boolean;
 }) {
   const clock = { now: opts.now };
   const thread = opts.thread ?? [msg(BEA, ROOT, "Where are the updated reflection screens?"), msg(MAYA, PROMISE, "I'll share it by Thu.")];
@@ -107,6 +114,7 @@ function mornings(opts: {
   const deps: NudgeDeps = {
     slack: {
       async replies(_channel, rootTs) {
+        if (opts.unreadable) return null;
         return { messages: rootTs === ROOT ? [...thread, ...posts.filter((p) => p.threadTs === ROOT).map((p) => ({ ts: p.ts, bot_id: "B0BOT", text: p.text }))] : [] };
       },
       async history(_channel, oldest) {
@@ -356,24 +364,46 @@ describe("answers", () => {
     let row = only(store);
     assert.equal(new Date(row.dueAt).toISOString(), "2026-10-07T04:00:00.000Z");
     assert.equal(row.snoozes, 1);
-    assert.equal(row.nudges, 0);
-    // Wednesday: the check-in comes back as a first reminder.
-    m.clock.now = at(37, 14);
+    m.clock.now = at(37, 14); // Wed
     await m.run();
-    assert.equal(m.posts.length, 2);
-    const second = m.posts[1]!.ts;
-    assert.equal(await react("hourglass_flowing_sand", MAYA, second), true);
-    assert.equal(only(store).snoozes, 2);
-    m.clock.now = at(42, 14);
-    await m.run();
-    const third = m.posts[2]!.ts;
-    const edits = m.updates.length;
-    // A third ⏳ changes nothing.
-    assert.equal(await react("hourglass_flowing_sand", MAYA, third), true);
+    const followUp = m.posts[1]!.ts;
+    assert.equal(await react("hourglass_flowing_sand", MAYA, followUp), true);
     row = only(store);
     assert.equal(row.snoozes, 2);
-    assert.equal(row.state, "nudged");
+    const due = row.dueAt;
+    const edits = m.updates.length;
+    // A third ⏳ changes nothing.
+    assert.equal(await react("hourglass_flowing_sand", MAYA, followUp), true);
+    row = only(store);
+    assert.equal(row.snoozes, 2);
+    assert.equal(row.dueAt, due);
     assert.equal(m.updates.length, edits);
+  });
+
+  it("a ⏳ moves the date but adds no ping: the reminder and one follow-up, then lapsed", async () => {
+    const { store, m, react } = await nudged();
+    await react("hourglass_flowing_sand"); // Fri
+    m.clock.now = at(37, 14); // Wed: the follow-up, not a second first reminder
+    await m.run();
+    assert.equal(m.posts.length, 2);
+    assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
+    await react("hourglass_flowing_sand", MAYA, m.posts[1]!.ts);
+    m.clock.now = at(42, 14); // the Monday after: due again, and spent
+    const report = await m.run();
+    assert.deepEqual(report.actions.map((a) => a.action), ["lapsed"]);
+    assert.equal(m.posts.length, 2);
+  });
+
+  it("every reminder a commitment posted stays answerable", async () => {
+    const { store, m, reminderTs, react } = await nudged();
+    await react("hourglass_flowing_sand"); // Fri, on the first reminder
+    m.clock.now = at(37, 14);
+    await m.run(); // the follow-up
+    assert.notEqual(m.posts[1]!.ts, reminderTs);
+    // 🙌 on the FIRST reminder still lands.
+    assert.equal(await react("raised_hands", MAYA, reminderTs), true);
+    assert.equal(only(store).state, "done");
+    assert.equal(m.updates.at(-1)!.ts, reminderTs);
   });
 
   it("✅ on a reminder does nothing, and never reaches the gate", async () => {
@@ -398,6 +428,106 @@ describe("answers", () => {
 
   it("the reminder's glyphs are none of the gate's", () => {
     for (const name of Object.keys(REMINDER_REACTIONS)) assert.equal(GATE_RESERVED.has(name), false, name);
+  });
+});
+
+describe("a promise said again", () => {
+  const REPLY = ts(32 + 0, 16); // Fri 2026-10-02 12:00 ET, under the reminder
+
+  it("a reply under a reminder adds no row, and a later day it names moves the date as a ⏳", async () => {
+    const { store } = await sweptPromise();
+    const m = mornings({ store, now: at(32, 14) });
+    await m.run(); // Fri: the reminder
+    const reply = msg(MAYA, REPLY, "Sorry! Will do by Wed.");
+    await sweptPromise({
+      store,
+      later: [reply],
+      now: at(32, 22),
+      reply: promiseReply({ message_ts: REPLY, deadline: "Wed", what: "share the Figma link" }),
+    });
+    const row = only(store);
+    assert.equal(row.id, `${DESIGN}:${PROMISE}`);
+    assert.equal(row.state, "snoozed");
+    assert.equal(row.snoozes, 1);
+    // "by Wed", said on Friday: the end of Wednesday the 7th.
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-08T04:00:00.000Z");
+    assert.equal(row.deadlineAt, row.dueAt);
+    // One task, two pings at most: Thursday's follow-up, then the lapse.
+    m.clock.now = at(38, 14); // Thu 8th
+    await m.run();
+    m.clock.now = at(42, 14);
+    await m.run();
+    m.clock.now = at(44, 14);
+    await m.run();
+    assert.equal(m.posts.length, 2);
+    assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
+    assert.equal(only(store).state, "lapsed");
+  });
+
+  it("said again with no later day, it changes nothing", async () => {
+    const { store } = await sweptPromise();
+    const before = only(store);
+    await sweptPromise({
+      store,
+      later: [msg(MAYA, ts(30, 16), "yep, on it")],
+      now: at(30, 22),
+      reply: promiseReply({ message_ts: ts(30, 16), deadline: null }),
+    });
+    assert.deepEqual(only(store), before);
+  });
+});
+
+describe("the morning's limits", () => {
+  it("a row held three mornings running lapses", async () => {
+    const { store } = await sweptPromise();
+    const m = mornings({ store, now: at(32, 14), unreadable: true });
+    const seen: string[] = [];
+    for (const day of [32, 35, 36]) {
+      m.clock.now = at(day, 14);
+      const report = await m.run();
+      seen.push(...report.actions.map((a) => a.action));
+    }
+    assert.deepEqual(seen, ["held", "held", "lapsed"]);
+    assert.equal(only(store).state, "lapsed");
+    assert.equal(only(store).holds, 3);
+    assert.equal(m.posts.length, 0);
+  });
+
+  it("a row that posts after a hold starts its count again", async () => {
+    const { store } = await sweptPromise();
+    const held = mornings({ store, now: at(32, 14), unreadable: true });
+    await held.run();
+    assert.equal(only(store).holds, 1);
+    const m = mornings({ store, now: at(35, 14) });
+    await m.run();
+    assert.equal(m.posts.length, 1);
+    assert.equal(only(store).holds, 0);
+  });
+
+  it("one promiser gets at most two reminders a morning; the rest wait, and waiting is no hold", async () => {
+    const { store: swept } = await sweptPromise();
+    const base = only(swept);
+    const store = createInMemoryCommitmentStore();
+    const threads = [ts(29, 14, 1), ts(29, 14, 2), ts(29, 14, 3)];
+    for (const [i, thread] of threads.entries()) {
+      const id = `${DESIGN}:${thread}`;
+      await store.addCommitments([{ ...base, id, threadTs: thread, messageTs: thread, dueAt: base.dueAt + i }]);
+      await store.saveText(id, { what: `task ${i + 1}`, bodies: {} }, Infinity);
+    }
+    const m = mornings({ store, now: at(32, 14) });
+    await m.run();
+    assert.equal(m.posts.length, 2);
+    // A retried alarm the same morning still holds the cap.
+    await m.run();
+    assert.equal(m.posts.length, 2);
+    const waiting = store.rows.get(`${DESIGN}:${threads[2]}`)!;
+    assert.equal(waiting.state, "open");
+    assert.equal(waiting.checkedOn, null);
+    assert.equal(waiting.holds, 0);
+    m.clock.now = at(35, 14); // Monday
+    await m.run();
+    assert.equal(m.posts.length, 3);
+    assert.equal(m.posts[2]!.threadTs, threads[2]);
   });
 });
 
@@ -444,6 +574,30 @@ describe("the reaction door", () => {
     assert.equal(ran.length, 0);
     assert.equal(delivery.gateNotes.length, 0);
     assert.equal((await threadState.getProposalByThread({ channel: DESIGN, thread: ROOT }))?.proposalTs, CARD_TS);
+  });
+
+  it("a reminder store that throws fails open: a card's ✅ still confirms", async () => {
+    const store = createInMemoryCommitmentStore();
+    store.byReminderTs = async () => {
+      throw new Error("D1_ERROR: no such table: commitments");
+    };
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal(card);
+    const ran: unknown[] = [];
+    await runReactionDoor(
+      { channel: DESIGN, messageTs: CARD_TS, glyph: "white_check_mark", userId: MAYA, messageAuthorId: BOT },
+      {
+        threadState,
+        delivery: () => recordingDelivery(),
+        threadRootOf: async () => ROOT,
+        botUserId: async () => BOT,
+        applyVerdict: async (v) => void ran.push(v),
+        restage: async () => {},
+        reminder: (r) =>
+          answerReminder(r, { store, update: async () => true, botUserId: async () => BOT, now: () => at(32, 15) }),
+      },
+    );
+    assert.equal(ran.length, 1);
   });
 
   it("✅ on a proposal card still confirms", async () => {
