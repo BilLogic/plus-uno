@@ -321,8 +321,14 @@ export function fewShotExamples(
 
 // ── Morning: check, then nudge ───────────────────────────────────────────────
 
-/** What the morning job reads with: everything but the detector. */
-export type NudgeDeps = Omit<CommitmentDeps, "detector">;
+/**
+ * What the morning job reads with: everything but the detector, and the
+ * handler for the card kinds (`../follow-through/`), which settle on their own
+ * evidence and say their own words. Absent, a card row due is left alone.
+ */
+export type NudgeDeps = Omit<CommitmentDeps, "detector"> & {
+  cards?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
+};
 
 /** What the morning did with one commitment. */
 export interface CommitmentAction {
@@ -383,6 +389,11 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
 }
 
 async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> {
+  if (c.kind !== "thread_promise") {
+    if (deps.cards) return deps.cards.due(c, now, runDate);
+    if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate });
+    return { id: c.id, action: "held", note: "no handler for card follow-ups on this run" };
+  }
   const settle = async (patch: Parameters<CommitmentStore["update"]>[1]): Promise<void> => {
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate, ...patch });
   };
@@ -531,6 +542,8 @@ export interface ReminderReaction {
 
 export interface ReminderDoorDeps {
   store: CommitmentStore;
+  /** A reaction on a card follow-up (`../follow-through/`): its own answers. */
+  cards?(c: CommitmentRecord, r: ReminderReaction): Promise<void>;
   update: CommitmentSlack["update"];
   botUserId(): Promise<string | undefined>;
   now(): number;
@@ -560,11 +573,17 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
   const answer = reminderAnswer(r.glyph);
   // Only a reminder glyph, or a gate glyph a reminder must swallow, is worth
   // the lookup: every 🎉 in every channel arrives here.
-  if (!answer && !GATE_RESERVED.has(r.glyph)) return false;
+  if (!answer && !GATE_RESERVED.has(r.glyph.replace(/::skin-tone-\d$/, ""))) return false;
   const bot = await deps.botUserId();
   if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return false;
   const c = await deps.store.byReminderTs(r.messageTs);
   if (!c || c.channel !== r.channel) return false;
+  if (c.kind !== "thread_promise") {
+    // Whatever the glyph, a card follow-up's own: its ✅ drafts a card, and
+    // never reaches the gate.
+    if (deps.cards) await deps.cards(c, r);
+    return true;
+  }
 
   if (!answer || r.userId !== c.promiserId || !LIVE_STATES.includes(c.state)) return true;
   const now = deps.now();

@@ -23,7 +23,7 @@ import {
   type NotionBlock,
 } from "./notion-blocks";
 
-const NOTION_API = "https://api.notion.com/v1";
+export const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2022-06-28";
 const TEAM_QUERY_PAGE_SIZE = 100;
 const TEAM_MAX = 200;
@@ -39,7 +39,7 @@ const MAX_RICH_TEXT = 1900; // Notion caps a single rich_text content at 2000
 // Shared auth headers for every Notion REST call — one definition so the token
 // header and API version can't drift between endpoints. `write:true` adds the
 // JSON content-type needed by POST/PATCH.
-function notionHeaders(env: Env, opts?: { write?: boolean }): Record<string, string> {
+export function notionHeaders(env: Env, opts?: { write?: boolean }): Record<string, string> {
   const h: Record<string, string> = {
     Authorization: `Bearer ${env.NOTION_API_KEY}`,
     "Notion-Version": NOTION_VERSION,
@@ -50,7 +50,7 @@ function notionHeaders(env: Env, opts?: { write?: boolean }): Record<string, str
 
 // One error-string format for every Notion endpoint (was hand-built ~7×, and
 // drifted). `fallback` names the operation for the message tail.
-function notionError(status: number, data: { code?: string; message?: string }, fallback: string): Error {
+export function notionError(status: number, data: { code?: string; message?: string }, fallback: string): Error {
   return new Error(`Notion ${status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? fallback}`);
 }
 

@@ -49,6 +49,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * in the promise's thread (src/commitments/).
  * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
  * Team Members database (src/usage/team-roles-sync.ts).
+ * The end-of-day `card-follow-through` keeps a follow-up for each active
+ * Roadmap card nobody owns or that has stopped moving; the morning
+ * `commitment-nudge` asks about it (src/follow-through/).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -65,7 +68,8 @@ export type ScheduledJobKind =
   | "ds-precedence-check"
   | "ds-precedence-post"
   | "commitment-nudge"
-  | "team-roles-sync";
+  | "team-roles-sync"
+  | "card-follow-through";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -129,6 +133,8 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-poll", kind: "figma-library-poll" },
     // Second, so a rehearsal reaches it before the batches spend the ceiling.
     { key: "ds-precedence-check", kind: "ds-precedence-check", after: ["figma-library-poll"], weekday: FRIDAY },
+    // Early too, for the same reason: one Roadmap read, a few lookups a card.
+    { key: "card-follow-through", kind: "card-follow-through" },
     // One job per classification batch, each an alarm of its own. Each takes
     // whatever is still pending, so a quiet day's later jobs find nothing.
     ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({

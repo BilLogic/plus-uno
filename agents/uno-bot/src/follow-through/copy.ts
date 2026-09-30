@@ -1,0 +1,117 @@
+// What a card follow-up says, and what each answer to it means.
+//
+// Fixed by the scenario table: F3 offers to draft the card ("Want me to draft
+// the card for <X>?"), F4 asks who is taking the card ("Who's taking
+// <card>?"), F5 asks whether it is still moving ("Still moving?"). Each
+// mentions its owner and nobody else by default — the assignee or a note's
+// takers, the card's creator, its Contributors — and never the lead unless the
+// lead is that person.
+//
+// Every Notion string (a title, a status) and every to-do summary is escaped
+// with `escapeSlackText` before it reaches a message: a title holding
+// `<!channel>` pings nobody. A link is Slack's own `<url|label>`.
+//
+// PURE: no `Env`, no Slack module, no Workers global.
+
+import { mapReaction } from "../gate/reactions";
+import { escapeSlackText } from "../slack/mrkdwn";
+import { reminderAnswer } from "../commitments/copy";
+
+/** What an answer to a card follow-up means. */
+export type CardAnswer = "draft" | "done" | "still_on_it" | "drop";
+
+/**
+ * The answer a reaction carries on a follow-up of this kind, or null. F3
+ * takes ✅ (draft it) and 🙅 (drop it); F5 takes 🙌 ⏳ 🙅; F4 is answered by a
+ * reply naming someone, so no reaction answers it.
+ */
+export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", glyph: string): CardAnswer | null {
+  const bare = glyph.replace(/::skin-tone-\d$/, "");
+  const reminder = reminderAnswer(bare);
+  if (kind === "card_todo") {
+    if (mapReaction(bare) === "confirm") return "draft";
+    return reminder === "not_doing" ? "drop" : null;
+  }
+  if (kind === "card_stale") {
+    if (reminder === "done") return "done";
+    if (reminder === "soon") return "still_on_it";
+    if (reminder === "not_doing") return "drop";
+  }
+  return null;
+}
+
+/** The legend under each kind's first message and its follow-up. */
+export const CARD_LEGENDS = {
+  card_todo: "✅ Draft it · 🙅 Drop it",
+  card_unowned: "Reply here with an @mention and I'll draft the Contributor change",
+  card_stale: "🙌 Done · ⏳ Still on it · 🙅 Drop it",
+} as const;
+
+/** What replaces the legend once someone answers. */
+export function cardAcknowledgement(answer: CardAnswer | "owner", staged: boolean): string {
+  switch (answer) {
+    case "draft":
+      return "On it. The draft card is in this thread; a ✅ there files it.";
+    case "owner":
+      return staged ? "Thanks. The Contributor change is in this thread; a ✅ there applies it." : "Thanks.";
+    case "done":
+      return staged ? "Nice. The status change is in this thread; a ✅ there applies it." : "Nice, noted.";
+    case "still_on_it":
+      return "Got it. I'll leave it be for now.";
+    case "drop":
+      return staged ? "Noted. The status change is in this thread; a ✅ there applies it." : "Noted. I won't ask again.";
+  }
+}
+
+function mentionsOf(people: readonly string[]): string {
+  return [...new Set(people.filter(Boolean))].map((p) => `<@${p}>`).join(" ");
+}
+
+function cardLink(card: { title: string; url: string }): string {
+  const title = escapeSlackText(card.title.replace(/\s+/g, " ").trim() || "untitled");
+  return card.url ? `<${card.url}|${title}>` : title;
+}
+
+/**
+ * F3's offer.
+ *
+ * @param input.people - The assignee, or the note's takers
+ * @param input.what - The card's subject, as the detector summarised it
+ * @param input.sourceUrl - The thread's permalink or the note's link, when known
+ * @param input.fromNote - Whether a running note, not a thread, held the to-do
+ */
+export function todoOfferText(input: { people: readonly string[]; what: string; sourceUrl: string | null; fromNote: boolean }): string {
+  const where = input.fromNote ? "the running note" : "this thread";
+  const from = input.sourceUrl ? `<${input.sourceUrl}|${where}>` : where;
+  return `${mentionsOf(input.people)} Want me to draft the card for ${escapeSlackText(input.what)}? It was a to-do in ${from}, and I can't find a matching Roadmap card.`;
+}
+
+/** F4's question. */
+export function unownedText(input: { creator: string; card: { title: string; url: string; status: string | null } }): string {
+  const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
+  return `<@${input.creator}> Who's taking ${cardLink(input.card)}? It has sat${status} with no Contributor for over a week.`;
+}
+
+/** F5's question. */
+export function staleText(input: { people: readonly string[]; card: { title: string; url: string; status: string | null } }): string {
+  const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
+  return `${mentionsOf(input.people)} Still moving? ${cardLink(input.card)} has sat${status} for three weeks with no comments.`;
+}
+
+/** The one follow-up, a week on. */
+export function cardFollowUpText(kind: "card_todo" | "card_unowned" | "card_stale", people: readonly string[]): string {
+  switch (kind) {
+    case "card_todo":
+      return `${mentionsOf(people)} Still want that card drafted? A ✅ or a 🙅 is all I need.`;
+    case "card_unowned":
+      return `${mentionsOf(people)} Still looking for someone to take this card. Reply with an @mention and I'll draft the change.`;
+    case "card_stale":
+      return `${mentionsOf(people)} Still moving? A reaction is all I need.`;
+  }
+}
+
+/** A card's subject as a card title: its first letter raised. */
+export function draftTitle(what: string): string {
+  const t = what.replace(/\s+/g, " ").trim();
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+}

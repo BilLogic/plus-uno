@@ -17,6 +17,8 @@ import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
+import { cardTodoThreadHookFor, runCardFollowThroughOnEnv } from "../follow-through/env";
+import type { SweepThread } from "../sweep/finding";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
 import {
@@ -32,15 +34,27 @@ import {
 export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
 
 /** Every sweep kind: one body, since `runSweepJob` tells them apart. The
- *  end-of-day channel read hands each thread to commitment reminders too —
- *  that kind only: commitment reminders cover channel threads, not group DMs
- *  or any other conversation a sweep kind may read. */
+ *  end-of-day channel read hands each thread to commitment reminders and to
+ *  card to-dos too — that kind only: both cover channel threads, not group
+ *  DMs or any other conversation a sweep kind may read. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
-  const onThread = job.kind === "sweep-channel" ? commitmentThreadHookFor(env, { dryRun }) : undefined;
+  const onThread = job.kind === "sweep-channel" ? threadHooks(env, dryRun) : undefined;
   const report = await runSweepJobOnEnv(env, job, { dryRun }, onThread ? { onThread } : {});
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
+
+/** The per-thread hooks the end-of-day channel read feeds, one after the
+ *  other; each swallows its own failures and throws only a budget stop. */
+function threadHooks(env: Env, dryRun: boolean): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
+  const hooks = [commitmentThreadHookFor(env, { dryRun }), cardTodoThreadHookFor(env, { dryRun })].filter(
+    (h): h is (thread: SweepThread, since: string) => Promise<void> => !!h,
+  );
+  if (!hooks.length) return undefined;
+  return async (thread, since) => {
+    for (const hook of hooks) await hook(thread, since);
+  };
+}
 
 const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Proves the path end to end — the enqueue, one alarm, the done marker —
@@ -115,6 +129,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "team-roles-sync": async (env, _job, { dryRun }) => {
     const report = await runTeamRolesSync(env, { dryRun });
     console.log(`[usage] team roles: ${report.summary}`);
+    return report;
+  },
+  // End of day: each active Roadmap card nobody owns, or that has stopped
+  // moving, becomes a follow-up the morning asks about (src/follow-through/).
+  "card-follow-through": async (env, job, { dryRun }) => {
+    const report = await runCardFollowThroughOnEnv(env, job, { dryRun });
+    console.log(`[follow-through] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.

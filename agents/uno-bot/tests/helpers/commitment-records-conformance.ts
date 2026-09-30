@@ -178,4 +178,36 @@ export function runCommitmentRecordsConformance(
     const [first] = await records.latestAnswers("C0PRIV", 1);
     assert.equal(first?.channelKind, "private");
   });
+
+  it("a card follow-up reads back with its card id; the card's latest is the one detected last", async () => {
+    const records = make();
+    const card = commitmentRow({
+      id: "card:p1:unowned:100",
+      kind: "card_unowned",
+      channel: "C0DESIGN",
+      threadTs: "",
+      messageTs: "",
+      requesterId: null,
+      deadlineAt: null,
+      cardId: "p1",
+      detectedAt: 100,
+    });
+    const later = commitmentRow({ ...card, id: "card:p1:stale:200", kind: "card_stale", detectedAt: 200 });
+    await records.addCommitments([card, later, commitmentRow({ id: "card:p2:stale:300", kind: "card_stale", cardId: "p2", detectedAt: 300 })]);
+    assert.deepEqual(await records.get(card.id), card);
+    assert.equal((await records.latestForCard("p1"))?.id, later.id);
+    assert.equal(await records.latestForCard("p9"), null);
+    assert.equal("cardId" in (await records.get(commitmentRow().id) ?? commitmentRow()), false);
+  });
+
+  it("a card follow-up is never a promise: not live in its thread, never an example", async () => {
+    const records = make();
+    await records.addCommitments([
+      commitmentRow({ id: "C:todo", kind: "card_todo", state: "open" }),
+      commitmentRow({ id: "C:todo-done", kind: "card_todo", state: "done", resolvedAt: 50 }),
+    ]);
+    const row = commitmentRow();
+    assert.equal(await records.liveInThread(row.channel, row.threadTs, row.promiserId), null);
+    assert.deepEqual(await records.latestAnswers("C0DESIGN", 5), []);
+  });
 }

@@ -45,6 +45,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
   assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), [
     "figma-library-poll",
+    "card-follow-through",
     "usage-classify",
     "usage-classify",
     "usage-classify",
@@ -109,6 +110,7 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
   const endOfDay = planRun("end-of-day", at(22, 0));
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
     ["figma-library-poll", "figma-library-poll", undefined],
+    ["card-follow-through", "card-follow-through", undefined],
     // One job per classification batch.
     ["usage-classify-1", "usage-classify", undefined],
     ["usage-classify-2", "usage-classify", undefined],

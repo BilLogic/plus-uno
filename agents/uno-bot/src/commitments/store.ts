@@ -44,8 +44,21 @@ export type CommitmentState =
 /** The states the morning still acts on. */
 export const LIVE_STATES: readonly CommitmentState[] = ["open", "nudged", "snoozed"];
 
-/** What made the row: a promise read in a swept thread. */
-export type CommitmentKind = "thread_promise";
+/**
+ * What made the row:
+ *   • `thread_promise` — a promise read in a swept thread;
+ *   • `card_todo` — a to-do to make a Roadmap card, from a thread or a running
+ *     note, whose evidence is a matching card;
+ *   • `card_unowned` — an active card with no Contributor;
+ *   • `card_stale` — an active card stuck in one Design Status.
+ * The three card kinds are the follow-through module's (`../follow-through/`):
+ * this module stores and schedules them, and hands their morning and their
+ * answers to it.
+ */
+export type CommitmentKind = "thread_promise" | "card_todo" | "card_unowned" | "card_stale";
+
+/** The card kinds, which the follow-through module handles. */
+export const CARD_KINDS: readonly CommitmentKind[] = ["card_todo", "card_unowned", "card_stale"];
 
 /** One promise, as `commitments` holds it. */
 export interface CommitmentRecord {
@@ -94,6 +107,9 @@ export interface CommitmentRecord {
   /** The morning run date its last reminder went up. */
   remindedOn: string | null;
   resolvedAt: number | null;
+  /** The Roadmap card's Notion page id, on a card follow-up; absent on a
+   *  promise. An id only — its title and link wait with the wording. */
+  cardId?: string | null;
 }
 
 /** A change to one commitment. */
@@ -115,16 +131,20 @@ export interface CommitmentRecords {
   nextDue(now: number, runDate: string, skip?: readonly string[]): Promise<CommitmentRecord | null>;
   /** How many commitments each promiser was reminded of on `runDate`. */
   remindedOn(runDate: string): Promise<Record<string, number>>;
-  /** A live commitment of this promiser's in this thread, or null. */
+  /** A live promise (`thread_promise`) of this promiser's in this thread, or
+   *  null. */
   liveInThread(channel: string, threadTs: string, promiserId: string): Promise<CommitmentRecord | null>;
   /** The commitment a reminder with this ts belongs to — its first reminder or
    *  its follow-up. */
   byReminderTs(ts: string): Promise<CommitmentRecord | null>;
   update(id: string, patch: CommitmentPatch): Promise<void>;
-  /** The newest `done` rows and the newest `not_promise` rows, at most `limit`
-   *  of each, newest answer first — those made in a public channel or in
+  /** The newest `done` promises and the newest `not_promise` ones, at most
+   *  `limit` of each, newest answer first — those made in a public channel or in
    *  `channel` itself, never another private place's or a DM's. */
   latestAnswers(channel: string, limit: number): Promise<CommitmentRecord[]>;
+  /** The follow-up for this Roadmap card detected last, of any card kind, or
+   *  null. */
+  latestForCard(cardId: string): Promise<CommitmentRecord | null>;
 }
 
 /** What one commitment's wording is, kept beside its row. */
@@ -134,6 +154,13 @@ export interface CommitmentText {
   /** Each reminder's body as posted, by its ts, so an answer can replace the
    *  legend and keep the rest. */
   bodies: Record<string, string>;
+  /** A card follow-up's other people to mention beside the promiser — a
+   *  running note's takers, a card's other Contributors. */
+  mentions?: string[];
+  /** A card follow-up's card: its title and link, as Notion gave them. */
+  card?: { title: string; url: string; status: string | null };
+  /** Where a card to-do was read: the thread's permalink or the note's link. */
+  sourceUrl?: string;
 }
 
 /** The KV half. */

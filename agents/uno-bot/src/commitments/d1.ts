@@ -1,6 +1,7 @@
 // The D1 commitment records — `commitments` in the usage database
 // (migrations/usage/0006_commitments.sql, and 0007_commitment_answers.sql for
-// where each promise was made).
+// where each promise was made, and 0011_card_follow_ups.sql for card
+// follow-ups and their card id).
 //
 // As the sweep's records do (`sweep/d1.ts`): every statement prepared with
 // bound parameters and charged to the meter BEFORE it is sent
@@ -37,6 +38,7 @@ const COLUMNS = [
   "holds",
   "reminded_on",
   "resolved_at",
+  "card_id",
 ] as const;
 
 type Row = Record<(typeof COLUMNS)[number], unknown>;
@@ -69,14 +71,15 @@ const NEXT_DUE =
   `AND promiser_id NOT IN (SELECT value FROM json_each(?)) ORDER BY due_at, commitment_id LIMIT 1`;
 const REMINDED_ON = "SELECT promiser_id, COUNT(*) AS n FROM commitments WHERE reminded_on = ? GROUP BY promiser_id";
 const LIVE_IN_THREAD =
-  `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND state IN (${LIVE}) ` +
+  `${SELECT} WHERE kind = 'thread_promise' AND channel_id = ? AND thread_ts = ? AND promiser_id = ? AND state IN (${LIVE}) ` +
   `ORDER BY promised_at, commitment_id LIMIT 1`;
 // One statement for both answers: each capped on its own, then merged newest
 // first. A row from a DM or another private place never matches.
 const answers = (state: "done" | "not_promise") =>
-  `SELECT * FROM (${SELECT} WHERE state = '${state}' AND (channel_kind = 'public' OR channel_id = ?) ` +
+  `SELECT * FROM (${SELECT} WHERE kind = 'thread_promise' AND state = '${state}' AND (channel_kind = 'public' OR channel_id = ?) ` +
   `ORDER BY resolved_at DESC, commitment_id DESC LIMIT ?)`;
 const LATEST_ANSWERS = `${answers("done")} UNION ALL ${answers("not_promise")} ORDER BY resolved_at DESC, commitment_id DESC`;
+const LATEST_FOR_CARD = `${SELECT} WHERE card_id = ? ORDER BY detected_at DESC, commitment_id DESC LIMIT 1`;
 const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
@@ -107,6 +110,7 @@ function toRow(r: CommitmentRecord): Row {
     holds: r.holds,
     reminded_on: r.remindedOn,
     resolved_at: r.resolvedAt,
+    card_id: r.cardId ?? null,
   };
 }
 
@@ -135,6 +139,8 @@ function fromRow(row: Row): CommitmentRecord {
     holds: Number(row.holds ?? 0),
     remindedOn: strOrNull(row.reminded_on),
     resolvedAt: numOrNull(row.resolved_at),
+    // A promise carries no card id at all, as it was written.
+    ...(row.card_id == null ? {} : { cardId: String(row.card_id) }),
   };
 }
 
@@ -160,6 +166,7 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
     },
     liveInThread: (channel, threadTs, promiserId) => first(LIVE_IN_THREAD, channel, threadTs, promiserId),
     byReminderTs: (ts) => first(BY_REMINDER, ts, ts),
+    latestForCard: (cardId) => first(LATEST_FOR_CARD, cardId),
     async latestAnswers(channel, limit) {
       if (limit <= 0) return [];
       chargeD1Query();

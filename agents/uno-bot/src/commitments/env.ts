@@ -24,6 +24,7 @@ import { measured, readSource, sweepSlackFor } from "../sweep/env";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { SweepThread } from "../sweep/finding";
 import { modelCommitmentDetector, modelEvidenceJudge } from "./detector";
+import { cardAnswerFor, cardFollowUpsFor } from "../follow-through/env";
 import { createD1CommitmentRecords } from "./d1";
 import {
   answerReminder,
@@ -108,7 +109,8 @@ export async function runCommitmentNudgesOnEnv(
     now: () => Date.now(),
     dryRun: opts.dryRun,
   };
-  return runCommitmentNudges(job, deps);
+  const cards = cardFollowUpsFor(env, opts, bot?.userId ?? null);
+  return runCommitmentNudges(job, cards ? { ...deps, cards } : deps);
 }
 
 /**
@@ -120,9 +122,11 @@ export async function runCommitmentNudgesOnEnv(
 export function reminderDoorFor(env: Env): ((r: ReminderReaction) => Promise<boolean>) | undefined {
   const store = storeFor(env);
   if (!store) return undefined;
+  const cards = cardAnswerFor(env);
   return (r) =>
     answerReminder(r, {
       store,
+      ...(cards ? { cards } : {}),
       update: (channel, ts, message) => updateReminder(env, channel, ts, message),
       botUserId: async () => (await getBotIdentity(env))?.userId,
       now: () => Date.now(),
@@ -138,7 +142,9 @@ function pick(slack: ReturnType<typeof sweepSlackFor>): Pick<CommitmentDeps["sla
   return { replies: slack.replies, history: slack.history };
 }
 
-function storeFor(env: Env): CommitmentStore | null {
+/** The commitment store on `Env` — records in D1, wording in KV — or null
+ *  when either binding is missing. */
+export function storeFor(env: Env): CommitmentStore | null {
   if (!env.USAGE_DB || !env.HARNESS_KV) return null;
   return { ...createD1CommitmentRecords({ db: env.USAGE_DB }), ...kvTexts(env.HARNESS_KV) };
 }

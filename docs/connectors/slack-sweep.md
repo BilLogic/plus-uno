@@ -1,7 +1,7 @@
 ---
 embodiment: all
 disclosure: reference
-summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, and how its commitment reminders nudge a promiser.
+summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, how its commitment reminders nudge a promiser, and its card follow-ups.
 ---
 
 # The end-of-day sweep
@@ -72,3 +72,17 @@ The same end-of-day read also looks for **commitments**: someone in a swept thre
 - **Said again:** a new promise by the same person in the same thread ("sorry, will do by Fri") is the same task. It adds no reminder, and a later day it names moves the due date the way a ⏳ does.
 - **Limits:** at most two reminders per person each morning; the rest wait for the next one. A commitment left unchecked or unposted three mornings running (an archived channel, a deleted thread) lapses.
 - **Stored:** a `commitments` row in the usage database holds ids, times, the state and two counts. The short summary of what was promised stays in KV with an expiry, and message text and links stay out of the database (ADR-030).
+
+## Card follow-ups
+
+Three more follow-ups ride the commitments' schedule and limits: the same end-of-day detection, the 10 am ET weekday morning post, one follow-up at most and then lapsed, and the two-a-person cap. The code is `agents/uno-bot/src/follow-through/`.
+
+- **F3, a card to-do with no card.** A thread or a running note says to create a Roadmap card ("Bill to create a card for the facelift last stage", "can someone make a card for this"). Two working days on, uno-bot searches the Roadmap by the to-do's words; a matching card closes it silently. Otherwise it asks "Want me to draft the card for …?", mentioning the assignee, or the note's takers when nobody was named. ✅ stages the drafted card (the PRD template, its own ✅ files it); 🙅 drops it.
+- **F4, an active card with no owner.** A card in Ready for Design, WIP or Under Review with an empty Contributor and no edit for 7 days. "Who's taking …?" mentions the card's creator. A reply naming someone ("@Maya") stages the Contributor change; its ✅ applies it.
+- **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. "Still moving?" mentions the Contributors: 🙌 done, ⏳ still on it (checked again in 3 weeks), 🙅 drop. 🙌 and 🙅 stage the Design Status change named by `FOLLOW_THROUGH_DONE_STATUS` / `FOLLOW_THROUGH_DROP_STATUS`; with none set, the answer is recorded and nothing is staged.
+- **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most five new card questions a channel each morning. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
+- **Evidence first:** each morning re-reads the card. A Contributor set, a status moved, an edit or a comment since closes it with no post.
+- **One message a card a week:** a follow-up's follow-up waits five working days, and a card asked about in the past week is not asked about again.
+- **Proposal cards** sit in the follow-up's thread for 72 h, in their own slot, confirmable by the people it names and whoever answered. Select values are exact-matched: a pillar only when the Roadmap offers it, a status refused rather than created.
+- **Stored:** a `commitments` row of kind `card_todo`, `card_unowned` or `card_stale`, keyed to the card's page id. Titles and links stay in KV (ADR-030).
+
