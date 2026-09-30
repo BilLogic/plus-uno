@@ -1,0 +1,350 @@
+// Capture beyond a thread's linked page: decisions in running notes and on
+// Roadmap cards (C4), an answer given only in chat (C3), and a page a thread
+// names without linking, found by search.
+//
+// Whole sweep days in memory, as tests/sweep-run.test.ts runs them: in-memory
+// Notion readers, recorded detector replies through the real detectors, the
+// in-memory store and the real card renderer.
+import { test } from "node:test";
+import assert from "node:assert/strict";
+
+import type { ScheduledJob } from "../src/scheduled/runs";
+import { runSweepJob, type SweepSource } from "../src/sweep/index";
+import { FOUND_BY_SEARCH } from "../src/sweep/capture-lines";
+import { recordSweepResolution } from "../src/sweep/outcomes";
+import { isTeamNote, type EditedRecordRow } from "../src/sweep/records";
+import {
+  at,
+  DESIGN,
+  drift,
+  msg,
+  NOTES_DB,
+  notionPage,
+  reply,
+  ROADMAP_DB,
+  sweepHarness,
+  ts,
+  UNIVERSAL,
+  type FakeChannel,
+} from "./helpers/sweep-harness";
+
+const NOTES: ScheduledJob = { key: "sweep:notes", kind: "sweep-notes" };
+const CARDS: ScheduledJob = { key: "sweep:cards", kind: "sweep-cards" };
+const END_OF_DAY: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN };
+const MORNING: ScheduledJob = { key: "sweep-post", kind: "sweep-post" };
+
+const OLD = "2026-09-01T10:00:00.000Z";
+const TONIGHT = "2026-09-29T20:00:00.000Z";
+
+const PRD = notionPage("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", { title: "Reflection PRD", contributors: ["Ade Okafor"] });
+const NOTE_ID = "cccccccccccccccccccccccccccccccc";
+const NOTE_URL = `https://www.notion.so/${NOTE_ID}`;
+
+function notePage(blocks: SweepSource["blocks"]): SweepSource {
+  return notionPage(NOTE_ID, { title: "Design sync", blocks, pillars: [], contributors: [] });
+}
+
+function noteRow(over: Partial<EditedRecordRow> = {}): EditedRecordRow {
+  return {
+    id: NOTE_ID,
+    url: NOTE_URL,
+    title: "Design sync 2026-09-29",
+    lastEditedTime: TONIGHT,
+    parentDatabaseId: NOTES_DB,
+    properties: {},
+    people: { "Note Takers": ["Bea Note"] },
+    ...over,
+  };
+}
+
+function recordReply(o: { source: SweepSource; block: string; evidence: string[]; replacement?: string }): string {
+  return JSON.stringify({
+    findings: [
+      {
+        source_url: o.source.url,
+        block_id: o.block,
+        source_says: "Launch is October 15.",
+        record_says: "Launch moved to November 1.",
+        replacement: o.replacement ?? "Launch date: November 1",
+        evidence_ids: o.evidence,
+        confidence: 0.9,
+      },
+    ],
+  });
+}
+
+const PEOPLE = { "Ade Okafor": "U0ADE", "Bea Note": "U0BEA", "Cy Contributor": "U0CY" };
+const quiet: Record<string, FakeChannel> = {};
+
+test("a note's decision that contradicts a PRD becomes one card in #plus-design, citing the note block", async () => {
+  const note = notePage([
+    { id: "n-old", lastEditedTime: OLD, text: "Kickoff notes from last month." },
+    { id: "n-dec", lastEditedTime: TONIGHT, text: "Decided: reflection launch moves to Nov 1.", links: [PRD.url] },
+  ]);
+  const h = sweepHarness({
+    channels: quiet,
+    sources: [PRD, note],
+    capture: true,
+    notion: { notes: [noteRow()] },
+    people: PEOPLE,
+    detectorReplies: [recordReply({ source: PRD, block: PRD.blocks[0]!.id, evidence: ["n-dec"] })],
+    now: at(29, 22),
+  });
+
+  const night = await runSweepJob(NOTES, h.deps);
+  assert.equal(night.findings.length, 1);
+  assert.equal(h.posted.length, 0, "the end of day posts nothing");
+  const prompt = String((h.provider.generated[0] as { prompt: string }).prompt);
+  assert.match(prompt, /n-dec · Decided/);
+  assert.doesNotMatch(prompt, /Kickoff notes/, "only what changed since the cursor is the record");
+
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1);
+  const [card] = h.posted;
+  assert.equal(card!.channel, DESIGN, "no thread, not the design system: #plus-design");
+  assert.equal(card!.threadTs, null);
+  assert.match(card!.text, /<@U0ADE>/, "the PRD card's Contributor is the owner");
+  assert.ok(card!.text.includes(`${NOTE_URL}#ndec`), "the card cites the note block");
+  assert.match(card!.text, /note says/);
+  const [staged] = h.staged;
+  assert.deepEqual((staged!.operations![0]!.input.replace as unknown[])[0], {
+    block_id: PRD.blocks[0]!.id,
+    last_edited_time: PRD.blocks[0]!.lastEditedTime,
+    content: "Launch date: November 1",
+  });
+  assert.deepEqual(staged!.confirmers, ["U0ADE", "U0BEA"], "the owner and the note takers");
+  assert.equal(await h.store.cursor("notion:running-notes"), TONIGHT);
+});
+
+test("a Universal-pillar card's comment contradicting its PRD lands in #plus-universal", async () => {
+  const CARD_ID = "dddddddddddddddddddddddddddddddd";
+  const card = notionPage(CARD_ID, {
+    title: "Button refresh",
+    pillars: ["Universal"],
+    contributors: ["Cy Contributor"],
+    blocks: [{ id: "c-spec", lastEditedTime: OLD, text: "Buttons use the primary style." }],
+  });
+  const h = sweepHarness({
+    channels: quiet,
+    sources: [card],
+    capture: true,
+    notion: {
+      cards: [
+        {
+          id: CARD_ID,
+          url: card.url,
+          title: card.title,
+          lastEditedTime: TONIGHT,
+          parentDatabaseId: ROADMAP_DB,
+          properties: { "Product Pillar": "Universal" },
+          people: { Contributor: ["Cy Contributor"] },
+        },
+      ],
+      comments: {
+        [CARD_ID]: [
+          { id: "cm-1", createdTime: TONIGHT, text: "Decided in crit: secondary style for buttons.", links: [], byBot: false },
+          { id: "cm-0", createdTime: OLD, text: "An old thought.", links: [], byBot: false },
+          { id: "cm-2", createdTime: TONIGHT, text: "uno-bot's own note.", links: [], byBot: true },
+        ],
+      },
+    },
+    people: PEOPLE,
+    detectorReplies: [
+      recordReply({ source: card, block: "c-spec", evidence: ["comment:cm-1"], replacement: "Buttons use the secondary style." }),
+    ],
+    now: at(29, 22),
+  });
+
+  await runSweepJob(CARDS, h.deps);
+  const prompt = String((h.provider.generated[0] as { prompt: string }).prompt);
+  assert.match(prompt, /comment:cm-1 · Decided in crit/);
+  assert.doesNotMatch(prompt, /An old thought|uno-bot's own note/);
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1);
+  assert.equal(h.posted[0]!.channel, UNIVERSAL);
+  assert.match(h.posted[0]!.text, /<@U0CY>/);
+  assert.match(h.posted[0]!.text, /card says/);
+});
+
+test("a thread's answer no page holds becomes a card in that thread naming the page, the section and the text", async () => {
+  const training = notionPage("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", {
+    title: "Tutor Training PRD",
+    blocks: [
+      { id: "h-setup", lastEditedTime: OLD, text: "Session setup", type: "heading_2" },
+      { id: "b-setup-1", lastEditedTime: OLD, text: "Each session opens with a check-in." },
+      { id: "h-pay", lastEditedTime: OLD, text: "Payments", type: "heading_2" },
+      { id: "b-pay-1", lastEditedTime: OLD, text: "Tutors are paid per session." },
+    ],
+  });
+  const root = msg("U0ASK", ts(29, 15), "What's the tutor to student ratio for training sessions?", {
+    reply_count: 1,
+    latest_reply: ts(29, 16),
+  });
+  const answer = msg("U0ANS", ts(29, 16), "1 tutor to 4–5 students, we settled it last week.", { thread_ts: root.ts });
+  const h = sweepHarness({
+    channels: { [DESIGN]: { kind: "public", history: [root], threads: { [root.ts]: [root, answer] } } },
+    sources: [training],
+    capture: true,
+    search: {
+      "tutor student ratio training session": [{ url: training.url, title: training.title, kind: "notion" }],
+    },
+    detectorReplies: [
+      JSON.stringify({
+        answers: [
+          {
+            question_ts: root.ts,
+            answer_ts: [answer.ts],
+            answered_by: "U0ANS",
+            documented: false,
+            source_url: training.url,
+            section_block_id: "h-setup",
+            new_section: null,
+            text: "Ratio is 1 tutor to 4–5 students.",
+            confidence: 0.9,
+          },
+        ],
+      }),
+    ],
+    now: at(29, 22),
+  });
+
+  await runSweepJob(END_OF_DAY, h.deps);
+  assert.equal(h.provider.generated.length, 1, "no page was pointed at, so only the answer is asked about");
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1);
+  const [card] = h.posted;
+  assert.equal(card!.channel, DESIGN);
+  assert.equal(card!.threadTs, root.ts, "in the source thread");
+  assert.match(card!.text, /<@U0ANS>/, "mentions whoever answered");
+  assert.doesNotMatch(card!.text, /<@U0ASK>/);
+  assert.match(card!.text, /add under .*Tutor Training PRD.* › \*Session setup\*/);
+  assert.match(card!.text, /Ratio is 1 tutor to 4–5 students\./);
+  assert.ok(card!.text.includes(FOUND_BY_SEARCH), "a page found by search says so");
+  const op = h.staged[0]!.operations![0]!;
+  assert.equal(op.toolName, "notion_update", "a proposal card that writes the text — never an intake");
+  assert.deepEqual(op.input.insert, [
+    { after_block_id: "b-setup-1", last_edited_time: OLD, content: "Ratio is 1 tutor to 4–5 students." },
+  ]);
+  assert.deepEqual(h.staged[0]!.confirmers, ["U0ANS", "U0ASK"], "the owner and everyone who posted");
+
+  // ✅ ran it: the added answer's item is confirmed, found by the block it follows.
+  const updated = await recordSweepResolution(
+    h.store,
+    h.staged[0]!,
+    [{ toolName: op.toolName, input: op.input, ok: true, result: "{\"ok\":true}" } as never],
+    at(30, 15),
+  );
+  assert.equal(updated, 1);
+  assert.deepEqual(h.store.items().map((i) => [i.blockId, i.status]), [["b-setup-1", "confirmed"]]);
+});
+
+test("a note of discussion with no decision produces nothing", async () => {
+  const note = notePage([
+    { id: "n-1", lastEditedTime: TONIGHT, text: "Launch: Oct 15 vs Nov 1? Pros and cons.", links: [PRD.url] },
+    { id: "n-2", lastEditedTime: TONIGHT, text: "AI: Ade to check eng capacity." },
+  ]);
+  const h = sweepHarness({
+    channels: quiet,
+    sources: [PRD, note],
+    capture: true,
+    notion: { notes: [noteRow()] },
+    people: PEOPLE,
+    detectorReplies: [JSON.stringify({ findings: [] })],
+    now: at(29, 22),
+  });
+
+  const night = await runSweepJob(NOTES, h.deps);
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(night.findings.length, 0);
+  assert.deepEqual(h.posted, []);
+  assert.deepEqual(h.staged, []);
+});
+
+test("private and 1:1 pages are never read as notes, and the cursor still moves past them", async () => {
+  const rows = [
+    noteRow({ id: "11111111111111111111111111111111", url: "https://www.notion.so/11111111111111111111111111111111", parentDatabaseId: null, lastEditedTime: "2026-09-29T18:00:00.000Z" }),
+    noteRow({ id: "22222222222222222222222222222222", url: "https://www.notion.so/22222222222222222222222222222222", parentDatabaseId: "ffffffffffffffffffffffffffffffff", lastEditedTime: "2026-09-29T18:30:00.000Z" }),
+    noteRow({ id: "33333333333333333333333333333333", url: "https://www.notion.so/33333333333333333333333333333333", title: "Ade / Bea 1:1", lastEditedTime: "2026-09-29T19:00:00.000Z" }),
+    noteRow({ id: "44444444444444444444444444444444", url: "https://www.notion.so/44444444444444444444444444444444", properties: { Type: "1-on-1" }, lastEditedTime: TONIGHT }),
+  ];
+  const h = sweepHarness({ channels: quiet, capture: true, notion: { notes: rows }, now: at(29, 22) });
+
+  const night = await runSweepJob(NOTES, h.deps);
+
+  assert.deepEqual(h.sourceReads, [], "no page outside the team notes is opened");
+  assert.equal(h.provider.generated.length, 0);
+  assert.equal(night.threads, 0);
+  assert.equal(await h.store.cursor("notion:running-notes"), TONIGHT);
+  assert.equal(isTeamNote(noteRow({ parentDatabaseId: "3ee43141-b0ce-4517-badc-cb52a7b97bdb".replace(/-/g, "") }), "3ee43141-b0ce-4517-badc-cb52a7b97bdb"), true);
+});
+
+test("a name nobody linked resolves above the floor, and the card says it was found by search", async () => {
+  const booking = notionPage("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", { title: "Booking Flow PRD" });
+  const root = msg("U0STARTER", ts(29, 15), "Launch moves to Nov 1 — can someone fix the booking PRD", {
+    reply_count: 1,
+    latest_reply: ts(29, 16),
+  });
+  const agreed = msg("U0ADE", ts(29, 16), "Agreed, Nov 1. I'll own it.", { thread_ts: root.ts });
+  const channels = { [DESIGN]: { kind: "public" as const, history: [root], threads: { [root.ts]: [root, agreed] } } };
+  const h = sweepHarness({
+    channels,
+    sources: [booking],
+    search: { "booking PRD": [{ url: booking.url, title: booking.title, kind: "notion" }] },
+    detectorReplies: [reply(drift({ source: booking, evidence: [agreed.ts], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+
+  const night = await runSweepJob(END_OF_DAY, h.deps);
+  assert.equal(night.findings[0]?.target.foundBy, "search");
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.ok(h.posted[0]!.text.includes(FOUND_BY_SEARCH));
+  assert.deepEqual(h.searches, ["notion booking PRD"]);
+});
+
+test("below the floor, a search keeps nothing: no page is read, no model is asked, no item is made", async () => {
+  const root = msg("U0STARTER", ts(29, 15), "Launch moves to Nov 1 — can someone fix the booking PRD", {
+    reply_count: 1,
+    latest_reply: ts(29, 16),
+  });
+  const agreed = msg("U0ADE", ts(29, 16), "Agreed.", { thread_ts: root.ts });
+  const h = sweepHarness({
+    channels: { [DESIGN]: { kind: "public", history: [root], threads: { [root.ts]: [root, agreed] } } },
+    search: { "booking PRD": [{ url: "https://www.notion.so/99999999999999999999999999999999", title: "Tutor Onboarding", kind: "notion" }] },
+    now: at(29, 22),
+  });
+
+  const night = await runSweepJob(END_OF_DAY, h.deps);
+
+  assert.equal(night.findings.length, 0);
+  assert.deepEqual(h.sourceReads, []);
+  assert.equal(h.provider.generated.length, 0);
+  assert.deepEqual(h.searches, ["notion booking PRD", "github booking PRD"], "GitHub only once Notion had nothing");
+});
+
+test("what one note costs: one edited-since read for the job, then the note, the page it links and one model call", async () => {
+  const note = notePage([{ id: "n-dec", lastEditedTime: TONIGHT, text: "Decided: launch moves to Nov 1.", links: [PRD.url] }]);
+  const h = sweepHarness({
+    channels: quiet,
+    sources: [PRD, note],
+    capture: true,
+    notion: { notes: [noteRow()] },
+    people: PEOPLE,
+    detectorReplies: [recordReply({ source: PRD, block: PRD.blocks[0]!.id, evidence: ["n-dec"] })],
+    now: at(29, 22),
+  });
+  await runSweepJob(NOTES, h.deps);
+  // A page read is a page GET and one blocks page (more for a long page): the
+  // job's Notion and model spend is 1 + 2 × 2 + 1 = 6 subrequests here.
+  assert.deepEqual(h.sourceReads, [NOTE_URL, PRD.url]);
+  assert.equal(h.provider.generated.length, 1);
+  assert.deepEqual(h.searches, []);
+});

@@ -543,6 +543,16 @@ export function operationKinds(
     ? (op.input.replace.filter((r) => r && typeof r === "object") as Record<string, unknown>[])
     : [];
   if (replaces.length) kinds.push({ label: "replace in place", details: replaces.map(replaceGist) });
+  // The sweep's added answers: new text after a named block, nothing replaced.
+  const inserts = Array.isArray(op.input.insert)
+    ? (op.input.insert.filter((r) => r && typeof r === "object") as Record<string, unknown>[])
+    : [];
+  if (inserts.length) {
+    kinds.push({
+      label: "add after a block",
+      details: inserts.map((r) => `_${firstLine(String(r.content ?? "").replace(/^#+\s*/, ""))}_`),
+    });
+  }
   const append = appendDetail(op.input.append);
   if (append) kinds.push({ label: "append", details: [append] });
   return kinds.length ? kinds : [{ label: kind, details: [] }];

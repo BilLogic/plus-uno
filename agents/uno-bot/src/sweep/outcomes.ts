@@ -30,14 +30,23 @@ import type { OperationOutcome } from "../gate/index";
 import { proposalOperations, type PendingProposal, type ProposalOperation } from "../thread-state/index";
 import type { SweepItemStatus, SweepRecords } from "./store";
 
-/** The block id an item's operation replaces, or null for any other op. */
+/** The block id an item's operation replaces — or, for an added answer, the
+ *  block it goes in after — or null for any other op. */
 export function replacedBlockOf(operation: Pick<ProposalOperation, "toolName" | "input">): string | null {
   if (operation.toolName !== "notion_update") return null;
   const replace = operation.input.replace;
-  if (!Array.isArray(replace) || replace.length !== 1) return null;
-  const entry = replace[0] as Record<string, unknown> | undefined;
-  const id = entry?.block_id ?? entry?.blockId;
-  return typeof id === "string" && id ? id : null;
+  if (Array.isArray(replace) && replace.length === 1) {
+    const entry = replace[0] as Record<string, unknown> | undefined;
+    const id = entry?.block_id ?? entry?.blockId;
+    return typeof id === "string" && id ? id : null;
+  }
+  const insert = operation.input.insert;
+  if (!replace && Array.isArray(insert) && insert.length === 1) {
+    const entry = insert[0] as Record<string, unknown> | undefined;
+    const id = entry?.after_block_id ?? entry?.afterBlockId;
+    return typeof id === "string" && id ? id : null;
+  }
+  return null;
 }
 
 /**

@@ -25,6 +25,10 @@ export const FIRST_ASK_RESOLUTION_KEY = "ask-resolution-1";
 /** The end-of-day job that sweeps every group DM uno-bot is in. */
 export const GROUP_DM_SWEEP_KEY = "sweep:group-dms";
 
+/** The end-of-day jobs that read the running notes and the Roadmap cards. */
+export const NOTES_SWEEP_KEY = "sweep:notes";
+export const CARDS_SWEEP_KEY = "sweep:cards";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -39,10 +43,11 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * that records how each ask was resolved (src/usage/resolution-pass.ts).
  * The end-of-day `proposal-expiry` records every card that aged out untouched
  * (src/usage/proposal-events.ts).
- * The sweep's three: one end-of-day `sweep-channel` job per swept channel reads
+ * The sweep's five: one end-of-day `sweep-channel` job per swept channel reads
  * the day and keeps its drift findings, one `sweep-group-dms` job does the
- * same for every group DM uno-bot is in, and the morning `sweep-post` stages
- * them as proposal cards (src/sweep/).
+ * same for every group DM uno-bot is in, `sweep-notes` and `sweep-cards` read
+ * the running notes and Roadmap cards edited that day for recorded decisions,
+ * and the morning `sweep-post` stages them as proposal cards (src/sweep/).
  * The weekly DS precedence check's two: Friday's end-of-day check, and the morning
  * post that opens its thread in #plus-universal (src/ds-precedence/).
  * The morning `commitment-nudge` reminds each promiser whose commitment is due,
@@ -59,6 +64,8 @@ export type ScheduledJobKind =
   | "proposal-expiry"
   | "sweep-channel"
   | "sweep-group-dms"
+  | "sweep-notes"
+  | "sweep-cards"
   | "sweep-post"
   | "ds-precedence-check"
   | "ds-precedence-post"
@@ -170,8 +177,10 @@ export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as con
  * jobs on a Tuesday; the date stays `at`'s. The weekday filter covers every
  * job, the spread-in batches and the sweep jobs included. The end-of-day run
  * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
- * `sweep:<channel>`, then one `sweep-group-dms` job, keyed `sweep:group-dms`
- * — only while the sweep is on at all, so a blank list still sweeps nothing.
+ * `sweep:<channel>`, then one `sweep-group-dms` job, keyed `sweep:group-dms`,
+ * then the running-notes and Roadmap-card jobs, keyed `sweep:notes` and
+ * `sweep:cards` — only while the sweep is on at all, so a blank list still
+ * sweeps nothing.
  *
  * @param name - Which run
  * @param at - When it fires, epoch ms
@@ -189,6 +198,8 @@ export function planRun(
       ? [
           ...sweepChannels.map((channel): ScheduledJob => ({ key: `sweep:${channel}`, kind: "sweep-channel", channel })),
           { key: GROUP_DM_SWEEP_KEY, kind: "sweep-group-dms" },
+          { key: NOTES_SWEEP_KEY, kind: "sweep-notes" },
+          { key: CARDS_SWEEP_KEY, kind: "sweep-cards" },
         ]
       : [];
   // The sweep jobs go before the purge, which stays last in every run.
