@@ -23,6 +23,9 @@ export default {
     title: 'Components/Status and loading/Status',
     component: Status,
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'deprecated', summary: '`style` started accepting `positive`, `negative` and `information` as deprecated aliases for `success`, `danger` and `info`, rendering the same and warning in development.' },
+        ],
         docs: {
             description: {
                 component:
@@ -483,6 +486,60 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(unknownType).backgroundColor).toBe(token('--color-success-state-08'));
         await expect(innerBorder(unknownType)).toBe(token('--color-success-state-16'));
         await expect(iconIn(unknownType), 'a state has no date icon').toBeNull();
+    } finally {
+        warn.mockRestore();
+    }
+};
+
+/**
+ * The old names keep working. `positive`, `negative` and `information` are
+ * the names Badge variants used, and each renders exactly as the library word
+ * that replaced it, on a state and on a date, with a development warning that
+ * names the replacement. The Statuses mount on a button press after the
+ * console is watched.
+ */
+export const DeprecatedStyleNames = () => {
+    const [mounted, setMounted] = useState(false);
+    return (
+        <div style={grid}>
+            <button type="button" onClick={() => setMounted(true)}>Mount the old names</button>
+            <div style={row}>
+                <Status style="success" data-testid="success">Completed</Status>
+                <Status style="danger" data-testid="danger">Overdue</Status>
+                <Status style="info" data-testid="info">In progress</Status>
+                <Status type="date" style="danger" data-testid="date-danger">Due Oct 14</Status>
+            </div>
+            {mounted && (
+                <div style={row}>
+                    <Status style="positive" data-testid="positive">Completed</Status>
+                    <Status style="negative" data-testid="negative">Overdue</Status>
+                    <Status style="information" data-testid="information">In progress</Status>
+                    <Status type="date" style="negative" data-testid="date-negative">Due Oct 14</Status>
+                </div>
+            )}
+        </div>
+    );
+};
+DeprecatedStyleNames.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+        await userEvent.click(canvas.getByRole('button', { name: 'Mount the old names' }));
+        const pairs = [['positive', 'success'], ['negative', 'danger'], ['information', 'info'], ['date-negative', 'date-danger']];
+        for (const [old, current] of pairs) {
+            const a = getComputedStyle(canvas.getByTestId(old));
+            const b = getComputedStyle(canvas.getByTestId(current));
+            await expect(a.backgroundColor, `${old} fills as ${current}`).toBe(b.backgroundColor);
+            await expect(a.color, `${old} reads as ${current}`).toBe(b.color);
+            await expect(a.boxShadow, `${old} is edged as ${current}`).toBe(b.boxShadow);
+            await expect(a.borderTopColor, `${old} is outlined as ${current}`).toBe(b.borderTopColor);
+        }
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="positive" is deprecated; use style="success"'));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="negative" is deprecated; use style="danger"'));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="information" is deprecated; use style="info"'));
+        // An alias is not an unknown value: it never falls back to neutral.
+        const messages = warn.mock.calls.map(([m]) => String(m));
+        await expect(messages.some((m) => m.includes('falls back to neutral'))).toBe(false);
     } finally {
         warn.mockRestore();
     }

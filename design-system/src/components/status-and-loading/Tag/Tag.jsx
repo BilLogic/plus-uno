@@ -73,8 +73,34 @@ export const TAG_VARIANTS = ['read-only', 'dismissible', 'selectable', 'operatio
 /** Deprecated names, still accepted, and what each one now means. */
 const DEPRECATED_COLORS = { orange: 'yellow' };
 
-/** Every name `color` accepts: the seven, then the deprecated aliases. */
-const ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange'];
+/**
+ * Every name `color` accepts: the seven, then the deprecated aliases. A
+ * literal, because the docs generator reads the values from source.
+ */
+export const TAG_ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange'];
+
+/**
+ * The color a name draws, or `null` when Tag does not know it. A deprecated
+ * alias resolves to its replacement, and `deprecated` says so, so a container
+ * can decide whether to pass the old name through for Tag to warn about.
+ */
+export const resolveTagColor = (color) => {
+    if (Object.hasOwn(DEPRECATED_COLORS, color)) return { color: DEPRECATED_COLORS[color], deprecated: true };
+    return TAG_COLORS.includes(color) ? { color, deprecated: false } : null;
+};
+
+/**
+ * Each curriculum hue, by its token name, and the Tag color that borrows it.
+ * The one place a SMART area or a curriculum Badge style finds its Tag color;
+ * the stylesheet's map of color to token is the same pairing read the other way.
+ */
+export const TAG_COLOR_OF_CURRICULUM = Object.freeze({
+    'social-emotional': 'yellow',
+    'mastering-content': 'purple',
+    advocacy: 'green',
+    relationship: 'magenta',
+    'technology-tools': 'blue',
+});
 
 /*
  * `operational` has no place in the new set: a tag that performs an action
@@ -222,10 +248,11 @@ export const Tag = ({
     // tooltip on every tag would repeat what most of them already show.
     const truncated = useIsTruncated(labelRef, [label, maxWidth]);
 
+    const colorEntry = resolveTagColor(color);
     let resolvedColor = color;
-    if (DEPRECATED_COLORS[resolvedColor]) {
-        warn(`[Tag] color="${resolvedColor}" is deprecated; use "${DEPRECATED_COLORS[resolvedColor]}".`);
-        resolvedColor = DEPRECATED_COLORS[resolvedColor];
+    if (colorEntry?.deprecated) {
+        resolvedColor = colorEntry.color;
+        warn(`[Tag] color="${color}" is deprecated; use "${resolvedColor}".`);
     }
 
     if (!behavior && variant) {
@@ -488,7 +515,7 @@ Tag.propTypes = {
     /** Deprecated: use `behavior`. `dismissible` is `removable`. `operational` still renders a plain button but warns: use `behavior="selectable"` with `aria-expanded`. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
     /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. */
-    color: PropTypes.oneOf(ACCEPTED_COLORS),
+    color: PropTypes.oneOf(TAG_ACCEPTED_COLORS),
     /** What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. */
     type: PropTypes.oneOf(TAG_TYPES),
     /** The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. */

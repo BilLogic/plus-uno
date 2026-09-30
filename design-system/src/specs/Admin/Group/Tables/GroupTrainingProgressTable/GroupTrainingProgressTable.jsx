@@ -231,10 +231,7 @@ const GroupTrainingProgressTable = ({
                                     className={`fas ${isExpanded ? 'fa-caret-down' : 'fa-caret-right'}`}
                                     style={{ color: 'var(--color-on-surface)' }}
                                 />
-                                <StaticBadgeSmart
-                                    type={item.competencyArea}
-                                    size="b3"
-                                />
+                                <StaticBadgeSmart type={item.competencyArea} />
                             </button>
                         )}
                         {item.level === 2 && (

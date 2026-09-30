@@ -3,8 +3,6 @@
 
 # StaticBadgeSmart
 
-SMART competency area badges built on top of the Badge component. Displays competency labels with appropriate colors and icons. Types: - socio-emotional (S) - mastering-content (M) - advocacy (A) - relationships (R) - technology-tools (T)
-
 > Implemented as `SmartBadges` in the source and exported as `StaticBadgeSmart`. Import the exported name; read the source under the implementation name.
 
 **Import:** `import { StaticBadgeSmart } from '@/components';`
@@ -15,8 +13,8 @@ SMART competency area badges built on top of the Badge component. Displays compe
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `type` | enum | — | SMART competency area type |
-| `size` | enum | `'b2'` | Badge size - uses Badge component sizing |
+| `type` | enum | — | The SMART area, by its key. For the area as people write it ("Mastering Content"), use CompetencyBadge. |
+| `size` | enum | — | Deprecated and ignored: a SMART area is a Tag, which has one size (22). |
 | `id` | string | — | HTML id attribute |
 | `className` | string | `''` | Additional CSS classes |
 

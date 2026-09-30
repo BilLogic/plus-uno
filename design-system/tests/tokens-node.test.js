@@ -529,7 +529,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
     }
     expect(withAlpha).toBe(87);
-    expect(comparable).toBe(647);
+    expect(comparable).toBe(646);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
