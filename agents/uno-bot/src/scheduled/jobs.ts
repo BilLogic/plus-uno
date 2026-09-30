@@ -16,6 +16,7 @@ import { askCategoriesFor, proposalEventLogFor } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
+import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
 import {
@@ -30,9 +31,11 @@ import {
  *  budget stop is thrown through. */
 export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
 
-/** Both sweep kinds: one body, since `runSweepJob` tells them apart. */
+/** Both sweep kinds: one body, since `runSweepJob` tells them apart. The
+ *  end-of-day read hands each thread to commitment reminders too. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
-  const report = await runSweepJobOnEnv(env, job, { dryRun });
+  const onThread = job.kind === "sweep-channel" ? commitmentThreadHookFor(env, { dryRun }) : undefined;
+  const report = await runSweepJobOnEnv(env, job, { dryRun }, onThread ? { onThread } : {});
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
@@ -94,6 +97,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // disagreements for the morning (src/ds-precedence/).
   "ds-precedence-check": async (env, _job, { dryRun }) => {
     console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, { dryRun })).summary}`);
+  },
+  // Morning: each due commitment is checked for completion, then nudged in its
+  // thread (src/commitments/).
+  "commitment-nudge": async (env, job, { dryRun }) => {
+    const report = await runCommitmentNudgesOnEnv(env, job, { dryRun });
+    console.log(`[commitments] ${job.key}: ${report.summary}`);
+    return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.
   "ds-precedence-post": async (env, _job, { dryRun }) => {

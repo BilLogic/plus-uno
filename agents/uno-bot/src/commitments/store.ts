@@ -1,0 +1,124 @@
+// What commitment reminders keep between runs, behind one port with two halves
+// — the sweep's split (`sweep/store.ts`), for the same reason.
+//
+// THE RECORDS (`CommitmentRecords`) live in D1, in the usage database
+// (migrations/usage/0006_commitments.sql): one row per promise, keyed by the
+// message that made it, carrying ids, times, a state and two counts. Nothing
+// in a row is message text or a link (ADR-030): the permalink is fetched again
+// when a nudge is written, from the channel and the message ts.
+//
+// THE TEXTS (`CommitmentTexts`) hold the one piece of wording a nudge needs —
+// the detector's short summary of what was promised, never a quote — and the
+// body of each reminder uno-bot posted, so an answer can replace the legend in
+// place. Production keeps them in HARNESS_KV with an expiry past the row's
+// last possible nudge (`./env.ts`).
+//
+// Two adapters for the records: in-memory (`./in-memory.ts`) for the Node suite
+// and D1 (`./d1.ts`), held equal by one conformance suite
+// (`tests/helpers/commitment-records-conformance.ts`, again under workerd).
+//
+// PURE: no `Env`, no Workers global.
+
+/**
+ * Where a commitment is in its life.
+ *   • `open` — detected, not yet due or not yet nudged;
+ *   • `nudged` — a reminder is up and unanswered;
+ *   • `snoozed` — ⏳: due again two working days out;
+ *   • `done` — 🙌; `dropped` — 🙅; `not_promise` — 🤔;
+ *   • `auto_done` — the morning's evidence check found it done, and nothing
+ *     was sent;
+ *   • `lapsed` — its one follow-up went unanswered too.
+ */
+export type CommitmentState =
+  | "open"
+  | "nudged"
+  | "snoozed"
+  | "done"
+  | "dropped"
+  | "not_promise"
+  | "auto_done"
+  | "lapsed";
+
+/** The states the morning still acts on. */
+export const LIVE_STATES: readonly CommitmentState[] = ["open", "nudged", "snoozed"];
+
+/** What made the row: a promise read in a swept thread. */
+export type CommitmentKind = "thread_promise";
+
+/** One promise, as `commitments` holds it. */
+export interface CommitmentRecord {
+  /** `<channel>:<message ts>` — one commitment per promising message. */
+  id: string;
+  kind: CommitmentKind;
+  channel: string;
+  /** The thread its nudge replies in: the thread root, or the message itself
+   *  when it started no thread. */
+  threadTs: string;
+  /** The message that made the promise. */
+  messageTs: string;
+  promiserId: string;
+  /** Who asked for it, when someone did. */
+  requesterId: string | null;
+  /** The end of the day the promiser named, epoch ms; null when they named
+   *  none. Kept apart from `dueAt`, which a ⏳ or a nudge re-arms. */
+  deadlineAt: number | null;
+  /** When the next step is due: the nudge, the follow-up, or the lapse. */
+  dueAt: number;
+  state: CommitmentState;
+  /** Reminders posted since the last answer: 0, 1 or 2. */
+  nudges: number;
+  /** ⏳ answers so far. */
+  snoozes: number;
+  /** 0–1, the detector's. */
+  confidence: number;
+  /** When the promise was made — its message's time. */
+  promisedAt: number;
+  detectedAt: number;
+  /** The end-of-day run date that found it, `YYYY-MM-DD`. */
+  runDate: string;
+  /** The first reminder's ts, and the follow-up's: where an answer lands. */
+  nudgeTs: string | null;
+  followupTs: string | null;
+  /** The morning run date that last looked at it, so one morning's retried job
+   *  never looks twice. */
+  checkedOn: string | null;
+  resolvedAt: number | null;
+}
+
+/** A change to one commitment. */
+export type CommitmentPatch = Partial<
+  Pick<CommitmentRecord, "state" | "dueAt" | "nudges" | "snoozes" | "nudgeTs" | "followupTs" | "checkedOn" | "resolvedAt">
+>;
+
+/** The D1 half. */
+export interface CommitmentRecords {
+  /** Insert, keeping a row already there — a promise re-read tomorrow keeps
+   *  the state it has reached. */
+  addCommitments(rows: CommitmentRecord[]): Promise<void>;
+  get(id: string): Promise<CommitmentRecord | null>;
+  /** The live commitment due soonest at `now` that `runDate`'s morning has not
+   *  yet looked at, or null. */
+  nextDue(now: number, runDate: string): Promise<CommitmentRecord | null>;
+  /** The commitment a reminder with this ts belongs to — its first reminder or
+   *  its follow-up. */
+  byReminderTs(ts: string): Promise<CommitmentRecord | null>;
+  update(id: string, patch: CommitmentPatch): Promise<void>;
+}
+
+/** What one commitment's wording is, kept beside its row. */
+export interface CommitmentText {
+  /** The detector's short summary of what was promised — never a quote. */
+  what: string;
+  /** Each reminder's body as posted, by its ts, so an answer can replace the
+   *  legend and keep the rest. */
+  bodies: Record<string, string>;
+}
+
+/** The KV half. */
+export interface CommitmentTexts {
+  text(id: string): Promise<CommitmentText | null>;
+  /** Keep the wording until `until` (epoch ms), replacing what was there. */
+  saveText(id: string, text: CommitmentText, until: number): Promise<void>;
+}
+
+export type CommitmentStore = CommitmentRecords & CommitmentTexts;

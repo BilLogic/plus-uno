@@ -41,6 +41,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * them as proposal cards (src/sweep/).
  * The weekly DS precedence check's two: Friday's end-of-day check, and the morning
  * post that opens its thread in #plus-universal (src/ds-precedence/).
+ * The morning `commitment-nudge` reminds each promiser whose commitment is due,
+ * in the promise's thread (src/commitments/).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -54,7 +56,8 @@ export type ScheduledJobKind =
   | "sweep-channel"
   | "sweep-post"
   | "ds-precedence-check"
-  | "ds-precedence-post";
+  | "ds-precedence-post"
+  | "commitment-nudge";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -108,6 +111,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-track", kind: "figma-library-track" },
     { key: "sweep-post", kind: "sweep-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
+    { key: "commitment-nudge", kind: "commitment-nudge" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },

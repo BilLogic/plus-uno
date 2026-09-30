@@ -87,14 +87,48 @@ const CONTEXT_TEXT_CAP = 4_000;
  * @param env - Worker bindings
  * @param job - A `sweep-channel` or `sweep-post` job
  * @param opts - `dryRun` reads and detects, and writes, posts and stages nothing
+ * @param extra - The per-thread hook other jobs read the sweep's threads with
  */
-export async function runSweepJobOnEnv(env: Env, job: ScheduledJob, opts: { dryRun: boolean }): Promise<SweepJobReport | { summary: string }> {
+export async function runSweepJobOnEnv(
+  env: Env,
+  job: ScheduledJob,
+  opts: { dryRun: boolean },
+  extra: Pick<SweepDeps, "onThread"> = {},
+): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
     // No cursor store means every run would re-read the day; nothing is safer.
     return { summary: "USAGE_DB or HARNESS_KV not bound — the sweep did nothing" };
   }
   const deps = await sweepDepsFor(env, env.USAGE_DB, env.HARNESS_KV, opts);
-  return runSweepJob(job, deps);
+  return runSweepJob(job, { ...deps, ...extra });
+}
+
+/**
+ * The sweep's Slack reads on `Env`, each measured — also what commitment
+ * reminders read a promise's thread with.
+ *
+ * @param env - Worker bindings
+ */
+export function sweepSlackFor(env: Env): SweepDeps["slack"] {
+  return {
+    async channelKind(channel) {
+      const res = await measured(() => conversationsInfo(env, channel));
+      if (!res.ok || !res.channel) return null;
+      return kindOf(res.channel);
+    },
+    async history(channel, oldest, cursor) {
+      const res = await measured(() => conversationsHistorySince(env, channel, oldest, cursor));
+      if (!res.ok) return null;
+      const next = res.response_metadata?.next_cursor;
+      return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
+    },
+    async replies(channel, rootTs, cursor) {
+      const res = await measured(() => conversationsReplies(env, channel, rootTs, 200, cursor ? { cursor } : {}));
+      if (!res.ok) return null;
+      const next = res.response_metadata?.next_cursor;
+      return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
+    },
+  };
 }
 
 async function sweepDepsFor(
@@ -109,25 +143,7 @@ async function sweepDepsFor(
   const directory = slackDirectoryFor(env);
   const bot = await measured(() => getBotIdentity(env));
   return {
-    slack: {
-      async channelKind(channel) {
-        const res = await measured(() => conversationsInfo(env, channel));
-        if (!res.ok || !res.channel) return null;
-        return kindOf(res.channel);
-      },
-      async history(channel, oldest, cursor) {
-        const res = await measured(() => conversationsHistorySince(env, channel, oldest, cursor));
-        if (!res.ok) return null;
-        const next = res.response_metadata?.next_cursor;
-        return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
-      },
-      async replies(channel, rootTs, cursor) {
-        const res = await measured(() => conversationsReplies(env, channel, rootTs, 200, cursor ? { cursor } : {}));
-        if (!res.ok) return null;
-        const next = res.response_metadata?.next_cursor;
-        return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
-      },
-    },
+    slack: sweepSlackFor(env),
     sources: { read: (url, kind) => measured(() => readSource(env, url, kind)) },
     people: {
       async slackIdFor(name) {
@@ -303,7 +319,7 @@ function tagOf(tag: CardTag, role: "card" | "plan"): SlackMessageMetadata {
 }
 
 /** A read that tripped the budget is the budget stop, whatever it returned. */
-async function measured<T>(fn: () => Promise<T>): Promise<T> {
+export async function measured<T>(fn: () => Promise<T>): Promise<T> {
   const before = subrequestBudgetTrips();
   const result = await fn();
   if (subrequestBudgetTrips() > before) throw new SubrequestBudgetError(LOOKUP_CEILING);
@@ -321,7 +337,7 @@ function kindOf(channel: { is_private?: boolean; is_im?: boolean; is_mpim?: bool
  * Notion read that fails — a 429, a 5xx, a page not shared — throws: the job
  * holds the thread rather than read "no findings" off a page it never saw.
  */
-async function readSource(env: Env, url: string, kind: TargetKind): Promise<SweepSource | null> {
+export async function readSource(env: Env, url: string, kind: TargetKind): Promise<SweepSource | null> {
   if (kind === "notion") {
     const pageId = parseNotionPageId(url);
     if (!pageId) return null;
