@@ -89,6 +89,14 @@ export interface SweepSource {
   /** `search` when nobody linked it and a search found it (`./search.ts`);
    *  absent for a linked source. */
   foundBy?: "search";
+  /** Notion only: the database the page is a row of, dashes removed, or null
+   *  for a page that is none's — what `./surfaces.ts` reads. */
+  parentDatabaseId?: string | null;
+  /** Notion only: select, multi-select and status values by property name. */
+  properties?: Record<string, string>;
+  /** Notion only: the page runs past the blocks read, so its last block read
+   *  is not its end. */
+  truncated?: boolean;
 }
 
 /** The target a finding is about. */

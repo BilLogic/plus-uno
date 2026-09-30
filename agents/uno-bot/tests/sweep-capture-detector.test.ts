@@ -107,6 +107,35 @@ test("an answer the thread never gave, a heading that is not one, or both places
   assert.equal(named[0]?.section, "Session setup", "a new section named like a heading goes under that heading");
 });
 
+test("on a page longer than the read, an answer with no known end to go after is dropped", () => {
+  const thread = threadOf(training.thread!);
+  const long: SweepSource = { ...training.sources[0]!, truncated: true };
+  const parse = (over: Record<string, unknown>) =>
+    parseAnswerReply(
+      JSON.stringify({
+        answers: [
+          {
+            question_ts: training.thread![0]!.ts,
+            answer_ts: [training.thread![1]!.ts],
+            answered_by: "U0ANS",
+            documented: false,
+            source_url: long.url,
+            text: "Ratio is 1 tutor to 4–5 students.",
+            confidence: 0.9,
+            section_block_id: null,
+            new_section: null,
+            ...over,
+          },
+        ],
+      }),
+      thread,
+      [long],
+    );
+  assert.equal(parse({ new_section: "Accessibility" }).length, 0, "the page's end is not known");
+  assert.equal(parse({ section_block_id: "h-pay" }).length, 0, "the last section may run past the read");
+  assert.equal(parse({ section_block_id: "h-setup" })[0]?.anchorId, "b-setup-1", "a section that ends inside the read still has its place");
+});
+
 test("a card's own entries are never the blocks its fix rewrites", () => {
   const card: SweepSource = {
     url: "https://www.notion.so/card",

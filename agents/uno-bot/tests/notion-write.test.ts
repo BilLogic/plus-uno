@@ -235,6 +235,26 @@ test("a page read hands back every block's id and last-edited stamp", async () =
   assert.deepEqual(page.blocks, [
     { id: BLOCK, type: "paragraph", lastEditedTime: READ_STAMP, text: "Sync runs nightly.", plain: true, links: [], byBot: false },
   ]);
+  assert.equal(page.truncated, false);
+});
+
+test("a page longer than the read says so, so its last block read is never taken for its end", async () => {
+  const LONG = "3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b";
+  serve({
+    [`GET /pages/${LONG}`]: { body: { id: LONG, properties: {} } },
+    [`GET /blocks/${LONG}/children`]: {
+      body: {
+        has_more: true,
+        next_cursor: "more",
+        results: [{ id: "b", type: "paragraph", last_edited_time: READ_STAMP, paragraph: { rich_text: [{ plain_text: "One of many." }] } }],
+      },
+    },
+  });
+  const { readNotionPage } = await notion();
+
+  const page = await readNotionPage(ENV, LONG, { complete: true });
+
+  assert.equal(page.truncated, true);
 });
 
 // A blocks page Notion refuses — a 429, a 5xx — is not a page with no blocks.
@@ -422,12 +442,30 @@ test("an insert after a block that moved since the read is refused as stale, and
   assert.deepEqual(calls.map((c) => c.method), ["GET"]);
 });
 
-test("the edited-since read asks for rows after the cursor, oldest edit first, and keeps each row's own parent", async () => {
+test("an insert after a block on another page is refused, and nothing is written", async () => {
+  serve({
+    [`GET /blocks/${BLOCK}`]: {
+      body: { id: BLOCK, last_edited_time: READ_STAMP, parent: { type: "page_id", page_id: "4c4c4c4c-4c4c-4c4c-4c4c-4c4c4c4c4c4c" } },
+    },
+  });
+  const { notionUpdate } = await notion();
+
+  const r = await notionUpdate(ENV, PAGE, {
+    insert: [{ afterBlockId: BLOCK, lastEditedTime: READ_STAMP, content: "Ratio is 1 tutor to 4–5 students." }],
+  });
+
+  assert.equal(r.inserted, 0);
+  assert.match(r.refused[0]!, /not on this page/);
+  assert.deepEqual(calls.map((c) => c.method), ["GET"]);
+});
+
+test("the edited-since read asks for rows at or after the cursor, a page at a time, oldest edit first, and keeps each row's own parent", async () => {
   const DB = "3ee43141-b0ce-4517-badc-cb52a7b97bdb";
   serve({
     [`POST /databases/3ee43141b0ce4517badccb52a7b97bdb/query`]: {
       body: {
         has_more: true,
+        next_cursor: "cur-2",
         results: [
           {
             id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -446,14 +484,19 @@ test("the edited-since read asks for rows after the cursor, oldest edit first, a
   });
   const { queryEditedSince } = await notion();
 
-  const { rows, more } = await queryEditedSince(ENV, DB, "2026-09-28T22:00:00.000Z", 10);
+  const { rows, more, next } = await queryEditedSince(ENV, DB, "2026-09-28T22:00:00.000Z", 10);
 
   assert.equal(more, true);
+  assert.equal(next, "cur-2");
+  // At or after: Notion rounds the stamp to the minute, so the cursor's own
+  // minute is read again and the caller passes over what it handled.
   assert.deepEqual(calls[0]!.body, {
     page_size: 10,
-    filter: { timestamp: "last_edited_time", last_edited_time: { after: "2026-09-28T22:00:00.000Z" } },
+    filter: { timestamp: "last_edited_time", last_edited_time: { on_or_after: "2026-09-28T22:00:00.000Z" } },
     sorts: [{ timestamp: "last_edited_time", direction: "ascending" }],
   });
+  await queryEditedSince(ENV, DB, "2026-09-28T22:00:00.000Z", 10, "cur-2");
+  assert.equal(calls[1]!.body!.start_cursor, "cur-2", "the next page starts where the last one ended");
   assert.deepEqual(rows, [
     {
       id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",

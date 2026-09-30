@@ -106,7 +106,15 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
-import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick, sweepTag } from "../sweep/cards";
+import {
+  asSweepRevision,
+  holdsInsert,
+  INSERT_CARD_REFUSAL,
+  replacedBlocks,
+  sweepCardInstruction,
+  sweepCardPick,
+  sweepTag,
+} from "../sweep/cards";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
@@ -1297,6 +1305,15 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     await delivery.postNote(refusal, replaced.sweepRun ? sweepTag("note") : undefined);
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+
+  // A sweep card that adds an answer is revised by `drop N` alone: the model
+  // has no `insert` to restage it with, so a worded revision would lose the
+  // added text rather than keep it byte for byte.
+  if (replaced?.sweepRun && holdsInsert(proposalOperations(replaced))) {
+    await delivery.postNote(INSERT_CARD_REFUSAL, sweepTag("note"));
+    await memory.remember(INSERT_CARD_REFUSAL);
+    return { disposition: "asked", posted: INSERT_CARD_REFUSAL, wrote: memory.wrote(), telemetry };
   }
 
   // A sweep card's revision drops fixes and does nothing else: each of its

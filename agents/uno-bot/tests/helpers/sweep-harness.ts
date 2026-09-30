@@ -55,6 +55,8 @@ export function notionPage(id: string, over: Partial<SweepSource> = {}): SweepSo
     text: "Launch date: October 15\nOwner: design team",
     pillars: [],
     contributors: [],
+    // A standalone page: no database's row.
+    parentDatabaseId: null,
     ...over,
   };
 }
@@ -167,7 +169,13 @@ export function sweepHarness(opts: {
   capture?: boolean;
   /** The running-notes and Roadmap rows edited since any cursor, and each
    *  card's comments by page id. Unset, those reads are not wired. */
-  notion?: { notes?: EditedRecordRow[]; cards?: EditedRecordRow[]; comments?: Record<string, RecordComment[]> };
+  notion?: {
+    notes?: EditedRecordRow[];
+    cards?: EditedRecordRow[];
+    comments?: Record<string, RecordComment[]>;
+    /** Rows per query page; 25 unless set. */
+    pageSize?: number;
+  };
 }): SweepHarness {
   const clock = { now: opts.now };
   const store = opts.store ?? createInMemorySweepStore();
@@ -288,9 +296,16 @@ export function sweepHarness(opts: {
     ...(opts.notion
       ? {
           notion: {
-            async edited(databaseId: string, since: string) {
-              const rows = databaseId === NOTES_DB ? (opts.notion!.notes ?? []) : (opts.notion!.cards ?? []);
-              return { rows: rows.filter((r) => r.lastEditedTime > since), more: false };
+            // Notion's own shape: rows at or after the cursor, oldest edit
+            // first, one page at a time, `next` naming where the next starts.
+            async edited(databaseId: string, since: string, after?: string) {
+              const all = (databaseId === NOTES_DB ? (opts.notion!.notes ?? []) : (opts.notion!.cards ?? []))
+                .filter((r) => r.lastEditedTime >= since)
+                .sort((a, b) => a.lastEditedTime.localeCompare(b.lastEditedTime));
+              const size = opts.notion!.pageSize ?? 25;
+              const from = after ? Number(after) : 0;
+              const more = from + size < all.length;
+              return { rows: all.slice(from, from + size), more, next: more ? String(from + size) : null };
             },
             async comments(pageId: string) {
               return opts.notion!.comments?.[pageId] ?? [];
@@ -359,6 +374,7 @@ export function sweepHarness(opts: {
       botUserId: BOT,
       runningNotesDb: NOTES_DB,
       roadmapDb: ROADMAP_DB,
+      teamSurfaceDbs: [ROADMAP_DB],
       ...(opts.privateAllowlist ? { privateAllowlist: opts.privateAllowlist } : {}),
     },
     meter: { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ ...headroom }) },

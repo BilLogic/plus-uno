@@ -11,18 +11,28 @@
 // WHAT IS KEPT. Only the top hit, and only when it clears `MATCH_FLOOR`
 // (`bestHit`). The score is the overlap coefficient of the two word sets — the
 // share of the SMALLER set found in the other — with stop words and document
-// nouns left out, so "booking PRD" matches "Booking Flow PRD" and a question
-// about tutor ratios in training sessions matches "Tutor Training PRD". Two
-// shared words are needed whenever both sides have two or more, so one common
-// word ("tutor") never carries a match on its own. A source found this way is
+// nouns left out, so "booking flow PRD" matches "Booking Flow PRD" and a
+// question about tutor ratios in training sessions matches "Tutor Training
+// PRD". Two shared content words are needed, always, so one word ("booking",
+// "tutor") never carries a match on its own — and a name with fewer than two
+// content words ("the booking PRD") is not searched for at all. A source found
+// this way is
 // marked `foundBy: "search"`, and the card says so, so a confirmer can reject a
 // wrong target with one reply.
 //
 // Notion first: it is the one estate uno-bot writes. GitHub is searched only
 // when Notion has no hit above the floor, and a GitHub hit is read-only context.
 //
+// A SEARCH THAT FAILS FINDS NOTHING. A 403, a secondary rate limit, a missing
+// scope or a dropped connection reads as no hit, so one estate's trouble never
+// holds a thread or stops a channel's night. A budget stop still throws.
+//
+// WHERE A HIT MAY COME FROM is the caller's to decide (`./surfaces.ts`): a hit
+// outside the team's surfaces is dropped before it is read.
+//
 // PURE: the searches are a port (`SourceSearch`), bound in `./env.ts`.
 
+import { rethrowIfBudget } from "../net";
 import type { SweepMessage, TargetKind } from "./finding";
 
 /** A hit's score must reach this to be kept. */
@@ -36,6 +46,9 @@ export interface SearchHit {
   url: string;
   title: string;
   kind: TargetKind;
+  /** The database a Notion hit is a row of, dashes removed; null for a page
+   *  that is no database's row. Absent for a GitHub hit. */
+  parentDatabaseId?: string | null;
 }
 
 /** The searches, with the bot's own credentials. Each call is one
@@ -80,8 +93,8 @@ const NAMED =
 
 /**
  * The documents a thread names without linking, each once, in order: "the
- * booking PRD" → `booking PRD`. A name that is only a document noun ("the
- * doc") names nothing.
+ * booking flow PRD" → `booking flow PRD`. A name with fewer than two content
+ * words ("the doc", "the booking PRD") names nothing a search could match.
  *
  * @param texts - The messages' text
  */
@@ -92,7 +105,7 @@ export function namedThings(texts: readonly string[]): string[] {
     const bare = text.replace(/<[^>]*>/g, " ");
     for (const m of bare.matchAll(NAMED)) {
       const name = m[1]!.replace(/\s+/g, " ").trim();
-      if (!words(name).length) continue;
+      if (words(name).length < 2) continue;
       if (!out.some((n) => n.toLowerCase() === name.toLowerCase())) out.push(name);
     }
   }
@@ -128,8 +141,7 @@ export function looksAnswered(messages: readonly SweepMessage[]): boolean {
 
 /**
  * How well a title matches a query, 0–1: the overlap coefficient of their
- * content words, or 0 when the overlap is thinner than two words while both
- * sides have two or more.
+ * content words, or 0 when they share fewer than two.
  *
  * @param query - What was searched for
  * @param title - A hit's title (for a file, its path)
@@ -140,7 +152,7 @@ export function matchScore(query: string, title: string): number {
   if (!q.size || !t.size) return 0;
   let shared = 0;
   for (const w of q) if (t.has(w)) shared += 1;
-  if (shared < Math.min(2, q.size, t.size)) return 0;
+  if (shared < 2) return 0;
   return shared / Math.min(q.size, t.size);
 }
 
@@ -168,22 +180,38 @@ export function bestHit(query: string, hits: readonly SearchHit[]): SearchHit | 
  * @param search - The searches
  * @param queries - What to search for, at most `MAX_SEARCHES_PER_UNIT` used
  * @param known - URLs the unit already has
+ * @param allowed - Whether a hit may be used at all — the team's surfaces
+ *   (`./surfaces.ts`); a hit it refuses is as if never returned
  */
 export async function findBySearch(
   search: SourceSearch,
   queries: readonly string[],
   known: ReadonlySet<string> = new Set(),
+  allowed: (hit: SearchHit) => boolean = () => true,
 ): Promise<SearchHit[]> {
   const found: SearchHit[] = [];
   const seen = new Set(known);
+  const usable = (hits: SearchHit[]) => hits.filter(allowed);
   for (const query of queries.slice(0, MAX_SEARCHES_PER_UNIT)) {
-    let hit = bestHit(query, await search.notion(query));
-    if (!hit && search.github) hit = bestHit(query, await search.github(query));
+    let hit = bestHit(query, usable(await quietly(() => search.notion(query))));
+    const github = search.github?.bind(search);
+    if (!hit && github) hit = bestHit(query, usable(await quietly(() => github(query))));
     if (!hit || seen.has(hit.url)) continue;
     seen.add(hit.url);
     found.push(hit);
   }
   return found;
+}
+
+/** A search's hits, or none when it failed — never a budget stop. */
+async function quietly(run: () => Promise<SearchHit[]>): Promise<SearchHit[]> {
+  try {
+    return await run();
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[sweep] a search failed and reads as no hit (${err instanceof Error ? err.message : String(err)})`);
+    return [];
+  }
 }
 
 /** Content words, lowercased, singular-ish: no stop words, no document nouns. */

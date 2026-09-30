@@ -285,7 +285,9 @@ function offeredFor(source: SweepSource, record: SweepRecord): SweepBlock[] {
 /**
  * Where an answer goes: after the last block of the named heading's section,
  * or after the page's last block for a new section. A new section named like
- * an existing heading goes under that heading instead.
+ * an existing heading goes under that heading instead. On a page longer than
+ * the read, the end is not known: neither a new section nor a section that
+ * runs past the last block read has a place, and the answer is dropped.
  */
 function placeFor(
   source: SweepSource,
@@ -300,7 +302,7 @@ function placeFor(
     at = blocks.findIndex((b) => isHeading(b) && flat(b.text) === flat(newSection));
     if (at < 0) {
       const last = blocks.at(-1);
-      if (!last?.lastEditedTime) return null;
+      if (source.truncated || !last?.lastEditedTime) return null;
       return { anchorId: last.id, anchorEditedTime: last.lastEditedTime, section: null, newSection };
     }
   }
@@ -314,7 +316,7 @@ function placeFor(
     end = i;
   }
   const anchor = blocks[end]!;
-  if (!anchor.lastEditedTime) return null;
+  if (!anchor.lastEditedTime || (source.truncated && end === blocks.length - 1)) return null;
   return { anchorId: anchor.id, anchorEditedTime: anchor.lastEditedTime, section: heading.text.trim(), newSection: null };
 }
 

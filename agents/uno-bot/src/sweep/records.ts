@@ -4,8 +4,9 @@
 // and queues it for the morning, like a thread's drift.
 //
 // TWO END-OF-DAY JOBS, one per source, each with its own cursor in
-// `sweep_cursors` (the key names the source, the value is Notion's
-// `last_edited_time`, ISO-8601):
+// `sweep_cursors` (the key names the source; the value is Notion's
+// `last_edited_time`, ISO-8601, then `|` and the ids of the rows already
+// handled at that time — `readCursor`):
 //
 //   `sweep-notes` reads the Design Running Notes rows edited since its cursor,
 //   oldest edit first. The record is each note's blocks edited since then.
@@ -14,10 +15,17 @@
 //   then; the card itself is among the pages its fix may rewrite, never at the
 //   blocks that record the decision.
 //
-// PRIVACY. Only team-visible consensus notes are read (`isTeamNote`): a row
-// whose own parent is the running-notes database, whose title and properties
-// do not mark it a 1:1. A page found anywhere else — a search hit, a page in
-// someone's private space — is never read as a note. The note's text reaches
+// THE CURSOR'S EDGE. Notion rounds `last_edited_time` to the minute, so rows
+// edited in the cursor's own minute are read again (`on_or_after`) and the
+// ones already handled are passed over by id. When a whole query page is rows
+// already handled, the next page is read, up to `QUERY_PAGES` a job, so forty
+// rows edited in one minute are all read across two nights.
+//
+// PRIVACY. Only team-visible consensus notes are read (`isTeamNote`,
+// `./surfaces.ts`): a row whose own parent is the running-notes database, whose
+// `Note Type`, title and other select values do not mark it a 1:1. Every page
+// a record leads to is read through the same guard (`readUsable`), so a 1:1 it
+// links or a search finds is never a source either. The note's text reaches
 // the card only as the detector's one-sentence summary and a link to the
 // block, in a team channel whose members could read the note already.
 //
@@ -33,7 +41,12 @@
 // detector passes it over (`./capture-detector.ts`); there is no "note with no
 // decision" check.
 //
-// THE BUDGET. One edited-since read per job, then per record: the page read,
+// ONE ITEM PER RECORD AND PAGE. A finding's id is the record row and the page
+// it fixes, never the block the model picked, so a job retried after a stop
+// between queueing and saving the cursor queues the same decision once.
+//
+// THE BUDGET. One edited-since read per job (up to `QUERY_PAGES` when the
+// cursor's minute is crowded), then per record: the page read,
 // its comments (cards), up to `MAX_SOURCES_PER_THREAD` target reads and
 // `MAX_SEARCHES_PER_UNIT` searches, one model call. The cursor is saved after
 // each record, so a budget stop keeps what is done and the runner retries the
@@ -48,6 +61,7 @@ import type { RecordEntry, SweepRecord } from "./capture-detector";
 import { classifyLink, type SweepSource, type TargetKind } from "./finding";
 import { postableAt } from "./schedule";
 import { findBySearch, namedThings } from "./search";
+import { isTeamNote, readUsable, searchGate } from "./surfaces";
 import type { PendingFinding, SweepRunOutcome } from "./store";
 import {
   contributorsOf,
@@ -88,8 +102,13 @@ export interface RecordComment {
 
 /** The Notion reads the two jobs need, with the bot's integration. */
 export interface SweepNotion {
-  /** Rows of a database edited after `since`, oldest edit first; one read. */
-  edited(databaseId: string, since: string): Promise<{ rows: EditedRecordRow[]; more: boolean }>;
+  /** Rows of a database edited at or after `since`, oldest edit first; one
+   *  read of one query page, continued from `after` when given. */
+  edited(
+    databaseId: string,
+    since: string,
+    after?: string,
+  ): Promise<{ rows: EditedRecordRow[]; more: boolean; next: string | null }>;
   /** A page's open comments. */
   comments(pageId: string): Promise<RecordComment[]>;
 }
@@ -100,20 +119,25 @@ const SOURCES = {
   card: { cursor: "notion:roadmap-cards", queue: "cards", people: "Contributor" },
 } as const;
 
-/** What marks a running note as a 1:1 rather than a team note. */
-const ONE_ON_ONE = /\b1\s*[:/–-]\s*1\b|\b1[\s-]*on[\s-]*1\b|\bone[\s-]*on[\s-]*one\b/i;
+export { isTeamNote } from "./surfaces";
 
-/**
- * Whether a running-notes row is a team-visible consensus note — the only kind
- * the sweep reads: its own parent is the running-notes database, and neither
- * its title nor any of its select values marks it a 1:1.
- *
- * @param row - The row as the edited-since read returned it
- * @param notesDb - `NOTION_RUNNING_NOTES_DB_ID`
- */
-export function isTeamNote(row: Pick<EditedRecordRow, "parentDatabaseId" | "title" | "properties">, notesDb: string): boolean {
-  if (!row.parentDatabaseId || row.parentDatabaseId !== bare(notesDb)) return false;
-  return !ONE_ON_ONE.test(row.title) && !Object.values(row.properties).some((v) => ONE_ON_ONE.test(v));
+/** Query pages read per job, the further ones only while every row on the
+ *  page before was already handled at the cursor's minute. */
+export const QUERY_PAGES = 3;
+
+/** Row ids kept at the cursor's minute; past this the oldest drop off. */
+const EDGE_IDS = 200;
+
+/** Where a job left off: the last edit time it reached, and the rows it
+ *  handled at that time. A bare time (no `|`) reads as none handled. */
+export function readCursor(value: string): { time: string; handled: string[] } {
+  const [time, ids] = value.split("|");
+  return { time: time!, handled: ids ? ids.split(",").filter(Boolean) : [] };
+}
+
+/** The cursor's stored value. */
+export function writeCursor(time: string, handled: readonly string[]): string {
+  return handled.length ? `${time}|${handled.slice(-EDGE_IDS).join(",")}` : time;
 }
 
 /**
@@ -158,16 +182,32 @@ export async function sweepRecords(job: ScheduledJob, deps: SweepDeps): Promise<
 
   const now = deps.now();
   const runDate = new Date(now).toISOString().slice(0, 10);
-  const cursor = (await deps.store.cursor(source.cursor)) ?? new Date(now - FIRST_SWEEP_WINDOW_MS).toISOString();
+  const start = readCursor(
+    (await deps.store.cursor(source.cursor)) ?? new Date(now - FIRST_SWEEP_WINDOW_MS).toISOString(),
+  );
+  const cursor = start.time;
   const kept: PendingFinding[] = [];
   const notes: string[] = [];
   const resolved = new Map<string, string | null>();
   let read = 0;
   let reached = cursor;
+  let handled = [...start.handled];
+  const seen = new Set(start.handled);
 
   try {
-    const { rows, more } = await deps.notion.edited(db, cursor);
-    if (more) notes.push(`more rows were edited than one read holds; the rest wait for the next run`);
+    let rows: EditedRecordRow[] = [];
+    let after: string | undefined;
+    // The cursor's own minute is read again; a page holding only rows already
+    // handled there is passed over for the next.
+    for (let page = 0; page < QUERY_PAGES; page++) {
+      const got = await deps.notion.edited(db, cursor, after);
+      rows = got.rows.filter((row) => !(row.lastEditedTime === cursor && seen.has(row.id)));
+      if (rows.length || !got.more || !got.next) {
+        if (got.more) notes.push(`more rows were edited than one read holds; the rest wait for the next run`);
+        break;
+      }
+      after = got.next;
+    }
     const failing = new Set(rows.length && !deps.dryRun ? await deps.store.failingThreads(source.cursor) : []);
     for (const row of rows) {
       const allowed = kind === "note" ? isTeamNote(row, db) : row.parentDatabaseId === bare(db);
@@ -193,9 +233,10 @@ export async function sweepRecords(job: ScheduledJob, deps: SweepDeps): Promise<
           if (failing.has(row.id) && !deps.dryRun) await deps.store.clearThreadFailure(source.cursor, row.id);
         }
       }
-      if (row.lastEditedTime > reached) {
-        if (!deps.dryRun) await deps.store.saveCursor(source.cursor, row.lastEditedTime, deps.now());
+      if (row.lastEditedTime >= reached) {
+        handled = row.lastEditedTime > reached ? [row.id] : [...handled, row.id];
         reached = row.lastEditedTime;
+        if (!deps.dryRun) await deps.store.saveCursor(source.cursor, writeCursor(reached, handled), deps.now());
       }
     }
   } catch (err) {
@@ -233,16 +274,17 @@ async function sweepRecord(
   let page: SweepSource | null;
   let comments: RecordComment[] = [];
   try {
-    page = await deps.sources.read(row.url, "notion");
+    page = await readUsable(deps.sources, deps.config, row.url, "notion");
     if (page && kind === "card") comments = await deps.notion!.comments(row.id);
   } catch (err) {
     return failure(`the ${kind} could not be read`, err);
   }
   if (!page) return none;
 
-  // What the record says since the cursor — never uno-bot's own edits.
-  const blocks = page.blocks.filter((b) => b.lastEditedTime > since && !b.byBot && b.text.trim());
-  const said = comments.filter((c) => c.createdTime > since && !c.byBot && c.text.trim());
+  // What the record says since the cursor — its own minute included, since
+  // Notion rounds to it — never uno-bot's own edits.
+  const blocks = page.blocks.filter((b) => b.lastEditedTime >= since && !b.byBot && b.text.trim());
+  const said = comments.filter((c) => c.createdTime >= since && !c.byBot && c.text.trim());
   const entries: RecordEntry[] = [
     ...said.map((c) => ({ id: `comment:${c.id}`, text: c.text })),
     ...blocks.map((b) => ({ id: b.id, text: b.text })),
@@ -263,19 +305,25 @@ async function sweepRecord(
   try {
     for (const link of [...linked.filter((l) => l.kind === "notion"), ...linked.filter((l) => l.kind !== "notion")]) {
       if (sources.length >= MAX_SOURCES_PER_THREAD) break;
-      const read = await deps.sources.read(link.url, link.kind);
+      const read = await readUsable(deps.sources, deps.config, link.url, link.kind);
       if (read) sources.push(read);
     }
-    if (deps.search && sources.length < MAX_SOURCES_PER_THREAD) {
-      const known = new Set([row.url, ...linked.map((l) => l.url)]);
-      for (const hit of await findBySearch(deps.search, namedThings(entries.map((e) => e.text)), known)) {
-        if (sources.length >= MAX_SOURCES_PER_THREAD || pageIdOf(hit.url) === own) continue;
-        const read = await deps.sources.read(hit.url, hit.kind);
-        if (read) sources.push({ ...read, foundBy: "search" });
-      }
-    }
   } catch (err) {
-    return failure("a page it names could not be read", err);
+    return failure("a page it links could not be read", err);
+  }
+  // A page it names without a link: from the team's surfaces only, and a
+  // search or read that fails is no hit (`./search.ts`).
+  if (deps.search && sources.length < MAX_SOURCES_PER_THREAD) {
+    const known = new Set([row.url, ...linked.map((l) => l.url)]);
+    const hits = await findBySearch(deps.search, namedThings(entries.map((e) => e.text)), known, searchGate(deps.config));
+    for (const hit of hits) {
+      if (sources.length >= MAX_SOURCES_PER_THREAD || pageIdOf(hit.url) === own) continue;
+      const read = await readUsable(deps.sources, deps.config, hit.url, hit.kind, true).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      if (read) sources.push(read);
+    }
   }
   if (!sources.some((s) => s.writable)) return none;
 
@@ -287,6 +335,7 @@ async function sweepRecord(
   // target names no Contributor.
   const people = await contributorsOf(deps, row.people[source.people] ?? (kind === "card" ? page.contributors : []), r.resolved);
   const findings: PendingFinding[] = [];
+  const perPage = new Map<string, number>();
   let unowned = 0;
   for (const d of detected.findings) {
     const contributors = await contributorsOf(deps, d.source.contributors, r.resolved);
@@ -295,8 +344,14 @@ async function sweepRecord(
       unowned += 1;
       continue;
     }
+    // Keyed by the record and the page it fixes, not the block the model
+    // chose, so a retried job queues the same decision once (a second one on
+    // the same page from the same record takes the next number).
+    const target = pageIdOf(d.source.url);
+    const nth = (perPage.get(target) ?? 0) + 1;
+    perPage.set(target, nth);
     findings.push({
-      id: `${source.queue}:${row.id}:${d.blockId}`,
+      id: `${source.queue}:${row.id}:${target}${nth > 1 ? `:${nth}` : ""}`,
       runDate: r.runDate,
       detectedAt: r.now,
       driftAt: Math.min(...d.evidenceIds.map((id) => when.get(id) ?? r.now)),

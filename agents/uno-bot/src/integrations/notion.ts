@@ -579,6 +579,9 @@ export interface NotionPageContent {
   /** The database the page is a row of, dashes removed; null for a page that
    *  is no database's row. */
   parentDatabaseId: string | null;
+  /** More top-level blocks follow the last one read: `blocks` stops short of
+   *  the page's end. */
+  truncated: boolean;
 }
 
 export interface NotionPageBlock {
@@ -713,6 +716,7 @@ export async function readNotionPage(
     const blocks: NotionPageBlock[] = [];
     let cursor: string | undefined;
     let partial = false;
+    let truncated = false;
     for (let i = 0; i < READ_BLOCK_PAGES; i++) {
       // Keep the blocks already read; a complete read lets the fetch below
       // throw the budget's own error instead.
@@ -754,6 +758,7 @@ export async function readNotionPage(
       }
       if (!bData.has_more || !bData.next_cursor) break;
       cursor = bData.next_cursor;
+      if (i === READ_BLOCK_PAGES - 1) truncated = true;
     }
 
     const result: NotionPageContent = {
@@ -764,6 +769,7 @@ export async function readNotionPage(
       text: lines.join("\n").slice(0, READ_TEXT_CAP),
       blocks,
       parentDatabaseId: page.parent?.database_id?.replace(/-/g, "") ?? null,
+      truncated: truncated || partial,
     };
     // Cache only whole reads (never a throw or a partial one). Clear when
     // full — a long-lived isolate shouldn't grow this unbounded; simple beats
@@ -788,6 +794,9 @@ export interface NotionSearchHit {
   id: string;
   title: string;
   url: string;
+  /** The database a page hit is a row of, dashes removed; null for a page
+   *  that is none's, or for a database hit. */
+  parentDatabaseId: string | null;
 }
 
 export async function notionSearch(
@@ -817,6 +826,7 @@ export async function notionSearch(
         id?: string;
         url?: string;
         title?: NotionRichText;
+        parent?: { type?: string; database_id?: string };
         properties?: Record<string, NotionProperty>;
       }>;
       message?: string;
@@ -842,7 +852,12 @@ export async function notionSearch(
         }
       }
       const bareId = r.id.replace(/-/g, "");
-      hits.push({ id: bareId, title, url: canonicalNotionUrl(r.url, bareId) });
+      hits.push({
+        id: bareId,
+        title,
+        url: canonicalNotionUrl(r.url, bareId),
+        parentDatabaseId: r.object === "page" ? (r.parent?.database_id?.replace(/-/g, "") ?? null) : null,
+      });
     }
     return hits;
   } finally {
@@ -873,21 +888,24 @@ export interface EditedRow {
 }
 
 /**
- * The rows of one database edited after `since`, oldest edit first: one query
- * page of at most `limit`, and whether more wait past it. One subrequest.
- * Throws on failure.
+ * The rows of one database edited at or after `since` — Notion rounds the
+ * stamp to the minute, so the caller passes over what it already handled —
+ * oldest edit first: one query page of at most `limit`, whether more wait past
+ * it, and where the next page starts. One subrequest. Throws on failure.
  *
  * @param env - Carries NOTION_API_KEY
  * @param databaseId - The database to read
- * @param since - ISO-8601; rows edited at or before it are left out
+ * @param since - ISO-8601; rows edited before it are left out
  * @param limit - Rows per read, 1–100
+ * @param after - The `next` of the page before, to read the one after it
  */
 export async function queryEditedSince(
   env: Env,
   databaseId: string,
   since: string,
   limit = 25,
-): Promise<{ rows: EditedRow[]; more: boolean }> {
+  after?: string,
+): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -897,14 +915,16 @@ export async function queryEditedSince(
       headers: notionHeaders(env, { write: true }),
       body: JSON.stringify({
         page_size: Math.min(Math.max(limit, 1), 100),
-        filter: { timestamp: "last_edited_time", last_edited_time: { after: since } },
+        filter: { timestamp: "last_edited_time", last_edited_time: { on_or_after: since } },
         sorts: [{ timestamp: "last_edited_time", direction: "ascending" }],
+        ...(after ? { start_cursor: after } : {}),
       }),
       signal: controller.signal,
     });
     const data = (await res.json()) as {
       results?: Array<DbQueryRow & { last_edited_time?: string; parent?: { database_id?: string } }>;
       has_more?: boolean;
+      next_cursor?: string | null;
       message?: string;
       code?: string;
     };
@@ -934,7 +954,7 @@ export async function queryEditedSince(
         people,
       });
     }
-    return { rows, more: data.has_more === true };
+    return { rows, more: data.has_more === true, next: data.next_cursor ?? null };
   } finally {
     clearTimeout(timer);
   }
@@ -1650,6 +1670,7 @@ async function replaceBlock(
  * refusal line when something did not.
  */
 async function insertAfter(
+  pageId: string,
   op: NotionBlockInsertion,
   headers: Record<string, string>,
   signal: AbortSignal,
@@ -1672,8 +1693,12 @@ async function insertAfter(
       stale: true,
     };
   }
-  const parentId = live.parent?.page_id ?? live.parent?.block_id;
-  if (!parentId) return { inserted: 0, refusal: `after ${label} (the block reports no parent to add under)` };
+  // The anchor must sit on the page the card names, at its top level: a block
+  // id from elsewhere never carries the text to another page.
+  const parentId = live.parent?.page_id;
+  if (!parentId || parentId.replace(/-/g, "") !== pageId.replace(/-/g, "")) {
+    return { inserted: 0, refusal: `after ${label} (that block is not on this page)` };
+  }
   let placed = 0;
   let after = op.afterBlockId;
   for (const batch of chunkBlocks(rendered, MAX_BLOCKS_PER_REQUEST)) {
@@ -1771,7 +1796,7 @@ export async function notionUpdate(
         refused.push("(an insert needs a block to follow and content)");
         continue;
       }
-      const r = await insertAfter(op, headers, controller.signal);
+      const r = await insertAfter(pageId, op, headers, controller.signal);
       inserted += r.inserted;
       if (r.refusal) refused.push(r.refusal);
       if (r.stale) staleStamps++;

@@ -96,6 +96,7 @@ import {
 import { MAX_MESSAGE_CHARS, type DriftDetector } from "./detector";
 import type { CaptureDetector } from "./capture-detector";
 import { sweepRecords, type SweepNotion } from "./records";
+import { readUsable, searchGate } from "./surfaces";
 import { findBySearch, looksAnswered, namedThings, questionQuery, type SourceSearch } from "./search";
 import {
   classifyLink,
@@ -247,6 +248,8 @@ export interface SweepConfig {
   runningNotesDb?: string;
   /** The Roadmap (`NOTION_ROADMAP_DB_ID`): what `sweep-cards` reads. */
   roadmapDb?: string;
+  /** The databases a search hit may be a row of (`./surfaces.ts`). */
+  teamSurfaceDbs?: readonly string[];
 }
 
 export interface SweepDeps {
@@ -638,7 +641,8 @@ async function sweepThread(
   const sources: SweepSource[] = [];
   for (const link of chosen) {
     try {
-      const source = await deps.sources.read(link.url, link.kind);
+      // A private note is never a source, linked or not (`./surfaces.ts`).
+      const source = await readUsable(deps.sources, deps.config, link.url, link.kind);
       if (source) sources.push(source);
     } catch (err) {
       // A page that failed to read is not a page with nothing on it: the
@@ -652,20 +656,25 @@ async function sweepThread(
   }
   // What nobody linked, found by search and marked so: the page a message
   // names, and — for an answered question with no page to hold it — the page
-  // its answer may belong on. Only the top hit above the floor is kept.
+  // its answer may belong on. Only the top hit above the floor, from one of
+  // the team's surfaces, is kept (`./surfaces.ts`). A search that fails, or a
+  // found page that will not read, is no hit: nobody pointed at that page, so
+  // it never holds the thread.
   if (deps.search && sources.length < MAX_SOURCES_PER_THREAD) {
     const question = answered && !sources.some((s) => s.writable) ? questionQuery(t.humans) : null;
-    try {
-      const hits = await findBySearch(deps.search, [...named, ...(question ? [question] : [])], new Set(chosen.map((l) => l.url)));
-      for (const hit of hits) {
-        if (sources.length >= MAX_SOURCES_PER_THREAD) break;
-        const source = await deps.sources.read(hit.url, hit.kind);
-        if (source && !sources.some((s) => s.url === source.url)) sources.push({ ...source, foundBy: "search" });
-      }
-    } catch (err) {
-      rethrowIfBudget(err);
-      const why = err instanceof Error ? err.message : String(err);
-      return { ok: false, error: `a search, or the page it found, could not be read (${why})`, counts: !QUOTA.test(why) };
+    const hits = await findBySearch(
+      deps.search,
+      [...named, ...(question ? [question] : [])],
+      new Set(chosen.map((l) => l.url)),
+      searchGate(deps.config),
+    );
+    for (const hit of hits) {
+      if (sources.length >= MAX_SOURCES_PER_THREAD) break;
+      const source = await readUsable(deps.sources, deps.config, hit.url, hit.kind, true).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      if (source && !sources.some((s) => s.url === source.url)) sources.push(source);
     }
   }
   if (!sources.some((s) => s.writable)) return none;

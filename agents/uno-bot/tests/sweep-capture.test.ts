@@ -13,6 +13,7 @@ import { runSweepJob, type SweepSource } from "../src/sweep/index";
 import { FOUND_BY_SEARCH } from "../src/sweep/capture-lines";
 import { recordSweepResolution } from "../src/sweep/outcomes";
 import { isTeamNote, type EditedRecordRow } from "../src/sweep/records";
+import { operationKinds } from "../src/slack/proposal-render";
 import {
   at,
   DESIGN,
@@ -115,7 +116,7 @@ test("a note's decision that contradicts a PRD becomes one card in #plus-design,
     content: "Launch date: November 1",
   });
   assert.deepEqual(staged!.confirmers, ["U0ADE", "U0BEA"], "the owner and the note takers");
-  assert.equal(await h.store.cursor("notion:running-notes"), TONIGHT);
+  assert.equal(await h.store.cursor("notion:running-notes"), `${TONIGHT}|${NOTE_ID}`);
 });
 
 test("a Universal-pillar card's comment contradicting its PRD lands in #plus-universal", async () => {
@@ -190,7 +191,9 @@ test("a thread's answer no page holds becomes a card in that thread naming the p
     sources: [training],
     capture: true,
     search: {
-      "tutor student ratio training session": [{ url: training.url, title: training.title, kind: "notion" }],
+      "tutor student ratio training session": [
+        { url: training.url, title: training.title, kind: "notion", parentDatabaseId: null },
+      ],
     },
     detectorReplies: [
       JSON.stringify({
@@ -244,6 +247,20 @@ test("a thread's answer no page holds becomes a card in that thread naming the p
   assert.deepEqual(h.store.items().map((i) => [i.blockId, i.status]), [["b-setup-1", "confirmed"]]);
 });
 
+test("an added answer's plan line is text, and a new section shows its heading and its line", () => {
+  const kinds = operationKinds({
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      insert: [{ after_block_id: "b", last_edited_time: OLD, content: "## Access <!channel>\nEvery video has *captions* <@U0X>." }],
+    },
+  });
+  const [detail] = kinds.find((k) => k.label === "add after a block")!.details;
+  assert.ok(detail!.includes("Access"), "the heading");
+  assert.ok(detail!.includes("Every video has"), "and the line under it");
+  assert.doesNotMatch(detail!, /<!channel>|<@U0X>/, "escaped: pings nobody");
+});
+
 test("a note of discussion with no decision produces nothing", async () => {
   const note = notePage([
     { id: "n-1", lastEditedTime: TONIGHT, text: "Launch: Oct 15 vs Nov 1? Pros and cons.", links: [PRD.url] },
@@ -270,6 +287,8 @@ test("a note of discussion with no decision produces nothing", async () => {
 
 test("private and 1:1 pages are never read as notes, and the cursor still moves past them", async () => {
   const rows = [
+    noteRow({ id: "55555555555555555555555555555555", url: "https://www.notion.so/55555555555555555555555555555555", title: "Design sync", properties: { "Note Type": "Team, 1:1" }, lastEditedTime: "2026-09-29T17:00:00.000Z" }),
+    noteRow({ id: "66666666666666666666666666666666", url: "https://www.notion.so/66666666666666666666666666666666", title: "<Qi / Bill> 1:1", lastEditedTime: "2026-09-29T17:30:00.000Z" }),
     noteRow({ id: "11111111111111111111111111111111", url: "https://www.notion.so/11111111111111111111111111111111", parentDatabaseId: null, lastEditedTime: "2026-09-29T18:00:00.000Z" }),
     noteRow({ id: "22222222222222222222222222222222", url: "https://www.notion.so/22222222222222222222222222222222", parentDatabaseId: "ffffffffffffffffffffffffffffffff", lastEditedTime: "2026-09-29T18:30:00.000Z" }),
     noteRow({ id: "33333333333333333333333333333333", url: "https://www.notion.so/33333333333333333333333333333333", title: "Ade / Bea 1:1", lastEditedTime: "2026-09-29T19:00:00.000Z" }),
@@ -282,13 +301,15 @@ test("private and 1:1 pages are never read as notes, and the cursor still moves 
   assert.deepEqual(h.sourceReads, [], "no page outside the team notes is opened");
   assert.equal(h.provider.generated.length, 0);
   assert.equal(night.threads, 0);
-  assert.equal(await h.store.cursor("notion:running-notes"), TONIGHT);
+  assert.equal(await h.store.cursor("notion:running-notes"), `${TONIGHT}|44444444444444444444444444444444`);
+  assert.equal(isTeamNote(noteRow({ properties: { "Note Type": "1:1" } }), NOTES_DB), false, "a tagged 1:1");
+  assert.equal(isTeamNote(noteRow({ properties: { "Note Type": "Team" } }), NOTES_DB), true);
   assert.equal(isTeamNote(noteRow({ parentDatabaseId: "3ee43141-b0ce-4517-badc-cb52a7b97bdb".replace(/-/g, "") }), "3ee43141-b0ce-4517-badc-cb52a7b97bdb"), true);
 });
 
 test("a name nobody linked resolves above the floor, and the card says it was found by search", async () => {
   const booking = notionPage("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", { title: "Booking Flow PRD" });
-  const root = msg("U0STARTER", ts(29, 15), "Launch moves to Nov 1 — can someone fix the booking PRD", {
+  const root = msg("U0STARTER", ts(29, 15), "Launch moves to Nov 1 — can someone fix the booking flow PRD", {
     reply_count: 1,
     latest_reply: ts(29, 16),
   });
@@ -297,7 +318,7 @@ test("a name nobody linked resolves above the floor, and the card says it was fo
   const h = sweepHarness({
     channels,
     sources: [booking],
-    search: { "booking PRD": [{ url: booking.url, title: booking.title, kind: "notion" }] },
+    search: { "booking flow PRD": [{ url: booking.url, title: booking.title, kind: "notion", parentDatabaseId: null }] },
     detectorReplies: [reply(drift({ source: booking, evidence: [agreed.ts], claimedBy: "U0ADE" }))],
     now: at(29, 22),
   });
@@ -307,18 +328,23 @@ test("a name nobody linked resolves above the floor, and the card says it was fo
   h.clock.now = at(30, 14);
   await runSweepJob(MORNING, h.deps);
   assert.ok(h.posted[0]!.text.includes(FOUND_BY_SEARCH));
-  assert.deepEqual(h.searches, ["notion booking PRD"]);
+  assert.deepEqual(h.searches, ["notion booking flow PRD"]);
 });
 
 test("below the floor, a search keeps nothing: no page is read, no model is asked, no item is made", async () => {
-  const root = msg("U0STARTER", ts(29, 15), "Launch moves to Nov 1 — can someone fix the booking PRD", {
+  const root = msg("U0STARTER", ts(29, 15), "Launch moves to Nov 1 — can someone fix the booking flow PRD", {
     reply_count: 1,
     latest_reply: ts(29, 16),
   });
   const agreed = msg("U0ADE", ts(29, 16), "Agreed.", { thread_ts: root.ts });
   const h = sweepHarness({
     channels: { [DESIGN]: { kind: "public", history: [root], threads: { [root.ts]: [root, agreed] } } },
-    search: { "booking PRD": [{ url: "https://www.notion.so/99999999999999999999999999999999", title: "Tutor Onboarding", kind: "notion" }] },
+    search: {
+      // One shared word ("booking") is not a match, however short the title.
+      "booking flow PRD": [
+        { url: "https://www.notion.so/99999999999999999999999999999999", title: "Booking", kind: "notion", parentDatabaseId: null },
+      ],
+    },
     now: at(29, 22),
   });
 
@@ -327,7 +353,131 @@ test("below the floor, a search keeps nothing: no page is read, no model is aske
   assert.equal(night.findings.length, 0);
   assert.deepEqual(h.sourceReads, []);
   assert.equal(h.provider.generated.length, 0);
-  assert.deepEqual(h.searches, ["notion booking PRD", "github booking PRD"], "GitHub only once Notion had nothing");
+  assert.deepEqual(h.searches, ["notion booking flow PRD", "github booking flow PRD"], "GitHub only once Notion had nothing");
+});
+
+/** A thread that names the reflection launch page without linking it. */
+function namingThread(link?: string): Record<string, FakeChannel> {
+  const root = msg("U0STARTER", ts(29, 15), `Launch moves to Nov 1 — fix the reflection launch page ${link ? `<${link}>` : ""}`, {
+    reply_count: 1,
+    latest_reply: ts(29, 16),
+  });
+  const agreed = msg("U0ADE", ts(29, 16), "Agreed, Nov 1.", { thread_ts: root.ts });
+  return { [DESIGN]: { kind: "public", history: [root], threads: { [root.ts]: [root, agreed] } } };
+}
+
+test("a 1:1 note found by search is refused: never read, never quoted, nothing proposed", async () => {
+  const oneOnOne = notionPage("77777777777777777777777777777777", {
+    title: "Reflection launch 1:1",
+    parentDatabaseId: NOTES_DB,
+    properties: { "Note Type": "1:1" },
+  });
+  const h = sweepHarness({
+    channels: namingThread(),
+    sources: [oneOnOne],
+    search: {
+      "reflection launch page": [{ url: oneOnOne.url, title: oneOnOne.title, kind: "notion", parentDatabaseId: NOTES_DB }],
+    },
+    now: at(29, 22),
+  });
+
+  const night = await runSweepJob(END_OF_DAY, h.deps);
+
+  assert.equal(night.findings.length, 0);
+  assert.equal(h.searches[0], "notion reflection launch page", "the search ran and found it");
+  assert.deepEqual(h.sourceReads, [], "the hit is dropped before it is read");
+  assert.equal(h.provider.generated.length, 0);
+});
+
+test("a page off the team's surfaces found by search is refused; a Roadmap row is kept", async () => {
+  const shared = notionPage("88888888888888888888888888888888", {
+    title: "Reflection Launch",
+    parentDatabaseId: "ffffffffffffffffffffffffffffffff",
+  });
+  const loose = notionPage("89898989898989898989898989898989", { title: "Reflection launch scratch" });
+  const refused = sweepHarness({
+    channels: namingThread(),
+    sources: [shared, loose],
+    search: {
+      "reflection launch page": [
+        { url: shared.url, title: shared.title, kind: "notion", parentDatabaseId: shared.parentDatabaseId },
+        { url: loose.url, title: loose.title, kind: "notion", parentDatabaseId: null },
+      ],
+    },
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, refused.deps);
+  assert.equal(refused.searches[0], "notion reflection launch page");
+  assert.deepEqual(refused.sourceReads, [], "an unlisted database's row, and a loose page not titled as a spec");
+
+  const card = notionPage("8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a", { title: "Reflection Launch", parentDatabaseId: ROADMAP_DB });
+  const kept = sweepHarness({
+    channels: namingThread(),
+    sources: [card],
+    search: { "reflection launch page": [{ url: card.url, title: card.title, kind: "notion", parentDatabaseId: ROADMAP_DB }] },
+    detectorReplies: [JSON.stringify({ findings: [] })],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, kept.deps);
+  assert.deepEqual(kept.sourceReads, [card.url]);
+});
+
+test("a 1:1 note someone linked is refused after the read, before any model sees it", async () => {
+  const oneOnOne = notionPage("7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a", {
+    title: "<Qi / Bill> 1:1",
+    parentDatabaseId: NOTES_DB,
+    properties: { "Note Type": "1:1" },
+  });
+  const h = sweepHarness({ channels: namingThread(oneOnOne.url), sources: [oneOnOne], now: at(29, 22) });
+
+  const night = await runSweepJob(END_OF_DAY, h.deps);
+
+  assert.equal(night.findings.length, 0);
+  assert.equal(h.provider.generated.length, 0, "nothing from the note reaches a detector, or a card");
+});
+
+test("forty notes edited in one minute are all read across two nights, none twice", async () => {
+  const rows = Array.from({ length: 40 }, (_, i) => {
+    const id = i.toString(16).padStart(32, "0");
+    return noteRow({ id, url: `https://www.notion.so/${id}`, title: `Team sync ${i}` });
+  });
+  const h = sweepHarness({ channels: quiet, capture: true, notion: { notes: rows, pageSize: 25 }, now: at(29, 22) });
+
+  const first = await runSweepJob(NOTES, h.deps);
+  h.clock.now = at(30, 22);
+  const second = await runSweepJob(NOTES, h.deps);
+  h.clock.now = at(1, 22);
+  const third = await runSweepJob(NOTES, h.deps);
+
+  assert.deepEqual([first.threads, second.threads, third.threads], [25, 15, 0]);
+  assert.equal(new Set(h.sourceReads).size, 40);
+  assert.equal(h.sourceReads.length, 40, "no note read twice");
+});
+
+test("a job retried before its cursor was saved queues the same decision once, whichever block it picks", async () => {
+  const note = notePage([{ id: "n-dec", lastEditedTime: TONIGHT, text: "Decided: launch moves to Nov 1.", links: [PRD.url] }]);
+  const h = sweepHarness({
+    channels: quiet,
+    sources: [PRD, note],
+    capture: true,
+    notion: { notes: [noteRow()] },
+    people: PEOPLE,
+    detectorReplies: [
+      recordReply({ source: PRD, block: PRD.blocks[0]!.id, evidence: ["n-dec"] }),
+      recordReply({ source: PRD, block: PRD.blocks[1]!.id, evidence: ["n-dec"], replacement: "Owner: design team, launch Nov 1" }),
+    ],
+    now: at(29, 22),
+  });
+
+  await runSweepJob(NOTES, h.deps);
+  // The stop landed between queueing and saving the cursor: the retry reads
+  // the note again, and the model picks another block this time.
+  await h.store.saveCursor("notion:running-notes", "2026-09-28T22:00:00.000Z", at(29, 22));
+  await runSweepJob(NOTES, h.deps);
+
+  const queued = await h.store.pendingFindings();
+  assert.equal(queued.length, 1);
+  assert.equal(queued[0]!.id, `notes:${NOTE_ID}:${PRD.url.slice(-32)}`);
 });
 
 test("what one note costs: one edited-since read for the job, then the note, the page it links and one model call", async () => {

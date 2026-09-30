@@ -300,6 +300,18 @@ export function replacedBlocks(operations: readonly Pick<ProposalOperation, "too
   return blocks;
 }
 
+/** Whether a card's operations add an answer (`insert`) — a card only
+ *  `drop N` revises, since `notion_update` offers the model no `insert` to
+ *  restage it with. */
+export function holdsInsert(operations: readonly Pick<ProposalOperation, "toolName" | "input">[]): boolean {
+  return operations.some((op) => op.toolName === "notion_update" && Array.isArray(op.input.insert) && op.input.insert.length > 0);
+}
+
+/** What a worded revision of a card holding an added answer is told. */
+export const INSERT_CARD_REFUSAL =
+  ":lock: This sweep card adds text after a block, which a reply in words can't restage exactly, so the card stays as it is. " +
+  "Reply `drop N` to leave a fix out, or ⛔ the card and ask me.";
+
 /** Whether a bot post is part of a sweep card: tagged as one, or — read
  *  without its metadata — opening as one does. */
 export function isSweepCardPost(post: { text?: string; metadata?: { event_type?: string } }): boolean {
@@ -377,7 +389,7 @@ export function sweepCardPick(text: string, count: number): number[] | null {
  */
 export function sweepCardInstruction(): string {
   return [
-    "(system: SWEEP CARD — the pending card is an end-of-day sweep card: one `notion_update` per fix, each an in-place replace, or an `insert` that adds an answer after a block.",
+    "(system: SWEEP CARD — the pending card is an end-of-day sweep card: one `notion_update` per fix, each an in-place replace, or an `insert` that adds an answer after a block. A card holding an `insert` is revised only by `drop N`: do not restage it, tell them to reply `drop N`.",
     "A reply that drops an item in words (\"not the second one\"; a bare \"drop 2\" is applied before you see it) → stage the SAME batch without that operation, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.",
     "Change only what the reply asked for: the revision holds the card's own fixes, minus the dropped ones. For anything more, `read_reference` `docs/connectors/slack-sweep`.)",
   ].join("\n");

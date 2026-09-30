@@ -316,6 +316,15 @@ async function sweepDepsFor(
       botUserId: bot?.userId ?? null,
       runningNotesDb: env.NOTION_RUNNING_NOTES_DB_ID?.trim() || undefined,
       roadmapDb: env.NOTION_ROADMAP_DB_ID?.trim() || undefined,
+      // Where a search hit may come from: the specs and the answers the team
+      // keeps (`./surfaces.ts`).
+      teamSurfaceDbs: [
+        env.NOTION_ROADMAP_DB_ID,
+        env.NOTION_HELP_TUTORS_DB_ID,
+        env.NOTION_HELP_TEACHERS_DB_ID,
+        env.NOTION_DECISIONS_DB_ID,
+        env.NOTION_MARKETPLACE_DB_ID,
+      ].flatMap((id) => (id?.trim() ? [id.trim()] : [])),
       privateAllowlist: (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
         .split(",")
         .map((id) => id.trim())
@@ -334,7 +343,7 @@ function sweepSearchFor(env: Env): SourceSearch {
   return {
     async notion(query) {
       const hits = await measured(() => notionSearch(env, query, SEARCH_HITS));
-      return hits.map((h): SearchHit => ({ url: h.url, title: h.title, kind: "notion" }));
+      return hits.map((h): SearchHit => ({ url: h.url, title: h.title, kind: "notion", parentDatabaseId: h.parentDatabaseId }));
     },
     ...(repo?.ok
       ? {
@@ -353,7 +362,8 @@ function sweepSearchFor(env: Env): SourceSearch {
 /** The notes and cards reads on `Env`, each measured. */
 function sweepNotionFor(env: Env): SweepNotion {
   return {
-    edited: (databaseId, since) => measured(() => queryEditedSince(env, databaseId, since, RECORDS_PER_JOB)),
+    edited: (databaseId, since, after) =>
+      measured(() => queryEditedSince(env, databaseId, since, RECORDS_PER_JOB, after)),
     comments: (pageId) => measured(() => listPageComments(env, pageId)),
   };
 }
@@ -505,6 +515,9 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
       text: page.text.slice(0, CONTEXT_TEXT_CAP),
       pillars: splitList(page.properties["Product Pillar"]),
       contributors: page.people["Contributor"] ?? [],
+      parentDatabaseId: page.parentDatabaseId,
+      properties: page.properties,
+      truncated: page.truncated,
     };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;
