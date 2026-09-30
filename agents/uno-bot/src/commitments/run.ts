@@ -11,7 +11,10 @@
 //   out (`commitmentDueAt`). It posts nothing. A thread whose new messages
 //   carry no promise words costs no model call. A promise by someone with a
 //   live commitment in the same thread is that task said again: no new row,
-//   and a later day it names moves the due date as a ⏳ would.
+//   and a later day it names moves the due date as a ⏳ would. The detector
+//   learns from people's answers: it is shown the newest 🤔 and 🙌 commitments
+//   as short summaries (`fewShotExamples`), never a DM's or another private
+//   place's.
 //
 //   `runCommitmentNudges` — the morning's `commitment-nudge` job. It takes the
 //   live commitments due now, soonest first, one at a time, each only once a
@@ -62,7 +65,7 @@ import {
   reminderBlocks,
   reminderText,
 } from "./copy";
-import type { CommitmentDetector, EvidenceJudge } from "./detector";
+import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample } from "./detector";
 import {
   commitmentDueAt,
   dayLabel,
@@ -91,6 +94,9 @@ export const TEXT_KEEP_MS = 30 * 24 * 60 * 60 * 1000;
 export const MAX_REMINDERS_PER_PERSON = 2;
 /** Mornings running a commitment may be held before it lapses. */
 export const MAX_HOLDS = 3;
+/** Earlier answers the detector is shown, of each kind — 🙌 done and 🤔 not a
+ *  promise — unless `CommitmentConfig.fewShot` says otherwise. */
+export const MAX_FEW_SHOT_PER_ANSWER = 3;
 
 const EVIDENCE_KINDS: ReadonlySet<TargetKind> = new Set(["notion", "github", "design-system-code"]);
 
@@ -116,6 +122,9 @@ export interface CommitmentConfig {
   /** The bot's own user id, whose messages are never evidence. */
   botUserId?: string | null;
   figmaLibraryKey?: string;
+  /** Earlier answers of each kind the detector is shown; 0 shows none.
+   *  Defaults to `MAX_FEW_SHOT_PER_ANSWER`. */
+  fewShot?: number;
 }
 
 export interface CommitmentDeps {
@@ -141,15 +150,24 @@ export interface CommitmentDeps {
  *
  * @param thread - The thread as the sweep read it: human messages, root first
  * @param since - The channel's cursor; messages after it are new
- * @param deps - The detector, the store, the clock
+ * @param deps - The detector, the store, the clock, and where the detector's
+ *   examples come from (`fewShotExamples`; none when absent)
  */
 export async function recordThreadCommitments(
   thread: SweepThread,
   since: string,
-  deps: Pick<CommitmentDeps, "detector" | "store" | "config" | "now" | "dryRun">,
+  deps: Pick<CommitmentDeps, "detector" | "store" | "config" | "now" | "dryRun"> & {
+    examples?(channel: string): Promise<FewShotExample[]>;
+  },
 ): Promise<{ rows: CommitmentRecord[]; texts: Record<string, string> }> {
   if (thread.channel === deps.config.unoBot) return { rows: [], texts: {} };
-  const found = await deps.detector.detect({ thread, since });
+  // Channel threads only, public or private; a group DM or a DM keeps none.
+  if (thread.channelKind !== "public" && thread.channelKind !== "private") return { rows: [], texts: {} };
+  // The detector's own gate, first, so a thread it would not ask about reads
+  // no examples either.
+  if (!mayHoldPromise(thread.messages, since)) return { rows: [], texts: {} };
+  const examples = deps.examples ? await deps.examples(thread.channel) : [];
+  const found = await deps.detector.detect({ thread, since, examples });
   if (!found.ok) throw new Error(`the commitment detector did not answer (${found.error})`);
   const now = deps.now();
   const rows: CommitmentRecord[] = [];
@@ -162,6 +180,7 @@ export async function recordThreadCommitments(
       id,
       kind: "thread_promise",
       channel: thread.channel,
+      channelKind: thread.channelKind,
       threadTs: thread.rootTs,
       messageTs: c.messageTs,
       promiserId: c.promiser,
@@ -236,9 +255,10 @@ async function foldRepromises(
 export function commitmentThreadHook(
   deps: Pick<CommitmentDeps, "detector" | "store" | "config" | "now" | "dryRun">,
 ): (thread: SweepThread, since: string) => Promise<void> {
+  const examples = fewShotExamples(deps);
   return async (thread, since) => {
     try {
-      const { rows } = await recordThreadCommitments(thread, since, deps);
+      const { rows } = await recordThreadCommitments(thread, since, { ...deps, examples });
       if (rows.length) {
         console.log(`[commitments] ${thread.channel} ${thread.rootTs}: ${rows.length} commitment(s) ${deps.dryRun ? "would be kept" : "kept"}`);
       }
@@ -246,6 +266,56 @@ export function commitmentThreadHook(
       rethrowIfBudget(err);
       console.warn(`[commitments] ${thread.channel} ${thread.rootTs}: ${err instanceof Error ? err.message : String(err)}`);
     }
+  };
+}
+
+/**
+ * Where the detector's examples come from: the newest commitments people
+ * answered 🙌 or 🤔, at most `config.fewShot` of each, from public channels
+ * and the swept channel itself (`CommitmentRecords.latestAnswers`), each with
+ * the summary kept beside it — at most one a promiser, so no one person's
+ * answers steer every channel. One read a channel for the life of the loader —
+ * one sweep job — however many of its threads the detector is asked about.
+ * An answer whose summary has expired is left out rather than replaced. A
+ * store that fails gives no examples: a missing example is not worth a missed
+ * promise. A budget stop throws through.
+ */
+export function fewShotExamples(
+  deps: Pick<CommitmentDeps, "store" | "config">,
+): (channel: string) => Promise<FewShotExample[]> {
+  const limit = Math.max(0, Math.floor(deps.config.fewShot ?? MAX_FEW_SHOT_PER_ANSWER));
+  const read = new Map<string, Promise<FewShotExample[]>>();
+  const load = async (channel: string): Promise<FewShotExample[]> => {
+    if (!limit) return [];
+    try {
+      // Twice the rows, so one example a promiser still leaves room for others.
+      const rows = await deps.store.latestAnswers(channel, limit * 2);
+      const out: FewShotExample[] = [];
+      const promisers = new Set<string>();
+      const count = { done: 0, not_promise: 0 };
+      for (const row of rows) {
+        const answer = row.state === "done" ? "done" : "not_promise";
+        if (promisers.has(row.promiserId) || count[answer] >= limit) continue;
+        const what = (await deps.store.text(row.id))?.what;
+        if (!what) continue;
+        promisers.add(row.promiserId);
+        count[answer] += 1;
+        out.push({ answer, what });
+      }
+      return out;
+    } catch (err) {
+      rethrowIfBudget(err);
+      console.warn(`[commitments] ${channel}: the detector's examples could not be read, asking without them: ${err instanceof Error ? err.message : String(err)}`);
+      return [];
+    }
+  };
+  return (channel) => {
+    let pending = read.get(channel);
+    if (!pending) {
+      pending = load(channel);
+      read.set(channel, pending);
+    }
+    return pending;
   };
 }
 

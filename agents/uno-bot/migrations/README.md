@@ -7,7 +7,7 @@ summary: The Worker's own database migrations — the uno-bot-usage D1 schema un
 One schema lives here: the **usage record**, the `uno-bot-usage` D1 database
 bound as `USAGE_DB` (`agents/uno-bot/src/usage/`, ADR-030). The end-of-day sweep's cursors,
 runs and items share it (`0002_sweep.sql`, `agents/uno-bot/src/sweep/store.ts`), and so do
-commitment reminders (`0006_commitments.sql`, `agents/uno-bot/src/commitments/store.ts`). The bot's
+commitment reminders (`0006_commitments.sql`, `0007_commitment_answers.sql`, `agents/uno-bot/src/commitments/store.ts`). The bot's
 semantic-retrieval schema does **not** — see the second half.
 
 ## The usage database (`usage/`)
