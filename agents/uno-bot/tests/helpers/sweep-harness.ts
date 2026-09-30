@@ -219,8 +219,9 @@ export function sweepHarness(opts: {
     },
     sources: {
       async read(url) {
-        if (broken.has(url)) throw new Error("Notion 503: service unavailable");
-        if (rateLimited.has(url)) throw new Error("Notion 429 rate_limited: Rate limited");
+        // What a complete read throws when the page's blocks page fails.
+        if (broken.has(url)) throw new Error("Notion 503 service_unavailable: slow down");
+        if (rateLimited.has(url)) throw new Error("Notion 429 rate_limited: slow down");
         return sources.get(url) ?? null;
       },
     },

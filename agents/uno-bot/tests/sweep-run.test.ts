@@ -791,7 +791,7 @@ test("a long thread is read page by page, and one past the page cap is left with
   assert.match(skipped.note ?? "", /left unread/);
 });
 
-test("a thread whose page keeps failing holds the cursor one night, and is skipped the next", async () => {
+test("a thread whose page keeps failing (its blocks answered 5xx) holds the cursor one night, and is skipped the next", async () => {
   const bad = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_B.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const good = thread({ user: "U0STARTER", when: ts(29, 17), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 18) }]);
   const h = sweepHarness({
@@ -839,7 +839,7 @@ test("a model quota stop holds the cursor every night without counting toward a 
   assert.equal(await h.store.cursor(DESIGN), ts(29, 0));
 });
 
-test("a Notion 429 holds the cursor every night without counting toward a skip", async () => {
+test("a Notion 429 on a page's blocks holds the cursor every night without counting toward a skip", async () => {
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], now: at(29, 22) });
   h.rateLimited.add(PAGE_A.url);

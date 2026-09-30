@@ -325,7 +325,8 @@ async function readSource(env: Env, url: string, kind: TargetKind): Promise<Swee
   if (kind === "notion") {
     const pageId = parseNotionPageId(url);
     if (!pageId) return null;
-    const page = await readNotionPage(env, pageId);
+    // Whole or not at all: a failed blocks page throws, and the thread holds.
+    const page = await readNotionPage(env, pageId, { complete: true });
     return {
       url: canonicalNotionUrl(url),
       kind,

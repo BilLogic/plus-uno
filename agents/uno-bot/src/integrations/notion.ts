@@ -657,8 +657,18 @@ function blockText(block: Record<string, unknown>): string {
 /**
  * Read a Notion page: title + rendered properties (incl. people/Owner) + block
  * text. Throws on failure so read_source can report it honestly. Read-only.
+ *
+ * A children page that fails, or a budget that runs out mid-read, leaves the
+ * blocks already read — what `read_source` shows — and that partial read is
+ * not cached. With `complete`, either throws instead (a failed page as
+ * `Notion <status>`): the sweep reads a page to judge all of it, and a page
+ * read as empty would pass its thread by.
  */
-export async function readNotionPage(env: Env, pageId: string): Promise<NotionPageContent> {
+export async function readNotionPage(
+  env: Env,
+  pageId: string,
+  opts: { complete?: boolean } = {},
+): Promise<NotionPageContent> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
 
   // Serve a fresh cached read (0 subrequests) if we read this page recently.
@@ -694,12 +704,25 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
     const lines: string[] = [];
     const blocks: NotionPageBlock[] = [];
     let cursor: string | undefined;
+    let partial = false;
     for (let i = 0; i < READ_BLOCK_PAGES; i++) {
-      if (subrequestBudgetSpent()) break; // keep the blocks already read
+      // Keep the blocks already read; a complete read lets the fetch below
+      // throw the budget's own error instead.
+      if (!opts.complete && subrequestBudgetSpent()) {
+        partial = true;
+        break;
+      }
       const qs = new URLSearchParams({ page_size: "100" });
       if (cursor) qs.set("start_cursor", cursor);
       const bRes = await countedFetch(`${NOTION_API}/blocks/${pageId}/children?${qs.toString()}`, { headers, signal: controller.signal });
-      if (!bRes.ok) break;
+      if (!bRes.ok) {
+        if (opts.complete) {
+          const err = (await bRes.json().catch(() => ({}))) as { code?: string; message?: string };
+          throw notionError(bRes.status, err, "the page's blocks could not be read");
+        }
+        partial = true;
+        break;
+      }
       const bData = (await bRes.json()) as {
         results?: Record<string, unknown>[]; has_more?: boolean; next_cursor?: string;
       };
@@ -730,8 +753,10 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
       text: lines.join("\n").slice(0, READ_TEXT_CAP),
       blocks,
     };
-    // Cache only successful reads (never a throw). Clear when full — a long-lived
-    // isolate shouldn't grow this unbounded; simple beats an LRU here.
+    // Cache only whole reads (never a throw or a partial one). Clear when
+    // full — a long-lived isolate shouldn't grow this unbounded; simple beats
+    // an LRU here.
+    if (partial) return result;
     if (readCache.size >= READ_CACHE_MAX) readCache.clear();
     readCache.set(pageId, { at: Date.now(), value: result });
     return result;

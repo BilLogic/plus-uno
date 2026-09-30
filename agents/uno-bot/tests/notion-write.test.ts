@@ -237,6 +237,37 @@ test("a page read hands back every block's id and last-edited stamp", async () =
   ]);
 });
 
+// A blocks page Notion refuses — a 429, a 5xx — is not a page with no blocks.
+// The sweep's complete read throws it as `Notion <status>`, which the sweep
+// holds on (a 429 without counting, `sweep/run.ts` QUOTA); read_source keeps
+// what it read and caches none of it.
+for (const [status, code] of [
+  [429, "rate_limited"],
+  [503, "service_unavailable"],
+] as const) {
+  test(`a blocks page answered ${status} throws in a complete read, and is partial and uncached otherwise`, async () => {
+    const page = `3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c${status === 429 ? "29" : "03"}`;
+    const failing: Routes = {
+      [`GET /pages/${page}`]: {
+        body: { id: page, properties: { Name: { type: "title", title: [{ plain_text: "Launch plan" }] } } },
+      },
+      [`GET /blocks/${page}/children`]: { status, body: { object: "error", code, message: "slow down" } },
+    };
+    serve(failing);
+    const { readNotionPage } = await notion();
+
+    await assert.rejects(readNotionPage(ENV, page, { complete: true }), new RegExp(`^Error: Notion ${status} ${code}`));
+
+    serve(failing);
+    const partial = await readNotionPage(ENV, page);
+    assert.deepEqual(partial.blocks, []);
+    // Not cached: the next read asks Notion again.
+    serve(failing);
+    await readNotionPage(ENV, page);
+    assert.ok(calls.some((c) => c.url.includes("/children")), "read again, not served from the cache");
+  });
+}
+
 // A replace keeps the block's own type and state. Notion refuses a PATCH that
 // changes a block's type, so a paragraph written onto a list item, a to-do or
 // a heading would never land; and the display mark a read puts on a list line
