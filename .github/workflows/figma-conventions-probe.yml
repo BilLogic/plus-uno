@@ -1,5 +1,6 @@
 # Throwaway: measures how closely files across the six PLUS Figma teams follow
 # docs/connectors/figma.md. Read-only GETs only. Never merged.
+# Pass 2 counts the conventions files actually use.
 # Prints aggregate counts, RM ids, and at most 5 example names per category.
 # Never prints comment text, handles or emails.
 name: figma-conventions-probe
@@ -53,100 +54,62 @@ jobs:
           const VFORK = /[-_ ]v\d+\b/i;
           const TOPTYPES = new Set(["FRAME", "SECTION", "COMPONENT", "COMPONENT_SET", "GROUP", "INSTANCE"]);
 
+          // Pass 2: the conventions files actually use. Full listing for names;
+          // the same evenly spaced sample at depth=1 for page schemes and comments.
+          const CARD = /\bCard\s*#?\s*(\d+(?:\s*(?:&|,|and|\+)\s*\d+)*)/i;
+          const SLASH3 = /^[^/]+\/[^/]+\/[^/]+$/;
+          const LEGACY = /\/\s*Legacy\s*\//i;
+          const SECT = { cover: /cover/i, specs: /spec/i, wip: /wip/i, playground: /playground/i, review: /review/i, archive: /archive/i };
           for (const [team, id] of Object.entries(teams)) {
-            const t = {
-              listing: "", filesKeys: "", folders: 0, filesListed: 0, sampled: 0, readOk: 0,
-              fileConv: 0, fileHasRM: 0, rmIds: [], vFork: 0, pageNumbered: 0,
-              officialStrict: 0, officialLoose: 0,
-              offTop: 0, offPrefixed: 0, offPrefixedCI: 0, offNear: 0,
-              allTop: 0, allPrefixed: 0, allPrefixedCI: 0,
-              prefixCounts: { wip: 0, spec: 0, replica: 0, archive: 0 },
-              wipFrames: 0, wipFramesStale30: 0, filesStale30: 0, filesStale90: 0,
-              withComments: 0, comments: 0, topThreads: 0, unresolvedThreads: 0, commentsErr: 0,
-              pageNames: {}, ex: { fileNames: [], nonConvFileNames: [], rmFiles: [], offUnprefixed: [], nearMiss: [], prefixed: [] },
-            };
-            // 1. Listing: v2 folders, fall back to v1 projects.
-            let [s, j] = await get(`/v2/teams/${id}/folders`);
-            let folders = arr(j, "folders", "projects", "data");
-            let filesPath = (fid) => `/v2/folders/${fid}/files`;
-            t.listing = `v2 folders ${s}${s !== 200 ? " " + errOf(j) : ""}; keys=${Object.keys(j).join(",")}`;
-            if (s !== 200) {
-              const [s1, j1] = await get(`/v1/teams/${id}/projects`);
-              t.listing += ` | v1 projects ${s1}${s1 !== 200 ? " " + errOf(j1) : ""}`;
-              if (s1 === 200) { folders = arr(j1, "projects"); filesPath = (fid) => `/v1/projects/${fid}/files`; }
-            }
-            t.folders = folders.length;
+            const t = { filesListed: 0, slash3: 0, card: 0, legacy: 0, other: 0, cardIds: [], otherEx: [],
+              sampled: 0, readOk: 0, sectionScheme: 0, hasSpecs: 0, hasWip: 0, hasPlayground: 0, hasReview: 0, hasArchive: 0,
+              wipPageStale30: 0, specsTop: 0, wipTop: 0, reviewTop: 0,
+              commentsInStale90: 0, unresolvedInStale90: 0, unresolvedTotal: 0, maxThreadsOneFile: 0 };
+            const [, j] = await get(`/v2/teams/${id}/folders`);
             const files = [];
-            for (const f of folders) {
-              const [fs, fj] = await get(filesPath(f.id));
-              if (fs !== 200) { t.listing += ` | files ${fs} ${errOf(fj)}`; continue; }
-              if (!t.filesKeys) t.filesKeys = Object.keys(fj).join(",");
-              files.push(...arr(fj, "files", "data"));
-            }
+            for (const f of arr(j, "folders")) { const [, fj] = await get(`/v2/folders/${f.id}/files`); files.push(...arr(fj, "files")); }
             t.filesListed = files.length;
-            // 2. Sample: all if <= SAMPLE, else evenly spaced by last_modified (old and new both).
+            for (const f of files) {
+              const n = f.name || "";
+              if (SLASH3.test(n)) t.slash3++;
+              const c = n.match(CARD);
+              if (c) { t.card++; t.cardIds.push(...c[1].match(/\d+/g).map(Number)); }
+              else if (LEGACY.test(n)) t.legacy++;
+              else { t.other++; ex(t.otherEx, n); }
+            }
+            t.cardIds = [...new Set(t.cardIds)].sort((a, b) => a - b);
             files.sort((a, b) => String(a.last_modified).localeCompare(String(b.last_modified)));
             const sample = files.length <= SAMPLE ? files
               : Array.from({ length: SAMPLE }, (_, i) => files[Math.floor((i * (files.length - 1)) / (SAMPLE - 1))]);
             t.sampled = sample.length;
             for (const f of sample) {
-              const key = f.key;
-              const name = f.name || "";
-              ex(t.ex.fileNames, name);
-              if (FILE_CONV.test(name)) t.fileConv++; else ex(t.ex.nonConvFileNames, name);
-              const rm = name.match(RM);
-              if (rm) { t.fileHasRM++; t.rmIds.push(Number(rm[1])); ex(t.ex.rmFiles, name); }
-              if (VFORK.test(name)) t.vFork++;
-
-              const [, mj] = await get(`/v1/files/${key}/meta`);
-              const lm = Date.parse(mj?.file?.last_touched_at || mj?.file?.last_modified || f.last_modified || "");
-              const ageDays = Number.isFinite(lm) ? (NOW - lm) / DAY : NaN;
-              if (ageDays > 30) t.filesStale30++;
-              if (ageDays > 90) t.filesStale90++;
-
-              const [ds, dj] = await get(`/v1/files/${key}?depth=2`);
-              if (ds !== 200) { t.listing += ` | file ${ds} ${errOf(dj)}`; continue; }
+              const age = (NOW - Date.parse(f.last_modified || "")) / DAY;
+              const [ds, dj] = await get(`/v1/files/${f.key}?depth=2`);
+              if (ds !== 200) continue;
               t.readOk++;
               const pages = dj.document?.children || [];
-              if (pages.length && pages.every((p) => NUMBERED.test(p.name))) t.pageNumbered++;
-              for (const p of pages) t.pageNames[p.name.trim()] = (t.pageNames[p.name.trim()] || 0) + 1;
-              const off = pages.find((p) => OFFICIAL.test(p.name));
-              const offLoose = off || pages.find((p) => OFFICIAL_LOOSE.test(p.name));
-              if (off) t.officialStrict++;
-              if (offLoose) t.officialLoose++;
+              const sect = (re) => pages.filter((p) => /^\s*-\s*-\s*-/.test(p.name) && re.test(p.name));
+              const has = Object.fromEntries(Object.entries(SECT).map(([k, re]) => [k, sect(re).length > 0]));
+              if (has.specs && has.wip) t.sectionScheme++;
+              if (has.specs) t.hasSpecs++; if (has.wip) t.hasWip++; if (has.playground) t.hasPlayground++;
+              if (has.review) t.hasReview++; if (has.archive) t.hasArchive++;
+              if (has.wip && age > 30) t.wipPageStale30++;
+              // Pages between one "- - - X - - -" divider and the next belong to X.
+              let cur = null;
               for (const p of pages) {
-                const tops = (p.children || []).filter((n) => TOPTYPES.has(n.type));
-                for (const n of tops) {
-                  t.allTop++;
-                  const m = n.name.match(PREFIX_CI);
-                  if (PREFIX.test(n.name)) { t.allPrefixed++; ex(t.ex.prefixed, n.name.slice(0, 60)); }
-                  if (m) {
-                    t.allPrefixedCI++; t.prefixCounts[m[1].toLowerCase()]++;
-                    if (m[1].toLowerCase() === "wip") { t.wipFrames++; if (ageDays > 30) t.wipFramesStale30++; }
-                  }
-                  if (p === offLoose) {
-                    t.offTop++;
-                    if (PREFIX.test(n.name)) t.offPrefixed++;
-                    if (m) t.offPrefixedCI++;
-                    else {
-                      if (NEAR.test(n.name)) { t.offNear++; ex(t.ex.nearMiss, n.name.slice(0, 60)); }
-                      ex(t.ex.offUnprefixed, n.name.slice(0, 60));
-                    }
-                  }
-                }
+                if (/^\s*-\s*-\s*-/.test(p.name)) { cur = SECT.specs.test(p.name) ? "specs" : SECT.wip.test(p.name) ? "wip" : SECT.review.test(p.name) ? "review" : null; continue; }
+                const tops = (p.children || []).filter((x) => TOPTYPES.has(x.type)).length;
+                if (cur === "specs") t.specsTop += tops; else if (cur === "wip") t.wipTop += tops; else if (cur === "review") t.reviewTop += tops;
               }
-              const [cs, cj] = await get(`/v1/files/${key}/comments`);
-              if (cs !== 200) { t.commentsErr++; continue; }
-              const cm = arr(cj, "comments");
-              if (cm.length) t.withComments++;
-              t.comments += cm.length;
-              const top = cm.filter((c) => !c.parent_id);
-              t.topThreads += top.length;
-              t.unresolvedThreads += top.filter((c) => !c.resolved_at).length;
+              const [cs, cj] = await get(`/v1/files/${f.key}/comments`);
+              if (cs !== 200) continue;
+              const top = arr(cj, "comments").filter((c) => !c.parent_id);
+              const un = top.filter((c) => !c.resolved_at).length;
+              t.unresolvedTotal += un;
+              t.maxThreadsOneFile = Math.max(t.maxThreadsOneFile, top.length);
+              if (age > 90) { t.commentsInStale90 += top.length; t.unresolvedInStale90 += un; }
             }
-            t.pageNames = Object.fromEntries(Object.entries(t.pageNames).sort((a, b) => b[1] - a[1]).slice(0, 10));
-            t.rmIds = [...new Set(t.rmIds)].sort((a, b) => a - b);
-            console.log(`\n=== ${team} ===\n${JSON.stringify(t)}`);
+            console.log(`\n=== ${team} (pass 2) ===\n${JSON.stringify(t)}`);
           }
           console.log(`\nTOTAL API calls: ${calls}`);
           JS
