@@ -9,7 +9,7 @@
 
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { cpSync, realpathSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 
 import { ARTIFACTS, assemble } from "./bundle-harness.mjs";
 import { run as checkHarnessBundle } from "./check-harness-bundle.mjs";
+import { frontmatter } from "../../../scripts/lib/corpus.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const checkout = path.resolve(here, "../../..");
@@ -281,6 +282,58 @@ test("an assembled bundle over its char budget fails the build", () => {
   assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
 });
 
+// ── The constitution's budget is soft (2026-09-30) ──────────────────────────
+//
+// Bill's call: a constitution file over its 20,000 warns — named, with the
+// overrun — and the build goes on. The ceiling does not soften with it, so a
+// constitution that swells the whole bundle past 175,500 still fails.
+
+/** Run the bundler bare and put the three artifacts back, whatever it wrote. */
+function runBundlerRestoring(args = []) {
+  const saved = ARTIFACTS.map(({ rel }) => [inCopy(rel), readFileSync(inCopy(rel), "utf8")]);
+  try {
+    const r = spawnSync("node", [bundler, ...args], { encoding: "utf8" });
+    return { code: r.status, out: `${r.stdout}${r.stderr}` };
+  } finally {
+    for (const [abs, text] of saved) writeFileSync(abs, text);
+  }
+}
+
+test("a constitution file over its char budget warns and the build goes on", () => {
+  // Enough to clear 20,000 and nowhere near the ceiling's headroom.
+  const rel = "AGENTS.md";
+  const size = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8")).body.length;
+  const pad = padding(Math.max(0, 20_000 - size) + 500);
+
+  const assembly = withFile(rel, (abs, original) => writeFileSync(abs, original + pad), () => assemble({ repoRoot }));
+  const errors = assembly.findings.filter((f) => (f.severity ?? "error") === "error");
+  assert.deepEqual(errors, [], "an over-budget constitution must not be an error");
+  const warning = assembly.findings.find((f) => f.severity === "warning" && /constitution/.test(f.message));
+  assert.ok(warning, "an over-budget constitution must be reported as a warning");
+  assert.match(warning.message, /AGENTS\.md/);
+  assert.match(warning.message, /20,000/, "the warning must name the budget");
+  assert.match(warning.message, /over by [\d,]+/, "the warning must name the overrun");
+  assert.ok(assembly.manifest, "the assembly must still run to the end");
+
+  const cli = withFile(rel, (abs, original) => writeFileSync(abs, original + pad), () => runBundlerRestoring());
+  assert.equal(cli.code, 0, `an over-budget constitution must not fail the build:\n${cli.out}`);
+  assert.match(cli.out, /AGENTS\.md \(constitution\): [\d,]+ chars against a budget of 20,000 — over by [\d,]+/);
+});
+
+test("a constitution that pushes the assembled bundle over the ceiling still fails", () => {
+  // A bare run, so nothing but the ceiling can fail it: `--check` would also
+  // fail on the stale artifacts a passing run leaves behind.
+  const rel = "AGENTS.md";
+  const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(200_000)), () =>
+    runBundlerRestoring(),
+  );
+  assert.equal(result.code, 1, "the ceiling must fail whichever doc carried the chars");
+  assert.match(result.out, /constitution's soft char budget/, "the soft overrun is still reported");
+  assert.match(result.out, /assembled bundle is over its char budget/);
+  assert.match(result.out, /175,500/, "the failure must name the ceiling");
+  assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
+});
+
 // ── The floor (#418) ─────────────────────────────────────────────────────────
 //
 // The ceiling stops a bundle from growing past what the model can attend to.
@@ -403,7 +456,7 @@ test("the manifest states the active floor, its cache and its region beside the 
   assert.match(md, /a floor of [\d,]+ \+ [\d,]+ \((?:implicit|explicit) cache, GEMINI_REGION [\w-]+\), [\d,]+ above it\./);
 });
 
-test("every budgeted file is under its budget today", () => {
+test("the committed harness passes every hard budget today", () => {
   const result = runBundler(["--check"]);
   assert.equal(result.code, 0, `the committed harness must be within budget:\n${result.out}`);
 });

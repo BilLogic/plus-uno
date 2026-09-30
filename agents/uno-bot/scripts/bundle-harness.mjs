@@ -46,9 +46,11 @@
 //
 // A DEFECT ABORTS THE ASSEMBLY at the same point the old `process.exit(1)`
 // stood, and the finding is returned rather than printed. That is deliberate:
-// once a doc under a section root declares no embodiment, or a budget is blown,
-// everything downstream is a measurement of a tree that must not ship, and
-// collecting further findings over it would report consequences as causes.
+// once a doc under a section root declares no embodiment, or a hard budget is
+// blown, everything downstream is a measurement of a tree that must not ship,
+// and collecting further findings over it would report consequences as causes.
+// The constitution's budget is SOFT: an overrun is a warning finding, printed
+// with the distance, and the assembly carries on (Bill's call, 2026-09-30).
 //
 // ── The byte-identical requirement is RETIRED (#159) ─────────────────────────
 //
@@ -129,7 +131,8 @@ const SECTIONS = [
  * Char budgets, in chars because these files have paragraph-length lines. The
  * contract they enforce is stated in `AGENTS.md` § The loading contract; this is
  * the assertion of it, so an edit that blows a budget fails the build instead of
- * being noticed months later by whoever re-measures.
+ * being noticed months later by whoever re-measures — except the constitution's,
+ * which is SOFT: an overrun warns, names the file and the distance, and ships.
  *
  * MEASURED ON THE BUNDLED BODY, not the file: frontmatter is stripped before
  * assembly, so it costs the prompt nothing, and charging a doc ~100 chars for
@@ -163,11 +166,16 @@ const BUDGETS = {
   persona: 28_000,
   botFace: 7_000,
   // Tier 1 — the constitution, always loaded. `AGENTS.md` § The loading contract
-  // states this number in prose ("Budget ≤20k chars: a tier that bloats defeats
-  // the tier"), and `check:harness-budgets` (#510) reads the manifest this script
-  // writes to hold that sentence to this constant. The budget attaches to the
-  // constitution's ROLE, like the persona's and the face's, so it cannot be lost
-  // by a rename.
+  // states this number in prose ("Soft budget ≤20k chars: an overrun warns"), and
+  // `check:harness-budgets` (#510) reads the manifest this script writes to hold
+  // that sentence to this constant. The budget attaches to the constitution's
+  // ROLE, like the persona's and the face's, so it cannot be lost by a rename.
+  //
+  // SOFT since 2026-09-30 (Bill's call). An over-budget constitution file is a
+  // WARNING finding — printed in `check:harness` with the overrun — and the
+  // build goes on; `softBudget()` below is the one place that says so. The
+  // assembled ceiling still fails, so constitution growth is still paid for
+  // out of the same 175.5k every other doc spends.
   constitution: 20_000,
   // A FLOOR beside the ceiling (#418). The assembled bundle is the cached prefix
   // of every Gemini request, and each cache Google offers has a minimum size
@@ -208,6 +216,12 @@ const BUDGETS = {
   // beside the explicit floor once that one is measured.
   assembledFloorMargin: 4_000,
 };
+
+/**
+ * Whether an overrun of this role's budget warns rather than fails. The
+ * constitution only: the persona, a Worker face, the ceiling and the floor fail.
+ */
+const softBudget = (role) => role === "constitution";
 
 /** The budget a member is held to, or null when its role carries none. */
 function budgetFor({ rel, section }) {
@@ -497,9 +511,9 @@ function renderCompanion({ members, raw, parts, assembled, disclosed, referenceM
     "where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only\n" +
     "region still costs a budgeted doc. `Running total` is the assembled prompt's length through that\n" +
     "row, so it also carries the `---` divider and path comment every member after the first adds —\n" +
-    "which is why the last running total exceeds the sum of the chars column. A row marked over budget\n" +
-    "cannot normally appear: the bundler refuses to write either artifact once a budget is blown, so\n" +
-    "the marker is what a relaxed or raised budget would have to explain.\n\n" +
+    "which is why the last running total exceeds the sum of the chars column. Only a constitution row\n" +
+    "can be marked over budget: that budget is soft and warns, while the bundler refuses to write any\n" +
+    "artifact once a persona or Worker-face budget is blown.\n\n" +
     "## Disclosed references\n\n" +
     (disclosed.length
       ? `These docs declare \`disclosure: reference\` and ship in \`agents/uno-bot/src/generated/references.ts\` ` +
@@ -820,11 +834,31 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
     }
   });
 
-  if (overBudget.length) {
+  // A soft overrun is reported and the assembly continues; the ceiling below
+  // still measures every char it added.
+  const softOver = overBudget.filter(({ role }) => softBudget(role));
+  const hardOver = overBudget.filter(({ role }) => !softBudget(role));
+  if (softOver.length) {
     findings.push({
       message:
-        `${overBudget.length} file(s) over its char budget:\n` +
-        overBudget
+        `${softOver.length} file(s) over the constitution's soft char budget (warning — the build goes on):\n` +
+        softOver
+          .map(
+            ({ rel, role, size, limit }) =>
+              `  ${rel} (${role}): ${n(size)} chars against a budget of ${n(limit)} — over by ${n(size - limit)}`,
+          )
+          .join("\n") +
+        "\n  -> Tier 1 loads on every request. Trim it back: a glossary row REPLACES the row it" +
+        "\n     supersedes rather than sitting beside it (AGENTS.md § The loading contract).",
+      severity: "warning",
+    });
+  }
+
+  if (hardOver.length) {
+    findings.push({
+      message:
+        `${hardOver.length} file(s) over its char budget:\n` +
+        hardOver
           .map(
             ({ rel, role, size, limit }) =>
               `  ${rel} (${role}): ${n(size)} chars against a budget of ${n(limit)} — over by ${n(size - limit)}`,
