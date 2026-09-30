@@ -235,3 +235,70 @@ test("in a thread entered through a sweep card, a decided card's result, notes a
     history = [];
   }
 });
+
+// ── The weekly DS precedence list threads ───────────────────────────────────
+// uno-bot posts a list and a card there on a schedule, which leaves a live
+// card and uno-bot's own posts in the thread. People reply to each other about
+// the list, so a reply is not a turn: an @mention or a typed gate emoji
+// engages, and nothing else does — not uno-bot having answered there, not a
+// newer week's thread, not a card that never posted. Every list thread is
+// recorded under its own ts.
+
+const UNIVERSAL = "C072E8SFLKV";
+const LAST_WEEK = "1759000000.000001";
+const THIS_WEEK = "1759500000.000001";
+
+function weeklyEnv(history: unknown[] = [], recorded: string[] = [LAST_WEEK, THIS_WEEK]): Env {
+  return {
+    ...ENV,
+    PLUS_UNIVERSAL_CHANNEL_ID: UNIVERSAL,
+    HARNESS_KV: {
+      get: async (key: string) => {
+        const ts = recorded.find((t) => key === `ds-precedence:thread:${t}`);
+        return ts ? { channel: UNIVERSAL, ts, cardTs: "" } : null;
+      },
+    },
+    THREAD_STATE: {
+      idFromName: (name: string) => name,
+      get: () => ({
+        // A card is live in the thread.
+        async getProposalByThread() {
+          return { proposalTs: "1759500000.000002" };
+        },
+        async readHistory() {
+          return history;
+        },
+      }),
+    },
+  } as unknown as Env;
+}
+
+const listReply = (text: string, thread = THIS_WEEK) =>
+  post({ channel: UNIVERSAL, ts: "1759500100.000001", thread_ts: thread, text });
+
+test("a plain reply in a list thread does not engage, though a card is live there", async () => {
+  assert.equal(await engages(listReply("agree with 2, the set exists"), weeklyEnv()), false);
+});
+
+test("an @mention or a typed gate emoji in a list thread engages", async () => {
+  assert.equal(await engages(listReply(`<@${BOT}> why is Button listed?`), weeklyEnv()), true);
+  assert.equal(await engages(listReply("✅"), weeklyEnv()), true);
+});
+
+test("uno-bot having answered in a list thread (a typed ✅, a mention) does not make every reply a turn", async () => {
+  assert.equal(await engages(listReply("and item 3?"), weeklyEnv([{ role: "assistant", content: "…" }])), false);
+});
+
+test("last week's list thread stays exempt after this week's posts", async () => {
+  assert.equal(await engages(listReply("still think 4 is wrong", LAST_WEEK), weeklyEnv()), false);
+});
+
+test("a list thread whose card never posted is still a list thread", async () => {
+  // Recorded when the list posted, before any card: no card, only the list.
+  assert.equal(await engages(listReply("nothing to confirm here?"), weeklyEnv([], [THIS_WEEK])), false);
+});
+
+test("another thread in #plus-universal with a live card keeps the ordinary rule", async () => {
+  const other = post({ channel: UNIVERSAL, ts: "1759500100.000002", thread_ts: "1759400000.000001", text: "looks good" });
+  assert.equal(await engages(other, weeklyEnv()), true);
+});

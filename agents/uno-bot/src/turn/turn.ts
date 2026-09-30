@@ -75,7 +75,9 @@ import {
   proposalOperations,
   proposalReplyThread,
   proposalTtlMs,
+  slotKeyOf,
   stagingCardOf,
+  SWEEP_KEY,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -1263,12 +1265,24 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   }
 
-  // The card this one revises. Every pending card, except a sweep card: a
-  // batch that replaces none of its blocks is some other ask made in the
-  // thread — filing an issue, say — and stages as its own card beside it
-  // (`proposalSlot`), inheriting none of its terms.
+  // The card this one revises. Every pending card, except a keyed one
+  // (`supersedeKey`) the batch does not touch: that is some other ask made in
+  // the thread — filing an issue under a sweep card, say — and stages as its
+  // own card beside it (`proposalSlot`), inheriting none of its terms. A sweep
+  // card is touched by a batch replacing one of its blocks; any other keyed
+  // card by a batch using one of its tools.
   const replaced =
-    request.pending?.sweepRun && !touchesBlocksOf(result.operations, request.pending) ? null : request.pending;
+    request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
+
+  // A keyed card that revises only its own way (the weekly DS precedence
+  // card, through `dispute N`) is not revised by a turn at all: the batch is
+  // refused with the card's note, rather than staged as a near-copy that
+  // stays live beside it — two live cards could both run.
+  if (replaced?.refuseRevision) {
+    await delivery.postNote(replaced.refuseRevision);
+    await memory.remember(replaced.refuseRevision);
+    return { disposition: "asked", posted: replaced.refuseRevision, wrote: memory.wrote(), telemetry };
+  }
 
   // A card that names its confirmers is revised only by one of them. A
   // revision keeps the card's confirmer set, so one staged by anyone else could
@@ -1380,7 +1394,12 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
     // deadline, and its outcome joins the row the Worker's staging wrote.
     ...(replaced?.sweepRun
-      ? { sweepRun: replaced.sweepRun, ttlMs: sweepLeftMs, originProposalTs: stagingCardOf(replaced) }
+      ? {
+          sweepRun: replaced.sweepRun,
+          supersedeKey: replaced.supersedeKey ?? SWEEP_KEY,
+          ttlMs: sweepLeftMs,
+          originProposalTs: stagingCardOf(replaced),
+        }
       : {}),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
@@ -2293,6 +2312,16 @@ function isSubsetOf(revised: readonly ProposalOperation[], original: readonly Pr
 function touchesBlocksOf(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
   const theirs = replacedBlocks(proposalOperations(card));
   return [...replacedBlocks(operations)].some((b) => theirs.has(b));
+}
+
+/**
+ * Whether a batch touches a keyed card: for a sweep card, replaces one of its
+ * blocks; for any other, uses one of its tools.
+ */
+function touchesCard(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
+  if (card.sweepRun) return touchesBlocksOf(operations, card);
+  const tools = new Set(proposalOperations(card).map((op) => op.toolName));
+  return operations.some((op) => tools.has(op.toolName));
 }
 
 /** Key-order-independent JSON compare, so two generations of the same tool

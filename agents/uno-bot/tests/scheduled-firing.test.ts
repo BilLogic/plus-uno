@@ -100,6 +100,7 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
     ["sweep-post", "sweep-post"],
+    ["ds-precedence-post", "ds-precedence-post"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],
   ]);
@@ -194,6 +195,31 @@ test("the enqueue reaches the run's own runner, and costs one charged hop", asyn
   assert.deepEqual(named, ["scheduled-run/end-of-day"]);
   assert.deepEqual(bodies, [run]);
   assert.equal(hops, 1);
+});
+
+test("the DS precedence check runs on Friday's end-of-day run only, right after the library poll", () => {
+  // 2026-10-02 is a Friday.
+  const friday = planRun("end-of-day", Date.UTC(2026, 9, 2, 22, 0));
+  assert.deepEqual(friday.jobs.slice(0, 2).map((j) => [j.key, j.after ?? []]), [
+    ["figma-library-poll", []],
+    ["ds-precedence-check", ["figma-library-poll"]],
+  ]);
+  const without = (at: number) => planRun("end-of-day", at).jobs.map((j) => j.key);
+  for (let day = 28; day <= 30; day++) {
+    // Monday to Wednesday of the same week, and Thursday below: no check.
+    assert.equal(without(Date.UTC(2026, 8, day, 22, 0)).includes("ds-precedence-check"), false);
+  }
+  assert.equal(without(Date.UTC(2026, 9, 1, 22, 0)).includes("ds-precedence-check"), false);
+  // The filter spares every other job, the spread-in batches included.
+  assert.deepEqual(
+    friday.jobs.filter((j) => j.kind !== "ds-precedence-check").map((j) => j.key),
+    without(Date.UTC(2026, 9, 1, 22, 0)),
+  );
+  assert.ok(friday.jobs.some((j) => j.kind === "usage-classify"));
+  // Another weekday's plan, on request, is that weekday's.
+  assert.equal(planRun("end-of-day", Date.UTC(2026, 8, 29, 22, 0), [], 5).jobs[1]?.key, "ds-precedence-check");
+  // The post is on every morning, so a morning whose reads fail is retried.
+  assert.ok(planRun("morning", Date.UTC(2026, 9, 5, 14, 0)).jobs.some((j) => j.kind === "ds-precedence-post"));
 });
 
 test("a dry run rehearses one ask-resolution job, not all of them", async () => {

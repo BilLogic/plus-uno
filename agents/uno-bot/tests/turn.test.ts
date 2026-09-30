@@ -815,6 +815,34 @@ test("a revised card inherits the lifetime and confirmer set of the card it repl
   assert.deepEqual(stored?.confirmers, ["U7", "U8"]);
 });
 
+// A card the Worker keyed apart (the weekly DS precedence card) is revised
+// only its own way: a turn whose batch would touch it — uses one of its tools —
+// posts the card's note and stages nothing, so the two can never both be live.
+test("a batch touching a keyed-apart card is refused with its note, and only that card stays live", async () => {
+  const weekly: PendingProposal = {
+    ...PENDING,
+    supersedeKey: "ds-precedence",
+    refuseRevision: "Reply `dispute N` to drop an item.",
+  };
+  const h = harness({
+    replies: [
+      {
+        text: "Here is the card without Button.",
+        toolCalls: [{ name: "notion_create", args: { title: "Weekly intake minus Button" } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(weekly);
+
+  const outcome = await runTurn(request({ text: "drop Button from the card", pending: weekly }), h.deps);
+
+  assert.equal(outcome.disposition, "asked");
+  assert.equal(outcome.staged, undefined);
+  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.equal((await h.threadState.getProposalByTs(weekly.proposalTs)).state, "found");
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, weekly.proposalTs, "no second live card");
+});
+
 // Someone outside the confirmer set could stage a revision nobody could then
 // run on their word — and staging it would retire the card its confirmers
 // can. Refused instead: the card stays live exactly as it was, and the person

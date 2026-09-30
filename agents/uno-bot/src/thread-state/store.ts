@@ -256,11 +256,29 @@ export interface PendingProposal {
    * Set on a card the end-of-day sweep staged: the morning it was posted,
    * `YYYY-MM-DD`. What a ✅, a ⛔ or a revision does to such a card is also
    * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision of
-   * it and a re-staged card carry it. It also gives the card its own slot in
-   * the thread (`proposalSlot`), so a sweep card and a turn's card stay live
-   * side by side.
+   * it and a re-staged card carry it. Its slot in the thread is its
+   * `supersedeKey`, `"sweep"`.
    */
   sweepRun?: string;
+  /**
+   * The card's own slot within its reply thread (`proposalSlot`). Absent —
+   * every turn's card — the card holds the thread's slot, and cards there
+   * replace one another. A card the Worker stages into a thread people also
+   * talk in sets one — `"sweep"` for an end-of-day sweep card, `"ds-precedence"`
+   * for the weekly DS precedence card — so it and a turn's card stay live side
+   * by side, and only a card with the same key replaces it. A turn's batch
+   * revises it only when it touches it (`turn/turn.ts`); while both are live,
+   * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
+   * always answers, and a reaction or button resolves the card it is on.
+   */
+  supersedeKey?: string;
+  /**
+   * On a keyed card: what a turn in its thread posts, in place of a card,
+   * when its batch would touch this one. A near-copy would otherwise stay live
+   * beside it, and both could run. The weekly DS precedence card points at
+   * `dispute N`, the one way it is revised.
+   */
+  refuseRevision?: string;
   /**
    * The card a person's ask first staged, when this one re-stages it after a
    * cut-off run (`turn/turn.ts` `restageExecution`), or the sweep card the
@@ -349,14 +367,27 @@ export function proposalReplyThread(
 
 /**
  * The grain one card retires another at: its reply thread, and within it the
- * sweep's slot for a sweep card (`sweepRun`). Both adapters' `putProposal`
- * compare with this, so a thread holds one turn card and one sweep card at
- * most, and staging retires only the card in its own slot — a revision of the
- * sweep card retires the sweep card, an unrelated ask stages beside it.
+ * card's own slot when it has a key (`supersedeKey`). Both adapters'
+ * `putProposal` compare with this, so a thread holds one turn card and one
+ * card per key at most, and staging retires only the card in its own slot —
+ * a revision of a keyed card retires that card, an unrelated ask stages beside
+ * it. The one supersession mechanism in the module.
+ *
+ * A sweep card staged before the key existed carries `sweepRun` and no key,
+ * and is read as keyed `"sweep"` so it keeps its slot until it expires.
  */
-export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "sweepRun">): string {
+export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "supersedeKey" | "sweepRun">): string {
   const thread = proposalReplyThread(proposal);
-  return proposal.sweepRun ? `${thread}#sweep` : thread;
+  const key = slotKeyOf(proposal);
+  return key ? `${thread}#${key}` : thread;
+}
+
+/** The end-of-day sweep card's slot key. */
+export const SWEEP_KEY = "sweep";
+
+/** A card's slot key, or undefined for a card holding its thread's slot. */
+export function slotKeyOf(proposal: Pick<PendingProposal, "supersedeKey" | "sweepRun">): string | undefined {
+  return proposal.supersedeKey ?? (proposal.sweepRun ? SWEEP_KEY : undefined);
 }
 
 /**

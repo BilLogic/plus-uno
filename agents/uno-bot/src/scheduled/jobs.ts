@@ -14,6 +14,7 @@ import { selectProvider } from "../agent/run-agent";
 import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
 import { askCategoriesFor, proposalEventLogFor } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
+import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
@@ -88,6 +89,15 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "proposal-expiry": async (env, _job, { dryRun }) => {
     const { summary } = await runProposalExpiry(proposalEventLogFor(env), Date.now(), { dryRun });
     console.log(`[usage] proposal expiry: ${summary}`);
+  },
+  // Friday's end of day: compare code with the library and keep the
+  // disagreements for the morning (src/ds-precedence/).
+  "ds-precedence-check": async (env, _job, { dryRun }) => {
+    console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, { dryRun })).summary}`);
+  },
+  // Morning: a waiting report becomes one thread and one card in #plus-universal.
+  "ds-precedence-post": async (env, _job, { dryRun }) => {
+    console.log(`[ds-precedence] post: ${(await runDsPrecedencePost(env, { dryRun })).summary}`);
   },
 };
 

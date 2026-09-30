@@ -54,7 +54,7 @@
 
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
-import { proposalReplyThread, type PendingProposal, type ThreadState } from "../thread-state/index";
+import { proposalReplyThread, SWEEP_KEY, type PendingProposal, type ThreadState } from "../thread-state/index";
 import { recordProposalEvents, stagedEvent, supersededEvents, type ProposalEventLog } from "../usage/index";
 import type { ProposalCard } from "../turn/index";
 import type { ScheduledJob } from "../scheduled/runs";
@@ -1056,6 +1056,8 @@ export function sweepProposal(
     ttlMs: SWEEP_CARD_TTL_MS,
     confirmers: [...plan.confirmers],
     sweepRun: posted.postDate,
+    // Its own slot in the thread, beside any turn's card (`proposalSlot`).
+    supersedeKey: SWEEP_KEY,
   };
 }
 

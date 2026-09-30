@@ -202,7 +202,8 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
 
 // ─── Figma REST (retry on 429/5xx, same policy as v1) ───────────────────────
 
-async function figmaGet<T>(env: Env, endpoint: string): Promise<T> {
+/** One Figma REST read, retried on a 429 or a 5xx. */
+export async function figmaGet<T>(env: Env, endpoint: string): Promise<T> {
   let lastErr = "";
   for (let attempt = 0; attempt <= RETRIES; attempt++) {
     if (attempt > 0) await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));

@@ -19,10 +19,32 @@ import type { ComponentRegistry, LibraryChangeSet } from "./draft";
 import { postLibraryFindings, type PostResult } from "./post";
 import { trackLibraryIntakes, type TrackedPublish, type TrackResult } from "./track";
 
-const TRACKED_KV_KEY = "figma-poll:tracked";
-const REGISTRY_PATH = "design-system/figma/component-registry.json";
+export const TRACKED_KV_KEY = "figma-poll:tracked";
+export const REGISTRY_PATH = "design-system/figma/component-registry.json";
 /** Pages of 200 members — a channel of up to 600 people. */
 const MEMBER_PAGES = 3;
+
+/**
+ * A channel's member ids, or null when Slack would not say — or when there are
+ * more than the pages read, since a card must not quietly leave out anyone who
+ * may decide it. The design-ops team is whoever is in #plus-universal.
+ *
+ * @param env - Worker bindings
+ * @param channel - The channel
+ */
+export async function channelMembers(env: Env, channel: string): Promise<string[] | null> {
+  const ids: string[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < MEMBER_PAGES; page++) {
+    const res = await conversationsMembers(env, channel, 200, cursor).catch(() => null);
+    if (!res?.ok) return null;
+    ids.push(...(res.members ?? []));
+    cursor = res.response_metadata?.next_cursor || undefined;
+    if (!cursor) return ids;
+  }
+  console.error(`[figma-library] ${channel} has more than ${MEMBER_PAGES * 200} members`);
+  return null;
+}
 
 function trackedStore(env: Env) {
   return kvJson<TrackedPublish[]>(env, TRACKED_KV_KEY, []);
@@ -51,21 +73,7 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
           return null;
         }
       },
-      async members() {
-        const ids: string[] = [];
-        let cursor: string | undefined;
-        for (let page = 0; page < MEMBER_PAGES; page++) {
-          const res = await conversationsMembers(env, channel, 200, cursor).catch(() => null);
-          if (!res?.ok) return null;
-          ids.push(...(res.members ?? []));
-          cursor = res.response_metadata?.next_cursor || undefined;
-          if (!cursor) return ids;
-        }
-        // More members than the pages read: the card must not quietly leave
-        // anyone out of who may decide it, so it waits for a fix.
-        console.error(`[figma-library] ${channel} has more than ${MEMBER_PAGES * 200} members`);
-        return null;
-      },
+      members: () => channelMembers(env, channel),
       async post(message) {
         const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
