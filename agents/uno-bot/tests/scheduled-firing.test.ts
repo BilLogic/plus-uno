@@ -102,6 +102,7 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
     ["sweep-post", "sweep-post"],
     ["ds-precedence-post", "ds-precedence-post"],
     ["commitment-nudge", "commitment-nudge"],
+    ["figma-drift-post", "figma-drift-post"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],

@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 55,740 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 58,509 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 12,623 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 15,392 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1707,7 +1707,7 @@ THE standing-automation registry. An automation absent from the table below is u
 
 # The end-of-day sweep
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #751 and #764 · the code is agents/uno-bot/src/sweep/. -->
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #750, #751 and #764 · the code is agents/uno-bot/src/sweep/. -->
 
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a proposal card until a person confirms it. Every write waits for that ✅.
 
@@ -1717,7 +1717,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job. DMs stay unread.
 - **When:** each weekday's end-of-day run (22:00 UTC) reads each channel since its cursor, which lives in the usage database.
-- **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place, so a thread with no Notion link, no named page and no answered question is passed over.
+- **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
 - **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
 - **Running notes and Roadmap cards:** two more end-of-day jobs read the Design Running Notes and the Roadmap cards edited since their own cursors. A note's new blocks, or a card's new comments and body edits, are the record. Only team notes are read. A 1:1 note (tagged `1:1` in *Note Type*, or titled as one), or any page that is not a row of the running-notes database, stays unread, and so does a 1:1 that a thread links or a search finds.
 
@@ -1766,6 +1766,17 @@ In a thread uno-bot entered through a sweep card, it answers a reply only when t
 - **⛔** declines the whole card.
 
 Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its card posted is one that expired.
+
+## Drift in a read-only file
+
+When a thread settles something a linked Figma file, `design-system/` code, Storybook page or repo file may not show yet, uno-bot does not try to edit the file. The code is `agents/uno-bot/src/figma-drift/`.
+
+- **The ask:** the next weekday morning run posts once in that thread, naming every file it discussed: "you talked about <file> — is the Figma up to date?" (or "the code", or "Storybook"; "are they up to date?" for several). Each file is linked, and only each file's owner is @-mentioned. A Figma file's last publisher is named by handle, in bold, as plain text rather than an @-mention. The ask goes where `pickDestination` puts it, as a sweep card does.
+- **The drafted intakes:** a thread that drafts intakes gets one card, in its own slot beside any sweep card or turn card, holding one intake per file. Its ✅ files a Roadmap card from the PRD template (`notion_create`, surface `prd`) for a Figma file, or a `harness-intake` issue (`github_issue_create`) for code or a repo file. `drop 2` leaves a file out, as on a sweep card. The Product Pillar is only ever a value the Roadmap already offers, taken from a Roadmap card the thread linked (Universal for the design-system library). An unknown value is left out, and the card says so.
+- **The public repo:** an issue drafted from a private channel, a group DM or a DM carries only the file and one neutral line, with no thread words and no link back. Any `@handle` in an issue's text is set in code. A Roadmap card from a private channel carries the thread's words after a ✅ from someone in it.
+- **One intake per file:** when several threads discussed the same file, the first gets the card and the others get the question alone, pointing at it. While that card is live, a new thread about the file also gets the question alone, and a thread whose own drift card is live waits for it. Each thread is asked about a given file once.
+- **"yes":** a whole-message yes ("yes", "yep", "yes, up to date", "already updated") or a reply saying the file is current, from someone the card names or who posted in an asked thread, withdraws the card at once. The card is edited to say so, and nobody can ✅ it after that. A reply that asks for something ("yes please file it", "go ahead", "ship it"), a question back or a no leaves the card as it is. A bare yes in a thread that also holds a turn's card answers that card. When the card also drafts intakes for files the replying thread did not discuss, it stays, and the reply names the `drop N` that leaves the answered files out.
+- **Terms:** the card's confirmers are the owners plus everyone who posted in the threads that discussed its files that morning. It expires after 72 h, with no re-ping.
 
 ## Commitment reminders
 

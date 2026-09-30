@@ -71,7 +71,7 @@ function deps(github: GithubIssueClient, over: Partial<GithubIssueDeps> = {}) {
   const bound: GithubIssueDeps = {
     github,
     requesterName: async () => "Bill Guo",
-    requestedInDm: false,
+    requestedPrivately: async () => false,
     threadPermalink: async () => PERMALINK,
     postToThread: async (text) => {
       posted.push(text);
@@ -103,10 +103,10 @@ test("a thread with no permalink still names the requester, and says the link is
   assert.match(body, /thread link unavailable/i);
 });
 
-test("a DM's footer says it came from a DM, and carries no link into it", () => {
-  const body = renderIssueBody(DRAFT, { requester: "Bill Guo", permalink: null, dm: true });
+test("a private place's footer says so, and carries no link into it", () => {
+  const body = renderIssueBody(DRAFT, { requester: "Bill Guo", permalink: null, privatePlace: true });
   assert.match(body, /on behalf of Bill Guo/);
-  assert.match(body, /filed from a DM/i);
+  assert.match(body, /filed from a private conversation/i);
   assert.doesNotMatch(body, /thread link unavailable/i);
   assert.doesNotMatch(body, /slack\.com/);
 });
@@ -192,7 +192,7 @@ test("an intake asked for in a DM files without the DM's link, and says where it
   const github = fakeClient(() => FILED);
   let asked = false;
   const { deps: d } = deps(github, {
-    requestedInDm: true,
+    requestedPrivately: async () => true,
     threadPermalink: async () => {
       asked = true;
       return "https://plus.slack.com/archives/D0123/p1700000000000190";
@@ -204,7 +204,7 @@ test("an intake asked for in a DM files without the DM's link, and says where it
   const sent = github.sent[0]!;
   assert.equal(asked, false, "a DM's permalink is never fetched for a public issue");
   assert.doesNotMatch(sent.body, /slack\.com/);
-  assert.match(sent.body, /filed from a DM/i);
+  assert.match(sent.body, /filed from a private conversation/i);
   assert.match(sent.body, /on behalf of Bill Guo/);
 });
 

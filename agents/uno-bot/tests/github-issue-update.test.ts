@@ -89,7 +89,7 @@ function deps(github: ReturnType<typeof fakeGithub>, over: Partial<GithubIssueUp
     resolveRepo: (requested) => resolveRepo(LIST, requested),
     github: github.clientFor,
     requesterName: async () => "Bill Guo",
-    requestedInDm: false,
+    requestedPrivately: async () => false,
     threadPermalink: async () => PERMALINK,
     postToThread: async (text) => {
       posted.push(text);
@@ -111,8 +111,8 @@ test("a comment carries the text verbatim, then the footer naming the requester 
 });
 
 test("a comment asked for in a DM says so and links nothing", () => {
-  const body = renderCommentBody("x", { requester: "Bill Guo", permalink: null, dm: true });
-  assert.match(body, /on behalf of Bill Guo, posted from a DM/);
+  const body = renderCommentBody("x", { requester: "Bill Guo", permalink: null, privatePlace: true });
+  assert.match(body, /on behalf of Bill Guo, posted from a private conversation/);
   assert.doesNotMatch(body, /slack\.com|thread link/);
 });
 
@@ -175,7 +175,7 @@ test("a DM's comment carries no link into the DM, and its permalink is never fet
   const github = fakeGithub();
   let asked = false;
   const { deps: d } = deps(github, {
-    requestedInDm: true,
+    requestedPrivately: async () => true,
     threadPermalink: async () => {
       asked = true;
       return "https://plus.slack.com/archives/D0123/p1";
@@ -185,7 +185,7 @@ test("a DM's comment carries no link into the DM, and its permalink is never fet
   const body = (github.steps[0] as { body: string }).body;
   assert.equal(asked, false);
   assert.doesNotMatch(body, /slack\.com/);
-  assert.match(body, /posted from a DM/);
+  assert.match(body, /posted from a private conversation/);
 });
 
 test("close carries its reason, after the comment that explains it", async () => {

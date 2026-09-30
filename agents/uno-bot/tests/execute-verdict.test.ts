@@ -49,6 +49,13 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     const ts = (u.searchParams.get("message_ts") ?? "").replace(".", "");
     return reply({ ok: true, permalink: `https://plus.slack.com/archives/${channel}/p${ts}` });
   }
+  if (url.includes("slack.com/api/conversations.info")) {
+    // A channel's kind by its test id: C0PRIV… private, G0… a group DM, any
+    // other C… public, and C0UNKNOWN one Slack will not describe.
+    const id = new URL(url).searchParams.get("channel") ?? "";
+    if (id === "C0UNKNOWN") return reply({ ok: false, error: "channel_not_found" });
+    return reply({ ok: true, channel: { id, is_private: id.startsWith("C0PRIV"), is_mpim: id.startsWith("G0"), is_im: false } });
+  }
   if (url.includes("slack.com/api/conversations.open")) {
     return reply({ ok: true, channel: { id: `D-${String(body?.users)}` } });
   }
@@ -110,12 +117,12 @@ function env(over: Partial<Record<string, string>> = {}): Env {
 
 /** A won ✅ on a card staged in the requester's own DM — where the
  *  conversation key is not a ts Slack accepts, and the reply ts is. */
-function won(operations: Array<{ toolName: string; input: Record<string, unknown> }>): GateVerdict {
+function won(operations: Array<{ toolName: string; input: Record<string, unknown> }>, channel = "D0REQUESTER"): GateVerdict {
   const proposal = {
     operations,
     toolName: operations[0]!.toolName,
     input: operations[0]!.input,
-    channel: "D0REQUESTER",
+    channel,
     threadTs: "dm",
     replyTs: "1700000000.000100",
     userMsgTs: "1700000000.000200",
@@ -335,7 +342,7 @@ test("an approved GitHub intake names who asked in its footer, and links the iss
   // The requester of record, resolved to a name — not whoever pressed ✅.
   assert.match(body, /on behalf of Bill Guo/);
   // Asked in a DM, so the public issue carries no link into it.
-  assert.match(body, /filed from a DM/);
+  assert.match(body, /filed from a private conversation/);
   assert.doesNotMatch(body, /slack\.com/);
   assert.deepEqual(filed.body?.labels, ["harness-intake", "needs-triage"]);
 
@@ -343,6 +350,40 @@ test("an approved GitHub intake names who asked in its footer, and links the iss
   assert.ok(note, "the issue link came back to the requesting conversation");
   assert.equal(note.channel, "D0REQUESTER");
   assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
+});
+
+// The repo is public: a card staged anywhere but a public channel files no
+// link back into its conversation — decided by the conversation's kind, since
+// a private channel's id starts with C like a public one's.
+for (const [place, channel] of [
+  ["a private channel", "C0PRIVATE01"],
+  ["a group DM", "G0GROUPDM01"],
+  ["a conversation Slack will not describe", "C0UNKNOWN"],
+] as const) {
+  test(`an approved GitHub intake staged in ${place} carries no permalink footer`, async () => {
+    calls = [];
+    const run = await executeVerdict();
+    await run(
+      env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" }),
+      won([{ toolName: "github_issue_create", input: { title: "A bot gap", body: "What went wrong." } }], channel),
+    );
+    const filed = calls.find((c) => c.url === "https://api.github.com/repos/BilLogic/plus-uno/issues");
+    const body = String(filed?.body?.body);
+    assert.match(body, /filed from a private conversation/);
+    assert.doesNotMatch(body, /slack\.com/);
+    assert.ok(!calls.some((c) => c.url.includes("chat.getPermalink")), "its permalink is never fetched");
+  });
+}
+
+test("an approved GitHub intake staged in a public channel links its source thread", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" }),
+    won([{ toolName: "github_issue_create", input: { title: "A bot gap", body: "What went wrong." } }], "C0PUBLIC01"),
+  );
+  const filed = calls.find((c) => c.url === "https://api.github.com/repos/BilLogic/plus-uno/issues");
+  assert.match(String(filed?.body?.body), /Source thread: https:\/\/plus\.slack\.com\/archives\/C0PUBLIC01\//);
 });
 
 test("an approved issue follow-up comments with the requester's footer, then closes with its reason", async () => {
@@ -364,7 +405,7 @@ test("an approved issue follow-up comments with the requester's footer, then clo
   );
   const comment = String(github[0]!.body?.body);
   assert.ok(comment.startsWith("Fixed in r384."), comment);
-  assert.match(comment, /Posted from Slack by uno-bot on behalf of Bill Guo, posted from a DM/);
+  assert.match(comment, /Posted from Slack by uno-bot on behalf of Bill Guo, posted from a private conversation/);
   assert.doesNotMatch(comment, /slack\.com/);
   assert.deepEqual(github[1]!.body, { state: "closed", state_reason: "completed" });
 
