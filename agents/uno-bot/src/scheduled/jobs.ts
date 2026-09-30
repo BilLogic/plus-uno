@@ -64,6 +64,10 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "sweep-channel": sweepBody,
   // End of day: the same, for every group DM uno-bot is in.
   "sweep-group-dms": sweepBody,
+  // End of day: decisions recorded in the running notes and on Roadmap cards
+  // edited that day (src/sweep/records.ts).
+  "sweep-notes": sweepBody,
+  "sweep-cards": sweepBody,
   // Morning: the findings whose morning has come become proposal cards.
   "sweep-post": sweepBody,
   // End of day: label one batch of the channel asks still holding text, and

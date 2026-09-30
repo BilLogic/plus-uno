@@ -189,7 +189,7 @@ test("each job's own report rides beside its reading", async () => {
   assert.equal("detail" in (report.jobs.find((j) => j.key === "assemble") ?? {}), false);
 });
 
-test("the end-of-day probe plans one sweep job per SWEEP_CHANNELS entry, #uno-bot left out, then the group DMs", async () => {
+test("the end-of-day probe plans one sweep job per SWEEP_CHANNELS entry, #uno-bot left out, then the group DMs, the notes and the cards", async () => {
   const url = new URL("https://w/debug/sweep?dry_run=1");
   const env = { SWEEP_CHANNELS: "C0DESIGN,C0UNOBOT,C0OTHER", UNO_BOT_CHANNEL_ID: "C0UNOBOT" } as unknown as Env;
   const report = await runMetered(() => sweepProbe(env, url, new Request(url)));
@@ -200,7 +200,7 @@ test("the end-of-day probe plans one sweep job per SWEEP_CHANNELS entry, #uno-bo
   };
   assert.deepEqual(
     body.planned.map((j) => j.key).filter((k) => k.startsWith("sweep:")),
-    ["sweep:C0DESIGN", "sweep:C0OTHER", "sweep:group-dms"],
+    ["sweep:C0DESIGN", "sweep:C0OTHER", "sweep:group-dms", "sweep:notes", "sweep:cards"],
   );
   const keys = body.planned.map((j) => j.key);
   assert.ok(keys.indexOf("sweep:C0OTHER") < keys.indexOf("usage-text-purge"), "the sweeps run before the purge");
