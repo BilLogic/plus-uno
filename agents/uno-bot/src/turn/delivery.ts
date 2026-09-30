@@ -106,6 +106,20 @@ export type CardCaveat =
       fromDm?: true;
     };
 
+/**
+ * The line an intake card leads with when the model staged it and wrote
+ * nothing: where the ✅ writes, and whether to. The live evals found the card
+ * alone in 27 of 28 staged turns on Gemini flash — correct, and saying nothing
+ * to the requester — so the Worker supplies the line the model skipped.
+ */
+export type CardAsk =
+  | { kind: "file-issue"; repo: string }
+  | { kind: "roadmap-intake" }
+  /** Each issue as `repo#number`, in the order the batch runs. `verb` is what
+   *  happens to them: `add` when every update is a comment alone, `close`
+   *  when every update is a close alone, `update` for anything else. */
+  | { kind: "update-issue"; verb: "add" | "close" | "update"; issues: string[] };
+
 /** Who can read a listed repo's issues; `unknown` when GitHub would not say,
  *  which the card words as "may be public". The same union as
  *  `RepoVisibility` in `integrations/github.ts`, restated so the turn imports
@@ -184,6 +198,15 @@ export interface ProposalCard {
   /** The model's own lead line, when it wrote one. Prose, so it passes
    *  through: this is the one thing on the card the turn did not decide. */
   lead?: string;
+  /** The Worker's own lead, set only when the model wrote none beside an
+   *  intake: which target the ✅ writes to, and a question. A meaning, so the
+   *  adapter spells and escapes it. */
+  ask?: CardAsk;
+  /** Who wrote the line the card opens with: the model's own reply, or the
+   *  Worker (its ask, its note, its PRD line). Absent when the card has no
+   *  lead. Not rendered — the eval envelope reports it, so a judge can tell a
+   *  model that followed the reply rule from a Worker that covered for it. */
+  leadBy?: "model" | "worker";
   /** The concrete page a write lands on, where a read resolved one. */
   target?: CardTarget;
   /** The diff, on a `revision` card. */
@@ -577,11 +600,18 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
 export function describeCard(card: ProposalCard): string {
   const parts = [`card(${card.kind}): ${card.verb}`];
   if (card.lead) parts.push(`lead: ${card.lead}`);
+  if (card.ask) parts.push(`ask: ${[card.ask.kind, ...askTargets(card.ask)].join(" ")}`);
   if (card.target) parts.push(`target: ${card.target.title}`);
   for (const field of card.fields) parts.push(describeField(field));
   for (const caveat of card.caveats) parts.push(`caveat: ${caveat.kind}`);
   if (card.operations.length > 1) parts.push(`${card.operations.length} operations`);
   return parts.join("\n");
+}
+
+function askTargets(ask: CardAsk): string[] {
+  if (ask.kind === "file-issue") return [ask.repo];
+  if (ask.kind === "update-issue") return [ask.verb, ...ask.issues];
+  return [];
 }
 
 function describeField(field: CardField): string {

@@ -566,6 +566,168 @@ test("an intake card says a private repo is private, and a repo it couldn't chec
   }
 });
 
+// A card staged with no reply beside it left the requester a card and no line
+// naming where it goes or asking whether to file (live evals G2, G5, G6, I1,
+// I2). The model writes that line most of the time; when it writes none, the
+// card leads with a short one of the Worker's own, marked as the Worker's.
+test("an intake card staged with no reply leads with a line naming the target and asking", async () => {
+  const issue = `${ISSUE_REPO}#688`;
+  const cases = [
+    {
+      calls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }],
+      ask: { kind: "file-issue", repo: ISSUE_REPO },
+      line: `I'll file this on ${ISSUE_REPO} — want me to?`,
+    },
+    {
+      calls: [{ name: "notion_create", args: { surface: "intake", title: "A gap" } }],
+      ask: { kind: "roadmap-intake" },
+      line: "I'll add this to the Roadmap as an intake — want me to?",
+    },
+    // An issue follow-up says what happens to the issue: a comment is added to
+    // it, a close closes it, and anything else — a relabel, a reopen, a comment
+    // with a close — updates it.
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, comment: "Another repro." } }],
+      ask: { kind: "update-issue", verb: "add", issues: [issue] },
+      line: `I'll add this to ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, state: "closed_completed" } }],
+      ask: { kind: "update-issue", verb: "close", issues: [issue] },
+      line: `I'll close ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, add_labels: ["bug"] } }],
+      ask: { kind: "update-issue", verb: "update", issues: [issue] },
+      line: `I'll update ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, state: "open" } }],
+      ask: { kind: "update-issue", verb: "update", issues: [issue] },
+      line: `I'll update ${issue} — want me to?`,
+    },
+    {
+      calls: [{ name: "github_issue_update", args: { issue_number: 688, comment: "Fixed.", state: "closed_completed" } }],
+      ask: { kind: "update-issue", verb: "update", issues: [issue] },
+      line: `I'll update ${issue} — want me to?`,
+    },
+    {
+      calls: [
+        { name: "github_issue_update", args: { issue_number: 688, comment: "Same repro." } },
+        { name: "github_issue_update", args: { issue_number: 689, state: "closed_completed" } },
+      ],
+      ask: { kind: "update-issue", verb: "update", issues: [issue, `${ISSUE_REPO}#689`] },
+      line: `I'll update ${issue}, ${ISSUE_REPO}#689 — want me to?`,
+    },
+  ] as const;
+  for (const { calls, ask, line } of cases) {
+    const h = harness({ replies: [{ toolCalls: [...calls] }] });
+    const outcome = await runTurn(request({ text: "track this" }), h.deps);
+    assert.equal(outcome.disposition, "staged", line);
+    const card = outcome.staged!.card;
+    assert.equal(card.lead, undefined, line);
+    assert.deepEqual(card.ask, ask, line);
+    assert.equal(card.leadBy, "worker", line);
+    const text = renderProposalCard(card).text;
+    assert.ok(text.startsWith(`${line}\n`), text);
+  }
+});
+
+// A mixed batch has no one line that is true of it, so it gets none.
+test("a batch across tools or repos gets no fallback line", async () => {
+  const batches = [
+    [
+      { name: "github_issue_update", args: { issue_number: 688, comment: "Another repro." } },
+      { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+    ],
+    [
+      { name: "github_issue_create", args: { title: "A gap", body: "Details.", repo: "BilLogic/plus-uno" } },
+      { name: "github_issue_create", args: { title: "A bug", body: "Details.", repo: "BilLogic/plus-marketing-website" } },
+    ],
+    [
+      { name: "notion_create", args: { surface: "intake", title: "A gap" } },
+      { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+    ],
+  ];
+  for (const calls of batches) {
+    const h = harness({
+      replies: [{ toolCalls: calls }],
+      issueTarget: (staged) => ({ repo: String(staged.repo ?? ISSUE_REPO), visibility: "public" }),
+    });
+    const outcome = await runTurn(request({ text: "track these" }), h.deps);
+    const label = calls.map((c) => c.name).join("+");
+    assert.equal(outcome.disposition, "staged", label);
+    assert.equal(outcome.staged!.card.ask, undefined, label);
+    assert.equal(outcome.staged!.card.leadBy, undefined, label);
+    assert.doesNotMatch(renderProposalCard(outcome.staged!.card).text, /want me to\?/, label);
+  }
+  // Two creates on the SAME repo are one target, and still get the line.
+  const same = harness({
+    replies: [
+      {
+        toolCalls: [
+          { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+          { name: "github_issue_create", args: { title: "A bug", body: "Details." } },
+        ],
+      },
+    ],
+  });
+  const card = (await runTurn(request({ text: "track these" }), same.deps)).staged!.card;
+  assert.deepEqual(card.ask, { kind: "file-issue", repo: ISSUE_REPO });
+});
+
+test("the model's own reply leads the card, and no fallback line is added", async () => {
+  const h = harness({
+    replies: [
+      { text: "Filing it on the harness repo — ok?", toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] },
+    ],
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.equal(card.lead, "Filing it on the harness repo — ok?");
+  assert.equal(card.ask, undefined);
+  assert.equal(card.leadBy, "model");
+  assert.doesNotMatch(renderProposalCard(card).text, /want me to\?/);
+});
+
+// The Worker's "I could not stage …" note rides the preview, but it is not
+// the model's reply: it neither suppresses the ask nor reads as the model's.
+test("a Worker note in the preview does not stand in for the model's reply", async () => {
+  const h = harness({
+    replies: [
+      {
+        toolCalls: [
+          { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+          { name: "github_issue_create", args: [] as unknown as Record<string, unknown> },
+        ],
+      },
+    ],
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.match(card.lead ?? "", /I could not stage/);
+  assert.deepEqual(card.ask, { kind: "file-issue", repo: ISSUE_REPO });
+  assert.equal(card.leadBy, "worker");
+  const text = renderProposalCard(card).text;
+  assert.ok(text.startsWith(`I'll file this on ${ISSUE_REPO} — want me to?\n\nI could not stage`), text);
+});
+
+test("a card whose heading already asks gets no fallback line", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "notion_create", args: { surface: "decision", title: "A title", properties: { roadmap_card: "https://www.notion.so/plus/rm-1" } } }] }],
+  });
+  const card = (await runTurn(request({ text: "log this decision" }), h.deps)).staged!.card;
+  assert.equal(card.ask, undefined);
+  assert.doesNotMatch(renderProposalCard(card).text, /want me to\?/);
+});
+
+test("the fallback line escapes the repo it names", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] }],
+    issueTarget: () => ({ repo: "org/<a&b>", visibility: "public" }),
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.ok(renderProposalCard(card).text.startsWith("I'll file this on org/&lt;a&amp;b&gt; — want me to?"));
+});
+
 
 // A follow-up on an issue writes to the same repos an intake does, so its card
 // shows what will happen — the resolved issue, each operation, and the comment

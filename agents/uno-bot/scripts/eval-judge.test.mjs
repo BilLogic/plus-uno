@@ -79,6 +79,16 @@ test("every D-id in the document reaches the judge prompt, with its definition",
   assert.ok(prompt.includes('{"verdict":"pass"}'), "the prompt still asks for the strict-JSON verdict");
 });
 
+test("the prompt says where a staged card's reply is, and that gateAsk is not it", () => {
+  // Live run 36672820165: the judge read an empty gateAsk as "no reply" on
+  // cards whose lead said exactly what the case asked for.
+  const prompt = judgeSystem(loadRubric());
+  assert.match(prompt, /"card": its "heading" and its "lead"/);
+  assert.match(prompt, /"gateAsk" is only the clarify gate's question/);
+  // And a Worker fallback is not the bot following the reply rule.
+  assert.match(prompt, /only a "model" lead counts as the reply/);
+});
+
 test("a rubric edit reaches the prompt without touching the prompt", () => {
   // A tenth dimension, invented here: the loader reads the document, so the
   // prompt grows a D10 nobody wrote into the prompt.

@@ -67,7 +67,7 @@ import {
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
-import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue-update-render";
+import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../tools/github-issue-update-render";
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
@@ -120,6 +120,7 @@ import { DRIFT_KEY } from "../figma-drift/finding";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
+  type CardAsk,
   type CardCaveat,
   type CardField,
   type CardRevision,
@@ -2062,7 +2063,22 @@ async function buildCard(
   implementPrdUrl: string | undefined,
   fromDm: boolean,
 ): Promise<ProposalCard> {
-  const { toolName, input } = result;
+  const card = await cardOf(result, deps, implementPrdUrl, fromDm);
+  // Who wrote the opening line, for the eval envelope: the model when its own
+  // reply leads, the Worker for everything else — its ask, its PRD line, or a
+  // lead that is only its "I could not stage …" note.
+  const modelLed = !card.ask && !!result.replyText && card.lead === result.previewText;
+  return card.ask || card.lead ? { ...card, leadBy: modelLed ? "model" : "worker" } : card;
+}
+
+/** The card itself, before who-wrote-the-lead is marked. */
+async function cardOf(
+  result: Extract<AgentResult, { kind: "proposal" }>,
+  deps: Pick<TurnDeps, "cards">,
+  implementPrdUrl: string | undefined,
+  fromDm: boolean,
+): Promise<ProposalCard> {
+  const { toolName, input, operations } = result;
   const card: ProposalCard = {
     kind: toolName === "notion_update" ? "revision" : "confirm",
     verb: verbFor(toolName),
@@ -2071,6 +2087,19 @@ async function buildCard(
     caveats: caveatsFor(toolName, input, result.previewText),
     operations: result.operations,
   };
+
+  // THE ASK, when the model staged an intake and wrote no line of its own
+  // beside it: the card leads with where it goes and whether to file, so the
+  // requester is never handed a card and silence. Read off the model's reply,
+  // not the preview — a Worker "I could not stage …" note is not a reply.
+  // Absent `replyText` is a card no model turn produced (a restage, a sweep
+  // revision), and those get none. Only the intake cards get one, and only
+  // when the WHOLE batch is one tool on one target — a mixed batch has no one
+  // line that is true of it, and every other card's heading and footer
+  // already say what the ✅ does.
+  const silent = result.replyText === "";
+  const sameTool = operations.every((op) => op.toolName === toolName);
+  const ask = (made: CardAsk | null): { ask?: CardAsk } => (silent && sameTool && made ? { ask: made } : {});
 
   if (toolName === "github_issue_create") {
     // THE REPO AND WHO CAN READ IT: an intake on a public repo is readable by
@@ -2082,18 +2111,24 @@ async function buildCard(
     return {
       ...card,
       verb: `${card.verb} on ${repo}`,
+      ...ask(silent && sameTool && (await oneRepo(operations, repo, deps)) ? { kind: "file-issue", repo } : null),
       caveats: [{ kind: "repo-visibility", repo, visibility, ...(fromDm ? { fromDm: true as const } : {}) }],
     };
   }
   if (toolName === "github_issue_update") {
-    return { ...card, ...(await issueUpdateCardOf(result.operations, deps, fromDm)) };
+    const { updates, ...update } = await issueUpdateCardOf(operations, deps, fromDm);
+    return { ...card, ...update, ...ask(updateAskOf(updates)) };
   }
   if (toolName === "notion_create") {
     // THE SURFACE, named the way the issue card names its repo: an intake is
     // a GitHub issue or a Roadmap card, and a requester redirects by surface
     // ("put it on the Roadmap instead") — so the heading says which this is.
-    const verb = NOTION_SURFACE_VERBS[String(input.surface ?? "").trim().toLowerCase()];
-    return verb ? { ...card, verb } : card;
+    const verb = NOTION_SURFACE_VERBS[surfaceOf(input)];
+    return {
+      ...card,
+      ...(verb ? { verb } : {}),
+      ...ask(operations.every((op) => surfaceOf(op.input) === "intake") ? { kind: "roadmap-intake" } : null),
+    };
   }
 
   if (toolName === "github_workflow_run") {
@@ -2149,6 +2184,48 @@ const NOTION_SURFACE_VERBS: Readonly<Record<string, string>> = {
   decision: "log this decision in the Decisions DB",
 };
 
+function surfaceOf(input: Record<string, unknown>): string {
+  return String(input.surface ?? "").trim().toLowerCase();
+}
+
+/** Every issue create in the batch files on `repo` — each read through the
+ *  same `issueTarget` the heading's repo was, so a batch across two repos is
+ *  never announced as filing on one. */
+async function oneRepo(
+  operations: ReadonlyArray<ProposalOperation>,
+  repo: string,
+  deps: Pick<TurnDeps, "cards">,
+): Promise<boolean> {
+  for (const op of operations.slice(1)) {
+    if ((await deps.cards.issueTarget(op.input)).repo !== repo) return false;
+  }
+  return true;
+}
+
+/** One issue follow-up, as the ask reads it: the target, and what happens —
+ *  `null` where the input did not read, which is a case for no line at all. */
+type UpdateAskPart = { target: string; verb: "add" | "close" | "update" } | null;
+
+/**
+ * The ask for a batch of issue follow-ups. `add this to` is true only of a
+ * comment alone, `close` only of a close alone; anything else — a relabel, a
+ * reopen, a comment and a close together — is an `update`. An update that did
+ * not read gets no line: a wrong line is worse than none.
+ */
+function updateAskOf(parts: readonly UpdateAskPart[]): CardAsk | null {
+  if (!parts.length || parts.some((p) => p === null)) return null;
+  const read = parts as ReadonlyArray<NonNullable<UpdateAskPart>>;
+  const verbs = new Set(read.map((p) => p.verb));
+  return { kind: "update-issue", verb: verbs.size === 1 ? read[0]!.verb : "update", issues: read.map((p) => p.target) };
+}
+
+function updateVerbOf(update: IssueUpdate): "add" | "close" | "update" {
+  const relabels = update.addLabels.length + update.removeLabels.length > 0;
+  if (update.comment && !update.state && !relabels) return "add";
+  if (!update.comment && update.state?.startsWith("closed") && !relabels) return "close";
+  return "update";
+}
+
 /**
  * An issue follow-up's card: per issue, `repo#number`, what will happen to it
  * in the order it runs, and any comment verbatim — read through the same
@@ -2164,20 +2241,23 @@ async function issueUpdateCardOf(
   operations: ReadonlyArray<ProposalOperation>,
   deps: Pick<TurnDeps, "cards">,
   fromDm: boolean,
-): Promise<Pick<ProposalCard, "fields" | "caveats">> {
+): Promise<Pick<ProposalCard, "fields" | "caveats"> & { updates: UpdateAskPart[] }> {
   const updates = operations.filter((op) => op.toolName === "github_issue_update");
   const notices = new Map<string, CardCaveat>();
   const perIssue: Array<{ target: string; fields: CardField[] }> = [];
+  const asks: UpdateAskPart[] = [];
   for (const op of updates) {
     const { repo, visibility } = await deps.cards.issueTarget(op.input);
     const read = issueUpdateFromInput(op.input);
     if (!read.ok) {
       perIssue.push({ target: `${repo}#${String(op.input.issue_number ?? "?")}`, fields: cardFieldsOf(op.input) });
+      asks.push(null);
       continue;
     }
     if (read.update.comment && !notices.has(repo)) {
       notices.set(repo, { kind: "repo-visibility", repo, visibility, write: "comment", ...(fromDm ? { fromDm: true as const } : {}) });
     }
+    asks.push({ target: `${repo}#${read.update.issue}`, verb: updateVerbOf(read.update) });
     perIssue.push({
       target: `${repo}#${read.update.issue}`,
       fields: [
@@ -2190,7 +2270,7 @@ async function issueUpdateCardOf(
     perIssue.length === 1
       ? [{ label: "issue", value: perIssue[0]!.target }, ...perIssue[0]!.fields]
       : perIssue.map((u) => ({ label: u.target, under: u.fields.map((field) => ({ field })) }));
-  return { fields, caveats: [...notices.values()] };
+  return { fields, caveats: [...notices.values()], updates: asks };
 }
 
 /**

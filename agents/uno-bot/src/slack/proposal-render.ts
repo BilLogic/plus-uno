@@ -19,7 +19,7 @@
 // `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
 import { escapeSlackText } from "./mrkdwn";
-import type { CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
+import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
@@ -126,7 +126,8 @@ export function renderProposalCard(card: ProposalCard): RenderedCard {
   // fallback copy, and as what the button handler re-renders from. A
   // `prototype_scaffold` is a single operation, so there is no plan to lose.
   const blocks: unknown[] = [];
-  if (card.lead) blocks.push({ type: "section", text: { type: "mrkdwn", text: card.lead } });
+  const lead = cardLead(card);
+  if (lead) blocks.push({ type: "section", text: { type: "mrkdwn", text: lead } });
   blocks.push({
     type: "image",
     image_url: card.previewImageUrl,
@@ -145,17 +146,46 @@ function aboutTo(card: ProposalCard): string {
   return `:warning: About to *${card.verb}*:`;
 }
 
+/** The line a card opens with: the model's own reply, or else the Worker's
+ *  ask — above whatever note the Worker added, which is not a reply. */
+export function cardLead(card: ProposalCard): string | undefined {
+  if (!card.ask) return card.lead;
+  return card.lead ? `${askText(card.ask)}\n\n${card.lead}` : askText(card.ask);
+}
+
+/** The card's heading as posted — absent on a `revision` card, which has none. */
+export function cardHeading(card: ProposalCard): string | undefined {
+  return card.kind === "confirm" ? aboutTo(card) : undefined;
+}
+
+/** The Worker's ask, in words: where the ✅ writes, and a question. The names
+ *  come from a read, so they are escaped. */
+function askText(ask: CardAsk): string {
+  switch (ask.kind) {
+    case "file-issue":
+      return `I'll file this on ${escapeSlackText(ask.repo)} — want me to?`;
+    case "roadmap-intake":
+      return "I'll add this to the Roadmap as an intake — want me to?";
+    case "update-issue": {
+      const issues = ask.issues.map(escapeSlackText).join(", ");
+      if (ask.verb === "add") return `I'll add this to ${issues} — want me to?`;
+      return `I'll ${ask.verb} ${issues} — want me to?`;
+    }
+  }
+}
+
 /** The ⚠️ card every gated tool but `notion_update` gets. */
 function confirmText(card: ProposalCard): string {
   const lines: string[] = [];
-  if (card.lead) lines.push(card.lead, "");
+  const lead = cardLead(card);
+  if (lead) lines.push(lead, "");
   lines.push(aboutTo(card));
   // The resolved target above the raw params, so the approver of a write sees
   // the CONCRETE page it will touch, not just an opaque id.
   if (card.target) lines.push(`• *Target:* ${targetWords(card.target)}`);
   // A card whose lead says everything — a Worker's card — has no parameter
   // line to show.
-  if (card.fields.length || !card.lead) lines.push(renderFields(card.fields));
+  if (card.fields.length || !lead) lines.push(renderFields(card.fields));
   for (const caveat of card.caveats) lines.push(caveatText(caveat));
   lines.push(CONFIRM_FOOTER);
   return lines.join("\n");
@@ -165,7 +195,8 @@ function confirmText(card: ProposalCard): string {
  *  lead, the named page and the `current → new` diff say it better. */
 function revisionText(card: ProposalCard): string {
   const lines: string[] = [];
-  if (card.lead) lines.push(card.lead, "");
+  const lead = cardLead(card);
+  if (lead) lines.push(lead, "");
   const body = card.revision ? revisionBody(card.revision) : "";
   if (body) lines.push(body);
   for (const caveat of card.caveats) lines.push(caveatText(caveat));

@@ -796,16 +796,21 @@
       ],
       "expectTool": "notion_create",
       "forbidTool": "github_issue_create",
-      "judgeNote": "AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for a listed repo's problem (uno-bot and the harness, the marketing site, the blueprint app's code). For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for a listed repo's problem (uno-bot and the harness, the marketing site, the blueprint app's code). For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.] [reply: the reply is the staged card's lead, and only a lead with card.leadBy \"model\" counts — this case measures whether the model follows the one-line reply rule, so the Worker's fallback line (leadBy \"worker\") does not pass the reply clause.]"
     },
     {
       "id": "G3",
       "name": "a request an open intake already covers gets a duplicate offer, not a fresh card",
       "blocker": false,
       "samples": 3,
+      "seed": {
+        "repo": "BilLogic/plus-uno",
+        "issue": 816,
+        "label": "harness-intake"
+      },
       "turns": [
         {
-          "prompt": "uno-bot told me it can't open GitHub issues and gave me a template to paste instead. Please track this on GitHub.",
+          "prompt": "The uno-prototype intake hook keeps treating subagent hand-backs and task notifications as my answers, in sessions where I never started it. Please track this on GitHub.",
           "expectKind": [
             "text"
           ],
@@ -822,7 +827,7 @@
           "expectTool": "github_issue_create"
         }
       ],
-      "judgeNote": "AUTHORED 2026-09-21. The duplicate check before a GitHub intake, and the way past it. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: turn 1's tool list holds a github_intake_search call and no github_issue_create is staged; turn 2, where the requester chooses to file anyway, stages github_issue_create. For the judge: turn 1's reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. Turn 2's card drafts the requester's problem, not the seeded issue's, and the reply stays in future tense. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (a comment would be a card of its own). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-21. The duplicate check before a GitHub intake, and the way past it. SEED: the open harness-intake issue BilLogic/plus-uno#816, \"The uno-prototype intake hook advances on agent hand-backs and system notices, in sessions that never started it\" — an existing intake, so the case needs no issue filed for it. Re-pointed 2026-09-30: the seed this case first assumed (an open intake about the bot refusing to open GitHub issues) was never filed, so on live run 36672820165 the search found nothing and the model followed the no-match note to a fresh card. When #816 closes, point the prompt at another open harness-intake issue before the next live run. Deterministic: turn 1's tool list holds a github_intake_search call and no github_issue_create is staged; turn 2, where the requester chooses to file anyway, stages github_issue_create. For the judge: turn 1's reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to add this to that issue or file a new one anyway — a choice, not a decision made for the requester. Turn 2's card drafts the requester's problem, not the seeded issue's, and the reply (the response's card lead) stays in future tense. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (a comment would be a card of its own). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — it becomes a blocker in the PR that commits its recording.]"
     },
     {
       "id": "G4",
@@ -844,7 +849,7 @@
           "repo": "BilLogic/plus-marketing-website"
         }
       },
-      "judgeNote": "AUTHORED 2026-09-21. Intakes file on the listed repo whose purpose matches what would change: a broken link on the public marketing site is that site's code, so the card targets plus-marketing-website, not the harness repo. Deterministic: the staged github_issue_create names repo BilLogic/plus-marketing-website. For the judge: the title names the broken button and page, the body states what was expected and what happened, the reply names the repo it chose so the requester can redirect it, stays in future tense, and invents no issue number or URL. Filing on plus-uno, or a Roadmap card, fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-21. Intakes file on the listed repo whose purpose matches what would change: a broken link on the public marketing site is that site's code, so the card targets plus-marketing-website, not the harness repo. Deterministic: the staged github_issue_create names repo BilLogic/plus-marketing-website. For the judge: the title names the broken button and page, the body states what was expected and what happened, the reply names the repo it chose so the requester can redirect it, stays in future tense, and invents no issue number or URL. Filing on plus-uno, or a Roadmap card, fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.] [reply: the reply is the staged card's lead, and only a lead with card.leadBy \"model\" counts — this case measures whether the model follows the one-line reply rule, so the Worker's fallback line (leadBy \"worker\") does not pass the reply clause.]"
     },
     {
       "id": "G5",
@@ -866,7 +871,7 @@
           "repo": "BilLogic/plus-uno-blueprint"
         }
       },
-      "judgeNote": "AUTHORED 2026-09-21. A bug in the service-blueprint app is the blueprint repo's code, so the intake files there. Deterministic: the staged github_issue_create names repo BilLogic/plus-uno-blueprint. For the judge: the body describes the crash as the requester did (the view, the condition, the symptom) without inventing a stack trace, the reply names the repo it chose so the requester can redirect it, and it stays in future tense. It does not treat this as a blueprint CONTENT edit (no wall-ritual about blueprint writes) — the app's code is the target. Filing on plus-uno or the marketing site fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-21. A bug in the service-blueprint app is the blueprint repo's code, so the intake files there. Deterministic: the staged github_issue_create names repo BilLogic/plus-uno-blueprint. For the judge: the body describes the crash as the requester did (the view, the condition, the symptom) without inventing a stack trace, the reply names the repo it chose so the requester can redirect it, and it stays in future tense. It does not treat this as a blueprint CONTENT edit (no wall-ritual about blueprint writes) — the app's code is the target. Filing on plus-uno or the marketing site fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.] [reply: the reply is the staged card's lead, and only a lead with card.leadBy \"model\" counts — this case measures whether the model follows the one-line reply rule, so the Worker's fallback line (leadBy \"worker\") does not pass the reply clause.]"
     },
     {
       "id": "G6",
@@ -882,7 +887,7 @@
         "proposal"
       ],
       "expectTool": "github_issue_create",
-      "judgeNote": "AUTHORED 2026-09-21. The default route, beside G4 and G5: a skill is harness work, and harness work files on plus-uno. The repo input may be omitted (the default) or name BilLogic/plus-uno — which is why this case asserts no repo arg deterministically; the card's heading names the repo either way. For the judge: the staged card is not aimed at plus-marketing-website or plus-uno-blueprint, the reply names plus-uno as the repo it chose so the requester can redirect it, and it stays in future tense. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-21. The default route, beside G4 and G5: a skill is harness work, and harness work files on plus-uno. The repo input may be omitted (the default) or name BilLogic/plus-uno — which is why this case asserts no repo arg deterministically; the card's heading names the repo either way. For the judge: the staged card is not aimed at plus-marketing-website or plus-uno-blueprint, the reply names plus-uno as the repo it chose so the requester can redirect it, and it stays in future tense. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.] [reply: the reply is the staged card's lead, and only a lead with card.leadBy \"model\" counts — this case measures whether the model follows the one-line reply rule, so the Worker's fallback line (leadBy \"worker\") does not pass the reply clause.]"
     },
     {
       "id": "G7",
@@ -975,7 +980,7 @@
       "expectToolCalled": {
         "tool": "github_intake_search"
       },
-      "judgeNote": "AUTHORED 2026-09-29. A top-level post in #uno-bot with no @mention is the team reporting a problem with uno-bot, so the turn runs the duplicate check and, with no open intake matching, stages github_issue_create on the default repo. Deterministic: the tool list holds a github_intake_search call and the staged card is github_issue_create. For the judge: the reply is short — a line asking whether to file it (\"Want me to file this?\") — with the card as the draft; the body carries what happened (a stale WIP status), what was expected (the board's Ready for QA), the evidence the post gives, who reported it, and a suggested label or area; it invents no issue number, URL, screenshot or thread the post did not mention, and stays in future tense. A long answer about Design Status in place of a card, a Roadmap card, or a refusal fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-29. A top-level post in #uno-bot with no @mention is the team reporting a problem with uno-bot, so the turn runs the duplicate check and, with no open intake matching, stages github_issue_create on the default repo. Deterministic: the tool list holds a github_intake_search call and the staged card is github_issue_create. For the judge: the reply is short — a line asking whether to file it (\"Want me to file this?\") — with the card as the draft; the body carries what happened (a stale WIP status), what was expected (the board's Ready for QA), the evidence the post gives, who reported it, and a suggested label or area; it invents no issue number, URL, screenshot or thread the post did not mention, and stays in future tense. A long answer about Design Status in place of a card, a Roadmap card, or a refusal fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.] [reply: the reply is the staged card's lead, and a Worker fallback (card.leadBy \"worker\") counts — this case measures what the reporter reads in #uno-bot, and the one-line offer is the Worker's guarantee as much as the model's.]"
     },
     {
       "id": "I2",
@@ -995,17 +1000,22 @@
       "expectToolCalled": {
         "tool": "github_intake_search"
       },
-      "judgeNote": "AUTHORED 2026-09-29. A change request in #uno-bot is an intake too, the same as a bug report: the duplicate check runs, then github_issue_create is staged. Deterministic: github_intake_search in the tool list, github_issue_create staged. For the judge: the draft frames it as a request — what happens today (no Figma link on component answers), what is wanted (the frame linked), who asked, a suggested area — without claiming the feature exists or promising it will ship; the reply is one short line offering to file it plus the card; it stays in future tense and invents no issue number or URL. Answering only with a Figma link for some component, or a card on the Roadmap, fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-29. A change request in #uno-bot is an intake too, the same as a bug report: the duplicate check runs, then github_issue_create is staged. Deterministic: github_intake_search in the tool list, github_issue_create staged. For the judge: the draft frames it as a request — what happens today (no Figma link on component answers), what is wanted (the frame linked), who asked, a suggested area — without claiming the feature exists or promising it will ship; the reply is one short line offering to file it plus the card; it stays in future tense and invents no issue number or URL. Answering only with a Figma link for some component, or a card on the Roadmap, fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.] [reply: the reply is the staged card's lead, and a Worker fallback (card.leadBy \"worker\") counts — this case measures what the reporter reads in #uno-bot, and the one-line offer is the Worker's guarantee as much as the model's.]"
     },
     {
       "id": "I3",
       "name": "a #uno-bot report an open intake already covers stages a comment on it",
       "blocker": false,
       "samples": 3,
+      "seed": {
+        "repo": "BilLogic/plus-uno",
+        "issue": 816,
+        "label": "harness-intake"
+      },
       "channel": "C0ARJ2A3A69",
       "turns": [
         {
-          "prompt": "uno-bot said it can't open GitHub issues and pasted a template for me to file by hand instead."
+          "prompt": "The uno-prototype intake hook took over my session again: it counted subagent hand-backs and task notifications as my answers, and I never ran /uno-prototype."
         }
       ],
       "expectKind": [
@@ -1016,7 +1026,7 @@
       "expectToolCalled": {
         "tool": "github_intake_search"
       },
-      "judgeNote": "AUTHORED 2026-09-29. The duplicate path in #uno-bot. SEED: recorded while an open issue labelled harness-intake on plus-uno covers this same problem (the bot refusing to open GitHub issues) — the seed G3 uses. Deterministic: github_intake_search runs, the staged card is github_issue_update, and no github_issue_create is staged. For the judge: the card comments on the issue the search returned, by the number it returned, with this report (what happened, who reported it, the post as evidence) as the comment; the reply links that issue by the title and URL the search gave and asks whether to add the report there. It invents no issue number or URL the search did not return and does not claim the comment is posted. A fresh issue card over the match fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — the #uno-bot intake is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-29. The duplicate path in #uno-bot. SEED: the open harness-intake issue BilLogic/plus-uno#816, \"The uno-prototype intake hook advances on agent hand-backs and system notices, in sessions that never started it\" — an existing intake, so the case needs no issue filed for it. Re-pointed 2026-09-30: the seed this case first assumed (an open intake about the bot refusing to open GitHub issues) was never filed, so on live run 36672820165 the search found nothing and the model followed the no-match note to a fresh card. When #816 closes, point the prompt at another open harness-intake issue before the next live run. Deterministic: github_intake_search runs, the staged card is github_issue_update, and no github_issue_create is staged. For the judge: the card comments on the issue the search returned, by the number it returned, with this report (what happened, who reported it, the post as evidence) as the comment; the reply (the response's card lead) links that issue by the title and URL the search gave, or names it, and asks whether to add the report there. It invents no issue number or URL the search did not return and does not claim the comment is posted. A fresh issue card over the match fails. [channel: the case posts in #uno-bot, so the turn carries the intake note only where the Worker's UNO_BOT_CHANNEL_ID names that id.] [blocker:false until recorded — it becomes a blocker in the PR that commits its recording.] [reply: the reply is the staged card's lead, and only a lead with card.leadBy \"model\" counts — this case measures whether the model follows the one-line reply rule, so the Worker's fallback line (leadBy \"worker\") does not pass the reply clause.]"
     },
     {
       "id": "I4",

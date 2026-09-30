@@ -564,6 +564,7 @@ test("narration is NOT emitted ahead of a side-effect call", async () => {
     toolName: "notion_create",
     input: { title: "Reflection redesign" },
     previewText: "I'll file a Roadmap card for the reflection redesign.",
+    replyText: "I'll file a Roadmap card for the reflection redesign.",
   });
 });
 
