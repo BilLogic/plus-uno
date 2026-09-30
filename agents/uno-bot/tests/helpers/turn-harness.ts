@@ -32,6 +32,7 @@ import {
   type TurnOrigin,
   type UsageLog,
   type SubType,
+  type TeamRoles,
 } from "../../src/usage/index";
 import type { ModelUsage } from "../../src/agent/model-provider";
 import type { AbsenceContext } from "../../src/agent/absence";
@@ -196,6 +197,8 @@ export function harness(opts: {
   now?: () => number;
   /** A DM ask's in-turn classifier. Absent, DM asks are recorded unlabelled. */
   classifyAsk?: (text: string) => Promise<SubType | null>;
+  /** The stored role map a staged card reads. Absent, none is stored. */
+  teamRoles?: () => Promise<TeamRoles>;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -303,6 +306,7 @@ export function harness(opts: {
       writeTimeoutMs: 50,
       classifyTimeoutMs: 50,
       ...(opts.classifyAsk ? { classifyAsk: opts.classifyAsk } : {}),
+      ...(opts.teamRoles ? { teamRoles: opts.teamRoles } : {}),
     },
 
     ...(opts.now ? { now: opts.now } : {}),

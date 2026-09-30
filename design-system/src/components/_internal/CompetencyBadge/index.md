@@ -3,6 +3,8 @@
 
 # CompetencyBadge
 
+A competency, which is a SMART area: the same read-only Tag `StaticBadgeSmart` renders, taking the area as people write it ("Mastering Content") as well as its key.
+
 **Import:** `import { CompetencyBadge } from '@/components';`
 
 **Source:** `design-system/src/components/_internal/CompetencyBadge/CompetencyBadge.jsx`
@@ -11,8 +13,8 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `competencyArea` | string (required) | — | — |
-| `size` | string | `'h2'` | — |
+| `competencyArea` | string (required) | — | The SMART area, as a key (`mastering-content`) or as written ("Mastering Content"). |
+| `size` | string | — | Deprecated and ignored: a competency is a Tag, which has one size (22). |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
 

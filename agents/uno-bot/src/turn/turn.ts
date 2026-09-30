@@ -101,6 +101,7 @@ import {
   type TurnOrigin,
   type TurnRecord,
   type UsageLog,
+  type TeamRoles,
 } from "../usage/index";
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
@@ -417,6 +418,21 @@ export interface TurnUsage {
   classifyAsk?(text: string): Promise<SubType | null>;
   /** Overrides `ASK_CLASSIFY_TIMEOUT_MS`. */
   classifyTimeoutMs?: number;
+  /** The stored Slack-id → role map a staged card's roles are read from
+   *  (`usage/roles.ts`). Absent, every role reads unknown. */
+  teamRoles?(): Promise<TeamRoles>;
+}
+
+/** The role map for a staged card; a read that fails reads as no map, so
+ *  every role is unknown and the card is staged all the same. */
+async function teamRolesOf(usage: TurnUsage): Promise<TeamRoles> {
+  // The roles only label a usage record, which never costs the turn its
+  // reply: any failure here, a budget stop included, records no roles.
+  try {
+    return (await usage.teamRoles?.()) ?? {};
+  } catch {
+    return {};
+  }
 }
 
 export interface TurnDeps {
@@ -1444,6 +1460,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         turnId: staging.turnId,
         testTraffic: staging.testTraffic,
         askText: request.text,
+        roles: await teamRolesOf(deps.usage),
       }),
     ],
     deps.usage.writeTimeoutMs,
@@ -1582,6 +1599,7 @@ async function dropFromSweepCard(
         turnId: staging.turnId,
         testTraffic: staging.testTraffic,
         askText: request.text,
+        roles: await teamRolesOf(deps.usage),
       }),
     ],
     deps.usage.writeTimeoutMs,

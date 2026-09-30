@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 53,928 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 54,717 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 10,811 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 11,600 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1718,8 +1718,8 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job. DMs stay unread.
 - **When:** each weekday's end-of-day run (22:00 UTC) reads each channel since its cursor, which lives in the usage database.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place, so a thread with no Notion link, no named page and no answered question is passed over.
-- **Named, not linked:** a message that names a page ("the booking PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, and only above the match floor. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply.
-- **Running notes and Roadmap cards:** two more end-of-day jobs read the Design Running Notes and the Roadmap cards edited since their own cursors. A note's new blocks, or a card's new comments and body edits, are the record. Only team notes are read. A 1:1 note, or any page that is not a row of the running-notes database, stays unread.
+- **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a standalone page titled as a PRD or spec. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
+- **Running notes and Roadmap cards:** two more end-of-day jobs read the Design Running Notes and the Roadmap cards edited since their own cursors. A note's new blocks, or a card's new comments and body edits, are the record. Only team notes are read. A 1:1 note (tagged `1:1` in *Note Type*, or titled as one), or any page that is not a row of the running-notes database, stays unread, and so does a 1:1 that a thread links or a search finds.
 
 ## Where a card goes
 
@@ -1751,7 +1751,7 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 
 ## Answers and decisions no page holds yet
 
-- **An answer given only in chat (C3):** a thread asks a question, someone answers it, and no page it links or a search finds states that answer. The card goes in that thread, mentions whoever answered, and proposes the exact page, the section and the line: "add under *Tutor Training PRD › Session setup*: 'Ratio is 1 tutor to 4–5 students.'" When no section fits, it opens a new section at the end of the closest page. Its ✅ writes the line after the section's last block, stamped like a replace: if that block has moved since the read, nothing is written. It is always a proposal card, and it files no intake and no ticket. Reply to adjust it, the way you would revise any card.
+- **An answer given only in chat (C3):** a thread asks a question, someone answers it, and no page it links or a search finds states that answer. The card goes in that thread, mentions whoever answered, and proposes the exact page, the section and the line: "add under *Tutor Training PRD › Session setup*: 'Ratio is 1 tutor to 4–5 students.'" When no section fits, it opens a new section at the end of the closest page. Its ✅ writes the line after the section's last block, stamped like a replace: if that block has moved since the read, nothing is written. It is always a proposal card, and it files no intake and no ticket. A card that adds an answer is revised by `drop N` alone; for any other change, ⛔ it and ask.
 - **A decision in a note or on a card (C4):** a running note, or a card's comment or edit, records a decision a page still states the old way. It has no thread, so the card goes by its target: #plus-universal for a design-system target (a `Universal`-pillar card), #plus-design for anything else. The owner is the target card's `Contributor`, then the note's takers or the card's own Contributors. Those people can confirm. The card links the note block or the card it came from.
 - **Discussion is not a decision:** options weighed, a question, a proposal or a to-do in a note produces nothing.
 
@@ -1777,6 +1777,7 @@ The same end-of-day read also looks for **commitments**: someone in a swept thre
 - **Where:** a reply in the promise's own thread, mentioning only the promiser. It follows `pickDestination` like every proactive job, so it stays out of #uno-bot and mentions the promiser rather than the lead.
 - **Answers,** from the promiser, as reactions on the reminder: 🙌 done, ⏳ soon (due again two working days out, at most twice), 🙅 not doing it, 🤔 not a promise. The answer replaces the legend in place and sends no new ping. Anyone else's reaction, and any other emoji (✅ included), changes nothing.
 - **One follow-up:** a reminder nobody answers gets one more, "Still on your list?", two working days later. If that one also goes unanswered, the commitment lapses silently. Those two posts are the whole allowance: a ⏳ moves the date and adds no post, and every reminder posted stays answerable.
+- **Learns from answers:** the detector is shown the three newest 🤔 and the three newest 🙌 commitments, as short summaries and at most one per person, so it misreads fewer messages as promises. They come only from public channels and the swept channel itself, so a DM's or another private channel's stay out. There is no fine-tuning and no prompt edit, and with no answers yet the prompt is unchanged.
 - **Said again:** a new promise by the same person in the same thread ("sorry, will do by Fri") is the same task. It adds no reminder, and a later day it names moves the due date the way a ⏳ does.
 - **Limits:** at most two reminders per person each morning; the rest wait for the next one. A commitment left unchecked or unposted three mornings running (an archived channel, a deleted thread) lapses.
 - **Stored:** a `commitments` row in the usage database holds ids, times, the state and two counts. The short summary of what was promised stays in KV with an expiry, and message text and links stay out of the database (ADR-030).

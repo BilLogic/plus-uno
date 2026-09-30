@@ -21,6 +21,10 @@
 // miniflare backs it with a local, per-run D1 and never contacts the account.
 // The migrations are read here, in Node, and handed to the test as the
 // `USAGE_MIGRATIONS` binding, because the Workers runtime has no filesystem.
+// The fifth is the metric queries suite: every query file in queries/usage/ is
+// run against that same migrated local D1, seeded, with its numbers asserted —
+// a query is SQL for D1's SQLite, and only that SQLite is evidence it runs.
+// The files are read here too, as the `METRIC_QUERIES` binding.
 //
 // The wrangler config is the source of the bindings: the THREAD_STATE Durable
 // Object binding, the `new_sqlite_classes` migration and
@@ -32,16 +36,23 @@
 // PLUGIN — `cloudflareTest()` in `plugins`, not `defineWorkersConfig` with
 // `test.poolOptions.workers`, which is the pre-0.22 form most examples online
 // still show.
+import { readdirSync, readFileSync } from "node:fs";
+
 import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-pool-workers";
 import { defineConfig } from "vitest/config";
 
 const usageMigrations = await readD1Migrations("./migrations/usage");
+const metricQueries = Object.fromEntries(
+  readdirSync("./queries/usage")
+    .filter((f) => f.endsWith(".sql"))
+    .map((f) => [f.replace(/\.sql$/, ""), readFileSync(`./queries/usage/${f}`, "utf8")]),
+);
 
 export default defineConfig({
   plugins: [
     cloudflareTest({
       wrangler: { configPath: "./wrangler.toml" },
-      miniflare: { bindings: { USAGE_MIGRATIONS: usageMigrations } },
+      miniflare: { bindings: { USAGE_MIGRATIONS: usageMigrations, METRIC_QUERIES: metricQueries } },
     }),
   ],
   test: {
@@ -50,6 +61,7 @@ export default defineConfig({
       "tests/workerd/usage-log.conformance.test.ts",
       "tests/workerd/sweep-records.conformance.test.ts",
       "tests/workerd/commitment-records.conformance.test.ts",
+      "tests/workerd/metric-queries.test.ts",
     ],
   },
 });

@@ -12,7 +12,7 @@ import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
 import { selectProvider } from "../agent/run-agent";
 import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
-import { askCategoriesFor, proposalEventLogFor } from "../usage/production";
+import { askCategoriesFor, proposalEventLogFor, runTeamRolesSync } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
@@ -111,6 +111,14 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "commitment-nudge": async (env, job, { dryRun }) => {
     const report = await runCommitmentNudgesOnEnv(env, job, { dryRun });
     console.log(`[commitments] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: the kickoff role map, rebuilt from the Notion Team Members
+  // database into KV. Counts in the log; a dry run's report lists the names
+  // that matched no one (src/usage/team-roles-sync.ts).
+  "team-roles-sync": async (env, _job, { dryRun }) => {
+    const report = await runTeamRolesSync(env, { dryRun });
+    console.log(`[usage] team roles: ${report.summary}`);
     return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.

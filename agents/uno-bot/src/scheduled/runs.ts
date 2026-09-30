@@ -52,6 +52,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * post that opens its thread in #plus-universal (src/ds-precedence/).
  * The morning `commitment-nudge` reminds each promiser whose commitment is due,
  * in the promise's thread (src/commitments/).
+ * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
+ * Team Members database (src/usage/team-roles-sync.ts).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -69,7 +71,8 @@ export type ScheduledJobKind =
   | "sweep-post"
   | "ds-precedence-check"
   | "ds-precedence-post"
-  | "commitment-nudge";
+  | "commitment-nudge"
+  | "team-roles-sync";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -124,6 +127,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "sweep-post", kind: "sweep-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
     { key: "commitment-nudge", kind: "commitment-nudge" },
+    { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },

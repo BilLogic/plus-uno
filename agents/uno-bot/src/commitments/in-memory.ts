@@ -51,6 +51,14 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
       const defined = Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined));
       rows.set(id, { ...row, ...defined });
     },
+    async latestAnswers(channel, limit) {
+      const seen = (r: CommitmentRecord) => r.channelKind === "public" || r.channel === channel;
+      const newest = (a: CommitmentRecord, b: CommitmentRecord) =>
+        (b.resolvedAt ?? 0) - (a.resolvedAt ?? 0) || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0);
+      const of = (state: CommitmentRecord["state"]) =>
+        [...rows.values()].filter((r) => r.state === state && seen(r)).sort(newest).slice(0, Math.max(0, limit));
+      return [...of("done"), ...of("not_promise")].sort(newest).map((r) => ({ ...r }));
+    },
     async text(id) {
       const kept = texts.get(id);
       return kept ? structuredClone(kept.text) : null;
