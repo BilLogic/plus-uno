@@ -28,7 +28,7 @@
 //   moves the date and adds none. At most `MAX_REMINDERS_PER_PERSON` a
 //   promiser a morning — the rest wait, which is no hold — and a row held
 //   `MAX_HOLDS` mornings running lapses. Nothing is sent outside the weekday
-//   14:00 UTC run (`isMorningRunTime`).
+//   10:00 ET run (`isMorningRunTime`).
 //
 //   `answerReminder` — the reaction door's first look. A reaction on a
 //   reminder is the reminder's, whatever the glyph: 🙌 ⏳ 🙅 🤔 from the

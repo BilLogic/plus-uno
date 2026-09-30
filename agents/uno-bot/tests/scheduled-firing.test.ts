@@ -1,8 +1,8 @@
 // The cron firing: a scheduled run on two slots, and nothing on the rest.
 //
 // No cron was added for the runs. The weekday `*/15 13-23` trigger already
-// fires at 14:00 and 22:00 UTC, so the handler reads the scheduled time and
-// enqueues the matching run. The Figma library poll that used to run on every
+// fires at 10:00 and 18:00 ET (14:00 and 22:00 UTC in EDT, an hour later in
+// EST), so the handler reads the scheduled time and enqueues the matching run. The Figma library poll that used to run on every
 // firing is the end-of-day run's job now. Driven through the firing's named
 // dependency, so the test sees exactly what it asked for.
 import { test } from "node:test";
@@ -62,12 +62,30 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   ]);
 });
 
-test("14:00 UTC enqueues the morning run and 22:00 UTC the end-of-day run", async () => {
+test("in EDT, 14:00 UTC enqueues the morning run and 22:00 UTC the end-of-day run", async () => {
   const morning = await fire(at(14, 0));
   assert.deepEqual(morning.runs.map((r) => [r.name, r.date]), [["morning", "2026-09-29"]]);
 
   const endOfDay = await fire(at(22, 0));
   assert.deepEqual(endOfDay.runs.map((r) => [r.name, r.date]), [["end-of-day", "2026-09-29"]]);
+});
+
+test("the runs keep their ET hours on both sides of the 1 Nov 2026 change", async () => {
+  // Fri 30 Oct is EDT (UTC-4); Mon 2 Nov is EST (UTC-5). The morning run is
+  // 10:00 ET and the end-of-day run 18:00 ET all year.
+  const oct30 = (hh: number) => Date.UTC(2026, 9, 30, hh);
+  const nov2 = (hh: number) => Date.UTC(2026, 10, 2, hh);
+  assert.deepEqual(runsForFiring(oct30(14)), ["morning"]);
+  assert.deepEqual(runsForFiring(oct30(15)), []);
+  assert.deepEqual(runsForFiring(oct30(22)), ["end-of-day"]);
+  assert.deepEqual(runsForFiring(nov2(14)), []);
+  assert.deepEqual(runsForFiring(nov2(15)), ["morning"]);
+  assert.deepEqual(runsForFiring(nov2(22)), []);
+  assert.deepEqual(runsForFiring(nov2(23)), ["end-of-day"]);
+  const morning = await fire(nov2(15));
+  assert.deepEqual(morning.runs.map((r) => [r.name, r.date]), [["morning", "2026-11-02"]]);
+  const endOfDay = await fire(nov2(23));
+  assert.deepEqual(endOfDay.runs.map((r) => [r.name, r.date]), [["end-of-day", "2026-11-02"]]);
 });
 
 test("no other firing enqueues a run", async () => {
