@@ -78,6 +78,8 @@ export const DM_RAISE_KEY = "dm-raise";
 
 export interface DmHookDeps {
   detector: DmDetector;
+  /** The end-of-day run's date (`JobContext.runDate`), which dates each row. */
+  runDate: string;
   store: CommitmentStore;
   now(): number;
   /** Detects as a real run does, and keeps nothing. */
@@ -155,7 +157,7 @@ async function keep(thread: DmThread, found: Extract<DmDetection, { ok: true }>,
     confidence,
     promisedAt: msOf(answerTs),
     detectedAt: now,
-    runDate: dateOf(now),
+    runDate: deps.runDate,
     nudgeTs: null,
     followupTs: null,
     checkedOn: null,
@@ -327,8 +329,4 @@ export function answerDmAsk(deps: DmAnswerDeps): (c: CommitmentRecord, r: Remind
 
 function msOf(ts: string): number {
   return Math.round(Number(ts) * 1000);
-}
-
-function dateOf(ms: number): string {
-  return new Date(ms).toISOString().slice(0, 10);
 }

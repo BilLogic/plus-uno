@@ -61,7 +61,7 @@
 
 import { D1QueryBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import { GATE_RESERVED } from "../gate/reactions";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { classifyLink, linksIn, pickDestination, resolveDestination, type SweepMessage, type SweepSource, type SweepThread, type TargetKind } from "../sweep/finding";
 import type { SweepSlack, SweepSlackMessage } from "../sweep/run";
 import {
@@ -141,7 +141,7 @@ export interface CommitmentConfig {
   fewShot?: number;
 }
 
-export interface CommitmentDeps {
+export interface CommitmentDeps extends Pick<JobContext, "runDate"> {
   slack: CommitmentSlack;
   sources: { read(url: string, kind: TargetKind): Promise<SweepSource | null> };
   detector: CommitmentDetector;
@@ -170,7 +170,7 @@ export interface CommitmentDeps {
 export async function recordThreadCommitments(
   thread: SweepThread,
   since: string,
-  deps: Pick<CommitmentDeps, "detector" | "store" | "config" | "now" | "dryRun"> & {
+  deps: Pick<CommitmentDeps, "detector" | "store" | "config" | "now" | "dryRun" | "runDate"> & {
     examples?(channel: string): Promise<FewShotExample[]>;
   },
 ): Promise<{ rows: CommitmentRecord[]; texts: Record<string, string> }> {
@@ -210,7 +210,7 @@ export async function recordThreadCommitments(
       confidence: c.confidence,
       promisedAt,
       detectedAt: now,
-      runDate: dateOf(now),
+      runDate: deps.runDate,
       nudgeTs: null,
       followupTs: null,
       checkedOn: null,
@@ -270,7 +270,7 @@ async function foldRepromises(
  * thread.
  */
 export function commitmentThreadHook(
-  deps: Pick<CommitmentDeps, "detector" | "store" | "config" | "now" | "dryRun">,
+  deps: Pick<CommitmentDeps, "detector" | "store" | "config" | "now" | "dryRun" | "runDate">,
 ): (thread: SweepThread, since: string) => Promise<void> {
   const examples = fewShotExamples(deps);
   return async (thread, since) => {
@@ -390,7 +390,7 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   };
   if (!deps.dryRun && !isMorningRunTime(now)) return report("skipped", "outside the weekday morning run");
 
-  const runDate = dateOf(now);
+  const runDate = deps.runDate;
   ensureHeadroom(deps, COMMITMENT_COST);
   // Read again by a retried job, so the cap holds across its alarms.
   const reminded = await deps.store.remindedOn(runDate);
@@ -728,8 +728,4 @@ function toMessage(m: SweepSlackMessage): SweepMessage {
 
 function msOf(ts: string): number {
   return Math.round(Number(ts) * 1000);
-}
-
-function dateOf(ms: number): string {
-  return new Date(ms).toISOString().slice(0, 10);
 }

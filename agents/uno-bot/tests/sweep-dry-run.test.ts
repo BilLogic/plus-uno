@@ -34,8 +34,10 @@ test("the sweep probe is a token-gated GET in the route table", () => {
 });
 
 test("a dry run reports the planned jobs and one reading per job, in runner order", async () => {
+  const dates: string[] = [];
   const report = await runMetered(() =>
-    dryRunScheduledRun(plan, async (job) => {
+    dryRunScheduledRun(plan, async (job, runDate) => {
+      dates.push(runDate);
       if (job.key === "a") {
         charge(2, "d1");
         await oneCall();
@@ -57,6 +59,7 @@ test("a dry run reports the planned jobs and one reading per job, in runner orde
   assert.equal(a?.cpu_ms, null);
   assert.match(report.cpu_note, /Workers Logs/);
   assert.equal(report.total_subrequests, 1);
+  assert.deepEqual(dates, ["2026-09-29", "2026-09-29"], "each job is rehearsed under the run's date");
 });
 
 test("what the jobs spent stays on the invocation's meter, which the envelope reads", async () => {

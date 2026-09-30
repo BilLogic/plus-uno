@@ -24,7 +24,7 @@ import {
   type ReminderMessage,
   type ReminderPlace,
 } from "../src/commitments/index";
-import { at, BOT, DESIGN, ts, UNO_BOT } from "./helpers/sweep-harness";
+import { at, BOT, DESIGN, ts, UNO_BOT, utcDay } from "./helpers/sweep-harness";
 
 const NUDGE: ScheduledJob = { key: "commitment-nudge", kind: "commitment-nudge" };
 const MAYA = "U0MAYA";
@@ -244,6 +244,9 @@ function mornings(store: InMemoryCommitmentStore, now: number) {
     markThread: async (channel, t) => void marked.push(`${channel}:${t}`),
     config: { unoBot: UNO_BOT, botUserId: BOT },
     now: () => clock.now,
+    get runDate() {
+      return utcDay(clock.now);
+    },
   };
   const react = (messageTs: string, glyph: string, userId = MAYA, channel = DM) =>
     answerReminder(

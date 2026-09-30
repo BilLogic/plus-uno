@@ -19,7 +19,7 @@ import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
 import { getBotIdentity, getPermalink, postMessage, updateMessage } from "../slack/api";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { measured, readSource, sweepSlackFor } from "../sweep/env";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { SweepThread } from "../sweep/finding";
@@ -42,11 +42,11 @@ import {
  * missing.
  *
  * @param env - Worker bindings
- * @param opts - `dryRun` detects and keeps nothing
+ * @param opts - `dryRun` detects and keeps nothing; `runDate` dates what it keeps
  */
 export function commitmentThreadHookFor(
   env: Env,
-  opts: { dryRun: boolean },
+  opts: JobContext,
 ): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
   const store = commitmentStoreFor(env);
   if (!store) return undefined;
@@ -58,6 +58,7 @@ export function commitmentThreadHookFor(
     config: { unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined },
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   });
 }
 
@@ -66,12 +67,13 @@ export function commitmentThreadHookFor(
  *
  * @param env - Worker bindings
  * @param job - The job
- * @param opts - `dryRun` reads and judges, and writes and posts nothing
+ * @param opts - `dryRun` reads and judges, and writes and posts nothing;
+ *   `runDate` is the morning each reminder counts against
  */
 export async function runCommitmentNudgesOnEnv(
   env: Env,
   job: ScheduledJob,
-  opts: { dryRun: boolean },
+  opts: JobContext,
 ): Promise<CommitmentJobReport | { summary: string }> {
   const store = commitmentStoreFor(env);
   if (!store || !env.HARNESS_KV) return { summary: "USAGE_DB or HARNESS_KV not bound — no commitments to nudge" };
@@ -106,6 +108,7 @@ export async function runCommitmentNudgesOnEnv(
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   };
   const cards = cardFollowUpsFor(env, opts, bot?.userId ?? null);
   const dm = dmAsksFor(env, opts);

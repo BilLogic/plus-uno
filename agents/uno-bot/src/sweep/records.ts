@@ -188,7 +188,7 @@ export async function sweepRecords(job: ScheduledJob, deps: SweepDeps): Promise<
   if (!db) return finish("skipped", `no ${kind === "note" ? "running-notes" : "Roadmap"} database is configured`, 0, []);
 
   const now = deps.now();
-  const runDate = new Date(now).toISOString().slice(0, 10);
+  const runDate = deps.runDate;
   const start = readCursor(
     (await deps.store.cursor(source.cursor)) ?? new Date(now - FIRST_SWEEP_WINDOW_MS).toISOString(),
   );

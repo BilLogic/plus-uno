@@ -61,7 +61,7 @@
 // enters in `./env.ts`.
 
 import { D1QueryBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type SweepMessage, type SweepThread } from "../sweep/finding";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalCard } from "../turn/index";
@@ -186,7 +186,7 @@ export interface ScanSkips {
   write(marks: Record<string, number>): Promise<void>;
 }
 
-export interface ScanDeps {
+export interface ScanDeps extends Pick<JobContext, "runDate"> {
   reads: Pick<CardReads, "activeCards" | "lastCommentAt" | "botUserId">;
   people: Pick<CardPeople, "slackIdForNotionUser" | "slackIdForName">;
   store: CommitmentStore;
@@ -319,7 +319,7 @@ async function scanCard(
     confidence: 1,
     promisedAt: card.lastEditedAt,
     detectedAt: now,
-    runDate: dateOf(now),
+    runDate: deps.runDate,
     nudgeTs: null,
     followupTs: null,
     checkedOn: null,
@@ -367,7 +367,7 @@ async function ownersOf(card: ActiveCard, condition: CardCondition, people: Scan
 
 // ── End of day: card to-dos (F3) ─────────────────────────────────────────────
 
-export interface TodoDeps {
+export interface TodoDeps extends Pick<JobContext, "runDate"> {
   detector: CardTodoDetector;
   store: CommitmentStore;
   config: Pick<FollowThroughConfig, "unoBot">;
@@ -416,7 +416,7 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
       confidence: todo.confidence,
       promisedAt,
       detectedAt: now,
-      runDate: dateOf(now),
+      runDate: deps.runDate,
       nudgeTs: null,
       followupTs: null,
       checkedOn: null,
@@ -470,7 +470,7 @@ export interface NoteCardTodos {
  */
 export async function recordNoteCardTodos(
   note: NoteCardTodos,
-  deps: Pick<TodoDeps, "store" | "now" | "dryRun"> & { config: FollowThroughConfig },
+  deps: Pick<TodoDeps, "store" | "now" | "dryRun" | "runDate"> & { config: FollowThroughConfig },
 ): Promise<CommitmentRecord[]> {
   const channel = resolveDestination({ rung: "design", channel: "plus-design" }, deps.config)?.channel;
   if (!channel || channel === deps.config.unoBot) return [];
@@ -498,7 +498,7 @@ export async function recordNoteCardTodos(
       confidence: 1,
       promisedAt: note.meetingAt,
       detectedAt: now,
-      runDate: dateOf(now),
+      runDate: deps.runDate,
       nudgeTs: null,
       followupTs: null,
       checkedOn: null,
@@ -541,7 +541,7 @@ export interface ReadNote {
  * logged.
  */
 export function cardTodoNoteHook(
-  deps: Pick<TodoDeps, "detector" | "store" | "now" | "dryRun"> & {
+  deps: Pick<TodoDeps, "detector" | "store" | "now" | "dryRun" | "runDate"> & {
     config: FollowThroughConfig;
     people: Pick<CardPeople, "slackIdForName">;
   },
@@ -1036,8 +1036,4 @@ function ensureHeadroom(deps: Pick<ScanDeps, "meter">, need: { subrequests: numb
   const left = deps.meter?.headroom() ?? { subrequests: Infinity, d1Queries: Infinity };
   if (left.d1Queries < need.d1Queries) throw new D1QueryBudgetError(need.d1Queries);
   if (left.subrequests < need.subrequests) throw new SubrequestBudgetError(need.subrequests);
-}
-
-function dateOf(ms: number): string {
-  return new Date(ms).toISOString().slice(0, 10);
 }

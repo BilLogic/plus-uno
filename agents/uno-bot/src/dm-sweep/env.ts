@@ -30,6 +30,7 @@ import type { CommitmentRecord } from "../commitments/store";
 import { activeDms } from "./active";
 import { modelDmDetector } from "./detector";
 import { answerDmAsk, dmAsksDue, dmThreadHook } from "./run";
+import type { JobContext } from "../scheduled/runs";
 
 /**
  * The DMs uno-bot answered in since a time, or undefined without the usage
@@ -56,11 +57,11 @@ export function activeDmsFor(env: Env): ((since: number) => Promise<ActiveDm[] |
  * missing.
  *
  * @param env - Worker bindings
- * @param opts - `dryRun` detects and keeps nothing
+ * @param opts - `dryRun` detects and keeps nothing; `runDate` dates what it keeps
  */
 export function dmThreadHookFor(
   env: Env,
-  opts: { dryRun: boolean },
+  opts: JobContext,
 ): ((thread: DmThread, since: string) => Promise<DmThreadVerdict>) | undefined {
   const store = commitmentStoreFor(env);
   if (!store) return undefined;
@@ -70,6 +71,7 @@ export function dmThreadHookFor(
     store,
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   });
 }
 

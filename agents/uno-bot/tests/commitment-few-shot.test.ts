@@ -24,7 +24,7 @@ import {
   type InMemoryCommitmentStore,
 } from "../src/commitments/index";
 import { commitmentRow } from "./helpers/commitment-records-conformance";
-import { at, DESIGN, msg, sweepHarness, ts, UNO_BOT } from "./helpers/sweep-harness";
+import { at, DESIGN, msg, sweepHarness, ts, UNO_BOT, utcDay } from "./helpers/sweep-harness";
 
 const EOD: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN };
 const BEA = "U0BEA";
@@ -72,6 +72,9 @@ async function sweep(store: InMemoryCommitmentStore, opts: { fewShot?: number; t
     store,
     config: { unoBot: UNO_BOT, ...(opts.fewShot !== undefined ? { fewShot: opts.fewShot } : {}) },
     now: () => h.clock.now,
+    get runDate() {
+      return h.deps.runDate;
+    },
   });
   await runSweepJob(EOD, h.deps);
   return provider;
@@ -136,7 +139,7 @@ describe("the detector learns from people's answers", () => {
     await answered(store, { id: "C0PRIV:1", channel: "C0PRIV", channelKind: "private", state: "done", resolvedAt: 52, what: "our own private task" });
     await answered(store, { id: "C0ELSE:1", channel: "C0ELSE", channelKind: "private", state: "done", resolvedAt: 53, what: "someone else's private task" });
     const provider = fakeProvider({ generateReplies: [JSON.stringify({ commitments: [] })] });
-    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: {}, now: () => at(29, 22) });
+    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: {}, now: () => at(29, 22), runDate: utcDay(at(29, 22)) });
     await hook(
       { channel: "C0PRIV", channelKind: "private", rootTs: ROOT, messages: [{ ts: PROMISE, user: MAYA, text: "I'll do it" }] },
       ROOT,
@@ -165,7 +168,7 @@ describe("the detector learns from people's answers", () => {
     let reads = 0;
     const counting = { ...store, latestAnswers: async (...args: Parameters<typeof store.latestAnswers>) => (reads++, store.latestAnswers(...args)) };
     const provider = fakeProvider({ generateReplies: [] });
-    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store: counting, config: {}, now: () => at(29, 22) });
+    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store: counting, config: {}, now: () => at(29, 22), runDate: utcDay(at(29, 22)) });
     await hook({ channel: DESIGN, channelKind: "public", rootTs: ROOT, messages: [{ ts: PROMISE, user: MAYA, text: "The screens look great." }] }, ROOT);
     assert.equal(reads, 0);
     assert.equal(provider.generated.length, 0);
@@ -177,7 +180,7 @@ describe("the detector learns from people's answers", () => {
     let reads = 0;
     const counting = { ...store, latestAnswers: async (...args: Parameters<typeof store.latestAnswers>) => (reads++, store.latestAnswers(...args)) };
     const provider = fakeProvider({ generateReplies: [JSON.stringify({ commitments: [] }), JSON.stringify({ commitments: [] })] });
-    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store: counting, config: {}, now: () => at(29, 22) });
+    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store: counting, config: {}, now: () => at(29, 22), runDate: utcDay(at(29, 22)) });
     for (const root of [ROOT, ts(29, 16)]) {
       await hook({ channel: DESIGN, channelKind: "public", rootTs: root, messages: [{ ts: PROMISE, user: MAYA, text: "I'll do it" }] }, ROOT);
     }
@@ -192,7 +195,7 @@ describe("the detector learns from people's answers", () => {
     const provider = fakeProvider({
       generateReplies: [JSON.stringify({ commitments: [{ message_ts: PROMISE, promiser: MAYA, requester: null, what: "do it", deadline: null, confidence: 0.9 }] })],
     });
-    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store: failing, config: {}, now: () => at(29, 22) });
+    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store: failing, config: {}, now: () => at(29, 22), runDate: utcDay(at(29, 22)) });
     await hook({ channel: DESIGN, channelKind: "public", rootTs: ROOT, messages: [{ ts: PROMISE, user: MAYA, text: "I'll do it" }] }, ROOT);
     assert.ok(promptOf(provider).startsWith("THREAD ("));
     assert.equal(store.rows.size, 1);
@@ -203,7 +206,7 @@ describe("the detector learns from people's answers", () => {
     const provider = fakeProvider({
       generateReplies: [JSON.stringify({ commitments: [{ message_ts: PROMISE, promiser: MAYA, requester: null, what: "do it", deadline: null, confidence: 0.9 }] })],
     });
-    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: {}, now: () => at(29, 22) });
+    const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: {}, now: () => at(29, 22), runDate: utcDay(at(29, 22)) });
     await hook({ channel: "C0PRIV", channelKind: "private", rootTs: ROOT, messages: [{ ts: PROMISE, user: MAYA, text: "I'll do it" }] }, ROOT);
     assert.equal([...store.rows.values()][0]?.channelKind, "private");
   });
@@ -228,7 +231,7 @@ describe("the detector learns from people's answers", () => {
       privateAllowlist: [PRIV],
       now: at(29, 22),
     });
-    h.deps.onThread = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: { unoBot: UNO_BOT }, now: () => h.clock.now });
+    h.deps.onThread = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: { unoBot: UNO_BOT }, now: () => h.clock.now, get runDate() { return h.deps.runDate; } });
     await runSweepJob({ key: `sweep:${PRIV}`, kind: "sweep-channel", channel: PRIV }, h.deps);
     const row = store.rows.get(`${PRIV}:${PROMISE}`);
     assert.equal(row?.channelKind, "private");
@@ -244,7 +247,7 @@ describe("the detector learns from people's answers", () => {
     for (const channelKind of ["group-dm", "dm"] as const) {
       const store = createInMemoryCommitmentStore();
       const provider = fakeProvider({ generateReplies: [] });
-      const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: {}, now: () => at(29, 22) });
+      const hook = commitmentThreadHook({ detector: modelCommitmentDetector(provider), store, config: {}, now: () => at(29, 22), runDate: utcDay(at(29, 22)) });
       await hook({ channel: "C0GROUP", channelKind, rootTs: ROOT, messages: [{ ts: PROMISE, user: MAYA, text: "I'll do it" }] }, ROOT);
       assert.equal(store.rows.size, 0);
       assert.equal(provider.generated.length, 0);

@@ -32,6 +32,6 @@ export const sweepProbe: ProbeRun = async (env, url) => {
     sweepChannelsFrom(env.SWEEP_CHANNELS, env.UNO_BOT_CHANNEL_ID),
     weekday,
   );
-  const report = await dryRunScheduledRun(run, (job) => rehearseScheduledJob(env, job));
+  const report = await dryRunScheduledRun(run, (job, runDate) => rehearseScheduledJob(env, job, runDate));
   return probeBody({ ok: true, dryRun: true, ...report });
 };

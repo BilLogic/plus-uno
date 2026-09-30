@@ -70,7 +70,14 @@ function world(opts: {
     now: opts.now,
   });
   h.deps.dms = async () => [{ channel: DM, person: MAYA }];
-  h.deps.onDmThread = dmThreadHook({ detector: modelDmDetector(dmProvider), store, now: () => h.clock.now });
+  h.deps.onDmThread = dmThreadHook({
+    detector: modelDmDetector(dmProvider),
+    store,
+    now: () => h.clock.now,
+    get runDate() {
+      return new Date(h.clock.now).toISOString().slice(0, 10);
+    },
+  });
 
   // Every morning post, anywhere, and what it carried.
   const posts: Array<{ channel: string; threadTs: string; text: string; ts: string; metadata?: unknown }> = [];
@@ -119,6 +126,9 @@ function world(opts: {
     markThread: async () => assert.fail("a DM thread is never marked"),
     config: { unoBot: "C0UNOBOT", botUserId: BOT },
     now: () => h.clock.now,
+    get runDate() {
+      return new Date(h.clock.now).toISOString().slice(0, 10);
+    },
     dm,
   };
   const react = (messageTs: string, glyph: string, userId = MAYA) =>

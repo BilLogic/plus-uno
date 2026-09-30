@@ -48,11 +48,13 @@ export const TEXT_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
  * WHY 11 DAYS AND NOT 14. The runs are weekday-only, so the longest gap
  * between two is Friday 18:00 ET to Monday 10:00 ET (64 h), and one missed run
  * stretches it to Monday 18:00 — 72 h, three days, and an hour more on the
- * weekend the clocks go back. Text is purged once it is 11 days less an hour
- * old, so the oldest any text can be before a run clears it is 11 + 3 = 14
- * days: the retention window holds through a weekend and one lost run.
+ * weekend the clocks go back. The purge is the last job of its run, so it can
+ * start well after its firing; an hour's margin covers that. Text is purged
+ * once it is 11 days less two hours old, so the oldest any text can be before
+ * a run clears it is 14 days: the retention window holds through a weekend,
+ * one lost run and a purge up to an hour late.
  */
-export const PURGE_AFTER_MS = TEXT_RETENTION_MS - (3 * 24 + 1) * 60 * 60 * 1000;
+export const PURGE_AFTER_MS = TEXT_RETENTION_MS - (3 * 24 + 2) * 60 * 60 * 1000;
 
 /** What one classify job did. */
 export interface ClassifyReport {
