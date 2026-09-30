@@ -49,6 +49,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
+import { ageInDays } from './figma-snapshots.mjs';
 import { isEntry } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -76,7 +77,11 @@ export function isIgnored({ name = '', containingFrame = '' } = {}) {
   return IGNORED.some((p) => p.test(name)) || IGNORED.some((p) => p.test(containingFrame));
 }
 
-/** `meta.components` from the REST response, in the snapshot's row shape. */
+/**
+ * `meta.components` from the REST response, in the snapshot's row shape,
+ * sorted by published key. The API promises no order, and a snapshot written in
+ * whatever order it answered would read as changed with nothing changed.
+ */
 export function rowsFrom(componentsResponse) {
   const components = componentsResponse?.meta?.components ?? [];
   return components
@@ -87,7 +92,8 @@ export function rowsFrom(componentsResponse) {
       nodeId: c.node_id,
       containingFrame: c.containing_frame?.name || '',
     }))
-    .filter((c) => !isIgnored(c));
+    .filter((c) => !isIgnored(c))
+    .sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
 }
 
 /**
@@ -133,13 +139,43 @@ export function setsIn(rows) {
  * one set's change. A component that moved between sets names both. A
  * standalone component, with no containing frame, is named by itself.
  */
-export function changedSets(before = [], after = []) {
+export function changedSets(before, after) {
   const { created, deleted, renamed } = diff(before, after);
   const was = new Map(before.map((c) => [c.key, c]));
   const setOf = (c) => c.containingFrame || c.name;
   const sets = new Set([...created, ...deleted, ...renamed].map(setOf));
   for (const c of renamed) sets.add(setOf(was.get(c.key)));
   return [...sets].sort();
+}
+
+/** A snapshot as a comparable string: `lastChecked` dropped, rows by key, object keys sorted. */
+function comparable(snapshot) {
+  const rest = { ...snapshot };
+  delete rest.lastChecked;
+  const byKey = [...(rest.components ?? [])].sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+  const sortKeys = (v) =>
+    Array.isArray(v)
+      ? v.map(sortKeys)
+      : v && typeof v === 'object'
+        ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sortKeys(v[k])]))
+        : v;
+  return JSON.stringify(sortKeys({ ...rest, components: byKey }));
+}
+
+/**
+ * What a refresh found, for the workflow that opens its PR.
+ *
+ * `changed` when anything but `lastChecked` differs. `date-only` when nothing
+ * did but the snapshot on main is past half the age ceiling: `check:figma-
+ * snapshots` fails at the ceiling, and a refresh that always discarded an
+ * unchanged run's date could never clear it. `unchanged` otherwise. A date
+ * that cannot be read counts as old.
+ */
+export function refreshVerdict(before, after, { now, maxAgeDays }) {
+  const ageDays = ageInDays(before.lastChecked, now);
+  if (comparable(before) !== comparable(after)) return { verdict: 'changed', ageDays };
+  if (ageDays === null || ageDays > maxAgeDays / 2) return { verdict: 'date-only', ageDays };
+  return { verdict: 'unchanged', ageDays };
 }
 
 /**

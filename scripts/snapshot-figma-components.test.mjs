@@ -15,6 +15,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +26,7 @@ import {
   changedSets,
   diff,
   isIgnored,
+  refreshVerdict,
   rowsFrom,
   setsIn,
   snapshotFrom,
@@ -138,6 +140,93 @@ test('a component moved between sets names both the set it left and the one it j
 test('no change names no set', () => {
   const rows = [{ key: 'k1', name: 'x', containingFrame: 'A' }];
   assert.deepEqual(changedSets(rows, rows), []);
+});
+
+test('rows are sorted by published key, so the API’s order cannot read as a change', () => {
+  const shuffled = { meta: { components: [...componentsResponse.meta.components].reverse() } };
+  assert.deepEqual(rowsFrom(shuffled).map((r) => r.key), ['k1', 'k2']);
+  const unsorted = {
+    meta: {
+      components: [
+        { key: 'kz', name: 'a', node_id: '1:9', containing_frame: { name: 'A' } },
+        { key: 'ka', name: 'b', node_id: '1:8', containing_frame: { name: 'B' } },
+      ],
+    },
+  };
+  assert.deepEqual(rowsFrom(unsorted).map((r) => r.key), ['ka', 'kz']);
+});
+
+// ── the refresh workflow's verdict ──────────────────────────────────────────────
+
+const NOW = new Date('2026-09-30T00:00:00.000Z');
+const snap = (lastChecked, extra = {}) => ({
+  lastChecked,
+  figmaFileKey: DEFAULT_FILE_KEY,
+  components: [
+    { key: 'k1', name: 'a', description: '', nodeId: '1:1', containingFrame: 'A' },
+    { key: 'k2', name: 'b', description: '', nodeId: '1:2', containingFrame: 'B' },
+  ],
+  versionIds: [],
+  nodeHashes: { '1:1': 'h1', '1:2': 'h2' },
+  ...extra,
+});
+
+test('a recent snapshot that differs only in lastChecked is unchanged', () => {
+  const before = snap('2026-09-20T00:00:00.000Z');
+  const after = snap(NOW.toISOString());
+  assert.equal(refreshVerdict(before, after, { now: NOW, maxAgeDays: 180 }).verdict, 'unchanged');
+});
+
+test('component order and hash key order are not changes', () => {
+  const before = snap('2026-09-20T00:00:00.000Z');
+  const after = snap(NOW.toISOString(), {
+    components: [...before.components].reverse(),
+    nodeHashes: { '1:2': 'h2', '1:1': 'h1' },
+  });
+  assert.equal(refreshVerdict(before, after, { now: NOW, maxAgeDays: 180 }).verdict, 'unchanged');
+});
+
+test('any other difference is a change — a description, a node id, a hash, a version', () => {
+  const before = snap('2026-09-20T00:00:00.000Z');
+  const edits = [
+    { components: [{ ...before.components[0], description: 'new' }, before.components[1]] },
+    { components: [{ ...before.components[0], nodeId: '9:9' }, before.components[1]] },
+    { nodeHashes: { '1:1': 'h1', '1:2': 'changed' } },
+    { versionIds: [{ id: 'v1' }] },
+  ];
+  for (const edit of edits) {
+    assert.equal(
+      refreshVerdict(before, snap(NOW.toISOString(), edit), { now: NOW, maxAgeDays: 180 }).verdict,
+      'changed',
+      JSON.stringify(edit),
+    );
+  }
+});
+
+test('an unchanged library past half the age ceiling is a date refresh, so the age check can clear', () => {
+  const at = (days) => snap(new Date(NOW.getTime() - days * 86400000).toISOString());
+  const after = snap(NOW.toISOString());
+  assert.equal(refreshVerdict(at(90), after, { now: NOW, maxAgeDays: 180 }).verdict, 'unchanged');
+  assert.deepEqual(refreshVerdict(at(91), after, { now: NOW, maxAgeDays: 180 }), {
+    verdict: 'date-only',
+    ageDays: 91,
+  });
+});
+
+test('a lastChecked that cannot be read is treated as old', () => {
+  const after = snap(NOW.toISOString());
+  assert.equal(refreshVerdict(snap('not a date'), after, { now: NOW, maxAgeDays: 180 }).verdict, 'date-only');
+});
+
+test('the verdict command prints GITHUB_OUTPUT lines, and fails on a file that is not JSON', () => {
+  const cli = path.join(REPO_ROOT, 'scripts/figma-snapshot-verdict.mjs');
+  const live = path.join(REPO_ROOT, 'scripts/figma-component-snapshot.json');
+  const out = execFileSync('node', [cli, live, live], { encoding: 'utf8' });
+  assert.match(out, /^verdict=(unchanged|date-only)\nage_days=\d+\n$/);
+
+  const bad = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'verdict-')), 'bad.json');
+  fs.writeFileSync(bad, '{not json');
+  assert.throws(() => execFileSync('node', [cli, live, bad], { stdio: 'pipe' }), (e) => e.status !== 0);
 });
 
 test('the written document keeps the shape the poller reads, plus the file key', () => {
