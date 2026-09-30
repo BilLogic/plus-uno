@@ -5,16 +5,6 @@ import './Divider.scss';
 /** Deprecated sizes, still accepted, and the size each one now means. */
 const DEPRECATED_SIZES = { '2.5px': 'xl' };
 
-/** Deprecated sizes already warned about: each one says so once per session. */
-const warned = new Set();
-
-const warnDeprecatedSize = (size) => {
-    if (process.env.NODE_ENV === 'production' || warned.has(size)) return;
-    warned.add(size);
-    // eslint-disable-next-line no-console
-    console.warn(`[Divider] size="${size}" is deprecated; use size="${DEPRECATED_SIZES[size]}".`);
-};
-
 const Divider = ({
     size = 'md',
     style = 'light',
@@ -31,12 +21,14 @@ const Divider = ({
         "xl": "xl",
         "1px": "sm",
         "1.5px": "md",
-        "2px": "lg",
-        "2.5px": "xl"
+        "2px": "lg"
     };
 
-    if (DEPRECATED_SIZES[size]) warnDeprecatedSize(size);
-    const sizeClass = sizeMap[size] || "md";
+    if (DEPRECATED_SIZES[size] && process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.warn(`[Divider] size="${size}" is deprecated; use size="${DEPRECATED_SIZES[size]}".`);
+    }
+    const sizeClass = sizeMap[size] ?? DEPRECATED_SIZES[size] ?? "md";
 
     const classes = [
         'plus-divider',
