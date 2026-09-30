@@ -21,7 +21,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's TagContext, never a prop."
+      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's or TagGroup's TagContext, never a prop."
     }
   ]
 };
@@ -154,12 +154,18 @@ message or fills the text box, and stops offering the suggestion.
 A suggestion sits in a tag row, so its label is a value's name, not a
 sentence. For a prompt, pass the full words as `text` and a short `label`.
 
-### Disabled comes from the field.
+### Disabled comes from the field or TagGroup.
 
-Disabled comes from the field through `TagContext`: inside a field that
-provides it, a suggestion reads the same value a Tag does and is disabled
-with the tags beside it. Like Tag,
-it has no `disabled` prop of its own.
+Disabled comes from a disabled field or `TagGroup` through `TagContext`: inside
+one, a suggestion reads the same value a Tag does and is disabled with the tags
+beside it. Like Tag, it has no `disabled` prop of its own.
+
+```jsx
+<TagGroup label="Focus areas" disabled={!canEdit}>
+  <Tag color="blue">Fractions</Tag>
+  <Suggestion label="Ratios" onAccept={add} />
+</TagGroup>
+```
 
 </div>
 

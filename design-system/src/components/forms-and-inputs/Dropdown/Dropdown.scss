@@ -178,6 +178,18 @@ $dropdown-themes: (
             cursor: not-allowed;
         }
 
+        // A static row says its words and is not a control: a default cursor,
+        // and no hover or press layer. It takes no focus, so it needs no focus
+        // reset.
+        &.pdropdown-item-static {
+            cursor: default;
+
+            &:hover,
+            &:active {
+                background-color: transparent;
+            }
+        }
+
         // Icon/Badge styling
         i {
             font-size: var(--font-size-fa-body1-solid);

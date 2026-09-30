@@ -3,13 +3,11 @@
 
 # TagGroup
 
-The container for a set of tags (#276). IT EXISTS TO OWN WHAT A SINGLE TAG CANNOT DECIDE: the gaps between tags, and whether a long set wraps or collapses. Both are properties of the set, not of any member of it. THE GAP LIVES HERE, NOT ON THE TAG. Atlassian's tag carries its own margin, which then has to be switched off with a `hasMargin` escape hatch whenever a parent uses `gap` — an API that exists only to undo a decision made in the wrong place. `Tag` sets `margin: 0` and this sets `gap`, so there is nothing to undo and nothing to double up.
-
 **Import:** `import { TagGroup } from '@/components';`
 
 **Source:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Overflow, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, DismissibleSet, CustomOverflowAction, Interactive
+**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, CollapseWithSuggestions, MenuKeepsActions, MaxVisible, OneMoreTag, CapNeverSqueezes, WrappedSuggestionsAreNotCounted, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx`
 
@@ -17,18 +15,22 @@ The container for a set of tags (#276). IT EXISTS TO OWN WHAT A SINGLE TAG CANNO
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | node | — | The tags. `null` and `false` are skipped rather than counted. |
+| `children` | node | — | The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden; they must be direct children, or components that carry Suggestion's `isSuggestion` marker. `null` and `false` are skipped rather than counted. |
 | `label` | string | — | The group's accessible name — what this set of tags is. |
-| `overflow` | enum | `'wrap'` | `wrap` flows onto more lines; `collapse` keeps one line and shows `+n`. |
-| `maxVisible` | number | `5` | `collapse` only: how many tags to show before the `+n`. |
-| `overflowLabel` | func | — | Formats the overflow tag's label. Defaults to `+n`. |
-| `onOverflowClick` | func | — | Replaces the default reveal — for opening a picker or a popover instead. |
+| `overflow` | enum | `'wrap'` | `wrap` flows onto more lines; `collapse` keeps one line, shows as many tags as fit, and puts the rest behind `+n`. |
+| `alignment` | enum | `'left'` | `right` lines the tags and the `+n` up on the right edge, for a right-aligned table column. |
+| `disabled` | bool | `false` | Disables every Tag and Suggestion in the group, as a disabled field does. |
+| `maxVisible` | number | — | `collapse` only: the most tags to show before `+n`, even when more would fit. By default, as many as fit. |
+| `overflowLabel` | func | — | Formats the overflow tag's visible label. Defaults to `+n`; its accessible name starts with that label: "+3 more tags" ("+1 more tag"), or "<label>, 3 more tags" for a custom one. |
+| `onOverflowClick` | func | — | Replaces the `+n` menu — for opening a picker or a panel instead. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 
 ## Variants
 
 **`overflow`** — `wrap` · `collapse`
+
+**`alignment`** — `left` · `right`
 
 Anything not listed is not a valid value.
 

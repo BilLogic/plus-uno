@@ -18,7 +18,7 @@
 | `text` | string | — | The label (alternative to children). |
 | `children` | node | — | The label (takes precedence over `text`). |
 | `behavior` | enum | — | What a person can do with the tag. `read-only` by default; `link` needs `href`. |
-| `variant` | enum | — | Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. |
+| `variant` | enum | — | Deprecated: use `behavior`. `dismissible` is `removable`. `operational` still renders a plain button but warns: use `behavior="selectable"` with `aria-expanded`. |
 | `color` | enum | `'grey'` | A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. |
 | `type` | oneOf | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
 | `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |

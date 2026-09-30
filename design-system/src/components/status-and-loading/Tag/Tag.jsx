@@ -44,7 +44,22 @@ import './Tag.scss';
  */
 export const TAG_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
 
+/*
+ * A literal array, because the docs generator and check:doc-identifiers read
+ * the values from source. `TAG_BEHAVIOR` names the same values for code that
+ * compares against them, so a renamed behavior fails loudly instead of
+ * falling through.
+ */
 export const TAG_BEHAVIORS = ['read-only', 'removable', 'selectable', 'link'];
+
+export const TAG_BEHAVIOR = Object.freeze({
+    READ_ONLY: 'read-only',
+    REMOVABLE: 'removable',
+    SELECTABLE: 'selectable',
+    LINK: 'link',
+    // What the deprecated `operational` variant resolves to; not a public behavior.
+    ACTION: 'action',
+});
 
 /** The types that lead with a 16 avatar: a person, an agent or a team. */
 export const AVATAR_TAG_TYPES = ['person', 'agent', 'team'];
@@ -63,15 +78,27 @@ const ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow',
 
 /*
  * `operational` has no place in the new set: a tag that performs an action
- * once is a button that looks like a tag, which is what TagGroup's `+n` still
- * is. It keeps working as a plain button with no pressed state until TagGroup
- * moves off it.
+ * once is a button that looks like a tag. It keeps working as a plain button
+ * with no pressed state, and warns. A button with a tag's look that opens
+ * something is a selectable tag given `aria-expanded`, as TagGroup's `+n` is.
  */
 const DEPRECATED_VARIANTS = {
-    'read-only': 'read-only',
-    dismissible: 'removable',
-    selectable: 'selectable',
-    operational: 'action',
+    'read-only': TAG_BEHAVIOR.READ_ONLY,
+    dismissible: TAG_BEHAVIOR.REMOVABLE,
+    selectable: TAG_BEHAVIOR.SELECTABLE,
+    operational: TAG_BEHAVIOR.ACTION,
+};
+
+/**
+ * What a tag does, from its props: `behavior` wins; `variant` is the old name
+ * for it; with neither, an `href` still makes a link, as it did before
+ * `behavior` existed. Exported so TagGroup's `+n` menu gives a hidden tag the
+ * same action the tag itself has. It never warns; Tag does that.
+ */
+export const resolveTagBehavior = ({ behavior, variant, href } = {}) => {
+    if (behavior) return behavior;
+    if (variant) return DEPRECATED_VARIANTS[variant];
+    return href ? TAG_BEHAVIOR.LINK : TAG_BEHAVIOR.READ_ONLY;
 };
 
 /**
@@ -201,18 +228,14 @@ export const Tag = ({
         resolvedColor = DEPRECATED_COLORS[resolvedColor];
     }
 
-    // `behavior` wins; `variant` is the old name for it. With neither, an
-    // `href` still makes a link, as it did before `behavior` existed.
-    let resolved = behavior;
-    if (!resolved && variant) {
-        // `operational` has no replacement to point at yet, so it stays quiet
-        // until TagGroup's `+n`, its one caller, moves to its own path.
-        if (variant !== 'operational') {
+    if (!behavior && variant) {
+        if (variant === 'operational') {
+            warn('[Tag] variant="operational" is deprecated; use behavior="selectable" with `aria-expanded`.');
+        } else {
             warn(`[Tag] variant="${variant}" is deprecated; use behavior="${DEPRECATED_VARIANTS[variant]}".`);
         }
-        resolved = DEPRECATED_VARIANTS[variant];
     }
-    if (!resolved) resolved = href ? 'link' : 'read-only';
+    const resolved = resolveTagBehavior({ behavior, variant, href });
 
     const hasAvatar = AVATAR_TAG_TYPES.includes(type);
     if (!hasAvatar && avatar) {
@@ -230,9 +253,9 @@ export const Tag = ({
         warn(`[Tag] the label is not text, so a type="${type}" tag has no initials to fall back on. Pass \`avatar\`.`);
     }
 
-    const isSelectable = resolved === 'selectable';
-    const isAction = resolved === 'action';
-    const isLink = resolved === 'link';
+    const isSelectable = resolved === TAG_BEHAVIOR.SELECTABLE;
+    const isAction = resolved === TAG_BEHAVIOR.ACTION;
+    const isLink = resolved === TAG_BEHAVIOR.LINK;
 
     // A count is a filter's result count, so it belongs to selectable only. On
     // a removable tag it would crowd the ×; elsewhere it would read as a Count
@@ -251,7 +274,7 @@ export const Tag = ({
 
     // The × renders for removable, and for a link with `onRemove`. Never in a
     // disabled field: a value you cannot change has nothing to remove.
-    const hasRemove = (resolved === 'removable' || isLink)
+    const hasRemove = (resolved === TAG_BEHAVIOR.REMOVABLE || isLink)
         && typeof onRemove === 'function'
         && !isDisabled;
 
@@ -357,6 +380,13 @@ export const Tag = ({
 
     const shared = { id, className: classes, style, ...rest };
 
+    /*
+     * A selectable tag is a toggle, so it publishes `aria-pressed`, unless the
+     * caller passes `aria-expanded`: then it is a button that opens something
+     * (TagGroup's `+n`), and "not pressed" would be the wrong thing to say.
+     */
+    const pressed = isSelectable && rest['aria-expanded'] === undefined ? isSelected : undefined;
+
     if (isSelectable || isAction) {
         return (
             <>
@@ -368,7 +398,7 @@ export const Tag = ({
                         aria-disabled={isLoading ? 'true' : undefined}
                         // `aria-pressed` makes a selectable tag a toggle rather
                         // than a button that looks different afterwards.
-                        aria-pressed={isSelectable ? isSelected : undefined}
+                        aria-pressed={pressed}
                         onClick={(e) => {
                             if (isLoading) return;
                             onClick?.(e);
@@ -435,6 +465,13 @@ export const Tag = ({
                 {lead}
                 {labelNode}
                 {removeButton}
+                {/*
+                  * A span has no disabled state a screen reader announces
+                  * (ARIA 1.2 does not support aria-disabled on a generic element), so a
+                  * disabled tag that is not a button says it in words: its
+                  * text is read as "Science, disabled".
+                  */}
+                {isDisabled && <span className="visually-hidden">, disabled</span>}
             </span>
             {status}
         </>
@@ -448,7 +485,7 @@ Tag.propTypes = {
     children: PropTypes.node,
     /** What a person can do with the tag. `read-only` by default; `link` needs `href`. */
     behavior: PropTypes.oneOf(TAG_BEHAVIORS),
-    /** Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. */
+    /** Deprecated: use `behavior`. `dismissible` is `removable`. `operational` still renders a plain button but warns: use `behavior="selectable"` with `aria-expanded`. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
     /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. */
     color: PropTypes.oneOf(ACCEPTED_COLORS),
