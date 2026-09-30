@@ -278,8 +278,15 @@ export function evidencePrompt(input: EvidenceInput): string {
 }
 
 /** The root, when named, then the newest messages that fit. */
+/** What one message costs of `MAX_COMMITMENT_THREAD_CHARS` — the measure a
+ *  caller splitting a long conversation into windows the detector sees whole
+ *  must use. */
+export function detectorChars(m: SweepMessage): number {
+  return Math.min(m.text.length, MAX_MESSAGE_CHARS) + 40;
+}
+
 function withinChars(messages: readonly SweepMessage[], rootTs: string | null): SweepMessage[] {
-  const size = (m: SweepMessage) => Math.min(m.text.length, MAX_MESSAGE_CHARS) + 40;
+  const size = detectorChars;
   const root = rootTs ? messages.find((m) => m.ts === rootTs) : undefined;
   let left = MAX_COMMITMENT_THREAD_CHARS - (root ? size(root) : 0);
   const kept: SweepMessage[] = [];

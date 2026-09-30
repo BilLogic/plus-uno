@@ -29,6 +29,7 @@ import { conversationsReplies, getBotIdentity } from "./api";
 import { slackDelivery } from "./slack-delivery";
 import { reactionRecorderFor } from "../usage/resolution-env";
 import { reminderDoorFor } from "../commitments/env";
+import { dmReminderDoorFor } from "../dm-watch/env";
 
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
   if (event.item.type !== "message") return;
@@ -76,8 +77,15 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
 
     recordReaction: reactionRecorderFor(env),
 
-    ...withReminder(reminderDoorFor(env)),
+    ...withReminder(eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env))),
   };
+}
+
+/** A DM reminder's door first — it looks only at DMs — then the thread
+ *  reminders'. Either claiming the reaction keeps it from the gate. */
+function eitherDoor(first: ReactionDoorDeps["reminder"], second: ReactionDoorDeps["reminder"]): ReactionDoorDeps["reminder"] {
+  if (!first || !second) return first ?? second;
+  return async (r) => (await first(r)) || second(r);
 }
 
 function withReminder(reminder: ReactionDoorDeps["reminder"]): Pick<ReactionDoorDeps, "reminder"> {
