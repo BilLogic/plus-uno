@@ -1,6 +1,42 @@
-import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import './Dropdown.scss';
+
+/** What in a custom toggle can take focus back after Escape. */
+const FOCUSABLE = [
+    'button:not([disabled])',
+    'a[href]',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
+/**
+ * Where Escape asked focus to go, held until the menu has really closed, and
+ * the one owner of the rule for forgetting it. Focus moves once the menu has
+ * closed, not when Escape asks, because a caller that controls `isOpen` may
+ * refuse. A refused Escape is then forgotten, so a close much later (the
+ * caller changing `isOpen` itself) never pulls focus back to the toggle. It is
+ * forgotten on any render where the menu is still open (here), and by the
+ * caller of `clear`: on any open or close request, on the next key, and when
+ * focus moves to another element. `take` hands it over once, on close.
+ */
+const usePendingEscapeFocus = (show) => {
+    const pending = useRef(null);
+    useLayoutEffect(() => {
+        if (show) pending.current = null;
+    });
+    return useMemo(() => ({
+        set: (target) => { pending.current = target; },
+        clear: () => { pending.current = null; },
+        take: () => {
+            const target = pending.current;
+            pending.current = null;
+            return target;
+        },
+    }), []);
+};
 
 const Dropdown = ({
     id,
@@ -25,8 +61,6 @@ const Dropdown = ({
     const toggleRef = useRef(null);
     const customToggleRef = useRef(null);
     const openerRef = useRef(null);
-    // Where Escape asked focus to go, held until the menu has really closed.
-    const escapeFocusRef = useRef(null);
     // Viewport-aware placement: the menu flips up when there isn't room below, and right-aligns
     // when a left-aligned menu would spill off the right edge. Only the default vertical dropdown
     // is auto-placed; an explicit `direction` of dropup/dropleft/dropright is honored as authored.
@@ -35,6 +69,7 @@ const Dropdown = ({
     // Determine if controlled or uncontrolled
     const isControlled = controlledIsOpen !== undefined;
     const show = isControlled ? controlledIsOpen : internalIsOpen;
+    const escapeFocus = usePendingEscapeFocus(show);
 
     /**
      * Every open/close goes through here (#207). Before it existed, a caller
@@ -46,7 +81,7 @@ const Dropdown = ({
      */
     const setOpen = (next) => {
         // Any open or close supersedes an Escape still waiting to land.
-        escapeFocusRef.current = null;
+        escapeFocus.clear();
         if (!isControlled) {
             setInternalIsOpen(next);
         }
@@ -71,14 +106,14 @@ const Dropdown = ({
      * that is still on the page; otherwise focus is left alone. It is never
      * moved to the page itself.
      *
-     * Focus moves once the menu has actually closed, not when Escape asks: a
-     * caller that controls `isOpen` may keep it open, and then focus stays on
-     * the item rather than jumping to the toggle of a menu that is still open.
+     * Escape stops here: an enclosing Modal or panel does not also close on
+     * the key that closed this menu. Focus moves once the menu has closed
+     * (see `usePendingEscapeFocus`).
      */
     const handleKeyDown = (event) => {
         if (event.key !== 'Escape') {
             // Any other key after a refused Escape is the person moving on.
-            escapeFocusRef.current = null;
+            escapeFocus.clear();
             return;
         }
         if (!show) return;
@@ -86,10 +121,10 @@ const Dropdown = ({
         const custom = customToggleRef.current;
         const opener = openerRef.current;
         const target = toggleRef.current
-            || custom?.querySelector('button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+            || custom?.querySelector(FOCUSABLE)
             || (opener && opener.isConnected && opener !== document.body ? opener : null);
         closeDropdown();
-        escapeFocusRef.current = target;
+        escapeFocus.set(target);
     };
 
     // Opening records what had focus, however it was opened (the toggle, or a
@@ -97,28 +132,15 @@ const Dropdown = ({
     useLayoutEffect(() => {
         if (show) {
             openerRef.current = document.activeElement;
-            escapeFocusRef.current = null;
             return;
         }
-        const target = escapeFocusRef.current;
-        escapeFocusRef.current = null;
-        target?.focus();
-    }, [show]);
-
-    /*
-     * An Escape the caller refused is forgotten, so a close much later (the
-     * caller changing `isOpen` itself) never pulls focus back to the toggle:
-     * on any render where the menu is still open after it, on the next key,
-     * and when focus moves to another element.
-     */
-    useLayoutEffect(() => {
-        if (show) escapeFocusRef.current = null;
-    });
+        escapeFocus.take()?.focus();
+    }, [show, escapeFocus]);
 
     const handleBlur = (event) => {
         // A focused item that is hidden has no next element; that is the
         // menu closing, not the person moving on.
-        if (event.relatedTarget) escapeFocusRef.current = null;
+        if (event.relatedTarget) escapeFocus.clear();
     };
 
     useEffect(() => {
@@ -335,31 +357,36 @@ const Dropdown = ({
                     // An `isStatic` item only says its words: a row, not a
                     // control, so nothing to press or focus, and a press on it
                     // leaves the menu open.
-                    let control;
-                    if (item.isStatic) {
-                        control = <div className={`${itemClasses} pdropdown-item-static`}>{inner}</div>;
-                    }
-                    return (
-                        <React.Fragment key={index}>
-                            {control || (item.href && !item.disabled ? (
+                    const renderControl = () => {
+                        if (item.isStatic) {
+                            return <div className={`${itemClasses} pdropdown-item-static`}>{inner}</div>;
+                        }
+                        if (item.href && !item.disabled) {
+                            return (
                                 <Link className={itemClasses} href={item.href} onClick={choose}>
                                     {inner}
                                 </Link>
-                            ) : (
-                                <button
-                                    type="button"
-                                    className={itemClasses}
-                                    disabled={item.disabled}
-                                    // An `isToggle` item switches on and off in
-                                    // place, so it says whether it is on.
-                                    aria-pressed={item.isToggle ? Boolean(item.selected) : undefined}
-                                    // `isBusy`: still working, so it says so.
-                                    aria-busy={item.isBusy ? 'true' : undefined}
-                                    onClick={choose}
-                                >
-                                    {inner}
-                                </button>
-                            ))}
+                            );
+                        }
+                        return (
+                            <button
+                                type="button"
+                                className={itemClasses}
+                                disabled={item.disabled}
+                                // An `isToggle` item switches on and off in
+                                // place, so it says whether it is on.
+                                aria-pressed={item.isToggle ? Boolean(item.selected) : undefined}
+                                // `isBusy`: still working, so it says so.
+                                aria-busy={item.isBusy ? 'true' : undefined}
+                                onClick={choose}
+                            >
+                                {inner}
+                            </button>
+                        );
+                    };
+                    return (
+                        <React.Fragment key={index}>
+                            {renderControl()}
                             {item.divider && index < items.length - 1 && (
                                 <div className="pdropdown-divider"></div>
                             )}
@@ -378,6 +405,7 @@ Dropdown.propTypes = {
     buttonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** The toggle's accessible name. Needed whenever `buttonText` is an icon. */
     ariaLabel: PropTypes.string,
+    /** The menu's items, in order: a button each by default, or a link (`href`), an on/off toggle (`isToggle`), a static row (`isStatic`) or a header. */
     items: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string,
         label: PropTypes.string,

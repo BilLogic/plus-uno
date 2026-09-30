@@ -18,7 +18,7 @@
 | `id` | string | — | — |
 | `buttonText` | string or node | `"Dropdown"` | Text displayed on the dropdown toggle button |
 | `ariaLabel` | string | — | The toggle's accessible name. Needed whenever `buttonText` is an icon. |
-| `items` | arrayOf or shape or string or bool or number or func or elementType | `[]` | Keeps the menu open after the item is chosen. |
+| `items` | arrayOf or shape or string or bool or number or func or elementType | `[]` | The menu's items, in order: a button each by default, or a link (`href`), an on/off toggle (`isToggle`), a static row (`isStatic`) or a header. |
 | `size` | enum | `"default"` | Button size |
 | `style` | enum | `"default"` | Trigger color style |
 | `fill` | enum | `"outline"` | Trigger surface treatment (outline default per spec; ghost for minimal emphasis) |

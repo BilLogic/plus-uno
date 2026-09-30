@@ -21,6 +21,12 @@ export default {
     title: 'Components/Status and loading/Tag group',
     component: TagGroup,
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'changed', summary: '`overflow="collapse"` fit as many tags as the width allowed instead of defaulting `maxVisible` to 5, and `maxVisible` became an optional cap that never squeezed a tag.' },
+            { date: '2026-09-29', kind: 'added', summary: 'A collapsed row put its hidden tags behind a `+n` tag named by its label and count ("+3 more tags") that opened a keyboard-operable menu, where a selectable tag toggled, a link tag stayed a link, and remove stayed on the row.' },
+            { date: '2026-09-29', kind: 'added', summary: '`alignment="right"` lined the tags and `+n` up on the right edge, and `disabled` disabled every Tag and Suggestion in the group through `TagContext`.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'Suggestions were never counted into `+n` and always sat at the end of the row, after the tags and `+n`.' },
+        ],
         docs: {
             description: {
                 component:

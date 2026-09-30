@@ -8,6 +8,11 @@ export default {
     component: Dropdown,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'changed', summary: 'Escape inside an open menu closed it, returned focus to the toggle once it had closed, and stopped propagating, so an enclosing Modal no longer closed on the same key.' },
+            { date: '2026-09-29', kind: 'added', summary: 'Items took `href` (and `linkComponent`) to render as a link, `isToggle` to report `selected` as `aria-pressed`, `isStatic` for a row that is not a control, and `isBusy` for an item still working.' },
+            { date: '2026-09-29', kind: 'fixed', summary: '`trailingIcon` became decorative (`aria-hidden`), like `leadingIcon`, so its glyph no longer leaked into the item name.' },
+        ],
         docs: {
             description: {
                 component: 'Dropdown component for displaying actionable lists and menus. Supports multi-select, icons, dividers, and different directions.'

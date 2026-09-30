@@ -204,6 +204,9 @@ would run off the edge, remeasuring on scroll and resize.
   forgotten (on the next key, a focus move, or a render with the menu still
   open), so a later close by the caller does not pull focus to the toggle.
   A click outside, bound to `mousedown`, also closes it.
+- **Escape stops at the dropdown.** Escape inside an open dropdown does not
+  propagate, so an enclosing Modal or panel stays open: the first Escape
+  closes the menu, the next one reaches the Modal.
 - **A custom `toggle` brings its own keyboard access.** The node you pass is
   wrapped in a `div` with an `onClick` and no role or tabindex, so a control
   inside it (a `Button`, a Tag) is what a keyboard user presses, and Enter or
