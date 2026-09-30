@@ -61,6 +61,17 @@ test("graded answers keep only the three grades", () => {
   );
 });
 
+test("a turn is graded once", () => {
+  assert.throws(
+    () =>
+      inputRows("graded_answers", [
+        { turn_id: "t1", grade: "correct", grader: "bill", note: "" },
+        { turn_id: "t1", grade: "wrong", grader: "ana", note: "" },
+      ]),
+    /graded_answers row 2: turn_id "t1" is already graded in row 1/,
+  );
+});
+
 test("a graded answer names its turn", () => {
   assert.throws(
     () => inputRows("graded_answers", [{ turn_id: "", grade: "correct", grader: "bill", note: "" }]),
@@ -80,6 +91,26 @@ test("the corpus export takes ISO times or epoch ms, and a blank reply", () => {
   assert.throws(
     () => inputRows("corpus_threads", [{ thread_id: "a", asked_at: "soon", first_reply_at: "", lead_replied_first: "0" }]),
     /corpus_threads row 1: asked_at "soon" is not a time/,
+  );
+});
+
+test("a time in epoch seconds is refused, not read as 1970", () => {
+  assert.throws(
+    () => inputRows("corpus_threads", [{ thread_id: "a", asked_at: "1738577400", first_reply_at: "", lead_replied_first: "0" }]),
+    /asked_at "1738577400" looks like epoch seconds: give epoch milliseconds \(13 digits\) or ISO 8601 with a zone/,
+  );
+});
+
+test("an ISO time with no zone is refused, not read in the machine's zone", () => {
+  for (const value of ["2025-02-03T10:00:00", "2025-02-03"]) {
+    assert.throws(
+      () => inputRows("corpus_threads", [{ thread_id: "a", asked_at: value, first_reply_at: "", lead_replied_first: "0" }]),
+      /has no zone: end it with Z or an offset/,
+    );
+  }
+  assert.deepEqual(
+    inputRows("corpus_threads", [{ thread_id: "a", asked_at: "2025-02-03T05:00:00-05:00", first_reply_at: "", lead_replied_first: "0" }]),
+    [["a", Date.parse("2025-02-03T10:00:00Z"), null, 0]],
   );
 });
 
@@ -122,6 +153,13 @@ test("with no window given, the file's own dates stand", () => {
   const sql = renderMetricQuery(QUERY, { inputs: { graded_answers: [] } });
   assert.match(sql, /'2026-09-01'/);
   assert.match(sql, /'2027-01-01'/);
+});
+
+test("a window date must be a day on the calendar", () => {
+  const inputs = { graded_answers: [] };
+  assert.throws(() => renderMetricQuery(QUERY, { from: "2026-13-01", inputs }), /2026-13-01 is not a calendar date/);
+  assert.throws(() => renderMetricQuery(QUERY, { to: "2026-02-30", inputs }), /2026-02-30 is not a calendar date/);
+  assert.doesNotThrow(() => renderMetricQuery(QUERY, { from: "2028-02-29", to: "2028-03-01", inputs }));
 });
 
 test("a window must be two dates, start before end", () => {

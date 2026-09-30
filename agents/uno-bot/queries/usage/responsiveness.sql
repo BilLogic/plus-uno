@@ -7,6 +7,12 @@
 -- grade `correct`. Ungraded answers are reported as their own cohort and are
 -- never counted as correct; answers graded partial or wrong are in neither.
 --
+-- Not the same population as the baseline. This reads every answered turn a
+-- person made to the bot — follow-ups, DMs and cards included — and the bot's
+-- first answer to it. The baseline reads sampled corpus threads and the first
+-- human reply to the thread's opening ask. Compare the two as "how long people
+-- waited", not as one measure before and after.
+--
 -- Percentiles are nearest-rank: the value at rank ceil(p * n) in ascending
 -- order, computed as (p * n + 99) / 100 in integers. The baseline query
 -- (responsiveness-baseline.sql) uses the same, so before and after compare.

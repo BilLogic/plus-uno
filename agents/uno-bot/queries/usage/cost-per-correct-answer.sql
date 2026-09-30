@@ -2,10 +2,17 @@
 --
 -- Definition: the estimated model spend of real turns in the window
 -- (turns.cost_usd, from the checked-in price table) divided by the correct
--- answers it bought, estimated as the window's answered asks times the
--- graded accuracy (correct / graded, as answer-accuracy.sql). Only a sample
--- is graded, so the divisor is an estimate and the grading's size is printed
--- beside it. Turns on an unpriced model (cost_usd null) add nothing to the
+-- answers it bought, estimated as the window's answers times the graded
+-- accuracy (correct / graded). Only a sample is graded, so the divisor is an
+-- estimate and the grading's size is printed beside it.
+--
+-- An answer is a turn with disposition `answered` and a first answer. The
+-- other dispositions are not answers to grade: `staged` (a card), `asked` (a
+-- clarifying question), `resolved` (a confirmation), `reacted`, `failed`,
+-- `stopped`. The accuracy is taken over graded rows from that same
+-- population, and graded rows on any other disposition are left out of it, so
+-- grade answers only — a grading drawn from cards or questions would not
+-- match the divisor it scales. Turns on an unpriced model (cost_usd null) add nothing to the
 -- spend and are counted in `unpriced_turns`, so the spend is a floor while any
 -- are. Then one row per calendar month (UTC) in the window: that month's spend
 -- and answered asks.
@@ -28,7 +35,7 @@ WITH
   ),
   -- @input graded_answers
   real_turns AS (
-    SELECT turn_id, cost_usd, first_answer_at IS NOT NULL AS answered,
+    SELECT turn_id, cost_usd, disposition = 'answered' AND first_answer_at IS NOT NULL AS answered,
       strftime('%Y-%m', asked_at / 1000, 'unixepoch') AS month
     FROM turns
     CROSS JOIN win
@@ -38,7 +45,7 @@ WITH
   grading AS (
     SELECT COUNT(*) AS graded, COALESCE(SUM(g.grade = 'correct'), 0) AS correct
     FROM graded_answers g
-    JOIN real_turns r ON r.turn_id = g.turn_id
+    JOIN real_turns r ON r.turn_id = g.turn_id AND r.answered
   ),
   totals AS (
     SELECT 'window' AS period, 0 AS ord,

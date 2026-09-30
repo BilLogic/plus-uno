@@ -6,19 +6,27 @@
 --     window. found = distinct findings; proposed = those carded (posted_at
 --     set); accepted = those confirmed; time to fix = resolved_at - drift_at
 --     of a confirmed item, the thread's first evidence to the ✅.
---   - Reconcile (do the sources agree?): Reconcile writes no sweep items. Its
---     cards are the worker's (via 'worker') with no Notion operation — the DS
---     precedence check and the library watcher file intakes, while Capture's
---     worker cards edit Notion. proposed = those cards; accepted = those with
---     a ✅ (a re-stage's included); time to fix = staged to ✅. found is null:
---     nothing records what Reconcile looked at and did not card.
+--   - Reconcile (do the sources agree?): Reconcile writes no sweep items, and
+--     proposal_events does not store a card's supersedeKey, so its cards are
+--     told apart by who staged them and what they run: worker cards (via
+--     'worker') whose every operation is one of Reconcile's own tools —
+--     github_issue_create and github_issue_update (the weekly DS precedence
+--     check, src/ds-precedence/) and component_implement (the library
+--     watcher, src/figma-library/). Capture's worker cards run notion_update
+--     or sweep_share_post and never count. The residual: a future Capture
+--     card that only files a GitHub intake would read as Reconcile.
+--     proposed = those cards; accepted = those with a ✅ (a re-stage's
+--     included); time to fix = staged to ✅. found is null: nothing records
+--     what Reconcile looked at and did not card.
 --   - Follow through (did it get done?): commitments from end-of-day runs in
 --     the window. found = promises read; proposed = those nudged at least
---     once; accepted = kept (`done`, or `auto_done` when the evidence check
---     found it done before any nudge); time to fix = promised_at to
---     resolved_at of a kept one. The reminder outcomes are counted beside it:
---     done · auto_done · dropped (🙅) · not_promise (🤔) · lapsed · live (open,
---     nudged or snoozed).
+--     once; accepted = `done`, the promiser's own 🙌; time to fix =
+--     promised_at to resolved_at of a `done` one. `auto_done` (the evidence
+--     check found it done, often before any nudge) is reported on its own and
+--     is neither accepted nor timed: nobody accepted anything, and its
+--     resolved_at is when the check looked, not when the work was done. The
+--     reminder outcomes are counted beside it: done · auto_done · dropped (🙅)
+--     · not_promise (🤔) · lapsed · live (open, nudged or snoozed).
 -- Medians are nearest-rank: (50 * n + 99) / 100.
 --
 -- Window: the end-of-day run's date (run_date, UTC) for sweep items and
@@ -61,7 +69,11 @@ WITH
       AND s.via = 'worker'
       AND s.test_traffic = 0
       AND s.at >= win.from_ms AND s.at < win.to_ms
-      AND NOT EXISTS (SELECT 1 FROM json_each(s.tools) WHERE value LIKE 'notion\_%' ESCAPE '\')
+      AND json_array_length(s.tools) > 0
+      AND NOT EXISTS (
+        SELECT 1 FROM json_each(s.tools)
+        WHERE value NOT IN ('github_issue_create', 'github_issue_update', 'component_implement')
+      )
   ),
   fixes(job, fix_ms) AS (
     SELECT 'Capture', resolved_at - drift_at FROM items WHERE status = 'confirmed' AND resolved_at IS NOT NULL
@@ -69,7 +81,7 @@ WITH
     SELECT 'Reconcile', confirmed_at - staged_at FROM reconcile WHERE confirmed_at IS NOT NULL
     UNION ALL
     SELECT 'Follow through', resolved_at - promised_at FROM promises
-    WHERE state IN ('done', 'auto_done') AND resolved_at IS NOT NULL
+    WHERE state = 'done' AND resolved_at IS NOT NULL
   ),
   medians AS (
     SELECT job, MAX(CASE WHEN rn = (50 * n + 99) / 100 THEN fix_ms END) AS median_fix_ms
@@ -95,7 +107,7 @@ WITH
     SELECT 3, 'Follow through',
       COUNT(*),
       COALESCE(SUM(nudges > 0), 0),
-      COALESCE(SUM(state IN ('done', 'auto_done')), 0),
+      COALESCE(SUM(state = 'done'), 0),
       COALESCE(SUM(state = 'done'), 0),
       COALESCE(SUM(state = 'auto_done'), 0),
       COALESCE(SUM(state = 'dropped'), 0),

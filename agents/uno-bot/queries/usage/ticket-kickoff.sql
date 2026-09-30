@@ -6,7 +6,12 @@
 --     re-stage, whose turn they borrow — counting them would count it twice;
 --   - worker cards (via 'worker'): nobody asked for them;
 --   - cards a revision replaced (a `superseded` row via 'revision'): the
---     revision is its own staged card, and carries the ticket on.
+--     revision is its own staged card, and carries the ticket on;
+--   - sweep-card revisions: a reply that revises a sweep card ("drop 2")
+--     stages through a turn, so it reads via 'turn', but its
+--     origin_proposal_id names the worker card it revises. Every card whose
+--     origin was staged via 'worker' is the sweep's, not a ticket anyone
+--     asked for.
 -- For each ticket: the time from the thread's first message
 -- (thread_started_at) to the card being staged, and to its ✅ — the card's
 -- own `confirmed` row, or its re-stage's — and whether the ✅ came from
@@ -42,6 +47,10 @@ WITH
       AND NOT EXISTS (
         SELECT 1 FROM proposal_events r
         WHERE r.proposal_id = s.proposal_id AND r.event = 'superseded' AND r.via = 'revision'
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM proposal_events o
+        WHERE o.proposal_id = s.origin_proposal_id AND o.event = 'staged' AND o.via = 'worker'
       )
   ),
   -- A ticket's cards: itself, and every re-stage of it.

@@ -11,11 +11,20 @@
 --     refused_stale_sweep_items: sweep items refused the same way;
 --   - gated_share: of the asks whose staged batch ran (resolution
 --     `task_completed` on the staging turn), the share whose card has a ✅ on
---     record. A batch that ran with no ✅ recorded is a gate gap, or a lost
---     `confirmed` write;
+--     record. A batch that ran with no ✅ recorded is a lost `confirmed`
+--     write, or a gate gap;
 --   - wrong_writes: of those batches, how many the graded answers grade
 --     `wrong`, out of graded_writes graded at all. No column marks a write
 --     wrong after the fact, so the grading is the only source.
+--
+-- GATED_SHARE IS CLOSE TO 1 BY CONSTRUCTION, AND IS NOT EVIDENCE THE GATE IS
+-- ENFORCED. A gated tool can only run as a card's batch — the loop dispatches
+-- ungated tools alone, and `tools_called` never names a gated one — and
+-- `task_completed` is written only when a ✅-approved batch ran. So the share
+-- measures whether the ✅ was recorded, not whether a write could slip past
+-- it. Evidence of enforcement would be ungated write attempts refused, or
+-- writes made with no card; no column records either, so this database
+-- holds none. Cite the gate from its tests, and this query for the outcomes.
 --
 -- The expired count is a LOWER BOUND: expiry is computed from D1 alone, and a
 -- card whose staged row was never written is never marked expired.

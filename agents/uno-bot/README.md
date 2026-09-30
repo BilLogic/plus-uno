@@ -187,9 +187,9 @@ The window is UTC dates, start inclusive, end exclusive. Left out, the dates wri
 
 Four files read something that is not in the database, and render it in as a table that exists only in the statement:
 
-- `responsiveness`, `answer-accuracy`, `cost-per-correct-answer` and `gated-writes` read the graded answers, `queries/usage/graded-answers.csv` (`turn_id,grade,grader,note`, grade `correct`, `partial` or `wrong`). Grade by adding rows there and committing them, so a grading can be re-run and cited. `--graded <csv>` reads another file.
+- `responsiveness`, `answer-accuracy`, `cost-per-correct-answer` and `gated-writes` read the graded answers, `queries/usage/graded-answers.csv` (`turn_id,grade,grader,note`, grade `correct`, `partial` or `wrong`, one row per turn). Grade answers only, meaning turns with disposition `answered`: cards and clarifying questions are not in the divisor that the accuracy scales. Add rows there and commit them, so a grading can be re-run and cited. `--graded <csv>` reads another file.
 - `self-improvement-loop` reads whether the bot's own tickets closed, exported from GitHub when you run it: `gh issue list --repo BilLogic/plus-uno --state all --json url,closedAt --limit 500 > /tmp/closures.json`, then `--closures /tmp/closures.json`.
-- `responsiveness-baseline` reads the Coordination Request Corpus export (`thread_id,asked_at,first_reply_at,lead_replied_first`, times as ISO 8601 or epoch ms) with `--corpus <csv>`. It has no window.
+- `responsiveness-baseline` reads the Coordination Request Corpus export (`thread_id,asked_at,first_reply_at,lead_replied_first`, times as epoch milliseconds or as ISO 8601 with a zone; epoch seconds and zone-less times are refused) with `--corpus <csv>`. It has no window.
 
 A file that reads an input fails with `no such table` if you run it without rendering, so an ungraded run cannot pass for a graded one.
 
@@ -199,6 +199,8 @@ A file that reads an input fails with `no such table` if you run it without rend
 - the window;
 - the graded-answers commit, when the query reads the grading;
 - the date it was run.
+
+**Asks and turns.** A turn is one row per message the bot answered, follow-ups included. An ask is a turn whose own message opened a thread, which is the unit to set against the inbox count. `self-serve-rate`, `where-lead-time-goes`, `load-on-lead` and `repeats-reaching-lead` print one of each, labelled in a `unit` column, and `return-rate` counts asks with the turns beside them. The usage record keeps no thread root, so the ask count is an approximation, and each header says which way it leans.
 
 Numbers taken while the window is still open move as the end-of-day pass settles the last day's asks, so cite a closed window when you can. The known limits are in each file's header. Two of them apply to several files: the expired count is a lower bound, and role splits read `unknown` until `agents/uno-bot/src/usage/roles.ts` is filled in.
 

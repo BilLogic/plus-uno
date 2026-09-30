@@ -7,6 +7,11 @@
 -- of replied threads the lead answered first. A thread with no reply counts
 -- in `threads` and in no wait.
 --
+-- Not the same population as responsiveness.sql. This reads sampled corpus
+-- threads and the first human reply to each thread's opening ask; that reads
+-- every answered turn to the bot, follow-ups and DMs included, and the bot's
+-- first answer. The method is shared; the populations are not.
+--
 -- Percentiles are nearest-rank: the value at rank ceil(p * n), as
 -- (p * n + 99) / 100 in integers — the same as responsiveness.sql. On the 299
 -- sampled threads the corpus work measured median 29 min and p90 16.8 h, with

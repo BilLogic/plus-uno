@@ -16,6 +16,10 @@
  *     baseline is computed from;
  *   - `ticket_closures` — GitHub's `url` and `closedAt` for the bot's own
  *     tickets, exported when the query is run.
+ * Times in an input are epoch milliseconds or ISO 8601 with a zone; epoch
+ * seconds and zone-less strings are refused rather than guessed at. A turn is
+ * graded once.
+ *
  * None of them is written to the database: the rows exist only in the
  * statement. A query whose marker is left unrendered fails with "no such
  * table", so an ungraded run cannot pass for a graded one.
@@ -55,6 +59,17 @@ const INPUTS = {
 
 const GRADES = ["correct", "partial", "wrong"];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
+/** Epoch milliseconds for any time since 2001: thirteen digits. */
+const EPOCH_MS = /^\d{13}$/;
+/** An ISO 8601 time that says its zone. */
+const ZONED = /(?:Z|[+-]\d{2}:?\d{2})$/i;
+
+/** Whether a YYYY-MM-DD string names a real day. */
+function isCalendarDate(/** @type {string} */ date) {
+  if (!DATE.test(date)) return false;
+  const d = new Date(`${date}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === date;
+}
 const MARKER = /^[ \t]*-- @input ([a-z_]+)[ \t]*$/gm;
 
 /**
@@ -121,8 +136,10 @@ export function parseCsv(text) {
 export function inputRows(name, records) {
   const columns = Object.hasOwn(INPUTS, name) ? INPUTS[name] : undefined;
   if (!columns) throw new Error(`no input named "${name}"`);
-  return records.map((record, r) =>
-    columns.map((column) => {
+  /** @type {Map<string, number>} */
+  const graded = new Map();
+  return records.map((record, r) => {
+    const row = columns.map((column) => {
       const key = [column.name, ...(column.aliases ?? [])].find((k) => Object.hasOwn(record, k));
       const raw = key === undefined ? null : record[key];
       const text = raw === null || raw === undefined ? "" : String(raw).trim();
@@ -144,8 +161,19 @@ export function inputRows(name, records) {
             if (column.kind === "time?") return null;
             throw fail(`${column.name} is empty`);
           }
-          const ms = /^\d+$/.test(text) ? Number(text) : Date.parse(text);
+          // Epoch milliseconds, or ISO 8601 with its zone. A shorter number is
+          // most likely epoch seconds, which read as milliseconds land in
+          // January 1970; a zone-less ISO string would be read in whatever
+          // zone the machine running this is in. Both are refused.
+          if (/^\d+$/.test(text)) {
+            if (!EPOCH_MS.test(text)) {
+              throw fail(`${column.name} "${text}" looks like epoch seconds: give epoch milliseconds (13 digits) or ISO 8601 with a zone`);
+            }
+            return Number(text);
+          }
+          const ms = Date.parse(text);
           if (!Number.isFinite(ms)) throw fail(`${column.name} "${text}" is not a time`);
+          if (!ZONED.test(text)) throw fail(`${column.name} "${text}" has no zone: end it with Z or an offset`);
           return ms;
         }
         case "bool": {
@@ -155,8 +183,18 @@ export function inputRows(name, records) {
           throw fail(`${column.name} "${text}" is not a boolean`);
         }
       }
-    }),
-  );
+    });
+    // A turn graded twice would be counted twice, or pick a grade by accident.
+    if (name === "graded_answers") {
+      const turn = /** @type {string} */ (row[0]);
+      const first = graded.get(turn);
+      if (first !== undefined) {
+        throw new Error(`graded_answers row ${r + 1}: turn_id "${turn}" is already graded in row ${first}`);
+      }
+      graded.set(turn, r + 1);
+    }
+    return row;
+  });
 }
 
 /**
@@ -211,7 +249,9 @@ function withDate(sql, marker, date) {
  */
 export function renderMetricQuery(sql, { from, to, inputs = {} } = {}) {
   for (const date of [from, to]) {
-    if (date !== undefined && !DATE.test(date)) throw new Error(`a window date is YYYY-MM-DD, not "${date}"`);
+    if (date === undefined) continue;
+    if (!DATE.test(date)) throw new Error(`a window date is YYYY-MM-DD, not "${date}"`);
+    if (!isCalendarDate(date)) throw new Error(`${date} is not a calendar date`);
   }
   if (from !== undefined && to !== undefined && !(from < to)) {
     throw new Error(`the window must start before it ends: ${from} is not before ${to}`);
