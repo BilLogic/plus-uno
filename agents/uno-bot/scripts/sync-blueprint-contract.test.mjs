@@ -38,9 +38,12 @@ const DRIFTED = "export const BLUEPRINT_CONTRACT = { breadcrumb: 'Layer' };\n";
 // docs/connectors/supabase/ here. The core carries a relative link to its
 // sibling and one that leaves docs/agents/; the rendering has to keep the
 // first and repoint the second.
+// It ends on the schema section, which the sync splits into its own disclosed
+// doc (#858), leaving a pointer in the core.
 const CORE =
   "---\naudience: agents\nsummary: The core.\n---\n\n# The blueprint, for agents\n\n" +
-  "See [the supplement](blueprint-direct-access.md) and [security](../engineering/access-and-security.md).\n";
+  "See [the supplement](blueprint-direct-access.md) and [security](../engineering/access-and-security.md).\n\n" +
+  "## The schema, as the catalog describes it\n\n### `cells`\nOne lane at one step.\n";
 const SUPPLEMENT = "---\naudience: agents\nsummary: The supplement.\n---\n\n# Direct access\n\nGET /rest/v1/cells\n";
 
 /**
@@ -62,6 +65,7 @@ function withRepos({ app, vendored, account = { core: CORE, supplement: SUPPLEME
   mkdirSync(docs, { recursive: true });
   const corePath = path.join(docs, "blueprint.md");
   const supplementPath = path.join(docs, "blueprint-direct-access.md");
+  const schemaPath = path.join(docs, "blueprint-schema.md");
 
   let appRoot = path.join(root, "absent");
   if (app !== null) {
@@ -123,6 +127,7 @@ function withRepos({ app, vendored, account = { core: CORE, supplement: SUPPLEME
       vendored: () => readFileSync(vendoredPath, "utf8"),
       core: () => readFileSync(corePath, "utf8"),
       supplement: () => readFileSync(supplementPath, "utf8"),
+      schema: () => readFileSync(schemaPath, "utf8"),
     };
   };
 
@@ -264,12 +269,12 @@ test("a sync renders the account with this repo's frontmatter and a vendored hea
     const c = core();
     assert.match(
       c,
-      /^---\nembodiment: all\nsummary: The core\.\nvendored_from: BilLogic\/plus-uno-blueprint docs\/agents\/blueprint\.md\nvendored_revision: abc1234\n---\n/,
+      /^---\nembodiment: all\nsummary: [^\n]+\nvendored_from: BilLogic\/plus-uno-blueprint docs\/agents\/blueprint\.md\nvendored_revision: abc1234\n---\n/,
     );
     assert.match(c, /<!-- VENDORED from BilLogic\/plus-uno-blueprint docs\/agents\/blueprint\.md by agents\/uno-bot\/scripts\/sync-blueprint-contract\.mjs\./);
     assert.ok(
-      c.endsWith(
-        "# The blueprint, for agents\n\nSee [the supplement](blueprint-direct-access.md) and [security](https://github.com/BilLogic/plus-uno-blueprint/blob/main/docs/engineering/access-and-security.md).\n",
+      c.includes(
+        "# The blueprint, for agents\n\nSee [the supplement](blueprint-direct-access.md) and [security](https://github.com/BilLogic/plus-uno-blueprint/blob/main/docs/engineering/access-and-security.md).\n\n## The schema",
       ),
       c,
     );
@@ -280,16 +285,45 @@ test("a sync renders the account with this repo's frontmatter and a vendored hea
   });
 });
 
+test("the schema section leaves the core for a disclosed doc, and the core points at it", () => {
+  withRepos({ app: CANONICAL, vendored: CANONICAL, vendoredAccount: null }, (invoke) => {
+    const { status, out, core, schema } = invoke([]);
+    assert.equal(status, 0);
+    assert.match(out, /synced: blueprint-schema\.md/);
+    const c = core();
+    assert.doesNotMatch(c, /One lane at one step/, "the schema body is not in the always-loaded core");
+    assert.match(c, /`docs\/connectors\/supabase\/blueprint-schema` — `read_reference` it/);
+    assert.match(c, /<!-- VENDORED [^\n]*this repo's sync writes it \(SCHEMA_POINTER\)/, "the header owns the pointer as this repo's");
+    const s = schema();
+    assert.match(s, /^---\nembodiment: all\ndisclosure: reference\nsummary: [^\n]+\nvendored_from: BilLogic\/plus-uno-blueprint docs\/agents\/blueprint\.md\n/);
+    assert.ok(s.endsWith("## The schema, as the catalog describes it\n\n### `cells`\nOne lane at one step.\n"), s);
+  });
+});
+
+test("an account whose schema heading moved fails the sync rather than bundling the schema", () => {
+  const renamed = { core: CORE.replace("## The schema, as the catalog describes it", "## Schema"), supplement: SUPPLEMENT };
+  withRepos({ app: CANONICAL, vendored: CANONICAL, account: renamed, vendoredAccount: null }, (invoke) => {
+    const { status, out } = invoke([]);
+    assert.equal(status, 1);
+    assert.match(out, /cannot render docs\/connectors\/supabase\/blueprint\.md: .*heading/);
+  });
+});
+
 test("a drifted account fails the check, and names the vendored file", () => {
   // A vendored core that is the source's OLD bytes, rendered — the shape a
   // rename in the blueprint leaves behind.
   withRepos({ app: CANONICAL, vendored: CANONICAL, vendoredAccount: null }, (invoke) => {
     invoke([]);
     // Now move the app's copy on, and check.
-    const moved = CORE.replace("The core.", "The core, renamed.");
+    const moved = CORE.replace("# The blueprint, for agents", "# The blueprint, renamed");
     const { status, out } = invoke(["--check"], {}, { core: moved });
     assert.equal(status, 1);
     assert.match(out, /drift: docs\/connectors\/supabase\/blueprint\.md differs from the app's blueprint\.md/);
+    // A column comment rewritten in the app drifts the disclosed schema, too.
+    const recommented = CORE.replace("One lane at one step.", "One lane at one step, on one path.");
+    const schemaDrift = invoke(["--check"], {}, { core: recommented });
+    assert.equal(schemaDrift.status, 1);
+    assert.match(schemaDrift.out, /drift: docs\/connectors\/supabase\/blueprint-schema\.md differs/);
   });
 });
 
