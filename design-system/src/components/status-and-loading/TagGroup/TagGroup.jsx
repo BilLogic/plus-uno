@@ -64,23 +64,35 @@ const isSuggestion = (child) => {
 
 /**
  * A hidden tag's line in the `+n` menu, keeping the tag's action. A selectable
- * tag is a toggle item that shows selected and keeps the menu open, so the
- * change is seen where it was made. A link tag is a link item to the same
- * address, with a trailing arrow for "goes somewhere". A tag still saving is
- * busy and cannot be pressed, as it is on the row. Anything else is a static
- * row that only says the words: nothing to press, nothing to focus, and remove
- * is not offered here, only on the row.
+ * tag is a toggle item led by the Dropdown's multi-select checkbox; it shows
+ * selected and keeps the menu open, so the change is seen where it was made.
+ * A link tag is a link item to the same address, with a trailing arrow for
+ * "goes somewhere". A tag still saving, whatever its behavior, is a disabled,
+ * busy row that cannot be pressed. Anything else is a static row that only
+ * says the words: nothing to press, nothing to focus, and remove is not
+ * offered here, only on the row.
  */
 const menuItemOf = (child) => {
     const props = child.props || {};
     const text = labelOf(child);
     const behavior = resolveTagBehavior(props);
-    if (props.isLoading && behavior !== 'read-only' && behavior !== 'removable') {
+    // Saving, whatever the behavior: the disabled row, busy, not actionable.
+    if (props.isLoading) {
         return { text, disabled: true, isBusy: true };
     }
     switch (behavior) {
         case 'selectable':
-            return { text, isToggle: true, selected: Boolean(props.isSelected), keepOpen: true, onClick: props.onClick };
+            return {
+                text,
+                isToggle: true,
+                selected: Boolean(props.isSelected),
+                // The Dropdown's multi-select checkbox, as Figma draws the
+                // row: decorative, since `aria-pressed` carries the state.
+                multiSelectCheckbox: true,
+                multiSelectChecked: Boolean(props.isSelected),
+                keepOpen: true,
+                onClick: props.onClick,
+            };
         case 'link':
             return {
                 text,

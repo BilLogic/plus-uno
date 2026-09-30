@@ -217,6 +217,9 @@ would run off the edge, remeasuring on scroll and resize.
   link (`linkComponent` for a router's), so it is announced as a link and can
   open in a new tab. An item with `isToggle` is a button that reports
   `selected` as `aria-pressed`; `keepOpen` leaves the menu open after it.
+  Give it `multiSelectCheckbox` and `multiSelectChecked` to lead with the
+  multi-select checkbox, which is decorative, since `aria-pressed` already
+  says whether it is on.
 - **A static row is not a control.** An item with `isStatic` is a plain row
   with no button role: it is not focusable, and pressing it leaves the menu
   open. An item with `isBusy` (with `disabled`) is still working and reports

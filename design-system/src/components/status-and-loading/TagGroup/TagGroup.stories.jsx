@@ -22,6 +22,7 @@ export default {
     component: TagGroup,
     parameters: {
         changelog: [
+            { date: '2026-09-29', kind: 'changed', summary: 'In the `+n` menu, a selectable tag led with the multi-select checkbox, checked and selected when on, and a saving tag of any behavior became a disabled, busy row.' },
             { date: '2026-09-29', kind: 'changed', summary: '`overflow="collapse"` fit as many tags as the width allowed instead of defaulting `maxVisible` to 5, and `maxVisible` became an optional cap that never squeezed a tag.' },
             { date: '2026-09-29', kind: 'added', summary: 'A collapsed row put its hidden tags behind a `+n` tag named by its label and count ("+3 more tags") that opened a keyboard-operable menu, where a selectable tag toggled, a link tag stayed a link, and remove stayed on the row.' },
             { date: '2026-09-29', kind: 'added', summary: '`alignment="right"` lined the tags and `+n` up on the right edge, and `disabled` disabled every Tag and Suggestion in the group through `TagContext`.' },
@@ -355,6 +356,7 @@ export const MenuKeepsActions = {
                     <Tag behavior="removable" color="blue" onRemove={onRemove}>Geography</Tag>
                     <Tag color="blue">Music</Tag>
                     <Tag behavior="selectable" color="blue" isLoading onClick={onSaving}>Art</Tag>
+                    <Tag color="blue" isLoading>Latin</Tag>
                 </TagGroup>
                 <p className="body2-txt">{picked ? 'Mathematics picked' : 'Nothing picked'}</p>
             </div>
@@ -362,16 +364,32 @@ export const MenuKeepsActions = {
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
-        const more = await canvas.findByRole('button', { name: '+5 more tags' });
+        const more = await canvas.findByRole('button', { name: '+6 more tags' });
         await userEvent.click(more);
 
-        // Selectable: a toggle, off, then on and still in the open menu.
+        // Selectable: a toggle, off, then on and still in the open menu. It
+        // leads with the Dropdown's multi-select checkbox, decorative since
+        // aria-pressed carries the state: unchecked in on-surface-variant,
+        // then checked in primary, with a different glyph.
+        const checkboxOf = (item) => item.querySelector('.dropdown-item-inner > [aria-hidden="true"]:first-child');
+        const glyph = (el) => getComputedStyle(el, '::before').content;
+        const offColor = tokenColor(canvasElement, '--color-on-surface-variant');
+        const onColor = tokenColor(canvasElement, '--color-primary');
         const toggle = canvas.getByRole('button', { name: 'Mathematics' });
         await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+        const offBox = checkboxOf(toggle);
+        await expect(offBox, 'a checkbox leads the row').not.toBeNull();
+        await expect(getComputedStyle(offBox).color, 'unchecked').toBe(offColor);
+        await expect(getComputedStyle(offBox).opacity, 'the empty box shows while off').toBe('1');
+        const offGlyph = glyph(offBox);
+        await expect(offGlyph, 'a glyph is drawn').not.toMatch(/^(none|normal|"")$/);
         await userEvent.click(toggle);
         await expect(canvas.getByText('Mathematics picked')).toBeInTheDocument();
         await expect(more, 'toggling keeps the menu open').toHaveAttribute('aria-expanded', 'true');
         await expect(canvas.getByRole('button', { name: 'Mathematics' })).toHaveAttribute('aria-pressed', 'true');
+        const onBox = checkboxOf(canvas.getByRole('button', { name: 'Mathematics' }));
+        await expect(getComputedStyle(onBox).color, 'checked').toBe(onColor);
+        await expect(glyph(onBox), 'the checked glyph differs').not.toBe(offGlyph);
         // Waited for: the item's background eases in. The token is read once,
         // outside the wait: its probe element would otherwise wake the wait's
         // own mutation observer on every read.
@@ -407,11 +425,14 @@ export const MenuKeepsActions = {
         await expect(canvas.queryByRole('button', { name: /^Remove/ }), 'remove stays on the row').toBeNull();
         await expect(args.onRemove).not.toHaveBeenCalled();
 
-        // Still saving: busy and not pressable, in the menu as on the row.
-        const saving = canvas.getByRole('button', { name: 'Art' });
-        await expect(saving).toBeDisabled();
-        await expect(saving).toHaveAttribute('aria-busy', 'true');
-        await userEvent.click(saving, { pointerEventsCheck: 0 });
+        // Still saving, whatever the behavior: disabled and busy, not
+        // pressable, and out of the tab order.
+        for (const s of ['Art', 'Latin']) {
+            const saving = canvas.getByRole('button', { name: s });
+            await expect(saving, `${s} is disabled`).toBeDisabled();
+            await expect(saving, `${s} is busy`).toHaveAttribute('aria-busy', 'true');
+            await userEvent.click(saving, { pointerEventsCheck: 0 });
+        }
         await expect(args.onSaving).not.toHaveBeenCalled();
     },
 };

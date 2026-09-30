@@ -74,7 +74,7 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
     <DsCanvasQuiet of={TagGroupStories.CollapseWithSuggestions} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag toggles and shows selected, a link tag is a link with a trailing arrow, a tag still saving is busy and cannot be pressed, and a read-only or removable tag is a static row with nothing to press. Remove stays on the row.</>}>
+<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag is led by a checkbox, empty when off and checked and selected when on, and toggles in place; a link tag is a link with a trailing arrow; a tag still saving, whatever its behavior, is a disabled, busy row; and a read-only or removable tag is a static row with nothing to press. Remove stays on the row.</>}>
     <DsCanvasQuiet of={TagGroupStories.MenuKeepsActions} />
 </DocsCanvasShell>
 
@@ -242,10 +242,11 @@ component of your own must copy the marker
 tag.
 
 In the menu, a hidden tag keeps what it does. A selectable tag toggles there,
-shows selected, and the menu stays open so the change is seen. A link tag is a
-link there, to the same address, with a trailing arrow. A tag still saving is
-busy there and cannot be pressed. A read-only or removable tag is a static row
-that only says its words. Remove is only offered on the row, never from the
+led by the Dropdown's multi-select checkbox: empty when off, checked and in the
+selected state when on, and the menu stays open so the change is seen. A link
+tag is a link there, to the same address, with a trailing arrow. A tag still
+saving, whatever its behavior, is a disabled, busy row that cannot be pressed.
+A read-only or removable tag is a static row that only says its words. Remove is only offered on the row, never from the
 menu.
 
 ### Right-align for a right-aligned column.
@@ -277,8 +278,9 @@ right-aligned. Everywhere else, tags read from the left.
   reports whether its menu is open. Enter or Space opens it, Tab reaches each
   hidden tag that does something, and Escape closes it with focus back on
   `+n`. A selectable tag in the menu is a toggle button that reports
-  `aria-pressed`; a link tag is a real link, whose arrow is decorative; a tag
-  still saving is a disabled button with `aria-busy`; a read-only or removable
+  `aria-pressed`, and its checkbox is decorative; a link tag is a real link,
+  whose arrow is decorative; a tag still saving, of any behavior, is a
+  disabled button with `aria-busy`, out of the tab order; a read-only or removable
   tag is a static row, not a control and not in the tab order.
 - **Suggestions stay reachable.** They are never behind `+n`, so a keyboard
   user reaches them on the row, after `+n`, without opening the menu.
