@@ -22,6 +22,8 @@ jobs:
           const h = { "X-Figma-Token": T, "Content-Type": "application/json" };
           const probes = [
             ["me (current_user:read)", "GET", "/v1/me"],
+            ["team id length", "INFO", String(TEAM?.length ?? 0)],
+            ["DS file project (file_metadata)", "GET", `/v1/files/${F}/meta`],
             ["file nodes (file_content:read)", "GET", `/v1/files/${F}?depth=1`],
             ["file versions (file_versions:read)", "GET", `/v1/files/${F}/versions`],
             ["file components (library_content:read)", "GET", `/v1/files/${F}/components`],
@@ -39,6 +41,7 @@ jobs:
           ];
           for (const [name, method, path, body] of probes) {
             if (!method) { console.log(`SKIP  ${name}`); continue; }
+            if (method === "INFO") { console.log(`INFO  ${name} — ${path}`); continue; }
             try {
               const r = await fetch("https://api.figma.com" + path, { method, headers: h, body });
               const text = await r.text();
@@ -47,6 +50,7 @@ jobs:
                 const j = JSON.parse(text);
                 if (r.ok) {
                   if (path === "/v1/me") note = `handle=${j.handle}`;
+                  else if (j.file) note = `project=${j.file.folder_name ?? j.file.project?.name ?? "?"}; team_matches_secret=${String(j.file.team_id ?? j.file.project?.team_id ?? "") === TEAM}`;
                   else if (j.webhooks) note = `${j.webhooks.length} webhook(s): ` + j.webhooks.map((w) => `${w.event_type}/${w.status}/${w.context ?? "team"}`).join(", ");
                   else if (j.projects) note = `${j.projects.length} project(s)`;
                   else if (j.comments) note = `${j.comments.length} comment(s)`;
@@ -54,7 +58,7 @@ jobs:
                   else if (j.meta?.components) note = `${j.meta.components.length} component(s)`;
                   else if (j.dev_resources) note = `${j.dev_resources.length} dev resource(s)`;
                   else note = "ok";
-                } else note = (j.err || j.message || JSON.stringify(j)).toString().slice(0, 200);
+                } else note = (j.err || j.message || JSON.stringify(j)).toString().slice(0, 1500);
               } catch { note = text.slice(0, 120); }
               console.log(`${String(r.status).padEnd(5)} ${name} — ${note}`);
             } catch (e) { console.log(`ERR   ${name} — ${e.message}`); }
