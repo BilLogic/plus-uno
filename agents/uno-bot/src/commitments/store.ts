@@ -19,6 +19,8 @@
 //
 // PURE: no `Env`, no Workers global.
 
+import type { ChannelKind } from "../sweep/finding";
+
 /**
  * Where a commitment is in its life.
  *   • `open` — detected, not yet due or not yet nudged;
@@ -51,6 +53,10 @@ export interface CommitmentRecord {
   id: string;
   kind: CommitmentKind;
   channel: string;
+  /** The kind of place the promise was made in. The detector's examples for
+   *  one channel come only from public channels and that channel itself, so a
+   *  DM's or another private place's promise never reaches it. */
+  channelKind: ChannelKind;
   /** The thread its nudge replies in: the thread root, or the message itself
    *  when it started no thread. */
   threadTs: string;
@@ -115,6 +121,10 @@ export interface CommitmentRecords {
    *  its follow-up. */
   byReminderTs(ts: string): Promise<CommitmentRecord | null>;
   update(id: string, patch: CommitmentPatch): Promise<void>;
+  /** The newest `done` rows and the newest `not_promise` rows, at most `limit`
+   *  of each, newest answer first — those made in a public channel or in
+   *  `channel` itself, never another private place's or a DM's. */
+  latestAnswers(channel: string, limit: number): Promise<CommitmentRecord[]>;
 }
 
 /** What one commitment's wording is, kept beside its row. */
