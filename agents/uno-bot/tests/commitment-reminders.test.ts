@@ -30,7 +30,7 @@ import {
   type InMemoryCommitmentStore,
   type ReminderMessage,
 } from "../src/commitments/index";
-import { at, BOT, DESIGN, msg, sweepHarness, ts, UNO_BOT } from "./helpers/sweep-harness";
+import { at, BOT, DESIGN, msg, sweepHarness, ts, UNO_BOT, utcDay } from "./helpers/sweep-harness";
 
 const NUDGE: ScheduledJob = { key: "commitment-nudge", kind: "commitment-nudge" };
 const EOD: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN };
@@ -85,6 +85,9 @@ async function sweptPromise(
     store,
     config: { unoBot: UNO_BOT },
     now: () => h.clock.now,
+    get runDate() {
+      return h.deps.runDate;
+    },
   });
   const job = channel === DESIGN ? EOD : { ...EOD, key: `sweep:${channel}`, channel };
   const report = await runSweepJob(job, h.deps);
@@ -141,6 +144,9 @@ function mornings(opts: {
     config: { unoBot: UNO_BOT, botUserId: BOT },
     meter: { headroom: () => opts.headroom ?? { subrequests: Infinity, d1Queries: Infinity } },
     now: () => clock.now,
+    get runDate() {
+      return utcDay(clock.now);
+    },
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
   const run = () => runCommitmentNudges(NUDGE, deps);

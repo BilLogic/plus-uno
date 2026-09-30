@@ -80,7 +80,7 @@ import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { OperationOutcome } from "../gate/index";
 import type { PendingProposal } from "../thread-state/index";
 import { modelDriftDetector } from "./detector";
@@ -120,14 +120,15 @@ const RECORDS_PER_JOB = 25;
  *
  * @param env - Worker bindings
  * @param job - A `sweep-channel` or `sweep-post` job
- * @param opts - `dryRun` reads and detects, and writes, posts and stages nothing
+ * @param opts - `dryRun` reads and detects, and writes, posts and stages
+ *   nothing; `runDate` dates its records
  * @param extra - The per-thread hook other jobs read the sweep's threads with,
  *   and where file drift goes (`figma-drift/`)
  */
 export async function runSweepJobOnEnv(
   env: Env,
   job: ScheduledJob,
-  opts: { dryRun: boolean },
+  opts: JobContext,
   extra: Pick<SweepDeps, "onThread" | "onNote" | "fileDrift"> = {},
 ): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
@@ -195,7 +196,7 @@ async function sweepDepsFor(
   env: Env,
   db: D1Database,
   kv: KVNamespace,
-  opts: { dryRun: boolean },
+  opts: JobContext,
 ): Promise<SweepDeps> {
   const provider = selectProvider(env);
   const detector = modelDriftDetector(provider);
@@ -334,6 +335,7 @@ async function sweepDepsFor(
     meter: { subrequests: subrequestsUsed, d1Queries: d1QueriesUsed, headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   };
 }
 

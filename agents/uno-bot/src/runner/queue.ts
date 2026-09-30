@@ -64,8 +64,9 @@ export interface RunnerDeps {
   now(): number;
   /** A person's turn, a reaction or a cut-off run. */
   runThreadJob(job: RunnerJobPayload): Promise<JobOutcome>;
-  /** One scheduled job. Resolving is done; a budget stop is caught here. */
-  runScheduledJob(job: ScheduledJob): Promise<void>;
+  /** One scheduled job, with the date of the run it was queued under.
+   *  Resolving is done; a budget stop is caught here. */
+  runScheduledJob(job: ScheduledJob, runDate: string): Promise<void>;
 }
 
 /**
@@ -215,7 +216,7 @@ async function drainScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Prom
   }
   const [key, queued] = entries[index]!;
   const label = `${queued.run} ${queued.date} ${queued.job.key}`;
-  const outcome = await runWithinCeiling(() => deps.runScheduledJob(queued.job));
+  const outcome = await runWithinCeiling(() => deps.runScheduledJob(queued.job, queued.date));
 
   if (outcome === "deferred" && queued.deferrals + 1 < MAX_JOB_DEFERRALS) {
     // Kept under the same key, so it is still first in line: it runs again

@@ -49,6 +49,7 @@ import type { PendingProposal } from "../thread-state/index";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
 import type { FigmaComponentsResponse } from "../figma-poll";
+import type { JobContext } from "../scheduled/runs";
 import {
   findDisagreements,
   indexedInLibrary,
@@ -96,6 +97,10 @@ const MIN_REVISION_TTL_MS = 60 * 60 * 1000;
 /** What the check keeps for the morning. */
 export interface PrecedenceReport {
   checkedAt: string;
+  /** The check run's date, `YYYY-MM-DD` — the week the list is labelled with.
+   *  Absent from a report kept before it was recorded; `checkedAt`'s date
+   *  stands in. */
+  weekOf?: string;
   items: Disagreement[];
 }
 
@@ -120,7 +125,7 @@ interface Store<T> {
   write(value: T): Promise<void>;
 }
 
-export interface CheckDeps {
+export interface CheckDeps extends Pick<JobContext, "runDate"> {
   github: {
     /** design-system/agent-views/components/index.md */
     indexMarkdown(): Promise<string>;
@@ -176,7 +181,7 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
     inFlight: await deps.inFlight(registry),
   });
   if (!opts.dryRun) {
-    await deps.report.write(items.length ? { checkedAt: new Date(deps.now()).toISOString(), items } : null);
+    await deps.report.write(items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, items } : null);
   }
   return {
     found: items.length,
@@ -254,7 +259,7 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
     return { posted: false, summary: `kept: ${missing.join(", ")} unread` };
   }
 
-  const weekOf = report.checkedAt.slice(0, 10);
+  const weekOf = report.weekOf ?? report.checkedAt.slice(0, 10);
   const items: NumberedItem[] = report.items.map((item, i) => ({ ...item, n: i + 1 }));
   const target: IntakeTarget = open ? { kind: "update", issue: open.number, url: open.url } : { kind: "create" };
   const operations = precedenceOperations(items, target, weekOf);

@@ -28,7 +28,7 @@ import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { CommitmentRecord } from "../commitments/store";
 import type { ReminderReaction } from "../commitments/run";
 import { commitmentStoreFor as storeFor } from "../commitments/store-env";
@@ -129,9 +129,9 @@ function peopleFor(env: Env): CardPeople {
  *
  * @param env - Worker bindings
  * @param job - The job
- * @param opts - `dryRun` reads and keeps nothing
+ * @param opts - `dryRun` reads and keeps nothing; `runDate` dates what it keeps
  */
-export async function runCardFollowThroughOnEnv(env: Env, job: ScheduledJob, opts: { dryRun: boolean }): Promise<ScanReport | { summary: string }> {
+export async function runCardFollowThroughOnEnv(env: Env, job: ScheduledJob, opts: JobContext): Promise<ScanReport | { summary: string }> {
   const store = storeFor(env);
   if (!store) return { summary: "USAGE_DB or HARNESS_KV not bound — no card follow-ups" };
   if (!env.NOTION_ROADMAP_DB_ID) return { summary: "NOTION_ROADMAP_DB_ID not set — no card follow-ups" };
@@ -145,6 +145,7 @@ export async function runCardFollowThroughOnEnv(env: Env, job: ScheduledJob, opt
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   });
 }
 
@@ -152,7 +153,7 @@ export async function runCardFollowThroughOnEnv(env: Env, job: ScheduledJob, opt
  * The sweep's per-thread hook for card to-dos, or undefined without the
  * bindings.
  */
-export function cardTodoThreadHookFor(env: Env, opts: { dryRun: boolean }): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
+export function cardTodoThreadHookFor(env: Env, opts: JobContext): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
   const store = storeFor(env);
   if (!store) return undefined;
   const detector = modelCardTodoDetector(selectProvider(env));
@@ -162,6 +163,7 @@ export function cardTodoThreadHookFor(env: Env, opts: { dryRun: boolean }): ((th
     config: configFor(env),
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   });
 }
 
@@ -203,9 +205,9 @@ export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?
  * bindings. The notes job calls it only for a team note past its guard.
  *
  * @param env - Worker bindings
- * @param opts - `dryRun` detects and keeps nothing
+ * @param opts - `dryRun` detects and keeps nothing; `runDate` dates what it keeps
  */
-export function cardTodoNoteHookFor(env: Env, opts: { dryRun: boolean }): ((note: ReadNote) => Promise<void>) | undefined {
+export function cardTodoNoteHookFor(env: Env, opts: JobContext): ((note: ReadNote) => Promise<void>) | undefined {
   const store = storeFor(env);
   if (!store) return undefined;
   const detector = modelCardTodoDetector(selectProvider(env));
@@ -216,6 +218,7 @@ export function cardTodoNoteHookFor(env: Env, opts: { dryRun: boolean }): ((note
     config: configFor(env),
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   });
 }
 

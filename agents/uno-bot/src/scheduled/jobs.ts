@@ -2,9 +2,12 @@
 //
 // A job body is paired with its kind as a `Record<ScheduledJobKind, JobBody>`,
 // the way Diagnostics pairs a route with its probe: a kind with no body fails
-// the typecheck rather than failing at 22:00. Every body takes `dryRun`:
-// `/debug/sweep?dry_run=1` runs the bodies in the probe's own invocation, and
-// under a dry run a body reads and spends as it would but writes nothing. What
+// the typecheck rather than failing at 22:00. Every body takes a `JobContext`:
+// `dryRun`, because `/debug/sweep?dry_run=1` runs the bodies in the probe's own
+// invocation, and under a dry run a body reads and spends as it would but
+// writes nothing; and `runDate`, the date of the run the job was queued under,
+// which a body dates its records, skips and labels with instead of the clock's
+// UTC date (`JobContext` says why). What
 // a body returns is its report, which the rehearsal shows beside the job's
 // reading — the sweep's findings and card text among them.
 import type { Env } from "../types";
@@ -26,6 +29,7 @@ import { runAskResolution } from "../usage/resolution-env";
 import {
   FIRST_ASK_RESOLUTION_KEY,
   runnerNameForRun,
+  type JobContext,
   type ScheduledJob,
   type ScheduledJobKind,
   type ScheduledRun,
@@ -33,18 +37,18 @@ import {
 
 /** One job kind's work, answering with its report. Resolving is done; a
  *  budget stop is thrown through. */
-export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
+export type JobBody = (env: Env, job: ScheduledJob, ctx: JobContext) => Promise<unknown>;
 
 /** Every sweep kind: one body, since `runSweepJob` tells them apart. The
  *  end-of-day channel read hands each thread to card to-dos and commitment
  *  reminders too — that kind only: both cover channel threads, not group DMs
  *  or any other conversation a sweep kind may read. The notes job hands each
  *  team note to card to-dos. */
-const sweepBody: JobBody = async (env, job, { dryRun }) => {
+const sweepBody: JobBody = async (env, job, ctx) => {
   // Drift in a file uno-bot cannot write, queued for the morning's ask.
   const fileDrift = job.kind === "sweep-post" ? undefined : fileDriftSinkFor(env);
-  const report = await runSweepJobOnEnv(env, job, { dryRun }, {
-    ...sweepHooks(env, job, dryRun),
+  const report = await runSweepJobOnEnv(env, job, ctx, {
+    ...sweepHooks(env, job, ctx),
     ...(fileDrift ? { fileDrift } : {}),
   });
   console.log(`[sweep] ${job.key}: ${report.summary}`);
@@ -53,13 +57,13 @@ const sweepBody: JobBody = async (env, job, { dryRun }) => {
 
 /** The hooks a sweep job feeds: per thread for a channel read, per note for
  *  the notes job, none otherwise. */
-export function sweepHooks(env: Env, job: ScheduledJob, dryRun: boolean): Pick<SweepDeps, "onThread" | "onNote"> {
+export function sweepHooks(env: Env, job: ScheduledJob, ctx: JobContext): Pick<SweepDeps, "onThread" | "onNote"> {
   if (job.kind === "sweep-channel") {
-    const onThread = threadHooks(env, dryRun);
+    const onThread = threadHooks(env, ctx);
     return onThread ? { onThread } : {};
   }
   if (job.kind === "sweep-notes") {
-    const onNote = cardTodoNoteHookFor(env, { dryRun });
+    const onNote = cardTodoNoteHookFor(env, ctx);
     return onNote ? { onNote } : {};
   }
   return {};
@@ -68,8 +72,8 @@ export function sweepHooks(env: Env, job: ScheduledJob, dryRun: boolean): Pick<S
 /** The per-thread hooks the end-of-day channel read feeds, one after the
  *  other; each swallows its own failures and throws only a budget stop. Card
  *  to-dos first, so a message kept as one is passed over as a promise. */
-export function threadHooks(env: Env, dryRun: boolean): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
-  const hooks = [cardTodoThreadHookFor(env, { dryRun }), commitmentThreadHookFor(env, { dryRun })].filter(
+export function threadHooks(env: Env, ctx: JobContext): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
+  const hooks = [cardTodoThreadHookFor(env, ctx), commitmentThreadHookFor(env, ctx)].filter(
     (h): h is (thread: SweepThread, since: string) => Promise<void> => !!h,
   );
   if (!hooks.length) return undefined;
@@ -139,13 +143,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   },
   // Friday's end of day: compare code with the library and keep the
   // disagreements for the morning (src/ds-precedence/).
-  "ds-precedence-check": async (env, _job, { dryRun }) => {
-    console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, { dryRun })).summary}`);
+  "ds-precedence-check": async (env, _job, ctx) => {
+    console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, ctx)).summary}`);
   },
   // Morning: each due commitment is checked for completion, then nudged in its
   // thread (src/commitments/).
-  "commitment-nudge": async (env, job, { dryRun }) => {
-    const report = await runCommitmentNudgesOnEnv(env, job, { dryRun });
+  "commitment-nudge": async (env, job, ctx) => {
+    const report = await runCommitmentNudgesOnEnv(env, job, ctx);
     console.log(`[commitments] ${job.key}: ${report.summary}`);
     return report;
   },
@@ -166,8 +170,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   },
   // End of day: each active Roadmap card nobody owns, or that has stopped
   // moving, becomes a follow-up the morning asks about (src/follow-through/).
-  "card-follow-through": async (env, job, { dryRun }) => {
-    const report = await runCardFollowThroughOnEnv(env, job, { dryRun });
+  "card-follow-through": async (env, job, ctx) => {
+    const report = await runCardFollowThroughOnEnv(env, job, ctx);
     console.log(`[follow-through] ${job.key}: ${report.summary}`);
     return report;
   },
@@ -182,10 +186,10 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
  *
  * @param env - The Worker environment
  * @param job - The job
- * @param opts - `dryRun` for the sweep probe
+ * @param ctx - `dryRun` for the sweep probe, and the run's date
  */
-export async function runScheduledJob(env: Env, job: ScheduledJob, opts: { dryRun: boolean }): Promise<void> {
-  await JOB_BODIES[job.kind](env, job, opts);
+export async function runScheduledJob(env: Env, job: ScheduledJob, ctx: JobContext): Promise<void> {
+  await JOB_BODIES[job.kind](env, job, ctx);
 }
 
 /**
@@ -193,9 +197,10 @@ export async function runScheduledJob(env: Env, job: ScheduledJob, opts: { dryRu
  *
  * @param env - The Worker environment
  * @param job - The job
+ * @param runDate - The rehearsed run's date
  */
-export function rehearseScheduledJob(env: Env, job: ScheduledJob): Promise<unknown> {
-  return JOB_BODIES[job.kind](env, job, { dryRun: true });
+export function rehearseScheduledJob(env: Env, job: ScheduledJob, runDate: string): Promise<unknown> {
+  return JOB_BODIES[job.kind](env, job, { dryRun: true, runDate });
 }
 
 /**
