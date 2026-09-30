@@ -282,6 +282,28 @@
     }
   },
   {
+    "name": "reminder_set",
+    "description": "Direct, ungated. When the person asks you to remind THEM of something ('remind me Thursday to review the PRD', 'remind me in 2 days about this thread'), set it here. Pass `when` as they said it and `what` as a short verb phrase in your own words, no quote ('review the PRD', 'come back to this thread'). It is delivered at the first weekday 10 am ET run on or after that day, in this DM or thread, mentioning only them; they answer 🙌 done or ⏳ snooze. On ok, reply with exactly `confirm` (\"Got it, Thu 10 am ET.\") and nothing else. On `ask`, nothing was set: ask that one question, then call again with their answer. Only for the asker: never set one for someone else. No proposal card.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "when",
+        "what"
+      ],
+      "properties": {
+        "when": {
+          "type": "string",
+          "description": "The time as the person said it: 'Thu', 'tomorrow', 'in 2 days', 'next week', 'Oct 3'."
+        },
+        "what": {
+          "type": "string",
+          "description": "What to remind them about, as a short verb phrase in your own words, with no quote, mention or link."
+        }
+      }
+    }
+  },
+  {
     "name": "slack_search",
     "description": "Read-only, ungated. Search Slack messages to find prior discussion. Results arrive PRE-CLEARED by a Worker-side visibility firewall and are safe to quote as returned. Three modes, reported in result.visibility: 'public-only' (no user credential stored — public channels are the entire search), 'workspace-filtered' (public + team-allowlisted private channels; DMs excluded), and 'requester-own' (active only when the requester has connected their Slack history AND is asking in their own DM with you — results then include their DMs, group DMs and private channels, exactly what they can already see). Requester-own results answer that requester in that DM and stay there. `searched_surfaces` says what was actually looked at. An empty result means nothing matched THERE — scope the absence in the same sentence as the finding ('nothing in the public channels I can see'), and when the result carries `absence_scope`, follow it exactly. `withheld_private_matches` appears ONLY in the requester's own DM, where saying 'there were matches I can't surface' is safe; elsewhere it is absent BY DESIGN, because the count alone tells a room that private material exists — so a missing field is reported as nothing. A `note` with a connect link is offered when the requester wanted wider coverage.",
     "input_schema": {

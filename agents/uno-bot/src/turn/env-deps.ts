@@ -102,6 +102,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     threadTs: wiring.toolThreadTs,
     userMsgTs: request.userMsgTs,
     requestedBy: request.userId,
+    ...(request.conversationType ? { conversationType: request.conversationType } : {}),
     // Bot-token search needs the triggering event's action_token; it exists
     // only for this turn, so it rides the context rather than any store.
     ...(request.actionToken ? { actionToken: request.actionToken } : {}),

@@ -44,8 +44,10 @@ export type CommitmentState =
 /** The states the morning still acts on. */
 export const LIVE_STATES: readonly CommitmentState[] = ["open", "nudged", "snoozed"];
 
-/** What made the row: a promise read in a swept thread. */
-export type CommitmentKind = "thread_promise";
+/** What made the row: a promise read in a swept thread, or a "remind me" a
+ *  person asked uno-bot for in the turn (`./remind.ts`) — a commitment made to
+ *  themselves, so its promiser and requester are the same person. */
+export type CommitmentKind = "thread_promise" | "self_reminder";
 
 /** One promise, as `commitments` holds it. */
 export interface CommitmentRecord {
@@ -115,15 +117,17 @@ export interface CommitmentRecords {
   nextDue(now: number, runDate: string, skip?: readonly string[]): Promise<CommitmentRecord | null>;
   /** How many commitments each promiser was reminded of on `runDate`. */
   remindedOn(runDate: string): Promise<Record<string, number>>;
-  /** A live commitment of this promiser's in this thread, or null. */
+  /** A live thread promise of this promiser's in this thread, or null — a
+   *  "remind me" there is never the same task said again. */
   liveInThread(channel: string, threadTs: string, promiserId: string): Promise<CommitmentRecord | null>;
   /** The commitment a reminder with this ts belongs to — its first reminder or
    *  its follow-up. */
   byReminderTs(ts: string): Promise<CommitmentRecord | null>;
   update(id: string, patch: CommitmentPatch): Promise<void>;
   /** The newest `done` rows and the newest `not_promise` rows, at most `limit`
-   *  of each, newest answer first — those made in a public channel or in
-   *  `channel` itself, never another private place's or a DM's. */
+   *  of each, newest answer first — thread promises made in a public channel
+   *  or in `channel` itself, never another private place's, a DM's, or a
+   *  "remind me". */
   latestAnswers(channel: string, limit: number): Promise<CommitmentRecord[]>;
 }
 

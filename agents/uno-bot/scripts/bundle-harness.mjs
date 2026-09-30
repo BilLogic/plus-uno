@@ -156,8 +156,9 @@ const BUDGETS = {
   // RAISED 175k -> 175.5k. The automations registry in
   // `docs/engineering/operations.md` gained the Figma snapshot refresh row, and
   // the table ships because an automation absent from it is undocumented by
-  // definition. Main stood 68 chars under the old ceiling, so no row fit. What
-  // the 500 bought: that one ~350-char row, and a little room for the next.
+  // definition. Main stood 51 chars under the old ceiling on 2026-09-30, so no
+  // row fit. What the 500 bought: that one ~350-char row, and a little room for
+  // the next.
   assembled: 175_500,
   persona: 28_000,
   botFace: 7_000,
