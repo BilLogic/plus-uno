@@ -64,6 +64,11 @@ export interface SweepBlock {
   /** False when its rich text carries a link, mention, equation or
    *  formatting a text replace would drop; absent reads as plain. */
   plain?: boolean;
+  /** The URLs its rich text links or mentions — how a note or a card names
+   *  the page it is about. */
+  links?: string[];
+  /** True when uno-bot's own integration made its last edit: never evidence. */
+  byBot?: boolean;
 }
 
 /** A linked source, read. */
@@ -81,6 +86,19 @@ export interface SweepSource {
   pillars: string[];
   /** The Roadmap card's `Contributor` names, when the source is a card. */
   contributors: string[];
+  /** `search` when nobody linked it and a search found it (`./search.ts`);
+   *  absent for a linked source. */
+  foundBy?: "search";
+  /** Notion only: the database the page is a row of, dashes removed, or null
+   *  for a page that is none's — what `./surfaces.ts` reads. */
+  parentDatabaseId?: string | null;
+  /** Notion only: Notion's `parent.type` — `workspace` for a top-level page. */
+  parentType?: string | null;
+  /** Notion only: select, multi-select and status values by property name. */
+  properties?: Record<string, string>;
+  /** Notion only: the page runs past the blocks read, so its last block read
+   *  is not its end. */
+  truncated?: boolean;
 }
 
 /** The target a finding is about. */
@@ -90,6 +108,34 @@ export interface FindingTarget {
   writable: boolean;
   title: string;
   pillars: string[];
+  /** `search` when a search found the page, so the card says so. */
+  foundBy?: "search";
+}
+
+/**
+ * Evidence that is not a Slack message: a running note's blocks, or a Roadmap
+ * card's comments and body edits (`./records.ts`). Its finding has no thread,
+ * so it goes to a team channel by its target (`pickDestination` rungs 3–4).
+ */
+export interface RecordEvidence {
+  kind: "note" | "card";
+  /** The note's or the card's page. */
+  url: string;
+  title: string;
+  /** The note blocks, or the card's comments and blocks, that record it. */
+  entryIds: string[];
+}
+
+/**
+ * What an undocumented answer adds (C3): the text goes in after the block the
+ * finding names — the last block of `section`, or the page's last block when
+ * it opens `newSection`. Absent on a drift finding, which replaces its block.
+ */
+export interface FindingAddition {
+  /** The heading it goes under, as the page shows it; null for a new section. */
+  section: string | null;
+  /** The heading of the section it opens on the page; null under `section`. */
+  newSection: string | null;
 }
 
 /** Where the evidence was read. */
@@ -102,6 +148,9 @@ export interface FindingEvidence {
   messageTs: string[];
   /** Their permalinks, fetched rather than built, when a fetch succeeded. */
   permalinks: string[];
+  /** Set when the evidence is a note or a card rather than a message:
+   *  `channel` is then the source's queue name and `threadTs` null. */
+  record?: RecordEvidence;
 }
 
 /** One drift, typed. */
@@ -125,6 +174,8 @@ export interface DriftFinding {
   confidence: number;
   /** Everyone who posted in the thread — confirmers beside the owner. */
   participants: string[];
+  /** Set when the fix adds an answer rather than replacing a block. */
+  add?: FindingAddition;
 }
 
 // ── Owner routing ────────────────────────────────────────────────────────────
