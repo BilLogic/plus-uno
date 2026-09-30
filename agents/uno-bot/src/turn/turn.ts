@@ -107,6 +107,7 @@ import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./anteceden
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick, sweepTag } from "../sweep/cards";
+import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -1675,17 +1676,22 @@ export async function restageExecution(
 ): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
   const original = restage.proposal;
   const first = restage.operations[0]!;
-  const built = await buildCard(
-    { kind: "proposal", operations: restage.operations, toolName: first.toolName, input: first.input },
-    deps,
-    implementPrdUrlFor(first.toolName, first.input, {
-      ...(original.notionPrdId ? { id: original.notionPrdId } : {}),
-      ...(original.notionPrdUrl ? { url: original.notionPrdUrl } : {}),
-    }),
-    // The card's DM caveats follow the surface, and a DM channel is the one
-    // the proposal record can still name.
-    original.channel.startsWith("D"),
-  );
+  // A group DM's share card is rebuilt as one, so a re-staged card still
+  // quotes the exact note its ✅ posts (`sweep/share.ts`).
+  const built =
+    original.supersedeKey === SWEEP_SHARE_KEY
+      ? sweepShareCard(restage.operations)
+      : await buildCard(
+          { kind: "proposal", operations: restage.operations, toolName: first.toolName, input: first.input },
+          deps,
+          implementPrdUrlFor(first.toolName, first.input, {
+            ...(original.notionPrdId ? { id: original.notionPrdId } : {}),
+            ...(original.notionPrdUrl ? { url: original.notionPrdUrl } : {}),
+          }),
+          // The card's DM caveats follow the surface, and a DM channel is the one
+          // the proposal record can still name.
+          original.channel.startsWith("D"),
+        );
   // The warning rides the card, not only the note before it: a note that
   // failed to post must not leave a card that reads like any other.
   const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };

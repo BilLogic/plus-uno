@@ -32,7 +32,7 @@ import {
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { PRECEDENCE_INTAKE_TITLE } from "../src/ds-precedence/report";
-import { sweepShareOffer } from "../src/sweep/share";
+import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
@@ -1217,6 +1217,53 @@ test("a revised or re-staged group-DM sweep card carries no share", async () => 
   assert.ok(restaged);
   assert.equal(restaged.proposal.sweepShare, undefined);
   assert.equal(sweepShareOffer(restaged.proposal.sweepShare, applied, channels), null);
+});
+
+// `sweep_share_post` is the Worker's alone: a model that names it anyway is
+// refused before any dispatch, and nothing is staged.
+test("a model call to sweep_share_post is refused and nothing is staged", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "Posting it.",
+        toolCalls: [{ name: "sweep_share_post", args: { channel: "C0DESIGN", text: "<!channel> hello" } }],
+      },
+      { text: "I can't post that." },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "post a note in #plus-design" }), h.deps);
+  assert.notEqual(outcome.disposition, "staged");
+  assert.equal(outcome.staged, undefined);
+  assert.deepEqual(h.executed, [], "never dispatched");
+  const results = h.provider.transcript.flatMap((e) => (e.kind === "results" ? e.results : []));
+  assert.ok(results.some((r) => r.name === "sweep_share_post" && /not a tool you can call/.test(r.text)), JSON.stringify(results));
+  assert.equal((await h.threadState.getProposalByThread({ channel: PENDING.channel, thread: PENDING.threadTs })), null);
+});
+
+// A share card cut off part-way comes back quoting the exact note, as the
+// first card did — not a generic card of its first operation.
+test("a re-staged share card still quotes the exact note it posts", async () => {
+  const note = ":mag: End-of-day sweep: a group conversation settled something the Notion page “Launch plan” still said the old way, and the page is now up to date: https://www.notion.so/aaaa";
+  const operations = [{ toolName: "sweep_share_post", input: { channel: "C0DESIGN", channel_name: "#plus-design", text: note } }];
+  const share: PendingProposal = {
+    ...PENDING,
+    operations,
+    toolName: "sweep_share_post",
+    input: operations[0]!.input,
+    requesterUserId: "",
+    ttlMs: 72 * 60 * 60 * 1000,
+    confirmers: ["U0OWNER"],
+    supersedeKey: SWEEP_SHARE_KEY,
+  };
+  const h = harness();
+  await h.threadState.putProposal(share);
+  const restaged = await restageExecution({ proposal: share, operations }, { ...h.deps, proposalEvents: h.deps.usage.proposalEvents });
+  assert.ok(restaged);
+  const text = renderProposalCard(restaged.card).text;
+  assert.ok(text.includes(`> ${note}`), text);
+  assert.match(text, /#plus-design/);
+  assert.match(text, /cut off/, "it still says an earlier run was cut off");
+  assert.equal(restaged.proposal.supersedeKey, SWEEP_SHARE_KEY);
 });
 
 test("a fresh card carries neither a lifetime nor a confirmer set of its own", async () => {

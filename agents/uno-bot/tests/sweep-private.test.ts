@@ -278,6 +278,26 @@ test("the share card is resolved by the gate: a ✅ runs its post, a ⛔ runs no
   assert.equal(no.execute, undefined, "a ⛔ posts nothing");
 });
 
+test("markup in a page title is inert on the share card and in the note, and the note is byte-equal to the card", async () => {
+  const hostile = notionPage("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", {
+    title: "Tutor guide <!channel> <@U0123ABCD> <!subteam^S01|design> <https://evil.example|click me> & co",
+  });
+  const { h, fix } = await groupDmCard(hostile);
+  const { posts, deps } = shareDeps(h);
+  const share = (await stageSweepShare(fix, [applied(hostile.url)], deps))!;
+  const note = String(share.operations![0]!.input.text);
+  const card = posts[0]!.text;
+
+  for (const raw of ["<!channel>", "<@U0123ABCD>", "<!subteam^", "<https://evil.example"]) {
+    assert.ok(!note.includes(raw), `the note carries no live markup: ${raw}`);
+    assert.ok(!card.includes(raw), `the card carries no live markup: ${raw}`);
+  }
+  assert.match(note, /&lt;!channel&gt; &lt;@U0123ABCD&gt;/, "shown as text");
+  assert.match(note, / &amp; co/);
+  for (const line of note.split("\n")) assert.ok(card.includes(`> ${line}`), `the card quotes the note byte for byte: ${line}`);
+  assert.doesNotMatch(card, /no parameters/, "no empty parameter line");
+});
+
 test("the note names only the pages written, and a design-system page goes to #plus-universal", () => {
   const universal = notionPage("cccccccccccccccccccccccccccccccc", { pillars: ["Universal"] });
   const share = {

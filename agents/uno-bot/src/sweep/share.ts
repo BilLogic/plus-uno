@@ -13,7 +13,9 @@
 //
 // The note names each page the batch brought up to date and says a group
 // conversation settled it: no quote of the conversation or of the change, no
-// name or mention, no link back into the group DM.
+// name or mention, no link back into the group DM. A page's title and link
+// are entity-escaped, so a title carrying `<!channel>` or `<@U…>` shows as
+// text and pings no one, on the card and in the channel alike.
 //
 // Only the fix card the morning staged carries the pages (`sweepShare`). A
 // revision or a re-staged fix card carries none, so it never offers a share:
@@ -25,6 +27,7 @@
 
 import type { OperationOutcome } from "../gate/index";
 import { rethrowIfBudget } from "../net";
+import { escapeSlackText } from "../slack/mrkdwn";
 import type { PendingProposal, ProposalOperation, SweepShare, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
@@ -69,8 +72,8 @@ export function sweepShareNotes(share: SweepShare, outcomes: readonly OperationO
     if (!pages.length) continue;
     const text =
       pages.length === 1
-        ? `:mag: ${SWEEP_CARD_MARK}: a group conversation settled something the Notion page “${plain(pages[0]!.title)}” still said the old way, and the page is now up to date: ${pages[0]!.url}`
-        : `:mag: ${SWEEP_CARD_MARK}: a group conversation settled things these Notion pages still said the old way, and they are now up to date:\n${pages.map((p) => `• ${plain(p.title)}: ${p.url}`).join("\n")}`;
+        ? `:mag: ${SWEEP_CARD_MARK}: a group conversation settled something the Notion page “${plain(pages[0]!.title)}” still said the old way, and the page is now up to date: ${escapeSlackText(pages[0]!.url)}`
+        : `:mag: ${SWEEP_CARD_MARK}: a group conversation settled things these Notion pages still said the old way, and they are now up to date:\n${pages.map((p) => `• ${plain(p.title)}: ${escapeSlackText(p.url)}`).join("\n")}`;
     notes.push({ to, text });
   }
   return notes;
@@ -97,24 +100,35 @@ export function sweepShareOffer(
     toolName: SWEEP_SHARE_TOOL,
     input: { channel: n.channel, channel_name: SHARE_CHANNEL_NAMES[n.to], text: n.text },
   }));
-  const where = notes.map((n) => SHARE_CHANNEL_NAMES[n.to]).join(" and ");
+  return { card: sweepShareCard(operations), operations };
+}
+
+/**
+ * The share card for its operations: each note quoted exactly as its ✅ posts
+ * it, under the channel it goes to. Built from the operations alone, so a
+ * share card re-staged after a cut-off shows the same notes as the first.
+ *
+ * @param operations - The card's `sweep_share_post` operations
+ */
+export function sweepShareCard(operations: readonly ProposalOperation[]): ProposalCard {
+  const notes = operations.map((op) => ({
+    where: typeof op.input.channel_name === "string" ? op.input.channel_name : "a team channel",
+    text: typeof op.input.text === "string" ? op.input.text : "",
+  }));
+  const where = [...new Set(notes.map((n) => n.where))].join(" and ");
+  const one = notes.length === 1;
   const lines = [
     `:mag: **${SWEEP_CARD_MARK}** — share what this conversation settled?`,
     "",
-    `Nothing from here has left this group DM. ✅ posts exactly ${notes.length === 1 ? "this note" : "these notes"} in ${where}; ⛔ drops ${notes.length === 1 ? "it" : "them"}.`,
+    `Nothing from here has left this group DM. ✅ posts exactly ${one ? "this note" : "these notes"} in ${where}; ⛔ drops ${one ? "it" : "them"}.`,
   ];
-  for (const n of notes) {
-    lines.push("", `In ${SHARE_CHANNEL_NAMES[n.to]}:`, ...n.text.split("\n").map((l) => `> ${l}`));
-  }
+  for (const n of notes) lines.push("", `In ${n.where}:`, ...n.text.split("\n").map((l) => `> ${l}`));
   lines.push(
     "",
     "The people who could confirm the fix can confirm this. " +
       `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   );
-  return {
-    card: { kind: "confirm", verb: `post this note in ${where}`, lead: lines.join("\n"), fields: [], caveats: [], operations },
-    operations,
-  };
+  return { kind: "confirm", verb: `post this note in ${where}`, lead: lines.join("\n"), fields: [], caveats: [], operations: [...operations] };
 }
 
 /**
@@ -179,7 +193,8 @@ export async function stageSweepShare(
   }
 }
 
-/** A page title as it appears in a note: one line, trimmed. */
+/** A page title as it appears in a note: one line, trimmed, and escaped so
+ *  any markup in it is text. */
 function plain(title: string): string {
-  return title.replace(/\s+/g, " ").trim() || "untitled";
+  return escapeSlackText(title.replace(/\s+/g, " ").trim() || "untitled");
 }
