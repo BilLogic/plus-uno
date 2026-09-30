@@ -27,7 +27,9 @@ export interface MessageJobDeps {
   claim(runKey: string): Promise<RunClaim>;
   /** Mark a run key done. Best-effort. */
   markDone(runKey: string): Promise<void>;
-  /** Whether the event could be a weekly-thread dispute — no reads. */
+  /** Whether the event could be a weekly-thread dispute, or a "yes, it's up
+   *  to date" to a file-drift ask (`figma-drift/`) — no reads. Both take this
+   *  one path. */
   disputeCandidate(event: SlackMessageEvent): boolean;
   /** Handle it; true when it did, and the turn is then skipped. */
   dispute(event: SlackMessageEvent): Promise<boolean>;

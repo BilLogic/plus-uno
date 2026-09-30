@@ -121,13 +121,14 @@ const RECORDS_PER_JOB = 25;
  * @param env - Worker bindings
  * @param job - A `sweep-channel` or `sweep-post` job
  * @param opts - `dryRun` reads and detects, and writes, posts and stages nothing
- * @param extra - The per-thread hook other jobs read the sweep's threads with
+ * @param extra - The per-thread hook other jobs read the sweep's threads with,
+ *   and where file drift goes (`figma-drift/`)
  */
 export async function runSweepJobOnEnv(
   env: Env,
   job: ScheduledJob,
   opts: { dryRun: boolean },
-  extra: Pick<SweepDeps, "onThread" | "onNote"> = {},
+  extra: Pick<SweepDeps, "onThread" | "onNote" | "fileDrift"> = {},
 ): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
     // No cursor store means every run would re-read the day; nothing is safer.
@@ -525,7 +526,9 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
   const raw = await executeReadSource(env, { url }, canvas ? { sharedCanvasIds: [canvas] } : undefined);
   try {
     const r = JSON.parse(raw) as { ok?: boolean; title?: string; content?: string };
-    if (!r.ok) return null;
+    // A Figma file link with no node, or one Figma would not serve, is still
+    // a file the thread discussed: the detector sees its name, and may ask.
+    if (!r.ok) return kind === "figma" || kind === "figma-library" ? unreadFigmaFile(url, kind) : null;
     return {
       url,
       kind,
@@ -539,6 +542,18 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
   } catch {
     return null;
   }
+}
+
+/** A Figma file named by its link's slug, its content unread. */
+function unreadFigmaFile(url: string, kind: TargetKind): SweepSource {
+  let title = "Figma file";
+  try {
+    const slug = new URL(url).pathname.split("/")[3];
+    if (slug) title = decodeURIComponent(slug).replace(/[-_]+/g, " ").trim() || title;
+  } catch {
+    // keep the plain name
+  }
+  return { url, kind, writable: false, title, blocks: [], text: "(the file's content could not be read)", pillars: [], contributors: [] };
 }
 
 function splitList(value: string | undefined): string[] {

@@ -40,6 +40,7 @@ import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
 import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
+import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
 
@@ -83,9 +84,16 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   switch (event.type) {
     case "message": {
       const msg = event as SlackMessageEvent;
-      // A `dispute N` reply in the weekly DS precedence thread is queued like a
-      // turn, and handled at the head of the thread's job (`message-job.ts`).
-      if (isDsPrecedenceCandidate(env, msg) || (await mayBeCardReply(env, msg)) || (await shouldHandleMessage(env, msg))) {
+      // A `dispute N` reply in the weekly DS precedence thread, a "yes, it's
+      // up to date" in a thread asked about a file, and an answer under a card
+      // follow-up are queued like a turn and handled at the head of the
+      // thread's job (`message-job.ts`).
+      if (
+        isDsPrecedenceCandidate(env, msg) ||
+        (await isDriftAnswerFor(env, msg)) ||
+        (await mayBeCardReply(env, msg)) ||
+        (await shouldHandleMessage(env, msg))
+      ) {
         await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
@@ -440,11 +448,12 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
 }
 
 /** The replies handled ahead of the turn, in the order tried, each never
- *  throwing: a weekly DS precedence dispute, and an answer under a card
- *  follow-up. */
+ *  throwing: a weekly DS precedence dispute, an answer about a file's drift,
+ *  and an answer under a card follow-up. */
 export function replyHandlersFor(env: Env): ReplyHandler[] {
   return [
     { name: "ds-precedence", candidate: (e) => isDsPrecedenceCandidate(env, e), handle: (e) => handleDsPrecedenceReply(env, e) },
+    { name: "figma-drift", candidate: (e) => isDriftAnswerCandidateFor(env, e), handle: (e) => handleDriftAnswer(env, e) },
     { name: "follow-through", candidate: (e) => isCardReplyCandidate(env, e), handle: (e) => handleCardReplyOnEnv(env, e) },
   ];
 }

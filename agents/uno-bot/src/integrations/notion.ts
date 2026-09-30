@@ -1014,24 +1014,6 @@ export async function readPageRow(env: Env, pageId: string): Promise<EditedRow |
   }
 }
 
-/** One database property's options, exactly as the schema has them and in
- *  its order (select, multi-select or status). One subrequest. */
-export async function databaseOptions(env: Env, databaseId: string, property: string): Promise<string[]> {
-  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  type Options = { options?: { name?: string }[] };
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    const res = await countedFetch(`${NOTION_API}/databases/${databaseId.replace(/-/g, "")}`, { headers: notionHeaders(env), signal: controller.signal });
-    const data = (await res.json()) as { properties?: Record<string, { select?: Options; multi_select?: Options; status?: Options }>; message?: string; code?: string };
-    if (!res.ok) throw notionError(res.status, data, "database schema read failed");
-    const def = data.properties?.[property];
-    return ((def?.status ?? def?.multi_select ?? def?.select)?.options ?? []).map((o) => o.name ?? "").filter(Boolean);
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 /** The integration's own Notion bot user id — what `created_by` holds on a
  *  page uno-bot made — or null when Notion would not say. One subrequest. */
 export async function notionBotUserId(env: Env): Promise<string | null> {
@@ -1334,6 +1316,43 @@ export async function notionCreate(
     clearTimeout(timer);
   }
 }
+
+/**
+ * The options a database's select, status or multi-select property offers, in
+ * their stored spelling — what a write exact-matches against, since Notion
+ * silently creates any option it is handed (`docs/connectors/notion.md`).
+ * Null when the property is not one of those types or is not on the schema.
+ *
+ * @param env - Worker bindings
+ * @param databaseId - The database, dashes optional
+ * @param property - The property's exact name
+ * @throws When the schema read fails
+ */
+export async function databaseOptions(env: Env, databaseId: string, property: string): Promise<string[] | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await countedFetch(`${NOTION_API}/databases/${databaseId.replace(/-/g, "")}`, {
+      headers: notionHeaders(env),
+      signal: controller.signal,
+    });
+    const db = (await res.json()) as {
+      message?: string;
+      code?: string;
+      properties?: Record<string, { select?: OptionList; status?: OptionList; multi_select?: OptionList }>;
+    };
+    if (!res.ok) throw notionError(res.status, db, "database schema fetch failed");
+    const def = db.properties?.[property];
+    const list = def?.select ?? def?.status ?? def?.multi_select;
+    if (!list) return null;
+    return (list.options ?? []).map((o) => o.name ?? "").filter(Boolean);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+type OptionList = { options?: { name?: string }[] };
 
 // ─── Update an existing page: schema-aware property writes + narrative append ──
 // (notion_update). Property writes introspect the page's PARENT DATABASE schema,

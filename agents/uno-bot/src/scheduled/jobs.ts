@@ -20,6 +20,7 @@ import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitment
 import { cardTodoNoteHookFor, cardTodoThreadHookFor, runCardFollowThroughOnEnv } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
+import { fileDriftSinkFor, runDriftAsksOnEnv } from "../figma-drift/env";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
 import {
@@ -40,7 +41,12 @@ export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) =
  *  or any other conversation a sweep kind may read. The notes job hands each
  *  team note to card to-dos. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
-  const report = await runSweepJobOnEnv(env, job, { dryRun }, sweepHooks(env, job, dryRun));
+  // Drift in a file uno-bot cannot write, queued for the morning's ask.
+  const fileDrift = job.kind === "sweep-post" ? undefined : fileDriftSinkFor(env);
+  const report = await runSweepJobOnEnv(env, job, { dryRun }, {
+    ...sweepHooks(env, job, dryRun),
+    ...(fileDrift ? { fileDrift } : {}),
+  });
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
@@ -141,6 +147,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "commitment-nudge": async (env, job, { dryRun }) => {
     const report = await runCommitmentNudgesOnEnv(env, job, { dryRun });
     console.log(`[commitments] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: each file drift the sweep kept is asked about in its thread, with
+  // one drafted intake per file (src/figma-drift/).
+  "figma-drift-post": async (env, job, { dryRun }) => {
+    const report = await runDriftAsksOnEnv(env, job, { dryRun });
+    console.log(`[figma-drift] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning: the kickoff role map, rebuilt from the Notion Team Members

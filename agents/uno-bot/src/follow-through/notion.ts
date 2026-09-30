@@ -98,7 +98,8 @@ export async function roadmapTitlesMatching(env: Env, words: string[]): Promise<
   return rows.map((r) => r.title);
 }
 
-/** One Roadmap property's options, exactly as the schema has them and in its order. */
-export function roadmapOptions(env: Env, property: "Product Pillar" | "Design Status"): Promise<string[]> {
-  return databaseOptions(env, roadmapId(env), property);
+/** One Roadmap property's options, exactly as the schema has them and in its
+ *  order; none when the property is gone from the schema. */
+export async function roadmapOptions(env: Env, property: "Product Pillar" | "Design Status"): Promise<string[]> {
+  return (await databaseOptions(env, roadmapId(env), property)) ?? [];
 }

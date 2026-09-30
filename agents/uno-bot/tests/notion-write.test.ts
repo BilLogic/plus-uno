@@ -557,7 +557,7 @@ test("the Roadmap reads: rows by status, one row again, a property's options, th
   assert.equal(rows[0]!.createdById, "u-bea");
   assert.equal(await readPageRow(ENV, PAGE), null, "a page gone or unshared reads as none");
   assert.deepEqual(await databaseOptions(ENV, DB, "Design Status"), ["Ready for Design", "WIP", "Shipped"]);
-  assert.deepEqual(await databaseOptions(ENV, DB, "Nope"), []);
+  assert.equal(await databaseOptions(ENV, DB, "Nope"), null);
   assert.equal(await notionBotUserId(ENV), "u-unobot");
 });
 
