@@ -191,19 +191,42 @@ would run off the edge, remeasuring on scroll and resize.
   from `buttonText` plus the word "options", which is why the toggle half of a
   split button renders no visible text.
 - **The menu is not an ARIA menu.** The container is a plain div and each item is
-  a `button`; there is no `role="menu"` or `role="menuitem"`, no arrow-key
-  navigation, and no Escape-to-close. Items are reached by tabbing, which works
-  but does not match the menu pattern a screen-reader user expects.
-- **Closing is mouse-driven.** The outside-click listener is bound to
-  `mousedown` only. A keyboard user leaves the menu by tabbing past it, not by
-  dismissing it.
-- **A custom `toggle` loses keyboard access.** The node you pass is wrapped in a
-  `div` with an `onClick` and no role, tabindex or key handler — so it is
-  clickable and nothing else. Pass a `Button` as the trigger only if you are
-  willing to lose that; otherwise use the built-in toggle.
+  a `button` (or a link, for an item with `href`); there is no `role="menu"` or `role="menuitem"` and no arrow-key
+  navigation. Items are reached by tabbing, which works but does not match the
+  menu pattern a screen-reader user expects.
+- **Escape closes it.** Pressing Escape anywhere in an open dropdown closes the
+  menu and puts focus back on the toggle: the caret button, on whichever side
+  of a split button it sits, or the control inside a custom `toggle`. A custom
+  toggle with nothing focusable in it returns focus to whatever had it when the
+  menu opened, if that is still on the page, and otherwise leaves focus alone.
+  Focus moves only once the menu has closed: a caller that controls `isOpen`
+  and keeps it open leaves focus where it was, and the refused Escape is then
+  forgotten (on the next key, a focus move, or a render with the menu still
+  open), so a later close by the caller does not pull focus to the toggle.
+  A click outside, bound to `mousedown`, also closes it.
+- **Escape stops at the dropdown.** Escape inside an open dropdown does not
+  propagate, so an enclosing Modal or panel stays open: the first Escape
+  closes the menu, the next one reaches the Modal.
+- **A custom `toggle` brings its own keyboard access.** The node you pass is
+  wrapped in a `div` with an `onClick` and no role or tabindex, so a control
+  inside it (a `Button`, a Tag) is what a keyboard user presses, and Enter or
+  Space on it opens the menu. Escape then returns focus to that control. A
+  plain `span` is clickable and nothing else, so pass a control, or use the
+  built-in toggle.
+- **Links and toggles say what they are.** An item with `href` is a real
+  link (`linkComponent` for a router's), so it is announced as a link and can
+  open in a new tab. An item with `isToggle` is a button that reports
+  `selected` as `aria-pressed`; `keepOpen` leaves the menu open after it.
+  Give it `multiSelectCheckbox` and `multiSelectChecked` to lead with the
+  multi-select checkbox, which is decorative, since `aria-pressed` already
+  says whether it is on.
+- **A static row is not a control.** An item with `isStatic` is a plain row
+  with no button role: it is not focusable, and pressing it leaves the menu
+  open. An item with `isBusy` (with `disabled`) is still working and reports
+  `aria-busy`.
 - **Icons are decorative — mostly.** The selected check mark, the multi-select
-  checkbox and `leadingIcon` are all `aria-hidden`. `trailingIcon` and the
-  submenu caret are not, so an icon font glyph there can leak into the item's
+  checkbox, `leadingIcon` and `trailingIcon` are all `aria-hidden`. The
+  submenu caret is not, so an icon font glyph there can leak into the item's
   announced name. Keep the item's meaning in `text` either way.
 
 ### Give the split treatment a real button when the label must act.

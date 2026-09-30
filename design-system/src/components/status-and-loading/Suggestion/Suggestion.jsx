@@ -17,8 +17,8 @@ import './Suggestion.scss';
  * The component does not change itself when accepted; the field that owns the
  * value decides what appears next.
  *
- * NO `disabled` PROP, as Tag has none. Disabled comes from the field through
- * `TagContext`, the value a Tag reads, so a suggestion can never disagree
+ * NO `disabled` PROP, as Tag has none. Disabled comes from a disabled field
+ * or TagGroup through `TagContext`, the value a Tag reads, so a suggestion can never disagree
  * with the tags beside it. Disabled, it is a native disabled button:
  * out of the tab order, announced as disabled, and never accepted.
  */
@@ -80,6 +80,13 @@ export const Suggestion = ({
         </button>
     );
 };
+
+/*
+ * The marker TagGroup looks for, rather than comparing component identity,
+ * so a memoized Suggestion, or a wrapper that copies this marker, is still
+ * kept out of `+n` and at the end of the row.
+ */
+Suggestion.isSuggestion = true;
 
 Suggestion.propTypes = {
     /** The proposed value's words. The accessible name is built from it. */

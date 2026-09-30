@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.stories.jsx` — Content, StyleVariants, Sizes, Layout, Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.stories.jsx` — Content, StyleVariants, Sizes, Layout, Overview, EscapeCloses, EscapeClosesSplit, EscapeClosesCustomToggle, LinkAndToggleItems, EscapeIgnoredWhenControlledStaysOpen, EscapeRefusedThenParentCloses, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx`
 
@@ -18,7 +18,7 @@
 | `id` | string | — | — |
 | `buttonText` | string or node | `"Dropdown"` | Text displayed on the dropdown toggle button |
 | `ariaLabel` | string | — | The toggle's accessible name. Needed whenever `buttonText` is an icon. |
-| `items` | arrayOf or shape or string or bool or number or func | `[]` | — |
+| `items` | arrayOf or shape or string or bool or number or func or elementType | `[]` | The menu's items, in order: a button each by default, or a link (`href`), an on/off toggle (`isToggle`), a static row (`isStatic`) or a header. |
 | `size` | enum | `"default"` | Button size |
 | `style` | enum | `"default"` | Trigger color style |
 | `fill` | enum | `"outline"` | Trigger surface treatment (outline default per spec; ghost for minimal emphasis) |

@@ -26,6 +26,11 @@ export default {
     title: 'Components/Status and loading/Tag',
     component: Tag,
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'deprecated', summary: '`variant="operational"` started warning in development; a tag that opens something became `behavior="selectable"` with `aria-expanded`.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'A disabled tag that is not a button ended with visually hidden ", disabled" text, so a screen reader announced it as disabled.' },
+            { date: '2026-09-29', kind: 'added', summary: '`resolveTagBehavior` was exported, so a container resolved a tag\'s behavior exactly as Tag did.' },
+        ],
         docs: {
             description: {
                 component:
