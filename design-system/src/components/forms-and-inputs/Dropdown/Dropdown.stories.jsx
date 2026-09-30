@@ -438,7 +438,7 @@ MenuRows.play = async ({ canvasElement }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Rows' }));
     const row = (name) => canvas.getByRole('button', { name });
     const words = (item) => within(item).getByText(item.textContent.trim());
-    const checkboxOf = (item) => item.querySelector('.dropdown-item-inner > [aria-hidden="true"]:first-child');
+    const checkboxOf = (item) => item.querySelector('.pdropdown-checkbox');
     const color = (token) => tokenColor(canvasElement, token);
     const length = (token) => tokenLength(canvasElement, token);
 
@@ -465,6 +465,7 @@ MenuRows.play = async ({ canvasElement }) => {
     const disabled = checkboxOf(row('Unavailable'));
     for (const box of [off, on, disabled]) {
         await expect(box, 'a checkbox leads the row').not.toBeNull();
+        await expect(box, 'the box is decorative').toHaveAttribute('aria-hidden', 'true');
         const s = getComputedStyle(box);
         await expect([px(s.width), px(s.height)], 'a 12px box').toEqual([12, 12]);
         await expect(px(s.borderTopLeftRadius), 'radius-50 corners').toBe(length('--size-border-radius-radius-50'));

@@ -372,7 +372,7 @@ export const MenuKeepsActions = {
         // `_Form Checkbox Button`, decorative since aria-pressed carries the
         // state: an on-primary box with a primary-border stroke and no check,
         // then a primary box with an on-primary check.
-        const checkboxOf = (item) => item.querySelector('.dropdown-item-inner > [aria-hidden="true"]:first-child');
+        const checkboxOf = (item) => item.querySelector('.pdropdown-checkbox');
         const toggle = canvas.getByRole('button', { name: 'Mathematics' });
         await expect(toggle).toHaveAttribute('aria-pressed', 'false');
         const offBox = checkboxOf(toggle);
