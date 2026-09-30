@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import RBBadge from 'react-bootstrap/Badge';
+import { TAG_COLOR_OF_CURRICULUM } from '../Tag';
 import './Badge.scss';
 
 /**
@@ -18,21 +19,17 @@ import './Badge.scss';
 /** The four status styles, which keep their names on Status. */
 const STATUS_STYLES = ['success', 'warning', 'danger', 'info'];
 
-/** Each curriculum style and the Tag color that borrows its hue. */
-const TAG_COLOR_OF = {
-    'social-emotional': 'yellow',
-    'mastering-content': 'purple',
-    advocacy: 'green',
-    relationship: 'magenta',
-    'technology-tools': 'blue',
-};
-
 /** The replacement for a Badge with these props, written as the call to make. */
 const replacementFor = ({ style, dismissible, counter }) => {
-    const color = TAG_COLOR_OF[style] ? ` color="${TAG_COLOR_OF[style]}"` : '';
+    // The curriculum styles are named for their hue's token, which is how Tag
+    // keys the color that borrows it.
+    const tagColor = Object.hasOwn(TAG_COLOR_OF_CURRICULUM, style) ? TAG_COLOR_OF_CURRICULUM[style] : null;
+    const color = tagColor ? ` color="${tagColor}"` : '';
     if (dismissible) return `<Tag behavior="removable"${color}>`;
     if (color) return `<Tag${color}>`;
-    const count = counter !== undefined ? ' count' : '';
+    // `count` takes a number, so the call names the one this badge shows.
+    const n = String(counter ?? '').trim() === '' ? NaN : Number(counter);
+    const count = counter === undefined ? '' : ` count={${Number.isFinite(n) ? n : '…'}}`;
     if (STATUS_STYLES.includes(style)) return `<Status style="${style}"${count}>`;
     return `<Status${count}> for a state, or <Tag> for a category`;
 };

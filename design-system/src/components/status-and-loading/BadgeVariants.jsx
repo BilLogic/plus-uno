@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Count from './Count';
-import Status from './Status';
+import { DEPRECATED_STYLE_ALIASES } from './Count/Count';
+import Status, { STATUS_DATE_STYLES } from './Status/Status';
 import Tag from './Tag';
 
 /**
@@ -31,8 +32,6 @@ export const BADGE_VARIANTS = ['status', 'counter', 'date', 'custom'];
  * and `info`, so an old call keeps its color.
  */
 export const BADGE_APPEARANCES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery', 'positive', 'negative', 'information'];
-
-const STYLE_OF = { positive: 'success', negative: 'danger', information: 'info' };
 
 /**
  * `1204` with `max={99}` -> `99+`. The old signature, kept for anything that
@@ -78,7 +77,7 @@ export const BadgeVariants = ({
 }) => {
     const content = children ?? text;
     const kind = BADGE_VARIANTS.includes(variant) ? variant : 'status';
-    const style = STYLE_OF[appearance] || appearance;
+    const style = Object.hasOwn(DEPRECATED_STYLE_ALIASES, appearance) ? DEPRECATED_STYLE_ALIASES[appearance] : appearance;
     const size = spacing === 'spacious' ? 'large' : 'medium';
     const shared = { id, className, ...rest };
 
@@ -99,14 +98,16 @@ export const BadgeVariants = ({
     if (kind === 'counter') {
         const countAppearance = isBold ? 'bold' : 'subtle';
         if (isEmptyCount(content)) {
-            warn(`is deprecated; use <Count appearance="dot" style="${style}" label="…">.`);
+            warn(`is deprecated; use <Count appearance="dot" style="${style}" label="${label || 'New'}">.`);
             return <Count appearance="dot" style={style} label={label || 'New'} {...shared} />;
         }
-        warn(`is deprecated; use <Count style="${style}"${isBold ? ' appearance="bold"' : ''}>.`);
         if (!Number.isFinite(Number(content))) {
-            warn(`variant="counter" takes a number; "${content}" renders nothing. A word is a Status or a Tag.`);
-            return null;
+            // A word is not a count. It keeps rendering, as the Status a word
+            // becomes, and the one warning says so.
+            warn(`is deprecated; variant="counter" takes a number, so "${content}" renders as <Status style="${style}">. Use Status or Tag for a word.`);
+            return <Status style={style} {...shared}>{content}</Status>;
         }
+        warn(`is deprecated; use <Count style="${style}"${isBold ? ' appearance="bold"' : ''}>.`);
         return (
             <Count
                 value={content}
@@ -119,20 +120,40 @@ export const BadgeVariants = ({
         );
     }
 
+    /*
+     * A date takes only neutral, warning and danger. Any other appearance
+     * renders neutral, and the warning names that valid call, so Status is not
+     * handed a style it would fall back from a second time.
+     */
     const isDate = kind === 'date';
-    warn(`is deprecated; use <Status ${isDate ? 'type="date" ' : ''}style="${style}"${spacing === 'spacious' ? ' size="large"' : ''}>.`);
+    const statusStyle = isDate && !STATUS_DATE_STYLES.includes(style) ? 'neutral' : style;
+    warn(`is deprecated; use <Status ${isDate ? 'type="date" ' : ''}style="${statusStyle}"${spacing === 'spacious' ? ' size="large"' : ''}>.`);
+
+    /*
+     * `label` renames a status for a screen reader. A Status is a span with no
+     * role, and ARIA does not allow a name on one, so the label is its text:
+     * visually hidden, with the visible words hidden from assistive technology.
+     */
+    const body = label
+        ? (
+            <>
+                <span aria-hidden="true">{content}</span>
+                <span className="visually-hidden">{label}</span>
+            </>
+        )
+        : content;
+
     return (
         <Status
             type={isDate ? 'date' : 'state'}
-            style={style}
+            style={statusStyle}
             size={size}
             leadingVisual={isDate ? undefined : iconBefore}
             count={isDate ? undefined : trailingMetric}
             maxWidth={maxWidth}
-            {...(label ? { 'aria-label': label } : null)}
             {...shared}
         >
-            {content}
+            {body}
         </Status>
     );
 };
@@ -160,7 +181,7 @@ BadgeVariants.propTypes = {
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** `counter` only: Count's bold appearance, for a count that asks for action now. */
     isBold: PropTypes.bool,
-    /** An accessible name. A dot is named by it ("New" by default); on a number it replaces the bare digits for a screen reader. */
+    /** What a screen reader says instead of the visible text. A dot is named by it ("New" by default); on a number it replaces the bare digits; on a status it is visually hidden text that replaces the words. */
     label: PropTypes.string,
     className: PropTypes.string,
     id: PropTypes.string,

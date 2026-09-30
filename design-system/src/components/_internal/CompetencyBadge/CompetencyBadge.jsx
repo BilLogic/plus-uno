@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart';
+import StaticBadgeSmart, { smartAreaOf } from '@/components/_internal/StaticBadgeSmart';
 
 /**
  * A competency, which is a SMART area: the same read-only Tag
@@ -14,8 +14,7 @@ const CompetencyBadge = ({ competencyArea, size, id, className = '', ...rest }) 
     }
     return (
         <StaticBadgeSmart
-            // The key StaticBadgeSmart's `type` takes: "Mastering Content" is `mastering-content`.
-            type={String(competencyArea).replace(/\s+/g, '-').toLowerCase()}
+            type={smartAreaOf(competencyArea)}
             id={id}
             className={`plus-competency-badge ${className}`.trim()}
             {...rest}

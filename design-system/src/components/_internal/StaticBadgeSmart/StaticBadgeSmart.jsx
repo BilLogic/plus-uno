@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Tag from '@/components/status-and-loading/Tag';
+import Tag, { TAG_COLOR_OF_CURRICULUM } from '@/components/status-and-loading/Tag';
 import { SMART_CONSTANTS } from '@/components/constants';
 
 /**
@@ -27,19 +27,29 @@ const TEXT_OF = {
     'technology-tools': SMART_CONSTANTS.CA_TT,
 };
 
-/** Each area's Tag color: the color whose curriculum hue is that area's. */
-export const SMART_TAG_COLORS = {
-    'socio-emotional': 'yellow',
-    'mastering-content': 'purple',
-    advocacy: 'green',
-    relationships: 'magenta',
-    'technology-tools': 'blue',
+/** Each area's curriculum hue, by the token name the hue is stored under. */
+const CURRICULUM_OF = {
+    'socio-emotional': 'social-emotional',
+    'mastering-content': 'mastering-content',
+    advocacy: 'advocacy',
+    relationships: 'relationship',
+    'technology-tools': 'technology-tools',
 };
 
-/** "Mastering Content" and "mastering-content" name the same area; an unknown one is socio-emotional, as before. */
-const areaOf = (type) => {
-    const normalized = String(type ?? '').replace(/\s+/g, '-').toLowerCase();
-    return TEXT_OF[normalized] ? normalized : 'socio-emotional';
+/** Each area's Tag color: the color that borrows the area's curriculum hue. */
+export const SMART_TAG_COLORS = Object.freeze(Object.fromEntries(
+    Object.entries(CURRICULUM_OF).map(([area, hue]) => [area, TAG_COLOR_OF_CURRICULUM[hue]]),
+));
+
+/**
+ * The area key for a SMART area as it is keyed or written: "Mastering Content"
+ * and `mastering-content` are the same area. An unknown one is socio-emotional,
+ * as it always has been. `type` takes the key; CompetencyBadge, which takes the
+ * written form, runs its value through this first.
+ */
+export const smartAreaOf = (type) => {
+    const normalized = String(type ?? '').trim().replace(/\s+/g, '-').toLowerCase();
+    return Object.hasOwn(TEXT_OF, normalized) ? normalized : 'socio-emotional';
 };
 
 const SmartBadges = ({
@@ -53,7 +63,7 @@ const SmartBadges = ({
         // eslint-disable-next-line no-console
         console.warn('[StaticBadgeSmart] `size` is deprecated and ignored: a SMART area is a Tag, and a Tag has one size.');
     }
-    const area = areaOf(type);
+    const area = smartAreaOf(type);
 
     return (
         <Tag
@@ -68,7 +78,7 @@ const SmartBadges = ({
 };
 
 SmartBadges.propTypes = {
-    /** SMART competency area type */
+    /** The SMART area, by its key. For the area as people write it ("Mastering Content"), use CompetencyBadge. */
     type: PropTypes.oneOf([
         'socio-emotional',
         'mastering-content',

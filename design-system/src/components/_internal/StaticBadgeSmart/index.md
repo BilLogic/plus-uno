@@ -13,7 +13,7 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `type` | enum | — | SMART competency area type |
+| `type` | enum | — | The SMART area, by its key. For the area as people write it ("Mastering Content"), use CompetencyBadge. |
 | `size` | enum | — | Deprecated and ignored: a SMART area is a Tag, which has one size (22). |
 | `id` | string | — | HTML id attribute |
 | `className` | string | `''` | Additional CSS classes |

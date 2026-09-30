@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
-import Tag, { TAG_COLORS } from '@/components/status-and-loading/Tag';
+import Tag, { TAG_ACCEPTED_COLORS, resolveTagColor } from '@/components/status-and-loading/Tag';
 import TagGroup from '@/components/status-and-loading/TagGroup';
 import useFieldId from './useFieldId';
 import './TagInput.scss';
@@ -13,7 +13,7 @@ import './TagInput.scss';
  * take are deprecated aliases for the Tag color nearest their hue: a tag is a
  * category, and its color never carries a meaning.
  */
-const DEPRECATED_COLORS = {
+const TAG_INPUT_COLOR_ALIASES = {
     default: 'grey',
     success: 'green',
     danger: 'magenta',
@@ -21,19 +21,30 @@ const DEPRECATED_COLORS = {
     info: 'teal',
 };
 
-/** Every name a tag's `color` accepts: the Tag colors, then the deprecated aliases. */
-const ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'default', 'success', 'danger', 'warning', 'info'];
+/** Every name a tag's `color` accepts: what Tag accepts, then TagInput's own aliases. */
+const ACCEPTED_COLORS = [...TAG_ACCEPTED_COLORS, ...Object.keys(TAG_INPUT_COLOR_ALIASES)];
 
+const warn = (message) => {
+    if (process.env.NODE_ENV === 'production') return;
+    // eslint-disable-next-line no-console
+    console.warn(`[TagInput] ${message}`);
+};
+
+/**
+ * The color to hand Tag. A Tag name, including Tag's own deprecated ones, goes
+ * through as given, so Tag decides and warns about its own aliases. TagInput's
+ * aliases resolve here, and anything else falls back to grey, each with a
+ * development warning.
+ */
 const tagColorOf = (color) => {
-    if (!color) return 'grey';
-    if (DEPRECATED_COLORS[color]) {
-        if (process.env.NODE_ENV !== 'production') {
-            // eslint-disable-next-line no-console
-            console.warn(`[TagInput] color "${color}" is deprecated; use "${DEPRECATED_COLORS[color]}".`);
-        }
-        return DEPRECATED_COLORS[color];
+    if (color === undefined || color === null || color === '') return 'grey';
+    if (Object.hasOwn(TAG_INPUT_COLOR_ALIASES, color)) {
+        warn(`color "${color}" is deprecated; use "${TAG_INPUT_COLOR_ALIASES[color]}".`);
+        return TAG_INPUT_COLOR_ALIASES[color];
     }
-    return TAG_COLORS.includes(color) || color === 'orange' ? color : 'grey';
+    if (resolveTagColor(color)) return color;
+    warn(`color "${color}" is not a Tag color; it falls back to grey.`);
+    return 'grey';
 };
 
 const TagInput = ({
@@ -59,8 +70,6 @@ const TagInput = ({
     const isControlled = tags !== undefined && tags !== null && Array.isArray(tags);
 
     const currentTags = isControlled ? tags : internalTags;
-
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
 
     /**
      * TagInput renders tags, not an input (#206). The label had nowhere to
@@ -124,7 +133,7 @@ const TagInput = ({
                 </Form.Label>
             )}
             <div
-                className={`plus-form-tag-input-container plus-form-tag-input-${size} ${sizeClass} ${disabled ? 'plus-form-tag-input-disabled' : ''}`}
+                className={`plus-form-tag-input-container plus-form-tag-input-${size} ${disabled ? 'plus-form-tag-input-disabled' : ''}`}
                 id={`${fieldId}-container`}
                 role={hasLabel ? 'group' : undefined}
                 aria-labelledby={labelId}

@@ -158,20 +158,24 @@ Counters.play = async ({ canvasElement }) => {
 };
 
 /**
- * A counter takes a number. A word in a counter is a Status or a Tag, so it
- * renders nothing and says so in development, rather than printing a word in a
- * number pill.
+ * A counter takes a number. A word keeps rendering, as the Status a word
+ * becomes, with one warning that says so rather than a deprecation and a
+ * second complaint.
  */
 export const CounterFormatting = () => (
-    <div style={row} data-testid="host">
-        <BadgeVariants variant="counter" appearance="neutral">many</BadgeVariants>
+    <div style={row}>
+        <BadgeVariants variant="counter" appearance="neutral" data-testid="word">many</BadgeVariants>
     </div>
 );
 
 CounterFormatting.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.queryByText('many')).toBeNull();
-    await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('variant="counter" takes a number'));
+    await expect(canvas.getByText('many')).toBeVisible();
+    await expect(px(getComputedStyle(canvas.getByTestId('word')).height), 'a word renders as a 20-tall Status').toBe(20);
+    const said = new Set(console.warn.mock.calls.map(([m]) => String(m)));
+    await expect([...said], 'one warning, naming what it renders').toEqual([
+        '[BadgeVariants] is deprecated; variant="counter" takes a number, so "many" renders as <Status style="neutral">. Use Status or Tag for a word.',
+    ]);
 };
 
 /* --------------------------------------------------------- trailing metric */
@@ -243,6 +247,47 @@ DateAndCustom.play = async ({ canvasElement }) => {
         .filter((el) => getComputedStyle(el).backgroundColor === 'rgb(127, 63, 177)');
     await expect(swatches, 'the color is on the swatch').toHaveLength(1);
     await expect(canvas.queryByRole('button')).toBeNull();
+};
+
+/**
+ * A date takes neutral, warning and danger only. Any other appearance renders
+ * a neutral date, and the one warning names that valid call, so nothing falls
+ * back a second time.
+ */
+export const DateWithAStateAppearance = () => (
+    <div style={pairs}>
+        <BadgeVariants variant="date" appearance="positive" data-testid="old-date">Due 12 Sept</BadgeVariants>
+        <Status type="date" data-testid="new-date">Due 12 Sept</Status>
+    </div>
+);
+
+DateWithAStateAppearance.play = async ({ canvasElement }) => {
+    await expectParity(within(canvasElement), ['date']);
+    const said = new Set(console.warn.mock.calls.map(([m]) => String(m)));
+    await expect([...said]).toEqual(['[BadgeVariants] is deprecated; use <Status type="date" style="neutral">.']);
+};
+
+/**
+ * `label` still renames a status for a screen reader, without an
+ * `aria-label` on a span that has no role, which ARIA does not allow: the
+ * label is visually hidden text, and the visible words are hidden from
+ * assistive technology.
+ */
+export const LabelledStatus = () => (
+    <div style={row}>
+        <BadgeVariants variant="status" appearance="positive" label="Session completed" data-testid="labelled">Done</BadgeVariants>
+    </div>
+);
+
+LabelledStatus.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const status = canvas.getByTestId('labelled');
+    await expect(status).not.toHaveAttribute('aria-label');
+    await expect(canvas.getByText('Done')).toBeVisible();
+    await expect(canvas.getByText('Done').closest('[aria-hidden="true"]'), 'the visible words are hidden from a screen reader').not.toBeNull();
+    const spoken = canvas.getByText('Session completed');
+    await expect(spoken.closest('[aria-hidden="true"]'), 'the label is what a screen reader reads').toBeNull();
+    await expect(spoken.getBoundingClientRect().width, 'the label is not seen').toBeLessThanOrEqual(1);
 };
 
 export const Truncation = () => (

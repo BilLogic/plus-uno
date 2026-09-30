@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import Count, { formatCount } from '../Count/Count';
+import Count, { DEPRECATED_STYLE_ALIASES, formatCount } from '../Count/Count';
 import Tooltip from '../../overlays/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './Status.scss';
@@ -38,11 +38,10 @@ export const STATUS_DATE_STYLES = ['neutral', 'warning', 'danger'];
 export const STATUS_SIZES = ['medium', 'large'];
 
 /**
- * The names Badge variants used, still accepted, and the library word each one
- * now means. A literal list beside it is what propTypes checks, because the
- * docs generator reads the values from source.
+ * Every name `style` accepts: the six, then the deprecated aliases Count
+ * defines (`DEPRECATED_STYLE_ALIASES`). A literal, because the docs generator
+ * reads the values from source.
  */
-const DEPRECATED_STYLES = { positive: 'success', negative: 'danger', information: 'info' };
 const ACCEPTED_STYLES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery', 'positive', 'negative', 'information'];
 
 /** The fixed icon of each date style: calendar, clock, alert. */
@@ -98,9 +97,9 @@ export const Status = ({
     const isDate = effectiveType === 'date';
     const allowed = isDate ? STATUS_DATE_STYLES : STATUS_STYLES;
     let effectiveStyle = style;
-    if (DEPRECATED_STYLES[style]) {
-        warn(`style="${style}" is deprecated; use style="${DEPRECATED_STYLES[style]}".`);
-        effectiveStyle = DEPRECATED_STYLES[style];
+    if (DEPRECATED_STYLE_ALIASES[style]) {
+        warn(`style="${style}" is deprecated; use style="${DEPRECATED_STYLE_ALIASES[style]}".`);
+        effectiveStyle = DEPRECATED_STYLE_ALIASES[style];
     }
     if (!allowed.includes(effectiveStyle)) {
         warn(`type="${effectiveType}" takes ${allowed.join(', ')}; style="${style}" falls back to neutral.`);

@@ -23,6 +23,9 @@ export default {
     title: 'Components/Status and loading/Status',
     component: Status,
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'deprecated', summary: '`style` started accepting `positive`, `negative` and `information` as deprecated aliases for `success`, `danger` and `info`, rendering the same and warning in development.' },
+        ],
         docs: {
             description: {
                 component:

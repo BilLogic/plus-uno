@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/BadgeVariants.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, Truncation, WithIcon, DeprecationWarnings, Interactive
+**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, DateWithAStateAppearance, LabelledStatus, Truncation, WithIcon, DeprecationWarnings, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/BadgeVariants.mdx`
 
@@ -27,7 +27,7 @@
 | `max` | number | — | `counter` only: the cap (99 by default). 1204 with max 99 reads `99+`. |
 | `maxWidth` | number or string | — | Caps the label, which ends in an ellipsis and shows its full text as a tooltip. 200 by default on a Status, 180 on a Tag. |
 | `isBold` | bool | `false` | `counter` only: Count's bold appearance, for a count that asks for action now. |
-| `label` | string | — | An accessible name. A dot is named by it ("New" by default); on a number it replaces the bare digits for a screen reader. |
+| `label` | string | — | What a screen reader says instead of the visible text. A dot is named by it ("New" by default); on a number it replaces the bare digits; on a status it is visually hidden text that replaces the words. |
 | `className` | string | — | — |
 | `id` | string | — | — |
 

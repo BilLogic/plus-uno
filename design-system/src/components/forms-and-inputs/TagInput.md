@@ -15,8 +15,8 @@
 | `name` | string | — | — |
 | `label` | node | — | — |
 | `required` | bool | `false` | — |
-| `tags` | enum | — | — |
-| `defaultTags` | enum | `[]` | — |
+| `tags` | arrayOf or string or shape or oneOf | — | — |
+| `defaultTags` | arrayOf or string or shape or oneOf | `[]` | — |
 | `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | — |
 | `onAdd` | func | — | — |
@@ -26,10 +26,6 @@
 | `style` | object | — | — |
 
 ## Variants
-
-**`tags`** — `grey` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `orange` · `default` · `success` · `danger` · `warning` · `info`
-
-**`defaultTags`** — `grey` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `orange` · `default` · `success` · `danger` · `warning` · `info`
 
 **`size`** — `small` · `medium` · `large`
 

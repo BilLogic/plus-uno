@@ -15,6 +15,11 @@ const icons = {
 export default {
     title: 'Components/Status and loading/Badge',
     component: Badge,
+    parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'deprecated', summary: 'Badge was deprecated in favor of Status, Count and Tag; it still rendered as before and warned in development with the replacement for its props.' },
+        ],
+    },
     tags: ['!dev', '!autodocs'],
     // Define argTypes to create the custom controls user requested
     argTypes: {
@@ -287,10 +292,10 @@ export const DeprecationWarning = {
         await expect(canvas.getByText('Completed')).toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
         const said = (text) => expect(console.warn).toHaveBeenCalledWith(expect.stringContaining(text));
-        await said('[Badge] is deprecated; use <Status style="success">');
+        await said('[Badge] is deprecated; use <Status style="success">.');
         await said('[Badge] is deprecated; use <Tag color="green">');
         await said('[Badge] is deprecated; use <Tag behavior="removable">');
-        await said('[Badge] is deprecated; use <Status style="danger" count>');
+        await said('[Badge] is deprecated; use <Status style="danger" count={3}>.');
         await said('[Badge] is deprecated; use <Status> for a state, or <Tag> for a category');
     },
 };

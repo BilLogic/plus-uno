@@ -25,10 +25,11 @@ export const COUNT_SIZES = ['medium', 'small'];
 
 /**
  * The names Badge variants used, still accepted, and the library word each one
- * now means. A literal list beside it is what propTypes checks, because the
- * docs generator reads the values from source.
+ * now means. Defined once here and shared by Status and BadgeVariants, which
+ * already build on Count. The literal list beside it is what propTypes checks,
+ * because the docs generator reads the values from source.
  */
-const DEPRECATED_STYLES = { positive: 'success', negative: 'danger', information: 'info' };
+export const DEPRECATED_STYLE_ALIASES = Object.freeze({ positive: 'success', negative: 'danger', information: 'info' });
 const ACCEPTED_STYLES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery', 'positive', 'negative', 'information'];
 
 /**
@@ -59,12 +60,12 @@ export const Count = ({
     const isDot = appearance === 'dot';
 
     let resolvedStyle = style;
-    if (DEPRECATED_STYLES[style]) {
+    if (DEPRECATED_STYLE_ALIASES[style]) {
         if (process.env.NODE_ENV !== 'production') {
             // eslint-disable-next-line no-console
-            console.warn(`[Count] style="${style}" is deprecated; use style="${DEPRECATED_STYLES[style]}".`);
+            console.warn(`[Count] style="${style}" is deprecated; use style="${DEPRECATED_STYLE_ALIASES[style]}".`);
         }
-        resolvedStyle = DEPRECATED_STYLES[style];
+        resolvedStyle = DEPRECATED_STYLE_ALIASES[style];
     }
 
     /*

@@ -3,7 +3,7 @@ import { expect, fn, spyOn, userEvent, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import CompetencyBadge from '@/components/_internal/CompetencyBadge';
-import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart';
+import StaticBadgeSmart, { SMART_TAG_COLORS } from '@/components/_internal/StaticBadgeSmart';
 import TagInput from '@/components/forms-and-inputs/TagInput';
 
 import Tag from './Tag';
@@ -34,13 +34,17 @@ export default {
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' };
 
-/** Each SMART area, the Tag color it takes, and the curriculum token behind that color. */
+/**
+ * Each SMART area, its label, and the curriculum token its hue is drawn from.
+ * The Tag color comes from `SMART_TAG_COLORS`, the one map the component uses,
+ * and the token is what the test checks that color against.
+ */
 const SMART = [
-    ['socio-emotional', 'Social-Emotional Learning', 'yellow', 'social-emotional'],
-    ['mastering-content', 'Mastering Content', 'purple', 'mastering-content'],
-    ['advocacy', 'Advocacy', 'green', 'advocacy'],
-    ['relationships', 'Relationships', 'magenta', 'relationship'],
-    ['technology-tools', 'Technology Tools', 'blue', 'technology-tools'],
+    ['socio-emotional', 'Social-Emotional Learning', 'social-emotional'],
+    ['mastering-content', 'Mastering Content', 'mastering-content'],
+    ['advocacy', 'Advocacy', 'advocacy'],
+    ['relationships', 'Relationships', 'relationship'],
+    ['technology-tools', 'Technology Tools', 'technology-tools'],
 ];
 
 const PROPS = ['height', 'backgroundColor', 'color', 'borderTopColor', 'borderTopLeftRadius', 'fontSize', 'paddingLeft'];
@@ -57,10 +61,10 @@ const swatchOf = (tag) => [...tag.querySelectorAll('[aria-hidden="true"]')]
 
 export const SmartAreas = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'max-content max-content', gap: '8px 24px' }}>
-        {SMART.map(([type, text, color]) => (
+        {SMART.map(([type, text]) => (
             <React.Fragment key={type}>
                 <StaticBadgeSmart type={type} data-testid={`smart-${type}`} />
-                <Tag color={color} data-testid={`tag-${type}`}>{text}</Tag>
+                <Tag color={SMART_TAG_COLORS[type]} data-testid={`tag-${type}`}>{text}</Tag>
             </React.Fragment>
         ))}
     </div>
@@ -73,7 +77,7 @@ export const SmartAreas = () => (
  */
 SmartAreas.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const [type, text, , token] of SMART) {
+    for (const [type, text, token] of SMART) {
         const smart = canvas.getByTestId(`smart-${type}`);
         await expect(smart.textContent, `${type} says its area`).toBe(text);
         await expect(look(smart), `${type} looks like a ${token} tag`).toEqual(look(canvas.getByTestId(`tag-${type}`)));
@@ -130,7 +134,7 @@ export const TagInputChips = {
     render: () => (
         <TagInput
             label="Topics"
-            tags={['Algebra', { text: 'Geometry', color: 'success' }, { text: 'Fractions', color: 'purple' }]}
+            tags={['Algebra', { text: 'Geometry', color: 'success' }, { text: 'Fractions', color: 'purple' }, { text: 'Ratios', color: 'lime' }]}
             onRemove={onRemove}
         />
     ),
@@ -143,7 +147,7 @@ export const TagInputChips = {
         const canvas = within(canvasElement);
         const group = canvas.getByRole('group', { name: 'Topics' });
         const items = within(group).getAllByRole('listitem');
-        await expect(items).toHaveLength(3);
+        await expect(items).toHaveLength(4);
 
         const tagOf = (text) => within(group).getByText(text).parentElement;
         await expect(px(getComputedStyle(tagOf('Algebra')).height), 'a chip is a 22 tag').toBe(22);
@@ -152,6 +156,9 @@ export const TagInputChips = {
         await expect(getComputedStyle(tagOf('Fractions')).borderTopColor, 'a Tag color is taken as given')
             .toBe(tokenColor(canvasElement, '--color-mastering-content-border-subtle'));
         await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "success" is deprecated; use "green"'));
+        await expect(getComputedStyle(tagOf('Ratios')).borderTopColor, 'an unknown color is grey')
+            .toBe(getComputedStyle(tagOf('Algebra')).borderTopColor);
+        await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "lime" is not a Tag color; it falls back to grey.'));
 
         await userEvent.click(within(group).getByRole('button', { name: 'Remove Geometry' }));
         await expect(onRemove).toHaveBeenCalledWith(1, { text: 'Geometry', color: 'success' });
