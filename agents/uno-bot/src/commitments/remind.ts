@@ -17,13 +17,12 @@
 // PURE: no `Env`, no Slack, no Workers global.
 
 import type { ChannelKind } from "../sweep/finding";
-import { MORNING_RUN_HOUR_UTC } from "../sweep/schedule";
+import { morningRunOn } from "../sweep/schedule";
 import { cleanWhat } from "./copy";
 import { addWorkingDays, dayLabel, deadlineDay, etDayOf, TEXT_KEEP_MS } from "./due";
 import type { CommitmentRecord, CommitmentStore } from "./store";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const HOUR_MS = 60 * 60 * 1000;
 
 /** Working days a ⏳ on a reminder moves it by. */
 export const SNOOZE_WORKING_DAYS = 2;
@@ -56,10 +55,8 @@ const COUNTS: Record<string, number> = {
 
 const ASK_WHEN = "When should I remind you? A day like Thu, tomorrow, in 2 days or Oct 3 works.";
 
-/** The morning run on an ET day: that date's 14:00 UTC. */
-export function morningRunOn(day: number): number {
-  return day + MORNING_RUN_HOUR_UTC * HOUR_MS;
-}
+/** The morning run on an ET day: that date's 10:00 ET (`../sweep/schedule`). */
+export { morningRunOn };
 
 /** The day itself on a weekday, else the Monday after — runs are weekday-only. */
 function weekdayOnOrAfter(day: number): number {

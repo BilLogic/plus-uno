@@ -111,7 +111,7 @@ test("⏳ re-arms due_at two working days out, at most twice", () => {
   assert.deepEqual([0, 1, 2, 3].map(maySnooze), [true, true, false, false]);
 });
 
-test("nothing is sent outside the weekday 14:00 UTC run", () => {
+test("nothing is sent outside the weekday 10:00 ET run (14:00 UTC in EDT)", () => {
   const table: Array<[string, number, boolean]> = [
     ["Tue 14:00", utc(9, 29, 14), true],
     ["Tue 14:40", utc(9, 29, 14, 40), true],
@@ -129,4 +129,20 @@ test("days are said as a weekday within the week, a date past it", () => {
   assert.equal(dayLabel(day(9, 29), day(10, 1)), "Tue");
   assert.equal(dayLabel(day(10, 12), day(9, 29)), "Oct 12");
   assert.equal(dueDayOf(commitmentDueAt(utc(9, 29, 15), "Thu").dueAt), day(10, 1));
+});
+
+test("the morning run is 10:00 ET on both sides of the 1 Nov 2026 change", () => {
+  const table: Array<[string, number, boolean]> = [
+    ["Fri 30 Oct 14:00 UTC, 10:00 EDT", utc(10, 30, 14), true],
+    ["Fri 30 Oct 15:00 UTC, 11:00 EDT", utc(10, 30, 15), false],
+    ["Mon 2 Nov 14:00 UTC, 9:00 EST", utc(11, 2, 14), false],
+    ["Mon 2 Nov 15:00 UTC, 10:00 EST", utc(11, 2, 15), true],
+    ["Mon 2 Nov 15:45 UTC", utc(11, 2, 15, 45), true],
+    ["Mon 2 Nov 16:00 UTC", utc(11, 2, 16), false],
+  ];
+  for (const [name, now, want] of table) assert.equal(isMorningRunTime(now), want, name);
+  // A commitment due Fri night is nudged Monday at 10:00 EST.
+  assert.equal(iso(nudgeAt(endOfEtDay(day(10, 30)))), "2026-11-02T15:00");
+  // One due Thu night is nudged Friday at 10:00 EDT.
+  assert.equal(iso(nudgeAt(endOfEtDay(day(10, 29)))), "2026-10-30T14:00");
 });

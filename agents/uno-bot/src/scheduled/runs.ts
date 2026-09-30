@@ -2,9 +2,10 @@
 //
 // No cron is added for them. The free plan caps an account at five cron
 // triggers, and the weekday `*/15 13-23 * * 1-5` trigger already fires at the
-// two times a run needs — 14:00 UTC (the morning run) and 22:00 UTC (the
-// end-of-day run). So a firing reads its own scheduled time and enqueues the
-// matching run; every other firing does nothing. The Figma library poll that
+// two times a run needs — 10:00 ET (the morning run) and 18:00 ET (the
+// end-of-day run), whether ET is UTC-4 or UTC-5. So a firing reads its own
+// scheduled time in ET and enqueues the matching run; every other firing does
+// nothing. The Figma library poll that
 // once ran on every firing is the end-of-day run's `figma-library-poll` job.
 // The wrangler.toml cron comment gives the ET times.
 //
@@ -15,6 +16,7 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import { END_OF_DAY_RUN_HOUR_ET, etParts, MORNING_RUN_HOUR_ET } from "../sweep/schedule";
 import { CLASSIFY_BATCHES } from "../usage/classify-run";
 import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
 
@@ -103,10 +105,10 @@ export interface ScheduledRun {
   readonly jobs: readonly ScheduledJob[];
 }
 
-/** The UTC hour each run is anchored to. Cron fires on the minute. */
+/** The ET hour each run is anchored to. Cron fires on the minute. */
 const RUN_HOURS: Record<ScheduledRunName, number> = {
-  morning: 14,
-  "end-of-day": 22,
+  morning: MORNING_RUN_HOUR_ET,
+  "end-of-day": END_OF_DAY_RUN_HOUR_ET,
 };
 
 /** Friday, as `Date.getUTCDay` numbers it. */
@@ -163,27 +165,30 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
 export const RUN_NAMES = Object.keys(RUN_HOURS) as ScheduledRunName[];
 
 /**
- * The runs a firing starts: the one anchored to its hour, when the firing is
- * that hour's :00 slot, and none otherwise.
+ * The runs a firing starts: the one anchored to its ET hour, when the firing
+ * is that hour's :00 slot, and none otherwise. Each run is once a day all
+ * year: 14:00 UTC is the morning run under EDT and nothing under EST.
  *
  * Compared by hour and minute, not to the millisecond, so a `scheduledTime` a
- * few seconds past the slot still lands in it.
+ * few seconds past the slot still lands in it. ET is a whole-hour offset, so
+ * the UTC minute is the ET minute.
  *
  * @param scheduledTime - The firing's scheduled time, epoch ms
  */
 export function runsForFiring(scheduledTime: number): ScheduledRunName[] {
-  const d = new Date(scheduledTime);
-  if (d.getUTCMinutes() !== 0) return [];
-  return RUN_NAMES.filter((name) => RUN_HOURS[name] === d.getUTCHours());
+  if (new Date(scheduledTime).getUTCMinutes() !== 0) return [];
+  const hour = etParts(scheduledTime).h;
+  return RUN_NAMES.filter((name) => RUN_HOURS[name] === hour);
 }
 
 /** Weekday names as a caller spells them, in `Date.getUTCDay` order. */
 export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
 /**
- * A run, planned for the UTC date of `at`: its jobs for that weekday — or
- * for `weekday` when given, which is how the sweep probe rehearses Friday's
- * jobs on a Tuesday; the date stays `at`'s. The weekday filter covers every
+ * A run, planned for the UTC date of `at` (at both runs' ET hours, also the
+ * ET date): its jobs for that weekday — or for `weekday` when given, which is
+ * how the sweep probe rehearses Friday's jobs on a Tuesday; the date stays
+ * `at`'s. The weekday filter covers every
  * job, the spread-in batches and the sweep jobs included. The end-of-day run
  * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
  * `sweep:<channel>`, then one `sweep-group-dms` job, keyed `sweep:group-dms`,

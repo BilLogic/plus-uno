@@ -112,7 +112,7 @@ test("owner routing falls through its three rungs, never to a default", () => {
   });
 });
 
-test("a finding posts at the first weekday 14:00 UTC after it was found", () => {
+test("a finding posts at the first weekday 10:00 ET (14:00 UTC in EDT) after it was found", () => {
   // Tuesday 22:00 → Wednesday 14:00.
   assert.equal(postableAt(Date.UTC(2026, 8, 29, 22)), Date.UTC(2026, 8, 30, 14));
   // Friday 22:00 → Monday 14:00, not the weekend.
@@ -121,6 +121,17 @@ test("a finding posts at the first weekday 14:00 UTC after it was found", () => 
   assert.equal(postableAt(Date.UTC(2026, 8, 29, 9)), Date.UTC(2026, 8, 29, 14));
   // Exactly at 14:00 is not "after".
   assert.equal(postableAt(Date.UTC(2026, 8, 29, 14)), Date.UTC(2026, 8, 30, 14));
+});
+
+test("a finding posts at 10:00 ET on both sides of the 1 Nov 2026 change", () => {
+  // Found Fri 30 Oct at the end-of-day run (EDT) → Mon 2 Nov 10:00 EST, 15:00 UTC.
+  assert.equal(postableAt(Date.UTC(2026, 9, 30, 22)), Date.UTC(2026, 10, 2, 15));
+  // Found before Friday's run → that morning, 10:00 EDT.
+  assert.equal(postableAt(Date.UTC(2026, 9, 30, 9)), Date.UTC(2026, 9, 30, 14));
+  // Found at 14:00 UTC on Mon 2 Nov, 9:00 EST → that morning's 15:00 UTC run.
+  assert.equal(postableAt(Date.UTC(2026, 10, 2, 14)), Date.UTC(2026, 10, 2, 15));
+  // Found in the small hours UTC, still the ET evening before.
+  assert.equal(postableAt(Date.UTC(2026, 10, 3, 2)), Date.UTC(2026, 10, 3, 15));
 });
 
 test("links: Slack's <url|label> and bare URLs, each once, classified or left alone", () => {

@@ -273,7 +273,7 @@ describe("the morning run", () => {
     assert.equal(m.posts.length, 2);
   });
 
-  it("sends nothing outside the weekday 14:00 UTC run", async () => {
+  it("sends nothing outside the weekday 10:00 ET run", async () => {
     const { store } = await sweptPromise();
     for (const now of [at(32, 22), at(32, 15), at(33, 14), at(34, 14)]) {
       const m = mornings({ store, now });
