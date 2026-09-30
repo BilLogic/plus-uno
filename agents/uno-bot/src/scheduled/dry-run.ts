@@ -32,11 +32,17 @@ export interface JobReading {
   key: string;
   kind: ScheduledJob["kind"];
   outcome: "handled" | "deferred" | "failed" | "skipped";
+  /** Why a job was not rehearsed: the ceiling was spent, or it repeats a kind
+   *  already rehearsed. Present only on a `skipped` reading. */
+  skipped_because?: "ceiling" | "repeat-of-kind";
   subrequests: number;
   internal_subrequests: number;
   d1_queries: number;
   wall_ms: number;
   cpu_ms: null;
+  /** What the job's body reported, when it reported anything — the sweep's
+   *  findings and the text of the cards it would post. */
+  detail?: unknown;
 }
 
 /** The rehearsal's report. */
@@ -66,7 +72,7 @@ const CPU_NOTE =
  */
 export async function dryRunScheduledRun(
   run: ScheduledRun,
-  execute: (job: ScheduledJob) => Promise<void>,
+  execute: (job: ScheduledJob) => Promise<unknown>,
   now: () => number = () => Date.now(),
 ): Promise<DryRunReport> {
   const queue = run.jobs.map((job) => ({ date: run.date, job }));
@@ -78,15 +84,26 @@ export async function dryRunScheduledRun(
     // plan order rather than loop.
     const index = Math.max(nextRunnable(queue), 0);
     const [{ job }] = queue.splice(index, 1) as [{ date: string; job: ScheduledJob }];
+    // ONE JOB PER KIND. A dry run writes nothing, so a second job of a kind
+    // would read the same rows the first did and report the same work again —
+    // five classify jobs would claim five batches from one. The first is
+    // rehearsed; each repeat is reported as skipped, and why.
+    if (jobs.some((j) => j.kind === job.kind)) {
+      jobs.push({ ...reading(job, "skipped", 0, 0, 0, 0), skipped_because: "repeat-of-kind" });
+      continue;
+    }
     if (subrequestsUsed() - startSubrequests >= LOOKUP_CEILING) {
-      jobs.push(reading(job, "skipped", 0, 0, 0, 0));
+      jobs.push({ ...reading(job, "skipped", 0, 0, 0, 0), skipped_because: "ceiling" });
       continue;
     }
     const before = { ext: subrequestsUsed(), internal: internalSubrequestsUsed(), d1: internalSubrequestsFor("d1") };
     const startedAt = now();
-    const outcome = await runWithinCeiling(() => execute(job), startSubrequests + LOOKUP_CEILING);
-    jobs.push(
-      reading(
+    let detail: unknown;
+    const outcome = await runWithinCeiling(async () => {
+      detail = await execute(job);
+    }, startSubrequests + LOOKUP_CEILING);
+    jobs.push({
+      ...reading(
         job,
         outcome,
         subrequestsUsed() - before.ext,
@@ -94,7 +111,8 @@ export async function dryRunScheduledRun(
         internalSubrequestsFor("d1") - before.d1,
         now() - startedAt,
       ),
-    );
+      ...(detail !== undefined ? { detail } : {}),
+    });
   }
 
   return {

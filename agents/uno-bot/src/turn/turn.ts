@@ -71,10 +71,13 @@ import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
+  mayConfirm,
   proposalOperations,
   proposalReplyThread,
-  revisedBy,
-  revisionRefusal,
+  proposalTtlMs,
+  slotKeyOf,
+  stagingCardOf,
+  SWEEP_KEY,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -83,11 +86,27 @@ import {
   type ThreadState,
   type VisionReference,
 } from "../thread-state/index";
-import { buildTurnRecord, type TurnOrigin, type TurnRecord, type UsageLog } from "../usage/index";
+import {
+  buildTurnRecord,
+  isTestTraffic,
+  quietly,
+  recordProposalEvents,
+  storesChannel,
+  stagedEvent,
+  supersededEvents,
+  turnIdOf,
+  type ProposalEventLog,
+  withAskLabel,
+  type SubType,
+  type TurnOrigin,
+  type TurnRecord,
+  type UsageLog,
+} from "../usage/index";
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
+import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick, sweepTag } from "../sweep/cards";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -137,6 +156,17 @@ const PROGRESS_LABEL = "Reading the question and this thread";
  *  lingers on a slow database before the record is given up as lost. */
 export const USAGE_WRITE_TIMEOUT_MS = 1_000;
 
+/**
+ * The longest an ask's in-turn classification may hold the end of a turn.
+ * The answer is already out; what waits is the thread's next job. NOT
+ * MEASURED: a flash-lite one-shot at the chill tier's `low` thinking, with a
+ * few hundred tokens in and a dozen out, is expected around 1–2 s at p50 on
+ * Vertex, so 4 s is meant to cover the tail without holding a follow-up long.
+ * Past it the row is written unlabelled, as a failed call is. Read the
+ * `[usage] … not classified: timed out` lines to tune it.
+ */
+export const ASK_CLASSIFY_TIMEOUT_MS = 4_000;
+
 // ── The request ──────────────────────────────────────────────────────────────
 
 /**
@@ -151,6 +181,24 @@ export const USAGE_WRITE_TIMEOUT_MS = 1_000;
  * read by both callers and by `slack/assistant.ts`.
  */
 export type TurnSurface = "channel" | "assistant";
+
+/**
+ * What kind of conversation an ask was made in, as Slack types it: a public
+ * `channel`, a private `group`, a group DM (`mpim`) or the app DM (`im`).
+ *
+ * NOT the surface. `surface` says where the answer is delivered, and a group
+ * DM is delivered like a channel; this says whose conversation it is, which is
+ * what the usage record's privacy rules read (`usage/record.ts`). Unknown when
+ * the event did not say — an `app_mention` carries no `channel_type` — and
+ * unknown is treated as private.
+ */
+export const CONVERSATION_TYPES = ["channel", "group", "mpim", "im"] as const;
+export type ConversationType = (typeof CONVERSATION_TYPES)[number];
+
+/** A value as a `ConversationType`, or undefined when it is not one. */
+export function asConversationType(value: unknown): ConversationType | undefined {
+  return CONVERSATION_TYPES.find((t) => t === value);
+}
 
 export interface TurnRequest {
   // ----- who -----
@@ -167,6 +215,8 @@ export interface TurnRequest {
   /** The person's own message, which is what a reaction lands on. */
   userMsgTs: string;
   surface: TurnSurface;
+  /** Whose conversation this is, when known (`conversationTypeOf`). */
+  conversationType?: ConversationType;
   /** True when the message arrived inside an existing thread. A turn that
    *  OPENED its thread is the one allowed to title it, and the antecedent
    *  window only ever opens for a top-level channel @mention. */
@@ -343,8 +393,21 @@ export interface TurnUsage {
   origin: TurnOrigin;
   /** `TEST_CHANNEL_IDS`, parsed: #uno-bot-sandbox. */
   testChannelIds: readonly string[];
+  /** Where the cards this turn stages, and the one a revision replaces, are
+   *  recorded (`usage/proposal-events.ts`). */
+  proposalEvents: ProposalEventLog;
   /** Overrides `USAGE_WRITE_TIMEOUT_MS`; a test's way to not wait it out. */
   writeTimeoutMs?: number;
+  /**
+   * Label one ask with its corpus Sub-type — one short `chill` call
+   * (`usage/categories.ts` `classifyAsks`). Asked, as the turn finishes, only
+   * for a real ask whose row keeps no text for the end-of-day classifier to
+   * read (a DM, a group DM, an unknown conversation). Absent, those asks are
+   * recorded unlabelled.
+   */
+  classifyAsk?(text: string): Promise<SubType | null>;
+  /** Overrides `ASK_CLASSIFY_TIMEOUT_MS`. */
+  classifyTimeoutMs?: number;
 }
 
 export interface TurnDeps {
@@ -422,6 +485,13 @@ export interface TurnDeps {
      *  default branch could not be read, and the card says so. */
     workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; branch: string | null } | null>;
   };
+
+  /**
+   * Told when a cut-off run is re-staged as a fresh card (`restageExecution`),
+   * so a record kept against the old card's ts can follow it — the sweep's
+   * items do (`sweep/outcomes.ts`). Best-effort; absent, nothing follows.
+   */
+  onRestaged?(from: PendingProposal, to: PendingProposal): Promise<void>;
 
   /**
    * One page of the conversation before this message, for the antecedent
@@ -566,39 +636,102 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     firstAnswerAt ??= clock();
   });
 
+  // What a card this turn stages is recorded with, known before it runs: the
+  // row it joins to, and the test-traffic rule as it reads for a staging turn.
+  const staging: StagingFacts = {
+    turnId: turnIdOf(request.channel, request.userMsgTs, startedAt),
+    channelStored: storesChannel(request.surface, request.conversationType),
+    now: clock,
+    testTraffic: isTestTraffic({
+      origin: deps.usage.origin,
+      channel: request.channel,
+      testChannelIds: deps.usage.testChannelIds,
+      disposition: "staged",
+      question: request.text,
+    }),
+  };
+
   const outcome = await withWorkingSignal(
     delivery,
-    (watched) => turnBody(request, { ...deps, delivery: watched }),
+    (watched) => turnBody(request, { ...deps, delivery: watched }, staging),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
 
   // Written AFTER the working signal is down and the answer is out, so the
-  // record costs the person nothing they can see.
-  await recordTurn(
-    buildTurnRecord({
-      build: BUILD,
-      origin: deps.usage.origin,
-      testChannelIds: deps.usage.testChannelIds,
-      requesterId: request.userId,
-      surface: request.surface,
-      inThread: request.threaded,
-      channel: request.channel,
-      askTs: request.userMsgTs,
-      question: request.text,
-      startedAt,
-      firstAnswerAt,
-      tier: outcome.telemetry.tier,
-      routeReason: outcome.telemetry.route,
-      ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
-      toolsCalled: outcome.telemetry.tools,
-      ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
-      disposition: outcome.disposition,
-      ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
-      ...(outcome.executed ? { executed: outcome.executed } : {}),
-    }),
-    deps.usage,
-  );
+  // record — and a DM ask's classification — costs the person nothing they
+  // can see.
+  const record = buildTurnRecord({
+    build: BUILD,
+    origin: deps.usage.origin,
+    testChannelIds: deps.usage.testChannelIds,
+    requesterId: request.userId,
+    surface: request.surface,
+    ...(request.conversationType ? { conversationType: request.conversationType } : {}),
+    inThread: request.threaded,
+    channel: request.channel,
+    askTs: request.userMsgTs,
+    question: request.text,
+    startedAt,
+    firstAnswerAt,
+    tier: outcome.telemetry.tier,
+    routeReason: outcome.telemetry.route,
+    ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
+    toolsCalled: outcome.telemetry.tools,
+    ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
+    disposition: outcome.disposition,
+    ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
+    ...(outcome.executed ? { executed: outcome.executed } : {}),
+  });
+  // A ticket a reaction or button ✅ on this turn's card filed before this row
+  // existed was kept on the card's staged row; it lands here.
+  if (outcome.staged && record.selfFiledTicketUrl === null) {
+    const staged = outcome.staged.proposal.proposalTs;
+    await quietly(`self-filed ticket for ${staged}`, async () => {
+      record.selfFiledTicketUrl = await deps.usage.proposalEvents.ticketFor(staged);
+    }, deps.usage.writeTimeoutMs);
+  }
+  await recordTurn(await labelInTurn(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
+}
+
+/** What a card this turn stages is recorded with (`usage/proposal-events.ts`). */
+interface StagingFacts {
+  /** This turn's row — the staged event's join to `turns`. */
+  turnId: string;
+  testTraffic: boolean;
+  /** Whether the card may name its channel: `turns`' rule for DMs. */
+  channelStored: boolean;
+  /** The turn's clock. */
+  now: () => number;
+}
+
+/**
+ * An ask whose row will never hold its text — a DM, a group DM, a conversation
+ * of unknown type — labelled in the turn: the one moment its text exists.
+ * A channel ask (labelled at the end of the day), test traffic (greetings
+ * included) and a caller with no classifier are left as they are. A call that
+ * fails or outlasts its timeout leaves the row unlabelled and is logged
+ * without the model's words — it never fails the turn.
+ */
+async function labelInTurn(
+  record: TurnRecord,
+  text: string,
+  usage: TurnUsage,
+  clock: () => number,
+): Promise<TurnRecord> {
+  if (record.requestText !== null || record.testTraffic || !usage.classifyAsk) return record;
+  try {
+    const subType = await withTimeout(
+      usage.classifyAsk(text),
+      usage.classifyTimeoutMs ?? ASK_CLASSIFY_TIMEOUT_MS,
+    );
+    return withAskLabel(record, subType, clock());
+  } catch (err) {
+    console.error(
+      `[usage] turn ${record.turnId} not classified: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return record;
+  }
 }
 
 /**
@@ -615,7 +748,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
   return {
     ...delivery,
     postAnswer: (text) => noted(delivery.postAnswer(text)),
-    postNote: (text) => noted(delivery.postNote(text)),
+    postNote: (text, tag) => noted(delivery.postNote(text, tag)),
     postGateNote: (note) => noted(delivery.postGateNote(note)),
     card: (proposal) => noted(delivery.card(proposal)),
   };
@@ -629,25 +762,31 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
  * thing it measures.
  */
 async function recordTurn(record: TurnRecord, usage: TurnUsage): Promise<void> {
-  const timeoutMs = usage.writeTimeoutMs ?? USAGE_WRITE_TIMEOUT_MS;
-  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    await Promise.race([
-      usage.log.record(record),
-      new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
-      }),
-    ]);
+    await withTimeout(usage.log.record(record), usage.writeTimeoutMs ?? USAGE_WRITE_TIMEOUT_MS);
   } catch (err) {
     console.error(
       `[usage] turn ${record.turnId} not recorded: ${err instanceof Error ? err.message : String(err)}`,
     );
+  }
+}
+
+/** `work`, or a rejection once `timeoutMs` has passed — whichever is first. */
+async function withTimeout<T>(work: Promise<T>, timeoutMs: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
+      }),
+    ]);
   } finally {
     if (timer !== undefined) clearTimeout(timer);
   }
 }
 
-async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
+async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFacts): Promise<TurnOutcome> {
   const { delivery, threadState } = deps;
 
   // When this turn began, which is what scopes a stop press to it. Taken HERE
@@ -734,6 +873,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     }
   }
 
+  // ── "drop 2" / "keep 1 and 3" on a sweep card ──────────────────────────────
+  //
+  // Read by index, with no model call: the revision is the card's own
+  // operations minus the dropped ones, byte for byte, so there is nothing for
+  // a model to reproduce. Anything else said under the card still goes to the
+  // model, and its revision is still held to the subset rule below.
+  if (request.pending?.sweepRun) {
+    const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
+    if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
+  }
+
   // ── A cut-off run in this thread ───────────────────────────────────────────
   //
   // A card approved here whose run never reported back (`ThreadState`'s
@@ -818,6 +968,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   if (request.intakeChannel) {
     modelBlocks.push(intakeChannelInstruction({ senderId: request.userId, isReply: request.threaded }));
   }
+
+  // A reply under a sweep card is most often someone dropping an item from it.
+  if (request.pending?.sweepRun) modelBlocks.push(sweepCardInstruction());
 
   // The antecedent window: what "this" points at. Only for a top-level channel
   // @mention with a dangling pronoun, and only ever ONE page of the
@@ -1079,17 +1232,6 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     });
   }
 
-  // A card the Worker staged and keyed apart (the weekly DS precedence card)
-  // is revised only its own way. A batch that would touch it is refused with
-  // the card's note, rather than staged as a near-copy that stays live beside
-  // it — two live cards could both run.
-  const refusal = revisionRefusal(request.pending, result.operations);
-  if (refusal) {
-    await delivery.postNote(refusal);
-    await memory.remember(refusal);
-    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
-  }
-
   // Gate idempotency (b): the person JUST cancelled this same action, and the
   // store's outcome note is authoritative — the live thread only shows the
   // narrative text. Don't re-card a cancelled action; require an explicit
@@ -1123,6 +1265,57 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     );
   }
 
+  // The card this one revises. Every pending card, except a keyed one
+  // (`supersedeKey`) the batch does not touch: that is some other ask made in
+  // the thread — filing an issue under a sweep card, say — and stages as its
+  // own card beside it (`proposalSlot`), inheriting none of its terms. A sweep
+  // card is touched by a batch replacing one of its blocks; any other keyed
+  // card by a batch using one of its tools.
+  const replaced =
+    request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
+
+  // A keyed card that revises only its own way (the weekly DS precedence
+  // card, through `dispute N`) is not revised by a turn at all: the batch is
+  // refused with the card's note, rather than staged as a near-copy that
+  // stays live beside it — two live cards could both run.
+  if (replaced?.refuseRevision) {
+    await delivery.postNote(replaced.refuseRevision);
+    await memory.remember(replaced.refuseRevision);
+    return { disposition: "asked", posted: replaced.refuseRevision, wrote: memory.wrote(), telemetry };
+  }
+
+  // A card that names its confirmers is revised only by one of them. A
+  // revision keeps the card's confirmer set, so one staged by anyone else could
+  // never run — and staging it would still retire the card its owners can
+  // confirm. So it is refused, and the card stays live exactly as it was.
+  // #uno-bot is the exception: there a reply joins the confirmer set
+  // (`intake-channel.ts`).
+  if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId)) {
+    const refusal = revisionRefusal(replaced.confirmers ?? [], request.userId);
+    await delivery.postNote(refusal, replaced.sweepRun ? sweepTag("note") : undefined);
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+
+  // A sweep card's revision drops fixes and does nothing else: each of its
+  // operations must be one of the card's own, as it was. Anything else — a fix
+  // rewritten, a stamp changed, one added — is refused and the card stays.
+  if (replaced?.sweepRun && !isSubsetOf(result.operations, proposalOperations(replaced))) {
+    const refusal =
+      ":lock: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
+      "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
+    await delivery.postNote(refusal, sweepTag("note"));
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+  // And it keeps the card's deadline, read before the card is retired.
+  const sweepLeftMs = replaced?.sweepRun ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  if (sweepLeftMs !== undefined && sweepLeftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED, sweepTag("note"));
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
+
   // A different proposal is already pending: retire it, because the card about
   // to go up replaces it. RETIRE, never claim (#583): a claim DELETES, and the
   // record deleted here is the one a late ✅ needs in order to be told its card
@@ -1136,18 +1329,28 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // the thread's pending card too: this closes the seconds the revision spends
   // being written, during which the old card would otherwise still execute the
   // input the person just pushed back on.
-  //
-  // A card keyed apart (`supersedeKey`, the Worker's weekly card) is not the
-  // one this card revises: it stays live beside it, and lends it no terms.
-  const revised = revisedBy(request.pending);
-  if (revised) await threadState.retireProposal(revised.proposalTs);
+  const retiredAhead =
+    replaced && (await threadState.retireProposal(replaced.proposalTs)).retired ? [replaced.proposalTs] : [];
+  // On the record only when a retire took a live card out of reach — not one
+  // a ✅ claimed meanwhile, which has its own outcome — and at once, so a card
+  // whose revision then fails to post is not later read as aged out.
+  const recordSuperseded = (retired: readonly string[]) =>
+    recordProposalEvents(
+      deps.usage.proposalEvents,
+      supersededEvents(retired, staging.now(), "revision"),
+      deps.usage.writeTimeoutMs,
+    );
+  await recordSuperseded(retiredAhead);
 
-  const card = await buildCard(
+  const built = await buildCard(
     result,
     deps,
     implementPrdUrlFor(result.toolName, result.input, prd),
     request.surface === "assistant",
   );
+  // A revision of a sweep card is still one, so replies under it are read by
+  // the sweep's rule.
+  const card = replaced?.sweepRun ? asSweepRevision(built) : built;
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
@@ -1186,14 +1389,44 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
-    ...inheritedTerms(revised),
+    ...inheritedTerms(replaced),
+    // A revision of a sweep card stays a sweep card, in the sweep's slot, so
+    // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
+    // deadline, and its outcome joins the row the Worker's staging wrote.
+    ...(replaced?.sweepRun
+      ? {
+          sweepRun: replaced.sweepRun,
+          supersedeKey: replaced.supersedeKey ?? SWEEP_KEY,
+          ttlMs: sweepLeftMs,
+          originProposalTs: stagingCardOf(replaced),
+        }
+      : {}),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
     ...(request.intakeChannel
-      ? { confirmers: intakeConfirmers(request.intakeChannel, revised, request.userId) }
+      ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
       : {}),
   };
-  await threadState.putProposal(proposal);
+  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  // On the record as soon as it is stored, so a ✅ that lands before the turn
+  // finishes finds the staged row and the turn id it joins to; a ticket that
+  // ✅ files waits on that row until the turn writes its own (`runTurn`).
+  await recordSuperseded(retiredByStaging);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    [
+      stagedEvent({
+        proposal,
+        at: staging.now(),
+        via: "turn",
+        channelStored: staging.channelStored,
+        turnId: staging.turnId,
+        testTraffic: staging.testTraffic,
+        askText: request.text,
+      }),
+    ],
+    deps.usage.writeTimeoutMs,
+  );
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
@@ -1206,6 +1439,148 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     wrote: memory.wrote(),
     telemetry,
   };
+}
+
+/** What a revision of a sweep card that has closed meanwhile is told. */
+const CARD_CLOSED = "That card is no longer open, so it stays as it was.";
+
+/**
+ * How long a live card has left before its deadline — its staging time plus
+ * its own lifetime — or 0 once it is no longer live. A sweep card's revision
+ * lives for this rather than a fresh lifetime.
+ */
+async function timeLeftOn(
+  card: PendingProposal,
+  threadState: TurnDeps["threadState"],
+  now: number,
+): Promise<number> {
+  const live = await threadState.getProposalByTs(card.proposalTs);
+  return live.state === "found" ? Math.max(0, live.createdAt + proposalTtlMs(card) - now) : 0;
+}
+
+/**
+ * Stage a sweep card without the fixes a "drop N" left out — or, with none
+ * left, cancel it through the gate as a typed ⛔ would. Held to the card's
+ * confirmer set, like any revision, and to its deadline: the revision lives
+ * only as long as the card it replaces had left, so dropping again and again
+ * never extends a card.
+ */
+async function dropFromSweepCard(
+  request: TurnRequest,
+  deps: TurnDeps,
+  memory: ThreadMemory,
+  kept: number[],
+  cardThread: string,
+  staging: StagingFacts,
+): Promise<TurnOutcome> {
+  const { delivery, threadState } = deps;
+  const pending = request.pending!;
+  const telemetry: TurnTelemetry = {
+    tier: "chill",
+    route: "sweep-drop",
+    trivial: true,
+    correction: false,
+    tools: [],
+    references: [],
+    interim: 0,
+  };
+  if (!request.intakeChannel && !mayConfirm(pending, request.userId)) {
+    const refusal = revisionRefusal(pending.confirmers ?? [], request.userId);
+    await delivery.postNote(refusal, sweepTag("note"));
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+  if (!kept.length) {
+    const verdict = await resolveSignal(
+      { kind: "typed", channel: request.channel, thread: cardThread, text: "⛔", userId: request.userId },
+      { threadState },
+    );
+    return settleVerdict(verdict, { deps, memory, note: "Cancelled.", telemetry });
+  }
+  const all = proposalOperations(pending);
+  const operations = kept.map((i) => all[i]!);
+  const first = operations[0]!;
+  // The card's own deadline, read before it is retired: what the revision
+  // inherits in place of a fresh lifetime.
+  const leftMs = await timeLeftOn(pending, threadState, staging.now());
+  if (leftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED, sweepTag("note"));
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
+  const retiredAhead = (await threadState.retireProposal(pending.proposalTs)).retired ? [pending.proposalTs] : [];
+  const recordSuperseded = (retired: readonly string[]) =>
+    recordProposalEvents(
+      deps.usage.proposalEvents,
+      supersededEvents(retired, staging.now(), "revision"),
+      deps.usage.writeTimeoutMs,
+    );
+  await recordSuperseded(retiredAhead);
+  const card = asSweepRevision(
+    await buildCard(
+      { kind: "proposal", operations, toolName: first.toolName, input: first.input },
+      deps,
+      undefined,
+      request.surface === "assistant",
+    ),
+  );
+  const posted = await delivery.card(card);
+  if (!posted.ok || !posted.ts) {
+    console.error("[turn] sweep card revision was not staged");
+    return { disposition: "failed", failure: { stage: "delivery" }, wrote: memory.wrote(), telemetry };
+  }
+  const proposal: PendingProposal = {
+    operations,
+    toolName: first.toolName,
+    input: first.input,
+    channel: request.channel,
+    threadTs: request.conversationTs,
+    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+    userMsgTs: request.userMsgTs,
+    proposalTs: posted.ts,
+    proposalText: posted.text,
+    requesterUserId: request.userId,
+    ...inheritedTerms(pending),
+    ttlMs: leftMs,
+    sweepRun: pending.sweepRun!,
+    // The Worker staged the card this revises: its usage row is the root
+    // every later outcome joins to.
+    originProposalTs: stagingCardOf(pending),
+  };
+  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  await recordSuperseded(retiredByStaging);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    [
+      stagedEvent({
+        proposal,
+        at: staging.now(),
+        via: "turn",
+        channelStored: staging.channelStored,
+        turnId: staging.turnId,
+        testTraffic: staging.testTraffic,
+        askText: request.text,
+      }),
+    ],
+    deps.usage.writeTimeoutMs,
+  );
+  await memory.remember(posted.text);
+  return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
+}
+
+/**
+ * What a person outside a card's confirmer set is told when their message
+ * would have revised it. Names who can, since that is who to ask; only a Slack
+ * user id is mentioned.
+ */
+export function revisionRefusal(confirmers: readonly string[], userId: string): string {
+  const id = /^[UW][A-Z0-9]{2,20}$/;
+  const to = id.test(userId) ? `<@${userId}> ` : "";
+  const who = confirmers.filter((c) => id.test(c)).map((c) => `<@${c}>`);
+  const names = who.length <= 1 ? who.join("") : `${who.slice(0, -1).join(", ")} or ${who[who.length - 1]}`;
+  return who.length
+    ? `:lock: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
+    : `:lock: ${to}Nobody here can change this proposal, so it stays as it is.`;
 }
 
 // ── The gate path ────────────────────────────────────────────────────────────
@@ -1252,7 +1627,12 @@ async function settleVerdict(
   }
   // A cut-off run's leftovers go back on a card of their own, after the note
   // that explains them — the card holds the buttons, so it comes last.
-  const staged = verdict.restage ? await restageExecution(verdict.restage, ctx.deps) : null;
+  const staged = verdict.restage
+    ? await restageExecution(verdict.restage, {
+        ...ctx.deps,
+        proposalEvents: ctx.deps.usage.proposalEvents,
+      })
+    : null;
   if (staged) await ctx.memory.remember(staged.proposal.proposalText);
   return {
     disposition: staged ? "staged" : "resolved",
@@ -1284,7 +1664,10 @@ async function settleVerdict(
  */
 export async function restageExecution(
   restage: GateRestage,
-  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards">,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards" | "onRestaged"> & {
+    /** Where the fresh card's staging is recorded. */
+    proposalEvents: ProposalEventLog;
+  },
 ): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
   const original = restage.proposal;
   const first = restage.operations[0]!;
@@ -1318,8 +1701,25 @@ export async function restageExecution(
     input: first.input,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    // The ask's own card, carried across however many re-stagings.
+    originProposalTs: stagingCardOf(original),
   };
-  await deps.threadState.putProposal(proposal);
+  const { retired } = await deps.threadState.putProposal(proposal);
+  // The fresh card is the ask's card's successor on the record: through
+  // `originProposalTs` it takes that card's turn, channel and test-traffic
+  // flag, so a ticket its ✅ files still finds the turn that asked for it.
+  await recordProposalEvents(deps.proposalEvents, [
+    ...supersededEvents(retired, Date.now(), "restage"),
+    stagedEvent({
+      proposal,
+      at: Date.now(),
+      via: "restage",
+      channelStored: false,
+    }),
+  ]);
+  await deps.onRestaged?.(original, proposal).catch((err: unknown) => {
+    console.error(`[turn] re-staged card's records not moved: ${err instanceof Error ? err.message : String(err)}`);
+  });
   return { proposal, card };
 }
 
@@ -1901,6 +2301,28 @@ function caveatsFor(
 }
 
 // ── Small pure helpers ───────────────────────────────────────────────────────
+
+/** Every operation in `revised` is one of `original`'s, byte for byte. */
+function isSubsetOf(revised: readonly ProposalOperation[], original: readonly ProposalOperation[]): boolean {
+  const kept = new Set(original.map(stableStringify));
+  return revised.length > 0 && revised.every((op) => kept.has(stableStringify(op)));
+}
+
+/** Whether a batch replaces any block the card replaces. */
+function touchesBlocksOf(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
+  const theirs = replacedBlocks(proposalOperations(card));
+  return [...replacedBlocks(operations)].some((b) => theirs.has(b));
+}
+
+/**
+ * Whether a batch touches a keyed card: for a sweep card, replaces one of its
+ * blocks; for any other, uses one of its tools.
+ */
+function touchesCard(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
+  if (card.sweepRun) return touchesBlocksOf(operations, card);
+  const tools = new Set(proposalOperations(card).map((op) => op.toolName));
+  return operations.some((op) => tools.has(op.toolName));
+}
 
 /** Key-order-independent JSON compare, so two generations of the same tool
  *  input register as identical even if the model emitted fields in a different

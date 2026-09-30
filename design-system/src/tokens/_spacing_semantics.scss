@@ -2,6 +2,10 @@
  * Semantic Spacing Tokens
  * These are the tokens designers and developers should use
  * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Surface Containers
+ *
+ * Hand-edited 2026-09-29: --size-element-stroke-xl points at stroke-300 (3px),
+ * as Figma's Element/stroke-xl does, because the generator refuses to run
+ * against the incomplete source exports. The source JSON agrees (3).
  */
 
 :root {
@@ -26,7 +30,7 @@
     --size-element-stroke-lg: var(--size-border-stroke-stroke-200);
     --size-element-stroke-md: var(--size-border-stroke-stroke-150);
     --size-element-stroke-sm: var(--size-border-stroke-stroke-100);
-    --size-element-stroke-xl: var(--size-border-stroke-stroke-250);
+    --size-element-stroke-xl: var(--size-border-stroke-stroke-300);
     --size-element-border: var(--size-border-stroke-stroke-100);
 
     /* Cards Layer */

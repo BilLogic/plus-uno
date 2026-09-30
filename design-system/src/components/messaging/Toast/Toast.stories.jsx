@@ -90,11 +90,28 @@ function ToastVariantsDemos() {
     );
 }
 
+/*
+ * `color-contrast` skips only the warning header's title and timestamp:
+ * accepted contrast exception, recorded in the text-contrast baseline; do not
+ * darken. Every other element and rule is still checked.
+ */
+const WARNING_HEADER_A11Y_PARAMS = {
+    a11y: {
+        config: {
+            rules: [{
+                id: 'color-contrast',
+                selector: '*:not(.plus-toast.warning .plus-toast-title):not(.plus-toast.warning .plus-toast-timestamp)',
+            }],
+        },
+    },
+};
+
 export const Styles = () => (
     <div className="d-flex flex-column gap-3">
         <ToastVariantsDemos />
     </div>
 );
+Styles.parameters = WARNING_HEADER_A11Y_PARAMS;
 
 export const Overview = () => (
     <ToastContainer className="p-3" style={{ position: 'static' }}>
@@ -161,6 +178,26 @@ Interactive.parameters = {
 const TOAST_STYLES = ['primary', 'secondary', 'danger', 'success', 'info', 'warning'];
 
 /**
+ * One toast per header color, stacked. `toastProps(style)` supplies what
+ * differs per story (test id, visibility, body); `children` follows the stack.
+ */
+const ToastPerStyle = ({ toastProps, children }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+        {TOAST_STYLES.map((style) => (
+            <Toast
+                key={style}
+                style={style}
+                title={`${style} toast`}
+                timestamp="Just now"
+                autohide={false}
+                {...toastProps(style)}
+            />
+        ))}
+        {children}
+    </div>
+);
+
+/**
  * The × on every header color. It is the shared `CloseButton` in its inverse
  * tone, so its size and focus ring are CloseButton's own tests; what is tested
  * here is how the Toast uses it. It sits one header gap after the timestamp, as
@@ -171,25 +208,20 @@ const TOAST_STYLES = ['primary', 'secondary', 'danger', 'success', 'info', 'warn
 export const Dismiss = () => {
     const [closed, setClosed] = useState([]);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
-            {TOAST_STYLES.map((style) => (
-                <Toast
-                    key={style}
-                    style={style}
-                    title={`${style} toast`}
-                    timestamp="Just now"
-                    show={!closed.includes(style)}
-                    autohide={false}
-                    onClose={() => setClosed((list) => [...list, style])}
-                    data-testid={`dismiss-${style}`}
-                >
-                    Press the × to close it.
-                </Toast>
-            ))}
+        <ToastPerStyle
+            toastProps={(style) => ({
+                show: !closed.includes(style),
+                onClose: () => setClosed((list) => [...list, style]),
+                'data-testid': `dismiss-${style}`,
+                children: 'Press the × to close it.',
+            })}
+        >
             <span className="body2-txt" data-testid="dismiss-closed">{closed.join(' ')}</span>
-        </div>
+        </ToastPerStyle>
     );
 };
+
+Dismiss.parameters = WARNING_HEADER_A11Y_PARAMS;
 
 Dismiss.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -230,6 +262,50 @@ Dismiss.play = async ({ canvasElement }) => {
     await userEvent.click(within(warning).getByRole('button', { name: 'Close' }));
     await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('warning');
     await waitFor(() => expect(canvas.queryByTestId('dismiss-warning')).toBeNull());
+};
+
+/**
+ * Every header draws its title, timestamp and icon in its fill's own content
+ * color, `--color-on-<role>`, as Figma binds them; the × is CloseButton's
+ * inverse tone, as the Dismiss story asserts. On the warning fill, title and
+ * timestamp: accepted contrast exception, recorded in the text-contrast
+ * baseline; do not darken.
+ */
+export const HeaderContent = () => (
+    <ToastPerStyle
+        toastProps={(style) => ({
+            show: true,
+            'data-testid': `header-${style}`,
+            children: `Header content uses the on-${style} color.`,
+        })}
+    />
+);
+
+HeaderContent.parameters = WARNING_HEADER_A11Y_PARAMS;
+
+HeaderContent.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const inverse = tokenColor(canvasElement, '--color-surface');
+
+    for (const style of TOAST_STYLES) {
+        const toast = canvas.getByTestId(`header-${style}`);
+        const header = toast.querySelector('.toast-header');
+        await expect(getComputedStyle(header).backgroundColor, `${style}: header fill`)
+            .toBe(tokenColor(canvasElement, `--color-${style}`));
+
+        const onRole = tokenColor(canvasElement, `--color-on-${style}`);
+        const parts = {
+            title: toast.querySelector('.plus-toast-title'),
+            timestamp: toast.querySelector('.plus-toast-timestamp'),
+            icon: toast.querySelector('.plus-toast-icon i'),
+        };
+        for (const [part, node] of Object.entries(parts)) {
+            await expect(getComputedStyle(node).color, `${style}: ${part} is on-${style}`).toBe(onRole);
+        }
+
+        const glyph = within(toast).getByRole('button', { name: 'Close' }).querySelector('i');
+        await expect(getComputedStyle(glyph).color, `${style}: × is the inverse tone`).toBe(inverse);
+    }
 };
 
 /**

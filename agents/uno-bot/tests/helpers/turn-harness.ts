@@ -24,10 +24,14 @@ import {
 } from "../../src/turn/index";
 import { runOperations, type OperationOutcome } from "../../src/gate/index";
 import {
+  createInMemoryProposalEventLog,
   createInMemoryUsageLog,
+  type InMemoryProposalEventLog,
   type InMemoryUsageLog,
+  type ProposalEventLog,
   type TurnOrigin,
   type UsageLog,
+  type SubType,
 } from "../../src/usage/index";
 import type { ModelUsage } from "../../src/agent/model-provider";
 import type { AbsenceContext } from "../../src/agent/absence";
@@ -128,6 +132,9 @@ export interface Harness {
   /** The usage records the turn left — the in-memory log, unless the case
    *  handed in a log of its own (then this one stays empty). */
   usage: InMemoryUsageLog;
+  /** The proposal events the turn left — the in-memory log, unless the case
+   *  handed in a log of its own. */
+  proposalEvents: InMemoryProposalEventLog;
 }
 
 export function harness(opts: {
@@ -175,6 +182,9 @@ export function harness(opts: {
   /** Stand in for the usage log — one that throws, say. Absent, the turn
    *  records into `harness().usage`. */
   usageLog?: UsageLog;
+  /** Stand in for the proposal-event log — one that throws, say. Absent, the
+   *  turn records into `harness().proposalEvents`. */
+  proposalEventLog?: ProposalEventLog;
   /** Where the turn came from; absent, a person in Slack. */
   origin?: TurnOrigin;
   /** `TEST_CHANNEL_IDS`, parsed. Absent, none. */
@@ -184,6 +194,8 @@ export function harness(opts: {
   providerUsage?: Partial<ModelUsage>;
   /** The turn's clock. Absent, the real one. */
   now?: () => number;
+  /** A DM ask's in-turn classifier. Absent, DM asks are recorded unlabelled. */
+  classifyAsk?: (text: string) => Promise<SubType | null>;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -193,6 +205,7 @@ export function harness(opts: {
     ...(opts.providerUsage ? { usage: opts.providerUsage } : {}),
   });
   const usage = createInMemoryUsageLog();
+  const proposalEvents = createInMemoryProposalEventLog({ turns: usage });
   const resolved: Harness["resolved"] = [];
   const ran: OperationOutcome[] = [];
   const judged: JudgeCall[] = [];
@@ -282,11 +295,14 @@ export function harness(opts: {
 
     usage: {
       log: opts.usageLog ?? usage,
+      proposalEvents: opts.proposalEventLog ?? proposalEvents,
       origin: opts.origin ?? "slack",
       testChannelIds: opts.testChannelIds ?? [],
       // A log that never answers must not make the suite wait out production's
-      // timeout.
+      // timeout — nor a classifier that never answers.
       writeTimeoutMs: 50,
+      classifyTimeoutMs: 50,
+      ...(opts.classifyAsk ? { classifyAsk: opts.classifyAsk } : {}),
     },
 
     ...(opts.now ? { now: opts.now } : {}),
@@ -324,7 +340,7 @@ export function harness(opts: {
     deliveredBody: (text) => text,
   };
 
-  return { deps, delivery, threadState, provider, resolved, ran, judged, executed, usage };
+  return { deps, delivery, threadState, provider, resolved, ran, judged, executed, usage, proposalEvents };
 }
 
 /** Posts a person would actually read, in order. */

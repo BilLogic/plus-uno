@@ -34,7 +34,7 @@ import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThr
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
 import { resolveSignal, type GateSignal } from "../src/gate/index";
-import { createInMemoryThreadState, revisedBy, type PendingProposal } from "../src/thread-state/index";
+import { createInMemoryThreadState, proposalSlot, type PendingProposal } from "../src/thread-state/index";
 
 const FILE_KEY = "zAecJNRdvJzAUOcjV32tRX";
 const REPO = "BilLogic/plus-uno";
@@ -449,7 +449,7 @@ describe("the morning post", () => {
     await threadState.putProposal(weekly);
     // A turn answering an @mention in the same thread: it sees the weekly card
     // as the thread's pending card, but does not revise it.
-    assert.equal(revisedBy(weekly), null);
+    assert.equal(proposalSlot(weekly), `${weekly.replyTs}#ds-precedence`, "the weekly card holds its own slot");
     const agentCard: PendingProposal = {
       toolName: "notion_create",
       input: { title: "x" },
@@ -521,6 +521,7 @@ describe("a dispute in the thread", () => {
     await threadState.putProposal(first);
     const record = kv<PostedThread | null>(thread);
     const posts: Post[] = [];
+    const superseded: string[] = [];
     let n = 0;
     const deps: DisputeDeps = {
       thread: {
@@ -540,7 +541,15 @@ describe("a dispute in the thread", () => {
         if (opts.stageThrows && p.proposalTs !== first.proposalTs) throw new Error("ThreadState down");
         await threadState.putProposal(p);
       },
-      retire: (ts) => threadState.retireProposal(ts),
+      restore: async (p) => {
+        await threadState.putProposal(p);
+      },
+      retire: async (ts) => {
+        await threadState.retireProposal(ts);
+      },
+      superseded: async (tss) => {
+        superseded.push(...tss);
+      },
       card: async (ts) => {
         const found = await threadState.getProposalByTs(ts);
         return found.state === "found" ? found.proposal : null;
@@ -549,7 +558,7 @@ describe("a dispute in the thread", () => {
     };
     const dispute = (text: string, threadTs = thread.ts) =>
       disputePrecedenceItems(deps, { channel: CHANNEL, threadTs, user: MEMBERS[0]!, text });
-    return { thread, first, threadState, record, posts, deps, dispute };
+    return { thread, first, threadState, record, posts, deps, dispute, superseded };
   }
 
   it("revises the card without the disputed item, in the same thread", async () => {
@@ -568,6 +577,7 @@ describe("a dispute in the thread", () => {
     assert.ok((p!.ttlMs ?? 0) < PRECEDENCE_CARD_TTL_MS, "a revision does not extend the card's life");
     assert.deepEqual(w.record.box.value?.disputed, [2]);
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
+    assert.deepEqual(w.superseded, [w.first.proposalTs], "superseded on the usage record once the revision is in place");
   });
 
   it("disputing every item withdraws the card", async () => {
@@ -607,6 +617,7 @@ describe("a dispute in the thread", () => {
     assert.equal(await w.dispute("dispute 2"), true, "no fall-through to a turn");
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
     assert.equal(w.record.box.value?.cardTs, w.first.proposalTs, "the record names the live card");
+    assert.deepEqual(w.superseded, [], "the restored card is not superseded on the record");
     assert.match(w.posts.at(-1)!.text, /didn't go through/);
     // The next dispute is judged against the card that is actually live.
     const posted = w.posts.length;

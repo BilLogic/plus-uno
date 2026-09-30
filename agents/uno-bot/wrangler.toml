@@ -215,6 +215,18 @@ UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
+# ── End-of-day sweep (src/sweep/) ────────────────────────────────────────────
+# The channels the end-of-day run reads for Notion drift, one job per channel:
+# comma-separated channel ids. THIS IS THE ONE LINE TO GROW — add a design
+# channel's id here once uno-bot is a member, and the next end-of-day run sweeps
+# it. Findings post at the next weekday morning run, in the thread the evidence
+# is in. #uno-bot is never swept whatever this says, DMs and group DMs are never
+# read, and a private channel listed here is skipped for now. Its cursors and
+# records live in USAGE_DB (migrations/usage/0002_sweep.sql); the findings wait
+# for the morning in HARNESS_KV under "sweep:findings:<channel>". Leave blank → nothing
+# is swept. Dry run: GET /debug/sweep?dry_run=1.
+#   plus-design C03FC8AS69K
+SWEEP_CHANNELS = "C03FC8AS69K"
 # #plus-design-feedback channel id — shareout_post drops feedback bundles here
 # (distinct from the reviews channel above). Leave blank → shareout falls back
 # to the origin thread.
@@ -298,6 +310,12 @@ CLAUDE_MODEL = "claude-sonnet-5"
 # greeting with no ask are test traffic without being listed here.
 #   uno-bot-sandbox C0B4QBWAUJU
 TEST_CHANNEL_IDS = "C0B4QBWAUJU"
+# The lead: a reply of theirs in an ask's thread, or a DM to them from the asker
+# on the same topic within 24 h, marks the ask escalated (src/usage/resolution.ts).
+# The end-of-day pass reads that DM half on the lead's OWN connected token
+# (/oauth/slack/start, ADR-020); unconnected, it records "none" instead.
+#   Bill U03FYQJRQHX
+LEAD_USER_ID = "U03FYQJRQHX"
 
 # Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
 # GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.
@@ -393,14 +411,16 @@ id = "aa0ba01735c545d1abe887bd81fc98aa"
 # KV — delivery-alert throttle, the Gemini explicit-cache memo, and the Figma
 # library's state under "figma-poll:*": the component snapshot, the findings
 # waiting for the morning post, and the posted cards being tracked
-# (src/figma-poll.ts, src/figma-library/env.ts). NOT a
+# (src/figma-poll.ts, src/figma-library/env.ts) — and the sweep's findings
+# waiting for the morning under "sweep:findings:*" (src/sweep/env.ts). NOT a
 # harness fallback: the harness is baked into the bundle and skills.ts serves
 # the compiled constant with zero KV access.
 [[kv_namespaces]]
 binding = "HARNESS_KV"
 id = "060347fa19cb41398dd516a8f7b8b21a"
 
-# D1 — the usage record: one row per turn (src/usage/, ADR-030). Its schema is
+# D1 — the usage record: one row per turn (src/usage/, ADR-030), and the
+# end-of-day sweep's cursors, runs and items (src/sweep/). Its schema is
 # migrations/usage/, applied with `wrangler d1 migrations apply uno-bot-usage`
 # (`--local` for a dev database, `--remote` for this one) — migrations/README.md.
 # The Worker tolerates the binding being absent: turns are answered as before

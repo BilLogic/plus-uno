@@ -55,12 +55,17 @@ Three jobs, from the spec (#742):
 
 - DM text.
 - Anything about the other party in a DM beyond what a reminder strictly needs.
+  The one DM-derived fact kept is a boolean, `escalated_to_lead`: whether an
+  asker raised the same topic with the lead. It is read on the lead's own token
+  (ADR-020, the 2026-09-29 amendment).
 - Channel request text past its classification, and in any case past 14 days.
 - Secrets and tokens.
 
 The first migration stores no message text at all: the row carries ids, times,
 counts, names of tools, and the *kinds* of source an answer linked to (Notion,
-the blueprint, Figma), never the links or the words.
+the blueprint, Figma), never the links or the words. The one link kept is a
+GitHub issue uno-bot filed on itself: `turns.self_filed_ticket_url` (0001),
+and the same link on a card's staged row, `proposal_events.ticket_url` (0003).
 
 **Access** is the uno-bot Cloudflare account's members and the query files. The
 bot never quotes one person's rows to another. **Retention**: turn metadata is

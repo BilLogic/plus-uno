@@ -65,7 +65,7 @@ Provide contextual feedback messages for typical user actions with the handful o
     <DsCanvasQuiet of={AlertStories.Styles} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Each style's 3px left border in its Border color, with on-surface title, body and link, on the darkest surface step.</>}>
+<DocsCanvasShell description={<>Each style's 3px left border in its Border color on its Container 08 ground, with on-surface title, body and link, on the darkest surface step.</>}>
     <DsCanvasQuiet of={AlertStories.BorderAndText} />
 </DocsCanvasShell>
 
@@ -133,11 +133,13 @@ list is shorter than `Button`'s — there is no `tertiary`, no `light` or `dark`
 and there are no SMART domain colors, because an alert is always saying
 something about state.
 
-Each style sets the ground, a 3px border on the left edge only in the style's
-Border color, and a default leading icon, drawn in the style's Icon color on the
+Each style sets the ground, its `Container 08` state layer
+(`--color-<style>-container-state-08`), a 3px border on the left edge only
+(`--size-element-stroke-xl`) in the style's Border color, and a default leading
+icon, drawn in the style's Icon color on the
 first line of text. The title, the body and any link in it are
 `--color-on-surface` in every style: the style is carried by the border, the
-icon and the ground, not by the text.
+icon and the ground, not by the text. Every style has 4px corners.
 
 | Style | Default icon |
 |---|---|

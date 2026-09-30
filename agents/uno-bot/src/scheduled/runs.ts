@@ -15,6 +15,13 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import { CLASSIFY_BATCHES } from "../usage/classify-run";
+import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
+
+/** The end-of-day run's first `ask-resolution` job: the one that announces a
+ *  missing token, and the one a dry run rehearses. */
+export const FIRST_ASK_RESOLUTION_KEY = "ask-resolution-1";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -23,7 +30,16 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * The Figma library's three: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, and the morning track follows
  * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
- * weekly DS precedence check's two: Friday's end-of-day check, and the morning
+ * usage record's two: the end-of-day classify jobs label a batch of channel
+ * asks each, and the purge — in both runs — keeps text under its 14 days
+ * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
+ * that records how each ask was resolved (src/usage/resolution-pass.ts).
+ * The end-of-day `proposal-expiry` records every card that aged out untouched
+ * (src/usage/proposal-events.ts).
+ * The sweep's two: one end-of-day `sweep-channel` job per swept channel reads
+ * the day and keeps its drift findings, and the morning `sweep-post` stages
+ * them as proposal cards (src/sweep/).
+ * The weekly DS precedence check's two: Friday's end-of-day check, and the morning
  * post that opens its thread in #plus-universal (src/ds-precedence/).
  */
 export type ScheduledJobKind =
@@ -31,6 +47,12 @@ export type ScheduledJobKind =
   | "figma-library-poll"
   | "figma-library-post"
   | "figma-library-track"
+  | "usage-classify"
+  | "usage-text-purge"
+  | "ask-resolution"
+  | "proposal-expiry"
+  | "sweep-channel"
+  | "sweep-post"
   | "ds-precedence-check"
   | "ds-precedence-post";
 
@@ -44,6 +66,8 @@ export interface ScheduledJob {
    * be done first. The runner passes over it while any of them is pending.
    */
   readonly after?: readonly string[];
+  /** The channel a `sweep-channel` job reads. */
+  readonly channel?: string;
   /** The UTC weekday (0 Sunday … 6 Saturday) the job is planned on; absent,
    *  every day its run fires. */
   readonly weekday?: number;
@@ -82,11 +106,31 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
+    { key: "sweep-post", kind: "sweep-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
+    // Both runs purge, so no text outlives 14 days across a weekend and one
+    // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
+    { key: "usage-text-purge", kind: "usage-text-purge" },
   ],
   "end-of-day": [
     { key: "figma-library-poll", kind: "figma-library-poll" },
+    // Second, so a rehearsal reaches it before the batches spend the ceiling.
     { key: "ds-precedence-check", kind: "ds-precedence-check", after: ["figma-library-poll"], weekday: FRIDAY },
+    // One job per classification batch, each an alarm of its own. Each takes
+    // whatever is still pending, so a quiet day's later jobs find nothing.
+    ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({
+      key: `usage-classify-${i + 1}`,
+      kind: "usage-classify" as const,
+    })),
+    // One alarm reads `PASS_LIMIT` asks; the run holds enough jobs for a day's
+    // (src/usage/resolution-pass.ts states the budget math).
+    ...Array.from({ length: ASK_RESOLUTION_JOBS }, (_, i) => ({
+      key: i === 0 ? FIRST_ASK_RESOLUTION_KEY : `ask-resolution-${i + 1}`,
+      kind: "ask-resolution" as const,
+    })),
+    // Not after the classify jobs: the purge holds whether or not they ran.
+    { key: "usage-text-purge", kind: "usage-text-purge" },
+    { key: "proposal-expiry", kind: "proposal-expiry" },
   ],
 };
 
@@ -112,19 +156,56 @@ export function runsForFiring(scheduledTime: number): ScheduledRunName[] {
 export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
 /**
- * A run, planned for the UTC date of `at`: its jobs for that weekday, or for
- * `weekday` when given — how the sweep probe rehearses Friday's jobs on a
- * Tuesday. The date stays `at`'s.
+ * A run, planned for the UTC date of `at`: its jobs for that weekday — or
+ * for `weekday` when given, which is how the sweep probe rehearses Friday's
+ * jobs on a Tuesday; the date stays `at`'s. The weekday filter covers every
+ * job, the spread-in batches and the sweep jobs included. The end-of-day run
+ * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
+ * `sweep:<channel>`.
  *
  * @param name - Which run
  * @param at - When it fires, epoch ms
+ * @param sweepChannels - The channels to sweep (`sweepChannelsFrom`)
  * @param weekday - Plan this weekday's jobs instead (0 Sunday … 6 Saturday)
  */
-export function planRun(name: ScheduledRunName, at: number, weekday?: number): ScheduledRun {
+export function planRun(
+  name: ScheduledRunName,
+  at: number,
+  sweepChannels: readonly string[] = [],
+  weekday?: number,
+): ScheduledRun {
+  const sweeps: ScheduledJob[] =
+    name === "end-of-day"
+      ? sweepChannels.map((channel) => ({ key: `sweep:${channel}`, kind: "sweep-channel", channel }))
+      : [];
+  // The sweep jobs go before the purge, which stays last in every run.
+  const plan = RUN_PLANS[name];
+  const purge = plan.findIndex((j) => j.kind === "usage-text-purge");
+  const all = purge < 0 ? [...plan, ...sweeps] : [...plan.slice(0, purge), ...sweeps, ...plan.slice(purge)];
   const d = new Date(at);
   const day = weekday ?? d.getUTCDay();
-  const jobs = RUN_PLANS[name].filter((job) => job.weekday === undefined || job.weekday === day);
+  const jobs = all.filter((job) => job.weekday === undefined || job.weekday === day);
   return { name, date: d.toISOString().slice(0, 10), jobs };
+}
+
+/**
+ * The channels the end-of-day sweep reads, from `SWEEP_CHANNELS` — a
+ * comma-separated list of channel ids, and the one line to grow when uno-bot
+ * joins another design channel. #uno-bot is never swept, whatever the list
+ * says: it is where the team reports problems with uno-bot, not a design
+ * channel. A DM id (`D…`) is never read either; a private channel on the list
+ * is refused by the job itself, which is the one that can ask Slack.
+ *
+ * @param value - `SWEEP_CHANNELS`
+ * @param unoBotChannel - `UNO_BOT_CHANNEL_ID`
+ */
+export function sweepChannelsFrom(value: string | undefined, unoBotChannel?: string): string[] {
+  const never = unoBotChannel?.trim();
+  const ids = (value ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => id && id !== never && !id.startsWith("D"));
+  return [...new Set(ids)];
 }
 
 /**
@@ -144,6 +225,8 @@ export function runnerNameForRun(name: ScheduledRunName): string {
 export interface FiringDeps {
   /** Put a planned run on its runner. */
   enqueueRun(run: ScheduledRun): Promise<void>;
+  /** The channels the end-of-day run sweeps (`sweepChannelsFrom`). */
+  sweepChannels?: readonly string[];
 }
 
 /**
@@ -156,7 +239,7 @@ export interface FiringDeps {
  * @param deps - The enqueue
  */
 export async function onScheduledFiring(scheduledTime: number, deps: FiringDeps): Promise<void> {
-  const runs = runsForFiring(scheduledTime).map((name) => planRun(name, scheduledTime));
+  const runs = runsForFiring(scheduledTime).map((name) => planRun(name, scheduledTime, deps.sweepChannels));
   await Promise.all(
     runs.map((run) =>
       deps.enqueueRun(run).catch((err: unknown) => {

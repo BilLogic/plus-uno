@@ -263,17 +263,30 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
   });
 
-  // A card keyed apart shares a reply thread with the conversation's cards
-  // but supersedes only by its key: neither retires the other, and a card with
-  // the same key still replaces it.
+  // A sweep card has its own slot in its thread: a turn's card staged there
+  // leaves it live, and a revision of the sweep card retires only it.
+  it("a sweep card and a turn's card stay live side by side in one thread", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+  });
+
+  // Every keyed card holds its own slot: a card with another key, or none,
+  // leaves it live, and only a card with the same key replaces it.
   it("a card with a supersedeKey is replaced only by its own key", async () => {
     const { store } = setup();
-    const key = "ds-precedence:1700.1";
-    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, supersedeKey: key }));
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
     await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
-    assert.equal((await store.getProposalByTs("1700.2")).state, "found", "a turn's card leaves it live");
-    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, supersedeKey: key }));
+    await store.putProposal(proposal({ proposalTs: "1700.5", replyTs: THREAD.thread, supersedeKey: "sweep", sweepRun: "2026-09-30" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found", "a turn's card and a sweep card leave it live");
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
     assert.equal((await store.getProposalByTs("1700.3")).state, "found", "it leaves the turn's card live");
+    assert.equal((await store.getProposalByTs("1700.5")).state, "found", "and the sweep card");
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded", "its revision replaces it");
   });
 
@@ -304,6 +317,44 @@ export function runThreadStateConformance(
     clock.advance(PROPOSAL_TTL_MS + 1);
     await store.putProposal(proposal({ proposalTs: "1700.3" }));
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  // What a staging and a retire REPORT: the usage record says a card was
+  // replaced only when one of these calls is what took it out of reach.
+  it("staging reports the live card it retired, and nothing else", async () => {
+    const { store, clock } = setup();
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.2" })), { retired: [] });
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.3" })), { retired: ["1700.2"] });
+    // Another thread's card, and an aged-out one, are not this staging's.
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread, replyTs: OTHER.thread }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.5" })), { retired: [] });
+  });
+
+  it("a staging does not report a card its caller already retired", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: true });
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.3" })), { retired: [] });
+  });
+
+  it("a retire reports false for a card claimed, already retired, replaced, aged out or unknown", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.claimProposal("1700.2"), true);
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: false });
+
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.deepEqual(await store.retireProposal("1700.3"), { retired: true });
+    assert.deepEqual(await store.retireProposal("1700.3"), { retired: false });
+
+    await store.putProposal(proposal({ proposalTs: "1700.4" }));
+    await store.putProposal(proposal({ proposalTs: "1700.5" })); // replaces 1700.4
+    assert.deepEqual(await store.retireProposal("1700.4"), { retired: false });
+
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await store.retireProposal("1700.5"), { retired: false });
+    assert.deepEqual(await store.retireProposal("9999.9"), { retired: false });
   });
 
   // A card that was replaced AND has since aged out reads as superseded while

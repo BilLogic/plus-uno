@@ -26,6 +26,7 @@
 // the Node suite DRIVE it rather than read it.
 
 import { mapReaction } from "./reactions";
+import { isResolvingReaction, type AnswerReaction } from "../usage/resolution";
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateRestage, type GateVerdict } from "./gate";
@@ -39,6 +40,8 @@ export interface ReactionRequest {
   glyph: string;
   /** Who reacted. */
   userId: string;
+  /** Who wrote the reacted message (Slack's `item_user`), when the event says. */
+  messageAuthorId?: string;
 }
 
 /** Where the door speaks: the verdict's own reply thread, against the message
@@ -88,6 +91,16 @@ export interface ReactionDoorDeps {
    * (`turn/turn.ts` `restageExecution`), and the envelope binds it.
    */
   restage(restage: GateRestage, delivery: Delivery): Promise<void>;
+
+  /**
+   * Put the asker's ✅ / 👍 on a bot answer on the usage record
+   * (`usage/resolution.ts`). Called only for a reaction the gate did not act
+   * on as a card, so nothing a card sees changes; the adapter matches the
+   * reactor to the ask, so someone else's reaction records nothing, and
+   * refuses a reacted ts that is a known card — one used up, which the gate
+   * no longer holds, still is. Must not throw — the envelope logs and swallows.
+   */
+  recordReaction?(reaction: AnswerReaction): Promise<void>;
 }
 
 export async function runReactionDoor(
@@ -109,17 +122,35 @@ export async function runReactionDoor(
   if (self && request.userId === self) return;
 
   const { channel } = request;
+  const thread = await deps.threadRootOf(channel, request.messageTs);
   const verdict = await resolveSignal(
     {
       kind: "reaction",
       messageTs: request.messageTs,
       channel,
-      thread: await deps.threadRootOf(channel, request.messageTs),
+      thread,
       glyph: request.glyph,
       userId: request.userId,
     },
     { threadState: deps.threadState },
   );
+
+  // Not a card, and a bot answer: the self-serve signal. Only when the gate did
+  // nothing at all — no claim, nothing to say, no card it points at — so a
+  // refusal, a "not on the card" pointer or a which-card question never also
+  // counts as "that answered it". A card is still resolved only by a reaction
+  // placed ON it.
+  if (
+    deps.recordReaction &&
+    verdict.outcome === "none" &&
+    !verdict.post &&
+    !verdict.proposal &&
+    self !== undefined &&
+    request.messageAuthorId === self &&
+    isResolvingReaction(request.glyph)
+  ) {
+    await deps.recordReaction({ channel, threadRoot: thread, reactedTs: request.messageTs, userId: request.userId });
+  }
 
   if (!verdict.post) return; // not a gate reaction, or nothing live to point at
 

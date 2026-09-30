@@ -14,6 +14,7 @@
 
 import type { Env } from "../types";
 import { countedFetch, subrequestBudgetSpent, rethrowIfBudget } from "../net";
+import { isPlainRichText, RICH_TEXT_TYPES, type RichTextRun } from "./notion-rich-text";
 import {
   chunkBlocks,
   markdownToNotionBlocks,
@@ -585,6 +586,9 @@ export interface NotionPageBlock {
   lastEditedTime: string;
   /** The block's rendered text — the line it contributed to `text`. */
   text: string;
+  /** Words only: no link, mention, equation or formatting a text replace
+   *  would drop (`isPlainRichText`). */
+  plain: boolean;
 }
 
 interface NotionProperty {
@@ -620,22 +624,51 @@ function renderProperty(p: NotionProperty): string {
   }
 }
 
+/** The mark a block's rendered line leads with, by type: what a reader of
+ *  `text` sees, and never part of the block's own rich text. */
+function displayPrefix(type: string): string {
+  if (type === "bulleted_list_item" || type === "numbered_list_item") return "• ";
+  if (type === "to_do") return "☐ ";
+  return "";
+}
+
+/**
+ * A block's text without the mark its rendered line leads with — the text an
+ * in-place replacement writes back, so a fix drafted from `• Owner: Ade`
+ * writes `Owner: Ade` into the list item rather than a second bullet.
+ *
+ * @param type - Notion's block type
+ * @param text - The rendered line, or a replacement drafted from one
+ */
+export function stripBlockPrefix(type: string, text: string): string {
+  const prefix = displayPrefix(type);
+  return prefix && text.startsWith(prefix) ? text.slice(prefix.length) : text;
+}
+
 function blockText(block: Record<string, unknown>): string {
   const type = block.type as string;
   const body = block[type] as { rich_text?: NotionRichText } | undefined;
   const txt = plain(body?.rich_text);
   if (!txt) return "";
-  if (type === "bulleted_list_item" || type === "numbered_list_item") return `• ${txt}`;
-  if (type === "to_do") return `☐ ${txt}`;
   if (type.startsWith("heading")) return `\n${txt}`;
-  return txt;
+  return `${displayPrefix(type)}${txt}`;
 }
 
 /**
  * Read a Notion page: title + rendered properties (incl. people/Owner) + block
  * text. Throws on failure so read_source can report it honestly. Read-only.
+ *
+ * A children page that fails, or a budget that runs out mid-read, leaves the
+ * blocks already read — what `read_source` shows — and that partial read is
+ * not cached. With `complete`, either throws instead (a failed page as
+ * `Notion <status>`): the sweep reads a page to judge all of it, and a page
+ * read as empty would pass its thread by.
  */
-export async function readNotionPage(env: Env, pageId: string): Promise<NotionPageContent> {
+export async function readNotionPage(
+  env: Env,
+  pageId: string,
+  opts: { complete?: boolean } = {},
+): Promise<NotionPageContent> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
 
   // Serve a fresh cached read (0 subrequests) if we read this page recently.
@@ -671,12 +704,25 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
     const lines: string[] = [];
     const blocks: NotionPageBlock[] = [];
     let cursor: string | undefined;
+    let partial = false;
     for (let i = 0; i < READ_BLOCK_PAGES; i++) {
-      if (subrequestBudgetSpent()) break; // keep the blocks already read
+      // Keep the blocks already read; a complete read lets the fetch below
+      // throw the budget's own error instead.
+      if (!opts.complete && subrequestBudgetSpent()) {
+        partial = true;
+        break;
+      }
       const qs = new URLSearchParams({ page_size: "100" });
       if (cursor) qs.set("start_cursor", cursor);
       const bRes = await countedFetch(`${NOTION_API}/blocks/${pageId}/children?${qs.toString()}`, { headers, signal: controller.signal });
-      if (!bRes.ok) break;
+      if (!bRes.ok) {
+        if (opts.complete) {
+          const err = (await bRes.json().catch(() => ({}))) as { code?: string; message?: string };
+          throw notionError(bRes.status, err, "the page's blocks could not be read");
+        }
+        partial = true;
+        break;
+      }
       const bData = (await bRes.json()) as {
         results?: Record<string, unknown>[]; has_more?: boolean; next_cursor?: string;
       };
@@ -686,11 +732,13 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
         lines.push(line);
         // Identity travels with the text, not beside it: the model can only
         // cite a block it was told the id of, and it can only be told here.
+        const type = String(block.type ?? "");
         blocks.push({
           id: String(block.id ?? ""),
-          type: String(block.type ?? ""),
+          type,
           lastEditedTime: String(block.last_edited_time ?? ""),
           text: line.trim(),
+          plain: isPlainRichText((block[type] as { rich_text?: RichTextRun[] } | undefined)?.rich_text),
         });
       }
       if (!bData.has_more || !bData.next_cursor) break;
@@ -705,8 +753,10 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
       text: lines.join("\n").slice(0, READ_TEXT_CAP),
       blocks,
     };
-    // Cache only successful reads (never a throw). Clear when full — a long-lived
-    // isolate shouldn't grow this unbounded; simple beats an LRU here.
+    // Cache only whole reads (never a throw or a partial one). Clear when
+    // full — a long-lived isolate shouldn't grow this unbounded; simple beats
+    // an LRU here.
+    if (partial) return result;
     if (readCache.size >= READ_CACHE_MAX) readCache.clear();
     readCache.set(pageId, { at: Date.now(), value: result });
     return result;
@@ -1114,6 +1164,10 @@ export interface NotionUpdateResult {
   replaced: number;
   /** Replacements that wrote NOTHING, each saying which block and why. */
   refused: string[];
+  /** How many of `refused` were refused because the block's stamp had moved
+   *  since it was read (ADR-029) — what the usage record counts as a stale
+   *  write refused. */
+  staleStamps: number;
 }
 
 // Fetch a page's title + its PARENT DATABASE property schema (real names, types,
@@ -1318,7 +1372,7 @@ async function replaceBlock(
   op: NotionBlockReplacement,
   headers: Record<string, string>,
   signal: AbortSignal,
-): Promise<{ replaced: number; refusal?: string }> {
+): Promise<{ replaced: number; refusal?: string; stale?: true }> {
   const label = shortBlockId(op.blockId);
   const rendered = markdownToNotionBlocks(op.content);
   if (!rendered.length) {
@@ -1334,9 +1388,9 @@ async function replaceBlock(
 
   const getRes = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, { headers, signal });
   const live = (await getRes.json().catch(() => ({}))) as {
-    id?: string; last_edited_time?: string; message?: string; code?: string;
+    id?: string; type?: string; last_edited_time?: string; message?: string; code?: string;
     parent?: { type?: string; page_id?: string; block_id?: string };
-  };
+  } & Record<string, unknown>;
   if (!getRes.ok || !live.id) {
     throw notionError(getRes.status, live, `block ${label} not found`);
   }
@@ -1349,13 +1403,34 @@ async function replaceBlock(
     return {
       replaced: 0,
       refusal: `${label} changed since read (read ${seen || "no stamp cited"}, now ${now || "unknown"})`,
+      stale: true,
     };
   }
 
+  // Notion refuses a PATCH that changes a block's type. A text block keeps
+  // its own type and state — the list item stays a list item, the to-do its
+  // tick, the heading its level — and only its rich text is rewritten, with
+  // the line's display mark taken off the replacement first.
+  const liveType = live.type ?? "";
+  const keepType = RICH_TEXT_TYPES.has(liveType);
+  // A text replace writes words only. A block whose rich text carries a link,
+  // a mention, an equation or formatting would lose it, so it is refused —
+  // unwritten, as a moved block is — rather than quietly flattened.
+  const liveText = (live[liveType] as { rich_text?: RichTextRun[] } | undefined)?.rich_text;
+  if (keepType && !isPlainRichText(liveText)) {
+    return {
+      replaced: 0,
+      refusal: `${label} (this block has links, mentions or formatting that a text replace would drop — edit it in Notion)`,
+    };
+  }
+  const written = keepType ? markdownToNotionBlocks(stripBlockPrefix(liveType, op.content)) : rendered;
+  const head = written[0] ?? first;
+  const headText = (head[head.type] as { rich_text?: unknown } | undefined)?.rich_text;
+  const payload = keepType && Array.isArray(headText) ? { [liveType]: { rich_text: headText } } : { [head.type]: head[head.type] };
   const res = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, {
     method: "PATCH",
     headers,
-    body: JSON.stringify({ [first.type]: first[first.type] }),
+    body: JSON.stringify(payload),
     signal,
   });
   if (!res.ok) {
@@ -1363,7 +1438,7 @@ async function replaceBlock(
     throw notionError(res.status, err, `block ${label} update failed`);
   }
 
-  const rest = rendered.slice(1);
+  const rest = written.slice(1);
   if (!rest.length) return { replaced: 1 };
 
   const parentId = live.parent?.page_id ?? live.parent?.block_id;
@@ -1410,6 +1485,7 @@ export async function notionUpdate(
   const updated: string[] = [];
   const skipped: string[] = [];
   const refused: string[] = [];
+  let staleStamps = 0;
   let appended = 0;
   let replaced = 0;
 
@@ -1464,6 +1540,7 @@ export async function notionUpdate(
       const r = await replaceBlock(env, op, headers, controller.signal);
       replaced += r.replaced;
       if (r.refusal) refused.push(r.refusal);
+      if (r.stale) staleStamps++;
     }
 
     // 3) Narrative append.
@@ -1500,7 +1577,7 @@ export async function notionUpdate(
     // Drop any cached read so the next read reflects this write, not a stale copy.
     if (updated.length || appended || replaced) evictReadCache(pageId);
 
-    return { id: pageId, updated, skipped, appended, replaced, refused };
+    return { id: pageId, updated, skipped, appended, replaced, refused, staleStamps };
   } finally {
     clearTimeout(timer);
   }

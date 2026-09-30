@@ -80,8 +80,10 @@ be, for anything a user has to read. `design-system/guidelines/foundations/acces
 requires that essential information never depend on motion.
 
 **`Divider` is decoration.** Its `size` list mixes token sizes (`sm`–`xl`) with
-literal pixel values (`1px`–`2.5px`); prefer the token sizes so the rule scales
-with the rest of the system.
+literal pixel values (`1px`–`2.5px`). The pixel strings are aliases for the
+token sizes. `2.5px` is deprecated: it maps to `xl` and draws 3px, so use
+`size="xl"`. Prefer the token sizes so the rule scales with the rest of the
+system.
 
 ## Related
 

@@ -205,6 +205,10 @@ export interface ProposalCard {
    *  could be fetched. A URL, not a block: what Slack does with an image is
    *  the adapter's. */
   previewImageUrl?: string;
+  /** The Worker's own tag on the card's message, read back later to tell
+   *  what kind of card it is — a revised end-of-day sweep card carries the
+   *  sweep's (`sweep/cards.ts` `asSweepRevision`). */
+  tag?: { eventType: string; payload: Record<string, string> };
 }
 
 // ── What Gate's verdict says ─────────────────────────────────────────────────
@@ -339,8 +343,9 @@ export interface Delivery {
   postAnswer(text: string): Promise<PostResult>;
 
   /** A note that is not an answer: a clarifying question, a cancellation, a
-   *  "you just cancelled that" bounce. No footer, no confidence pre-check. */
-  postNote(text: string): Promise<PostResult>;
+   *  "you just cancelled that" bounce. No footer, no confidence pre-check.
+   *  `tag` is the Worker's own tag on the message, as on a card. */
+  postNote(text: string, tag?: ProposalCard["tag"]): Promise<PostResult>;
 
   /**
    * Say what a gate signal came to.
@@ -390,7 +395,7 @@ export type DeliveryCall =
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string }
   | { kind: "answer"; text: string }
-  | { kind: "note"; text: string }
+  | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote }
   | { kind: "proposal"; card: ProposalCard }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string };
@@ -515,8 +520,8 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts: `answer-${calls.length}` };
     },
 
-    async postNote(text) {
-      calls.push({ kind: "note", text });
+    async postNote(text, tag) {
+      calls.push({ kind: "note", text, ...(tag ? { tag } : {}) });
       if (opts.noteFails) return { ok: false, text };
       posted.push(text);
       return { ok: true, text, ts: `note-${calls.length}` };

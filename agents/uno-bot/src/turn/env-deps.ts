@@ -31,12 +31,13 @@ import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
+import { recordSweepRestageFor } from "../sweep/env";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { TurnOrigin } from "../usage/index";
-import { testChannelIdsOf, usageLogFor } from "../usage/production";
+import { NO_PROPOSAL_EVENT_LOG, classifyAskFor, proposalEventLogFor, testChannelIdsOf, usageLogFor } from "../usage/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -169,13 +170,19 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // caller's own difference.
     usage: {
       log: usageLogFor(env),
+      // Never for the eval transport: its cards live in an in-memory store and
+      // are nobody's writes, so they stay out of the production table.
+      proposalEvents: wiring.origin === "debug" ? NO_PROPOSAL_EVENT_LOG : proposalEventLogFor(env),
       origin: wiring.origin,
       testChannelIds: testChannelIdsOf(env),
+      // An ask's in-turn label — only when there is a database to keep it in.
+      ...(classifyAskFor(env) ? { classifyAsk: classifyAskFor(env)! } : {}),
     },
 
     // The reads a card needs and Turn may not make itself — shared with the
     // doors that re-stage a cut-off run (`restageFor`, below).
     cards: cardReadsFor(env),
+    onRestaged: (from, to) => recordSweepRestageFor(env, from, to),
 
     async readAntecedent(channel, beforeTs, limit) {
       const before = await conversationsHistoryBefore(env, channel, beforeTs, limit);
@@ -254,7 +261,14 @@ export function restageFor(
   threadState: ThreadState,
 ): (restage: GateRestage, delivery: Delivery) => Promise<void> {
   const cards = cardReadsFor(env);
+  const proposalEvents = proposalEventLogFor(env);
   return async (restage, delivery) => {
-    await restageExecution(restage, { threadState, delivery, cards });
+    await restageExecution(restage, {
+      threadState,
+      delivery,
+      cards,
+      proposalEvents,
+      onRestaged: (from, to) => recordSweepRestageFor(env, from, to),
+    });
   };
 }

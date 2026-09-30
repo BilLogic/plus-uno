@@ -2,6 +2,8 @@ import type { Env } from "../types";
 import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
 import { DM_CONVERSATION, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
+import { engagesOnSweepCard, isSweepCardPost } from "../sweep/cards";
+import { isSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
@@ -337,45 +339,62 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
   // Thread reply with no mention: engage if the bot is already part of this
   // thread, so a conversation flows without re-mentioning on every turn (e.g.
   // the bot asked for a PRD and the user pastes it back). Check cheap -> robust:
-  //   1) an active proposal (confirm/cancel window)
+  //   1) an active proposal (confirm/cancel window) a turn staged
   //   2) the DO history — the bot writes a turn there EVERY time it replies, so
   //      a non-empty history means the bot has engaged in this thread already
   //   3) the live thread — the root @mentioned the bot, or the bot has posted
   //      (covers threads whose DO history was pruned, and replies that arrive
   //       before the bot has answered the mentioned root)
+  // A thread where the bot's only posts are end-of-day sweep cards is the
+  // team's own conversation, which the bot joined uninvited: there a reply
+  // engages only when it is addressed to the card (`engagesOnSweepCard`).
   // On any lookup error, FAIL OPEN for a thread reply: silently dropping a
   // follow-up (a "frozen" bot) is worse than an occasional extra reply.
   try {
-    const store = threadStateFor(env);
-    const ref = { channel: event.channel, thread: event.thread_ts };
-    // A weekly DS precedence list thread is a place people talk about the
-    // list, not to uno-bot: for as long as it is recorded as one, engage only
-    // on an @mention (above) or a typed gate emoji — never because uno-bot
-    // has posted or answered there. `dispute N` is queued on its own.
+    // A thread the bot entered through a sweep card stays the team's: there
+    // only an @mention (above), a whole-message pick of the card's fixes or a
+    // typed gate emoji engages — not the batch result, the notes or the
+    // history the card's own resolution left (`sweep/thread-mark.ts`).
+    if (env.HARNESS_KV && (await isSweepThread(env.HARNESS_KV, event.channel, event.thread_ts))) {
+      return engagesOnSweepCard(event.text ?? "");
+    }
+    // A weekly DS precedence list thread is the same: people talk about the
+    // list there, not to uno-bot. For as long as it is recorded as one, only
+    // an @mention (above) or a typed gate emoji engages (`ds-precedence/env.ts`);
+    // `dispute N` is queued on its own.
     if (await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts)) {
       return typedEmojiDecision(event.text ?? "") !== null;
     }
+    const store = threadStateFor(env);
+    const ref = { channel: event.channel, thread: event.thread_ts };
     const pending = await store.getProposalByThread(ref);
-    if (pending) return true;
+    if (pending && !pending.sweepRun) return true;
 
-    const history = await store.readHistory(ref);
-    if (history.length > 0) return true;
+    // Under a live sweep card the history may hold only the card's own turns
+    // (a drop, a refusal), which is no invitation; the live thread below says
+    // whether anyone has talked to the bot there.
+    if (!pending) {
+      const history = await store.readHistory(ref);
+      if (history.length > 0) return true;
+    }
 
+    const aboutTheCard = engagesOnSweepCard(event.text ?? "");
     if (identity) {
-      const replies = await conversationsReplies(env, event.channel, event.thread_ts, 50);
+      const replies = await conversationsReplies(env, event.channel, event.thread_ts, 50, { includeMetadata: true });
       const msgs = Array.isArray(replies.messages) ? replies.messages : [];
       // The thread ROOT @mentioned the bot -> the whole thread is a bot
       // conversation; replies never need to re-mention it (even before the bot
       // has answered). conversations.replies returns the parent first.
       const root = msgs[0];
       if (root?.text?.includes(`<@${identity.userId}>`)) return true;
-      // Or the bot has already posted in the thread.
-      const botInThread = msgs.some(
+      // Or the bot has already posted in the thread — anything but sweep cards.
+      const botPosts = msgs.filter(
         (m) => m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId),
       );
-      if (botInThread) return true;
+      if (botPosts.some((m) => !isSweepCardPost(m))) return true;
+      if (botPosts.length) return aboutTheCard;
     }
-    return false;
+    return pending ? aboutTheCard : false;
   } catch (err) {
     console.warn(
       `[slack] thread-engagement check failed, engaging (fail-open): ${err instanceof Error ? err.message : String(err)}`,

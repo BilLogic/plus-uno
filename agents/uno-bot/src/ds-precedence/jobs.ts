@@ -20,10 +20,11 @@
 //   • the DISPUTE — a reply in that thread starting `dispute 2` posts a
 //     revised card in the same thread without them. It runs at the head of
 //     the thread's queued job (slack/message-job.ts), so it is handled once
-//     and two disputes run one after the other. Every weekly card carries the
-//     thread's own `supersedeKey`: a revision supersedes the old card, so a
-//     late ✅ on it is told it was replaced, while a turn's card in the same
-//     thread and the weekly card leave each other alone, and a turn whose
+//     and two disputes run one after the other. Every weekly card holds the
+//     thread's `"ds-precedence"` slot (`supersedeKey`): a revision supersedes
+//     the old card, so a late ✅ on it is told it was replaced, while a turn's
+//     card or a sweep card in the same thread and the weekly card leave each
+//     other alone, and a turn whose
 //     batch would touch the weekly card is refused with a pointer to
 //     `dispute N`. The revision keeps the old card's expiry. Disputing every
 //     item withdraws the card. Only a card still pending is revised; a dispute
@@ -206,7 +207,7 @@ function stagedCard(
     confirmers: [...thread.confirmers],
     // Keyed apart from the thread: a turn's card in this thread neither
     // replaces the weekly card nor is replaced by it; its revisions share it.
-    supersedeKey: `ds-precedence:${thread.ts}`,
+    supersedeKey: "ds-precedence",
     refuseRevision:
       "This is the weekly DS precedence card, and it changes only one way: reply `dispute N` (or `dispute 1, 3`) " +
       "to drop an item, and I'll post the revised card.",
@@ -280,9 +281,14 @@ export interface DisputeDeps {
   /** The record of the thread the reply is in, or null when it is no list thread. */
   thread: Store<PostedThread | null>;
   post(message: { text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
+  /** Stage a card anew: on the usage record as staged. */
   stage(proposal: PendingProposal): Promise<void>;
+  /** Put a retired card back in place; its staged row stands. */
+  restore(proposal: PendingProposal): Promise<void>;
   /** Retire a card so no ✅ runs it. */
   retire(proposalTs: string): Promise<void>;
+  /** Put cards a dispute took out of reach on the usage record as superseded. */
+  superseded(proposalTs: readonly string[]): Promise<void>;
   /** The card as staged while it is still pending; null once decided, expired or replaced. */
   card(proposalTs: string): Promise<PendingProposal | null>;
   now(): number;
@@ -343,10 +349,11 @@ export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadRep
   const disputed = [...thread.disputed, ...fresh].sort((a, b) => a - b);
   const remaining = thread.items.filter((i) => !disputed.includes(i.n));
   const ttlMs = Math.max(thread.expiresAt - deps.now(), MIN_REVISION_TTL_MS);
-  const restore = () => deps.stage({ ...old, ttlMs });
+  const restore = () => deps.restore({ ...old, ttlMs });
 
   await deps.retire(old.proposalTs);
   if (!remaining.length) {
+    await deps.superseded([old.proposalTs]);
     await deps.thread.write({ ...thread, disputed, cardTs: "" });
     return say(`Every item is disputed, so the card is withdrawn and nothing is filed this week (disputed by <@${reply.user}>).`);
   }
@@ -369,6 +376,10 @@ export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadRep
     await restore().catch(() => {});
     await deps.retire(sent.ts).catch(() => {});
     await say("That revised card didn't go through, so the card before it still stands. Try the `dispute` again.").catch(() => {});
+    return true;
   }
+  // Superseded on the record only once the revision is in place: a card
+  // restored after a failure was never out of reach for long.
+  await deps.superseded([old.proposalTs]);
   return true;
 }

@@ -9,6 +9,9 @@ import type { Env } from "../types";
 import { charge } from "../net";
 import type { SlackMessageEvent } from "../slack/types";
 import { postMessage } from "../slack/api";
+import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
+import { proposalEventLogFor } from "../usage/production";
+import type { PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { FINDINGS_KV_KEY, figmaGet, kvJson, type FigmaComponentsResponse } from "../figma-poll";
@@ -93,7 +96,7 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
         return open ? { number: open.number, url: open.url } : null;
       },
       post: (message) => post(env, channel, message),
-      stage: (proposal) => threadStateFor(env).putProposal(proposal),
+      stage: (proposal) => stageWeeklyCard(env, proposal),
       channel,
       now: () => Date.now(),
     },
@@ -132,8 +135,17 @@ export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent
     {
       thread: threadRecord(env, event.thread_ts!),
       post: (message) => post(env, event.channel, message),
-      stage: (proposal) => store.putProposal(proposal),
-      retire: (ts) => store.retireProposal(ts),
+      stage: (proposal) => stageWeeklyCard(env, proposal),
+      async restore(proposal) {
+        // Back in place, not staged anew: its staged row stands. A revision
+        // this retires is superseded on the record, as any card is.
+        const { retired } = await store.putProposal(proposal);
+        await recordProposalEvents(proposalEventLogFor(env), supersededEvents(retired, Date.now(), "worker"));
+      },
+      async retire(ts) {
+        await store.retireProposal(ts);
+      },
+      superseded: (tss) => recordProposalEvents(proposalEventLogFor(env), supersededEvents(tss, Date.now(), "worker")),
       card: async (ts) => {
         const found = await store.getProposalByTs(ts);
         return found.state === "found" ? found.proposal : null;
@@ -158,6 +170,20 @@ export async function isWeeklyPrecedenceThread(env: Env, channel: string, thread
   if (!env.HARNESS_KV || channel !== env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()) return false;
   const thread = await threadRecord(env, threadTs).read();
   return !!thread && thread.channel === channel && thread.ts === threadTs;
+}
+
+/**
+ * Stage a weekly card the Worker posted, and put it on the usage record like
+ * any card — a staged row via the Worker in #plus-universal, and a superseded
+ * row for any card the staging retired — as the sweep and the library card do.
+ */
+async function stageWeeklyCard(env: Env, proposal: PendingProposal): Promise<void> {
+  const { retired } = await threadStateFor(env).putProposal(proposal);
+  const now = Date.now();
+  await recordProposalEvents(proposalEventLogFor(env), [
+    ...supersededEvents(retired, now, "worker"),
+    stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
+  ]);
 }
 
 /** One list thread's record in HARNESS_KV, kept `THREAD_RECORD_TTL_S`. */

@@ -18,11 +18,32 @@ const copy = (r: TurnRecord): TurnRecord => ({
   sourcesCited: [...r.sourcesCited],
 });
 
+/**
+ * What an upsert leaves when a row already exists — the D1 adapter's
+ * `ON CONFLICT` clause, stated for a map. The turn's own columns take the new
+ * values; the category columns are the classifier's: a null leaves the stored
+ * label, and a row already classified, or already purged, never gets its text
+ * back.
+ */
+export function mergeOnRetry(stored: TurnRecord | undefined, incoming: TurnRecord): TurnRecord {
+  if (!stored) return copy(incoming);
+  return {
+    ...copy(incoming),
+    requestText: stored.classifiedAt === null && stored.requestText !== null ? incoming.requestText : null,
+    subType: incoming.subType ?? stored.subType,
+    painCategory: incoming.painCategory ?? stored.painCategory,
+    classifiedAt: incoming.classifiedAt ?? stored.classifiedAt,
+    // A ticket another writer put on the row (`noteSelfFiledTicket`) survives
+    // a rewrite that names none.
+    selfFiledTicketUrl: incoming.selfFiledTicketUrl ?? stored.selfFiledTicketUrl,
+  };
+}
+
 export function createInMemoryUsageLog(): InMemoryUsageLog {
   const rows = new Map<string, TurnRecord>();
   return {
     async record(turn) {
-      rows.set(turn.turnId, copy(turn));
+      rows.set(turn.turnId, mergeOnRetry(rows.get(turn.turnId), turn));
     },
     async get(turnId) {
       const row = rows.get(turnId);

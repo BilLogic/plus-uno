@@ -90,7 +90,13 @@ function harness(opts: { disputeThrows?: boolean; engages?: boolean } = {}) {
             staged.push(p);
             await threadState.putProposal(p);
           },
-          retire: (ts) => threadState.retireProposal(ts),
+          restore: async (p) => {
+            await threadState.putProposal(p);
+          },
+          retire: async (ts) => {
+            await threadState.retireProposal(ts);
+          },
+          superseded: async () => {},
           card: async (ts) => {
             const found = await threadState.getProposalByTs(ts);
             return found.state === "found" ? found.proposal : null;

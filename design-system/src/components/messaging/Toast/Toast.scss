@@ -4,6 +4,8 @@
  * Uses design system tokens - no hardcoded values
  */
 
+@use '../../../styles/icon-glyph' as *;
+
 .plus-toast.toast,
 .plus-toast,
 .toast.plus-toast {
@@ -30,7 +32,8 @@
             justify-content: center;
             flex-shrink: 0;
 
-            i {
+            @include icon-glyph {
+                // @contrast: non-text
                 font-size: var(--font-size-fa-body1-solid);
                 color: var(--color-on-surface-variant);
             }
@@ -77,15 +80,22 @@
     }
 
     // --- STYLE VARIANTS ---
-    // Using !important to override base styles
+    // Each header is filled with its role, and its title, timestamp and icon
+    // are drawn in that role's on-color. `!important` overrides the base
+    // header styles above. One block per role, written out:
+    // check:text-contrast reads token names from source, so a loop that
+    // interpolated the role into the token name would hide every pair from it.
     &.danger {
 
         .plus-toast-header,
         .toast-header {
             background-color: var(--color-danger) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-danger) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-danger) !important;
+                }
             }
 
             .plus-toast-title {
@@ -104,8 +114,11 @@
         .toast-header {
             background-color: var(--color-success) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-success) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-success) !important;
+                }
             }
 
             .plus-toast-title {
@@ -118,25 +131,27 @@
         }
     }
 
-    // Warning uses on-warning-container (dark) instead of on-warning (white):
-    // white text on the solid --color-warning background falls below the
-    // 4.5:1 contrast ratio required at this font size/weight.
+    // Title and timestamp: accepted contrast exception, recorded in the
+    // text-contrast baseline; do not darken.
     &.warning {
 
         .plus-toast-header,
         .toast-header {
             background-color: var(--color-warning) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-warning-container) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-warning) !important;
+                }
             }
 
             .plus-toast-title {
-                color: var(--color-on-warning-container) !important;
+                color: var(--color-on-warning) !important;
             }
 
             .plus-toast-timestamp {
-                color: var(--color-on-warning-container) !important;
+                color: var(--color-on-warning) !important;
             }
         }
     }
@@ -147,8 +162,11 @@
         .toast-header {
             background-color: var(--color-info) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-info) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-info) !important;
+                }
             }
 
             .plus-toast-title {
@@ -167,8 +185,11 @@
         .toast-header {
             background-color: var(--color-primary) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-primary) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-primary) !important;
+                }
             }
 
             .plus-toast-title {
@@ -187,8 +208,11 @@
         .toast-header {
             background-color: var(--color-secondary) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-on-secondary) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-on-secondary) !important;
+                }
             }
 
             .plus-toast-title {

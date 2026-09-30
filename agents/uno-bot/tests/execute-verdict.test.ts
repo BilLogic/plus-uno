@@ -19,6 +19,7 @@ import assert from "node:assert/strict";
 
 import type { Env } from "../src/types";
 import type { GateVerdict } from "../src/gate/index";
+import type { ProposalEventLog } from "../src/usage/index";
 
 interface Call {
   url: string;
@@ -69,6 +70,14 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     );
   }
   if (/^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/]+\/issues\/\d+$/.test(url)) return reply({ number: 688 });
+  // A Notion block someone edited after the bot read it: its stamp has moved.
+  if (url.startsWith("https://api.notion.com/v1/blocks/") && !init?.method) {
+    return reply({
+      id: url.split("/").pop(),
+      last_edited_time: "2026-09-15T16:40:00.000Z",
+      parent: { type: "page_id", page_id: "0123456789abcdef0123456789abcdef" },
+    });
+  }
   if (url.includes("oauth2.googleapis.com/token")) return reply({ access_token: "ya29.test" });
   if (url.includes("gmail.googleapis.com")) return reply({ id: "msg-1" });
   throw new Error(`no stub route for ${url}`);
@@ -211,6 +220,20 @@ test("a multi-recipient relay tells the thread once", async () => {
   assert.equal(inThread.length, 1, inThread.map((p) => p.text).join("\n---\n"));
   assert.match(String(inThread[0]!.text), /<@U0COCO0001>/);
   assert.match(String(inThread[0]!.text), /<@U0MERYEM01>/);
+});
+
+// A sweep card's batch result answers the card, so it carries the sweep's
+// tag, as the card does: the thread's later replies read by the sweep's rule.
+test("a sweep card's batch result carries the sweep's tag", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const verdict = won([
+    { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+    { toolName: "dm_relay", input: { recipient: "U0MERYEM01", text: "hi" } },
+  ]);
+  await run(env(), { ...verdict, proposal: { ...verdict.proposal!, sweepRun: "2026-09-30" } });
+  const result = posts().find((p) => p.channel === "D0REQUESTER");
+  assert.deepEqual(result?.metadata, { event_type: "uno_sweep_card", event_payload: { role: "result" } });
 });
 
 const EMAIL = {
@@ -415,4 +438,239 @@ test("a run a later look has taken stops at its next operation and tells no outc
     [],
     "the note and the re-staged card are the thread's account, not a batch result",
   );
+});
+
+// ── What a verdict leaves on the usage record ────────────────────────────────
+//
+// Every door hands its verdict here, so this is where a verdict's proposal
+// events are written (`usage/proposal-events.ts`): the door and the person
+// come on the verdict from Gate, and the executor records them.
+
+const CLOCK = () => 1_700_000_500_000;
+
+/** Loaded lazily, like the executor: the usage module reaches `net.ts`. */
+function usage(): Promise<typeof import("../src/usage/index")> {
+  return import("../src/usage/index.js");
+}
+
+function by(verdict: GateVerdict, door: NonNullable<GateVerdict["by"]>["door"], userId?: string): GateVerdict {
+  return { ...verdict, by: { door, ...(userId ? { userId } : {}) } };
+}
+
+const intake = [{ toolName: "github_issue_create", input: { title: "A bot gap", body: "What went wrong." } }];
+const githubEnv = () => env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" });
+
+test("a won ✅ is recorded confirmed, with the door and whether someone other than the requester pressed it", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  await run(githubEnv(), by(won(intake), "reaction", "U0PRESSER1"), { events, now: CLOCK });
+  assert.deepEqual(
+    events.events().map((e) => [e.proposalId, e.event, e.via, e.actorId, e.confirmedByOther, e.at]),
+    [["1700000000.000300", "confirmed", "reaction", "U0PRESSER1", true, CLOCK()]],
+  );
+});
+
+test("a won ⛔ is recorded cancelled, and runs nothing", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  const { execute: _none, ...declined } = won(intake);
+  await run(env(), by({ ...declined, decision: "cancel" }, "button", "U0REQUESTR1"), { events, now: CLOCK });
+  assert.deepEqual(events.events().map((e) => [e.event, e.via, e.confirmedByOther]), [["cancelled", "button", null]]);
+  assert.equal(calls.some((c) => c.url.includes("api.github.com")), false);
+});
+
+test("a lost race records nothing", async () => {
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  await run(env(), { ...by(won(intake), "typed", "U0PRESSER1"), outcome: "stale" }, { events, now: CLOCK });
+  assert.deepEqual(events.events(), []);
+});
+
+test("a write refused because its page moved is recorded refused_stale, once for the batch", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  const stale = (block: string) => ({
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/A-page-0123456789abcdef0123456789abcdef",
+      replace: [{ block_id: block, last_edited_time: "2026-09-15T14:02:00.000Z", content: "the correction" }],
+    },
+  });
+  await run(
+    env({ NOTION_API_KEY: "secret_test" }),
+    by(won([stale("1f2e3d4c5b6a79881f2e3d4c5b6a7988"), stale("2f2e3d4c5b6a79881f2e3d4c5b6a7988")]), "model"),
+    { events, now: CLOCK },
+  );
+  // Nothing was written: the only Notion calls are the two stamp reads.
+  assert.deepEqual(
+    calls.filter((c) => c.url.startsWith("https://api.notion.com/")).map((c) => c.body),
+    [null, null],
+  );
+  assert.deepEqual(events.events().map((e) => [e.event, e.via]), [
+    ["confirmed", "model"],
+    ["refused_stale", "executor"],
+  ]);
+});
+
+test("what the batch leaves on the record is written before the history note, so a throw there cannot drop it", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  const failingHistory = {
+    idFromName: () => "thread-state",
+    get: () => ({
+      ...THREAD_STATE.get(),
+      appendHistory: async () => {
+        throw new Error("history write refused");
+      },
+    }),
+  };
+  const stale = {
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/A-page-0123456789abcdef0123456789abcdef",
+      replace: [{ block_id: "1f2e3d4c5b6a79881f2e3d4c5b6a7988", last_edited_time: "2026-09-15T14:02:00.000Z", content: "x" }],
+    },
+  };
+  await assert.rejects(
+    run(
+      { ...env({ NOTION_API_KEY: "secret_test" }), THREAD_STATE: failingHistory } as unknown as Env,
+      by(won([stale]), "reaction", "U0PRESSER1"),
+      { events, now: CLOCK },
+    ),
+    /history write refused/,
+  );
+  assert.deepEqual(events.events().map((e) => e.event), ["confirmed", "refused_stale"]);
+});
+
+test("a ✅ on a reaction or a button that files a ticket on the bot puts it on the staging turn's row", async () => {
+  for (const door of ["reaction", "button"] as const) {
+    calls = [];
+    const turns = (await usage()).createInMemoryUsageLog();
+    const events = (await usage()).createInMemoryProposalEventLog({ turns });
+    await turns.record(stagingTurn());
+    await events.record(await stagedFor("C1:1700000000.000200"));
+    const run = await executeVerdict();
+    await run(githubEnv(), by(won(intake), door, "U0PRESSER1"), { events, now: CLOCK });
+    assert.equal(
+      (await turns.get("C1:1700000000.000200"))?.selfFiledTicketUrl,
+      "https://github.com/BilLogic/plus-uno/issues/701",
+      door,
+    );
+  }
+});
+
+test("a typed or model ✅ leaves the ticket to the turn it ran in", async () => {
+  // That turn's own row carries it (`usage/record.ts`); the staging turn's row
+  // carrying it too would count one ticket twice.
+  for (const door of ["typed", "model"] as const) {
+    calls = [];
+    const turns = (await usage()).createInMemoryUsageLog();
+    const events = (await usage()).createInMemoryProposalEventLog({ turns });
+    await turns.record(stagingTurn());
+    await events.record(await stagedFor("C1:1700000000.000200"));
+    const run = await executeVerdict();
+    await run(githubEnv(), by(won(intake), door, "U0PRESSER1"), { events, now: CLOCK });
+    assert.equal((await turns.get("C1:1700000000.000200"))?.selfFiledTicketUrl, null, door);
+  }
+});
+
+test("if recording fails, the proposal still resolves normally", async () => {
+  calls = [];
+  appended = [];
+  const broken: ProposalEventLog = {
+    ...(await usage()).createInMemoryProposalEventLog(),
+    async record() {
+      throw new Error("D1 unavailable");
+    },
+    async noteSelfFiledTicket() {
+      throw new Error("D1 unavailable");
+    },
+  };
+  const run = await executeVerdict();
+  await run(githubEnv(), by(won(intake), "reaction", "U0PRESSER1"), { events: broken, now: CLOCK });
+  assert.ok(calls.some((c) => c.url === "https://api.github.com/repos/BilLogic/plus-uno/issues"), "the issue was filed");
+  assert.ok(posts().some((p) => String(p.text).includes("issues/701")), "and the thread was told");
+  assert.equal(appended.length, 1, "and the outcome was remembered");
+});
+
+function stagingTurn() {
+  return {
+    turnId: "C1:1700000000.000200",
+    build: "r-test",
+    requesterId: "U0REQUESTR1",
+    surface: "channel" as const,
+    inThread: true,
+    channelId: "C1",
+    askTs: "1700000000.000200",
+    askedAt: 1_700_000_000_200,
+    firstAnswerAt: 1_700_000_000_900,
+    latencyMs: 700,
+    tier: "default",
+    routeReason: "default",
+    provider: null,
+    model: null,
+    fallbackUsed: false,
+    tokensIn: 0,
+    tokensOut: 0,
+    tokensThinking: 0,
+    tokensCached: 0,
+    costUsd: 0,
+    toolsCalled: [],
+    sourcesCited: [],
+    disposition: "staged",
+    proposalId: "1700000000.000300",
+    stopUsed: false,
+    selfFiledTicketUrl: null,
+    testTraffic: false,
+    conversationType: "channel" as const,
+    requestText: null,
+    subType: null,
+    painCategory: null,
+    classifiedAt: null,
+  };
+}
+
+async function stagedFor(turnId: string) {
+  const verdict = won(intake);
+  return { ...(await usage()).stagedEvent({ proposal: verdict.proposal!, at: 0, via: "turn" as const, channelStored: true }), turnId };
+}
+
+// ── The self-serve record, after the person has been told ───────────────────
+
+test("a budget stop in the task-completion write still posts the result and the history note", async () => {
+  calls = [];
+  appended = [];
+  executionCalls = [];
+  const { D1QueryBudgetError } = await import("../src/net.js");
+  const writes: string[] = [];
+  const USAGE_DB = {
+    prepare: () => ({
+      bind: () => ({
+        run: async () => ({}),
+        all: async () => ({ results: [] }),
+        first: async () => {
+          writes.push(`task_completed after ${posts().filter((p) => p.channel === "D0REQUESTER").length} result post(s)`);
+          throw new D1QueryBudgetError(40);
+        },
+      }),
+    }),
+  };
+  const run = await executeVerdict();
+  await run(
+    { ...env(), USAGE_DB } as unknown as Env,
+    won([
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "one" } },
+      { toolName: "dm_relay", input: { recipient: "U0COCO0002", text: "two" } },
+    ]),
+  );
+  const result = posts().filter((p) => p.channel === "D0REQUESTER");
+  assert.equal(result.length, 1, "the batch result was posted");
+  assert.equal(result[0]!.thread_ts, "1700000000.000100");
+  assert.ok(appended.some((a) => a.ref.channel === "D0REQUESTER"), "the history note was written");
+  assert.deepEqual(writes, ["task_completed after 1 result post(s)"], "the write was tried, last");
+  assert.ok(executionCalls.includes("end 1700000000.000300"));
 });

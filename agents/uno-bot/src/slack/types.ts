@@ -25,6 +25,10 @@ export interface SlackMessageEvent {
   thread_ts?: string;
   bot_id?: string;
   subtype?: string;
+  /** `channel` · `group` · `mpim` · `im` (or `app_home`). Slack puts it on
+   *  `message` events and NOT on `app_mention`, so a turn reached through a
+   *  mention may not know it (`turn/request.ts` `conversationTypeOf`). */
+  channel_type?: string;
   /** Set only on SYNTHETIC events (a shortcut, /grind, /chill) — an explicit
    *  tier that beats routing heuristics. Never present on a real Slack event. */
   tierOverride?: "chill" | "default" | "grind";
@@ -139,6 +143,8 @@ export interface SlackReactionAddedEvent {
   user: string;
   reaction: string;
   item: { type: "message"; channel: string; ts: string };
+  /** Who wrote the reacted message. */
+  item_user?: string;
   event_ts: string;
 }
 

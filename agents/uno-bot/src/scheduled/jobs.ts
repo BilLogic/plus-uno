@@ -4,16 +4,38 @@
 // the way Diagnostics pairs a route with its probe: a kind with no body fails
 // the typecheck rather than failing at 22:00. Every body takes `dryRun`:
 // `/debug/sweep?dry_run=1` runs the bodies in the probe's own invocation, and
-// under a dry run a body reads and spends as it would but writes nothing.
+// under a dry run a body reads and spends as it would but writes nothing. What
+// a body returns is its report, which the rehearsal shows beside the job's
+// reading — the sweep's findings and card text among them.
 import type { Env } from "../types";
 import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
+import { selectProvider } from "../agent/run-agent";
+import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
+import { askCategoriesFor, proposalEventLogFor } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
-import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
+import { runSweepJobOnEnv } from "../sweep/env";
+import { runProposalExpiry } from "../usage/index";
+import { runAskResolution } from "../usage/resolution-env";
+import {
+  FIRST_ASK_RESOLUTION_KEY,
+  runnerNameForRun,
+  type ScheduledJob,
+  type ScheduledJobKind,
+  type ScheduledRun,
+} from "./runs";
 
-/** One job kind's work. Resolving is done; a budget stop is thrown through. */
-export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<void>;
+/** One job kind's work, answering with its report. Resolving is done; a
+ *  budget stop is thrown through. */
+export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
+
+/** Both sweep kinds: one body, since `runSweepJob` tells them apart. */
+const sweepBody: JobBody = async (env, job, { dryRun }) => {
+  const report = await runSweepJobOnEnv(env, job, { dryRun });
+  console.log(`[sweep] ${job.key}: ${report.summary}`);
+  return report;
+};
 
 const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Proves the path end to end — the enqueue, one alarm, the done marker —
@@ -31,6 +53,42 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: link each posted card's PR, and close its intake on merge.
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
+  // End of day, one per swept channel: read the day, keep its drift findings
+  // for the morning (src/sweep/run.ts).
+  "sweep-channel": sweepBody,
+  // Morning: the findings whose morning has come become proposal cards.
+  "sweep-post": sweepBody,
+  // End of day: label one batch of the channel asks still holding text, and
+  // null that text in the same write. Counts only — never the model's words.
+  "usage-classify": async (env, job, { dryRun }) => {
+    const store = askCategoriesFor(env);
+    if (!store) return;
+    const r = await runClassifyBatch({ store, provider: selectProvider(env), now: () => Date.now(), dryRun });
+    const verb = dryRun ? "would label" : "labelled";
+    console.log(
+      `[usage] ${job.key}: ${verb} ${r.labelled} ask(s) (${r.blank} blank), ${r.failed} failed, ${r.givenUp} given up`,
+    );
+  },
+  // Both runs: text past the purge cutoff goes, whatever happened to it.
+  "usage-text-purge": async (env, _job, { dryRun }) => {
+    const store = askCategoriesFor(env);
+    if (!store) return;
+    const cleared = await runTextPurge({ store, now: () => Date.now(), dryRun });
+    console.log(`[usage] text purge: ${dryRun ? "dry run, nothing cleared" : `${cleared} row(s) cleared`}`);
+  },
+  // End of day: 24 h on, record how each ask was resolved (src/usage/resolution-pass.ts).
+  // A dry run rehearses one of them: the rest would re-read the same asks.
+  "ask-resolution": async (env, job, { dryRun }) => {
+    const first = job.key === FIRST_ASK_RESOLUTION_KEY;
+    if (dryRun && !first) return;
+    console.log(`[resolution] ${(await runAskResolution(env, { dryRun, announce: first })).summary}`);
+  },
+  // End of day: every card that aged out with no outcome gets its `expired`
+  // event, dated to when it aged out. Idempotent, so a retried alarm adds none.
+  "proposal-expiry": async (env, _job, { dryRun }) => {
+    const { summary } = await runProposalExpiry(proposalEventLogFor(env), Date.now(), { dryRun });
+    console.log(`[usage] proposal expiry: ${summary}`);
   },
   // Friday's end of day: compare code with the library and keep the
   // disagreements for the morning (src/ds-precedence/).
@@ -50,8 +108,18 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
  * @param job - The job
  * @param opts - `dryRun` for the sweep probe
  */
-export function runScheduledJob(env: Env, job: ScheduledJob, opts: { dryRun: boolean }): Promise<void> {
-  return JOB_BODIES[job.kind](env, job, opts);
+export async function runScheduledJob(env: Env, job: ScheduledJob, opts: { dryRun: boolean }): Promise<void> {
+  await JOB_BODIES[job.kind](env, job, opts);
+}
+
+/**
+ * Rehearse one scheduled job, answering with its report — the probe's form.
+ *
+ * @param env - The Worker environment
+ * @param job - The job
+ */
+export function rehearseScheduledJob(env: Env, job: ScheduledJob): Promise<unknown> {
+  return JOB_BODIES[job.kind](env, job, { dryRun: true });
 }
 
 /**

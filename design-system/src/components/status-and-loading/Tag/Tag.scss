@@ -474,3 +474,79 @@ $tag-colors: (
 .plus-tag--disabled .plus-tag__initials {
     color: var(--color-secondary-text, #3b525f);
 }
+
+/* -------------------------------------------------------------- on images */
+
+/*
+ * Elevated, for a tag on a photo or a video: a solid Surface Container Lowest
+ * fill, no border, the Elevation 2 shadow and neutral text, with the hue kept
+ * on the swatch. Read-only and link only; the component never sets the class
+ * on anything else. The border turns clear rather than going away, so the tag
+ * stays 22 tall.
+ *
+ * The base tokens, not the `--surface-raised` role pair: that role layer is
+ * still an open proposal that no component consumes yet.
+ *
+ * It sits after disabled on purpose: a disabled tag on a picture keeps its
+ * solid ground, since the translucent disabled fill would sink into the image,
+ * and takes only the disabled text and swatch.
+ */
+.plus-tag--elevated,
+.plus-tag--elevated.plus-tag--disabled:hover,
+.plus-tag--elevated.plus-tag--disabled:active {
+    border-color: transparent;
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    box-shadow: var(--elevation-light-2);
+}
+
+/*
+ * A link's hover and press lay the on-surface 08 and 12 state layers over the
+ * solid fill, as Figma stacks them, rather than swapping the fill for the hue's
+ * translucent layer. A one-color gradient is how CSS stacks a second fill.
+ */
+.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):hover,
+.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:hover) {
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    background-image: linear-gradient(
+        var(--color-on-surface-state-08, rgba(25, 28, 30, 0.08)),
+        var(--color-on-surface-state-08, rgba(25, 28, 30, 0.08))
+    );
+}
+
+.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):active,
+.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:active) {
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    background-image: linear-gradient(
+        var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12)),
+        var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12))
+    );
+}
+
+/*
+ * Focus: the standard ring 2px outside the tag, with the 2px between them
+ * filled in the surface color, so the ring reads on a dark picture. The gap is
+ * a spread shadow under the outline, so it follows the tag's corners.
+ *
+ * The ring is restated rather than inherited: check:focus-ring scores each
+ * rule on its own strongest indicator, and the white gap alone would fail it.
+ */
+.plus-tag--elevated:focus-visible,
+.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:focus-visible) {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+    box-shadow:
+        0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface-container-lowest, #ffffff),
+        var(--elevation-light-2);
+}
+
+/*
+ * The × of an elevated link takes the same gap on focus: 2px of the surface
+ * color between the × and its ring, so the ring reads on a dark picture. The
+ * ring and the 12 fill are restated for check:focus-ring, as above.
+ */
+.plus-tag--elevated .plus-tag__remove:focus-visible {
+    background-color: var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12));
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface-container-lowest, #ffffff);
+}

@@ -1993,7 +1993,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop."
+            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's TagContext, never a prop."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
@@ -2190,6 +2190,9 @@
           },
           "isLoading": {
             "type": "boolean"
+          },
+          "isElevated": {
+            "type": "boolean"
           }
         }
       },
@@ -2206,9 +2209,10 @@
             "isComponentSet": true,
             "variantProps": {
               "isSelected": "selected",
-              "isLoading": "state=saving"
+              "isLoading": "state=saving",
+              "isElevated": "elevated"
             },
-            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is later work and not in code yet."
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
           },
           {
             "id": "remove-button",
