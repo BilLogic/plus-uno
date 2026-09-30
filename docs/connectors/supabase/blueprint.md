@@ -5,7 +5,7 @@ vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint.md
 vendored_revision: e51ce8038e11
 ---
 
-<!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
+<!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. Its closing schema section is not upstream's: this repo's sync writes it (SCHEMA_POINTER) in place of the schema, which it vendors as blueprint-schema.md. -->
 
 # The blueprint, for agents
 

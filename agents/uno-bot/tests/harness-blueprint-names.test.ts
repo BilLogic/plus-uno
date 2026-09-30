@@ -382,7 +382,12 @@ test("the sweep bites — a retired name in prose is caught", () => {
 test("the account's core is in the prompt, its schema is disclosed, and the catalog parses", () => {
   const prompt = assembledPrompt();
   assert.ok(prompt.includes("<!-- docs/connectors/supabase/blueprint.md -->"), "the account's core must be bundled");
-  const proper = prompt.slice(0, prompt.indexOf("<!-- reference: "));
+  // The first MARKER LINE, not the first mention: the section's own preamble
+  // names the marker in prose, and slicing there would leave ~250 chars.
+  const firstReference = prompt.search(/^<!-- reference: /m);
+  assert.notEqual(firstReference, -1, "the bundle carries its disclosed references");
+  const proper = prompt.slice(0, firstReference);
+  assert.ok(proper.length > 100_000, `the prompt proper is ${proper.length} chars — the slice missed the marker line`);
   assert.equal(schemaTables(proper).size, 0, "the catalog rides behind read_reference, not in the prompt");
   assert.match(prompt, /`docs\/connectors\/supabase\/blueprint-schema` — `read_reference` it/, "the core points at the schema");
   const references = readFileSync(resolve(BOT, "src", "generated", "references.ts"), "utf8");

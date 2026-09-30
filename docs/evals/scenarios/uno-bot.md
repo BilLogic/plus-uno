@@ -21,11 +21,11 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **51** (B×6 · C×1 · D×1 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
+| cases | **52** (B×7 · C×1 · D×1 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
 | blockers | 30 |
-| turns · sample runs | 61 · 151 |
+| turns · sample runs | 62 · 154 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 34 |
+| recorded, so the pull-request gate reaches them | 35 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
@@ -347,6 +347,14 @@ _**blocker** · 3 samples · recorded_
 - **Trigger:** "how long does "{{subject.cell}}" take?"
 - **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"notion_create"` · `textRegex`: `"^(?![\\s\\S]*(?:\\d+(?:[.,]\\d+)?|[Aa] few|[Oo]ne|[Tt]wo|[Tt]hree|[Ff]our|[Ff]ive|[Tt]en|[Ff]ifteen|[Tt]wenty|[Tt]hirty|[Ff]orty|[Ff]ifty|[Ss]ixty)[\\s-]*(?:[Mm]in|[Hh]our|[Hh]r|[Ss]ec))[\\s\\S]*$"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-05 (#415). The cell is real and chosen from the live board; the QUESTION is not answerable, because `cells` has no duration field — the route checks that against the contract's column list before offering this subject, so the premise is verified rather than remembered. The reply must say the blueprint does not record how long things take, name what it DOES record for that cell (what happens, the lane, the owner, its resources), and offer the next-best source if there is one. The deterministic half rejects any stated duration — a number or a spelled-out number followed by minutes/hours/seconds — because the failure this case exists to catch is a plausible figure improvised to fill the gap. NOTE FOR A REVIEWER READING THIS RED: the check cannot tell an invented figure from one quoted out of a cell's own prose. If it fires, read the transcript — a duration the blueprint genuinely wrote down in a cell's summary is a finding about that cell, not about the bot. Absence must be stated, not staged: proposing a Notion write to 'capture' the missing duration is a fail, and so is any invented number. [samples:3 — absence behaviour is phrasing, and phrasing is what sampling measures.]
+
+## B7 — a column question reads the disclosed blueprint schema by pointer (#858)
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "In the service blueprint, what is a cell's `cell_key`? What format does it follow, and is the phase one of its parts?"
+- **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"read_reference","args":{"name":"docs/connectors/supabase/blueprint-schema"}}` · `forbidTool`: `"notion_create"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-30 (#858). The blueprint account's rendered schema left the always-loaded prompt for the reference map as `docs/connectors/supabase/blueprint-schema`, and the core carries a pointer in its place that fires when an answer turns on what a column means. This case proves a column question reaches the schema through that pointer. `cells.cell_key` is picked because the core never explains it: only the schema's column comment says what it is. Deterministic: the route's tool list holds a read_reference call whose name is exactly `docs/connectors/supabase/blueprint-schema`; an answer written from the prompt alone, or from a search_blueprint row, fails here however plausible it reads. For the judge: the reply says `cell_key` is the cell's stable identity, five slugified segments in the order service / scenario / path / lane / step, and that the phase is NOT one of them; an example key in that shape is welcome. A reply that includes the phase as a segment, invents a different segment order, or proposes a write fails. Non-blocking until a live run (`uno-bot-evals.yml`) confirms the model takes the pointer; promote it to a blocker then.
 
 ## G1 — "track this on GitHub" stages an issue, not a refusal
 

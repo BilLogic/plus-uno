@@ -293,6 +293,7 @@ test("the schema section leaves the core for a disclosed doc, and the core point
     const c = core();
     assert.doesNotMatch(c, /One lane at one step/, "the schema body is not in the always-loaded core");
     assert.match(c, /`docs\/connectors\/supabase\/blueprint-schema` — `read_reference` it/);
+    assert.match(c, /<!-- VENDORED [^\n]*this repo's sync writes it \(SCHEMA_POINTER\)/, "the header owns the pointer as this repo's");
     const s = schema();
     assert.match(s, /^---\nembodiment: all\ndisclosure: reference\nsummary: [^\n]+\nvendored_from: BilLogic\/plus-uno-blueprint docs\/agents\/blueprint\.md\n/);
     assert.ok(s.endsWith("## The schema, as the catalog describes it\n\n### `cells`\nOne lane at one step.\n"), s);

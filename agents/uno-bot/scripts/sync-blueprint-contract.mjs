@@ -82,6 +82,8 @@ const TARGETS = [
       renderAccount(splitSchema(text).core, rev, {
         file: "blueprint.md",
         embodiment: "all",
+        note:
+          "Its closing schema section is not upstream's: this repo's sync writes it (SCHEMA_POINTER) in place of the schema, which it vendors as blueprint-schema.md.",
         summary:
           "What this blueprint is, how to retrieve from it, what absence and status mean, how paths relate to a scenario's main route, and the vocabulary — the hand-written core, always loaded; the schema is blueprint-schema.md beside it",
       }),
@@ -170,7 +172,7 @@ class SchemaSplitError extends Error {}
  * not, so any revision derived from git differs between the two and a
  * comparison that included it would drift on every commit to the app.
  */
-function renderAccount(text, rev, { file, embodiment, disclosure, summary }) {
+function renderAccount(text, rev, { file, embodiment, disclosure, summary, note }) {
   const { meta, body } = splitFrontmatter(text);
   const origin = `${ACCOUNT_REPO} ${ACCOUNT_DIR}/${file}`;
   const routing = summary ?? meta.summary;
@@ -184,7 +186,9 @@ function renderAccount(text, rev, { file, embodiment, disclosure, summary }) {
     "---\n\n";
   const header =
     `<!-- VENDORED from ${origin} by agents/uno-bot/scripts/sync-blueprint-contract.mjs. ` +
-    "Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->\n\n";
+    "Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift." +
+    (note ? ` ${note}` : "") +
+    " -->\n\n";
   return front + header + rewriteLinks(body, file);
 }
 
