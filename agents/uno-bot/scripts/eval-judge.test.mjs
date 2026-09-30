@@ -25,6 +25,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { generateKeyPairSync } from "node:crypto";
+import { loadCases } from "./eval-case.mjs";
 import {
   DEFAULT_JUDGE_MODEL,
   JUDGE_TIER,
@@ -85,8 +86,26 @@ test("the prompt says where a staged card's reply is, and that gateAsk is not it
   const prompt = judgeSystem(loadRubric());
   assert.match(prompt, /"card": its "heading" and its "lead"/);
   assert.match(prompt, /"gateAsk" is only the clarify gate's question/);
-  // And a Worker fallback is not the bot following the reply rule.
-  assert.match(prompt, /only a "model" lead counts as the reply/);
+});
+
+test("a Worker lead counts as the reply unless the case says it measures the model", () => {
+  // Live run 36694075577: with "only a model lead counts" in the system prompt,
+  // G1 and V1 went from 3/3 to 0/3 on cards whose Worker line said what the
+  // case asked, and W1, R22 and P6 fell on the same reading. The rule belongs
+  // to the cases that measure model compliance, not to every card.
+  const prompt = judgeSystem(loadRubric());
+  assert.doesNotMatch(prompt, /only a "model" lead counts/);
+  assert.match(prompt, /a "worker" lead is what the requester read, and it counts as the reply/);
+  assert.match(prompt, /unless the case's expectation says a "worker" lead does not pass its reply clause/);
+});
+
+test("the model-only reply clause sits in exactly the cases that measure model compliance", () => {
+  const MODEL_ONLY = /only a lead with card\.leadBy \\?"model\\?" counts/;
+  const carrying = loadCases()
+    .cases.filter((c) => MODEL_ONLY.test(c.judgeNote ?? ""))
+    .map((c) => c.id)
+    .sort();
+  assert.deepEqual(carrying, ["G2", "G4", "G5", "G6", "I3"]);
 });
 
 test("a rubric edit reaches the prompt without touching the prompt", () => {
