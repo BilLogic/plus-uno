@@ -99,13 +99,26 @@ When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` �
 ## Token Workflow
 
 ```
-Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
+Figma export → design-system/src/tokens/source/*.json → npm run generate:tokens → commit SCSS
 ```
 
+- The source JSON is exported from the BS4 Foundation library through the
+  Figma MCP, read-only: one file per collection (`colors _ accent.json`,
+  `colors _ neutral.json`, `size _ primitive.json`, `size _ semantics.json`,
+  `size _ layout.json`). Each is `{ modes, variables }`, and every variable
+  carries `id`, `name`, `resolvedType`, `valuesByMode` (aliases kept as
+  `VARIABLE_ALIAS`) and `resolvedValuesByMode` (every alias resolved to its
+  final value).
+- Known gap: `npm run sync:tokens` (`scripts/sync-figma-tokens.js`) writes to
+  `new tokens/` and resolves only one alias level, so it cannot produce these
+  files yet. Use the MCP export until it is fixed.
 - Never edit generated token files (`_colors.scss`, `_spacing_semantics.scss`, etc.) directly
 - Where a token deliberately differs from Figma, or is not in Figma, the
   generator says so in a named constant (`SEMANTIC_OVERRIDES`,
-  `CODE_ONLY_PRIMITIVES` and their neighbors in `scripts/generate-all-tokens.js`)
+  `CODE_ONLY_PRIMITIVES`, `CODE_ONLY_LAYOUT` and their neighbors in
+  `scripts/generate-all-tokens.js`). It refuses to write when one of them has
+  gone stale: an override Figma now agrees with, or a code-only name Figma
+  now has
 - Token source is Figma; SCSS is generated output
 - Figma mapping tables: `design-system/guidelines/figma/token-mapping.md`
 - Refresh agent views: `npm run generate:agent`

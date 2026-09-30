@@ -6,13 +6,49 @@ import { compare, refusals } from './token-generation.mjs';
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
- * Both hang off `TOKEN_DIR` (#620/#621) rather than being spelled seven times,
- * so moving the token directory is one edit and the generator cannot end up
- * reading one tree and writing another.
+ * Both hang off `TOKEN_DIR` rather than being spelled seven times, so moving
+ * the token directory is one edit and the generator cannot end up reading one
+ * tree and writing another.
  */
 const SOURCE_DIR = `${TOKEN_DIR}/source`;
+
 /**
- * A Figma colour ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`
+ * One export from `SOURCE_DIR` and its mode ids. `oneMode` is for the
+ * collections this generator reads a single value from: a second mode there is
+ * a refusal, not a silent read of whichever mode happens to come first.
+ */
+function readSource(file, { oneMode = false } = {}) {
+    const json = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/${file}`, 'utf8'));
+    const modes = Object.keys(json.modes);
+    if (oneMode && modes.length !== 1) {
+        throw new Error(
+            `${file}: ${modes.length} modes (${Object.values(json.modes).join(', ')}). ` +
+            'This collection is written as one set of values; say which mode is the stylesheet before reading it.',
+        );
+    }
+    return { json, modes };
+}
+
+/**
+ * Every exception constant below is checked against the export it excuses.
+ * An override Figma now agrees with, or a code-only name Figma now has, is
+ * no longer an exception, and keeping it would hide the next real difference.
+ * Each such case lands here and the run refuses before writing anything.
+ */
+const staleExceptions = [];
+const stale = (constant, message) => staleExceptions.push(`${constant}: ${message}`);
+
+/**
+ * A name as a token: `Social-Emotional` -> `social-emotional`,
+ * `Spacing/Small/space-000` -> `spacing-small-space-000`.
+ */
+const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-');
+
+/** The state-layer opacities, in the order they are written. */
+const STATE_LEVELS = ['08', '12', '16'];
+
+/**
+ * A Figma color ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`
  * with the alpha at up to three places otherwise (0.08, not 0.080).
  */
 function cssColor({ r, g, b, a = 1 }) {
@@ -20,9 +56,6 @@ function cssColor({ r, g, b, a = 1 }) {
     if (a < 1) return `rgba(${byte(r)}, ${byte(g)}, ${byte(b)}, ${+a.toFixed(3)})`;
     return '#' + [r, g, b].map((n) => byte(n).toString(16).padStart(2, '0')).join('');
 }
-
-/** `Social-Emotional` -> `social-emotional`, `on surface variant` -> `on-surface-variant`. */
-const slug = (name) => name.trim().toLowerCase().replace(/\s+/g, '-');
 
 /**
  * The accent families in the `colors / accent` collection, in the order the
@@ -38,7 +71,7 @@ const ACCENT_FAMILIES = [
  * so every Info token is written as a `var()` of its Tertiary twin. That also
  * covers the two Figma leaves as literals or not at all (`Info 08` is a literal
  * of the same value; there is no `Info Border Subtle`), and the generator
- * refuses if any Info variable stops resolving to its Tertiary twin's colour.
+ * refuses if any Info variable stops resolving to its Tertiary twin's color.
  */
 const ALIASED_FAMILIES = { Info: 'Tertiary' };
 
@@ -55,7 +88,7 @@ function accentToken(name) {
     const f = slug(family);
     const leaf = rest.join('/');
 
-    const state = leaf.match(/^State-layers\/(.+) (08|12|16)$/);
+    const state = leaf.match(new RegExp(`^State-layers/(.+) (${STATE_LEVELS.join('|')})$`));
     if (state) {
         if (state[1] === family) return `${f}-state-${state[2]}`;
         if (state[1] === `${family} Container`) return `${f}-container-state-${state[2]}`;
@@ -76,10 +109,9 @@ function accentToken(name) {
 
 /** The order a family's tokens are written in, base roles then state layers. */
 function familyOrder(f) {
-    const levels = ['08', '12', '16'];
     return {
         roles: [f, `${f}-text`, `on-${f}`, `${f}-container`, `on-${f}-container`, `inverse-${f}`, `${f}-border-subtle`],
-        states: [...levels.map((l) => `${f}-state-${l}`), ...levels.map((l) => `${f}-container-state-${l}`)],
+        states: [...STATE_LEVELS.map((l) => `${f}-state-${l}`), ...STATE_LEVELS.map((l) => `${f}-container-state-${l}`)],
     };
 }
 
@@ -89,7 +121,7 @@ function familyOrder(f) {
  * for the `Surface roles/*` aliases, which are not part of this file.
  */
 function neutralToken(name) {
-    const state = name.match(/^State-layers\/(.+)\/opacity-0_(08|12|16)$/);
+    const state = name.match(new RegExp(`^State-layers/(.+)/opacity-0_(${STATE_LEVELS.join('|')})$`));
     if (state) return `${slug(state[1])}-state-${state[2]}`;
     const role = name.match(/^Neutral Colors\/(?:Surface container\/|Alternative\/)?([^/]+)$/);
     return role ? slug(role[1]) : null;
@@ -122,16 +154,16 @@ const CODE_ONLY_NEUTRALS = { 'disabled-opacity': '0.38' };
  * Colors/Surface container/on-surface` do); a disagreement is a refusal, not a
  * last-one-wins.
  */
-function collectColors(collection, toToken, file) {
-    const mode = Object.keys(collection.modes)[0];
+function collectColors(file, toToken) {
+    const { json, modes: [mode] } = readSource(file, { oneMode: true });
     const map = {};
-    for (const v of collection.variables) {
+    for (const v of json.variables) {
         if (v.resolvedType !== 'COLOR') continue;
         const token = toToken(v.name);
         if (!token) continue;
         const resolved = v.resolvedValuesByMode[mode];
         if (!resolved || resolved.r === undefined) {
-            throw new Error(`${file}: ${v.name} has no resolved colour. Export it with every alias resolved.`);
+            throw new Error(`${file}: ${v.name} has no resolved color. Export it with every alias resolved.`);
         }
         const value = cssColor(resolved);
         if (map[token] !== undefined && map[token] !== value) {
@@ -146,11 +178,13 @@ function collectColors(collection, toToken, file) {
  * Process and generate colors SCSS
  */
 function generateColorsSCSS() {
-    const accent = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ accent.json`, 'utf8'));
-    const neutral = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ neutral.json`, 'utf8'));
+    const accentMap = collectColors('colors _ accent.json', accentToken);
+    const neutralMap = collectColors('colors _ neutral.json', neutralToken);
 
-    const accentMap = collectColors(accent, accentToken, 'colors _ accent.json');
-    const neutralMap = collectColors(neutral, neutralToken, 'colors _ neutral.json');
+    const neutralNames = new Set(readSource('colors _ neutral.json').json.variables.map((v) => neutralToken(v.name)));
+    for (const key of Object.keys(CODE_ONLY_NEUTRALS)) {
+        if (neutralNames.has(key)) stale('CODE_ONLY_NEUTRALS', `--color-${key} is now a Figma variable; read it from the export.`);
+    }
 
     let scss = `/**
  * Material Design 3 Color Tokens
@@ -205,7 +239,7 @@ function generateColorsSCSS() {
        ============================================ */
 `;
     for (const base of NEUTRAL_STATE_BASES) {
-        const keys = ['08', '12', '16'].map((l) => `${base}-state-${l}`).filter((k) => neutralMap[k] !== undefined);
+        const keys = STATE_LEVELS.map((l) => `${base}-state-${l}`).filter((k) => neutralMap[k] !== undefined);
         if (!keys.length) continue;
         scss += `\n    /* ${base} */\n`;
         for (const key of keys) scss += `    --color-${key}: ${neutralMap[key]};\n`;
@@ -218,7 +252,7 @@ function generateColorsSCSS() {
     const placed = new Set([
         ...ACCENT_FAMILIES.flatMap((f) => Object.values(familyOrder(slug(f))).flat()),
         ...Object.values(NEUTRAL_GROUPS).flat(),
-        ...NEUTRAL_STATE_BASES.flatMap((b) => ['08', '12', '16'].map((l) => `${b}-state-${l}`)),
+        ...NEUTRAL_STATE_BASES.flatMap((b) => STATE_LEVELS.map((l) => `${b}-state-${l}`)),
     ]);
     const unplaced = Object.entries({ ...accentMap, ...neutralMap }).filter(([k]) => !placed.has(k));
     if (unplaced.length) {
@@ -241,16 +275,8 @@ function generateColorsSCSS() {
  * decision that Figma is wrong.
  */
 
-/** `Spacing/Small/space-000` -> `spacing-small-space-000`, `Surface Container/pad-x-sm` -> `surface-container-pad-x-sm`. */
-const sizeSlug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-');
-
 /** A size in CSS: `8px`, `1.5px`, `1023.98px`. */
 const px = (n) => `${+Number(n).toFixed(2)}px`;
-
-function readSource(file) {
-    const json = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/${file}`, 'utf8'));
-    return { json, modes: Object.keys(json.modes) };
-}
 
 /**
  * Primitives the stylesheet declares that Figma does not have. They are kept
@@ -270,12 +296,12 @@ const CODE_ONLY_PRIMITIVES = {
 
 /** `{id: {token, value}}` for every Figma primitive, keyed by variable id so semantics can point at them. */
 function primitiveTokens() {
-    const { json, modes } = readSource('size _ primitive.json');
+    const { json, modes: [mode] } = readSource('size _ primitive.json', { oneMode: true });
     const byId = {};
     for (const v of json.variables) {
-        const value = v.resolvedValuesByMode[modes[0]];
+        const value = v.resolvedValuesByMode[mode];
         if (typeof value !== 'number') throw new Error(`size _ primitive.json: ${v.name} has no numeric value.`);
-        byId[v.id] = { token: sizeSlug(v.name), value };
+        byId[v.id] = { token: slug(v.name), value };
     }
     return byId;
 }
@@ -284,8 +310,14 @@ function primitiveTokens() {
  * Generate primitives SCSS
  */
 function generatePrimitivesSCSS() {
+    const primitives = Object.values(primitiveTokens());
+    const figmaNames = new Set(primitives.map((p) => p.token));
+    for (const token of Object.values(CODE_ONLY_PRIMITIVES).flatMap(Object.keys)) {
+        if (figmaNames.has(token)) stale('CODE_ONLY_PRIMITIVES', `--size-${token} is now a Figma variable; read it from the export.`);
+    }
+
     const groups = { spacing: [], radius: [], stroke: [] };
-    for (const { token, value } of Object.values(primitiveTokens())) {
+    for (const { token, value } of primitives) {
         const group = token.startsWith('spacing-') ? 'spacing' : token.includes('-radius-') ? 'radius' : token.includes('-stroke-') ? 'stroke' : null;
         if (!group) throw new Error(`size _ primitive.json: no group for --size-${token}.`);
         groups[group].push({ token, value });
@@ -346,19 +378,44 @@ const SEMANTICS_NOT_WRITTEN = new Set([
     'table-row-radius',
 ]);
 
+/** The semantic layers in the order they are written. */
+const SEMANTIC_LAYERS = [
+    { prefix: 'element', heading: 'Elements Layer' },
+    { prefix: 'card', heading: 'Cards Layer' },
+    { prefix: 'section', heading: 'Sections Layer' },
+    { prefix: 'modal', heading: 'Modals Layer' },
+    { prefix: 'surface', heading: 'Surfaces Layer' },
+    { prefix: 'surface-container', heading: 'Surface Containers Layer' },
+    { prefix: 'table', heading: 'Table Tokens' },
+];
+
+/**
+ * Within a layer, tokens are written by kind in this order, then by size with
+ * `-full` last. A token of a kind not listed here is a refusal.
+ */
+const SEMANTIC_KINDS = ['cell-x', 'cell-y', 'cell-gap', 'pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
+
 /**
  * Generate semantic tokens SCSS
  */
 function generateSemanticsSCSS() {
     const primitives = primitiveTokens();
     const primitiveNames = new Set(Object.values(primitives).map((p) => p.token));
-    const { json, modes } = readSource('size _ semantics.json');
+    const { json, modes: [mode] } = readSource('size _ semantics.json', { oneMode: true });
+
+    const figmaNames = new Set(json.variables.map((v) => slug(v.name)));
+    for (const token of SEMANTICS_NOT_WRITTEN) {
+        if (!figmaNames.has(token)) stale('SEMANTICS_NOT_WRITTEN', `Figma no longer has ${token}; drop it from the list.`);
+    }
+    for (const token of Object.keys(CODE_ONLY_SEMANTICS)) {
+        if (figmaNames.has(token)) stale('CODE_ONLY_SEMANTICS', `--size-${token} is now a Figma variable; read it from the export.`);
+    }
 
     const values = {};
     for (const v of json.variables) {
-        const token = sizeSlug(v.name);
+        const token = slug(v.name);
         if (SEMANTICS_NOT_WRITTEN.has(token)) continue;
-        const val = v.valuesByMode[modes[0]];
+        const val = v.valuesByMode[mode];
         if (val?.type === 'VARIABLE_ALIAS') {
             const target = primitives[val.id];
             if (!target) throw new Error(`size _ semantics.json: ${v.name} aliases ${val.id}, which is not a primitive.`);
@@ -369,6 +426,13 @@ function generateSemanticsSCSS() {
             throw new Error(`size _ semantics.json: ${v.name} has neither an alias nor a number.`);
         }
     }
+    for (const [token, primitive] of Object.entries(SEMANTIC_OVERRIDES)) {
+        if (values[token] === undefined) {
+            stale('SEMANTIC_OVERRIDES', `Figma has no ${token}; it belongs in CODE_ONLY_SEMANTICS.`);
+        } else if (values[token] === `var(--size-${primitive})`) {
+            stale('SEMANTIC_OVERRIDES', `Figma's ${token} is now ${values[token]}, the same as the override; delete the override.`);
+        }
+    }
     for (const [token, primitive] of Object.entries({ ...CODE_ONLY_SEMANTICS, ...SEMANTIC_OVERRIDES })) {
         if (!primitiveNames.has(primitive) && !(primitive in CODE_ONLY_PRIMITIVES.spacing)) {
             throw new Error(`generate-all-tokens.js: --size-${token} points at --size-${primitive}, which is not generated.`);
@@ -376,24 +440,21 @@ function generateSemanticsSCSS() {
         values[token] = `var(--size-${primitive})`;
     }
 
-    const layers = [
-        ['element', 'Elements Layer'],
-        ['card', 'Cards Layer'],
-        ['section', 'Sections Layer'],
-        ['modal', 'Modals Layer'],
-        ['surface-container', 'Surface Containers Layer'],
-        ['surface', 'Surfaces Layer'],
-        ['table', 'Table Tokens'],
-    ];
-    const order = ['cell', 'pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
-    const kind = (token) => order.findIndex((o) => token.includes(`-${o}`));
-
-    const byLayer = Object.fromEntries(layers.map(([layer]) => [layer, []]));
+    const byLayer = Object.fromEntries(SEMANTIC_LAYERS.map(({ prefix }) => [prefix, []]));
     for (const token of Object.keys(values)) {
-        const layer = layers.find(([l]) => token.startsWith(`${l}-`));
+        // Longest prefix first, so `surface-container-*` is not read as `surface-*`.
+        const layer = SEMANTIC_LAYERS.filter(({ prefix }) => token.startsWith(`${prefix}-`))
+            .sort((a, b) => b.prefix.length - a.prefix.length)[0];
         if (!layer) throw new Error(`size _ semantics.json: no layer for --size-${token}.`);
-        byLayer[layer[0]].push(token);
+        byLayer[layer.prefix].push(token);
     }
+    const kind = (token, prefix) => {
+        const rest = token.slice(prefix.length + 1);
+        const index = SEMANTIC_KINDS.findIndex((k) => rest === k || rest.startsWith(`${k}-`));
+        if (index < 0) throw new Error(`size _ semantics.json: --size-${token} is none of SEMANTIC_KINDS.`);
+        return index;
+    };
+    const full = (t) => (t.endsWith('-full') ? 1 : 0);
 
     let scss = `/**
  * Semantic Spacing Tokens
@@ -403,12 +464,10 @@ function generateSemanticsSCSS() {
 
 :root {
 `;
-    // Surfaces before Surface Containers in the output, as the stylesheet always had them.
-    for (const layer of ['element', 'card', 'section', 'modal', 'surface', 'surface-container', 'table']) {
-        const full = (t) => (t.endsWith('-full') ? 1 : 0);
-        const tokens = byLayer[layer].sort((a, b) => kind(a) - kind(b) || full(a) - full(b) || a.localeCompare(b));
+    for (const { prefix, heading } of SEMANTIC_LAYERS) {
+        const tokens = byLayer[prefix].sort((a, b) => kind(a, prefix) - kind(b, prefix) || full(a) - full(b) || a.localeCompare(b));
         if (!tokens.length) continue;
-        scss += `\n    /* ${layers.find(([l]) => l === layer)[1]} */\n`;
+        scss += `\n    /* ${heading} */\n`;
         for (const token of tokens) scss += `    --size-${token}: ${values[token]};\n`;
     }
     scss += `}\n`;
@@ -426,6 +485,22 @@ const BREAKPOINT_OVERRIDES = { 'xl-max': 1919.98 };
 const CODE_ONLY_BREAKPOINTS = { 'xxl-min': 1920 };
 
 /**
+ * Layout tokens the stylesheet declares that Figma does not have, with the
+ * comment each is written with. The SideNav is a fixed 164px wide; Figma draws
+ * it at that width but has no variable for it.
+ */
+const CODE_ONLY_LAYOUT = {
+    'layout-sidebar-width': { value: 164, note: 'SideNav fixed width' },
+};
+
+/**
+ * The semantic token the grid gutter is documented as equal to. The note is
+ * checked, not trusted: Figma's `Grid/content-gutter` and this token's
+ * resolved value have to match.
+ */
+const GRID_GAP_EQUALS = 'element-gap-sm';
+
+/**
  * Generate layout tokens SCSS
  *
  * Reads `Breakpoints/*`, `Columns/*` and `Grid/content-gutter`. Not written
@@ -434,6 +509,7 @@ const CODE_ONLY_BREAKPOINTS = { 'xxl-min': 1920 };
  */
 function generateLayoutSCSS() {
     const { json } = readSource('size _ layout.json');
+    const figmaNames = json.variables.map((v) => slug(v.name));
     const modes = Object.entries(json.modes).map(([id, name]) => {
         if (!BREAKPOINT_KEYS[name]) throw new Error(`size _ layout.json: unknown mode "${name}".`);
         return { id, key: BREAKPOINT_KEYS[name] };
@@ -451,11 +527,31 @@ function generateLayoutSCSS() {
         breakpoints[`${mode.key}-min`] = min(mode);
         breakpoints[`${mode.key}-max`] = max(mode);
     }
+    for (const [key, value] of Object.entries(BREAKPOINT_OVERRIDES)) {
+        if (breakpoints[key] === undefined) stale('BREAKPOINT_OVERRIDES', `Figma has no ${key}; it belongs in CODE_ONLY_BREAKPOINTS.`);
+        else if (breakpoints[key] === value) stale('BREAKPOINT_OVERRIDES', `Figma's ${key} is now ${value}, the same as the override; delete the override.`);
+    }
+    for (const key of Object.keys(CODE_ONLY_BREAKPOINTS)) {
+        if (breakpoints[key] !== undefined) stale('CODE_ONLY_BREAKPOINTS', `Figma now has ${key}; read it from the export.`);
+    }
+    for (const token of Object.keys(CODE_ONLY_LAYOUT)) {
+        const bare = token.replace(/^layout-/, '');
+        const match = figmaNames.find((n) => n === token || n.endsWith(bare));
+        if (match) stale('CODE_ONLY_LAYOUT', `Figma now has ${match}; read --${token} from the export.`);
+    }
     Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
 
     const gutter = variable('Grid/content-gutter');
     const gutters = new Set(modes.map(gutter));
     if (gutters.size !== 1) throw new Error('size _ layout.json: Grid/content-gutter differs by mode; --layout-grid-gap is one value.');
+    const gridGap = [...gutters][0];
+
+    const semantics = readSource('size _ semantics.json', { oneMode: true });
+    const twin = semantics.json.variables.find((v) => slug(v.name) === GRID_GAP_EQUALS);
+    const twinValue = twin?.resolvedValuesByMode[semantics.modes[0]];
+    if (twinValue !== gridGap) {
+        stale('GRID_GAP_EQUALS', `Grid/content-gutter is ${gridGap} but ${GRID_GAP_EQUALS} is ${twinValue}; the note no longer holds.`);
+    }
 
     const columns = (mode, indent) =>
         Array.from({ length: 12 }, (_, i) => `${indent}--col-${i + 1}: ${px(variable(`Columns/col-${i + 1}`)(mode))};\n`).join('');
@@ -468,9 +564,9 @@ function generateLayoutSCSS() {
 :root {
     /* Breakpoints */
 ${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\n`).join('')}
-    /* App shell + content grid (mirrors the Figma size/layout collection) */
-    --layout-sidebar-width: 164px; /* SideNav fixed width */
-    --layout-grid-gap: ${px([...gutters][0])}; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */
+    /* App shell + content grid */
+${Object.entries(CODE_ONLY_LAYOUT).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note}; not a Figma variable (CODE_ONLY_LAYOUT) */\n`).join('')}\
+    --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --size-${GRID_GAP_EQUALS}); col-* spans assume this */
 
     /* Content-grid column spans — ${modes[0].key.toUpperCase()} values; wider breakpoints override below */
 ${columns(modes[0], '    ')}}
@@ -480,31 +576,6 @@ ${columns(modes[0], '    ')}}
     }
     return scss;
 }
-
-/**
- * Validate generated SCSS files to ensure no primitive tokens are used
- */
-function validateSemanticTokens(scssContent, filename) {
-    // List of primitive token patterns that should NOT appear in semantic files
-    const primitivePatterns = [
-        /--size-spacing-/,
-        /--size-border-radius-radius-/,
-        /--size-border-stroke-stroke-/,
-    ];
-
-    const errors = [];
-    primitivePatterns.forEach(pattern => {
-        const matches = scssContent.match(new RegExp(pattern, 'g'));
-        if (matches) {
-            matches.forEach(match => {
-                errors.push(`Primitive token found in ${filename}: ${match}`);
-            });
-        }
-    });
-
-    return errors;
-}
-
 
 // Generate all files
 //
@@ -517,12 +588,30 @@ function validateSemanticTokens(scssContent, filename) {
 console.log('Generating token SCSS files...');
 
 const OUT_DIR = TOKEN_DIR;
-const built = [
-    { file: '_colors.scss', generated: generateColorsSCSS() },
-    { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
-    { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
-    { file: '_layout.scss', generated: generateLayoutSCSS() },
-].map((entry) => ({
+let generated;
+try {
+    generated = [
+        { file: '_colors.scss', generated: generateColorsSCSS() },
+        { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
+        { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
+        { file: '_layout.scss', generated: generateLayoutSCSS() },
+    ];
+} catch (error) {
+    console.error(`\n❌ Refusing to write. ${error.message}\n   Nothing was written.\n`);
+    process.exit(1);
+}
+
+if (staleExceptions.length) {
+    console.error('\n❌ Refusing to write. These exceptions no longer describe a difference from Figma:\n');
+    for (const line of staleExceptions) console.error(`   ${line}`);
+    console.error(
+        '\n   Update the constant in scripts/generate-all-tokens.js so it only lists\n' +
+        '   real differences, then run this again. Nothing was written.\n',
+    );
+    process.exit(1);
+}
+
+const built = generated.map((entry) => ({
     ...entry,
     committed: fs.existsSync(path.join(OUT_DIR, entry.file))
         ? fs.readFileSync(path.join(OUT_DIR, entry.file), 'utf8')
@@ -568,15 +657,4 @@ if (refused.length && force) {
 }
 
 console.log('\n✅ All token files generated successfully!');
-/*
- * `validateSemanticTokens` is still not run — see the commented-out block above.
- * This line used to read "✅ Validation passed: No primitive tokens found in
- * semantic files", printed unconditionally beside a validation that had been
- * commented out, which is a claim rather than a result. The validation would
- * report 48 findings today: `_spacing_semantics.scss` uses `--size-spacing-*`
- * throughout, which is the pattern it forbids. Turning it on means deciding
- * whether that pattern is wrong or the rule is; neither is decided here, and
- * neither is served by printing that it passed.
- */
-console.log('ℹ️  Semantic-token validation is DISABLED (48 known findings). Not run, not passed.');
 

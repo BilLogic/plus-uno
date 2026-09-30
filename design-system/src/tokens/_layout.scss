@@ -13,9 +13,9 @@
     --breakpoint-xl-max: 1919.98px;
     --breakpoint-xxl-min: 1920px;
 
-    /* App shell + content grid (mirrors the Figma size/layout collection) */
-    --layout-sidebar-width: 164px; /* SideNav fixed width */
-    --layout-grid-gap: 8px; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */
+    /* App shell + content grid */
+    --layout-sidebar-width: 164px; /* SideNav fixed width; not a Figma variable (CODE_ONLY_LAYOUT) */
+    --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --size-element-gap-sm); col-* spans assume this */
 
     /* Content-grid column spans — MD values; wider breakpoints override below */
     --col-1: 48.67px;

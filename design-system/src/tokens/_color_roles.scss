@@ -13,8 +13,8 @@
  * container, a `-text`, and six state overlays. That names two roles and uses
  * three. There is no `--color-warning-border` and no `--color-warning-icon`, so
  * an intent-coloured stroke or glyph reaches for the BASE, which is also the
- * ground. `_colors.scss` even says so in a comment beside the value —
- * "for borders/backgrounds" — which is a rule nothing can enforce.
+ * ground. `_colors.scss` used to say so in a comment beside the value —
+ * "for borders/backgrounds" — which was a rule nothing could enforce.
  *
  * WHAT THE BASE ACTUALLY MEASURES. Contrast of each base against the five
  * surface steps this system ships, `--color-surface-container-lowest` (#ffffff)
