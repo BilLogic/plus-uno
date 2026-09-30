@@ -32,6 +32,7 @@ import {
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { PRECEDENCE_INTAKE_TITLE } from "../src/ds-precedence/report";
+import { sweepShareOffer } from "../src/sweep/share";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
@@ -1184,6 +1185,38 @@ test("re-staging a cut-off sweep card tells onRestaged which card replaced which
   );
   assert.ok(staged);
   assert.deepEqual(moved, [[SWEEP_CARD.proposalTs, staged.proposal.proposalTs, "2026-09-30"]]);
+});
+
+// A group DM's share is offered only after the card people were shown: a
+// revision or a re-staged card carries no pages to share, so its ✅ applies
+// the fix and never leads to a share card.
+test("a revised or re-staged group-DM sweep card carries no share", async () => {
+  const GROUP_DM_CARD: PendingProposal = {
+    ...SWEEP_CARD,
+    sweepShare: { pages: [{ url: FIX_ONE.page_url, title: "Launch plan", to: "plus-design" }] },
+  };
+  const applied = [
+    { toolName: "notion_update", input: FIX_ONE, ok: true, result: JSON.stringify({ ok: true }), message: "updated" },
+  ];
+  const channels = { plusDesign: "C0DESIGN" };
+  assert.ok(sweepShareOffer(GROUP_DM_CARD.sweepShare, applied, channels), "the card as shown would offer one");
+
+  const h = harness();
+  await h.threadState.putProposal(GROUP_DM_CARD);
+  const revised = await runTurn(request({ text: "drop 2", pending: GROUP_DM_CARD, userId: "U0OWNER" }), h.deps);
+  assert.equal(revised.disposition, "staged");
+  assert.equal(revised.staged!.proposal.sweepShare, undefined);
+  assert.equal(sweepShareOffer(revised.staged!.proposal.sweepShare, applied, channels), null);
+
+  const again = harness();
+  await again.threadState.putProposal(GROUP_DM_CARD);
+  const restaged = await restageExecution(
+    { proposal: GROUP_DM_CARD, operations: [{ toolName: "notion_update", input: FIX_ONE }] },
+    { ...again.deps, proposalEvents: again.deps.usage.proposalEvents },
+  );
+  assert.ok(restaged);
+  assert.equal(restaged.proposal.sweepShare, undefined);
+  assert.equal(sweepShareOffer(restaged.proposal.sweepShare, applied, channels), null);
 });
 
 test("a fresh card carries neither a lifetime nor a confirmer set of its own", async () => {

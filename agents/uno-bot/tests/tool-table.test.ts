@@ -24,6 +24,7 @@ import {
   gateWordsFor,
   isToolName,
   rowFor,
+  runsPastGate,
   TOOL_NAMES,
   TOOL_TABLE,
   withSchemas,
@@ -42,14 +43,27 @@ function schemasFromDisk(): ToolSchema[] {
 }
 
 describe("the tool table", () => {
-  it("has one row per tool in the schema file, and no row without one", () => {
+  it("has one row per tool in the schema file, and no row without one but the worker tools", () => {
     const rows = withSchemas(schemasFromDisk());
     assert.deepEqual([...Object.keys(rows)].sort(), [...TOOL_NAMES].sort());
     for (const name of TOOL_NAMES) {
       assert.equal(rows[name].name, name);
-      assert.equal(rows[name].schema.name, name);
-      assert.ok(rows[name].schema.description.length > 0, `${name} has no description`);
+      const schema = rows[name].schema;
+      if (TOOL_TABLE[name].access === "worker") {
+        assert.equal(schema, null, `${name} is the Worker's alone, so no one is offered it`);
+        continue;
+      }
+      assert.equal(schema?.name, name);
+      assert.ok((schema?.description.length ?? 0) > 0, `${name} has no description`);
     }
+  });
+
+  it("refuses a schema for a worker tool, which the model must never be offered", () => {
+    const offered = [
+      ...schemasFromDisk(),
+      { name: "sweep_share_post", description: "x", input_schema: { type: "object", properties: {} } },
+    ] as ToolSchema[];
+    assert.throws(() => withSchemas(offered), /sweep_share_post/);
   });
 
   it("says which tool is missing rather than which count is wrong", () => {
@@ -80,8 +94,8 @@ describe("the access column partitions the tools across the two dispatches", () 
   // not copy into `.test-build/`), so what is checked is the fact they read:
   // every tool falls to exactly one dispatch, and the one that falls to
   // neither is named rather than merely absent.
-  it("puts every tool in exactly one of the three standings", () => {
-    const seen = { ungated: 0, gated: 0, control: 0 };
+  it("puts every tool in exactly one of the four standings", () => {
+    const seen = { ungated: 0, gated: 0, worker: 0, control: 0 };
     for (const name of TOOL_NAMES) {
       const access = TOOL_TABLE[name].access;
       assert.ok(access in seen, `${name} has an access no dispatch reads: ${access}`);
@@ -91,7 +105,7 @@ describe("the access column partitions the tools across the two dispatches", () 
     // assertion in this file while meaning the Gate is never reached.
     assert.ok(seen.ungated > 0, "no tool runs inside the turn");
     assert.ok(seen.gated > 0, "no tool runs past the Gate");
-    assert.equal(seen.ungated + seen.gated + seen.control, TOOL_NAMES.length);
+    assert.equal(seen.ungated + seen.gated + seen.worker + seen.control, TOOL_NAMES.length);
   });
 
   it("intercepts proposal_resolve and nothing else", () => {
@@ -130,8 +144,8 @@ describe("the readers answer from the row", () => {
       const row = rowFor(name);
       assert.ok(row, `${name} has no row`);
       const words = gateWordsFor(name);
-      if (row.access !== "gated") {
-        assert.equal(words, null, `${name} is not gated but carries card words`);
+      if (!runsPastGate(row.access)) {
+        assert.equal(words, null, `${name} does not run past the Gate but carries card words`);
         continue;
       }
       assert.ok(words, `${name} is gated with no card words`);

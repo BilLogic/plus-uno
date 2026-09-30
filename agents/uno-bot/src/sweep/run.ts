@@ -70,7 +70,7 @@
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
 import { proposalReplyThread, SWEEP_KEY, type PendingProposal, type ThreadState } from "../thread-state/index";
-import { recordProposalEvents, stagedEvent, supersededEvents, type ProposalEventLog } from "../usage/index";
+import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
 import type { ProposalCard } from "../turn/index";
 import type { ScheduledJob } from "../scheduled/runs";
 import {
@@ -86,6 +86,7 @@ import {
 import { MAX_MESSAGE_CHARS, type DriftDetector } from "./detector";
 import {
   classifyLink,
+  conversationTypeOf,
   linksIn,
   pickDestination,
   resolveDestination,
@@ -201,8 +202,8 @@ export interface SweepDelivery {
   /** The card's own message under this key, matched by its tag's key and
    *  role. `since` bounds a channel-top search. */
   findPosted(to: CardPlace, cardKey: string, since: string): Promise<PostedCard>;
-  /** Stage the card, as a turn's staging does. */
-  stage(proposal: PendingProposal): Promise<void>;
+  /** Stage the card, as a turn's staging does, in a place of this kind. */
+  stage(proposal: PendingProposal, channelKind: ChannelKind): Promise<void>;
   /** The sweep cards ThreadState holds live in a channel — a revision or a
    *  re-staged card among them, whether or not the records caught up. */
   liveCards(channel: string): Promise<PendingProposal[]>;
@@ -272,6 +273,9 @@ export interface SweepJobReport {
   threads: number;
   /** Kept tonight (end of day), or carded this morning. */
   findings: PendingFinding[];
+  /** On a dry run, the findings from private places, as ids only
+   *  (`withheldFromDryRun`). */
+  withheld?: Array<{ id: string; channel: string; channelKind: ChannelKind }>;
   /** Posted this morning — or, on a dry run, what would be. */
   cards: SweepCardReport[];
   summary: string;
@@ -284,10 +288,38 @@ export interface SweepJobReport {
  * @param deps - Everything it touches, by name
  * @throws A budget stop, after saving what was done — so the runner defers
  */
-export function runSweepJob(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
-  if (job.kind === "sweep-post") return postFindings(job, deps);
-  if (job.kind === "sweep-group-dms") return sweepGroupDms(job, deps);
-  return sweepChannel(job, deps);
+export async function runSweepJob(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
+  const report =
+    job.kind === "sweep-post"
+      ? await postFindings(job, deps)
+      : job.kind === "sweep-group-dms"
+        ? await sweepGroupDms(job, deps)
+        : await sweepChannel(job, deps);
+  return deps.dryRun ? withheldFromDryRun(report) : report;
+}
+
+/** What a dry run's report shows of a card from a private place. */
+export const WITHHELD_TEXT = "(withheld: this card is for a private channel or a group DM)";
+
+/**
+ * A dry run's report with everything from a private channel, a group DM or a
+ * DM reduced to counts and ids. `/debug/sweep` shows the report to whoever
+ * calls it, who may be no one who could see that evidence (ADR-031): its
+ * findings leave as their id, channel and kind — no text on either side, no
+ * replacement, no owner — and its cards keep their place and count, not their
+ * text. The summary's counts still include them.
+ *
+ * @param report - A dry run's report
+ */
+export function withheldFromDryRun(report: SweepJobReport): SweepJobReport {
+  const hidden = report.findings.filter((f) => f.evidence.channelKind !== "public");
+  if (!hidden.length && !report.cards.some((c) => c.destination.rung === "private")) return report;
+  return {
+    ...report,
+    findings: report.findings.filter((f) => f.evidence.channelKind === "public"),
+    withheld: hidden.map((f) => ({ id: f.id, channel: f.evidence.channel, channelKind: f.evidence.channelKind })),
+    cards: report.cards.map((c) => (c.destination.rung === "private" ? { ...c, text: WITHHELD_TEXT } : c)),
+  };
 }
 
 // ── End of day: read, detect, queue ──────────────────────────────────────────
@@ -295,8 +327,11 @@ export function runSweepJob(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
 /**
  * Every group DM uno-bot is in, one after another on this job's budget. Each
  * is swept as a channel is — its own cursor, its own run record under
- * `<job key>:<channel>` — so a budget stop part-way keeps what is done, and
- * the retried job skips it.
+ * `<job key>:<channel>`. A budget stop part-way keeps what is done and is
+ * thrown, so the runner retries the job on a fresh budget; the retry passes
+ * over every group DM whose run today is already handled, spending one record
+ * read on each instead of its Slack reads. Any other failure in one group DM
+ * is logged and counted, and the rest are still swept.
  */
 async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
   const base = { kind: "sweep-group-dms" as const, key: job.key };
@@ -305,14 +340,32 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
     const note = "the group DMs uno-bot is in could not be listed";
     return { ...base, outcome: "skipped", note, threads: 0, findings: [], cards: [], summary: note };
   }
+  const runDate = dateOf(deps.now());
   const reports: SweepJobReport[] = [];
+  let done = 0;
+  const failed: string[] = [];
   for (const channel of listed.filter((c) => c && c !== deps.config.unoBot)) {
-    reports.push(await sweepChannel({ key: `${job.key}:${channel}`, kind: "sweep-channel", channel }, deps, "group-dm"));
+    const key = `${job.key}:${channel}`;
+    if (!deps.dryRun && (await deps.store.getRun(`${runDate}:${key}`))?.outcome === "handled") {
+      done += 1;
+      continue;
+    }
+    try {
+      reports.push(await sweepChannel({ key, kind: "sweep-channel", channel }, deps, "group-dm"));
+    } catch (err) {
+      rethrowIfBudget(err);
+      console.error(`[sweep] group DM ${channel} failed: ${err instanceof Error ? err.message : String(err)}`);
+      failed.push(channel);
+    }
   }
   const threads = reports.reduce((n, r) => n + r.threads, 0);
   const findings = reports.flatMap((r) => r.findings);
   const cards = reports.flatMap((r) => r.cards);
-  const notes = reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`);
+  const notes = [
+    ...(done ? [`${done} already swept today`] : []),
+    ...(failed.length ? [`${failed.length} failed: ${failed.join(", ")}`] : []),
+    ...reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`),
+  ];
   const note = notes.length ? notes.join("; ") : null;
   const counted = `${reports.length} group DM(s), ${threads} thread(s) read, ${findings.length} finding(s) kept for the morning`;
   return { ...base, outcome: "handled", note, threads, findings, cards, summary: note ? `${counted} — ${note}` : counted };
@@ -862,7 +915,7 @@ async function stageOrWithdraw(
 ): Promise<boolean> {
   const { deps } = ctx;
   try {
-    await deps.delivery.stage(sweepProposal(plan, posted));
+    await deps.delivery.stage(sweepProposal(plan, posted), plan.items[0]!.evidence.channelKind);
   } catch (err) {
     if (isSubrequestBudgetError(err)) throw err;
     const why = err instanceof Error ? err.message : String(err);
@@ -1043,6 +1096,9 @@ async function sortOutCarded(
  * superseded row for any card the staging retired. Its later ✅ or ⛔ pairs
  * with that staged row.
  *
+ * The staged row names the channel only where a turn's would
+ * (`storesChannel`): never a group DM or a DM.
+ *
  * A thread the bot had no history in is marked as entered through the card
  * (`thread-mark.ts`), so what the bot posts there answering the card never
  * makes the team's later replies its conversation. Best-effort: an unmarked
@@ -1056,6 +1112,7 @@ export async function stageSweepCard(
     markThread?: (channel: string, thread: string) => Promise<void>;
   },
   now: number,
+  channelKind: ChannelKind = "public",
 ): Promise<void> {
   if (deps.markThread) {
     const ref = { channel: proposal.channel, thread: proposal.threadTs };
@@ -1069,7 +1126,12 @@ export async function stageSweepCard(
   const { retired } = await deps.threadState.putProposal(proposal);
   await recordProposalEvents(deps.proposalEvents, [
     ...supersededEvents(retired, now, "worker"),
-    stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
+    stagedEvent({
+      proposal,
+      at: now,
+      via: "worker",
+      channelStored: storesChannel("channel", conversationTypeOf(channelKind)),
+    }),
   ]);
 }
 

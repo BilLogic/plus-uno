@@ -63,12 +63,20 @@ export interface ToolSchema {
  *
  * `ungated` runs inline inside the turn — the reads, plus `slack_react`,
  * which writes but is reversible. `gated` is staged as a proposal card and
- * runs only past the Gate. `control` is neither — it resolves a card that is
- * already standing, and the loop intercepts it before any dispatch.
+ * runs only past the Gate. `worker` runs past the Gate too, but only the
+ * Worker stages it: it has no schema, is never offered to the model, and a
+ * call the model makes to it is refused like any unknown name. `control` is
+ * neither — it resolves a card that is already standing, and the loop
+ * intercepts it before any dispatch.
  *
  * It is the DISPATCH distinction, not a read/write one.
  */
-export type ToolAccess = "ungated" | "gated" | "control";
+export type ToolAccess = "ungated" | "gated" | "worker" | "control";
+
+/** True for a tool that runs past the Gate: `gated`, or staged by the Worker. */
+export function runsPastGate(access: ToolAccess): boolean {
+  return access === "gated" || access === "worker";
+}
 
 /**
  * How a staged tool is SPOKEN ABOUT — the words the proposal card and the
@@ -117,7 +125,7 @@ export type ToolRow = {
   readonly reviewRequest: string | null;
 } & (
   | { readonly access: "ungated" | "control"; readonly gate?: undefined }
-  | { readonly access: "gated"; readonly gate: GateWords }
+  | { readonly access: "gated" | "worker"; readonly gate: GateWords }
 );
 
 export const TOOL_TABLE = {
@@ -258,6 +266,19 @@ export const TOOL_TABLE = {
       nouns: ["workflow", "run", "github", "action", "sync"],
     },
   },
+  // The reworded note a group DM's share card posts (src/sweep/share.ts): the
+  // exact text the card showed, to the team channel it named. The Worker
+  // stages it; the model is never offered it.
+  sweep_share_post: {
+    access: "worker",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "post this note in a team channel",
+      kind: "post a note",
+      nouns: ["note", "share", "post"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 
@@ -293,13 +314,14 @@ export function rowFor(name: string): ToolRow | null {
  */
 export function gateWordsFor(name: string): GateWords | null {
   const row = rowFor(name);
-  return row?.access === "gated" ? row.gate : null;
+  return row && runsPastGate(row.access) ? (row.gate ?? null) : null;
 }
 
-/** One row with the schema it is offered under. */
+/** One row with the schema it is offered under — null for a `worker` row,
+ *  which is offered to no one. */
 export type SchemaRow = ToolRow & {
   readonly name: ToolName;
-  readonly schema: ToolSchema;
+  readonly schema: ToolSchema | null;
 };
 
 /**
@@ -321,13 +343,22 @@ export function withSchemas(schemas: readonly ToolSchema[]): Record<ToolName, Sc
   }
   const rows = {} as Record<ToolName, SchemaRow>;
   const schemaless: string[] = [];
+  const offered: string[] = [];
   for (const name of TOOL_NAMES) {
     const schema = byName.get(name);
+    if (TOOL_TABLE[name].access === "worker") {
+      if (schema) offered.push(name);
+      rows[name] = { name, ...TOOL_TABLE[name], schema: null };
+      continue;
+    }
     if (!schema) {
       schemaless.push(name);
       continue;
     }
     rows[name] = { name, ...TOOL_TABLE[name], schema };
+  }
+  if (offered.length) {
+    throw new Error(`worker tools must have no schema, since no one is offered them: ${offered.sort().join(", ")}`);
   }
   if (schemaless.length) {
     throw new Error(`tool table rows with no schema: ${schemaless.sort().join(", ")}`);

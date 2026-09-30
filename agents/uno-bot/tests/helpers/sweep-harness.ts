@@ -87,6 +87,8 @@ export interface FakeChannel {
   threads?: Record<string, SweepSlackMessage[]>;
   /** Its members, as `conversations.members` lists them; absent, the read fails. */
   members?: string[];
+  /** Its history read throws, as a failure no budget explains would. */
+  fails?: boolean;
 }
 
 export interface SweepHarness {
@@ -214,6 +216,7 @@ export function sweepHarness(opts: {
         reads.push(`history ${channel}`);
         const c = opts.channels[channel];
         if (!c) return null;
+        if (c.fails) throw new Error(`history of ${channel} blew up`);
         return page(c.history.filter((m) => Number(m.ts) > Number(oldest)), cursor);
       },
       async replies(channel, rootTs, cursor) {
@@ -268,7 +271,7 @@ export function sweepHarness(opts: {
         const hit = posted.find((p) => p.channel === to.channel && p.threadTs === to.threadTs && p.cardKey === cardKey);
         return hit ? { state: "found", ts: hit.ts, text: hit.text, digest: hit.digest } : { state: "absent" };
       },
-      async stage(proposal) {
+      async stage(proposal, channelKind) {
         once("stage");
         staged.push(proposal);
         // The production staging: the card, and its rows on the usage record.
@@ -276,6 +279,7 @@ export function sweepHarness(opts: {
           proposal,
           { threadState, proposalEvents, markThread: async (channel, thread) => void marked.add(`${channel}:${thread}`) },
           clock.now,
+          channelKind,
         );
         // A stop after the card is in ThreadState, before the job heard back.
         once("afterStage");

@@ -261,39 +261,37 @@ test("a group DM's sweep card whose write was refused shares nothing", async () 
   assert.equal(posts().filter((p) => p.channel === "C0DESIGN").length, 0, "the block had moved, so nothing was applied");
 });
 
-test("a group DM's applied fix is shared once in its team channel, and never in #uno-bot", async () => {
-  const { shareSweepSummaryFor } = await import("../src/sweep/env.js");
-  const applied = {
-    toolName: "notion_update",
-    input: { page_url: SHARED_PAGE },
-    ok: true,
-    result: JSON.stringify({ ok: true }),
-    message: "updated",
-  };
-  const proposal = won([applied]).proposal!;
+test("a share card's ✅ posts exactly its note to its channel, and nothing to #uno-bot or elsewhere", async () => {
+  const note = ":mag: End-of-day sweep: a group conversation settled something the Notion page “Launch plan” still said the old way, and the page is now up to date: " + SHARED_PAGE;
+  const share = (channel: string) => ({ toolName: "sweep_share_post", input: { channel, channel_name: "#plus-design", text: note } });
   calls = [];
-  await shareSweepSummaryFor(
-    env(SHARE_ENV),
-    { ...proposal, channel: "G0MPIM", sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" }] } },
-    [applied],
-  );
-  assert.deepEqual(posts().map((p) => p.channel), ["C0DESIGN"]);
-  assert.match(String(posts()[0]!.text), /Launch plan/);
-  assert.doesNotMatch(String(posts()[0]!.text), /<@|G0MPIM/);
+  const run = await executeVerdict();
+  const verdict = won([share("C0DESIGN")]);
+  await run(env(SHARE_ENV), { ...verdict, proposal: { ...verdict.proposal!, channel: "G0MPIM", supersedeKey: "sweep-share" } });
+  const inDesign = posts().filter((p) => p.channel === "C0DESIGN");
+  assert.equal(inDesign.length, 1);
+  assert.equal(inDesign[0]!.text, note, "exactly the text the card showed");
 
-  // The team channel set to #uno-bot, or not set: nothing goes anywhere.
+  // A card aimed anywhere else — #uno-bot, a private channel — posts nothing there.
+  for (const elsewhere of ["C0UNOBOT", "G0SECRET"]) {
+    calls = [];
+    const aimed = won([share(elsewhere)]);
+    await run(env(SHARE_ENV), { ...aimed, proposal: { ...aimed.proposal!, channel: "G0MPIM" } });
+    assert.equal(posts().filter((p) => p.channel === elsewhere).length, 0, elsewhere);
+  }
+});
+
+test("a group DM's fix ✅ posts nothing outside the group DM", async () => {
   calls = [];
-  await shareSweepSummaryFor(
-    env({ ...SHARE_ENV, PLUS_DESIGN_CHANNEL_ID: "C0UNOBOT" }),
-    { ...proposal, sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" }] } },
-    [applied],
-  );
-  await shareSweepSummaryFor(env(), { ...proposal, sweepShare: { pages: [{ url: SHARED_PAGE, title: "x", to: "plus-design" }] } }, [
-    applied,
-  ]);
-  // A card from anywhere else has no share.
-  await shareSweepSummaryFor(env(SHARE_ENV), proposal, [applied]);
-  assert.deepEqual(posts(), []);
+  const run = await executeVerdict();
+  const verdict = won([{ toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } }]);
+  const proposal = {
+    ...verdict.proposal!,
+    sweepRun: "2026-09-30",
+    sweepShare: { pages: [{ url: SHARED_PAGE, title: "Launch plan", to: "plus-design" as const }] },
+  };
+  await run(env(SHARE_ENV), { ...verdict, proposal });
+  assert.equal(posts().filter((p) => p.channel === "C0DESIGN" || p.channel === "C0UNIVERSAL").length, 0);
 });
 
 const EMAIL = {

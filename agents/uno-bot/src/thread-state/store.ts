@@ -261,10 +261,11 @@ export interface PendingProposal {
    */
   sweepRun?: string;
   /**
-   * Set on a sweep card staged in a group DM: the pages its fixes touch, and
-   * the team channel a reworded note about each goes to once a ✅ applies it
-   * (`sweep/share.ts`). The note names the page and nothing else: no quote,
-   * no names. A revision of it and a re-staged card carry it.
+   * Set on a sweep card the morning staged in a group DM: the pages its fixes
+   * touch, and the team channel a reworded note about each would go to. Once
+   * its ✅ has written one, the Worker stages a separate share card offering
+   * that note (`sweep/share.ts`). A revision or a re-staged card never carries
+   * it, so only the card people were shown offers a share.
    */
   sweepShare?: SweepShare;
   /**

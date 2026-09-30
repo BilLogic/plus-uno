@@ -30,7 +30,7 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 #uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
 
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
-- **Group DM:** the card goes back in that group DM. Its ✅ also posts a reworded note in the rung 3 or 4 channel, naming the page it brought up to date, with no quote and no names. The card says so before anyone confirms.
+- **Group DM:** the card goes back in that group DM, and its ✅ applies the fix only. Once that batch has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. Its ✅ posts that note; its ⛔ drops it. It has the fix card's confirmers and 72 h. A revised or re-staged fix card offers no share.
 - **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private card.
 
 ## The card

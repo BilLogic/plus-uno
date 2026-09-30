@@ -23,8 +23,9 @@
 //     proposal renderer and tagged with its key in message metadata, and
 //     `ThreadState.putProposal`. A card is found again by that tag
 //     (`include_all_metadata`), and withdrawn with `chat.update`.
-//   • A group DM's share: once its card's ✅ has run, `chat.postMessage` of
-//     each reworded note in its team channel (`shareSweepSummaryFor`).
+//   • A group DM's share: once its fix card's ✅ has written a page, a
+//     separate share card posted and staged in the same thread
+//     (`offerSweepShareFor`); its own ✅ runs `sweep_share_post`.
 //
 // THE BUDGET, AT EVERY READ. A read that ran into the lookup ceiling may come
 // back short rather than throw — a paging loop that stopped, an executor that
@@ -72,7 +73,7 @@ import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
 import { SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
-import { sweepShareNotes } from "./share";
+import { stageSweepShare } from "./share";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
@@ -231,7 +232,7 @@ async function sweepDepsFor(
         }
         return { state: "unknown", why: `more than ${FIND_POSTED_PAGES} pages to search` };
       },
-      async stage(proposal) {
+      async stage(proposal, channelKind) {
         await stageSweepCard(
           proposal,
           {
@@ -240,6 +241,7 @@ async function sweepDepsFor(
             markThread: (channel, thread) => markSweepThread(kv, channel, thread),
           },
           Date.now(),
+          channelKind,
         );
       },
       async cardState(proposalTs) {
@@ -299,35 +301,42 @@ export async function recordSweepResolutionFor(
 }
 
 /**
- * Post a group-DM card's reworded notes once its ✅ has run (`sweepShareNotes`):
- * one per team channel, naming the pages the batch brought up to date. Never
- * in #uno-bot, and nothing when the channel is not configured. Best-effort: a
- * failed post is logged and never reaches the person.
+ * Offer a group DM's share once its fix card's ✅ has run (`stageSweepShare`):
+ * a separate card in the same thread showing the note and naming its team
+ * channel, staged for the fix card's confirmers. Nothing for a card from
+ * anywhere else, a revision, or a batch that wrote nothing.
  *
  * @param env - Carries the team channels' ids
- * @param proposal - The confirmed card
+ * @param proposal - The confirmed fix card
  * @param outcomes - What its batch ran
  */
-export async function shareSweepSummaryFor(
+export async function offerSweepShareFor(
   env: Env,
   proposal: PendingProposal,
   outcomes: readonly OperationOutcome[],
 ): Promise<void> {
   if (!proposal.sweepShare) return;
-  const channels = {
-    "plus-universal": env.PLUS_UNIVERSAL_CHANNEL_ID?.trim(),
-    "plus-design": env.PLUS_DESIGN_CHANNEL_ID?.trim(),
-  };
-  for (const note of sweepShareNotes(proposal.sweepShare, outcomes)) {
-    const channel = channels[note.to];
-    if (!channel || channel === env.UNO_BOT_CHANNEL_ID?.trim()) continue;
-    try {
-      const sent = await postMessage(env, { channel, text: note.text, metadata: sweepPostMetadata("note") });
-      if (!sent.ok) console.warn(`[sweep] share of ${proposal.proposalTs} not posted: ${sent.error ?? "no"}`);
-    } catch (err) {
-      console.error(`[sweep] share of ${proposal.proposalTs} not posted: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
+  await stageSweepShare(proposal, outcomes, {
+    channels: {
+      plusDesign: env.PLUS_DESIGN_CHANNEL_ID,
+      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID,
+      unoBot: env.UNO_BOT_CHANNEL_ID,
+    },
+    async post(to, card) {
+      const rendered = renderProposalCard(card);
+      const res = await postMessage(env, {
+        channel: to.channel,
+        thread_ts: to.threadTs,
+        text: rendered.text,
+        blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+        metadata: sweepPostMetadata("note"),
+      });
+      return res.ok && res.ts ? { ok: true, ts: res.ts, text: rendered.text } : { ok: false };
+    },
+    threadState: threadStateFor(env),
+    proposalEvents: proposalEventLogFor(env),
+    now: () => Date.now(),
+  });
 }
 
 /**

@@ -247,11 +247,10 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
   // refuses a schema with no row and a row with no schema, and building the
   // model's roster through it is what makes that refusal reach a deployment.
   // `tool-definitions.json` is still where every schema is written.
-  const tools: ToolSpec[] = TOOLS.map((t) => ({
-    name: t.name,
-    description: t.schema.description,
-    input_schema: t.schema.input_schema,
-  }));
+  // A `worker` row has no schema and is offered to no one.
+  const tools: ToolSpec[] = TOOLS.flatMap((t) =>
+    t.schema ? [{ name: t.name, description: t.schema.description, input_schema: t.schema.input_schema }] : [],
+  );
 
   // Keyed like the CONVERSATION, not the thread. `/stop` arrives carrying only
   // a channel, so the key it can compute is the one this must read: a DM

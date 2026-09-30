@@ -23,6 +23,12 @@
 /** What kind of conversation a message was read in. */
 export type ChannelKind = "public" | "private" | "group-dm" | "dm";
 
+/** The turn record's name for a kind of conversation (`ConversationType`),
+ *  so the usage record's rules read a sweep place as they read a turn's. */
+export function conversationTypeOf(kind: ChannelKind): "channel" | "group" | "mpim" | "im" {
+  return kind === "public" ? "channel" : kind === "private" ? "group" : kind === "group-dm" ? "mpim" : "im";
+}
+
 /** What a linked source is, as far as the sweep's two decisions care. */
 export type TargetKind =
   | "notion"

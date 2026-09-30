@@ -17,10 +17,10 @@
 // the card lives 72 hours, with no re-ping when it lapses. Each item names its
 // owner, who is @-mentioned; nobody else is.
 //
-// A GROUP DM'S CARD also says what its ✅ shares outside the group DM: a
-// reworded note naming the pages it brought up to date, in the team channel
-// the fix would go to with its evidence set aside (`sweepShareOf`,
-// `./share.ts`). A private channel's card shares nothing.
+// A GROUP DM'S CARD carries the pages it fixes (`sweepShareOf`), so that once
+// its ✅ has written one, a separate share card can offer a reworded note
+// (`./share.ts`). Its own ✅ applies the fix and nothing more. A private
+// channel's card carries nothing to share.
 //
 // PURE: no `Env`, no Slack call. The card is data (`ProposalCard`); Slack
 // renders it (`slack/proposal-render.ts`).
@@ -212,15 +212,6 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
       "The owners named above and anyone who posted in this thread can confirm. " +
       `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   );
-  const share = sweepShareOf(plan.items);
-  if (share) {
-    const where = [...new Set(share.pages.map((p) => SHARE_CHANNEL_NAMES[p.to]))].join(" and ");
-    lines.push(
-      "",
-      `Nothing from this conversation leaves it but this: the ✅ also posts a short note in ${where} ` +
-        "naming the page it brought up to date — no quote, and no names.",
-    );
-  }
   return {
     kind: "confirm",
     verb: n === 1 ? "apply this Notion fix" : `apply these ${n} Notion fixes`,

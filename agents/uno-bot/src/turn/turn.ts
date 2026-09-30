@@ -1399,7 +1399,6 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(replaced?.sweepRun
       ? {
           sweepRun: replaced.sweepRun,
-          ...(replaced.sweepShare ? { sweepShare: replaced.sweepShare } : {}),
           supersedeKey: replaced.supersedeKey ?? SWEEP_KEY,
           ttlMs: sweepLeftMs,
           originProposalTs: stagingCardOf(replaced),
@@ -1548,7 +1547,6 @@ async function dropFromSweepCard(
     ttlMs: leftMs,
     sweepRun: pending.sweepRun!,
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
-    ...(pending.sweepShare ? { sweepShare: pending.sweepShare } : {}),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.
     originProposalTs: stagingCardOf(pending),
@@ -1698,8 +1696,10 @@ export async function restageExecution(
     return null;
   }
   // A cancel run is not carried over: part of the original may already have
-  // happened, and a ⛔ on the fresh card must run nothing a second time.
-  const { onCancel: _onCancel, ...kept } = original;
+  // happened, and a ⛔ on the fresh card must run nothing a second time. Nor
+  // is a group DM's share: only the card people were shown offers one
+  // (`sweep/share.ts`).
+  const { onCancel: _onCancel, sweepShare: _sweepShare, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,
