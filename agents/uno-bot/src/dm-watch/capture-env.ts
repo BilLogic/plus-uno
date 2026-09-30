@@ -16,7 +16,8 @@
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
-import { conversationsOpen, getBotIdentity, postMessage, updateMessage } from "../slack/api";
+import { conversationsHistorySince, conversationsOpen, getBotIdentity, postMessage } from "../slack/api";
+import { SWEEP_CARD_EVENT } from "../sweep/cards";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
@@ -24,9 +25,9 @@ import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { modelCaptureDetector } from "../sweep/capture-detector";
 import { modelDriftDetector } from "../sweep/detector";
 import { measured, readSource, sweepSearchFor } from "../sweep/env";
-import { stageSweepCard, WITHDRAWN_TEXT } from "../sweep/run";
+import { stageSweepCard } from "../sweep/run";
 import { runDmCapturePost, runDmCaptureRead, type DmCaptureReport } from "./capture";
-import { dmCaptureQueueFor, dmWatchRecordsFor, ownerSlackFor, progressIn } from "./env";
+import { dmCaptureQueueFor, dmWatchRecordsFor, ownerSlackFor, progressIn, removeCaptureCard, withdrawCaptureCard } from "./env";
 import { CAPTURE_FEATURE } from "./store";
 
 /** Everyone with DM Capture on, for the scheduled firing; none when unbound. */
@@ -63,7 +64,8 @@ export async function runDmCaptureReadOnEnv(env: Env, job: ScheduledJob, opts: J
     },
     detector: { detect: (input) => measured(() => detector.detect(input)) },
     capture: { answers: (input) => measured(() => capture.answers(input)) },
-    search: sweepSearchFor(env),
+    // Notion only: a DM's words never go to GitHub code search.
+    search: { notion: sweepSearchFor(env).notion },
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
@@ -85,21 +87,34 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
         const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, metadata: message.metadata });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
-      async withdraw(channel, ts) {
-        // Out of reach first: a card that says it didn't go through can't be ✅'d.
-        await threadStateFor(env).retireProposal(ts);
-        await updateMessage(env, { channel, ts, text: WITHDRAWN_TEXT });
+      withdraw: (channel, ts, text) => withdrawCaptureCard(env, channel, ts, text),
+      remove: (channel, ts) => removeCaptureCard(env, channel, ts),
+      async findPosted(channel, cardKey, since) {
+        // One page of the DM's top level since the run's date: the job's card
+        // is among the first messages uno-bot posts there that morning.
+        const res = await measured(() => conversationsHistorySince(env, channel, since, undefined, { includeMetadata: true }));
+        if (!res.ok) return "unknown";
+        const hit = (res.messages ?? []).find(
+          (m) => m.metadata?.event_type === SWEEP_CARD_EVENT && m.metadata.event_payload.card_key === cardKey && m.metadata.event_payload.role === "card",
+        );
+        if (hit) {
+          const digest = hit.metadata?.event_payload.digest;
+          return { ts: hit.ts, digest: typeof digest === "string" ? digest : "" };
+        }
+        return res.response_metadata?.next_cursor ? "unknown" : null;
       },
     },
     render(card) {
       const rendered = renderProposalCard(card);
-      return { text: rendered.text, blocks: rendered.blocks ?? proposalCardBlocks(rendered.text) };
+      return {
+        text: rendered.text,
+        blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+        ...(rendered.followUp?.length ? { followUp: rendered.followUp } : {}),
+      };
     },
     stage: (proposal) =>
       stageSweepCard(proposal, { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) }, Date.now(), "dm"),
-    async cardLive(proposalTs) {
-      return (await threadStateFor(env).getProposalByTs(proposalTs)).state === "found";
-    },
+    liveCards: (channel) => threadStateFor(env).getProposalsByChannel(channel),
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,

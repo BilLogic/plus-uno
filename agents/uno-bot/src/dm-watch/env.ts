@@ -21,13 +21,14 @@ import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
-import { conversationsOpen, conversationsReplies, getBotIdentity, postMessage, slackReadAs, updateMessage, usersInfo } from "../slack/api";
+import { conversationsOpen, conversationsReplies, deleteMessage, getBotIdentity, postMessage, slackReadAs, updateMessage, usersInfo } from "../slack/api";
+import { threadStateFor } from "../thread-state/production";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { measured } from "../sweep/env";
 import type { SweepSlackMessage } from "../sweep/run";
 import { modelCommitmentDetector, modelEvidenceJudge } from "../commitments/detector";
 import { createD1DmWatchRecords } from "./d1";
-import type { DmCaptureFinding, DmCaptureQueue } from "./capture";
+import { dropDmCapture, type DmCaptureFinding, type DmCaptureQueue } from "./capture";
 import {
   accessOf,
   answerDmReminder,
@@ -92,7 +93,15 @@ export async function setDmWatchOnEnv(env: Env, userId: string, selected: readon
     records,
     access: (id) => accessOf(id, ownerSlackFor(env)),
     now: () => Date.now(),
-    dropCapture: (id) => dmCaptureQueueFor(env)?.clear(id) ?? Promise.resolve(),
+    async dropCapture(id) {
+      const queue = dmCaptureQueueFor(env);
+      if (!queue) return;
+      await dropDmCapture(id, {
+        queue,
+        liveCards: (channel) => threadStateFor(env).getProposalsByChannel(channel),
+        withdraw: (channel, ts, text) => withdrawCaptureCard(env, channel, ts, text),
+      });
+    },
   });
 }
 
@@ -263,4 +272,17 @@ export function dmCaptureQueueFor(env: Env): DmCaptureQueue | null {
       await kv.delete(key(owner));
     },
   };
+}
+
+/** Take a DM Capture card back: out of reach in ThreadState first, so it
+ *  can't be ✅'d, then edited to say why. */
+export async function withdrawCaptureCard(env: Env, channel: string, ts: string, text: string): Promise<void> {
+  await threadStateFor(env).retireProposal(ts);
+  await updateMessage(env, { channel, ts, text });
+}
+
+/** Take a DM Capture card back entirely: retired, then deleted. */
+export async function removeCaptureCard(env: Env, channel: string, ts: string): Promise<void> {
+  await threadStateFor(env).retireProposal(ts);
+  await deleteMessage(env, channel, ts);
 }

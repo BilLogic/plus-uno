@@ -19,16 +19,20 @@ import { stageSweepCard } from "../src/sweep/run";
 import type { DriftDetector } from "../src/sweep/detector";
 import type { CaptureDetector } from "../src/sweep/capture-detector";
 import type { SweepSlackMessage } from "../src/sweep/run";
-import type { SweepSource } from "../src/sweep/finding";
+import type { SourceSearch } from "../src/sweep/search";
 import { createInMemoryThreadState, mayConfirm, type PendingProposal } from "../src/thread-state/index";
 import { createInMemoryProposalEventLog } from "../src/usage/index";
+import { createInMemoryCommitmentStore, fewShotExamples } from "../src/commitments/index";
 import {
   accessOf,
   CAPTURE_FEATURE,
   createInMemoryDmWatchRecords,
+  DM_CARD_SWITCHED_OFF,
   DM_WATCH_LABELS,
   dmWatchHomeBlocks,
+  dropDmCapture,
   positionScope,
+  quotesDm,
   runDmCapturePost,
   runDmCaptureRead,
   runDmPromiseRead,
@@ -65,6 +69,14 @@ function dmMessages(): SweepSlackMessage[] {
   ];
 }
 
+interface Post {
+  channel: string;
+  text: string;
+  ts: string;
+  tag: string;
+  payload: Record<string, string>;
+}
+
 interface World {
   records: InMemoryDmWatchRecords;
   tokens: Set<string>;
@@ -73,15 +85,26 @@ interface World {
   kv: Map<string, DmCaptureFinding[]>;
   progress: Map<string, { latest: string }>;
   logs: string[];
-  posts: { channel: string; text: string; ts: string; tag: string }[];
+  posts: Post[];
+  removed: string[];
+  withdrawn: { ts: string; text: string }[];
   staged: PendingProposal[];
+  clock: { now: number };
   threadState: ReturnType<typeof createInMemoryThreadState>;
   events: ReturnType<typeof createInMemoryProposalEventLog>;
-  detected: { channelKind: string; channel: string }[];
-  headroom: { subrequests: number; d1Queries: number };
+  detected: { channel: string; firstTs: string }[];
+  /** Detector windows the budget still covers; past them the meter says no. */
+  windows: number;
+  /** Page URLs whose read throws, as a Notion 429 or 5xx would. */
+  broken: Set<string>;
+  /** The detector's replacement quotes the DM. */
+  quoting: boolean;
+  /** Run inside the detector — a switch turned off mid-run, say. */
+  onDetect?: () => Promise<void>;
 }
 
 function world(): World {
+  const clock = { now: ON_AT };
   return {
     records: createInMemoryDmWatchRecords(),
     tokens: new Set([MAYA, KAI]),
@@ -91,11 +114,16 @@ function world(): World {
     progress: new Map(),
     logs: [],
     posts: [],
+    removed: [],
+    withdrawn: [],
     staged: [],
-    threadState: createInMemoryThreadState(),
+    clock,
+    threadState: createInMemoryThreadState({ now: () => clock.now }),
     events: createInMemoryProposalEventLog(),
     detected: [],
-    headroom: { subrequests: Infinity, d1Queries: Infinity },
+    windows: Infinity,
+    broken: new Set(),
+    quoting: false,
   };
 }
 
@@ -129,32 +157,50 @@ function ownerSlack(w: World) {
   };
 }
 
-/** Drift whenever a window links the page and says "November". */
+/** Drift on the page's first block when a window says "November", on its
+ *  second when it says "owner is now Kai" — each only with the page read. */
 function detector(w: World): DriftDetector {
   return {
     async detect({ thread, sources }) {
-      w.detected.push({ channelKind: thread.channelKind, channel: thread.channel });
-      const said = thread.messages.find((m) => m.text.includes("November"));
+      w.windows -= 1;
+      w.detected.push({ channel: thread.channel, firstTs: thread.messages[0]!.ts });
+      await w.onDetect?.();
       const source = sources.find((s) => s.url === PAGE.url);
-      if (!said || !source) return { ok: true, findings: [] };
-      const block = source.blocks[0]!;
-      return {
-        ok: true,
-        findings: [
-          {
-            source,
-            blockId: block.id,
-            lastEditedTime: block.lastEditedTime,
-            original: block.text,
-            sourceSays: "Launch is October 15.",
-            threadSays: "Launch moved to November 1.",
-            replacement: "Launch date: November 1",
-            evidenceTs: [said.ts],
-            claimedBy: said.user,
-            confidence: 0.9,
-          },
-        ],
-      };
+      if (!source) return { ok: true, findings: [] };
+      const findings = [];
+      const november = thread.messages.find((m) => m.text.includes("November"));
+      if (november) {
+        const block = source.blocks[0]!;
+        findings.push({
+          source,
+          blockId: block.id,
+          lastEditedTime: block.lastEditedTime,
+          original: block.text,
+          sourceSays: "Launch is October 15.",
+          threadSays: "Launch moved to November 1.",
+          replacement: w.quoting ? `Launch date: ${SECRET}` : "Launch date: November 1",
+          evidenceTs: [november.ts],
+          claimedBy: november.user,
+          confidence: 0.9,
+        });
+      }
+      const owner = thread.messages.find((m) => m.text.includes("owner is now Kai"));
+      if (owner) {
+        const block = source.blocks[1]!;
+        findings.push({
+          source,
+          blockId: block.id,
+          lastEditedTime: block.lastEditedTime,
+          original: block.text,
+          sourceSays: "The design team owns it.",
+          threadSays: "Kai owns it now.",
+          replacement: "Owner: Kai",
+          evidenceTs: [owner.ts],
+          claimedBy: owner.user,
+          confidence: 0.9,
+        });
+      }
+      return { ok: true, findings };
     },
   };
 }
@@ -162,6 +208,7 @@ function detector(w: World): DriftDetector {
 const noAnswers: Pick<CaptureDetector, "answers"> = { answers: async () => ({ ok: true, answers: [] }) };
 
 function common(w: World, now: number) {
+  w.clock.now = now;
   return {
     runDate: new Date(now).toISOString().slice(0, 10),
     records: w.records,
@@ -170,7 +217,9 @@ function common(w: World, now: number) {
       save: async (owner: string, list: DmCaptureFinding[]) => void w.kv.set(owner, list.map((f) => ({ ...f }))),
       clear: async (owner: string) => void w.kv.delete(owner),
     },
-    meter: { headroom: () => w.headroom },
+    // Reads (one subrequest) always fit; a detector window (twelve) only while
+    // `windows` lasts.
+    meter: { headroom: () => (w.windows > 0 ? { subrequests: Infinity, d1Queries: Infinity } : { subrequests: 3, d1Queries: 50 }) },
     now: () => now,
     log: (line: string) => w.logs.push(line),
   };
@@ -186,26 +235,44 @@ function readDeps(w: World, now = EOD): DmCaptureReadDeps {
       set: async (k, v) => void w.progress.set(k, v),
       clear: async (k) => void w.progress.delete(k),
     },
-    sources: { read: async (url) => (url === PAGE.url ? PAGE : null) },
+    sources: {
+      async read(url) {
+        if (w.broken.has(url)) throw new Error("Notion answered 503");
+        return url === PAGE.url ? PAGE : null;
+      },
+    },
     surfaces: {},
     detector: detector(w),
     capture: noAnswers,
   };
 }
 
-function postDeps(w: World, now = WED): DmCapturePostDeps {
-  let n = 0;
+function withdraw(w: World) {
+  return async (_channel: string, ts: string, text: string) => {
+    w.withdrawn.push({ ts, text });
+    await w.threadState.retireProposal(ts);
+  };
+}
+
+function postDeps(w: World, now = WED, over: Partial<DmCapturePostDeps> = {}): DmCapturePostDeps {
   return {
     ...common(w, now),
     bot: {
       dmChannel: async (user) => `D-UNO-${user}`,
       async post(channel, message) {
-        n += 1;
-        const posted = `${now / 1000}.00000${n}`;
-        w.posts.push({ channel, text: message.text, ts: posted, tag: message.metadata.event_type });
+        const posted = `${now / 1000}.00000${w.posts.length + 1}`;
+        w.posts.push({ channel, text: message.text, ts: posted, tag: message.metadata.event_type, payload: message.metadata.event_payload });
         return { ok: true, ts: posted };
       },
-      withdraw: async () => undefined,
+      withdraw: withdraw(w),
+      async remove(_channel, ts) {
+        w.removed.push(ts);
+        await w.threadState.retireProposal(ts);
+      },
+      async findPosted(channel, cardKey) {
+        const hit = w.posts.find((p) => p.channel === channel && p.payload.card_key === cardKey && !w.removed.includes(p.ts));
+        return hit ? { ts: hit.ts, digest: hit.payload.digest ?? "" } : null;
+      },
     },
     render(card) {
       const rendered = renderProposalCard(card);
@@ -215,7 +282,8 @@ function postDeps(w: World, now = WED): DmCapturePostDeps {
       w.staged.push(proposal);
       await stageSweepCard(proposal, { threadState: w.threadState, proposalEvents: w.events }, now, "dm");
     },
-    cardLive: async (proposalTs) => (await w.threadState.getProposalByTs(proposalTs)).state === "found",
+    liveCards: (channel) => w.threadState.getProposalsByChannel(channel),
+    ...over,
   };
 }
 
@@ -225,10 +293,18 @@ async function turnOn(w: World, user: string, features: DmWatchFeature[], now = 
       records: w.records,
       access: (u) => accessOf(u, ownerSlack(w)),
       now: () => now,
-      dropCapture: async (u) => void w.kv.delete(u),
+      dropCapture: (u) =>
+        dropDmCapture(u, {
+          queue: common(w, now).queue,
+          liveCards: (channel) => w.threadState.getProposalsByChannel(channel),
+          withdraw: withdraw(w),
+        }),
     })
   ).on;
 }
+
+/** Maya's live cards in her DM with uno-bot. */
+const liveIn = (w: World) => w.threadState.getProposalsByChannel(`D-UNO-${MAYA}`);
 
 describe("the switch", () => {
   it("is a third Home-tab checkbox, off by default, with its own words", () => {
@@ -271,6 +347,46 @@ describe("the switch", () => {
     const morning = planRun("morning", WED, [], undefined, promisers, capturers).jobs.filter((j) => j.user);
     assert.deepEqual(morning.map((j) => j.key), [`dm-promise-nudge:${KAI}`, `dm-capture-post:${MAYA}`]);
   });
+
+  it("turning it off withdraws a live card — a ✅ can no longer run it — and drops what it found", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    await runDmCapturePost(postJob(MAYA), postDeps(w));
+    assert.equal((await liveIn(w)).length, 1);
+    await turnOn(w, MAYA, [], at(30, 15));
+    assert.deepEqual(w.withdrawn, [{ ts: w.posts[0]!.ts, text: DM_CARD_SWITCHED_OFF }]);
+    assert.deepEqual(await liveIn(w), []);
+    assert.equal(w.kv.has(MAYA), false);
+  });
+
+  it("turned off mid-read: nothing of the run is kept", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    w.onDetect = () => w.records.setSwitch(MAYA, CAPTURE_FEATURE, false, { now: EOD, readThrough: "0" });
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    assert.equal(w.kv.has(MAYA), false);
+    assert.deepEqual(await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)), {});
+  });
+
+  it("turned off while the card posts: the card is withdrawn and nothing is kept", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    const deps = postDeps(w);
+    const stage = deps.stage;
+    const report = await runDmCapturePost(postJob(MAYA), {
+      ...deps,
+      async stage(p) {
+        await stage(p);
+        await w.records.setSwitch(MAYA, CAPTURE_FEATURE, false, { now: WED, readThrough: "0" });
+      },
+    });
+    assert.equal(report.outcome, "skipped");
+    assert.deepEqual(w.withdrawn.map((x) => x.text), [DM_CARD_SWITCHED_OFF]);
+    assert.deepEqual(await liveIn(w), []);
+    assert.equal(w.kv.has(MAYA), false);
+  });
 });
 
 describe("a DM finding", () => {
@@ -279,7 +395,7 @@ describe("a DM finding", () => {
     await turnOn(w, MAYA, [CAPTURE_FEATURE]);
     const report = await runDmCaptureRead(readJob(MAYA), readDeps(w));
     assert.equal(report.outcome, "handled");
-    assert.deepEqual(w.detected, [{ channelKind: "dm", channel: DM_BEA }], "uno-bot's own DM is never read");
+    assert.deepEqual(w.detected.map((d) => d.channel), [DM_BEA], "uno-bot's own DM is never read");
     const queued = w.kv.get(MAYA) ?? [];
     assert.equal(queued.length, 1);
     const f = queued[0]!;
@@ -289,12 +405,25 @@ describe("a DM finding", () => {
     assert.equal(f.state, "queued");
     const stored = JSON.stringify(queued);
     assert.ok(!stored.includes(BEA), "no id of the other person");
-    assert.ok(!stored.includes("November 1, keep it"), "no quote of the DM");
     assert.ok(!stored.includes("Launch moved to"), "no summary of the DM");
+    // No field repeats five of the DM's words in a row.
+    const dm = dmMessages().map((m) => m.text ?? "");
+    for (const text of [f.replacement, f.sourceSays, f.original]) assert.ok(!quotesDm(text, f.original, dm), text);
     // Its own read positions, beside the promise jobs' (which stay unread).
     assert.deepEqual(Object.keys(await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE))), [DM_BEA]);
     assert.deepEqual(await w.records.positions(MAYA), {});
     assert.deepEqual(w.records.rows(), [], "no promise row");
+  });
+
+  it("an edit that quotes the DM is dropped", async () => {
+    const w = world();
+    w.quoting = true;
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    assert.equal(w.kv.has(MAYA), false);
+    assert.ok(quotesDm(`Launch date: ${SECRET}`, PAGE.blocks[0]!.text, [SECRET]));
+    // The page's own words, repeated in the DM, are the page's, not a quote.
+    assert.ok(!quotesDm("Launch date: October 15 for everyone", "Launch date: October 15 for everyone", ["launch date october 15 for everyone"]));
   });
 
   it("reaches only the owner's DM with uno-bot, on a card only the owner can confirm", async () => {
@@ -333,22 +462,57 @@ describe("a DM finding", () => {
     assert.equal(w.kv.get(MAYA)?.[0]?.state, "proposed");
   });
 
-  it("gets one card at a time, and a fix already carded is not offered again", async () => {
+  it("waits while the card is live — or a revision a `drop N` made of it — and a carded fix is not offered again", async () => {
     const w = world();
     await turnOn(w, MAYA, [CAPTURE_FEATURE]);
     await runDmCaptureRead(readJob(MAYA), readDeps(w));
     await runDmCapturePost(postJob(MAYA), postDeps(w));
-    // Bea says it again the next day: the same fix, re-read.
-    w.messages.get(DM_BEA)!.push({ ts: ts(30, 16), user: BEA, text: "reminder: November 1 it is" });
+    const card = w.staged[0]!;
+    // Maya replies `drop 1`: a revision replaces the card in its thread, and
+    // the card's own ts reads superseded.
+    await w.threadState.putProposal({ ...card, proposalTs: `${card.proposalTs}9`, proposalText: "revised" });
+    assert.notEqual((await w.threadState.getProposalByTs(card.proposalTs)).state, "found");
+    // A new decision the next day, and the same fix said again.
+    w.messages.get(DM_BEA)!.push(
+      { ts: ts(30, 16), user: BEA, text: `and the owner is now Kai ${PAGE.url}` },
+      { ts: ts(30, 16, 5), user: BEA, text: "reminder: November 1 it is" },
+    );
     await runDmCaptureRead(readJob(MAYA), readDeps(w, at(30, 22)));
-    assert.equal(w.kv.get(MAYA)?.length, 1);
+    const queued = w.kv.get(MAYA) ?? [];
+    assert.deepEqual(queued.map((f) => [f.blockId, f.state]), [
+      [PAGE.blocks[0]!.id, "proposed"],
+      [PAGE.blocks[1]!.id, "queued"],
+    ]);
     const report = await runDmCapturePost(postJob(MAYA), postDeps(w, THU));
-    assert.match(report.summary, /still live|nothing due/);
+    assert.match(report.summary, /still live/);
     assert.equal(w.posts.length, 1);
+    // Once the revision is gone, the new fix gets its card.
+    await w.threadState.retireProposal(`${card.proposalTs}9`);
+    await runDmCapturePost(postJob(MAYA), postDeps(w, at(32, 14)));
+    assert.equal(w.posts.length, 2);
+  });
+
+  it("is shown whole: a card that would need a follow-up holds fewer fixes, and the rest wait", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    w.messages.get(DM_BEA)!.push({ ts: ts(29, 17, 5), user: BEA, text: `and the owner is now Kai ${PAGE.url}` });
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    assert.equal(w.kv.get(MAYA)?.length, 2);
+    const deps = postDeps(w);
+    await runDmCapturePost(postJob(MAYA), {
+      ...deps,
+      render(card) {
+        const r = deps.render(card);
+        return (card.operations?.length ?? 0) > 1 ? { ...r, followUp: ["the plan, in full"] } : r;
+      },
+    });
+    assert.equal(w.staged[0]?.operations?.length, 1);
+    assert.deepEqual(w.kv.get(MAYA)?.map((f) => f.state), ["proposed", "queued"]);
   });
 
   it("never appears in a channel card, a few-shot block or another person's job", async () => {
     const w = world();
+    const commitments = createInMemoryCommitmentStore();
     await turnOn(w, MAYA, [CAPTURE_FEATURE]);
     await turnOn(w, KAI, [CAPTURE_FEATURE]);
     // Kai's job first, then Maya's, then both mornings.
@@ -362,22 +526,52 @@ describe("a DM finding", () => {
     // One post, in Maya's DM with uno-bot — no channel, no thread, no #uno-bot.
     assert.deepEqual(w.posts.map((p) => p.channel), [`D-UNO-${MAYA}`]);
     assert.ok(w.staged.every((p) => p.channel.startsWith("D-UNO-") && p.threadTs === p.proposalTs));
-    // Nothing it read became a promise row, which is where the detector's
-    // few-shot examples come from.
-    assert.deepEqual(w.records.rows(), []);
+    // The thread commitment store — where the detector's few-shot examples
+    // come from — holds nothing of it, and gives no example for either DM.
+    assert.equal(commitments.rows.size, 0);
+    assert.equal(commitments.texts.size, 0);
+    const examples = fewShotExamples({ store: commitments, config: {} as never });
+    assert.deepEqual(await examples(DM_BEA), []);
+    assert.deepEqual(await examples(`D-UNO-${MAYA}`), []);
+    assert.deepEqual(w.records.rows(), [], "nor a DM promise row");
+  });
+});
+
+describe("the morning post", () => {
+  it("a budget stop after the post deletes the card before rethrowing; the retry posts afresh", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    await assert.rejects(
+      runDmCapturePost(postJob(MAYA), postDeps(w, WED, { stage: async () => { throw new SubrequestBudgetError(1); } })),
+      SubrequestBudgetError,
+    );
+    assert.deepEqual(w.removed, [w.posts[0]!.ts]);
+    assert.equal(w.kv.get(MAYA)?.[0]?.state, "queued");
+    await runDmCapturePost(postJob(MAYA), postDeps(w, WED + 60_000));
+    assert.equal(w.posts.length, 2);
+    assert.equal((await liveIn(w)).length, 1);
+    assert.equal(w.kv.get(MAYA)?.[0]?.proposalTs, w.posts[1]!.ts);
   });
 
-  it("turning the switch off drops what it found and where it had read to, and the morning posts nothing", async () => {
+  it("a card an earlier try left up unstaged is found by its tag and staged as it is", async () => {
     const w = world();
-    await turnOn(w, MAYA, [CAPTURE_FEATURE, "promises_made"]);
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
     await runDmCaptureRead(readJob(MAYA), readDeps(w));
-    assert.equal(w.kv.get(MAYA)?.length, 1);
-    await turnOn(w, MAYA, ["promises_made"], at(30, 9));
-    assert.equal(w.kv.has(MAYA), false);
-    assert.deepEqual(await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)), {});
-    const report = await runDmCapturePost(postJob(MAYA), postDeps(w));
-    assert.equal(report.outcome, "skipped");
-    assert.deepEqual(w.posts, []);
+    const first = postDeps(w);
+    await assert.rejects(
+      runDmCapturePost(postJob(MAYA), {
+        ...first,
+        bot: { ...first.bot, remove: async () => { throw new SubrequestBudgetError(1); } },
+        stage: async () => { throw new SubrequestBudgetError(1); },
+      }),
+      SubrequestBudgetError,
+    );
+    assert.equal(w.posts.length, 1);
+    await runDmCapturePost(postJob(MAYA), postDeps(w, WED + 60_000));
+    assert.equal(w.posts.length, 1, "no second card");
+    assert.deepEqual(w.staged.map((p) => p.proposalTs), [w.posts[0]!.ts]);
+    assert.equal(w.kv.get(MAYA)?.[0]?.state, "proposed");
   });
 });
 
@@ -394,16 +588,65 @@ describe("reading", () => {
     assert.equal(w.kv.get(MAYA)?.length, 1, "Capture still read the messages the promise job had read");
   });
 
+  it("a linked page that fails to read holds the DM there; the next night finds the decision", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    w.broken.add(PAGE.url);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    assert.equal(w.kv.has(MAYA), false);
+    assert.deepEqual(await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)), {}, "not read past the window");
+    w.broken.clear();
+    await runDmCaptureRead(readJob(MAYA), readDeps(w, at(30, 22)));
+    assert.equal(w.kv.get(MAYA)?.length, 1);
+  });
+
+  it("a page named without a link is searched for in Notion only — the DM's words never reach GitHub", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    w.messages.set(DM_BEA, [{ ts: DECIDED, user: BEA, text: "the booking flow PRD should say November 1 now" }]);
+    const searched: string[] = [];
+    const search: SourceSearch = {
+      notion: async (q) => (searched.push(`notion:${q}`), []),
+      github: async (q) => (searched.push(`github:${q}`), []),
+    };
+    await runDmCaptureRead(readJob(MAYA), { ...readDeps(w), search });
+    assert.ok(searched.some((s) => s.startsWith("notion:")), "the name was searched for");
+    assert.deepEqual(searched.filter((s) => s.startsWith("github:")), []);
+  });
+
   it("a budget stop keeps what was done and the night's stopping point; the retry finishes", async () => {
     const w = world();
     await turnOn(w, MAYA, [CAPTURE_FEATURE]);
-    w.headroom = { subrequests: 3, d1Queries: 50 };
+    w.windows = 0;
     await assert.rejects(runDmCaptureRead(readJob(MAYA), readDeps(w)), SubrequestBudgetError);
     assert.equal(w.kv.has(MAYA), false);
     assert.equal(w.progress.size, 1, "tonight's stopping point is kept for the retry");
-    w.headroom = { subrequests: Infinity, d1Queries: Infinity };
+    w.windows = Infinity;
     await runDmCaptureRead(readJob(MAYA), readDeps(w, EOD + 60_000));
     assert.equal(w.kv.get(MAYA)?.length, 1);
     assert.equal(w.progress.size, 0);
+  });
+
+  it("a budget stop mid-DM keeps the window done, and the retry reads on from it", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    const filler = (i: number) => `${"status notes ".repeat(95)}#${i}`;
+    const long: SweepSlackMessage[] = [
+      { ts: ts(29, 16, 0), user: BEA, text: `launch is November 1 now ${PAGE.url} ${filler(0)}` },
+      ...[1, 2, 3, 4, 5, 6, 7, 8].map((i) => ({ ts: ts(29, 16, i), user: i % 2 ? MAYA : BEA, text: filler(i) })),
+      { ts: ts(29, 16, 9), user: BEA, text: `and the owner is now Kai ${PAGE.url}` },
+    ];
+    w.messages.set(DM_BEA, long);
+    w.windows = 1;
+    await assert.rejects(runDmCaptureRead(readJob(MAYA), readDeps(w)), SubrequestBudgetError);
+    assert.deepEqual(w.kv.get(MAYA)?.map((f) => f.blockId), [PAGE.blocks[0]!.id], "the first window's finding is kept");
+    const through = (await w.records.positions(positionScope(MAYA, CAPTURE_FEATURE)))[DM_BEA]?.through;
+    assert.ok(through && Number(through) > Number(long[0]!.ts) && Number(through) < Number(long.at(-1)!.ts), "the position is past the first window only");
+    const seen = w.detected.length;
+    w.windows = Infinity;
+    await runDmCaptureRead(readJob(MAYA), readDeps(w, EOD + 60_000));
+    assert.deepEqual(w.kv.get(MAYA)?.map((f) => f.blockId), [PAGE.blocks[0]!.id, PAGE.blocks[1]!.id]);
+    assert.equal(w.detected.length, seen + 1, "only the window not yet read");
+    assert.ok(Number(w.detected.at(-1)!.firstTs) > Number(long[0]!.ts), "the first window is not read again");
   });
 });
