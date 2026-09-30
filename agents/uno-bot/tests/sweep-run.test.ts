@@ -436,11 +436,11 @@ test("a stop in stage is finished by the retry, and a stage that fails outright 
 // A try that staged its card and stopped before recording it as posted: the
 // retry finds the card staged. Resolved meanwhile, it stays resolved — staged
 // afresh, a ✅'d card could run twice and a ⛔'d one would come back.
-for (const [glyph, name] of [
-  ["✅", "confirmed"],
-  ["⛔", "cancelled"],
+for (const [glyph, name, status] of [
+  ["✅", "confirmed", "confirmed"],
+  ["⛔", "cancelled", "dropped"],
 ] as const) {
-  test(`a card ${name} between a stopped try and its retry is recorded, never staged again`, async () => {
+  test(`a card ${name} between a stopped try and its retry is recorded with its items resolved, never staged again`, async () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const found = reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
     const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
@@ -467,6 +467,11 @@ for (const [glyph, name] of [
     assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
     assert.match(retry.note ?? "", /already staged by an earlier try, and resolved since/);
     assert.ok(h.store.items().every((i) => i.proposalTs === card.proposalTs), "its items are recorded on the card");
+    // And resolved as the card was, rather than left at proposed.
+    assert.deepEqual(
+      h.store.items().map((i) => i.status),
+      h.store.items().map(() => status),
+    );
     assert.deepEqual(await h.store.pendingFindings(), [], "its fix is not queued to come back");
   });
 }

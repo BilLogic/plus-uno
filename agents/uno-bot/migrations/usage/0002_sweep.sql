@@ -39,7 +39,8 @@ CREATE TABLE sweep_runs (
 CREATE INDEX sweep_runs_by_date ON sweep_runs (run_date);
 
 -- One row per proposed fix. Moves from proposed to confirmed, dropped,
--- refused_stale (the page moved since the sweep read it) or failed. An item
+-- refused_stale (the page moved since the sweep read it), refused_unwritable
+-- (the block cannot take a text replace, e.g. it gained a link) or failed. An item
 -- still proposed 72 h after posted_at expired unanswered.
 CREATE TABLE sweep_items (
   item_id      TEXT    PRIMARY KEY,              -- "<card key>#<block id>"
@@ -50,7 +51,7 @@ CREATE TABLE sweep_items (
   thread_ts    TEXT    NOT NULL,
   block_id     TEXT    NOT NULL,
   owner_id     TEXT    NOT NULL,
-  status       TEXT    NOT NULL CHECK (status IN ('proposed', 'confirmed', 'dropped', 'refused_stale', 'failed')),
+  status       TEXT    NOT NULL CHECK (status IN ('proposed', 'confirmed', 'dropped', 'refused_stale', 'refused_unwritable', 'failed')),
   card_key     TEXT    NOT NULL,                 -- "<post date>:<destination>:<first block id>"
   proposal_ts  TEXT,                             -- the live card; a revision moves it; null until posted and staged
   drift_at     INTEGER NOT NULL,                 -- the thread's first evidence message

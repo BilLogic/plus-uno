@@ -76,22 +76,39 @@ const react = (card: PendingProposal, userId: string, glyph = "white_check_mark"
   userId,
 });
 
-/** A fake Notion page: a replace lands only on the stamp it read. */
+/** A fake Notion page: a replace lands only on the stamp it read, and only on
+ *  a block of plain words — the integration's own two refusals. */
 function fakeNotion(page: SweepSource) {
   const blocks = new Map(page.blocks.map((b) => [b.id, { stamp: b.lastEditedTime, text: b.text }]));
+  const formatted = new Set<string>();
   const execute = async (op: ProposalOperation): Promise<string> => {
     // A stamp read and a write: what a real replace spends.
     await countedFetch("data:text/plain,retrieve");
     const [replace] = op.input.replace as Array<{ block_id: string; last_edited_time: string; content: string }>;
     const block = blocks.get(replace!.block_id)!;
     if (block.stamp !== replace!.last_edited_time) {
-      return JSON.stringify({ ok: false, status: "no_changes", replaced: 0, refused: [`${replace!.block_id} moved since it was read`] });
+      return JSON.stringify({
+        ok: false,
+        status: "no_changes",
+        replaced: 0,
+        refused: [`${replace!.block_id} moved since it was read`],
+        staleStamps: 1,
+      });
+    }
+    if (formatted.has(replace!.block_id)) {
+      return JSON.stringify({
+        ok: false,
+        status: "no_changes",
+        replaced: 0,
+        refused: [`${replace!.block_id} (this block has links, mentions or formatting that a text replace would drop)`],
+        staleStamps: 0,
+      });
     }
     await countedFetch("data:text/plain,update");
     blocks.set(replace!.block_id, { stamp: "2026-09-30T14:05:00.000Z", text: replace!.content });
     return JSON.stringify({ ok: true, status: "updated", replaced: 1, refused: [] });
   };
-  return { blocks, execute };
+  return { blocks, formatted, execute };
 }
 
 test("a ✅ from someone neither an owner nor in the thread executes nothing", async () => {
@@ -172,6 +189,27 @@ test("a moved stamp writes nothing and is recorded as refused_stale", async () =
     h.store.items().map((i) => [i.blockId, i.status]),
     [
       ["blk-0", "refused_stale"],
+      ["blk-1", "confirmed"],
+    ],
+  );
+});
+
+// A block that gained a link or bold since the read is refused unwritten —
+// its own outcome, not a moved block and not a failure.
+test("a block refused for its formatting is recorded as refused_unwritable", async () => {
+  const page = pageWith(2);
+  const { h, card } = await stagedCard(2, page);
+  const notion = fakeNotion(page);
+  notion.formatted.add("blk-0");
+
+  const verdict = await resolveSignal(react(card, "U0BEA"), { threadState: h.threadState });
+  const outcomes = await runOperations(verdict.execute!.operations, notion.execute);
+  await recordSweepResolution(h.store, card, outcomes, at(30, 15));
+
+  assert.deepEqual(
+    h.store.items().map((i) => [i.blockId, i.status]),
+    [
+      ["blk-0", "refused_unwritable"],
       ["blk-1", "confirmed"],
     ],
   );

@@ -185,10 +185,9 @@ export interface SweepDelivery {
   /** The sweep cards ThreadState holds live in a channel — a revision or a
    *  re-staged card among them, whether or not the records caught up. */
   liveCards(channel: string): Promise<PendingProposal[]>;
-  /** Whether a posted card was ever staged: `live` while ThreadState holds
-   *  it, `decided` once it left — ✅, ⛔, revised, aged out, or any row on
-   *  the usage record — and `unstaged` when neither knows it. */
-  cardState(proposalTs: string): Promise<"live" | "decided" | "unstaged">;
+  /** Whether a posted card was ever staged, and what became of it
+   *  (`sweepCardState`). */
+  cardState(proposalTs: string): Promise<SweepCardState>;
   /** Retire the card in ThreadState so it can't be ✅'d, replace its text,
    *  remove its buttons, and retag it so a later search by its key passes it
    *  over. */
@@ -847,7 +846,7 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
     notes.push(`${cardKey}: the posted card shows other fixes than its snapshot — withdrawn`);
     return "released";
   }
-  let state: "live" | "decided" | "unstaged";
+  let state: SweepCardState;
   try {
     state = await deps.delivery.cardState(posted.ts);
   } catch (err) {
@@ -855,17 +854,27 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
     notes.push(`${cardKey}: could not tell whether it was already staged (${err instanceof Error ? err.message : String(err)}) — held for the next try`);
     return "held";
   }
-  if (state !== "unstaged") {
+  if (state.state !== "unstaged") {
     // Staged by the earlier try: record it as posted when it went up, so its
     // deadline is the card's own, and stage nothing.
     const postedAt = msOf(posted.ts);
     await deps.store.markPosted(cardKey, posted.ts, Number.isFinite(postedAt) ? postedAt : now);
     await deps.store.dropCard(cardKey);
     await deps.store.removeFindings(plan.items.map((f) => f.id));
-    notes.push(`${cardKey}: already staged by an earlier try${state === "decided" ? ", and resolved since" : ""} — recorded, not staged again`);
-    if (state === "decided") return "decided";
-    ctx.carded.push(...plan.items);
-    return "live";
+    if (state.state === "live") {
+      notes.push(`${cardKey}: already staged by an earlier try — recorded, not staged again`);
+      ctx.carded.push(...plan.items);
+      return "live";
+    }
+    // Resolved meanwhile, while its items had no card ts to be found by: they
+    // take what the card came to now, rather than sit at proposed.
+    if (state.items) {
+      for (const item of await deps.store.itemsForProposal(posted.ts)) {
+        if (item.status === "proposed") await deps.store.updateItem(item.itemId, { status: state.items, resolvedAt: now });
+      }
+    }
+    notes.push(`${cardKey}: already staged by an earlier try, and resolved since — recorded, not staged again`);
+    return "decided";
   }
   const staged = await stageOrWithdraw(ctx, plan, {
     channel: to.channel,
@@ -893,7 +902,7 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
 }
 
 /** An item in one of these states means the thread has had this fix. */
-const CARDED: readonly SweepItemStatus[] = ["proposed", "dropped", "confirmed"];
+const CARDED: readonly SweepItemStatus[] = ["proposed", "dropped", "confirmed", "refused_unwritable"];
 
 /**
  * Split the due findings into those still to card and those already carded
@@ -995,20 +1004,35 @@ function placeOf(key: string, config: SweepConfig): { channel: string; threadTs:
   return channel ? { channel, threadTs: threadTs || null } : null;
 }
 
+/** What a posted card came to, for a retry that finds it already staged. */
+export type SweepCardState =
+  | { state: "live" }
+  /** `items` is what its still-proposed items come to; null when the record
+   *  says it was claimed but not whether it ran. */
+  | { state: "decided"; items: SweepItemStatus | null }
+  | { state: "unstaged" };
+
 /**
  * Whether a posted card was ever staged, from what ThreadState and the usage
  * record hold (`SweepDelivery.cardState`): live while ThreadState holds it;
  * decided once it is revised or aged out, or gone from ThreadState with any
- * row on the record — its staged row, or the ✅ or ⛔ that claimed it.
+ * row on the record — its staged row, or the ✅ or ⛔ that claimed it. A ⛔,
+ * a revision or an expiry drops its items; a ✅ confirms them, or records
+ * them refused when a write found its block moved.
  */
 export async function sweepCardState(
   proposalTs: string,
   deps: { threadState: Pick<ThreadState, "getProposalByTs">; proposalEvents: Pick<ProposalEventLog, "eventsOf"> },
-): Promise<"live" | "decided" | "unstaged"> {
+): Promise<SweepCardState> {
   const lookup = await deps.threadState.getProposalByTs(proposalTs);
-  if (lookup.state === "found") return "live";
-  if (lookup.state !== "none") return "decided";
-  return (await deps.proposalEvents.eventsOf(proposalTs)).length ? "decided" : "unstaged";
+  if (lookup.state === "found") return { state: "live" };
+  if (lookup.state !== "none") return { state: "decided", items: "dropped" };
+  const events = new Set((await deps.proposalEvents.eventsOf(proposalTs)).map((e) => e.event));
+  if (!events.size) return { state: "unstaged" };
+  if (events.has("refused_stale")) return { state: "decided", items: "refused_stale" };
+  if (events.has("confirmed")) return { state: "decided", items: "confirmed" };
+  if (events.has("cancelled") || events.has("superseded") || events.has("expired")) return { state: "decided", items: "dropped" };
+  return { state: "decided", items: null };
 }
 
 /** The card as ThreadState stages it: no Turn behind it, its own terms. */

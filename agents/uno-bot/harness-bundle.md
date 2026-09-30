@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 48,544 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 48,700 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 5,427 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 5,583 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1743,7 +1743,7 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 
 ## Dropping, revising, declining
 
-In a thread where uno-bot's only posts are sweep cards, it answers a reply only when the reply is addressed to the card: an @mention, a typed ✅ or ⛔, or a whole reply that picks fixes by number ("drop 2", "keep 1 and 3", "remove 1, 3 and 4"). A sentence with a number in it ("change 2 buttons to secondary") is the thread's own conversation, and so is the rest. A revised card carries the sweep's mark, so the same rule holds under it.
+In a thread uno-bot entered through a sweep card, it answers a reply only when the reply is addressed to the card, before the card is decided and after: an @mention, a typed ✅ or ⛔, or a whole reply that picks fixes by number ("drop 2", "keep 1 and 3", "remove 1, 3 and 4"). A sentence with a number in it ("change 2 buttons to secondary") is the thread's own conversation, and so is the rest. A revised card, the batch result and the sweep's notes carry the sweep's mark, and none of them makes the thread uno-bot's conversation.
 
 - **"drop 2", "keep 1 and 3":** the Worker applies these itself, by number: the revision is the card's own fixes minus the dropped ones, and it replaces the card, keeping its confirmers and its deadline — a revision lives only as long as the card had left. Dropping every fix cancels the card.
 - **Any other change to the fixes** comes to you: stage the same batch without the operations the reply leaves out, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.
@@ -1751,7 +1751,7 @@ In a thread where uno-bot's only posts are sweep cards, it answers a reply only 
 - **Change only what was asked:** a revision holds the card's own fixes, minus the dropped ones, each exactly as it was. A batch that touches none of the card's blocks is a separate ask, staged beside it.
 - **⛔** declines the whole card.
 
-Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, or failed. An item still proposed 72 h after its card posted is one that expired.
+Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its card posted is one that expired.
 
 
 

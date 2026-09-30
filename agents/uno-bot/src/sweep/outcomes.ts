@@ -9,7 +9,8 @@
 // found by its card's ts and its block id, since one item is one operation
 // with one replace.
 //
-//   ✅ ran it      → `confirmed` when the write landed, `refused_stale` when the
+//   ✅ ran it      → `confirmed` when the write landed, `refused_unwritable` when
+//                    the block cannot take a text replace, `refused_stale` when the
 //                    integration refused it because the block moved since the
 //                    sweep read it, `failed` for any other error.
 //   ⛔             → every item `dropped`.
@@ -41,14 +42,19 @@ export function replacedBlockOf(operation: Pick<ProposalOperation, "toolName" | 
 
 /**
  * The item status one executed operation comes to. A refusal is the
- * integration saying the block moved since the read (ADR-029): nothing was
- * written, and that is `refused_stale`, not a failure.
+ * integration declining to write, and nothing was written: `refused_stale`
+ * when the block moved since the read (ADR-029, `staleStamps`), and
+ * `refused_unwritable` for any other refusal — a block whose links, mentions
+ * or formatting a text replace would drop, or an empty replacement. Neither is
+ * a failure.
  */
 export function statusOfOutcome(outcome: Pick<OperationOutcome, "ok" | "result">): SweepItemStatus {
   if (outcome.ok) return "confirmed";
   try {
-    const r = JSON.parse(outcome.result) as { refused?: unknown };
-    if (Array.isArray(r.refused) && r.refused.length > 0) return "refused_stale";
+    const r = JSON.parse(outcome.result) as { refused?: unknown; staleStamps?: unknown };
+    if (Array.isArray(r.refused) && r.refused.length > 0) {
+      return typeof r.staleStamps === "number" && r.staleStamps > 0 ? "refused_stale" : "refused_unwritable";
+    }
   } catch {
     // not JSON — a plain failure
   }

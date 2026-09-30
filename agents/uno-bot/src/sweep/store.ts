@@ -3,9 +3,9 @@
 // THE RECORDS (`SweepRecords`) live in D1, in the usage database
 // (migrations/usage/0002_sweep.sql): each channel's cursor, one `sweep_runs`
 // row per job, and one `sweep_items` row per proposed fix, which moves from
-// `proposed` to `confirmed`, `dropped`, `refused_stale` or `failed`. The cursor
-// is here and never in KV: a cursor read a minute stale re-reads a day, or skips
-// one. Nothing in these rows is message text (ADR-030) — ids, times, a status.
+// `proposed` to `confirmed`, `dropped`, `refused_stale`, `refused_unwritable`
+// or `failed`. The cursor is here and never in KV: a cursor read a minute
+// stale re-reads a day, or skips one. Nothing in these rows is message text (ADR-030) — ids, times, a status.
 //
 // THE QUEUE (`FindingQueue`) holds what the end-of-day jobs found until the
 // morning post, and it DOES hold text: what the page says, what the thread
@@ -34,7 +34,7 @@ export interface PendingFinding extends DriftFinding {
   driftAt: number;
 }
 
-export type SweepItemStatus = "proposed" | "confirmed" | "dropped" | "refused_stale" | "failed";
+export type SweepItemStatus = "proposed" | "confirmed" | "dropped" | "refused_stale" | "refused_unwritable" | "failed";
 
 /** One proposed fix, as `sweep_items` holds it. */
 export interface SweepItemRecord {
