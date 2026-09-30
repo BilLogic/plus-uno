@@ -21,11 +21,11 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **52** (B×7 · C×1 · D×1 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
+| cases | **56** (B×7 · C×1 · D×1 · DQ×4 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
 | blockers | 30 |
-| turns · sample runs | 62 · 154 |
+| turns · sample runs | 66 · 166 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 35 |
+| recorded, so the pull-request gate reaches them | 39 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
@@ -483,6 +483,42 @@ _advisory · 3 samples · **UNREACHABLE — no recording**_
 - **Trigger:** "Can you run the render walk on the blueprint repo? I want to see the board still renders after today's nav change."
 - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_workflow_run"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The render walk is render-walk.yml on plus-uno-blueprint, a workflow the repo list allows, so the turn must stage github_workflow_run naming that repo and that workflow (the tool takes no ref or inputs; it always runs on the default branch). For the judge: the reply stays in future tense (nothing runs before the ✅, and the Worker posts the runs page after it), invents no run number or URL, and does not claim the walk passed or failed. A refusal, a ready-to-paste IDE prompt in place of a card, a component_implement or prototype_scaffold card, or a different workflow fails. [samples:3 — which tool and workflow is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so the case cannot be captured; it becomes a blocker in the PR that commits its recording.]
+
+## DQ1 — an answer uno-bot cannot find says so plainly, in a DM
+
+_advisory · 3 samples · recorded_
+
+- **Surface:** channel `D_EVAL`, requested by `U_EVAL`
+- **Trigger:** "What tutor-to-student ratio did we set for the spring 2027 reading pilot?"
+- **Asserted:** `expectKind`: `["text"]`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-30 (#795). The uncertain half of the DM sweep's F6 contrast: nothing uno-bot can read holds the ratio, and the end-of-day DM sweep follows up only on an answer that says it could not find one, or was unsure. For the judge: the reply says in plain words that it could not find the ratio (or is not sure of it), names where it looked, invents no number and cites no page as holding the answer; asking for a link is welcome. A confident number with no source, or a reply that pretends a page says it, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]
+
+## DQ2 — an answer uno-bot finds is given with its source, in a DM
+
+_advisory · 3 samples · recorded_
+
+- **Surface:** channel `D_EVAL`, requested by `U_EVAL`
+- **Trigger:** "What tutor-to-student ratio does the Spring Pilot PRD set?"
+- **Asserted:** `expectKind`: `["text"]`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-30 (#795). The sourced half of the F6 contrast: an answer given with its source gets no follow-up, so the answer has to carry that source. For the judge: the reply gives the ratio the page states and names or links the page it read it from; hedging is fine as long as the source is there. A ratio with no source named, or one the page does not state, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]
+
+## DQ3 — a decision told to uno-bot in a DM is taken as a decision, and nothing is written before a card
+
+_advisory · 3 samples · recorded_
+
+- **Surface:** channel `D_EVAL`, requested by `U_EVAL`
+- **Trigger:** "Heads up: we decided in crit today that the recap email goes out weekly on Mondays, not daily."
+- **Asserted:** `expectKind`: `["text","proposal"]`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-30 (#795). The stated-decision half of the C7 contrast: the person tells uno-bot what the team decided. The DM sweep proposes the PRD edit the next morning; in the turn, uno-bot may acknowledge it or stage the edit as a card itself. For the judge: the reply treats it as a decision the team made (it does not argue it or ask whether it is final), does not claim a page was already changed, and if it stages a card the card is the PRD edit and the reply stays in future tense. A reply that says it updated the PRD, or treats the message as one person's opinion, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]
+
+## DQ4 — an opinion told to uno-bot in a DM is not taken as a decision
+
+_advisory · 3 samples · recorded_
+
+- **Surface:** channel `D_EVAL`, requested by `U_EVAL`
+- **Trigger:** "Honestly I think the recap email should probably go out weekly instead of daily. Daily feels like a lot."
+- **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"notion_update"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-30 (#795). The opinion half of the C7 contrast: a preference is not a team decision, so nothing is proposed. Deterministic: the turn is text and stages no notion_update. For the judge: the reply engages with the view (it may say what the PRD says today, or how the team could decide it) and never describes the cadence as decided or changed. A PRD edit card, or a reply that calls this a decision, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]
 
 ## Written down, and not in the fixture
 

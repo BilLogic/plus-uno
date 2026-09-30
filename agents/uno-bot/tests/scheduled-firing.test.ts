@@ -149,16 +149,17 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
   ]);
 });
 
-test("the end-of-day run sweeps each listed channel as its own job, then the group DMs, the notes and the cards, before the purge; the morning posts", () => {
+test("the end-of-day run sweeps each listed channel as its own job, then the group DMs, the DMs, the notes and the cards, before the purge; the morning posts", () => {
   const endOfDay = planRun("end-of-day", at(22, 0), ["C0DESIGN", "C0OTHER"]);
   const jobs = endOfDay.jobs.map((j) => [j.key, j.kind, j.channel]);
   // The sweep jobs go straight before the purge; what the plan holds after it
   // stays after it.
   const purge = jobs.findIndex(([key]) => key === "usage-text-purge");
-  assert.deepEqual(jobs.slice(purge - 5, purge + 1), [
+  assert.deepEqual(jobs.slice(purge - 6, purge + 1), [
     ["sweep:C0DESIGN", "sweep-channel", "C0DESIGN"],
     ["sweep:C0OTHER", "sweep-channel", "C0OTHER"],
     ["sweep:group-dms", "sweep-group-dms", undefined],
+    ["sweep:dms", "sweep-dms", undefined],
     ["sweep:notes", "sweep-notes", undefined],
     ["sweep:cards", "sweep-cards", undefined],
     ["usage-text-purge", "usage-text-purge", undefined],
@@ -166,7 +167,7 @@ test("the end-of-day run sweeps each listed channel as its own job, then the gro
   assert.deepEqual(jobs.slice(purge + 1).map(([key]) => key), ["proposal-expiry"]);
   // The channels are the end of day's alone: the morning run only posts.
   const morning = planRun("morning", at(14, 0), ["C0DESIGN"]).jobs;
-  assert.equal(morning.some((j) => j.kind === "sweep-channel" || j.kind === "sweep-group-dms"), false);
+  assert.equal(morning.some((j) => j.kind === "sweep-channel" || j.kind === "sweep-group-dms" || j.kind === "sweep-dms"), false);
   // A blank list sweeps nothing, the group DMs included.
   assert.equal(planRun("end-of-day", at(22, 0), []).jobs.some((j) => j.key.startsWith("sweep:")), false);
 });
@@ -184,9 +185,10 @@ test("a firing plans the end-of-day sweep over the channels it was handed", asyn
     },
     sweepChannels: ["C0DESIGN"],
   });
-  assert.deepEqual(runs[0]?.jobs.map((j) => j.key).slice(-6), [
+  assert.deepEqual(runs[0]?.jobs.map((j) => j.key).slice(-7), [
     "sweep:C0DESIGN",
     "sweep:group-dms",
+    "sweep:dms",
     "sweep:notes",
     "sweep:cards",
     "usage-text-purge",

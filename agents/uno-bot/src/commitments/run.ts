@@ -89,7 +89,7 @@ import {
   TEXT_KEEP_MS,
 } from "./due";
 import { snoozedRunAt } from "./remind";
-import { budgetOf, cardTodoId, isCardKind, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText, type ReminderBudget } from "./store";
+import { budgetOf, cardTodoId, isCardKind, isDmKind, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText, type ReminderBudget } from "./store";
 
 /** What one commitment may spend before it starts: the evidence reads, the
  *  judge, the permalink and the post, and the D1 statements around them. */
@@ -345,6 +345,9 @@ export function fewShotExamples(
  */
 export type NudgeDeps = Omit<CommitmentDeps, "detector"> & {
   cards?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
+  /** The handler for the DM kinds (`../dm-sweep/`), which post only in their
+   *  own DM. Absent, a DM row due is left alone. */
+  dm?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
 };
 
 /** What the morning did with one commitment. */
@@ -414,6 +417,11 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
     if (deps.cards) return deps.cards.due(c, now, runDate);
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate });
     return { id: c.id, action: "held", note: "no handler for card follow-ups on this run" };
+  }
+  if (isDmKind(c.kind)) {
+    if (deps.dm) return deps.dm.due(c, now, runDate);
+    if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate });
+    return { id: c.id, action: "held", note: "no handler for DM asks on this run" };
   }
   const settle = async (patch: Parameters<CommitmentStore["update"]>[1]): Promise<void> => {
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate, ...patch });
@@ -613,6 +621,8 @@ export interface ReminderDoorDeps {
   store: CommitmentStore;
   /** A reaction on a card follow-up (`../follow-through/`): its own answers. */
   cards?(c: CommitmentRecord, r: ReminderReaction): Promise<void>;
+  /** A reaction on a DM ask (`../dm-sweep/`): its own answers. */
+  dm?(c: CommitmentRecord, r: ReminderReaction): Promise<void>;
   update: CommitmentSlack["update"];
   botUserId(): Promise<string | undefined>;
   now(): number;
@@ -651,6 +661,10 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
     // Whatever the glyph, a card follow-up's own: its ✅ drafts a card, and
     // never reaches the gate.
     if (deps.cards) await deps.cards(c, r);
+    return true;
+  }
+  if (isDmKind(c.kind)) {
+    if (deps.dm) await deps.dm(c, r);
     return true;
   }
 

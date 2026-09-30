@@ -27,6 +27,9 @@ export const FIRST_ASK_RESOLUTION_KEY = "ask-resolution-1";
 /** The end-of-day job that sweeps every group DM uno-bot is in. */
 export const GROUP_DM_SWEEP_KEY = "sweep:group-dms";
 
+/** The end-of-day job that reads each 1:1 DM uno-bot answered in lately. */
+export const DM_SWEEP_KEY = "sweep:dms";
+
 /** The end-of-day jobs that read the running notes and the Roadmap cards. */
 export const NOTES_SWEEP_KEY = "sweep:notes";
 export const CARDS_SWEEP_KEY = "sweep:cards";
@@ -47,7 +50,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * (src/usage/proposal-events.ts).
  * The sweep's five: one end-of-day `sweep-channel` job per swept channel reads
  * the day and keeps its drift findings, one `sweep-group-dms` job does the
- * same for every group DM uno-bot is in, `sweep-notes` and `sweep-cards` read
+ * same for every group DM uno-bot is in, one `sweep-dms` job reads each 1:1 DM
+ * uno-bot answered in for what it could not answer, what it saw disagree and
+ * decisions told to it (src/dm-sweep/), `sweep-notes` and `sweep-cards` read
  * the running notes and Roadmap cards edited that day for recorded decisions,
  * and the morning `sweep-post` stages them as proposal cards (src/sweep/).
  * The weekly DS precedence check's two: Friday's end-of-day check, and the morning
@@ -74,6 +79,7 @@ export type ScheduledJobKind =
   | "proposal-expiry"
   | "sweep-channel"
   | "sweep-group-dms"
+  | "sweep-dms"
   | "sweep-notes"
   | "sweep-cards"
   | "sweep-post"
@@ -198,7 +204,7 @@ export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as con
  * job, the spread-in batches and the sweep jobs included. The end-of-day run
  * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
  * `sweep:<channel>`, then one `sweep-group-dms` job, keyed `sweep:group-dms`,
- * then the running-notes and Roadmap-card jobs, keyed `sweep:notes` and
+ * then one `sweep-dms` job, keyed `sweep:dms`, then the running-notes and Roadmap-card jobs, keyed `sweep:notes` and
  * `sweep:cards` — only while the sweep is on at all, so a blank list still
  * sweeps nothing.
  *
@@ -218,6 +224,7 @@ export function planRun(
       ? [
           ...sweepChannels.map((channel): ScheduledJob => ({ key: `sweep:${channel}`, kind: "sweep-channel", channel })),
           { key: GROUP_DM_SWEEP_KEY, kind: "sweep-group-dms" },
+          { key: DM_SWEEP_KEY, kind: "sweep-dms" },
           { key: NOTES_SWEEP_KEY, kind: "sweep-notes" },
           { key: CARDS_SWEEP_KEY, kind: "sweep-cards" },
         ]

@@ -64,6 +64,9 @@ export interface SweepItemRecord {
   /** When its card was posted and staged; null until then. */
   postedAt: number | null;
   resolvedAt: number | null;
+  /** `dm` for an item found in a person's DM with uno-bot; absent for a
+   *  channel's, a group DM's, a note's or a card's. */
+  surface?: "dm";
 }
 
 export type SweepRunOutcome = "handled" | "deferred" | "skipped";

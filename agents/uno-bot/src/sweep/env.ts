@@ -30,6 +30,9 @@
 //     proposal renderer and tagged with its key in message metadata, and
 //     `ThreadState.putProposal`. A card is found again by that tag
 //     (`include_all_metadata`), and withdrawn with `chat.update`.
+//   • The DM job: the DMs uno-bot answered in, from the usage record
+//     (`dm-sweep/active.ts`); a DM's history and replies read with their
+//     message tags, on the bot's `im:history`.
 //   • A group DM's share: once its fix card's ✅ has written a page, a
 //     separate share card posted and staged in the same thread
 //     (`offerSweepShareFor`); its own ✅ runs `sweep_share_post`.
@@ -93,6 +96,7 @@ import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "
 import { classifyLink, type ChannelKind, type SweepSource, type TargetKind } from "./finding";
 import { SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
 import { stageSweepShare } from "./share";
+import { activeDmsFor } from "../dm-sweep/env";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
@@ -128,14 +132,16 @@ export async function runSweepJobOnEnv(
   env: Env,
   job: ScheduledJob,
   opts: { dryRun: boolean },
-  extra: Pick<SweepDeps, "onThread" | "onNote" | "fileDrift"> = {},
+  extra: Pick<SweepDeps, "onThread" | "onNote" | "onDmThread" | "fileDrift"> = {},
 ): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
     // No cursor store means every run would re-read the day; nothing is safer.
     return { summary: "USAGE_DB or HARNESS_KV not bound — the sweep did nothing" };
   }
   const deps = await sweepDepsFor(env, env.USAGE_DB, env.HARNESS_KV, opts);
-  return runSweepJob(job, { ...deps, ...extra });
+  // The DM list only where the DM job has its hook to hand each thread to.
+  const dms = extra.onDmThread ? activeDmsFor(env) : undefined;
+  return runSweepJob(job, { ...deps, ...extra, ...(dms ? { dms } : {}) });
 }
 
 /**
@@ -151,14 +157,20 @@ export function sweepSlackFor(env: Env): SweepDeps["slack"] {
       if (!res.ok || !res.channel) return null;
       return kindOf(res.channel);
     },
+    // A DM's messages come with their tags, so the DM sweep can find its own
+    // ask among them (`dm-sweep/run.ts`); no other read asks for them.
     async history(channel, oldest, cursor) {
-      const res = await measured(() => conversationsHistorySince(env, channel, oldest, cursor));
+      const res = await measured(() =>
+        conversationsHistorySince(env, channel, oldest, cursor, { includeMetadata: channel.startsWith("D") }),
+      );
       if (!res.ok) return null;
       const next = res.response_metadata?.next_cursor;
       return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
     },
     async replies(channel, rootTs, cursor) {
-      const res = await measured(() => conversationsReplies(env, channel, rootTs, 200, cursor ? { cursor } : {}));
+      const res = await measured(() =>
+        conversationsReplies(env, channel, rootTs, 200, { ...(cursor ? { cursor } : {}), includeMetadata: channel.startsWith("D") }),
+      );
       if (!res.ok) return null;
       const next = res.response_metadata?.next_cursor;
       return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };

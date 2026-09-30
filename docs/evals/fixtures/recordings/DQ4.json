@@ -1,0 +1,17 @@
+{
+  "case": "DQ4",
+  "source": "authored",
+  "recordedAt": "2026-09-30",
+  "note": "AUTHORED with #795, not captured off the Worker. The draw is the turn the case expects; it proves the turn, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=DQ4`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Honestly I think the recap email should probably go out weekly instead of daily. Daily feels like a lot.",
+      "replies": [
+        {
+          "text": "That's a fair view: daily is a lot of email. Right now the cadence reads as daily, and changing it would be a team call. If you want, I can help you frame it for crit."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

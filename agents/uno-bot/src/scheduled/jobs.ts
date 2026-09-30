@@ -21,6 +21,7 @@ import { cardTodoNoteHookFor, cardTodoThreadHookFor, runCardFollowThroughOnEnv }
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv } from "../figma-drift/env";
+import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
 import {
@@ -42,7 +43,8 @@ export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) =
  *  team note to card to-dos. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
   // Drift in a file uno-bot cannot write, queued for the morning's ask.
-  const fileDrift = job.kind === "sweep-post" ? undefined : fileDriftSinkFor(env);
+  // Never a DM's: what a DM finds stays in it, and a drafted intake would not.
+  const fileDrift = job.kind === "sweep-post" || job.kind === "sweep-dms" ? undefined : fileDriftSinkFor(env);
   const report = await runSweepJobOnEnv(env, job, { dryRun }, {
     ...sweepHooks(env, job, dryRun),
     ...(fileDrift ? { fileDrift } : {}),
@@ -52,8 +54,8 @@ const sweepBody: JobBody = async (env, job, { dryRun }) => {
 };
 
 /** The hooks a sweep job feeds: per thread for a channel read, per note for
- *  the notes job, none otherwise. */
-export function sweepHooks(env: Env, job: ScheduledJob, dryRun: boolean): Pick<SweepDeps, "onThread" | "onNote"> {
+ *  the notes job, per DM thread for the DM job, none otherwise. */
+export function sweepHooks(env: Env, job: ScheduledJob, dryRun: boolean): Pick<SweepDeps, "onThread" | "onNote" | "onDmThread"> {
   if (job.kind === "sweep-channel") {
     const onThread = threadHooks(env, dryRun);
     return onThread ? { onThread } : {};
@@ -61,6 +63,10 @@ export function sweepHooks(env: Env, job: ScheduledJob, dryRun: boolean): Pick<S
   if (job.kind === "sweep-notes") {
     const onNote = cardTodoNoteHookFor(env, { dryRun });
     return onNote ? { onNote } : {};
+  }
+  if (job.kind === "sweep-dms") {
+    const onDmThread = dmThreadHookFor(env, { dryRun });
+    return onDmThread ? { onDmThread } : {};
   }
   return {};
 }
@@ -100,6 +106,9 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "sweep-channel": sweepBody,
   // End of day: the same, for every group DM uno-bot is in.
   "sweep-group-dms": sweepBody,
+  // End of day: each 1:1 DM uno-bot answered in, for the next morning's asks
+  // in that DM (src/dm-sweep/).
+  "sweep-dms": sweepBody,
   // End of day: decisions recorded in the running notes and on Roadmap cards
   // edited that day (src/sweep/records.ts).
   "sweep-notes": sweepBody,

@@ -1,0 +1,169 @@
+{
+ "_readme": "DM detector cases (agents/uno-bot/src/dm-sweep/detector.ts): one thread of a person's DM with uno-bot, both sides, its cursor, and the recorded detector reply. Replayed through the real detector by agents/uno-bot/tests/dm-detector.test.ts. The two contrasts the DM sweep turns on: an uncertain answer (DM1) against a sourced one (DM2), and a stated decision (DM3) against an opinion (DM4); DM5 is the disagreement uno-bot noticed while answering. Every recording is authored.",
+ "cases": [
+  {
+   "id": "DM1",
+   "name": "an uncertain answer: uno-bot could not find the pilot's tutor ratio",
+   "judgeNote": "uno-bot's new answer says it found nothing it can read on the question. One unanswered item on that answer, with what was looked for as a short noun phrase in the detector's own words. No disagreement and no decision: the person only asked.",
+   "since": "1790690000.000000",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0MAYA",
+     "byBot": false,
+     "text": "What's the tutor ratio for the spring pilot?"
+    },
+    {
+     "ts": "1790694060.000200",
+     "user": "U0BOT",
+     "byBot": true,
+     "text": "I couldn't find the tutor ratio for the spring pilot in the PRDs, the Roadmap or the help center. If someone has it, a link would help."
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"unanswered\": [{\"answer_ts\": \"1790694060.000200\", \"what\": \"the tutor ratio for the spring pilot\", \"confidence\": 0.93}], \"disagreements\": [], \"decisions\": []}\n```"
+   },
+   "expect": {
+    "unanswered": [
+     {
+      "answerTs": "1790694060.000200",
+      "what": "the tutor ratio for the spring pilot"
+     }
+    ],
+    "disagreements": [],
+    "decisions": []
+   }
+  },
+  {
+   "id": "DM2",
+   "name": "a sourced answer, hedged: no follow-up",
+   "judgeNote": "uno-bot answers and names the page it read, even though it words the answer carefully. An answer given with a source is never a follow-up (the ticket's F6 rule), so nothing is reported.",
+   "since": "1790690000.000000",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0MAYA",
+     "byBot": false,
+     "text": "How many students per tutor in the spring pilot?"
+    },
+    {
+     "ts": "1790694060.000200",
+     "user": "U0BOT",
+     "byBot": true,
+     "text": "It looks like 1 tutor to 4 students: the Spring Pilot PRD's Staffing section says so (<https://www.notion.so/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb|Spring Pilot PRD>). It was last edited in August."
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"unanswered\": [], \"disagreements\": [], \"decisions\": []}\n```"
+   },
+   "expect": {
+    "unanswered": [],
+    "disagreements": [],
+    "decisions": []
+   }
+  },
+  {
+   "id": "DM3",
+   "name": "a stated decision: the recap goes weekly",
+   "judgeNote": "The person tells uno-bot what the team decided. One decision on the person's message. uno-bot's reply is not the decision, and no answer here is unanswered or a disagreement.",
+   "since": "1790690000.000000",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0MAYA",
+     "byBot": false,
+     "text": "Heads up: we decided in crit today that the recap goes weekly, not daily."
+    },
+    {
+     "ts": "1790694060.000200",
+     "user": "U0BOT",
+     "byBot": true,
+     "text": "Thanks. The Weekly Recap PRD still says daily."
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"unanswered\": [], \"disagreements\": [], \"decisions\": [{\"message_ts\": \"1790694000.000100\", \"confidence\": 0.9}]}\n```"
+   },
+   "expect": {
+    "unanswered": [],
+    "disagreements": [],
+    "decisions": [
+     {
+      "messageTs": "1790694000.000100"
+     }
+    ]
+   }
+  },
+  {
+   "id": "DM4",
+   "name": "an opinion, not a decision: nothing",
+   "judgeNote": "The person says what they think the cadence should be. An opinion or a preference is not a team decision, so no decision is reported and no drift read runs.",
+   "since": "1790690000.000000",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0MAYA",
+     "byBot": false,
+     "text": "Honestly I think the recap should probably be weekly. Daily feels like a lot."
+    },
+    {
+     "ts": "1790694060.000200",
+     "user": "U0BOT",
+     "byBot": true,
+     "text": "That's a fair point. The Weekly Recap PRD says daily right now."
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"unanswered\": [], \"disagreements\": [], \"decisions\": []}\n```"
+   },
+   "expect": {
+    "unanswered": [],
+    "disagreements": [],
+    "decisions": []
+   }
+  },
+  {
+   "id": "DM5",
+   "name": "a disagreement uno-bot noticed: Figma and the code on the warning colour",
+   "judgeNote": "uno-bot's answer says Figma and the code hold different values. One disagreement on that answer: a topic in uno-bot's words (never the person's), the two sources' short names, and design_system true (the library and the tokens).",
+   "since": "1790690000.000000",
+   "thread": [
+    {
+     "ts": "1790694000.000100",
+     "user": "U0MAYA",
+     "byBot": false,
+     "text": "What's our warning colour? I need it for the alert banner mock."
+    },
+    {
+     "ts": "1790694060.000200",
+     "user": "U0BOT",
+     "byBot": true,
+     "text": "Figma's library has warning at #FFB020, but the code's token is #715C00, so the two disagree. I'd use the code's until someone settles it."
+    }
+   ],
+   "recording": {
+    "source": "authored",
+    "reply": "```json\n{\"unanswered\": [], \"disagreements\": [{\"answer_ts\": \"1790694060.000200\", \"topic\": \"the warning colour\", \"sources\": [\"Figma\", \"the code\"], \"design_system\": true, \"confidence\": 0.92}], \"decisions\": []}\n```"
+   },
+   "expect": {
+    "unanswered": [],
+    "disagreements": [
+     {
+      "answerTs": "1790694060.000200",
+      "topic": "the warning colour",
+      "sources": [
+       "Figma",
+       "the code"
+      ],
+      "designSystem": true
+     }
+    ],
+    "decisions": []
+   }
+  }
+ ]
+}

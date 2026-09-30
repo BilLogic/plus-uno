@@ -201,7 +201,7 @@ test("the end-of-day probe plans one sweep job per SWEEP_CHANNELS entry, #uno-bo
   };
   assert.deepEqual(
     body.planned.map((j) => j.key).filter((k) => k.startsWith("sweep:")),
-    ["sweep:C0DESIGN", "sweep:C0OTHER", "sweep:group-dms", "sweep:notes", "sweep:cards"],
+    ["sweep:C0DESIGN", "sweep:C0OTHER", "sweep:group-dms", "sweep:dms", "sweep:notes", "sweep:cards"],
   );
   const keys = body.planned.map((j) => j.key);
   assert.ok(keys.indexOf("sweep:C0OTHER") < keys.indexOf("usage-text-purge"), "the sweeps run before the purge");

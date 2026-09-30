@@ -11,6 +11,7 @@
 //   • The store: `./store-env.ts` — the records in the usage database, the
 //     wording in HARNESS_KV with an expiry.
 //   • The thread mark: the sweep card's (`markSweepThread`).
+//   • The DM rows' morning and answers: the DM sweep's (`dm-sweep/env.ts`).
 //
 // A Worker with either binding missing keeps no commitments and sends nothing.
 
@@ -24,6 +25,7 @@ import { markSweepThread } from "../sweep/thread-mark";
 import type { SweepThread } from "../sweep/finding";
 import { modelCommitmentDetector, modelEvidenceJudge } from "./detector";
 import { cardAnswerFor, cardFollowUpsFor } from "../follow-through/env";
+import { dmAnswerFor, dmAsksFor } from "../dm-sweep/env";
 import { commitmentStoreFor } from "./store-env";
 import {
   answerReminder,
@@ -106,7 +108,8 @@ export async function runCommitmentNudgesOnEnv(
     dryRun: opts.dryRun,
   };
   const cards = cardFollowUpsFor(env, opts, bot?.userId ?? null);
-  return runCommitmentNudges(job, cards ? { ...deps, cards } : deps);
+  const dm = dmAsksFor(env, opts);
+  return runCommitmentNudges(job, { ...deps, ...(cards ? { cards } : {}), ...(dm ? { dm } : {}) });
 }
 
 /**
@@ -119,10 +122,12 @@ export function reminderDoorFor(env: Env): ((r: ReminderReaction) => Promise<boo
   const store = commitmentStoreFor(env);
   if (!store) return undefined;
   const cards = cardAnswerFor(env);
+  const dm = dmAnswerFor(env);
   return (r) =>
     answerReminder(r, {
       store,
       ...(cards ? { cards } : {}),
+      ...(dm ? { dm } : {}),
       update: (channel, ts, message) => updateReminder(env, channel, ts, message),
       botUserId: async () => (await getBotIdentity(env))?.userId,
       now: () => Date.now(),

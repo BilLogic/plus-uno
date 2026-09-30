@@ -54,11 +54,22 @@ export const LIVE_STATES: readonly CommitmentState[] = ["open", "nudged", "snooz
  *     note, whose evidence is a matching card;
  *   • `card_unowned` — an active card with no Contributor;
  *   • `card_stale` — an active card stuck in one Design Status.
- * The three card kinds are the follow-through module's (`../follow-through/`):
- * this module stores and schedules them, and hands their morning and their
- * answers to it.
+ *   • `dm_unanswered` — uno-bot said, in a person's DM with it, that it could
+ *     not find an answer or was not sure of it: asked about once, next morning;
+ *   • `dm_disagreement` — uno-bot noticed, while answering in a DM, that two
+ *     sources disagree: the next morning offers to raise it.
+ * The three card kinds are the follow-through module's (`../follow-through/`)
+ * and the two DM kinds the DM sweep's (`../dm-sweep/`): this module stores and
+ * schedules them, and hands their morning and their answers to their module.
  */
-export type CommitmentKind = "thread_promise" | "self_reminder" | "card_todo" | "card_unowned" | "card_stale";
+export type CommitmentKind =
+  | "thread_promise"
+  | "self_reminder"
+  | "card_todo"
+  | "card_unowned"
+  | "card_stale"
+  | "dm_unanswered"
+  | "dm_disagreement";
 
 /** The card kinds, which the follow-through module handles. */
 export const CARD_KINDS: readonly CommitmentKind[] = ["card_todo", "card_unowned", "card_stale"];
@@ -66,6 +77,15 @@ export const CARD_KINDS: readonly CommitmentKind[] = ["card_todo", "card_unowned
 /** Whether a row is a card follow-up's. */
 export function isCardKind(kind: CommitmentKind): boolean {
   return CARD_KINDS.includes(kind);
+}
+
+/** The DM kinds, which the DM sweep handles. Their rows are always a DM's
+ *  (`channelKind: "dm"`, the record's surface flag). */
+export const DM_KINDS: readonly CommitmentKind[] = ["dm_unanswered", "dm_disagreement"];
+
+/** Whether a row is one the DM sweep keeps. */
+export function isDmKind(kind: CommitmentKind): boolean {
+  return DM_KINDS.includes(kind);
 }
 
 /**
@@ -202,6 +222,9 @@ export interface CommitmentText {
    *  offered, in the order shown, until one is picked and staged or the
    *  choice lapses; `reposted` once the list went up a second time. */
   choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean; listedAt: number; reposted: boolean };
+  /** A `dm_disagreement`'s two sources, in the detector's short names, and
+   *  the team channel its note would go to. `what` holds the topic. */
+  raise?: { sources: [string, string]; to: "plus-design" | "plus-universal" };
 }
 
 /** The KV half. */

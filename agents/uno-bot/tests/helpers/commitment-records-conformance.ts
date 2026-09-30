@@ -246,4 +246,18 @@ export function runCommitmentRecordsConformance(
     // It is due like any other.
     assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01"))?.id, live.id);
   });
+
+  it("a DM ask keeps its kind and its DM, is due like any other on the asked budget, and is never a promise", async () => {
+    const records = make();
+    const miss = commitmentRow({ id: "D0MAYA:1.0:unanswered", kind: "dm_unanswered", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA", deadlineAt: null });
+    const raise = commitmentRow({ id: "D0MAYA:2.0:raise", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA", deadlineAt: null, dueAt: miss.dueAt + 1 });
+    await records.addCommitments([miss, raise]);
+    assert.deepEqual(await records.get(miss.id), miss);
+    assert.deepEqual(await records.get(raise.id), raise);
+    assert.equal(await records.liveInThread(miss.channel, miss.threadTs, "U0MAYA"), null);
+    assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01", { cards: ["U0MAYA"] }))?.id, miss.id);
+    assert.equal(await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01", { asked: ["U0MAYA"] }), null);
+    await records.update(miss.id, { state: "done", resolvedAt: 5 });
+    assert.deepEqual(await records.latestAnswers(miss.channel, 3), []);
+  });
 }
