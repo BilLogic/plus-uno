@@ -69,30 +69,32 @@ export function captureItemLines(
 ): string[] | null {
   const { target, evidence } = item;
   if (!item.add && !evidence.record && target.foundBy !== "search") return null;
-  const page = `[${escapeSlackText(target.title)}](${target.url})`;
+  // Slack's own `<url|label>`, as the drift lines link: a `]` in a title
+  // cannot break it, and the escaped label pings nobody.
+  const page = `<${target.url}|${escapeSlackText(flat(target.title) || "untitled")}>`;
   const searched = target.foundBy === "search" ? ` _(${FOUND_BY_SEARCH})_` : "";
   const where = evidence.permalinks[0] ? ` ([where](${evidence.permalinks[0]}))` : "";
 
   if (item.add) {
     const place = item.add.section
-      ? `add under ${page} › *${escapeSlackText(item.add.section)}*`
-      : `add a new section *${escapeSlackText(item.add.newSection ?? "")}* to ${page}`;
+      ? `add under ${page} › *${escapeSlackText(flat(item.add.section))}*`
+      : `add a new section *${escapeSlackText(flat(item.add.newSection ?? ""))}* to ${page}`;
     return [
       `${i + 1}. <@${item.owner}> · ${place}${searched}`,
       `   - thread answered: “${quote(item.threadSays)}”${where}`,
-      `   - adds: “${escapeSlackText(item.replacement)}”`,
+      `   - adds: “${escapeSlackText(flat(item.replacement))}”`,
     ];
   }
 
   const record = evidence.record;
   const said = record
-    ? `   - ${record.kind === "note" ? "note" : "card"} says: “${quote(item.threadSays)}” ([${record.kind === "note" ? "note" : "card"}](${recordLink(record.url, record.entryIds[0])}))`
+    ? `   - ${record.kind} says: “${quote(item.threadSays)}” (<${recordLink(record.url, record.entryIds[0])}|${record.kind}>)`
     : `   - thread says: “${quote(item.threadSays)}”${where}`;
   return [
     `${i + 1}. <@${item.owner}> · ${page}${searched}`,
     `   - page says: “${quote(item.sourceSays)}”`,
     said,
-    `   - change: “${change.before}” → “${change.after}”`,
+    `   - change: “${escapeSlackText(change.before)}” → “${escapeSlackText(change.after)}”`,
   ];
 }
 
@@ -102,7 +104,11 @@ function recordLink(url: string, entryId: string | undefined): string {
   return `${url.split("#")[0]}#${entryId.replace(/-/g, "")}`;
 }
 
+function flat(text: string): string {
+  return text.replace(/\s+/g, " ").trim();
+}
+
 function quote(text: string): string {
-  const flat = text.replace(/\s+/g, " ").trim();
-  return escapeSlackText(flat.length > QUOTE_CHARS ? `${flat.slice(0, QUOTE_CHARS - 1)}…` : flat);
+  const line = flat(text);
+  return escapeSlackText(line.length > QUOTE_CHARS ? `${line.slice(0, QUOTE_CHARS - 1)}…` : line);
 }

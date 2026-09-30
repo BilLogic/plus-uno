@@ -368,32 +368,32 @@ export const MenuKeepsActions = {
         await userEvent.click(more);
 
         // Selectable: a toggle, off, then on and still in the open menu. It
-        // leads with the Dropdown's multi-select checkbox, decorative since
-        // aria-pressed carries the state: unchecked in on-surface-variant,
-        // then checked in primary, with a different glyph.
-        const checkboxOf = (item) => item.querySelector('.dropdown-item-inner > [aria-hidden="true"]:first-child');
-        const glyph = (el) => getComputedStyle(el, '::before').content;
-        const offColor = tokenColor(canvasElement, '--color-on-surface-variant');
-        const onColor = tokenColor(canvasElement, '--color-primary');
+        // leads with the Dropdown's multi-select checkbox, Figma's
+        // `_Form Checkbox Button`, decorative since aria-pressed carries the
+        // state: an on-primary box with a primary-border stroke and no check,
+        // then a primary box with an on-primary check.
+        const checkboxOf = (item) => item.querySelector('.pdropdown-checkbox');
         const toggle = canvas.getByRole('button', { name: 'Mathematics' });
         await expect(toggle).toHaveAttribute('aria-pressed', 'false');
         const offBox = checkboxOf(toggle);
         await expect(offBox, 'a checkbox leads the row').not.toBeNull();
-        await expect(getComputedStyle(offBox).color, 'unchecked').toBe(offColor);
-        await expect(getComputedStyle(offBox).opacity, 'the empty box shows while off').toBe('1');
-        const offGlyph = glyph(offBox);
-        await expect(offGlyph, 'a glyph is drawn').not.toMatch(/^(none|normal|"")$/);
+        await expect(getComputedStyle(offBox).backgroundColor, 'unchecked fill')
+            .toBe(tokenColor(canvasElement, '--color-on-primary'));
+        await expect(getComputedStyle(offBox).borderTopColor, 'unchecked stroke')
+            .toBe(tokenColor(canvasElement, '--color-primary-border'));
+        await expect(offBox.querySelector('svg'), 'no check while off').toBeNull();
         await userEvent.click(toggle);
         await expect(canvas.getByText('Mathematics picked')).toBeInTheDocument();
         await expect(more, 'toggling keeps the menu open').toHaveAttribute('aria-expanded', 'true');
         await expect(canvas.getByRole('button', { name: 'Mathematics' })).toHaveAttribute('aria-pressed', 'true');
         const onBox = checkboxOf(canvas.getByRole('button', { name: 'Mathematics' }));
-        await expect(getComputedStyle(onBox).color, 'checked').toBe(onColor);
-        await expect(glyph(onBox), 'the checked glyph differs').not.toBe(offGlyph);
+        await expect(getComputedStyle(onBox).backgroundColor, 'checked fill')
+            .toBe(tokenColor(canvasElement, '--color-primary'));
+        await expect(onBox.querySelector('svg'), 'a check is drawn').not.toBeNull();
         // Waited for: the item's background eases in. The token is read once,
         // outside the wait: its probe element would otherwise wake the wait's
         // own mutation observer on every read.
-        const selectedGround = tokenColor(canvasElement, '--color-primary-state-08');
+        const selectedGround = tokenColor(canvasElement, '--color-primary-container-state-16');
         await waitFor(() => expect(
             getComputedStyle(canvas.getByRole('button', { name: 'Mathematics' })).backgroundColor,
             'the item shows the menu\'s selected state',

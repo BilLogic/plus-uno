@@ -38,6 +38,17 @@ const usePendingEscapeFocus = (show) => {
     }), []);
 };
 
+/**
+ * The check in a checked multi-select box, drawn as Figma's `_Form Checkbox
+ * Button` draws it (its vector, on the box's 12px grid). It takes its color
+ * from the box (`currentColor`).
+ */
+const CheckGlyph = () => (
+    <svg viewBox="0 0 12 12" focusable="false">
+        <path d="M2.29 6.62 3.53 5.38 6 7.86 4.76 9.09Z M8.48 2.91 9.71 4.14 6 7.86 4.76 6.62Z" />
+    </svg>
+);
+
 const Dropdown = ({
     id,
     buttonText = "Dropdown",
@@ -305,27 +316,20 @@ const Dropdown = ({
                     };
                     const inner = (
                         <div className="dropdown-item-inner">
-                            {item.multiSelectCheckbox ? (
-                                <i
-                                    className={
-                                        item.multiSelectChecked
-                                            ? 'fa-solid fa-square-check'
-                                            : 'fa-regular fa-square'
-                                    }
-                                    style={{
-                                        color: item.multiSelectChecked
-                                            ? 'var(--color-primary)'
-                                            : 'var(--color-on-surface-variant)',
-                                        flexShrink: 0,
-                                    }}
+                            {/*
+                              * The multi-select checkbox, Figma's `_Form
+                              * Checkbox Button`. Decorative: a toggle row says
+                              * whether it is on through `aria-pressed`. A row
+                              * without it has nothing before its leading icon
+                              * or words, so its words start at the padding.
+                              */}
+                            {item.multiSelectCheckbox && (
+                                <span
+                                    className={`pdropdown-checkbox${item.multiSelectChecked ? ' is-checked' : ''}`}
                                     aria-hidden="true"
-                                />
-                            ) : (
-                                <i
-                                    className="fas fa-check selected-icon"
-                                    style={{ opacity: item.selected ? 1 : 0 }}
-                                    aria-hidden="true"
-                                />
+                                >
+                                    {item.multiSelectChecked && <CheckGlyph />}
+                                </span>
                             )}
 
                             {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}

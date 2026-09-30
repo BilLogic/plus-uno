@@ -174,38 +174,43 @@ function revisionText(card: ProposalCard): string {
 }
 
 function targetWords(target: { title: string; parent?: string }): string {
-  return target.parent ? `${target.title} — in ${target.parent}` : target.title;
+  const title = escapeSlackText(target.title);
+  return target.parent ? `${title} — in ${escapeSlackText(target.parent)}` : title;
 }
 
 function revisionBody(revision: CardRevision): string {
   const lines: string[] = [];
   const { page } = revision;
+  // Every word below is the page's or the request's, so each is escaped: a
+  // title or value holding `<!channel>` is text on the card, never a ping.
+  const esc = escapeSlackText;
   if (page) {
     // Named + linked card — `<url|Title> — in <ParentDB>`, never a bare hex URL.
     lines.push(
       page.title
-        ? `*<${page.url}|${page.title}>*${page.parent ? ` — in ${page.parent}` : ""}`
+        ? `*<${page.url}|${esc(page.title)}>*${page.parent ? ` — in ${esc(page.parent)}` : ""}`
         : `*<${page.url}|this Notion page>*`,
     );
   }
   // One bullet per changed field, always — `current → new`, values backticked.
   for (const p of revision.properties) {
+    const label = esc(p.label);
     lines.push(
-      p.from ? `• *${p.label}:* \`${p.from}\` → \`${p.to}\`` : `• *${p.label}:* \`${p.to}\``,
+      p.from ? `• *${label}:* \`${esc(p.from)}\` → \`${esc(p.to)}\`` : `• *${label}:* \`${esc(p.to)}\``,
     );
   }
   if (revision.rewrite) {
     const { blocks, previews } = revision.rewrite;
     const head = `• *Rewriting ${blocks} block(s) in place* (the rest of the page is untouched).`;
     lines.push(
-      previews.length ? `${head}\n${previews.map((t) => `    ↳ _${t}_`).join("\n")}` : head,
+      previews.length ? `${head}\n${previews.map((t) => `    ↳ _${esc(t)}_`).join("\n")}` : head,
     );
   }
   if (revision.append) {
     const { headings } = revision.append;
     lines.push(
       headings.length
-        ? `• *Appending:* ${headings.map((h) => `_${h}_`).join(", ")}`
+        ? `• *Appending:* ${headings.map((h) => `_${esc(h)}_`).join(", ")}`
         : `• *Appending a note to the page.*`,
     );
   }
@@ -536,7 +541,7 @@ export function operationKinds(
   if (fields.length) {
     kinds.push({
       label: "set properties",
-      details: fields.map(([k, v]) => `${humanizeParamKey(k)} → \`${String(v)}\``),
+      details: fields.map(([k, v]) => `${escapeSlackText(humanizeParamKey(k))} → \`${escapeSlackText(String(v))}\``),
     });
   }
   const replaces = Array.isArray(op.input.replace)
@@ -586,9 +591,10 @@ function replaceGist(replace: Record<string, unknown>): string {
   };
   const before = pick("before", "current", "current_text", "block_text", "was");
   const blockId = pick("block_id", "blockId");
-  const after = firstLine(pick("content"));
+  // The page's words and the replacement's are text, never markup.
+  const after = escapeSlackText(firstLine(pick("content")));
   const from = before
-    ? `_${firstLine(before)}_`
+    ? `_${escapeSlackText(firstLine(before))}_`
     : blockId
       ? `block \`${blockId}\``
       : "_(the cited block)_";
@@ -608,7 +614,7 @@ function appendDetail(append: unknown): string | null {
       s && typeof s === "object" ? String((s as Record<string, unknown>).heading ?? "").trim() : "",
     )
     .filter(Boolean);
-  if (headings.length) return headings.map((h) => `_${h}_`).join(", ");
+  if (headings.length) return headings.map((h) => `_${escapeSlackText(h)}_`).join(", ");
   if (typeof o.text === "string" && o.text.trim()) return "_a note on the page_";
   return null;
 }

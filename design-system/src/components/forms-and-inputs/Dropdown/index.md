@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.stories.jsx` — Content, StyleVariants, Sizes, Layout, Overview, EscapeCloses, EscapeClosesSplit, EscapeClosesCustomToggle, LinkAndToggleItems, EscapeIgnoredWhenControlledStaysOpen, EscapeRefusedThenParentCloses, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.stories.jsx` — Content, StyleVariants, Sizes, Layout, Overview, EscapeCloses, EscapeClosesSplit, EscapeClosesCustomToggle, LinkAndToggleItems, EscapeIgnoredWhenControlledStaysOpen, EscapeRefusedThenParentCloses, MenuRows, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx`
 
@@ -43,7 +43,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-state-16` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-container` · `--color-primary-state-08` · `--color-surface-container` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-line-height-h6` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body1-solid` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--font-size-fa-h6-solid` · `--font-size-h6` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-sm`
+`--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-state-16` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-container` · `--color-primary-container-state-16` · `--color-surface` · `--color-surface-container` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-line-height-h6` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body1-solid` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--font-size-fa-h6-solid` · `--font-size-h6` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-border-radius-radius-50` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-sm` · `--size-element-stroke-xl`
 
 From `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss`. Override these through the token layer, never with a literal.
 
