@@ -77,7 +77,7 @@ const answers = (state: "done" | "not_promise") =>
   `SELECT * FROM (${SELECT} WHERE state = '${state}' AND (channel_kind = 'public' OR channel_id = ?) ` +
   `ORDER BY resolved_at DESC, commitment_id DESC LIMIT ?)`;
 const LATEST_ANSWERS = `${answers("done")} UNION ALL ${answers("not_promise")} ORDER BY resolved_at DESC, commitment_id DESC`;
-const BY_REMINDER =`${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
+const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));

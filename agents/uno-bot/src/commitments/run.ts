@@ -273,7 +273,8 @@ export function commitmentThreadHook(
  * Where the detector's examples come from: the newest commitments people
  * answered 🙌 or 🤔, at most `config.fewShot` of each, from public channels
  * and the swept channel itself (`CommitmentRecords.latestAnswers`), each with
- * the summary kept beside it. One read a channel for the life of the loader —
+ * the summary kept beside it — at most one a promiser, so no one person's
+ * answers steer every channel. One read a channel for the life of the loader —
  * one sweep job — however many of its threads the detector is asked about.
  * An answer whose summary has expired is left out rather than replaced. A
  * store that fails gives no examples: a missing example is not worth a missed
@@ -287,11 +288,19 @@ export function fewShotExamples(
   const load = async (channel: string): Promise<FewShotExample[]> => {
     if (!limit) return [];
     try {
-      const rows = await deps.store.latestAnswers(channel, limit);
+      // Twice the rows, so one example a promiser still leaves room for others.
+      const rows = await deps.store.latestAnswers(channel, limit * 2);
       const out: FewShotExample[] = [];
+      const promisers = new Set<string>();
+      const count = { done: 0, not_promise: 0 };
       for (const row of rows) {
+        const answer = row.state === "done" ? "done" : "not_promise";
+        if (promisers.has(row.promiserId) || count[answer] >= limit) continue;
         const what = (await deps.store.text(row.id))?.what;
-        if (what) out.push({ answer: row.state === "done" ? "done" : "not_promise", what });
+        if (!what) continue;
+        promisers.add(row.promiserId);
+        count[answer] += 1;
+        out.push({ answer, what });
       }
       return out;
     } catch (err) {

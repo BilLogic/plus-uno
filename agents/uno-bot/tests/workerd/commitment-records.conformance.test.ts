@@ -44,17 +44,37 @@ describe("[d1] the commitments migration", () => {
     expect(spent).toBe(5);
   });
 
-  it("refuses a place outside the four kinds, and reads a row from before 0007 as public", async () => {
+  it("refuses a place outside the four kinds", async () => {
     const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
     await expect(records.addCommitments([commitmentRow({ channelKind: "shared" as never })])).rejects.toThrow(/CHECK/);
-    const row = commitmentRow();
-    await bindings.USAGE_DB.prepare(
-      "INSERT INTO commitments (commitment_id, kind, channel_id, thread_ts, message_ts, promiser_id, due_at, state, confidence, promised_at, detected_at, run_date) " +
-        "VALUES (?, 'thread_promise', ?, ?, ?, ?, 1, 'done', 0.9, 1, 1, '2026-09-29')",
-    )
-      .bind(row.id, row.channel, row.threadTs, row.messageTs, row.promiserId)
-      .run();
-    expect((await records.get(row.id))?.channelKind).toBe("public");
+  });
+
+  it("0007 fails closed: an unknown old row reads private, a backfilled public channel's row reads public", async () => {
+    // Rebuild the table as 0006 left it, write rows the way the pre-0007
+    // Worker did, then apply 0007 itself over them.
+    const all = bindings.USAGE_MIGRATIONS;
+    await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
+    await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+    await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0007"));
+    const old = (id: string, channel: string) =>
+      bindings.USAGE_DB.prepare(
+        "INSERT INTO commitments (commitment_id, kind, channel_id, thread_ts, message_ts, promiser_id, due_at, state, confidence, promised_at, detected_at, run_date) " +
+          "VALUES (?, 'thread_promise', ?, '1.0', ?, 'U0MAYA', 1, 'done', 0.9, 1, 1, '2026-09-29')",
+      )
+        .bind(id, channel, id)
+        .run();
+    await old("C03FC8AS69K:1", "C03FC8AS69K"); // plus-design, public
+    await old("C074QG2V7DJ:1", "C074QG2V7DJ"); // plus-design-feedback, private
+    await old("C0UNKNOWN:1", "C0UNKNOWN");
+    await applyD1Migrations(bindings.USAGE_DB, all);
+    const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
+    expect((await records.get("C03FC8AS69K:1"))?.channelKind).toBe("public");
+    expect((await records.get("C074QG2V7DJ:1"))?.channelKind).toBe("private");
+    expect((await records.get("C0UNKNOWN:1"))?.channelKind).toBe("private");
+    // Leave the table as the other cases find it: empty, and planned as empty
+    // (0007's PRAGMA optimize just measured these three rows).
+    await bindings.USAGE_DB.prepare("DELETE FROM commitments").run();
+    await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
   });
 
   it("refuses a state outside the lifecycle", async () => {
