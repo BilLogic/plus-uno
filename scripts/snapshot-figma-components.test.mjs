@@ -218,6 +218,15 @@ test('a lastChecked that cannot be read is treated as old', () => {
   assert.equal(refreshVerdict(snap('not a date'), after, { now: NOW, maxAgeDays: 180 }).verdict, 'date-only');
 });
 
+test('a lastChecked in the future is treated as old, like an unreadable one', () => {
+  const after = snap(NOW.toISOString());
+  const ahead = snap(new Date(NOW.getTime() + 3 * 86400000).toISOString());
+  assert.deepEqual(refreshVerdict(ahead, after, { now: NOW, maxAgeDays: 180 }), {
+    verdict: 'date-only',
+    ageDays: -3,
+  });
+});
+
 test('the verdict command prints GITHUB_OUTPUT lines, and fails on a file that is not JSON', () => {
   const cli = path.join(REPO_ROOT, 'scripts/figma-snapshot-verdict.mjs');
   const live = path.join(REPO_ROOT, 'scripts/figma-component-snapshot.json');

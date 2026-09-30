@@ -99,14 +99,20 @@ jobs:
         if: steps.compare.outputs.verdict == 'unchanged'
         # A refresh PR still open from an earlier run is stale now: main already
         # matches the library, so it is closed rather than left to be merged.
+        # `--head` matches a branch NAME, so a fork's PR from a branch of the
+        # same name would match too; only this repo's own head is touched, here
+        # and in the edit path below.
         env:
           GH_TOKEN: ${{ github.token }}
           BASE: ${{ github.event.repository.default_branch }}
+          OWNER: ${{ github.repository_owner }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          git checkout -- "$SNAPSHOT"
-          PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number // empty')
+          PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open \
+            --json number,headRepositoryOwner,isCrossRepository \
+            | jq -r --arg owner "$OWNER" \
+              '[.[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == $owner)][0].number // empty')
           if [ -n "$PR" ]; then
             gh pr close "$PR" --comment "Closed by [a later refresh]($RUN_URL): the published library now matches \`$SNAPSHOT\` on $BASE."
           fi
@@ -143,6 +149,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           BASE: ${{ github.event.repository.default_branch }}
+          OWNER: ${{ github.repository_owner }}
           VERDICT: ${{ steps.compare.outputs.verdict }}
           AGE_DAYS: ${{ steps.compare.outputs.age_days }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -171,7 +178,10 @@ jobs:
             echo "Opened by [Refresh Figma Component Snapshot]($RUN_URL)."
           } > "$BODY"
 
-          PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number // empty')
+          PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open \
+            --json number,headRepositoryOwner,isCrossRepository \
+            | jq -r --arg owner "$OWNER" \
+              '[.[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == $owner)][0].number // empty')
           if [ -n "$PR" ]; then
             gh pr edit "$PR" --body-file "$BODY"
             URL=$(gh pr view "$PR" --json url --jq .url)
