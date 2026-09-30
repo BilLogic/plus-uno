@@ -1,7 +1,7 @@
 // No channel ask's text outlives 14 days — across a weekend, and across one
 // missed run.
 //
-// The runs are weekday-only (14:00 and 22:00 UTC), so the purge cannot run
+// The runs are weekday-only (10:00 and 18:00 ET), so the purge cannot run
 // every day. These cases walk the real schedule hour by hour — which firings
 // start a run, and which runs hold the purge job, read from `runs.ts` itself —
 // and the real purge job, over a store holding one ask, and check that the
@@ -98,6 +98,22 @@ test("any ask hour in a week, with any one run missed, is cleared within 14 days
     for (const skip of [undefined, ...firings]) {
       const age = await ageWhenCleared(askedAt, skip);
       assert.ok(age <= TEXT_RETENTION_MS, `asked ${new Date(askedAt).toISOString()}, skipped ${skip}`);
+    }
+  }
+});
+
+test("the weekend the clocks go back, with one run missed, still clears within 14 days", async () => {
+  // Fri 30 Oct's end-of-day run is 22:00 UTC (EDT) and Mon 2 Nov's runs are
+  // 15:00 and 23:00 UTC (EST): the weekend gap is an hour longer than usual.
+  const fridayRun = Date.UTC(2026, 9, 30, 22);
+  const askedAt = fridayRun + 60 * 1000 - PURGE_AFTER_MS;
+  const age = await ageWhenCleared(askedAt, Date.UTC(2026, 10, 2, 15));
+  assert.ok(age <= TEXT_RETENTION_MS, `cleared at ${age / DAY} days`);
+  const weekStart = Date.UTC(2026, 9, 26);
+  for (let at = weekStart; at < weekStart + 14 * DAY; at += HOUR + 7 * 60 * 1000) {
+    for (const skip of [undefined, ...purgeFirings(at, 21)]) {
+      const cleared = await ageWhenCleared(at, skip);
+      assert.ok(cleared <= TEXT_RETENTION_MS, `asked ${new Date(at).toISOString()}, skipped ${skip}`);
     }
   }
 });

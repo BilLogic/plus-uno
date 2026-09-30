@@ -17,6 +17,7 @@ import {
   SELF_REMINDER_LAST_LEGEND,
   SELF_REMINDER_LEGEND,
   setSelfReminder,
+  snoozedRunAt,
   ONE_PER_MESSAGE,
   type InMemoryCommitmentStore,
   type NudgeDeps,
@@ -92,11 +93,27 @@ describe("reading the time", () => {
     });
   }
 
+  it("places a reminder at 10:00 ET on both sides of the 1 Nov 2026 change", () => {
+    const thuOct29 = at(59, 18); // Thu 2026-10-29, 2 pm EDT
+    const fri = parseReminderWhen("Fri", thuOct29);
+    assert.ok(fri.ok);
+    assert.equal(iso(fri.runAt), "2026-10-30T14:00:00.000Z");
+    const mon = parseReminderWhen("Mon", thuOct29);
+    assert.ok(mon.ok);
+    assert.equal(iso(mon.runAt), "2026-11-02T15:00:00.000Z");
+    // Today at 14:30 UTC on Mon 2 Nov is 9:30 EST: its 10 am run is still ahead.
+    const today = parseReminderWhen("today", Date.UTC(2026, 10, 2, 14, 30));
+    assert.ok(today.ok);
+    assert.equal(iso(today.runAt), "2026-11-02T15:00:00.000Z");
+    // A ⏳ on Thu 29 Oct moves it two working days out: Mon 2 Nov, 10:00 EST.
+    assert.equal(iso(snoozedRunAt(thuOct29)), "2026-11-02T15:00:00.000Z");
+  });
+
   it("a date with no year rolled into next year, close by, is placed and named with its year", async () => {
     const dec20 = at(111, 18); // Sun 2026-12-20
     const when = parseReminderWhen("1/5", dec20);
     assert.ok(when.ok && when.rolledYear);
-    assert.equal(iso(when.runAt), "2027-01-05T14:00:00.000Z");
+    assert.equal(iso(when.runAt), "2027-01-05T15:00:00.000Z"); // 10:00 EST
     const store = createInMemoryCommitmentStore();
     const result = await setSelfReminder({ when: "1/5", what: "renew the license" }, dmPlace, { store, now: () => dec20 });
     assert.ok(result.ok);
