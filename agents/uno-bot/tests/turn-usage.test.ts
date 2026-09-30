@@ -484,6 +484,21 @@ test("a card staged in a DM or a group DM names no channel and records no one it
   }
 });
 
+test("a staged card's roles come from the stored role map; no map, or a failed read, means unknown", async () => {
+  const roles = async () => ({ U1: "pm" as const, U2: "dev" as const });
+  const cases = [
+    { teamRoles: roles, want: ["pm", "dev"] },
+    { teamRoles: undefined, want: [null, null] },
+    { teamRoles: async (): Promise<never> => { throw new Error("kv down"); }, want: [null, null] },
+  ];
+  for (const { teamRoles, want } of cases) {
+    const h = harness({ replies: [REVISION], ...(teamRoles ? { teamRoles } : {}) });
+    await runTurn(request({ text: "<@U2> asked me to file it" }), h.deps);
+    const [staged] = h.proposalEvents.events();
+    assert.deepEqual([staged?.requesterRole, staged?.aimedAtRole], want);
+  }
+});
+
 test("a re-staged card carries its original's turn, so its ticket still finds a turn row", async () => {
   const h = harness();
   const original = { ...PENDING, proposalTs: "1700000000.000300" };

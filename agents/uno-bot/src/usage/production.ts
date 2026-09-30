@@ -14,6 +14,17 @@ import { createD1UsageLog } from "./d1";
 import { createD1ProposalEventLog } from "./proposal-events-d1";
 import type { ProposalEventLog } from "./proposal-events";
 import type { UsageLog } from "./store";
+import type { TeamRoles } from "./roles";
+import { charge, rethrowIfBudget } from "../net";
+import { findTeamMembers } from "../integrations/notion";
+import { slackDirectoryFor } from "../tools/slack-people";
+import {
+  syncTeamRoles,
+  TEAM_ROLES_KV_KEY,
+  TEAM_ROLES_TTL_S,
+  type StoredTeamRoles,
+  type TeamRolesSyncReport,
+} from "./team-roles-sync";
 
 let warnedUnbound = false;
 
@@ -78,4 +89,58 @@ export function testChannelIdsOf(env: Pick<Env, "TEST_CHANNEL_IDS">): string[] {
     .split(",")
     .map((id) => id.trim())
     .filter(Boolean);
+}
+
+/**
+ * The stored role map (`./team-roles-sync.ts`), or an empty one — every role
+ * then reads unknown — when none is stored, KV is not bound or the read fails.
+ * One KV read, charged to the internal bucket.
+ *
+ * @throws A budget stop, which is the caller's to handle rather than an
+ *   empty map
+ */
+export async function teamRolesFor(env: Pick<Env, "HARNESS_KV">): Promise<TeamRoles> {
+  if (!env.HARNESS_KV) return {};
+  try {
+    charge(1, "kv");
+    return (await env.HARNESS_KV.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json"))?.roles ?? {};
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[usage] team roles not read: ${err instanceof Error ? err.message : String(err)}`);
+    return {};
+  }
+}
+
+/**
+ * The daily role-map sync on `Env`: Team Members from Notion, the directory
+ * from users.list with the bot token, the map into HARNESS_KV.
+ *
+ * @param env - Worker bindings
+ * @param opts - `dryRun` writes nothing
+ */
+export async function runTeamRolesSync(env: Env, opts: { dryRun: boolean }): Promise<TeamRolesSyncReport> {
+  const kv = env.HARNESS_KV;
+  // A dry run writes nothing, so it rehearses the reads with or without KV.
+  if (!kv && !opts.dryRun) {
+    return { written: false, matched: 0, unmatched: 0, ambiguous: 0, summary: "HARNESS_KV not bound — sync skipped" };
+  }
+  const directory = slackDirectoryFor(env);
+  return syncTeamRoles(
+    {
+      roster: () => findTeamMembers(env),
+      listUsers: (cursor) => directory.listUsers(cursor),
+      async read() {
+        if (!kv) return null;
+        charge(1, "kv");
+        return kv.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json");
+      },
+      async write(stored) {
+        if (!kv) return;
+        charge(1, "kv");
+        await kv.put(TEAM_ROLES_KV_KEY, JSON.stringify(stored), { expirationTtl: TEAM_ROLES_TTL_S });
+      },
+      now: () => Date.now(),
+    },
+    opts,
+  );
 }
