@@ -165,6 +165,7 @@ Counters.play = async ({ canvasElement }) => {
 export const CounterFormatting = () => (
     <div style={row}>
         <BadgeVariants variant="counter" appearance="neutral" data-testid="word">many</BadgeVariants>
+        <BadgeVariants variant="counter" appearance="neutral" label="Many new replies" data-testid="named-word">lots</BadgeVariants>
     </div>
 );
 
@@ -173,9 +174,17 @@ CounterFormatting.play = async ({ canvasElement }) => {
     await expect(canvas.getByText('many')).toBeVisible();
     await expect(px(getComputedStyle(canvas.getByTestId('word')).height), 'a word renders as a 20-tall Status').toBe(20);
     const said = new Set(console.warn.mock.calls.map(([m]) => String(m)));
-    await expect([...said], 'one warning, naming what it renders').toEqual([
+    await expect([...said].filter((m) => m.includes('"many"')), 'one warning, naming what it renders').toEqual([
         '[BadgeVariants] is deprecated; variant="counter" takes a number, so "many" renders as <Status style="neutral">. Use Status or Tag for a word.',
     ]);
+
+    // `label` still names a word for a screen reader, as it does on a status.
+    const named = canvas.getByTestId('named-word');
+    await expect(named).not.toHaveAttribute('aria-label');
+    await expect(canvas.getByText('lots').closest('[aria-hidden="true"]'), 'the visible word is hidden from a screen reader').not.toBeNull();
+    const spoken = within(named).getByText('Many new replies');
+    await expect(spoken.closest('[aria-hidden="true"]'), 'the label is what a screen reader reads').toBeNull();
+    await expect(spoken.getBoundingClientRect().width, 'the label is not seen').toBeLessThanOrEqual(1);
 };
 
 /* --------------------------------------------------------- trailing metric */

@@ -60,7 +60,7 @@ export const Count = ({
     const isDot = appearance === 'dot';
 
     let resolvedStyle = style;
-    if (DEPRECATED_STYLE_ALIASES[style]) {
+    if (Object.hasOwn(DEPRECATED_STYLE_ALIASES, style)) {
         if (process.env.NODE_ENV !== 'production') {
             // eslint-disable-next-line no-console
             console.warn(`[Count] style="${style}" is deprecated; use style="${DEPRECATED_STYLE_ALIASES[style]}".`);

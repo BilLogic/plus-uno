@@ -73,7 +73,10 @@ export const TAG_VARIANTS = ['read-only', 'dismissible', 'selectable', 'operatio
 /** Deprecated names, still accepted, and what each one now means. */
 const DEPRECATED_COLORS = { orange: 'yellow' };
 
-/** Every name `color` accepts: the seven, then the deprecated aliases. */
+/**
+ * Every name `color` accepts: the seven, then the deprecated aliases. A
+ * literal, because the docs generator reads the values from source.
+ */
 export const TAG_ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange'];
 
 /**
@@ -245,9 +248,10 @@ export const Tag = ({
     // tooltip on every tag would repeat what most of them already show.
     const truncated = useIsTruncated(labelRef, [label, maxWidth]);
 
+    const colorEntry = resolveTagColor(color);
     let resolvedColor = color;
-    if (resolveTagColor(color)?.deprecated) {
-        resolvedColor = resolveTagColor(color).color;
+    if (colorEntry?.deprecated) {
+        resolvedColor = colorEntry.color;
         warn(`[Tag] color="${color}" is deprecated; use "${resolvedColor}".`);
     }
 

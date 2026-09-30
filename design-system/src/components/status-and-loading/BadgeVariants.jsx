@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Count from './Count';
-import { DEPRECATED_STYLE_ALIASES } from './Count/Count';
-import Status, { STATUS_DATE_STYLES } from './Status/Status';
+import Count, { DEPRECATED_STYLE_ALIASES } from './Count';
+import Status, { STATUS_DATE_STYLES } from './Status';
 import Tag from './Tag';
 
 /**
@@ -43,6 +42,20 @@ export function formatCount(value, max) {
     if (typeof max === 'number' && n > max) return `${max}+`;
     return String(n);
 }
+
+/*
+ * `label` renames a label for a screen reader. A Status is a span with no role,
+ * and ARIA does not allow a name on one, so the label is its text: visually
+ * hidden, with the visible words hidden from assistive technology.
+ */
+const withHiddenLabel = (content, label) => (label
+    ? (
+        <>
+            <span aria-hidden="true">{content}</span>
+            <span className="visually-hidden">{label}</span>
+        </>
+    )
+    : content);
 
 const warn = (message) => {
     if (process.env.NODE_ENV === 'production') return;
@@ -105,7 +118,7 @@ export const BadgeVariants = ({
             // A word is not a count. It keeps rendering, as the Status a word
             // becomes, and the one warning says so.
             warn(`is deprecated; variant="counter" takes a number, so "${content}" renders as <Status style="${style}">. Use Status or Tag for a word.`);
-            return <Status style={style} {...shared}>{content}</Status>;
+            return <Status style={style} {...shared}>{withHiddenLabel(content, label)}</Status>;
         }
         warn(`is deprecated; use <Count style="${style}"${isBold ? ' appearance="bold"' : ''}>.`);
         return (
@@ -129,20 +142,6 @@ export const BadgeVariants = ({
     const statusStyle = isDate && !STATUS_DATE_STYLES.includes(style) ? 'neutral' : style;
     warn(`is deprecated; use <Status ${isDate ? 'type="date" ' : ''}style="${statusStyle}"${spacing === 'spacious' ? ' size="large"' : ''}>.`);
 
-    /*
-     * `label` renames a status for a screen reader. A Status is a span with no
-     * role, and ARIA does not allow a name on one, so the label is its text:
-     * visually hidden, with the visible words hidden from assistive technology.
-     */
-    const body = label
-        ? (
-            <>
-                <span aria-hidden="true">{content}</span>
-                <span className="visually-hidden">{label}</span>
-            </>
-        )
-        : content;
-
     return (
         <Status
             type={isDate ? 'date' : 'state'}
@@ -153,7 +152,7 @@ export const BadgeVariants = ({
             maxWidth={maxWidth}
             {...shared}
         >
-            {body}
+            {withHiddenLabel(content, label)}
         </Status>
     );
 };

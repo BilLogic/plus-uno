@@ -97,7 +97,7 @@ export const Status = ({
     const isDate = effectiveType === 'date';
     const allowed = isDate ? STATUS_DATE_STYLES : STATUS_STYLES;
     let effectiveStyle = style;
-    if (DEPRECATED_STYLE_ALIASES[style]) {
+    if (Object.hasOwn(DEPRECATED_STYLE_ALIASES, style)) {
         warn(`style="${style}" is deprecated; use style="${DEPRECATED_STYLE_ALIASES[style]}".`);
         effectiveStyle = DEPRECATED_STYLE_ALIASES[style];
     }
