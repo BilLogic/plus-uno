@@ -153,7 +153,9 @@ function confirmText(card: ProposalCard): string {
   // The resolved target above the raw params, so the approver of a write sees
   // the CONCRETE page it will touch, not just an opaque id.
   if (card.target) lines.push(`• *Target:* ${targetWords(card.target)}`);
-  lines.push(renderFields(card.fields));
+  // A card whose lead says everything — a Worker's card — has no parameter
+  // line to show.
+  if (card.fields.length || !card.lead) lines.push(renderFields(card.fields));
   for (const caveat of card.caveats) lines.push(caveatText(caveat));
   lines.push(CONFIRM_FOOTER);
   return lines.join("\n");

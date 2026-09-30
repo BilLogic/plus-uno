@@ -908,19 +908,18 @@ test("on budget exhaustion the job saves its cursor at the last fully processed 
   assert.equal(h.store.runs().length, 1, "the retry rewrote its own row");
 });
 
-test("a private channel is skipped, a DM is never read, and #uno-bot is never swept", async () => {
+test("a private channel off the allowlist is skipped, a DM is never read, and #uno-bot is never swept", async () => {
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, []);
   const h = sweepHarness({
     channels: {
       G0PRIVATE: { kind: "private", history: [t.root] },
       D0DM: { kind: "dm", history: [t.root] },
-      G0MPIM: { kind: "group-dm", history: [t.root] },
       [UNO_BOT]: { kind: "public", history: [t.root] },
     },
     sources: [PAGE_A],
     now: at(29, 22),
   });
-  for (const channel of ["G0PRIVATE", "D0DM", "G0MPIM", UNO_BOT]) {
+  for (const channel of ["G0PRIVATE", "D0DM", UNO_BOT]) {
     const report = await runSweepJob({ key: `sweep:${channel}`, kind: "sweep-channel", channel }, h.deps);
     assert.equal(report.outcome, "skipped", channel);
   }

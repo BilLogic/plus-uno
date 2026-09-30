@@ -22,6 +22,9 @@ import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
  *  missing token, and the one a dry run rehearses. */
 export const FIRST_ASK_RESOLUTION_KEY = "ask-resolution-1";
 
+/** The end-of-day job that sweeps every group DM uno-bot is in. */
+export const GROUP_DM_SWEEP_KEY = "sweep:group-dms";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -36,8 +39,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * that records how each ask was resolved (src/usage/resolution-pass.ts).
  * The end-of-day `proposal-expiry` records every card that aged out untouched
  * (src/usage/proposal-events.ts).
- * The sweep's two: one end-of-day `sweep-channel` job per swept channel reads
- * the day and keeps its drift findings, and the morning `sweep-post` stages
+ * The sweep's three: one end-of-day `sweep-channel` job per swept channel reads
+ * the day and keeps its drift findings, one `sweep-group-dms` job does the
+ * same for every group DM uno-bot is in, and the morning `sweep-post` stages
  * them as proposal cards (src/sweep/).
  * The weekly DS precedence check's two: Friday's end-of-day check, and the morning
  * post that opens its thread in #plus-universal (src/ds-precedence/).
@@ -54,6 +58,7 @@ export type ScheduledJobKind =
   | "ask-resolution"
   | "proposal-expiry"
   | "sweep-channel"
+  | "sweep-group-dms"
   | "sweep-post"
   | "ds-precedence-check"
   | "ds-precedence-post"
@@ -165,7 +170,8 @@ export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as con
  * jobs on a Tuesday; the date stays `at`'s. The weekday filter covers every
  * job, the spread-in batches and the sweep jobs included. The end-of-day run
  * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
- * `sweep:<channel>`.
+ * `sweep:<channel>`, then one `sweep-group-dms` job, keyed `sweep:group-dms`
+ * — only while the sweep is on at all, so a blank list still sweeps nothing.
  *
  * @param name - Which run
  * @param at - When it fires, epoch ms
@@ -179,8 +185,11 @@ export function planRun(
   weekday?: number,
 ): ScheduledRun {
   const sweeps: ScheduledJob[] =
-    name === "end-of-day"
-      ? sweepChannels.map((channel) => ({ key: `sweep:${channel}`, kind: "sweep-channel", channel }))
+    name === "end-of-day" && sweepChannels.length
+      ? [
+          ...sweepChannels.map((channel): ScheduledJob => ({ key: `sweep:${channel}`, kind: "sweep-channel", channel })),
+          { key: GROUP_DM_SWEEP_KEY, kind: "sweep-group-dms" },
+        ]
       : [];
   // The sweep jobs go before the purge, which stays last in every run.
   const plan = RUN_PLANS[name];
@@ -198,7 +207,8 @@ export function planRun(
  * joins another design channel. #uno-bot is never swept, whatever the list
  * says: it is where the team reports problems with uno-bot, not a design
  * channel. A DM id (`D…`) is never read either; a private channel on the list
- * is refused by the job itself, which is the one that can ask Slack.
+ * but off `SLACK_SEARCH_PRIVATE_ALLOWLIST` is refused by the job itself, which
+ * is the one that can ask Slack what kind it is.
  *
  * @param value - `SWEEP_CHANNELS`
  * @param unoBotChannel - `UNO_BOT_CHANNEL_ID`
