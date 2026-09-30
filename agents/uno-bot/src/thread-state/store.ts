@@ -109,6 +109,16 @@ export const CUT_OFF_SWEEP_SLACK_MS = 30_000;
 export const CUT_OFF_SWEEP_RETRY_MS = 2 * 60 * 1000;
 
 /**
+ * How long the alarm keeps looking at one cut-off run, whatever the card's own
+ * TTL: the hour, or the TTL when that is shorter. Each look re-arms the alarm
+ * `CUT_OFF_SWEEP_RETRY_MS` out, so a 72 h card measured by its TTL would be
+ * retried about 2,160 times on a hand-off that keeps failing; capped, about 30.
+ * A person's own look — a press, a reaction, the next turn in the thread — can
+ * still take the record for the card's whole TTL.
+ */
+export const CUT_OFF_SWEEP_WINDOW_MS = 60 * 60 * 1000;
+
+/**
  * How many times a cut-off note is tried before the teller gives up.
  *
  * Also the bound on duplicates: a post that Slack accepted and then timed out
@@ -243,9 +253,37 @@ export interface PendingProposal {
    */
   onCancel?: ProposalOperation[];
   /**
+   * Set on a card the end-of-day sweep staged: the morning it was posted,
+   * `YYYY-MM-DD`. What a ✅, a ⛔ or a revision does to such a card is also
+   * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision of
+   * it and a re-staged card carry it. Its slot in the thread is its
+   * `supersedeKey`, `"sweep"`.
+   */
+  sweepRun?: string;
+  /**
+   * The card's own slot within its reply thread (`proposalSlot`). Absent —
+   * every turn's card — the card holds the thread's slot, and cards there
+   * replace one another. A card the Worker stages into a thread people also
+   * talk in sets one — `"sweep"` for an end-of-day sweep card, `"ds-precedence"`
+   * for the weekly DS precedence card — so it and a turn's card stay live side
+   * by side, and only a card with the same key replaces it. A turn's batch
+   * revises it only when it touches it (`turn/turn.ts`); while both are live,
+   * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
+   * always answers, and a reaction or button resolves the card it is on.
+   */
+  supersedeKey?: string;
+  /**
+   * On a keyed card: what a turn in its thread posts, in place of a card,
+   * when its batch would touch this one. A near-copy would otherwise stay live
+   * beside it, and both could run. The weekly DS precedence card points at
+   * `dispute N`, the one way it is revised.
+   */
+  refuseRevision?: string;
+  /**
    * The card a person's ask first staged, when this one re-stages it after a
-   * cut-off run (`turn/turn.ts` `restageExecution`). Absent on every other
-   * card. The usage record keys the staging ask on its card, so a ✅ on the
+   * cut-off run (`turn/turn.ts` `restageExecution`), or the sweep card the
+   * Worker staged, when this one revises it. Absent on every other card. The
+   * usage record keys the staging ask on its card, so a ✅ on the
    * re-staged card still resolves the ask that started it (`stagingCardOf`).
    */
   originProposalTs?: string;
@@ -328,6 +366,31 @@ export function proposalReplyThread(
 }
 
 /**
+ * The grain one card retires another at: its reply thread, and within it the
+ * card's own slot when it has a key (`supersedeKey`). Both adapters'
+ * `putProposal` compare with this, so a thread holds one turn card and one
+ * card per key at most, and staging retires only the card in its own slot —
+ * a revision of a keyed card retires that card, an unrelated ask stages beside
+ * it. The one supersession mechanism in the module.
+ *
+ * A sweep card staged before the key existed carries `sweepRun` and no key,
+ * and is read as keyed `"sweep"` so it keeps its slot until it expires.
+ */
+export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "supersedeKey" | "sweepRun">): string {
+  const thread = proposalReplyThread(proposal);
+  const key = slotKeyOf(proposal);
+  return key ? `${thread}#${key}` : thread;
+}
+
+/** The end-of-day sweep card's slot key. */
+export const SWEEP_KEY = "sweep";
+
+/** A card's slot key, or undefined for a card holding its thread's slot. */
+export function slotKeyOf(proposal: Pick<PendingProposal, "supersedeKey" | "sweepRun">): string | undefined {
+  return proposal.supersedeKey ?? (proposal.sweepRun ? SWEEP_KEY : undefined);
+}
+
+/**
  * The operations of a proposal, however it was stored.
  *
  * The one reader of the expand–contract pair above: a record written since the
@@ -403,7 +466,8 @@ export function afterFailedNote(execution: Execution): { record: Execution; repo
 /**
  * When the ThreadState alarm should next fire for this execution, or null
  * when it never needs to: a taken record owed no note has a teller, and one past
- * its TTL is the GC's. One not yet cut off is due just past the threshold;
+ * `CUT_OFF_SWEEP_WINDOW_MS` (or its TTL, when shorter) is left to a person's
+ * look and then the GC. One not yet cut off is due just past the threshold;
  * one already past it is what `findCutOffExecutions` found and the alarm
  * handed over, and is looked at again in `CUT_OFF_SWEEP_RETRY_MS` in case
  * nobody took it.
@@ -411,7 +475,7 @@ export function afterFailedNote(execution: Execution): { record: Execution; repo
 export function cutOffSweepAt(execution: Execution, now: number): number | null {
   if (execution.takenAt !== undefined && !execution.noteOwed) return null;
   const age = now - execution.startedAt;
-  if (age > proposalTtlMs(execution.proposal)) return null;
+  if (age > Math.min(proposalTtlMs(execution.proposal), CUT_OFF_SWEEP_WINDOW_MS)) return null;
   if (age > EXECUTION_CUTOFF_MS) return now + CUT_OFF_SWEEP_RETRY_MS;
   return execution.startedAt + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS;
 }

@@ -26,6 +26,7 @@ import {
   cutOffTakeable,
   ownTtl,
   proposalReplyThread,
+  proposalSlot,
   proposalTtlMs,
   type Execution,
   type HistoryTurn,
@@ -156,7 +157,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // grain, and why a DM needs it, are in `putProposal`'s contract. Only
       // LIVE records are touched: an aged-out card is already answered by
       // "expired".
-      const thread = proposalReplyThread(proposal);
+      const slot = proposalSlot(proposal);
       const retired: string[] = [];
       for (const rec of proposals.values()) {
         if (rec.proposal.proposalTs === proposal.proposalTs) continue;
@@ -166,7 +167,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (rec.supersededBy) continue;
         if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) continue;
         if (rec.proposal.channel !== proposal.channel) continue;
-        if (proposalReplyThread(rec.proposal) !== thread) continue;
+        if (proposalSlot(rec.proposal) !== slot) continue;
         rec.supersededBy = proposal.proposalTs;
         // Reported only if this staging is what took it out of reach.
         if (!rec.retired) retired.push(rec.proposal.proposalTs);

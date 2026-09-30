@@ -71,9 +71,13 @@ import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
+  mayConfirm,
   proposalOperations,
   proposalReplyThread,
+  proposalTtlMs,
+  slotKeyOf,
   stagingCardOf,
+  SWEEP_KEY,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -102,6 +106,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
+import { asSweepRevision, replacedBlocks, sweepCardInstruction, sweepCardPick, sweepTag } from "../sweep/cards";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -482,6 +487,13 @@ export interface TurnDeps {
   };
 
   /**
+   * Told when a cut-off run is re-staged as a fresh card (`restageExecution`),
+   * so a record kept against the old card's ts can follow it — the sweep's
+   * items do (`sweep/outcomes.ts`). Best-effort; absent, nothing follows.
+   */
+  onRestaged?(from: PendingProposal, to: PendingProposal): Promise<void>;
+
+  /**
    * One page of the conversation before this message, for the antecedent
    * window — already reduced to author and text, newest last.
    *
@@ -736,7 +748,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
   return {
     ...delivery,
     postAnswer: (text) => noted(delivery.postAnswer(text)),
-    postNote: (text) => noted(delivery.postNote(text)),
+    postNote: (text, tag) => noted(delivery.postNote(text, tag)),
     postGateNote: (note) => noted(delivery.postGateNote(note)),
     card: (proposal) => noted(delivery.card(proposal)),
   };
@@ -861,6 +873,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     }
   }
 
+  // ── "drop 2" / "keep 1 and 3" on a sweep card ──────────────────────────────
+  //
+  // Read by index, with no model call: the revision is the card's own
+  // operations minus the dropped ones, byte for byte, so there is nothing for
+  // a model to reproduce. Anything else said under the card still goes to the
+  // model, and its revision is still held to the subset rule below.
+  if (request.pending?.sweepRun) {
+    const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
+    if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
+  }
+
   // ── A cut-off run in this thread ───────────────────────────────────────────
   //
   // A card approved here whose run never reported back (`ThreadState`'s
@@ -945,6 +968,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   if (request.intakeChannel) {
     modelBlocks.push(intakeChannelInstruction({ senderId: request.userId, isReply: request.threaded }));
   }
+
+  // A reply under a sweep card is most often someone dropping an item from it.
+  if (request.pending?.sweepRun) modelBlocks.push(sweepCardInstruction());
 
   // The antecedent window: what "this" points at. Only for a top-level channel
   // @mention with a dangling pronoun, and only ever ONE page of the
@@ -1239,6 +1265,58 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   }
 
+  // The card this one revises. Every pending card, except a keyed one
+  // (`supersedeKey`) the batch does not touch: that is some other ask made in
+  // the thread — filing an issue under a sweep card, say — and stages as its
+  // own card beside it (`proposalSlot`), inheriting none of its terms. A sweep
+  // card is touched by a batch replacing one of its blocks; any other keyed
+  // card by a batch aiming one of its tools at the same target — the weekly
+  // card's own intake, not a separate issue filed or commented on beside it.
+  const replaced =
+    request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
+
+  // A keyed card that revises only its own way (the weekly DS precedence
+  // card, through `dispute N`) is not revised by a turn at all: the batch is
+  // refused with the card's note, rather than staged as a near-copy that
+  // stays live beside it — two live cards could both run.
+  if (replaced?.refuseRevision) {
+    await delivery.postNote(replaced.refuseRevision);
+    await memory.remember(replaced.refuseRevision);
+    return { disposition: "asked", posted: replaced.refuseRevision, wrote: memory.wrote(), telemetry };
+  }
+
+  // A card that names its confirmers is revised only by one of them. A
+  // revision keeps the card's confirmer set, so one staged by anyone else could
+  // never run — and staging it would still retire the card its owners can
+  // confirm. So it is refused, and the card stays live exactly as it was.
+  // #uno-bot is the exception: there a reply joins the confirmer set
+  // (`intake-channel.ts`).
+  if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId)) {
+    const refusal = revisionRefusal(replaced.confirmers ?? [], request.userId);
+    await delivery.postNote(refusal, replaced.sweepRun ? sweepTag("note") : undefined);
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+
+  // A sweep card's revision drops fixes and does nothing else: each of its
+  // operations must be one of the card's own, as it was. Anything else — a fix
+  // rewritten, a stamp changed, one added — is refused and the card stays.
+  if (replaced?.sweepRun && !isSubsetOf(result.operations, proposalOperations(replaced))) {
+    const refusal =
+      ":lock: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
+      "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
+    await delivery.postNote(refusal, sweepTag("note"));
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+  // And it keeps the card's deadline, read before the card is retired.
+  const sweepLeftMs = replaced?.sweepRun ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  if (sweepLeftMs !== undefined && sweepLeftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED, sweepTag("note"));
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
+
   // A different proposal is already pending: retire it, because the card about
   // to go up replaces it. RETIRE, never claim (#583): a claim DELETES, and the
   // record deleted here is the one a late ✅ needs in order to be told its card
@@ -1253,9 +1331,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // being written, during which the old card would otherwise still execute the
   // input the person just pushed back on.
   const retiredAhead =
-    request.pending && (await threadState.retireProposal(request.pending.proposalTs)).retired
-      ? [request.pending.proposalTs]
-      : [];
+    replaced && (await threadState.retireProposal(replaced.proposalTs)).retired ? [replaced.proposalTs] : [];
   // On the record only when a retire took a live card out of reach — not one
   // a ✅ claimed meanwhile, which has its own outcome — and at once, so a card
   // whose revision then fails to post is not later read as aged out.
@@ -1267,12 +1343,15 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   await recordSuperseded(retiredAhead);
 
-  const card = await buildCard(
+  const built = await buildCard(
     result,
     deps,
     implementPrdUrlFor(result.toolName, result.input, prd),
     request.surface === "assistant",
   );
+  // A revision of a sweep card is still one, so replies under it are read by
+  // the sweep's rule.
+  const card = replaced?.sweepRun ? asSweepRevision(built) : built;
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
@@ -1311,7 +1390,20 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
-    ...inheritedTerms(request.pending),
+    ...inheritedTerms(replaced),
+    // A revision of a keyed card stays in the card's slot.
+    ...(replaced?.supersedeKey ? { supersedeKey: replaced.supersedeKey } : {}),
+    // A revision of a sweep card stays a sweep card, in the sweep's slot, so
+    // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
+    // deadline, and its outcome joins the row the Worker's staging wrote.
+    ...(replaced?.sweepRun
+      ? {
+          sweepRun: replaced.sweepRun,
+          supersedeKey: replaced.supersedeKey ?? SWEEP_KEY,
+          ttlMs: sweepLeftMs,
+          originProposalTs: stagingCardOf(replaced),
+        }
+      : {}),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
     ...(request.intakeChannel
@@ -1350,6 +1442,149 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     wrote: memory.wrote(),
     telemetry,
   };
+}
+
+/** What a revision of a sweep card that has closed meanwhile is told. */
+const CARD_CLOSED = "That card is no longer open, so it stays as it was.";
+
+/**
+ * How long a live card has left before its deadline — its staging time plus
+ * its own lifetime — or 0 once it is no longer live. A sweep card's revision
+ * lives for this rather than a fresh lifetime.
+ */
+async function timeLeftOn(
+  card: PendingProposal,
+  threadState: TurnDeps["threadState"],
+  now: number,
+): Promise<number> {
+  const live = await threadState.getProposalByTs(card.proposalTs);
+  return live.state === "found" ? Math.max(0, live.createdAt + proposalTtlMs(card) - now) : 0;
+}
+
+/**
+ * Stage a sweep card without the fixes a "drop N" left out — or, with none
+ * left, cancel it through the gate as a typed ⛔ would. Held to the card's
+ * confirmer set, like any revision, and to its deadline: the revision lives
+ * only as long as the card it replaces had left, so dropping again and again
+ * never extends a card.
+ */
+async function dropFromSweepCard(
+  request: TurnRequest,
+  deps: TurnDeps,
+  memory: ThreadMemory,
+  kept: number[],
+  cardThread: string,
+  staging: StagingFacts,
+): Promise<TurnOutcome> {
+  const { delivery, threadState } = deps;
+  const pending = request.pending!;
+  const telemetry: TurnTelemetry = {
+    tier: "chill",
+    route: "sweep-drop",
+    trivial: true,
+    correction: false,
+    tools: [],
+    references: [],
+    interim: 0,
+  };
+  if (!request.intakeChannel && !mayConfirm(pending, request.userId)) {
+    const refusal = revisionRefusal(pending.confirmers ?? [], request.userId);
+    await delivery.postNote(refusal, sweepTag("note"));
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+  if (!kept.length) {
+    const verdict = await resolveSignal(
+      { kind: "typed", channel: request.channel, thread: cardThread, text: "⛔", userId: request.userId },
+      { threadState },
+    );
+    return settleVerdict(verdict, { deps, memory, note: "Cancelled.", telemetry });
+  }
+  const all = proposalOperations(pending);
+  const operations = kept.map((i) => all[i]!);
+  const first = operations[0]!;
+  // The card's own deadline, read before it is retired: what the revision
+  // inherits in place of a fresh lifetime.
+  const leftMs = await timeLeftOn(pending, threadState, staging.now());
+  if (leftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED, sweepTag("note"));
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
+  const retiredAhead = (await threadState.retireProposal(pending.proposalTs)).retired ? [pending.proposalTs] : [];
+  const recordSuperseded = (retired: readonly string[]) =>
+    recordProposalEvents(
+      deps.usage.proposalEvents,
+      supersededEvents(retired, staging.now(), "revision"),
+      deps.usage.writeTimeoutMs,
+    );
+  await recordSuperseded(retiredAhead);
+  const card = asSweepRevision(
+    await buildCard(
+      { kind: "proposal", operations, toolName: first.toolName, input: first.input },
+      deps,
+      undefined,
+      request.surface === "assistant",
+    ),
+  );
+  const posted = await delivery.card(card);
+  if (!posted.ok || !posted.ts) {
+    console.error("[turn] sweep card revision was not staged");
+    return { disposition: "failed", failure: { stage: "delivery" }, wrote: memory.wrote(), telemetry };
+  }
+  const proposal: PendingProposal = {
+    operations,
+    toolName: first.toolName,
+    input: first.input,
+    channel: request.channel,
+    threadTs: request.conversationTs,
+    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+    userMsgTs: request.userMsgTs,
+    proposalTs: posted.ts,
+    proposalText: posted.text,
+    requesterUserId: request.userId,
+    ...inheritedTerms(pending),
+    ttlMs: leftMs,
+    sweepRun: pending.sweepRun!,
+    supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
+    // The Worker staged the card this revises: its usage row is the root
+    // every later outcome joins to.
+    originProposalTs: stagingCardOf(pending),
+  };
+  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  await recordSuperseded(retiredByStaging);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    [
+      stagedEvent({
+        proposal,
+        at: staging.now(),
+        via: "turn",
+        channelStored: staging.channelStored,
+        turnId: staging.turnId,
+        testTraffic: staging.testTraffic,
+        askText: request.text,
+      }),
+    ],
+    deps.usage.writeTimeoutMs,
+  );
+  await memory.remember(posted.text);
+  return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
+}
+
+/**
+ * What a person outside a card's confirmer set is told when their message
+ * would have revised it. Names who can, since that is who to ask; only a Slack
+ * user id is mentioned.
+ */
+export function revisionRefusal(confirmers: readonly string[], userId: string): string {
+  const id = /^[UW][A-Z0-9]{2,20}$/;
+  const to = id.test(userId) ? `<@${userId}> ` : "";
+  const who = confirmers.filter((c) => id.test(c)).map((c) => `<@${c}>`);
+  const names = who.length <= 1 ? who.join("") : `${who.slice(0, -1).join(", ")} or ${who[who.length - 1]}`;
+  return who.length
+    ? `:lock: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
+    : `:lock: ${to}Nobody here can change this proposal, so it stays as it is.`;
 }
 
 // ── The gate path ────────────────────────────────────────────────────────────
@@ -1433,7 +1668,7 @@ async function settleVerdict(
  */
 export async function restageExecution(
   restage: GateRestage,
-  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards"> & {
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards" | "onRestaged"> & {
     /** Where the fresh card's staging is recorded. */
     proposalEvents: ProposalEventLog;
   },
@@ -1486,6 +1721,9 @@ export async function restageExecution(
       channelStored: false,
     }),
   ]);
+  await deps.onRestaged?.(original, proposal).catch((err: unknown) => {
+    console.error(`[turn] re-staged card's records not moved: ${err instanceof Error ? err.message : String(err)}`);
+  });
   return { proposal, card };
 }
 
@@ -2067,6 +2305,43 @@ function caveatsFor(
 }
 
 // ── Small pure helpers ───────────────────────────────────────────────────────
+
+/** Every operation in `revised` is one of `original`'s, byte for byte. */
+function isSubsetOf(revised: readonly ProposalOperation[], original: readonly ProposalOperation[]): boolean {
+  const kept = new Set(original.map(stableStringify));
+  return revised.length > 0 && revised.every((op) => kept.has(stableStringify(op)));
+}
+
+/** Whether a batch replaces any block the card replaces. */
+function touchesBlocksOf(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
+  const theirs = replacedBlocks(proposalOperations(card));
+  return [...replacedBlocks(operations)].some((b) => theirs.has(b));
+}
+
+/**
+ * Whether a batch touches a keyed card: for a sweep card, replaces one of its
+ * blocks; for any other, aims one of its tools at the same target.
+ */
+function touchesCard(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
+  if (card.sweepRun) return touchesBlocksOf(operations, card);
+  const theirs = proposalOperations(card);
+  return operations.some((op) => theirs.some((own) => sameTarget(op, own)));
+}
+
+/**
+ * Whether two operations use the same tool on the same target: an issue update
+ * on the same `issue_number`, an issue create under the same title. Any other
+ * tool is matched by the tool alone.
+ */
+function sameTarget(a: ProposalOperation, b: ProposalOperation): boolean {
+  if (a.toolName !== b.toolName) return false;
+  if (a.toolName === "github_issue_update") return String(a.input.issue_number) === String(b.input.issue_number);
+  if (a.toolName === "github_issue_create") {
+    const title = (op: ProposalOperation) => String(op.input.title ?? "").trim().toLowerCase();
+    return title(a) === title(b);
+  }
+  return true;
+}
 
 /** Key-order-independent JSON compare, so two generations of the same tool
  *  input register as identical even if the model emitted fields in a different

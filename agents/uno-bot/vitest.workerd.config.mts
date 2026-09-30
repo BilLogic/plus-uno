@@ -14,7 +14,9 @@
 // grows. The second is the UsageLog conformance suite (ADR-030), for the same
 // reason as the first: what is under test is the D1 adapter against real
 // SQLite with the real migrations applied, which no Node fake is evidence
-// about. Its `USAGE_DB` binding comes from wrangler.toml like the rest;
+// about. The third is the sweep records suite, for the same reason and on the
+// same database (migrations/usage/0002_sweep.sql). Their `USAGE_DB` binding
+// comes from wrangler.toml like the rest;
 // miniflare backs it with a local, per-run D1 and never contacts the account.
 // The migrations are read here, in Node, and handed to the test as the
 // `USAGE_MIGRATIONS` binding, because the Workers runtime has no filesystem.
@@ -45,6 +47,7 @@ export default defineConfig({
     include: [
       "tests/workerd/thread-state.conformance.test.ts",
       "tests/workerd/usage-log.conformance.test.ts",
+      "tests/workerd/sweep-records.conformance.test.ts",
     ],
   },
 });

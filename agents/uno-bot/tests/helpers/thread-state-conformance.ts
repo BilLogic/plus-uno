@@ -263,6 +263,33 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
   });
 
+  // A sweep card has its own slot in its thread: a turn's card staged there
+  // leaves it live, and a revision of the sweep card retires only it.
+  it("a sweep card and a turn's card stay live side by side in one thread", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, sweepRun: "2026-09-30" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+  });
+
+  // Every keyed card holds its own slot: a card with another key, or none,
+  // leaves it live, and only a card with the same key replaces it.
+  it("a card with a supersedeKey is replaced only by its own key", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    await store.putProposal(proposal({ proposalTs: "1700.5", replyTs: THREAD.thread, supersedeKey: "sweep", sweepRun: "2026-09-30" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found", "a turn's card and a sweep card leave it live");
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found", "it leaves the turn's card live");
+    assert.equal((await store.getProposalByTs("1700.5")).state, "found", "and the sweep card");
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded", "its revision replaces it");
+  });
+
   // "superseded" and "expired" are different things to say to a person: one card
   // was replaced two seconds ago, the other aged out an hour ago.
   it("a superseded ts is not reported as expired", async () => {

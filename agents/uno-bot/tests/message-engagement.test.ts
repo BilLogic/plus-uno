@@ -17,27 +17,43 @@ const BOT = "UBOT";
 const UNO_BOT = "C0UNOBOT";
 const OTHER = "C0DESIGN";
 
+const ROOT_ONLY = [{ user: "U1", text: "root", ts: "1700.1" }];
 let slackCalls: string[] = [];
+/** What `conversations.replies` answers; a case may set its own thread. */
+let thread: Array<Record<string, unknown>> = ROOT_ONLY;
+/** The card `getProposalByThread` answers; none unless a case sets one. */
+let pending: Record<string, unknown> | null = null;
+let history: unknown[] = [];
+/** Threads marked as entered through a sweep card (`sweep/thread-mark.ts`). */
+const marks = new Set<string>();
 globalThis.fetch = (async (input: unknown) => {
   const url = String(input instanceof Request ? input.url : input);
   slackCalls.push(url.replace("https://slack.com/api/", ""));
   const body = url.endsWith("auth.test")
     ? { ok: true, user_id: BOT, bot_id: "BBOT" }
-    : { ok: true, messages: [{ user: "U1", text: "root", ts: "1700.1" }] };
+    : { ok: true, messages: thread };
   return new Response(JSON.stringify(body), { headers: { "content-type": "application/json" } });
 }) as typeof fetch;
 
 const ENV = {
   SLACK_BOT_TOKEN: "xoxb-test",
+  HARNESS_KV: {
+    async get(key: string) {
+      return marks.has(key) ? "1" : null;
+    },
+    async put(key: string) {
+      marks.add(key);
+    },
+  },
   UNO_BOT_CHANNEL_ID: UNO_BOT,
   THREAD_STATE: {
     idFromName: (name: string) => name,
     get: () => ({
       async getProposalByThread() {
-        return null;
+        return pending;
       },
       async readHistory() {
-        return [];
+        return history;
       },
     }),
   },
@@ -84,4 +100,205 @@ test("a thread reply in #uno-bot keeps the follow-up rule: no bot in the thread,
 
 test("an @mention anywhere still engages", async () => {
   assert.equal(await engages(post({ channel: OTHER, text: `<@${BOT}> what's the token for primary?` })), true);
+});
+
+// A thread where uno-bot's only post is an end-of-day sweep card is the team's
+// own conversation: a reply engages only when it is addressed to the card.
+const SWEEP_CARD_POST = {
+  user: BOT,
+  bot_id: "BBOT",
+  ts: "1700.5",
+  text: ":mag: *End-of-day sweep* — this thread settled something a linked page still says the old way.",
+  metadata: { event_type: "uno_sweep_card", event_payload: { card_key: "2026-09-30:C0DESIGN:1700.1:blk-1" } },
+};
+const inSweepThread = (text: string) => post({ channel: OTHER, ts: "1700.9", thread_ts: "1700.1", text });
+
+async function withSweepThread<T>(posts: Array<Record<string, unknown>>, fn: () => Promise<T>): Promise<T> {
+  thread = [...ROOT_ONLY, ...posts];
+  pending = { proposalTs: "1700.5", sweepRun: "2026-09-30" };
+  try {
+    return await fn();
+  } finally {
+    thread = ROOT_ONLY;
+    pending = null;
+    history = [];
+  }
+}
+
+// Someone has already replied after the card, so a later reply is not
+// answering the card merely by where it sits.
+const TEAM_REPLY = { user: "U2", ts: "1700.7", text: "morning all" };
+
+test("under a sweep card, the thread's own conversation is left alone", async () => {
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY], async () => {
+    assert.equal(await engages(inSweepThread("lunch at noon?")), false);
+    assert.equal(await engages(inSweepThread("Keep it simple")), false);
+    assert.equal(await engages(inSweepThread("change the header for all breakpoints")), false);
+    assert.equal(await engages(inSweepThread("I'll change the deck before Friday")), false);
+    assert.equal(await engages(inSweepThread("we should fix the onboarding flow")), false);
+    assert.equal(await engages(inSweepThread("keep the first one, skip the rest")), false, "words alone name no fix");
+  });
+});
+
+// A sentence that holds a verb and a number is still the thread's own talk:
+// only a whole-message pick of the card's fixes is addressed to it.
+const NUMBERED_TALK = [
+  "change 2 buttons to secondary",
+  "fix 2 bugs before Friday",
+  "we should keep 3 columns on mobile",
+  "item 4 in the spec is outdated",
+  "remove 2 of the variants",
+];
+
+test("under a sweep card, a sentence with a number in it is left alone", async () => {
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY], async () => {
+    for (const text of NUMBERED_TALK) assert.equal(await engages(inSweepThread(text)), false, text);
+  });
+});
+
+test("under a sweep card, a whole-message pick, a typed gate emoji or an @mention engages", async () => {
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY], async () => {
+    assert.equal(await engages(inSweepThread("drop 2")), true);
+    assert.equal(await engages(inSweepThread("keep 1 and 3")), true);
+    assert.equal(await engages(inSweepThread("remove 1, 3 and 4.")), true);
+    assert.equal(await engages(inSweepThread("keep only 2")), true);
+    assert.equal(await engages(inSweepThread(":white_check_mark:")), true);
+    assert.equal(await engages(inSweepThread("⛔")), true);
+    assert.equal(await engages(inSweepThread(`<@${BOT}> what does this card change?`)), true);
+  });
+});
+
+test("a reply posted straight after the sweep card is read by the same rule as any other", async () => {
+  await withSweepThread([SWEEP_CARD_POST], async () => {
+    assert.equal(await engages(inSweepThread("Keep it simple")), false);
+    assert.equal(await engages(inSweepThread("drop 1")), true);
+  });
+});
+
+// A revision of a sweep card carries the sweep's mark and tag, and the turn
+// that staged it leaves history behind: neither makes the thread the bot's.
+test("under a revised sweep card, with the drop's turn in history, the same rule holds", async () => {
+  const revision = {
+    user: BOT,
+    bot_id: "BBOT",
+    ts: "1700.8",
+    text: ":mag: *End-of-day sweep* — revised.",
+    metadata: { event_type: "uno_sweep_card", event_payload: { role: "revision" } },
+  };
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY, { user: "U2", ts: "1700.75", text: "drop 2" }, revision], async () => {
+    history = [{ role: "user", text: "drop 2" }, { role: "assistant", text: revision.text }];
+    for (const text of NUMBERED_TALK) assert.equal(await engages(inSweepThread(text)), false, text);
+    assert.equal(await engages(inSweepThread("drop 1")), true);
+  });
+});
+
+// An ordinary thread — one the bot was not marked as entering through a sweep
+// card — keeps the follow-up rule: once uno-bot has said anything else there,
+// every reply engages again.
+test("in an unmarked thread, once uno-bot has said anything else, every reply engages again", async () => {
+  const answer = { user: BOT, bot_id: "BBOT", ts: "1700.7", text: "Dropped the second fix." };
+  await withSweepThread([SWEEP_CARD_POST, answer], async () => {
+    assert.equal(await engages(inSweepThread("lunch at noon?")), true);
+  });
+});
+
+test("an ordinary bot thread, with history and no card, engages on every reply", async () => {
+  thread = [...ROOT_ONLY, { user: BOT, bot_id: "BBOT", ts: "1700.3", text: "Here's the token." }];
+  history = [{ role: "assistant", text: "Here's the token." }];
+  try {
+    assert.equal(await engages(inSweepThread("and for secondary?")), true);
+  } finally {
+    thread = ROOT_ONLY;
+    history = [];
+  }
+});
+
+// A thread the bot entered through a sweep card stays the team's after the
+// card is decided: the batch result, the notes and the history the ✅ left
+// behind invite nothing. Only a pick, a typed gate emoji or an @mention does.
+test("in a thread entered through a sweep card, a decided card's result, notes and history invite nothing", async () => {
+  const result = { user: BOT, bot_id: "BBOT", ts: "1700.7", text: "Applied 2 fixes." };
+  const lock = { user: BOT, bot_id: "BBOT", ts: "1700.8", text: ":lock: Only <@U0OWNER> can change this proposal." };
+  marks.add(`sweep:thread:${OTHER}:1700.1`);
+  thread = [...ROOT_ONLY, SWEEP_CARD_POST, result, lock];
+  history = [{ role: "assistant", text: "(Ran 2 operations.)" }];
+  try {
+    for (const text of ["lunch at noon?", "thanks!", ...NUMBERED_TALK]) {
+      assert.equal(await engages(inSweepThread(text)), false, text);
+    }
+    assert.equal(await engages(inSweepThread("drop 1")), true);
+    assert.equal(await engages(inSweepThread("✅")), true);
+    assert.equal(await engages(inSweepThread(`<@${BOT}> what changed?`)), true);
+  } finally {
+    marks.clear();
+    thread = ROOT_ONLY;
+    history = [];
+  }
+});
+
+// ── The weekly DS precedence list threads ───────────────────────────────────
+// uno-bot posts a list and a card there on a schedule, which leaves a live
+// card and uno-bot's own posts in the thread. People reply to each other about
+// the list, so a reply is not a turn: an @mention or a typed gate emoji
+// engages, and nothing else does — not uno-bot having answered there, not a
+// newer week's thread, not a card that never posted. Every list thread is
+// recorded under its own ts.
+
+const UNIVERSAL = "C072E8SFLKV";
+const LAST_WEEK = "1759000000.000001";
+const THIS_WEEK = "1759500000.000001";
+
+function weeklyEnv(history: unknown[] = [], recorded: string[] = [LAST_WEEK, THIS_WEEK]): Env {
+  return {
+    ...ENV,
+    PLUS_UNIVERSAL_CHANNEL_ID: UNIVERSAL,
+    HARNESS_KV: {
+      get: async (key: string) => {
+        const ts = recorded.find((t) => key === `ds-precedence:thread:${t}`);
+        return ts ? { channel: UNIVERSAL, ts, cardTs: "" } : null;
+      },
+    },
+    THREAD_STATE: {
+      idFromName: (name: string) => name,
+      get: () => ({
+        // A card is live in the thread.
+        async getProposalByThread() {
+          return { proposalTs: "1759500000.000002" };
+        },
+        async readHistory() {
+          return history;
+        },
+      }),
+    },
+  } as unknown as Env;
+}
+
+const listReply = (text: string, thread = THIS_WEEK) =>
+  post({ channel: UNIVERSAL, ts: "1759500100.000001", thread_ts: thread, text });
+
+test("a plain reply in a list thread does not engage, though a card is live there", async () => {
+  assert.equal(await engages(listReply("agree with 2, the set exists"), weeklyEnv()), false);
+});
+
+test("an @mention or a typed gate emoji in a list thread engages", async () => {
+  assert.equal(await engages(listReply(`<@${BOT}> why is Button listed?`), weeklyEnv()), true);
+  assert.equal(await engages(listReply("✅"), weeklyEnv()), true);
+});
+
+test("uno-bot having answered in a list thread (a typed ✅, a mention) does not make every reply a turn", async () => {
+  assert.equal(await engages(listReply("and item 3?"), weeklyEnv([{ role: "assistant", content: "…" }])), false);
+});
+
+test("last week's list thread stays exempt after this week's posts", async () => {
+  assert.equal(await engages(listReply("still think 4 is wrong", LAST_WEEK), weeklyEnv()), false);
+});
+
+test("a list thread whose card never posted is still a list thread", async () => {
+  // Recorded when the list posted, before any card: no card, only the list.
+  assert.equal(await engages(listReply("nothing to confirm here?"), weeklyEnv([], [THIS_WEEK])), false);
+});
+
+test("another thread in #plus-universal with a live card keeps the ordinary rule", async () => {
+  const other = post({ channel: UNIVERSAL, ts: "1759500100.000002", thread_ts: "1759400000.000001", text: "looks good" });
+  assert.equal(await engages(other, weeklyEnv()), true);
 });

@@ -2,6 +2,8 @@ import type { Env } from "../types";
 import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
 import { DM_CONVERSATION, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
+import { engagesOnSweepCard, isSweepCardPost } from "../sweep/cards";
+import { isSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
@@ -36,6 +38,9 @@ import { runSlackTurn } from "./turn-adapter";
 import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
+import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
+import { typedEmojiDecision } from "../gate/reactions";
+import { isUserTurn, runMessageJob } from "./message-job";
 
 // Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
 export type {
@@ -77,7 +82,9 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   switch (event.type) {
     case "message": {
       const msg = event as SlackMessageEvent;
-      if (await shouldHandleMessage(env, msg)) {
+      // A `dispute N` reply in the weekly DS precedence thread is queued like a
+      // turn, and handled at the head of the thread's job (`message-job.ts`).
+      if (isDsPrecedenceCandidate(env, msg) || (await shouldHandleMessage(env, msg))) {
         await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
@@ -300,14 +307,6 @@ function conversationKey(e: ThreadedEvent): string {
   return `${e.channel}:${conversationTs(e)}`;
 }
 
-function isUserTurn(event: SlackMessageEvent): boolean {
-  if (event.bot_id) return false;
-  if (event.subtype) return false;
-  if (!event.text) return false;
-  if (!event.user) return false;
-  return true;
-}
-
 // Gate for plain `message` events: should the bot engage at all? Slack delivers
 // a `message` event for EVERY message in a channel the bot is a member of, so
 // without this the bot replies to everything (e.g. someone typing "implement"
@@ -340,38 +339,62 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
   // Thread reply with no mention: engage if the bot is already part of this
   // thread, so a conversation flows without re-mentioning on every turn (e.g.
   // the bot asked for a PRD and the user pastes it back). Check cheap -> robust:
-  //   1) an active proposal (confirm/cancel window)
+  //   1) an active proposal (confirm/cancel window) a turn staged
   //   2) the DO history — the bot writes a turn there EVERY time it replies, so
   //      a non-empty history means the bot has engaged in this thread already
   //   3) the live thread — the root @mentioned the bot, or the bot has posted
   //      (covers threads whose DO history was pruned, and replies that arrive
   //       before the bot has answered the mentioned root)
+  // A thread where the bot's only posts are end-of-day sweep cards is the
+  // team's own conversation, which the bot joined uninvited: there a reply
+  // engages only when it is addressed to the card (`engagesOnSweepCard`).
   // On any lookup error, FAIL OPEN for a thread reply: silently dropping a
   // follow-up (a "frozen" bot) is worse than an occasional extra reply.
   try {
+    // A thread the bot entered through a sweep card stays the team's: there
+    // only an @mention (above), a whole-message pick of the card's fixes or a
+    // typed gate emoji engages — not the batch result, the notes or the
+    // history the card's own resolution left (`sweep/thread-mark.ts`).
+    if (env.HARNESS_KV && (await isSweepThread(env.HARNESS_KV, event.channel, event.thread_ts))) {
+      return engagesOnSweepCard(event.text ?? "");
+    }
+    // A weekly DS precedence list thread is the same: people talk about the
+    // list there, not to uno-bot. For as long as it is recorded as one, only
+    // an @mention (above) or a typed gate emoji engages (`ds-precedence/env.ts`);
+    // `dispute N` is queued on its own.
+    if (await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts)) {
+      return typedEmojiDecision(event.text ?? "") !== null;
+    }
     const store = threadStateFor(env);
     const ref = { channel: event.channel, thread: event.thread_ts };
     const pending = await store.getProposalByThread(ref);
-    if (pending) return true;
+    if (pending && !pending.sweepRun) return true;
 
-    const history = await store.readHistory(ref);
-    if (history.length > 0) return true;
+    // Under a live sweep card the history may hold only the card's own turns
+    // (a drop, a refusal), which is no invitation; the live thread below says
+    // whether anyone has talked to the bot there.
+    if (!pending) {
+      const history = await store.readHistory(ref);
+      if (history.length > 0) return true;
+    }
 
+    const aboutTheCard = engagesOnSweepCard(event.text ?? "");
     if (identity) {
-      const replies = await conversationsReplies(env, event.channel, event.thread_ts, 50);
+      const replies = await conversationsReplies(env, event.channel, event.thread_ts, 50, { includeMetadata: true });
       const msgs = Array.isArray(replies.messages) ? replies.messages : [];
       // The thread ROOT @mentioned the bot -> the whole thread is a bot
       // conversation; replies never need to re-mention it (even before the bot
       // has answered). conversations.replies returns the parent first.
       const root = msgs[0];
       if (root?.text?.includes(`<@${identity.userId}>`)) return true;
-      // Or the bot has already posted in the thread.
-      const botInThread = msgs.some(
+      // Or the bot has already posted in the thread — anything but sweep cards.
+      const botPosts = msgs.filter(
         (m) => m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId),
       );
-      if (botInThread) return true;
+      if (botPosts.some((m) => !isSweepCardPost(m))) return true;
+      if (botPosts.length) return aboutTheCard;
     }
-    return false;
+    return pending ? aboutTheCard : false;
   } catch (err) {
     console.warn(
       `[slack] thread-engagement check failed, engaging (fail-open): ${err instanceof Error ? err.message : String(err)}`,
@@ -381,18 +404,13 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
 }
 
 async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" | "deferred"> {
-  if (!isUserTurn(event)) {
-    console.log(`[slack] skipping subtype=${event.subtype ?? ""} bot=${event.bot_id ?? ""}`);
-    return "handled";
-  }
-
   // Per-message dedup: Slack delivers app_mention AND message.channels for the
   // same message when the bot is @-mentioned in a channel it has history for.
   // Both events have different event_ids so the envelope-level dedup misses
   // them. Key by (channel, ts) which uniquely identifies the user's message.
   //
-  // Lease semantics (not one-shot): the turn is claimed as "running" here and
-  // marked "done" below when it finishes. A deploy mid-run hard-kills the
+  // Lease semantics (not one-shot): the turn is claimed as "running" and
+  // marked "done" when it finishes. A deploy mid-run hard-kills the
   // invocation with no finally, so the alarm retry that follows must NOT be
   // swallowed as a duplicate — it defers while the lease is fresh and reclaims
   // (re-runs the turn) once the lease is stale. Before this, a killed run left
@@ -403,45 +421,22 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
   // bot-token search is inert without one. PRESENCE only — the token itself
   // never reaches a log.
   console.log(`[slack] msg ${event.channel}/${event.ts} action_token=${!!event.action_token}`);
-  const runKey = `msg:${event.channel}:${event.ts}`;
   const store = threadStateFor(env);
-  // Fails OPEN like the envelope dedup above: an unreachable store re-runs the
-  // turn rather than dropping it.
-  const claim = await store.claimRun(runKey).catch(() => "claimed" as const);
-  if (claim === "done") {
-    console.log(`[slack] dedup: msg ${event.channel}/${event.ts} already handled`);
-    return "handled";
-  }
-  if (claim === "running") {
-    console.log(
-      `[slack] dedup: msg ${event.channel}/${event.ts} in-flight — deferring (reclaims if the run died)`,
-    );
-    return "deferred";
-  }
-
-  try {
-    await handleUserMessage(env, event);
-  } finally {
-    // Also marks done on a throw: the thrown path posts a visible ❌ upstream,
-    // which counts as handled. Only a hard kill skips this — by design, so the
-    // lease can rescue it.
+  return runMessageJob(event, {
+    // Fails OPEN like the envelope dedup above: an unreachable store re-runs
+    // the turn rather than dropping it.
+    claim: (runKey) => store.claimRun(runKey).catch(() => "claimed" as const),
     // Best-effort by contract: a missed mark self-heals when the lease goes
-    // stale, at the cost of one re-run.
-    await store.markRunDone(runKey).catch(() => {});
-    // No status clear here. Turn raises the working signal and Turn takes it
-    // down, in one `finally` around every exit it has (#555) — a second owner
-    // here could only clear the surfaces IT knew about, which is how a channel
-    // thread kept the indicator a DM-gated clear never reached.
-    //
-    // ONE SANCTIONED EXCEPTION, added #576: the in-thread stop door settles the
-    // session itself when Slack's stop control is pressed, because Slack says
-    // plainly that the press moves no status of its own. It escapes the defect
-    // above by construction — the event names the exact channel and thread, so
-    // there is no surface it could fail to know about — and it settles by the
-    // same card-based rule the turn uses, so the two writers agree on every
-    // ending that consults the card. It is the only other settler there is.
-  }
-  return "handled";
+    // stale, at the cost of one re-run. No status clear here. Turn raises the
+    // working signal and Turn takes it down, in one `finally` around every
+    // exit it has (#555); the in-thread stop door (#576) is the one other
+    // settler, and it settles by the same card-based rule.
+    markDone: (runKey) => store.markRunDone(runKey).catch(() => {}),
+    disputeCandidate: (e) => isDsPrecedenceCandidate(env, e),
+    dispute: (e) => handleDsPrecedenceReply(env, e),
+    engages: (e) => shouldHandleMessage(env, e),
+    turn: (e) => handleUserMessage(env, e),
+  });
 }
 
 async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<void> {

@@ -31,9 +31,11 @@ import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
+import { recordSweepRestageFor } from "../sweep/env";
+import { recordPrecedenceRestageFor } from "../ds-precedence/env";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
-import type { ThreadState } from "../thread-state/index";
+import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { TurnOrigin } from "../usage/index";
 import { NO_PROPOSAL_EVENT_LOG, classifyAskFor, proposalEventLogFor, testChannelIdsOf, usageLogFor } from "../usage/production";
@@ -181,6 +183,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // The reads a card needs and Turn may not make itself — shared with the
     // doors that re-stage a cut-off run (`restageFor`, below).
     cards: cardReadsFor(env),
+    onRestaged: (from, to) => followRestageFor(env, from, to),
 
     async readAntecedent(channel, beforeTs, limit) {
       const before = await conversationsHistoryBefore(env, channel, beforeTs, limit);
@@ -261,6 +264,21 @@ export function restageFor(
   const cards = cardReadsFor(env);
   const proposalEvents = proposalEventLogFor(env);
   return async (restage, delivery) => {
-    await restageExecution(restage, { threadState, delivery, cards, proposalEvents });
+    await restageExecution(restage, {
+      threadState,
+      delivery,
+      cards,
+      proposalEvents,
+      onRestaged: (from, to) => followRestageFor(env, from, to),
+    });
   };
+}
+
+/**
+ * The records kept against a card that follow it when a cut-off run is
+ * re-staged: the sweep's items, and the weekly DS precedence thread's live
+ * card. Each reads nothing for a card that is not its own.
+ */
+async function followRestageFor(env: Env, from: PendingProposal, to: PendingProposal): Promise<void> {
+  await Promise.all([recordSweepRestageFor(env, from, to), recordPrecedenceRestageFor(env, from, to)]);
 }
