@@ -78,6 +78,7 @@ import {
   type Destination,
   type SweepMessage,
   type SweepSource,
+  type SweepThread,
   type TargetKind,
 } from "./finding";
 import { postableAt } from "./schedule";
@@ -225,6 +226,13 @@ export interface SweepDeps {
   now(): number;
   /** Reads and detects as a real run does, and writes, posts and stages nothing. */
   dryRun?: boolean;
+  /**
+   * Handed each thread the end-of-day job reads — its human messages, root
+   * first — and the channel's cursor, so another job reads the same threads
+   * without a second read (commitment reminders, `commitments/run.ts`). A
+   * budget stop throws through; any other failure is the hook's to swallow.
+   */
+  onThread?(thread: SweepThread, since: string): Promise<void>;
 }
 
 /** One planned or posted card, as the report shows it. */
@@ -340,6 +348,7 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
       } else if (messages !== "too-long") {
         const humans = messages.filter((m) => isHuman(m, deps.config.botUserId)).map(toSweepMessage);
         threads += 1;
+        if (deps.onThread) await deps.onThread({ channel, channelKind: kind, rootTs: unit.root.ts, messages: humans }, cursor);
         const found = await sweepThread(deps, { channel, rootTs: unit.root.ts, humans, runDate, now, resolved });
         if (!found.ok) {
           if ((await failed(unit.root.ts, found.error, found.counts)) === "hold") {

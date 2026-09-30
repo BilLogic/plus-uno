@@ -6,7 +6,8 @@ summary: The Worker's own database migrations — the uno-bot-usage D1 schema un
 
 One schema lives here: the **usage record**, the `uno-bot-usage` D1 database
 bound as `USAGE_DB` (`agents/uno-bot/src/usage/`, ADR-030). The end-of-day sweep's cursors,
-runs and items share it (`0002_sweep.sql`, `agents/uno-bot/src/sweep/store.ts`). The bot's
+runs and items share it (`0002_sweep.sql`, `agents/uno-bot/src/sweep/store.ts`), and so do
+commitment reminders (`0006_commitments.sql`, `agents/uno-bot/src/commitments/store.ts`). The bot's
 semantic-retrieval schema does **not** — see the second half.
 
 ## The usage database (`usage/`)
@@ -43,15 +44,16 @@ logged and dropped). A deploy with no pending migration needs no step.
   after the turn in `agents/uno-bot/src/usage/resolution-d1.ts`, and a ticket
   filed from a card's reaction or button onto its staging turn by
   `proposal-events-d1.ts`. The sweep's tables are mapped in
-  `agents/uno-bot/src/sweep/d1.ts`.
+  `agents/uno-bot/src/sweep/d1.ts`, and `commitments` in
+  `agents/uno-bot/src/commitments/d1.ts`.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
 - What the database never stores — message text past classification, any DM
   text (a DM ask keeps only its category labels), secrets — is ADR-030's, and a
   migration does not widen it.
 
-**Tested** by `npm run test:workerd`: the UsageLog, ProposalEventLog and sweep
-records conformance suites apply every file here to a local D1 before they
+**Tested** by `npm run test:workerd`: the UsageLog, ProposalEventLog, sweep
+records and commitment records conformance suites apply every file here to a local D1 before they
 run, so a migration that fails to apply, or a column an adapter names and the
 schema lacks, fails there.
 

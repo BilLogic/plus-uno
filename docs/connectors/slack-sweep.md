@@ -1,7 +1,7 @@
 ---
 embodiment: all
 disclosure: reference
-summary: The end-of-day sweep — what it reads, where its drift cards go and who may confirm, drop or revise one.
+summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, and how its commitment reminders nudge a promiser.
 ---
 
 # The end-of-day sweep
@@ -51,3 +51,17 @@ In a thread uno-bot entered through a sweep card, it answers a reply only when t
 - **⛔** declines the whole card.
 
 Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its card posted is one that expired.
+
+## Commitment reminders
+
+The same end-of-day read also looks for **commitments**: someone in a swept thread takes on a task themselves ("I'll share the Figma link by Thu", or "yep, will do" to a request). uno-bot nudges the person who promised if it looks undone. The code is `agents/uno-bot/src/commitments/`.
+
+- **Detected** at the end-of-day run, from that night's new messages only. A hypothetical, a joke or a promise made for someone else is not a commitment, and only people's messages count, not uno-bot's.
+- **Due** at the end of the day the promiser named (ET, Monday to Friday), or two working days after the promise when they named none.
+- **Checked first:** at the first weekday morning run after it is due (14:00 UTC), uno-bot reads the thread since the promise, the promiser's later messages in the channel and the Notion or GitHub pages they linked. If those show it done, the commitment closes and nothing is posted.
+- **Where:** a reply in the promise's own thread, mentioning only the promiser. It follows `pickDestination` like every proactive job, so it stays out of #uno-bot and mentions the promiser rather than the lead.
+- **Answers,** from the promiser, as reactions on the reminder: 🙌 done, ⏳ soon (due again two working days out, at most twice), 🙅 not doing it, 🤔 not a promise. The answer replaces the legend in place and sends no new ping. Anyone else's reaction, and any other emoji (✅ included), changes nothing.
+- **One follow-up:** a reminder nobody answers gets one more, "Still on your list?", two working days later. If that one also goes unanswered, the commitment lapses silently. Those two posts are the whole allowance: a ⏳ moves the date and adds no post, and every reminder posted stays answerable.
+- **Said again:** a new promise by the same person in the same thread ("sorry, will do by Fri") is the same task. It adds no reminder, and a later day it names moves the due date the way a ⏳ does.
+- **Limits:** at most two reminders per person each morning; the rest wait for the next one. A commitment left unchecked or unposted three mornings running (an archived channel, a deleted thread) lapses.
+- **Stored:** a `commitments` row in the usage database holds ids, times, the state and two counts. The short summary of what was promised stays in KV with an expiry, and message text and links stay out of the database (ADR-030).
