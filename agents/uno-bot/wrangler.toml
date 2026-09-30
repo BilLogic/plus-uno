@@ -230,12 +230,6 @@ PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # is swept. Dry run: GET /debug/sweep?dry_run=1.
 #   plus-design C03FC8AS69K · plus-design-feedback C074QG2V7DJ (private)
 SWEEP_CHANNELS = "C03FC8AS69K,C074QG2V7DJ"
-# The Roadmap Design Status a 🙌 on a stuck-card follow-up proposes, and a 🙅
-# (src/follow-through/). Exact option names from the board; a value the board
-# lacks is refused when the card runs. Unset → the answer is recorded and no
-# status change is proposed.
-# FOLLOW_THROUGH_DONE_STATUS = ""
-# FOLLOW_THROUGH_DROP_STATUS = ""
 # #plus-design-feedback channel id — shareout_post drops feedback bundles here
 # (distinct from the reviews channel above). Leave blank → shareout falls back
 # to the origin thread.

@@ -29,10 +29,13 @@
 //
 //   `answerCardFollowUp` — a reaction on a follow-up: F3's ✅ stages the drafted
 //   card as a proposal card (its own ✅ files it) and 🙅 drops the to-do; F5's
-//   🙌 and 🙅 stage the matching Design Status change, ⏳ leaves the card be.
+//   🙌 and 🙅 from the owner list the card's live Design Status options, the
+//   likely ones first, and ⏳ leaves the card be.
 //
-//   `handleCardOwnerReply` — a reply under F4's question naming someone
-//   ("@Maya") stages the Contributor change as a proposal card.
+//   `handleCardReply` — a reply under a follow-up: under F4's question, one
+//   naming someone ("@Maya") stages the Contributor change; under F5's list,
+//   the owner's pick — a number or a name typed whole — stages the Design
+//   Status change, and anything else gets the list again and stages nothing.
 //
 // WHERE IT POSTS: `pickDestination`, as every proactive job. A thread's to-do
 // is answered in that thread (a private channel's stays there); a card has no
@@ -67,6 +70,8 @@ import {
   CARD_LEGENDS,
   draftTitle,
   staleText,
+  statusChoiceText,
+  statusRetryText,
   todoOfferText,
   unownedText,
 } from "./copy";
@@ -79,6 +84,8 @@ import {
   MAX_CARD_POSTS_PER_CHANNEL,
   mayFollowUpCard,
   maybeCondition,
+  orderStatusOptions,
+  pickStatus,
   STALE_AFTER_MS,
   todoWords,
   type ActiveCard,
@@ -110,6 +117,8 @@ export interface CardReads {
   titlesMatching(words: string[]): Promise<string[]>;
   /** The Roadmap's `Product Pillar` options, exactly as the database has them. */
   pillarOptions(): Promise<string[]>;
+  /** The Roadmap's `Design Status` options, exactly and in the schema's order. */
+  statusOptions(): Promise<string[]>;
 }
 
 /** Who is who, across Notion and Slack; null when not exactly one person. */
@@ -125,10 +134,6 @@ export interface FollowThroughConfig {
   /** #uno-bot: never a destination. */
   unoBot?: string;
   botUserId?: string | null;
-  /** The Design Status a 🙌 on F5 moves a card to, and a 🙅; unset, the answer
-   *  is recorded and no change is staged. Exact-matched when it runs. */
-  doneStatus?: string;
-  dropStatus?: string;
 }
 
 /** A proposal card to post in a follow-up's thread and stage. */
@@ -586,7 +591,7 @@ async function checkCardEvidence(deps: DueDeps, c: CommitmentRecord, text: Commi
 
 export interface AnswerDeps {
   store: CommitmentStore;
-  reads: Pick<CardReads, "pillarOptions">;
+  reads: Pick<CardReads, "pillarOptions" | "statusOptions">;
   people: Pick<CardPeople, "notionUserForSlack">;
   /** Replace a posted follow-up's legend in place: no new message, no ping. */
   update(channel: string, ts: string, message: FollowUpMessage): Promise<boolean>;
@@ -639,8 +644,15 @@ export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, d
     // follow-up asks.
     await deps.store.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt: now + STALE_AFTER_MS });
   } else if (kind === "card_stale") {
-    const status = answer === "done" ? deps.config.doneStatus?.trim() : deps.config.dropStatus?.trim();
-    if (status && c.cardId && text?.card) staged = await deps.stage({ card: statusCard(text.card, status, answer), ...thread, confirmers });
+    // The owner suggests where the card goes: the board's live options, the
+    // likely ones for this answer first, and the pick stages the move.
+    const choice = answer === "done" ? "done" : "drop";
+    const options = text?.card ? orderStatusOptions(await deps.reads.statusOptions(), choice, text.card.status) : [];
+    if (text?.card && options.length) {
+      await deps.post(thread, statusChoiceText({ owner: r.userId, card: text.card, options }));
+      await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false } }, now + TEXT_KEEP_MS);
+      staged = true;
+    }
     await deps.store.update(c.id, { state: answer === "done" ? "done" : "dropped", resolvedAt: now });
   } else {
     await deps.store.update(c.id, { state: "dropped", resolvedAt: now });
@@ -717,24 +729,44 @@ export function contributorCard(card: { title: string; url: string }, slackUser:
   };
 }
 
+/** A reply under a card follow-up. */
+export interface CardReply {
+  channel: string;
+  threadTs: string;
+  user: string;
+  text: string;
+}
+
 /**
- * A reply under F4's question that names someone: stage the Contributor
- * change. False when the thread is no live F4 question or the reply names
- * nobody — the reply then takes its ordinary path.
+ * A reply under a card follow-up: F4's owner, or F5's pick of Design Status.
+ * False when the thread holds neither, or the reply is not one — it then
+ * takes its ordinary path.
  *
  * @param reply - The reply
  * @param deps - The store, the people, the posts and the staging
  */
-export async function handleCardOwnerReply(
-  reply: { channel: string; threadTs: string; user: string; text: string },
+export async function handleCardReply(
+  reply: CardReply,
+  deps: Pick<AnswerDeps, "store" | "people" | "update" | "post" | "stage" | "config" | "now">,
+): Promise<boolean> {
+  if (reply.user === deps.config.botUserId) return false;
+  const c = await deps.store.byReminderTs(reply.threadTs);
+  if (!c || c.channel !== reply.channel) return false;
+  if (c.kind === "card_unowned") return ownerReply(c, reply, deps);
+  if (c.kind === "card_stale") return statusReply(c, reply, deps);
+  return false;
+}
+
+/** Under F4's question, a reply naming someone stages the Contributor change. */
+async function ownerReply(
+  c: CommitmentRecord,
+  reply: CardReply,
   deps: Pick<AnswerDeps, "store" | "people" | "update" | "post" | "stage" | "config" | "now">,
 ): Promise<boolean> {
   const named = [...reply.text.matchAll(/<@([UW][A-Z0-9]+)(?:\|[^>]*)?>/g)]
     .map((m) => m[1]!)
     .find((id) => id !== deps.config.botUserId);
-  if (!named) return false;
-  const c = await deps.store.byReminderTs(reply.threadTs);
-  if (!c || c.kind !== "card_unowned" || c.channel !== reply.channel || !LIVE_STATES.includes(c.state)) return false;
+  if (!named || !LIVE_STATES.includes(c.state)) return false;
   const text = await deps.store.text(c.id);
   if (!text?.card) return false;
   const thread = { channel: reply.channel, threadTs: reply.threadTs };
@@ -751,6 +783,39 @@ export async function handleCardOwnerReply(
   if (!staged) return true;
   await deps.store.update(c.id, { state: "done", resolvedAt: deps.now() });
   await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, cardAcknowledgement("owner", true));
+  return true;
+}
+
+/**
+ * Under F5's list, the owner's pick stages the Design Status change — only the
+ * owner's reply counts. A reply that is no listed option gets the options
+ * again, on one line, and stages nothing. The value staged is the schema's
+ * own spelling, and `notion_update` exact-matches it again when it runs.
+ */
+async function statusReply(
+  c: CommitmentRecord,
+  reply: CardReply,
+  deps: Pick<AnswerDeps, "store" | "post" | "stage" | "update" | "now">,
+): Promise<boolean> {
+  const text = await deps.store.text(c.id);
+  const choosing = text?.choosing;
+  if (!text?.card || !choosing || choosing.staged) return false;
+  const owners = [c.promiserId, ...(text.mentions ?? [])];
+  if (!owners.includes(reply.user)) return false;
+  const thread = { channel: reply.channel, threadTs: reply.threadTs };
+  const status = pickStatus(reply.text, choosing.options);
+  if (!status) {
+    await deps.post(thread, statusRetryText(choosing.options));
+    return true;
+  }
+  const staged = await deps.stage({
+    card: statusCard(text.card, status, choosing.answer),
+    ...thread,
+    confirmers: [...new Set([...owners, reply.user])],
+  });
+  if (!staged) return true;
+  await deps.store.saveText(c.id, { ...text, choosing: { ...choosing, staged: true } }, deps.now() + TEXT_KEEP_MS);
+  await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, cardAcknowledgement("status", true));
   return true;
 }
 

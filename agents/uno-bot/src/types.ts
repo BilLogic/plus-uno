@@ -86,11 +86,6 @@ export interface Env {
   /** The channels the end-of-day sweep reads, comma-separated ids
    *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
   SWEEP_CHANNELS?: string;
-  /** The Roadmap Design Status a 🙌 on a stuck-card follow-up proposes, and a
-   *  🙅 (`src/follow-through/`). Exact option names; unset, the answer is
-   *  recorded and no status change is proposed. */
-  FOLLOW_THROUGH_DONE_STATUS?: string;
-  FOLLOW_THROUGH_DROP_STATUS?: string;
   // #plus-design-feedback — shareout_post posts feedback bundles here (distinct
   // from the reviews channel above). Optional — unset → shareout_post falls back
   // to the origin thread.

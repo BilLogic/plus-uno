@@ -38,7 +38,7 @@ import {
   notionUserName,
   queryActiveCards,
   readCard,
-  roadmapPillarOptions,
+  roadmapOptions,
   roadmapTitlesMatching,
 } from "./notion";
 import {
@@ -46,7 +46,7 @@ import {
   cardFollowUps,
   cardTodoThreadHook,
   followThroughProposal,
-  handleCardOwnerReply,
+  handleCardReply,
   runCardFollowThroughScan,
   type AnswerDeps,
   type CardFollowUps,
@@ -64,8 +64,6 @@ function configFor(env: Env, botUserId?: string | null): FollowThroughConfig {
     plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
     unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
     botUserId: botUserId ?? null,
-    doneStatus: env.FOLLOW_THROUGH_DONE_STATUS?.trim() || undefined,
-    dropStatus: env.FOLLOW_THROUGH_DROP_STATUS?.trim() || undefined,
   };
 }
 
@@ -75,7 +73,8 @@ function readsFor(env: Env): CardReads {
     card: (pageId) => measured(() => readCard(env, pageId)),
     lastCommentAt: (pageId) => measured(() => lastCommentAt(env, pageId, Date.now())),
     titlesMatching: (words) => measured(() => roadmapTitlesMatching(env, words)),
-    pillarOptions: () => measured(() => roadmapPillarOptions(env)),
+    pillarOptions: () => measured(() => roadmapOptions(env, "Product Pillar")),
+    statusOptions: () => measured(() => roadmapOptions(env, "Design Status")),
   };
 }
 
@@ -244,33 +243,37 @@ export function cardAnswerFor(env: Env): ((c: CommitmentRecord, r: ReminderReact
   };
 }
 
+/** A pick of Design Status is a word or two, or a number: one short line. */
+const SHORT_REPLY_CHARS = 60;
+
 /**
- * Whether a message could name an owner under F4's question: a person's reply
- * in a #plus-design or #plus-universal thread that @-mentions someone. Reads
- * nothing — the dispatch uses it to queue the reply, where
- * `handleCardOwnerReplyOnEnv` decides.
+ * Whether a message could answer a card follow-up: a person's reply in a
+ * #plus-design or #plus-universal thread that @-mentions someone (F4's owner)
+ * or is one short line (F5's pick of Design Status). Reads nothing — the
+ * dispatch uses it to queue the reply, where `handleCardReplyOnEnv` decides.
  *
  * @param env - Worker bindings
  * @param event - The message
  */
-export function isCardOwnerReplyCandidate(env: Env, event: SlackMessageEvent): boolean {
+export function isCardReplyCandidate(env: Env, event: SlackMessageEvent): boolean {
   const channels = [env.PLUS_DESIGN_CHANNEL_ID?.trim(), env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()].filter(Boolean);
   if (!event.thread_ts || event.thread_ts === event.ts || !channels.includes(event.channel)) return false;
   if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
   if (!env.USAGE_DB || !env.HARNESS_KV) return false;
-  return /<@[UW][A-Z0-9]+(?:\|[^>]*)?>/.test(event.text ?? "");
+  const text = (event.text ?? "").trim();
+  return /<@[UW][A-Z0-9]+(?:\|[^>]*)?>/.test(text) || (!!text && text.length <= SHORT_REPLY_CHARS && !text.includes("\n"));
 }
 
 /**
- * A queued reply under F4's question: stage the Contributor change. True when
- * it did, and the turn is then skipped.
+ * A queued reply under a card follow-up (`handleCardReply`). True when it was
+ * one, and the turn is then skipped.
  *
  * @param env - Worker bindings
  * @param event - The message
  */
-export async function handleCardOwnerReplyOnEnv(env: Env, event: SlackMessageEvent): Promise<boolean> {
-  if (!isCardOwnerReplyCandidate(env, event)) return false;
+export async function handleCardReplyOnEnv(env: Env, event: SlackMessageEvent): Promise<boolean> {
+  if (!isCardReplyCandidate(env, event)) return false;
   const deps = answerDepsFor(env, (await getBotIdentity(env))?.userId ?? null);
   if (!deps) return false;
-  return handleCardOwnerReply({ channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" }, deps);
+  return handleCardReply({ channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" }, deps);
 }

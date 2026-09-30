@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 54,767 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 54,966 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 11,650 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 11,849 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1780,7 +1780,7 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 
 - **F3, a card to-do with no card.** A thread or a running note says to create a Roadmap card ("Bill to create a card for the facelift last stage", "can someone make a card for this"). Two working days on, uno-bot searches the Roadmap by the to-do's words; a matching card closes it silently. Otherwise it asks "Want me to draft the card for …?", mentioning the assignee, or the note's takers when nobody was named. ✅ stages the drafted card (the PRD template, its own ✅ files it); 🙅 drops it.
 - **F4, an active card with no owner.** A card in Ready for Design, WIP or Under Review with an empty Contributor and no edit for 7 days. "Who's taking …?" mentions the card's creator. A reply naming someone ("@Maya") stages the Contributor change; its ✅ applies it.
-- **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. "Still moving?" mentions the Contributors: 🙌 done, ⏳ still on it (checked again in 3 weeks), 🙅 drop. 🙌 and 🙅 stage the Design Status change named by `FOLLOW_THROUGH_DONE_STATUS` / `FOLLOW_THROUGH_DROP_STATUS`; with none set, the answer is recorded and nothing is staged.
+- **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. "Still moving?" mentions the Contributors: 🙌 done, ⏳ still on it (checked again in 3 weeks), 🙅 drop. After 🙌 or 🙅 from an owner, uno-bot lists the card's live Design Status options in the thread, read from the Roadmap schema, Shipped and Under Dev first for 🙌 and Archived first for 🙅. The owner replies with a number or a name typed whole, and that stages the move on a ✅ card. Any other reply gets the options again and stages nothing; only an owner's reply counts.
 - **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most five new card questions a channel each morning. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
 - **Evidence first:** each morning re-reads the card. A Contributor set, a status moved, an edit or a comment since closes it with no post.
 - **One message a card a week:** a follow-up's follow-up waits five working days, and a card asked about in the past week is not asked about again.

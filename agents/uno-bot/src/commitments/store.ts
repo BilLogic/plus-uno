@@ -161,6 +161,9 @@ export interface CommitmentText {
   card?: { title: string; url: string; status: string | null };
   /** Where a card to-do was read: the thread's permalink or the note's link. */
   sourceUrl?: string;
+  /** A stuck card whose owner answered 🙌 or 🙅: the Design Status options
+   *  offered, in the order shown, until one is picked and staged. */
+  choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean };
 }
 
 /** The KV half. */

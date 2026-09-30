@@ -10,8 +10,9 @@
 //     which never flags it;
 //   • a Notion user's name (`users/{id}`), and the Notion user with a given
 //     name (`users`, a few pages);
-//   • the Roadmap's `Product Pillar` options (`databases/{roadmap}`), for the
-//     exact match a drafted card's pillar needs (hard rule 4).
+//   • the Roadmap's `Product Pillar` and `Design Status` options
+//     (`databases/{roadmap}`), for the exact match a drafted card's pillar and
+//     a stuck card's new status need (hard rule 4).
 //
 // Card titles and pillar names come back as Notion wrote them; whoever renders
 // one to Slack escapes it.
@@ -177,13 +178,18 @@ export async function roadmapTitlesMatching(env: Env, words: string[]): Promise<
   return rows.map((r) => r.title);
 }
 
-/** The Roadmap's `Product Pillar` options, exactly as the database has them. */
-export async function roadmapPillarOptions(env: Env): Promise<string[]> {
+/**
+ * One Roadmap property's options, exactly as the schema has them and in its
+ * order: `Product Pillar` (multi-select) or `Design Status` (status).
+ */
+export async function roadmapOptions(env: Env, property: "Product Pillar" | "Design Status"): Promise<string[]> {
   if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
-  const { status, data } = await notionJson<{ properties?: Record<string, { multi_select?: { options?: { name?: string }[] } }>; message?: string; code?: string }>(
+  type Options = { options?: { name?: string }[] };
+  const { status, data } = await notionJson<{ properties?: Record<string, { multi_select?: Options; status?: Options }>; message?: string; code?: string }>(
     env,
     `/databases/${env.NOTION_ROADMAP_DB_ID}`,
   );
   if (status >= 300) throw notionError(status, data, "roadmap schema read failed");
-  return (data.properties?.["Product Pillar"]?.multi_select?.options ?? []).map((o) => o.name ?? "").filter(Boolean);
+  const prop = data.properties?.[property];
+  return ((property === "Design Status" ? prop?.status : prop?.multi_select)?.options ?? []).map((o) => o.name ?? "").filter(Boolean);
 }

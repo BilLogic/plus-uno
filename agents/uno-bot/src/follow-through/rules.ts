@@ -112,6 +112,41 @@ export function mayFollowUpCard(
   return last <= now - CARD_MESSAGE_GAP_MS;
 }
 
+/** The Design Status options offered first after 🙌 (done) and 🙅 (drop). */
+export const LIKELY_STATUSES: Readonly<Record<"done" | "drop", readonly string[]>> = {
+  done: ["Shipped", "Under Dev"],
+  drop: ["Archived"],
+};
+
+/**
+ * The Design Status options a stuck card's owner picks from: the Roadmap's
+ * live options, exactly as the schema has them, the likely ones for the
+ * answer first and the rest in the schema's order, the card's current status
+ * left out.
+ *
+ * @param options - The schema's options, in its order
+ * @param answer - 🙌 (`done`) or 🙅 (`drop`)
+ * @param current - The card's Design Status now
+ */
+export function orderStatusOptions(options: readonly string[], answer: "done" | "drop", current: string | null): string[] {
+  const live = [...new Set(options.filter((o) => o && o !== current))];
+  const likely = LIKELY_STATUSES[answer].filter((o) => live.includes(o));
+  return [...likely, ...live.filter((o) => !likely.includes(o))];
+}
+
+/**
+ * The option a reply picks: a number from the list, or one option's name
+ * typed whole (case and surrounding space aside). Null for anything else.
+ *
+ * @param reply - The reply's text
+ * @param options - The options offered, in the order shown
+ */
+export function pickStatus(reply: string, options: readonly string[]): string | null {
+  const said = reply.replace(/<@[^>]+>/g, " ").trim().replace(/^["'“]|["'”.!]$/g, "").trim();
+  if (/^\d{1,2}$/.test(said)) return options[Number(said) - 1] ?? null;
+  return options.find((o) => o.toLowerCase() === said.toLowerCase()) ?? null;
+}
+
 /** Words that say "make a card" rather than what the card is about. */
 const TODO_NOISE = new Set([
   "a", "an", "the", "for", "to", "of", "on", "in", "and", "with", "about", "this", "that", "it",

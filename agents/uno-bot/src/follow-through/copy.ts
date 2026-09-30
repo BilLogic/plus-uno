@@ -48,18 +48,20 @@ export const CARD_LEGENDS = {
 } as const;
 
 /** What replaces the legend once someone answers. */
-export function cardAcknowledgement(answer: CardAnswer | "owner", staged: boolean): string {
+export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", staged: boolean): string {
   switch (answer) {
     case "draft":
       return "On it. The draft card is in this thread; a ✅ there files it.";
     case "owner":
       return staged ? "Thanks. The Contributor change is in this thread; a ✅ there applies it." : "Thanks.";
+    case "status":
+      return staged ? "Thanks. The status change is in this thread; a ✅ there applies it." : "Thanks.";
     case "done":
-      return staged ? "Nice. The status change is in this thread; a ✅ there applies it." : "Nice, noted.";
+      return staged ? "Nice. Pick the card's new Design Status in this thread." : "Nice, noted.";
     case "still_on_it":
       return "Got it. I'll leave it be for now.";
     case "drop":
-      return staged ? "Noted. The status change is in this thread; a ✅ there applies it." : "Noted. I won't ask again.";
+      return staged ? "Noted. Pick the card's new Design Status in this thread." : "Noted. I won't ask again.";
   }
 }
 
@@ -108,6 +110,17 @@ export function cardFollowUpText(kind: "card_todo" | "card_unowned" | "card_stal
     case "card_stale":
       return `${mentionsOf(people)} Still moving? A reaction is all I need.`;
   }
+}
+
+/** The owner's choice of Design Status, numbered as `pickStatus` reads it. */
+export function statusChoiceText(input: { owner: string; card: { title: string; url: string }; options: readonly string[] }): string {
+  const list = input.options.map((o, i) => `${i + 1}. ${escapeSlackText(o)}`).join("\n");
+  return `<@${input.owner}> Which Design Status should ${cardLink(input.card)} move to? Reply with a name or a number:\n${list}`;
+}
+
+/** A reply that named no live option: the options again, on one line. */
+export function statusRetryText(options: readonly string[]): string {
+  return `That isn't one of the card's Design Status options. Reply with one of: ${options.map((o, i) => `${i + 1}. ${escapeSlackText(o)}`).join(" · ")}`;
 }
 
 /** A card's subject as a card title: its first letter raised. */
