@@ -521,14 +521,15 @@ async function sweepDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobRep
   if (!listed) return skipped("the DMs uno-bot answered in could not be listed");
   const runDate = deps.runDate;
   const reports: SweepJobReport[] = [];
-  let done = 0;
   const failed: string[] = [];
-  const seen = new Set<string>();
-  for (const dm of listed) {
-    if (!dm.channel.startsWith("D") || seen.has(dm.channel)) continue;
-    seen.add(dm.channel);
+  const dms = listed.filter((dm, i) => dm.channel.startsWith("D") && listed.findIndex((d) => d.channel === dm.channel) === i);
+  const runIdOf = (channel: string) => `${runDate}:${job.key}:${channel}`;
+  // One read for every DM already swept today, however many a retry passes over.
+  const handled = new Set(deps.dryRun || !dms.length ? [] : await deps.store.handledRuns(dms.map((dm) => runIdOf(dm.channel))));
+  let done = 0;
+  for (const dm of dms) {
     const key = `${job.key}:${dm.channel}`;
-    if (!deps.dryRun && (await deps.store.getRun(`${runDate}:${key}`))?.outcome === "handled") {
+    if (handled.has(runIdOf(dm.channel))) {
       done += 1;
       continue;
     }

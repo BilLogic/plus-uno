@@ -26,11 +26,15 @@
 //   `dmAsksDue` — the morning's `commitment-nudge` job hands it each DM row
 //   due, as it hands card follow-ups to theirs. F6: "Yesterday I couldn't find
 //   <X>. Did you get it?", once, in the thread; unanswered by its next due
-//   date, it lapses. C6: a proposal card in the thread offering to raise it —
+//   date, it lapses. C6: a proposal card in the thread offering to post a note —
 //   its ✅ runs `sweep_share_post` with a reworded note (`./copy.ts`) in
 //   #plus-universal for the design system, #plus-design otherwise
 //   (`shareDestination`), and its ⛔ drops it. That ✅, by the person the DM is
-//   with, is the only way anything found in a DM reaches a channel.
+//   with, is the only way anything found in a DM reaches a channel. Each raise
+//   card holds a slot of its own (`raiseSlot`), and a topic is offered once a
+//   thread (`raiseId`). Every post here is tagged (`DM_ASK_EVENT`,
+//   `DM_RAISE_EVENT`), so the next night reads it as uno-bot's own post and
+//   never as an answer (`detector.ts` § isFresh).
 //
 //   `answerDmAsk` — the reaction door's hand-off for a DM row: 🙅 on the F6
 //   ask from its person drops it. Any other glyph does nothing. The raise
@@ -56,7 +60,7 @@ import type { DmThread, DmThreadVerdict } from "../sweep/run";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
-import { ASK_DROPPED, ASK_LEGEND, askText, raiseCard, whenWord, type RaiseTo } from "./copy";
+import { ASK_DROPPED, ASK_LEGEND, askText, DM_RAISE_EVENT, raiseCard, whenWord, type RaiseTo } from "./copy";
 import type { DmDetection, DmDetector } from "./detector";
 
 /** The tag on uno-bot's F6 ask: how the next night finds the ask its person
@@ -71,8 +75,33 @@ export const DM_WITHHELD = "(withheld: this ask is for a DM)";
  *  its thread for placement: the rest of that night's run. */
 const RETRY_WINDOW_MS = 6 * 60 * 60 * 1000;
 
-/** The raise card's own slot in its thread (`proposalSlot`). */
+/** The raise card's slot key in its thread (`proposalSlot`): one slot per
+ *  offer (`raiseSlot`), so a second raise in a thread never retires the first. */
 export const DM_RAISE_KEY = "dm-raise";
+
+/** The slot one raise card holds: its row's own. */
+export function raiseSlot(id: string): string {
+  return `${DM_RAISE_KEY}:${id}`;
+}
+
+/**
+ * A disagreement's row id: one per topic per thread, so uno-bot saying the
+ * same thing again — or a model reading it again — offers nothing new. The
+ * topic enters as a hash, never as words (ADR-030: no text in D1).
+ *
+ * @param channel - The DM
+ * @param rootTs - The thread
+ * @param topic - The detector's topic
+ */
+export function raiseId(channel: string, rootTs: string, topic: string): string {
+  const key = topic.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  let h = 0x811c9dc5;
+  for (let i = 0; i < key.length; i++) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return `${channel}:${rootTs}:raise:${h.toString(16).padStart(8, "0")}`;
+}
 
 // ── End of day ───────────────────────────────────────────────────────────────
 
@@ -173,7 +202,9 @@ async function keep(thread: DmThread, found: Extract<DmDetection, { ok: true }>,
     texts[id] = { what: miss.what, bodies: {} };
   }
   for (const d of found.disagreements) {
-    const id = `${thread.channel}:${d.answerTs}:raise`;
+    // One offer a topic a thread, however often uno-bot says it again.
+    const id = raiseId(thread.channel, thread.rootTs, d.topic);
+    if (rows.some((r) => r.id === id)) continue;
     const to: RaiseTo = shareDestination({ kind: d.designSystem ? "design-system-code" : "notion", pillars: [] }).channel;
     rows.push(row(id, "dm_disagreement", d.answerTs, d.confidence));
     texts[id] = { what: d.topic, bodies: {}, raise: { sources: d.sources, to } };
@@ -181,13 +212,13 @@ async function keep(thread: DmThread, found: Extract<DmDetection, { ok: true }>,
   if (!rows.length || deps.dryRun) return rows.length;
   let fresh = 0;
   for (const r of rows) if (!(await deps.store.get(r.id))) fresh += 1;
-  if (!fresh) return 0;
-  await deps.store.addCommitments(rows);
+  // The wording first, so a row is never kept without it: a stop between
+  // the two leaves only wording that expires. Wording already there stays.
   for (const r of rows) {
-    // A row already there keeps its wording.
     if (await deps.store.text(r.id)) continue;
     await deps.store.saveText(r.id, texts[r.id]!, now + TEXT_KEEP_MS);
   }
+  if (fresh) await deps.store.addCommitments(rows);
   return fresh;
 }
 
@@ -205,8 +236,12 @@ export interface DmMorningDeps {
   slack: {
     /** Post the F6 ask in the DM thread, tagged. */
     post(to: { channel: string; threadTs: string }, message: DmAskMessage): Promise<{ ok: boolean; ts?: string }>;
-    /** Post the raise card in the DM thread. */
-    postCard(to: { channel: string; threadTs: string }, card: ProposalCard): Promise<{ ok: boolean; ts?: string; text?: string }>;
+    /** Post the raise card in the DM thread, tagged. */
+    postCard(
+      to: { channel: string; threadTs: string },
+      card: ProposalCard,
+      metadata: DmAskMessage["metadata"],
+    ): Promise<{ ok: boolean; ts?: string; text?: string }>;
   };
   threadState: Pick<ThreadState, "putProposal">;
   proposalEvents: ProposalEventLog;
@@ -271,7 +306,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
   if (!channel || channel === deps.channels.unoBot?.trim()) return lapse("refused", `no ${to} channel to raise it in`);
   const { card, operations } = raiseCard({ when, topic: text.what, sources: text.raise.sources, channel, to });
   if (deps.dryRun) return { id: c.id, action: "nudged", text: DM_WITHHELD };
-  const sent = await deps.slack.postCard(place, card);
+  const sent = await deps.slack.postCard(place, card, { event_type: DM_RAISE_EVENT, event_payload: { id: c.id } });
   if (!sent.ok || !sent.ts) return hold("Slack refused the post");
   const first = operations[0]!;
   const proposal: PendingProposal = {
@@ -288,7 +323,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     ttlMs: SWEEP_CARD_TTL_MS,
     // The person the DM is with, and nobody else.
     confirmers: [c.promiserId],
-    supersedeKey: DM_RAISE_KEY,
+    supersedeKey: raiseSlot(c.id),
   };
   const { retired } = await deps.threadState.putProposal(proposal);
   // A DM is never named on the record (`storesChannel`).

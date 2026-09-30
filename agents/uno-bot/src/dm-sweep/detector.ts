@@ -14,6 +14,11 @@
 // parse because the two are one contract: anything off the shape is dropped,
 // never repaired.
 //
+// WHAT IS NEW. A message after the DM's cursor — except uno-bot's own posts,
+// which it tags (a sweep card, the F6 ask, the raise card, a batch result):
+// those are shown as context and are never new, so a card uno-bot posted in
+// the morning is never read back as an answer that night (`isFresh`).
+//
 // WHAT THE PARSE REFUSES: an item on a message that is not one of tonight's
 // new ones; an unanswered or disagreement item on a message that is not
 // uno-bot's, and a decision on one that is; a summary, topic or source name
@@ -94,10 +99,19 @@ export function modelDmDetector(provider: ModelProvider): DmDetector {
   return { detect: (input) => detectDmItems(provider, input) };
 }
 
+/**
+ * Whether a message is one of tonight's new ones: after the cursor, and not
+ * one of uno-bot's own tagged posts — a card, an ask, a note — which are
+ * context only.
+ */
+export function isFresh(m: DmMessage, since: string): boolean {
+  return isNew(m.ts, since) && !(m.byBot && m.tag);
+}
+
 /** A new message of either side: the gate on the model call. A thread with
- *  nothing new costs none. */
+ *  nothing new — uno-bot's own posts aside — costs none. */
 export function mayHoldDmItem(messages: readonly DmMessage[], since: string): boolean {
-  return messages.some((m) => isNew(m.ts, since) && m.text.trim().length > 0);
+  return messages.some((m) => isFresh(m, since) && m.text.trim().length > 0);
 }
 
 /**
@@ -129,7 +143,7 @@ export function dmDetectorPrompt(messages: readonly DmMessage[], since: string):
   const lines = ["THREAD (oldest first; NEW marks tonight's messages):"];
   for (const m of messages) {
     const who = m.byBot ? "uno-bot" : "person";
-    lines.push(`${isNew(m.ts, since) ? "NEW " : ""}[${m.ts}] ${who}: ${cap(m.text, MAX_MESSAGE_CHARS)}`);
+    lines.push(`${isFresh(m, since) ? "NEW " : ""}[${m.ts}] ${who}: ${cap(m.text, MAX_MESSAGE_CHARS)}`);
   }
   return lines.join("\n");
 }
@@ -148,7 +162,7 @@ export function parseDmReply(
   const personTexts = shown.filter((m) => !m.byBot).map((m) => m.text);
   const newBy = (ts: unknown, bot: boolean): DmMessage | null => {
     const m = byTs.get(str(ts));
-    return m && isNew(m.ts, since) && m.byBot === bot ? m : null;
+    return m && isFresh(m, since) && m.byBot === bot ? m : null;
   };
   const entries = (key: string): Record<string, unknown>[] =>
     (Array.isArray(raw[key]) ? (raw[key] as unknown[]) : []).filter(
@@ -173,7 +187,7 @@ export function parseDmReply(
     if (!m || confidence === null || !topic || names.length !== 2 || !names[0] || !names[1]) continue;
     if (names[0].toLowerCase() === names[1].toLowerCase()) continue;
     if (repeatsPerson(topic, personTexts)) continue;
-    if (disagreements.some((d) => d.answerTs === m.ts)) continue;
+    if (disagreements.some((d) => d.answerTs === m.ts && d.topic.toLowerCase() === topic.toLowerCase())) continue;
     disagreements.push({ answerTs: m.ts, topic, sources: [names[0], names[1]], designSystem: e.design_system === true, confidence });
   }
 

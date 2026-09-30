@@ -47,6 +47,9 @@ export function createInMemorySweepStore(): InMemorySweepStore {
       const run = runs.get(runId);
       return run ? copy(run) : null;
     },
+    async handledRuns(runIds) {
+      return [...new Set(runIds)].filter((id) => runs.get(id)?.outcome === "handled").sort();
+    },
     async addItems(added) {
       for (const item of added) if (!items.has(item.itemId)) items.set(item.itemId, copy(item));
     },

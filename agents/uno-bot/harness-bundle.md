@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 89,819 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 90,209 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 21,853 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 22,243 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,849 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1402,10 +1402,11 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 About half the asks happen in people's 1:1 DMs with uno-bot. The end-of-day run reads each DM someone asked uno-bot something in since its last read, both sides of each thread, with the bot token. Everything it finds goes back **only into that same DM thread**, at the next weekday morning run (10 am ET). The code is `agents/uno-bot/src/dm-sweep/`.
 
 - **F6, a question uno-bot could not answer.** uno-bot's answer said it could not find it, or was not sure. The next morning, once: "Yesterday I couldn't find <X>. Did you get it?" An answer given with a source gets none. A reply with the answer or a link is read that night like an answered question in a channel (§ Answers and decisions no page holds yet), and its placement card lands in the DM. 🙅 on the ask drops it. Unanswered, it lapses.
-- **C6, a disagreement uno-bot noticed.** uno-bot's answer said two sources disagree (Figma and code on the warning colour). The next morning, a card: "Yesterday I noticed Figma and code disagree on warning. Want me to raise it with the owner?" Its ✅ posts one reworded note in #plus-universal for the design system, #plus-design otherwise: uno-bot's own summary, with no quote of the DM and no name. ⛔ drops it.
+- **C6, a disagreement uno-bot noticed.** uno-bot's answer said two sources disagree (Figma and code on the warning colour). The next morning, a card: "Yesterday I noticed Figma and the code disagree on the warning colour. Want me to post a note about it in #plus-universal?" (#plus-design when it is not the design system). Its ✅ posts that one reworded note: uno-bot's own summary, with no quote of the DM and no name. ⛔ drops it. The note names no owner and files no intake; whoever owns it picks it up in the channel. One offer per topic per thread.
 - **C7, a decision told to uno-bot.** The person states a team decision ("we decided the recap goes weekly"); an opinion or a wish is not one. That night the thread gets the drift read, following the links uno-bot's own answers carried too, and the next morning brings a proposal card with the page edit, in the DM.
+- **Own posts:** uno-bot tags every post it makes in a DM (the ask, the raise card, a sweep card), and the next night reads those as context only, so a card is only ever read as its own post.
 - **Leaving the DM:** C6's ✅, by the person the DM is with, is the only way anything found in a DM reaches a channel. Every card here is theirs alone to confirm, and a channel card for the same fix still goes up in its own thread.
-- **Limits:** F6 and C6 count toward the person's two reminders a morning, and each is asked once.
+- **Limits:** F6 and C6 spend the budget uno-bot's own follow-ups share (two a person a morning, after the person's own reminders), and each is asked once.
 - **Stored:** F6 and C6 are `commitments` rows of kind `dm_unanswered` and `dm_disagreement`, and C7's fixes are `sweep_items` rows with `surface = 'dm'`. What uno-bot could not find and what disagrees stay in KV with an expiry, in uno-bot's words (ADR-030). Nothing from a DM feeds another person's job or the commitment detector's examples.
 
 

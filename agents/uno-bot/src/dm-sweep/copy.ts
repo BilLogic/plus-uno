@@ -16,6 +16,10 @@ import { SHARE_CHANNEL_NAMES, SWEEP_CARD_TTL_MS } from "../sweep/cards";
 import type { ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 
+/** The tag on the raise card, as on every post uno-bot makes in a DM, so the
+ *  next night reads it as uno-bot's own post and never as an answer. */
+export const DM_RAISE_EVENT = "uno_dm_raise";
+
 /** The tool the raise card runs: the group-DM share's, which posts only to
  *  #plus-design or #plus-universal (`tools/sweep-share-post.ts`). */
 export const RAISE_TOOL = "sweep_share_post";
@@ -78,9 +82,9 @@ export function raiseCard(o: {
   const operations: ProposalOperation[] = [{ toolName: RAISE_TOOL, input: { channel: o.channel, channel_name: where, text } }];
   const [a, b] = o.sources.map(plain);
   const lines = [
-    `${o.when} I noticed ${a} and ${b} disagree on ${plain(o.topic)}. Want me to raise it with the owner?`,
+    `${o.when} I noticed ${a} and ${b} disagree on ${plain(o.topic)}. Want me to post a note about it in ${where}?`,
     "",
-    `✅ posts exactly this note in ${where}. Nothing else from this DM goes with it: no quote, no names. ⛔ drops it.`,
+    `✅ posts exactly this note in ${where}. Nothing else from this DM goes with it: no quote, no names. React ⛔ to drop it.`,
     "",
     `In ${where}:`,
     `> ${text}`,

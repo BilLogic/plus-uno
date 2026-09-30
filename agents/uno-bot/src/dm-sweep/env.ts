@@ -94,13 +94,14 @@ export function dmAsksFor(
         const res = await postMessage(env, { channel: to.channel, thread_ts: to.threadTs, ...message });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
-      async postCard(to, card) {
+      async postCard(to, card, metadata) {
         const rendered = renderProposalCard(card);
         const res = await postMessage(env, {
           channel: to.channel,
           thread_ts: to.threadTs,
           text: rendered.text,
           blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+          metadata,
         });
         return res.ok && res.ts ? { ok: true, ts: res.ts, text: rendered.text } : { ok: false };
       },

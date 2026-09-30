@@ -8,7 +8,7 @@
 // drift and capture detectors over recorded replies, the real DM hook over a
 // recorded DM detector, the in-memory commitment store, and the real morning
 // commitment job with the DM handler.
-import { describe, it } from "node:test";
+import { beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { fakeProvider } from "../src/agent/providers/fake";
@@ -23,7 +23,8 @@ import {
   activeDms,
   answerDmAsk,
   DM_ASK_EVENT,
-  DM_RAISE_KEY,
+  DM_RAISE_EVENT,
+  raiseSlot,
   dmAsksDue,
   dmThreadHook,
   modelDmDetector,
@@ -33,6 +34,8 @@ import { runSweepJob, shadowedByPrivate, type PendingFinding, type SweepSource }
 import type { ScheduledJob } from "../src/scheduled/runs";
 import type { PendingProposal } from "../src/thread-state/index";
 import { renderProposalCard } from "../src/slack/proposal-render";
+import { resolveSignal } from "../src/gate/index";
+import { SWEEP_CARD_EVENT } from "../src/sweep/cards";
 import { at, BOT, DESIGN, msg, notionPage, sweepHarness, ts, UNIVERSAL, type FakeChannel } from "./helpers/sweep-harness";
 
 const DMS: ScheduledJob = { key: "sweep:dms", kind: "sweep-dms" };
@@ -93,9 +96,9 @@ function world(opts: {
         posts.push(posted);
         return { ok: true, ts: posted.ts };
       },
-      async postCard(to, card) {
+      async postCard(to, card, metadata) {
         const text = renderProposalCard(card).text;
-        const posted = { channel: to.channel, threadTs: to.threadTs, text, ts: nextTs() };
+        const posted = { channel: to.channel, threadTs: to.threadTs, text, ts: nextTs(), metadata };
         posts.push(posted);
         return { ok: true, ts: posted.ts, text };
       },
@@ -378,12 +381,13 @@ describe("C6: a disagreement uno-bot noticed while answering", () => {
     const card = w.posts[0]!;
     assert.equal(card.channel, DM);
     assert.equal(card.threadTs, root.ts);
-    assert.match(card.text, /Yesterday I noticed Figma and the code disagree on the warning colour\. Want me to raise it with the owner\?/);
+    assert.match(card.text, /Yesterday I noticed Figma and the code disagree on the warning colour\. Want me to post a note about it in #plus-universal\?/);
 
     const proposal = w.staged[0]!;
     assert.equal(proposal.channel, DM);
     assert.deepEqual(proposal.confirmers, [MAYA]);
-    assert.equal(proposal.supersedeKey, DM_RAISE_KEY);
+    assert.equal(proposal.supersedeKey, raiseSlot(rowsOf(w.store)[0]!.id));
+    assert.deepEqual(card.metadata, { event_type: DM_RAISE_EVENT, event_payload: { id: rowsOf(w.store)[0]!.id } }, "tagged as uno-bot's own post");
     assert.equal(proposal.operations!.length, 1);
     const op = proposal.operations![0]!;
     assert.equal(op.toolName, RAISE_TOOL);
@@ -545,5 +549,189 @@ describe("the DM list", () => {
     assert.match(sent[0]!.sql, /surface = 'assistant'/);
     assert.match(sent[0]!.sql, /test_traffic = 0/);
     assert.equal(sent[0]!.values[0], 1000);
+  });
+});
+
+// ── Review fixes ─────────────────────────────────────────────────────────────
+
+describe("uno-bot never reads its own posts back as new", () => {
+  // A fresh root each case: the cases move its latest reply.
+  let root = msg(MAYA, ts(29, 15), "What's our warning colour?", { reply_count: 1, latest_reply: ts(29, 15, 1) });
+  beforeEach(() => {
+    root = msg(MAYA, ts(29, 15), "What's our warning colour?", { reply_count: 1, latest_reply: ts(29, 15, 1) });
+  });
+  const answer = bot(ts(29, 15, 1), "Figma has warning at #FFB020, but the code's token is #715C00, so they disagree.", { thread_ts: root.ts });
+  const warning = { topic: "the warning colour", sources: ["Figma", "the code"], design_system: true, confidence: 0.9 };
+
+  it("a ⛔'d raise card is never offered again: its own post that night is context, not an answer", async () => {
+    const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
+    const w = world({ dm, dmReplies: [dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] })], now: at(29, 22) });
+    await w.endOfDay();
+    w.h.clock.now = at(30, 14, 5);
+    await w.morning();
+    const card = w.posts[0]!;
+    const proposal = w.staged[0]!;
+    const no = await resolveSignal(
+      { kind: "reaction", messageTs: proposal.proposalTs, channel: DM, thread: proposal.replyTs!, glyph: "no_entry", userId: MAYA },
+      { threadState: w.h.threadState },
+    );
+    assert.equal(no.outcome, "won");
+    assert.equal(no.execute, undefined, "⛔ posts nothing");
+    // The card, as Slack returns it that night: uno-bot's, tagged, and the
+    // newest thing in the thread — worded just like a disagreement.
+    dm.threads![root.ts] = [root, answer, bot(card.ts, card.text, { thread_ts: root.ts, metadata: card.metadata as never })];
+    root.latest_reply = card.ts;
+    w.h.clock.now = at(30, 22);
+    await w.endOfDay();
+    assert.equal(w.dmProvider.generated.length, 1, "nothing new in the thread, so no second read");
+    for (const day of [31, 32, 35]) {
+      w.h.clock.now = at(day, 14, 5);
+      await w.morning();
+    }
+    assert.equal(w.posts.length, 1, "never offered again");
+  });
+
+  it("the same disagreement said again in the thread is one offer", async () => {
+    const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
+    const later = msg(MAYA, ts(30, 16), "Which one should I use?", { thread_ts: root.ts });
+    const again = bot(ts(30, 16, 1), "Still the same: Figma and the code disagree on the warning colour.", { thread_ts: root.ts });
+    const w = world({
+      dm,
+      dmReplies: [
+        dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] }),
+        dmReply({ disagreements: [{ answer_ts: again.ts, ...warning, topic: "The warning colour." }] }),
+      ],
+      now: at(29, 22),
+    });
+    await w.endOfDay();
+    dm.threads![root.ts] = [root, answer, later, again];
+    root.latest_reply = again.ts;
+    w.h.clock.now = at(30, 22);
+    await w.endOfDay();
+    assert.equal(w.dmProvider.generated.length, 2);
+    assert.equal(rowsOf(w.store).length, 1);
+  });
+
+  it("a ⛔'d C7 card is never proposed again", async () => {
+    const recap = notionPage("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", {
+      title: "Recap PRD",
+      blocks: [{ id: "b-1", lastEditedTime: OLD, text: "The recap goes out daily." }],
+    });
+    const r = msg(MAYA, ts(29, 15), "We decided the recap goes weekly.", { reply_count: 1, latest_reply: ts(29, 15, 1) });
+    const a = bot(ts(29, 15, 1), `Noted: the <${recap.url}|Recap PRD> says daily.`, { thread_ts: r.ts });
+    const dm: FakeChannel = { kind: "dm", history: [r], threads: { [r.ts]: [r, a] } };
+    const finding = JSON.stringify({
+      findings: [
+        { source_url: recap.url, block_id: "b-1", source_says: "daily", thread_says: "weekly", replacement: "The recap goes out weekly.", evidence_ts: [r.ts], claimed_by: null, confidence: 0.9 },
+      ],
+    });
+    const w = world({ dm, dmReplies: [dmReply({ decisions: [{ message_ts: r.ts, confidence: 0.9 }] })], sweepReplies: [finding], sources: [recap], now: at(29, 22) });
+    await w.endOfDay();
+    w.h.clock.now = at(30, 14, 5);
+    await w.morning();
+    assert.equal(w.h.posted.length, 1);
+    const posted = w.h.posted[0]!;
+    const staged = w.h.staged[0]!;
+    await resolveSignal(
+      { kind: "reaction", messageTs: staged.proposalTs, channel: DM, thread: staged.replyTs ?? staged.threadTs, glyph: "no_entry", userId: MAYA },
+      { threadState: w.h.threadState },
+    );
+    for (const item of await w.h.store.itemsOnCard(posted.cardKey)) await w.h.store.updateItem(item.itemId, { status: "dropped" });
+    dm.threads![r.ts] = [r, a, bot(posted.ts, posted.text, { thread_ts: r.ts, metadata: { event_type: SWEEP_CARD_EVENT, event_payload: { card_key: posted.cardKey } } })];
+    r.latest_reply = posted.ts;
+    w.h.clock.now = at(30, 22);
+    await w.endOfDay();
+    assert.equal(w.dmProvider.generated.length, 1, "uno-bot's own card is no new message");
+    w.h.clock.now = at(31, 14, 5);
+    await w.morning();
+    assert.equal(w.h.posted.length, 1, "never proposed again");
+  });
+
+  it("a second raise in a thread keeps the first card live", async () => {
+    const both = bot(ts(29, 15, 1), "Figma and the code disagree on warning, and the PRD and the card disagree on the launch date.", { thread_ts: root.ts });
+    const w = world({
+      dm: { kind: "dm", history: [root], threads: { [root.ts]: [root, both] } },
+      dmReplies: [
+        dmReply({
+          disagreements: [
+            { answer_ts: both.ts, ...warning },
+            { answer_ts: both.ts, topic: "the launch date", sources: ["the PRD", "the Roadmap card"], design_system: false, confidence: 0.9 },
+          ],
+        }),
+      ],
+      now: at(29, 22),
+    });
+    await w.endOfDay();
+    w.h.clock.now = at(30, 14, 5);
+    await w.morning();
+    assert.equal(w.staged.length, 2);
+    for (const p of w.staged) assert.equal((await w.h.threadState.getProposalByTs(p.proposalTs)).state, "found");
+  });
+});
+
+describe("a DM ask waits behind a person's own asks", () => {
+  it("two DM asks and a \"remind me\" due: the \"remind me\" goes out this morning, first", async () => {
+    const store = createInMemoryCommitmentStore();
+    const base = {
+      channel: DM,
+      channelKind: "dm" as const,
+      threadTs: ts(29, 15),
+      messageTs: ts(29, 15, 1),
+      promiserId: MAYA,
+      requesterId: MAYA,
+      deadlineAt: null,
+      state: "open" as const,
+      nudges: 0,
+      snoozes: 0,
+      confidence: 0.9,
+      promisedAt: at(29, 15),
+      detectedAt: at(29, 22),
+      runDate: "2026-09-29",
+      nudgeTs: null,
+      followupTs: null,
+      checkedOn: null,
+      holds: 0,
+      remindedOn: null,
+      resolvedAt: null,
+    };
+    await store.addCommitments([
+      { ...base, id: `${DM}:a:unanswered`, kind: "dm_unanswered", dueAt: at(29, 22) },
+      { ...base, id: `${DM}:b:unanswered`, kind: "dm_unanswered", threadTs: ts(29, 16), dueAt: at(29, 22) },
+      { ...base, id: `${DM}:c:raise`, kind: "dm_disagreement", threadTs: ts(29, 17), dueAt: at(29, 22) },
+      { ...base, id: `${DM}:self`, kind: "self_reminder", dueAt: at(30, 14) },
+    ]);
+    for (const id of [`${DM}:a:unanswered`, `${DM}:b:unanswered`, `${DM}:self`]) await store.saveText(id, { what: "the ratio", bodies: {} }, at(60, 0));
+    await store.saveText(`${DM}:c:raise`, { what: "the warning colour", bodies: {}, raise: { sources: ["Figma", "the code"], to: "plus-universal" } }, at(60, 0));
+    const now = at(30, 14, 5);
+    const order: string[] = [];
+    const nudges = await runCommitmentNudges(NUDGE, {
+      slack: {
+        replies: async () => null,
+        history: async () => null,
+        permalink: async () => null,
+        async post(_to, message) {
+          order.push(`self: ${message.text}`);
+          return { ok: true, ts: "1.1" };
+        },
+        update: async () => true,
+      },
+      sources: { read: async () => null },
+      judge: { judge: async () => ({ ok: true, done: false, evidenceTs: [] }) },
+      store,
+      markThread: async () => {},
+      config: { unoBot: "C0UNOBOT", botUserId: BOT },
+      now: () => now,
+      runDate: "2026-09-30",
+      dm: {
+        async due(c) {
+          order.push(`dm: ${c.id}`);
+          await store.update(c.id, { state: "nudged", nudges: 1, remindedOn: "2026-09-30", checkedOn: "2026-09-30" });
+          return { id: c.id, action: "nudged" };
+        },
+      },
+    });
+    assert.ok(order[0]!.startsWith("self: "), `the "remind me" first: ${order.join(" | ")}`);
+    assert.equal(order.filter((o) => o.startsWith("dm: ")).length, 2, "the DM asks spend their own budget of two");
+    assert.equal(nudges.actions.length, 3);
   });
 });

@@ -204,6 +204,15 @@ export function createD1SweepRecords(deps: { db: SweepDatabase }): SweepRecords 
       const row = await db.prepare(SELECT_RUN).bind(runId).first<RunRow>();
       return row ? fromRunRow(row) : null;
     },
+    async handledRuns(runIds) {
+      if (!runIds.length) return [];
+      chargeD1Query();
+      const { results } = await db
+        .prepare("SELECT run_id FROM sweep_runs WHERE outcome = 'handled' AND run_id IN (SELECT value FROM json_each(?)) ORDER BY run_id")
+        .bind(JSON.stringify([...new Set(runIds)]))
+        .all<{ run_id: unknown }>();
+      return results.map((r) => String(r.run_id));
+    },
     async addItems(added) {
       if (!added.length) return;
       chargeD1Query();

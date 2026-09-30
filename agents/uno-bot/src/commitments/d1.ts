@@ -13,7 +13,7 @@
 
 import { chargeD1Query } from "../net";
 import type { SweepDatabase } from "../sweep/d1";
-import { CARD_KINDS, LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentRecords, type ReminderBudget } from "./store";
+import { LIVE_STATES, RAISED_KINDS, type CommitmentPatch, type CommitmentRecord, type CommitmentRecords, type ReminderBudget } from "./store";
 
 const COLUMNS = [
   "commitment_id",
@@ -67,9 +67,10 @@ const INSERT =
   `SELECT ${COLUMNS.map((c) => `json_extract(value, '$.${c}')`).join(", ")} FROM json_each(?) WHERE true ` +
   `ON CONFLICT (commitment_id) DO NOTHING`;
 const LIVE = LIVE_STATES.map((s) => `'${s}'`).join(", ");
-const IS_CARD = `kind IN (${CARD_KINDS.map((k) => `'${k}'`).join(", ")})`;
-// A person's own asks first, then card follow-ups; each passes over the
-// promisers its own budget has spent (`ReminderBudget`).
+const IS_CARD = `kind IN (${RAISED_KINDS.map((k) => `'${k}'`).join(", ")})`;
+// A person's own asks first, then what uno-bot raises on its own (card
+// follow-ups, DM asks); each passes over the promisers its own budget has
+// spent (`ReminderBudget`).
 const NEXT_DUE =
   `${SELECT} WHERE state IN (${LIVE}) AND due_at <= ? AND (checked_on IS NULL OR checked_on <> ?) ` +
   `AND CASE WHEN ${IS_CARD} THEN promiser_id NOT IN (SELECT value FROM json_each(?)) ` +

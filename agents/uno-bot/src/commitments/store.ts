@@ -88,17 +88,21 @@ export function isDmKind(kind: CommitmentKind): boolean {
   return DM_KINDS.includes(kind);
 }
 
+/** The kinds uno-bot raises on its own, which spend the `cards` budget. */
+export const RAISED_KINDS: readonly CommitmentKind[] = [...CARD_KINDS, ...DM_KINDS];
+
 /**
  * The two morning budgets a promiser's reminders count against: `asked`, what
  * a person asked for or promised (thread promises, "remind me"), and `cards`,
- * the card follow-ups uno-bot raises on its own. A card backlog spends only
- * its own budget, so it never pushes a person's own reminder back a morning.
+ * what uno-bot raises on its own — the card follow-ups and the DM asks. That
+ * backlog spends only its own budget and goes after a person's own asks, so it
+ * never pushes a person's own reminder back a morning.
  */
 export type ReminderBudget = "asked" | "cards";
 
 /** The budget a kind's reminders count against. */
 export function budgetOf(kind: CommitmentKind): ReminderBudget {
-  return isCardKind(kind) ? "cards" : "asked";
+  return isCardKind(kind) || isDmKind(kind) ? "cards" : "asked";
 }
 
 /** The promisers passed over for each budget. */
