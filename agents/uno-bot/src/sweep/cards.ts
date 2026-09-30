@@ -17,13 +17,18 @@
 // the card lives 72 hours, with no re-ping when it lapses. Each item names its
 // owner, who is @-mentioned; nobody else is.
 //
+// A GROUP DM'S CARD carries the pages it fixes (`sweepShareOf`), so that once
+// its ✅ has written one, a separate share card can offer a reworded note
+// (`./share.ts`). Its own ✅ applies the fix and nothing more. A private
+// channel's card carries nothing to share.
+//
 // PURE: no `Env`, no Slack call. The card is data (`ProposalCard`); Slack
 // renders it (`slack/proposal-render.ts`).
 
 import { typedEmojiDecision } from "../gate/reactions";
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, SweepShare } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
-import { pickDestination, type Destination } from "./finding";
+import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
 
 /** How long a sweep card stays confirmable. */
@@ -150,6 +155,29 @@ function stable(v: unknown): string {
       .join(",")}}`;
   }
   return JSON.stringify(v);
+}
+
+/** Slack's names for the two team channels a group DM's share goes to. */
+export const SHARE_CHANNEL_NAMES: Record<SweepShare["pages"][number]["to"], string> = {
+  "plus-universal": "#plus-universal",
+  "plus-design": "#plus-design",
+};
+
+/**
+ * The share a group-DM card carries, or undefined for a card from anywhere
+ * else: each page its fixes touch, once, in item order, with the team channel
+ * a note about it goes to (`shareDestination`).
+ *
+ * @param items - The card's findings
+ */
+export function sweepShareOf(items: readonly PendingFinding[]): SweepShare | undefined {
+  if (!items.length || !items.every((f) => f.evidence.channelKind === "group-dm")) return undefined;
+  const pages: SweepShare["pages"] = [];
+  for (const f of items) {
+    if (pages.some((p) => p.url === f.target.url)) continue;
+    pages.push({ url: f.target.url, title: f.target.title, to: shareDestination(f.target).channel });
+  }
+  return { pages };
 }
 
 /** One key per place a card can land: a thread, or a team channel. */

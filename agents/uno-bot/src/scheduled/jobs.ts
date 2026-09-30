@@ -31,7 +31,7 @@ import {
  *  budget stop is thrown through. */
 export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
 
-/** Both sweep kinds: one body, since `runSweepJob` tells them apart. The
+/** Every sweep kind: one body, since `runSweepJob` tells them apart. The
  *  end-of-day channel read hands each thread to commitment reminders too —
  *  that kind only: commitment reminders cover channel threads, not group DMs
  *  or any other conversation a sweep kind may read. */
@@ -62,6 +62,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // End of day, one per swept channel: read the day, keep its drift findings
   // for the morning (src/sweep/run.ts).
   "sweep-channel": sweepBody,
+  // End of day: the same, for every group DM uno-bot is in.
+  "sweep-group-dms": sweepBody,
   // Morning: the findings whose morning has come become proposal cards.
   "sweep-post": sweepBody,
   // End of day: label one batch of the channel asks still holding text, and

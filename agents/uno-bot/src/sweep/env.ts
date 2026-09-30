@@ -2,7 +2,10 @@
 //
 // What each port becomes:
 //   • Slack reads: `conversations.info` for the channel's kind, and
-//     `conversations.history` / `.replies` with the bot token.
+//     `conversations.history` / `.replies` with the bot token; for a private
+//     place, `conversations.members` when a Contributor is about to be named
+//     owner there; and `users.conversations` (`types=mpim`) for the group DMs
+//     uno-bot is in. The private allowlist is `SLACK_SEARCH_PRIVATE_ALLOWLIST`.
 //   • Source reads: Notion through `readNotionPage`, which keeps each block's
 //     id and `last_edited_time` for the replace; GitHub, Figma and canvases
 //     through `source_read`'s own executor, as read-only context.
@@ -20,6 +23,9 @@
 //     proposal renderer and tagged with its key in message metadata, and
 //     `ThreadState.putProposal`. A card is found again by that tag
 //     (`include_all_metadata`), and withdrawn with `chat.update`.
+//   • A group DM's share: once its fix card's ✅ has written a page, a
+//     separate share card posted and staged in the same thread
+//     (`offerSweepShareFor`); its own ✅ runs `sweep_share_post`.
 //
 // THE BUDGET, AT EVERY READ. A read that ran into the lookup ceiling may come
 // back short rather than throw — a paging loop that stopped, an executor that
@@ -41,8 +47,10 @@ import {
 } from "../net";
 import { canonicalNotionUrl, parseNotionPageId, readNotionPage, stripBlockPrefix } from "../integrations/notion";
 import {
+  botConversations,
   conversationsHistorySince,
   conversationsInfo,
+  conversationsMembers,
   conversationsReplies,
   getBotIdentity,
   getPermalink,
@@ -64,7 +72,8 @@ import { markSweepThread } from "./thread-mark";
 import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
-import { SWEEP_CARD_EVENT, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
+import { SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
+import { stageSweepShare } from "./share";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
@@ -79,6 +88,8 @@ const QUEUE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 /** The key itself outlives its newest finding by the same week. */
 const QUEUE_TTL_SECONDS = QUEUE_MAX_AGE_MS / 1000;
 const CONTEXT_TEXT_CAP = 4_000;
+/** Pages of 200 read for a member list or the bot's group DMs. */
+const LIST_PAGES = 5;
 
 
 /**
@@ -127,6 +138,31 @@ export function sweepSlackFor(env: Env): SweepDeps["slack"] {
       if (!res.ok) return null;
       const next = res.response_metadata?.next_cursor;
       return { messages: res.messages ?? [], ...(next ? { nextCursor: next } : {}) };
+    },
+    async members(channel) {
+      const ids: string[] = [];
+      let cursor: string | undefined;
+      for (let i = 0; i < LIST_PAGES; i++) {
+        const res = await measured(() => conversationsMembers(env, channel, 200, cursor));
+        if (!res.ok) return null;
+        ids.push(...(res.members ?? []));
+        cursor = res.response_metadata?.next_cursor;
+        if (!cursor) return ids;
+      }
+      // Cut off: the list is partial, and a partial list names no one outside it.
+      return ids;
+    },
+    async groupDms() {
+      const ids: string[] = [];
+      let cursor: string | undefined;
+      for (let i = 0; i < LIST_PAGES; i++) {
+        const res = await measured(() => botConversations(env, "mpim", cursor));
+        if (!res.ok) return null;
+        ids.push(...(res.channels ?? []).map((c) => c.id ?? "").filter(Boolean));
+        cursor = res.response_metadata?.next_cursor;
+        if (!cursor) break;
+      }
+      return ids;
     },
   };
 }
@@ -212,7 +248,7 @@ async function sweepDepsFor(
         }
         return { state: "unknown", why: `more than ${FIND_POSTED_PAGES} pages to search` };
       },
-      async stage(proposal) {
+      async stage(proposal, channelKind) {
         await stageSweepCard(
           proposal,
           {
@@ -221,6 +257,7 @@ async function sweepDepsFor(
             markThread: (channel, thread) => markSweepThread(kv, channel, thread),
           },
           Date.now(),
+          channelKind,
         );
       },
       async cardState(proposalTs) {
@@ -247,6 +284,10 @@ async function sweepDepsFor(
       unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
       figmaLibraryKey: env.FIGMA_FILE_KEY?.trim() || undefined,
       botUserId: bot?.userId ?? null,
+      privateAllowlist: (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean),
     },
     meter: { subrequests: subrequestsUsed, d1Queries: d1QueriesUsed, headroom: budgetHeadroom },
     now: () => Date.now(),
@@ -273,6 +314,45 @@ export async function recordSweepResolutionFor(
   } catch (err) {
     console.error(`[sweep] outcome of ${proposal.proposalTs} not recorded: ${err instanceof Error ? err.message : String(err)}`);
   }
+}
+
+/**
+ * Offer a group DM's share once its fix card's ✅ has run (`stageSweepShare`):
+ * a separate card in the same thread showing the note and naming its team
+ * channel, staged for the fix card's confirmers. Nothing for a card from
+ * anywhere else, a revision, or a batch that wrote nothing.
+ *
+ * @param env - Carries the team channels' ids
+ * @param proposal - The confirmed fix card
+ * @param outcomes - What its batch ran
+ */
+export async function offerSweepShareFor(
+  env: Env,
+  proposal: PendingProposal,
+  outcomes: readonly OperationOutcome[],
+): Promise<void> {
+  if (!proposal.sweepShare) return;
+  await stageSweepShare(proposal, outcomes, {
+    channels: {
+      plusDesign: env.PLUS_DESIGN_CHANNEL_ID,
+      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID,
+      unoBot: env.UNO_BOT_CHANNEL_ID,
+    },
+    async post(to, card) {
+      const rendered = renderProposalCard(card);
+      const res = await postMessage(env, {
+        channel: to.channel,
+        thread_ts: to.threadTs,
+        text: rendered.text,
+        blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+        metadata: sweepPostMetadata("note"),
+      });
+      return res.ok && res.ts ? { ok: true, ts: res.ts, text: rendered.text } : { ok: false };
+    },
+    threadState: threadStateFor(env),
+    proposalEvents: proposalEventLogFor(env),
+    now: () => Date.now(),
+  });
 }
 
 /**

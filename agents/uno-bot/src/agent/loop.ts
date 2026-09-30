@@ -292,7 +292,11 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       // Fires when the lookup ceiling is already reached, or the tool-count
       // backstop is hit. LOOKUPS only — side-effect tools are peeled off by the
       // caller and stay allowed even when the lookup budget is spent.
-      if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
+      if (rowFor(call.name)?.access === "worker") {
+        // Only the Worker stages a `worker` tool; the model is never offered
+        // one, so a call to it is refused here, before any dispatch.
+        text = JSON.stringify({ ok: false, error: `'${call.name}' is not a tool you can call` });
+      } else if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
         text = budgetRefusedResult();
       } else {
         toolCallsUsed++;
