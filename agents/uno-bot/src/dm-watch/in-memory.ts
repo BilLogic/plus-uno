@@ -28,8 +28,11 @@ export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
       if (mine.size) switches.set(userId, mine);
       else switches.delete(userId);
     },
-    async watchers() {
-      return [...switches.keys()].sort();
+    async watchers(features) {
+      return [...switches.entries()]
+        .filter(([, mine]) => !features || features.some((f) => mine.has(f)))
+        .map(([user]) => user)
+        .sort();
     },
     async positions(userId) {
       return Object.fromEntries(Object.entries(read.get(userId) ?? {}).map(([k, v]) => [k, { ...v }]));

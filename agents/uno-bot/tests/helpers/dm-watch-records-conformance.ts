@@ -7,7 +7,7 @@
 // (`tests/workerd/dm-watch-records.conformance.test.ts`).
 import assert from "node:assert/strict";
 
-import type { DmCommitmentRecord, DmWatchRecords } from "../../src/dm-watch/store";
+import { positionScope, type DmCommitmentRecord, type DmWatchRecords } from "../../src/dm-watch/store";
 
 export interface ConformanceRunner {
   it(name: string, fn: () => Promise<void>): void;
@@ -65,6 +65,21 @@ export function runDmWatchRecordsConformance(label: string, make: () => DmWatchR
     assert.deepEqual((await r.switches("U0MAYA")).map((s) => s.feature), ["promises_to_me"]);
     await r.setSwitch("U0MAYA", "promises_to_me", false, { now: 500, readThrough: "500.000000" });
     assert.deepEqual(await r.watchers(), []);
+  });
+
+  it("watchers narrow to the switches named, and each switch's job keeps its own read positions", async () => {
+    const r = make();
+    await r.setSwitch("U0MAYA", "promises_made", true, { now: 100, readThrough: "100.000000" });
+    await r.setSwitch("U0BEA", "dm_capture", true, { now: 100, readThrough: "100.000000" });
+    assert.deepEqual(await r.watchers(), ["U0BEA", "U0MAYA"]);
+    assert.deepEqual(await r.watchers(["promises_made", "promises_to_me"]), ["U0MAYA"]);
+    assert.deepEqual(await r.watchers(["dm_capture"]), ["U0BEA"]);
+    const at = { through: "10.000000", upTo: null };
+    await r.savePositions(positionScope("U0BEA", "dm_capture"), { D0MAYA: at });
+    assert.deepEqual(await r.positions(positionScope("U0BEA", "promises_made")), {});
+    assert.deepEqual(await r.positions(positionScope("U0BEA", "dm_capture")), { D0MAYA: at });
+    await r.clearPositions(positionScope("U0BEA", "promises_made"));
+    assert.deepEqual(await r.positions(positionScope("U0BEA", "dm_capture")), { D0MAYA: at });
   });
 
   it("keeps how far each DM was read, per person, upserted in one go, and forgets them on request", async () => {

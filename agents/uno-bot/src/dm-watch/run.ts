@@ -63,8 +63,11 @@ import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnoo
 import { LIVE_STATES } from "../commitments/store";
 import { madeFollowUpText, madeToAcknowledgement, MADE_LAST_LEGEND, MADE_TO_LAST_LEGEND, MADE_TO_LEGEND, madeToFollowUpText, madeToText } from "./copy";
 import {
+  CAPTURE_FEATURE,
   DM_WATCH_FEATURES,
   featureOf,
+  positionScope,
+  PROMISE_FEATURES,
   isDmWatchFeature,
   postsAllowed,
   type DmCommitmentKind,
@@ -197,7 +200,13 @@ export interface SetDmWatchResult {
 export async function setDmWatch(
   userId: string,
   selected: readonly DmWatchFeature[],
-  deps: { records: DmWatchRecords; access(userId: string): Promise<DmAccess>; now(): number },
+  deps: {
+    records: DmWatchRecords;
+    access(userId: string): Promise<DmAccess>;
+    now(): number;
+    /** DM Capture went off: drop what it found and has not yet carded. */
+    dropCapture?(userId: string): Promise<void>;
+  },
 ): Promise<SetDmWatchResult> {
   const now = deps.now();
   const on = new Set((await deps.records.switches(userId)).map((s) => s.feature));
@@ -212,10 +221,15 @@ export async function setDmWatch(
     } else if (!want && on.has(feature)) {
       await deps.records.setSwitch(userId, feature, false, { now, readThrough: tsOf(now) });
       await deps.records.lapseLive(userId, PROMISE_KINDS.filter((k) => featureOf(k) === feature), now);
+      if (feature === CAPTURE_FEATURE) {
+        await deps.records.clearPositions(positionScope(userId, feature));
+        await deps.dropCapture?.(userId);
+      }
       on.delete(feature);
     }
   }
-  if (!on.size) await deps.records.clearPositions(userId);
+  // The promise jobs' positions go once neither promise switch is on.
+  if (!PROMISE_FEATURES.some((f) => on.has(f))) await deps.records.clearPositions(userId);
   const result: SetDmWatchResult = { on: DM_WATCH_FEATURES.filter((f) => on.has(f)) };
   return access && !access.ok ? { ...result, refused: access } : result;
 }
@@ -374,7 +388,7 @@ export async function runDmPromiseRead(job: ScheduledJob, deps: DmReadDeps): Pro
 
 /** Every DM of the owner's, page by page, up to `MAX_IM_PAGES`; null when the
  *  list cannot be read. */
-async function listIms(api: OwnerSlack): Promise<{ channels: { id: string; user: string }[]; complete: boolean } | null> {
+export async function listIms(api: OwnerSlack): Promise<{ channels: { id: string; user: string }[]; complete: boolean } | null> {
   const channels: { id: string; user: string }[] = [];
   let cursor: string | undefined;
   for (let page = 0; page < MAX_IM_PAGES; page++) {
@@ -399,7 +413,7 @@ async function listIms(api: OwnerSlack): Promise<{ channels: { id: string; user:
  * any length drains over nights. At most `MAX_HISTORY_PAGES` reads. Null when
  * Slack would not say and nothing was read.
  */
-async function readForward(
+export async function readForward(
   api: OwnerSlack,
   channel: string,
   at: { since: string; upTo: string | null; latest: string },
@@ -709,11 +723,11 @@ async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): P
 
 // ── Shared ───────────────────────────────────────────────────────────────────
 
-type Ready = { ok: true; api: OwnerSlack; url: string } | { ok: false; reason: Exclude<DmAccess, { ok: true }>["reason"]; note: string };
+export type Ready = { ok: true; api: OwnerSlack; url: string } | { ok: false; reason: Exclude<DmAccess, { ok: true }>["reason"]; note: string };
 
 /** The owner's reads when their token can run the job; otherwise why not,
  *  logged once. */
-async function ready(user: string, deps: Common): Promise<Ready> {
+export async function ready(user: string, deps: Pick<Common, "ownerSlack" | "log">): Promise<Ready> {
   const access = await accessOf(user, deps.ownerSlack);
   if (access.ok) return access;
   let note = "no connected token";
@@ -724,7 +738,7 @@ async function ready(user: string, deps: Common): Promise<Ready> {
 }
 
 /** A person's messages, oldest first. */
-function humans(messages: readonly SweepSlackMessage[], botUserId: string | null): SweepMessage[] {
+export function humans(messages: readonly SweepSlackMessage[], botUserId: string | null): SweepMessage[] {
   return messages
     .filter((m) => !m.bot_id && m.user && m.user !== botUserId && (!m.subtype || m.subtype === "thread_broadcast"))
     .map((m) => ({ ts: m.ts, user: m.user ?? "", text: m.text ?? "" }))
@@ -752,7 +766,7 @@ function reporter(kind: DmJobReport["kind"], job: ScheduledJob) {
   });
 }
 
-function ensureHeadroom(deps: Pick<Common, "meter">, need: { subrequests: number; d1Queries: number }): void {
+export function ensureHeadroom(deps: Pick<Common, "meter">, need: { subrequests: number; d1Queries: number }): void {
   const left = deps.meter?.headroom() ?? { subrequests: Infinity, d1Queries: Infinity };
   if (left.d1Queries < need.d1Queries) throw new D1QueryBudgetError(need.d1Queries);
   if (left.subrequests < need.subrequests) throw new SubrequestBudgetError(need.subrequests);

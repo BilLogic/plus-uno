@@ -16,6 +16,7 @@ import type { DmWatchFeature } from "./store";
 export const DM_WATCH_LABELS: Readonly<Record<DmWatchFeature, string>> = {
   promises_made: "Remind me about promises I make in my DMs",
   promises_to_me: "Tell me when a promise made to me in my DMs looks overdue",
+  dm_capture: "Catch decisions from my DMs",
 };
 
 /** The legend under a reminder about a promise made to the owner. */
