@@ -79,8 +79,9 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/connectors/slack.md`](docs/connectors/slack.md) | Pillar → channel map (group announcements; all private — uno-bot must be invited before posting/@here): Universal → #plus-universal C072E8SFLKV · Admin → #plus-admin C089A3E9CCW · |
 | [`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md) | The Storybook MCP endpoint — the primary interface to the design system while Storybook runs, plus the story-authoring conventions that keep it useful. |
 | [`docs/connectors/supabase/blueprint-direct-access.md`](docs/connectors/supabase/blueprint-direct-access.md) | Query recipes and service-key notes for agents that read the blueprint's database directly rather than through the portal — the supplement to blueprint.md, which it adds to |
-| [`docs/connectors/supabase/blueprint-navigation.md`](docs/connectors/supabase/blueprint-navigation.md) | uno-bot's voice over the blueprint — citation shape, confidence language, absence behaviour and source routing; the blueprint's own account of its shape and schema is blueprint.md beside this file |
-| [`docs/connectors/supabase/blueprint.md`](docs/connectors/supabase/blueprint.md) | What this blueprint is, how to retrieve from it, what absence and status mean, and how paths relate to a scenario's main route — the hand-written core — followed by the vocabulary and the schema, rendered from the code and the catalog. |
+| [`docs/connectors/supabase/blueprint-navigation.md`](docs/connectors/supabase/blueprint-navigation.md) | uno-bot's voice over the blueprint — citation shape, confidence language, absence behaviour and source routing; the blueprint's own account of its shape is blueprint.md beside this file, its schema blueprint-schema.md |
+| [`docs/connectors/supabase/blueprint-schema.md`](docs/connectors/supabase/blueprint-schema.md) | Every blueprint table and column as the database catalog describes it, and the tables only a service key reads — the schema section of blueprint.md, disclosed |
+| [`docs/connectors/supabase/blueprint.md`](docs/connectors/supabase/blueprint.md) | What this blueprint is, how to retrieve from it, what absence and status mean, how paths relate to a scenario's main route, and the vocabulary — the hand-written core, always loaded; the schema is blueprint-schema.md beside it |
 | [`docs/connectors/supabase/overview.md`](docs/connectors/supabase/overview.md) | Two hard rules, every row: never merge two sources into one unattributed answer — surface the conflict instead of blending it — and never fabricate a blueprint citation, the worst |
 
 ## Design system
@@ -214,6 +215,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-143 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+144 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.

@@ -58,6 +58,14 @@
 // own truth is the chain it arrives by: plus-uno-blueprint's
 // `check:agent-account` fails when the catalog and the render disagree, and
 // `sync-blueprint-contract.mjs --check` fails when the vendored bytes differ.
+//
+// THE SCHEMA LEFT THE PROMPT (#858). The sync now vendors the account as two
+// docs: the hand-written core, still in the prompt, and the `generated:schema`
+// region as `blueprint-schema.md`, disclosed behind `read_reference`. The
+// allowlist is read from that file directly. The swept subject still carries
+// the catalog, because harness-bundle.md appends every disclosed reference
+// after the prompt, but the prompt proper — up to the first reference marker —
+// no longer does.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -77,6 +85,12 @@ import { INDEX_LEGEND } from "../src/integrations/blueprint-index";
 const REPO = resolve(process.cwd(), "..", "..");
 const BOT = resolve(REPO, "agents", "uno-bot");
 const ACCOUNT = resolve(REPO, "docs", "connectors", "supabase", "blueprint.md");
+const SCHEMA = resolve(REPO, "docs", "connectors", "supabase", "blueprint-schema.md");
+
+/** The allowlist: the disclosed schema's catalog, table → columns. */
+function catalog(): Map<string, Set<string>> {
+  return schemaTables(readFileSync(SCHEMA, "utf8"));
+}
 const PROMPT_MARKER = "## The assembled prompt";
 const SCHEMA_OPEN = /<!-- generated:schema[^>]*-->/;
 const SCHEMA_CLOSE = "<!-- /generated:schema -->";
@@ -365,10 +379,15 @@ test("the sweep bites — a retired name in prose is caught", () => {
 
 // ── The allowlist (#412) ─────────────────────────────────────────────────────
 
-test("the vendored account is in the prompt, and its catalog parses", () => {
+test("the account's core is in the prompt, its schema is disclosed, and the catalog parses", () => {
   const prompt = assembledPrompt();
-  assert.ok(prompt.includes("<!-- docs/connectors/supabase/blueprint.md -->"), "the account must be bundled");
-  const schema = schemaTables(prompt);
+  assert.ok(prompt.includes("<!-- docs/connectors/supabase/blueprint.md -->"), "the account's core must be bundled");
+  const proper = prompt.slice(0, prompt.indexOf("<!-- reference: "));
+  assert.equal(schemaTables(proper).size, 0, "the catalog rides behind read_reference, not in the prompt");
+  assert.match(prompt, /`docs\/connectors\/supabase\/blueprint-schema` — `read_reference` it/, "the core points at the schema");
+  const references = readFileSync(resolve(BOT, "src", "generated", "references.ts"), "utf8");
+  assert.ok(references.includes('"docs/connectors/supabase/blueprint-schema"'), "the schema ships in the reference map");
+  const schema = catalog();
   assert.ok(schema.size >= 10, `expected the rendered catalog, got ${schema.size} table(s)`);
   for (const [table, columns] of [
     ["cells", ["content", "summary", "frame", "status", "lane_id", "step_id", "path_id"]],
@@ -381,17 +400,17 @@ test("the vendored account is in the prompt, and its catalog parses", () => {
 });
 
 test("every qualified identifier in the assembled prompt resolves against the account", () => {
-  const schema = schemaTables(assembledPrompt());
+  const schema = catalog();
   assert.deepEqual(unresolved(assembledPrompt(), schema, "harness-bundle.md"), []);
 });
 
 test("every qualified identifier in the tool schemas resolves against the account", () => {
-  const schema = schemaTables(assembledPrompt());
+  const schema = catalog();
   assert.deepEqual(unresolved(toolDefinitions(), schema, "tool-definitions.json"), []);
 });
 
 test("the allowlist bites — a column the schema lacks is caught, on a table it has", () => {
-  const schema = schemaTables(readFileSync(ACCOUNT, "utf8"));
+  const schema = catalog();
   assert.deepEqual(unresolved("read `cells.picture` first, then `cells.colour`.", schema, "planted"), [
     "planted:1 names `cells.picture`, which the schema lacks",
     "planted:1 names `cells.colour`, which the schema lacks",
@@ -402,15 +421,18 @@ test("the allowlist bites — a column the schema lacks is caught, on a table it
 
 test("the blocklist bites in the account's hand-written part, and is silent inside its catalog", () => {
   const account = readFileSync(ACCOUNT, "utf8");
+  const disclosed = readFileSync(SCHEMA, "utf8");
   // The catalog names live columns that share a retired spelling. Correct
   // there — and this is what exempting the region buys.
   assert.deepEqual(offenders(account, "account"), []);
+  assert.deepEqual(offenders(disclosed, "schema"), []);
   // A retired name planted in the hand-written part: caught.
   const planted = account.replace("## What it is", "## What it is\n\nRead `path_type` first.");
   assert.equal(offenders(planted, "account").length, 1);
   assert.match(offenders(planted, "account")[0]!, /names `path_type`/);
   // Planted inside the catalog: not this sweep's finding — the catalog's truth
   // is the blueprint's check:agent-account and the sync's drift gate.
-  const inCatalog = account.replace("### `cells`", "### `cells`\nRead `path_type` first.");
-  assert.deepEqual(offenders(inCatalog, "account"), []);
+  const inCatalog = disclosed.replace("### `cells`", "### `cells`\nRead `path_type` first.");
+  assert.notEqual(inCatalog, disclosed, "the plant landed");
+  assert.deepEqual(offenders(inCatalog, "schema"), []);
 });
