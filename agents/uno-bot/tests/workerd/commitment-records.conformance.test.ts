@@ -38,9 +38,23 @@ describe("[d1] the commitments migration", () => {
       await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01");
       await records.byReminderTs("111.1");
       await records.update(commitmentRow().id, { state: "nudged" });
+      await records.latestAnswers("C0DESIGN", 3);
       return d1QueriesUsed();
     });
-    expect(spent).toBe(4);
+    expect(spent).toBe(5);
+  });
+
+  it("refuses a place outside the four kinds, and reads a row from before 0007 as public", async () => {
+    const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
+    await expect(records.addCommitments([commitmentRow({ channelKind: "shared" as never })])).rejects.toThrow(/CHECK/);
+    const row = commitmentRow();
+    await bindings.USAGE_DB.prepare(
+      "INSERT INTO commitments (commitment_id, kind, channel_id, thread_ts, message_ts, promiser_id, due_at, state, confidence, promised_at, detected_at, run_date) " +
+        "VALUES (?, 'thread_promise', ?, ?, ?, ?, 1, 'done', 0.9, 1, 1, '2026-09-29')",
+    )
+      .bind(row.id, row.channel, row.threadTs, row.messageTs, row.promiserId)
+      .run();
+    expect((await records.get(row.id))?.channelKind).toBe("public");
   });
 
   it("refuses a state outside the lifecycle", async () => {
@@ -58,6 +72,9 @@ describe("[d1] the commitments migration", () => {
     expect(await plan("SELECT commitment_id FROM commitments WHERE state IN ('open') AND due_at <= 5")).toMatch(
       /commitments_by_due/,
     );
+    expect(
+      await plan("SELECT commitment_id FROM commitments WHERE state = 'done' AND (channel_kind = 'public' OR channel_id = 'C') ORDER BY resolved_at DESC LIMIT 3"),
+    ).toMatch(/commitments_by_answer/);
   });
 
   it("holds no text column: ids, times, a state and counts", async () => {

@@ -6,6 +6,11 @@
 // beside its parse because the two are one contract: anything off the shape is
 // dropped, never repaired.
 //
+// LEARNING FROM ANSWERS: the detector's prompt may open with a few earlier
+// commitments people answered 🤔 (not a promise) or 🙌 (done), as the
+// detector's own summaries (`fewShotBlock`). Built from the store at run time
+// (`./run.ts`), never from a prompt file, and absent when there are none.
+//
 // WHAT THE DETECTOR'S PARSE REFUSES:
 //   • a message that is not one of tonight's new messages — an old promise was
 //     read the night it was made, and a row already there keeps its state;
@@ -91,9 +96,19 @@ export interface DetectedCommitment {
 
 export type CommitmentDetection = { ok: true; commitments: DetectedCommitment[] } | { ok: false; error: string };
 
+/**
+ * One earlier commitment and how its promiser answered its reminder: 🙌 done
+ * (a real promise) or 🤔 not a promise (a misreading). The detector's own
+ * short summary only — never a quote, and never a DM's for a channel.
+ */
+export interface FewShotExample {
+  answer: "done" | "not_promise";
+  what: string;
+}
+
 /** The detector as the sweep's thread hook takes it. */
 export interface CommitmentDetector {
-  detect(input: { thread: SweepThread; since: string }): Promise<CommitmentDetection>;
+  detect(input: { thread: SweepThread; since: string; examples?: readonly FewShotExample[] }): Promise<CommitmentDetection>;
 }
 
 /** What the judge is shown about one promise. */
@@ -137,17 +152,19 @@ export function mayHoldPromise(messages: readonly SweepMessage[], since: string)
  * @param provider - The model seam; asked at most once, on the `chill` tier
  * @param input.thread - The thread, human messages only, root first
  * @param input.since - The channel's cursor: messages after it are new
+ * @param input.examples - Earlier answers to learn from (`fewShotBlock`); none
+ *   leaves the prompt as it is
  */
 export async function detectCommitments(
   provider: ModelProvider,
-  input: { thread: SweepThread; since: string },
+  input: { thread: SweepThread; since: string; examples?: readonly FewShotExample[] },
 ): Promise<CommitmentDetection> {
   if (!mayHoldPromise(input.thread.messages, input.since)) return { ok: true, commitments: [] };
   const shown = withinChars(input.thread.messages, input.thread.rootTs);
   const reply = await provider.generate({
     tier: COMMITMENT_TIER,
     system: COMMITMENT_DETECTOR_SYSTEM,
-    prompt: detectorPrompt(shown, input.since),
+    prompt: withExamples(input.examples ?? [], detectorPrompt(shown, input.since)),
     maxTokens: MAX_TOKENS,
   });
   if (!reply.ok) return { ok: false, error: reply.message };
@@ -161,6 +178,28 @@ export function detectorPrompt(messages: readonly SweepMessage[], since: string)
     lines.push(`${isNew(m.ts, since) ? "NEW " : ""}[${m.ts}] <@${m.user}>: ${cap(m.text, MAX_MESSAGE_CHARS)}`);
   }
   return lines.join("\n");
+}
+
+/**
+ * What people answered earlier reminders, as the detector reads it ahead of
+ * the thread: the 🤔 misreadings to steer clear of, then the 🙌 promises that
+ * were real, each list in the order given (newest first). No examples, no
+ * block — the empty string.
+ */
+export function fewShotBlock(examples: readonly FewShotExample[]): string {
+  const of = (answer: FewShotExample["answer"]) => examples.filter((e) => e.answer === answer).map((e) => `- ${e.what}`);
+  const misread = of("not_promise");
+  const kept = of("done");
+  if (!misread.length && !kept.length) return "";
+  const lines = ["PAST ANSWERS (how promisers answered earlier reminders; summaries, newest first):"];
+  if (misread.length) lines.push("Marked NOT a promise — do not report messages like these:", ...misread);
+  if (kept.length) lines.push("Marked done — real commitments like these:", ...kept);
+  return lines.join("\n");
+}
+
+function withExamples(examples: readonly FewShotExample[], prompt: string): string {
+  const block = fewShotBlock(examples);
+  return block ? `${block}\n\n${prompt}` : prompt;
 }
 
 /**

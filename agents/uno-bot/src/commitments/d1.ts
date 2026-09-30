@@ -1,5 +1,6 @@
 // The D1 commitment records — `commitments` in the usage database
-// (migrations/usage/0006_commitments.sql).
+// (migrations/usage/0006_commitments.sql, and 0007_commitment_answers.sql for
+// where each promise was made).
 //
 // As the sweep's records do (`sweep/d1.ts`): every statement prepared with
 // bound parameters and charged to the meter BEFORE it is sent
@@ -16,6 +17,7 @@ const COLUMNS = [
   "commitment_id",
   "kind",
   "channel_id",
+  "channel_kind",
   "thread_ts",
   "message_ts",
   "promiser_id",
@@ -69,7 +71,13 @@ const REMINDED_ON = "SELECT promiser_id, COUNT(*) AS n FROM commitments WHERE re
 const LIVE_IN_THREAD =
   `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND state IN (${LIVE}) ` +
   `ORDER BY promised_at, commitment_id LIMIT 1`;
-const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
+// One statement for both answers: each capped on its own, then merged newest
+// first. A row from a DM or another private place never matches.
+const answers = (state: "done" | "not_promise") =>
+  `SELECT * FROM (${SELECT} WHERE state = '${state}' AND (channel_kind = 'public' OR channel_id = ?) ` +
+  `ORDER BY resolved_at DESC, commitment_id DESC LIMIT ?)`;
+const LATEST_ANSWERS = `${answers("done")} UNION ALL ${answers("not_promise")} ORDER BY resolved_at DESC, commitment_id DESC`;
+const BY_REMINDER =`${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
@@ -79,6 +87,7 @@ function toRow(r: CommitmentRecord): Row {
     commitment_id: r.id,
     kind: r.kind,
     channel_id: r.channel,
+    channel_kind: r.channelKind,
     thread_ts: r.threadTs,
     message_ts: r.messageTs,
     promiser_id: r.promiserId,
@@ -106,6 +115,7 @@ function fromRow(row: Row): CommitmentRecord {
     id: String(row.commitment_id),
     kind: row.kind as CommitmentRecord["kind"],
     channel: String(row.channel_id),
+    channelKind: row.channel_kind as CommitmentRecord["channelKind"],
     threadTs: String(row.thread_ts),
     messageTs: String(row.message_ts),
     promiserId: String(row.promiser_id),
@@ -150,6 +160,12 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
     },
     liveInThread: (channel, threadTs, promiserId) => first(LIVE_IN_THREAD, channel, threadTs, promiserId),
     byReminderTs: (ts) => first(BY_REMINDER, ts, ts),
+    async latestAnswers(channel, limit) {
+      if (limit <= 0) return [];
+      chargeD1Query();
+      const { results } = await db.prepare(LATEST_ANSWERS).bind(channel, limit, channel, limit).all<Row>();
+      return results.map(fromRow);
+    },
     async update(id, patch) {
       const sets: string[] = [];
       const values: unknown[] = [];

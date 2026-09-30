@@ -19,6 +19,7 @@ export function commitmentRow(over: Partial<CommitmentRecord> = {}): CommitmentR
     id: "C0DESIGN:1790694600.000200",
     kind: "thread_promise",
     channel: "C0DESIGN",
+    channelKind: "public",
     threadTs: "1790694000.000100",
     messageTs: "1790694600.000200",
     promiserId: "U0MAYA",
@@ -54,7 +55,7 @@ export function runCommitmentRecordsConformance(
     const row = commitmentRow();
     await records.addCommitments([row]);
     assert.deepEqual(await records.get(row.id), row);
-    const bare = commitmentRow({ id: "C0DESIGN:2", messageTs: "2", requesterId: null, deadlineAt: null });
+    const bare = commitmentRow({ id: "C0DESIGN:2", messageTs: "2", requesterId: null, deadlineAt: null, channelKind: "private" });
     await records.addCommitments([bare]);
     assert.deepEqual(await records.get(bare.id), bare);
     assert.equal(await records.get("C0DESIGN:missing"), null);
@@ -150,5 +151,31 @@ export function runCommitmentRecordsConformance(
       dueAt: 42,
       checkedOn: "2026-10-01",
     });
+  });
+
+  it("the latest answers: each of 🙌 and 🤔 capped, newest first, public or this channel's own", async () => {
+    const records = make();
+    await records.addCommitments([
+      commitmentRow({ id: "C:done1", state: "done", resolvedAt: 10 }),
+      commitmentRow({ id: "C:done2", state: "done", resolvedAt: 30 }),
+      commitmentRow({ id: "C:done3", state: "done", resolvedAt: 20 }),
+      commitmentRow({ id: "C:nope1", state: "not_promise", resolvedAt: 15 }),
+      commitmentRow({ id: "C:nope2", state: "not_promise", resolvedAt: 25 }),
+      commitmentRow({ id: "C:nope3", state: "not_promise", resolvedAt: 5 }),
+      commitmentRow({ id: "C:dropped", state: "dropped", resolvedAt: 99 }),
+      commitmentRow({ id: "C:auto", state: "auto_done", resolvedAt: 99 }),
+      commitmentRow({ id: "C:open", state: "open" }),
+      commitmentRow({ id: "D:dm", channel: "D0MAYA", channelKind: "dm", state: "done", resolvedAt: 99 }),
+      commitmentRow({ id: "G:group", channel: "C0GROUP", channelKind: "group-dm", state: "not_promise", resolvedAt: 99 }),
+      commitmentRow({ id: "P:mine", channel: "C0PRIV", channelKind: "private", state: "done", resolvedAt: 40 }),
+      commitmentRow({ id: "P:other", channel: "C0ELSE", channelKind: "private", state: "done", resolvedAt: 99 }),
+    ]);
+    const ids = async (channel: string, limit: number) => (await records.latestAnswers(channel, limit)).map((r) => r.id);
+    assert.deepEqual(await ids("C0DESIGN", 2), ["C:done2", "C:nope2", "C:done3", "C:nope1"]);
+    assert.deepEqual(await ids("C0PRIV", 1), ["P:mine", "C:nope2"]);
+    assert.deepEqual(await ids("D0MAYA", 1), ["D:dm", "C:nope2"]);
+    assert.deepEqual(await ids("C0DESIGN", 0), []);
+    const [first] = await records.latestAnswers("C0PRIV", 1);
+    assert.equal(first?.channelKind, "private");
   });
 }
