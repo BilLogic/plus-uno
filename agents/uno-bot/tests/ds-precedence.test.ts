@@ -21,7 +21,9 @@ import {
 import { disputedItems, PRECEDENCE_MARKER, precedenceOperations } from "../src/ds-precedence/report";
 import {
   disputePrecedenceItems,
+  followRestagedCard,
   postPrecedenceReport,
+  precedenceChannel,
   type DisputeDeps,
   runPrecedenceCheck,
   PRECEDENCE_CARD_TTL_MS,
@@ -30,7 +32,12 @@ import {
   type PostDeps,
   type PrecedenceReport,
 } from "../src/ds-precedence/jobs";
-import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
+import {
+  handleDsPrecedenceReply,
+  isDsPrecedenceCandidate,
+  isWeeklyPrecedenceThread,
+  recordPrecedenceRestageFor,
+} from "../src/ds-precedence/env";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
 import { resolveSignal, type GateSignal } from "../src/gate/index";
@@ -348,6 +355,11 @@ async function weekReport(): Promise<PrecedenceReport> {
 }
 
 describe("the morning post", () => {
+  it("lands where pickDestination sends a design-system finding: #plus-universal, never #plus-design", () => {
+    assert.equal(precedenceChannel({ plusUniversal: CHANNEL, plusDesign: "C0DESIGN" }), CHANNEL);
+    assert.equal(precedenceChannel({ plusDesign: "C0DESIGN" }), null, "no fallback to another channel");
+  });
+
   it("a clean week posts nothing", async () => {
     const { deps, posts, staged } = postDeps(null, null);
     const result = await postPrecedenceReport(deps);
@@ -514,6 +526,7 @@ describe("a dispute in the thread", () => {
     postFails?: boolean;
     stageThrows?: boolean;
     writeThrows?: boolean;
+    restoreThrows?: boolean;
     onPost?: (m: Post) => Promise<void>;
   } = {}) {
     const { thread, first } = await posted();
@@ -542,6 +555,7 @@ describe("a dispute in the thread", () => {
         await threadState.putProposal(p);
       },
       restore: async (p) => {
+        if (opts.restoreThrows) throw new Error("ThreadState down");
         await threadState.putProposal(p);
       },
       retire: async (ts) => {
@@ -634,6 +648,35 @@ describe("a dispute in the thread", () => {
     assert.match(w.posts.at(-1)!.text, /didn't go through/);
   });
 
+  it("a revision that fails and whose old card cannot be put back says neither went through", async () => {
+    const w = await world({ stageThrows: true, restoreThrows: true });
+    assert.equal(await w.dispute("dispute 2"), true);
+    const last = w.posts.at(-1)!.text;
+    assert.match(last, /didn't go through/);
+    assert.doesNotMatch(last, /still stands/, "the old card is not live, so the reply does not say it is");
+  });
+
+  it("a card re-staged after a cut-off is followed by the record, so a later dispute revises it", async () => {
+    const w = await world();
+    // What a cut-off re-stage does: a fresh card, the old one's terms, rooted
+    // at it (`restageExecution`).
+    const restaged: PendingProposal = { ...w.first, proposalTs: "1759600500.000001", originProposalTs: w.first.proposalTs };
+    await w.threadState.putProposal(restaged);
+    await followRestagedCard(w.deps.thread, w.first, restaged);
+    assert.equal(w.record.box.value?.cardTs, restaged.proposalTs);
+
+    assert.equal(await w.dispute("dispute 2"), true);
+    assert.ok(w.posts[0]!.blocks, "a revised card, not \"already decided or expired\"");
+    assert.equal((await w.threadState.getProposalByTs(restaged.proposalTs)).state, "superseded");
+  });
+
+  it("a re-staged card that is not the thread's live one moves nothing", async () => {
+    const w = await world();
+    const other: PendingProposal = { ...w.first, proposalTs: "1.1" };
+    await followRestagedCard(w.deps.thread, other, { ...other, proposalTs: "1.2" });
+    assert.equal(w.record.box.value?.cardTs, w.first.proposalTs);
+  });
+
   it("a dispute that changes nothing says why in one line", async () => {
     const w = await world();
     await w.dispute("dispute 9");
@@ -718,6 +761,31 @@ describe("the Slack hook", () => {
     assert.equal(isDsPrecedenceCandidate(e, msg({ channel: "C0OTHER" })), false);
     assert.equal(isDsPrecedenceCandidate(e, msg({ thread_ts: undefined })), false);
     assert.equal(isDsPrecedenceCandidate(e, msg({ text: "I wouldn't dispute 1" })), false);
+  });
+
+  it("a cut-off re-stage of the weekly card moves its thread's record; any other card reads nothing", async () => {
+    const reads: string[] = [];
+    const puts: Array<[string, PostedThread]> = [];
+    const e = {
+      HARNESS_KV: {
+        get: async (key: string) => {
+          reads.push(key);
+          return { ...thread, cardTs: "1759500000.000002" };
+        },
+        put: async (key: string, value: string) => {
+          puts.push([key, JSON.parse(value) as PostedThread]);
+        },
+      },
+    } as unknown as Env;
+    const from = { supersedeKey: "ds-precedence", proposalTs: "1759500000.000002", replyTs: thread.ts, threadTs: thread.ts } as PendingProposal;
+    await recordPrecedenceRestageFor(e, from, { ...from, proposalTs: "1759500900.000001" });
+    assert.equal(puts.length, 1);
+    assert.match(puts[0]![0], new RegExp(thread.ts.replace(".", "\\.")));
+    assert.equal(puts[0]![1].cardTs, "1759500900.000001");
+
+    reads.length = 0;
+    await recordPrecedenceRestageFor(e, { ...from, supersedeKey: "sweep" }, { ...from, proposalTs: "2.2" });
+    assert.deepEqual(reads, []);
   });
 
   it("knows the weekly thread, so its replies are not all turns", async () => {

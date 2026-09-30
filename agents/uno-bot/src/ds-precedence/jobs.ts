@@ -9,7 +9,7 @@
 //     overnight, and reporting every component missing would file a wrong
 //     intake — that week is skipped, logged once, and changes nothing kept.
 //   • the POST — every morning run (`ds-precedence-post`): when a report is
-//     waiting, open ONE thread in #plus-universal — the list — and put the
+//     waiting, open ONE thread in #plus-universal (`precedenceChannel`) — the list — and put the
 //     card in it. The card files the weekly intake, or comments on the one
 //     already open. Confirmers are the channel's members, read now, as the
 //     library card reads them; the card lives six days, so it has gone before
@@ -25,8 +25,9 @@
 //     the old card, so a late ✅ on it is told it was replaced, while a turn's
 //     card or a sweep card in the same thread and the weekly card leave each
 //     other alone, and a turn whose
-//     batch would touch the weekly card is refused with a pointer to
-//     `dispute N`. The revision keeps the old card's expiry. Disputing every
+//     batch is aimed at the weekly intake itself is refused with a pointer to
+//     `dispute N`. The revision keeps the old card's expiry. A card re-staged
+//     after a cut-off run is followed by the record (`followRestagedCard`). Disputing every
 //     item withdraws the card. Only a card still pending is revised; a dispute
 //     that changes nothing gets one line saying why.
 //     Every list thread is recorded under its own ts (`env.ts`), before its
@@ -46,6 +47,7 @@
 
 import type { PendingProposal } from "../thread-state/index";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
 import type { FigmaComponentsResponse } from "../figma-poll";
 import {
   findDisagreements,
@@ -63,6 +65,25 @@ import {
   type IntakeTarget,
   type NumberedItem,
 } from "./report";
+
+/** The thread slot every weekly card holds (`PendingProposal.supersedeKey`). */
+export const PRECEDENCE_KEY = "ds-precedence";
+
+/**
+ * The channel the weekly list opens in, by the rule every proactive job
+ * shares (`pickDestination`): the check reads no conversation, so there is no
+ * private place or thread to answer in, and its target is the Figma library —
+ * a design-system target. Null when that role's channel is not configured.
+ *
+ * @param channels - The Worker's team channel ids
+ */
+export function precedenceChannel(channels: TeamChannels): string | null {
+  const destination = pickDestination({
+    evidence: { channel: "", channelKind: "public", threadTs: null, messageTs: [], permalinks: [] },
+    target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [] },
+  });
+  return resolveDestination(destination, channels)?.channel ?? null;
+}
 
 /** How long the weekly card stays confirmable: gone before next week's. */
 export const PRECEDENCE_CARD_TTL_MS = 6 * 24 * 60 * 60 * 1000;
@@ -207,7 +228,7 @@ function stagedCard(
     confirmers: [...thread.confirmers],
     // Keyed apart from the thread: a turn's card in this thread neither
     // replaces the weekly card nor is replaced by it; its revisions share it.
-    supersedeKey: "ds-precedence",
+    supersedeKey: PRECEDENCE_KEY,
     refuseRevision:
       "This is the weekly DS precedence card, and it changes only one way: reply `dispute N` (or `dispute 1, 3`) " +
       "to drop an item, and I'll post the revised card.",
@@ -373,13 +394,39 @@ export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadRep
     console.error(`[ds-precedence] revision posted but not recorded: ${err instanceof Error ? err.message : String(err)}`);
     // The old card shares the revision's key, so restoring it retires the
     // revision if it was staged; the record still names the old card.
-    await restore().catch(() => {});
+    const restored = await restore().then(
+      () => true,
+      () => false,
+    );
     await deps.retire(sent.ts).catch(() => {});
-    await say("That revised card didn't go through, so the card before it still stands. Try the `dispute` again.").catch(() => {});
+    await say(
+      restored
+        ? "That revised card didn't go through, so the card before it still stands. Try the `dispute` again."
+        : "That revised card didn't go through, and the card before it couldn't be put back, so neither is live and nothing will be filed from this thread. Ask me to file the intake if it's still wanted.",
+    ).catch(() => {});
     return true;
   }
   // Superseded on the record only once the revision is in place: a card
   // restored after a failure was never out of reach for long.
   await deps.superseded([old.proposalTs]);
   return true;
+}
+
+/**
+ * A weekly card re-staged after a cut-off run (`turn/turn.ts`
+ * `restageExecution`) is the thread's live card now: the record follows it, so
+ * a later `dispute` finds it. A card the record does not name moves nothing.
+ *
+ * @param thread - The record of the thread the card was in
+ * @param from - The card re-staged
+ * @param to - The fresh card
+ */
+export async function followRestagedCard(
+  thread: Store<PostedThread | null>,
+  from: Pick<PendingProposal, "proposalTs">,
+  to: Pick<PendingProposal, "proposalTs">,
+): Promise<void> {
+  const record = await thread.read();
+  if (!record || record.cardTs !== from.proposalTs) return;
+  await thread.write({ ...record, cardTs: to.proposalTs });
 }
