@@ -11,108 +11,135 @@ import { compare, refusals } from './token-generation.mjs';
  * reading one tree and writing another.
  */
 const SOURCE_DIR = `${TOKEN_DIR}/source`;
+/**
+ * A Figma colour ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`
+ * with the alpha at up to three places otherwise (0.08, not 0.080).
+ */
+function cssColor({ r, g, b, a = 1 }) {
+    const byte = (n) => Math.round(n * 255);
+    if (a < 1) return `rgba(${byte(r)}, ${byte(g)}, ${byte(b)}, ${+a.toFixed(3)})`;
+    return '#' + [r, g, b].map((n) => byte(n).toString(16).padStart(2, '0')).join('');
+}
+
+/** `Social-Emotional` -> `social-emotional`, `on surface variant` -> `on-surface-variant`. */
+const slug = (name) => name.trim().toLowerCase().replace(/\s+/g, '-');
 
 /**
- * Convert RGB to hex/rgba
+ * The accent families in the `colors / accent` collection, in the order the
+ * stylesheet lists them.
  */
-function rgbToHex(r, g, b, a = 1) {
-    const toHex = (n) => Math.round(n * 255).toString(16).padStart(2, '0');
-    if (a < 1 && a > 0) {
-        return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
+const ACCENT_FAMILIES = [
+    'Primary', 'Secondary', 'Tertiary', 'Danger', 'Success', 'Warning', 'Info',
+    'Social-Emotional', 'Mastering-Content', 'Advocacy', 'Relationship', 'Technology-Tools',
+];
+
+/**
+ * Info is Tertiary under another name: Figma aliases `Info/*` to `Tertiary/*`,
+ * so every Info token is written as a `var()` of its Tertiary twin. That also
+ * covers the two Figma leaves as literals or not at all (`Info 08` is a literal
+ * of the same value; there is no `Info Border Subtle`), and the generator
+ * refuses if any Info variable stops resolving to its Tertiary twin's colour.
+ */
+const ALIASED_FAMILIES = { Info: 'Tertiary' };
+
+/**
+ * `Primary/Primary (Text)` -> `primary-text`, `Primary/State-layers/Primary
+ * Container 08` -> `primary-container-state-08`, and so on, or `null` for a
+ * variable this file does not carry: the `-icon`/`-border` roles and focus
+ * rings (hand-maintained in `_color_roles.scss`), the `Proposal/*` candidates,
+ * and stray leaves such as `Advocacy/on-surface` and the `Content` string.
+ */
+function accentToken(name) {
+    const [family, ...rest] = name.split('/');
+    if (!ACCENT_FAMILIES.includes(family) || rest.length === 0) return null;
+    const f = slug(family);
+    const leaf = rest.join('/');
+
+    const state = leaf.match(/^State-layers\/(.+) (08|12|16)$/);
+    if (state) {
+        if (state[1] === family) return `${f}-state-${state[2]}`;
+        if (state[1] === `${family} Container`) return `${f}-container-state-${state[2]}`;
+        return null;
     }
-    return '#' + toHex(r) + toHex(g) + toHex(b);
+
+    const roles = {
+        [family]: f,
+        [`${family} (Text)`]: `${f}-text`,
+        [`On ${family}`]: `on-${f}`,
+        [`${family} Container`]: `${f}-container`,
+        [`On ${family} Container`]: `on-${f}-container`,
+        [`Inverse ${family}`]: `inverse-${f}`,
+        [`${family} Border Subtle`]: `${f}-border-subtle`,
+    };
+    return roles[leaf] ?? null;
+}
+
+/** The order a family's tokens are written in, base roles then state layers. */
+function familyOrder(f) {
+    const levels = ['08', '12', '16'];
+    return {
+        roles: [f, `${f}-text`, `on-${f}`, `${f}-container`, `on-${f}-container`, `inverse-${f}`, `${f}-border-subtle`],
+        states: [...levels.map((l) => `${f}-state-${l}`), ...levels.map((l) => `${f}-container-state-${l}`)],
+    };
 }
 
 /**
- * Convert Figma variable name to Material Design 3 CSS variable name
+ * `Neutral Colors/Alternative/surface-dim` -> `surface-dim`,
+ * `State-layers/on surface/opacity-0_08` -> `on-surface-state-08`, or `null`
+ * for the `Surface roles/*` aliases, which are not part of this file.
  */
-function toM3ColorName(name) {
-    // Remove known Figma group prefixes to simplify the name
-    let normalized = name
-        .replace(/^_/, '')
-        .replace(/^ColorsElevations\/MaterialDesign-ColorRoles\//, '')
-        .replace(/^ColorsElevations\/colors,guidance\//, '')
-        .replace(/^ColorsElevations\/PLUSBrandcolors,updatedJune2025\//, '')
-        .replace(/^ColorsElevations\//, '')
-        .replace(/\//g, '-')
-        .toLowerCase()
-        .trim();
+function neutralToken(name) {
+    const state = name.match(/^State-layers\/(.+)\/opacity-0_(08|12|16)$/);
+    if (state) return `${slug(state[1])}-state-${state[2]}`;
+    const role = name.match(/^Neutral Colors\/(?:Surface container\/|Alternative\/)?([^/]+)$/);
+    return role ? slug(role[1]) : null;
+}
 
-    // Material Design 3 specific mappings
-    const mappings = {
-        'primary': 'primary', // Direct match after stripping
-        'on-primary': 'on-primary',
-        'primary-container': 'primary-container',
-        'on-primary-container': 'on-primary-container',
-        'inverse-primary': 'inverse-primary',
-        'secondary': 'secondary',
-        'on-secondary': 'on-secondary',
-        'secondary-container': 'secondary-container',
-        'on-secondary-container': 'on-secondary-container',
-        'tertiary': 'tertiary',
-        'on-tertiary': 'on-tertiary',
-        'tertiary-container': 'tertiary-container',
-        'on-tertiary-container': 'on-tertiary-container',
-        'danger': 'danger',
-        'error': 'danger', // Map Error to Danger
-        'on-danger': 'on-danger',
-        'on-error': 'on-danger',
-        'danger-container': 'danger-container',
-        'error-container': 'danger-container',
-        'on-danger-container': 'on-danger-container',
-        'on-error-container': 'on-danger-container',
-        'success': 'success',
-        'on-success': 'on-success',
-        // Map Add-on to Success for now if needed, or keep separate
-        'add-on': 'success',
-        'warning': 'warning',
-        'on-warning': 'on-warning',
-        'info': 'info',
-        'on-info': 'on-info',
-        'surface': 'surface',
-        'on-surface': 'on-surface',
-        'surface-variant': 'surface-variant',
-        'on-surface-variant': 'on-surface-variant',
-        'outline': 'outline',
-        'outline-variant': 'outline-variant',
-        'background': 'background',
-        'on-background': 'on-background',
+const NEUTRAL_GROUPS = {
+    'Surface': ['surface', 'on-surface'],
+    'Surface Variant': ['surface-variant', 'on-surface-variant'],
+    'Outline': ['outline', 'outline-variant'],
+    'Surface Containers': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
+    'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'disabled-opacity', 'inverse-surface', 'inverse-on-surface'],
+};
 
-        // Legacy/Messy mappings
-        'primary-primary': 'primary',
-        'primary-on-primary': 'on-primary',
-        'secondary-secondary': 'secondary',
-    };
+const NEUTRAL_STATE_BASES = [
+    'surface', 'outline', 'surface-variant', 'inverse-surface', 'shadow', 'outline-variant',
+    'surface-container-highest', 'surface-container-high', 'surface-container',
+    'surface-container-low', 'surface-container-lowest', 'surface-bright', 'surface-dim',
+    'on-surface', 'on-surface-variant',
+];
 
-    // Check direct mapping first
-    if (mappings[normalized]) {
-        return mappings[normalized];
+/**
+ * Not a Figma variable: the M3 disabled-content opacity. Figma applies it as
+ * a layer opacity rather than a variable, and components read it from here.
+ */
+const CODE_ONLY_NEUTRALS = { 'disabled-opacity': '0.38' };
+
+/**
+ * `{token: cssValue}` for one collection, through `toToken`. Two variables that
+ * land on one token must agree (`Neutral Colors/on-surface` and `Neutral
+ * Colors/Surface container/on-surface` do); a disagreement is a refusal, not a
+ * last-one-wins.
+ */
+function collectColors(collection, toToken, file) {
+    const mode = Object.keys(collection.modes)[0];
+    const map = {};
+    for (const v of collection.variables) {
+        if (v.resolvedType !== 'COLOR') continue;
+        const token = toToken(v.name);
+        if (!token) continue;
+        const resolved = v.resolvedValuesByMode[mode];
+        if (!resolved || resolved.r === undefined) {
+            throw new Error(`${file}: ${v.name} has no resolved colour. Export it with every alias resolved.`);
+        }
+        const value = cssColor(resolved);
+        if (map[token] !== undefined && map[token] !== value) {
+            throw new Error(`${file}: two variables map to --color-${token} with different values (${map[token]}, ${value}).`);
+        }
+        map[token] = value;
     }
-
-    // Handle state layers
-    if (normalized.includes('state-layers')) {
-        normalized = normalized
-            .replace('primary-state-layers-primary-08', 'primary-state-08')
-            .replace('primary-state-layers-primary-12', 'primary-state-12')
-            .replace('primary-state-layers-primary-16', 'primary-state-16')
-            .replace('primary-state-layers-primary-container-08', 'primary-container-state-08')
-            .replace('primary-state-layers-primary-container-12', 'primary-container-state-12')
-            .replace('primary-state-layers-primary-container-16', 'primary-container-state-16')
-            .replace('secondary-state-layers-secondary-08', 'secondary-state-08')
-            .replace('secondary-state-layers-secondary-12', 'secondary-state-12')
-            .replace('secondary-state-layers-secondary-16', 'secondary-state-16')
-            .replace('secondary-state-layers-secondary-container-08', 'secondary-container-state-08')
-            .replace('secondary-state-layers-secondary-container-12', 'secondary-container-state-12')
-            .replace('secondary-state-layers-secondary-container-16', 'secondary-container-state-16')
-            .replace('tertiary-state-layers-tertiary-08', 'tertiary-state-08')
-            .replace('tertiary-state-layers-tertiary-12', 'tertiary-state-12')
-            .replace('tertiary-state-layers-tertiary-16', 'tertiary-state-16')
-            .replace('tertiary-state-layers-tertiary-container-08', 'tertiary-container-state-08')
-            .replace('tertiary-state-layers-tertiary-container-12', 'tertiary-container-state-12')
-            .replace('tertiary-state-layers-tertiary-container-16', 'tertiary-container-state-16');
-    }
-
-    return mappings[normalized] || normalized;
+    return map;
 }
 
 /**
@@ -122,8 +149,8 @@ function generateColorsSCSS() {
     const accent = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ accent.json`, 'utf8'));
     const neutral = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ neutral.json`, 'utf8'));
 
-    const accentMode = Object.keys(accent.modes)[0];
-    const neutralMode = Object.keys(neutral.modes)[0];
+    const accentMap = collectColors(accent, accentToken, 'colors _ accent.json');
+    const neutralMap = collectColors(neutral, neutralToken, 'colors _ neutral.json');
 
     let scss = `/**
  * Material Design 3 Color Tokens
@@ -135,157 +162,69 @@ function generateColorsSCSS() {
     /* ============================================
        ACCENT COLORS - Material Design 3 Roles
        ============================================ */
-    
-    /* Primary Colors */
 `;
 
-    // Process accent colors
-    const colorMap = {};
-    accent.variables.forEach(v => {
-        const val = v.valuesByMode[accentMode];
-        if (!val) return;
-
-        let colorValue;
-        if (val.type === 'VARIABLE_ALIAS') {
-            // For aliases, we'll resolve them later
-            const resolved = v.resolvedValuesByMode[accentMode];
-            if (resolved && resolved.r !== undefined) {
-                colorValue = rgbToHex(resolved.r, resolved.g, resolved.b, resolved.a);
-            } else {
-                return; // Skip if we can't resolve
+    for (const family of ACCENT_FAMILIES) {
+        const f = slug(family);
+        const { roles, states } = familyOrder(f);
+        const target = ALIASED_FAMILIES[family];
+        const line = (token) => {
+            if (!target) return accentMap[token] === undefined ? '' : `    --color-${token}: ${accentMap[token]};\n`;
+            const twin = token.replace(f, slug(target));
+            if (accentMap[twin] === undefined) return '';
+            if (accentMap[token] !== undefined && accentMap[token] !== accentMap[twin]) {
+                throw new Error(
+                    `colors _ accent.json: --color-${token} is ${accentMap[token]} but --color-${twin} is ` +
+                    `${accentMap[twin]}. ${family} is written as an alias of ${target}; they have to agree.`,
+                );
             }
-        } else if (typeof val === 'string') {
-            // Check if it's a hex string
-            colorValue = val;
-        } else if (val.r !== undefined) {
-            colorValue = rgbToHex(val.r, val.g, val.b, val.a);
-        } else {
-            return;
-        }
+            return `    --color-${token}: var(--color-${twin});\n`;
+        };
+        const note = target ? `    /* ${family} aliases to ${target} */\n` : '';
+        scss += `\n    /* ${family} Colors */\n${note}${roles.map(line).join('')}`;
+        scss += `\n    /* ${family} State Layers */\n${note}${states.map(line).join('')}`;
+    }
 
-        const cssName = toM3ColorName(v.name);
-        colorMap[cssName] = colorValue;
-    });
-
-    // Organize and output accent colors by category
-    const categories = {
-        'Primary': ['primary', 'on-primary', 'primary-container', 'on-primary-container', 'inverse-primary'],
-        'Primary State Layers': Object.keys(colorMap).filter(k => k.startsWith('primary-state') || k.startsWith('primary-container-state')),
-        'Secondary': ['secondary', 'on-secondary', 'secondary-container', 'on-secondary-container'],
-        'Secondary State Layers': Object.keys(colorMap).filter(k => k.startsWith('secondary-state') || k.startsWith('secondary-container-state')),
-        'Tertiary': ['tertiary', 'on-tertiary', 'tertiary-container', 'on-tertiary-container'],
-        'Tertiary State Layers': Object.keys(colorMap).filter(k => k.startsWith('tertiary-state') || k.startsWith('tertiary-container-state')),
-        'Danger': ['danger', 'on-danger', 'danger-container', 'on-danger-container'],
-        'Danger State Layers': Object.keys(colorMap).filter(k => k.startsWith('danger-state') || k.startsWith('danger-container-state')),
-        'Success': ['success', 'on-success', 'success-container', 'on-success-container'],
-        'Success State Layers': Object.keys(colorMap).filter(k => k.startsWith('success-state') || k.startsWith('success-container-state')),
-        'Warning': ['warning', 'on-warning', 'warning-container', 'on-warning-container'],
-        'Warning State Layers': Object.keys(colorMap).filter(k => k.startsWith('warning-state') || k.startsWith('warning-container-state')),
-        'Info': ['info', 'on-info', 'info-container', 'on-info-container'],
-        'Info State Layers': Object.keys(colorMap).filter(k => k.startsWith('info-state') || k.startsWith('info-container-state')),
-        'Social-Emotional': ['social-emotional', 'on-social-emotional', 'social-emotional-container', 'on-social-emotional-container'],
-        'Social-Emotional State Layers': Object.keys(colorMap).filter(k => k.startsWith('social-emotional-state') || k.startsWith('social-emotional-container-state')),
-        'Mastering Content': ['mastering-content', 'on-mastering-content', 'mastering-content-container', 'on-mastering-content-container'],
-        'Mastering Content State Layers': Object.keys(colorMap).filter(k => k.startsWith('mastering-content-state') || k.startsWith('mastering-content-container-state')),
-        'Advocacy': ['advocacy', 'on-advocacy', 'advocacy-container', 'on-advocacy-container'],
-        'Advocacy State Layers': Object.keys(colorMap).filter(k => k.startsWith('advocacy-state') || k.startsWith('advocacy-container-state')),
-        'Relationship': ['relationship', 'on-relationship', 'relationship-container', 'on-relationship-container'],
-        'Relationship State Layers': Object.keys(colorMap).filter(k => k.startsWith('relationship-state') || k.startsWith('relationship-container-state')),
-        'Technology Tools': ['technology-tools', 'on-technology-tools', 'technology-tools-container', 'on-technology-tools-container'],
-        'Technology Tools State Layers': Object.keys(colorMap).filter(k => k.startsWith('technology-tools-state') || k.startsWith('technology-tools-container-state')),
-    };
-
-    Object.entries(categories).forEach(([category, keys]) => {
-        if (keys.length > 0 && keys.some(k => colorMap[k])) {
-            scss += `\n    /* ${category} */\n`;
-            keys.forEach(key => {
-                if (colorMap[key]) {
-                    scss += `    --color-${key}: ${colorMap[key]};\n`;
-                }
-            });
-        }
-    });
-
-    // Process neutral colors
-    scss += `\n    /* ============================================
+    scss += `
+    /* ============================================
        NEUTRAL COLORS - Material Design 3
        ============================================ */
-    
-    /* Surface Colors */\n`;
+`;
 
-    const neutralMap = {};
-    neutral.variables.forEach(v => {
-        const val = v.valuesByMode[neutralMode];
-        if (!val) return;
-
-        let colorValue;
-        if (val.type === 'VARIABLE_ALIAS') {
-            const resolved = v.resolvedValuesByMode[neutralMode];
-            if (resolved && resolved.r !== undefined) {
-                colorValue = rgbToHex(resolved.r, resolved.g, resolved.b, resolved.a);
-            } else {
-                return;
-            }
-        } else if (typeof val === 'string') {
-            colorValue = val;
-        } else if (val.r !== undefined) {
-            colorValue = rgbToHex(val.r, val.g, val.b, val.a);
-        } else {
-            return;
+    const neutralValues = { ...neutralMap, ...CODE_ONLY_NEUTRALS };
+    for (const [group, keys] of Object.entries(NEUTRAL_GROUPS)) {
+        scss += `\n    /* ${group} */\n`;
+        for (const key of keys) {
+            if (neutralValues[key] !== undefined) scss += `    --color-${key}: ${neutralValues[key]};\n`;
         }
+    }
 
-        let cssName = v.name
-            .replace(/^Neutral Colors\//i, '')
-            .replace(/^State-layers\//i, '')
-            .replace(/\//g, '-')
-            .toLowerCase()
-            .trim();
+    scss += `
+    /* ============================================
+       NEUTRAL STATE LAYERS
+       ============================================ */
+`;
+    for (const base of NEUTRAL_STATE_BASES) {
+        const keys = ['08', '12', '16'].map((l) => `${base}-state-${l}`).filter((k) => neutralMap[k] !== undefined);
+        if (!keys.length) continue;
+        scss += `\n    /* ${base} */\n`;
+        for (const key of keys) scss += `    --color-${key}: ${neutralMap[key]};\n`;
+    }
 
-        // Map to M3 names
-        if (cssName === 'surface') cssName = 'surface';
-        else if (cssName === 'on-surface') cssName = 'on-surface';
-        else if (cssName === 'outline') cssName = 'outline';
-        else if (cssName === 'outline-variant') cssName = 'outline-variant';
-        else if (cssName === 'surface-container-surface-container-high') cssName = 'surface-container-high';
-        else if (cssName === 'surface-container-surface-container') cssName = 'surface-container';
-        else if (cssName === 'surface-container-surface-container-low') cssName = 'surface-container-low';
-        else if (cssName === 'surface-container-surface-container-lowest') cssName = 'surface-container-lowest';
-        else if (cssName === 'alternative-surface-dim') cssName = 'surface-dim';
-        else if (cssName === 'alternative-surface-bright') cssName = 'surface-bright';
-        else if (cssName === 'alternative-surface-variant') cssName = 'surface-variant';
-        else if (cssName === 'alternative-scrim') cssName = 'scrim';
-        else if (cssName === 'alternative-inverse-surface') cssName = 'inverse-surface';
-        else if (cssName === 'alternative-inverse-on-surface') cssName = 'inverse-on-surface';
-        else if (cssName === 'on-surface-variant') cssName = 'on-surface-variant';
-        else if (cssName.includes('surface-container-surface-container-highest')) cssName = 'surface-container-highest';
-        else if (cssName.startsWith('surface-container-on-surface')) cssName = 'on-surface';
-
-        // Skip state layers for now (they're handled separately if needed)
-        if (cssName.includes('opacity') || cssName.includes('state-layers')) {
-            return;
-        }
-
-        neutralMap[cssName] = colorValue;
-    });
-
-    // Output neutral colors in organized groups
-    const neutralGroups = {
-        'Surface': ['surface', 'on-surface'],
-        'Surface Variant': ['surface-variant', 'on-surface-variant'],
-        'Outline': ['outline', 'outline-variant'],
-        'Surface Containers': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
-        'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'inverse-surface', 'inverse-on-surface'],
-    };
-
-    Object.entries(neutralGroups).forEach(([group, keys]) => {
-        const existingKeys = keys.filter(k => neutralMap[k]);
-        if (existingKeys.length > 0) {
-            scss += `\n    /* ${group} */\n`;
-            existingKeys.forEach(key => {
-                scss += `    --color-${key}: ${neutralMap[key]};\n`;
-            });
-        }
-    });
+    /*
+     * Anything the maps produced that no list above placed. Written rather than
+     * dropped, so a new Figma role shows up in the diff instead of vanishing.
+     */
+    const placed = new Set([
+        ...ACCENT_FAMILIES.flatMap((f) => Object.values(familyOrder(slug(f))).flat()),
+        ...Object.values(NEUTRAL_GROUPS).flat(),
+        ...NEUTRAL_STATE_BASES.flatMap((b) => ['08', '12', '16'].map((l) => `${b}-state-${l}`)),
+    ]);
+    const unplaced = Object.entries({ ...accentMap, ...neutralMap }).filter(([k]) => !placed.has(k));
+    if (unplaced.length) {
+        scss += `\n    /* Unsorted (add these to an order list in generate-all-tokens.js) */\n`;
+        for (const [key, value] of unplaced) scss += `    --color-${key}: ${value};\n`;
+    }
 
     scss += `}\n`;
 
