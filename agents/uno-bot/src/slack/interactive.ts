@@ -31,6 +31,9 @@ import { proposalCardBlocks } from "./proposal-render";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
+import { DM_WATCH_ACTION_ID, selectedFeatures } from "../dm-watch/index";
+import { setDmWatchOnEnv } from "../dm-watch/env";
+import { publishHomeView } from "./home";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -39,7 +42,7 @@ interface InteractionPayload {
   user?: { id?: string };
   channel?: { id?: string };
   message?: { ts?: string; thread_ts?: string };
-  actions?: Array<{ action_id?: string; value?: string }>;
+  actions?: Array<{ action_id?: string; value?: string; selected_options?: { value?: string }[] }>;
   callback_id?: string;
 }
 
@@ -107,6 +110,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
+  if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   // No silent catch-all. This used to fall through to the feedback handler,
   // which meant an action_id nobody had wired reached a function that ignored
   // it — a dead button that looked alive. Say so in the log instead.
@@ -197,6 +201,18 @@ function homeStopDeps(env: Env): HomeStopDoorDeps {
     dmChannelFor: (id) => conversationsOpen(env, id),
     delivery: (target) => slackDelivery(env, { ...target, userMsgTs: "" }),
   };
+}
+
+// The Home tab's DM watch switches. The checkboxes send every option still
+// ticked; saving turns on and off what changed, then the view is published
+// again so it shows what was saved — a switch that needs a connected token and
+// has none stays unticked.
+async function saveDmWatch(env: Env, payload: InteractionPayload): Promise<void> {
+  const userId = payload.user?.id;
+  if (!userId) return;
+  const on = await setDmWatchOnEnv(env, userId, selectedFeatures(payload.actions?.[0]));
+  console.log(`[interactive] DM watch for ${userId}: ${on.length ? on.join(", ") : "all off"}`);
+  await publishHomeView(env, userId);
 }
 
 // The `icon_button` delete on an answer footer (native-feedback mode).
