@@ -33,7 +33,7 @@ import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations, stagingCardOf, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
-import { recordSweepResolutionFor } from "../sweep/env";
+import { offerSweepShareFor, recordSweepResolutionFor } from "../sweep/env";
 import { sweepPostMetadata } from "../sweep/cards";
 import {
   executionEvents,
@@ -45,7 +45,7 @@ import {
 } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { recordTaskCompletion } from "../usage/resolution-env";
-import { isToolName } from "./tool-table";
+import { isToolName, runsPastGate } from "./tool-table";
 import { TOOLS_BY_NAME } from "./tools";
 
 /**
@@ -249,6 +249,11 @@ async function runWonVerdict(
       }
     }
 
+    // A group DM's fix card that wrote a page: offer the reworded note on a
+    // separate card, after the result, so its ✅ is a choice of its own.
+    // Best-effort, as the result is; a budget stop is thrown.
+    if (!fenced) await offerSweepShareFor(env, pending, outcomes);
+
     // The self-serve signal: a batch that ran whole resolves the ask that
     // staged it — the ask's own card, even when this one re-staged it after a
     // cut-off. LAST, once the person has been told: it is a record, not the
@@ -337,7 +342,7 @@ async function executeTool(
     return JSON.stringify({ ok: false, error: `unknown tool: ${name}` });
   }
   const row = TOOLS_BY_NAME[name];
-  if (row.access !== "gated") {
+  if (!runsPastGate(row.access)) {
     return JSON.stringify({
       ok: false,
       error: `'${name}' is ${row.access} and does not run from the gate`,
