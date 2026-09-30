@@ -10,6 +10,11 @@
 // The map is built from the Notion Team Members database — the team CMS — by
 // a daily job (`./team-roles-sync.ts`) and kept in KV; a turn reads the stored
 // map and never calls Notion. `buildRoleMap` is the matching rule.
+//
+// The roles are for analytics only, never for access: nothing is allowed or
+// refused on them. They are only as trustworthy as their inputs — names match
+// on Slack real and display names, which each member edits, and anyone who
+// can edit Team Members can set a row's group or Slack id.
 
 /** The three roles "can you file that?" bounces between. */
 export type TeamRole = "pm" | "dev" | "design";
@@ -74,15 +79,18 @@ export interface RoleMatch {
  * whose real name or display name is the row's name once normalised. A row
  * that matches nobody, or more than one member, gives nobody a role; so does
  * a member two rows give different roles. A row's own Slack id, when it has
- * one, is taken as the match.
+ * one, is taken as the match — but only when it is an active, non-bot member
+ * of the directory; otherwise the row is unmatched.
  *
  * @param roster - The Team Members rows
  * @param directory - The workspace's members
  */
 export function buildRoleMap(roster: readonly RosterRow[], directory: readonly DirectoryPerson[]): RoleMatch {
   const byName = new Map<string, Set<string>>();
+  const active = new Set<string>();
   for (const person of directory) {
     if (person.deleted || person.is_bot || person.id === "USLACKBOT") continue;
+    active.add(person.id);
     for (const name of [person.real_name, person.profile?.display_name]) {
       const key = name ? normalisePersonName(name) : "";
       if (key) byName.set(key, (byName.get(key) ?? new Set()).add(person.id));
@@ -96,7 +104,9 @@ export function buildRoleMap(roster: readonly RosterRow[], directory: readonly D
     if (row.affiliation === PAST_COLLABORATORS) continue;
     const role = row.group && Object.hasOwn(GROUP_ROLES, row.group) ? GROUP_ROLES[row.group] : undefined;
     if (!role) continue;
-    const ids = row.slackUserId ? [row.slackUserId] : [...(byName.get(normalisePersonName(row.name)) ?? [])];
+    const ids = row.slackUserId
+      ? active.has(row.slackUserId) ? [row.slackUserId] : []
+      : [...(byName.get(normalisePersonName(row.name)) ?? [])];
     const [id] = ids;
     if (!id) unmatched.push(row.name);
     else if (ids.length > 1) ambiguous.push(row.name);

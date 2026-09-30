@@ -100,8 +100,28 @@ test("deactivated members and bots are never matched", () => {
 });
 
 test("a row's own Slack id is taken as its match", () => {
-  const { roles } = buildRoleMap([{ name: "Nobody Listed", group: "Software Developer", slackUserId: "U0ZED0001" }], []);
+  const { roles } = buildRoleMap(
+    [{ name: "Nobody Listed", group: "Software Developer", slackUserId: "U0ZED0001" }],
+    [{ id: "U0ZED0001", real_name: "Zed Young" }],
+  );
   assert.deepEqual(roles, { U0ZED0001: "dev" });
+});
+
+test("a row's Slack id that is not an active, non-bot member gets no role and counts as unmatched", () => {
+  const { roles, unmatched, matched } = buildRoleMap(
+    [
+      { name: "Not In Slack", group: "Software Developer", slackUserId: "U0GONE001" },
+      { name: "Left Us", group: "Product Manager", slackUserId: "U0LEFT001" },
+      { name: "A Bot", group: "Product Designer", slackUserId: "B0BOT0001" },
+      { name: "Slackbot", group: "Product Designer", slackUserId: "USLACKBOT" },
+    ],
+    [
+      { id: "U0LEFT001", real_name: "Left Us", deleted: true },
+      { id: "B0BOT0001", real_name: "A Bot", is_bot: true },
+      { id: "USLACKBOT", real_name: "Slackbot" },
+    ],
+  );
+  assert.deepEqual([roles, matched, unmatched], [{}, 0, ["Not In Slack", "Left Us", "A Bot", "Slackbot"]]);
 });
 
 test("someone off the map, or nobody at all, has no role", () => {
@@ -136,6 +156,7 @@ function syncDeps(over: Partial<TeamRolesSyncDeps> = {}): TeamRolesSyncDeps & { 
         ? { ok: true, members: DIRECTORY.slice(2) }
         : { ok: true, members: DIRECTORY.slice(0, 2), next_cursor: "page-2" };
     },
+    read: async () => null,
     write: async (stored: StoredTeamRoles) => {
       written.push(stored);
     },
@@ -175,6 +196,7 @@ test("a failed or short read writes nothing, so the last map is kept", async () 
     { listUsers: async () => ({ ok: false, error: "ratelimited" }) },
     // A directory that never ends stops at the page cap.
     { listUsers: async () => ({ ok: true, members: [], next_cursor: "more" }) },
+    { read: async () => { throw new Error("kv down"); } },
   ];
   for (const over of cases) {
     const deps = syncDeps(over);
@@ -202,6 +224,52 @@ test("a budget stop is thrown through, for the runner to defer", async () => {
   await assert.rejects(syncTeamRoles(deps, { dryRun: false }), SubrequestBudgetError);
 });
 
+// ── The shrink guard ────────────────────────────────────────────────────────
+
+/** A stored map of `n` entries, none of them the ones the fixtures build. */
+function storedOf(n: number): StoredTeamRoles {
+  return { at: 1, roles: Object.fromEntries(Array.from({ length: n }, (_, i) => [`U0OLD${String(i).padStart(4, "0")}`, "dev" as const])) };
+}
+
+test("an empty read keeps a stored map that has entries", async () => {
+  const deps = syncDeps({
+    roster: async () => ({ members: ROSTER.map((row) => ({ ...row, group: "Designer" })), truncated: false }),
+    read: async () => storedOf(3),
+  });
+  const report = await syncTeamRoles(deps, { dryRun: false });
+  assert.deepEqual(deps.written, []);
+  assert.equal(report.written, false);
+  assert.equal(report.keptPrevious, true);
+  assert.equal(report.summary, "0 matched, 0 unmatched, 0 ambiguous — kept previous map: new map had 0 of 3");
+});
+
+test("a new map 60% smaller than the stored one keeps it", async () => {
+  // Two entries (Ana, Bo) against a stored five.
+  const deps = syncDeps({ roster: async () => ({ members: ROSTER.slice(0, 2), truncated: false }), read: async () => storedOf(5) });
+  const report = await syncTeamRoles(deps, { dryRun: false });
+  assert.deepEqual(deps.written, []);
+  assert.equal(report.keptPrevious, true);
+  assert.match(report.summary, /kept previous map: new map had 2 of 5$/);
+});
+
+test("a normal change writes: a new map at least half the stored one, or any map over an empty one", async () => {
+  for (const stored of [storedOf(6), storedOf(4), storedOf(0), null]) {
+    const deps = syncDeps({ read: async () => stored });
+    const report = await syncTeamRoles(deps, { dryRun: false });
+    assert.equal(deps.written.length, 1);
+    assert.equal(report.written, true);
+    assert.equal(report.keptPrevious, undefined);
+  }
+});
+
+test("a dry run reports a shrink the same way, and writes nothing", async () => {
+  const deps = syncDeps({ roster: async () => ({ members: [], truncated: false }), read: async () => storedOf(4) });
+  const report = await syncTeamRoles(deps, { dryRun: true });
+  assert.deepEqual(deps.written, []);
+  assert.equal(report.keptPrevious, true);
+  assert.equal(report.summary, "dry run, nothing written: 0 matched, 0 unmatched, 0 ambiguous — kept previous map: new map had 0 of 4");
+});
+
 // ── The stored map, as a turn reads it ──────────────────────────────────────
 
 function fakeKv(get: (key: string) => Promise<unknown>): Pick<Env, "HARNESS_KV"> {
@@ -214,4 +282,8 @@ test("a turn reads the stored map; no map, no KV or a failed read reads as none"
   assert.deepEqual(await teamRolesFor(fakeKv(async () => null)), {});
   assert.deepEqual(await teamRolesFor({}), {});
   assert.deepEqual(await teamRolesFor(fakeKv(async () => { throw new Error("kv down"); })), {});
+});
+
+test("a budget stop reading the stored map is thrown through, not read as no map", async () => {
+  await assert.rejects(teamRolesFor(fakeKv(async () => { throw new SubrequestBudgetError(38); })), SubrequestBudgetError);
 });

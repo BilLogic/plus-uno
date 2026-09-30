@@ -9,6 +9,11 @@
 // (ADR-030). The job logs counts; a dry run lists the names that found no
 // one, so the CMS can be fixed.
 //
+// A read that succeeds can still come back hollow — the database moved, rows
+// restricted, a Group option renamed so nothing maps. So a new map that is
+// empty, or under half the size of the stored one, does not replace a stored
+// map that has entries; the run says so and the old map stands.
+//
 // Free of `Env`: its reads and its store are passed in (`./production.ts`
 // binds them), so the Node suite drives it with fakes.
 
@@ -39,6 +44,8 @@ export interface TeamRolesSyncDeps {
   roster(): Promise<{ members: readonly RosterRow[]; truncated: boolean }>;
   /** One users.list page, and where the next starts. */
   listUsers(cursor?: string): Promise<{ ok: boolean; error?: string; members?: DirectoryPerson[]; next_cursor?: string }>;
+  /** The map stored now, or null when there is none. */
+  read(): Promise<StoredTeamRoles | null>;
   write(stored: StoredTeamRoles): Promise<void>;
   now(): number;
 }
@@ -50,6 +57,8 @@ export interface TeamRolesSyncReport {
   unmatched: number;
   ambiguous: number;
   summary: string;
+  /** True when the new map shrank too far and the stored one was kept. */
+  keptPrevious?: boolean;
   unmatchedNames?: string[];
   ambiguousNames?: string[];
 }
@@ -87,14 +96,35 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
   }
 
   const match = buildRoleMap(roster.members, directory);
-  const counts = `${match.matched} matched, ${match.unmatched.length} unmatched, ${match.ambiguous.length} ambiguous`;
-  if (!opts.dryRun) await deps.write({ at: deps.now(), roles: match.roles });
+  let counts = `${match.matched} matched, ${match.unmatched.length} unmatched, ${match.ambiguous.length} ambiguous`;
+
+  let previous: StoredTeamRoles | null;
+  try {
+    previous = await deps.read();
+  } catch (err) {
+    rethrowIfBudget(err);
+    return kept(`stored map read failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+  const had = Object.keys(match.roles).length;
+  const of = previous ? Object.keys(previous.roles).length : 0;
+  const shrunk = shrankTooFar(had, of);
+  if (shrunk) counts += ` — kept previous map: new map had ${had} of ${of}`;
+
+  const write = !opts.dryRun && !shrunk;
+  if (write) await deps.write({ at: deps.now(), roles: match.roles });
   return {
-    written: !opts.dryRun,
+    written: write,
     matched: match.matched,
     unmatched: match.unmatched.length,
     ambiguous: match.ambiguous.length,
     summary: opts.dryRun ? `dry run, nothing written: ${counts}` : counts,
+    ...(shrunk ? { keptPrevious: true } : {}),
     ...(opts.dryRun ? { unmatchedNames: match.unmatched, ambiguousNames: match.ambiguous } : {}),
   };
+}
+
+/** Whether a new map of `had` entries is too hollow to replace a stored map
+ *  of `of`: empty, or under half, and only when the stored one has entries. */
+export function shrankTooFar(had: number, of: number): boolean {
+  return of > 0 && (had === 0 || had * 2 < of);
 }

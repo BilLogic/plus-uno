@@ -418,6 +418,8 @@ export interface TurnUsage {
 /** The role map for a staged card; a read that fails reads as no map, so
  *  every role is unknown and the card is staged all the same. */
 async function teamRolesOf(usage: TurnUsage): Promise<TeamRoles> {
+  // The roles only label a usage record, which never costs the turn its
+  // reply: any failure here, a budget stop included, records no roles.
   try {
     return (await usage.teamRoles?.()) ?? {};
   } catch {

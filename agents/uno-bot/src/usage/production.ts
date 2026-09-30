@@ -15,7 +15,7 @@ import { createD1ProposalEventLog } from "./proposal-events-d1";
 import type { ProposalEventLog } from "./proposal-events";
 import type { UsageLog } from "./store";
 import type { TeamRoles } from "./roles";
-import { charge } from "../net";
+import { charge, rethrowIfBudget } from "../net";
 import { findTeamMembers } from "../integrations/notion";
 import { slackDirectoryFor } from "../tools/slack-people";
 import {
@@ -95,6 +95,9 @@ export function testChannelIdsOf(env: Pick<Env, "TEST_CHANNEL_IDS">): string[] {
  * The stored role map (`./team-roles-sync.ts`), or an empty one — every role
  * then reads unknown — when none is stored, KV is not bound or the read fails.
  * One KV read, charged to the internal bucket.
+ *
+ * @throws A budget stop, which is the caller's to handle rather than an
+ *   empty map
  */
 export async function teamRolesFor(env: Pick<Env, "HARNESS_KV">): Promise<TeamRoles> {
   if (!env.HARNESS_KV) return {};
@@ -102,6 +105,7 @@ export async function teamRolesFor(env: Pick<Env, "HARNESS_KV">): Promise<TeamRo
     charge(1, "kv");
     return (await env.HARNESS_KV.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json"))?.roles ?? {};
   } catch (err) {
+    rethrowIfBudget(err);
     console.warn(`[usage] team roles not read: ${err instanceof Error ? err.message : String(err)}`);
     return {};
   }
@@ -125,6 +129,11 @@ export async function runTeamRolesSync(env: Env, opts: { dryRun: boolean }): Pro
     {
       roster: () => findTeamMembers(env),
       listUsers: (cursor) => directory.listUsers(cursor),
+      async read() {
+        if (!kv) return null;
+        charge(1, "kv");
+        return kv.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json");
+      },
       async write(stored) {
         if (!kv) return;
         charge(1, "kv");
