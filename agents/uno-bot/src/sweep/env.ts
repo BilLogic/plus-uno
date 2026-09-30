@@ -315,7 +315,13 @@ async function readSource(env: Env, url: string, kind: TargetKind): Promise<Swee
       title: page.title,
       // The block's own text, without the list or to-do mark its rendered
       // line leads with: what a replace writes back is this text.
-      blocks: page.blocks.map((b) => ({ id: b.id, lastEditedTime: b.lastEditedTime, text: stripBlockPrefix(b.type, b.text) })),
+      blocks: page.blocks.map((b) => ({
+        id: b.id,
+        lastEditedTime: b.lastEditedTime,
+        text: stripBlockPrefix(b.type, b.text),
+        type: b.type,
+        plain: b.plain,
+      })),
       text: page.text.slice(0, CONTEXT_TEXT_CAP),
       pillars: splitList(page.properties["Product Pillar"]),
       contributors: page.people["Contributor"] ?? [],

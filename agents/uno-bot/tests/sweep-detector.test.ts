@@ -161,3 +161,43 @@ test("a block too long to show whole is not offered, and a fix to it is refused"
   assert.equal(result.findings.length, 0);
   assert.ok(!provider.generated[0]!.prompt.includes("blk-launch ·"), "the block is not listed");
 });
+
+// A replace writes plain words into one block. Code, a table row, a block
+// carrying a link or bold, or text over two lines is not offered, and a fix
+// aimed at one is refused.
+for (const c of [
+  { name: "a code block", block: { type: "code" } },
+  { name: "a table row", block: { type: "table_row" } },
+  { name: "a block with formatting", block: { type: "paragraph", plain: false } },
+]) {
+  test(`${c.name} is not offered, and a fix to it is refused`, async () => {
+    const text = "Launch is October 15.";
+    const sources: SweepSource[] = [
+      { ...trueDrift!.sources[0]!, blocks: [{ id: "blk-launch", lastEditedTime: "2026-09-01T10:00:00.000Z", text, ...c.block }] },
+    ];
+    const provider = fakeProvider({ generateReplies: [reply({ replacement: "Launch is November 1." })] });
+    const result = await detectDrift(provider, { thread: threadOf(trueDrift!), sources });
+    assert.ok(result.ok);
+    assert.equal(result.findings.length, 0);
+    assert.ok(!(provider.generated[0]?.prompt ?? "").includes("blk-launch ·"), "the block is not listed");
+  });
+}
+
+test("a text block of plain words is offered", () => {
+  const sources: SweepSource[] = [
+    {
+      ...trueDrift!.sources[0]!,
+      blocks: [{ id: "blk-launch", lastEditedTime: "2026-09-01T10:00:00.000Z", text: "Launch is October 15.", type: "to_do", plain: true }],
+    },
+  ];
+  assert.equal(parseDetectorReply(reply({ replacement: "Launch is November 1." }), threadOf(trueDrift!), sources).length, 1);
+});
+
+test("a replacement that adds a line break is refused", () => {
+  const sources: SweepSource[] = [
+    { ...trueDrift!.sources[0]!, blocks: [{ id: "blk-launch", lastEditedTime: "2026-09-01T10:00:00.000Z", text: "Launch is October 15." }] },
+  ];
+  const parseOne = (replacement: string) => parseDetectorReply(reply({ replacement }), threadOf(trueDrift!), sources);
+  assert.equal(parseOne("Launch is November 1.\nOwner: Bea").length, 0);
+  assert.equal(parseOne("Launch is November 1.").length, 1, "the control is kept");
+});

@@ -150,3 +150,8 @@ test("a fix is shown as its changed span, before and after, with context", () =>
   assert.ok(before.length < 120, "context, not the whole block");
   assert.deepEqual(changedSpan("Owner: design team", "Owner: Bea"), { before: "Owner: design team", after: "Owner: Bea" });
 });
+
+test("a change in whitespace alone still shows as a change", () => {
+  const { before, after } = changedSpan("Owner: Bea", "Owner:  Bea");
+  assert.notEqual(before, after);
+});

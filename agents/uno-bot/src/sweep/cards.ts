@@ -207,8 +207,10 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
  * @param replacement - What the fix writes in its place
  */
 export function changedSpan(original: string, replacement: string): { before: string; after: string } {
-  const a = flat(original);
-  const b = flat(replacement);
+  // Compared as written, whitespace included: a changed space or line is a
+  // change the card has to show.
+  const a = original;
+  const b = replacement;
   let head = 0;
   while (head < a.length && head < b.length && a[head] === b[head]) head++;
   let tail = 0;

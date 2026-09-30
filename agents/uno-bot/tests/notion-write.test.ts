@@ -233,7 +233,7 @@ test("a page read hands back every block's id and last-edited stamp", async () =
 
   assert.equal(page.text, "Sync runs nightly.");
   assert.deepEqual(page.blocks, [
-    { id: BLOCK, type: "paragraph", lastEditedTime: READ_STAMP, text: "Sync runs nightly." },
+    { id: BLOCK, type: "paragraph", lastEditedTime: READ_STAMP, text: "Sync runs nightly.", plain: true },
   ]);
 });
 
@@ -269,6 +269,78 @@ for (const c of [
     assert.equal(payload.rich_text.map((run) => run.text.content).join(""), c.text);
   });
 }
+
+// A replace writes words only, so a block whose rich text carries more than
+// words would lose it. Those are refused unwritten; plain words proceed.
+const RUN = { type: "text", text: { content: "Owner: Bea", link: null }, href: null };
+for (const c of [
+  {
+    name: "a mention",
+    rich_text: [RUN, { type: "mention", mention: { type: "user", user: { id: "u1" } }, href: null }],
+  },
+  {
+    name: "a link",
+    rich_text: [{ type: "text", text: { content: "the spec", link: { url: "https://example.test" } }, href: "https://example.test" }],
+  },
+  {
+    name: "bold",
+    rich_text: [{ ...RUN, annotations: { bold: true, italic: false, strikethrough: false, underline: false, code: false, color: "default" } }],
+  },
+]) {
+  test(`a replace onto a block with ${c.name} is refused, and nothing is written`, async () => {
+    serve({
+      [`GET /blocks/${BLOCK}`]: {
+        body: {
+          id: BLOCK,
+          type: "paragraph",
+          paragraph: { rich_text: c.rich_text },
+          last_edited_time: READ_STAMP,
+          parent: { type: "page_id", page_id: PAGE },
+        },
+      },
+    });
+    const { notionUpdate } = await notion();
+
+    const r = await notionUpdate(ENV, PAGE, { replace: [{ blockId: BLOCK, lastEditedTime: READ_STAMP, content: "Owner: Ade" }] });
+
+    assert.equal(r.replaced, 0);
+    assert.deepEqual(
+      calls.map((c) => c.method),
+      ["GET"],
+    );
+    assert.equal(r.refused.length, 1);
+    assert.match(r.refused[0]!, /links, mentions or formatting that a text replace would drop/);
+    assert.equal(r.staleStamps, 0);
+  });
+}
+
+test("a replace onto a block of plain words proceeds", async () => {
+  serve({
+    [`GET /blocks/${BLOCK}`]: {
+      body: {
+        id: BLOCK,
+        type: "paragraph",
+        paragraph: {
+          rich_text: [
+            {
+              ...RUN,
+              annotations: { bold: false, italic: false, strikethrough: false, underline: false, code: false, color: "default" },
+            },
+          ],
+        },
+        last_edited_time: READ_STAMP,
+        parent: { type: "page_id", page_id: PAGE },
+      },
+    },
+    [`PATCH /blocks/${BLOCK}`]: { body: { id: BLOCK } },
+  });
+  const { notionUpdate } = await notion();
+
+  const r = await notionUpdate(ENV, PAGE, { replace: [{ blockId: BLOCK, lastEditedTime: READ_STAMP, content: "Owner: Ade" }] });
+
+  assert.equal(r.replaced, 1);
+  assert.deepEqual(r.refused, []);
+});
 
 test("a read's display mark comes off a block's text by its type, and only its own", async () => {
   const { stripBlockPrefix } = await notion();

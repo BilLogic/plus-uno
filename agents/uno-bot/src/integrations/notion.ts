@@ -14,6 +14,7 @@
 
 import type { Env } from "../types";
 import { countedFetch, subrequestBudgetSpent, rethrowIfBudget } from "../net";
+import { isPlainRichText, RICH_TEXT_TYPES, type RichTextRun } from "./notion-rich-text";
 import {
   chunkBlocks,
   markdownToNotionBlocks,
@@ -585,6 +586,9 @@ export interface NotionPageBlock {
   lastEditedTime: string;
   /** The block's rendered text — the line it contributed to `text`. */
   text: string;
+  /** Words only: no link, mention, equation or formatting a text replace
+   *  would drop (`isPlainRichText`). */
+  plain: boolean;
 }
 
 interface NotionProperty {
@@ -640,22 +644,6 @@ export function stripBlockPrefix(type: string, text: string): string {
   const prefix = displayPrefix(type);
   return prefix && text.startsWith(prefix) ? text.slice(prefix.length) : text;
 }
-
-/** Block types whose payload is their `rich_text` plus per-type state
- *  (a to-do's `checked`, a heading's level): a replace keeps the type and
- *  that state, and rewrites only the text. */
-const RICH_TEXT_TYPES: ReadonlySet<string> = new Set([
-  "paragraph",
-  "heading_1",
-  "heading_2",
-  "heading_3",
-  "bulleted_list_item",
-  "numbered_list_item",
-  "to_do",
-  "quote",
-  "callout",
-  "toggle",
-]);
 
 function blockText(block: Record<string, unknown>): string {
   const type = block.type as string;
@@ -721,11 +709,13 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
         lines.push(line);
         // Identity travels with the text, not beside it: the model can only
         // cite a block it was told the id of, and it can only be told here.
+        const type = String(block.type ?? "");
         blocks.push({
           id: String(block.id ?? ""),
-          type: String(block.type ?? ""),
+          type,
           lastEditedTime: String(block.last_edited_time ?? ""),
           text: line.trim(),
+          plain: isPlainRichText((block[type] as { rich_text?: RichTextRun[] } | undefined)?.rich_text),
         });
       }
       if (!bData.has_more || !bData.next_cursor) break;
@@ -1375,7 +1365,7 @@ async function replaceBlock(
   const live = (await getRes.json().catch(() => ({}))) as {
     id?: string; type?: string; last_edited_time?: string; message?: string; code?: string;
     parent?: { type?: string; page_id?: string; block_id?: string };
-  };
+  } & Record<string, unknown>;
   if (!getRes.ok || !live.id) {
     throw notionError(getRes.status, live, `block ${label} not found`);
   }
@@ -1398,6 +1388,16 @@ async function replaceBlock(
   // the line's display mark taken off the replacement first.
   const liveType = live.type ?? "";
   const keepType = RICH_TEXT_TYPES.has(liveType);
+  // A text replace writes words only. A block whose rich text carries a link,
+  // a mention, an equation or formatting would lose it, so it is refused —
+  // unwritten, as a moved block is — rather than quietly flattened.
+  const liveText = (live[liveType] as { rich_text?: RichTextRun[] } | undefined)?.rich_text;
+  if (keepType && !isPlainRichText(liveText)) {
+    return {
+      replaced: 0,
+      refusal: `${label} (this block has links, mentions or formatting that a text replace would drop — edit it in Notion)`,
+    };
+  }
   const written = keepType ? markdownToNotionBlocks(stripBlockPrefix(liveType, op.content)) : rendered;
   const head = written[0] ?? first;
   const headText = (head[head.type] as { rich_text?: unknown } | undefined)?.rich_text;

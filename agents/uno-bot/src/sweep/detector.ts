@@ -28,6 +28,7 @@
 
 import type { ModelProvider } from "../agent/model-provider";
 import type { SweepSource, SweepThread } from "./finding";
+import { RICH_TEXT_TYPES } from "../integrations/notion-rich-text";
 
 /** Findings the detector is less sure of than this are dropped. */
 export const CONFIDENCE_FLOOR = 0.7;
@@ -200,11 +201,16 @@ export function parseDetectorReply(text: string, thread: SweepThread, sources: S
 }
 
 /** The blocks of a writable source the model may rewrite: each shown whole,
- *  in page order, until the source's share is spent. */
+ *  in page order, until the source's share is spent. Only a text block of
+ *  plain words, on one line, is offered: a replace writes plain text into
+ *  one block, so anything else — code, a table row, a link or bold it would
+ *  drop, a line break that would split it — could only fail or lose text. */
 export function offeredBlocks(source: SweepSource): SweepSource["blocks"] {
   const offered: SweepSource["blocks"] = [];
   let spent = 0;
   for (const b of source.blocks) {
+    if (b.type !== undefined && !RICH_TEXT_TYPES.has(b.type)) continue;
+    if (b.plain === false || b.text.includes("\n")) continue;
     if (b.text.length > MAX_OFFERED_BLOCK_CHARS) continue;
     if (spent + b.text.length > MAX_OFFERED_CHARS_PER_SOURCE) break;
     spent += b.text.length;
@@ -225,6 +231,9 @@ export function replacementProblem(original: string, replacement: string, eviden
   if (!replacement) return "empty";
   if (replacement === original) return "unchanged";
   if (replacement.length > MAX_REPLACEMENT_CHARS) return "too long";
+  // One block in, one block out: a line break would write extra blocks after
+  // it, which the card would not show as such.
+  if (replacement.includes("\n")) return "more than one line";
   if (TRUNCATION_MARKS.some((m) => replacement.includes(m) && !original.includes(m))) return "truncated";
   // A fix swaps words; one that comes back much shorter has lost some.
   const was = words(original).length;

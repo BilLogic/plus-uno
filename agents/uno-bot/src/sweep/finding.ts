@@ -53,6 +53,11 @@ export interface SweepBlock {
   id: string;
   lastEditedTime: string;
   text: string;
+  /** Notion's block type; absent reads as a paragraph. */
+  type?: string;
+  /** False when its rich text carries a link, mention, equation or
+   *  formatting a text replace would drop; absent reads as plain. */
+  plain?: boolean;
 }
 
 /** A linked source, read. */
