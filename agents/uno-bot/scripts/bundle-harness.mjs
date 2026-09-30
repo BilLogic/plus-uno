@@ -152,7 +152,14 @@ const BUDGETS = {
   // 5k bought: the `eval case` and `unreachable` rows here, and room for the rows the
   // rest of the batch's tickets will need. The floor below is untouched, so this
   // moves the ceiling only.
-  assembled: 175_000,
+  //
+  // RAISED 175k -> 175.5k. The automations registry in
+  // `docs/engineering/operations.md` gained the Figma snapshot refresh row, and
+  // the table ships because an automation absent from it is undocumented by
+  // definition. Main stood 51 chars under the old ceiling on 2026-09-30, so no
+  // row fit. What the 500 bought: that one ~350-char row, and a little room for
+  // the next.
+  assembled: 175_500,
   persona: 28_000,
   botFace: 7_000,
   // Tier 1 — the constitution, always loaded. `AGENTS.md` § The loading contract

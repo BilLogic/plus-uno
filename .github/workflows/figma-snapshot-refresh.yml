@@ -1,0 +1,201 @@
+name: Refresh Figma Component Snapshot
+
+# Re-records scripts/figma-component-snapshot.json from the PUBLISHED Figma
+# library and opens (or updates) a draft PR with the result (registry:
+# docs/engineering/operations.md). It runs `npm run snapshot:figma-components`,
+# which reads Figma REST only and publishes nothing. The script needs
+# FIGMA_ACCESS_TOKEN, and only this repo's secret holds one, which is why the
+# refresh runs here and not on a laptop.
+#
+# Loop shape: manual dispatch → one fetch → one PR (changed, or a date refresh
+# near the age ceiling), or a "no change" summary that closes any stale refresh
+# PR → stop. On demand only, never a cron: a refresh follows a library publish
+# somebody meant, and each one is a PR a human reviews.
+# Spot-run: `gh workflow run figma-snapshot-refresh.yml` (from main).
+#
+# Why this replaces the old poller's shape. The retired figma-library-poll.yml
+# committed straight to main with "[skip ci]" and `git push || true`, so a
+# failed push went unnoticed and nothing ever checked the new baseline. Here the
+# snapshot goes through a PR like any other change.
+#
+# Why the PR is a DRAFT. A PR opened and pushed with the job's GITHUB_TOKEN
+# starts no other workflow (GitHub's rule, to prevent recursive runs), so the
+# pull_request gates do not run on it by themselves. The repo holds no app or
+# PAT secret scoped for this, and a new secret is not added for one manual job.
+# So the PR opens as a draft and its body says how to start the gates: close
+# and reopen it, which is an event of the person doing it. The commit message
+# carries no "[skip ci]" for the same reason: it would skip those gates too.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write # push the fixed refresh branch
+  pull-requests: write # open or update its PR
+
+# Two refreshes at once would force-push the same branch over each other.
+concurrency:
+  group: figma-snapshot-refresh
+  cancel-in-progress: false
+
+env:
+  SNAPSHOT: scripts/figma-component-snapshot.json
+  BRANCH: chore/figma-snapshot-refresh
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Refuse a run off the default branch
+        # The refresh branch is cut from whatever ref was dispatched. From any
+        # branch but main, the PR would carry that branch's commits as well.
+        env:
+          REF: ${{ github.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$REF" != "refs/heads/$DEFAULT_BRANCH" ]; then
+            echo "::error::Dispatch this workflow from $DEFAULT_BRANCH, not $REF."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+
+      - name: Setup Node.js
+        # No npm cache and no install: both scripts import Node built-ins and
+        # repo-local modules only.
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Fetch the published library
+        # FIGMA_FILE_KEY is left to the script's own default, the BS4 Foundation
+        # library the snapshot records. A different key would re-record a
+        # different library over it. --silent keeps npm's banner out of the log
+        # the PR body quotes.
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          npm run --silent snapshot:figma-components | tee "$RUNNER_TEMP/snapshot.log"
+          { echo '```'; cat "$RUNNER_TEMP/snapshot.log"; echo '```'; } > "$RUNNER_TEMP/delta.md"
+
+      - name: Compare with main
+        id: compare
+        # The verdict script ignores `lastChecked` (it moves on every run), row
+        # order and key order. An unchanged library whose snapshot on main is
+        # past half check:figma-snapshots' age ceiling reads as `date-only`, so
+        # the refresh can clear that check. A file that is not JSON fails here
+        # rather than reading as a change.
+        run: |
+          set -euo pipefail
+          git show "HEAD:$SNAPSHOT" > "$RUNNER_TEMP/main-snapshot.json"
+          node scripts/figma-snapshot-verdict.mjs "$RUNNER_TEMP/main-snapshot.json" "$SNAPSHOT" \
+            | tee -a "$GITHUB_OUTPUT"
+
+      - name: No change
+        if: steps.compare.outputs.verdict == 'unchanged'
+        # A refresh PR still open from an earlier run is stale now: main already
+        # matches the library, so it is closed rather than left to be merged.
+        # `--head` matches a branch NAME, so a fork's PR from a branch of the
+        # same name would match too; only this repo's own head is touched, here
+        # and in the edit path below.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.event.repository.default_branch }}
+          OWNER: ${{ github.repository_owner }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open \
+            --json number,headRepositoryOwner,isCrossRepository \
+            | jq -r --arg owner "$OWNER" \
+              '[.[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == $owner)][0].number // empty')
+          if [ -n "$PR" ]; then
+            gh pr close "$PR" --comment "Closed by [a later refresh]($RUN_URL): the published library now matches \`$SNAPSHOT\` on $BASE."
+          fi
+          {
+            echo "## Figma component snapshot: no change"
+            echo
+            echo "The published library matches \`$SNAPSHOT\` on $BASE. No branch pushed, no PR opened."
+            if [ -n "$PR" ]; then echo; echo "Closed the stale refresh PR #$PR."; fi
+            echo
+            cat "$RUNNER_TEMP/delta.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Push the refresh branch
+        if: steps.compare.outputs.verdict != 'unchanged'
+        # The branch is rebuilt from main on every run, so the force push
+        # replaces an older refresh rather than stacking on it.
+        env:
+          VERDICT: ${{ steps.compare.outputs.verdict }}
+        run: |
+          set -euo pipefail
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add "$SNAPSHOT"
+          if [ "$VERDICT" = "date-only" ]; then
+            git commit -m "chore: refresh Figma component snapshot date"
+          else
+            git commit -m "chore: refresh Figma component snapshot"
+          fi
+          git push --force origin "$BRANCH"
+
+      - name: Open or update the draft PR
+        if: steps.compare.outputs.verdict != 'unchanged'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.event.repository.default_branch }}
+          OWNER: ${{ github.repository_owner }}
+          VERDICT: ${{ steps.compare.outputs.verdict }}
+          AGE_DAYS: ${{ steps.compare.outputs.age_days }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          BODY="$RUNNER_TEMP/pr-body.md"
+          {
+            echo "Refreshes \`$SNAPSHOT\` from the published Figma library."
+            echo
+            if [ "$VERDICT" = "date-only" ]; then
+              echo "**Date refresh only.** The published library matches $BASE. This PR moves \`lastChecked\` forward because the snapshot on $BASE was ${AGE_DAYS:-an unreadable number of} days old, past half of the \`check:figma-snapshots\` age ceiling."
+              echo
+            fi
+            echo "## Delta"
+            echo
+            cat "$RUNNER_TEMP/delta.md"
+            echo
+            echo "Counts are published variants, and \"sets changed\" names the component sets they belong to. The delta covers adds, removals and renames only. A change with no set named is somewhere else: a variant's \`description\` or \`nodeId\`, a node hash (a visual edit), or the publish history."
+            echo
+            echo "## Before merging"
+            echo
+            echo "This PR was opened by the workflow's \`GITHUB_TOKEN\`, and GitHub starts no other workflow from that token's events, so **the pull_request checks have not run**. To run them, close this PR and reopen it. Mark it ready for review once they pass."
+            echo
+            echo "Each later run force-pushes \`$BRANCH\` and rewrites this description, and its checks need another close and reopen. A later run that finds no change closes this PR."
+            echo
+            echo "Opened by [Refresh Figma Component Snapshot]($RUN_URL)."
+          } > "$BODY"
+
+          PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open \
+            --json number,headRepositoryOwner,isCrossRepository \
+            | jq -r --arg owner "$OWNER" \
+              '[.[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == $owner)][0].number // empty')
+          if [ -n "$PR" ]; then
+            gh pr edit "$PR" --body-file "$BODY"
+            URL=$(gh pr view "$PR" --json url --jq .url)
+            VERB="Updated"
+          else
+            URL=$(gh pr create --draft --base "$BASE" --head "$BRANCH" \
+              --title "chore: refresh Figma component snapshot" --body-file "$BODY")
+            VERB="Opened"
+          fi
+
+          {
+            echo "## Figma component snapshot: $VERDICT"
+            echo
+            echo "$VERB draft PR: $URL"
+            echo
+            cat "$RUNNER_TEMP/delta.md"
+          } >> "$GITHUB_STEP_SUMMARY"

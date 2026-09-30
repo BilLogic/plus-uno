@@ -45,10 +45,12 @@ export const MIN_COMPONENTS = 1347;
 const FILE_KEY = 'zAecJNRdvJzAUOcjV32tRX';
 
 export const REMEDY = [
-  '  -> Neither file can be refreshed from CI; both need Figma:',
+  '  -> Both files are re-recorded from Figma:',
   ...Object.values(REFRESHERS).map(
     ({ file, script, needs }) => `       ${file}\n         npm run ${script} — needs ${needs}`,
   ),
+  '     The components file can also be refreshed from CI, which holds the token:',
+  '       gh workflow run figma-snapshot-refresh.yml   (opens a draft PR with the delta)',
 ].join('\n');
 
 /*
