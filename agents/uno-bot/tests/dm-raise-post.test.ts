@@ -127,5 +127,11 @@ test("a raise id holds the DM and a hash of the source pair — no topic, no sou
   const a = raiseId(DM, ["Figma", "the code"], "1.0");
   assert.equal(a, raiseId(DM, ["code", "figma"], "1.0"), "the same pair, however named or ordered");
   assert.notEqual(a, raiseId(DM, ["Figma", "Storybook"], "1.0"));
+  for (const named of [["the Figma library", "the codebase"], ["Figma file", "the repo"], ["the code base", "Figma designs"]] as const) {
+    assert.equal(raiseId(DM, named, "1.0"), a, `${named.join(" / ")} is the same pair`);
+  }
+  assert.equal(raiseId(DM, ["the Storybook docs", "the service blueprint"], "1.0"), raiseId(DM, ["Storybook", "Blueprint"], "1.0"));
+  assert.notEqual(raiseId(DM, ["the Brand deck", "Figma"], "1.0"), a, "an unknown name keeps its own normalised name");
+  assert.equal(raiseId(DM, ["the Brand deck", "Figma"], "1.0"), raiseId(DM, ["brand deck", "figma"], "1.0"));
   assert.match(a, /^D0MAYA:raise:[0-9a-f]{8}:1\.0$/);
 });
