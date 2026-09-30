@@ -49,6 +49,9 @@ export interface SearchHit {
   /** The database a Notion hit is a row of, dashes removed; null for a page
    *  that is no database's row. Absent for a GitHub hit. */
   parentDatabaseId?: string | null;
+  /** Notion's `parent.type` for a Notion hit: `workspace` for a top-level
+   *  page, `page_id` or `block_id` for a nested one, `database_id` for a row. */
+  parentType?: string | null;
 }
 
 /** The searches, with the bot's own credentials. Each call is one

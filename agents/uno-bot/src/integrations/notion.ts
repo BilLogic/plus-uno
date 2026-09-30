@@ -579,6 +579,8 @@ export interface NotionPageContent {
   /** The database the page is a row of, dashes removed; null for a page that
    *  is no database's row. */
   parentDatabaseId: string | null;
+  /** Notion's `parent.type`: `workspace` for a top-level page. */
+  parentType: string | null;
   /** More top-level blocks follow the last one read: `blocks` stops short of
    *  the page's end. */
   truncated: boolean;
@@ -769,6 +771,7 @@ export async function readNotionPage(
       text: lines.join("\n").slice(0, READ_TEXT_CAP),
       blocks,
       parentDatabaseId: page.parent?.database_id?.replace(/-/g, "") ?? null,
+      parentType: page.parent?.type ?? null,
       truncated: truncated || partial,
     };
     // Cache only whole reads (never a throw or a partial one). Clear when
@@ -797,6 +800,9 @@ export interface NotionSearchHit {
   /** The database a page hit is a row of, dashes removed; null for a page
    *  that is none's, or for a database hit. */
   parentDatabaseId: string | null;
+  /** Notion's `parent.type`: `workspace`, `page_id`, `block_id`,
+   *  `database_id`; null when Notion gave none. */
+  parentType: string | null;
 }
 
 export async function notionSearch(
@@ -857,6 +863,7 @@ export async function notionSearch(
         title,
         url: canonicalNotionUrl(r.url, bareId),
         parentDatabaseId: r.object === "page" ? (r.parent?.database_id?.replace(/-/g, "") ?? null) : null,
+        parentType: r.parent?.type ?? null,
       });
     }
     return hits;

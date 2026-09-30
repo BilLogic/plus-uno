@@ -55,8 +55,9 @@ export function notionPage(id: string, over: Partial<SweepSource> = {}): SweepSo
     text: "Launch date: October 15\nOwner: design team",
     pillars: [],
     contributors: [],
-    // A standalone page: no database's row.
+    // A top-level workspace page: no database's row.
     parentDatabaseId: null,
+    parentType: "workspace",
     ...over,
   };
 }

@@ -13,6 +13,7 @@ import { runSweepJob, type SweepSource } from "../src/sweep/index";
 import { FOUND_BY_SEARCH } from "../src/sweep/capture-lines";
 import { recordSweepResolution } from "../src/sweep/outcomes";
 import { isTeamNote, type EditedRecordRow } from "../src/sweep/records";
+import { isTeamSurface } from "../src/sweep/surfaces";
 import { operationKinds } from "../src/slack/proposal-render";
 import {
   at,
@@ -192,7 +193,7 @@ test("a thread's answer no page holds becomes a card in that thread naming the p
     capture: true,
     search: {
       "tutor student ratio training session": [
-        { url: training.url, title: training.title, kind: "notion", parentDatabaseId: null },
+        { url: training.url, title: training.title, kind: "notion", parentDatabaseId: null, parentType: "workspace" },
       ],
     },
     detectorReplies: [
@@ -318,7 +319,7 @@ test("a name nobody linked resolves above the floor, and the card says it was fo
   const h = sweepHarness({
     channels,
     sources: [booking],
-    search: { "booking flow PRD": [{ url: booking.url, title: booking.title, kind: "notion", parentDatabaseId: null }] },
+    search: { "booking flow PRD": [{ url: booking.url, title: booking.title, kind: "notion", parentDatabaseId: null, parentType: "workspace" }] },
     detectorReplies: [reply(drift({ source: booking, evidence: [agreed.ts], claimedBy: "U0ADE" }))],
     now: at(29, 22),
   });
@@ -342,7 +343,7 @@ test("below the floor, a search keeps nothing: no page is read, no model is aske
     search: {
       // One shared word ("booking") is not a match, however short the title.
       "booking flow PRD": [
-        { url: "https://www.notion.so/99999999999999999999999999999999", title: "Booking", kind: "notion", parentDatabaseId: null },
+        { url: "https://www.notion.so/99999999999999999999999999999999", title: "Booking", kind: "notion", parentDatabaseId: null, parentType: "workspace" },
       ],
     },
     now: at(29, 22),
@@ -401,7 +402,7 @@ test("a page off the team's surfaces found by search is refused; a Roadmap row i
     search: {
       "reflection launch page": [
         { url: shared.url, title: shared.title, kind: "notion", parentDatabaseId: shared.parentDatabaseId },
-        { url: loose.url, title: loose.title, kind: "notion", parentDatabaseId: null },
+        { url: loose.url, title: loose.title, kind: "notion", parentDatabaseId: null, parentType: "workspace" },
       ],
     },
     now: at(29, 22),
@@ -446,7 +447,7 @@ test("forty notes edited in one minute are all read across two nights, none twic
   const first = await runSweepJob(NOTES, h.deps);
   h.clock.now = at(30, 22);
   const second = await runSweepJob(NOTES, h.deps);
-  h.clock.now = at(1, 22);
+  h.clock.now = at(31, 22);
   const third = await runSweepJob(NOTES, h.deps);
 
   assert.deepEqual([first.threads, second.threads, third.threads], [25, 15, 0]);
@@ -477,7 +478,106 @@ test("a job retried before its cursor was saved queues the same decision once, w
 
   const queued = await h.store.pendingFindings();
   assert.equal(queued.length, 1);
-  assert.equal(queued[0]!.id, `notes:${NOTE_ID}:${PRD.url.slice(-32)}`);
+  assert.equal(queued[0]!.id, `notes:n-dec:${PRD.url.slice(-32)}`, "keyed by the decision's entry and the page");
+});
+
+test("Thursday's new decision on a card about the same page is its own item, after Monday's was carded — and a retry queues it once", async () => {
+  const CARD_ID = "9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d";
+  const card = notionPage(CARD_ID, {
+    title: "Button refresh",
+    contributors: ["Cy Contributor"],
+    blocks: [{ id: "c-spec", lastEditedTime: OLD, text: "Buttons use the primary style." }],
+  });
+  const row: EditedRecordRow = {
+    id: CARD_ID,
+    url: card.url,
+    title: card.title,
+    lastEditedTime: "2026-09-28T20:00:00.000Z",
+    parentDatabaseId: ROADMAP_DB,
+    properties: {},
+    people: { Contributor: ["Cy Contributor"] },
+  };
+  const comments = [{ id: "cm-1", createdTime: "2026-09-28T20:00:00.000Z", text: "Decided: secondary buttons.", links: [], byBot: false }];
+  const decided = (evidence: string, replacement: string) =>
+    recordReply({ source: card, block: "c-spec", evidence: [evidence], replacement });
+  const h = sweepHarness({
+    channels: quiet,
+    sources: [card],
+    capture: true,
+    notion: { cards: [row], comments: { [CARD_ID]: comments } },
+    people: PEOPLE,
+    detectorReplies: [
+      decided("comment:cm-1", "Buttons use the secondary style."),
+      decided("comment:cm-2", "Buttons use the tertiary style."),
+      decided("comment:cm-2", "Buttons use the tertiary style."),
+    ],
+    now: at(28, 22),
+  });
+
+  // Monday: decided, and carded the next morning.
+  await runSweepJob(CARDS, h.deps);
+  h.clock.now = at(29, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1);
+  // ✅ ran it on Tuesday.
+  const monday = h.staged[0]!;
+  const op = monday.operations![0]!;
+  await recordSweepResolution(h.store, monday, [{ toolName: op.toolName, input: op.input, ok: true, result: "{\"ok\":true}" } as never], at(29, 15));
+  await h.threadState.retireProposal(monday.proposalTs);
+
+  // Thursday: a new comment on the same card changes the same page again.
+  comments.push({ id: "cm-2", createdTime: "2026-10-01T18:00:00.000Z", text: "Decided in crit: tertiary after all.", links: [], byBot: false });
+  row.lastEditedTime = "2026-10-01T18:00:00.000Z";
+  h.clock.now = at(31, 22);
+  await runSweepJob(CARDS, h.deps);
+  // A stop landed before the cursor was saved: the retry reads it again.
+  await h.store.saveCursor("notion:roadmap-cards", "2026-09-30T00:00:00.000Z", at(31, 22));
+  await runSweepJob(CARDS, h.deps);
+
+  const queued = await h.store.pendingFindings();
+  assert.deepEqual(queued.map((f) => f.id), [`cards:comment:cm-2:${CARD_ID}`]);
+  h.clock.now = at(32, 14);
+  const friday = await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 2, `Thursday's decision is proposed (${friday.summary})`);
+  assert.match(h.posted[1]!.text, /tertiary/);
+});
+
+test("eighty cards edited in one minute are all read across nights, and the job never stalls at the minute", async () => {
+  const rows: EditedRecordRow[] = Array.from({ length: 80 }, (_, i) => {
+    const id = `c${i.toString(16).padStart(31, "0")}`;
+    return {
+      id,
+      url: `https://www.notion.so/${id}`,
+      title: `Card ${i}`,
+      lastEditedTime: TONIGHT,
+      parentDatabaseId: ROADMAP_DB,
+      properties: {},
+      people: {},
+    };
+  });
+  const h = sweepHarness({ channels: quiet, capture: true, notion: { cards: rows, pageSize: 25 }, now: at(29, 22) });
+
+  const nights: number[] = [];
+  for (let day = 29; day < 35; day++) {
+    h.clock.now = at(day, 22);
+    nights.push((await runSweepJob(CARDS, h.deps)).threads);
+  }
+
+  assert.deepEqual(nights, [25, 25, 25, 5, 0, 0]);
+  assert.equal(new Set(h.sourceReads).size, 80);
+  assert.equal(h.sourceReads.length, 80, "none read twice");
+});
+
+test("a searched page is a team surface only as a database row or a top-level spec, and never when its title reads as a 1:1", () => {
+  const config = { runningNotesDb: NOTES_DB, teamSurfaceDbs: [ROADMAP_DB] };
+  const hit = (title: string, parentType: string, parentDatabaseId: string | null = null) =>
+    isTeamSurface({ kind: "notion", title, parentType, parentDatabaseId }, config);
+  assert.equal(hit("Qi / Bill 1:1 – booking flow spec", "workspace"), false, "a 1:1 title, whatever it ends with");
+  assert.equal(hit("Qi / Bill 1:1 – booking flow spec", "database_id", ROADMAP_DB), false, "even on a team database");
+  assert.equal(hit("Booking flow PRD", "page_id"), false, "a child page — under a 1:1 note or anywhere else");
+  assert.equal(hit("Booking flow PRD", "block_id"), false);
+  assert.equal(hit("Booking flow PRD", "workspace"), true, "a top-level spec is kept");
+  assert.equal(hit("Booking flow notes", "workspace"), false, "a top-level page that is no spec");
 });
 
 test("what one note costs: one edited-since read for the job, then the note, the page it links and one model call", async () => {

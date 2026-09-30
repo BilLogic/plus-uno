@@ -343,7 +343,7 @@ function sweepSearchFor(env: Env): SourceSearch {
   return {
     async notion(query) {
       const hits = await measured(() => notionSearch(env, query, SEARCH_HITS));
-      return hits.map((h): SearchHit => ({ url: h.url, title: h.title, kind: "notion", parentDatabaseId: h.parentDatabaseId }));
+      return hits.map((h): SearchHit => ({ url: h.url, title: h.title, kind: "notion", parentDatabaseId: h.parentDatabaseId, parentType: h.parentType }));
     },
     ...(repo?.ok
       ? {
@@ -516,6 +516,7 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
       pillars: splitList(page.properties["Product Pillar"]),
       contributors: page.people["Contributor"] ?? [],
       parentDatabaseId: page.parentDatabaseId,
+      parentType: page.parentType,
       properties: page.properties,
       truncated: page.truncated,
     };

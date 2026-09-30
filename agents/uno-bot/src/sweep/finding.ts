@@ -92,6 +92,8 @@ export interface SweepSource {
   /** Notion only: the database the page is a row of, dashes removed, or null
    *  for a page that is none's — what `./surfaces.ts` reads. */
   parentDatabaseId?: string | null;
+  /** Notion only: Notion's `parent.type` — `workspace` for a top-level page. */
+  parentType?: string | null;
   /** Notion only: select, multi-select and status values by property name. */
   properties?: Record<string, string>;
   /** Notion only: the page runs past the blocks read, so its last block read

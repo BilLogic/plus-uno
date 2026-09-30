@@ -5,8 +5,9 @@
 //
 // TWO END-OF-DAY JOBS, one per source, each with its own cursor in
 // `sweep_cursors` (the key names the source; the value is Notion's
-// `last_edited_time`, ISO-8601, then `|` and the ids of the rows already
-// handled at that time — `readCursor`):
+// `last_edited_time`, ISO-8601, then `|` the ids of the rows already handled
+// at that time, then `|` the Notion query cursor of the page being worked
+// through at that time — `readCursor`):
 //
 //   `sweep-notes` reads the Design Running Notes rows edited since its cursor,
 //   oldest edit first. The record is each note's blocks edited since then.
@@ -18,8 +19,10 @@
 // THE CURSOR'S EDGE. Notion rounds `last_edited_time` to the minute, so rows
 // edited in the cursor's own minute are read again (`on_or_after`) and the
 // ones already handled are passed over by id. When a whole query page is rows
-// already handled, the next page is read, up to `QUERY_PAGES` a job, so forty
-// rows edited in one minute are all read across two nights.
+// already handled, the next page is read, up to `QUERY_PAGES` a job, and the
+// page reached is kept in the cursor, so the next night starts there rather
+// than at the minute's first page: however many rows share one minute, each
+// night moves on.
 //
 // PRIVACY. Only team-visible consensus notes are read (`isTeamNote`,
 // `./surfaces.ts`): a row whose own parent is the running-notes database, whose
@@ -41,9 +44,11 @@
 // detector passes it over (`./capture-detector.ts`); there is no "note with no
 // decision" check.
 //
-// ONE ITEM PER RECORD AND PAGE. A finding's id is the record row and the page
-// it fixes, never the block the model picked, so a job retried after a stop
-// between queueing and saving the cursor queues the same decision once.
+// ONE ITEM PER DECISION AND PAGE. A finding's id is the earliest record entry
+// it cites (a note block, or `comment:<id>`) and the page it fixes, never the
+// block the model picked: a job retried after a stop between queueing and
+// saving the cursor queues the same decision once, and a later decision on the
+// same card about the same page — a new comment — is an item of its own.
 //
 // THE BUDGET. One edited-since read per job (up to `QUERY_PAGES` when the
 // cursor's minute is crowded), then per record: the page read,
@@ -128,16 +133,18 @@ export const QUERY_PAGES = 3;
 /** Row ids kept at the cursor's minute; past this the oldest drop off. */
 const EDGE_IDS = 200;
 
-/** Where a job left off: the last edit time it reached, and the rows it
- *  handled at that time. A bare time (no `|`) reads as none handled. */
-export function readCursor(value: string): { time: string; handled: string[] } {
-  const [time, ids] = value.split("|");
-  return { time: time!, handled: ids ? ids.split(",").filter(Boolean) : [] };
+/** Where a job left off: the last edit time it reached, the rows it handled
+ *  at that time, and the query page it was working through there. A bare
+ *  time (no `|`) reads as none handled, from the first page. */
+export function readCursor(value: string): { time: string; handled: string[]; page?: string } {
+  const [time, ids, page] = value.split("|");
+  return { time: time!, handled: ids ? ids.split(",").filter(Boolean) : [], ...(page ? { page } : {}) };
 }
 
 /** The cursor's stored value. */
-export function writeCursor(time: string, handled: readonly string[]): string {
-  return handled.length ? `${time}|${handled.slice(-EDGE_IDS).join(",")}` : time;
+export function writeCursor(time: string, handled: readonly string[], page?: string): string {
+  if (!handled.length && !page) return time;
+  return `${time}|${handled.slice(-EDGE_IDS).join(",")}${page ? `|${page}` : ""}`;
 }
 
 /**
@@ -193,20 +200,36 @@ export async function sweepRecords(job: ScheduledJob, deps: SweepDeps): Promise<
   let reached = cursor;
   let handled = [...start.handled];
   const seen = new Set(start.handled);
+  // The query page being worked through at the cursor's minute: where a later
+  // night picks up. It belongs to this cursor's query alone.
+  let after = start.page;
+  const save = async (page?: string) => {
+    if (!deps.dryRun) await deps.store.saveCursor(source.cursor, writeCursor(reached, handled, page), deps.now());
+  };
 
   try {
     let rows: EditedRecordRow[] = [];
-    let after: string | undefined;
     // The cursor's own minute is read again; a page holding only rows already
-    // handled there is passed over for the next.
+    // handled there is passed over for the next, and the page reached is kept.
     for (let page = 0; page < QUERY_PAGES; page++) {
-      const got = await deps.notion.edited(db, cursor, after);
+      let got: Awaited<ReturnType<SweepNotion["edited"]>>;
+      try {
+        got = await deps.notion.edited(db, cursor, after);
+      } catch (err) {
+        // A kept page Notion no longer honours starts the minute over; the
+        // handled ids still keep anything from being read twice.
+        rethrowIfBudget(err);
+        if (!after || page > 0) throw err;
+        after = undefined;
+        got = await deps.notion.edited(db, cursor);
+      }
       rows = got.rows.filter((row) => !(row.lastEditedTime === cursor && seen.has(row.id)));
       if (rows.length || !got.more || !got.next) {
         if (got.more) notes.push(`more rows were edited than one read holds; the rest wait for the next run`);
         break;
       }
       after = got.next;
+      await save(after);
     }
     const failing = new Set(rows.length && !deps.dryRun ? await deps.store.failingThreads(source.cursor) : []);
     for (const row of rows) {
@@ -234,9 +257,11 @@ export async function sweepRecords(job: ScheduledJob, deps: SweepDeps): Promise<
         }
       }
       if (row.lastEditedTime >= reached) {
+        // A new minute is a new query: the page kept for the old one goes.
+        if (row.lastEditedTime > reached) after = undefined;
         handled = row.lastEditedTime > reached ? [row.id] : [...handled, row.id];
         reached = row.lastEditedTime;
-        if (!deps.dryRun) await deps.store.saveCursor(source.cursor, writeCursor(reached, handled), deps.now());
+        await save(after);
       }
     }
   } catch (err) {
@@ -335,7 +360,6 @@ async function sweepRecord(
   // target names no Contributor.
   const people = await contributorsOf(deps, row.people[source.people] ?? (kind === "card" ? page.contributors : []), r.resolved);
   const findings: PendingFinding[] = [];
-  const perPage = new Map<string, number>();
   let unowned = 0;
   for (const d of detected.findings) {
     const contributors = await contributorsOf(deps, d.source.contributors, r.resolved);
@@ -344,14 +368,12 @@ async function sweepRecord(
       unowned += 1;
       continue;
     }
-    // Keyed by the record and the page it fixes, not the block the model
-    // chose, so a retried job queues the same decision once (a second one on
-    // the same page from the same record takes the next number).
-    const target = pageIdOf(d.source.url);
-    const nth = (perPage.get(target) ?? 0) + 1;
-    perPage.set(target, nth);
+    // Keyed by the decision — its earliest cited entry — and the page it
+    // fixes, not the block the model chose: a retry queues it once, and a
+    // later decision about the same page is its own item.
+    const [first] = [...d.evidenceIds].sort((a, b) => (when.get(a) ?? 0) - (when.get(b) ?? 0) || a.localeCompare(b));
     findings.push({
-      id: `${source.queue}:${row.id}:${target}${nth > 1 ? `:${nth}` : ""}`,
+      id: `${source.queue}:${first ?? d.blockId}:${pageIdOf(d.source.url)}`,
       runDate: r.runDate,
       detectedAt: r.now,
       driftAt: Math.min(...d.evidenceIds.map((id) => when.get(id) ?? r.now)),

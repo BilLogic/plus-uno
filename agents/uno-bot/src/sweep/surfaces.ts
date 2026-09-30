@@ -13,7 +13,10 @@
 //   • A SEARCH HIT COMES FROM A TEAM SURFACE (`isTeamSurface`): a row of one of
 //     the databases the team writes its specs and answers in (the Roadmap, the
 //     Help Centers, the Decisions log, the Marketplace — `teamSurfaceDbs`), or
-//     a standalone page titled as a PRD or spec. Anything else a search finds —
+//     a TOP-LEVEL workspace page titled as a PRD or spec. A page nested under
+//     another page or block is not one — a child of a 1:1 note included, so no
+//     parent walk is needed — and neither is any page whose title reads as a
+//     1:1 ("Qi / Bill 1:1 – booking flow spec"). Anything else a search finds —
 //     a page someone shared with the integration, a running note, a row of an
 //     unlisted database — is no hit. It is dropped before it is read, by the
 //     parent Notion's search reports, and checked again on the parent the read
@@ -35,7 +38,7 @@ export interface SurfaceConfig {
 /** What marks a running note as a 1:1 rather than a team note. */
 const ONE_ON_ONE = /\b1\s*[:/–-]\s*1\b|\b1[\s-]*on[\s-]*1\b|\bone[\s-]*on[\s-]*one\b/i;
 
-/** A standalone page that names itself a spec. */
+/** A top-level page that names itself a spec. */
 const SPEC_TITLE = /\b(?:PRDs?|spec|specs|specification)\b/i;
 
 /**
@@ -79,12 +82,13 @@ export function isPrivateNote(source: SweepSource, config: SurfaceConfig): boole
  * @param config - The team's databases
  */
 export function isTeamSurface(
-  hit: { kind: TargetKind; title: string; parentDatabaseId?: string | null },
+  hit: { kind: TargetKind; title: string; parentDatabaseId?: string | null; parentType?: string | null },
   config: SurfaceConfig,
 ): boolean {
   if (hit.kind !== "notion") return true;
+  if (ONE_ON_ONE.test(hit.title)) return false;
   if (hit.parentDatabaseId === undefined) return false;
-  if (hit.parentDatabaseId === null) return SPEC_TITLE.test(hit.title);
+  if (hit.parentDatabaseId === null) return hit.parentType === "workspace" && SPEC_TITLE.test(hit.title);
   if (config.runningNotesDb && hit.parentDatabaseId === bare(config.runningNotesDb)) return false;
   return (config.teamSurfaceDbs ?? []).some((db) => bare(db) === hit.parentDatabaseId);
 }
