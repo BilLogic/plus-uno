@@ -136,7 +136,7 @@ export function judgeSystem(rubric) {
     `The rubric, verbatim from docs/evals/rubrics/bot-answer.md:`,
     rubric.block,
     ``,
-    `A "proposal" result means the action was STAGED behind a human confirmation — it did not execute. What the requester read beside a staged card is the response's "card": its "heading" and its "lead" (the bot's reply, or the Worker's own line when the bot wrote none). "gateAsk" is only the clarify gate's question when it held a proposal back; null beside a staged card does not mean the requester got no reply.`,
+    `A "proposal" result means the action was STAGED behind a human confirmation — it did not execute. What the requester read beside a staged card is the response's "card": its "heading" and its "lead". "card.leadBy" says who wrote the lead: "model" is the bot's own reply; "worker" is a fallback line the Worker added because the bot wrote none. Where the case asks what the bot's reply says or does, only a "model" lead counts as the reply — a "worker" lead is not the bot following the rule. "gateAsk" is only the clarify gate's question when it held a proposal back; null beside a staged card does not mean the requester got no reply.`,
     ``,
     `Reply with STRICT JSON only: {"verdict":"pass"} or {"verdict":"fail","reason":"<one sentence>"}.`,
   ].join("\n");

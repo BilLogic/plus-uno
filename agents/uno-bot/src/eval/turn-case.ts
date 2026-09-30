@@ -238,20 +238,25 @@ function evalResult(report: EvalTurnReport): EvalResult | null {
  *  arrives as `ok: true, disposition: failed` is a case marked failed on a
  *  quota, which is how the first live run "failed" all 34). */
 /**
- * The last card the turn staged, as a person reads its top: the heading and the
- * line it leads with — the model's own reply, or the Worker's ask when the
- * model wrote none. `null` when nothing was staged.
+ * The last card the turn staged, as a person reads its top: the heading, the
+ * line it leads with, and who wrote that line — `model` for the model's own
+ * reply, `worker` for the Worker's ask (or note) when the model wrote none. A
+ * case measuring whether the MODEL follows the reply rule reads `leadBy`, so a
+ * Worker fallback cannot pass it. `null` when nothing was staged.
  *
  * The judge used to see the proposal's input and `gateAsk`, and read an empty
  * `gateAsk` as "the requester got no reply" — but `gateAsk` is the clarify
  * gate's question, and the reply is on the card. This is the card.
  */
-function stagedCard(report: EvalTurnReport): { heading?: string; lead?: string } | null {
+function stagedCard(
+  report: EvalTurnReport,
+): { heading?: string; lead?: string; leadBy?: "model" | "worker" } | null {
   const staged = [...report.calls].reverse().find((c) => c.kind === "proposal");
   if (!staged || staged.kind !== "proposal") return null;
   const heading = cardHeading(staged.card);
   const lead = cardLead(staged.card);
-  return { ...(heading ? { heading } : {}), ...(lead ? { lead } : {}) };
+  const { leadBy } = staged.card;
+  return { ...(heading ? { heading } : {}), ...(lead ? { lead } : {}), ...(lead && leadBy ? { leadBy } : {}) };
 }
 
 function failureError(report: EvalTurnReport): string {

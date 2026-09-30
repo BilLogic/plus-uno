@@ -49,7 +49,7 @@ export function intakeChannelInstruction(message: { senderId: string; isReply: b
     "(system: INTAKE CHANNEL — this is #uno-bot, where the team reports problems with uno-bot and asks for changes to it.",
     "When the message reports a problem or asks for a change, it is an intake:",
     "1. Run `github_intake_search` first.",
-    "2. An open intake that matches → stage `github_issue_update` with a comment on that issue carrying this report, and link the issue. No match → stage `github_issue_create` on the default repo.",
+    "2. An open intake that matches → stage `github_issue_update` with a comment on that issue carrying this report, link the issue, and ask in one line whether to add it there; never stage `github_issue_create` over the match unless they choose to file anyway. No match → stage `github_issue_create` on the default repo.",
     `3. Draft it to spec grade: what happened; what was expected; the evidence (any thread, link or screenshot the post references — the post's own link is appended when it files); who reported it (${who}); a suggested label or area.`,
     "4. Reply in one short line — \"Want me to file this?\" — with the card as the draft. A reply here that refines it gets a revised card.",
     "A question gets its answer and no card; add the intake offer only when it also reports a problem or asks for a change.)",

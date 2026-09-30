@@ -93,6 +93,7 @@ import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
 import { workerTransport } from "./eval-transport.mjs";
 import { localTransport } from "./eval-transport-local.mjs";
+import { readGithubIssue, seedWarnings } from "./eval-seed.mjs";
 import { describeTally, judgeFromEnv, judgeSkipped, judgeTally, noJudge } from "./eval-judge.mjs";
 
 const {
@@ -517,6 +518,14 @@ async function main() {
   const transport = TRANSPORTS[opts.transport]();
   const judge = await judgeFromEnv();
   console.log(`[evals] judge ${judge.name}`);
+  // A live run checks the tracker issues its duplicate cases assume, and says
+  // so loudly when one closed (scripts/eval-seed.mjs). The local transport
+  // replays recordings and reaches no tracker, so it skips this.
+  if (opts.transport === "worker") {
+    for (const w of await seedWarnings(loadCases(CASES_PATH).cases, (repo, issue) => readGithubIssue(repo, issue))) {
+      console.warn(`[evals] ${w}`);
+    }
+  }
 
   const summary = await runEvals({
     transport,

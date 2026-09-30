@@ -555,6 +555,7 @@ test("a staged card reports its heading and lead, so an empty gateAsk is not rea
   assert.deepEqual(silentBody.card, {
     heading: ":warning: About to *file a GitHub issue on BilLogic/plus-uno*:",
     lead: "I'll file this on BilLogic/plus-uno — want me to?",
+    leadBy: "worker",
   });
 
   const replied = harness({
@@ -564,8 +565,9 @@ test("a staged card reports its heading and lead, so an empty gateAsk is not rea
   });
   const repliedBody = evalTurnResponse(
     report(await runTurn(evalRequest({ prompt: "track this on GitHub" }), replied.deps), replied),
-  ) as { card: { lead?: string } | null };
+  ) as { card: { lead?: string; leadBy?: string } | null };
   assert.equal(repliedBody.card?.lead, "Filing it on plus-uno — ok?");
+  assert.equal(repliedBody.card?.leadBy, "model");
 
   // Nothing staged, nothing to report.
   const answered = harness();

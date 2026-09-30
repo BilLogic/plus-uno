@@ -122,6 +122,11 @@ export type AgentResult =
        *  leaves the contract when mid-turn effects move behind the Delivery
        *  port and `slack/events.ts` stops reading the result's fields directly. */
       previewText?: string;
+      /** What the MODEL wrote beside the call, and nothing the Worker added —
+       *  `previewText` also carries the "I could not stage …" note. `""` when
+       *  the model wrote nothing; absent on a proposal no model turn produced
+       *  (a restage, a sweep revision), which gets no fallback lead. */
+      replyText?: string;
     }
   | {
       kind: "resolved";
@@ -609,6 +614,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         toolName: operations[0]!.toolName,
         input: operations[0]!.input,
         previewText: preview || undefined,
+        replyText: (reply.text || "").trim(),
       });
     }
 

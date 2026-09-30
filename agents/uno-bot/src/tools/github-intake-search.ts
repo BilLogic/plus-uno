@@ -101,11 +101,15 @@ export async function findOpenIntakes(
       // No match is not a routing decision. The no-match note used to say
       // "Stage github_issue_create", and the model followed it even where the
       // repo was unclear (live eval G7) — so it names the two branches instead.
+      // ONE match note serves both surfaces: in the #uno-bot intake channel the
+      // comment is staged as the card (I3), elsewhere the choice is asked in
+      // words first (G3) — `turn/intake-channel.ts` says the same.
       note: matches.length
-        ? "Open intakes that may already cover this. Before staging github_issue_create, name the closest " +
-          "by title and link, and ask: add this to that issue instead (a github_issue_update comment), or " +
-          "file a new one anyway? Stage the new issue only if they choose to file anyway. Not a match on a " +
-          "closer read → say so and file it."
+        ? "Open intakes that may already cover this. Name the closest by title and link, and ask: add this " +
+          "to that issue instead, or file a new one anyway? In the #uno-bot intake channel, stage " +
+          "github_issue_update with the comment and ask in one line; elsewhere ask in text first. Never " +
+          "stage github_issue_create over the match unless they choose to file anyway. Not a match on a " +
+          "closer read → say so, and file it where the repo is clear, or ask."
         : "No open intake matches these words. Where the repo or surface is clear, file it there; where " +
           "it is unclear, ask which repo, naming the listed ones by purpose. If the words were narrow, one " +
           "retry with other words first is fine.",
@@ -119,8 +123,9 @@ export async function findOpenIntakes(
         (err instanceof GithubRateLimitError
           ? "Couldn't check for a duplicate: GitHub's search rate limit is spent for now. "
           : "Couldn't check for a duplicate. ") +
-        "Say so in one clause and stage github_issue_create anyway — " +
-        "triage catches a duplicate the check missed.",
+        "Say so in one clause. Where the repo is clear, stage github_issue_create anyway — triage " +
+        "catches a duplicate the check missed; where it is unclear, ask which repo first, naming the " +
+        "listed ones by purpose.",
     });
   }
 }

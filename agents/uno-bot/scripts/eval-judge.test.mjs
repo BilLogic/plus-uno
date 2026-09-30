@@ -85,6 +85,8 @@ test("the prompt says where a staged card's reply is, and that gateAsk is not it
   const prompt = judgeSystem(loadRubric());
   assert.match(prompt, /"card": its "heading" and its "lead"/);
   assert.match(prompt, /"gateAsk" is only the clarify gate's question/);
+  // And a Worker fallback is not the bot following the reply rule.
+  assert.match(prompt, /only a "model" lead counts as the reply/);
 });
 
 test("a rubric edit reaches the prompt without touching the prompt", () => {

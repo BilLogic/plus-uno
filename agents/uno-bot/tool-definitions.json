@@ -184,7 +184,7 @@
   },
   {
     "name": "github_intake_search",
-    "description": "Read-only, ungated. Search the open GitHub intakes (issues labelled harness-intake, awaiting triage) by keyword, on a listed repo — plus-uno unless `repo` names another. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to link that one instead or file a new one anyway — stage the card only on 'file anyway'. No match is not a route: which repo it belongs on unclear → ask, naming the listed ones. The Worker fixes the open state and the label and refuses a repo off its list; you send keywords, and a repo when it is not plus-uno.",
+    "description": "Read-only, ungated. Search the open GitHub intakes (issues labelled harness-intake, awaiting triage) by keyword, on a listed repo — plus-uno unless `repo` names another. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to add this to it (a github_issue_update comment) or file a new one anyway — stage the card only on 'file anyway'. No match is not a route: which repo it belongs on unclear → ask, naming the listed ones. The Worker fixes the open state and the label and refuses a repo off its list; you send keywords, and a repo when it is not plus-uno.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

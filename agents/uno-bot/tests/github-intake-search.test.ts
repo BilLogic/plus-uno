@@ -114,8 +114,13 @@ test("a likely duplicate comes back with its title and link, and the note offers
   assert.match(result.note!, /title and link/i);
   assert.match(result.note!, /file (?:a new one )?anyway/i);
   assert.match(result.note!, /github_issue_create/);
-  // Adding to the match is a follow-up on it, and the note names that tool.
-  assert.match(result.note!, /github_issue_update/);
+  // Adding to the match is a follow-up on it, and the note names that tool —
+  // staged at once in the #uno-bot intake channel, asked in words elsewhere.
+  assert.match(result.note!, /add this to that issue instead/);
+  assert.match(result.note!, /#uno-bot intake channel, stage github_issue_update/);
+  assert.match(result.note!, /elsewhere ask in text first/);
+  assert.match(result.note!, /Never stage github_issue_create over the match/);
+  assert.match(result.note!, /where the repo is clear, or ask\.$/);
 });
 
 test("no match says so, and leaves the route to the repo rather than prescribing a card", async () => {
@@ -181,7 +186,9 @@ test("a failed search is reported, and does not block filing", async () => {
   assert.match(result.error!, /403/);
   // The check is a courtesy to the tracker, not a gate on the request.
   assert.match(result.note!, /couldn't check/i);
-  assert.match(result.note!, /github_issue_create/);
+  assert.match(result.note!, /Where the repo is clear, stage github_issue_create anyway/);
+  // An unclear repo still gets a question, search or no search.
+  assert.match(result.note!, /ask which repo first/);
 });
 
 test("a spent rate limit is named as such, and still does not block filing", async () => {
@@ -191,4 +198,5 @@ test("a spent rate limit is named as such, and still does not block filing", asy
   assert.equal(result.ok, false);
   assert.match(result.note!, /rate limit/i);
   assert.match(result.note!, /github_issue_create/);
+  assert.match(result.note!, /ask which repo first/);
 });

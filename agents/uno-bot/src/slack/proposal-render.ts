@@ -146,9 +146,11 @@ function aboutTo(card: ProposalCard): string {
   return `:warning: About to *${card.verb}*:`;
 }
 
-/** The line a card opens with: the model's own, or else the Worker's ask. */
+/** The line a card opens with: the model's own reply, or else the Worker's
+ *  ask — above whatever note the Worker added, which is not a reply. */
 export function cardLead(card: ProposalCard): string | undefined {
-  return card.lead ?? (card.ask ? askText(card.ask) : undefined);
+  if (!card.ask) return card.lead;
+  return card.lead ? `${askText(card.ask)}\n\n${card.lead}` : askText(card.ask);
 }
 
 /** The card's heading as posted — absent on a `revision` card, which has none. */
@@ -164,8 +166,11 @@ function askText(ask: CardAsk): string {
       return `I'll file this on ${escapeSlackText(ask.repo)} — want me to?`;
     case "roadmap-intake":
       return "I'll add this to the Roadmap as an intake — want me to?";
-    case "update-issue":
-      return `I'll add this to ${ask.issues.map(escapeSlackText).join(", ")} — want me to?`;
+    case "update-issue": {
+      const issues = ask.issues.map(escapeSlackText).join(", ");
+      if (ask.verb === "add") return `I'll add this to ${issues} — want me to?`;
+      return `I'll ${ask.verb} ${issues} — want me to?`;
+    }
   }
 }
 

@@ -389,6 +389,7 @@ test("text beside a side-effect call becomes the proposal preview, not narration
     toolName: "notion_create",
     input: { title: "Reflection redesign" },
     previewText: "I'll file a Roadmap card for the reflection redesign.",
+    replyText: "I'll file a Roadmap card for the reflection redesign.",
   });
   assert.deepEqual(rec.interim, []);
   // Staged, never executed: only the one model call was made.
