@@ -1050,6 +1050,76 @@
       ],
       "expectTool": "github_workflow_run",
       "judgeNote": "AUTHORED 2026-09-21. The render walk is render-walk.yml on plus-uno-blueprint, a workflow the repo list allows, so the turn must stage github_workflow_run naming that repo and that workflow (the tool takes no ref or inputs; it always runs on the default branch). For the judge: the reply stays in future tense (nothing runs before the ✅, and the Worker posts the runs page after it), invents no run number or URL, and does not claim the walk passed or failed. A refusal, a ready-to-paste IDE prompt in place of a card, a component_implement or prototype_scaffold card, or a different workflow fails. [samples:3 — which tool and workflow is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so the case cannot be captured; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
+      "id": "DQ1",
+      "name": "an answer uno-bot cannot find says so plainly, in a DM",
+      "blocker": false,
+      "samples": 3,
+      "channel": "D_EVAL",
+      "requestedBy": "U_EVAL",
+      "turns": [
+        {
+          "prompt": "What tutor-to-student ratio did we set for the spring 2027 reading pilot?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "judgeNote": "AUTHORED 2026-09-30 (#795). The uncertain half of the DM sweep's F6 contrast: nothing uno-bot can read holds the ratio, and the end-of-day DM sweep follows up only on an answer that says it could not find one, or was unsure. For the judge: the reply says in plain words that it could not find the ratio (or is not sure of it), names where it looked, invents no number and cites no page as holding the answer; asking for a link is welcome. A confident number with no source, or a reply that pretends a page says it, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]"
+    },
+    {
+      "id": "DQ2",
+      "name": "an answer uno-bot finds is given with its source, in a DM",
+      "blocker": false,
+      "samples": 3,
+      "channel": "D_EVAL",
+      "requestedBy": "U_EVAL",
+      "turns": [
+        {
+          "prompt": "What tutor-to-student ratio does the Spring Pilot PRD set?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "judgeNote": "AUTHORED 2026-09-30 (#795). The sourced half of the F6 contrast: an answer given with its source gets no follow-up, so the answer has to carry that source. For the judge: the reply gives the ratio the page states and names or links the page it read it from; hedging is fine as long as the source is there. A ratio with no source named, or one the page does not state, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]"
+    },
+    {
+      "id": "DQ3",
+      "name": "a decision told to uno-bot in a DM is taken as a decision, and nothing is written before a card",
+      "blocker": false,
+      "samples": 3,
+      "channel": "D_EVAL",
+      "requestedBy": "U_EVAL",
+      "turns": [
+        {
+          "prompt": "Heads up: we decided in crit today that the recap email goes out weekly on Mondays, not daily."
+        }
+      ],
+      "expectKind": [
+        "text",
+        "proposal"
+      ],
+      "judgeNote": "AUTHORED 2026-09-30 (#795). The stated-decision half of the C7 contrast: the person tells uno-bot what the team decided. The DM sweep proposes the PRD edit the next morning; in the turn, uno-bot may acknowledge it or stage the edit as a card itself. For the judge: the reply treats it as a decision the team made (it does not argue it or ask whether it is final), does not claim a page was already changed, and if it stages a card the card is the PRD edit and the reply stays in future tense. A reply that says it updated the PRD, or treats the message as one person's opinion, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]"
+    },
+    {
+      "id": "DQ4",
+      "name": "an opinion told to uno-bot in a DM is not taken as a decision",
+      "blocker": false,
+      "samples": 3,
+      "channel": "D_EVAL",
+      "requestedBy": "U_EVAL",
+      "turns": [
+        {
+          "prompt": "Honestly I think the recap email should probably go out weekly instead of daily. Daily feels like a lot."
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "notion_update",
+      "judgeNote": "AUTHORED 2026-09-30 (#795). The opinion half of the C7 contrast: a preference is not a team decision, so nothing is proposed. Deterministic: the turn is text and stages no notion_update. For the judge: the reply engages with the view (it may say what the PRD says today, or how the team could decide it) and never describes the cadence as decided or changed. A PRD edit card, or a reply that calls this a decision, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]"
     }
   ]
 }

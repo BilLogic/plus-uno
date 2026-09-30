@@ -1,0 +1,17 @@
+{
+  "case": "DQ3",
+  "source": "authored",
+  "recordedAt": "2026-09-30",
+  "note": "AUTHORED with #795, not captured off the Worker. The draw is the turn the case expects; it proves the turn, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=DQ3`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Heads up: we decided in crit today that the recap email goes out weekly on Mondays, not daily.",
+      "replies": [
+        {
+          "text": "Got it: the recap email goes out weekly on Mondays now, not daily. If the recap PRD still says daily, I'll suggest the edit so it matches. Nothing changes on the page until someone confirms it."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

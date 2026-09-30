@@ -69,7 +69,7 @@ Every turn either route records is a live billable model run, so the script reco
 ## Recorded today
 
 <!-- census:recorded — generated from docs/evals/fixtures/uno-bot-cases.json by agents/uno-bot/scripts/eval-docs.mjs; do not edit by hand -->
-**35 of 52 fixture cases are recorded** — 1 `authored`, 34 `captured`. The other 17 are **unreachable**: R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1. Each skips by name on the pull-request gate, so nothing about it is measured there — record it (`-f cases=<id>` below) or accept that it gates nothing.
+**39 of 56 fixture cases are recorded** — 5 `authored`, 34 `captured`. The other 17 are **unreachable**: R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1. Each skips by name on the pull-request gate, so nothing about it is measured there — record it (`-f cases=<id>` below) or accept that it gates nothing.
 <!-- /census:recorded -->
 
 Off a single `mode=record` CI run. `source` per file is the thing to read before trusting a green run; the three that shipped authored with #512 (R3, R5, R11) were replaced by the capture.

@@ -1,0 +1,32 @@
+{
+  "case": "DQ2",
+  "source": "authored",
+  "recordedAt": "2026-09-30",
+  "note": "AUTHORED with #795, not captured off the Worker. The draw is the turn the case expects; it proves the turn, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=DQ2`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "What tutor-to-student ratio does the Spring Pilot PRD set?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "Spring Pilot PRD"
+              }
+            }
+          ]
+        },
+        {
+          "text": "The Spring Pilot PRD sets 1 tutor to 4 students, in its Staffing section: <https://www.notion.so/Spring-Pilot-PRD-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb|Spring Pilot PRD>."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "notion_search",
+          "text": "{\"ok\": true, \"results\": [{\"title\": \"Spring Pilot PRD\", \"url\": \"https://www.notion.so/Spring-Pilot-PRD-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"snippet\": \"Staffing: 1 tutor to 4 students per session.\"}]}"
+        }
+      ]
+    }
+  ]
+}

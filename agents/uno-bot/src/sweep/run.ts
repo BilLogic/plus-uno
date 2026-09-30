@@ -15,6 +15,17 @@
 //   uno-bot is in, as the bot's own conversation list names them, one after
 //   another on the job's budget; each keeps its own cursor and run record.
 //
+//   `sweep-dms` (end of day, one job) reads each 1:1 DM uno-bot answered in
+//   since its last run (`SweepDeps.dms`, from the usage record) with the bot
+//   token — a DM uno-bot is a party to needs no opt-in. Each DM thread, both
+//   sides of it, goes to `onDmThread` (`../dm-sweep/`), which keeps what uno-bot
+//   could not answer and what it saw disagree, and says whether the person
+//   stated a decision (C7) or answered uno-bot's ask about a missed question
+//   (F6). Only then does the thread go through the drift and placement reads
+//   below, its links read from uno-bot's answers too; what they find is posted
+//   back only in that DM. A DM finding never shadows a channel's copy of the
+//   same fix: a DM is one person's, and the team's thread keeps its card.
+//
 //   A thread that names a page without linking it has that page searched for
 //   (`./search.ts`), and one that asks a question someone answered is asked
 //   where the answer belongs when no page holds it (`./capture-detector.ts`):
@@ -47,7 +58,11 @@
 //     team channel — the page's name, no quote, no names (`./share.ts`).
 //   • A fix found both in a public thread and in a private place is private:
 //     it goes on the private card, and the public copy leaves the queue.
-//   • A DM is never read, and #uno-bot is never swept and never posted in.
+//   • A 1:1 DM with uno-bot is read only by `sweep-dms`, and everything it
+//     finds is posted back only in that DM. Its one way out is the ✅ on the
+//     DM sweep's offer to raise a disagreement (`../dm-sweep/`).
+//   • Any other DM is never read, and #uno-bot is never swept and never
+//     posted in.
 //
 // THE BUDGET. Each alarm runs one job on a fresh subrequest budget, under the
 // lookup ceiling (ADR-022). A channel's threads are processed oldest activity
@@ -189,6 +204,40 @@ export interface SweepSlack {
   groupDms?(): Promise<string[] | null>;
 }
 
+/** A 1:1 DM uno-bot answered in, and its person. */
+export interface ActiveDm {
+  channel: string;
+  person: string;
+}
+
+/** One message of a person's DM with uno-bot, either side. */
+export interface DmMessage {
+  ts: string;
+  /** The person's id, or uno-bot's for its own messages. */
+  user: string;
+  text: string;
+  byBot: boolean;
+  /** An app's tag on the message (Slack message metadata), when it has one. */
+  tag?: { type: string; payload: Record<string, unknown> };
+}
+
+/** A thread of a person's DM with uno-bot, as `sweep-dms` reads it. */
+export interface DmThread {
+  channel: string;
+  /** The person whose DM it is. */
+  person: string;
+  rootTs: string;
+  /** Both sides, root first. */
+  messages: DmMessage[];
+}
+
+/** What a DM thread asks of the sweep's own reads: drift, for a decision the
+ *  person stated; placement, for an answer to uno-bot's ask. */
+export interface DmThreadVerdict {
+  decision: boolean;
+  answered: boolean;
+}
+
 /** A card as Slack will post it. */
 export interface RenderedSweepCard {
   text: string;
@@ -297,6 +346,17 @@ export interface SweepDeps extends Pick<JobContext, "runDate"> {
    */
   onThread?(thread: SweepThread, since: string): Promise<void>;
   /**
+   * The 1:1 DMs uno-bot answered in since `since` (epoch ms), each with its
+   * person, or null when they cannot be read. Absent, `sweep-dms` skips.
+   */
+  dms?(since: number): Promise<ActiveDm[] | null>;
+  /**
+   * Handed each DM thread `sweep-dms` reads — both sides — and the DM's
+   * cursor (`../dm-sweep/`). A budget stop throws through; any other failure
+   * is the hook's to swallow. Absent, `sweep-dms` skips.
+   */
+  onDmThread?(thread: DmThread, since: string): Promise<DmThreadVerdict>;
+  /**
    * Handed each team running note the notes job reads — past its team-note
    * guard — with its entries edited since the cursor and its Note Takers as
    * Slack ids, so another job reads the same notes without a second read
@@ -331,7 +391,7 @@ export interface SweepCardReport {
 
 /** What one job came to. */
 export interface SweepJobReport {
-  kind: "sweep-channel" | "sweep-group-dms" | "sweep-post" | "sweep-notes" | "sweep-cards";
+  kind: "sweep-channel" | "sweep-group-dms" | "sweep-dms" | "sweep-post" | "sweep-notes" | "sweep-cards";
   key: string;
   outcome: SweepRunOutcome;
   note: string | null;
@@ -360,9 +420,11 @@ export async function runSweepJob(job: ScheduledJob, deps: SweepDeps): Promise<S
       ? await postFindings(job, deps)
       : job.kind === "sweep-group-dms"
         ? await sweepGroupDms(job, deps)
-        : job.kind === "sweep-notes" || job.kind === "sweep-cards"
-          ? await sweepRecords(job, deps)
-          : await sweepChannel(job, deps);
+        : job.kind === "sweep-dms"
+          ? await sweepDms(job, deps)
+          : job.kind === "sweep-notes" || job.kind === "sweep-cards"
+            ? await sweepRecords(job, deps)
+            : await sweepChannel(job, deps);
   return deps.dryRun ? withheldFromDryRun(report) : report;
 }
 
@@ -439,13 +501,73 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
   return { ...base, outcome: "handled", note, threads, findings, cards, summary: note ? `${counted} — ${note}` : counted };
 }
 
+/** How far back `sweep-dms` looks for DMs uno-bot answered in: a weekend and
+ *  a missed run. Each DM's own cursor says what in it is new. */
+export const DM_LOOKBACK_MS = 4 * 24 * 60 * 60 * 1000;
+
+/**
+ * Every 1:1 DM uno-bot answered in lately, one after another on this job's
+ * budget, as the group-DM job goes: each its own cursor and run record under
+ * `<job key>:<channel>`, a retry passing over the DMs already handled today,
+ * and one DM's failure logged without stopping the rest. The list comes from
+ * the usage record, not from Slack, so it needs no scope to list DMs and
+ * costs one D1 read however many DMs uno-bot has.
+ */
+async function sweepDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
+  const base = { kind: "sweep-dms" as const, key: job.key };
+  const skipped = (note: string): SweepJobReport => ({ ...base, outcome: "skipped", note, threads: 0, findings: [], cards: [], summary: note });
+  if (!deps.dms || !deps.onDmThread) return skipped("no DM reader is wired");
+  const listed = await deps.dms(deps.now() - DM_LOOKBACK_MS);
+  if (!listed) return skipped("the DMs uno-bot answered in could not be listed");
+  const runDate = deps.runDate;
+  const reports: SweepJobReport[] = [];
+  const failed: string[] = [];
+  const dms = listed.filter((dm, i) => dm.channel.startsWith("D") && listed.findIndex((d) => d.channel === dm.channel) === i);
+  const runIdOf = (channel: string) => `${runDate}:${job.key}:${channel}`;
+  // One read for every DM already swept today, however many a retry passes over.
+  const handled = new Set(deps.dryRun || !dms.length ? [] : await deps.store.handledRuns(dms.map((dm) => runIdOf(dm.channel))));
+  let done = 0;
+  for (const dm of dms) {
+    const key = `${job.key}:${dm.channel}`;
+    if (handled.has(runIdOf(dm.channel))) {
+      done += 1;
+      continue;
+    }
+    try {
+      reports.push(await sweepChannel({ key, kind: "sweep-channel", channel: dm.channel }, deps, "dm", dm.person));
+    } catch (err) {
+      rethrowIfBudget(err);
+      console.error(`[sweep] DM ${dm.channel} failed: ${err instanceof Error ? err.message : String(err)}`);
+      failed.push(dm.channel);
+    }
+  }
+  const threads = reports.reduce((n, r) => n + r.threads, 0);
+  const findings = reports.flatMap((r) => r.findings);
+  const cards = reports.flatMap((r) => r.cards);
+  const notes = [
+    ...(done ? [`${done} already swept today`] : []),
+    ...(failed.length ? [`${failed.length} failed: ${failed.join(", ")}`] : []),
+    ...reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`),
+  ];
+  const note = notes.length ? notes.join("; ") : null;
+  const counted = `${reports.length} DM(s), ${threads} thread(s) read, ${findings.length} finding(s) kept for the morning`;
+  return { ...base, outcome: "handled", note, threads, findings, cards, summary: note ? `${counted} — ${note}` : counted };
+}
+
 /**
  * One channel's end of day.
  *
  * @param only - Sweep it only when Slack says it is this kind — how the
- *   group-DM job holds itself to group DMs
+ *   group-DM job holds itself to group DMs. `dm` is the DM job's: a `D…` id
+ *   is a DM, and Slack is not asked.
+ * @param person - The DM's person, for `dm`
  */
-async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKind): Promise<SweepJobReport> {
+async function sweepChannel(
+  job: ScheduledJob,
+  deps: SweepDeps,
+  only?: ChannelKind,
+  person?: string,
+): Promise<SweepJobReport> {
   const startedAt = deps.now();
   const meterStart = readMeter(deps);
   const channel = job.channel ?? "";
@@ -475,9 +597,11 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKi
 
   if (!channel) return finish("skipped", "no channel on the job", 0, []);
   if (channel === deps.config.unoBot) return finish("skipped", "#uno-bot is never swept", 0, []);
-  const kind = await deps.slack.channelKind(channel);
+  // A DM's kind is its id's: asking Slack would need a scope uno-bot has no
+  // other use for.
+  const kind = only === "dm" ? (channel.startsWith("D") && person ? "dm" : null) : await deps.slack.channelKind(channel);
   if (kind === null) return finish("skipped", "Slack would not describe the channel", 0, []);
-  if (kind === "dm") return finish("skipped", "DMs are never read", 0, []);
+  if (kind === "dm" && only !== "dm") return finish("skipped", "a DM is read only by the DM job", 0, []);
   if (only && kind !== only) return finish("skipped", `not a ${only}`, 0, []);
   if (kind === "private" && !(deps.config.privateAllowlist ?? []).includes(channel)) {
     return finish("skipped", "a private channel off the private allowlist is never read", 0, []);
@@ -497,8 +621,10 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKi
   // A private place's members, read once, the first time a Contributor is
   // about to be named owner there.
   let members: Promise<ReadonlySet<string>> | undefined;
+  // A DM's one member beside uno-bot is its person, who is its owner anyway:
+  // no Contributor elsewhere is named there.
   const membersOf = (): Promise<ReadonlySet<string>> =>
-    (members ??= (deps.slack.members ? deps.slack.members(channel) : Promise.resolve(null)).then(
+    (members ??= (kind === "dm" ? Promise.resolve(null) : deps.slack.members ? deps.slack.members(channel) : Promise.resolve(null)).then(
       (m) => new Set(m ?? []),
     ));
 
@@ -529,8 +655,18 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKi
       } else if (messages !== "too-long") {
         const humans = messages.filter((m) => isHuman(m, deps.config.botUserId)).map(toSweepMessage);
         threads += 1;
-        if (deps.onThread) await deps.onThread({ channel, channelKind: kind, rootTs: unit.root.ts, messages: humans }, cursor);
+        if (deps.onThread && kind !== "dm") await deps.onThread({ channel, channelKind: kind, rootTs: unit.root.ts, messages: humans }, cursor);
+        // A DM thread goes to the DM hook first, which says what — if
+        // anything — the drift and placement reads should look for.
+        const dm =
+          kind === "dm" && deps.onDmThread
+            ? {
+                ...(await deps.onDmThread({ channel, person: person!, rootTs: unit.root.ts, messages: dmMessages(messages, deps.config.botUserId) }, cursor)),
+                botTexts: messages.filter((m) => !isHuman(m, deps.config.botUserId)).map((m) => m.text ?? ""),
+              }
+            : undefined;
         const found = await sweepThread(deps, {
+          ...(dm ? { dm } : {}),
           channel,
           channelKind: kind,
           rootTs: unit.root.ts,
@@ -647,6 +783,9 @@ async function sweepThread(
     resolved: Map<string, string | null>;
     /** The place's members — read only for a place that is not public. */
     membersOf: () => Promise<ReadonlySet<string>>;
+    /** A DM thread's verdict (`DmThreadVerdict`), and uno-bot's own messages
+     *  there, whose links are followed but whose words are never evidence. */
+    dm?: DmThreadVerdict & { botTexts: string[] };
   },
 ): Promise<
   | { ok: true; findings: PendingFinding[]; drifts: FileDriftFinding[]; readOnly: number; trimmed: number }
@@ -657,7 +796,11 @@ async function sweepThread(
   const triggers = (kind: TargetKind): boolean => !!deps.fileDrift && triggersFileDrift(kind);
   const root = t.humans.find((m) => m.ts === t.rootTs) ?? t.humans[0];
   if (!root) return none;
-  const links = [...new Set(t.humans.flatMap((m) => linksIn(m.text)))]
+  // In a DM, nothing is looked for unless the DM hook asked: a stated
+  // decision for drift, an answer to uno-bot's ask for placement.
+  if (t.dm && !t.dm.decision && !t.dm.answered) return none;
+  const linkTexts = [...t.humans.map((m) => m.text), ...(t.dm?.botTexts ?? [])];
+  const links = [...new Set(linkTexts.flatMap((text) => linksIn(text)))]
     .map((url) => ({ url, kind: classifyLink(url, deps.config.figmaLibraryKey) }))
     .filter((l): l is { url: string; kind: TargetKind } => l.kind !== null);
   const linksNotion = links.some((l) => l.kind === "notion");
@@ -666,7 +809,10 @@ async function sweepThread(
   // A page a message names without linking, and a question someone answered
   // (`./search.ts`) — each looked for only when its detector is wired.
   const named = deps.search ? namedThings(t.humans.map((m) => m.text)) : [];
-  const answered = !!deps.capture && looksAnswered(t.humans);
+  // In a DM the person answers their own question, so the DM hook says when
+  // they have — only ever in reply to uno-bot's ask.
+  const answered = !!deps.capture && (t.dm ? t.dm.answered : looksAnswered(t.humans));
+  const driftAsked = !t.dm || t.dm.decision;
   // Only Notion is written in place, so a thread with no Notion link, no file
   // link asked about, nothing named and no answered question has nothing this
   // sweep can propose — and costs no read and no model call.
@@ -722,7 +868,7 @@ async function sweepThread(
   // Drift needs a page or file the thread pointed at — linked or named. A page
   // found only from the question's words is for placing its answer.
   const detected =
-    linksNotion || linksFile || named.length
+    driftAsked && (linksNotion || linksFile || named.length)
       ? await deps.detector.detect({ thread, sources })
       : { ok: true as const, findings: [] };
   if (!detected.ok) {
@@ -1250,7 +1396,11 @@ function fixKey(f: Pick<PendingFinding, "target" | "blockId">): string {
  * @param queued - Every finding in the queue, due or not
  */
 export function shadowedByPrivate(due: readonly PendingFinding[], queued: readonly PendingFinding[]): PendingFinding[] {
-  const privateFixes = new Set(queued.filter((f) => f.evidence.channelKind !== "public").map(fixKey));
+  // A 1:1 DM shadows nothing: it is one person's, what it finds never steers
+  // another place's job, and the public card shows only its own thread's words.
+  const privateFixes = new Set(
+    queued.filter((f) => f.evidence.channelKind !== "public" && f.evidence.channelKind !== "dm").map(fixKey),
+  );
   return due.filter((f) => f.evidence.channelKind === "public" && privateFixes.has(fixKey(f)));
 }
 
@@ -1445,6 +1595,8 @@ function itemRecord(f: PendingFinding, plan: SweepCardPlan, now: number): SweepI
     detectedAt: f.detectedAt,
     postedAt: null,
     resolvedAt: null,
+    // The record's surface flag: an item found in a person's DM with uno-bot.
+    ...(f.evidence.channelKind === "dm" ? { surface: "dm" as const } : {}),
   };
 }
 
@@ -1506,6 +1658,26 @@ function ensureHeadroom(deps: SweepDeps, need: { subrequests: number; d1Queries:
   const left = deps.meter?.headroom() ?? { subrequests: Infinity, d1Queries: Infinity };
   if (left.d1Queries < need.d1Queries) throw new D1QueryBudgetError(need.d1Queries);
   if (left.subrequests < need.subrequests) throw new SubrequestBudgetError(need.subrequests);
+}
+
+/** A DM thread's messages, both sides, uno-bot's own marked and their tags
+ *  kept; anything neither the person's nor uno-bot's (a join, an edit notice)
+ *  left out. */
+function dmMessages(messages: readonly SweepSlackMessage[], botUserId: string | null | undefined): DmMessage[] {
+  const out: DmMessage[] = [];
+  for (const m of messages) {
+    const human = isHuman(m, botUserId);
+    const bot = !human && (!!m.bot_id || (!!botUserId && m.user === botUserId));
+    if (!human && !bot) continue;
+    out.push({
+      ts: m.ts,
+      user: m.user ?? botUserId ?? "",
+      text: m.text ?? "",
+      byBot: bot,
+      ...(m.metadata ? { tag: { type: m.metadata.event_type, payload: m.metadata.event_payload ?? {} } } : {}),
+    });
+  }
+  return out;
 }
 
 function isHuman(m: SweepSlackMessage, botUserId: string | null | undefined): boolean {

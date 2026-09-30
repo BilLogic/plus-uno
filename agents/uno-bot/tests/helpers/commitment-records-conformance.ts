@@ -246,4 +246,35 @@ export function runCommitmentRecordsConformance(
     // It is due like any other.
     assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01"))?.id, live.id);
   });
+
+  it("a DM ask keeps its kind and its DM, goes after a person's own asks on the cards budget, and is never a promise", async () => {
+    const records = make();
+    const miss = commitmentRow({ id: "D0MAYA:1.0:unanswered", kind: "dm_unanswered", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA", deadlineAt: null, dueAt: 10 });
+    const raise = commitmentRow({ id: "D0MAYA:2.0:raise", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA", deadlineAt: null, dueAt: 11 });
+    const self = commitmentRow({ id: "D0MAYA:3.0", kind: "self_reminder", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA", deadlineAt: null, dueAt: 50 });
+    await records.addCommitments([miss, raise, self]);
+    assert.deepEqual(await records.get(miss.id), miss);
+    assert.deepEqual(await records.get(raise.id), raise);
+    assert.equal(await records.liveInThread(miss.channel, miss.threadTs, "U0MAYA"), null);
+    // The "remind me", due later, still goes first.
+    assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01"))?.id, self.id);
+    assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01", { asked: ["U0MAYA"] }))?.id, miss.id);
+    assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01", { asked: ["U0MAYA"], cards: ["U0MAYA"] })), null);
+    await records.update(miss.id, { state: "nudged", remindedOn: "2026-10-01" });
+    assert.deepEqual(await records.remindedOn("2026-10-01"), { asked: {}, cards: { U0MAYA: 1 } });
+    await records.update(miss.id, { state: "done", resolvedAt: 5 });
+    assert.deepEqual(await records.latestAnswers(miss.channel, 3), []);
+  });
+
+  it("rows are read by id prefix, in id order, and only those", async () => {
+    const records = make();
+    const a = commitmentRow({ id: "D0MAYA:raise:aaaa0000:2.0", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm" });
+    const b = commitmentRow({ id: "D0MAYA:raise:aaaa0000:1.0", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm" });
+    const other = commitmentRow({ id: "D0MAYA:raise:bbbb0000:1.0", kind: "dm_disagreement", channel: "D0MAYA", channelKind: "dm" });
+    const elsewhere = commitmentRow({ id: "D0MAYB:raise:aaaa0000:1.0", kind: "dm_disagreement", channel: "D0MAYB", channelKind: "dm" });
+    await records.addCommitments([a, b, other, elsewhere]);
+    assert.deepEqual((await records.byIdPrefix("D0MAYA:raise:aaaa0000:")).map((r) => r.id), [b.id, a.id]);
+    assert.deepEqual((await records.byIdPrefix("D0MAYA:raise:")).map((r) => r.id), [b.id, a.id, other.id]);
+    assert.deepEqual(await records.byIdPrefix("D0NOBODY:"), []);
+  });
 }

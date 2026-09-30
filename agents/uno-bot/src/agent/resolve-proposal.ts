@@ -35,6 +35,7 @@ import { proposalOperations, stagingCardOf, type PendingProposal } from "../thre
 import { threadStateFor } from "../thread-state/production";
 import { offerSweepShareFor, recordSweepResolutionFor } from "../sweep/env";
 import { sweepPostMetadata } from "../sweep/cards";
+import { dmResultTag } from "../dm-sweep/run";
 import {
   executionEvents,
   quietly,
@@ -243,8 +244,10 @@ async function runWonVerdict(
           channel: run.channel,
           text: resultMessage,
           ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
-          // A sweep card's result carries the sweep's tag, as the card does.
-          ...(pending.sweepRun ? { metadata: sweepPostMetadata("result") } : {}),
+          // A sweep card's result carries the sweep's tag, as the card does;
+          // a DM raise card's, the DM sweep's, so that night reads it as
+          // uno-bot's own post (`dm-sweep/run.ts` § dmResultTag).
+          ...resultMetadataFor(pending),
         });
       }
     }
@@ -349,4 +352,18 @@ async function executeTool(
     });
   }
   return row.run(env, input, slack);
+}
+
+/**
+ * The tag a batch result posts with: a sweep card's the sweep's, a DM raise
+ * card's the DM sweep's, any other none.
+ *
+ * @param pending - The resolved proposal
+ */
+export function resultMetadataFor(
+  pending: Pick<PendingProposal, "sweepRun" | "supersedeKey">,
+): { metadata?: { event_type: string; event_payload: Record<string, unknown> } } {
+  if (pending.sweepRun) return { metadata: sweepPostMetadata("result") };
+  const dm = dmResultTag(pending);
+  return dm ? { metadata: dm } : {};
 }

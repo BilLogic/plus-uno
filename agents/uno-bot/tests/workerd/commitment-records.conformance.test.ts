@@ -35,6 +35,15 @@ async function insertAsBefore0009(row: ReturnType<typeof commitmentRow>): Promis
     .run();
 }
 
+/** The schema as 0005 left it, so a case can apply 0006 onward itself: the
+ *  commitments table gone, and the column 0010 added to `sweep_items` with
+ *  it, since re-applying 0010 adds that column again. */
+async function rewindTo0005(): Promise<void> {
+  await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
+  await bindings.USAGE_DB.prepare("ALTER TABLE sweep_items DROP COLUMN surface").run();
+  await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+}
+
 beforeAll(async () => {
   await applyD1Migrations(bindings.USAGE_DB, bindings.USAGE_MIGRATIONS);
 });
@@ -70,8 +79,7 @@ describe("[d1] the commitments migration", () => {
     // Rebuild the table as 0006 left it, write rows the way the pre-0007
     // Worker did, then apply 0007 itself over them.
     const all = bindings.USAGE_MIGRATIONS;
-    await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
-    await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+    await rewindTo0005();
     await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0007"));
     const old = (id: string, channel: string) =>
       bindings.USAGE_DB.prepare(
@@ -96,8 +104,7 @@ describe("[d1] the commitments migration", () => {
 
   it("0008 rebuilds the table for \"remind me\" and copies every row as it was", async () => {
     const all = bindings.USAGE_MIGRATIONS;
-    await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
-    await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+    await rewindTo0005();
     await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0008"));
     const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
     const before = commitmentRow({ state: "nudged", nudges: 1, nudgeTs: "111.1", checkedOn: "2026-10-01", remindedOn: "2026-10-01", holds: 1 });
@@ -114,8 +121,7 @@ describe("[d1] the commitments migration", () => {
 
   it("0009 rebuilds the table for card follow-ups: both earlier kinds read back unchanged, and the card kinds are valid", async () => {
     const all = bindings.USAGE_MIGRATIONS;
-    await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
-    await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
+    await rewindTo0005();
     await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0009"));
     const promise = commitmentRow({ state: "nudged", nudges: 1, nudgeTs: "111.1", checkedOn: "2026-10-01", remindedOn: "2026-10-01", holds: 1 });
     const self = commitmentRow({ id: "D0MAYA:222.2", kind: "self_reminder", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA", state: "snoozed", snoozes: 1 });
@@ -151,6 +157,37 @@ describe("[d1] the commitments migration", () => {
       "commitments_by_reminded",
       "commitments_by_thread",
     ]);
+    await bindings.USAGE_DB.prepare("DELETE FROM commitments").run();
+    await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
+  });
+
+  it("0010 rebuilds the table for the DM asks: every earlier kind reads back unchanged, and the DM kinds are valid", async () => {
+    const all = bindings.USAGE_MIGRATIONS;
+    await rewindTo0005();
+    await applyD1Migrations(bindings.USAGE_DB, all.filter((m) => m.name < "0010"));
+    const records = createD1CommitmentRecords({ db: bindings.USAGE_DB });
+    const card = commitmentRow({ id: "card:p1", kind: "card_stale", cardId: "p1", state: "nudged", nudges: 1, nudgeTs: "111.1" });
+    const self = commitmentRow({ id: "D0MAYA:222.2", kind: "self_reminder", channel: "D0MAYA", channelKind: "dm", requesterId: "U0MAYA" });
+    await records.addCommitments([card, self]);
+    const miss = commitmentRow({ id: "D0MAYA:1.0:unanswered", kind: "dm_unanswered", channel: "D0MAYA", channelKind: "dm" });
+    await expect(records.addCommitments([miss])).rejects.toThrow(/CHECK/);
+    await applyD1Migrations(bindings.USAGE_DB, all);
+    expect(await records.get(card.id)).toEqual(card);
+    expect(await records.get(self.id)).toEqual(self);
+    for (const kind of ["dm_unanswered", "dm_disagreement"] as const) {
+      const row = commitmentRow({ id: `D0MAYA:${kind}`, kind, channel: "D0MAYA", channelKind: "dm" });
+      await records.addCommitments([row]);
+      expect(await records.get(row.id)).toEqual(row);
+    }
+    await expect(records.addCommitments([commitmentRow({ id: "C:odd", kind: "other" as never })])).rejects.toThrow(/CHECK/);
+    const { results: indexes } = await bindings.USAGE_DB.prepare("SELECT name FROM pragma_index_list('commitments')").all<{ name: string }>();
+    expect(indexes.map((i) => i.name).filter((n) => n.startsWith("commitments_by_")).length).toBe(7);
+    // The sweep's items take the surface flag: 'channel' by default.
+    const { results: cols } = await bindings.USAGE_DB.prepare("SELECT name, dflt_value FROM pragma_table_info('sweep_items')").all<{
+      name: string;
+      dflt_value: string | null;
+    }>();
+    expect(cols.find((c) => c.name === "surface")?.dflt_value).toBe("'channel'");
     await bindings.USAGE_DB.prepare("DELETE FROM commitments").run();
     await bindings.USAGE_DB.prepare("ANALYZE commitments").run();
   });

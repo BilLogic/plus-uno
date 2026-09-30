@@ -81,6 +81,22 @@ export function runSweepRecordsConformance(label: string, make: () => SweepRecor
     assert.deepEqual(await records.itemsOnCard(sweepItem().cardKey), [sweepItem()]);
   });
 
+  it("handled runs are found in one read, and only handled ones", async () => {
+    const records = make();
+    await records.recordRun(sweepRun({ runId: "2026-09-29:a", jobKey: "a" }));
+    await records.recordRun(sweepRun({ runId: "2026-09-29:b", jobKey: "b", outcome: "deferred" }));
+    assert.deepEqual(await records.handledRuns(["2026-09-29:b", "2026-09-29:a", "2026-09-29:c"]), ["2026-09-29:a"]);
+    assert.deepEqual(await records.handledRuns([]), []);
+  });
+
+  it("an item from a DM reads back with its surface; any other reads back without one", async () => {
+    const records = make();
+    const dm = sweepItem({ itemId: "k#dm", cardKey: "k-dm", channel: "D0MAYA", destination: "D0MAYA:1.0", surface: "dm" });
+    await records.addItems([dm, sweepItem()]);
+    assert.deepEqual(await records.itemsOnCard("k-dm"), [dm]);
+    assert.deepEqual(await records.itemsOnCard(sweepItem().cardKey), [sweepItem()]);
+  });
+
   it("items are found by their card, their live proposal and their finding", async () => {
     const records = make();
     const second = sweepItem({ itemId: `${sweepItem().cardKey}#blk-2`, blockId: "blk-2", findingId: "C0DESIGN:1790694000.000000:blk-2" });

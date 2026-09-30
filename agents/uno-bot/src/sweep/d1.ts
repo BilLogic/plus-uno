@@ -1,5 +1,6 @@
 // The D1 sweep records — `sweep_cursors`, `sweep_runs` and `sweep_items` in the
-// usage database (migrations/usage/0002_sweep.sql).
+// usage database (migrations/usage/0002_sweep.sql; 0010_dm_sources.sql adds
+// `sweep_items.surface`).
 //
 // As the usage log does (`usage/d1.ts`): every statement prepared with bound
 // parameters, and each charged to the meter BEFORE it is sent
@@ -55,6 +56,7 @@ const ITEM_COLUMNS = [
   "detected_at",
   "posted_at",
   "resolved_at",
+  "surface",
 ] as const;
 
 type RunRow = Record<(typeof RUN_COLUMNS)[number], unknown>;
@@ -150,6 +152,7 @@ function itemRow(i: SweepItemRecord): ItemRow {
     detected_at: i.detectedAt,
     posted_at: i.postedAt,
     resolved_at: i.resolvedAt,
+    surface: i.surface ?? "channel",
   };
 }
 
@@ -170,6 +173,7 @@ function fromItemRow(row: ItemRow): SweepItemRecord {
     detectedAt: Number(row.detected_at),
     postedAt: numOrNull(row.posted_at),
     resolvedAt: numOrNull(row.resolved_at),
+    ...(row.surface === "dm" ? { surface: "dm" as const } : {}),
   };
 }
 
@@ -199,6 +203,15 @@ export function createD1SweepRecords(deps: { db: SweepDatabase }): SweepRecords 
       chargeD1Query();
       const row = await db.prepare(SELECT_RUN).bind(runId).first<RunRow>();
       return row ? fromRunRow(row) : null;
+    },
+    async handledRuns(runIds) {
+      if (!runIds.length) return [];
+      chargeD1Query();
+      const { results } = await db
+        .prepare("SELECT run_id FROM sweep_runs WHERE outcome = 'handled' AND run_id IN (SELECT value FROM json_each(?)) ORDER BY run_id")
+        .bind(JSON.stringify([...new Set(runIds)]))
+        .all<{ run_id: unknown }>();
+      return results.map((r) => String(r.run_id));
     },
     async addItems(added) {
       if (!added.length) return;
