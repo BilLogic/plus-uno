@@ -68,7 +68,7 @@ const ResourceCard = ({
             {/* Footer with badge and button */}
             <div className="plus-resource-card-footer">
                 {badgeType && (
-                    <StaticBadgeSmart type={badgeType} size="b3" />
+                    <StaticBadgeSmart type={badgeType} />
                 )}
                 <Button
                     text={actionButtonText}

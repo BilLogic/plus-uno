@@ -37,6 +37,14 @@ export const STATUS_STYLES = ['neutral', 'success', 'warning', 'danger', 'info',
 export const STATUS_DATE_STYLES = ['neutral', 'warning', 'danger'];
 export const STATUS_SIZES = ['medium', 'large'];
 
+/**
+ * The names Badge variants used, still accepted, and the library word each one
+ * now means. A literal list beside it is what propTypes checks, because the
+ * docs generator reads the values from source.
+ */
+const DEPRECATED_STYLES = { positive: 'success', negative: 'danger', information: 'info' };
+const ACCEPTED_STYLES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery', 'positive', 'negative', 'information'];
+
 /** The fixed icon of each date style: calendar, clock, alert. */
 export const STATUS_DATE_ICONS = {
     neutral: 'calendar',
@@ -90,7 +98,11 @@ export const Status = ({
     const isDate = effectiveType === 'date';
     const allowed = isDate ? STATUS_DATE_STYLES : STATUS_STYLES;
     let effectiveStyle = style;
-    if (!allowed.includes(style)) {
+    if (DEPRECATED_STYLES[style]) {
+        warn(`style="${style}" is deprecated; use style="${DEPRECATED_STYLES[style]}".`);
+        effectiveStyle = DEPRECATED_STYLES[style];
+    }
+    if (!allowed.includes(effectiveStyle)) {
         warn(`type="${effectiveType}" takes ${allowed.join(', ')}; style="${style}" falls back to neutral.`);
         effectiveStyle = 'neutral';
     }
@@ -162,8 +174,8 @@ Status.propTypes = {
     children: PropTypes.node.isRequired,
     /** `state` for a condition; `date` for a due or event date, outlined with a fixed icon. */
     type: PropTypes.oneOf(STATUS_TYPES),
-    /** The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. */
-    style: PropTypes.oneOf(STATUS_STYLES),
+    /** The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. `positive`, `negative` and `information` are deprecated aliases for `success`, `danger` and `info`. */
+    style: PropTypes.oneOf(ACCEPTED_STYLES),
     /** `medium` (20) in rows, lists and sentences; `large` (32) beside a heading. */
     size: PropTypes.oneOf(STATUS_SIZES),
     /** One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. */

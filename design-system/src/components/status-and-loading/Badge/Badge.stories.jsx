@@ -1,4 +1,5 @@
 import React from 'react';
+import { expect, spyOn, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Badge from './Badge';
 
@@ -258,4 +259,38 @@ Interactive.args = {
     trailingVisualIcon: 'Check',
     showCounter: false,
     counterValue: '5',
+};
+
+/**
+ * Badge is deprecated, and still renders as it did. Every render warns in
+ * development with the component that replaces it for the props it was given:
+ * a status style is a Status, a curriculum style or a dismissible badge is a
+ * Tag, and a counter moves to the replacement's `count`.
+ */
+export const DeprecationWarning = {
+    render: () => (
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Badge style="success">Completed</Badge>
+            <Badge style="advocacy">Advocacy</Badge>
+            <Badge style="info" dismissible onDismiss={() => {}}>Algebra</Badge>
+            <Badge style="danger" counter={3}>Errors</Badge>
+            <Badge>Draft</Badge>
+        </div>
+    ),
+    // The spy goes in before the story renders, so the render's warning is caught.
+    beforeEach: () => {
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        return () => warn.mockRestore();
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByText('Completed')).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
+        const said = (text) => expect(console.warn).toHaveBeenCalledWith(expect.stringContaining(text));
+        await said('[Badge] is deprecated; use <Status style="success">');
+        await said('[Badge] is deprecated; use <Tag color="green">');
+        await said('[Badge] is deprecated; use <Tag behavior="removable">');
+        await said('[Badge] is deprecated; use <Status style="danger" count>');
+        await said('[Badge] is deprecated; use <Status> for a state, or <Tag> for a category');
+    },
 };

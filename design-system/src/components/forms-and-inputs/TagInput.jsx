@@ -1,15 +1,47 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import Tag, { TAG_COLORS } from '@/components/status-and-loading/Tag';
+import TagGroup from '@/components/status-and-loading/TagGroup';
 import useFieldId from './useFieldId';
 import './TagInput.scss';
+
+/**
+ * The chips are Tags in a TagGroup, so a picked value looks like every other
+ * category in the product and a disabled field disables its tags through the
+ * group. A tag's `color` is a Tag color. The status names the chips used to
+ * take are deprecated aliases for the Tag color nearest their hue: a tag is a
+ * category, and its color never carries a meaning.
+ */
+const DEPRECATED_COLORS = {
+    default: 'grey',
+    success: 'green',
+    danger: 'magenta',
+    warning: 'yellow',
+    info: 'teal',
+};
+
+/** Every name a tag's `color` accepts: the Tag colors, then the deprecated aliases. */
+const ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'default', 'success', 'danger', 'warning', 'info'];
+
+const tagColorOf = (color) => {
+    if (!color) return 'grey';
+    if (DEPRECATED_COLORS[color]) {
+        if (process.env.NODE_ENV !== 'production') {
+            // eslint-disable-next-line no-console
+            console.warn(`[TagInput] color "${color}" is deprecated; use "${DEPRECATED_COLORS[color]}".`);
+        }
+        return DEPRECATED_COLORS[color];
+    }
+    return TAG_COLORS.includes(color) || color === 'orange' ? color : 'grey';
+};
 
 const TagInput = ({
     id,
     name,
     label,
     required = false,
-    tags = [],
+    tags,
     defaultTags = [],
     size = 'medium',
     disabled = false,
@@ -22,6 +54,8 @@ const TagInput = ({
 }) => {
     // Internal state for uncontrolled usage if tags not provided
     const [internalTags, setInternalTags] = useState(defaultTags);
+    // Controlled only when `tags` is passed. It used to default to an empty
+    // list, which made every TagInput controlled and left `defaultTags` unread.
     const isControlled = tags !== undefined && tags !== null && Array.isArray(tags);
 
     const currentTags = isControlled ? tags : internalTags;
@@ -38,6 +72,11 @@ const TagInput = ({
     const fieldId = useFieldId(id);
     const hasLabel = Boolean(label);
     const labelId = hasLabel ? `${fieldId}-label` : undefined;
+
+    // A × is offered only where pressing it can remove something: a list
+    // TagInput keeps itself, or a controlled one with a handler. A disabled
+    // field has none; TagGroup takes the × away from its tags.
+    const canRemove = !disabled && (!isControlled || Boolean(onRemove || onChange));
 
     const handleAdd = (tagValue) => {
         if (disabled) return;
@@ -90,23 +129,24 @@ const TagInput = ({
                 role={hasLabel ? 'group' : undefined}
                 aria-labelledby={labelId}
             >
-                {currentTags.map((tag, index) => {
-                    const tagValue = typeof tag === 'string' ? tag : tag.value || tag.text || '';
-                    const tagText = typeof tag === 'string' ? tag : tag.text || tag.value || '';
-                    const tagColor = typeof tag === 'object' && tag.color ? tag.color : 'default';
-
-                    return (
-                        <div
-                            key={index}
-                            className={`plus-form-tag-item plus-form-tag-item-${tagColor}`}
-                        >
-                            <span className="plus-form-tag-icon">
-                                <i className="fa-solid fa-plus" aria-hidden="true" />
-                            </span>
-                            <span className="plus-form-tag-text">{tagText}</span>
-                        </div>
-                    );
-                })}
+                {currentTags.length > 0 && (
+                    <TagGroup disabled={disabled}>
+                        {currentTags.map((tag, index) => {
+                            const tagText = typeof tag === 'string' ? tag : tag.text || tag.value || '';
+                            return (
+                                <Tag
+                                    // Values can repeat, so the position is part of the key.
+                                    key={`${index}-${tagText}`}
+                                    color={tagColorOf(typeof tag === 'object' ? tag.color : undefined)}
+                                    behavior={canRemove ? 'removable' : 'read-only'}
+                                    onRemove={canRemove ? () => handleRemove(index) : undefined}
+                                >
+                                    {tagText}
+                                </Tag>
+                            );
+                        })}
+                    </TagGroup>
+                )}
             </div>
         </div>
     );
@@ -123,7 +163,7 @@ TagInput.propTypes = {
             PropTypes.shape({
                 value: PropTypes.string,
                 text: PropTypes.string,
-                color: PropTypes.oneOf(['default', 'success', 'danger', 'warning', 'info'])
+                color: PropTypes.oneOf(ACCEPTED_COLORS)
             })
         ])
     ),
@@ -133,7 +173,7 @@ TagInput.propTypes = {
             PropTypes.shape({
                 value: PropTypes.string,
                 text: PropTypes.string,
-                color: PropTypes.oneOf(['default', 'success', 'danger', 'warning', 'info'])
+                color: PropTypes.oneOf(ACCEPTED_COLORS)
             })
         ])
     ),

@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Tag from '@/components/status-and-loading/Tag';
 import { SMART_CONSTANTS } from '@/components/constants';
 
 /**
  * SmartBadges Component
- * 
- * SMART competency area badges built on top of the Badge component.
- * Displays competency labels with appropriate colors and icons.
- * 
+ *
+ * A SMART competency area, as a read-only Tag in the area's curriculum color.
+ * An area is a category, so it is outlined like every other Tag rather than
+ * filled like a Status.
+ *
  * Types:
  * - socio-emotional (S)
  * - mastering-content (M)
@@ -16,48 +17,53 @@ import { SMART_CONSTANTS } from '@/components/constants';
  * - relationships (R)
  * - technology-tools (T)
  */
+
+/** Each area's label. */
+const TEXT_OF = {
+    'socio-emotional': SMART_CONSTANTS.CA_SE_FULL,
+    'mastering-content': SMART_CONSTANTS.CA_MC,
+    advocacy: SMART_CONSTANTS.CA_ADV,
+    relationships: SMART_CONSTANTS.CA_RELN,
+    'technology-tools': SMART_CONSTANTS.CA_TT,
+};
+
+/** Each area's Tag color: the color whose curriculum hue is that area's. */
+export const SMART_TAG_COLORS = {
+    'socio-emotional': 'yellow',
+    'mastering-content': 'purple',
+    advocacy: 'green',
+    relationships: 'magenta',
+    'technology-tools': 'blue',
+};
+
+/** "Mastering Content" and "mastering-content" name the same area; an unknown one is socio-emotional, as before. */
+const areaOf = (type) => {
+    const normalized = String(type ?? '').replace(/\s+/g, '-').toLowerCase();
+    return TEXT_OF[normalized] ? normalized : 'socio-emotional';
+};
+
 const SmartBadges = ({
     type,
-    size = 'b2',
+    size,
     id,
-    className = ''
+    className = '',
+    ...rest
 }) => {
-    // Normalize type string
-    const normalizedType = type.replace(/\s+/g, '-').toLowerCase();
-
-    // Map type to display text from SMART constants
-    const textMap = {
-        'socio-emotional': SMART_CONSTANTS.CA_SE_FULL,
-        'mastering-content': SMART_CONSTANTS.CA_MC,
-        'advocacy': SMART_CONSTANTS.CA_ADV,
-        'relationships': SMART_CONSTANTS.CA_RELN,
-        'technology-tools': SMART_CONSTANTS.CA_TT
-    };
-
-    // Map our type names to Badge style prop names
-    // Badge uses 'social-emotional' (with 'social' not 'socio')
-    // and 'relationship' (singular, not 'relationships')
-    const styleMap = {
-        'socio-emotional': 'social-emotional',
-        'mastering-content': 'mastering-content',
-        'advocacy': 'advocacy',
-        'relationships': 'relationship',
-        'technology-tools': 'technology-tools'
-    };
-
-    const displayText = textMap[normalizedType] || SMART_CONSTANTS.CA_SE_FULL;
-    const badgeStyle = styleMap[normalizedType] || 'social-emotional';
+    if (size !== undefined && process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.warn('[StaticBadgeSmart] `size` is deprecated and ignored: a SMART area is a Tag, and a Tag has one size.');
+    }
+    const area = areaOf(type);
 
     return (
-        <Badge
+        <Tag
             id={id}
-            style={badgeStyle}
-            size={size}
-            className={`plus-smart-badge plus-smart-badge--${normalizedType} ${className}`}
-            leadingVisual={<i className="fas fa-circle-dot" />}
+            color={SMART_TAG_COLORS[area]}
+            className={`plus-smart-badge ${className}`.trim()}
+            {...rest}
         >
-            {displayText}
-        </Badge>
+            {TEXT_OF[area]}
+        </Tag>
     );
 };
 
@@ -70,7 +76,7 @@ SmartBadges.propTypes = {
         'relationships',
         'technology-tools'
     ]).isRequired,
-    /** Badge size - uses Badge component sizing */
+    /** Deprecated and ignored: a SMART area is a Tag, which has one size (22). */
     size: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3']),
     /** HTML id attribute */
     id: PropTypes.string,

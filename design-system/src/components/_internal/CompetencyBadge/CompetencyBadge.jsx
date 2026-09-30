@@ -1,41 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { SMART_CONSTANTS } from '@/components/constants';
+import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart';
 
-const CompetencyBadge = ({ competencyArea, size = 'h2', id, className = '' }) => {
-    const normalizedArea = competencyArea.replace(/\s+/g, '-').toLowerCase();
-
-    const textMap = {
-        'socio-emotional': SMART_CONSTANTS.CA_SE_FULL,
-        'mastering-content': SMART_CONSTANTS.CA_MC,
-        'advocacy': SMART_CONSTANTS.CA_ADV,
-        'relationships': SMART_CONSTANTS.CA_RELN,
-        'technology-tools': SMART_CONSTANTS.CA_TT
-    };
-
-    const displayText = textMap[normalizedArea] || SMART_CONSTANTS.CA_SE_FULL;
-
+/**
+ * A competency, which is a SMART area: the same read-only Tag
+ * `StaticBadgeSmart` renders, taking the area as people write it
+ * ("Mastering Content") as well as its key.
+ */
+const CompetencyBadge = ({ competencyArea, size, id, className = '', ...rest }) => {
+    if (size !== undefined && process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.warn('[CompetencyBadge] `size` is deprecated and ignored: a competency is a Tag, and a Tag has one size.');
+    }
     return (
-        <div
+        <StaticBadgeSmart
+            // The key StaticBadgeSmart's `type` takes: "Mastering Content" is `mastering-content`.
+            type={String(competencyArea).replace(/\s+/g, '-').toLowerCase()}
             id={id}
-            className={`plus-competency-badge plus-competency-badge-${normalizedArea} plus-competency-badge-${size} ${className}`}
-        >
-            <div className="plus-competency-badge-container">
-                <div className="plus-competency-badge-content">
-                    <div className="plus-competency-badge-icon">
-                        <i className="fas fa-circle-dot"></i>
-                    </div>
-                    <div className="plus-competency-badge-text">
-                        <p>{displayText}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+            className={`plus-competency-badge ${className}`.trim()}
+            {...rest}
+        />
     );
 };
 
 CompetencyBadge.propTypes = {
+    /** The SMART area, as a key (`mastering-content`) or as written ("Mastering Content"). */
     competencyArea: PropTypes.string.isRequired,
+    /** Deprecated and ignored: a competency is a Tag, which has one size (22). */
     size: PropTypes.string,
     id: PropTypes.string,
     className: PropTypes.string,

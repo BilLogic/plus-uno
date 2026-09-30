@@ -91,7 +91,7 @@ const LessonListSection = ({
                                     </td>
                                     <td className="lesson-list-section__td lesson-list-section__td--focus">
                                         {student.focusArea ? (
-                                            <StaticBadgeSmart type={student.focusArea} size="b3" />
+                                            <StaticBadgeSmart type={student.focusArea} />
                                         ) : (
                                             <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                                                 —
