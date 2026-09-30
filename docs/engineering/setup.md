@@ -116,9 +116,11 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
 - Where a token deliberately differs from Figma, or is not in Figma, the
   generator says so in a named constant (`SEMANTIC_OVERRIDES`,
   `CODE_ONLY_PRIMITIVES`, `CODE_ONLY_LAYOUT` and their neighbors in
-  `scripts/generate-all-tokens.js`). It refuses to write when one of them has
-  gone stale: an override Figma now agrees with, or a code-only name Figma
-  now has
+  `scripts/generate-all-tokens.js`). The Info tokens are the one other case:
+  `ALIASED_FAMILIES` writes every Info token as an alias of its Tertiary twin,
+  including `--color-info-border-subtle`, which Figma has no variable for. The
+  generator refuses to write when a constant has gone stale: an override Figma
+  now agrees with, or a code-only name Figma now has
 - Token source is Figma; SCSS is generated output
 - Figma mapping tables: `design-system/guidelines/figma/token-mapping.md`
 - Refresh agent views: `npm run generate:agent`

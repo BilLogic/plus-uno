@@ -509,7 +509,7 @@ const GRID_GAP_EQUALS = 'element-gap-sm';
  */
 function generateLayoutSCSS() {
     const { json } = readSource('size _ layout.json');
-    const figmaNames = json.variables.map((v) => slug(v.name));
+    const figmaNames = new Set(json.variables.map((v) => slug(v.name)));
     const modes = Object.entries(json.modes).map(([id, name]) => {
         if (!BREAKPOINT_KEYS[name]) throw new Error(`size _ layout.json: unknown mode "${name}".`);
         return { id, key: BREAKPOINT_KEYS[name] };
@@ -535,9 +535,7 @@ function generateLayoutSCSS() {
         if (breakpoints[key] !== undefined) stale('CODE_ONLY_BREAKPOINTS', `Figma now has ${key}; read it from the export.`);
     }
     for (const token of Object.keys(CODE_ONLY_LAYOUT)) {
-        const bare = token.replace(/^layout-/, '');
-        const match = figmaNames.find((n) => n === token || n.endsWith(bare));
-        if (match) stale('CODE_ONLY_LAYOUT', `Figma now has ${match}; read --${token} from the export.`);
+        if (figmaNames.has(token)) stale('CODE_ONLY_LAYOUT', `--${token} is now a Figma variable; read it from the export.`);
     }
     Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
 
@@ -597,12 +595,12 @@ try {
         { file: '_layout.scss', generated: generateLayoutSCSS() },
     ];
 } catch (error) {
-    console.error(`\n❌ Refusing to write. ${error.message}\n   Nothing was written.\n`);
+    console.error(`\n❌ Generation failed. ${error.message}\n   Nothing was written.\n`);
     process.exit(1);
 }
 
 if (staleExceptions.length) {
-    console.error('\n❌ Refusing to write. These exceptions no longer describe a difference from Figma:\n');
+    console.error('\n❌ Stale exception. These exceptions no longer describe a difference from Figma:\n');
     for (const line of staleExceptions) console.error(`   ${line}`);
     console.error(
         '\n   Update the constant in scripts/generate-all-tokens.js so it only lists\n' +
