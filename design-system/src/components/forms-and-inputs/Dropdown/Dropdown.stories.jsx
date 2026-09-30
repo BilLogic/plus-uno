@@ -370,6 +370,35 @@ EscapeIgnoredWhenControlledStaysOpen.play = async ({ canvasElement }) => {
     await expect(first, 'focus stays on the item').toHaveFocus();
 };
 
+/**
+ * The caller refuses Escape, the person moves on, and later the caller closes
+ * the menu itself. Focus stays where the person went: the refused Escape is
+ * not remembered and replayed onto the toggle.
+ */
+export const EscapeRefusedThenParentCloses = () => {
+    const [open, setOpen] = React.useState(true);
+    return (
+        <div style={{ display: 'flex', gap: '24px', padding: '24px 24px 160px' }}>
+            <Dropdown buttonText="Held open" items={ESCAPE_ITEMS} isOpen={open} onToggle={() => {}} />
+            <button type="button" onClick={() => setOpen(false)}>Close from outside</button>
+        </div>
+    );
+};
+
+EscapeRefusedThenParentCloses.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('button', { name: 'Rename' });
+    first.focus();
+    await userEvent.keyboard('{Escape}');
+    await expect(first, 'the refused Escape leaves focus on the item').toHaveFocus();
+
+    const closer = canvas.getByRole('button', { name: 'Close from outside' });
+    closer.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.queryByRole('button', { name: 'Rename' }), 'the caller closed it').toBeNull();
+    await expect(closer, 'focus does not jump to the toggle').toHaveFocus();
+};
+
 export const Interactive = {
     args: {
         buttonText: 'Dropdown',

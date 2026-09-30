@@ -74,11 +74,11 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
     <DsCanvasQuiet of={TagGroupStories.CollapseWithSuggestions} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag toggles and shows selected, a link tag is a link with a trailing arrow, and a read-only or removable tag is a plain item. Remove stays on the row.</>}>
+<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag toggles and shows selected, a link tag is a link with a trailing arrow, a tag still saving is busy and cannot be pressed, and a read-only or removable tag is a static row with nothing to press. Remove stays on the row.</>}>
     <DsCanvasQuiet of={TagGroupStories.MenuKeepsActions} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>The <code>+n</code> is a grey selectable tag with no swatch, named "n more tags": hover is the 08 state layer and pressed the 12.</>}>
+<DocsCanvasShell description={<>The <code>+n</code> is a grey selectable tag with no swatch, named by its label and count ("+3 more tags"): hover is the 08 state layer and pressed the 12.</>}>
     <DsCanvasQuiet of={TagGroupStories.OverflowTag} />
 </DocsCanvasShell>
 
@@ -243,8 +243,10 @@ tag.
 
 In the menu, a hidden tag keeps what it does. A selectable tag toggles there,
 shows selected, and the menu stays open so the change is seen. A link tag is a
-link there, to the same address, with a trailing arrow. A read-only tag is a
-plain item. Remove is only offered on the row, never from the menu.
+link there, to the same address, with a trailing arrow. A tag still saving is
+busy there and cannot be pressed. A read-only or removable tag is a static row
+that only says its words. Remove is only offered on the row, never from the
+menu.
 
 ### Right-align for a right-aligned column.
 
@@ -269,10 +271,15 @@ right-aligned. Everywhere else, tags read from the left.
 - **Hidden tags leave the list.** A collapsed group's hidden tags are out of
   sight, out of the tab order and out of the list's count until the menu shows
   them.
-- **`+n` is named "n more tags"** ("1 more tag" for one) and reports whether its menu is open. Enter
-  or Space opens it, Tab reaches each hidden tag, and Escape closes it with
-  focus back on `+n`. A selectable tag in the menu is a toggle button that
-  reports `aria-pressed`; a link tag is a real link, whose arrow is decorative.
+- **`+n`'s name starts with what it shows**, so a person who says the label
+  they see can press it: "+3 more tags", "+1 more tag" for one, and with a
+  custom `overflowLabel` the label then the count ("3 more, 3 more tags"). It
+  reports whether its menu is open. Enter or Space opens it, Tab reaches each
+  hidden tag that does something, and Escape closes it with focus back on
+  `+n`. A selectable tag in the menu is a toggle button that reports
+  `aria-pressed`; a link tag is a real link, whose arrow is decorative; a tag
+  still saving is a disabled button with `aria-busy`; a read-only or removable
+  tag is a static row, not a control and not in the tab order.
 - **Suggestions stay reachable.** They are never behind `+n`, so a keyboard
   user reaches them on the row, after `+n`, without opening the menu.
 - **Disabled is announced per tag.** A selectable tag, a Suggestion and `+n`

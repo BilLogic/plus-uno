@@ -21,7 +21,7 @@
 | `alignment` | enum | `'left'` | `right` lines the tags and the `+n` up on the right edge, for a right-aligned table column. |
 | `disabled` | bool | `false` | Disables every Tag and Suggestion in the group, as a disabled field does. |
 | `maxVisible` | number | — | `collapse` only: the most tags to show before `+n`, even when more would fit. By default, as many as fit. |
-| `overflowLabel` | func | — | Formats the overflow tag's visible label. Defaults to `+n`; its accessible name is always "n more tags" ("1 more tag"). |
+| `overflowLabel` | func | — | Formats the overflow tag's visible label. Defaults to `+n`; its accessible name starts with that label: "+3 more tags" ("+1 more tag"), or "<label>, 3 more tags" for a custom one. |
 | `onOverflowClick` | func | — | Replaces the `+n` menu — for opening a picker or a panel instead. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |

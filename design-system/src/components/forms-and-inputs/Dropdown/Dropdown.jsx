@@ -76,7 +76,12 @@ const Dropdown = ({
      * the item rather than jumping to the toggle of a menu that is still open.
      */
     const handleKeyDown = (event) => {
-        if (event.key !== 'Escape' || !show) return;
+        if (event.key !== 'Escape') {
+            // Any other key after a refused Escape is the person moving on.
+            escapeFocusRef.current = null;
+            return;
+        }
+        if (!show) return;
         event.stopPropagation();
         const custom = customToggleRef.current;
         const opener = openerRef.current;
@@ -99,6 +104,22 @@ const Dropdown = ({
         escapeFocusRef.current = null;
         target?.focus();
     }, [show]);
+
+    /*
+     * An Escape the caller refused is forgotten, so a close much later (the
+     * caller changing `isOpen` itself) never pulls focus back to the toggle:
+     * on any render where the menu is still open after it, on the next key,
+     * and when focus moves to another element.
+     */
+    useLayoutEffect(() => {
+        if (show) escapeFocusRef.current = null;
+    });
+
+    const handleBlur = (event) => {
+        // A focused item that is hidden has no next element; that is the
+        // menu closing, not the person moving on.
+        if (event.relatedTarget) escapeFocusRef.current = null;
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -223,7 +244,7 @@ const Dropdown = ({
     );
 
     return (
-        <div id={id} className={wrapperClasses} ref={dropdownRef} onKeyDown={handleKeyDown}>
+        <div id={id} className={wrapperClasses} ref={dropdownRef} onKeyDown={handleKeyDown} onBlur={handleBlur}>
             {split ? (
                 direction === 'dropleft' ? (
                     <>
@@ -311,9 +332,16 @@ const Dropdown = ({
                      * router's link, as Tag takes one.
                      */
                     const Link = item.linkComponent || 'a';
+                    // An `isStatic` item only says its words: a row, not a
+                    // control, so nothing to press or focus, and a press on it
+                    // leaves the menu open.
+                    let control;
+                    if (item.isStatic) {
+                        control = <div className={`${itemClasses} pdropdown-item-static`}>{inner}</div>;
+                    }
                     return (
                         <React.Fragment key={index}>
-                            {item.href && !item.disabled ? (
+                            {control || (item.href && !item.disabled ? (
                                 <Link className={itemClasses} href={item.href} onClick={choose}>
                                     {inner}
                                 </Link>
@@ -325,11 +353,13 @@ const Dropdown = ({
                                     // An `isToggle` item switches on and off in
                                     // place, so it says whether it is on.
                                     aria-pressed={item.isToggle ? Boolean(item.selected) : undefined}
+                                    // `isBusy`: still working, so it says so.
+                                    aria-busy={item.isBusy ? 'true' : undefined}
                                     onClick={choose}
                                 >
                                     {inner}
                                 </button>
-                            )}
+                            ))}
                             {item.divider && index < items.length - 1 && (
                                 <div className="pdropdown-divider"></div>
                             )}
@@ -368,6 +398,10 @@ Dropdown.propTypes = {
         href: PropTypes.string,
         /** Router link to render instead of `<a>` for an item with `href`. */
         linkComponent: PropTypes.elementType,
+        /** A row that only says its words: not a control, not focusable, never closes the menu. */
+        isStatic: PropTypes.bool,
+        /** Still working: published as `aria-busy`. Pair it with `disabled`. */
+        isBusy: PropTypes.bool,
         /** An on/off item: it publishes `selected` as `aria-pressed`. */
         isToggle: PropTypes.bool
     })),

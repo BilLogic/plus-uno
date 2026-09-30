@@ -102,14 +102,21 @@ export const Collapse = () => (
     </div>
 );
 
+/** The visible line for `words` in an open `+n` menu, whatever its role. */
+const menuRow = (list, words) => within(list).queryAllByText(words)
+    .find((el) => el.closest('[role="listitem"]')?.querySelector('[aria-expanded]')
+        && el.checkVisibility({ visibilityProperty: true })) ?? null;
+
 /** How many tags a person can see, and what `+n` says is hidden. */
 const readCollapse = (canvasElement) => {
     const canvas = within(canvasElement);
     const list = canvas.getByRole('list', { name: 'Subjects' });
     const more = within(list).queryByRole('button', { name: /more tags$/ });
-    // A tag on the row, not an item in the menu, and not one hidden past the edge.
+    // A tag on the row, not a row in the `+n` menu (which sits in the `+n`
+    // item), and not one hidden past the edge.
     const onRow = (s) => within(list).queryAllByText(s)
-        .some((el) => !el.closest('button') && el.checkVisibility({ visibilityProperty: true }));
+        .some((el) => !el.closest('[role="listitem"]')?.querySelector('[aria-expanded]')
+            && el.checkVisibility({ visibilityProperty: true }));
     const shown = SUBJECTS.filter(onRow);
     return { list, more, shown };
 };
@@ -138,7 +145,7 @@ const expectFits = async (canvasElement) => {
         return;
     }
     await expect(more).not.toBeNull();
-    await expect(more).toHaveAccessibleName(`${hiddenCount} more tags`);
+    await expect(more).toHaveAccessibleName(`+${hiddenCount} more tags`);
     await expect(more).toHaveTextContent(`+${hiddenCount}`);
     await expect(box(more).right).toBeLessThanOrEqual(right + 0.5);
 
@@ -193,7 +200,9 @@ Collapse.play = async ({ canvasElement }) => {
 export const CollapseMenu = () => (
     <div style={{ width: '300px', paddingBottom: '240px' }}>
         <TagGroup label="Subjects" overflow="collapse">
-            {SUBJECTS.map((s) => <Tag key={s} color="green">{s}</Tag>)}
+            {SUBJECTS.map((s) => (
+                <Tag key={s} behavior="link" href={`#${s}`} onClick={(e) => e.preventDefault()} color="green">{s}</Tag>
+            ))}
         </TagGroup>
     </div>
 );
@@ -205,7 +214,7 @@ CollapseMenu.play = async ({ canvasElement }) => {
 
     await expect(more).toHaveAttribute('aria-expanded', 'false');
     for (const s of hidden) {
-        await expect(canvas.queryByRole('button', { name: s }), `${s} is not reachable while closed`).toBeNull();
+        await expect(canvas.queryByRole('link', { name: s }), `${s} is not reachable while closed`).toBeNull();
     }
 
     more.focus();
@@ -214,19 +223,19 @@ CollapseMenu.play = async ({ canvasElement }) => {
 
     // The menu lists exactly the hidden tags, in order.
     for (const s of hidden) {
-        await expect(canvas.getByRole('button', { name: s })).toBeVisible();
+        await expect(canvas.getByRole('link', { name: s })).toBeVisible();
     }
     for (const s of shown) {
-        await expect(canvas.queryByRole('button', { name: s }), `${s} is already on the row`).toBeNull();
+        await expect(canvas.getAllByRole('link', { name: s }), `${s} is on the row, not also in the menu`).toHaveLength(1);
     }
 
     await userEvent.tab();
-    await expect(canvas.getByRole('button', { name: hidden[0] }), 'Tab reaches the first hidden tag').toHaveFocus();
+    await expect(canvas.getByRole('link', { name: hidden[0] }), 'Tab reaches the first hidden tag').toHaveFocus();
 
     await userEvent.keyboard('{Escape}');
     await expect(more).toHaveAttribute('aria-expanded', 'false');
     await expect(more, 'Escape returns focus to +n').toHaveFocus();
-    await expect(canvas.queryByRole('button', { name: hidden[0] })).toBeNull();
+    await expect(canvas.queryByRole('link', { name: hidden[0] })).toBeNull();
 
     // Space opens it too, and choosing an item closes it.
     await userEvent.keyboard(' ');
@@ -265,7 +274,7 @@ export const CollapseWithSuggestions = {
             const { more, shown } = readCollapse(canvasElement);
             await expect(shown.length).toBeLessThan(SUBJECTS.length);
             await expect(more, 'only the hidden tags are counted')
-                .toHaveAccessibleName(`${SUBJECTS.length - shown.length} more tags`);
+                .toHaveAccessibleName(`+${SUBJECTS.length - shown.length} more tags`);
             // Both suggestions show, after +n, in order, and inside the row.
             await expect(insert()).toBeVisible();
             await expect(prompt()).toBeVisible();
@@ -299,8 +308,9 @@ export const CollapseWithSuggestions = {
         await userEvent.click(more);
         await expect(more).toHaveAttribute('aria-expanded', 'true');
         for (const s of SUBJECTS.slice(shown.length)) {
-            await expect(canvas.getByRole('button', { name: s })).toBeVisible();
+            await expect(menuRow(list, s), `${s} is in the menu`).not.toBeNull();
         }
+        await expect(menuRow(list, 'Fractions')).toBeNull();
         await expect(canvas.queryByRole('button', { name: 'Fractions' })).toBeNull();
         await expect(canvas.queryByRole('button', { name: 'Summarize' })).toBeNull();
         await expect(canvas.getAllByRole('button', { name: /suggested$/ })).toHaveLength(2);
@@ -318,8 +328,8 @@ export const CollapseWithSuggestions = {
  * removable tag is a plain item, because removing stays on the row.
  */
 export const MenuKeepsActions = {
-    args: { onRemove: fn(), onFollow: fn() },
-    render: function Render({ onRemove, onFollow }) {
+    args: { onRemove: fn(), onFollow: fn(), onSaving: fn() },
+    render: function Render({ onRemove, onFollow, onSaving }) {
         const [picked, setPicked] = useState(false);
         return (
             <div style={{ width: '600px', paddingBottom: '240px' }}>
@@ -338,6 +348,7 @@ export const MenuKeepsActions = {
                     </Tag>
                     <Tag behavior="removable" color="blue" onRemove={onRemove}>Geography</Tag>
                     <Tag color="blue">Music</Tag>
+                    <Tag behavior="selectable" color="blue" isLoading onClick={onSaving}>Art</Tag>
                 </TagGroup>
                 <p className="body2-txt">{picked ? 'Mathematics picked' : 'Nothing picked'}</p>
             </div>
@@ -345,7 +356,7 @@ export const MenuKeepsActions = {
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
-        const more = await canvas.findByRole('button', { name: '4 more tags' });
+        const more = await canvas.findByRole('button', { name: '+5 more tags' });
         await userEvent.click(more);
 
         // Selectable: a toggle, off, then on and still in the open menu.
@@ -375,14 +386,27 @@ export const MenuKeepsActions = {
         await userEvent.click(link);
         await expect(args.onFollow).toHaveBeenCalledTimes(1);
 
-        // Read-only and removable: plain items, never toggles, never a ×.
+        // Read-only and removable: rows that only say the words. Not buttons,
+        // not focusable, never a ×, and pressing one leaves the menu open.
         await userEvent.click(more);
+        const list = canvas.getByRole('list', { name: 'Filters' });
         for (const s of ['Geography', 'Music']) {
-            const item = canvas.getByRole('button', { name: s });
-            await expect(item).not.toHaveAttribute('aria-pressed');
+            await expect(canvas.queryByRole('button', { name: s }), `${s} is not a button`).toBeNull();
+            const row = menuRow(list, s);
+            await expect(row, `${s} is listed`).not.toBeNull();
+            await expect(row.closest('button, a, [tabindex]'), `${s} is not focusable`).toBeNull();
         }
+        await userEvent.click(menuRow(list, 'Music'));
+        await expect(more, 'a plain row does not close the menu').toHaveAttribute('aria-expanded', 'true');
         await expect(canvas.queryByRole('button', { name: /^Remove/ }), 'remove stays on the row').toBeNull();
         await expect(args.onRemove).not.toHaveBeenCalled();
+
+        // Still saving: busy and not pressable, in the menu as on the row.
+        const saving = canvas.getByRole('button', { name: 'Art' });
+        await expect(saving).toBeDisabled();
+        await expect(saving).toHaveAttribute('aria-busy', 'true');
+        await userEvent.click(saving, { pointerEventsCheck: 0 });
+        await expect(args.onSaving).not.toHaveBeenCalled();
     },
 };
 
@@ -401,11 +425,12 @@ MaxVisible.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     // Three tags plus the overflow tag itself.
     await waitFor(() => expect(canvas.getAllByRole('listitem')).toHaveLength(4));
-    await expect(canvas.getByRole('button', { name: '4 more tags' })).toHaveTextContent('+4');
+    await expect(canvas.getByRole('button', { name: '+4 more tags' })).toHaveTextContent('+4');
 };
 
 /**
- * One hidden tag is "1 more tag", not "1 more tags".
+ * One hidden tag is "+1 more tag", not "+1 more tags". The name starts with
+ * the visible label, so a person who says what they see can press it.
  */
 export const OneMoreTag = () => (
     <div style={{ width: '600px' }}>
@@ -418,7 +443,7 @@ export const OneMoreTag = () => (
 
 OneMoreTag.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const more = await canvas.findByRole('button', { name: '1 more tag' });
+    const more = await canvas.findByRole('button', { name: '+1 more tag' });
     await expect(more).toHaveTextContent('+1');
 };
 
@@ -441,13 +466,13 @@ CapNeverSqueezes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const none = canvas.getByRole('list', { name: 'None shown' });
     await expect(
-        await within(none).findByRole('button', { name: `${SUBJECTS.length} more tags` }),
+        await within(none).findByRole('button', { name: `+${SUBJECTS.length} more tags` }),
         'every tag is behind +n',
     ).toBeInTheDocument();
     await expect(readCollapseList(none), 'no tag shows, squeezed or not').toBe(0);
 
     const one = canvas.getByRole('list', { name: 'One shown' });
-    await within(one).findByRole('button', { name: `${SUBJECTS.length - 1} more tags` });
+    await within(one).findByRole('button', { name: `+${SUBJECTS.length - 1} more tags` });
     const words = within(canvas.getByTestId('one-Science')).getByText('Science');
     await expect(words.scrollWidth, 'the one tag is whole').toBeLessThanOrEqual(words.clientWidth);
 };
@@ -472,7 +497,7 @@ export const WrappedSuggestionsAreNotCounted = () => (
 
 WrappedSuggestionsAreNotCounted.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const more = await canvas.findByRole('button', { name: '2 more tags' });
+    const more = await canvas.findByRole('button', { name: '+2 more tags' });
     await expect(canvas.getByRole('button', { name: 'Add Fractions, suggested' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: 'Add Ratios, suggested' })).toBeVisible();
     await expect(box(canvas.getByRole('button', { name: 'Add Fractions, suggested' })).left).toBeGreaterThan(box(more).right);
@@ -532,7 +557,7 @@ export const OverflowTag = () => (
 
 OverflowTag.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const more = await canvas.findByRole('button', { name: '5 more tags' });
+    const more = await canvas.findByRole('button', { name: '+5 more tags' });
 
     await expect(more).toHaveAttribute('aria-expanded', 'false');
     await expect(more, 'a menu button, not a toggle').not.toHaveAttribute('aria-pressed');
@@ -639,7 +664,7 @@ StableOnParentRender.play = async ({ canvasElement }) => {
         await userEvent.click(canvas.getByRole('button', { name: 'Add Latin' }));
         await waitFor(() => expect(readsOfList()).toBeGreaterThan(0));
         await expect(canvas.getByRole('button', { name: /more tags$/ })).toHaveAccessibleName(
-            `${SUBJECTS.length + 1 - readCollapseList(list)} more tags`,
+            `+${SUBJECTS.length + 1 - readCollapseList(list)} more tags`,
         );
     } finally {
         measured.mockRestore();
@@ -862,7 +887,8 @@ export const CustomOverflowAction = () => {
 
 CustomOverflowAction.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const more = await canvas.findByRole('button', { name: '5 more tags' });
+    // A custom label still leads the name, then the count in words.
+    const more = await canvas.findByRole('button', { name: '5 more, 5 more tags' });
     await expect(more).toHaveTextContent('5 more');
 
     await userEvent.click(more);

@@ -470,7 +470,7 @@ Tag.propTypes = {
     children: PropTypes.node,
     /** What a person can do with the tag. `read-only` by default; `link` needs `href`. */
     behavior: PropTypes.oneOf(TAG_BEHAVIORS),
-    /** Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. */
+    /** Deprecated: use `behavior`. `dismissible` is `removable`. `operational` still renders a plain button but warns: use `behavior="selectable"` with `aria-expanded`. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
     /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. */
     color: PropTypes.oneOf(ACCEPTED_COLORS),

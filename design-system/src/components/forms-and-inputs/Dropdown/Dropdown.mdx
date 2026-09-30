@@ -200,7 +200,9 @@ would run off the edge, remeasuring on scroll and resize.
   toggle with nothing focusable in it returns focus to whatever had it when the
   menu opened, if that is still on the page, and otherwise leaves focus alone.
   Focus moves only once the menu has closed: a caller that controls `isOpen`
-  and keeps it open leaves focus where it was.
+  and keeps it open leaves focus where it was, and the refused Escape is then
+  forgotten (on the next key, a focus move, or a render with the menu still
+  open), so a later close by the caller does not pull focus to the toggle.
   A click outside, bound to `mousedown`, also closes it.
 - **A custom `toggle` brings its own keyboard access.** The node you pass is
   wrapped in a `div` with an `onClick` and no role or tabindex, so a control
@@ -212,6 +214,10 @@ would run off the edge, remeasuring on scroll and resize.
   link (`linkComponent` for a router's), so it is announced as a link and can
   open in a new tab. An item with `isToggle` is a button that reports
   `selected` as `aria-pressed`; `keepOpen` leaves the menu open after it.
+- **A static row is not a control.** An item with `isStatic` is a plain row
+  with no button role: it is not focusable, and pressing it leaves the menu
+  open. An item with `isBusy` (with `disabled`) is still working and reports
+  `aria-busy`.
 - **Icons are decorative — mostly.** The selected check mark, the multi-select
   checkbox, `leadingIcon` and `trailingIcon` are all `aria-hidden`. The
   submenu caret is not, so an icon font glyph there can leak into the item's

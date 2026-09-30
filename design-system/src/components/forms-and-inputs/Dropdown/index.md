@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.stories.jsx` — Content, StyleVariants, Sizes, Layout, Overview, EscapeCloses, EscapeClosesSplit, EscapeClosesCustomToggle, LinkAndToggleItems, EscapeIgnoredWhenControlledStaysOpen, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.stories.jsx` — Content, StyleVariants, Sizes, Layout, Overview, EscapeCloses, EscapeClosesSplit, EscapeClosesCustomToggle, LinkAndToggleItems, EscapeIgnoredWhenControlledStaysOpen, EscapeRefusedThenParentCloses, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx`
 

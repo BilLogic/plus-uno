@@ -38,10 +38,18 @@ import './TagGroup.scss';
 export const TAG_GROUP_OVERFLOWS = ['wrap', 'collapse'];
 export const TAG_GROUP_ALIGNMENTS = ['left', 'right'];
 
+/*
+ * The row's measured members, marked so measuring and observing read the same
+ * sets: the tags, the Suggestions, and the widest `+n` copy.
+ */
+const TAG_ITEMS = ':scope > [data-tag-index]';
+const SUGGESTION_ITEMS = ':scope > [data-tag-suggestion]';
+const WIDEST_OVERFLOW = ':scope > [data-tag-widest]';
+
 /** A tag's words, for its line in the `+n` menu. */
 const labelOf = (child) => {
     const props = child.props || {};
-    return props.children ?? props.text ?? props.label;
+    return props.children ?? props.text;
 };
 
 /**
@@ -58,13 +66,19 @@ const isSuggestion = (child) => {
  * A hidden tag's line in the `+n` menu, keeping the tag's action. A selectable
  * tag is a toggle item that shows selected and keeps the menu open, so the
  * change is seen where it was made. A link tag is a link item to the same
- * address, with a trailing arrow for "goes somewhere". Anything else is a
- * plain item: remove is not offered here, only on the row.
+ * address, with a trailing arrow for "goes somewhere". A tag still saving is
+ * busy and cannot be pressed, as it is on the row. Anything else is a static
+ * row that only says the words: nothing to press, nothing to focus, and remove
+ * is not offered here, only on the row.
  */
 const menuItemOf = (child) => {
     const props = child.props || {};
     const text = labelOf(child);
-    switch (resolveTagBehavior(props)) {
+    const behavior = resolveTagBehavior(props);
+    if (props.isLoading && behavior !== 'read-only' && behavior !== 'removable') {
+        return { text, disabled: true, isBusy: true };
+    }
+    switch (behavior) {
         case 'selectable':
             return { text, isToggle: true, selected: Boolean(props.isSelected), keepOpen: true, onClick: props.onClick };
         case 'link':
@@ -78,7 +92,7 @@ const menuItemOf = (child) => {
         case 'action':
             return { text, onClick: props.onClick };
         default:
-            return { text };
+            return { text, isStatic: true };
     }
 };
 
@@ -147,7 +161,7 @@ export const TagGroup = ({
     const squeezed = collapses && fit.squeeze;
     const hidden = items.length - shown;
 
-    const format = (n) => (overflowLabel ? overflowLabel(n) : `+${n}`);
+    const formatOverflowLabel = (n) => (overflowLabel ? overflowLabel(n) : `+${n}`);
 
     /*
      * Room for `+n` is measured once per digit count, on a hidden copy whose
@@ -160,7 +174,7 @@ export const TagGroup = ({
      * becomes `+10` and back.
      */
     const digits = String(Math.max(items.length - 1, 1)).length;
-    const widestLabel = format(Number('8'.repeat(digits)));
+    const widestLabel = formatOverflowLabel(Number('8'.repeat(digits)));
 
     // The children's keys, as one string: what the set is, without the
     // identity of a `children` array that every parent render makes anew.
@@ -169,12 +183,12 @@ export const TagGroup = ({
     const measure = useCallback(() => {
         const list = listRef.current;
         if (!list || !collapses) return;
-        const itemEls = Array.from(list.querySelectorAll(':scope > [data-tag-index]'));
-        const ghost = list.querySelector(':scope > [data-tag-widest]');
+        const itemEls = Array.from(list.querySelectorAll(TAG_ITEMS));
+        const ghost = list.querySelector(WIDEST_OVERFLOW);
         const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
         // The suggestions' room, each with the gap before it, comes off the
         // row before any tag is counted.
-        const reserved = Array.from(list.querySelectorAll(':scope > [data-tag-suggestion]'))
+        const reserved = Array.from(list.querySelectorAll(SUGGESTION_ITEMS))
             .reduce((sum, el) => sum + gap + el.getBoundingClientRect().width, 0);
 
         /*
@@ -218,7 +232,7 @@ export const TagGroup = ({
             frame = requestAnimationFrame(measure);
         });
         observer.observe(list);
-        list.querySelectorAll(':scope > [data-tag-index], :scope > [data-tag-suggestion], :scope > [data-tag-widest]')
+        list.querySelectorAll(`${TAG_ITEMS}, ${SUGGESTION_ITEMS}, ${WIDEST_OVERFLOW}`)
             .forEach((el) => observer.observe(el));
         return () => {
             cancelAnimationFrame(frame);
@@ -245,16 +259,21 @@ export const TagGroup = ({
         </Tag>
     );
 
-    let more = null;
+    let overflowItem = null;
     if (collapses && hidden > 0) {
-        const tag = overflowTag(format(hidden), {
-            'aria-label': `${hidden} more ${hidden === 1 ? 'tag' : 'tags'}`,
+        const visible = formatOverflowLabel(hidden);
+        const count = `${hidden} more ${hidden === 1 ? 'tag' : 'tags'}`;
+        const tag = overflowTag(visible, {
+            // The name starts with the visible label (WCAG 2.5.3), so saying
+            // what is on screen presses it: "+3 more tags". A custom label
+            // leads, then the count in words: "3 more, 3 more tags".
+            'aria-label': overflowLabel ? `${visible}, ${count}` : `+${count}`,
             // With `onOverflowClick` the caller opens its own picker, which
             // holds its own state, so `+n` stays collapsed.
             'aria-expanded': onOverflowClick ? false : menuIsOpen,
             onClick: onOverflowClick,
         });
-        more = onOverflowClick ? tag : (
+        overflowItem = onOverflowClick ? tag : (
             // The menu is the library's Dropdown: the hidden tags are its items,
             // so they are reached with Tab and chosen with Enter, and Escape
             // closes it with focus back on `+n`.
@@ -305,9 +324,9 @@ export const TagGroup = ({
                         {child}
                     </div>
                 ))}
-                {more && (
+                {overflowItem && (
                     <div role="listitem" className="plus-tag-group__item">
-                        {more}
+                        {overflowItem}
                     </div>
                 )}
                 {suggestions.map((child) => (
@@ -342,7 +361,7 @@ TagGroup.propTypes = {
     disabled: PropTypes.bool,
     /** `collapse` only: the most tags to show before `+n`, even when more would fit. By default, as many as fit. */
     maxVisible: PropTypes.number,
-    /** Formats the overflow tag's visible label. Defaults to `+n`; its accessible name is always "n more tags" ("1 more tag"). */
+    /** Formats the overflow tag's visible label. Defaults to `+n`; its accessible name starts with that label: "+3 more tags" ("+1 more tag"), or "<label>, 3 more tags" for a custom one. */
     overflowLabel: PropTypes.func,
     /** Replaces the `+n` menu — for opening a picker or a panel instead. */
     onOverflowClick: PropTypes.func,
