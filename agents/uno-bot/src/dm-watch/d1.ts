@@ -22,6 +22,7 @@ const COLUMNS = [
   "nudges",
   "snoozes",
   "detected_at",
+  "reminder_channel",
   "nudge_ts",
   "followup_ts",
   "checked_on",
@@ -37,6 +38,7 @@ const PATCH_COLUMNS: Record<keyof DmCommitmentPatch, (typeof COLUMNS)[number]> =
   dueAt: "due_at",
   nudges: "nudges",
   snoozes: "snoozes",
+  reminderChannel: "reminder_channel",
   nudgeTs: "nudge_ts",
   followupTs: "followup_ts",
   checkedOn: "checked_on",
@@ -54,7 +56,12 @@ const INSERT =
 const NEXT_DUE =
   `${SELECT} WHERE owner_id = ? AND state IN (${LIVE}) AND due_at <= ? AND (checked_on IS NULL OR checked_on <> ?) ` +
   `ORDER BY due_at, commitment_id LIMIT 1`;
-const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
+const BY_REMINDER =
+  `${SELECT} WHERE reminder_channel = ? AND nudge_ts = ? UNION ALL ${SELECT} WHERE reminder_channel = ? AND followup_ts = ? LIMIT 1`;
+const SAVE_POSITIONS =
+  `INSERT INTO dm_read_positions (user_id, channel_id, read_through) ` +
+  `SELECT ?, key, value FROM json_each(?) WHERE true ` +
+  `ON CONFLICT (user_id, channel_id) DO UPDATE SET read_through = excluded.read_through`;
 const LAPSE_LIVE =
   `UPDATE dm_commitments SET state = 'lapsed', resolved_at = ? ` +
   `WHERE owner_id = ? AND state IN (${LIVE}) AND kind IN (SELECT value FROM json_each(?))`;
@@ -77,6 +84,7 @@ function toRow(r: DmCommitmentRecord): Row {
     nudges: r.nudges,
     snoozes: r.snoozes,
     detected_at: r.detectedAt,
+    reminder_channel: r.reminderChannel,
     nudge_ts: r.nudgeTs,
     followup_ts: r.followupTs,
     checked_on: r.checkedOn,
@@ -97,6 +105,7 @@ function fromRow(row: Row): DmCommitmentRecord {
     nudges: Number(row.nudges),
     snoozes: Number(row.snoozes),
     detectedAt: Number(row.detected_at),
+    reminderChannel: strOrNull(row.reminder_channel),
     nudgeTs: strOrNull(row.nudge_ts),
     followupTs: strOrNull(row.followup_ts),
     checkedOn: strOrNull(row.checked_on),
@@ -139,15 +148,19 @@ export function createD1DmWatchRecords(deps: { db: SweepDatabase }): DmWatchReco
       const { results } = await db.prepare("SELECT DISTINCT user_id FROM dm_watch ORDER BY user_id").bind().all<{ user_id: unknown }>();
       return results.map((r) => String(r.user_id));
     },
-    async advance(userId, features, ts) {
-      if (!features.length) return;
-      await run(
-        "UPDATE dm_watch SET read_through = ? WHERE user_id = ? AND feature IN (SELECT value FROM json_each(?))",
-        ts,
-        userId,
-        JSON.stringify(features),
-      );
+    async positions(userId) {
+      chargeD1Query();
+      const { results } = await db
+        .prepare("SELECT channel_id, read_through FROM dm_read_positions WHERE user_id = ?")
+        .bind(userId)
+        .all<{ channel_id: unknown; read_through: unknown }>();
+      return Object.fromEntries(results.map((r) => [String(r.channel_id), String(r.read_through)]));
     },
+    async savePositions(userId, positions) {
+      if (!Object.keys(positions).length) return;
+      await run(SAVE_POSITIONS, userId, JSON.stringify(positions));
+    },
+    clearPositions: (userId) => run("DELETE FROM dm_read_positions WHERE user_id = ?", userId),
     async addCommitments(rows) {
       if (!rows.length) return;
       await run(INSERT, JSON.stringify(rows.map(toRow)));
@@ -162,7 +175,7 @@ export function createD1DmWatchRecords(deps: { db: SweepDatabase }): DmWatchReco
         .first<{ n: unknown }>();
       return Number(row?.n ?? 0);
     },
-    byReminderTs: (ts) => first(BY_REMINDER, ts, ts),
+    byReminderTs: (channel, ts) => first(BY_REMINDER, channel, ts, channel, ts),
     async update(id, patch) {
       const sets: string[] = [];
       const values: unknown[] = [];

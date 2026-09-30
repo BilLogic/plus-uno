@@ -12,6 +12,7 @@ export type InMemoryDmWatchRecords = DmWatchRecords & {
 export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
   const switches = new Map<string, Map<DmWatchFeature, DmWatchSwitch>>();
   const rows = new Map<string, DmCommitmentRecord>();
+  const read = new Map<string, Record<string, string>>();
   const live = (r: DmCommitmentRecord) => LIVE_STATES.includes(r.state);
   return {
     rows: () => [...rows.values()].map((r) => ({ ...r })),
@@ -30,11 +31,14 @@ export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
     async watchers() {
       return [...switches.keys()].sort();
     },
-    async advance(userId, features, ts) {
-      for (const f of features) {
-        const s = switches.get(userId)?.get(f);
-        if (s) s.readThrough = ts;
-      }
+    async positions(userId) {
+      return { ...(read.get(userId) ?? {}) };
+    },
+    async savePositions(userId, positions) {
+      if (Object.keys(positions).length) read.set(userId, { ...(read.get(userId) ?? {}), ...positions });
+    },
+    async clearPositions(userId) {
+      read.delete(userId);
     },
     async addCommitments(add) {
       for (const r of add) if (!rows.has(r.id)) rows.set(r.id, { ...r });
@@ -52,8 +56,9 @@ export function createInMemoryDmWatchRecords(): InMemoryDmWatchRecords {
     async remindedCount(ownerId, runDate) {
       return [...rows.values()].filter((r) => r.ownerId === ownerId && r.remindedOn === runDate).length;
     },
-    async byReminderTs(ts) {
-      const r = [...rows.values()].find((x) => x.nudgeTs === ts) ?? [...rows.values()].find((x) => x.followupTs === ts);
+    async byReminderTs(channel, ts) {
+      const mine = [...rows.values()].filter((x) => x.reminderChannel === channel);
+      const r = mine.find((x) => x.nudgeTs === ts) ?? mine.find((x) => x.followupTs === ts);
       return r ? { ...r } : null;
     },
     async update(id, patch) {

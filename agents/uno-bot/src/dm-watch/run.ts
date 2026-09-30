@@ -3,57 +3,68 @@
 // next weekday morning run reminds them, and only them, in their DM with
 // uno-bot; they answer with a reaction.
 //
-// FOUR ENTRY POINTS, one module:
+// FIVE ENTRY POINTS, one module:
 //
 //   `setDmWatch` — the Home tab's switches, saved. Each is off until turned
-//   on, and turning one on reads nothing already said: it starts from now.
-//   Turning one off stops its future jobs and lapses every live promise it was
-//   tracking, silently. Turning one on needs a connected token (ADR-020).
+//   on, and turning one on reads nothing already said: it counts from now.
+//   Turning one on needs a token of their own whose granted scopes cover the
+//   jobs (ADR-020, ADR-024); otherwise it stays off and says why. Turning one
+//   off stops its future jobs and lapses every live promise it was tracking,
+//   silently; the last one off forgets how far their DMs were read.
+//   `saveDmWatchAction` is the Home tab's checkboxes, handed to it.
 //
 //   `runDmPromiseRead` — the end-of-day `dm-promise-read` job, one per person
 //   with a switch on. No switch on, or no token of their own: no DM is read.
-//   Before any read it checks the token's granted scopes against Slack
-//   (ADR-024); a missing scope skips the job with one log line. Then it lists
-//   the person's DMs, reads each one's new messages, asks the commitment
-//   detector, and keeps each promise the person made (`made`, when that switch
-//   is on) or was made to them (`made_to`, likewise) as a row holding the
-//   permalink, `due_at` and the state — no summary, no id of the other person.
-//   It posts nothing.
+//   Before any read it checks the token's granted scopes against Slack; a
+//   missing scope skips the job with one log line. Then it lists every one of
+//   the person's DMs, page by page, and reads the ones read longest ago first
+//   — each from where it was last read to where tonight stops — up to
+//   `MAX_DMS_PER_NIGHT`. A DM's position moves only when all of its new
+//   messages were read, so a DM not reached tonight, or too busy to read
+//   whole, loses nothing: it comes first another night. Each promise the
+//   person made (`made`) or was made to them (`made_to`), for a switch that is
+//   on, is kept as a row holding the permalink, `due_at` and the state — no
+//   summary, no id of the other person. It posts nothing.
 //
 //   `runDmPromiseNudges` — the morning `dm-promise-nudge` job, one per person.
 //   Each due row's message is read again from its permalink with the same
 //   token and the summary regenerated from it; a message that is gone, or no
-//   longer reads as a promise, lapses silently. The messages after it are
-//   judged for completion. Otherwise the reminder goes to the person's DM with
-//   uno-bot — never a thread, a card, or anyone else's DM, and never to the
-//   other person — and its one follow-up two working days later; unanswered,
-//   it lapses.
+//   longer reads as a promise, lapses silently, and so does a row whose switch
+//   is off. The messages after it are judged for completion. Otherwise the
+//   reminder goes to the person's DM with uno-bot — never a thread, a card, or
+//   anyone else's DM, and never to the other person. Unanswered, it gets one
+//   follow-up two working days later, then lapses. A ⏳ earns a check-back
+//   two working days out, at most twice (`postsAllowed`).
 //
 //   `answerDmReminder` — the reaction door's look at a DM reminder. A promise
 //   the person made answers to the thread reminder's four glyphs; a promise
-//   made to them to 🙌 got it · ⏳ wait (two more working days, at most twice)
-//   · 🙅 drop.
+//   made to them to 🙌 got it · ⏳ wait · 🙅 drop.
 //
 // THE BUDGET. One job per person, each on its own alarm and fresh budget. A
-// DM starts only when what is left covers it; a stop saves where the job got
-// to and rethrows, and the runner runs it again on a fresh budget.
+// DM starts only when what is left covers it. A stop saves the positions of
+// the DMs finished so far and rethrows; the runner runs the job again on a
+// fresh budget, which keeps the night's stopping point (keyed by the run's
+// date, so a retry past midnight UTC resumes rather than restarts) and skips
+// the DMs already read.
 //
 // Every dependency is injected, so the Node suite runs whole days against
 // fakes (tests/dm-watch.test.ts). `Env` enters in `./env.ts`.
 
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import { GATE_RESERVED } from "../gate/reactions";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
 import { acknowledgement, REMINDER_LEGEND, reminderAnswer, reminderBlocks, reminderText } from "../commitments/copy";
 import type { CommitmentDetector, DetectedCommitment, EvidenceJudge } from "../commitments/detector";
 import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnooze, nudgeAt, rearmedDueAt } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
-import { madeFollowUpText, madeToAcknowledgement, MADE_TO_LEGEND, madeToFollowUpText, madeToText } from "./copy";
+import { madeFollowUpText, madeToAcknowledgement, MADE_LAST_LEGEND, MADE_TO_LAST_LEGEND, MADE_TO_LEGEND, madeToFollowUpText, madeToText } from "./copy";
 import {
   DM_WATCH_FEATURES,
   featureOf,
+  isDmWatchFeature,
+  postsAllowed,
   type DmCommitmentKind,
   type DmCommitmentPatch,
   type DmCommitmentRecord,
@@ -63,10 +74,17 @@ import {
 
 /** The user scopes the jobs read with: the DM list and the DMs themselves. */
 export const REQUIRED_SCOPES = ["im:read", "im:history"] as const;
-/** DMs one night reads at most; past it the rest wait, and the report says so. */
+/** DMs one night reads at most, the ones read longest ago first; the rest
+ *  come first another night, and the report counts them. */
 export const MAX_DMS_PER_NIGHT = 80;
-/** Messages one DM read takes since the switch's `readThrough`. */
+/** `users.conversations` pages of 200 read for the DM list; a list longer
+ *  than this is reported incomplete. */
+export const MAX_IM_PAGES = 5;
+/** Messages per history page. */
 export const DM_HISTORY_LIMIT = 100;
+/** History pages one DM may take in a night; past it the DM keeps its
+ *  position and is read first another night. */
+export const MAX_HISTORY_PAGES = 3;
 /** Messages up to and including the promise, read again at nudge time. */
 export const CONTEXT_MESSAGES = 8;
 /** Messages after the promise the morning judges for completion. */
@@ -75,8 +93,9 @@ export const EVIDENCE_MESSAGES = 50;
 export const MAX_DM_REMINDERS_PER_MORNING = 2;
 /** Mornings running a row may be held before it lapses. */
 export const MAX_DM_HOLDS = 3;
-/** What one DM read may spend: the history, the detector, the insert. */
-export const DM_READ_COST = { subrequests: 3, d1Queries: 2 };
+/** What one history page of a DM may spend: the page and the detector, the
+ *  insert and the positions saved at a stop. */
+export const DM_READ_COST = { subrequests: 2, d1Queries: 2 };
 /** What one reminder may spend: two DM reads, the detector, the judge, the
  *  name, the bot DM and the post, and the D1 statements around them. */
 export const DM_NUDGE_COST = { subrequests: 8, d1Queries: 3 };
@@ -88,25 +107,33 @@ export interface OwnerSlack {
   /** auth.test: the scopes Slack actually granted this token, the workspace
    *  URL permalinks are built on, and whose token it is; null when refused. */
   identity(): Promise<{ scopes: readonly string[]; url: string; userId: string } | null>;
-  /** The owner's DMs (`users.conversations`, `types=im`), each with the other
-   *  person's id; null when unreadable. */
-  ims(): Promise<{ channels: { id: string; user: string }[]; complete: boolean } | null>;
-  /** One page of a DM's messages, newest first as Slack returns them; null
-   *  when unreadable. */
+  /** One page of the owner's DMs (`users.conversations`, `types=im`), each
+   *  with the other person's id, and the next page's cursor; null when
+   *  unreadable. */
+  ims(cursor?: string): Promise<{ channels: { id: string; user: string }[]; nextCursor?: string } | null>;
+  /** One page of a DM's messages, newest first as Slack returns them, and the
+   *  next (older) page's cursor; null when unreadable. */
   history(
     channel: string,
-    range: { oldest?: string; latest?: string; inclusive?: boolean; limit: number },
-  ): Promise<{ messages: SweepSlackMessage[]; hasMore: boolean } | null>;
+    range: { oldest?: string; latest?: string; inclusive?: boolean; limit: number; cursor?: string },
+  ): Promise<{ messages: SweepSlackMessage[]; hasMore: boolean; nextCursor?: string } | null>;
 }
 
-/** Where a budget-stopped night picks up, kept for the day. */
+/** Where tonight's read stops, kept for the run so a retried job reads to the
+ *  same point. */
 export interface ReadProgress {
-  get(key: string): Promise<{ latest: string; next: number } | null>;
-  set(key: string, value: { latest: string; next: number }): Promise<void>;
+  get(key: string): Promise<{ latest: string } | null>;
+  set(key: string, value: { latest: string }): Promise<void>;
   clear(key: string): Promise<void>;
 }
 
-interface Common {
+/** Whether a person's token can run the jobs. */
+export type DmAccess =
+  | { ok: true; api: OwnerSlack; url: string }
+  | { ok: false; reason: "no-token" | "refused" }
+  | { ok: false; reason: "missing-scopes"; missing: string[] };
+
+interface Common extends Pick<JobContext, "runDate"> {
   records: DmWatchRecords;
   /** The owner's own-token reads, or null when they have no token of their
    *  own (a workspace fallback never counts). */
@@ -145,26 +172,31 @@ export interface DmJobReport {
 
 // ── The switches ─────────────────────────────────────────────────────────────
 
+/** What saving the switches did: what is on, and why a switch asked for
+ *  stayed off. */
+export interface SetDmWatchResult {
+  on: DmWatchFeature[];
+  refused?: Exclude<DmAccess, { ok: true }>;
+}
+
 /**
  * Save the Home tab's switches for one person: `selected` is every switch that
  * should be on. A switch turned off lapses its live promises, silently. One
- * turned on starts reading from now, and only with a connected token.
- *
- * @returns The switches on afterwards
+ * turned on counts from now, and only when their own token can run the jobs.
  */
 export async function setDmWatch(
   userId: string,
   selected: readonly DmWatchFeature[],
-  deps: { records: DmWatchRecords; connected(userId: string): Promise<boolean>; now(): number },
-): Promise<DmWatchFeature[]> {
+  deps: { records: DmWatchRecords; access(userId: string): Promise<DmAccess>; now(): number },
+): Promise<SetDmWatchResult> {
   const now = deps.now();
   const on = new Set((await deps.records.switches(userId)).map((s) => s.feature));
-  let connected: boolean | undefined;
+  let access: DmAccess | undefined;
   for (const feature of DM_WATCH_FEATURES) {
     const want = selected.includes(feature);
     if (want && !on.has(feature)) {
-      connected ??= await deps.connected(userId);
-      if (!connected) continue;
+      access ??= await deps.access(userId);
+      if (!access.ok) continue;
       await deps.records.setSwitch(userId, feature, true, { now, readThrough: tsOf(now) });
       on.add(feature);
     } else if (!want && on.has(feature)) {
@@ -173,7 +205,40 @@ export async function setDmWatch(
       on.delete(feature);
     }
   }
-  return DM_WATCH_FEATURES.filter((f) => on.has(f));
+  if (!on.size) await deps.records.clearPositions(userId);
+  const result: SetDmWatchResult = { on: DM_WATCH_FEATURES.filter((f) => on.has(f)) };
+  return access && !access.ok ? { ...result, refused: access } : result;
+}
+
+/**
+ * The Home tab's checkboxes, saved for the person who clicked them — the
+ * payload's user, never anyone the action names — and their Home published
+ * again, saying why a switch stayed off.
+ */
+export async function saveDmWatchAction(
+  payload: { user?: { id?: string }; actions?: { selected_options?: { value?: string }[] }[] },
+  deps: {
+    save(userId: string, selected: DmWatchFeature[]): Promise<SetDmWatchResult>;
+    publish(userId: string, refused?: SetDmWatchResult["refused"]): Promise<void>;
+  },
+): Promise<void> {
+  const userId = payload.user?.id;
+  if (!userId) return;
+  const selected = (payload.actions?.[0]?.selected_options ?? []).map((o) => o.value).filter(isDmWatchFeature);
+  const result = await deps.save(userId, selected);
+  await deps.publish(userId, result.refused);
+}
+
+/** Whether this person's own token can run the jobs: theirs, and granted the
+ *  scopes they read with, as Slack reports them live (ADR-024). */
+export async function accessOf(userId: string, ownerSlack: Common["ownerSlack"]): Promise<DmAccess> {
+  const api = await ownerSlack(userId);
+  if (!api) return { ok: false, reason: "no-token" };
+  const id = await api.identity();
+  if (!id || id.userId !== userId) return { ok: false, reason: "refused" };
+  const missing = REQUIRED_SCOPES.filter((s) => !id.scopes.includes(s));
+  if (missing.length) return { ok: false, reason: "missing-scopes", missing };
+  return { ok: true, api, url: id.url };
 }
 
 // ── End of day: read the owner's DMs ─────────────────────────────────────────
@@ -181,7 +246,7 @@ export async function setDmWatch(
 /**
  * The end-of-day `dm-promise-read` job for `job.user`.
  *
- * @throws A budget stop, after saving where it got to — so the runner defers
+ * @throws A budget stop, after saving the DMs finished — so the runner defers
  */
 export async function runDmPromiseRead(job: ScheduledJob, deps: DmReadDeps): Promise<DmJobReport> {
   const report = reporter("dm-promise-read", job);
@@ -190,59 +255,135 @@ export async function runDmPromiseRead(job: ScheduledJob, deps: DmReadDeps): Pro
   const switches = (await deps.records.switches(user)).filter((s) => PROMISE_KINDS.some((k) => featureOf(k) === s.feature));
   if (!switches.length) return report("skipped", "no switch on");
   const slack = await ready(user, deps);
-  if (typeof slack === "string") return report("skipped", slack);
+  if (!slack.ok) return report("skipped", slack.note);
 
   const now = deps.now();
-  const key = `dm-watch:read:${user}:${dateOf(now)}`;
+  const key = `dm-watch:read:${user}:${deps.runDate}`;
   const saved = await deps.progress.get(key);
   const latest = saved?.latest ?? tsOf(now);
-  const oldest = switches.map((s) => s.readThrough).reduce((a, b) => (Number(a) <= Number(b) ? a : b));
-  const listed = await slack.api.ims();
+  if (!saved && !deps.dryRun) await deps.progress.set(key, { latest });
+  const floor = switches.map((s) => s.readThrough).reduce((a, b) => (Number(a) <= Number(b) ? a : b));
+
+  const listed = await listIms(slack.api);
   if (!listed) {
     log(deps, `[dm-watch] ${user}: the DM list could not be read, job skipped`);
     return report("skipped", "the DM list could not be read");
   }
-  const people = listed.channels
-    .filter((c) => c.user && c.user !== user && c.user !== deps.botUserId && c.user !== "USLACKBOT")
-    .sort((a, b) => a.id.localeCompare(b.id));
-  const ims = people.slice(0, MAX_DMS_PER_NIGHT);
-  const counts = { read: 0, unreadable: 0, made: 0, made_to: 0 };
-  let i = saved?.next ?? 0;
+  const people = listed.channels.filter((c) => c.user !== user && c.user !== deps.botUserId && c.user !== "USLACKBOT");
+  const positions = await deps.records.positions(user);
+  const from = (id: string) => {
+    const p = positions[id];
+    return p && Number(p) > Number(floor) ? p : floor;
+  };
+  // Read at an earlier alarm of this same night.
+  const doneTonight = people.filter((c) => Number(from(c.id)) >= Number(latest)).length;
+  // The longest unread first, so a DM a night did not reach comes first next.
+  const waiting = people
+    .filter((c) => Number(from(c.id)) < Number(latest))
+    .sort((a, b) => Number(from(a.id)) - Number(from(b.id)) || a.id.localeCompare(b.id));
+  const tonight = waiting.slice(0, Math.max(0, MAX_DMS_PER_NIGHT - doneTonight));
+  const counts = { read: 0, busy: 0, unreadable: 0, made: 0, made_to: 0 };
+  const finished: Record<string, string> = {};
+  const save = async () => {
+    if (!deps.dryRun) await deps.records.savePositions(user, finished);
+  };
   try {
-    for (; i < ims.length; i++) {
-      ensureHeadroom(deps, DM_READ_COST);
-      const im = ims[i]!;
-      const page = await slack.api.history(im.id, { oldest, latest, limit: DM_HISTORY_LIMIT });
-      if (!page) {
+    for (const im of tonight) {
+      const since = from(im.id);
+      const read = await readDm(slack.api, im.id, since, latest, deps);
+      if (!read) {
         counts.unreadable += 1;
         continue;
       }
-      counts.read += 1;
-      const messages = humans(page.messages, deps.botUserId);
-      if (!messages.length) continue;
-      const found = await deps.detector.detect({ thread: { channel: im.id, channelKind: "dm", rootTs: messages[0]!.ts, messages }, since: oldest });
-      if (!found.ok) {
-        counts.unreadable += 1;
-        continue;
+      if (read.messages.length) {
+        const found = await deps.detector.detect({
+          thread: { channel: im.id, channelKind: "dm", rootTs: read.messages[0]!.ts, messages: read.messages },
+          since,
+        });
+        if (!found.ok) {
+          // Its position stays: read again another night.
+          counts.unreadable += 1;
+          continue;
+        }
+        const rows = found.commitments.flatMap((c) => rowFor(c, { user, channel: im.id, url: slack.url, switches, now }));
+        for (const row of rows) counts[row.kind] += 1;
+        if (rows.length && !deps.dryRun) await deps.records.addCommitments(rows);
       }
-      const rows = found.commitments.flatMap((c) => rowFor(c, { user, channel: im.id, url: slack.url, switches, now }));
-      for (const row of rows) counts[row.kind] += 1;
-      if (rows.length && !deps.dryRun) await deps.records.addCommitments(rows);
+      if (read.complete) {
+        counts.read += 1;
+        finished[im.id] = latest;
+      } else {
+        counts.busy += 1;
+        log(deps, `[dm-watch] ${user}: a DM had more than ${MAX_HISTORY_PAGES} pages since it was last read; it keeps its place`);
+      }
     }
   } catch (err) {
-    if (isSubrequestBudgetError(err) && !deps.dryRun) await deps.progress.set(key, { latest, next: i });
+    if (isSubrequestBudgetError(err)) {
+      // What finished stays finished; a save the budget refuses only means
+      // those DMs are read again, which keeps no row twice.
+      await save().catch(() => undefined);
+    }
     throw err;
   }
+  await save();
   if (!deps.dryRun) {
-    await deps.records.advance(user, switches.map((s) => s.feature), latest);
+    // A switch turned off while this ran: what it just kept lapses too.
+    const still = new Set((await deps.records.switches(user)).map((s) => s.feature));
+    const off = PROMISE_KINDS.filter((k) => !still.has(featureOf(k)) && switches.some((s) => s.feature === featureOf(k)));
+    if (off.length) await deps.records.lapseLive(user, off, now);
     await deps.progress.clear(key);
   }
-  const more = people.length > ims.length ? `; ${people.length - ims.length} DM(s) past the nightly cap` : "";
+  const notes = [
+    waiting.length > tonight.length ? `${waiting.length - tonight.length} DM(s) wait for another night` : "",
+    listed.complete ? "" : `the DM list ran past ${MAX_IM_PAGES} pages, so later DMs were not listed`,
+  ].filter(Boolean);
   return report(
     "handled",
-    null,
-    `${counts.read} DM(s) read, ${counts.unreadable} unreadable; ${counts.made} made, ${counts.made_to} made to them ${deps.dryRun ? "would be kept" : "kept"}${more}`,
+    notes.length ? notes.join("; ") : null,
+    `${counts.read} DM(s) read, ${counts.busy} too busy to finish, ${counts.unreadable} unreadable; ${counts.made} made, ${counts.made_to} made to them ${deps.dryRun ? "would be kept" : "kept"}`,
   );
+}
+
+/** Every DM of the owner's, page by page, up to `MAX_IM_PAGES`; null when the
+ *  list cannot be read. */
+async function listIms(api: OwnerSlack): Promise<{ channels: { id: string; user: string }[]; complete: boolean } | null> {
+  const channels: { id: string; user: string }[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < MAX_IM_PAGES; page++) {
+    const res = await api.ims(cursor);
+    if (!res) return page ? { channels, complete: false } : null;
+    channels.push(...res.channels);
+    cursor = res.nextCursor;
+    if (!cursor) return { channels, complete: true };
+  }
+  return { channels, complete: false };
+}
+
+/**
+ * One DM's messages after `since` up to `latest`, oldest first: `complete`
+ * when every page was read, so its position may move to `latest`. Null when
+ * Slack would not say.
+ */
+async function readDm(
+  api: OwnerSlack,
+  channel: string,
+  since: string,
+  latest: string,
+  deps: Pick<Common, "botUserId" | "meter">,
+): Promise<{ messages: SweepMessage[]; complete: boolean } | null> {
+  const all: SweepSlackMessage[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < MAX_HISTORY_PAGES; page++) {
+    ensureHeadroom(deps, DM_READ_COST);
+    const res = await api.history(channel, { oldest: since, latest, limit: DM_HISTORY_LIMIT, ...(cursor ? { cursor } : {}) });
+    if (!res) return null;
+    all.push(...res.messages);
+    cursor = res.hasMore ? res.nextCursor : undefined;
+    // Slack says more with no cursor to reach it: not complete.
+    if (res.hasMore && !cursor) return { messages: humans(all, deps.botUserId), complete: false };
+    if (!cursor) return { messages: humans(all, deps.botUserId), complete: true };
+  }
+  return { messages: humans(all, deps.botUserId), complete: false };
 }
 
 /** A detected promise as a row, when its switch is on and it is new to it. */
@@ -264,6 +405,7 @@ function rowFor(
       nudges: 0,
       snoozes: 0,
       detectedAt: at.now,
+      reminderChannel: null,
       nudgeTs: null,
       followupTs: null,
       checkedOn: null,
@@ -287,19 +429,20 @@ export async function runDmPromiseNudges(job: ScheduledJob, deps: DmNudgeDeps): 
   if (!user) return report("skipped", "no user on the job");
   const now = deps.now();
   if (!deps.dryRun && !isMorningRunTime(now)) return report("skipped", "outside the weekday morning run");
-  const runDate = dateOf(now);
+  const runDate = deps.runDate;
   const on = new Set((await deps.records.switches(user)).map((s) => s.feature));
   let sent = await deps.records.remindedCount(user, runDate);
-  let slack: Awaited<ReturnType<typeof ready>> | undefined;
+  let slack: Ready | undefined;
   const tally: Record<string, number> = {};
   while (sent < MAX_DM_REMINDERS_PER_MORNING) {
     ensureHeadroom(deps, DM_NUDGE_COST);
     const c = await deps.records.nextDue(user, now, runDate);
     if (!c) break;
     slack ??= await ready(user, deps);
-    // A missing scope skips the whole job, rows untouched (ADR-024).
-    if (typeof slack === "string" && slack !== NO_TOKEN) return report("skipped", slack);
-    const action = await remind(deps, c, on, typeof slack === "string" ? null : slack, now, runDate);
+    // A missing scope skips the whole job, rows untouched (ADR-024). No token,
+    // or a refused one, holds each row, and a row held long enough lapses.
+    if (!slack.ok && slack.reason === "missing-scopes") return report("skipped", slack.note);
+    const action = await remind(deps, c, on, slack.ok ? slack : null, now, runDate);
     tally[action] = (tally[action] ?? 0) + 1;
     if (action === "nudged" || action === "followed-up") sent += 1;
     if (deps.dryRun) break;
@@ -335,11 +478,11 @@ async function remind(
     await settle({ holds });
     return "held";
   };
-  // Its switch turned off since: lapsed, silently (the toggle lapses these;
-  // this covers a row it missed).
+  // Its switch turned off since — a toggle that raced the night's read, say:
+  // lapsed, silently.
   if (!on.has(featureOf(c.kind))) return lapse();
-  if (c.nudges >= 2) return lapse();
-  if (!slack) return hold("no connected token");
+  if (c.nudges >= postsAllowed(c.snoozes)) return lapse();
+  if (!slack) return hold("no usable token of their own");
   const at = parsePermalink(c.permalink);
   if (!at) return lapse();
 
@@ -368,28 +511,34 @@ async function remind(
     }
   }
 
-  const first = c.nudges === 0;
+  // The reminder in full the first time and at a ⏳'s check-back; otherwise
+  // the short follow-up.
+  const full = c.nudges === 0 || c.state === "snoozed";
   const promisedAt = msOf(at.ts);
   const due = commitmentDueAt(promisedAt, promise.deadline);
   const byLabel = due.stated ? dayLabel(dueDayOf(due.dueAt), etDayOf(now)) : null;
   const promisedLabel = dayLabel(etDayOf(promisedAt), etDayOf(now));
   let body: string;
   if (c.kind === "made") {
-    body = first
+    body = full
       ? reminderText({ promiser: c.ownerId, what: promise.what, deadlineLabel: byLabel, promisedLabel, permalink: c.permalink })
       : madeFollowUpText(c.ownerId, c.permalink);
   } else {
-    body = first
+    body = full
       ? madeToText({ name: await deps.bot.userName(promise.promiser), what: promise.what, byLabel, promisedLabel, permalink: c.permalink })
       : madeToFollowUpText(c.ownerId, c.permalink);
   }
-  const action = first ? "nudged" : "followed-up";
+  const action = c.nudges === 0 ? "nudged" : "followed-up";
   if (deps.dryRun) return action;
 
+  // ⏳ is offered only while it can still bring a check-back.
+  const legend = maySnooze(c.snoozes)
+    ? c.kind === "made" ? REMINDER_LEGEND : MADE_TO_LEGEND
+    : c.kind === "made" ? MADE_LAST_LEGEND : MADE_TO_LAST_LEGEND;
   // The owner's DM with uno-bot, top level: never a thread, never anyone else.
   const dm = await deps.bot.dmChannel(c.ownerId);
   if (!dm) return hold("the owner's DM with uno-bot could not be opened");
-  const posted = await deps.bot.post(dm, { text: body, blocks: reminderBlocks(body, c.kind === "made" ? REMINDER_LEGEND : MADE_TO_LEGEND) });
+  const posted = await deps.bot.post(dm, { text: body, blocks: reminderBlocks(body, legend) });
   if (!posted.ok || !posted.ts) return hold("Slack refused the post");
   await settle({
     state: "nudged",
@@ -397,7 +546,8 @@ async function remind(
     holds: 0,
     remindedOn: runDate,
     dueAt: rearmedDueAt(now),
-    ...(first ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
+    reminderChannel: dm,
+    ...(c.nudges === 0 ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
   });
   return action;
 }
@@ -444,12 +594,13 @@ async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): P
   if (!answer && !GATE_RESERVED.has(r.glyph.replace(/::skin-tone-\d$/, ""))) return false;
   const bot = await deps.botUserId();
   if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return false;
-  const c = await deps.records.byReminderTs(r.messageTs);
+  const c = await deps.records.byReminderTs(r.channel, r.messageTs);
   if (!c) return false;
   if (!answer || r.userId !== c.ownerId || !LIVE_STATES.includes(c.state)) return true;
   const now = deps.now();
   let ack: string;
   if (answer === "soon") {
+    // Twice at most; each one is a check-back the morning will make.
     if (!maySnooze(c.snoozes)) return true;
     const dueAt = rearmedDueAt(now);
     await deps.records.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt });
@@ -472,29 +623,18 @@ async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): P
 
 // ── Shared ───────────────────────────────────────────────────────────────────
 
-const NO_TOKEN = "no connected token";
+type Ready = { ok: true; api: OwnerSlack; url: string } | { ok: false; reason: Exclude<DmAccess, { ok: true }>["reason"]; note: string };
 
-/**
- * The owner's reads, once the token is theirs and its granted scopes cover the
- * job (ADR-024); otherwise why not, logged once.
- */
-async function ready(user: string, deps: Common): Promise<{ api: OwnerSlack; url: string } | string> {
-  const api = await deps.ownerSlack(user);
-  if (!api) {
-    log(deps, `[dm-watch] ${user}: ${NO_TOKEN}, job skipped`);
-    return NO_TOKEN;
-  }
-  const id = await api.identity();
-  if (!id || id.userId !== user) {
-    log(deps, `[dm-watch] ${user}: the token was refused or is not theirs, job skipped`);
-    return "the token was refused";
-  }
-  const missing = REQUIRED_SCOPES.filter((s) => !id.scopes.includes(s));
-  if (missing.length) {
-    log(deps, `[dm-watch] ${user}: the token lacks ${missing.join(", ")}, job skipped`);
-    return `the token lacks ${missing.join(", ")}`;
-  }
-  return { api, url: id.url };
+/** The owner's reads when their token can run the job; otherwise why not,
+ *  logged once. */
+async function ready(user: string, deps: Common): Promise<Ready> {
+  const access = await accessOf(user, deps.ownerSlack);
+  if (access.ok) return access;
+  let note = "no connected token";
+  if (access.reason === "refused") note = "the token was refused or is not theirs";
+  if (access.reason === "missing-scopes") note = `the token lacks ${access.missing.join(", ")}`;
+  log(deps, `[dm-watch] ${user}: ${note}, job skipped`);
+  return { ok: false, reason: access.reason, note };
 }
 
 /** A person's messages, oldest first. */
@@ -542,8 +682,4 @@ function tsOf(ms: number): string {
 
 function msOf(ts: string): number {
   return Math.round(Number(ts) * 1000);
-}
-
-function dateOf(ms: number): string {
-  return new Date(ms).toISOString().slice(0, 10);
 }

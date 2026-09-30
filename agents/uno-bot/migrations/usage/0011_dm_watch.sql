@@ -9,7 +9,13 @@
 -- `dm_watch` is one row per person per switch that is ON. Turning a switch off
 -- deletes its row. `feature` has no CHECK on purpose: the code holds the list
 -- (`DM_WATCH_FEATURES`), so a later switch is a new value, not a table rebuild.
--- `read_through` is the Slack ts that switch's DMs have been read up to.
+-- `read_through` is the Slack ts the switch was turned on at: nothing said at
+-- or before it counts for that switch.
+--
+-- `dm_read_positions` is how far each of a person's DMs has been read, one row
+-- per DM actually read. A night that cannot reach every DM reads the ones read
+-- longest ago first, so every DM is reached across nights and no message is
+-- skipped. Deleted when the person's last switch goes off.
 --
 -- `dm_commitments` is one row per promise found in those DMs: made by the
 -- person (`made`) or made to them (`made_to`). A row holds the permalink,
@@ -27,6 +33,13 @@ CREATE TABLE IF NOT EXISTS dm_watch (
   PRIMARY KEY (user_id, feature)
 );
 
+CREATE TABLE IF NOT EXISTS dm_read_positions (
+  user_id       TEXT    NOT NULL,              -- whose DMs
+  channel_id    TEXT    NOT NULL,              -- one of their DMs (D…)
+  read_through  TEXT    NOT NULL,              -- Slack ts everything in it is read up to
+  PRIMARY KEY (user_id, channel_id)
+);
+
 CREATE TABLE IF NOT EXISTS dm_commitments (
   commitment_id  TEXT    PRIMARY KEY,           -- "<owner>:<channel>:<message ts>", from the permalink
   owner_id       TEXT    NOT NULL,              -- the opted-in person, the only one ever told
@@ -34,11 +47,12 @@ CREATE TABLE IF NOT EXISTS dm_commitments (
   permalink      TEXT    NOT NULL,
   due_at         INTEGER NOT NULL,              -- the next step: reminder, follow-up or lapse
   state          TEXT    NOT NULL CHECK (state IN ('open', 'nudged', 'snoozed', 'done', 'dropped', 'not_promise', 'auto_done', 'lapsed')),
-  nudges         INTEGER NOT NULL DEFAULT 0,    -- reminders posted, at most two
+  nudges         INTEGER NOT NULL DEFAULT 0,    -- reminders posted: two, plus one check-back per ⏳
   snoozes        INTEGER NOT NULL DEFAULT 0,    -- ⏳ answers, at most two
   detected_at    INTEGER NOT NULL,
-  nudge_ts       TEXT,                          -- the reminder, in the owner's DM with uno-bot
-  followup_ts    TEXT,                          -- its one follow-up
+  reminder_channel TEXT,                        -- the owner's DM with uno-bot, where the reminders are
+  nudge_ts       TEXT,                          -- the first reminder
+  followup_ts    TEXT,                          -- the latest one after it: a check-back after ⏳, or the follow-up
   checked_on     TEXT,                          -- YYYY-MM-DD: the morning that last looked
   holds          INTEGER NOT NULL DEFAULT 0,    -- consecutive mornings it could not be read or posted
   reminded_on    TEXT,                          -- YYYY-MM-DD: the morning its last reminder went up
@@ -48,8 +62,8 @@ CREATE TABLE IF NOT EXISTS dm_commitments (
 -- The morning takes one owner's live rows due soonest.
 CREATE INDEX IF NOT EXISTS dm_commitments_by_owner_due ON dm_commitments (owner_id, state, due_at);
 
--- A reaction finds its row by the reminder it landed on.
-CREATE INDEX IF NOT EXISTS dm_commitments_by_nudge ON dm_commitments (nudge_ts);
-CREATE INDEX IF NOT EXISTS dm_commitments_by_followup ON dm_commitments (followup_ts);
+-- A reaction finds its row by the reminder it landed on, in its DM.
+CREATE INDEX IF NOT EXISTS dm_commitments_by_nudge ON dm_commitments (reminder_channel, nudge_ts);
+CREATE INDEX IF NOT EXISTS dm_commitments_by_followup ON dm_commitments (reminder_channel, followup_ts);
 
 PRAGMA optimize;

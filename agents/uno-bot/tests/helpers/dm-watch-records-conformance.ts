@@ -24,6 +24,7 @@ export function dmRow(over: Partial<DmCommitmentRecord> = {}): DmCommitmentRecor
     nudges: 0,
     snoozes: 0,
     detectedAt: 1_790_719_200_000,
+    reminderChannel: null,
     nudgeTs: null,
     followupTs: null,
     checkedOn: null,
@@ -50,13 +51,12 @@ export function runDmWatchRecordsConformance(label: string, make: () => DmWatchR
     const r = make();
     await r.setSwitch("U0MAYA", "promises_made", true, { now: 100, readThrough: "100.000000" });
     await r.setSwitch("U0MAYA", "promises_to_me", true, { now: 200, readThrough: "200.000000" });
-    await r.advance("U0MAYA", ["promises_made"], "300.000000");
     await r.setSwitch("U0MAYA", "promises_made", true, { now: 400, readThrough: "400.000000" });
     const on = await r.switches("U0MAYA");
     assert.deepEqual(
       on.sort((a, b) => a.feature.localeCompare(b.feature)),
       [
-        { feature: "promises_made", since: 100, readThrough: "300.000000" },
+        { feature: "promises_made", since: 100, readThrough: "100.000000" },
         { feature: "promises_to_me", since: 200, readThrough: "200.000000" },
       ],
     );
@@ -64,6 +64,19 @@ export function runDmWatchRecordsConformance(label: string, make: () => DmWatchR
     assert.deepEqual((await r.switches("U0MAYA")).map((s) => s.feature), ["promises_to_me"]);
     await r.setSwitch("U0MAYA", "promises_to_me", false, { now: 500, readThrough: "500.000000" });
     assert.deepEqual(await r.watchers(), []);
+  });
+
+  it("keeps how far each DM was read, per person, upserted in one go, and forgets them on request", async () => {
+    const r = make();
+    assert.deepEqual(await r.positions("U0MAYA"), {});
+    await r.savePositions("U0MAYA", { D0BEA: "10.000000", D0KAI: "20.000000" });
+    await r.savePositions("U0MAYA", { D0BEA: "30.000000" });
+    await r.savePositions("U0BEA", { D0MAYA: "5.000000" });
+    await r.savePositions("U0MAYA", {});
+    assert.deepEqual(await r.positions("U0MAYA"), { D0BEA: "30.000000", D0KAI: "20.000000" });
+    await r.clearPositions("U0MAYA");
+    assert.deepEqual(await r.positions("U0MAYA"), {});
+    assert.deepEqual(await r.positions("U0BEA"), { D0MAYA: "5.000000" });
   });
 
   it("a row reads back field for field, and a second insert keeps the first", async () => {
@@ -96,14 +109,16 @@ export function runDmWatchRecordsConformance(label: string, make: () => DmWatchR
   it("counts an owner's reminders on a morning, and finds a row by either reminder", async () => {
     const r = make();
     await r.addCommitments([dmRow({ id: "a" }), dmRow({ id: "b" }), dmRow({ id: "c", ownerId: "U0BEA" })]);
-    await r.update("a", { remindedOn: "2026-10-01", nudgeTs: "111.1", state: "nudged", nudges: 1 });
-    await r.update("b", { remindedOn: "2026-10-01", followupTs: "222.2" });
+    await r.update("a", { remindedOn: "2026-10-01", reminderChannel: "D0UNO", nudgeTs: "111.1", state: "nudged", nudges: 1 });
+    await r.update("b", { remindedOn: "2026-10-01", reminderChannel: "D0UNO", followupTs: "222.2" });
     await r.update("c", { remindedOn: "2026-10-01" });
     assert.equal(await r.remindedCount("U0MAYA", "2026-10-01"), 2);
     assert.equal(await r.remindedCount("U0MAYA", "2026-10-02"), 0);
-    assert.equal((await r.byReminderTs("111.1"))?.id, "a");
-    assert.equal((await r.byReminderTs("222.2"))?.id, "b");
-    assert.equal(await r.byReminderTs("333.3"), null);
+    assert.equal((await r.byReminderTs("D0UNO", "111.1"))?.id, "a");
+    assert.equal((await r.byReminderTs("D0UNO", "222.2"))?.id, "b");
+    assert.equal(await r.byReminderTs("D0UNO", "333.3"), null);
+    // The same ts in another conversation is not this reminder.
+    assert.equal(await r.byReminderTs("D0ELSE", "111.1"), null);
     const a = await r.get("a");
     assert.equal(a?.state, "nudged");
     assert.equal(a?.nudges, 1);

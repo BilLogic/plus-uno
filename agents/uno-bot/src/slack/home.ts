@@ -20,7 +20,7 @@ import type { SlackAppHomeOpenedEvent } from "./types";
 import { slackCall } from "./api";
 import { SUGGESTED_PROMPTS } from "./assistant";
 import { slackConnectUrl } from "../oauth/slack";
-import { dmWatchHomeBlocks, type DmWatchFeature } from "../dm-watch/index";
+import { dmWatchHomeBlocks, type DmAccess, type DmWatchFeature } from "../dm-watch/index";
 import { dmWatchHomeStateFor } from "../dm-watch/env";
 
 // The Home view is a Block Kit document built per publish (cheap — no state,
@@ -182,19 +182,26 @@ const connectBlocks = (url: string) => [
  * @param input.connectUrl - Where to connect, or null when OAuth is not set up
  * @param input.viewer - Whether this person has connected, and their switches
  */
-export function homeView(input: { connectUrl: string | null; viewer: { connected: boolean; on: readonly DmWatchFeature[] } }) {
-  const personal = input.viewer.connected ? dmWatchHomeBlocks(input.viewer.on) : input.connectUrl ? connectBlocks(input.connectUrl) : [];
+export function homeView(input: {
+  connectUrl: string | null;
+  viewer: { connected: boolean; on: readonly DmWatchFeature[]; refused?: Exclude<DmAccess, { ok: true }> };
+}) {
+  const { viewer, connectUrl } = input;
+  const notice = viewer.refused ? { refused: viewer.refused, connectUrl } : undefined;
+  const personal = viewer.connected ? dmWatchHomeBlocks(viewer.on, notice) : connectUrl ? connectBlocks(connectUrl) : [];
   return { type: "home", blocks: [...HOME_INTRO, ...personal, ...HOME_BODY] };
 }
 
-async function buildHomeView(env: Env, userId: string) {
-  return homeView({ connectUrl: slackConnectUrl(env), viewer: await dmWatchHomeStateFor(env, userId) });
+async function buildHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
+  const viewer = await dmWatchHomeStateFor(env, userId);
+  return homeView({ connectUrl: slackConnectUrl(env), viewer: refused ? { ...viewer, refused } : viewer });
 }
 
 /** Publish this person's Home view — on opening the tab, and again after they
- *  change a switch, so the ticks show what was saved. */
-export async function publishHomeView(env: Env, userId: string): Promise<void> {
-  await slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId) });
+ *  change a switch, so the ticks show what was saved and a switch that stayed
+ *  off says why. */
+export async function publishHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>): Promise<void> {
+  await slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId, refused) });
 }
 
 /** Same publish, but hands Slack's verdict back. Nothing in the event path

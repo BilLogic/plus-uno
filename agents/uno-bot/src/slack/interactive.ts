@@ -31,7 +31,7 @@ import { proposalCardBlocks } from "./proposal-render";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
-import { DM_WATCH_ACTION_ID, selectedFeatures } from "../dm-watch/index";
+import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
 
@@ -203,16 +203,20 @@ function homeStopDeps(env: Env): HomeStopDoorDeps {
   };
 }
 
-// The Home tab's DM watch switches. The checkboxes send every option still
-// ticked; saving turns on and off what changed, then the view is published
-// again so it shows what was saved — a switch that needs a connected token and
-// has none stays unticked.
+// The Home tab's DM watch switches (`saveDmWatchAction`). The checkboxes send
+// every option still ticked; saving turns on and off what changed, then the
+// view is published again so it shows what was saved — and a switch whose
+// token cannot run the jobs stays unticked, with the reason and the link.
 async function saveDmWatch(env: Env, payload: InteractionPayload): Promise<void> {
-  const userId = payload.user?.id;
-  if (!userId) return;
-  const on = await setDmWatchOnEnv(env, userId, selectedFeatures(payload.actions?.[0]));
-  console.log(`[interactive] DM watch for ${userId}: ${on.length ? on.join(", ") : "all off"}`);
-  await publishHomeView(env, userId);
+  await saveDmWatchAction(payload, {
+    async save(userId, selected) {
+      const result = await setDmWatchOnEnv(env, userId, selected);
+      const refused = result.refused ? ` (refused: ${result.refused.reason})` : "";
+      console.log(`[interactive] DM watch for ${userId}: ${result.on.length ? result.on.join(", ") : "all off"}${refused}`);
+      return result;
+    },
+    publish: (userId, refused) => publishHomeView(env, userId, refused),
+  });
 }
 
 // The `icon_button` delete on an answer footer (native-feedback mode).

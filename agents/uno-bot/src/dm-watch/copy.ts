@@ -20,6 +20,10 @@ export const DM_WATCH_LABELS: Readonly<Record<DmWatchFeature, string>> = {
 
 /** The legend under a reminder about a promise made to the owner. */
 export const MADE_TO_LEGEND = "🙌 Got it · ⏳ Wait 2 more days · 🙅 Drop";
+/** The same, once both ⏳ are spent: no ⏳ is offered that could bring nothing. */
+export const MADE_TO_LAST_LEGEND = "🙌 Got it · 🙅 Drop";
+/** A promise the owner made, once both ⏳ are spent. */
+export const MADE_LAST_LEGEND = "🙌 Done · 🙅 Not doing it · 🤔 Not a promise";
 
 /** What replaces that legend once the owner answers. 🤔 means nothing here. */
 export function madeToAcknowledgement(answer: Exclude<ReminderAnswer, "not_promise">, checkBackDay?: string): string {

@@ -6,22 +6,48 @@
 // PURE: Block Kit in, Block Kit out.
 
 import { DM_WATCH_LABELS } from "./copy";
+import type { DmAccess } from "./run";
 import { DM_WATCH_FEATURES, isDmWatchFeature, type DmWatchFeature } from "./store";
 
 /** The checkboxes' action id; `slack/interactive.ts` routes it. */
 export const DM_WATCH_ACTION_ID = "uno_dm_watch";
 
+/** Why a switch just asked for stayed off, in the person's words. */
+function refusedText(refused: Exclude<DmAccess, { ok: true }>): string {
+  if (refused.reason === "missing-scopes") {
+    return `:warning: Your Slack link can't read your DMs yet: it is missing ${refused.missing.map((s) => `\`${s}\``).join(" and ")}. Link your Slack again to turn this on.`;
+  }
+  return ":warning: I couldn't use your Slack link. Link your Slack again to turn this on.";
+}
+
 /**
- * The section's blocks, with `on` ticked.
+ * The section's blocks, with `on` ticked, and — right after a switch asked
+ * for stayed off — why, with the link to connect again.
  *
  * @param on - The switches this person has on
+ * @param notice - Why a switch stayed off, and where to connect
  */
-export function dmWatchHomeBlocks(on: readonly DmWatchFeature[]): unknown[] {
+export function dmWatchHomeBlocks(
+  on: readonly DmWatchFeature[],
+  notice?: { refused: Exclude<DmAccess, { ok: true }>; connectUrl: string | null },
+): unknown[] {
   const option = (f: DmWatchFeature) => ({ text: { type: "plain_text", text: DM_WATCH_LABELS[f] }, value: f });
   const ticked = DM_WATCH_FEATURES.filter((f) => on.includes(f)).map(option);
+  const warning = notice
+    ? [
+        {
+          type: "section",
+          text: { type: "mrkdwn", text: refusedText(notice.refused) },
+          ...(notice.connectUrl
+            ? { accessory: { type: "button", text: { type: "plain_text", text: "🔗 Link your Slack again", emoji: true }, url: notice.connectUrl } }
+            : {}),
+        },
+      ]
+    : [];
   return [
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*Reminders from your DMs*" } },
+    ...warning,
     {
       type: "actions",
       elements: [

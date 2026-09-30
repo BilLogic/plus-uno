@@ -15,14 +15,18 @@ import { onScheduledFiring, planRun, type ScheduledRun } from "../src/scheduled/
 import type { CommitmentDetector, EvidenceJudge } from "../src/commitments/detector";
 import type { SweepSlackMessage } from "../src/sweep/run";
 import {
+  accessOf,
   answerDmReminder,
   createInMemoryDmWatchRecords,
   DM_WATCH_ACTION_ID,
+  MADE_TO_LAST_LEGEND,
   MADE_TO_LEGEND,
+  MAX_DMS_PER_NIGHT,
   parsePermalink,
   permalinkOf,
   runDmPromiseNudges,
   runDmPromiseRead,
+  saveDmWatchAction,
   selectedFeatures,
   setDmWatch,
   type DmNudgeDeps,
@@ -61,6 +65,10 @@ interface FakeSlack {
   api: OwnerSlack;
   calls: string[];
   messages: Map<string, SweepSlackMessage[]>;
+  /** The DM list, as Slack pages it (200 a page). */
+  ims: { id: string; user: string }[];
+  /** auth.test says the token is refused. */
+  refused: boolean;
 }
 
 function fakeSlack(scopes: string[] = ["im:read", "im:history", "search:read"]): FakeSlack {
@@ -69,28 +77,42 @@ function fakeSlack(scopes: string[] = ["im:read", "im:history", "search:read"]):
     [DM_BEA, dmMessages()],
     ["D0UNO", [{ ts: ts(29, 16), user: MAYA, text: "PROMISE: never read, uno-bot's own DM" }]],
   ]);
-  const api: OwnerSlack = {
-    async identity() {
-      calls.push("auth.test");
-      return { scopes, url: URL, userId: MAYA };
-    },
-    async ims() {
-      calls.push("users.conversations");
-      return { channels: [{ id: DM_BEA, user: BEA }, { id: "D0UNO", user: BOT }], complete: true };
-    },
-    async history(channel, range) {
-      calls.push(`history:${channel}`);
-      const all = messages.get(channel) ?? [];
-      const inRange = all.filter((m) => {
-        const t = Number(m.ts);
-        if (range.oldest && !(t > Number(range.oldest))) return false;
-        if (range.latest && (range.inclusive ? t > Number(range.latest) : t >= Number(range.latest))) return false;
-        return true;
-      });
-      return { messages: inRange.reverse().slice(0, range.limit), hasMore: false };
+  const fake: FakeSlack = {
+    calls,
+    messages,
+    ims: [{ id: DM_BEA, user: BEA }, { id: "D0UNO", user: BOT }],
+    refused: false,
+    api: {
+      async identity() {
+        calls.push("auth.test");
+        return fake.refused ? null : { scopes, url: URL, userId: MAYA };
+      },
+      async ims(cursor) {
+        calls.push("users.conversations");
+        const from = Number(cursor ?? 0);
+        const page = fake.ims.slice(from, from + 200);
+        return from + 200 < fake.ims.length ? { channels: page, nextCursor: String(from + 200) } : { channels: page };
+      },
+      // Newest first, `limit` a page, the cursor an offset — as Slack pages.
+      async history(channel, range) {
+        calls.push(`history:${channel}`);
+        const all = messages.get(channel) ?? [];
+        const inRange = all
+          .filter((m) => {
+            const t = Number(m.ts);
+            if (range.oldest && !(t > Number(range.oldest))) return false;
+            if (range.latest && (range.inclusive ? t > Number(range.latest) : t >= Number(range.latest))) return false;
+            return true;
+          })
+          .sort((a, b) => Number(b.ts) - Number(a.ts));
+        const from = Number(range.cursor ?? 0);
+        const page = inRange.slice(from, from + range.limit);
+        const more = from + range.limit < inRange.length;
+        return { messages: page, hasMore: more, ...(more ? { nextCursor: String(from + range.limit) } : {}) };
+      },
     },
   };
-  return { api, calls, messages };
+  return fake;
 }
 
 /** Reads "PROMISE: what|deadline" in tonight's new messages. */
@@ -114,7 +136,7 @@ interface World {
   hasToken: boolean;
   logs: string[];
   posts: { channel: string; text: string; blocks: unknown[] }[];
-  progress: Map<string, { latest: string; next: number }>;
+  progress: Map<string, { latest: string }>;
 }
 
 function world(over: Partial<Pick<World, "hasToken">> & { scopes?: string[] } = {}): World {
@@ -128,8 +150,9 @@ function world(over: Partial<Pick<World, "hasToken">> & { scopes?: string[] } = 
   };
 }
 
-function readDeps(w: World, now: number): DmReadDeps {
+function readDeps(w: World, now: number, runDate = new Date(now).toISOString().slice(0, 10)): DmReadDeps {
   return {
+    runDate,
     records: w.records,
     ownerSlack: async (user) => (w.hasToken && user === MAYA ? w.slack.api : null),
     detector,
@@ -161,8 +184,10 @@ function nudgeDeps(w: World, now: number, judge: EvidenceJudge = notDone): DmNud
   };
 }
 
+const ownerSlackOf = (w: World) => async (user: string) => (w.hasToken && user === MAYA ? w.slack.api : null);
+
 async function turnOn(w: World, features: DmWatchFeature[], now = ON_AT) {
-  return setDmWatch(MAYA, features, { records: w.records, connected: async () => w.hasToken, now: () => now });
+  return (await setDmWatch(MAYA, features, { records: w.records, access: (u) => accessOf(u, ownerSlackOf(w)), now: () => now })).on;
 }
 
 describe("the switches", () => {
@@ -175,6 +200,7 @@ describe("the switches", () => {
       // On, then off again: still nothing read.
       await turnOn(w, [feature]);
       await turnOn(w, [], at(29, 12));
+      w.slack.calls.length = 0;
       await runDmPromiseRead(READ, readDeps(w, EOD));
       assert.deepEqual(w.slack.calls, []);
     });
@@ -193,7 +219,8 @@ describe("the switches", () => {
 
   it("a missing scope on the live token skips the job with one log line, before any DM is read", async () => {
     const w = world({ scopes: ["im:read", "search:read"] });
-    await turnOn(w, ["promises_made"]);
+    // Turned on before the token's grant narrowed.
+    await w.records.setSwitch(MAYA, "promises_made", true, { now: ON_AT, readThrough: (ON_AT / 1000).toFixed(6) });
     const report = await runDmPromiseRead(READ, readDeps(w, EOD));
     assert.equal(report.outcome, "skipped");
     assert.deepEqual(w.slack.calls, ["auth.test"]);
@@ -285,7 +312,7 @@ describe("the end-of-day read", () => {
     w.slack.messages.get(DM_BEA)!.push({ ts: ts(30, 17), user: BEA, text: "PROMISE: share the Figma file" });
     await runDmPromiseRead(READ, readDeps(w, at(30, 22)));
     assert.equal(w.records.rows().length, 2);
-    assert.equal((await w.records.switches(MAYA))[0]?.readThrough, (at(30, 22) / 1000).toFixed(6));
+    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: (at(30, 22) / 1000).toFixed(6) });
   });
 
   it("a budget stop saves where it got to, and the retry picks up there", async () => {
@@ -293,7 +320,7 @@ describe("the end-of-day read", () => {
     await turnOn(w, ["promises_made"]);
     const deps = readDeps(w, EOD);
     await assert.rejects(runDmPromiseRead(READ, { ...deps, meter: { headroom: () => ({ subrequests: 1, d1Queries: 40 }) } }), /budget/);
-    assert.deepEqual([...w.progress.values()], [{ latest: (EOD / 1000).toFixed(6), next: 0 }]);
+    assert.deepEqual([...w.progress.values()], [{ latest: (EOD / 1000).toFixed(6) }]);
     await runDmPromiseRead(READ, deps);
     assert.equal(w.records.rows().length, 1);
     assert.equal(w.progress.size, 0);
@@ -434,7 +461,7 @@ describe("the Home tab", () => {
   it("each person sees their own switches, and only once connected", async () => {
     const w = world();
     await turnOn(w, ["promises_made"]);
-    await setDmWatch(BEA, ["promises_to_me"], { records: w.records, connected: async () => true, now: () => ON_AT });
+    await setDmWatch(BEA, ["promises_to_me"], { records: w.records, access: async () => ({ ok: true, api: w.slack.api, url: URL }), now: () => ON_AT });
     const viewFor = async (user: string, connected = true) =>
       homeView({ connectUrl: "https://uno.example/oauth/slack/start", viewer: { connected, on: (await w.records.switches(user)).map((s) => s.feature) } });
     const ticked = (view: { blocks: unknown[] }) => {
@@ -456,5 +483,191 @@ describe("the Home tab", () => {
   it("the checkboxes' selection becomes the switches, ignoring anything unknown", () => {
     assert.deepEqual(selectedFeatures({ selected_options: [{ value: "promises_to_me" }, { value: "decisions" }] }), ["promises_to_me"]);
     assert.deepEqual(selectedFeatures(undefined), []);
+  });
+});
+
+describe("reaching every DM, and every message in it", () => {
+  const promiseIn = (channel: string, user: string, at_: string, what: string): [string, SweepSlackMessage[]] => [
+    channel,
+    [{ ts: at_, user, text: `PROMISE: ${what}` }],
+  ];
+
+  it("a budget stop mid-list keeps the DMs finished, and the retry reads only the rest", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    w.slack.ims = [
+      { id: "D0A", user: "U0A" },
+      { id: "D0B", user: "U0B" },
+      { id: "D0C", user: "U0C" },
+    ];
+    for (const [c, m] of [promiseIn("D0A", "U0A", ts(29, 17), "a"), promiseIn("D0B", "U0B", ts(29, 17), "b"), promiseIn("D0C", "U0C", ts(29, 17), "c")]) {
+      w.slack.messages.set(c, m);
+    }
+    let checks = 0;
+    const stopping = { ...readDeps(w, EOD), meter: { headroom: () => (++checks > 2 ? { subrequests: 0, d1Queries: 40 } : { subrequests: 50, d1Queries: 40 }) } };
+    await assert.rejects(runDmPromiseRead(READ, stopping), /budget/);
+    const latest = (EOD / 1000).toFixed(6);
+    assert.deepEqual(await w.records.positions(MAYA), { D0A: latest, D0B: latest });
+    w.slack.calls.length = 0;
+    await runDmPromiseRead(READ, readDeps(w, at(29, 22, 2)));
+    assert.deepEqual(w.slack.calls.filter((c) => c.startsWith("history:")), ["history:D0C"]);
+    assert.deepEqual(await w.records.positions(MAYA), { D0A: latest, D0B: latest, D0C: latest });
+    assert.equal(w.records.rows().length, 3);
+  });
+
+  it("a DM with more than a page since it was last read is paged through, so its oldest promise is not skipped", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const chatter = Array.from({ length: 249 }, (_, i) => ({ ts: ts(29, 18, 0, i + 1), user: BEA, text: `note ${i}` }));
+    w.slack.messages.set(DM_BEA, [{ ts: ts(29, 17), user: BEA, text: "PROMISE: send the tokens doc|Wed" }, ...chatter]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    assert.deepEqual(w.records.rows().map((r) => r.kind), ["made_to"]);
+    assert.equal(w.slack.calls.filter((c) => c === `history:${DM_BEA}`).length, 3);
+    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: (EOD / 1000).toFixed(6) });
+  });
+
+  it("a DM too busy to read whole keeps its place, says so, and is read first another night", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const chatter = Array.from({ length: 350 }, (_, i) => ({ ts: ts(29, 18, 0, i + 1), user: BEA, text: `note ${i}` }));
+    w.slack.messages.set(DM_BEA, [{ ts: ts(29, 17), user: BEA, text: "PROMISE: send the tokens doc|Wed" }, ...chatter]);
+    const report = await runDmPromiseRead(READ, readDeps(w, EOD));
+    assert.deepEqual(await w.records.positions(MAYA), {});
+    assert.match(report.summary, /1 too busy to finish/);
+    assert.ok(w.logs.some((l) => l.includes("keeps its place")));
+  });
+
+  it("more DMs than a night reads: the ones not reached come first the next night, their messages intact", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const quiet = Array.from({ length: MAX_DMS_PER_NIGHT + 5 }, (_, i) => ({ id: `D1${String(i).padStart(3, "0")}`, user: `U1${i}` }));
+    // An active DM whose id sorts after every quiet one.
+    w.slack.ims = [...quiet, { id: "D9ACTIVE", user: "U9KAI" }];
+    w.slack.messages.set("D9ACTIVE", [{ ts: ts(29, 17), user: "U9KAI", text: "PROMISE: share the flows" }]);
+    const first = await runDmPromiseRead(READ, readDeps(w, EOD));
+    assert.match(first.summary, /6 DM\(s\) wait for another night/);
+    assert.equal(w.records.rows().length, 0);
+    w.slack.calls.length = 0;
+    await runDmPromiseRead(READ, readDeps(w, at(30, 22)));
+    assert.ok(w.slack.calls.includes("history:D9ACTIVE"));
+    assert.deepEqual(w.records.rows().map((r) => r.permalink), [permalinkOf(URL, "D9ACTIVE", ts(29, 17))]);
+  });
+
+  it("a DM list longer than a page is read to its end", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const quiet = Array.from({ length: 250 }, (_, i) => ({ id: `D1${String(i).padStart(3, "0")}`, user: `U1${i}` }));
+    w.slack.ims = [{ id: "D0000", user: "U0000" }, ...quiet.slice(0, 210), { id: "D0LATE", user: "U0LATE" }];
+    w.slack.messages.set("D0LATE", [{ ts: ts(29, 17), user: "U0LATE", text: "PROMISE: send it" }]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    assert.equal(w.slack.calls.filter((c) => c === "users.conversations").length, 2);
+    assert.equal(w.records.rows().length, 1);
+  });
+
+  it("a retry after midnight UTC resumes the night it belongs to, by the run's date", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const stopped = { ...readDeps(w, EOD, "2026-09-29"), meter: { headroom: () => ({ subrequests: 0, d1Queries: 40 }) } };
+    await assert.rejects(runDmPromiseRead(READ, stopped), /budget/);
+    // Retried at 00:30 UTC on the 30th, still the 29th's run.
+    await runDmPromiseRead(READ, readDeps(w, at(30, 0, 30), "2026-09-29"));
+    assert.deepEqual(await w.records.positions(MAYA), { [DM_BEA]: (EOD / 1000).toFixed(6) });
+    assert.equal(w.progress.size, 0);
+  });
+
+  it("a switch turned off while the night's read runs: what it kept lapses", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    const racing: DmReadDeps = {
+      ...readDeps(w, EOD),
+      detector: {
+        async detect(input) {
+          await w.records.setSwitch(MAYA, "promises_to_me", false, { now: EOD, readThrough: "0" });
+          return detector.detect(input);
+        },
+      },
+    };
+    await runDmPromiseRead(READ, racing);
+    assert.deepEqual(w.records.rows().map((r) => r.state), ["lapsed"]);
+  });
+});
+
+describe("⏳, token refusals and the scopes a switch needs", () => {
+  async function toBeaReminded() {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    return w;
+  }
+  const react = (w: World, glyph: string, when: number) => {
+    const row = w.records.rows()[0]!;
+    return answerDmReminder(
+      { channel: `D-UNO-${MAYA}`, messageTs: (row.followupTs ?? row.nudgeTs)!, glyph, userId: MAYA, messageAuthorId: BOT },
+      { records: w.records, reminderBody: async () => "body", update: async () => true, botUserId: async () => BOT, now: () => when },
+    );
+  };
+  const legendOf = (post: { blocks: unknown[] }) => (post.blocks[1] as { elements: { text: string }[] }).elements[0]!.text;
+
+  it("⏳ on the follow-up brings the check-back it promises, twice at most, and the last post offers no ⏳", async () => {
+    const w = await toBeaReminded();
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU)); // the reminder
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 14))); // Tue Oct 6: the follow-up
+    assert.equal(w.posts.length, 2);
+    assert.match(w.posts[1]!.text, /Still waiting on this one\?/);
+    assert.equal(await react(w, "hourglass_flowing_sand", at(36, 15)), true);
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 14))); // Fri Oct 9: the check-back
+    assert.equal(w.posts.length, 3);
+    assert.match(w.posts[2]!.text, /^Bea said they'd send the tokens doc/);
+    assert.equal(legendOf(w.posts[2]!), MADE_TO_LEGEND);
+    await react(w, "hourglass_flowing_sand", at(39, 15));
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(44, 14))); // Wed Oct 14: the second check-back
+    assert.equal(w.posts.length, 4);
+    assert.equal(legendOf(w.posts[3]!), MADE_TO_LAST_LEGEND);
+    // A third ⏳ changes nothing.
+    await react(w, "hourglass_flowing_sand", at(44, 15));
+    assert.equal(w.records.rows()[0]!.snoozes, 2);
+  });
+
+  it("a token Slack refuses holds the morning's rows like no token, and they lapse", async () => {
+    const w = await toBeaReminded();
+    w.slack.refused = true;
+    for (const day of [31, 32, 35]) await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(day, 14)));
+    assert.deepEqual(w.posts, []);
+    assert.equal(w.records.rows()[0]!.state, "lapsed");
+  });
+
+  it("turning a switch on with a token missing a scope leaves it off and says why, with the link", async () => {
+    const w = world({ scopes: ["im:read"] });
+    const result = await setDmWatch(MAYA, ["promises_made"], { records: w.records, access: (u) => accessOf(u, ownerSlackOf(w)), now: () => ON_AT });
+    assert.deepEqual(result, { on: [], refused: { ok: false, reason: "missing-scopes", missing: ["im:history"] } });
+    const view = homeView({ connectUrl: "https://uno.example/oauth/slack/start", viewer: { connected: true, on: result.on, refused: result.refused } });
+    const text = JSON.stringify(view.blocks);
+    assert.match(text, /missing `im:history`/);
+    assert.match(text, /uno\.example\/oauth\/slack\/start/);
+    assert.ok(!text.includes("initial_options"), "the box is not left ticked");
+  });
+
+  it("the Home checkboxes save for the person who clicked, and republish with why a switch stayed off", async () => {
+    const saved: [string, DmWatchFeature[]][] = [];
+    const published: [string, string | undefined][] = [];
+    await saveDmWatchAction(
+      { user: { id: MAYA }, actions: [{ selected_options: [{ value: "promises_made" }, { value: "decisions" }] }] },
+      {
+        async save(userId, selected) {
+          saved.push([userId, selected]);
+          return { on: [], refused: { ok: false, reason: "no-token" } };
+        },
+        async publish(userId, refused) {
+          published.push([userId, refused?.reason]);
+        },
+      },
+    );
+    assert.deepEqual(saved, [[MAYA, ["promises_made"]]]);
+    assert.deepEqual(published, [[MAYA, "no-token"]]);
+    // No user on the payload: nothing is saved for anyone.
+    await saveDmWatchAction({ actions: [{ selected_options: [{ value: "promises_made" }] }] }, {
+      save: async () => assert.fail("saved with no user"),
+      publish: async () => assert.fail("published with no user"),
+    });
   });
 });

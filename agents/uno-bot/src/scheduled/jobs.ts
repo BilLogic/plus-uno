@@ -178,15 +178,15 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   },
   // End of day, one per person with a DM watch switch on: their own DMs, read
   // with their own token, for promises (src/dm-watch/). Counts only in the log.
-  "dm-promise-read": async (env, job, { dryRun }) => {
-    const report = await runDmPromiseReadOnEnv(env, job, { dryRun });
+  "dm-promise-read": async (env, job, ctx) => {
+    const report = await runDmPromiseReadOnEnv(env, job, ctx);
     console.log(`[dm-watch] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning, one per person: each due DM promise re-read from its permalink,
   // then a reminder in their DM with uno-bot (src/dm-watch/).
-  "dm-promise-nudge": async (env, job, { dryRun }) => {
-    const report = await runDmPromiseNudgesOnEnv(env, job, { dryRun });
+  "dm-promise-nudge": async (env, job, ctx) => {
+    const report = await runDmPromiseNudgesOnEnv(env, job, ctx);
     console.log(`[dm-watch] ${job.key}: ${report.summary}`);
     return report;
   },

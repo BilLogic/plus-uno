@@ -21,6 +21,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await bindings.USAGE_DB.prepare("DELETE FROM dm_watch").run();
   await bindings.USAGE_DB.prepare("DELETE FROM dm_commitments").run();
+  await bindings.USAGE_DB.prepare("DELETE FROM dm_read_positions").run();
 });
 
 runDmWatchRecordsConformance("d1", () => createD1DmWatchRecords({ db: bindings.USAGE_DB }), {
@@ -57,15 +58,18 @@ describe("[d1] the DM watch migration", () => {
   it("holds no summary and no id of the other person", async () => {
     const { results } = await bindings.USAGE_DB.prepare("SELECT name FROM pragma_table_info('dm_commitments')").all<{ name: string }>();
     const names = results.map((r) => r.name);
-    for (const name of names) expect(name).not.toMatch(/text|summary|what|promiser|requester|counterparty|channel|user/);
+    // `reminder_channel` is the owner's own DM with uno-bot, never the other person's.
+    for (const name of names.filter((n) => n !== "reminder_channel")) {
+      expect(name).not.toMatch(/text|summary|what|promiser|requester|counterparty|channel|user/);
+    }
     expect(names).toContain("permalink");
   });
 
   it("serves the morning and a reaction from their indexes", async () => {
     const plan = async (sql: string) =>
       (await bindings.USAGE_DB.prepare(`EXPLAIN QUERY PLAN ${sql}`).all<{ detail: string }>()).results.map((r) => r.detail).join(" | ");
-    expect(await plan("SELECT commitment_id FROM dm_commitments WHERE nudge_ts = 'x'")).toMatch(/dm_commitments_by_nudge/);
-    expect(await plan("SELECT commitment_id FROM dm_commitments WHERE followup_ts = 'x'")).toMatch(/dm_commitments_by_followup/);
+    expect(await plan("SELECT commitment_id FROM dm_commitments WHERE reminder_channel = 'D' AND nudge_ts = 'x'")).toMatch(/dm_commitments_by_nudge/);
+    expect(await plan("SELECT commitment_id FROM dm_commitments WHERE reminder_channel = 'D' AND followup_ts = 'x'")).toMatch(/dm_commitments_by_followup/);
     expect(await plan("SELECT commitment_id FROM dm_commitments WHERE owner_id = 'U' AND state IN ('open') AND due_at <= 5")).toMatch(
       /dm_commitments_by_owner_due/,
     );

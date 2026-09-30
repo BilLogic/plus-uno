@@ -11,7 +11,7 @@ commitment reminders (`0006_commitments.sql`, `0007_commitment_answers.sql`, `00
 note that group DMs and DMs keep no commitments holds only for thread promises:
 since 0008 a self-reminder asked for in a DM or group DM is kept, and posted
 back only there. DM watch keeps its Home-tab switches and the promises read
-in a person's own DMs in two tables of its own (`0011_dm_watch.sql`,
+in a person's own DMs, and how far each DM was read, in three tables of its own (`0011_dm_watch.sql`,
 `agents/uno-bot/src/dm-watch/store.ts`): a row there holds a permalink, which
 that ticket allows, and no summary and no id of the other person. The bot's
 semantic-retrieval schema does **not** — see the second half.
@@ -55,7 +55,7 @@ logged and dropped). A deploy with no pending migration needs no step.
   filed from a card's reaction or button onto its staging turn by
   `proposal-events-d1.ts`. The sweep's tables are mapped in
   `agents/uno-bot/src/sweep/d1.ts`, `commitments` in
-  `agents/uno-bot/src/commitments/d1.ts`, and DM watch's two in
+  `agents/uno-bot/src/commitments/d1.ts`, and DM watch's three in
   `agents/uno-bot/src/dm-watch/d1.ts`.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.

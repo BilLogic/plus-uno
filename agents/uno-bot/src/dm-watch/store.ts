@@ -1,11 +1,13 @@
 // What DM watch keeps between runs, behind one port.
 //
-// TWO TABLES in the usage database (migrations/usage/0011_dm_watch.sql):
+// THREE TABLES in the usage database (migrations/usage/0011_dm_watch.sql):
 //
 //   • `dm_watch` — the switches a person turned on in their Home tab, one row
-//     per switch that is on, each with how far its DMs have been read. The
-//     switch list is `DM_WATCH_FEATURES`, in code: a new switch is a new value
-//     here and nowhere in the schema.
+//     per switch that is on, each with when it was turned on. The switch list
+//     is `DM_WATCH_FEATURES`, in code: a new switch is a new value here and
+//     nowhere in the schema.
+//   • `dm_read_positions` — how far each DM of theirs has been read, one row
+//     per DM a night actually read.
 //   • `dm_commitments` — each promise read in those DMs: its permalink, when
 //     its next step is due, and its state, with the counts and reminder ts the
 //     morning schedules by. NO summary and NO id of the other person: the
@@ -40,8 +42,8 @@ export interface DmWatchSwitch {
   feature: DmWatchFeature;
   /** When it was turned on, epoch ms. */
   since: number;
-  /** The Slack ts its DMs have been read up to: nothing at or before it is
-   *  read for this switch again. */
+  /** The Slack ts it was turned on at: nothing said at or before it counts
+   *  for this switch. */
   readThrough: string;
 }
 
@@ -67,11 +69,16 @@ export interface DmCommitmentRecord {
   permalink: string;
   dueAt: number;
   state: CommitmentState;
-  /** Reminders posted: 0, 1 or 2. */
+  /** Reminders posted: the reminder and its follow-up, plus one check-back
+   *  per ⏳ (`postsAllowed`). */
   nudges: number;
   /** ⏳ answers so far. */
   snoozes: number;
   detectedAt: number;
+  /** The owner's DM with uno-bot, where its reminders were posted. */
+  reminderChannel: string | null;
+  /** The first reminder; the latest one after it (a check-back or the
+   *  follow-up). */
   nudgeTs: string | null;
   followupTs: string | null;
   checkedOn: string | null;
@@ -81,19 +88,26 @@ export interface DmCommitmentRecord {
 }
 
 export type DmCommitmentPatch = Partial<
-  Pick<DmCommitmentRecord, "state" | "dueAt" | "nudges" | "snoozes" | "nudgeTs" | "followupTs" | "checkedOn" | "holds" | "remindedOn" | "resolvedAt">
+  Pick<
+    DmCommitmentRecord,
+    "state" | "dueAt" | "nudges" | "snoozes" | "reminderChannel" | "nudgeTs" | "followupTs" | "checkedOn" | "holds" | "remindedOn" | "resolvedAt"
+  >
 >;
 
 export interface DmWatchRecords {
   /** The switches this person has on. */
   switches(userId: string): Promise<DmWatchSwitch[]>;
-  /** Turn a switch on (reading from `readThrough` onward) or off. On again
+  /** Turn a switch on (counting from `readThrough` onward) or off. On again
    *  when it is already on keeps its place. */
   setSwitch(userId: string, feature: DmWatchFeature, on: boolean, at: { now: number; readThrough: string }): Promise<void>;
   /** Everyone with at least one switch on — one scheduled job each. */
   watchers(): Promise<string[]>;
-  /** Move these switches' `readThrough` to `ts`. */
-  advance(userId: string, features: readonly DmWatchFeature[], ts: string): Promise<void>;
+  /** How far each DM of theirs has been read, by DM id. */
+  positions(userId: string): Promise<Record<string, string>>;
+  /** Record how far these DMs have been read, in one statement. */
+  savePositions(userId: string, positions: Readonly<Record<string, string>>): Promise<void>;
+  /** Forget how far their DMs were read — their last switch went off. */
+  clearPositions(userId: string): Promise<void>;
 
   /** Insert, keeping a row already there. */
   addCommitments(rows: DmCommitmentRecord[]): Promise<void>;
@@ -103,10 +117,19 @@ export interface DmWatchRecords {
   nextDue(ownerId: string, now: number, runDate: string): Promise<DmCommitmentRecord | null>;
   /** How many reminders this owner got on `runDate`. */
   remindedCount(ownerId: string, runDate: string): Promise<number>;
-  /** The row a reminder with this ts belongs to. */
-  byReminderTs(ts: string): Promise<DmCommitmentRecord | null>;
+  /** The row a reminder posted in `channel` with this ts belongs to. */
+  byReminderTs(channel: string, ts: string): Promise<DmCommitmentRecord | null>;
   update(id: string, patch: DmCommitmentPatch): Promise<void>;
   /** Every live row of this owner's of these kinds becomes `lapsed`, in one
    *  statement. Silent: nothing is posted. */
   lapseLive(ownerId: string, kinds: readonly DmCommitmentKind[], now: number): Promise<void>;
+}
+
+/**
+ * How many reminders a row may have in all: the reminder and its one
+ * follow-up, plus one check-back for each ⏳ it was answered with — so a ⏳
+ * always gets the check it promises.
+ */
+export function postsAllowed(snoozes: number): number {
+  return 2 + snoozes;
 }

@@ -19,12 +19,13 @@ import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
 import { conversationsOpen, conversationsReplies, getBotIdentity, postMessage, slackReadAs, updateMessage, usersInfo } from "../slack/api";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { measured } from "../sweep/env";
 import type { SweepSlackMessage } from "../sweep/run";
 import { modelCommitmentDetector, modelEvidenceJudge } from "../commitments/detector";
 import { createD1DmWatchRecords } from "./d1";
 import {
+  accessOf,
   answerDmReminder,
   runDmPromiseNudges,
   runDmPromiseRead,
@@ -33,6 +34,7 @@ import {
   type DmReminderReaction,
   type OwnerSlack,
   type ReadProgress,
+  type SetDmWatchResult,
 } from "./run";
 import type { DmWatchFeature, DmWatchRecords } from "./store";
 
@@ -69,11 +71,12 @@ export async function dmWatchHomeStateFor(env: Env, userId: string): Promise<{ c
   }
 }
 
-/** Save a person's switches from the Home tab; answers with what is on. */
-export async function setDmWatchOnEnv(env: Env, userId: string, selected: readonly DmWatchFeature[]): Promise<DmWatchFeature[]> {
+/** Save a person's switches from the Home tab; answers with what is on, and
+ *  why a switch asked for stayed off. */
+export async function setDmWatchOnEnv(env: Env, userId: string, selected: readonly DmWatchFeature[]): Promise<SetDmWatchResult> {
   const records = dmWatchRecordsFor(env);
-  if (!records) return [];
-  return setDmWatch(userId, selected, { records, connected: (id) => connected(env, id), now: () => Date.now() });
+  if (!records) return { on: [] };
+  return setDmWatch(userId, selected, { records, access: (id) => accessOf(id, ownerSlackFor(env)), now: () => Date.now() });
 }
 
 /** The owner's own-token reads, or null without a token of their own. */
@@ -99,15 +102,21 @@ function ownerSlackFor(env: Env): (userId: string) => Promise<OwnerSlack | null>
           return null;
         }
       },
-      async ims() {
-        const res = (await slackReadAs(token, "users.conversations", { types: "im", exclude_archived: "true", limit: "200" })) as {
+      async ims(cursor) {
+        const res = (await slackReadAs(token, "users.conversations", {
+          types: "im",
+          exclude_archived: "true",
+          limit: "200",
+          ...(cursor ? { cursor } : {}),
+        })) as {
           ok: boolean;
           channels?: { id?: string; user?: string }[];
           response_metadata?: { next_cursor?: string };
         };
         if (!res.ok) return null;
         const channels = (res.channels ?? []).flatMap((c) => (c.id && c.user ? [{ id: c.id, user: c.user }] : []));
-        return { channels, complete: !res.response_metadata?.next_cursor };
+        const next = res.response_metadata?.next_cursor;
+        return next ? { channels, nextCursor: next } : { channels };
       },
       async history(channel, range) {
         const res = (await slackReadAs(token, "conversations.history", {
@@ -116,9 +125,11 @@ function ownerSlackFor(env: Env): (userId: string) => Promise<OwnerSlack | null>
           ...(range.oldest ? { oldest: range.oldest } : {}),
           ...(range.latest ? { latest: range.latest } : {}),
           ...(range.inclusive ? { inclusive: "true" } : {}),
-        })) as { ok: boolean; messages?: SweepSlackMessage[]; has_more?: boolean };
+          ...(range.cursor ? { cursor: range.cursor } : {}),
+        })) as { ok: boolean; messages?: SweepSlackMessage[]; has_more?: boolean; response_metadata?: { next_cursor?: string } };
         if (!res.ok || !Array.isArray(res.messages)) return null;
-        return { messages: res.messages, hasMore: res.has_more === true };
+        const next = res.response_metadata?.next_cursor;
+        return { messages: res.messages, hasMore: res.has_more === true, ...(next ? { nextCursor: next } : {}) };
       },
     };
   };
@@ -142,7 +153,7 @@ function progressIn(kv: KVNamespace): ReadProgress {
 }
 
 /** The end-of-day `dm-promise-read` job on `Env`. */
-export async function runDmPromiseReadOnEnv(env: Env, job: ScheduledJob, opts: { dryRun: boolean }): Promise<DmJobReport | { summary: string }> {
+export async function runDmPromiseReadOnEnv(env: Env, job: ScheduledJob, opts: JobContext): Promise<DmJobReport | { summary: string }> {
   const records = dmWatchRecordsFor(env);
   if (!records || !env.HARNESS_KV) return { summary: "USAGE_DB or HARNESS_KV not bound — no DM watch" };
   const detector = modelCommitmentDetector(selectProvider(env));
@@ -156,11 +167,12 @@ export async function runDmPromiseReadOnEnv(env: Env, job: ScheduledJob, opts: {
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   });
 }
 
 /** The morning `dm-promise-nudge` job on `Env`. */
-export async function runDmPromiseNudgesOnEnv(env: Env, job: ScheduledJob, opts: { dryRun: boolean }): Promise<DmJobReport | { summary: string }> {
+export async function runDmPromiseNudgesOnEnv(env: Env, job: ScheduledJob, opts: JobContext): Promise<DmJobReport | { summary: string }> {
   const records = dmWatchRecordsFor(env);
   if (!records) return { summary: "USAGE_DB not bound — no DM watch" };
   const provider = selectProvider(env);
@@ -188,6 +200,7 @@ export async function runDmPromiseNudgesOnEnv(env: Env, job: ScheduledJob, opts:
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
+    runDate: opts.runDate,
   });
 }
 
