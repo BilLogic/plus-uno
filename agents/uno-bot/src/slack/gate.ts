@@ -28,6 +28,7 @@ import type { SlackReactionAddedEvent } from "./events";
 import { conversationsReplies, getBotIdentity } from "./api";
 import { slackDelivery } from "./slack-delivery";
 import { reactionRecorderFor } from "../usage/resolution-env";
+import { reminderDoorFor } from "../commitments/env";
 
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
   if (event.item.type !== "message") return;
@@ -74,5 +75,11 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
     restage: restageFor(env, threadState),
 
     recordReaction: reactionRecorderFor(env),
+
+    ...withReminder(reminderDoorFor(env)),
   };
+}
+
+function withReminder(reminder: ReactionDoorDeps["reminder"]): Pick<ReactionDoorDeps, "reminder"> {
+  return reminder ? { reminder } : {};
 }

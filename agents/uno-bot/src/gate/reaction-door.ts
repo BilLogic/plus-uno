@@ -101,6 +101,14 @@ export interface ReactionDoorDeps {
    * no longer holds, still is. Must not throw — the envelope logs and swallows.
    */
   recordReaction?(reaction: AnswerReaction): Promise<void>;
+
+  /**
+   * A commitment reminder's own look, ahead of everything else: true when the
+   * reacted message is a reminder, which then owns the reaction whatever its
+   * glyph — so a ✅ there never reaches a card (`commitments/run.ts`
+   * `answerReminder`).
+   */
+  reminder?(request: ReactionRequest): Promise<boolean>;
 }
 
 export async function runReactionDoor(
@@ -111,7 +119,9 @@ export async function runReactionDoor(
   // is the authority on what it means. This one only decides whether the
   // reaction is worth the thread-root read below — every 🎉 in every channel
   // the bot is in arrives here, and a Slack call per party popper is a
-  // subrequest spent on nothing.
+  // subrequest spent on nothing. A reminder's glyphs are not the gate's, so a
+  // reminder looks first.
+  if (deps.reminder && (await deps.reminder(request))) return;
   if (!mapReaction(request.glyph)) return;
 
   // The bot must never resolve its own proposals. slack_react refuses the

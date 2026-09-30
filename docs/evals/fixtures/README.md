@@ -10,6 +10,7 @@ Fixed inputs the benchmarks run against — same inputs, comparable outputs acro
 | uno-maintain | seeded issue set defined inline in `docs/evals/scenarios/uno-maintain.md` S5 (11 targets + 1 cross-estate) | the taxonomy table in `skills/uno-maintain/references/method.md` |
 | uno-bot | `uno-bot-cases.json` — prompts, deterministic checks, and each case's `judgeNote` | the `judgeNote` beside each case — plain text, withheld from the bot by the read guard |
 | uno-bot sweep | `sweep-drift-cases.json` — drift-detector cases (true drift, agreement, near-miss): a thread, its sources and the recorded detector reply | each case's `expect` and `judgeNote`, replayed through the real detector by `agents/uno-bot/tests/sweep-detector.test.ts` |
+| uno-bot commitments | `commitment-cases.json` — commitment-detector cases (a real promise, a request answered yes, a hypothetical, a joke): a thread, its cursor and the recorded detector reply | each case's `expect` and `judgeNote`, replayed through the real detector by `agents/uno-bot/tests/commitment-detector.test.ts` |
 
 Fixtures are frozen: revise only when the thing they test changes, and note it in the fixture header — a moving fixture measures nothing.
 
