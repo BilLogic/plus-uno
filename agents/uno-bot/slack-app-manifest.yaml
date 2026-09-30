@@ -262,6 +262,7 @@ oauth_config:
       - mcp:connect
       - metadata.message:read
       - mpim:history
+      - mpim:read
       - reactions:read
       - reactions:write
       - search:read.files
