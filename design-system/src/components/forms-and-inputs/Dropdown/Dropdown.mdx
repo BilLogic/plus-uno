@@ -220,12 +220,17 @@ would run off the edge, remeasuring on scroll and resize.
   Give it `multiSelectCheckbox` and `multiSelectChecked` to lead with the
   multi-select checkbox, which is decorative, since `aria-pressed` already
   says whether it is on.
+- **A selected row is not shown by color alone.** `selected` gives the row
+  the primary-container ground and a primary-container stroke on its left
+  edge, so the edge still marks it where the ground is hard to see. There is
+  no check mark: a row with no leading visual starts its words at the
+  padding.
 - **A static row is not a control.** An item with `isStatic` is a plain row
   with no button role: it is not focusable, and pressing it leaves the menu
   open. An item with `isBusy` (with `disabled`) is still working and reports
   `aria-busy`.
-- **Icons are decorative — mostly.** The selected check mark, the multi-select
-  checkbox, `leadingIcon` and `trailingIcon` are all `aria-hidden`. The
+- **Icons are decorative — mostly.** The multi-select checkbox,
+  `leadingIcon` and `trailingIcon` are all `aria-hidden`. The
   submenu caret is not, so an icon font glyph there can leak into the item's
   announced name. Keep the item's meaning in `text` either way.
 

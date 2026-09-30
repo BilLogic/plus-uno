@@ -148,27 +148,23 @@ $dropdown-themes: (
             background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
         }
 
-        // Selected state (JSX uses 'selected' class)
+        // Selected (JSX uses 'selected'), as Figma's `state=selected`: the
+        // primary-container 16 ground, with a primary-container stroke of
+        // stroke-xl on the left edge only.
         &.selected,
         &.active {
             position: relative;
-            background-color: var(--color-primary-state-08, rgba(4, 114, 168, 0.08));
+            background-color: var(--color-primary-container-state-16);
             color: var(--color-on-surface);
 
-            // Left selection rail (4px)
             &::before {
                 content: '';
                 position: absolute;
                 left: 0;
                 top: 0;
                 bottom: 0;
-                width: 4px;
+                width: var(--size-element-stroke-xl);
                 background-color: var(--color-primary-container);
-            }
-
-            .selected-icon {
-                opacity: 1 !important;
-                color: var(--color-primary);
             }
         }
 
@@ -213,6 +209,43 @@ $dropdown-themes: (
         white-space: nowrap;
         pointer-events: none;
         padding-top: var(--size-element-pad-y-md);
+    }
+
+    // --- MULTI-SELECT CHECKBOX ---
+    // Figma's `_Form Checkbox Button`. Unchecked: an on-primary box with a
+    // primary-border stroke. Checked: a primary box, no stroke, with an
+    // on-primary check. On a disabled row: a surface box with an on-surface
+    // stroke. The 12px size is a literal because Figma's box is a fixed 12px
+    // frame bound to no size variable; the radius is the radius-50 primitive
+    // because that is the variable Figma binds (no semantic radius is 2px).
+    .pdropdown-checkbox {
+        flex-shrink: 0;
+        box-sizing: border-box;
+        width: 12px;
+        height: 12px;
+        border: var(--size-element-stroke-sm) solid var(--color-primary-border);
+        border-radius: var(--size-border-radius-radius-50);
+        background-color: var(--color-on-primary);
+
+        // The check takes the box's color (`currentColor`).
+        &.is-checked {
+            border-width: 0;
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+        }
+
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+    }
+
+    .dropdown-item.disabled .pdropdown-checkbox:not(.is-checked),
+    .dropdown-item:disabled .pdropdown-checkbox:not(.is-checked) {
+        border-color: var(--color-on-surface);
+        background-color: var(--color-surface);
     }
 
     .dropdown-item-inner {
