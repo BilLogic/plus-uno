@@ -39,6 +39,7 @@ import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
 import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
+import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { isUserTurn, runMessageJob } from "./message-job";
 
@@ -82,9 +83,14 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   switch (event.type) {
     case "message": {
       const msg = event as SlackMessageEvent;
-      // A `dispute N` reply in the weekly DS precedence thread is queued like a
-      // turn, and handled at the head of the thread's job (`message-job.ts`).
-      if (isDsPrecedenceCandidate(env, msg) || (await shouldHandleMessage(env, msg))) {
+      // A `dispute N` reply in the weekly DS precedence thread, and a "yes, it's
+      // up to date" in a thread asked about a file, are queued like a turn and
+      // handled at the head of the thread's job (`message-job.ts`).
+      if (
+        isDsPrecedenceCandidate(env, msg) ||
+        (await isDriftAnswerFor(env, msg)) ||
+        (await shouldHandleMessage(env, msg))
+      ) {
         await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
@@ -432,8 +438,9 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // exit it has (#555); the in-thread stop door (#576) is the one other
     // settler, and it settles by the same card-based rule.
     markDone: (runKey) => store.markRunDone(runKey).catch(() => {}),
-    disputeCandidate: (e) => isDsPrecedenceCandidate(env, e),
-    dispute: (e) => handleDsPrecedenceReply(env, e),
+    disputeCandidate: (e) => isDsPrecedenceCandidate(env, e) || isDriftAnswerCandidateFor(env, e),
+    // Each handler re-checks its own candidate and answers false for the other's.
+    dispute: async (e) => (await handleDsPrecedenceReply(env, e)) || (await handleDriftAnswer(env, e)),
     engages: (e) => shouldHandleMessage(env, e),
     turn: (e) => handleUserMessage(env, e),
   });

@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,949 chars from 16 files**, against an assembled budget of 175,000 (51 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,565 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **175,300 chars from 16 files**, against an assembled budget of 175,500 (200 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,916 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -28,13 +28,13 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,784 | 7,000 (Worker face) |
 | 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,483 | 7,000 (Worker face) |
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,885 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−6,678 ide-only) | 97,856 | — |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−7,223 ide-only) | 97,856 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,854 | — |
 | 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,092 (−3,386 ide-only) | 127,988 | — |
 | 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 131,241 | — |
 | 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,828 | — |
 | 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 166,417 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,484 (−605 ide-only) | 174,949 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,835 (−605 ide-only) | 175,300 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 55,736 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 58,505 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 12,619 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 15,388 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1683,6 +1683,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
 |---|---|---|---|---|---|---|---|
 | Figma library sync | Worker scheduled runs: poll at end of day, post + track next morning | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
+| Figma snapshot refresh | on demand (`workflow_dispatch` from `main`) | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks), otherwise the run ends green | GHA · Figma REST, no model call | Bill | built |
 | Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
 | Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
 | Marketplace add/edit | — | uno-publish (registration) | — | ❌ **not built.** The two stub workflows (`marketplace-add.yml` / `marketplace-edit.yml`) were deleted in #158 — they logged a payload and posted a construction notice, and nothing dispatched them. No Worker tool exists. The open product question — repo data file (`src/pages/PrototypeMarket/prototypes-data.js`) versus the Notion database when they disagree — is tracked in #173 and must be answered before this is built | (planned) | — | planned |
@@ -1707,7 +1708,7 @@ THE standing-automation registry. An automation absent from the table below is u
 
 # The end-of-day sweep
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #751 and #764 · the code is agents/uno-bot/src/sweep/. -->
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #750, #751 and #764 · the code is agents/uno-bot/src/sweep/. -->
 
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a proposal card until a person confirms it. Every write waits for that ✅.
 
@@ -1717,7 +1718,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job. DMs stay unread.
 - **When:** each weekday's end-of-day run (6 pm ET) reads each channel since its cursor, which lives in the usage database.
-- **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place, so a thread with no Notion link, no named page and no answered question is passed over.
+- **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
 - **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
 - **Running notes and Roadmap cards:** two more end-of-day jobs read the Design Running Notes and the Roadmap cards edited since their own cursors. A note's new blocks, or a card's new comments and body edits, are the record. Only team notes are read. A 1:1 note (tagged `1:1` in *Note Type*, or titled as one), or any page that is not a row of the running-notes database, stays unread, and so does a 1:1 that a thread links or a search finds.
 
@@ -1766,6 +1767,17 @@ In a thread uno-bot entered through a sweep card, it answers a reply only when t
 - **⛔** declines the whole card.
 
 Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its card posted is one that expired.
+
+## Drift in a read-only file
+
+When a thread settles something a linked Figma file, `design-system/` code, Storybook page or repo file may not show yet, uno-bot does not try to edit the file. The code is `agents/uno-bot/src/figma-drift/`.
+
+- **The ask:** the next weekday morning run posts once in that thread, naming every file it discussed: "you talked about <file> — is the Figma up to date?" (or "the code", or "Storybook"; "are they up to date?" for several). Each file is linked, and only each file's owner is @-mentioned. A Figma file's last publisher is named by handle, in bold, as plain text rather than an @-mention. The ask goes where `pickDestination` puts it, as a sweep card does.
+- **The drafted intakes:** a thread that drafts intakes gets one card, in its own slot beside any sweep card or turn card, holding one intake per file. Its ✅ files a Roadmap card from the PRD template (`notion_create`, surface `prd`) for a Figma file, or a `harness-intake` issue (`github_issue_create`) for code or a repo file. `drop 2` leaves a file out, as on a sweep card. The Product Pillar is only ever a value the Roadmap already offers, taken from a Roadmap card the thread linked (Universal for the design-system library). An unknown value is left out, and the card says so.
+- **The public repo:** an issue drafted from a private channel, a group DM or a DM carries only the file and one neutral line, with no thread words and no link back. Any `@handle` in an issue's text is set in code. A Roadmap card from a private channel carries the thread's words after a ✅ from someone in it.
+- **One intake per file:** when several threads discussed the same file, the first gets the card and the others get the question alone, pointing at it. While that card is live, a new thread about the file also gets the question alone, and a thread whose own drift card is live waits for it. Each thread is asked about a given file once.
+- **"yes":** a whole-message yes ("yes", "yep", "yes, up to date", "already updated") or a reply saying the file is current, from someone the card names or who posted in an asked thread, withdraws the card at once. The card is edited to say so, and nobody can ✅ it after that. A reply that asks for something ("yes please file it", "go ahead", "ship it"), a question back or a no leaves the card as it is. A bare yes in a thread that also holds a turn's card answers that card. When the card also drafts intakes for files the replying thread did not discuss, it stays, and the reply names the `drop N` that leaves the answered files out.
+- **Terms:** the card's confirmers are the owners plus everyone who posted in the threads that discussed its files that morning. It expires after 72 h, with no re-ping.
 
 ## Commitment reminders
 

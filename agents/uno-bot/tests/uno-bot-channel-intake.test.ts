@@ -266,7 +266,7 @@ test("✅ from the poster files the issue with the harness-intake label and repl
     fileGithubIssue(op.input, {
       github,
       requesterName: async () => "Poster",
-      requestedInDm: false,
+      requestedPrivately: async () => false,
       threadPermalink: async () => `https://plus.slack.com/archives/${CHANNEL}/p1700000000000100`,
       postToThread: async (text) => {
         posted.push(text);

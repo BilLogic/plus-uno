@@ -66,7 +66,7 @@ export const DRIFT_DETECTOR_SYSTEM = [
   "Not drift:",
   "- the source already says what the thread says (agreement);",
   "- a proposal, question, idea or open disagreement nobody settled (a near-miss);",
-  "- a detail the source never mentions.",
+  "- a detail the source never mentions — except in a read-only design file (Figma), whose text rarely states a decision: there, a settled change to what the file would have to show (a layout, a component, copy, a flow) is drift, and source_says is what the file shows, or \"the file may not show this yet\".",
   "Reply with JSON only, no prose, in exactly this shape:",
   '{"findings":[{"source_url":"…","block_id":"…","source_says":"…","thread_says":"…","replacement":"…","evidence_ts":["…"],"claimed_by":"U…"|null,"confidence":0.0}]}',
   "- source_url: one of the listed sources, verbatim.",
