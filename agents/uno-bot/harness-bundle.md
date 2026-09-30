@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 54,717 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **7 reference(s), 54,801 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 11,600 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 11,684 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1718,7 +1718,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job. DMs stay unread.
 - **When:** each weekday's end-of-day run (22:00 UTC) reads each channel since its cursor, which lives in the usage database.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place, so a thread with no Notion link, no named page and no answered question is passed over.
-- **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a standalone page titled as a PRD or spec. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
+- **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
 - **Running notes and Roadmap cards:** two more end-of-day jobs read the Design Running Notes and the Roadmap cards edited since their own cursors. A note's new blocks, or a card's new comments and body edits, are the record. Only team notes are read. A 1:1 note (tagged `1:1` in *Note Type*, or titled as one), or any page that is not a row of the running-notes database, stays unread, and so does a 1:1 that a thread links or a search finds.
 
 ## Where a card goes
