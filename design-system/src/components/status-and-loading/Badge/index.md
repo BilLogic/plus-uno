@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Badge/Badge.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Badge/Badge.stories.jsx` — Sizes, Styles, Content, Overview, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Badge/Badge.stories.jsx` — Sizes, Styles, Content, Overview, Interactive, DeprecationWarning
 
 **Storybook page:** `design-system/src/components/status-and-loading/Badge/Badge.mdx`
 

@@ -1,2610 +1,456 @@
 {
   "modes": {
-    "Default": "Default"
+    "3969:0": "Medium (768px)",
+    "3969:1": "Large (1024px)",
+    "3969:2": "X-Large (1440px)"
   },
   "variables": [
     {
-      "id": "Size=06 - Container (Fluid)",
-      "name": "Breakpoint / Size=06 - Container (Fluid)",
+      "id": "VariableID:3969:18408",
+      "name": "Breakpoints/min width",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 768,
+        "3969:1": 1024,
+        "3969:2": 1440
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 768,
+        "3969:1": 1024,
+        "3969:2": 1440
       }
     },
     {
-      "id": "Size=06 - Container (Fluid) (Grid 0)",
-      "name": "Breakpoint / Size=06 - Container (Fluid)",
+      "id": "VariableID:3969:18419",
+      "name": "Breakpoints/max width",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 1023.97998046875,
+        "3969:1": 1439.97998046875,
+        "3969:2": 1800
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 1023.97998046875,
+        "3969:1": 1439.97998046875,
+        "3969:2": 1800
       }
     },
     {
-      "id": "Size=05 - Mobile (Extra small)",
-      "name": "Breakpoint / Size=05 - Mobile (Extra small)",
+      "id": "VariableID:6084:21604",
+      "name": "Columns/col-1",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 48.66999816894531,
+        "3969:1": 55,
+        "3969:2": 89.66999816894531
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 48.66999816894531,
+        "3969:1": 55,
+        "3969:2": 89.66999816894531
       }
     },
     {
-      "id": "Size=05 - Mobile (Extra small) (Grid 0)",
-      "name": "Breakpoint / Size=05 - Mobile (Extra small)",
+      "id": "VariableID:6084:21605",
+      "name": "Columns/col-2",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 105.33000183105469,
+        "3969:1": 118,
+        "3969:2": 187.3300018310547
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 105.33000183105469,
+        "3969:1": 118,
+        "3969:2": 187.3300018310547
       }
     },
     {
-      "id": "Size=04 - Tablet (Small)",
-      "name": "Breakpoint / Size=04 - Tablet (Small)",
+      "id": "VariableID:6084:21606",
+      "name": "Columns/col-3",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 162,
+        "3969:1": 181,
+        "3969:2": 285
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 162,
+        "3969:1": 181,
+        "3969:2": 285
       }
     },
     {
-      "id": "Size=04 - Tablet (Small) (Grid 0)",
-      "name": "Breakpoint / Size=04 - Tablet (Small)",
+      "id": "VariableID:6084:21607",
+      "name": "Columns/col-4",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 218.6699981689453,
+        "3969:1": 244,
+        "3969:2": 382.6700134277344
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 218.6699981689453,
+        "3969:1": 244,
+        "3969:2": 382.6700134277344
       }
     },
     {
-      "id": "Size=03 - Tablet (Medium)",
-      "name": "Breakpoint / Size=03 - Tablet (Medium)",
+      "id": "VariableID:6084:21608",
+      "name": "Columns/col-5",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 275.3299865722656,
+        "3969:1": 307,
+        "3969:2": 480.3299865722656
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 275.3299865722656,
+        "3969:1": 307,
+        "3969:2": 480.3299865722656
       }
     },
     {
-      "id": "Size=03 - Tablet (Medium) (Grid 0)",
-      "name": "Breakpoint / Size=03 - Tablet (Medium)",
+      "id": "VariableID:6084:21609",
+      "name": "Columns/col-6",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 332,
+        "3969:1": 370,
+        "3969:2": 578
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 332,
+        "3969:1": 370,
+        "3969:2": 578
       }
     },
     {
-      "id": "Size=02 - Desktop (Large)",
-      "name": "Breakpoint / Size=02 - Desktop (Large)",
+      "id": "VariableID:6084:21610",
+      "name": "Columns/col-7",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 388.6700134277344,
+        "3969:1": 433,
+        "3969:2": 675.6699829101562
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 388.6700134277344,
+        "3969:1": 433,
+        "3969:2": 675.6699829101562
       }
     },
     {
-      "id": "Size=02 - Desktop (Large) (Grid 0)",
-      "name": "Breakpoint / Size=02 - Desktop (Large)",
+      "id": "VariableID:6084:21611",
+      "name": "Columns/col-8",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 445.3299865722656,
+        "3969:1": 496,
+        "3969:2": 773.3300170898438
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 445.3299865722656,
+        "3969:1": 496,
+        "3969:2": 773.3300170898438
       }
     },
     {
-      "id": "Size=01 - Desktop HD (Extra large)",
-      "name": "Breakpoint / Size=01 - Desktop HD (Extra large)",
+      "id": "VariableID:6084:21612",
+      "name": "Columns/col-9",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 502,
+        "3969:1": 559,
+        "3969:2": 871
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 502,
+        "3969:1": 559,
+        "3969:2": 871
       }
     },
     {
-      "id": "Size=01 - Desktop HD (Extra large) (Grid 0)",
-      "name": "Breakpoint / Size=01 - Desktop HD (Extra large)",
+      "id": "VariableID:6084:21613",
+      "name": "Columns/col-10",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 558.6699829101562,
+        "3969:1": 622,
+        "3969:2": 968.6699829101562
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 558.6699829101562,
+        "3969:1": 622,
+        "3969:2": 968.6699829101562
       }
     },
     {
-      "id": "Breakpoint",
-      "name": "Breakpoint",
+      "id": "VariableID:6084:21614",
+      "name": "Columns/col-11",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 615.3300170898438,
+        "3969:1": 685,
+        "3969:2": 1066.3299560546875
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 615.3300170898438,
+        "3969:1": 685,
+        "3969:2": 1066.3299560546875
       }
     },
     {
-      "id": "Breakpoint (Grid 0)",
-      "name": "Breakpoint",
+      "id": "VariableID:6084:21615",
+      "name": "Columns/col-12",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 672,
+        "3969:1": 748,
+        "3969:2": 1164
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 672,
+        "3969:1": 748,
+        "3969:2": 1164
       }
     },
     {
-      "id": "Grid",
-      "name": "Breakpoint / Grid",
+      "id": "VariableID:4171:19691",
+      "name": "Display/hidden <= md",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": false,
+        "3969:1": true,
+        "3969:2": true
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": false,
+        "3969:1": true,
+        "3969:2": true
       }
     },
     {
-      "id": "Filled buttons",
-      "name": "Filled buttons",
+      "id": "VariableID:4169:19683",
+      "name": "Display/hidden <= lg",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": false,
+        "3969:1": false,
+        "3969:2": true
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": false,
+        "3969:1": false,
+        "3969:2": true
       }
     },
     {
-      "id": "_Button",
-      "name": "Filled buttons / _Button",
+      "id": "VariableID:4169:19684",
+      "name": "Display/hidden <= xl",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": false,
+        "3969:1": false,
+        "3969:2": false
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": false,
+        "3969:1": false,
+        "3969:2": false
       }
     },
     {
-      "id": "Breakpoint",
-      "name": "Breakpoint",
+      "id": "VariableID:4169:19681",
+      "name": "Display/hidden on all",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": false,
+        "3969:1": false,
+        "3969:2": false
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": false,
+        "3969:1": false,
+        "3969:2": false
       }
     },
     {
-      "id": "Breakpoint (Grid 0)",
-      "name": "Breakpoint",
+      "id": "VariableID:4169:19687",
+      "name": "Display/visible <= md",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": true,
+        "3969:1": false,
+        "3969:2": false
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": true,
+        "3969:1": false,
+        "3969:2": false
       }
     },
     {
-      "id": "Max containter with",
-      "name": "Breakpoint / Max containter with",
+      "id": "VariableID:4169:19688",
+      "name": "Display/visible <= lg",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": true,
+        "3969:1": true,
+        "3969:2": false
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": true,
+        "3969:1": true,
+        "3969:2": false
       }
     },
     {
-      "id": "Grid",
-      "name": "Breakpoint / Grid",
+      "id": "VariableID:4169:19689",
+      "name": "Display/visible <= xl",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": true,
+        "3969:1": true,
+        "3969:2": true
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": true,
+        "3969:1": true,
+        "3969:2": true
       }
     },
     {
-      "id": "Breakpoint",
-      "name": "Breakpoint",
+      "id": "VariableID:4169:19686",
+      "name": "Display/visible on all",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "BOOLEAN",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": true,
+        "3969:1": true,
+        "3969:2": true
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": true,
+        "3969:1": true,
+        "3969:2": true
       }
     },
     {
-      "id": "Breakpoint (Grid 0)",
-      "name": "Breakpoint",
+      "id": "VariableID:17202:120",
+      "name": "Grid/columns",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 12,
+        "3969:1": 12,
+        "3969:2": 12
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 12,
+        "3969:1": 12,
+        "3969:2": 12
       }
     },
     {
-      "id": "Max containter with",
-      "name": "Breakpoint / Max containter with",
+      "id": "VariableID:17202:121",
+      "name": "Grid/content-gutter",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 8,
+        "3969:1": 8,
+        "3969:2": 8
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 8,
+        "3969:1": 8,
+        "3969:2": 8
       }
     },
     {
-      "id": "Grid",
-      "name": "Breakpoint / Grid",
+      "id": "VariableID:17202:122",
+      "name": "Grid/viewport-gutter",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 12,
+        "3969:1": 16,
+        "3969:2": 16
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 12,
+        "3969:1": 16,
+        "3969:2": 16
       }
     },
     {
-      "id": "Side Nav",
-      "name": "Breakpoint / Side Nav",
+      "id": "VariableID:17202:123",
+      "name": "Grid/viewport-margin",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 16,
+        "3969:1": 32,
+        "3969:2": 32
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 16,
+        "3969:1": 32,
+        "3969:2": 32
       }
     },
     {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
+      "id": "VariableID:17427:391",
+      "name": "Min Heights/card-body",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 20,
+        "3969:1": 30,
+        "3969:2": 40
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 20,
+        "3969:1": 30,
+        "3969:2": 40
       }
     },
     {
-      "id": "Side Nav",
-      "name": "Breakpoint / Side Nav",
+      "id": "VariableID:17427:392",
+      "name": "Min Heights/modal-body",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
       "valuesByMode": {
-        "Default": 0
+        "3969:0": 40,
+        "3969:1": 50,
+        "3969:2": 60
       },
       "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Breakpoint",
-      "name": "Breakpoint",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Breakpoint (Grid 0)",
-      "name": "Breakpoint",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav",
-      "name": "Breakpoint / Side Nav",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav",
-      "name": "Breakpoint / Side Nav",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav",
-      "name": "Breakpoint / Side Nav",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Adjustable Margin",
-      "name": "Breakpoint / Adjustable Margin",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav",
-      "name": "Breakpoint / Side Nav",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Grid",
-      "name": "Breakpoint / Grid",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Gutter",
-      "name": "Breakpoint / Gutter",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Adjustable Margin",
-      "name": "Breakpoint / Adjustable Margin",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Side Nav - Fixed Width",
-      "name": "Breakpoint / Side Nav - Fixed Width",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Filled buttons",
-      "name": "Filled buttons",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "_Button",
-      "name": "Filled buttons / _Button",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×3-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×3-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×3-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×3 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×3 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×3 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×2-2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×2-2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×2-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×2-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/horizontal×1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×10 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×9 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×8 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×7 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×6 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×5 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×4 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×3-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×3-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×3-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×3 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×3 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×3 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×2-2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×2-2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×2-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×2-1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×2 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/vertical×1 / layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "layout-blocks/base",
-      "name": "layout-blocks/base",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "swap-label",
-      "name": "layout-blocks/base / swap-label",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Header",
-      "name": "Layout / Header",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Artboard",
-      "name": "Layout / Artboard",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Artboard (Grid 0)",
-      "name": "Layout / Artboard",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "OUTDATED",
-      "name": "OUTDATED",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "OUTDATED (Grid 0)",
-      "name": "OUTDATED",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "OUTDATED (Grid 1)",
-      "name": "OUTDATED",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "ArtBoardHeader",
-      "name": "OUTDATED / ArtBoardHeader",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "ArtBoardFooter",
-      "name": "OUTDATED / ArtBoardFooter",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Overview",
-      "name": "Overview",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Overview (Grid 0)",
-      "name": "Overview",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Overview (Grid 1)",
-      "name": "Overview",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "ArtBoardHeader",
-      "name": "Overview / ArtBoardHeader",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "ArtBoardFooter",
-      "name": "Overview / ArtBoardFooter",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "component",
-      "name": "component",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Card",
-      "name": "component / Card",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Modal",
-      "name": "component / Modal",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "table test",
-      "name": "table test",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "page",
-      "name": "page",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Homepage",
-      "name": "page / Homepage",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Homepage",
-      "name": "page / Homepage",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Static Badge/h1/default",
-      "name": "page / Static Badge/h1/default",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Static Badge/h1/default",
-      "name": "page / Static Badge/h1/default",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Examples",
-      "name": "Examples",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Frame 1010106142",
-      "name": "Examples / Frame 1010106142",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Edit tutor info",
-      "name": "Edit tutor info",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Modal",
-      "name": "Modal",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Form Content",
-      "name": "Main Form / Form Content",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Form Section Header",
-      "name": "Main Form / Form Section Header",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Form Content",
-      "name": "Main Form / Form Content",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Header",
-      "name": "Spacing Token Guidelines / Header",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Content",
-      "name": "Spacing Token Guidelines / Content",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Content",
-      "name": "Pointer / Content",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Content",
-      "name": "Pointer / Content",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Using sm for padding and md for vertical/horizontal spacing in the same component is valid. It is rare/not ideal to mix different semantic sizes for the same token type (e.g., pad-x-sm + pad-y-md).",
-      "name": "Using sm for padding and md for vertical/horizontal spacing in the same component is valid. It is rare/not ideal to mix different semantic sizes for the same token type (e.g., pad-x-sm + pad-y-md).",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Ellipse",
-      "name": "Form <-> Specific Use Cases Gap XS Token: This token is reserved for tight spacing where elements are closely related. Its primary use is for the space between a form label and its input field (e.g., a text field or dropdown menu). / Ellipse",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
-      }
-    },
-    {
-      "id": "Core Spacing Principles for Elements The primary spacing tokens are tied to the typographic hierarchy. Use the following as your default guide: Headline Text: Use element-gap-lg and element-x/y-lg Title Text: Use element-gap-md and element-x/y-md Body Text: Use element-gap-smand element-x/y-sm However, mixing tokens is still allowed (see mixing Tokens) if absolutely necessary",
-      "name": "Core Spacing Principles for Elements The primary spacing tokens are tied to the typographic hierarchy. Use the following as your default guide: Headline Text: Use element-gap-lg and element-x/y-lg Title Text: Use element-gap-md and element-x/y-md Body Text: Use element-gap-smand element-x/y-sm However, mixing tokens is still allowed (see mixing Tokens) if absolutely necessary",
-      "valuesByMode": {
-        "Default": 0
-      },
-      "resolvedValuesByMode": {
-        "Default": {
-          "resolvedValue": 0
-        }
+        "3969:0": 40,
+        "3969:1": 50,
+        "3969:2": 60
       }
     }
   ]

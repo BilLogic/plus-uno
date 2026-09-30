@@ -39,6 +39,14 @@ export const REMEDY =
   '     to regenerate SCSS from source. It has to be safe to run.';
 
 /**
+ * The one refusal this check accepts: the generator declining to shrink a token
+ * file, which is the export being incomplete rather than the generator being
+ * wrong. Every other non-zero exit (a stale exception, a thrown error, a second
+ * mode) is a finding, so it cannot pass CI by printing a refusal.
+ */
+export const SHRINK_REFUSAL = 'A generator may not shrink the thing it generates';
+
+/**
  * The token files by name, each with the hash of what it says right now.
  *
  * WHERE THEY ARE is `tokens-node`'s (#620/#621) rather than a path spelled
@@ -78,20 +86,34 @@ const measure = byRoot((repoRoot) => {
   const status = generator.status ?? 1;
 
   const after = digest(repoRoot);
-  return { before, after, output, status, shrinks: output.includes('Refusing to write') };
+  return { before, after, output, status, refusedShrink: output.includes(SHRINK_REFUSAL) };
 });
+
+/** The `❌` lines the generator printed and the lines under them, for quoting. */
+const quoted = (output) => {
+  const at = output.indexOf('❌');
+  return (at < 0 ? output : output.slice(at)).trim().split('\n').map((l) => `    ${l.trim()}`).filter((l) => l.trim()).join('\n');
+};
+
+/**
+ * The verdict on one generator run, from its exit status and output alone.
+ * @returns {string[]}
+ */
+export function verdict({ status, output }) {
+  const refusedShrink = output.includes(SHRINK_REFUSAL);
+  if (refusedShrink && status === 0) {
+    return ['the generator said a file would shrink and still exited 0 — the refusal is cosmetic.'];
+  }
+  if (!refusedShrink && status !== 0) {
+    return [`the generator exited ${status}, and not because a file would shrink:\n${quoted(output) || '    (no output)'}`];
+  }
+  return [];
+}
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { before, after, status, shrinks } = measure(repoRoot);
-  const found = [];
-
-  if (shrinks && status === 0) {
-    found.push('the generator said a file would shrink and still exited 0 — the refusal is cosmetic.');
-  }
-  if (!shrinks && status !== 0) {
-    found.push(`the generator exited ${status} without saying why. A refusal has to name what it saved.`);
-  }
+  const { before, after, output, status } = measure(repoRoot);
+  const found = verdict({ status, output });
 
   for (const [file, hash] of Object.entries(before)) {
     if (after[file] !== hash) found.push(`${file} CHANGED during --dry-run. Nothing may be written on that path.`);
@@ -119,10 +141,10 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
 /** The green line, which carries the exit code and which branch earned it. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const { status, shrinks } = measure(repoRoot);
+  const { status, refusedShrink } = measure(repoRoot);
   return (
     `--dry-run wrote nothing, exit ${status} ` +
-    `${shrinks ? 'with a named refusal' : 'and no file would shrink'}`
+    `${refusedShrink ? 'with a named refusal' : 'and no file would shrink'}`
   );
 }
 

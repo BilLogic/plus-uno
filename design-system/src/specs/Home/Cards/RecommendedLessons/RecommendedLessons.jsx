@@ -87,7 +87,7 @@ const RecommendedLessons = ({
                 <div className="plus-recommended-lessons-top">
                     <div className="plus-recommended-lessons-tags">
                         {badgeType && (
-                            <StaticBadgeSmart type={badgeType} size="b2" />
+                            <StaticBadgeSmart type={badgeType} />
                         )}
                         {duration && (
                             <>
