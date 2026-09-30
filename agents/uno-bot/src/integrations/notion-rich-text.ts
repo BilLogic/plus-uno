@@ -39,6 +39,22 @@ export interface RichTextRun {
 }
 
 /**
+ * The URLs a block's rich text links or mentions, each once, in order — a
+ * page mention's `href` among them. How a running note or a card names the
+ * page it is about.
+ *
+ * @param runs - The block's `rich_text`
+ */
+export function richTextLinks(runs: readonly RichTextRun[] | undefined): string[] {
+  const out: string[] = [];
+  for (const run of runs ?? []) {
+    const url = run.href ?? run.text?.link?.url ?? "";
+    if (url && !out.includes(url)) out.push(url);
+  }
+  return out;
+}
+
+/**
  * Whether a block's rich text is words only — no link, mention or equation,
  * and no annotation off its default — so a plain text replace loses nothing.
  *

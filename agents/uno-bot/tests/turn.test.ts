@@ -1022,6 +1022,38 @@ test("a sweep card's revision that rewrites a fix is refused, and the card stays
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
 });
 
+// A card that adds an answer holds an `insert` the model cannot restage, so a
+// worded revision is refused rather than staged without the added text.
+test("a worded revision of a sweep card holding an added answer is refused, and the card stays", async () => {
+  const ADD = {
+    page_url: "https://www.notion.so/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    insert: [{ after_block_id: "blk-3", last_edited_time: "2026-09-01T10:00:00.000Z", content: "Ratio is 1 tutor to 4–5 students." }],
+  };
+  const card: PendingProposal = {
+    ...SWEEP_CARD,
+    operations: [
+      { toolName: "notion_update", input: FIX_ONE },
+      { toolName: "notion_update", input: ADD },
+    ],
+  };
+  const h = harness({
+    replies: [{ text: "Dropped the ratio.", toolCalls: [{ name: "notion_update", args: FIX_ONE }] }],
+  });
+  await h.threadState.putProposal(card);
+
+  const outcome = await runTurn(request({ text: "leave out the ratio one", pending: card, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "asked");
+  assert.equal(outcome.staged, undefined);
+  assert.match(outcome.posted ?? "", /reply `drop N`/i);
+  assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+
+  // `drop 1` still revises it, by index, keeping the added answer byte for byte.
+  const dropped = await runTurn(request({ text: "drop 1", pending: card, userId: "U0OWNER" }), h.deps);
+  assert.equal(dropped.disposition, "staged");
+  assert.deepEqual(dropped.staged!.proposal.operations, [{ toolName: "notion_update", input: ADD }]);
+});
+
 // "drop N" is read by index: the revision is the card's own operations minus
 // the dropped one, byte for byte, with no model call to reproduce them.
 test("a confirmer's \"drop 2\" revises a sweep card by index, without the model", async () => {

@@ -248,7 +248,7 @@ function words(text: string): string[] {
 }
 
 /** The first JSON object in a reply, fenced or not. */
-function jsonObjectIn(text: string): unknown {
+export function jsonObjectIn(text: string): unknown {
   const from = text.indexOf("{");
   const to = text.lastIndexOf("}");
   if (from < 0 || to <= from) return null;

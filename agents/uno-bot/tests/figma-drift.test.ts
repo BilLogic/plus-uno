@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
 import type { ScheduledJob } from "../src/scheduled/runs";
-import { runSweepJob, stageSweepCard, type SweepSlackMessage, type SweepSource } from "../src/sweep/index";
+import { DRIFT_DETECTOR_SYSTEM, runSweepJob, stageSweepCard, type SweepSlackMessage, type SweepSource } from "../src/sweep/index";
 import { createInMemoryDriftStore, type InMemoryDriftStore } from "../src/figma-drift/in-memory";
 import {
   answerDriftAsk,
@@ -81,6 +81,8 @@ function night(opts: {
   sources: SweepSource[];
   replies: string[];
   channelKind?: "public" | "private";
+  /** Wire the sweep's search and answer capture, as production does. */
+  capture?: boolean;
 }): { h: SweepHarness; drifts: InMemoryDriftStore } {
   const drifts = createInMemoryDriftStore();
   const h = sweepHarness({
@@ -96,6 +98,7 @@ function night(opts: {
     detectorReplies: opts.replies,
     now: at(29, 22),
     ...(opts.channelKind === "private" ? { privateAllowlist: [DESIGN] } : {}),
+    ...(opts.capture ? { search: {}, capture: true } : {}),
   });
   h.deps.fileDrift = drifts;
   return { h, drifts };
@@ -378,6 +381,25 @@ describe("a Figma drift at the morning run", () => {
     const report = await runDriftAsks(MORNING, m.deps);
     assert.deepEqual(m.posted, []);
     assert.equal(report.summary, "no file drift due this morning");
+  });
+});
+
+describe("a Figma-only thread", () => {
+  it("still reaches the detector and yields a drift finding, with search and answer capture wired", async () => {
+    // No Notion link, no page named in words, no question answered: only the
+    // Figma link makes the thread worth reading.
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [
+      { user: "U0ADE", when: ts(29, 16), text: "Agreed, drop the Share button." },
+    ]);
+    const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)], "U0ADE"))], capture: true });
+    const eod = await runSweepJob(EOD, h.deps);
+    const asked = h.provider.generated as Array<{ system?: string }>;
+    assert.equal(asked.filter((p) => p.system === DRIFT_DETECTOR_SYSTEM).length, 1, "the drift detector was asked, once");
+    assert.equal(eod.findings.length, 0, "no Notion card");
+    const [found] = await drifts.pending();
+    assert.ok(found, "the file drift is queued");
+    assert.equal(found.fileKey, `figma:${FILE_KEY}`);
+    assert.equal(found.owner, "U0ADE");
   });
 });
 

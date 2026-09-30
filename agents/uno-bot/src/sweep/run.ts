@@ -1,6 +1,6 @@
 // `runSweepJob(job, deps)` — the end-of-day sweep, one scheduled job at a time.
 //
-// THREE JOB KINDS, one module:
+// FIVE JOB KINDS, one entry point:
 //
 //   `sweep-channel` (end of day, one per channel on `SWEEP_CHANNELS`) reads the
 //   channel since its cursor with the bot token — `conversations.history` in
@@ -14,6 +14,16 @@
 //   `sweep-group-dms` (end of day, one job) does the same for every group DM
 //   uno-bot is in, as the bot's own conversation list names them, one after
 //   another on the job's budget; each keeps its own cursor and run record.
+//
+//   A thread that names a page without linking it has that page searched for
+//   (`./search.ts`), and one that asks a question someone answered is asked
+//   where the answer belongs when no page holds it (`./capture-detector.ts`):
+//   that finding adds the answer under its section rather than replacing a
+//   block, and posts in the thread like any other.
+//
+//   `sweep-notes` and `sweep-cards` (end of day) read the running notes and
+//   the Roadmap cards edited since their cursors for recorded decisions
+//   (`./records.ts`), and queue what they find the same way.
 //
 //   `sweep-post` (the weekday morning run) takes the findings whose morning has
 //   come (`postableAt`), groups them by destination (`pickDestination`), and
@@ -86,6 +96,10 @@ import {
   type SweepCardPlan,
 } from "./cards";
 import { MAX_MESSAGE_CHARS, type DriftDetector } from "./detector";
+import type { CaptureDetector } from "./capture-detector";
+import { sweepRecords, type SweepNotion } from "./records";
+import { readUsable, searchGate } from "./surfaces";
+import { findBySearch, looksAnswered, namedThings, questionQuery, type SourceSearch } from "./search";
 import {
   classifyLink,
   conversationTypeOf,
@@ -239,6 +253,12 @@ export interface SweepConfig {
   /** The private channels the team cleared (`SLACK_SEARCH_PRIVATE_ALLOWLIST`):
    *  the only ones the sweep reads. */
   privateAllowlist?: readonly string[];
+  /** Design Running Notes (`NOTION_RUNNING_NOTES_DB_ID`): what `sweep-notes` reads. */
+  runningNotesDb?: string;
+  /** The Roadmap (`NOTION_ROADMAP_DB_ID`): what `sweep-cards` reads. */
+  roadmapDb?: string;
+  /** The databases a search hit may be a row of (`./surfaces.ts`). */
+  teamSurfaceDbs?: readonly string[];
 }
 
 export interface SweepDeps {
@@ -247,6 +267,15 @@ export interface SweepDeps {
   /** A Contributor's name as a Slack id, when exactly one person has it. */
   people: { slackIdFor(name: string): Promise<string | null> };
   detector: DriftDetector;
+  /** The Capture detectors beside drift — undocumented answers, and decisions
+   *  in notes and cards (`./capture-detector.ts`). Absent, neither runs. */
+  capture?: CaptureDetector;
+  /** Searches for a page a message names without linking (`./search.ts`).
+   *  Absent, nothing is searched. */
+  search?: SourceSearch;
+  /** The running-notes and Roadmap reads (`./records.ts`). Absent, those
+   *  two jobs skip. */
+  notion?: SweepNotion;
   store: SweepStore;
   delivery: SweepDelivery;
   config: SweepConfig;
@@ -289,7 +318,7 @@ export interface SweepCardReport {
 
 /** What one job came to. */
 export interface SweepJobReport {
-  kind: "sweep-channel" | "sweep-group-dms" | "sweep-post";
+  kind: "sweep-channel" | "sweep-group-dms" | "sweep-post" | "sweep-notes" | "sweep-cards";
   key: string;
   outcome: SweepRunOutcome;
   note: string | null;
@@ -318,7 +347,9 @@ export async function runSweepJob(job: ScheduledJob, deps: SweepDeps): Promise<S
       ? await postFindings(job, deps)
       : job.kind === "sweep-group-dms"
         ? await sweepGroupDms(job, deps)
-        : await sweepChannel(job, deps);
+        : job.kind === "sweep-notes" || job.kind === "sweep-cards"
+          ? await sweepRecords(job, deps)
+          : await sweepChannel(job, deps);
   return deps.dryRun ? withheldFromDryRun(report) : report;
 }
 
@@ -616,10 +647,17 @@ async function sweepThread(
   const links = [...new Set(t.humans.flatMap((m) => linksIn(m.text)))]
     .map((url) => ({ url, kind: classifyLink(url, deps.config.figmaLibraryKey) }))
     .filter((l): l is { url: string; kind: TargetKind } => l.kind !== null);
-  // Only Notion is written in place, so a thread with no Notion link — and,
-  // when file drift is asked about, no Figma or design-system link — has
-  // nothing this sweep can propose, and costs no read and no model call.
-  if (!links.some((l) => l.kind === "notion" || triggers(l.kind))) return none;
+  const linksNotion = links.some((l) => l.kind === "notion");
+  // A Figma or design-system link, when file drift is asked about.
+  const linksFile = links.some((l) => triggers(l.kind));
+  // A page a message names without linking, and a question someone answered
+  // (`./search.ts`) — each looked for only when its detector is wired.
+  const named = deps.search ? namedThings(t.humans.map((m) => m.text)) : [];
+  const answered = !!deps.capture && looksAnswered(t.humans);
+  // Only Notion is written in place, so a thread with no Notion link, no file
+  // link asked about, nothing named and no answered question has nothing this
+  // sweep can propose — and costs no read and no model call.
+  if (!linksNotion && !linksFile && !named.length && !answered) return none;
   const chosen = [
     ...links.filter((l) => l.kind === "notion"),
     ...links.filter((l) => triggers(l.kind)),
@@ -628,7 +666,8 @@ async function sweepThread(
   const sources: SweepSource[] = [];
   for (const link of chosen) {
     try {
-      const source = await deps.sources.read(link.url, link.kind);
+      // A private note is never a source, linked or not (`./surfaces.ts`).
+      const source = await readUsable(deps.sources, deps.config, link.url, link.kind);
       if (source) sources.push(source);
     } catch (err) {
       // A page that failed to read is not a page with nothing on it: the
@@ -640,13 +679,39 @@ async function sweepThread(
       return { ok: false, error: `a linked page could not be read (${why})`, counts: !QUOTA.test(why) };
     }
   }
+  // What nobody linked, found by search and marked so: the page a message
+  // names, and — for an answered question with no page to hold it — the page
+  // its answer may belong on. Only the top hit above the floor, from one of
+  // the team's surfaces, is kept (`./surfaces.ts`). A search that fails, or a
+  // found page that will not read, is no hit: nobody pointed at that page, so
+  // it never holds the thread.
+  if (deps.search && sources.length < MAX_SOURCES_PER_THREAD) {
+    const question = answered && !sources.some((s) => s.writable) ? questionQuery(t.humans) : null;
+    const hits = await findBySearch(
+      deps.search,
+      [...named, ...(question ? [question] : [])],
+      new Set(chosen.map((l) => l.url)),
+      searchGate(deps.config),
+    );
+    for (const hit of hits) {
+      if (sources.length >= MAX_SOURCES_PER_THREAD) break;
+      const source = await readUsable(deps.sources, deps.config, hit.url, hit.kind, true).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      if (source && !sources.some((s) => s.url === source.url)) sources.push(source);
+    }
+  }
   if (!sources.some((s) => s.writable || triggers(s.kind))) return none;
 
   const shown = withinThreadBudget(t.humans, root.ts);
-  const detected = await deps.detector.detect({
-    thread: { channel: t.channel, channelKind: t.channelKind, rootTs: t.rootTs, messages: shown.messages },
-    sources,
-  });
+  const thread: SweepThread = { channel: t.channel, channelKind: t.channelKind, rootTs: t.rootTs, messages: shown.messages };
+  // Drift needs a page or file the thread pointed at — linked or named. A page
+  // found only from the question's words is for placing its answer.
+  const detected =
+    linksNotion || linksFile || named.length
+      ? await deps.detector.detect({ thread, sources })
+      : { ok: true as const, findings: [] };
   if (!detected.ok) {
     return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !QUOTA.test(detected.error) };
   }
@@ -716,6 +781,7 @@ async function sweepThread(
         writable: d.source.writable,
         title: d.source.title,
         pillars: d.source.pillars,
+        ...(d.source.foundBy ? { foundBy: d.source.foundBy } : {}),
       },
       blockId: d.blockId,
       lastEditedTime: d.lastEditedTime,
@@ -728,6 +794,46 @@ async function sweepThread(
       confidence: d.confidence,
       participants,
     });
+  }
+
+  // An answered question no page states (C3): a card in this thread that
+  // adds the answer where it belongs, naming whoever answered.
+  if (answered) {
+    const placed = await deps.capture!.answers({ thread, sources });
+    if (!placed.ok) {
+      return { ok: false, error: `the answer detector did not answer (${placed.error})`, counts: !QUOTA.test(placed.error) };
+    }
+    for (const a of placed.answers) {
+      const answers = shown.messages.filter((m) => a.evidenceTs.includes(m.ts) && m.ts !== a.questionTs);
+      const answerer = a.answeredBy && participants.includes(a.answeredBy) ? a.answeredBy : (answers[0]?.user ?? null);
+      const { owner } = routeOwner({ claimedBy: answerer, participants, contributorIds: [], starter: root.user });
+      const said = answers.map((m) => m.text).join(" ");
+      findings.push({
+        id: `${t.channel}:${t.rootTs}:add:${a.anchorId}`,
+        runDate: t.runDate,
+        detectedAt: t.now,
+        driftAt: Math.min(...a.evidenceTs.map(msOf)),
+        target: {
+          url: a.source.url,
+          kind: a.source.kind,
+          writable: a.source.writable,
+          title: a.source.title,
+          pillars: a.source.pillars,
+          ...(a.source.foundBy ? { foundBy: a.source.foundBy } : {}),
+        },
+        blockId: a.anchorId,
+        lastEditedTime: a.anchorEditedTime,
+        original: "",
+        sourceSays: "",
+        threadSays: said.length > 300 ? `${said.slice(0, 299)}…` : said,
+        replacement: a.text,
+        evidence: { channel: t.channel, channelKind: t.channelKind, threadTs: t.rootTs, messageTs: a.evidenceTs, permalinks: [] },
+        owner,
+        confidence: a.confidence,
+        participants,
+        add: { section: a.section, newSection: a.newSection },
+      });
+    }
   }
   return { ok: true, findings, drifts, readOnly, trimmed: shown.trimmed };
 }
@@ -762,7 +868,7 @@ async function inPlace(ids: readonly string[], membersOf: () => Promise<Readonly
 }
 
 /** The card's Contributors as Slack ids, each name looked up once per job. */
-async function contributorsOf(
+export async function contributorsOf(
   deps: SweepDeps,
   names: readonly string[],
   resolved: Map<string, string | null>,
@@ -1335,7 +1441,7 @@ function groupBy<T>(list: readonly T[], keyOf: (item: T) => string): Map<string,
   return out;
 }
 
-function plannedCards(deps: SweepDeps, findings: PendingFinding[], postDate: string): SweepCardReport[] {
+export function plannedCards(deps: SweepDeps, findings: PendingFinding[], postDate: string): SweepCardReport[] {
   return planSweepCards(findings, postDate).flatMap((plan) => {
     const to = resolveDestination(plan.destination, deps.config);
     if (!to) return [];
@@ -1354,7 +1460,7 @@ function plannedCards(deps: SweepDeps, findings: PendingFinding[], postDate: str
 
 // ── Shared ───────────────────────────────────────────────────────────────────
 
-async function recordRun(
+export async function recordRun(
   deps: SweepDeps,
   r: Omit<SweepRunRecord, "runId" | "runDate" | "subrequests" | "d1Queries" | "finishedAt"> & {
     meterStart: { subrequests: number; d1Queries: number };
@@ -1375,7 +1481,7 @@ async function recordRun(
   });
 }
 
-function readMeter(deps: SweepDeps): { subrequests: number; d1Queries: number } {
+export function readMeter(deps: SweepDeps): { subrequests: number; d1Queries: number } {
   return { subrequests: deps.meter?.subrequests() ?? 0, d1Queries: deps.meter?.d1Queries() ?? 0 };
 }
 
