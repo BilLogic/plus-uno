@@ -41,8 +41,9 @@ test('a stale exception fails, and the finding quotes the generator', () => {
   assert.doesNotMatch(finding, /Generating token SCSS files/);
 });
 
-test('a thrown error fails, even when it says "Refusing to write"', () => {
+test('a thrown error fails, even in the legacy wording that says "Refusing to write"', () => {
   const [finding] = verdict({ status: 1, output: '❌ Refusing to write. size _ semantics.json: 2 modes.' });
+  assert.match(finding, /not because a file would shrink/);
   assert.match(finding, /2 modes/);
 });
 

@@ -486,11 +486,13 @@ const CODE_ONLY_BREAKPOINTS = { 'xxl-min': 1920 };
 
 /**
  * Layout tokens the stylesheet declares that Figma does not have, with the
- * comment each is written with. The SideNav is a fixed 164px wide; Figma draws
- * it at that width but has no variable for it.
+ * comment each is written with and `figmaName`, the slug the variable would
+ * have in `size / layout` (whose names slug to `grid-*`, `breakpoints-*` and
+ * so on, never `layout-*`). The SideNav is a fixed 164px wide; Figma draws it
+ * at that width but has no variable for it.
  */
 const CODE_ONLY_LAYOUT = {
-    'layout-sidebar-width': { value: 164, note: 'SideNav fixed width' },
+    'layout-sidebar-width': { value: 164, note: 'SideNav fixed width', figmaName: 'grid-sidebar-width' },
 };
 
 /**
@@ -534,8 +536,8 @@ function generateLayoutSCSS() {
     for (const key of Object.keys(CODE_ONLY_BREAKPOINTS)) {
         if (breakpoints[key] !== undefined) stale('CODE_ONLY_BREAKPOINTS', `Figma now has ${key}; read it from the export.`);
     }
-    for (const token of Object.keys(CODE_ONLY_LAYOUT)) {
-        if (figmaNames.has(token)) stale('CODE_ONLY_LAYOUT', `--${token} is now a Figma variable; read it from the export.`);
+    for (const [token, { figmaName }] of Object.entries(CODE_ONLY_LAYOUT)) {
+        if (figmaNames.has(figmaName)) stale('CODE_ONLY_LAYOUT', `Figma now has ${figmaName}; read --${token} from the export.`);
     }
     Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
 
