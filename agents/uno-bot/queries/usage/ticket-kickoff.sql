@@ -19,9 +19,11 @@
 -- the ✅s that say either way). Medians are nearest-rank, as elsewhere:
 -- (50 * n + 99) / 100.
 --
--- By requester role: one row for all tickets, then one per role. The role
--- comes from the checked-in role map (src/usage/roles.ts); a person not on it
--- reads `unknown`, and while the map is empty every ticket does.
+-- By requester role: one row for all tickets, then one per role. The role is
+-- written on the staged row from the role map (src/usage/roles.ts), which a
+-- daily job builds from the Notion Team Members database. A person not on the
+-- map reads `unknown`, and so does every card staged before the map was
+-- first synced — the role is recorded at staging and never backfilled.
 --
 -- Window: staging time (proposal_events.at of the staged row), UTC, the @from
 -- date inclusive to the @to date exclusive. Set both with

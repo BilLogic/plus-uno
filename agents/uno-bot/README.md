@@ -202,7 +202,7 @@ A file that reads an input fails with `no such table` if you run it without rend
 
 **Asks and turns.** A turn is one row per message the bot answered, follow-ups included. An ask is a turn whose own message opened a thread, which is the unit to set against the inbox count. `self-serve-rate`, `where-lead-time-goes`, `load-on-lead` and `repeats-reaching-lead` print one of each, labelled in a `unit` column, and `return-rate` counts asks with the turns beside them. The usage record keeps no thread root, so the ask count is an approximation, and each header says which way it leans.
 
-Numbers taken while the window is still open move as the end-of-day pass settles the last day's asks, so cite a closed window when you can. The known limits are in each file's header. Two of them apply to several files: the expired count is a lower bound, and role splits read `unknown` until `agents/uno-bot/src/usage/roles.ts` is filled in.
+Numbers taken while the window is still open move as the end-of-day pass settles the last day's asks, so cite a closed window when you can. The known limits are in each file's header. Two of them apply to several files: the expired count is a lower bound, and a ticket's role reads `unknown` when its requester is not on the role map (`agents/uno-bot/src/usage/roles.ts`, synced daily from Team Members), and for every card staged before the map was first synced.
 
 ## Gotchas
 

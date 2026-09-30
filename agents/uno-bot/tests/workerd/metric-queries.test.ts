@@ -112,6 +112,7 @@ const TURNS: TurnSeed[] = [
 //       its write then refused a stale page. Filed ticket #902.
 //   P7  t8's card, replaced by a revision at 11:00.
 //   P8  t9's card: staged 10:01 in a thread begun 09:59, ✅ by the asker 12:00.
+//       Its requester was on the role map, as a PM; the other cards' were not.
 //   P3  t13's card: staged 15:02 in a thread begun 15:00, ⛔ at 16:00.
 //   P4  t5's card: test traffic.
 //   P2  a Reconcile card (the worker, an intake): staged 14:00, ✅ 16:00.
@@ -127,7 +128,7 @@ const EVENTS: Record<string, unknown>[] = [
   { proposal_id: "P1r", event: "refused_stale", at: T(6, 16) + 5_000, via: "executor" },
   { proposal_id: "P7", event: "staged", at: T(10, 10, 1), via: "turn", turn_id: "C1:t8", requester_id: "UA", tools: '["notion_create"]', ttl_ms: HOUR, thread_started_at: T(10, 10) },
   { proposal_id: "P7", event: "superseded", at: T(10, 11), via: "revision" },
-  { proposal_id: "P8", event: "staged", at: T(11, 10, 1), via: "turn", turn_id: "C1:t9", requester_id: "UA", tools: '["github_issue_create"]', ttl_ms: HOUR, thread_started_at: T(11, 9, 59) },
+  { proposal_id: "P8", event: "staged", at: T(11, 10, 1), via: "turn", turn_id: "C1:t9", requester_id: "UA", tools: '["github_issue_create"]', ttl_ms: HOUR, thread_started_at: T(11, 9, 59), requester_role: "pm" },
   { proposal_id: "P8", event: "confirmed", at: T(11, 12), via: "button", actor_id: "UA", confirmed_by_other: 0 },
   { proposal_id: "P3", event: "staged", at: T(14, 15, 2), via: "turn", turn_id: "C1:t13", requester_id: "UA", tools: '["notion_create"]', ttl_ms: HOUR, thread_started_at: T(14, 15) },
   { proposal_id: "P3", event: "cancelled", at: T(14, 16), via: "reaction", actor_id: "UA" },
@@ -389,18 +390,12 @@ describe("metric queries on the seed", () => {
     // and P9 nobody asked for; P4 is test traffic). P6r — a sweep-card
     // revision staged through a turn — is not a ticket: counting it would make
     // four. To staging: 61 m, 2 m, 2 m. To ✅:
-    // P1 via its re-stage, 3 h; P8, 2 h 1 m. The role map is empty: unknown.
-    const row = {
-      tickets: 3,
-      confirmed: 2,
-      confirmed_by_other: 1,
-      other_share: 0.5,
-      median_to_staging_ms: 120_000,
-      median_to_confirm_ms: 7_260_000,
-    };
+    // P1 via its re-stage, 3 h; P8, 2 h 1 m. P8's requester is a PM; P1's
+    // and P3's are not on the map, so read unknown.
     expect(await run("ticket-kickoff")).toEqual([
-      { requester_role: "all", ...row },
-      { requester_role: "unknown", ...row },
+      { requester_role: "all", tickets: 3, confirmed: 2, confirmed_by_other: 1, other_share: 0.5, median_to_staging_ms: 120_000, median_to_confirm_ms: 7_260_000 },
+      { requester_role: "pm", tickets: 1, confirmed: 1, confirmed_by_other: 0, other_share: 0, median_to_staging_ms: 120_000, median_to_confirm_ms: 7_260_000 },
+      { requester_role: "unknown", tickets: 2, confirmed: 1, confirmed_by_other: 1, other_share: 1, median_to_staging_ms: 120_000, median_to_confirm_ms: 10_800_000 },
     ]);
   });
 
