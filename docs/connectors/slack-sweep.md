@@ -1,12 +1,12 @@
 ---
 embodiment: all
 disclosure: reference
-summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, and how its commitment reminders nudge a promiser.
+summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, how it asks about a read-only file, and how its commitment reminders nudge a promiser.
 ---
 
 # The end-of-day sweep
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749 and #751 · the code is agents/uno-bot/src/sweep/. -->
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #750 and #751 · the code is agents/uno-bot/src/sweep/. -->
 
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a proposal card until a person confirms it. Every write waits for that ✅.
 
@@ -16,7 +16,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job. DMs stay unread.
 - **When:** each weekday's end-of-day run (22:00 UTC) reads each channel since its cursor, which lives in the usage database.
-- **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place, so a thread with no Notion link is passed over.
+- **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion link, Figma link or `design-system/` code link is passed over.
 
 ## Where a card goes
 
@@ -57,6 +57,17 @@ In a thread uno-bot entered through a sweep card, it answers a reply only when t
 - **⛔** declines the whole card.
 
 Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its card posted is one that expired.
+
+## Drift in a read-only file
+
+When a thread settles something a linked Figma file, `design-system/` code, Storybook page or repo file may not show yet, uno-bot does not try to edit the file. The code is `agents/uno-bot/src/figma-drift/`.
+
+- **The ask:** the next weekday morning run posts in that thread: "you talked about <file> — is the Figma up to date?" (or "the code", or "Storybook"), with a link to the file and the owner and the thread's posters @-mentioned. A Figma file's last publisher is named by handle, in bold, as plain text rather than an @-mention. The ask goes where `pickDestination` puts it, as a sweep card does.
+- **The drafted intake:** the ask is a card in its own slot, beside any sweep card or turn card. Its ✅ files a Roadmap card from the PRD template (`notion_create`, surface `prd`) for a Figma file, or a `harness-intake` issue (`github_issue_create`) for code or a repo file. The Product Pillar is only ever a value the Roadmap already offers, taken from a Roadmap card the thread linked (Universal for the design-system library). An unknown value is left out, and the card says so.
+- **One intake per file:** when several threads discussed the same file, the first gets the card and the others get the question alone, pointing at it. While that card is live, a new thread about the file also gets the question alone. Each thread is asked about a given file once.
+- **"yes":** a reply saying the file is up to date, from someone the card names or who posted in an asked thread, withdraws the card at once. The card is edited to say so, and nobody can ✅ it after that. A question back ("is it up to date?") or a no leaves the card as it is.
+- **Terms:** the card's confirmers are the owners plus everyone who posted in the asked threads. It expires after 72 h, with no re-ping.
+- **A turn in the thread:** a batch that files the same kind of intake revises the card and keeps it in its slot, with the same confirmers and deadline.
 
 ## Commitment reminders
 

@@ -7,7 +7,9 @@
 //   pages of 200, plus the replies of every thread active since then — follows
 //   the links each thread carries through the existing source reads, asks the
 //   detector, routes each finding to its owner, and queues it for the morning.
-//   It posts nothing.
+//   It posts nothing. A finding on a file uno-bot cannot write — Figma, the
+//   design-system code, Storybook — is routed the same way and handed to the
+//   morning's ask in its thread (`fileDrift`, `figma-drift/`).
 //
 //   `sweep-group-dms` (end of day, one job) does the same for every group DM
 //   uno-bot is in, as the bot's own conversation list names them, one after
@@ -99,6 +101,13 @@ import {
   type TargetKind,
 } from "./finding";
 import { postableAt } from "./schedule";
+import {
+  fileDriftFinding,
+  intakeLaneOf,
+  triggersFileDrift,
+  type FileDriftFinding,
+  type FileDriftSink,
+} from "../figma-drift/finding";
 import type {
   CardSnapshot,
   PendingFinding,
@@ -258,6 +267,13 @@ export interface SweepDeps {
    * budget stop throws through; any other failure is the hook's to swallow.
    */
   onThread?(thread: SweepThread, since: string): Promise<void>;
+  /**
+   * Where a finding on a file uno-bot cannot write goes — a Figma file, the
+   * design-system code, Storybook — for the morning's ask in its thread
+   * (`figma-drift/`). Absent, such a finding is counted and left, and a
+   * thread with no Notion link is passed over.
+   */
+  fileDrift?: FileDriftSink;
 }
 
 /** One planned or posted card, as the report shows it. */
@@ -430,6 +446,7 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKi
   const kept: PendingFinding[] = [];
   let threads = 0;
   let readOnly = 0;
+  let fileDrifts = 0;
   let reached = cursor;
   const notes: string[] = [];
   const resolved = new Map<string, string | null>();
@@ -487,7 +504,9 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKi
           if (found.trimmed) notes.push(`thread ${unit.root.ts}: ${found.trimmed} oldest repl(ies) left out of the detector's view`);
           kept.push(...found.findings);
           readOnly += found.readOnly;
+          fileDrifts += found.drifts.length;
           if (!deps.dryRun && found.findings.length) await deps.store.addFindings(found.findings);
+          if (!deps.dryRun && found.drifts.length) await deps.fileDrift?.add(found.drifts);
           if (failing.has(unit.root.ts) && !deps.dryRun) await deps.store.clearThreadFailure(channel, unit.root.ts);
         }
       } else {
@@ -513,6 +532,7 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps, only?: ChannelKi
 
   const cards = deps.dryRun ? plannedCards(deps, kept, dateOf(postableAt(now))) : [];
   if (readOnly) notes.push(`${readOnly} finding(s) on targets uno-bot cannot write were left alone`);
+  if (fileDrifts) notes.push(`${fileDrifts} finding(s) on files uno-bot cannot write kept for the morning's ask`);
   return finish("handled", notes.length ? notes.join("; ") : null, threads, kept, cards);
 }
 
@@ -585,22 +605,26 @@ async function sweepThread(
     membersOf: () => Promise<ReadonlySet<string>>;
   },
 ): Promise<
-  | { ok: true; findings: PendingFinding[]; readOnly: number; trimmed: number }
+  | { ok: true; findings: PendingFinding[]; drifts: FileDriftFinding[]; readOnly: number; trimmed: number }
   | { ok: false; error: string; counts: boolean }
 > {
-  const none = { ok: true as const, findings: [], readOnly: 0, trimmed: 0 };
+  const none = { ok: true as const, findings: [], drifts: [], readOnly: 0, trimmed: 0 };
+  // With somewhere to put it, a file uno-bot cannot write is worth a read too.
+  const triggers = (kind: TargetKind): boolean => !!deps.fileDrift && triggersFileDrift(kind);
   const root = t.humans.find((m) => m.ts === t.rootTs) ?? t.humans[0];
   if (!root) return none;
   const links = [...new Set(t.humans.flatMap((m) => linksIn(m.text)))]
     .map((url) => ({ url, kind: classifyLink(url, deps.config.figmaLibraryKey) }))
     .filter((l): l is { url: string; kind: TargetKind } => l.kind !== null);
-  // Only Notion is written in place, so a thread with no Notion link has
-  // nothing this sweep can propose — and costs no read and no model call.
-  if (!links.some((l) => l.kind === "notion")) return none;
-  const chosen = [...links.filter((l) => l.kind === "notion"), ...links.filter((l) => l.kind !== "notion")].slice(
-    0,
-    MAX_SOURCES_PER_THREAD,
-  );
+  // Only Notion is written in place, so a thread with no Notion link — and,
+  // when file drift is asked about, no Figma or design-system link — has
+  // nothing this sweep can propose, and costs no read and no model call.
+  if (!links.some((l) => l.kind === "notion" || triggers(l.kind))) return none;
+  const chosen = [
+    ...links.filter((l) => l.kind === "notion"),
+    ...links.filter((l) => triggers(l.kind)),
+    ...links.filter((l) => l.kind !== "notion" && !triggers(l.kind)),
+  ].slice(0, MAX_SOURCES_PER_THREAD);
   const sources: SweepSource[] = [];
   for (const link of chosen) {
     try {
@@ -616,7 +640,7 @@ async function sweepThread(
       return { ok: false, error: `a linked page could not be read (${why})`, counts: !QUOTA.test(why) };
     }
   }
-  if (!sources.some((s) => s.writable)) return none;
+  if (!sources.some((s) => s.writable || triggers(s.kind))) return none;
 
   const shown = withinThreadBudget(t.humans, root.ts);
   const detected = await deps.detector.detect({
@@ -629,11 +653,15 @@ async function sweepThread(
 
   const participants = [...new Set(t.humans.map((m) => m.user))];
   const findings: PendingFinding[] = [];
+  const drifts: FileDriftFinding[] = [];
   let readOnly = 0;
   for (const d of detected.findings) {
-    // A target uno-bot cannot write is not carded here; it is counted, and
-    // the run's record says how many were left.
-    if (!d.source.writable || !d.blockId || !d.lastEditedTime) {
+    // A target uno-bot cannot write is not carded here. A file the morning
+    // asks about is routed and handed on below; anything else is counted,
+    // and the run's record says how many were left.
+    const writable = d.source.writable && !!d.blockId && !!d.lastEditedTime;
+    const asked = !d.source.writable && !!deps.fileDrift && intakeLaneOf(d.source.kind) !== null;
+    if (!writable && !asked) {
       readOnly += 1;
       continue;
     }
@@ -649,6 +677,34 @@ async function sweepThread(
     const contributorIds =
       t.channelKind === "public" || !named.length ? named : await inPlace(named, t.membersOf);
     const { owner } = routeOwner({ claimedBy: d.claimedBy, participants, contributorIds, starter: root.user });
+    if (!writable) {
+      const drift = fileDriftFinding({
+        channel: t.channel,
+        channelKind: t.channelKind,
+        rootTs: t.rootTs,
+        runDate: t.runDate,
+        now: t.now,
+        target: {
+          url: d.source.url,
+          kind: d.source.kind,
+          writable: d.source.writable,
+          title: d.source.title,
+          pillars: d.source.pillars,
+        },
+        sourceSays: d.sourceSays,
+        threadSays: d.threadSays,
+        evidenceTs: d.evidenceTs,
+        owner,
+        participants,
+        confidence: d.confidence,
+        // The pillars of any Roadmap card the thread links: what the intake
+        // may be filed under, exact-matched in the morning.
+        pillars: sources.flatMap((s) => s.pillars),
+      });
+      // One per file per thread: the first the detector named stands.
+      if (drift && !drifts.some((x) => x.id === drift.id)) drifts.push(drift);
+      continue;
+    }
     findings.push({
       id: `${t.channel}:${t.rootTs}:${d.blockId}`,
       runDate: t.runDate,
@@ -673,7 +729,7 @@ async function sweepThread(
       participants,
     });
   }
-  return { ok: true, findings, readOnly, trimmed: shown.trimmed };
+  return { ok: true, findings, drifts, readOnly, trimmed: shown.trimmed };
 }
 
 /** A stop that is a quota's — the model's or a source's — not the thread's:

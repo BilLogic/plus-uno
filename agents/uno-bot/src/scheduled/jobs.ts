@@ -17,6 +17,7 @@ import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
+import { fileDriftSinkFor, runDriftAsksOnEnv } from "../figma-drift/env";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
 import {
@@ -37,7 +38,12 @@ export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) =
  *  or any other conversation a sweep kind may read. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
   const onThread = job.kind === "sweep-channel" ? commitmentThreadHookFor(env, { dryRun }) : undefined;
-  const report = await runSweepJobOnEnv(env, job, { dryRun }, onThread ? { onThread } : {});
+  // Drift in a file uno-bot cannot write, queued for the morning's ask.
+  const fileDrift = job.kind === "sweep-post" ? undefined : fileDriftSinkFor(env);
+  const report = await runSweepJobOnEnv(env, job, { dryRun }, {
+    ...(onThread ? { onThread } : {}),
+    ...(fileDrift ? { fileDrift } : {}),
+  });
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
@@ -107,6 +113,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "commitment-nudge": async (env, job, { dryRun }) => {
     const report = await runCommitmentNudgesOnEnv(env, job, { dryRun });
     console.log(`[commitments] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: each file drift the sweep kept is asked about in its thread, with
+  // one drafted intake per file (src/figma-drift/).
+  "figma-drift-post": async (env, job, { dryRun }) => {
+    const report = await runDriftAsksOnEnv(env, job, { dryRun });
+    console.log(`[figma-drift] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.
