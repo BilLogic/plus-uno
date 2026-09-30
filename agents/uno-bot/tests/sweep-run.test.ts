@@ -56,7 +56,7 @@ test("a quiet day stages nothing", async () => {
   const h = sweepHarness({ channels: channelOf(quiet), now: at(29, 22) });
 
   const night = await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, h.deps);
 
   assert.equal(night.findings.length, 0);
@@ -92,7 +92,7 @@ test("two drifts from two owners in one thread make one card, in that thread, wi
 
   await runSweepJob(END_OF_DAY, h.deps);
   assert.equal(h.posted.length, 0, "the end of day posts nothing");
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, h.deps);
 
   assert.equal(h.posted.length, 1);
@@ -140,7 +140,7 @@ test("drifts in two threads make two cards, one per thread, and nothing goes to 
   });
 
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
 
   assert.deepEqual(
@@ -154,7 +154,7 @@ test("drifts in two threads make two cards, one per thread, and nothing goes to 
   assert.equal(h.staged.length, 2);
 });
 
-test("findings detected at 22:00 are posted at the next weekday 14:00 run, not before", async () => {
+test("findings detected in the evening are posted at the next weekday 09:00 ET run, not before", async () => {
   // Friday 2026-10-02.
   const t = thread({ user: "U0STARTER", when: ts(32, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(32, 16) }]);
   const h = sweepHarness({
@@ -165,12 +165,12 @@ test("findings detected at 22:00 are posted at the next weekday 14:00 run, not b
   });
   await runSweepJob(END_OF_DAY, h.deps);
 
-  for (const when of [at(32, 22, 30), at(33, 14), at(34, 14), at(35, 13, 59)]) {
+  for (const when of [at(32, 22, 30), at(33, 13), at(34, 13), at(35, 12, 59)]) {
     h.clock.now = when;
     await runSweepJob(MORNING, h.deps);
     assert.deepEqual(h.posted, [], new Date(when).toISOString());
   }
-  h.clock.now = at(35, 14); // Monday
+  h.clock.now = at(35, 13); // Monday
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1);
 });
@@ -193,7 +193,7 @@ test("12 edits make one card of ten in the thread, and the other two wait for it
   const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
 
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, h.deps);
 
   assert.deepEqual(h.posted.map((p) => p.threadTs), [t.root.ts], "one live card per thread");
@@ -202,13 +202,13 @@ test("12 edits make one card of ten in the thread, and the other two wait for it
   assert.match(morning.note ?? "", /2 fix\(es\) wait/);
 
   // The next morning the card is still live: nothing more goes up.
-  h.clock.now = at(31, 14);
+  h.clock.now = at(31, 13);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1);
 
   // Once it is resolved, the two that waited go out on the next card.
   await recordSweepResolution(h.store, h.staged[0]!, undefined, at(31, 15));
-  h.clock.now = at(32, 14);
+  h.clock.now = at(32, 13);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 2);
   assert.equal(h.staged[1]!.operations!.length, 2);
@@ -219,10 +219,10 @@ test("a card that lapsed unanswered frees its thread for the fixes that waited",
   const { page, t, found } = manyEdits("d", 12);
   const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
 
-  h.clock.now = at(30, 14) + SWEEP_CARD_TTL_MS + 60_000;
+  h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 2);
   assert.equal(h.staged[1]!.operations!.length, 2);
@@ -235,7 +235,7 @@ test("a place whose revision was never recorded is still live the next morning",
   const { page, t, found } = manyEdits("r", 12);
   const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
   const card = h.staged[0]!;
 
@@ -244,7 +244,7 @@ test("a place whose revision was never recorded is still live the next morning",
   await h.threadState.retireProposal(card.proposalTs);
   await h.threadState.putProposal({ ...card, proposalTs: ts(30, 16), ttlMs: SWEEP_CARD_TTL_MS - 2 * 3_600_000, operations: card.operations!.slice(1) });
 
-  h.clock.now = at(31, 14);
+  h.clock.now = at(31, 13);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1, "the two that wait keep waiting");
 });
@@ -256,15 +256,15 @@ test("a place is live while ThreadState holds its card, even after the records' 
   const { page, t, found } = manyEdits("s", 12);
   const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
   const card = h.staged[0]!;
 
-  h.clock.now = at(32, 14);
+  h.clock.now = at(32, 13);
   await h.threadState.retireProposal(card.proposalTs);
-  await h.threadState.putProposal({ ...card, proposalTs: ts(32, 14) });
+  await h.threadState.putProposal({ ...card, proposalTs: ts(32, 13) });
 
-  h.clock.now = at(30, 14) + SWEEP_CARD_TTL_MS + 60_000;
+  h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1, "the re-staged card still holds the thread");
 });
@@ -313,7 +313,7 @@ test("a fix a thread already had carded is not proposed again, and a new day's f
   const first = reply(drift({ source: PAGE_A, block: PAGE_A.blocks[0]!.id, evidence: [ts(29, 16)], claimedBy: "U0ADE" }));
   const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [first], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
   const dayOne = h.staged[0]!;
 
@@ -331,7 +331,7 @@ test("a fix a thread already had carded is not proposed again, and a new day's f
   );
   h.clock.now = at(30, 22);
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(31, 14);
+  h.clock.now = at(31, 13);
   await runSweepJob(MORNING, h.deps);
 
   assert.equal(h.staged.length, 1, "day one's card is still live, so the new fix waits");
@@ -344,7 +344,7 @@ test("a fix a thread already had carded is not proposed again, and a new day's f
 
   // Day one's card is confirmed; the next morning the new fix goes out alone.
   await recordSweepResolution(h.store, dayOne, [{ ok: true, toolName: "notion_update", input: dayOne.operations![0]!.input, result: "{}" }] as never, at(31, 15));
-  h.clock.now = at(32, 14);
+  h.clock.now = at(32, 13);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.staged.length, 2);
   assert.deepEqual(
@@ -365,11 +365,11 @@ test("a stop while a card's items are recorded ends, on the retry, in exactly on
   await runSweepJob(END_OF_DAY, h.deps);
 
   h.faults.addItems = new SubrequestBudgetError(40);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
   assert.equal(h.posted.length, 0, "nothing posts before its items are recorded");
 
-  h.clock.now = at(30, 14, 2);
+  h.clock.now = at(30, 13, 2);
   await runSweepJob(MORNING, h.deps);
   await assertOneStagedCard(h);
 });
@@ -385,12 +385,12 @@ test("a stop after the post, before it is staged, is finished by the retry — n
   await runSweepJob(END_OF_DAY, h.deps);
 
   h.faults.post = new SubrequestBudgetError(38);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
   assert.equal(h.posted.length, 1);
   assert.equal(h.staged.length, 0);
 
-  h.clock.now = at(30, 14, 2);
+  h.clock.now = at(30, 13, 2);
   const retry = await runSweepJob(MORNING, h.deps);
   assert.match(retry.note ?? "", /finished staging/);
   await assertOneStagedCard(h);
@@ -403,9 +403,9 @@ test("a stop in stage is finished by the retry, and a stage that fails outright 
   await runSweepJob(END_OF_DAY, h.deps);
 
   h.faults.stage = new SubrequestBudgetError(38);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
-  h.clock.now = at(30, 14, 2);
+  h.clock.now = at(30, 13, 2);
   await runSweepJob(MORNING, h.deps);
   await assertOneStagedCard(h);
 
@@ -414,7 +414,7 @@ test("a stop in stage is finished by the retry, and a stage that fails outright 
   const other = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, other.deps);
   other.faults.stage = new Error("ThreadState unavailable");
-  other.clock.now = at(30, 14);
+  other.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, other.deps);
   assert.equal(other.posted.length, 1);
   assert.match(other.posted[0]!.withdrawn ?? "", /didn't go through/);
@@ -425,9 +425,9 @@ test("a stop in stage is finished by the retry, and a stage that fails outright 
   // A later try that stops after recording its items is never finished onto
   // the withdrawn card: that card was retagged.
   other.faults.post = new SubrequestBudgetError(38);
-  other.clock.now = at(30, 14, 5);
+  other.clock.now = at(30, 13, 5);
   await assert.rejects(runSweepJob(MORNING, other.deps), isSubrequestBudgetError);
-  other.clock.now = at(30, 14, 7);
+  other.clock.now = at(30, 13, 7);
   await runSweepJob(MORNING, other.deps);
   assert.equal(other.staged.length, 1);
   assert.notEqual(other.staged[0]!.proposalTs, other.posted[0]!.ts, "the withdrawn card is not the one staged");
@@ -447,7 +447,7 @@ for (const [glyph, name, status] of [
     await runSweepJob(END_OF_DAY, h.deps);
 
     h.faults.markPosted = new SubrequestBudgetError(38);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
     const card = h.staged[0]!;
 
@@ -482,14 +482,14 @@ test("a card staged into a thread the bot had no history in marks the thread; on
 
   const fresh = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, fresh.deps);
-  fresh.clock.now = at(30, 14);
+  fresh.clock.now = at(30, 13);
   await runSweepJob(MORNING, fresh.deps);
   assert.deepEqual([...fresh.marked], [`${DESIGN}:${t.root.ts}`]);
 
   const talked = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
   await talked.threadState.appendHistory({ channel: DESIGN, thread: t.root.ts }, { role: "assistant", content: "Here's the PRD." });
   await runSweepJob(END_OF_DAY, talked.deps);
-  talked.clock.now = at(30, 14);
+  talked.clock.now = at(30, 13);
   await runSweepJob(MORNING, talked.deps);
   assert.equal(talked.staged.length, 1);
   assert.deepEqual([...talked.marked], [], "a thread already the bot's conversation stays one");
@@ -504,7 +504,7 @@ test("a withdrawn card is out of reach of a ✅", async () => {
   const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, h.deps);
   h.faults.afterStage = new Error("the staging's reply was lost");
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
 
   const card = h.posted[0]!;
@@ -523,7 +523,7 @@ test("a card staged by a stopped try and still live is recorded on the retry, no
   const h = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, h.deps);
   h.faults.markPosted = new SubrequestBudgetError(38);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
 
   h.clock.now = at(30, 16);
@@ -543,14 +543,14 @@ test("a card whose budget is not there is not started: the job defers before pos
   await runSweepJob(END_OF_DAY, h.deps);
 
   h.headroom.subrequests = 2;
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
   assert.equal(h.posted.length, 0);
   assert.deepEqual(h.store.items(), []);
   assert.equal(h.store.runs().at(-1)?.outcome, "deferred");
 
   h.headroom.subrequests = Infinity;
-  h.clock.now = at(30, 14, 2);
+  h.clock.now = at(30, 13, 2);
   await runSweepJob(MORNING, h.deps);
   await assertOneStagedCard(h);
 });
@@ -578,7 +578,7 @@ test("a card shows every fix whole: it holds only as many as one message fits, a
     now: at(29, 22),
   });
   await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, h.deps);
 
   const held = h.staged[0]!.operations!.length;
@@ -605,7 +605,7 @@ test("a fix too long to show whole even alone is not offered", async () => {
   // A renderer that can only show the card by moving its plan to a follow-up.
   const render = h.deps.delivery.render;
   h.deps.delivery.render = (card) => ({ ...render(card), followUp: ["the plan"] });
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 0);
   assert.match(morning.note ?? "", /too long to show whole on a card — not offered/);
@@ -625,7 +625,7 @@ async function postedButUnstaged() {
   });
   await runSweepJob(END_OF_DAY, h.deps);
   h.faults.stage = new SubrequestBudgetError(38);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
   const shown = h.posted[0]!;
 
@@ -648,7 +648,7 @@ async function postedButUnstaged() {
 test("a card finished on a later morning stages what it showed, not what the queue re-read since", async () => {
   const { h, page, shown } = await postedButUnstaged();
 
-  h.clock.now = at(31, 14);
+  h.clock.now = at(31, 13);
   await runSweepJob(MORNING, h.deps);
 
   assert.equal(h.posted.length, 1, "no second card");
@@ -668,7 +668,7 @@ test("a posted card whose digest differs from its snapshot is withdrawn, never s
   const { h, shown } = await postedButUnstaged();
   shown.digest = "someone-else";
 
-  h.clock.now = at(31, 14);
+  h.clock.now = at(31, 13);
   const morning = await runSweepJob(MORNING, h.deps);
 
   assert.match(shown.withdrawn ?? "", /didn't go through/);
@@ -686,17 +686,17 @@ test("a card that cannot be found for sure is held, not posted again; once found
   });
   await runSweepJob(END_OF_DAY, h.deps);
   h.faults.stage = new SubrequestBudgetError(38);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
 
   h.unknownSearches.left = 1;
-  h.clock.now = at(30, 14, 2);
+  h.clock.now = at(30, 13, 2);
   const held = await runSweepJob(MORNING, h.deps);
   assert.match(held.note ?? "", /held for the next try/);
   assert.equal(h.posted.length, 1, "not posted again");
   assert.equal(h.staged.length, 0);
 
-  h.clock.now = at(30, 14, 4);
+  h.clock.now = at(30, 13, 4);
   await runSweepJob(MORNING, h.deps);
   await assertOneStagedCard(h);
 });
@@ -711,11 +711,11 @@ test("a card still unknown after its 72 h is released and its fix carded afresh"
   });
   await runSweepJob(END_OF_DAY, h.deps);
   h.faults.post = new SubrequestBudgetError(38);
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
 
   h.unknownSearches.left = 1;
-  h.clock.now = at(33, 14, 30);
+  h.clock.now = at(33, 13, 30);
   const morning = await runSweepJob(MORNING, h.deps);
   assert.match(morning.note ?? "", /still not found after its 72 h/);
   assert.equal(h.posted.length, 2, "a fresh card");
@@ -752,9 +752,9 @@ test("a retried job is idempotent", async () => {
   assert.equal(h.provider.generated.length, 1);
   assert.equal((await h.store.pendingFindings()).length, 1);
 
-  h.clock.now = at(30, 14);
+  h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
-  h.clock.now = at(30, 14, 2);
+  h.clock.now = at(30, 13, 2);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1);
   assert.equal(h.store.items().length, 1);
@@ -944,7 +944,7 @@ test("a dry run returns the findings and the card text, and writes and posts not
   // The morning rehearsed over a real night's queue: text, and no post.
   const real = sweepHarness({ channels: channelOf(t), sources: [PAGE_A], detectorReplies: [found], now: at(29, 22) });
   await runSweepJob(END_OF_DAY, real.deps);
-  real.clock.now = at(30, 14);
+  real.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, { ...real.deps, dryRun: true });
   assert.equal(morning.cards.length, 1);
   assert.match(morning.cards[0]!.text, /End-of-day sweep/);

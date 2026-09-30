@@ -5,7 +5,7 @@
 // thread". The model passes the time as said and a short summary of the
 // subject to `reminder_set`; this reads the time, keeps a `self_reminder` row
 // beside the promises the sweep reads, and answers with the one line the
-// model confirms with ("Got it, Thu 10 am ET."). A time it cannot place, or
+// model confirms with ("Got it, Thu 9 am ET."). A time it cannot place, or
 // one that could mean two days, comes back as the one question to ask, and
 // nothing is kept. No proposal card: nothing is written outside uno-bot.
 //
@@ -55,7 +55,7 @@ const COUNTS: Record<string, number> = {
 
 const ASK_WHEN = "When should I remind you? A day like Thu, tomorrow, in 2 days or Oct 3 works.";
 
-/** The morning run on an ET day: that date's 10:00 ET (`../sweep/schedule`). */
+/** The morning run on an ET day: that date's 09:00 ET (`../sweep/schedule`). */
 export { morningRunOn };
 
 /** The day itself on a weekday, else the Monday after — runs are weekday-only. */
@@ -106,7 +106,7 @@ export function parseReminderWhen(when: string, now: number): ReminderWhen {
   const place = (day: number): ReminderWhen => {
     const onWeekday = weekdayOnOrAfter(day);
     const runAt = morningRunOn(onWeekday);
-    if (runAt <= now) return { ok: false, ask: "Today's 10 am ET run has already gone. Tomorrow instead?" };
+    if (runAt <= now) return { ok: false, ask: "Today's 9 am ET run has already gone. Tomorrow instead?" };
     return { ok: true, day: onWeekday, runAt };
   };
   if (!said) return { ok: false, ask: ASK_WHEN };
@@ -162,11 +162,11 @@ function nextWeekday(today: number, weekday: number): number {
   return day;
 }
 
-/** The one line the model confirms with: "Got it, Thu 10 am ET." — with the
+/** The one line the model confirms with: "Got it, Thu 9 am ET." — with the
  *  year ("Jan 5, 2027") when a date said without one was read as next year's. */
 export function reminderConfirmation(day: number, now: number, withYear = false): string {
   const label = withYear ? `${monthDay(day)}, ${new Date(day).getUTCFullYear()}` : dayLabel(day, etDayOf(now));
-  return `Got it, ${label} 10 am ET.`;
+  return `Got it, ${label} 9 am ET.`;
 }
 
 /** The answer to a second, different reminder asked from one message. */

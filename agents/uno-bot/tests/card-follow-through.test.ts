@@ -66,7 +66,7 @@ const BEA = "U0BEA";
 const ADE = "U0ADE";
 const CONFIG: FollowThroughConfig = { plusDesign: DESIGN, plusUniversal: UNIVERSAL, unoBot: UNO_BOT, botUserId: BOT };
 
-const ROOT = ts(29, 14); // Tue 2026-09-29, 10:00 ET
+const ROOT = ts(29, 13); // Tue 2026-09-29, 09:00 ET
 const TODO = ts(29, 15);
 const EOD = at(29, 22);
 
@@ -241,7 +241,7 @@ describe("F3: a to-do to make a card", () => {
   it("with a matching card by its due date, becomes auto_done and sends nothing", async () => {
     const { store } = await keptTodo();
     const rm = roadmap({ titles: ["Facelift kickoff", "Facelift — last stage polish"] });
-    const m = morning(store, rm, at(32, 14)); // Fri 10:00 ET
+    const m = morning(store, rm, at(32, 13)); // Fri 09:00 ET
     const report = await m.run();
     assert.equal(only(store).state, "auto_done");
     assert.equal(m.posts.length, 0);
@@ -251,7 +251,7 @@ describe("F3: a to-do to make a card", () => {
   it("with no card, gets one offer in its thread, and its ✅ stages the drafted card", async () => {
     const { store } = await keptTodo();
     const rm = roadmap({ titles: ["Facelift kickoff"] });
-    const m = morning(store, rm, at(32, 14));
+    const m = morning(store, rm, at(32, 13));
     await m.run();
     assert.equal(m.posts.length, 1);
     const [offer] = m.posts;
@@ -262,7 +262,7 @@ describe("F3: a to-do to make a card", () => {
     assert.equal(only(store).state, "nudged");
 
     // The same morning again posts nothing more.
-    await morning(store, rm, at(32, 14, 30)).run();
+    await morning(store, rm, at(32, 13, 30)).run();
 
     const a = answers(store, rm);
     const row = only(store);
@@ -281,7 +281,7 @@ describe("F3: a to-do to make a card", () => {
   it("🙅 from the assignee drops it; from anyone else changes nothing", async () => {
     const { store } = await keptTodo();
     const rm = roadmap();
-    await morning(store, rm, at(32, 14)).run();
+    await morning(store, rm, at(32, 13)).run();
     const row = only(store);
     const a = answers(store, rm);
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "no_good", userId: ADE }, a.deps);
@@ -294,17 +294,17 @@ describe("F3: a to-do to make a card", () => {
   it("follows up once, a week on, then lapses", async () => {
     const { store } = await keptTodo();
     const rm = roadmap();
-    const first = morning(store, rm, at(32, 14));
+    const first = morning(store, rm, at(32, 13));
     await first.run();
     // Two working days on is too soon: one message a card a week.
-    const early = morning(store, rm, at(36, 14));
+    const early = morning(store, rm, at(36, 13));
     await early.run();
     assert.equal(early.posts.length, 0);
-    const second = morning(store, rm, at(42, 14)); // Mon Oct 12, the first morning past a week
+    const second = morning(store, rm, at(42, 13)); // Mon Oct 12, the first morning past a week
     await second.run();
     assert.equal(second.posts.length, 1);
     assert.match(second.posts[0]!.text, /Still want that card drafted\?/);
-    const third = morning(store, rm, at(50, 14));
+    const third = morning(store, rm, at(50, 13));
     await third.run();
     assert.equal(third.posts.length, 0);
     assert.equal(only(store).state, "lapsed");
@@ -325,7 +325,7 @@ describe("F3: a to-do to make a card", () => {
     const row = only(store);
     assert.equal(row.channel, DESIGN);
     assert.equal(row.threadTs, "");
-    const m = morning(store, roadmap(), at(32, 14));
+    const m = morning(store, roadmap(), at(32, 13));
     await m.run();
     assert.equal(m.posts.length, 1);
     assert.equal(m.posts[0]!.threadTs, null);
@@ -366,7 +366,7 @@ describe("F4: an active card with no owner", () => {
     assert.equal(row.promiserId, BEA);
     assert.equal(row.channel, DESIGN);
     assert.equal(row.cardId, "p1");
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts.length, 1);
     assert.equal(m.posts[0]!.channel, DESIGN);
@@ -400,7 +400,7 @@ describe("F4: an active card with no owner", () => {
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     rm.cards.set("p1", card({ contributors: [{ id: "n-maya", name: "Maya Chen" }] }));
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).state, "auto_done");
@@ -410,7 +410,7 @@ describe("F4: an active card with no owner", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     const question = m.posts[0]!;
     assert.ok(rm.marks.has(`${DESIGN}:${question.ts}`), "the question's thread takes replies");
@@ -429,7 +429,7 @@ describe("F4: an active card with no owner", () => {
     // Staged is not applied: the row stays live until the card shows a Contributor.
     assert.equal(only(store).state, "nudged");
     rm.cards.set("p1", card({ contributors: [{ id: "n-maya", name: "Maya Chen" }], lastEditedAt: at(31, 12) }));
-    await morning(store, rm, at(39, 14)).run();
+    await morning(store, rm, at(39, 13)).run();
     assert.equal(only(store).state, "auto_done");
   });
 
@@ -437,10 +437,10 @@ describe("F4: an active card with no owner", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     await handleCardReply({ channel: DESIGN, threadTs: m.posts[0]!.ts, user: BEA, text: "<@U0MAYA>" }, answers(store, rm).deps);
-    const later = morning(store, rm, at(39, 14)); // a week on, the card still unowned
+    const later = morning(store, rm, at(39, 13)); // a week on, the card still unowned
     await later.run();
     assert.equal(later.posts.length, 1);
     assert.match(later.posts[0]!.text, /Still looking for someone/);
@@ -450,7 +450,7 @@ describe("F4: an active card with no owner", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     const a = answers(store, rm);
     const reply = (user: string, text: string) => handleCardReply({ channel: DESIGN, threadTs: m.posts[0]!.ts, user, text }, a.deps);
@@ -469,7 +469,7 @@ describe("F4: an active card with no owner", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     const a = answers(store, rm);
     // The card's creator (Bea) was asked; Maya and Ade were not.
@@ -487,7 +487,7 @@ describe("F4: an active card with no owner", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     const a = answers(store, rm);
     assert.equal(await handleCardReply({ channel: DESIGN, threadTs: m.posts[0]!.ts, user: BEA, text: "<@U0ADE> maybe" }, a.deps), true);
@@ -508,7 +508,7 @@ describe("F5: a stuck card", () => {
     const row = only(store);
     assert.equal(row.kind, "card_stale");
     assert.equal(row.channel, UNIVERSAL);
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts[0]!.channel, UNIVERSAL);
     assert.match(m.posts[0]!.text, /Still moving\?/);
@@ -539,7 +539,7 @@ describe("F5: a stuck card", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [stuck()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    await morning(store, rm, at(30, 14)).run();
+    await morning(store, rm, at(30, 13)).run();
     const row = only(store);
     const a = answers(store, rm);
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph, userId: MAYA }, a.deps);
@@ -614,7 +614,7 @@ describe("F5: a stuck card", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [stuck()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    await morning(store, rm, at(30, 14)).run();
+    await morning(store, rm, at(30, 13)).run();
     const row = only(store);
     const a = answers(store, rm);
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "raised_hands", userId: BEA }, a.deps);
@@ -628,7 +628,7 @@ describe("F5: a stuck card", () => {
     const rm = roadmap({ cards: [stuck()], comments });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     comments.p1 = at(30, 12);
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).state, "auto_done");
@@ -638,7 +638,7 @@ describe("F5: a stuck card", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [stuck()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    await morning(store, rm, at(30, 14)).run();
+    await morning(store, rm, at(30, 13)).run();
     const row = only(store);
     await store.update(row.id, { state: "done", resolvedAt: at(30, 15) });
     // Edited since, and stuck again by its own clock — but asked two days ago.
@@ -653,7 +653,7 @@ describe("shared rules", () => {
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     await store.update(only(store).id, { channel: UNO_BOT } as never);
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts.length, 0);
     // The ports hold no Notion comment write at all: a follow-up is a Slack post.
@@ -683,7 +683,7 @@ describe("shared rules", () => {
 
   it("a ✅ on a card follow-up is the follow-up's, never the gate's", async () => {
     const { store } = await keptTodo();
-    await morning(store, roadmap(), at(32, 14)).run();
+    await morning(store, roadmap(), at(32, 13)).run();
     const row = only(store);
     const seen: string[] = [];
     const handled = await answerReminder(
@@ -700,7 +700,7 @@ describe("shared rules", () => {
       cards: [card({ pageId: "a" }), card({ pageId: "b", lastEditedAt: EOD - 9 * DAY }), card({ pageId: "c", lastEditedAt: EOD - 10 * DAY })],
     });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     // All three are Bea's to answer: two this morning, the third waits.
     assert.equal(m.posts.length, 2);
@@ -734,8 +734,8 @@ describe("beside \"remind me\"", () => {
       store,
       markThread: async () => {},
       config: { unoBot: UNO_BOT, botUserId: BOT },
-      now: () => at(31, 14),
-      runDate: utcDay(at(31, 14)),
+      now: () => at(31, 13),
+      runDate: utcDay(at(31, 13)),
       cards: { due: async (c) => (seen.push(c.id), { id: c.id, action: "auto_done" }) },
     };
     await runCommitmentNudges(NUDGE, deps);
@@ -936,7 +936,7 @@ describe("replies under a follow-up", () => {
     rm.people.slackIdForNotionUser = async (id: string) => ({ "n-bea": BEA, "n-maya": MAYA })[id] ?? null;
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     assert.equal(store.rows.size, 3);
-    const m = morning(store, rm, at(30, 14));
+    const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts.length, 2);
   });
@@ -980,7 +980,7 @@ describe("one message, one row", () => {
 describe("F3 answers", () => {
   it("only ✅ drafts: 👍 does not", async () => {
     const { store } = await keptTodo();
-    await morning(store, roadmap(), at(32, 14)).run();
+    await morning(store, roadmap(), at(32, 13)).run();
     const row = only(store);
     const a = answers(store, roadmap());
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "+1", userId: MAYA }, a.deps);
@@ -990,7 +990,7 @@ describe("F3 answers", () => {
 
   it("someone who posted in the thread may ask for the draft; an outsider may not", async () => {
     const { store } = await keptTodo();
-    await morning(store, roadmap(), at(32, 14)).run();
+    await morning(store, roadmap(), at(32, 13)).run();
     const row = only(store);
     const a = answers(store, roadmap());
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "white_check_mark", userId: ADE }, a.deps);
@@ -1023,7 +1023,7 @@ describe("F3 answers", () => {
       runDate: utcDay(EOD),
     });
     const rm = roadmap();
-    await morning(store, rm, at(32, 14)).run();
+    await morning(store, rm, at(32, 13)).run();
     const a = answers(store, rm);
     for (const row of store.rows.values()) {
       await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "white_check_mark", userId: BEA }, a.deps);
@@ -1042,7 +1042,7 @@ describe("F3 answers", () => {
       now: () => EOD,
       runDate: utcDay(EOD),
     });
-    await morning(store, roadmap(), at(32, 14)).run();
+    await morning(store, roadmap(), at(32, 13)).run();
     const row = only(store);
     const a = answers(store, roadmap());
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "white_check_mark", userId: MAYA }, a.deps);
@@ -1212,7 +1212,7 @@ describe("the morning's two budgets", () => {
     const set = await setSelfReminder({ when: "Thu", what: "review the PRD" }, place, { store, now: () => at(29, 18) });
     assert.ok(set.ok);
     const asked: string[] = [];
-    const m = quietMorning(store, at(31, 14), {
+    const m = quietMorning(store, at(31, 13), {
       async due(c, _now, runDate) {
         asked.push(c.id);
         await store.update(c.id, { state: "nudged", nudges: 1, checkedOn: runDate, remindedOn: runDate });
@@ -1231,7 +1231,7 @@ describe("a kind this Worker does not know", () => {
   it("is held, and lapses after three held mornings like any other hold", async () => {
     const store = createInMemoryCommitmentStore();
     await store.addCommitments([cardRow("x:1", { kind: "card_future" as CommitmentRecord["kind"], cardId: null })]);
-    for (const day of [1, 2, 5]) await quietMorning(store, Date.UTC(2026, 9, day, 14)).run();
+    for (const day of [1, 2, 5]) await quietMorning(store, Date.UTC(2026, 9, day, 13)).run();
     const row = [...store.rows.values()][0]!;
     assert.equal(row.state, "lapsed");
     assert.equal(row.holds, 3);

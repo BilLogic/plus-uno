@@ -108,8 +108,9 @@ uno-bot/
     │                     waitUntil() cancellation window that killed long runs
     ├── runner/           The runner's scheduling over a storage port: one job per alarm, the
     │                     deferred retry, a scheduled run's order and idempotency (+ in-memory runner)
-    ├── scheduled/        The morning (10:00 ET) and end-of-day (18:00 ET) runs the cron
-    │                     enqueues, their job bodies, and the /debug/sweep dry run
+    ├── scheduled/        The morning (09:00 ET) and end-of-day (00:00 ET, dated to the day
+    │                     it sweeps) runs the cron enqueues, their job bodies, and the
+    │                     /debug/sweep dry run
     └── version.ts        BUILD string returned by /health
 ```
 

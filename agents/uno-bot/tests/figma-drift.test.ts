@@ -221,7 +221,7 @@ describe("a Figma drift at the morning run", () => {
     assert.match(eod.note ?? "", /1 finding\(s\) on files uno-bot cannot write kept for the morning's ask/);
     assert.equal((await drifts.pending()).length, 1);
 
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     const report = await runDriftAsks(MORNING, m.deps);
 
@@ -266,7 +266,7 @@ describe("a Figma drift at the morning run", () => {
     await runSweepJob(EOD, h.deps);
     assert.equal(fileKeyOf(FIGMA_A.url, "figma"), fileKeyOf(FIGMA_B.url, "figma"), "one file, two nodes");
 
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
 
@@ -291,7 +291,7 @@ describe("a Figma drift at the morning run", () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1);
@@ -303,7 +303,7 @@ describe("a Figma drift at the morning run", () => {
       { ...(await pendingOf(h, drifts, one, FIGMA_A))!, detectedAt: at(30, 22) },
       { ...(await pendingOf(h, drifts, later, FIGMA_B))!, detectedAt: at(30, 22) },
     ]);
-    h.clock.now = at(31, 14);
+    h.clock.now = at(31, 13);
     await runDriftAsks(MORNING, m.deps);
 
     assert.equal(m.posted.length, 2, "the first thread is not asked again");
@@ -326,7 +326,7 @@ describe("a Figma drift at the morning run", () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [code.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [t], sources: [code], replies: [reply(fileDrift(code, [ts(29, 16)], "U0ADE"))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
 
@@ -345,7 +345,7 @@ describe("a Figma drift at the morning run", () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))], channelKind: "private" });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
 
@@ -362,7 +362,7 @@ describe("a Figma drift at the morning run", () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts, { dryRun: true });
     const report = await runDriftAsks(MORNING, m.deps);
     assert.equal(report.asks.length, 1);
@@ -376,7 +376,7 @@ describe("a Figma drift at the morning run", () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13, 59);
+    h.clock.now = at(30, 12, 59);
     const m = morning(h, drifts);
     const report = await runDriftAsks(MORNING, m.deps);
     assert.deepEqual(m.posted, []);
@@ -411,7 +411,7 @@ describe("the Product Pillar on a Roadmap intake", () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [card.url, FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [t], sources: [card, FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts, { options });
     await runDriftAsks(MORNING, m.deps);
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
@@ -452,7 +452,7 @@ describe("a yes in an asked thread", () => {
       replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
     });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
@@ -521,7 +521,7 @@ describe("two files discussed in one thread", () => {
       replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)], "U0ADE"), fileDrift(CODE, [ts(29, 16)], "U0ADE"))],
     });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
     return { h, drifts, m, t };
@@ -548,7 +548,7 @@ describe("two files discussed in one thread", () => {
     const found = await pendingOf(h, drifts, again, other);
     assert.ok(found);
     await drifts.add([{ ...found, detectedAt: at(30, 22) }]);
-    h.clock.now = at(31, 14);
+    h.clock.now = at(31, 13);
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1, "nothing new in a thread whose card is live");
     assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 1);
@@ -561,7 +561,7 @@ describe("two files discussed in one thread", () => {
     // A second thread asked about the code file alone.
     const second = ts(29, 19);
     await drifts.saveAsked(DESIGN, second, {
-      [fileKeyOf(CODE.url, CODE.kind)]: { cardChannel: DESIGN, cardThread: card!.replyTs!, people: ["U0CY"], kind: CODE.kind, askedAt: at(30, 14) },
+      [fileKeyOf(CODE.url, CODE.kind)]: { cardChannel: DESIGN, cardThread: card!.replyTs!, people: ["U0CY"], kind: CODE.kind, askedAt: at(30, 13) },
     });
     const deps = answerDeps(h, drifts, m.posted);
     assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: second, user: "U0CY", text: "yes" }, deps), true);
@@ -575,7 +575,7 @@ describe("what a GitHub issue carries from a private place", () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [CODE.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [t], sources: [CODE], replies: [reply(fileDrift(CODE, [ts(29, 16)], "U0ADE"))], channelKind: "private" });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     await runDriftAsks(MORNING, morning(h, drifts).deps);
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
     const input = card!.operations![0]!.input as { title: string; body: string };
@@ -591,7 +591,7 @@ describe("what a GitHub issue carries from a private place", () => {
     const mention = { ...fileDrift(CODE, [ts(29, 16)], "U0ADE"), thread_says: "@octocat owns the Button change now." };
     const { h, drifts } = night({ threads: [t], sources: [CODE], replies: [reply(mention)] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     await runDriftAsks(MORNING, morning(h, drifts).deps);
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
     const input = card!.operations![0]!.input as { title: string; body: string };
@@ -622,7 +622,7 @@ describe("a yes that cannot be read", () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
@@ -641,7 +641,7 @@ describe("a yes that cannot be read", () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 14);
+    h.clock.now = at(30, 13);
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);

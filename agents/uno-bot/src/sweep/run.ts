@@ -492,7 +492,7 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
   const findings = reports.flatMap((r) => r.findings);
   const cards = reports.flatMap((r) => r.cards);
   const notes = [
-    ...(done ? [`${done} already swept today`] : []),
+    ...(done ? [`${done} already swept this run`] : []),
     ...(failed.length ? [`${failed.length} failed: ${failed.join(", ")}`] : []),
     ...reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`),
   ];
@@ -524,7 +524,7 @@ async function sweepDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobRep
   const failed: string[] = [];
   const dms = listed.filter((dm, i) => dm.channel.startsWith("D") && listed.findIndex((d) => d.channel === dm.channel) === i);
   const runIdOf = (channel: string) => `${runDate}:${job.key}:${channel}`;
-  // One read for every DM already swept today, however many a retry passes over.
+  // One read for every DM already swept this run, however many a retry passes over.
   const handled = new Set(deps.dryRun || !dms.length ? [] : await deps.store.handledRuns(dms.map((dm) => runIdOf(dm.channel))));
   let done = 0;
   for (const dm of dms) {
@@ -545,7 +545,7 @@ async function sweepDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobRep
   const findings = reports.flatMap((r) => r.findings);
   const cards = reports.flatMap((r) => r.cards);
   const notes = [
-    ...(done ? [`${done} already swept today`] : []),
+    ...(done ? [`${done} already swept this run`] : []),
     ...(failed.length ? [`${failed.length} failed: ${failed.join(", ")}`] : []),
     ...reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`),
   ];

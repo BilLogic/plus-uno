@@ -348,11 +348,11 @@ describe("the end-of-day check", () => {
     assert.equal(report.box.writes, 0);
   });
 
-  it("under EST, a check deferred past 00:00 UTC labels the week with its run's date", async () => {
-    // Friday 2026-12-04: the 18:00 ET run fires at 23:00 UTC, and the check,
-    // deferred on a budget stop, runs at 00:10 UTC on Saturday.
+  it("under EST, Friday's check runs on Saturday and labels the week with Friday, its run's date", async () => {
+    // Friday 2026-12-04 is swept at Saturday 00:00 EST, 05:00 UTC, and the
+    // check, deferred on a budget stop, runs at 05:10 UTC.
     const { deps, report } = checkDeps(LIBRARY);
-    await runPrecedenceCheck({ ...deps, now: () => Date.UTC(2026, 11, 5, 0, 10), runDate: "2026-12-04" });
+    await runPrecedenceCheck({ ...deps, now: () => Date.UTC(2026, 11, 5, 5, 10), runDate: "2026-12-04" });
     const morning = postDeps(report.box.value, null);
     await postPrecedenceReport(morning.deps);
     assert.match(morning.posts[0]!.text, /\(2026-12-04\)/);

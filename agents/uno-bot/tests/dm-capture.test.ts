@@ -54,8 +54,8 @@ const DM_BEA = "D0BEA";
 const URL = "https://plus.slack.com/";
 const ON_AT = at(28, 15);
 const EOD = at(29, 22);
-const WED = at(30, 14);
-const THU = at(31, 14);
+const WED = at(30, 13);
+const THU = at(31, 13);
 const PAGE = notionPage("5a1e5a1e5a1e5a1e5a1e5a1e5a1e5a1e", { title: "Launch plan <!channel>" });
 const DECIDED = ts(29, 17);
 const SECRET = "the launch moved to November 1, keep it between us";
@@ -497,7 +497,7 @@ describe("a DM finding", () => {
     assert.equal(w.posts.length, 1);
     // Once the revision is gone, the new fix gets its card.
     await w.threadState.retireProposal(`${card.proposalTs}9`);
-    await runDmCapturePost(postJob(MAYA), postDeps(w, at(32, 14)));
+    await runDmCapturePost(postJob(MAYA), postDeps(w, at(32, 13)));
     assert.equal(w.posts.length, 2);
   });
 

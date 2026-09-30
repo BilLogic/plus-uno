@@ -197,7 +197,7 @@ describe("F6: a question uno-bot could not answer", () => {
     assert.equal(row!.promiserId, MAYA);
     assert.equal(JSON.stringify(row).includes("tutor ratio"), false, "no message text on the row");
 
-    w.h.clock.now = at(30, 14, 5); // Wed, 10:05 ET
+    w.h.clock.now = at(30, 13, 5); // Wed, 09:05 ET
     await w.morning();
     assert.equal(w.posts.length, 1);
     const ask = w.posts[0]!;
@@ -208,7 +208,7 @@ describe("F6: a question uno-bot could not answer", () => {
 
     // Unanswered by its next due date (Monday's run), it lapses: asked once.
     for (const day of [31, 32, 35]) {
-      w.h.clock.now = at(day, 14, 5);
+      w.h.clock.now = at(day, 13, 5);
       await w.morning();
     }
     assert.equal(w.posts.length, 1, "never a second ask");
@@ -222,7 +222,7 @@ describe("F6: a question uno-bot could not answer", () => {
     const w = world({ dm: { kind: "dm", history: [root], threads: { [root.ts]: [root, sourced] } }, dmReplies: [dmReply({})], now: at(29, 22) });
     await w.endOfDay();
     assert.equal(rowsOf(w.store).length, 0);
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     assert.equal(w.postedIn().length, 0);
   });
@@ -230,7 +230,7 @@ describe("F6: a question uno-bot could not answer", () => {
   it("🙅 on the ask drops it, in place and with no new ping", async () => {
     const w = world({ dm: { kind: "dm", history: [root], threads: { [root.ts]: [root, miss] } }, dmReplies: [missed], now: at(29, 22) });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     const ask = w.posts[0]!;
     assert.equal(await w.react(ask.ts, "white_check_mark"), true, "a ✅ on the ask is the ask's, and does nothing");
@@ -254,7 +254,7 @@ describe("F6: a question uno-bot could not answer", () => {
     // Tonight's read, then Wednesday night's, which finds nothing new of its kinds.
     const w = world({ dm, dmReplies: [missed, dmReply({})], sources: [pilot], now: at(29, 22) });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     const ask = w.posts[0]!;
     const [row] = rowsOf(w.store);
@@ -288,7 +288,7 @@ describe("F6: a question uno-bot could not answer", () => {
     await w.endOfDay();
     assert.equal(w.store.rows.get(row!.id)!.state, "done", "the ask is answered");
 
-    w.h.clock.now = at(31, 14, 5);
+    w.h.clock.now = at(31, 13, 5);
     await w.morning();
     assert.equal(w.h.posted.length, 1, "one placement card");
     const card = w.h.posted[0]!;
@@ -343,7 +343,7 @@ describe("C7: a decision told to uno-bot", () => {
     });
     await w.endOfDay();
     assert.deepEqual(w.h.sourceReads, [recap.url], "the PRD uno-bot linked in its answer is read");
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     assert.equal(w.h.posted.length, 1);
     assert.equal(w.h.posted[0]!.channel, DM);
@@ -359,7 +359,7 @@ describe("C7: a decision told to uno-bot", () => {
     await w.endOfDay();
     assert.equal(w.h.provider.generated.length, 0, "no drift detector call");
     assert.equal(w.h.sourceReads.length, 0);
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     assert.equal(w.postedIn().length, 0);
   });
@@ -382,7 +382,7 @@ describe("C6: a disagreement uno-bot noticed while answering", () => {
   async function raised() {
     const w = world({ dm: { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } }, dmReplies: [noticed], now: at(29, 22) });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     return w;
   }
@@ -430,12 +430,12 @@ describe("C6: a disagreement uno-bot noticed while answering", () => {
       now: at(29, 22),
     });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     assert.equal(w.staged[0]!.operations![0]!.input.channel, DESIGN);
-    w.h.clock.now = at(31, 14, 5);
+    w.h.clock.now = at(31, 13, 5);
     await w.morning();
-    w.h.clock.now = at(32, 14, 5);
+    w.h.clock.now = at(32, 13, 5);
     await w.morning();
     assert.equal(w.posts.length, 1);
   });
@@ -494,7 +494,7 @@ describe("nothing from a DM reaches a channel without the person's ✅", () => {
     });
     await w.endOfDay();
     for (const day of [30, 31, 32]) {
-      w.h.clock.now = at(day, 14, 5);
+      w.h.clock.now = at(day, 13, 5);
       await w.morning();
     }
     assert.equal(w.h.posted.length, 1, "the C7 card");
@@ -579,7 +579,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
     const w = world({ dm, dmReplies: [dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] })], now: at(29, 22) });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     const card = w.posts[0]!;
     const proposal = w.staged[0]!;
@@ -597,7 +597,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     await w.endOfDay();
     assert.equal(w.dmProvider.generated.length, 1, "nothing new in the thread, so no second read");
     for (const day of [31, 32, 35]) {
-      w.h.clock.now = at(day, 14, 5);
+      w.h.clock.now = at(day, 13, 5);
       await w.morning();
     }
     assert.equal(w.posts.length, 1, "never offered again");
@@ -639,7 +639,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     });
     const w = world({ dm, dmReplies: [dmReply({ decisions: [{ message_ts: r.ts, confidence: 0.9 }] })], sweepReplies: [finding], sources: [recap], now: at(29, 22) });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     assert.equal(w.h.posted.length, 1);
     const posted = w.h.posted[0]!;
@@ -654,7 +654,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     w.h.clock.now = at(30, 22);
     await w.endOfDay();
     assert.equal(w.dmProvider.generated.length, 1, "uno-bot's own card is no new message");
-    w.h.clock.now = at(31, 14, 5);
+    w.h.clock.now = at(31, 13, 5);
     await w.morning();
     assert.equal(w.h.posted.length, 1, "never proposed again");
   });
@@ -674,7 +674,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     });
     await w.endOfDay();
     assert.equal(rowsOf(w.store).length, 2, "one a thread");
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     assert.equal(w.staged.length, 2);
     for (const p of w.staged) assert.equal((await w.h.threadState.getProposalByTs(p.proposalTs)).state, "found");
@@ -684,7 +684,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
     const w = world({ dm, dmReplies: [dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] })], now: at(29, 22) });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     const proposal = w.staged[0]!;
     await resolveSignal(
@@ -693,8 +693,8 @@ describe("uno-bot never reads its own posts back as new", () => {
     );
     // That day: asked again in the same thread, and in a new one; uno-bot says
     // it again in other words, naming the sources a little differently.
-    const again = msg(MAYA, ts(30, 14, 30), "so which is right?", { thread_ts: root.ts });
-    const reworded = bot(ts(30, 14, 31), "The warning token differs: Figma says #FFB020, code says #715C00.", { thread_ts: root.ts });
+    const again = msg(MAYA, ts(30, 13, 30), "so which is right?", { thread_ts: root.ts });
+    const reworded = bot(ts(30, 13, 31), "The warning token differs: Figma says #FFB020, code says #715C00.", { thread_ts: root.ts });
     dm.threads![root.ts] = [root, answer, again, reworded];
     root.latest_reply = reworded.ts;
     const root2 = msg(MAYA, ts(30, 15), "What hex is warning?", { reply_count: 1, latest_reply: ts(30, 15, 1) });
@@ -710,7 +710,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     assert.equal(w.dmProvider.generated.length, 3, "both threads were read");
     assert.equal(rowsOf(w.store).length, 1, "no second raise");
     for (const day of [31, 32, 35, 36]) {
-      w.h.clock.now = at(day, 14, 5);
+      w.h.clock.now = at(day, 13, 5);
       await w.morning();
     }
     assert.equal(w.posts.length, 1, "no new card");
@@ -722,7 +722,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
     const w = world({ dm, dmReplies: [dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] })], now: at(29, 22) });
     await w.endOfDay();
-    w.h.clock.now = at(30, 14, 5);
+    w.h.clock.now = at(30, 13, 5);
     await w.morning();
     const proposal = w.staged[0]!;
     await resolveSignal(
@@ -783,11 +783,11 @@ describe("a DM ask waits behind a person's own asks", () => {
       { ...base, id: `${DM}:a:unanswered`, kind: "dm_unanswered", dueAt: at(29, 22) },
       { ...base, id: `${DM}:b:unanswered`, kind: "dm_unanswered", threadTs: ts(29, 16), dueAt: at(29, 22) },
       { ...base, id: `${DM}:c:raise`, kind: "dm_disagreement", threadTs: ts(29, 17), dueAt: at(29, 22) },
-      { ...base, id: `${DM}:self`, kind: "self_reminder", dueAt: at(30, 14) },
+      { ...base, id: `${DM}:self`, kind: "self_reminder", dueAt: at(30, 13) },
     ]);
     for (const id of [`${DM}:a:unanswered`, `${DM}:b:unanswered`, `${DM}:self`]) await store.saveText(id, { what: "the ratio", bodies: {} }, at(60, 0));
     await store.saveText(`${DM}:c:raise`, { what: "the warning colour", bodies: {}, raise: { sources: ["Figma", "the code"], to: "plus-universal" } }, at(60, 0));
-    const now = at(30, 14, 5);
+    const now = at(30, 13, 5);
     const order: string[] = [];
     const nudges = await runCommitmentNudges(NUDGE, {
       slack: {
