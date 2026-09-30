@@ -135,7 +135,7 @@ if (found.length) {
 
 console.log(`check:harness — ${CHECKS.length} sub-checks, one exit code\n`);
 
-const { failures, seconds, total } = await runAll({
+const { failures, warned, seconds, total } = await runAll({
   repoRoot: REPO_ROOT,
   onResult: (row, result) =>
     console.log(
@@ -144,6 +144,14 @@ const { failures, seconds, total } = await runAll({
     ),
 });
 const elapsed = seconds.toFixed(1);
+
+// A passing check's warnings — the constitution's soft budget among them — are
+// printed whether or not anything failed: they do not block, and they are the
+// only place the overrun is said.
+for (const check of warned) {
+  console.warn(`\n${'─'.repeat(72)}\n⚠ ${check.name}   (${check.invocation})\n`);
+  console.warn(check.output);
+}
 
 if (!failures.length) {
   console.log(`\n✓ check:harness — ${total}/${total} sub-checks passed in ${elapsed}s`);

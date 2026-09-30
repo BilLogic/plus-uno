@@ -5,11 +5,12 @@
 //
 // The budgets live in one place, `BUDGETS` in
 // `agents/uno-bot/scripts/bundle-harness.mjs`, and the build fails on a doc that
-// blows one. That much has a guard. What had none is the prose: two harness
-// documents state a budget as a NUMBER a reader will believe —
+// blows one — except the constitution's, which is soft and warns. That much has
+// a guard. What had none is the prose: two harness documents state a budget as a
+// NUMBER a reader will believe —
 //
-//   AGENTS.md § The loading contract: "Budget ≤20k chars: a tier that bloats
-//   defeats the tier."
+//   AGENTS.md § The loading contract: "Soft budget ≤20k chars: an overrun warns
+//   rather than fails".
 //   skills/README.md § The three questions a new line answers: "`bot.md` is on
 //   a 7,000-char budget the bundler asserts".
 //
@@ -65,8 +66,10 @@ export const CLAIMS = [
   {
     file: 'AGENTS.md',
     budget: 'constitution',
-    quote: 'Budget ≤20k chars: a tier that bloats defeats the tier.',
-    pattern: /Budget\s+≤\s*([\d,.]+)k\s+chars/,
+    // "Soft" is part of the match: the bundler only warns on this budget, and a
+    // sentence that dropped the word would promise a failure the build never gives.
+    quote: 'Soft budget ≤20k chars: an overrun warns rather than fails',
+    pattern: /Soft budget\s+≤\s*([\d,.]+)k\s+chars/,
     scale: 1_000,
   },
   {

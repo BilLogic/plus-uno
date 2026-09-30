@@ -164,6 +164,18 @@ test('a row whose module exports no run() falls back to the spawn and says so', 
   assert.match(result.output, /ran the script/);
 });
 
+test('a passing check that warns is carried to the composite, and does not fail it', async () => {
+  const WARNING = { ...PASSING, name: 'check:fake-warn', module: 'fake/warn.mjs' };
+  const load = (modulePath) =>
+    modulePath === WARNING.module
+      ? Promise.resolve({ run: () => [{ file: 'AGENTS.md', message: 'over by 500', severity: 'warning' }] })
+      : fakeLoad(modulePath);
+  const { failures, warned } = await runAll({ repoRoot: REPO_ROOT, rows: [WARNING, PASSING], load });
+  assert.equal(failures.length, 0);
+  assert.deepEqual(warned.map((w) => w.name), ['check:fake-warn']);
+  assert.match(warned[0].output, /\(warning\) AGENTS\.md {2}over by 500/);
+});
+
 test('the composite reports every failure, not the first', async () => {
   const seen = [];
   const { failures, total } = await runAll({

@@ -31,7 +31,7 @@ const manifest = (budgets = {}) => ({
  * @param {{tier1?: string|null, botFace?: string|null}} [prose] the sentence to
  *   write, or null to leave the file out entirely.
  */
-function fixture({ tier1 = 'Budget ≤20k chars: a tier that bloats defeats the tier.', botFace = 'a 7,000-char budget the bundler asserts' } = {}) {
+function fixture({ tier1 = 'Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier.', botFace = 'a 7,000-char budget the bundler asserts' } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'harness-budgets-'));
   if (tier1 !== null) {
     fs.writeFileSync(
@@ -63,7 +63,7 @@ test('a prose number raised without the constant is a finding naming both values
 });
 
 test('a prose number lowered without the constant is a finding too', () => {
-  const findings = compare({ repoRoot: fixture({ tier1: 'Budget ≤16k chars.' }), manifest: manifest() });
+  const findings = compare({ repoRoot: fixture({ tier1: 'Soft budget ≤16k chars.' }), manifest: manifest() });
   assert.equal(findings.length, 1);
   assert.equal(findings[0].file, 'AGENTS.md');
   assert.match(findings[0].message, /16,000 chars/);
@@ -88,6 +88,15 @@ test('a sentence rewritten out of reach is a finding, not a silent pass', () => 
   assert.equal(findings.length, 1);
   assert.match(findings[0].message, /no longer states the botFace budget where this check looks/);
   assert.match(findings[0].message, /It used to read/, 'must quote the sentence it lost');
+});
+
+test('the constitution sentence must say its budget is soft', () => {
+  // The bundler warns on a constitution overrun rather than failing, so prose
+  // stating a plain budget would promise a failure the build no longer gives.
+  const findings = compare({ repoRoot: fixture({ tier1: 'Budget ≤20k chars: a tier that bloats defeats the tier.' }), manifest: manifest() });
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'AGENTS.md');
+  assert.match(findings[0].message, /no longer states the constitution budget where this check looks/);
 });
 
 test('a claimed file that does not exist is a finding', () => {

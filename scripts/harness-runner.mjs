@@ -30,7 +30,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { ALL, CHECKS, declaredNames } from './checks.registry.mjs';
-import { exitCodeFor, renderFindings } from './lib/findings.mjs';
+import { exitCodeFor, isError, renderFindings } from './lib/findings.mjs';
 
 /** The two manifests the completeness assertion scans. */
 export const MANIFESTS = [
@@ -221,6 +221,9 @@ export async function runCheck(row, { repoRoot, spawn = defaultSpawn, load = def
       const findings = (await mod.run({ repoRoot })) ?? [];
       return {
         ok: exitCodeFor(findings) === 0,
+        // Carried so the composite can print a passing check's warnings, which
+        // it would otherwise swallow with the rest of a green check's output.
+        warned: findings.some((f) => !isError(f)),
         seconds: since(),
         output: renderFindings(row.name, findings, { remedy: mod.REMEDY }),
         invocation,
@@ -280,10 +283,12 @@ function runSpawn(row, { repoRoot, spawn, since }) {
 export async function runAll({ repoRoot, rows = CHECKS, onResult = () => {}, spawn, load }) {
   const started = Date.now();
   const failures = [];
+  const warned = [];
   for (const row of rows) {
     const result = await runCheck(row, { repoRoot, spawn, load });
     onResult(row, result);
     if (!result.ok) failures.push({ ...row, ...result });
+    else if (result.warned) warned.push({ ...row, ...result });
   }
-  return { failures, seconds: (Date.now() - started) / 1000, total: rows.length };
+  return { failures, warned, seconds: (Date.now() - started) / 1000, total: rows.length };
 }
