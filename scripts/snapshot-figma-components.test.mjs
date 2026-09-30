@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_FILE_KEY,
   MISSING_TOKEN,
+  changedSets,
   diff,
   isIgnored,
   rowsFrom,
@@ -110,6 +111,33 @@ test('the diff is by published key, so a rename is a rename and not a delete plu
 test('sets are the distinct containing frames, and the blank one is not a set', () => {
   assert.equal(setsIn([{ containingFrame: 'A' }, { containingFrame: 'A' }, { containingFrame: 'B' }]), 2);
   assert.equal(setsIn([{ containingFrame: '' }]), 0);
+});
+
+test('the changed sets name every set an add, a removal or a rename touched, once each and sorted', () => {
+  const before = [
+    { key: 'd1', name: 'size=1px', containingFrame: 'Divider' },
+    { key: 'd2', name: 'size=2px', containingFrame: 'Divider' },
+    { key: 't1', name: 'state=default', containingFrame: 'Tag' },
+    { key: 'b1', name: 'size=lg', containingFrame: 'Badge' },
+  ];
+  const after = [
+    { key: 'd1', name: 'size=sm', containingFrame: 'Divider' },
+    { key: 'd2', name: 'size=lg', containingFrame: 'Divider' },
+    { key: 't1', name: 'state=default', containingFrame: 'Tag' },
+    { key: 'c1', name: 'size=md', containingFrame: 'Count' },
+  ];
+  assert.deepEqual(changedSets(before, after), ['Badge', 'Count', 'Divider']);
+});
+
+test('a component moved between sets names both the set it left and the one it joined', () => {
+  const before = [{ key: 'k1', name: 'x', containingFrame: 'Old' }];
+  const after = [{ key: 'k1', name: 'x', containingFrame: 'New' }];
+  assert.deepEqual(changedSets(before, after), ['New', 'Old']);
+});
+
+test('no change names no set', () => {
+  const rows = [{ key: 'k1', name: 'x', containingFrame: 'A' }];
+  assert.deepEqual(changedSets(rows, rows), []);
 });
 
 test('the written document keeps the shape the poller reads, plus the file key', () => {

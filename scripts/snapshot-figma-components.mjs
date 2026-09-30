@@ -128,6 +128,21 @@ export function setsIn(rows) {
 }
 
 /**
+ * The component SETS the delta touched, by name, sorted — what a reviewer of a
+ * refresh reads first, since a variant rename arrives as dozens of rows but is
+ * one set's change. A component that moved between sets names both. A
+ * standalone component, with no containing frame, is named by itself.
+ */
+export function changedSets(before = [], after = []) {
+  const { created, deleted, renamed } = diff(before, after);
+  const was = new Map(before.map((c) => [c.key, c]));
+  const setOf = (c) => c.containingFrame || c.name;
+  const sets = new Set([...created, ...deleted, ...renamed].map(setOf));
+  for (const c of renamed) sets.add(setOf(was.get(c.key)));
+  return [...sets].sort();
+}
+
+/**
  * The snapshot document.
  *
  * `nodeHashes` is carried in the shape the poller wrote it — one md5 per node
@@ -239,6 +254,8 @@ async function main() {
       `last checked ${previous.lastChecked}).`,
   );
   console.log(`  +${created.length} added · -${deleted.length} removed · ~${renamed.length} renamed`);
+  const sets = changedSets(previous.components, rows);
+  console.log(`  sets changed: ${sets.length ? sets.join(', ') : 'none'}`);
 
   if (dryRun) {
     console.log('\n--dry-run: nothing written.');

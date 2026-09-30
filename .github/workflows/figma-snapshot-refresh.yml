@@ -1,0 +1,161 @@
+name: Refresh Figma Component Snapshot
+
+# Re-records scripts/figma-component-snapshot.json from the PUBLISHED Figma
+# library and opens (or updates) a draft PR with the result (registry:
+# docs/engineering/operations.md). It runs `npm run snapshot:figma-components`,
+# which reads Figma REST only and publishes nothing. The script needs
+# FIGMA_ACCESS_TOKEN, and only this repo's secret holds one, which is why the
+# refresh runs here and not on a laptop.
+#
+# Loop shape: manual dispatch → one fetch → one PR or a "no change" summary →
+# stop. On demand only, never a cron: a refresh follows a library publish
+# somebody meant, and each one is a PR a human reviews.
+# Spot-run: `gh workflow run figma-snapshot-refresh.yml` (from main).
+#
+# Why this replaces the old poller's shape. The retired figma-library-poll.yml
+# committed straight to main with "[skip ci]" and `git push || true`, so a
+# failed push went unnoticed and nothing ever checked the new baseline. Here the
+# snapshot goes through a PR like any other change.
+#
+# Why the PR is a DRAFT. A PR opened and pushed with the job's GITHUB_TOKEN
+# starts no other workflow (GitHub's rule, to prevent recursive runs), so the
+# pull_request gates do not run on it by themselves. The repo holds no app or
+# PAT secret scoped for this, and a new secret is not added for one manual job.
+# So the PR opens as a draft and its body says how to start the gates: close
+# and reopen it, which is an event of the person doing it. The commit message
+# carries no "[skip ci]" for the same reason: it would skip those gates too.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write # push the fixed refresh branch
+  pull-requests: write # open or update its PR
+
+# Two refreshes at once would force-push the same branch over each other.
+concurrency:
+  group: figma-snapshot-refresh
+  cancel-in-progress: false
+
+env:
+  SNAPSHOT: scripts/figma-component-snapshot.json
+  BRANCH: chore/figma-snapshot-refresh
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Refuse a run off the default branch
+        # The refresh branch is cut from whatever ref was dispatched. From any
+        # branch but main, the PR would carry that branch's commits as well.
+        env:
+          REF: ${{ github.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$REF" != "refs/heads/$DEFAULT_BRANCH" ]; then
+            echo "::error::Dispatch this workflow from $DEFAULT_BRANCH, not $REF."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+
+      - name: Setup Node.js
+        # No npm cache and no install: the script imports Node built-ins and one
+        # repo-local module only.
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Fetch the published library
+        # FIGMA_FILE_KEY is left to the script's own default, the BS4 Foundation
+        # library the snapshot records. A different key would re-record a
+        # different library over it.
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+        run: |
+          set -o pipefail
+          node scripts/snapshot-figma-components.mjs | tee "$RUNNER_TEMP/snapshot.log"
+
+      - name: Compare with main
+        id: compare
+        # `lastChecked` moves on every run, so a byte diff always differs. The
+        # snapshot changed only if something besides that timestamp did.
+        run: |
+          if cmp -s <(git show "HEAD:$SNAPSHOT" | jq -S 'del(.lastChecked)') \
+                    <(jq -S 'del(.lastChecked)' "$SNAPSHOT"); then
+            git checkout -- "$SNAPSHOT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## Figma component snapshot: no change"
+              echo
+              echo "The published library matches \`$SNAPSHOT\` on main. No branch pushed, no PR opened."
+              echo
+              echo '```'
+              cat "$RUNNER_TEMP/snapshot.log"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push the refresh branch
+        if: steps.compare.outputs.changed == 'true'
+        # The branch is rebuilt from main on every run, so the force push
+        # replaces an older refresh rather than stacking on it.
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add "$SNAPSHOT"
+          git commit -m "chore: refresh Figma component snapshot"
+          git push --force origin "$BRANCH"
+
+      - name: Open or update the draft PR
+        if: steps.compare.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.event.repository.default_branch }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          BODY="$RUNNER_TEMP/pr-body.md"
+          {
+            echo "Refreshes \`$SNAPSHOT\` from the published Figma library."
+            echo
+            echo "## Delta"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/snapshot.log"
+            echo '```'
+            echo
+            echo "Counts are published variants; \"sets changed\" names the component sets they belong to. A refresh with no set named changed only node hashes (a visual edit) or the publish history."
+            echo
+            echo "## Before merging"
+            echo
+            echo "This PR was opened by the workflow's \`GITHUB_TOKEN\`, and GitHub starts no other workflow from that token's events, so **the pull_request checks have not run**. To run them, close this PR and reopen it. Mark it ready for review once they pass."
+            echo
+            echo "Opened by [Refresh Figma Component Snapshot]($RUN_URL). A later run force-pushes \`$BRANCH\` and rewrites this description."
+          } > "$BODY"
+
+          PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number')
+          if [ -n "$PR" ]; then
+            gh pr edit "$PR" --body-file "$BODY"
+            URL=$(gh pr view "$PR" --json url --jq .url)
+            VERB="Updated"
+          else
+            URL=$(gh pr create --draft --base "$BASE" --head "$BRANCH" \
+              --title "chore: refresh Figma component snapshot" --body-file "$BODY")
+            VERB="Opened"
+          fi
+
+          {
+            echo "## Figma component snapshot: changed"
+            echo
+            echo "$VERB draft PR: $URL"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/snapshot.log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
