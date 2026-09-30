@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect } from 'storybook/test';
+import { expect, spyOn } from 'storybook/test';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Divider from '@/components/layout-and-structure/Divider';
@@ -12,6 +12,7 @@ export default {
         changelog: [
             { date: '2026-09-29', kind: 'changed', summary: '`xl` is 3px instead of 2.5px: `--size-element-stroke-xl` now resolves to stroke-300, as Figma\'s Element/stroke-xl does.' },
             { date: '2026-09-29', kind: 'changed', summary: '`size="2.5px"` now draws 3px: the alias still maps to `xl`.' },
+            { date: '2026-09-29', kind: 'deprecated', summary: '`size="2.5px"` was deprecated in favor of `size="xl"`; it still draws 3px.' },
         ],
         docs: {
             description: {
@@ -173,6 +174,33 @@ Sizes.play = async ({ canvasElement }) => {
         await expect(drawn, `${size}: line is the stroke-${size} token`)
             .toBe(tokenLength(canvasElement, `--size-element-stroke-${size}`));
     }
+};
+
+/**
+ * The old `size="2.5px"` alias keeps working and draws `xl` (3px), but its name
+ * no longer says what it draws, so development says to use `size="xl"`.
+ * Production stays quiet.
+ */
+export const DeprecatedSize = {
+    render: () => (
+        <div style={dividerCol}>
+            <Divider size="2.5px" id="divider-deprecated" />
+        </div>
+    ),
+    // The spy goes in before the story renders, so the render's warning is caught.
+    beforeEach: () => {
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        return () => warn.mockRestore();
+    },
+    play: async ({ canvasElement }) => {
+        const line = canvasElement.querySelector('#divider-deprecated .plus-divider-line');
+        const drawn = px(getComputedStyle(line).height);
+        await expect(drawn, '2.5px draws 3px').toBe(3);
+        await expect(drawn, '2.5px draws the stroke-xl token')
+            .toBe(tokenLength(canvasElement, '--size-element-stroke-xl'));
+        await expect(console.warn, 'development names the replacement')
+            .toHaveBeenCalledWith(expect.stringContaining('size="2.5px" is deprecated; use size="xl"'));
+    },
 };
 
 export const Styles = () => (

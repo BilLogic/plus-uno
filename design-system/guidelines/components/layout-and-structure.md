@@ -81,8 +81,9 @@ requires that essential information never depend on motion.
 
 **`Divider` is decoration.** Its `size` list mixes token sizes (`sm`–`xl`) with
 literal pixel values (`1px`–`2.5px`). The pixel strings are aliases for the
-token sizes, and `2.5px` maps to `xl`, so it draws 3px. Prefer the token sizes
-so the rule scales with the rest of the system.
+token sizes. `2.5px` is deprecated: it maps to `xl` and draws 3px, so use
+`size="xl"`. Prefer the token sizes so the rule scales with the rest of the
+system.
 
 ## Related
 
