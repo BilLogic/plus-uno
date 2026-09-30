@@ -2,10 +2,6 @@
  * Semantic Spacing Tokens
  * These are the tokens designers and developers should use
  * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Surface Containers
- *
- * Hand-edited 2026-09-29: --size-element-stroke-xl points at stroke-300 (3px),
- * as Figma's Element/stroke-xl does, because the generator refuses to run
- * against the incomplete source exports. The source JSON agrees (3).
  */
 
 :root {
@@ -25,7 +21,6 @@
     --size-element-radius-lg: var(--size-border-radius-radius-200);
     --size-element-radius-md: var(--size-border-radius-radius-100);
     --size-element-radius-sm: var(--size-border-radius-radius-100);
-    /* Fully rounded (pill shape) - maps to --size-border-radius-radius-1000 */
     --size-element-radius-full: var(--size-border-radius-radius-1000);
     --size-element-stroke-lg: var(--size-border-stroke-stroke-200);
     --size-element-stroke-md: var(--size-border-stroke-stroke-150);
@@ -93,7 +88,7 @@
     --size-surface-radius: var(--size-border-radius-radius-400);
     --size-surface-border: var(--size-border-stroke-stroke-200);
 
-    /* Surface Container (Figma: Surface Container/pad-x-sm, pad-y-sm, gap-sm) */
+    /* Surface Containers Layer */
     --size-surface-container-pad-x: var(--size-spacing-medium-space-300);
     --size-surface-container-pad-y: var(--size-spacing-medium-space-200);
     --size-surface-container-gap-md: var(--size-spacing-medium-space-300);
