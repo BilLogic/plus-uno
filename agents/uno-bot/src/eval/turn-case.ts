@@ -27,6 +27,7 @@
 import type { AgentResult } from "../agent/loop";
 import type { ToolCall } from "../agent/tool-transcript";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
+import { cardHeading, cardLead } from "../slack/proposal-render";
 import { buildTurnRequest, isIntakeChannel, type DeliveryCall, type TurnOutcome, type TurnRequest } from "../turn/index";
 
 /** The synthetic surface an eval turn arrives on. `C_EVAL` is a channel by the
@@ -139,7 +140,8 @@ export interface EvalTurnReport {
    *  in `eval/turn-adapter.ts`). The decision is read from here because the
    *  typed-gate path never reaches the loop. */
   resolutions: Array<{ toolName: string; decision: "confirm" | "cancel"; narrative?: string }>;
-  /** What the clarify gate asked, when it asked. */
+  /** What the clarify gate asked INSTEAD of staging, when it asked — the
+   *  Worker's question, never the model's reply beside a card. */
   gateAsk: string | null;
   /** The model's tool calls with their arguments and what each result said
    *  about itself (`agent/tool-transcript.ts`). */
@@ -235,6 +237,23 @@ function evalResult(report: EvalTurnReport): EvalResult | null {
  *  transient model error still reads as one to the runner's retry (a 429 that
  *  arrives as `ok: true, disposition: failed` is a case marked failed on a
  *  quota, which is how the first live run "failed" all 34). */
+/**
+ * The last card the turn staged, as a person reads its top: the heading and the
+ * line it leads with — the model's own reply, or the Worker's ask when the
+ * model wrote none. `null` when nothing was staged.
+ *
+ * The judge used to see the proposal's input and `gateAsk`, and read an empty
+ * `gateAsk` as "the requester got no reply" — but `gateAsk` is the clarify
+ * gate's question, and the reply is on the card. This is the card.
+ */
+function stagedCard(report: EvalTurnReport): { heading?: string; lead?: string } | null {
+  const staged = [...report.calls].reverse().find((c) => c.kind === "proposal");
+  if (!staged || staged.kind !== "proposal") return null;
+  const heading = cardHeading(staged.card);
+  const lead = cardLead(staged.card);
+  return { ...(heading ? { heading } : {}), ...(lead ? { lead } : {}) };
+}
+
 function failureError(report: EvalTurnReport): string {
   const failure = [...report.calls].reverse().find((c) => c.kind === "failure");
   const stage = report.outcome.failure?.stage ?? "internal";
@@ -267,6 +286,7 @@ export const EVAL_RESPONSE_FIELDS = [
   "tools",
   "references",
   "gateAsk",
+  "card",
   "narration",
   "subrequests",
   "subrequest_hosts",
@@ -288,6 +308,9 @@ export const CONDITIONAL_RESPONSE_FIELDS = ["error", "result"] as const;
  * `references` is the turn's own telemetry (the names `read_reference` served),
  * and `narration` is what the recording Delivery was asked to post as interim
  * lines — the same callback production's Slack adapter posts from.
+ *
+ * `card` is the staged card's heading and lead (`stagedCard`), and `gateAsk`
+ * is only ever the clarify gate's question: a staged card's reply is `card.lead`.
  */
 export function evalTurnResponse(report: EvalTurnReport): Record<string, unknown> {
   const { outcome, meter } = report;
@@ -308,6 +331,7 @@ export function evalTurnResponse(report: EvalTurnReport): Record<string, unknown
     tools: report.tools,
     references: outcome.telemetry.references,
     gateAsk: report.gateAsk,
+    card: stagedCard(report),
     ...(result ? { result } : {}),
     // What the turn DID, beside what the model said: the disposition, the tier
     // it routed to and the judges' verdicts. Additive — nothing reads it yet —

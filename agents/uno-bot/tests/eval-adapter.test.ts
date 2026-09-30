@@ -540,3 +540,35 @@ test("a staged card reports the proposal, and a failure reports ok:false", async
   assert.equal(failedBody.ok, false);
   assert.match(failedBody.error, /429 quota exhausted/);
 });
+
+test("a staged card reports its heading and lead, so an empty gateAsk is not read as no reply", async () => {
+  // Live run 36672820165: the judge read `gateAsk: null` beside a staged card
+  // as "the requester got no line". `gateAsk` is the clarify gate's question;
+  // what the requester read is the card's heading and lead.
+  const silent = harness({
+    replies: [{ toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] }],
+  });
+  const silentBody = evalTurnResponse(
+    report(await runTurn(evalRequest({ prompt: "track this on GitHub" }), silent.deps), silent),
+  ) as { gateAsk: string | null; card: { heading?: string; lead?: string } | null };
+  assert.equal(silentBody.gateAsk, null);
+  assert.deepEqual(silentBody.card, {
+    heading: ":warning: About to *file a GitHub issue on BilLogic/plus-uno*:",
+    lead: "I'll file this on BilLogic/plus-uno — want me to?",
+  });
+
+  const replied = harness({
+    replies: [
+      { text: "Filing it on plus-uno — ok?", toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] },
+    ],
+  });
+  const repliedBody = evalTurnResponse(
+    report(await runTurn(evalRequest({ prompt: "track this on GitHub" }), replied.deps), replied),
+  ) as { card: { lead?: string } | null };
+  assert.equal(repliedBody.card?.lead, "Filing it on plus-uno — ok?");
+
+  // Nothing staged, nothing to report.
+  const answered = harness();
+  const answeredBody = evalTurnResponse(report(await runTurn(evalRequest({ prompt: TEXT }), answered.deps), answered));
+  assert.equal(answeredBody.card, null);
+});

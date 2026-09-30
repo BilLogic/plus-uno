@@ -120,6 +120,7 @@ import { DRIFT_KEY } from "../figma-drift/finding";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
+  type CardAsk,
   type CardCaveat,
   type CardField,
   type CardRevision,
@@ -2072,6 +2073,12 @@ async function buildCard(
     operations: result.operations,
   };
 
+  // THE ASK, when the model staged an intake and wrote no line beside it: the
+  // card leads with where it goes and whether to file, so the requester is
+  // never handed a card and silence. Only the intake cards get one — every
+  // other card's heading and footer already say what the ✅ does.
+  const ask = (made: CardAsk): { ask?: CardAsk } => (result.previewText ? {} : { ask: made });
+
   if (toolName === "github_issue_create") {
     // THE REPO AND WHO CAN READ IT: an intake on a public repo is readable by
     // anyone the moment it is filed, and the card is the one place a person
@@ -2082,18 +2089,25 @@ async function buildCard(
     return {
       ...card,
       verb: `${card.verb} on ${repo}`,
+      ...ask({ kind: "file-issue", repo }),
       caveats: [{ kind: "repo-visibility", repo, visibility, ...(fromDm ? { fromDm: true as const } : {}) }],
     };
   }
   if (toolName === "github_issue_update") {
-    return { ...card, ...(await issueUpdateCardOf(result.operations, deps, fromDm)) };
+    const { issues, ...update } = await issueUpdateCardOf(result.operations, deps, fromDm);
+    return { ...card, ...update, ...ask({ kind: "update-issue", issues }) };
   }
   if (toolName === "notion_create") {
     // THE SURFACE, named the way the issue card names its repo: an intake is
     // a GitHub issue or a Roadmap card, and a requester redirects by surface
     // ("put it on the Roadmap instead") — so the heading says which this is.
-    const verb = NOTION_SURFACE_VERBS[String(input.surface ?? "").trim().toLowerCase()];
-    return verb ? { ...card, verb } : card;
+    const surface = String(input.surface ?? "").trim().toLowerCase();
+    const verb = NOTION_SURFACE_VERBS[surface];
+    return {
+      ...card,
+      ...(verb ? { verb } : {}),
+      ...(surface === "intake" ? ask({ kind: "roadmap-intake" }) : {}),
+    };
   }
 
   if (toolName === "github_workflow_run") {
@@ -2164,7 +2178,7 @@ async function issueUpdateCardOf(
   operations: ReadonlyArray<ProposalOperation>,
   deps: Pick<TurnDeps, "cards">,
   fromDm: boolean,
-): Promise<Pick<ProposalCard, "fields" | "caveats">> {
+): Promise<Pick<ProposalCard, "fields" | "caveats"> & { issues: string[] }> {
   const updates = operations.filter((op) => op.toolName === "github_issue_update");
   const notices = new Map<string, CardCaveat>();
   const perIssue: Array<{ target: string; fields: CardField[] }> = [];
@@ -2190,7 +2204,7 @@ async function issueUpdateCardOf(
     perIssue.length === 1
       ? [{ label: "issue", value: perIssue[0]!.target }, ...perIssue[0]!.fields]
       : perIssue.map((u) => ({ label: u.target, under: u.fields.map((field) => ({ field })) }));
-  return { fields, caveats: [...notices.values()] };
+  return { fields, caveats: [...notices.values()], issues: perIssue.map((u) => u.target) };
 }
 
 /**

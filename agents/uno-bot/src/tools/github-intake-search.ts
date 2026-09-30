@@ -98,11 +98,16 @@ export async function findOpenIntakes(
       keywords: terms,
       count: matches.length,
       matches,
+      // No match is not a routing decision. The no-match note used to say
+      // "Stage github_issue_create", and the model followed it even where the
+      // repo was unclear (live eval G7) — so it names the two branches instead.
       note: matches.length
         ? "Open intakes that may already cover this. Before staging github_issue_create, name the closest " +
-          "by title and link, and ask: link that issue instead, or file a new one anyway? Stage the card " +
-          "only if they choose to file anyway. Not a match on a closer read → say so and stage it."
-        : "No open intake matches these words. Stage github_issue_create; if the words were narrow, one " +
+          "by title and link, and ask: add this to that issue instead (a github_issue_update comment), or " +
+          "file a new one anyway? Stage the new issue only if they choose to file anyway. Not a match on a " +
+          "closer read → say so and file it."
+        : "No open intake matches these words. Where the repo or surface is clear, file it there; where " +
+          "it is unclear, ask which repo, naming the listed ones by purpose. If the words were narrow, one " +
           "retry with other words first is fine.",
     });
   } catch (err) {

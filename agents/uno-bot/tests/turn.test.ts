@@ -566,6 +566,70 @@ test("an intake card says a private repo is private, and a repo it couldn't chec
   }
 });
 
+// A card staged with no reply beside it left the requester a card and no line
+// naming where it goes or asking whether to file (live evals G2, G5, G6, I1,
+// I2). The model writes that line most of the time; when it writes none, the
+// card leads with a short one of the Worker's own.
+test("an intake card staged with no reply leads with a line naming the target and asking", async () => {
+  const cases = [
+    {
+      call: { name: "github_issue_create", args: { title: "A gap", body: "Details." } },
+      ask: { kind: "file-issue", repo: ISSUE_REPO },
+      line: `I'll file this on ${ISSUE_REPO} — want me to?`,
+    },
+    {
+      call: { name: "notion_create", args: { surface: "intake", title: "A gap" } },
+      ask: { kind: "roadmap-intake" },
+      line: "I'll add this to the Roadmap as an intake — want me to?",
+    },
+    {
+      call: { name: "github_issue_update", args: { issue_number: 688, comment: "Another repro." } },
+      ask: { kind: "update-issue", issues: [`${ISSUE_REPO}#688`] },
+      line: `I'll add this to ${ISSUE_REPO}#688 — want me to?`,
+    },
+  ] as const;
+  for (const { call, ask, line } of cases) {
+    const h = harness({ replies: [{ toolCalls: [call] }] });
+    const outcome = await runTurn(request({ text: "track this" }), h.deps);
+    assert.equal(outcome.disposition, "staged", call.name);
+    const card = outcome.staged!.card;
+    assert.equal(card.lead, undefined, call.name);
+    assert.deepEqual(card.ask, ask, call.name);
+    const text = renderProposalCard(card).text;
+    assert.ok(text.startsWith(`${line}\n`), text);
+  }
+});
+
+test("the model's own reply leads the card, and no fallback line is added", async () => {
+  const h = harness({
+    replies: [
+      { text: "Filing it on the harness repo — ok?", toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] },
+    ],
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.equal(card.lead, "Filing it on the harness repo — ok?");
+  assert.equal(card.ask, undefined);
+  assert.doesNotMatch(renderProposalCard(card).text, /want me to\?/);
+});
+
+test("a card whose heading already asks gets no fallback line", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "notion_create", args: { surface: "decision", title: "A title", properties: { roadmap_card: "https://www.notion.so/plus/rm-1" } } }] }],
+  });
+  const card = (await runTurn(request({ text: "log this decision" }), h.deps)).staged!.card;
+  assert.equal(card.ask, undefined);
+  assert.doesNotMatch(renderProposalCard(card).text, /want me to\?/);
+});
+
+test("the fallback line escapes the repo it names", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] }],
+    issueTarget: () => ({ repo: "org/<a&b>", visibility: "public" }),
+  });
+  const card = (await runTurn(request({ text: "track this" }), h.deps)).staged!.card;
+  assert.ok(renderProposalCard(card).text.startsWith("I'll file this on org/&lt;a&amp;b&gt; — want me to?"));
+});
+
 
 // A follow-up on an issue writes to the same repos an intake does, so its card
 // shows what will happen — the resolved issue, each operation, and the comment
