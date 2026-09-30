@@ -1,8 +1,9 @@
 // A scheduled run, rehearsed:
 // `/debug/sweep?dry_run=1[&run=morning|end-of-day][&weekday=sun…sat]`.
 // Plans the run the cron would enqueue (end-of-day unless `run` says
-// otherwise; today's jobs unless `weekday` names another day's, so the weekly
-// DS precedence check can be rehearsed with `&weekday=fri` on any day) and
+// otherwise; the day `planRun` dates it to — today's, or before 09:00 ET the
+// end-of-day run's day before — unless `weekday` names another day's, so the
+// weekly DS precedence check can be rehearsed with `&weekday=fri` on any day) and
 // dry-runs every job in this request, reporting the planned
 // jobs and, per job, its subrequests, D1 queries, time and report — for the
 // drift sweep, the findings and the card text, posted nowhere. Dry runs only:

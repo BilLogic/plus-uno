@@ -173,7 +173,7 @@ export function nudgeAt(dueAt: number): number {
 
 /**
  * True only while a weekday's morning run is going: Monday to Friday, in the
- * 10:00 ET hour. Nothing is sent outside it, whatever job asks.
+ * 09:00 ET hour. Nothing is sent outside it, whatever job asks.
  */
 export function isMorningRunTime(now: number): boolean {
   const wd = new Date(etDayOf(now)).getUTCDay();

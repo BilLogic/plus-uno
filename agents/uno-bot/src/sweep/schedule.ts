@@ -1,15 +1,21 @@
 // When the day's runs happen, in the team's time, and when a sweep finding may
 // be posted: at the first weekday morning run after it was detected.
 //
-// Both runs are ET times all year: the morning run at 10:00 ET and the
-// end-of-day run at 18:00 ET. In UTC that is 14:00 and 22:00 under EDT and
-// 15:00 and 23:00 under EST, which the weekday `*/15 13-23` cron covers either
-// way, so the firing reads its ET hour rather than a fixed UTC one.
+// Both runs are ET times all year: the end-of-day run at 00:00 ET, just after
+// the workday it sweeps ends (students work late), and the morning run at
+// 09:00 ET, when people start. In UTC that is 04:00 and 13:00 under EDT and
+// 05:00 and 14:00 under EST. The crons fire at both UTC hours of each
+// (wrangler.toml), so a firing reads its ET hour rather than a fixed UTC one.
+//
+// The end-of-day run fires after midnight, so it is DATED to the ET day it
+// sweeps — the one that just ended (`sweptDayOf`). Monday to Friday are swept
+// Tuesday to Saturday at 00:00 ET, and a record, skip or label a job keeps
+// still names the workday it read.
 //
 // Detection runs in the end-of-day jobs and posting at the morning run, so
 // people see a card at the start of their day and its 72 h clock starts when
-// they can act on it. A finding detected on a Friday evening therefore waits
-// for Monday morning. Stated as a function of the detection time, not of which
+// they can act on it. A finding swept at Saturday 00:00 therefore waits for
+// Monday morning. Stated as a function of the detection time, not of which
 // run is asking, so a morning job that runs late, twice, or on a rehearsal
 // cannot post a finding before its morning.
 //
@@ -19,9 +25,9 @@
 // PURE.
 
 /** The ET hour of the morning run (`scheduled/runs.ts` anchors it). */
-export const MORNING_RUN_HOUR_ET = 10;
-/** The ET hour of the end-of-day run. */
-export const END_OF_DAY_RUN_HOUR_ET = 18;
+export const MORNING_RUN_HOUR_ET = 9;
+/** The ET hour of the end-of-day run: midnight, closing the day it sweeps. */
+export const END_OF_DAY_RUN_HOUR_ET = 0;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
@@ -54,9 +60,22 @@ export function etHourOn(day: number, hour: number): number {
   return etParts(edt).h === hour ? edt : edt + HOUR_MS;
 }
 
-/** The morning run on an ET day: that date's 10:00 ET. */
+/** The morning run on an ET day: that date's 09:00 ET. */
 export function morningRunOn(day: number): number {
   return etHourOn(day, MORNING_RUN_HOUR_ET);
+}
+
+/**
+ * The ET day an end-of-day run at `at` sweeps, and is dated to: the day before
+ * when `at` is before the morning run's hour — the 00:00 ET firing, and any
+ * job of it deferred into the small hours — and `at`'s own day from the
+ * morning on, which is the day a rehearsal in working hours would sweep.
+ *
+ * @param at - When the run fires, or is rehearsed, epoch ms
+ */
+export function sweptDayOf(at: number): number {
+  const day = etDayOf(at);
+  return etParts(at).h < MORNING_RUN_HOUR_ET ? day - DAY_MS : day;
 }
 
 /**

@@ -492,7 +492,7 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
   const findings = reports.flatMap((r) => r.findings);
   const cards = reports.flatMap((r) => r.cards);
   const notes = [
-    ...(done ? [`${done} already swept today`] : []),
+    ...(done ? [`${done} already swept this run`] : []),
     ...(failed.length ? [`${failed.length} failed: ${failed.join(", ")}`] : []),
     ...reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`),
   ];
@@ -502,8 +502,11 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
 }
 
 /** How far back `sweep-dms` looks for DMs uno-bot answered in: a weekend and
- *  a missed run. Each DM's own cursor says what in it is new. */
-export const DM_LOOKBACK_MS = 4 * 24 * 60 * 60 * 1000;
+ *  a missed run. Two end-of-day runs are at most 96 h apart (Sat 00:00 to
+ *  Wed 00:00 with Tuesday's missed), and 97 h on the weekend the clocks go
+ *  back, so four days and two hours covers both with an hour to spare. Each
+ *  DM's own cursor says what in it is new. */
+export const DM_LOOKBACK_MS = (4 * 24 + 2) * 60 * 60 * 1000;
 
 /**
  * Every 1:1 DM uno-bot answered in lately, one after another on this job's
@@ -524,7 +527,7 @@ async function sweepDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobRep
   const failed: string[] = [];
   const dms = listed.filter((dm, i) => dm.channel.startsWith("D") && listed.findIndex((d) => d.channel === dm.channel) === i);
   const runIdOf = (channel: string) => `${runDate}:${job.key}:${channel}`;
-  // One read for every DM already swept today, however many a retry passes over.
+  // One read for every DM already swept this run, however many a retry passes over.
   const handled = new Set(deps.dryRun || !dms.length ? [] : await deps.store.handledRuns(dms.map((dm) => runIdOf(dm.channel))));
   let done = 0;
   for (const dm of dms) {
@@ -545,7 +548,7 @@ async function sweepDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobRep
   const findings = reports.flatMap((r) => r.findings);
   const cards = reports.flatMap((r) => r.cards);
   const notes = [
-    ...(done ? [`${done} already swept today`] : []),
+    ...(done ? [`${done} already swept this run`] : []),
     ...(failed.length ? [`${failed.length} failed: ${failed.join(", ")}`] : []),
     ...reports.filter((r) => r.note).map((r) => `${r.channel}: ${r.note}`),
   ];

@@ -37,33 +37,33 @@ const iso = (ms: number) => new Date(ms).toISOString();
 describe("reading the time", () => {
   // [said, when it is said, the morning run it names]
   const placed: Array<[string, number, string]> = [
-    ["Thu", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["Thursday", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["on Thursday", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["this Thu", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["Mon", ASKED, "2026-10-05T14:00:00.000Z"],
-    ["tomorrow", ASKED, "2026-09-30T14:00:00.000Z"],
-    ["tomorrow morning", ASKED, "2026-09-30T14:00:00.000Z"],
-    ["Thu at 3pm", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["thursday at 3", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["Thu at 3:30", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["in 2 days", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["in two days", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["2 days from now", ASKED, "2026-10-01T14:00:00.000Z"],
-    ["in a week", ASKED, "2026-10-06T14:00:00.000Z"],
-    ["next week", ASKED, "2026-10-05T14:00:00.000Z"],
+    ["Thu", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["Thursday", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["on Thursday", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["this Thu", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["Mon", ASKED, "2026-10-05T13:00:00.000Z"],
+    ["tomorrow", ASKED, "2026-09-30T13:00:00.000Z"],
+    ["tomorrow morning", ASKED, "2026-09-30T13:00:00.000Z"],
+    ["Thu at 3pm", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["thursday at 3", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["Thu at 3:30", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["in 2 days", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["in two days", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["2 days from now", ASKED, "2026-10-01T13:00:00.000Z"],
+    ["in a week", ASKED, "2026-10-06T13:00:00.000Z"],
+    ["next week", ASKED, "2026-10-05T13:00:00.000Z"],
     // From a Friday: calendar days land on the weekend and move to Monday;
     // working days skip it.
-    ["in 2 days", at(32, 18), "2026-10-05T14:00:00.000Z"],
-    ["in 2 working days", at(32, 18), "2026-10-06T14:00:00.000Z"],
-    ["tomorrow", at(32, 18), "2026-10-05T14:00:00.000Z"],
+    ["in 2 days", at(32, 18), "2026-10-05T13:00:00.000Z"],
+    ["in 2 working days", at(32, 18), "2026-10-06T13:00:00.000Z"],
+    ["tomorrow", at(32, 18), "2026-10-05T13:00:00.000Z"],
     // Dates, and a Saturday date moved to Monday.
-    ["Oct 8", ASKED, "2026-10-08T14:00:00.000Z"],
-    ["10/8", ASKED, "2026-10-08T14:00:00.000Z"],
-    ["2026-10-15", ASKED, "2026-10-15T14:00:00.000Z"],
-    ["Oct 3", ASKED, "2026-10-05T14:00:00.000Z"],
+    ["Oct 8", ASKED, "2026-10-08T13:00:00.000Z"],
+    ["10/8", ASKED, "2026-10-08T13:00:00.000Z"],
+    ["2026-10-15", ASKED, "2026-10-15T13:00:00.000Z"],
+    ["Oct 3", ASKED, "2026-10-05T13:00:00.000Z"],
     // Today, while its run is still ahead.
-    ["today", at(29, 12), "2026-09-29T14:00:00.000Z"],
+    ["today", at(29, 12), "2026-09-29T13:00:00.000Z"],
   ];
   for (const [said, now, runAt] of placed) {
     it(`places "${said}" at ${runAt}`, () => {
@@ -93,31 +93,31 @@ describe("reading the time", () => {
     });
   }
 
-  it("places a reminder at 10:00 ET on both sides of the 1 Nov 2026 change", () => {
+  it("places a reminder at 09:00 ET on both sides of the 1 Nov 2026 change", () => {
     const thuOct29 = at(59, 18); // Thu 2026-10-29, 2 pm EDT
     const fri = parseReminderWhen("Fri", thuOct29);
     assert.ok(fri.ok);
-    assert.equal(iso(fri.runAt), "2026-10-30T14:00:00.000Z");
+    assert.equal(iso(fri.runAt), "2026-10-30T13:00:00.000Z");
     const mon = parseReminderWhen("Mon", thuOct29);
     assert.ok(mon.ok);
-    assert.equal(iso(mon.runAt), "2026-11-02T15:00:00.000Z");
-    // Today at 14:30 UTC on Mon 2 Nov is 9:30 EST: its 10 am run is still ahead.
-    const today = parseReminderWhen("today", Date.UTC(2026, 10, 2, 14, 30));
+    assert.equal(iso(mon.runAt), "2026-11-02T14:00:00.000Z");
+    // Today at 13:30 UTC on Mon 2 Nov is 8:30 EST: its 9 am run is still ahead.
+    const today = parseReminderWhen("today", Date.UTC(2026, 10, 2, 13, 30));
     assert.ok(today.ok);
-    assert.equal(iso(today.runAt), "2026-11-02T15:00:00.000Z");
-    // A ⏳ on Thu 29 Oct moves it two working days out: Mon 2 Nov, 10:00 EST.
-    assert.equal(iso(snoozedRunAt(thuOct29)), "2026-11-02T15:00:00.000Z");
+    assert.equal(iso(today.runAt), "2026-11-02T14:00:00.000Z");
+    // A ⏳ on Thu 29 Oct moves it two working days out: Mon 2 Nov, 09:00 EST.
+    assert.equal(iso(snoozedRunAt(thuOct29)), "2026-11-02T14:00:00.000Z");
   });
 
   it("a date with no year rolled into next year, close by, is placed and named with its year", async () => {
     const dec20 = at(111, 18); // Sun 2026-12-20
     const when = parseReminderWhen("1/5", dec20);
     assert.ok(when.ok && when.rolledYear);
-    assert.equal(iso(when.runAt), "2027-01-05T15:00:00.000Z"); // 10:00 EST
+    assert.equal(iso(when.runAt), "2027-01-05T14:00:00.000Z"); // 09:00 EST
     const store = createInMemoryCommitmentStore();
     const result = await setSelfReminder({ when: "1/5", what: "renew the license" }, dmPlace, { store, now: () => dec20 });
     assert.ok(result.ok);
-    assert.equal(result.confirm, "Got it, Jan 5, 2027 10 am ET.");
+    assert.equal(result.confirm, "Got it, Jan 5, 2027 9 am ET.");
   });
 
   it("names a place's kind fail-closed", () => {
@@ -145,7 +145,7 @@ describe("setting a reminder in the turn", () => {
   it("keeps a self_reminder row due at the morning run, the summary in the text store, and confirms in one line", async () => {
     const store = createInMemoryCommitmentStore();
     const result = await asked(store);
-    assert.deepEqual(result, { ok: true, confirm: "Got it, Thu 10 am ET.", runAt: "2026-10-01T14:00:00.000Z" });
+    assert.deepEqual(result, { ok: true, confirm: "Got it, Thu 9 am ET.", runAt: "2026-10-01T13:00:00.000Z" });
     const row = store.rows.get(`${DM}:${ASK_TS}`)!;
     assert.equal(row.kind, "self_reminder");
     assert.equal(row.channelKind, "dm");
@@ -153,7 +153,7 @@ describe("setting a reminder in the turn", () => {
     assert.equal(row.requesterId, MAYA);
     assert.equal(row.threadTs, ASK_TS);
     assert.equal(row.state, "open");
-    assert.equal(iso(row.dueAt), "2026-10-01T14:00:00.000Z");
+    assert.equal(iso(row.dueAt), "2026-10-01T13:00:00.000Z");
     assert.equal(store.texts.get(row.id)?.text.what, "review the PRD for reflections");
   });
 
@@ -174,7 +174,7 @@ describe("setting a reminder in the turn", () => {
     assert.ok(again.ok);
     assert.equal(store.rows.size, 1);
     const row = [...store.rows.values()][0]!;
-    assert.equal(iso(row.dueAt), "2026-10-05T14:00:00.000Z");
+    assert.equal(iso(row.dueAt), "2026-10-05T13:00:00.000Z");
     assert.equal(row.state, "open");
     assert.equal(row.nudges, 0);
     assert.equal(row.snoozes, 0);
@@ -186,7 +186,7 @@ describe("setting a reminder in the turn", () => {
     const second = await asked(store, "Mon", dmPlace, "book the usability room");
     assert.deepEqual(second, { ok: false, error: ONE_PER_MESSAGE });
     const row = [...store.rows.values()][0]!;
-    assert.equal(iso(row.dueAt), "2026-10-01T14:00:00.000Z");
+    assert.equal(iso(row.dueAt), "2026-10-01T13:00:00.000Z");
     assert.equal(store.texts.get(row.id)?.text.what, "review the PRD for reflections");
   });
 
@@ -263,9 +263,9 @@ describe("delivering it", () => {
   it("waits for its morning, posts once in the same DM thread mentioning only the requester, and never twice", async () => {
     const store = createInMemoryCommitmentStore();
     await asked(store);
-    const m = mornings(store, at(30, 14, 5)); // Wed: not yet
+    const m = mornings(store, at(30, 13, 5)); // Wed: not yet
     assert.equal((await m.run()).summary, "nothing due");
-    m.clock.now = at(31, 14, 5); // Thu's run
+    m.clock.now = at(31, 13, 5); // Thu's run
     await m.run();
     assert.equal(m.posts.length, 1);
     const post = m.posts[0]!;
@@ -279,7 +279,7 @@ describe("delivering it", () => {
     assert.deepEqual(m.marked, []);
     // A retried job the same morning, and the next morning: nothing more.
     await m.run();
-    m.clock.now = at(32, 14, 5);
+    m.clock.now = at(32, 13, 5);
     await m.run();
     assert.equal(m.posts.length, 1);
   });
@@ -288,7 +288,7 @@ describe("delivering it", () => {
     const store = createInMemoryCommitmentStore();
     const root = ts(29, 15);
     await asked(store, "Thu", { channel: DESIGN, channelKind: "public", threadTs: root, messageTs: ASK_TS, userId: MAYA });
-    const m = mornings(store, at(31, 14, 5));
+    const m = mornings(store, at(31, 13, 5));
     await m.run();
     assert.equal(m.posts.length, 1);
     assert.equal(m.posts[0]!.channel, DESIGN);
@@ -298,10 +298,10 @@ describe("delivering it", () => {
   it("unanswered, it lapses with no follow-up", async () => {
     const store = createInMemoryCommitmentStore();
     await asked(store);
-    const m = mornings(store, at(31, 14, 5));
+    const m = mornings(store, at(31, 13, 5));
     await m.run();
     for (const day of [32, 35, 36, 37]) {
-      m.clock.now = at(day, 14, 5);
+      m.clock.now = at(day, 13, 5);
       await m.run();
     }
     assert.equal(m.posts.length, 1);
@@ -311,7 +311,7 @@ describe("delivering it", () => {
   it("🙌 marks it done and replaces the legend in place", async () => {
     const store = createInMemoryCommitmentStore();
     await asked(store);
-    const m = mornings(store, at(31, 14, 5));
+    const m = mornings(store, at(31, 13, 5));
     await m.run();
     m.clock.now = at(31, 15);
     assert.equal(await m.react(m.posts[0]!.ts, "raised_hands"), true);
@@ -323,19 +323,19 @@ describe("delivering it", () => {
   it("⏳ re-arms it two working days out, where it is posted once more, with 🙌 alone", async () => {
     const store = createInMemoryCommitmentStore();
     await asked(store);
-    const m = mornings(store, at(31, 14, 5));
+    const m = mornings(store, at(31, 13, 5));
     await m.run();
     m.clock.now = at(31, 15); // Thu
     assert.equal(await m.react(m.posts[0]!.ts, "hourglass_flowing_sand"), true);
     const row = [...store.rows.values()][0]!;
     assert.equal(row.state, "snoozed");
-    assert.equal(iso(row.dueAt), "2026-10-05T14:00:00.000Z"); // Mon's run
+    assert.equal(iso(row.dueAt), "2026-10-05T13:00:00.000Z"); // Mon's run
     assert.equal(legendOf(m.updates[0]!), "Got it. I'll remind you again Mon.");
 
-    m.clock.now = at(32, 14, 5); // Fri: not yet
+    m.clock.now = at(32, 13, 5); // Fri: not yet
     await m.run();
     assert.equal(m.posts.length, 1);
-    m.clock.now = at(35, 14, 5); // Mon
+    m.clock.now = at(35, 13, 5); // Mon
     await m.run();
     assert.equal(m.posts.length, 2);
     assert.equal(m.posts[1]!.threadTs, ASK_TS);
@@ -345,7 +345,7 @@ describe("delivering it", () => {
     assert.equal(await m.react(m.posts[1]!.ts, "hourglass_flowing_sand"), true);
     assert.equal([...store.rows.values()][0]!.state, "nudged");
     for (const day of [36, 37, 38, 39]) {
-      m.clock.now = at(day, 14, 5);
+      m.clock.now = at(day, 13, 5);
       await m.run();
     }
     assert.equal(m.posts.length, 2);
@@ -355,7 +355,7 @@ describe("delivering it", () => {
   it("🙅, 🤔 and anyone else's reaction change nothing", async () => {
     const store = createInMemoryCommitmentStore();
     await asked(store);
-    const m = mornings(store, at(31, 14, 5));
+    const m = mornings(store, at(31, 13, 5));
     await m.run();
     assert.equal(await m.react(m.posts[0]!.ts, "no_good"), true);
     assert.equal(await m.react(m.posts[0]!.ts, "thinking_face"), true);
@@ -370,10 +370,10 @@ describe("delivering it", () => {
       const t = ts(29, 18, n);
       await asked(store, "Thu", { ...dmPlace, threadTs: t, messageTs: t }, `thing ${n}`);
     }
-    const m = mornings(store, at(31, 14, 5));
+    const m = mornings(store, at(31, 13, 5));
     await m.run();
     assert.equal(m.posts.length, 2);
-    m.clock.now = at(32, 14, 5);
+    m.clock.now = at(32, 13, 5);
     await m.run();
     assert.equal(m.posts.length, 3);
   });

@@ -118,9 +118,10 @@ test("a job cut short by the budget keeps its key and runs before later jobs", a
   assert.ok(h.clock.t >= before + DEFER_RETRY_MS, "the retry waited the deferred interval");
 });
 
-test("a job is handed its run's date, also when its retry runs past 00:00 UTC", async () => {
-  // Under EST the end-of-day run starts at 23:00 UTC: a job the budget stops
-  // near midnight retries on the next UTC day, still under its run's date.
+test("a job is handed its run's date, also when its retry runs on a later calendar day", async () => {
+  // The end-of-day run fires at 00:00 ET and is dated to the ET day it
+  // sweeps, the one before: a job the budget stops, and its retry, run on
+  // the next calendar day, still under the run's date.
   const dates: string[] = [];
   let tripped = false;
   const h = harness(async (job, runDate) => {
