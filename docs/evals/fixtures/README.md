@@ -12,6 +12,7 @@ Fixed inputs the benchmarks run against — same inputs, comparable outputs acro
 | uno-bot sweep | `sweep-drift-cases.json` — drift-detector cases (true drift, agreement, near-miss): a thread, its sources and the recorded detector reply | each case's `expect` and `judgeNote`, replayed through the real detector by `agents/uno-bot/tests/sweep-detector.test.ts` |
 | uno-bot sweep capture | `sweep-capture-cases.json` — answer-in-chat vs answer-already-documented, picking the section (or a new one) for an answer, and decision vs discussion in a note: a thread or record, its pages and the recorded detector reply | each case's `expect` and `judgeNote`, replayed through the real detectors by `agents/uno-bot/tests/sweep-capture-detector.test.ts` |
 | uno-bot commitments | `commitment-cases.json` — commitment-detector cases (a real promise, a request answered yes, a hypothetical, a joke): a thread, its cursor and the recorded detector reply | each case's `expect` and `judgeNote`, replayed through the real detector by `agents/uno-bot/tests/commitment-detector.test.ts` |
+| uno-bot card to-dos | `card-todo-cases.json` — card to-do detector cases (a card to-do with and without an assignee, a to-do not about a card, talk about an existing card): a thread, its cursor and the recorded detector reply | each case's `expect` and `judgeNote`, replayed through the real detector by `agents/uno-bot/tests/card-todo-detector.test.ts` |
 
 Fixtures are frozen: revise only when the thing they test changes, and note it in the fixture header — a moving fixture measures nothing.
 

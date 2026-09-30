@@ -23,6 +23,7 @@ import { measured, readSource, sweepSlackFor } from "../sweep/env";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { SweepThread } from "../sweep/finding";
 import { modelCommitmentDetector, modelEvidenceJudge } from "./detector";
+import { cardAnswerFor, cardFollowUpsFor } from "../follow-through/env";
 import { commitmentStoreFor } from "./store-env";
 import {
   answerReminder,
@@ -104,7 +105,8 @@ export async function runCommitmentNudgesOnEnv(
     now: () => Date.now(),
     dryRun: opts.dryRun,
   };
-  return runCommitmentNudges(job, deps);
+  const cards = cardFollowUpsFor(env, opts, bot?.userId ?? null);
+  return runCommitmentNudges(job, cards ? { ...deps, cards } : deps);
 }
 
 /**
@@ -116,9 +118,11 @@ export async function runCommitmentNudgesOnEnv(
 export function reminderDoorFor(env: Env): ((r: ReminderReaction) => Promise<boolean>) | undefined {
   const store = commitmentStoreFor(env);
   if (!store) return undefined;
+  const cards = cardAnswerFor(env);
   return (r) =>
     answerReminder(r, {
       store,
+      ...(cards ? { cards } : {}),
       update: (channel, ts, message) => updateReminder(env, channel, ts, message),
       botUserId: async () => (await getBotIdentity(env))?.userId,
       now: () => Date.now(),

@@ -44,10 +44,52 @@ export type CommitmentState =
 /** The states the morning still acts on. */
 export const LIVE_STATES: readonly CommitmentState[] = ["open", "nudged", "snoozed"];
 
-/** What made the row: a promise read in a swept thread, or a "remind me" a
- *  person asked uno-bot for in the turn (`./remind.ts`) — a commitment made to
- *  themselves, so its promiser and requester are the same person. */
-export type CommitmentKind = "thread_promise" | "self_reminder";
+/**
+ * What made the row:
+ *   • `thread_promise` — a promise read in a swept thread;
+ *   • `self_reminder` — a "remind me" a person asked uno-bot for in the turn
+ *     (`./remind.ts`) — a commitment made to themselves, so its promiser and
+ *     requester are the same person;
+ *   • `card_todo` — a to-do to make a Roadmap card, from a thread or a running
+ *     note, whose evidence is a matching card;
+ *   • `card_unowned` — an active card with no Contributor;
+ *   • `card_stale` — an active card stuck in one Design Status.
+ * The three card kinds are the follow-through module's (`../follow-through/`):
+ * this module stores and schedules them, and hands their morning and their
+ * answers to it.
+ */
+export type CommitmentKind = "thread_promise" | "self_reminder" | "card_todo" | "card_unowned" | "card_stale";
+
+/** The card kinds, which the follow-through module handles. */
+export const CARD_KINDS: readonly CommitmentKind[] = ["card_todo", "card_unowned", "card_stale"];
+
+/** Whether a row is a card follow-up's. */
+export function isCardKind(kind: CommitmentKind): boolean {
+  return CARD_KINDS.includes(kind);
+}
+
+/**
+ * The two morning budgets a promiser's reminders count against: `asked`, what
+ * a person asked for or promised (thread promises, "remind me"), and `cards`,
+ * the card follow-ups uno-bot raises on its own. A card backlog spends only
+ * its own budget, so it never pushes a person's own reminder back a morning.
+ */
+export type ReminderBudget = "asked" | "cards";
+
+/** The budget a kind's reminders count against. */
+export function budgetOf(kind: CommitmentKind): ReminderBudget {
+  return isCardKind(kind) ? "cards" : "asked";
+}
+
+/** The promisers passed over for each budget. */
+export type ReminderSkip = Partial<Record<ReminderBudget, readonly string[]>>;
+
+/** A thread card to-do's id: its message's, marked. One message is either a
+ *  card to-do or a promise, never both — the promise hook passes over a
+ *  message this id is already kept for. */
+export function cardTodoId(channel: string, messageTs: string): string {
+  return `${channel}:${messageTs}:card`;
+}
 
 /** One promise, as `commitments` holds it. */
 export interface CommitmentRecord {
@@ -96,6 +138,9 @@ export interface CommitmentRecord {
   /** The morning run date its last reminder went up. */
   remindedOn: string | null;
   resolvedAt: number | null;
+  /** The Roadmap card's Notion page id, on a card follow-up; absent on a
+   *  promise. An id only — its title and link wait with the wording. */
+  cardId?: string | null;
 }
 
 /** A change to one commitment. */
@@ -112,11 +157,14 @@ export interface CommitmentRecords {
    *  the state it has reached. */
   addCommitments(rows: CommitmentRecord[]): Promise<void>;
   get(id: string): Promise<CommitmentRecord | null>;
-  /** The live commitment due soonest at `now` that `runDate`'s morning has not
-   *  yet looked at, passing over the promisers in `skip`, or null. */
-  nextDue(now: number, runDate: string, skip?: readonly string[]): Promise<CommitmentRecord | null>;
-  /** How many commitments each promiser was reminded of on `runDate`. */
-  remindedOn(runDate: string): Promise<Record<string, number>>;
+  /** The live commitment `runDate`'s morning has not yet looked at, a
+   *  person's own asks (promises, "remind me") before card follow-ups and then
+   *  soonest due, passing over the promisers `skip` names for its budget, or
+   *  null. */
+  nextDue(now: number, runDate: string, skip?: ReminderSkip): Promise<CommitmentRecord | null>;
+  /** How many commitments each promiser was reminded of on `runDate`, per
+   *  budget. */
+  remindedOn(runDate: string): Promise<Record<ReminderBudget, Record<string, number>>>;
   /** A live thread promise of this promiser's in this thread, or null — a
    *  "remind me" there is never the same task said again. */
   liveInThread(channel: string, threadTs: string, promiserId: string): Promise<CommitmentRecord | null>;
@@ -129,6 +177,9 @@ export interface CommitmentRecords {
    *  or in `channel` itself, never another private place's, a DM's, or a
    *  "remind me". */
   latestAnswers(channel: string, limit: number): Promise<CommitmentRecord[]>;
+  /** For each of these Roadmap cards that has one, the follow-up detected
+   *  last, of any card kind — one read for a night's candidates. */
+  latestForCards(cardIds: readonly string[]): Promise<Record<string, CommitmentRecord>>;
 }
 
 /** What one commitment's wording is, kept beside its row. */
@@ -138,6 +189,19 @@ export interface CommitmentText {
   /** Each reminder's body as posted, by its ts, so an answer can replace the
    *  legend and keep the rest. */
   bodies: Record<string, string>;
+  /** A card follow-up's other people to mention beside the promiser — a
+   *  running note's takers, a card's other Contributors. */
+  mentions?: string[];
+  /** A card follow-up's card: its title and link, as Notion gave them. */
+  card?: { title: string; url: string; status: string | null };
+  /** Where a card to-do was read: the thread's permalink or the note's link. */
+  sourceUrl?: string;
+  /** A thread card to-do's other posters, who may ask for the draft too. */
+  participants?: string[];
+  /** A stuck card whose owner answered 🙌 or 🙅: the Design Status options
+   *  offered, in the order shown, until one is picked and staged or the
+   *  choice lapses; `reposted` once the list went up a second time. */
+  choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean; listedAt: number; reposted: boolean };
 }
 
 /** The KV half. */

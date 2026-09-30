@@ -26,7 +26,9 @@
 //   re-armed two working days out for its one follow-up; a follow-up nobody
 //   answers makes the row `lapsed`. Two posts per commitment in all: a ⏳
 //   moves the date and adds none. At most `MAX_REMINDERS_PER_PERSON` a
-//   promiser a morning — the rest wait, which is no hold — and a row held
+//   promiser a morning, and card follow-ups `MAX_CARD_REMINDERS_PER_PERSON`
+//   more on a budget of their own, a person's own asks first — the rest
+//   wait, which is no hold — and a row held
 //   `MAX_HOLDS` mornings running lapses. Nothing is sent outside the weekday
 //   10:00 ET run (`isMorningRunTime`).
 //
@@ -87,7 +89,7 @@ import {
   TEXT_KEEP_MS,
 } from "./due";
 import { snoozedRunAt } from "./remind";
-import { LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "./store";
+import { budgetOf, cardTodoId, isCardKind, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText, type ReminderBudget } from "./store";
 
 /** What one commitment may spend before it starts: the evidence reads, the
  *  judge, the permalink and the post, and the D1 statements around them. */
@@ -98,8 +100,12 @@ export const MAX_EVIDENCE_REPLY_PAGES = 3;
 export const MAX_EVIDENCE_HISTORY_PAGES = 2;
 /** Linked Notion and GitHub pages read looking for completion. */
 export const MAX_EVIDENCE_SOURCES = 2;
-/** Reminders one promiser gets in one morning run; the rest wait a morning. */
+/** Reminders of a person's own asks (promises, "remind me") one promiser gets
+ *  in one morning run; the rest wait a morning. */
 export const MAX_REMINDERS_PER_PERSON = 2;
+/** Card follow-ups one promiser gets in one morning run, a budget of their
+ *  own beside `MAX_REMINDERS_PER_PERSON`. */
+export const MAX_CARD_REMINDERS_PER_PERSON = 2;
 /** Mornings running a commitment may be held before it lapses. */
 export const MAX_HOLDS = 3;
 /** Earlier answers the detector is shown, of each kind — 🙌 done and 🤔 not a
@@ -181,6 +187,9 @@ export async function recordThreadCommitments(
   const rows: CommitmentRecord[] = [];
   const texts: Record<string, string> = {};
   for (const c of found.commitments) {
+    // "I'll file a card for X" is a card to-do, read first and kept once:
+    // no promise row beside it, so its person is asked once.
+    if (await deps.store.get(cardTodoId(thread.channel, c.messageTs))) continue;
     const promisedAt = msOf(c.messageTs);
     const due = commitmentDueAt(promisedAt, c.deadline);
     const id = `${thread.channel}:${c.messageTs}`;
@@ -329,8 +338,14 @@ export function fewShotExamples(
 
 // ── Morning: check, then nudge ───────────────────────────────────────────────
 
-/** What the morning job reads with: everything but the detector. */
-export type NudgeDeps = Omit<CommitmentDeps, "detector">;
+/**
+ * What the morning job reads with: everything but the detector, and the
+ * handler for the card kinds (`../follow-through/`), which settle on their own
+ * evidence and say their own words. Absent, a card row due is left alone.
+ */
+export type NudgeDeps = Omit<CommitmentDeps, "detector"> & {
+  cards?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
+};
 
 /** What the morning did with one commitment. */
 export interface CommitmentAction {
@@ -376,13 +391,17 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   ensureHeadroom(deps, COMMITMENT_COST);
   // Read again by a retried job, so the cap holds across its alarms.
   const reminded = await deps.store.remindedOn(runDate);
-  const capped = () => Object.keys(reminded).filter((p) => reminded[p]! >= MAX_REMINDERS_PER_PERSON);
+  const limit: Record<ReminderBudget, number> = { asked: MAX_REMINDERS_PER_PERSON, cards: MAX_CARD_REMINDERS_PER_PERSON };
+  const capped = (b: ReminderBudget) => Object.keys(reminded[b]).filter((p) => reminded[b][p]! >= limit[b]);
   for (;;) {
     ensureHeadroom(deps, COMMITMENT_COST);
-    const c = await deps.store.nextDue(now, runDate, capped());
+    const c = await deps.store.nextDue(now, runDate, { asked: capped("asked"), cards: capped("cards") });
     if (!c) break;
     const action = await handleDue(deps, c, now, runDate);
-    if (action.action === "nudged" || action.action === "followed-up") reminded[c.promiserId] = (reminded[c.promiserId] ?? 0) + 1;
+    if (action.action === "nudged" || action.action === "followed-up") {
+      const counts = reminded[budgetOf(c.kind)];
+      counts[c.promiserId] = (counts[c.promiserId] ?? 0) + 1;
+    }
     actions.push(action);
     // A rehearsal marks nothing, so the same row would come back: it shows one.
     if (deps.dryRun) break;
@@ -391,6 +410,11 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
 }
 
 async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> {
+  if (isCardKind(c.kind)) {
+    if (deps.cards) return deps.cards.due(c, now, runDate);
+    if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate });
+    return { id: c.id, action: "held", note: "no handler for card follow-ups on this run" };
+  }
   const settle = async (patch: Parameters<CommitmentStore["update"]>[1]): Promise<void> => {
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate, ...patch });
   };
@@ -406,6 +430,12 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
     console.warn(`[commitments] ${c.id} lapsed after ${holds} held mornings: ${note}`);
     return { id: c.id, action: "lapsed", note: `held ${holds} mornings running (${note})` };
   };
+  if (c.kind !== "thread_promise" && c.kind !== "self_reminder") {
+    // A kind this Worker does not know — a row a newer one wrote: held, and
+    // lapsed after as many mornings as any other hold.
+    console.warn(`[commitments] ${c.id}: unknown kind ${String(c.kind)}, held`);
+    return hold(`unknown kind ${String(c.kind)}`);
+  }
   // The reminder and its one follow-up are all a commitment gets, whatever
   // ⏳ moved its date.
   if (c.nudges >= 2) {
@@ -581,6 +611,8 @@ export interface ReminderReaction {
 
 export interface ReminderDoorDeps {
   store: CommitmentStore;
+  /** A reaction on a card follow-up (`../follow-through/`): its own answers. */
+  cards?(c: CommitmentRecord, r: ReminderReaction): Promise<void>;
   update: CommitmentSlack["update"];
   botUserId(): Promise<string | undefined>;
   now(): number;
@@ -610,11 +642,17 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
   const answer = reminderAnswer(r.glyph);
   // Only a reminder glyph, or a gate glyph a reminder must swallow, is worth
   // the lookup: every 🎉 in every channel arrives here.
-  if (!answer && !GATE_RESERVED.has(r.glyph)) return false;
+  if (!answer && !GATE_RESERVED.has(r.glyph.replace(/::skin-tone-\d$/, ""))) return false;
   const bot = await deps.botUserId();
   if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return false;
   const c = await deps.store.byReminderTs(r.messageTs);
   if (!c || c.channel !== r.channel) return false;
+  if (isCardKind(c.kind)) {
+    // Whatever the glyph, a card follow-up's own: its ✅ drafts a card, and
+    // never reaches the gate.
+    if (deps.cards) await deps.cards(c, r);
+    return true;
+  }
 
   if (!answer || r.userId !== c.promiserId || !LIVE_STATES.includes(c.state)) return true;
   const now = deps.now();

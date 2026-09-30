@@ -474,7 +474,7 @@ test("the edited-since read asks for rows at or after the cursor, a page at a ti
             parent: { type: "database_id", database_id: DB },
             properties: {
               Name: { type: "title", title: [{ plain_text: "Design sync" }] },
-              "Note Takers": { type: "people", people: [{ name: "Ade Okafor" }] },
+              "Note Takers": { type: "people", people: [{ id: "u-ade", name: "Ade Okafor" }] },
               Type: { type: "select", select: { name: "Team" } },
             },
           },
@@ -506,8 +506,59 @@ test("the edited-since read asks for rows at or after the cursor, a page at a ti
       parentDatabaseId: "3ee43141b0ce4517badccb52a7b97bdb",
       properties: { Type: "Team" },
       people: { "Note Takers": ["Ade Okafor"] },
+      persons: { "Note Takers": [{ id: "u-ade", name: "Ade Okafor" }] },
+      values: { Type: ["Team"] },
+      createdById: null,
     },
   ]);
+});
+
+test("the Roadmap reads: rows by status, one row again, a property's options, the integration's own user", async () => {
+  const DB = "2fc01241aaaa4bbbbccccddddeeeefff";
+  serve({
+    [`POST /databases/${DB}/query`]: {
+      body: {
+        has_more: false,
+        next_cursor: null,
+        results: [
+          {
+            id: "cccccccc-cccc-cccc-cccc-cccccccccccc",
+            url: "https://www.notion.so/Card-cccccccccccccccccccccccccccccccc",
+            last_edited_time: "2026-09-20T12:00:00.000Z",
+            created_by: { id: "u-bea" },
+            parent: { type: "database_id", database_id: DB },
+            properties: {
+              Name: { type: "title", title: [{ plain_text: "Tutor filters" }] },
+              "Design Status": { type: "status", status: { name: "WIP" } },
+              Pillar: { type: "multi_select", multi_select: [{ name: "Tutor" }, { name: "Universal" }] },
+              Contributor: { type: "people", people: [{ id: "u-maya", name: "Maya Chen" }] },
+            },
+          },
+        ],
+      },
+    },
+    [`GET /pages/${PAGE}`]: { status: 404, body: { code: "object_not_found", message: "gone" } },
+    [`GET /databases/${DB}`]: {
+      body: { properties: { "Design Status": { status: { options: [{ name: "Ready for Design" }, { name: "WIP" }, { name: "Shipped" }] } } } },
+    },
+    [`GET /users/me`]: { body: { id: "u-unobot" } },
+  });
+  const { queryRowsWithStatus, readPageRow, databaseOptions, notionBotUserId } = await notion();
+
+  const { rows, more } = await queryRowsWithStatus(ENV, DB, "Design Status", ["WIP", "Under Review"], 50);
+  assert.deepEqual(calls[0]!.body, {
+    page_size: 50,
+    filter: { or: [{ property: "Design Status", status: { equals: "WIP" } }, { property: "Design Status", status: { equals: "Under Review" } }] },
+  });
+  assert.equal(more, false);
+  assert.equal(rows[0]!.title, "Tutor filters");
+  assert.deepEqual(rows[0]!.values, { "Design Status": ["WIP"], Pillar: ["Tutor", "Universal"] });
+  assert.deepEqual(rows[0]!.persons, { Contributor: [{ id: "u-maya", name: "Maya Chen" }] });
+  assert.equal(rows[0]!.createdById, "u-bea");
+  assert.equal(await readPageRow(ENV, PAGE), null, "a page gone or unshared reads as none");
+  assert.deepEqual(await databaseOptions(ENV, DB, "Design Status"), ["Ready for Design", "WIP", "Shipped"]);
+  assert.equal(await databaseOptions(ENV, DB, "Nope"), null);
+  assert.equal(await notionBotUserId(ENV), "u-unobot");
 });
 
 test("a page's comments come back with their text, time and the pages they mention", async () => {

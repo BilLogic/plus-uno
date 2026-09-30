@@ -319,6 +319,16 @@ async function sweepRecord(
     ...said.map((c) => [`comment:${c.id}`, Date.parse(c.createdTime)] as const),
     ...blocks.map((b) => [b.id, Date.parse(b.lastEditedTime)] as const),
   ]);
+  // A team note's new entries also go to card to-dos, which ask its takers.
+  if (kind === "note" && deps.onNote) {
+    const takers = await contributorsOf(deps, row.people[source.people] ?? [], r.resolved);
+    await deps.onNote({
+      pageId: pageIdOf(row.url),
+      url: row.url,
+      entries: entries.map((e) => ({ id: e.id, text: e.text, at: when.get(e.id) ?? r.now })),
+      takers,
+    });
+  }
 
   // The pages it is about: the card itself, then what it links, then what it
   // names without linking.

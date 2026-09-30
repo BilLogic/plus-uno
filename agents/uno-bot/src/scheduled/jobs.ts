@@ -17,6 +17,9 @@ import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
+import { cardTodoNoteHookFor, cardTodoThreadHookFor, runCardFollowThroughOnEnv } from "../follow-through/env";
+import type { SweepThread } from "../sweep/finding";
+import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv } from "../figma-drift/env";
 import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
@@ -33,20 +36,47 @@ import {
 export type JobBody = (env: Env, job: ScheduledJob, opts: { dryRun: boolean }) => Promise<unknown>;
 
 /** Every sweep kind: one body, since `runSweepJob` tells them apart. The
- *  end-of-day channel read hands each thread to commitment reminders too —
- *  that kind only: commitment reminders cover channel threads, not group DMs
- *  or any other conversation a sweep kind may read. */
+ *  end-of-day channel read hands each thread to card to-dos and commitment
+ *  reminders too — that kind only: both cover channel threads, not group DMs
+ *  or any other conversation a sweep kind may read. The notes job hands each
+ *  team note to card to-dos. */
 const sweepBody: JobBody = async (env, job, { dryRun }) => {
-  const onThread = job.kind === "sweep-channel" ? commitmentThreadHookFor(env, { dryRun }) : undefined;
   // Drift in a file uno-bot cannot write, queued for the morning's ask.
   const fileDrift = job.kind === "sweep-post" ? undefined : fileDriftSinkFor(env);
   const report = await runSweepJobOnEnv(env, job, { dryRun }, {
-    ...(onThread ? { onThread } : {}),
+    ...sweepHooks(env, job, dryRun),
     ...(fileDrift ? { fileDrift } : {}),
   });
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
+
+/** The hooks a sweep job feeds: per thread for a channel read, per note for
+ *  the notes job, none otherwise. */
+export function sweepHooks(env: Env, job: ScheduledJob, dryRun: boolean): Pick<SweepDeps, "onThread" | "onNote"> {
+  if (job.kind === "sweep-channel") {
+    const onThread = threadHooks(env, dryRun);
+    return onThread ? { onThread } : {};
+  }
+  if (job.kind === "sweep-notes") {
+    const onNote = cardTodoNoteHookFor(env, { dryRun });
+    return onNote ? { onNote } : {};
+  }
+  return {};
+}
+
+/** The per-thread hooks the end-of-day channel read feeds, one after the
+ *  other; each swallows its own failures and throws only a budget stop. Card
+ *  to-dos first, so a message kept as one is passed over as a promise. */
+export function threadHooks(env: Env, dryRun: boolean): ((thread: SweepThread, since: string) => Promise<void>) | undefined {
+  const hooks = [cardTodoThreadHookFor(env, { dryRun }), commitmentThreadHookFor(env, { dryRun })].filter(
+    (h): h is (thread: SweepThread, since: string) => Promise<void> => !!h,
+  );
+  if (!hooks.length) return undefined;
+  return async (thread, since) => {
+    for (const hook of hooks) await hook(thread, since);
+  };
+}
 
 const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Proves the path end to end — the enqueue, one alarm, the done marker —
@@ -132,6 +162,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "team-roles-sync": async (env, _job, { dryRun }) => {
     const report = await runTeamRolesSync(env, { dryRun });
     console.log(`[usage] team roles: ${report.summary}`);
+    return report;
+  },
+  // End of day: each active Roadmap card nobody owns, or that has stopped
+  // moving, becomes a follow-up the morning asks about (src/follow-through/).
+  "card-follow-through": async (env, job, { dryRun }) => {
+    const report = await runCardFollowThroughOnEnv(env, job, { dryRun });
+    console.log(`[follow-through] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.

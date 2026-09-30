@@ -297,6 +297,19 @@ export interface SweepDeps {
    */
   onThread?(thread: SweepThread, since: string): Promise<void>;
   /**
+   * Handed each team running note the notes job reads — past its team-note
+   * guard — with its entries edited since the cursor and its Note Takers as
+   * Slack ids, so another job reads the same notes without a second read
+   * (card to-dos, `follow-through/run.ts`). A budget stop throws through; any
+   * other failure is the hook's to swallow.
+   */
+  onNote?(note: {
+    pageId: string;
+    url: string;
+    entries: Array<{ id: string; text: string; at: number }>;
+    takers: string[];
+  }): Promise<void>;
+  /**
    * Where a finding on a file uno-bot cannot write goes — a Figma file, the
    * design-system code, Storybook — for the morning's ask in its thread
    * (`figma-drift/`). Absent, such a finding is counted and left, and a

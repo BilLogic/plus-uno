@@ -2,8 +2,12 @@
 // `onMessage` that decides WHAT runs, on named dependencies so the orderings
 // that matter are driven with fakes (tests/ds-precedence-queued.test.ts).
 //
-// A `dispute N` reply in a weekly DS precedence list thread is handled HERE,
-// at the head of the thread's own job, and nowhere earlier:
+// A reply handled ahead of the turn — a `dispute N` in a weekly DS precedence
+// list thread, a "yes, it's up to date" to a file-drift ask, an answer under a
+// card follow-up — is handled HERE, at the head of the thread's own job, and
+// nowhere earlier. Which handler, if any, was decided when the message was
+// queued (`chainReplyHandlers`), so a reply no handler wanted pays no claim
+// and no second engagement check here. For a handled reply:
 //   • the dispute has its own claim (`dispute:` + channel + ts), so the
 //     `message` event and its `app_mention` twin try it once between them;
 //     one that is handled also marks the message's own key done, so the twin
@@ -15,8 +19,11 @@
 //     without it: a subtype such as a `thread_broadcast` is skipped unclaimed,
 //     and a reply the engagement gate would not have queued runs nothing —
 //     so an `app_mention` twin arriving second still gets its turn;
-//   • a revision that throws falls through to the ordinary turn in the same
-//     job, so the reply is answered rather than dropped.
+//   • a handler that throws falls through to the ordinary turn in the same
+//     job, so the reply is answered rather than dropped. The DS revision
+//     relies on this. The drift handler catches its own failures but a
+//     budget stop, which it re-throws as on main; the card handler catches
+//     every failure, a budget stop included.
 
 import type { RunClaim } from "../thread-state/index";
 import type { SlackMessageEvent } from "./types";
@@ -36,6 +43,44 @@ export interface MessageJobDeps {
   engages(event: SlackMessageEvent): Promise<boolean>;
   /** The ordinary turn. */
   turn(event: SlackMessageEvent): Promise<void>;
+}
+
+/** One reply handled ahead of the turn: a shape check that reads nothing, and
+ *  the handler, true when the reply was its. A handler that throws sends the
+ *  reply to the turn (`runMessageJob`). */
+export interface ReplyHandler {
+  name: string;
+  candidate(event: SlackMessageEvent): boolean;
+  handle(event: SlackMessageEvent): Promise<boolean>;
+}
+
+/**
+ * Several ahead-of-the-turn handlers as the job's one dispute door. `matched`
+ * is the handler the message was queued for (its name), or null for none —
+ * the job then tries no handler at all. Left out (a job queued before this
+ * was carried), or naming a handler this code does not have (a job queued by
+ * another version), every handler whose shape fits is a candidate, first to
+ * handle it wins, and an unhandled reply takes the engagement check. A throw
+ * propagates as it did from one handler, so the job runs the turn.
+ *
+ * @param handlers - In the order tried
+ * @param matched - The handler chosen when the message was queued
+ */
+export function chainReplyHandlers(
+  handlers: readonly ReplyHandler[],
+  matched?: string | null,
+): Pick<MessageJobDeps, "disputeCandidate" | "dispute"> {
+  const known = matched != null && handlers.some((h) => h.name === matched);
+  const tried = matched === null ? [] : known ? handlers.filter((h) => h.name === matched) : handlers;
+  return {
+    disputeCandidate: (event) => tried.some((h) => h.candidate(event)),
+    async dispute(event) {
+      for (const h of tried) {
+        if (h.candidate(event) && (await h.handle(event))) return true;
+      }
+      return false;
+    },
+  };
 }
 
 /** A person's own plain message: no bot, no subtype, some text. */

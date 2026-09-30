@@ -1,6 +1,7 @@
 // The D1 commitment records — `commitments` in the usage database
 // (migrations/usage/0006_commitments.sql, 0007_commitment_answers.sql for
-// where each promise was made, and 0008_self_reminders.sql for "remind me").
+// where each promise was made, 0008_self_reminders.sql for "remind me", and
+// 0009_card_follow_ups.sql for card follow-ups and their card id).
 //
 // As the sweep's records do (`sweep/d1.ts`): every statement prepared with
 // bound parameters and charged to the meter BEFORE it is sent
@@ -11,7 +12,7 @@
 
 import { chargeD1Query } from "../net";
 import type { SweepDatabase } from "../sweep/d1";
-import { LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentRecords } from "./store";
+import { CARD_KINDS, LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentRecords, type ReminderBudget } from "./store";
 
 const COLUMNS = [
   "commitment_id",
@@ -37,6 +38,7 @@ const COLUMNS = [
   "holds",
   "reminded_on",
   "resolved_at",
+  "card_id",
 ] as const;
 
 type Row = Record<(typeof COLUMNS)[number], unknown>;
@@ -64,10 +66,17 @@ const INSERT =
   `SELECT ${COLUMNS.map((c) => `json_extract(value, '$.${c}')`).join(", ")} FROM json_each(?) WHERE true ` +
   `ON CONFLICT (commitment_id) DO NOTHING`;
 const LIVE = LIVE_STATES.map((s) => `'${s}'`).join(", ");
+const IS_CARD = `kind IN (${CARD_KINDS.map((k) => `'${k}'`).join(", ")})`;
+// A person's own asks first, then card follow-ups; each passes over the
+// promisers its own budget has spent (`ReminderBudget`).
 const NEXT_DUE =
   `${SELECT} WHERE state IN (${LIVE}) AND due_at <= ? AND (checked_on IS NULL OR checked_on <> ?) ` +
-  `AND promiser_id NOT IN (SELECT value FROM json_each(?)) ORDER BY due_at, commitment_id LIMIT 1`;
-const REMINDED_ON = "SELECT promiser_id, COUNT(*) AS n FROM commitments WHERE reminded_on = ? GROUP BY promiser_id";
+  `AND CASE WHEN ${IS_CARD} THEN promiser_id NOT IN (SELECT value FROM json_each(?)) ` +
+  `ELSE promiser_id NOT IN (SELECT value FROM json_each(?)) END ` +
+  `ORDER BY CASE WHEN ${IS_CARD} THEN 1 ELSE 0 END, due_at, commitment_id LIMIT 1`;
+const REMINDED_ON =
+  `SELECT promiser_id, CASE WHEN ${IS_CARD} THEN 'cards' ELSE 'asked' END AS budget, COUNT(*) AS n ` +
+  `FROM commitments WHERE reminded_on = ? GROUP BY promiser_id, budget`;
 const LIVE_IN_THREAD =
   `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND kind = 'thread_promise' AND state IN (${LIVE}) ` +
   `ORDER BY promised_at, commitment_id LIMIT 1`;
@@ -78,6 +87,9 @@ const answers = (state: "done" | "not_promise") =>
   `SELECT * FROM (${SELECT} WHERE state = '${state}' AND kind = 'thread_promise' AND (channel_kind = 'public' OR channel_id = ?) ` +
   `ORDER BY resolved_at DESC, commitment_id DESC LIMIT ?)`;
 const LATEST_ANSWERS = `${answers("done")} UNION ALL ${answers("not_promise")} ORDER BY resolved_at DESC, commitment_id DESC`;
+// Every row of the night's candidate cards in one statement; the newest per
+// card is picked in the Worker.
+const FOR_CARDS = `${SELECT} WHERE card_id IN (SELECT value FROM json_each(?)) ORDER BY card_id, detected_at DESC, commitment_id DESC`;
 const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
@@ -108,6 +120,7 @@ function toRow(r: CommitmentRecord): Row {
     holds: r.holds,
     reminded_on: r.remindedOn,
     resolved_at: r.resolvedAt,
+    card_id: r.cardId ?? null,
   };
 }
 
@@ -136,6 +149,8 @@ function fromRow(row: Row): CommitmentRecord {
     holds: Number(row.holds ?? 0),
     remindedOn: strOrNull(row.reminded_on),
     resolvedAt: numOrNull(row.resolved_at),
+    // A promise carries no card id at all, as it was written.
+    ...(row.card_id == null ? {} : { cardId: String(row.card_id) }),
   };
 }
 
@@ -153,14 +168,24 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
       await db.prepare(INSERT).bind(JSON.stringify(rows.map(toRow))).run();
     },
     get: (id) => first(`${SELECT} WHERE commitment_id = ?`, id),
-    nextDue: (now, runDate, skip = []) => first(NEXT_DUE, now, runDate, JSON.stringify(skip)),
+    nextDue: (now, runDate, skip = {}) => first(NEXT_DUE, now, runDate, JSON.stringify(skip.cards ?? []), JSON.stringify(skip.asked ?? [])),
     async remindedOn(runDate) {
       chargeD1Query();
-      const { results } = await db.prepare(REMINDED_ON).bind(runDate).all<{ promiser_id: unknown; n: unknown }>();
-      return Object.fromEntries(results.map((r) => [String(r.promiser_id), Number(r.n)]));
+      const { results } = await db.prepare(REMINDED_ON).bind(runDate).all<{ promiser_id: unknown; budget: unknown; n: unknown }>();
+      const counts: Record<ReminderBudget, Record<string, number>> = { asked: {}, cards: {} };
+      for (const r of results) counts[r.budget === "cards" ? "cards" : "asked"][String(r.promiser_id)] = Number(r.n);
+      return counts;
     },
     liveInThread: (channel, threadTs, promiserId) => first(LIVE_IN_THREAD, channel, threadTs, promiserId),
     byReminderTs: (ts) => first(BY_REMINDER, ts, ts),
+    async latestForCards(cardIds) {
+      if (!cardIds.length) return {};
+      chargeD1Query();
+      const { results } = await db.prepare(FOR_CARDS).bind(JSON.stringify([...new Set(cardIds)])).all<Row>();
+      const latest: Record<string, CommitmentRecord> = {};
+      for (const row of results.map(fromRow)) if (row.cardId && !latest[row.cardId]) latest[row.cardId] = row;
+      return latest;
+    },
     async latestAnswers(channel, limit) {
       if (limit <= 0) return [];
       chargeD1Query();

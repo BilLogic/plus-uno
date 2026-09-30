@@ -5,12 +5,13 @@
 // and two quick disputes — the runner takes them one at a time — both apply.
 //
 // The claim is the in-memory ThreadState's real `claimRun`; the dispute is the
-// real `disputePrecedenceItems` over an in-memory thread record. Nothing
-// reaches Slack.
+// real `disputePrecedenceItems` over an in-memory thread record, reached
+// through the real reply chain (`chainReplyHandlers`) the Worker builds, with a
+// card follow-up handler behind it that finds nothing. Nothing reaches Slack.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { runMessageJob, type MessageJobDeps } from "../src/slack/message-job";
+import { chainReplyHandlers, runMessageJob, type MessageJobDeps } from "../src/slack/message-job";
 import { disputePrecedenceItems, PRECEDENCE_CARD_TTL_MS, type PostedThread } from "../src/ds-precedence/jobs";
 import { disputedItems } from "../src/ds-precedence/report";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
@@ -70,48 +71,56 @@ function harness(opts: { disputeThrows?: boolean; engages?: boolean } = {}) {
   const deps: MessageJobDeps = {
     claim: (key) => threadState.claimRun(key),
     markDone: (key) => threadState.markRunDone(key),
-    disputeCandidate: (e) => e.channel === CHANNEL && !!e.thread_ts && disputedItems(e.text ?? "").length > 0,
-    dispute: async (e) => {
-      await ready;
-      if (opts.disputeThrows) throw new Error("Slack down");
-      return disputePrecedenceItems(
-        {
-          thread: {
-            read: async () => record.value,
-            write: async (v) => {
-              record.value = v;
-            },
-          },
-          post: async () => {
-            posted += 1;
-            return { ok: true, ts: `1759600000.00000${posted}` };
-          },
-          stage: async (p) => {
-            staged.push(p);
-            await threadState.putProposal(p);
-          },
-          restore: async (p) => {
-            await threadState.putProposal(p);
-          },
-          retire: async (ts) => {
-            await threadState.retireProposal(ts);
-          },
-          superseded: async () => {},
-          card: async (ts) => {
-            const found = await threadState.getProposalByTs(ts);
-            return found.state === "found" ? found.proposal : null;
-          },
-          now: () => NOW,
-        },
-        { channel: e.channel, threadTs: e.thread_ts!, user: e.user!, text: e.text ?? "" },
-      );
-    },
+    ...chainReplyHandlers([
+      {
+        name: "ds-precedence",
+        candidate: (e) => e.channel === CHANNEL && !!e.thread_ts && disputedItems(e.text ?? "").length > 0,
+        handle: (e) => dispute(e),
+      },
+      // Never throws, and answers nothing in a list thread.
+      { name: "follow-through", candidate: () => false, handle: async () => false },
+    ]),
     // Engages as the gate would in the weekly thread: on an @mention.
     engages: async (e) => opts.engages ?? /<@/.test(e.text ?? ""),
     turn: async (e) => {
       turns.push(e.ts);
     },
   };
+  async function dispute(e: SlackMessageEvent): Promise<boolean> {
+    await ready;
+    if (opts.disputeThrows) throw new Error("Slack down");
+    return disputePrecedenceItems(
+      {
+        thread: {
+          read: async () => record.value,
+          write: async (v) => {
+            record.value = v;
+          },
+        },
+        post: async () => {
+          posted += 1;
+          return { ok: true, ts: `1759600000.00000${posted}` };
+        },
+        stage: async (p) => {
+          staged.push(p);
+          await threadState.putProposal(p);
+        },
+        restore: async (p) => {
+          await threadState.putProposal(p);
+        },
+        retire: async (ts) => {
+          await threadState.retireProposal(ts);
+        },
+        superseded: async () => {},
+        card: async (ts) => {
+          const found = await threadState.getProposalByTs(ts);
+          return found.state === "found" ? found.proposal : null;
+        },
+        now: () => NOW,
+      },
+      { channel: e.channel, threadTs: e.thread_ts!, user: e.user!, text: e.text ?? "" },
+    );
+  }
   return { deps, record, turns, staged };
 }
 

@@ -875,9 +875,11 @@ export async function notionSearch(
 // ─── Rows edited since a time, and a page's comments (for the sweep) ─────────
 // The end-of-day sweep reads the running notes and the Roadmap cards changed
 // since its cursor. One query page, oldest edit first, so a job that stops
-// part-way keeps its place by the last row it finished. Read-only.
+// part-way keeps its place by the last row it finished. Card follow-ups read
+// the Roadmap's cards in its active Design Status values, and one card again,
+// as the same row. Read-only.
 
-/** A database row, as the sweep's edited-since read returns it. */
+/** A database row, as the sweep's and card follow-ups' reads return it. */
 export interface EditedRow {
   /** Dashes removed. */
   id: string;
@@ -892,6 +894,168 @@ export interface EditedRow {
   properties: Record<string, string>;
   /** People-typed properties → names. */
   people: Record<string, string[]>;
+  /** People-typed properties → each person's Notion user id and name, paired
+   *  as Notion lists them (a name may be ""), those without an id left out. */
+  persons: Record<string, Array<{ id: string; name: string }>>;
+  /** Select, multi-select and status values by property name, one per option. */
+  values: Record<string, string[]>;
+  /** Who created the row, as a Notion user id. */
+  createdById: string | null;
+}
+
+type RawRow = DbQueryRow & { last_edited_time?: string; parent?: { database_id?: string }; created_by?: { id?: string } };
+
+/** One raw database row as an `EditedRow`, or null when it is archived. */
+function toEditedRow(r: RawRow & { in_trash?: boolean }): EditedRow | null {
+  if (!r.id || r.archived || r.in_trash) return null;
+  const bareId = r.id.replace(/-/g, "");
+  let title = "(untitled)";
+  const properties: Record<string, string> = {};
+  const people: Record<string, string[]> = {};
+  const persons: Record<string, Array<{ id: string; name: string }>> = {};
+  const values: Record<string, string[]> = {};
+  for (const [name, prop] of Object.entries(r.properties ?? {})) {
+    if (prop.type === "title") title = plain(prop.title) || title;
+    else if (prop.type === "people") {
+      people[name] = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
+      persons[name] = (prop.people ?? []).filter((u) => u.id).map((u) => ({ id: u.id!, name: u.name ?? "" }));
+    } else if (prop.type === "select" || prop.type === "multi_select" || prop.type === "status") {
+      const value = renderProperty(prop);
+      if (value) properties[name] = value;
+      const list = prop.type === "multi_select" ? (prop.multi_select ?? []).map((o) => o.name ?? "") : [(prop.type === "status" ? prop.status : prop.select)?.name ?? ""];
+      values[name] = list.filter(Boolean);
+    }
+  }
+  return {
+    id: bareId,
+    url: canonicalNotionUrl(r.url, bareId),
+    title,
+    lastEditedTime: r.last_edited_time ?? "",
+    parentDatabaseId: r.parent?.database_id?.replace(/-/g, "") ?? null,
+    properties,
+    people,
+    persons,
+    values,
+    createdById: r.created_by?.id ?? null,
+  };
+}
+
+/** One page of a database query, as `EditedRow`s. One subrequest. */
+async function queryRowPage(
+  env: Env,
+  databaseId: string,
+  body: Record<string, unknown>,
+  label: string,
+): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await countedFetch(`${NOTION_API}/databases/${databaseId.replace(/-/g, "")}/query`, {
+      method: "POST",
+      headers: notionHeaders(env, { write: true }),
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    const data = (await res.json()) as { results?: RawRow[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
+    if (!res.ok) throw notionError(res.status, data, label);
+    const rows = (data.results ?? []).map(toEditedRow).filter((r): r is EditedRow => r !== null);
+    return { rows, more: data.has_more === true, next: data.next_cursor ?? null };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * The rows of one database whose status property holds one of `statuses`:
+ * one query page of at most `limit`, whether more wait past it, and where the
+ * next page starts. One subrequest. Throws on failure.
+ *
+ * @param env - Carries NOTION_API_KEY
+ * @param databaseId - The database to read
+ * @param property - A status property, by its exact name
+ * @param statuses - Its option names, exact
+ * @param limit - Rows per read, 1–100
+ * @param after - The `next` of the page before
+ */
+export async function queryRowsWithStatus(
+  env: Env,
+  databaseId: string,
+  property: string,
+  statuses: readonly string[],
+  limit = 100,
+  after?: string,
+): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
+  return queryRowPage(
+    env,
+    databaseId,
+    {
+      page_size: Math.min(Math.max(limit, 1), 100),
+      filter: { or: statuses.map((s) => ({ property, status: { equals: s } })) },
+      ...(after ? { start_cursor: after } : {}),
+    },
+    "status query failed",
+  );
+}
+
+/** One database row read again, or null when it is gone or unshared. One
+ *  subrequest. */
+export async function readPageRow(env: Env, pageId: string): Promise<EditedRow | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await countedFetch(`${NOTION_API}/pages/${pageId}`, { headers: notionHeaders(env), signal: controller.signal });
+    const data = (await res.json()) as RawRow & { in_trash?: boolean; message?: string; code?: string };
+    if (res.status === 404) return null;
+    if (!res.ok) throw notionError(res.status, data, "page read failed");
+    return toEditedRow(data);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** The integration's own Notion bot user id — what `created_by` holds on a
+ *  page uno-bot made — or null when Notion would not say. One subrequest. */
+export async function notionBotUserId(env: Env): Promise<string | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const res = await countedFetch(`${NOTION_API}/users/me`, { headers: notionHeaders(env) });
+  const data = (await res.json()) as { id?: string };
+  return res.ok && data.id ? data.id : null;
+}
+
+/** A Notion person's name, or null for a bot or an unknown id. One subrequest. */
+export async function notionUserName(env: Env, userId: string): Promise<string | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const res = await countedFetch(`${NOTION_API}/users/${userId}`, { headers: notionHeaders(env) });
+  const data = (await res.json()) as { name?: string | null; type?: string };
+  if (!res.ok || data.type !== "person") return null;
+  return data.name?.trim() || null;
+}
+
+/** Notion users pages read looking for a name. */
+const USER_LIST_PAGES = 3;
+
+/**
+ * The one Notion person whose name, compared by `normalise`, is this one; null
+ * for none or several. Up to `USER_LIST_PAGES` subrequests.
+ */
+export async function notionUserIdForName(env: Env, name: string, normalise: (s: string) => string): Promise<string | null> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const wanted = normalise(name);
+  if (!wanted) return null;
+  const hits = new Set<string>();
+  let cursor: string | undefined;
+  for (let page = 0; page < USER_LIST_PAGES; page++) {
+    const q = new URLSearchParams({ page_size: "100", ...(cursor ? { start_cursor: cursor } : {}) });
+    const res = await countedFetch(`${NOTION_API}/users?${q.toString()}`, { headers: notionHeaders(env) });
+    const data = (await res.json()) as { results?: { id?: string; name?: string; type?: string }[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
+    if (!res.ok) throw notionError(res.status, data, "user list failed");
+    for (const u of data.results ?? []) if (u.id && u.type === "person" && u.name && normalise(u.name) === wanted) hits.add(u.id);
+    if (!data.has_more || !data.next_cursor) break;
+    cursor = data.next_cursor;
+  }
+  return hits.size === 1 ? [...hits][0]! : null;
 }
 
 /**
@@ -913,58 +1077,17 @@ export async function queryEditedSince(
   limit = 25,
   after?: string,
 ): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
-  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    const res = await countedFetch(`${NOTION_API}/databases/${databaseId.replace(/-/g, "")}/query`, {
-      method: "POST",
-      headers: notionHeaders(env, { write: true }),
-      body: JSON.stringify({
-        page_size: Math.min(Math.max(limit, 1), 100),
-        filter: { timestamp: "last_edited_time", last_edited_time: { on_or_after: since } },
-        sorts: [{ timestamp: "last_edited_time", direction: "ascending" }],
-        ...(after ? { start_cursor: after } : {}),
-      }),
-      signal: controller.signal,
-    });
-    const data = (await res.json()) as {
-      results?: Array<DbQueryRow & { last_edited_time?: string; parent?: { database_id?: string } }>;
-      has_more?: boolean;
-      next_cursor?: string | null;
-      message?: string;
-      code?: string;
-    };
-    if (!res.ok) throw notionError(res.status, data, "edited-since query failed");
-    const rows: EditedRow[] = [];
-    for (const r of data.results ?? []) {
-      if (!r.id || r.archived) continue;
-      const bareId = r.id.replace(/-/g, "");
-      let title = "(untitled)";
-      const properties: Record<string, string> = {};
-      const people: Record<string, string[]> = {};
-      for (const [name, prop] of Object.entries(r.properties ?? {})) {
-        if (prop.type === "title") title = plain(prop.title) || title;
-        else if (prop.type === "people") people[name] = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
-        else if (prop.type === "select" || prop.type === "multi_select" || prop.type === "status") {
-          const value = renderProperty(prop);
-          if (value) properties[name] = value;
-        }
-      }
-      rows.push({
-        id: bareId,
-        url: canonicalNotionUrl(r.url, bareId),
-        title,
-        lastEditedTime: r.last_edited_time ?? "",
-        parentDatabaseId: r.parent?.database_id?.replace(/-/g, "") ?? null,
-        properties,
-        people,
-      });
-    }
-    return { rows, more: data.has_more === true, next: data.next_cursor ?? null };
-  } finally {
-    clearTimeout(timer);
-  }
+  return queryRowPage(
+    env,
+    databaseId,
+    {
+      page_size: Math.min(Math.max(limit, 1), 100),
+      filter: { timestamp: "last_edited_time", last_edited_time: { on_or_after: since } },
+      sorts: [{ timestamp: "last_edited_time", direction: "ascending" }],
+      ...(after ? { start_cursor: after } : {}),
+    },
+    "edited-since query failed",
+  );
 }
 
 /** One comment on a page. */
