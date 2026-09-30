@@ -1,182 +1,218 @@
 import React from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, spyOn, within } from 'storybook/test';
 
-import BadgeVariants, { BADGE_APPEARANCES, formatCount, readableOn } from './BadgeVariants';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+
+import BadgeVariants, { BADGE_APPEARANCES } from './BadgeVariants';
+import Count from './Count';
+import Status from './Status';
+import Tag from './Tag';
 
 /**
- * `Badge` variants — the system-generated half of the label system (#276).
+ * `BadgeVariants` — deprecated. A thin wrapper that renders Status, Count and
+ * Tag, so existing calls keep working while they move.
  *
- * The seam is story `play:` functions run by `check:storybook` in a real
- * browser, as #276 settled. What is asserted here is what a person could
- * observe, or what a computed style really is — never a class name.
+ * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
+ * in a real browser. Every assertion is something a person could observe or a
+ * computed style, never a class name. The central one is parity: a
+ * BadgeVariants call and the Status, Count or Tag it now stands for render the
+ * same computed styles, side by side, found by the `data-testid` each story
+ * gives them.
  *
- * Contrast is deliberately not re-asserted: the a11y ratchet already tracks
- * `color-contrast` over every story rendered, and may fall but never rise. All
- * six mappings were measured and clear WCAG AA; five clear AAA.
+ * Every render warns in development, so the console is watched for the whole
+ * file: the warnings are asserted where they are the subject, and kept out of
+ * the test output everywhere else.
  */
 
 export default {
     title: 'Components/Status and loading/Badge variants',
     component: BadgeVariants,
+    beforeEach: () => {
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        return () => warn.mockRestore();
+    },
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'deprecated', summary: 'BadgeVariants was deprecated. It renders Status for `status` and `date`, Count for `counter` and a read-only Tag for `custom`, and warns in development with the replacement.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'Every variant took the look of the component it now renders: filled statuses with an inside border, outlined dates with a fixed icon, pill counts capped at 99, and `custom` as an outlined tag with its color on the swatch.' },
+        ],
         docs: {
             description: {
                 component:
-                    'A badge shows system-generated data that people cannot change. To show a '
-                    + 'value someone has picked, use a tag instead.',
+                    'Deprecated. Is it a number? Count. Is it the condition something is in, and '
+                    + 'can that condition change? Status. Otherwise, Tag. BadgeVariants renders '
+                    + 'those three, so existing calls keep working while they move.',
             },
         },
     },
 };
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' };
+const pairs = { display: 'grid', gridTemplateColumns: 'max-content max-content', gap: '12px 24px', alignItems: 'center' };
+
+/* ------------------------------------------------------------------ helpers */
+
+/** What a person could measure of a label: its box, its colors and its type. */
+const PROPS = [
+    'height', 'width', 'backgroundColor', 'color', 'boxShadow', 'borderTopWidth', 'borderTopColor',
+    'borderTopLeftRadius', 'paddingLeft', 'paddingRight', 'fontSize', 'lineHeight', 'fontWeight',
+];
+
+const look = (el) => {
+    const cs = getComputedStyle(el);
+    return Object.fromEntries(PROPS.map((p) => [p, cs[p]]));
+};
+
+/** The same computed look for `old-<key>` and `new-<key>`, and for every label nested inside. */
+const expectParity = async (canvas, keys) => {
+    for (const key of keys) {
+        const old = canvas.getByTestId(`old-${key}`);
+        const current = canvas.getByTestId(`new-${key}`);
+        await expect(old.textContent, `${key}: same text`).toBe(current.textContent);
+        await expect(look(old), `${key}: same computed look`).toEqual(look(current));
+        const inner = (el) => [...el.querySelectorAll('*')].filter((n) => n.childElementCount === 0 && n.textContent);
+        const [oldInner, newInner] = [inner(old), inner(current)];
+        await expect(oldInner.length, `${key}: same parts`).toBe(newInner.length);
+        for (let i = 0; i < oldInner.length; i += 1) {
+            await expect(look(oldInner[i]), `${key}: part ${i} looks the same`).toEqual(look(newInner[i]));
+        }
+    }
+};
+
+/** The old appearance names, and the Status and Count style each one became. */
+const STYLE_OF = { positive: 'success', negative: 'danger', neutral: 'neutral', information: 'info', discovery: 'discovery' };
 
 /* ------------------------------------------------------------- appearance */
 
 export const Appearances = () => (
-    <div style={row}>
+    <div style={pairs}>
         {BADGE_APPEARANCES.map((a) => (
-            <BadgeVariants key={a} variant="status" appearance={a}>{a}</BadgeVariants>
+            <React.Fragment key={a}>
+                <BadgeVariants variant="status" appearance={a} data-testid={`old-${a}`}>{a}</BadgeVariants>
+                <Status style={STYLE_OF[a] || a} data-testid={`new-${a}`}>{a}</Status>
+            </React.Fragment>
         ))}
     </div>
 );
 
 /**
- * Five appearances, five grounds.
- *
- * The point of closing the set is that the same state looks the same on every
- * screen — which is worth nothing if two of the five resolve to the same colour
- * because a token was missing. That is the failure this catches: a name with no
- * rule renders as the page background and passes every visual glance.
+ * Each appearance renders exactly as the Status style that replaced it. The
+ * old names (`positive`, `negative`, `information`) are aliases, so the same
+ * state keeps its color without a caller changing a line, and `warning`, which
+ * Badge variants never had, is accepted too.
  */
 Appearances.play = async ({ canvasElement }) => {
-    const badges = canvasElement.querySelectorAll('.plus-badge-v');
-    await expect(badges).toHaveLength(5);
-
-    const grounds = new Set([...badges].map((b) => getComputedStyle(b).backgroundColor));
-    await expect(grounds.size).toBe(5);
-    // …and none of them transparent, which is what an unresolved token gives.
-    for (const g of grounds) await expect(g).not.toBe('rgba(0, 0, 0, 0)');
+    const canvas = within(canvasElement);
+    await expectParity(canvas, BADGE_APPEARANCES);
+    await expect(getComputedStyle(canvas.getByTestId('old-positive')).backgroundColor, 'positive fills as success')
+        .toBe(tokenColor(canvasElement, '--color-success-state-08'));
+    await expect(getComputedStyle(canvas.getByTestId('old-warning')).backgroundColor, 'warning fills as warning')
+        .toBe(tokenColor(canvasElement, '--color-warning-state-08'));
 };
 
 /* ---------------------------------------------------------------- density */
 
 export const Density = () => (
-    <div style={row}>
-        <BadgeVariants variant="status" appearance="information" spacing="default">Default</BadgeVariants>
-        <BadgeVariants variant="status" appearance="information" spacing="spacious">Spacious</BadgeVariants>
+    <div style={pairs}>
+        <BadgeVariants variant="status" appearance="information" spacing="default" data-testid="old-default">Default</BadgeVariants>
+        <Status style="info" size="medium" data-testid="new-default">Default</Status>
+        <BadgeVariants variant="status" appearance="information" spacing="spacious" data-testid="old-spacious">Spacious</BadgeVariants>
+        <Status style="info" size="large" data-testid="new-spacious">Spacious</Status>
     </div>
 );
 
-/**
- * Density changes PADDING and never TYPE.
- *
- * This is the rule that replaces the removed `size` prop, and the reason it was
- * removed: a badge whose type size moved with its density could disagree with
- * the text beside it. Assert both halves — that the box really did change, and
- * that the type really did not — because a rule with only one half asserted
- * passes when the whole thing is a no-op.
- */
+/** `spacing` is Status `size`: default is medium (20 tall), spacious is large (32). */
 Density.play = async ({ canvasElement }) => {
-    const [d, s] = canvasElement.querySelectorAll('.plus-badge-v');
-    const cd = getComputedStyle(d);
-    const cs = getComputedStyle(s);
-
-    await expect(cs.paddingLeft).not.toBe(cd.paddingLeft);
-    await expect(parseFloat(cs.paddingLeft)).toBeGreaterThan(parseFloat(cd.paddingLeft));
-    await expect(s.getBoundingClientRect().height).toBeGreaterThan(d.getBoundingClientRect().height);
-
-    await expect(cs.fontSize).toBe(cd.fontSize);
-    await expect(cs.lineHeight).toBe(cd.lineHeight);
+    const canvas = within(canvasElement);
+    await expectParity(canvas, ['default', 'spacious']);
+    await expect(px(getComputedStyle(canvas.getByTestId('old-default')).height)).toBe(20);
+    await expect(px(getComputedStyle(canvas.getByTestId('old-spacious')).height)).toBe(32);
 };
 
 /* ---------------------------------------------------------------- counter */
 
 export const Counters = () => (
-    <div style={row}>
-        <BadgeVariants variant="counter" appearance="information">7</BadgeVariants>
-        <BadgeVariants variant="counter" appearance="information" max={99}>1204</BadgeVariants>
-        <BadgeVariants variant="counter" appearance="negative" label="Unread">{0}</BadgeVariants>
+    <div style={pairs}>
+        <BadgeVariants variant="counter" appearance="information" data-testid="old-seven">7</BadgeVariants>
+        <Count value={7} style="info" data-testid="new-seven" />
+        <BadgeVariants variant="counter" appearance="negative" isBold max={99} data-testid="old-capped">1204</BadgeVariants>
+        <Count value={1204} appearance="bold" style="danger" max={99} data-testid="new-capped" />
+        <BadgeVariants variant="counter" appearance="negative" label="Unread" data-testid="old-dot">{0}</BadgeVariants>
+        <Count appearance="dot" style="danger" label="Unread" data-testid="new-dot" />
     </div>
 );
 
 /**
- * `max` caps the count, and an empty count becomes a dot.
- *
- * 1204 unread items rendering in full pushes a table column open — the failure
- * `max` exists for. And a counter with nothing to say is the notification dot,
- * folded in rather than made a second component to learn.
+ * A counter is a Count: `isBold` is the bold appearance, `max` still caps, and
+ * a counter with nothing to say is still a dot, named by `label` ("New" by
+ * default).
  */
 Counters.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-
-    await expect(canvas.getByText('7')).toBeInTheDocument();
-    await expect(canvas.getByText('99+')).toBeInTheDocument();
+    await expectParity(canvas, ['seven', 'capped', 'dot']);
+    await expect(within(canvas.getByTestId('old-capped')).getByText('99+')).toBeInTheDocument();
     await expect(canvas.queryByText('1204')).toBeNull();
-
-    // Zero is a dot, and a dot has no text — so without a name it is a coloured
-    // circle assistive technology cannot describe.
-    const dot = canvas.getByRole('status', { name: 'Unread' });
-    await expect(dot).toBeInTheDocument();
+    const dot = canvas.getByTestId('old-dot');
+    await expect(dot).toHaveAccessibleName('Unread');
     await expect(dot.textContent).toBe('');
-    const c = getComputedStyle(dot);
-    await expect(c.borderRadius).toBe('50%');
 };
 
 /**
- * `formatCount` leaves a non-numeric value alone rather than printing NaN.
+ * A counter takes a number. A word keeps rendering, as the Status a word
+ * becomes, with one warning that says so rather than a deprecation and a
+ * second complaint.
  */
 export const CounterFormatting = () => (
     <div style={row}>
-        <BadgeVariants variant="counter" appearance="neutral">many</BadgeVariants>
+        <BadgeVariants variant="counter" appearance="neutral" data-testid="word">many</BadgeVariants>
+        <BadgeVariants variant="counter" appearance="neutral" label="Many new replies" data-testid="named-word">lots</BadgeVariants>
     </div>
 );
 
 CounterFormatting.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText('many')).toBeInTheDocument();
-    await expect(formatCount('many', 99)).toBe('many');
-    await expect(formatCount(1204, 99)).toBe('99+');
-    await expect(formatCount(99, 99)).toBe('99');
+    await expect(canvas.getByText('many')).toBeVisible();
+    await expect(px(getComputedStyle(canvas.getByTestId('word')).height), 'a word renders as a 20-tall Status').toBe(20);
+    const said = new Set(console.warn.mock.calls.map(([m]) => String(m)));
+    await expect([...said].filter((m) => m.includes('"many"')), 'one warning, naming what it renders').toEqual([
+        '[BadgeVariants] is deprecated; variant="counter" takes a number, so "many" renders as <Status style="neutral">. Use Status or Tag for a word.',
+    ]);
+
+    // `label` still names a word for a screen reader, as it does on a status.
+    const named = canvas.getByTestId('named-word');
+    await expect(named).not.toHaveAttribute('aria-label');
+    await expect(canvas.getByText('lots').closest('[aria-hidden="true"]'), 'the visible word is hidden from a screen reader').not.toBeNull();
+    const spoken = within(named).getByText('Many new replies');
+    await expect(spoken.closest('[aria-hidden="true"]'), 'the label is what a screen reader reads').toBeNull();
+    await expect(spoken.getBoundingClientRect().width, 'the label is not seen').toBeLessThanOrEqual(1);
 };
 
 /* --------------------------------------------------------- trailing metric */
 
 export const TrailingMetric = () => (
-    <div style={row}>
-        <BadgeVariants variant="status" appearance="information" trailingMetric={12}>In progress</BadgeVariants>
-        <BadgeVariants variant="status" appearance="positive" trailingMetric={1204} max={99}>Complete</BadgeVariants>
+    <div style={pairs}>
+        <BadgeVariants variant="status" appearance="information" trailingMetric={12} data-testid="old-medium">In progress</BadgeVariants>
+        <Status style="info" count={12} data-testid="new-medium">In progress</Status>
+        <BadgeVariants variant="status" appearance="positive" spacing="spacious" trailingMetric={1204} data-testid="old-large">Complete</BadgeVariants>
+        <Status style="success" size="large" count={1204} data-testid="new-large">Complete</Status>
     </div>
 );
 
 /**
- * A status badge composes a counter badge inside itself.
- *
- * "In progress · 12" is one component call rather than hand-assembly, and the
- * inner appearance is DERIVED from the outer one — both grounds are ours, so
- * there is no cross-package mapping to get wrong. The count has to read against
- * a ground that is already tinted, which is why it is bold.
+ * `trailingMetric` is Status `count`: a Count of the same style nested inside
+ * the label, 16 tall in a default status and 20 in a spacious one, capped at 99.
  */
 TrailingMetric.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-
-    const outer = canvas.getByText('In progress').closest('.plus-badge-v');
-    const metric = outer.querySelector('.plus-badge-v__metric');
-    await expect(metric).not.toBeNull();
-    await expect(metric.textContent).toBe('12');
-    await expect(parseInt(getComputedStyle(metric).fontWeight, 10)).toBeGreaterThanOrEqual(600);
-
-    // `max` reaches the inner counter too, or a four-digit metric reopens the
-    // column the cap exists to protect.
-    await expect(canvas.getByText('99+')).toBeInTheDocument();
+    await expectParity(canvas, ['medium', 'large']);
+    const heightOf = (text) => px(getComputedStyle(within(canvasElement).getAllByText(text)[0].parentElement).height);
+    await expect(heightOf('12'), 'nested in a default status, the count is 16').toBe(16);
+    await expect(heightOf('99+'), 'nested in a spacious status, the count is 20').toBe(20);
 };
 
 /**
- * `trailingMetric` is gated to `status`.
- *
- * A count inside a counter is a counter inside a counter. The gate is behaviour,
- * not a type — propTypes validates the value, never whether the combination
- * means anything.
+ * `trailingMetric` is gated to `status`. A count inside a counter is a counter
+ * inside a counter, so the counter renders on its own.
  */
 export const TrailingMetricIsGatedToStatus = () => (
     <div style={row}>
@@ -185,119 +221,153 @@ export const TrailingMetricIsGatedToStatus = () => (
 );
 
 TrailingMetricIsGatedToStatus.play = async ({ canvasElement }) => {
-    await expect(canvasElement.querySelectorAll('.plus-badge-v__metric')).toHaveLength(0);
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('9')).toBeInTheDocument();
+    await expect(canvas.queryByText('5')).toBeNull();
 };
 
 /* ------------------------------------------------------------------ other */
 
 export const DateAndCustom = () => (
-    <div style={row}>
-        <BadgeVariants variant="date" appearance="neutral" spacing="spacious">Due 12 Sept</BadgeVariants>
-        <BadgeVariants variant="custom" color="#7f3fb1">Custom</BadgeVariants>
+    <div style={pairs}>
+        <BadgeVariants variant="date" appearance="negative" data-testid="old-date">Due 12 Sept</BadgeVariants>
+        <Status type="date" style="danger" data-testid="new-date">Due 12 Sept</Status>
+        <BadgeVariants variant="date" appearance="neutral" spacing="spacious" data-testid="old-spacious-date">Due 14 Sept</BadgeVariants>
+        <Status type="date" size="large" data-testid="new-spacious-date">Due 14 Sept</Status>
+        <BadgeVariants variant="custom" color="#7f3fb1" data-testid="old-custom">Custom</BadgeVariants>
+        <Tag swatchBefore="#7f3fb1" data-testid="new-custom">Custom</Tag>
     </div>
 );
 
 /**
- * `custom` is the escape hatch, and the only place a non-semantic colour is
- * allowed in — so it must actually take one, and must not also claim an
- * appearance from the closed set.
+ * A date is a date Status: outlined, with its fixed icon. `custom`, the escape
+ * hatch for a color that means nothing, is a category, so it renders a
+ * read-only Tag: outlined, neutral text, and the color it was given on the
+ * swatch rather than the fill.
  */
 DateAndCustom.play = async ({ canvasElement }) => {
-    const custom = canvasElement.querySelector('.plus-badge-v--custom');
-    await expect(getComputedStyle(custom).backgroundColor).toBe('rgb(127, 63, 177)');
-    await expect(custom.className).not.toContain('plus-badge-v--neutral');
+    const canvas = within(canvasElement);
+    await expectParity(canvas, ['date', 'spacious-date', 'custom']);
+
+    const custom = canvas.getByTestId('old-custom');
+    await expect(px(getComputedStyle(custom).height), 'a tag is 22 tall').toBe(22);
+    await expect(getComputedStyle(custom).backgroundColor, 'a read-only tag has no fill').not.toBe('rgb(127, 63, 177)');
+    const swatches = [...custom.querySelectorAll('[aria-hidden="true"]')]
+        .filter((el) => getComputedStyle(el).backgroundColor === 'rgb(127, 63, 177)');
+    await expect(swatches, 'the color is on the swatch').toHaveLength(1);
+    await expect(canvas.queryByRole('button')).toBeNull();
+};
+
+/**
+ * A date takes neutral, warning and danger only. Any other appearance renders
+ * a neutral date, and the one warning names that valid call, so nothing falls
+ * back a second time.
+ */
+export const DateWithAStateAppearance = () => (
+    <div style={pairs}>
+        <BadgeVariants variant="date" appearance="positive" data-testid="old-date">Due 12 Sept</BadgeVariants>
+        <Status type="date" data-testid="new-date">Due 12 Sept</Status>
+    </div>
+);
+
+DateWithAStateAppearance.play = async ({ canvasElement }) => {
+    await expectParity(within(canvasElement), ['date']);
+    const said = new Set(console.warn.mock.calls.map(([m]) => String(m)));
+    await expect([...said]).toEqual(['[BadgeVariants] is deprecated; use <Status type="date" style="neutral">.']);
+};
+
+/**
+ * `label` still renames a status for a screen reader, without an
+ * `aria-label` on a span that has no role, which ARIA does not allow: the
+ * label is visually hidden text, and the visible words are hidden from
+ * assistive technology.
+ */
+export const LabelledStatus = () => (
+    <div style={row}>
+        <BadgeVariants variant="status" appearance="positive" label="Session completed" data-testid="labelled">Done</BadgeVariants>
+    </div>
+);
+
+LabelledStatus.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const status = canvas.getByTestId('labelled');
+    await expect(status).not.toHaveAttribute('aria-label');
+    await expect(canvas.getByText('Done')).toBeVisible();
+    await expect(canvas.getByText('Done').closest('[aria-hidden="true"]'), 'the visible words are hidden from a screen reader').not.toBeNull();
+    const spoken = canvas.getByText('Session completed');
+    await expect(spoken.closest('[aria-hidden="true"]'), 'the label is what a screen reader reads').toBeNull();
+    await expect(spoken.getBoundingClientRect().width, 'the label is not seen').toBeLessThanOrEqual(1);
 };
 
 export const Truncation = () => (
     <div style={row}>
-        <BadgeVariants variant="status" appearance="neutral" maxWidth={120}>
+        <BadgeVariants variant="status" appearance="neutral" maxWidth={120} data-testid="old">
             Waiting on external review
         </BadgeVariants>
     </div>
 );
 
 /**
- * A truncated status keeps its full text — CSS ellipsis leaves nothing behind
- * for a screen reader or a hover, and a status nobody can read is not a status.
+ * A truncated status keeps its full text. It ends in an ellipsis at its cap,
+ * and becomes a tab stop so a keyboard user can reach the tooltip that holds
+ * the whole of it.
  */
 Truncation.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const el = canvas.getByTitle('Waiting on external review');
-    await expect(el).toBeInTheDocument();
-    const text = el.querySelector('.plus-badge-v__text');
+    const el = canvas.getByTestId('old');
+    await expect(px(getComputedStyle(el).width)).toBeLessThanOrEqual(120);
+    const text = canvas.getByText('Waiting on external review');
     await expect(text.scrollWidth).toBeGreaterThan(text.clientWidth);
+    await expect(el.tabIndex, 'a clipped status is a tab stop').toBe(0);
 };
 
 export const WithIcon = () => (
-    <div style={row}>
-        <BadgeVariants variant="status" appearance="positive" iconBefore={<i className="fa-solid fa-check" />}>
+    <div style={pairs}>
+        <BadgeVariants variant="status" appearance="positive" iconBefore={<i className="fa-solid fa-check" />} data-testid="old-icon">
             Passed
         </BadgeVariants>
+        <Status style="success" leadingVisual="check" data-testid="new-icon">Passed</Status>
     </div>
 );
 
 /**
- * The glyph is decoration; the word carries the meaning.
- *
- * It is there for the case colour cannot cover — `positive` and `information`
- * are 74° apart in hue but near-identical in lightness and saturation, so hue
- * carries all the differentiation and that is the axis deuteranopia collapses.
- * Announcing it as well would give a screen-reader user "check, Passed".
+ * `iconBefore` is Status `leadingVisual`. The glyph is decoration; the word
+ * carries the meaning, so the status is announced as "Passed" alone.
  */
 WithIcon.play = async ({ canvasElement }) => {
-    const icon = canvasElement.querySelector('.plus-badge-v__icon');
-    await expect(icon).toHaveAttribute('aria-hidden', 'true');
-    await expect(within(canvasElement).getByText('Passed')).toBeInTheDocument();
+    const canvas = within(canvasElement);
+    await expectParity(canvas, ['icon']);
+    const icon = canvas.getByTestId('old-icon').querySelector('i');
+    await expect(icon.closest('[aria-hidden="true"]')).not.toBeNull();
+    await expect(canvas.getByTestId('old-icon').textContent).toBe('Passed');
 };
 
-/**
- * The escape hatch cannot be made unreadable.
- *
- * WHY THIS STORY EXISTS: the first version of `custom` set a background and let
- * the text inherit, and the a11y suite failed it on `color-contrast` — a purple
- * ground under near-black text. That is #276's own defect coming back through
- * the one door the spec leaves open, so the foreground is now derived from the
- * background rather than inherited.
- *
- * Both directions are asserted. A rule that only ever picks white passes the
- * dark case and quietly makes every light badge unreadable.
- */
-export const CustomStaysReadable = () => (
+/* ------------------------------------------------------------ deprecation */
+
+export const DeprecationWarnings = () => (
     <div style={row}>
-        <BadgeVariants variant="custom" color="#191c1e">On a dark ground</BadgeVariants>
-        <BadgeVariants variant="custom" color="#f3f6f4">On a light ground</BadgeVariants>
-        <BadgeVariants variant="custom" color="#7f3fb1">Purple</BadgeVariants>
+        <BadgeVariants variant="status" appearance="positive">Completed</BadgeVariants>
+        <BadgeVariants variant="date" appearance="negative">Due 12 Sept</BadgeVariants>
+        <BadgeVariants variant="counter" appearance="information">7</BadgeVariants>
+        <BadgeVariants variant="custom" color="#7f3fb1">Algebra</BadgeVariants>
     </div>
 );
 
-CustomStaysReadable.play = async ({ canvasElement }) => {
-    const [dark, light] = canvasElement.querySelectorAll('.plus-badge-v--custom');
-
-    // Dark ground takes white; light ground takes the design system's ink.
-    await expect(getComputedStyle(dark).color).toBe('rgb(255, 255, 255)');
-    await expect(getComputedStyle(light).color).not.toBe('rgb(255, 255, 255)');
-    await expect(getComputedStyle(dark).color).not.toBe(getComputedStyle(light).color);
-
-    await expect(readableOn('#000000')).toBe('#ffffff');
-    await expect(readableOn('#ffffff')).not.toBe('#ffffff');
-    await expect(readableOn('rgb(0, 0, 0)')).toBe('#ffffff');
-    await expect(readableOn('#000')).toBe('#ffffff');
-
-    // Unparsable returns null, so the caller sets nothing rather than guessing.
-    await expect(readableOn('not-a-colour')).toBeNull();
-    await expect(readableOn(undefined)).toBeNull();
+/** Every variant warns in development, and each warning names its replacement exactly. */
+DeprecationWarnings.play = async () => {
+    const said = (text) => expect(console.warn).toHaveBeenCalledWith(expect.stringContaining(text));
+    await said('[BadgeVariants] is deprecated; use <Status style="success">');
+    await said('[BadgeVariants] is deprecated; use <Status type="date" style="danger">');
+    await said('[BadgeVariants] is deprecated; use <Count style="info">');
+    await said('[BadgeVariants] is deprecated; use <Tag>');
 };
 
 /* -------------------------------------------------------------- playground */
 
 /**
- * Interactive playground.
- *
- * `variant` and `appearance` are what gate every other prop, so they are what
- * the controls open on. `trailingMetric` is deliberately left unset rather than
- * seeded: it renders on `status` and nowhere else, so a control that silently
- * stops having an effect the moment you change the variant beside it reads as
- * the prop being broken rather than as the gate working.
+ * Interactive playground. `trailingMetric` is left unset: it renders on
+ * `status` and nowhere else, so a control that stops having an effect the
+ * moment the variant changes reads as the prop being broken.
  */
 export const Interactive = (args) => <BadgeVariants {...args} />;
 

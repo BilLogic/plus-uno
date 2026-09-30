@@ -1,4 +1,2 @@
-import Count from './Count';
-
-export { Count };
-export default Count;
+export * from './Count';
+export { default } from './Count';

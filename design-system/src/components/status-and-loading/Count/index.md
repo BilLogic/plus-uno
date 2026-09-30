@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Count/Count.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Count/Count.stories.jsx` — Appearances, Sizes, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Count/Count.stories.jsx` — Appearances, Sizes, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, DeprecatedStyleNames, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Count/Count.mdx`
 
@@ -19,7 +19,7 @@
 | `max` | number | `99` | Above this the pill shows `{max}+`. |
 | `showZero` | bool | `false` | Render a count of 0 instead of nothing. |
 | `appearance` | enum | `'subtle'` | `subtle` by default; `bold` asks for action now (at most one per area); `inverse` is a solid white pill for filled buttons and dark surfaces; `dot` is presence without a number. |
-| `style` | enum | `'neutral'` | The intent. Use one only when the number carries it. `inverse` is always neutral. |
+| `style` | enum | `'neutral'` | The intent. Use one only when the number carries it. `inverse` is always neutral. `positive`, `negative` and `information` are deprecated aliases for `success`, `danger` and `info`. |
 | `size` | enum | `'medium'` | `medium` (20) on its own; `small` (16) is for use inside a label. A dot is always 8. |
 | `ring` | bool | `false` | A 2px surface ring, for a count pinned to the corner of an icon or avatar. |
 | `label` | string | — | The accessible name. Required for `dot`; on a number it replaces the bare digits for screen readers. |
@@ -30,7 +30,7 @@
 
 **`appearance`** — `subtle` · `bold` · `inverse` · `dot`
 
-**`style`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery`
+**`style`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery` · `positive` · `negative` · `information`
 
 **`size`** — `medium` · `small`
 

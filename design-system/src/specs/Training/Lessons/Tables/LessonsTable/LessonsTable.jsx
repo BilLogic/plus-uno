@@ -155,7 +155,7 @@ const LessonsTable = ({
                                 {/* Competency Column */}
                                 <td className="lessons-table__cell">
                                     {lesson.competencyArea ? (
-                                        <StaticBadgeSmart type={lesson.competencyArea} size="b3" />
+                                        <StaticBadgeSmart type={lesson.competencyArea} />
                                     ) : (
                                         <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                                             {lesson.competency || 'N/A'}

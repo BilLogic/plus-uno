@@ -1,4 +1,2 @@
-import Status from './Status';
-
-export { Status };
-export default Status;
+export * from './Status';
+export { default } from './Status';
