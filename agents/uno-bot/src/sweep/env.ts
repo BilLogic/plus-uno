@@ -341,7 +341,7 @@ async function sweepDepsFor(
 
 /** The sweep's searches on `Env`, each measured: Notion, then GitHub code in
  *  the default repo when the Worker has a token for it. */
-function sweepSearchFor(env: Env): SourceSearch {
+export function sweepSearchFor(env: Env): SourceSearch {
   const repo = env.GITHUB_TOKEN ? resolveRepoFor(env, undefined) : null;
   return {
     async notion(query) {

@@ -62,10 +62,13 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * The end-of-day `card-follow-through` keeps a follow-up for each active
  * Roadmap card nobody owns or that has stopped moving; the morning
  * `commitment-nudge` asks about it (src/follow-through/).
- * DM watch's two, one job per person with a Home-tab switch on: the
+ * DM watch's two, one job per person with a promise switch on: the
  * end-of-day `dm-promise-read` reads that person's DMs with their own token,
  * and the morning `dm-promise-nudge` reminds them in their DM with uno-bot
- * (src/dm-watch/).
+ * (src/dm-watch/). DM Capture's two, one job per person with its switch on:
+ * the end-of-day `dm-capture-read` reads their DMs for drift and undocumented
+ * answers, and the morning `dm-capture-post` offers the fixes on a card in
+ * their DM with uno-bot that only they can confirm (src/dm-watch/capture.ts).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -88,7 +91,9 @@ export type ScheduledJobKind =
   | "team-roles-sync"
   | "card-follow-through"
   | "dm-promise-read"
-  | "dm-promise-nudge";
+  | "dm-promise-nudge"
+  | "dm-capture-read"
+  | "dm-capture-post";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -225,13 +230,15 @@ export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as con
  * `sweep:cards` — only while the sweep is on at all, so a blank list still
  * sweeps nothing. Both runs add one DM watch job per person in
  * `dmWatchers`: `dm-promise-read:<user>` at the end of the day,
- * `dm-promise-nudge:<user>` in the morning.
+ * `dm-promise-nudge:<user>` in the morning; and one per person in
+ * `dmCapturers`: `dm-capture-read:<user>`, then `dm-capture-post:<user>`.
  *
  * @param name - Which run
  * @param at - When it fires, epoch ms
  * @param sweepChannels - The channels to sweep (`sweepChannelsFrom`)
  * @param weekday - Plan this weekday's jobs instead (0 Sunday … 6 Saturday)
- * @param dmWatchers - Everyone with a DM watch switch on
+ * @param dmWatchers - Everyone with a DM promise switch on
+ * @param dmCapturers - Everyone with DM Capture on
  */
 export function planRun(
   name: ScheduledRunName,
@@ -239,6 +246,7 @@ export function planRun(
   sweepChannels: readonly string[] = [],
   weekday?: number,
   dmWatchers: readonly string[] = [],
+  dmCapturers: readonly string[] = [],
 ): ScheduledRun {
   const sweeps: ScheduledJob[] =
     name === "end-of-day" && sweepChannels.length
@@ -250,7 +258,11 @@ export function planRun(
         ]
       : [];
   const kind = name === "end-of-day" ? "dm-promise-read" : "dm-promise-nudge";
-  const dms = [...new Set(dmWatchers)].map((user): ScheduledJob => ({ key: `${kind}:${user}`, kind, user }));
+  const captureKind = name === "end-of-day" ? "dm-capture-read" : "dm-capture-post";
+  const dms = [
+    ...[...new Set(dmWatchers)].map((user): ScheduledJob => ({ key: `${kind}:${user}`, kind, user })),
+    ...[...new Set(dmCapturers)].map((user): ScheduledJob => ({ key: `${captureKind}:${user}`, kind: captureKind, user })),
+  ];
   // The sweep and DM jobs go before the purge, which stays last in every run.
   const plan = RUN_PLANS[name];
   const purge = plan.findIndex((j) => j.kind === "usage-text-purge");
@@ -301,8 +313,10 @@ export interface FiringDeps {
   enqueueRun(run: ScheduledRun): Promise<void>;
   /** The channels the end-of-day run sweeps (`sweepChannelsFrom`). */
   sweepChannels?: readonly string[];
-  /** Everyone with a DM watch switch on — read only when a run fires. */
+  /** Everyone with a DM promise switch on — read only when a run fires. */
   dmWatchers?(): Promise<readonly string[]>;
+  /** Everyone with DM Capture on — read only when a run fires. */
+  dmCapturers?(): Promise<readonly string[]>;
 }
 
 /**
@@ -324,7 +338,13 @@ export async function onScheduledFiring(scheduledTime: number, deps: FiringDeps)
         return [] as readonly string[];
       })
     : [];
-  const runs = names.map((name) => planRun(name, scheduledTime, deps.sweepChannels, undefined, watchers));
+  const capturers = deps.dmCapturers
+    ? await deps.dmCapturers().catch((err: unknown) => {
+        console.error(`[scheduled] DM Capture watchers could not be read: ${message(err)}`);
+        return [] as readonly string[];
+      })
+    : [];
+  const runs = names.map((name) => planRun(name, scheduledTime, deps.sweepChannels, undefined, watchers, capturers));
   await Promise.all(
     runs.map((run) =>
       deps.enqueueRun(run).catch((err: unknown) => {

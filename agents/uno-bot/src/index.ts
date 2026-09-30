@@ -17,6 +17,7 @@ import { onScheduledFiring, sweepChannelsFrom } from "./scheduled/runs";
 import { enqueueScheduledRun } from "./scheduled/jobs";
 import { runMetered } from "./net";
 import { dmWatchersFor } from "./dm-watch/env";
+import { dmCapturersFor } from "./dm-watch/capture-env";
 import * as diagnostics from "./diagnostics";
 
 export default {
@@ -32,8 +33,9 @@ export default {
         onScheduledFiring(controller.scheduledTime, {
           enqueueRun: (run) => enqueueScheduledRun(env, run),
           sweepChannels: sweepChannelsFrom(env.SWEEP_CHANNELS, env.UNO_BOT_CHANNEL_ID),
-          // One D1 read, only on a firing that starts a run.
+          // One D1 read each, only on a firing that starts a run.
           dmWatchers: () => dmWatchersFor(env),
+          dmCapturers: () => dmCapturersFor(env),
         }),
       ),
     );

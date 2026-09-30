@@ -46,7 +46,7 @@ export function dmWatchHomeBlocks(
     : [];
   return [
     { type: "divider" },
-    { type: "section", text: { type: "mrkdwn", text: "*Reminders from your DMs*" } },
+    { type: "section", text: { type: "mrkdwn", text: "*From your DMs*" } },
     ...warning,
     {
       type: "actions",
@@ -66,7 +66,7 @@ export function dmWatchHomeBlocks(
         {
           type: "mrkdwn",
           text:
-            "Off until you turn them on. I read your DMs with your own Slack link, each evening, and remind only you, here in our DM the next morning. I never message the other person. Turn one off and I stop, and drop what it was tracking.",
+            "Off until you turn them on. I read your DMs with your own Slack link, each evening, and tell only you, here in our DM the next morning: a reminder, or a page fix only you can confirm. I never message the other person. Turn one off and I stop, and drop what it was tracking.",
         },
       ],
     },

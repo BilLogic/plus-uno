@@ -26,6 +26,7 @@ import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv } from "../figma-drift/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
+import { runDmCapturePostOnEnv, runDmCaptureReadOnEnv } from "../dm-watch/capture-env";
 import { runAskResolution } from "../usage/resolution-env";
 import {
   FIRST_ASK_RESOLUTION_KEY,
@@ -188,6 +189,20 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "dm-promise-nudge": async (env, job, ctx) => {
     const report = await runDmPromiseNudgesOnEnv(env, job, ctx);
     console.log(`[dm-watch] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // End of day, one per person with DM Capture on: their own DMs, read with
+  // their own token, for drift and undocumented answers (src/dm-watch/capture.ts).
+  "dm-capture-read": async (env, job, ctx) => {
+    const report = await runDmCaptureReadOnEnv(env, job, ctx);
+    console.log(`[dm-capture] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning, one per person: what their DMs settled, on one card in their DM
+  // with uno-bot that only they can confirm.
+  "dm-capture-post": async (env, job, ctx) => {
+    const report = await runDmCapturePostOnEnv(env, job, ctx);
+    console.log(`[dm-capture] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.

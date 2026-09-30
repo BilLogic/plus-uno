@@ -156,9 +156,14 @@ export function createD1DmWatchRecords(deps: { db: SweepDatabase }): DmWatchReco
       on
         ? run(SWITCH_ON, userId, feature, at.now, at.readThrough)
         : run("DELETE FROM dm_watch WHERE user_id = ? AND feature = ?", userId, feature),
-    async watchers() {
+    async watchers(features) {
       chargeD1Query();
-      const { results } = await db.prepare("SELECT DISTINCT user_id FROM dm_watch ORDER BY user_id").bind().all<{ user_id: unknown }>();
+      const { results } = features
+        ? await db
+            .prepare("SELECT DISTINCT user_id FROM dm_watch WHERE feature IN (SELECT value FROM json_each(?)) ORDER BY user_id")
+            .bind(JSON.stringify(features))
+            .all<{ user_id: unknown }>()
+        : await db.prepare("SELECT DISTINCT user_id FROM dm_watch ORDER BY user_id").bind().all<{ user_id: unknown }>();
       return results.map((r) => String(r.user_id));
     },
     async positions(userId) {

@@ -7,7 +7,10 @@
 //     is `DM_WATCH_FEATURES`, in code: a new switch is a new value here and
 //     nowhere in the schema.
 //   • `dm_read_positions` — how far each DM of theirs has been read, one row
-//     per DM a night actually read.
+//     per DM a night actually read. Each job keeps its own positions under its
+//     own scope (`positionScope`): the promise jobs under the person's id, DM
+//     Capture under `<id>#capture`, so turning one on never skips what the
+//     other has already read.
 //   • `dm_commitments` — each promise read in those DMs: its permalink, when
 //     its next step is due, and its state, with the counts and reminder ts the
 //     morning schedules by. NO summary and NO id of the other person: the
@@ -27,10 +30,23 @@ import type { CommitmentState } from "../commitments/store";
  * until its owner turns it on.
  *   • `promises_made` — "Remind me about promises I make in my DMs";
  *   • `promises_to_me` — "Tell me when a promise made to me in my DMs looks
- *     overdue".
+ *     overdue";
+ *   • `dm_capture` — "Catch decisions from my DMs" (`./capture.ts`).
  */
-export const DM_WATCH_FEATURES = ["promises_made", "promises_to_me"] as const;
+export const DM_WATCH_FEATURES = ["promises_made", "promises_to_me", "dm_capture"] as const;
 export type DmWatchFeature = (typeof DM_WATCH_FEATURES)[number];
+
+/** The switches the promise jobs read for. */
+export const PROMISE_FEATURES: readonly DmWatchFeature[] = ["promises_made", "promises_to_me"];
+
+/** The switch DM Capture reads for. */
+export const CAPTURE_FEATURE = "dm_capture" satisfies DmWatchFeature;
+
+/** Whose read positions a switch's job keeps: the promise jobs share the
+ *  person's own; DM Capture keeps its own beside them. */
+export function positionScope(userId: string, feature: DmWatchFeature): string {
+  return feature === CAPTURE_FEATURE ? `${userId}#capture` : userId;
+}
 
 /** Whether a stored or submitted value names a switch this Worker knows. */
 export function isDmWatchFeature(value: unknown): value is DmWatchFeature {
@@ -121,14 +137,15 @@ export interface DmWatchRecords {
   /** Turn a switch on (counting from `readThrough` onward) or off. On again
    *  when it is already on keeps its place. */
   setSwitch(userId: string, feature: DmWatchFeature, on: boolean, at: { now: number; readThrough: string }): Promise<void>;
-  /** Everyone with at least one switch on — one scheduled job each. */
-  watchers(): Promise<string[]>;
-  /** How far each DM of theirs has been read, by DM id. */
-  positions(userId: string): Promise<Record<string, DmReadPosition>>;
+  /** Everyone with at least one of these switches on (any, when absent) —
+   *  one scheduled job each. */
+  watchers(features?: readonly DmWatchFeature[]): Promise<string[]>;
+  /** How far each DM has been read under this scope (`positionScope`), by DM id. */
+  positions(scope: string): Promise<Record<string, DmReadPosition>>;
   /** Record how far these DMs have been read, in one statement. */
-  savePositions(userId: string, positions: Readonly<Record<string, DmReadPosition>>): Promise<void>;
-  /** Forget how far their DMs were read — their last switch went off. */
-  clearPositions(userId: string): Promise<void>;
+  savePositions(scope: string, positions: Readonly<Record<string, DmReadPosition>>): Promise<void>;
+  /** Forget how far this scope's DMs were read — its switches went off. */
+  clearPositions(scope: string): Promise<void>;
 
   /** Insert, keeping a row already there. */
   addCommitments(rows: DmCommitmentRecord[]): Promise<void>;

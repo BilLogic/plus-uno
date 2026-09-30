@@ -1,4 +1,5 @@
-// DM watch on `Env` — the only file in the folder that names it.
+// DM watch on `Env` — with `./capture-env.ts`, DM Capture's half, the only
+// files in the folder that name it.
 //
 // What each port becomes:
 //   • The records: `dm_watch` and `dm_commitments` in the usage database.
@@ -11,6 +12,8 @@
 //     `conversations.replies` to read a reminder back for its answer.
 //   • The detector and the judge: `selectProvider(env)`.
 //   • A night's progress: HARNESS_KV, for a day.
+//   • DM Capture's queue: HARNESS_KV, one key per person, for two weeks
+//     (`dmCaptureQueueFor`).
 //
 // A Worker without USAGE_DB keeps no switches and runs no DM jobs.
 
@@ -24,6 +27,7 @@ import { measured } from "../sweep/env";
 import type { SweepSlackMessage } from "../sweep/run";
 import { modelCommitmentDetector, modelEvidenceJudge } from "../commitments/detector";
 import { createD1DmWatchRecords } from "./d1";
+import type { DmCaptureFinding, DmCaptureQueue } from "./capture";
 import {
   accessOf,
   answerDmReminder,
@@ -36,18 +40,26 @@ import {
   type ReadProgress,
   type SetDmWatchResult,
 } from "./run";
-import type { DmWatchFeature, DmWatchRecords } from "./store";
+import { PROMISE_FEATURES, type DmWatchFeature, type DmWatchRecords } from "./store";
 
 const PROGRESS_TTL_S = 2 * 24 * 60 * 60;
+/** DM Capture's queue: one key per person, `dm-watch:capture:<user>` — never
+ *  under the sweep's `sweep:findings:`, so the channel sweep's morning never
+ *  sees a DM finding. */
+const CAPTURE_KV_PREFIX = "dm-watch:capture:";
+/** A DM finding, carded or not, is forgotten after two weeks: long enough to
+ *  wait out a live card, and to keep a carded fix from being offered twice. */
+const CAPTURE_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
 
 /** The records, or null without the usage database. */
 export function dmWatchRecordsFor(env: Env): DmWatchRecords | null {
   return env.USAGE_DB ? createD1DmWatchRecords({ db: env.USAGE_DB }) : null;
 }
 
-/** Everyone with a switch on, for the scheduled firing; none when unbound. */
+/** Everyone with a promise switch on, for the scheduled firing; none when
+ *  unbound. */
 export async function dmWatchersFor(env: Env): Promise<string[]> {
-  return (await dmWatchRecordsFor(env)?.watchers()) ?? [];
+  return (await dmWatchRecordsFor(env)?.watchers(PROMISE_FEATURES)) ?? [];
 }
 
 /** Whether this person has connected a token of their own. */
@@ -76,11 +88,16 @@ export async function dmWatchHomeStateFor(env: Env, userId: string): Promise<{ c
 export async function setDmWatchOnEnv(env: Env, userId: string, selected: readonly DmWatchFeature[]): Promise<SetDmWatchResult> {
   const records = dmWatchRecordsFor(env);
   if (!records) return { on: [] };
-  return setDmWatch(userId, selected, { records, access: (id) => accessOf(id, ownerSlackFor(env)), now: () => Date.now() });
+  return setDmWatch(userId, selected, {
+    records,
+    access: (id) => accessOf(id, ownerSlackFor(env)),
+    now: () => Date.now(),
+    dropCapture: (id) => dmCaptureQueueFor(env)?.clear(id) ?? Promise.resolve(),
+  });
 }
 
 /** The owner's own-token reads, or null without a token of their own. */
-function ownerSlackFor(env: Env): (userId: string) => Promise<OwnerSlack | null> {
+export function ownerSlackFor(env: Env): (userId: string) => Promise<OwnerSlack | null> {
   return async (userId) => {
     const credential = await getSlackAccessTokenFor(env, userId);
     if (!credential?.own) return null;
@@ -135,7 +152,7 @@ function ownerSlackFor(env: Env): (userId: string) => Promise<OwnerSlack | null>
   };
 }
 
-function progressIn(kv: KVNamespace): ReadProgress {
+export function progressIn(kv: KVNamespace): ReadProgress {
   return {
     async get(key) {
       charge(1, "kv");
@@ -222,4 +239,28 @@ export function dmReminderDoorFor(env: Env): ((r: DmReminderReaction) => Promise
       botUserId: async () => (await getBotIdentity(env))?.userId,
       now: () => Date.now(),
     });
+}
+
+/** DM Capture's queue in HARNESS_KV (text, with an expiry — never D1), or
+ *  null when unbound. */
+export function dmCaptureQueueFor(env: Env): DmCaptureQueue | null {
+  const kv = env.HARNESS_KV;
+  if (!kv) return null;
+  const key = (owner: string) => `${CAPTURE_KV_PREFIX}${owner}`;
+  return {
+    async load(owner) {
+      charge(1, "kv");
+      const all = (await kv.get<DmCaptureFinding[]>(key(owner), "json")) ?? [];
+      return all.filter((f) => Date.now() - f.detectedAt <= CAPTURE_MAX_AGE_MS);
+    },
+    async save(owner, findings) {
+      charge(1, "kv");
+      if (findings.length) await kv.put(key(owner), JSON.stringify(findings), { expirationTtl: CAPTURE_MAX_AGE_MS / 1000 });
+      else await kv.delete(key(owner));
+    },
+    async clear(owner) {
+      charge(1, "kv");
+      await kv.delete(key(owner));
+    },
+  };
 }
