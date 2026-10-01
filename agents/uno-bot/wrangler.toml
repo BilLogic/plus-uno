@@ -344,9 +344,11 @@ LEAD_USER_ID = "U03FYQJRQHX"
 #       github_workflow_run, which starts a listed workflow, and
 #       github_read / github_intake_search on each listed repo.
 #   FIGMA_ACCESS_TOKEN
-#       Figma read PAT. Two consumers: the proposal screenshot fetch in
-#       events.ts, and the library poll's component/version reads on the
-#       cron.
+#       Figma personal access token, used only through the Figma client
+#       (src/figma/): frame reads and renders, the library poll, the DS
+#       precedence check and the drift publisher. It shares one budget per
+#       rate-limit tier with Bill's other tokens, which the client paces
+#       at half.
 #   NOTION_API_KEY
 #       Notion internal integration token — notion_create/update/archive
 #       plus every notion_search catalog read. Each database must also be

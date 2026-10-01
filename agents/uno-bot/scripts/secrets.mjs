@@ -45,7 +45,7 @@ export const SECRETS = [
   {
     name: "FIGMA_ACCESS_TOKEN",
     required: true,
-    why: "Figma read PAT. Two consumers: the proposal screenshot fetch in events.ts, and the library poll's component/version reads on the cron.",
+    why: "Figma personal access token, used only through the Figma client (src/figma/): frame reads and renders, the library poll, the DS precedence check and the drift publisher. It shares one budget per rate-limit tier with Bill's other tokens, which the client paces at half.",
   },
   {
     name: "NOTION_API_KEY",
