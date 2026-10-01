@@ -14,7 +14,8 @@ import { proposalEventLogFor } from "../usage/production";
 import type { PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { githubLibraryReads, resolveRepoFor } from "../integrations/github";
-import { FINDINGS_KV_KEY, figmaGet, kvJson, type FigmaComponentsResponse } from "../figma-poll";
+import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
+import { figmaClientFor } from "../figma/production";
 import { channelMembers, REGISTRY_PATH, TRACKED_KV_KEY } from "../figma-library/env";
 import type { LibraryChangeSet } from "../figma-library/draft";
 import type { TrackedPublish } from "../figma-library/track";
@@ -49,7 +50,8 @@ const INDEX_FILE = "design-system/agent-views/components/index.md";
  * @param opts - `dryRun` writes nothing; `runDate` is the week the report is labelled with
  */
 export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<CheckResult> {
-  if (!env.FIGMA_ACCESS_TOKEN || !env.FIGMA_FILE_KEY) {
+  const figma = figmaClientFor(env);
+  if (!figma || !env.FIGMA_FILE_KEY) {
     return { found: 0, summary: "FIGMA_ACCESS_TOKEN / FIGMA_FILE_KEY not configured — check skipped" };
   }
   if (!env.HARNESS_KV) return { found: 0, summary: "HARNESS_KV not bound — nowhere to keep the report; check skipped" };
@@ -63,7 +65,7 @@ export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<
         indexMarkdown: () => reads.rawFile(INDEX_FILE),
         registry: async () => JSON.parse(await reads.rawFile(REGISTRY_PATH)) as PrecedenceRegistry,
       },
-      figma: { components: () => figmaGet<FigmaComponentsResponse>(env, `/files/${fileKey}/components`) },
+      figma,
       report: kvJson<PrecedenceReport | null>(env, REPORT_KV_KEY, null),
       inFlight: async (registry) =>
         inFlightComponents(

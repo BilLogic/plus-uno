@@ -43,6 +43,8 @@ import type { ProposalCard } from "../turn/index";
 import type { ChannelKind, TargetKind } from "../sweep/finding";
 import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
 import { postableAt } from "../sweep/schedule";
+import type { FigmaClient, FigmaVersionsResponse } from "../figma/client";
+import { versionsFrom } from "../figma-poll";
 import {
   askLine,
   cardTerms,
@@ -72,6 +74,17 @@ export const MAX_FILES_PER_CARD = 5;
 export const MAX_QUESTIONS_PER_MORNING = 4;
 /** How long a mark with no card holds its file for a try still posting. */
 const POSTING_HOLD_MS = 60 * 60 * 1000;
+
+/**
+ * Who last published a file: the author of its newest named version, or null
+ * when Figma names nobody. Autosaves are not publishes (`versionsFrom`).
+ *
+ * @param result - The file's `/versions` body
+ */
+export function publisherOf(result: FigmaVersionsResponse): { handle: string; at: string } | null {
+  const [newest] = versionsFrom(result);
+  return newest && newest.user !== "Unknown" ? { handle: newest.user, at: newest.createdAt } : null;
+}
 
 /** Where one file's intake is drafted, while its card may be live. */
 export interface IntakeMark {
@@ -136,8 +149,9 @@ export interface DriftPostDeps {
   cardLive(proposalTs: string): Promise<boolean>;
   /** Whether a thread already holds a live drift card. */
   threadBusy(channel: string, threadTs: string): Promise<boolean>;
-  /** Who last published a Figma file, or null when unread. */
-  publisher(fileKey: string): Promise<{ handle: string; at: string } | null>;
+  /** The Figma client, for who last published a file (`publisherOf`). Without
+   *  one, no card names a publisher. */
+  figma?: Pick<FigmaClient, "versions">;
   /** The Roadmap's Product Pillar options, or null when unread. */
   pillarOptions(): Promise<string[] | null>;
   config: TeamChannels & { unoBot?: string };
@@ -362,12 +376,16 @@ async function askWithCard(
   for (const [i, d] of drafted.entries()) {
     const f = d.here;
     const figmaKey = f.fileKey.startsWith("figma:") ? f.fileKey.slice("figma:".length) : null;
-    const publisher = figmaKey
-      ? await deps.publisher(figmaKey).catch((err: unknown) => {
-          rethrowIfBudget(err);
-          return null;
-        })
-      : null;
+    const publisher =
+      figmaKey && deps.figma
+        ? await deps.figma
+            .versions(figmaKey)
+            .then(publisherOf)
+            .catch((err: unknown) => {
+              rethrowIfBudget(err);
+              return null;
+            })
+        : null;
     const candidates = pillarCandidates(d.all);
     const choice =
       f.lane === "roadmap" && candidates.length

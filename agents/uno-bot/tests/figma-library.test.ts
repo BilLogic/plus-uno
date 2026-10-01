@@ -3,21 +3,18 @@
 // resolves that card for the channel's members only, and the tracker links
 // the implementation PR back and closes the intake on merge.
 //
-// The Figma side is a recorded /components + /versions pair, run through the
-// same parsers the Worker uses (`componentsFrom`, `versionsFrom`), so the diff
-// is the real one. Slack, GitHub and KV are the jobs' named dependencies.
+// The Figma side is a recorded /components + /versions pair served by the
+// shared fake Figma (`src/figma/in-memory.ts`), and run through the same
+// parsers the Worker uses (`componentsFrom`, `versionsFrom`), so the diff is
+// the real one. Slack, GitHub and KV are the jobs' named dependencies.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import {
-  componentsFrom,
-  pollFigmaLibrary,
-  versionsFrom,
-  type FigmaComponentsResponse,
-  type FigmaVersionsResponse,
-  type PollDeps,
-  type Snapshot,
-} from "../src/figma-poll";
+import { componentsFrom, pollFigmaLibrary, type PollDeps, type Snapshot } from "../src/figma-poll";
+import { FigmaRequestError, type FigmaComponentsResponse, type FigmaVersionsResponse } from "../src/figma/client";
+import { createInMemoryFigma } from "../src/figma/in-memory";
+import type { FigmaNode } from "../src/integrations/figma-reading";
+import { SubrequestBudgetError } from "../src/net";
 import { draftPublishIntake, type ComponentRegistry, type LibraryChangeSet } from "../src/figma-library/draft";
 import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostDeps } from "../src/figma-library/post";
 import { implementPrTitle, trackLibraryIntakes, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
@@ -120,18 +117,26 @@ function pollDeps(today: FigmaComponentsResponse, findings = kv<LibraryChangeSet
     nodeHashes: {},
   };
   const snapshot = kv<Snapshot | null>(yesterday);
+  const figma = createInMemoryFigma();
+  figma.seedFile(FILE_KEY, { components: today, versions: VERSIONS });
   const deps: PollDeps = {
-    figma: {
-      components: async () => componentsFrom(today),
-      versions: async () => versionsFrom(VERSIONS),
-      nodeHashes: async () => ({}),
-    },
+    figma,
     snapshot,
     findings,
     fileKey: FILE_KEY,
     now: () => Date.UTC(2026, 8, 29, 22, 0),
   };
-  return { deps, snapshot, findings };
+  return { deps, snapshot, findings, figma };
+}
+
+/** Yesterday's publish only: the version the snapshot already knows. */
+const KNOWN_VERSION_ONLY: FigmaVersionsResponse = { versions: [VERSIONS.versions![2]!] };
+
+/** One node per component in `library`, each with one text layer `label`. */
+function nodesOf(library: FigmaComponentsResponse, label: (nodeId: string) => string): Record<string, FigmaNode> {
+  return Object.fromEntries(
+    componentsFrom(library).map((c) => [c.nodeId, { name: c.name, type: "COMPONENT", children: [{ type: "TEXT", characters: label(c.nodeId) }] }]),
+  );
 }
 
 /** The morning post on fakes, staging into a real in-memory ThreadState. */
@@ -182,9 +187,9 @@ describe("the end-of-day poll", () => {
   });
 
   it("finds nothing on a quiet day, and posts nothing the next morning", async () => {
-    const { deps, findings } = pollDeps(BEFORE);
+    const { deps, findings, figma } = pollDeps(BEFORE);
     // Same components, and the only new version is the one already known.
-    deps.figma.versions = async () => versionsFrom({ versions: [VERSIONS.versions![2]!] });
+    figma.seedFile(FILE_KEY, { versions: KNOWN_VERSION_ONLY });
     const result = await pollFigmaLibrary(deps);
     assert.equal(result.summary, "no changes since last check");
     assert.deepEqual(findings.writes, []);
@@ -196,11 +201,63 @@ describe("the end-of-day poll", () => {
     assert.deepEqual(morning.staged, []);
   });
 
+  it("asks Figma twice on a quiet day: the library's components and its versions", async () => {
+    const { deps, figma } = pollDeps(BEFORE);
+    figma.seedFile(FILE_KEY, { versions: KNOWN_VERSION_ONLY });
+    await pollFigmaLibrary(deps);
+    assert.deepEqual(
+      figma.calls().map((c) => [c.method, c.args[0]]),
+      [
+        ["components", FILE_KEY],
+        ["versions", FILE_KEY],
+      ],
+    );
+  });
+
   it("writes nothing on a dry run", async () => {
     const { deps, snapshot, findings } = pollDeps(AFTER);
     await pollFigmaLibrary(deps, { dryRun: true });
     assert.deepEqual(findings.writes, []);
     assert.deepEqual(snapshot.writes, []);
+  });
+
+  it("finds a change the metadata does not show, through the node hashes", async () => {
+    const snapshot = kv<Snapshot | null>(null);
+    const findings = kv<LibraryChangeSet[]>([]);
+    const figma = createInMemoryFigma();
+    figma.seedFile(FILE_KEY, { components: BEFORE, versions: KNOWN_VERSION_ONLY, nodes: nodesOf(BEFORE, () => "Label") });
+    const deps: PollDeps = { figma, snapshot, findings, fileKey: FILE_KEY, now: () => Date.UTC(2026, 8, 29, 22, 0) };
+
+    // The first poll stores the baseline: four components, one /nodes call.
+    await pollFigmaLibrary(deps);
+    assert.equal(Object.keys(snapshot.value!.nodeHashes).length, 4);
+
+    // A publish that changes the small Badge's look and no component's name.
+    figma.seedFile(FILE_KEY, { versions: VERSIONS, nodes: nodesOf(BEFORE, (id) => (id === "20:1" ? "Label, bolder" : "Label")) });
+    const result = await pollFigmaLibrary(deps);
+    assert.equal(result.modified, 1);
+    assert.deepEqual(findings.value[0]!.modified.map((c) => c.name), ["Size=sm"]);
+    assert.deepEqual(
+      figma.calls().filter((c) => c.method === "nodes").map((c) => c.args[2]),
+      [{ geometry: "paths" }, { geometry: "paths" }],
+    );
+  });
+
+  it("leaves out a hash chunk Figma refuses, and still advances", async () => {
+    const { deps, snapshot, figma } = pollDeps(BEFORE);
+    figma.failNext("nodes", new FigmaRequestError(500, "Figma nodes 500: Internal error"));
+    const result = await pollFigmaLibrary(deps);
+    assert.match(result.summary, /versions:1/);
+    assert.deepEqual(snapshot.value?.nodeHashes, {});
+    assert.deepEqual(snapshot.value?.versionIds, ["2210000000000000002", "2210000000000000001"]);
+  });
+
+  it("stops on a budget stop in the hashes before writing anything, so the retry still sees the publish", async () => {
+    const { deps, snapshot, findings, figma } = pollDeps(BEFORE);
+    figma.failNext("nodes", new SubrequestBudgetError(38));
+    await assert.rejects(pollFigmaLibrary(deps), SubrequestBudgetError);
+    assert.deepEqual(snapshot.writes, []);
+    assert.deepEqual(findings.writes, []);
   });
 });
 

@@ -9,7 +9,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import type { FigmaComponentsResponse } from "../src/figma-poll";
+import type { FigmaComponentsResponse } from "../src/figma/client";
+import { createInMemoryFigma } from "../src/figma/in-memory";
 import {
   findDisagreements,
   inFlightComponents,
@@ -245,9 +246,11 @@ function kv<T>(initial: T) {
 }
 
 function checkDeps(library: FigmaComponentsResponse, report = kv<PrecedenceReport | null>(null)) {
+  const figma = createInMemoryFigma();
+  figma.seedFile(FILE_KEY, { components: library });
   const deps: CheckDeps = {
     github: { indexMarkdown: async () => INDEX_MD, registry: async () => REGISTRY },
-    figma: { components: async () => library },
+    figma,
     report: report.store,
     inFlight: async () => new Set<string>(),
     fileKey: FILE_KEY,

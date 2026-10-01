@@ -1,15 +1,14 @@
-// Worker-safe Figma helpers. Uses only the WHATWG `URL` + `fetch` globals
-// (both available in the Workers runtime) — no Node APIs.
+// Figma reads for a pasted frame link, over the Figma client (`src/figma/`).
 //
 // `parseFigmaUrl` validates/splits a pasted Figma link (used by the executor
-// and the proposal preview). `fetchFigmaImagePngUrl` renders a node to a PNG
-// for the Slack proposal preview.
+// and the proposal preview). `fetchFigmaNode` reads a frame's text for
+// `source_read`; `fetchFigmaImagePngUrl` renders a node to a PNG for vision
+// and the Slack proposal preview. Each takes the client rather than `Env`, so
+// tests drive them over the shared fake.
 
-import type { Env } from "../types";
-import { countedFetch } from "../net";
-import { collectTextLayers, type FigmaNode } from "./figma-reading";
+import type { FigmaCallOptions, FigmaClient } from "../figma/client";
+import { collectTextLayers } from "./figma-reading";
 
-const FIGMA_API = "https://api.figma.com";
 const IMAGE_FETCH_TIMEOUT_MS = 8000;
 const NODE_FETCH_TIMEOUT_MS = 8000;
 
@@ -31,28 +30,21 @@ export interface FigmaNodeContent {
 
 
 /**
- * Read a Figma node's structure + text layers via the REST API (for review /
- * inspection — distinct from the PNG preview). Throws on a missing token or a
- * non-2xx/err response so the caller can surface an honest "couldn't read it".
+ * Read a Figma node's structure + text layers (for review / inspection —
+ * distinct from the PNG preview). Throws on a missing client or a refusal the
+ * client's retries did not get past, so the caller can surface an honest
+ * "couldn't read it".
+ *
+ * @param figma - The Figma client; undefined when the Worker has no token
  */
 export async function fetchFigmaNode(
-  env: Env,
+  figma: Pick<FigmaClient, "nodes"> | undefined,
   fileKey: string,
   nodeId: string,
 ): Promise<FigmaNodeContent> {
-  if (!env.FIGMA_ACCESS_TOKEN) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
+  if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
 
-  const url = `${FIGMA_API}/v1/files/${fileKey}/nodes?ids=${encodeURIComponent(nodeId)}`;
-  const res = await countedFetch(url, {
-    headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
-  }, NODE_FETCH_TIMEOUT_MS);
-  const data = (await res.json().catch(() => ({}))) as {
-    err?: string | null;
-    nodes?: Record<string, { document?: FigmaNode } | undefined>;
-  };
-  if (!res.ok || data.err) {
-    throw new Error(`Figma nodes ${res.status}${data.err ? `: ${data.err}` : ""}`);
-  }
+  const data = await figma.nodes(fileKey, [nodeId], { timeoutMs: NODE_FETCH_TIMEOUT_MS });
   const doc = data.nodes?.[nodeId]?.document;
   if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
   const { texts, truncated } = collectTextLayers(doc);
@@ -61,49 +53,39 @@ export async function fetchFigmaNode(
 
 export { parseFigmaUrl, type FigmaUrlParts } from "./figma-reading";
 
+/** How a render may be bounded: its scale, and the client's wait and attempts. */
+export type FigmaRenderOptions = Pick<FigmaCallOptions, "maxWaitMs" | "attempts"> & { scale?: 1 | 2 };
+
 /**
- * Render a Figma node to a PNG and return its signed URL, for the Slack
- * proposal preview. Best-effort: returns null (never throws) on a missing
- * token, a non-2xx response, a Figma `err`, or an 8s timeout — the caller
- * posts the proposal without an image rather than blocking on it.
+ * Render a Figma node to a PNG and return its signed URL, for vision and the
+ * Slack proposal preview. Best-effort: returns null (never throws) on a
+ * missing client, any refusal, a Figma `err`, or an 8s timeout — the caller
+ * goes on without an image rather than blocking on it. How long it may wait
+ * for the rate budget is the caller's (`opts`).
  *
  * The returned URL is a short-lived (~30 min) signed S3 link; Slack mirrors it
  * into its own CDN at post time, so expiry after posting doesn't matter.
+ *
+ * @param figma - The Figma client; undefined when the Worker has no token
  */
 export async function fetchFigmaImagePngUrl(
-  env: Env,
+  figma: Pick<FigmaClient, "images"> | undefined,
   fileKey: string,
   nodeId: string,
-  scale: 1 | 2 = 1,
+  opts: FigmaRenderOptions = {},
 ): Promise<string | null> {
-  if (!env.FIGMA_ACCESS_TOKEN) {
+  if (!figma) {
     console.warn("[figma] FIGMA_ACCESS_TOKEN not set — skipping preview image");
     return null;
   }
 
-  const params = new URLSearchParams({ ids: nodeId, format: "png", scale: String(scale) });
-  const url = `${FIGMA_API}/v1/images/${fileKey}?${params.toString()}`;
-
+  const { scale = 1, ...call } = opts;
   try {
-    const res = await countedFetch(url, {
-      headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
-    }, IMAGE_FETCH_TIMEOUT_MS);
-    if (!res.ok) {
-      console.warn(`[figma] images ${fileKey} ${nodeId} -> ${res.status}`);
-      return null;
-    }
-    const data = (await res.json()) as {
-      err?: string | null;
-      images?: Record<string, string | null>;
-    };
-    if (data.err) {
-      console.warn(`[figma] images err: ${data.err}`);
-      return null;
-    }
+    const data = await figma.images(fileKey, [nodeId], { format: "png", scale, timeoutMs: IMAGE_FETCH_TIMEOUT_MS, ...call });
     // The images map is keyed by the node id exactly as requested.
     return data.images?.[nodeId] ?? null;
   } catch (err) {
-    console.warn(`[figma] image fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+    console.warn(`[figma] images ${fileKey} ${nodeId} failed: ${err instanceof Error ? err.message : String(err)}`);
     return null;
   }
 }

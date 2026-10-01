@@ -48,7 +48,7 @@
 import type { PendingProposal } from "../thread-state/index";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
-import type { FigmaComponentsResponse } from "../figma-poll";
+import type { FigmaClient } from "../figma/client";
 import type { JobContext } from "../scheduled/runs";
 import {
   findDisagreements,
@@ -132,7 +132,8 @@ export interface CheckDeps extends Pick<JobContext, "runDate"> {
     /** design-system/figma/component-registry.json */
     registry(): Promise<PrecedenceRegistry>;
   };
-  figma: { components(): Promise<FigmaComponentsResponse> };
+  /** The Figma client: the library file's components. */
+  figma: Pick<FigmaClient, "components">;
   report: Store<PrecedenceReport | null>;
   /** Components a library publish is still carrying. */
   inFlight(registry: PrecedenceRegistry): Promise<Set<string>>;
@@ -156,7 +157,7 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
   const [markdown, registry, components] = await Promise.all([
     deps.github.indexMarkdown(),
     deps.github.registry(),
-    deps.figma.components(),
+    deps.figma.components(deps.fileKey),
   ]);
   const index = parseComponentIndex(markdown);
   if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
