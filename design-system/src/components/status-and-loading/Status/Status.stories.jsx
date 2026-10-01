@@ -20,8 +20,9 @@ import Status, { STATUS_DATE_STYLES, STATUS_SIZES, STATUS_STYLES, STATUS_TYPES }
  */
 
 export default {
-    title: 'Components/Status and loading/Status',
+    title: 'Components/Status and loading/Status, Count & Tag/Status',
     component: Status,
+    tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
             { date: '2026-09-29', kind: 'deprecated', summary: '`style` started accepting `positive`, `negative` and `information` as deprecated aliases for `success`, `danger` and `info`, rendering the same and warning in development.' },
