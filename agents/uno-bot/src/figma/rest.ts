@@ -372,8 +372,9 @@ async function body<T>(what: string, res: Response): Promise<T> {
   let parsed: unknown;
   try {
     parsed = await res.json();
-  } catch {
-    throw new FigmaRequestError(res.status, `Figma ${what} ${res.status}: the body was not JSON`);
+  } catch (err) {
+    // Not JSON, or the read was cut off (the attempt's timeout covers the body).
+    throw new FigmaRequestError(res.status, `Figma ${what} ${res.status}: the body could not be read (${messageOf(err)})`);
   }
   const err = (parsed as { err?: unknown } | null)?.err;
   if (typeof err === "string" && err) {

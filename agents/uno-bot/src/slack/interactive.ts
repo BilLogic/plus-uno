@@ -24,7 +24,7 @@
 import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
-import { restageFor } from "../turn/env-deps";
+import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postToResponseUrl } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
@@ -152,7 +152,9 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
     applyVerdict: (verdict) => executeVerdict(env, verdict),
     replyEphemeral: (text) => replyEphemeral(payload, text),
     replaceCard: (text, note) => replaceCard(payload, text, note),
-    restage: restageFor(env, threadState),
+    // This door runs inside `waitUntil`, so a re-staged card's preview waits
+    // only briefly for the Figma rate budget.
+    restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
   };
 }
 

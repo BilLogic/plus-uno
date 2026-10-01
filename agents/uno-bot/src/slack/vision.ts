@@ -24,10 +24,11 @@ import {
 const MAX_IMAGE_ATTACHMENTS = 3;
 const MAX_IMAGE_BYTES = Math.floor(3.5 * 1024 * 1024); // Anthropic per-image limit is ~5MB; stay well under
 const IMAGE_FETCH_TIMEOUT_MS = 10_000;
-// The reply waits on the render, so it may wait only so long for the Figma
-// rate budget, and a hung render is tried once more, not twice: a first 429
-// is still retried, and the turn goes on text-first if that fails too.
-const FIGMA_RENDER = { maxWaitMs: 10_000, attempts: 2 } as const;
+// The turn runs in the AgentRunner's alarm, outside `waitUntil`, so a first
+// 429 on the render is waited out (up to the client's 60 s) rather than read
+// as "screenshot unavailable" (#892). A hung render is tried once more, not
+// twice, since the reply waits on it.
+const FIGMA_RENDER = { attempts: 2 } as const;
 // The Anthropic API only accepts these four image media types — anything else
 // (svg, tiff, heic…) would 400 the whole request, so it's skipped like oversize.
 const SUPPORTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);

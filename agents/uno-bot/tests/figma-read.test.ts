@@ -34,6 +34,7 @@ import { fetchFigmaImagePngUrl, fetchFigmaNode } from "../src/integrations/figma
 import { FigmaRequestError } from "../src/figma/client";
 import { createInMemoryFigma } from "../src/figma/in-memory";
 import { createFigmaRestClient } from "../src/figma/rest";
+import { PREVIEW_UNDER_WAIT_UNTIL } from "../src/turn/env-deps";
 
 
 /** A frame with `n` TEXT descendants, nested so the walk has to recurse. */
@@ -212,5 +213,53 @@ describe("a frame read over the Figma client", () => {
     const figma = seeded();
     await fetchFigmaImagePngUrl(figma, FILE, NODE, { maxWaitMs: 0, attempts: 1 });
     assert.deepEqual(figma.calls()[0]!.args[2], { format: "png", scale: 1, timeoutMs: 8000, maxWaitMs: 0, attempts: 1 });
+  });
+});
+
+describe("a render's first 429", () => {
+  const FILE = "AbC123xyz";
+  const NODE = "158:21725";
+  const RENDERED = "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/frame.png";
+
+  /** A REST client whose Figma answers a 429 with `retryAfter`, then the render. */
+  function rateLimitedOnce(retryAfter: string) {
+    const answers = [
+      new Response(JSON.stringify({ status: 429, err: "Rate limit exceeded" }), { status: 429, headers: { "retry-after": retryAfter } }),
+      new Response(JSON.stringify({ err: null, images: { [NODE]: RENDERED } }), { status: 200 }),
+    ];
+    const clock = { t: 0 };
+    const sentAt: number[] = [];
+    const figma = createFigmaRestClient({
+      token: "figd_test",
+      now: () => clock.t,
+      async sleep(ms) {
+        clock.t += ms;
+      },
+      async transport() {
+        sentAt.push(clock.t);
+        return answers.shift()!;
+      },
+    });
+    return { figma, sentAt };
+  }
+
+  it("is waited out where a turn renders — vision, and a turn's card preview", async () => {
+    // Both pass two attempts and the client's 60 s wait (`slack/vision.ts`,
+    // `turn/env-deps.ts`), so a 30 s Retry-After still renders.
+    const { figma, sentAt } = rateLimitedOnce("30");
+    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, { attempts: 2 }), RENDERED);
+    assert.deepEqual(sentAt, [0, 30000]);
+  });
+
+  it("is waited out briefly where the button door re-stages a card inside waitUntil", async () => {
+    const { figma, sentAt } = rateLimitedOnce("3");
+    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, PREVIEW_UNDER_WAIT_UNTIL), RENDERED);
+    assert.deepEqual(sentAt, [0, 3000]);
+  });
+
+  it("gives the re-staged card no preview at once when the wait would run past waitUntil", async () => {
+    const { figma, sentAt } = rateLimitedOnce("30");
+    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, PREVIEW_UNDER_WAIT_UNTIL), null);
+    assert.deepEqual(sentAt, [0], "no second attempt, and no sleep");
   });
 });
