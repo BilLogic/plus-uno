@@ -82,6 +82,44 @@ cleanup('nl-conv');
 // Review/critique phrasings never trigger the build gate
 assert.equal(run('review this prototype').continue, true);
 
+// Meta-discussion about the skill/hook itself never triggers the build gate
+// (regression: a bare "uno-prototype" substring used to match regardless of
+// context, so a sentence about fixing the gate's own triggering re-triggered
+// the gate it was describing).
+for (const phrase of [
+  'make sure uno-prototype only starts the prd gate when truly starting a new project',
+  'fix the uno-prototype hook so it stops over-triggering',
+  'debug why the uno-prototype gate fired on this message',
+  'update the prd gate logic in intents.mjs',
+]) {
+  cleanup('meta-conv');
+  const meta = run(phrase, 'meta-conv');
+  assert.equal(meta.continue, true, `expected pass-through for: ${phrase}`);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `expected no intake for: ${phrase}`);
+}
+cleanup('meta-conv');
+
+// Continuing/updating an ALREADY-EXISTING prototype never triggers the build
+// gate — only starting something new does.
+for (const phrase of [
+  'continue working on the onboarding prototype',
+  'update the existing parent portal prototype',
+  'fix the tutor inbox prototype',
+  'iterate on this prototype',
+]) {
+  cleanup('continue-conv');
+  const cont = run(phrase, 'continue-conv');
+  assert.equal(cont.continue, true, `expected pass-through for: ${phrase}`);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `expected no intake for: ${phrase}`);
+}
+cleanup('continue-conv');
+
+// A genuinely new build request still triggers, even when it shares
+// vocabulary ("prototype") with the continuation phrasings above.
+run('build a new prototype for the parent portal', 'new-conv');
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, 'expected intake for a genuinely new build request');
+cleanup('new-conv');
+
 // Inline PRD in the first message still starts at the PRD check choice (no skip)
 const inlinePrd =
   'prototype this student dashboard\n\nPRD: Student Dashboard\nAcceptance criteria: join session in one click\nUser flows: view schedule\nDeliverables: high-fidelity desktop interface';
