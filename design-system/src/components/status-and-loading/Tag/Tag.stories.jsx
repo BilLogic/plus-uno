@@ -23,8 +23,9 @@ import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TagContext } from './
  */
 
 export default {
-    title: 'Components/Status and loading/Tag',
+    title: 'Components/Status and loading/Status, Count & Tag/Tag',
     component: Tag,
+    tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
             { date: '2026-09-29', kind: 'deprecated', summary: '`variant="operational"` started warning in development; a tag that opens something became `behavior="selectable"` with `aria-expanded`.' },
