@@ -74,7 +74,7 @@ import {
   cardAcknowledgement,
   cardAnswer,
   cardFollowUpText,
-  CARD_LEGENDS,
+  CARD_FOOTERS,
   draftTitle,
   staleText,
   statusChoiceText,
@@ -662,7 +662,7 @@ export async function cardFollowUpDue(
   if (deps.dryRun) return { id: c.id, action, text: body };
 
   const to = { channel: c.channel, threadTs: topLevel ? c.nudgeTs : c.threadTs };
-  const sent = await deps.slack.post(to, { text: body, blocks: reminderBlocks(body, CARD_LEGENDS[kind]) });
+  const sent = await deps.slack.post(to, { text: body, blocks: reminderBlocks(body, CARD_FOOTERS[kind]) });
   if (!sent.ok || !sent.ts) return holdCard(deps, c, now, runDate, "Slack refused the post");
   if (first && topLevel) posted.set(c.channel, (posted.get(c.channel) ?? 0) + 1);
   await settle({

@@ -33,8 +33,29 @@ export function reminderAnswer(name: string): ReminderAnswer | null {
   return REMINDER_REACTIONS[name.replace(/::skin-tone-\d$/, "")] ?? null;
 }
 
-/** The context line under a reminder until someone answers it. */
-export const REMINDER_LEGEND = "🙌 Done · ⏳ Soon · 🙅 Not doing it · 🤔 Not a promise";
+/** One answer a reminder offers: a button that stands in for the reaction. */
+export interface ReminderChoice {
+  /** Slack's name for the glyph, as a reaction event sends it: the answer's key. */
+  glyph: string;
+  /** The button's label, glyph first. */
+  label: string;
+}
+
+/** What sits under a reminder: the answers as buttons, with an optional hint
+ *  line below them, or only a line of words (an answer's acknowledgement, or
+ *  a prompt that wants a typed reply). */
+export type ReminderFooter = string | { hint?: string; choices: readonly ReminderChoice[] };
+
+/** The button row's action ids all start here; the glyph follows. */
+export const REMINDER_ACTION_PREFIX = "uno_reminder_";
+
+/** The answers under a reminder until someone answers it. */
+export const REMINDER_CHOICES: readonly ReminderChoice[] = [
+  { glyph: "raised_hands", label: "🙌 Done" },
+  { glyph: "hourglass_flowing_sand", label: "⏳ Need more time" },
+  { glyph: "no_good", label: "🙅 Not doing this" },
+  { glyph: "thinking_face", label: "🤔 Wasn't a promise" },
+];
 
 /** What replaces the legend once the promiser answers. */
 export function acknowledgement(answer: ReminderAnswer, checkBackDay?: string): string {
@@ -42,11 +63,11 @@ export function acknowledgement(answer: ReminderAnswer, checkBackDay?: string): 
     case "done":
       return "Nice, marked done.";
     case "soon":
-      return `Got it. I'll check back ${checkBackDay ?? "soon"}.`;
+      return `No problem. I'll check back ${checkBackDay ?? "soon"}.`;
     case "not_doing":
-      return "Noted. I won't ask again.";
+      return "Understood. I won't ask again.";
     case "not_promise":
-      return "My mistake, thanks. I'll read that kind of message better next time.";
+      return "My mistake, thanks.";
   }
 }
 
@@ -101,23 +122,45 @@ export function reminderText(input: {
 }): string {
   const link = original(input.permalink);
   if (input.deadlineLabel) {
-    return `Hey <@${input.promiser}>, you said you'd ${input.what} by ${input.deadlineLabel}. I haven't spotted it yet, so I'm checking in.${link}`;
+    return `Hi <@${input.promiser}>, you mentioned you'd ${input.what} by ${input.deadlineLabel}. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or does the date need to move?${link}`;
   }
-  return `Hey <@${input.promiser}>, on ${input.promisedLabel} you said you'd ${input.what}. Did it happen?${link}`;
+  return `Hi <@${input.promiser}>, on ${input.promisedLabel} you mentioned you'd ${input.what}. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or still in progress?${link}`;
 }
 
 /** The second and last reminder. */
 export function followUpText(promiser: string): string {
-  return `<@${promiser}> Still on your list? A reaction is all I need.`;
+  return `<@${promiser}> Checking in once more. Is it done, or does it need more time?`;
 }
 
-/** A reminder as Slack blocks: its body, then the legend or an answer's
- *  acknowledgement as a context line. */
-export function reminderBlocks(body: string, footer: string): unknown[] {
-  return [
-    { type: "section", text: { type: "mrkdwn", text: body } },
-    { type: "context", elements: [{ type: "mrkdwn", text: footer }] },
-  ];
+/** A reminder as Slack blocks: its body, then either the answers as buttons
+ *  (with a hint line under them, when the footer has one) or a line of words,
+ *  such as an answer's acknowledgement, as a context line. */
+export function reminderBlocks(body: string, footer: ReminderFooter): unknown[] {
+  const blocks: unknown[] = [{ type: "section", text: { type: "mrkdwn", text: body } }];
+  if (typeof footer === "string") {
+    blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: footer }] });
+    return blocks;
+  }
+  blocks.push({
+    type: "actions",
+    block_id: "uno_reminder_actions",
+    elements: footer.choices.map((c) => ({
+      type: "button",
+      action_id: `${REMINDER_ACTION_PREFIX}${c.glyph}`,
+      text: { type: "plain_text", text: c.label, emoji: true },
+      value: c.glyph,
+    })),
+  });
+  if (footer.hint) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: footer.hint }] });
+  return blocks;
+}
+
+/** The labels a footer shows, for a test or a log: its buttons, or its words. */
+export function footerLabels(blocks: readonly unknown[]): string {
+  const rest = blocks.slice(1) as Array<{ type: string; elements: Array<{ text: string | { text: string } }> }>;
+  return rest
+    .flatMap((b) => b.elements.map((e) => (typeof e.text === "string" ? e.text : e.text.text)))
+    .join(" · ");
 }
 
 // ── "Remind me" ──────────────────────────────────────────────────────────────
@@ -126,10 +169,13 @@ export function reminderBlocks(body: string, footer: string): unknown[] {
 // snooze. Its last allowed post offers 🙌 alone, since a ⏳ there could bring
 // nothing more.
 
-/** The legend under a "remind me" while a ⏳ can still bring it back. */
-export const SELF_REMINDER_LEGEND = "🙌 Done · ⏳ Snooze 2 days";
-/** The legend under its last allowed post. */
-export const SELF_REMINDER_LAST_LEGEND = "🙌 Done";
+/** The answers under a "remind me" while a ⏳ can still bring it back. */
+export const SELF_REMINDER_CHOICES: readonly ReminderChoice[] = [
+  { glyph: "raised_hands", label: "🙌 Done" },
+  { glyph: "hourglass_flowing_sand", label: "⏳ Snooze 2 days" },
+];
+/** The answer under its last allowed post. */
+export const SELF_REMINDER_LAST_CHOICES: readonly ReminderChoice[] = [{ glyph: "raised_hands", label: "🙌 Done" }];
 
 /**
  * The reminder a person asked for, mentioning only them.

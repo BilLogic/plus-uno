@@ -14,7 +14,7 @@
 // PURE: no `Env`, no Slack module, no Workers global.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import { reminderAnswer } from "../commitments/copy";
+import { reminderAnswer, type ReminderFooter } from "../commitments/copy";
 
 /** F3's draft is asked for with ✅ (or ✔️) alone — not 👍, which reads as a
  *  nod rather than "draft it". */
@@ -43,12 +43,25 @@ export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", gl
   return null;
 }
 
-/** The legend under each kind's first message and its follow-up. */
-export const CARD_LEGENDS = {
-  card_todo: "✅ Draft it · 🙅 Drop it",
+/** What sits under each kind's first message and its follow-up: buttons where a
+ *  tap answers it, a line of words where only a typed reply can (F4 names a
+ *  person). */
+export const CARD_FOOTERS: Record<"card_todo" | "card_unowned" | "card_stale", ReminderFooter> = {
+  card_todo: {
+    choices: [
+      { glyph: "white_check_mark", label: "✅ Draft it" },
+      { glyph: "no_good", label: "🙅 Drop it" },
+    ],
+  },
   card_unowned: "Reply here with an @mention, or \"me\", and I'll draft the Contributor change",
-  card_stale: "🙌 Done · ⏳ Still on it · 🙅 Drop it",
-} as const;
+  card_stale: {
+    choices: [
+      { glyph: "raised_hands", label: "🙌 Done" },
+      { glyph: "hourglass_flowing_sand", label: "⏳ Still on it" },
+      { glyph: "no_good", label: "🙅 Drop it" },
+    ],
+  },
+};
 
 /** What replaces the legend once someone answers. */
 export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", staged: boolean): string {
@@ -64,7 +77,7 @@ export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", sta
     case "still_on_it":
       return "Got it. I'll leave it be for now.";
     case "drop":
-      return staged ? "Noted. Pick the card's new Design Status in this thread." : "Noted. I won't ask again.";
+      return staged ? "Understood. Pick the card's new Design Status in this thread." : "Understood. I won't ask again.";
   }
 }
 
@@ -88,30 +101,30 @@ function cardLink(card: { title: string; url: string }): string {
 export function todoOfferText(input: { people: readonly string[]; what: string; sourceUrl: string | null; fromNote: boolean }): string {
   const where = input.fromNote ? "the running note" : "this thread";
   const from = input.sourceUrl ? `<${input.sourceUrl}|${where}>` : where;
-  return `${mentionsOf(input.people)} Want me to draft the card for ${escapeSlackText(input.what)}? It was a to-do in ${from}, and I can't find a matching Roadmap card.`;
+  return `${mentionsOf(input.people)} Want me to draft a Roadmap card for ${escapeSlackText(input.what)}? It came up as a to-do in ${from}, and I couldn't find one.`;
 }
 
 /** F4's question. */
 export function unownedText(input: { creator: string; card: { title: string; url: string; status: string | null } }): string {
   const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
-  return `<@${input.creator}> Who's taking ${cardLink(input.card)}? It has sat${status} with no Contributor for over a week.`;
+  return `<@${input.creator}> Who should take ${cardLink(input.card)}? It's been${status} for over a week with no Contributor.`;
 }
 
 /** F5's question. */
 export function staleText(input: { people: readonly string[]; card: { title: string; url: string; status: string | null } }): string {
   const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
-  return `${mentionsOf(input.people)} Still moving? ${cardLink(input.card)} has sat${status} for three weeks with no comments.`;
+  return `${mentionsOf(input.people)} Checking in on ${cardLink(input.card)}: it's been${status} for about three weeks with no comments. Is it still moving?`;
 }
 
 /** The one follow-up, a week on. */
 export function cardFollowUpText(kind: "card_todo" | "card_unowned" | "card_stale", people: readonly string[]): string {
   switch (kind) {
     case "card_todo":
-      return `${mentionsOf(people)} Still want that card drafted? A ✅ or a 🙅 is all I need.`;
+      return `${mentionsOf(people)} Still want that card drafted?`;
     case "card_unowned":
-      return `${mentionsOf(people)} Still looking for someone to take this card. Reply with an @mention, or "me", and I'll draft the change.`;
+      return `${mentionsOf(people)} This card still has no Contributor. Reply with an @mention, or "me", and I'll draft the change.`;
     case "card_stale":
-      return `${mentionsOf(people)} Still moving? A reaction is all I need.`;
+      return `${mentionsOf(people)} Checking in once more. Is it still moving?`;
   }
 }
 

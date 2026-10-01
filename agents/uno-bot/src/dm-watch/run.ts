@@ -57,11 +57,11 @@ import { GATE_RESERVED } from "../gate/reactions";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
-import { acknowledgement, REMINDER_LEGEND, reminderAnswer, reminderBlocks, reminderText } from "../commitments/copy";
+import { acknowledgement, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText } from "../commitments/copy";
 import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type DetectedCommitment, type EvidenceJudge } from "../commitments/detector";
 import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnooze, nudgeAt, rearmedDueAt } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
-import { madeFollowUpText, madeToAcknowledgement, MADE_LAST_LEGEND, MADE_TO_LAST_LEGEND, MADE_TO_LEGEND, madeToFollowUpText, madeToText } from "./copy";
+import { madeFollowUpText, madeToAcknowledgement, MADE_LAST_CHOICES, MADE_TO_LAST_CHOICES, MADE_TO_CHOICES, madeToFollowUpText, madeToText } from "./copy";
 import {
   CAPTURE_FEATURE,
   DM_WATCH_FEATURES,
@@ -630,13 +630,13 @@ async function remind(
   if (deps.dryRun) return action;
 
   // ⏳ is offered only while it can still bring a check-back.
-  const legend = maySnooze(c.snoozes)
-    ? c.kind === "made" ? REMINDER_LEGEND : MADE_TO_LEGEND
-    : c.kind === "made" ? MADE_LAST_LEGEND : MADE_TO_LAST_LEGEND;
+  const choices = maySnooze(c.snoozes)
+    ? c.kind === "made" ? REMINDER_CHOICES : MADE_TO_CHOICES
+    : c.kind === "made" ? MADE_LAST_CHOICES : MADE_TO_LAST_CHOICES;
   // The owner's DM with uno-bot, top level: never a thread, never anyone else.
   const dm = await deps.bot.dmChannel(c.ownerId);
   if (!dm) return hold("the owner's DM with uno-bot could not be opened");
-  const posted = await deps.bot.post(dm, { text: body, blocks: reminderBlocks(body, legend) });
+  const posted = await deps.bot.post(dm, { text: body, blocks: reminderBlocks(body, { choices }) });
   if (!posted.ok || !posted.ts) return hold("Slack refused the post");
   await settle({
     state: "nudged",

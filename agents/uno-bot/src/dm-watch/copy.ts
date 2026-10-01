@@ -9,7 +9,7 @@
 //
 // PURE: no `Env`, no Slack module, no Workers global.
 
-import type { ReminderAnswer } from "../commitments/copy";
+import type { ReminderAnswer, ReminderChoice } from "../commitments/copy";
 import type { DmWatchFeature } from "./store";
 
 /** The switches as the Home tab words them. */
@@ -19,12 +19,23 @@ export const DM_WATCH_LABELS: Readonly<Record<DmWatchFeature, string>> = {
   dm_capture: "Catch decisions from my DMs",
 };
 
-/** The legend under a reminder about a promise made to the owner. */
-export const MADE_TO_LEGEND = "🙌 Got it · ⏳ Wait 2 more days · 🙅 Drop";
+/** The answers under a reminder about a promise made to the owner. */
+export const MADE_TO_CHOICES: readonly ReminderChoice[] = [
+  { glyph: "raised_hands", label: "🙌 Got it" },
+  { glyph: "hourglass_flowing_sand", label: "⏳ Wait 2 more days" },
+  { glyph: "no_good", label: "🙅 Drop it" },
+];
 /** The same, once both ⏳ are spent: no ⏳ is offered that could bring nothing. */
-export const MADE_TO_LAST_LEGEND = "🙌 Got it · 🙅 Drop";
+export const MADE_TO_LAST_CHOICES: readonly ReminderChoice[] = [
+  { glyph: "raised_hands", label: "🙌 Got it" },
+  { glyph: "no_good", label: "🙅 Drop it" },
+];
 /** A promise the owner made, once both ⏳ are spent. */
-export const MADE_LAST_LEGEND = "🙌 Done · 🙅 Not doing it · 🤔 Not a promise";
+export const MADE_LAST_CHOICES: readonly ReminderChoice[] = [
+  { glyph: "raised_hands", label: "🙌 Done" },
+  { glyph: "no_good", label: "🙅 Not doing this" },
+  { glyph: "thinking_face", label: "🤔 Wasn't a promise" },
+];
 
 /** What replaces that legend once the owner answers. 🤔 means nothing here. */
 export function madeToAcknowledgement(answer: Exclude<ReminderAnswer, "not_promise">, checkBackDay?: string): string {
@@ -32,9 +43,9 @@ export function madeToAcknowledgement(answer: Exclude<ReminderAnswer, "not_promi
     case "done":
       return "Got it. I'll leave it there.";
     case "soon":
-      return `Okay. I'll check again ${checkBackDay ?? "in two working days"}.`;
+      return `No problem. I'll check again ${checkBackDay ?? "in two working days"}.`;
     case "not_doing":
-      return "Dropped. I won't bring it up again.";
+      return "Understood. I won't bring it up again.";
   }
 }
 
@@ -60,16 +71,16 @@ function original(permalink: string): string {
 export function madeToText(input: { name: string | null; what: string; byLabel: string | null; promisedLabel: string; permalink: string }): string {
   const who = plainName(input.name);
   const said = input.byLabel ? `${who} said they'd ${input.what} by ${input.byLabel}.` : `On ${input.promisedLabel}, ${who} said they'd ${input.what}.`;
-  return `${said} Want to follow up?${original(input.permalink)}`;
+  return `${said} I haven't spotted it yet. Want to follow up?${original(input.permalink)}`;
 }
 
 /** The one follow-up about a promise made to the owner. */
 export function madeToFollowUpText(owner: string, permalink: string): string {
-  return `<@${owner}> Still waiting on this one? A reaction is all I need.${original(permalink)}`;
+  return `<@${owner}> Checking in once more. Want to follow up?${original(permalink)}`;
 }
 
 /** The one follow-up about a promise the owner made, with its link — the
  *  reminder above it may be days back in the DM. */
 export function madeFollowUpText(owner: string, permalink: string): string {
-  return `<@${owner}> Still on your list? A reaction is all I need.${original(permalink)}`;
+  return `<@${owner}> Checking in once more. Is it done, or does it need more time?${original(permalink)}`;
 }
