@@ -67,12 +67,12 @@ import type { SweepSlack, SweepSlackMessage } from "../sweep/run";
 import {
   acknowledgement,
   followUpText,
-  REMINDER_LEGEND,
+  REMINDER_CHOICES,
   reminderAnswer,
   reminderBlocks,
   reminderText,
-  SELF_REMINDER_LAST_LEGEND,
-  SELF_REMINDER_LEGEND,
+  SELF_REMINDER_LAST_CHOICES,
+  SELF_REMINDER_CHOICES,
   selfReminderText,
   snoozeAcknowledgement,
 } from "./copy";
@@ -488,7 +488,7 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   const action = first ? "nudged" : "followed-up";
   if (deps.dryRun) return { id: c.id, action, text: body };
 
-  const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, REMINDER_LEGEND) });
+  const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, { choices: REMINDER_CHOICES }) });
   if (!posted.ok || !posted.ts) return hold("Slack refused the post");
   await settle({
     state: "nudged",
@@ -522,8 +522,8 @@ async function remindSelf(
   const first = c.nudges === 0;
   const body = selfReminderText({ requester: c.promiserId, what: text.what, permalink: await deps.slack.permalink(c.channel, c.messageTs) });
   if (deps.dryRun) return { id: c.id, action: "nudged", text: body };
-  const legend = c.nudges + 1 < 2 && maySnooze(c.snoozes) ? SELF_REMINDER_LEGEND : SELF_REMINDER_LAST_LEGEND;
-  const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, legend) });
+  const choices = c.nudges + 1 < 2 && maySnooze(c.snoozes) ? SELF_REMINDER_CHOICES : SELF_REMINDER_LAST_CHOICES;
+  const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, { choices }) });
   if (!posted.ok || !posted.ts) return hold("Slack refused the post");
   await settle({
     state: "nudged",

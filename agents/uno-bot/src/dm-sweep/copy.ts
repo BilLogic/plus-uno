@@ -27,11 +27,15 @@ export const RAISE_TOOL = "sweep_share_post";
 /** The team channel a raise note goes to, by role. */
 export type RaiseTo = "plus-design" | "plus-universal";
 
-/** The legend under the ask about a missed question. */
-export const ASK_LEGEND = "Reply here with the answer or a link, and I'll suggest where it belongs · 🙅 Never mind";
+/** What sits under the ask about a missed question: a button to let it go, and
+ *  the way to answer it, which is a typed reply. */
+export const ASK_FOOTER = {
+  hint: "Or reply here with the answer or a link, and I'll suggest where it belongs.",
+  choices: [{ glyph: "no_good", label: "🙅 Never mind" }],
+} as const;
 
-/** What replaces the legend once the person says never mind. */
-export const ASK_DROPPED = "Never mind, then. I won't ask again.";
+/** What replaces the buttons once the person says never mind. */
+export const ASK_DROPPED = "No problem. I won't ask again.";
 
 /**
  * "Yesterday", when `said` was the ET day before `today`; otherwise "On Fri".
@@ -46,7 +50,7 @@ export function whenWord(said: number, today: number, weekday: string): string {
 
 /** The morning ask about a question uno-bot could not answer (F6). */
 export function askText(o: { when: string; what: string }): string {
-  return `${o.when} I couldn't find ${escapeSlackText(o.what)}. Did you get it?`;
+  return `${o.when} I couldn't find ${escapeSlackText(o.what)}. Did you manage to get it?`;
 }
 
 /**

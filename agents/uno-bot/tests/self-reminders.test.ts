@@ -14,8 +14,9 @@ import {
   createInMemoryCommitmentStore,
   parseReminderWhen,
   runCommitmentNudges,
-  SELF_REMINDER_LAST_LEGEND,
-  SELF_REMINDER_LEGEND,
+  SELF_REMINDER_LAST_CHOICES,
+  SELF_REMINDER_CHOICES,
+  footerLabels,
   setSelfReminder,
   snoozedRunAt,
   ONE_PER_MESSAGE,
@@ -256,7 +257,7 @@ function mornings(store: InMemoryCommitmentStore, now: number) {
   return { run: () => runCommitmentNudges(NUDGE, deps), posts, updates, marked, clock, react };
 }
 
-const legendOf = (m: ReminderMessage) => (m.blocks[1] as { elements: Array<{ text: string }> }).elements[0]!.text;
+const legendOf = (m: ReminderMessage) => footerLabels(m.blocks);
 const mentions = (text: string) => [...text.matchAll(/<@(U[A-Z0-9]+)>/g)].map((m) => m[1]);
 
 describe("delivering it", () => {
@@ -274,7 +275,7 @@ describe("delivering it", () => {
     assert.deepEqual(mentions(post.text), [MAYA]);
     assert.match(post.text, /review the PRD for reflections/);
     assert.match(post.text, /Original message/);
-    assert.equal(legendOf(post), SELF_REMINDER_LEGEND);
+    assert.equal(legendOf(post), SELF_REMINDER_CHOICES.map((c) => c.label).join(" · "));
     // The person invited uno-bot here: the thread is not marked.
     assert.deepEqual(m.marked, []);
     // A retried job the same morning, and the next morning: nothing more.
@@ -316,7 +317,7 @@ describe("delivering it", () => {
     m.clock.now = at(31, 15);
     assert.equal(await m.react(m.posts[0]!.ts, "raised_hands"), true);
     assert.equal([...store.rows.values()][0]!.state, "done");
-    assert.equal(legendOf(m.updates[0]!), "Nice, marked done.");
+    assert.equal(legendOf(m.updates[0]!), "Nice, marked done. Thanks for closing the loop.");
     assert.equal(m.updates[0]!.text, m.posts[0]!.text);
   });
 
@@ -339,7 +340,7 @@ describe("delivering it", () => {
     await m.run();
     assert.equal(m.posts.length, 2);
     assert.equal(m.posts[1]!.threadTs, ASK_TS);
-    assert.equal(legendOf(m.posts[1]!), SELF_REMINDER_LAST_LEGEND);
+    assert.equal(legendOf(m.posts[1]!), SELF_REMINDER_LAST_CHOICES.map((c) => c.label).join(" · "));
 
     // A ⏳ on the last post changes nothing: no third post can follow it.
     assert.equal(await m.react(m.posts[1]!.ts, "hourglass_flowing_sand"), true);

@@ -61,7 +61,7 @@ import type { DmThread, DmThreadVerdict } from "../sweep/run";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
-import { ASK_DROPPED, ASK_LEGEND, askText, DM_RAISE_EVENT, raiseCard, whenWord, type RaiseTo } from "./copy";
+import { ASK_DROPPED, ASK_FOOTER, askText, DM_RAISE_EVENT, raiseCard, whenWord, type RaiseTo } from "./copy";
 import type { DmDetection, DmDetector } from "./detector";
 
 /** The tag on uno-bot's F6 ask: how the next night finds the ask its person
@@ -367,7 +367,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     if (deps.dryRun) return { id: c.id, action: "nudged", text: DM_WITHHELD };
     const posted = await deps.slack.post(place, {
       text: body,
-      blocks: reminderBlocks(body, ASK_LEGEND),
+      blocks: reminderBlocks(body, ASK_FOOTER),
       metadata: { event_type: DM_ASK_EVENT, event_payload: { id: c.id } },
     });
     if (!posted.ok || !posted.ts) return hold("Slack refused the post");

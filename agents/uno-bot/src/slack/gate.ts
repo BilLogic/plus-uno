@@ -47,6 +47,23 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
 }
 
 /**
+ * A tap on one of a reminder's buttons. A button stands in for the reaction it
+ * is labelled with, so it takes the same two doors a reaction on a reminder
+ * does — the answer, the store write and the in-place edit are theirs, and a
+ * tap on a card the store no longer holds changes nothing.
+ *
+ * @param env - Worker bindings
+ * @param press - The tap: the reminder it sits on, the glyph it stands for, who pressed
+ */
+export async function handleReminderButton(
+  env: Env,
+  press: { channel: string; messageTs: string; glyph: string; userId: string },
+): Promise<boolean> {
+  const door = eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env));
+  return door ? door(press) : false;
+}
+
+/**
  * `Env`, once, as the dependencies the door actually reads.
  *
  * Every entry is either a port with two adapters (the thread store, Delivery)

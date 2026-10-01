@@ -34,6 +34,8 @@ import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
+import { handleReminderButton } from "./gate";
+import { REMINDER_ACTION_PREFIX } from "../commitments/copy";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -111,10 +113,24 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
+  if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
   // No silent catch-all. This used to fall through to the feedback handler,
   // which meant an action_id nobody had wired reached a function that ignored
   // it — a dead button that looked alive. Say so in the log instead.
   console.warn(`[interactive] no handler for action_id=${actionId}`);
+}
+
+// A button under a reminder (commitment, card follow-up, DM ask). It is the
+// reaction it is labelled with, tapped: the action id carries the glyph's Slack
+// name, and the reminder doors do the rest (`handleReminderButton`).
+async function answerFromButton(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
+  const channel = payload.channel?.id;
+  const messageTs = payload.message?.ts;
+  const userId = payload.user?.id;
+  const glyph = payload.actions?.[0]?.value || actionId.slice(REMINDER_ACTION_PREFIX.length);
+  if (!channel || !messageTs || !userId || !glyph) return;
+  const claimed = await handleReminderButton(env, { channel, messageTs, glyph, userId });
+  console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} claimed=${claimed}`);
 }
 
 // ✅ Approve / ⛔ Cancel on a proposal card (2026-08-22).

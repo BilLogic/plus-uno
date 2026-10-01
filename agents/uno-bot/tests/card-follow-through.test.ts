@@ -22,6 +22,7 @@ import {
   cardTodoId,
   commitmentThreadHook,
   createInMemoryCommitmentStore,
+  footerLabels,
   MAX_CARD_REMINDERS_PER_PERSON,
   modelCommitmentDetector,
   runCommitmentNudges,
@@ -173,7 +174,7 @@ function answers(store: InMemoryCommitmentStore, rm: ReturnType<typeof roadmap>,
     reads: rm.reads,
     people: rm.people,
     async update(_channel, t, message) {
-      const footer = (message.blocks[1] as { elements: { text: string }[] }).elements[0]!.text;
+      const footer = footerLabels(message.blocks);
       edits.push({ ts: t, text: message.text, footer });
       return true;
     },
@@ -257,7 +258,7 @@ describe("F3: a to-do to make a card", () => {
     const [offer] = m.posts;
     assert.equal(offer!.channel, DESIGN);
     assert.equal(offer!.threadTs, ROOT);
-    assert.match(offer!.text, /Want me to draft the card for the facelift last stage\?/);
+    assert.match(offer!.text, /Would it help if I drafted a Roadmap card for the facelift last stage\?/);
     assert.deepEqual(mentions(offer!.text), [MAYA]);
     assert.equal(only(store).state, "nudged");
 
@@ -303,7 +304,7 @@ describe("F3: a to-do to make a card", () => {
     const second = morning(store, rm, at(42, 13)); // Mon Oct 12, the first morning past a week
     await second.run();
     assert.equal(second.posts.length, 1);
-    assert.match(second.posts[0]!.text, /Still want that card drafted\?/);
+    assert.match(second.posts[0]!.text, /would a drafted card still help\?/);
     const third = morning(store, rm, at(50, 13));
     await third.run();
     assert.equal(third.posts.length, 0);
@@ -371,7 +372,7 @@ describe("F4: an active card with no owner", () => {
     assert.equal(m.posts.length, 1);
     assert.equal(m.posts[0]!.channel, DESIGN);
     assert.equal(m.posts[0]!.threadTs, null);
-    assert.match(m.posts[0]!.text, /Who's taking <https:\/\/www\.notion\.so\/p1\|Facelift — last stage>\?/);
+    assert.match(m.posts[0]!.text, /who's the right person to take <https:\/\/www\.notion\.so\/p1\|Facelift — last stage>\?/);
     assert.deepEqual(mentions(m.posts[0]!.text), [BEA]);
     // Its thread is marked, so the team's replies there are not turns.
     assert.deepEqual(m.marked, [`${DESIGN}:${m.posts[0]!.ts}`]);
@@ -443,7 +444,7 @@ describe("F4: an active card with no owner", () => {
     const later = morning(store, rm, at(39, 13)); // a week on, the card still unowned
     await later.run();
     assert.equal(later.posts.length, 1);
-    assert.match(later.posts[0]!.text, /Still looking for someone/);
+    assert.match(later.posts[0]!.text, /this card still has no Contributor/);
   });
 
   it("\"me\" names the replier; two people, or uno-bot, name nobody", async () => {
@@ -511,7 +512,7 @@ describe("F5: a stuck card", () => {
     const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts[0]!.channel, UNIVERSAL);
-    assert.match(m.posts[0]!.text, /Still moving\?/);
+    assert.match(m.posts[0]!.text, /Is it still moving, finished, or better to drop\?/);
     assert.match(m.posts[0]!.text, /\*Under Review\*/);
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
   });

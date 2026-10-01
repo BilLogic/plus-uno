@@ -22,7 +22,8 @@ import {
   createInMemoryCommitmentStore,
   modelCommitmentDetector,
   modelEvidenceJudge,
-  REMINDER_LEGEND,
+  REMINDER_CHOICES,
+  footerLabels,
   REMINDER_REACTIONS,
   runCommitmentNudges,
   type NudgeDeps,
@@ -238,9 +239,9 @@ describe("the morning run", () => {
     assert.deepEqual(mentions(nudge!.text), [MAYA]);
     assert.equal(
       nudge!.text,
-      `Hey <@${MAYA}>, you said you'd share the Figma link for the reflection screens by Thu. I haven't spotted it yet, so I'm checking in. <https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}|Original message>`,
+      `Hi <@${MAYA}>, quick check-in, no pressure. You mentioned you'd share the Figma link for the reflection screens by Thu, and I haven't spotted it yet, so I'm checking in to make sure things keep moving. I may well have missed it. Has it landed, or does the date need to move? Either is fine. <https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}|Original message>`,
     );
-    assert.deepEqual((nudge!.blocks[1] as { elements: { text: string }[] }).elements[0]!.text, REMINDER_LEGEND);
+    assert.deepEqual(footerLabels(nudge!.blocks), REMINDER_CHOICES.map((c) => c.label).join(" · "));
     const row = only(store);
     assert.equal(row.state, "nudged");
     assert.equal(row.nudges, 1);
@@ -256,7 +257,7 @@ describe("the morning run", () => {
     // Tue + two working days: due Thursday night, nudged Friday.
     const m = mornings({ store, now: at(32, 13) });
     await m.run();
-    assert.match(m.posts[0]!.text, new RegExp(`^Hey <@${MAYA}>, on Tue you said you'd share the Figma link for the reflection screens\\. Did it happen\\?`));
+    assert.match(m.posts[0]!.text, new RegExp(`^Hi <@${MAYA}>, quick check-in, no pressure\\. On Tue you mentioned you'd share the Figma link for the reflection screens, and I haven't spotted it yet.*Has it landed, or is it still in progress\\?`));
   });
 
   it("no answer brings one follow-up, then the commitment lapses", async () => {
@@ -269,7 +270,7 @@ describe("the morning run", () => {
     m.clock.now = at(37, 13); // Wed: the follow-up
     await m.run();
     assert.equal(m.posts.length, 2);
-    assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
+    assert.equal(m.posts[1]!.text, `<@${MAYA}> One more note from me, then I'll leave it be. Whichever button fits is fine, including "Need more time."`);
     assert.equal(m.posts[1]!.threadTs, ROOT);
     assert.equal(only(store).followupTs, m.posts[1]!.ts);
     m.clock.now = at(42, 13); // the Monday after: lapsed, silently
@@ -295,7 +296,7 @@ describe("the morning run", () => {
     const m = mornings({ store, now: at(32, 18), dryRun: true });
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["nudged"]);
-    assert.match(report.actions[0]!.text ?? "", /you said you'd share the Figma link/);
+    assert.match(report.actions[0]!.text ?? "", /You mentioned you'd share the Figma link/);
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).state, "open");
   });
@@ -342,10 +343,10 @@ describe("answers", () => {
   }
 
   const table: Array<[string, string, CommitmentRecord["state"], string]> = [
-    ["🙌", "raised_hands", "done", "Nice, marked done."],
-    ["⏳", "hourglass_flowing_sand", "snoozed", "Got it. I'll check back Wed."],
-    ["🙅", "no_good", "dropped", "Noted. I won't ask again."],
-    ["🤔", "thinking_face", "not_promise", "My mistake, thanks. I'll read that kind of message better next time."],
+    ["🙌", "raised_hands", "done", "Nice, marked done. Thanks for closing the loop."],
+    ["⏳", "hourglass_flowing_sand", "snoozed", "No problem. I'll check back Wed."],
+    ["🙅", "no_good", "dropped", "Understood, and thanks for letting me know. I won't ask again."],
+    ["🤔", "thinking_face", "not_promise", "My mistake, and thanks for the correction."],
   ];
   for (const [glyph, name, state, ack] of table) {
     it(`${glyph} sets ${state} and replaces the legend in place`, async () => {
@@ -359,7 +360,7 @@ describe("answers", () => {
       // message is posted.
       assert.equal(edit!.text, m.posts[0]!.text);
       assert.deepEqual(edit!.blocks[0], m.posts[0]!.blocks[0]);
-      assert.equal((edit!.blocks[1] as { elements: { text: string }[] }).elements[0]!.text, ack);
+      assert.equal(footerLabels(edit!.blocks), ack);
       assert.equal(m.posts.length, 1);
     });
   }
@@ -392,7 +393,7 @@ describe("answers", () => {
     m.clock.now = at(37, 13); // Wed: the follow-up, not a second first reminder
     await m.run();
     assert.equal(m.posts.length, 2);
-    assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
+    assert.equal(m.posts[1]!.text, `<@${MAYA}> One more note from me, then I'll leave it be. Whichever button fits is fine, including "Need more time."`);
     await react("hourglass_flowing_sand", MAYA, m.posts[1]!.ts);
     m.clock.now = at(42, 13); // the Monday after: due again, and spent
     const report = await m.run();
@@ -466,7 +467,7 @@ describe("a promise said again", () => {
     m.clock.now = at(44, 13);
     await m.run();
     assert.equal(m.posts.length, 2);
-    assert.equal(m.posts[1]!.text, `<@${MAYA}> Still on your list? A reaction is all I need.`);
+    assert.equal(m.posts[1]!.text, `<@${MAYA}> One more note from me, then I'll leave it be. Whichever button fits is fine, including "Need more time."`);
     assert.equal(only(store).state, "lapsed");
   });
 
