@@ -13,6 +13,9 @@ import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-re
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { DRIFT_DETECTOR_SYSTEM, runSweepJob, stageSweepCard, type SweepSlackMessage, type SweepSource } from "../src/sweep/index";
 import { createInMemoryDriftStore, type InMemoryDriftStore } from "../src/figma-drift/in-memory";
+import { FigmaRequestError } from "../src/figma/client";
+import { createInMemoryFigma, type InMemoryFigma } from "../src/figma/in-memory";
+import { SubrequestBudgetError } from "../src/net";
 import {
   answerDriftAsk,
   isDriftAnswerCandidate,
@@ -118,10 +121,21 @@ function morning(
   h: SweepHarness,
   drifts: InMemoryDriftStore,
   opts: { options?: string[] | null; publisher?: { handle: string; at: string } | null; dryRun?: boolean } = {},
-): { deps: DriftPostDeps; posted: Posted[]; marked: string[] } {
+): { deps: DriftPostDeps; posted: Posted[]; marked: string[]; figma: InMemoryFigma } {
   const posted: Posted[] = [];
   const marked: string[] = [];
   let seq = 0;
+  // The file's newest named version is the publisher's; `publisher: null` is
+  // a file Figma names no publisher for.
+  const publisher = opts.publisher === undefined ? { handle: "bea.designs", at: "2026-09-20T10:00:00Z" } : opts.publisher;
+  const figma = createInMemoryFigma();
+  figma.seedFile(FILE_KEY, {
+    versions: {
+      versions: publisher
+        ? [{ id: "2210000000000000009", label: "Recap screens", description: "", created_at: publisher.at, user: { handle: publisher.handle } }]
+        : [],
+    },
+  });
   const deps: DriftPostDeps = {
     store: drifts,
     slack: {
@@ -162,9 +176,7 @@ function morning(
       const cards = await h.threadState.getProposalsByChannel(channel);
       return cards.some((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === threadTs);
     },
-    async publisher() {
-      return opts.publisher === undefined ? { handle: "bea.designs", at: "2026-09-20T10:00:00Z" } : opts.publisher;
-    },
+    figma,
     async pillarOptions() {
       return opts.options === undefined ? ["Tutor Experience", "Universal"] : opts.options;
     },
@@ -172,7 +184,7 @@ function morning(
     now: () => h.clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
-  return { deps, posted, marked };
+  return { deps, posted, marked, figma };
 }
 
 /** The answer's deps over the harness's ThreadState and usage record. */
@@ -253,6 +265,42 @@ describe("a Figma drift at the morning run", () => {
     assert.deepEqual(events.map((e) => [e.event, e.via]), [["staged", "worker"]], "staging is on the usage record");
     assert.deepEqual(await drifts.pending(), [], "an asked finding leaves the queue");
     assert.equal(report.asks.length, 1);
+    assert.deepEqual(m.figma.calls().map((c) => [c.method, c.args[0]]), [["versions", FILE_KEY]], "one Figma read: the publisher");
+  });
+
+  /** One thread that discussed FIGMA_A, swept, and the morning ready to run. */
+  async function sweptRecap() {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [
+      { user: "U0ADE", when: ts(29, 16) },
+      { user: "U0BEA", when: ts(29, 17), text: "I'll handle the recap screen." },
+    ]);
+    const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)], "U0BEA"))] });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    return { h, drifts, m: morning(h, drifts) };
+  }
+
+  it("still asks when Figma will not say who published, and names no one", async () => {
+    const { m } = await sweptRecap();
+    m.figma.failNext("versions", new FigmaRequestError(503, "Figma versions 503: Service unavailable"));
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.posted.length, 1, "the ask goes out");
+    assert.doesNotMatch(m.posted[0]!.text, /Last published by/);
+  });
+
+  it("names no one for a file with no named version", async () => {
+    const t = await sweptRecap();
+    const m = morning(t.h, t.drifts, { publisher: null });
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.posted.length, 1);
+    assert.doesNotMatch(m.posted[0]!.text, /Last published by/);
+  });
+
+  it("stops on a budget stop reading the publisher, and posts nothing", async () => {
+    const { m } = await sweptRecap();
+    m.figma.failNext("versions", new SubrequestBudgetError(38));
+    await assert.rejects(runDriftAsks(MORNING, m.deps), SubrequestBudgetError);
+    assert.deepEqual(m.posted, []);
   });
 
   it("asks two threads about the same file with one intake and two asks, one per thread", async () => {

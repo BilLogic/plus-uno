@@ -36,7 +36,7 @@
 // Pure: no `Env`, no fetch. tests/ds-precedence.test.ts drives it over
 // fixtures drawn from #339.
 
-import type { FigmaComponentsResponse } from "../figma-poll";
+import type { FigmaComponentsResponse } from "../figma/client";
 import { figmaNodeUrl, type LibraryChangeSet } from "../figma-library/draft";
 
 /** The three DS sources, in precedence order: the first wins. */

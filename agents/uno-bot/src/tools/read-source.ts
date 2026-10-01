@@ -14,6 +14,7 @@ import type { Env, SlackContext } from "../types";
 import { canonicalNotionUrl, parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
 import { FIGMA_NOTE, FIGMA_TRUNCATION_NOTE } from "../integrations/figma-reading";
+import { figmaClientFor } from "../figma/production";
 import { countedFetch } from "../net";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { readSlackCanvasSource } from "./slack-canvas-source";
@@ -136,7 +137,7 @@ export async function executeReadSource(
     if (/(^|\.)figma\.com$/.test(host)) {
       const parts = parseFigmaUrl(url);
       if (!parts) return JSON.stringify({ ok: false, error: "couldn't parse a Figma file/node from that URL (need a node-id)" });
-      const node = await fetchFigmaNode(env, parts.fileKey, parts.nodeId);
+      const node = await fetchFigmaNode(figmaClientFor(env), parts.fileKey, parts.nodeId);
       return JSON.stringify({
         ok: true,
         source_type: "figma",

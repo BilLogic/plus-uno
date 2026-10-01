@@ -27,20 +27,24 @@
 //   and diffed on the NEXT publish rather than fetched from the previous
 //   version, which would double the node fetches past the cap.
 //   A job the ceiling stops is deferred and retried on a fresh budget
-//   (src/runner/queue.ts), so an overrun costs a retry, not the run.
+//   (src/runner/queue.ts), so an overrun costs a retry, not the run. Each 429
+//   the Figma client retries is one more external call.
+//
+// Wall time: every call goes through the Figma client (src/figma/), which
+// paces /nodes — Tier 1 — at 5 a minute. A quiet or a change run is two calls
+// and no wait; a full re-hash is a burst of 5, then one every 12 s, so about
+// 5½ minutes for 32 chunks, inside a Durable Object alarm's 15.
 //
 // Named dependencies (`PollDeps`), so tests/figma-library.test.ts drives the
-// diff over a recorded Figma response; `Env` enters only in `runFigmaPoll` at
+// diff over the shared in-memory Figma; `Env` enters only in `runFigmaPoll` at
 // the foot.
 
 import type { Env } from "./types";
-import { countedFetch, charge } from "./net";
+import { charge, rethrowIfBudget } from "./net";
+import type { FigmaClient, FigmaComponentsResponse, FigmaVersionsResponse } from "./figma/client";
+import { figmaClientFor } from "./figma/production";
 import type { LibraryChangeSet, LibraryComponent, PublishedVersion } from "./figma-library/draft";
 
-const FIGMA_API = "https://api.figma.com";
-const FETCH_TIMEOUT_MS = 15000;
-const RETRIES = 2;
-const RETRY_DELAY_MS = 1000;
 /** Node-ids per /nodes request (URL-length bound, same as v1). */
 const HASH_CHUNK_SIZE = 50;
 /** Hard cap on /nodes calls per run so one poll stays under the lookup ceiling. */
@@ -75,11 +79,8 @@ export interface PollResult {
 
 /** What the poll reads and writes, by name. */
 export interface PollDeps {
-  figma: {
-    components(): Promise<LibraryComponent[]>;
-    versions(): Promise<PublishedVersion[]>;
-    nodeHashes(components: LibraryComponent[]): Promise<Record<string, string>>;
-  };
+  /** The Figma client: the file's components, its versions, and node hashes. */
+  figma: Pick<FigmaClient, "components" | "versions" | "nodes">;
   snapshot: { read(): Promise<Snapshot | null>; write(snapshot: Snapshot): Promise<void> };
   findings: { read(): Promise<LibraryChangeSet[]>; write(findings: LibraryChangeSet[]): Promise<void> };
   fileKey: string;
@@ -121,13 +122,16 @@ function diffComponents(oldComponents: LibraryComponent[], newComponents: Librar
  * @param opts - `dryRun` reads and diffs, and writes nothing
  */
 export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean } = {}): Promise<PollResult> {
-  const [components, versions] = await Promise.all([deps.figma.components(), deps.figma.versions()]);
+  const [components, versions] = await Promise.all([
+    deps.figma.components(deps.fileKey).then(componentsFrom),
+    deps.figma.versions(deps.fileKey).then(versionsFrom),
+  ]);
   console.log(`[figma-poll] ${components.length} components, ${versions.length} recent published versions`);
   const at = new Date(deps.now()).toISOString();
 
   const snapshot = await deps.snapshot.read();
   if (!snapshot) {
-    const nodeHashes = await deps.figma.nodeHashes(components);
+    const nodeHashes = await fetchNodeHashes(deps.figma, deps.fileKey, components);
     if (!opts.dryRun) {
       await deps.snapshot.write({ lastChecked: at, components, versionIds: versions.map((v) => v.id), nodeHashes });
     }
@@ -144,7 +148,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   let refreshedHashes: Record<string, string> | null = null;
   const metadataChanged = diff.created.length + diff.modified.length + diff.deleted.length > 0;
   if (!metadataChanged && newVersions.length > 0) {
-    refreshedHashes = await deps.figma.nodeHashes(components);
+    refreshedHashes = await fetchNodeHashes(deps.figma, deps.fileKey, components);
     const oldHashes = snapshot.nodeHashes ?? {};
     if (Object.keys(oldHashes).length) {
       for (const comp of components) {
@@ -200,27 +204,6 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   };
 }
 
-// ─── Figma REST (retry on 429/5xx, same policy as v1) ───────────────────────
-
-/** One Figma REST read, retried on a 429 or a 5xx. */
-export async function figmaGet<T>(env: Env, endpoint: string): Promise<T> {
-  let lastErr = "";
-  for (let attempt = 0; attempt <= RETRIES; attempt++) {
-    if (attempt > 0) await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-    try {
-      const res = await countedFetch(`${FIGMA_API}/v1${endpoint}`, {
-        headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
-      }, FETCH_TIMEOUT_MS);
-      if (res.ok) return (await res.json()) as T;
-      lastErr = `Figma API ${res.status}: ${(await res.text()).slice(0, 200)}`;
-      if (res.status !== 429 && res.status < 500) break; // non-retryable
-    } catch (err) {
-      lastErr = err instanceof Error ? err.message : String(err);
-    }
-  }
-  throw new Error(lastErr || "Figma API request failed");
-}
-
 // ─── Component filtering (v1's non-DS ignore list, verbatim) ────────────────
 
 const IGNORED_COMPONENT_PATTERNS = [
@@ -236,19 +219,6 @@ function isIgnoredComponent(c: LibraryComponent): boolean {
   if (IGNORED_COMPONENT_PATTERNS.some((p) => p.test(c.name))) return true;
   if (IGNORED_COMPONENT_PATTERNS.some((p) => p.test(c.containingFrame))) return true;
   return false;
-}
-
-/** The /components response, as far as the poll reads it. */
-export interface FigmaComponentsResponse {
-  meta?: {
-    components?: {
-      key: string;
-      name: string;
-      description?: string;
-      node_id: string;
-      containing_frame?: { name?: string; nodeId?: string; containingComponentSet?: { name?: string; nodeId?: string } };
-    }[];
-  };
 }
 
 /**
@@ -270,17 +240,6 @@ export function componentsFrom(result: FigmaComponentsResponse): LibraryComponen
     };
   });
   return mapped.filter((c) => !isIgnoredComponent(c));
-}
-
-/** The /versions response, as far as the poll reads it. */
-export interface FigmaVersionsResponse {
-  versions?: {
-    id: string;
-    label?: string | null;
-    description?: string | null;
-    created_at: string;
-    user?: { handle?: string };
-  }[];
 }
 
 /** Recent intentional publishes only, newest first — Figma autosaves have a
@@ -308,11 +267,17 @@ async function sha256Hex(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-interface FigmaNodesResponse {
-  nodes?: Record<string, { document?: unknown } | undefined>;
-}
-
-async function fetchNodeHashes(env: Env, components: LibraryComponent[]): Promise<Record<string, string>> {
+/**
+ * A hash per component node, read in chunks. A chunk Figma will not serve is
+ * left out — its components show no visual change this run. A budget stop is
+ * not: it stops the poll before anything is written, so the deferred retry
+ * still sees the publish as new rather than finding the snapshot advanced.
+ */
+async function fetchNodeHashes(
+  figma: Pick<FigmaClient, "nodes">,
+  fileKey: string,
+  components: LibraryComponent[],
+): Promise<Record<string, string>> {
   const hashes: Record<string, string> = {};
   const chunks: LibraryComponent[][] = [];
   for (let i = 0; i < components.length; i += HASH_CHUNK_SIZE) {
@@ -323,22 +288,20 @@ async function fetchNodeHashes(env: Env, components: LibraryComponent[]): Promis
     chunks.length = MAX_HASH_REQUESTS;
   }
 
-  // Batched concurrency: HASH_CONCURRENCY chunks in flight at a time.
+  // Batched concurrency: HASH_CONCURRENCY chunks in flight at a time. The
+  // client paces them; the batches keep any one call's wait for its slot
+  // well inside its 60 s.
   for (let i = 0; i < chunks.length; i += HASH_CONCURRENCY) {
     await Promise.all(chunks.slice(i, i + HASH_CONCURRENCY).map(async (chunk) => {
-      // ids stay RAW (colons + commas are query-legal) — %2C-encoding the commas
-      // risks Figma reading the batch as one malformed id (v1 sent them raw).
-      const ids = chunk.map((c) => c.nodeId).filter(Boolean).join(",");
-      if (!ids) return;
+      const ids = chunk.map((c) => c.nodeId).filter(Boolean);
+      if (!ids.length) return;
       try {
-        const result = await figmaGet<FigmaNodesResponse>(
-          env,
-          `/files/${env.FIGMA_FILE_KEY}/nodes?ids=${ids}&geometry=paths`,
-        );
+        const result = await figma.nodes(fileKey, ids, { geometry: "paths" });
         for (const [nodeId, nodeData] of Object.entries(result.nodes ?? {})) {
           if (nodeData?.document) hashes[nodeId] = await sha256Hex(JSON.stringify(nodeData.document));
         }
       } catch (err) {
+        rethrowIfBudget(err);
         console.warn(`[figma-poll] node-hash chunk failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     }));
@@ -373,23 +336,19 @@ export function kvJson<T>(env: Env, key: string, empty: T): { read(): Promise<T>
  * @param opts - `dryRun` writes nothing
  */
 export async function runFigmaPoll(env: Env, opts: { dryRun?: boolean } = {}): Promise<PollResult> {
-  if (!env.FIGMA_ACCESS_TOKEN || !env.FIGMA_FILE_KEY) {
+  const figma = figmaClientFor(env);
+  if (!figma || !env.FIGMA_FILE_KEY) {
     return { ran: false, summary: "FIGMA_ACCESS_TOKEN / FIGMA_FILE_KEY not configured — poll skipped" };
   }
   if (!env.HARNESS_KV) {
     return { ran: false, summary: "HARNESS_KV not bound — nowhere to keep the snapshot; poll skipped" };
   }
-  const fileKey = env.FIGMA_FILE_KEY;
   return pollFigmaLibrary(
     {
-      figma: {
-        components: async () => componentsFrom(await figmaGet<FigmaComponentsResponse>(env, `/files/${fileKey}/components`)),
-        versions: async () => versionsFrom(await figmaGet<FigmaVersionsResponse>(env, `/files/${fileKey}/versions`)),
-        nodeHashes: (components) => fetchNodeHashes(env, components),
-      },
+      figma,
       snapshot: kvJson<Snapshot | null>(env, SNAPSHOT_KV_KEY, null) as PollDeps["snapshot"],
       findings: kvJson<LibraryChangeSet[]>(env, FINDINGS_KV_KEY, []),
-      fileKey,
+      fileKey: env.FIGMA_FILE_KEY,
       now: () => Date.now(),
     },
     opts,

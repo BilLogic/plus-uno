@@ -12,7 +12,8 @@
 //     (`isSweepCardPost`); `chat.getPermalink`; `chat.update` to withdraw.
 //   • Staging: the sweep's own (`stageSweepCard`) — ThreadState, the staged
 //     row on the usage record, and the thread mark.
-//   • The publisher: Figma's `/files/:key/versions`, newest publish's handle.
+//   • The publisher: the Figma client's `/versions` read (`src/figma/`),
+//     newest publish's handle, or no client and no publisher without a token.
 //   • The pillar options: the Roadmap database's schema
 //     (`NOTION_ROADMAP_DB_ID`, `Product Pillar`).
 //
@@ -29,7 +30,7 @@ import { proposalReplyThread, type PendingProposal } from "../thread-state/index
 import { proposalEvent, recordProposalEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { databaseOptions } from "../integrations/notion";
-import { figmaGet, versionsFrom, type FigmaVersionsResponse } from "../figma-poll";
+import { figmaClientFor } from "../figma/production";
 import { measured } from "../sweep/env";
 import { stageSweepCard } from "../sweep/run";
 import { SWEEP_CARD_EVENT } from "../sweep/cards";
@@ -84,6 +85,7 @@ export async function runDriftAsksOnEnv(
   const kv = env.HARNESS_KV;
   const threadState = threadStateFor(env);
   const roadmap = env.NOTION_ROADMAP_DB_ID?.trim();
+  const figma = figmaClientFor(env);
   return runDriftAsks(job, {
     store: kvDriftStore(kv),
     slack: {
@@ -129,13 +131,7 @@ export async function runDriftAsksOnEnv(
     async threadBusy(channel, threadTs) {
       return !!(await driftCardIn(env, channel, threadTs));
     },
-    async publisher(fileKey) {
-      if (!env.FIGMA_ACCESS_TOKEN) return null;
-      const [newest] = versionsFrom(
-        await measured(() => figmaGet<FigmaVersionsResponse>(env, `/files/${fileKey}/versions`)),
-      );
-      return newest && newest.user !== "Unknown" ? { handle: newest.user, at: newest.createdAt } : null;
-    },
+    ...(figma ? { figma: { versions: (fileKey: string) => measured(() => figma.versions(fileKey)) } } : {}),
     async pillarOptions() {
       if (!roadmap) return null;
       return measured(() => databaseOptions(env, roadmap, "Product Pillar"));

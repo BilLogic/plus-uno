@@ -16,6 +16,11 @@
 // The second is the one with a fixture, because a cap is only provable by
 // crossing it. Both assertions were confirmed to FAIL against the old code
 // before this file was kept.
+//
+// The read itself runs over the Figma client (#892): the shared fake for what
+// it makes of a node, and the REST client over a scripted transport for the
+// one thing only Figma's own answer can show — a first 429 is waited out, not
+// reported to the person who pasted the link.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -25,6 +30,10 @@ import {
   MAX_TEXT_LAYERS,
   type FigmaNode,
 } from "../src/integrations/figma-reading";
+import { fetchFigmaImagePngUrl, fetchFigmaNode } from "../src/integrations/figma";
+import { FigmaRequestError } from "../src/figma/client";
+import { createInMemoryFigma } from "../src/figma/in-memory";
+import { createFigmaRestClient } from "../src/figma/rest";
 
 
 /** A frame with `n` TEXT descendants, nested so the walk has to recurse. */
@@ -126,5 +135,82 @@ describe("the note the model is handed", () => {
   it("the truncation note says the missing part is unknown, not absent", () => {
     assert.match(FIGMA_TRUNCATION_NOTE, /partial/i);
     assert.match(FIGMA_TRUNCATION_NOTE, /unknown rather than nonexistent/i);
+  });
+});
+
+describe("a frame read over the Figma client", () => {
+  const FILE = "AbC123xyz";
+  const NODE = "158:21725";
+
+  function seeded(frame: FigmaNode = frameWith(3)) {
+    const figma = createInMemoryFigma();
+    figma.seedFile(FILE, { nodes: { [NODE]: frame } });
+    return figma;
+  }
+
+  it("reads the frame's name, type and text, asking for that one node within 8 s", async () => {
+    const figma = seeded();
+    assert.deepEqual(await fetchFigmaNode(figma, FILE, NODE), {
+      name: "Board",
+      type: "FRAME",
+      texts: ["line 0", "line 1", "line 2"],
+      truncated: false,
+    });
+    assert.deepEqual(figma.calls(), [{ method: "nodes", args: [FILE, [NODE], { timeoutMs: 8000 }] }]);
+  });
+
+  it("says when the frame was cut short", async () => {
+    const node = await fetchFigmaNode(seeded(frameWith(MAX_TEXT_LAYERS + 1)), FILE, NODE);
+    assert.equal(node.texts.length, MAX_TEXT_LAYERS);
+    assert.equal(node.truncated, true);
+  });
+
+  it("throws on a node the file does not hold, and on a Worker with no token", async () => {
+    await assert.rejects(fetchFigmaNode(seeded(), FILE, "9:9"), /^Error: Figma node 9:9 not found in file AbC123xyz$/);
+    await assert.rejects(fetchFigmaNode(undefined, FILE, NODE), /FIGMA_ACCESS_TOKEN not configured on the Worker/);
+  });
+
+  it("passes on what Figma refused, worded as Figma said it", async () => {
+    const figma = seeded();
+    figma.failNext("nodes", new FigmaRequestError(403, "Figma nodes 403: Invalid token"));
+    await assert.rejects(fetchFigmaNode(figma, FILE, NODE), { status: 403, message: "Figma nodes 403: Invalid token" });
+  });
+
+  it("waits out a first 429 from Figma rather than reporting it", async () => {
+    const answers = [
+      new Response(JSON.stringify({ status: 429, err: "Rate limit exceeded" }), { status: 429, headers: { "retry-after": "2" } }),
+      new Response(JSON.stringify({ nodes: { [NODE]: { document: frameWith(2) } } }), { status: 200 }),
+    ];
+    const clock = { t: 0 };
+    const sentAt: number[] = [];
+    const figma = createFigmaRestClient({
+      token: "figd_test",
+      now: () => clock.t,
+      async sleep(ms) {
+        clock.t += ms;
+      },
+      async transport() {
+        sentAt.push(clock.t);
+        return answers.shift()!;
+      },
+    });
+    const node = await fetchFigmaNode(figma, FILE, NODE);
+    assert.deepEqual(node.texts, ["line 0", "line 1"]);
+    assert.deepEqual(sentAt, [0, 2000], "asked again once the Retry-After had passed");
+  });
+
+  it("renders a URL, or no image at all on any failure", async () => {
+    const figma = seeded();
+    assert.match((await fetchFigmaImagePngUrl(figma, FILE, NODE)) ?? "", /^https:\/\//);
+    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, "9:9"), null, "a node that would not render");
+    figma.failNext("images", new FigmaRequestError(500, "Figma images 500: Internal error"));
+    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE), null, "a refusal");
+    assert.equal(await fetchFigmaImagePngUrl(undefined, FILE, NODE), null, "no token");
+  });
+
+  it("renders with the caller's bounds on waiting", async () => {
+    const figma = seeded();
+    await fetchFigmaImagePngUrl(figma, FILE, NODE, { maxWaitMs: 0, attempts: 1 });
+    assert.deepEqual(figma.calls()[0]!.args[2], { format: "png", scale: 1, timeoutMs: 8000, maxWaitMs: 0, attempts: 1 });
   });
 });

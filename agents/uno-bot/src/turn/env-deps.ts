@@ -34,6 +34,7 @@ import { renderDeliveredBody } from "../slack/render";
 import { recordSweepRestageFor } from "../sweep/env";
 import { recordPrecedenceRestageFor } from "../ds-precedence/env";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
+import { figmaClientFor } from "../figma/production";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
@@ -232,10 +233,15 @@ export function cardReadsFor(env: Env): TurnDeps["cards"] {
     // preview, and the card posts as every other card does. It used to build
     // the whole card — text, image block, footer and buttons — in
     // `slack/proposal-figma.ts`, which is a module this one line replaced.
+    // One attempt and no wait for the rate budget: a re-staged card is
+    // rebuilt under `waitUntil`'s 30 s (the button door's `restage`), and a
+    // card without its preview beats a ✅ that never posts.
     async designPreviewImage(input) {
       const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
       const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
-      return parts ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1) : null;
+      return parts
+        ? await fetchFigmaImagePngUrl(figmaClientFor(env), parts.fileKey, parts.nodeId, { maxWaitMs: 0, attempts: 1 })
+        : null;
     },
     // The repo a GitHub intake lands in, resolved from its `repo` input as
     // the executor resolves it, and whether that repo is public — asked of

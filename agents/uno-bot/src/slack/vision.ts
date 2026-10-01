@@ -12,6 +12,7 @@ import type { SlackEventFile, SlackMessageEvent } from "./types";
 import type { HistoryTurn } from "../thread-state/index";
 import type { HistoricalImages } from "../agent/provider-conversation";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
+import { figmaClientFor } from "../figma/production";
 import { countedFetch } from "../net";
 import {
   firstFigmaFrameUrl,
@@ -23,6 +24,10 @@ import {
 const MAX_IMAGE_ATTACHMENTS = 3;
 const MAX_IMAGE_BYTES = Math.floor(3.5 * 1024 * 1024); // Anthropic per-image limit is ~5MB; stay well under
 const IMAGE_FETCH_TIMEOUT_MS = 10_000;
+// The reply waits on the render, so it may wait only so long for the Figma
+// rate budget, and a hung render is tried once more, not twice: a first 429
+// is still retried, and the turn goes on text-first if that fails too.
+const FIGMA_RENDER = { maxWaitMs: 10_000, attempts: 2 } as const;
 // The Anthropic API only accepts these four image media types — anything else
 // (svg, tiff, heic…) would 400 the whole request, so it's skipped like oversize.
 const SUPPORTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
@@ -150,7 +155,7 @@ async function loadFigmaImage(
   env: Env,
   parts: NonNullable<ReturnType<typeof parseFigmaUrl>>,
 ): Promise<AgentImage | null> {
-  const pngUrl = await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1);
+  const pngUrl = await fetchFigmaImagePngUrl(figmaClientFor(env), parts.fileKey, parts.nodeId, FIGMA_RENDER);
   if (!pngUrl) return null;
   const png = await fetchBytes(pngUrl);
   if (!png || png.byteLength === 0 || png.byteLength > MAX_IMAGE_BYTES) return null;
