@@ -15,6 +15,12 @@
 // itself, so the harness runner can import it from the root and call
 // `run({ repoRoot })` without knowing where this package sits.
 //
+// Figma has one door of its own (#892). Every personal token on Bill's account
+// draws from one Figma budget per tier, and `src/figma/rest.ts` is what paces
+// uno-bot's share of it and backs off on a 429. A call that names the API
+// anywhere else is counted by the meter but skips both, so it fails here even
+// when it goes through countedFetch.
+//
 // Run: npm run check:fetch (also runs as part of deploy)
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -30,6 +36,10 @@ const srcDirIn = (repoRoot) => path.join(repoRoot, "agents", "uno-bot", "src");
 
 // net.ts owns the one real fetch.
 const ALLOWED_BARE_FETCH = new Set(["net.ts"]);
+
+// The Figma client's REST adapter owns the one Figma door.
+const FIGMA_CLIENT = "figma/rest.ts";
+const FIGMA_API = /api\.figma\.com/i;
 
 // DO stub calls are real subrequests that never touch fetch(), so they must be
 // charge()d by hand. Allowlisted by file:line-content so a NEW stub call fails
@@ -94,6 +104,11 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       // `src/<file>:<line>` is relative to this package, not to the repo, so it
       // stays inside the sentence rather than moving into a Finding's `file`.
       const at = `src/${unix}:${i + 1}: ${line.trim()}`;
+      // First, because routing this call through countedFetch would not fix it.
+      if (FIGMA_API.test(line) && unix !== FIGMA_CLIENT) {
+        offences.push(`${at}\n    -> only src/figma/rest.ts talks to Figma (#892), where every call is paced\n       against the budget Bill's tokens share; add a method to the Figma client.`);
+        return;
+      }
       if (GLOBAL_FETCH.test(line)) {
         offences.push(`${at}\n    -> globalThis/self/window.fetch bypasses the meter; import countedFetch.`);
         return;
@@ -116,7 +131,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
 /** The green line. The ✓ says "ok"; this says what was proved. */
 export function summary() {
-  return "every outbound call is counted";
+  return "every outbound call is counted, and only the Figma client calls Figma";
 }
 
 main(import.meta.url, "check:fetch", { run, summary, remedy: REMEDY });
