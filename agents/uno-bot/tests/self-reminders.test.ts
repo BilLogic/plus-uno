@@ -317,7 +317,7 @@ describe("delivering it", () => {
     m.clock.now = at(31, 15);
     assert.equal(await m.react(m.posts[0]!.ts, "raised_hands"), true);
     assert.equal([...store.rows.values()][0]!.state, "done");
-    assert.equal(legendOf(m.updates[0]!), "Nice, marked done. Thanks for closing the loop.");
+    assert.equal(legendOf(m.updates[0]!), "Nice, marked done.");
     assert.equal(m.updates[0]!.text, m.posts[0]!.text);
   });
 

@@ -50,14 +50,14 @@ export const CARD_FOOTERS: Record<"card_todo" | "card_unowned" | "card_stale", R
   card_todo: {
     choices: [
       { glyph: "white_check_mark", label: "✅ Draft it" },
-      { glyph: "no_good", label: "🙅 No thanks" },
+      { glyph: "no_good", label: "🙅 Drop it" },
     ],
   },
   card_unowned: "Reply here with an @mention, or \"me\", and I'll draft the Contributor change",
   card_stale: {
     choices: [
-      { glyph: "raised_hands", label: "🙌 Finished" },
-      { glyph: "hourglass_flowing_sand", label: "⏳ Still going" },
+      { glyph: "raised_hands", label: "🙌 Done" },
+      { glyph: "hourglass_flowing_sand", label: "⏳ Still on it" },
       { glyph: "no_good", label: "🙅 Drop it" },
     ],
   },
@@ -67,7 +67,7 @@ export const CARD_FOOTERS: Record<"card_todo" | "card_unowned" | "card_stale", R
 export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", staged: boolean): string {
   switch (answer) {
     case "draft":
-      return "On it, thanks. The draft card is in this thread; a ✅ there files it.";
+      return "On it. The draft card is in this thread; a ✅ there files it.";
     case "owner":
       return staged ? "Thanks. The Contributor change is in this thread; a ✅ there applies it." : "Thanks.";
     case "status":
@@ -75,7 +75,7 @@ export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", sta
     case "done":
       return staged ? "Nice. Pick the card's new Design Status in this thread." : "Nice, noted.";
     case "still_on_it":
-      return "Got it, thanks. I'll leave it be for now.";
+      return "Got it. I'll leave it be for now.";
     case "drop":
       return staged ? "Understood. Pick the card's new Design Status in this thread." : "Understood. I won't ask again.";
   }
@@ -101,30 +101,30 @@ function cardLink(card: { title: string; url: string }): string {
 export function todoOfferText(input: { people: readonly string[]; what: string; sourceUrl: string | null; fromNote: boolean }): string {
   const where = input.fromNote ? "the running note" : "this thread";
   const from = input.sourceUrl ? `<${input.sourceUrl}|${where}>` : where;
-  return `${mentionsOf(input.people)} Would it help if I drafted a Roadmap card for ${escapeSlackText(input.what)}? It came up as a to-do in ${from}, and I couldn't find a matching card. No worries if not.`;
+  return `${mentionsOf(input.people)} Want me to draft a Roadmap card for ${escapeSlackText(input.what)}? It came up as a to-do in ${from}, and I couldn't find one.`;
 }
 
 /** F4's question. */
 export function unownedText(input: { creator: string; card: { title: string; url: string; status: string | null } }): string {
   const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
-  return `<@${input.creator}> Quick question when you have a moment: who's the right person to take ${cardLink(input.card)}? It's been${status} for over a week without a Contributor, and I didn't want it to slip through.`;
+  return `<@${input.creator}> Who should take ${cardLink(input.card)}? It's been${status} for over a week with no Contributor.`;
 }
 
 /** F5's question. */
 export function staleText(input: { people: readonly string[]; card: { title: string; url: string; status: string | null } }): string {
   const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
-  return `${mentionsOf(input.people)} Checking in on ${cardLink(input.card)}, in case it helps. It's been${status} for about three weeks with no comments. Is it still moving, finished, or better to drop? Any of those is fine.`;
+  return `${mentionsOf(input.people)} Checking in on ${cardLink(input.card)}: it's been${status} for about three weeks with no comments. Is it still moving?`;
 }
 
 /** The one follow-up, a week on. */
 export function cardFollowUpText(kind: "card_todo" | "card_unowned" | "card_stale", people: readonly string[]): string {
   switch (kind) {
     case "card_todo":
-      return `${mentionsOf(people)} One more note from me, then I'll leave it be: would a drafted card still help? Either button is fine.`;
+      return `${mentionsOf(people)} Still want that card drafted?`;
     case "card_unowned":
-      return `${mentionsOf(people)} One more note from me, then I'll leave it be: this card still has no Contributor. Reply with an @mention, or "me", whenever you're ready and I'll draft the change.`;
+      return `${mentionsOf(people)} This card still has no Contributor. Reply with an @mention, or "me", and I'll draft the change.`;
     case "card_stale":
-      return `${mentionsOf(people)} One more note from me, then I'll leave it be. Whichever button fits is fine.`;
+      return `${mentionsOf(people)} Checking in once more. Is it still moving?`;
   }
 }
 

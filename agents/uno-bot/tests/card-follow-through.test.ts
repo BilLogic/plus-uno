@@ -258,7 +258,7 @@ describe("F3: a to-do to make a card", () => {
     const [offer] = m.posts;
     assert.equal(offer!.channel, DESIGN);
     assert.equal(offer!.threadTs, ROOT);
-    assert.match(offer!.text, /Would it help if I drafted a Roadmap card for the facelift last stage\?/);
+    assert.match(offer!.text, /Want me to draft a Roadmap card for the facelift last stage\?/);
     assert.deepEqual(mentions(offer!.text), [MAYA]);
     assert.equal(only(store).state, "nudged");
 
@@ -304,7 +304,7 @@ describe("F3: a to-do to make a card", () => {
     const second = morning(store, rm, at(42, 13)); // Mon Oct 12, the first morning past a week
     await second.run();
     assert.equal(second.posts.length, 1);
-    assert.match(second.posts[0]!.text, /would a drafted card still help\?/);
+    assert.match(second.posts[0]!.text, /Still want that card drafted\?/);
     const third = morning(store, rm, at(50, 13));
     await third.run();
     assert.equal(third.posts.length, 0);
@@ -372,7 +372,7 @@ describe("F4: an active card with no owner", () => {
     assert.equal(m.posts.length, 1);
     assert.equal(m.posts[0]!.channel, DESIGN);
     assert.equal(m.posts[0]!.threadTs, null);
-    assert.match(m.posts[0]!.text, /who's the right person to take <https:\/\/www\.notion\.so\/p1\|Facelift — last stage>\?/);
+    assert.match(m.posts[0]!.text, /Who should take <https:\/\/www\.notion\.so\/p1\|Facelift — last stage>\?/);
     assert.deepEqual(mentions(m.posts[0]!.text), [BEA]);
     // Its thread is marked, so the team's replies there are not turns.
     assert.deepEqual(m.marked, [`${DESIGN}:${m.posts[0]!.ts}`]);
@@ -444,7 +444,7 @@ describe("F4: an active card with no owner", () => {
     const later = morning(store, rm, at(39, 13)); // a week on, the card still unowned
     await later.run();
     assert.equal(later.posts.length, 1);
-    assert.match(later.posts[0]!.text, /this card still has no Contributor/);
+    assert.match(later.posts[0]!.text, /This card still has no Contributor/);
   });
 
   it("\"me\" names the replier; two people, or uno-bot, name nobody", async () => {
@@ -512,7 +512,7 @@ describe("F5: a stuck card", () => {
     const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts[0]!.channel, UNIVERSAL);
-    assert.match(m.posts[0]!.text, /Is it still moving, finished, or better to drop\?/);
+    assert.match(m.posts[0]!.text, /Is it still moving\?/);
     assert.match(m.posts[0]!.text, /\*Under Review\*/);
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
   });

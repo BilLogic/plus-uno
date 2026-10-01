@@ -50,7 +50,7 @@ export function whenWord(said: number, today: number, weekday: string): string {
 
 /** The morning ask about a question uno-bot could not answer (F6). */
 export function askText(o: { when: string; what: string }): string {
-  return `${o.when} I couldn't find ${escapeSlackText(o.what)}. Did you manage to get it?`;
+  return `${o.when} I couldn't find ${escapeSlackText(o.what)}. Did you get it?`;
 }
 
 /**

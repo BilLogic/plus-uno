@@ -61,13 +61,13 @@ export const REMINDER_CHOICES: readonly ReminderChoice[] = [
 export function acknowledgement(answer: ReminderAnswer, checkBackDay?: string): string {
   switch (answer) {
     case "done":
-      return "Nice, marked done. Thanks for closing the loop.";
+      return "Nice, marked done.";
     case "soon":
       return `No problem. I'll check back ${checkBackDay ?? "soon"}.`;
     case "not_doing":
-      return "Understood, and thanks for letting me know. I won't ask again.";
+      return "Understood. I won't ask again.";
     case "not_promise":
-      return "My mistake, and thanks for the correction.";
+      return "My mistake, thanks.";
   }
 }
 
@@ -122,14 +122,14 @@ export function reminderText(input: {
 }): string {
   const link = original(input.permalink);
   if (input.deadlineLabel) {
-    return `Hi <@${input.promiser}>, quick check-in, no pressure. You mentioned you'd ${input.what} by ${input.deadlineLabel}, and I haven't spotted it yet, so I'm checking in to make sure things keep moving. I may well have missed it. Has it landed, or does the date need to move? Either is fine.${link}`;
+    return `Hi <@${input.promiser}>, you mentioned you'd ${input.what} by ${input.deadlineLabel}. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or does the date need to move?${link}`;
   }
-  return `Hi <@${input.promiser}>, quick check-in, no pressure. On ${input.promisedLabel} you mentioned you'd ${input.what}, and I haven't spotted it yet, so I'm checking in to make sure things keep moving. I may well have missed it. Has it landed, or is it still in progress? Either is fine.${link}`;
+  return `Hi <@${input.promiser}>, on ${input.promisedLabel} you mentioned you'd ${input.what}. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or still in progress?${link}`;
 }
 
 /** The second and last reminder. */
 export function followUpText(promiser: string): string {
-  return `<@${promiser}> One more note from me, then I'll leave it be. Whichever button fits is fine, including "Need more time."`;
+  return `<@${promiser}> Checking in once more. Is it done, or does it need more time?`;
 }
 
 /** A reminder as Slack blocks: its body, then either the answers as buttons

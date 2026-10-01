@@ -342,7 +342,7 @@ describe("the morning reminder", () => {
     assert.equal(w.posts.length, 1);
     const post = w.posts[0]!;
     assert.equal(post.channel, `D-UNO-${MAYA}`);
-    assert.match(post.text, /^Bea said they'd send the tokens doc by Wed\. I haven't spotted it yet, so I'm flagging it in case you'd like to follow up\./);
+    assert.match(post.text, /^Bea said they'd send the tokens doc by Wed\. I haven't spotted it yet\. Want to follow up\?/);
     assert.ok(!post.text.includes(`<@${BEA}>`), "the promiser is named, never mentioned");
     assert.equal(footerLabels(post.blocks), MADE_TO_CHOICES.map((c) => c.label).join(" · "));
     // The only writes the owner's token could make: none — its port has reads only.
@@ -360,13 +360,13 @@ describe("the morning reminder", () => {
     assert.equal((await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU))).summary, "nothing due");
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, FRI));
     assert.equal(w.posts.length, 1);
-    assert.match(w.posts[0]!.text, new RegExp(`^Hi <@${MAYA}>, quick check-in, no pressure\\. On Tue you mentioned you'd review the PRD`));
+    assert.match(w.posts[0]!.text, new RegExp(`^Hi <@${MAYA}>, on Tue you mentioned you'd review the PRD`));
     // Re-armed to the end of Tue Oct 6: the follow-up goes on Wed.
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13)));
     assert.equal(w.posts.length, 1);
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(37, 13)));
     assert.equal(w.posts.length, 2);
-    assert.match(w.posts[1]!.text, /One more note from me, then I'll leave it be/);
+    assert.match(w.posts[1]!.text, /Checking in once more/);
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(42, 13))); // Mon Oct 12
     assert.equal(w.posts.length, 2);
     assert.equal(w.records.rows()[0]!.state, "lapsed");
@@ -437,7 +437,7 @@ describe("answering a DM reminder", () => {
     const { w, edits, door } = await remindedWorld();
     assert.equal(await door("raised_hands"), true);
     assert.equal(w.records.rows()[0]!.state, "done");
-    assert.deepEqual(edits.map((e) => e.footer), ["Got it, thanks. I'll leave it there."]);
+    assert.deepEqual(edits.map((e) => e.footer), ["Got it. I'll leave it there."]);
   });
 
   it("⏳ waits two more working days, at most twice; 🙅 drops it", async () => {
@@ -642,7 +642,7 @@ describe("⏳, token refusals and the scopes a switch needs", () => {
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU)); // the reminder
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13))); // Tue Oct 6: the follow-up
     assert.equal(w.posts.length, 2);
-    assert.match(w.posts[1]!.text, /One more note from me, then I'll leave it be/);
+    assert.match(w.posts[1]!.text, /Checking in once more/);
     assert.equal(await react(w, "hourglass_flowing_sand", at(36, 15)), true);
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 13))); // Fri Oct 9: the check-back
     assert.equal(w.posts.length, 3);

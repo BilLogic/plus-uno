@@ -41,7 +41,7 @@ export const MADE_LAST_CHOICES: readonly ReminderChoice[] = [
 export function madeToAcknowledgement(answer: Exclude<ReminderAnswer, "not_promise">, checkBackDay?: string): string {
   switch (answer) {
     case "done":
-      return "Got it, thanks. I'll leave it there.";
+      return "Got it. I'll leave it there.";
     case "soon":
       return `No problem. I'll check again ${checkBackDay ?? "in two working days"}.`;
     case "not_doing":
@@ -71,16 +71,16 @@ function original(permalink: string): string {
 export function madeToText(input: { name: string | null; what: string; byLabel: string | null; promisedLabel: string; permalink: string }): string {
   const who = plainName(input.name);
   const said = input.byLabel ? `${who} said they'd ${input.what} by ${input.byLabel}.` : `On ${input.promisedLabel}, ${who} said they'd ${input.what}.`;
-  return `${said} I haven't spotted it yet, so I'm flagging it in case you'd like to follow up. No pressure either way.${original(input.permalink)}`;
+  return `${said} I haven't spotted it yet. Want to follow up?${original(input.permalink)}`;
 }
 
 /** The one follow-up about a promise made to the owner. */
 export function madeToFollowUpText(owner: string, permalink: string): string {
-  return `<@${owner}> One more note from me, then I'll leave it be. Whichever button fits is fine.${original(permalink)}`;
+  return `<@${owner}> Checking in once more. Want to follow up?${original(permalink)}`;
 }
 
 /** The one follow-up about a promise the owner made, with its link — the
  *  reminder above it may be days back in the DM. */
 export function madeFollowUpText(owner: string, permalink: string): string {
-  return `<@${owner}> One more note from me, then I'll leave it be. Whichever button fits is fine, including "Need more time."${original(permalink)}`;
+  return `<@${owner}> Checking in once more. Is it done, or does it need more time?${original(permalink)}`;
 }

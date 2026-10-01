@@ -203,7 +203,7 @@ describe("F6: a question uno-bot could not answer", () => {
     const ask = w.posts[0]!;
     assert.equal(ask.channel, DM);
     assert.equal(ask.threadTs, root.ts);
-    assert.equal(ask.text, "Yesterday I couldn't find the tutor ratio for the spring pilot. Did you manage to get it?");
+    assert.equal(ask.text, "Yesterday I couldn't find the tutor ratio for the spring pilot. Did you get it?");
     assert.deepEqual(ask.metadata, { event_type: DM_ASK_EVENT, event_payload: { id: row!.id } });
 
     // Unanswered by its next due date (Monday's run), it lapses: asked once.
