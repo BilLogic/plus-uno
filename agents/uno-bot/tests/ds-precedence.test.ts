@@ -20,6 +20,7 @@ import {
   type PrecedenceRegistry,
 } from "../src/ds-precedence/compare";
 import { droppedItems, PRECEDENCE_MARKER, precedenceOperations, precedenceRuleUrl } from "../src/ds-precedence/report";
+import { replyHandlerAt } from "../src/slack/events";
 import {
   disputePrecedenceItems,
   followRestagedCard,
@@ -820,6 +821,17 @@ describe("the Slack hook", () => {
     assert.equal(await handleDsPrecedenceReply(env(reads), msg({ channel: "C0OTHER" })), false);
     assert.equal(await handleDsPrecedenceReply(env(reads), msg({ thread_ts: undefined })), false);
     assert.deepEqual(reads, []);
+  });
+
+  it("queues a `drop N` for this handler only in a list thread — under any other card it stays free", async () => {
+    // `drop` is the sweep's verb too: a `drop 2` under a follow-up or a sweep
+    // card in #plus-universal must reach the handlers after this one.
+    const listed = {
+      PLUS_UNIVERSAL_CHANNEL_ID: CHANNEL,
+      HARNESS_KV: { get: async (key: string) => (key.endsWith(thread.ts) ? thread : null) },
+    } as unknown as Env;
+    assert.equal(await replyHandlerAt(listed, msg({ text: "drop 2" })), "ds-precedence");
+    assert.notEqual(await replyHandlerAt(listed, msg({ text: "drop 2", thread_ts: "1759599999.000001" })), "ds-precedence");
   });
 
   it("queues a person's `drop N` reply or broadcast in a #plus-universal thread, and nothing else", () => {

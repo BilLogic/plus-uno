@@ -18,9 +18,14 @@
 //
 // AN EXPIRED CARD IS CLOSED OUT (#886 § 3.1). Both the ✅ and the ⛔ file the
 // intake, marker and all, so a card past its 72 hours with no intake was never
-// decided. The job files the intake itself — the same draft, labels and
-// footer the ✅ path uses, so the publish is not lost — and edits the card:
-// its buttons go, and its last line says what happened. One ambiguity is
+// decided. Before filing, the job looks again, wider than the morning's one
+// page — every intake updated since the card posted — and files nothing when
+// that page is full, because a duplicate intake and a "No decision" stamped on
+// a decided card are worse than a day's wait. Then it files the intake itself
+// — the same draft, labels and footer the ✅ path uses, so the publish is not
+// lost — writes that down at once, and edits the card: its buttons go, and its
+// last line says what happened. An edit that fails is tried again the next
+// morning (`closePending`), and nothing is filed twice. One ambiguity is
 // accepted: a ✅ whose filing failed also leaves no intake, and that card is
 // filed here too, with the same "No decision" line. A card tracked before the
 // card kept its draft has nothing to file from, and ages out as before.
@@ -29,13 +34,14 @@
 //
 // Subrequest math, per job: 2 reads, then per card at most 1 read (its linked
 // PR) and 5 writes (a PR linked and merged in one look: intake comment, thread
-// post, intake comment, close, thread post; an expiry is 3: a permalink, the
-// filing, the edit) for at most `MAX_TRACKED_PER_RUN` cards — 2 + 6 × 5 = 32,
-// under the lookup ceiling of 38. KV is the internal bucket.
+// post, intake comment, close, thread post; an expiry is 4: the wider look, a
+// permalink, the filing, the edit) for at most `MAX_TRACKED_PER_RUN` cards —
+// 2 + 6 × 5 = 32, under the lookup ceiling of 38. KV is the internal bucket.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
 import { namesInWords, windowInWords } from "../slack/copy-words";
+import { rethrowIfBudget } from "../net";
 import { LIBRARY_CARD_TTL_MS } from "./post";
 
 /** A posted library card, followed until its PR merges or it ages out. */
@@ -57,6 +63,9 @@ export interface TrackedPublish {
    *  before they were kept. */
   draft?: { title: string; body: string };
   cardText?: string;
+  /** This job filed the intake at expiry and the card's edit has not landed
+   *  yet: the next look tries the edit again, and files nothing. */
+  closePending?: true;
 }
 
 export interface IntakeRef {
@@ -85,6 +94,9 @@ export interface TrackDeps {
     pull(number: number): Promise<PullRef | null>;
     comment(issue: number, body: string): Promise<void>;
     close(issue: number): Promise<void>;
+    /** Every intake updated since `since`, up to a page of 100, and whether
+     *  that was all of them. */
+    intakesSince(since: string): Promise<{ intakes: IntakeRef[]; complete: boolean }>;
     /** File an expired card's intake, as its ✅ would have; the card is where
      *  its footer points. */
     fileIntake(draft: { title: string; body: string }, card: { channel: string; ts: string }): Promise<{ number: number; url: string }>;
@@ -153,6 +165,23 @@ export interface TrackResult {
 }
 
 /**
+ * Edit an expired card to its words and its closing line. True when it
+ * landed; a failure is logged and the card stays `closePending` for the next
+ * look, and a budget stop ends the job.
+ */
+async function closeExpired(deps: TrackDeps, card: TrackedPublish, intake: { number: number; url: string }): Promise<boolean> {
+  try {
+    await deps.closeCard(card.channel, card.ts, card.cardText!, expiredCardNote(intake.url));
+    delete card.closePending;
+    return true;
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.error(`[figma-library] expired card ${card.key}: filed #${intake.number}, card not edited yet — ${err instanceof Error ? err.message : String(err)}`);
+    return false;
+  }
+}
+
+/**
  * One morning's look at every tracked card.
  *
  * @param deps - The store, GitHub and the thread post
@@ -195,28 +224,58 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
       if (pr) taken.add(pr.number);
     }
 
-    // Past its window with no intake and no PR: nobody decided. File the
-    // intake the ✅ or ⛔ would have filed, then close the card.
-    if (!pr && !card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && card.cardText) {
-      if (!opts.dryRun) {
-        let filed: { number: number; url: string };
-        try {
-          filed = await deps.github.fileIntake(card.draft, card);
-        } catch (err) {
-          // Tried again tomorrow: nothing was filed, so nothing is lost.
-          console.error(`[figma-library] expired card ${card.key}: intake not filed — ${err instanceof Error ? err.message : String(err)}`);
-          continue;
-        }
-        card.intake = filed;
-        // The intake is what matters; a card that will not edit is logged,
-        // and is not filed a second time tomorrow.
-        await deps.closeCard(card.channel, card.ts, card.cardText, expiredCardNote(filed.url)).catch((err: unknown) => {
-          console.error(`[figma-library] expired card ${card.key}: filed #${filed.number}, card not edited — ${err instanceof Error ? err.message : String(err)}`);
-        });
-      }
-      expired += 1;
-      done.add(card.key);
+    // An expired card whose intake this job already filed: only the edit is
+    // left to do.
+    if (card.closePending && card.intake && card.cardText) {
+      // Tried each morning until it lands, or until the card ages out.
+      const landed = opts.dryRun || (await closeExpired(deps, card, card.intake));
+      if (landed || age > TRACK_DAYS * DAY_MS) done.add(card.key);
       continue;
+    }
+
+    // Past its window with no intake and no PR: nobody decided — once a wider
+    // look agrees. File the intake the ✅ or ⛔ would have filed, write that
+    // down, then close the card.
+    if (!pr && !card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && card.cardText) {
+      let look: { intakes: IntakeRef[]; complete: boolean };
+      try {
+        look = await deps.github.intakesSince(new Date(card.postedAt - CLOCK_SLACK_MS).toISOString());
+      } catch (err) {
+        rethrowIfBudget(err);
+        console.error(`[figma-library] expired card ${card.key}: could not look for its intake — ${err instanceof Error ? err.message : String(err)}`);
+        continue;
+      }
+      const own = look.intakes.find((i) => i.body.includes(card.marker));
+      if (own) {
+        // Decided after all; the morning's one page had missed it.
+        card.intake = { number: own.number, url: own.url };
+      } else if (!look.complete) {
+        console.warn(`[figma-library] expired card ${card.key}: over 100 intakes since it posted — not filed, to be sure of no duplicate`);
+        continue;
+      } else {
+        if (!opts.dryRun) {
+          let filed: { number: number; url: string };
+          try {
+            filed = await deps.github.fileIntake(card.draft, card);
+          } catch (err) {
+            rethrowIfBudget(err);
+            // Tried again tomorrow: nothing was filed, so nothing is lost.
+            console.error(`[figma-library] expired card ${card.key}: intake not filed — ${err instanceof Error ? err.message : String(err)}`);
+            continue;
+          }
+          card.intake = filed;
+          card.closePending = true;
+          // On record before the edit, so no later stop can file it twice.
+          await deps.tracked.write(tracked.filter((t) => !done.has(t.key)));
+          if (!(await closeExpired(deps, card, filed))) {
+            expired += 1;
+            continue;
+          }
+        }
+        expired += 1;
+        done.add(card.key);
+        continue;
+      }
     }
 
     if (pr && !card.pr) {

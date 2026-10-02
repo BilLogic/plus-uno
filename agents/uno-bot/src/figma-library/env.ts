@@ -19,12 +19,16 @@ import { githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolve
 import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
 import type { ComponentRegistry, LibraryChangeSet } from "./draft";
-import { postLibraryFindings, type PostResult } from "./post";
+import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostResult } from "./post";
+import { windowInWords } from "../slack/copy-words";
+import { rethrowIfBudget } from "../net";
 import { trackLibraryIntakes, type TrackedPublish, type TrackResult } from "./track";
 
 export const TRACKED_KV_KEY = "figma-poll:tracked";
+/** Edits announced as "edited, not published", waiting for the next publish. */
+const UNPUBLISHED_KV_KEY = "figma-poll:unpublished";
 /** Who an expired card's intake was filed for, as its footer says it. */
-const EXPIRED_REQUESTER = "the #plus-universal library card, after 72 h with no decision";
+const EXPIRED_REQUESTER = `the #plus-universal library card, after ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)} with no decision`;
 export const REGISTRY_PATH = "design-system/figma/component-registry.json";
 /** Pages of 200 members — a channel of up to 600 people. */
 const MEMBER_PAGES = 3;
@@ -68,6 +72,7 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
     {
       findings: kvJson<LibraryChangeSet[]>(env, FINDINGS_KV_KEY, []),
       tracked: trackedStore(env),
+      unpublished: kvJson<LibraryChangeSet | null>(env, UNPUBLISHED_KV_KEY, null),
       async registry() {
         if (!target.ok) return null;
         try {
@@ -127,10 +132,14 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
           await writes.comment(issue, body);
         },
         close: (issue) => writes.setState(issue, "closed", "completed"),
+        intakesSince: (since) => reads.intakesSince(since),
         // The ✅ path's filing, minus the ✅: the same labels, and the same
         // footer naming where it came from.
         async fileIntake(draft, card) {
-          const permalink = await getPermalink(env, card.channel, card.ts).catch(() => null);
+          const permalink = await getPermalink(env, card.channel, card.ts).catch((err: unknown) => {
+            rethrowIfBudget(err);
+            return null;
+          });
           return issues.createIssue({
             title: draft.title,
             body: renderIssueBody(draft, { requester: EXPIRED_REQUESTER, permalink }),

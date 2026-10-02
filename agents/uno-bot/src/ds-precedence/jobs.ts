@@ -52,6 +52,7 @@
 
 import type { PendingProposal } from "../thread-state/index";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { namesInWords } from "../slack/copy-words";
 import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
 import type { FigmaClient } from "../figma/client";
 import type { JobContext } from "../scheduled/runs";
@@ -345,7 +346,7 @@ export interface ThreadReply {
 }
 
 const listed = (ns: readonly number[]) =>
-  ns.length === 1 ? `Item ${ns[0]} is` : `Items ${ns.slice(0, -1).join(", ")} and ${ns[ns.length - 1]} are`;
+  ns.length === 1 ? `Item ${ns[0]} is` : `Items ${namesInWords(ns.map(String))} are`;
 
 /**
  * A reply starting `drop N` (or the older `dispute N`) in a list thread:

@@ -237,18 +237,85 @@ describe("a library edited, not published", () => {
     assert.equal(
       text,
       [
-        `*Library edited, not published.* 1 component's name or description changed in the <https://www.figma.com/design/${FILE_KEY}|library>, with no new version.`,
+        `*Library edited, not published.* 1 component's name or description changed in the <https://www.figma.com/design/${FILE_KEY}|library>, with no new version: Button.`,
         "Nothing to build yet. I'll post again when a version is published.",
       ].join("\n"),
     );
     passesChecklist(text);
   });
 
-  it("counts components plainly when some were added or removed", () => {
+  it("counts components plainly when some were added or removed, and names them", () => {
     const cs = changeSet({ versions: [], modified: [component("Button")], created: [component("Chip")] });
     const text = editedNotPublished(cs, draftPublishIntake(cs, REGISTRY));
-    assert.match(text, /^\*Library edited, not published\.\* 2 components changed in the <[^>]+\|library>, with no new version\.$/m);
+    assert.match(text, /^\*Library edited, not published\.\* 2 components changed in the <[^>]+\|library>, with no new version: Button and Chip\.$/m);
     passesChecklist(text);
+  });
+
+  it("past 1,500 characters, names as many as fit and counts the rest", () => {
+    const many = Array.from({ length: 90 }, (_, i) => component(`Edited component ${String(i).padStart(2, "0")}`));
+    const cs = changeSet({ versions: [], modified: many });
+    const text = editedNotPublished(cs, draftPublishIntake(cs, REGISTRY));
+    passesChecklist(text);
+    const m = /no new version: (.*) and (\d+) more\.$/m.exec(text);
+    assert.ok(m, text);
+    assert.equal(m[1]!.split(", ").length + Number(m[2]), 90);
+  });
+});
+
+describe("the consent a stated card's footer carries", () => {
+  // The footer stands in for the operation plan, so it names every operation
+  // the ✅ runs — pinned here, where a new operation would have to be named.
+  it("the library card names both of its operations, and only those", () => {
+    const seven = changeSet({ modified: [component("Button"), component("Toast")] });
+    const intake = draftPublishIntake(seven, REGISTRY);
+    const built = libraryCard(seven, intake);
+    assert.deepEqual(built.operations.map((o) => o.toolName), ["github_issue_create", "component_implement"]);
+    assert.match(built.footer!, /^:white_check_mark: files the intake and drafts the code for Button\. :no_entry: files the intake only\./);
+
+    const noCode = changeSet({ modified: [component("Toast")] });
+    const alone = libraryCard(noCode, draftPublishIntake(noCode, REGISTRY));
+    assert.deepEqual(alone.operations.map((o) => o.toolName), ["github_issue_create"]);
+    assert.doesNotMatch(alone.footer!, /drafts the code/);
+  });
+
+  it("the precedence card names its one write", () => {
+    for (const target of [{ kind: "create" }, { kind: "update", issue: 9, url: "https://github.com/o/r/issues/9" }] as IntakeTarget[]) {
+      const operations = precedenceOperations(THREE, target, "2026-09-28");
+      assert.equal(operations.length, 1);
+      const built = precedenceCard(THREE, [], target, operations, 144);
+      assert.match(built.footer!, target.kind === "create" ? /files items 1, 2 and 3 as the weekly intake/ : /adds items 1, 2 and 3 to the/);
+    }
+  });
+});
+
+describe("the full list in the card's thread", () => {
+  it("never ends a reply on an empty group heading, and never opens one on a blank line", () => {
+    // Enough Has-code names to fill most of a reply, then a few without code:
+    // the second group's heading lands right at the boundary.
+    const registry: ComponentRegistry = {
+      components: Object.fromEntries(
+        Array.from({ length: 400 }, (_, i) => {
+          const name = `Mapped component ${String(i).padStart(3, "0")}`;
+          return [name, { code: { mdxPath: `x/${i}/${i}.mdx` }, figma: { sets: [{ name, componentSetNodeId: `9:${name}` }] } }];
+        }),
+      ),
+    };
+    for (const mapped of [150, 160, 170, 400]) {
+      const rows = [
+        ...Array.from({ length: mapped }, (_, i) => component(`Mapped component ${String(i).padStart(3, "0")}`)),
+        ...Array.from({ length: 300 }, (_, i) => component(`Loose component ${String(i).padStart(3, "0")}`)),
+      ];
+      const intake = draftPublishIntake(changeSet({ modified: rows }), registry);
+      const replies = componentListMessages(intake);
+      for (const reply of replies) {
+        assert.ok(reply.length <= 3500, `${reply.length} chars`);
+        assert.doesNotMatch(reply, /^\n/);
+        assert.doesNotMatch(reply, /:\* $/m, "a heading with no names after it");
+      }
+      const named = replies.join("\n").split("\n").flatMap((l) => (l.startsWith("• *") ? l.replace(/^• \*[^*]+:\* /, "").split(", ") : []));
+      assert.equal(named.length, rows.length, `${mapped} mapped`);
+      assert.equal(new Set(named).size, rows.length);
+    }
   });
 });
 

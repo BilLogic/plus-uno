@@ -23,7 +23,7 @@
 import type { ProposalOperation } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { namesInWords, shortDate, windowInWords } from "../slack/copy-words";
+import { largestFitting, namesInWords, ONE_POST_CHARS, packLines, shortDate, windowInWords } from "../slack/copy-words";
 import { SOURCE_NAMES, type Disagreement } from "./compare";
 
 /** The hidden line the weekly intake's body opens with. */
@@ -37,11 +37,6 @@ export type NumberedItem = Disagreement & { n: number };
 export type IntakeTarget = { kind: "create" } | { kind: "update"; issue: number; url: string };
 
 const RULE = `${SOURCE_NAMES.code} > ${SOURCE_NAMES.library} > ${SOURCE_NAMES["spec-pages"]}`;
-
-/** #886's ceiling for one post: a longer list goes in the thread. */
-const LIST_CHARS = 1500;
-/** What one overflow reply is packed to — under a single post's ~3,900. */
-const REPLY_CHARS = 3500;
 
 /**
  * Where the precedence rule is written: AGENTS.md § Conventions on the
@@ -105,25 +100,13 @@ export function precedenceList(items: readonly NumberedItem[], weekOf: string, r
   const tail = ["", `Reply \`drop ${items[Math.min(1, items.length - 1)]!.n}\` for any that's deliberate, and I'll revise the card.`];
   const lines = items.map(itemLine);
   const whole = [...head, ...lines, ...tail].join("\n");
-  if (whole.length <= LIST_CHARS || lines.length < 2) return { text: whole, overflow: [] };
+  if (whole.length <= ONE_POST_CHARS || lines.length < 2) return { text: whole, overflow: [] };
 
   // Too long for one post: as many items as fit, the rest counted here and
   // listed in the thread under their own numbers.
-  let shown = lines.length - 1;
   const cut = (k: number) => [...head, ...lines.slice(0, k), `and ${lines.length - k} more, listed in the thread.`, ...tail].join("\n");
-  while (shown > 1 && cut(shown).length > LIST_CHARS) shown -= 1;
-  const overflow: string[] = [];
-  let current = "";
-  for (const line of lines.slice(shown)) {
-    if (current && current.length + 1 + line.length > REPLY_CHARS) {
-      overflow.push(current);
-      current = line;
-    } else {
-      current = current ? `${current}\n${line}` : line;
-    }
-  }
-  if (current) overflow.push(current);
-  return { text: cut(shown), overflow };
+  const shown = largestFitting(1, lines.length - 1, (k) => cut(k).length <= ONE_POST_CHARS);
+  return { text: cut(shown), overflow: packLines(lines.slice(shown)) };
 }
 
 function cell(text: string): string {

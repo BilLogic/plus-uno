@@ -447,16 +447,20 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
 
 /**
  * The ahead-of-the-turn handler a message is for, decided once when it is
- * queued: a weekly DS precedence `drop N` (by shape), a "yes, it's up to date"
- * in a thread asked about a file, or an answer in a thread holding a card
- * follow-up (each one KV read, and only for a message of the right shape).
- * Null for none.
+ * queued: a weekly DS precedence `drop N` in one of its list threads, a "yes,
+ * it's up to date" in a thread asked about a file, or an answer in a thread
+ * holding a card follow-up (each one KV read, and only for a message of the
+ * right shape). Null for none.
+ *
+ * The precedence check reads the thread, not only the shape: `drop N` is also
+ * the sweep's verb, so a `drop 2` under any other card in #plus-universal has
+ * to stay free for the handlers after this one and for the turn.
  *
  * @param env - Worker bindings
  * @param msg - The message
  */
 export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<string | null> {
-  if (isDsPrecedenceCandidate(env, msg)) return "ds-precedence";
+  if (isDsPrecedenceCandidate(env, msg) && (await isWeeklyPrecedenceThread(env, msg.channel, msg.thread_ts!))) return "ds-precedence";
   if (await isDriftAnswerFor(env, msg)) return "figma-drift";
   if (await mayBeCardReply(env, msg)) return "follow-through";
   return null;

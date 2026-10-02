@@ -13,7 +13,7 @@
 // from GitHub), so tests/figma-library.test.ts drafts from a recorded diff.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import { namesInWords, windowInWords } from "../slack/copy-words";
+import { largestFitting, namesInWords, ONE_POST_CHARS, THREAD_REPLY_CHARS, windowInWords } from "../slack/copy-words";
 
 /** A component as the poll keeps it in its snapshot. */
 export interface LibraryComponent {
@@ -350,11 +350,6 @@ function firstLine(text: string): string {
 // messages holds the rules they follow; tests/figma-copy.test.ts pins both.
 // Every Figma-sourced string is escaped.
 
-/** #886's ceiling for one post: a longer list goes in the thread. */
-export const CARD_CHARS = 1500;
-/** What one overflow reply is packed to — under a single post's ~3,900. */
-const REPLY_CHARS = 3500;
-
 const HAS_CODE = "Has code";
 const NO_CODE_YET = "No code mapping yet";
 
@@ -393,7 +388,7 @@ function groupLine(group: { label: string; names: string[] }, cap = Infinity): s
 /** The library card, as the parts its renderer and its post need. */
 export interface PublishCardCopy {
   /** Who published what, the count, and every name under Has code and No
-   *  code mapping yet — capped only when the card would pass `CARD_CHARS`. */
+   *  code mapping yet — capped only when the card would pass `ONE_POST_CHARS`. */
   lead: string;
   /** What ✅ and ⛔ each do, and who decides for how long. */
   footer: string;
@@ -431,54 +426,55 @@ export function publishCard(changeSet: LibraryChangeSet, intake: PublishIntake, 
   ].join("\n");
 
   const groups = codeGroups(intake);
-  const fits = (lead: string) => lead.length + 2 + footer.length <= CARD_CHARS;
+  const fits = (lead: string) => lead.length + 2 + footer.length <= ONE_POST_CHARS;
   const full = [...head, ...groups.map((g) => groupLine(g))].join("\n");
   if (fits(full)) return { lead: full, footer, overflow: [] };
 
   // Too long for one post: each group keeps as many names as fit, the rest
   // are counted, and the whole list goes in the thread.
-  const most = Math.max(...groups.map((g) => g.names.length));
-  let cap = Math.max(1, most - 1);
-  let lead = [...head, ...groups.map((g) => groupLine(g, cap))].join("\n");
-  while (cap > 1 && !fits(lead)) {
-    cap -= 1;
-    lead = [...head, ...groups.map((g) => groupLine(g, cap))].join("\n");
-  }
-  return { lead, footer, overflow: componentListMessages(intake) };
+  const leadAt = (cap: number) => [...head, ...groups.map((g) => groupLine(g, cap))].join("\n");
+  const cap = largestFitting(1, Math.max(...groups.map((g) => g.names.length)) - 1, (c) => fits(leadAt(c)));
+  return { lead: leadAt(cap), footer, overflow: componentListMessages(intake) };
 }
 
 /**
  * The card's complete list, for its thread: every name in each group, packed
- * into as many replies as it takes.
+ * into as many replies as it takes. A group cut across two replies says
+ * "continued" in the second; a reply never ends on a group's empty heading.
  *
  * @param intake - The drafted intake
  */
 export function componentListMessages(intake: PublishIntake): string[] {
-  const messages: string[] = [];
-  let current = `All ${intake.rows.length} components in this publish:`;
+  const messages: string[][] = [[`All ${intake.rows.length} components in this publish:`]];
+  const size = (lines: readonly string[]) => lines.join("\n").length;
   for (const group of codeGroups(intake)) {
-    let line = `• *${group.label}:* `;
-    let first = true;
+    let heading = `• *${group.label}:* `;
+    let names: string[] = [];
     for (const name of group.names) {
-      const piece = first ? name : `, ${name}`;
-      if (current.length + 1 + line.length + piece.length > REPLY_CHARS) {
-        messages.push(`${current}\n${line}`);
-        current = "";
-        line = `• *${group.label}, continued:* ${name}`;
+      const message = messages[messages.length - 1]!;
+      const tried = [...message, heading + [...names, name].join(", ")];
+      if (size(tried) > THREAD_REPLY_CHARS && (names.length || message.length)) {
+        // Close this reply with the names it holds, and go on in the next.
+        if (names.length) {
+          message.push(heading + names.join(", "));
+          heading = `• *${group.label}, continued:* `;
+        }
+        messages.push([]);
+        names = [name];
       } else {
-        line += piece;
+        names.push(name);
       }
-      first = false;
     }
-    current = current ? `${current}\n${line}` : line;
+    if (names.length) messages[messages.length - 1]!.push(heading + names.join(", "));
   }
-  messages.push(current);
-  return messages;
+  return messages.filter((m) => m.length).map((m) => m.join("\n"));
 }
 
 /**
  * What a change with no published version posts: no card, because there is
- * nothing to decide (#886 § 3.1 "Edited, not published").
+ * nothing to decide (#886 § 3.1 "Edited, not published"). It names what
+ * changed, so its count is its list; the change rides into the next publish's
+ * card (`mergeChangeSets`), which is what "I'll post again" promises.
  *
  * @param changeSet - What the poll found, with no version
  * @param intake - Its drafted intake, for the rows
@@ -490,8 +486,62 @@ export function editedNotPublished(changeSet: LibraryChangeSet, intake: PublishI
   const what = onlyEdits
     ? `${n} ${n === 1 ? "component's name or description" : "components' names or descriptions"} changed`
     : `${n} component${n === 1 ? "" : "s"} changed`;
-  return [
-    `*Library edited, not published.* ${what} in the ${library}, with no new version.`,
-    "Nothing to build yet. I'll post again when a version is published.",
-  ].join("\n");
+  const names = intake.rows.map((r) => escapeSlackText(r.figmaName));
+  const textWith = (shown: number) => {
+    const rest = names.length - shown;
+    const listed = rest ? `${names.slice(0, shown).join(", ")} and ${rest} more` : namesInWords(names);
+    return [
+      `*Library edited, not published.* ${what} in the ${library}, with no new version: ${listed}.`,
+      "Nothing to build yet. I'll post again when a version is published.",
+    ].join("\n");
+  };
+  const whole = textWith(names.length);
+  if (whole.length <= ONE_POST_CHARS || names.length < 2) return whole;
+  return textWith(largestFitting(1, names.length - 1, (k) => textWith(k).length <= ONE_POST_CHARS));
+}
+
+/**
+ * Two change sets as one, the newer on top — how an edit posted as "edited,
+ * not published" rides into the next publish's card, so the card lists it
+ * and its intake carries it. Per component key: created then deleted is
+ * nothing; created then changed is still created; deleted then back is a
+ * change; otherwise the newer word stands. The version and the time are the
+ * newer set's.
+ *
+ * @param older - The change set already announced
+ * @param newer - The one now being posted
+ */
+export function mergeChangeSets(older: LibraryChangeSet, newer: LibraryChangeSet): LibraryChangeSet {
+  type Kind = "created" | "modified" | "deleted";
+  const byKey = new Map<string, { kind: Kind; component: LibraryComponent }>();
+  for (const set of [older, newer]) {
+    for (const kind of ["created", "modified", "deleted"] as const) {
+      for (const component of set[kind]) {
+        const before = byKey.get(component.key)?.kind;
+        if (before === "created" && kind === "deleted") byKey.delete(component.key);
+        else if (before === "created") byKey.set(component.key, { kind: "created", component });
+        else if (before === "deleted" && kind !== "deleted") byKey.set(component.key, { kind: "modified", component });
+        else byKey.set(component.key, { kind, component });
+      }
+    }
+  }
+  const of = (kind: Kind) => [...byKey.values()].filter((v) => v.kind === kind).map((v) => v.component);
+  const merged: LibraryChangeSet = {
+    detectedAt: newer.detectedAt,
+    fileKey: newer.fileKey,
+    versions: newer.versions,
+    created: of("created"),
+    modified: of("modified"),
+    deleted: of("deleted"),
+  };
+  if (older.newComponentIds || newer.newComponentIds || older.removedComponentIds || newer.removedComponentIds) {
+    // A component is still new while a created variant of it is left, and
+    // still removed while a deleted one is.
+    const ids = (kind: Kind) => new Set(merged[kind].map(componentIdOf));
+    const created = ids("created");
+    const deleted = ids("deleted");
+    merged.newComponentIds = [...new Set([...(older.newComponentIds ?? []), ...(newer.newComponentIds ?? [])])].filter((id) => created.has(id));
+    merged.removedComponentIds = [...new Set([...(older.removedComponentIds ?? []), ...(newer.removedComponentIds ?? [])])].filter((id) => deleted.has(id));
+  }
+  return merged;
 }
