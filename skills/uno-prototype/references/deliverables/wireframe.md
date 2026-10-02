@@ -31,7 +31,7 @@ or the coded build).
 
 **Execution mode: MCP-direct — UNO drives the Figma MCP.** All Figma writes go
 through **writers/figma** (obeys `docs/connectors/figma.md` — file
-placement, prefixes, annotations); never write to the workspace directly.
+placement, page sections, annotations); never write to the workspace directly.
 Building wireframes *from DS components* triggers the registry gate:
 `design-system/guidelines/figma/registry-load-gate.md`.
 

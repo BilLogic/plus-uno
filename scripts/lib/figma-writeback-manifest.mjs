@@ -56,8 +56,6 @@ export function validateWritebackManifest(manifest) {
   }
   if (!frame.name || typeof frame.name !== 'string') {
     errors.push('Missing required field: writeBackFrame.name');
-  } else if (!String(frame.name).startsWith('[replica]')) {
-    warnings.push('writeBackFrame.name should use the [replica] prefix per figma-workspace.md.');
   }
 
   const components = /** @type {unknown[]} */ (m.components || []);

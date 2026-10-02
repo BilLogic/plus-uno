@@ -41,7 +41,7 @@ d. **Gate — DS gap (method §4):** needed component not in
    `design-system/agent-views/components/index.md` → name the gap, propose the
    nearest existing composition, file a uno-maintain intake. Never hand-roll a
    lookalike.
-e. Playground frames or wip placement in Figma → summon **writers/figma**
+e. Playground or WIP pages in Figma → summon **writers/figma**
    (obeys `docs/connectors/figma.md`).
 
 Hi-fi hard rules (`AGENTS.md` § Hard rules in full): tokens over literals ·
