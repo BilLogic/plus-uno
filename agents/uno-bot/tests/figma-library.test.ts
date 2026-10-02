@@ -385,6 +385,9 @@ describe("the morning post", () => {
     assert.deepEqual(morning.store.findings.value, []);
     assert.equal(morning.store.tracked.value.length, 1);
     assert.equal(morning.store.tracked.value[0]!.implement, "Accordion, Badge");
+    // What an expiry nobody decides needs: the intake to file, the card to edit.
+    assert.equal(morning.store.tracked.value[0]!.draft?.title, "Figma library publish: Badge sizes + accordion copy — 3 components");
+    assert.equal(morning.store.tracked.value[0]!.cardText, morning.posts[0]!.text);
   });
 
   it("says plainly when the library was edited and not published, and offers no ✅", async () => {
@@ -554,17 +557,21 @@ describe("the morning tracker", () => {
   });
 
   type Pulls = Awaited<ReturnType<TrackDeps["github"]["recentPulls"]>>;
+  type Intakes = Awaited<ReturnType<TrackDeps["github"]["recentIntakes"]>>;
+  /** The card's intake, filed by a ✅ or a ⛔ — and one that is not its. */
+  const DECIDED: Intakes = [
+    { number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" },
+    { number: 870, url: "https://github.com/o/r/issues/870", body: `${card().marker}\n\n## What was published` },
+  ];
   /** `pulls` is the recent-pulls window; `byNumber` is every PR GitHub has. */
-  function trackDeps(pulls: Pulls, tracked = [card()], byNumber: Pulls = pulls) {
+  function trackDeps(pulls: Pulls, tracked = [card()], byNumber: Pulls = pulls, intakes: Intakes = DECIDED) {
     const calls: string[] = [];
+    const edits: Array<{ text: string; note: string }> = [];
     const store = kv(tracked);
     const deps: TrackDeps = {
       tracked: store,
       github: {
-        recentIntakes: async () => [
-          { number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" },
-          { number: 870, url: "https://github.com/o/r/issues/870", body: `${card().marker}\n\n## What was published` },
-        ],
+        recentIntakes: async () => intakes,
         recentPulls: async () => pulls,
         pull: async (number) => byNumber.find((p) => p.number === number) ?? null,
         comment: async (issue, body) => {
@@ -573,13 +580,21 @@ describe("the morning tracker", () => {
         close: async (issue) => {
           calls.push(`close #${issue}`);
         },
+        fileIntake: async (draft, from) => {
+          calls.push(`file "${draft.title}" from ${from.channel}/${from.ts}`);
+          return { number: 990, url: "https://github.com/o/r/issues/990" };
+        },
       },
       postToThread: async (channel, ts, text) => {
         calls.push(`thread ${channel}/${ts}: ${text}`);
       },
+      closeCard: async (channel, ts, text, note) => {
+        calls.push(`edit ${channel}/${ts}: ${note}`);
+        edits.push({ text, note });
+      },
       now: () => POSTED_AT + 24 * 60 * 60 * 1000,
     };
-    return { deps, calls, store };
+    return { deps, calls, edits, store };
   }
   const pr = (over: Partial<{ state: "open" | "closed"; merged: boolean; title: string; createdAt: string }> = {}) => ({
     number: 880,
@@ -650,5 +665,131 @@ describe("the morning tracker", () => {
     const result = await trackLibraryIntakes(deps);
     assert.equal(result.dropped, 1);
     assert.deepEqual(store.value, []);
+  });
+});
+
+describe("a library card nobody decides", () => {
+  const POSTED_AT = Date.UTC(2026, 8, 30, 14, 0);
+  const HOUR = 60 * 60 * 1000;
+  const CARD_TEXT = '*Library published: "Badge sizes"* by coco · <https://x|view version>\n\n:white_check_mark: files the intake.';
+  const undecided = (over: Partial<TrackedPublish> = {}): TrackedPublish => ({
+    key: "2210000000000000002",
+    marker: "<!-- uno-bot:figma-publish:2210000000000000002 -->",
+    channel: CHANNEL,
+    ts: "1790000000.000001",
+    postedAt: POSTED_AT,
+    implement: "Accordion, Badge",
+    draft: { title: "Figma library publish: Badge sizes — 3 components", body: "<!-- uno-bot:figma-publish:2210000000000000002 -->\n\n## What was published" },
+    cardText: CARD_TEXT,
+    ...over,
+  });
+
+  /** The tracker over GitHub with no intake carrying the card's marker. */
+  function world(tracked: TrackedPublish[], now: number) {
+    const calls: string[] = [];
+    const edits: Array<{ text: string; note: string }> = [];
+    const store = kv(tracked);
+    const deps: TrackDeps = {
+      tracked: store,
+      github: {
+        recentIntakes: async () => [{ number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" }],
+        recentPulls: async () => [],
+        pull: async () => null,
+        comment: async (issue, body) => {
+          calls.push(`comment #${issue}: ${body}`);
+        },
+        close: async (issue) => {
+          calls.push(`close #${issue}`);
+        },
+        fileIntake: async (draft, from) => {
+          calls.push(`file "${draft.title}" from ${from.channel}/${from.ts}`);
+          return { number: 990, url: "https://github.com/o/r/issues/990" };
+        },
+      },
+      postToThread: async (channel, ts, text) => {
+        calls.push(`thread ${channel}/${ts}: ${text}`);
+      },
+      closeCard: async (channel, ts, text, note) => {
+        calls.push(`edit ${channel}/${ts}`);
+        edits.push({ text, note });
+      },
+      now: () => now,
+    };
+    return { deps, calls, edits, store };
+  }
+
+  it("files the intake and closes the card once its 72 hours pass, and only once", async () => {
+    const { deps, calls, edits, store } = world([undecided()], POSTED_AT + 73 * HOUR);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 1);
+    assert.deepEqual(calls, [
+      `file "Figma library publish: Badge sizes — 3 components" from ${CHANNEL}/1790000000.000001`,
+      `edit ${CHANNEL}/1790000000.000001`,
+    ]);
+    // The card keeps its words and gains #886's closing line.
+    assert.deepEqual(edits, [
+      { text: CARD_TEXT, note: "_No decision in 72 h. Filed the <https://github.com/o/r/issues/990|intake> so it isn't lost._" },
+    ]);
+    assert.deepEqual(store.value, []);
+
+    const again = world(store.value, POSTED_AT + 97 * HOUR);
+    await trackLibraryIntakes(again.deps);
+    assert.deepEqual(again.calls, []);
+  });
+
+  it("leaves a card alone while it can still be decided", async () => {
+    const { deps, calls, store } = world([undecided()], POSTED_AT + 71 * HOUR);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
+  });
+
+  it("leaves a decided card alone: its intake carries the marker", async () => {
+    const { deps, calls } = world([undecided()], POSTED_AT + 73 * HOUR);
+    deps.github.recentIntakes = async () => [
+      { number: 870, url: "https://github.com/o/r/issues/870", body: `${undecided().marker}\n\n## What was published` },
+    ];
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.ok(!calls.some((c) => c.startsWith("file") || c.startsWith("edit")), calls.join("\n"));
+  });
+
+  it("has nothing to file for a card tracked before it kept its draft, and lets it age out", async () => {
+    const { draft: _d, cardText: _c, ...legacy } = undecided();
+    const { deps, calls, store } = world([legacy], POSTED_AT + 73 * HOUR);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
+  });
+
+  it("tries again tomorrow when the filing fails, and edits nothing", async () => {
+    const { deps, calls, store } = world([undecided()], POSTED_AT + 73 * HOUR);
+    deps.github.fileIntake = async () => {
+      throw new Error("GitHub issues 502");
+    };
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
+  });
+
+  it("does not file twice when the card will not edit", async () => {
+    const { deps, calls, store } = world([undecided()], POSTED_AT + 73 * HOUR);
+    deps.closeCard = async () => {
+      throw new Error("message_not_found");
+    };
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 1);
+    assert.equal(calls.filter((c) => c.startsWith("file")).length, 1);
+    assert.deepEqual(store.value, []);
+  });
+
+  it("files and edits nothing on a dry run", async () => {
+    const { deps, calls } = world([undecided()], POSTED_AT + 73 * HOUR);
+    const result = await trackLibraryIntakes(deps, { dryRun: true });
+    assert.equal(result.expired, 1);
+    assert.deepEqual(calls, []);
   });
 });

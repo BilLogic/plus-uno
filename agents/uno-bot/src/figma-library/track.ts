@@ -15,17 +15,28 @@
 //     two publishes of the same components get a PR each rather than sharing.
 // A PR once linked is read back by its number, so one that stays open past the
 // recent-pulls window is still seen merging.
-// Neither the ✅ nor the ⛔ is recorded anywhere this job can read, so it does
-// not ask: a card whose PR never appears (a ⛔, an expired card, a failed run)
-// is dropped after `TRACK_DAYS`.
+//
+// AN EXPIRED CARD IS CLOSED OUT (#886 § 3.1). Both the ✅ and the ⛔ file the
+// intake, marker and all, so a card past its 72 hours with no intake was never
+// decided. The job files the intake itself — the same draft, labels and
+// footer the ✅ path uses, so the publish is not lost — and edits the card:
+// its buttons go, and its last line says what happened. One ambiguity is
+// accepted: a ✅ whose filing failed also leaves no intake, and that card is
+// filed here too, with the same "No decision" line. A card tracked before the
+// card kept its draft has nothing to file from, and ages out as before.
+// A card whose PR never appears (a ⛔, a failed run) is dropped after
+// `TRACK_DAYS`.
 //
 // Subrequest math, per job: 2 reads, then per card at most 1 read (its linked
 // PR) and 5 writes (a PR linked and merged in one look: intake comment, thread
-// post, intake comment, close, thread post) for at most `MAX_TRACKED_PER_RUN`
-// cards — 2 + 6 × 5 = 32, under the lookup ceiling of 38. KV is the internal
-// bucket.
+// post, intake comment, close, thread post; an expiry is 3: a permalink, the
+// filing, the edit) for at most `MAX_TRACKED_PER_RUN` cards — 2 + 6 × 5 = 32,
+// under the lookup ceiling of 38. KV is the internal bucket.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
+
+import { windowInWords } from "../slack/copy-words";
+import { LIBRARY_CARD_TTL_MS } from "./post";
 
 /** A posted library card, followed until its PR merges or it ages out. */
 export interface TrackedPublish {
@@ -41,6 +52,11 @@ export interface TrackedPublish {
   implement: string | null;
   intake?: { number: number; url: string };
   pr?: { number: number; url: string };
+  /** The intake as drafted, and the card as posted: what an expired card
+   *  needs to file the one and close the other. Absent on a card tracked
+   *  before they were kept. */
+  draft?: { title: string; body: string };
+  cardText?: string;
 }
 
 export interface IntakeRef {
@@ -69,9 +85,19 @@ export interface TrackDeps {
     pull(number: number): Promise<PullRef | null>;
     comment(issue: number, body: string): Promise<void>;
     close(issue: number): Promise<void>;
+    /** File an expired card's intake, as its ✅ would have; the card is where
+     *  its footer points. */
+    fileIntake(draft: { title: string; body: string }, card: { channel: string; ts: string }): Promise<{ number: number; url: string }>;
   };
   postToThread(channel: string, ts: string, text: string): Promise<void>;
+  /** Edit a card to its text and a closing line, with no buttons. */
+  closeCard(channel: string, ts: string, text: string, note: string): Promise<void>;
   now(): number;
+}
+
+/** The line an expired card ends with (#886 § 3.1). */
+export function expiredCardNote(intakeUrl: string): string {
+  return `_No decision in ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)}. Filed the <${intakeUrl}|intake> so it isn't lost._`;
 }
 
 /** A card whose PR has not appeared by now is let go. */
@@ -93,6 +119,8 @@ export interface TrackResult {
   linked: number;
   closed: number;
   dropped: number;
+  /** Cards past their window with no decision, whose intake this run filed. */
+  expired: number;
   remaining: number;
   summary: string;
 }
@@ -105,7 +133,7 @@ export interface TrackResult {
  */
 export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: boolean } = {}): Promise<TrackResult> {
   const tracked = await deps.tracked.read();
-  if (!tracked.length) return { linked: 0, closed: 0, dropped: 0, remaining: 0, summary: "nothing tracked" };
+  if (!tracked.length) return { linked: 0, closed: 0, dropped: 0, expired: 0, remaining: 0, summary: "nothing tracked" };
 
   const batch = [...tracked].sort((a, b) => a.postedAt - b.postedAt).slice(0, MAX_TRACKED_PER_RUN);
   const since = new Date(Math.min(...batch.map((t) => t.postedAt)) - CLOCK_SLACK_MS).toISOString();
@@ -119,6 +147,7 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
   let linked = 0;
   let closed = 0;
   let dropped = 0;
+  let expired = 0;
   for (const card of batch) {
     const age = deps.now() - card.postedAt;
     if (!card.intake) {
@@ -137,6 +166,30 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
           Date.parse(p.createdAt) >= card.postedAt - CLOCK_SLACK_MS,
       );
       if (pr) taken.add(pr.number);
+    }
+
+    // Past its window with no intake and no PR: nobody decided. File the
+    // intake the ✅ or ⛔ would have filed, then close the card.
+    if (!pr && !card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && card.cardText) {
+      if (!opts.dryRun) {
+        let filed: { number: number; url: string };
+        try {
+          filed = await deps.github.fileIntake(card.draft, card);
+        } catch (err) {
+          // Tried again tomorrow: nothing was filed, so nothing is lost.
+          console.error(`[figma-library] expired card ${card.key}: intake not filed — ${err instanceof Error ? err.message : String(err)}`);
+          continue;
+        }
+        card.intake = filed;
+        // The intake is what matters; a card that will not edit is logged,
+        // and is not filed a second time tomorrow.
+        await deps.closeCard(card.channel, card.ts, card.cardText, expiredCardNote(filed.url)).catch((err: unknown) => {
+          console.error(`[figma-library] expired card ${card.key}: filed #${filed.number}, card not edited — ${err instanceof Error ? err.message : String(err)}`);
+        });
+      }
+      expired += 1;
+      done.add(card.key);
+      continue;
     }
 
     if (pr && !card.pr) {
@@ -197,7 +250,8 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
     linked,
     closed,
     dropped,
+    expired,
     remaining: remaining.length,
-    summary: `linked ${linked}, closed ${closed}, dropped ${dropped}, tracking ${remaining.length}`,
+    summary: `linked ${linked}, closed ${closed}, dropped ${dropped}, expired ${expired}, tracking ${remaining.length}`,
   };
 }

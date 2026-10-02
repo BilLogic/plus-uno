@@ -214,6 +214,10 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
       ts,
       postedAt: deps.now(),
       implement: operations.length > 1 ? intake.implement.join(", ") : null,
+      // Kept for an expiry nobody decides: the tracker files this draft and
+      // closes this card (`figma-library/track.ts`).
+      draft: { title: intake.title, body: intake.body },
+      cardText: card.text,
     });
     waiting.shift();
     posted += 1;
