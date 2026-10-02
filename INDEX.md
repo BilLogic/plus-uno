@@ -72,7 +72,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`docs/connectors/figma.md`](docs/connectors/figma.md) | Every annotation carries one category label: Interaction · Content · Layout · Token-Style · Behavior · Accessibility |
+| [`docs/connectors/figma.md`](docs/connectors/figma.md) | PLUS Figma files follow How We Fig — five stage folders per team, `<Project> / Card <n> & <m> / <designers>` titles, six divider page sections; an agent suggests a rename or a move and a person makes it |
 | [`docs/connectors/notion.md`](docs/connectors/notion.md) | How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape. |
 | [`docs/connectors/overview.md`](docs/connectors/overview.md) | One row per connected tool: where its conventions live, what touches it |
 | [`docs/connectors/slack-sweep.md`](docs/connectors/slack-sweep.md) | The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, how it asks about a read-only file, how its commitment reminders nudge a promiser, its card follow-ups, and what it asks in a person's DM with uno-bot. |
