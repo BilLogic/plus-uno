@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import {
   CONFIRM_FOOTER,
   groupOperations,
+  renderProposalCard,
   withOperationPlan,
   type PlannedOperation,
 } from "../src/slack/proposal-render";
@@ -212,4 +213,36 @@ test("a single-operation batch keeps the per-tool result it always had", () => {
     ]),
     null,
   );
+});
+
+test("a stated card is its lead and its one footer — no preamble, no plan, no second footer", () => {
+  const footer = ":white_check_mark: files the intake and drafts the code. :no_entry: files the intake only.";
+  const card = renderProposalCard({
+    kind: "stated",
+    verb: "file this intake and start the implementation",
+    lead: "*Library published*",
+    footer,
+    fields: [{ label: "intake", value: "Figma library publish" }],
+    caveats: [],
+    // Two operations: a confirm card would splice the plan in.
+    operations: [BATCH[0]!, BATCH[3]!],
+  });
+  assert.equal(card.text, `*Library published*\n\n${footer}`);
+  assert.equal(card.followUp, undefined);
+});
+
+test("a stated card still carries a caveat, above its footer", () => {
+  const card = renderProposalCard({
+    kind: "stated",
+    verb: "file this intake",
+    lead: "*Library published*",
+    footer: ":white_check_mark: files the intake.",
+    fields: [],
+    caveats: [{ kind: "cut-off-rerun" }],
+    operations: [BATCH[3]!],
+  });
+  const lines = card.text.split("\n");
+  assert.match(lines[2]!, /An earlier approved run was cut off/);
+  assert.equal(lines.at(-1), ":white_check_mark: files the intake.");
+  assert.ok(!card.text.includes(CONFIRM_FOOTER), card.text);
 });
