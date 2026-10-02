@@ -14,7 +14,7 @@ summary: The feedback rail — share for comment: bundle, Decisions DB, and what
    - Decisions — summon `writers/notion` to create/update Decisions DB rows for
      this Roadmap card (Evidence = share-out / thread permalink when available).
    - Figma replica (prototypes only) — summon `writers/figma` to build
-     `[replica]`-prefixed frames from the coded prototype.
+     replica frames from the coded prototype.
 2. **Gate check.** Any required piece missing → produce it before going
    further. In this IDE flow a partial bundle never posts. (uno-bot's quick
    feedback rail differs since 2026-07-16: it stages immediately and flags gaps

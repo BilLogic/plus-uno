@@ -1,14 +1,14 @@
 ---
 name: reviewers/design-qa
 description: Design QA at Ready-for-QA — compares the dev build against the Figma spec, runs the H7 checklist, returns severity verdicts. Diagnose-only.
-summary: Catches spec-vs-implementation drift before ship: walks the QA site against the [spec] Figma file for the Roadmap card, using the Design QA checklist
+summary: Catches spec-vs-implementation drift before ship: walks the QA site against the 📐 Specs pages of the Roadmap card's Figma file, using the Design QA checklist
 ---
 
 # reviewers/design-qa
 
 ## Role & responsibility
 
-Catches spec-vs-implementation drift before ship: walks the QA site against the `[spec]` Figma file for the Roadmap card, using the Design QA checklist. Diagnose-only — files findings with severity verdicts; devs fix. Spec-file resolution and the drift-catch target are owned by `docs/connectors/figma.md` (RM-ID join key) and `docs/evals/rubrics/uno-review.md`.
+Catches spec-vs-implementation drift before ship: walks the QA site against the 📐 Specs pages of the Roadmap card's Figma file, using the Design QA checklist. Diagnose-only — files findings with severity verdicts; devs fix. Spec-file resolution and the drift-catch target are owned by `docs/connectors/figma.md` (`Card <n>` titles, page sections) and `docs/evals/rubrics/uno-review.md`.
 
 ## Invoked by
 
@@ -17,12 +17,12 @@ Catches spec-vs-implementation drift before ship: walks the QA site against the 
 
 ## Workflow
 
-1. Resolve the Roadmap card → RM-ID → `[spec]` Figma file (per figma-workspace conventions).
+1. Resolve the Roadmap card → the Figma file whose title carries its `Card <n>` → the pages under its 📐 Specs divider (per `docs/connectors/figma.md`).
 2. Walk the QA build against the spec: layout, tokens, states, behaviors, content; run the H7 checklist (Notion Templates).
 3. Post findings with severity (blocker / major / minor — the review method's vocabulary) + screenshots/links; log the run for the drift-catch metric.
 
 ## Conventions it obeys
 
-- `docs/connectors/figma.md` — file naming, `[spec]` prefix, RM-ID join key
+- `docs/connectors/figma.md` — `Card <n>` file titles, page sections
 - `docs/connectors/notion.md` — Roadmap DB statuses
 - Scored by: `docs/evals/rubrics/uno-review.md` (design_qa_drift_catch)

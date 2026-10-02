@@ -12,7 +12,7 @@ Poke holes in a design at the right depth for its stage. **Diagnose only — thi
 
 ## Intake — the artifact manifest (mandatory)
 
-Every designer-initiated review starts from a one-line manifest: **fidelity (low / mid / high / coded) · tools used · PRD link**. Every prototyping path exit produces one; for hand-crafted work the designer supplies it. The manifest may also carry unresolved check failures (the prototype method §5.3 sends them forward — treat them as pre-flagged findings, not surprises). Fidelity arrives from prototyping as dial settings, which collapse to the low / mid / high / coded label used here. No manifest → ask for it before reviewing — the manifest is what makes the review stage-appropriate. **Exemption:** the auto-triggered Design QA path (Ready-for-QA) derives its context from the Roadmap card + `[spec]` file instead of a manifest. One artifact per review; no side-by-side comparisons.
+Every designer-initiated review starts from a one-line manifest: **fidelity (low / mid / high / coded) · tools used · PRD link**. Every prototyping path exit produces one; for hand-crafted work the designer supplies it. The manifest may also carry unresolved check failures (the prototype method §5.3 sends them forward — treat them as pre-flagged findings, not surprises). Fidelity arrives from prototyping as dial settings, which collapse to the low / mid / high / coded label used here. No manifest → ask for it before reviewing — the manifest is what makes the review stage-appropriate. **Exemption:** the auto-triggered Design QA path (Ready-for-QA) derives its context from the Roadmap card + its file's 📐 Specs pages instead of a manifest. One artifact per review; no side-by-side comparisons.
 
 ## Three scenarios
 
@@ -20,7 +20,7 @@ Every designer-initiated review starts from a one-line manifest: **fidelity (low
 |---|---|---|
 | **Stage-lens review** (Flow 2, step 4) | an artifact exits any prototyping path — including hand-crafted work — or the user asks for a review/critique | ds-lens + uno-lens + a11y-lens, in parallel |
 | **Handoff gate** (Flow 3, H4) | a handoff package is about to publish — after rails propagation, before sign-off | same three lenses in parallel; uno-lens additionally checks the spec against what was just propagated to uno-storybook / uno-blueprint |
-| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve RM-ID → `[spec]` Figma file, walk the QA build against it with the Design QA checklist |
+| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve the card's Figma file (`Card <n>` in its title) → its 📐 Specs pages, walk the QA build against them with the Design QA checklist |
 
 ## Lens dispatch — parallel, in-lane, stage-appropriate
 
@@ -37,7 +37,7 @@ What each lens applies (the rules live in the docs, not here):
 - `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and `AGENTS.md` § Hard rules. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
 - `reviewers/uno-lens` — artifact vs PRD + uno-blueprint constraints, queried live at review time.
 - `reviewers/a11y-lens` — `design-system/guidelines/foundations/accessibility.md`: WCAG AA contrast, 44×44 targets, keyboard reach, focus order + visibility, semantic HTML / screen readers, color-not-alone, reduced motion.
-- `reviewers/design-qa` — the `[spec]` frames' Dev Mode annotations (`docs/connectors/figma.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
+- `reviewers/design-qa` — the 📐 Specs pages' Dev Mode annotations (`docs/connectors/figma.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
 
 ## Findings & severity
 
