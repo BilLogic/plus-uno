@@ -21,7 +21,7 @@ export function namesInWords(names: readonly string[]): string {
  * @param isoDate - `YYYY-MM-DD`, or a full ISO timestamp (its date is used)
  */
 export function shortDate(isoDate: string): string {
-  const [, month, day] = /^(\d{4})-(\d{2})-(\d{2})/.exec(isoDate) ?? [];
+  const [, , month, day] = /^(\d{4})-(\d{2})-(\d{2})/.exec(isoDate) ?? [];
   const m = Number(month);
   if (!m || m > 12 || !day) return isoDate;
   return `${MONTHS[m - 1]} ${Number(day)}`;

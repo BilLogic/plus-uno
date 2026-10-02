@@ -1305,7 +1305,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
 
   // A keyed card that revises only its own way (the weekly DS precedence
-  // card, through `dispute N`) is not revised by a turn at all: the batch is
+  // card, through `drop N`) is not revised by a turn at all: the batch is
   // refused with the card's note, rather than staged as a near-copy that
   // stays live beside it — two live cards could both run.
   if (replaced?.refuseRevision) {

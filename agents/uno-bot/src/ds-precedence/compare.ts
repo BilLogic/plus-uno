@@ -38,6 +38,7 @@
 
 import type { FigmaComponentsResponse } from "../figma/client";
 import { figmaNodeUrl, type LibraryChangeSet } from "../figma-library/draft";
+import { namesInWords } from "../slack/copy-words";
 
 /** The three DS sources, in precedence order: the first wins. */
 export type DsSource = "code" | "library" | "spec-pages";
@@ -63,7 +64,10 @@ export interface Disagreement {
   key: string;
   component: string;
   kind: DisagreementKind;
-  /** One sentence, Markdown-safe; component and prop names in backticks. */
+  /** What disagrees, in #886 § 3.4's register — "code has `size="xs"`, the
+   *  library doesn't" — and without the component's name, which the list's
+   *  item line and the intake's table each lead with. Markdown-safe; props and
+   *  values in backticks. */
   summary: string;
   codeUrl: string;
   figmaUrl: string;
@@ -251,6 +255,8 @@ export function indexedInLibrary(index: readonly IndexEntry[], registry: Precede
 }
 
 const ticked = (xs: readonly string[]) => xs.map((x) => `\`${x}\``).join(", ");
+/** Values as props a person reads them: `size="xs"` and `size="xl"`. */
+const propValues = (prop: string, values: readonly string[]) => namesInWords(values.map((v) => `\`${prop}="${v}"\``));
 
 export interface CompareInput {
   index: readonly IndexEntry[];
@@ -288,7 +294,7 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
         report(
           "missing-in-figma",
           "",
-          `\`${entry.name}\` is in the component index, and the library has no published set for it.`,
+          "code has it, the library has no published component for it",
           `https://www.figma.com/design/${fileKey}`,
         );
       }
@@ -320,9 +326,9 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
         report(
           "prop-as-sets",
           prop,
-          `\`${entry.name}.${prop}\` is one prop in code (${ticked(codeValues)}); the library splits it into ` +
-            `${sets.length} sets: ${sets.join(", ")}.` +
-            (uncovered.length ? ` ${ticked(uncovered)} ${uncovered.length === 1 ? "has" : "have"} no set.` : ""),
+          `code has one \`${prop}\` prop (${ticked(codeValues)}), the library splits it into ` +
+            `${sets.length} components: ${namesInWords(sets)}` +
+            (uncovered.length ? `; ${ticked(uncovered)} ${uncovered.length === 1 ? "has" : "have"} no component` : ""),
           firstUrl,
         );
         continue;
@@ -335,14 +341,12 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
           report(
             "axis-values",
             prop,
-            `\`${entry.name}.${prop}\` values disagree: ` +
-              [
-                lacks.length ? `the library lacks ${ticked(lacks)}` : "",
-                adds.length ? `the library adds ${ticked(adds)}, which code does not have` : "",
-              ]
-                .filter(Boolean)
-                .join("; ") +
-              ".",
+            [
+              lacks.length ? `code has ${propValues(prop, lacks)}, the library doesn't` : "",
+              adds.length ? `the library has ${propValues(prop, adds)}, code doesn't` : "",
+            ]
+              .filter(Boolean)
+              .join("; "),
             firstUrl,
           );
         }
@@ -352,7 +356,7 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
         report(
           "missing-axis",
           prop,
-          `\`${entry.name}.${prop}\` (${ticked(codeValues)}) is a prop in code, and no variant axis of the library's set carries it.`,
+          `code has a \`${prop}\` prop (${ticked(codeValues)}), and no variant in the library carries it`,
           setUrl(withAxes[0]!),
         );
       }

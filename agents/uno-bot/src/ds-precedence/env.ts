@@ -21,7 +21,7 @@ import type { LibraryChangeSet } from "../figma-library/draft";
 import type { TrackedPublish } from "../figma-library/track";
 import type { JobContext } from "../scheduled/runs";
 import { inFlightComponents, type PrecedenceRegistry } from "./compare";
-import { disputedItems, PRECEDENCE_MARKER } from "./report";
+import { droppedItems, PRECEDENCE_MARKER, precedenceRuleUrl } from "./report";
 import {
   disputePrecedenceItems,
   followRestagedCard,
@@ -108,6 +108,7 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
       post: (message) => post(env, channel, message),
       stage: (proposal) => stageWeeklyCard(env, proposal),
       channel,
+      ruleUrl: precedenceRuleUrl(target.entry.repo),
       now: () => Date.now(),
     },
     opts,
@@ -115,10 +116,11 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
 }
 
 /**
- * Whether a message could be a dispute of the weekly thread: a person's reply
+ * Whether a message could drop items from the weekly thread: a person's reply
  * (or "also send to channel" broadcast) in a #plus-universal thread that starts
- * with `dispute N`. Reads nothing — the dispatch uses it to queue the reply on
- * the thread's runner, where `handleDsPrecedenceReply` decides.
+ * with `drop N` (or the older `dispute N`). Reads nothing — the dispatch uses
+ * it to queue the reply on the thread's runner, where `handleDsPrecedenceReply`
+ * decides.
  *
  * @param env - Worker bindings
  * @param event - The message
@@ -127,16 +129,16 @@ export function isDsPrecedenceCandidate(env: Env, event: SlackMessageEvent): boo
   const channel = env.PLUS_UNIVERSAL_CHANNEL_ID?.trim();
   if (!channel || event.channel !== channel || !event.thread_ts || !env.HARNESS_KV) return false;
   if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
-  return disputedItems(event.text ?? "").length > 0;
+  return droppedItems(event.text ?? "").length > 0;
 }
 
 /**
- * A queued reply that disputes items of the live weekly thread: revise its
+ * A queued reply that drops items from the live weekly thread: revise its
  * card. Runs at the head of the thread's job (`slack/message-job.ts`).
  *
  * @param env - Worker bindings
  * @param event - The message
- * @returns Whether it was a dispute, handled — the turn is then skipped
+ * @returns Whether it was a drop, handled — the turn is then skipped
  */
 export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent): Promise<boolean> {
   if (!isDsPrecedenceCandidate(env, event)) return false;

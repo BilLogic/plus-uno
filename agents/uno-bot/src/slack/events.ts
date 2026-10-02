@@ -84,7 +84,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   switch (event.type) {
     case "message": {
       const msg = event as SlackMessageEvent;
-      // A `dispute N` reply in the weekly DS precedence thread, a "yes, it's
+      // A `drop N` reply in the weekly DS precedence thread, a "yes, it's
       // up to date" in a thread asked about a file, and an answer under a card
       // follow-up are queued like a turn and handled at the head of the
       // thread's job (`message-job.ts`).
@@ -368,7 +368,7 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
     // A weekly DS precedence list thread is the same: people talk about the
     // list there, not to uno-bot. For as long as it is recorded as one, only
     // an @mention (above) or a typed gate emoji engages (`ds-precedence/env.ts`);
-    // `dispute N` is queued on its own.
+    // `drop N` is queued on its own.
     if (await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts)) {
       return typedEmojiDecision(event.text ?? "") !== null;
     }
@@ -447,7 +447,7 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
 
 /**
  * The ahead-of-the-turn handler a message is for, decided once when it is
- * queued: a weekly DS precedence dispute (by shape), a "yes, it's up to date"
+ * queued: a weekly DS precedence `drop N` (by shape), a "yes, it's up to date"
  * in a thread asked about a file, or an answer in a thread holding a card
  * follow-up (each one KV read, and only for a message of the right shape).
  * Null for none.
@@ -463,7 +463,7 @@ export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<
 }
 
 /** The replies handled ahead of the turn, in the order tried: a weekly DS
- *  precedence dispute (a throw runs the turn), an answer about a file's drift
+ *  precedence `drop N` (a throw runs the turn), an answer about a file's drift
  *  (it catches its own failures but a budget stop, as on main), and an answer
  *  under a card follow-up (it catches every failure). */
 export function replyHandlersFor(env: Env): ReplyHandler[] {
