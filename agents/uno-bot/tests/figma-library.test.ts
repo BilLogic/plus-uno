@@ -612,7 +612,7 @@ describe("the morning tracker", () => {
     assert.equal(result.linked, 1);
     assert.deepEqual(calls, [
       "comment #870: The implementation PR is open: https://github.com/o/r/pull/880",
-      `thread ${CHANNEL}/1790000000.000001: :link: The implementation PR is open: <https://github.com/o/r/pull/880|#880> — linked in the intake <https://github.com/o/r/issues/870|#870>.`,
+      `thread ${CHANNEL}/1790000000.000001: PR open: <https://github.com/o/r/pull/880|#880>. Linked from the <https://github.com/o/r/issues/870|intake>.`,
     ]);
     assert.deepEqual(store.value[0]!.pr, { number: 880, url: "https://github.com/o/r/pull/880" });
 
@@ -628,6 +628,25 @@ describe("the morning tracker", () => {
     assert.equal(result.closed, 1);
     assert.ok(calls.includes("close #870"));
     assert.ok(calls.some((c) => c.startsWith("comment #870: Incorporated by")));
+    // One 🎉, naming what now matches the library.
+    assert.ok(
+      calls.includes(
+        `thread ${CHANNEL}/1790000000.000001: :tada: <https://github.com/o/r/pull/880|#880> merged, so Accordion and Badge match the library. Closed the <https://github.com/o/r/issues/870|intake>.`,
+      ),
+      calls.join("\n"),
+    );
+    assert.deepEqual(store.value, []);
+  });
+
+  it("says a PR closed without merging leaves the intake open, and stops tracking", async () => {
+    const { deps, calls, store } = trackDeps([pr({ state: "closed", merged: false })]);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.dropped, 1);
+    assert.equal(
+      calls.at(-1),
+      `thread ${CHANNEL}/1790000000.000001: <https://github.com/o/r/pull/880|#880> closed without merging. The <https://github.com/o/r/issues/870|intake> stays open for the next try.`,
+    );
+    assert.ok(!calls.includes("close #870"));
     assert.deepEqual(store.value, []);
   });
 

@@ -35,7 +35,7 @@
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
-import { windowInWords } from "../slack/copy-words";
+import { namesInWords, windowInWords } from "../slack/copy-words";
 import { LIBRARY_CARD_TTL_MS } from "./post";
 
 /** A posted library card, followed until its PR merges or it ages out. */
@@ -98,6 +98,33 @@ export interface TrackDeps {
 /** The line an expired card ends with (#886 § 3.1). */
 export function expiredCardNote(intakeUrl: string): string {
   return `_No decision in ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)}. Filed the <${intakeUrl}|intake> so it isn't lost._`;
+}
+
+// ── The card's thread, as the PR moves (#886 § 3.2) ──────────────────────────
+// Plain links, and one 🎉 — on the merge, naming what now matches. A ✅ only
+// ever means "approve", so it appears in none of these.
+
+type Link = { number: number; url: string };
+
+/** The PR opened. */
+export function prOpenedLine(pr: Link, intake?: Link): string {
+  return `PR open: <${pr.url}|#${pr.number}>.${intake ? ` Linked from the <${intake.url}|intake>.` : ""}`;
+}
+
+/**
+ * The PR merged: what now matches the library, by name.
+ *
+ * @param implement - The component list the card dispatched, comma-joined
+ */
+export function prMergedLine(pr: Link, implement: string | null, intake?: Link): string {
+  const names = (implement ?? "").split(",").map((n) => n.trim()).filter(Boolean);
+  const matches = names.length ? `, so ${namesInWords(names)} ${names.length === 1 ? "matches" : "match"} the library` : "";
+  return `:tada: <${pr.url}|#${pr.number}> merged${matches}.${intake ? ` Closed the <${intake.url}|intake>.` : ""}`;
+}
+
+/** The PR closed without merging: the intake stays for the next try. */
+export function prClosedLine(pr: Link, intake?: Link): string {
+  return `<${pr.url}|#${pr.number}> closed without merging.${intake ? ` The <${intake.url}|intake> stays open for the next try.` : ""}`;
 }
 
 /** A card whose PR has not appeared by now is let go. */
@@ -199,12 +226,7 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
         if (card.intake) {
           await deps.github.comment(card.intake.number, `The implementation PR is open: ${pr.url}`);
         }
-        await deps.postToThread(
-          card.channel,
-          card.ts,
-          `:link: The implementation PR is open: <${pr.url}|#${pr.number}>` +
-            (card.intake ? ` — linked in the intake <${card.intake.url}|#${card.intake.number}>.` : "."),
-        );
+        await deps.postToThread(card.channel, card.ts, prOpenedLine(pr, card.intake));
       }
     }
 
@@ -216,12 +238,7 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
           await deps.github.comment(card.intake.number, `Incorporated by ${pr.url}, merged.`);
           await deps.github.close(card.intake.number);
         }
-        await deps.postToThread(
-          card.channel,
-          card.ts,
-          `:white_check_mark: <${pr.url}|#${pr.number}> merged` +
-            (card.intake ? ` — closed the intake <${card.intake.url}|#${card.intake.number}> as incorporated.` : "."),
-        );
+        await deps.postToThread(card.channel, card.ts, prMergedLine(pr, card.implement, card.intake));
       }
       continue;
     }
@@ -230,11 +247,7 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
       dropped += 1;
       done.add(card.key);
       if (!opts.dryRun) {
-        await deps.postToThread(
-          card.channel,
-          card.ts,
-          `:information_source: <${pr.url}|#${pr.number}> was closed without merging, so the intake stays open.`,
-        );
+        await deps.postToThread(card.channel, card.ts, prClosedLine(pr, card.intake));
       }
       continue;
     }
