@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **152,740 chars from 16 files**, against an assembled budget of 175,500 (22,760 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 132,356 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **152,848 chars from 16 files**, against an assembled budget of 175,500 (22,652 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 132,464 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -26,15 +26,15 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,972 | 70,843 | 7,000 (Worker face) |
 | 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,556 | 7,000 (Worker face) |
 | 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,843 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,663 | 89,548 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,950 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,270 (−7,738 ide-only) | 99,262 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 113,260 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,092 (−3,424 ide-only) | 129,394 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 132,678 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 139,194 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 143,857 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,835 (−605 ide-only) | 152,740 | — |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,687 | 89,572 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,974 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−7,738 ide-only) | 99,370 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 113,368 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,092 (−3,424 ide-only) | 129,502 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 132,786 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 139,302 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 143,965 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,835 (−605 ide-only) | 152,848 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,7 +46,7 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 91,101 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 91,120 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -56,7 +56,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
-| `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,905 |
+| `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,924 |
 | `uno-synthesize/method` | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 |
 
 ## The assembled prompt
@@ -624,7 +624,7 @@ Poke holes in a design from Slack. A designer links a frame, a prototype, a spec
 ## Execute — one review turn
 
 1. **Read the method.** The pointer at the foot of this file names it; make that `read_reference` call before anything below — intake, scenarios, lens depth, severity and verdict are its sections. Done when the method is in this turn's context.
-2. **Take the manifest.** A designer-initiated review starts from the one-liner — fidelity (low / mid / high / coded) · tools used · PRD link. Missing → ask once in-thread. The target is in hand only when the read returns the artifact's own content — its text layers, its markup, its rendered screen. Still missing, or not in hand (no link; `source_read` fails; or the page answers with an application shell and none of the artifact in it) → say so plainly, record an intake (`notion_create`, surface `intake`, gated) and route to a human. A URL that loaded is not an artifact that loaded. Where the artifact is code, its source in the repo is the artifact; where it is a link, the blueprint rows and the feature's specs are context around the thing under review rather than the thing itself. Design QA arrives when someone brings the card at RTT (no auto-trigger exists): resolve `Card <n>` → its file's 📐 Specs pages per the method, in place of a manifest. Done when fidelity, tools and PRD are known, or the turn has ended at the intake.
+2. **Take the manifest.** A designer-initiated review starts from the one-liner — fidelity (low / mid / high / coded) · tools used · PRD link. Missing → ask once in-thread. The target is in hand only when the read returns the artifact's own content — its text layers, its markup, its rendered screen. Still missing, or not in hand (no link; `source_read` fails; or the page answers with an application shell and none of the artifact in it) → say so plainly, record an intake (`notion_create`, surface `intake`, gated) and route to a human. A URL that loaded is not an artifact that loaded. Where the artifact is code, its source in the repo is the artifact; where it is a link, the blueprint rows and the feature's specs are context around the thing under review rather than the thing itself. Design QA arrives when someone brings the card at RTT (no auto-trigger exists): find the file whose title lists the card's number → its 📐 Specs pages per the method, in place of a manifest. Done when fidelity, tools and PRD are known, or the turn has ended at the intake.
 3. **Inspect before judging.** `source_read` the linked frame (rendered screenshot + text layers) and the PRD or spec; `github_read` the rule docs each lens applies — `design-system/guidelines/foundations/accessibility.md`, the agent-views, the component's source for a coded artifact. Every finding rests on fetched content. Done when you can quote what is in the artifact.
 4. **Apply the lenses yourself**, one at a time, in-lane, at the manifest's fidelity depth — there is no sub-agent dispatch here: ds-lens (components, tokens, layout, the hard rules), uno-lens (artifact vs PRD and `search_blueprint` rows, queried live), a11y-lens (contrast, targets, keyboard, focus, semantics, colour-not-alone, motion); Design QA walks the build against the 📐 Specs pages' Dev Mode annotations and the checklist. **The fidelity wall:** qualitative review from the screenshot is yours — layout, hierarchy, alignment, spacing feel, glaring contrast, flow logic, structure, terminology, copy, PRD conformance. Computed values are IDE-only — exact WCAG ratios, token fidelity, 44×44 measurement, focus order, responsive behaviour (`skills/uno-review` + Figma MCP + `run-review-checks.sh`, the catch-pattern greps included). Say the boundary plainly, mark depth-limited findings as *partial*, and offer an intake or a ready-to-paste IDE prompt with the frame and PRD links pre-filled. No image renderable → a text-layer review, labelled as such. Done when each lens has run at its depth or been marked partial.
 5. **Write each finding** with severity · lens · evidence (what is in the artifact) · reference (the doc or rule) · re-entry point. Blockers and majors flip the verdict; minors are advisory and travel with the artifact. Three strong findings beat seven mushy ones — a low-confidence finding is omitted. "What's working" is mandatory: 1–3 specific strengths with the principle they match. Done when every finding carries all five parts.
@@ -750,7 +750,7 @@ MISC holds workshop, onboarding and event files, and sits outside the scheme.
 
 ## File titles
 
-A card's file is titled `<Project> / Card <n> & <m> / <designers>`, e.g. `AI Indicator / Card 733 & 1002 / <designers>`. `Card <n>` is the Roadmap card's number, the `<n>` of its RM-ID, and it is how a file joins its card in Notion. A file for several cards lists every one, joined by `&`.
+A card's file is titled `<Project> / Card <n> & <m> / <designers>`, e.g. `AI Indicator / Card 733 & 1002 / <designers>`. `Card <n>` is the Roadmap card's number, the `<n>` of its RM-ID, and it is how a file joins its card in Notion. A file for several cards lists every one, joined by `&`, so a card's number may follow `Card` or `&`, and it matches only as a whole number.
 
 - Work from before the Roadmap is titled `<Project> / Legacy / <term>`.
 - Libraries, templates and reference kits keep plain names, e.g. `Design System (S23)`.
@@ -2371,7 +2371,7 @@ Every designer-initiated review starts from a one-line manifest: **fidelity (low
 |---|---|---|
 | **Stage-lens review** (Flow 2, step 4) | an artifact exits any prototyping path — including hand-crafted work — or the user asks for a review/critique | ds-lens + uno-lens + a11y-lens, in parallel |
 | **Handoff gate** (Flow 3, H4) | a handoff package is about to publish — after rails propagation, before sign-off | same three lenses in parallel; uno-lens additionally checks the spec against what was just propagated to uno-storybook / uno-blueprint |
-| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve the card's Figma file (`Card <n>` in its title) → its 📐 Specs pages, walk the QA build against them with the Design QA checklist |
+| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve the card's Figma file (its number in the title's `Card <n> & <m>`) → its 📐 Specs pages, walk the QA build against them with the Design QA checklist |
 
 ## Lens dispatch — parallel, in-lane, stage-appropriate
 

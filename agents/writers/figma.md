@@ -18,7 +18,7 @@ The only agent that writes to the Figma workspace. Owns file titles, page placem
 
 ## Workflow
 
-1. Resolve the card's file (`Card <n>` in its title) and the divider section the work belongs under before writing anything.
+1. Resolve the card's file (its number in the title's `Card <n> & <m>`) and the divider section the work belongs under before writing anything.
 2. Write frames/annotations per the workspace playbook; annotation text per writing-style.
 3. Leave the workspace navigable: right section, right page (per `docs/connectors/figma.md`), stale things archived not deleted.
 

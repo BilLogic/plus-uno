@@ -17,7 +17,7 @@ Catches spec-vs-implementation drift before ship: walks the QA site against the 
 
 ## Workflow
 
-1. Resolve the Roadmap card → the Figma file whose title carries its `Card <n>` → the pages under its 📐 Specs divider (per `docs/connectors/figma.md`).
+1. Resolve the Roadmap card → the Figma file whose title lists its number (`Card <n> & <m>`) → the pages under its 📐 Specs divider (per `docs/connectors/figma.md`).
 2. Walk the QA build against the spec: layout, tokens, states, behaviors, content; run the H7 checklist (Notion Templates).
 3. Post findings with severity (blocker / major / minor — the review method's vocabulary) + screenshots/links; log the run for the drift-catch metric.
 

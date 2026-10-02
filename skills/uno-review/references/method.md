@@ -20,7 +20,7 @@ Every designer-initiated review starts from a one-line manifest: **fidelity (low
 |---|---|---|
 | **Stage-lens review** (Flow 2, step 4) | an artifact exits any prototyping path — including hand-crafted work — or the user asks for a review/critique | ds-lens + uno-lens + a11y-lens, in parallel |
 | **Handoff gate** (Flow 3, H4) | a handoff package is about to publish — after rails propagation, before sign-off | same three lenses in parallel; uno-lens additionally checks the spec against what was just propagated to uno-storybook / uno-blueprint |
-| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve the card's Figma file (`Card <n>` in its title) → its 📐 Specs pages, walk the QA build against them with the Design QA checklist |
+| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve the card's Figma file (its number in the title's `Card <n> & <m>`) → its 📐 Specs pages, walk the QA build against them with the Design QA checklist |
 
 ## Lens dispatch — parallel, in-lane, stage-appropriate
 

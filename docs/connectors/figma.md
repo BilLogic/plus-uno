@@ -32,7 +32,7 @@ MISC holds workshop, onboarding and event files, and sits outside the scheme.
 
 ## File titles
 
-A card's file is titled `<Project> / Card <n> & <m> / <designers>`, e.g. `AI Indicator / Card 733 & 1002 / <designers>`. `Card <n>` is the Roadmap card's number, the `<n>` of its RM-ID, and it is how a file joins its card in Notion. A file for several cards lists every one, joined by `&`.
+A card's file is titled `<Project> / Card <n> & <m> / <designers>`, e.g. `AI Indicator / Card 733 & 1002 / <designers>`. `Card <n>` is the Roadmap card's number, the `<n>` of its RM-ID, and it is how a file joins its card in Notion. A file for several cards lists every one, joined by `&`, so a card's number may follow `Card` or `&`, and it matches only as a whole number.
 
 - Work from before the Roadmap is titled `<Project> / Legacy / <term>`.
 - Libraries, templates and reference kits keep plain names, e.g. `Design System (S23)`.

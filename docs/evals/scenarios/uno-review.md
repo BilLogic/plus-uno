@@ -16,7 +16,7 @@ summary: uno-review — eval scenarios
 
 ## S2 — Design QA at Ready-for-QA
 - **Trigger:** Roadmap card flips to `Dev Status: Ready for QA (RTT)`
-- **Expected:** reviewers/design-qa resolves the card's Figma file (`Card <n>` in its title) → its 📐 Specs pages; walks the QA build against them with the Design QA checklist; blockers hold Ready-for-Prod; run logged for the drift-catch metric
+- **Expected:** reviewers/design-qa resolves the card's Figma file (its number in the title's `Card <n> & <m>`) → its 📐 Specs pages; walks the QA build against them with the Design QA checklist; blockers hold Ready-for-Prod; run logged for the drift-catch metric
 - **Fails if:** QA runs against the wrong spec file · findings lack severity verdicts
 
 ## S3 — diagnose-only guard
