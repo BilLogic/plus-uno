@@ -674,7 +674,11 @@ export async function cardFollowUpDue(
     ...(first ? { nudgeTs: sent.ts } : { followupTs: sent.ts }),
   });
   await deps.store.saveText(c.id, { ...text, bodies: { ...text.bodies, [sent.ts]: body } }, now + TEXT_KEEP_MS);
-  await deps.markThread(c.channel, to.threadTs ?? sent.ts);
+  // Marked only when the follow-up went into the team's own thread (a to-do's
+  // thread): there replies are the team talking to each other. A follow-up at
+  // the channel's top starts a thread that is uno-bot's own, so a reply there
+  // is a reply to uno-bot and engages it like any thread it is in.
+  if (c.threadTs) await deps.markThread(c.channel, c.threadTs);
   // Replies under F4's question may name its owner.
   if (first && c.kind === "card_unowned") await deps.markReplyThread(c.channel, sent.ts, OWNER_REPLY_TTL_MS);
   return { id: c.id, action, text: body, ts: sent.ts };

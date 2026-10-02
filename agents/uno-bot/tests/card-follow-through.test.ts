@@ -260,6 +260,9 @@ describe("F3: a to-do to make a card", () => {
     assert.equal(offer!.threadTs, ROOT);
     assert.match(offer!.text, /Want me to draft a Roadmap card for the facelift last stage\?/);
     assert.deepEqual(mentions(offer!.text), [MAYA]);
+    // Posted into the team's own thread, it marks that thread: the replies
+    // there are the team's conversation, not turns.
+    assert.deepEqual(m.marked, [`${DESIGN}:${ROOT}`]);
     assert.equal(only(store).state, "nudged");
 
     // The same morning again posts nothing more.
@@ -374,8 +377,9 @@ describe("F4: an active card with no owner", () => {
     assert.equal(m.posts[0]!.threadTs, null);
     assert.match(m.posts[0]!.text, /Who should take <https:\/\/www\.notion\.so\/p1\|Facelift — last stage>\?/);
     assert.deepEqual(mentions(m.posts[0]!.text), [BEA]);
-    // Its thread is marked, so the team's replies there are not turns.
-    assert.deepEqual(m.marked, [`${DESIGN}:${m.posts[0]!.ts}`]);
+    // Posted at the channel's top, its thread is uno-bot's own: it is not
+    // marked, so a reply there engages uno-bot like any thread it is in.
+    assert.deepEqual(m.marked, []);
   });
 
   it("is not kept before a week has passed, nor again the same night", async () => {

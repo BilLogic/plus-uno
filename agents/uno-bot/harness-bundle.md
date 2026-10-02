@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 91,047 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 91,319 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 23,081 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 23,353 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,849 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1392,7 +1392,7 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 - **F4, an active card with no owner.** A card in WIP or Under Review with an empty Contributor and no edit for 7 days; a card waiting in Need PRD / Under Playground or Ready for Design is queued work, and is passed over. "Who should take …?" mentions the card's creator. Only someone the question asked (the card's creator, or a person it mentioned) can name the owner: their reply naming exactly one person ("@Maya"), or their own "me", "mine" or "I'll take it", stages the Contributor change. The follow-up closes once the card shows a Contributor; a proposal nobody applies leaves it open for its follow-up. Cards uno-bot's own integration created are passed over.
 - **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. "Is it still moving?" mentions the Contributors, with buttons: 🙌 Done, ⏳ Still on it (checked again in 3 weeks), 🙅 Drop it. After 🙌 or 🙅 from an owner, uno-bot lists the card's live Design Status options in the thread, read from the Roadmap schema, Shipped and Under Dev first for 🙌 and Archived first for 🙅. The owner replies with a number or a name typed whole, and that stages the move on a ✅ card. The first other reply gets the options again, once, and stages nothing; after that, and after 72 h, replies are the thread's own. Only an owner's reply counts.
 - **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most two new card questions a channel each morning. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
-- **Replies:** the thread of an F4 question or an F5 options list carries a KV mark while it waits, so a short reply anywhere else costs no database read. A failed reply check hands the reply to the thread as usual.
+- **Replies:** the thread of an F4 question or an F5 options list carries a KV mark while it waits, so a short reply anywhere else costs no database read. A failed reply check hands the reply to the thread as usual. A follow-up posted at the channel's top starts a thread that is uno-bot's own, so any other reply there engages uno-bot like a thread it is in, with no @mention needed. One posted into the team's own thread (a to-do's) leaves that thread the team's, as a sweep card does.
 - **Passed over:** a card with nobody to ask in Slack, or no channel, is marked in KV and looked at again a week on; a stale card with a recent comment, once that comment is three weeks old.
 - **Evidence first:** each morning re-reads the card. A Contributor set, a status moved, an edit or a comment since closes it with no post.
 - **One message a card a week:** a follow-up's follow-up waits five working days, and a card asked about in the past week is not asked about again.
