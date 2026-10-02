@@ -2,6 +2,11 @@
 // poll found becomes ONE message in #plus-universal — the summary and a
 // proposal card — with the drafted intake behind it.
 //
+// A CHANGE WITH NO PUBLISHED VERSION posts no card (#886 § 3.1): the library
+// was edited, not published, so there is nothing to build and nothing to
+// decide. It says so in one plain message, files nothing, stages nothing and
+// is not tracked.
+//
 // THE CARD. Its batch files the intake (`github_issue_create`) and, when any
 // changed component maps to code, dispatches `figma-implement.yml` for all of
 // them (`component_implement` carrying `library_publish`). It is staged the way
@@ -25,20 +30,27 @@
 // nobody could confirm, would be worse than a day's wait.
 //
 // Subrequest math, per job: the registry (1) and the channel's members (at
-// most 3 pages), then per change set one post; the staging is a Durable Object
-// hop and KV is the internal bucket. The poll keeps at most `MAX_FINDINGS` (5)
-// change sets waiting, so 1 + 3 + 5 = 9 — far under the lookup ceiling of 38.
+// most 3 pages), then per change set one post, and — only when the card had to
+// cap its list — the full list in its thread, a reply per ~3,500 chars of
+// names (about 200 names each); the staging is a Durable Object hop and KV is
+// the internal bucket. The poll keeps at most `MAX_FINDINGS` (5) change sets
+// waiting: with no list to spill that is 1 + 3 + 5 = 9, and even five cards
+// each spilling three replies come to 1 + 3 + 5 × 4 = 24, under the lookup
+// ceiling of 38.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
 import type { PendingProposal, ProposalOperation } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { textSections } from "../slack/render";
 import {
   draftPublishIntake,
-  publishSummary,
+  editedNotPublished,
+  publishCard,
   type ComponentRegistry,
   type LibraryChangeSet,
+  type PublishCardCopy,
   type PublishIntake,
 } from "./draft";
 import type { TrackedPublish } from "./track";
@@ -55,6 +67,8 @@ export interface PostDeps {
   members(): Promise<string[] | null>;
   /** Post one top-level message in the channel. */
   post(message: { text: string; blocks: unknown[] }): Promise<{ ok: boolean; ts?: string }>;
+  /** Post a reply in a card's thread — the full list, when the card capped it. */
+  reply(ts: string, text: string): Promise<void>;
   /** Stage the card, as a turn's staging does. */
   stage(proposal: PendingProposal): Promise<void>;
   channel: string;
@@ -86,7 +100,9 @@ export function libraryOperations(intake: PublishIntake): { operations: Proposal
 }
 
 /**
- * The card as data: the summary leads, then what the ✅ does.
+ * The card as data: a `stated` card, whose lead is the publish and its
+ * components and whose one footer says what ✅ and ⛔ each do — both
+ * operations named, which is why it carries no plan (#886 § 3.1).
  *
  * @param changeSet - What the poll found
  * @param intake - Its drafted intake
@@ -95,11 +111,13 @@ export function libraryCard(
   changeSet: LibraryChangeSet,
   intake: PublishIntake,
   operations: ProposalOperation[] = libraryOperations(intake).operations,
+  copy: PublishCardCopy = publishCard(changeSet, intake, LIBRARY_CARD_TTL_MS / 3_600_000),
 ): ProposalCard {
   return {
-    kind: "confirm",
+    kind: "stated",
     verb: operations.length > 1 ? "file this intake and start the implementation" : "file this intake",
-    lead: publishSummary(changeSet, intake, LIBRARY_CARD_TTL_MS / 3_600_000),
+    lead: copy.lead,
+    footer: copy.footer,
     fields: [
       { label: "intake", value: intake.title },
       ...(operations.length > 1 ? [{ label: "implement", value: intake.implement.join(", ") }] : []),
@@ -132,13 +150,27 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
   while (waiting.length) {
     const changeSet = waiting[0]!;
     const intake = draftPublishIntake(changeSet, registry);
-    const { operations, onCancel } = libraryOperations(intake);
-    const card = renderProposalCard(libraryCard(changeSet, intake, operations));
     if (opts.dryRun) {
       waiting.shift();
       posted += 1;
       continue;
     }
+    if (!intake.versionId) {
+      // Edited, not published: said plainly, and nothing to decide.
+      const text = editedNotPublished(changeSet, intake);
+      const sent = await deps.post({ text, blocks: textSections(text) });
+      if (!sent.ok) {
+        console.error(`[figma-library] post for ${intake.key} failed — kept for tomorrow`);
+        break;
+      }
+      waiting.shift();
+      posted += 1;
+      await deps.findings.write(waiting);
+      continue;
+    }
+    const copy = publishCard(changeSet, intake, LIBRARY_CARD_TTL_MS / 3_600_000);
+    const { operations, onCancel } = libraryOperations(intake);
+    const card = renderProposalCard(libraryCard(changeSet, intake, operations, copy));
     const sent = await deps.post({ text: card.text, blocks: proposalCardBlocks(card.text) });
     if (!sent.ok || !sent.ts) {
       console.error(`[figma-library] post for ${intake.key} failed — kept for tomorrow`);
@@ -166,6 +198,14 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
       // The message is up; posting it again tomorrow would make two. Its ✅
       // will say it was already resolved, which is where a person asks.
       console.error(`[figma-library] card for ${intake.key} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
+    }
+    // The card capped its list to stay one readable post; the whole list
+    // goes in its thread. A reply that fails is logged — the intake carries
+    // every row too — and the card is not posted again.
+    for (const text of copy.overflow) {
+      await deps.reply(ts, text).catch((err: unknown) => {
+        console.error(`[figma-library] full list for ${intake.key} not posted: ${err instanceof Error ? err.message : String(err)}`);
+      });
     }
     tracked.push({
       key: intake.key,

@@ -13,6 +13,7 @@
 // from GitHub), so tests/figma-library.test.ts drafts from a recorded diff.
 
 import { escapeSlackText } from "../slack/mrkdwn";
+import { namesInWords, windowInWords } from "../slack/copy-words";
 
 /** A component as the poll keeps it in its snapshot. */
 export interface LibraryComponent {
@@ -46,6 +47,15 @@ export interface LibraryChangeSet {
   /** Each as it now reads. */
   modified: LibraryComponent[];
   deleted: LibraryComponent[];
+  /**
+   * The components (by `componentIdOf`) that are new to the library as a
+   * whole, and the ones gone from it — so a new variant on an existing
+   * component reads as an update, not as a new component. Absent on a change
+   * set kept from before the poll recorded them; the card then judges by the
+   * variants alone.
+   */
+  newComponentIds?: string[];
+  removedComponentIds?: string[];
 }
 
 /** The slice of component-registry.json the draft reads. */
@@ -66,6 +76,8 @@ export interface IntakeRow {
   figmaUrl: string;
   /** The registry's component and its directory; null is "no code mapping". */
   code: { name: string; dir: string } | null;
+  /** What happened to the component as a whole, as the card counts it. */
+  change: "new" | "updated" | "removed";
   created: string[];
   modified: string[];
   deleted: string[];
@@ -122,6 +134,7 @@ function listed(names: readonly string[]): string {
 }
 
 interface Group {
+  id: string;
   figmaName: string;
   setNodeId?: string;
   firstNodeId: string;
@@ -130,15 +143,27 @@ interface Group {
   deleted: string[];
 }
 
+/**
+ * Which component a variant belongs to: its set's node id, else its set or
+ * frame name. The card's rows and the poll's new/removed ids both use it, so
+ * they name the same thing.
+ *
+ * @param c - A variant (or a lone component)
+ */
+export function componentIdOf(c: LibraryComponent): string {
+  return c.setNodeId ?? `name:${(c.containingFrame || c.name).toLowerCase()}`;
+}
+
 /** The change set by component set: variants of one set are one row. */
 function groupsOf(changeSet: LibraryChangeSet): Group[] {
   const groups = new Map<string, Group>();
   const add = (c: LibraryComponent, kind: "created" | "modified" | "deleted") => {
     const figmaName = c.containingFrame || c.name;
-    const id = c.setNodeId ?? `name:${figmaName.toLowerCase()}`;
+    const id = componentIdOf(c);
     let group = groups.get(id);
     if (!group) {
       group = {
+        id,
         figmaName,
         ...(c.setNodeId ? { setNodeId: c.setNodeId } : {}),
         firstNodeId: c.nodeId,
@@ -203,6 +228,23 @@ function proposalFor(group: Group, code: { name: string; dir: string } | null): 
   return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`;
 }
 
+/**
+ * New, updated or removed, for the component as a whole. The poll's ids say
+ * whether the component itself is new or gone; a change set kept from before
+ * it recorded them is judged by its variants — every one created is new,
+ * every one deleted is removed.
+ */
+function changeOf(group: Group, changeSet: LibraryChangeSet): IntakeRow["change"] {
+  if (changeSet.newComponentIds || changeSet.removedComponentIds) {
+    if (changeSet.newComponentIds?.includes(group.id)) return "new";
+    if (changeSet.removedComponentIds?.includes(group.id)) return "removed";
+    return "updated";
+  }
+  if (!group.modified.length && !group.deleted.length) return "new";
+  if (!group.created.length && !group.modified.length) return "removed";
+  return "updated";
+}
+
 function changeCell(row: Pick<IntakeRow, "created" | "modified" | "deleted">): string {
   const cells: string[] = [];
   const n = (xs: string[]) => `${xs.length} variant${xs.length === 1 ? "" : "s"}`;
@@ -234,6 +276,7 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
       figmaName: group.figmaName,
       figmaUrl: mapped?.url ?? figmaNodeUrl(changeSet.fileKey, group.setNodeId ?? group.firstNodeId),
       code,
+      change: changeOf(group, changeSet),
       created: group.created,
       modified: group.modified,
       deleted: group.deleted,
@@ -301,44 +344,154 @@ function firstLine(text: string): string {
   return text.split("\n")[0]!.trim().slice(0, 80);
 }
 
+// ── The #plus-universal messages (#886 § 3.1, approved 2026-09-30) ──────────
+//
+// The words are the approved copy's, and `docs/connectors/slack.md` § Figma
+// messages holds the rules they follow; tests/figma-copy.test.ts pins both.
+// Every Figma-sourced string is escaped.
+
+/** #886's ceiling for one post: a longer list goes in the thread. */
+export const CARD_CHARS = 1500;
+/** What one overflow reply is packed to — under a single post's ~3,900. */
+const REPLY_CHARS = 3500;
+
+const HAS_CODE = "Has code";
+const NO_CODE_YET = "No code mapping yet";
+
+/** The library file itself, which an edited-not-published post links. */
+function libraryUrl(fileKey: string): string {
+  return `https://www.figma.com/design/${fileKey}`;
+}
+
+/** The card's two groups, every row's name in each, in row order. */
+function codeGroups(intake: PublishIntake): Array<{ label: string; names: string[] }> {
+  const groups = [
+    { label: HAS_CODE, names: intake.rows.filter((r) => r.code).map((r) => escapeSlackText(r.figmaName)) },
+    { label: NO_CODE_YET, names: intake.rows.filter((r) => !r.code).map((r) => escapeSlackText(r.figmaName)) },
+  ];
+  return groups.filter((g) => g.names.length);
+}
+
+/** "7 components changed: 2 new, 5 updated." — the count is the rows, and so
+ *  is the list under it. */
+function countLine(rows: readonly IntakeRow[]): string {
+  if (!rows.length) return "No changed components found. The version has the details.";
+  const parts = (["new", "updated", "removed"] as const)
+    .map((change) => ({ change, n: rows.filter((r) => r.change === change).length }))
+    .filter((p) => p.n)
+    .map((p) => `${p.n} ${p.change}`);
+  return `${rows.length} component${rows.length === 1 ? "" : "s"} changed: ${parts.join(", ")}.`;
+}
+
+/** A group's line, its names capped at `cap` with the rest counted. */
+function groupLine(group: { label: string; names: string[] }, cap = Infinity): string {
+  const shown = group.names.slice(0, cap);
+  const rest = group.names.length - shown.length;
+  return `• *${group.label}:* ${shown.join(", ")}${rest ? ` and ${rest} more` : ""}`;
+}
+
+/** The library card, as the parts its renderer and its post need. */
+export interface PublishCardCopy {
+  /** Who published what, the count, and every name under Has code and No
+   *  code mapping yet — capped only when the card would pass `CARD_CHARS`. */
+  lead: string;
+  /** What ✅ and ⛔ each do, and who decides for how long. */
+  footer: string;
+  /** The complete list, for the card's thread, when the lead had to cap it. */
+  overflow: string[];
+}
+
 /**
- * The summary the card leads with: who published what, the change by kind,
- * the code mapping, and what each decision does — in Slack mrkdwn, every
- * Figma-sourced string escaped.
+ * The library publish card's words.
  *
- * @param changeSet - What the poll found
+ * @param changeSet - What the poll found; it carries a published version
  * @param intake - Its drafted intake
- * @param ttlHours - How long the card stays live, as the card states it
+ * @param ttlHours - How long the card stays open
  */
-export function publishSummary(changeSet: LibraryChangeSet, intake: PublishIntake, ttlHours: number): string {
+export function publishCard(changeSet: LibraryChangeSet, intake: PublishIntake, ttlHours: number): PublishCardCopy {
   const newest = changeSet.versions[0];
-  const lines: string[] = [];
+  const head: string[] = [];
   if (newest) {
-    const label = escapeSlackText(newest.label || firstLine(newest.description) || "untitled publish");
-    lines.push(
-      `:art: *Figma library publish* — *${label}*, published by *${escapeSlackText(newest.user)}* · ` +
-        `<${versionUrl(changeSet.fileKey, newest.id)}|view this version>`,
+    const label = escapeSlackText(newest.label || firstLine(newest.description) || "untitled");
+    head.push(
+      `*Library published: "${label}"* by ${escapeSlackText(newest.user)} · <${versionUrl(changeSet.fileKey, newest.id)}|view version>`,
     );
-    if (newest.description) lines.push(`> ${escapeSlackText(newest.description.slice(0, 300)).replace(/\n/g, "\n> ")}`);
-  } else {
-    lines.push(":art: *Figma library change* — component metadata changed without a published version.");
+    if (newest.description) head.push(`> ${escapeSlackText(newest.description.slice(0, 300)).replace(/\n/g, "\n> ")}`);
   }
-  const byKind = (kind: "created" | "modified" | "deleted") =>
-    listed(intake.rows.filter((r) => r[kind].length).map((r) => escapeSlackText(r.figmaName)));
-  if (changeSet.created.length) lines.push(`• :package: *New:* ${byKind("created")}`);
-  if (changeSet.modified.length) lines.push(`• :pencil2: *Modified:* ${byKind("modified")}`);
-  if (changeSet.deleted.length) lines.push(`• :wastebasket: *Deleted:* ${byKind("deleted")}`);
-  const code = [
-    intake.implement.length ? `maps to ${intake.implement.join(", ")}` : "",
-    intake.unmapped.length ? `${NO_MAPPING}: ${listed(intake.unmapped.map(escapeSlackText))}` : "",
-  ].filter(Boolean);
-  if (code.length) lines.push(`*Code:* ${code.join(" · ")}`);
-  lines.push(
-    intake.implement.length
-      ? `:white_check_mark: files the intake and runs \`figma-implement\` for *${intake.implement.join(", ")}* · ` +
-          `:no_entry: files the intake only.`
-      : ":white_check_mark: or :no_entry: files the intake — there is nothing to implement from it.",
-    `Any #plus-universal member can decide, for ${ttlHours} hours.`,
-  );
-  return lines.join("\n");
+  head.push("", countLine(intake.rows));
+
+  const implement = intake.implement.map(escapeSlackText);
+  const footer = [
+    implement.length
+      ? `:white_check_mark: files the intake and drafts the code for ${namesInWords(implement)}. :no_entry: files the intake only.`
+      : intake.rows.length
+        ? ":white_check_mark: and :no_entry: both file the intake. Nothing here has code yet, so there's nothing to draft."
+        : ":white_check_mark: and :no_entry: both file the intake. There's nothing to draft.",
+    `Anyone in this channel can decide, for the next ${windowInWords(ttlHours)}.`,
+  ].join("\n");
+
+  const groups = codeGroups(intake);
+  const fits = (lead: string) => lead.length + 2 + footer.length <= CARD_CHARS;
+  const full = [...head, ...groups.map((g) => groupLine(g))].join("\n");
+  if (fits(full)) return { lead: full, footer, overflow: [] };
+
+  // Too long for one post: each group keeps as many names as fit, the rest
+  // are counted, and the whole list goes in the thread.
+  const most = Math.max(...groups.map((g) => g.names.length));
+  let cap = Math.max(1, most - 1);
+  let lead = [...head, ...groups.map((g) => groupLine(g, cap))].join("\n");
+  while (cap > 1 && !fits(lead)) {
+    cap -= 1;
+    lead = [...head, ...groups.map((g) => groupLine(g, cap))].join("\n");
+  }
+  return { lead, footer, overflow: componentListMessages(intake) };
+}
+
+/**
+ * The card's complete list, for its thread: every name in each group, packed
+ * into as many replies as it takes.
+ *
+ * @param intake - The drafted intake
+ */
+export function componentListMessages(intake: PublishIntake): string[] {
+  const messages: string[] = [];
+  let current = `All ${intake.rows.length} components in this publish:`;
+  for (const group of codeGroups(intake)) {
+    let line = `• *${group.label}:* `;
+    let first = true;
+    for (const name of group.names) {
+      const piece = first ? name : `, ${name}`;
+      if (current.length + 1 + line.length + piece.length > REPLY_CHARS) {
+        messages.push(`${current}\n${line}`);
+        current = "";
+        line = `• *${group.label}, continued:* ${name}`;
+      } else {
+        line += piece;
+      }
+      first = false;
+    }
+    current = current ? `${current}\n${line}` : line;
+  }
+  messages.push(current);
+  return messages;
+}
+
+/**
+ * What a change with no published version posts: no card, because there is
+ * nothing to decide (#886 § 3.1 "Edited, not published").
+ *
+ * @param changeSet - What the poll found, with no version
+ * @param intake - Its drafted intake, for the rows
+ */
+export function editedNotPublished(changeSet: LibraryChangeSet, intake: PublishIntake): string {
+  const n = intake.rows.length;
+  const library = `<${libraryUrl(changeSet.fileKey)}|library>`;
+  const onlyEdits = intake.rows.every((r) => !r.created.length && !r.deleted.length);
+  const what = onlyEdits
+    ? `${n} ${n === 1 ? "component's name or description" : "components' names or descriptions"} changed`
+    : `${n} component${n === 1 ? "" : "s"} changed`;
+  return [
+    `*Library edited, not published.* ${what} in the ${library}, with no new version.`,
+    "Nothing to build yet. I'll post again when a version is published.",
+  ].join("\n");
 }

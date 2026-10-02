@@ -78,6 +78,10 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
         const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
+      async reply(ts, text) {
+        const res = await postMessage(env, { channel, thread_ts: ts, text });
+        if (!res.ok) throw new Error(res.error ?? "chat.postMessage failed");
+      },
       async stage(proposal) {
         const { retired } = await threadStateFor(env).putProposal(proposal);
         // On the usage record like any card, staged by the Worker itself.
