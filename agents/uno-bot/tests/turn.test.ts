@@ -986,7 +986,7 @@ test("a batch touching a keyed-apart card is refused with its note, and only tha
   const weekly: PendingProposal = {
     ...PENDING,
     supersedeKey: "ds-precedence",
-    refuseRevision: "Reply `dispute N` to drop an item.",
+    refuseRevision: "Reply `drop N` to leave an item out.",
   };
   const h = harness({
     replies: [
@@ -1002,7 +1002,7 @@ test("a batch touching a keyed-apart card is refused with its note, and only tha
 
   assert.equal(outcome.disposition, "asked");
   assert.equal(outcome.staged, undefined);
-  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.match(outcome.posted ?? "", /drop N/);
   assert.equal((await h.threadState.getProposalByTs(weekly.proposalTs)).state, "found");
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, weekly.proposalTs, "no second live card");
 });
@@ -1017,7 +1017,7 @@ const WEEKLY_UPDATE: PendingProposal = {
   input: { issue_number: 812, comment: "### Week of 2026-10-02" },
   operations: [{ toolName: "github_issue_update", input: { issue_number: 812, comment: "### Week of 2026-10-02" } }],
   supersedeKey: "ds-precedence",
-  refuseRevision: "Reply `dispute N` to drop an item.",
+  refuseRevision: "Reply `drop N` to leave an item out.",
 };
 const WEEKLY_CREATE: PendingProposal = {
   ...WEEKLY_UPDATE,
@@ -1053,7 +1053,7 @@ test("a comment on the weekly intake itself is still refused with the card's not
   });
 
   assert.equal(outcome.disposition, "asked");
-  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.match(outcome.posted ?? "", /drop N/);
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_UPDATE.proposalTs, "no second live card");
 });
 
@@ -1077,7 +1077,7 @@ test("a batch filing the weekly intake's own title is still refused with the car
   });
 
   assert.equal(outcome.disposition, "asked");
-  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.match(outcome.posted ?? "", /drop N/);
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_CREATE.proposalTs, "no second live card");
 });
 

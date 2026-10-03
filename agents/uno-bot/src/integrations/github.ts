@@ -620,6 +620,10 @@ export interface GithubLibraryReads {
   /** Open `harness-intake` issues, most recently updated first, pulls left
    *  out — the first 100, where a weekly-updated intake stays near the top. */
   openIntakes(): Promise<Array<{ number: number; url: string; body: string }>>;
+  /** Every `harness-intake` issue updated since `since` (ISO), up to 100, and
+   *  whether that was all of them — so a caller about to file can tell "none
+   *  carries the marker" from "the page ran out". */
+  intakesSince(since: string): Promise<{ intakes: Array<{ number: number; url: string; body: string }>; complete: boolean }>;
   /** The most recently opened pulls, any state. */
   recentPulls(): Promise<LibraryPull[]>;
   /** One pull by number, as it stands now; null on a 404. */
@@ -710,6 +714,28 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
       return intakesAt(
         `https://api.github.com/repos/${repo}/issues?labels=harness-intake&state=open&sort=updated&direction=desc&per_page=100`,
       );
+    },
+    async intakesSince(since) {
+      // Counted before pulls are left out: a full page is a page that may
+      // have more behind it, whatever it held.
+      const url =
+        `https://api.github.com/repos/${repo}/issues?labels=harness-intake&state=all` +
+        `&since=${encodeURIComponent(since)}&per_page=100`;
+      const data = (await (await get("issue list", url)).json().catch(() => [])) as Array<{
+        number?: unknown;
+        html_url?: unknown;
+        body?: unknown;
+        pull_request?: unknown;
+      }>;
+      const page = Array.isArray(data) ? data : [];
+      return {
+        intakes: page.flatMap((i) =>
+          typeof i.number === "number" && typeof i.html_url === "string" && !i.pull_request
+            ? [{ number: i.number, url: i.html_url, body: typeof i.body === "string" ? i.body : "" }]
+            : [],
+        ),
+        complete: page.length < 100,
+      };
     },
     async recentPulls() {
       const url = `https://api.github.com/repos/${repo}/pulls?state=all&sort=created&direction=desc&per_page=${LIBRARY_PAGE}`;

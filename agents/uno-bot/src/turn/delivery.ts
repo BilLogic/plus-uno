@@ -189,9 +189,22 @@ export interface ProposalCard {
    * `confirm` is the ⚠️ card every gated tool gets: a preamble naming the verb,
    * then the staged parameters. `revision` is `notion_update`'s — the diff
    * leads and there is no preamble, because the named page and the
-   * `current → new` lines say it better than a warning would.
+   * `current → new` lines say it better than a warning would. `stated` is a
+   * card the Worker posts on its own — the library publish card, the weekly
+   * precedence card — whose `lead` states the whole proposal and whose
+   * `footer` says what ✅ and ⛔ each do: one footer, no preamble, no plan
+   * (#886).
    */
-  kind: "confirm" | "revision";
+  kind: "confirm" | "revision" | "stated";
+  /**
+   * A `stated` card's one footer, in place of the shared confirm footer.
+   *
+   * It stands in for the operation plan too, so it NAMES EVERY OPERATION the
+   * ✅ runs — "files the intake and drafts the code for Button and Badge" is
+   * two operations, both said. That is the consent the plan exists for, kept
+   * in words a person reads in one line.
+   */
+  footer?: string;
   /** What one ✅ does, in the GATED ROW's own words (`agent/tool-table.ts`
    *  § `GateWords`, #598) — never the bare tool name a designer cannot read. */
   verb: string;

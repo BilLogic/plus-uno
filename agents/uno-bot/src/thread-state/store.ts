@@ -284,7 +284,7 @@ export interface PendingProposal {
    * On a keyed card: what a turn in its thread posts, in place of a card,
    * when its batch would touch this one. A near-copy would otherwise stay live
    * beside it, and both could run. The weekly DS precedence card points at
-   * `dispute N`, the one way it is revised.
+   * `drop N`, the one way it is revised.
    */
   refuseRevision?: string;
   /**

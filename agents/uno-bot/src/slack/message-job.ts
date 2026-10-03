@@ -2,7 +2,7 @@
 // `onMessage` that decides WHAT runs, on named dependencies so the orderings
 // that matter are driven with fakes (tests/ds-precedence-queued.test.ts).
 //
-// A reply handled ahead of the turn — a `dispute N` in a weekly DS precedence
+// A reply handled ahead of the turn — a `drop N` in a weekly DS precedence
 // list thread, a "yes, it's up to date" to a file-drift ask, an answer under a
 // card follow-up — is handled HERE, at the head of the thread's own job, and
 // nowhere earlier. Which handler, if any, was decided when the message was

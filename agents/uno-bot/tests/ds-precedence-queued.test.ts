@@ -13,7 +13,7 @@ import assert from "node:assert/strict";
 
 import { chainReplyHandlers, runMessageJob, type MessageJobDeps } from "../src/slack/message-job";
 import { disputePrecedenceItems, PRECEDENCE_CARD_TTL_MS, type PostedThread } from "../src/ds-precedence/jobs";
-import { disputedItems } from "../src/ds-precedence/report";
+import { droppedItems } from "../src/ds-precedence/report";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import type { SlackMessageEvent } from "../src/slack/types";
 
@@ -74,7 +74,7 @@ function harness(opts: { disputeThrows?: boolean; engages?: boolean } = {}) {
     ...chainReplyHandlers([
       {
         name: "ds-precedence",
-        candidate: (e) => e.channel === CHANNEL && !!e.thread_ts && disputedItems(e.text ?? "").length > 0,
+        candidate: (e) => e.channel === CHANNEL && !!e.thread_ts && droppedItems(e.text ?? "").length > 0,
         handle: (e) => dispute(e),
       },
       // Never throws, and answers nothing in a list thread.
@@ -132,9 +132,9 @@ describe("a dispute on the queued path", () => {
     for (const order of [["message", "mention"], ["mention", "message"]]) {
       const { deps, record, turns, staged } = harness();
       const events: Record<string, SlackMessageEvent> = {
-        message: reply("1759500100.000001", "<@UBOT> dispute 2"),
+        message: reply("1759500100.000001", "<@UBOT> drop 2"),
         // The mention twin, as `appMentionToMessage` shapes it: same ts.
-        mention: reply("1759500100.000001", "<@UBOT> dispute 2"),
+        mention: reply("1759500100.000001", "<@UBOT> drop 2"),
       };
       for (const which of order) assert.equal(await runMessageJob(events[which]!, deps), "handled");
       assert.equal(staged.length, 1, `one revised card (${order.join(" then ")})`);
@@ -145,7 +145,7 @@ describe("a dispute on the queued path", () => {
 
   it("a dispute sent to the channel too (thread_broadcast) is handled", async () => {
     const { deps, record, turns } = harness();
-    await runMessageJob(reply("1759500200.000001", "dispute 3", { subtype: "thread_broadcast" }), deps);
+    await runMessageJob(reply("1759500200.000001", "drop 3", { subtype: "thread_broadcast" }), deps);
     assert.deepEqual(record.value?.disputed, [3]);
     assert.deepEqual(turns, []);
   });
@@ -158,15 +158,15 @@ describe("a dispute on the queued path", () => {
 
   it("a revision that throws falls through to the turn in the same job", async () => {
     const { deps, turns } = harness({ disputeThrows: true });
-    await runMessageJob(reply("1759500300.000001", "dispute 1"), deps);
+    await runMessageJob(reply("1759500300.000001", "drop 1"), deps);
     assert.deepEqual(turns, ["1759500300.000001"]);
   });
 
   it("two quick disputes both apply, and the last card carries neither item", async () => {
     const { deps, record, staged } = harness();
     // The thread's runner takes one job at a time.
-    await runMessageJob(reply("1759500400.000001", "dispute 1"), deps);
-    await runMessageJob(reply("1759500400.000002", "dispute 3"), deps);
+    await runMessageJob(reply("1759500400.000001", "drop 1"), deps);
+    await runMessageJob(reply("1759500400.000002", "drop 3"), deps);
     assert.deepEqual(record.value?.disputed, [1, 3]);
     assert.equal(staged.length, 2);
     const last = String(staged[1]!.operations![0]!.input.body);
@@ -179,12 +179,12 @@ describe("a dispute on the queued path", () => {
   it("a dispute outside a list thread runs no turn where the reply would not engage", async () => {
     const { deps, record, turns, staged } = harness();
     const elsewhere = "1759400000.000001";
-    await runMessageJob(reply("1759500600.000001", "dispute 1", { thread_ts: elsewhere }), deps);
+    await runMessageJob(reply("1759500600.000001", "drop 1", { thread_ts: elsewhere }), deps);
     assert.deepEqual(turns, []);
     assert.deepEqual(staged, []);
     assert.deepEqual(record.value?.disputed, []);
     // With an @mention it would have engaged anyway, so its turn runs.
-    await runMessageJob(reply("1759500600.000002", "<@UBOT> dispute 1", { thread_ts: elsewhere }), deps);
+    await runMessageJob(reply("1759500600.000002", "<@UBOT> drop 1", { thread_ts: elsewhere }), deps);
     assert.deepEqual(turns, ["1759500600.000002"]);
   });
 
@@ -193,22 +193,22 @@ describe("a dispute on the queued path", () => {
     const elsewhere = "1759400000.000001";
     const ts = "1759500650.000001";
     // The broadcast `message` event lands first, and is declined as a dispute.
-    await runMessageJob(reply(ts, "<@UBOT> dispute 1", { thread_ts: elsewhere, subtype: "thread_broadcast" }), deps);
+    await runMessageJob(reply(ts, "<@UBOT> drop 1", { thread_ts: elsewhere, subtype: "thread_broadcast" }), deps);
     assert.deepEqual(turns, []);
     // Its `app_mention` twin, as `appMentionToMessage` shapes it (no subtype).
-    await runMessageJob(reply(ts, "<@UBOT> dispute 1", { thread_ts: elsewhere }), deps);
+    await runMessageJob(reply(ts, "<@UBOT> drop 1", { thread_ts: elsewhere }), deps);
     assert.deepEqual(turns, [ts]);
   });
 
   it("a dispute in the list thread that changes nothing is answered there, and runs no turn", async () => {
     const { deps, turns } = harness();
-    assert.equal(await runMessageJob(reply("1759500660.000001", "<@UBOT> dispute 9"), deps), "handled");
+    assert.equal(await runMessageJob(reply("1759500660.000001", "<@UBOT> drop 9"), deps), "handled");
     assert.deepEqual(turns, []);
   });
 
   it("a reply that only mentions disputing changes nothing", async () => {
     const { deps, record, turns, staged } = harness();
-    for (const [ts, text] of [["1759500700.000001", "I wouldn't dispute 2"], ["1759500700.000002", "should we dispute 3?"]]) {
+    for (const [ts, text] of [["1759500700.000001", "I wouldn't drop 2"], ["1759500700.000002", "should we drop 3?"]]) {
       await runMessageJob(reply(ts!, text!), deps);
     }
     assert.deepEqual(staged, [], "no revised card");
