@@ -54,7 +54,7 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
-import { STALE_POST, renderGateNote } from "../src/slack/gate-note";
+import { STALE_POST, STATED_SUPERSEDED_POST, renderGateNote } from "../src/slack/gate-note";
 import { verdictEvents } from "../src/usage/index";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
@@ -1051,4 +1051,138 @@ describe("Gate imports no Slack module", () => {
       );
     });
   }
+});
+
+// A card the Worker states itself — the library card, the weekly DS
+// precedence card — answers the gate in its own words (`PendingProposal.stated`).
+// The generic lines assume a card someone asked for: "tell me what to change",
+// "ask me again", "the newest :warning: card". None of that is true here.
+describe("a stated card answers in its own words", () => {
+  const HOUR_MS = 60 * 60 * 1000;
+  const WORDS = {
+    cancelled: "Intake only",
+    expired:
+      "That card closed after 72 h with no decision, so nothing was drafted. " +
+      "I file its intake the morning after, so the publish isn't lost.",
+  };
+  const INTAKE = { toolName: "github_issue_create", input: { title: "Figma publish", body: "…" } };
+  const STATED: PendingProposal = {
+    ...PROPOSAL,
+    toolName: INTAKE.toolName,
+    input: INTAKE.input,
+    operations: [INTAKE],
+    onCancel: [INTAKE],
+    ttlMs: 72 * HOUR_MS,
+    stated: WORDS,
+  };
+
+  async function stagedStated(card: PendingProposal = STATED, at?: () => number): Promise<ThreadState> {
+    const store = createInMemoryThreadState(at ? { now: at } : {});
+    await store.putProposal(card);
+    return store;
+  }
+
+  /** A Slack user id, which is all a card's closing line will mention. */
+  const PRESSER = "U0AAAAAA2";
+
+  /** The real button door, recording what the person and the card are shown. */
+  async function press(threadState: ThreadState, decision: "confirm" | "cancel") {
+    const delivery = recordingDelivery();
+    const ephemerals: string[] = [];
+    const notes: string[] = [];
+    await runButtonDoor(
+      { channel: CHANNEL, messageTs: CARD_TS, decision, userId: PRESSER },
+      {
+        threadState,
+        delivery: () => delivery,
+        applyVerdict: async () => {},
+        replyEphemeral: async (text) => void ephemerals.push(text),
+        replaceCard: async (_text, note) => void notes.push(note),
+        restage: async () => {},
+      },
+    );
+    return { delivery, ephemerals, notes };
+  }
+
+  it("says the card's phrase for a ⛔ in the thread, on every door", async () => {
+    const cancels: Array<{ name: string; signal: GateSignal }> = [
+      { name: "reaction", signal: reaction({ glyph: "no_entry" }) },
+      { name: "button", signal: button("cancel") },
+      { name: "typed", signal: typed("⛔") },
+    ];
+    for (const door of cancels) {
+      const verdict = await resolveSignal(door.signal, { threadState: await stagedStated() });
+      assert.equal(verdict.outcome, "won", door.name);
+      assert.deepEqual(verdict.execute?.operations, [INTAKE], door.name);
+      assert.deepEqual(
+        verdict.post?.note,
+        { kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"], cancelled: "Intake only" },
+        door.name,
+      );
+      assert.equal(renderGateNote(verdict.post!.note), "Intake only.", door.name);
+    }
+  });
+
+  it("closes the card with what the ⛔ did and who decided", async () => {
+    const { notes, delivery } = await press(await stagedStated(), "cancel");
+    assert.deepEqual(notes, [`:no_entry: Intake only, decided by <@${PRESSER}>.`]);
+    assert.equal(delivery.gateNotes.length, 1);
+  });
+
+  it("keeps the ✅ lines every card has", async () => {
+    const { notes, delivery } = await press(await stagedStated(), "confirm");
+    assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
+    assert.deepEqual(notes, [`:white_check_mark: Approved by <@${PRESSER}>`]);
+  });
+
+  it("answers a decision after the window with the card's own line", async () => {
+    let clock = 1_000_000;
+    const at = () => clock;
+    const late = await stagedStated(STATED, at);
+    clock += 73 * HOUR_MS;
+    const verdict = await resolveSignal(reaction(), { threadState: late });
+    assert.equal(verdict.outcome, "stale");
+    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS, words: WORDS.expired });
+    assert.equal(renderGateNote(verdict.post!.note), WORDS.expired);
+
+    // Through the button door it is said to the presser alone, and nothing runs.
+    clock = 1_000_000;
+    const pressed = await stagedStated(STATED, at);
+    clock += 73 * HOUR_MS;
+    const { ephemerals, notes } = await press(pressed, "confirm");
+    assert.deepEqual(ephemerals, [WORDS.expired]);
+    assert.deepEqual(notes, []);
+  });
+
+  it("sends a ✅ on a replaced card to the newest card, with no ⚠️ to point at", async () => {
+    const threadState = await stagedStated();
+    await threadState.putProposal({ ...STATED, proposalTs: "1700000000.000295", proposalText: "(the revised card)" });
+    for (const signal of [reaction(), button()]) {
+      const verdict = await resolveSignal(signal, { threadState });
+      assert.equal(verdict.outcome, "stale");
+      assert.deepEqual(verdict.post?.note, { kind: "superseded", stated: true });
+      assert.equal(renderGateNote(verdict.post!.note), STATED_SUPERSEDED_POST);
+      assert.doesNotMatch(STATED_SUPERSEDED_POST, /:warning:/);
+    }
+  });
+
+  it("tells a reaction beside the card where it is, without a tool name", async () => {
+    const verdict = await resolveSignal(reaction({ messageTs: "1700000000.000999" }), {
+      threadState: await stagedStated(),
+    });
+    assert.equal(verdict.outcome, "none");
+    assert.equal(verdict.execute, undefined);
+    assert.equal(
+      renderGateNote(verdict.post!.note),
+      "<@U2> I saw your :white_check_mark:, but it's not on the card, so nothing ran. " +
+        "Use the card's buttons, or react on the card itself.",
+    );
+  });
+
+  it("leaves a turn's card on the generic lines", async () => {
+    const { notes } = await press(await staged(), "cancel");
+    assert.deepEqual(notes, [`:no_entry: Cancelled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
+    assert.match(renderGateNote({ kind: "superseded" }), /newest :warning: card/);
+    assert.match(renderGateNote({ kind: "expired" }), /Ask me again/);
+  });
 });

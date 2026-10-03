@@ -53,6 +53,7 @@ import { rethrowIfBudget } from "../net";
 import {
   draftPublishIntake,
   editedNotPublished,
+  libraryCardWords,
   mergeChangeSets,
   publishCard,
   type ComponentRegistry,
@@ -210,6 +211,9 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
         ttlMs: LIBRARY_CARD_TTL_MS,
         confirmers: [...members],
         onCancel,
+        // Its own words at the gate: a ⛔ is "intake only", not a request to
+        // stage it again, and nobody can "ask again" for a publish.
+        stated: libraryCardWords(intake, LIBRARY_CARD_TTL_MS / 3_600_000),
       });
     } catch (err) {
       // The message is up; posting it again tomorrow would make two. Its ✅

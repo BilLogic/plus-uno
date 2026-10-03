@@ -253,6 +253,15 @@ export interface PendingProposal {
    */
   onCancel?: ProposalOperation[];
   /**
+   * The card's own words for the gate's answers, on a card the Worker states
+   * itself (`ProposalCard.kind: "stated"` — the library card, the weekly DS
+   * precedence card). Absent — every turn's card — the generic lines in
+   * `slack/gate-note.ts`, which assume a card someone asked for: "tell me what
+   * to change", "ask me again", "the newest :warning: card". A stated card has
+   * no ⚠️, nobody asked for it, and its ⛔ means what its footer says.
+   */
+  stated?: StatedCardWords;
+  /**
    * Set on a card the end-of-day sweep staged: the morning it was posted,
    * `YYYY-MM-DD`. What a ✅, a ⛔ or a revision does to such a card is also
    * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision of
@@ -297,6 +306,21 @@ export interface PendingProposal {
   originProposalTs?: string;
 }
 
+/**
+ * What a stated card says at the gate (`PendingProposal.stated`). Two lines,
+ * because they are the two the generic wording gets wrong on such a card; a
+ * replaced card and a gesture beside the card get a stated variant of their
+ * own in `slack/gate-note.ts`, which needs no words from the card.
+ */
+export interface StatedCardWords {
+  /** What a ⛔ did, as a phrase with no person in it: "Intake only". The card
+   *  ends `:no_entry: <phrase>, decided by <@U>.` and the ⛔'s note in the
+   *  thread is `<phrase>.` */
+  cancelled: string;
+  /** The answer to a ✅ or ⛔ that came after the card's window closed. */
+  expired: string;
+}
+
 /** The card the ask behind this proposal staged: its origin, or itself. */
 export function stagingCardOf(proposal: Pick<PendingProposal, "proposalTs" | "originProposalTs">): string {
   return proposal.originProposalTs ?? proposal.proposalTs;
@@ -338,6 +362,12 @@ export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number 
  *  card on the default hour, so that answer reads exactly as it always has. */
 export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: number } {
   return proposal.ttlMs !== undefined ? { ttlMs: proposal.ttlMs } : {};
+}
+
+/** A stated card's own words, spread onto an "expired" or "superseded" lookup
+ *  — absent for every turn's card, whose answers read as they always have. */
+export function ownWords(proposal: Pick<PendingProposal, "stated">): { stated?: StatedCardWords } {
+  return proposal.stated ? { stated: proposal.stated } : {};
 }
 
 /**
@@ -536,11 +566,12 @@ export type ProposalLookup =
   /** Retired by a newer card staged in the same reply thread, or retired ahead
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
-   *  way for never lands. */
-  | { state: "superseded" }
+   *  way for never lands. `stated` is a stated card's own words. */
+  | { state: "superseded"; stated?: StatedCardWords }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
-   *  told how long it was live; absent, it lived the default hour. */
-  | { state: "expired"; ttlMs?: number }
+   *  told how long it was live; absent, it lived the default hour. `stated` is
+   *  a stated card's own words, whose `expired` line says it instead. */
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords }
   | { state: "none" };
 
 /**

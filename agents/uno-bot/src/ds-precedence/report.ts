@@ -20,7 +20,7 @@
 //
 // Pure: no `Env`, no fetch.
 
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { largestFitting, namesInWords, ONE_POST_CHARS, packLines, shortDate, windowInWords } from "../slack/copy-words";
@@ -200,5 +200,19 @@ export function precedenceCard(
     fields: target.kind === "update" ? [{ label: "intake", value: `#${target.issue}` }] : [{ label: "intake", value: PRECEDENCE_INTAKE_TITLE }],
     caveats: [],
     operations,
+  };
+}
+
+/**
+ * What the weekly card says at the gate (`PendingProposal.stated`). A ⛔ files
+ * nothing, as the footer says; and a late ✅ or ⛔ is told the card closed,
+ * rather than "ask me again" — a later week's check is what asks again.
+ *
+ * @param windowHours - The card's whole window, from the first post
+ */
+export function precedenceCardWords(windowHours: number): StatedCardWords {
+  return {
+    cancelled: "Nothing filed this week",
+    expired: `That card closed after ${windowInWords(windowHours)} with no decision, so nothing was filed.`,
   };
 }

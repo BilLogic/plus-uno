@@ -12,6 +12,7 @@
 // Pure: no `Env`, no fetch. The registry arrives as data (the post job reads it
 // from GitHub), so tests/figma-library.test.ts drafts from a recorded diff.
 
+import type { StatedCardWords } from "../thread-state/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { largestFitting, namesInWords, ONE_POST_CHARS, THREAD_REPLY_CHARS, windowInWords } from "../slack/copy-words";
 
@@ -435,6 +436,25 @@ export function publishCard(changeSet: LibraryChangeSet, intake: PublishIntake, 
   const leadAt = (cap: number) => [...head, ...groups.map((g) => groupLine(g, cap))].join("\n");
   const cap = largestFitting(1, Math.max(...groups.map((g) => g.names.length)) - 1, (c) => fits(leadAt(c)));
   return { lead: leadAt(cap), footer, overflow: componentListMessages(intake) };
+}
+
+/**
+ * What the library card says at the gate (`PendingProposal.stated`). A ⛔
+ * files the intake only, as the footer says; and a card nobody decides is
+ * filed the morning after its window (`track.ts`), so a late ✅ or ⛔ is told
+ * that rather than "ask me again", which nobody can do for a publish.
+ *
+ * @param intake - Its drafted intake
+ * @param ttlHours - How long the card stays open
+ */
+export function libraryCardWords(intake: PublishIntake, ttlHours: number): StatedCardWords {
+  const drafts = intake.implement.length > 0 && !!intake.versionId;
+  return {
+    cancelled: "Intake only",
+    expired:
+      `That card closed after ${windowInWords(ttlHours)} with no decision${drafts ? ", so nothing was drafted" : ""}. ` +
+      "I file its intake the morning after, so the publish isn't lost.",
+  };
 }
 
 /**
