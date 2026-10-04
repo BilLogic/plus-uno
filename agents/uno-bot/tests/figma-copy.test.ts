@@ -1,6 +1,7 @@
 // Every Figma message uno-bot's code writes, against the copy Bill approved in
 // #886 (2026-09-30) — the library publish card, its thread, the post for a
-// library edited but not published, and the weekly precedence thread.
+// library edited but not published, the weekly precedence thread, and what
+// either card says at the gate.
 //
 // Two things are pinned, the way tests/share-out.test.ts pins its post:
 //   • each renderer's words, as literals: its first line, its counts against
@@ -18,6 +19,7 @@ import {
   componentListMessages,
   draftPublishIntake,
   editedNotPublished,
+  libraryCardWords,
   publishCard,
   type ComponentRegistry,
   type LibraryChangeSet,
@@ -27,13 +29,17 @@ import { libraryCard, LIBRARY_CARD_TTL_MS } from "../src/figma-library/post";
 import { expiredCardNote, prClosedLine, prMergedLine, prOpenedLine } from "../src/figma-library/track";
 import {
   precedenceCard,
+  precedenceCardWords,
   precedenceList,
   precedenceOperations,
   precedenceRuleUrl,
   type IntakeTarget,
   type NumberedItem,
 } from "../src/ds-precedence/report";
+import { PRECEDENCE_CARD_TTL_MS } from "../src/ds-precedence/jobs";
 import { CONFIRM_FOOTER, renderProposalCard } from "../src/slack/proposal-render";
+import { renderGateNote, statedCancelledNote } from "../src/slack/gate-note";
+import type { GateNote } from "../src/turn/index";
 
 // ── The doc ──────────────────────────────────────────────────────────────────
 
@@ -82,12 +88,7 @@ function passesChecklist(text: string, { gate = false, ship = false } = {}): voi
   assert.ok(text.length <= 1500, `${text.length} chars:\n${text}`);
   assert.ok(text.split("\n")[0]!.trim(), "a first line that says something");
   assert.doesNotMatch(text, /<!(here|channel|everyone)>/);
-  // One vocabulary.
-  const words = readable(text).toLowerCase();
-  for (const retired of RETIRED) {
-    const pattern = new RegExp(`(^|[^\\w-])${retired.toLowerCase().replace(/[.*+?^${}()|[\]\\#]/g, "\\$&")}($|[^\\w-])`);
-    assert.doesNotMatch(words, pattern, `"${retired}" is retired (slack.md § Figma messages)`);
-  }
+  assertVocabulary(text);
   // Emoji only as the gate, and one 🎉 on a ship.
   const emoji = text.match(/:[a-z_]+:/g) ?? [];
   const allowed = new Set(["white_check_mark", "no_entry", ...(ship ? ["tada"] : [])].map((e) => `:${e}:`));
@@ -103,6 +104,19 @@ function passesChecklist(text: string, { gate = false, ship = false } = {}): voi
   }
   assert.ok(!text.includes(CONFIRM_FOOTER), "no second, shared footer");
   assert.doesNotMatch(text, /About to/);
+}
+
+/** A retired phrase as a whole word, so "unmapped" never matches inside another. */
+function retiredPattern(retired: string): RegExp {
+  return new RegExp(`(^|[^\\w-])${retired.toLowerCase().replace(/[.*+?^${}()|[\]\\#]/g, "\\$&")}($|[^\\w-])`);
+}
+
+/** One vocabulary: no word from the Not column. */
+function assertVocabulary(text: string): void {
+  const words = readable(text).toLowerCase();
+  for (const retired of RETIRED) {
+    assert.doesNotMatch(words, retiredPattern(retired), `"${retired}" is retired (slack.md § Figma messages)`);
+  }
 }
 
 /** The library card's count, against the names under it. */
@@ -450,5 +464,77 @@ describe("the weekly precedence thread", () => {
       ].join("\n"),
     );
     passesChecklist(text, { gate: true });
+  });
+});
+
+// ── What a stated card says at the gate ──────────────────────────────────────
+//
+// The gate's generic lines assume a card someone asked for: "tell me what to
+// change", "ask me again", "the newest :warning: card". These are the lines the
+// library and precedence cards say instead (`PendingProposal.stated`), and the
+// stated variants the gate keeps for a replaced card and a gesture beside one.
+// #886 had no words for them; they follow its register and are Bill's to confirm.
+
+/** One line a person reads after a press or a reaction on a stated card. */
+function passesGateAnswer(text: string, glyphs: readonly string[] = []): void {
+  assert.ok(text.length <= 1500, text);
+  assertVocabulary(text);
+  for (const e of text.match(/:[a-z_]+:/g) ?? []) assert.ok(glyphs.includes(e), `${e} is not this answer's gate glyph`);
+  for (const generic of [/tell me what to change/i, /ask me again/i, /:warning:/, /About to/, /stage it again/]) {
+    assert.doesNotMatch(text, generic);
+  }
+}
+
+describe("what a stated card says at the gate", () => {
+  const ttlHours = LIBRARY_CARD_TTL_MS / 3_600_000;
+  const drafting = libraryCardWords(draftPublishIntake(changeSet({ modified: [component("Button"), component("Chip")] }), REGISTRY), ttlHours);
+  const noCode = libraryCardWords(
+    draftPublishIntake(changeSet({ created: [component("Chip")], newComponentIds: ["9:Chip"] }), REGISTRY),
+    ttlHours,
+  );
+  const weekly = precedenceCardWords(PRECEDENCE_CARD_TTL_MS / 3_600_000);
+
+  it("the library card: a ⛔ is the intake only, and a late decision is told the intake still lands", () => {
+    assert.equal(drafting.cancelled, "Intake only");
+    assert.equal(
+      drafting.expired,
+      "That card closed after 72 h with no decision, so nothing was drafted. I file its intake the morning after, so the publish isn't lost.",
+    );
+    // Nothing had code, so there was nothing to draft and the line says less.
+    assert.equal(noCode.expired, "That card closed after 72 h with no decision. I file its intake the morning after, so the publish isn't lost.");
+  });
+
+  it("the precedence card: a ⛔ files nothing, and its window is the whole six days", () => {
+    assert.deepEqual(weekly, {
+      cancelled: "Nothing filed this week",
+      expired: "That card closed after 6 days with no decision, so nothing was filed.",
+    });
+  });
+
+  it("a ⛔ closes either card with what it did and who decided", () => {
+    assert.equal(statedCancelledNote(drafting, "U0AAAAAA2"), ":no_entry: Intake only, decided by <@U0AAAAAA2>.");
+    assert.equal(statedCancelledNote(weekly, "U0AAAAAA2"), ":no_entry: Nothing filed this week, decided by <@U0AAAAAA2>.");
+    // Only a Slack id is mentioned; anything else would blank the post.
+    assert.equal(statedCancelledNote(weekly, "someone"), ":no_entry: Nothing filed this week.");
+    passesGateAnswer(statedCancelledNote(drafting, "U0AAAAAA2"), [":no_entry:"]);
+    passesGateAnswer(statedCancelledNote(weekly, "U0AAAAAA2"), [":no_entry:"]);
+  });
+
+  it("every answer the gate gives a stated card holds to the copy rules, and names no tool", () => {
+    const answers: Array<[GateNote, string[]]> = [
+      [{ kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"], cancelled: drafting.cancelled }, []],
+      [{ kind: "resolved", decision: "cancel", cancelled: weekly.cancelled }, []],
+      [{ kind: "expired", ttlMs: LIBRARY_CARD_TTL_MS, words: drafting.expired }, []],
+      [{ kind: "expired", ttlMs: PRECEDENCE_CARD_TTL_MS, words: weekly.expired }, []],
+      [{ kind: "superseded", stated: true }, []],
+      [{ kind: "not-on-the-card", toolName: "github_issue_create", glyph: "no_entry", userId: "U0AAAAAA2", stated: true }, [":no_entry:"]],
+    ];
+    for (const [note, glyphs] of answers) {
+      const text = renderGateNote(note);
+      passesGateAnswer(text, glyphs);
+      assert.doesNotMatch(text, /github_issue_create|an issue/, text);
+    }
+    assert.equal(renderGateNote(answers[0]![0]), "Intake only.");
+    assert.equal(renderGateNote(answers[1]![0]), "Nothing filed this week.");
   });
 });

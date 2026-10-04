@@ -23,11 +23,19 @@
 //     person did not wait too long, they acted on the card above the one being
 //     held — and unlike an aged-out card there is a live one in the thread to
 //     send them to.
+//   • A STATED CARD (the library card, the weekly DS precedence card) is one
+//     nobody asked for, with no ⚠️ and a ⛔ that means what its footer says.
+//     "Tell me what to change", "ask me again" and "the newest :warning: card"
+//     are all wrong on it, so it carries its own words for a ⛔ and a late
+//     decision (`PendingProposal.stated`, written beside each card's copy),
+//     and a replaced card or a gesture beside it gets a stated line here.
+//     These follow the Figma copy rules (`docs/connectors/slack.md` § Figma
+//     messages), and `tests/figma-copy.test.ts` holds them to it.
 //
 // Import-free and Env-free: it renders and posts nothing.
 
 import type { GateNote } from "../turn/index";
-import { PROPOSAL_TTL_MS } from "../thread-state/index";
+import { PROPOSAL_TTL_MS, type StatedCardWords } from "../thread-state/index";
 import { SLACK_USER_ID } from "./mrkdwn";
 import { gateWordsFor } from "../agent/tool-table";
 
@@ -64,6 +72,19 @@ export const SUPERSEDED_POST =
   ":arrows_counterclockwise: That proposal was replaced by a newer one — nothing was executed. " +
   "Confirm on the newest :warning: card in this thread instead.";
 
+/** The ✅/⛔ on a stated card a revision replaced: it has no ⚠️ to point at. */
+export const STATED_SUPERSEDED_POST =
+  "That card was revised, so nothing ran. Decide on the newest card in this thread.";
+
+/**
+ * A stated card's last line once a ⛔ has decided it, where its buttons were:
+ * what the ⛔ did, and who decided. Only a Slack user id is mentioned, which is
+ * what the markup sanitiser keeps (`SLACK_USER_ID`).
+ */
+export function statedCancelledNote(words: Pick<StatedCardWords, "cancelled">, userId: string): string {
+  return `:no_entry: ${words.cancelled}${SLACK_USER_ID.test(userId) ? `, decided by <@${userId}>` : ""}.`;
+}
+
 /** The default narrative, when the winning signal brought no words of its own. */
 export function defaultNarrative(decision: "confirm" | "cancel"): string {
   return decision === "confirm" ? "Got it — kicking that off." : "Cancelled.";
@@ -87,19 +108,27 @@ function thirdPerson(phrase: string): string {
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
     case "resolved":
+      // A stated card's ⛔ says what its footer promised, in the card's words.
+      if (note.decision === "cancel" && note.cancelled) return `${note.cancelled}.`;
       return note.stillRuns?.length ? cancelStillRuns(note.stillRuns) : defaultNarrative(note.decision);
     case "said":
       return note.text;
     case "already-resolved":
       return STALE_POST;
     case "expired":
-      return expiredPost(note.ttlMs);
+      return note.words ?? expiredPost(note.ttlMs);
     case "superseded":
-      return SUPERSEDED_POST;
+      return note.stated ? STATED_SUPERSEDED_POST : SUPERSEDED_POST;
     case "not-on-the-card":
       // Say where the card is, and name who is being answered: this is the one
       // verdict aimed at a specific person's specific gesture, so it is the one
       // that mentions them.
+      if (note.stated) {
+        return (
+          `<@${note.userId}> I saw your :${note.glyph}:, but it's not on the card, so nothing ran. ` +
+          `Use the card's buttons, or react on the card itself.`
+        );
+      }
       return (
         `:eyes: <@${note.userId}> I saw your :${note.glyph}:, but it is not on the proposal I am holding — ` +
         `nothing was executed. Use the buttons on the :warning: card for *${note.toolName}* just above, ` +

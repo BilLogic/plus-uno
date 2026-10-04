@@ -39,6 +39,7 @@ import type {
   Execution,
   PendingProposal,
   ProposalOperation,
+  StatedCardWords,
   ThreadState,
 } from "../thread-state/index";
 import type { GateNote } from "../turn/index";
@@ -204,7 +205,7 @@ export interface GateDeps {
  * who made it and the tool on the live card, none of which Gate may spell.
  */
 function pointerNote(live: PendingProposal, glyph: string, userId: string): GateNote {
-  return { kind: "not-on-the-card", toolName: live.toolName, glyph, userId };
+  return { kind: "not-on-the-card", toolName: live.toolName, glyph, userId, ...(live.stated ? { stated: true } : {}) };
 }
 
 /** Where a resolution speaks: the card's own reply target, never `threadTs` —
@@ -257,7 +258,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
     return {
       outcome: "stale",
       decision,
-      post: { note: { kind: "superseded" }, replyTs: replyTargetOf(signal) },
+      post: { note: { kind: "superseded", ...(found.stated ? { stated: true } : {}) }, replyTs: replyTargetOf(signal) },
     };
   }
 
@@ -269,8 +270,13 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       decision,
       post: {
         // The card's own lifetime rides along when it had one, so the note
-        // says how long it was live rather than assuming the hour.
-        note: { kind: "expired", ...(found.ttlMs !== undefined ? { ttlMs: found.ttlMs } : {}) },
+        // says how long it was live rather than assuming the hour — and a
+        // stated card's own line, which says it in that card's terms.
+        note: {
+          kind: "expired",
+          ...(found.ttlMs !== undefined ? { ttlMs: found.ttlMs } : {}),
+          ...(found.stated ? { words: found.stated.expired } : {}),
+        },
         replyTs: replyTargetOf(signal),
       },
     };
@@ -387,7 +393,10 @@ async function claim(
       proposal,
       decision,
       post: {
-        note: why.state === "superseded" ? { kind: "superseded" } : { kind: "already-resolved" },
+        note:
+          why.state === "superseded"
+            ? { kind: "superseded", ...(proposal.stated ? { stated: true } : {}) }
+            : { kind: "already-resolved" },
         replyTs: replyTarget(proposal),
       },
     };
@@ -425,6 +434,7 @@ async function claim(
             kind: "resolved",
             decision,
             ...(decision === "cancel" && run ? { stillRuns: proposalOperations(run).map((op) => op.toolName) } : {}),
+            ...(decision === "cancel" && proposal.stated ? { cancelled: proposal.stated.cancelled } : {}),
           },
       replyTs: replyTarget(proposal),
     },
@@ -506,8 +516,8 @@ async function locate(
   deps: GateDeps,
 ): Promise<
   | { state: "found"; proposal: PendingProposal }
-  | { state: "superseded" }
-  | { state: "expired"; ttlMs?: number }
+  | { state: "superseded"; stated?: StatedCardWords }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords }
   | { state: "cut-off"; execution: Execution }
   | { state: "several"; count: number }
   | { state: "none" }
@@ -525,7 +535,7 @@ async function locate(
     // thread's newest card and the person would be told their ✅ "is not on
     // the proposal I am holding", when what actually happened is that the card
     // they acted on was replaced.
-    if (byTs.state === "superseded") return { state: "superseded" };
+    if (byTs.state === "superseded") return byTs;
     if (byTs.state === "expired") return byTs;
     // No card under this ts — and the claim that consumed it may belong to a
     // run that was cut off. Only a gesture ON the stuck card asks this: a

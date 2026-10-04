@@ -67,6 +67,7 @@ import {
 import {
   droppedItems,
   precedenceCard,
+  precedenceCardWords,
   precedenceList,
   precedenceOperations,
   type IntakeTarget,
@@ -244,6 +245,9 @@ function stagedCard(
     // Keyed apart from the thread: a turn's card in this thread neither
     // replaces the weekly card nor is replaced by it; its revisions share it.
     supersedeKey: PRECEDENCE_KEY,
+    // Its own words at the gate, for the whole six days from the first post —
+    // a revision keeps that expiry, so its own shorter ttl would misstate it.
+    stated: precedenceCardWords(PRECEDENCE_CARD_TTL_MS / 3_600_000),
     refuseRevision:
       "This is the weekly DS precedence card, and it changes only one way: reply `drop N` (or `drop 1, 3`) " +
       "to leave an item out, and I'll post the revised card.",
