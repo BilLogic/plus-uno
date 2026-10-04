@@ -109,7 +109,7 @@ export function askLead(input: { mentions: readonly string[]; items: readonly As
   const ask = askLine(input.mentions, items);
   if (items.length === 1) {
     const [item] = items;
-    const settled = `This thread settled “${said(item!.threadSays)}” on ${dayWords(item!.decidedAt)}, and ${fileLink(item!.file)} ${changeWords(item!.change)}.`;
+    const settled = `This thread settled "${said(item!.threadSays)}" on ${dayWords(item!.decidedAt)}, and ${fileLink(item!.file)} ${changeWords(item!.change)}.`;
     return [`${headline} ${settled}`, `${ask}${item!.elsewhere ? ` ${elsewhereSentence(item!.elsewhere.cardLink)}` : ""}`].join("\n");
   }
   // A card's own files are numbered when there are several, so `drop 2` names
@@ -118,7 +118,7 @@ export function askLead(input: { mentions: readonly string[]; items: readonly As
   let n = 0;
   const lines = items.map((item) => {
     const mark = !item.elsewhere && drafted > 1 ? `${(n += 1)}.` : "•";
-    const line = `${mark} ${fileLink(item.file)}: settled “${said(item.threadSays)}” on ${dayWords(item.decidedAt)}, and it ${changeWords(item.change)}.`;
+    const line = `${mark} ${fileLink(item.file)}: settled "${said(item.threadSays)}" on ${dayWords(item.decidedAt)}, and it ${changeWords(item.change)}.`;
     return item.elsewhere ? `${line} ${elsewhereSentence(item.elsewhere.cardLink)}` : line;
   });
   return [`${headline} This thread settled a decision about each of these files:`, ...lines, ask].join("\n");

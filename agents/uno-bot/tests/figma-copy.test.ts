@@ -590,7 +590,7 @@ describe("the drift question (#886 § 3.3)", () => {
     assert.equal(
       text,
       [
-        "*Is the Figma file still current?* This thread settled “tooltips on option chips” on Sep 24, and <https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting / Card 2482> hasn't changed since Sep 20.",
+        "*Is the Figma file still current?* This thread settled \"tooltips on option chips\" on Sep 24, and <https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting / Card 2482> hasn't changed since Sep 20.",
         "<@U0MERYEM1>, update the frame, or reply `skip` if the decision didn't touch Figma.",
         "",
         ":white_check_mark: files a Roadmap card for the update. :no_entry: files nothing.",
@@ -603,7 +603,7 @@ describe("the drift question (#886 § 3.3)", () => {
   it("several files, code among them: numbered for `drop`, and one footer naming both intakes", () => {
     const text = driftCard([one, { ...one, file: CODE, change: { kind: "unknown" } }], ["roadmap", "maintain"]);
     assert.match(text, /^\*Are these files still current\?\* This thread settled a decision about each of these files:\n1\. /);
-    assert.match(text, /\n2\. <[^>]+\|Button\.jsx>: settled “tooltips on option chips” on Sep 24, and it may not show it yet\.\n/);
+    assert.match(text, /\n2\. <[^>]+\|Button\.jsx>: settled "tooltips on option chips" on Sep 24, and it may not show it yet\.\n/);
     assert.match(text, /\n:white_check_mark: files both intakes; reply `drop 2` to leave one out\. :no_entry: files nothing\.\n/);
     passesChecklist(text, { gate: true });
   });

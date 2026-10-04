@@ -40,7 +40,9 @@
 // as cancelled by that person. It does not wait out its 72 h. A bare "yes" in
 // a thread that also holds a live turn card is that card's; and a card that
 // also files for files the replying thread never discussed stays, with a note
-// saying which `drop N` leaves the answered ones out.
+// saying which `drop N` leaves the answered ones out. A `skip` speaks for its
+// own thread's decision only: under the question alone it strikes that
+// question through and leaves the card another thread's decision drafted.
 //
 // A POSTED CARD IS STAGED OR WITHDRAWN. A file's intake mark is written before
 // the post, so a retried morning never posts a second card for it; a post that
@@ -86,6 +88,9 @@ export const MAX_CARDS_PER_MORNING = 4;
 export const MAX_FILES_PER_CARD = 5;
 /** Threads given the question alone per morning; the rest wait. */
 export const MAX_QUESTIONS_PER_MORNING = 4;
+/** Figma decisions the morning looks at before asking; a thread whose look
+ *  would pass it waits whole for tomorrow. */
+export const MAX_LOOKS_PER_MORNING = 6;
 /** Decisions one re-check looks at; the rest wait for the next run. */
 export const MAX_RECHECKS_PER_RUN = 6;
 /** How long a mark with no card holds its file for a try still posting. */
@@ -308,36 +313,50 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
   if (busy.size) notes.push(`${busy.size} thread(s) wait for their live drift card`);
 
   // The file first: a decision its file already shows is not asked about.
+  // Oldest thread first, and a thread at a time up to the morning's cap: the
+  // look is not kept between tries, so a budget stop repeats it, and a
+  // thread past the cap waits whole for tomorrow rather than be asked in part.
   const look: FileLook = { reads: deps.figma ? cachedReads(deps.figma) : null, changes: new Map(), judgedThrough: new Map() };
   const settled: DriftPostReport["settled"] = [];
   const settledIds: string[] = [];
   const toAsk: FileDriftFinding[] = [];
-  for (const f of fresh) {
-    if (!look.reads || !isFigmaKind(f.target.kind)) {
+  let looked = 0;
+  let held = 0;
+  for (const [, list] of [...groupBy(fresh, threadKey)].sort((a, b) => earliest(a[1]) - earliest(b[1]))) {
+    const figmaFiles = look.reads ? list.filter((f) => isFigmaKind(f.target.kind)).length : 0;
+    if (looked > 0 && looked + figmaFiles > MAX_LOOKS_PER_MORNING) {
+      held += 1;
+      continue;
+    }
+    looked += figmaFiles;
+    for (const f of list) {
+      if (!look.reads || !isFigmaKind(f.target.kind)) {
+        toAsk.push(f);
+        continue;
+      }
+      if (!deps.dryRun) ensureHeadroom(deps, { subrequests: CHECK_SUBREQUESTS, d1Queries: 0 });
+      const check = await checkDecision(look.reads, deps.judge, {
+        fileKey: f.fileKey,
+        url: f.target.url,
+        decidedAt: f.driftAt,
+        threadSays: f.threadSays,
+        sourceSays: f.sourceSays,
+      });
+      if (check.shows) {
+        settledIds.push(f.id);
+        settled.push({ channel: f.evidence.channel, threadTs: f.evidence.threadTs, fileKey: f.fileKey });
+        continue;
+      }
+      look.changes.set(f.id, check.change);
+      if (check.judged && check.change.kind === "changed") look.judgedThrough.set(f.id, check.change.at);
       toAsk.push(f);
-      continue;
     }
-    if (!deps.dryRun) ensureHeadroom(deps, { subrequests: CHECK_SUBREQUESTS, d1Queries: 0 });
-    const check = await checkDecision(look.reads, deps.judge, {
-      fileKey: f.fileKey,
-      url: f.target.url,
-      decidedAt: f.driftAt,
-      threadSays: f.threadSays,
-      sourceSays: f.sourceSays,
-    });
-    if (check.shows) {
-      settledIds.push(f.id);
-      settled.push({ channel: f.evidence.channel, threadTs: f.evidence.threadTs, fileKey: f.fileKey });
-      continue;
-    }
-    look.changes.set(f.id, check.change);
-    if (check.judged && check.change.kind === "changed") look.judgedThrough.set(f.id, check.change.at);
-    toAsk.push(f);
   }
   if (settledIds.length) {
     if (!deps.dryRun) await deps.store.remove(settledIds);
     notes.push(`${settledIds.length} file(s) already show their decision, so ${deps.dryRun ? "would not be" : "not"} asked`);
   }
+  if (held) notes.push(`${held} thread(s) wait for tomorrow's look at their files`);
 
   // One finding per file per thread.
   const threads = new Map<string, ThreadPlan>();
@@ -826,7 +845,8 @@ export async function recheckLiveAsks(
   let partly = 0;
   for (const ask of live.sort((a, b) => a.askedAt - b.askedAt)) {
     const open = ask.files.filter((f) => f.caughtUpAt === undefined);
-    if (checked + open.length > MAX_RECHECKS_PER_RUN) {
+    // One question naming more files than the cap is still looked at, alone.
+    if (checked > 0 && checked + open.length > MAX_RECHECKS_PER_RUN) {
       waiting += 1;
       continue;
     }
@@ -952,6 +972,13 @@ export function isDriftAnswerCandidate(event: {
  * whole, and say which `drop N` leaves the answered files off a card it
  * answers in part.
  *
+ * A YES REACHES WHERE THE INTAKE IS; A SKIP STAYS IN ITS THREAD. "The file is
+ * current" is true for every thread that discussed it, so a yes under a
+ * question withdraws the card it points at. "This decision didn't touch
+ * Figma" is about one thread's decision, so a `skip` withdraws only a card in
+ * its own thread, or strikes through the question there and leaves the card
+ * the other thread's decision drafted.
+ *
  * NEVER THROWS BUT FOR A BUDGET STOP: a failed read answers false, so the
  * reply takes the ordinary engagement rule rather than a turn it would never
  * have had. A card already retired when a later step fails is still edited
@@ -981,6 +1008,7 @@ export async function answerDriftAsk(reply: DriftReply, deps: DriftAnswerDeps): 
   let handled = false;
   for (const entries of cards.values()) {
     const [, file] = entries[0]!;
+    if (answer === "skip" && (file.cardChannel !== reply.channel || file.cardThread !== reply.threadTs)) continue;
     let card: PendingProposal | null;
     try {
       card = await deps.liveCard(file.cardChannel, file.cardThread!);
@@ -1025,6 +1053,18 @@ export async function answerDriftAsk(reply: DriftReply, deps: DriftAnswerDeps): 
     for (const ask of cardAsks.filter((a) => a.role === "card")) await step(() => deps.dropLiveAsk(ask), "live drop");
     if (card.channel !== reply.channel || cardThread !== reply.threadTs) {
       await step(() => deps.post(reply.channel, reply.threadTs, withdrawnElsewhereText(onCard.length)), "note");
+    }
+  }
+  if (answer === "skip" && !handled && Object.values(record).some((f) => f.people.includes(reply.user))) {
+    // The question alone, in a thread whose intake another thread drafted.
+    const here = await deps.liveAsksIn(reply.channel, reply.threadTs).catch((err: unknown) => {
+      swallowed(err, "live read");
+      return [] as LiveAsk[];
+    });
+    for (const ask of here.filter((a) => a.role === "question")) {
+      await step(() => deps.edit(ask.channel, ask.ts, skippedText(ask.headline, reply.user)), "edit");
+      await step(() => deps.dropLiveAsk(ask), "live drop");
+      handled = true;
     }
   }
   if (handled) {

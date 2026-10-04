@@ -21,6 +21,8 @@ import { SubrequestBudgetError } from "../src/net";
 import {
   answerDriftAsk,
   isDriftAnswerCandidate,
+  MAX_LOOKS_PER_MORNING,
+  MAX_RECHECKS_PER_RUN,
   recheckLiveAsks,
   runDriftAsks,
   type DriftAnswerDeps,
@@ -284,7 +286,7 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(
       card!.text.split("\n").slice(0, 2).join("\n"),
       [
-        "*Is the Figma file still current?* This thread settled “The recap drops the Share button; tutors see it automatically” on Sep 29, and <https://www.figma.com/design/AbC123xyz/Session-Recap?node-id=1-2|Session Recap> hasn't changed since Sep 20.",
+        "*Is the Figma file still current?* This thread settled \"The recap drops the Share button; tutors see it automatically\" on Sep 29, and <https://www.figma.com/design/AbC123xyz/Session-Recap?node-id=1-2|Session Recap> hasn't changed since Sep 20.",
         "<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma.",
       ].join("\n"),
       "#886 § 3.3, word for word",
@@ -644,7 +646,7 @@ describe("two files discussed in one thread", () => {
     assert.equal(m.posted[0]!.threadTs, t.root.ts);
     assert.match(
       m.posted[0]!.text,
-      /^\*Are these files still current\?\* This thread settled a decision about each of these files:\n1\. <[^>]+\|Session Recap>: settled “[^”]+” on Sep 29, and it hasn't changed since Sep 20\.\n2\. <[^>]+\|Button\.jsx>: settled “[^”]+” on Sep 29, and it may not show it yet\.\n<@U0ADE>, update them, or reply `skip` if the decisions didn't touch them\./,
+      /^\*Are these files still current\?\* This thread settled a decision about each of these files:\n1\. <[^>]+\|Session Recap>: settled "[^"]+" on Sep 29, and it hasn't changed since Sep 20\.\n2\. <[^>]+\|Button\.jsx>: settled "[^"]+" on Sep 29, and it may not show it yet\.\n<@U0ADE>, update them, or reply `skip` if the decisions didn't touch them\./,
     );
     assert.match(m.posted[0]!.text, /:white_check_mark: files both intakes; reply `drop 2` to leave one out\. :no_entry: files nothing\./);
     const cards = await h.threadState.getProposalsByChannel(DESIGN);
@@ -793,7 +795,7 @@ describe("the ask's words (#886 § 3.3)", () => {
     assert.equal(
       askLead({ mentions: ["U0BEA"], items: [item(RECAP, { kind: "unchanged", at: at(20, 15) })] }),
       [
-        "*Is the Figma file still current?* This thread settled “Tooltips on option chips” on Sep 24, and <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;> hasn't changed since Sep 20.",
+        "*Is the Figma file still current?* This thread settled \"Tooltips on option chips\" on Sep 24, and <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;> hasn't changed since Sep 20.",
         "<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma.",
       ].join("\n"),
     );
@@ -810,7 +812,7 @@ describe("the ask's words (#886 § 3.3)", () => {
     assert.equal(
       askLead({ mentions: ["U0ADE"], items: [item(BUTTON, { kind: "unknown" })] }),
       [
-        "*Is the code still current?* This thread settled “Tooltips on option chips” on Sep 24, and <https://github.com/o/r/blob/main/b.jsx|Button.jsx> may not show it yet.",
+        "*Is the code still current?* This thread settled \"Tooltips on option chips\" on Sep 24, and <https://github.com/o/r/blob/main/b.jsx|Button.jsx> may not show it yet.",
         "<@U0ADE>, update the code, or reply `skip` if the decision didn't touch it.",
       ].join("\n"),
     );
@@ -830,9 +832,9 @@ describe("the ask's words (#886 § 3.3)", () => {
       text,
       [
         "*Are these files still current?* This thread settled a decision about each of these files:",
-        "1. <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;>: settled “Tooltips on option chips” on Sep 24, and it hasn't changed since Sep 20.",
-        "2. <https://github.com/o/r/blob/main/b.jsx|Button.jsx>: settled “Tooltips on option chips” on Sep 24, and it may not show it yet.",
-        "• <https://plus-uno.netlify.app/storybook/?path=/docs/button|Button>: settled “Tooltips on option chips” on Sep 24, and it may not show it yet. Its intake is drafted <https://plus.slack.com/archives/C0DESIGN/p1|in another thread>.",
+        "1. <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;>: settled \"Tooltips on option chips\" on Sep 24, and it hasn't changed since Sep 20.",
+        "2. <https://github.com/o/r/blob/main/b.jsx|Button.jsx>: settled \"Tooltips on option chips\" on Sep 24, and it may not show it yet.",
+        "• <https://plus-uno.netlify.app/storybook/?path=/docs/button|Button>: settled \"Tooltips on option chips\" on Sep 24, and it may not show it yet. Its intake is drafted <https://plus.slack.com/archives/C0DESIGN/p1|in another thread>.",
         "<@U0BEA> <@U0ADE>, update them, or reply `skip` if the decisions didn't touch them.",
       ].join("\n"),
     );
@@ -849,7 +851,7 @@ describe("the ask's words (#886 § 3.3)", () => {
       // 02:00 UTC on Sep 25 is still Sep 24 in ET.
       items: [{ ...item(RECAP, { kind: "unknown" }), threadSays: "Ping <!here> about it.", decidedAt: at(25, 2) }],
     });
-    assert.match(text, /settled “Ping &lt;!here&gt; about it” on Sep 24,/);
+    assert.match(text, /settled "Ping &lt;!here&gt; about it" on Sep 24,/);
     assert.match(text, /\nUpdate the frame, or reply `skip`/, "with no owner, the ask still names the action");
   });
 });
@@ -1314,3 +1316,113 @@ async function pendingOf(h: SweepHarness, _drifts: InMemoryDriftStore, t: Return
   await runSweepJob(EOD, again.deps);
   return (await probe.pending())[0];
 }
+
+describe("the drift check's limits (#897 review)", () => {
+  it("looks at no more files a morning than its cap, and a thread past it waits whole for tomorrow", async () => {
+    const threads = Array.from({ length: MAX_LOOKS_PER_MORNING + 1 }, (_, i) =>
+      thread({ user: "U0STARTER", when: ts(29, 8 + i), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 8 + i, 30) }]),
+    );
+    const { h, drifts } = night({
+      threads,
+      sources: [FIGMA_A],
+      replies: threads.map((t) => reply(fileDrift(FIGMA_A, [t.messages[1]!.ts]))),
+    });
+    await runSweepJob(EOD, h.deps);
+    assert.equal((await drifts.pending()).length, MAX_LOOKS_PER_MORNING + 1);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    const report = await runDriftAsks(MORNING, m.deps);
+
+    assert.match(report.note ?? "", /1 thread\(s\) wait for tomorrow's look at their files/);
+    const newest = threads[threads.length - 1]!;
+    assert.ok(
+      (await drifts.pending()).some((f) => f.evidence.threadTs === newest.root.ts),
+      "the newest thread's finding stays queued for tomorrow",
+    );
+    assert.ok(!m.posted.some((p) => p.threadTs === newest.root.ts), "and its thread is not asked today");
+  });
+
+  it("still looks at one question that names more files than a re-check's cap", async () => {
+    const { h, drifts } = await recapMorning();
+    const figma = createInMemoryFigma();
+    const keys = Array.from({ length: MAX_RECHECKS_PER_RUN + 1 }, (_, i) => `File${i}`);
+    for (const key of keys) {
+      figma.seedFile(key, {
+        versions: { versions: [{ id: "1", label: null, description: null, created_at: "2026-09-30T18:00:00Z", user: { handle: "bea.designs" } }] },
+        nodes: { "1:2": frame(UPDATED) },
+      });
+    }
+    await drifts.saveLiveAsk({
+      channel: DESIGN,
+      ts: ts(30, 13, 0, 1),
+      threadTs: ts(29, 15),
+      role: "question",
+      headline: "Are these files still current?",
+      askedAt: at(30, 13),
+      files: keys.map((key) => ({
+        fileKey: `figma:${key}`,
+        kind: "figma" as const,
+        url: `https://www.figma.com/design/${key}/x?node-id=1-2`,
+        decidedAt: at(29, 16),
+        threadSays: "The recap drops the Share button.",
+        sourceSays: "It has a Share button.",
+        checkedThrough: at(29, 16),
+      })),
+    });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, figma, { judge: async () => "shows" });
+    const report = await recheckLiveAsks(RECHECK, r.deps);
+    assert.equal(report.checked, keys.length);
+    assert.deepEqual(r.edits.map((e) => e.text), ["~Are these files still current?~ Yes, updated Sep 30. Nothing to do."]);
+  });
+});
+
+describe("a skip under the question alone (#897 review)", () => {
+  /** Two threads about one file: the card in the first, the question alone in the second. */
+  async function twoThreads() {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
+    const { h, drifts } = night({
+      threads: [one, two],
+      sources: [FIGMA_A, FIGMA_B],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    h.clock.now = at(30, 15);
+    return { h, drifts, m, one, two, card: card!, deps: answerDeps(h, drifts, m.posted) };
+  }
+
+  it("strikes through its own question and leaves the card the other thread's decision drafted", async () => {
+    const { h, drifts, m, one, two, card, deps } = await twoThreads();
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0CY", text: "skip" }, deps), true);
+
+    const question = m.posted.find((p) => p.threadTs === two.root.ts)!;
+    assert.equal(question.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0CY>. Nothing to do.");
+    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "the first thread's card stays");
+    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, undefined);
+    assert.deepEqual(deps.notes, [], "nothing posted");
+    assert.deepEqual(
+      (await drifts.liveAsks()).map((a) => [a.threadTs, a.role]),
+      [[one.root.ts, "card"]],
+      "the card is still looked at; the skipped question is not",
+    );
+  });
+
+  it("leaves both alone for someone who didn't post in that thread", async () => {
+    const { h, m, two, card, deps } = await twoThreads();
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0STRANGER", text: "skip" }, deps), false);
+    assert.equal(m.posted.find((p) => p.threadTs === two.root.ts)!.withdrawn, undefined);
+    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+  });
+
+  it("withdraws the card when the skip is in the card's own thread", async () => {
+    const { h, m, one, card, deps } = await twoThreads();
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "skip" }, deps), true);
+    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0ADE>. Nothing to do.");
+  });
+});
