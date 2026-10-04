@@ -72,6 +72,7 @@ import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
   mayConfirm,
+  ownWords,
   proposalOperations,
   proposalReplyThread,
   proposalTtlMs,
@@ -1586,6 +1587,9 @@ async function dropFromSweepCard(
     ttlMs: leftMs,
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
+    // The same card minus some items, so a drift card's own gate words stay
+    // (`figma-drift/copy.ts` `driftCardWords`); a sweep card has none.
+    ...ownWords(pending),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.
     originProposalTs: stagingCardOf(pending),

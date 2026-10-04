@@ -1,11 +1,11 @@
 // The drift store in memory, for the Node suite: the queue the end-of-day
-// sweep fills, the file marks and the threads' ask records. Production keeps
-// the same three in HARNESS_KV (`./env.ts`).
+// sweep fills, the file marks, the threads' ask records and the live asks.
+// Production keeps the same four in HARNESS_KV (`./env.ts`).
 //
 // PURE: no `Env`, no Workers global.
 
 import type { FileDriftFinding, FileDriftSink } from "./finding";
-import type { AskRecord, DriftStore, IntakeMark } from "./run";
+import type { AskRecord, DriftStore, IntakeMark, LiveAsk } from "./run";
 
 export interface InMemoryDriftStore extends DriftStore, FileDriftSink {
   /** Every intake mark, by group. */
@@ -16,7 +16,10 @@ export function createInMemoryDriftStore(): InMemoryDriftStore {
   let queue: FileDriftFinding[] = [];
   const marks = new Map<string, IntakeMark>();
   const records = new Map<string, AskRecord>();
+  const live = new Map<string, LiveAsk>();
   const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
+  const liveKey = (a: Pick<LiveAsk, "channel" | "threadTs" | "ts">) => `${a.channel}:${a.threadTs}:${a.ts}`;
+  const byAge = (list: LiveAsk[]) => list.sort((a, b) => a.askedAt - b.askedAt).map(clone);
   return {
     async add(findings) {
       const byId = new Map(queue.map((f) => [f.id, f] as const));
@@ -44,6 +47,18 @@ export function createInMemoryDriftStore(): InMemoryDriftStore {
     },
     async saveAsked(channel, threadTs, record) {
       records.set(`${channel}:${threadTs}`, clone(record));
+    },
+    async liveAsks() {
+      return byAge([...live.values()]);
+    },
+    async liveAsksIn(channel, threadTs) {
+      return byAge([...live.values()].filter((a) => a.channel === channel && a.threadTs === threadTs));
+    },
+    async saveLiveAsk(ask) {
+      live.set(liveKey(ask), clone(ask));
+    },
+    async dropLiveAsk(ask) {
+      live.delete(liveKey(ask));
     },
     marks: () => marks,
   };

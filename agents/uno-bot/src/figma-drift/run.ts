@@ -1,9 +1,14 @@
-// `runDriftAsks` — the morning's `figma-drift-post` job — and
-// `answerDriftAsk`, the "yes, it's up to date" reply that withdraws a card.
+// `runDriftAsks` — the morning's `figma-drift-post` job — `recheckLiveAsks`,
+// the `figma-drift-recheck` job that withdraws a question once its file
+// catches up, and `answerDriftAsk`, the "yes" or `skip` that withdraws a card.
 //
 // THE MORNING. The end-of-day sweep queued each file drift it found
 // (`sweep/run.ts` → `FileDriftSink`). At the next weekday morning run
 // (`postableAt`):
+//   • THE FILE FIRST (#897). Each Figma file is looked at before its thread
+//     is asked (`./check.ts`): a file that changed after the decision and
+//     whose linked frame now shows it is not asked about, and leaves the
+//     queue. Every other ask says what the file did since the decision.
 //   • ONE INTAKE PER FILE. A file's intake is drafted in the first thread that
 //     discussed it (`askGroupOf` keeps audiences apart). While that card is
 //     live, the file gets no second intake.
@@ -21,14 +26,21 @@
 // Each ask is posted where `pickDestination` puts it — its own thread, or the
 // private place its evidence is in — and never in #uno-bot.
 //
-// THE YES. A reply in an asked thread that says its files are current
-// (`upToDateAnswer`), from someone who may decide the card, withdraws it:
-// retired in ThreadState so no ✅ can file it, edited to say why, and recorded
-// on the usage record as cancelled by that person. It does not wait out its
-// 72 h. A bare "yes" in a thread that also holds a live turn card is that
-// card's; and a card that also files for files the replying thread never
-// discussed stays, with a note saying which `drop N` leaves the answered ones
-// out.
+// WHILE IT IS LIVE. Each ask posted is kept as a live record for its 72 h.
+// Both scheduled runs look at each record's Figma files again; once every file
+// a message names shows its decision, that same message is edited to strike
+// the question through — "Yes, updated Sep 30. Nothing to do." — and a card is
+// retired first, so no ✅ can file it. Nothing is ever posted. Past 72 h a
+// question is left as it is: no re-ping, no edit.
+//
+// THE YES. A reply in an asked thread that says its files are current, or that
+// is the ask's `skip` (`driftAnswer`), from someone who may decide the card,
+// withdraws it: retired in ThreadState so no ✅ can file it, edited to strike
+// the question through and say who answered, and recorded on the usage record
+// as cancelled by that person. It does not wait out its 72 h. A bare "yes" in
+// a thread that also holds a live turn card is that card's; and a card that
+// also files for files the replying thread never discussed stays, with a note
+// saying which `drop N` leaves the answered ones out.
 //
 // A POSTED CARD IS STAGED OR WITHDRAWN. A file's intake mark is written before
 // the post, so a retried morning never posts a second card for it; a post that
@@ -46,23 +58,25 @@ import { postableAt } from "../sweep/schedule";
 import type { FigmaClient, FigmaVersionsResponse } from "../figma/client";
 import { versionsFrom } from "../figma-poll";
 import {
-  askLine,
-  cardTerms,
+  askLead,
+  caughtUpText,
+  confirmedText,
+  driftAnswer,
+  driftCardWords,
+  driftFooter,
+  driftHeadline,
   DRIFT_CARD_TTL_MS,
   DRIFT_NOT_STAGED_TEXT,
-  elsewhereWords,
-  fileLink,
   mentionsOf,
   partlyAnsweredText,
   pillarNote,
-  pingText,
-  publisherLine,
-  saidLines,
-  upToDateAnswer,
+  skippedText,
   withdrawnElsewhereText,
-  withdrawnText,
-  type AskedFileWords,
+  type AskItem,
+  type FileChange,
 } from "./copy";
+import { cachedReads, checkDecision, isFigmaKind, type FileReads } from "./check";
+import type { FrameJudge } from "./judge";
 import { draftIntake, fileKeyOfOperation, matchPillar, pillarCandidates } from "./draft";
 import { askGroupOf, DRIFT_KEY, type FileDriftFinding, type IntakeLane } from "./finding";
 
@@ -72,8 +86,13 @@ export const MAX_CARDS_PER_MORNING = 4;
 export const MAX_FILES_PER_CARD = 5;
 /** Threads given the question alone per morning; the rest wait. */
 export const MAX_QUESTIONS_PER_MORNING = 4;
+/** Decisions one re-check looks at; the rest wait for the next run. */
+export const MAX_RECHECKS_PER_RUN = 6;
 /** How long a mark with no card holds its file for a try still posting. */
 const POSTING_HOLD_MS = 60 * 60 * 1000;
+/** What one decision's look at its file may spend: a `versions` read, a
+ *  `nodes` read and the judgement. */
+const CHECK_SUBREQUESTS = 3;
 
 /**
  * Who last published a file: the author of its newest named version, or null
@@ -111,7 +130,40 @@ export interface AskedFile {
 /** Everything a thread has been asked, by file key. */
 export type AskRecord = Record<string, AskedFile>;
 
-/** The queue and the marks, behind one port. */
+/** One file a live ask names, with what the re-check has seen of it. */
+export interface LiveAskFile {
+  /** The drift file key (`figma:<key>`, or a repo URL's). */
+  fileKey: string;
+  kind: TargetKind;
+  /** The link the thread used — its node id names the frame. */
+  url: string;
+  /** When the thread settled it, epoch ms. */
+  decidedAt: number;
+  threadSays: string;
+  sourceSays: string;
+  /** The newest change already judged not to show the decision; the
+   *  decision time until one has been. */
+  checkedThrough: number;
+  /** The change found to show the decision, epoch ms. */
+  caughtUpAt?: number;
+}
+
+/** A question posted and still within its 72 h: the message to edit, and the
+ *  files whose catching up withdraws it. */
+export interface LiveAsk {
+  channel: string;
+  /** The message: the card, or the question alone. */
+  ts: string;
+  /** The thread it is in. */
+  threadTs: string;
+  role: "card" | "question";
+  /** Its first line, for the struck-through edit. */
+  headline: string;
+  askedAt: number;
+  files: LiveAskFile[];
+}
+
+/** The queue, the marks and the live asks, behind one port. */
 export interface DriftStore {
   pending(): Promise<FileDriftFinding[]>;
   remove(ids: string[]): Promise<void>;
@@ -121,6 +173,12 @@ export interface DriftStore {
   clearIntakeMark(group: string): Promise<void>;
   asked(channel: string, threadTs: string): Promise<AskRecord>;
   saveAsked(channel: string, threadTs: string, record: AskRecord): Promise<void>;
+  /** Every live ask, oldest first. Kept for the card's 72 h. */
+  liveAsks(): Promise<LiveAsk[]>;
+  /** The live asks posted in one thread. */
+  liveAsksIn(channel: string, threadTs: string): Promise<LiveAsk[]>;
+  saveLiveAsk(ask: LiveAsk): Promise<void>;
+  dropLiveAsk(ask: Pick<LiveAsk, "channel" | "threadTs" | "ts">): Promise<void>;
 }
 
 /** A place a message goes: a thread, or a place's top. */
@@ -149,9 +207,13 @@ export interface DriftPostDeps {
   cardLive(proposalTs: string): Promise<boolean>;
   /** Whether a thread already holds a live drift card. */
   threadBusy(channel: string, threadTs: string): Promise<boolean>;
-  /** The Figma client, for who last published a file (`publisherOf`). Without
-   *  one, no card names a publisher. */
-  figma?: Pick<FigmaClient, "versions">;
+  /** The Figma client: a file's last change and publisher (`versions`), and
+   *  the linked frame (`nodes`). Without one, no file is looked at and no
+   *  card names a publisher. */
+  figma?: Pick<FigmaClient, "versions" | "nodes">;
+  /** Whether a frame now shows a decision (`./judge.ts`). Without one, no
+   *  decision is ever found shown, and every drift is asked about. */
+  judge?: FrameJudge;
   /** The Roadmap's Product Pillar options, or null when unread. */
   pillarOptions(): Promise<string[] | null>;
   config: TeamChannels & { unoBot?: string };
@@ -178,6 +240,8 @@ export interface DriftPostReport {
   outcome: "handled";
   note: string | null;
   asks: DriftAskReport[];
+  /** Decisions whose file already shows them, so nobody was asked. */
+  settled: Array<{ channel: string; threadTs: string | null; fileKey: string }>;
   summary: string;
 }
 
@@ -195,6 +259,15 @@ interface ThreadPlan {
 
 /** Where a file's intake is drafted this morning. */
 type Home = { kind: "live"; mark: IntakeMark } | { kind: "new"; thread: string };
+
+/** What the morning read of the files, shared by every ask it posts. */
+interface FileLook {
+  reads: FileReads | null;
+  /** Each asked finding's file, by finding id. */
+  changes: Map<string, FileChange>;
+  /** Each finding whose change was judged and not shown: the change. */
+  judgedThrough: Map<string, number>;
+}
 
 /**
  * One morning's asks.
@@ -234,9 +307,41 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
   if (already.length && !deps.dryRun) await deps.store.remove(already);
   if (busy.size) notes.push(`${busy.size} thread(s) wait for their live drift card`);
 
+  // The file first: a decision its file already shows is not asked about.
+  const look: FileLook = { reads: deps.figma ? cachedReads(deps.figma) : null, changes: new Map(), judgedThrough: new Map() };
+  const settled: DriftPostReport["settled"] = [];
+  const settledIds: string[] = [];
+  const toAsk: FileDriftFinding[] = [];
+  for (const f of fresh) {
+    if (!look.reads || !isFigmaKind(f.target.kind)) {
+      toAsk.push(f);
+      continue;
+    }
+    if (!deps.dryRun) ensureHeadroom(deps, { subrequests: CHECK_SUBREQUESTS, d1Queries: 0 });
+    const check = await checkDecision(look.reads, deps.judge, {
+      fileKey: f.fileKey,
+      url: f.target.url,
+      decidedAt: f.driftAt,
+      threadSays: f.threadSays,
+      sourceSays: f.sourceSays,
+    });
+    if (check.shows) {
+      settledIds.push(f.id);
+      settled.push({ channel: f.evidence.channel, threadTs: f.evidence.threadTs, fileKey: f.fileKey });
+      continue;
+    }
+    look.changes.set(f.id, check.change);
+    if (check.judged && check.change.kind === "changed") look.judgedThrough.set(f.id, check.change.at);
+    toAsk.push(f);
+  }
+  if (settledIds.length) {
+    if (!deps.dryRun) await deps.store.remove(settledIds);
+    notes.push(`${settledIds.length} file(s) already show their decision, so ${deps.dryRun ? "would not be" : "not"} asked`);
+  }
+
   // One finding per file per thread.
   const threads = new Map<string, ThreadPlan>();
-  for (const [key, list] of groupBy(fresh, threadKey)) {
+  for (const [key, list] of groupBy(toAsk, threadKey)) {
     const findings = [...groupBy(list, (f) => f.fileKey).values()]
       .map((same) => same.sort((a, b) => a.driftAt - b.driftAt)[0]!)
       .sort((a, b) => a.driftAt - b.driftAt || a.id.localeCompare(b.id));
@@ -287,7 +392,7 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
   const cardThreads = [...threads.values()].filter((t) => t.drafts.length).sort((a, b) => earliest(a.findings) - earliest(b.findings));
   const carded: ThreadPlan[] = [];
   for (const t of cardThreads) {
-    if (await askWithCard(deps, t, byGroup, homes, cardLinks, cardPlaces, asks, notes)) carded.push(t);
+    if (await askWithCard(deps, t, byGroup, homes, look, cardLinks, cardPlaces, asks, notes)) carded.push(t);
   }
   // Recorded once every card is up, so a file drafted on a later card is on
   // this thread's record too. A file whose card did not go up stays queued.
@@ -306,7 +411,7 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
       break;
     }
     questions += 1;
-    asked.push(...(await askQuestion(deps, t, homes, cardLinks, cardPlaces, asks)));
+    asked.push(...(await askQuestion(deps, t, homes, look, cardLinks, cardPlaces, asks)));
   }
   if (asked.length && !deps.dryRun) await deps.store.remove(asked);
 
@@ -316,7 +421,7 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
   const summary = asks.length
     ? `${verb} ${asks.length} thread(s), ${cards} with drafted intakes${note ? ` — ${note}` : ""}`
     : `no file drift due this morning${note ? ` — ${note}` : ""}`;
-  return { kind: "figma-drift-post", key: job.key, outcome: "handled", note, asks, summary };
+  return { kind: "figma-drift-post", key: job.key, outcome: "handled", note, asks, settled, summary };
 }
 
 /**
@@ -330,6 +435,7 @@ async function askWithCard(
   t: ThreadPlan,
   byGroup: Map<string, FileDriftFinding[]>,
   homes: Map<string, Home>,
+  look: FileLook,
   cardLinks: Map<string, string | null>,
   cardPlaces: Map<string, { channel: string; thread: string | null }>,
   asks: DriftAskReport[],
@@ -351,8 +457,8 @@ async function askWithCard(
   if (!deps.dryRun) {
     // Everything the card will send, counted before any of it is: the
     // permalinks, a publisher and the pillar options per file, the post, the
-    // staging, its own permalink and a withdrawal held back.
-    ensureHeadroom(deps, { subrequests: publicEvidence.length + 2 * drafted.length + 4, d1Queries: 2 });
+    // staging, its own permalink, its live record and a withdrawal held back.
+    ensureHeadroom(deps, { subrequests: publicEvidence.length + 2 * drafted.length + 5, d1Queries: 2 });
   }
   const now = deps.now();
   if (!deps.dryRun) {
@@ -370,22 +476,16 @@ async function askWithCard(
     if (link) permalinks[f.id] = link;
   }
   let options: Promise<string[] | null> | undefined;
-  const bullets: string[] = [];
+  const notesBelow: string[] = [];
   const operations: ProposalOperation[] = [];
   const lanes: IntakeLane[] = [];
-  for (const [i, d] of drafted.entries()) {
+  for (const d of drafted) {
     const f = d.here;
     const figmaKey = f.fileKey.startsWith("figma:") ? f.fileKey.slice("figma:".length) : null;
-    const publisher =
-      figmaKey && deps.figma
-        ? await deps.figma
-            .versions(figmaKey)
-            .then(publisherOf)
-            .catch((err: unknown) => {
-              rethrowIfBudget(err);
-              return null;
-            })
-        : null;
+    // The morning's look at the file read its versions already; the
+    // publisher comes from the same read.
+    const versions = figmaKey && look.reads ? await look.reads.versions(figmaKey) : null;
+    const publisher = versions ? publisherOf(versions) : null;
     const candidates = pillarCandidates(d.all);
     const choice =
       f.lane === "roadmap" && candidates.length
@@ -400,27 +500,18 @@ async function askWithCard(
     const intake = draftIntake({ findings: d.all, pillar: choice.pillar, publisher, permalinks });
     operations.push(intake.operation);
     lanes.push(intake.lane);
-    const pub = publisherLine(publisher);
-    bullets.push(
-      drafted.length > 1 ? `${i + 1}. ${fileLink(f.target)}` : "",
-      ...(pub ? [`${drafted.length > 1 ? "   " : ""}${pub}`] : []),
-      ...saidLines(f.threadSays, f.sourceSays, drafted.length > 1 ? "   " : ""),
-      ...(choice.note ? [`${drafted.length > 1 ? "   " : ""}${pillarNote(choice.note)}`] : []),
-    );
+    if (choice.note) notesBelow.push(pillarNote(choice.note, drafted.length > 1 ? operations.length : undefined));
   }
   // Files this thread discussed whose intake is drafted on another card.
   const elsewhere = t.findings.filter((f) => !t.drafts.includes(askGroupOf(f)));
-  for (const f of elsewhere) bullets.push(`• ${fileLink(f.target)}: ${elsewhereWords(linkFor(askGroupOf(f), cardLinks))}`);
-
-  const files: AskedFileWords[] = [...drafted.map((d) => d.here), ...elsewhere].map((f) => f.target);
-  const lead = [
-    `:art: ${askLine({ mentions: mentionsOf(t.findings.map((f) => f.owner)), files })}`,
-    ...bullets.filter((line) => line !== ""),
-    "",
-    cardTerms(lanes, drafted[0]!.here.target.kind),
-  ].join("\n");
+  const named = [...drafted.map((d) => d.here), ...elsewhere];
+  const items: AskItem[] = named.map((f) => ({
+    ...itemOf(f, look),
+    ...(t.drafts.includes(askGroupOf(f)) ? {} : { elsewhere: { cardLink: linkFor(askGroupOf(f), cardLinks) } }),
+  }));
+  const lead = [askLead({ mentions: mentionsOf(t.findings.map((f) => f.owner)), items }), ...notesBelow].join("\n");
   const card: ProposalCard = {
-    kind: "confirm",
+    kind: "stated",
     verb:
       operations.length > 1
         ? `file these ${operations.length} intakes`
@@ -428,6 +519,7 @@ async function askWithCard(
           ? "file this Roadmap card"
           : "file this intake",
     lead,
+    footer: driftFooter(lanes),
     fields: [],
     caveats: [],
     operations,
@@ -474,6 +566,8 @@ async function askWithCard(
     confirmers,
     // Its own slot, beside a sweep card and a turn's card (`proposalSlot`).
     supersedeKey: DRIFT_KEY,
+    // Nobody asked, so the gate's "ask me again" lines would be wrong.
+    stated: driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000),
   };
   try {
     await deps.stage(proposal, first.evidence.channelKind);
@@ -489,6 +583,7 @@ async function askWithCard(
     await deps.store.setIntakeMark(d.group, { channel: to.channel, threadTs: root, cardTs: sent.ts, markedAt: now });
   }
   asks.push({ ...report, ts: sent.ts });
+  await keepLive(deps, { channel: to.channel, ts: sent.ts, threadTs: root, role: "card" }, named, look, now);
   const link = await deps.slack.permalink(to.channel, sent.ts).catch((err: unknown) => {
     rethrowIfBudget(err);
     return null;
@@ -509,6 +604,7 @@ async function askQuestion(
   deps: DriftPostDeps,
   t: ThreadPlan,
   homes: Map<string, Home>,
+  look: FileLook,
   cardLinks: Map<string, string | null>,
   cardPlaces: Map<string, { channel: string; thread: string | null }>,
   asks: DriftAskReport[],
@@ -519,8 +615,8 @@ async function askQuestion(
   const first = findings[0]!;
   const to = placeOf(first, deps.config);
   if (!to) return [];
-  if (!deps.dryRun) ensureHeadroom(deps, { subrequests: 1 + findings.length, d1Queries: 0 });
-  const links: Array<{ file: AskedFileWords; cardLink: string | null }> = [];
+  if (!deps.dryRun) ensureHeadroom(deps, { subrequests: 2 + findings.length, d1Queries: 0 });
+  const items: AskItem[] = [];
   for (const f of findings) {
     const group = askGroupOf(f);
     let link = linkFor(group, cardLinks);
@@ -532,10 +628,9 @@ async function askQuestion(
       });
       cardLinks.set(group, link);
     }
-    links.push({ file: f.target, cardLink: link });
+    items.push({ ...itemOf(f, look), elsewhere: { cardLink: link } });
   }
-  const line = askLine({ mentions: mentionsOf(findings.map((f) => f.owner)), files: findings.map((f) => f.target) });
-  const text = pingText(`:art: ${line}`, links);
+  const text = askLead({ mentions: mentionsOf(findings.map((f) => f.owner)), items });
   const report: DriftAskReport = {
     channel: to.channel,
     threadTs: to.threadTs,
@@ -551,8 +646,48 @@ async function askQuestion(
   if (!sent.ok || !sent.ts) return [];
   if (to.threadTs) await deps.slack.markThread(to.channel, to.threadTs).catch(rethrowIfBudget);
   asks.push({ ...report, ts: sent.ts });
+  await keepLive(deps, { channel: to.channel, ts: sent.ts, threadTs: to.threadTs ?? sent.ts, role: "question" }, findings, look, deps.now());
   await recordAsked(deps, findings, (f) => placeFor(askGroupOf(f), homes, cardPlaces));
   return findings.map((f) => f.id);
+}
+
+/** A finding as the ask names it, with what the morning saw of its file. */
+function itemOf(f: FileDriftFinding, look: FileLook): AskItem {
+  return { file: f.target, threadSays: f.threadSays, decidedAt: f.driftAt, change: look.changes.get(f.id) ?? { kind: "unknown" } };
+}
+
+/**
+ * Keep a posted ask as live, so the re-check can withdraw it. Best-effort: the
+ * ask is up whether or not its record lands, and without one it simply lives
+ * out its 72 h as every ask did before.
+ */
+async function keepLive(
+  deps: Pick<DriftPostDeps, "store">,
+  message: Pick<LiveAsk, "channel" | "ts" | "threadTs" | "role">,
+  findings: readonly FileDriftFinding[],
+  look: FileLook,
+  now: number,
+): Promise<void> {
+  const ask: LiveAsk = {
+    ...message,
+    headline: driftHeadline(findings.map((f) => f.target.kind)),
+    askedAt: now,
+    files: findings.map((f) => ({
+      fileKey: f.fileKey,
+      kind: f.target.kind,
+      url: f.target.url,
+      decidedAt: f.driftAt,
+      threadSays: f.threadSays,
+      sourceSays: f.sourceSays,
+      checkedThrough: look.judgedThrough.get(f.id) ?? f.driftAt,
+    })),
+  };
+  try {
+    await deps.store.saveLiveAsk(ask);
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.error(`[figma-drift] live record for ${message.channel}:${message.ts} not kept: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 /** A file's card link, once fetched this morning; null until then. */
@@ -601,6 +736,171 @@ function placeOf(f: FileDriftFinding, config: DriftPostDeps["config"]): AskPlace
   return to;
 }
 
+// ── While it is live ─────────────────────────────────────────────────────────
+
+export interface DriftRecheckDeps {
+  store: Pick<DriftStore, "liveAsks" | "saveLiveAsk" | "dropLiveAsk">;
+  /** The Figma client; without one, nothing is looked at. */
+  figma?: Pick<FigmaClient, "versions" | "nodes">;
+  /** Without one, no decision is ever found shown. */
+  judge?: FrameJudge;
+  /** The live drift card in a thread — a revision of it included. */
+  liveCard(channel: string, thread: string): Promise<PendingProposal | null>;
+  /** Take the card out of reach; false when it was no longer live. */
+  retire(proposalTs: string): Promise<boolean>;
+  /** Edit a message to `text`, its buttons gone. */
+  edit(channel: string, ts: string, text: string): Promise<void>;
+  /** The card's cancelled row on the usage record, by the Worker. */
+  recordWithdrawn(proposal: PendingProposal): Promise<void>;
+  meter?: { headroom(): { subrequests: number; d1Queries: number } };
+  now(): number;
+  dryRun?: boolean;
+}
+
+/** One question withdrawn — or, on a dry run, that would be. */
+export interface DriftWithdrawal {
+  channel: string;
+  ts: string;
+  role: "card" | "question";
+  files: string[];
+  text: string;
+}
+
+export interface DriftRecheckReport {
+  kind: "figma-drift-recheck";
+  key: string;
+  outcome: "handled";
+  /** Decisions looked at. */
+  checked: number;
+  withdrawn: DriftWithdrawal[];
+  note: string | null;
+  summary: string;
+}
+
+/**
+ * Look again at each live question's files, and withdraw a question whose
+ * files all show their decision by editing the message it is — never by
+ * posting. A question past its 72 h is left as it is.
+ *
+ * @param job - The `figma-drift-recheck` job
+ * @param deps - Everything it touches, by name
+ * @param opts.fileKey - Only the questions naming this file — the seam a
+ *   file-change notification calls (#896)
+ * @throws A budget stop — the runner retries on a fresh budget, and what was
+ *   already judged is kept on each record, so nothing is judged twice
+ */
+export async function recheckLiveAsks(
+  job: { key: string },
+  deps: DriftRecheckDeps,
+  opts: { fileKey?: string } = {},
+): Promise<DriftRecheckReport> {
+  const now = deps.now();
+  const notes: string[] = [];
+  const withdrawn: DriftWithdrawal[] = [];
+  const done = (checked: number): DriftRecheckReport => {
+    const note = notes.length ? notes.join("; ") : null;
+    const verb = deps.dryRun ? "would withdraw" : "withdrew";
+    const summary = `looked at ${checked} decision(s), ${verb} ${withdrawn.length} question(s)${note ? ` — ${note}` : ""}`;
+    return { kind: "figma-drift-recheck", key: job.key, outcome: "handled", checked, withdrawn, note, summary };
+  };
+  if (!deps.figma) {
+    notes.push("no Figma client");
+    return done(0);
+  }
+  const reads = cachedReads(deps.figma);
+  const live: LiveAsk[] = [];
+  for (const ask of await deps.store.liveAsks()) {
+    // Past its 72 h: no re-ping, and no edit either.
+    if (ask.askedAt + DRIFT_CARD_TTL_MS <= now) {
+      if (!deps.dryRun) await deps.store.dropLiveAsk(ask);
+      continue;
+    }
+    if (opts.fileKey && !ask.files.some((f) => f.fileKey === opts.fileKey)) continue;
+    // Code and Storybook can't be looked at, so a question naming one stays.
+    if (!ask.files.every((f) => isFigmaKind(f.kind))) continue;
+    live.push(ask);
+  }
+
+  let checked = 0;
+  let waiting = 0;
+  let partly = 0;
+  for (const ask of live.sort((a, b) => a.askedAt - b.askedAt)) {
+    const open = ask.files.filter((f) => f.caughtUpAt === undefined);
+    if (checked + open.length > MAX_RECHECKS_PER_RUN) {
+      waiting += 1;
+      continue;
+    }
+    let changed = false;
+    for (const f of open) {
+      if (!deps.dryRun) ensureHeadroom(deps, { subrequests: CHECK_SUBREQUESTS, d1Queries: 0 });
+      checked += 1;
+      const check = await checkDecision(reads, deps.judge, f);
+      if (check.change.kind !== "changed") continue;
+      if (check.shows) {
+        f.caughtUpAt = check.change.at;
+        changed = true;
+      } else if (check.judged) {
+        f.checkedThrough = check.change.at;
+        changed = true;
+      }
+    }
+    if (ask.files.every((f) => f.caughtUpAt !== undefined)) {
+      await withdrawCaughtUp(ask, deps, withdrawn, notes);
+    } else {
+      if (ask.files.some((f) => f.caughtUpAt !== undefined)) partly += 1;
+      if (changed && !deps.dryRun) await deps.store.saveLiveAsk(ask);
+    }
+  }
+  if (partly) notes.push(`${partly} question(s) wait for their other files`);
+  if (waiting) notes.push(`${waiting} question(s) wait for the next run`);
+  return done(checked);
+}
+
+/** Edit a caught-up question in place, retiring its card first. */
+async function withdrawCaughtUp(ask: LiveAsk, deps: DriftRecheckDeps, withdrawn: DriftWithdrawal[], notes: string[]): Promise<void> {
+  const text = caughtUpText(ask.headline, Math.max(...ask.files.map((f) => f.caughtUpAt!)));
+  const files = ask.files.map((f) => f.fileKey);
+  if (deps.dryRun) {
+    withdrawn.push({ channel: ask.channel, ts: ask.ts, role: ask.role, files, text });
+    return;
+  }
+  if (ask.role === "question") {
+    await step(() => deps.edit(ask.channel, ask.ts, text), "edit");
+    await deps.store.dropLiveAsk(ask);
+    withdrawn.push({ channel: ask.channel, ts: ask.ts, role: ask.role, files, text });
+    return;
+  }
+  // The thread's live drift card: this one, or its `drop N` revision. A card
+  // for other files — staged after this one was resolved — is not this ask's.
+  let card: PendingProposal | null = null;
+  try {
+    card = await deps.liveCard(ask.channel, ask.threadTs);
+  } catch (err) {
+    swallowed(err, "card lookup");
+    return;
+  }
+  const live = card && proposalOperations(card).every((op) => files.includes(fileKeyOfOperation(op) ?? "")) ? card : null;
+  let retired = false;
+  if (live) {
+    try {
+      retired = await deps.retire(live.proposalTs);
+    } catch (err) {
+      swallowed(err, "retire");
+      return;
+    }
+  }
+  if (!live || !retired) {
+    // ✅'d, ⛔'d or lapsed: the card already says what happened.
+    await deps.store.dropLiveAsk(ask);
+    notes.push(`${ask.channel}:${ask.ts}: its card is no longer live`);
+    return;
+  }
+  await step(() => deps.edit(live.channel, live.proposalTs, text), "edit");
+  await step(() => deps.recordWithdrawn(live), "record");
+  await deps.store.dropLiveAsk(ask);
+  withdrawn.push({ channel: live.channel, ts: live.proposalTs, role: ask.role, files, text });
+}
+
 // ── The yes ──────────────────────────────────────────────────────────────────
 
 /** A thread reply, as the answer reads it. */
@@ -625,11 +925,14 @@ export interface DriftAnswerDeps {
   post(channel: string, threadTs: string, text: string): Promise<void>;
   /** The card's cancelled row on the usage record, by this person. */
   recordWithdrawn(proposal: PendingProposal, user: string): Promise<void>;
+  /** The live asks in a thread, so an answered one is not withdrawn again. */
+  liveAsksIn(channel: string, threadTs: string): Promise<LiveAsk[]>;
+  dropLiveAsk(ask: Pick<LiveAsk, "channel" | "threadTs" | "ts">): Promise<void>;
 }
 
 /**
- * Whether a message could be a yes to a drift ask — no reads, so the message
- * job can ask it of every thread reply.
+ * Whether a message could be a yes or a `skip` to a drift ask — no reads, so
+ * the message job can ask it of every thread reply.
  *
  * @param event - The message
  */
@@ -641,12 +944,13 @@ export function isDriftAnswerCandidate(event: {
   text?: string;
 }): boolean {
   if (!event.thread_ts || event.bot_id || !event.user || event.subtype) return false;
-  return upToDateAnswer(event.text ?? "") !== null;
+  return driftAnswer(event.text ?? "") !== null;
 }
 
 /**
- * A yes in an asked thread: withdraw each live card it answers whole, and
- * say which `drop N` leaves the answered files off a card it answers in part.
+ * A yes or a `skip` in an asked thread: withdraw each live card it answers
+ * whole, and say which `drop N` leaves the answered files off a card it
+ * answers in part.
  *
  * NEVER THROWS BUT FOR A BUDGET STOP: a failed read answers false, so the
  * reply takes the ordinary engagement rule rather than a turn it would never
@@ -658,7 +962,7 @@ export function isDriftAnswerCandidate(event: {
  * @returns Whether a card was withdrawn or answered — the reply then runs no turn
  */
 export async function answerDriftAsk(reply: DriftReply, deps: DriftAnswerDeps): Promise<boolean> {
-  const answer = upToDateAnswer(reply.text);
+  const answer = driftAnswer(reply.text);
   if (!answer) return false;
   let record: AskRecord;
   try {
@@ -709,11 +1013,28 @@ export async function answerDriftAsk(reply: DriftReply, deps: DriftAnswerDeps): 
     }
     if (!retired) continue;
     handled = true;
-    await step(() => deps.edit(card.channel, card.proposalTs, withdrawnText(reply.user, kinds)), "edit");
+    const cardThread = proposalReplyThread(card);
+    const cardAsks = await deps.liveAsksIn(card.channel, cardThread).catch((err: unknown) => {
+      swallowed(err, "live read");
+      return [] as LiveAsk[];
+    });
+    const headline = cardAsks.find((a) => a.role === "card")?.headline ?? driftHeadline(kinds);
+    const text = answer === "skip" ? skippedText(headline, reply.user) : confirmedText(headline, reply.user);
+    await step(() => deps.edit(card.channel, card.proposalTs, text), "edit");
     await step(() => deps.recordWithdrawn(card, reply.user), "record");
-    if (card.channel !== reply.channel || proposalReplyThread(card) !== reply.threadTs) {
-      await step(() => deps.post(reply.channel, reply.threadTs, withdrawnElsewhereText(kinds)), "note");
+    for (const ask of cardAsks.filter((a) => a.role === "card")) await step(() => deps.dropLiveAsk(ask), "live drop");
+    if (card.channel !== reply.channel || cardThread !== reply.threadTs) {
+      await step(() => deps.post(reply.channel, reply.threadTs, withdrawnElsewhereText(onCard.length)), "note");
     }
+  }
+  if (handled) {
+    // The question in the replying thread is answered: no later look at the
+    // file edits over what this person said.
+    const here = await deps.liveAsksIn(reply.channel, reply.threadTs).catch((err: unknown) => {
+      swallowed(err, "live read");
+      return [] as LiveAsk[];
+    });
+    for (const ask of here.filter((a) => a.role === "question")) await step(() => deps.dropLiveAsk(ask), "live drop");
   }
   return handled;
 }
@@ -729,7 +1050,7 @@ async function step(fn: () => Promise<void>, what: string): Promise<void> {
 
 function swallowed(err: unknown, what: string): false {
   if (isSubrequestBudgetError(err)) throw err;
-  console.error(`[figma-drift] yes: ${what} failed: ${err instanceof Error ? err.message : String(err)}`);
+  console.error(`[figma-drift] ${what} failed: ${err instanceof Error ? err.message : String(err)}`);
   return false;
 }
 
@@ -750,7 +1071,7 @@ function groupBy<T>(list: readonly T[], keyOf: (item: T) => string): Map<string,
 }
 
 /** Stop, as the budget does, unless what is left covers the step. */
-function ensureHeadroom(deps: DriftPostDeps, need: { subrequests: number; d1Queries: number }): void {
+function ensureHeadroom(deps: Pick<DriftPostDeps, "meter">, need: { subrequests: number; d1Queries: number }): void {
   const left = deps.meter?.headroom() ?? { subrequests: Infinity, d1Queries: Infinity };
   if (left.d1Queries < need.d1Queries) throw new D1QueryBudgetError(need.d1Queries);
   if (left.subrequests < need.subrequests) throw new SubrequestBudgetError(need.subrequests);

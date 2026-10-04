@@ -1,7 +1,7 @@
 // Every Figma message uno-bot's code writes, against the copy Bill approved in
 // #886 (2026-09-30) — the library publish card, its thread, the post for a
-// library edited but not published, the weekly precedence thread, and what
-// either card says at the gate.
+// library edited but not published, the weekly precedence thread, the drift
+// question and its withdrawal, and what each card says at the gate.
 //
 // Two things are pinned, the way tests/share-out.test.ts pins its post:
 //   • each renderer's words, as literals: its first line, its counts against
@@ -39,6 +39,19 @@ import {
 import { PRECEDENCE_CARD_TTL_MS } from "../src/ds-precedence/jobs";
 import { CONFIRM_FOOTER, renderProposalCard } from "../src/slack/proposal-render";
 import { renderGateNote, statedCancelledNote } from "../src/slack/gate-note";
+import {
+  askLead,
+  caughtUpText,
+  confirmedText,
+  driftCardWords,
+  driftFooter,
+  DRIFT_CARD_TTL_MS,
+  DRIFT_NOT_STAGED_TEXT,
+  partlyAnsweredText,
+  skippedText,
+  withdrawnElsewhereText,
+  type AskItem,
+} from "../src/figma-drift/copy";
 import type { GateNote } from "../src/turn/index";
 
 // ── The doc ──────────────────────────────────────────────────────────────────
@@ -106,9 +119,15 @@ function passesChecklist(text: string, { gate = false, ship = false } = {}): voi
   assert.doesNotMatch(text, /About to/);
 }
 
-/** A retired phrase as a whole word, so "unmapped" never matches inside another. */
+/**
+ * A retired phrase as a whole word, so "unmapped" never matches inside another.
+ * "the Figma" retires a name for the file, not the word before "file": #886's
+ * own drift question (§ 3.3) asks "Is the Figma file still current?".
+ */
 function retiredPattern(retired: string): RegExp {
-  return new RegExp(`(^|[^\\w-])${retired.toLowerCase().replace(/[.*+?^${}()|[\]\\#]/g, "\\$&")}($|[^\\w-])`);
+  const phrase = retired.toLowerCase();
+  const notBefore = phrase === "the figma" ? "(?! file)" : "";
+  return new RegExp(`(^|[^\\w-])${phrase.replace(/[.*+?^${}()|[\]\\#]/g, "\\$&")}${notBefore}($|[^\\w-])`);
 }
 
 /** One vocabulary: no word from the Not column. */
@@ -536,5 +555,92 @@ describe("what a stated card says at the gate", () => {
     }
     assert.equal(renderGateNote(answers[0]![0]), "Intake only.");
     assert.equal(renderGateNote(answers[1]![0]), "Nothing filed this week.");
+  });
+});
+
+// ── The drift question (#886 § 3.3) ──────────────────────────────────────────
+//
+// § 3.3 gives three lines: the question, its two-line body, and the edit that
+// withdraws it. The rest — a file that changed but can't be confirmed, code
+// and Storybook, several files, the card's footer, the lines a `yes` and a
+// `skip` leave, and the gate's words — follow its register and are Bill's to
+// confirm.
+
+describe("the drift question (#886 § 3.3)", () => {
+  const FILE = { title: "Goal Setting / Card 2482", url: "https://www.figma.com/design/K/Goal-Setting?node-id=1-2", kind: "figma" as const };
+  const CODE = { title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" as const };
+  const SEP_24 = Date.UTC(2026, 8, 24, 16);
+  const one: AskItem = { file: FILE, threadSays: "tooltips on option chips", decidedAt: SEP_24, change: { kind: "unchanged", at: Date.UTC(2026, 8, 20, 15) } };
+  const MERYEM = "U0MERYEM1";
+
+  function driftCard(items: AskItem[], lanes: Array<"roadmap" | "maintain">): string {
+    return renderProposalCard({
+      kind: "stated",
+      verb: "file this Roadmap card",
+      lead: askLead({ mentions: [MERYEM], items }),
+      footer: driftFooter(lanes),
+      fields: [],
+      caveats: [],
+      operations: [],
+    }).text;
+  }
+
+  it("reads as § 3.3: the question, what the thread settled and when, the file's last change, one action from one person", () => {
+    const text = driftCard([one], ["roadmap"]);
+    assert.equal(
+      text,
+      [
+        "*Is the Figma file still current?* This thread settled “tooltips on option chips” on Sep 24, and <https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting / Card 2482> hasn't changed since Sep 20.",
+        "<@U0MERYEM1>, update the frame, or reply `skip` if the decision didn't touch Figma.",
+        "",
+        ":white_check_mark: files a Roadmap card for the update. :no_entry: files nothing.",
+        "The people named here and anyone who posted in this thread can decide, for the next 72 h.",
+      ].join("\n"),
+    );
+    passesChecklist(text, { gate: true });
+  });
+
+  it("several files, code among them: numbered for `drop`, and one footer naming both intakes", () => {
+    const text = driftCard([one, { ...one, file: CODE, change: { kind: "unknown" } }], ["roadmap", "maintain"]);
+    assert.match(text, /^\*Are these files still current\?\* This thread settled a decision about each of these files:\n1\. /);
+    assert.match(text, /\n2\. <[^>]+\|Button\.jsx>: settled “tooltips on option chips” on Sep 24, and it may not show it yet\.\n/);
+    assert.match(text, /\n:white_check_mark: files both intakes; reply `drop 2` to leave one out\. :no_entry: files nothing\.\n/);
+    passesChecklist(text, { gate: true });
+  });
+
+  it("the question alone points at the card and carries no gate", () => {
+    const text = askLead({ mentions: [MERYEM], items: [{ ...one, change: { kind: "changed", at: Date.UTC(2026, 8, 26, 18) }, elsewhere: { cardLink: "https://plus.slack.com/archives/C0/p1" } }] });
+    assert.match(text, /, and <[^>]+\|Goal Setting \/ Card 2482> last changed Sep 26\.\n/);
+    assert.match(text, /Its intake is drafted <https:\/\/plus\.slack\.com\/archives\/C0\/p1\|in another thread>\.$/);
+    passesChecklist(text);
+  });
+
+  it("is withdrawn by editing the same message, striking the question through", () => {
+    const headline = "Is the Figma file still current?";
+    const withdrawn = [
+      [caughtUpText(headline, Date.UTC(2026, 8, 30, 18)), "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."],
+      [confirmedText(headline, MERYEM), "~Is the Figma file still current?~ Yes, confirmed by <@U0MERYEM1>. Nothing to do."],
+      [skippedText(headline, MERYEM), "~Is the Figma file still current?~ Skipped by <@U0MERYEM1>. Nothing to do."],
+    ];
+    for (const [text, expected] of withdrawn) {
+      assert.equal(text, expected);
+      passesChecklist(text!);
+    }
+    for (const text of [withdrawnElsewhereText(1), withdrawnElsewhereText(2), partlyAnsweredText([2]), DRIFT_NOT_STAGED_TEXT]) passesChecklist(text);
+    assert.equal(DRIFT_NOT_STAGED_TEXT, "This question didn't go through, so its intake can't be filed from here. I'll ask again.");
+  });
+
+  it("answers the gate in its own words: a ⛔ files nothing, and a late decision is told nothing was filed", () => {
+    const words = driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000);
+    assert.deepEqual(words, { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." });
+    assert.equal(statedCancelledNote(words, "U0AAAAAA2"), ":no_entry: No intake filed, decided by <@U0AAAAAA2>.");
+    passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
+    for (const note of [
+      { kind: "resolved", decision: "cancel", cancelled: words.cancelled },
+      { kind: "expired", ttlMs: DRIFT_CARD_TTL_MS, words: words.expired },
+    ] as GateNote[]) {
+      passesGateAnswer(renderGateNote(note));
+    }
+    assert.equal(renderGateNote({ kind: "expired", ttlMs: DRIFT_CARD_TTL_MS, words: words.expired }), words.expired);
   });
 });

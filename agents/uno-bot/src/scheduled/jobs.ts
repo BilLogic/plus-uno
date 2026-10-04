@@ -23,7 +23,7 @@ import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitment
 import { cardTodoNoteHookFor, cardTodoThreadHookFor, runCardFollowThroughOnEnv } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
-import { fileDriftSinkFor, runDriftAsksOnEnv } from "../figma-drift/env";
+import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
@@ -168,6 +168,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // one drafted intake per file (src/figma-drift/).
   "figma-drift-post": async (env, job, { dryRun }) => {
     const report = await runDriftAsksOnEnv(env, job, { dryRun });
+    console.log(`[figma-drift] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Both runs: each live drift question whose Figma file now shows the
+  // decision is edited in place, never replied to (src/figma-drift/).
+  "figma-drift-recheck": async (env, job, { dryRun }) => {
+    const report = await runDriftRecheckOnEnv(env, job, { dryRun });
     console.log(`[figma-drift] ${job.key}: ${report.summary}`);
     return report;
   },
