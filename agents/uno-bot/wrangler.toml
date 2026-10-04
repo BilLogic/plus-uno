@@ -206,6 +206,13 @@ BLUEPRINT_INDEX = "off"
 # end-of-day poll diffs this file's components/versions against a KV snapshot
 # (HARNESS_KV, key "figma-poll:snapshot"). Leave blank to disable the poll.
 FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
+# The six PLUS Figma teams, as name=id pairs. Non-secret, and no API call lists
+# them: each id is read off the team's URL (the #881 probe used these). The
+# notification route (POST /figma/events, src/figma-notify/) is subscribed per
+# team by figma-subscriptions.yml, which reads this line; the nightly backstop
+# (#896) lists these teams' folders. It replaces the FIGMA_TEAM_ID secret, which
+# held one id, and the wrong one.
+FIGMA_TEAM_IDS = "Universal=1279226364199713409,Training=1279227480162592555,Toolkit=1279227565411025715,Admin=1279229084983452695,Others=1279227354789670676,MISC=1279241534978917312"
 # #plus-universal channel id (private; uno-bot is a member) — the design-ops
 # team's channel. The morning run posts each library publish here as one card
 # (drafted intake + implementation), and its members are who may confirm it.
@@ -349,6 +356,12 @@ LEAD_USER_ID = "U03FYQJRQHX"
 #       precedence check and the drift publisher. It shares one budget per
 #       rate-limit tier with Bill's other tokens, which the client paces
 #       at half.
+#   FIGMA_WEBHOOK_PASSCODE [optional]
+#       the passcode Figma echoes in every notification to POST
+#       /figma/events (src/figma-notify/). The same value is the GitHub
+#       secret figma-subscriptions.yml subscribes with, and it lives in
+#       those two places only. Unset, the route answers 401 to every
+#       delivery and queues nothing.
 #   NOTION_API_KEY
 #       Notion internal integration token — notion_create/update/archive
 #       plus every notion_search catalog read. Each database must also be

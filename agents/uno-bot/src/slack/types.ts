@@ -4,6 +4,8 @@
 // events.ts (which would be a cycle). events.ts re-exports them for existing
 // importers (index.ts, agent-runner.ts).
 
+import type { FigmaEventJob } from "../figma-notify/event";
+
 /** Slack file attachment metadata as delivered on message/app_mention events.
  *  Only the fields the vision path reads — everything else is ignored. */
 export interface SlackEventFile {
@@ -174,11 +176,15 @@ export interface SlackUrlVerification {
 
 export type SlackEnvelope = SlackEventCallback | SlackUrlVerification | { type: string };
 
-// The per-thread work the AgentRunner DO processes (one job per alarm).
+// The work an AgentRunner DO drains from its thread queue, one job per alarm:
+// a thread's turns, reactions and cut-off runs, and — on the `figma/events`
+// runner — the Figma notifications the route queued (`figma-notify/`).
 export type RunnerJobPayload =
   /** `reply`: the ahead-of-the-turn handler chosen when it was queued, null
    *  for none, absent on a job queued before it was carried. */
   | { kind: "message"; event: SlackMessageEvent; reply?: string | null }
   | { kind: "reaction"; event: SlackReactionAddedEvent }
   /** A cut-off run the ThreadState alarm found and nobody has looked at. */
-  | { kind: "cut-off"; proposalTs: string };
+  | { kind: "cut-off"; proposalTs: string }
+  /** A Figma notification, kept as ids and times (`figma-notify/event.ts`). */
+  | { kind: "figma-event"; event: FigmaEventJob };

@@ -42,6 +42,7 @@ import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThr
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
 import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
+import { runFigmaEventJob } from "../figma-notify/job";
 import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
 
 // Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
@@ -181,8 +182,9 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // into its own thread.
     console.error(`[slack] runner enqueue failed (${job.kind}): ${res.status}`);
     // A cut-off job has nobody waiting on it: the record stays untaken, and
-    // the ThreadState alarm hands it over again.
-    if (job.kind === "cut-off") return;
+    // the ThreadState alarm hands it over again. A Figma event has no thread
+    // to speak in, and never comes this way: its route enqueues it once.
+    if (job.kind === "cut-off" || job.kind === "figma-event") return;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -224,6 +226,10 @@ export function handOffCutOffRunsFor(env: Env): (due: Execution[]) => Promise<vo
 // the turn's run-lease is held by another (possibly killed) invocation — the
 // runner must then KEEP the job and retry later instead of deleting it.
 export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
+  if (job.kind === "figma-event") {
+    await runFigmaEventJob(job.event);
+    return "handled";
+  }
   if (job.kind === "cut-off") {
     await handleCutOffRun(env, job.proposalTs);
     return "handled";

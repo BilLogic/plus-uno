@@ -43,6 +43,8 @@ interface QueuedRunJob {
 }
 
 const JOB_PREFIX = "job:";
+/** `seen:<once key>` — a job queued once already, with when. */
+const SEEN_PREFIX = "seen:";
 /** `run:<date>:<position>:<key>` — date, then plan position, orders the queue. */
 const RUN_PREFIX = "run:";
 /** `done:<date>:<key>` — what makes a re-enqueued run add nothing. */
@@ -55,6 +57,14 @@ const DONE_PREFIX = "done:";
  * rest of the day would only hold up the jobs behind it.
  */
 export const MAX_JOB_DEFERRALS = 3;
+
+/**
+ * How long a once-key is remembered (`enqueueThreadJobOnce`). Figma, the one
+ * caller, retries a failed delivery at 5 min, 30 min and 3 h — its last try
+ * lands 3 h 35 min after the first failure — so two days outlasts every
+ * redelivery with a wide margin and keeps the marks to a few days' worth.
+ */
+export const SEEN_KEEP_MS = 2 * 24 * 60 * 60 * 1000;
 
 /** What a job resolves to. `deferred` keeps it; `handled` drops it. */
 export type JobOutcome = "handled" | "deferred";
@@ -81,6 +91,40 @@ export async function enqueueThreadJob(storage: RunnerStorage, job: RunnerJob, n
   const key = `${JOB_PREFIX}${String(job.enqueuedAt).padStart(15, "0")}:${crypto.randomUUID()}`;
   await storage.put(key, job);
   if ((await storage.getAlarm()) === null) await storage.setAlarm(now);
+}
+
+/**
+ * Queue a thread job once per `onceKey`: a key already queued within
+ * `SEEN_KEEP_MS` queues nothing.
+ *
+ * The check and the mark are one step because the Durable Object's input gate
+ * holds other requests while its own storage calls are in flight — which is why
+ * a sender that redelivers (Figma, #895) is deduplicated here and not with a KV
+ * mark, whose reads are eventually consistent and whose writes are the free
+ * plan's scarcest budget. Marks past the window are dropped as each new key is
+ * queued.
+ *
+ * @param storage - The runner's storage
+ * @param job - The payload and when it was enqueued
+ * @param onceKey - What a repeat of this job repeats exactly
+ * @param now - Epoch ms
+ * @returns Whether it was queued — false for a repeat
+ */
+export async function enqueueThreadJobOnce(
+  storage: RunnerStorage,
+  job: RunnerJob,
+  onceKey: string,
+  now: number,
+): Promise<boolean> {
+  const mark = `${SEEN_PREFIX}${onceKey}`;
+  const seen = await storage.get<number>(mark);
+  if (seen !== undefined && now - seen <= SEEN_KEEP_MS) return false;
+  for (const [key, at] of await storage.list<number>({ prefix: SEEN_PREFIX })) {
+    if (now - at > SEEN_KEEP_MS) await storage.delete(key);
+  }
+  await storage.put(mark, now);
+  await enqueueThreadJob(storage, job, now);
+  return true;
 }
 
 /**

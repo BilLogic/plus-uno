@@ -48,6 +48,11 @@ export const SECRETS = [
     why: "Figma personal access token, used only through the Figma client (src/figma/): frame reads and renders, the library poll, the DS precedence check and the drift publisher. It shares one budget per rate-limit tier with Bill's other tokens, which the client paces at half.",
   },
   {
+    name: "FIGMA_WEBHOOK_PASSCODE",
+    required: false,
+    why: "the passcode Figma echoes in every notification to POST /figma/events (src/figma-notify/). The same value is the GitHub secret figma-subscriptions.yml subscribes with, and it lives in those two places only. Unset, the route answers 401 to every delivery and queues nothing.",
+  },
+  {
     name: "NOTION_API_KEY",
     required: true,
     why: "Notion internal integration token — notion_create/update/archive plus every notion_search catalog read. Each database must also be shared with the integration.",
