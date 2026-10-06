@@ -29,7 +29,7 @@ import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalOperation, SweepShare } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
-import { addedContent, captureConfirmers, captureItemLines, captureLead } from "./capture-lines";
+import { STANDING_TOO, addedContent, captureConfirmers, captureItemLines, captureLead } from "./capture-lines";
 import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
 
@@ -229,7 +229,7 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
   lines.push(
     "",
     `One ✅ applies ${n === 1 ? "it" : `all ${n}`}; reply \`drop 2\` to leave one out. ` +
-      `${captureConfirmers(plan.items) ?? "The owners named above and anyone who posted in this thread can confirm."} ` +
+      `${captureConfirmers(plan.items) ?? `The owners named above and anyone who posted in this thread can confirm.${STANDING_TOO}`} ` +
       `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   );
   return {

@@ -1129,6 +1129,27 @@ test("a revision from outside the confirmer set is refused and leaves the card l
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, held.proposalTs);
 });
 
+test("a standing confirmer's push-back stages a revision that keeps the card's own confirmers", async () => {
+  const held: PendingProposal = { ...PENDING, ttlMs: 72 * 60 * 60 * 1000, confirmers: ["U0OWNER"] };
+  const h = harness({
+    replies: [
+      {
+        text: "Filing the revised card.",
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(held);
+
+  const outcome = await runTurn(
+    request({ text: "call it v2 instead", pending: held, userId: "U0LEAD" }),
+    { ...h.deps, standingConfirmers: ["U0LEAD"] },
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
+});
+
 const FIX_ONE = {
   page_url: "https://www.notion.so/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   replace: [{ block_id: "blk-1", last_edited_time: "2026-09-01T10:00:00.000Z", content: "Launch date: November 1" }],

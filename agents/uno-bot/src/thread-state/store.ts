@@ -398,8 +398,17 @@ export function cardConfirmers(
   standing: readonly string[] = [],
 ): string[] | null {
   if (!proposal.confirmers) return null;
-  if (proposal.channel.startsWith("D")) return [...proposal.confirmers];
+  if (isImChannel(proposal.channel)) return [...proposal.confirmers];
   return [...new Set([...proposal.confirmers, ...standing])];
+}
+
+/**
+ * Whether a channel id is a 1:1 DM (`D…`). Stated once, here at the bottom of
+ * the import graph, so the store's own reach rule and `turn/request.ts`
+ * `turnSurfaceOf` read the same id the same way.
+ */
+export function isImChannel(channel: string): boolean {
+  return channel.startsWith("D");
 }
 
 /**

@@ -359,8 +359,7 @@ async function claim(
   // signal has to leave it exactly as it was for the person who may confirm.
   // `none`, not `stale` — nobody else resolved it and it has not aged out;
   // this signal was simply not one the card accepts.
-  const standing = deps.standingConfirmers ?? [];
-  if (!mayConfirm(proposal, userId, standing)) {
+  if (!mayConfirm(proposal, userId, deps.standingConfirmers)) {
     console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
     return {
       outcome: "none",
@@ -369,16 +368,12 @@ async function claim(
       post: {
         note: {
           kind: "not-a-confirmer",
-          confirmers: cardConfirmers(proposal, standing) ?? [],
+          confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
           ...(userId ? { userId } : {}),
         },
         replyTs: replyTarget(proposal),
       },
     };
-  }
-
-  if (userId && proposal.confirmers && !proposal.confirmers.includes(userId)) {
-    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId} admitted as a standing confirmer`);
   }
 
   // A person who reacts ✅ and then, unsure it registered, also types "go
@@ -409,6 +404,12 @@ async function claim(
         replyTs: replyTarget(proposal),
       },
     };
+  }
+
+  // Won by someone the card's own set would have refused: the standing set let
+  // them in, and the log says so (the usage record keeps only who).
+  if (userId && !mayConfirm(proposal, userId)) {
+    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId} won as a standing confirmer`);
   }
 
   // Won, and about to run: record that it started, before anything can. The
