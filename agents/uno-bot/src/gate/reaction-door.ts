@@ -21,6 +21,8 @@
 //
 // Anyone in the thread may confirm/cancel — the requester lock was removed
 // 2026-07-14, and `requesterUserId` is still stored for the record (ADR-014).
+// A card that names its confirmers takes only them and the standing
+// confirmers (`cardConfirmers`); Gate holds every door to that.
 //
 // PURE by design: no `Env`, no Workers global, no fetch — which is what lets
 // the Node suite DRIVE it rather than read it.
@@ -57,6 +59,10 @@ export interface ReactionDoorDeps {
   /** Per-thread memory — where the staged card is, and the claim that is the
    *  lock on it. */
   threadState: ThreadState;
+
+  /** Who may resolve any card with a confirmer set — Gate's own
+   *  `standingConfirmers`, handed through. */
+  standingConfirmers?: readonly string[];
 
   /**
    * Everything the person sees. A factory rather than an instance because
@@ -142,7 +148,7 @@ export async function runReactionDoor(
       glyph: request.glyph,
       userId: request.userId,
     },
-    { threadState: deps.threadState },
+    { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers },
   );
 
   // Not a card, and a bot answer: the self-serve signal. Only when the gate did

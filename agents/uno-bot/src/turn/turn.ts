@@ -71,6 +71,7 @@ import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
+  cardConfirmers,
   mayConfirm,
   ownWords,
   proposalOperations,
@@ -442,6 +443,10 @@ export interface TurnDeps {
   /** Per-thread memory. Turn reads the panel context and the outcome notes, and
    *  owns the history append and its compaction. */
   threadState: ThreadState;
+
+  /** Who may resolve any card with a confirmer set — Gate's own
+   *  `standingConfirmers`, handed through. */
+  standingConfirmers?: readonly string[];
 
   /** Everything the person sees while the turn runs, and the answer. */
   delivery: Delivery;
@@ -873,7 +878,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         userId: request.userId,
         ...(request.pending ? {} : { wholeDm: true as const }),
       },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     // A verdict with no decision means the message was not a gate emoji — it
     // is language, and language goes to the model; so is a gate emoji with no
@@ -1201,7 +1206,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         ...(result.messageToUser ? { messageToUser: result.messageToUser } : {}),
         userId: request.userId,
       },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     return settleVerdict(verdict, { deps, memory, telemetry });
   }
@@ -1252,7 +1257,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         ...(result.previewText ? { messageToUser: result.previewText } : {}),
         userId: request.userId,
       },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     return settleVerdict(verdict, {
       deps,
@@ -1321,8 +1326,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // confirm. So it is refused, and the card stays live exactly as it was.
   // #uno-bot is the exception: there a reply joins the confirmer set
   // (`intake-channel.ts`).
-  if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId)) {
-    const refusal = revisionRefusal(replaced.confirmers ?? [], request.userId);
+  if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId, deps.standingConfirmers)) {
+    const refusal = revisionRefusal(cardConfirmers(replaced, deps.standingConfirmers) ?? [], request.userId);
     await delivery.postNote(refusal, replaced.sweepRun ? sweepTag("note") : undefined);
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
@@ -1527,8 +1532,8 @@ async function dropFromSweepCard(
     references: [],
     interim: 0,
   };
-  if (!request.intakeChannel && !mayConfirm(pending, request.userId)) {
-    const refusal = revisionRefusal(pending.confirmers ?? [], request.userId);
+  if (!request.intakeChannel && !mayConfirm(pending, request.userId, deps.standingConfirmers)) {
+    const refusal = revisionRefusal(cardConfirmers(pending, deps.standingConfirmers) ?? [], request.userId);
     await delivery.postNote(refusal, sweepTag("note"));
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
@@ -1536,7 +1541,7 @@ async function dropFromSweepCard(
   if (!kept.length) {
     const verdict = await resolveSignal(
       { kind: "typed", channel: request.channel, thread: cardThread, text: "⛔", userId: request.userId },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     return settleVerdict(verdict, { deps, memory, note: "Cancelled.", telemetry });
   }

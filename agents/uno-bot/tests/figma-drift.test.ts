@@ -608,6 +608,16 @@ describe("a yes in an asked thread", () => {
     assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
   });
 
+  it("lets a standing confirmer withdraw the card they were not asked on", async () => {
+    const { h, one, card, deps } = await askedCard();
+    const handled = await answerDriftAsk(
+      { channel: DESIGN, threadTs: one.root.ts, user: "U0LEAD", text: "yes" },
+      { ...deps, standingConfirmers: ["U0LEAD"] },
+    );
+    assert.equal(handled, true);
+    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+  });
+
   it("answers nothing in a thread that was never asked", async () => {
     const { deps } = await askedCard();
     assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: ts(29, 9), user: "U0ADE", text: "yes" }, deps), false);

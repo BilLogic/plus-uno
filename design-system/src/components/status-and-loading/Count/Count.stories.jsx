@@ -18,8 +18,9 @@ import Count, { COUNT_APPEARANCES, COUNT_SIZES, COUNT_STYLES } from './Count';
  */
 
 export default {
-    title: 'Components/Status and loading/Count',
+    title: 'Components/Status and loading/Status, Count & Tag/Count',
     component: Count,
+    tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
             { date: '2026-09-29', kind: 'deprecated', summary: '`style` started accepting `positive`, `negative` and `information` as deprecated aliases for `success`, `danger` and `info`, rendering the same and warning in development.' },
