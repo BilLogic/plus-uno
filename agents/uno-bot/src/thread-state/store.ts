@@ -253,6 +253,15 @@ export interface PendingProposal {
    */
   onCancel?: ProposalOperation[];
   /**
+   * The card's own words for the gate's answers, on a card the Worker states
+   * itself (`ProposalCard.kind: "stated"` — the library card, the weekly DS
+   * precedence card). Absent — every turn's card — the generic lines in
+   * `slack/gate-note.ts`, which assume a card someone asked for: "tell me what
+   * to change", "ask me again", "the newest :warning: card". A stated card has
+   * no ⚠️, nobody asked for it, and its ⛔ means what its footer says.
+   */
+  stated?: StatedCardWords;
+  /**
    * Set on a card the end-of-day sweep staged: the morning it was posted,
    * `YYYY-MM-DD`. What a ✅, a ⛔ or a revision does to such a card is also
    * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision of
@@ -295,6 +304,21 @@ export interface PendingProposal {
    * re-staged card still resolves the ask that started it (`stagingCardOf`).
    */
   originProposalTs?: string;
+}
+
+/**
+ * What a stated card says at the gate (`PendingProposal.stated`). Two lines,
+ * because they are the two the generic wording gets wrong on such a card; a
+ * replaced card and a gesture beside the card get a stated variant of their
+ * own in `slack/gate-note.ts`, which needs no words from the card.
+ */
+export interface StatedCardWords {
+  /** What a ⛔ did, as a phrase with no person in it: "Intake only". The card
+   *  ends `:no_entry: <phrase>, decided by <@U>.` and the ⛔'s note in the
+   *  thread is `<phrase>.` */
+  cancelled: string;
+  /** The answer to a ✅ or ⛔ that came after the card's window closed. */
+  expired: string;
 }
 
 /** The card the ask behind this proposal staged: its origin, or itself. */
@@ -340,17 +364,51 @@ export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: numb
   return proposal.ttlMs !== undefined ? { ttlMs: proposal.ttlMs } : {};
 }
 
+/** A stated card's own words, spread onto an "expired" or "superseded" lookup
+ *  — absent for every turn's card, whose answers read as they always have. */
+export function ownWords(proposal: Pick<PendingProposal, "stated">): { stated?: StatedCardWords } {
+  return proposal.stated ? { stated: proposal.stated } : {};
+}
+
 /**
  * Whether this person may resolve this card. No confirmer set, anyone may;
- * with one, only its members — and a signal with no person behind it is
- * refused, since the set cannot be checked against it.
+ * with one, only the people `cardConfirmers` admits — and a signal with no
+ * person behind it is refused, since the set cannot be checked against it.
  */
 export function mayConfirm(
-  proposal: Pick<PendingProposal, "confirmers">,
+  proposal: Pick<PendingProposal, "confirmers" | "channel">,
   userId: string | undefined,
+  standing: readonly string[] = [],
 ): boolean {
-  if (!proposal.confirmers) return true;
-  return userId !== undefined && proposal.confirmers.includes(userId);
+  const admitted = cardConfirmers(proposal, standing);
+  if (!admitted) return true;
+  return userId !== undefined && admitted.includes(userId);
+}
+
+/**
+ * Everyone who may resolve a card with a confirmer set: its own confirmers,
+ * then the deployment's standing confirmers (`STANDING_CONFIRMER_IDS`), each
+ * once. Null for a card with no set, which anyone may resolve. The standing
+ * set is read at resolution, never stored on the card, so a change to it
+ * reaches cards already open — and it never reaches a card in a 1:1 DM, which
+ * is the person's own and nobody else's.
+ */
+export function cardConfirmers(
+  proposal: Pick<PendingProposal, "confirmers" | "channel">,
+  standing: readonly string[] = [],
+): string[] | null {
+  if (!proposal.confirmers) return null;
+  if (isImChannel(proposal.channel)) return [...proposal.confirmers];
+  return [...new Set([...proposal.confirmers, ...standing])];
+}
+
+/**
+ * Whether a channel id is a 1:1 DM (`D…`). Stated once, here at the bottom of
+ * the import graph, so the store's own reach rule and `turn/request.ts`
+ * `turnSurfaceOf` read the same id the same way.
+ */
+export function isImChannel(channel: string): boolean {
+  return channel.startsWith("D");
 }
 
 /**
@@ -536,11 +594,12 @@ export type ProposalLookup =
   /** Retired by a newer card staged in the same reply thread, or retired ahead
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
-   *  way for never lands. */
-  | { state: "superseded" }
+   *  way for never lands. `stated` is a stated card's own words. */
+  | { state: "superseded"; stated?: StatedCardWords }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
-   *  told how long it was live; absent, it lived the default hour. */
-  | { state: "expired"; ttlMs?: number }
+   *  told how long it was live; absent, it lived the default hour. `stated` is
+   *  a stated card's own words, whose `expired` line says it instead. */
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords }
   | { state: "none" };
 
 /**

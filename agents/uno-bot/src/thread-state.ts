@@ -57,6 +57,7 @@ import {
   cutOffSweepAt,
   cutOffTakeable,
   ownTtl,
+  ownWords,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
@@ -364,14 +365,15 @@ export class ThreadState extends DurableObject<Env> {
   async getProposalByTs(proposalTs: string, at: number): Promise<ProposalLookup> {
     const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
     if (!rec) return { state: "none" };
+    const proposal = (rec.payload as PendingProposal | null) ?? {};
     if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at))) {
-      return { state: "superseded" };
+      return { state: "superseded", ...ownWords(proposal) };
     }
     if (at - rec.createdAt > recordTtlMs(rec)) {
       await this.storage.delete(proposalKey(proposalTs));
-      return { state: "expired", ...ownTtl((rec.payload as PendingProposal | null) ?? {}) };
+      return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal) };
     }
-    if (rec.supersededBy || rec.retired) return { state: "superseded" };
+    if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal) };
     return {
       state: "found",
       proposal: rec.payload as PendingProposal,

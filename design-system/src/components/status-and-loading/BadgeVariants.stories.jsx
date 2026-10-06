@@ -25,8 +25,9 @@ import Tag from './Tag';
  */
 
 export default {
-    title: 'Components/Status and loading/Badge variants',
+    title: 'Components/Status and loading/Status, Count & Tag/Status/Deprecated/Badge variants',
     component: BadgeVariants,
+    tags: ['!dev', '!autodocs'],
     beforeEach: () => {
         const warn = spyOn(console, 'warn').mockImplementation(() => {});
         return () => warn.mockRestore();

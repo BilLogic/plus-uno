@@ -19,7 +19,7 @@ import Progress from './Progress/Progress';
  */
 
 export default {
-    title: 'Components/Status and loading/Progress bounds',
+    title: 'Components/Status and loading/Progress',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

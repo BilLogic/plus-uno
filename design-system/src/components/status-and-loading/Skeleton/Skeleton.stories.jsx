@@ -71,6 +71,7 @@ const emulateReducedMotion = async (value) => {
 export default {
     title: 'Components/Status and loading/Skeleton',
     component: Skeleton,
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

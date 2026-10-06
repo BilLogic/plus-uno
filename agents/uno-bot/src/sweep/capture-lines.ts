@@ -46,11 +46,16 @@ export function captureLead(items: readonly PendingFinding[]): string | null {
   return null;
 }
 
+/** The clause every sweep card's confirm line ends with: the deployment's
+ *  standing confirmers (`STANDING_CONFIRMER_IDS`) may resolve it too. Plain
+ *  words, never a mention, so a card pings nobody it does not name. */
+export const STANDING_TOO = " The team's standing confirmers can too.";
+
 /** Who may confirm, when the card holds only notes and cards — there is no
  *  thread whose posters count. Null keeps the thread wording. */
 export function captureConfirmers(items: readonly PendingFinding[]): string | null {
   return items.every((f) => f.evidence.record)
-    ? "The owners named above and the note takers can confirm."
+    ? `The owners named above and the note takers can confirm.${STANDING_TOO}`
     : null;
 }
 

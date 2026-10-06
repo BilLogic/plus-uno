@@ -360,6 +360,14 @@ describe("the morning post", () => {
     assert.deepEqual(card.confirmers, MEMBERS);
     assert.equal(card.ttlMs, LIBRARY_CARD_TTL_MS);
     assert.equal(LIBRARY_CARD_TTL_MS, 72 * 60 * 60 * 1000);
+    // Its own words at the gate: a ⛔ is "intake only", and a late decision
+    // is told the intake gets filed, not to ask again.
+    assert.deepEqual(card.stated, {
+      cancelled: "Intake only",
+      expired:
+        "That card closed after 72 h with no decision, so nothing was drafted. " +
+        "I file its intake the morning after, so the publish isn't lost.",
+    });
     assert.equal(card.proposalTs, card.replyTs);
 
     // The approved card (#886 § 3.1): who published what, every changed

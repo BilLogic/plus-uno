@@ -230,4 +230,6 @@ Every Figma message passes these eight:
 6. The words match the table above.
 7. Anything written into Figma leads with `🐐 le goat (uno-bot) · AI-generated`.
 8. Under 1,500 characters; a longer list goes in the thread.
+
+**At the gate,** the library card and the weekly precedence card answer in their own words, because the gate's shared lines assume a card someone asked for. A ⛔ closes the card with what it did ("Intake only", "Nothing filed this week") and who decided. A ✅ or ⛔ after the window is told the card closed and what happens next. A replaced card, or a reaction beside one, points at the card itself, with no ⚠️ to name. Each card's lines sit beside its copy (`PendingProposal.stated`), and the same test holds them to this section.
 <!-- /ide-only -->

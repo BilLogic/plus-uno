@@ -259,4 +259,9 @@ export interface Env {
   // any requester / any recipient (legacy behavior). See tools/send-email.ts.
   EMAIL_AUTHORIZED_USERS?: string;
   EMAIL_ALLOWED_DOMAINS?: string;
+  /** Comma-separated Slack user ids who may confirm or cancel any card that
+   *  names its confirmers, beside the people it names — except a card in
+   *  someone's 1:1 DM. Unset, a card's own set is the whole of it
+   *  (src/slack/standing-confirmers.ts). */
+  STANDING_CONFIRMER_IDS?: string;
 }

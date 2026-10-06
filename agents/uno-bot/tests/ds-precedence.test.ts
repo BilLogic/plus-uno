@@ -426,6 +426,10 @@ describe("the morning post", () => {
     assert.deepEqual(p.confirmers, MEMBERS);
     assert.equal(p.ttlMs, PRECEDENCE_CARD_TTL_MS);
     assert.equal(p.onCancel, undefined);
+    assert.deepEqual(p.stated, {
+      cancelled: "Nothing filed this week",
+      expired: "That card closed after 6 days with no decision, so nothing was filed.",
+    });
     assert.equal(p.proposalTs, "1759500000.000002");
     assert.equal(p.replyTs, "1759500000.000001");
     assert.equal(p.operations?.length, 1);
@@ -647,6 +651,8 @@ describe("a dispute in the thread", () => {
     assert.match(body, /Button/);
     assert.doesNotMatch(body, /TreeSelect/);
     assert.ok((p!.ttlMs ?? 0) < PRECEDENCE_CARD_TTL_MS, "a revision does not extend the card's life");
+    // Its late-decision line still names the whole six days, not what was left.
+    assert.deepEqual(p!.stated, w.first.stated);
     assert.deepEqual(w.record.box.value?.disputed, [2]);
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
     assert.deepEqual(w.superseded, [w.first.proposalTs], "superseded on the usage record once the revision is in place");
