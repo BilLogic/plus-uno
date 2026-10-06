@@ -1,6 +1,8 @@
 // File drift, a day at a time: the end-of-day sweep finds a decision a Figma
 // file (or code) may not show yet, the weekday morning run asks the thread
-// "is the Figma up to date?" with a drafted intake, and a "yes" withdraws it.
+// "Is the Figma file still current?" with a drafted intake — once it has
+// looked at the file — and a "yes", a `skip` or the file catching up
+// withdraws it (#897).
 //
 // The night runs through the sweep harness — its fake Slack, the real
 // detector over recorded replies — with the in-memory drift store as its
@@ -19,11 +21,18 @@ import { SubrequestBudgetError } from "../src/net";
 import {
   answerDriftAsk,
   isDriftAnswerCandidate,
+  MAX_LOOKS_PER_MORNING,
+  MAX_RECHECKS_PER_RUN,
+  recheckLiveAsks,
   runDriftAsks,
   type DriftAnswerDeps,
   type DriftPostDeps,
+  type DriftRecheckDeps,
 } from "../src/figma-drift/run";
-import { askLine, DRIFT_CARD_TTL_MS, isUpToDateReply, publisherLine, upToDateAnswer } from "../src/figma-drift/copy";
+import { askLead, DRIFT_CARD_TTL_MS, driftAnswer, driftCardWords, skippedSharedText } from "../src/figma-drift/copy";
+import { FRAME_MATCH_SYSTEM, frameMatchPrompt, modelFrameJudge, parseFrameMatch } from "../src/figma-drift/judge";
+import { fakeProvider, type FakeProvider } from "../src/agent/providers/fake";
+import type { FigmaNode } from "../src/integrations/figma-reading";
 import { fileKeyOfOperation, githubInert, matchPillar, NEUTRAL_SETTLED } from "../src/figma-drift/draft";
 import { DRIFT_KEY, fileKeyOf } from "../src/figma-drift/finding";
 import { proposalReplyThread } from "../src/thread-state/index";
@@ -116,26 +125,55 @@ interface Posted {
   withdrawn?: string;
 }
 
+/** A frame whose text layers are `texts`. */
+function frame(texts: readonly string[]): FigmaNode {
+  return { name: "Recap", type: "FRAME", children: texts.map((characters, i) => ({ name: `Text ${i}`, type: "TEXT", characters })) };
+}
+
+/** What the morning's fake Figma file holds. */
+interface FileOpts {
+  /** The newest named version's author and time; null names no publisher. */
+  publisher?: { handle: string; at: string } | null;
+  /** An autosave after the publish: the file's last change. */
+  changedAt?: string;
+  /** Node 1-2's text layers now (FIGMA_A's frame); node 3-4 keeps the old ones. */
+  frameA?: string[];
+}
+
+/** Seed the morning's Figma file. */
+function seedFigmaFile(figma: InMemoryFigma, opts: FileOpts): void {
+  // The file's newest named version is the publisher's; `publisher: null` is
+  // a file Figma names no publisher for.
+  const publisher = opts.publisher === undefined ? { handle: "bea.designs", at: "2026-09-20T10:00:00Z" } : opts.publisher;
+  figma.seedFile(FILE_KEY, {
+    versions: {
+      versions: [
+        ...(opts.changedAt ? [{ id: "2210000000000000010", label: null, description: null, created_at: opts.changedAt, user: { handle: "bea.designs" } }] : []),
+        ...(publisher
+          ? [{ id: "2210000000000000009", label: "Recap screens", description: "", created_at: publisher.at, user: { handle: publisher.handle } }]
+          : []),
+      ],
+    },
+    nodes: { "1:2": frame(opts.frameA ?? ["Recap", "Share with tutor"]), "3:4": frame(["Recap", "Share with tutor"]) },
+  });
+}
+
+/** The judge's replies, recorded: `shows` is a confident yes. */
+const SHOWS = JSON.stringify({ shows: true, confidence: 0.92 });
+const NOT_SHOWN = JSON.stringify({ shows: false, confidence: 0.9 });
+
 /** The morning: `runDriftAsks` over the night's store, ThreadState and record. */
 function morning(
   h: SweepHarness,
   drifts: InMemoryDriftStore,
-  opts: { options?: string[] | null; publisher?: { handle: string; at: string } | null; dryRun?: boolean } = {},
-): { deps: DriftPostDeps; posted: Posted[]; marked: string[]; figma: InMemoryFigma } {
+  opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[] } = {},
+): { deps: DriftPostDeps; posted: Posted[]; marked: string[]; figma: InMemoryFigma; provider: FakeProvider } {
   const posted: Posted[] = [];
   const marked: string[] = [];
   let seq = 0;
-  // The file's newest named version is the publisher's; `publisher: null` is
-  // a file Figma names no publisher for.
-  const publisher = opts.publisher === undefined ? { handle: "bea.designs", at: "2026-09-20T10:00:00Z" } : opts.publisher;
   const figma = createInMemoryFigma();
-  figma.seedFile(FILE_KEY, {
-    versions: {
-      versions: publisher
-        ? [{ id: "2210000000000000009", label: "Recap screens", description: "", created_at: publisher.at, user: { handle: publisher.handle } }]
-        : [],
-    },
-  });
+  seedFigmaFile(figma, opts);
+  const provider = fakeProvider({ generateReplies: opts.judge ?? [] });
   const deps: DriftPostDeps = {
     store: drifts,
     slack: {
@@ -177,6 +215,7 @@ function morning(
       return cards.some((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === threadTs);
     },
     figma,
+    judge: modelFrameJudge(provider),
     async pillarOptions() {
       return opts.options === undefined ? ["Tutor Experience", "Universal"] : opts.options;
     },
@@ -184,7 +223,7 @@ function morning(
     now: () => h.clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
-  return { deps, posted, marked, figma };
+  return { deps, posted, marked, figma, provider };
 }
 
 /** The answer's deps over the harness's ThreadState and usage record. */
@@ -216,6 +255,9 @@ function answerDeps(h: SweepHarness, drifts: InMemoryDriftStore, posted: Posted[
         { ...proposalEvent(proposal.proposalTs, "cancelled", h.clock.now, "typed"), actorId: user },
       ]);
     },
+    liveAsksIn: (channel, threadTs) => drifts.liveAsksIn(channel, threadTs),
+    saveLiveAsk: (ask) => drifts.saveLiveAsk(ask),
+    dropLiveAsk: (ask) => drifts.dropLiveAsk(ask),
   };
 }
 
@@ -242,10 +284,17 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(card!.channel, DESIGN);
     assert.equal(card!.threadTs, t.root.ts, "in the thread the evidence is in");
     assert.ok(m.posted.every((p) => p.channel !== UNO_BOT && p.channel !== "C0PLUSDESIGN"));
-    assert.match(card!.text, /^:art: <@U0BEA> you talked about <https:\/\/www\.figma\.com\/design\/AbC123xyz\/Session-Recap\?node-id=1-2\|Session Recap> — is the Figma up to date\?/);
-    assert.match(card!.text, /Last published by \*bea\.designs\* on 2026-09-20\./);
+    assert.equal(
+      card!.text.split("\n").slice(0, 2).join("\n"),
+      [
+        "*Is the Figma file still current?* This thread settled \"The recap drops the Share button; tutors see it automatically\" on Sep 29, and <https://www.figma.com/design/AbC123xyz/Session-Recap?node-id=1-2|Session Recap> hasn't changed since Sep 20.",
+        "<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma.",
+      ].join("\n"),
+      "#886 § 3.3, word for word",
+    );
+    assert.match(card!.text, /\n\n:white_check_mark: files a Roadmap card for the update\. :no_entry: files nothing\.\nThe people named here and anyone who posted in this thread can decide, for the next 72 h\. The team's standing confirmers can too\.$/);
+    assert.doesNotMatch(card!.text, /Last published by|:art:|:warning:|About to/, "the publisher is the intake's, and the card has one footer");
     assert.doesNotMatch(card!.text, /<@bea/, "the publisher is never @-mentioned");
-    assert.match(card!.text, /reply `yes` and I'll withdraw this/);
 
     const staged = await h.threadState.getProposalsByChannel(DESIGN);
     assert.equal(staged.length, 1);
@@ -260,12 +309,20 @@ describe("a Figma drift at the morning run", () => {
     assert.deepEqual(proposal.confirmers, ["U0BEA", "U0STARTER", "U0ADE"], "the owner plus everyone who posted");
     assert.equal(proposal.replyTs, t.root.ts);
     assert.equal(proposal.sweepRun, undefined, "not a sweep card: it holds no sweep items");
+    assert.deepEqual(proposal.stated, driftCardWords(72), "the gate answers in the card's own words");
+    const sections = (input.sections as Array<{ heading: string; body: string }>).map((s) => s.body).join("\n");
+    assert.match(sections, /Last published by bea\.designs on 2026-09-20\./, "the publisher is on the intake");
 
     const events = await h.proposalEvents.eventsOf(proposal.proposalTs);
     assert.deepEqual(events.map((e) => [e.event, e.via]), [["staged", "worker"]], "staging is on the usage record");
     assert.deepEqual(await drifts.pending(), [], "an asked finding leaves the queue");
     assert.equal(report.asks.length, 1);
-    assert.deepEqual(m.figma.calls().map((c) => [c.method, c.args[0]]), [["versions", FILE_KEY]], "one Figma read: the publisher");
+    assert.deepEqual(
+      m.figma.calls().map((c) => [c.method, c.args[0]]),
+      [["versions", FILE_KEY]],
+      "one Figma read: the file's versions, for its last change and its publisher",
+    );
+    assert.equal(m.provider.generated.length, 0, "an unchanged file needs no judgement");
   });
 
   /** One thread that discussed FIGMA_A, swept, and the morning ready to run. */
@@ -280,12 +337,15 @@ describe("a Figma drift at the morning run", () => {
     return { h, drifts, m: morning(h, drifts) };
   }
 
-  it("still asks when Figma will not say who published, and names no one", async () => {
-    const { m } = await sweptRecap();
+  it("still asks when Figma will not answer, says the file may not show it yet, and names no one", async () => {
+    const { h, m } = await sweptRecap();
     m.figma.failNext("versions", new FigmaRequestError(503, "Figma versions 503: Service unavailable"));
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1, "the ask goes out");
-    assert.doesNotMatch(m.posted[0]!.text, /Last published by/);
+    assert.match(m.posted[0]!.text, /\|Session Recap> may not show it yet\.\n/);
+    const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
+    assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/);
+    assert.equal(m.figma.calls().length, 1, "a failed read is not tried again for the publisher");
   });
 
   it("names no one for a file with no named version", async () => {
@@ -293,7 +353,8 @@ describe("a Figma drift at the morning run", () => {
     const m = morning(t.h, t.drifts, { publisher: null });
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1);
-    assert.doesNotMatch(m.posted[0]!.text, /Last published by/);
+    const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
+    assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/);
   });
 
   it("stops on a budget stop reading the publisher, and posts nothing", async () => {
@@ -327,9 +388,9 @@ describe("a Figma drift at the morning run", () => {
     );
     const staged = await h.threadState.getProposalsByChannel(DESIGN);
     assert.equal(staged.length, 1, "one intake for the file");
-    assert.match(m.posted[1]!.text, /is the Figma up to date\?/);
-    assert.match(m.posted[1]!.text, /I've drafted the intake <https:\/\/plus\.slack\.com\/archives\/C0DESIGN\/p\d+\|in another thread>/);
-    assert.match(m.posted[1]!.text, /^:art: <@U0BEA> you talked about/, "the owner is mentioned");
+    assert.match(m.posted[1]!.text, /^\*Is the Figma file still current\?\* This thread settled /);
+    assert.match(m.posted[1]!.text, /Its intake is drafted <https:\/\/plus\.slack\.com\/archives\/C0DESIGN\/p\d+\|in another thread>\.$/);
+    assert.match(m.posted[1]!.text, /\n<@U0BEA>, update the frame/, "the owner is mentioned");
     assert.doesNotMatch(m.posted[1]!.text, /<@U0CY>/, "the thread's other posters are not pinged");
     assert.deepEqual(staged[0]!.confirmers, ["U0STARTER", "U0ADE", "U0BEA", "U0CY"], "both threads' people may decide");
     assert.ok(m.marked.includes(`${DESIGN}:${two.root.ts}`), "the asked thread is marked, so its replies stay the team's");
@@ -378,9 +439,9 @@ describe("a Figma drift at the morning run", () => {
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
 
-    assert.match(m.posted[0]!.text, /is the code up to date\?/);
-    assert.doesNotMatch(m.posted[0]!.text, /Last published by/, "no Figma publisher for code");
-    assert.match(m.posted[0]!.text, /✅ files a `harness-intake` issue/);
+    assert.match(m.posted[0]!.text, /^\*Is the code still current\?\* This thread settled .+ and <[^>]+\|Button\.jsx> may not show it yet\.\n<@U0ADE>, update the code, or reply `skip` if the decision didn't touch it\./);
+    assert.match(m.posted[0]!.text, /:white_check_mark: files an intake for the update\./);
+    assert.equal(m.figma.calls().length, 0, "code is not Figma's to look at");
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
     const op = proposal!.operations![0]!;
     assert.equal(op.toolName, "github_issue_create");
@@ -509,18 +570,23 @@ describe("a yes in an asked thread", () => {
   }
 
   it("closes the question and withdraws the drafted card at once, not after 72 h", async () => {
-    const { h, one, card, m, deps } = await askedCard();
+    const { h, drifts, one, two, card, m, deps } = await askedCard();
     const handled = await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "yes, it's up to date" }, deps);
 
     assert.equal(handled, true);
     assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "retired: no ✅ can file it");
-    assert.equal(m.posted[0]!.withdrawn, ":white_check_mark: Thanks, <@U0ADE>. The Figma is up to date, so I've withdrawn this intake.");
+    assert.equal(m.posted[0]!.withdrawn, "~Is the Figma file still current?~ Yes, confirmed by <@U0ADE>. Nothing to do.");
     const events = await h.proposalEvents.eventsOf(card.proposalTs);
     assert.deepEqual(events.map((e) => [e.event, e.via, e.actorId]), [
       ["staged", "worker", null],
       ["cancelled", "typed", "U0ADE"],
     ]);
     assert.deepEqual(deps.notes, [], "answered in the card's own thread: nothing more is posted");
+    assert.deepEqual(
+      (await drifts.liveAsks()).map((a) => [a.threadTs, a.role]),
+      [[two.root.ts, "question"]],
+      "the card's record goes, so no later look at the file edits over the answer",
+    );
   });
 
   it("withdraws the card from the other asked thread too, and says so there", async () => {
@@ -528,7 +594,7 @@ describe("a yes in an asked thread", () => {
     const handled = await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0CY", text: "Yep" }, deps);
     assert.equal(handled, true);
     assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-    assert.deepEqual(deps.notes, [`${DESIGN}:${two.root.ts} Thanks! The Figma is up to date, so I've withdrawn the intake.`]);
+    assert.deepEqual(deps.notes, [`${DESIGN}:${two.root.ts} Thanks, I've withdrawn the drafted intake in the other thread.`]);
   });
 
   it("leaves the card alone for someone who may not decide it, a question, or a no", async () => {
@@ -589,8 +655,11 @@ describe("two files discussed in one thread", () => {
     const { h, m, t } = await twoFiles();
     assert.equal(m.posted.length, 1, "one ask for the thread");
     assert.equal(m.posted[0]!.threadTs, t.root.ts);
-    assert.match(m.posted[0]!.text, /you talked about <[^>]+\|Session Recap> and <[^>]+\|Button\.jsx> — are they up to date\?/);
-    assert.match(m.posted[0]!.text, /reply `drop 2` to leave one out/);
+    assert.match(
+      m.posted[0]!.text,
+      /^\*Are these files still current\?\* This thread settled a decision about each of these files:\n1\. <[^>]+\|Session Recap>: settled "[^"]+" on Sep 29, and it hasn't changed since Sep 20\.\n2\. <[^>]+\|Button\.jsx>: settled "[^"]+" on Sep 29, and it may not show it yet\.\n<@U0ADE>, update them, or reply `skip` if the decisions didn't touch them\./,
+    );
+    assert.match(m.posted[0]!.text, /:white_check_mark: files both intakes; reply `drop 2` to leave one out\. :no_entry: files nothing\./);
     const cards = await h.threadState.getProposalsByChannel(DESIGN);
     assert.equal(cards.length, 1, "one card, so neither retires the other");
     assert.deepEqual(cards[0]!.operations!.map((op) => op.toolName), ["notion_create", "github_issue_create"]);
@@ -672,6 +741,9 @@ describe("a yes that cannot be read", () => {
       edit: async () => {},
       post: async () => {},
       recordWithdrawn: async () => {},
+      liveAsksIn: async () => [],
+      saveLiveAsk: async () => {},
+      dropLiveAsk: async () => {},
     };
     assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: "1.0", user: "U0ADE", text: "yes" }, deps), false);
   });
@@ -719,39 +791,91 @@ describe("a yes that cannot be read", () => {
   });
 });
 
-describe("the ask's words", () => {
-  it("names the file by its title, linked, and escapes it", () => {
+describe("the ask's words (#886 § 3.3)", () => {
+  const RECAP = { title: "Recap <!channel>", url: "https://www.figma.com/design/K/x?node-id=1-2", kind: "figma" as const };
+  const BUTTON = { title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" as const };
+  const STORY = { title: "Button", url: "https://plus-uno.netlify.app/storybook/?path=/docs/button", kind: "storybook" as const };
+  const decided = at(24, 16);
+  const item = (file: typeof RECAP | typeof BUTTON | typeof STORY, change: Parameters<typeof askLead>[0]["items"][number]["change"]) => ({
+    file,
+    threadSays: "Tooltips on option chips.",
+    decidedAt: decided,
+    change,
+  });
+
+  it("names the file by its title, linked and escaped, and says it hasn't changed since", () => {
     assert.equal(
-      askLine({ mentions: ["U0BEA"], files: [{ title: "Recap <!channel>", url: "https://www.figma.com/design/K/x", kind: "figma" }] }),
-      "<@U0BEA> you talked about <https://www.figma.com/design/K/x|Recap &lt;!channel&gt;> — is the Figma up to date?",
-    );
-    assert.equal(
-      askLine({ mentions: ["U0BEA"], files: [{ title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" }] }),
-      "<@U0BEA> you talked about <https://github.com/o/r/blob/main/b.jsx|Button.jsx> — is the code up to date?",
-    );
-    assert.equal(
-      askLine({
-        mentions: ["U0BEA"],
-        files: [
-          { title: "Recap", url: "https://www.figma.com/design/K/x", kind: "figma" },
-          { title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" },
-        ],
-      }),
-      "<@U0BEA> you talked about <https://www.figma.com/design/K/x|Recap> and <https://github.com/o/r/blob/main/b.jsx|Button.jsx> — are they up to date?",
+      askLead({ mentions: ["U0BEA"], items: [item(RECAP, { kind: "unchanged", at: at(20, 15) })] }),
+      [
+        "*Is the Figma file still current?* This thread settled \"Tooltips on option chips\" on Sep 24, and <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;> hasn't changed since Sep 20.",
+        "<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma.",
+      ].join("\n"),
     );
   });
 
-  it("shows the publisher's handle in bold, escaped, never as a mention", () => {
-    assert.equal(publisherLine({ handle: "<@U0EVIL>", at: "2026-09-20T10:00:00Z" }), "Last published by *&lt;@U0EVIL&gt;* on 2026-09-20.");
-    assert.equal(publisherLine(null), null);
+  it("says when a file changed after the decision it couldn't confirm, and that an unread one may not show it", () => {
+    const changed = askLead({ mentions: ["U0BEA"], items: [item(RECAP, { kind: "changed", at: at(26, 18) })] });
+    assert.match(changed, /\|Recap &lt;!channel&gt;> last changed Sep 26\.\n/);
+    const unread = askLead({ mentions: ["U0BEA"], items: [item(RECAP, { kind: "unknown" })] });
+    assert.match(unread, /\|Recap &lt;!channel&gt;> may not show it yet\.\n/);
   });
 
-  it("reads a bare affirmative or an explicit 'the file is current' as the answer", () => {
+  it("asks about code and Storybook in their own words", () => {
+    assert.equal(
+      askLead({ mentions: ["U0ADE"], items: [item(BUTTON, { kind: "unknown" })] }),
+      [
+        "*Is the code still current?* This thread settled \"Tooltips on option chips\" on Sep 24, and <https://github.com/o/r/blob/main/b.jsx|Button.jsx> may not show it yet.",
+        "<@U0ADE>, update the code, or reply `skip` if the decision didn't touch it.",
+      ].join("\n"),
+    );
+    assert.match(askLead({ mentions: ["U0ADE"], items: [item(STORY, { kind: "unknown" })] }), /^\*Is Storybook still current\?\*[^\n]+\n<@U0ADE>, update Storybook, or reply `skip` if the decision didn't touch it\.$/);
+  });
+
+  it("numbers a card's own files, so `drop 2` names one, and points at an intake drafted elsewhere", () => {
+    const text = askLead({
+      mentions: ["U0BEA", "U0ADE"],
+      items: [
+        item(RECAP, { kind: "unchanged", at: at(20, 15) }),
+        item(BUTTON, { kind: "unknown" }),
+        { ...item(STORY, { kind: "unknown" }), elsewhere: { cardLink: "https://plus.slack.com/archives/C0DESIGN/p1" } },
+      ],
+    });
+    assert.equal(
+      text,
+      [
+        "*Are these files still current?* This thread settled a decision about each of these files:",
+        "1. <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;>: settled \"Tooltips on option chips\" on Sep 24, and it hasn't changed since Sep 20.",
+        "2. <https://github.com/o/r/blob/main/b.jsx|Button.jsx>: settled \"Tooltips on option chips\" on Sep 24, and it may not show it yet.",
+        "• <https://plus-uno.netlify.app/storybook/?path=/docs/button|Button>: settled \"Tooltips on option chips\" on Sep 24, and it may not show it yet. Its intake is drafted <https://plus.slack.com/archives/C0DESIGN/p1|in another thread>.",
+        "<@U0BEA> <@U0ADE>, update them, or reply `skip` if the decisions didn't touch them.",
+      ].join("\n"),
+    );
+  });
+
+  it("asks the question alone with the card's link, or without one it could not read", () => {
+    const alone = askLead({ mentions: ["U0BEA"], items: [{ ...item(RECAP, { kind: "unknown" }), elsewhere: { cardLink: null } }] });
+    assert.match(alone, /\n<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma\. Its intake is drafted in another thread\.$/);
+  });
+
+  it("escapes the thread's words, and dates each by its ET day", () => {
+    const text = askLead({
+      mentions: [],
+      // 02:00 UTC on Sep 25 is still Sep 24 in ET.
+      items: [{ ...item(RECAP, { kind: "unknown" }), threadSays: "Ping <!here> about it.", decidedAt: at(25, 2) }],
+    });
+    assert.match(text, /settled "Ping &lt;!here&gt; about it" on Sep 24,/);
+    assert.match(text, /\nUpdate the frame, or reply `skip`/, "with no owner, the ask still names the action");
+  });
+});
+
+describe("an answer in an asked thread", () => {
+  it("reads a bare affirmative, an explicit 'the file is current', or the ask's `skip`", () => {
     const bare = ["yes", "Yes!", "yep", "yes it is", "yes, up to date", "it's up to date", "It’s up to date.", "already updated", "already updated :white_check_mark:", "<@U0BOT> yes"];
-    for (const text of bare) assert.equal(upToDateAnswer(text), "bare", text);
+    for (const text of bare) assert.equal(driftAnswer(text), "bare", text);
     for (const text of ["the Figma is up to date", "Figma's updated", "yep, the file is current", "code is up to date now"]) {
-      assert.equal(upToDateAnswer(text), "explicit", text);
+      assert.equal(driftAnswer(text), "explicit", text);
     }
+    for (const text of ["skip", "Skip.", "`skip`", "<@U0BOT> skip"]) assert.equal(driftAnswer(text), "skip", text);
   });
 
   it("reads an approval, a plan or a question as the thread's own conversation", () => {
@@ -772,12 +896,425 @@ describe("the ask's words", () => {
       "I'll update it tomorrow",
       "correct",
       "yes but the spacing still needs work",
+      "skip it?",
+      "let's skip the standup",
     ];
-    for (const text of not) assert.equal(upToDateAnswer(text), null, text);
-    assert.equal(isUpToDateReply("yes"), true);
+    for (const text of not) assert.equal(driftAnswer(text), null, text);
     assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", user: "U0ADE", text: "yes" }), true);
+    assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", user: "U0ADE", text: "skip" }), true);
     assert.equal(isDriftAnswerCandidate({ user: "U0ADE", text: "yes" }), false, "a top-level message answers nothing");
     assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", bot_id: "B1", user: "U0BOT", text: "yes" }), false);
+  });
+});
+
+// ── #897: the file, looked at before the ask and while it is live ────────────
+
+/** The recap thread, swept, with the morning ready to run against `file`. */
+async function recapMorning(file: Parameters<typeof morning>[2] = {}) {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [
+    { user: "U0ADE", when: ts(29, 16) },
+    { user: "U0BEA", when: ts(29, 17), text: "I'll handle the recap screen." },
+  ]);
+  const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)], "U0BEA"))] });
+  await runSweepJob(EOD, h.deps);
+  h.clock.now = at(30, 13);
+  return { h, drifts, t, m: morning(h, drifts, file) };
+}
+
+/** The frame once the designer has made the change. */
+const UPDATED = ["Recap", "Shared with tutor automatically"];
+/** After the decision (Sep 29, 12:00 ET) and before the morning that asks. */
+const CHANGED_AFTER = "2026-09-29T21:00:00Z";
+
+/** The re-check over the morning's store, ThreadState, record and file. */
+function recheck(
+  h: SweepHarness,
+  drifts: InMemoryDriftStore,
+  figma: InMemoryFigma,
+  opts: { judge?: string[] | DriftRecheckDeps["judge"]; dryRun?: boolean } = {},
+): { deps: DriftRecheckDeps; edits: Array<{ channel: string; ts: string; text: string }>; provider: FakeProvider } {
+  const edits: Array<{ channel: string; ts: string; text: string }> = [];
+  const provider = fakeProvider({ generateReplies: Array.isArray(opts.judge) ? opts.judge : [] });
+  const deps: DriftRecheckDeps = {
+    store: drifts,
+    figma,
+    judge: typeof opts.judge === "function" ? opts.judge : modelFrameJudge(provider),
+    async liveCard(channel, thread) {
+      const cards = await h.threadState.getProposalsByChannel(channel);
+      return cards.find((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
+    },
+    async retire(ts) {
+      return (await h.threadState.retireProposal(ts)).retired;
+    },
+    async edit(channel, ts, text) {
+      edits.push({ channel, ts, text });
+    },
+    async recordWithdrawn(proposal) {
+      await recordProposalEvents(h.proposalEvents, [proposalEvent(proposal.proposalTs, "cancelled", h.clock.now, "worker")]);
+    },
+    async cardFiled(proposalTs) {
+      return (await h.proposalEvents.eventsOf(proposalTs)).some((e) => e.event === "confirmed");
+    },
+    now: () => h.clock.now,
+    ...(opts.dryRun ? { dryRun: true } : {}),
+  };
+  return { deps, edits, provider };
+}
+const RECHECK = { key: "figma-drift-recheck" };
+
+describe("the drift check, before the ask (#897)", () => {
+  it("asks nobody when the file changed after the decision and the frame now shows it", async () => {
+    const { h, drifts, m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED, judge: [SHOWS] });
+    const report = await runDriftAsks(MORNING, m.deps);
+
+    assert.deepEqual(m.posted, [], "no question");
+    assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 0, "no card staged");
+    assert.deepEqual(await drifts.pending(), [], "the finding leaves the queue");
+    assert.deepEqual(await drifts.liveAsks(), []);
+    assert.deepEqual(report.settled.map((s) => s.fileKey), [`figma:${FILE_KEY}`]);
+    assert.match(report.summary, /^no file drift due this morning — 1 file\(s\) already show their decision, so not asked$/);
+    assert.deepEqual(m.figma.calls().map((c) => [c.method, c.args[0], c.args[1]]), [
+      ["versions", FILE_KEY, undefined],
+      ["nodes", FILE_KEY, ["1:2"]],
+    ]);
+    const [judged] = m.provider.generated;
+    assert.equal(judged!.system, FRAME_MATCH_SYSTEM);
+    assert.match(judged!.prompt, /^SETTLED: The recap drops the Share button; tutors see it automatically\./);
+    assert.match(judged!.prompt, /THE FRAME SHOWED THEN: The recap screen has a Share with tutor button\./);
+    assert.match(judged!.prompt, /Recap\nShared with tutor automatically$/);
+  });
+
+  it("asks, saying when the file last changed, when the frame doesn't show the decision", async () => {
+    const { h, drifts, m } = await recapMorning({ changedAt: CHANGED_AFTER, judge: [NOT_SHOWN] });
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.posted.length, 1);
+    assert.match(m.posted[0]!.text, /\|Session Recap> last changed Sep 29\.\n<@U0BEA>, update the frame/);
+    const [live] = await drifts.liveAsks();
+    assert.equal(live!.files[0]!.checkedThrough, Date.parse(CHANGED_AFTER), "the version judged is not judged again");
+    assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 1);
+  });
+
+  it("asks when the judge is unsure, off its shape, failing or not configured", async () => {
+    const unsure = [JSON.stringify({ shows: true, confidence: 0.5 }), "the frame looks updated", JSON.stringify({ shows: "yes", confidence: 1 })];
+    for (const answer of unsure) {
+      const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED, judge: [answer] });
+      await runDriftAsks(MORNING, m.deps);
+      assert.equal(m.posted.length, 1, answer);
+    }
+    for (const provider of [fakeProvider({ generateFailMessage: "Gemini 429" }), fakeProvider({ generateUnavailableMessage: "no key" })]) {
+      const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED });
+      m.deps.judge = modelFrameJudge(provider);
+      await runDriftAsks(MORNING, m.deps);
+      assert.equal(m.posted.length, 1);
+    }
+    const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED });
+    delete m.deps.judge;
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.posted.length, 1, "with no judge, nothing is ever found shown");
+    assert.deepEqual(m.figma.calls().map((c) => c.method), ["versions"], "and no frame is read for it");
+  });
+
+  it("asks without judging a link that names no frame", async () => {
+    const whole = figmaFile("1-2", { url: `https://www.figma.com/design/${FILE_KEY}/Session-Recap` });
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [whole.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({ threads: [t], sources: [whole], replies: [reply(fileDrift(whole, [ts(29, 16)], "U0ADE"))] });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts, { changedAt: CHANGED_AFTER, judge: [SHOWS] });
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.posted.length, 1);
+    assert.match(m.posted[0]!.text, /last changed Sep 29\./);
+    assert.equal(m.provider.generated.length, 0);
+    assert.deepEqual(m.figma.calls().map((c) => c.method), ["versions"]);
+  });
+
+  it("stops on a budget stop reading the frame, and posts nothing", async () => {
+    const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED, judge: [SHOWS] });
+    m.figma.failNext("nodes", new SubrequestBudgetError(38));
+    await assert.rejects(runDriftAsks(MORNING, m.deps), SubrequestBudgetError);
+    assert.deepEqual(m.posted, []);
+  });
+
+  it("asks only the thread whose decision the frame doesn't show, and drafts the intake there", async () => {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
+    const { h, drifts } = night({
+      threads: [one, two],
+      sources: [FIGMA_A, FIGMA_B],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    // Node 1-2 was updated; node 3-4 still shows the button.
+    const m = morning(h, drifts, { changedAt: CHANGED_AFTER, frameA: UPDATED });
+    m.deps.judge = async (input) => (input.frame.texts.includes("Shared with tutor automatically") ? "shows" : "unsure");
+    const report = await runDriftAsks(MORNING, m.deps);
+
+    assert.deepEqual(m.posted.map((p) => [p.threadTs, p.card]), [[two.root.ts, true]]);
+    assert.deepEqual(report.settled, [{ channel: DESIGN, threadTs: one.root.ts, fileKey: `figma:${FILE_KEY}` }]);
+    assert.deepEqual(
+      m.figma.calls().map((c) => [c.method, c.args[1]]),
+      [
+        ["versions", undefined],
+        ["nodes", ["1:2"]],
+        ["nodes", ["3:4"]],
+      ],
+      "one versions read for the file, one read per frame",
+    );
+  });
+
+  it("waits for the drift card a thread already holds before looking at its file", async () => {
+    const { h, drifts, m, t } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const other = figmaFile("9-9", { url: "https://www.figma.com/design/ZzOther9/Onboarding?node-id=9-9", title: "Onboarding" });
+    const again = thread({ user: "U0STARTER", when: t.root.ts, urls: [other.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    await drifts.add([{ ...(await pendingOf(h, drifts, again, other))!, detectedAt: at(30, 22) }]);
+    h.clock.now = at(31, 13);
+    const calls = m.figma.calls().length;
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.figma.calls().length, calls, "no read for a finding that waits");
+  });
+});
+
+describe("the drift check, while the question is live (#897)", () => {
+  it("edits the live card in place, retires it, and posts nothing, once the frame shows the decision", async () => {
+    const { h, drifts, m, t } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    const [live] = await drifts.liveAsks();
+    assert.deepEqual(
+      { role: live!.role, ts: live!.ts, threadTs: live!.threadTs, headline: live!.headline },
+      { role: "card", ts: card!.proposalTs, threadTs: t.root.ts, headline: "Is the Figma file still current?" },
+    );
+
+    // The designer updates the frame on Sep 30; the end-of-day run looks again.
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    const report = await recheckLiveAsks(RECHECK, r.deps);
+
+    assert.deepEqual(r.edits, [{ channel: DESIGN, ts: card!.proposalTs, text: "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do." }]);
+    assert.equal(m.posted.length, 1, "edited, not replied to");
+    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "retired: no ✅ can file it");
+    const events = await h.proposalEvents.eventsOf(card!.proposalTs);
+    assert.deepEqual(events.map((e) => [e.event, e.via, e.actorId]), [
+      ["staged", "worker", null],
+      ["cancelled", "worker", null],
+    ]);
+    assert.deepEqual(await drifts.liveAsks(), []);
+    assert.equal(report.withdrawn.length, 1);
+    assert.match(report.summary, /^looked at 1 decision\(s\), withdrew 1 question\(s\)$/);
+  });
+
+  it("edits the question in the other thread too", async () => {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
+    const { h, drifts } = night({
+      threads: [one, two],
+      sources: [FIGMA_A, FIGMA_B],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    assert.deepEqual(m.posted.map((p) => p.card), [true, false]);
+
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, m.figma, { judge: async () => "shows" });
+    await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(
+      r.edits.map((e) => [e.ts, e.text]),
+      m.posted.map((p) => [p.ts, "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."]),
+    );
+    assert.equal(m.posted.length, 2, "nothing posted");
+  });
+
+  it("leaves a question whose frame doesn't show it, judges each change once, and withdraws it when one does", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z" });
+    h.clock.now = at(31, 4);
+    const first = recheck(h, drifts, m.figma, { judge: [NOT_SHOWN] });
+    await recheckLiveAsks(RECHECK, first.deps);
+    assert.deepEqual(first.edits, []);
+    assert.equal(first.provider.generated.length, 1);
+
+    h.clock.now = at(31, 13);
+    const second = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    await recheckLiveAsks(RECHECK, second.deps);
+    assert.equal(second.provider.generated.length, 0, "the same version is not judged twice");
+    assert.deepEqual(second.edits, []);
+
+    seedFigmaFile(m.figma, { changedAt: "2026-10-01T15:00:00Z", frameA: UPDATED });
+    h.clock.now = at(32, 4);
+    const third = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    await recheckLiveAsks(RECHECK, third.deps);
+    assert.deepEqual(third.edits.map((e) => e.text), ["~Is the Figma file still current?~ Yes, updated Oct 1. Nothing to do."]);
+  });
+
+  it("waits until every file a question names shows its decision", async () => {
+    const other = figmaFile("9-9", { url: "https://www.figma.com/design/ZzOther9/Onboarding?node-id=9-9", title: "Onboarding" });
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url, other.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({
+      threads: [t],
+      sources: [FIGMA_A, other],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)], "U0ADE"), fileDrift(other, [ts(29, 16)], "U0ADE"))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    m.figma.seedFile("ZzOther9", {
+      versions: { versions: [{ id: "1", label: "v1", description: "", created_at: "2026-09-20T10:00:00Z", user: { handle: "bea.designs" } }] },
+      nodes: { "9:9": frame(["Onboarding"]) },
+    });
+    await runDriftAsks(MORNING, m.deps);
+    assert.match(m.posted[0]!.text, /^\*Are these files still current\?\*/);
+
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const first = recheck(h, drifts, m.figma, { judge: async () => "shows" });
+    const report = await recheckLiveAsks(RECHECK, first.deps);
+    assert.deepEqual(first.edits, [], "one file of two is not the question answered");
+    assert.match(report.summary, /1 question\(s\) wait for their other files/);
+
+    m.figma.seedFile("ZzOther9", {
+      versions: { versions: [{ id: "2", label: null, description: null, created_at: "2026-10-01T15:00:00Z", user: { handle: "bea.designs" } }] },
+    });
+    h.clock.now = at(32, 4);
+    const second = recheck(h, drifts, m.figma, { judge: async () => "shows" });
+    await recheckLiveAsks(RECHECK, second.deps);
+    assert.deepEqual(second.edits.map((e) => e.text), ["~Are these files still current?~ Yes, updated Oct 1. Nothing to do."]);
+  });
+
+  it("leaves a question that names code, which it can't look at", async () => {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url, CODE.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({
+      threads: [t],
+      sources: [FIGMA_A, CODE],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)], "U0ADE"), fileDrift(CODE, [ts(29, 16)], "U0ADE"))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, m.figma, { judge: async () => "shows" });
+    const report = await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(r.edits, []);
+    assert.equal(report.checked, 0);
+  });
+
+  it("leaves a card someone already decided", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    await h.threadState.retireProposal(card!.proposalTs);
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    const report = await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(r.edits, [], "the card already says what happened");
+    assert.deepEqual(await drifts.liveAsks(), []);
+    assert.match(report.note ?? "", /its card is no longer live/);
+  });
+
+  it("looks and judges on a dry run, and edits, retires and writes nothing", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    const before = await drifts.liveAsks();
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS], dryRun: true });
+    const report = await recheckLiveAsks(RECHECK, r.deps);
+    assert.equal(r.provider.generated.length, 1);
+    assert.deepEqual(report.withdrawn.map((w) => w.text), ["~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."]);
+    assert.match(report.summary, /would withdraw 1 question/);
+    assert.deepEqual(r.edits, []);
+    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+    assert.deepEqual(await drifts.liveAsks(), before);
+  });
+});
+
+describe("no re-ping (#897)", () => {
+  it("after 72 h with no answer, later mornings ask nothing and the file catching up edits nothing", async () => {
+    const { h, drifts, m, t } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(m.posted.length, 1);
+
+    // The thread stays busy, so the sweep finds the same drift on later nights.
+    const again = (await pendingOf(h, drifts, t, FIGMA_A))!;
+    for (const [found, askedAt] of [
+      [at(33, 4), at(35, 13)],
+      [at(36, 4), at(37, 13)],
+    ] as const) {
+      await drifts.add([{ ...again, detectedAt: found }]);
+      h.clock.now = askedAt;
+      await runDriftAsks(MORNING, m.deps);
+      assert.equal(m.posted.length, 1, `nothing posted on ${new Date(askedAt).toISOString().slice(0, 10)}`);
+      assert.deepEqual(await drifts.pending(), [], "the thread was asked: the finding leaves");
+    }
+
+    // Past its 72 h, the frame finally changes.
+    seedFigmaFile(m.figma, { changedAt: "2026-10-06T15:00:00Z", frameA: UPDATED });
+    h.clock.now = at(37, 20);
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    const report = await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(r.edits, [], "no edit either");
+    assert.equal(r.provider.generated.length, 0);
+    assert.equal(report.checked, 0);
+    assert.equal(m.posted.length, 1);
+    assert.deepEqual(await drifts.liveAsks(), []);
+  });
+});
+
+describe("a skip in an asked thread", () => {
+  it("withdraws the card in its own words, and a later look at the file edits nothing", async () => {
+    const { h, drifts, m, t } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    h.clock.now = at(30, 15);
+    const deps = answerDeps(h, drifts, m.posted);
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: t.root.ts, user: "U0BEA", text: "skip" }, deps), true);
+    assert.equal(m.posted[0]!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0BEA>. Nothing to do.");
+    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+    assert.deepEqual(await drifts.liveAsks(), []);
+
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(r.edits, []);
+  });
+});
+
+describe("the frame judge", () => {
+  const input = { threadSays: "The recap drops the Share button.", sourceSays: "It has a Share button.", frame: { name: "Recap", texts: ["Recap"], truncated: false } };
+
+  it("counts only a confident yes", () => {
+    assert.equal(parseFrameMatch('{"shows":true,"confidence":0.7}'), "shows");
+    assert.equal(parseFrameMatch('```json\n{"shows": true, "confidence": 0.95}\n```'), "shows");
+    for (const reply of ['{"shows":true,"confidence":0.69}', '{"shows":true}', '{"shows":false,"confidence":1}', '{"shows":true,"confidence":3}', "yes", ""]) {
+      assert.equal(parseFrameMatch(reply), "unsure", reply);
+    }
+  });
+
+  it("shows the decision, the frame as it was and as it is, and says when the frame was cut", () => {
+    assert.equal(
+      frameMatchPrompt(input),
+      'SETTLED: The recap drops the Share button.\nTHE FRAME SHOWED THEN: It has a Share button.\n\nTHE FRAME NOW — "Recap", its text layers in order:\nRecap',
+    );
+    assert.match(frameMatchPrompt({ ...input, frame: { name: "Recap", texts: [], truncated: true } }), /\(only the first ones: the frame holds more\):\n\(no text layers\)$/);
+  });
+
+  it("asks the detector's tier, and is unsure when the model fails", async () => {
+    const provider = fakeProvider({ generateReplies: [SHOWS] });
+    assert.equal(await modelFrameJudge(provider)(input), "shows");
+    assert.equal(provider.generated[0]!.tier, "chill");
+    assert.equal(await modelFrameJudge(fakeProvider({ generateFailMessage: "500" }))(input), "unsure");
   });
 });
 
@@ -794,3 +1331,234 @@ async function pendingOf(h: SweepHarness, _drifts: InMemoryDriftStore, t: Return
   await runSweepJob(EOD, again.deps);
   return (await probe.pending())[0];
 }
+
+describe("the drift check's limits (#897 review)", () => {
+  it("looks at no more files a morning than its cap, and a thread past it waits whole for tomorrow", async () => {
+    const threads = Array.from({ length: MAX_LOOKS_PER_MORNING + 1 }, (_, i) =>
+      thread({ user: "U0STARTER", when: ts(29, 8 + i), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 8 + i, 30) }]),
+    );
+    const { h, drifts } = night({
+      threads,
+      sources: [FIGMA_A],
+      replies: threads.map((t) => reply(fileDrift(FIGMA_A, [t.messages[1]!.ts]))),
+    });
+    await runSweepJob(EOD, h.deps);
+    assert.equal((await drifts.pending()).length, MAX_LOOKS_PER_MORNING + 1);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    const report = await runDriftAsks(MORNING, m.deps);
+
+    assert.match(report.note ?? "", /1 thread\(s\) wait for tomorrow's look at their files/);
+    const newest = threads[threads.length - 1]!;
+    assert.ok(
+      (await drifts.pending()).some((f) => f.evidence.threadTs === newest.root.ts),
+      "the newest thread's finding stays queued for tomorrow",
+    );
+    assert.ok(!m.posted.some((p) => p.threadTs === newest.root.ts), "and its thread is not asked today");
+  });
+
+  it("still looks at one question that names more files than a re-check's cap", async () => {
+    const { h, drifts } = await recapMorning();
+    const figma = createInMemoryFigma();
+    const keys = Array.from({ length: MAX_RECHECKS_PER_RUN + 1 }, (_, i) => `File${i}`);
+    for (const key of keys) {
+      figma.seedFile(key, {
+        versions: { versions: [{ id: "1", label: null, description: null, created_at: "2026-09-30T18:00:00Z", user: { handle: "bea.designs" } }] },
+        nodes: { "1:2": frame(UPDATED) },
+      });
+    }
+    await drifts.saveLiveAsk({
+      channel: DESIGN,
+      ts: ts(30, 13, 0, 1),
+      threadTs: ts(29, 15),
+      role: "question",
+      headline: "Are these files still current?",
+      askedAt: at(30, 13),
+      files: keys.map((key) => ({
+        fileKey: `figma:${key}`,
+        kind: "figma" as const,
+        url: `https://www.figma.com/design/${key}/x?node-id=1-2`,
+        decidedAt: at(29, 16),
+        threadSays: "The recap drops the Share button.",
+        sourceSays: "It has a Share button.",
+        checkedThrough: at(29, 16),
+      })),
+    });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, figma, { judge: async () => "shows" });
+    const report = await recheckLiveAsks(RECHECK, r.deps);
+    assert.equal(report.checked, keys.length);
+    assert.deepEqual(r.edits.map((e) => e.text), ["~Are these files still current?~ Yes, updated Sep 30. Nothing to do."]);
+  });
+});
+
+describe("a skip under the question alone (#897 review)", () => {
+  /** Two threads about one file: the card in the first, the question alone in the second. */
+  async function twoThreads() {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
+    const { h, drifts } = night({
+      threads: [one, two],
+      sources: [FIGMA_A, FIGMA_B],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    h.clock.now = at(30, 15);
+    return { h, drifts, m, one, two, card: card!, deps: answerDeps(h, drifts, m.posted) };
+  }
+
+  it("strikes through its own question and leaves the card the other thread's decision drafted", async () => {
+    const { h, drifts, m, one, two, card, deps } = await twoThreads();
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0CY", text: "skip" }, deps), true);
+
+    const question = m.posted.find((p) => p.threadTs === two.root.ts)!;
+    assert.equal(question.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0CY>. Nothing to do.");
+    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "the first thread's card stays");
+    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, undefined);
+    assert.deepEqual(deps.notes, [], "nothing posted");
+    assert.deepEqual(
+      (await drifts.liveAsks()).map((a) => [a.threadTs, a.role]),
+      [[one.root.ts, "card"]],
+      "the card is still looked at; the skipped question is not",
+    );
+  });
+
+  it("leaves both alone for someone who didn't post in that thread", async () => {
+    const { h, m, two, card, deps } = await twoThreads();
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0STRANGER", text: "skip" }, deps), false);
+    assert.equal(m.posted.find((p) => p.threadTs === two.root.ts)!.withdrawn, undefined);
+    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+  });
+
+  it("lets a standing confirmer skip the question alone too", async () => {
+    const { m, two, deps } = await twoThreads();
+    const handled = await answerDriftAsk(
+      { channel: DESIGN, threadTs: two.root.ts, user: "U0LEAD", text: "skip" },
+      { ...deps, standingConfirmers: ["U0LEAD"] },
+    );
+    assert.equal(handled, true);
+    assert.equal(m.posted.find((p) => p.threadTs === two.root.ts)!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0LEAD>. Nothing to do.");
+  });
+});
+
+describe("a skip under a card another thread's decision also drafted (#897 review)", () => {
+  /** Thread one holds the card; thread two's question points at it. */
+  async function shared(oneUrls: string[] = [FIGMA_A.url], extra: SweepSource[] = []) {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: oneUrls }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
+    const { h, drifts } = night({
+      threads: [one, two],
+      sources: [FIGMA_A, FIGMA_B, ...extra],
+      replies: [
+        reply(fileDrift(FIGMA_A, [ts(29, 16)]), ...extra.map((x) => fileDrift(x, [ts(29, 16)]))),
+        reply(fileDrift(FIGMA_B, [ts(29, 18)])),
+      ],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    h.clock.now = at(30, 15);
+    return { h, drifts, m, one, two, card: card!, deps: answerDeps(h, drifts, m.posted) };
+  }
+
+  it("keeps the card for the other thread's decision, and withdraws it once that thread skips too", async () => {
+    const { h, m, one, two, card, deps } = await shared();
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "skip" }, deps), true);
+    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "thread two's decision still files");
+    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, undefined);
+    assert.deepEqual(deps.notes, [`${DESIGN}:${one.root.ts} ${skippedSharedText([])}`]);
+
+    // Thread two's skip leaves no decision on the card.
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0CY", text: "skip" }, deps), true);
+    assert.equal(m.posted.find((p) => p.threadTs === two.root.ts)!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0CY>. Nothing to do.");
+    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0CY>. Nothing to do.");
+  });
+
+  it("names the `drop N` for a file only the skipping thread decided", async () => {
+    const { h, card, one, deps } = await shared([FIGMA_A.url, CODE.url], [CODE]);
+    assert.deepEqual(card.operations!.map(fileKeyOfOperation), [`figma:${FILE_KEY}`, fileKeyOf(CODE.url, CODE.kind)]);
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "skip" }, deps), true);
+    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
+    assert.deepEqual(deps.notes, [`${DESIGN}:${one.root.ts} ${skippedSharedText([2])}`]);
+    assert.match(deps.notes[0]!, /Reply `drop 2` under it/);
+  });
+
+  it("keeps the card for a thread asked on a later morning, pointing at it", async () => {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    // The next night, another thread settles something on the same file.
+    const two = thread({ user: "U0BEA", when: ts(30, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(30, 18) }]);
+    await drifts.add([{ ...(await pendingOf(h, drifts, two, FIGMA_B))!, detectedAt: at(30, 22) }]);
+    h.clock.now = at(31, 13);
+    await runDriftAsks(MORNING, m.deps);
+    assert.deepEqual(m.posted.map((p) => [p.threadTs, p.card]), [
+      [one.root.ts, true],
+      [two.root.ts, false],
+    ]);
+    const deps = answerDeps(h, drifts, m.posted);
+    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "skip" }, deps), true);
+    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "thread two's question still points at a live card");
+  });
+});
+
+describe("a caught-up card's withdrawal and the budget (#897 review)", () => {
+  it("stops before the look when the withdrawal after it would not fit, and finishes on the retry", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+
+    // Room for the look, and none for the retire, edit and record after it.
+    const tight = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    tight.deps.meter = { headroom: () => ({ subrequests: 3, d1Queries: 0 }) };
+    await assert.rejects(recheckLiveAsks(RECHECK, tight.deps), SubrequestBudgetError);
+    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "not retired with its buttons still up");
+    assert.deepEqual(tight.edits, []);
+    assert.equal(tight.provider.generated.length, 0, "stopped before the judgement, so the retry repeats nothing");
+
+    const retry = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    await recheckLiveAsks(RECHECK, retry.deps);
+    assert.deepEqual(retry.edits.map((e) => e.ts), [card!.proposalTs]);
+    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+  });
+});
+
+describe("a question whose card was filed (#897 review)", () => {
+  it("is left as it is once the file catches up, since its ✅ filed an intake", async () => {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
+    const { h, drifts } = night({
+      threads: [one, two],
+      sources: [FIGMA_A, FIGMA_B],
+      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
+    });
+    await runSweepJob(EOD, h.deps);
+    h.clock.now = at(30, 13);
+    const m = morning(h, drifts);
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    // Someone ✅s the card: the intake is filed.
+    await recordProposalEvents(h.proposalEvents, [proposalEvent(card!.proposalTs, "confirmed", at(30, 15), "reaction")]);
+    await h.threadState.retireProposal(card!.proposalTs);
+
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    const r = recheck(h, drifts, m.figma, { judge: async () => "shows" });
+    await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(r.edits, [], "neither says there is nothing to do");
+    assert.deepEqual(await drifts.liveAsks(), []);
+  });
+});

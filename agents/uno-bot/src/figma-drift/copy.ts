@@ -1,23 +1,36 @@
 // What the morning ask says, and which replies answer it.
 //
-// The words are the persona's, fixed by the ticket: "you talked about <X> —
-// is the Figma up to date?", with a link to the file. A thread is asked once a
-// morning, naming every file it discussed: the card that carries the drafted
-// intakes leads with that question, and a thread whose files' intakes are
-// drafted elsewhere gets the question alone, pointing at them. A "yes" closes
-// the question and withdraws the card.
+// The words are #886 § 3.3's, approved by Bill on 2026-09-30:
+//
+//   *Is the Figma file still current?* This thread settled "<what>" on Sep 24,
+//   and <file> hasn't changed since Sep 20.
+//   <@owner>, update the frame, or reply `skip` if the decision didn't touch Figma.
+//
+// and, once the file catches up, the same message edited to
+// "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."
+// Everything else here — the variants for a file that changed but can't be
+// confirmed, for code and Storybook, for several files, the card's footer, the
+// lines a `yes` and a `skip` leave, and what the gate says on this card —
+// follows that register and is Bill's to confirm (`slack.md` § Figma messages
+// holds the rules, and `tests/figma-copy.test.ts` pins every line to them).
+//
+// A thread is asked once a morning, naming every file it discussed: the card
+// that carries the drafted intakes leads with the question, and a thread whose
+// files' intakes are drafted elsewhere gets the question alone, pointing at them.
 //
 // MENTIONS: the ask @-mentions each file's owner and nobody else. The thread's
 // other posters already follow it, so the ask reaches them without a ping.
 //
 // EVERY NOTION- AND FIGMA-SOURCED STRING IS ESCAPED (`escapeSlackText`): a file
-// title or a thread paraphrase holding `<!channel>` pings nobody. The Figma
-// publisher is named by their handle in bold and never @-mentioned — the
-// versions API gives a handle and no Slack id.
+// title or a thread paraphrase holding `<!channel>` pings nobody.
 //
 // PURE: no `Env`, no Slack module, no Workers global.
 
 import { escapeSlackText } from "../slack/mrkdwn";
+import { shortDate, windowInWords } from "../slack/copy-words";
+import { etDayOf } from "../sweep/schedule";
+import { STANDING_TOO } from "../sweep/capture-lines";
+import type { StatedCardWords } from "../thread-state/index";
 import type { TargetKind } from "../sweep/finding";
 import type { IntakeLane } from "./finding";
 
@@ -33,11 +46,26 @@ export interface AskedFileWords {
   kind: TargetKind;
 }
 
-/** What the question asks about, in the persona's words. */
-export function askedThing(kind: TargetKind): string {
-  if (kind === "figma" || kind === "figma-library") return "the Figma";
-  if (kind === "storybook") return "Storybook";
-  return "the code";
+/**
+ * What the morning learned about a file's last change, against the decision:
+ *   • `unchanged` — its last change is at or before the decision;
+ *   • `changed` — it changed after, and its frame could not be confirmed to
+ *     show the decision (a frame that does is not asked about at all);
+ *   • `unknown` — not read: a failed read, or a file that is not Figma's.
+ */
+export type FileChange = { kind: "unchanged"; at: number } | { kind: "changed"; at: number } | { kind: "unknown" };
+
+/** One file the ask names. */
+export interface AskItem {
+  file: AskedFileWords;
+  /** What the thread settled. */
+  threadSays: string;
+  /** When it settled it — the earliest evidence message, epoch ms. */
+  decidedAt: number;
+  change: FileChange;
+  /** Set for a file whose intake is drafted on a card in another thread:
+   *  that card's link, or null when it could not be read. */
+  elsewhere?: { cardLink: string | null };
 }
 
 /** The owners to mention, each once, in order. */
@@ -50,91 +78,130 @@ export function fileLink(file: Pick<AskedFileWords, "title" | "url">): string {
   return `<${file.url}|${escapeSlackText(flat(file.title) || "this file")}>`;
 }
 
+/** A moment as its ET day, "Sep 24". */
+export function dayWords(at: number): string {
+  return shortDate(new Date(etDayOf(at)).toISOString());
+}
+
 /**
- * The question itself: the owners, each file linked by its title, and whether
- * it is up to date.
+ * The question the ask opens with, and its withdrawal strikes through.
+ *
+ * @param kinds - The kinds of every file the message names
+ */
+export function driftHeadline(kinds: readonly TargetKind[]): string {
+  if (kinds.length !== 1) return "Are these files still current?";
+  const [kind] = kinds;
+  if (kind === "figma" || kind === "figma-library") return "Is the Figma file still current?";
+  if (kind === "storybook") return "Is Storybook still current?";
+  return "Is the code still current?";
+}
+
+/**
+ * Everything the ask says above a card's footer: the question in bold, what
+ * the thread settled and when, what the file did since, and who is asked to
+ * do what. A file drafted elsewhere says where its intake is.
  *
  * @param input.mentions - Slack user ids of the files' owners (`mentionsOf`)
- * @param input.files - The files, in the order the card numbers them
+ * @param input.items - The files, those this card drafts first, in card order
  */
-export function askLine(input: { mentions: readonly string[]; files: readonly AskedFileWords[] }): string {
-  const who = input.mentions.map((id) => `<@${id}>`).join(" ");
-  const links = input.files.map(fileLink);
-  const named = links.length <= 1 ? (links[0] ?? "this file") : `${links.slice(0, -1).join(", ")} and ${links[links.length - 1]}`;
-  const question =
-    input.files.length === 1 ? `is ${askedThing(input.files[0]!.kind)} up to date?` : "are they up to date?";
-  return `${who ? `${who} ` : ""}you talked about ${named} — ${question}`;
+export function askLead(input: { mentions: readonly string[]; items: readonly AskItem[] }): string {
+  const items = input.items;
+  const headline = `*${driftHeadline(items.map((i) => i.file.kind))}*`;
+  const ask = askLine(input.mentions, items);
+  if (items.length === 1) {
+    const [item] = items;
+    const settled = `This thread settled "${said(item!.threadSays)}" on ${dayWords(item!.decidedAt)}, and ${fileLink(item!.file)} ${changeWords(item!.change)}.`;
+    return [`${headline} ${settled}`, `${ask}${item!.elsewhere ? ` ${elsewhereSentence(item!.elsewhere.cardLink)}` : ""}`].join("\n");
+  }
+  // A card's own files are numbered when there are several, so `drop 2` names
+  // one; a file drafted elsewhere is a bullet, since no `drop` reaches it.
+  const drafted = items.filter((i) => !i.elsewhere).length;
+  let n = 0;
+  const lines = items.map((item) => {
+    const mark = !item.elsewhere && drafted > 1 ? `${(n += 1)}.` : "•";
+    const line = `${mark} ${fileLink(item.file)}: settled "${said(item.threadSays)}" on ${dayWords(item.decidedAt)}, and it ${changeWords(item.change)}.`;
+    return item.elsewhere ? `${line} ${elsewhereSentence(item.elsewhere.cardLink)}` : line;
+  });
+  return [`${headline} This thread settled a decision about each of these files:`, ...lines, ask].join("\n");
 }
 
-/** Who last published the file, by handle, in bold — never a mention. */
-export function publisherLine(publisher: { handle: string; at: string } | null): string | null {
-  if (!publisher?.handle) return null;
-  const when = publisher.at ? ` on ${publisher.at.slice(0, 10)}` : "";
-  return `Last published by *${escapeSlackText(flat(publisher.handle).replace(/\*/g, ""))}*${when}.`;
+/** What the file did since the decision, as the ask's sentence ends. */
+function changeWords(change: FileChange): string {
+  if (change.kind === "unchanged") return `hasn't changed since ${dayWords(change.at)}`;
+  if (change.kind === "changed") return `last changed ${dayWords(change.at)}`;
+  return "may not show it yet";
 }
 
-/** What the thread settled, and what the file shows, as the detector read them. */
-export function saidLines(threadSays: string, sourceSays: string, indent = ""): string[] {
-  const lines = [`${indent}• The thread settled: “${escapeSlackText(quote(threadSays))}”`];
-  if (sourceSays.trim()) lines.push(`${indent}• The file shows: “${escapeSlackText(quote(sourceSays))}”`);
-  return lines;
+/** The one action, from the files' owners. */
+function askLine(mentions: readonly string[], items: readonly AskItem[]): string {
+  const who = mentions.map((id) => `<@${id}>`).join(" ");
+  const kinds = items.map((i) => i.file.kind);
+  let rest: string;
+  if (kinds.length !== 1) rest = "update them, or reply `skip` if the decisions didn't touch them.";
+  else if (kinds[0] === "figma" || kinds[0] === "figma-library") rest = "update the frame, or reply `skip` if the decision didn't touch Figma.";
+  else if (kinds[0] === "storybook") rest = "update Storybook, or reply `skip` if the decision didn't touch it.";
+  else rest = "update the code, or reply `skip` if the decision didn't touch it.";
+  return who ? `${who}, ${rest}` : capitalized(rest);
 }
 
-/** What a ✅ files, by lane. */
-export function intakeWords(lane: IntakeLane): string {
-  return lane === "roadmap" ? "a Roadmap card for the update" : "a `harness-intake` issue for the update";
+function elsewhereSentence(cardLink: string | null): string {
+  return `Its intake is drafted ${cardLink ? `<${cardLink}|in another thread>` : "in another thread"}.`;
 }
 
 /**
- * The card's closing lines: the two answers, who decides, and its clock.
+ * The card's one footer: what ✅ and ⛔ each do, who decides, and for how long.
+ * Its last clause names the team's standing confirmers in plain words, as a
+ * sweep card's does, so the card pings nobody it does not name.
  *
  * @param intakes - The lanes of the intakes the card files, in card order
- * @param kind - The file's kind, when the card asks about one file
+ * @param standing - Whether the standing confirmers reach the card: false
+ *   for a card in a 1:1 DM, which is the person's own (`cardConfirmers`)
  */
-export function cardTerms(intakes: readonly IntakeLane[], kind: TargetKind): string {
-  const answers =
+export function driftFooter(intakes: readonly IntakeLane[], standing = true): string {
+  const files =
     intakes.length === 1
-      ? `If ${askedThing(kind)} is already current, reply \`yes\` and I'll withdraw this. If not, ✅ files ${intakeWords(intakes[0]!)}. `
-      : `If they're already current, reply \`yes\` and I'll withdraw this. If not, one ✅ files all ${intakes.length} intakes; reply \`drop 2\` to leave one out. `;
-  return (
-    answers +
-    "The people named here and anyone who posted in this thread can decide. " +
-    `Expires in ${DRIFT_CARD_TTL_MS / 3_600_000} h, with no reminder.`
-  );
-}
-
-/** Where a file's intake is drafted, for a file this card does not file. */
-export function elsewhereWords(cardLink: string | null): string {
-  return `its intake is drafted ${cardLink ? `<${cardLink}|in another thread>` : "in another thread"}`;
-}
-
-/**
- * The question in a thread whose files' intakes are drafted on cards in other
- * threads.
- *
- * @param line - `askLine` for this thread
- * @param files - Each file's link to the card that drafts its intake
- */
-export function pingText(line: string, files: ReadonlyArray<{ file: AskedFileWords; cardLink: string | null }>): string {
-  if (files.length === 1) {
-    const where = files[0]!.cardLink ? `<${files[0]!.cardLink}|in another thread>` : "in another thread";
-    return `${line} I've drafted the intake ${where}. If it's already current, reply \`yes\` here and I'll withdraw it.`;
-  }
+      ? `files ${intakes[0] === "roadmap" ? "a Roadmap card" : "an intake"} for the update`
+      : `files ${intakes.length === 2 ? "both intakes" : `all ${intakes.length} intakes`}; reply \`drop 2\` to leave one out`;
   return [
-    line,
-    ...files.map((f) => `• ${fileLink(f.file)}: ${elsewhereWords(f.cardLink)}`),
-    "If they're already current, reply `yes` here and I'll withdraw them.",
+    `:white_check_mark: ${files}. :no_entry: files nothing.`,
+    `The people named here and anyone who posted in this thread can decide, for the next ${windowInWords(DRIFT_CARD_TTL_MS / 3_600_000)}.${standing ? STANDING_TOO : ""}`,
   ].join("\n");
 }
 
-/** What the card is edited to once someone says its files are up to date. */
-export function withdrawnText(user: string, kinds: readonly TargetKind[]): string {
-  return `:white_check_mark: Thanks, <@${user}>. ${capitalized(currentWords(kinds))}, so I've withdrawn this intake.`;
+/**
+ * What the gate says on a drift card, in place of its generic lines: nobody
+ * asked for this card, so "tell me what to change" and "ask me again" would
+ * be wrong, and #886 promises no re-ping (`PendingProposal.stated`).
+ *
+ * @param ttlHours - The card's whole window, in hours
+ */
+export function driftCardWords(ttlHours: number): StatedCardWords {
+  return {
+    cancelled: "No intake filed",
+    expired: `That card closed after ${windowInWords(ttlHours)} with no decision, so nothing was filed.`,
+  };
 }
 
-/** Posted in the thread a "yes" came from, when the card is in another one. */
-export function withdrawnElsewhereText(kinds: readonly TargetKind[]): string {
-  return `Thanks! ${capitalized(currentWords(kinds))}, so I've withdrawn the intake.`;
+// ── Withdrawals: the same message, edited ────────────────────────────────────
+
+/** Edited in once every file the message names shows its decision (#886 § 3.3). */
+export function caughtUpText(headline: string, at: number): string {
+  return `~${headline}~ Yes, updated ${dayWords(at)}. Nothing to do.`;
+}
+
+/** Edited in when someone in the thread says the files are current. */
+export function confirmedText(headline: string, user: string): string {
+  return `~${headline}~ Yes, confirmed by <@${user}>. Nothing to do.`;
+}
+
+/** Edited in when someone replies `skip`: the decision didn't touch the file. */
+export function skippedText(headline: string, user: string): string {
+  return `~${headline}~ Skipped by <@${user}>. Nothing to do.`;
+}
+
+/** Posted in the thread a yes came from, when the card is in another one. */
+export function withdrawnElsewhereText(intakes: number): string {
+  return `Thanks, I've withdrawn the drafted ${intakes === 1 ? "intake" : "intakes"} in the other thread.`;
 }
 
 /**
@@ -148,9 +215,24 @@ export function partlyAnsweredText(numbers: readonly number[]): string {
   return `Thanks! That card also drafts intakes for files this thread didn't discuss, so it stays. Reply \`drop ${which}\` under it to leave ${numbers.length === 1 ? "this file" : "these files"} out.`;
 }
 
+/**
+ * Posted when a `skip` comes under a card that also files another thread's
+ * decision: the skip speaks for its own thread, so the card stays for the
+ * other one, and the reply says how to leave out a file only this thread
+ * decided.
+ *
+ * @param numbers - The card's files no other thread's decision keeps on it
+ */
+export function skippedSharedText(numbers: readonly number[]): string {
+  const stays = "Thanks! That card also carries another thread's decision, so it stays for that thread.";
+  if (!numbers.length) return stays;
+  return `${stays} Reply \`drop ${numbers.join(" and ")}\` under it to leave out ${numbers.length === 1 ? "the file" : "the files"} only this thread decided.`;
+}
+
 /** What a card that did not go through is edited to say. */
-export const DRIFT_NOT_STAGED_TEXT =
-  ":warning: This question didn't go through, so its intake can't be filed from here. I'll ask again.";
+export const DRIFT_NOT_STAGED_TEXT = "This question didn't go through, so its intake can't be filed from here. I'll ask again.";
+
+// ── Replies ──────────────────────────────────────────────────────────────────
 
 /** Words that say "no" or "not yet". */
 const NEGATION = /\b(no|nope|not|nah|yet)\b|n't\b/;
@@ -165,6 +247,8 @@ const BARE =
 /** A message that says the file itself is current. */
 const EXPLICIT =
   /\b(it|it'?s|figma|figma'?s|file|file'?s|code|storybook|design|frames?|screens?)\b[\w\s']{0,30}?\b(up[ -]to[ -]date|updated|current)\b/;
+/** The ask's own verb, as a whole message. */
+const SKIP = /^skip$/;
 /** Characters of a reply read as an answer at all: an answer is short. */
 const MAX_ANSWER_CHARS = 120;
 
@@ -172,41 +256,40 @@ const MAX_ANSWER_CHARS = 120;
  * What a thread reply says about the asked file:
  *   • `bare` — the whole message is a bare affirmative ("yes", "yep", "yes it
  *     is", "yes, up to date", "it's up to date", "already updated");
- *   • `explicit` — it says the file is current ("the Figma is up to date");
+ *   • `explicit` — it says the file is current ("the file is up to date");
+ *   • `skip` — the whole message is the ask's `skip`: the decision didn't
+ *     touch the file;
  *   • null — anything else: a question, a no, or a message that asks for
  *     something to happen ("yes please file it", "go ahead", "ship it").
  *
  * @param text - The reply, as Slack sent it
  */
-export function upToDateAnswer(text: string): "bare" | "explicit" | null {
+export function driftAnswer(text: string): "bare" | "explicit" | "skip" | null {
   const t = text
     .replace(/<@[A-Z0-9]+>/g, " ")
     .replace(/:[a-z0-9_+-]+:/g, " ")
     .replace(/[’‘]/g, "'")
+    .replace(/[`]/g, "")
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
   if (!t || t.length > MAX_ANSWER_CHARS || t.includes("?")) return null;
-  if (NEGATION.test(t) || ACTION.test(t)) return null;
   const whole = t.replace(/[.!,\s]+$/g, "").replace(/^[,\s]+/, "");
+  if (SKIP.test(whole)) return "skip";
+  if (NEGATION.test(t) || ACTION.test(t)) return null;
   if (BARE.test(whole)) return "bare";
   if (EXPLICIT.test(t)) return "explicit";
   return null;
 }
 
-/** Whether a thread reply says the asked file is up to date (`upToDateAnswer`). */
-export function isUpToDateReply(text: string): boolean {
-  return upToDateAnswer(text) !== null;
-}
-
-/** Why the Product Pillar was left off an intake, for the card. */
-export function pillarNote(note: string): string {
-  return `_Product Pillar: ${escapeSlackText(note)}_`;
-}
-
-function currentWords(kinds: readonly TargetKind[]): string {
-  const things = [...new Set(kinds.map(askedThing))];
-  return things.length === 1 ? `${things[0]} is up to date` : "the files are up to date";
+/**
+ * Why the Product Pillar was left off an intake, for the card.
+ *
+ * @param note - Why (`matchPillar`)
+ * @param intake - The intake's number, on a card that files several
+ */
+export function pillarNote(note: string, intake?: number): string {
+  return `_Product Pillar${intake ? ` (intake ${intake})` : ""}: ${escapeSlackText(note)}_`;
 }
 
 function capitalized(text: string): string {
@@ -217,7 +300,9 @@ function flat(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
-function quote(text: string): string {
-  const f = flat(text);
-  return f.length > SAID_CHARS ? `${f.slice(0, SAID_CHARS - 1)}…` : f;
+/** A thread's paraphrase as the ask quotes it: one line, capped, escaped,
+ *  with no closing full stop doubled inside the quote marks. */
+function said(text: string): string {
+  const f = flat(text).replace(/[.\s]+$/, "");
+  return escapeSlackText(f.length > SAID_CHARS ? `${f.slice(0, SAID_CHARS - 1)}…` : f);
 }

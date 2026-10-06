@@ -1248,6 +1248,7 @@ test("a confirmer's \"drop 2\" revises a sweep card by index, without the model"
   assert.equal(outcome.disposition, "staged");
   assert.deepEqual(outcome.staged!.proposal.operations, [{ toolName: "notion_update", input: FIX_ONE }]);
   assert.equal(outcome.staged!.proposal.sweepRun, "2026-09-30");
+  assert.equal(outcome.staged!.proposal.stated, undefined, "a sweep card has no words of its own to keep");
   assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
   assert.equal(h.provider.sends.length, 0, "no model call");
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "superseded");
@@ -1297,6 +1298,7 @@ test("a confirmer's \"drop 2\" leaves a file off a file-drift card, without the 
     ttlMs: 72 * 60 * 60 * 1000,
     confirmers: ["U0OWNER"],
     supersedeKey: "figma-drift",
+    stated: { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." },
   };
   await h.threadState.putProposal(driftCard);
 
@@ -1305,6 +1307,7 @@ test("a confirmer's \"drop 2\" leaves a file off a file-drift card, without the 
   assert.equal(outcome.disposition, "staged");
   assert.deepEqual(outcome.staged!.proposal.operations, [figma]);
   assert.equal(outcome.staged!.proposal.supersedeKey, "figma-drift", "it stays in the drift card's slot");
+  assert.deepEqual(outcome.staged!.proposal.stated, driftCard.stated, "the same card, so the gate keeps its words (#897)");
   assert.equal(outcome.staged!.proposal.sweepRun, undefined, "it is not a sweep card");
   assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
   assert.equal(h.provider.sends.length, 0, "no model call");
