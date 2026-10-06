@@ -110,7 +110,7 @@ jobs:
       # down with it.
       - name: The sb pin, read from package.json so it has one home
         id: sb-pin
-        run: node -p "'ref=' + require('./package.json').devDependencies['agentic-service-blueprinting'].split('#')[1]" >> "$GITHUB_OUTPUT"
+        run: node -p "'ref=' + require('./package.json').devDependencies['uno-blueprint'].split('#')[1]" >> "$GITHUB_OUTPUT"
       - name: Check out plus-uno-blueprint beside this repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         continue-on-error: true
@@ -118,19 +118,19 @@ jobs:
           repository: BilLogic/plus-uno-blueprint
           path: .sibling-repos/plus-uno-blueprint
           persist-credentials: false
-      - name: Check out agentic-service-blueprinting at the pinned tag
+      - name: Check out the sb template kit (BilLogic/uno-blueprint) at the pinned tag
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         continue-on-error: true
         with:
-          repository: BilLogic/agentic-service-blueprinting
+          repository: BilLogic/uno-blueprint
           ref: ${{ steps.sb-pin.outputs.ref }}
-          path: .sibling-repos/agentic-service-blueprinting
+          path: .sibling-repos/uno-blueprint-kit
           persist-credentials: false
       # >>> GENERATED (sweep-cross-repo) by scripts/generate-check-scripts.mjs from scripts/checks.registry.mjs — do not edit between the markers; run `npm run generate:check-registry`.
       - name: Cross-repo duplicate sweep (the comparison, for real)
         env:
           BLUEPRINT_REPO: .sibling-repos/plus-uno-blueprint
-          SB_REPO: .sibling-repos/agentic-service-blueprinting
+          SB_REPO: .sibling-repos/uno-blueprint-kit
         run: npm run check:cross-repo
       # <<< END GENERATED (sweep-cross-repo)
 

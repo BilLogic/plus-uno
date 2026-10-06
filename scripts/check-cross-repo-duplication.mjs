@@ -17,8 +17,13 @@
  *
  * IT RUNS HERE, DOWNSTREAM, because this is where drift lands: plus-uno already
  * reaches the blueprint by token (`agents/uno-bot/scripts/sync-blueprint-contract.mjs`)
- * and now holds `agentic-service-blueprinting` as a development dependency,
- * pinned the way the blueprint pins it. Neither sibling depends on this repo, so
+ * and now holds the sb template kit as a development dependency, pinned the way
+ * the blueprint pins it. The kit's package and repo are `uno-blueprint`
+ * (`BilLogic/uno-blueprint`, renamed from `agentic-service-blueprinting` at its
+ * v2.0.0) — not the PLUS blueprint estate of the same name, which this sweep
+ * calls `blueprint` and reads from `plus-uno-blueprint`. So the kit is labelled
+ * as the template kit and its sibling checkout is `uno-blueprint-kit`, never a
+ * bare `uno-blueprint` directory, which is the deployment's local checkout. Neither sibling depends on this repo, so
  * hosting the sweep there would mean giving one of them an edge it does not have.
  *
  * ── THE UNIT IS A PASSAGE, NOT A PARAGRAPH ──────────────────────────────────
@@ -114,9 +119,9 @@
  *
  * Where each repo comes from, in order:
  *   plus-uno   this checkout. Always present; it is the one running the sweep.
- *   sb         $SB_REPO, then `node_modules/agentic-service-blueprinting` (the
- *              pinned development dependency — `npm install` at the root is all
- *              it takes), then a sibling checkout beside any ancestor of this repo.
+ *   sb         $SB_REPO, then `node_modules/uno-blueprint` (the pinned
+ *              development dependency — `npm install` at the root is all it
+ *              takes), then a `uno-blueprint-kit` checkout beside any ancestor.
  *   blueprint  $BLUEPRINT_REPO (the variable `sync-blueprint-contract.mjs`
  *              already uses), then a sibling checkout beside any ancestor.
  *
@@ -162,7 +167,7 @@ export const REPOS = [
   },
   {
     key: 'sb',
-    label: 'BilLogic/agentic-service-blueprinting',
+    label: 'BilLogic/uno-blueprint (sb template kit)',
     roots: ['AGENTS.md', 'CONTEXT.md', 'README.md', 'docs', 'skills', 'references'],
   },
 ];
@@ -403,12 +408,15 @@ export function locateOne(key) {
     return existsSync(path.join(root, 'AGENTS.md')) ? { root, how: `$${varName}` } : null;
   }
   if (key === 'sb') {
-    const dep = path.join(REPO_ROOT, 'node_modules', 'agentic-service-blueprinting');
+    const dep = path.join(REPO_ROOT, 'node_modules', 'uno-blueprint');
     if (existsSync(path.join(dep, 'AGENTS.md'))) {
       return { root: dep, how: 'the pinned development dependency in node_modules' };
     }
   }
-  const dirName = key === 'sb' ? 'agentic-service-blueprinting' : 'plus-uno-blueprint';
+  // Not a bare `uno-blueprint`: that is where the deployment's checkout sits
+  // (`sync-blueprint-contract.mjs` defaults there), and reading it as the kit
+  // would compare the estate against itself under the wrong name.
+  const dirName = key === 'sb' ? 'uno-blueprint-kit' : 'plus-uno-blueprint';
   for (const up of ancestors(REPO_ROOT)) {
     const guess = path.join(up, dirName);
     if (existsSync(path.join(guess, 'AGENTS.md'))) return { root: guess, how: `a sibling checkout at ${guess}` };

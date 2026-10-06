@@ -909,7 +909,7 @@ export const WORKFLOW_STEPS = [
     runs: ["check:cross-repo"],
     env: {
       BLUEPRINT_REPO: ".sibling-repos/plus-uno-blueprint",
-      SB_REPO: ".sibling-repos/agentic-service-blueprinting",
+      SB_REPO: ".sibling-repos/uno-blueprint-kit",
     },
   },
   {

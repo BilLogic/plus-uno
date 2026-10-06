@@ -471,7 +471,7 @@ async function main() {
           // by the vendored contract as `urlParams.cell` — and source_key IS
           // the cell id. (The app module that reads it is no longer in the
           // uno-blueprint repo at all: that deployment imports the application
-          // from the agentic-service-blueprinting package.)
+          // from the sb template kit's package, `uno-blueprint` on npm.)
           ref_url: `${BLUEPRINT_URL.replace(/\/+$/, "")}/?cell=${r.source_key}`,
           chunk: r.chunk,
           embedding: embeddings[j],

@@ -243,3 +243,15 @@ test("a baselined library with a NEW version is still a finding", () => {
   const extra = live.versions.filter((v) => !recorded.includes(v));
   assert.deepEqual(extra, ["6.5.1"]);
 });
+
+test("prose that says `from` a backticked name is not an import", () => {
+  // The bundled harness says "Product truth from `uno-blueprint`" — the PLUS
+  // blueprint estate — and the sb template kit's package is also named
+  // uno-blueprint. A static import never takes a template literal, so this is
+  // prose; counting it would keep the kit's exemption alive for the wrong reason.
+  const unused = unusedDeclared({
+    declared: decl("uno-blueprint"),
+    sources: [{ path: "src/generated/harness.ts", text: "Product truth from `uno-blueprint` (`writers/blueprint`)" }],
+  });
+  assert.deepEqual(unused, ["uno-blueprint"]);
+});
