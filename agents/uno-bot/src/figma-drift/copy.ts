@@ -29,6 +29,7 @@
 import { escapeSlackText } from "../slack/mrkdwn";
 import { shortDate, windowInWords } from "../slack/copy-words";
 import { etDayOf } from "../sweep/schedule";
+import { STANDING_TOO } from "../sweep/capture-lines";
 import type { StatedCardWords } from "../thread-state/index";
 import type { TargetKind } from "../sweep/finding";
 import type { IntakeLane } from "./finding";
@@ -149,17 +150,21 @@ function elsewhereSentence(cardLink: string | null): string {
 
 /**
  * The card's one footer: what ✅ and ⛔ each do, who decides, and for how long.
+ * Its last clause names the team's standing confirmers in plain words, as a
+ * sweep card's does, so the card pings nobody it does not name.
  *
  * @param intakes - The lanes of the intakes the card files, in card order
+ * @param standing - Whether the standing confirmers reach the card: false
+ *   for a card in a 1:1 DM, which is the person's own (`cardConfirmers`)
  */
-export function driftFooter(intakes: readonly IntakeLane[]): string {
+export function driftFooter(intakes: readonly IntakeLane[], standing = true): string {
   const files =
     intakes.length === 1
       ? `files ${intakes[0] === "roadmap" ? "a Roadmap card" : "an intake"} for the update`
       : `files ${intakes.length === 2 ? "both intakes" : `all ${intakes.length} intakes`}; reply \`drop 2\` to leave one out`;
   return [
     `:white_check_mark: ${files}. :no_entry: files nothing.`,
-    `The people named here and anyone who posted in this thread can decide, for the next ${windowInWords(DRIFT_CARD_TTL_MS / 3_600_000)}.`,
+    `The people named here and anyone who posted in this thread can decide, for the next ${windowInWords(DRIFT_CARD_TTL_MS / 3_600_000)}.${standing ? STANDING_TOO : ""}`,
   ].join("\n");
 }
 
@@ -208,6 +213,20 @@ export function withdrawnElsewhereText(intakes: number): string {
 export function partlyAnsweredText(numbers: readonly number[]): string {
   const which = numbers.join(" and ");
   return `Thanks! That card also drafts intakes for files this thread didn't discuss, so it stays. Reply \`drop ${which}\` under it to leave ${numbers.length === 1 ? "this file" : "these files"} out.`;
+}
+
+/**
+ * Posted when a `skip` comes under a card that also files another thread's
+ * decision: the skip speaks for its own thread, so the card stays for the
+ * other one, and the reply says how to leave out a file only this thread
+ * decided.
+ *
+ * @param numbers - The card's files no other thread's decision keeps on it
+ */
+export function skippedSharedText(numbers: readonly number[]): string {
+  const stays = "Thanks! That card also carries another thread's decision, so it stays for that thread.";
+  if (!numbers.length) return stays;
+  return `${stays} Reply \`drop ${numbers.join(" and ")}\` under it to leave out ${numbers.length === 1 ? "the file" : "the files"} only this thread decided.`;
 }
 
 /** What a card that did not go through is edited to say. */

@@ -190,6 +190,9 @@ export async function runDriftRecheckOnEnv(
     async recordWithdrawn(proposal) {
       await recordProposalEvents(proposalEventLogFor(env), [proposalEvent(proposal.proposalTs, "cancelled", Date.now(), "worker")]);
     },
+    async cardFiled(ts) {
+      return (await proposalEventLogFor(env).eventsOf(ts)).some((e) => e.event === "confirmed");
+    },
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,
@@ -262,6 +265,7 @@ export async function handleDriftAnswer(env: Env, event: SlackMessageEvent): Pro
         ]);
       },
       liveAsksIn: (channel, threadTs) => store.liveAsksIn(channel, threadTs),
+      saveLiveAsk: (ask) => store.saveLiveAsk(ask),
       dropLiveAsk: (ask) => store.dropLiveAsk(ask),
     },
   );

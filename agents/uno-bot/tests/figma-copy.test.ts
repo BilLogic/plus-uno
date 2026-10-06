@@ -48,11 +48,13 @@ import {
   DRIFT_CARD_TTL_MS,
   DRIFT_NOT_STAGED_TEXT,
   partlyAnsweredText,
+  skippedSharedText,
   skippedText,
   withdrawnElsewhereText,
   type AskItem,
 } from "../src/figma-drift/copy";
 import type { GateNote } from "../src/turn/index";
+import { STANDING_TOO } from "../src/sweep/capture-lines";
 
 // ── The doc ──────────────────────────────────────────────────────────────────
 
@@ -594,10 +596,16 @@ describe("the drift question (#886 § 3.3)", () => {
         "<@U0MERYEM1>, update the frame, or reply `skip` if the decision didn't touch Figma.",
         "",
         ":white_check_mark: files a Roadmap card for the update. :no_entry: files nothing.",
-        "The people named here and anyone who posted in this thread can decide, for the next 72 h.",
+        "The people named here and anyone who posted in this thread can decide, for the next 72 h. The team's standing confirmers can too.",
       ].join("\n"),
     );
     passesChecklist(text, { gate: true });
+  });
+
+  it("names the standing confirmers in plain words, and leaves them off a card in a 1:1 DM", () => {
+    assert.ok(driftFooter(["roadmap"]).endsWith(`for the next 72 h.${STANDING_TOO}`));
+    assert.doesNotMatch(driftFooter(["roadmap"]), /<@|<!/);
+    assert.ok(driftFooter(["roadmap"], false).endsWith("for the next 72 h."));
   });
 
   it("several files, code among them: numbered for `drop`, and one footer naming both intakes", () => {
@@ -626,7 +634,7 @@ describe("the drift question (#886 § 3.3)", () => {
       assert.equal(text, expected);
       passesChecklist(text!);
     }
-    for (const text of [withdrawnElsewhereText(1), withdrawnElsewhereText(2), partlyAnsweredText([2]), DRIFT_NOT_STAGED_TEXT]) passesChecklist(text);
+    for (const text of [withdrawnElsewhereText(1), withdrawnElsewhereText(2), partlyAnsweredText([2]), skippedSharedText([]), skippedSharedText([2]), DRIFT_NOT_STAGED_TEXT]) passesChecklist(text);
     assert.equal(DRIFT_NOT_STAGED_TEXT, "This question didn't go through, so its intake can't be filed from here. I'll ask again.");
   });
 
