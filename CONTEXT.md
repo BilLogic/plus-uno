@@ -53,7 +53,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 |---|---|---|
 | **uno** | the design agent, all embodiments (constitution: `AGENTS.md`) | "the AI" |
 | **uno-bot** | uno's Slack embodiment — the Cloudflare Worker in `agents/uno-bot/` | "Slackbot" |
-| **uno-blueprint** | product source of truth (Supabase); Tier 3 — `AGENTS.md` § The loading contract | "the database" |
+| **uno-blueprint** | product source of truth (Supabase); Tier 3 — `AGENTS.md` § The loading contract. Not the `uno-blueprint` devDependency — that is the sb template kit | "the database" |
 | **Diagnostics** | uno-bot's probe module (`agents/uno-bot/src/diagnostics/`): the public `/health/blueprint` contract probe plus the `/debug/*` probes, behind one token gate and one report envelope. `/health` is the separate uptime route in the Worker entry | "the debug routes" |
 | **uno-storybook** | design-system source of truth (stories + MDX → /storybook) | "the docs site" |
 | **share-out** | a feedback-rail publish: Loom + preview + Decisions DB link (+ replica for prototypes) | "post", "update" |

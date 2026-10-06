@@ -44,9 +44,13 @@ const CONFIG_FILE = /(^|\/)(\.storybook\/|[^/]*\.config\.[cm]?[jt]s$)/;
 /** Every way a module actually gets pulled in, and no more than those. */
 function importsIn(text) {
   const specifiers = new Set();
+  // A static `from` / `import` takes a string literal, never a template, so a
+  // backtick there is prose: the bundled harness says "Product truth from
+  // `uno-blueprint`", which read as an import of the sb template kit's package
+  // of the same name. Only the call forms below accept a template.
   const patterns = [
-    /\bfrom\s*["'`]([^"'`]+)["'`]/g,          // import x from "y" / export … from "y"
-    /\bimport\s*["'`]([^"'`]+)["'`]/g,        // import "y"
+    /\bfrom\s*["']([^"']+)["']/g,          // import x from "y" / export … from "y"
+    /\bimport\s*["']([^"']+)["']/g,        // import "y"
     /\bimport\s*\(\s*["'`]([^"'`]+)["'`]/g,   // import("y")
     /\brequire\s*\(\s*["'`]([^"'`]+)["'`]/g,  // require("y")
     /@import\s+(?:url\()?\s*["'`]([^"'`]+)["'`]/g, // CSS @import "y"
