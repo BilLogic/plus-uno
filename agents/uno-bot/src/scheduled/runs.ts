@@ -61,8 +61,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * The morning `commitment-nudge` reminds each promiser whose commitment is due,
  * in the promise's thread (src/commitments/).
  * The morning `figma-drift-post` asks each thread whose decision may have left
- * a Figma file or code stale whether it is up to date, with a drafted intake
- * (src/figma-drift/).
+ * a Figma file or code stale whether it is up to date, with a drafted intake,
+ * once it has looked at the file; `figma-drift-recheck`, in both runs, edits a
+ * live question in place once its file shows the decision (src/figma-drift/).
  * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
  * Team Members database (src/usage/team-roles-sync.ts).
  * The end-of-day `card-follow-through` keeps a follow-up for each active
@@ -95,6 +96,7 @@ export type ScheduledJobKind =
   | "ds-precedence-post"
   | "commitment-nudge"
   | "figma-drift-post"
+  | "figma-drift-recheck"
   | "team-roles-sync"
   | "card-follow-through"
   | "dm-promise-read"
@@ -175,6 +177,9 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "sweep-post", kind: "sweep-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
     { key: "commitment-nudge", kind: "commitment-nudge" },
+    // Before the post, so a question its file caught up with overnight is
+    // withdrawn first.
+    { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
     { key: "figma-drift-post", kind: "figma-drift-post" },
     { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
@@ -187,6 +192,9 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "ds-precedence-check", kind: "ds-precedence-check", after: ["figma-library-poll"], weekday: FRIDAY },
     // Early too, for the same reason: one Roadmap read, a few lookups a card.
     { key: "card-follow-through", kind: "card-follow-through" },
+    // A live drift question is looked at again in both runs, so a file that
+    // caught up during the day withdraws it by morning.
+    { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
     // One job per classification batch, each an alarm of its own. Each takes
     // whatever is still pending, so a quiet day's later jobs find nothing.
     ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({

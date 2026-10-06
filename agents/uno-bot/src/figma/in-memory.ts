@@ -10,6 +10,8 @@
 //     both as an `errors` entry on a 200, as Figma refuses part of a batch;
 //   • a team takes 20 webhooks, and the 21st is a 400;
 //   • a webhook's passcode reads back as an empty string;
+//   • a webhook's delivery history is what the test seeded, and an unknown
+//     webhook's is a 404;
 //   • a comment is posted as the token's owner (`me`), whoever asked.
 // Refusals are `FigmaRequestError`s worded like the REST client's.
 //
@@ -28,6 +30,7 @@ import {
   type FigmaUser,
   type FigmaVersionsResponse,
   type FigmaWebhook,
+  type FigmaWebhookRequest,
 } from "./client";
 
 /** A Dev Mode link limit: Figma's, per node. */
@@ -63,6 +66,8 @@ export interface InMemoryFigma extends FigmaClient {
   seedTeam(teamId: string, folders: FigmaFolder[]): void;
   /** Seed a folder's files. */
   seedFolder(folderId: string, files: FigmaFolderFile[]): void;
+  /** Seed what Figma delivered to a webhook, newest first or in any order. */
+  seedWebhookRequests(webhookId: string, requests: FigmaWebhookRequest[]): void;
   /** Every call, in order, refused ones included. */
   calls(): FigmaCall[];
   /** The calls that changed Figma — posts, replies, link adds and removes, webhooks created. */
@@ -103,6 +108,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
   const teams = new Map<string, FigmaFolder[]>();
   const folders = new Map<string, FigmaFolderFile[]>();
   const webhooks: FigmaWebhook[] = [];
+  const deliveries = new Map<string, FigmaWebhookRequest[]>();
   const log: Array<FigmaCall & { landed: boolean }> = [];
   const failures = new Map<FigmaMethod, unknown[]>();
   let seq = 0;
@@ -159,6 +165,9 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
     },
     seedFolder(folderId, list) {
       folders.set(folderId, clone(list));
+    },
+    seedWebhookRequests(webhookId, list) {
+      deliveries.set(webhookId, clone(list));
     },
     calls: () => log.map(({ method, args }) => ({ method, args: clone(args) })),
     writes: () => log.filter((c) => c.landed && WRITES.has(c.method)).map(({ method, args }) => ({ method, args: clone(args) })),
@@ -313,6 +322,13 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
       };
       webhooks.push(hook);
       return landed(entry, { ...hook, passcode: "" });
+    },
+    async webhookRequests(webhookId, o) {
+      const entry = enter("webhookRequests", [webhookId, o]);
+      if (!webhooks.some((w) => w.id === webhookId) && !deliveries.has(webhookId)) {
+        throw new FigmaRequestError(404, "Figma webhook requests 404: Not found");
+      }
+      return landed(entry, { requests: deliveries.get(webhookId) ?? [] });
     },
   };
 }

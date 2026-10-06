@@ -27,7 +27,7 @@
 import type { Env } from "./types";
 import { runMetered } from "./net";
 import { onRunnerJob } from "./slack/events";
-import { enqueueRun, enqueueThreadJob, runOneJob, type RunnerDeps, type RunnerJob } from "./runner/queue";
+import { enqueueRun, enqueueThreadJob, enqueueThreadJobOnce, runOneJob, type RunnerDeps, type RunnerJob } from "./runner/queue";
 import { runScheduledJob } from "./scheduled/jobs";
 import type { ScheduledRun } from "./scheduled/runs";
 
@@ -50,6 +50,14 @@ export class AgentRunner {
       const job = (await request.json()) as RunnerJob;
       await enqueueThreadJob(this.state.storage, job, Date.now());
       return new Response(JSON.stringify({ ok: true }), { status: 202 });
+    }
+    // A job a sender may deliver more than once — a Figma notification
+    // (`figma-notify/`): queued only the first time its key is seen.
+    if (request.method === "POST" && url.pathname === "/enqueue-once") {
+      const { job, enqueuedAt, onceKey } = (await request.json()) as RunnerJob & { onceKey?: unknown };
+      if (typeof onceKey !== "string" || !onceKey) return new Response("onceKey is required", { status: 400 });
+      const queued = await enqueueThreadJobOnce(this.state.storage, { job, enqueuedAt }, onceKey, Date.now());
+      return new Response(JSON.stringify({ ok: true, queued }), { status: 202 });
     }
     if (request.method === "POST" && url.pathname === "/enqueue-run") {
       const run = (await request.json()) as ScheduledRun;

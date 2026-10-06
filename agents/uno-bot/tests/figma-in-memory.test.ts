@@ -30,7 +30,7 @@ const link = (url: string, node = FRAME) => ({ name: "🐐 le goat · Code: Reca
 
 describe("the shared fake Figma", () => {
   it("has every method the REST client has", () => {
-    const inspectors = new Set(["seedFile", "seedTeam", "seedFolder", "calls", "writes", "failNext"]);
+    const inspectors = new Set(["seedFile", "seedTeam", "seedFolder", "seedWebhookRequests", "calls", "writes", "failNext"]);
     const methods = Object.keys(createInMemoryFigma()).filter((m) => !inspectors.has(m)).sort();
     assert.deepEqual(methods, Object.keys(createFigmaRestClient({ token: "x" })).sort());
   });
@@ -137,6 +137,20 @@ describe("webhooks in the fake", () => {
     const figma = seeded();
     assert.equal((await figma.createWebhook(hook(0))).passcode, "");
     assert.deepEqual((await figma.teamWebhooks("1279226364199713409")).webhooks.map((w) => w.passcode), [""]);
+  });
+
+  it("answers a webhook's deliveries as seeded, none for a new one, and 404 for an unknown one", async () => {
+    const figma = seeded();
+    const made = await figma.createWebhook(hook(0));
+    assert.deepEqual((await figma.webhookRequests(made.id)).requests, []);
+    const ping = {
+      webhook_id: made.id,
+      request_info: { sent_at: "2026-10-05T14:00:00Z", payload: { event_type: "PING" } },
+      response_info: { status: 200 },
+    };
+    figma.seedWebhookRequests(made.id, [ping]);
+    assert.deepEqual((await figma.webhookRequests(made.id)).requests, [ping]);
+    await assert.rejects(figma.webhookRequests("no-such-webhook"), { status: 404 });
   });
 });
 

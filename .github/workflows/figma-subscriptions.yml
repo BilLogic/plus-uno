@@ -1,0 +1,131 @@
+name: Figma notification subscriptions
+
+# Lists, creates or checks the Figma subscriptions that send notifications to
+# uno-bot's POST /figma/events (#895; registry: docs/engineering/operations.md).
+# It runs `agents/uno-bot/scripts/figma-subscriptions.mjs` over the Worker's
+# own Figma client. It runs here, not on a laptop, because only this repo's
+# secrets hold FIGMA_ACCESS_TOKEN and FIGMA_WEBHOOK_PASSCODE, and the passcode
+# lives in that secret and the Worker's, nowhere else.
+#
+# Loop shape: manual dispatch → one read (and, for `create`, the missing
+# subscriptions) → a job summary → stop. On demand only, never a cron.
+#   • list    each team's subscriptions to the route, and what is missing
+#   • create  the same, then creates what is missing. Safe to re-run: it
+#             creates nothing that exists, and stops at the first failure
+#   • status  each subscription's newest deliveries and how the route answered
+#
+# BILL'S OK IS THE GATE ON `create` (#884, #891). Its job runs in the
+# uno-bot-production environment, whose required reviewer approves the run
+# before the passcode is read. `list` and `status` only read, so they run
+# without it, and never see the passcode.
+#
+# The defaults are #895's first step: FILE_COMMENT on Universal, one
+# subscription, whose PING and first live comment `status` then shows. The other
+# eleven (#896) are a later run with `teams: all` and both events.
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "list, create or status"
+        type: choice
+        options: [list, create, status]
+        default: list
+      teams:
+        description: "Team names from FIGMA_TEAM_IDS, comma-separated, or all"
+        type: string
+        default: Universal
+      events:
+        description: "FILE_COMMENT and/or FILE_UPDATE, comma-separated"
+        type: string
+        default: FILE_COMMENT
+
+permissions:
+  contents: read
+
+# Two creates at once could each see a subscription missing and both make it.
+concurrency:
+  group: figma-subscriptions
+  cancel-in-progress: false
+
+jobs:
+  read:
+    if: inputs.action != 'create'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Refuse a run off the default branch
+        # The script reads FIGMA_TEAM_IDS and the route from the checkout.
+        env:
+          REF: ${{ github.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$REF" != "refs/heads/$DEFAULT_BRANCH" ]; then
+            echo "::error::Dispatch this workflow from $DEFAULT_BRANCH, not $REF."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+          cache-dependency-path: agents/uno-bot/package-lock.json
+
+      - name: Install the Worker's dependencies
+        working-directory: agents/uno-bot
+        run: npm ci
+
+      - name: Read the subscriptions
+        working-directory: agents/uno-bot
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          UNO_BOT_WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL }}
+          ACTION: ${{ inputs.action }}
+          TEAMS: ${{ inputs.teams }}
+          EVENTS: ${{ inputs.events }}
+        run: node scripts/figma-subscriptions.mjs --action "$ACTION" --teams "$TEAMS" --events "$EVENTS"
+
+  create:
+    if: inputs.action == 'create'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # The approval in front of the passcode: Bill's OK, given in Actions.
+    environment: uno-bot-production
+    steps:
+      - name: Refuse a run off the default branch
+        env:
+          REF: ${{ github.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$REF" != "refs/heads/$DEFAULT_BRANCH" ]; then
+            echo "::error::Dispatch this workflow from $DEFAULT_BRANCH, not $REF."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+          cache-dependency-path: agents/uno-bot/package-lock.json
+
+      - name: Install the Worker's dependencies
+        working-directory: agents/uno-bot
+        run: npm ci
+
+      - name: Create what is missing
+        working-directory: agents/uno-bot
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          FIGMA_WEBHOOK_PASSCODE: ${{ secrets.FIGMA_WEBHOOK_PASSCODE }}
+          UNO_BOT_WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL }}
+          TEAMS: ${{ inputs.teams }}
+          EVENTS: ${{ inputs.events }}
+        run: node scripts/figma-subscriptions.mjs --action create --teams "$TEAMS" --events "$EVENTS"

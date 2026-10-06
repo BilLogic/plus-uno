@@ -5,15 +5,19 @@
 //     `figma-drift:findings:` (each end-of-day channel job writes only its
 //     own), a finding older than 30 days dropped as it is read; a file's intake
 //     mark under `figma-drift:intake:`, kept past its card's 72 h; a thread's
-//     ask record under `figma-drift:ask:`, kept 30 days. KV, not D1: the queue
-//     holds the thread's words (ADR-030).
+//     ask record under `figma-drift:ask:`, kept 30 days; each posted ask's live
+//     record under `figma-drift:live:<channel>:<thread>:<ts>`, kept the card's
+//     72 h. KV, not D1: the queue and the live records hold the thread's words
+//     (ADR-030), and expire.
 //   • Slack: `chat.postMessage` in the thread, tagged with the sweep's message
 //     metadata so a reply under it is read by the sweep thread's rule
 //     (`isSweepCardPost`); `chat.getPermalink`; `chat.update` to withdraw.
 //   • Staging: the sweep's own (`stageSweepCard`) — ThreadState, the staged
 //     row on the usage record, and the thread mark.
-//   • The publisher: the Figma client's `/versions` read (`src/figma/`),
-//     newest publish's handle, or no client and no publisher without a token.
+//   • The file: the Figma client (`src/figma/`) — `/versions` for a file's
+//     last change and its newest publish's handle, `/nodes` for the linked
+//     frame; no client, and no file is looked at, without a token.
+//   • The judge: the `chill` tier through `selectProvider` (`./judge.ts`).
 //   • The pillar options: the Roadmap database's schema
 //     (`NOTION_ROADMAP_DB_ID`, `Product Pillar`).
 //
@@ -31,6 +35,8 @@ import { proposalEvent, recordProposalEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { databaseOptions } from "../integrations/notion";
 import { figmaClientFor } from "../figma/production";
+import type { FigmaClient } from "../figma/client";
+import { selectProvider } from "../agent/run-agent";
 import { measured } from "../sweep/env";
 import { stageSweepCard } from "../sweep/run";
 import { SWEEP_CARD_EVENT } from "../sweep/cards";
@@ -39,19 +45,24 @@ import type { ScheduledJob } from "../scheduled/runs";
 import { DRIFT_CARD_TTL_MS } from "./copy";
 import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { DRIFT_KEY, type FileDriftFinding, type FileDriftSink } from "./finding";
+import { modelFrameJudge } from "./judge";
 import {
   answerDriftAsk,
   isDriftAnswerCandidate,
+  recheckLiveAsks,
   runDriftAsks,
   type AskRecord,
   type DriftPostReport,
+  type DriftRecheckReport,
   type DriftStore,
   type IntakeMark,
+  type LiveAsk,
 } from "./run";
 
 const QUEUE_PREFIX = "figma-drift:findings:";
 const MARK_PREFIX = "figma-drift:intake:";
 const ASK_PREFIX = "figma-drift:ask:";
+const LIVE_PREFIX = "figma-drift:live:";
 const DAY_S = 24 * 60 * 60;
 /** A queued finding not asked within 30 days is dropped as the queue is read. */
 const QUEUE_MAX_AGE_MS = 30 * DAY_S * 1000;
@@ -59,6 +70,8 @@ const QUEUE_MAX_AGE_MS = 30 * DAY_S * 1000;
 const MARK_TTL_S = DRIFT_CARD_TTL_MS / 1000 + DAY_S;
 /** A thread is not asked twice about a file for this long. */
 const ASK_TTL_S = 30 * DAY_S;
+/** A live record lasts as long as its question may be withdrawn. */
+const LIVE_TTL_S = DRIFT_CARD_TTL_MS / 1000;
 
 /**
  * Where the end-of-day sweep hands its file drift, or undefined when there is
@@ -75,7 +88,7 @@ export function fileDriftSinkFor(env: Env): FileDriftSink | undefined {
  *
  * @param env - Worker bindings
  * @param job - The job
- * @param opts - `dryRun` reads and drafts, and posts, stages and writes nothing
+ * @param opts - `dryRun` reads, judges and drafts, and posts, stages and writes nothing
  */
 export async function runDriftAsksOnEnv(
   env: Env,
@@ -86,7 +99,7 @@ export async function runDriftAsksOnEnv(
   const kv = env.HARNESS_KV;
   const threadState = threadStateFor(env);
   const roadmap = env.NOTION_ROADMAP_DB_ID?.trim();
-  const figma = figmaClientFor(env);
+  const figma = figmaFor(env);
   return runDriftAsks(job, {
     store: kvDriftStore(kv),
     slack: {
@@ -132,7 +145,7 @@ export async function runDriftAsksOnEnv(
     async threadBusy(channel, threadTs) {
       return !!(await driftCardIn(env, channel, threadTs));
     },
-    ...(figma ? { figma: { versions: (fileKey: string) => measured(() => figma.versions(fileKey)) } } : {}),
+    ...(figma ? { figma, judge: modelFrameJudge(selectProvider(env)) } : {}),
     async pillarOptions() {
       if (!roadmap) return null;
       return measured(() => databaseOptions(env, roadmap, "Product Pillar"));
@@ -149,7 +162,45 @@ export async function runDriftAsksOnEnv(
 }
 
 /**
- * Whether a message could be a "yes, it's up to date" — no reads.
+ * The `figma-drift-recheck` job on `Env`, in both scheduled runs: each live
+ * question whose Figma files now all show their decision is edited in place.
+ *
+ * @param env - Worker bindings
+ * @param job - The job
+ * @param opts - `dryRun` reads and judges, and edits, retires and writes nothing
+ */
+export async function runDriftRecheckOnEnv(
+  env: Env,
+  job: ScheduledJob,
+  opts: { dryRun: boolean },
+): Promise<DriftRecheckReport | { summary: string }> {
+  if (!env.HARNESS_KV) return { summary: "HARNESS_KV not bound — no live question to look at" };
+  const figma = figmaFor(env);
+  const threadState = threadStateFor(env);
+  return recheckLiveAsks(job, {
+    store: kvDriftStore(env.HARNESS_KV),
+    ...(figma ? { figma, judge: modelFrameJudge(selectProvider(env)) } : {}),
+    liveCard: (channel, thread) => driftCardIn(env, channel, thread),
+    async retire(ts) {
+      return (await threadState.retireProposal(ts)).retired;
+    },
+    async edit(channel, ts, text) {
+      await updateMessage(env, { channel, ts, text, metadata: driftTag("drift-withdrawn") });
+    },
+    async recordWithdrawn(proposal) {
+      await recordProposalEvents(proposalEventLogFor(env), [proposalEvent(proposal.proposalTs, "cancelled", Date.now(), "worker")]);
+    },
+    async cardFiled(ts) {
+      return (await proposalEventLogFor(env).eventsOf(ts)).some((e) => e.event === "confirmed");
+    },
+    meter: { headroom: budgetHeadroom },
+    now: () => Date.now(),
+    dryRun: opts.dryRun,
+  });
+}
+
+/**
+ * Whether a message could be a "yes, it's up to date" or a `skip` — no reads.
  *
  * @param env - Worker bindings
  * @param event - The message
@@ -159,9 +210,9 @@ export function isDriftAnswerCandidateFor(env: Env, event: SlackMessageEvent): b
 }
 
 /**
- * Whether a message is a candidate yes in a thread uno-bot asked about a file
- * — one KV read, and only for a candidate — so the event handler queues it
- * without queueing every "yes" in every thread.
+ * Whether a message is a candidate answer in a thread uno-bot asked about a
+ * file — one KV read, and only for a candidate — so the event handler queues
+ * it without queueing every "yes" in every thread.
  *
  * @param env - Worker bindings
  * @param event - The message
@@ -176,8 +227,8 @@ export async function isDriftAnswerFor(env: Env, event: SlackMessageEvent): Prom
 }
 
 /**
- * A queued reply that says an asked file is up to date: withdraw its card.
- * Runs at the head of the thread's job (`slack/message-job.ts`).
+ * A queued reply that says an asked file is up to date, or `skip`: withdraw
+ * its card. Runs at the head of the thread's job (`slack/message-job.ts`).
  *
  * @param env - Worker bindings
  * @param event - The message
@@ -213,8 +264,21 @@ export async function handleDriftAnswer(env: Env, event: SlackMessageEvent): Pro
           { ...proposalEvent(proposal.proposalTs, "cancelled", Date.now(), "typed"), actorId: user },
         ]);
       },
+      liveAsksIn: (channel, threadTs) => store.liveAsksIn(channel, threadTs),
+      saveLiveAsk: (ask) => store.saveLiveAsk(ask),
+      dropLiveAsk: (ask) => store.dropLiveAsk(ask),
     },
   );
+}
+
+/** The Figma reads a drift job makes, each measured against the budget. */
+function figmaFor(env: Env): Pick<FigmaClient, "versions" | "nodes"> | undefined {
+  const figma = figmaClientFor(env);
+  if (!figma) return undefined;
+  return {
+    versions: (fileKey, opts) => measured(() => figma.versions(fileKey, opts)),
+    nodes: (fileKey, ids, opts) => measured(() => figma.nodes(fileKey, ids, opts)),
+  };
 }
 
 /** The live drift card in a thread, a revision of it included. */
@@ -243,6 +307,18 @@ function kvDriftStore(kv: KVNamespace): DriftStore & FileDriftSink {
     else await kv.delete(key);
   };
   const channelOf = (id: string) => id.slice(0, id.indexOf(":"));
+  const liveKey = (a: Pick<LiveAsk, "channel" | "threadTs" | "ts">) => `${LIVE_PREFIX}${a.channel}:${a.threadTs}:${a.ts}`;
+  const liveUnder = async (prefix: string): Promise<LiveAsk[]> => {
+    charge(1, "kv");
+    const listed = await kv.list({ prefix });
+    const out: LiveAsk[] = [];
+    for (const { name } of listed.keys) {
+      charge(1, "kv");
+      const ask = await kv.get<LiveAsk>(name, "json");
+      if (ask) out.push(ask);
+    }
+    return out.sort((a, b) => a.askedAt - b.askedAt);
+  };
   return {
     async add(added) {
       for (const channel of new Set(added.map((f) => f.evidence.channel))) {
@@ -284,6 +360,20 @@ function kvDriftStore(kv: KVNamespace): DriftStore & FileDriftSink {
     async saveAsked(channel, threadTs, record) {
       charge(1, "kv");
       await kv.put(`${ASK_PREFIX}${channel}:${threadTs}`, JSON.stringify(record), { expirationTtl: ASK_TTL_S });
+    },
+    liveAsks: () => liveUnder(LIVE_PREFIX),
+    // The trailing colon keeps thread `1.0` from matching thread `1.01`.
+    liveAsksIn: (channel, threadTs) => liveUnder(`${LIVE_PREFIX}${channel}:${threadTs}:`),
+    async saveLiveAsk(ask) {
+      charge(1, "kv");
+      // Its TTL runs from when it was asked, so a re-save never lengthens it.
+      const left = Math.ceil((ask.askedAt + DRIFT_CARD_TTL_MS - Date.now()) / 1000);
+      if (left < 60) return;
+      await kv.put(liveKey(ask), JSON.stringify(ask), { expirationTtl: Math.min(left, LIVE_TTL_S) });
+    },
+    async dropLiveAsk(ask) {
+      charge(1, "kv");
+      await kv.delete(liveKey(ask));
     },
   };
 }

@@ -49,6 +49,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   assert.deepEqual(planRun("end-of-day", MIDNIGHT).jobs.map((j) => j.kind), [
     "figma-library-poll",
     "card-follow-through",
+    "figma-drift-recheck",
     "usage-classify",
     "usage-classify",
     "usage-classify",
@@ -154,6 +155,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["sweep-post", "sweep-post"],
     ["ds-precedence-post", "ds-precedence-post"],
     ["commitment-nudge", "commitment-nudge"],
+    // A live drift question is looked at again before the morning asks anew.
+    ["figma-drift-recheck", "figma-drift-recheck"],
     ["figma-drift-post", "figma-drift-post"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
@@ -164,6 +167,7 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
     ["figma-library-poll", "figma-library-poll", undefined],
     ["card-follow-through", "card-follow-through", undefined],
+    ["figma-drift-recheck", "figma-drift-recheck", undefined],
     // One job per classification batch.
     ["usage-classify-1", "usage-classify", undefined],
     ["usage-classify-2", "usage-classify", undefined],

@@ -151,6 +151,11 @@ const SHAPES: Shape[] = [
     send: { method: "GET", url: `${API}/v2/webhooks?context=team&context_id=1279226364199713409` },
   },
   { method: "createWebhook", call: (f) => f.createWebhook(WEBHOOK), send: { method: "POST", url: `${API}/v2/webhooks`, body: WEBHOOK } },
+  {
+    method: "webhookRequests",
+    call: (f) => f.webhookRequests("wh 1"),
+    send: { method: "GET", url: `${API}/v2/webhooks/wh%201/requests` },
+  },
 ];
 
 describe("what each Figma call sends", () => {

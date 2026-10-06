@@ -19,6 +19,7 @@ import { runMetered } from "./net";
 import { dmWatchersFor } from "./dm-watch/env";
 import { dmCapturersFor } from "./dm-watch/capture-env";
 import * as diagnostics from "./diagnostics";
+import { handleFigmaEventsOnEnv } from "./figma-notify/env";
 
 export default {
   // Cron (wrangler.toml [triggers]). The 09:00 and 00:00 ET firings enqueue
@@ -81,6 +82,12 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
   // slack/interactive.ts.
   if (request.method === "POST" && url.pathname === "/slack/interactive") {
     return handleSlackInteractiveRequest(request, env, ctx);
+  }
+
+  // Figma's notifications (#895): the passcode checked, the event queued once
+  // on the `figma/events` runner, and a fast 200 — src/figma-notify/.
+  if (request.method === "POST" && url.pathname === "/figma/events") {
+    return handleFigmaEventsOnEnv(request, env);
   }
 
   // One-time Slack OAuth — issues the user token that slack_search needs
