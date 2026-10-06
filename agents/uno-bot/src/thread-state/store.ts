@@ -372,15 +372,34 @@ export function ownWords(proposal: Pick<PendingProposal, "stated">): { stated?: 
 
 /**
  * Whether this person may resolve this card. No confirmer set, anyone may;
- * with one, only its members — and a signal with no person behind it is
- * refused, since the set cannot be checked against it.
+ * with one, only the people `cardConfirmers` admits — and a signal with no
+ * person behind it is refused, since the set cannot be checked against it.
  */
 export function mayConfirm(
-  proposal: Pick<PendingProposal, "confirmers">,
+  proposal: Pick<PendingProposal, "confirmers" | "channel">,
   userId: string | undefined,
+  standing: readonly string[] = [],
 ): boolean {
-  if (!proposal.confirmers) return true;
-  return userId !== undefined && proposal.confirmers.includes(userId);
+  const admitted = cardConfirmers(proposal, standing);
+  if (!admitted) return true;
+  return userId !== undefined && admitted.includes(userId);
+}
+
+/**
+ * Everyone who may resolve a card with a confirmer set: its own confirmers,
+ * then the deployment's standing confirmers (`STANDING_CONFIRMER_IDS`), each
+ * once. Null for a card with no set, which anyone may resolve. The standing
+ * set is read at resolution, never stored on the card, so a change to it
+ * reaches cards already open — and it never reaches a card in a 1:1 DM, which
+ * is the person's own and nobody else's.
+ */
+export function cardConfirmers(
+  proposal: Pick<PendingProposal, "confirmers" | "channel">,
+  standing: readonly string[] = [],
+): string[] | null {
+  if (!proposal.confirmers) return null;
+  if (proposal.channel.startsWith("D")) return [...proposal.confirmers];
+  return [...new Set([...proposal.confirmers, ...standing])];
 }
 
 /**

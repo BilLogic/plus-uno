@@ -1232,6 +1232,36 @@ test("a confirmer's \"drop 2\" revises a sweep card by index, without the model"
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "superseded");
 });
 
+// A standing confirmer may revise a card they are not on, as its confirmers
+// may — and the revision keeps the card's OWN set, since the standing set is
+// read at resolution and never stored on a card.
+test("a standing confirmer's \"drop 2\" revises a sweep card, which keeps its own confirmers", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(
+    request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0LEAD" }),
+    { ...h.deps, standingConfirmers: ["U0LEAD"] },
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
+});
+
+test("a revision refused from outside the set names the standing confirmers too", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(
+    request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0BYSTANDER" }),
+    { ...h.deps, standingConfirmers: ["U0LEAD"] },
+  );
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /Only <@U0OWNER> or <@U0LEAD> can change/);
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
 // A file-drift card holds one intake per file and is read the same way: "drop
 // 2" leaves the second file out, in the card's own slot, with its confirmers.
 test("a confirmer's \"drop 2\" leaves a file off a file-drift card, without the model", async () => {

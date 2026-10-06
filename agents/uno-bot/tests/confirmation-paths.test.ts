@@ -365,6 +365,102 @@ describe("a card with a confirmer set", () => {
   });
 });
 
+// The lead may need to decide a card nobody named them on. Standing confirmers
+// resolve any card with a confirmer set, on every door, beside its own set and
+// never in place of it — except a card in someone's 1:1 DM, which stays theirs.
+describe("standing confirmers", () => {
+  const OWNER = "U7";
+  const LEAD = "U9";
+  const OUTSIDER = "U2";
+  const standingConfirmers = [LEAD];
+
+  async function stagedFor(card: Partial<PendingProposal>): Promise<ThreadState> {
+    const store = createInMemoryThreadState();
+    await store.putProposal({ ...PROPOSAL, confirmers: [OWNER], ...card });
+    return store;
+  }
+
+  const doorsFrom = (userId: string, card: Partial<PendingProposal> = {}): Array<{ name: string; signal: GateSignal }> => [
+    { name: "reaction on the card", signal: reaction({ userId, ...(card.channel ? { channel: card.channel } : {}) }) },
+    { name: "the card's ✅ button", signal: { kind: "button", messageTs: CARD_TS, decision: "confirm", userId } },
+    {
+      name: "the emoji typed alone",
+      signal: { kind: "typed", channel: card.channel ?? CHANNEL, thread: THREAD, text: "✅", userId },
+    },
+    {
+      name: "the model's proposal_resolve",
+      signal: { kind: "model", pending: { ...PROPOSAL, confirmers: [OWNER], ...card }, decision: "confirm", userId },
+    },
+  ];
+
+  it("lets a standing confirmer win a card they are not on, on every door", async () => {
+    for (const door of doorsFrom(LEAD)) {
+      const verdict = await resolveSignal(door.signal, { threadState: await stagedFor({}), standingConfirmers });
+      assert.equal(verdict.outcome, "won", door.name);
+      assert.notEqual(verdict.execute, undefined, door.name);
+    }
+  });
+
+  it("lets a standing confirmer cancel too", async () => {
+    const threadState = await stagedFor({});
+    const verdict = await resolveSignal(reaction({ glyph: "no_entry", userId: LEAD }), { threadState, standingConfirmers });
+    assert.equal(verdict.outcome, "won");
+    assert.equal(verdict.decision, "cancel");
+  });
+
+  it("keeps the card's own confirmers, and refuses everyone else naming both sets", async () => {
+    const owner = await resolveSignal(reaction({ userId: OWNER }), { threadState: await stagedFor({}), standingConfirmers });
+    assert.equal(owner.outcome, "won");
+
+    const threadState = await stagedFor({});
+    const refused = await resolveSignal(reaction({ userId: OUTSIDER }), { threadState, standingConfirmers });
+    assert.equal(refused.outcome, "none");
+    assert.deepEqual(refused.post?.note, { kind: "not-a-confirmer", confirmers: [OWNER, LEAD], userId: OUTSIDER });
+    assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
+  });
+
+  it("names a standing confirmer once when the card already names them", async () => {
+    const threadState = await stagedFor({ confirmers: [OWNER, LEAD] });
+    const refused = await resolveSignal(reaction({ userId: OUTSIDER }), { threadState, standingConfirmers });
+    assert.deepEqual(refused.post?.note, { kind: "not-a-confirmer", confirmers: [OWNER, LEAD], userId: OUTSIDER });
+  });
+
+  it("runs the card once when the owner and a standing confirmer both ✅ it", async () => {
+    const threadState = await stagedFor({});
+    const first = await resolveSignal(reaction({ userId: OWNER }), { threadState, standingConfirmers });
+    const second = await resolveSignal(reaction({ userId: LEAD }), { threadState, standingConfirmers });
+    assert.equal([first, second].filter((v) => v.outcome === "won").length, 1);
+  });
+
+  it("does not reach a card in someone's 1:1 DM", async () => {
+    const dm = { channel: "D0MAYA", confirmers: ["U0MAYA"] };
+    for (const door of doorsFrom(LEAD, dm)) {
+      const threadState = await stagedFor(dm);
+      const verdict = await resolveSignal(door.signal, { threadState, standingConfirmers });
+      assert.equal(verdict.outcome, "none", door.name);
+      assert.deepEqual(verdict.post?.note, { kind: "not-a-confirmer", confirmers: ["U0MAYA"], userId: LEAD }, door.name);
+    }
+  });
+
+  it("changes nothing about a card with no confirmer set", async () => {
+    const verdict = await resolveSignal(reaction({ userId: OUTSIDER }), {
+      threadState: await stagedFor({ confirmers: undefined }),
+      standingConfirmers,
+    });
+    assert.equal(verdict.outcome, "won");
+  });
+
+  it("does not revive an expired card", async () => {
+    let now = 1_000_000;
+    const threadState = createInMemoryThreadState({ now: () => now });
+    await threadState.putProposal({ ...PROPOSAL, confirmers: [OWNER] });
+    now += PROPOSAL_TTL_MS + 1;
+    const verdict = await resolveSignal(reaction({ userId: LEAD }), { threadState, standingConfirmers });
+    assert.equal(verdict.outcome, "stale");
+    assert.equal(verdict.post?.note.kind, "expired");
+  });
+});
+
 // A card the Worker stages itself may say what a ⛔ still runs — the library
 // card files its intake either way. A turn's card never sets it, so a cancel
 // there still runs nothing (the describe above).

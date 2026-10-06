@@ -34,7 +34,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { cancelRunOf, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { cancelRunOf, cardConfirmers, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -192,6 +192,10 @@ export interface GateDeps {
    *  a second opinion about whether a proposal is live is how "already
    *  expired" and "already resolved" start disagreeing. */
   threadState: ThreadState;
+  /** Slack ids who may resolve any card with a confirmer set, beside its own
+   *  set (`cardConfirmers`). Absent or empty, a card's own set is the whole
+   *  of it. Read from `STANDING_CONFIRMER_IDS` where `Env` becomes the deps. */
+  standingConfirmers?: readonly string[];
 }
 
 // ── What the doors say ───────────────────────────────────────────────────────
@@ -355,7 +359,8 @@ async function claim(
   // signal has to leave it exactly as it was for the person who may confirm.
   // `none`, not `stale` — nobody else resolved it and it has not aged out;
   // this signal was simply not one the card accepts.
-  if (!mayConfirm(proposal, userId)) {
+  const standing = deps.standingConfirmers ?? [];
+  if (!mayConfirm(proposal, userId, standing)) {
     console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
     return {
       outcome: "none",
@@ -364,12 +369,16 @@ async function claim(
       post: {
         note: {
           kind: "not-a-confirmer",
-          confirmers: [...(proposal.confirmers ?? [])],
+          confirmers: cardConfirmers(proposal, standing) ?? [],
           ...(userId ? { userId } : {}),
         },
         replyTs: replyTarget(proposal),
       },
     };
+  }
+
+  if (userId && proposal.confirmers && !proposal.confirmers.includes(userId)) {
+    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId} admitted as a standing confirmer`);
   }
 
   // A person who reacts ✅ and then, unsure it registered, also types "go

@@ -50,6 +50,10 @@ export interface ButtonDoorDeps {
    *  lock on it. */
   threadState: ThreadState;
 
+  /** Who may resolve any card with a confirmer set — Gate's own
+   *  `standingConfirmers`, handed through. */
+  standingConfirmers?: readonly string[];
+
   /**
    * Everything the person sees. A factory rather than an instance because
    * where the door speaks is the VERDICT's answer (`post.replyTs`), which is
@@ -98,7 +102,7 @@ export async function runButtonDoor(
       decision: request.decision,
       userId: request.userId,
     },
-    { threadState: deps.threadState },
+    { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers },
   );
   console.log(
     `[interactive] ${request.decision} button on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,

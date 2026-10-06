@@ -27,6 +27,7 @@ import { restageFor } from "../turn/env-deps";
 import type { SlackReactionAddedEvent } from "./events";
 import { conversationsReplies, getBotIdentity } from "./api";
 import { slackDelivery } from "./slack-delivery";
+import { standingConfirmersOf } from "./standing-confirmers";
 import { reactionRecorderFor } from "../usage/resolution-env";
 import { reminderDoorFor } from "../commitments/env";
 import { dmReminderDoorFor } from "../dm-watch/env";
@@ -75,6 +76,8 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
   const threadState = threadStateFor(env);
   return {
     threadState,
+
+    standingConfirmers: standingConfirmersOf(env),
 
     delivery: (target) => slackDelivery(env, target),
 
