@@ -26,6 +26,11 @@
 // run against that same migrated local D1, seeded, with its numbers asserted —
 // a query is SQL for D1's SQLite, and only that SQLite is evidence it runs.
 // The files are read here too, as the `METRIC_QUERIES` binding.
+// The last is the Figma notification route (#895): the acceptance cases sent
+// through the Worker's own fetch handler, which Node cannot load, to the real
+// AgentRunner — whose input gate is what makes a redelivery's claim refuse —
+// and real KV. `FIGMA_WEBHOOK_PASSCODE` is a test value bound here, as a
+// secret is never in wrangler.toml.
 //
 // The wrangler config is the source of the bindings: the THREAD_STATE Durable
 // Object binding, the `new_sqlite_classes` migration and
@@ -53,7 +58,13 @@ export default defineConfig({
   plugins: [
     cloudflareTest({
       wrangler: { configPath: "./wrangler.toml" },
-      miniflare: { bindings: { USAGE_MIGRATIONS: usageMigrations, METRIC_QUERIES: metricQueries } },
+      miniflare: {
+        bindings: {
+          USAGE_MIGRATIONS: usageMigrations,
+          METRIC_QUERIES: metricQueries,
+          FIGMA_WEBHOOK_PASSCODE: "workerd-test-passcode",
+        },
+      },
     }),
   ],
   test: {
@@ -64,6 +75,7 @@ export default defineConfig({
       "tests/workerd/commitment-records.conformance.test.ts",
       "tests/workerd/dm-watch-records.conformance.test.ts",
       "tests/workerd/metric-queries.test.ts",
+      "tests/workerd/figma-events.route.test.ts",
     ],
   },
 });

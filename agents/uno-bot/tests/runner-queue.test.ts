@@ -16,10 +16,13 @@
 //
 //   an assemble job waits — it does not run while a job it depends on is
 //   still pending, whatever order they were queued in
+//
+//   a once-key queues once — a sender that redelivers (Figma, #895) gets one
+//   job per key for as long as the key is remembered
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createInMemoryRunnerStorage, type InMemoryRunnerStorage } from "../src/runner/storage";
-import { enqueueRun, enqueueThreadJob, runOneJob, type RunnerDeps } from "../src/runner/queue";
+import { SEEN_KEEP_MS, enqueueRun, enqueueThreadJob, enqueueThreadJobOnce, runOneJob, type RunnerDeps } from "../src/runner/queue";
 import { DEFER_RETRY_MS } from "../src/thread-state/index";
 import {
   runMetered,
@@ -211,4 +214,48 @@ test("thread jobs keep their behaviour: one per alarm, a deferred one kept", asy
   await enqueueThreadJob(h.storage, { job: cutOff, enqueuedAt: 2 }, h.clock.t);
   assert.equal(await drain(h), 3);
   assert.deepEqual(h.threadRan, ["reaction", "reaction", "cut-off"]);
+});
+
+// ── once per key (#895) ──────────────────────────────────────────────────────
+
+const figmaJob = (eventId: string): RunnerJobPayload => ({
+  kind: "figma-event",
+  event: { eventId, type: "FILE_COMMENT", webhookId: "w1", fileKey: "FILE", commentId: eventId.split(":")[1]! },
+});
+
+test("a once-key queues one job, and a repeat of it queues nothing", async () => {
+  const h = harness();
+  assert.equal(await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:1"), enqueuedAt: 1 }, "comment:1", h.clock.t), true);
+  assert.equal(await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:1"), enqueuedAt: 2 }, "comment:1", h.clock.t), false);
+  assert.equal(await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:2"), enqueuedAt: 3 }, "comment:2", h.clock.t), true);
+  assert.equal(await drain(h), 2, "one alarm per queued job");
+  assert.deepEqual(h.threadRan, ["figma-event", "figma-event"]);
+});
+
+test("a repeat after its job has run still queues nothing, for as long as the key is kept", async () => {
+  const h = harness();
+  await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:1"), enqueuedAt: 1 }, "comment:1", h.clock.t);
+  await drain(h);
+  // Figma's last retry lands 3 h 35 min after the first failure.
+  h.clock.t += 4 * 60 * 60 * 1000;
+  assert.equal(await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:1"), enqueuedAt: 2 }, "comment:1", h.clock.t), false);
+  assert.equal(await drain(h), 0);
+});
+
+test("a once-key past its window is forgotten, and old marks are dropped as new keys arrive", async () => {
+  const h = harness();
+  await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:1"), enqueuedAt: 1 }, "comment:1", h.clock.t);
+  h.clock.t += SEEN_KEEP_MS + 1;
+  await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:2"), enqueuedAt: 2 }, "comment:2", h.clock.t);
+  assert.deepEqual([...(await h.storage.list({ prefix: "seen:" })).keys()], ["seen:comment:2"]);
+  assert.equal(await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:1"), enqueuedAt: 3 }, "comment:1", h.clock.t), true);
+});
+
+test("a once-key job waits its turn among the thread's jobs, and sets the alarm", async () => {
+  const h = harness();
+  await enqueueThreadJob(h.storage, { job: { kind: "cut-off", proposalTs: "1.2" }, enqueuedAt: 1 }, h.clock.t);
+  await enqueueThreadJobOnce(h.storage, { job: figmaJob("comment:1"), enqueuedAt: 2 }, "comment:1", h.clock.t);
+  assert.notEqual(await h.storage.getAlarm(), null);
+  await drain(h);
+  assert.deepEqual(h.threadRan, ["cut-off", "figma-event"]);
 });

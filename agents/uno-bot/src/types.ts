@@ -54,6 +54,13 @@ export interface Env {
   // and whose members may confirm it.
   FIGMA_FILE_KEY?: string;
   PLUS_UNIVERSAL_CHANNEL_ID?: string;
+  /** The six PLUS Figma teams, `name=id` pairs (`figma-notify/teams.ts`). The
+   *  subscription setup reads them from wrangler.toml; the nightly backstop
+   *  (#896) lists their folders. */
+  FIGMA_TEAM_IDS?: string;
+  /** The passcode Figma echoes in every notification (`POST /figma/events`).
+   *  Unset → the route answers 401 to every delivery. */
+  FIGMA_WEBHOOK_PASSCODE?: string;
   /** #uno-bot, the intake channel (`turn/intake-channel.ts`): a top-level post
    *  there engages with no @mention. Unset → there is no intake channel. */
   UNO_BOT_CHANNEL_ID?: string;
