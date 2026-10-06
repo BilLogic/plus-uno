@@ -204,6 +204,24 @@ export interface FigmaWebhooksResponse {
   webhooks: FigmaWebhook[];
 }
 
+/**
+ * One delivery Figma made to a webhook, as far as the setup reads it. The
+ * payload carries the passcode and any comment's text, so a reader takes its
+ * `event_type` and nothing else.
+ */
+export interface FigmaWebhookRequest {
+  webhook_id: string;
+  request_info: { endpoint?: string; payload?: { event_type?: string }; sent_at: string };
+  /** Null when the endpoint never answered. */
+  response_info: { status: string | number; received_at?: string } | null;
+  error_msg?: string | null;
+}
+
+/** GET /v2/webhooks/:id/requests — the deliveries of the last seven days. */
+export interface FigmaWebhookRequestsResponse {
+  requests: FigmaWebhookRequest[];
+}
+
 /** POST /v2/webhooks. A team takes 20 at most, and only a team admin may create one. */
 export interface FigmaNewWebhook {
   event_type: FigmaWebhookEvent;
@@ -257,6 +275,8 @@ export interface FigmaClient {
   teamWebhooks(teamId: string, opts?: FigmaCallOptions): Promise<FigmaWebhooksResponse>;
   /** Subscribe to a notification. Tier 2. */
   createWebhook(input: FigmaNewWebhook, opts?: FigmaCallOptions): Promise<FigmaWebhook>;
+  /** What Figma delivered to one subscription in the last seven days, and how each was answered. Tier 2. */
+  webhookRequests(webhookId: string, opts?: FigmaCallOptions): Promise<FigmaWebhookRequestsResponse>;
 }
 
 /** The name of one client method, for the fake's inspectors and failure switch. */

@@ -77,6 +77,7 @@ import {
   type FigmaTier,
   type FigmaVersionsResponse,
   type FigmaWebhook,
+  type FigmaWebhookRequestsResponse,
   type FigmaWebhooksResponse,
 } from "./client";
 
@@ -310,6 +311,11 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
       ),
     createWebhook: (input, opts) =>
       call<FigmaWebhook>({ what: "webhook create", tier: 2, method: "POST", path: "/v2/webhooks", body: input }, opts),
+    webhookRequests: (webhookId, opts) =>
+      call<FigmaWebhookRequestsResponse>(
+        { what: "webhook requests", tier: 2, method: "GET", path: `/v2/webhooks/${encodeURIComponent(webhookId)}/requests` },
+        opts,
+      ),
   };
 }
 

@@ -55,7 +55,7 @@ The end-of-day run also tags asks on the **usage record** with the corpus Sub-ty
 
 **Quality loop, pre-send:** substantive text drafts (≥1500 chars — deliverable-shaped output, not ordinary replies) get ONE cheap judge call against a condensed D1–D9 rubric (`agents/uno-bot/src/agent/draft-judge.ts`) and are revised once if flagged; short replies skip it, and any judge error/timeout ships the original draft (fail open). Verdicts land in the telemetry stream as `[uno-bot] draft-judge …` lines.
 
-**Partially — Figma:** no Figma MCP for the Worker (closed catalog; only approved apps like Claude Code/Cursor connect). A pasted frame link (with `node-id`) arrives with a rendered screenshot the model can *see*, plus structure/text layers over REST (`source_read`) — so qualitative review works. The screenshot remains visible for the immediately following user turn, then expires; its base64 bytes are not stored. The node response also contains fills, geometry and variable-binding IDs, but the reader drops them; resolving an ID to a token name is separately Enterprise-gated. Given a component name, the bot reads known values from `design-system/src/tokens/` through `github_read`; exact frame measurements and visual math stay with the IDE. The bot never writes to Figma. Every read `FIGMA_ACCESS_TOKEN` makes — the frame read, the vision and proposal-card renders, the library poll, the DS precedence check and the drift card's publisher — goes through one client (`src/figma/`), which paces each rate-limit tier at half the budget Bill's tokens share and backs off on a 429.
+**Partially — Figma:** no Figma MCP for the Worker (closed catalog; only approved apps like Claude Code/Cursor connect). A pasted frame link (with `node-id`) arrives with a rendered screenshot the model can *see*, plus structure/text layers over REST (`source_read`) — so qualitative review works. The screenshot remains visible for the immediately following user turn, then expires; its base64 bytes are not stored. The node response also contains fills, geometry and variable-binding IDs, but the reader drops them; resolving an ID to a token name is separately Enterprise-gated. Given a component name, the bot reads known values from `design-system/src/tokens/` through `github_read`; exact frame measurements and visual math stay with the IDE. The bot never writes to Figma. Every read `FIGMA_ACCESS_TOKEN` makes — the frame read, the vision and proposal-card renders, the library poll, the DS precedence check and the drift card's publisher — goes through one client (`src/figma/`), which paces each rate-limit tier at half the budget Bill's tokens share and backs off on a 429. Figma's notifications reach `POST /figma/events` (`src/figma-notify/`): the passcode is checked, each event is queued once on the `figma/events` runner, and KV keeps which files got comments each day and each file's last change, as ids and times. Nothing reads one event at a time yet; the drift re-check (#897), the comment decisions (#900) and @uno replies (#903) will. The subscriptions are created by `figma-subscriptions.yml`, behind the required reviewer's approval.
 
 **Can't:** edit repo files, run shell/`npm`/`git`, or spawn IDE subagents — it's a Worker, not an IDE agent. It routes that work to Claude Code/Cursor via ready-to-paste handoff prompts. Blueprint and marketplace-catalog writes are deliberately not bot tools (they run in-IDE via `writers/blueprint` / `writers/notion`).
 
@@ -72,7 +72,7 @@ uno-bot/
 ├── package.json / tsconfig.json / .dev.vars.example
 └── src/
     ├── index.ts          Fetch handler — verify, route, export the Durable Objects: /health ·
-    │                     /slack/{events,commands,interactive} · /oauth/slack/{start,callback} ·
+    │                     /slack/{events,commands,interactive} · /figma/events · /oauth/slack/{start,callback} ·
     │                     everything diagnostic → src/diagnostics — plus the cron scheduled() handler
     ├── diagnostics/      Every probe, behind one token gate and one report envelope: the public
     │                     /health/blueprint contract probe + twelve /debug/* probes (routes.ts is
@@ -97,6 +97,9 @@ uno-bot/
     │                     v1's poll-figma-library.js, Worker-native) → findings in KV
     ├── figma-library/    Morning jobs: findings → drafted intake + #plus-universal
     │                     card; tracker links the PR and closes the intake on merge
+    ├── figma-notify/     POST /figma/events: Figma's notifications, passcode-checked,
+    │                     queued once on the figma/events runner, noted in KV as ids
+    │                     and times; the subscription setup figma-subscriptions.yml runs
     ├── ds-precedence/    Weekly check (Friday end of day): code vs the library under
     │                     DS precedence → one #plus-universal thread + intake card
     ├── thread-state/     ThreadState: ONE typed interface for everything a turn
@@ -147,6 +150,7 @@ curl http://localhost:8787/health
 | `GITHUB_TOKEN` | PAT for `repository_dispatch`, `github_read`, the intake duplicate check (`github_intake_search`), issue creation and follow-ups (`github_issue_create`, `github_issue_update` — need Issues: write on each listed repo) and workflow runs (`github_workflow_run` — needs Actions: Read and write on each repo whose `GITHUB_REPOS` entry lists workflows) |
 | `NOTION_API_KEY` | Notion integration token (`notion_create` / `notion_update` / `notion_archive` + catalog reads) |
 | `FIGMA_ACCESS_TOKEN` | Figma personal token, used only through the Figma client (`src/figma/`) — frame reads and renders, the library poll, the DS precedence check and the drift publisher |
+| `FIGMA_WEBHOOK_PASSCODE` | the passcode Figma echoes in every notification to `POST /figma/events`; its twin is the GitHub secret `figma-subscriptions.yml` subscribes with. Unset, the route answers 401 |
 | `SUPABASE_ANON_KEY` | read-only blueprint key (`search_blueprint`) |
 | `GMAIL_*` | OAuth for `email_send` (sender, client id/secret, refresh token) |
 | `DEBUG_TOKEN` | gates the `/debug/*` routes (sent as the `x-debug-token` header) |

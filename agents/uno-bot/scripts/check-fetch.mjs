@@ -48,6 +48,7 @@ const FIGMA_API = /api\.figma\.com/i;
 const CHARGED_STUB_CALLS = new Set([
   "slack/events.ts", // enqueueAgentJob charges 1 for the AgentRunner hop
   "scheduled/jobs.ts", // enqueueScheduledRun charges 1 for the run's AgentRunner hop
+  "figma-notify/env.ts", // enqueueOnce charges 1 for the figma/events AgentRunner hop
 ]);
 
 // A Durable Object RPC hop — `stub.readHistory(ref, at)` (#493) — is the same
