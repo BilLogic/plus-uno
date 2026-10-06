@@ -17,6 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleSubmit } from './engine.mjs';
+import { hasPrototypeIntent } from './intents.mjs';
 import { ACTIVE_INTAKE_FILE, buildAgentIntakeInstruction } from './intake-question.mjs';
 import { STATES } from './states.mjs';
 
@@ -81,6 +82,79 @@ cleanup('nl-conv');
 
 // Review/critique phrasings never trigger the build gate
 assert.equal(run('review this prototype').continue, true);
+
+// Meta-discussion about the skill/hook itself never triggers the build gate
+// (regression: a bare "uno-prototype" substring used to match regardless of
+// context, so a sentence about fixing the gate's own triggering re-triggered
+// the gate it was describing).
+for (const phrase of [
+  'make sure uno-prototype only starts the prd gate when truly starting a new project',
+  'fix the uno-prototype hook so it stops over-triggering',
+  'debug why the uno-prototype gate fired on this message',
+  'update the prd gate logic in intents.mjs',
+]) {
+  cleanup('meta-conv');
+  const meta = run(phrase, 'meta-conv');
+  assert.equal(meta.continue, true, `expected pass-through for: ${phrase}`);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `expected no intake for: ${phrase}`);
+}
+cleanup('meta-conv');
+
+// Continuing/updating an ALREADY-EXISTING prototype never triggers the build
+// gate — only starting something new does.
+for (const phrase of [
+  'continue working on the onboarding prototype',
+  'update the existing parent portal prototype',
+  'fix the tutor inbox prototype',
+  'iterate on this prototype',
+]) {
+  cleanup('continue-conv');
+  const cont = run(phrase, 'continue-conv');
+  assert.equal(cont.continue, true, `expected pass-through for: ${phrase}`);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `expected no intake for: ${phrase}`);
+}
+cleanup('continue-conv');
+
+// A genuinely new build request still triggers, even when it shares
+// vocabulary ("prototype") with the continuation phrasings above.
+run('build a new prototype for the parent portal', 'new-conv');
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, 'expected intake for a genuinely new build request');
+cleanup('new-conv');
+
+// The meta and maintenance exclusions never outrank a genuine build request.
+// An explicit invocation wins outright, and a maintenance verb only excludes a
+// prompt when no build intent comes before it — "prototype X and update the
+// prototype copy" is a new build that mentions later upkeep.
+for (const phrase of [
+  '/uno-prototype build the tutor dashboard, then polish the prototype',
+  'prototype the session recap screen and update the prototype copy',
+  'create a prototype for the onboarding flow and continue the prototype tomorrow',
+  'make a hi-fi prototype of the tutor signup to fix the hook-up flow',
+  'skills/uno-prototype build the parent portal',
+  '@skills/uno-prototype build the parent portal',
+  'uno-prototype: parent portal',
+  'use the uno-prototype skill to build the tutor inbox',
+  'run uno-prototype on the session recap',
+  'use `skills/uno-prototype` to build the parent portal',
+]) {
+  assert.equal(hasPrototypeIntent(phrase), true, `expected the gate for: ${phrase}`);
+}
+
+// Talking about the skill, or quoting a prompt inside a report, is not a
+// request to build — the live miss was a review report quoting example
+// prompts, which walked a whole intake.
+for (const phrase of [
+  'fixing the uno-prototype hook regex',
+  'why did the uno-prototype gate fire',
+  'Finding: the exclusion now wins over an explicit call, so "/uno-prototype build the tutor dashboard, then polish the prototype" no longer fires.',
+  'Finding: `prototype the session recap screen and update the prototype copy` stopped firing after the change.',
+  'Review report:\n> create a prototype for the onboarding flow and continue the prototype tomorrow\nThis used to fire the gate.',
+  'Report:\n```\n/uno-prototype build the tutor dashboard\n```\nquoted from the PR description',
+  'edit skills/uno-prototype/SKILL.md so the gate wording is shorter',
+  'fix the hook so it stops over-triggering',
+]) {
+  assert.equal(hasPrototypeIntent(phrase), false, `expected no gate for: ${phrase}`);
+}
 
 // Inline PRD in the first message still starts at the PRD check choice (no skip)
 const inlinePrd =
