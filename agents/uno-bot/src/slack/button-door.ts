@@ -24,7 +24,7 @@
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
-import { renderGateNote } from "./gate-note";
+import { renderGateNote, statedCancelledNote } from "./gate-note";
 
 /** One button press, in the facts the envelope already has. */
 export interface ButtonRequest {
@@ -49,6 +49,10 @@ export interface ButtonDoorDeps {
   /** Per-thread memory — where the staged card is, and the claim that is the
    *  lock on it. */
   threadState: ThreadState;
+
+  /** Who may resolve any card with a confirmer set — Gate's own
+   *  `standingConfirmers`, handed through. */
+  standingConfirmers?: readonly string[];
 
   /**
    * Everything the person sees. A factory rather than an instance because
@@ -98,7 +102,7 @@ export async function runButtonDoor(
       decision: request.decision,
       userId: request.userId,
     },
-    { threadState: deps.threadState },
+    { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers },
   );
   console.log(
     `[interactive] ${request.decision} button on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,
@@ -140,10 +144,14 @@ export async function runButtonDoor(
     () => "idle",
   );
 
+  // A stated card's ⛔ is a decision its footer described, not a request to
+  // stage it again, so it closes in the card's own words.
   const note =
     request.decision === "confirm"
       ? `:white_check_mark: Approved by <@${request.userId}>`
-      : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
+      : pending.stated
+        ? statedCancelledNote(pending.stated, request.userId)
+        : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
   await deps.replaceCard(pending.proposalText, note);
 }
 

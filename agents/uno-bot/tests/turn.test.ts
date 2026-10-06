@@ -986,7 +986,7 @@ test("a batch touching a keyed-apart card is refused with its note, and only tha
   const weekly: PendingProposal = {
     ...PENDING,
     supersedeKey: "ds-precedence",
-    refuseRevision: "Reply `dispute N` to drop an item.",
+    refuseRevision: "Reply `drop N` to leave an item out.",
   };
   const h = harness({
     replies: [
@@ -1002,7 +1002,7 @@ test("a batch touching a keyed-apart card is refused with its note, and only tha
 
   assert.equal(outcome.disposition, "asked");
   assert.equal(outcome.staged, undefined);
-  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.match(outcome.posted ?? "", /drop N/);
   assert.equal((await h.threadState.getProposalByTs(weekly.proposalTs)).state, "found");
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, weekly.proposalTs, "no second live card");
 });
@@ -1017,7 +1017,7 @@ const WEEKLY_UPDATE: PendingProposal = {
   input: { issue_number: 812, comment: "### Week of 2026-10-02" },
   operations: [{ toolName: "github_issue_update", input: { issue_number: 812, comment: "### Week of 2026-10-02" } }],
   supersedeKey: "ds-precedence",
-  refuseRevision: "Reply `dispute N` to drop an item.",
+  refuseRevision: "Reply `drop N` to leave an item out.",
 };
 const WEEKLY_CREATE: PendingProposal = {
   ...WEEKLY_UPDATE,
@@ -1053,7 +1053,7 @@ test("a comment on the weekly intake itself is still refused with the card's not
   });
 
   assert.equal(outcome.disposition, "asked");
-  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.match(outcome.posted ?? "", /drop N/);
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_UPDATE.proposalTs, "no second live card");
 });
 
@@ -1077,7 +1077,7 @@ test("a batch filing the weekly intake's own title is still refused with the car
   });
 
   assert.equal(outcome.disposition, "asked");
-  assert.match(outcome.posted ?? "", /dispute N/);
+  assert.match(outcome.posted ?? "", /drop N/);
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, WEEKLY_CREATE.proposalTs, "no second live card");
 });
 
@@ -1127,6 +1127,27 @@ test("a revision from outside the confirmer set is refused and leaves the card l
   assert.match(outcome.posted ?? "", /^:lock: <@U0BYSTANDER> Only <@U0OWNER> or <@U0POSTER> can change this proposal/);
   assert.equal((await h.threadState.getProposalByTs(held.proposalTs)).state, "found");
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, held.proposalTs);
+});
+
+test("a standing confirmer's push-back stages a revision that keeps the card's own confirmers", async () => {
+  const held: PendingProposal = { ...PENDING, ttlMs: 72 * 60 * 60 * 1000, confirmers: ["U0OWNER"] };
+  const h = harness({
+    replies: [
+      {
+        text: "Filing the revised card.",
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(held);
+
+  const outcome = await runTurn(
+    request({ text: "call it v2 instead", pending: held, userId: "U0LEAD" }),
+    { ...h.deps, standingConfirmers: ["U0LEAD"] },
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
 });
 
 const FIX_ONE = {
@@ -1230,6 +1251,36 @@ test("a confirmer's \"drop 2\" revises a sweep card by index, without the model"
   assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
   assert.equal(h.provider.sends.length, 0, "no model call");
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "superseded");
+});
+
+// A standing confirmer may revise a card they are not on, as its confirmers
+// may — and the revision keeps the card's OWN set, since the standing set is
+// read at resolution and never stored on a card.
+test("a standing confirmer's \"drop 2\" revises a sweep card, which keeps its own confirmers", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(
+    request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0LEAD" }),
+    { ...h.deps, standingConfirmers: ["U0LEAD"] },
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
+});
+
+test("a revision refused from outside the set names the standing confirmers too", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(
+    request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0BYSTANDER" }),
+    { ...h.deps, standingConfirmers: ["U0LEAD"] },
+  );
+
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /Only <@U0OWNER> or <@U0LEAD> can change/);
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
 });
 
 // A file-drift card holds one intake per file and is read the same way: "drop
@@ -1439,6 +1490,27 @@ test("a revised or re-staged group-DM sweep card carries no share", async () => 
   assert.ok(restaged);
   assert.equal(restaged.proposal.sweepShare, undefined);
   assert.equal(sweepShareOffer(restaged.proposal.sweepShare, applied, channels), null);
+});
+
+// A stated card (the library card, the weekly precedence card) answers the
+// gate in its own words. The fresh card a cut-off run comes back on is an
+// ordinary one, with a ⛔ that runs nothing, so neither its words nor its
+// cancel run come with it.
+test("a re-staged stated card leaves its own words and its cancel run behind", async () => {
+  const STATED_CARD: PendingProposal = {
+    ...SWEEP_CARD,
+    onCancel: [{ toolName: "notion_update", input: FIX_ONE }],
+    stated: { cancelled: "Intake only", expired: "That card closed after 72 h with no decision." },
+  };
+  const h = harness();
+  await h.threadState.putProposal(STATED_CARD);
+  const restaged = await restageExecution(
+    { proposal: STATED_CARD, operations: [{ toolName: "notion_update", input: FIX_TWO }] },
+    { ...h.deps, proposalEvents: h.deps.usage.proposalEvents },
+  );
+  assert.ok(restaged);
+  assert.equal(restaged.proposal.stated, undefined);
+  assert.equal(restaged.proposal.onCancel, undefined);
 });
 
 // `sweep_share_post` is the Worker's alone: a model that names it anyway is

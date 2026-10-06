@@ -43,7 +43,7 @@ import type { Env } from "./types";
 import { charge, rethrowIfBudget } from "./net";
 import type { FigmaClient, FigmaComponentsResponse, FigmaVersionsResponse } from "./figma/client";
 import { figmaClientFor } from "./figma/production";
-import type { LibraryChangeSet, LibraryComponent, PublishedVersion } from "./figma-library/draft";
+import { componentIdOf, type LibraryChangeSet, type LibraryComponent, type PublishedVersion } from "./figma-library/draft";
 
 /** Node-ids per /nodes request (URL-length bound, same as v1). */
 const HASH_CHUNK_SIZE = 50;
@@ -166,6 +166,10 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   const changed = diff.created.length + diff.modified.length + diff.deleted.length + newVersions.length > 0;
   let pending: number | undefined;
   if (changed) {
+    // A component is new when none of its variants was in the snapshot, and
+    // removed when none is left — a variant added to Badge updates Badge.
+    const before = new Set(snapshot.components.map(componentIdOf));
+    const after = new Set(components.map(componentIdOf));
     const changeSet: LibraryChangeSet = {
       detectedAt: at,
       fileKey: deps.fileKey,
@@ -173,6 +177,8 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
       created: diff.created,
       modified: diff.modified,
       deleted: diff.deleted,
+      newComponentIds: [...new Set(diff.created.map(componentIdOf))].filter((id) => !before.has(id)),
+      removedComponentIds: [...new Set(diff.deleted.map(componentIdOf))].filter((id) => !after.has(id)),
     };
     const findings = [...(await deps.findings.read()), changeSet];
     if (findings.length > MAX_FINDINGS) {

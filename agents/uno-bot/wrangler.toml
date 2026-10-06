@@ -324,6 +324,12 @@ TEST_CHANNEL_IDS = "C0B4QBWAUJU"
 # (/oauth/slack/start, ADR-020); unconnected, it records "none" instead.
 #   Bill U03FYQJRQHX
 LEAD_USER_ID = "U03FYQJRQHX"
+# Standing confirmers: who may confirm or cancel ANY card that names its
+# confirmers (a sweep fix, a Figma drift, a DS-precedence card), beside the
+# people it names. Not a card in someone's own 1:1 DM, which stays theirs.
+# Unset, a card's own set is the whole of it (src/slack/standing-confirmers.ts).
+#   Bill U03FYQJRQHX · Bryan U09E652SJ02
+STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 
 # Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
 # GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.

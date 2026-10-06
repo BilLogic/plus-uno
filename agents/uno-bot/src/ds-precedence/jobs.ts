@@ -17,19 +17,22 @@
 //     the intake, so a ⛔ files nothing.
 //     Every morning rather than only Monday's: a morning whose reads fail keeps
 //     the report, and the next one posts it.
-//   • the DISPUTE — a reply in that thread starting `dispute 2` posts a
-//     revised card in the same thread without them. It runs at the head of
-//     the thread's queued job (slack/message-job.ts), so it is handled once
-//     and two disputes run one after the other. Every weekly card holds the
-//     thread's `"ds-precedence"` slot (`supersedeKey`): a revision supersedes
-//     the old card, so a late ✅ on it is told it was replaced, while a turn's
-//     card or a sweep card in the same thread and the weekly card leave each
-//     other alone, and a turn whose
+//   • the DROP — a reply in that thread starting `drop 2` (or `dispute 2`,
+//     the verb before #886) posts a revised card in the same thread without
+//     them. It runs at the head of the thread's queued job
+//     (slack/message-job.ts), so it is handled once and two drops run one
+//     after the other. Every weekly card holds the thread's `"ds-precedence"`
+//     slot (`supersedeKey`): a revision supersedes the old card, so a late ✅
+//     on it is told it was replaced, while a turn's card or a sweep card in the
+//     same thread and the weekly card leave each other alone, and a turn whose
 //     batch is aimed at the weekly intake itself is refused with a pointer to
-//     `dispute N`. The revision keeps the old card's expiry. A card re-staged
-//     after a cut-off run is followed by the record (`followRestagedCard`). Disputing every
-//     item withdraws the card. Only a card still pending is revised; a dispute
-//     that changes nothing gets one line saying why.
+//     `drop N`. The revision keeps the old card's expiry. A card re-staged
+//     after a cut-off run is followed by the record (`followRestagedCard`).
+//     Dropping every item withdraws the card. Only a card still pending is
+//     revised; a drop that changes nothing gets one line saying why. The
+//     record, the job plumbing and this function still say "dispute" — the
+//     stored and internal name for a dropped item, kept so a thread recorded
+//     before the rename reads the same.
 //     Every list thread is recorded under its own ts (`env.ts`), before its
 //     card posts, so the engagement gate and the dispute find it whichever
 //     week it is and whether or not the card made it.
@@ -39,7 +42,9 @@
 //          from Figma = 3 external; the in-flight read and the report are KV,
 //          the internal bucket.
 //   post:  members (at most 3 pages) + the open-intake lookup (1) + the list
-//          (1) + the card (1) = 6; the staging is a Durable Object hop.
+//          (1) + the card (1) = 6, plus a reply per ~3,500 chars of items
+//          when the list is too long for one post; the staging is a Durable
+//          Object hop.
 //   dispute: at most two posts (the revision, and a line if it fails); the
 //          staging and the KV record are internal.
 //
@@ -47,6 +52,7 @@
 
 import type { PendingProposal } from "../thread-state/index";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { namesInWords } from "../slack/copy-words";
 import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
 import type { FigmaClient } from "../figma/client";
 import type { JobContext } from "../scheduled/runs";
@@ -59,10 +65,11 @@ import {
   type PrecedenceRegistry,
 } from "./compare";
 import {
-  disputedItems,
+  droppedItems,
   precedenceCard,
+  precedenceCardWords,
+  precedenceList,
   precedenceOperations,
-  threadText,
   type IntakeTarget,
   type NumberedItem,
 } from "./report";
@@ -113,6 +120,7 @@ export interface PostedThread {
   cardTs: string;
   weekOf: string;
   items: NumberedItem[];
+  /** Item numbers dropped by a reply (stored under the old verb's name). */
   disputed: number[];
   target: IntakeTarget;
   confirmers: string[];
@@ -203,6 +211,8 @@ export interface PostDeps {
   post(message: { text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
   stage(proposal: PendingProposal): Promise<void>;
   channel: string;
+  /** Where the precedence rule is written, as the list links it. */
+  ruleUrl: string;
   now(): number;
 }
 
@@ -235,9 +245,12 @@ function stagedCard(
     // Keyed apart from the thread: a turn's card in this thread neither
     // replaces the weekly card nor is replaced by it; its revisions share it.
     supersedeKey: PRECEDENCE_KEY,
+    // Its own words at the gate, for the whole six days from the first post —
+    // a revision keeps that expiry, so its own shorter ttl would misstate it.
+    stated: precedenceCardWords(PRECEDENCE_CARD_TTL_MS / 3_600_000),
     refuseRevision:
-      "This is the weekly DS precedence card, and it changes only one way: reply `dispute N` (or `dispute 1, 3`) " +
-      "to drop an item, and I'll post the revised card.",
+      "This is the weekly DS precedence card, and it changes only one way: reply `drop N` (or `drop 1, 3`) " +
+      "to leave an item out, and I'll post the revised card.",
   };
 }
 
@@ -267,7 +280,8 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
   const card = renderProposalCard(precedenceCard(items, [], target, operations, PRECEDENCE_CARD_TTL_MS / 3_600_000));
   if (opts.dryRun) return { posted: false, summary: `would post ${items.length} item(s) and a card` };
 
-  const list = await deps.post({ text: threadText(items, weekOf) });
+  const words = precedenceList(items, weekOf, deps.ruleUrl);
+  const list = await deps.post({ text: words.text });
   if (!list.ok || !list.ts) {
     console.error("[ds-precedence] the list did not post — report kept for tomorrow");
     return { posted: false, summary: "list post failed; kept" };
@@ -289,6 +303,12 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
   // Recorded before the card: a list thread is one whether or not its card
   // makes it, so its replies are never all turns.
   await deps.recordThread(base);
+  // The items the list post had no room for, before the card, so the card
+  // stays the last thing in the thread.
+  for (const text of words.overflow) {
+    const spilled = await deps.post({ text, thread_ts: list.ts });
+    if (!spilled.ok) console.error("[ds-precedence] part of the list did not post in the thread");
+  }
   const sent = await deps.post({ text: card.text, blocks: proposalCardBlocks(card.text), thread_ts: list.ts });
   if (!sent.ok || !sent.ts) {
     console.error("[ds-precedence] the list posted and the card did not");
@@ -330,19 +350,19 @@ export interface ThreadReply {
 }
 
 const listed = (ns: readonly number[]) =>
-  ns.length === 1 ? `Item ${ns[0]} is` : `Items ${ns.slice(0, -1).join(", ")} and ${ns[ns.length - 1]} are`;
+  ns.length === 1 ? `Item ${ns[0]} is` : `Items ${namesInWords(ns.map(String))} are`;
 
 /**
- * A reply starting `dispute N` in a list thread: revise its card without the
- * items. Answers whether it handled the reply — false (not a list thread, or
- * not a dispute) leaves it to the ordinary path.
+ * A reply starting `drop N` (or the older `dispute N`) in a list thread:
+ * revise its card without the items. Answers whether it handled the reply —
+ * false (not a list thread, or not a drop) leaves it to the ordinary path.
  *
- * In a list thread every dispute is answered: a revised card, a withdrawn one,
+ * In a list thread every drop is answered: a revised card, a withdrawn one,
  * or one line saying why nothing changed — an item not on the list, one
  * already dropped, or a card already decided or expired.
  *
  * The old card is retired BEFORE the revised one posts, as a turn's revision
- * does, so a ✅ racing the dispute cannot run the list the person just pushed
+ * does, so a ✅ racing the drop cannot run the list the person just pushed
  * back on; a revision that fails to post restores it. Anything that fails
  * after the revised card posts restores the old card too and says so in one
  * line, so the record and the live card never disagree.
@@ -351,7 +371,7 @@ const listed = (ns: readonly number[]) =>
  * @param reply - The reply
  */
 export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadReply): Promise<boolean> {
-  const numbers = disputedItems(reply.text);
+  const numbers = droppedItems(reply.text);
   if (!numbers.length) return false;
   const thread = await deps.thread.read();
   if (!thread || thread.channel !== reply.channel || thread.ts !== reply.threadTs) return false;
@@ -382,7 +402,7 @@ export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadRep
   if (!remaining.length) {
     await deps.superseded([old.proposalTs]);
     await deps.thread.write({ ...thread, disputed, cardTs: "" });
-    return say(`Every item is disputed, so the card is withdrawn and nothing is filed this week (disputed by <@${reply.user}>).`);
+    return say(`Every item is dropped, so the card is withdrawn and nothing is filed this week (dropped by <@${reply.user}>).`);
   }
 
   const operations = precedenceOperations(remaining, thread.target, thread.weekOf);
@@ -407,7 +427,7 @@ export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadRep
     await deps.retire(sent.ts).catch(() => {});
     await say(
       restored
-        ? "That revised card didn't go through, so the card before it still stands. Try the `dispute` again."
+        ? "That revised card didn't go through, so the card before it still stands. Try the `drop` again."
         : "That revised card didn't go through, and the card before it couldn't be put back, so neither is live and nothing will be filed from this thread. Ask me to file the intake if it's still wanted.",
     ).catch(() => {});
     return true;
@@ -421,7 +441,7 @@ export async function disputePrecedenceItems(deps: DisputeDeps, reply: ThreadRep
 /**
  * A weekly card re-staged after a cut-off run (`turn/turn.ts`
  * `restageExecution`) is the thread's live card now: the record follows it, so
- * a later `dispute` finds it. A card the record does not name moves nothing.
+ * a later `drop` finds it. A card the record does not name moves nothing.
  *
  * @param thread - The record of the thread the card was in
  * @param from - The card re-staged

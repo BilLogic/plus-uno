@@ -13,7 +13,7 @@ const icons = {
 };
 
 export default {
-    title: 'Components/Status and loading/Badge',
+    title: 'Components/Status and loading/Status, Count & Tag/Status/Deprecated/Badge',
     component: Badge,
     parameters: {
         changelog: [

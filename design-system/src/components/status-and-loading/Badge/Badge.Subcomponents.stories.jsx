@@ -2,7 +2,7 @@ import React from 'react';
 import Badge from './Badge';
 
 export default {
-    title: 'Components/Status and loading/Badge',
+    title: 'Components/Status and loading/Status, Count & Tag/Status/Deprecated/Badge',
     component: Badge,
     tags: ['!dev'],
     parameters: {

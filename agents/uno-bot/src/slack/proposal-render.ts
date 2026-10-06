@@ -115,6 +115,9 @@ export interface RenderedCard {
  * fit in one message.
  */
 export function renderProposalCard(card: ProposalCard): RenderedCard {
+  // A stated card's footer names every operation it runs, so it carries no
+  // plan of its own (`ProposalCard.footer`).
+  if (card.kind === "stated") return { text: statedText(card) };
   const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
   const plan = withOperationPlan(body, card.operations);
   const followUp = plan.followUp ?? [];
@@ -201,6 +204,21 @@ function revisionText(card: ProposalCard): string {
   if (body) lines.push(body);
   for (const caveat of card.caveats) lines.push(caveatText(caveat));
   lines.push(CONFIRM_FOOTER);
+  return lines.join("\n");
+}
+
+/**
+ * A card the Worker posted on its own: its lead, any caveat, then its one
+ * footer (#886: "one footer, which says what ✅ and ⛔ do"). No ⚠️ preamble and
+ * no parameter line — the lead already says what the card is for — and no
+ * `CONFIRM_FOOTER`, which would be a second footer saying something else.
+ */
+function statedText(card: ProposalCard): string {
+  const lines: string[] = [];
+  const lead = cardLead(card);
+  if (lead) lines.push(lead, "");
+  for (const caveat of card.caveats) lines.push(caveatText(caveat));
+  lines.push(card.footer ?? CONFIRM_FOOTER);
   return lines.join("\n");
 }
 

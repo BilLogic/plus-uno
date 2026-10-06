@@ -143,8 +143,9 @@ function nodesOf(library: FigmaComponentsResponse, label: (nodeId: string) => st
 function postDeps(findings: LibraryChangeSet[]) {
   const threadState = createInMemoryThreadState({ now: () => Date.UTC(2026, 8, 30, 14, 0) });
   const posts: Array<{ text: string; blocks: unknown[] }> = [];
+  const replies: Array<{ ts: string; text: string }> = [];
   const staged: PendingProposal[] = [];
-  const store = { findings: kv(findings), tracked: kv<TrackedPublish[]>([]) };
+  const store = { findings: kv(findings), tracked: kv<TrackedPublish[]>([]), unpublished: kv<LibraryChangeSet | null>(null) };
   const deps: PostDeps = {
     ...store,
     registry: async () => REGISTRY,
@@ -153,6 +154,9 @@ function postDeps(findings: LibraryChangeSet[]) {
       posts.push(message);
       return { ok: true, ts: `1790000000.00000${posts.length}` };
     },
+    async reply(ts, text) {
+      replies.push({ ts, text });
+    },
     async stage(proposal) {
       staged.push(proposal);
       await threadState.putProposal(proposal);
@@ -160,7 +164,21 @@ function postDeps(findings: LibraryChangeSet[]) {
     channel: CHANNEL,
     now: () => Date.UTC(2026, 8, 30, 14, 0),
   };
-  return { deps, posts, staged, threadState, store };
+  return { deps, posts, replies, staged, threadState, store };
+}
+
+/** A change set with no new version: an Accordion variant renamed, and
+ *  nothing published. */
+async function foundEditOnly(): Promise<LibraryChangeSet> {
+  const edited: FigmaComponentsResponse = {
+    meta: { components: [variant("k-acc-1", "State=Closed", "10:1", "accordion", "13667:6004"), ...BEFORE.meta!.components!.slice(1)] },
+  };
+  const { deps, findings, figma } = pollDeps(edited);
+  figma.seedFile(FILE_KEY, { versions: KNOWN_VERSION_ONLY });
+  await pollFigmaLibrary(deps);
+  assert.equal(findings.value.length, 1);
+  assert.deepEqual(findings.value[0]!.versions, []);
+  return findings.value[0]!;
 }
 
 async function foundPublish(): Promise<LibraryChangeSet> {
@@ -182,8 +200,29 @@ describe("the end-of-day poll", () => {
     assert.deepEqual(changeSet!.created.map((c) => c.name).sort(), ["Size=lg", "Trend=up"]);
     assert.deepEqual(changeSet!.modified.map((c) => c.name), ["State=Closed"]);
     assert.deepEqual(changeSet!.deleted, []);
+    // Sparkline is new to the library; Badge only gained a variant.
+    assert.deepEqual(changeSet!.newComponentIds, ["400:1"]);
+    assert.deepEqual(changeSet!.removedComponentIds, []);
     assert.deepEqual(result.pending, 1);
     assert.deepEqual(snapshot.value?.versionIds, ["2210000000000000002", "2210000000000000001"]);
+  });
+
+  it("records a component as removed only when none of its variants is left", async () => {
+    // Yesterday's Tooltip is gone, and one of the two Accordion variants.
+    const shrunk: FigmaComponentsResponse = {
+      meta: { components: BEFORE.meta!.components!.filter((c) => c.key !== "k-tip-1" && c.key !== "k-acc-2") },
+    };
+    const { deps, findings } = pollDeps(shrunk);
+    await pollFigmaLibrary(deps);
+    const [changeSet] = findings.value;
+    assert.deepEqual(changeSet!.deleted.map((c) => c.name).sort(), ["Placement=top", "State=Expanded"]);
+    assert.deepEqual(changeSet!.removedComponentIds, ["300:1"]);
+    assert.deepEqual(changeSet!.newComponentIds, []);
+    const intake = draftPublishIntake(changeSet!, REGISTRY);
+    assert.deepEqual(intake.rows.map((r) => [r.figmaName, r.change]), [
+      ["accordion", "updated"],
+      ["tooltip", "removed"],
+    ]);
   });
 
   it("finds nothing on a quiet day, and posts nothing the next morning", async () => {
@@ -289,6 +328,19 @@ describe("the drafted intake", () => {
     assert.deepEqual(intake.implement, ["Accordion", "Badge"]);
     assert.deepEqual(intake.unmapped, ["sparkline"]);
   });
+
+  it("counts a component new only when the library had none of it — a new variant is an update", async () => {
+    const changeSet = await foundPublish();
+    assert.deepEqual(draftPublishIntake(changeSet, REGISTRY).rows.map((r) => [r.figmaName, r.change]), [
+      ["accordion", "updated"],
+      ["badge", "updated"],
+      ["sparkline", "new"],
+    ]);
+    // A change set kept from before the poll recorded ids is judged by its
+    // variants: every one of Badge's changed variants is new, so it reads new.
+    const { newComponentIds: _n, removedComponentIds: _r, ...older } = changeSet;
+    assert.deepEqual(draftPublishIntake(older, REGISTRY).rows.map((r) => r.change), ["updated", "new", "new"]);
+  });
 });
 
 // ── The morning post ─────────────────────────────────────────────────────────
@@ -308,20 +360,125 @@ describe("the morning post", () => {
     assert.deepEqual(card.confirmers, MEMBERS);
     assert.equal(card.ttlMs, LIBRARY_CARD_TTL_MS);
     assert.equal(LIBRARY_CARD_TTL_MS, 72 * 60 * 60 * 1000);
+    // Its own words at the gate: a ⛔ is "intake only", and a late decision
+    // is told the intake gets filed, not to ask again.
+    assert.deepEqual(card.stated, {
+      cancelled: "Intake only",
+      expired:
+        "That card closed after 72 h with no decision, so nothing was drafted. " +
+        "I file its intake the morning after, so the publish isn't lost.",
+    });
     assert.equal(card.proposalTs, card.replyTs);
 
-    // The message names the publisher and says what each decision does.
-    const text = morning.posts[0]!.text;
-    assert.match(text, /published by \*coco\*/);
-    assert.match(text, /no code mapping: sparkline/);
-    assert.match(text, /files the intake only/);
-    assert.match(text, /Any #plus-universal member can decide, for 72 hours/);
-    assert.doesNotMatch(text, /Design System Updated|implement `/);
+    // The approved card (#886 § 3.1): who published what, every changed
+    // component under its group, and one footer.
+    assert.equal(
+      morning.posts[0]!.text,
+      [
+        `*Library published: "Badge sizes + accordion copy"* by coco · <https://www.figma.com/design/${FILE_KEY}?version-id=2210000000000000002|view version>`,
+        "> Adds lg badge",
+        "",
+        "3 components changed: 1 new, 2 updated.",
+        "• *Has code:* accordion, badge",
+        "• *No code mapping yet:* sparkline",
+        "",
+        ":white_check_mark: files the intake and drafts the code for Accordion and Badge. :no_entry: files the intake only.",
+        "Anyone in this channel can decide, for the next 72 h.",
+      ].join("\n"),
+    );
+    // Short enough to keep its list, so nothing spills into the thread.
+    assert.deepEqual(morning.replies, []);
 
     // Nothing waits any more; the card is tracked.
     assert.deepEqual(morning.store.findings.value, []);
     assert.equal(morning.store.tracked.value.length, 1);
     assert.equal(morning.store.tracked.value[0]!.implement, "Accordion, Badge");
+    // What an expiry nobody decides needs: the intake to file, the card to edit.
+    assert.equal(morning.store.tracked.value[0]!.draft?.title, "Figma library publish: Badge sizes + accordion copy — 3 components");
+    assert.equal(morning.store.tracked.value[0]!.cardText, morning.posts[0]!.text);
+  });
+
+  it("says plainly when the library was edited and not published, and offers no ✅", async () => {
+    const morning = postDeps([await foundEditOnly()]);
+    const result = await postLibraryFindings(morning.deps);
+    assert.equal(result.posted, 1);
+    assert.equal(
+      morning.posts[0]!.text,
+      [
+        `*Library edited, not published.* 1 component's name or description changed in the <https://www.figma.com/design/${FILE_KEY}|library>, with no new version: accordion.`,
+        "Nothing to build yet. I'll post again when a version is published.",
+      ].join("\n"),
+    );
+    // No button row, nothing staged, nothing to track, and it waits no more.
+    assert.ok(!JSON.stringify(morning.posts[0]!.blocks).includes('"actions"'), JSON.stringify(morning.posts[0]!.blocks));
+    assert.doesNotMatch(morning.posts[0]!.text, /:white_check_mark:|:no_entry:/);
+    assert.deepEqual(morning.staged, []);
+    assert.deepEqual(morning.store.tracked.value, []);
+    assert.deepEqual(morning.store.findings.value, []);
+    // Kept, to ride into the next publish's card.
+    assert.deepEqual(morning.store.unpublished.value?.modified.map((c) => c.name), ["State=Closed"]);
+  });
+
+  it("carries an unpublished edit into the next publish's card, as it promised", async () => {
+    // A Tooltip description edited with no version, then — the next morning —
+    // a publish that touches three other components.
+    const tooltip = componentsFrom(BEFORE).find((c) => c.key === "k-tip-1")!;
+    const edit: LibraryChangeSet = {
+      detectedAt: "2026-09-28T22:00:00Z",
+      fileKey: FILE_KEY,
+      versions: [],
+      created: [],
+      modified: [{ ...tooltip, description: "Now with an arrow" }],
+      deleted: [],
+      newComponentIds: [],
+      removedComponentIds: [],
+    };
+    const day1 = postDeps([edit]);
+    await postLibraryFindings(day1.deps);
+    assert.match(day1.posts[0]!.text, /^\*Library edited, not published\.\*/);
+
+    const day2 = postDeps([await foundPublish()]);
+    day2.store.unpublished = kv(day1.store.unpublished.value);
+    day2.deps.unpublished = day2.store.unpublished;
+    await postLibraryFindings(day2.deps);
+    const card = day2.posts[0]!.text;
+    assert.match(card, /^4 components changed: 1 new, 3 updated\.$/m);
+    assert.match(card, /^• \*Has code:\* accordion, badge, tooltip$/m);
+    assert.match(card, /drafts the code for Accordion, Badge and Tooltip\./);
+    // The intake carries it too, and nothing waits any more.
+    assert.match(String(day2.staged[0]!.operations![0]!.input.body), /tooltip/);
+    assert.equal(day2.store.unpublished.value, null);
+  });
+
+  it("puts the whole list in the card's thread when it would make the card too long", async () => {
+    const changeSet = await foundPublish();
+    // Sixty more unmapped components, each a new set.
+    const extra = Array.from({ length: 60 }, (_, i) => ({
+      key: `k-extra-${i}`,
+      name: "Default",
+      description: "",
+      nodeId: `50:${i}`,
+      containingFrame: `extra component number ${i}`,
+      setNodeId: `500:${i}`,
+    }));
+    const big: LibraryChangeSet = {
+      ...changeSet,
+      created: [...changeSet.created, ...extra],
+      newComponentIds: [...(changeSet.newComponentIds ?? []), ...extra.map((c) => c.setNodeId)],
+    };
+    const morning = postDeps([big]);
+    await postLibraryFindings(morning.deps);
+    const text = morning.posts[0]!.text;
+    assert.ok(text.length <= 1500, `${text.length} chars`);
+    assert.match(text, /^63 components changed: 61 new, 2 updated\.$/m);
+    assert.match(text, /\*No code mapping yet:\* .* and \d+ more$/m);
+    // The thread reply names all 63, under the same two groups.
+    assert.equal(morning.replies.length, 1);
+    assert.equal(morning.replies[0]!.ts, morning.staged[0]!.proposalTs);
+    assert.match(morning.replies[0]!.text, /^All 63 components in this publish:/);
+    for (const name of ["accordion", "badge", "sparkline", "extra component number 0", "extra component number 59"]) {
+      assert.ok(morning.replies[0]!.text.includes(name), name);
+    }
   });
 
   it("keeps the findings when the registry or the members cannot be read", async () => {
@@ -441,17 +598,21 @@ describe("the morning tracker", () => {
   });
 
   type Pulls = Awaited<ReturnType<TrackDeps["github"]["recentPulls"]>>;
+  type Intakes = Awaited<ReturnType<TrackDeps["github"]["recentIntakes"]>>;
+  /** The card's intake, filed by a ✅ or a ⛔ — and one that is not its. */
+  const DECIDED: Intakes = [
+    { number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" },
+    { number: 870, url: "https://github.com/o/r/issues/870", body: `${card().marker}\n\n## What was published` },
+  ];
   /** `pulls` is the recent-pulls window; `byNumber` is every PR GitHub has. */
-  function trackDeps(pulls: Pulls, tracked = [card()], byNumber: Pulls = pulls) {
+  function trackDeps(pulls: Pulls, tracked = [card()], byNumber: Pulls = pulls, intakes: Intakes = DECIDED) {
     const calls: string[] = [];
+    const edits: Array<{ text: string; note: string }> = [];
     const store = kv(tracked);
     const deps: TrackDeps = {
       tracked: store,
       github: {
-        recentIntakes: async () => [
-          { number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" },
-          { number: 870, url: "https://github.com/o/r/issues/870", body: `${card().marker}\n\n## What was published` },
-        ],
+        recentIntakes: async () => intakes,
         recentPulls: async () => pulls,
         pull: async (number) => byNumber.find((p) => p.number === number) ?? null,
         comment: async (issue, body) => {
@@ -460,13 +621,22 @@ describe("the morning tracker", () => {
         close: async (issue) => {
           calls.push(`close #${issue}`);
         },
+        intakesSince: async () => ({ intakes, complete: true }),
+        fileIntake: async (draft, from) => {
+          calls.push(`file "${draft.title}" from ${from.channel}/${from.ts}`);
+          return { number: 990, url: "https://github.com/o/r/issues/990" };
+        },
       },
       postToThread: async (channel, ts, text) => {
         calls.push(`thread ${channel}/${ts}: ${text}`);
       },
+      closeCard: async (channel, ts, text, note) => {
+        calls.push(`edit ${channel}/${ts}: ${note}`);
+        edits.push({ text, note });
+      },
       now: () => POSTED_AT + 24 * 60 * 60 * 1000,
     };
-    return { deps, calls, store };
+    return { deps, calls, edits, store };
   }
   const pr = (over: Partial<{ state: "open" | "closed"; merged: boolean; title: string; createdAt: string }> = {}) => ({
     number: 880,
@@ -484,7 +654,7 @@ describe("the morning tracker", () => {
     assert.equal(result.linked, 1);
     assert.deepEqual(calls, [
       "comment #870: The implementation PR is open: https://github.com/o/r/pull/880",
-      `thread ${CHANNEL}/1790000000.000001: :link: The implementation PR is open: <https://github.com/o/r/pull/880|#880> — linked in the intake <https://github.com/o/r/issues/870|#870>.`,
+      `thread ${CHANNEL}/1790000000.000001: PR open: <https://github.com/o/r/pull/880|#880>. Linked from the <https://github.com/o/r/issues/870|intake>.`,
     ]);
     assert.deepEqual(store.value[0]!.pr, { number: 880, url: "https://github.com/o/r/pull/880" });
 
@@ -500,6 +670,25 @@ describe("the morning tracker", () => {
     assert.equal(result.closed, 1);
     assert.ok(calls.includes("close #870"));
     assert.ok(calls.some((c) => c.startsWith("comment #870: Incorporated by")));
+    // One 🎉, naming what now matches the library.
+    assert.ok(
+      calls.includes(
+        `thread ${CHANNEL}/1790000000.000001: :tada: <https://github.com/o/r/pull/880|#880> merged, so Accordion and Badge match the library. Closed the <https://github.com/o/r/issues/870|intake>.`,
+      ),
+      calls.join("\n"),
+    );
+    assert.deepEqual(store.value, []);
+  });
+
+  it("says a PR closed without merging leaves the intake open, and stops tracking", async () => {
+    const { deps, calls, store } = trackDeps([pr({ state: "closed", merged: false })]);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.dropped, 1);
+    assert.equal(
+      calls.at(-1),
+      `thread ${CHANNEL}/1790000000.000001: <https://github.com/o/r/pull/880|#880> closed without merging. The <https://github.com/o/r/issues/870|intake> stays open for the next try.`,
+    );
+    assert.ok(!calls.includes("close #870"));
     assert.deepEqual(store.value, []);
   });
 
@@ -537,5 +726,163 @@ describe("the morning tracker", () => {
     const result = await trackLibraryIntakes(deps);
     assert.equal(result.dropped, 1);
     assert.deepEqual(store.value, []);
+  });
+});
+
+describe("a library card nobody decides", () => {
+  const POSTED_AT = Date.UTC(2026, 8, 30, 14, 0);
+  const HOUR = 60 * 60 * 1000;
+  const CARD_TEXT = '*Library published: "Badge sizes"* by coco · <https://x|view version>\n\n:white_check_mark: files the intake.';
+  const undecided = (over: Partial<TrackedPublish> = {}): TrackedPublish => ({
+    key: "2210000000000000002",
+    marker: "<!-- uno-bot:figma-publish:2210000000000000002 -->",
+    channel: CHANNEL,
+    ts: "1790000000.000001",
+    postedAt: POSTED_AT,
+    implement: "Accordion, Badge",
+    draft: { title: "Figma library publish: Badge sizes — 3 components", body: "<!-- uno-bot:figma-publish:2210000000000000002 -->\n\n## What was published" },
+    cardText: CARD_TEXT,
+    ...over,
+  });
+
+  /** The tracker over GitHub with no intake carrying the card's marker. */
+  function world(tracked: TrackedPublish[], now: number) {
+    const calls: string[] = [];
+    const edits: Array<{ text: string; note: string }> = [];
+    const store = kv(tracked);
+    const deps: TrackDeps = {
+      tracked: store,
+      github: {
+        recentIntakes: async () => [{ number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" }],
+        recentPulls: async () => [],
+        pull: async () => null,
+        comment: async (issue, body) => {
+          calls.push(`comment #${issue}: ${body}`);
+        },
+        close: async (issue) => {
+          calls.push(`close #${issue}`);
+        },
+        intakesSince: async () => ({ intakes: [{ number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" }], complete: true }),
+        fileIntake: async (draft, from) => {
+          calls.push(`file "${draft.title}" from ${from.channel}/${from.ts}`);
+          return { number: 990, url: "https://github.com/o/r/issues/990" };
+        },
+      },
+      postToThread: async (channel, ts, text) => {
+        calls.push(`thread ${channel}/${ts}: ${text}`);
+      },
+      closeCard: async (channel, ts, text, note) => {
+        calls.push(`edit ${channel}/${ts}`);
+        edits.push({ text, note });
+      },
+      now: () => now,
+    };
+    return { deps, calls, edits, store };
+  }
+
+  it("files the intake and closes the card once its 72 hours pass, and only once", async () => {
+    const { deps, calls, edits, store } = world([undecided()], POSTED_AT + 73 * HOUR);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 1);
+    assert.deepEqual(calls, [
+      `file "Figma library publish: Badge sizes — 3 components" from ${CHANNEL}/1790000000.000001`,
+      `edit ${CHANNEL}/1790000000.000001`,
+    ]);
+    // The card keeps its words and gains #886's closing line.
+    assert.deepEqual(edits, [
+      { text: CARD_TEXT, note: "_No decision in 72 h. Filed the <https://github.com/o/r/issues/990|intake> so it isn't lost._" },
+    ]);
+    assert.deepEqual(store.value, []);
+
+    const again = world(store.value, POSTED_AT + 97 * HOUR);
+    await trackLibraryIntakes(again.deps);
+    assert.deepEqual(again.calls, []);
+  });
+
+  it("leaves a card alone while it can still be decided", async () => {
+    const { deps, calls, store } = world([undecided()], POSTED_AT + 71 * HOUR);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
+  });
+
+  it("leaves a decided card alone: its intake carries the marker", async () => {
+    const { deps, calls } = world([undecided()], POSTED_AT + 73 * HOUR);
+    deps.github.recentIntakes = async () => [
+      { number: 870, url: "https://github.com/o/r/issues/870", body: `${undecided().marker}\n\n## What was published` },
+    ];
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.ok(!calls.some((c) => c.startsWith("file") || c.startsWith("edit")), calls.join("\n"));
+  });
+
+  it("has nothing to file for a card tracked before it kept its draft, and lets it age out", async () => {
+    const { draft: _d, cardText: _c, ...legacy } = undecided();
+    const { deps, calls, store } = world([legacy], POSTED_AT + 73 * HOUR);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
+  });
+
+  it("tries again tomorrow when the filing fails, and edits nothing", async () => {
+    const { deps, calls, store } = world([undecided()], POSTED_AT + 73 * HOUR);
+    deps.github.fileIntake = async () => {
+      throw new Error("GitHub issues 502");
+    };
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
+  });
+
+  it("tries the edit again the next morning when it fails, and files nothing twice", async () => {
+    const first = world([undecided()], POSTED_AT + 73 * HOUR);
+    first.deps.closeCard = async () => {
+      throw new Error("ratelimited");
+    };
+    const result = await trackLibraryIntakes(first.deps);
+    assert.equal(result.expired, 1);
+    assert.equal(first.calls.filter((c) => c.startsWith("file")).length, 1);
+    // The filing is on record before the edit was tried.
+    assert.equal(first.store.writes.length, 2);
+    assert.deepEqual(first.store.writes[0]![0]!.intake, { number: 990, url: "https://github.com/o/r/issues/990" });
+    assert.equal(first.store.value[0]!.closePending, true);
+
+    const next = world(first.store.value, POSTED_AT + 97 * HOUR);
+    await trackLibraryIntakes(next.deps);
+    assert.deepEqual(next.calls, [`edit ${CHANNEL}/1790000000.000001`], "the edit only — no second intake");
+    assert.equal(next.edits[0]!.note, "_No decision in 72 h. Filed the <https://github.com/o/r/issues/990|intake> so it isn't lost._");
+    assert.deepEqual(next.store.value, []);
+  });
+
+  it("files nothing when a wider look finds the card's intake after all", async () => {
+    const { deps, calls, store } = world([undecided()], POSTED_AT + 73 * HOUR);
+    // The morning's one page missed it; every intake since the card holds it.
+    deps.github.intakesSince = async () => ({
+      intakes: [{ number: 870, url: "https://github.com/o/r/issues/870", body: `${undecided().marker}\n\n## What was published` }],
+      complete: true,
+    });
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.deepEqual(store.value[0]!.intake, { number: 870, url: "https://github.com/o/r/issues/870" });
+  });
+
+  it("files nothing when there are too many intakes since the card to be sure", async () => {
+    const { deps, calls, store } = world([undecided()], POSTED_AT + 73 * HOUR);
+    deps.github.intakesSince = async () => ({ intakes: [], complete: false });
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
+  });
+
+  it("files and edits nothing on a dry run", async () => {
+    const { deps, calls } = world([undecided()], POSTED_AT + 73 * HOUR);
+    const result = await trackLibraryIntakes(deps, { dryRun: true });
+    assert.equal(result.expired, 1);
+    assert.deepEqual(calls, []);
   });
 });

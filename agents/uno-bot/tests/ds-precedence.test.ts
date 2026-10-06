@@ -1,7 +1,7 @@
 // The weekly DS precedence check, end to end on fakes: the end-of-day check
 // compares the component index and the registry's props with the Figma
 // library, the next morning run posts one thread in #plus-universal with a
-// card that files or updates one intake, and a reply disputes an item.
+// card that files or updates one intake, and a reply drops an item.
 //
 // The fixtures are drawn from the manual first pass of this check (#339): the
 // five button sets that split what code keeps as one `fill` prop, a code
@@ -19,7 +19,8 @@ import {
   parseComponentIndex,
   type PrecedenceRegistry,
 } from "../src/ds-precedence/compare";
-import { disputedItems, PRECEDENCE_MARKER, precedenceOperations } from "../src/ds-precedence/report";
+import { droppedItems, PRECEDENCE_MARKER, precedenceOperations, precedenceRuleUrl } from "../src/ds-precedence/report";
+import { replyHandlerAt } from "../src/slack/events";
 import {
   disputePrecedenceItems,
   followRestagedCard,
@@ -175,9 +176,10 @@ describe("the comparison", () => {
     assert.equal(d!.kind, "prop-as-sets");
     assert.equal(d!.loser, "library");
     assert.equal(d!.winner, "code");
-    assert.match(d!.summary, /`Button\.fill` is one prop in code/);
-    assert.match(d!.summary, /Filled buttons/);
-    assert.match(d!.summary, /`ghost` has no set/);
+    // #886's register, without the component's name: the item line leads with it.
+    assert.match(d!.summary, /^code has one `fill` prop \(/);
+    assert.match(d!.summary, /, the library splits it into \d+ components: .*Filled buttons/);
+    assert.match(d!.summary, /; `ghost` has no component$/);
     assert.equal(d!.codeUrl, `https://github.com/${REPO}/blob/main/design-system/src/components/actions/Button/index.md`);
     assert.match(d!.figmaUrl, /node-id=33-2470/);
   });
@@ -186,6 +188,7 @@ describe("the comparison", () => {
     const tree = check().filter((d) => d.component === "TreeSelect");
     assert.equal(tree.length, 1);
     assert.equal(tree[0]!.kind, "missing-in-figma");
+    assert.equal(tree[0]!.summary, "code has it, the library has no published component for it");
     assert.equal(tree[0]!.loser, "library");
     assert.equal(tree[0]!.figmaUrl, `https://www.figma.com/design/${FILE_KEY}`);
   });
@@ -207,7 +210,7 @@ describe("the comparison", () => {
     }).filter((d) => d.component === "Tooltip");
     assert.equal(found.length, 1);
     assert.equal(found[0]!.kind, "axis-values");
-    assert.match(found[0]!.summary, /`start`/);
+    assert.equal(found[0]!.summary, 'code has `placement="start"`, the library doesn\'t');
     // Button's `size` maps "medium (default)" to medium, so it is not reported.
     assert.equal(check().some((d) => d.component === "Button" && d.kind === "axis-values"), false);
   });
@@ -308,6 +311,7 @@ function postDeps(report: PrecedenceReport | null, openIntake: { number: number;
       staged.push(proposal);
     },
     channel: CHANNEL,
+    ruleUrl: precedenceRuleUrl(REPO),
     now: () => Date.UTC(2026, 9, 5, 14, 0),
   };
   return { deps, posts, staged, reportBox, threadBox, recorded };
@@ -358,7 +362,7 @@ describe("the end-of-day check", () => {
     await runPrecedenceCheck({ ...deps, now: () => Date.UTC(2026, 11, 5, 5, 10), runDate: "2026-12-04" });
     const morning = postDeps(report.box.value, null);
     await postPrecedenceReport(morning.deps);
-    assert.match(morning.posts[0]!.text, /\(2026-12-04\)/);
+    assert.match(morning.posts[0]!.text, /\(week of Dec 4\)/);
     assert.equal(morning.recorded[0]!.weekOf, "2026-12-04");
     assert.match(JSON.stringify(morning.staged[0]!.operations), /Week of 2026-12-04/);
   });
@@ -367,7 +371,7 @@ describe("the end-of-day check", () => {
     const kept = { checkedAt: "2026-09-25T22:00:00.000Z", items: (await weekReport()).items };
     const morning = postDeps(kept, null);
     await postPrecedenceReport(morning.deps);
-    assert.match(morning.posts[0]!.text, /\(2026-09-25\)/);
+    assert.match(morning.posts[0]!.text, /\(week of Sep 25\)/);
   });
 });
 
@@ -398,17 +402,34 @@ describe("the morning post", () => {
     assert.equal(posts.length, 2);
     const [list, card] = posts;
     assert.equal(list!.thread_ts, undefined);
-    assert.match(list!.text, /1\.\*? .*Button/);
-    assert.match(list!.text, /2\.\*? .*TreeSelect/);
-    assert.match(list!.text, /BS4 Foundation library/);
-    assert.match(list!.text, /dispute 2/);
+    // #886 § 3.4: the finding first, the rule as a clause and a link, every
+    // item under its component, and the `drop` instruction last.
+    const lines = list!.text.split("\n");
+    assert.equal(lines[0], "*Code and the library disagree on 2 components* (week of Oct 2)");
+    assert.equal(
+      lines[1],
+      `Code wins by our <https://github.com/${REPO}/blob/main/AGENTS.md#conventions--what-agents-obey|precedence rule>, so the library side needs the fix unless it's deliberate.`,
+    );
+    assert.match(lines[3]!, /^1\. Button: code has one `fill` prop .* · <https:\/\/github\.com\/.*\|code> · <https:\/\/www\.figma\.com\/.*\|Figma>$/);
+    assert.match(lines[4]!, /^2\. TreeSelect: code has it, the library has no published component for it · </);
+    assert.equal(lines.at(-1), "Reply `drop 2` for any that's deliberate, and I'll revise the card.");
+    assert.doesNotMatch(list!.text, /loses|dispute|BS4|:white_check_mark:/);
+    // The card in the thread: its one footer, beside its buttons.
     assert.equal(card!.thread_ts, "1759500000.000001");
+    assert.equal(
+      card!.text,
+      ":white_check_mark: files items 1 and 2 as the weekly intake. :no_entry: files nothing.\nAnyone in this channel can decide, for the next 6 days.",
+    );
 
     assert.equal(staged.length, 1);
     const p = staged[0]!;
     assert.deepEqual(p.confirmers, MEMBERS);
     assert.equal(p.ttlMs, PRECEDENCE_CARD_TTL_MS);
     assert.equal(p.onCancel, undefined);
+    assert.deepEqual(p.stated, {
+      cancelled: "Nothing filed this week",
+      expired: "That card closed after 6 days with no decision, so nothing was filed.",
+    });
     assert.equal(p.proposalTs, "1759500000.000002");
     assert.equal(p.replyTs, "1759500000.000001");
     assert.equal(p.operations?.length, 1);
@@ -423,8 +444,9 @@ describe("the morning post", () => {
   });
 
   it("updates an open weekly intake in place rather than filing a second", async () => {
-    const { deps, staged } = postDeps(await weekReport(), { number: 900, url: `https://github.com/${REPO}/issues/900` });
+    const { deps, staged, posts } = postDeps(await weekReport(), { number: 900, url: `https://github.com/${REPO}/issues/900` });
     await postPrecedenceReport(deps);
+    assert.match(posts[1]!.text, new RegExp(`^:white_check_mark: adds items 1 and 2 to the <https://github\\.com/${REPO}/issues/900\\|weekly intake>\\. :no_entry: files nothing\\.`));
     const ops = staged[0]!.operations!;
     assert.equal(ops.length, 1);
     assert.equal(ops[0]!.toolName, "github_issue_update");
@@ -529,16 +551,23 @@ describe("a dispute in the thread", () => {
     return { thread: threadBox.box.value!, first: staged[0]! };
   }
 
-  it("reads `dispute N` replies, and nothing looser", () => {
-    assert.deepEqual(disputedItems("dispute 2"), [2]);
-    assert.deepEqual(disputedItems("dispute #1 and 3, see the set"), [1, 3]);
-    assert.deepEqual(disputedItems("Dispute 2, 4"), [2, 4]);
-    assert.deepEqual(disputedItems("<@UBOT> dispute 2 — it is on its way"), [2]);
-    assert.deepEqual(disputedItems("item 2 looks wrong"), []);
+  it("reads `drop N` replies, and nothing looser", () => {
+    assert.deepEqual(droppedItems("drop 2"), [2]);
+    assert.deepEqual(droppedItems("drop #1 and 3, see the set"), [1, 3]);
+    assert.deepEqual(droppedItems("Drop 2, 4"), [2, 4]);
+    assert.deepEqual(droppedItems("<@UBOT> drop 2 — it is on its way"), [2]);
+    assert.deepEqual(droppedItems("item 2 looks wrong"), []);
     // Only a reply that STARTS with the word counts.
-    assert.deepEqual(disputedItems("I wouldn't dispute 2"), []);
-    assert.deepEqual(disputedItems("should we dispute 3?"), []);
-    assert.deepEqual(disputedItems("dispute 3?"), [], "a question, not a dispute");
+    assert.deepEqual(droppedItems("I wouldn't drop 2"), []);
+    assert.deepEqual(droppedItems("should we drop 3?"), []);
+    assert.deepEqual(droppedItems("drop 3?"), [], "a question, not a drop");
+    assert.deepEqual(droppedItems("dropped 2 already"), []);
+  });
+
+  it("still reads `dispute N`, the verb a thread posted before #886 asks for", () => {
+    assert.deepEqual(droppedItems("dispute 2"), [2]);
+    assert.deepEqual(droppedItems("<@UBOT> dispute #1 and 3"), [1, 3]);
+    assert.deepEqual(droppedItems("I wouldn't dispute 2"), []);
   });
 
   const NOW = Date.UTC(2026, 9, 5, 16, 0);
@@ -598,11 +627,21 @@ describe("a dispute in the thread", () => {
     return { thread, first, threadState, record, posts, deps, dispute, superseded };
   }
 
-  it("revises the card without the disputed item, in the same thread", async () => {
+  it("revises the card without the dropped item, in the same thread", async () => {
     const w = await world();
-    assert.equal(await w.dispute("dispute 2 — TreeSelect is on its way"), true);
+    assert.equal(await w.dispute("drop 2 — TreeSelect is on its way"), true);
     assert.equal(w.posts.length, 1);
     assert.equal(w.posts[0]!.thread_ts, w.thread.ts);
+    // The revision says what it left out, then its one footer.
+    assert.equal(
+      w.posts[0]!.text,
+      [
+        "Revised without item 2.",
+        "",
+        ":white_check_mark: files item 1 as the weekly intake. :no_entry: files nothing.",
+        "Anyone in this channel can decide, for the next 6 days.",
+      ].join("\n"),
+    );
     const revised = await w.threadState.getProposalByTs(w.record.box.value!.cardTs);
     assert.equal(revised.state, "found");
     const p = revised.state === "found" ? revised.proposal : null;
@@ -612,16 +651,30 @@ describe("a dispute in the thread", () => {
     assert.match(body, /Button/);
     assert.doesNotMatch(body, /TreeSelect/);
     assert.ok((p!.ttlMs ?? 0) < PRECEDENCE_CARD_TTL_MS, "a revision does not extend the card's life");
+    // Its late-decision line still names the whole six days, not what was left.
+    assert.deepEqual(p!.stated, w.first.stated);
     assert.deepEqual(w.record.box.value?.disputed, [2]);
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
     assert.deepEqual(w.superseded, [w.first.proposalTs], "superseded on the usage record once the revision is in place");
   });
 
-  it("disputing every item withdraws the card", async () => {
+  it("dropping every item withdraws the card", async () => {
     const w = await world();
-    assert.equal(await w.dispute("dispute 1, 2"), true);
+    assert.equal(await w.dispute("drop 1, 2"), true);
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
-    assert.match(w.posts[0]!.text, /withdrawn/);
+    assert.equal(
+      w.posts[0]!.text,
+      `Every item is dropped, so the card is withdrawn and nothing is filed this week (dropped by <@${MEMBERS[0]}>).`,
+    );
+  });
+
+  it("a `dispute N` reply revises the card exactly as `drop N` does", async () => {
+    const byDrop = await world();
+    const byDispute = await world();
+    await byDrop.dispute("drop 2");
+    await byDispute.dispute("dispute 2");
+    assert.equal(byDispute.posts[0]!.text, byDrop.posts[0]!.text);
+    assert.deepEqual(byDispute.record.box.value?.disputed, [2]);
   });
 
   it("the old card is retired before the revision posts, so a racing ✅ runs nothing", async () => {
@@ -636,14 +689,14 @@ describe("a dispute in the thread", () => {
         outcomes.push(verdict.outcome);
       },
     });
-    await w.dispute("dispute 2");
+    await w.dispute("drop 2");
     assert.equal(outcomes.length, 1);
     assert.notEqual(outcomes[0], "won", "a confirm on the retired card resolves nothing");
   });
 
   it("a revision that fails to post restores the old card", async () => {
     const w = await world({ postFails: true });
-    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal(await w.dispute("drop 2"), true);
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
     assert.equal(w.record.box.value?.cardTs, w.first.proposalTs);
     assert.deepEqual(w.record.box.value?.disputed, []);
@@ -651,20 +704,20 @@ describe("a dispute in the thread", () => {
 
   it("a revision that posts but does not stage restores the old card and says so, and later disputes still work", async () => {
     const w = await world({ stageThrows: true });
-    assert.equal(await w.dispute("dispute 2"), true, "no fall-through to a turn");
+    assert.equal(await w.dispute("drop 2"), true, "no fall-through to a turn");
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
     assert.equal(w.record.box.value?.cardTs, w.first.proposalTs, "the record names the live card");
     assert.deepEqual(w.superseded, [], "the restored card is not superseded on the record");
-    assert.match(w.posts.at(-1)!.text, /didn't go through/);
-    // The next dispute is judged against the card that is actually live.
+    assert.equal(w.posts.at(-1)!.text, "That revised card didn't go through, so the card before it still stands. Try the `drop` again.");
+    // The next drop is judged against the card that is actually live.
     const posted = w.posts.length;
-    assert.equal(await w.dispute("dispute 9"), true);
+    assert.equal(await w.dispute("drop 9"), true);
     assert.match(w.posts[posted]!.text, /not on this week's list/);
   });
 
   it("a revision whose record does not write restores the old card over it", async () => {
     const w = await world({ writeThrows: true });
-    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal(await w.dispute("drop 2"), true);
     assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
     const revisionTs = w.posts.find((m) => m.blocks) ? "1759600001.000001" : "";
     assert.notEqual((await w.threadState.getProposalByTs(revisionTs)).state, "found", "the revision is not live");
@@ -673,7 +726,7 @@ describe("a dispute in the thread", () => {
 
   it("a revision that fails and whose old card cannot be put back says neither went through", async () => {
     const w = await world({ stageThrows: true, restoreThrows: true });
-    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal(await w.dispute("drop 2"), true);
     const last = w.posts.at(-1)!.text;
     assert.match(last, /didn't go through/);
     assert.doesNotMatch(last, /still stands/, "the old card is not live, so the reply does not say it is");
@@ -688,7 +741,7 @@ describe("a dispute in the thread", () => {
     await followRestagedCard(w.deps.thread, w.first, restaged);
     assert.equal(w.record.box.value?.cardTs, restaged.proposalTs);
 
-    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal(await w.dispute("drop 2"), true);
     assert.ok(w.posts[0]!.blocks, "a revised card, not \"already decided or expired\"");
     assert.equal((await w.threadState.getProposalByTs(restaged.proposalTs)).state, "superseded");
   });
@@ -702,10 +755,10 @@ describe("a dispute in the thread", () => {
 
   it("a dispute that changes nothing says why in one line", async () => {
     const w = await world();
-    await w.dispute("dispute 9");
+    await w.dispute("drop 9");
     assert.match(w.posts.at(-1)!.text, /^Item 9 is not on this week's list\.$/);
-    await w.dispute("dispute 2");
-    await w.dispute("dispute 2");
+    await w.dispute("drop 2");
+    await w.dispute("drop 2");
     assert.match(w.posts.at(-1)!.text, /^Item 2 is already dropped\.$/);
     assert.deepEqual(w.record.box.value?.disputed, [2]);
   });
@@ -717,16 +770,18 @@ describe("a dispute in the thread", () => {
       { threadState: w.threadState },
     );
     assert.equal(won.outcome, "won");
-    assert.equal(await w.dispute("dispute 2"), true);
+    assert.equal(await w.dispute("drop 2"), true);
     assert.equal(w.posts.length, 1);
     assert.match(w.posts[0]!.text, /already been decided or has expired/);
     assert.equal(w.posts[0]!.blocks, undefined, "no revised card");
   });
 
-  it("leaves a reply outside a list thread, or one that is no dispute, to the ordinary path", async () => {
+  it("leaves a reply outside a list thread, or one that is no drop, to the ordinary path", async () => {
     const w = await world();
     assert.equal(await w.dispute("thanks!"), false);
-    assert.equal(await w.dispute("dispute 1", "1.2"), false);
+    // A `drop 1` on some other card's thread — a sweep card's — is not this
+    // card's to answer: it goes on to the turn, which reads it there.
+    assert.equal(await w.dispute("drop 1", "1.2"), false);
     assert.deepEqual(w.posts, []);
   });
 
@@ -764,9 +819,9 @@ describe("the Slack hook", () => {
       },
     }) as unknown as Env;
   const msg = (over: Partial<SlackMessageEvent>): SlackMessageEvent =>
-    ({ type: "message", channel: CHANNEL, thread_ts: thread.ts, ts: "1759500001.000001", user: "U1", text: "dispute 1", ...over }) as SlackMessageEvent;
+    ({ type: "message", channel: CHANNEL, thread_ts: thread.ts, ts: "1759500001.000001", user: "U1", text: "drop 1", ...over }) as SlackMessageEvent;
 
-  it("reads nothing for a message that cannot be a dispute", async () => {
+  it("reads nothing for a message that cannot be a drop", async () => {
     const reads: string[] = [];
     assert.equal(await handleDsPrecedenceReply(env(reads), msg({ text: "looks right to me" })), false);
     assert.equal(await handleDsPrecedenceReply(env(reads), msg({ channel: "C0OTHER" })), false);
@@ -774,16 +829,28 @@ describe("the Slack hook", () => {
     assert.deepEqual(reads, []);
   });
 
-  it("queues a person's `dispute N` reply or broadcast in a #plus-universal thread, and nothing else", () => {
+  it("queues a `drop N` for this handler only in a list thread — under any other card it stays free", async () => {
+    // `drop` is the sweep's verb too: a `drop 2` under a follow-up or a sweep
+    // card in #plus-universal must reach the handlers after this one.
+    const listed = {
+      PLUS_UNIVERSAL_CHANNEL_ID: CHANNEL,
+      HARNESS_KV: { get: async (key: string) => (key.endsWith(thread.ts) ? thread : null) },
+    } as unknown as Env;
+    assert.equal(await replyHandlerAt(listed, msg({ text: "drop 2" })), "ds-precedence");
+    assert.notEqual(await replyHandlerAt(listed, msg({ text: "drop 2", thread_ts: "1759599999.000001" })), "ds-precedence");
+  });
+
+  it("queues a person's `drop N` reply or broadcast in a #plus-universal thread, and nothing else", () => {
     const e = env([]);
     assert.equal(isDsPrecedenceCandidate(e, msg({})), true);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "<@UBOT> dispute 1" })), true);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "<@UBOT> drop 1" })), true);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "<@UBOT> dispute 1" })), true, "the verb before #886");
     assert.equal(isDsPrecedenceCandidate(e, msg({ subtype: "thread_broadcast" })), true);
     assert.equal(isDsPrecedenceCandidate(e, msg({ subtype: "message_changed" })), false);
     assert.equal(isDsPrecedenceCandidate(e, msg({ bot_id: "B1" })), false);
     assert.equal(isDsPrecedenceCandidate(e, msg({ channel: "C0OTHER" })), false);
     assert.equal(isDsPrecedenceCandidate(e, msg({ thread_ts: undefined })), false);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "I wouldn't dispute 1" })), false);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "I wouldn't drop 1" })), false);
   });
 
   it("a cut-off re-stage of the weekly card moves its thread's record; any other card reads nothing", async () => {

@@ -21,7 +21,7 @@
         "CONTEXT.md": 7,
         "agents/uno-bot/AGENT.md": 3,
         "skills/uno-maintain/bot.md": 2,
-        "docs/connectors/figma.md": 3,
+        "docs/connectors/figma.md": 2,
         "docs/connectors/notion.md": 23,
         "docs/connectors/slack.md": 17,
         "docs/connectors/supabase/blueprint-navigation.md": 3,

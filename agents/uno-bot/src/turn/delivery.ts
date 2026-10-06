@@ -189,9 +189,22 @@ export interface ProposalCard {
    * `confirm` is the ⚠️ card every gated tool gets: a preamble naming the verb,
    * then the staged parameters. `revision` is `notion_update`'s — the diff
    * leads and there is no preamble, because the named page and the
-   * `current → new` lines say it better than a warning would.
+   * `current → new` lines say it better than a warning would. `stated` is a
+   * card the Worker posts on its own — the library publish card, the weekly
+   * precedence card — whose `lead` states the whole proposal and whose
+   * `footer` says what ✅ and ⛔ each do: one footer, no preamble, no plan
+   * (#886).
    */
-  kind: "confirm" | "revision";
+  kind: "confirm" | "revision" | "stated";
+  /**
+   * A `stated` card's one footer, in place of the shared confirm footer.
+   *
+   * It stands in for the operation plan too, so it NAMES EVERY OPERATION the
+   * ✅ runs — "files the intake and drafts the code for Button and Badge" is
+   * two operations, both said. That is the consent the plan exists for, kept
+   * in words a person reads in one line.
+   */
+  footer?: string;
   /** What one ✅ does, in the GATED ROW's own words (`agent/tool-table.ts`
    *  § `GateWords`, #598) — never the bare tool name a designer cannot read. */
   verb: string;
@@ -251,21 +264,25 @@ export interface ProposalCard {
 export type GateNote =
   /** The claim was won and the signal brought no words of its own.
    *  `stillRuns` names what a won ⛔ runs anyway, on a card that said a
-   *  cancel would (`PendingProposal.onCancel`). */
-  | { kind: "resolved"; decision: "confirm" | "cancel"; stillRuns?: string[] }
+   *  cancel would (`PendingProposal.onCancel`). `cancelled` is a stated
+   *  card's own phrase for what its ⛔ did (`PendingProposal.stated`). */
+  | { kind: "resolved"; decision: "confirm" | "cancel"; stillRuns?: string[]; cancelled?: string }
   /** The claim was won and the model said what it was doing. Prose, so it
    *  passes through — the same exemption `ProposalCard.lead` gets. */
   | { kind: "said"; text: string }
   /** The lost race: someone else's confirmation got there first. */
   | { kind: "already-resolved" }
   /** A ✅ on a card that aged out of the store. `ttlMs` is the card's own
-   *  lifetime when it set one; absent, it lived the default hour. */
-  | { kind: "expired"; ttlMs?: number }
-  /** A ✅ on a card a revision replaced (#573). */
-  | { kind: "superseded" }
+   *  lifetime when it set one; absent, it lived the default hour. `words` is
+   *  a stated card's own line for it, which is said instead. */
+  | { kind: "expired"; ttlMs?: number; words?: string }
+  /** A ✅ on a card a revision replaced (#573). `stated` when that card was a
+   *  stated one, which has no ⚠️ to point at. */
+  | { kind: "superseded"; stated?: true }
   /** A reaction that landed somewhere other than the card it claims: say where
-   *  the live card is, and resolve nothing. */
-  | { kind: "not-on-the-card"; toolName: string; glyph: string; userId: string }
+   *  the live card is, and resolve nothing. `stated` when the live card is a
+   *  stated one: no ⚠️, and no tool name a person would know it by. */
+  | { kind: "not-on-the-card"; toolName: string; glyph: string; userId: string; stated?: true }
   /** A gate emoji typed outside any card's thread, in a DM holding several
    *  live cards: ask which one, and resolve none of them. */
   | { kind: "which-card"; count: number }

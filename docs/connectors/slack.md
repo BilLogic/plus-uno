@@ -68,7 +68,7 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake.
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake — as does a card nobody decides. A library edited but not published posts with no card.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
@@ -200,3 +200,36 @@ When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words 
 - **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
 
 Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `lane`"), not in ordinary prose ("a tutor joins the call").
+
+<!-- ide-only -->
+## Figma messages
+
+The words uno-bot's own code writes about Figma follow the copy Bill approved in #886 (2026-09-30): the library publish card and its thread, the post for a library edited but not published, and the weekly precedence thread. A new Figma message follows it too. `agents/uno-bot/tests/figma-copy.test.ts` pins each renderer to this section, and reads the Not column below as words no message may use.
+
+**A proactive post** speaks first, in someone's channel or file, so it earns the interruption in its first line: it opens with the fact, asks one named person for one action, and keeps wit for a success post. ✅ and ⛔ appear only as the gate, 🐐 only in the label, and one 🎉 when something ships.
+
+| Say | Not |
+|---|---|
+| library | Foundation library, DS file |
+| published · edited, not published | metadata changed, version-less change |
+| component · variant | component set, node |
+| has code · no code mapping yet | mapped, unmapped |
+| intake (linked, nothing more) | harness-intake issue |
+| Card 2482 | RM-2482, card #2482, ticket |
+| the file | the Figma, the doc |
+| Decisions DB | decision log |
+| skip · drop | dismiss, ignore, dispute |
+
+Every Figma message passes these eight:
+
+1. The first line says what happened, or asks the question.
+2. Every count matches the names listed, or the list ends with "and N more".
+3. One named person is asked for one action, with no `<!here>`.
+4. ✅ and ⛔ each say what they do, in one footer.
+5. No decorative emoji: 🎉 appears only on a ship, and 🐐 only in the label.
+6. The words match the table above.
+7. Anything written into Figma leads with `🐐 le goat (uno-bot) · AI-generated`.
+8. Under 1,500 characters; a longer list goes in the thread.
+
+**At the gate,** the library card and the weekly precedence card answer in their own words, because the gate's shared lines assume a card someone asked for. A ⛔ closes the card with what it did ("Intake only", "Nothing filed this week") and who decided. A ✅ or ⛔ after the window is told the card closed and what happens next. A replaced card, or a reaction beside one, points at the card itself, with no ⚠️ to name. Each card's lines sit beside its copy (`PendingProposal.stated`), and the same test holds them to this section.
+<!-- /ide-only -->

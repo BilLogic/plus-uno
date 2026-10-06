@@ -18,8 +18,9 @@ import TagGroup from './TagGroup';
  */
 
 export default {
-    title: 'Components/Status and loading/Tag group',
+    title: 'Components/Status and loading/Status, Count & Tag/Tag group',
     component: TagGroup,
+    tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
             { date: '2026-09-29', kind: 'changed', summary: 'In the `+n` menu, a selectable tag led with the multi-select checkbox, checked and selected when on, and a saving tag of any behavior became a disabled, busy row.' },

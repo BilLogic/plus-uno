@@ -2,6 +2,16 @@
 // poll found becomes ONE message in #plus-universal — the summary and a
 // proposal card — with the drafted intake behind it.
 //
+// A CHANGE WITH NO PUBLISHED VERSION posts no card (#886 § 3.1): the library
+// was edited, not published, so there is nothing to build and nothing to
+// decide. It says so in one plain message, files nothing, stages nothing and
+// is not tracked — but it is KEPT (`unpublished`), and the next publish's card
+// carries it (`mergeChangeSets`), which is what its "I'll post again when a
+// version is published" promises. The poll cannot tell an autosave from a
+// publish left without a description (`versionsFrom`), and its snapshot has
+// already moved past the change, so without this a real publish read as an
+// edit would never reach a card.
+//
 // THE CARD. Its batch files the intake (`github_issue_create`) and, when any
 // changed component maps to code, dispatches `figma-implement.yml` for all of
 // them (`component_implement` carrying `library_publish`). It is staged the way
@@ -25,20 +35,30 @@
 // nobody could confirm, would be worse than a day's wait.
 //
 // Subrequest math, per job: the registry (1) and the channel's members (at
-// most 3 pages), then per change set one post; the staging is a Durable Object
-// hop and KV is the internal bucket. The poll keeps at most `MAX_FINDINGS` (5)
-// change sets waiting, so 1 + 3 + 5 = 9 — far under the lookup ceiling of 38.
+// most 3 pages), then per change set one post, and — only when the card had to
+// cap its list — the full list in its thread, a reply per ~3,500 chars of
+// names (about 200 names each); the staging is a Durable Object hop and KV is
+// the internal bucket. The poll keeps at most `MAX_FINDINGS` (5) change sets
+// waiting: with no list to spill that is 1 + 3 + 5 = 9, and even five cards
+// each spilling three replies come to 1 + 3 + 5 × 4 = 24, under the lookup
+// ceiling of 38.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
 import type { PendingProposal, ProposalOperation } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { textSections } from "../slack/render";
+import { rethrowIfBudget } from "../net";
 import {
   draftPublishIntake,
-  publishSummary,
+  editedNotPublished,
+  libraryCardWords,
+  mergeChangeSets,
+  publishCard,
   type ComponentRegistry,
   type LibraryChangeSet,
+  type PublishCardCopy,
   type PublishIntake,
 } from "./draft";
 import type { TrackedPublish } from "./track";
@@ -49,12 +69,17 @@ export const LIBRARY_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 export interface PostDeps {
   findings: { read(): Promise<LibraryChangeSet[]>; write(findings: LibraryChangeSet[]): Promise<void> };
   tracked: { read(): Promise<TrackedPublish[]>; write(tracked: TrackedPublish[]): Promise<void> };
+  /** Edits posted as "edited, not published", merged, waiting to ride into
+   *  the next publish's card. */
+  unpublished: { read(): Promise<LibraryChangeSet | null>; write(changeSet: LibraryChangeSet | null): Promise<void> };
   /** component-registry.json, or null when it could not be read. */
   registry(): Promise<ComponentRegistry | null>;
   /** The channel's member ids, or null when Slack would not say. */
   members(): Promise<string[] | null>;
   /** Post one top-level message in the channel. */
   post(message: { text: string; blocks: unknown[] }): Promise<{ ok: boolean; ts?: string }>;
+  /** Post a reply in a card's thread — the full list, when the card capped it. */
+  reply(ts: string, text: string): Promise<void>;
   /** Stage the card, as a turn's staging does. */
   stage(proposal: PendingProposal): Promise<void>;
   channel: string;
@@ -86,7 +111,9 @@ export function libraryOperations(intake: PublishIntake): { operations: Proposal
 }
 
 /**
- * The card as data: the summary leads, then what the ✅ does.
+ * The card as data: a `stated` card, whose lead is the publish and its
+ * components and whose one footer says what ✅ and ⛔ each do — both
+ * operations named, which is why it carries no plan (#886 § 3.1).
  *
  * @param changeSet - What the poll found
  * @param intake - Its drafted intake
@@ -95,11 +122,13 @@ export function libraryCard(
   changeSet: LibraryChangeSet,
   intake: PublishIntake,
   operations: ProposalOperation[] = libraryOperations(intake).operations,
+  copy: PublishCardCopy = publishCard(changeSet, intake, LIBRARY_CARD_TTL_MS / 3_600_000),
 ): ProposalCard {
   return {
-    kind: "confirm",
+    kind: "stated",
     verb: operations.length > 1 ? "file this intake and start the implementation" : "file this intake",
-    lead: publishSummary(changeSet, intake, LIBRARY_CARD_TTL_MS / 3_600_000),
+    lead: copy.lead,
+    footer: copy.footer,
     fields: [
       { label: "intake", value: intake.title },
       ...(operations.length > 1 ? [{ label: "implement", value: intake.implement.join(", ") }] : []),
@@ -129,16 +158,37 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
   let posted = 0;
   const waiting = [...findings];
   const tracked = await deps.tracked.read();
+  let carried = await deps.unpublished.read();
   while (waiting.length) {
-    const changeSet = waiting[0]!;
-    const intake = draftPublishIntake(changeSet, registry);
-    const { operations, onCancel } = libraryOperations(intake);
-    const card = renderProposalCard(libraryCard(changeSet, intake, operations));
+    const found = waiting[0]!;
     if (opts.dryRun) {
       waiting.shift();
       posted += 1;
       continue;
     }
+    if (!found.versions.length) {
+      // Edited, not published: said plainly, and nothing to decide. The edit
+      // is kept to ride into the next publish's card — the poll's snapshot has
+      // already moved past it, so nothing else would bring it back.
+      const text = editedNotPublished(found, draftPublishIntake(found, registry));
+      const sent = await deps.post({ text, blocks: textSections(text) });
+      if (!sent.ok) {
+        console.error("[figma-library] edited-not-published post failed — kept for tomorrow");
+        break;
+      }
+      carried = carried ? mergeChangeSets(carried, found) : found;
+      await deps.unpublished.write(carried);
+      waiting.shift();
+      posted += 1;
+      await deps.findings.write(waiting);
+      continue;
+    }
+    // A publish: any edit announced before it is part of it now.
+    const changeSet = carried ? mergeChangeSets(carried, found) : found;
+    const intake = draftPublishIntake(changeSet, registry);
+    const copy = publishCard(changeSet, intake, LIBRARY_CARD_TTL_MS / 3_600_000);
+    const { operations, onCancel } = libraryOperations(intake);
+    const card = renderProposalCard(libraryCard(changeSet, intake, operations, copy));
     const sent = await deps.post({ text: card.text, blocks: proposalCardBlocks(card.text) });
     if (!sent.ok || !sent.ts) {
       console.error(`[figma-library] post for ${intake.key} failed — kept for tomorrow`);
@@ -161,6 +211,9 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
         ttlMs: LIBRARY_CARD_TTL_MS,
         confirmers: [...members],
         onCancel,
+        // Its own words at the gate: a ⛔ is "intake only", not a request to
+        // stage it again, and nobody can "ask again" for a publish.
+        stated: libraryCardWords(intake, LIBRARY_CARD_TTL_MS / 3_600_000),
       });
     } catch (err) {
       // The message is up; posting it again tomorrow would make two. Its ✅
@@ -174,11 +227,29 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
       ts,
       postedAt: deps.now(),
       implement: operations.length > 1 ? intake.implement.join(", ") : null,
+      // Kept for an expiry nobody decides: the tracker files this draft and
+      // closes this card (`figma-library/track.ts`).
+      draft: { title: intake.title, body: intake.body },
+      cardText: card.text,
     });
     waiting.shift();
     posted += 1;
     await deps.tracked.write(tracked);
     await deps.findings.write(waiting);
+    if (carried) {
+      carried = null;
+      await deps.unpublished.write(null);
+    }
+    // The card capped its list to stay one readable post; the whole list goes
+    // in its thread — after the card is on record, so a stop here can never
+    // post the card twice. A reply that fails is logged (the intake carries
+    // every row); a budget stop ends the job, and the rest wait for its retry.
+    for (const text of copy.overflow) {
+      await deps.reply(ts, text).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        console.error(`[figma-library] full list for ${intake.key} not posted: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    }
   }
   const verb = opts.dryRun ? "would post" : "posted";
   return { posted, pending: waiting.length, summary: `${verb} ${posted}, ${waiting.length} waiting` };

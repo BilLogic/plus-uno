@@ -71,6 +71,7 @@ import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
+  cardConfirmers,
   mayConfirm,
   proposalOperations,
   proposalReplyThread,
@@ -441,6 +442,10 @@ export interface TurnDeps {
   /** Per-thread memory. Turn reads the panel context and the outcome notes, and
    *  owns the history append and its compaction. */
   threadState: ThreadState;
+
+  /** Who may resolve any card with a confirmer set — Gate's own
+   *  `standingConfirmers`, handed through. */
+  standingConfirmers?: readonly string[];
 
   /** Everything the person sees while the turn runs, and the answer. */
   delivery: Delivery;
@@ -872,7 +877,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         userId: request.userId,
         ...(request.pending ? {} : { wholeDm: true as const }),
       },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     // A verdict with no decision means the message was not a gate emoji — it
     // is language, and language goes to the model; so is a gate emoji with no
@@ -1200,7 +1205,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         ...(result.messageToUser ? { messageToUser: result.messageToUser } : {}),
         userId: request.userId,
       },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     return settleVerdict(verdict, { deps, memory, telemetry });
   }
@@ -1251,7 +1256,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         ...(result.previewText ? { messageToUser: result.previewText } : {}),
         userId: request.userId,
       },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     return settleVerdict(verdict, {
       deps,
@@ -1305,7 +1310,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
 
   // A keyed card that revises only its own way (the weekly DS precedence
-  // card, through `dispute N`) is not revised by a turn at all: the batch is
+  // card, through `drop N`) is not revised by a turn at all: the batch is
   // refused with the card's note, rather than staged as a near-copy that
   // stays live beside it — two live cards could both run.
   if (replaced?.refuseRevision) {
@@ -1320,8 +1325,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // confirm. So it is refused, and the card stays live exactly as it was.
   // #uno-bot is the exception: there a reply joins the confirmer set
   // (`intake-channel.ts`).
-  if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId)) {
-    const refusal = revisionRefusal(replaced.confirmers ?? [], request.userId);
+  if (replaced && !request.intakeChannel && !mayConfirm(replaced, request.userId, deps.standingConfirmers)) {
+    const refusal = revisionRefusal(cardConfirmers(replaced, deps.standingConfirmers) ?? [], request.userId);
     await delivery.postNote(refusal, replaced.sweepRun ? sweepTag("note") : undefined);
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
@@ -1526,8 +1531,8 @@ async function dropFromSweepCard(
     references: [],
     interim: 0,
   };
-  if (!request.intakeChannel && !mayConfirm(pending, request.userId)) {
-    const refusal = revisionRefusal(pending.confirmers ?? [], request.userId);
+  if (!request.intakeChannel && !mayConfirm(pending, request.userId, deps.standingConfirmers)) {
+    const refusal = revisionRefusal(cardConfirmers(pending, deps.standingConfirmers) ?? [], request.userId);
     await delivery.postNote(refusal, sweepTag("note"));
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
@@ -1535,7 +1540,7 @@ async function dropFromSweepCard(
   if (!kept.length) {
     const verdict = await resolveSignal(
       { kind: "typed", channel: request.channel, thread: cardThread, text: "⛔", userId: request.userId },
-      { threadState },
+      { threadState, standingConfirmers: deps.standingConfirmers },
     );
     return settleVerdict(verdict, { deps, memory, note: "Cancelled.", telemetry });
   }
@@ -1743,8 +1748,10 @@ export async function restageExecution(
   // A cancel run is not carried over: part of the original may already have
   // happened, and a ⛔ on the fresh card must run nothing a second time. Nor
   // is a group DM's share: only the card people were shown offers one
-  // (`sweep/share.ts`).
-  const { onCancel: _onCancel, sweepShare: _sweepShare, ...kept } = original;
+  // (`sweep/share.ts`). Nor are a stated card's own words: the fresh card is
+  // an ordinary one, with a ⚠️ and a ⛔ that runs nothing, so "Intake only"
+  // would misstate it.
+  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,
