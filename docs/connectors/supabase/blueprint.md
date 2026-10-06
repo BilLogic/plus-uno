@@ -2,7 +2,7 @@
 embodiment: all
 summary: What this blueprint is, how to retrieve from it, what absence and status mean, how paths relate to a scenario's main route, and the vocabulary — the hand-written core, always loaded; the schema is blueprint-schema.md beside it
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint.md
-vendored_revision: e51ce8038e11
+vendored_revision: a49b4f93a20f
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. Its closing schema section is not upstream's: this repo's sync writes it (SCHEMA_POINTER) in place of the schema, which it vendors as blueprint-schema.md. -->
