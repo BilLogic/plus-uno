@@ -18,7 +18,7 @@
 
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import type { ModelTier } from "../agent/routing";
-import { proposalReplyThread } from "../thread-state/index";
+import { isImChannel, proposalReplyThread } from "../thread-state/index";
 import type { HistoryTurn, PendingProposal, VisionReference } from "../thread-state/index";
 import { asConversationType, type ConversationType, type TurnRequest, type TurnSurface } from "./turn";
 import type { IntakeThread } from "./intake-channel";
@@ -77,7 +77,7 @@ export interface TurnFacts {
  * that can be changed in one place and still be wrong in five.
  */
 export function turnSurfaceOf(channel: string): TurnSurface {
-  return channel.startsWith("D") ? "assistant" : "channel";
+  return isImChannel(channel) ? "assistant" : "channel";
 }
 
 /**

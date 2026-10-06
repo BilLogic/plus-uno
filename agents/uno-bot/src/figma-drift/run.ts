@@ -615,6 +615,9 @@ export interface DriftAnswerDeps {
   asked(channel: string, threadTs: string): Promise<AskRecord>;
   /** The live drift card in a thread — a revision of it included. */
   liveCard(channel: string, thread: string): Promise<PendingProposal | null>;
+  /** Who may decide any card with a confirmer set, beside its own — Gate's
+   *  `standingConfirmers`. */
+  standingConfirmers?: readonly string[];
   /** Whether the thread also holds a live turn card (no slot key). */
   hasTurnCard(channel: string, thread: string): Promise<boolean>;
   /** Take the card out of reach; false when it was no longer live. */
@@ -686,7 +689,7 @@ export async function answerDriftAsk(reply: DriftReply, deps: DriftAnswerDeps): 
     }
     if (!card) continue;
     const people = new Set(entries.flatMap(([, f]) => f.people));
-    if (!people.has(reply.user) && !(card.confirmers && mayConfirm(card, reply.user))) continue;
+    if (!people.has(reply.user) && !(card.confirmers && mayConfirm(card, reply.user, deps.standingConfirmers))) continue;
 
     // Which of the card's files this thread was asked about.
     const onCard = proposalOperations(card).map(fileKeyOfOperation);
