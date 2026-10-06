@@ -20,8 +20,9 @@ import Tile, { TILE_SIZES, TILE_COLORS } from './Tile';
  */
 
 export default {
-    title: 'Components/Status and loading/Tile',
+    title: 'Foundations/Tile',
     component: Tile,
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
