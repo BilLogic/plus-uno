@@ -165,7 +165,17 @@ export function handleSubmit(input) {
     return result(true);
   }
 
-  if (hasNewPrdIntent(prompt)) {
+  const cachedPrd = loadPrdCache(conversationId);
+  const session = loadSession(conversationId);
+
+  // An override that pre-empts even an active session (mid-reflection, "actually
+  // let's use a different PRD" should restart rather than be read as a reflection
+  // answer) — but only within an already-active uno-prototype conversation.
+  // "Replace the PRD" presupposes there's a PRD or in-progress gate to replace;
+  // gating on existing context keeps this from firing on unrelated meta-discussion
+  // like "update the prd gate logic", which has no prototype context at all and
+  // was reaching this check unconditionally before any context was known.
+  if ((cachedPrd || session) && hasNewPrdIntent(prompt)) {
     clearPrdCache(conversationId);
     clearBriefing(conversationId);
     clearSession(conversationId);
@@ -173,9 +183,6 @@ export function handleSubmit(input) {
     saveSession(conversationId, fresh);
     return presentState(conversationId, fresh);
   }
-
-  const cachedPrd = loadPrdCache(conversationId);
-  const session = loadSession(conversationId);
 
   if (session?.status === 'active') {
     return handleActiveSession(conversationId, session, prompt, attachments);

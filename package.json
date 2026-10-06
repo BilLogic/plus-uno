@@ -146,7 +146,7 @@
     "bootstrap": "^5.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^13.4.4",
+    "framer-motion": "^14.0.0",
     "highcharts": "^13.1.1",
     "highcharts-react-official": "^3.2.3",
     "radix-ui": "^1.4.3",
