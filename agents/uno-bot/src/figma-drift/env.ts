@@ -37,6 +37,7 @@ import { SWEEP_CARD_EVENT } from "../sweep/cards";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { ScheduledJob } from "../scheduled/runs";
 import { DRIFT_CARD_TTL_MS } from "./copy";
+import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { DRIFT_KEY, type FileDriftFinding, type FileDriftSink } from "./finding";
 import {
   answerDriftAsk,
@@ -193,6 +194,7 @@ export async function handleDriftAnswer(env: Env, event: SlackMessageEvent): Pro
     {
       asked: (channel, threadTs) => store.asked(channel, threadTs),
       liveCard: (channel, thread) => driftCardIn(env, channel, thread),
+      standingConfirmers: standingConfirmersOf(env),
       async hasTurnCard(channel, thread) {
         const cards = await threadState.getProposalsByChannel(channel);
         return cards.some((p) => !p.supersedeKey && !p.sweepRun && proposalReplyThread(p) === thread);

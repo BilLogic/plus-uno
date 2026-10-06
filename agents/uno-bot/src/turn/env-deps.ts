@@ -31,6 +31,7 @@ import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
+import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { recordSweepRestageFor } from "../sweep/env";
 import { recordPrecedenceRestageFor } from "../ds-precedence/env";
 import { fetchFigmaImagePngUrl, parseFigmaUrl, type FigmaRenderOptions } from "../integrations/figma";
@@ -114,6 +115,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 
   return {
     threadState: wiring.threadState,
+    standingConfirmers: standingConfirmersOf(env),
     delivery: wiring.delivery,
 
     async runAgent(req) {

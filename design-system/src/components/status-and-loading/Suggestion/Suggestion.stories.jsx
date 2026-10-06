@@ -26,8 +26,9 @@ import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
  */
 
 export default {
-    title: 'Components/Status and loading/Suggestion',
+    title: 'Components/Status and loading/AI Label/Suggestion',
     component: Suggestion,
+    tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
             { date: '2026-09-29', kind: 'added', summary: 'Suggestion carried a public `Suggestion.isSuggestion` marker that TagGroup used to keep it out of `+n` and at the end of the row, a wrapper had to copy it, and a disabled TagGroup disabled the Suggestions in it.' },

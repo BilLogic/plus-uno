@@ -30,6 +30,7 @@ import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
+import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
@@ -164,6 +165,7 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
   const threadState = threadStateFor(env);
   return {
     threadState,
+    standingConfirmers: standingConfirmersOf(env),
     delivery: (target) => slackDelivery(env, target),
     applyVerdict: (verdict) => executeVerdict(env, verdict),
     replyEphemeral: (text) => replyEphemeral(payload, text),

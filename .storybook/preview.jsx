@@ -168,6 +168,7 @@ const preview = {
             "Elevation",
             "Iconography",
             "Logos",
+            "Tile",
             "Imagery",
             "Design tokens",
             "Accessibility"
@@ -238,9 +239,20 @@ const preview = {
             ],
             "Status and loading",
             [
-              "Badge",
-              "Loading",
-              "Progress"
+              "Status, Count & Tag",
+              [
+                "Status",
+                "Count",
+                "Tag",
+                "Tag group"
+              ],
+              "AI Label",
+              [
+                "AI label",
+                "Suggestion"
+              ],
+              "Progress",
+              "Loading"
             ]
           ],
           "Data visualizations",

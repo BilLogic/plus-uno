@@ -34,7 +34,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { cancelRunOf, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { cancelRunOf, cardConfirmers, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -192,6 +192,10 @@ export interface GateDeps {
    *  a second opinion about whether a proposal is live is how "already
    *  expired" and "already resolved" start disagreeing. */
   threadState: ThreadState;
+  /** Slack ids who may resolve any card with a confirmer set, beside its own
+   *  set (`cardConfirmers`). Absent or empty, a card's own set is the whole
+   *  of it. Read from `STANDING_CONFIRMER_IDS` where `Env` becomes the deps. */
+  standingConfirmers?: readonly string[];
 }
 
 // ── What the doors say ───────────────────────────────────────────────────────
@@ -355,7 +359,7 @@ async function claim(
   // signal has to leave it exactly as it was for the person who may confirm.
   // `none`, not `stale` — nobody else resolved it and it has not aged out;
   // this signal was simply not one the card accepts.
-  if (!mayConfirm(proposal, userId)) {
+  if (!mayConfirm(proposal, userId, deps.standingConfirmers)) {
     console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
     return {
       outcome: "none",
@@ -364,7 +368,7 @@ async function claim(
       post: {
         note: {
           kind: "not-a-confirmer",
-          confirmers: [...(proposal.confirmers ?? [])],
+          confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
           ...(userId ? { userId } : {}),
         },
         replyTs: replyTarget(proposal),
@@ -400,6 +404,12 @@ async function claim(
         replyTs: replyTarget(proposal),
       },
     };
+  }
+
+  // Won by someone the card's own set would have refused: the standing set let
+  // them in, and the log says so (the usage record keeps only who).
+  if (userId && !mayConfirm(proposal, userId)) {
+    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId} won as a standing confirmer`);
   }
 
   // Won, and about to run: record that it started, before anything can. The
