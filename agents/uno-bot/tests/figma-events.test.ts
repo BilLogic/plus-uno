@@ -205,6 +205,14 @@ describe("a delivery with the right passcode", () => {
     assert.deepEqual((await queued(runner)).map((j) => j.eventId), ["comment:1700001", "comment:1700001:resolved:2026-10-04T14:00:00Z"]);
   });
 
+  it("queues a resolution but leaves no commented note: a day of only resolutions is not a day of comments", async () => {
+    const { deps, runner, kv } = setup();
+    await handleFigmaEvents(post({ ...COMMENT, resolved_at: "2026-10-04T14:00:00Z", timestamp: "2026-10-04T14:00:00Z" }), deps);
+    assert.deepEqual((await queued(runner)).map((j) => j.eventId), ["comment:1700001:resolved:2026-10-04T14:00:00Z"]);
+    assert.equal(kv.store.size, 0);
+    assert.deepEqual(kv.counts(), { gets: 0, puts: 0 });
+  });
+
   it("dates a comment on the team's day: 22:30 ET is still that day", async () => {
     const { deps, kv } = setup();
     // 02:30 UTC on Oct 4 is 22:30 EDT on Oct 3.
@@ -301,7 +309,7 @@ describe("reading a payload", () => {
     const event = readFigmaEvent({ ...COMMENT, created_at: undefined, timestamp: undefined });
     assert.equal(event?.type, "FILE_COMMENT");
     if (event?.type !== "FILE_COMMENT") return;
-    assert.equal(noteFor(event, NOW).key, "figma-notify:commented:2026-10-03:FILEKEY1");
+    assert.equal(noteFor(event, NOW)?.key, "figma-notify:commented:2026-10-03:FILEKEY1");
   });
 
   it("writes a last-change note over one it cannot read", async () => {

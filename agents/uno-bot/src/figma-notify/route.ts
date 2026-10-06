@@ -121,8 +121,9 @@ export async function handleFigmaEvents(request: Request, deps: FigmaEventsDeps)
     return ok();
   }
 
+  const note = noteFor(event, deps.now());
   try {
-    await writeNote(deps.notes, noteFor(event, deps.now()));
+    if (note) await writeNote(deps.notes, note);
   } catch (err) {
     console.error(`[figma-notify] ${eventId} queued, but its note was not written: ${messageOf(err)}`);
   }

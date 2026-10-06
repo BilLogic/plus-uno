@@ -26,7 +26,7 @@
 // The two notes, in HARNESS_KV with an expiry:
 //   • `figma-notify:commented:<ET date>:<file_key>` — the file got comments
 //     that day. Kept 8 days, for a weekly reader plus one. Written once per
-//     file per day: a second comment finds it there.
+//     file per day: a second comment finds it there. A resolution leaves none.
 //   • `figma-notify:changed:<file_key>` — the file's last change. Kept 30
 //     days. Moved only forward, so a retry that arrives after a later change
 //     cannot move it back.
@@ -170,20 +170,23 @@ export function etDateOf(at: number): string {
 }
 
 /**
- * The note a new event leaves.
+ * The note a new event leaves, or `null` for a resolution: resolving a thread
+ * is not commenting, so a day with only resolutions does not read as a day
+ * with comments.
  *
- * A comment is dated by when it was resolved, else created, else when Figma
- * sent it, else now — on the ET day, the team's day, so the midnight run reads
- * the day that just ended.
+ * A comment is dated by when it was created, else when Figma sent it, else
+ * now — on the ET day, the team's day, so the midnight run reads the day that
+ * just ended.
  *
  * @param event - A new file event
  * @param now - Epoch ms, for a comment that carries no time of its own
  */
-export function noteFor(event: Extract<FigmaEvent, { type: "FILE_COMMENT" | "FILE_UPDATE" }>, now: number): FigmaNote {
+export function noteFor(event: Extract<FigmaEvent, { type: "FILE_COMMENT" | "FILE_UPDATE" }>, now: number): FigmaNote | null {
   if (event.type === "FILE_UPDATE") {
     return { key: `${CHANGED_PREFIX}${event.fileKey}`, at: event.at, ttlS: CHANGED_TTL_S, write: "if-newer" };
   }
-  const at = event.resolvedAt ?? event.createdAt ?? event.at ?? new Date(now).toISOString();
+  if (event.resolvedAt) return null;
+  const at = event.createdAt ?? event.at ?? new Date(now).toISOString();
   return {
     key: `${COMMENTED_PREFIX}${etDateOf(Date.parse(at))}:${event.fileKey}`,
     at,
