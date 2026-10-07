@@ -8,6 +8,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { deliveryAdapter, type PlanTask, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
+import { planBlock } from "../src/slack/plan-block";
 import type { ToolProgressEvent } from "../src/agent/tool-progress";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
@@ -122,6 +123,15 @@ describe("a task card's details, output and sources", () => {
     const card = lastCard(slack, "tool-1");
     assert.equal(card.details, "Checking whether this shipped · tutor import");
     assert.equal(card.output, "no matching cards");
+  });
+
+  it("a static plan's card spells its sources as Slack's url sources", () => {
+    const url = "https://www.notion.so/Recap-1";
+    const block = planBlock("Working on it", [
+      { id: "tool-1", title: "Searching Notion", status: "complete", output: "1 page", sources: [{ text: "Recap", url }] },
+    ]);
+    const [card] = block.tasks as Array<Record<string, unknown>>;
+    assert.deepEqual(card!.sources, [{ type: "url", text: "Recap", url }]);
   });
 
   it("an error card keeps the error as its output and carries no sources", async () => {
