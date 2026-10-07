@@ -22,6 +22,7 @@ import {
   appendStream,
   appendTasks,
   postMessage,
+  setPlanTitle,
   slackCall,
   startStream,
   stopStream,
@@ -133,6 +134,9 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       startStream(env, channel, threadTs, userId, team, "plan"),
     async appendTasks(channel, ts, tasks) {
       await appendTasks(env, channel, ts, tasks);
+    },
+    async setPlanTitle(channel, ts, title) {
+      await setPlanTitle(env, channel, ts, title);
     },
     async stopStream(channel, ts) {
       await stopStream(env, channel, ts);

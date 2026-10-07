@@ -59,6 +59,7 @@ export type SlackCall =
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "tasks"; channel: string; ts: string; tasks: PlanTask[] }
+  | { kind: "heading"; channel: string; ts: string; title: string }
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
@@ -187,6 +188,9 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
+    },
+    async setPlanTitle(channel, ts, title) {
+      record({ kind: "heading", channel, ts, title });
     },
     async stopStream(channel, ts) {
       record({ kind: "stopStream", channel, ts });
