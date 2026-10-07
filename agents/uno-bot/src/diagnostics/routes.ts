@@ -35,6 +35,7 @@ export const DIAGNOSTIC_ROUTES = {
   "turn-eval": { method: "POST", path: "/debug/eval", auth: "debug-token" },
   "slack-search": { method: "GET", path: "/debug/slack-search", auth: "debug-token" },
   "slack-stream": { method: "GET", path: "/debug/slack-stream", auth: "debug-token" },
+  "slack-post": { method: "GET", path: "/debug/slack-post", auth: "debug-token" },
   home: { method: "GET", path: "/debug/home", auth: "debug-token" },
   blueprint: { method: "GET", path: "/debug/blueprint", auth: "debug-token" },
   "blueprint-search": { method: "GET", path: "/debug/blueprint-search", auth: "debug-token" },
