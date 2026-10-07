@@ -15,6 +15,7 @@
 //
 // `Env` enters here and stops here.
 
+import { asDelivery } from "../net";
 import type { Env } from "../types";
 import {
   addReaction,
@@ -115,7 +116,7 @@ export function postingDeps(env: Env): PostingDeps {
  */
 function slackClientFor(env: Env): SlackDeliveryClient {
   const posting = postingDeps(env);
-  return {
+  return asDeliveryClient({
     async addReaction(channel, ts, name) {
       await addReaction(env, channel, ts, name);
     },
@@ -138,7 +139,7 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
-  };
+  });
 }
 
 /**
@@ -148,12 +149,32 @@ function slackClientFor(env: Env): SlackDeliveryClient {
  * Plan mode is the adapter's `startStream`, gated on `SLACK_STREAM_PLAN`.
  */
 function postingClientFor(env: Env): PostingClient {
-  return {
+  return asDeliveryClient({
     addReaction: (channel, ts, name) => addReaction(env, channel, ts, name),
     postMessage: (input) => postMessage(env, input),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team),
     appendStream: (channel, ts, text) => appendStream(env, channel, ts, text),
     stopStream: (channel, ts, blocks) => stopStream(env, channel, ts, blocks),
-  };
+  });
+}
+
+/**
+ * Every call a client record makes, under the meter's delivery label.
+ *
+ * Delivery runs WHILE lookups do: the plan stream's cards are posted from the
+ * agent loop's own callbacks, mid-lookup, and the lookup limit is one field on
+ * the per-invocation meter. Unlabelled, a card update was charged to the lookup
+ * ceiling, could be refused by it, and stamped a complete result as partial
+ * (`net.ts` § asDelivery). Labelled here, at the record, so every Slack call
+ * Delivery makes — the plan stream and the answer above all — carries it, and a
+ * method added to either record carries it without anyone remembering to.
+ */
+function asDeliveryClient<C extends object>(client: C): C {
+  return Object.fromEntries(
+    Object.entries(client).map(([name, call]) => [
+      name,
+      (...args: unknown[]) => asDelivery(() => (call as (...a: unknown[]) => Promise<unknown>)(...args)),
+    ]),
+  ) as C;
 }

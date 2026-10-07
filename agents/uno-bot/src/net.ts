@@ -43,6 +43,14 @@ interface Meter {
   /** When set, countedFetch refuses the call that would cross it. */
   limit?: number;
   /**
+   * External subrequests made under the delivery label (asDelivery) — also in
+   * `count`. Monotonic: a limit records it on entry, so delivery spent while
+   * the limit is active can be taken back out of what the limit sees.
+   */
+  delivery: number;
+  /** `delivery` as it stood when the active limit was set. */
+  limitDeliveryBase: number;
+  /**
    * How many times the limit has stopped a read this invocation — thrown OR
    * checked by a paging loop. Monotonic, never reset: callers compare a before
    * and after reading, so nested regions can't clobber each other.
@@ -51,6 +59,14 @@ interface Meter {
 }
 
 const meterStore = new AsyncLocalStorage<Meter>();
+
+/**
+ * Set while a Slack delivery call runs — see asDelivery(). A SEPARATE store from
+ * the meter, because the label belongs to the call's async chain, not to the
+ * invocation: the lookup limit is one field on the per-invocation meter, so a
+ * card update fired while a lookup runs reads that limit too.
+ */
+const deliveryStore = new AsyncLocalStorage<true>();
 
 /**
  * Thrown by countedFetch when the next call would cross the active limit.
@@ -79,7 +95,7 @@ export class SubrequestBudgetError extends Error {
  */
 export function subrequestBudgetSpent(): boolean {
   const m = meterStore.getStore();
-  if (m?.limit == null || m.count < m.limit) return false;
+  if (m?.limit == null || lookupCount(m) < m.limit) return false;
   // Records a trip: the caller is about to return LESS than it was asked for.
   // A partial read reported as if it were whole is the same lie as a swallowed
   // throw, so the boundary has to hear about both.
@@ -117,7 +133,8 @@ export function rethrowIfBudget(err: unknown): void {
 /**
  * Run `fn` with outbound calls capped at `limit` total subrequests for this
  * invocation. Wrap the phases that must not eat the delivery reserve — i.e.
- * grounding lookups. Delivery itself runs unlimited, against the real 50.
+ * grounding lookups. Delivery itself runs outside it, against the real 50 —
+ * including a delivery call made while `fn` is still running (asDelivery).
  *
  * @param limit - Total invocation subrequests allowed while `fn` runs
  */
@@ -125,14 +142,48 @@ export async function withSubrequestLimit<T>(limit: number, fn: () => Promise<T>
   const m = meterStore.getStore();
   if (!m) return fn();
   const previous = m.limit;
+  const previousBase = m.limitDeliveryBase;
   m.limit = limit;
+  m.limitDeliveryBase = m.delivery;
   try {
     return await fn();
   } finally {
     m.limit = previous;
+    m.limitDeliveryBase = previousBase;
   }
 }
 
+/**
+ * What the active limit sees: the invocation total, less delivery calls made
+ * since that limit was set (asDelivery). Delivery spent BEFORE the limit stays
+ * in — it is spend the ceiling was always measured against.
+ */
+function lookupCount(m: Meter): number {
+  return m.count - (m.delivery - m.limitDeliveryBase);
+}
+
+
+/**
+ * Run `fn` as a Slack delivery call — the plan stream's card updates, the
+ * answer, the reactions and status that frame them.
+ *
+ * Delivery is not a lookup's spend. The lookup limit is one field on the
+ * per-invocation meter, so without this label a card update fired WHILE a
+ * lookup runs was charged to `LOOKUP_CEILING`: it took a call the lookup had
+ * been promised, could be refused at the ceiling, and its refusal bumped the
+ * trip count that stamps a complete result as partial. Under the label the
+ * lookup limit does not apply and a refusal is not a trip; the call is still
+ * counted, and still refused at the real `SUBREQUEST_CAP` — that cap is what
+ * kills the invocation, and delivery spends against it like anything else.
+ *
+ * The label follows the async chain `fn` starts, so a call the caller fires
+ * with `void` keeps it after the caller has moved on.
+ *
+ * @param fn - The delivery call
+ */
+export function asDelivery<T>(fn: () => Promise<T>): Promise<T> {
+  return deliveryStore.run(true, fn);
+}
 
 /**
  * Run `fn` with a fresh subrequest counter. Wrap whatever the 50-subrequest cap
@@ -142,7 +193,7 @@ export async function withSubrequestLimit<T>(limit: number, fn: () => Promise<T>
  */
 export function runMetered<T>(fn: () => Promise<T>): Promise<T> {
   return meterStore.run(
-    { count: 0, byHost: {}, internal: 0, internalByLabel: {}, d1: 0, trips: 0 },
+    { count: 0, byHost: {}, internal: 0, internalByLabel: {}, d1: 0, trips: 0, delivery: 0, limitDeliveryBase: 0 },
     fn,
   );
 }
@@ -233,7 +284,8 @@ export function d1QueriesUsed(): number {
 export function budgetHeadroom(): { subrequests: number; d1Queries: number } {
   const m = meterStore.getStore();
   if (!m) return { subrequests: Infinity, d1Queries: Infinity };
-  return { subrequests: (m.limit ?? SUBREQUEST_CAP) - m.count, d1Queries: D1_QUERY_CAP - m.d1 };
+  const subrequests = m.limit == null ? SUBREQUEST_CAP - m.count : m.limit - lookupCount(m);
+  return { subrequests, d1Queries: D1_QUERY_CAP - m.d1 };
 }
 
 /** Internal (Cloudflare-service) subrequests spent so far this invocation. */
@@ -282,7 +334,13 @@ export function meterBreakdown(): string {
 function meterCall(url: string): void {
   const m = meterStore.getStore();
   if (!m) return;
-  if (m.limit != null && m.count >= m.limit) {
+  const delivery = deliveryStore.getStore() === true;
+  if (delivery) {
+    // Delivery answers to the real cap only, and its refusal is not a trip:
+    // trips mean a LOOKUP came back short (asDelivery).
+    if (m.count >= SUBREQUEST_CAP) throw new SubrequestBudgetError(SUBREQUEST_CAP);
+    m.delivery += 1;
+  } else if (m.limit != null && lookupCount(m) >= m.limit) {
     m.trips += 1;
     throw new SubrequestBudgetError(m.limit);
   }
