@@ -64,6 +64,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * a Figma file or code stale whether it is up to date, with a drafted intake,
  * once it has looked at the file; `figma-drift-recheck`, in both runs, edits a
  * live question in place once its file shows the decision (src/figma-drift/).
+ * The end-of-day `figma-backstop` jobs list every Figma team's folders and
+ * queue a change no notification reported (src/figma-notify/backstop.ts).
  * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
  * Team Members database (src/usage/team-roles-sync.ts).
  * The end-of-day `card-follow-through` keeps a follow-up for each active
@@ -97,6 +99,7 @@ export type ScheduledJobKind =
   | "commitment-nudge"
   | "figma-drift-post"
   | "figma-drift-recheck"
+  | "figma-backstop"
   | "team-roles-sync"
   | "card-follow-through"
   | "dm-promise-read"
@@ -154,6 +157,10 @@ const RUN_HOURS: Record<ScheduledRunName, number> = {
   "end-of-day": END_OF_DAY_RUN_HOUR_ET,
 };
 
+/** Jobs the end-of-day run gives the Figma backstop: a full sweep of the six
+ *  teams is 36 listings, a job may make 38, and a third is room to spare. */
+export const BACKSTOP_JOBS = 3;
+
 /** Friday, as `Date.getUTCDay` numbers it. */
 const FRIDAY = 5;
 
@@ -195,6 +202,10 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     // A live drift question is looked at again in both runs, so a file that
     // caught up during the day withdraws it by morning.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
+    // The Figma backstop's sweep, cut into jobs: each takes what the last left,
+    // so a night whose sweep fits in one finds the later ones done
+    // (src/figma-notify/backstop.ts).
+    ...Array.from({ length: BACKSTOP_JOBS }, (_, i) => ({ key: `figma-backstop-${i + 1}`, kind: "figma-backstop" as const })),
     // One job per classification batch, each an alarm of its own. Each takes
     // whatever is still pending, so a quiet day's later jobs find nothing.
     ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({
