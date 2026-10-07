@@ -19,9 +19,9 @@ name: Figma notification subscriptions
 # before the passcode is read. `list` and `status` only read, so they run
 # without it, and never see the passcode.
 #
-# The defaults are #895's first step: FILE_COMMENT on Universal, one
-# subscription, whose PING and first live comment `status` then shows. The other
-# eleven (#896) are a later run with `teams: all` and both events.
+# The defaults are the 12 #896 asks for: FILE_COMMENT and FILE_UPDATE on all
+# six teams. #895's first step made FILE_COMMENT on Universal alone and checked
+# its PING; a run of the defaults makes the other 11, and a re-run makes none.
 
 on:
   workflow_dispatch:
@@ -34,11 +34,11 @@ on:
       teams:
         description: "Team names from FIGMA_TEAM_IDS, comma-separated, or all"
         type: string
-        default: Universal
+        default: all
       events:
         description: "FILE_COMMENT and/or FILE_UPDATE, comma-separated"
         type: string
-        default: FILE_COMMENT
+        default: FILE_COMMENT,FILE_UPDATE
 
 permissions:
   contents: read

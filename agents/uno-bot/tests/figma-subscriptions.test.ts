@@ -13,6 +13,7 @@ import { createInMemoryFigma } from "../src/figma/in-memory";
 import { FigmaRequestError, type FigmaWebhookRequest } from "../src/figma/client";
 import {
   MAX_WEBHOOKS_PER_TEAM,
+  SUBSCRIBABLE,
   WEBHOOK_DESCRIPTION,
   ensureSubscriptions,
   reportLines,
@@ -136,6 +137,35 @@ describe("ensuring the subscriptions", () => {
       report.rows.map((r) => `${r.team} ${r.event} ${r.state}`),
       ["Universal FILE_COMMENT exists", "Universal FILE_UPDATE created", "Training FILE_COMMENT created", "Training FILE_UPDATE created"],
     );
+  });
+
+  it("brings the six teams to their 12 — the 11 #895 left — and a re-run creates none (#896)", async () => {
+    const toml = readFileSync(join(process.cwd(), "wrangler.toml"), "utf8");
+    const six = figmaTeamsFrom(/^FIGMA_TEAM_IDS = "([^"\r\n]*)"/m.exec(toml)![1]);
+    // #895's one subscription is already there.
+    const figma = await figmaWith({ team: UNIVERSAL, event: "FILE_COMMENT" });
+    const run = (create: boolean) =>
+      ensureSubscriptions({ figma, teams: selectTeams(six, "all"), events: SUBSCRIBABLE, endpoint: ENDPOINT, passcode: PASSCODE, create });
+    const tally = (rows: { state: string }[]) => rows.reduce<Record<string, number>>((n, r) => ({ ...n, [r.state]: (n[r.state] ?? 0) + 1 }), {});
+
+    assert.deepEqual(tally((await run(false)).rows), { exists: 1, missing: 11 });
+    const made = await run(true);
+    assert.deepEqual(tally(made.rows), { exists: 1, created: 11 });
+    assert.equal(made.stopped, false);
+    const again = await run(true);
+    assert.deepEqual(tally(again.rows), { exists: 12 });
+    assert.equal(figma.writes().length, 1 + 11, "the re-run created nothing");
+    assert.equal(new Set(again.rows.map((r) => `${r.team} ${r.event}`)).size, 12, "one per team and event");
+  });
+
+  it("creates a team's first while it has room, refuses its second at Figma's limit, and stops", async () => {
+    const figma = createInMemoryFigma();
+    for (let i = 0; i < MAX_WEBHOOKS_PER_TEAM - 1; i++) {
+      await figma.createWebhook({ event_type: "FILE_UPDATE", context: "team", context_id: TRAINING.id, endpoint: `https://x.example/${i}`, passcode: "p" });
+    }
+    const report = await ensureSubscriptions({ figma, teams: [TRAINING, UNIVERSAL], events: SUBSCRIBABLE, endpoint: ENDPOINT, passcode: PASSCODE, create: true });
+    assert.deepEqual(report.rows.map((r) => `${r.team} ${r.event} ${r.state}`), ["Training FILE_COMMENT created", "Training FILE_UPDATE refused"]);
+    assert.equal(report.stopped, true, "Universal is not tried");
   });
 
   it("lists a subscription pointing elsewhere and leaves it alone", async () => {

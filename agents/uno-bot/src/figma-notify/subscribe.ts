@@ -8,11 +8,11 @@
 // subscription pointing anywhere else is listed as someone else's and left
 // alone.
 //
-// ONE AT A TIME, as #884 settled. The first run creates FILE_COMMENT on
-// Universal and nothing else; the PING Figma sends a new subscription, and one
-// live comment, are checked in `status` before the rest (#896). A creation that
-// fails stops the run there, so setup cannot half-break across teams. A new
-// subscription is created ACTIVE, so that Figma sends the PING.
+// ONE STEP, THEN THE REST, as #884 settled. #895's run created FILE_COMMENT on
+// Universal alone, and its PING was checked in `status`. The rest — both
+// events on all six teams, 12 in all (#896) — are one run of the defaults. A
+// creation that fails stops the run there, so setup cannot half-break across
+// teams. A new subscription is created ACTIVE, so that Figma sends the PING.
 //
 // WHAT IS PRINTED. Team names, events, webhook ids, statuses, and for each
 // delivery its time, event type, Figma's answer and any error. Never a
