@@ -21,6 +21,7 @@
 
 import type { Env } from "../types";
 import { postMessage, slackCall } from "./api";
+import { toPlainText } from "./mrkdwn";
 import type { SessionStatus, StatusResult } from "./session-status";
 import { threadStateFor } from "../thread-state/production";
 import { getSlackAccessTokenFor, slackConnectUrl } from "../oauth/slack";
@@ -172,8 +173,35 @@ export async function renameSession(
   await slackCall(env, "agents.sessions.rename", {
     channel_id: channel,
     thread_ts,
-    title,
+    title: sessionTitle(title),
   });
+}
+
+/** A title `agents.sessions.rename` will take.
+ *
+ *  Slack refuses anything else with `invalid_name`, which its reference glosses
+ *  as "The `title` value is not valid for a channel name" — even for a session
+ *  in a DM thread, which has no channel to rename. Production logged that on
+ *  every DM turn while the asks were plain sentences: a colon, an apostrophe, a
+ *  question mark, the `…` a shortened question ends with, and the Claude app's
+ *  `*Sent using* <@U…|Claude>` footer. Slack does not say which character it
+ *  objected to, so the title keeps only what both of its statements allow: a
+ *  channel name's letters, numbers, hyphens and underscores, at most 80 of
+ *  them, and the capitals and spaces its own example title ("Bora Bora trip
+ *  prep") shows passing. Markup reads as its words first, so a mention leaves
+ *  its label rather than a user id. An apostrophe closes up (`what's` →
+ *  `whats`); every other character becomes a space. */
+const SESSION_TITLE_MAX = 80;
+export function sessionTitle(text: string): string {
+  const words = toPlainText(text)
+    .replace(/['\u2019]/g, "")
+    .replace(/[^\p{L}\p{N}_-]+/gu, " ")
+    .trim();
+  if (!/[\p{L}\p{N}]/u.test(words)) return "Chat with UNO Bot";
+  if (words.length <= SESSION_TITLE_MAX) return words;
+  const cut = words.slice(0, SESSION_TITLE_MAX + 1);
+  const brk = cut.lastIndexOf(" ");
+  return (brk > SESSION_TITLE_MAX / 2 ? cut.slice(0, brk) : cut.slice(0, SESSION_TITLE_MAX)).trim();
 }
 
 /** One-line, model-facing description of the open surface — only the channel is
