@@ -396,12 +396,30 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   let planCurrent = { id: "understand", title: "" };
   let planStep = 0;
 
-  /** Mark the in-progress card and forget the stream, so nothing re-uses it. */
+  // EVERY update to the open plan stream goes through this one chain, and each
+  // link is caught. Two reasons, both seen with fire-and-forget appends: a
+  // refused or thrown append with no catch is an unhandled rejection in the
+  // Worker, and two appends in flight at once can land in either order — a
+  // card's "complete" arriving after the next card's "in progress" reads as a
+  // step that finished before it started. A link waits for the one before it,
+  // so Slack receives updates in the order they were issued; a link that fails
+  // is swallowed, so the chain itself never rejects and the next link still
+  // runs. Whoever settles the stream awaits the chain first.
+  let planChain: Promise<void> = Promise.resolve();
+
+  /** Queue one task update behind every update already issued. */
+  const sendTask = (ts: string, task: PlanTask): Promise<void> => {
+    planChain = planChain.then(() => slack.appendTask(channel, ts, task)).catch(() => {});
+    return planChain;
+  };
+
+  /** Mark the in-progress card, wait for every queued update to land, and
+   *  forget the stream, so nothing re-uses it. */
   const settlePlan = async (status: "complete" | "error"): Promise<string | null> => {
     if (!planTs) return null;
     const ts = planTs;
-    await slack.appendTask(channel, ts, { ...planCurrent, status }).catch(() => {});
     planTs = null;
+    await sendTask(ts, { ...planCurrent, status });
     return ts;
   };
 
@@ -506,9 +524,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       planTs = await slack.startStream(channel, replyTs, target.userId, target.team);
       if (!planTs) return;
       planCurrent = { id: "understand", title: label };
-      await slack
-        .appendTask(channel, planTs, { ...planCurrent, status: "in_progress" })
-        .catch(() => {});
+      await sendTask(planTs, { ...planCurrent, status: "in_progress" });
     },
 
     endProgress,
@@ -518,10 +534,13 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         // Each narration line is its own card, and the previous one is closed
         // by re-sending its id with status complete — that is what makes it
         // read as progress rather than as a list of things all still happening.
+        // Both go through the chain, so the close lands before the open and
+        // neither can escape as a rejection; `postInterim` stays
+        // fire-and-forget because the chain is awaited by whoever settles it.
         const open = planTs;
-        void slack.appendTask(channel, open, { ...planCurrent, status: "complete" });
+        void sendTask(open, { ...planCurrent, status: "complete" });
         planCurrent = { id: `step-${++planStep}`, title: text.slice(0, 120) };
-        void slack.appendTask(channel, open, { ...planCurrent, status: "in_progress" });
+        void sendTask(open, { ...planCurrent, status: "in_progress" });
         return;
       }
       void slack

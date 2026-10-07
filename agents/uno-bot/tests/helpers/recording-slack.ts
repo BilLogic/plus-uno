@@ -76,12 +76,23 @@ export interface RecordingSlackOptions {
   /** Throw out of the answer post, so the adapter's "close the stream nobody
    *  else holds" path is reachable. */
   answerThrows?: unknown;
+  /** How long the Nth task update (0-based) takes to come back, in ms. A
+   *  schedule where an early update is slow and a later one fast is a client
+   *  that resolves out of order — the shape that let a card's "complete" land
+   *  after the next card's "in progress" while updates were fire-and-forget. */
+  taskDelayMs?: (index: number) => number;
+  /** Reject every task update, the way a refused or thrown append arrives. */
+  taskRejects?: unknown;
 }
 
 export interface RecordingSlack {
   client: SlackDeliveryClient;
   /** Everything Slack was asked to do, in order. */
   calls: SlackCall[];
+  /** Every call in the order it LANDED — a task update when its promise
+   *  settled, everything else when it was made. With a slow client this is
+   *  what Slack actually received, which `calls` (the order of asking) is not. */
+  landed: SlackCall[];
   /** Every `[working]` line reported, in order. */
   lines: WorkingLine[];
   /** The adapter's dependencies, with this client in them. */
@@ -92,19 +103,26 @@ export interface RecordingSlack {
 
 export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack {
   const calls: SlackCall[] = [];
+  const landed: SlackCall[] = [];
   const lines: WorkingLine[] = [];
   let posted = 0;
+  let tasks = 0;
+  // Every call but a task update lands the moment it is made.
+  const record = (call: SlackCall): void => {
+    calls.push(call);
+    if (call.kind !== "task") landed.push(call);
+  };
 
   const client: SlackDeliveryClient = {
     async addReaction(channel, ts, name) {
-      calls.push({ kind: "react", channel, ts, name });
+      record({ kind: "react", channel, ts, name });
     },
     async removeReaction(channel, ts, name) {
-      calls.push({ kind: "unreact", channel, ts, name });
+      record({ kind: "unreact", channel, ts, name });
     },
     async postMessage(input) {
       const blocks = !!input.blocks;
-      calls.push({
+      record({
         kind: "message",
         channel: input.channel,
         ...(input.thread_ts === undefined ? {} : { threadTs: input.thread_ts }),
@@ -115,7 +133,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       return { ok: true, ts: `posted-${++posted}` };
     },
     async postAnswer(input) {
-      calls.push({
+      record({
         kind: "answer",
         channel: input.channel,
         ...(input.threadTs === undefined ? {} : { threadTs: input.threadTs }),
@@ -129,7 +147,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       return { ok: true, text: input.text };
     },
     async postFailure(input) {
-      calls.push({
+      record({
         kind: "failure",
         channel: input.channel,
         ...(input.threadTs === undefined ? {} : { threadTs: input.threadTs }),
@@ -138,7 +156,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       });
     },
     async startStream(channel, threadTs, userId, team) {
-      calls.push({
+      record({
         kind: "startStream",
         channel,
         threadTs,
@@ -148,24 +166,30 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       return opts.streamTs === undefined ? "stream-1" : opts.streamTs;
     },
     async appendTask(channel, ts, task) {
-      calls.push({ kind: "task", channel, ts, task });
+      const call: SlackCall = { kind: "task", channel, ts, task };
+      record(call);
+      const delay = opts.taskDelayMs?.(tasks++) ?? 0;
+      if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
+      landed.push(call);
+      if (opts.taskRejects !== undefined) throw opts.taskRejects;
     },
     async stopStream(channel, ts) {
-      calls.push({ kind: "stopStream", channel, ts });
+      record({ kind: "stopStream", channel, ts });
     },
     async setSessionStatus(channel, threadTs, status) {
-      calls.push({ kind: "status", channel, threadTs, status });
+      record({ kind: "status", channel, threadTs, status });
       if (opts.statusThrows !== undefined) throw opts.statusThrows;
       return opts.status ?? { ok: true };
     },
     async renameSession(channel, threadTs, title) {
-      calls.push({ kind: "rename", channel, threadTs, title });
+      record({ kind: "rename", channel, threadTs, title });
     },
   };
 
   return {
     client,
     calls,
+    landed,
     lines,
     deps: (planStream = false) => ({
       slack: client,
