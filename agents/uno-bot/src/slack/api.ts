@@ -319,11 +319,16 @@ export async function postMessage(env: Env, input: PostMessageInput) {
  *  together as a checklist that fills in. See startStream's plan-mode note. */
 export type TaskDisplayMode = "timeline" | "plan" | "dense";
 
-/** A `task_update` chunk — one step in the plan, updated in place by `id`. */
+/** The statuses Slack takes on a task card. Its typings list `pending` too;
+ *  the API answers that with `invalid_arguments`, so it is not one of them. */
+export type TaskStatus = "in_progress" | "complete" | "error";
+
+/** A `task_update` chunk — one step in the plan, updated in place by `id`.
+ *  Its text is plain text, already passed (`mrkdwn.ts` § `toPlainText`). */
 export interface TaskChunk {
   id: string;
   title: string;
-  status: "pending" | "in_progress" | "complete" | "error";
+  status: TaskStatus;
   details?: string;
   output?: string;
   /** Links the step read, already filtered to what the thread may see. */
@@ -468,12 +473,11 @@ export async function appendTasks(
       chunks: tasks.map((task) => ({
         type: "task_update",
         id: task.id,
-        title: task.title.slice(0, 250),
+        title: chunkText(task.title),
         status: task.status,
-        ...(task.details ? { details: taskDetails(task.details) } : {}),
-        ...(task.output ? { output: taskDetails(task.output) } : {}),
-        // A source's name takes the same pass as `details`.
-        ...cardLinks(task, taskDetails),
+        ...(task.details ? { details: chunkText(task.details) } : {}),
+        ...(task.output ? { output: chunkText(task.output) } : {}),
+        ...cardLinks(task, chunkText),
       })),
     });
     return !!res.ok;
@@ -499,18 +503,15 @@ export async function setPlanTitle(env: Env, channel: string, ts: string, title:
 }
 
 /**
- * A task card's `details` or `output`, through the markup pass and within the
- * 256-char chunk limit.
+ * A task card's plain text, within the 256-char chunk limit.
  *
- * Slack documents a task card's `title` as plain text (the task card block
- * reference, which the `task_update` chunk "looks mighty similar to"), so the
- * title goes as written. The chunk's `details` and `output` are bare strings
- * whose format no page names — the block's are rich text — so they take the
- * pass: an escaped `&lt;` read literally is a blemish, a blanked card is not.
- * Cut after escaping, and never inside an entity or a kept `<…>`.
+ * Slack shows a card's title, `details`, `output` and a source's name as plain
+ * text, so they arrive already through the plain-text pass (the adapter runs
+ * `toPlainText` on every word as it enters a card) and take no markup pass
+ * here: the mrkdwn escaper turned a source's `&` into a visible `&amp;`.
  */
-function taskDetails(details: string): string {
-  return sanitizeSlackMarkup(details).slice(0, 250).replace(/&[a-z]{0,3}$|<[^>]*$/, "");
+function chunkText(text: string): string {
+  return text.slice(0, 250);
 }
 
 /** Close the stream. Blocks are only accepted here — which is why the feedback

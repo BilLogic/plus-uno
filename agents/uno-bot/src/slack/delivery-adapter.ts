@@ -14,14 +14,16 @@
 //     thread at all (#576);
 //   • the checklist (CONTEXT.md). With the plan-stream switch on, a substantive
 //     turn opens a stream in `task_display_mode: "plan"` and each lookup the
-//     turn makes lands as a task card — queued pending, in progress while it
-//     runs, complete or error when it lands — with the narration that
-//     introduced it as its details, so the person reads one filling-in
-//     checklist instead of loose messages. Off, narration is a small ⏳
-//     message and lookups show nothing. Which it is has never been the turn's
-//     business, and now it cannot be;
-//   • the answer closing the stream the checklist lives in, rather than opening
-//     a second one beside it.
+//     turn makes lands as a task card — in progress when it starts, complete
+//     or error when it lands — with the narration that introduced it as its
+//     details, so the person reads one filling-in checklist instead of loose
+//     messages. Off, narration is a small ⏳ message and lookups show
+//     nothing. Which it is has never been the turn's business, and now it
+//     cannot be;
+//   • the answer posted BENEATH the checklist once its stream is stopped.
+//     Closing the stream into the answer was the first design, and Slack
+//     refuses it: a stream opened in plan mode takes task and plan chunks, and
+//     the answer's markdown appended into it is `streaming_mode_mismatch`.
 //
 // AND THE TWO THINGS A PERSON ACTS ON, since #623: the proposal card and a
 // gate verdict both arrive as data and are spelled on the way out —
@@ -66,6 +68,7 @@ import { turnSurfaceOf } from "../turn/request";
 import type { FooterKind } from "./footer-kind";
 import type { SlackMessageMetadata } from "./api";
 import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
+import { toPlainText } from "./mrkdwn";
 import { renderGateNote } from "./gate-note";
 import { planBlock } from "./plan-block";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
@@ -110,12 +113,17 @@ export interface SlackDeliveryTarget {
 
 /** One card in the plan stream's checklist. Structurally `api.ts`'s
  *  `TaskChunk`, restated here so the pure adapter does not import the module
- *  that holds `Env`. Text goes as the card means it; the client is what puts
- *  it through Slack's markup pass and chunk limit. */
+ *  that holds `Env`. Its text is plain text, already through `toPlainText`;
+ *  the client only holds it to Slack's chunk limit.
+ *
+ *  `status` is the three Slack takes. A call announced but not yet started is
+ *  `pending` in the adapter's own bookkeeping (`Card` below) and is never
+ *  sent: Slack answers `pending` with `invalid_arguments`, and the type is
+ *  what keeps it from being sent again. */
 export interface PlanTask {
   id: string;
   title: string;
-  status: "pending" | "in_progress" | "complete" | "error";
+  status: "in_progress" | "complete" | "error";
   /** The line under the title — the narration that introduced the card. */
   details?: string;
   /** What came of it — "4 pages", or the short reason a card ended in error. */
@@ -125,6 +133,11 @@ export interface PlanTask {
   /** The image URL of the card's logo (`estate-logos.ts`), or none. */
   icon?: string;
 }
+
+/** A card as the adapter keeps it: a `PlanTask`, or a call announced and not
+ *  yet started — kept so its place, title and details are ready when it
+ *  starts, and so a call that never runs can settle as "Not run". */
+type Card = Omit<PlanTask, "status"> & { status: PlanTask["status"] | "pending" };
 
 /** The card a checklist opens with, titled with the turn's progress label and
  *  closed when the first lookup starts. */
@@ -152,7 +165,8 @@ const HEADING_CHARS = 256;
  * @param ask - The person's message, whole
  */
 export function checklistHeading(ask: string): string {
-  const oneLine = ask.replace(/\s+/g, " ").trim();
+  // Plain text first, then the cut: the limit is on what Slack shows.
+  const oneLine = toPlainText(ask).replace(/\s+/g, " ").trim();
   if (oneLine.length <= HEADING_CHARS) return oneLine;
   const cut = oneLine.slice(0, HEADING_CHARS - 1);
   const brk = cut.lastIndexOf(" ");
@@ -202,15 +216,14 @@ export interface SlackDeliveryClient {
   }): Promise<{ ok: boolean; ts?: string }>;
   /** The answer, rendered, footered, split across messages and verified —
    *  `slack/delivery.ts` § `postTextVerified`. Reports what it POSTED, which
-   *  is not what it was handed. */
+   *  is not what it was handed. It takes no stream of the checklist's: the
+   *  answer is markdown, and a plan-mode stream refuses markdown. */
   postAnswer(input: {
     channel: string;
     threadTs?: string;
     text: string;
     recipient: { userId: string; team?: string };
     footerHint?: FooterKind;
-    /** ts of a stream already open for this turn: the answer closes it. */
-    openStreamTs?: string;
   }): Promise<{ ok: boolean; text: string }>;
   /** The visible failure: the ❌ and the message that says how far it got. */
   postFailure(input: {
@@ -474,8 +487,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   let planMode: "stream" | "static" = "stream";
   /** The static checklist's heading, kept for the rewrite. */
   let planTitle = "";
-  /** Every card on the checklist, by id, as it was last sent. */
-  const cards = new Map<string, PlanTask>();
+  /** Every card on the checklist, by id, as it was last sent — or, while
+   *  pending, as it will be sent when its call starts. */
+  const cards = new Map<string, Card>();
   /** The one card in progress, if any. */
   let running: string | null = null;
   /** Narration waiting for the card it introduces. */
@@ -499,17 +513,22 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   // last — and closing one card while opening the next costs one call, not two.
   // Two updates to one card in a burst collapse to the later one; a card keeps
   // the place its first update gave it.
+  //
+  // A PENDING CARD IS KEPT, NOT SENT. Slack's task status is in progress,
+  // complete or error; `pending` is refused (`invalid_arguments`, the whole
+  // append with it). So an announced call waits here, and its card first
+  // reaches Slack in progress, when the call starts.
   let planChain: Promise<void> = Promise.resolve();
   const outbox = new Map<string, PlanTask>();
   let linkQueued = false;
 
   /** Record a card's new state and queue it behind every update already issued. */
-  const update = (ts: string, task: PlanTask): Promise<void> => {
-    cards.set(task.id, task);
+  const update = (ts: string, card: Card): Promise<void> => {
+    cards.set(card.id, card);
     // A static checklist is only rewritten at settle: the card's new state is
-    // kept, and nothing is sent.
-    if (planMode === "static") return planChain;
-    outbox.set(task.id, task);
+    // kept, and nothing is sent. Nor is a pending card, on either path.
+    if (planMode === "static" || card.status === "pending") return planChain;
+    outbox.set(card.id, { ...card, status: card.status });
     if (!linkQueued) {
       linkQueued = true;
       planChain = planChain
@@ -525,7 +544,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   };
 
   /** Move a card that is on the checklist to a new status. */
-  const move = (ts: string, id: string, status: PlanTask["status"], extra: Partial<PlanTask> = {}): void => {
+  const move = (ts: string, id: string, status: Card["status"], extra: Partial<PlanTask> = {}): void => {
     const card = cards.get(id);
     if (!card) return;
     if (running === id && status !== "in_progress") running = null;
@@ -534,19 +553,19 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
 
   // THE CAP. The first `TASK_CARD_CAP` calls get a card each; every call after
   // them folds into one overflow card, whose count is how many it holds and
-  // whose status is theirs taken together — pending while none has started,
-  // complete or error once all have settled (error if any erred), in progress
-  // in between. So the checklist never holds more than cap + 1 tool cards, and
+  // whose status is theirs taken together — pending (so kept, not sent) while
+  // none has started, complete or error once all have settled (error if any
+  // erred), in progress in between. So the checklist never holds more than cap + 1 tool cards, and
   // a folded call's transitions cost what any card's do: one append each.
   /** Each folded call's status, by the card id it would have had. */
-  const folded = new Map<string, PlanTask["status"]>();
+  const folded = new Map<string, Card["status"]>();
 
   /** Re-send the overflow card from the calls folded into it. */
   const sendOverflow = (ts: string): void => {
     const states = [...folded.values()];
     const settled = states.filter((s) => s === "complete" || s === "error");
     const failed = states.filter((s) => s === "error").length;
-    const status: PlanTask["status"] = states.every((s) => s === "pending")
+    const status: Card["status"] = states.every((s) => s === "pending")
       ? "pending"
       : settled.length === states.length
         ? failed
@@ -566,7 +585,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
    * Put a call on the checklist if it is not there yet — its own card while
    * there is room, the overflow card after — and say which card is its.
    */
-  const admit = (ts: string, id: string, card: PlanTask): string => {
+  const admit = (ts: string, id: string, card: Card): string => {
     if (folded.has(id)) return OVERFLOW_CARD;
     if (cards.has(id)) return id;
     const own = [...cards.keys()].filter((k) => k !== OPENING_CARD && k !== OVERFLOW_CARD).length;
@@ -580,7 +599,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   };
 
   /** Move a call's card — its own, or its share of the overflow card. */
-  const moveCall = (ts: string, id: string, status: PlanTask["status"], extra: Partial<PlanTask> = {}): void => {
+  const moveCall = (ts: string, id: string, status: Card["status"], extra: Partial<PlanTask> = {}): void => {
     if (folded.has(id)) {
       folded.set(id, status);
       sendOverflow(ts);
@@ -590,7 +609,8 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   };
 
   /** Settle every card still open, wait for every queued update to land, and
-   *  forget the stream, so nothing re-uses it.
+   *  forget the checklist, so nothing re-uses it. A stream's ts comes back for
+   *  the caller to stop; a static checklist is rewritten here and returns none.
    *
    *  A card still in progress settles with the turn. A card still PENDING is
    *  a lookup that never ran — a stopped turn answers with some queued — so it
@@ -610,8 +630,10 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // The one rewrite, with every card's final state. Best-effort like every
       // card update: a checklist that would not settle is not worth a turn.
       // Nothing for an answer to close, so the answer posts beneath it.
+      // Every card has settled above, so none is pending any more.
+      const settled = [...cards.values()].filter((c): c is PlanTask => c.status !== "pending");
       await slack
-        .updateMessage({ channel, ts, text: planTitle, blocks: [planBlock(planTitle, [...cards.values()])] })
+        .updateMessage({ channel, ts, text: planTitle, blocks: [planBlock(planTitle, settled)] })
         .catch(() => {});
       return null;
     }
@@ -787,13 +809,19 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       const ts = planTs;
       const id = `tool-${event.seq}`;
       const icon = estateLogo(words.estate, event.args);
+      // EVERY WORD ON A CARD IS PLAIN TEXT, passed once as it arrives here —
+      // the narration, the query, a tool's output or error, a source's name.
+      // Slack shows these fields unparsed, so markup is turned into the words
+      // it shows rather than escaped (`mrkdwn.ts` § `toPlainText`, which also
+      // says why that is as safe as the escaper against a blanked message).
+      // Once, here, because the pass decodes entities and is not idempotent.
       /** The card as a call first puts it on the checklist. */
-      const fresh: PlanTask = { id, title: words.title, status: "pending", ...(icon ? { icon } : {}) };
+      const fresh: Card = { id, title: toPlainText(words.title), status: "pending", ...(icon ? { icon } : {}) };
       switch (event.phase) {
         case "announced": {
           // What the call looks for, after the narration that introduced it.
           const query = readoutFor(event.name)?.details(event.args) ?? null;
-          const details = [heldDetails, query].filter(Boolean).join(" · ");
+          const details = toPlainText([heldDetails, query].filter(Boolean).join(" · "));
           heldDetails = null;
           admit(ts, id, { ...fresh, ...(details ? { details } : {}) });
           return;
@@ -810,46 +838,40 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         }
         case "finished": {
           if (event.error) {
-            moveCall(ts, id, "error", { output: shortReason(event.error) });
+            moveCall(ts, id, "error", { output: shortReason(toPlainText(event.error)) });
             return;
           }
           // A call folded into the overflow card has no card of its own to
           // carry a readout; only its status counts there.
-          const { output } = event;
-          const sources = threadVisibleSources(event.sources ?? []);
+          const output = event.output ? toPlainText(event.output) : "";
+          const sources = threadVisibleSources(event.sources ?? []).map((s) => ({ ...s, text: toPlainText(s.text) }));
           moveCall(ts, id, "complete", { ...(output ? { output } : {}), ...(sources.length ? { sources } : {}) });
           return;
         }
         case "refused":
-          moveCall(ts, id, "error", { output: shortReason(event.reason) });
+          moveCall(ts, id, "error", { output: shortReason(toPlainText(event.reason)) });
           return;
       }
     },
 
     async postAnswer(text): Promise<PostResult> {
-      // The answer CLOSES the checklist's stream instead of opening a second
-      // one beside it.
-      const openStream = await settlePlan("complete");
-      try {
-        const posted = await slack.postAnswer({
-          channel,
-          threadTs: replyTs,
-          text,
-          // The recipient pair. The plan stream above has always passed it;
-          // the answer path could not, because this was the only place holding
-          // the ids and it never handed them over (#572).
-          recipient: { userId: target.userId, team: target.team },
-          footerHint: target.footerHint,
-          ...(openStream ? { openStreamTs: openStream } : {}),
-        });
-        return { ok: posted.ok, text: posted.text };
-      } catch (err) {
-        // The stream was handed over to be closed INTO the answer. If the post
-        // threw before it got there, nobody else holds its ts — and a stream
-        // left open renders as a live "typing" bubble that never settles.
-        if (openStream) await slack.stopStream(channel, openStream).catch(() => {});
-        throw err;
-      }
+      // The checklist settles and its stream stops FIRST, then the answer
+      // posts beneath it the ordinary way. The stream's ts is not handed on:
+      // the answer is markdown, and markdown appended into a stream opened in
+      // plan mode is refused (`streaming_mode_mismatch`) — after which the
+      // answer path stopped the stream, stopped it again, and posted anyway.
+      await endProgress("complete");
+      const posted = await slack.postAnswer({
+        channel,
+        threadTs: replyTs,
+        text,
+        // The recipient pair. The plan stream above has always passed it;
+        // the answer path could not, because this was the only place holding
+        // the ids and it never handed them over (#572).
+        recipient: { userId: target.userId, team: target.team },
+        footerHint: target.footerHint,
+      });
+      return { ok: posted.ok, text: posted.text };
     },
 
     postNote,

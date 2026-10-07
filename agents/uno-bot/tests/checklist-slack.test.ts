@@ -61,7 +61,7 @@ async function threeLookups(delivery: ReturnType<typeof deliveryAdapter>): Promi
 }
 
 describe("the checklist", () => {
-  it("queues every announced call as pending, runs one at a time, and spends one append per transition", async () => {
+  it("opens each card in progress when its call starts, runs one at a time, and spends one append per transition", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
@@ -71,13 +71,18 @@ describe("the checklist", () => {
 
     assert.deepEqual(appends(slack), [
       ["understand:in_progress"],
-      // The batch arrives as one call: the first card already running, the
-      // other two queued, and the opening card closed beside them.
-      ["tool-1:in_progress", "tool-2:pending", "tool-3:pending", "understand:complete"],
+      // The batch arrives as one call: the opening card closed and the first
+      // card running. The two calls announced beside it have no card yet —
+      // Slack refuses a `pending` one — and each appears when it starts.
+      ["understand:complete", "tool-1:in_progress"],
       ["tool-1:complete", "tool-2:in_progress"],
       ["tool-2:complete", "tool-3:in_progress"],
       ["tool-3:complete"],
     ]);
+    // No status Slack refuses ever leaves.
+    for (const call of slack.of("tasks")) {
+      assert.ok(call.tasks.every((t) => ["in_progress", "complete", "error"].includes(t.status)));
+    }
     // Never two cards in progress in the same append.
     for (const call of slack.of("tasks")) {
       assert.ok(call.tasks.filter((t) => t.status === "in_progress").length <= 1);
@@ -86,8 +91,11 @@ describe("the checklist", () => {
     const titles = new Map(slack.of("tasks").flatMap((c) => c.tasks.map((t) => [t.id, t.title] as const)));
     assert.equal(titles.get("tool-2"), "Searching Notion");
     assert.equal(titles.get("tool-3"), "Searching the blueprint");
-    // The answer closes the stream the checklist lives in.
-    assert.deepEqual(slack.of("answer").map((a) => a.openStreamTs), ["stream-1"]);
+    // The checklist's stream stops once, and the answer posts beneath it.
+    assert.deepEqual(
+      slack.calls.filter((c) => c.kind === "stopStream" || c.kind === "answer").map((c) => c.kind),
+      ["stopStream", "answer"],
+    );
   });
 
   it("settles a failed lookup as an error card with a short reason, and a refused one too", async () => {
@@ -119,7 +127,13 @@ describe("the checklist", () => {
     await tick();
     await delivery.endProgress("error");
 
+    // The running card settles with the turn; the two that never started
+    // appear for the first time as not run.
     assert.deepEqual(appends(slack).at(-1), ["tool-1:error", "tool-2:error", "tool-3:error"]);
+    assert.deepEqual(
+      slack.of("tasks").at(-1)!.tasks.map((t) => t.output),
+      [undefined, "Not run", "Not run"],
+    );
     assert.equal(slack.calls.at(-1)!.kind, "stopStream");
   });
 

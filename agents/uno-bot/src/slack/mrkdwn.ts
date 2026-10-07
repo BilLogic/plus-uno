@@ -84,6 +84,60 @@ export function sanitizeSlackBlocks<T>(blocks: T): T {
 }
 
 /**
+ * Text for a field Slack shows as PLAIN TEXT — a checklist's heading, a task
+ * card's title, `details` and `output`, a source's name — written as the words
+ * a reader would have seen in a message.
+ *
+ * Plain text is not parsed: Slack shows `<@U…>` and `&amp;` exactly as sent,
+ * so `sanitizeSlackMarkup` — which keeps valid markup and escapes the rest —
+ * is the wrong pass there (live 2026-10-07: a heading read `*Sent using*
+ * <@U0ASFR2RJ9W>`, a source `Employment &amp; Access`). Instead:
+ *
+ *   • `<@U…|name>` → `@name`, a bare `<@U…>` → `@someone`; `<#C…|name>` →
+ *     `#name`, a bare `<#C…>` → `#channel`; `<!here>` → `@here`;
+ *     `<url|label>` → `label`, a bare `<url>` → the url; anything else in
+ *     angle brackets → what is inside them;
+ *   • the `*`, `_`, `~` and backtick emphasis markers go — a marker between
+ *     two word characters (`slack_search`) is part of the word and stays;
+ *   • `&amp;`, `&lt;` and `&gt;` decode to their characters, in one pass, so
+ *     `&amp;lt;` reads `&lt;` rather than `<`.
+ *
+ * WHY THIS IS SAFE where the escaper was needed: markup Slack cannot parse
+ * blanks a whole message (docs/connectors/slack.md § Streamed text, and
+ * `sanitizeSlackMarkup` above), and this pass removes every `<…>` before
+ * anything is sent — the angle markup becomes words, and the only `<` or `>`
+ * left is one an entity decoded to, into a field Slack does not parse.
+ *
+ * Not idempotent — a decoded `&amp;amp;` decodes again — so it runs once, on
+ * text as it arrives, never on a card already passed. Cut AFTER it: the limit
+ * is on what is shown.
+ */
+export function toPlainText(text: string): string {
+  return text
+    .replace(/<([^<>\n]*)>/g, (_match, inner: string) => plainMarkup(inner))
+    .replace(/[*_~`]+/g, (run: string, offset: number, all: string) =>
+      /\w/.test(all[offset - 1] ?? "") && /\w/.test(all[offset + run.length] ?? "") ? run : "",
+    )
+    .replace(/&(amp|lt|gt);/g, (_match, name: string) => (name === "amp" ? "&" : name === "lt" ? "<" : ">"));
+}
+
+/** One `<…>` as the words it shows. */
+function plainMarkup(inner: string): string {
+  const bar = inner.indexOf("|");
+  const target = bar < 0 ? inner : inner.slice(0, bar);
+  const label = bar < 0 ? "" : inner.slice(bar + 1).trim();
+  if (target.startsWith("@")) return `@${label.replace(/^@/, "") || "someone"}`;
+  if (target.startsWith("#")) return `#${label.replace(/^#/, "") || "channel"}`;
+  if (target.startsWith("!")) {
+    if (label) return label;
+    const special = /^!(here|channel|everyone)$/.exec(target);
+    return special ? `@${special[1]}` : "";
+  }
+  if (label) return label;
+  return target.replace(/^mailto:/, "");
+}
+
+/**
  * Where a stream's markup pass stands between two appends: the tail it has not
  * sent yet, and whether the text sent so far ends a line.
  */

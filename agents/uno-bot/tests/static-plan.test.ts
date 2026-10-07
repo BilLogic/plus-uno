@@ -90,8 +90,11 @@ describe("static checklist in a top-level DM", () => {
       elements: [{ type: "rich_text_section", elements: [{ type: "text", text: "Notion said no" }] }],
     });
 
-    const [answer] = slack.of("answer");
-    assert.equal(answer!.openStreamTs, undefined, "the answer is its own message, not a stream close");
+    // The answer is its own message, posted after the checklist settles.
+    assert.deepEqual(
+      slack.calls.filter((c) => c.kind === "update" || c.kind === "answer").map((c) => c.kind),
+      ["update", "answer"],
+    );
   });
 
   it("settles every open card to error when the turn ends on error", async () => {

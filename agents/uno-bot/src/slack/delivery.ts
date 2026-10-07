@@ -200,7 +200,6 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
  * @param text the answer body
  * @param recipient who a stream would be for
  * @param footerHint forces the footer variant; absent = classify from the body
- * @param openStreamTs ts of a stream already open for this turn (plan mode)
  */
 export async function postTextVerified(
   deps: PostingDeps,
@@ -217,22 +216,19 @@ export async function postTextVerified(
    *  under the PERSON'S name, and the standard "check before acting" line is
    *  wrong for that. Absent = classify from the body. */
   footerHint?: FooterKind,
-  /** ts of a stream already open for this turn (plan mode). When present the
-   *  answer CLOSES that stream instead of opening a new one. */
-  openStreamTs?: string,
 ): Promise<{ ok: boolean; text: string }> {
   const body = renderDeliveredBody(text);
   const footer = footerBlocks(footerKindFor(body, footerHint));
 
   const ok = await deliverAnswer(answerMessages(body), {
     async stream(piece, withFooter) {
-      if (!((openStreamTs || deps.streamingOn) && threadTs)) return false;
+      if (!(deps.streamingOn && threadTs)) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision
       // itself is `decideStream`. Until #572 the answer path passed neither
       // id, so a channel turn bought an `invalid_arguments` and a console.warn
       // on its way to the ordinary post it was going to make anyway.
-      const decision = decideStream(openStreamTs, recipient);
+      const decision = decideStream(recipient);
       if (!decision.open) {
         if (decision.missing !== "recipient") {
           const user = recipient?.userId || "MISSING";
@@ -245,20 +241,23 @@ export async function postTextVerified(
         }
         return false;
       }
-      const streamTs =
-        openStreamTs ??
-        (await deps.slack.startStream(channel, threadTs, recipient.userId, recipient.team));
+      const streamTs = await deps.slack.startStream(channel, threadTs, recipient.userId, recipient.team);
       if (!streamTs) return false;
+      // ONE STOP PER STREAM. A stream the first stop closed takes no second
+      // one — Slack answers it `message_not_in_streaming_state` — so the stop
+      // is repeated only when it failed or never ran, to leave nothing
+      // rendering as a live "typing" bubble.
+      let stopped = false;
       try {
         const appended = await deps.slack.appendStream(channel, streamTs, piece);
         const blocks = withFooter && footer.length ? footer : undefined;
-        const stopped = await deps.slack.stopStream(channel, streamTs, blocks);
+        stopped = await deps.slack.stopStream(channel, streamTs, blocks);
         if (appended && stopped) return true;
         console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
-        await deps.slack.stopStream(channel, streamTs).catch(() => {});
+        if (!stopped) await deps.slack.stopStream(channel, streamTs).catch(() => {});
         return false;
       } catch (err) {
-        await deps.slack.stopStream(channel, streamTs).catch(() => {});
+        if (!stopped) await deps.slack.stopStream(channel, streamTs).catch(() => {});
         throw err;
       }
     },
