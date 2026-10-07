@@ -17,7 +17,8 @@
 //   status  each subscription's newest deliveries and how the route answered —
 //           the PING, then the first live comment
 //
-// The defaults are #895's: Universal, FILE_COMMENT. The teams come from
+// The defaults are every team and both events — the 12 #896 asks for, of
+// which #895's run made the first. The teams come from
 // FIGMA_TEAM_IDS in wrangler.toml; the route from UNO_BOT_WORKER_URL, else the
 // production Worker (worker-url.mjs). FIGMA_ACCESS_TOKEN is required, and
 // FIGMA_WEBHOOK_PASSCODE for `create`; neither is ever printed.
@@ -46,7 +47,7 @@ export const ROUTE = "/figma/events";
  *   creates nothing
  */
 export function parseArgs(argv) {
-  const out = { action: "list", teams: "Universal", events: ["FILE_COMMENT"] };
+  const out = { action: "list", teams: "all", events: ["FILE_COMMENT", "FILE_UPDATE"] };
   for (let i = 0; i < argv.length; i += 2) {
     const flag = argv[i];
     const value = argv[i + 1];

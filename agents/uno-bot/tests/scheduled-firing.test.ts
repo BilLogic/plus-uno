@@ -50,6 +50,9 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
     "figma-library-poll",
     "card-follow-through",
     "figma-drift-recheck",
+    "figma-backstop",
+    "figma-backstop",
+    "figma-backstop",
     "usage-classify",
     "usage-classify",
     "usage-classify",
@@ -168,6 +171,10 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-library-poll", "figma-library-poll", undefined],
     ["card-follow-through", "card-follow-through", undefined],
     ["figma-drift-recheck", "figma-drift-recheck", undefined],
+    // The Figma backstop's sweep, in as many jobs as it may need (#896).
+    ["figma-backstop-1", "figma-backstop", undefined],
+    ["figma-backstop-2", "figma-backstop", undefined],
+    ["figma-backstop-3", "figma-backstop", undefined],
     // One job per classification batch.
     ["usage-classify-1", "usage-classify", undefined],
     ["usage-classify-2", "usage-classify", undefined],

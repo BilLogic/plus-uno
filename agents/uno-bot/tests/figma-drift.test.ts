@@ -24,6 +24,7 @@ import {
   MAX_LOOKS_PER_MORNING,
   MAX_RECHECKS_PER_RUN,
   recheckLiveAsks,
+  recheckOnUpdate,
   runDriftAsks,
   type DriftAnswerDeps,
   type DriftPostDeps,
@@ -1560,5 +1561,48 @@ describe("a question whose card was filed (#897 review)", () => {
     await recheckLiveAsks(RECHECK, r.deps);
     assert.deepEqual(r.edits, [], "neither says there is nothing to do");
     assert.deepEqual(await drifts.liveAsks(), []);
+  });
+});
+
+describe("a file-change notification (#896)", () => {
+  it("withdraws a caught-up question within its own job, the way the scheduled runs do", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    assert.equal(await drifts.liveFileUntil(`figma:${FILE_KEY}`), at(30, 13) + DRIFT_CARD_TTL_MS, "the ask marked its file");
+    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+
+    // The designer updates the frame that afternoon; Figma's FILE_UPDATE follows.
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(30, 19);
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    const report = await recheckOnUpdate(FILE_KEY, { ...r.deps, store: drifts });
+
+    assert.ok(report);
+    assert.deepEqual(r.edits.map((e) => [e.ts, e.text]), [[card!.proposalTs, "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."]]);
+    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+    assert.equal(m.posted.length, 1, "edited, not replied to");
+  });
+
+  it("costs one read for a file no live question names: no list, no Figma call", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const calls = m.figma.calls().length;
+    let listed = 0;
+    const store = { ...drifts, liveAsks: async () => ((listed += 1), drifts.liveAsks()) };
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    assert.equal(await recheckOnUpdate("SomeOtherFile9", { ...r.deps, store }), null);
+    assert.equal(listed, 0, "no live record was listed");
+    assert.equal(m.figma.calls().length, calls, "and Figma was not called");
+    assert.equal(r.provider.generated.length, 0);
+  });
+
+  it("looks no further once the question's 72 h are up", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    seedFigmaFile(m.figma, { changedAt: "2026-10-03T15:00:00Z", frameA: UPDATED });
+    h.clock.now = at(30, 13) + DRIFT_CARD_TTL_MS + 1;
+    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    assert.equal(await recheckOnUpdate(FILE_KEY, { ...r.deps, store: drifts }), null);
+    assert.deepEqual(r.edits, []);
   });
 });

@@ -7,8 +7,8 @@ import assert from "node:assert/strict";
 import { ROUTE, endpointFor, parseArgs } from "./figma-subscriptions.mjs";
 import { DEFAULT_WORKER_ORIGIN } from "./worker-url.mjs";
 
-test("defaults to #895's first step: list FILE_COMMENT on Universal", () => {
-  assert.deepEqual(parseArgs([]), { action: "list", teams: "Universal", events: ["FILE_COMMENT"] });
+test("defaults to the 12: list both events on every team (#896)", () => {
+  assert.deepEqual(parseArgs([]), { action: "list", teams: "all", events: ["FILE_COMMENT", "FILE_UPDATE"] });
 });
 
 test("reads every flag, in any case", () => {

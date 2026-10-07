@@ -24,6 +24,7 @@ import { cardTodoNoteHookFor, cardTodoThreadHookFor, runCardFollowThroughOnEnv }
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
+import { runBackstopOnEnv } from "../figma-notify/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
@@ -176,6 +177,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "figma-drift-recheck": async (env, job, { dryRun }) => {
     const report = await runDriftRecheckOnEnv(env, job, { dryRun });
     console.log(`[figma-drift] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // End of day, one of three: the next stretch of the folder listing that
+  // queues a Figma change no notification reported (src/figma-notify/backstop.ts).
+  "figma-backstop": async (env, job, { dryRun }) => {
+    const report = await runBackstopOnEnv(env, job, { dryRun });
+    console.log(`[figma-backstop] ${job.key}: ${report.summary}`);
     return report;
   },
   // Morning: the kickoff role map, rebuilt from the Notion Team Members

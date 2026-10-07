@@ -401,3 +401,35 @@ describe("the queued job", () => {
     assert.match(line, /^\[figma-notify\] FILE_COMMENT on FILEKEY1: comment 2, a reply to 1/);
   });
 });
+
+describe("the queued job's readers (#896)", () => {
+  const CHANGE = { eventId: "update:FILEKEY1:2026-10-03T18:00:00Z", type: "FILE_UPDATE" as const, webhookId: "3302", fileKey: "FILEKEY1", at: "2026-10-03T18:00:00Z" };
+
+  it("hands a file change to the drift re-check, and only a file change", async () => {
+    const seen: string[] = [];
+    const readers = {
+      onFileUpdate: async (fileKey: string) => {
+        seen.push(fileKey);
+        return "no live drift question names it";
+      },
+    };
+    const line = await runFigmaEventJob(CHANGE, readers);
+    await runFigmaEventJob({ eventId: "comment:2", type: "FILE_COMMENT", webhookId: "3301", fileKey: "FILEKEY1", commentId: "2" }, readers);
+    assert.deepEqual(seen, ["FILEKEY1"]);
+    assert.equal(line, "[figma-notify] FILE_UPDATE on FILEKEY1: a change at 2026-10-03T18:00:00Z — no live drift question names it");
+  });
+
+  it("logs a re-check that failed rather than throw it, since the scheduled runs look anyway", async () => {
+    const line = await runFigmaEventJob(CHANGE, {
+      onFileUpdate: async () => {
+        throw new Error("KV down");
+      },
+    });
+    assert.match(line, /the drift re-check failed, so the next scheduled run looks instead: KV down$/);
+  });
+
+  it("says when the backstop queued it", async () => {
+    const line = await runFigmaEventJob({ ...CHANGE, eventId: "backstop:FILEKEY1:2026-10-03T18:00:00Z", via: "backstop" });
+    assert.match(line, /^\[figma-notify\] FILE_UPDATE on FILEKEY1 \(from the backstop\): a change at /);
+  });
+});

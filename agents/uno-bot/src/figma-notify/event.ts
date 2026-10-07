@@ -79,6 +79,9 @@ export interface FigmaEventJob {
   parentId?: string;
   userId?: string;
   at?: string;
+  /** Set when the nightly backstop queued it for a change whose notification
+   *  never came (`./backstop.ts`); absent on a notification's own job. */
+  via?: "backstop";
 }
 
 /** A note in KV: the key, the time it records, how long it stays, and when it
