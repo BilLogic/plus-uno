@@ -31,11 +31,12 @@ async function lookup(
   await tick();
 }
 
-/** The card as Slack last saw it. */
+/** The card as Slack shows it: every update to it laid over the last, since a
+ *  card's text goes once and its later updates carry only what changed. */
 function lastCard(slack: RecordingSlack, id: string): PlanTask {
   const cards = slack.of("tasks").flatMap((call) => call.tasks).filter((t) => t.id === id);
   assert.ok(cards.length, `card ${id} was sent`);
-  return cards.at(-1)!;
+  return Object.assign({}, ...cards) as PlanTask;
 }
 
 async function finishedCard(name: string, args: Record<string, unknown>, result: unknown): Promise<PlanTask> {
