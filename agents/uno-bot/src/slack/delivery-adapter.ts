@@ -71,6 +71,7 @@ import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from ".
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { progressFor } from "../agent/tool-table";
+import { estateLogo } from "./estate-logos";
 import {
   settledStatus,
   WORKING_STATUS,
@@ -116,6 +117,8 @@ export interface PlanTask {
   details?: string;
   /** What came of it — today, the short reason a card ended in error. */
   output?: string;
+  /** The image URL of the card's logo (`estate-logos.ts`), or none. */
+  icon?: string;
 }
 
 /** The card a checklist opens with, titled with the turn's progress label and
@@ -627,14 +630,24 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         case "announced": {
           const details = heldDetails;
           heldDetails = null;
-          void update(ts, { id, title: words.title, status: "pending", ...(details ? { details } : {}) });
+          const icon = estateLogo(words.estate, event.args);
+          void update(ts, {
+            id,
+            title: words.title,
+            status: "pending",
+            ...(details ? { details } : {}),
+            ...(icon ? { icon } : {}),
+          });
           return;
         }
         case "started": {
           // One card in progress at a time: whatever was running — the opening
           // card, on the first lookup — closes in the same append.
           if (running && running !== id) move(ts, running, "complete");
-          if (!cards.has(id)) cards.set(id, { id, title: words.title, status: "pending" });
+          if (!cards.has(id)) {
+            const icon = estateLogo(words.estate, event.args);
+            cards.set(id, { id, title: words.title, status: "pending", ...(icon ? { icon } : {}) });
+          }
           running = id;
           move(ts, id, "in_progress");
           return;
