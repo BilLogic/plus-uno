@@ -327,6 +327,8 @@ export interface TaskChunk {
   output?: string;
   /** Links the step read, already filtered to what the thread may see. */
   sources?: ReadonlyArray<{ text: string; url: string }>;
+  /** An image URL for the card's logo. */
+  icon?: string;
 }
 
 export async function startStream(
@@ -474,6 +476,10 @@ export async function appendTasks(
         ...(task.sources?.length
           ? { sources: task.sources.map((s) => ({ type: "url", text: taskDetails(s.text), url: s.url })) }
           : {}),
+        // Slack's `icon` on a task chunk is absent from @slack/types, so it is
+        // built here as a plain object. An image URL is the one documented
+        // form of `name`.
+        ...(task.icon ? { icon: { type: "icon", name: task.icon } } : {}),
       })),
     });
     return !!res.ok;

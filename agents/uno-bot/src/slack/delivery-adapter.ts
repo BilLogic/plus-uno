@@ -74,6 +74,7 @@ import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { progressFor } from "../agent/tool-table";
 import { readoutFor } from "../agent/progress-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
+import { estateLogo } from "./estate-logos";
 import {
   settledStatus,
   WORKING_STATUS,
@@ -121,6 +122,8 @@ export interface PlanTask {
   output?: string;
   /** The links it read that the thread may see (`card-sources.ts`). */
   sources?: CardSource[];
+  /** The image URL of the card's logo (`estate-logos.ts`), or none. */
+  icon?: string;
 }
 
 /** The card a checklist opens with, titled with the turn's progress label and
@@ -769,17 +772,20 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (!words) return;
       const ts = planTs;
       const id = `tool-${event.seq}`;
+      const icon = estateLogo(words.estate, event.args);
+      /** The card as a call first puts it on the checklist. */
+      const fresh: PlanTask = { id, title: words.title, status: "pending", ...(icon ? { icon } : {}) };
       switch (event.phase) {
         case "announced": {
           // What the call looks for, after the narration that introduced it.
           const query = readoutFor(event.name)?.details(event.args) ?? null;
           const details = [heldDetails, query].filter(Boolean).join(" · ");
           heldDetails = null;
-          admit(ts, id, { id, title: words.title, status: "pending", ...(details ? { details } : {}) });
+          admit(ts, id, { ...fresh, ...(details ? { details } : {}) });
           return;
         }
         case "started": {
-          const card = admit(ts, id, { id, title: words.title, status: "pending" });
+          const card = admit(ts, id, fresh);
           // One card in progress at a time: whatever was running — the opening
           // card, on the first lookup — closes in the same append. Two folded
           // calls share a card, so the second starting closes nothing.

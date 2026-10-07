@@ -11,8 +11,9 @@
 // block too. Two fields change shape on the way: the stream chunk's `id` is the
 // block's `task_id`, and the chunk's `details` / `output` are bare strings where
 // the block's are rich text. A source is kept as `{text, url}` and spelled as
-// Slack's `{type: "url", …}` here, as `api.ts` spells it for the chunk. Every
-// other field a card carries — an icon — passes through as it is.
+// Slack's `{type: "url", …}` here, as `api.ts` spells it for the chunk, and an
+// icon is kept as its image URL and spelled as Slack's `{type: "icon", name}` —
+// a bare string there is an invalid block, and the rewrite would be refused.
 //
 // PURE: no `Env`, so the adapter can import it without importing `api.ts`.
 
@@ -38,9 +39,8 @@ function richText(text: string): Record<string, unknown> {
 
 /** One card as a `task_card` block element. */
 function taskCard(task: PlanTask): Record<string, unknown> {
-  const { id, title, status, details, output, sources, ...rest } = task;
+  const { id, title, status, details, output, sources, icon } = task;
   return {
-    ...rest,
     type: "task_card",
     task_id: id,
     title: cut(title),
@@ -49,6 +49,7 @@ function taskCard(task: PlanTask): Record<string, unknown> {
     ...(output ? { output: richText(output) } : {}),
     // A card keeps a source as `{text, url}`; Slack's source names its kind.
     ...(sources?.length ? { sources: sources.map((s) => ({ type: "url", text: cut(s.text), url: s.url })) } : {}),
+    ...(icon ? { icon: { type: "icon", name: icon } } : {}),
   };
 }
 

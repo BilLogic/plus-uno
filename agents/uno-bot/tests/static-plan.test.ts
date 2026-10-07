@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
 import type { ToolProgressEvent } from "../src/agent/tool-progress";
+import { planBlock } from "../src/slack/plan-block";
 import { recordingSlack } from "./helpers/recording-slack";
 
 /** A top-level DM: no thread to reply under. */
@@ -134,5 +135,16 @@ describe("static checklist in a top-level DM", () => {
     await delivery.endProgress("complete");
 
     assert.deepEqual(slack.calls, []);
+  });
+});
+
+describe("planBlock", () => {
+  it("spells a card's icon as Slack's icon object, never a bare URL", () => {
+    const block = planBlock("Checklist", [
+      { id: "tool-1", title: "Searching GitHub", status: "complete", icon: "https://example.test/github.png" },
+      { id: "tool-2", title: "Searching the blueprint", status: "complete" },
+    ]) as { tasks: Array<Record<string, unknown>> };
+    assert.deepEqual(block.tasks[0]!.icon, { type: "icon", name: "https://example.test/github.png" });
+    assert.equal("icon" in block.tasks[1]!, false);
   });
 });
