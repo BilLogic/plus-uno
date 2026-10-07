@@ -515,9 +515,32 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   // complete or error; `pending` is refused (`invalid_arguments`, the whole
   // append with it). So an announced call waits here, and its card first
   // reaches Slack in progress, when the call starts.
+  //
+  // A CARD'S TEXT GOES ONCE. Slack appends a re-sent `details` to the card's
+  // existing details rather than replacing it: live, a card read "onboarding"
+  // as "onboardingonboarding" after its complete re-sent the same text. So a
+  // field already sent for a card is left off its later updates; its status
+  // moves every time, its text only when the text is new. Counted as shown
+  // once handed over: a refused append leaves the card stuck either way, and
+  // re-sending its text would not unstick it.
   let planChain: Promise<void> = Promise.resolve();
   const outbox = new Map<string, PlanTask>();
   let linkQueued = false;
+  /** What each card's text fields already say on Slack. */
+  const shown = new Map<string, Partial<Pick<PlanTask, "details" | "output" | "sources">>>();
+
+  /** `task` without the text Slack already shows for it, and that text noted. */
+  const onlyNewText = (task: PlanTask): PlanTask => {
+    const was = shown.get(task.id) ?? {};
+    const { details, output, sources, ...rest } = task;
+    const fresh = {
+      ...(details && details !== was.details ? { details } : {}),
+      ...(output && output !== was.output ? { output } : {}),
+      ...(sources?.length && JSON.stringify(sources) !== JSON.stringify(was.sources) ? { sources } : {}),
+    };
+    shown.set(task.id, { ...was, ...fresh });
+    return { ...rest, ...fresh };
+  };
 
   /** Record a card's new state and queue it behind every update already issued. */
   const update = (ts: string, card: Card): Promise<void> => {
@@ -531,7 +554,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       planChain = planChain
         .then(() => {
           linkQueued = false;
-          const tasks = [...outbox.values()];
+          const tasks = [...outbox.values()].map(onlyNewText);
           outbox.clear();
           return slack.appendTasks(channel, ts, tasks);
         })

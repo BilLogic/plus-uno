@@ -171,8 +171,10 @@ describe("the checklist", () => {
       [...new Set(cards.filter((t) => t.details).map((t) => `${t.id}: ${t.details}`))],
       ["tool-1: Checking whether this shipped"],
     );
-    // A card that is updated keeps its details: a task update replaces the card.
-    assert.equal(cards.filter((t) => t.id === "tool-1").at(-1)!.details, "Checking whether this shipped");
+    // Sent once: Slack appends a re-sent `details` rather than replacing it, so
+    // the card's closing update carries its status alone.
+    assert.equal(cards.filter((t) => t.id === "tool-1" && t.details).length, 1);
+    assert.equal("details" in cards.filter((t) => t.id === "tool-1").at(-1)!, false);
   });
 
   it("drops the backstop line while the checklist is live, and never glues it into a card", async () => {
@@ -252,5 +254,32 @@ describe("the checklist", () => {
     await strict.client.appendTasks("C123", "stream-1", [iconed]);
     assert.deepEqual(expectRefusals(strict.refused), [{ call: "task t1 with an icon", error: "invalid_arguments" }]);
     assert.equal(strict.landed.length, 0);
+  });
+});
+
+describe("a card's text", () => {
+  it("goes to Slack once — later updates of the card carry its status, not its details again", async () => {
+    // Slack appends a re-sent `details` to the card's existing details rather
+    // than replacing it: live, a card read "onboardingonboarding".
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(true), TARGET);
+    const args = { title: "onboarding" };
+
+    await delivery.beginProgress("Working on it");
+    delivery.toolProgress({ seq: 1, name: "roadmap_query", args, phase: "announced" });
+    delivery.toolProgress({ seq: 1, name: "roadmap_query", args, phase: "started" });
+    await tick();
+    delivery.toolProgress(
+      finishedProgress({ seq: 1, name: "roadmap_query", args }, JSON.stringify({ ok: true, rows: [] })),
+    );
+    await tick();
+    await delivery.postAnswer("Here it is.");
+
+    const updates = slack.of("tasks").flatMap((call) => call.tasks.filter((t) => t.id === "tool-1"));
+    assert.ok(updates.length >= 2, "the card opens and closes");
+    const withDetails = updates.filter((t) => t.details);
+    assert.equal(withDetails.length, 1, `details sent ${withDetails.length} times`);
+    assert.equal(updates.at(-1)!.status, "complete");
+    assert.equal("details" in updates.at(-1)!, false, "the closing update carries no details");
   });
 });
