@@ -91,14 +91,13 @@ crons = ["0 4,5 * * TUE-SAT", "0 13,14 * * MON-FRI"]
 SLACK_STREAM_MARKUP_PROBE = "pass:2026-09-22 r393 DM: raw bare <@teammate> + fenced <@teammate> <@U…> streamed via markdown_text, not blank; both shown literally, fenced one as code, real id in code did not ping"
 SLACK_STREAMING = "off"
 #
-# The checklist: opens the turn's stream up front in `task_display_mode: "plan"`
-# and shows one task card per lookup the turn makes (query, result, sources,
-# estate logo), closing into the answer; a top-level DM, where Slack refuses a
-# stream, gets a static plan posted at start and settled once. Off, the
-# between-tool narration posts as loose :hourglass: messages, as before. On for
-# the live watch: one multi-tool turn in a DM thread and one top-level, before
-# it stays the default.
-SLACK_STREAM_PLAN = "on"
+# Plan-mode streaming: opens the turn's stream up front in
+# `task_display_mode: "plan"` and routes the between-tool narration into it as
+# task cards instead of loose :hourglass: messages. An early stream was tried
+# with plain text and reverted — nothing to put in it renders an empty bubble
+# for the whole run. Plan mode should differ because the stream carries cards;
+# watch one multi-tool turn before believing it.
+SLACK_STREAM_PLAN = "off"
 # Native feedback elements: Slack's `context_actions` block (`feedback_buttons`
 # + an `icon_button` delete) in place of the hand-rolled 👍/👎 row. Off because
 # an invalid block degrades SILENTLY here — delivery falls back to plain text,
