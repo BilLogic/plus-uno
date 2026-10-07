@@ -26,6 +26,7 @@ import {
   slackCall,
   startStream,
   stopStream,
+  updateMessage,
 } from "./api";
 import { renameSession, setSessionStatus } from "./assistant";
 import {
@@ -140,6 +141,7 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     async stopStream(channel, ts) {
       await stopStream(env, channel, ts);
     },
+    updateMessage: (input) => updateMessage(env, input),
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
