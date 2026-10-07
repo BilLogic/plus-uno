@@ -9,10 +9,12 @@
 // newer than its note was changed without a notification.
 //
 // THE WINDOW. A sweep looks at changes in (from, until]. `until` is the sweep's
-// start less an hour, because FILE_UPDATE comes about 30 minutes after editing
-// stops and a change still inside that hour may yet be notified. `from` is the
-// last finished sweep's `until`, or a day back the first time. So every change
-// falls in exactly one sweep; one made in the run's last hour waits a night.
+// start less half an hour, because FILE_UPDATE comes about 30 minutes after
+// editing stops: a younger change may still be notified. `from` is the last
+// finished sweep's `until`, or a day back the first time. So every change falls
+// in exactly one sweep; one made in the run's last half hour waits a night. A
+// notification that does arrive for a change the backstop also queued costs
+// that change one more guarded look, nothing worse.
 //
 // THE BUDGET. A full sweep is one listing per team and one per folder: 36 Tier
 // 2 calls for six teams of five folders, and a scheduled job may spend 38
@@ -45,8 +47,9 @@ import type { FigmaTeam } from "./teams";
 
 /** Where the sweep's progress is kept, in HARNESS_KV. */
 export const BACKSTOP_STATE_KEY = "figma-notify:backstop";
-/** A change this recent may still be notified, so it waits for the next sweep. */
-export const GRACE_MS = 60 * 60 * 1000;
+/** A change this recent may still be notified — Figma sends FILE_UPDATE about
+ *  30 minutes after editing stops — so it waits for the next sweep. */
+export const GRACE_MS = 30 * 60 * 1000;
 /** How far the first sweep ever looks back. */
 export const FIRST_LOOK_BACK_MS = 24 * 60 * 60 * 1000;
 /** How long after a sweep's end the next may start. The jobs of one run are
@@ -255,6 +258,10 @@ function report(
   },
 ): BackstopReport {
   const note = r.notes.length ? r.notes.join("; ") : null;
+  // No sweep ran: say why, and only that.
+  if (!r.sweep) {
+    return { kind: "figma-backstop", key: job.key, outcome: "handled", listed: 0, inWindow: 0, missed: [], left: 0, finished: false, note, summary: note ?? "nothing to do" };
+  }
   const window = r.sweep ? ` in ${new Date(r.sweep.from).toISOString()}–${new Date(r.sweep.until).toISOString()}` : "";
   const verb = r.dryRun ? "would queue" : "queued";
   const end = r.finished ? "sweep finished" : `${r.left} listing(s) left`;

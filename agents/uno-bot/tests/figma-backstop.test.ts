@@ -23,6 +23,8 @@ import {
 } from "../src/figma-notify/backstop";
 import { CHANGED_PREFIX, CHANGED_TTL_S, type FigmaEventJob } from "../src/figma-notify/event";
 import type { FigmaTeam } from "../src/figma-notify/teams";
+import { runBackstopOnEnv } from "../src/figma-notify/env";
+import type { Env } from "../src/types";
 
 const HOUR = 60 * 60 * 1000;
 /** The end-of-day run: 00:00 ET on Oct 8, 2026. */
@@ -145,7 +147,7 @@ describe("the backstop catches what no notification reported", () => {
     assert.equal(w.notes.get(`${CHANGED_PREFIX}FILEA`)!.at, iso(AFTERNOON), "the note moves forward");
   });
 
-  it("leaves a change from the run's last hour for the next sweep, which queues it", async () => {
+  it("leaves a change from the run's last half hour for the next sweep, which queues it", async () => {
     const late = MIDNIGHT - 20 * 60 * 1000;
     const figma = teamsWith([UNIVERSAL], { Universal: { F1: [{ key: "FILEA", at: late }] } });
     const w = world(figma, [UNIVERSAL]);
@@ -228,7 +230,7 @@ describe("the backstop's budget (AC 3)", () => {
       reports.push(await runBackstop({ key: `figma-backstop-${i}` }, w.deps));
     }
     assert.equal(reports[0]!.finished, true, "one job at the ceiling makes all 36");
-    for (const later of reports.slice(1)) assert.match(later.summary, /tonight's sweep has already finished/);
+    for (const later of reports.slice(1)) assert.equal(later.summary, "tonight's sweep has already finished");
     assert.equal(figma.calls().length, 36, "the later jobs list nothing");
   });
 
@@ -313,7 +315,20 @@ describe("the backstop when Figma or the runner says no", () => {
   it("does nothing, and keeps nothing, with no teams to list", async () => {
     const w = world(createInMemoryFigma(), []);
     const report = await runBackstop(JOB, w.deps);
-    assert.match(report.summary, /no teams to list/);
+    assert.equal(report.summary, "no teams to list");
     assert.equal(w.state(), null);
+  });
+});
+
+describe("the backstop on the Worker's bindings", () => {
+  const kv = {} as KVNamespace;
+  const job = { key: "figma-backstop-1", kind: "figma-backstop" as const };
+
+  it("says what it lacks, and spends nothing: no KV, no token, or teams it cannot read", async () => {
+    const said = async (env: Partial<Env>) => (await runBackstopOnEnv(env as Env, job, { dryRun: false })).summary;
+    assert.match(await said({}), /HARNESS_KV not bound/);
+    assert.match(await said({ HARNESS_KV: kv }), /FIGMA_ACCESS_TOKEN not set/);
+    assert.match(await said({ HARNESS_KV: kv, FIGMA_ACCESS_TOKEN: "t", FIGMA_TEAM_IDS: "Universal" }), /no backstop: FIGMA_TEAM_IDS: "Universal" is not name=id/);
+    assert.match(await said({ HARNESS_KV: kv, FIGMA_ACCESS_TOKEN: "t", FIGMA_TEAM_IDS: " " }), /FIGMA_TEAM_IDS is empty/);
   });
 });
