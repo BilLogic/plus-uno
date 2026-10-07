@@ -65,7 +65,7 @@ const ask = (route: ProbeRoute, headers: Record<string, string> = {}) =>
 
 test("every token-gated probe refuses an unauthenticated request with 404 not found", async () => {
   const gated = ROUTE_LIST.filter((r) => r.auth === "debug-token");
-  assert.equal(gated.length, 12, "twelve /debug/* probes are registered");
+  assert.equal(gated.length, 13, "thirteen /debug/* probes are registered");
   for (const route of gated) {
     const probes = [fake(route, { body: { reached: true } })];
     const res = await routeProbes(probes, ask(route), new URL(`https://w${route.path}`), env, ctx());
@@ -221,7 +221,8 @@ test("an unknown path and a wrong method both get the fall-through 404", async (
 
 test("the probe table claims each address once", () => {
   assert.deepEqual(duplicateRoutes(DIAGNOSTIC_ROUTES), []);
-  assert.equal(Object.keys(DIAGNOSTIC_ROUTES).length, 13, "twelve /debug/* probes + /health/blueprint");
+  assert.equal(Object.keys(DIAGNOSTIC_ROUTES).length, 14, "thirteen /debug/* probes + /health/blueprint");
+  assert.deepEqual(DIAGNOSTIC_ROUTES["slack-post"], { method: "GET", path: "/debug/slack-post", auth: "debug-token" });
 
   // The check has teeth: a second claim on one address is reported.
   assert.deepEqual(

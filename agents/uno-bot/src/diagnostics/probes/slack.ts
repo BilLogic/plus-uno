@@ -1,5 +1,6 @@
 // Slack-surface probes: what the live install grants for search, what
-// chat.startStream accepts, and whether an App Home view validates.
+// chat.startStream and chat.postMessage accept, and whether an App Home view
+// validates.
 import { publishHomeViewForDebug } from "../../slack/home";
 import { getSlackAccessTokenFor } from "../../oauth/slack";
 import { countedFetch } from "../../net";
@@ -120,6 +121,49 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
     };
   }
   return { body: { sent: payload, status: res.status, slack } };
+};
+
+// The post probe: chat.postMessage with these blocks AS GIVEN, and Slack's
+// verdict verbatim, `response_metadata` included. The stream probe proves what
+// a stream takes; this proves what an ordinary post takes, so a new block shape
+// is tried against production Slack in a DM before anything is switched on for
+// the team. Nothing is sanitised on the way out, on purpose — a shape the
+// Worker would mend is not the shape being asked about.
+//
+// ?channel= (required) ?blocks=<JSON array> (required) ?text= (the plain-text
+// copy) ?thread_ts=. Same reach as the stream probe's ?text=: a DM or the alert
+// channel, and only so much of it. Token-gated: it posts a real message.
+export const slackPostProbe: ProbeRun = async (env, url) => {
+  const channel = url.searchParams.get("channel");
+  if (!channel) return { body: { ok: false, error: "channel required" }, status: 400 };
+  const alertChannel = env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL;
+  const blocksParam = url.searchParams.get("blocks") ?? "";
+  const refusal = probeTextRefusal(channel, blocksParam, alertChannel);
+  if (refusal) return { body: { ok: false, error: refusal.replace(/^text/, "blocks") }, status: 400 };
+  const text = url.searchParams.get("text");
+  if (text && text.length > PROBE_TEXT_LIMIT)
+    return { body: { ok: false, error: `text is ${text.length} chars; the probe takes at most ${PROBE_TEXT_LIMIT}` }, status: 400 };
+  let blocks: unknown;
+  try {
+    blocks = JSON.parse(blocksParam);
+  } catch {
+    return { body: { ok: false, error: "blocks is not JSON" }, status: 400 };
+  }
+  if (!Array.isArray(blocks)) return { body: { ok: false, error: "blocks must be a JSON array" }, status: 400 };
+  const payload: Record<string, unknown> = { channel };
+  const threadTs = url.searchParams.get("thread_ts");
+  if (threadTs) payload.thread_ts = threadTs;
+  if (text) payload.text = text;
+  payload.blocks = blocks;
+  const res = await countedFetch("https://slack.com/api/chat.postMessage", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  return { body: { sent: payload, slack: await res.json() } };
 };
 
 /** Open a plan-mode stream, append `chunks` raw in one call, close it, and
