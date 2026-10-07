@@ -189,6 +189,21 @@ test("a task card's details take the pass and stay within the chunk limit; its p
   await appendTasks(ENV, "D0123", "9.0", [{ id: "t3", title: "t", status: "complete", details: "y".repeat(240) + " <@U0A8JFHQPU2>" }]);
   const cut = String((sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!.details);
   assert.equal(cut, "y".repeat(240) + " ", "a kept mention is dropped whole, never cut open");
+
+  // A card's sources go as Slack's url sources: each name takes the same pass
+  // and limit as `details`, and the link goes as it came.
+  sent = [];
+  const url = "https://www.notion.so/Recap-1?a=1&b=2";
+  await appendTasks(ENV, "D0123", "9.0", [
+    { id: "t4", title: "t", status: "complete", output: "2 pages", sources: [{ text: "R&D <notes>" + "w".repeat(300), url }] },
+  ]);
+  const withSources = (sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!;
+  assert.equal(withSources.output, "2 pages");
+  const [source] = withSources.sources as Array<{ type: string; text: string; url: string }>;
+  assert.equal(source!.type, "url");
+  assert.equal(source!.url, url);
+  assert.ok(source!.text.startsWith("R&amp;D &lt;notes&gt;"), source!.text);
+  assert.ok(source!.text.length <= 250, String(source!.text.length));
 });
 
 test("the markup probe streams raw text only to a DM or the alert channel, and only so much", async () => {
