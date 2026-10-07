@@ -325,6 +325,8 @@ export interface TaskChunk {
   status: "pending" | "in_progress" | "complete" | "error";
   details?: string;
   output?: string;
+  /** Links the step read, already filtered to what the thread may see. */
+  sources?: ReadonlyArray<{ text: string; url: string }>;
 }
 
 export async function startStream(
@@ -467,6 +469,11 @@ export async function appendTasks(
         status: task.status,
         ...(task.details ? { details: taskDetails(task.details) } : {}),
         ...(task.output ? { output: taskDetails(task.output) } : {}),
+        // A source's name takes the same pass as `details`; its URL goes as
+        // the tool returned it, since a link is not text to escape.
+        ...(task.sources?.length
+          ? { sources: task.sources.map((s) => ({ type: "url", text: taskDetails(s.text), url: s.url })) }
+          : {}),
       })),
     });
     return !!res.ok;

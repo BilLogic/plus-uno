@@ -71,6 +71,8 @@ import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from ".
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { progressFor } from "../agent/tool-table";
+import { readoutFor } from "../agent/progress-readout";
+import { threadVisibleSources, type CardSource } from "./card-sources";
 import {
   settledStatus,
   WORKING_STATUS,
@@ -114,8 +116,10 @@ export interface PlanTask {
   status: "pending" | "in_progress" | "complete" | "error";
   /** The line under the title — the narration that introduced the card. */
   details?: string;
-  /** What came of it — today, the short reason a card ended in error. */
+  /** What came of it — "4 pages", or the short reason a card ended in error. */
   output?: string;
+  /** The links it read that the thread may see (`card-sources.ts`). */
+  sources?: CardSource[];
 }
 
 /** The card a checklist opens with, titled with the turn's progress label and
@@ -625,7 +629,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       const id = `tool-${event.seq}`;
       switch (event.phase) {
         case "announced": {
-          const details = heldDetails;
+          // What the call looks for, after the narration that introduced it.
+          const query = readoutFor(event.name)?.details(event.args) ?? null;
+          const details = [heldDetails, query].filter(Boolean).join(" · ");
           heldDetails = null;
           void update(ts, { id, title: words.title, status: "pending", ...(details ? { details } : {}) });
           return;
@@ -639,9 +645,17 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           move(ts, id, "in_progress");
           return;
         }
-        case "finished":
-          move(ts, id, event.error ? "error" : "complete", event.error ? { output: shortReason(event.error) } : {});
+        case "finished": {
+          if (event.error) {
+            move(ts, id, "error", { output: shortReason(event.error) });
+            return;
+          }
+          const readout = readoutFor(event.name);
+          const output = readout?.output(event.result);
+          const sources = threadVisibleSources(readout?.sources(event.result) ?? []);
+          move(ts, id, "complete", { ...(output ? { output } : {}), ...(sources.length ? { sources } : {}) });
           return;
+        }
         case "refused":
           move(ts, id, "error", { output: shortReason(event.reason) });
           return;
