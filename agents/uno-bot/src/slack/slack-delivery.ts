@@ -15,15 +15,18 @@
 //
 // `Env` enters here and stops here.
 
+import { asDelivery } from "../net";
 import type { Env } from "../types";
 import {
   addReaction,
   appendStream,
-  appendTask,
+  appendTasks,
   postMessage,
+  setPlanTitle,
   slackCall,
   startStream,
   stopStream,
+  updateMessage,
 } from "./api";
 import { renameSession, setSessionStatus } from "./assistant";
 import {
@@ -115,7 +118,7 @@ export function postingDeps(env: Env): PostingDeps {
  */
 function slackClientFor(env: Env): SlackDeliveryClient {
   const posting = postingDeps(env);
-  return {
+  return asDeliveryClient({
     async addReaction(channel, ts, name) {
       await addReaction(env, channel, ts, name);
     },
@@ -129,16 +132,20 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team, "plan"),
-    async appendTask(channel, ts, task) {
-      await appendTask(env, channel, ts, task);
+    async appendTasks(channel, ts, tasks) {
+      await appendTasks(env, channel, ts, tasks);
+    },
+    async setPlanTitle(channel, ts, title) {
+      await setPlanTitle(env, channel, ts, title);
     },
     async stopStream(channel, ts) {
       await stopStream(env, channel, ts);
     },
+    updateMessage: (input) => updateMessage(env, input),
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
-  };
+  });
 }
 
 /**
@@ -148,12 +155,32 @@ function slackClientFor(env: Env): SlackDeliveryClient {
  * Plan mode is the adapter's `startStream`, gated on `SLACK_STREAM_PLAN`.
  */
 function postingClientFor(env: Env): PostingClient {
-  return {
+  return asDeliveryClient({
     addReaction: (channel, ts, name) => addReaction(env, channel, ts, name),
     postMessage: (input) => postMessage(env, input),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team),
     appendStream: (channel, ts, text) => appendStream(env, channel, ts, text),
     stopStream: (channel, ts, blocks) => stopStream(env, channel, ts, blocks),
-  };
+  });
+}
+
+/**
+ * Every call a client record makes, under the meter's delivery label.
+ *
+ * Delivery runs WHILE lookups do: the checklist's cards are posted from the
+ * agent loop's own callbacks, mid-lookup, and the lookup limit is one field on
+ * the per-invocation meter. Unlabelled, a card update was charged to the lookup
+ * ceiling, could be refused by it, and stamped a complete result as partial
+ * (`net.ts` § asDelivery). Labelled here, at the record, so every Slack call
+ * Delivery makes — the checklist and the answer above all — carries it, and a
+ * method added to either record carries it without anyone remembering to.
+ */
+function asDeliveryClient<C extends object>(client: C): C {
+  return Object.fromEntries(
+    Object.entries(client).map(([name, call]) => [
+      name,
+      (...args: unknown[]) => asDelivery(() => (call as (...a: unknown[]) => Promise<unknown>)(...args)),
+    ]),
+  ) as C;
 }

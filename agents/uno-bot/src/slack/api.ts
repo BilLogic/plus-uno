@@ -13,6 +13,7 @@ import {
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { rowFor } from "../agent/tool-table";
+import { cardLinks } from "./plan-block";
 
 interface SlackOk {
   ok: true;
@@ -324,6 +325,11 @@ export interface TaskChunk {
   title: string;
   status: "pending" | "in_progress" | "complete" | "error";
   details?: string;
+  output?: string;
+  /** Links the step read, already filtered to what the thread may see. */
+  sources?: ReadonlyArray<{ text: string; url: string }>;
+  /** An image URL for the card's logo. */
+  icon?: string;
 }
 
 export async function startStream(
@@ -442,24 +448,49 @@ export async function appendStream(
   }
 }
 
-/** Push one plan step into an open stream. `id` is the identity of the step —
- *  sending the same id again UPDATES that card rather than adding another, so
- *  a step goes in_progress → complete without ever duplicating. Best-effort:
- *  a dropped progress card is not worth failing a turn over. */
-export async function appendTask(env: Env, channel: string, ts: string, task: TaskChunk): Promise<boolean> {
+/** Push plan steps into an open stream, in ONE append — `chunks` is an array,
+ *  so closing one card and opening the next costs one subrequest. `id` is the
+ *  identity of a step — sending the same id again UPDATES that card rather
+ *  than adding another, so a step goes in_progress → complete without ever
+ *  duplicating. Best-effort: a dropped progress card is not worth failing a
+ *  turn over. */
+export async function appendTasks(
+  env: Env,
+  channel: string,
+  ts: string,
+  tasks: readonly TaskChunk[],
+): Promise<boolean> {
+  if (!tasks.length) return true;
   try {
     const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
       channel,
       ts,
-      chunks: [
-        {
-          type: "task_update",
-          id: task.id,
-          title: task.title.slice(0, 250),
-          status: task.status,
-          ...(task.details ? { details: taskDetails(task.details) } : {}),
-        },
-      ],
+      chunks: tasks.map((task) => ({
+        type: "task_update",
+        id: task.id,
+        title: task.title.slice(0, 250),
+        status: task.status,
+        ...(task.details ? { details: taskDetails(task.details) } : {}),
+        ...(task.output ? { output: taskDetails(task.output) } : {}),
+        // A source's name takes the same pass as `details`.
+        ...cardLinks(task, taskDetails),
+      })),
+    });
+    return !!res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Retitle the open stream's plan — one `plan_update` chunk. Its `title` is
+ *  plain text like a card's, held to the 256-char chunk limit. Best-effort, as
+ *  every progress update is. */
+export async function setPlanTitle(env: Env, channel: string, ts: string, title: string): Promise<boolean> {
+  try {
+    const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
+      channel,
+      ts,
+      chunks: [{ type: "plan_update", title: title.slice(0, 256) }],
     });
     return !!res.ok;
   } catch {
@@ -468,15 +499,15 @@ export async function appendTask(env: Env, channel: string, ts: string, task: Ta
 }
 
 /**
- * A task card's `details`, through the markup pass and within the 256-char
- * chunk limit.
+ * A task card's `details` or `output`, through the markup pass and within the
+ * 256-char chunk limit.
  *
  * Slack documents a task card's `title` as plain text (the task card block
  * reference, which the `task_update` chunk "looks mighty similar to"), so the
- * title goes as written. The chunk's `details` is a bare string whose format
- * no page names — the block's is rich text — so it takes the pass: an escaped
- * `&lt;` read literally is a blemish, a blanked card is not. Cut after
- * escaping, and never inside an entity or a kept `<…>`.
+ * title goes as written. The chunk's `details` and `output` are bare strings
+ * whose format no page names — the block's are rich text — so they take the
+ * pass: an escaped `&lt;` read literally is a blemish, a blanked card is not.
+ * Cut after escaping, and never inside an entity or a kept `<…>`.
  */
 function taskDetails(details: string): string {
   return sanitizeSlackMarkup(details).slice(0, 250).replace(/&[a-z]{0,3}$|<[^>]*$/, "");

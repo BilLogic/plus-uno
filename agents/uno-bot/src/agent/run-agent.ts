@@ -94,6 +94,7 @@ import type { ToolBody } from "./tool-bodies";
 import { isToolName, type ToolName } from "./tool-table";
 import { TOOLS, TOOLS_BY_NAME } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
+import type { ToolProgressEvent } from "./tool-progress";
 
 export type { AgentResult, TurnDials, TurnSpend } from "./loop";
 
@@ -185,6 +186,10 @@ export interface AgentInput {
    *  failure is diagnosable from the artifact instead of only from a live
    *  re-run (#452). Absent on production turns. */
   onToolResult?: (result: ToolResultNote) => void;
+  /** Where each lookup is in its life, for the checklist — see `loop.ts`
+   *  `onToolProgress`. Turn wires it on every turn; Delivery decides whether
+   *  the surface shows it. */
+  onToolProgress?: (event: ToolProgressEvent) => void;
 }
 
 /**
@@ -290,6 +295,7 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
       onDials: input.onDials,
       onToolCall: input.onToolCall,
       onToolResult: input.onToolResult,
+      onToolProgress: input.onToolProgress,
       onSpend: (s) => {
         spend = s;
       },

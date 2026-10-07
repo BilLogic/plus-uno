@@ -151,28 +151,59 @@ test("neither streaming flag turns on without a recorded probe PASS", async () =
 });
 
 test("a task card's details take the pass and stay within the chunk limit; its plain-text title does not", async () => {
-  const { appendTask } = await import("../src/slack/api.js");
+  const { appendTasks } = await import("../src/slack/api.js");
   sent = [];
-  await appendTask(ENV, "D0123", "9.0", {
-    id: "t1",
-    title: "Read <@teammate>'s note",
-    status: "in_progress",
-    details: "quoting `<@teammate>` for <@U0A8JFHQPU2>",
-  });
+  await appendTasks(ENV, "D0123", "9.0", [
+    {
+      id: "t1",
+      title: "Read <@teammate>'s note",
+      status: "in_progress",
+      details: "quoting `<@teammate>` for <@U0A8JFHQPU2>",
+    },
+  ]);
   const chunk = (sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!;
   assert.equal(chunk.title, "Read <@teammate>'s note");
   assert.equal(chunk.details, "quoting `&lt;@teammate&gt;` for <@U0A8JFHQPU2>");
 
+  // Closing one card and opening the next travel as two chunks of ONE call,
+  // and an error card's reason takes the same pass as its details.
   sent = [];
-  await appendTask(ENV, "D0123", "9.0", { id: "t2", title: "t", status: "complete", details: "x".repeat(245) + "<<<<<" });
+  await appendTasks(ENV, "D0123", "9.0", [
+    { id: "t0", title: "Searching Notion", status: "error", output: "502 from <api>" + "z".repeat(300) },
+    { id: "t1", title: "Searching Slack", status: "in_progress" },
+  ]);
+  assert.equal(sent.length, 1);
+  const pair = sent[0]!.body.chunks as Array<Record<string, unknown>>;
+  assert.deepEqual(pair.map((c) => `${c.id}:${c.status}`), ["t0:error", "t1:in_progress"]);
+  const output = String(pair[0]!.output);
+  assert.ok(output.startsWith("502 from &lt;api&gt;"), output);
+  assert.ok(output.length <= 250, String(output.length));
+
+  sent = [];
+  await appendTasks(ENV, "D0123", "9.0", [{ id: "t2", title: "t", status: "complete", details: "x".repeat(245) + "<<<<<" }]);
   const long = String((sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!.details);
   assert.ok(long.length <= 250, String(long.length));
   assert.match(long, /^x{245}(&lt;)*$/, "cut at an entity boundary");
 
   sent = [];
-  await appendTask(ENV, "D0123", "9.0", { id: "t3", title: "t", status: "complete", details: "y".repeat(240) + " <@U0A8JFHQPU2>" });
+  await appendTasks(ENV, "D0123", "9.0", [{ id: "t3", title: "t", status: "complete", details: "y".repeat(240) + " <@U0A8JFHQPU2>" }]);
   const cut = String((sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!.details);
   assert.equal(cut, "y".repeat(240) + " ", "a kept mention is dropped whole, never cut open");
+
+  // A card's sources go as Slack's url sources: each name takes the same pass
+  // and limit as `details`, and the link goes as it came.
+  sent = [];
+  const url = "https://www.notion.so/Recap-1?a=1&b=2";
+  await appendTasks(ENV, "D0123", "9.0", [
+    { id: "t4", title: "t", status: "complete", output: "2 pages", sources: [{ text: "R&D <notes>" + "w".repeat(300), url }] },
+  ]);
+  const withSources = (sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!;
+  assert.equal(withSources.output, "2 pages");
+  const [source] = withSources.sources as Array<{ type: string; text: string; url: string }>;
+  assert.equal(source!.type, "url");
+  assert.equal(source!.url, url);
+  assert.ok(source!.text.startsWith("R&amp;D &lt;notes&gt;"), source!.text);
+  assert.ok(source!.text.length <= 250, String(source!.text.length));
 });
 
 test("the markup probe streams raw text only to a DM or the alert channel, and only so much", async () => {
@@ -202,4 +233,17 @@ test("the markup probe streams raw text only to a DM or the alert channel, and o
   sent = [];
   res = await probe(`channel=C0ARJ2A3A69&${base}&text=hi`);
   assert.equal((res.body as { appended: boolean }).appended, true);
+});
+
+test("a task card's logo goes as Slack's icon object, and a card without one sends no icon", async () => {
+  const { appendTasks } = await import("../src/slack/api.js");
+  const logo = "https://plus-uno.netlify.app/uno-bot/estate-logos/github.png";
+  sent = [];
+  await appendTasks(ENV, "D0123", "9.0", [
+    { id: "t1", title: "Reading GitHub", status: "pending", icon: logo },
+    { id: "t2", title: "Setting your reminder", status: "pending" },
+  ]);
+  const [withLogo, without] = sent[0]!.body.chunks as Array<Record<string, unknown>>;
+  assert.deepEqual(withLogo!.icon, { type: "icon", name: logo });
+  assert.equal("icon" in without!, false);
 });

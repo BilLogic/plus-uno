@@ -37,6 +37,7 @@ import type { ModelTier } from "./routing";
 import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-state/index";
 import type { ProviderConversationTurn } from "./provider-conversation";
 import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";
+import { finishedProgress, type ToolProgressEvent } from "./tool-progress";
 import type {
   ModelProvider,
   ModelStop,
@@ -230,6 +231,12 @@ export interface LoopInput {
   onDials?: (dials: TurnDials) => void;
   onToolCall?: (call: ToolCall) => void;
   onToolResult?: (result: ToolResultNote) => void;
+  /**
+   * Where each lookup is in its life — announced, started, finished, refused —
+   * with its arguments and its raw result (capped). What the checklist is drawn
+   * from; `tool-progress.ts` says why it is not `onToolResult` widened.
+   */
+  onToolProgress?: (event: ToolProgressEvent) => void;
   /** Called once, as the turn finishes, with what it ran on and spent — the
    *  facts of the `[uno-bot] request done` line, for the usage record. */
   onSpend?: (spend: TurnSpend) => void;
@@ -256,6 +263,8 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
   /** The turn's one preflight correction, once it has been handed to the model. */
   let preflightSpent = false;
   const toolNamesUsed: string[] = [];
+  /** How many lookups this turn has announced — each one's card number. */
+  let progressSeq = 0;
 
   const finish = (result: AgentResult): AgentResult => {
     // Measured spend, per host — how close the turn came to the cap, instead of
@@ -292,7 +301,20 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
    */
   const runLookups = async (calls: ModelToolCall[]): Promise<ModelToolResult[]> => {
     const results: ModelToolResult[] = [];
-    for (const call of calls) {
+    // The whole batch is announced before any of it runs, so the checklist
+    // shows what is queued as well as what is running. Each call keeps its
+    // number through every phase, and the numbering runs across the turn.
+    const numbered = calls.map((call) => ({ call, seq: ++progressSeq }));
+    for (const { call, seq } of numbered) {
+      input.onToolProgress?.({ seq, name: call.name, args: call.args, phase: "announced" });
+    }
+    for (const { call, seq } of numbered) {
+      const progress = { seq, name: call.name, args: call.args };
+      /** Report the refusal this call was answered with as its card's end. */
+      const refused = (refusal: string): void => {
+        const reason = toolResultDigest(call.name, refusal).error ?? "not run";
+        input.onToolProgress?.({ ...progress, phase: "refused", reason });
+      };
       let text: string;
       // Fires when the lookup ceiling is already reached, or the tool-count
       // backstop is hit. LOOKUPS only — side-effect tools are peeled off by the
@@ -301,10 +323,13 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         // Only the Worker stages a `worker` tool; the model is never offered
         // one, so a call to it is refused here, before any dispatch.
         text = JSON.stringify({ ok: false, error: `'${call.name}' is not a tool you can call` });
+        refused(text);
       } else if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
         text = budgetRefusedResult();
+        refused(text);
       } else {
         toolCallsUsed++;
+        input.onToolProgress?.({ ...progress, phase: "started" });
         // Enforced, not forecast: the ceiling refuses the call that would cross
         // it, so a tool can start with any headroom and simply return less.
         const tripsBefore = deps.budget.trips();
@@ -316,9 +341,12 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
           // a catch that ate the throw. The counter sees it either way, so a
           // short read cannot pass as a whole one.
           if (deps.budget.trips() > tripsBefore) text = markPartialLookup(text);
+          const { error } = toolResultDigest(call.name, text);
+          input.onToolProgress?.(finishedProgress(progress, text, error));
         } catch (err) {
           if (!deps.budget.isBudgetError(err)) throw err;
           text = budgetRefusedResult();
+          refused(text);
         }
       }
       // The result's own honesty fields, for the eval transcript. Reported for

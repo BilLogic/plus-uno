@@ -65,7 +65,8 @@ import {
   type OperationOutcome,
 } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
-import { gateWordsFor } from "../agent/tool-table";
+import { gateWordsFor, taskCardFor } from "../agent/tool-table";
+import type { ToolProgressEvent } from "../agent/tool-progress";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../tools/github-issue-update-render";
 import {
@@ -130,6 +131,7 @@ import {
   type CardTarget,
   type Delivery,
   type DeliveryFailureStage,
+  type InterimKind,
   type IssueTarget,
   type ProposalCard,
   type TurnSettlement,
@@ -364,6 +366,9 @@ export interface TurnAgentRequest {
    *  `agent/loop.ts` `cancelSince`. */
   cancelSince?: number;
   onInterim(text: string): void;
+  /** Where each lookup is in its life — the checklist's feed. Turn filters it
+   *  to the calls that get a task card and hands those to Delivery. */
+  onToolProgress(event: ToolProgressEvent): void;
   /** The same clarify-vs-act check Turn runs after the loop returns, with this
    *  thread's PRD already bound, so the loop can put a refusal to the model as
    *  the call's own result instead of the person seeing the first one. */
@@ -686,7 +691,16 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
 
   const outcome = await withWorkingSignal(
     delivery,
-    (watched) => turnBody(request, { ...deps, delivery: watched }, staging),
+    (watched) =>
+      turnBody(request, { ...deps, delivery: watched }, staging).catch(async (err: unknown) => {
+        // A throw past every exit of the body reaches the outermost catch
+        // (`slack/events.ts`), which posts the "internal" failure and holds no
+        // Delivery to close anything with. Settle the checklist here first, or
+        // it sits open above that failure, still claiming a step is running.
+        // Settling twice is a no-op, so an exit that already did is safe.
+        await watched.endProgress("error").catch(() => {});
+        throw err;
+      }),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
 
@@ -1072,25 +1086,37 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       ...(request.threaded ? {} : { titleFrom: request.text }),
     });
   }
-  if (!trivial) await delivery.beginProgress(PROGRESS_LABEL);
+  // The ask rides along for the checklist's heading. Unlike the session title
+  // above it goes on every substantive turn: it titles this turn's checklist,
+  // not the thread.
+  if (!trivial) await delivery.beginProgress(PROGRESS_LABEL, request.text);
 
   // Interim updates: long runs are legal (streaming plus MCP can take several
   // minutes). Two complementary signals — the model's own between-tool
   // narration as it works, and a generic note that backstops runs which have
   // produced none yet.
   let interimPosted = false;
-  const postInterim = (text: string): void => {
+  const postInterim = (text: string, kind?: InterimKind): void => {
     interimPosted = true;
     interimCount++;
-    delivery.postInterim(text);
+    delivery.postInterim(text, kind);
   };
   const backstopAt = Math.abs(
     parseInt(request.userMsgTs.replace(".", "").slice(-6), 10) || 0,
   ) % BACKSTOP_LINES.length;
   const backstop = setTimeout(() => {
     if (interimPosted) return;
-    postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!);
+    postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!, "backstop");
   }, INTERIM_BACKSTOP_MS);
+
+  // The checklist: one task card per lookup that has words for one on its tool
+  // table row. The loop reports every call it runs through the lookup path; a
+  // reaction, a Worker-only call and anything gated have no card, and that is
+  // the table's answer, not a list kept here. Fire-and-forget like the
+  // narration, for the same reason: a courtesy must not wait in front of work.
+  const showToolProgress = (event: ToolProgressEvent): void => {
+    if (taskCardFor(event.name)) delivery.toolProgress(event);
+  };
 
   // Clarify-vs-act, bound to this thread once: the loop asks it mid-turn (so a
   // refusal reaches the model), and the block below asks it again on whatever
@@ -1122,7 +1148,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       ...(assistantContext ? { assistantContext } : {}),
       correction,
       preflight: preflightCall,
-      onInterim: postInterim,
+      onInterim: (text) => postInterim(text),
+      onToolProgress: showToolProgress,
       cancelSince: startedAt,
     });
   } catch (err) {

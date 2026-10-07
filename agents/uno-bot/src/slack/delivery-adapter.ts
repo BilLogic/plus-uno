@@ -12,11 +12,13 @@
 //     `setWorking` below: a channel turn gets 👀 AND a session status, and that
 //     status is what makes Slack's native stop button available in a channel
 //     thread at all (#576);
-//   • the plan stream. With the plan-stream switch on, a substantive turn opens
-//     a stream in `task_display_mode: "plan"` and each narration line lands as a
-//     task card that closes as the next one opens, so the person reads one
-//     filling-in checklist instead of three loose messages. Off, the same
-//     narration is a small ⏳ message. Which it is has never been the turn's
+//   • the checklist (CONTEXT.md). With the plan-stream switch on, a substantive
+//     turn opens a stream in `task_display_mode: "plan"` and each lookup the
+//     turn makes lands as a task card — queued pending, in progress while it
+//     runs, complete or error when it lands — with the narration that
+//     introduced it as its details, so the person reads one filling-in
+//     checklist instead of loose messages. Off, narration is a small ⏳
+//     message and lookups show nothing. Which it is has never been the turn's
 //     business, and now it cannot be;
 //   • the answer closing the stream the checklist lives in, rather than opening
 //     a second one beside it.
@@ -65,9 +67,14 @@ import type { FooterKind } from "./footer-kind";
 import type { SlackMessageMetadata } from "./api";
 import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { renderGateNote } from "./gate-note";
+import { planBlock } from "./plan-block";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
+import { taskCardFor } from "../agent/tool-table";
+import { readoutFor } from "../agent/task-card-readout";
+import { threadVisibleSources, type CardSource } from "./card-sources";
+import { estateLogo } from "./estate-logos";
 import {
   settledStatus,
   WORKING_STATUS,
@@ -103,11 +110,68 @@ export interface SlackDeliveryTarget {
 
 /** One card in the plan stream's checklist. Structurally `api.ts`'s
  *  `TaskChunk`, restated here so the pure adapter does not import the module
- *  that holds `Env`. */
+ *  that holds `Env`. Text goes as the card means it; the client is what puts
+ *  it through Slack's markup pass and chunk limit. */
 export interface PlanTask {
   id: string;
   title: string;
   status: "pending" | "in_progress" | "complete" | "error";
+  /** The line under the title — the narration that introduced the card. */
+  details?: string;
+  /** What came of it — "4 pages", or the short reason a card ended in error. */
+  output?: string;
+  /** The links it read that the thread may see (`card-sources.ts`). */
+  sources?: CardSource[];
+  /** The image URL of the card's logo (`estate-logos.ts`), or none. */
+  icon?: string;
+}
+
+/** The card a checklist opens with, titled with the turn's progress label and
+ *  closed when the first lookup starts. */
+const OPENING_CARD = "understand";
+
+/** How many task cards one turn's checklist shows, the opening card aside.
+ *  Calls past the last fold into one overflow card — a busy turn stays
+ *  readable, and every card it does not open is an append it does not spend. */
+export const TASK_CARD_CAP = 8;
+
+/** The overflow card's id, beside the `tool-<seq>` ids it stands in for. */
+const OVERFLOW_CARD = "tool-more";
+
+/** What a card whose lookup never ran says when the checklist settles. */
+const NOT_RUN = "Not run";
+
+/** Slack's cap on a plan or task chunk's text. */
+const HEADING_CHARS = 256;
+
+/**
+ * The checklist's heading, from the ask: one line, inside Slack's chunk cap,
+ * cut on a word where one is near. No model call — the ask already says what
+ * the turn is for, in the person's own words.
+ *
+ * @param ask - The person's message, whole
+ */
+export function checklistHeading(ask: string): string {
+  const oneLine = ask.replace(/\s+/g, " ").trim();
+  if (oneLine.length <= HEADING_CHARS) return oneLine;
+  const cut = oneLine.slice(0, HEADING_CHARS - 1);
+  const brk = cut.lastIndexOf(" ");
+  return `${brk > HEADING_CHARS / 2 ? cut.slice(0, brk) : cut}…`;
+}
+
+/** How long an error card's reason may run. A card says THAT a lookup failed
+ *  and roughly why; the answer is where a surviving limitation is explained. */
+const REASON_CHARS = 120;
+
+/**
+ * A tool's error, cut to what an error card can carry: its first line, and no
+ * more than a glance's worth of it.
+ *
+ * @param error - The tool's own error string, or the refusal it was handed
+ */
+export function shortReason(error: string): string {
+  const line = error.split("\n").map((l) => l.trim()).find(Boolean) ?? "";
+  return line.length > REASON_CHARS ? `${line.slice(0, REASON_CHARS - 1).trimEnd()}…` : line;
 }
 
 /**
@@ -163,10 +227,17 @@ export interface SlackDeliveryClient {
     userId: string,
     team?: string,
   ): Promise<string | null>;
-  /** Put a task card into an open stream, or update one already there. */
-  appendTask(channel: string, ts: string, task: PlanTask): Promise<void>;
+  /** Put task cards into an open stream, or update ones already there — all
+   *  in ONE append, because each append is a subrequest and closing one card
+   *  while opening the next is one transition, not two. */
+  appendTasks(channel: string, ts: string, tasks: readonly PlanTask[]): Promise<void>;
+  /** Retitle an open stream's checklist (a `plan_update`). */
+  setPlanTitle(channel: string, ts: string, title: string): Promise<void>;
   /** Close a stream. */
   stopStream(channel: string, ts: string): Promise<void>;
+  /** Rewrite one of the bot's own messages in place — how a static checklist
+   *  settles where no stream could open. */
+  updateMessage(input: { channel: string; ts: string; text: string; blocks: unknown[] }): Promise<{ ok: boolean }>;
   /** Move the agent session's lifecycle status — the working signal itself. */
   setSessionStatus(channel: string, threadTs: string, status: SessionStatus): Promise<StatusResult>;
   /** Name the session, so the conversation is findable in History / Messages. */
@@ -388,26 +459,183 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   const { slack, logWorking } = deps;
   const { channel, replyTs, userMsgTs } = target;
 
-  // The plan stream, if one is open: its ts, the card currently in progress,
-  // and how many steps have passed. The card is carried WHOLE, not just its id
-  // — a task update REPLACES the card, so re-sending the id with a placeholder
-  // title would rewrite the step's name as it completed.
+  // The plan stream, if one is open, and the checklist inside it: the opening
+  // card the turn's label names, then one task card per lookup. Every card is
+  // carried WHOLE — a task update REPLACES the card, so an update that re-sent
+  // only an id and a status would wipe the title and details it went out with.
   let planTs: string | null = null;
-  let planCurrent = { id: "understand", title: "" };
-  let planStep = 0;
+  // WHERE NO STREAM CAN OPEN — a top-level DM, which has no thread — the same
+  // checklist is a static `plan` block instead: posted once when progress
+  // begins, rewritten once at settle, and never touched in between, so a turn
+  // spends two calls on it however many lookups it makes. `planTs` is then the
+  // ts of that message rather than of a stream, and the cards below are kept
+  // exactly as the stream path keeps them, so the settle renders whatever they
+  // carry.
+  let planMode: "stream" | "static" = "stream";
+  /** The static checklist's heading, kept for the rewrite. */
+  let planTitle = "";
+  /** Every card on the checklist, by id, as it was last sent. */
+  const cards = new Map<string, PlanTask>();
+  /** The one card in progress, if any. */
+  let running: string | null = null;
+  /** Narration waiting for the card it introduces. */
+  let heldDetails: string | null = null;
 
-  /** Mark the in-progress card and forget the stream, so nothing re-uses it. */
+  // EVERY update to the open checklist goes through this one chain, and each
+  // link is caught. Two reasons, both seen with fire-and-forget appends: a
+  // refused or thrown append with no catch is an unhandled rejection in the
+  // Worker, and two appends in flight at once can land in either order — a
+  // card's "complete" arriving after the next card's "in progress" reads as a
+  // step that finished before it started. A link waits for the one before it,
+  // so Slack receives updates in the order they were issued; a link that fails
+  // is swallowed, so the chain itself never rejects and the next link still
+  // runs. Whoever settles the stream awaits the chain first.
+  //
+  // AND A LINK CARRIES EVERY UPDATE ISSUED BEFORE IT LEAVES, as one append.
+  // Each append is a subrequest out of the turn's fifty, and the loop issues
+  // updates in bursts: a reply's whole batch announced at once, and one lookup
+  // finishing in the same breath as the next one starts. Those bursts are
+  // synchronous, so a link queued by the first update of a burst runs after the
+  // last — and closing one card while opening the next costs one call, not two.
+  // Two updates to one card in a burst collapse to the later one; a card keeps
+  // the place its first update gave it.
+  let planChain: Promise<void> = Promise.resolve();
+  const outbox = new Map<string, PlanTask>();
+  let linkQueued = false;
+
+  /** Record a card's new state and queue it behind every update already issued. */
+  const update = (ts: string, task: PlanTask): Promise<void> => {
+    cards.set(task.id, task);
+    // A static checklist is only rewritten at settle: the card's new state is
+    // kept, and nothing is sent.
+    if (planMode === "static") return planChain;
+    outbox.set(task.id, task);
+    if (!linkQueued) {
+      linkQueued = true;
+      planChain = planChain
+        .then(() => {
+          linkQueued = false;
+          const tasks = [...outbox.values()];
+          outbox.clear();
+          return slack.appendTasks(channel, ts, tasks);
+        })
+        .catch(() => {});
+    }
+    return planChain;
+  };
+
+  /** Move a card that is on the checklist to a new status. */
+  const move = (ts: string, id: string, status: PlanTask["status"], extra: Partial<PlanTask> = {}): void => {
+    const card = cards.get(id);
+    if (!card) return;
+    if (running === id && status !== "in_progress") running = null;
+    void update(ts, { ...card, ...extra, status });
+  };
+
+  // THE CAP. The first `TASK_CARD_CAP` calls get a card each; every call after
+  // them folds into one overflow card, whose count is how many it holds and
+  // whose status is theirs taken together — pending while none has started,
+  // complete or error once all have settled (error if any erred), in progress
+  // in between. So the checklist never holds more than cap + 1 tool cards, and
+  // a folded call's transitions cost what any card's do: one append each.
+  /** Each folded call's status, by the card id it would have had. */
+  const folded = new Map<string, PlanTask["status"]>();
+
+  /** Re-send the overflow card from the calls folded into it. */
+  const sendOverflow = (ts: string): void => {
+    const states = [...folded.values()];
+    const settled = states.filter((s) => s === "complete" || s === "error");
+    const failed = states.filter((s) => s === "error").length;
+    const status: PlanTask["status"] = states.every((s) => s === "pending")
+      ? "pending"
+      : settled.length === states.length
+        ? failed
+          ? "error"
+          : "complete"
+        : "in_progress";
+    if (running === OVERFLOW_CARD && status !== "in_progress") running = null;
+    void update(ts, {
+      id: OVERFLOW_CARD,
+      title: `…and ${folded.size} more`,
+      status,
+      ...(failed ? { output: `${failed} failed` } : {}),
+    });
+  };
+
+  /**
+   * Put a call on the checklist if it is not there yet — its own card while
+   * there is room, the overflow card after — and say which card is its.
+   */
+  const admit = (ts: string, id: string, card: PlanTask): string => {
+    if (folded.has(id)) return OVERFLOW_CARD;
+    if (cards.has(id)) return id;
+    const own = [...cards.keys()].filter((k) => k !== OPENING_CARD && k !== OVERFLOW_CARD).length;
+    if (own < TASK_CARD_CAP) {
+      void update(ts, card);
+      return id;
+    }
+    folded.set(id, "pending");
+    sendOverflow(ts);
+    return OVERFLOW_CARD;
+  };
+
+  /** Move a call's card — its own, or its share of the overflow card. */
+  const moveCall = (ts: string, id: string, status: PlanTask["status"], extra: Partial<PlanTask> = {}): void => {
+    if (folded.has(id)) {
+      folded.set(id, status);
+      sendOverflow(ts);
+    } else {
+      move(ts, id, status, extra);
+    }
+  };
+
+  /** Settle every card still open, wait for every queued update to land, and
+   *  forget the stream, so nothing re-uses it.
+   *
+   *  A card still in progress settles with the turn. A card still PENDING is
+   *  a lookup that never ran — a stopped turn answers with some queued — so it
+   *  settles as an error that says so, whatever the turn's outcome: a tick
+   *  beside a read that never happened would claim work nobody did. */
   const settlePlan = async (status: "complete" | "error"): Promise<string | null> => {
     if (!planTs) return null;
     const ts = planTs;
-    await slack.appendTask(channel, ts, { ...planCurrent, status }).catch(() => {});
     planTs = null;
+    for (const card of [...cards.values()]) {
+      if (card.status === "in_progress") move(ts, card.id, status);
+      else if (card.status === "pending") move(ts, card.id, "error", { output: NOT_RUN });
+    }
+    heldDetails = null;
+    await planChain;
+    if (planMode === "static") {
+      // The one rewrite, with every card's final state. Best-effort like every
+      // card update: a checklist that would not settle is not worth a turn.
+      // Nothing for an answer to close, so the answer posts beneath it.
+      await slack
+        .updateMessage({ channel, ts, text: planTitle, blocks: [planBlock(planTitle, [...cards.values()])] })
+        .catch(() => {});
+      return null;
+    }
     return ts;
   };
 
   const endProgress = async (outcome: "complete" | "error"): Promise<void> => {
     const ts = await settlePlan(outcome);
     if (ts) await slack.stopStream(channel, ts).catch(() => {});
+  };
+
+  /** Post the static checklist, opening card in progress. A refused post
+   *  leaves no checklist, exactly as a refused stream does. */
+  const beginStaticPlan = async (label: string): Promise<void> => {
+    const opening: PlanTask = { id: OPENING_CARD, title: label, status: "in_progress" };
+    const posted = await slack
+      .postMessage({ channel, text: label, blocks: [planBlock(label, [opening])] })
+      .catch(() => ({ ok: false as const }));
+    if (!posted.ok || !("ts" in posted) || !posted.ts) return;
+    planMode = "static";
+    planTitle = label;
+    planTs = posted.ts;
+    running = OPENING_CARD;
+    cards.set(OPENING_CARD, opening);
   };
 
   /** A plain post into the thread. A local rather than only a port method,
@@ -498,30 +726,47 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       );
     },
 
-    async beginProgress(label) {
+    async beginProgress(label, ask) {
       // An early stream is only honest in plan mode: with plain text there is
       // nothing to put in it and the client renders an empty bubble for the
       // whole run (tried, reverted — see api.ts).
-      if (!deps.planStream || !replyTs) return;
+      if (!deps.planStream) return;
+      // The checklist opens under the progress label and is retitled once from
+      // the ask.
+      const heading = ask ? checklistHeading(ask) : "";
+      if (!replyTs) {
+        await beginStaticPlan(label);
+        // A static plan is rewritten once at settle anyway, so its retitle
+        // rides that rewrite rather than spending a call of its own.
+        if (planTs && heading) planTitle = heading;
+        return;
+      }
       planTs = await slack.startStream(channel, replyTs, target.userId, target.team);
       if (!planTs) return;
-      planCurrent = { id: "understand", title: label };
-      await slack
-        .appendTask(channel, planTs, { ...planCurrent, status: "in_progress" })
-        .catch(() => {});
+      running = OPENING_CARD;
+      const opened = update(planTs, { id: OPENING_CARD, title: label, status: "in_progress" });
+      // The heading goes behind the opening card on the same chain.
+      if (heading) {
+        const ts = planTs;
+        planChain = planChain.then(() => slack.setPlanTitle(channel, ts, heading)).catch(() => {});
+      }
+      await opened;
     },
 
     endProgress,
 
-    postInterim(text) {
+    postInterim(text, kind = "narration") {
       if (planTs) {
-        // Each narration line is its own card, and the previous one is closed
-        // by re-sending its id with status complete — that is what makes it
-        // read as progress rather than as a list of things all still happening.
-        const open = planTs;
-        void slack.appendTask(channel, open, { ...planCurrent, status: "complete" });
-        planCurrent = { id: `step-${++planStep}`, title: text.slice(0, 120) };
-        void slack.appendTask(channel, open, { ...planCurrent, status: "in_progress" });
+        // The backstop line only says the turn is still alive, and with a
+        // checklist open the running card and the working signal already say
+        // so. Held as details it would read as what the next lookup is for, so
+        // it is dropped.
+        if (kind === "backstop") return;
+        // With a checklist open, narration is not a card of its own: it says
+        // what the lookups it introduces are for, so it becomes the details of
+        // the next card announced. The latest line wins — it is the one written
+        // nearest the calls.
+        heldDetails = text;
         return;
       }
       void slack
@@ -531,6 +776,54 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           text: `:hourglass_flowing_sand: ${text}`,
         })
         .catch(() => {});
+    },
+
+    toolProgress(event) {
+      // No stream, no checklist: with the switch off the narration above is
+      // the whole of what a person sees, exactly as before there were cards.
+      if (!planTs) return;
+      const words = taskCardFor(event.name);
+      if (!words) return;
+      const ts = planTs;
+      const id = `tool-${event.seq}`;
+      const icon = estateLogo(words.estate, event.args);
+      /** The card as a call first puts it on the checklist. */
+      const fresh: PlanTask = { id, title: words.title, status: "pending", ...(icon ? { icon } : {}) };
+      switch (event.phase) {
+        case "announced": {
+          // What the call looks for, after the narration that introduced it.
+          const query = readoutFor(event.name)?.details(event.args) ?? null;
+          const details = [heldDetails, query].filter(Boolean).join(" · ");
+          heldDetails = null;
+          admit(ts, id, { ...fresh, ...(details ? { details } : {}) });
+          return;
+        }
+        case "started": {
+          const card = admit(ts, id, fresh);
+          // One card in progress at a time: whatever was running — the opening
+          // card, on the first lookup — closes in the same append. Two folded
+          // calls share a card, so the second starting closes nothing.
+          if (running && running !== card) move(ts, running, "complete");
+          running = card;
+          moveCall(ts, id, "in_progress");
+          return;
+        }
+        case "finished": {
+          if (event.error) {
+            moveCall(ts, id, "error", { output: shortReason(event.error) });
+            return;
+          }
+          // A call folded into the overflow card has no card of its own to
+          // carry a readout; only its status counts there.
+          const { output } = event;
+          const sources = threadVisibleSources(event.sources ?? []);
+          moveCall(ts, id, "complete", { ...(output ? { output } : {}), ...(sources.length ? { sources } : {}) });
+          return;
+        }
+        case "refused":
+          moveCall(ts, id, "error", { output: shortReason(event.reason) });
+          return;
+      }
     },
 
     async postAnswer(text): Promise<PostResult> {

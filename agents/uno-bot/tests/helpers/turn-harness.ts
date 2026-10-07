@@ -161,6 +161,12 @@ export function harness(opts: {
   delivery?: RecordingDelivery;
   threadState?: ThreadState;
   toolResult?: string;
+  /** A lookup's result by tool name, for a case where one lookup fails and
+   *  another does not. Wins over `toolResult`. */
+  toolResultFor?: (name: string) => string;
+  /** The subrequest meter the loop reads. Absent, one that spends nothing; a
+   *  case about a refused lookup hands in one already at the ceiling. */
+  budget?: LoopBudget;
   /** Stand in for the side-effect tool table, so a case can fail one operation
    *  of a batch. Absent — as everywhere else here — nothing is executed. */
   executeOperation?: (operation: { toolName: string; input: Record<string, unknown> }) => Promise<string>;
@@ -227,11 +233,11 @@ export function harness(opts: {
         deps: {
           async executeUngatedTool(name) {
             executed.push(name);
-            return opts.toolResult ?? JSON.stringify({ ok: true, rows: [] });
+            return opts.toolResultFor?.(name) ?? opts.toolResult ?? JSON.stringify({ ok: true, rows: [] });
           },
           // The real store, as production wires it (`threadStateFor(env)`).
           threadState,
-          budget: IDLE_BUDGET,
+          budget: opts.budget ?? IDLE_BUDGET,
           // Wired as production wires it: the loop gets the first go at a
           // refusal, and only a call refused twice reaches the person.
           ...(req.preflight ? { preflight: req.preflight } : {}),
@@ -250,6 +256,7 @@ export function harness(opts: {
         currentSenderId: req.currentSender.userId,
         cancelKey: opts.cancelKey ?? null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),
+        onToolProgress: req.onToolProgress,
         onSpend: (s) => {
           spend = s;
         },

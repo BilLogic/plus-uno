@@ -30,10 +30,20 @@
 // anywhere. (Not a compile property: `tsconfig.test.json` globs `src/**`.)
 
 import type { ProposalOperation } from "../thread-state/index";
+import type { ToolProgressEvent } from "../agent/tool-progress";
 
 /** How far a turn got before it failed. Drives what the message the person
  *  sees can honestly promise (`slack/failure-message.ts`). */
 export type DeliveryFailureStage = "context" | "agent" | "delivery" | "internal";
+
+/**
+ * Which kind of "still working" line an interim is. `narration` is the model's
+ * own line about the lookups it is about to make; `backstop` is the turn's
+ * generic line for a run that has said nothing for a while. A surface that
+ * already shows the run is alive can drop a backstop and still owe narration
+ * its place.
+ */
+export type InterimKind = "narration" | "backstop";
 
 /**
  * What the finished work left behind, in the port's own words: whether a
@@ -368,16 +378,33 @@ export interface Delivery {
    * that post no answer: `postAnswer` closes the surface INTO the answer, so a
    * checklist and the reply it belongs to stay one message. Both no-op where the
    * surface has no progress rendering, which is what keeps the turn from caring.
+   *
+   * `ask` is the person's message, handed over whole: a surface that can title
+   * its progress (the checklist's heading) draws the title from it, and decides
+   * itself how much of it fits. Omitted, the surface keeps `label` as its title.
    */
-  beginProgress(label: string): Promise<void>;
+  beginProgress(label: string, ask?: string): Promise<void>;
   endProgress(outcome: "complete" | "error"): Promise<void>;
 
   /**
    * Say that work is still happening. FIRE AND FORGET by contract: it is
    * called from inside the agent loop's narration callback, where waiting on a
    * post would put a courtesy message in front of the answer.
+   *
+   * @param kind - Whose line it is; narration when omitted
    */
-  postInterim(text: string): void;
+  postInterim(text: string, kind?: InterimKind): void;
+
+  /**
+   * Where one lookup is in its life — the checklist's feed. FIRE AND FORGET,
+   * like `postInterim` and for the same reason: it is called from inside the
+   * agent loop, between a tool and the next.
+   *
+   * Turn hands over only the calls that get a task card (`taskCardFor` on the
+   * tool table); whether the surface shows a checklist at all is the adapter's
+   * business, and one that shows none no-ops.
+   */
+  toolProgress(event: ToolProgressEvent): void;
 
   /** The answer. A progress surface still open closes INTO it. */
   postAnswer(text: string): Promise<PostResult>;
@@ -431,9 +458,10 @@ export type DeliveryCall =
   | { kind: "removeReaction"; emoji: string }
   | { kind: "working"; status?: string; titleFrom?: string }
   | { kind: "working-clear"; settlement: TurnSettlement }
-  | { kind: "beginProgress"; label: string }
+  | { kind: "beginProgress"; label: string; ask?: string }
   | { kind: "endProgress"; outcome: "complete" | "error" }
-  | { kind: "interim"; text: string }
+  | { kind: "interim"; text: string; backstop?: true }
+  | { kind: "toolProgress"; event: ToolProgressEvent }
   | { kind: "answer"; text: string }
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote }
@@ -541,16 +569,20 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "working-clear", settlement });
     },
 
-    async beginProgress(label) {
-      calls.push({ kind: "beginProgress", label });
+    async beginProgress(label, ask) {
+      calls.push({ kind: "beginProgress", label, ...(ask === undefined ? {} : { ask }) });
     },
 
     async endProgress(outcome) {
       calls.push({ kind: "endProgress", outcome });
     },
 
-    postInterim(text) {
-      calls.push({ kind: "interim", text });
+    postInterim(text, kind) {
+      calls.push({ kind: "interim", text, ...(kind === "backstop" ? { backstop: true as const } : {}) });
+    },
+
+    toolProgress(event) {
+      calls.push({ kind: "toolProgress", event });
     },
 
     async postAnswer(text) {
