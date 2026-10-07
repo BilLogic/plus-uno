@@ -41,9 +41,23 @@ async function parseSlackResponse<T extends SlackResponse>(res: Response, method
     return { ok: false, error: err } as unknown as T;
   }
   if (!data.ok) {
-    console.warn(`[slack] ${method} failed: ${(data as SlackErr).error}`);
+    console.warn(`[slack] ${method} failed: ${(data as SlackErr).error}${refusalDetail(data)}`);
   }
   return data;
+}
+
+/**
+ * Slack's own account of a refusal, when it gives one: `response_metadata.messages`
+ * names the argument it rejected (`[ERROR] … [json-pointer:/chunks/0/icon]`).
+ * `invalid_arguments` alone says only that SOMETHING in the payload was wrong —
+ * the checklist's first two live watches failed on exactly that, with nothing
+ * in the log to say which field. The messages describe the payload's shape,
+ * not workspace content, and are cut so a long one cannot flood the log.
+ */
+export function refusalDetail(data: unknown): string {
+  const messages = (data as { response_metadata?: { messages?: unknown } }).response_metadata?.messages;
+  if (!Array.isArray(messages) || !messages.length) return "";
+  return ` — ${messages.map(String).join(" | ").slice(0, 400)}`;
 }
 
 // Exported: assistant.ts / home.ts reuse this rather than hand-rolling their

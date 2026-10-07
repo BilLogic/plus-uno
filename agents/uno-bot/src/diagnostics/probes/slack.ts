@@ -55,6 +55,24 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
     });
     return { body: { stopped: stopTs, slack: await r.json() } };
   }
+  // ?chunks=<JSON array> — the checklist probe: open the stream in plan mode,
+  // append these chunks AS GIVEN in one call, close it, and return every raw
+  // response, `response_metadata` included. A card field Slack refuses comes
+  // back named here, one payload at a time, with the plan switch left off.
+  // Same reach as ?text=: a DM or the alert channel, and only so much of it.
+  const chunksParam = url.searchParams.get("chunks");
+  if (chunksParam !== null) {
+    const refusal = probeTextRefusal(channel, chunksParam, env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL);
+    if (refusal) return { body: { ok: false, error: refusal.replace(/^text/, "chunks") }, status: 400 };
+    let chunks: unknown;
+    try {
+      chunks = JSON.parse(chunksParam);
+    } catch {
+      return { body: { ok: false, error: "chunks is not JSON" }, status: 400 };
+    }
+    if (!Array.isArray(chunks)) return { body: { ok: false, error: "chunks must be a JSON array" }, status: 400 };
+    return { body: await probeChunks(env, channel, url, chunks) };
+  }
   const text = url.searchParams.get("text");
   if (text !== null) {
     const refusal = probeTextRefusal(channel, text, env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL);
@@ -103,6 +121,30 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   }
   return { body: { sent: payload, status: res.status, slack } };
 };
+
+/** Open a plan-mode stream, append `chunks` raw in one call, close it, and
+ *  report Slack's three verdicts verbatim. */
+async function probeChunks(env: Env, channel: string, url: URL, chunks: unknown[]): Promise<Record<string, unknown>> {
+  const call = async (method: string, body: Record<string, unknown>) =>
+    (await (
+      await countedFetch(`https://slack.com/api/${method}`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+        },
+        body: JSON.stringify(body),
+      })
+    ).json()) as { ok?: boolean; ts?: string };
+  const open: Record<string, unknown> = { channel, task_display_mode: url.searchParams.get("mode") || "plan" };
+  const threadTs = url.searchParams.get("thread_ts");
+  if (threadTs) open.thread_ts = threadTs;
+  const start = await call("chat.startStream", open);
+  if (!start.ok || !start.ts) return { sent: open, start };
+  const append = await call("chat.appendStream", { channel, ts: start.ts, chunks });
+  const stop = await call("chat.stopStream", { channel, ts: start.ts });
+  return { sent: { ...open, chunks }, start, append, stop };
+}
 
 /** The longest raw text the markup probe streams. */
 export const PROBE_TEXT_LIMIT = 2_000;
