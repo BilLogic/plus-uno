@@ -65,7 +65,8 @@ import {
   type OperationOutcome,
 } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
-import { gateWordsFor } from "../agent/tool-table";
+import { gateWordsFor, progressFor } from "../agent/tool-table";
+import type { ToolProgressEvent } from "../agent/tool-progress";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../tools/github-issue-update-render";
 import {
@@ -364,6 +365,9 @@ export interface TurnAgentRequest {
    *  `agent/loop.ts` `cancelSince`. */
   cancelSince?: number;
   onInterim(text: string): void;
+  /** Where each lookup is in its life — the checklist's feed. Turn filters it
+   *  to the calls that get a task card and hands those to Delivery. */
+  onToolProgress(event: ToolProgressEvent): void;
   /** The same clarify-vs-act check Turn runs after the loop returns, with this
    *  thread's PRD already bound, so the loop can put a refusal to the model as
    *  the call's own result instead of the person seeing the first one. */
@@ -1092,6 +1096,15 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!);
   }, INTERIM_BACKSTOP_MS);
 
+  // The checklist: one task card per lookup that has words for one on its tool
+  // table row. The loop reports every call it runs through the lookup path; a
+  // reaction, a Worker-only call and anything gated have no card, and that is
+  // the table's answer, not a list kept here. Fire-and-forget like the
+  // narration, for the same reason: a courtesy must not wait in front of work.
+  const showToolProgress = (event: ToolProgressEvent): void => {
+    if (progressFor(event.name)) delivery.toolProgress(event);
+  };
+
   // Clarify-vs-act, bound to this thread once: the loop asks it mid-turn (so a
   // refusal reaches the model), and the block below asks it again on whatever
   // the loop finally staged (so a refusal the model could not fix reaches the
@@ -1123,6 +1136,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       correction,
       preflight: preflightCall,
       onInterim: postInterim,
+      onToolProgress: showToolProgress,
       cancelSince: startedAt,
     });
   } catch (err) {

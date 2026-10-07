@@ -20,7 +20,7 @@ import type { Env } from "../types";
 import {
   addReaction,
   appendStream,
-  appendTask,
+  appendTasks,
   postMessage,
   slackCall,
   startStream,
@@ -130,8 +130,8 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team, "plan"),
-    async appendTask(channel, ts, task) {
-      await appendTask(env, channel, ts, task);
+    async appendTasks(channel, ts, tasks) {
+      await appendTasks(env, channel, ts, tasks);
     },
     async stopStream(channel, ts) {
       await stopStream(env, channel, ts);

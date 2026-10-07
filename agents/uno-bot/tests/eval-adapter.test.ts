@@ -125,6 +125,7 @@ function harness(
         currentSenderId: req.currentSender.userId,
         cancelKey: null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),
+        onToolProgress: req.onToolProgress,
       });
       agent.result = result;
       return { result, tools: executed.slice(), references: [] };
@@ -335,6 +336,36 @@ test("an eval case and a Slack message with the same text produce the same outco
     await fromSlack.threadState.readHistory(ref),
   );
   assert.equal(evalOutcome.disposition, "answered");
+});
+
+test("a turn that looks things up shows the same checklist from both adapters", async () => {
+  const replies: ScriptedReply[] = [
+    {
+      text: "Checking the blueprint…",
+      toolCalls: [
+        { name: "search_blueprint", args: { query: "call-off" } },
+        { name: "slack_react", args: { name: "eyes" } },
+      ],
+    },
+    { text: "A call-off opens the slot a fill-in claims." },
+  ];
+
+  const fromEval = harness({ replies: [...replies] });
+  await runTurn(evalRequest({ prompt: TEXT }), fromEval.deps);
+
+  const fromSlack = harness({ replies: [...replies] });
+  await runTurn(slackRequest(), fromSlack.deps);
+
+  const checklist = (calls: typeof fromEval.delivery.calls) =>
+    calls.flatMap((c) => (c.kind === "toolProgress" ? [`${c.event.name}:${c.event.phase}`] : []));
+  // The eval artifact's `calls` IS the recording, so a checklist the eval route
+  // could not see would be a checklist no scenario could assert.
+  assert.deepEqual(checklist(fromEval.delivery.calls), [
+    "search_blueprint:announced",
+    "search_blueprint:started",
+    "search_blueprint:finished",
+  ]);
+  assert.deepEqual(fromEval.delivery.calls, fromSlack.delivery.calls);
 });
 
 test("history and a pending proposal reach the turn the same way from both sides", async () => {

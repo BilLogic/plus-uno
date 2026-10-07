@@ -30,9 +30,11 @@
 // anywhere. (Not a compile property: `tsconfig.test.json` globs `src/**`.)
 
 import type { ProposalOperation } from "../thread-state/index";
+import type { ToolProgressEvent } from "../agent/tool-progress";
 
 /** How far a turn got before it failed. Drives what the message the person
- *  sees can honestly promise (`slack/failure-message.ts`). */
+ *    | { kind: "toolProgress"; event: ToolProgressEvent }
+sees can honestly promise (`slack/failure-message.ts`). */
 export type DeliveryFailureStage = "context" | "agent" | "delivery" | "internal";
 
 /**
@@ -379,6 +381,17 @@ export interface Delivery {
    */
   postInterim(text: string): void;
 
+  /**
+   * Where one lookup is in its life — the checklist's feed. FIRE AND FORGET,
+   * like `postInterim` and for the same reason: it is called from inside the
+   * agent loop, between a tool and the next.
+   *
+   * Turn hands over only the calls that get a task card (`progressFor` on the
+   * tool table); whether the surface shows a checklist at all is the adapter's
+   * business, and one that shows none no-ops.
+   */
+  toolProgress(event: ToolProgressEvent): void;
+
   /** The answer. A progress surface still open closes INTO it. */
   postAnswer(text: string): Promise<PostResult>;
 
@@ -434,6 +447,7 @@ export type DeliveryCall =
   | { kind: "beginProgress"; label: string }
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string }
+  | { kind: "toolProgress"; event: ToolProgressEvent }
   | { kind: "answer"; text: string }
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote }
@@ -551,6 +565,10 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
 
     postInterim(text) {
       calls.push({ kind: "interim", text });
+    },
+
+    toolProgress(event) {
+      calls.push({ kind: "toolProgress", event });
     },
 
     async postAnswer(text) {
