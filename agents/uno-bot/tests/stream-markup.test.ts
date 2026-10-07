@@ -226,3 +226,43 @@ test("a task card's logo goes as Slack's icon object, and a card without one sen
   assert.deepEqual(withLogo!.icon, { type: "icon", name: logo });
   assert.equal("icon" in without!, false);
 });
+
+test("the checklist probe streams raw chunks in plan mode, only to a DM or the alert channel", async () => {
+  const { slackStreamProbe } = await import("../src/diagnostics/probes/slack.js");
+  const probe = async (q: string) => {
+    const url = `https://w/debug/slack-stream?${q}`;
+    return (await slackStreamProbe(ENV, new URL(url), new Request(url))) as {
+      body: Record<string, unknown>;
+      status?: number;
+    };
+  };
+  const chunks = [{ type: "task_update", id: "t1", title: "Searching Notion", status: "in_progress" }];
+  const q = `thread_ts=1.0&chunks=${encodeURIComponent(JSON.stringify(chunks))}`;
+
+  sent = [];
+  let res = await probe(`channel=C0PUBLIC1&${q}`);
+  assert.equal(res.status, 400);
+  assert.match(String(res.body.error), /^chunks= .*DM \(D…\)/);
+  res = await probe(`channel=D0123&thread_ts=1.0&chunks=${encodeURIComponent("{not json")}`);
+  assert.equal(res.status, 400);
+  assert.equal(sent.length, 0, "a refused probe calls nothing");
+
+  res = await probe(`channel=D0123&${q}`);
+  assert.deepEqual(sent.map((s) => s.method), ["chat.startStream", "chat.appendStream", "chat.stopStream"]);
+  assert.equal(sent[0]!.body.task_display_mode, "plan");
+  assert.deepEqual(sent[1]!.body.chunks, chunks, "raw, on purpose");
+});
+
+test("a Slack refusal's response_metadata reaches the log line", async () => {
+  const { refusalDetail } = await import("../src/slack/api.js");
+  assert.equal(refusalDetail({ ok: false, error: "invalid_arguments" }), "");
+  assert.equal(
+    refusalDetail({
+      ok: false,
+      error: "invalid_arguments",
+      response_metadata: { messages: ["[ERROR] invalid value [json-pointer:/chunks/0/icon]"] },
+    }),
+    " — [ERROR] invalid value [json-pointer:/chunks/0/icon]",
+  );
+  assert.ok(refusalDetail({ response_metadata: { messages: ["x".repeat(1000)] } }).length <= 403);
+});
