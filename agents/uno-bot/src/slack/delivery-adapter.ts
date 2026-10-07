@@ -715,14 +715,21 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // nothing to put in it and the client renders an empty bubble for the
       // whole run (tried, reverted — see api.ts).
       if (!deps.planStream) return;
-      if (!replyTs) return beginStaticPlan(label);
+      // The checklist opens under the progress label and is retitled once from
+      // the ask.
+      const heading = ask ? checklistHeading(ask) : "";
+      if (!replyTs) {
+        await beginStaticPlan(label);
+        // A static plan is rewritten once at settle anyway, so its retitle
+        // rides that rewrite rather than spending a call of its own.
+        if (planTs && heading) planTitle = heading;
+        return;
+      }
       planTs = await slack.startStream(channel, replyTs, target.userId, target.team);
       if (!planTs) return;
       running = OPENING_CARD;
       const opened = update(planTs, { id: OPENING_CARD, title: label, status: "in_progress" });
-      // The heading, once, behind the opening card on the same chain: the
-      // checklist opens under the progress label and is retitled from the ask.
-      const heading = ask ? checklistHeading(ask) : "";
+      // The heading goes behind the opening card on the same chain.
       if (heading) {
         const ts = planTs;
         planChain = planChain.then(() => slack.setPlanTitle(channel, ts, heading)).catch(() => {});

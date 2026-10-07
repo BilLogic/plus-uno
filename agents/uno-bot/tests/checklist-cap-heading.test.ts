@@ -144,6 +144,20 @@ describe("the checklist's heading", () => {
     assert.ok(heading.title.endsWith("…"));
   });
 
+  it("titles a top-level DM's static plan from the ask when it settles, at no extra call", async () => {
+    const slack = recordingSlack();
+    const { replyTs: _thread, ...topLevel } = TARGET;
+    const delivery = deliveryAdapter(slack.deps(true), topLevel);
+
+    await delivery.beginProgress("Working on it", "Did it ship?");
+    await delivery.endProgress("complete");
+
+    assert.equal(slack.of("heading").length, 0);
+    const [settled] = slack.of("update");
+    assert.equal(settled?.text, "Did it ship?");
+    assert.match(JSON.stringify(settled?.blocks), /Did it ship\?/);
+  });
+
   it("sends no heading without an ask, and none without a stream", async () => {
     const noAsk = recordingSlack();
     const a = deliveryAdapter(noAsk.deps(true), TARGET);
