@@ -13,6 +13,7 @@ import {
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { rowFor } from "../agent/tool-table";
+import { cardLinks } from "./plan-block";
 
 interface SlackOk {
   ok: true;
@@ -471,15 +472,8 @@ export async function appendTasks(
         status: task.status,
         ...(task.details ? { details: taskDetails(task.details) } : {}),
         ...(task.output ? { output: taskDetails(task.output) } : {}),
-        // A source's name takes the same pass as `details`; its URL goes as
-        // the tool returned it, since a link is not text to escape.
-        ...(task.sources?.length
-          ? { sources: task.sources.map((s) => ({ type: "url", text: taskDetails(s.text), url: s.url })) }
-          : {}),
-        // Slack's `icon` on a task chunk is absent from @slack/types, so it is
-        // built here as a plain object. An image URL is the one documented
-        // form of `name`.
-        ...(task.icon ? { icon: { type: "icon", name: task.icon } } : {}),
+        // A source's name takes the same pass as `details`.
+        ...cardLinks(task, taskDetails),
       })),
     });
     return !!res.ok;

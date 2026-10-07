@@ -11,7 +11,6 @@ import assert from "node:assert/strict";
 
 import type { DeliveryCall, RecordingDelivery } from "../src/turn/index";
 import type { ToolProgressEvent } from "../src/agent/tool-progress";
-import { MAX_PROGRESS_RESULT_CHARS } from "../src/agent/tool-progress";
 import { LOOKUP_CEILING } from "../src/agent/loop-policy";
 import { harness, request } from "./helpers/turn-harness";
 import { runTurn } from "../src/turn/index";
@@ -87,8 +86,18 @@ test("a later reply's calls continue the numbering, so no two cards share an id"
   );
 });
 
-test("a finished lookup carries its raw result, capped, and the tool's own error", async () => {
-  const big = JSON.stringify({ ok: true, rows: ["x".repeat(MAX_PROGRESS_RESULT_CHARS * 2)] });
+test("a finished lookup carries what its readout made of the WHOLE result, and the tool's own error", async () => {
+  // A search whose rows sit at the front and whose payload runs far past what
+  // any one event should hold: the card still counts the rows and links them.
+  const big = JSON.stringify({
+    ok: true,
+    results: [
+      { title: "Session recap", url: "https://www.notion.so/recap-1" },
+      { title: "Call-off flow", url: "https://www.notion.so/calloff-2" },
+    ],
+    excerpt: "x".repeat(40_000),
+  });
+  assert.ok(big.length > 16_000);
   const h = harness({
     replies: [
       {
@@ -108,10 +117,14 @@ test("a finished lookup carries its raw result, capped, and the tool's own error
   const finished = progressOf(h.delivery).filter((e) => e.phase === "finished");
   assert.equal(finished.length, 2);
   const [search, read] = finished as Array<Extract<ToolProgressEvent, { phase: "finished" }>>;
-  assert.ok(search!.result.length <= MAX_PROGRESS_RESULT_CHARS);
-  assert.ok(search!.result.startsWith('{"ok":true'));
+  assert.equal(search!.output, "2 pages");
+  assert.deepEqual(search!.sources, [
+    { text: "Session recap", url: "https://www.notion.so/recap-1" },
+    { text: "Call-off flow", url: "https://www.notion.so/calloff-2" },
+  ]);
   assert.equal(search!.error, undefined);
   assert.equal(read!.error, "404 not found");
+  assert.equal(read!.output, undefined);
 });
 
 test("a lookup the budget refuses is reported refused, never left announced", async () => {
@@ -162,4 +175,26 @@ test("gated writes and slack_react never become cards; the reads beside them do"
     "2:notion_search:started",
     "2:notion_search:finished",
   ]);
+});
+
+test("a throw past the agent's own catch still settles the checklist as an error", async () => {
+  // The outermost catch (`slack/events.ts`) posts the "internal" failure, but
+  // it holds no Delivery: a checklist left open there would sit above the
+  // failure still claiming a step is in progress. The judge throwing is one
+  // such exit — after the lookups, before the answer.
+  const h = harness({
+    replies: [
+      { toolCalls: [{ name: "notion_search", args: { query: "a" } }] },
+      { text: "Done." },
+    ],
+    judge: () => {
+      throw new Error("judge unreachable");
+    },
+  });
+
+  await assert.rejects(runTurn(request(), h.deps), /judge unreachable/);
+
+  const progress = h.delivery.calls.filter((c) => c.kind === "beginProgress" || c.kind === "endProgress");
+  assert.equal(progress[0]?.kind, "beginProgress");
+  assert.deepEqual(progress.at(-1), { kind: "endProgress", outcome: "error" });
 });

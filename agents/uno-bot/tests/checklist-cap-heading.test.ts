@@ -8,7 +8,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
-import type { ToolProgressEvent } from "../src/agent/tool-progress";
+import { finishedProgress, type ToolProgressEvent } from "../src/agent/tool-progress";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
 const TARGET: SlackDeliveryTarget = {
@@ -23,14 +23,12 @@ const NAME = "notion_search";
 
 const announced = (seq: number): ToolProgressEvent => ({ seq, name: NAME, args: {}, phase: "announced" });
 const started = (seq: number): ToolProgressEvent => ({ seq, name: NAME, args: {}, phase: "started" });
-const finished = (seq: number, error?: string): ToolProgressEvent => ({
-  seq,
-  name: NAME,
-  args: {},
-  phase: "finished",
-  result: error ? JSON.stringify({ ok: false, error }) : JSON.stringify({ ok: true, rows: [] }),
-  ...(error ? { error } : {}),
-});
+const finished = (seq: number, error?: string): ToolProgressEvent =>
+  finishedProgress(
+    { seq, name: NAME, args: {} },
+    error ? JSON.stringify({ ok: false, error }) : JSON.stringify({ ok: true, rows: [] }),
+    error,
+  );
 
 const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
 

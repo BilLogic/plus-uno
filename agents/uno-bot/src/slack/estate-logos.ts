@@ -14,6 +14,8 @@
 // and its cards go without a logo rather than with a broken one.
 
 import type { Estate } from "../agent/tool-table";
+import { readLinkOf } from "../agent/task-card-readout";
+import { estateOfUrl } from "./estate-hosts";
 
 /** Where the logos are served from. */
 export const ESTATE_LOGO_BASE = "https://plus-uno.netlify.app/uno-bot/estate-logos";
@@ -24,32 +26,14 @@ const LOGOS: Partial<Record<Estate, string>> = {
   figma: `${ESTATE_LOGO_BASE}/figma.png`,
 };
 
-/** A read link's estate, from its host — for the one tool whose estate is
- *  whatever the link it was handed points at. */
-function estateOfUrl(raw: unknown): Estate | null {
-  if (typeof raw !== "string") return null;
-  let url: URL;
-  try {
-    url = new URL(raw);
-  } catch {
-    return null;
-  }
-  const host = url.hostname.replace(/^www\./, "");
-  if (host === "github.com" || host.endsWith(".github.com") || host === "raw.githubusercontent.com") return "github";
-  if (host === "figma.com" || host.endsWith(".figma.com")) return "figma";
-  if (host.endsWith(".slack.com") || host === "slack.com") return "slack";
-  if (host === "notion.so" || host.endsWith(".notion.so") || host.endsWith(".notion.site")) return "notion";
-  return null;
-}
-
 /**
  * The logo URL a tool's card carries, or undefined for none.
  *
  * @param estate - The estate the tool table names for the tool, or null
- * @param args - The call's arguments; a tool naming no estate that was handed a
- *   `url` takes the estate of that link
+ * @param args - The call's arguments; a tool naming no estate takes the estate
+ *   of the link it reads (`readLinkOf`), the same link its card's details name
  */
 export function estateLogo(estate: Estate | null, args: Record<string, unknown>): string | undefined {
-  const which = estate ?? estateOfUrl(args.url);
+  const which = estate ?? estateOfUrl(readLinkOf(args));
   return which ? LOGOS[which] : undefined;
 }

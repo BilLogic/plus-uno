@@ -168,12 +168,12 @@ function postingClientFor(env: Env): PostingClient {
 /**
  * Every call a client record makes, under the meter's delivery label.
  *
- * Delivery runs WHILE lookups do: the plan stream's cards are posted from the
+ * Delivery runs WHILE lookups do: the checklist's cards are posted from the
  * agent loop's own callbacks, mid-lookup, and the lookup limit is one field on
  * the per-invocation meter. Unlabelled, a card update was charged to the lookup
  * ceiling, could be refused by it, and stamped a complete result as partial
  * (`net.ts` § asDelivery). Labelled here, at the record, so every Slack call
- * Delivery makes — the plan stream and the answer above all — carries it, and a
+ * Delivery makes — the checklist and the answer above all — carries it, and a
  * method added to either record carries it without anyone remembering to.
  */
 function asDeliveryClient<C extends object>(client: C): C {

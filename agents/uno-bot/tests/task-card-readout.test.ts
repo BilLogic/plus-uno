@@ -8,8 +8,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { readoutFor, type ProgressSource } from "../src/agent/progress-readout";
-import { TOOL_TABLE, progressFor, type ToolName } from "../src/agent/tool-table";
+import { readoutFor, type TaskCardSource } from "../src/agent/task-card-readout";
+import { TOOL_TABLE, taskCardFor, type ToolName } from "../src/agent/tool-table";
 
 const ok = (body: Record<string, unknown>): string => JSON.stringify({ ok: true, ...body });
 const failed = (error: string): string => JSON.stringify({ ok: false, error, note: "say so" });
@@ -20,7 +20,7 @@ interface Row {
   details: string | null;
   result: string;
   output: string | null;
-  sources?: ProgressSource[];
+  sources?: TaskCardSource[];
 }
 
 const ROWS: Row[] = [
@@ -155,7 +155,7 @@ describe("a task card's readout", () => {
 
   it("every tool that gets a card has a readout, and nothing else does", () => {
     for (const name of Object.keys(TOOL_TABLE) as ToolName[]) {
-      assert.equal(readoutFor(name) !== null, progressFor(name) !== null, name);
+      assert.equal(readoutFor(name) !== null, taskCardFor(name) !== null, name);
     }
   });
 

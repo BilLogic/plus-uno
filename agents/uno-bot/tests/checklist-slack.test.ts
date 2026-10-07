@@ -11,7 +11,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
-import type { ToolProgressEvent } from "../src/agent/tool-progress";
+import { finishedProgress, type ToolProgressEvent } from "../src/agent/tool-progress";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
 const TARGET: SlackDeliveryTarget = {
@@ -26,14 +26,12 @@ const NAMES: Record<number, string> = { 1: "roadmap_query", 2: "notion_search", 
 
 const announced = (seq: number): ToolProgressEvent => ({ seq, name: NAMES[seq]!, args: {}, phase: "announced" });
 const started = (seq: number): ToolProgressEvent => ({ seq, name: NAMES[seq]!, args: {}, phase: "started" });
-const finished = (seq: number, error?: string): ToolProgressEvent => ({
-  seq,
-  name: NAMES[seq]!,
-  args: {},
-  phase: "finished",
-  result: error ? JSON.stringify({ ok: false, error }) : JSON.stringify({ ok: true, rows: [] }),
-  ...(error ? { error } : {}),
-});
+const finished = (seq: number, error?: string): ToolProgressEvent =>
+  finishedProgress(
+    { seq, name: NAMES[seq]!, args: {} },
+    error ? JSON.stringify({ ok: false, error }) : JSON.stringify({ ok: true, rows: [] }),
+    error,
+  );
 const refused = (seq: number, reason: string): ToolProgressEvent => ({
   seq,
   name: NAMES[seq]!,
@@ -125,6 +123,23 @@ describe("the checklist", () => {
     assert.equal(slack.calls.at(-1)!.kind, "stopStream");
   });
 
+  it("settles a card whose lookup never ran as an error, never as complete", async () => {
+    // A stopped turn answers with lookups still queued: the running card
+    // settles with the turn, and a queued one says it was not run.
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(true), TARGET);
+
+    await delivery.beginProgress("Working on it");
+    for (const e of [announced(1), announced(2), started(1)]) delivery.toolProgress(e);
+    await tick();
+    await delivery.postAnswer("Stopped.");
+
+    const last = slack.of("tasks").at(-1)!.tasks;
+    assert.deepEqual(last.map((t) => `${t.id}:${t.status}`), ["tool-1:complete", "tool-2:error"]);
+    assert.equal(last.find((t) => t.id === "tool-2")!.output, "Not run");
+    assert.equal(last.find((t) => t.id === "tool-1")!.output, undefined);
+  });
+
   it("lands narration as the details of the card it precedes, never as a card of its own", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
@@ -144,6 +159,41 @@ describe("the checklist", () => {
     );
     // A card that is updated keeps its details: a task update replaces the card.
     assert.equal(cards.filter((t) => t.id === "tool-1").at(-1)!.details, "Checking whether this shipped");
+  });
+
+  it("drops the backstop line while the checklist is live, and never glues it into a card", async () => {
+    // The running card and the working signal already say the turn is alive;
+    // "Still on it" under the next card would read as what that lookup is for.
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(true), TARGET);
+
+    await delivery.beginProgress("Working on it");
+    delivery.postInterim("Still on it — this one needs a longer dig.", "backstop");
+    await threeLookups(delivery);
+    await delivery.postAnswer("Here it is.");
+
+    assert.equal(slack.of("message").length, 0, "no ⏳ message beside the checklist");
+    const cards = slack.of("tasks").flatMap((c) => c.tasks);
+    assert.ok(cards.every((t) => !t.details?.includes("Still on it")), "never a card's details");
+  });
+
+  it("with the plan switch off, posts the backstop line exactly as before", async () => {
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(false), TARGET);
+
+    await delivery.beginProgress("Working on it");
+    delivery.postInterim("Still on it — this one needs a longer dig.", "backstop");
+    await tick();
+
+    assert.deepEqual(slack.calls, [
+      {
+        kind: "message",
+        channel: "C123",
+        threadTs: "100.1",
+        text: ":hourglass_flowing_sand: Still on it — this one needs a longer dig.",
+        blocks: false,
+      },
+    ]);
   });
 
   it("with the plan switch off, shows no cards and posts exactly today's narration", async () => {

@@ -22,9 +22,10 @@
 //     model decides whether to cite it.
 //
 // Slack-specific on purpose, and the reason it lives here and not beside the
-// readouts that produce the sources (`agent/progress-readout.ts`).
+// readouts that produce the sources (`agent/task-card-readout.ts`).
 
-import type { ProgressSource } from "../agent/progress-readout";
+import type { TaskCardSource } from "../agent/task-card-readout";
+import { estateOfHost } from "./estate-hosts";
 
 /** A source as a card carries it — the link and its name, nothing about who
  *  could see it, because only visible ones get this far. */
@@ -33,8 +34,8 @@ export interface CardSource {
   url: string;
 }
 
-/** The hosts whose links pass, each matched as the host or a subdomain of it. */
-const SHARED_HOSTS = ["notion.so", "notion.site", "github.com", "githubusercontent.com", "figma.com"];
+/** The estates whose links pass on their host alone (`estate-hosts.ts`). */
+const SHARED_ESTATES = new Set(["notion", "github", "figma"]);
 
 /** Our own estates on the Netlify site, by path: other paths there are
  *  prototypes and previews, not a source an answer rests on. */
@@ -44,9 +45,7 @@ const OWN_PATHS = ["/blueprint", "/storybook"];
 /** The `slack_search` visibilities whose links the thread may see. */
 const THREAD_VISIBLE = ["public-only", "requester-own"];
 
-const isHost = (host: string, domain: string): boolean => host === domain || host.endsWith(`.${domain}`);
-
-function passes(source: ProgressSource): boolean {
+function passes(source: TaskCardSource): boolean {
   let url: URL;
   try {
     url = new URL(source.url);
@@ -55,9 +54,10 @@ function passes(source: ProgressSource): boolean {
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return false;
   const host = url.hostname.toLowerCase();
-  if (SHARED_HOSTS.some((d) => isHost(host, d))) return true;
+  const estate = estateOfHost(host);
+  if (estate && SHARED_ESTATES.has(estate)) return true;
   if (host === OWN_SITE) return OWN_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(`${p}/`));
-  if (isHost(host, "slack.com")) {
+  if (estate === "slack") {
     const conversation = url.pathname.match(/^\/archives\/([A-Z0-9]+)/)?.[1] ?? "";
     // D… is a direct message; G… a group DM or a legacy private channel.
     if (!conversation.startsWith("C")) return false;
@@ -71,6 +71,6 @@ function passes(source: ProgressSource): boolean {
  *
  * @param sources - What the tool's readout pulled from its result
  */
-export function threadVisibleSources(sources: readonly ProgressSource[]): CardSource[] {
+export function threadVisibleSources(sources: readonly TaskCardSource[]): CardSource[] {
   return sources.filter(passes).map(({ text, url }) => ({ text, url }));
 }

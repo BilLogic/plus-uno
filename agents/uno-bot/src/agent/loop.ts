@@ -37,7 +37,7 @@ import type { ModelTier } from "./routing";
 import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-state/index";
 import type { ProviderConversationTurn } from "./provider-conversation";
 import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";
-import { capProgressResult, type ToolProgressEvent } from "./tool-progress";
+import { finishedProgress, type ToolProgressEvent } from "./tool-progress";
 import type {
   ModelProvider,
   ModelStop,
@@ -342,12 +342,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
           // short read cannot pass as a whole one.
           if (deps.budget.trips() > tripsBefore) text = markPartialLookup(text);
           const { error } = toolResultDigest(call.name, text);
-          input.onToolProgress?.({
-            ...progress,
-            phase: "finished",
-            result: capProgressResult(text),
-            ...(error ? { error } : {}),
-          });
+          input.onToolProgress?.(finishedProgress(progress, text, error));
         } catch (err) {
           if (!deps.budget.isBudgetError(err)) throw err;
           text = budgetRefusedResult();

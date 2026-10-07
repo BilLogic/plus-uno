@@ -31,7 +31,6 @@ const done = (seq: number, error?: string): ToolProgressEvent => ({
   name: NAMES[seq] ?? "notion_search",
   args: {},
   phase: "finished",
-  result: "{}",
   ...(error ? { error } : {}),
 });
 

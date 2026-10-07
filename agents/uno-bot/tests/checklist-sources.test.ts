@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 
 import { deliveryAdapter, type PlanTask, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
 import { planBlock } from "../src/slack/plan-block";
-import type { ToolProgressEvent } from "../src/agent/tool-progress";
+import { finishedProgress, type ToolProgressEvent } from "../src/agent/tool-progress";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
 const TARGET: SlackDeliveryTarget = { channel: "C123", replyTs: "100.1", userMsgTs: "100.1", userId: "U1", team: "T1" };
@@ -27,7 +27,7 @@ async function lookup(
   delivery.toolProgress({ ...base, phase: "announced" } as ToolProgressEvent);
   delivery.toolProgress({ ...base, phase: "started" } as ToolProgressEvent);
   await tick();
-  delivery.toolProgress({ ...base, phase: "finished", result });
+  delivery.toolProgress(finishedProgress(base, result));
   await tick();
 }
 
@@ -141,7 +141,7 @@ describe("a task card's details, output and sources", () => {
     const base = { seq: 1, name: "notion_search", args: { query: "x" } };
     delivery.toolProgress({ ...base, phase: "announced" });
     delivery.toolProgress({ ...base, phase: "started" });
-    delivery.toolProgress({ ...base, phase: "finished", result: JSON.stringify({ ok: false, error: "502 from Notion" }), error: "502 from Notion" });
+    delivery.toolProgress(finishedProgress(base, JSON.stringify({ ok: false, error: "502 from Notion" }), "502 from Notion"));
     await delivery.postAnswer("Done.");
     const card = lastCard(slack, "tool-1");
     assert.equal(card.status, "error");

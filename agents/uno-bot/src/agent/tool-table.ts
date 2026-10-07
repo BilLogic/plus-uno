@@ -114,7 +114,7 @@ export type Estate = "notion" | "figma" | "github" | "blueprint" | "slack" | "st
  * The table has five readers that are not Slack, and a column that held a
  * Slack shape would drag Slack into every one of them.
  */
-export interface ProgressWords {
+export interface TaskCardWords {
   /** The card's title, in uno's voice — what it is doing, as it would say it
    *  ("Searching Notion"). */
   readonly title: string;
@@ -130,7 +130,7 @@ export interface ProgressWords {
  * them — and an ungated row with them — fails the typecheck where the row is
  * written. That is what makes adding a row the only edit a new tool needs.
  *
- * The same holds for `progress` on an ungated row: REQUIRED, so a new lookup
+ * The same holds for `taskCard` on an ungated row: REQUIRED, so a new lookup
  * cannot ship without saying what it looks like in progress. `null` is a
  * stated answer — "this call gets no task card" — and it is how `slack_react`
  * stays off the checklist: a reaction is a courtesy, not a read.
@@ -154,10 +154,10 @@ export type ToolRow = {
   | {
       readonly access: "ungated";
       readonly gate?: undefined;
-      readonly progress: ProgressWords | null;
+      readonly taskCard: TaskCardWords | null;
     }
-  | { readonly access: "control"; readonly gate?: undefined; readonly progress?: undefined }
-  | { readonly access: "gated" | "worker"; readonly gate: GateWords; readonly progress?: undefined }
+  | { readonly access: "control"; readonly gate?: undefined; readonly taskCard?: undefined }
+  | { readonly access: "gated" | "worker"; readonly gate: GateWords; readonly taskCard?: undefined }
 );
 
 export const TOOL_TABLE = {
@@ -165,13 +165,13 @@ export const TOOL_TABLE = {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Checking the Roadmap board", estate: "notion" },
+    taskCard: { title: "Checking the Roadmap board", estate: "notion" },
   },
   notion_search: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Searching Notion", estate: "notion" },
+    taskCard: { title: "Searching Notion", estate: "notion" },
   },
   // A URL of any estate, so the row names none: which one this call read is
   // in its arguments, not in the tool.
@@ -179,65 +179,65 @@ export const TOOL_TABLE = {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Reading the link", estate: null },
+    taskCard: { title: "Reading the link", estate: null },
   },
   search_blueprint: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Searching the blueprint", estate: "blueprint" },
+    taskCard: { title: "Searching the blueprint", estate: "blueprint" },
   },
   github_read: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Reading GitHub", estate: "github" },
+    taskCard: { title: "Reading GitHub", estate: "github" },
   },
   // The duplicate check before `github_issue_create`: open intakes by keyword.
   github_intake_search: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Checking open intakes on GitHub", estate: "github" },
+    taskCard: { title: "Checking open intakes on GitHub", estate: "github" },
   },
   slack_user_profile: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Looking someone up in Slack", estate: "slack" },
+    taskCard: { title: "Looking someone up in Slack", estate: "slack" },
   },
   slack_channel_members: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Checking who's in the channel", estate: "slack" },
+    taskCard: { title: "Checking who's in the channel", estate: "slack" },
   },
   slack_thread_read: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Reading the Slack thread", estate: "slack" },
+    taskCard: { title: "Reading the Slack thread", estate: "slack" },
   },
-  slack_react: { access: "ungated", retrieval: false, reviewRequest: null, progress: null },
+  slack_react: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
   // "Remind me": writes only uno-bot's own record, posted back to the asker
   // alone at a morning run (`commitments/remind.ts`).
   reminder_set: {
     access: "ungated",
     retrieval: false,
     reviewRequest: null,
-    progress: { title: "Setting your reminder", estate: null },
+    taskCard: { title: "Setting your reminder", estate: null },
   },
   slack_search: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    progress: { title: "Searching Slack", estate: "slack" },
+    taskCard: { title: "Searching Slack", estate: "slack" },
   },
   read_reference: {
     access: "ungated",
     retrieval: false,
     reviewRequest: null,
-    progress: { title: "Checking my playbook", estate: null },
+    taskCard: { title: "Checking my playbook", estate: null },
   },
   notion_create: {
     access: "gated",
@@ -422,9 +422,9 @@ export function gateWordsFor(name: string): GateWords | null {
  * The checklist's one membership test: Turn reads it to decide which calls it
  * hands Delivery, and the Slack adapter reads it for the words.
  */
-export function progressFor(name: string): ProgressWords | null {
+export function taskCardFor(name: string): TaskCardWords | null {
   const row = rowFor(name);
-  return row?.access === "ungated" ? row.progress : null;
+  return row?.access === "ungated" ? row.taskCard : null;
 }
 
 /** One row with the schema it is offered under — null for a `worker` row,
