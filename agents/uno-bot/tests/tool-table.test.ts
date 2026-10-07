@@ -165,7 +165,7 @@ describe("the readers answer from the row", () => {
       }
       assert.ok(words, `${name} is a lookup with no task-card words`);
       assert.ok(words.title.length > 0 && words.title !== name, `${name} has no title in uno's words`);
-      // The column names an estate; it never carries a URL or anything else
+      // The column is words; it never carries a URL or anything else
       // Slack-shaped, because five readers of this table are not Slack.
       assert.doesNotMatch(JSON.stringify(words), /https?:|task_update|\bicon\b/);
     }

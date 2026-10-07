@@ -214,19 +214,6 @@ test("the markup probe streams raw text only to a DM or the alert channel, and o
   assert.equal((res.body as { appended: boolean }).appended, true);
 });
 
-test("a task card's logo goes as Slack's icon object, and a card without one sends no icon", async () => {
-  const { appendTasks } = await import("../src/slack/api.js");
-  const logo = "https://plus-uno.netlify.app/uno-bot/estate-logos/github.png";
-  sent = [];
-  await appendTasks(ENV, "D0123", "9.0", [
-    { id: "t1", title: "Reading GitHub", status: "in_progress", icon: logo },
-    { id: "t2", title: "Setting your reminder", status: "in_progress" },
-  ]);
-  const [withLogo, without] = sent[0]!.body.chunks as Array<Record<string, unknown>>;
-  assert.deepEqual(withLogo!.icon, { type: "icon", name: logo });
-  assert.equal("icon" in without!, false);
-});
-
 test("the checklist probe streams raw chunks in plan mode, only to a DM or the alert channel", async () => {
   const { slackStreamProbe } = await import("../src/diagnostics/probes/slack.js");
   const probe = async (q: string) => {

@@ -123,6 +123,10 @@ Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading`
 
 **Streaming stays off until a live probe passes.** Either flag is refused unless `SLACK_STREAM_MARKUP_PROBE` records `pass:YYYY-MM-DD`: stream a body with a bare `<@teammate>` and one in a code fence to a test DM, raw, via `/debug/slack-stream?…&text=`, and check it isn't blank. Note too whether the fence shows `&lt;` and whether a real `<@U…>` pings.
 
+#### Task cards
+
+**A task card carries no icon.** Slack's reference page shows an `icon` on a `task_update` chunk, but on 2026-10-07 production refused every shape tried with `invalid_arguments` (`failed to match exactly one allowed schema [json-pointer:/chunks/0]`): an image URL as `name`, a `url`, an `image` element, a named icon, an emoji. The same chunk without `icon` was taken, as were `details`, `output`, `sources` and `plan_update`. To recheck, send raw chunks to a test DM through `/debug/slack-stream?…&chunks=`.
+
 Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 
 ### The same Markdown goes everywhere else too

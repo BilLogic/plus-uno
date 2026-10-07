@@ -347,8 +347,6 @@ export interface TaskChunk {
   output?: string;
   /** Links the step read, already filtered to what the thread may see. */
   sources?: ReadonlyArray<{ text: string; url: string }>;
-  /** An image URL for the card's logo. */
-  icon?: string;
 }
 
 export async function startStream(
