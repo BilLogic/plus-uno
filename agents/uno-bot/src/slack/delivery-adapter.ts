@@ -71,8 +71,8 @@ import { planBlock } from "./plan-block";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
-import { progressFor } from "../agent/tool-table";
-import { readoutFor } from "../agent/progress-readout";
+import { taskCardFor } from "../agent/tool-table";
+import { readoutFor } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
 import { estateLogo } from "./estate-logos";
 import {
@@ -137,6 +137,9 @@ export const TASK_CARD_CAP = 8;
 
 /** The overflow card's id, beside the `tool-<seq>` ids it stands in for. */
 const OVERFLOW_CARD = "tool-more";
+
+/** What a card whose lookup never ran says when the checklist settles. */
+const NOT_RUN = "Not run";
 
 /** Slack's cap on a plan or task chunk's text. */
 const HEADING_CHARS = 256;
@@ -478,7 +481,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   /** Narration waiting for the card it introduces. */
   let heldDetails: string | null = null;
 
-  // EVERY update to the open plan stream goes through this one chain, and each
+  // EVERY update to the open checklist goes through this one chain, and each
   // link is caught. Two reasons, both seen with fire-and-forget appends: a
   // refused or thrown append with no catch is an unhandled rejection in the
   // Worker, and two appends in flight at once can land in either order — a
@@ -587,13 +590,19 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   };
 
   /** Settle every card still open, wait for every queued update to land, and
-   *  forget the stream, so nothing re-uses it. */
+   *  forget the stream, so nothing re-uses it.
+   *
+   *  A card still in progress settles with the turn. A card still PENDING is
+   *  a lookup that never ran — a stopped turn answers with some queued — so it
+   *  settles as an error that says so, whatever the turn's outcome: a tick
+   *  beside a read that never happened would claim work nobody did. */
   const settlePlan = async (status: "complete" | "error"): Promise<string | null> => {
     if (!planTs) return null;
     const ts = planTs;
     planTs = null;
     for (const card of [...cards.values()]) {
-      if (card.status === "pending" || card.status === "in_progress") move(ts, card.id, status);
+      if (card.status === "in_progress") move(ts, card.id, status);
+      else if (card.status === "pending") move(ts, card.id, "error", { output: NOT_RUN });
     }
     heldDetails = null;
     await planChain;
@@ -746,8 +755,13 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
 
     endProgress,
 
-    postInterim(text) {
+    postInterim(text, kind = "narration") {
       if (planTs) {
+        // The backstop line only says the turn is still alive, and with a
+        // checklist open the running card and the working signal already say
+        // so. Held as details it would read as what the next lookup is for, so
+        // it is dropped.
+        if (kind === "backstop") return;
         // With a checklist open, narration is not a card of its own: it says
         // what the lookups it introduces are for, so it becomes the details of
         // the next card announced. The latest line wins — it is the one written
@@ -768,7 +782,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // No stream, no checklist: with the switch off the narration above is
       // the whole of what a person sees, exactly as before there were cards.
       if (!planTs) return;
-      const words = progressFor(event.name);
+      const words = taskCardFor(event.name);
       if (!words) return;
       const ts = planTs;
       const id = `tool-${event.seq}`;
@@ -801,9 +815,8 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           }
           // A call folded into the overflow card has no card of its own to
           // carry a readout; only its status counts there.
-          const readout = readoutFor(event.name);
-          const output = readout?.output(event.result);
-          const sources = threadVisibleSources(readout?.sources(event.result) ?? []);
+          const { output } = event;
+          const sources = threadVisibleSources(event.sources ?? []);
           moveCall(ts, id, "complete", { ...(output ? { output } : {}), ...(sources.length ? { sources } : {}) });
           return;
         }

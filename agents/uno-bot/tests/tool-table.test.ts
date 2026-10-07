@@ -23,7 +23,7 @@ import { describe, it } from "node:test";
 import {
   gateWordsFor,
   isToolName,
-  progressFor,
+  taskCardFor,
   rowFor,
   runsPastGate,
   TOOL_NAMES,
@@ -158,7 +158,7 @@ describe("the readers answer from the row", () => {
 
   it("gives every lookup its task-card words — slack_react excepted — and nothing else any", () => {
     for (const name of TOOL_NAMES) {
-      const words = progressFor(name);
+      const words = taskCardFor(name);
       if (rowFor(name)!.access !== "ungated" || name === "slack_react") {
         assert.equal(words, null, `${name} would put a card on the checklist`);
         continue;

@@ -65,7 +65,7 @@ import {
   type OperationOutcome,
 } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
-import { gateWordsFor, progressFor } from "../agent/tool-table";
+import { gateWordsFor, taskCardFor } from "../agent/tool-table";
 import type { ToolProgressEvent } from "../agent/tool-progress";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../tools/github-issue-update-render";
@@ -131,6 +131,7 @@ import {
   type CardTarget,
   type Delivery,
   type DeliveryFailureStage,
+  type InterimKind,
   type IssueTarget,
   type ProposalCard,
   type TurnSettlement,
@@ -690,7 +691,16 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
 
   const outcome = await withWorkingSignal(
     delivery,
-    (watched) => turnBody(request, { ...deps, delivery: watched }, staging),
+    (watched) =>
+      turnBody(request, { ...deps, delivery: watched }, staging).catch(async (err: unknown) => {
+        // A throw past every exit of the body reaches the outermost catch
+        // (`slack/events.ts`), which posts the "internal" failure and holds no
+        // Delivery to close anything with. Settle the checklist here first, or
+        // it sits open above that failure, still claiming a step is running.
+        // Settling twice is a no-op, so an exit that already did is safe.
+        await watched.endProgress("error").catch(() => {});
+        throw err;
+      }),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
 
@@ -1086,17 +1096,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // narration as it works, and a generic note that backstops runs which have
   // produced none yet.
   let interimPosted = false;
-  const postInterim = (text: string): void => {
+  const postInterim = (text: string, kind?: InterimKind): void => {
     interimPosted = true;
     interimCount++;
-    delivery.postInterim(text);
+    delivery.postInterim(text, kind);
   };
   const backstopAt = Math.abs(
     parseInt(request.userMsgTs.replace(".", "").slice(-6), 10) || 0,
   ) % BACKSTOP_LINES.length;
   const backstop = setTimeout(() => {
     if (interimPosted) return;
-    postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!);
+    postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!, "backstop");
   }, INTERIM_BACKSTOP_MS);
 
   // The checklist: one task card per lookup that has words for one on its tool
@@ -1105,7 +1115,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // the table's answer, not a list kept here. Fire-and-forget like the
   // narration, for the same reason: a courtesy must not wait in front of work.
   const showToolProgress = (event: ToolProgressEvent): void => {
-    if (progressFor(event.name)) delivery.toolProgress(event);
+    if (taskCardFor(event.name)) delivery.toolProgress(event);
   };
 
   // Clarify-vs-act, bound to this thread once: the loop asks it mid-turn (so a
@@ -1138,7 +1148,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       ...(assistantContext ? { assistantContext } : {}),
       correction,
       preflight: preflightCall,
-      onInterim: postInterim,
+      onInterim: (text) => postInterim(text),
       onToolProgress: showToolProgress,
       cancelSince: startedAt,
     });

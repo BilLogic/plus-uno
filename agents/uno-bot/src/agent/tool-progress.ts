@@ -19,23 +19,22 @@
 // never announced, because it never reached the lookup path.
 //
 // WHO GETS ONE. The loop reports every call it runs through the lookup path;
-// which of them become cards is the tool table's answer (`progressFor`), read
+// which of them become cards is the tool table's answer (`taskCardFor`), read
 // by Turn, so the loop does not learn a presentation rule.
+//
+// WHAT A FINISHED EVENT CARRIES. What the call's readout made of its result
+// (`task-card-readout.ts`) — the count and the links — never the raw text. The
+// readout runs here, on the WHOLE result, because a result cut short first is
+// JSON no longer: a large read would parse as nothing and land as a bare card.
+// Which of the links a thread may see is still Slack's to decide.
 //
 // A PURE module: no Env, no Slack shape. What a card LOOKS like is the Slack
 // adapter's (`slack/delivery-adapter.ts`).
 
+import { readoutFor, type TaskCardSource } from "./task-card-readout";
+
 /** Where one call is in its life. */
 export type ToolProgressPhase = "announced" | "started" | "finished" | "refused";
-
-/**
- * How much of a result an event carries.
- *
- * Enough for a card to count what came back and pull out the links it read —
- * a search's rows sit near the top, and a page's links do not need its whole
- * body — and small enough that an event never holds a corpus in memory twice.
- */
-export const MAX_PROGRESS_RESULT_CHARS = 16_000;
 
 interface ToolProgressBase {
   /**
@@ -57,8 +56,11 @@ export type ToolProgressEvent =
   | (ToolProgressBase & { readonly phase: "announced" | "started" })
   | (ToolProgressBase & {
       readonly phase: "finished";
-      /** The raw result text, cut to `MAX_PROGRESS_RESULT_CHARS`. */
-      readonly result: string;
+      /** What came back, as a glance — "4 pages" — when the readout could say. */
+      readonly output?: string;
+      /** The links the result names, with what the tool knew of who may see
+       *  them. Absent when it named none. */
+      readonly sources?: readonly TaskCardSource[];
       /** The tool's own error, when its result says it failed — the same field
        *  the eval transcript reads, so a card and the artifact never disagree
        *  about whether a lookup failed. */
@@ -70,7 +72,26 @@ export type ToolProgressEvent =
       readonly reason: string;
     });
 
-/** A result cut to what an event carries. */
-export function capProgressResult(text: string): string {
-  return text.length > MAX_PROGRESS_RESULT_CHARS ? text.slice(0, MAX_PROGRESS_RESULT_CHARS) : text;
+/**
+ * The `finished` event for a call, its readout taken from the whole result.
+ *
+ * @param base - The call's seq, name and arguments
+ * @param result - The raw result text, uncut
+ * @param error - The tool's own error, when its result says it failed
+ */
+export function finishedProgress(
+  base: { readonly seq: number; readonly name: string; readonly args: Record<string, unknown> },
+  result: string,
+  error?: string,
+): ToolProgressEvent {
+  const readout = error ? null : readoutFor(base.name);
+  const output = readout?.output(result) ?? null;
+  const sources = readout?.sources(result) ?? [];
+  return {
+    ...base,
+    phase: "finished",
+    ...(output ? { output } : {}),
+    ...(sources.length ? { sources } : {}),
+    ...(error ? { error } : {}),
+  };
 }

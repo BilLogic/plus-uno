@@ -72,4 +72,15 @@ describe("estate logos on task cards", () => {
     assert.equal(icons.get("tool-3"), undefined);
     assert.equal(icons.get("tool-4"), undefined);
   });
+
+  it("reads the link the same way the card's details do: the url, else the first link in the text", async () => {
+    const icons = await iconsFor([
+      { name: "source_read", args: { text: "can you read https://github.com/BilLogic/plus-uno/pull/1 please" } },
+      { name: "source_read", args: { url: "https://raw.githubusercontent.com/BilLogic/plus-uno/main/README.md" } },
+      { name: "source_read", args: { url: "https://gist.githubusercontent.com/x/y/raw/z.md" } },
+    ]);
+    assert.equal(icons.get("tool-1"), `${LOGOS}/github.png`);
+    assert.equal(icons.get("tool-2"), `${LOGOS}/github.png`);
+    assert.equal(icons.get("tool-3"), `${LOGOS}/github.png`, "one host rule with the visibility filter");
+  });
 });

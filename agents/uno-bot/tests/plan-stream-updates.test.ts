@@ -48,7 +48,6 @@ const finished = (seq: number): ToolProgressEvent => ({
   name: NAMES[seq]!,
   args: {},
   phase: "finished",
-  result: "{}",
 });
 
 /** Two lookups, reported the way the loop reports them, a tool run apart. */

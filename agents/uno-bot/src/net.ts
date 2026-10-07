@@ -162,9 +162,8 @@ function lookupCount(m: Meter): number {
   return m.count - (m.delivery - m.limitDeliveryBase);
 }
 
-
 /**
- * Run `fn` as a Slack delivery call — the plan stream's card updates, the
+ * Run `fn` as a Slack delivery call — the checklist's card updates, the
  * answer, the reactions and status that frame them.
  *
  * Delivery is not a lookup's spend. The lookup limit is one field on the

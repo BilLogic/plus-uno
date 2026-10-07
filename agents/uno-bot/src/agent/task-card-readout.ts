@@ -1,7 +1,7 @@
 // What a task card says about its lookup, beside the title the tool table
 // gives it: the query it ran, what came back, and the links it read.
 //
-// WHY A MODULE BESIDE THE TABLE, NOT A COLUMN IN IT. The table's `progress`
+// WHY A MODULE BESIDE THE TABLE, NOT A COLUMN IN IT. The table's `taskCard`
 // column is words and an estate — data its five non-Slack readers can carry
 // without noticing. These are functions over a tool's own payload, and every
 // one of them knows that payload's shape; living beside the tool table keeps
@@ -11,8 +11,9 @@
 // fails `tsc` where the map is written.
 //
 // WHAT IT READS. `details` reads the arguments the model sent; `output` and
-// `sources` read the raw result text a `finished` progress event carries
-// (`tool-progress.ts`), cut to `MAX_PROGRESS_RESULT_CHARS`. A result that is not
+// `sources` read the whole raw result, where the loop builds the `finished`
+// progress event (`tool-progress.ts`), so a large read is never cut short of
+// valid JSON before it is read. A result that is not
 // JSON, or that says it failed, has no output and no sources here: an error
 // card's line is the error itself, which the adapter already shortens.
 //
@@ -23,11 +24,11 @@
 //
 // A PURE module: no Env, no Slack shape.
 
-import type { ProgressWords, TOOL_TABLE } from "./tool-table";
-import { progressFor } from "./tool-table";
+import type { TaskCardWords, TOOL_TABLE } from "./tool-table";
+import { taskCardFor } from "./tool-table";
 
 /** One link a lookup read. */
-export interface ProgressSource {
+export interface TaskCardSource {
   /** What to call it — the page's title, the file's path, the channel. */
   readonly text: string;
   readonly url: string;
@@ -41,40 +42,47 @@ export interface ProgressSource {
 
 /** What a card says beyond its title. Every method answers null (or none)
  *  rather than inventing a line it cannot ground. */
-export interface ProgressReadout {
+export interface TaskCardReadout {
   /** What the call looked for, from the arguments the model sent. */
   details(args: Record<string, unknown>): string | null;
   /** What came back, as a glance — "4 pages", "no matches". */
   output(result: string): string | null;
   /** The links the result names, at most `MAX_SOURCES`, each once. */
-  sources(result: string): ProgressSource[];
+  sources(result: string): TaskCardSource[];
 }
 
 /** How many links one card carries. Enough to open the source behind a claim;
  *  few enough that a card stays a line, not a reading list. */
 export const MAX_SOURCES = 5;
 
-/** The tools that get a card: ungated rows whose progress is not null. */
+/** The tools that get a card: ungated rows whose taskCard is not null. */
 type CardTool = {
-  [K in keyof typeof TOOL_TABLE]: (typeof TOOL_TABLE)[K] extends { readonly progress: ProgressWords } ? K : never;
+  [K in keyof typeof TOOL_TABLE]: (typeof TOOL_TABLE)[K] extends { readonly taskCard: TaskCardWords } ? K : never;
 }[keyof typeof TOOL_TABLE];
 
 // ─── reading a payload ───────────────────────────────────────────────────────
 
 type Payload = Record<string, unknown>;
 
-/** The result as a successful payload, or null — not JSON, not an object, or
- *  a result that says it failed. */
-function succeeded(result: string): Payload | null {
+/** The result as a JSON object, or null — not JSON, or not an object. */
+function payloadOf(result: string): Payload | null {
   let parsed: unknown;
   try {
     parsed = JSON.parse(result);
   } catch {
     return null;
   }
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
-  const p = parsed as Payload;
-  return p.ok === false || typeof p.error === "string" ? null : p;
+  return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as Payload) : null;
+}
+
+/** Does a payload say it failed? */
+const saysFailed = (p: Payload): boolean => p.ok === false || typeof p.error === "string";
+
+/** The result as a successful payload, or null — not JSON, not an object, or
+ *  a result that says it failed. */
+function succeeded(result: string): Payload | null {
+  const p = payloadOf(result);
+  return p && !saysFailed(p) ? p : null;
 }
 
 const str = (v: unknown): string | null => (typeof v === "string" && v.trim() ? v.trim() : null);
@@ -107,7 +115,7 @@ function countOutput(list: string, one: string, none = "no matches", many?: stri
  *  Only a row's own `url` / `link` — never a URL found inside its content,
  *  which is what the page SAYS, not what the lookup READ. */
 function rowLinks(list: string, labels: readonly string[], visibilityFrom?: string) {
-  return (result: string): ProgressSource[] => {
+  return (result: string): TaskCardSource[] => {
     const p = succeeded(result);
     const rows = p?.[list];
     if (!p || !Array.isArray(rows)) return [];
@@ -126,7 +134,7 @@ function rowLinks(list: string, labels: readonly string[], visibilityFrom?: stri
 }
 
 /** The one link a single-document read returned. */
-function ownLink(result: string): ProgressSource[] {
+function ownLink(result: string): TaskCardSource[] {
   const p = succeeded(result);
   const url = p && httpUrl(p.url);
   if (!p || !url) return [];
@@ -138,12 +146,24 @@ const httpUrl = (v: unknown): string | null => {
   return s && /^https?:\/\//i.test(s) ? s : null;
 };
 
-function unique(sources: ProgressSource[]): ProgressSource[] {
+function unique(sources: TaskCardSource[]): TaskCardSource[] {
   const seen = new Set<string>();
   return sources.filter((s) => !seen.has(s.url) && seen.add(s.url)).slice(0, MAX_SOURCES);
 }
 
-const noSources = (): ProgressSource[] => [];
+const noSources = (): TaskCardSource[] => [];
+
+/**
+ * The link a `source_read` call reads: the URL it was handed, or the first one
+ * in the text it was handed — the tool's own rule for which link it reads. The
+ * card's details and its logo (`slack/estate-logos.ts`) both read it here, so
+ * the two never name different links.
+ *
+ * @param args - The call's arguments
+ */
+export function readLinkOf(args: Record<string, unknown>): string | null {
+  return str(args.url) ?? str(args.text)?.match(/https?:\/\/[^\s<>|)"']+/i)?.[0] ?? null;
+}
 
 /** The first argument present, as text. */
 const arg = (...keys: string[]) => (args: Record<string, unknown>): string | null =>
@@ -151,7 +171,7 @@ const arg = (...keys: string[]) => (args: Record<string, unknown>): string | nul
 
 // ─── the readouts ────────────────────────────────────────────────────────────
 
-const READOUTS: { readonly [K in CardTool]: ProgressReadout } = {
+const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
   roadmap_query: {
     details: (args) =>
       typeof args.card_number === "number" ? `#${args.card_number}` : arg("title", "person", "design_status")(args),
@@ -169,9 +189,7 @@ const READOUTS: { readonly [K in CardTool]: ProgressReadout } = {
     sources: rowLinks("results", ["title", "name"]),
   },
   source_read: {
-    // The URL it was handed, or the first one in the text it was handed —
-    // the tool's own rule for which link it reads.
-    details: (args) => str(args.url) ?? str(args.text)?.match(/https?:\/\/[^\s<>|)"']+/i)?.[0] ?? null,
+    details: readLinkOf,
     output: (result) => {
       const p = succeeded(result);
       if (!p) return null;
@@ -231,15 +249,11 @@ const READOUTS: { readonly [K in CardTool]: ProgressReadout } = {
   reminder_set: {
     details: arg("what"),
     output: (result) => {
-      const p = succeeded(result);
-      if (p) return str(p.confirm) ?? "Reminder set";
+      const p = payloadOf(result);
+      if (!p) return null;
+      if (!saysFailed(p)) return str(p.confirm) ?? "Reminder set";
       // Not set, and not failed either: the tool asked when.
-      try {
-        const asked = JSON.parse(result) as Payload;
-        return str(asked?.ask) ? "Needs a time" : null;
-      } catch {
-        return null;
-      }
+      return str(p.ask) ? "Needs a time" : null;
     },
     sources: noSources,
   },
@@ -261,11 +275,11 @@ const READOUTS: { readonly [K in CardTool]: ProgressReadout } = {
 
 /**
  * The readout for a tool's card, or null for a call that gets no card — the
- * same membership as `progressFor`, which it defers to.
+ * same membership as `taskCardFor`, which it defers to.
  *
  * @param name - The tool's registered name
  */
-export function readoutFor(name: string): ProgressReadout | null {
-  if (!progressFor(name)) return null;
-  return (READOUTS as Record<string, ProgressReadout>)[name] ?? null;
+export function readoutFor(name: string): TaskCardReadout | null {
+  if (!taskCardFor(name)) return null;
+  return (READOUTS as Record<string, TaskCardReadout>)[name] ?? null;
 }
