@@ -11,11 +11,15 @@
 // block too. Two fields change shape on the way: the stream chunk's `id` is the
 // block's `task_id`, and the chunk's `details` / `output` are bare strings where
 // the block's are rich text. A source is kept as `{text, url}` and spelled as
-// Slack's `{type: "url", …}`, and an icon is kept as its image URL and spelled
-// as Slack's `{type: "icon", name}` — a bare string there is an invalid block,
-// and the rewrite would be refused. Those two spellings are the same on the
-// stream chunk, so `cardLinks` is the one place they are written, and `api.ts`
-// imports it for the chunk.
+// Slack's `{type: "url", …}`. That spelling is the same on the stream chunk,
+// so `cardLinks` is the one place it is written, and `api.ts` imports it for
+// the chunk.
+//
+// NO ICON. Slack refuses a `task_update` chunk carrying any `icon` — every
+// shape tried live on 2026-10-07 (an image URL, `url`, an `image` element, a
+// named icon, an emoji) came back `invalid_arguments`, despite the reference
+// page's example (docs/connectors/slack.md § Task cards). The block's icon
+// was never seen to work either, so a card carries none on either path.
 //
 // PURE: no `Env`, so the adapter can import it without importing `api.ts`.
 
@@ -40,25 +44,20 @@ function richText(text: string): Record<string, unknown> {
 }
 
 /**
- * A card's sources and logo as Slack spells them, on a stream chunk and on a
- * block alike — ready to spread into either.
+ * A card's sources as Slack spells them, on a stream chunk and on a block
+ * alike — ready to spread into either.
  *
- * @param task - The card's kept sources (`{text, url}`) and icon (an image URL)
+ * @param task - The card's kept sources (`{text, url}`)
  * @param textPass - The path's own pass over a source's name: the chunk's
  *   markup pass, or the block's cut. A URL goes as the tool returned it, since
  *   a link is not text to escape.
  */
 export function cardLinks(
-  task: { readonly sources?: ReadonlyArray<{ text: string; url: string }>; readonly icon?: string },
+  task: { readonly sources?: ReadonlyArray<{ text: string; url: string }> },
   textPass: (text: string) => string,
 ): Record<string, unknown> {
-  const { sources, icon } = task;
-  return {
-    ...(sources?.length ? { sources: sources.map((s) => ({ type: "url", text: textPass(s.text), url: s.url })) } : {}),
-    // Slack's `icon` is absent from @slack/types, so it is a plain object; an
-    // image URL is the one documented form of `name`.
-    ...(icon ? { icon: { type: "icon", name: icon } } : {}),
-  };
+  const { sources } = task;
+  return sources?.length ? { sources: sources.map((s) => ({ type: "url", text: textPass(s.text), url: s.url })) } : {};
 }
 
 /** One card as a `task_card` block element. */

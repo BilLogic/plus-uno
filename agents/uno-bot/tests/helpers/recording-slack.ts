@@ -19,7 +19,8 @@
 // Slack answered `invalid_arguments` to a `pending` task status,
 // `streaming_mode_mismatch` to markdown appended into a stream opened in plan
 // mode, and `message_not_in_streaming_state` to a stop on a stream already
-// stopped. Both clients below refuse those three the same way — the call is
+// stopped — and `invalid_arguments` again to a task card carrying any `icon`.
+// Both clients below refuse those the same way — the call is
 // recorded, it does not land, and the refusal is kept on `refused` — and
 // because the adapter swallows a refused card update by design, a refusal
 // nobody looked at FAILS THE TEST it happened in (the `afterEach` below). A
@@ -255,6 +256,14 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
       const bad = tasks.find((t) => !SLACK_TASK_STATUSES.has(t.status));
       if (bad) return refuse(refused, `task ${bad.id} as ${String(bad.status)}`, "invalid_arguments");
+      // A card's `icon`, in every shape: the `/debug/slack-stream?chunks=` probe
+      // against production Slack on 2026-10-07 had a `task_update` carrying an
+      // image-URL `name`, a `url`, an `image` element, a named icon and an emoji
+      // all refused — `invalid_arguments`, "failed to match exactly one allowed
+      // schema [json-pointer:/chunks/0]" — and the same chunk without it taken.
+      // `PlanTask` has no such field; this holds one smuggled back in.
+      const iconed = tasks.find((t) => "icon" in t);
+      if (iconed) return refuse(refused, `task ${iconed.id} with an icon`, "invalid_arguments");
       if (stopped.has(ts)) return refuse(refused, "task update on a stopped stream", "message_not_in_streaming_state");
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;

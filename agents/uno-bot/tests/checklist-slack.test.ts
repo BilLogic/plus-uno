@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
 import { finishedProgress, type ToolProgressEvent } from "../src/agent/tool-progress";
-import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
+import { expectRefusals, recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
 const TARGET: SlackDeliveryTarget = {
   channel: "C123",
@@ -234,5 +234,23 @@ describe("the checklist", () => {
     await tick();
 
     assert.deepEqual(appends(slack), [["understand:in_progress"]]);
+  });
+
+  it("sends no card an icon, and the strict client refuses one the way Slack does", async () => {
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(true), TARGET);
+
+    await delivery.beginProgress("Working on it");
+    await threeLookups(delivery);
+    await delivery.endProgress("complete");
+    for (const call of slack.of("tasks")) assert.ok(call.tasks.every((t) => !("icon" in t)));
+
+    // Slack answered every icon shape tried on 2026-10-07 with
+    // `invalid_arguments`; a card carrying one must fail here too.
+    const strict = recordingSlack();
+    const iconed = { id: "t1", title: "Reading GitHub", status: "in_progress" as const, icon: "https://example.test/github.png" };
+    await strict.client.appendTasks("C123", "stream-1", [iconed]);
+    assert.deepEqual(expectRefusals(strict.refused), [{ call: "task t1 with an icon", error: "invalid_arguments" }]);
+    assert.equal(strict.landed.length, 0);
   });
 });

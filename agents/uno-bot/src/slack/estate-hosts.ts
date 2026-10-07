@@ -1,8 +1,7 @@
-// Which estate a link lives on, from its host — the one rule both Slack-side
-// readers of a card's links use: the logo a read link's card carries
-// (`estate-logos.ts`) and whether a source may ride on a card at all
-// (`card-sources.ts`). Two hand-written copies had already drifted on which
-// GitHub content host counted; one table keeps them agreeing.
+// Which estate a link lives on, from its host — the rule that decides whether
+// a source may ride on a card at all (`card-sources.ts`). Two hand-written
+// copies had once drifted on which GitHub content host counted; one table
+// keeps that from happening again.
 //
 // A PURE module: no Env.
 

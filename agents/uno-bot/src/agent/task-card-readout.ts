@@ -2,7 +2,7 @@
 // gives it: the query it ran, what came back, and the links it read.
 //
 // WHY A MODULE BESIDE THE TABLE, NOT A COLUMN IN IT. The table's `taskCard`
-// column is words and an estate — data its five non-Slack readers can carry
+// column is words — data its five non-Slack readers can carry
 // without noticing. These are functions over a tool's own payload, and every
 // one of them knows that payload's shape; living beside the tool table keeps
 // the table a table. The membership rule still holds as hard as a column
@@ -155,9 +155,7 @@ const noSources = (): TaskCardSource[] => [];
 
 /**
  * The link a `source_read` call reads: the URL it was handed, or the first one
- * in the text it was handed — the tool's own rule for which link it reads. The
- * card's details and its logo (`slack/estate-logos.ts`) both read it here, so
- * the two never name different links.
+ * in the text it was handed — the tool's own rule for which link it reads.
  *
  * @param args - The call's arguments
  */
