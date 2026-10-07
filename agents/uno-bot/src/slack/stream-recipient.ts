@@ -28,15 +28,16 @@ export interface StreamRecipient {
  *  surprising one and the caller says so out loud; see `slack/delivery.ts`. */
 export type StreamMissing = "recipient" | "user" | "team";
 
-/** May the answer open — or reuse — a stream, and if not, what was missing. */
+/** May the answer open a stream, and if not, what was missing. */
 export type StreamDecision = { open: true } | { open: false; missing: StreamMissing };
 
 /**
- * Decide whether the answer opens (or reuses) a stream.
+ * Decide whether the answer opens a stream.
  *
- * A stream already open for this turn (plan mode's) is reused whatever the
- * recipient looks like: it was opened with the ids, and the answer only closes
- * it. Otherwise BOTH ids must be in hand. The reason is not a budget: a call
+ * BOTH ids must be in hand. (The answer once reused the checklist's plan-mode
+ * stream whatever the recipient looked like; Slack refuses the answer's
+ * markdown in a plan-mode stream, so the answer now always opens its own or
+ * posts.) The reason is not a budget: a call
  * that cannot succeed should not be made, and Slack documents the pair as
  * required when a stream goes to a channel.
  *
@@ -49,11 +50,7 @@ export type StreamDecision = { open: true } | { open: false; missing: StreamMiss
  * (`event.user!`, `slack/turn-adapter.ts`) — so `undefined` and `""` are both
  * reachable at runtime however the type reads.
  */
-export function decideStream(
-  openStreamTs: string | undefined,
-  recipient: StreamRecipient | undefined,
-): StreamDecision {
-  if (openStreamTs) return { open: true };
+export function decideStream(recipient: StreamRecipient | undefined): StreamDecision {
   const user = recipient?.userId;
   const team = recipient?.team;
   if (user && team) return { open: true };

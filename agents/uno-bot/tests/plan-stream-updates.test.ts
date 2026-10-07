@@ -91,8 +91,11 @@ describe("plan-stream updates", () => {
     assert.deepEqual(slack.landed.map(step), [
       "startStream",
       "understand:in_progress",
-      "tool-1:in_progress tool-2:pending understand:complete",
+      "understand:complete tool-1:in_progress",
+      // Updates issued while the append before them was still in flight
+      // travel together, the later state of one card winning.
       "tool-1:complete tool-2:complete",
+      "stopStream",
       "answer",
     ]);
   });
@@ -112,13 +115,14 @@ describe("plan-stream updates", () => {
     // Every update was still offered to Slack, in order, after the one before it failed.
     assert.deepEqual(slack.of("tasks").map(step), [
       "understand:in_progress",
-      "tool-1:in_progress tool-2:pending understand:complete",
+      "understand:complete tool-1:in_progress",
       "tool-1:complete tool-2:complete",
     ]);
-    // The answer closes the stream it was handed, so nothing is left spinning.
+    // The stream is still stopped, so nothing is left spinning, and the answer
+    // posts beneath it.
     assert.deepEqual(
-      slack.of("answer").map((a) => a.openStreamTs),
-      ["stream-1"],
+      slack.calls.filter((c) => c.kind === "stopStream" || c.kind === "answer").map((c) => c.kind),
+      ["stopStream", "answer"],
     );
   });
 
@@ -133,7 +137,7 @@ describe("plan-stream updates", () => {
     assert.deepEqual(slack.landed.map(step), [
       "startStream",
       "understand:in_progress",
-      "tool-1:error tool-2:error understand:complete",
+      "understand:complete tool-1:error tool-2:error",
       "stopStream",
     ]);
   });

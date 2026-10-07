@@ -46,17 +46,17 @@ async function withWarns(fn: () => Promise<unknown>): Promise<string[]> {
 
 describe("opening a stream", () => {
   it("needs both recipient ids", () => {
-    assert.deepEqual(decideStream(undefined, BOTH), { open: true });
+    assert.deepEqual(decideStream(BOTH), { open: true });
   });
 
   it("is refused when either id is missing, and names the half", () => {
     // Named, because the caller logs it: a turn that lost streaming without
     // saying so is the same silence #572 was about.
-    assert.deepEqual(decideStream(undefined, { userId: "U1" }), {
+    assert.deepEqual(decideStream({ userId: "U1" }), {
       open: false,
       missing: "team",
     });
-    assert.deepEqual(decideStream(undefined, { userId: "", team: "T1" }), {
+    assert.deepEqual(decideStream({ userId: "", team: "T1" }), {
       open: false,
       missing: "user",
     });
@@ -65,24 +65,16 @@ describe("opening a stream", () => {
   it("calls a recipient with nothing in it unremarkable", () => {
     // Neither half: a path that never had a recipient, not a turn that lost
     // one — so `delivery.ts` stays quiet about it.
-    assert.deepEqual(decideStream(undefined, { userId: "", team: "" }), {
+    assert.deepEqual(decideStream({ userId: "", team: "" }), {
       open: false,
       missing: "recipient",
     });
     // `userId` reaches this via `event.user!` in slack/turn-adapter.ts, so a
     // wholly absent recipient is reachable at runtime whatever the type says.
-    assert.deepEqual(decideStream(undefined, undefined), {
+    assert.deepEqual(decideStream(undefined), {
       open: false,
       missing: "recipient",
     });
-  });
-
-  it("reuses a stream already open, whatever the recipient looks like", () => {
-    // Plan mode opened it WITH the ids; the answer only closes it, and a
-    // handed-over stream left unclosed renders as work still in progress.
-    assert.deepEqual(decideStream(OPEN_TS, BOTH), { open: true });
-    assert.deepEqual(decideStream(OPEN_TS, { userId: "" }), { open: true });
-    assert.deepEqual(decideStream(OPEN_TS, undefined), { open: true });
   });
 });
 

@@ -13,7 +13,19 @@
 // is worse than none. And its failure switches are OPTIONS on the record rather
 // than a second constructor each, so a case that needs a refusal reads as one
 // word.
+//
+// AND IT REFUSES WHAT SLACK REFUSES. A fake that accepts anything let a
+// checklist pass every suite and break on every multi-tool turn in production:
+// Slack answered `invalid_arguments` to a `pending` task status,
+// `streaming_mode_mismatch` to markdown appended into a stream opened in plan
+// mode, and `message_not_in_streaming_state` to a stop on a stream already
+// stopped. Both clients below refuse those three the same way — the call is
+// recorded, it does not land, and the refusal is kept on `refused` — and
+// because the adapter swallows a refused card update by design, a refusal
+// nobody looked at FAILS THE TEST it happened in (the `afterEach` below). A
+// suite cannot pass while Slack would have said no.
 
+import { afterEach } from "node:test";
 import type {
   PlanTask,
   SlackDeliveryClient,
@@ -48,7 +60,6 @@ export type SlackCall =
       userId: string;
       team?: string;
       footerHint?: FooterKind;
-      openStreamTs?: string;
     }
   | {
       kind: "failure";
@@ -63,6 +74,45 @@ export type SlackCall =
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
+
+/** A call Slack would have refused, and the error code it would have said. */
+export interface SlackRefusal {
+  call: string;
+  error: string;
+}
+
+/** The task statuses Slack accepts. Its typings list `pending` too; the API
+ *  answers it with `invalid_arguments`. */
+const SLACK_TASK_STATUSES: ReadonlySet<string> = new Set(["in_progress", "complete", "error"]);
+
+/** Every refusal not yet looked at, from every recording client in this test. */
+const unread: SlackRefusal[] = [];
+
+// A refusal is a failure unless the test took it off `refused` on purpose
+// (`expectRefusals`). Registered once, at import, so it covers every suite that
+// drives either client without each one remembering to ask.
+afterEach(() => {
+  if (!unread.length) return;
+  const seen = unread.splice(0);
+  throw new Error(`Slack would have refused: ${seen.map((r) => `${r.call} → ${r.error}`).join("; ")}`);
+});
+
+/** Note a refusal: on the client's own list, and on the list the hook reads. */
+function refuse(list: SlackRefusal[], call: string, error: string): void {
+  const refusal = { call, error };
+  list.push(refusal);
+  unread.push(refusal);
+}
+
+/** Take a client's refusals as expected, so the test it happened in may pass. */
+export function expectRefusals(list: readonly SlackRefusal[]): SlackRefusal[] {
+  const taken = [...list];
+  for (const r of taken) {
+    const at = unread.indexOf(r);
+    if (at >= 0) unread.splice(at, 1);
+  }
+  return taken;
+}
 
 /** A `[working]` line as it was reported, with the outcome that produced it. */
 export interface WorkingLine {
@@ -106,6 +156,8 @@ export interface RecordingSlack {
   landed: SlackCall[];
   /** Every `[working]` line reported, in order. */
   lines: WorkingLine[];
+  /** Every call Slack would have refused, with its error code. */
+  refused: SlackRefusal[];
   /** The adapter's dependencies, with this client in them. */
   deps(planStream?: boolean): SlackDeliveryDeps;
   /** Just the calls of one kind, narrowed. */
@@ -116,8 +168,13 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
   const calls: SlackCall[] = [];
   const landed: SlackCall[] = [];
   const lines: WorkingLine[] = [];
+  const refused: SlackRefusal[] = [];
   let posted = 0;
   let appends = 0;
+  // Every stream this client opens is a plan-mode one — the adapter's
+  // `startStream` is the checklist's — and a stopped stream takes nothing more.
+  const planStreams = new Set<string>();
+  const stopped = new Set<string>();
   // Every call but a task append lands the moment it is made.
   const record = (call: SlackCall): void => {
     calls.push(call);
@@ -157,8 +214,16 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         userId: input.recipient.userId,
         ...(input.recipient.team === undefined ? {} : { team: input.recipient.team }),
         ...(input.footerHint === undefined ? {} : { footerHint: input.footerHint }),
-        ...(input.openStreamTs === undefined ? {} : { openStreamTs: input.openStreamTs }),
       });
+      // Closing a stream INTO the answer appends the answer as markdown, and a
+      // plan-mode stream takes task and plan chunks only. The client's type
+      // no longer carries a stream ts at all; this is the refusal Slack gave
+      // when it did, kept so a stream ts smuggled back in still fails.
+      const handed = (input as { openStreamTs?: string }).openStreamTs;
+      if (handed !== undefined) {
+        if (planStreams.has(handed)) refuse(refused, "answer appended into a plan stream", "streaming_mode_mismatch");
+        stopped.add(handed);
+      }
       if (opts.answerThrows !== undefined) throw opts.answerThrows;
       return { ok: true, text: input.text };
     },
@@ -179,21 +244,29 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         userId,
         ...(team === undefined ? {} : { team }),
       });
-      return opts.streamTs === undefined ? "stream-1" : opts.streamTs;
+      const ts = opts.streamTs === undefined ? "stream-1" : opts.streamTs;
+      if (ts) planStreams.add(ts);
+      return ts;
     },
     async appendTasks(channel, ts, tasks) {
       const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks] };
       record(call);
       const delay = opts.taskDelayMs?.(appends++) ?? 0;
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
+      const bad = tasks.find((t) => !SLACK_TASK_STATUSES.has(t.status));
+      if (bad) return refuse(refused, `task ${bad.id} as ${String(bad.status)}`, "invalid_arguments");
+      if (stopped.has(ts)) return refuse(refused, "task update on a stopped stream", "message_not_in_streaming_state");
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
     },
     async setPlanTitle(channel, ts, title) {
       record({ kind: "heading", channel, ts, title });
+      if (stopped.has(ts)) refuse(refused, "plan title on a stopped stream", "message_not_in_streaming_state");
     },
     async stopStream(channel, ts) {
       record({ kind: "stopStream", channel, ts });
+      if (stopped.has(ts)) return refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
+      stopped.add(ts);
     },
     async setSessionStatus(channel, threadTs, status) {
       record({ kind: "status", channel, threadTs, status });
@@ -210,6 +283,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     calls,
     landed,
     lines,
+    refused,
     deps: (planStream = false) => ({
       slack: client,
       planStream,
@@ -246,6 +320,8 @@ export interface RecordingPostingOptions {
 export interface RecordingPosting {
   client: PostingClient;
   calls: PostingCall[];
+  /** Every call Slack would have refused, with its error code. */
+  refused: SlackRefusal[];
   /** The posting functions' dependencies, with this client in them. */
   deps(over?: Partial<Omit<PostingDeps, "slack">>): PostingDeps;
   of<K extends PostingCall["kind"]>(kind: K): Array<Extract<PostingCall, { kind: K }>>;
@@ -261,7 +337,9 @@ export interface RecordingPosting {
  */
 export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingPosting {
   const calls: PostingCall[] = [];
+  const refused: SlackRefusal[] = [];
   let posted = 0;
+  const stopped = new Set<string>();
 
   const client: PostingClient = {
     async addReaction(channel, ts, name) {
@@ -291,17 +369,28 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
     },
     async appendStream(channel, ts, text) {
       calls.push({ kind: "appendStream", channel, ts, text });
+      if (stopped.has(ts)) {
+        refuse(refused, "append on a stopped stream", "message_not_in_streaming_state");
+        return false;
+      }
       return !opts.appendFails;
     },
     async stopStream(channel, ts, blocks) {
       calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length });
-      return !opts.stopFails;
+      if (stopped.has(ts)) {
+        refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
+        return false;
+      }
+      if (opts.stopFails) return false;
+      stopped.add(ts);
+      return true;
     },
   };
 
   return {
     client,
     calls,
+    refused,
     /**
      * The posting functions' dependencies, with this client in them.
      *
