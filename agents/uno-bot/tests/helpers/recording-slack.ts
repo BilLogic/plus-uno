@@ -29,7 +29,17 @@ import type { SessionStatus, StatusResult } from "../../src/slack/session-status
 export type SlackCall =
   | { kind: "react"; channel: string; ts: string; name: string }
   | { kind: "unreact"; channel: string; ts: string; name: string }
-  | { kind: "message"; channel: string; threadTs?: string; text: string; blocks: boolean }
+  | {
+      kind: "message";
+      channel: string;
+      threadTs?: string;
+      text: string;
+      blocks: boolean;
+      /** The blocks themselves, when there were any — what a static checklist
+       *  is asserted on. */
+      blockList?: unknown[];
+    }
+  | { kind: "update"; channel: string; ts: string; text: string; blocks: unknown[] }
   | {
       kind: "answer";
       channel: string;
@@ -128,9 +138,14 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         ...(input.thread_ts === undefined ? {} : { threadTs: input.thread_ts }),
         text: input.text,
         blocks,
+        ...(input.blocks ? { blockList: input.blocks } : {}),
       });
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
       return { ok: true, ts: `posted-${++posted}` };
+    },
+    async updateMessage(input) {
+      record({ kind: "update", channel: input.channel, ts: input.ts, text: input.text, blocks: input.blocks });
+      return { ok: !opts.messageFails };
     },
     async postAnswer(input) {
       record({

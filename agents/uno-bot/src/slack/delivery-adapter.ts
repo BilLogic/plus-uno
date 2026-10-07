@@ -67,6 +67,7 @@ import type { FooterKind } from "./footer-kind";
 import type { SlackMessageMetadata } from "./api";
 import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { renderGateNote } from "./gate-note";
+import { planBlock } from "./plan-block";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
@@ -200,6 +201,9 @@ export interface SlackDeliveryClient {
   appendTasks(channel: string, ts: string, tasks: readonly PlanTask[]): Promise<void>;
   /** Close a stream. */
   stopStream(channel: string, ts: string): Promise<void>;
+  /** Rewrite one of the bot's own messages in place — how a static checklist
+   *  settles where no stream could open. */
+  updateMessage(input: { channel: string; ts: string; text: string; blocks: unknown[] }): Promise<{ ok: boolean }>;
   /** Move the agent session's lifecycle status — the working signal itself. */
   setSessionStatus(channel: string, threadTs: string, status: SessionStatus): Promise<StatusResult>;
   /** Name the session, so the conversation is findable in History / Messages. */
@@ -426,6 +430,16 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   // carried WHOLE — a task update REPLACES the card, so an update that re-sent
   // only an id and a status would wipe the title and details it went out with.
   let planTs: string | null = null;
+  // WHERE NO STREAM CAN OPEN — a top-level DM, which has no thread — the same
+  // checklist is a static `plan` block instead: posted once when progress
+  // begins, rewritten once at settle, and never touched in between, so a turn
+  // spends two calls on it however many lookups it makes. `planTs` is then the
+  // ts of that message rather than of a stream, and the cards below are kept
+  // exactly as the stream path keeps them, so the settle renders whatever they
+  // carry.
+  let planMode: "stream" | "static" = "stream";
+  /** The static checklist's heading, kept for the rewrite. */
+  let planTitle = "";
   /** Every card on the checklist, by id, as it was last sent. */
   const cards = new Map<string, PlanTask>();
   /** The one card in progress, if any. */
@@ -458,6 +472,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   /** Record a card's new state and queue it behind every update already issued. */
   const update = (ts: string, task: PlanTask): Promise<void> => {
     cards.set(task.id, task);
+    // A static checklist is only rewritten at settle: the card's new state is
+    // kept, and nothing is sent.
+    if (planMode === "static") return planChain;
     outbox.set(task.id, task);
     if (!linkQueued) {
       linkQueued = true;
@@ -492,12 +509,36 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     }
     heldDetails = null;
     await planChain;
+    if (planMode === "static") {
+      // The one rewrite, with every card's final state. Best-effort like every
+      // card update: a checklist that would not settle is not worth a turn.
+      // Nothing for an answer to close, so the answer posts beneath it.
+      await slack
+        .updateMessage({ channel, ts, text: planTitle, blocks: [planBlock(planTitle, [...cards.values()])] })
+        .catch(() => {});
+      return null;
+    }
     return ts;
   };
 
   const endProgress = async (outcome: "complete" | "error"): Promise<void> => {
     const ts = await settlePlan(outcome);
     if (ts) await slack.stopStream(channel, ts).catch(() => {});
+  };
+
+  /** Post the static checklist, opening card in progress. A refused post
+   *  leaves no checklist, exactly as a refused stream does. */
+  const beginStaticPlan = async (label: string): Promise<void> => {
+    const opening: PlanTask = { id: OPENING_CARD, title: label, status: "in_progress" };
+    const posted = await slack
+      .postMessage({ channel, text: label, blocks: [planBlock(label, [opening])] })
+      .catch(() => ({ ok: false as const }));
+    if (!posted.ok || !("ts" in posted) || !posted.ts) return;
+    planMode = "static";
+    planTitle = label;
+    planTs = posted.ts;
+    running = OPENING_CARD;
+    cards.set(OPENING_CARD, opening);
   };
 
   /** A plain post into the thread. A local rather than only a port method,
@@ -592,7 +633,8 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // An early stream is only honest in plan mode: with plain text there is
       // nothing to put in it and the client renders an empty bubble for the
       // whole run (tried, reverted — see api.ts).
-      if (!deps.planStream || !replyTs) return;
+      if (!deps.planStream) return;
+      if (!replyTs) return beginStaticPlan(label);
       planTs = await slack.startStream(channel, replyTs, target.userId, target.team);
       if (!planTs) return;
       running = OPENING_CARD;
