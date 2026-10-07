@@ -101,12 +101,39 @@ export interface GateWords {
 }
 
 /**
+ * The estates a lookup can read — named, never drawn. Which logo stands for
+ * one is the Slack adapter's map; this table only says where a tool looks.
+ */
+export type Estate = "notion" | "figma" | "github" | "blueprint" | "slack" | "storybook";
+
+/**
+ * How a lookup is SHOWN while it runs — its task card on the checklist
+ * (CONTEXT.md § checklist), which only an ungated tool is ever given.
+ *
+ * Words and an estate, and nothing Slack-shaped: no URL, no chunk, no status.
+ * The table has five readers that are not Slack, and a column that held a
+ * Slack shape would drag Slack into every one of them.
+ */
+export interface ProgressWords {
+  /** The card's title, in uno's voice — what it is doing, as it would say it
+   *  ("Searching Notion"). */
+  readonly title: string;
+  /** The estate it reads, or null for a tool that reads none of them. */
+  readonly estate: Estate | null;
+}
+
+/**
  * What a tool is, beyond the schema the model is shown.
  *
  * A union on `access`, not a flat record with an optional field: the card
  * words belong to a gated tool and to nothing else, so a gated row without
  * them — and an ungated row with them — fails the typecheck where the row is
  * written. That is what makes adding a row the only edit a new tool needs.
+ *
+ * The same holds for `progress` on an ungated row: REQUIRED, so a new lookup
+ * cannot ship without saying what it looks like in progress. `null` is a
+ * stated answer — "this call gets no task card" — and it is how `slack_react`
+ * stays off the checklist: a reaction is a courtesy, not a read.
  */
 export type ToolRow = {
   /**
@@ -124,27 +151,94 @@ export type ToolRow = {
    */
   readonly reviewRequest: string | null;
 } & (
-  | { readonly access: "ungated" | "control"; readonly gate?: undefined }
-  | { readonly access: "gated" | "worker"; readonly gate: GateWords }
+  | {
+      readonly access: "ungated";
+      readonly gate?: undefined;
+      readonly progress: ProgressWords | null;
+    }
+  | { readonly access: "control"; readonly gate?: undefined; readonly progress?: undefined }
+  | { readonly access: "gated" | "worker"; readonly gate: GateWords; readonly progress?: undefined }
 );
 
 export const TOOL_TABLE = {
-  roadmap_query: { access: "ungated", retrieval: true, reviewRequest: null },
-  notion_search: { access: "ungated", retrieval: true, reviewRequest: null },
-  source_read: { access: "ungated", retrieval: true, reviewRequest: null },
-  search_blueprint: { access: "ungated", retrieval: true, reviewRequest: null },
-  github_read: { access: "ungated", retrieval: true, reviewRequest: null },
+  roadmap_query: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Checking the Roadmap board", estate: "notion" },
+  },
+  notion_search: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Searching Notion", estate: "notion" },
+  },
+  // A URL of any estate, so the row names none: which one this call read is
+  // in its arguments, not in the tool.
+  source_read: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Reading the link", estate: null },
+  },
+  search_blueprint: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Searching the blueprint", estate: "blueprint" },
+  },
+  github_read: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Reading GitHub", estate: "github" },
+  },
   // The duplicate check before `github_issue_create`: open intakes by keyword.
-  github_intake_search: { access: "ungated", retrieval: true, reviewRequest: null },
-  slack_user_profile: { access: "ungated", retrieval: true, reviewRequest: null },
-  slack_channel_members: { access: "ungated", retrieval: true, reviewRequest: null },
-  slack_thread_read: { access: "ungated", retrieval: true, reviewRequest: null },
-  slack_react: { access: "ungated", retrieval: false, reviewRequest: null },
+  github_intake_search: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Checking open intakes on GitHub", estate: "github" },
+  },
+  slack_user_profile: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Looking someone up in Slack", estate: "slack" },
+  },
+  slack_channel_members: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Checking who's in the channel", estate: "slack" },
+  },
+  slack_thread_read: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Reading the Slack thread", estate: "slack" },
+  },
+  slack_react: { access: "ungated", retrieval: false, reviewRequest: null, progress: null },
   // "Remind me": writes only uno-bot's own record, posted back to the asker
   // alone at a morning run (`commitments/remind.ts`).
-  reminder_set: { access: "ungated", retrieval: false, reviewRequest: null },
-  slack_search: { access: "ungated", retrieval: true, reviewRequest: null },
-  read_reference: { access: "ungated", retrieval: false, reviewRequest: null },
+  reminder_set: {
+    access: "ungated",
+    retrieval: false,
+    reviewRequest: null,
+    progress: { title: "Setting your reminder", estate: null },
+  },
+  slack_search: {
+    access: "ungated",
+    retrieval: true,
+    reviewRequest: null,
+    progress: { title: "Searching Slack", estate: "slack" },
+  },
+  read_reference: {
+    access: "ungated",
+    retrieval: false,
+    reviewRequest: null,
+    progress: { title: "Checking my playbook", estate: null },
+  },
   notion_create: {
     access: "gated",
     retrieval: false,
@@ -318,6 +412,19 @@ export function rowFor(name: string): ToolRow | null {
 export function gateWordsFor(name: string): GateWords | null {
   const row = rowFor(name);
   return row && runsPastGate(row.access) ? (row.gate ?? null) : null;
+}
+
+/**
+ * The task-card words for a lookup, or null for a call that gets no card —
+ * a gated write (it is on the proposal card), a Worker-only or control call,
+ * `slack_react`, or a name nobody registered.
+ *
+ * The checklist's one membership test: Turn reads it to decide which calls it
+ * hands Delivery, and the Slack adapter reads it for the words.
+ */
+export function progressFor(name: string): ProgressWords | null {
+  const row = rowFor(name);
+  return row?.access === "ungated" ? row.progress : null;
 }
 
 /** One row with the schema it is offered under — null for a `worker` row,

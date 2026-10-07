@@ -151,26 +151,42 @@ test("neither streaming flag turns on without a recorded probe PASS", async () =
 });
 
 test("a task card's details take the pass and stay within the chunk limit; its plain-text title does not", async () => {
-  const { appendTask } = await import("../src/slack/api.js");
+  const { appendTasks } = await import("../src/slack/api.js");
   sent = [];
-  await appendTask(ENV, "D0123", "9.0", {
-    id: "t1",
-    title: "Read <@teammate>'s note",
-    status: "in_progress",
-    details: "quoting `<@teammate>` for <@U0A8JFHQPU2>",
-  });
+  await appendTasks(ENV, "D0123", "9.0", [
+    {
+      id: "t1",
+      title: "Read <@teammate>'s note",
+      status: "in_progress",
+      details: "quoting `<@teammate>` for <@U0A8JFHQPU2>",
+    },
+  ]);
   const chunk = (sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!;
   assert.equal(chunk.title, "Read <@teammate>'s note");
   assert.equal(chunk.details, "quoting `&lt;@teammate&gt;` for <@U0A8JFHQPU2>");
 
+  // Closing one card and opening the next travel as two chunks of ONE call,
+  // and an error card's reason takes the same pass as its details.
   sent = [];
-  await appendTask(ENV, "D0123", "9.0", { id: "t2", title: "t", status: "complete", details: "x".repeat(245) + "<<<<<" });
+  await appendTasks(ENV, "D0123", "9.0", [
+    { id: "t0", title: "Searching Notion", status: "error", output: "502 from <api>" + "z".repeat(300) },
+    { id: "t1", title: "Searching Slack", status: "in_progress" },
+  ]);
+  assert.equal(sent.length, 1);
+  const pair = sent[0]!.body.chunks as Array<Record<string, unknown>>;
+  assert.deepEqual(pair.map((c) => `${c.id}:${c.status}`), ["t0:error", "t1:in_progress"]);
+  const output = String(pair[0]!.output);
+  assert.ok(output.startsWith("502 from &lt;api&gt;"), output);
+  assert.ok(output.length <= 250, String(output.length));
+
+  sent = [];
+  await appendTasks(ENV, "D0123", "9.0", [{ id: "t2", title: "t", status: "complete", details: "x".repeat(245) + "<<<<<" }]);
   const long = String((sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!.details);
   assert.ok(long.length <= 250, String(long.length));
   assert.match(long, /^x{245}(&lt;)*$/, "cut at an entity boundary");
 
   sent = [];
-  await appendTask(ENV, "D0123", "9.0", { id: "t3", title: "t", status: "complete", details: "y".repeat(240) + " <@U0A8JFHQPU2>" });
+  await appendTasks(ENV, "D0123", "9.0", [{ id: "t3", title: "t", status: "complete", details: "y".repeat(240) + " <@U0A8JFHQPU2>" }]);
   const cut = String((sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!.details);
   assert.equal(cut, "y".repeat(240) + " ", "a kept mention is dropped whole, never cut open");
 });

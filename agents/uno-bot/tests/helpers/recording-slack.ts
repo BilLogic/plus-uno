@@ -48,7 +48,7 @@ export type SlackCall =
       stage: DeliveryFailureStage;
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
-  | { kind: "task"; channel: string; ts: string; task: PlanTask }
+  | { kind: "tasks"; channel: string; ts: string; tasks: PlanTask[] }
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
@@ -76,7 +76,7 @@ export interface RecordingSlackOptions {
   /** Throw out of the answer post, so the adapter's "close the stream nobody
    *  else holds" path is reachable. */
   answerThrows?: unknown;
-  /** How long the Nth task update (0-based) takes to come back, in ms. A
+  /** How long the Nth task append (0-based) takes to come back, in ms. A
    *  schedule where an early update is slow and a later one fast is a client
    *  that resolves out of order — the shape that let a card's "complete" land
    *  after the next card's "in progress" while updates were fire-and-forget. */
@@ -106,11 +106,11 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
   const landed: SlackCall[] = [];
   const lines: WorkingLine[] = [];
   let posted = 0;
-  let tasks = 0;
-  // Every call but a task update lands the moment it is made.
+  let appends = 0;
+  // Every call but a task append lands the moment it is made.
   const record = (call: SlackCall): void => {
     calls.push(call);
-    if (call.kind !== "task") landed.push(call);
+    if (call.kind !== "tasks") landed.push(call);
   };
 
   const client: SlackDeliveryClient = {
@@ -165,10 +165,10 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       });
       return opts.streamTs === undefined ? "stream-1" : opts.streamTs;
     },
-    async appendTask(channel, ts, task) {
-      const call: SlackCall = { kind: "task", channel, ts, task };
+    async appendTasks(channel, ts, tasks) {
+      const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks] };
       record(call);
-      const delay = opts.taskDelayMs?.(tasks++) ?? 0;
+      const delay = opts.taskDelayMs?.(appends++) ?? 0;
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
