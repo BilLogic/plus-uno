@@ -370,8 +370,12 @@ export interface Delivery {
    * that post no answer: `postAnswer` closes the surface INTO the answer, so a
    * checklist and the reply it belongs to stay one message. Both no-op where the
    * surface has no progress rendering, which is what keeps the turn from caring.
+   *
+   * `ask` is the person's message, handed over whole: a surface that can title
+   * its progress (the checklist's heading) draws the title from it, and decides
+   * itself how much of it fits. Omitted, the surface keeps `label` as its title.
    */
-  beginProgress(label: string): Promise<void>;
+  beginProgress(label: string, ask?: string): Promise<void>;
   endProgress(outcome: "complete" | "error"): Promise<void>;
 
   /**
@@ -444,7 +448,7 @@ export type DeliveryCall =
   | { kind: "removeReaction"; emoji: string }
   | { kind: "working"; status?: string; titleFrom?: string }
   | { kind: "working-clear"; settlement: TurnSettlement }
-  | { kind: "beginProgress"; label: string }
+  | { kind: "beginProgress"; label: string; ask?: string }
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string }
   | { kind: "toolProgress"; event: ToolProgressEvent }
@@ -555,8 +559,8 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "working-clear", settlement });
     },
 
-    async beginProgress(label) {
-      calls.push({ kind: "beginProgress", label });
+    async beginProgress(label, ask) {
+      calls.push({ kind: "beginProgress", label, ...(ask === undefined ? {} : { ask }) });
     },
 
     async endProgress(outcome) {
