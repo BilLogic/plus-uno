@@ -97,7 +97,7 @@ SLACK_STREAMING = "off"
 # with plain text and reverted — nothing to put in it renders an empty bubble
 # for the whole run. Plan mode should differ because the stream carries cards;
 # watch one multi-tool turn before believing it.
-SLACK_STREAM_PLAN = "off"
+SLACK_STREAM_PLAN = "on"
 # Native feedback elements: Slack's `context_actions` block (`feedback_buttons`
 # + an `icon_button` delete) in place of the hand-rolled 👍/👎 row. Off because
 # an invalid block degrades SILENTLY here — delivery falls back to plain text,
