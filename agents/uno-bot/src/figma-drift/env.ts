@@ -7,7 +7,8 @@
 //     mark under `figma-drift:intake:`, kept past its card's 72 h; a thread's
 //     ask record under `figma-drift:ask:`, kept 30 days; each posted ask's live
 //     record under `figma-drift:live:<channel>:<thread>:<ts>`, kept the card's
-//     72 h. KV, not D1: the queue and the live records hold the thread's words
+//     72 h, and beside it `figma-drift:live-file:<file>`, the one read a
+//     file-change notification makes before it looks further. KV, not D1: the queue and the live records hold the thread's words
 //     (ADR-030), and expire.
 //   • Slack: `chat.postMessage` in the thread, tagged with the sweep's message
 //     metadata so a reply under it is read by the sweep thread's rule
@@ -50,6 +51,7 @@ import {
   answerDriftAsk,
   isDriftAnswerCandidate,
   recheckLiveAsks,
+  recheckOnUpdate,
   runDriftAsks,
   type AskRecord,
   type DriftPostReport,
@@ -63,6 +65,8 @@ const QUEUE_PREFIX = "figma-drift:findings:";
 const MARK_PREFIX = "figma-drift:intake:";
 const ASK_PREFIX = "figma-drift:ask:";
 const LIVE_PREFIX = "figma-drift:live:";
+/** Not under LIVE_PREFIX: `live-file:` never matches the `live:` list. */
+const LIVE_FILE_PREFIX = "figma-drift:live-file:";
 const DAY_S = 24 * 60 * 60;
 /** A queued finding not asked within 30 days is dropped as the queue is read. */
 const QUEUE_MAX_AGE_MS = 30 * DAY_S * 1000;
@@ -175,10 +179,31 @@ export async function runDriftRecheckOnEnv(
   opts: { dryRun: boolean },
 ): Promise<DriftRecheckReport | { summary: string }> {
   if (!env.HARNESS_KV) return { summary: "HARNESS_KV not bound — no live question to look at" };
+  return recheckLiveAsks(job, recheckDepsFor(env, env.HARNESS_KV, opts.dryRun));
+}
+
+/**
+ * A file-change notification's look at one file, on `Env` (#896): one KV read
+ * when no live drift question names the file, the re-check when one does.
+ * Runs as the FILE_UPDATE job on the `figma/events` runner
+ * (`figma-notify/job.ts`), a backstop's queued change included.
+ *
+ * @param env - Worker bindings
+ * @param figmaKey - The changed file's Figma key
+ * @returns What it did, for the job's log line
+ */
+export async function recheckOnUpdateOnEnv(env: Env, figmaKey: string): Promise<string> {
+  if (!env.HARNESS_KV) return "no HARNESS_KV binding, so no drift question to look at";
+  const report = await recheckOnUpdate(figmaKey, recheckDepsFor(env, env.HARNESS_KV, false));
+  return report ? `drift re-check: ${report.summary}` : "no live drift question names it";
+}
+
+/** The re-check's dependencies on `Env`. */
+function recheckDepsFor(env: Env, kv: KVNamespace, dryRun: boolean): Parameters<typeof recheckOnUpdate>[1] {
   const figma = figmaFor(env);
   const threadState = threadStateFor(env);
-  return recheckLiveAsks(job, {
-    store: kvDriftStore(env.HARNESS_KV),
+  return {
+    store: kvDriftStore(kv),
     ...(figma ? { figma, judge: modelFrameJudge(selectProvider(env)) } : {}),
     liveCard: (channel, thread) => driftCardIn(env, channel, thread),
     async retire(ts) {
@@ -195,8 +220,8 @@ export async function runDriftRecheckOnEnv(
     },
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
-    dryRun: opts.dryRun,
-  });
+    dryRun,
+  };
 }
 
 /**
@@ -374,6 +399,18 @@ function kvDriftStore(kv: KVNamespace): DriftStore & FileDriftSink {
     async dropLiveAsk(ask) {
       charge(1, "kv");
       await kv.delete(liveKey(ask));
+    },
+    async markLiveFile(fileKey, until) {
+      // Written, never read back first: the newest ask's expiry is the latest,
+      // and an older one expiring early only skips a look the runs still make.
+      const left = Math.ceil((until - Date.now()) / 1000);
+      if (left < 60) return;
+      charge(1, "kv");
+      await kv.put(`${LIVE_FILE_PREFIX}${fileKey}`, JSON.stringify({ until }), { expirationTtl: Math.min(left, LIVE_TTL_S) });
+    },
+    async liveFileUntil(fileKey) {
+      charge(1, "kv");
+      return (await kv.get<{ until: number }>(`${LIVE_FILE_PREFIX}${fileKey}`, "json"))?.until ?? null;
     },
   };
 }

@@ -17,6 +17,7 @@ export function createInMemoryDriftStore(): InMemoryDriftStore {
   const marks = new Map<string, IntakeMark>();
   const records = new Map<string, AskRecord>();
   const live = new Map<string, LiveAsk>();
+  const liveFiles = new Map<string, number>();
   const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
   const liveKey = (a: Pick<LiveAsk, "channel" | "threadTs" | "ts">) => `${a.channel}:${a.threadTs}:${a.ts}`;
   const byAge = (list: LiveAsk[]) => list.sort((a, b) => a.askedAt - b.askedAt).map(clone);
@@ -59,6 +60,12 @@ export function createInMemoryDriftStore(): InMemoryDriftStore {
     },
     async dropLiveAsk(ask) {
       live.delete(liveKey(ask));
+    },
+    async markLiveFile(fileKey, until) {
+      liveFiles.set(fileKey, Math.max(until, liveFiles.get(fileKey) ?? 0));
+    },
+    async liveFileUntil(fileKey) {
+      return liveFiles.get(fileKey) ?? null;
     },
     marks: () => marks,
   };

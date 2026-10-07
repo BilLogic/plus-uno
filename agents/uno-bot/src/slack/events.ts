@@ -40,7 +40,7 @@ import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
 import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
-import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor } from "../figma-drift/env";
+import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor, recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
 import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
@@ -227,7 +227,7 @@ export function handOffCutOffRunsFor(env: Env): (due: Execution[]) => Promise<vo
 // runner must then KEEP the job and retry later instead of deleting it.
 export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
   if (job.kind === "figma-event") {
-    await runFigmaEventJob(job.event);
+    await runFigmaEventJob(job.event, { onFileUpdate: (fileKey) => recheckOnUpdateOnEnv(env, fileKey) });
     return "handled";
   }
   if (job.kind === "cut-off") {

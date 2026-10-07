@@ -201,6 +201,11 @@ export interface DriftStore {
   liveAsksIn(channel: string, threadTs: string): Promise<LiveAsk[]>;
   saveLiveAsk(ask: LiveAsk): Promise<void>;
   dropLiveAsk(ask: Pick<LiveAsk, "channel" | "threadTs" | "ts">): Promise<void>;
+  /** Note that a live question names this Figma file until `until` — the one
+   *  read a file-change notification makes before it looks any further. */
+  markLiveFile(fileKey: string, until: number): Promise<void>;
+  /** Until when a live question names this file, or null. */
+  liveFileUntil(fileKey: string): Promise<number | null>;
 }
 
 /** A place a message goes: a thread, or a place's top. */
@@ -741,6 +746,11 @@ async function keepLive(
   };
   try {
     await deps.store.saveLiveAsk(ask);
+    // A file-change notification reads this, and looks no further for a file
+    // no live question names (`recheckOnUpdate`).
+    for (const key of new Set(ask.files.filter((f) => isFigmaKind(f.kind)).map((f) => f.fileKey))) {
+      await deps.store.markLiveFile(key, now + DRIFT_CARD_TTL_MS);
+    }
   } catch (err) {
     rethrowIfBudget(err);
     console.error(`[figma-drift] live record for ${message.channel}:${message.ts} not kept: ${err instanceof Error ? err.message : String(err)}`);
@@ -945,6 +955,26 @@ export async function recheckLiveAsks(
   if (partly) notes.push(`${partly} question(s) wait for their other files`);
   if (waiting) notes.push(`${waiting} question(s) wait for the next run`);
   return done(checked);
+}
+
+/**
+ * A file-change notification's look at one file (#896): nothing at all — no
+ * list, no Figma read — unless a live question names it, and then the re-check
+ * for the questions that do. The same withdrawal as the scheduled runs', about
+ * 30 minutes after the edit rather than at the next run.
+ *
+ * @param figmaKey - The file's Figma key, as the notification names it
+ * @param deps - The re-check's, and the one read that guards it
+ * @returns The re-check's report, or null when no live question names the file
+ */
+export async function recheckOnUpdate(
+  figmaKey: string,
+  deps: DriftRecheckDeps & { store: DriftRecheckDeps["store"] & Pick<DriftStore, "liveFileUntil"> },
+): Promise<DriftRecheckReport | null> {
+  const fileKey = `figma:${figmaKey}`;
+  const until = await deps.store.liveFileUntil(fileKey);
+  if (until === null || until <= deps.now()) return null;
+  return recheckLiveAsks({ key: `figma-update:${figmaKey}` }, deps, { fileKey });
 }
 
 /** Edit a caught-up question in place, retiring its card first. */
