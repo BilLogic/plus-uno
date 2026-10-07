@@ -1076,7 +1076,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       ...(request.threaded ? {} : { titleFrom: request.text }),
     });
   }
-  if (!trivial) await delivery.beginProgress(PROGRESS_LABEL);
+  // The ask rides along for the checklist's heading. Unlike the session title
+  // above it goes on every substantive turn: it titles this turn's checklist,
+  // not the thread.
+  if (!trivial) await delivery.beginProgress(PROGRESS_LABEL, request.text);
 
   // Interim updates: long runs are legal (streaming plus MCP can take several
   // minutes). Two complementary signals — the model's own between-tool

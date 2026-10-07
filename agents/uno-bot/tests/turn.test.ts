@@ -2012,6 +2012,15 @@ test("a trivial turn skips the working signals and the progress surface", async 
   assert.deepEqual(workingSignalOf(h.delivery), []);
 });
 
+test("a substantive turn opens its progress surface with the ask, for the checklist's heading", async () => {
+  // Threaded or not: the heading is drawn from THIS turn's ask, unlike the
+  // session title, which only a thread the turn opened may take.
+  const h = harness();
+  await runTurn(request(), h.deps);
+  const begun = h.delivery.calls.find((c) => c.kind === "beginProgress");
+  assert.equal(begun?.ask, "how does a call-off reach a fill-in?");
+});
+
 /** The working signal's whole life in one turn, in order. */
 const workingSignalOf = (delivery: RecordingDelivery): string[] =>
   delivery.calls

@@ -29,7 +29,17 @@ import type { SessionStatus, StatusResult } from "../../src/slack/session-status
 export type SlackCall =
   | { kind: "react"; channel: string; ts: string; name: string }
   | { kind: "unreact"; channel: string; ts: string; name: string }
-  | { kind: "message"; channel: string; threadTs?: string; text: string; blocks: boolean }
+  | {
+      kind: "message";
+      channel: string;
+      threadTs?: string;
+      text: string;
+      blocks: boolean;
+      /** The blocks themselves, when there were any — what a static checklist
+       *  is asserted on. */
+      blockList?: unknown[];
+    }
+  | { kind: "update"; channel: string; ts: string; text: string; blocks: unknown[] }
   | {
       kind: "answer";
       channel: string;
@@ -49,6 +59,7 @@ export type SlackCall =
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "tasks"; channel: string; ts: string; tasks: PlanTask[] }
+  | { kind: "heading"; channel: string; ts: string; title: string }
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
@@ -128,9 +139,14 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         ...(input.thread_ts === undefined ? {} : { threadTs: input.thread_ts }),
         text: input.text,
         blocks,
+        ...(input.blocks ? { blockList: input.blocks } : {}),
       });
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
       return { ok: true, ts: `posted-${++posted}` };
+    },
+    async updateMessage(input) {
+      record({ kind: "update", channel: input.channel, ts: input.ts, text: input.text, blocks: input.blocks });
+      return { ok: !opts.messageFails };
     },
     async postAnswer(input) {
       record({
@@ -172,6 +188,9 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
+    },
+    async setPlanTitle(channel, ts, title) {
+      record({ kind: "heading", channel, ts, title });
     },
     async stopStream(channel, ts) {
       record({ kind: "stopStream", channel, ts });

@@ -481,6 +481,22 @@ export async function appendTasks(
   }
 }
 
+/** Retitle the open stream's plan — one `plan_update` chunk. Its `title` is
+ *  plain text like a card's, held to the 256-char chunk limit. Best-effort, as
+ *  every progress update is. */
+export async function setPlanTitle(env: Env, channel: string, ts: string, title: string): Promise<boolean> {
+  try {
+    const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
+      channel,
+      ts,
+      chunks: [{ type: "plan_update", title: title.slice(0, 256) }],
+    });
+    return !!res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * A task card's `details` or `output`, through the markup pass and within the
  * 256-char chunk limit.

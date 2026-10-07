@@ -22,9 +22,11 @@ import {
   appendStream,
   appendTasks,
   postMessage,
+  setPlanTitle,
   slackCall,
   startStream,
   stopStream,
+  updateMessage,
 } from "./api";
 import { renameSession, setSessionStatus } from "./assistant";
 import {
@@ -133,9 +135,13 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     async appendTasks(channel, ts, tasks) {
       await appendTasks(env, channel, ts, tasks);
     },
+    async setPlanTitle(channel, ts, title) {
+      await setPlanTitle(env, channel, ts, title);
+    },
     async stopStream(channel, ts) {
       await stopStream(env, channel, ts);
     },
+    updateMessage: (input) => updateMessage(env, input),
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
