@@ -18,6 +18,7 @@
 // call that fetches it is a named client on `TurnDeps.cards`, wired in
 // `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
+import { sweepCardBlocks } from "./sweep-card-blocks";
 import { escapeSlackText } from "./mrkdwn";
 import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
@@ -80,6 +81,25 @@ export function proposalCardBlocks(text: string, resolvedNote?: string): unknown
   return blocks;
 }
 
+/**
+ * Post a card, stepping down to its text in sections when Slack refuses its
+ * own blocks — a sweep card's carousel, say — so a refused shape never loses
+ * the card. Its text is unchanged, and so is what it was staged with.
+ *
+ * @param post - One post of the card's text and blocks
+ * @param card - The rendered card
+ */
+export async function postWithPlainRung<R extends { ok: boolean; error?: string }>(
+  post: (blocks: unknown[]) => Promise<R>,
+  card: { text: string; blocks: unknown[] },
+  refusedForBlocks: (res: R) => boolean,
+): Promise<R> {
+  const res = await post(card.blocks);
+  if (res.ok || !refusedForBlocks(res)) return res;
+  const plain = proposalCardBlocks(card.text);
+  return JSON.stringify(plain) === JSON.stringify(card.blocks) ? res : post(plain);
+}
+
 /** A card, as Slack: the notification/fallback text, the blocks when the card
  *  has any of its own, and the messages that go out BEFORE it. */
 export interface RenderedCard {
@@ -104,6 +124,13 @@ export function renderProposalCard(card: ProposalCard): RenderedCard {
   const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
   const plan = withOperationPlan(body, card.operations);
   const followUp = plan.followUp ?? [];
+  // A sweep card: one card per fix (`sweep-card-blocks.ts`). The planned text
+  // is its notification and fallback copy, and what it is staged with.
+  const fixes = card.fixes ? sweepCardBlocks(card.fixes, CONFIRM_FOOTER) : null;
+  if (fixes) {
+    const blocks = [...fixes, ...proposalActionBlocks()];
+    return followUp.length ? { text: plan.text, blocks, followUp } : { text: plan.text, blocks };
+  }
   if (!card.previewImageUrl) {
     return followUp.length ? { text: plan.text, followUp } : { text: plan.text };
   }

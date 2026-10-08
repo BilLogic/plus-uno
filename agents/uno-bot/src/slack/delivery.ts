@@ -208,7 +208,7 @@ const BLOCK_REFUSALS = new Set(["invalid_blocks", "invalid_blocks_format"]);
  * `channel_not_found`, a thrown call) would fail the next block rung the same
  * way, so the answer goes straight to bare text instead.
  */
-function refusedForBlocks(posted: { ok: boolean; error?: string }): boolean {
+export function refusedForBlocks(posted: { ok: boolean; error?: string }): boolean {
   if (BLOCK_REFUSALS.has(posted.error ?? "")) return true;
   if (posted.error !== "invalid_arguments") return false;
   const messages = (posted as { response_metadata?: { messages?: unknown } }).response_metadata?.messages;

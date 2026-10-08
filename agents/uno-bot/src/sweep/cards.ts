@@ -28,8 +28,8 @@
 import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalOperation, SweepShare } from "../thread-state/index";
-import type { ProposalCard } from "../turn/index";
-import { STANDING_TOO, addedContent, captureConfirmers, captureItemLines, captureLead } from "./capture-lines";
+import type { CardFix, ProposalCard } from "../turn/index";
+import { STANDING_TOO, addedContent, captureConfirmers, captureFixWords, captureItemLines, captureLead } from "./capture-lines";
 import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
 
@@ -207,38 +207,40 @@ export function destinationKey(d: Destination): string {
  */
 export function sweepCard(plan: SweepCardPlan): ProposalCard {
   const n = plan.items.length;
-  const lines = [
-    `**${SWEEP_CARD_MARK}** — ${captureLead(plan.items) ?? `this thread settled ${n === 1 ? "something" : `${n} things`} a linked page still says the old way.`}`,
-    "",
-  ];
-  plan.items.forEach((item, i) => {
+  const head = `**${SWEEP_CARD_MARK}** — ${captureLead(plan.items) ?? `this thread settled ${n === 1 ? "something" : `${n} things`} a linked page still says the old way.`}`;
+  const items: CardFix[] = plan.items.map((item, i) => {
     const evidence = item.evidence.permalinks[0] ? ` ([where](${item.evidence.permalinks[0]}))` : "";
     const { before, after } = changedSpan(item.original, item.replacement);
+    const fix = {
+      page: { title: flat(item.target.title), url: item.target.url },
+      owner: item.owner,
+      ...captureFixWords(item, { before, after }),
+    };
     const capture = captureItemLines(item, i, { before, after });
-    if (capture) return void lines.push(...capture);
+    if (capture) return { ...fix, detail: capture.join("\n") };
     // Page and thread words are text: a title or block holding `<!channel>`
     // pings nobody. The link is Slack's own `<url|label>`, so a `]` in a title
     // cannot break a Markdown one.
-    lines.push(
+    const detail = [
       `${i + 1}. <@${item.owner}> · <${item.target.url}|${escapeSlackText(flat(item.target.title) || "untitled")}>`,
       `   - page says: “${escapeSlackText(quote(item.sourceSays))}”`,
       `   - thread says: “${escapeSlackText(quote(item.threadSays))}”${evidence}`,
       `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
-    );
+    ].join("\n");
+    return { ...fix, detail };
   });
-  lines.push(
-    "",
+  const tail =
     `One ✅ applies ${n === 1 ? "it" : `all ${n}`}; reply \`drop 2\` to leave one out. ` +
-      `${captureConfirmers(plan.items) ?? `The owners named above and anyone who posted in this thread can confirm.${STANDING_TOO}`} ` +
-      `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
-  );
+    `${captureConfirmers(plan.items) ?? `The owners named above and anyone who posted in this thread can confirm.${STANDING_TOO}`} ` +
+    `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`;
   return {
     kind: "confirm",
     verb: n === 1 ? "apply this Notion fix" : `apply these ${n} Notion fixes`,
-    lead: lines.join("\n"),
+    lead: [head, "", ...items.map((f) => f.detail), "", tail].join("\n"),
     fields: [],
     caveats: [],
     operations: plan.operations,
+    fixes: { head, items, tail },
   };
 }
 

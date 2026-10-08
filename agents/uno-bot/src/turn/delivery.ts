@@ -256,6 +256,37 @@ export interface ProposalCard {
    *  what kind of card it is — a revised end-of-day sweep card carries the
    *  sweep's (`sweep/cards.ts` `asSweepRevision`). */
   tag?: { eventType: string; payload: Record<string, string> };
+  /** A sweep card's fixes, one card each beneath its head line
+   *  (`slack/sweep-card-blocks.ts`). The `lead` still states the whole card:
+   *  it is the text copy, and what the card is staged with. */
+  fixes?: CardFixes;
+}
+
+/** A sweep card's fixes, as the blocks show them. */
+export interface CardFixes {
+  /** The card's opening line, Markdown: the sweep's mark and what it found. */
+  head: string;
+  /** In card order: fix N is what `drop N` names. */
+  items: CardFix[];
+  /** How to confirm and drop, who may, and when it lapses — Markdown. */
+  tail: string;
+}
+
+/** One fix on a sweep card. */
+export interface CardFix {
+  page: { title: string; url: string };
+  /** The fix's owner, by Slack id; absent where only the card's owner may
+   *  confirm (a DM capture card). */
+  owner?: string;
+  /** Plain words beside the owner, such as how the page was found. */
+  note?: string;
+  /** What it writes, plain words: `“before” → “after”`, or what it adds. */
+  change: string;
+  /** Where it was said, as the card's second button. */
+  where?: { label: string; url: string };
+  /** The item's lines from the text copy — page says, thread says, the whole
+   *  change — which fold into the card's closed box. */
+  detail: string;
 }
 
 // ── What Gate's verdict says ─────────────────────────────────────────────────
