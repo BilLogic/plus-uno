@@ -90,7 +90,7 @@ const SCOPES = [
 ].join(" ");
 
 const SUCCESS_MESSAGE =
-  "✅ Slack linked. Searches you ask for in your DM with uno-bot now cover everything you can see. You can close this tab.";
+  "✅ Slack linked. Searches you ask for in your DM with le goat now cover everything you can see. You can close this tab.";
 
 // ─── KV keys ────────────────────────────────────────────────────────────────
 const PKCE_TTL_S = 600;

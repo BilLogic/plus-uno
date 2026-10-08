@@ -208,3 +208,41 @@ export function messageBlocksRefusal(blocks: readonly unknown[]): string | null 
   if (tableChars > DATA_TABLE_CHARS) return `${tableChars} chars of table cells in one message`;
   return null;
 }
+
+/** A modal's title, close and submit labels: 24 characters each, per Slack's
+ *  view reference (read 2026-10-08). */
+const VIEW_LABEL_CHARS = 24;
+
+/** Blocks in one view, per the view reference: 100, against a message's 50. */
+const MAX_VIEW_BLOCKS = 100;
+
+/** A view's `private_metadata`, per the view reference: 3,000 characters. */
+const VIEW_METADATA_CHARS = 3000;
+
+/**
+ * Why Slack would refuse a modal view (`views.open`, `views.update`), or null.
+ *
+ * The block rules are a message's, one by one; only the count differs. A
+ * view's labels are plain_text and capped, and so is its `private_metadata`.
+ *
+ * @param view - The `view` a views call carries
+ */
+export function viewRefusal(view: unknown): string | null {
+  if (!isShape(view) || view.type !== "modal") return "a view that is not a modal";
+  for (const key of ["title", "close", "submit"] as const) {
+    const label = view[key];
+    if (label === undefined && key !== "title") continue;
+    if (!isShape(label) || label.type !== "plain_text" || !nonEmpty(label.text)) return `a view ${key} that is not plain_text`;
+    if (String(label.text).length > VIEW_LABEL_CHARS) return `a view ${key} of ${String(label.text).length} chars`;
+  }
+  if (typeof view.private_metadata === "string" && view.private_metadata.length > VIEW_METADATA_CHARS) {
+    return `private_metadata of ${view.private_metadata.length} chars`;
+  }
+  const blocks = Array.isArray(view.blocks) ? view.blocks : [];
+  if (blocks.length > MAX_VIEW_BLOCKS) return `${blocks.length} blocks in one view`;
+  for (const block of blocks) {
+    const why = blockRefusal(block);
+    if (why) return why;
+  }
+  return null;
+}

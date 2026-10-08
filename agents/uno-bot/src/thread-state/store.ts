@@ -238,7 +238,7 @@ export interface PendingProposal {
   /**
    * The Slack user ids allowed to resolve this card. Absent, anyone in the
    * thread may, as every turn's card allows. Present, Gate refuses every
-   * other person's signal on all four doors and names these instead
+   * other person's signal on every door and names these instead
    * (`mayConfirm`). An empty list admits nobody: the set is enforced as
    * written rather than read as "unset".
    */

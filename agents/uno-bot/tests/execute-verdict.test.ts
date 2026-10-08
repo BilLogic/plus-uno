@@ -85,6 +85,25 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
       parent: { type: "page_id", page_id: "0123456789abcdef0123456789abcdef" },
     });
   }
+  // Notion writes: a created page, an append, a property change and the reads
+  // a property change makes first.
+  if (url === "https://api.notion.com/v1/pages" && init?.method === "POST") {
+    return reply({ id: "9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f", url: "https://www.notion.so/9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f" });
+  }
+  if (url.startsWith("https://api.notion.com/v1/blocks/") && url.endsWith("/children") && init?.method === "PATCH") {
+    return reply({ results: [] });
+  }
+  if (url.startsWith("https://api.notion.com/v1/pages/") && init?.method === "PATCH") return reply({ id: "page" });
+  if (url.startsWith("https://api.notion.com/v1/pages/")) {
+    return reply({
+      id: "0123456789abcdef0123456789abcdef",
+      parent: { type: "database_id", database_id: "dbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdb" },
+      properties: { Name: { type: "title", title: [{ plain_text: "A card" }] } },
+    });
+  }
+  if (url.startsWith("https://api.notion.com/v1/databases/")) {
+    return reply({ properties: { Name: { type: "title" }, Priority: { type: "rich_text" } } });
+  }
   if (url.includes("oauth2.googleapis.com/token")) return reply({ access_token: "ya29.test" });
   if (url.includes("gmail.googleapis.com")) return reply({ id: "msg-1" });
   throw new Error(`no stub route for ${url}`);
@@ -789,4 +808,71 @@ test("a won verdict, confirmed or cancelled, adds no reaction", async () => {
       `a ${decision} reacted`,
     );
   }
+});
+
+// Body content the bot writes into Notion opens with whom it was written for,
+// so a reader knows the words are the bot's and whom to ask about them.
+
+const NOTION_ENV = { NOTION_API_KEY: "secret_test", NOTION_ROADMAP_DB_ID: "rdrdrdrdrdrdrdrdrdrdrdrdrdrdrdrd" };
+const notionWrites = () =>
+  calls
+    .filter((c) => c.url.startsWith("https://api.notion.com/") && c.body !== null)
+    .map((c) => ({ url: c.url, body: c.body! }));
+/** The text of the first block in a list of Notion blocks. */
+const firstText = (blocks: unknown): string => {
+  const block = (blocks as Array<Record<string, unknown> & { type: string }>)[0]!;
+  const runs = (block[block.type] as { rich_text?: Array<{ text?: { content?: string } }> }).rich_text ?? [];
+  return runs.map((r) => r.text?.content ?? "").join("");
+};
+
+test("an approved Notion create opens its page with the requester's attribution line", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_create", input: { surface: "intake", title: "Fix the tutor table", summary: "The table overflows." } }]),
+  );
+  const create = notionWrites().find((w) => w.url === "https://api.notion.com/v1/pages");
+  assert.ok(create, "the page was created");
+  assert.equal(firstText(create.body.children), "Written by le goat on behalf of Bill Guo");
+});
+
+test("an approved Notion append opens the appended blocks with the attribution line", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_update", input: { page_url: SHARED_PAGE, append: { text: "Design review moved to Friday." } } }]),
+  );
+  const append = notionWrites().find((w) => w.url.endsWith("/children"));
+  assert.ok(append, "the blocks were appended");
+  assert.equal(firstText(append.body.children), "Written by le goat on behalf of Bill Guo");
+  assert.equal(firstText((append.body.children as unknown[]).slice(1)), "Design review moved to Friday.");
+});
+
+test("a Worker-staged Notion create, with no requester of record, names whoever approved it", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const staged = won([{ toolName: "notion_create", input: { surface: "prd", title: "A drafted card", summary: "From a to-do." } }]);
+  const unowned: GateVerdict = {
+    ...staged,
+    proposal: { ...staged.proposal!, requesterUserId: "" },
+    execute: { ...staged.execute!, requesterUserId: "" },
+  };
+  await run(env(NOTION_ENV), by(unowned, "button", "U0REQUESTR1"));
+  const create = notionWrites().find((w) => w.url === "https://api.notion.com/v1/pages");
+  assert.ok(create, "the page was created");
+  assert.equal(firstText(create.body.children), "Written by le goat on behalf of Bill Guo");
+});
+
+test("a property-only Notion update writes no attribution: there is no body to attribute", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_update", input: { page_url: SHARED_PAGE, properties: { Priority: "High" } } }]),
+  );
+  const writes = notionWrites();
+  assert.equal(writes.length, 1, JSON.stringify(writes));
+  assert.deepEqual(Object.keys(writes[0]!.body), ["properties"]);
 });

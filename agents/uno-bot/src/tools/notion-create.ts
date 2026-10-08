@@ -4,13 +4,15 @@
 // dual-write shape is an in-IDE writers/notion operation. Component PRDs and
 // research notes are not bot surfaces: component PRDs are regular feature PRDs
 // on the Roadmap, and deep research is an IDE-only skill that writes to the
-// project hub's Research page.
+// project hub's Research page. The page opens with the attribution line naming
+// the requester (`integrations/notion-attribution.ts`).
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
+import { requesterName } from "./requester-name";
 
 const SURFACES = new Set<NotionCreateSurface>(["prd", "intake", "decision"]);
 
@@ -93,12 +95,13 @@ export async function executeNotionCreate(
       extras,
       roadmapCard: roadmapCard || undefined,
       decisionStatus: decisionStatus || undefined,
+      onBehalfOf: await requesterName(env, slack),
     });
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
       // Escaped inside the label: a `>` in the title would end the link.
-      text: `:memo: Created on *${created.label}*: <${created.url}|${escapeSlackText(title)}>`,
+      text: `:white_check_mark: Created on *${created.label}*: <${created.url}|${escapeSlackText(title)}>`,
     });
     return JSON.stringify({
       ok: true,

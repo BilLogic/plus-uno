@@ -289,11 +289,11 @@ test("the Slack renderer is the one place a verdict becomes words", () => {
   });
   assert.match(pointer, /<@U2>/);
   assert.match(pointer, /:white_check_mark:/);
-  assert.match(pointer, /:eyes:/);
+  assert.match(pointer, /^:warning:/);
   assert.match(pointer, /notion_create/);
 
   const failed = renderGateNote({ kind: "resolve-failed", glyph: "white_check_mark" });
   assert.match(failed, /:white_check_mark:/);
-  assert.match(failed, /:warning:/);
+  assert.match(failed, /^:x:/);
   assert.match(failed, /hit a snag executing it/);
 });

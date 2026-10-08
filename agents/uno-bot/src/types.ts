@@ -20,6 +20,10 @@ export interface SlackContext {
   batched?: boolean;
   userMsgTs: string;
   requestedBy?: string;
+  /** Who pressed ✅, when the Gate knows. Read only to name a write's author
+   *  when the card has no requester of record (a Worker-staged card); every
+   *  rule about whom a write is FOR reads `requestedBy`. */
+  approvedBy?: string;
   /** Slack's kind of conversation for the turn, when known — `channel`,
    *  `group`, `mpim` or `im` (`turn/request.ts` § `conversationTypeOf`). */
   conversationType?: string;

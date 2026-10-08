@@ -107,7 +107,23 @@ export async function runButtonDoor(
   console.log(
     `[interactive] ${request.decision} button on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,
   );
+  await applyPressVerdict(request, verdict, deps);
+}
 
+/**
+ * A press's verdict, applied: the thread hears a win, the run goes ahead and
+ * the card loses its buttons; anything else is answered where the person is
+ * looking (`replyEphemeral`).
+ *
+ * Shared with the Review pop-up's Approve (`review-door.ts`), which is the
+ * same press made from a different surface: one path applies both, so the two
+ * cannot drift apart on what a win posts or what the card is left saying.
+ */
+export async function applyPressVerdict(
+  request: ButtonRequest,
+  verdict: GateVerdict,
+  deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers">,
+): Promise<void> {
   if (verdict.post?.note.kind === "cut-off" && verdict.proposal) {
     await speakCutOff(request, verdict, verdict.proposal, verdict.post, deps);
     return;
@@ -169,7 +185,7 @@ async function speakCutOff(
   verdict: GateVerdict,
   pending: NonNullable<GateVerdict["proposal"]>,
   post: NonNullable<GateVerdict["post"]>,
-  deps: ButtonDoorDeps,
+  deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers">,
 ): Promise<void> {
   const door = deps.delivery({
     channel: pending.channel,

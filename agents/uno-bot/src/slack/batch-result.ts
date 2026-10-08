@@ -39,8 +39,9 @@ export function batchResultMessage(outcomes: OperationOutcome[]): string | null 
     lines.push(group.heading);
     for (const i of group.members) {
       const o = outcomes[i]!;
-      const mark = o.ok ? ":white_check_mark:" : ":x:";
-      lines.push(`  ${i + 1}. ${mark} *${operationKindSummary(planned[i]!)}* — ${o.message}`);
+      // In words: a sign on every row would put one per operation on the
+      // message, and the head line already carries the one sign it needs.
+      lines.push(`  ${i + 1}. *${operationKindSummary(planned[i]!)}* — ${o.ok ? "done" : "failed"}: ${o.message}`);
     }
   }
   return [head, ...lines].join("\n");

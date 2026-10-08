@@ -843,7 +843,7 @@ export async function draftCard(c: CommitmentRecord, text: CommitmentText, deps:
   return {
     kind: "confirm",
     verb: "file this Roadmap card",
-    lead: `:memo: Draft card for the to-do: *${escapeLead(title)}*. A ✅ from the people named above, or whoever asked for it, files it. Expires in 72 h.`,
+    lead: `Draft card for the to-do: *${escapeLead(title)}*. A ✅ from the people named above, or whoever asked for it, files it. Expires in 72 h.`,
     fields: [],
     caveats: [],
     operations: [operation],
@@ -856,7 +856,7 @@ export function statusCard(card: { title: string; url: string }, status: string,
   return {
     kind: "confirm",
     verb: `move this card to ${status}`,
-    lead: `:card_index_dividers: ${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it. Expires in 72 h.`,
+    lead: `${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it. Expires in 72 h.`,
     fields: [],
     caveats: [],
     operations: [{ toolName: "notion_update", input: { page_url: card.url, properties: { "Design Status": status } } }],
@@ -868,7 +868,7 @@ export function contributorCard(card: { title: string; url: string }, slackUser:
   return {
     kind: "confirm",
     verb: "set this card's Contributor",
-    lead: `:bust_in_silhouette: Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it. Expires in 72 h.`,
+    lead: `Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it. Expires in 72 h.`,
     fields: [],
     caveats: [],
     operations: [{ toolName: "notion_update", input: { page_url: card.url, properties: { Contributor: notionUser } } }],
