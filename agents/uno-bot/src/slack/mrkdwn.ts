@@ -31,6 +31,11 @@ export function escapeSlackText(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/** A name as Markdown link text: one line, no brackets to break the link. */
+export function linkLabel(text: string): string {
+  return text.replace(/[[\]]/g, "").replace(/\s+/g, " ").trim();
+}
+
 /**
  * Keep the `<…>` markup Slack can parse, and entity-escape every other `<`,
  * `>` and bare `&`.

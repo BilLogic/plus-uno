@@ -18,6 +18,7 @@
 
 import type { TaskCardSource } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
+import { linkLabel } from "./mrkdwn";
 
 /** Below this many links an answer carries no box. */
 export const MIN_SOURCES = 3;
@@ -48,9 +49,6 @@ export function foldedBox(title: string, children: unknown[]): Record<string, un
   };
 }
 
-/** A link's name as Markdown link text: one line, no brackets to break it. */
-const label = (text: string): string => text.replace(/[[\]]/g, "").replace(/\s+/g, " ").trim();
-
 /**
  * The box for an answer's links, or null when fewer than three are ones the
  * thread may see.
@@ -70,12 +68,12 @@ export function sourcesBox(sources: readonly TaskCardSource[] | undefined): Sour
             style: "bullet",
             elements: shown.map(({ text, url }) => ({
               type: "rich_text_section",
-              elements: [{ type: "link", url, text: label(text) || url }],
+              elements: [{ type: "link", url, text: linkLabel(text) || url }],
             })),
           },
         ],
       },
     ]),
-    line: `Sources: ${shown.map(({ text, url }) => `[${label(text) || url}](${url})`).join(" · ")}`,
+    line: `Sources: ${shown.map(({ text, url }) => `[${linkLabel(text) || url}](${url})`).join(" · ")}`,
   };
 }
