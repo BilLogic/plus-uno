@@ -208,7 +208,7 @@ describe("the fallback ladder", () => {
 });
 
 describe("the markup pass over a markdown block", () => {
-  it("keeps the Markdown as written and escapes only the <…> Slack cannot parse", () => {
+  it("leaves the Markdown exactly as written, tags in fences included", () => {
     const text = [
       "| a | b |",
       "|---|---|",
@@ -216,13 +216,12 @@ describe("the markup pass over a markdown block", () => {
       "",
       "Ask <@teammate> or <@U0ASFR2RJ9W>, see <https://example.com|the doc> -> **done**",
       "> quoted",
+      "```jsx",
+      '<Button variant="primary">Save</Button>',
+      "```",
     ].join("\n");
     const block = at(sanitizeSlackBlocks([{ type: "markdown", text }]) as Array<{ text: string }>, 0);
 
-    assert.equal(
-      block.text,
-      text.replace("<@teammate>", "&lt;@teammate&gt;"),
-      "only the unparseable token changed",
-    );
+    assert.equal(block.text, text, "Slack shows an escaped entity as written, so nothing is escaped");
   });
 });

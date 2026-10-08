@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **156,334 chars from 16 files**, against an assembled budget of 175,500 (19,166 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 135,950 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **156,428 chars from 16 files**, against an assembled budget of 175,500 (19,072 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 136,044 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,296 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,692 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 113,690 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 18,293 (−5,803 ide-only) | 132,025 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 135,309 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 141,825 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 146,488 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 156,334 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 18,387 (−5,803 ide-only) | 132,119 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 135,403 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 141,919 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 146,582 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 156,428 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -997,7 +997,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 | Path | What is sent | Converted by |
 |---|---|---|
 | Streamed first part (streaming on, in a thread) | `markdown_text` — your Markdown, with only the markup pass below | `sanitizeStreamChunk` in `appendStream` / `stopStream` |
-| Posted part (channel answers, continuation parts, streaming off, a stream that failed) | one `markdown` block — your Markdown as written — plus the footer `context` block on the last part | only `sanitizeMarkdownMarkup`, which escapes unparseable `<…>` |
+| Posted part (channel answers, continuation parts, streaming off, a stream that failed) | one `markdown` block — your Markdown as written — plus the footer `context` block on the last part | none — Slack turns it into rich text itself, and shows an escaped `&lt;` as written |
 | Fallback rung 1 (Slack refused the `markdown` block for its blocks: `invalid_blocks`, `invalid_blocks_format`, or `invalid_arguments` pointing into `/blocks`) | `section` blocks, which are mrkdwn-only, plus the footer | `toSlackMrkdwn` in `textSections` |
 | Fallback rung 2 (Slack refused the sections too, or refused the first post for anything other than its blocks) | bare `text`, no footer | `toSlackMrkdwn` in `postMessage` |
 | `chat.postMessage` `text`, every rung | the whole part as mrkdwn, for notifications and screen readers | `toSlackMrkdwn` in `postMessage` |
@@ -1005,7 +1005,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). A `markdown` block keeps your `&`, `<` and `>` as written and escapes only a `<…>` token that is not valid markup (`sanitizeMarkdownMarkup`). Worker code escapes a title inside a link label (`escapeSlackText`).
+**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). A `markdown` block gets no pass: Slack converts it to rich text, so an unparseable `<…>` shows as plain text rather than blanking the message, and an escaped `&lt;` would show as those characters (live 2026-10-07). Worker code escapes a title inside a link label (`escapeSlackText`).
 
 #### Streamed text
 
