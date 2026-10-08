@@ -9,7 +9,9 @@
 // can comment, relabel and close, and editing a body is none of those.
 //
 // Items keep the number they were posted with, so `drop 2` means the same
-// item on every revision of the card.
+// item on every revision of the card. The list posts as a result table with
+// that number in its first column, up to 30 rows in the one message; the
+// plain mrkdwn list is its fallback when Slack refuses the table.
 //
 // THE WORDS are #886 § 3.4's (approved 2026-09-30): the list leads with the
 // finding, the rule is one clause and a link, and the reply verb is `drop` —
@@ -23,6 +25,8 @@
 import type { ProposalOperation, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
+import { resultTableBlock } from "../slack/result-table-block";
+import { MAX_ROWS, type ResultTable } from "../turn/result-table";
 import { largestFitting, namesInWords, ONE_POST_CHARS, packLines, shortDate, windowInWords } from "../slack/copy-words";
 import { SOURCE_NAMES, type Disagreement } from "./compare";
 
@@ -74,10 +78,53 @@ function itemLine(i: NumberedItem): string {
 
 /** The list post, and the items that would not fit in it. */
 export interface PrecedenceList {
+  /** The list as plain mrkdwn, cut at one post's length: the post when Slack
+   *  refuses the table. */
   text: string;
   /** Replies for the thread, before the card: the items past the cut, with
    *  the numbers they were given. */
   overflow: string[];
+  /** The list as one result table: the post the thread opens with. */
+  table: {
+    /** Its text copy — the finding, every tabled item and the instruction —
+     *  which notifications read and the plain rung does not need. */
+    text: string;
+    blocks: Array<Record<string, unknown>>;
+    /** The items past the table's thirty rows, for the thread. */
+    overflow: string[];
+  };
+}
+
+/**
+ * The items as a result table, the drop number first, so the number a reply
+ * names is the one the row shows. The component links to its code and the
+ * last column to its library component.
+ */
+function itemsTable(items: readonly NumberedItem[], total: number, components: number): ResultTable {
+  return {
+    lookup: "ds_precedence",
+    columns: [
+      { label: "#", numeric: true },
+      { label: "Component", numeric: false },
+      { label: "Disagreement", numeric: false },
+      { label: "Library", numeric: false },
+    ],
+    rows: items.map((i) => ({
+      // A cell is plain text, where backticks would show as written.
+      cells: [i.n, i.component, i.summary.replace(/`/g, ""), "Figma"],
+      links: [undefined, i.codeUrl, undefined, i.figmaUrl],
+      line: itemLine(i),
+      names: [],
+      mentions: [],
+    })),
+    caption:
+      total > items.length
+        ? `The first ${items.length} of ${total} disagreements; the rest are in the thread`
+        : `${total} disagreement${total === 1 ? "" : "s"} across ${components} component${components === 1 ? "" : "s"}`,
+    total,
+    partial: total > items.length,
+    labels: [],
+  };
 }
 
 /**
@@ -99,14 +146,39 @@ export function precedenceList(items: readonly NumberedItem[], weekOf: string, r
   ];
   const tail = ["", `Reply \`drop ${items[Math.min(1, items.length - 1)]!.n}\` for any that's deliberate, and I'll revise the card.`];
   const lines = items.map(itemLine);
+  const more = (k: number) => `and ${lines.length - k} more, listed in the thread.`;
+  const table = tabled(items, components, head, tail, more);
   const whole = [...head, ...lines, ...tail].join("\n");
-  if (whole.length <= ONE_POST_CHARS || lines.length < 2) return { text: whole, overflow: [] };
+  if (whole.length <= ONE_POST_CHARS || lines.length < 2) return { text: whole, overflow: [], table };
 
   // Too long for one post: as many items as fit, the rest counted here and
   // listed in the thread under their own numbers.
-  const cut = (k: number) => [...head, ...lines.slice(0, k), `and ${lines.length - k} more, listed in the thread.`, ...tail].join("\n");
+  const cut = (k: number) => [...head, ...lines.slice(0, k), more(k), ...tail].join("\n");
   const shown = largestFitting(1, lines.length - 1, (k) => cut(k).length <= ONE_POST_CHARS);
-  return { text: cut(shown), overflow: packLines(lines.slice(shown)) };
+  return { text: cut(shown), overflow: packLines(lines.slice(shown)), table };
+}
+
+/**
+ * The list as a result table between the finding and the instruction: up to
+ * thirty items in the one message, any past that in the thread as before.
+ */
+function tabled(
+  items: readonly NumberedItem[],
+  components: number,
+  head: string[],
+  tail: string[],
+  more: (k: number) => string,
+): PrecedenceList["table"] {
+  const rows = items.slice(0, MAX_ROWS);
+  const rest = items.slice(MAX_ROWS).map(itemLine);
+  const lead = [...head.filter(Boolean), ...(rest.length ? [more(rows.length)] : [])].join("\n");
+  const close = tail.filter(Boolean).join("\n");
+  const section = (text: string) => ({ type: "section", text: { type: "mrkdwn", text } });
+  return {
+    text: [lead, "", ...rows.map(itemLine), "", close].join("\n"),
+    blocks: [section(lead), resultTableBlock(itemsTable(rows, items.length, components)), section(close)],
+    overflow: packLines(rest),
+  };
 }
 
 function cell(text: string): string {
