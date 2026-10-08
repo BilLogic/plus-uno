@@ -169,6 +169,84 @@ test("two flagged lookups in one turn: the last that qualifies is the table", as
   assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, true, false]);
 });
 
+/** The lookup's result for a title search: `hits` cards with the phrase in
+ *  their titles, then `similar` that only resemble it. */
+function titleResult(hits: number, similar: number, over: Record<string, unknown> = {}): string {
+  const cards = [
+    ...Array.from({ length: hits }, (_, i) => card(i + 1, { title: `Onboarding ${i + 1}`, title_match: "contains" })),
+    ...Array.from({ length: similar }, (_, i) => card(50 + i, { title: `Boarding pass ${i}`, title_match: "similar" })),
+  ];
+  return JSON.stringify({
+    ok: true,
+    filters: { title: "onboarding" },
+    count: cards.length,
+    contains_count: hits,
+    truncated: false,
+    cards,
+    note: "Every card with \"onboarding\" in its title is listed first.",
+    ...over,
+  });
+}
+
+const TITLE_ASK = { name: "roadmap_query", args: { title: "onboarding", as_table: true } };
+
+test("a flagged title search tables only the cards whose titles contain the phrase", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [TITLE_ASK] }, { text: "Three cards mention onboarding." }],
+    toolResult: titleResult(3, 2),
+  });
+  const outcome = await runTurn(request({ text: "which cards mention onboarding?" }), h.deps);
+
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.deepEqual(table.rows.map((r) => r.title), ["Onboarding 1", "Onboarding 2", "Onboarding 3"]);
+  assert.deepEqual(table.filter, { title: "onboarding" });
+  assert.equal(table.partial, false);
+  const [result] = resultsTheModelRead(h);
+  assert.equal(result?.table_attached, true);
+  assert.equal(result?.row_count, 3);
+  assert.equal((result?.cards as unknown[]).length, 5, "the did-you-mean guesses still reach the model");
+  const stored = outcome.wrote.turns.find((t) => t.role === "assistant")?.content ?? "";
+  assert.equal(stored.includes("Boarding pass"), false, "no guess is remembered as shown");
+});
+
+test("a title search with one hit, or only similar guesses, attaches nothing", async () => {
+  for (const [hits, similar] of [[1, 4], [0, 5]] as const) {
+    const h = harness({ replies: [{ toolCalls: [TITLE_ASK] }, { text: "Did you mean…" }], toolResult: titleResult(hits, similar) });
+    await runTurn(request({ text: "the onboarding card?" }), h.deps);
+
+    assert.equal(answerCall(h.delivery.calls).cardTable, undefined, `${hits} hits`);
+    const [result] = resultsTheModelRead(h);
+    assert.equal(result?.table_attached, false, `${hits} hits`);
+    assert.equal("row_count" in (result ?? {}), false, `${hits} hits`);
+  }
+});
+
+test("a title search that listed only the first of its hits is a partial table", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [TITLE_ASK] }, { text: "The first 30 of 41." }],
+    toolResult: titleResult(30, 0, { contains_count: 41 }),
+  });
+  await runTurn(request({ text: "which cards mention onboarding?" }), h.deps);
+
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.equal(table.rows.length, 30);
+  assert.equal(table.total, 41);
+  assert.equal(table.partial, true);
+});
+
+test("an enumeration then a flagged title search: the title search's hits are the table", async () => {
+  const results = [wipResult(5), titleResult(2, 3)];
+  const h = harness({
+    replies: [{ toolCalls: [ASK] }, { toolCalls: [TITLE_ASK] }, { text: "Done." }],
+    toolResultFor: () => results.shift() ?? "{}",
+  });
+  await runTurn(request({ text: "WIP, then onboarding" }), h.deps);
+
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.deepEqual(table.rows.map((r) => r.title), ["Onboarding 1", "Onboarding 2"]);
+  assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, true]);
+});
+
 test("a failed lookup is handed back to the model untouched", async () => {
   const failed = JSON.stringify({ ok: false, error: "Notion is down" });
   const h = harness({ replies: [{ toolCalls: [ASK] }, { text: "Could not read it." }], toolResult: failed });

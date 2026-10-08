@@ -38,19 +38,21 @@ function numberCell(n: number | null) {
 /**
  * What the table holds, in a line: the count and the filter —
  * "13 cards · Design Status WIP" — and, when the lookup listed only the first
- * of its matches, "first 30 of 41 cards". A partial read with no larger count
- * to give says so plainly, so a cut list never reads as the whole board.
+ * of its matches, "first 30 of 41 · Design Status WIP". A partial read with no
+ * larger count to give says so plainly, so a cut list never reads as the whole
+ * board.
  */
 export function cardTableCaption(table: CardTable): string {
   const n = table.rows.length;
   const count = !table.partial
     ? `${n} card${n === 1 ? "" : "s"}`
     : table.total > n
-      ? `first ${n} of ${table.total} cards`
+      ? `first ${n} of ${table.total}`
       : `at least ${n} cards`;
   const filters = [
     table.filter.designStatus ? `Design Status ${table.filter.designStatus}` : null,
     table.filter.person ? `with ${table.filter.person}` : null,
+    table.filter.title ? `title contains "${table.filter.title}"` : null,
   ];
   return [count, ...filters].filter(Boolean).join(" · ");
 }
