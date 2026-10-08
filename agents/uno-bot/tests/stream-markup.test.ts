@@ -185,6 +185,22 @@ test("a task card's text goes as plain text, as handed, within the chunk limit",
   assert.ok(source!.text.length <= 250, String(source!.text.length));
 });
 
+test("a task card's icon goes on the chunk exactly as production Slack took it, and a card without one sends none", async () => {
+  // The `/debug/slack-stream?chunks=` probe landed this chunk on 2026-10-07.
+  const { appendTasks } = await import("../src/slack/api.js");
+  sent = [];
+  await appendTasks(ENV, "D0123", "9.0", [
+    { id: "t1", title: "Reading GitHub", status: "in_progress", icon: { type: "icon", name: "code" } },
+    { id: "t2", title: "Setting your reminder", status: "in_progress" },
+  ]);
+  const [withIcon, without] = sent[0]!.body.chunks as Array<Record<string, unknown>>;
+  assert.equal(
+    JSON.stringify(withIcon),
+    '{"type":"task_update","id":"t1","title":"Reading GitHub","status":"in_progress","icon":{"type":"icon","name":"code"}}',
+  );
+  assert.equal("icon" in without!, false);
+});
+
 test("the markup probe streams raw text only to a DM or the alert channel, and only so much", async () => {
   const { slackStreamProbe, PROBE_TEXT_LIMIT } = await import("../src/diagnostics/probes/slack.js");
   const probe = async (q: string) => {

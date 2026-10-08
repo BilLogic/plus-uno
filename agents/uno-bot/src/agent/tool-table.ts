@@ -101,8 +101,9 @@ export interface GateWords {
 }
 
 /**
- * The estates a link can live on — named, never drawn. `slack/estate-hosts.ts`
- * maps a host to one, and the checklist's source filter reads it.
+ * The estates a lookup can read — named, never drawn. `slack/estate-hosts.ts`
+ * maps a link's host to one, which the checklist's source filter reads; which
+ * glyph stands for one is the Slack side's map (`slack/estate-glyphs.ts`).
  */
 export type Estate = "notion" | "figma" | "github" | "blueprint" | "slack" | "storybook";
 
@@ -110,7 +111,7 @@ export type Estate = "notion" | "figma" | "github" | "blueprint" | "slack" | "st
  * How a lookup is SHOWN while it runs — its task card on the checklist
  * (CONTEXT.md § checklist), which only an ungated tool is ever given.
  *
- * Words, and nothing Slack-shaped: no URL, no chunk, no status.
+ * Words and an estate, and nothing Slack-shaped: no URL, no chunk, no icon.
  * The table has five readers that are not Slack, and a column that held a
  * Slack shape would drag Slack into every one of them.
  */
@@ -118,6 +119,10 @@ export interface TaskCardWords {
   /** The card's title, in uno's voice — what it is doing, as it would say it
    *  ("Searching Notion"). */
   readonly title: string;
+  /** The estate it reads; `"link"` for a tool whose estate is that of the link
+   *  each call reads (`task-card-readout.ts` § `readLinkOf`), decided per call
+   *  rather than per tool; or null for a tool that reads none of them. */
+  readonly estate: Estate | "link" | null;
 }
 
 /**
@@ -163,58 +168,58 @@ export const TOOL_TABLE = {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Checking the Roadmap board" },
+    taskCard: { title: "Checking the Roadmap board", estate: "notion" },
   },
   notion_search: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Searching Notion" },
+    taskCard: { title: "Searching Notion", estate: "notion" },
   },
-  // A URL of any estate, so the row names none: which one this call read is
-  // in its arguments, not in the tool.
+  // A URL of any estate, so the row names `"link"`: which one this call read
+  // is in its arguments, not in the tool.
   source_read: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Reading the link" },
+    taskCard: { title: "Reading the link", estate: "link" },
   },
   search_blueprint: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Searching the blueprint" },
+    taskCard: { title: "Searching the blueprint", estate: "blueprint" },
   },
   github_read: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Reading GitHub" },
+    taskCard: { title: "Reading GitHub", estate: "github" },
   },
   // The duplicate check before `github_issue_create`: open intakes by keyword.
   github_intake_search: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Checking open intakes on GitHub" },
+    taskCard: { title: "Checking open intakes on GitHub", estate: "github" },
   },
   slack_user_profile: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Looking someone up in Slack" },
+    taskCard: { title: "Looking someone up in Slack", estate: "slack" },
   },
   slack_channel_members: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Checking who's in the channel" },
+    taskCard: { title: "Checking who's in the channel", estate: "slack" },
   },
   slack_thread_read: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Reading the Slack thread" },
+    taskCard: { title: "Reading the Slack thread", estate: "slack" },
   },
   slack_react: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
   // "Remind me": writes only uno-bot's own record, posted back to the asker
@@ -223,19 +228,19 @@ export const TOOL_TABLE = {
     access: "ungated",
     retrieval: false,
     reviewRequest: null,
-    taskCard: { title: "Setting your reminder" },
+    taskCard: { title: "Setting your reminder", estate: null },
   },
   slack_search: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
-    taskCard: { title: "Searching Slack" },
+    taskCard: { title: "Searching Slack", estate: "slack" },
   },
   read_reference: {
     access: "ungated",
     retrieval: false,
     reviewRequest: null,
-    taskCard: { title: "Checking my playbook" },
+    taskCard: { title: "Checking my playbook", estate: null },
   },
   notion_create: {
     access: "gated",

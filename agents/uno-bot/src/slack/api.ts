@@ -14,6 +14,7 @@ import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { rowFor } from "../agent/tool-table";
 import { cardLinks } from "./plan-block";
+import type { SlackIcon } from "./estate-glyphs";
 
 interface SlackOk {
   ok: true;
@@ -347,6 +348,8 @@ export interface TaskChunk {
   output?: string;
   /** Links the step read, already filtered to what the thread may see. */
   sources?: ReadonlyArray<{ text: string; url: string }>;
+  /** The card's glyph, as Slack's icon object (`estate-glyphs.ts`). */
+  icon?: SlackIcon;
 }
 
 export async function startStream(
