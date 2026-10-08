@@ -9,8 +9,10 @@
 // field its rows do not carry, is refused in the call's own result, and the
 // model writes the plain list instead. Nothing the model types becomes a cell.
 //
-// THE PRESENTATION is the data the turn hands Delivery beside the prose. Today
-// it holds the one result table; each new shape is one more field on it, built
+// THE PRESENTATION is the data the turn hands Delivery beside the prose. It
+// holds the one result table and the ⚠️ lines (`turn/warning-line.ts`, which
+// every lookup result and the model's `conflict` shape also pass through);
+// each new shape is one more field on it, built
 // here from the same recorded lookups and spelled for Slack on the posting
 // side, so a new shape never needs a new argument on the Delivery seam.
 //
@@ -37,11 +39,16 @@ import {
   type RoadmapResult,
   type RowsRemoved,
 } from "./result-table";
+import { signed, warningLog } from "./warning-line";
+import type { AbsenceContext } from "../agent/absence";
 
 /** What rides beneath an answer. */
 export interface Presentation {
   /** The result table, when the turn's lookups left one. */
   table?: ResultTable;
+  /** The ⚠️ lines (`turn/warning-line.ts`): at most two sentences, each
+   *  without its sign, which the posting side places. */
+  warnings?: readonly string[];
 }
 
 /** The tool the model asks for a shape with. */
@@ -54,6 +61,12 @@ export interface Presenter {
    * the text the model reads — rewritten when it carries a table's news.
    */
   revise(name: string, args: Record<string, unknown>, text: string): string;
+  /** A lookup refused before it ran, with the refusal's error. */
+  refused(name: string, error: string): void;
+  /** The loop ran out of round-trips and answered from what it had. */
+  budgetSpent(): void;
+  /** The absence pre-check fired on the draft. */
+  absenceFired(ctx: AbsenceContext): void;
   /** What the turn's lookups left to post beneath the answer, if anything. */
   presentation(): Presentation | undefined;
 }
@@ -119,18 +132,41 @@ function attachedNote(table: ResultTable): string {
 
 const NO_TABLE_NOTE = "No table is attached. If the rows answer the question, list them in your answer yourself.";
 
-/** A fresh presenter, for one turn. */
-export function presenter(): Presenter {
+/**
+ * A fresh presenter, for one turn.
+ *
+ * @param opts.now - The turn's clock, read for the ⚠️ line's freshness cutoff
+ */
+export function presenter(opts: { now?: () => number } = {}): Presenter {
   const lookups = new Map<string, Recorded>();
+  const warnings = warningLog(opts.now);
   let table: ResultTable | undefined;
 
   const answer = (body: Record<string, unknown>): string => JSON.stringify(body);
   const refuse = (error: string): string => answer({ ok: false, table_attached: false, error, note: NO_TABLE_NOTE });
 
+  /** The model's conflict line: placed under the answer by code, or refused. */
+  const conflict = (args: Record<string, unknown>): string => {
+    const taken = warnings.conflict(args.line);
+    return taken.ok
+      ? answer({
+          ok: true,
+          warning_attached: true,
+          note: "The line is posted beneath your answer with its ⚠️. Do not repeat the conflict in your prose or type ⚠️ yourself.",
+        })
+      : answer({
+          ok: false,
+          warning_attached: false,
+          error: taken.refusal,
+          note: "No ⚠️ line was added. If the conflict still matters, say it plainly in one sentence of your prose, without ⚠️.",
+        });
+  };
+
   /** The model's `present` call, answered from the recorded lookups. */
   const present = (args: Record<string, unknown>): string => {
     const shape = args.shape ?? "table";
-    if (shape !== "table") return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table.`);
+    if (shape === "conflict") return conflict(args);
+    if (shape !== "table") return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table or a conflict.`);
     const lookup = typeof args.lookup === "string" ? args.lookup.trim() : "";
     const recorded = lookups.get(lookup);
     if (!recorded) {
@@ -167,6 +203,7 @@ export function presenter(): Presenter {
   return {
     revise(name, args, text) {
       if (name === PRESENT_TOOL) return present(args);
+      warnings.lookup(name, text);
       const parsed = parse(text);
       if (!parsed || parsed.ok !== true) return text;
       lookups.set(name, { args, result: parsed });
@@ -180,8 +217,19 @@ export function presenter(): Presenter {
         ...(cards ? { row_count: cards.rows.length, note: cardTableNote(cards) } : {}),
       });
     },
+    refused(name, error) {
+      warnings.refused(name, error);
+    },
+    budgetSpent() {
+      warnings.budgetSpent();
+    },
+    absenceFired(ctx) {
+      warnings.absenceFired(ctx);
+    },
     presentation() {
-      return table ? { table } : undefined;
+      const lines = warnings.lines();
+      if (!table && !lines.length) return undefined;
+      return { ...(table ? { table } : {}), ...(lines.length ? { warnings: lines } : {}) };
     },
   };
 }
@@ -204,14 +252,17 @@ export function presentedProse(prose: string, presentation: Presentation | undef
 }
 
 /**
- * The message's text copy: the prose, then a table's plain list. What a
- * notification shows, a screen reader reads and the thread remembers.
+ * The message's text copy: the prose, then a table's plain list, then the ⚠️
+ * lines. What a notification shows, a screen reader reads and the thread
+ * remembers.
  *
  * @param prose - The answer as it posts
  * @param presentation - What rides beneath it
  */
 export function textCopy(prose: string, presentation: Presentation | undefined): string {
-  return presentation?.table ? withResultList(prose, presentation.table) : prose;
+  const body = presentation?.table ? withResultList(prose, presentation.table) : prose;
+  const lines = presentation?.warnings ?? [];
+  return lines.length ? `${body}\n\n${lines.map(signed).join("\n")}` : body;
 }
 
 /**

@@ -17,7 +17,9 @@ import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
+import { toSlackMrkdwn } from "./mrkdwn";
 import { textCopy, type Presentation } from "../turn/presentation";
+import { signed } from "../turn/warning-line";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -215,6 +217,16 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
 }
 
 /**
+ * The ⚠️ lines as Slack shows them: one `context` line each, sign first, just
+ * above the footer. A context line and not Slack's `alert` block, which Slack
+ * refuses in a message (live 2026-10-07); a context line renders on every
+ * client, phone included.
+ */
+function warningBlocks(lines: readonly string[]): Array<Record<string, unknown>> {
+  return lines.map((line) => ({ type: "context", elements: [{ type: "mrkdwn", text: signed(toSlackMrkdwn(line)) }] }));
+}
+
+/**
  * Post a verified answer: stream it when the recipient pair is complete, else
  * fall back to an ordinary message. The recipient is REQUIRED — #572 was an
  * optional positional argument nobody passed.
@@ -250,11 +262,14 @@ export async function postTextVerified(
   const body = renderDeliveredBody(text);
   const { presentation } = extras;
   const resultTable = presentation?.table;
-  // A table of rows is a checkable claim however short the prose above it:
-  // the honesty line goes beneath it even when the prose alone would read as
-  // an acknowledgement.
-  const footerKind: FooterKind = resultTable && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
-  const footer = footerBlocks(footerKind);
+  const warnings = presentation?.warnings ?? [];
+  // A table of rows is a checkable claim however short the prose above it,
+  // and so is anything a ⚠️ line qualifies: the honesty line goes beneath it
+  // even when the prose alone would read as an acknowledgement.
+  const qualified = Boolean(resultTable) || warnings.length > 0;
+  const footerKind: FooterKind = qualified && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
+  // The ⚠️ lines ride with the footer, just above it, on every block rung.
+  const footer = [...warningBlocks(warnings), ...footerBlocks(footerKind)];
   // The table rides where the footer does — the answer's last part, where it
   // ends — and its plain list rides that part's text copy, which is what a
   // notification shows and what the thread remembers.
@@ -266,8 +281,10 @@ export async function postTextVerified(
       if (!(deps.streamingOn && threadTs)) return false;
       // An answer carrying a table posts as an ordinary message: Slack
       // does not document a `data_table` in a stream, and a stream's first part
-      // is not where the table rides on a split answer anyway.
-      if (resultTable) return false;
+      // is not where the table rides on a split answer anyway. An answer with
+      // a ⚠️ line posts as one too: a stream has no text copy, and the line's
+      // sentence must reach the notification as well as the block.
+      if (qualified) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision
       // itself is `decideStream`. Until #572 the answer path passed neither
@@ -347,7 +364,8 @@ export async function postTextVerified(
       // A table steps down first, to the same answer without it and its
       // rows as a plain list in the Markdown — so a rendering problem never
       // costs the reader the list. Every rung below carries that list too.
-      const prose = tabled ? copy : piece;
+      // The list without the ⚠️ lines, which keep their own blocks in `tail`.
+      const prose = tabled && resultTable ? textCopy(piece, { table: resultTable }) : piece;
       if (tabled && refusedForBlocks(posted)) {
         console.warn(`[slack] result table refused (${refusalOf(posted)}); retrying without it, the rows as a list`);
         posted = await send([{ type: "markdown", text: prose }, ...tail]);

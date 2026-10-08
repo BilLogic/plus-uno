@@ -287,27 +287,25 @@
   },
   {
     "name": "present",
-    "description": "Ungated, fetches nothing. Show rows a lookup already returned THIS turn as a sortable table beneath your answer: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. The result says `table_attached`: when true, lead with the takeaway and what stands out, name at most 3 rows, and leave the rest to the table; when false, its `error` says why, and you list the rows in your answer yourself.",
+    "description": "Ungated, fetches nothing. Two shapes. 'table': show rows a lookup already returned THIS turn as a sortable table beneath your answer: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. The result says `table_attached`: when true, lead with the takeaway and what stands out, name at most 3 rows, and leave the rest to the table; when false, its `error` says why, and you list the rows in your answer yourself. 'conflict': when two sources you read this turn disagree — the blueprint (today) says one thing, a Roadmap card or PRD (the plan) another — give the disagreement as ONE sentence in `line`, naming both sides; code posts it as a ⚠️ line under your answer. One per answer; never type ⚠️ yourself. The result says `warning_attached`; when false, say the conflict in one plain sentence of your prose instead.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "shape",
-        "lookup",
-        "columns",
-        "takeaway"
+        "shape"
       ],
       "properties": {
         "shape": {
           "type": "string",
           "enum": [
-            "table"
+            "table",
+            "conflict"
           ],
-          "description": "The shape to show: 'table'."
+          "description": "The shape to show: 'table', or 'conflict' for a disagreement between two sources."
         },
         "lookup": {
           "type": "string",
-          "description": "The tool whose rows to show, as named this turn, e.g. 'search_blueprint'. Its most recent result is used."
+          "description": "For a table: the tool whose rows to show, as named this turn, e.g. 'search_blueprint'. Its most recent result is used."
         },
         "list": {
           "type": "string",
@@ -318,11 +316,15 @@
           "items": {
             "type": "string"
           },
-          "description": "1 to 4 field names exactly as the rows carry them, the identifying field first (e.g. ['title', 'scenario', 'lane'])."
+          "description": "For a table: 1 to 4 field names exactly as the rows carry them, the identifying field first (e.g. ['title', 'scenario', 'lane'])."
         },
         "takeaway": {
           "type": "string",
-          "description": "The one-sentence takeaway the table supports, as your answer will lead with it."
+          "description": "For a table: the one-sentence takeaway the table supports, as your answer will lead with it."
+        },
+        "line": {
+          "type": "string",
+          "description": "For a conflict: one sentence naming both sides, e.g. 'The blueprint says cycles reset weekly; Roadmap card #2569 plans to count sessions instead.' No emoji."
         }
       }
     }

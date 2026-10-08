@@ -79,7 +79,9 @@ export interface TurnDials {
 }
 
 export type AgentResult =
-  | { kind: "text"; text: string }
+  /** `cutShort`: the answer came from the tools-disabled synthesis pass, once
+   *  the loop's round-trips ran out — what Turn's ⚠️ line reads. */
+  | { kind: "text"; text: string; cutShort?: true }
   /**
    * The turn was stopped, and the answer goes undelivered.
    *
@@ -670,5 +672,5 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     console.log("[stop] stopped after the synthesis pass, answer undelivered");
     return finish({ kind: "stopped" });
   }
-  return finish({ kind: "text", text: final.text || CLARIFY_FALLBACK });
+  return finish({ kind: "text", text: final.text || CLARIFY_FALLBACK, cutShort: true });
 }
