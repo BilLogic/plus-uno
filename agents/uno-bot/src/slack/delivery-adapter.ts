@@ -68,6 +68,8 @@
 
 import { turnSurfaceOf } from "../turn/request";
 import type { FooterKind } from "./footer-kind";
+import type { AnswerFeedback } from "./feedback";
+import { SLACK_TS, turnIdOf } from "../usage/record";
 import type { SlackMessageMetadata } from "./api";
 import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
@@ -250,6 +252,8 @@ export interface SlackDeliveryClient {
     footerHint?: FooterKind;
     /** What rides beneath the answer, when the turn left anything. */
     presentation?: Presentation;
+    /** The feedback buttons' turn, under a substantive answer. */
+    feedback?: AnswerFeedback;
   }): Promise<{ ok: boolean; text: string }>;
   /** The visible failure: the ❌ and the message that says how far it got. */
   postFailure(input: {
@@ -1066,6 +1070,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         // Handed on as data: the blocks and the plain list are the posting
         // path's to spell (`slack/result-table-block.ts`).
         ...(presentation ? { presentation } : {}),
+        // The usage record's id for this turn, worked out as the turn works it
+        // out: a tap on the answer's feedback buttons is filed against it.
+        ...(SLACK_TS.test(userMsgTs) ? { feedback: { turnId: turnIdOf(channel, userMsgTs, 0) } } : {}),
       });
       return { ok: posted.ok, text: posted.text };
     },
