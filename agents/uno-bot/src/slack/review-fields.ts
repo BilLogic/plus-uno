@@ -208,6 +208,23 @@ export async function reviewFields(
     return reads.get(id)!;
   };
   const fields: EditableField[] = [];
+  for (const { field, source } of draftFields(proposal)) {
+    if (source) {
+      if (selects && !selects.has(field.key)) continue;
+      const options = (await optionsOf(source))?.filter((o) => o.length <= MAX_OPTION_CHARS).slice(0, MAX_OPTIONS);
+      if (!options?.length) continue;
+      fields.push({ ...field, options });
+      continue;
+    }
+    fields.push(field);
+  }
+  return fields;
+}
+
+/** Every field the table offers on this proposal, with the draft's value and,
+ *  for a select, where its options live — nothing read. */
+function draftFields(proposal: PendingProposal): Array<{ field: EditableField; source?: OptionSource }> {
+  const out: Array<{ field: EditableField; source?: OptionSource }> = [];
   for (const [index, op] of proposalOperations(proposal).entries()) {
     const table = FIELDS[op.toolName] ?? [];
     for (const spec of typeof table === "function" ? table(op.input) : table) {
@@ -218,16 +235,45 @@ export async function reviewFields(
       if (!value && !spec.required && spec.kind !== "select") continue;
       if (value.length > MAX_INPUT_CHARS) continue;
       const field: EditableField = { key: `${index}.${spec.path}`, label: spec.label, kind: spec.kind, required: !!spec.required, value };
-      if (spec.options) {
-        if (selects && !selects.has(field.key)) continue;
-        const options = (await optionsOf(spec.options))?.filter((o) => o.length <= MAX_OPTION_CHARS).slice(0, MAX_OPTIONS);
-        if (!options?.length) continue;
-        field.options = options;
-      }
-      fields.push(field);
+      out.push(spec.options ? { field, source: spec.options } : { field });
     }
   }
-  return fields;
+  return out;
+}
+
+/**
+ * The draft's value of each field a confirmer could edit, by key, with no
+ * option read: what saved edits are compared against, so only a value that
+ * differs from the draft is carried to Approve.
+ */
+export function draftValuesOf(proposal: PendingProposal): Map<string, string> {
+  return new Map(draftFields(proposal).map(({ field }) => [field.key, field.value]));
+}
+
+/**
+ * The batch with these values written where each field's key points: the
+ * pop-up's draft as it reads after saved edits. Unchecked, because it only
+ * shows; Approve's `checkEdits` is the gate on what runs.
+ */
+export function withValues(proposal: PendingProposal, values: ReadonlyMap<string, string>): ProposalOperation[] {
+  return proposalOperations(proposal).map((op, index) => {
+    let input = op.input;
+    for (const [key, value] of values) {
+      const [at, ...path] = key.split(".");
+      if (Number(at) === index && path.length) input = writePath(input, path.join("."), value);
+    }
+    return { toolName: op.toolName, input };
+  });
+}
+
+/** A state as Slack would send it holding these values, each under its
+ *  field's input: how saved edits re-enter the checks on Approve. */
+export function stateOf(values: Readonly<Record<string, string>>): ReviewViewState {
+  const state: ReviewViewState = {};
+  for (const [key, value] of Object.entries(values)) {
+    state[`${FIELD_BLOCK_PREFIX}${key}`] = { [FIELD_ACTION_ID]: { value, selected_option: { value } } };
+  }
+  return state;
 }
 
 /**
@@ -337,7 +383,7 @@ function clip(text: string): string {
 export function checkFieldEdits(
   fields: readonly EditableField[],
   state: ReviewViewState | undefined,
-): { ok: true; changed: Map<string, string>; edited: string[] } | { ok: false; alert: string } {
+): { ok: true; changed: Map<string, string>; edited: string[] } | { ok: false; alert: string; key: string } {
   const values = stateValues(fields, state);
   const changed = new Map<string, string>();
   const edited: string[] = [];
@@ -345,7 +391,7 @@ export function checkFieldEdits(
     const value = values.get(field.key);
     if (value === undefined || value === field.value) continue;
     const why = refusal(field, value);
-    if (why) return { ok: false, alert: why };
+    if (why) return { ok: false, alert: why, key: field.key };
     changed.set(field.key, value);
     if (!edited.includes(field.label)) edited.push(field.label);
   }
@@ -363,19 +409,23 @@ export function checkFieldEdits(
  */
 export function checkEdits(proposal: PendingProposal, fields: readonly EditableField[], state: ReviewViewState | undefined): CheckedEdits {
   const checked = checkFieldEdits(fields, state);
-  if (!checked.ok) return checked;
-  const operations = proposalOperations(proposal).map((op, index) => {
-    let input = op.input;
-    for (const [key, value] of checked.changed) {
-      const [at, ...path] = key.split(".");
-      if (Number(at) === index) input = writePath(input, path.join("."), value);
-    }
-    return { toolName: op.toolName, input };
-  });
+  if (!checked.ok) return { ok: false, alert: checked.alert };
+  const operations = withValues(proposal, checked.changed);
   const changes = fields
     .filter((field) => checked.changed.has(field.key))
     .map((field) => ({ key: field.key, from: field.value, to: checked.changed.get(field.key)! }));
   return { ok: true, operations, edited: checked.edited, changes };
+}
+
+/** The labels of the fields these keys name, in the draft's order, each once:
+ *  how the pop-up says which fields carry saved edits. */
+export function labelsOf(proposal: PendingProposal, keys: Iterable<string>): string[] {
+  const want = new Set(keys);
+  const labels: string[] = [];
+  for (const { field } of draftFields(proposal)) {
+    if (want.has(field.key) && !labels.includes(field.label)) labels.push(field.label);
+  }
+  return labels;
 }
 
 /** The card's line for an approved edit: who changed which fields. */
