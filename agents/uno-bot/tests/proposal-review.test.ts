@@ -82,8 +82,8 @@ const approve = (userId = "U2", viewId = "V1") => ({
   decision: "confirm" as const,
 });
 
-/** A confirmer's decision row in the body; Approve is the footer's submit. */
-const DECISION_ROW = ["uno_review_changes", "uno_review_reject"];
+/** A confirmer's decision row, the body's last block: all three decisions. */
+const DECISION_ROW = ["uno_review_approve", "uno_review_changes", "uno_review_reject"];
 
 /** Every action element a view offers. */
 function actionIds(view: unknown): string[] {
@@ -210,7 +210,7 @@ describe("Review opens the draft", () => {
     assert.match(viewText(views.calls[1]!.view), /Reflection redesign/);
   });
 
-  it("puts Approve in the footer, Needs changes and Reject last in the body, and holds no input", async () => {
+  it("puts Approve, Needs changes and Reject in one row at the foot, Close alone in the footer, and holds no input", async () => {
     const { deps, views } = harness(await staged());
     await runReviewOpen(open(), deps);
     const draft = views.calls[1]!.view as {
@@ -218,12 +218,13 @@ describe("Review opens the draft", () => {
       submit?: { text: string };
       close?: { text: string };
     };
-    assert.equal(draft.submit?.text, "Approve");
+    assert.equal(draft.submit, undefined, "no footer submit: the decisions sit together in the row");
     assert.equal(draft.close?.text, "Close");
     assert.deepEqual(actionIds(draft), DECISION_ROW);
     assert.deepEqual(
       draft.blocks.at(-1)?.elements?.map((e) => [e.text.text, e.style ?? "default"]),
       [
+        ["Approve", "primary"],
         ["Needs changes", "default"],
         ["Reject", "danger"],
       ],
@@ -232,7 +233,7 @@ describe("Review opens the draft", () => {
     // Edit fields sits at the top, beside the draft.
     assert.equal(draft.blocks[0]?.accessory?.action_id, "uno_review_edit");
     assert.equal(draft.blocks[0]?.accessory?.text.text, "Edit fields");
-    assert.doesNotMatch(viewText(draft), /Check edits|uno_review_approve/);
+    assert.doesNotMatch(viewText(draft), /Check edits/);
   });
 
   it("carries the card it is about, so the decision finds it", async () => {
