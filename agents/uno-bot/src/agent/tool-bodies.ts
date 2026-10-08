@@ -13,10 +13,11 @@
 // agent entry's per-turn bookkeeping nor the Gate's Durable Object imports
 // come with them.
 //
-// A BODY IS THE TOOL, NOT THE TURN. Three of the ungated tools are wrapped
+// A BODY IS THE TOOL, NOT THE TURN. Four of the ungated tools are wrapped
 // where they are dispatched, in `agent/run-agent.ts`: a correction turn forces
-// `search_blueprint` to re-fetch, and `search_blueprint`, `slack_search` and
-// `read_reference` each leave a per-turn receipt. Those wrappers read the
+// `search_blueprint` to re-fetch, `search_blueprint`, `slack_search` and
+// `read_reference` each leave a per-turn receipt, and `slack_react` takes one
+// reaction per message per turn. Those wrappers read the
 // turn's scope, which is the dispatch's knowledge and not the tool's, so they
 // stay there — as `TURN_WRAPPERS`, a `Partial<Record<ToolName, …>>` the
 // dispatch composes around the body it looked up (#597). Nothing here carries

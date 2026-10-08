@@ -266,7 +266,7 @@
   },
   {
     "name": "slack_react",
-    "description": "Direct, ungated. Add an emoji reaction AS UNO-BOT to a message in the current thread — to acknowledge, celebrate, or signal state. Any workspace emoji name without colons ('tada', 'eyes', 'raised_hands', a custom workspace emoji). Reactions are reversible. For a PURE acknowledgement from the user ('thanks', 'got it', 'nice') react and end the turn with no text — the reaction is the whole reply. The gate emoji (white_check_mark, heavy_check_mark, +1, thumbsup, no_entry, x, negative_squared_cross_mark, no_entry_sign) resolve proposal cards, so the tool refuses them. With message_ts omitted it reacts to the user's current message.",
+    "description": "Direct, ungated. Add an emoji reaction AS UNO-BOT to a message in the current thread — to acknowledge, celebrate, or signal state. Any workspace emoji name without colons ('tada', 'eyes', 'raised_hands', a custom workspace emoji). Reactions are reversible. For a PURE acknowledgement from the user ('thanks', 'got it', 'nice') react and end the turn with no text — the reaction is the whole reply. The gate emoji (white_check_mark, heavy_check_mark, +1, thumbsup, no_entry, x, negative_squared_cross_mark, no_entry_sign) resolve proposal cards, so the tool refuses them. One reaction per message per turn: a second on the same message is refused. With message_ts omitted it reacts to the user's current message.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
