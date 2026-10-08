@@ -244,6 +244,14 @@ export interface PendingProposal {
    */
   confirmers?: string[];
   /**
+   * Set by the store, never by a stager: a confirmer pressed Needs changes and
+   * the revision is being written (`ThreadState.markRevising`). The card stays
+   * findable, for the revision turn that replaces it, and is decided by no one
+   * meanwhile — the claim refuses it, and Gate answers every signal on it with
+   * "being revised".
+   */
+  revising?: { userId: string };
+  /**
    * What a ⛔ still runs, when the card says so. Absent — every turn's card —
    * a cancel runs nothing. Only a card the Worker stages itself sets it: the
    * Figma library card files its intake whichever way it is decided and only
@@ -747,6 +755,26 @@ export interface ThreadState {
    * answers false — nothing was replaced by this revision.
    */
   retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
+
+  /**
+   * Mark a live card as being revised: Needs changes, accepted.
+   *
+   * The first mark wins — `"marked"` — and a second answers `"already"`, so
+   * two presses start one revision. A card claimed, retired, replaced, aged
+   * out or never staged answers `"gone"`. A marked card is still found by
+   * every lookup, because the revision turn has to find it to replace it,
+   * and `claimProposal` refuses it until the mark clears. One read-modify-
+   * write, as the claim is, so a racing Approve and Needs changes have one
+   * winner between them.
+   */
+  markRevising(proposalTs: string, userId: string): Promise<"marked" | "already" | "gone">;
+
+  /**
+   * Lift the mark: the revision turn ended without staging a revision, so the
+   * card is decidable again. Staging the revision needs no clear — it retires
+   * the card. A card with no mark, or no record, is a no-op.
+   */
+  clearRevising(proposalTs: string): Promise<void>;
 
   /** Look one up by the ts of its card. */
   getProposalByTs(proposalTs: string): Promise<ProposalLookup>;

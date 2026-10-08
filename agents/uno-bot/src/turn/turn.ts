@@ -708,10 +708,13 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
         // it sits open above that failure, still claiming a step is running.
         // Settling twice is a no-op, so an exit that already did is safe.
         await watched.endProgress("error").catch(() => {});
+        await unlockRevision(request, cardLive, deps);
         throw err;
       }),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
+
+  if (outcome.disposition !== "staged") await unlockRevision(request, cardLive, deps);
 
   // Written AFTER the working signal is down and the answer is out, so the
   // record — and a DM ask's classification — costs the person nothing they
@@ -748,6 +751,20 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   }
   await recordTurn(await labelInTurn(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
+}
+
+/**
+ * A card sent back with Needs changes stays locked until its revision
+ * replaces it (`ThreadState.markRevising`). The revision is the asker's turn
+ * in the card's thread; one that ends without staging it — it failed, or
+ * answered instead — unlocks the card, or nothing could ever decide it.
+ */
+async function unlockRevision(request: TurnRequest, cardLive: boolean, deps: Pick<TurnDeps, "threadState">): Promise<void> {
+  const pending = request.pending;
+  if (!cardLive || !pending?.revising || pending.revising.userId !== request.userId) return;
+  await deps.threadState.clearRevising(pending.proposalTs).catch((err: unknown) => {
+    console.warn(`[turn] revising mark on ${pending.proposalTs} not cleared: ${err instanceof Error ? err.message : String(err)}`);
+  });
 }
 
 /** What a card this turn stages is recorded with (`usage/proposal-events.ts`). */

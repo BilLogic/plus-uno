@@ -7,7 +7,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { runReactionDoor, type GateVerdict } from "../src/gate/index";
+import { resolveSignal, runReactionDoor, type GateSignal, type GateVerdict } from "../src/gate/index";
 import {
   PROPOSAL_TTL_MS,
   createInMemoryThreadState,
@@ -17,7 +17,8 @@ import {
 import { recordingDelivery } from "../src/turn/index";
 import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
-import type { ProposalCard } from "../src/turn/index";
+import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
+import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
 import { verdictEvents } from "../src/usage/index";
 import { recordingViews, type RecordingViews } from "./helpers/recording-slack";
 
@@ -375,6 +376,62 @@ describe("Needs changes in the pop-up", () => {
 
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "superseded");
     assert.deepEqual((await react(threadState, "white_check_mark")).filter((v) => v.execute), []);
+  });
+
+  it("locks the card while it is revised: no door approves, rejects or revises it again", async () => {
+    const threadState = await staged();
+    const { deps, revisions } = harness(threadState);
+    await runReviewDecision(decide("revise", "Call it Reflection v2"), deps);
+    assert.equal(revisions.length, 1);
+
+    const signals: GateSignal[] = [
+      { kind: "review", messageTs: CARD_TS, decision: "confirm", userId: "U2" },
+      { kind: "review", messageTs: CARD_TS, decision: "cancel", userId: "U2" },
+      { kind: "review", messageTs: CARD_TS, decision: "revise", note: "and shorter", userId: "U2" },
+      { kind: "button", messageTs: CARD_TS, decision: "confirm", userId: "U2" },
+      { kind: "reaction", messageTs: CARD_TS, channel: CHANNEL, thread: THREAD, glyph: "white_check_mark", userId: "U2" },
+      { kind: "typed", channel: CHANNEL, thread: THREAD, text: "✅", userId: "U2" },
+      { kind: "model", pending: PROPOSAL, decision: "confirm", userId: "U2" },
+    ];
+    for (const signal of signals) {
+      const verdict = await resolveSignal(signal, { threadState });
+      assert.notEqual(verdict.outcome, "won", signal.kind);
+      assert.equal(verdict.execute, undefined, signal.kind);
+      assert.equal(verdict.revise, undefined, signal.kind);
+      assert.equal(verdict.post?.note.kind, "being-revised", signal.kind);
+    }
+    // Still the card the revision turn finds and replaces.
+    assert.equal((await threadState.getProposalByThread({ channel: CHANNEL, thread: THREAD }))?.proposalTs, CARD_TS);
+  });
+
+  it("is idempotent: a second Needs changes starts no second revision", async () => {
+    const threadState = await staged();
+    const { deps, views, revisions, cardUpdates } = harness(threadState);
+    await runReviewDecision(decide("revise", "Call it Reflection v2"), deps);
+    await runReviewDecision(decide("revise", "Call it Reflection v2", "U3"), deps);
+    assert.equal(revisions.length, 1);
+    assert.equal(cardUpdates.length, 1);
+    assert.match(viewText(views.calls.at(-1)!.view), /being revised/);
+  });
+
+  it("unlocks when the revision turn fails, so the card can be decided again", async () => {
+    const t = turnHarness();
+    await t.threadState.putProposal(PENDING);
+    assert.equal(await t.threadState.markRevising(PENDING.proposalTs, "U1"), "marked");
+    const [pending] = await t.threadState.getProposalsByChannel(PENDING.channel);
+    const broken: TurnDeps = {
+      ...t.deps,
+      async runAgent() {
+        throw new Error("the run stopped");
+      },
+    };
+    await runTurn(turnRequest({ text: "Needs changes on the proposal card above: shorter", pending: pending! }), broken);
+
+    const verdict = await resolveSignal(
+      { kind: "button", messageTs: PENDING.proposalTs, decision: "confirm", userId: "U1" },
+      { threadState: t.threadState },
+    );
+    assert.equal(verdict.outcome, "won");
   });
 
   it("keeps the note and the decisions through Check edits, the submit the note's input needs", async () => {

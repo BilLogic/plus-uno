@@ -51,7 +51,8 @@ import type { GateNote } from "../turn/index";
  * What the Review pop-up decides: a ✅ or a ⛔ as every door has them — the
  * pop-up's Reject is a ⛔ that may say why — or `revise`, Needs changes, which
  * only the pop-up has. A revise is not a resolution: it consumes nothing and
- * runs nothing, and the card stays live for the revision that replaces it.
+ * runs nothing; it locks the card as being revised (`ThreadState.markRevising`),
+ * and the card stays findable for the revision that replaces it.
  */
 export type ReviewDecision = Decision | "revise";
 
@@ -204,7 +205,7 @@ export interface GateVerdict {
    */
   by?: { door: GateSignal["kind"]; userId?: string };
   /**
-   * Needs changes, accepted: the card is live, the person may decide it, and a
+   * Needs changes, accepted: the card is now locked as being revised, and a
    * revision is to be written from `note`. Set only on a `won` verdict of a
    * review `revise`, which has no `decision`, no `post` and no `execute` — the
    * door posts the note into the thread and the revision turn does the rest.
@@ -406,6 +407,11 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
     };
   }
 
+  // Sent back with Needs changes: its revision is being written, and the
+  // revised card is the one to decide. Every door, every decision — a second
+  // Needs changes included, which is how two presses start one revision.
+  if (proposal.revising) return beingRevised(proposal, decision);
+
   if (signal.kind === "review") {
     if (signal.decision === "revise") return askForChanges(proposal, signal.note ?? "", signal.userId, deps);
     // The pop-up's ⛔ is Reject, and its reason rides on the note it posts.
@@ -430,7 +436,9 @@ function edited(proposal: PendingProposal, operations: ProposalOperation[] | und
  * Needs changes on a live card: the confirmer rules a claim applies, and then
  * no claim.
  *
- * The card is NOT consumed and NOT retired here. The revision is a turn in the
+ * The card is NOT consumed and NOT retired here, only marked as being revised,
+ * which every signal on it is refused by until the revision replaces it or the
+ * revision turn ends without one. The revision is a turn in the
  * card's thread, and a turn revises the card it finds pending there — so the
  * card has to still be pending when it looks. Staging the revision is what
  * retires it (`ThreadState.putProposal`), and the turn retires it ahead of
@@ -446,8 +454,21 @@ async function askForChanges(
   const text = note.trim();
   if (!text) return { outcome: "none", proposal, post: null };
   if (!mayConfirm(proposal, userId, deps.standingConfirmers)) return notAConfirmer(proposal, "cancel", userId, deps, true);
+  // The mark is the lock, as the claim is for a decision: of two presses, or a
+  // press racing an Approve, one wins. A failed write revises nothing.
+  const mark = await deps.threadState.markRevising(proposal.proposalTs, userId).catch(() => "gone" as const);
+  if (mark === "already") return beingRevised(proposal, "cancel");
+  if (mark === "gone") {
+    return { outcome: "stale", proposal, decision: "cancel", post: { note: { kind: "already-resolved" }, replyTs: replyTarget(proposal) } };
+  }
   console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: changes asked by ${userId}`);
   return { outcome: "won", proposal, post: null, revise: { note: text } };
+}
+
+/** A signal on a card whose revision is being written: nothing resolved. */
+function beingRevised(proposal: PendingProposal, decision: Decision): GateVerdict {
+  console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: being revised, signal refused`);
+  return { outcome: "stale", proposal, decision, post: { note: { kind: "being-revised" }, replyTs: replyTarget(proposal) } };
 }
 
 /**
@@ -559,6 +580,8 @@ async function claim(
     const why = await deps.threadState
       .getProposalByTs(proposal.proposalTs)
       .catch(() => ({ state: "none" }) as const);
+    // Still there, and refused: someone sent it back with Needs changes.
+    if (why.state === "found" && why.proposal.revising) return beingRevised(proposal, decision);
     return {
       outcome: "stale",
       proposal,

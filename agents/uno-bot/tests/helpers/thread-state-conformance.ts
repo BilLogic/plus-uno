@@ -554,6 +554,52 @@ export function runThreadStateConformance(
     assert.equal(await store.claimProposal("1700.2"), false);
   });
 
+  // Needs changes locks a card while its revision is written: the first
+  // press marks it, a second is told it already is, and nothing claims it
+  // until the mark clears or the revision replaces it.
+  it("a card marked as being revised is marked once, found, and not claimable", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.markRevising("1700.2", "U2"), "marked");
+    assert.equal(await store.markRevising("1700.2", "U3"), "already");
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state === "found" && found.proposal.revising?.userId, "U2");
+    assert.equal((await store.getProposalByThread(THREAD))?.revising?.userId, "U2");
+    assert.equal(await store.claimProposal("1700.2"), false);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+  });
+
+  it("a cleared mark leaves the card claimable, as it was", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.markRevising("1700.2", "U2");
+    await store.clearRevising("1700.2");
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state === "found" && found.proposal.revising, undefined);
+    assert.equal(await store.claimProposal("1700.2"), true);
+  });
+
+  it("a card claimed, replaced or never staged cannot be marked", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.equal(await store.markRevising("1700.2", "U2"), "gone");
+    assert.equal(await store.claimProposal("1700.3"), true);
+    assert.equal(await store.markRevising("1700.3", "U2"), "gone");
+    assert.equal(await store.markRevising("1700.9", "U2"), "gone");
+    await store.clearRevising("1700.9");
+  });
+
+  it("a revision supersedes a card being revised, as any other", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.markRevising("1700.2", "U2");
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: true });
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    assert.equal(await store.claimProposal("1700.3"), true);
+  });
+
   // ----- executions -----
   //
   // A won ✅ is recorded from the claim until its outcome is told, so a run cut

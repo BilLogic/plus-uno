@@ -340,6 +340,9 @@ export type GateNote =
    *  nothing, and name who can. `userId` is who was refused, when the signal
    *  carried one. */
   | { kind: "not-a-confirmer"; confirmers: string[]; userId?: string }
+  /** A signal on a card someone sent back with Needs changes: its revision
+   *  is being written, so nothing decides it meanwhile. */
+  | { kind: "being-revised" }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string }
   /**

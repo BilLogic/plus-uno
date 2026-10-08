@@ -191,6 +191,22 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       return { retired: true };
     },
 
+    async markRevising(proposalTs, userId) {
+      const rec = proposals.get(proposalTs);
+      if (!rec || rec.retired || rec.supersededBy) return "gone";
+      if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return "gone";
+      if (rec.proposal.revising) return "already";
+      rec.proposal = { ...rec.proposal, revising: { userId } };
+      return "marked";
+    },
+
+    async clearRevising(proposalTs) {
+      const rec = proposals.get(proposalTs);
+      if (!rec?.proposal.revising) return;
+      const { revising: _, ...rest } = rec.proposal;
+      rec.proposal = rest;
+    },
+
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
       const rec = proposals.get(proposalTs);
       if (!rec) return { state: "none" };
@@ -239,7 +255,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     // interface.
     async claimProposal(proposalTs) {
       const rec = proposals.get(proposalTs);
-      if (!rec || rec.retired || rec.supersededBy) return false;
+      // A card being revised is refused too: its revision is on the way.
+      if (!rec || rec.retired || rec.supersededBy || rec.proposal.revising) return false;
       return proposals.delete(proposalTs);
     },
 

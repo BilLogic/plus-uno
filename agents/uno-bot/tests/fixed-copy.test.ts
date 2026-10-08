@@ -369,6 +369,7 @@ describe("the gate notes", () => {
     { kind: "not-a-confirmer", confirmers: ["U0000007"], userId: "U0000002" },
     { kind: "not-a-confirmer", confirmers: [] },
     { kind: "resolve-failed", glyph: "white_check_mark" },
+    { kind: "being-revised" },
     { kind: "cut-off", finished: [{ toolName: "notion_create", ok: true }], unfinished: ["notion_update"], restaged: true },
   ];
   for (const note of notes) {
