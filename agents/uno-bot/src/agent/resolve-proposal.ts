@@ -189,6 +189,7 @@ async function runWonVerdict(
         // DM's attribution are both about the person the action is for.
         ...(verdict.post?.replyTs ? { replyTs: verdict.post.replyTs } : {}),
         requestedBy: run.requesterUserId,
+        ...(verdict.by?.userId ? { approvedBy: verdict.by.userId } : {}),
         // More than one operation → `batchResultMessage` below is the thread's
         // one account of the outcome.
         ...(run.operations.length > 1 ? { batched: true } : {}),
