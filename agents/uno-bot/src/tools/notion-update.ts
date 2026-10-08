@@ -5,6 +5,8 @@
 // moved since (ADR-029). Nothing is ever deleted. Property writes
 // are limited to a known set (see notionUpdate) so we never guess a property's
 // type or trip the silent select auto-create; unknown props are reported back.
+// An append opens with the attribution line naming the requester; a replace,
+// an insert and a property change carry none (`docs/connectors/notion.md`).
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
@@ -17,6 +19,7 @@ import {
   type NotionBlockReplacement,
   type PrdSection,
 } from "../integrations/notion";
+import { requesterName } from "./requester-name";
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
@@ -131,7 +134,9 @@ export async function executeNotionUpdate(
   }
 
   try {
-    const r = await notionUpdate(env, pageId, { properties, append, replace, insert });
+    // The name is read only when there is body content to attribute.
+    const onBehalfOf = append ? await requesterName(env, slack) : undefined;
+    const r = await notionUpdate(env, pageId, { properties, append, replace, insert, onBehalfOf });
     const parts: string[] = [];
     // Name each concrete change with its NEW value codified, e.g.
     // "set *Dev Status* → `Ready for Dev`" — not a bare property name (2026-07-14).
