@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 92,892 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 93,096 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 24,897 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 25,101 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1433,7 +1433,8 @@ The same end-of-day read also looks for **commitments**: someone in a swept thre
 - **Due** at the end of the day the promiser named (ET, Monday to Friday), or two working days after the promise when they named none.
 - **Checked first:** at the first weekday morning run after it is due (9 am ET), uno-bot reads the thread since the promise, the promiser's later messages in the channel and the Notion or GitHub pages they linked. If those show it done, the commitment closes and nothing is posted.
 - **Where:** a reply in the promise's own thread, mentioning only the promiser. It follows `pickDestination` like every proactive job, so it stays out of #uno-bot and mentions the promiser rather than the lead.
-- **Answers,** from the promiser, as buttons under the reminder (🙌 Done, ⏳ Need more time, 🙅 Not doing this, 🤔 Wasn't a promise) or as the matching reaction on it: 🙌 done, ⏳ soon (due again two working days out, at most twice), 🙅 not doing it, 🤔 not a promise. A button is the reaction it is labelled with, tapped, and goes through the same door (`slack/interactive.ts` → `handleReminderButton`). The answer replaces the buttons with a line of words in place and sends no new ping. Anyone else's tap or reaction, and any other emoji (✅ included), changes nothing.
+- **Looks like** a card: a bold heading ("You said you'd share the Figma link by Thu", or "On Tue you said you'd …" when no day was named), then one small line with the mention, the question and the original link, then the buttons.
+- **Answers,** from the promiser, as buttons under the reminder (Done, Later, Dropped, Wasn't a promise) or as the matching reaction on it: 🙌 done, ⏳ soon (due again two working days out, at most twice), 🙅 not doing it, 🤔 not a promise. Each button is its reaction, tapped (in that order), and goes through the same door (`slack/interactive.ts` → `handleReminderButton`). The answer replaces the buttons with a line of words in place and sends no new ping. Anyone else's tap or reaction, and any other emoji (✅ included), changes nothing.
 - **One follow-up:** a reminder nobody answers gets one more ("Checking in once more."), two working days later. If that one also goes unanswered, the commitment lapses silently. Those two posts are the whole allowance: a ⏳ moves the date and adds no post, and every reminder posted stays answerable.
 - **Learns from answers:** the detector is shown the three newest 🤔 and the three newest 🙌 commitments, as short summaries and at most one per person, so it misreads fewer messages as promises. They come only from public channels and the swept channel itself, so a DM's or another private channel's stay out. There is no fine-tuning and no prompt edit, and with no answers yet the prompt is unchanged.
 - **Said again:** a new promise by the same person in the same thread ("sorry, will do by Fri") is the same task. It adds no reminder, and a later day it names moves the due date the way a ⏳ does.
