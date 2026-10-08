@@ -152,20 +152,94 @@ test("a measured restatement is declared to the judge before it grades", async (
   assert.match(fake.generated[0]!.prompt, /MEASURED: this draft retains almost all/);
 });
 
-test("a draft longer than the judge reads is skipped on purpose, never revised from half of it", async () => {
-  // The judge reads the first 8,000 characters. A revision of that prefix,
-  // swapped in for a 17,614-char walkthrough, would ship the first half of the
-  // answer as the whole of it — so past the cap nothing is asked, the skip says
-  // why, and the draft ships as written. A correction or a forced judgement
-  // does not lift it: the repair would be just as truncated.
-  const long = `${LONG_DRAFT} ${"more of the walkthrough. ".repeat(400)}`;
-  assert.ok(long.length > 8_000);
+// ── long drafts: a verdict, never a revision ─────────────────────────────────
+
+/** Every `[uno-bot] draft-judge` line logged while `run` runs. */
+async function judgeLines(run: () => Promise<unknown>): Promise<string[]> {
+  const lines: string[] = [];
+  const original = console.log;
+  console.log = (...args: unknown[]) => {
+    const line = args.map(String).join(" ");
+    if (line.includes("draft-judge")) lines.push(line);
+  };
+  try {
+    await run();
+  } finally {
+    console.log = original;
+  }
+  return lines;
+}
+
+/** A 17,600-character walkthrough — the size live answers reached on
+ *  2026-10-07 — whose last sentence only a whole read can see. */
+const TAIL = "The last phase is the one nobody has signed off yet.";
+const WALKTHROUGH = `${LONG_DRAFT} ${"more of the walkthrough, phase by phase. ".repeat(400)}${TAIL}`;
+
+test("a draft past the revision window gets a real verdict on the whole of it", async () => {
+  assert.ok(WALKTHROUGH.length > 17_000 && WALKTHROUGH.length < 18_000);
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  let out: Awaited<ReturnType<typeof reviewDraft>> | undefined;
+  const lines = await judgeLines(async () => {
+    out = await reviewDraft(fake, { userText: "walk me through it", draft: WALKTHROUGH });
+  });
+
+  assert.deepEqual(out, { text: WALKTHROUGH, verdict: "pass" });
+  assert.equal(fake.generated.length, 1);
+  const asked = fake.generated[0]!;
+  // Read whole, to the last sentence, not the first 8,000 characters.
+  assert.ok(asked.prompt.includes(TAIL));
+  assert.equal(asked.tier, "default");
+  // Asked for a verdict and told not to rewrite.
+  assert.match(asked.system ?? "", /VERDICT ONLY/);
+  // The verdict line says which mode ran, and no line reads `reason=long`.
+  assert.equal(lines.length, 1);
+  assert.match(lines[0]!, /verdict=pass .*mode=verdict/);
+  assert.doesNotMatch(lines[0]!, /reason=long/);
+});
+
+test("no path swaps a long answer for a revision, however whole the revision looks", async () => {
+  // Past the revision window a rewrite has to come back inside the judge's
+  // output ceiling and its timer, and a model that runs out of either returns
+  // a faithful prefix — the half-an-answer this mode exists to rule out. So a
+  // revision is ignored there even when it is the draft's own length, on every
+  // kind of turn, and the fail ships the draft with what the judge found logged.
+  const wholeLooking = WALKTHROUGH.replace("call-off path", "call-off route");
+  for (const args of [{}, { correction: true, priorAssistantText: "No." }, { forceReason: "absent" }]) {
+    const fake = fakeProvider({
+      generateReplies: [verdictJson({ verdict: "fail", failed: ["D9"], revised: wholeLooking })],
+    });
+
+    let out: Awaited<ReturnType<typeof reviewDraft>> | undefined;
+    const lines = await judgeLines(async () => {
+      out = await reviewDraft(fake, { userText: "walk me through it", draft: WALKTHROUGH, ...args });
+    });
+
+    assert.deepEqual(out, { text: WALKTHROUGH, verdict: "fail" });
+    assert.match(lines.at(-1)!, /verdict=fail .*failed=\[D9\] revised=false .*mode=verdict/);
+  }
+});
+
+test("a draft inside the revision window is judged in revise mode, and says so", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  const lines = await judgeLines(() => reviewDraft(fake, { userText: "q", draft: LONG_DRAFT }));
+
+  assert.doesNotMatch(fake.generated[0]!.system ?? "", /VERDICT ONLY/);
+  assert.match(lines[0]!, /verdict=pass .*mode=revise/);
+});
+
+test("a draft past even the verdict window is skipped on purpose, with no model call", async () => {
+  // The bound that keeps a verdict inside the timer: about twice the longest
+  // answer seen live. Past it the draft ships unread and the skip says why.
+  const huge = `${LONG_DRAFT} ${"more of the walkthrough. ".repeat(1400)}`;
+  assert.ok(huge.length > 32_000);
 
   for (const args of [{}, { correction: true, priorAssistantText: "No." }, { forceReason: "absent" }]) {
     const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
-    const out = await reviewDraft(fake, { userText: "walk me through it", draft: long, ...args });
+    const out = await reviewDraft(fake, { userText: "walk me through it", draft: huge, ...args });
 
-    assert.deepEqual(out, { text: long, verdict: "skip", reason: "draft longer than the judge reads" });
+    assert.deepEqual(out, { text: huge, verdict: "skip", reason: "draft longer than the judge reads" });
     assert.deepEqual(fake.generated, []);
   }
 });
