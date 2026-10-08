@@ -98,8 +98,47 @@ const surfaceIs = (surface: string) => (input: Input) =>
 const props = (input: Input): Input =>
   input.properties && typeof input.properties === "object" ? (input.properties as Input) : {};
 
-/** What each tool lets a confirmer change. */
-const FIELDS: Record<string, FieldSpec[]> = {
+/** The spellings a Notion title property goes by, compared as `notionUpdate`
+ *  compares names: case, spaces and underscores ignored. */
+const TITLE_NAMES = new Set(["name", "title"]);
+const squash = (name: string) => name.toLowerCase().replace(/[\s_]+/g, "");
+
+/**
+ * A `notion_update`'s fields are the text it writes and the title it sets, so
+ * they follow the call's own shape: one per appended text, section body and
+ * replacement, and a title only when `properties` sets one. The page, a
+ * replacement's block and its stamp, and every other property stay locked.
+ * Each is offered only where the call writes something, since a required
+ * field the draft left out would otherwise open as an empty input.
+ */
+function notionUpdateFields(input: Input): FieldSpec[] {
+  const specs: FieldSpec[] = [];
+  // A key with a dot in it is not a path `writePath` can address.
+  const title = Object.keys(props(input)).find(
+    (key) => TITLE_NAMES.has(squash(key)) && !key.includes(".") && typeof props(input)[key] === "string",
+  );
+  if (title) specs.push({ path: `properties.${title}`, label: "Title", kind: "text", required: true });
+  const append = input.append && typeof input.append === "object" ? (input.append as Input) : {};
+  if (typeof append.text === "string") specs.push({ path: "append.text", label: "Text to append", kind: "multiline", required: true });
+  const sections = Array.isArray(append.sections) ? append.sections : [];
+  sections.forEach((section, i) => {
+    const { heading, body } = (section ?? {}) as Input;
+    if (typeof heading !== "string" || !heading.trim() || typeof body !== "string") return;
+    specs.push({ path: `append.sections.${i}.body`, label: `Section to append: ${clip(heading.trim())}`, kind: "multiline", required: true });
+  });
+  const replace = Array.isArray(input.replace) ? input.replace : [];
+  replace.forEach((entry, i) => {
+    if (typeof (entry as Input | null)?.content !== "string") return;
+    const label = replace.length > 1 ? `Replacement text ${i + 1}` : "Replacement text";
+    specs.push({ path: `replace.${i}.content`, label, kind: "multiline", required: true });
+  });
+  return specs;
+}
+
+/** What each tool lets a confirmer change: a fixed list, or one read off the
+ *  call when the call's shape decides which fields exist. */
+const FIELDS: Record<string, FieldSpec[] | ((input: Input) => FieldSpec[])> = {
+  notion_update: notionUpdateFields,
   notion_create: [
     { path: "title", label: "Title", kind: "text", required: true },
     { path: "summary", label: "Summary", kind: "multiline" },
@@ -164,7 +203,8 @@ export async function reviewFields(proposal: PendingProposal, readOptions: ReadO
   };
   const fields: EditableField[] = [];
   for (const [index, op] of proposalOperations(proposal).entries()) {
-    for (const spec of FIELDS[op.toolName] ?? []) {
+    const table = FIELDS[op.toolName] ?? [];
+    for (const spec of typeof table === "function" ? table(op.input) : table) {
       if (spec.applies && !spec.applies(op.input)) continue;
       const raw = spec.read ? spec.read(op.input) : readPath(op.input, spec.path);
       if (raw !== undefined && typeof raw !== "string") continue;

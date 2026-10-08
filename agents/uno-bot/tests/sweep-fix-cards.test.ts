@@ -127,6 +127,49 @@ test("\"drop 2\" leaves out the fix on the second card", async () => {
   assert.deepEqual(left, ["Launch: November", "Scope: tutors and students"]);
 });
 
+test("the card \"drop 2\" revises to is a carousel of the fixes left, renumbered", async () => {
+  const { staged } = await postedCard();
+  const t = harness();
+  const pending = { ...staged, channel: CHANNEL, threadTs: CONVERSATION, replyTs: CONVERSATION };
+  await t.threadState.putProposal(pending);
+  const outcome = await runTurn(request({ text: "drop 2", pending, userId: "U0ADE" }), t.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  const rendered = renderProposalCard(outcome.staged!.card);
+  const blocks = rendered.blocks as Block[];
+  assert.equal(messageBlocksRefusal(blocks), null);
+  const carousel = blocks.find((b) => b.type === "carousel");
+  assert.ok(carousel, "the revision is a carousel again");
+  const cards = carousel.elements as Block[];
+  assert.deepEqual(
+    cards.map((c) => plainOf(c.title)),
+    ["1. Reflection PRD", "2. Reflection PRD"],
+  );
+  assert.match(plainOf(cards[0]!.body), /→ “Launch: November”/);
+  assert.match(plainOf(cards[1]!.body), /→ “Scope: tutors and students”/, "the third fix is now the second");
+  assert.match(plainOf(cards[1]!.subtitle), /<@U0ADE>/, "its owner rides with it");
+
+  // The folded words are renumbered too, so `drop 2` on the revision names
+  // the card that reads 2.
+  const folded = (blocks.find((b) => b.type === "container")!.child_blocks as Block[]).map((b) => String(b.text?.text ?? ""));
+  assert.equal(folded.length, 2);
+  assert.match(folded[0]!, /^1\. /);
+  assert.match(folded[1]!, /^2\. .*\n[\s\S]*Scope: tutors only/);
+  assert.doesNotMatch(JSON.stringify(blocks), /Owner: Bea/, "the dropped fix is gone");
+  assert.doesNotMatch(JSON.stringify(blocks), /all 3/, "no count from the card it revises");
+  assert.match(rendered.text, /End-of-day sweep/, "the text copy still opens with the sweep's mark");
+
+  // A second drop on the revision still shows what is left as a card: one
+  // fix stands alone, as on any one-fix sweep card.
+  const revised = outcome.staged!.proposal;
+  await t.threadState.putProposal(revised);
+  const again = await runTurn(request({ text: "drop 1", pending: revised, userId: "U0ADE" }), t.deps);
+  const left = (renderProposalCard(again.staged!.card).blocks as Block[]).filter((b) => b.type === "card");
+  assert.equal(left.length, 1);
+  assert.match(plainOf(left[0]!.title), /^1\. Reflection PRD$/);
+  assert.match(plainOf(left[0]!.body), /Scope: tutors and students/);
+});
+
 test("the text copy opens with the sweep's mark, so an untagged post is still a sweep card", async () => {
   const { post } = await postedCard();
   assert.match(post.text, /End-of-day sweep/);

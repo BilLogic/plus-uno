@@ -432,7 +432,8 @@ export interface RecordingPostingOptions {
   /** Refuse a post whose blocks include any of these types, the way Slack
    *  refuses a block it will not take on a surface — so each rung of the
    *  answer's fallback ladder is reachable. Answered `invalid_blocks`, with
-   *  `response_metadata.messages` naming the block. */
+   *  `response_metadata.messages` naming the block. A stream's stop carrying
+   *  one is refused too, answered `false` as the client answers a refusal. */
   refusesBlockTypes?: readonly string[];
   /** Fail every post with this error code and `response_metadata.messages` —
    *  a failure that is not about the blocks (`ratelimited`), or one that
@@ -523,6 +524,11 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
     async stopStream(channel, ts, blocks) {
       calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length, ...(blocks?.length ? { blockList: blocks } : {}) });
       if (refuseBlocks(refused, "stop", blocks)) return false;
+      const refusedType = blocks?.find((b) => opts.refusesBlockTypes?.includes(String(b.type)))?.type;
+      if (refusedType !== undefined) {
+        refuse(refused, `stop with a ${String(refusedType)} block`, "invalid_blocks");
+        return false;
+      }
       if (stopped.has(ts)) {
         refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
         return false;

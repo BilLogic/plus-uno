@@ -284,3 +284,94 @@ describe("Check edits, the footer Slack requires beside the fields", () => {
     assert.equal(alerts(view).length, 1, "one alert, replacing any before it");
   });
 });
+
+describe("a notion_update draft", () => {
+  const UPDATE: Partial<PendingProposal> = {
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/Reflection-redesign-0123456789abcdef0123456789abcdef",
+      properties: { Name: "Reflection redesign v2", "Design Status": "In Review" },
+      append: {
+        text: "Progress: the form is down to three questions.",
+        sections: [{ heading: "Open questions", body: "Does the mentor see the answers?" }],
+      },
+      replace: [
+        { block_id: "b1", last_edited_time: "2026-10-01T09:00:00.000Z", content: "Tutors answer three questions." },
+      ],
+    },
+    proposalText: ":warning: About to *update a Notion page*",
+  };
+
+  it("offers the title it sets and the text it writes, and never where it writes", async () => {
+    const { deps, views } = harness(await staged(UPDATE));
+    await runReviewOpen(open(), deps);
+    const fields = inputs(views.calls[1]!.view);
+    assert.deepEqual(
+      fields.map((f) => [f.block_id, f.label?.text, f.element?.initial_value]),
+      [
+        ["uno_field:0.properties.Name", "Title", "Reflection redesign v2"],
+        ["uno_field:0.append.text", "Text to append", "Progress: the form is down to three questions."],
+        ["uno_field:0.append.sections.0.body", "Section to append: Open questions", "Does the mentor see the answers?"],
+        ["uno_field:0.replace.0.content", "Replacement text", "Tutors answer three questions."],
+      ],
+    );
+    // The page, the block and its stamp, and any other property stay locked.
+    const offered = JSON.stringify(fields.map((f) => [f.block_id, f.label?.text]));
+    for (const locked of ["page_url", ".block_id", "last_edited_time", "Design Status"]) {
+      assert.ok(!offered.includes(locked), locked);
+    }
+    assert.deepEqual(views.refused, []);
+  });
+
+  it("offers no title when the update does not set one", async () => {
+    const { deps, views } = harness(
+      await staged({ ...UPDATE, input: { page_url: UPDATE.input!.page_url, append: { text: "A dated pulse." } } }),
+    );
+    await runReviewOpen(open(), deps);
+    assert.deepEqual(inputs(views.calls[1]!.view).map((f) => f.label?.text), ["Text to append"]);
+  });
+
+  it("writes the edited text to the same page, and the card says who edited what", async () => {
+    const { deps, ran, cardUpdates } = harness(await staged(UPDATE));
+    await runReviewDecision(
+      approve({
+        "uno_field:0.append.text": text("Progress: the form is down to two questions."),
+        "uno_field:0.replace.0.content": text("Tutors answer two questions."),
+      }),
+      deps,
+    );
+    assert.equal(ran.length, 1);
+    const input = ran[0]!.execute!.input as {
+      page_url: string;
+      append: { text: string; sections: unknown[] };
+      replace: Array<{ block_id: string; last_edited_time: string; content: string }>;
+      properties: Record<string, string>;
+    };
+    assert.equal(input.page_url, UPDATE.input!.page_url);
+    assert.equal(input.append.text, "Progress: the form is down to two questions.");
+    assert.deepEqual(input.append.sections, (UPDATE.input!.append as { sections: unknown[] }).sections);
+    assert.deepEqual(input.replace, [
+      { block_id: "b1", last_edited_time: "2026-10-01T09:00:00.000Z", content: "Tutors answer two questions." },
+    ]);
+    assert.deepEqual(input.properties, UPDATE.input!.properties);
+    assert.match(cardUpdates[0]!.note, /^:pencil2: <@U2> edited Text to append, Replacement text\n/);
+  });
+
+  it("writes an edited title under the property the update names", async () => {
+    const { deps, ran } = harness(await staged(UPDATE));
+    await runReviewDecision(approve({ "uno_field:0.properties.Name": text("Reflection, shorter form") }), deps);
+    assert.deepEqual(ran[0]?.execute?.input.properties, { Name: "Reflection, shorter form", "Design Status": "In Review" });
+  });
+
+  it("refuses a placeholder or an emptied text with the same guards a create has", async () => {
+    const placeholder = harness(await staged(UPDATE));
+    await runReviewDecision(approve({ "uno_field:0.replace.0.content": text("TBD") }), placeholder.deps);
+    assert.deepEqual(placeholder.ran, []);
+    assert.match(alerts(placeholder.views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Replacement text is still a placeholder/);
+
+    const emptied = harness(await staged(UPDATE));
+    await runReviewDecision(approve({ "uno_field:0.append.text": text("  ") }), emptied.deps);
+    assert.deepEqual(emptied.ran, []);
+    assert.match(alerts(emptied.views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Text to append can't be empty/);
+  });
+});

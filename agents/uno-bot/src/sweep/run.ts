@@ -1566,6 +1566,7 @@ export function sweepProposal(
 ): PendingProposal {
   const first = plan.operations[0]!;
   const share = sweepShareOf(plan.items);
+  const { fixes } = sweepCard(plan);
   return {
     operations: plan.operations,
     toolName: first.toolName,
@@ -1587,6 +1588,8 @@ export function sweepProposal(
     supersedeKey: SWEEP_KEY,
     // A group DM's card: what its ✅ shares, as the card said (`./share.ts`).
     ...(share ? { sweepShare: share } : {}),
+    // What its carousel showed, so a `drop N` revision is a carousel too.
+    ...(fixes ? { fixes } : {}),
   };
 }
 
