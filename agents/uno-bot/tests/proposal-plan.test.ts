@@ -199,9 +199,9 @@ test("the result message mirrors the card's grouping, done or failed per operati
 
   assert.match(message, /5 operations — 4 done, 1 failed/);
   assert.match(message, /\*<https:\/\/notion\.so\/calendar-sync-hub\|Calendar Sync hub>\*/);
-  assert.match(message, /1\. :white_check_mark: \*replace in place\* — operation 1 landed/);
-  assert.match(message, /3\. :x: \*set properties\* — the block moved since it was read/);
-  assert.match(message, /5\. :white_check_mark: \*post a share-out\* — operation 5 landed/);
+  assert.match(message, /1\. \*replace in place\* — done: operation 1 landed/);
+  assert.match(message, /3\. \*set properties\* — failed: the block moved since it was read/);
+  assert.match(message, /5\. \*post a share-out\* — done: operation 5 landed/);
   // One heading per target here too, the same four the card showed.
   assert.equal(message.split("(Notion data source)").length - 1, 1);
 });

@@ -40,13 +40,14 @@ export const OUTCOME_EVENTS: readonly ProposalEventKind[] = ["confirmed", "cance
 
 /**
  * How an event happened. For a verdict, the door it came through: `reaction`,
- * `button`, `typed` or `model`. Otherwise who did it: `turn`, `restage` or
+ * `button`, `review`, `typed` or `model`. Otherwise who did it: `turn`, `restage` or
  * `worker` staged it, a `revision` replaced it, the `end-of-day` pass aged it
  * out, the `executor` refused a stale write.
  */
 export type ProposalEventVia =
   | "reaction"
   | "button"
+  | "review"
   | "typed"
   | "model"
   | "turn"

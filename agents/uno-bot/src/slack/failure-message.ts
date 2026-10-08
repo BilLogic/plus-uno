@@ -94,7 +94,7 @@ export function buildFailureMessage(input: FailureInput): string {
 
   return [
     `:x: ${PROGRESS[stage]}`,
-    "Nothing was created or changed — reads can't change anything, and I never write without your :white_check_mark: first.",
+    "Nothing was created or changed — reads can't change anything, and I never write without your approval first.",
     `*Next:* ${NEXT_STEP[stage]} If it repeats, say so${where} and someone will look at the logs.`,
   ].join("\n");
 }

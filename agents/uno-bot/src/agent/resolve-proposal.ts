@@ -2,7 +2,7 @@
 // reaction, and the record of what was done.
 //
 // The decision half of this file is gone — the lookup, the emoji parse, the
-// claim and the lost-race message are `gate/gate.ts` now, once, for all four
+// claim and the lost-race message are `gate/gate.ts` now, once, for every
 // doors (#500). What is left is the part that needs `Env`: a side-effect tool
 // only ever runs from here, and only ever on a verdict that WON its claim.
 //
@@ -122,7 +122,7 @@ async function recordOutcome(
 ): Promise<void> {
   await recordProposalEvents(record.events, executionEvents(pending.proposalTs, outcomes, at));
   const door = verdict.by?.door;
-  const ticket = door === "reaction" || door === "button" ? selfFiledTicketOf(outcomes) : null;
+  const ticket = door === "reaction" || door === "button" || door === "review" ? selfFiledTicketOf(outcomes) : null;
   if (ticket) {
     await quietly(`self-filed ticket on ${pending.proposalTs}`, () =>
       record.events.noteSelfFiledTicket(pending.proposalTs, ticket),
@@ -189,6 +189,7 @@ async function runWonVerdict(
         // DM's attribution are both about the person the action is for.
         ...(verdict.post?.replyTs ? { replyTs: verdict.post.replyTs } : {}),
         requestedBy: run.requesterUserId,
+        ...(verdict.by?.userId ? { approvedBy: verdict.by.userId } : {}),
         // More than one operation → `batchResultMessage` below is the thread's
         // one account of the outcome.
         ...(run.operations.length > 1 ? { batched: true } : {}),

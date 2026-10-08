@@ -2,7 +2,7 @@
 // a revision.
 //
 // A card is resolved by Gate like any other — the sweep adds nothing to the
-// four doors. What it adds is the record, written after the fact by the two
+// doors. What it adds is the record, written after the fact by the two
 // places that know the fact: the executor, once a batch has run
 // (`agent/resolve-proposal.ts`), and the Slack turn envelope, once a turn has
 // staged a revision of a sweep card (`slack/turn-adapter.ts`). Each item is

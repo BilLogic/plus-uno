@@ -153,8 +153,8 @@ describe("plan-stream updates", () => {
     await delivery.endProgress("complete");
 
     assert.deepEqual(slack.calls, [
-      { kind: "message", channel: "C123", threadTs: "100.1", text: ":hourglass_flowing_sand: checking Notion", blocks: false },
-      { kind: "message", channel: "C123", threadTs: "100.1", text: ":hourglass_flowing_sand: checking Figma", blocks: false },
+      { kind: "message", channel: "C123", threadTs: "100.1", text: "checking Notion", blocks: false },
+      { kind: "message", channel: "C123", threadTs: "100.1", text: "checking Figma", blocks: false },
     ]);
   });
 });

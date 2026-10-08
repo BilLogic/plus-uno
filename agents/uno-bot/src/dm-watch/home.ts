@@ -39,7 +39,7 @@ export function dmWatchHomeBlocks(
           type: "section",
           text: { type: "mrkdwn", text: refusedText(notice.refused) },
           ...(notice.connectUrl
-            ? { accessory: { type: "button", text: { type: "plain_text", text: "🔗 Link your Slack again", emoji: true }, url: notice.connectUrl } }
+            ? { accessory: { type: "button", text: { type: "plain_text", text: "Link your Slack again" }, url: notice.connectUrl } }
             : {}),
         },
       ]

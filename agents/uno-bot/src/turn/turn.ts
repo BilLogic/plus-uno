@@ -1330,7 +1330,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       );
     if (justCancelled) {
       const bounce =
-        `:leftwards_arrow_with_hook: You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
+        `You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       await delivery.postNote(bounce);
       await memory.remember(bounce);
@@ -1394,7 +1394,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // rewritten, a stamp changed, one added — is refused and the card stays.
   if (replaced?.sweepRun && !isSubsetOf(result.operations, proposalOperations(replaced))) {
     const refusal =
-      ":lock: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
+      ":warning: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
       "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
     await delivery.postNote(refusal, sweepTag("note"));
     await memory.remember(refusal);
@@ -1679,8 +1679,8 @@ export function revisionRefusal(confirmers: readonly string[], userId: string): 
   const who = confirmers.filter((c) => id.test(c)).map((c) => `<@${c}>`);
   const names = who.length <= 1 ? who.join("") : `${who.slice(0, -1).join(", ")} or ${who[who.length - 1]}`;
   return who.length
-    ? `:lock: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
-    : `:lock: ${to}Nobody here can change this proposal, so it stays as it is.`;
+    ? `:warning: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
+    : `:warning: ${to}Nobody here can change this proposal, so it stays as it is.`;
 }
 
 // ── The gate path ────────────────────────────────────────────────────────────

@@ -39,7 +39,8 @@ import type { FooterKind } from "../../src/slack/footer-kind";
 import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
 import { textCopy, type Presentation, type DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
-import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES } from "./slack-block-rules";
+import type { ReviewViews } from "../../src/slack/review-door";
+import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES, viewRefusal } from "./slack-block-rules";
 
 /** One thing the adapter asked Slack to do, in order. */
 export type SlackCall =
@@ -78,6 +79,7 @@ export type SlackCall =
   | { kind: "heading"; channel: string; ts: string; title: string }
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
+  | { kind: "statusLine"; channel: string; threadTs: string; text: string }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
 
 /** A call Slack would have refused, and the error code it would have said. */
@@ -112,6 +114,62 @@ function refuseBlocks(list: SlackRefusal[], call: string, blocks: readonly unkno
   const why = blocks ? messageBlocksRefusal(blocks) : null;
   if (why) refuse(list, `${call} with ${why}`, "invalid_blocks");
   return !!why;
+}
+
+/** One views call the review door made, in order. */
+export type ViewCall =
+  | { kind: "open"; triggerId: string; view: unknown }
+  | { kind: "update"; viewId: string; view: unknown };
+
+export interface RecordingViews {
+  client: ReviewViews;
+  calls: ViewCall[];
+  /** Every call Slack would have refused, with its error code. */
+  refused: SlackRefusal[];
+}
+
+/**
+ * Slack's views methods, recorded. `views.open` answers the view id `V1`, as
+ * Slack answers with the opened view's id; a view Slack would refuse is
+ * recorded, refused (`invalid_arguments`, the code views calls give a bad
+ * shape) and fails the test unless taken (`expectRefusals`). An update to a
+ * view that was never opened is refused as Slack refuses it (`not_found`).
+ *
+ * @param opts.openFails - Refuse every open, as an expired trigger is refused
+ * @param opts.alreadyOpen - Views open before the test began: the pop-up a
+ *   decision is pressed in
+ */
+export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string[] } = {}): RecordingViews {
+  const calls: ViewCall[] = [];
+  const refused: SlackRefusal[] = [];
+  const opened = new Set<string>(opts.alreadyOpen ?? []);
+  const client: ReviewViews = {
+    async open(triggerId, view) {
+      calls.push({ kind: "open", triggerId, view });
+      if (opts.openFails) return null;
+      const why = viewRefusal(view);
+      if (why) {
+        refuse(refused, `views.open with ${why}`, "invalid_arguments");
+        return null;
+      }
+      opened.add("V1");
+      return "V1";
+    },
+    async update(viewId, view) {
+      calls.push({ kind: "update", viewId, view });
+      const why = viewRefusal(view);
+      if (why) {
+        refuse(refused, `views.update with ${why}`, "invalid_arguments");
+        return false;
+      }
+      if (!opened.has(viewId)) {
+        refuse(refused, `views.update on ${viewId}`, "not_found");
+        return false;
+      }
+      return true;
+    },
+  };
+  return { client, calls, refused };
 }
 
 /** Take a client's refusals as expected, so the test it happened in may pass. */
@@ -185,6 +243,8 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
   // `startStream` is the checklist's — and a stopped stream takes nothing more.
   const planStreams = new Set<string>();
   const stopped = new Set<string>();
+  // Threads whose session was last moved off `processing`.
+  const settledThreads = new Set<string>();
   // Every call but a task append lands the moment it is made.
   const record = (call: SlackCall): void => {
     calls.push(call);
@@ -296,11 +356,21 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     },
     async setSessionStatus(channel, threadTs, status) {
       record({ kind: "status", channel, threadTs, status });
+      if (status !== "processing") settledThreads.add(threadTs);
+      else settledThreads.delete(threadTs);
       if (opts.statusThrows !== undefined) throw opts.statusThrows;
       return opts.status ?? { ok: true };
     },
     async renameSession(channel, threadTs, title) {
       record({ kind: "rename", channel, threadTs, title });
+    },
+    // Slack would not refuse a status line sent after the settle — it would
+    // do worse: the bridged call moves the session back to `processing`, and
+    // nothing clears it for the hour Slack takes to time it out. Held as a
+    // refusal so a line that lands late fails the test it happened in.
+    async setStatusLine(channel, threadTs, text) {
+      record({ kind: "statusLine", channel, threadTs, text });
+      if (settledThreads.has(threadTs)) refuse(refused, "status line after the settle", "reraised_processing");
     },
   };
 

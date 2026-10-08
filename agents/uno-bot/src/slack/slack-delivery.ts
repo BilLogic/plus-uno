@@ -28,7 +28,7 @@ import {
   stopStream,
   updateMessage,
 } from "./api";
-import { renameSession, setSessionStatus } from "./assistant";
+import { renameSession, setSessionStatus, setStatusLine } from "./assistant";
 import {
   DEFAULT_ALERT_CHANNEL,
   postTextVerified,
@@ -145,6 +145,7 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
+    setStatusLine: (channel, threadTs, text) => setStatusLine(env, channel, threadTs, text),
   });
 }
 
