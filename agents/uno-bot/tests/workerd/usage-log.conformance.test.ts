@@ -84,7 +84,7 @@ describe("[d1] answer feedback", () => {
   it("refuses a reason the schema does not name", async () => {
     const log = createD1AnswerFeedbackLog({ db: bindings.USAGE_DB });
     await expect(
-      log.record({ answerTs: "1.2", userId: "U1", turnId: null, rating: "down", reason: "rude" as never, hasNote: false, at: 1 }),
+      log.record({ channel: "C1", answerTs: "1.2", userId: "U1", turnId: null, rating: "down", reason: "rude" as never, hasNote: false, at: 1 }),
     ).rejects.toThrow(/CHECK/);
   });
 });
