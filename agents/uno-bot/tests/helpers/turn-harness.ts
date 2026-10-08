@@ -164,6 +164,9 @@ export function harness(opts: {
   /** A lookup's result by tool name, for a case where one lookup fails and
    *  another does not. Wins over `toolResult`. */
   toolResultFor?: (name: string) => string;
+  /** How long each lookup takes, in ms. Absent, it answers at once — which
+   *  is faster than any Slack call, so what Slack is told mid-lookup needs it. */
+  toolDelayMs?: number;
   /** The subrequest meter the loop reads. Absent, one that spends nothing; a
    *  case about a refused lookup hands in one already at the ceiling. */
   budget?: LoopBudget;
@@ -233,6 +236,7 @@ export function harness(opts: {
         deps: {
           async executeUngatedTool(name) {
             executed.push(name);
+            if (opts.toolDelayMs) await new Promise((resolve) => setTimeout(resolve, opts.toolDelayMs));
             return opts.toolResultFor?.(name) ?? opts.toolResult ?? JSON.stringify({ ok: true, rows: [] });
           },
           // The real store, as production wires it (`threadStateFor(env)`).

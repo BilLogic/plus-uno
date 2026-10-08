@@ -95,9 +95,9 @@ async function setSuggestedPrompts(
 // documents no such argument: its arguments are `status`, `channel_id`,
 // `thread_ts`, `title`, `initiator_user_id` and the `chat:write.customize`
 // icon/username trio. Sending a field the method does not define is how a call
-// starts getting refused, so the cycling is dropped rather than smuggled. What
-// replaces it is nothing, deliberately: the spinner is Slack's to render, and
-// this app no longer has a say in its wording.
+// starts getting refused, so the cycling is dropped rather than smuggled. The
+// words came back another way: one line per step, naming the step in progress
+// (`setStatusLine` below).
 
 /**
  * Move the agent session's status: `processing` to raise the working signal,
@@ -120,8 +120,8 @@ async function setSuggestedPrompts(
  * is the supported path, not a patch.
  *
  * WHAT IT NO LONGER TAKES. The status text itself. `status` is a lifecycle
- * value out of a closed set, not a sentence — nothing this app writes reaches
- * the indicator any more.
+ * value out of a closed set, not a sentence. The words on the indicator are
+ * `setStatusLine`'s.
  *
  * Reports what came back rather than returning nothing. api.ts already logs
  * Slack's refusals, so the gap was never a refusal: it was that the CALLER
@@ -151,6 +151,36 @@ export async function setSessionStatus(
     status,
   });
   return res.ok ? { ok: true } : { ok: false, error: res.error };
+}
+
+/**
+ * Put words on the working indicator: the step a turn is on, "is checking the
+ * Roadmap board…".
+ *
+ * WHY THE BRIDGED METHOD, BESIDE THE SESSION ONE ABOVE. `agents.sessions.setStatus`
+ * takes a lifecycle value and no text — its reference documents no field for
+ * what the indicator says — while `assistant.threads.setStatus` still takes
+ * `status` as the words to show, and Slack bridges it onto sessions: a
+ * non-empty line sets the session to `processing`. So the lifecycle stays the
+ * session method's, raise and settle alike, and this carries only the words,
+ * while the session is already `processing`. It never sends an empty line,
+ * because the empty line is the bridged CLEAR, and a clear by this path is the
+ * one that once left "le goat is working…" under a delivered answer (#574).
+ *
+ * The caller owns the one hazard: a line that lands after the settle moves the
+ * session back to `processing`. The Delivery adapter sends these on its
+ * checklist chain and stops them before the settle goes out.
+ *
+ * Best-effort, like the rename: words that did not show cost nothing else.
+ */
+export async function setStatusLine(
+  env: Env,
+  channel: string,
+  thread_ts: string,
+  text: string,
+): Promise<void> {
+  if (!thread_ts || !text.trim()) return;
+  await slackCall(env, "assistant.threads.setStatus", { channel_id: channel, thread_ts, status: text });
 }
 
 /** Name an agent session. Slack asks for this explicitly — "Set the title

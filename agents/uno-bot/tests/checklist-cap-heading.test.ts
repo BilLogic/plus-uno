@@ -19,13 +19,16 @@ const TARGET: SlackDeliveryTarget = {
   team: "T1",
 };
 
-const NAME = "notion_search";
+// Two tools in turn, so no lookup follows one of its own kind: consecutive
+// lookups of one kind share a card (`tests/checklist-steps.test.ts`), and the
+// cap is about cards.
+const nameOf = (seq: number): string => (seq % 2 ? "notion_search" : "slack_search");
 
-const announced = (seq: number): ToolProgressEvent => ({ seq, name: NAME, args: {}, phase: "announced" });
-const started = (seq: number): ToolProgressEvent => ({ seq, name: NAME, args: {}, phase: "started" });
+const announced = (seq: number): ToolProgressEvent => ({ seq, name: nameOf(seq), args: {}, phase: "announced" });
+const started = (seq: number): ToolProgressEvent => ({ seq, name: nameOf(seq), args: {}, phase: "started" });
 const finished = (seq: number, error?: string): ToolProgressEvent =>
   finishedProgress(
-    { seq, name: NAME, args: {} },
+    { seq, name: nameOf(seq), args: {} },
     error ? JSON.stringify({ ok: false, error }) : JSON.stringify({ ok: true, rows: [] }),
     error,
   );
