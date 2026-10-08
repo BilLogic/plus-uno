@@ -9,6 +9,8 @@
 // Hard policies:
 //   • SKIP entirely for short replies (< MIN_DRAFT_CHARS) — quick lookups and
 //     acknowledgements never pay the judge tax.
+//   • VERDICT ONLY past the revision window (MAX_DRAFT_CHARS): a long draft
+//     is read whole and graded, but no rewrite of it ever ships.
 //   • FAIL OPEN: any judge error/timeout/unparseable output → send the
 //     ORIGINAL draft unchanged. The judge can only ever improve a reply,
 //     never block one.
@@ -118,8 +120,23 @@ const MIN_DRAFT_CHARS = 1000;
 const JUDGE_TIMEOUT_MS = 25_000;
 // Inputs are capped so the judge call stays cheap and bounded.
 const MAX_USER_CHARS = 2_000;
-const MAX_DRAFT_CHARS = 8_000;
 const MAX_PRIOR_CHARS = 4_000;
+// The REVISION window. A draft up to this length is judged in revise mode: the
+// judge may return a rewrite, and the rewrite ships if the guards below accept
+// it. A whole rewrite of anything longer has to come back inside
+// JUDGE_MAX_TOKENS and JUDGE_TIMEOUT_MS, and a model that runs out of either
+// returns a faithful prefix, which no guard here is built to tell from a
+// faithful whole.
+const MAX_DRAFT_CHARS = 8_000;
+// The VERDICT window. A draft past the revision window and up to this length
+// is read whole and judged verdict-only: pass or fail with the failed codes,
+// never a rewrite. Reading costs input tokens, which a flash model takes in far
+// faster than it writes, and a verdict is a dozen output tokens, so the call
+// stays near the time a short draft takes — 6,829ms for a 1,294-character draft
+// on `default` on 2026-10-07. About twice the longest answer seen live
+// (17,614 characters that day); past it the draft ships unread, with the skip
+// logged.
+const MAX_VERDICT_DRAFT_CHARS = 32_000;
 // A "revision" shorter than this fraction of the original is treated as a
 // judge malfunction (e.g. it answered instead of revising) — original ships.
 const MIN_REVISION_RATIO = 0.25;
@@ -165,6 +182,18 @@ CORRECTION TURN. The user's message is CORRECTING your previous reply, which is 
 - A freshness claim ("I just checked", "re-ran that") when no lookup tool ran this turn is a FAIL.
 Failure code: "gate:correction".`;
 
+/** Appended to the judge system prompt ONLY past the revision window, and LAST,
+ *  so it overrides the reply format the rubric asks for. The Worker ignores a
+ *  `revised` field in this mode anyway (`reviewDraft`); telling the judge not
+ *  to write one is what keeps the call to a verdict's worth of output, and so
+ *  inside the timer. */
+const VERDICT_ONLY = `
+
+VERDICT ONLY. This draft is long, and it ships as written whatever you find, so do NOT rewrite it and do NOT include a "revised" field. Judge the WHOLE draft, to its last line, against the same rubric and gates. Reply with STRICT JSON only:
+  {"verdict":"pass"}
+or
+  {"verdict":"fail","failed":["D9","gate:formatting"]}`;
+
 export interface JudgeOutcome {
   /** The text to send: the revised draft on a usable "fail", else the original. */
   text: string;
@@ -176,6 +205,10 @@ export interface JudgeOutcome {
    *  judge keeps with its own `judgeSkipped` (#618). */
   reason?: string;
 }
+
+/** How a draft is judged, decided by its length alone and logged on every
+ *  verdict line: `revise` may ship the judge's rewrite, `verdict` never does. */
+type JudgeMode = "revise" | "verdict";
 
 /** What a skip with no reason is recorded as — a bug, named rather than blank. */
 const UNRECORDED_SKIP_REASON = "skipped for no recorded reason";
@@ -213,6 +246,7 @@ async function callJudgeModel(
     toolsUsedThisTurn: string[];
     stalled: boolean;
     extraInstruction?: string;
+    mode: JudgeMode;
   },
 ): Promise<ModelText> {
   const prompt =
@@ -230,13 +264,16 @@ async function callJudgeModel(
     // blind on every non-correction turn.
     `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` +
     `User message:\n${userText.slice(0, MAX_USER_CHARS)}\n\n` +
-    `Draft reply:\n${draft.slice(0, MAX_DRAFT_CHARS)}` +
+    // Never sliced: `reviewDraft` only asks about a draft that fits its mode's
+    // window, so the judge always reads the draft whole.
+    `Draft reply:\n${draft}` +
     // A deterministic pre-check already decided WHAT is wrong; passing its one
     // sentence through beats asking the judge to rediscover it, and a specific
     // instruction is what keeps the repair from producing generic filler.
     (ctx.extraInstruction ? `\n\n${ctx.extraInstruction}` : "");
 
-  const system = ctx.correction ? JUDGE_SYSTEM + CORRECTION_GATE : JUDGE_SYSTEM;
+  const system =
+    JUDGE_SYSTEM + (ctx.correction ? CORRECTION_GATE : "") + (ctx.mode === "verdict" ? VERDICT_ONLY : "");
 
   // A tier, a system block, a prompt and a ceiling. Whether that is Gemini or
   // Claude, which model the tier resolves to, what level it thinks at and
@@ -289,15 +326,26 @@ export async function reviewDraft(
     return judgeSkipped(draft, "draft shorter than the judged floor");
   }
 
-  // Past MAX_DRAFT_CHARS the judge reads only a prefix, and a revision of a
-  // prefix cannot stand in for the whole: swapped in for a 17k walkthrough it
-  // would ship the first half as the answer. Neither MIN_REVISION_RATIO nor the
-  // vocabulary guard is built to catch "faithful but truncated", so nothing is
-  // asked. No caller lifts this — a correction or a forced repair would be just
-  // as truncated — and the skip is logged so it never reads as a pass. While
-  // the judge sat on grind this case was masked by the timeout, which fired
-  // before any revision could come back.
-  if (draft.trim().length > MAX_DRAFT_CHARS) {
+  // Past the revision window the judge still reads the draft, whole, but only
+  // for a verdict. From 2026-10-07 it skipped anything past MAX_DRAFT_CHARS,
+  // because it read just the first 8k and a revision of that prefix, swapped in
+  // for a 17k walkthrough, would have shipped the first half as the answer —
+  // so the longest answers, walkthroughs and big Roadmap lists, were the ones
+  // that went out unchecked. Two other ways to judge them were weighed: raising
+  // the revision window, which asks for a 17k rewrite inside a 6,000-token
+  // ceiling and a 25s timer, and judging part by part along `answerMessages`,
+  // which costs a call per part and grades the confidence clause in each part
+  // that does not carry it. A verdict on the whole draft is one call, a few
+  // seconds of reading more than a short draft, and no rewrite to truncate. A
+  // fail ships the draft as written, with the failed codes on the verdict line.
+  // A forced repair (correction, confidence, absence) gets a verdict and no
+  // repair past this line: a repair is a rewrite, and a rewrite is what this
+  // window cannot trust.
+  const mode: JudgeMode = draft.trim().length > MAX_DRAFT_CHARS ? "verdict" : "revise";
+
+  // Past the verdict window nothing is asked, so the call stays bounded. No
+  // caller lifts this, and the skip is logged so it never reads as a pass.
+  if (draft.trim().length > MAX_VERDICT_DRAFT_CHARS) {
     console.log(
       `[uno-bot] draft-judge build=${BUILD} verdict=skip reason=long draft_chars=${draft.length} ` +
         `correction=${correction ? "yes" : "no"} forced=${forceReason ?? "no"}`,
@@ -325,6 +373,7 @@ export async function reviewDraft(
         toolsUsedThisTurn,
         stalled,
         extraInstruction,
+        mode,
       }),
       new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
     ]);
@@ -354,7 +403,13 @@ export async function reviewDraft(
         verdict = "fail";
         failed = Array.isArray(parsed.failed) ? parsed.failed.filter((f): f is string => typeof f === "string") : [];
         const revised = typeof parsed.revised === "string" ? parsed.revised.trim() : "";
-        if (revised.length < draft.trim().length * MIN_REVISION_RATIO) {
+        if (mode === "verdict") {
+          // Checked FIRST, before any guard: in this mode a revision never
+          // ships, however whole it looks. The guards below measure a rewrite
+          // against the draft; none of them can tell a faithful prefix of a
+          // long answer from the answer.
+          if (revised) console.warn("[draft-judge] revision past the revision window — ignored, sending the original draft");
+        } else if (revised.length < draft.trim().length * MIN_REVISION_RATIO) {
           console.warn("[draft-judge] fail verdict but truncated revision — sending the original draft");
         } else if (shouldRejectRevision(draft, revised)) {
           // Length was the ONLY check until 2026-08-06, and a degenerate
@@ -383,7 +438,7 @@ export async function reviewDraft(
       `failed=[${failed.join(",")}] ` +
       `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length} ` +
       `correction=${correction ? "yes" : "no"} stalled=${stalled ? "yes" : "no"} ` +
-      `forced=${forceReason ?? "no"} ` +
+      `forced=${forceReason ?? "no"} mode=${mode} ` +
       `tools=[${toolsUsedThisTurn.join(",")}]`,
   );
   if (verdict === "skip") return judgeSkipped(text, reason);
