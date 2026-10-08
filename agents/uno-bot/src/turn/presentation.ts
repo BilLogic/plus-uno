@@ -22,8 +22,14 @@
 //
 // ONE TABLE PER ANSWER: the last request that produced one wins.
 //
+// THE SOURCES are every link the turn's lookups read, as their task cards
+// carry them: each once, in the order read. Which of them a thread may see,
+// and whether there are enough to fold into a box, is the posting side's call
+// (`slack/card-sources.ts`, `slack/sources-box.ts`).
+//
 // PURE: no Env, no Slack shape.
 
+import type { TaskCardSource } from "../agent/task-card-readout";
 import {
   roadmapCards,
   roadmapTable,
@@ -42,6 +48,8 @@ import {
 export interface Presentation {
   /** The result table, when the turn's lookups left one. */
   table?: ResultTable;
+  /** The links the turn's lookups read, each once, in the order read. */
+  sources?: readonly TaskCardSource[];
 }
 
 /** The tool the model asks for a shape with. */
@@ -54,6 +62,8 @@ export interface Presenter {
    * the text the model reads — rewritten when it carries a table's news.
    */
   revise(name: string, args: Record<string, unknown>, text: string): string;
+  /** The links a finished lookup read, as its task card carries them. */
+  sourcesRead(sources: readonly TaskCardSource[]): void;
   /** What the turn's lookups left to post beneath the answer, if anything. */
   presentation(): Presentation | undefined;
 }
@@ -123,6 +133,7 @@ const NO_TABLE_NOTE = "No table is attached. If the rows answer the question, li
 export function presenter(): Presenter {
   const lookups = new Map<string, Recorded>();
   let table: ResultTable | undefined;
+  const sources = new Map<string, TaskCardSource>();
 
   const answer = (body: Record<string, unknown>): string => JSON.stringify(body);
   const refuse = (error: string): string => answer({ ok: false, table_attached: false, error, note: NO_TABLE_NOTE });
@@ -180,8 +191,12 @@ export function presenter(): Presenter {
         ...(cards ? { row_count: cards.rows.length, note: cardTableNote(cards) } : {}),
       });
     },
+    sourcesRead(read) {
+      for (const source of read) if (!sources.has(source.url)) sources.set(source.url, source);
+    },
     presentation() {
-      return table ? { table } : undefined;
+      if (!table && !sources.size) return undefined;
+      return { ...(table ? { table } : {}), ...(sources.size ? { sources: [...sources.values()] } : {}) };
     },
   };
 }

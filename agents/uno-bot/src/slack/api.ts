@@ -290,6 +290,9 @@ export interface PostMessageInput {
   blocks?: unknown[];
   /** Also show this threaded reply in the main conversation. */
   reply_broadcast?: boolean;
+  /** False keeps Slack from previewing the links in the message. */
+  unfurl_links?: boolean;
+  unfurl_media?: boolean;
   /** The app's own tag, read back with `include_all_metadata`. */
   metadata?: SlackMessageMetadata;
 }
