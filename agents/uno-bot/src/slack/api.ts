@@ -114,6 +114,25 @@ export async function postToResponseUrl(
   });
 }
 
+/**
+ * Open a modal on an interaction's `trigger_id` (valid three seconds, one use).
+ * The opened view's id, which `viewsUpdate` fills in later, or null when Slack
+ * refused — an expired trigger answers `expired_trigger_id`. A view's blocks
+ * take the same markup pass as a message's.
+ */
+export async function viewsOpen(env: Env, triggerId: string, view: Record<string, unknown>): Promise<string | null> {
+  const res = await slackCall<SlackResponse>(env, "views.open", { trigger_id: triggerId, view: withSafeBlocks(view) });
+  if (!res.ok) return null;
+  const id = (res.view as { id?: unknown } | undefined)?.id;
+  return typeof id === "string" ? id : null;
+}
+
+/** Replace an open modal's contents. Whether Slack took it. */
+export async function viewsUpdate(env: Env, viewId: string, view: Record<string, unknown>): Promise<boolean> {
+  const res = await slackCall<SlackResponse>(env, "views.update", { view_id: viewId, view: withSafeBlocks(view) });
+  return res.ok;
+}
+
 // Slack READ methods reject JSON bodies (invalid_arguments — the
 // conversations.replies lesson, 2026-07-10): they take GET query params.
 async function slackGet<T extends SlackResponse>(

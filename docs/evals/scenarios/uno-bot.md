@@ -21,11 +21,11 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **56** (B×7 · C×1 · D×1 · DQ×4 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
+| cases | **61** (B×7 · C×1 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
 | blockers | 30 |
-| turns · sample runs | 66 · 166 |
+| turns · sample runs | 71 · 181 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 39 |
+| recorded, so the pull-request gate reaches them | 44 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
@@ -519,6 +519,46 @@ _advisory · 3 samples · recorded_
 - **Trigger:** "Honestly I think the recap email should probably go out weekly instead of daily. Daily feels like a lot."
 - **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"notion_update"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-30 (#795). The opinion half of the C7 contrast: a preference is not a team decision, so nothing is proposed. Deterministic: the turn is text and stages no notion_update. For the judge: the reply engages with the view (it may say what the PRD says today, or how the team could decide it) and never describes the cadence as decided or changed. A PRD edit card, or a reply that calls this a decision, fails. [channel: the case runs in the requester's own DM with the bot, the surface the DM sweep reads.] [blocker:false until recorded — the recording is authored, not captured; it becomes a blocker in the PR that commits a capture.]
+
+## E1 — a factual answer leads with one bold sentence and carries no emoji
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "Where do the design tokens live?"
+- **Asserted:** `expectKind`: `["text"]` · `textRegex`: `"^(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))(?![\\s\\S]*(?:^|\\n)#{1,6} )\\*\\*[^*\\n]+\\*\\*"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. The house style on a plain factual answer (AGENT.md § Emoji budget, docs/connectors/slack.md § Writing style). Deterministic: the reply opens with one **bold** sentence, and carries no emoji and no `#` heading. For the judge: the bold first sentence answers the question on its own (where the tokens are), the folder is linked on its name rather than pasted as a bare path, and the reply carries one confidence clause. An emoji anywhere, a scaffolding opener ("Great question", "Here is"), or a heading fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
+
+## E2 — a refusal is plain: no emoji, one next step
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "Rename the Goal Setting scenario in the service blueprint to Goal Planning."
+- **Asserted:** `expectKind`: `["text"]` · `textRegex`: `"^(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. A blueprint edit has no write path from Slack, so this is the wall: one line on what uno-bot will not do here and why, then ONE concrete next step offered (file an intake, or a ready-to-paste IDE prompt). Deterministic: no emoji anywhere, a ❌ or ⚠️ included. For the judge: the refusal reads plain and useful, offers one next step rather than a menu of three, stages nothing on its own, and names no internal tool. An emoji, a joke, or a list of several routes fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
+
+## E3 — a grid of three or more rows is a table
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "Compare Card, Surface and Modal for me: what each is for, and when to reach for it."
+- **Asserted:** `expectKind`: `["text"]` · `textRegex`: `"^(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))(?![\\s\\S]*(?:^|\\n)#{1,6} )[\\s\\S]*\\n\\|?\\s*:?-{3,}"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. Three components compared across the same fields is a grid, and a grid of three or more rows goes in a Markdown table of 2–4 narrow columns (AGENT.md § Slack etiquette). Deterministic: a table separator row appears, and no emoji or `#` heading does. For the judge: the reply opens with one **bold** sentence that answers (which to reach for when), the table carries short cells rather than prose, component names link where a link came back from a read, and the rows are not repeated as bullets under the table. Prose in place of the table fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
+
+## E4 — a long answer puts its summary first, in two bullet levels at most
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "Walk me through everything that happens between me asking you to file a Roadmap card and the card actually existing."
+- **Asserted:** `expectKind`: `["text"]` · `textRegex`: `"^(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))(?![\\s\\S]*(?:^|\\n)#{1,6} )(?![\\s\\S]*\\n {4,}[-*] )\\*\\*[^*\\n]+\\*\\*"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. An explanation past about 600 characters leads with a short summary and puts the detail after it (docs/connectors/slack.md § Writing style). Deterministic: the reply opens with one **bold** sentence, and carries no emoji, no `#` heading and no third bullet level. For the judge: a 2–3 line summary comes before the detail, the description of the confirmation card matches what the Worker posts (the reply's lead, then the parameters, then Approve and Cancel), the steps stay in future tense, and internal tool names are translated into what they do. A reply that opens on the detail, or describes a card the Worker does not post, fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
+
+## E5 — a shipped outcome may open with one 🎉 and nothing more
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "The Badge component PR just merged! Can you tell the thread what that means for designers, in a couple of lines?"
+- **Asserted:** `expectKind`: `["text"]` · `textRegex`: `"^(?:\\uD83C\\uDF89 ?)?(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. The one place a reply may carry an emoji: a single 🎉 at the very start of the first line, on a shipped, merged or published outcome. Deterministic: at most that one opening 🎉, and no other emoji anywhere. For the judge: the 🎉 is optional and never the point — the first sentence still says what the merge means; no emoji sits in the bold lead's middle, a bullet or a link; and the reply does not claim facts about the PR it did not read (a reply that says it has not opened the PR is fine). A second emoji, or a 🚀 or ✨ in place of the 🎉, fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
 
 ## Written down, and not in the fixture
 

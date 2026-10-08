@@ -78,8 +78,10 @@ describe("estate glyphs on task cards", () => {
     ]);
     assert.deepEqual(icons.get("tool-1"), { type: "icon", name: "cube" });
     assert.deepEqual(icons.get("tool-2"), { type: "icon", name: "map" });
+    // The last two read the same estate one after the other, so they share a
+    // step, and its glyph.
     assert.deepEqual(icons.get("tool-3"), { type: "icon", name: "globe" });
-    assert.deepEqual(icons.get("tool-4"), { type: "icon", name: "globe" });
+    assert.equal(icons.has("tool-4"), false);
   });
 
   it("carries the same icons on the static plan in a top-level DM", async () => {

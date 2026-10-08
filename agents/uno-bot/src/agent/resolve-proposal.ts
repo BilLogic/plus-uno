@@ -2,7 +2,7 @@
 // reaction, and the record of what was done.
 //
 // The decision half of this file is gone — the lookup, the emoji parse, the
-// claim and the lost-race message are `gate/gate.ts` now, once, for all four
+// claim and the lost-race message are `gate/gate.ts` now, once, for every
 // doors (#500). What is left is the part that needs `Env`: a side-effect tool
 // only ever runs from here, and only ever on a verdict that WON its claim.
 //
@@ -27,7 +27,7 @@
 // put the proposal in front of a person in the first place.
 
 import type { Env, SlackContext } from "../types";
-import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
+import { postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
 import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
 import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
@@ -122,7 +122,7 @@ async function recordOutcome(
 ): Promise<void> {
   await recordProposalEvents(record.events, executionEvents(pending.proposalTs, outcomes, at));
   const door = verdict.by?.door;
-  const ticket = door === "reaction" || door === "button" ? selfFiledTicketOf(outcomes) : null;
+  const ticket = door === "reaction" || door === "button" || door === "review" ? selfFiledTicketOf(outcomes) : null;
   if (ticket) {
     await quietly(`self-filed ticket on ${pending.proposalTs}`, () =>
       record.events.noteSelfFiledTicket(pending.proposalTs, ticket),
@@ -139,13 +139,9 @@ async function runWonVerdict(
 ): Promise<OperationOutcome[] | undefined> {
   const store = threadStateFor(env);
 
-  await addReaction(
-    env,
-    pending.channel,
-    pending.userMsgTs,
-    verdict.decision === "confirm" ? "handshake" : "wave",
-  );
-
+  // No reaction here: code reacts 👀 on arrival and ❌ on a failure, and
+  // nothing else (AGENT.md § Emoji budget). The verdict's own post says what
+  // was decided; a 🤝 or 👋 on the requester's message said it twice.
   const proposed = proposalOperations(pending).length;
   const run = verdict.execute;
   if (!run) {
