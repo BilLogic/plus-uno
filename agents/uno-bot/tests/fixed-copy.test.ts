@@ -30,6 +30,7 @@ import { renderGateNote } from "../src/slack/gate-note";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { buildFailureMessage } from "../src/slack/failure-message";
+import { inThreadStopLine } from "../src/slack/session-stop";
 import type { GateNote } from "../src/turn/index";
 import type { OperationOutcome } from "../src/gate/index";
 
@@ -44,6 +45,9 @@ const GATE = ["✅", "⛔"];
 /** How a person answers a reminder. */
 const REMINDER = ["🙌", "⏳", "🙅", "🤔"];
 const GOAT = "🐐";
+/** The Stop sign: what a pressed stop opens with, kept apart from ⛔, which is
+ *  the gate's cancel and would read as one. */
+const STOP = "🛑";
 
 /** Slack shortcodes the copy writes, as the glyph a person sees. */
 const SHORTCODES: Record<string, string> = {
@@ -58,6 +62,7 @@ const SHORTCODES: Record<string, string> = {
   hourglass_flowing_sand: "⏳",
   no_good: "🙅",
   thinking_face: "🤔",
+  octagonal_sign: STOP,
 };
 
 /**
@@ -80,7 +85,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "slack/commands.ts": [],
   "slack/events.ts": [],
   "slack/shortcuts.ts": [],
-  "slack/session-stop.ts": [],
+  "slack/session-stop.ts": [STOP],
   "slack/try-asking.ts": [],
   "slack/delivery.ts": [],
   "slack/delivery-adapter.ts": [],
@@ -422,6 +427,15 @@ describe("the batch result", () => {
     assert.match(text, /failed/);
     const allDone = batchResultMessage(outcomes.map((o) => ({ ...o, ok: true })))!;
     assertBudget(allDone);
+  });
+});
+
+describe("the stop line", () => {
+  it("opens with the Stop sign, never the gate's ⛔", () => {
+    const line = inThreadStopLine("U0000002");
+    assert.equal(emojiIn(line)[0], STOP, line);
+    assert.ok(!emojiIn(line).includes("⛔"), line);
+    assertBudget(line, [STOP]);
   });
 });
 
