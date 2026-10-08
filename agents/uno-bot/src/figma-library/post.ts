@@ -1,6 +1,7 @@
 // The morning run's `figma-library-post` job: each change set the end-of-day
-// poll found becomes ONE message in #plus-universal — the summary and a
-// proposal card — with the drafted intake behind it.
+// poll found becomes ONE message in #plus-universal — a release card, a
+// result table of the changed components and the proposal card's decision
+// (`release.ts`) — with the drafted intake behind it.
 //
 // A CHANGE WITH NO PUBLISHED VERSION posts no card (#886 § 3.1): the library
 // was edited, not published, so there is nothing to build and nothing to
@@ -62,6 +63,7 @@ import {
   type PublishIntake,
 } from "./draft";
 import type { TrackedPublish } from "./track";
+import { releaseBlocks } from "./release";
 
 /** How long the card stays confirmable. */
 export const LIBRARY_CARD_TTL_MS = 72 * 60 * 60 * 1000;
@@ -189,7 +191,18 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
     const copy = publishCard(changeSet, intake, LIBRARY_CARD_TTL_MS / 3_600_000);
     const { operations, onCancel } = libraryOperations(intake);
     const card = renderProposalCard(libraryCard(changeSet, intake, operations, copy));
-    const sent = await deps.post({ text: card.text, blocks: proposalCardBlocks(card.text) });
+    // The release card and the table of changed components lead, and the
+    // decision — what ✅ and ⛔ do, and Review — stays last. Slack refusing
+    // them posts the card as text, which is the whole card on its own.
+    const release = releaseBlocks(changeSet, intake);
+    let sent = { ok: false } as { ok: boolean; ts?: string };
+    let listed = false;
+    if (release.length) {
+      sent = await deps.post({ text: card.text, blocks: [...release, ...proposalCardBlocks(copy.footer)] });
+      listed = sent.ok && release.some((b) => b.type === "data_table");
+      if (!sent.ok) console.warn(`[figma-library] release blocks for ${intake.key} refused — posting the card as text`);
+    }
+    if (!sent.ok) sent = await deps.post({ text: card.text, blocks: proposalCardBlocks(card.text) });
     if (!sent.ok || !sent.ts) {
       console.error(`[figma-library] post for ${intake.key} failed — kept for tomorrow`);
       break;
@@ -244,7 +257,9 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
     // in its thread — after the card is on record, so a stop here can never
     // post the card twice. A reply that fails is logged (the intake carries
     // every row); a budget stop ends the job, and the rest wait for its retry.
-    for (const text of copy.overflow) {
+    // The table names every component already, so the list goes in the thread
+    // only when no table did.
+    for (const text of listed ? [] : copy.overflow) {
       await deps.reply(ts, text).catch((err: unknown) => {
         rethrowIfBudget(err);
         console.error(`[figma-library] full list for ${intake.key} not posted: ${err instanceof Error ? err.message : String(err)}`);

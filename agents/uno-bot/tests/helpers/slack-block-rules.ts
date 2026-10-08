@@ -209,6 +209,19 @@ function dataTableRefusal(block: Shape): string | null {
  *  reference (read 2026-10-08): 150 characters each, at most 3 buttons. */
 const CARD_TITLE_CHARS = 150;
 const CARD_BUTTONS = 3;
+/** A card's body and subtext: 200 characters each, per the same reference. */
+const CARD_BODY_CHARS = 200;
+
+/** The names a card's `slack_icon` takes, per Slack's icon object reference
+ *  (read 2026-10-08). A wider list than a task card's (`SLACK_ICON_NAMES`),
+ *  which is what live Slack accepted there. */
+const CARD_ICON_NAMES: ReadonlySet<string> = new Set([
+  "archive", "book", "bookmark", "bot", "bug", "calendar", "call", "caret-left", "caret-right", "check", "clipboard",
+  "code", "comment", "compass", "copy", "cube", "download", "edit", "email", "eye-closed", "eye-open", "file", "flag",
+  "folder", "gear", "globe", "heart", "help", "image", "info", "key", "lightbulb", "link", "map", "mobile",
+  "new-window", "pin", "plus", "refine", "refresh", "rocket", "save", "screen", "share", "sparkle", "star",
+  "star-filled", "tag", "thumbs-down", "thumbs-up", "trash", "upload", "user", "warning",
+]);
 
 /** A carousel's cards, per its block reference: 1 to 10. */
 const CAROUSEL_CARDS = { min: 1, max: 10 };
@@ -232,7 +245,21 @@ function cardRefusal(card: unknown): string | null {
     }
     if (String(text.text).length > CARD_TITLE_CHARS) return `a card ${key} of ${String(text.text).length} chars`;
   }
+  for (const key of ["body", "subtext"] as const) {
+    if (!(key in card)) continue;
+    const text = card[key];
+    if (!isShape(text) || (text.type !== "plain_text" && text.type !== "mrkdwn") || !nonEmpty(text.text)) {
+      return `a card ${key} that is not a text object`;
+    }
+    if (String(text.text).length > CARD_BODY_CHARS) return `a card ${key} of ${String(text.text).length} chars`;
+  }
   if ("icon" in card && "slack_icon" in card) return "a card with both icon and slack_icon";
+  if ("slack_icon" in card) {
+    const icon = card.slack_icon;
+    if (!isShape(icon) || icon.type !== "icon" || !CARD_ICON_NAMES.has(String(icon.name))) {
+      return `a card slack_icon ${JSON.stringify(icon)}`;
+    }
+  }
   if ("icon" in card) {
     const icon = card.icon;
     if (!isShape(icon) || icon.type !== "image" || !nonEmpty(icon.alt_text)) return "a card icon that is not an image element";

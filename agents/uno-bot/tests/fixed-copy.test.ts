@@ -81,6 +81,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "slack/events.ts": [],
   "slack/shortcuts.ts": [],
   "slack/session-stop.ts": [],
+  "slack/try-asking.ts": [],
   "slack/delivery.ts": [],
   "slack/delivery-adapter.ts": [],
   "slack/api.ts": [],
@@ -107,6 +108,7 @@ const FIXED_COPY: Record<string, string[]> = {
   // PR, the one ship tests/figma-copy.test.ts allows.
   "figma-library/draft.ts": [],
   "figma-library/post.ts": [],
+  "figma-library/release.ts": [],
   "figma-library/track.ts": ["🎉"],
   "figma-drift/copy.ts": [],
   "ds-precedence/report.ts": [],
@@ -118,6 +120,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "tools/notion-archive.ts": [],
   "tools/send-email.ts": [],
   "tools/relay-dm.ts": [],
+  "tools/relayed-dm-render.ts": [],
   "tools/github-issue.ts": [],
   "tools/github-issue-update.ts": [],
   "tools/github-workflow.ts": [],

@@ -5,8 +5,8 @@
 //   1. fetch the requesting message's permalink — fetched, never constructed
 //      (`getPermalink`'s own rule);
 //   2. open the DM with `conversations.open`;
-//   3. post the approved text wrapped in the Worker's attribution and link
-//      (`relayed-dm-render.ts`);
+//   3. post the approved text wrapped in the Worker's attribution and link,
+//      as a card with the text copy beside it (`relayed-dm-render.ts`);
 //   4. remember the DM in the recipient's own DM conversation with the bot,
 //      so a reply there ("what's this about?") has what was sent to go on;
 //   5. say in the requesting thread where it went, or why it could not go.
@@ -27,12 +27,16 @@ import type { Env, SlackContext } from "../types";
 import { getPermalink, openConversation, postMessage } from "../slack/api";
 import { DM_CONVERSATION, type ThreadState } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
-import { relayFailure, relayRecipientId, renderRelayedDm } from "./relayed-dm-render";
+import { sanitizeSlackMarkup, toSlackMrkdwn } from "../slack/mrkdwn";
+import { relayFailure, relayRecipientId, renderRelayedDm, renderRelayedDmBlocks } from "./relayed-dm-render";
+
+/** Slack refusing the blocks rather than the DM. */
+const BLOCKS_REFUSED = /^invalid_(blocks|arguments)/;
 
 /** The three Slack calls a relay makes, and nothing else. */
 export interface RelaySlack {
   openDm(userId: string): Promise<{ ok: true; channel: string } | { ok: false; error: string }>;
-  postMessage(message: { channel: string; text: string; thread_ts?: string }): Promise<{ ok: boolean; error?: string; ts?: string }>;
+  postMessage(message: { channel: string; text: string; thread_ts?: string; blocks?: unknown[] }): Promise<{ ok: boolean; error?: string; ts?: string }>;
   permalink(channel: string, ts: string): Promise<string | null>;
 }
 
@@ -126,13 +130,23 @@ export async function executeRelayDm(
   const dm = await slack.openDm(recipient);
   if (!dm.ok) return refused(dm.error);
 
-  const sent = renderRelayedDm({
+  const relayed = {
     requesterId: context.requestedBy,
     text,
     permalink,
     originIsDm: context.channel.startsWith("D"),
-  });
-  const posted = await slack.postMessage({ channel: dm.channel, text: sent });
+  };
+  const sent = renderRelayedDm(relayed);
+  // The card is what the recipient sees; the text, with its attribution, is
+  // what notifications and the remembered turn read. Blocks skip the egress
+  // pass the text gets (`api.ts` § postMessage), so the card's copy of the
+  // message takes it here. A card Slack refuses falls back to the text alone.
+  const blocks = renderRelayedDmBlocks({ ...relayed, text: sanitizeSlackMarkup(toSlackMrkdwn(text)) });
+  let posted = await slack.postMessage({ channel: dm.channel, text: sent, blocks });
+  if (!posted.ok && BLOCKS_REFUSED.test(posted.error ?? "")) {
+    console.warn(`[relay] the card was refused (${posted.error}) — sending the text alone`);
+    posted = await slack.postMessage({ channel: dm.channel, text: sent });
+  }
   if (!posted.ok) return refused(posted.error ?? "unknown");
 
   // Best-effort: the DM is in their inbox either way, and a store hiccup must

@@ -51,6 +51,7 @@ import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
+import { TRY_ASKING_ACTION_PREFIX, runTryAskingDoor } from "./try-asking";
 import { handleReminderButton } from "./gate";
 import { REMINDER_ACTION_PREFIX } from "../commitments/copy";
 import { FEEDBACK_ACTION_ID, FEEDBACK_VIEW_CALLBACK_ID, feedbackAckFor, type FeedbackViewState } from "./feedback";
@@ -160,6 +161,7 @@ export function handleInteraction(
  *  clicking it is a no-op that logs nothing anyone will read. */
 async function dispatchAction(env: Env, actionId: string, payload: InteractionPayload): Promise<void> {
   if (actionId === "uno_stop_run") return stopRun(env, payload);
+  if (actionId.startsWith(TRY_ASKING_ACTION_PREFIX)) return tryAsking(env, payload);
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
@@ -374,6 +376,23 @@ async function stopRun(env: Env, payload: InteractionPayload): Promise<void> {
   const userId = payload.user?.id;
   if (!userId) return;
   await runHomeStopDoor({ userId }, homeStopDeps(env));
+}
+
+// A Home-tab "Try asking" button: the prompt asked in the presser's DM, as
+// them (`try-asking.ts`).
+//
+// `Env` enters here and stops here.
+async function tryAsking(env: Env, payload: InteractionPayload): Promise<void> {
+  const userId = payload.user?.id;
+  if (!userId) return;
+  await runTryAskingDoor(
+    { userId, value: payload.actions?.[0]?.value },
+    {
+      dmChannelFor: (id) => conversationsOpen(env, id),
+      post: async (message) => (await postMessage(env, message))?.ts ?? null,
+      enqueue: (event, key) => enqueueAgentJob(env, { kind: "message", event }, key),
+    },
+  );
 }
 
 /**

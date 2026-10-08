@@ -19,6 +19,7 @@ import { createInMemoryThreadState, DM_CONVERSATION } from "../src/thread-state/
 import { runOperations } from "../src/gate/index";
 import { preflight } from "../src/agent/preflight";
 import type { Env, SlackContext } from "../src/types";
+import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 
 // ── the wrapper ──────────────────────────────────────────────────────────────
 
@@ -134,7 +135,7 @@ describe("preflight on a relay", () => {
 
 interface FakeSlack extends RelaySlack {
   opened: string[];
-  posts: Array<{ channel: string; text: string; thread_ts?: string }>;
+  posts: Array<{ channel: string; text: string; thread_ts?: string; blocks?: unknown[] }>;
 }
 
 /** What each recipient's DM conversation was told the bot said. */
@@ -153,7 +154,7 @@ function fakeMemory(opts: { fail?: boolean } = {}): FakeMemory {
   };
 }
 
-function fakeSlack(opts: { refuse?: Record<string, string>; permalink?: string | null } = {}): FakeSlack {
+function fakeSlack(opts: { refuse?: Record<string, string>; permalink?: string | null; refuseBlocks?: boolean } = {}): FakeSlack {
   const opened: string[] = [];
   const posts: FakeSlack["posts"] = [];
   return {
@@ -165,6 +166,7 @@ function fakeSlack(opts: { refuse?: Record<string, string>; permalink?: string |
       return error ? { ok: false, error } : { ok: true, channel: `D-${userId}` };
     },
     async postMessage(message) {
+      if (opts.refuseBlocks && message.blocks) return { ok: false, error: "invalid_blocks" };
       posts.push(message);
       return { ok: true, ts: `1700000001.00000${posts.length}` };
     },
@@ -209,6 +211,61 @@ describe("an approved relay", () => {
     assert.equal(slack.posts.filter((p) => p.channel === "C1").length, 0);
     assert.match(outcomes[0]!.message, /Sent to <@U0COCO>/);
     assert.match(outcomes[1]!.message, /Sent to <@U0MERYEM>/);
+  });
+
+  it("arrives as a card: the sender, the message and a button back to the thread", async () => {
+    const slack = fakeSlack();
+    await executeRelayDm({ slack, memory: fakeMemory() }, { recipient: "U0COCO", text: "RM-2436 is Ready for QA." }, CONTEXT);
+    const dm = slack.posts.find((p) => p.channel === "D-U0COCO")!;
+    assert.ok(dm.blocks, "the DM carries blocks");
+    assert.equal(messageBlocksRefusal(dm.blocks), null);
+    const card = dm.blocks.find((b) => (b as { type: string }).type === "card") as Record<string, any>;
+    assert.ok(card, JSON.stringify(dm.blocks));
+    assert.match(card.title.text, /<@U0REQ1>/);
+    assert.equal(card.body.text, "RM-2436 is Ready for QA.");
+    assert.deepEqual(
+      card.actions.map((a: any) => [a.text.text, a.url]),
+      [["Open the thread", "https://plus.slack.com/archives/C1/p1700000000000200"]],
+    );
+    // The attribution stays in the text: notifications, and the bot's own
+    // memory of the DM, read the text and not the card.
+    assert.ok(dm.text.startsWith("<@U0REQ1> asked me to pass this on:"), dm.text);
+    assert.ok(dm.text.includes("https://plus.slack.com/archives/C1/p1700000000000200"));
+  });
+
+  it("puts a message too long for a card's body beneath it, whole", async () => {
+    const slack = fakeSlack();
+    const long = `${"The handoff notes are in the PRD. ".repeat(12)}End.`;
+    await executeRelayDm({ slack, memory: fakeMemory() }, { recipient: "U0COCO", text: long }, CONTEXT);
+    const dm = slack.posts.find((p) => p.channel === "D-U0COCO")!;
+    assert.equal(messageBlocksRefusal(dm.blocks!), null);
+    const card = dm.blocks!.find((b) => (b as { type: string }).type === "card") as Record<string, any>;
+    assert.equal(card.body, undefined);
+    assert.ok(JSON.stringify(dm.blocks).includes("End."), "the whole message is in the blocks");
+  });
+
+  it("still sends the text, attribution and all, when Slack refuses the card", async () => {
+    const slack = fakeSlack({ refuseBlocks: true });
+    const result = JSON.parse(
+      await executeRelayDm({ slack, memory: fakeMemory() }, { recipient: "U0COCO", text: "hi" }, CONTEXT),
+    );
+    assert.equal(result.status, "sent");
+    const dm = slack.posts.find((p) => p.channel === "D-U0COCO")!;
+    assert.equal(dm.blocks, undefined);
+    assert.ok(dm.text.startsWith("<@U0REQ1> asked me to pass this on:"));
+  });
+
+  it("gives a DM-origin request no button the recipient could not follow", async () => {
+    const slack = fakeSlack();
+    await executeRelayDm(
+      { slack, memory: fakeMemory() },
+      { recipient: "U0COCO", text: "hi" },
+      { ...CONTEXT, channel: "D0REQUESTER", threadTs: "dm" },
+    );
+    const dm = slack.posts.find((p) => p.channel === "D-U0COCO")!;
+    const card = dm.blocks!.find((b) => (b as { type: string }).type === "card") as Record<string, any>;
+    assert.equal(card.actions, undefined);
+    assert.match(JSON.stringify(dm.blocks), /only they can open/);
   });
 
   it("confirms a single relay in the requesting thread, under the real reply ts", async () => {

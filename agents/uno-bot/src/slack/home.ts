@@ -18,7 +18,7 @@
 import type { Env } from "../types";
 import type { SlackAppHomeOpenedEvent } from "./types";
 import { slackCall } from "./api";
-import { SUGGESTED_PROMPTS } from "./assistant";
+import { tryAskingButtons } from "./try-asking";
 import { slackConnectUrl } from "../oauth/slack";
 import { dmWatchHomeBlocks, type DmAccess, type DmWatchFeature } from "../dm-watch/index";
 import { dmWatchHomeStateFor } from "../dm-watch/env";
@@ -41,18 +41,40 @@ const HOME_INTRO = [
   },
 ];
 
-const HOME_BODY = [
+/** What I can do, one card each: a title and a body of at most 200
+ *  characters, the most a card's body holds. */
+const CAPABILITIES = [
+  {
+    icon: "book",
+    title: "Answer, grounded",
+    body: "Roadmap card status, owner and pillar, how a product flow works, design-system components and tokens, and any linked Notion, Figma or Slack doc. Cited, live.",
+  },
+  {
+    icon: "edit",
+    title: "Create, with your approval",
+    body: "Draft a PRD, file or update a card, start a component build or prototype, share work for feedback. Nothing is written until someone approves it.",
+  },
+  {
+    icon: "code",
+    title: "Hand off to code",
+    body: "Anything that needs real code, I write as a ready-to-paste prompt for your IDE agent: Claude Code, Cursor, Codex or Antigravity.",
+  },
+] as const;
+
+const homeBody = (connected: boolean) => [
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*What I can do*" } },
+    // Three cards side by side. Card and carousel blocks are allowed on a Home
+    // tab per Slack's block reference (both list "Home tabs" among their
+    // surfaces); the icons are Slack's named ones, so nothing is fetched.
     {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text:
-          "• *Answer, grounded* — Roadmap card status / owner / pillar, how a product flow works, design-system components & tokens, and any linked Notion, Figma, or Slack doc\n" +
-          "• *Create — with your approval* — draft a PRD, file or update a card, kick off a component build or prototype, share work for feedback\n" +
-          "• *Hand off* — anything that needs real code, I write a ready-to-paste prompt for your IDE agent (Claude Code, Cursor, Codex, Antigravity)",
-      },
+      type: "carousel",
+      elements: CAPABILITIES.map((c) => ({
+        type: "card",
+        slack_icon: { type: "icon", name: c.icon },
+        title: { type: "plain_text", text: c.title },
+        body: { type: "mrkdwn", text: c.body },
+      })),
     },
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*How to reach me*" } },
@@ -103,15 +125,10 @@ const HOME_BODY = [
     },
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*Try asking*" } },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        // Single source of truth: the same four starter prompts the assistant
-        // panel offers as chips (assistant.ts) — imported, not hand-copied.
-        text: SUGGESTED_PROMPTS.map((p) => `› _${p.message}_`).join("\n"),
-      },
-    },
+    // The assistant panel's starters (assistant.ts), as buttons that ask them
+    // in the person's DM (try-asking.ts) — the set that works for them, so
+    // someone who has not linked their Slack is not offered a search of it.
+    { type: "actions", elements: tryAskingButtons(connected) },
     { type: "divider" },
     {
       type: "actions",
@@ -189,7 +206,7 @@ export function homeView(input: {
   const { viewer, connectUrl } = input;
   const notice = viewer.refused ? { refused: viewer.refused, connectUrl } : undefined;
   const personal = viewer.connected ? dmWatchHomeBlocks(viewer.on, notice) : connectUrl ? connectBlocks(connectUrl) : [];
-  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...HOME_BODY] };
+  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...homeBody(viewer.connected)] };
 }
 
 async function buildHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
