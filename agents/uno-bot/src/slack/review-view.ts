@@ -5,13 +5,14 @@
 // Renders and posts nothing; `review-door.ts` decides which view to show and
 // hands it to Slack.
 //
-// THE DRAFT HOLDS NO INPUT. Slack's view footer holds two buttons, submit and
-// close, and an input anywhere in a view forces a submit. So the draft is
-// read-only, and its footer is the decision a person makes most: Approve as
-// the submit, Close beside it. The other two decisions are the body's last
-// row, Needs changes and Reject, and the fields are an Edit fields button at
-// the top. Each of those pushes a view of its own (`views.push`) holding the
-// one input it needs, with its own submit.
+// THE DRAFT HOLDS NO INPUT, AND NO SUBMIT. Slack's view footer holds two
+// buttons, submit and close, so three decisions cannot all sit there. They sit
+// together instead, as the body's last row, in the order a person reads them:
+// Approve, Needs changes, Reject. The footer is Close alone, which Slack allows
+// because the draft has no input. The fields are an Edit fields button at the
+// top. Needs changes, Reject and Edit fields each push a view of their own
+// (`views.push`) holding the one input it needs, with its own submit; Approve
+// needs no input and decides from the row.
 //
 // SAVED EDITS RIDE IN THE DRAFT'S `private_metadata`. Edit fields' Save edits
 // writes the values that differ from the draft into the parent view's
@@ -30,13 +31,15 @@ import { fieldInputBlocks, labelsOf, withValues, type EditableField } from "./re
 import { caveatsOf, draftHeadline, readableDraft } from "./review-draft";
 import type { PendingProposal, StatedCardWords } from "../thread-state/index";
 
-/** The draft's buttons; `slack/interactive.ts` routes all three. */
+/** The draft's buttons; `slack/interactive.ts` routes all four. */
+export const REVIEW_APPROVE_ACTION_ID = "uno_review_approve";
 export const REVIEW_CHANGES_ACTION_ID = "uno_review_changes";
 export const REVIEW_REJECT_ACTION_ID = "uno_review_reject";
 export const REVIEW_EDIT_ACTION_ID = "uno_review_edit";
 
 /** Each view's `callback_id`, which names its submit to the endpoint. The
- *  draft's submit is Approve. */
+ *  draft has no submit now; its callback still decides Approve for a draft
+ *  opened before the row held it. */
 export const REVIEW_CALLBACK_ID = "uno_review_draft";
 export const REVIEW_CHANGES_CALLBACK_ID = "uno_review_changes_note";
 export const REVIEW_REJECT_CALLBACK_ID = "uno_review_reject_note";
@@ -72,9 +75,6 @@ type View = Record<string, unknown>;
 
 /** The one alert a view carries, replaced rather than stacked. */
 export const REVIEW_ALERT_BLOCK_ID = "uno_review_alert";
-
-/** The draft's footer submit: the confirm decision. */
-export const APPROVE = "Approve";
 
 /** What a view's `private_metadata` holds for this card. */
 export function reviewMetadata(card: ReviewedCard): string {
@@ -134,9 +134,8 @@ export interface DraftAccess {
  * headings and paragraphs, then the card's caveats (`review-draft.ts`). A
  * proposal that file cannot read shows the card's text instead.
  *
- * A confirmer's view has Approve as its submit, Edit fields at the top when
- * the draft has fields to edit, and Needs changes and Reject as the body's
- * last row. `mayDecide` false is the same draft read-only: Close alone, and a
+ * A confirmer's view has Edit fields at the top when the draft has fields to
+ * edit, and Approve, Needs changes and Reject as the body's last row. `mayDecide` false is the same draft read-only: Close alone, and a
  * line naming who can decide.
  *
  * `opts.edits` are the values Save edits kept: the draft shows them in place,
@@ -172,6 +171,7 @@ export function draftView(
           type: "actions",
           block_id: "uno_review_decision",
           elements: [
+            button(REVIEW_APPROVE_ACTION_ID, "Approve", "confirm", "primary"),
             button(REVIEW_CHANGES_ACTION_ID, "Needs changes", "revise"),
             button(REVIEW_REJECT_ACTION_ID, "Reject", "cancel", "danger"),
           ],
@@ -182,7 +182,6 @@ export function draftView(
   return modal(
     { channel: card.channel, ts: card.ts, ...(Object.keys(edits).length ? { edits } : {}) },
     [...head, ...fitted, ...tail],
-    access.mayDecide ? { submit: APPROVE } : {},
   );
 }
 

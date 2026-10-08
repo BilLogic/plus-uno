@@ -1,8 +1,8 @@
 // The review door — a proposal card's Review pop-up, opened and decided.
 //
-// Review on the card opens a modal with the whole draft. Its decisions —
-// Approve (the footer's submit), Needs changes and Reject (pushed views, each
-// with its own submit) — are the Gate's fifth signal (`review`), resolved by
+// Review on the card opens a modal with the whole draft. Its decisions sit in
+// one row at its foot — Approve (decides from the row), Needs changes and
+// Reject (pushed views, each with its own submit) — and are the Gate's fifth signal (`review`), resolved by
 // the same `resolveSignal` as a reaction, a typed emoji and the model's call,
 // so the confirmer set, standing confirmers, TTL, supersession and the
 // one-winner claim are the Gate's and not this file's. Reject is a ⛔ with a
@@ -123,8 +123,8 @@ export interface ReviewOpenRequest {
 
 /** A decision submitted from the pop-up. */
 export interface ReviewDecisionRequest {
-  /** The view the decision was submitted from: the draft for Approve, the
-   *  pushed view for Needs changes and Reject. */
+  /** The view the decision was made from: the draft for Approve, the pushed
+   *  view for Needs changes and Reject. */
   viewId: string;
   /** The draft under a pushed view, so the answer replaces it too and the
    *  stack closes onto the same line. */

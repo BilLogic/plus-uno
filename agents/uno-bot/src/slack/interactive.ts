@@ -38,6 +38,7 @@ import {
   type ReviewViewState,
 } from "./review-door";
 import {
+  REVIEW_APPROVE_ACTION_ID,
   REVIEW_CALLBACK_ID,
   REVIEW_CHANGES_ACTION_ID,
   REVIEW_CHANGES_CALLBACK_ID,
@@ -180,6 +181,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
+  if (actionId === REVIEW_APPROVE_ACTION_ID) return approveInReview(env, payload);
   if (actionId === REVIEW_CHANGES_ACTION_ID) return pushInReview(env, payload, "changes");
   if (actionId === REVIEW_REJECT_ACTION_ID) return pushInReview(env, payload, "reject");
   if (actionId === REVIEW_EDIT_ACTION_ID) return pushInReview(env, payload, "edit");
@@ -278,8 +280,34 @@ async function pushInReview(env: Env, payload: InteractionPayload, step: "change
 }
 
 /**
- * A Review view's submit: Approve on the draft, Send changes, Reject, or Save
- * edits. A decision is acked at once with a line that says it is under way,
+ * Approve, pressed in the draft's decision row. The draft has no input, so
+ * Approve needs no view of its own: the draft turns to a line that says it is
+ * under way, and the door answers in the same view once the Gate has — the
+ * same decision, edits and checks as the old footer submit.
+ */
+async function approveInReview(env: Env, payload: InteractionPayload): Promise<void> {
+  const card = reviewedCardOf(payload.view?.private_metadata);
+  const userId = payload.user?.id;
+  const viewId = payload.view?.id;
+  if (!card || !userId || !viewId) return;
+  const deps = reviewDoorDeps(env);
+  await deps.views.update(viewId, noticeView(card, "Approving…"));
+  await runReviewDecision(
+    {
+      viewId,
+      channel: card.channel,
+      messageTs: card.ts,
+      userId,
+      decision: "confirm",
+      ...(card.edits ? { edits: card.edits } : {}),
+    },
+    deps,
+  );
+}
+
+/**
+ * A Review view's submit: Send changes, Reject, Save edits, or Approve from a
+ * draft opened before Approve moved into its row. A decision is acked at once with a line that says it is under way,
  * and the door answers in the same view once the Gate has (`showIn`). Save
  * edits is answered in the ack: Slack's error under a refused field, or an
  * empty ack that closes the view onto the redrawn draft.

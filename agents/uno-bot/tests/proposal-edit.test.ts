@@ -253,7 +253,7 @@ describe("an edit the guards refuse", () => {
     // still carried to the next Approve.
     assert.match(JSON.stringify(blocksOf(view)), /\*Title:\* TBD/);
     assert.deepEqual(reviewedCardOf((view as { private_metadata: string }).private_metadata)?.edits, { "0.title": "TBD" });
-    assert.equal((view as { submit?: { text: string } }).submit?.text, "Approve");
+    assert.match(JSON.stringify(blocksOf(view)), /uno_review_approve/);
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
     assert.deepEqual(views.refused, []);
   });
