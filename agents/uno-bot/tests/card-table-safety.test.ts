@@ -11,7 +11,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { postTextVerified } from "../src/slack/delivery";
-import type { CardTable } from "../src/turn/index";
+import { roadmapTable, type ResultTable } from "../src/turn/index";
 import { expectRefusals, recordingPosting } from "./helpers/recording-slack";
 
 const RECIPIENT = { userId: "U1", team: "T1" };
@@ -20,9 +20,9 @@ const LIST = ["Card 1 — #401 — WIP", "Card 2 — #402 — WIP", "Card 3 — 
 
 type Block = { type: string; text?: unknown };
 
-/** A table of three WIP cards. */
-function wip(): CardTable {
-  return {
+/** A table of three WIP cards, as the Roadmap preset builds it. */
+function wip(): ResultTable {
+  return roadmapTable({
     rows: [1, 2, 3].map((i) => ({
       title: `Card ${i}`,
       url: `https://www.notion.so/card-${i}`,
@@ -33,7 +33,7 @@ function wip(): CardTable {
     filter: { designStatus: "WIP" },
     total: 3,
     partial: false,
-  };
+  });
 }
 
 /** Run `fn` collecting `console.warn` lines instead of printing them. */
@@ -57,7 +57,7 @@ describe("an answer carrying a card table", () => {
   it("posts as an ordinary message and never streams, even with streaming on", async () => {
     const slack = recordingPosting();
     const posted = await postTextVerified(slack.deps({ streamingOn: true }), "C1", "100.1", PROSE, RECIPIENT, undefined, {
-      cardTable: wip(),
+      presentation: { table: wip() },
     });
 
     assert.equal(posted.ok, true);
@@ -72,7 +72,7 @@ describe("a split answer carrying a card table", () => {
     const prose = Array.from({ length: 48 }, (_, i) => para(i)).join("\n\n");
     const slack = recordingPosting();
     await postTextVerified(slack.deps({ streamingOn: true }), "C1", "100.1", prose, RECIPIENT, undefined, {
-      cardTable: wip(),
+      presentation: { table: wip() },
     });
 
     const messages = slack.of("message");
@@ -91,7 +91,7 @@ describe("a card table Slack refuses", () => {
     const slack = recordingPosting({ refusesBlockTypes: ["data_table"] });
     const { result, lines } = await warnings(() =>
       postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", PROSE, RECIPIENT, undefined, {
-        cardTable: wip(),
+        presentation: { table: wip() },
       }),
     );
     expectRefusals(slack.refused);
@@ -103,7 +103,7 @@ describe("a card table Slack refuses", () => {
     assert.equal(blocksOf(messages[1]!)[0]!.text, `${PROSE}\n\n${LIST}`);
     assert.equal(messages[1]!.text, `${PROSE}\n\n${LIST}`);
     assert.ok(
-      lines.some((l) => /card table refused/.test(l) && /json-pointer:\/blocks\/1/.test(l)),
+      lines.some((l) => /result table refused/.test(l) && /json-pointer:\/blocks\/1/.test(l)),
       `logged the step down with Slack's detail: ${lines.join(" / ")}`,
     );
   });
@@ -112,7 +112,7 @@ describe("a card table Slack refuses", () => {
     const slack = recordingPosting({ refusesBlockTypes: ["data_table", "markdown"] });
     const { result, lines } = await warnings(() =>
       postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", PROSE, RECIPIENT, undefined, {
-        cardTable: wip(),
+        presentation: { table: wip() },
       }),
     );
     expectRefusals(slack.refused);
@@ -129,7 +129,7 @@ describe("a card table Slack refuses", () => {
       .join("");
     for (const n of [401, 402, 403]) assert.match(sectionText, new RegExp(`#${n}`), `card #${n} is in the sections`);
     assert.equal(messages[2]!.text, `${PROSE}\n\n${LIST}`);
-    assert.ok(lines.some((l) => /card table refused/.test(l)));
+    assert.ok(lines.some((l) => /result table refused/.test(l)));
     assert.ok(
       lines.some((l) => /markdown block refused/.test(l) && /invalid_blocks/.test(l)),
       `logged the second step down: ${lines.join(" / ")}`,
@@ -140,7 +140,7 @@ describe("a card table Slack refuses", () => {
     const slack = recordingPosting({ refusesBlockTypes: ["data_table", "markdown", "section"] });
     const { result, lines } = await warnings(() =>
       postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", PROSE, RECIPIENT, undefined, {
-        cardTable: wip(),
+        presentation: { table: wip() },
       }),
     );
     expectRefusals(slack.refused);
@@ -160,7 +160,7 @@ describe("a card table Slack refuses", () => {
     const slack = recordingPosting({ postFailsWith: { error: "ratelimited" } });
     const { result } = await warnings(() =>
       postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", PROSE, RECIPIENT, undefined, {
-        cardTable: wip(),
+        presentation: { table: wip() },
       }),
     );
 

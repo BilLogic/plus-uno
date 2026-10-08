@@ -31,7 +31,7 @@
 
 import type { ProposalOperation } from "../thread-state/index";
 import type { ToolProgressEvent } from "../agent/tool-progress";
-import { withCardList, type CardTable } from "./card-table";
+import { textCopy, type Presentation } from "./presentation";
 
 /** How far a turn got before it failed. Drives what the message the person
  *  sees can honestly promise (`slack/failure-message.ts`). */
@@ -418,13 +418,13 @@ export interface Delivery {
   /**
    * The answer. A progress surface still open closes INTO it.
    *
-   * `cardTable` rides beneath the answer when the turn's lookups left one
-   * (`turn/card-table.ts`). The text copy the result reports is then the prose
-   * AND its plain list — what a notification shows and what the thread
-   * remembers — so a later turn knows which cards were shown. Absent, the
-   * answer posts exactly as it always has.
+   * `presentation` rides beneath the answer when the turn's lookups left one
+   * (`turn/presentation.ts`): a result table today. The text copy the result
+   * reports is then the prose AND the table's plain list — what a
+   * notification shows and what the thread remembers — so a later turn knows
+   * which rows were shown. Absent, the answer posts exactly as it always has.
    */
-  postAnswer(text: string, cardTable?: CardTable): Promise<PostResult>;
+  postAnswer(text: string, presentation?: Presentation): Promise<PostResult>;
 
   /** A note that is not an answer: a clarifying question, a cancellation, a
    *  "you just cancelled that" bounce. No footer, no confidence pre-check.
@@ -479,7 +479,7 @@ export type DeliveryCall =
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string; backstop?: true }
   | { kind: "toolProgress"; event: ToolProgressEvent }
-  | { kind: "answer"; text: string; cardTable?: CardTable }
+  | { kind: "answer"; text: string; presentation?: Presentation }
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote }
   | { kind: "proposal"; card: ProposalCard }
@@ -602,11 +602,11 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "toolProgress", event });
     },
 
-    async postAnswer(prose, cardTable) {
-      calls.push({ kind: "answer", text: prose, ...(cardTable ? { cardTable } : {}) });
+    async postAnswer(prose, presentation) {
+      calls.push({ kind: "answer", text: prose, ...(presentation ? { presentation } : {}) });
       // The text copy the Slack adapter reports: the prose, and the table's
       // plain list beneath it when there is one.
-      const text = cardTable ? withCardList(prose, cardTable) : prose;
+      const text = textCopy(prose, presentation);
       if (opts.answerFails) return { ok: false, text };
       posted.push(text);
       return { ok: true, text, ts: `answer-${calls.length}` };

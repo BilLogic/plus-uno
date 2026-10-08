@@ -49,6 +49,28 @@ export interface TaskCardReadout {
   output(result: string): string | null;
   /** The links the result names, at most `MAX_SOURCES`, each once. */
   sources(result: string): TaskCardSource[];
+  /** Where the call is routed, for a tool whose code routes it — which repo,
+   *  which Notion database — or null where it routes nowhere in particular. */
+  decision?(args: Record<string, unknown>): TaskCardDecision | null;
+}
+
+/**
+ * A routing choice the tool's own code makes from the call's arguments, shown
+ * as a step of its own.
+ *
+ * Only routing the CODE does: `resolveRepoFor` sends a call that names no repo
+ * to the default one, and `notion_search` turns a scope into the database it
+ * queries. Nothing here reads the model's reasons, because a card that claimed
+ * to know them would be inventing them.
+ */
+export interface TaskCardDecision {
+  /** What is being chosen — a call's choice is compared only with earlier
+   *  choices of the same kind. */
+  readonly kind: "repo" | "notion-database";
+  /** The choice itself, so two calls routed alike share one step. */
+  readonly value: string;
+  /** The step's title. */
+  readonly title: string;
 }
 
 /** How many links one card carries. Enough to open the source behind a claim;
@@ -167,6 +189,42 @@ export function readLinkOf(args: Record<string, unknown>): string | null {
 const arg = (...keys: string[]) => (args: Record<string, unknown>): string | null =>
   keys.map((k) => str(args[k])).find(Boolean) ?? null;
 
+/**
+ * The repo a GitHub call goes to: the one it names, or the default when it
+ * names none — `resolveRepoFor`'s rule. A repo off the list is refused by the
+ * tool, and its card says so; the step only names what was asked for.
+ */
+function repoDecision(args: Record<string, unknown>): TaskCardDecision {
+  const repo = str(args.repo);
+  if (!repo) return { kind: "repo", value: "", title: "Chose the default repo" };
+  const name = repo.split("/").pop() || repo;
+  return { kind: "repo", value: repo.toLowerCase(), title: `Chose the ${name} repo` };
+}
+
+/** What each `notion_search` scope searches, as a person would call it. The
+ *  scopes are the tool's enum (`tools/notion-search.ts`); `any` searches the
+ *  whole workspace and so chooses nothing. */
+const NOTION_SCOPE_WORDS: Readonly<Record<string, string>> = {
+  team: "the team roster",
+  apps: "the Third Party Applications database",
+  marketplace: "the Prototype Marketplace",
+  help_tutors: "the tutor Help Center",
+  help_teachers: "the teacher Help Center",
+  decisions: "the Decisions database",
+  running_notes: "the Design Running Notes",
+  news: "the News database",
+  success_stories: "the Success Stories database",
+  research_papers: "the Research Papers database",
+  banners: "the Banners database",
+};
+
+/** The Notion database a scoped search goes to, or null for `any`. */
+function notionScopeDecision(args: Record<string, unknown>): TaskCardDecision | null {
+  const scope = str(args.scope)?.toLowerCase();
+  const words = scope ? NOTION_SCOPE_WORDS[scope] : undefined;
+  return scope && words ? { kind: "notion-database", value: scope, title: `Chose ${words}` } : null;
+}
+
 // ─── the readouts ────────────────────────────────────────────────────────────
 
 const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
@@ -185,6 +243,7 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
     },
     output: countOutput("results", "page"),
     sources: rowLinks("results", ["title", "name"]),
+    decision: notionScopeDecision,
   },
   source_read: {
     details: readLinkOf,
@@ -212,11 +271,13 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
       return path ? `Read ${path}` : null;
     },
     sources: rowLinks("hits", ["path"]),
+    decision: repoDecision,
   },
   github_intake_search: {
     details: arg("keywords"),
     output: countOutput("matches", "open intake", "no open intakes match"),
     sources: rowLinks("matches", ["title"]),
+    decision: repoDecision,
   },
   // A Slack id says nothing to a person reading the card, and spelled as a
   // mention it would ping; a name looked up is what the card shows.

@@ -1,0 +1,32 @@
+{
+  "case": "E1",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the one-voice ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case's regex agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=E1`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Where do the design tokens live?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/tokens"
+              }
+            }
+          ]
+        },
+        {
+          "text": "**The design tokens live in [`design-system/src/tokens`](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens) in the plus-uno repo.**\n\nEach file there holds one family — colour, spacing, typography, radius, elevation — as CSS custom properties, and components read them as `var(--…)` rather than raw values. I read that folder just now, so this is current."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "github_read",
+          "text": "{\"ok\": true, \"entries\": [\"colors.css\", \"spacing.css\", \"typography.css\", \"radius.css\", \"elevation.css\"]}"
+        }
+      ]
+    }
+  ]
+}

@@ -18,11 +18,11 @@ Populated 2026-07-07: 7 rubrics (six skills + bot-answer) rebuilt from the Notio
 <!-- census:uno-bot-cases — generated from docs/evals/fixtures/uno-bot-cases.json by agents/uno-bot/scripts/eval-docs.mjs; do not edit by hand -->
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **56** (B×7 · C×1 · D×1 · DQ×4 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
+| cases | **61** (B×7 · C×1 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
 | blockers | 30 |
-| turns · sample runs | 66 · 166 |
+| turns · sample runs | 71 · 181 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 39 |
+| recorded, so the pull-request gate reaches them | 44 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`. The scenario-by-scenario census is `scenarios/uno-bot.md`.

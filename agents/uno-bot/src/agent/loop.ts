@@ -240,9 +240,9 @@ export interface LoopInput {
   /**
    * The turn's last word on a lookup's result before the model reads it: the
    * text it returns is what goes into the `tool_result`. Called for a lookup
-   * that ran, never for one refused before it could. How Turn keeps the card
-   * table its lookups qualify for, and tells the model it did
-   * (`turn/card-table.ts`). Absent, the model reads the result as the tool
+   * that ran, never for one refused before it could. How Turn's presentation
+   * step records what the turn fetched and answers `present` from it
+   * (`turn/presentation.ts`). Absent, the model reads the result as the tool
    * answered it.
    */
   reviseLookupResult?: (name: string, args: Record<string, unknown>, text: string) => string;

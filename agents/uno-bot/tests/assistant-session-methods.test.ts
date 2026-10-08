@@ -26,9 +26,14 @@ describe("the methods the working signal sends", () => {
     assert.match(src, /slackCall\(env, "agents\.sessions\.rename"/);
   });
 
-  it("sends no bridged status or title call", () => {
-    assert.ok(!src.includes('"assistant.threads.setStatus"'), "setStatus is gone");
+  it("sends no bridged title call, and the bridged status only as the words of a step", () => {
     assert.ok(!src.includes('"assistant.threads.setTitle"'), "setTitle is gone");
+    // The session method takes no words, so the step's words still go by the
+    // bridged one — once, in the function that refuses an empty line, because
+    // the empty line is the bridged clear this file moved off (#574).
+    const sends = src.match(/"assistant\.threads\.setStatus"/g) ?? [];
+    assert.equal(sends.length, 1);
+    assert.match(src, /export async function setStatusLine\([\s\S]*?if \(!thread_ts \|\| !text\.trim\(\)\) return;\s*await slackCall\(env, "assistant\.threads\.setStatus"/);
   });
 
   it("leaves suggested prompts alone — Slack has published no replacement", () => {
