@@ -23,4 +23,5 @@ export * from "./request";
 export * from "./antecedent";
 export * from "./intake-channel";
 export * from "./result-table";
+export * from "./chart";
 export * from "./presentation";

@@ -271,7 +271,7 @@ const isRecord = (v: unknown): v is Record_ => typeof v === "object" && v !== nu
 const isAddress = (v: unknown): v is string => typeof v === "string" && /^https?:\/\//.test(v);
 
 /** A field name as a header: `design_status` → "Design Status". */
-function labelOf(field: string): string {
+export function labelOf(field: string): string {
   return field
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .split(/[_\s]+/)
@@ -305,7 +305,7 @@ function usableFields(rows: Record_[]): string[] {
 }
 
 /** The list of records a result holds under `key`, or its first one. */
-function listOf(result: Record_, key: string | undefined): { key: string; rows: Record_[] } | null {
+export function listOf(result: Record_, key: string | undefined): { key: string; rows: Record_[] } | null {
   const lists = Object.entries(result).filter(
     ([, v]) => Array.isArray(v) && v.length > 0 && v.every(isRecord),
   ) as Array<[string, Record_[]]>;
@@ -314,7 +314,7 @@ function listOf(result: Record_, key: string | undefined): { key: string; rows: 
 }
 
 /** The whole count behind a list, when the result reports one. */
-function wholeCount(result: Record_, key: string): number | undefined {
+export function wholeCount(result: Record_, key: string): number | undefined {
   const singular = key.replace(/s$/, "");
   for (const field of [`${key}Total`, `${singular}Total`, "matched", "total"]) {
     if (typeof result[field] === "number") return result[field];
@@ -334,7 +334,7 @@ function filterOf(args: Record_): string[] {
 }
 
 /** What a list holds, by its key: "findings", or "finding" for one. */
-function nounOf(key: string, n: number): string {
+export function nounOf(key: string, n: number): string {
   const plural = key.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
   return n === 1 ? plural.replace(/s$/, "") : plural;
 }

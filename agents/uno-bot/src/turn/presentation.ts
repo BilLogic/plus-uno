@@ -9,10 +9,11 @@
 // field its rows do not carry, is refused in the call's own result, and the
 // model writes the plain list instead. Nothing the model types becomes a cell.
 //
-// THE PRESENTATION is the data the turn hands Delivery beside the prose. Today
-// it holds the one result table; each new shape is one more field on it, built
-// here from the same recorded lookups and spelled for Slack on the posting
-// side, so a new shape never needs a new argument on the Delivery seam.
+// THE PRESENTATION is the data the turn hands Delivery beside the prose: the
+// one result table, up to 2 charts, and the sentence saying why a chart became
+// a table. Each new shape is one more field on it, built here from the same
+// recorded lookups and spelled for Slack on the posting side, so a new shape
+// never needs a new argument on the Delivery seam.
 //
 // WHAT THE MODEL IS TOLD. A Roadmap lookup that asked for a table gains
 // `table_attached`, and `row_count` and a rewritten `note` when it is true.
@@ -20,10 +21,16 @@
 // refusal. Either way the model writes its prose knowing what the reader will
 // see beneath it — a summary when a table is there, the plain list when not.
 //
-// ONE TABLE PER ANSWER: the last request that produced one wins.
+// ONE TABLE PER ANSWER: the last request that produced one wins. AT MOST 2
+// CHARTS, Slack's cap per message: a third is refused.
+//
+// A CHART THAT CANNOT BE GROUNDED (`turn/chart.ts` says why) degrades to the
+// lookup's rows as a result table, and the reason rides as `degraded`, which
+// the posting side shows as a ⚠️ line and the text copy repeats.
 //
 // PURE: no Env, no Slack shape.
 
+import { chartLine, chartOf, CHART_KINDS, type Chart, type ChartKind } from "./chart";
 import {
   roadmapCards,
   roadmapTable,
@@ -42,7 +49,15 @@ import {
 export interface Presentation {
   /** The result table, when the turn's lookups left one. */
   table?: ResultTable;
+  /** Up to 2 charts, in the order they were asked for. */
+  charts?: Chart[];
+  /** Why a chart the model asked for is the table instead, as one sentence
+   *  for the reader: "Not charted: only 2 groups to compare." */
+  degraded?: string;
 }
+
+/** Charts per message: Slack refuses a third. */
+export const MAX_CHARTS = 2;
 
 /** The tool the model asks for a shape with. */
 export const PRESENT_TOOL = "present";
@@ -119,42 +134,123 @@ function attachedNote(table: ResultTable): string {
 
 const NO_TABLE_NOTE = "No table is attached. If the rows answer the question, list them in your answer yourself.";
 
+/** What `present` answers when a chart is attached: code's values, which are
+ *  the only numbers about it the answer may give. */
+function chartNote(chart: Chart): string {
+  return (
+    `A ${chart.kind} chart titled "${chart.title}" is posted beneath your answer, its values counted by code from the lookup. ` +
+    "Lead with your takeaway in one sentence; any number you give about it must be one of `values` or `total`, " +
+    "and do not list the values out, since the chart and its text copy show them."
+  );
+}
+
+/** The fields a fallback table shows when the model named none: the row's
+ *  name, the field it grouped by, and the field it summed. */
+function fallbackColumns(result: Record<string, unknown>, groupBy: string, measure: string | undefined): string[] {
+  const rows = Object.values(result).find((v): v is Record<string, unknown>[] => Array.isArray(v)) ?? [];
+  const name = ["title", "name"].find((f) => rows.some((r) => typeof r?.[f] === "string"));
+  return [...new Set([name, groupBy, measure].filter((f): f is string => !!f))];
+}
+
 /** A fresh presenter, for one turn. */
 export function presenter(): Presenter {
   const lookups = new Map<string, Recorded>();
   let table: ResultTable | undefined;
+  const charts: Chart[] = [];
+  let degraded: string | undefined;
 
   const answer = (body: Record<string, unknown>): string => JSON.stringify(body);
   const refuse = (error: string): string => answer({ ok: false, table_attached: false, error, note: NO_TABLE_NOTE });
 
+  /** A result table of one recorded lookup, or the refusal worded for the
+   *  model. */
+  const tableFrom = (lookup: string, recorded: Recorded, args: Record<string, unknown>, columns: string[]): ResultTable | string => {
+    if (lookup === "roadmap_query") {
+      const cards = roadmapCards(recorded.result as RoadmapResult);
+      return cards ? roadmapTable(cards) : "That Roadmap lookup has fewer than two definite cards; name them in prose.";
+    }
+    if (columns.length > MAX_COLUMNS) return `At most ${MAX_COLUMNS} columns; you named ${columns.length}.`;
+    const reading = tableOf(lookup, recorded.args, recorded.result, {
+      ...(typeof args.list === "string" && args.list ? { list: args.list } : {}),
+      columns,
+      ...(typeof args.takeaway === "string" ? { takeaway: args.takeaway } : {}),
+    });
+    return "refusal" in reading ? reading.refusal : reading.table;
+  };
+
+  const columnsOf = (args: Record<string, unknown>): string[] =>
+    Array.isArray(args.columns) ? args.columns.filter((c): c is string => typeof c === "string") : [];
+
+  const refuseChart = (error: string): string =>
+    answer({ ok: false, chart_attached: false, table_attached: false, error, note: NO_TABLE_NOTE });
+
+  /** A `present` call asking for a chart: drawn from the recorded lookup, or
+   *  degraded to the rows it would have counted, as a table with the reason
+   *  beside it. */
+  const presentChart = (lookup: string, recorded: Recorded, args: Record<string, unknown>): string => {
+    if (charts.length >= MAX_CHARTS) return refuseChart(`At most ${MAX_CHARTS} charts per answer, and ${MAX_CHARTS} are already attached.`);
+    const kind = String(args.chart ?? "bar") as ChartKind;
+    if (!CHART_KINDS.includes(kind)) return refuseChart(`'${kind}' is not a chart; ask for one of ${CHART_KINDS.join(", ")}.`);
+    const groupBy = typeof args.group_by === "string" ? args.group_by.trim() : "";
+    if (!groupBy) return refuseChart("Name the field to group the rows by in group_by.");
+    const measured = typeof args.measure === "string" ? args.measure.trim() : "";
+    const measure = measured && measured !== "count" ? measured : undefined;
+    const reading = chartOf(lookup, recorded.result, {
+      kind,
+      groupBy,
+      ...(measure ? { measure } : {}),
+      ...(typeof args.list === "string" && args.list ? { list: args.list } : {}),
+      ...(typeof args.takeaway === "string" ? { takeaway: args.takeaway } : {}),
+    });
+    if ("chart" in reading) {
+      const chart = reading.chart;
+      charts.push(chart);
+      return answer({
+        ok: true,
+        chart_attached: true,
+        title: chart.title,
+        values: Object.fromEntries(chart.points.map((p) => [p.label, p.value])),
+        total: chart.total,
+        note: chartNote(chart),
+      });
+    }
+    const named = columnsOf(args);
+    const fallback = tableFrom(lookup, recorded, args, named.length ? named : fallbackColumns(recorded.result, groupBy, measure));
+    if (typeof fallback === "string") return refuseChart(`No chart: ${reading.refusal}`);
+    table = fallback;
+    degraded = `Not charted: ${reading.refusal}`;
+    return answer({
+      ok: false,
+      chart_attached: false,
+      table_attached: true,
+      error: `No chart: ${reading.refusal}`,
+      row_count: fallback.rows.length,
+      caption: fallback.caption,
+      note: `${attachedNote(fallback)} A line beneath it tells the reader why there is no chart, so do not repeat it.`,
+    });
+  };
+
   /** The model's `present` call, answered from the recorded lookups. */
   const present = (args: Record<string, unknown>): string => {
     const shape = args.shape ?? "table";
-    if (shape !== "table") return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table.`);
+    if (shape !== "table" && shape !== "chart") {
+      return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table or a chart.`);
+    }
     const lookup = typeof args.lookup === "string" ? args.lookup.trim() : "";
     const recorded = lookups.get(lookup);
     if (!recorded) {
       const made = [...lookups.keys()];
-      return refuse(
-        `No ${lookup || "named"} lookup ran this turn, so there are no rows to table.` +
-          (made.length ? ` Lookups that did: ${made.join(", ")}.` : ""),
-      );
+      const error =
+        `No ${lookup || "named"} lookup ran this turn, so there are no rows to ${shape === "chart" ? "chart" : "table"}.` +
+        (made.length ? ` Lookups that did: ${made.join(", ")}.` : "");
+      return shape === "chart" ? refuseChart(error) : refuse(error);
     }
-    if (lookup === "roadmap_query") {
-      const cards = roadmapCards(recorded.result as RoadmapResult);
-      if (!cards) return refuse("That Roadmap lookup has fewer than two definite cards; name them in prose.");
-      table = roadmapTable(cards);
-    } else {
-      const columns = Array.isArray(args.columns) ? args.columns.filter((c): c is string => typeof c === "string") : [];
-      if (columns.length > MAX_COLUMNS) return refuse(`At most ${MAX_COLUMNS} columns; you named ${columns.length}.`);
-      const reading = tableOf(lookup, recorded.args, recorded.result, {
-        ...(typeof args.list === "string" && args.list ? { list: args.list } : {}),
-        columns,
-        ...(typeof args.takeaway === "string" ? { takeaway: args.takeaway } : {}),
-      });
-      if ("refusal" in reading) return refuse(reading.refusal);
-      table = reading.table;
-    }
+    if (shape === "chart") return presentChart(lookup, recorded, args);
+    const made = tableFrom(lookup, recorded, args, columnsOf(args));
+    if (typeof made === "string") return refuse(made);
+    // A table asked for in its own right replaces a fallback, and its reason.
+    table = made;
+    degraded = undefined;
     return answer({
       ok: true,
       table_attached: true,
@@ -173,7 +269,10 @@ export function presenter(): Presenter {
       // The Roadmap preset's own door: the lookup asked for its table itself.
       if (name !== "roadmap_query") return text;
       const cards = args.as_table === true ? roadmapCards(parsed as RoadmapResult) : undefined;
-      if (cards) table = roadmapTable(cards);
+      if (cards) {
+        table = roadmapTable(cards);
+        degraded = undefined;
+      }
       return JSON.stringify({
         ...parsed,
         table_attached: cards !== undefined,
@@ -181,7 +280,12 @@ export function presenter(): Presenter {
       });
     },
     presentation() {
-      return table ? { table } : undefined;
+      if (!table && charts.length === 0) return undefined;
+      return {
+        ...(table ? { table } : {}),
+        ...(charts.length ? { charts: [...charts] } : {}),
+        ...(table && degraded ? { degraded } : {}),
+      };
     },
   };
 }
@@ -197,21 +301,35 @@ export function presenter(): Presenter {
  */
 export function presentedProse(prose: string, presentation: Presentation | undefined): RowsRemoved {
   const table = presentation?.table;
-  if (!table) return { text: prose, removed: 0 };
+  if (!table) {
+    const takeaway = presentation?.charts?.find((c) => c.takeaway)?.takeaway;
+    return { text: !prose.trim() && takeaway ? takeaway : prose, removed: 0 };
+  }
   const stripped = withoutRepeatedRows(prose, table);
   if (!stripped.text.trim() && table.takeaway) return { text: table.takeaway, removed: stripped.removed };
   return stripped;
 }
 
 /**
- * The message's text copy: the prose, then a table's plain list. What a
- * notification shows, a screen reader reads and the thread remembers.
+ * The message's text copy: the prose, then each chart's top values, a table's
+ * plain list and the ⚠️ line, in the order they post. What a notification
+ * shows, a screen reader reads and the thread remembers.
  *
  * @param prose - The answer as it posts
  * @param presentation - What rides beneath it
  */
 export function textCopy(prose: string, presentation: Presentation | undefined): string {
-  return presentation?.table ? withResultList(prose, presentation.table) : prose;
+  if (!presentation) return prose;
+  const charts = (presentation.charts ?? []).map(chartLine);
+  let copy = charts.length ? [prose, "", ...charts].join("\n") : prose;
+  if (presentation.table) copy = withResultList(copy, presentation.table);
+  return presentation.degraded ? [copy, "", warningLine(presentation.degraded)].join("\n") : copy;
+}
+
+/** The ⚠️ line a degraded chart leaves, as it posts and as the text copy
+ *  carries it. */
+export function warningLine(sentence: string): string {
+  return `⚠️ ${sentence}`;
 }
 
 /**
@@ -221,5 +339,9 @@ export function textCopy(prose: string, presentation: Presentation | undefined):
  * @param presentation - What rides beneath the draft
  */
 export function judgedList(presentation: Presentation | undefined): string | undefined {
-  return presentation?.table ? resultList(presentation.table) : undefined;
+  const lines = [
+    ...(presentation?.charts ?? []).map(chartLine),
+    ...(presentation?.table ? [resultList(presentation.table)] : []),
+  ];
+  return lines.length ? lines.join("\n") : undefined;
 }

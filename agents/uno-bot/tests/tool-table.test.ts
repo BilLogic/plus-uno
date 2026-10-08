@@ -162,7 +162,8 @@ describe("the readers answer from the row", () => {
     // on it, and it is no step on the checklist.
     const offered = schemasFromDisk().find((s) => s.name === "present");
     assert.ok(offered, "the model is offered present");
-    assert.deepEqual(offered.input_schema.required, ["shape", "lookup", "columns", "takeaway"]);
+    assert.deepEqual(offered.input_schema.required, ["shape", "lookup", "takeaway"]);
+    assert.deepEqual((offered.input_schema.properties.shape as { enum?: string[] }).enum, ["table", "chart"]);
     assert.equal(rowFor("present")?.access, "ungated");
     assert.equal(rowFor("present")?.retrieval, false);
     assert.equal(taskCardFor("present"), null);

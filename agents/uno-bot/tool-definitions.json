@@ -287,23 +287,41 @@
   },
   {
     "name": "present",
-    "description": "Ungated, fetches nothing. Show rows a lookup already returned THIS turn as a sortable table beneath your answer: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. The result says `table_attached`: when true, lead with the takeaway and what stands out, name at most 3 rows, and leave the rest to the table; when false, its `error` says why, and you list the rows in your answer yourself.",
+    "description": "Ungated, fetches nothing. Show rows a lookup already returned THIS turn as a sortable table beneath your answer: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. The result says `table_attached`: when true, lead with the takeaway and what stands out, name at most 3 rows, and leave the rest to the table; when false, its `error` says why, and you list the rows in your answer yourself. CHARTS: when the rows hold numbers that compare (cards per Design Status, issues per owner) or trend (sessions per week), ask for shape 'chart' instead, with group_by and, to sum a numeric field rather than count rows, measure. Code counts or sums each group from the lookup's rows; you never type a value. At least 3 groups, at most 2 charts per answer. The result says `chart_attached` and hands back `values` and `total`: lead with the takeaway, and any number you give is one of those. A chart that cannot be grounded (a partial list, too few groups, a field the rows lack) comes back `chart_attached: false` with the rows attached as a table and a line beneath it saying why.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "shape",
         "lookup",
-        "columns",
         "takeaway"
       ],
       "properties": {
         "shape": {
           "type": "string",
           "enum": [
-            "table"
+            "table",
+            "chart"
           ],
-          "description": "The shape to show: 'table'."
+          "description": "'table' to show the rows; 'chart' to show their counts or sums per group."
+        },
+        "chart": {
+          "type": "string",
+          "enum": [
+            "bar",
+            "line",
+            "area",
+            "pie"
+          ],
+          "description": "For shape 'chart': 'bar' to compare groups, 'line' or 'area' for a trend over ordered groups such as weeks, 'pie' for parts of a whole. Default 'bar'."
+        },
+        "group_by": {
+          "type": "string",
+          "description": "For shape 'chart': the field to group the rows by, exactly as the rows carry it (e.g. 'design_status')."
+        },
+        "measure": {
+          "type": "string",
+          "description": "For shape 'chart': a numeric field to sum per group. Omit to count the rows in each group."
         },
         "lookup": {
           "type": "string",
@@ -318,7 +336,7 @@
           "items": {
             "type": "string"
           },
-          "description": "1 to 4 field names exactly as the rows carry them, the identifying field first (e.g. ['title', 'scenario', 'lane'])."
+          "description": "1 to 4 field names exactly as the rows carry them, the identifying field first (e.g. ['title', 'scenario', 'lane']). Required for a table; for a chart, the columns its fallback table shows."
         },
         "takeaway": {
           "type": "string",
