@@ -28,8 +28,14 @@
 // lookup's rows as a result table, and the reason rides as `degraded`, which
 // the posting side shows as a ⚠️ line and the text copy repeats.
 //
+// THE SOURCES are every link the turn's lookups read, as their task cards
+// carry them: each once, in the order read. Which of them a thread may see,
+// and whether there are enough to fold into a box, is the posting side's call
+// (`slack/card-sources.ts`, `slack/sources-box.ts`).
+//
 // PURE: no Env, no Slack shape.
 
+import type { TaskCardSource } from "../agent/task-card-readout";
 import { chartLine, chartOf, CHART_KINDS, type Chart, type ChartKind } from "./chart";
 import {
   roadmapCards,
@@ -54,6 +60,8 @@ export interface Presentation {
   /** Why a chart the model asked for is the table instead, as one sentence
    *  for the reader: "Not charted: only 2 groups to compare." */
   degraded?: string;
+  /** The links the turn's lookups read, each once, in the order read. */
+  sources?: readonly TaskCardSource[];
 }
 
 /** Charts per message: Slack refuses a third. */
@@ -69,6 +77,8 @@ export interface Presenter {
    * the text the model reads — rewritten when it carries a table's news.
    */
   revise(name: string, args: Record<string, unknown>, text: string): string;
+  /** The links a finished lookup read, as its task card carries them. */
+  sourcesRead(sources: readonly TaskCardSource[]): void;
   /** What the turn's lookups left to post beneath the answer, if anything. */
   presentation(): Presentation | undefined;
 }
@@ -158,6 +168,7 @@ export function presenter(): Presenter {
   let table: ResultTable | undefined;
   const charts: Chart[] = [];
   let degraded: string | undefined;
+  const sources = new Map<string, TaskCardSource>();
 
   const answer = (body: Record<string, unknown>): string => JSON.stringify(body);
   const refuse = (error: string): string => answer({ ok: false, table_attached: false, error, note: NO_TABLE_NOTE });
@@ -279,12 +290,16 @@ export function presenter(): Presenter {
         ...(cards ? { row_count: cards.rows.length, note: cardTableNote(cards) } : {}),
       });
     },
+    sourcesRead(read) {
+      for (const source of read) if (!sources.has(source.url)) sources.set(source.url, source);
+    },
     presentation() {
-      if (!table && charts.length === 0) return undefined;
+      if (!table && charts.length === 0 && !sources.size) return undefined;
       return {
         ...(table ? { table } : {}),
         ...(charts.length ? { charts: [...charts] } : {}),
         ...(table && degraded ? { degraded } : {}),
+        ...(sources.size ? { sources: [...sources.values()] } : {}),
       };
     },
   };
@@ -333,8 +348,8 @@ export function warningLine(sentence: string): string {
 }
 
 /**
- * What the draft judge is shown of the presentation: the table's plain list,
- * or undefined when there is no table.
+ * What the draft judge is shown of the presentation: each chart's values and
+ * the table's plain list, or undefined when there is neither.
  *
  * @param presentation - What rides beneath the draft
  */

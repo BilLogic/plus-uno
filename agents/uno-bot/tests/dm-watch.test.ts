@@ -360,7 +360,7 @@ describe("the morning reminder", () => {
     assert.equal((await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU))).summary, "nothing due");
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, FRI));
     assert.equal(w.posts.length, 1);
-    assert.match(w.posts[0]!.text, new RegExp(`^Hi <@${MAYA}>, on Tue you mentioned you'd review the PRD`));
+    assert.match(w.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd review the PRD\\*\\n<@${MAYA}> `));
     // Re-armed to the end of Tue Oct 6: the follow-up goes on Wed.
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13)));
     assert.equal(w.posts.length, 1);

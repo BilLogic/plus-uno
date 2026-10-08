@@ -94,7 +94,7 @@ test("a Roadmap status count posts as a bar chart whose values are the lookup's 
   assert.equal(told[0]!.total, 6);
 
   const { blocks, text } = await posted(answer.text, presentation);
-  assert.deepEqual(blocks.map((b) => b.type), ["markdown", "data_visualization", "context"]);
+  assert.deepEqual(blocks.map((b) => b.type), ["markdown", "data_visualization", "container", "context"], "the chart, then the Sources box and the footer");
   assert.deepEqual(blocks[1], {
     type: "data_visualization",
     title: "Cards by Design Status",
@@ -165,7 +165,7 @@ test("fewer than 3 points falls back to the result table, with a ⚠️ line in 
   assert.match(String(told[0]!.error), /only 2 groups/);
 
   const { blocks, text } = await posted(answer.text, presentation);
-  assert.deepEqual(blocks.map((b) => b.type), ["markdown", "data_table", "context", "context"]);
+  assert.deepEqual(blocks.map((b) => b.type), ["markdown", "data_table", "context", "container", "context"], "the table, its ⚠️ line, the Sources box, the footer");
   assert.match(contextText(blocks[2]!), /^⚠️ Not charted: only 2 groups/);
   assert.match(text, /⚠️ Not charted: only 2 groups/, "the sentence is in the message text");
 });
@@ -185,10 +185,11 @@ test("values that cannot be grounded fall back too: a partial list, or a measure
   assert.match(String(missing.told[0]!.error), /pillar/);
 });
 
-test("a chart request naming a lookup the turn never made is refused, and nothing posts beneath the prose", async () => {
+test("a chart request naming a lookup the turn never made is refused, and no chart or table posts", async () => {
   const { presentation, told } = await turn([chartOf({ lookup: "search_blueprint" })]);
 
-  assert.equal(presentation, undefined);
+  assert.equal(presentation?.charts, undefined);
+  assert.equal(presentation?.table, undefined);
   assert.equal(told[0]!.chart_attached, false);
   assert.match(String(told[0]!.error), /No search_blueprint lookup ran this turn/);
 });

@@ -25,11 +25,25 @@ import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
-import { conversationsOpen, deleteMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
+import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID, proposalCardBlocks } from "./proposal-render";
-import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "./review-door";
-import { REVIEW_APPROVE_ACTION_ID, reviewedCardOf } from "./review-view";
+import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps, type ReviewViewState } from "./review-door";
+import {
+  REVIEW_APPROVE_ACTION_ID,
+  REVIEW_CALLBACK_ID,
+  REVIEW_CHANGES_ACTION_ID,
+  REVIEW_REJECT_ACTION_ID,
+  reviewNoteOf,
+  reviewedCardOf,
+} from "./review-view";
+import type { OptionSource } from "./review-fields";
+import { databaseOptions } from "../integrations/notion";
+import type { ReviewDecision } from "../gate/index";
+import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
+import { conversationKey, enqueueAgentJob } from "./events";
+import { escapeSlackText } from "./mrkdwn";
+import type { SlackMessageEvent } from "./types";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
@@ -39,6 +53,9 @@ import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
 import { handleReminderButton } from "./gate";
 import { REMINDER_ACTION_PREFIX } from "../commitments/copy";
+import { FEEDBACK_ACTION_ID, FEEDBACK_VIEW_CALLBACK_ID, feedbackAckFor, type FeedbackViewState } from "./feedback";
+import { runFeedbackReason, runFeedbackTap, type FeedbackDoorDeps } from "./feedback-door";
+import { answerFeedbackLogFor } from "../usage/feedback-env";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -46,13 +63,17 @@ interface InteractionPayload {
   response_url?: string;
   user?: { id?: string };
   channel?: { id?: string };
-  message?: { ts?: string; thread_ts?: string };
+  message?: { ts?: string; thread_ts?: string; text?: string };
   actions?: Array<{ action_id?: string; value?: string; selected_options?: { value?: string }[] }>;
   callback_id?: string;
   /** A click's one-use, three-second key to `views.open`. */
   trigger_id?: string;
-  /** Set when the click was inside a modal rather than on a message. */
-  view?: { id?: string; private_metadata?: string };
+  /** Set when the click was inside a modal rather than on a message, and on a
+   *  modal's submit. `state.values` holds its inputs as the person left them. */
+  view?: { id?: string; private_metadata?: string; callback_id?: string; state?: { values?: ReviewViewState } } & Record<
+    string,
+    unknown
+  >;
 }
 
 export function parseInteraction(rawBody: string): InteractionPayload | null {
@@ -105,6 +126,29 @@ export function handleInteraction(
       }));
       return new Response("", { status: 200 });
     }
+    // A modal sent: the Review pop-up's Check edits, or the feedback pop-up.
+    // Each is answered in the ack itself, inside Slack's three seconds, and
+    // anything slower runs after it.
+    case "view_submission": {
+      const callbackId = payload.view?.callback_id;
+      if (callbackId === FEEDBACK_VIEW_CALLBACK_ID && payload.user?.id) {
+        const view = payload.view as FeedbackViewState;
+        const userId = payload.user.id;
+        const ack = feedbackAckFor(view);
+        ctx.waitUntil(runFeedbackReason({ userId, view }, feedbackDoorDeps(env)).catch((err) => {
+          console.error(`[interactive] feedback reason failed: ${err instanceof Error ? err.message : String(err)}`);
+        }));
+        return ack ? Response.json(ack) : new Response("", { status: 200 });
+      }
+      // The Review pop-up's Check edits: `response_action: "update"` is the
+      // only way a submit keeps its modal open, redrawn with the edits kept
+      // and one alert about them. Nothing is read.
+      if (!payload.view || callbackId !== REVIEW_CALLBACK_ID) {
+        console.log(`[interactive] unhandled view_submission ${callbackId ?? "(none)"}`);
+        return new Response("", { status: 200 });
+      }
+      return Response.json({ response_action: "update", view: checkedEditsView(payload.view) });
+    }
     default:
       console.log(`[interactive] unhandled type: ${payload.type}`);
       return new Response("", { status: 200 });
@@ -121,7 +165,10 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId === REVIEW_APPROVE_ACTION_ID) return decideInReview(env, payload, "confirm");
+  if (actionId === REVIEW_CHANGES_ACTION_ID) return decideInReview(env, payload, "revise");
+  if (actionId === REVIEW_REJECT_ACTION_ID) return decideInReview(env, payload, "cancel");
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
+  if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
   // No silent catch-all. This used to fall through to the feedback handler,
   // which meant an action_id nobody had wired reached a function that ignored
@@ -200,18 +247,73 @@ async function openReview(env: Env, payload: InteractionPayload): Promise<void> 
   const messageTs = payload.message?.ts;
   const userId = payload.user?.id;
   if (!triggerId || !channel || !messageTs || !userId) return;
-  await runReviewOpen({ triggerId, channel, messageTs, userId }, reviewDoorDeps(env));
+  const cardText = payload.message?.text;
+  await runReviewOpen({ triggerId, channel, messageTs, userId, ...(cardText ? { cardText } : {}) }, reviewDoorDeps(env));
 }
 
-async function decideInReview(env: Env, payload: InteractionPayload, decision: "confirm" | "cancel"): Promise<void> {
+async function decideInReview(env: Env, payload: InteractionPayload, decision: ReviewDecision): Promise<void> {
   const viewId = payload.view?.id;
   const card = reviewedCardOf(payload.view?.private_metadata);
   const userId = payload.user?.id;
   if (!viewId || !card || !userId) return;
+  const state = payload.view?.state?.values;
+  const note = reviewNoteOf(payload.view?.state);
   await runReviewDecision(
-    { viewId, channel: card.channel, messageTs: card.ts, userId, decision },
+    {
+      viewId,
+      channel: card.channel,
+      messageTs: card.ts,
+      userId,
+      decision,
+      ...(note ? { note } : {}),
+      ...(state ? { state } : {}),
+    },
     reviewDoorDeps(env),
   );
+}
+
+/**
+ * Needs changes, handed to uno-bot: the note goes into the card's thread as a
+ * line naming who asked, and a turn is queued on that line as the confirmer's
+ * own reply — the same synthetic message the shortcuts and slash commands
+ * build, so history, the pending card it revises, the supersession and the
+ * visible-failure backstops all run unchanged. The card is still pending, so
+ * the turn sees it and its revision replaces it.
+ */
+async function reviseFromReview(
+  env: Env,
+  request: { proposal: PendingProposal; note: string; userId: string },
+): Promise<void> {
+  const { proposal, note, userId } = request;
+  const thread = proposalReplyThread(proposal);
+  const posted = await postMessage(env, {
+    channel: proposal.channel,
+    thread_ts: thread,
+    text: `:pencil2: <@${userId}> asked for changes: ${escapeSlackText(note)}`,
+  });
+  if (!posted?.ts) {
+    console.error(`[interactive] needs-changes note did not post on ${proposal.channel}/${proposal.proposalTs}`);
+    await postMessage(env, {
+      channel: proposal.channel,
+      thread_ts: thread,
+      text: ":warning: I couldn't start the revision. Reply here with what to change and I'll revise the draft.",
+    }).catch(() => {});
+    return;
+  }
+  const event: SlackMessageEvent = {
+    type: "message",
+    channel: proposal.channel,
+    user: userId,
+    text: `Needs changes on the proposal card above: ${note}`,
+    ts: posted.ts,
+    thread_ts: thread,
+  };
+  await enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event));
+}
+
+/** Where a pop-up select's options live, as the Worker's bindings name them. */
+function optionDatabase(env: Env, source: OptionSource): string | undefined {
+  return source.database === "roadmap" ? env.NOTION_ROADMAP_DB_ID : env.NOTION_DECISIONS_DB_ID;
 }
 
 /** `Env`, once, as the dependencies the review door reads. */
@@ -233,6 +335,11 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);
     },
     restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
+    revise: (request) => reviseFromReview(env, request),
+    fieldOptions: async (source) => {
+      const database = optionDatabase(env, source);
+      return database ? databaseOptions(env, database, source.property) : null;
+    },
   };
 }
 
@@ -313,30 +420,48 @@ async function deleteAnswer(env: Env, payload: InteractionPayload): Promise<void
   console.log(`[interactive] delete ${channel}/${ts} ok=${res.ok} by=${payload.user?.id ?? "?"}`);
 }
 
-// The 👍/👎 answer footer was removed on 2026-08-21 (Bill).
+// The feedback buttons under an answer, and the pop-up a "bad answer" opens.
 //
-// It asked for something the system could not accept. Slack's data policy
-// forbids retaining retrieved workspace content, so the vote could only ever
-// be logged, never stored — one unstructured console line per press, rolling
-// away unread. Nothing counted it, nothing could query it. A 👎 was a person
-// telling us something into a void, under every substantive answer.
+// The Slack envelope for the feedback door (`feedback-door.ts`): a press
+// carries the answer in `message` and the pressed button's value in the
+// action, and `Env` becomes the door's named dependencies.
 //
-// The acknowledgement also claimed to replace the buttons "so a second vote is
-// not invited" while sending `replace_original: false`, so it never did: one
-// person could vote as many times as they liked. Any future aggregation would
-// have been meaningless before it started.
+// A pair of these buttons was retired on 2026-08-21 because a vote could only
+// be logged, never kept, and one person could vote as often as they liked.
+// Both are answered now: a press is a row on the usage record, one per person
+// per answer with the last word winning (`usage/feedback.ts`), and it carries
+// the turn the answer belongs to, so a "bad answer" is counted against the
+// kind of question that drew it. A note, which is text, is posted in the
+// thread rather than stored.
 //
-// And it cost more than nothing. 👍 was a confirm REACTION on staged proposals
-// until the same day, so the product spent months putting a thumbs-up under
-// every answer while one flavour of thumbs-up meant "yes, write to Notion".
-// Buttons and reactions are different Slack mechanisms and this button never
-// fired a write — but a person told to "give the thumbs up" reaches for
-// whichever is closer.
-//
-// What remains in the footer is the part that was doing the work: the honesty
-// line ("LLM-written · check before acting"). It is prose and needs no handler.
-//
-// If a feedback signal is wanted later, the honest shape is a WRITTEN one — a
-// reply in the thread, which is where the analysable signal already lives, and
-// which is what the retired 👎 acknowledgement asked for and then had nowhere
-// to put.
+// `Env` enters here and stops here.
+async function feedbackFromButton(env: Env, payload: InteractionPayload): Promise<void> {
+  const channel = payload.channel?.id;
+  const answerTs = payload.message?.ts;
+  const userId = payload.user?.id;
+  if (!channel || !answerTs || !userId) return;
+  await runFeedbackTap(
+    {
+      channel,
+      answerTs,
+      threadTs: payload.message?.thread_ts ?? answerTs,
+      userId,
+      value: payload.actions?.[0]?.value,
+      ...(payload.trigger_id ? { triggerId: payload.trigger_id } : {}),
+    },
+    feedbackDoorDeps(env),
+  );
+}
+
+/** `Env`, once, as the dependencies the feedback door reads. */
+function feedbackDoorDeps(env: Env): FeedbackDoorDeps {
+  return {
+    log: answerFeedbackLogFor(env),
+    openView: (triggerId, view) => viewsOpen(env, triggerId, view),
+    postNote: async (channel, threadTs, text) => {
+      const res = await postMessage(env, { channel, thread_ts: threadTs, text });
+      if (!res.ok) throw new Error(res.error ?? "postMessage refused");
+    },
+    now: () => Date.now(),
+  };
+}

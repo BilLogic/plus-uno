@@ -276,8 +276,16 @@ export type GateNote =
   /** The claim was won and the signal brought no words of its own.
    *  `stillRuns` names what a won ⛔ runs anyway, on a card that said a
    *  cancel would (`PendingProposal.onCancel`). `cancelled` is a stated
-   *  card's own phrase for what its ⛔ did (`PendingProposal.stated`). */
-  | { kind: "resolved"; decision: "confirm" | "cancel"; stillRuns?: string[]; cancelled?: string }
+   *  card's own phrase for what its ⛔ did (`PendingProposal.stated`).
+   *  `rejected` marks a ⛔ made as the Review pop-up's Reject, with the reason
+   *  the person gave, if any — the person's words, so escaped where shown. */
+  | {
+      kind: "resolved";
+      decision: "confirm" | "cancel";
+      stillRuns?: string[];
+      cancelled?: string;
+      rejected?: { reason?: string };
+    }
   /** The claim was won and the model said what it was doing. Prose, so it
    *  passes through — the same exemption `ProposalCard.lead` gets. */
   | { kind: "said"; text: string }

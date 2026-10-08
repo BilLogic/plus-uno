@@ -53,7 +53,9 @@ logged and dropped). A deploy with no pending migration needs no step.
   `agents/uno-bot/src/usage/category-store.ts`, the resolution columns written
   after the turn in `agents/uno-bot/src/usage/resolution-d1.ts`, and a ticket
   filed from a card's reaction or button onto its staging turn by
-  `proposal-events-d1.ts`. The sweep's tables are mapped in
+  `proposal-events-d1.ts`. `answer_feedback` (`0012_answer_feedback.sql`), one
+row per person per answer from the feedback buttons, is mapped in
+`agents/uno-bot/src/usage/feedback-d1.ts`. The sweep's tables are mapped in
   `agents/uno-bot/src/sweep/d1.ts`, `commitments` in
   `agents/uno-bot/src/commitments/d1.ts`, and DM watch's three in
   `agents/uno-bot/src/dm-watch/d1.ts`.

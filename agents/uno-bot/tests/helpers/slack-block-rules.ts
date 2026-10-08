@@ -10,8 +10,9 @@
 
 /** The block types the Worker sends: answers (`section`, `markdown`, the
  *  footer's `context`, the result table's `data_table`, a chart's
- *  `data_visualization`), the checklist (`plan`),
- *  proposal cards (`actions`, `image`) and the rest of its layouts. Slack knows
+ *  `data_visualization`), the checklist (`plan`), proposal cards (`actions`,
+ *  `image`), the Sources box (`container`) and the rest of its layouts. Slack
+ *  knows
  *  many more — `carousel`, `card` — but one the Worker never sends is a typo or
  *  a new shape nobody proved, and either should fail a test before it reaches
  *  Slack. An unknown `type` was refused by blocks.validate on 2026-10-07
@@ -27,7 +28,41 @@ const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "image",
   "divider",
   "header",
+  "container",
+  "context_actions",
 ]);
+
+/** What a `container` holds, per its block reference (read 2026-10-08): 1 to
+ *  10 child blocks, of these types only. Live on 2026-10-07 Slack refused an
+ *  `alert` inside one ("unsupported type: alert"), and the reference lists no
+ *  `markdown` or `data_visualization`. Its title is plain_text, 150 at most. */
+const CONTAINER_CHILD_TYPES: ReadonlySet<string> = new Set([
+  "actions", "context", "divider", "file", "header", "image", "input", "rich_text", "section", "table", "video",
+]);
+const CONTAINER_CHILDREN = { min: 1, max: 10 };
+const CONTAINER_TITLE_CHARS = 150;
+
+/** Why Slack would refuse a `container`, or null. */
+function containerRefusal(block: Shape): string | null {
+  const title = block.title;
+  if (!isShape(title) || title.type !== "plain_text" || !nonEmpty(title.text)) return "a container without a plain_text title";
+  if (String(title.text).length > CONTAINER_TITLE_CHARS) return `a container title of ${String(title.text).length} chars`;
+  const children = Array.isArray(block.child_blocks) ? block.child_blocks : [];
+  if (children.length < CONTAINER_CHILDREN.min || children.length > CONTAINER_CHILDREN.max) {
+    return `a container of ${children.length} child blocks`;
+  }
+  for (const child of children) {
+    const type = isShape(child) ? String(child.type) : "non-object";
+    if (!CONTAINER_CHILD_TYPES.has(type)) return `a ${type} block inside a container`;
+    if (type !== "rich_text" && type !== "input" && type !== "table" && type !== "file" && type !== "video") {
+      const why = blockRefusal(child);
+      if (why) return `${why} inside a container`;
+    } else if (type === "rich_text" && !Array.isArray((child as Shape).elements)) {
+      return "a rich_text without elements inside a container";
+    }
+  }
+  return null;
+}
 
 /** A `data_table`'s rows, header included, and its columns, per Slack's block
  *  reference (read 2026-10-07): 1 to 200 data rows under the header, 1 to 20
@@ -230,12 +265,26 @@ function blockRefusal(block: unknown): string | null {
     const n = Array.isArray(block.elements) ? block.elements.length : 0;
     if (n < CONTEXT_ELEMENTS.min || n > CONTEXT_ELEMENTS.max) return `a context of ${n} elements`;
   }
+  if (type === "context_actions") {
+    // The block reference (read 2026-10-08): 1 to 5 elements, each a
+    // `feedback_buttons` or an `icon_button`. Posted live with one
+    // `feedback_buttons` in Bill's DM on 2026-10-08.
+    const elements = Array.isArray(block.elements) ? block.elements : [];
+    if (elements.length < 1 || elements.length > 5) return `a context_actions of ${elements.length} elements`;
+    if (!elements.every((e) => isShape(e) && (e.type === "feedback_buttons" || e.type === "icon_button"))) {
+      return "a context_actions element that is not feedback_buttons or icon_button";
+    }
+  }
   if (type === "data_table") {
     const why = dataTableRefusal(block);
     if (why) return why;
   }
   if (type === "data_visualization") {
     const why = dataVisualizationRefusal(block);
+    if (why) return why;
+  }
+  if (type === "container") {
+    const why = containerRefusal(block);
     if (why) return why;
   }
   if (type === "plan") {
@@ -304,8 +353,71 @@ export function viewRefusal(view: unknown): string | null {
   const blocks = Array.isArray(view.blocks) ? view.blocks : [];
   if (blocks.length > MAX_VIEW_BLOCKS) return `${blocks.length} blocks in one view`;
   for (const block of blocks) {
-    const why = blockRefusal(block);
+    const why = isShape(block) && VIEW_ONLY_BLOCKS.has(String(block.type)) ? viewOnlyRefusal(block) : blockRefusal(block);
     if (why) return why;
   }
+  // The view reference: "submit is required when an input block is within the
+  // blocks array".
+  if (blocks.some((b) => isShape(b) && b.type === "input") && view.submit === undefined) {
+    return "an input block in a view with no submit";
+  }
   return null;
+}
+
+/** Blocks a view takes and a message does not: the pop-up's fields, and the
+ *  alert, which Slack refuses in a message (live 2026-10-08, "Block type is
+ *  not supported in this container"). */
+const VIEW_ONLY_BLOCKS: ReadonlySet<string> = new Set(["input", "alert"]);
+
+/** An alert's text, per the alert block reference (read 2026-10-08). */
+const ALERT_TEXT_CHARS = 200;
+const ALERT_LEVELS: ReadonlySet<string> = new Set(["default", "info", "warning", "error", "success"]);
+
+/** A `plain_text_input`'s value, and a `static_select`'s options and their
+ *  text, per the element references (read 2026-10-08). */
+const INPUT_VALUE_CHARS = 3000;
+const SELECT_OPTIONS = { min: 1, max: 100 };
+const OPTION_TEXT_CHARS = 75;
+const RADIO_OPTIONS = { min: 1, max: 10 };
+
+/** Why Slack would refuse an input or an alert in a view, or null. */
+function viewOnlyRefusal(block: Shape): string | null {
+  if (block.type === "alert") {
+    const text = isShape(block.text) ? block.text.text : undefined;
+    if (!nonEmpty(text)) return "an alert without text";
+    if (String(text).length > ALERT_TEXT_CHARS) return `an alert of ${String(text).length} chars`;
+    if (block.level !== undefined && !ALERT_LEVELS.has(String(block.level))) return `an alert at level ${String(block.level)}`;
+    return null;
+  }
+  if (!isShape(block.label) || block.label.type !== "plain_text" || !nonEmpty(block.label.text)) {
+    return "an input without a plain_text label";
+  }
+  const element = block.element;
+  if (!isShape(element)) return "an input without an element";
+  if (element.type === "plain_text_input") {
+    if (typeof element.initial_value === "string" && element.initial_value.length > INPUT_VALUE_CHARS) {
+      return `an input value of ${element.initial_value.length} chars`;
+    }
+    return null;
+  }
+  if (element.type === "static_select") {
+    const options = Array.isArray(element.options) ? element.options : [];
+    if (options.length < SELECT_OPTIONS.min || options.length > SELECT_OPTIONS.max) return `a select of ${options.length} options`;
+    for (const o of options) {
+      const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
+      if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a select option without short text";
+    }
+    return null;
+  }
+  if (element.type === "radio_buttons") {
+    // The radio buttons reference (read 2026-10-08): 1 to 10 options.
+    const options = Array.isArray(element.options) ? element.options : [];
+    if (options.length < RADIO_OPTIONS.min || options.length > RADIO_OPTIONS.max) return `radio buttons of ${options.length} options`;
+    for (const o of options) {
+      const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
+      if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a radio option without short text";
+    }
+    return null;
+  }
+  return `an input of ${String(element.type)}`;
 }
