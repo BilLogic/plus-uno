@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,471 chars from 16 files**, against an assembled budget of 175,500 (17,029 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,087 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,772 chars from 16 files**, against an assembled budget of 175,500 (16,728 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,388 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,418 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,814 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 113,812 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 20,308 (−5,803 ide-only) | 134,162 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 137,446 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 143,962 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 148,625 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 158,471 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 20,609 (−5,803 ide-only) | 134,463 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 137,747 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 144,263 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 148,926 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 158,772 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1003,7 +1003,8 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **What it holds:** the card title linked to its Notion card, card number, Design Status, Dev Status. Pillars and people are left out to keep the columns narrow. The page size is the row count (at most 30), so every row shows at once.
 - **Caption:** the count and the filter (`13 cards · Design Status WIP`), or `first 30 of 41 · …` when the lookup listed only part of what matched.
 - **Prose:** the model's result says `table_attached` and `row_count`. With a table, the answer gives the count, what stands out and what to act on, names at most 3 cards, and points at the table in one short phrase. Without one (`table_attached: false`), it writes the plain list.
-- **Text copy:** the prose, then one plain line per card (`title — #412 — WIP`). Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
+- **Text copy:** the prose, then a plain line per card, written by code from the table's rows. Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
+- **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the card's title and number, its statuses, a bullet or link), so every card prints once. A sentence that names a card stays. The count removed is logged as `[card-table]`.
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
 
 ### What the Worker does on each path

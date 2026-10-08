@@ -112,7 +112,8 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **What it holds:** the card title linked to its Notion card, card number, Design Status, Dev Status. Pillars and people are left out to keep the columns narrow. The page size is the row count (at most 30), so every row shows at once.
 - **Caption:** the count and the filter (`13 cards · Design Status WIP`), or `first 30 of 41 · …` when the lookup listed only part of what matched.
 - **Prose:** the model's result says `table_attached` and `row_count`. With a table, the answer gives the count, what stands out and what to act on, names at most 3 cards, and points at the table in one short phrase. Without one (`table_attached: false`), it writes the plain list.
-- **Text copy:** the prose, then one plain line per card (`title — #412 — WIP`). Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
+- **Text copy:** the prose, then a plain line per card, written by code from the table's rows. Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
+- **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the card's title and number, its statuses, a bullet or link), so every card prints once. A sentence that names a card stays. The count removed is logged as `[card-table]`.
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
 
 ### What the Worker does on each path
