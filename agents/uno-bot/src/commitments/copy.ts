@@ -192,11 +192,11 @@ export function footerLabels(blocks: readonly unknown[]): string {
 
 /** The answers under a "remind me" while a ⏳ can still bring it back. */
 export const SELF_REMINDER_CHOICES: readonly ReminderChoice[] = [
-  { glyph: "raised_hands", label: "🙌 Done" },
-  { glyph: "hourglass_flowing_sand", label: "⏳ Snooze 2 days" },
+  { glyph: "raised_hands", label: "Done" },
+  { glyph: "hourglass_flowing_sand", label: "Snooze 2 days" },
 ];
 /** The answer under its last allowed post. */
-export const SELF_REMINDER_LAST_CHOICES: readonly ReminderChoice[] = [{ glyph: "raised_hands", label: "🙌 Done" }];
+export const SELF_REMINDER_LAST_CHOICES: readonly ReminderChoice[] = [{ glyph: "raised_hands", label: "Done" }];
 
 /**
  * The reminder a person asked for, mentioning only them.

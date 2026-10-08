@@ -1,8 +1,8 @@
 // What people said of an answer, on the usage record: one row per person per
 // answer, from the feedback buttons beneath it (`slack/feedback.ts`).
 //
-// Keyed to the ANSWER'S ts — the message the buttons sit on — and the person
-// who pressed, so a second press replaces the first rather than counting
+// Keyed to the ANSWER — its channel and ts, the message the buttons sit on,
+// since a ts is unique only within its channel — and the person who pressed, so a second press replaces the first rather than counting
 // twice. The row carries the turn the answer belongs to, which is how a
 // "bad answer" is joined to the kind of question that drew it (`turns`).
 //
@@ -21,6 +21,8 @@ export type FeedbackReason = "wrong_facts" | "missing_source" | "too_long" | "ot
 
 /** One person's word on one answer. */
 export interface AnswerFeedbackRecord {
+  /** The channel the answer is in. */
+  channel: string;
   /** The answer's own ts: the message the buttons sit on. */
   answerTs: string;
   /** Who pressed. */
@@ -50,7 +52,7 @@ export interface AnswerFeedbackRecord {
 export interface AnswerFeedbackLog {
   record(feedback: AnswerFeedbackRecord): Promise<void>;
   /** One person's row on one answer, or null when they have said nothing. */
-  get(answerTs: string, userId: string): Promise<AnswerFeedbackRecord | null>;
+  get(channel: string, answerTs: string, userId: string): Promise<AnswerFeedbackRecord | null>;
 }
 
 /** The row a write leaves, given the row before it: the rule both adapters keep. */
@@ -69,14 +71,14 @@ export function mergeFeedback(before: AnswerFeedbackRecord | null, next: AnswerF
  *  (`tests/helpers/answer-feedback-conformance.ts`). */
 export function createInMemoryAnswerFeedbackLog(): AnswerFeedbackLog & { records(): AnswerFeedbackRecord[] } {
   const rows = new Map<string, AnswerFeedbackRecord>();
-  const key = (answerTs: string, userId: string) => `${answerTs}\u0000${userId}`;
+  const key = (channel: string, answerTs: string, userId: string) => `${channel}\u0000${answerTs}\u0000${userId}`;
   return {
     async record(feedback) {
-      const k = key(feedback.answerTs, feedback.userId);
+      const k = key(feedback.channel, feedback.answerTs, feedback.userId);
       rows.set(k, mergeFeedback(rows.get(k) ?? null, feedback));
     },
-    async get(answerTs, userId) {
-      const row = rows.get(key(answerTs, userId));
+    async get(channel, answerTs, userId) {
+      const row = rows.get(key(channel, answerTs, userId));
       return row ? { ...row } : null;
     },
     records: () => [...rows.values()].map((r) => ({ ...r })),

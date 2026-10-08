@@ -296,7 +296,7 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
     if (v.description) lines.push(`  > ${v.description.replace(/\n/g, "\n  > ")}`);
   }
   if (!changeSet.versions.length) lines.push("- No published version: the component metadata changed without one.");
-  lines.push(`- Found by uno-bot's end-of-day library poll on ${changeSet.detectedAt.slice(0, 10)}.`, "");
+  lines.push(`- Found by le goat's end-of-day library poll on ${changeSet.detectedAt.slice(0, 10)}.`, "");
 
   lines.push("## Changed components", "");
   if (rows.length) {

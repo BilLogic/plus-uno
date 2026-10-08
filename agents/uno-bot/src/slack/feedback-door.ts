@@ -52,6 +52,7 @@ export async function runFeedbackTap(tap: FeedbackTap, deps: FeedbackDoorDeps): 
     if (!opened) console.warn(`[feedback] pop-up refused for ${tap.channel}/${tap.answerTs}`);
   }
   await record(deps, {
+    channel: tap.channel,
     answerTs: tap.answerTs,
     userId: tap.userId,
     turnId: pressed.turnId,
@@ -76,6 +77,7 @@ export async function runFeedbackReason(
   if (!sent) return;
   const { target, reason, note } = sent;
   await record(deps, {
+    channel: target.channel,
     answerTs: target.answerTs,
     userId: submission.userId,
     turnId: target.turnId,
@@ -96,7 +98,7 @@ async function record(deps: FeedbackDoorDeps, row: AnswerFeedbackRecord): Promis
   try {
     await deps.log.record(row);
   } catch (err) {
-    console.error(`[feedback] not recorded on ${row.answerTs}: ${messageOf(err)}`);
+    console.error(`[feedback] not recorded on ${row.channel}/${row.answerTs}: ${messageOf(err)}`);
   }
 }
 

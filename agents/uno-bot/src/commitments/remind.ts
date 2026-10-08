@@ -230,7 +230,7 @@ export async function setSelfReminder(
   deps: { store: CommitmentStore; unoBot?: string; now(): number },
 ): Promise<SetReminderResult> {
   if (place.channel === deps.unoBot) {
-    return { ok: false, error: "reminders are not delivered in #uno-bot; ask in a DM with uno-bot or in a team thread" };
+    return { ok: false, error: "reminders are not delivered in #uno-bot; ask in a DM with le goat or in a team thread" };
   }
   const what = cleanWhat(typeof input.what === "string" ? input.what : "");
   if (!what) return { ok: false, error: "missing what: a short summary of what to remind them about" };

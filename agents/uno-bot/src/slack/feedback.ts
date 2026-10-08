@@ -1,7 +1,8 @@
 // The feedback buttons under an answer, and the pop-up a "bad answer" opens.
 //
 // Renders and posts nothing; `slack/delivery.ts` puts the row under an answer
-// and `slack/feedback-door.ts` answers a tap. Imports types only, so both the
+// and `slack/feedback-door.ts` answers a tap. Imports types and the pure
+// `mrkdwn` escape only, so both the
 // posting path and the door read one spelling of the action ids and the button
 // values.
 //
@@ -16,6 +17,7 @@
 // usage record keeps only that there was one — it never stores text (ADR-030).
 
 import type { FeedbackRating, FeedbackReason } from "../usage/feedback";
+import { escapeSlackText } from "./mrkdwn";
 
 /** Both feedback buttons; `slack/interactive.ts` routes it. */
 export const FEEDBACK_ACTION_ID = "uno_feedback";
@@ -172,7 +174,9 @@ export function feedbackAckFor(view: FeedbackViewState): Record<string, unknown>
   return feedbackSubmissionOf(view) ? { response_action: "update", view: feedbackThanksView() } : null;
 }
 
-/** The note, as it is posted in the answer's thread. */
+/** The note, as it is posted in the answer's thread: the person's words as
+ *  words, so a note cannot ping the channel or dress a link up as another. */
 export function feedbackNoteText(userId: string, reason: FeedbackReason, note: string): string {
-  return `<@${userId}> marked the answer above as bad (${reasonLabel(reason).toLowerCase()}):\n> ${note.replace(/\n/g, "\n> ")}`;
+  const words = escapeSlackText(note).replace(/\n/g, "\n> ");
+  return `<@${userId}> marked the answer above as bad (${reasonLabel(reason).toLowerCase()}):\n> ${words}`;
 }

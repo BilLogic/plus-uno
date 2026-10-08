@@ -31,7 +31,7 @@ export type RaiseTo = "plus-design" | "plus-universal";
  *  the way to answer it, which is a typed reply. */
 export const ASK_FOOTER = {
   hint: "Or reply here with the answer or a link, and I'll suggest where it belongs.",
-  choices: [{ glyph: "no_good", label: "🙅 Never mind" }],
+  choices: [{ glyph: "no_good", label: "Never mind" }],
 } as const;
 
 /** What replaces the buttons once the person says never mind. */
