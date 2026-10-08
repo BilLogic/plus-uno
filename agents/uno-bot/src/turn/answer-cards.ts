@@ -19,7 +19,7 @@
 // PURE: no Env, no Slack shape. What a card LOOKS like in Slack — its block
 // and its estate's logo — is `slack/answer-cards-block.ts`'s.
 
-import { linkLabel } from "../slack/mrkdwn";
+import { linkLabel } from "./link-label";
 
 /** One link button on a card. */
 export interface CardLink {

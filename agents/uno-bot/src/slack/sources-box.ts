@@ -18,7 +18,7 @@
 
 import type { TaskCardSource } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
-import { linkLabel } from "./mrkdwn";
+import { linkLabel } from "../turn/link-label";
 
 /** Below this many links an answer carries no box. */
 export const MIN_SOURCES = 3;
