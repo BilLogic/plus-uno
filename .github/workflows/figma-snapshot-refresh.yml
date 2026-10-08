@@ -7,11 +7,20 @@ name: Refresh Figma Component Snapshot
 # FIGMA_ACCESS_TOKEN, and only this repo's secret holds one, which is why the
 # refresh runs here and not on a laptop.
 #
-# Loop shape: manual dispatch → one fetch → one PR (changed, or a date refresh
-# near the age ceiling), or a "no change" summary that closes any stale refresh
-# PR → stop. On demand only, never a cron: a refresh follows a library publish
+# Loop shape: a publish or a manual dispatch → one fetch → one PR (changed, or a
+# date refresh near the age ceiling), or a "no change" summary that closes any
+# stale refresh PR → stop. Never a cron: a refresh follows a library publish
 # somebody meant, and each one is a PR a human reviews.
-# Spot-run: `gh workflow run figma-snapshot-refresh.yml` (from main).
+#   • ONCE PER PUBLISH (#898). uno-bot's end-of-day poll, finding a newly
+#     published library version, sends `repository_dispatch`
+#     `figma-library-published` (agents/uno-bot/src/figma-library/
+#     snapshot-refresh.ts), once, retried the next morning if GitHub refused it.
+#     Its payload's version id is shown in the summary and goes nowhere else.
+#   • BY HAND, still: `gh workflow run figma-snapshot-refresh.yml` (from main).
+# A RATE LIMIT IS WAITED OUT. The script waits out Figma's 429s (up to 30
+# minutes in all) and paces its node fetches; a run that still cannot finish
+# writes nothing and says Figma was busy (exit 75), and the next publish or a
+# re-run completes it.
 #
 # Why this replaces the old poller's shape. The retired figma-library-poll.yml
 # committed straight to main with "[skip ci]" and `git push || true`, so a
@@ -28,12 +37,16 @@ name: Refresh Figma Component Snapshot
 
 on:
   workflow_dispatch: {}
+  repository_dispatch:
+    types: [figma-library-published]
 
 permissions:
   contents: write # push the fixed refresh branch
   pull-requests: write # open or update its PR
 
-# Two refreshes at once would force-push the same branch over each other.
+# Two refreshes at once would force-push the same branch over each other. A
+# publish found while one runs waits behind it; a newer waiting run replaces an
+# older one, which is right, since each records the library as it then stands.
 concurrency:
   group: figma-snapshot-refresh
   cancel-in-progress: false
@@ -45,7 +58,9 @@ env:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # The paced node fetches take about 6 minutes, and a rate limit may add up
+    # to 30 more of waiting.
+    timeout-minutes: 45
 
     steps:
       - name: Refuse a run off the default branch
@@ -58,6 +73,24 @@ jobs:
           if [ "$REF" != "refs/heads/$DEFAULT_BRANCH" ]; then
             echo "::error::Dispatch this workflow from $DEFAULT_BRANCH, not $REF."
             exit 1
+          fi
+
+      - name: Say what started it
+        # The publish's version id arrives through env and is checked to be
+        # digits before it is written anywhere; nothing from client_payload is
+        # ever part of a command.
+        env:
+          EVENT: ${{ github.event_name }}
+          VERSION_ID: ${{ github.event.client_payload.figma_version_id }}
+        run: |
+          if [ "$EVENT" = "repository_dispatch" ]; then
+            if [[ "$VERSION_ID" =~ ^[0-9]+$ ]]; then
+              echo "Started by uno-bot: the library published version $VERSION_ID." >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "Started by uno-bot, for a library publish." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "Started by hand." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Checkout repository
@@ -77,9 +110,21 @@ jobs:
         # the PR body quotes.
         env:
           FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+        # Exit 75 is the script's "Figma kept rate-limiting": nothing written.
         run: |
           set -euo pipefail
-          npm run --silent snapshot:figma-components | tee "$RUNNER_TEMP/snapshot.log"
+          status=0
+          npm run --silent snapshot:figma-components | tee "$RUNNER_TEMP/snapshot.log" || status=$?
+          if [ "$status" -eq 75 ]; then
+            {
+              echo "## Figma component snapshot: Figma was busy"
+              echo
+              echo "Figma kept rate-limiting after the script waited, so nothing was written. Re-run this workflow, or the next publish will."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::Figma kept rate-limiting; nothing was written."
+            exit 1
+          fi
+          if [ "$status" -ne 0 ]; then exit "$status"; fi
           { echo '```'; cat "$RUNNER_TEMP/snapshot.log"; echo '```'; } > "$RUNNER_TEMP/delta.md"
 
       - name: Compare with main

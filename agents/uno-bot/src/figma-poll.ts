@@ -6,7 +6,9 @@
 // nobody needs code started within minutes. It fetches the DS file's components
 // and published versions from the Figma REST API, diffs them against the
 // snapshot in KV, and when something changed it adds one change set to the
-// findings in KV. It posts nothing. The morning run's `figma-library-post` job
+// findings in KV. A new published version also owes the repo's copy of the
+// snapshot a refresh, recorded in KV for the `figma-snapshot-refresh` job
+// (src/figma-library/snapshot-refresh.ts). It posts nothing. The morning run's `figma-library-post` job
 // reads the findings and turns each into a drafted intake and one card in
 // #plus-universal (src/figma-library/post.ts) — findings post at the next
 // morning run, like every proactive job.
@@ -44,6 +46,7 @@ import { charge, rethrowIfBudget } from "./net";
 import type { FigmaClient, FigmaComponentsResponse, FigmaVersionsResponse } from "./figma/client";
 import { figmaClientFor } from "./figma/production";
 import { componentIdOf, type LibraryChangeSet, type LibraryComponent, type PublishedVersion } from "./figma-library/draft";
+import { owedWith, REFRESH_OWED_KV_KEY, type RefreshOwed } from "./figma-library/snapshot-refresh";
 
 /** Node-ids per /nodes request (URL-length bound, same as v1). */
 const HASH_CHUNK_SIZE = 50;
@@ -75,6 +78,8 @@ export interface PollResult {
   newVersions?: number;
   /** Change sets now waiting for the morning post. */
   pending?: number;
+  /** Publishes the repo's copy of the snapshot is now owed a refresh for. */
+  refreshOwed?: number;
 }
 
 /** What the poll reads and writes, by name. */
@@ -83,6 +88,9 @@ export interface PollDeps {
   figma: Pick<FigmaClient, "components" | "versions" | "nodes">;
   snapshot: { read(): Promise<Snapshot | null>; write(snapshot: Snapshot): Promise<void> };
   findings: { read(): Promise<LibraryChangeSet[]>; write(findings: LibraryChangeSet[]): Promise<void> };
+  /** The publishes the repo's copy of the snapshot is owed a refresh for
+   *  (`figma-library/snapshot-refresh.ts`). Absent, none is recorded. */
+  owed?: { read(): Promise<RefreshOwed | null>; write(owed: RefreshOwed): Promise<void> };
   fileKey: string;
   now(): number;
 }
@@ -189,6 +197,17 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
     if (!opts.dryRun) await deps.findings.write(kept);
   }
 
+  // A publish owes the repo's copy a refresh (#898). Recorded before the
+  // snapshot moves on: a poll stopped in between finds the same versions again
+  // and merges the same ids; one that finished never reports them twice. A
+  // library edited with no new version owes nothing.
+  let refreshOwed: number | undefined;
+  if (newVersions.length && deps.owed) {
+    const owed = owedWith(await deps.owed.read(), newVersions.map((v) => v.id), at);
+    refreshOwed = owed.versionIds.length;
+    if (!opts.dryRun) await deps.owed.write(owed);
+  }
+
   if (!opts.dryRun) {
     await deps.snapshot.write({
       lastChecked: at,
@@ -207,6 +226,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
     deleted: diff.deleted.length,
     newVersions: newVersions.length,
     ...(pending !== undefined ? { pending } : {}),
+    ...(refreshOwed !== undefined ? { refreshOwed } : {}),
   };
 }
 
@@ -354,6 +374,7 @@ export async function runFigmaPoll(env: Env, opts: { dryRun?: boolean } = {}): P
       figma,
       snapshot: kvJson<Snapshot | null>(env, SNAPSHOT_KV_KEY, null) as PollDeps["snapshot"],
       findings: kvJson<LibraryChangeSet[]>(env, FINDINGS_KV_KEY, []),
+      owed: kvJson<RefreshOwed | null>(env, REFRESH_OWED_KV_KEY, null) as NonNullable<PollDeps["owed"]>,
       fileKey: env.FIGMA_FILE_KEY,
       now: () => Date.now(),
     },

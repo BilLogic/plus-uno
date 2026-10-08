@@ -1,5 +1,7 @@
-// The Figma library's two morning jobs, bound to `Env` — the only file in the
-// folder that names it. The post reads the registry from GitHub and the
+// The Figma library's jobs, bound to `Env` — the only file in the folder that
+// names it. The snapshot refresh (`./snapshot-refresh.ts`) reads what the poll
+// left owed in HARNESS_KV and sends `repository_dispatch` with GITHUB_TOKEN, the
+// way `component_implement` starts `figma-implement.yml`. The post reads the registry from GitHub and the
 // channel's members from Slack, posts the card, and stages it in ThreadState;
 // the tracker reads GitHub and posts in the card's thread, and files and closes
 // a card nobody decided. Findings and the tracked cards are JSON in HARNESS_KV
@@ -18,10 +20,12 @@ import { proposalEventLogFor } from "../usage/production";
 import { githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
+import { repositoryDispatch } from "../tools/github-dispatch";
+import { REFRESH_OWED_KV_KEY, runSnapshotRefresh, type RefreshOwed, type SnapshotRefreshReport } from "./snapshot-refresh";
 import type { ComponentRegistry, LibraryChangeSet } from "./draft";
 import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostResult } from "./post";
 import { windowInWords } from "../slack/copy-words";
-import { rethrowIfBudget } from "../net";
+import { charge, rethrowIfBudget } from "../net";
 import { trackLibraryIntakes, type TrackedPublish, type TrackResult } from "./track";
 
 export const TRACKED_KV_KEY = "figma-poll:tracked";
@@ -158,4 +162,33 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
     },
     opts,
   );
+}
+
+/**
+ * The `figma-snapshot-refresh` job on `Env` (#898): start the repo snapshot's
+ * refresh for the publishes the poll found, once — right after the poll, and
+ * again in the morning for a dispatch GitHub refused.
+ *
+ * @param env - Worker bindings
+ * @param opts - `dryRun` reads what is owed and dispatches nothing
+ */
+export async function runSnapshotRefreshOnEnv(env: Env, opts: { dryRun: boolean }): Promise<SnapshotRefreshReport | { summary: string }> {
+  const kv = env.HARNESS_KV;
+  if (!kv) return { summary: "HARNESS_KV not bound — no publish is recorded, so nothing to refresh" };
+  const owed = kvJson<RefreshOwed | null>(env, REFRESH_OWED_KV_KEY, null);
+  return runSnapshotRefresh({
+    owed: {
+      read: owed.read,
+      async clear() {
+        charge(1, "kv");
+        await kv.delete(REFRESH_OWED_KV_KEY);
+      },
+    },
+    async dispatch(eventType, payload) {
+      // Unset, the refresh stays owed and every run says why.
+      if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) throw new Error("GITHUB_TOKEN or GITHUB_REPO is not set");
+      return repositoryDispatch(env, eventType, payload);
+    },
+    dryRun: opts.dryRun,
+  });
 }
