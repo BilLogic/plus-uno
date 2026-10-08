@@ -17,16 +17,40 @@
 // and the candidate cap applies only to the looser matches after them.
 
 import type { Env } from "../types";
-import { queryRoadmapCards, type RoadmapCard } from "../integrations/notion";
+import {
+  databaseOptions,
+  queryRoadmapCards,
+  ROADMAP_STATUS_PROP,
+  type RoadmapCard,
+} from "../integrations/notion";
 
 const MAX_ENUMERATION_ROWS = 30;
 const MAX_TITLE_CANDIDATES = 6;
 
+const errorText = (err: unknown): string => (err instanceof Error ? err.message : String(err));
+
 // Notion rejects an unknown filter property with a 400 validation_error; that —
 // not an empty result — is what a property rename looks like.
 function isFilterDriftError(err: unknown): boolean {
-  const msg = err instanceof Error ? err.message : String(err);
-  return /validation_error|Could not find property/i.test(msg);
+  return /validation_error|Could not find property/i.test(errorText(err));
+}
+
+// A status the board has no option for draws the SAME validation_error code as
+// a missing property, so the code alone cannot tell them apart; the message
+// can. Captured live from the Roadmap on 2026-10-07:
+//   status option "In Progress" not found for property "Design Status".
+//     Available options: "Need PRD / Under Playground", "Ready for Design", ...
+//   Could not find property with name or id: Design Statuz
+// Read as drift, the first one logged a false alarm and re-sent the same status.
+function isUnknownOptionError(err: unknown): boolean {
+  return /\boption "[^"]*" not found for property/i.test(errorText(err));
+}
+
+/** The options Notion lists after "Available options:", in its spelling — empty
+ *  when the message does not carry them. */
+function optionsInMessage(err: unknown): string[] {
+  const tail = errorText(err).split(/Available options:/i)[1];
+  return tail ? Array.from(tail.matchAll(/"([^"]+)"/g), (m) => m[1] ?? "").filter(Boolean) : [];
 }
 
 function tokens(text: string): string[] {
@@ -134,6 +158,22 @@ export async function executeRoadmapQuery(
       // off an empty result (an empty filtered result is a true absence: the
       // server's case-insensitive `contains` is a superset of what scoreTitle
       // could rank above zero, so a rescan would only re-find the same nothing).
+      if (designStatus && isUnknownOptionError(err)) {
+        // Not drift: the property is there and the value is not one of its
+        // options. A rescan would send the same status and fail again, so hand
+        // the model the board's options instead — from Notion's own message, or
+        // from the schema when the message stops at the name.
+        let options = optionsInMessage(err);
+        if (!options.length) {
+          options = (await databaseOptions(env, env.NOTION_ROADMAP_DB_ID, ROADMAP_STATUS_PROP)) ?? [];
+        }
+        return JSON.stringify({
+          ok: false,
+          error: `"${designStatus}" is not a Design Status on the Roadmap board`,
+          design_status_options: options,
+          note: "Retry roadmap_query with the option that means what they asked for (e.g. \"in progress\" is most likely WIP). If none fits, tell them the board's statuses rather than guessing.",
+        });
+      }
       if (!isFilterDriftError(err)) throw err;
       console.warn("[roadmap] filter rejected — property names may have drifted; unfiltered rescan");
       ({ rows: cards, truncated } = await queryRoadmapCards(env, { designStatus }));
