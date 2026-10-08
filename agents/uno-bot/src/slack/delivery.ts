@@ -14,7 +14,7 @@ import { decideStream, type StreamRecipient } from "./stream-recipient";
 import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
-import { buildFailureMessage, type FailureStage } from "./failure-message";
+import { failureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
 import { chartBlock } from "./chart-block";
@@ -136,6 +136,8 @@ async function alertCapacity(deps: PostingDeps, err: unknown): Promise<void> {
  * @param userMsgTs the person's message — what the ❌ lands on
  * @param err so capacity/quota outages surface distinctly
  * @param stage how far the turn got; drives what the message can honestly promise
+ * @param ask the question, when it can be asked again: the post offers it
+ *   back as Try again
  */
 export async function postVisibleFailure(
   deps: PostingDeps,
@@ -144,20 +146,18 @@ export async function postVisibleFailure(
   userMsgTs: string,
   err?: unknown,
   stage: FailureStage = "internal",
+  ask?: string,
 ): Promise<void> {
   const capacity = isCapacityError(err);
   await deps.slack.addReaction(channel, userMsgTs, "x").catch(() => {});
-  await deps.slack
-    .postMessage({
-      channel,
-      thread_ts: threadTs,
-      text: buildFailureMessage({
-        stage,
-        capacity,
-        alertChannel: deps.alertChannel,
-      }),
-    })
-    .catch(() => {});
+  const message = failureMessage({ stage, capacity, alertChannel: deps.alertChannel, ...(ask ? { ask } : {}) });
+  const posted = await deps.slack
+    .postMessage({ channel, thread_ts: threadTs, text: message.text, blocks: message.blocks })
+    .catch(() => ({ ok: false }) as { ok: boolean; error?: string });
+  // Blocks refused is no reason to go quiet: the same words, without them.
+  if (!posted.ok && refusedForBlocks(posted)) {
+    await deps.slack.postMessage({ channel, thread_ts: threadTs, text: message.text }).catch(() => {});
+  }
   if (capacity) await alertCapacity(deps, err);
 }
 

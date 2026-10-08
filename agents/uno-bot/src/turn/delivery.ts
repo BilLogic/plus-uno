@@ -494,8 +494,10 @@ export interface Delivery {
   card(proposal: ProposalCard): Promise<PostResult>;
 
   /** Make a failure visible. Best-effort and never throwing, because the one
-   *  thing worse than an error message is silence. */
-  postFailure(stage: DeliveryFailureStage, err?: unknown): Promise<void>;
+   *  thing worse than an error message is silence. `ask` is the person's
+   *  question when the turn can run again on it: a surface that can offer a
+   *  retry offers it on this. */
+  postFailure(stage: DeliveryFailureStage, err?: unknown, ask?: string): Promise<void>;
 }
 
 // ── The recording adapter ────────────────────────────────────────────────────
@@ -514,7 +516,7 @@ export type DeliveryCall =
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote }
   | { kind: "proposal"; card: ProposalCard }
-  | { kind: "failure"; stage: DeliveryFailureStage; message?: string };
+  | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
 
 export interface RecordingDelivery extends Delivery {
   /** Everything the turn did, in order. */
@@ -677,11 +679,12 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts };
     },
 
-    async postFailure(stage, err) {
+    async postFailure(stage, err, ask) {
       calls.push({
         kind: "failure",
         stage,
         ...(err === undefined ? {} : { message: err instanceof Error ? err.message : String(err) }),
+        ...(ask === undefined ? {} : { ask }),
       });
     },
   };

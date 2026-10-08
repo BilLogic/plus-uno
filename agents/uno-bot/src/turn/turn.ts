@@ -1183,7 +1183,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // Close the progress surface before the failure message, or the checklist
     // sits open above it forever, still claiming a step is in progress.
     await delivery.endProgress("error");
-    await delivery.postFailure("agent", err);
+    await delivery.postFailure("agent", err, request.text);
     telemetry.interim = interimCount;
     return {
       disposition: "failed",
@@ -2014,7 +2014,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   if (!posted.ok) {
     // Never post a completion signal for a reply that was never delivered.
     console.error("[turn] reply delivery failed after retry");
-    await delivery.postFailure("delivery");
+    await delivery.postFailure("delivery", undefined, request.text);
     return {
       disposition: "failed",
       failure: { stage: "delivery" },

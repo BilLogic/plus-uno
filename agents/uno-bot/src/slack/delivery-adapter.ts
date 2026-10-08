@@ -262,6 +262,8 @@ export interface SlackDeliveryClient {
     userMsgTs: string;
     stage: DeliveryFailureStage;
     err?: unknown;
+    /** The question, offered back as Try again. */
+    ask?: string;
   }): Promise<void>;
   /** Open a plan-mode stream, or report that none opened. */
   startStream(
@@ -1125,11 +1127,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       };
     },
 
-    async postFailure(stage: DeliveryFailureStage, err) {
+    async postFailure(stage: DeliveryFailureStage, err, ask) {
       // The checklist is settled by the turn's own `endProgress("error")`
       // before it gets here — a failure message under a step that still claims
       // to be in progress is how the plan stream read after a dead run.
-      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err });
+      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err, ...(ask ? { ask } : {}) });
     },
   };
 }
