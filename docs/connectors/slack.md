@@ -117,6 +117,15 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the row's identifying field, its other values, the column headers' words, a bullet or link), so every row prints once. A Roadmap card counts as typed out only when the line names its number too. A sentence that names a row stays. The count removed is logged as `[result-table]`.
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
 
+#### The ⚠️ line: what the reader has to see
+
+**A caution goes on its own line under the answer, apart from the prose.** Each ⚠️ line is a `context` block just above the footer: one sentence, at most two lines per answer. Slack's `alert` block is not used, because Slack refuses it in a message.
+
+- **Code adds it** from what the turn already knows, one line per trigger however often it fires: a lookup reported `truncated` or `partial`; a source errored, timed out or refused access (an argument the tool refused is not a source failure, and a retry that came back whole clears it); the lookup budget refused a lookup, cut one short, or ended the loop in a synthesis pass; blueprint rows whose newest `updatedAt` is older than 180 days; the absence pre-check fired. The turn has no wall-clock budget, so the call budget is the only budget line.
+- **The model adds one, for an estate conflict:** two sources it read this turn disagree (the blueprint says one thing, a Roadmap card or PRD another). It calls `present` with shape `conflict` and the disagreement as one sentence in `line`; code places the ⚠️. Refused, in the call's own result: fewer than two sources answered this turn, more than one sentence, an emoji, over 240 characters, a second conflict, or two lines already held. A ⚠️ the model typed at the start of `line` is dropped.
+- **Order and cap:** lines keep the order their triggers were first met; a third is dropped.
+- **Text copy:** each line, sign first, after the prose and any table list, so notifications carry it. An answer with a ⚠️ line posts as an ordinary message rather than a stream, which has no text copy.
+
 ### What the Worker does on each path
 
 | Path | What is sent | Converted by |
