@@ -109,7 +109,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { cardList, readCardTable, withoutRepeatedRows, type CardTable } from "./card-table";
+import { judgedList, presentedProse, presenter, type Presentation } from "./presentation";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -371,8 +371,9 @@ export interface TurnAgentRequest {
    *  to the calls that get a task card and hands those to Delivery. */
   onToolProgress(event: ToolProgressEvent): void;
   /** Turn's last word on each lookup's result before the model reads it — how
-   *  it keeps the card table a lookup qualified for and tells the model so
-   *  (`turn/card-table.ts`). Returns the text the model reads. */
+   *  the presentation step records what the turn fetched, answers `present`
+   *  and tells the model what rides beneath its answer
+   *  (`turn/presentation.ts`). Returns the text the model reads. */
   reviseLookupResult(name: string, args: Record<string, unknown>, text: string): string;
   /** The same clarify-vs-act check Turn runs after the loop returns, with this
    *  thread's PRD already bound, so the loop can put a refusal to the model as
@@ -474,9 +475,9 @@ export interface TurnDeps {
     toolsUsedThisTurn: string[];
     forceReason?: string;
     extraInstruction?: string;
-    /** The plain list of the card table beneath the draft, when one is
+    /** The plain list of the result table beneath the draft, when one is
      *  attached — absent otherwise, and the judge is asked as before. */
-    cardTableList?: string;
+    tableList?: string;
   }): Promise<TurnJudgement>;
 
   /** Clarify-vs-act: what this tool call still needs before it may be staged,
@@ -802,7 +803,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
   };
   return {
     ...delivery,
-    postAnswer: (text, cardTable) => noted(delivery.postAnswer(text, cardTable)),
+    postAnswer: (text, presentation) => noted(delivery.postAnswer(text, presentation)),
     postNote: (text, tag) => noted(delivery.postNote(text, tag)),
     postGateNote: (note) => noted(delivery.postGateNote(note)),
     card: (proposal) => noted(delivery.card(proposal)),
@@ -1142,16 +1143,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     });
   };
 
-  // The card table: the last lookup this turn that qualified for one. Kept as
-  // each result comes back rather than read off the run afterwards, because
-  // the model has to be TOLD whether a table was attached while it can still
-  // write its prose around it — a summary over a table, the plain list without.
-  let cardTable: CardTable | undefined;
-  const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string => {
-    const reading = readCardTable(name, args, text);
-    if (reading.table) cardTable = reading.table;
-    return reading.result;
-  };
+  // The presentation step: every lookup's result passes through it as it
+  // comes back, rather than being read off the run afterwards, because the
+  // model has to be TOLD what rides beneath its answer while it can still write
+  // its prose around it — a summary over a table, the plain list without.
+  const presenting = presenter();
+  const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string =>
+    presenting.revise(name, args, text);
 
   let run: TurnAgentRun;
   try {
@@ -1202,6 +1200,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // second message beside it. Every other exit below closes it itself, because
   // nothing that follows them would.
   if (result.kind === "text") {
+    const presentation = presenting.presentation();
     return finishTextTurn(result.text, {
       request,
       deps,
@@ -1212,7 +1211,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       correction,
       telemetry,
       memory,
-      ...(cardTable ? { cardTable } : {}),
+      ...(presentation ? { presentation } : {}),
     });
   }
 
@@ -1845,8 +1844,8 @@ interface TextTurnCtx {
   correction: boolean;
   telemetry: TurnTelemetry;
   memory: ThreadMemory;
-  /** The card table this turn's lookups left, to post beneath the answer. */
-  cardTable?: CardTable;
+  /** What this turn's lookups left to post beneath the answer. */
+  presentation?: Presentation;
 }
 
 /**
@@ -1943,7 +1942,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
     // both: a draft that summarises and points at the table has answered.
-    ...(ctx.cardTable ? { cardTableList: cardList(ctx.cardTable) } : {}),
+    ...(judgedList(ctx.presentation) ? { tableList: judgedList(ctx.presentation) } : {}),
   });
   telemetry.judge = reviewed.verdict;
 
@@ -1974,16 +1973,13 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // Delivery shares, so Slack, the recording Delivery and the thread's memory
   // all get the same prose. A rule that must hold on every provider lives in
   // code, not in the persona.
-  let prose = reviewed.text;
-  if (ctx.cardTable) {
-    const stripped = withoutRepeatedRows(prose, ctx.cardTable);
-    if (stripped.removed) console.log(`[card-table] removed ${stripped.removed} repeated row line(s) from the prose`);
-    prose = stripped.text;
-  }
+  const stripped = presentedProse(reviewed.text, ctx.presentation);
+  if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
+  const prose = stripped.text;
 
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
-  const posted = await delivery.postAnswer(prose, ctx.cardTable);
+  const posted = await delivery.postAnswer(prose, ctx.presentation);
 
   // The receipt rides the USER turn, keyed by the user message's ts. It
   // describes the TURN, not the message, and the user ts is the only id this

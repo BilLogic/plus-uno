@@ -1,0 +1,16 @@
+{
+  "case": "E3",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the one-voice ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case's regex agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=E3`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Compare Card, Surface and Modal for me: what each is for, and when to reach for it.",
+      "replies": [
+        {
+          "text": "**Reach for Card to group one item's content, Surface for a plain raised area, and Modal when the task has to interrupt the page.**\n\n| Component | What it's for | Reach for it when |\n|---|---|---|\n| Card | one item's content, framed | a list or grid of similar things |\n| Surface | a background layer | you need elevation with no structure |\n| Modal | a focused task over the page | the person must finish or cancel first |\n\nThat's from the design-system docs I know, not a fresh read, so check Storybook before you build on the edge cases."
+        }
+      ]
+    }
+  ]
+}

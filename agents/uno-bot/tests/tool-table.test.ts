@@ -156,10 +156,22 @@ describe("the readers answer from the row", () => {
     }
   });
 
-  it("gives every lookup its task-card words — slack_react excepted — and nothing else any", () => {
+  it("offers present inside the turn, as a choice of shape rather than a read", () => {
+    // The presentation step answers it from the turn's own lookups
+    // (`turn/presentation.ts`): it fetches nothing, so an answer cannot rest
+    // on it, and it is no step on the checklist.
+    const offered = schemasFromDisk().find((s) => s.name === "present");
+    assert.ok(offered, "the model is offered present");
+    assert.deepEqual(offered.input_schema.required, ["shape", "lookup", "columns", "takeaway"]);
+    assert.equal(rowFor("present")?.access, "ungated");
+    assert.equal(rowFor("present")?.retrieval, false);
+    assert.equal(taskCardFor("present"), null);
+  });
+
+  it("gives every lookup its task-card words — slack_react and present excepted — and nothing else any", () => {
     for (const name of TOOL_NAMES) {
       const words = taskCardFor(name);
-      if (rowFor(name)!.access !== "ungated" || name === "slack_react") {
+      if (rowFor(name)!.access !== "ungated" || name === "slack_react" || name === "present") {
         assert.equal(words, null, `${name} would put a card on the checklist`);
         continue;
       }

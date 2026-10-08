@@ -293,9 +293,9 @@ test("a throwing adapter fails open too — the judge never blocks a reply", asy
   assert.equal(out.reason, "socket hang up");
 });
 
-// ── a card table beneath the draft ───────────────────────────────────────────
+// ── a result table beneath the draft ─────────────────────────────────────────
 //
-// The reader gets the prose and a table of cards beneath it, so the judge is
+// The reader gets the prose and a table of rows beneath it, so the judge is
 // told the table is there and reads its plain list. The list is not the draft:
 // code built it from the lookup's rows, the judge never rewrites it, and its
 // length moves none of the draft's windows.
@@ -303,30 +303,30 @@ test("a throwing adapter fails open too — the judge never blocks a reply", asy
 const LIST = ["Card 1 — #401 — WIP", "Card 2 — #402 — WIP", "Card 3 — #403 — WIP"].join("\n");
 const LONG_LIST = Array.from({ length: 30 }, (_, i) => `Card ${i} with a long title — #${400 + i} — WIP`).join("\n");
 
-test("with a card table attached, the judge is told so and reads the plain list after the draft", async () => {
+test("with a table attached, the judge is told so and reads the plain list after the draft", async () => {
   const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
 
-  const out = await reviewDraft(fake, { userText: "which cards are in WIP?", draft: LONG_DRAFT, cardTableList: LIST });
+  const out = await reviewDraft(fake, { userText: "which cards are in WIP?", draft: LONG_DRAFT, tableList: LIST });
 
   assert.deepEqual(out, { text: LONG_DRAFT, verdict: "pass" });
   const { prompt } = fake.generated[0]!;
-  assert.match(prompt, /card table/i);
+  assert.match(prompt, /table attached/i);
   assert.ok(prompt.includes(LIST), "the plain list reaches the judge whole");
   assert.ok(prompt.indexOf(LIST) > prompt.indexOf(LONG_DRAFT), "the list sits beneath the draft, as the reader sees it");
 });
 
-test("with no card table, the judge's prompt says nothing about one", async () => {
+test("with no table, the judge's prompt says nothing about one", async () => {
   const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
 
   await reviewDraft(fake, { userText: "which cards are in WIP?", draft: LONG_DRAFT });
 
-  assert.doesNotMatch(fake.generated[0]!.prompt, /card table/i);
+  assert.doesNotMatch(fake.generated[0]!.prompt, /table attached/i);
 });
 
 test("the list does not count toward the draft's length: a short summary over a long list is still skipped", async () => {
   const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
 
-  const out = await reviewDraft(fake, { userText: "q", draft: "Thirty cards are in WIP.", cardTableList: LONG_LIST });
+  const out = await reviewDraft(fake, { userText: "q", draft: "Thirty cards are in WIP.", tableList: LONG_LIST });
 
   assert.equal(out.verdict, "skip");
   assert.equal(fake.generated.length, 0);
@@ -336,7 +336,93 @@ test("the list does not count toward the revision window either", async () => {
   const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
   const draft = `${LONG_DRAFT} ${"x".repeat(7_900 - LONG_DRAFT.length)}`;
 
-  await reviewDraft(fake, { userText: "q", draft, cardTableList: LONG_LIST });
+  await reviewDraft(fake, { userText: "q", draft, tableList: LONG_LIST });
 
   assert.doesNotMatch(fake.generated[0]!.system ?? "", /VERDICT ONLY/);
+});
+
+// ── the emoji budget ─────────────────────────────────────────────────────────
+//
+// A reply carries no emoji, or one 🎉 opening its first line on a shipped,
+// merged or published outcome (AGENT.md § Emoji budget). The count is code's,
+// so a breach is judged whatever the draft's length, and fails whatever the
+// judge says; whether a lone 🎉 sits on a real outcome is the judge's reading.
+
+test("a short draft carrying two emoji is judged, and fails on the emoji gate even when the judge passes it", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  const out = await reviewDraft(fake, { userText: "status?", draft: "🚀 Card 2482 is in WIP ✨" });
+
+  assert.equal(fake.generated.length, 1, "the floor is lifted for a breach");
+  assert.match(fake.generated[0]!.prompt, /emoji/i, "the judge is told what to repair");
+  assert.equal(out.verdict, "fail");
+});
+
+test("an emoji anywhere but the start of the first line fails, even alone", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  const out = await reviewDraft(fake, { userText: "status?", draft: "Card 2482 is in WIP 👀" });
+
+  assert.equal(out.verdict, "fail");
+});
+
+test("a breach ships the judge's revision when it keeps to the budget", async () => {
+  const fixed = "Card 2482 is in WIP, and Bill owns it — I checked the Roadmap board just now.";
+  const fake = fakeProvider({
+    generateReplies: [verdictJson({ verdict: "fail", failed: ["gate:emoji"], revised: fixed })],
+  });
+
+  const out = await reviewDraft(fake, {
+    userText: "status?",
+    draft: "🚀 Card 2482 is in WIP, and Bill owns it — I checked the Roadmap board just now ✨",
+  });
+
+  assert.deepEqual(out, { text: fixed, verdict: "fail" });
+});
+
+test("a revision that still breaks the budget does not ship", async () => {
+  const draft = "🚀 Card 2482 is in WIP, and Bill owns it — I checked the Roadmap board just now ✨";
+  const fake = fakeProvider({
+    generateReplies: [
+      verdictJson({ verdict: "fail", failed: ["gate:emoji"], revised: `${draft.replace(" ✨", "")} 🎉` }),
+    ],
+  });
+
+  const out = await reviewDraft(fake, { userText: "status?", draft });
+
+  assert.equal(out.verdict, "fail");
+  assert.equal(out.text, draft);
+});
+
+test("a lone 🎉 opening a short draft is read by the judge, which decides whether it is earned", async () => {
+  const plain = "The Roadmap board has 13 cards in WIP.";
+  const fake = fakeProvider({
+    generateReplies: [verdictJson({ verdict: "fail", failed: ["gate:emoji"], revised: plain })],
+  });
+
+  const out = await reviewDraft(fake, { userText: "how many in WIP?", draft: `🎉 ${plain}` });
+
+  assert.equal(fake.generated.length, 1, "a short draft with an emoji is still judged");
+  assert.equal(out.verdict, "fail");
+  assert.equal(out.text, plain);
+});
+
+test("a short draft with no emoji still skips the judge", async () => {
+  const fake = fakeProvider({ generateReplies: [] });
+
+  const out = await reviewDraft(fake, {
+    userText: "status?",
+    draft: "Card 2482 is in WIP at 10:30 — see [the card](https://x.test).",
+  });
+
+  assert.equal(out.verdict, "skip");
+  assert.equal(fake.generated.length, 0);
+});
+
+test("a Slack shortcode counts as an emoji", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  const out = await reviewDraft(fake, { userText: "status?", draft: "Shipped :rocket: at 10:30:00 today." });
+
+  assert.equal(out.verdict, "fail");
 });

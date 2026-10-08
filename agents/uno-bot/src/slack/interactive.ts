@@ -28,8 +28,10 @@ import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID, proposalCardBlocks } from "./proposal-render";
-import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "./review-door";
-import { REVIEW_APPROVE_ACTION_ID, reviewedCardOf } from "./review-view";
+import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps, type ReviewViewState } from "./review-door";
+import { REVIEW_APPROVE_ACTION_ID, REVIEW_CALLBACK_ID, reviewedCardOf } from "./review-view";
+import type { OptionSource } from "./review-fields";
+import { databaseOptions } from "../integrations/notion";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
@@ -54,9 +56,12 @@ interface InteractionPayload {
   callback_id?: string;
   /** A click's one-use, three-second key to `views.open`. */
   trigger_id?: string;
-  /** Set when the click was inside a modal rather than on a message, and on
-   *  a modal's submission, which also carries what was filled in. */
-  view?: { id?: string; callback_id?: string } & FeedbackViewState;
+  /** Set when the click was inside a modal rather than on a message, and on a
+   *  modal's submit. `state.values` holds its inputs as the person left them. */
+  view?: { id?: string; private_metadata?: string; callback_id?: string; state?: { values?: ReviewViewState } } & Record<
+    string,
+    unknown
+  >;
 }
 
 export function parseInteraction(rawBody: string): InteractionPayload | null {
@@ -109,23 +114,28 @@ export function handleInteraction(
       }));
       return new Response("", { status: 200 });
     }
-    // A modal sent. The only one with a submit button is the feedback pop-up;
-    // its ack IS the reply, so it is worked out here, inside the three
-    // seconds, and the write runs after.
+    // A modal sent: the Review pop-up's Check edits, or the feedback pop-up.
+    // Each is answered in the ack itself, inside Slack's three seconds, and
+    // anything slower runs after it.
     case "view_submission": {
-      const view = payload.view;
-      const userId = payload.user?.id;
-      if (view?.callback_id !== FEEDBACK_VIEW_CALLBACK_ID || !userId) {
-        console.log(`[interactive] unhandled view_submission: ${view?.callback_id ?? "(none)"}`);
+      const callbackId = payload.view?.callback_id;
+      if (callbackId === FEEDBACK_VIEW_CALLBACK_ID && payload.user?.id) {
+        const view = payload.view as FeedbackViewState;
+        const userId = payload.user.id;
+        const ack = feedbackAckFor(view);
+        ctx.waitUntil(runFeedbackReason({ userId, view }, feedbackDoorDeps(env)).catch((err) => {
+          console.error(`[interactive] feedback reason failed: ${err instanceof Error ? err.message : String(err)}`);
+        }));
+        return ack ? Response.json(ack) : new Response("", { status: 200 });
+      }
+      // The Review pop-up's Check edits: `response_action: "update"` is the
+      // only way a submit keeps its modal open, redrawn with the edits kept
+      // and one alert about them. Nothing is read.
+      if (!payload.view || callbackId !== REVIEW_CALLBACK_ID) {
+        console.log(`[interactive] unhandled view_submission ${callbackId ?? "(none)"}`);
         return new Response("", { status: 200 });
       }
-      const ack = feedbackAckFor(view);
-      ctx.waitUntil(runFeedbackReason({ userId, view }, feedbackDoorDeps(env)).catch((err) => {
-        console.error(`[interactive] feedback reason failed: ${err instanceof Error ? err.message : String(err)}`);
-      }));
-      return ack
-        ? new Response(JSON.stringify(ack), { status: 200, headers: { "content-type": "application/json" } })
-        : new Response("", { status: 200 });
+      return Response.json({ response_action: "update", view: checkedEditsView(payload.view) });
     }
     default:
       console.log(`[interactive] unhandled type: ${payload.type}`);
@@ -231,10 +241,16 @@ async function decideInReview(env: Env, payload: InteractionPayload, decision: "
   const card = reviewedCardOf(payload.view?.private_metadata);
   const userId = payload.user?.id;
   if (!viewId || !card || !userId) return;
+  const state = payload.view?.state?.values;
   await runReviewDecision(
-    { viewId, channel: card.channel, messageTs: card.ts, userId, decision },
+    { viewId, channel: card.channel, messageTs: card.ts, userId, decision, ...(state ? { state } : {}) },
     reviewDoorDeps(env),
   );
+}
+
+/** Where a pop-up select's options live, as the Worker's bindings name them. */
+function optionDatabase(env: Env, source: OptionSource): string | undefined {
+  return source.database === "roadmap" ? env.NOTION_ROADMAP_DB_ID : env.NOTION_DECISIONS_DB_ID;
 }
 
 /** `Env`, once, as the dependencies the review door reads. */
@@ -256,6 +272,10 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);
     },
     restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
+    fieldOptions: async (source) => {
+      const database = optionDatabase(env, source);
+      return database ? databaseOptions(env, database, source.property) : null;
+    },
   };
 }
 
