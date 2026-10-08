@@ -25,7 +25,8 @@
 // readouts that produce the sources (`agent/task-card-readout.ts`).
 
 import type { TaskCardSource } from "../agent/task-card-readout";
-import { estateOfHost } from "./estate-hosts";
+import type { Estate } from "../agent/tool-table";
+import { estateOfUrl } from "./estate-hosts";
 
 /** A source as a card carries it — the link and its name, nothing about who
  *  could see it, because only visible ones get this far. */
@@ -34,31 +35,19 @@ export interface CardSource {
   url: string;
 }
 
-/** The estates whose links pass on their host alone (`estate-hosts.ts`). */
-const SHARED_ESTATES = new Set(["notion", "github", "figma"]);
-
-/** Our own estates on the Netlify site, by path: other paths there are
- *  prototypes and previews, not a source an answer rests on. */
-const OWN_SITE = "plus-uno.netlify.app";
-const OWN_PATHS = ["/blueprint", "/storybook"];
+/** The estates whose links pass on their link alone (`estate-hosts.ts`):
+ *  the shared ones by host, and our own on the Netlify site by path — other
+ *  paths there are prototypes and previews, which are no estate at all. */
+const PASSING_ESTATES: ReadonlySet<Estate> = new Set<Estate>(["notion", "github", "figma", "storybook", "blueprint"]);
 
 /** The `slack_search` visibilities whose links the thread may see. */
 const THREAD_VISIBLE = ["public-only", "requester-own"];
 
 function passes(source: TaskCardSource): boolean {
-  let url: URL;
-  try {
-    url = new URL(source.url);
-  } catch {
-    return false;
-  }
-  if (url.protocol !== "https:" && url.protocol !== "http:") return false;
-  const host = url.hostname.toLowerCase();
-  const estate = estateOfHost(host);
-  if (estate && SHARED_ESTATES.has(estate)) return true;
-  if (host === OWN_SITE) return OWN_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(`${p}/`));
+  const estate = estateOfUrl(source.url);
+  if (estate && PASSING_ESTATES.has(estate)) return true;
   if (estate === "slack") {
-    const conversation = url.pathname.match(/^\/archives\/([A-Z0-9]+)/)?.[1] ?? "";
+    const conversation = new URL(source.url).pathname.match(/^\/archives\/([A-Z0-9]+)/)?.[1] ?? "";
     // D… is a direct message; G… a group DM or a legacy private channel.
     if (!conversation.startsWith("C")) return false;
     return THREAD_VISIBLE.some((v) => source.visibility?.startsWith(v));
