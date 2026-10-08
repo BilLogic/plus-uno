@@ -13,7 +13,7 @@
 //
 // The wordings themselves are load-bearing and have each been earned:
 //
-//   • THE LOST RACE is one wording for all four doors, and deliberately
+//   • THE LOST RACE is one wording for every door, and deliberately
 //     without a mention: the model's signal has no user, and a message that
 //     differs by door is a message that drifts by door.
 //   • AN AGED-OUT CARD is never met with silence. Live 2026-07-10, silence

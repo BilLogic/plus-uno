@@ -1,8 +1,9 @@
-// Gate — four signals in, one verdict out.
+// Gate — five signals in, one verdict out.
 //
-// A staged proposal is resolved four ways: a reaction on the card, the card's
-// own ✅/⛔ button, the same emoji typed alone as a message, and the model's
-// `proposal_resolve` call once the loop has validated it. Until now each door
+// A staged proposal is resolved five ways: a reaction on the card, the card's
+// own ✅/⛔ button, a decision in the card's Review pop-up, the same emoji typed
+// alone as a message, and the model's `proposal_resolve` call once the loop
+// has validated it. Until now each door
 // looked the proposal up its own way, wrote its own lost-race handling, and
 // two of them read the claim's answer while a third threw it away — which is
 // the bug: `slack/gate.ts` ignored the boolean, so a reaction that LOST the
@@ -18,7 +19,7 @@
 // `<@user>` and all, which made "no Slack call" true of the effects and false
 // of the content (#623); the wordings now live in `slack/gate-note.ts` and the
 // emoji vocabulary moved in here, as `gate/reactions.ts`. That is also what
-// lets the whole four-path agreement be asserted in one Node test against the
+// lets the agreement between every door be asserted in one Node test against the
 // in-memory ThreadState (`tests/confirmation-paths.test.ts`) — as MEANINGS
 // now, not as strings.
 //
@@ -71,6 +72,14 @@ export type GateSignal =
   | {
       kind: "button";
       /** The card itself: a button press always carries its own message. */
+      messageTs: string;
+      decision: Decision;
+      userId: string;
+    }
+  | {
+      kind: "review";
+      /** The card the pop-up was opened from: the view carries its ts, so the
+       *  decision is about that card and no other, as a button press is. */
       messageTs: string;
       decision: Decision;
       userId: string;
@@ -246,7 +255,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   // Parse before any read: a 🎉 in a thread that happens to hold a proposal is
   // not a gate signal and must cost nothing and say nothing.
   const decision =
-    signal.kind === "button"
+    signal.kind === "button" || signal.kind === "review"
       ? signal.decision
       : signal.kind === "reaction"
         ? mapReaction(signal.glyph)
@@ -344,6 +353,40 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   }
 
   return claim(proposal, decision, signal.userId, deps);
+}
+
+/**
+ * What a person opening a card's Review pop-up is shown: the card, and whether
+ * they may decide it — or why there is nothing left to decide.
+ *
+ * A look, not a signal: it claims nothing, consumes nothing and records
+ * nothing, so opening the pop-up twice, or opening it and closing it, leaves
+ * the card exactly as it was. `mayDecide` is the same `mayConfirm` the claim
+ * checks, so the pop-up never offers a decision the claim would refuse. The
+ * decision itself comes back through `resolveSignal` as a `review` signal,
+ * which re-checks all of it: a card can expire or be replaced while the pop-up
+ * is open.
+ */
+export type ProposalLook =
+  | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[] }
+  | { state: "superseded"; stated?: StatedCardWords }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords }
+  /** Decided, cut off, or never a card: nothing here is waiting on anyone. */
+  | { state: "gone" };
+
+export async function lookAtProposal(messageTs: string, userId: string, deps: GateDeps): Promise<ProposalLook> {
+  const byTs = await deps.threadState.getProposalByTs(messageTs).catch(() => ({ state: "none" }) as const);
+  if (byTs.state === "found") {
+    const proposal = byTs.proposal;
+    return {
+      state: "live",
+      proposal,
+      mayDecide: mayConfirm(proposal, userId, deps.standingConfirmers),
+      confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
+    };
+  }
+  if (byTs.state === "superseded" || byTs.state === "expired") return byTs;
+  return { state: "gone" };
 }
 
 /** The claim, and the verdict that follows from it. */
@@ -570,7 +613,8 @@ async function locate(
 function threadRefOf(
   signal: Exclude<GateSignal, { kind: "model" }>,
 ): { channel: string; thread: string } | null {
-  if (signal.kind === "button") return null; // a press carries no conversation
+  // A press, on the card or in its pop-up, carries no conversation.
+  if (signal.kind === "button" || signal.kind === "review") return null;
   return { channel: signal.channel, thread: signal.thread };
 }
 

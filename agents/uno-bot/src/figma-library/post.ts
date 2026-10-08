@@ -16,7 +16,7 @@
 // changed component maps to code, dispatches `figma-implement.yml` for all of
 // them (`component_implement` carrying `library_publish`). It is staged the way
 // a turn stages one — `ThreadState.putProposal` — with no turn behind it, so
-// Gate resolves it on all four doors like any other card, with two terms of its
+// Gate resolves it on every door like any other card, with two terms of its
 // own:
 //   • `confirmers` — the channel's members, read here at staging time. The
 //     design-ops team is whoever is in #plus-universal, so no variable names

@@ -1,4 +1,4 @@
-// The four ways to resolve a proposal agree with each other.
+// The five ways to resolve a proposal agree with each other.
 //
 // This file used to assert a glyph table and call itself "the three
 // confirmation paths agree" — it proved that ✅ means confirm, which was never
@@ -8,7 +8,8 @@
 //
 // So every case here drives a real signal through `resolveSignal` against one
 // staged proposal in the in-memory ThreadState, and asserts the VERDICT: the
-// same outcome, the same note, and one execution between all four.
+// same outcome, the same note, and one execution between all five. The Review
+// pop-up's own door is driven in `tests/proposal-review.test.ts`.
 // Past the verdict, the reaction door (#592) and the button door (#654) are
 // driven too — they take their dependencies by name, so the whole door runs
 // here on the recording Delivery rather than being read with a regex.
@@ -57,7 +58,7 @@ import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
 import { STALE_POST, STATED_SUPERSEDED_POST, renderGateNote } from "../src/slack/gate-note";
 import { verdictEvents } from "../src/usage/index";
 
-// ── one staged proposal, and the four signals that resolve it ────────────────
+// ── one staged proposal, and the five signals that resolve it ────────────────
 
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
@@ -99,6 +100,13 @@ const button = (decision: "confirm" | "cancel" = "confirm"): GateSignal => ({
   userId: "U2",
 });
 
+const review = (decision: "confirm" | "cancel" = "confirm"): GateSignal => ({
+  kind: "review",
+  messageTs: CARD_TS,
+  decision,
+  userId: "U2",
+});
+
 const typed = (text = "✅"): GateSignal => ({
   kind: "typed",
   channel: CHANNEL,
@@ -118,11 +126,12 @@ const model = (messageToUser?: string): GateSignal => ({
 const DOORS: Array<{ name: string; signal: GateSignal }> = [
   { name: "reaction on the card", signal: reaction() },
   { name: "the card's ✅ button", signal: button() },
+  { name: "Approve in the Review pop-up", signal: review() },
   { name: "the emoji typed alone", signal: typed() },
   { name: "the model's proposal_resolve", signal: model() },
 ];
 
-describe("four signals, one verdict", () => {
+describe("five signals, one verdict", () => {
   it("wins, posts the same verdict, and executes the same tool on every door", async () => {
     const verdicts: GateVerdict[] = [];
     for (const door of DOORS) {
@@ -158,7 +167,7 @@ describe("four signals, one verdict", () => {
       );
     }
 
-    // Not "each looks right" but "all four are the same verdict" — past the
+    // Not "each looks right" but "all five are the same verdict" — past the
     // door it came through, which each one names for the record.
     const { by: _first, ...first } = verdicts[0]!;
     for (const verdict of verdicts.slice(1)) {
@@ -170,6 +179,7 @@ describe("four signals, one verdict", () => {
       [
         { door: "reaction", userId: "U2" },
         { door: "button", userId: "U2" },
+        { door: "review", userId: "U2" },
         { door: "typed", userId: "U2" },
         { door: "model" },
       ],
@@ -196,6 +206,7 @@ describe("four signals, one verdict", () => {
     const cancels: GateSignal[] = [
       reaction({ glyph: "no_entry" }),
       button("cancel"),
+      review("cancel"),
       typed("⛔"),
       { kind: "model", pending: PROPOSAL, decision: "cancel", userId: "U1" },
     ];

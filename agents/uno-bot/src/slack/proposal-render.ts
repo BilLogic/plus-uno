@@ -32,8 +32,11 @@ import { relayRecipientId } from "../tools/relayed-dm-render";
 export const CONFIRM_FOOTER =
   `:white_check_mark: to approve · :no_entry: to cancel (then tell me what to change).`;
 
+/** The card's Review button; `slack/interactive.ts` routes it. */
+export const REVIEW_ACTION_ID = "uno_proposal_review";
+
 /**
- * The Approve / Cancel button row.
+ * The Approve / Cancel / Review button row.
  *
  * STYLING, and what Slack actually allows. Block Kit gives a button exactly
  * three looks — `style: "primary"` (filled green), `style: "danger"` (filled
@@ -78,6 +81,15 @@ export function proposalActionBlocks(): unknown[] {
           style: "danger",
           text: { type: "plain_text", text: "Cancel" },
           value: "cancel",
+        },
+        // Opens the whole draft in a pop-up (`slack/review-door.ts`). Quiet
+        // default style: it decides nothing, so it should not read as a
+        // third answer to the yes/no beside it.
+        {
+          type: "button",
+          action_id: REVIEW_ACTION_ID,
+          text: { type: "plain_text", text: "Review" },
+          value: "review",
         },
       ],
     },
