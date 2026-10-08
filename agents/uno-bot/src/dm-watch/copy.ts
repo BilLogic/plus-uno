@@ -32,9 +32,9 @@ export const MADE_TO_LAST_CHOICES: readonly ReminderChoice[] = [
 ];
 /** A promise the owner made, once both ⏳ are spent. */
 export const MADE_LAST_CHOICES: readonly ReminderChoice[] = [
-  { glyph: "raised_hands", label: "🙌 Done" },
-  { glyph: "no_good", label: "🙅 Not doing this" },
-  { glyph: "thinking_face", label: "🤔 Wasn't a promise" },
+  { glyph: "raised_hands", label: "Done" },
+  { glyph: "no_good", label: "Dropped" },
+  { glyph: "thinking_face", label: "Wasn't a promise" },
 ];
 
 /** What replaces that legend once the owner answers. 🤔 means nothing here. */

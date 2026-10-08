@@ -48,6 +48,14 @@ import type { GateNote } from "../turn/index";
 // ── The signal ───────────────────────────────────────────────────────────────
 
 /**
+ * What the Review pop-up decides: a ✅ or a ⛔ as every door has them — the
+ * pop-up's Reject is a ⛔ that may say why — or `revise`, Needs changes, which
+ * only the pop-up has. A revise is not a resolution: it consumes nothing and
+ * runs nothing, and the card stays live for the revision that replaces it.
+ */
+export type ReviewDecision = Decision | "revise";
+
+/**
  * One confirmation attempt, in the terms of the door it came through.
  *
  * A signal carries the FACTS the door already has, never a lookup: the ts a
@@ -81,8 +89,19 @@ export type GateSignal =
       /** The card the pop-up was opened from: the view carries its ts, so the
        *  decision is about that card and no other, as a button press is. */
       messageTs: string;
-      decision: Decision;
+      /** Approve, Reject (`cancel`), or Needs changes (`revise`). */
+      decision: ReviewDecision;
+      /** Needs changes' note, which the revision is written from; Reject's
+       *  reason, when one was given. */
+      note?: string;
       userId: string;
+      /**
+       * The batch as the pop-up's edits left it, already checked by the door
+       * against the guards a draft passes (`slack/review-fields.ts`). Absent,
+       * the card runs as staged. Applied only to the card the claim wins, so
+       * it is what the execution record and the run both carry.
+       */
+      operations?: ProposalOperation[];
     }
   | {
       kind: "typed";
@@ -184,6 +203,13 @@ export interface GateVerdict {
    * turn).
    */
   by?: { door: GateSignal["kind"]; userId?: string };
+  /**
+   * Needs changes, accepted: the card is live, the person may decide it, and a
+   * revision is to be written from `note`. Set only on a `won` verdict of a
+   * review `revise`, which has no `decision`, no `post` and no `execute` — the
+   * door posts the note into the thread and the revision turn does the rest.
+   */
+  revise?: { note: string };
 }
 
 /** What a cut-off verdict asks to have staged again. */
@@ -254,10 +280,16 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
 
   // Parse before any read: a 🎉 in a thread that happens to hold a proposal is
   // not a gate signal and must cost nothing and say nothing.
+  // A Needs changes that finds nothing live to change is answered as a ⛔
+  // would be: it asked for nothing to run, so it can only be told why.
   const decision =
-    signal.kind === "button" || signal.kind === "review"
-      ? signal.decision
-      : signal.kind === "reaction"
+    signal.kind === "review"
+      ? signal.decision === "revise"
+        ? "cancel"
+        : signal.decision
+      : signal.kind === "button"
+        ? signal.decision
+        : signal.kind === "reaction"
         ? mapReaction(signal.glyph)
         : typedEmojiDecision(signal.text);
   if (!decision) return { outcome: "none", post: null };
@@ -352,7 +384,72 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
     };
   }
 
+  if (signal.kind === "review") {
+    if (signal.decision === "revise") return askForChanges(proposal, signal.note ?? "", signal.userId, deps);
+    // The pop-up's ⛔ is Reject, and its reason rides on the note it posts.
+    if (decision === "cancel") {
+      const reason = signal.note?.trim();
+      return claim(proposal, decision, signal.userId, deps, undefined, reason ? { reason } : {});
+    }
+    return claim(edited(proposal, signal.operations), decision, signal.userId, deps);
+  }
   return claim(proposal, decision, signal.userId, deps);
+}
+
+/** The card with a pop-up's edited batch in place of its own, the first
+ *  operation mirrored where the one-operation readers look. */
+function edited(proposal: PendingProposal, operations: ProposalOperation[] | undefined): PendingProposal {
+  const [first] = operations ?? [];
+  if (!first) return proposal;
+  return { ...proposal, operations, toolName: first.toolName, input: first.input };
+}
+
+/**
+ * Needs changes on a live card: the confirmer rules a claim applies, and then
+ * no claim.
+ *
+ * The card is NOT consumed and NOT retired here. The revision is a turn in the
+ * card's thread, and a turn revises the card it finds pending there — so the
+ * card has to still be pending when it looks. Staging the revision is what
+ * retires it (`ThreadState.putProposal`), and the turn retires it ahead of
+ * writing (`retireProposal`), which is the supersession every other revision
+ * gets. An empty note revises nothing: there is nothing to write it from.
+ */
+async function askForChanges(
+  proposal: PendingProposal,
+  note: string,
+  userId: string,
+  deps: GateDeps,
+): Promise<GateVerdict> {
+  const text = note.trim();
+  if (!text) return { outcome: "none", proposal, post: null };
+  if (!mayConfirm(proposal, userId, deps.standingConfirmers)) return notAConfirmer(proposal, "cancel", userId, deps);
+  console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: changes asked by ${userId}`);
+  return { outcome: "won", proposal, post: null, revise: { note: text } };
+}
+
+/** A signal from someone the card does not accept: nothing resolved, and who
+ *  can resolve it named. */
+function notAConfirmer(
+  proposal: PendingProposal,
+  decision: Decision,
+  userId: string | undefined,
+  deps: GateDeps,
+): GateVerdict {
+  console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
+  return {
+    outcome: "none",
+    proposal,
+    decision,
+    post: {
+      note: {
+        kind: "not-a-confirmer",
+        confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
+        ...(userId ? { userId } : {}),
+      },
+      replyTs: replyTarget(proposal),
+    },
+  };
 }
 
 /**
@@ -396,6 +493,8 @@ async function claim(
   userId: string | undefined,
   deps: GateDeps,
   narrative?: string,
+  /** Set for the pop-up's Reject: a ⛔ that says so, with its reason. */
+  rejected?: { reason?: string },
 ): Promise<GateVerdict> {
   // A card with a confirmer set resolves only for its members, on every door.
   // Checked BEFORE the claim, because the claim consumes the card: a refused
@@ -403,20 +502,7 @@ async function claim(
   // `none`, not `stale` — nobody else resolved it and it has not aged out;
   // this signal was simply not one the card accepts.
   if (!mayConfirm(proposal, userId, deps.standingConfirmers)) {
-    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
-    return {
-      outcome: "none",
-      proposal,
-      decision,
-      post: {
-        note: {
-          kind: "not-a-confirmer",
-          confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
-          ...(userId ? { userId } : {}),
-        },
-        replyTs: replyTarget(proposal),
-      },
-    };
+    return notAConfirmer(proposal, decision, userId, deps);
   }
 
   // A person who reacts ✅ and then, unsure it registered, also types "go
@@ -488,6 +574,7 @@ async function claim(
             decision,
             ...(decision === "cancel" && run ? { stillRuns: proposalOperations(run).map((op) => op.toolName) } : {}),
             ...(decision === "cancel" && proposal.stated ? { cancelled: proposal.stated.cancelled } : {}),
+            ...(decision === "cancel" && rejected ? { rejected } : {}),
           },
       replyTs: replyTarget(proposal),
     },

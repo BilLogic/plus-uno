@@ -1118,16 +1118,26 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!, "backstop");
   }, INTERIM_BACKSTOP_MS);
 
+  // The presentation step: every lookup's result passes through it as it
+  // comes back, rather than being read off the run afterwards, because the
+  // model has to be TOLD what rides beneath its answer while it can still write
+  // its prose around it — a summary over a table, the plain list without.
+  const presenting = presenter({ now: () => deps.now?.() ?? Date.now() });
+
   // The checklist: one task card per lookup that has words for one on its tool
   // table row. The loop reports every call it runs through the lookup path; a
   // reaction, a Worker-only call and anything gated have no card, and that is
   // the table's answer, not a list kept here. Fire-and-forget like the
   // narration, for the same reason: a courtesy must not wait in front of work.
+  // A finished card's links are also the presentation step's, for the
+  // Sources box beneath the answer.
   const showToolProgress = (event: ToolProgressEvent): void => {
     // A lookup refused before it ran never reaches `reviseLookupResult`, so
     // the presentation step hears of it here: a budget refusal is a ⚠️ line.
     if (event.phase === "refused") presenting.refused(event.name, event.reason);
-    if (taskCardFor(event.name)) delivery.toolProgress(event);
+    if (!taskCardFor(event.name)) return;
+    delivery.toolProgress(event);
+    if (event.phase === "finished" && event.sources) presenting.sourcesRead(event.sources);
   };
 
   // Clarify-vs-act, bound to this thread once: the loop asks it mid-turn (so a
@@ -1146,11 +1156,6 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     });
   };
 
-  // The presentation step: every lookup's result passes through it as it
-  // comes back, rather than being read off the run afterwards, because the
-  // model has to be TOLD what rides beneath its answer while it can still write
-  // its prose around it — a summary over a table, the plain list without.
-  const presenting = presenter({ now: () => deps.now?.() ?? Date.now() });
   const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string =>
     presenting.revise(name, args, text);
 

@@ -90,7 +90,7 @@ test("a clean turn carries no ⚠️ line", async () => {
   const { answer, warnings } = await turn([[SEARCH], [ROADMAP]], { search_blueprint: blueprintRows(), roadmap_query: roadmapCards() });
 
   assert.deepEqual(warnings, []);
-  assert.equal(answer.presentation, undefined);
+  assert.equal(answer.presentation?.warnings, undefined);
   const { blocks, message } = await posted(answer.text, answer.presentation);
   assert.ok(!contextTexts(blocks).some((t) => t.includes("⚠")));
   assert.doesNotMatch(message.text, /⚠/);

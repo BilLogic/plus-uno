@@ -1,9 +1,11 @@
 // The UsageLog conformance suite, run against the in-memory adapter. The D1
 // adapter runs the same suite under workerd
 // (tests/workerd/usage-log.conformance.test.ts). The ResolutionLog suite rides
-// along on the same pair of runs.
+// along on the same pair of runs, and so does the AnswerFeedbackLog suite.
 import test from "node:test";
 
+import { createInMemoryAnswerFeedbackLog } from "../src/usage/feedback";
+import { runAnswerFeedbackConformance } from "./helpers/answer-feedback-conformance";
 import { createInMemoryAskCategories } from "../src/usage/category-store";
 import { createInMemoryUsageLog } from "../src/usage/in-memory";
 import { createInMemoryResolutionLog } from "../src/usage/resolution-in-memory";
@@ -31,3 +33,7 @@ runResolutionLogConformance(
   },
   { it: (name, fn) => test(name, fn) },
 );
+
+runAnswerFeedbackConformance("in-memory", () => createInMemoryAnswerFeedbackLog(), {
+  it: (name, fn) => test(name, fn),
+});

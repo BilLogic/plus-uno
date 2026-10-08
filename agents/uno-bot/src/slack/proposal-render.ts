@@ -24,45 +24,31 @@ import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 
-// One shared confirmation footer on every card. Anyone in the thread may
-// confirm/cancel (the requester lock was removed 2026-07-14), so it names no
-// approver. It names the two gestures and nothing else — no "or just say go
-// ahead": the buttons and reactions are the clear path, and anything typed
-// goes to the model, which reads it in context (2026-08-22).
-export const CONFIRM_FOOTER =
-  `:white_check_mark: to approve · :no_entry: to cancel (then tell me what to change).`;
+// One shared confirmation footer on every card. It names no approver, since
+// the confirmer set decides who may, and it points at the one button: the
+// decisions — Approve, Needs changes, Reject — are made in the pop-up. The ✅
+// and ⛔ reactions still resolve a card, as a fallback for people used to
+// them, and are deliberately not advertised here.
+export const CONFIRM_FOOTER = "Press Review to approve it, ask for changes or reject it.";
 
-/** The card's Review button; `slack/interactive.ts` routes it. */
+/** The card's Review button, and View once decided; `slack/interactive.ts`
+ *  routes both. */
 export const REVIEW_ACTION_ID = "uno_proposal_review";
 
 /**
- * The Approve / Cancel / Review button row.
+ * The card's one button: Review, and View once the card is decided.
  *
- * STYLING, and what Slack actually allows. Block Kit gives a button exactly
- * three looks — `style: "primary"` (filled green), `style: "danger"` (filled
- * red), and no `style` at all (the quiet default outline). There is no tonal
- * variant, no custom colour, no border control. Emoji in the label is the only
- * other dial.
+ * The card used to carry Approve (`primary`) and Cancel (`danger`) beside it.
+ * Both moved into the pop-up, whose last row is Approve, Needs changes and
+ * Reject (`slack/review-view.ts`), so a decision is always made with the whole
+ * draft in front of the person. Cards already posted with the old pair still
+ * work: `slack/interactive.ts` keeps routing `uno_proposal_confirm` and
+ * `uno_proposal_cancel`.
  *
- * The first cut used filled + emoji on BOTH buttons, which read as shouting:
- * colour and glyph each carried the whole message, so the row said everything
- * twice in two saturated blocks side by side.
- *
- * Now: filled on both, no emoji. The colour carries the meaning and the label
- * says the word; the glyph was the third copy of the same signal.
- *
- * Approve is `primary`, Cancel is `danger` (Bill's call, 2026-08-22). I had
- * argued for a quiet default on Cancel, on the reasoning that red marks the
- * dangerous choice and here *Approve* is the one firing the irreversible
- * write. Overruled, and the counter-argument is good: in a two-button yes/no
- * the pair reads as a pair, and a green/red set is instantly legible at a
- * glance in a busy thread — which is where these cards are actually read.
- *
- * The handler in slack/interactive.ts resolves the card the button sits on, so
- * the buttons carry no payload — the message ts is the identity, as with a
- * reaction.
+ * Quiet default style, no emoji: it decides nothing itself. It carries no
+ * payload — the card's message ts is the identity, as with a reaction.
  */
-export function proposalActionBlocks(): unknown[] {
+export function proposalActionBlocks(label: "Review" | "View" = "Review"): unknown[] {
   return [
     {
       type: "actions",
@@ -70,26 +56,9 @@ export function proposalActionBlocks(): unknown[] {
       elements: [
         {
           type: "button",
-          action_id: "uno_proposal_confirm",
-          style: "primary",
-          text: { type: "plain_text", text: "Approve" },
-          value: "confirm",
-        },
-        {
-          type: "button",
-          action_id: "uno_proposal_cancel",
-          style: "danger",
-          text: { type: "plain_text", text: "Cancel" },
-          value: "cancel",
-        },
-        // Opens the whole draft in a pop-up (`slack/review-door.ts`). Quiet
-        // default style: it decides nothing, so it should not read as a
-        // third answer to the yes/no beside it.
-        {
-          type: "button",
           action_id: REVIEW_ACTION_ID,
-          text: { type: "plain_text", text: "Review" },
-          value: "review",
+          text: { type: "plain_text", text: label },
+          value: label.toLowerCase(),
         },
       ],
     },
@@ -97,12 +66,14 @@ export function proposalActionBlocks(): unknown[] {
 }
 
 /** A text-only card as blocks: the text in ≤3000-char sections, then the
- *  button row. Used at post time and again by the button handler to re-render
- *  the card once it is resolved (buttons off, outcome on). */
+ *  Review button. Used at post time and again by the doors to re-render the
+ *  card once it is decided: the outcome as a context line, and View, which
+ *  opens the draft read-only. */
 export function proposalCardBlocks(text: string, resolvedNote?: string): unknown[] {
   const blocks: unknown[] = [...textSections(text)];
   if (resolvedNote) {
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: resolvedNote }] });
+    blocks.push(...proposalActionBlocks("View"));
   } else {
     blocks.push(...proposalActionBlocks());
   }
@@ -294,7 +265,7 @@ function caveatText(caveat: CardCaveat): string {
   if (caveat.kind === "bundle-incomplete") {
     return (
       `:warning: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +
-      `A :white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
+      `Approving posts it *without* them — or drop the links in this thread first and I'll fold them in.`
     );
   }
   if (caveat.kind === "repo-visibility") {
@@ -454,7 +425,7 @@ function packMessages(lead: string, lines: string[]): string[] {
 function planHead(operations: number, groups: number): string {
   const where = groups === 1 ? "" : ` across ${groups} targets`;
   // Plain, not bold: the group headings under it are the bold lines.
-  return `This one ✅ runs ${operations} operations${where}, in order:`;
+  return `Approving runs ${operations} operations${where}, in order:`;
 }
 
 function planBody(
@@ -501,6 +472,11 @@ function planLines(op: PlannedOperation, n: number): string[] {
 /** A run of operations that land on the SAME thing, in batch order. */
 export interface OperationGroup {
   heading: string;
+  /** The heading in plain words, for where mrkdwn does not render: a result
+   *  table's cell. */
+  name: string;
+  /** Where the target lives, when its input gives a real address. */
+  url?: string;
   /** Indices into the batch — so a caller can pair a group with whatever else
    *  it holds per operation (the Gate's outcomes) without re-deriving order. */
   members: number[];
@@ -518,10 +494,10 @@ export function groupOperations(operations: ReadonlyArray<PlannedOperation>): Op
   const groups: OperationGroup[] = [];
   const byKey = new Map<string, OperationGroup>();
   operations.forEach((op, i) => {
-    const { key, heading } = operationGroupKey(op);
+    const { key, ...target } = operationGroupKey(op);
     let group = byKey.get(key);
     if (!group) {
-      group = { heading, members: [] };
+      group = { ...target, members: [] };
       byKey.set(key, group);
       groups.push(group);
     }
@@ -530,39 +506,48 @@ export function groupOperations(operations: ReadonlyArray<PlannedOperation>): Op
   return groups;
 }
 
+/** A group's key, its card heading, the heading in plain words, and its link. */
+interface GroupKey {
+  key: string;
+  heading: string;
+  name: string;
+  url?: string;
+}
+
+/** A target whose card heading is its plain name in bold. */
+const bolded = (key: string, name: string): GroupKey => ({ key, heading: `*${name}*`, name });
+
 /** What an operation lands ON, in the words its own input uses — a Notion page,
  *  a data source, a repo, a channel, a recipient. Never invented: an input that
  *  names no target gets the tool's own generic heading, because a wrong target
  *  on a card is worse than a vague one. */
-function operationGroupKey(op: PlannedOperation): { key: string; heading: string } {
+function operationGroupKey(op: PlannedOperation): GroupKey {
   const str = (k: string): string =>
     typeof op.input[k] === "string" ? (op.input[k] as string).trim() : "";
 
   if (op.toolName === "notion_create") {
     const source = str("database") || str("data_source") || str("surface");
     return source
-      ? { key: `source:${source.toLowerCase()}`, heading: `*${source}* (Notion data source)` }
-      : { key: "source:notion", heading: "*Notion*" };
+      ? { key: `source:${source.toLowerCase()}`, heading: `*${source}* (Notion data source)`, name: `${source} (Notion data source)` }
+      : bolded("source:notion", "Notion");
   }
   if (op.toolName === "email_send") {
     const to = str("to") || str("recipient");
-    return to
-      ? { key: `email:${to.toLowerCase()}`, heading: `*${to}*` }
-      : { key: "email:", heading: "*Gmail*" };
+    return to ? bolded(`email:${to.toLowerCase()}`, to) : bolded("email:", "Gmail");
   }
   if (op.toolName === "dm_relay") {
+    // A table cell renders no mention, so the plain name is the kind of
+    // target; the text copy beside the table names the person.
     const id = relayRecipientId(op.input.recipient);
-    return id
-      ? { key: `dm:${id}`, heading: `*<@${id}>*` }
-      : { key: "dm:", heading: "*a DM*" };
+    return id ? { key: `dm:${id}`, heading: `*<@${id}>*`, name: "a DM" } : bolded("dm:", "a DM");
   }
   if (op.toolName === "shareout_post") {
     const channel = str("channel") || "#plus-design-feedback";
-    return { key: `channel:${channel.toLowerCase()}`, heading: `*${channel}*` };
+    return bolded(`channel:${channel.toLowerCase()}`, channel);
   }
   if (op.toolName === "component_implement" || op.toolName === "prototype_scaffold") {
     const repo = str("repo") || str("repository");
-    if (repo) return { key: `repo:${repo.toLowerCase()}`, heading: `*${repo}*` };
+    if (repo) return bolded(`repo:${repo.toLowerCase()}`, repo);
   }
   const pageUrl = str("page_url") || str("url");
   const title = str("title") || str("page_title") || str("page");
@@ -570,14 +555,13 @@ function operationGroupKey(op: PlannedOperation): { key: string; heading: string
     // Only a real URL becomes a link, and the title is escaped inside its
     // label: a `>` in either would end the link early.
     const linked = /^https?:\/\/[^\s|<>]+$/.test(pageUrl);
-    const label = escapeSlackText(title || (linked ? "this Notion page" : pageUrl));
+    const name = title || (linked ? "this Notion page" : pageUrl);
+    const label = escapeSlackText(name);
     const heading = linked ? `*<${pageUrl}|${label}>*` : `*${label}*`;
-    return { key: `page:${(pageUrl || title).toLowerCase()}`, heading };
+    return { key: `page:${(pageUrl || title).toLowerCase()}`, heading, name, ...(linked ? { url: pageUrl } : {}) };
   }
   const target = operationTarget(op.input);
-  return target
-    ? { key: `other:${target.toLowerCase()}`, heading: `*${target}*` }
-    : { key: `tool:${op.toolName}`, heading: `*${op.toolName}*` };
+  return target ? bolded(`other:${target.toLowerCase()}`, target) : bolded(`tool:${op.toolName}`, op.toolName);
 }
 
 /** One operation's kinds, each with its own detail lines. A `notion_update`

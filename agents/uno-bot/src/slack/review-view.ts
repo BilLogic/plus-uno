@@ -2,9 +2,11 @@
 // follow a decision or find nothing left to decide.
 //
 // Renders and posts nothing; `review-door.ts` decides which view to show and
-// hands it to Slack. Every view is a modal with a Close and no submit: the
-// decision is a button in the body's last row, because a view's footer holds
-// only two buttons, and Slack's ✕ closes without deciding.
+// hands it to Slack. Every view is a modal with a Close, and the decision is a
+// button in the body's last row, because a view's footer holds only two
+// buttons, and Slack's ✕ closes without deciding. A confirmer's draft also
+// has a submit, because Slack requires one beside an input (the fields, the
+// note); it is Check edits, which decides nothing (`CHECK_EDITS`).
 //
 // The view carries the card it is about in `private_metadata`, as the card's
 // own buttons carry it in the message they sit on — that ts is the identity,
@@ -12,10 +14,24 @@
 import { textSections } from "./render";
 import { CONFIRM_FOOTER } from "./proposal-render";
 import { SLACK_USER_ID } from "./mrkdwn";
+import { fieldInputBlocks, type EditableField } from "./review-fields";
 import type { PendingProposal, StatedCardWords } from "../thread-state/index";
 
-/** The Approve button inside the pop-up; `slack/interactive.ts` routes it. */
+/** The decision row inside the pop-up; `slack/interactive.ts` routes all three. */
 export const REVIEW_APPROVE_ACTION_ID = "uno_review_approve";
+export const REVIEW_CHANGES_ACTION_ID = "uno_review_changes";
+export const REVIEW_REJECT_ACTION_ID = "uno_review_reject";
+
+/** The note input: Needs changes' note, Reject's reason. A decision press
+ *  carries it in the view's state under these ids (`reviewNoteOf`). */
+const NOTE_BLOCK_ID = "uno_review_note";
+const NOTE_ACTION_ID = "uno_review_note_input";
+
+/** Slack's cap on a `plain_text_input`. */
+const NOTE_MAX_CHARS = 3000;
+
+/** Said above the row when Needs changes was pressed with no note. */
+const NOTE_NEEDED = ":warning: Needs changes needs a note: write what to change, then press it again.";
 
 /** The card a view is about, as `private_metadata` carries it. */
 export interface ReviewedCard {
@@ -32,14 +48,46 @@ const MAX_VIEW_BLOCKS = 100;
 
 type View = Record<string, unknown>;
 
-function modal(card: ReviewedCard, blocks: unknown[]): View {
+/** A view's `callback_id`, which names the pop-up's submit to the endpoint. */
+export const REVIEW_CALLBACK_ID = "uno_review";
+
+/** The one alert a view carries, replaced rather than stacked. */
+export const REVIEW_ALERT_BLOCK_ID = "uno_review_alert";
+
+/**
+ * The footer's submit, on every view a confirmer can decide from. Slack
+ * requires a submit on any view with an input block — the fields, and the
+ * note every confirmer's view carries — and pressing Enter in a field
+ * presses it, so it decides nothing: it runs the edit checks and answers in
+ * the pop-up. The decision stays in the body's last row.
+ */
+export const CHECK_EDITS = "Check edits";
+
+function modal(card: ReviewedCard, blocks: unknown[], opts: { submit?: string } = {}): View {
   return {
     type: "modal",
+    callback_id: REVIEW_CALLBACK_ID,
     title: { type: "plain_text", text: TITLE },
     close: { type: "plain_text", text: "Close" },
+    ...(opts.submit ? { submit: { type: "plain_text", text: opts.submit } } : {}),
     private_metadata: JSON.stringify({ channel: card.channel, ts: card.ts }),
     blocks: blocks.slice(0, MAX_VIEW_BLOCKS),
   };
+}
+
+/** What the pop-up has to say about the edits: an alert block, which Slack
+ *  takes in a modal and nowhere else. Text is plain, so a quoted edit shows
+ *  exactly as typed. */
+export function alertBlock(level: "error" | "success", text: string): unknown {
+  return { type: "alert", block_id: REVIEW_ALERT_BLOCK_ID, level, text: { type: "plain_text", text } };
+}
+
+/** The draft's fields, editable, and what the pop-up says about them. */
+export interface DraftEdit {
+  fields: readonly EditableField[];
+  /** The person's own values, kept across a redraw. */
+  values?: ReadonlyMap<string, string>;
+  alert?: { level: "error" | "success"; text: string };
 }
 
 function line(text: string): unknown {
@@ -58,33 +106,97 @@ export function loadingView(card: ReviewedCard): View {
  *
  * `mayDecide` false is the same draft read-only: no decision row, and a line
  * naming who can decide instead.
+ *
+ * `edit` gives a confirmer the draft's fields as inputs, under the draft and
+ * above the decision; an alert about them opens the view, where it is seen.
+ * Read-only views take no fields.
+ *
+ * A confirmer's view ends with the note and then the decision row — Approve,
+ * Needs changes, Reject, in that order. The note is optional to Slack, because
+ * Approve ignores it and Reject takes it as an optional reason; Needs changes
+ * without one is refused by the door, which re-renders this view with
+ * `noteNeeded`. The note is an input too, so every confirmer's view carries
+ * the Check edits submit Slack requires beside one.
  */
 export function draftView(
   card: ReviewedCard,
   proposal: PendingProposal,
   access: { mayDecide: boolean; confirmers: readonly string[] },
+  edit?: DraftEdit,
+  opts: { noteNeeded?: boolean } = {},
 ): View {
-  const body = proposal.proposalText.replace(CONFIRM_FOOTER, "").trim();
-  const blocks: unknown[] = [...textSections(body)];
+  const fields = access.mayDecide ? (edit?.fields ?? []) : [];
+  const blocks: unknown[] = [];
+  if (fields.length && edit?.alert) blocks.push(alertBlock(edit.alert.level, edit.alert.text));
+  blocks.push(...textSections(draftBody(proposal.proposalText)));
+  if (fields.length) {
+    blocks.push({ type: "divider" });
+    blocks.push(...fieldInputBlocks(fields, edit?.values));
+  }
   if (access.mayDecide) {
     blocks.push({ type: "divider" });
-    blocks.push({
-      type: "actions",
-      block_id: "uno_review_decision",
-      elements: [
-        {
-          type: "button",
-          action_id: REVIEW_APPROVE_ACTION_ID,
-          style: "primary",
-          text: { type: "plain_text", text: "Approve" },
-          value: "confirm",
-        },
-      ],
-    });
+    blocks.push(noteInput());
+    if (opts.noteNeeded) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: NOTE_NEEDED }] });
+    blocks.push(decisionRow());
   } else {
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: readOnlyLine(access.confirmers) }] });
   }
-  return modal(card, blocks);
+  return modal(card, blocks, access.mayDecide ? { submit: CHECK_EDITS } : {});
+}
+
+/** The card's text without its footer, which points at the pop-up itself. */
+function draftBody(text: string): string {
+  return text.replace(CONFIRM_FOOTER, "").trim();
+}
+
+function noteInput(): unknown {
+  return {
+    type: "input",
+    block_id: NOTE_BLOCK_ID,
+    optional: true,
+    label: { type: "plain_text", text: "Note" },
+    hint: { type: "plain_text", text: "Needed for Needs changes: I revise the draft from it. Optional for Reject, as the reason." },
+    element: { type: "plain_text_input", action_id: NOTE_ACTION_ID, multiline: true, max_length: NOTE_MAX_CHARS },
+  };
+}
+
+function decisionRow(): unknown {
+  const button = (action_id: string, text: string, value: string, style?: "primary" | "danger") => ({
+    type: "button",
+    action_id,
+    ...(style ? { style } : {}),
+    text: { type: "plain_text", text },
+    value,
+  });
+  return {
+    type: "actions",
+    block_id: "uno_review_decision",
+    elements: [
+      button(REVIEW_APPROVE_ACTION_ID, "Approve", "confirm", "primary"),
+      button(REVIEW_CHANGES_ACTION_ID, "Needs changes", "revise"),
+      button(REVIEW_REJECT_ACTION_ID, "Reject", "cancel", "danger"),
+    ],
+  };
+}
+
+/** What the note input holds, from a decision press's `view.state.values` —
+ *  trimmed, and empty when there is none. */
+export function reviewNoteOf(state: unknown): string {
+  const values = (state as { values?: Record<string, Record<string, { value?: unknown }>> } | undefined)?.values;
+  const value = values?.[NOTE_BLOCK_ID]?.[NOTE_ACTION_ID]?.value;
+  return typeof value === "string" ? value.trim() : "";
+}
+
+/**
+ * A decided card, opened from View: its own words, read-only. The record is
+ * gone once a card is decided, so the words are the card's message as Slack
+ * hands it with the click, outcome line included.
+ */
+export function decidedView(card: ReviewedCard, cardText: string): View {
+  return modal(card, [
+    ...textSections(draftBody(cardText)),
+    { type: "context", elements: [{ type: "mrkdwn", text: "Read-only. This proposal has already been decided." }] },
+  ]);
 }
 
 function readOnlyLine(confirmers: readonly string[]): string {
