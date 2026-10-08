@@ -126,7 +126,13 @@ describe("an answer with a card table", () => {
   it("says when the list is only the first of more", async () => {
     const { dataTable } = await post(wip(30, { total: 41, partial: true }));
 
-    assert.equal(dataTable.caption, "first 30 of 41 cards · Design Status WIP");
+    assert.equal(dataTable.caption, "first 30 of 41 · Design Status WIP");
+  });
+
+  it("names the phrase a title search's list is for", async () => {
+    const { dataTable } = await post(wip(3, { filter: { title: "onboarding" } }));
+
+    assert.equal(dataTable.caption, '3 cards · title contains "onboarding"');
   });
 
   it("names the person a person's list is for", async () => {

@@ -8,8 +8,11 @@
 // itself could be wrong, short or unlinked, and nothing would say so.
 //
 // WHEN ONE IS ATTACHED is a rule here, not a line in the persona: the lookup
-// asked for it and returned two or more definite cards. A single card is an
-// answer in prose. If several lookups in a turn qualify, the last one is the
+// asked for it and returned two or more definite cards. Definite means an
+// enumeration's cards (a design status and/or a person), or, on a title
+// search, the cards whose titles really contain the phrase: the "similar"
+// did-you-mean guesses stay in the prose, so a guess never sits in a grid that
+// reads as fact. A single card is an answer in prose. If several lookups in a turn qualify, the last one is the
 // table — one per answer.
 //
 // WHAT THE MODEL IS TOLD. The lookup's result gains `table_attached`, and
@@ -38,7 +41,7 @@ export interface CardTableRow {
 export interface CardTable {
   rows: CardTableRow[];
   /** The filters the lookup ran under, for the caption. */
-  filter: { designStatus?: string; person?: string };
+  filter: { designStatus?: string; person?: string; title?: string };
   /** How many cards matched. More than `rows.length` when the lookup listed
    *  only the first of them. */
   total: number;
@@ -64,6 +67,7 @@ interface LookupCard {
   card_number?: unknown;
   design_status?: unknown;
   dev_status?: unknown;
+  title_match?: unknown;
 }
 
 interface LookupResult {
@@ -71,6 +75,7 @@ interface LookupResult {
   filters?: { design_status?: unknown; person?: unknown; title?: unknown; card_number?: unknown };
   cards?: unknown;
   matched?: unknown;
+  contains_count?: unknown;
   truncated?: unknown;
 }
 
@@ -95,9 +100,9 @@ function rowOf(card: LookupCard): CardTableRow | null {
  * Only a `roadmap_query` that answered `ok` is touched; anything else — another
  * tool, a failed lookup, a payload that is not JSON — comes back as it was.
  *
- * Definite cards are an enumeration's: a design status and/or a person. A
- * lookup that searched by title or card number attaches nothing yet, because
- * its candidates include cards that only resemble what was asked for.
+ * Definite cards are an enumeration's (a design status and/or a person), or a
+ * title search's hits, the cards marked `title_match: "contains"`. A lookup by
+ * card number alone asks after one card, so it attaches nothing.
  *
  * @param name - The tool that ran
  * @param args - The arguments the model sent it
@@ -124,19 +129,27 @@ export function readCardTable(name: string, args: Record<string, unknown>, resul
 
 function tableOf(parsed: LookupResult): CardTable | undefined {
   const filters = parsed.filters ?? {};
-  if (filters.title !== undefined || filters.card_number !== undefined) return undefined;
   const designStatus = text(filters.design_status);
   const person = text(filters.person);
-  if (!designStatus && !person) return undefined;
+  const title = text(filters.title);
+  if (!title && (filters.card_number !== undefined || (!designStatus && !person))) return undefined;
 
-  const cards = Array.isArray(parsed.cards) ? (parsed.cards as LookupCard[]) : [];
+  const all = Array.isArray(parsed.cards) ? (parsed.cards as LookupCard[]) : [];
+  // A title search lists its hits first and its guesses after. Only the hits
+  // are definite, and `contains_count` is the whole count of them.
+  const cards = title ? all.filter((c) => c.title_match === "contains") : all;
   const rows = cards.map(rowOf).filter((r): r is CardTableRow => r !== null);
   if (rows.length < MIN_ROWS) return undefined;
 
-  const matched = typeof parsed.matched === "number" ? Math.max(parsed.matched, rows.length) : rows.length;
+  const whole = title ? parsed.contains_count : parsed.matched;
+  const matched = typeof whole === "number" ? Math.max(whole, rows.length) : rows.length;
   return {
     rows,
-    filter: { ...(designStatus ? { designStatus } : {}), ...(person ? { person } : {}) },
+    filter: {
+      ...(designStatus ? { designStatus } : {}),
+      ...(person ? { person } : {}),
+      ...(title ? { title } : {}),
+    },
     total: matched,
     partial: matched > rows.length || parsed.truncated === true,
   };
