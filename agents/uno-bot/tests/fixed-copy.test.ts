@@ -30,6 +30,7 @@ import { renderGateNote } from "../src/slack/gate-note";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { buildFailureMessage } from "../src/slack/failure-message";
+import { emojiIn as countEmoji } from "../src/voice/emoji";
 import type { GateNote } from "../src/turn/index";
 import type { OperationOutcome } from "../src/gate/index";
 
@@ -224,11 +225,10 @@ export function stringLiterals(src: string): string[] {
   return out;
 }
 
-/** Every emoji in a piece of copy, as the glyph a person sees. */
+/** Every emoji in a piece of copy, as the glyph a person sees: the voice's own
+ *  counter, the one the draft judge reads, with a shortcode read as its glyph. */
 function emojiIn(text: string): string[] {
-  const glyphs = (text.replace(/\uFE0F/g, "").match(/\p{Extended_Pictographic}/gu) ?? []).filter((g) => !"©®™↔↩↪".includes(g));
-  const codes = [...text.matchAll(/(?<![\w}$-]):([a-z][a-z0-9_+-]*):(?![\w])/g)].map((m) => SHORTCODES[m[1]!] ?? `:${m[1]}:`);
-  return [...glyphs, ...codes];
+  return countEmoji(text).map((e) => (e.startsWith(":") ? (SHORTCODES[e.slice(1, -1)] ?? e) : e.replace(/\uFE0F/g, "")));
 }
 
 function filesUnder(dir: string): string[] {

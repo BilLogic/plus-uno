@@ -7,11 +7,24 @@
 //
 // What counts: any grapheme carrying an Extended_Pictographic code point (so a
 // ZWJ family, a flag-free keycap or a skin tone is ONE emoji), and a Slack
-// shortcode such as `:rocket:`, which Slack renders as the glyph. A shortcode
-// starts with a letter, so a clock time like `10:30:00` is not one.
+// shortcode such as `:rocket:`, which Slack renders as the glyph.
+//
+// What does not: the typographic symbols Unicode also files as pictographic
+// (© ® ™ ‼ ⁉ ℹ and the arrows ↔ … ↪), which render as text unless a U+FE0F
+// asks for the emoji form; and a shortcode that is not a word of its own, so a
+// clock time `10:30:00`, `a:b:c` and `key:value:` are not one. A `}` or `$`
+// before it is a template substitution, as the copy guard reads source.
 
 const PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
-const SHORTCODE = /:[a-z][a-z0-9_+-]*:/g;
+const TEXT_SYMBOLS = /[©®™‼⁉ℹ↔↕↖↗↘↙↩↪]/gu;
+const SHORTCODE = /(?<![\w}$-]):[a-z][a-z0-9_+-]*:(?!\w)/g;
+
+/** A grapheme drawn as an emoji: a pictographic code point that is not a text
+ *  symbol, or a text symbol asked for in its emoji form. */
+function isEmoji(grapheme: string): boolean {
+  if (grapheme.includes("️")) return PICTOGRAPHIC.test(grapheme);
+  return PICTOGRAPHIC.test(grapheme.replace(TEXT_SYMBOLS, ""));
+}
 
 /** The one emoji a reply may carry, and only to open its first line. */
 export const SHIP_EMOJI = "🎉";
@@ -21,7 +34,7 @@ export function emojiIn(text: string): string[] {
   const found: Array<{ at: number; emoji: string }> = [];
   const segmenter = new Intl.Segmenter("en", { granularity: "grapheme" });
   for (const { segment, index } of segmenter.segment(text)) {
-    if (PICTOGRAPHIC.test(segment)) found.push({ at: index, emoji: segment });
+    if (isEmoji(segment)) found.push({ at: index, emoji: segment });
   }
   for (const m of text.matchAll(SHORTCODE)) found.push({ at: m.index ?? 0, emoji: m[0] });
   return found.sort((a, b) => a.at - b.at).map((f) => f.emoji);
