@@ -239,7 +239,7 @@ describe("the morning run", () => {
     assert.deepEqual(mentions(nudge!.text), [MAYA]);
     assert.equal(
       nudge!.text,
-      `Hi <@${MAYA}>, you mentioned you'd share the Figma link for the reflection screens by Thu. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or does the date need to move? <https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}|Original message>`,
+      `*You said you'd share the Figma link for the reflection screens by Thu*\n<@${MAYA}> I haven't spotted it yet. Is it done, or does the date need to move? · <https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}|Original message>`,
     );
     assert.deepEqual(footerLabels(nudge!.blocks), REMINDER_CHOICES.map((c) => c.label).join(" · "));
     const row = only(store);
@@ -257,7 +257,7 @@ describe("the morning run", () => {
     // Tue + two working days: due Thursday night, nudged Friday.
     const m = mornings({ store, now: at(32, 13) });
     await m.run();
-    assert.match(m.posts[0]!.text, new RegExp(`^Hi <@${MAYA}>, on Tue you mentioned you'd share the Figma link for the reflection screens\\. I haven't spotted it yet.*Is it done, or still in progress\\?`));
+    assert.match(m.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd share the Figma link for the reflection screens\\*\\n<@${MAYA}> I haven't spotted it yet\\. Is it done, or still in progress\\?`));
   });
 
   it("no answer brings one follow-up, then the commitment lapses", async () => {
@@ -296,7 +296,7 @@ describe("the morning run", () => {
     const m = mornings({ store, now: at(32, 18), dryRun: true });
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["nudged"]);
-    assert.match(report.actions[0]!.text ?? "", /you mentioned you'd share the Figma link/);
+    assert.match(report.actions[0]!.text ?? "", /You said you'd share the Figma link/);
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).state, "open");
   });

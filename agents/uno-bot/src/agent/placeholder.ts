@@ -86,6 +86,16 @@ function findPlaceholder(
   return null;
 }
 
+/**
+ * The unfilled slot one field's text is, or holds, written as it appears — or
+ * null when the text is content. The same shape test a create call's fields
+ * get, for one value on its own: an edit made in the Review pop-up is checked
+ * by it before the write (`slack/review-fields.ts`).
+ */
+export function placeholderIn(value: string): string | null {
+  return findPlaceholder([{ name: "", value }], "")?.text ?? null;
+}
+
 /** The surface in its own words — a decision record is not "a card". */
 function notionSurfaceName(input: Record<string, unknown>): string {
   const surface = typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";

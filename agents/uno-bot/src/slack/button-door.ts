@@ -25,6 +25,7 @@ import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { renderGateNote, statedCancelledNote } from "./gate-note";
+import { escapeSlackText } from "./mrkdwn";
 
 /** One button press, in the facts the envelope already has. */
 export interface ButtonRequest {
@@ -162,12 +163,16 @@ export async function applyPressVerdict(
 
   // A stated card's ⛔ is a decision its footer described, not a request to
   // stage it again, so it closes in the card's own words.
+  // The pop-up's Reject names itself, and its reason, on the card it closed.
+  const rejected = post.note.kind === "resolved" ? post.note.rejected : undefined;
   const note =
     request.decision === "confirm"
       ? `:white_check_mark: Approved by <@${request.userId}>`
       : pending.stated
         ? statedCancelledNote(pending.stated, request.userId)
-        : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
+        : rejected
+          ? `:no_entry: Rejected by <@${request.userId}>${rejected.reason ? `: ${escapeSlackText(rejected.reason)}` : ""}`
+          : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
   await deps.replaceCard(pending.proposalText, note);
 }
 

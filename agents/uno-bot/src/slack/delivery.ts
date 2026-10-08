@@ -18,6 +18,7 @@ import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
 import { textCopy, type Presentation } from "../turn/presentation";
+import { feedbackBlock, type AnswerFeedback } from "./feedback";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -161,11 +162,10 @@ export { renderDeliveredBody, textSections } from "./render";
 
 // ── The answer footer ────────────────────────────────────────────────────────
 //
-// One line of prose, and nothing to press.
-//
-// It used to carry 👍/👎 buttons, and behind a flag a Slack-native variant of
-// the same pair plus a delete control. Both went on 2026-08-21; the reasoning
-// for the votes is in interactive.ts, where the handler used to be.
+// One line of prose, and beneath it on a substantive answer Slack's feedback
+// buttons (`feedback.ts`). Those went on 2026-08-21, when a vote could only be
+// logged, and came back once a press had somewhere to be kept: the usage
+// record, against the answer (interactive.ts says how).
 //
 // DELETE went too, and that one was a real decision rather than collateral.
 // The argument for it was good — a wrong answer sitting in a channel is a
@@ -208,6 +208,11 @@ function refusedForBlocks(posted: { ok: boolean; error?: string }): boolean {
   return Array.isArray(messages) && messages.some((m) => /json-pointer:\/blocks(\/|\])/.test(String(m)));
 }
 
+/** A split answer's `(i/n)`, as the small grey line under its part. */
+function markerBlocks(marker: string | null): Array<Record<string, unknown>> {
+  return marker ? [{ type: "context", elements: [{ type: "mrkdwn", text: marker }] }] : [];
+}
+
 function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
@@ -228,7 +233,8 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
  * @param extras what rides beneath the answer: the turn's presentation, whose
  *   result table posts as a `data_table` between the last part's `markdown`
  *   block and its footer, with its plain list appended to that part's text
- *   copy
+ *   copy; and the feedback buttons, under a substantive answer's footer, tied
+ *   to `feedback.turnId`
  */
 export async function postTextVerified(
   deps: PostingDeps,
@@ -245,7 +251,7 @@ export async function postTextVerified(
    *  under the PERSON'S name, and the standard "check before acting" line is
    *  wrong for that. Absent = classify from the body. */
   footerHint?: FooterKind,
-  extras: { presentation?: Presentation } = {},
+  extras: { presentation?: Presentation; feedback?: AnswerFeedback } = {},
 ): Promise<{ ok: boolean; text: string }> {
   const body = renderDeliveredBody(text);
   const { presentation } = extras;
@@ -255,6 +261,9 @@ export async function postTextVerified(
   // an acknowledgement.
   const footerKind: FooterKind = resultTable && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
   const footer = footerBlocks(footerKind);
+  // The feedback buttons ride a full footer only: an acknowledgement has
+  // nothing to judge, and a draft is the person's own words.
+  const feedback = extras.feedback && footerKind === "full" ? [feedbackBlock(extras.feedback)] : [];
   // The table rides where the footer does — the answer's last part, where it
   // ends — and its plain list rides that part's text copy, which is what a
   // notification shows and what the thread remembers.
@@ -262,7 +271,7 @@ export async function postTextVerified(
   const copyOf = (piece: string, last: boolean): string => (last ? textCopy(piece, presentation) : piece);
 
   const ok = await deliverAnswer(answerMessages(body), {
-    async stream(piece, withFooter) {
+    async stream(piece, withFooter, marker) {
       if (!(deps.streamingOn && threadTs)) return false;
       // An answer carrying a table posts as an ordinary message: Slack
       // does not document a `data_table` in a stream, and a stream's first part
@@ -295,7 +304,11 @@ export async function postTextVerified(
       let stopped = false;
       try {
         const appended = await deps.slack.appendStream(channel, streamTs, piece);
-        const blocks = withFooter && footer.length ? footer : undefined;
+        // No feedback buttons on a streamed answer: blocks in a stream's stop
+        // are proven for the marker and the footer only, and a refused stop
+        // re-posts the whole answer.
+        const closing = [...markerBlocks(marker), ...(withFooter ? footer : [])];
+        const blocks = closing.length ? closing : undefined;
         stopped = await deps.slack.stopStream(channel, streamTs, blocks);
         if (appended && stopped) return true;
         console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
@@ -333,17 +346,33 @@ export async function postTextVerified(
     //
     // The `text` copy is the whole part on every rung: notifications and
     // screen readers read it, and `postMessage` renders it to mrkdwn.
-    async post(piece, withFooter) {
-      const tail = withFooter ? footer : [];
+    //
+    // A split answer's `(i/n)` is a context line under the part on the block
+    // rungs. The section and bare-text rungs have no such line to give it, so
+    // there it leads the part as `_(i/n)_`, the way every part once did.
+    async post(piece, withFooter, marker) {
+      const footing = withFooter ? footer : [];
+      const tail = [...markerBlocks(marker), ...footing];
       const copy = copyOf(piece, withFooter);
-      const send = (blocks?: Array<Record<string, unknown>>) =>
+      const send = (blocks?: Array<Record<string, unknown>>, text = copy) =>
         deps.slack
-          .postMessage({ channel, thread_ts: threadTs, text: copy, ...(blocks ? { blocks } : {}) })
+          .postMessage({ channel, thread_ts: threadTs, text, ...(blocks ? { blocks } : {}) })
           .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
 
       const tabled = withFooter && table.length > 0;
-      let posted = await send([{ type: "markdown", text: piece }, ...(tabled ? table : []), ...tail]);
+      const first = [{ type: "markdown", text: piece }, ...(tabled ? table : []), ...tail];
+      // The feedback buttons ride the first rung only, at its very end. Any
+      // block refusal while they are aboard drops them and resends the same
+      // message — the table's rule, one rung higher: they are the newest
+      // block in the message, and a missing vote costs less than a worse answer.
+      const voting = withFooter && feedback.length > 0;
+      let posted = await send(voting ? [...first, ...feedback] : first);
       if (posted.ok) return true;
+      if (voting && refusedForBlocks(posted)) {
+        console.warn(`[slack] feedback buttons refused (${refusalOf(posted)}); retrying without them`);
+        posted = await send(first);
+        if (posted.ok) return true;
+      }
       // A table steps down first, to the same answer without it and its
       // rows as a plain list in the Markdown — so a rendering problem never
       // costs the reader the list. Every rung below carries that list too.
@@ -353,13 +382,14 @@ export async function postTextVerified(
         posted = await send([{ type: "markdown", text: prose }, ...tail]);
         if (posted.ok) return true;
       }
+      const numbered = (text: string) => (marker ? `_${marker}_\n\n${text}` : text);
       if (refusedForBlocks(posted)) {
         console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
-        posted = await send([...textSections(prose), ...tail]);
+        posted = await send([...textSections(numbered(prose)), ...footing], numbered(copy));
         if (posted.ok) return true;
       }
       console.warn(`[slack] ${refusedForBlocks(posted) ? "section blocks refused" : "post failed"} (${refusalOf(posted)}); retrying as plain text`);
-      posted = await send();
+      posted = await send(undefined, numbered(copy));
       return !!posted.ok;
     },
   });

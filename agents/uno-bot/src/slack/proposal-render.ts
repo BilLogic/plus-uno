@@ -24,45 +24,31 @@ import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 
-// One shared confirmation footer on every card. Anyone in the thread may
-// confirm/cancel (the requester lock was removed 2026-07-14), so it names no
-// approver. It names the two gestures and nothing else — no "or just say go
-// ahead": the buttons and reactions are the clear path, and anything typed
-// goes to the model, which reads it in context (2026-08-22).
-export const CONFIRM_FOOTER =
-  `:white_check_mark: to approve · :no_entry: to cancel (then tell me what to change).`;
+// One shared confirmation footer on every card. It names no approver, since
+// the confirmer set decides who may, and it points at the one button: the
+// decisions — Approve, Needs changes, Reject — are made in the pop-up. The ✅
+// and ⛔ reactions still resolve a card, as a fallback for people used to
+// them, and are deliberately not advertised here.
+export const CONFIRM_FOOTER = "Press Review to approve it, ask for changes or reject it.";
 
-/** The card's Review button; `slack/interactive.ts` routes it. */
+/** The card's Review button, and View once decided; `slack/interactive.ts`
+ *  routes both. */
 export const REVIEW_ACTION_ID = "uno_proposal_review";
 
 /**
- * The Approve / Cancel / Review button row.
+ * The card's one button: Review, and View once the card is decided.
  *
- * STYLING, and what Slack actually allows. Block Kit gives a button exactly
- * three looks — `style: "primary"` (filled green), `style: "danger"` (filled
- * red), and no `style` at all (the quiet default outline). There is no tonal
- * variant, no custom colour, no border control. Emoji in the label is the only
- * other dial.
+ * The card used to carry Approve (`primary`) and Cancel (`danger`) beside it.
+ * Both moved into the pop-up, whose last row is Approve, Needs changes and
+ * Reject (`slack/review-view.ts`), so a decision is always made with the whole
+ * draft in front of the person. Cards already posted with the old pair still
+ * work: `slack/interactive.ts` keeps routing `uno_proposal_confirm` and
+ * `uno_proposal_cancel`.
  *
- * The first cut used filled + emoji on BOTH buttons, which read as shouting:
- * colour and glyph each carried the whole message, so the row said everything
- * twice in two saturated blocks side by side.
- *
- * Now: filled on both, no emoji. The colour carries the meaning and the label
- * says the word; the glyph was the third copy of the same signal.
- *
- * Approve is `primary`, Cancel is `danger` (Bill's call, 2026-08-22). I had
- * argued for a quiet default on Cancel, on the reasoning that red marks the
- * dangerous choice and here *Approve* is the one firing the irreversible
- * write. Overruled, and the counter-argument is good: in a two-button yes/no
- * the pair reads as a pair, and a green/red set is instantly legible at a
- * glance in a busy thread — which is where these cards are actually read.
- *
- * The handler in slack/interactive.ts resolves the card the button sits on, so
- * the buttons carry no payload — the message ts is the identity, as with a
- * reaction.
+ * Quiet default style, no emoji: it decides nothing itself. It carries no
+ * payload — the card's message ts is the identity, as with a reaction.
  */
-export function proposalActionBlocks(): unknown[] {
+export function proposalActionBlocks(label: "Review" | "View" = "Review"): unknown[] {
   return [
     {
       type: "actions",
@@ -70,26 +56,9 @@ export function proposalActionBlocks(): unknown[] {
       elements: [
         {
           type: "button",
-          action_id: "uno_proposal_confirm",
-          style: "primary",
-          text: { type: "plain_text", text: "Approve" },
-          value: "confirm",
-        },
-        {
-          type: "button",
-          action_id: "uno_proposal_cancel",
-          style: "danger",
-          text: { type: "plain_text", text: "Cancel" },
-          value: "cancel",
-        },
-        // Opens the whole draft in a pop-up (`slack/review-door.ts`). Quiet
-        // default style: it decides nothing, so it should not read as a
-        // third answer to the yes/no beside it.
-        {
-          type: "button",
           action_id: REVIEW_ACTION_ID,
-          text: { type: "plain_text", text: "Review" },
-          value: "review",
+          text: { type: "plain_text", text: label },
+          value: label.toLowerCase(),
         },
       ],
     },
@@ -97,12 +66,14 @@ export function proposalActionBlocks(): unknown[] {
 }
 
 /** A text-only card as blocks: the text in ≤3000-char sections, then the
- *  button row. Used at post time and again by the button handler to re-render
- *  the card once it is resolved (buttons off, outcome on). */
+ *  Review button. Used at post time and again by the doors to re-render the
+ *  card once it is decided: the outcome as a context line, and View, which
+ *  opens the draft read-only. */
 export function proposalCardBlocks(text: string, resolvedNote?: string): unknown[] {
   const blocks: unknown[] = [...textSections(text)];
   if (resolvedNote) {
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: resolvedNote }] });
+    blocks.push(...proposalActionBlocks("View"));
   } else {
     blocks.push(...proposalActionBlocks());
   }
@@ -294,7 +265,7 @@ function caveatText(caveat: CardCaveat): string {
   if (caveat.kind === "bundle-incomplete") {
     return (
       `:warning: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +
-      `A :white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
+      `Approving posts it *without* them — or drop the links in this thread first and I'll fold them in.`
     );
   }
   if (caveat.kind === "repo-visibility") {
@@ -454,7 +425,7 @@ function packMessages(lead: string, lines: string[]): string[] {
 function planHead(operations: number, groups: number): string {
   const where = groups === 1 ? "" : ` across ${groups} targets`;
   // Plain, not bold: the group headings under it are the bold lines.
-  return `This one ✅ runs ${operations} operations${where}, in order:`;
+  return `Approving runs ${operations} operations${where}, in order:`;
 }
 
 function planBody(
