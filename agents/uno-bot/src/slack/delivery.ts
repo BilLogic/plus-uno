@@ -18,6 +18,7 @@ import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { cardTableBlock } from "./card-table-block";
 import { withCardList, type CardTable } from "../turn/card-table";
+import { feedbackBlock, type AnswerFeedback } from "./feedback";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -161,11 +162,10 @@ export { renderDeliveredBody, textSections } from "./render";
 
 // ── The answer footer ────────────────────────────────────────────────────────
 //
-// One line of prose, and nothing to press.
-//
-// It used to carry 👍/👎 buttons, and behind a flag a Slack-native variant of
-// the same pair plus a delete control. Both went on 2026-08-21; the reasoning
-// for the votes is in interactive.ts, where the handler used to be.
+// One line of prose, and beneath it on a substantive answer Slack's feedback
+// buttons (`feedback.ts`). Those went on 2026-08-21, when a vote could only be
+// logged, and came back once a press had somewhere to be kept: the usage
+// record, against the answer (interactive.ts says how).
 //
 // DELETE went too, and that one was a real decision rather than collateral.
 // The argument for it was good — a wrong answer sitting in a channel is a
@@ -227,7 +227,8 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
  * @param footerHint forces the footer variant; absent = classify from the body
  * @param extras what rides beneath the answer: a card table, posted as a
  *   `data_table` between the last part's `markdown` block and its footer, with
- *   its plain list appended to that part's text copy
+ *   its plain list appended to that part's text copy; and the feedback
+ *   buttons, under a substantive answer's footer, tied to `feedback.turnId`
  */
 export async function postTextVerified(
   deps: PostingDeps,
@@ -244,7 +245,7 @@ export async function postTextVerified(
    *  under the PERSON'S name, and the standard "check before acting" line is
    *  wrong for that. Absent = classify from the body. */
   footerHint?: FooterKind,
-  extras: { cardTable?: CardTable } = {},
+  extras: { cardTable?: CardTable; feedback?: AnswerFeedback } = {},
 ): Promise<{ ok: boolean; text: string }> {
   const body = renderDeliveredBody(text);
   const { cardTable } = extras;
@@ -253,6 +254,9 @@ export async function postTextVerified(
   // an acknowledgement.
   const footerKind: FooterKind = cardTable && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
   const footer = footerBlocks(footerKind);
+  // The feedback buttons ride a full footer only: an acknowledgement has
+  // nothing to judge, and a draft is the person's own words.
+  const feedback = extras.feedback && footerKind === "full" ? [feedbackBlock(extras.feedback)] : [];
   // The table rides where the footer does — the answer's last part, where it
   // ends — and its plain list rides that part's text copy, which is what a
   // notification shows and what the thread remembers.
@@ -294,6 +298,9 @@ export async function postTextVerified(
       let stopped = false;
       try {
         const appended = await deps.slack.appendStream(channel, streamTs, piece);
+        // No feedback buttons on a streamed answer: blocks in a stream's stop
+        // are proven for the footer only, and a refused stop re-posts the
+        // whole answer.
         const blocks = withFooter && footer.length ? footer : undefined;
         stopped = await deps.slack.stopStream(channel, streamTs, blocks);
         if (appended && stopped) return true;
@@ -341,8 +348,19 @@ export async function postTextVerified(
           .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
 
       const tabled = withFooter && table.length > 0;
-      let posted = await send([{ type: "markdown", text: piece }, ...(tabled ? table : []), ...tail]);
+      const first = [{ type: "markdown", text: piece }, ...(tabled ? table : []), ...tail];
+      // The feedback buttons ride the first rung only, at its very end. Any
+      // block refusal while they are aboard drops them and resends the same
+      // message — the card table's rule, one rung higher: they are the newest
+      // block in the message, and a missing vote costs less than a worse answer.
+      const voting = withFooter && feedback.length > 0;
+      let posted = await send(voting ? [...first, ...feedback] : first);
       if (posted.ok) return true;
+      if (voting && refusedForBlocks(posted)) {
+        console.warn(`[slack] feedback buttons refused (${refusalOf(posted)}); retrying without them`);
+        posted = await send(first);
+        if (posted.ok) return true;
+      }
       // A card table steps down first, to the same answer without it and its
       // cards as a plain list in the Markdown — so a rendering problem never
       // costs the reader the list. Every rung below carries that list too.

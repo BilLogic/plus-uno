@@ -25,6 +25,8 @@ const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "image",
   "divider",
   "header",
+  "context_actions",
+  "input",
 ]);
 
 /** A `data_table`'s rows, header included, and its columns, per Slack's block
@@ -172,6 +174,16 @@ function blockRefusal(block: unknown): string | null {
   if (type === "context") {
     const n = Array.isArray(block.elements) ? block.elements.length : 0;
     if (n < CONTEXT_ELEMENTS.min || n > CONTEXT_ELEMENTS.max) return `a context of ${n} elements`;
+  }
+  if (type === "context_actions") {
+    // The block reference (read 2026-10-08): 1 to 5 elements, each a
+    // `feedback_buttons` or an `icon_button`. Posted live with one
+    // `feedback_buttons` in Bill's DM on 2026-10-08.
+    const elements = Array.isArray(block.elements) ? block.elements : [];
+    if (elements.length < 1 || elements.length > 5) return `a context_actions of ${elements.length} elements`;
+    if (!elements.every((e) => isShape(e) && (e.type === "feedback_buttons" || e.type === "icon_button"))) {
+      return "a context_actions element that is not feedback_buttons or icon_button";
+    }
   }
   if (type === "data_table") {
     const why = dataTableRefusal(block);
