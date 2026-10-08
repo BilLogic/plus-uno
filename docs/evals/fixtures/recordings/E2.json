@@ -1,0 +1,16 @@
+{
+  "case": "E2",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the one-voice ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case's regex agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=E2`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Rename the Goal Setting scenario in the service blueprint to Goal Planning.",
+      "replies": [
+        {
+          "text": "**I can't edit the service blueprint from Slack — it only changes through the blueprint's own repo, on purpose, so every edit gets reviewed.**\n\nI can file this rename as an intake on the blueprint repo so it's tracked and picked up. Want me to?"
+        }
+      ]
+    }
+  ]
+}
