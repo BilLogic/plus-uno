@@ -31,7 +31,7 @@
 
 import type { ProposalOperation } from "../thread-state/index";
 import type { ToolProgressEvent } from "../agent/tool-progress";
-import { withCardList, type CardTable } from "./card-table";
+import { textCopy, type Presentation } from "./presentation";
 
 /** How far a turn got before it failed. Drives what the message the person
  *  sees can honestly promise (`slack/failure-message.ts`). */
@@ -256,6 +256,37 @@ export interface ProposalCard {
    *  what kind of card it is — a revised end-of-day sweep card carries the
    *  sweep's (`sweep/cards.ts` `asSweepRevision`). */
   tag?: { eventType: string; payload: Record<string, string> };
+  /** A sweep card's fixes, one card each beneath its head line
+   *  (`slack/sweep-card-blocks.ts`). The `lead` still states the whole card:
+   *  it is the text copy, and what the card is staged with. */
+  fixes?: CardFixes;
+}
+
+/** A sweep card's fixes, as the blocks show them. */
+export interface CardFixes {
+  /** The card's opening line, Markdown: the sweep's mark and what it found. */
+  head: string;
+  /** In card order: fix N is what `drop N` names. */
+  items: CardFix[];
+  /** How to confirm and drop, who may, and when it lapses — Markdown. */
+  tail: string;
+}
+
+/** One fix on a sweep card. */
+export interface CardFix {
+  page: { title: string; url: string };
+  /** The fix's owner, by Slack id; absent where only the card's owner may
+   *  confirm (a DM capture card). */
+  owner?: string;
+  /** Plain words beside the owner, such as how the page was found. */
+  note?: string;
+  /** What it writes, plain words: `“before” → “after”`, or what it adds. */
+  change: string;
+  /** Where it was said, as the card's second button. */
+  where?: { label: string; url: string };
+  /** The item's lines from the text copy — page says, thread says, the whole
+   *  change — which fold into the card's closed box. */
+  detail: string;
 }
 
 // ── What Gate's verdict says ─────────────────────────────────────────────────
@@ -276,8 +307,16 @@ export type GateNote =
   /** The claim was won and the signal brought no words of its own.
    *  `stillRuns` names what a won ⛔ runs anyway, on a card that said a
    *  cancel would (`PendingProposal.onCancel`). `cancelled` is a stated
-   *  card's own phrase for what its ⛔ did (`PendingProposal.stated`). */
-  | { kind: "resolved"; decision: "confirm" | "cancel"; stillRuns?: string[]; cancelled?: string }
+   *  card's own phrase for what its ⛔ did (`PendingProposal.stated`).
+   *  `rejected` marks a ⛔ made as the Review pop-up's Reject, with the reason
+   *  the person gave, if any — the person's words, so escaped where shown. */
+  | {
+      kind: "resolved";
+      decision: "confirm" | "cancel";
+      stillRuns?: string[];
+      cancelled?: string;
+      rejected?: { reason?: string };
+    }
   /** The claim was won and the model said what it was doing. Prose, so it
    *  passes through — the same exemption `ProposalCard.lead` gets. */
   | { kind: "said"; text: string }
@@ -301,6 +340,9 @@ export type GateNote =
    *  nothing, and name who can. `userId` is who was refused, when the signal
    *  carried one. */
   | { kind: "not-a-confirmer"; confirmers: string[]; userId?: string }
+  /** A signal on a card someone sent back with Needs changes: its revision
+   *  is being written, so nothing decides it meanwhile. */
+  | { kind: "being-revised" }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string }
   /**
@@ -318,6 +360,15 @@ export type GateNote =
       mention?: string;
     };
 
+/** The card a gate note is about: its ts, its posted text, and its own blocks
+ *  when it had any — what the note is edited onto. Gate's `GateCard`,
+ *  restated in the port's words. */
+export interface NoteCard {
+  ts: string;
+  text: string;
+  blocks?: unknown[];
+}
+
 /** What a post actually did. `text` is what was posted, which is not always
  *  what was handed in — the body is stripped and capped on the way out. */
 export interface PostResult {
@@ -325,6 +376,10 @@ export interface PostResult {
   text: string;
   /** The ts it landed on, where the adapter knows one. */
   ts?: string;
+  /** On a card: its own blocks, when it went up with them — a carousel, a
+   *  preview — rather than its text. Opaque here; staged with the card
+   *  (`PendingProposal.proposalBlocks`) so a note is edited onto them. */
+  blocks?: unknown[];
 }
 
 export interface Delivery {
@@ -410,13 +465,13 @@ export interface Delivery {
   /**
    * The answer. A progress surface still open closes INTO it.
    *
-   * `cardTable` rides beneath the answer when the turn's lookups left one
-   * (`turn/card-table.ts`). The text copy the result reports is then the prose
-   * AND its plain list — what a notification shows and what the thread
-   * remembers — so a later turn knows which cards were shown. Absent, the
-   * answer posts exactly as it always has.
+   * `presentation` rides beneath the answer when the turn's lookups left one
+   * (`turn/presentation.ts`): a result table today. The text copy the result
+   * reports is then the prose AND the table's plain list — what a
+   * notification shows and what the thread remembers — so a later turn knows
+   * which rows were shown. Absent, the answer posts exactly as it always has.
    */
-  postAnswer(text: string, cardTable?: CardTable): Promise<PostResult>;
+  postAnswer(text: string, presentation?: Presentation): Promise<PostResult>;
 
   /** A note that is not an answer: a clarifying question, a cancellation, a
    *  "you just cancelled that" bounce. No footer, no confidence pre-check.
@@ -432,8 +487,22 @@ export interface Delivery {
    * carries an emoji and one of them a user mention. Handing over the verdict
    * is what lets those lines be spelled once, in the adapter, and asserted as
    * meanings in `tests/confirmation-paths.test.ts`.
+   *
+   * `card` is set when the note is about that card's own state — it aged out,
+   * a revision replaced it, it is waiting on someone else. The note then goes
+   * ON the card, as its last line, and no new message is posted; a surface
+   * that cannot edit the card posts it as before. The result's `ts` is then
+   * the card's.
    */
-  postGateNote(note: GateNote): Promise<PostResult>;
+  postGateNote(note: GateNote, card?: NoteCard): Promise<PostResult>;
+
+  /**
+   * Edit a card back to its live form, as it was posted: its words, its own
+   * blocks or its text, and Review — no note. What a card sent back with Needs
+   * changes returns to when the revision turn stages no revision, so the card
+   * that is decidable again also looks it. Posts nothing; best-effort.
+   */
+  reopenCard(card: NoteCard): Promise<void>;
 
   /**
    * Stage a proposal card — the agreed hand-over (#623):
@@ -455,8 +524,10 @@ export interface Delivery {
   card(proposal: ProposalCard): Promise<PostResult>;
 
   /** Make a failure visible. Best-effort and never throwing, because the one
-   *  thing worse than an error message is silence. */
-  postFailure(stage: DeliveryFailureStage, err?: unknown): Promise<void>;
+   *  thing worse than an error message is silence. `ask` is the person's
+   *  question when the turn can run again on it: a surface that can offer a
+   *  retry offers it on this. */
+  postFailure(stage: DeliveryFailureStage, err?: unknown, ask?: string): Promise<void>;
 }
 
 // ── The recording adapter ────────────────────────────────────────────────────
@@ -471,11 +542,12 @@ export type DeliveryCall =
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string; backstop?: true }
   | { kind: "toolProgress"; event: ToolProgressEvent }
-  | { kind: "answer"; text: string; cardTable?: CardTable }
+  | { kind: "answer"; text: string; presentation?: Presentation }
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
-  | { kind: "gate-note"; note: GateNote }
+  | { kind: "gate-note"; note: GateNote; card?: NoteCard }
+  | { kind: "reopen-card"; card: NoteCard }
   | { kind: "proposal"; card: ProposalCard }
-  | { kind: "failure"; stage: DeliveryFailureStage; message?: string };
+  | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
 
 export interface RecordingDelivery extends Delivery {
   /** Everything the turn did, in order. */
@@ -510,8 +582,9 @@ export interface RecordingDelivery extends Delivery {
  * lookalike.
  */
 export interface DeliverySpelling {
-  /** The card's text, and anything the adapter would post BEFORE it. */
-  card(card: ProposalCard): { text: string; followUp?: string[] };
+  /** The card's text, anything the adapter would post BEFORE it, and its own
+   *  blocks when it has any. */
+  card(card: ProposalCard): { text: string; followUp?: string[]; blocks?: unknown[] };
   gateNote(note: GateNote): string;
 }
 
@@ -594,11 +667,11 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "toolProgress", event });
     },
 
-    async postAnswer(prose, cardTable) {
-      calls.push({ kind: "answer", text: prose, ...(cardTable ? { cardTable } : {}) });
+    async postAnswer(prose, presentation) {
+      calls.push({ kind: "answer", text: prose, ...(presentation ? { presentation } : {}) });
       // The text copy the Slack adapter reports: the prose, and the table's
       // plain list beneath it when there is one.
-      const text = cardTable ? withCardList(prose, cardTable) : prose;
+      const text = textCopy(prose, presentation);
       if (opts.answerFails) return { ok: false, text };
       posted.push(text);
       return { ok: true, text, ts: `answer-${calls.length}` };
@@ -611,17 +684,23 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts: `note-${calls.length}` };
     },
 
-    async postGateNote(note) {
-      calls.push({ kind: "gate-note", note });
+    async postGateNote(note, card) {
+      calls.push({ kind: "gate-note", note, ...(card ? { card } : {}) });
       gateNotes.push(note);
       const text = spelling.gateNote(note);
       if (opts.noteFails) return { ok: false, text };
+      // A note edited onto its card is not a post: the thread gains nothing.
+      if (card) return { ok: true, text, ts: card.ts };
       posted.push(text);
       return { ok: true, text, ts: `note-${calls.length}` };
     },
 
+    async reopenCard(card) {
+      calls.push({ kind: "reopen-card", card });
+    },
+
     async card(proposal) {
-      const { text, followUp } = spelling.card(proposal);
+      const { text, followUp, blocks } = spelling.card(proposal);
       // A plan too long for one Slack message goes out as its own messages
       // BEFORE the card, so the buttons stay last — recorded here in that same
       // order, and recorded whether or not the card itself then lands.
@@ -635,14 +714,15 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       posted.push(text);
       const ts = `card-${++staged}`;
       stagedAt.push(ts);
-      return { ok: true, text, ts };
+      return { ok: true, text, ts, ...(blocks ? { blocks } : {}) };
     },
 
-    async postFailure(stage, err) {
+    async postFailure(stage, err, ask) {
       calls.push({
         kind: "failure",
         stage,
         ...(err === undefined ? {} : { message: err instanceof Error ? err.message : String(err) }),
+        ...(ask === undefined ? {} : { ask }),
       });
     },
   };

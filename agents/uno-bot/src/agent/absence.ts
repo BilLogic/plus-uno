@@ -105,6 +105,17 @@ function modeOf(visibility: string): "own" | "workspace" | "public" {
 }
 
 /**
+ * What the search covered, in a reader's words — the ⚠️ line's half of the
+ * same fact the repair below states (`turn/warning-line.ts`).
+ */
+export function absenceScope(ctx: AbsenceContext): string {
+  const mode = modeOf(ctx.visibility);
+  if (mode === "own") return "what you can see in Slack";
+  if (mode === "workspace") return "the Slack channels I can search";
+  return "public Slack channels";
+}
+
+/**
  * What to tell the judge to fix, in the wording the mode that actually ran
  * makes true.
  *

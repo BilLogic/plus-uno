@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 
 import { postTextVerified } from "../src/slack/delivery";
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
-import type { CardTable } from "../src/turn/index";
+import { roadmapTable, type CardTable } from "../src/turn/index";
 import { recordingPosting, recordingSlack } from "./helpers/recording-slack";
 
 const RECIPIENT = { userId: "U1", team: "T1" };
@@ -37,11 +37,12 @@ function wip(n: number, over: Partial<CardTable> = {}): CardTable {
   };
 }
 
-/** Post `table` beneath the prose, and hand back the one message it made. */
+/** Post `table` beneath the prose, as the Roadmap preset, and hand back the
+ *  one message it made. */
 async function post(table: CardTable, prose = PROSE) {
   const slack = recordingPosting();
   const posted = await postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", prose, RECIPIENT, undefined, {
-    cardTable: table,
+    presentation: { table: roadmapTable(table) },
   });
   const messages = slack.of("message");
   assert.equal(messages.length, 1, "one message");
@@ -158,23 +159,23 @@ describe("an answer with a card table", () => {
 });
 
 describe("the Slack adapter", () => {
-  it("hands the turn's card table to the posting path, and reports the text copy as posted", async () => {
+  it("hands the turn's presentation to the posting path, and reports the text copy as posted", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(), THREAD);
-    const table = wip(3);
-    const posted = await delivery.postAnswer(PROSE, table);
+    const presentation = { table: roadmapTable(wip(3)) };
+    const posted = await delivery.postAnswer(PROSE, presentation);
 
     const [answer] = slack.of("answer");
-    assert.deepEqual(answer?.cardTable, table);
+    assert.deepEqual(answer?.presentation, presentation);
     assert.equal(answer?.text, PROSE, "the prose goes down as written");
     assert.match(posted.text, /^Card 3 — #403 — WIP$/m);
   });
 
-  it("hands down no table when the turn left none", async () => {
+  it("hands down no presentation when the turn left none", async () => {
     const slack = recordingSlack();
     await deliveryAdapter(slack.deps(), THREAD).postAnswer(PROSE);
 
-    assert.equal("cardTable" in (slack.of("answer")[0] ?? {}), false);
+    assert.equal("presentation" in (slack.of("answer")[0] ?? {}), false);
   });
 });
 

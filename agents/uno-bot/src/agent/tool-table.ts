@@ -222,6 +222,10 @@ export const TOOL_TABLE = {
     taskCard: { title: "Reading the Slack thread", estate: "slack" },
   },
   slack_react: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
+  // The answer's shape: a table of rows a lookup already returned this turn.
+  // Turn's presentation step answers it from those results
+  // (`turn/presentation.ts`), so it fetches nothing and is no checklist step.
+  present: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
   // "Remind me": writes only uno-bot's own record, posted back to the asker
   // alone at a morning run (`commitments/remind.ts`).
   reminder_set: {

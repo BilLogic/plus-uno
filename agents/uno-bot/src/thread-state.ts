@@ -58,9 +58,11 @@ import {
   cutOffTakeable,
   ownTtl,
   ownWords,
+  ownText,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
+  withLiveMark,
   type CutOffNoteReport,
   type Execution,
   type HistoryTurn,
@@ -350,6 +352,31 @@ export class ThreadState extends DurableObject<Env> {
     return { retired: true };
   }
 
+  // Needs changes' lock — the contract is on the interface. The mark rides on
+  // the payload, so every lookup hands it back — read through `withLiveMark`,
+  // which lapses it — and the input gate stays closed across the read and the
+  // write, so two presses mark it once.
+  async markRevising(proposalTs: string, userId: string, at: number): Promise<"marked" | "already" | "gone"> {
+    const key = proposalKey(proposalTs);
+    const rec = await this.storage.get<ProposalRecord>(key);
+    if (!rec || rec.retired || rec.supersededBy) return "gone";
+    if (at - rec.createdAt > recordTtlMs(rec)) return "gone";
+    const pending = rec.payload as PendingProposal | null;
+    if (!pending) return "gone";
+    if (withLiveMark(pending, at).revising) return "already";
+    await this.storage.put<ProposalRecord>(key, { ...rec, payload: { ...pending, revising: { userId, at } } });
+    return "marked";
+  }
+
+  async clearRevising(proposalTs: string): Promise<void> {
+    const key = proposalKey(proposalTs);
+    const rec = await this.storage.get<ProposalRecord>(key);
+    const pending = rec?.payload as PendingProposal | null | undefined;
+    if (!rec || !pending?.revising) return;
+    const { revising: _, ...rest } = pending;
+    await this.storage.put<ProposalRecord>(key, { ...rec, payload: rest });
+  }
+
   // Is the card that retired another one still around to be looked at? Its own
   // retirement does not matter: a chain still ends in a live newest card.
   private async successorIsLive(ts: string, at: number): Promise<boolean> {
@@ -367,16 +394,16 @@ export class ThreadState extends DurableObject<Env> {
     if (!rec) return { state: "none" };
     const proposal = (rec.payload as PendingProposal | null) ?? {};
     if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at))) {
-      return { state: "superseded", ...ownWords(proposal) };
+      return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
     }
     if (at - rec.createdAt > recordTtlMs(rec)) {
       await this.storage.delete(proposalKey(proposalTs));
-      return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal) };
+      return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal) };
     }
-    if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal) };
+    if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
     return {
       state: "found",
-      proposal: rec.payload as PendingProposal,
+      proposal: withLiveMark(rec.payload as PendingProposal, at),
       createdAt: rec.createdAt,
     };
   }
@@ -394,7 +421,7 @@ export class ThreadState extends DurableObject<Env> {
       if (proposalReplyThread(proposal) !== ref.thread) continue; // keyed on the card's thread
       if (!best || rec.createdAt > best.createdAt) best = rec;
     }
-    return (best?.payload as PendingProposal | undefined) ?? null;
+    return best ? withLiveMark(best.payload as PendingProposal, at) : null;
   }
 
   // Same scan at channel grain, newest first: which cards are live anywhere in
@@ -411,7 +438,7 @@ export class ThreadState extends DurableObject<Env> {
     }
     return live
       .sort((a, b) => b.createdAt - a.createdAt)
-      .map((rec) => rec.payload as PendingProposal);
+      .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
   // The delete IS the claim. A Durable Object handles one event at a time, so of
@@ -425,10 +452,13 @@ export class ThreadState extends DurableObject<Env> {
   // one they just looked up, and the lookups alone therefore left a replaced
   // card executable. The reason this is the store's job, and the per-message
   // run lease that makes the race reachable, are on the interface.
-  async claimProposal(proposalTs: string): Promise<boolean> {
+  async claimProposal(proposalTs: string, at: number): Promise<boolean> {
     const key = proposalKey(proposalTs);
     const rec = await this.storage.get<ProposalRecord>(key);
     if (!rec || rec.retired || rec.supersededBy) return false;
+    // A card being revised is refused too: its revision is on the way.
+    const pending = rec.payload as PendingProposal | null;
+    if (pending && withLiveMark(pending, at).revising) return false;
     return this.storage.delete(key);
   }
 

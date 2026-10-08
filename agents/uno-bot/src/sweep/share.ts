@@ -72,8 +72,8 @@ export function sweepShareNotes(share: SweepShare, outcomes: readonly OperationO
     if (!pages.length) continue;
     const text =
       pages.length === 1
-        ? `:mag: ${SWEEP_CARD_MARK}: a group conversation settled something the Notion page “${plain(pages[0]!.title)}” still said the old way, and the page is now up to date: ${escapeSlackText(pages[0]!.url)}`
-        : `:mag: ${SWEEP_CARD_MARK}: a group conversation settled things these Notion pages still said the old way, and they are now up to date:\n${pages.map((p) => `• ${plain(p.title)}: ${escapeSlackText(p.url)}`).join("\n")}`;
+        ? `${SWEEP_CARD_MARK}: a group conversation settled something the Notion page “${plain(pages[0]!.title)}” still said the old way, and the page is now up to date: ${escapeSlackText(pages[0]!.url)}`
+        : `${SWEEP_CARD_MARK}: a group conversation settled things these Notion pages still said the old way, and they are now up to date:\n${pages.map((p) => `• ${plain(p.title)}: ${escapeSlackText(p.url)}`).join("\n")}`;
     notes.push({ to, text });
   }
   return notes;
@@ -118,7 +118,7 @@ export function sweepShareCard(operations: readonly ProposalOperation[]): Propos
   const where = [...new Set(notes.map((n) => n.where))].join(" and ");
   const one = notes.length === 1;
   const lines = [
-    `:mag: **${SWEEP_CARD_MARK}** — share what this conversation settled?`,
+    `**${SWEEP_CARD_MARK}** — share what this conversation settled?`,
     "",
     `Nothing from here has left this group DM. ✅ posts exactly ${one ? "this note" : "these notes"} in ${where}; ⛔ drops ${one ? "it" : "them"}.`,
   ];

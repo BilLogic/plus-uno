@@ -86,6 +86,16 @@ function findPlaceholder(
   return null;
 }
 
+/**
+ * The unfilled slot one field's text is, or holds, written as it appears — or
+ * null when the text is content. The same shape test a create call's fields
+ * get, for one value on its own: an edit made in the Review pop-up is checked
+ * by it before the write (`slack/review-fields.ts`).
+ */
+export function placeholderIn(value: string): string | null {
+  return findPlaceholder([{ name: "", value }], "")?.text ?? null;
+}
+
 /** The surface in its own words — a decision record is not "a card". */
 function notionSurfaceName(input: Record<string, unknown>): string {
   const surface = typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";
@@ -142,12 +152,12 @@ export function placeholderRefusal(
   const surface = notionSurfaceName(input);
   const title = typeof input.title === "string" ? input.title.trim() : "";
   if (!title) {
-    return `:memo: That ${surface} has no *title* yet. Give me a one-liner and I'll stage it.`;
+    return `That ${surface} has no *title* yet. Give me a one-liner and I'll stage it.`;
   }
   const hit = findPlaceholder(notionCreateFields(input), sourceTextOf(input));
   if (!hit) return null;
   return (
-    `:memo: I won't file that ${surface} yet — the *${hit.field}* is still a placeholder (\`${hit.text}\`). ` +
+    `I won't file that ${surface} yet — the *${hit.field}* is still a placeholder (\`${hit.text}\`). ` +
     "Send me the real wording for that one and I'll stage it."
   );
 }

@@ -2,7 +2,7 @@
 // reaction, and the record of what was done.
 //
 // The decision half of this file is gone — the lookup, the emoji parse, the
-// claim and the lost-race message are `gate/gate.ts` now, once, for all four
+// claim and the lost-race message are `gate/gate.ts` now, once, for every
 // doors (#500). What is left is the part that needs `Env`: a side-effect tool
 // only ever runs from here, and only ever on a verdict that WON its claim.
 //
@@ -27,9 +27,9 @@
 // put the proposal in front of a person in the first place.
 
 import type { Env, SlackContext } from "../types";
-import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
+import { postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
 import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
-import { batchResultMessage } from "../slack/batch-result";
+import { batchResultPost } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations, stagingCardOf, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
@@ -122,7 +122,7 @@ async function recordOutcome(
 ): Promise<void> {
   await recordProposalEvents(record.events, executionEvents(pending.proposalTs, outcomes, at));
   const door = verdict.by?.door;
-  const ticket = door === "reaction" || door === "button" ? selfFiledTicketOf(outcomes) : null;
+  const ticket = door === "reaction" || door === "button" || door === "review" ? selfFiledTicketOf(outcomes) : null;
   if (ticket) {
     await quietly(`self-filed ticket on ${pending.proposalTs}`, () =>
       record.events.noteSelfFiledTicket(pending.proposalTs, ticket),
@@ -139,13 +139,9 @@ async function runWonVerdict(
 ): Promise<OperationOutcome[] | undefined> {
   const store = threadStateFor(env);
 
-  await addReaction(
-    env,
-    pending.channel,
-    pending.userMsgTs,
-    verdict.decision === "confirm" ? "handshake" : "wave",
-  );
-
+  // No reaction here: code reacts 👀 on arrival and ❌ on a failure, and
+  // nothing else (AGENT.md § Emoji budget). The verdict's own post says what
+  // was decided; a 🤝 or 👋 on the requester's message said it twice.
   const proposed = proposalOperations(pending).length;
   const run = verdict.execute;
   if (!run) {
@@ -189,7 +185,8 @@ async function runWonVerdict(
         // DM's attribution are both about the person the action is for.
         ...(verdict.post?.replyTs ? { replyTs: verdict.post.replyTs } : {}),
         requestedBy: run.requesterUserId,
-        // More than one operation → `batchResultMessage` below is the thread's
+        ...(verdict.by?.userId ? { approvedBy: verdict.by.userId } : {}),
+        // More than one operation → `batchResultPost` below is the thread's
         // one account of the outcome.
         ...(run.operations.length > 1 ? { batched: true } : {}),
         userMsgTs: run.userMsgTs,
@@ -235,20 +232,27 @@ async function runWonVerdict(
     if (!fenced) {
       // Say what ran. A batch's partial result is invisible otherwise: the person
       // approved four things and the thread would show one tool's reply.
-      const resultMessage = batchResultMessage(outcomes);
-      if (resultMessage) {
+      const result = batchResultPost(outcomes);
+      if (result) {
         // Under the verdict's own reply target, which the gate already worked out
         // — the REAL message ts the card was posted with, never the conversation
         // key (see `PendingProposal.replyTs` for the DM that swallowed a write).
-        await postMessage(env, {
+        const message = {
           channel: run.channel,
-          text: resultMessage,
+          text: result.text,
           ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
           // A sweep card's result carries the sweep's tag, as the card does;
           // a DM raise card's, the DM sweep's, so that night reads it as
           // uno-bot's own post (`dm-sweep/run.ts` § dmResultTag).
           ...resultMetadataFor(pending),
-        });
+        };
+        // The table, and the grouped list alone if Slack refuses it: a
+        // rendering problem never costs the person the account of the run.
+        const posted = result.blocks ? await postMessage(env, { ...message, blocks: result.blocks }) : undefined;
+        if (!posted?.ok) {
+          if (posted) console.warn(`[gate] batch result table refused (${posted.error ?? "no error code"}); posting the list`);
+          await postMessage(env, message);
+        }
       }
     }
 

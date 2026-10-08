@@ -270,8 +270,10 @@ export type PostedCard =
 export interface SweepDelivery {
   render(card: ProposalCard): RenderedSweepCard;
   /** Post the card — and any follow-up before it — tagged with its key and
-   *  digest; the card's own message as the card, a follow-up as its plan. */
-  post(to: CardPlace, card: RenderedSweepCard, tag: CardTag): Promise<{ ok: boolean; ts?: string }>;
+   *  digest; the card's own message as the card, a follow-up as its plan.
+   *  `blocks` is the card's own blocks when it went up with them, and absent
+   *  when Slack refused them and it stepped down to its text. */
+  post(to: CardPlace, card: RenderedSweepCard, tag: CardTag): Promise<{ ok: boolean; ts?: string; blocks?: unknown[] }>;
   /** The card's own message under this key, matched by its tag's key and
    *  role. `since` bounds a channel-top search. */
   findPosted(to: CardPlace, cardKey: string, since: string): Promise<PostedCard>;
@@ -1199,7 +1201,14 @@ async function postCard(ctx: MorningCtx, planned: SweepCardPlan, postDate: strin
     return;
   }
   const root = to.threadTs ?? sent.ts;
-  const staged = await stageOrWithdraw(ctx, plan, { channel: to.channel, root, ts: sent.ts, text: rendered.text, postDate });
+  const staged = await stageOrWithdraw(ctx, plan, {
+    channel: to.channel,
+    root,
+    ts: sent.ts,
+    text: rendered.text,
+    ...(sent.blocks ? { blocks: sent.blocks } : {}),
+    postDate,
+  });
   if (!staged) return;
   await deps.store.removeFindings(ids);
   ctx.cards.push({ ...report, proposalTs: sent.ts });
@@ -1244,7 +1253,7 @@ async function fitToOneMessage(ctx: MorningCtx, plan: SweepCardPlan): Promise<Sw
 async function stageOrWithdraw(
   ctx: MorningCtx,
   plan: SweepCardPlan,
-  posted: { channel: string; root: string; ts: string; text: string; postDate: string },
+  posted: { channel: string; root: string; ts: string; text: string; blocks?: unknown[]; postDate: string },
 ): Promise<boolean> {
   const { deps } = ctx;
   try {
@@ -1553,10 +1562,11 @@ export async function sweepCardState(
 /** The card as ThreadState stages it: no Turn behind it, its own terms. */
 export function sweepProposal(
   plan: SweepCardPlan,
-  posted: { channel: string; root: string; ts: string; text: string; postDate: string },
+  posted: { channel: string; root: string; ts: string; text: string; blocks?: unknown[]; postDate: string },
 ): PendingProposal {
   const first = plan.operations[0]!;
   const share = sweepShareOf(plan.items);
+  const { fixes } = sweepCard(plan);
   return {
     operations: plan.operations,
     toolName: first.toolName,
@@ -1567,6 +1577,8 @@ export function sweepProposal(
     userMsgTs: posted.root,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    // Its carousel, which a note or a decision is edited onto.
+    ...(posted.blocks ? { proposalBlocks: posted.blocks } : {}),
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
     ttlMs: SWEEP_CARD_TTL_MS,
@@ -1576,6 +1588,8 @@ export function sweepProposal(
     supersedeKey: SWEEP_KEY,
     // A group DM's card: what its ✅ shares, as the card said (`./share.ts`).
     ...(share ? { sweepShare: share } : {}),
+    // What its carousel showed, so a `drop N` revision is a carousel too.
+    ...(fixes ? { fixes } : {}),
   };
 }
 

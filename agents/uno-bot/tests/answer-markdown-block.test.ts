@@ -102,20 +102,43 @@ describe("a posted answer", () => {
 });
 
 describe("a split answer", () => {
-  it("posts every part in a markdown block, and the footer on the last part only", async () => {
+  it("posts every part in a markdown block, its (i/n) marker a context line under it, and the footer on the last part only", async () => {
     const slack = recordingPosting();
     await postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", longAnswer(), RECIPIENT);
 
     const messages = slack.of("message");
     assert.ok(messages.length > 1, "the answer split");
     messages.forEach((message, i) => {
-      const types = blocksOf(message).map((b) => b.type);
+      const blocks = blocksOf(message);
       const last = i === messages.length - 1;
-      assert.deepEqual(types, last ? ["markdown", "context"] : ["markdown"], `part ${i + 1}`);
-      assert.equal(at(blocksOf(message), 0).text, message.text, `part ${i + 1}'s text copy is the whole part`);
+      assert.deepEqual(blocks.map((b) => b.type), last ? ["markdown", "context", "context"] : ["markdown", "context"], `part ${i + 1}`);
+      assert.deepEqual(at(blocks, 1).elements, [{ type: "mrkdwn", text: `(${i + 1}/${messages.length})` }], `part ${i + 1}'s marker`);
+      assert.doesNotMatch(String(at(blocks, 0).text), /^_\(\d+\/\d+\)_/, `part ${i + 1}'s Markdown carries no marker of its own`);
+      assert.equal(at(blocks, 0).text, message.text, `part ${i + 1}'s text copy is the whole part`);
     });
     const holder = messages.find((m) => m.text.includes("| Card | Status | Owner |"));
     assert.ok(holder, "the table's header row reached a part");
+  });
+
+  it("closes the streamed first part with its marker", async () => {
+    const slack = recordingPosting();
+    await postTextVerified(slack.deps(), "C1", "100.1", longAnswer(), RECIPIENT);
+
+    const parts = 1 + slack.of("message").length;
+    assert.ok(parts > 1, "the answer split");
+    const stop = at(slack.of("stopStream"), 0);
+    assert.deepEqual(stop.blockList, [{ type: "context", elements: [{ type: "mrkdwn", text: `(1/${parts})` }] }]);
+    assert.doesNotMatch(at(slack.of("appendStream"), 0).text, /^_\(/);
+  });
+
+  it("keeps the marker as a line of the part when Slack refuses the blocks", async () => {
+    const slack = recordingPosting({ refusesBlockTypes: ["markdown", "section"] });
+    await warnings(() => postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", longAnswer(), RECIPIENT));
+    expectRefusals(slack.refused);
+
+    const bare = slack.of("message").filter((m) => !m.blocks);
+    assert.ok(bare.length > 1, "every part reached Slack as bare text");
+    bare.forEach((m, i) => assert.ok(m.text.startsWith(`_(${i + 1}/${bare.length})_\n\n`), `bare part ${i + 1}: ${m.text.slice(0, 20)}`));
   });
 });
 

@@ -23,3 +23,6 @@ export * from "./resolution";
 export { createInMemoryResolutionLog } from "./resolution-in-memory";
 export { createD1ResolutionLog, type ResolutionDatabase } from "./resolution-d1";
 export { decideAsk, runResolutionPass, type ResolutionPassDeps } from "./resolution-pass";
+// What people said of an answer: a third port, wired from `Env` in `./feedback-env.ts`.
+export * from "./feedback";
+export { createD1AnswerFeedbackLog, type AnswerFeedbackDatabase } from "./feedback-d1";

@@ -37,9 +37,10 @@ import type {
 } from "../../src/slack/delivery-adapter";
 import type { FooterKind } from "../../src/slack/footer-kind";
 import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
-import { withCardList, type CardTable, type DeliveryFailureStage } from "../../src/turn/index";
+import { textCopy, type Presentation, type DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
-import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES } from "./slack-block-rules";
+import type { ReviewViews } from "../../src/slack/review-door";
+import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES, viewRefusal } from "./slack-block-rules";
 
 /** One thing the adapter asked Slack to do, in order. */
 export type SlackCall =
@@ -64,7 +65,8 @@ export type SlackCall =
       userId: string;
       team?: string;
       footerHint?: FooterKind;
-      cardTable?: CardTable;
+      presentation?: Presentation;
+      feedback?: { turnId: string };
     }
   | {
       kind: "failure";
@@ -72,12 +74,14 @@ export type SlackCall =
       threadTs?: string;
       userMsgTs: string;
       stage: DeliveryFailureStage;
+      ask?: string;
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "tasks"; channel: string; ts: string; tasks: PlanTask[] }
   | { kind: "heading"; channel: string; ts: string; title: string }
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
+  | { kind: "statusLine"; channel: string; threadTs: string; text: string }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
 
 /** A call Slack would have refused, and the error code it would have said. */
@@ -112,6 +116,62 @@ function refuseBlocks(list: SlackRefusal[], call: string, blocks: readonly unkno
   const why = blocks ? messageBlocksRefusal(blocks) : null;
   if (why) refuse(list, `${call} with ${why}`, "invalid_blocks");
   return !!why;
+}
+
+/** One views call the review door made, in order. */
+export type ViewCall =
+  | { kind: "open"; triggerId: string; view: unknown }
+  | { kind: "update"; viewId: string; view: unknown };
+
+export interface RecordingViews {
+  client: ReviewViews;
+  calls: ViewCall[];
+  /** Every call Slack would have refused, with its error code. */
+  refused: SlackRefusal[];
+}
+
+/**
+ * Slack's views methods, recorded. `views.open` answers the view id `V1`, as
+ * Slack answers with the opened view's id; a view Slack would refuse is
+ * recorded, refused (`invalid_arguments`, the code views calls give a bad
+ * shape) and fails the test unless taken (`expectRefusals`). An update to a
+ * view that was never opened is refused as Slack refuses it (`not_found`).
+ *
+ * @param opts.openFails - Refuse every open, as an expired trigger is refused
+ * @param opts.alreadyOpen - Views open before the test began: the pop-up a
+ *   decision is pressed in
+ */
+export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string[] } = {}): RecordingViews {
+  const calls: ViewCall[] = [];
+  const refused: SlackRefusal[] = [];
+  const opened = new Set<string>(opts.alreadyOpen ?? []);
+  const client: ReviewViews = {
+    async open(triggerId, view) {
+      calls.push({ kind: "open", triggerId, view });
+      if (opts.openFails) return null;
+      const why = viewRefusal(view);
+      if (why) {
+        refuse(refused, `views.open with ${why}`, "invalid_arguments");
+        return null;
+      }
+      opened.add("V1");
+      return "V1";
+    },
+    async update(viewId, view) {
+      calls.push({ kind: "update", viewId, view });
+      const why = viewRefusal(view);
+      if (why) {
+        refuse(refused, `views.update with ${why}`, "invalid_arguments");
+        return false;
+      }
+      if (!opened.has(viewId)) {
+        refuse(refused, `views.update on ${viewId}`, "not_found");
+        return false;
+      }
+      return true;
+    },
+  };
+  return { client, calls, refused };
 }
 
 /** Take a client's refusals as expected, so the test it happened in may pass. */
@@ -185,6 +245,8 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
   // `startStream` is the checklist's — and a stopped stream takes nothing more.
   const planStreams = new Set<string>();
   const stopped = new Set<string>();
+  // Threads whose session was last moved off `processing`.
+  const settledThreads = new Set<string>();
   // Every call but a task append lands the moment it is made.
   const record = (call: SlackCall): void => {
     calls.push(call);
@@ -226,7 +288,8 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         userId: input.recipient.userId,
         ...(input.recipient.team === undefined ? {} : { team: input.recipient.team }),
         ...(input.footerHint === undefined ? {} : { footerHint: input.footerHint }),
-        ...(input.cardTable === undefined ? {} : { cardTable: input.cardTable }),
+        ...(input.presentation === undefined ? {} : { presentation: input.presentation }),
+        ...(input.feedback === undefined ? {} : { feedback: input.feedback }),
       });
       // Closing a stream INTO the answer appends the answer as markdown, and a
       // plan-mode stream takes task and plan chunks only. The client's type
@@ -238,9 +301,9 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         stopped.add(handed);
       }
       if (opts.answerThrows !== undefined) throw opts.answerThrows;
-      // What the posting path reports it posted: a card table's plain list
-      // rides the text copy beneath the prose.
-      return { ok: true, text: input.cardTable ? withCardList(input.text, input.cardTable) : input.text };
+      // What the posting path reports it posted: a table's plain list rides
+      // the text copy beneath the prose.
+      return { ok: true, text: textCopy(input.text, input.presentation) };
     },
     async postFailure(input) {
       record({
@@ -249,6 +312,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         ...(input.threadTs === undefined ? {} : { threadTs: input.threadTs }),
         userMsgTs: input.userMsgTs,
         stage: input.stage,
+        ...(input.ask === undefined ? {} : { ask: input.ask }),
       });
     },
     async startStream(channel, threadTs, userId, team) {
@@ -296,11 +360,21 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     },
     async setSessionStatus(channel, threadTs, status) {
       record({ kind: "status", channel, threadTs, status });
+      if (status !== "processing") settledThreads.add(threadTs);
+      else settledThreads.delete(threadTs);
       if (opts.statusThrows !== undefined) throw opts.statusThrows;
       return opts.status ?? { ok: true };
     },
     async renameSession(channel, threadTs, title) {
       record({ kind: "rename", channel, threadTs, title });
+    },
+    // Slack would not refuse a status line sent after the settle — it would
+    // do worse: the bridged call moves the session back to `processing`, and
+    // nothing clears it for the hour Slack takes to time it out. Held as a
+    // refusal so a line that lands late fails the test it happened in.
+    async setStatusLine(channel, threadTs, text) {
+      record({ kind: "statusLine", channel, threadTs, text });
+      if (settledThreads.has(threadTs)) refuse(refused, "status line after the settle", "reraised_processing");
     },
   };
 
@@ -333,11 +407,20 @@ export type PostingCall =
       blocks: boolean;
       /** The blocks themselves, when there were any — what an answer's
        *  `markdown` block and its fallback rungs are asserted on. */
-      blockList?: unknown[];
+      blockList?: unknown[];      /** The unfurl flags, as sent: false keeps Slack from previewing links. */
+      unfurlLinks?: boolean;
+      unfurlMedia?: boolean;
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "appendStream"; channel: string; ts: string; text: string }
-  | { kind: "stopStream"; channel: string; ts: string; blocks: boolean };
+  | {
+      kind: "stopStream";
+      channel: string;
+      ts: string;
+      blocks: boolean;
+      /** The blocks the stop carried, when it carried any. */
+      blockList?: unknown[];
+    };
 
 export interface RecordingPostingOptions {
   /** What `startStream` opens. `null` is a stream Slack would not open. */
@@ -349,7 +432,8 @@ export interface RecordingPostingOptions {
   /** Refuse a post whose blocks include any of these types, the way Slack
    *  refuses a block it will not take on a surface — so each rung of the
    *  answer's fallback ladder is reachable. Answered `invalid_blocks`, with
-   *  `response_metadata.messages` naming the block. */
+   *  `response_metadata.messages` naming the block. A stream's stop carrying
+   *  one is refused too, answered `false` as the client answers a refusal. */
   refusesBlockTypes?: readonly string[];
   /** Fail every post with this error code and `response_metadata.messages` —
    *  a failure that is not about the blocks (`ratelimited`), or one that
@@ -398,6 +482,8 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
         text: input.text,
         blocks,
         ...(input.blocks ? { blockList: input.blocks } : {}),
+        ...(input.unfurl_links === undefined ? {} : { unfurlLinks: input.unfurl_links }),
+        ...(input.unfurl_media === undefined ? {} : { unfurlMedia: input.unfurl_media }),
       });
       if (refuseBlocks(refused, "post", input.blocks)) return { ok: false, error: "invalid_blocks" };
       const at = (input.blocks ?? []).findIndex((b) => opts.refusesBlockTypes?.includes(String(b.type)));
@@ -436,8 +522,13 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
       return !opts.appendFails;
     },
     async stopStream(channel, ts, blocks) {
-      calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length });
+      calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length, ...(blocks?.length ? { blockList: blocks } : {}) });
       if (refuseBlocks(refused, "stop", blocks)) return false;
+      const refusedType = blocks?.find((b) => opts.refusesBlockTypes?.includes(String(b.type)))?.type;
+      if (refusedType !== undefined) {
+        refuse(refused, `stop with a ${String(refusedType)} block`, "invalid_blocks");
+        return false;
+      }
       if (stopped.has(ts)) {
         refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
         return false;

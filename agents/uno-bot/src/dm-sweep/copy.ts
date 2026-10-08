@@ -31,7 +31,7 @@ export type RaiseTo = "plus-design" | "plus-universal";
  *  the way to answer it, which is a typed reply. */
 export const ASK_FOOTER = {
   hint: "Or reply here with the answer or a link, and I'll suggest where it belongs.",
-  choices: [{ glyph: "no_good", label: "🙅 Never mind" }],
+  choices: [{ glyph: "no_good", label: "Never mind" }],
 } as const;
 
 /** What replaces the buttons once the person says never mind. */
@@ -62,7 +62,7 @@ export function askText(o: { when: string; what: string }): string {
 export function raiseNote(o: { topic: string; sources: readonly [string, string] }): string {
   const [a, b] = o.sources.map(plain);
   return (
-    `:mag: While answering a question, uno-bot noticed that ${a} and ${b} disagree on ${plain(o.topic)}. ` +
+    `While answering a question, le goat noticed that ${a} and ${b} disagree on ${plain(o.topic)}. ` +
     "Whoever owns it may want to check which one is right."
   );
 }

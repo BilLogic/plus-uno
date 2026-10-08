@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 
 import { SubrequestBudgetError } from "../src/net";
 import { planRun, type ScheduledJob } from "../src/scheduled/runs";
-import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
+import { ownBlocksOf, proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
 import { MAX_FAILED_NIGHTS, stageSweepCard, sweepCardState } from "../src/sweep/run";
 import type { DriftDetector } from "../src/sweep/detector";
 import type { CaptureDetector } from "../src/sweep/capture-detector";
@@ -270,7 +270,8 @@ function postDeps(w: World, now = WED, over: Partial<DmCapturePostDeps> = {}): D
       async post(channel, message) {
         const posted = `${now / 1000}.00000${w.posts.length + 1}`;
         w.posts.push({ channel, text: message.text, ts: posted, tag: message.metadata.event_type, payload: message.metadata.event_payload });
-        return { ok: true, ts: posted };
+        const own = ownBlocksOf(message);
+        return { ok: true, ts: posted, ...(own ? { blocks: own } : {}) };
       },
       withdraw: withdraw(w),
       async remove(_channel, ts) {
@@ -469,6 +470,15 @@ describe("a DM finding", () => {
     const events = w.events.events();
     assert.deepEqual(events.map((e) => [e.event, e.channelId]), [["staged", null]]);
     assert.equal(w.kv.get(MAYA)?.[0]?.state, "proposed");
+  });
+
+  it("stages the card with the blocks it went up with, for a note or a decision to edit onto", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    await runDmCapturePost(postJob(MAYA), postDeps(w));
+    const blocks = w.staged[0]!.proposalBlocks as Array<{ type: string }> | undefined;
+    assert.ok(blocks?.some((b) => b.type === "card"), "one fix: its card");
   });
 
   it("waits while the card is live — or a revision a `drop N` made of it — and a carded fix is not offered again", async () => {

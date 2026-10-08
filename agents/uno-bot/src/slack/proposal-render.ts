@@ -18,48 +18,39 @@
 // call that fetches it is a named client on `TurnDeps.cards`, wired in
 // `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
+import { sweepCardBlocks } from "./sweep-card-blocks";
 import { escapeSlackText } from "./mrkdwn";
+import { footerNoteFor } from "./footer-kind";
 import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 
-// One shared confirmation footer on every card. Anyone in the thread may
-// confirm/cancel (the requester lock was removed 2026-07-14), so it names no
-// approver. It names the two gestures and nothing else — no "or just say go
-// ahead": the buttons and reactions are the clear path, and anything typed
-// goes to the model, which reads it in context (2026-08-22).
-export const CONFIRM_FOOTER =
-  `:white_check_mark: to approve · :no_entry: to cancel (then tell me what to change).`;
+// One shared confirmation footer on every card. It names no approver, since
+// the confirmer set decides who may, and it points at the one button: the
+// decisions — Approve, Needs changes, Reject — are made in the pop-up. The ✅
+// and ⛔ reactions still resolve a card, as a fallback for people used to
+// them, and are deliberately not advertised here.
+export const CONFIRM_FOOTER = "Press Review to approve it, ask for changes or reject it.";
+
+/** The card's Review button, and View once decided; `slack/interactive.ts`
+ *  routes both. */
+export const REVIEW_ACTION_ID = "uno_proposal_review";
 
 /**
- * The Approve / Cancel button row.
+ * The card's one button: Review, and View once the card is decided.
  *
- * STYLING, and what Slack actually allows. Block Kit gives a button exactly
- * three looks — `style: "primary"` (filled green), `style: "danger"` (filled
- * red), and no `style` at all (the quiet default outline). There is no tonal
- * variant, no custom colour, no border control. Emoji in the label is the only
- * other dial.
+ * The card used to carry Approve (`primary`) and Cancel (`danger`) beside it.
+ * Both moved into the pop-up, whose last row is Approve, Needs changes and
+ * Reject (`slack/review-view.ts`), so a decision is always made with the whole
+ * draft in front of the person. Cards already posted with the old pair still
+ * work: `slack/interactive.ts` keeps routing `uno_proposal_confirm` and
+ * `uno_proposal_cancel`.
  *
- * The first cut used filled + emoji on BOTH buttons, which read as shouting:
- * colour and glyph each carried the whole message, so the row said everything
- * twice in two saturated blocks side by side.
- *
- * Now: filled on both, no emoji. The colour carries the meaning and the label
- * says the word; the glyph was the third copy of the same signal.
- *
- * Approve is `primary`, Cancel is `danger` (Bill's call, 2026-08-22). I had
- * argued for a quiet default on Cancel, on the reasoning that red marks the
- * dangerous choice and here *Approve* is the one firing the irreversible
- * write. Overruled, and the counter-argument is good: in a two-button yes/no
- * the pair reads as a pair, and a green/red set is instantly legible at a
- * glance in a busy thread — which is where these cards are actually read.
- *
- * The handler in slack/interactive.ts resolves the card the button sits on, so
- * the buttons carry no payload — the message ts is the identity, as with a
- * reaction.
+ * Quiet default style, no emoji: it decides nothing itself. It carries no
+ * payload — the card's message ts is the identity, as with a reaction.
  */
-export function proposalActionBlocks(): unknown[] {
+export function proposalActionBlocks(label: "Review" | "View" = "Review"): unknown[] {
   return [
     {
       type: "actions",
@@ -67,34 +58,283 @@ export function proposalActionBlocks(): unknown[] {
       elements: [
         {
           type: "button",
-          action_id: "uno_proposal_confirm",
-          style: "primary",
-          text: { type: "plain_text", text: "Approve" },
-          value: "confirm",
-        },
-        {
-          type: "button",
-          action_id: "uno_proposal_cancel",
-          style: "danger",
-          text: { type: "plain_text", text: "Cancel" },
-          value: "cancel",
+          action_id: REVIEW_ACTION_ID,
+          text: { type: "plain_text", text: label },
+          value: label.toLowerCase(),
         },
       ],
     },
   ];
 }
 
-/** A text-only card as blocks: the text in ≤3000-char sections, then the
- *  button row. Used at post time and again by the button handler to re-render
- *  the card once it is resolved (buttons off, outcome on). */
-export function proposalCardBlocks(text: string, resolvedNote?: string): unknown[] {
-  const blocks: unknown[] = [...textSections(text)];
+/**
+ * A text-only card as blocks. Used at post time and again by the doors to
+ * re-render the card once it is decided: the outcome as a context line, and
+ * View, which opens the draft read-only.
+ *
+ * A turn's card — one that ends with `CONFIRM_FOOTER` — is SHORT in the
+ * thread: one summary line, the body's size, the LLM line and Review. Its
+ * whole draft is the text (Slack's notification and fallback copy, history,
+ * what the model reads back) and the Review pop-up, where it is decided. The
+ * summary is read off that text (`shortCardOf`), so a decided card, which the
+ * doors re-render from its text, stays short too. Any other card — a stated
+ * one with its own footer — shows its text whole, as before.
+ */
+export function proposalCardBlocks(text: string, resolvedNote?: string, button?: "Review" | "View"): unknown[] {
+  const short = shortCardOf(text);
+  const blocks: unknown[] = short
+    ? [
+        { type: "section", text: { type: "mrkdwn", text: short.summary } },
+        context(resolvedNote ? short.size : `${short.size} · review before approving`),
+        context(footerNoteFor("full")),
+      ]
+    : [...textSections(text)];
   if (resolvedNote) {
+    // A note on a card still live — one waiting on someone else — keeps
+    // Review; every other note closes the card, so it offers View.
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: resolvedNote }] });
+    blocks.push(...proposalActionBlocks(button ?? "View"));
   } else {
     blocks.push(...proposalActionBlocks());
   }
   return blocks;
+}
+
+/** A card as posted, which a note or a decision is edited onto: its text, and
+ *  its own blocks when it had any. */
+export interface PostedCard {
+  text: string;
+  blocks?: unknown[];
+}
+
+/**
+ * A posted card with a note as its last line: a gate note, or the outcome a
+ * decision came to.
+ *
+ * A card posted with blocks of its own — a sweep card's carousel, a Figma
+ * library card's release card and table, a Figma preview — keeps them: its
+ * button row comes off, the note goes on, and the row comes back with `button`
+ * where it had one. Decisions are made in the Review pop-up, so a card still
+ * live keeps Review and a decided one offers View; a card posted without the
+ * row gains neither. A text-only card is re-rendered from its text
+ * (`proposalCardBlocks`), which carries the row it was posted with.
+ *
+ * @param card - The card as posted
+ * @param note - Its last line, mrkdwn
+ * @param button - Review while it can still be decided, View once it cannot
+ */
+export function notedCardBlocks(card: PostedCard, note: string, button: "Review" | "View" = "View"): unknown[] {
+  if (!card.blocks) {
+    return proposalCardBlocks(card.text, note, button);
+  }
+  const hadButton = card.blocks.some(isActionRow);
+  const blocks = [...card.blocks.filter((b) => !isActionRow(b)), context(note)];
+  if (hadButton) blocks.push(...proposalActionBlocks(button));
+  return blocks;
+}
+
+/**
+ * The blocks a card went up with, when they are its own — a carousel, a
+ * release card, a preview — rather than its text re-rendered, which is what
+ * every edit falls back to anyway (`notedCardBlocks`). What a poster keeps on
+ * the record as `PendingProposal.proposalBlocks`.
+ *
+ * @param card - The card's text, and the blocks it was posted with
+ */
+export function ownBlocksOf(card: { text: string; blocks: unknown[] }): unknown[] | undefined {
+  return JSON.stringify(card.blocks) === JSON.stringify(proposalCardBlocks(card.text)) ? undefined : card.blocks;
+}
+
+/** The card's own button row (`proposalActionBlocks`). */
+function isActionRow(block: unknown): boolean {
+  return (block as { block_id?: string } | null)?.block_id === "uno_proposal_actions";
+}
+
+function context(text: string): unknown {
+  return { type: "context", elements: [{ type: "mrkdwn", text }] };
+}
+
+/** Field labels whose value is the draft's prose: what the size line counts. */
+const BODY_LABELS = new Set(["body", "summary", "text", "content", "message", "notes", "description"]);
+/** Field labels that name the thing being written: the summary's title. */
+const TITLE_LABELS = new Set(["title", "page title", "subject", "name"]);
+/** A key field the summary names beside the title: short, one line. */
+const KEY_FIELD_CHARS = 40;
+const KEY_FIELDS = 3;
+const SUMMARY_TITLE_CHARS = 80;
+
+/** One `• *Label:* value` line of a card's text, with what continues it. */
+interface DraftField {
+  label: string;
+  value: string;
+  nested: boolean;
+}
+
+/**
+ * A turn's card, as the thread shows it: the summary line and the size line,
+ * read off the card's own text — or null for a card that is not a turn's
+ * (no `CONFIRM_FOOTER`), which shows its text whole.
+ *
+ * Reads only lines this module writes: the `About to` heading, the field
+ * bullets, a revision's linked page line, the caveats and the plan head.
+ */
+export function shortCardOf(text: string): { summary: string; size: string } | null {
+  const at = text.lastIndexOf(CONFIRM_FOOTER);
+  if (at === -1) return null;
+  const draft = text.slice(0, at).trimEnd();
+  const lines = draft.split("\n");
+
+  const fields: DraftField[] = [];
+  let heading: string | undefined;
+  let page: string | undefined;
+  let operations: string | undefined;
+  let warnings = 0;
+  let inField = false;
+  for (const line of lines) {
+    const head = /^:warning: About to \*(.+)\*:$/.exec(line);
+    if (head) {
+      heading = head[1];
+      inField = false;
+      continue;
+    }
+    const field = /^(\s*)• \*([^*]+):\*\s?(.*)$/.exec(line);
+    if (field) {
+      fields.push({ label: field[2]!.trim(), value: field[3]!, nested: field[1]!.length > 0 });
+      inField = true;
+      continue;
+    }
+    if (line.startsWith(":warning:")) {
+      warnings++;
+      inField = false;
+      continue;
+    }
+    const plan = /^Approving runs (\d+) operations/.exec(line);
+    if (plan) {
+      operations = plan[1];
+      inField = false;
+      continue;
+    }
+    const linked = /^\*<[^|>]+\|([^>]+)>\*/.exec(line);
+    if (linked && !page) {
+      page = linked[1];
+      continue;
+    }
+    // A multi-line value — a body — continues its field until the next bullet.
+    if (inField && fields.length && !/^\s*◦ /.test(line)) fields.at(-1)!.value += `\n${line}`;
+  }
+
+  const lower = (f: DraftField) => f.label.toLowerCase();
+  const target = fields.find((f) => lower(f) === "target")?.value.trim();
+  const titled = fields.find((f) => !f.nested && TITLE_LABELS.has(lower(f)))?.value.trim();
+  const title = titled || target || page;
+  const keys = fields
+    .filter((f) => f.value.trim() && !f.value.includes("\n") && f.value.trim().length <= KEY_FIELD_CHARS)
+    .filter((f) => !TITLE_LABELS.has(lower(f)) && !BODY_LABELS.has(lower(f)) && lower(f) !== "target")
+    .filter((f) => !/https?:\/\//.test(f.value))
+    .slice(0, KEY_FIELDS)
+    .map((f) => f.value.trim());
+  if (titled && target) keys.unshift(target);
+
+  const verb = heading ?? (page ? (gateWordsFor("notion_update")?.verb ?? "update a Notion page") : undefined);
+  const named = title ? `_${clip(title, SUMMARY_TITLE_CHARS)}_` : "";
+  const after = [named, ...keys].filter(Boolean).join(" · ");
+  const summary = verb
+    ? `:warning: Ready to *${verb}*${after ? `: ${after}` : ""}`
+    : `:warning: Ready for review: ${clip(lines.find((l) => l.trim())?.trim() ?? "a proposal", SUMMARY_TITLE_CHARS)}`;
+
+  // The size of the prose the pop-up holds: its body field, or the draft.
+  const body = fields
+    .filter((f) => BODY_LABELS.has(lower(f)))
+    .sort((a, b) => b.value.trim().length - a.value.trim().length)[0];
+  const sizeOf = (label: string, n: number) => `${label} ${n.toLocaleString("en-US")} characters`;
+  const size = [
+    body ? sizeOf(body.label, body.value.trim().length) : sizeOf("Draft", draft.length),
+    ...(operations ? [`${operations} operations`] : []),
+    ...(warnings ? [`${warnings} warning${warnings === 1 ? "" : "s"} in the draft`] : []),
+  ].join(" · ");
+  return { summary, size };
+}
+
+/**
+ * A card's text with the Review pop-up's edits in place of the draft's values:
+ * what an approved card says from then on, in the thread and in View.
+ *
+ * Each change is written where this module wrote the field — its
+ * `• *Label:* value` line, labelled from the input key's last segment as
+ * `renderField` labels it — and only where that line's whole value is the old
+ * one: a line that merely starts with it (`Goal` on a card showing `Goal
+ * cycles`) holds another value, and is left alone. The thread's summary is
+ * read off these lines (`shortCardOf`), so it follows the edit. Failing a
+ * line, the old value is replaced where it stands whole exactly once, wrapped
+ * the way a plan line wraps a value (`` `Goal` ``, `*Goal*`), and never
+ * inside a longer value. A value the draft never showed is left to the edit
+ * line beside it.
+ *
+ * @param text - The card's text as posted
+ * @param changes - The pop-up's changes: input key, value before and after
+ */
+export function withEditedFields(text: string, changes: ReadonlyArray<{ key: string; from: string; to: string }>): string {
+  let out = text;
+  for (const change of changes) {
+    if (!change.from) continue;
+    const label = humanizeParamKey(change.key.split(".").at(-1) ?? change.key);
+    const line = `• *${label}:* ${change.from}`;
+    const at = wholeLineAt(out, line);
+    if (at !== -1) {
+      out = `${out.slice(0, at)}• *${label}:* ${change.to}${out.slice(at + line.length)}`;
+      continue;
+    }
+    const alone = wrappedOnceAt(out, change.from);
+    if (alone !== -1) out = `${out.slice(0, alone)}${change.to}${out.slice(alone + change.from.length)}`;
+  }
+  return out;
+}
+
+/** Where `line` stands as a whole line of `text` — nothing but indentation
+ *  before it, and its line ending where it does — or -1. */
+function wholeLineAt(text: string, line: string): number {
+  for (let at = text.indexOf(line); at !== -1; at = text.indexOf(line, at + 1)) {
+    const before = text.slice(text.lastIndexOf("\n", at - 1) + 1, at);
+    const after = text[at + line.length];
+    if (/^\s*$/.test(before) && (after === undefined || after === "\n")) return at;
+  }
+  return -1;
+}
+
+/** The marks a plan line wraps a value in, each with its closing mark. */
+const WRAPS: Readonly<Record<string, string>> = { "`": "`", "*": "*", _: "_", '"': '"', "“": "”" };
+
+/** Where `value` appears in `text` exactly once and wrapped whole in one pair
+ *  of `WRAPS`, or -1. */
+function wrappedOnceAt(text: string, value: string): number {
+  const first = text.indexOf(value);
+  if (first === -1 || text.indexOf(value, first + 1) !== -1) return -1;
+  const close = WRAPS[text[first - 1] ?? ""];
+  return close !== undefined && text[first + value.length] === close ? first : -1;
+}
+
+function clip(text: string, max: number): string {
+  const line = text.split("\n")[0] ?? "";
+  return line.length > max ? `${line.slice(0, max - 1)}…` : line;
+}
+
+/**
+ * Post a card, stepping down to its text in sections when Slack refuses its
+ * own blocks — a sweep card's carousel, say — so a refused shape never loses
+ * the card. Its text is unchanged, and so is what it was staged with.
+ *
+ * @param post - One post of the card's text and blocks
+ * @param card - The rendered card
+ */
+export async function postWithPlainRung<R extends { ok: boolean; error?: string }>(
+  post: (blocks: unknown[]) => Promise<R>,
+  card: { text: string; blocks: unknown[] },
+  refusedForBlocks: (res: R) => boolean,
+): Promise<R> {
+  const res = await post(card.blocks);
+  if (res.ok || !refusedForBlocks(res)) return res;
+  const plain = proposalCardBlocks(card.text);
+  return JSON.stringify(plain) === JSON.stringify(card.blocks) ? res : post(plain);
 }
 
 /** A card, as Slack: the notification/fallback text, the blocks when the card
@@ -121,6 +361,13 @@ export function renderProposalCard(card: ProposalCard): RenderedCard {
   const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
   const plan = withOperationPlan(body, card.operations);
   const followUp = plan.followUp ?? [];
+  // A sweep card: one card per fix (`sweep-card-blocks.ts`). The planned text
+  // is its notification and fallback copy, and what it is staged with.
+  const fixes = card.fixes ? sweepCardBlocks(card.fixes, CONFIRM_FOOTER) : null;
+  if (fixes) {
+    const blocks = [...fixes, ...proposalActionBlocks()];
+    return followUp.length ? { text: plan.text, blocks, followUp } : { text: plan.text, blocks };
+  }
   if (!card.previewImageUrl) {
     return followUp.length ? { text: plan.text, followUp } : { text: plan.text };
   }
@@ -281,8 +528,8 @@ function caveatText(caveat: CardCaveat): string {
   }
   if (caveat.kind === "bundle-incomplete") {
     return (
-      `:rotating_light: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +
-      `:white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
+      `:warning: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +
+      `Approving posts it *without* them — or drop the links in this thread first and I'll fold them in.`
     );
   }
   if (caveat.kind === "repo-visibility") {
@@ -293,16 +540,16 @@ function caveatText(caveat: CardCaveat): string {
         : ["the issue", "once it's filed", "Check the body"];
     const who =
       caveat.visibility === "public"
-        ? `:globe_with_meridians: *${caveat.repo}* is public — anyone can read ${what} ${when}.`
+        ? `:warning: *${caveat.repo}* is public — anyone can read ${what} ${when}.`
         : caveat.visibility === "private"
-          ? `:lock: *${caveat.repo}* is private — only people with access to it can read ${what}.`
-          : `:globe_with_meridians: *${caveat.repo}* may be public — I couldn't check, so treat ${what} as readable by anyone.`;
+          ? `*${caveat.repo}* is private — only people with access to it can read ${what}.`
+          : `:warning: *${caveat.repo}* may be public — I couldn't check, so treat ${what} as readable by anyone.`;
     // A DM's footer names the requester and links nothing, so the card
     // promises no link either.
     const footer = caveat.fromDm ? "I add a footer naming you." : "I add a footer naming you and linking this thread.";
     return `${who} ${check} for anything from a DM or private channel before you approve; ${footer}`;
   }
-  return ":mag: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.";
+  return ":warning: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.";
 }
 
 function renderFields(fields: ReadonlyArray<CardField>): string {
@@ -403,7 +650,7 @@ export function withOperationPlan(
   return {
     text: collapsed,
     followUp: packMessages(
-      `:package: *The full plan for the card below — ${operations.length} operations, in order:*`,
+      `*The full plan for the card below — ${operations.length} operations, in order:*`,
       full,
     ),
   };
@@ -441,7 +688,8 @@ function packMessages(lead: string, lines: string[]): string[] {
 
 function planHead(operations: number, groups: number): string {
   const where = groups === 1 ? "" : ` across ${groups} targets`;
-  return `:package: *This one ✅ runs ${operations} operations${where}, in order:*`;
+  // Plain, not bold: the group headings under it are the bold lines.
+  return `Approving runs ${operations} operations${where}, in order:`;
 }
 
 function planBody(
@@ -488,6 +736,11 @@ function planLines(op: PlannedOperation, n: number): string[] {
 /** A run of operations that land on the SAME thing, in batch order. */
 export interface OperationGroup {
   heading: string;
+  /** The heading in plain words, for where mrkdwn does not render: a result
+   *  table's cell. */
+  name: string;
+  /** Where the target lives, when its input gives a real address. */
+  url?: string;
   /** Indices into the batch — so a caller can pair a group with whatever else
    *  it holds per operation (the Gate's outcomes) without re-deriving order. */
   members: number[];
@@ -505,10 +758,10 @@ export function groupOperations(operations: ReadonlyArray<PlannedOperation>): Op
   const groups: OperationGroup[] = [];
   const byKey = new Map<string, OperationGroup>();
   operations.forEach((op, i) => {
-    const { key, heading } = operationGroupKey(op);
+    const { key, ...target } = operationGroupKey(op);
     let group = byKey.get(key);
     if (!group) {
-      group = { heading, members: [] };
+      group = { ...target, members: [] };
       byKey.set(key, group);
       groups.push(group);
     }
@@ -517,39 +770,48 @@ export function groupOperations(operations: ReadonlyArray<PlannedOperation>): Op
   return groups;
 }
 
+/** A group's key, its card heading, the heading in plain words, and its link. */
+interface GroupKey {
+  key: string;
+  heading: string;
+  name: string;
+  url?: string;
+}
+
+/** A target whose card heading is its plain name in bold. */
+const bolded = (key: string, name: string): GroupKey => ({ key, heading: `*${name}*`, name });
+
 /** What an operation lands ON, in the words its own input uses — a Notion page,
  *  a data source, a repo, a channel, a recipient. Never invented: an input that
  *  names no target gets the tool's own generic heading, because a wrong target
  *  on a card is worse than a vague one. */
-function operationGroupKey(op: PlannedOperation): { key: string; heading: string } {
+function operationGroupKey(op: PlannedOperation): GroupKey {
   const str = (k: string): string =>
     typeof op.input[k] === "string" ? (op.input[k] as string).trim() : "";
 
   if (op.toolName === "notion_create") {
     const source = str("database") || str("data_source") || str("surface");
     return source
-      ? { key: `source:${source.toLowerCase()}`, heading: `*${source}* (Notion data source)` }
-      : { key: "source:notion", heading: "*Notion*" };
+      ? { key: `source:${source.toLowerCase()}`, heading: `*${source}* (Notion data source)`, name: `${source} (Notion data source)` }
+      : bolded("source:notion", "Notion");
   }
   if (op.toolName === "email_send") {
     const to = str("to") || str("recipient");
-    return to
-      ? { key: `email:${to.toLowerCase()}`, heading: `*${to}*` }
-      : { key: "email:", heading: "*Gmail*" };
+    return to ? bolded(`email:${to.toLowerCase()}`, to) : bolded("email:", "Gmail");
   }
   if (op.toolName === "dm_relay") {
+    // A table cell renders no mention, so the plain name is the kind of
+    // target; the text copy beside the table names the person.
     const id = relayRecipientId(op.input.recipient);
-    return id
-      ? { key: `dm:${id}`, heading: `*<@${id}>*` }
-      : { key: "dm:", heading: "*a DM*" };
+    return id ? { key: `dm:${id}`, heading: `*<@${id}>*`, name: "a DM" } : bolded("dm:", "a DM");
   }
   if (op.toolName === "shareout_post") {
     const channel = str("channel") || "#plus-design-feedback";
-    return { key: `channel:${channel.toLowerCase()}`, heading: `*${channel}*` };
+    return bolded(`channel:${channel.toLowerCase()}`, channel);
   }
   if (op.toolName === "component_implement" || op.toolName === "prototype_scaffold") {
     const repo = str("repo") || str("repository");
-    if (repo) return { key: `repo:${repo.toLowerCase()}`, heading: `*${repo}*` };
+    if (repo) return bolded(`repo:${repo.toLowerCase()}`, repo);
   }
   const pageUrl = str("page_url") || str("url");
   const title = str("title") || str("page_title") || str("page");
@@ -557,14 +819,13 @@ function operationGroupKey(op: PlannedOperation): { key: string; heading: string
     // Only a real URL becomes a link, and the title is escaped inside its
     // label: a `>` in either would end the link early.
     const linked = /^https?:\/\/[^\s|<>]+$/.test(pageUrl);
-    const label = escapeSlackText(title || (linked ? "this Notion page" : pageUrl));
+    const name = title || (linked ? "this Notion page" : pageUrl);
+    const label = escapeSlackText(name);
     const heading = linked ? `*<${pageUrl}|${label}>*` : `*${label}*`;
-    return { key: `page:${(pageUrl || title).toLowerCase()}`, heading };
+    return { key: `page:${(pageUrl || title).toLowerCase()}`, heading, name, ...(linked ? { url: pageUrl } : {}) };
   }
   const target = operationTarget(op.input);
-  return target
-    ? { key: `other:${target.toLowerCase()}`, heading: `*${target}*` }
-    : { key: `tool:${op.toolName}`, heading: `*${op.toolName}*` };
+  return target ? bolded(`other:${target.toLowerCase()}`, target) : bolded(`tool:${op.toolName}`, op.toolName);
 }
 
 /** One operation's kinds, each with its own detail lines. A `notion_update`

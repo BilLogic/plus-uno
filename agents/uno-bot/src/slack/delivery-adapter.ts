@@ -17,7 +17,9 @@
 //     turn makes lands as a task card — in progress when it starts, complete
 //     or error when it lands — with the narration that introduced it as its
 //     details, so the person reads one filling-in checklist instead of loose
-//     messages. Off, narration is a small ⏳ message and lookups show
+//     messages. Consecutive lookups of one kind share a card, a routing
+//     choice is a card of its own, and the working status names the card in
+//     progress. Off, narration is a small ⏳ message and lookups show
 //     nothing. Which it is has never been the turn's business, and now it
 //     cannot be;
 //   • the answer posted BENEATH the checklist once its stream is stopped.
@@ -66,16 +68,19 @@
 
 import { turnSurfaceOf } from "../turn/request";
 import type { FooterKind } from "./footer-kind";
+import type { AnswerFeedback } from "./feedback";
+import { SLACK_TS, turnIdOf } from "../usage/record";
 import type { SlackMessageMetadata } from "./api";
-import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
+import { notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
-import { renderGateNote } from "./gate-note";
+import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
 import { planBlock } from "./plan-block";
-import type { CardTable, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
+import { retryValue } from "./try-again";
+import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
-import { SUBREQUEST_CAP } from "../agent/loop-policy";
+import { DELIVERY_RESERVE, SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
-import { readoutFor } from "../agent/task-card-readout";
+import { MAX_SOURCES, readoutFor, type TaskCardDecision } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
 import { estateIcon, type SlackIcon } from "./estate-glyphs";
 import {
@@ -141,6 +146,14 @@ export interface PlanTask {
  *  starts, and so a call that never runs can settle as "Not run". */
 type Card = Omit<PlanTask, "status"> & { status: PlanTask["status"] | "pending" };
 
+/** One call's part of a card several consecutive calls share. */
+interface CallState {
+  status: Card["status"];
+  /** Its readout, or the reason it failed. */
+  output?: string;
+  sources?: CardSource[];
+}
+
 /** The card a checklist opens with, titled with the turn's progress label and
  *  closed when the first lookup starts. */
 const OPENING_CARD = "understand";
@@ -173,6 +186,18 @@ export function checklistHeading(ask: string): string {
   const cut = oneLine.slice(0, HEADING_CHARS - 1);
   const brk = cut.lastIndexOf(" ");
   return `${brk > HEADING_CHARS / 2 ? cut.slice(0, brk) : cut}…`;
+}
+
+/**
+ * The working indicator's words for a step: its card title, as what le goat
+ * "is" doing. Slack shows the line after the app's name, which is why the
+ * Gate doors' own line reads "is working on that…".
+ *
+ * @param title - The card title of the step in progress ("Checking the Roadmap board")
+ */
+export function statusLineOf(title: string): string {
+  const words = title.trim();
+  return `is ${words.charAt(0).toLowerCase()}${words.slice(1)}…`;
 }
 
 /** How long an error card's reason may run. A card says THAT a lookup failed
@@ -226,8 +251,10 @@ export interface SlackDeliveryClient {
     text: string;
     recipient: { userId: string; team?: string };
     footerHint?: FooterKind;
-    /** The card table beneath the answer, when the turn left one. */
-    cardTable?: CardTable;
+    /** What rides beneath the answer, when the turn left anything. */
+    presentation?: Presentation;
+    /** The feedback buttons' turn, under a substantive answer. */
+    feedback?: AnswerFeedback;
   }): Promise<{ ok: boolean; text: string }>;
   /** The visible failure: the ❌ and the message that says how far it got. */
   postFailure(input: {
@@ -236,6 +263,9 @@ export interface SlackDeliveryClient {
     userMsgTs: string;
     stage: DeliveryFailureStage;
     err?: unknown;
+    /** The question and who asked it, as the Try again button carries them
+     *  (`try-again.ts` § `retryValue`). */
+    ask?: string;
   }): Promise<void>;
   /** Open a plan-mode stream, or report that none opened. */
   startStream(
@@ -259,6 +289,9 @@ export interface SlackDeliveryClient {
   setSessionStatus(channel: string, threadTs: string, status: SessionStatus): Promise<StatusResult>;
   /** Name the session, so the conversation is findable in History / Messages. */
   renameSession(channel: string, threadTs: string, title: string): Promise<void>;
+  /** Put words on the working indicator — the step in progress. Never a clear:
+   *  the lifecycle stays `setSessionStatus`'s. */
+  setStatusLine(channel: string, threadTs: string, text: string): Promise<void>;
 }
 
 export interface SlackDeliveryDeps {
@@ -301,7 +334,7 @@ export function consoleWorkingLog(line: string, outcome: WorkingSignalOutcome): 
  *  presentation, and this is the one caller. */
 export function threadTitleFrom(text: string): string {
   const oneLine = text.replace(/\s+/g, " ").trim();
-  if (!oneLine) return "Chat with UNO Bot";
+  if (!oneLine) return "Chat with le goat";
   if (oneLine.length <= 60) return oneLine;
   const cut = oneLine.slice(0, 60);
   const brk = cut.lastIndexOf(" ");
@@ -549,13 +582,38 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     return { ...rest, ...fresh };
   };
 
-  /** Record a card's new state and queue it behind every update already issued. */
-  const update = (ts: string, card: Card): Promise<void> => {
-    cards.set(card.id, card);
-    // A static checklist is only rewritten at settle: the card's new state is
-    // kept, and nothing is sent. Nor is a pending card, on either path.
-    if (planMode === "static" || card.status === "pending") return planChain;
-    outbox.set(card.id, { ...card, status: card.status });
+  // THE WORKING STATUS NAMES THE STEP IN PROGRESS. `agents.sessions.setStatus`
+  // takes a lifecycle value and no words, so the words go by the one method
+  // that still carries them, `assistant.threads.setStatus` (`assistant.ts` §
+  // `setStatusLine`). Slack's bridge maps a non-empty line onto `processing`,
+  // which is what the session already is — and also what makes a line that
+  // lands AFTER the settle dangerous: it would raise the indicator again for
+  // the hour Slack takes to time it out. So the line rides this chain, behind
+  // the card it names, and stops for good once the clear has begun.
+  //
+  // At most one line a link, only when the step changed, and only while the
+  // step it names is still in progress when the link goes — a step that ended
+  // in the same breath is not worth a call. So a turn spends at most one call
+  // per step it shows. Never out of the reserve the answer is posted from:
+  // words on a spinner are not worth an answer that cannot post.
+  /** The step the indicator should name — its card, and its words — and the
+   *  words it names now. */
+  let statusWanted: { card: string; title: string } | null = null;
+  let statusSent: string | null = null;
+  /** Set once the settle begins; no line goes out after it. */
+  let statusClosed = false;
+
+  const sendStatusLine = async (): Promise<void> => {
+    if (!replyTs || statusClosed || !statusWanted || statusWanted.title === statusSent) return;
+    if (cards.get(statusWanted.card)?.status !== "in_progress") return;
+    if (SUBREQUEST_CAP - subrequestsUsed() <= DELIVERY_RESERVE) return;
+    statusSent = statusWanted.title;
+    await slack.setStatusLine(channel, replyTs, statusLineOf(statusWanted.title));
+  };
+
+  /** Queue one link behind every update already issued, unless one is queued
+   *  and not yet run — that one will carry whatever is issued before it does. */
+  const flush = (ts: string): Promise<void> => {
     if (!linkQueued) {
       linkQueued = true;
       planChain = planChain
@@ -563,11 +621,23 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           linkQueued = false;
           const tasks = [...outbox.values()].map(onlyNewText);
           outbox.clear();
-          return slack.appendTasks(channel, ts, tasks);
+          return tasks.length ? slack.appendTasks(channel, ts, tasks) : undefined;
         })
+        .catch(() => {})
+        .then(sendStatusLine)
         .catch(() => {});
     }
     return planChain;
+  };
+
+  /** Record a card's new state and queue it behind every update already issued. */
+  const update = (ts: string, card: Card): Promise<void> => {
+    cards.set(card.id, card);
+    // A static checklist is only rewritten at settle: the card's new state is
+    // kept, and nothing is sent. Nor is a pending card, on either path.
+    if (planMode === "static" || card.status === "pending") return planChain;
+    outbox.set(card.id, { ...card, status: card.status });
+    return flush(ts);
   };
 
   /** Move a card that is on the checklist to a new status. */
@@ -578,7 +648,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     void update(ts, { ...card, ...extra, status });
   };
 
-  // THE CAP. The first `TASK_CARD_CAP` calls get a card each; every call after
+  // THE CAP. The first `TASK_CARD_CAP` cards are shown; every call after
   // them folds into one overflow card, whose count is how many it holds and
   // whose status is theirs taken together — pending (so kept, not sent) while
   // none has started, complete or error once all have settled (error if any
@@ -608,31 +678,120 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     });
   };
 
+  // CONSECUTIVE LOOKUPS SHARE A STEP. A call of the same tool, routed the same
+  // way, as the call admitted just before it joins that call's card while the
+  // card is still open — three blueprint searches in one reply read as one
+  // step that searched three things, not three steps. A card already settled
+  // is not reopened: its output has gone out, and Slack appends a re-sent
+  // output rather than replacing it. So a later reply's search is a new step.
+  //
+  // A shared card is drawn from its calls: in progress while any is unsettled,
+  // then complete — or error when any failed, as the overflow card does — with
+  // every call's query as its details and every call's readout as its output.
+  // Its details grow only until the card first goes out, for the same reason.
+  /** Each call's own state on the card it shares, by card id then call id. */
+  const members = new Map<string, Map<string, CallState>>();
+  /** Which card each admitted call is on. */
+  const cardOf = new Map<string, string>();
+  /** The card the last lookup was admitted to, and what a call must match to
+   *  join it. */
+  let lastLookup: { card: string; key: string } | null = null;
+
+  // A ROUTING DECISION IS A STEP. When a call's code routes it somewhere —
+  // which repo, which Notion database (`task-card-readout.ts` § decisions) —
+  // and that differs from where the turn last routed a call of the same kind,
+  // the choice is a card of its own just before the lookup it routed, settled
+  // complete as the lookup starts. It takes a place under the cap like any
+  // card; with no room for both, the lookup keeps the place and the decision
+  // is left off, since it is a lookup the overflow card counts.
+  /** The last choice of each kind, so a repeat is not a new step. */
+  const lastDecision = new Map<TaskCardDecision["kind"], string>();
+  /** The decision card each call was routed by, by call id. */
+  const decisionOf = new Map<string, string>();
+
+  const ownCards = (): number => [...cards.keys()].filter((k) => k !== OPENING_CARD && k !== OVERFLOW_CARD).length;
+
   /**
-   * Put a call on the checklist if it is not there yet — its own card while
-   * there is room, the overflow card after — and say which card is its.
+   * Put a call on the checklist if it is not there yet — the open card of the
+   * call before it when the two are consecutive, its own card while there is
+   * room, the overflow card after — and say which card is its.
    */
-  const admit = (ts: string, id: string, card: Card): string => {
+  const admit = (ts: string, id: string, card: Card, key: string, decision: TaskCardDecision | null): string => {
     if (folded.has(id)) return OVERFLOW_CARD;
-    if (cards.has(id)) return id;
-    const own = [...cards.keys()].filter((k) => k !== OPENING_CARD && k !== OVERFLOW_CARD).length;
-    if (own < TASK_CARD_CAP) {
-      void update(ts, card);
-      return id;
+    const known = cardOf.get(id);
+    if (known) return known;
+    const prior = lastLookup && lastLookup.key === key ? cards.get(lastLookup.card) : undefined;
+    if (prior && (prior.status === "pending" || prior.status === "in_progress")) {
+      members.get(prior.id)?.set(id, { status: "pending" });
+      cardOf.set(id, prior.id);
+      if (card.details && !shown.has(prior.id)) {
+        const details = [prior.details, card.details].filter(Boolean).join(" · ");
+        cards.set(prior.id, { ...prior, details });
+        const queued = outbox.get(prior.id);
+        if (queued) outbox.set(prior.id, { ...queued, details });
+      }
+      return prior.id;
     }
-    folded.set(id, "pending");
-    sendOverflow(ts);
-    return OVERFLOW_CARD;
+    if (ownCards() >= TASK_CARD_CAP) {
+      lastLookup = null;
+      folded.set(id, "pending");
+      sendOverflow(ts);
+      return OVERFLOW_CARD;
+    }
+    const decided = decision && lastDecision.get(decision.kind) !== decision.value ? decision : null;
+    if (decision) lastDecision.set(decision.kind, decision.value);
+    if (decided && ownCards() + 1 < TASK_CARD_CAP) {
+      const decisionId = `decision-${id}`;
+      void update(ts, {
+        id: decisionId,
+        title: toPlainText(decided.title),
+        status: "pending",
+        ...(card.icon ? { icon: card.icon } : {}),
+      });
+      decisionOf.set(id, decisionId);
+    }
+    members.set(id, new Map([[id, { status: "pending" }]]));
+    cardOf.set(id, id);
+    lastLookup = { card: id, key };
+    void update(ts, card);
+    return id;
   };
 
-  /** Move a call's card — its own, or its share of the overflow card. */
+  /** A shared card, drawn from its calls. Its output and links wait for the
+   *  last of them, so each goes out once. */
+  const drawShared = (ts: string, cardId: string, calls: readonly CallState[]): void => {
+    const unsettled = calls.some((c) => c.status === "pending" || c.status === "in_progress");
+    if (unsettled) {
+      const status = calls.every((c) => c.status === "pending") ? "pending" : "in_progress";
+      if (cards.get(cardId)?.status !== status) move(ts, cardId, status);
+      return;
+    }
+    const failed = calls.filter((c) => c.status === "error").length;
+    const outputs = calls.flatMap((c) => (c.status === "complete" && c.output ? [c.output] : []));
+    const output =
+      `${calls.length} lookups${outputs.length ? `: ${outputs.join(" · ")}` : ""}` + (failed ? ` · ${failed} failed` : "");
+    const seen = new Set<string>();
+    const sources = calls
+      .flatMap((c) => c.sources ?? [])
+      .filter((s) => !seen.has(s.url) && seen.add(s.url))
+      .slice(0, MAX_SOURCES);
+    move(ts, cardId, failed ? "error" : "complete", { output, ...(sources.length ? { sources } : {}) });
+  };
+
+  /** Move a call's card — its own, its share of a card it joined, or its
+   *  share of the overflow card. */
   const moveCall = (ts: string, id: string, status: Card["status"], extra: Partial<PlanTask> = {}): void => {
     if (folded.has(id)) {
       folded.set(id, status);
       sendOverflow(ts);
-    } else {
-      move(ts, id, status, extra);
+      return;
     }
+    const cardId = cardOf.get(id);
+    const calls = cardId ? members.get(cardId) : undefined;
+    if (!cardId || !calls) return;
+    calls.set(id, { status, ...(extra.output ? { output: extra.output } : {}), ...(extra.sources ? { sources: extra.sources } : {}) });
+    if (calls.size === 1) move(ts, cardId, status, extra);
+    else drawShared(ts, cardId, [...calls.values()]);
   };
 
   /** Settle every card still open, wait for every queued update to land, and
@@ -768,6 +927,10 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // thread waiting on a ✅ settles to `suspended` rather than claiming to
       // be idle (#575).
       if (!replyTs) return;
+      // No step line after this point, and none still in flight when the
+      // settle goes: a line landing after it would raise the indicator again.
+      statusClosed = true;
+      await planChain;
       await reportStatus(
         "clear",
         () => slack.setSessionStatus(channel, replyTs, settledStatus(settlement)),
@@ -822,7 +985,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         .postMessage({
           channel,
           thread_ts: replyTs,
-          text: `:hourglass_flowing_sand: ${text}`,
+          text,
         })
         .catch(() => {});
     },
@@ -844,22 +1007,33 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // Once, here, because the pass decodes entities and is not idempotent.
       /** The card as a call first puts it on the checklist. */
       const fresh: Card = { id, title: toPlainText(words.title), status: "pending", ...(icon ? { icon } : {}) };
+      // Where the call's code routes it, and so what a call must match to
+      // share its card: the same tool, routed the same way, reading the same
+      // estate — a link read on Figma and one on GitHub keep their own glyphs.
+      const decision = readoutFor(event.name)?.decision?.(event.args) ?? null;
+      const key = [event.name, icon?.name ?? "", decision ? `${decision.kind}:${decision.value}` : ""].join("|");
       switch (event.phase) {
         case "announced": {
           // What the call looks for, after the narration that introduced it.
           const query = readoutFor(event.name)?.details(event.args) ?? null;
           const details = toPlainText([heldDetails, query].filter(Boolean).join(" · "));
           heldDetails = null;
-          admit(ts, id, { ...fresh, ...(details ? { details } : {}) });
+          admit(ts, id, { ...fresh, ...(details ? { details } : {}) }, key, decision);
           return;
         }
         case "started": {
-          const card = admit(ts, id, fresh);
+          const card = admit(ts, id, fresh, key, decision);
           // One card in progress at a time: whatever was running — the opening
-          // card, on the first lookup — closes in the same append. Two folded
-          // calls share a card, so the second starting closes nothing.
+          // card, on the first lookup — closes in the same append. Calls that
+          // share a card, folded or consecutive, close nothing as the next starts.
           if (running && running !== card) move(ts, running, "complete");
           running = card;
+          // The choice was made as the call went out, so its step is done.
+          const decided = decisionOf.get(id);
+          if (decided) move(ts, decided, "complete");
+          // The indicator names the step: the card's title, or the call's own
+          // where it is folded, since "…and 3 more" names nothing.
+          statusWanted = { card, title: card === OVERFLOW_CARD ? fresh.title : (cards.get(card)?.title ?? fresh.title) };
           moveCall(ts, id, "in_progress");
           return;
         }
@@ -881,7 +1055,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       }
     },
 
-    async postAnswer(text, cardTable): Promise<PostResult> {
+    async postAnswer(text, presentation): Promise<PostResult> {
       // The checklist settles and its stream stops FIRST, then the answer
       // posts beneath it the ordinary way. The stream's ts is not handed on:
       // the answer is markdown, and markdown appended into a stream opened in
@@ -897,9 +1071,12 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         // the ids and it never handed them over (#572).
         recipient: { userId: target.userId, team: target.team },
         footerHint: target.footerHint,
-        // Handed on as data: the block and the plain list are the posting
-        // path's to spell (`slack/card-table-block.ts`).
-        ...(cardTable ? { cardTable } : {}),
+        // Handed on as data: the blocks and the plain list are the posting
+        // path's to spell (`slack/result-table-block.ts`).
+        ...(presentation ? { presentation } : {}),
+        // The usage record's id for this turn, worked out as the turn works it
+        // out: a tap on the answer's feedback buttons is filed against it.
+        ...(SLACK_TS.test(userMsgTs) ? { feedback: { turnId: turnIdOf(channel, userMsgTs, 0) } } : {}),
       });
       return { ok: posted.ok, text: posted.text };
     },
@@ -909,7 +1086,33 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // A gate verdict is spelled HERE and nowhere else (#623): every
     // `:hourglass:`, the one `<@user>`, and the line that points at the live
     // card. Gate hands over which verdict it is; `slack/gate-note.ts` says it.
-    postGateNote: (note) => postNote(renderGateNote(note)),
+    //
+    // A note about a card's own state is edited onto that card instead: its
+    // words as posted, the note as its last line, and Review while it can
+    // still be decided or View once it cannot. An edit Slack refuses posts the
+    // note in the thread as before, so the person is never left with silence.
+    async postGateNote(note, card) {
+      if (!card) return postNote(renderGateNote(note));
+      const line = renderCardNote(note);
+      const updated = await slack
+        .updateMessage({
+          channel,
+          ts: card.ts,
+          text: card.text,
+          blocks: notedCardBlocks(card, line, cardStaysLive(note) ? "Review" : "View"),
+        })
+        .catch(() => ({ ok: false }));
+      if (updated.ok) return { ok: true, text: line, ts: card.ts };
+      console.warn(`[slack] gate note could not be edited onto ${channel}/${card.ts}; posting it`);
+      return postNote(renderGateNote(note));
+    },
+
+    async reopenCard(card) {
+      const updated = await slack
+        .updateMessage({ channel, ts: card.ts, text: card.text, blocks: card.blocks ?? proposalCardBlocks(card.text) })
+        .catch(() => ({ ok: false }));
+      if (!updated.ok) console.warn(`[slack] card ${channel}/${card.ts} could not be reopened`);
+    },
 
     async card(card: ProposalCard): Promise<PostResult> {
       // THE CARD ARRIVES AS DATA and is spelled here (#623): the turn decided
@@ -929,6 +1132,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // kept alongside as the notification/fallback copy, and it is what the
       // button handler re-renders the card from.
       const blocks = rendered.blocks ?? proposalCardBlocks(rendered.text);
+      // Its own blocks, as long as they are what went up: the record keeps
+      // them so a note or a decision is edited onto them.
+      let own = rendered.blocks;
       const metadata = card.tag ? { event_type: card.tag.eventType, event_payload: card.tag.payload } : undefined;
       let posted = await slack.postMessage({
         channel,
@@ -944,19 +1150,23 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (!posted.ok) {
         console.warn("[slack] proposal with blocks failed; retrying text-only");
         posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text, ...(metadata ? { metadata } : {}) });
+        own = undefined;
       }
       return {
         ok: !!posted.ok,
         text: rendered.text,
         ...(posted.ok && posted.ts ? { ts: posted.ts } : {}),
+        ...(posted.ok && own ? { blocks: own } : {}),
       };
     },
 
-    async postFailure(stage: DeliveryFailureStage, err) {
+    async postFailure(stage: DeliveryFailureStage, err, ask) {
       // The checklist is settled by the turn's own `endProgress("error")`
       // before it gets here — a failure message under a step that still claims
       // to be in progress is how the plan stream read after a dead run.
-      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err });
+      // The button carries who asked, so only they can ask it again.
+      const retry = ask ? retryValue(target.userId, ask) : undefined;
+      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err, ...(retry ? { ask: retry } : {}) });
     },
   };
 }

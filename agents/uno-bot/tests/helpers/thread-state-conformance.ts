@@ -29,6 +29,7 @@ import {
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
+  REVISING_MARK_MS,
   RUN_LEASE_MS,
   proposalOperations,
   unfinishedOperations,
@@ -554,6 +555,70 @@ export function runThreadStateConformance(
     assert.equal(await store.claimProposal("1700.2"), false);
   });
 
+  // Needs changes locks a card while its revision is written: the first
+  // press marks it, a second is told it already is, and nothing claims it
+  // until the mark clears or the revision replaces it.
+  it("a card marked as being revised is marked once, found, and not claimable", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.markRevising("1700.2", "U2"), "marked");
+    assert.equal(await store.markRevising("1700.2", "U3"), "already");
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state === "found" && found.proposal.revising?.userId, "U2");
+    assert.equal((await store.getProposalByThread(THREAD))?.revising?.userId, "U2");
+    assert.equal(await store.claimProposal("1700.2"), false);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+  });
+
+  it("a cleared mark leaves the card claimable, as it was", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.markRevising("1700.2", "U2");
+    await store.clearRevising("1700.2");
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state === "found" && found.proposal.revising, undefined);
+    assert.equal(await store.claimProposal("1700.2"), true);
+  });
+
+  // A Worker that dies mid-revision never clears its mark, so the mark lapses
+  // on its own long before the card does.
+  it("a mark older than its bound reads as cleared: found unmarked, claimable, and markable again", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.markRevising("1700.2", "U2");
+    clock.advance(REVISING_MARK_MS - 1_000);
+    assert.equal(await store.claimProposal("1700.2"), false);
+    clock.advance(2_000);
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state === "found" && found.proposal.revising, undefined);
+    assert.equal((await store.getProposalByThread(THREAD))?.revising, undefined);
+    assert.equal((await store.getProposalsByChannel(THREAD.channel))[0]?.revising, undefined);
+    assert.equal(await store.markRevising("1700.2", "U3"), "marked");
+    clock.advance(REVISING_MARK_MS + 1);
+    assert.equal(await store.claimProposal("1700.2"), true);
+  });
+
+  it("a card claimed, replaced or never staged cannot be marked", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.equal(await store.markRevising("1700.2", "U2"), "gone");
+    assert.equal(await store.claimProposal("1700.3"), true);
+    assert.equal(await store.markRevising("1700.3", "U2"), "gone");
+    assert.equal(await store.markRevising("1700.9", "U2"), "gone");
+    await store.clearRevising("1700.9");
+  });
+
+  it("a revision supersedes a card being revised, as any other", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.markRevising("1700.2", "U2");
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: true });
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    assert.equal(await store.claimProposal("1700.3"), true);
+  });
+
   // ----- executions -----
   //
   // A won ✅ is recorded from the claim until its outcome is told, so a run cut
@@ -1047,15 +1112,16 @@ export function runThreadStateConformance(
 
   // A stated card's own words ride the two answers whose generic wording is
   // wrong on it — "ask me again", "the newest :warning: card" — so the gate
-  // can say them instead (`PendingProposal.stated`).
+  // can say them instead (`PendingProposal.stated`). Every card's posted text
+  // rides them too, so the gate's note can be edited onto the card itself.
   it("a stated card's words ride its superseded and expired answers", async () => {
     const { store, clock } = setup();
     const stated = { cancelled: "Intake only", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
     clock.advance(LONG_TTL_MS + HOUR_MS);
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?" });
   });
 
   it("a retired stated card carries its words, and a turn's card answers as it always has", async () => {
@@ -1063,13 +1129,13 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", stated }));
     await store.retireProposal("1700.2");
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
     await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
     await store.retireProposal("1700.4");
-    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded" });
+    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?" });
     await store.putProposal(proposal({ proposalTs: "1700.6", threadTs: "1700.5" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
-    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired" });
+    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?" });
   });
 
   it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {

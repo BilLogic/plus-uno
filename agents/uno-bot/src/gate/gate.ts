@@ -1,8 +1,9 @@
-// Gate — four signals in, one verdict out.
+// Gate — five signals in, one verdict out.
 //
-// A staged proposal is resolved four ways: a reaction on the card, the card's
-// own ✅/⛔ button, the same emoji typed alone as a message, and the model's
-// `proposal_resolve` call once the loop has validated it. Until now each door
+// A staged proposal is resolved five ways: a reaction on the card, the card's
+// own ✅/⛔ button, a decision in the card's Review pop-up, the same emoji typed
+// alone as a message, and the model's `proposal_resolve` call once the loop
+// has validated it. Until now each door
 // looked the proposal up its own way, wrote its own lost-race handling, and
 // two of them read the claim's answer while a third threw it away — which is
 // the bug: `slack/gate.ts` ignored the boolean, so a reaction that LOST the
@@ -18,7 +19,7 @@
 // `<@user>` and all, which made "no Slack call" true of the effects and false
 // of the content (#623); the wordings now live in `slack/gate-note.ts` and the
 // emoji vocabulary moved in here, as `gate/reactions.ts`. That is also what
-// lets the whole four-path agreement be asserted in one Node test against the
+// lets the agreement between every door be asserted in one Node test against the
 // in-memory ThreadState (`tests/confirmation-paths.test.ts`) — as MEANINGS
 // now, not as strings.
 //
@@ -45,6 +46,15 @@ import type {
 import type { GateNote } from "../turn/index";
 
 // ── The signal ───────────────────────────────────────────────────────────────
+
+/**
+ * What the Review pop-up decides: a ✅ or a ⛔ as every door has them — the
+ * pop-up's Reject is a ⛔ that may say why — or `revise`, Needs changes, which
+ * only the pop-up has. A revise is not a resolution: it consumes nothing and
+ * runs nothing; it locks the card as being revised (`ThreadState.markRevising`),
+ * and the card stays findable for the revision that replaces it.
+ */
+export type ReviewDecision = Decision | "revise";
 
 /**
  * One confirmation attempt, in the terms of the door it came through.
@@ -74,6 +84,25 @@ export type GateSignal =
       messageTs: string;
       decision: Decision;
       userId: string;
+    }
+  | {
+      kind: "review";
+      /** The card the pop-up was opened from: the view carries its ts, so the
+       *  decision is about that card and no other, as a button press is. */
+      messageTs: string;
+      /** Approve, Reject (`cancel`), or Needs changes (`revise`). */
+      decision: ReviewDecision;
+      /** Needs changes' note, which the revision is written from; Reject's
+       *  reason, when one was given. */
+      note?: string;
+      userId: string;
+      /**
+       * The batch as the pop-up's edits left it, already checked by the door
+       * against the guards a draft passes (`slack/review-fields.ts`). Absent,
+       * the card runs as staged. Applied only to the card the claim wins, so
+       * it is what the execution record and the run both carry.
+       */
+      operations?: ProposalOperation[];
     }
   | {
       kind: "typed";
@@ -158,7 +187,7 @@ export interface GateVerdict {
    * with an emoji and — for the one verdict aimed at a person's own gesture —
    * a mention in it (#623). A door posts it through `Delivery.postGateNote`.
    */
-  post: { note: GateNote; replyTs: string } | null;
+  post: { note: GateNote; replyTs: string; card?: GateCard } | null;
   execute?: GateExecution;
   /**
    * Operations to put back in front of a person on a fresh card — set only on
@@ -175,6 +204,42 @@ export interface GateVerdict {
    * turn).
    */
   by?: { door: GateSignal["kind"]; userId?: string };
+  /**
+   * Needs changes, accepted: the card is now locked as being revised, and a
+   * revision is to be written from `note`. Set only on a `won` verdict of a
+   * review `revise`, which has no `decision`, no `post` and no `execute` — the
+   * door posts the note into the thread and the revision turn does the rest.
+   */
+  revise?: { note: string };
+}
+
+/**
+ * The card a note is about, when the note is about the card's own state: it
+ * aged out, a revision replaced it, or it is waiting on someone else. Such a
+ * note belongs ON the card, as its last line, rather than in a new message —
+ * `Delivery.postGateNote` takes it there. `text` is the card as posted, and
+ * `blocks` its own blocks when it had any: what the note is edited onto.
+ */
+export interface GateCard {
+  ts: string;
+  text: string;
+  blocks?: unknown[];
+}
+
+/** The card a note is about, when its words are known: a staged proposal, or
+ *  what an "expired" or "superseded" lookup kept of one. */
+function cardOf(
+  ts: string,
+  posted: { proposalText?: string; proposalBlocks?: unknown[] },
+): { card?: GateCard } {
+  if (!posted.proposalText) return {};
+  return {
+    card: {
+      ts,
+      text: posted.proposalText,
+      ...(posted.proposalBlocks ? { blocks: posted.proposalBlocks } : {}),
+    },
+  };
 }
 
 /** What a cut-off verdict asks to have staged again. */
@@ -240,15 +305,21 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   // state by the loop, and carries the proposal itself — there is nothing to
   // look up, only the claim.
   if (signal.kind === "model") {
-    return claim(signal.pending, signal.decision, signal.userId, deps, signal.messageToUser);
+    return claim(signal.pending, signal.decision, signal.userId, deps, { narrative: signal.messageToUser });
   }
 
   // Parse before any read: a 🎉 in a thread that happens to hold a proposal is
   // not a gate signal and must cost nothing and say nothing.
+  // A Needs changes that finds nothing live to change is answered as a ⛔
+  // would be: it asked for nothing to run, so it can only be told why.
   const decision =
-    signal.kind === "button"
-      ? signal.decision
-      : signal.kind === "reaction"
+    signal.kind === "review"
+      ? signal.decision === "revise"
+        ? "cancel"
+        : signal.decision
+      : signal.kind === "button"
+        ? signal.decision
+        : signal.kind === "reaction"
         ? mapReaction(signal.glyph)
         : typedEmojiDecision(signal.text);
   if (!decision) return { outcome: "none", post: null };
@@ -262,7 +333,11 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
     return {
       outcome: "stale",
       decision,
-      post: { note: { kind: "superseded", ...(found.stated ? { stated: true } : {}) }, replyTs: replyTargetOf(signal) },
+      post: {
+        note: { kind: "superseded", ...(found.stated ? { stated: true } : {}) },
+        replyTs: replyTargetOf(signal),
+        ...cardSignalled(signal, found),
+      },
     };
   }
 
@@ -282,6 +357,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
           ...(found.stated ? { words: found.stated.expired } : {}),
         },
         replyTs: replyTargetOf(signal),
+        ...cardSignalled(signal, found),
       },
     };
   }
@@ -343,7 +419,136 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
     };
   }
 
-  return claim(proposal, decision, signal.userId, deps);
+  // Sent back with Needs changes: its revision is being written, and the
+  // revised card is the one to decide. Every door, every decision — a second
+  // Needs changes included, which is how two presses start one revision.
+  if (proposal.revising) return beingRevised(proposal, decision);
+
+  if (signal.kind === "review") {
+    if (signal.decision === "revise") return askForChanges(proposal, signal.note ?? "", signal.userId, deps);
+    // The pop-up's ⛔ is Reject, and its reason rides on the note it posts.
+    if (decision === "cancel") {
+      const reason = signal.note?.trim();
+      return claim(proposal, decision, signal.userId, deps, { byCard: true, rejected: reason ? { reason } : {} });
+    }
+    return claim(edited(proposal, signal.operations), decision, signal.userId, deps, { byCard: true });
+  }
+  return claim(proposal, decision, signal.userId, deps, { byCard: signal.kind !== "typed" });
+}
+
+/** The card with a pop-up's edited batch in place of its own, the first
+ *  operation mirrored where the one-operation readers look. */
+function edited(proposal: PendingProposal, operations: ProposalOperation[] | undefined): PendingProposal {
+  const [first] = operations ?? [];
+  if (!first) return proposal;
+  return { ...proposal, operations, toolName: first.toolName, input: first.input };
+}
+
+/**
+ * Needs changes on a live card: the confirmer rules a claim applies, and then
+ * no claim.
+ *
+ * The card is NOT consumed and NOT retired here, only marked as being revised,
+ * which every signal on it is refused by until the revision replaces it or the
+ * revision turn ends without one. The revision is a turn in the
+ * card's thread, and a turn revises the card it finds pending there — so the
+ * card has to still be pending when it looks. Staging the revision is what
+ * retires it (`ThreadState.putProposal`), and the turn retires it ahead of
+ * writing (`retireProposal`), which is the supersession every other revision
+ * gets. An empty note revises nothing: there is nothing to write it from.
+ */
+async function askForChanges(
+  proposal: PendingProposal,
+  note: string,
+  userId: string,
+  deps: GateDeps,
+): Promise<GateVerdict> {
+  const text = note.trim();
+  if (!text) return { outcome: "none", proposal, post: null };
+  if (!mayConfirm(proposal, userId, deps.standingConfirmers)) return notAConfirmer(proposal, "cancel", userId, deps, true);
+  // The mark is the lock, as the claim is for a decision: of two presses, or a
+  // press racing an Approve, one wins. A failed write revises nothing.
+  const mark = await deps.threadState.markRevising(proposal.proposalTs, userId).catch(() => "gone" as const);
+  if (mark === "already") return beingRevised(proposal, "cancel");
+  if (mark === "gone") {
+    return { outcome: "stale", proposal, decision: "cancel", post: { note: { kind: "already-resolved" }, replyTs: replyTarget(proposal) } };
+  }
+  console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: changes asked by ${userId}`);
+  return { outcome: "won", proposal, post: null, revise: { note: text } };
+}
+
+/** A signal on a card whose revision is being written: nothing resolved. */
+function beingRevised(proposal: PendingProposal, decision: Decision): GateVerdict {
+  console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: being revised, signal refused`);
+  return { outcome: "stale", proposal, decision, post: { note: { kind: "being-revised" }, replyTs: replyTarget(proposal) } };
+}
+
+/**
+ * A signal from someone the card does not accept: nothing resolved, and who
+ * can resolve it named.
+ *
+ * `byCard` is a gesture made ON the card — a reaction, a press, the pop-up —
+ * whose person is looking at the card, so the line goes there. A typed emoji
+ * or the model's call was made in the thread, and is answered there, near the
+ * message, as it always was: a line edited onto a card above would be missed.
+ */
+function notAConfirmer(
+  proposal: PendingProposal,
+  decision: Decision,
+  userId: string | undefined,
+  deps: GateDeps,
+  byCard: boolean,
+): GateVerdict {
+  console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
+  return {
+    outcome: "none",
+    proposal,
+    decision,
+    post: {
+      note: {
+        kind: "not-a-confirmer",
+        confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
+        ...(userId ? { userId } : {}),
+      },
+      replyTs: replyTarget(proposal),
+      // The card is still live and waiting on one of them: the line goes on it.
+      ...(byCard ? cardOf(proposal.proposalTs, proposal) : {}),
+    },
+  };
+}
+
+/**
+ * What a person opening a card's Review pop-up is shown: the card, and whether
+ * they may decide it — or why there is nothing left to decide.
+ *
+ * A look, not a signal: it claims nothing, consumes nothing and records
+ * nothing, so opening the pop-up twice, or opening it and closing it, leaves
+ * the card exactly as it was. `mayDecide` is the same `mayConfirm` the claim
+ * checks, so the pop-up never offers a decision the claim would refuse. The
+ * decision itself comes back through `resolveSignal` as a `review` signal,
+ * which re-checks all of it: a card can expire or be replaced while the pop-up
+ * is open.
+ */
+export type ProposalLook =
+  | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[] }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  /** Decided, cut off, or never a card: nothing here is waiting on anyone. */
+  | { state: "gone" };
+
+export async function lookAtProposal(messageTs: string, userId: string, deps: GateDeps): Promise<ProposalLook> {
+  const byTs = await deps.threadState.getProposalByTs(messageTs).catch(() => ({ state: "none" }) as const);
+  if (byTs.state === "found") {
+    const proposal = byTs.proposal;
+    return {
+      state: "live",
+      proposal,
+      mayDecide: mayConfirm(proposal, userId, deps.standingConfirmers),
+      confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
+    };
+  }
+  if (byTs.state === "superseded" || byTs.state === "expired") return byTs;
+  return { state: "gone" };
 }
 
 /** The claim, and the verdict that follows from it. */
@@ -352,28 +557,23 @@ async function claim(
   decision: Decision,
   userId: string | undefined,
   deps: GateDeps,
-  narrative?: string,
+  opts: {
+    /** The model's own words for the outcome. */
+    narrative?: string;
+    /** Set for the pop-up's Reject: a ⛔ that says so, with its reason. */
+    rejected?: { reason?: string };
+    /** The signal was a gesture on the card itself (`notAConfirmer`). */
+    byCard?: boolean;
+  } = {},
 ): Promise<GateVerdict> {
+  const { narrative, rejected } = opts;
   // A card with a confirmer set resolves only for its members, on every door.
   // Checked BEFORE the claim, because the claim consumes the card: a refused
   // signal has to leave it exactly as it was for the person who may confirm.
   // `none`, not `stale` — nobody else resolved it and it has not aged out;
   // this signal was simply not one the card accepts.
   if (!mayConfirm(proposal, userId, deps.standingConfirmers)) {
-    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
-    return {
-      outcome: "none",
-      proposal,
-      decision,
-      post: {
-        note: {
-          kind: "not-a-confirmer",
-          confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
-          ...(userId ? { userId } : {}),
-        },
-        replyTs: replyTarget(proposal),
-      },
-    };
+    return notAConfirmer(proposal, decision, userId, deps, opts.byCard ?? false);
   }
 
   // A person who reacts ✅ and then, unsure it registered, also types "go
@@ -392,6 +592,8 @@ async function claim(
     const why = await deps.threadState
       .getProposalByTs(proposal.proposalTs)
       .catch(() => ({ state: "none" }) as const);
+    // Still there, and refused: someone sent it back with Needs changes.
+    if (why.state === "found" && why.proposal.revising) return beingRevised(proposal, decision);
     return {
       outcome: "stale",
       proposal,
@@ -402,6 +604,9 @@ async function claim(
             ? { kind: "superseded", ...(proposal.stated ? { stated: true } : {}) }
             : { kind: "already-resolved" },
         replyTs: replyTarget(proposal),
+        // A replaced card says so on itself; a lost race is about this
+        // person's signal, not the card, and is said in the thread.
+        ...(why.state === "superseded" ? cardOf(proposal.proposalTs, proposal) : {}),
       },
     };
   }
@@ -445,6 +650,7 @@ async function claim(
             decision,
             ...(decision === "cancel" && run ? { stillRuns: proposalOperations(run).map((op) => op.toolName) } : {}),
             ...(decision === "cancel" && proposal.stated ? { cancelled: proposal.stated.cancelled } : {}),
+            ...(decision === "cancel" && rejected ? { rejected } : {}),
           },
       replyTs: replyTarget(proposal),
     },
@@ -526,8 +732,8 @@ async function locate(
   deps: GateDeps,
 ): Promise<
   | { state: "found"; proposal: PendingProposal }
-  | { state: "superseded"; stated?: StatedCardWords }
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   | { state: "cut-off"; execution: Execution }
   | { state: "several"; count: number }
   | { state: "none" }
@@ -570,8 +776,18 @@ async function locate(
 function threadRefOf(
   signal: Exclude<GateSignal, { kind: "model" }>,
 ): { channel: string; thread: string } | null {
-  if (signal.kind === "button") return null; // a press carries no conversation
+  // A press, on the card or in its pop-up, carries no conversation.
+  if (signal.kind === "button" || signal.kind === "review") return null;
   return { channel: signal.channel, thread: signal.thread };
+}
+
+/** The card a by-ts signal was placed on: a reaction's or a press's own
+ *  message. A typed signal names no card. */
+function cardSignalled(
+  signal: Exclude<GateSignal, { kind: "model" }>,
+  posted: Parameters<typeof cardOf>[1],
+): { card?: GateCard } {
+  return signal.kind === "typed" ? {} : cardOf(signal.messageTs, posted);
 }
 
 /** Where to answer a signal whose proposal was never found. */

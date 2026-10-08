@@ -32,6 +32,7 @@
 
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
+import type { CardFixes } from "../turn/delivery";
 
 export type { AssistantContext, VisionReference };
 
@@ -218,6 +219,16 @@ export interface PendingProposal {
   userMsgTs: string;
   proposalTs: string;
   proposalText: string;
+  /**
+   * The card's own blocks as posted, when it had blocks of its own rather than
+   * its text in sections: a sweep card's carousel, a Figma library card's
+   * release card and table, a Figma preview's screenshot. A note or a decision
+   * is edited onto these (`slack/proposal-render.ts` `notedCardBlocks`), so the
+   * card keeps its layout. Absent — a text-only card, or one that stepped down
+   * to its text when Slack refused its blocks — it is re-rendered from
+   * `proposalText`.
+   */
+  proposalBlocks?: unknown[];
   /** Who asked. Kept for the record, not a lock: who may confirm is
    *  `confirmers` (the requester-only lock was removed 2026-07-14, see
    *  gate/reaction-door.ts). */
@@ -238,11 +249,20 @@ export interface PendingProposal {
   /**
    * The Slack user ids allowed to resolve this card. Absent, anyone in the
    * thread may, as every turn's card allows. Present, Gate refuses every
-   * other person's signal on all four doors and names these instead
+   * other person's signal on every door and names these instead
    * (`mayConfirm`). An empty list admits nobody: the set is enforced as
    * written rather than read as "unset".
    */
   confirmers?: string[];
+  /**
+   * Set by the store, never by a stager: a confirmer pressed Needs changes and
+   * the revision is being written (`ThreadState.markRevising`). The card stays
+   * findable, for the revision turn that replaces it, and is decided by no one
+   * meanwhile — the claim refuses it, and Gate answers every signal on it with
+   * "being revised". `at` is when it was marked: past `REVISING_MARK_MS` the
+   * mark reads as cleared (`withLiveMark`).
+   */
+  revising?: { userId: string; at?: number };
   /**
    * What a ⛔ still runs, when the card says so. Absent — every turn's card —
    * a cancel runs nothing. Only a card the Worker stages itself sets it: the
@@ -277,6 +297,13 @@ export interface PendingProposal {
    * it, so only the card people were shown offers a share.
    */
   sweepShare?: SweepShare;
+  /**
+   * A sweep card's fixes as its carousel showed them (`ProposalCard.fixes`),
+   * one per operation, in order. A `drop N` revision carries the ones it
+   * keeps, renumbered, so the revised card is a carousel too
+   * (`sweep/cards.ts` `keptFixes`). A re-staged card never carries them.
+   */
+  fixes?: CardFixes;
   /**
    * The card's own slot within its reply thread (`proposalSlot`). Absent —
    * every turn's card — the card holds the thread's slot, and cards there
@@ -358,6 +385,27 @@ export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number 
   return proposal.ttlMs ?? PROPOSAL_TTL_MS;
 }
 
+/**
+ * How long a Needs changes mark holds a card. A revision turn stages or
+ * clears well inside it; a Worker that died mid-revision clears nothing, and
+ * without a bound its card would stay undecidable until it aged out.
+ */
+export const REVISING_MARK_MS = 15 * 60 * 1000;
+
+/**
+ * The card as every lookup hands it back: a mark past `REVISING_MARK_MS`
+ * reads as cleared. A mark written before marks carried a time keeps holding.
+ *
+ * @param proposal - The stored card
+ * @param at - The store's now
+ */
+export function withLiveMark(proposal: PendingProposal, at: number): PendingProposal {
+  const since = proposal.revising?.at;
+  if (since === undefined || at - since <= REVISING_MARK_MS) return proposal;
+  const { revising: _, ...rest } = proposal;
+  return rest;
+}
+
 /** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
  *  card on the default hour, so that answer reads exactly as it always has. */
 export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: number } {
@@ -368,6 +416,22 @@ export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: numb
  *  — absent for every turn's card, whose answers read as they always have. */
 export function ownWords(proposal: Pick<PendingProposal, "stated">): { stated?: StatedCardWords } {
   return proposal.stated ? { stated: proposal.stated } : {};
+}
+
+/** The card as posted — its text, and its own blocks when it had any — spread
+ *  onto an "expired" or "superseded" lookup: what a gate note is edited onto. */
+export function ownText(
+  proposal: Partial<Pick<PendingProposal, "proposalText" | "proposalBlocks">>,
+): { proposalText?: string; proposalBlocks?: unknown[] } {
+  return proposal.proposalText
+    ? { proposalText: proposal.proposalText, ...(proposal.proposalBlocks ? { proposalBlocks: proposal.proposalBlocks } : {}) }
+    : {};
+}
+
+/** The blocks a card went up with, spread onto the proposal staged from it —
+ *  absent for a card posted as its text. */
+export function ownBlocks(posted: { blocks?: unknown[] }): { proposalBlocks?: unknown[] } {
+  return posted.blocks ? { proposalBlocks: posted.blocks } : {};
 }
 
 /**
@@ -595,11 +659,13 @@ export type ProposalLookup =
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
-  | { state: "superseded"; stated?: StatedCardWords }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
-   *  a stated card's own words, whose `expired` line says it instead. */
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords }
+   *  a stated card's own words, whose `expired` line says it instead.
+   *  `proposalText` and `proposalBlocks` (both answers) are the card as
+   *  posted, so the note about it can be edited onto it. */
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   | { state: "none" };
 
 /**
@@ -739,6 +805,27 @@ export interface ThreadState {
    * answers false — nothing was replaced by this revision.
    */
   retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
+
+  /**
+   * Mark a live card as being revised: Needs changes, accepted.
+   *
+   * The first mark wins — `"marked"` — and a second answers `"already"`, so
+   * two presses start one revision. A card claimed, retired, replaced, aged
+   * out or never staged answers `"gone"`. A marked card is still found by
+   * every lookup, because the revision turn has to find it to replace it,
+   * and `claimProposal` refuses it until the mark clears. One read-modify-
+   * write, as the claim is, so a racing Approve and Needs changes have one
+   * winner between them. The mark lapses after `REVISING_MARK_MS`: every
+   * lookup, the claim and a second mark then read it as cleared.
+   */
+  markRevising(proposalTs: string, userId: string): Promise<"marked" | "already" | "gone">;
+
+  /**
+   * Lift the mark: the revision turn ended without staging a revision, so the
+   * card is decidable again. Staging the revision needs no clear — it retires
+   * the card. A card with no mark, or no record, is a no-op.
+   */
+  clearRevising(proposalTs: string): Promise<void>;
 
   /** Look one up by the ts of its card. */
   getProposalByTs(proposalTs: string): Promise<ProposalLookup>;

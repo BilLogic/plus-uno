@@ -20,6 +20,7 @@ import assert from "node:assert/strict";
 import type { Env } from "../src/types";
 import type { GateVerdict } from "../src/gate/index";
 import type { ProposalEventLog } from "../src/usage/index";
+import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 
 interface Call {
   url: string;
@@ -27,6 +28,7 @@ interface Call {
 }
 
 let calls: Call[] = [];
+let refuseTables = false;
 
 globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   const url = String(input);
@@ -43,6 +45,10 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   if (String(body?.text ?? "").includes("EXPLODE")) throw new Error("socket hang up");
   const reply = (payload: unknown) =>
     new Response(JSON.stringify(payload), { status: 200, headers: { "content-type": "application/json" } });
+  // Slack refusing a table, on demand.
+  if (refuseTables && url.includes("chat.postMessage") && JSON.stringify(body?.blocks ?? []).includes("data_table")) {
+    return reply({ ok: false, error: "invalid_blocks" });
+  }
   if (url.includes("slack.com/api/chat.getPermalink")) {
     const u = new URL(url);
     const channel = u.searchParams.get("channel");
@@ -84,6 +90,25 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
       last_edited_time: "2026-09-15T16:40:00.000Z",
       parent: { type: "page_id", page_id: "0123456789abcdef0123456789abcdef" },
     });
+  }
+  // Notion writes: a created page, an append, a property change and the reads
+  // a property change makes first.
+  if (url === "https://api.notion.com/v1/pages" && init?.method === "POST") {
+    return reply({ id: "9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f", url: "https://www.notion.so/9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f" });
+  }
+  if (url.startsWith("https://api.notion.com/v1/blocks/") && url.endsWith("/children") && init?.method === "PATCH") {
+    return reply({ results: [] });
+  }
+  if (url.startsWith("https://api.notion.com/v1/pages/") && init?.method === "PATCH") return reply({ id: "page" });
+  if (url.startsWith("https://api.notion.com/v1/pages/")) {
+    return reply({
+      id: "0123456789abcdef0123456789abcdef",
+      parent: { type: "database_id", database_id: "dbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdb" },
+      properties: { Name: { type: "title", title: [{ plain_text: "A card" }] } },
+    });
+  }
+  if (url.startsWith("https://api.notion.com/v1/databases/")) {
+    return reply({ properties: { Name: { type: "title" }, Priority: { type: "rich_text" } } });
   }
   if (url.includes("oauth2.googleapis.com/token")) return reply({ access_token: "ya29.test" });
   if (url.includes("gmail.googleapis.com")) return reply({ id: "msg-1" });
@@ -405,7 +430,7 @@ test("an approved issue follow-up comments with the requester's footer, then clo
   );
   const comment = String(github[0]!.body?.body);
   assert.ok(comment.startsWith("Fixed in r384."), comment);
-  assert.match(comment, /Posted from Slack by uno-bot on behalf of Bill Guo, posted from a private conversation/);
+  assert.match(comment, /Posted from Slack by le goat on behalf of Bill Guo, posted from a private conversation/);
   assert.doesNotMatch(comment, /slack\.com/);
   assert.deepEqual(github[1]!.body, { state: "closed", state_reason: "completed" });
 
@@ -439,7 +464,7 @@ test("an approved intake naming a listed repo is filed there, with the two fixed
   assert.deepEqual(filings.map((c) => c.url), ["https://api.github.com/repos/BilLogic/plus-marketing-website/issues"]);
   const sent = filings[0]!.body!;
   assert.deepEqual(sent.labels, ["harness-intake", "needs-triage"]);
-  assert.match(String(sent.body), /^The hero button links nowhere\.\n\n---\nFiled from Slack by uno-bot on behalf of Bill Guo/);
+  assert.match(String(sent.body), /^The hero button links nowhere\.\n\n---\nFiled from Slack by le goat on behalf of Bill Guo/);
   assert.equal(sent.repo, undefined, "the repo is the URL's, never a field of the model's");
   assert.ok(posts().some((p) => /on BilLogic\/plus-marketing-website/.test(String(p.text))));
 });
@@ -772,4 +797,153 @@ test("a budget stop in the task-completion write still posts the result and the 
   assert.ok(appended.some((a) => a.ref.channel === "D0REQUESTER"), "the history note was written");
   assert.deepEqual(writes, ["task_completed after 1 result post(s)"], "the write was tried, last");
   assert.ok(executionCalls.includes("end 1700000000.000300"));
+});
+
+// Code sends two reactions, 👀 on arrival and ❌ on a failure (AGENT.md
+// § Emoji budget). A decided card used to collect a 🤝 or a 👋 on the
+// requester's message as well, which the persona never described.
+test("a won verdict, confirmed or cancelled, adds no reaction", async () => {
+  for (const decision of ["confirm", "cancel"] as const) {
+    calls = [];
+    const run = await executeVerdict();
+    const verdict = won([{ toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } }]);
+    await run(env(), { ...verdict, decision } as GateVerdict);
+    assert.deepEqual(
+      calls.filter((c) => c.url.includes("reactions.add")).map((c) => c.body?.name),
+      [],
+      `a ${decision} reacted`,
+    );
+  }
+});
+
+// Body content the bot writes into Notion opens with whom it was written for,
+// so a reader knows the words are the bot's and whom to ask about them.
+
+const NOTION_ENV = { NOTION_API_KEY: "secret_test", NOTION_ROADMAP_DB_ID: "rdrdrdrdrdrdrdrdrdrdrdrdrdrdrdrd" };
+const notionWrites = () =>
+  calls
+    .filter((c) => c.url.startsWith("https://api.notion.com/") && c.body !== null)
+    .map((c) => ({ url: c.url, body: c.body! }));
+/** The text of the first block in a list of Notion blocks. */
+const firstText = (blocks: unknown): string => {
+  const block = (blocks as Array<Record<string, unknown> & { type: string }>)[0]!;
+  const runs = (block[block.type] as { rich_text?: Array<{ text?: { content?: string } }> }).rich_text ?? [];
+  return runs.map((r) => r.text?.content ?? "").join("");
+};
+
+test("an approved Notion create opens its page with the requester's attribution line", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_create", input: { surface: "intake", title: "Fix the tutor table", summary: "The table overflows." } }]),
+  );
+  const create = notionWrites().find((w) => w.url === "https://api.notion.com/v1/pages");
+  assert.ok(create, "the page was created");
+  assert.equal(firstText(create.body.children), "Written by le goat on behalf of Bill Guo");
+});
+
+test("an approved Notion append opens the appended blocks with the attribution line", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_update", input: { page_url: SHARED_PAGE, append: { text: "Design review moved to Friday." } } }]),
+  );
+  const append = notionWrites().find((w) => w.url.endsWith("/children"));
+  assert.ok(append, "the blocks were appended");
+  assert.equal(firstText(append.body.children), "Written by le goat on behalf of Bill Guo");
+  assert.equal(firstText((append.body.children as unknown[]).slice(1)), "Design review moved to Friday.");
+});
+
+test("a Worker-staged Notion create, with no requester of record, names whoever approved it", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  const staged = won([{ toolName: "notion_create", input: { surface: "prd", title: "A drafted card", summary: "From a to-do." } }]);
+  const unowned: GateVerdict = {
+    ...staged,
+    proposal: { ...staged.proposal!, requesterUserId: "" },
+    execute: { ...staged.execute!, requesterUserId: "" },
+  };
+  await run(env(NOTION_ENV), by(unowned, "button", "U0REQUESTR1"));
+  const create = notionWrites().find((w) => w.url === "https://api.notion.com/v1/pages");
+  assert.ok(create, "the page was created");
+  assert.equal(firstText(create.body.children), "Written by le goat on behalf of Bill Guo");
+});
+
+test("a property-only Notion update writes no attribution: there is no body to attribute", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_update", input: { page_url: SHARED_PAGE, properties: { Priority: "High" } } }]),
+  );
+  const writes = notionWrites();
+  assert.equal(writes.length, 1, JSON.stringify(writes));
+  assert.deepEqual(Object.keys(writes[0]!.body), ["properties"]);
+});
+
+// A batch's result is a result table — where, what and result, a row per
+// operation — under a one-line head. A failure reads "failed" and its reason,
+// and a created item is linked from its row.
+test("a batch result posts as a table of where, what and result, linking what it created", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([
+      { toolName: "notion_create", input: { surface: "intake", title: "Fix the tutor table", summary: "The table overflows." } },
+      { toolName: "not_a_tool", input: {} },
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+    ]),
+  );
+  const result = posts().find((p) => p.channel === "D0REQUESTER" && Array.isArray(p.blocks));
+  assert.ok(result, posts().map((p) => p.text).join("\n---\n"));
+  assert.equal(result.thread_ts, "1700000000.000100");
+  const blocks = result.blocks as Array<Record<string, unknown>>;
+  assert.equal(messageBlocksRefusal(blocks), null);
+  const table = blocks.find((b) => b.type === "data_table") as { caption: string; rows: unknown[][] } | undefined;
+  assert.ok(table, JSON.stringify(blocks));
+  assert.match(table.caption, /3 operations: 2 done, 1 failed/);
+  const cell = (c: unknown): string => JSON.stringify(c);
+  assert.deepEqual(table.rows[0]!.map((c) => (c as { text: string }).text), ["Where", "What", "Result"]);
+  assert.equal(table.rows.length, 4, "a row per operation, under the header");
+  assert.match(cell(table.rows[1]![2]), /"text":"done"/);
+  assert.match(cell(table.rows[2]![2]), /"text":"failed: [^"]+"/);
+  assert.match(cell(table.rows[3]![2]), /"text":"done"/);
+  assert.match(cell(table.rows[1]), /"type":"link","url":"https:\/\/www\.notion\.so\/9f9f/, "the created page is linked");
+  // The text copy still names every operation: notifications and the thread's
+  // history read it.
+  assert.match(String(result.text), /2 done, 1 failed/);
+});
+
+test("a refused batch table steps down to the text it always posted", async () => {
+  calls = [];
+  refuseTables = true;
+  try {
+    const run = await executeVerdict();
+    await run(
+      env(),
+      won([
+        { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+        { toolName: "not_a_tool", input: {} },
+      ]),
+    );
+  } finally {
+    refuseTables = false;
+  }
+  const inThread = posts().filter((p) => p.channel === "D0REQUESTER");
+  assert.equal(inThread.length, 2, "the table, then the text alone");
+  assert.equal(inThread[1]!.blocks, undefined);
+  assert.match(String(inThread[1]!.text), /1 done, 1 failed/);
+});
+
+test("a one-operation result posts no table", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_create", input: { surface: "intake", title: "Fix the tutor table", summary: "The table overflows." } }]),
+  );
+  assert.equal(JSON.stringify(posts()).includes("data_table"), false);
 });

@@ -18,7 +18,8 @@ import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
 import { conversationsHistorySince, conversationsOpen, getBotIdentity, postMessage } from "../slack/api";
 import { SWEEP_CARD_EVENT } from "../sweep/cards";
-import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { ownBlocksOf, postWithPlainRung, proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { refusedForBlocks } from "../slack/delivery";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
@@ -86,8 +87,18 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
     bot: {
       dmChannel: (userId) => conversationsOpen(env, userId),
       async post(channel, message) {
-        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, metadata: message.metadata });
-        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
+        let sent: unknown[] = message.blocks;
+        const res = await postWithPlainRung(
+          (blocks) => {
+            sent = blocks;
+            return postMessage(env, { channel, text: message.text, blocks, metadata: message.metadata });
+          },
+          message,
+          refusedForBlocks,
+        );
+        // Its own blocks only when they are what went up, not its text rung.
+        const own = sent === message.blocks ? ownBlocksOf(message) : undefined;
+        return res.ok && res.ts ? { ok: true, ts: res.ts, ...(own ? { blocks: own } : {}) } : { ok: false };
       },
       withdraw: (channel, ts, text) => withdrawCaptureCard(env, channel, ts, text),
       remove: (channel, ts) => removeCaptureCard(env, channel, ts),

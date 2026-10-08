@@ -72,6 +72,7 @@ import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
+  ownBlocks,
   cardConfirmers,
   mayConfirm,
   ownWords,
@@ -109,12 +110,13 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { cardList, readCardTable, withoutRepeatedRows, type CardTable } from "./card-table";
+import { judgedList, presentedProse, presenter, type Presenter } from "./presentation";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
   holdsInsert,
   INSERT_CARD_REFUSAL,
+  keptFixes,
   replacedBlocks,
   sweepCardInstruction,
   sweepCardPick,
@@ -371,8 +373,9 @@ export interface TurnAgentRequest {
    *  to the calls that get a task card and hands those to Delivery. */
   onToolProgress(event: ToolProgressEvent): void;
   /** Turn's last word on each lookup's result before the model reads it — how
-   *  it keeps the card table a lookup qualified for and tells the model so
-   *  (`turn/card-table.ts`). Returns the text the model reads. */
+   *  the presentation step records what the turn fetched, answers `present`
+   *  and tells the model what rides beneath its answer
+   *  (`turn/presentation.ts`). Returns the text the model reads. */
   reviseLookupResult(name: string, args: Record<string, unknown>, text: string): string;
   /** The same clarify-vs-act check Turn runs after the loop returns, with this
    *  thread's PRD already bound, so the loop can put a refusal to the model as
@@ -474,9 +477,9 @@ export interface TurnDeps {
     toolsUsedThisTurn: string[];
     forceReason?: string;
     extraInstruction?: string;
-    /** The plain list of the card table beneath the draft, when one is
+    /** The plain list of the result table beneath the draft, when one is
      *  attached — absent otherwise, and the judge is asked as before. */
-    cardTableList?: string;
+    tableList?: string;
   }): Promise<TurnJudgement>;
 
   /** Clarify-vs-act: what this tool call still needs before it may be staged,
@@ -707,10 +710,13 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
         // it sits open above that failure, still claiming a step is running.
         // Settling twice is a no-op, so an exit that already did is safe.
         await watched.endProgress("error").catch(() => {});
+        await unlockRevision(request, cardLive, deps);
         throw err;
       }),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
+
+  if (outcome.disposition !== "staged") await unlockRevision(request, cardLive, deps);
 
   // Written AFTER the working signal is down and the answer is out, so the
   // record — and a DM ask's classification — costs the person nothing they
@@ -747,6 +753,35 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   }
   await recordTurn(await labelInTurn(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
+}
+
+/**
+ * A card sent back with Needs changes stays locked until its revision
+ * replaces it (`ThreadState.markRevising`). The revision is the asker's turn
+ * in the card's thread; one that ends without staging it — it failed, or
+ * answered instead — unlocks the card, or nothing could ever decide it, and
+ * edits it back to its live form, so it stops saying it is being revised.
+ */
+async function unlockRevision(
+  request: TurnRequest,
+  cardLive: boolean,
+  deps: Pick<TurnDeps, "threadState" | "delivery">,
+): Promise<void> {
+  const pending = request.pending;
+  if (!cardLive || !pending?.revising || pending.revising.userId !== request.userId) return;
+  try {
+    await deps.threadState.clearRevising(pending.proposalTs);
+  } catch (err) {
+    console.warn(`[turn] revising mark on ${pending.proposalTs} not cleared: ${err instanceof Error ? err.message : String(err)}`);
+    return;
+  }
+  await deps.delivery
+    .reopenCard({
+      ts: pending.proposalTs,
+      text: pending.proposalText,
+      ...(pending.proposalBlocks ? { blocks: pending.proposalBlocks } : {}),
+    })
+    .catch(() => {});
 }
 
 /** What a card this turn stages is recorded with (`usage/proposal-events.ts`). */
@@ -802,9 +837,9 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
   };
   return {
     ...delivery,
-    postAnswer: (text, cardTable) => noted(delivery.postAnswer(text, cardTable)),
+    postAnswer: (text, presentation) => noted(delivery.postAnswer(text, presentation)),
     postNote: (text, tag) => noted(delivery.postNote(text, tag)),
-    postGateNote: (note) => noted(delivery.postGateNote(note)),
+    postGateNote: (note, card) => noted(delivery.postGateNote(note, card)),
     card: (proposal) => noted(delivery.card(proposal)),
   };
 }
@@ -1117,13 +1152,26 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!, "backstop");
   }, INTERIM_BACKSTOP_MS);
 
+  // The presentation step: every lookup's result passes through it as it
+  // comes back, rather than being read off the run afterwards, because the
+  // model has to be TOLD what rides beneath its answer while it can still write
+  // its prose around it — a summary over a table, the plain list without.
+  const presenting = presenter({ now: () => deps.now?.() ?? Date.now() });
+
   // The checklist: one task card per lookup that has words for one on its tool
   // table row. The loop reports every call it runs through the lookup path; a
   // reaction, a Worker-only call and anything gated have no card, and that is
   // the table's answer, not a list kept here. Fire-and-forget like the
   // narration, for the same reason: a courtesy must not wait in front of work.
+  // A finished card's links are also the presentation step's, for the
+  // Sources box beneath the answer.
   const showToolProgress = (event: ToolProgressEvent): void => {
-    if (taskCardFor(event.name)) delivery.toolProgress(event);
+    // A lookup refused before it ran never reaches `reviseLookupResult`, so
+    // the presentation step hears of it here: a budget refusal is a ⚠️ line.
+    if (event.phase === "refused") presenting.refused(event.name, event.reason);
+    if (!taskCardFor(event.name)) return;
+    delivery.toolProgress(event);
+    if (event.phase === "finished" && event.sources) presenting.sourcesRead(event.sources);
   };
 
   // Clarify-vs-act, bound to this thread once: the loop asks it mid-turn (so a
@@ -1142,16 +1190,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     });
   };
 
-  // The card table: the last lookup this turn that qualified for one. Kept as
-  // each result comes back rather than read off the run afterwards, because
-  // the model has to be TOLD whether a table was attached while it can still
-  // write its prose around it — a summary over a table, the plain list without.
-  let cardTable: CardTable | undefined;
-  const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string => {
-    const reading = readCardTable(name, args, text);
-    if (reading.table) cardTable = reading.table;
-    return reading.result;
-  };
+  const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string =>
+    presenting.revise(name, args, text);
 
   let run: TurnAgentRun;
   try {
@@ -1177,7 +1217,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // Close the progress surface before the failure message, or the checklist
     // sits open above it forever, still claiming a step is in progress.
     await delivery.endProgress("error");
-    await delivery.postFailure("agent", err);
+    await delivery.postFailure("agent", err, request.text);
     telemetry.interim = interimCount;
     return {
       disposition: "failed",
@@ -1202,6 +1242,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // second message beside it. Every other exit below closes it itself, because
   // nothing that follows them would.
   if (result.kind === "text") {
+    // An answer the loop synthesised once its round-trips ran out rests on
+    // fewer lookups than it wanted: a ⚠️ line says so.
+    if (result.cutShort) presenting.budgetSpent();
     return finishTextTurn(result.text, {
       request,
       deps,
@@ -1212,7 +1255,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       correction,
       telemetry,
       memory,
-      ...(cardTable ? { cardTable } : {}),
+      presenting,
     });
   }
 
@@ -1331,7 +1374,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       );
     if (justCancelled) {
       const bounce =
-        `:leftwards_arrow_with_hook: You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
+        `You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       await delivery.postNote(bounce);
       await memory.remember(bounce);
@@ -1395,7 +1438,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // rewritten, a stamp changed, one added — is refused and the card stays.
   if (replaced?.sweepRun && !isSubsetOf(result.operations, proposalOperations(replaced))) {
     const refusal =
-      ":lock: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
+      ":warning: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
       "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
     await delivery.postNote(refusal, sweepTag("note"));
     await memory.remember(refusal);
@@ -1477,6 +1520,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // door re-renders the resolved card from this field, so a second rendering
     // that drifted would repaint the card with words it never had (#623).
     proposalText: posted.text,
+    ...ownBlocks(posted),
     requesterUserId: request.userId,
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
@@ -1612,7 +1656,11 @@ async function dropFromSweepCard(
       deps.usage.writeTimeoutMs,
     );
   await recordSuperseded(retiredAhead);
-  const card = asSweepRevision(
+  // The fixes left, renumbered, so the revision is a carousel as its card
+  // was. Only fixes staged one per operation can be picked by the same index;
+  // anything else revises to the text card.
+  const fixes = pending.fixes?.items.length === all.length ? keptFixes(pending.fixes, kept) : undefined;
+  const built = asSweepRevision(
     await buildCard(
       { kind: "proposal", operations, toolName: first.toolName, input: first.input },
       deps,
@@ -1620,6 +1668,7 @@ async function dropFromSweepCard(
       request.surface === "assistant",
     ),
   );
+  const card: ProposalCard = fixes ? { ...built, fixes } : built;
   const posted = await delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error("[turn] sweep card revision was not staged");
@@ -1635,10 +1684,12 @@ async function dropFromSweepCard(
     userMsgTs: request.userMsgTs,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    ...ownBlocks(posted),
     requesterUserId: request.userId,
     ...inheritedTerms(pending),
     ttlMs: leftMs,
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
+    ...(fixes ? { fixes } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
     // The same card minus some items, so a drift card's own gate words stay
     // (`figma-drift/copy.ts` `driftCardWords`); a sweep card has none.
@@ -1680,8 +1731,8 @@ export function revisionRefusal(confirmers: readonly string[], userId: string): 
   const who = confirmers.filter((c) => id.test(c)).map((c) => `<@${c}>`);
   const names = who.length <= 1 ? who.join("") : `${who.slice(0, -1).join(", ")} or ${who[who.length - 1]}`;
   return who.length
-    ? `:lock: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
-    : `:lock: ${to}Nobody here can change this proposal, so it stays as it is.`;
+    ? `:warning: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
+    : `:warning: ${to}Nobody here can change this proposal, so it stays as it is.`;
 }
 
 // ── The gate path ────────────────────────────────────────────────────────────
@@ -1716,7 +1767,7 @@ async function settleVerdict(
   },
 ): Promise<TurnOutcome> {
   const said = verdict.post
-    ? await ctx.deps.delivery.postGateNote(verdict.post.note)
+    ? await ctx.deps.delivery.postGateNote(verdict.post.note, verdict.post.card)
     : undefined;
   const posted = said?.text;
   const executed = await ctx.deps.applyVerdict(verdict);
@@ -1802,8 +1853,10 @@ export async function restageExecution(
   // is a group DM's share: only the card people were shown offers one
   // (`sweep/share.ts`). Nor are a stated card's own words: the fresh card is
   // an ordinary one, with a ⚠️ and a ⛔ that runs nothing, so "Intake only"
-  // would misstate it.
-  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, ...kept } = original;
+  // would misstate it. Nor are a sweep card's fixes: the fresh card holds
+  // what never ran, so they no longer line up with its operations. Nor are
+  // the old card's blocks: the fresh card went up with its own.
+  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,
@@ -1811,6 +1864,7 @@ export async function restageExecution(
     input: first.input,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    ...ownBlocks(posted),
     // The ask's own card, carried across however many re-stagings.
     originProposalTs: stagingCardOf(original),
   };
@@ -1845,8 +1899,9 @@ interface TextTurnCtx {
   correction: boolean;
   telemetry: TurnTelemetry;
   memory: ThreadMemory;
-  /** The card table this turn's lookups left, to post beneath the answer. */
-  cardTable?: CardTable;
+  /** The turn's presentation step: what its lookups left to post beneath the
+   *  answer, read once the pre-checks below have added their ⚠️ lines. */
+  presenting: Presenter;
 }
 
 /**
@@ -1911,6 +1966,9 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     try {
       if (judgeAbsence(deps.deliveredBody(draft)) === "unscoped") {
         absenceRepair = absenceRepairInstruction(run.absence);
+        // The repair rewrites the claim; the ⚠️ line keeps the scope in front
+        // of the reader whatever the rewrite says.
+        ctx.presenting.absenceFired(run.absence);
         console.log(`[absence] unscoped claim over ${run.absence.visibility} — forcing repair`);
       }
     } catch (err) {
@@ -1919,6 +1977,10 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
       );
     }
   }
+
+  // Everything that rides beneath the answer is known from here on: the
+  // lookups' table and ⚠️ lines, and the absence check's line above.
+  const presentation = ctx.presenting.presentation();
 
   // ONE judge call carries both repairs when both fire. Sent as two sibling
   // instructions they compete and the model does one.
@@ -1943,7 +2005,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
     // both: a draft that summarises and points at the table has answered.
-    ...(ctx.cardTable ? { cardTableList: cardList(ctx.cardTable) } : {}),
+    ...(judgedList(presentation) ? { tableList: judgedList(presentation) } : {}),
   });
   telemetry.judge = reviewed.verdict;
 
@@ -1974,16 +2036,13 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // Delivery shares, so Slack, the recording Delivery and the thread's memory
   // all get the same prose. A rule that must hold on every provider lives in
   // code, not in the persona.
-  let prose = reviewed.text;
-  if (ctx.cardTable) {
-    const stripped = withoutRepeatedRows(prose, ctx.cardTable);
-    if (stripped.removed) console.log(`[card-table] removed ${stripped.removed} repeated row line(s) from the prose`);
-    prose = stripped.text;
-  }
+  const stripped = presentedProse(reviewed.text, presentation);
+  if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
+  const prose = stripped.text;
 
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
-  const posted = await delivery.postAnswer(prose, ctx.cardTable);
+  const posted = await delivery.postAnswer(prose, presentation);
 
   // The receipt rides the USER turn, keyed by the user message's ts. It
   // describes the TURN, not the message, and the user ts is the only id this
@@ -2000,7 +2059,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   if (!posted.ok) {
     // Never post a completion signal for a reply that was never delivered.
     console.error("[turn] reply delivery failed after retry");
-    await delivery.postFailure("delivery");
+    await delivery.postFailure("delivery", undefined, request.text);
     return {
       disposition: "failed",
       failure: { stage: "delivery" },

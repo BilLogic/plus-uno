@@ -467,6 +467,12 @@ export function localTransport({
               // which is what the Worker passes too.
               cancelKey: null,
               ...(req.onInterim ? { onInterim: req.onInterim } : {}),
+              // The presentation step, wired as the Worker wires it: what rides
+              // beneath the answer (a result table, a ⚠️ line) is built from
+              // these, so a replay without them would measure a turn that never
+              // presents anything.
+              onToolProgress: req.onToolProgress,
+              reviseLookupResult: req.reviseLookupResult,
               onDials: (d) => {
                 const { detail, ...named } = d;
                 // The recorded model reports an empty `detail` — the fake
