@@ -25,15 +25,19 @@ const verdictJson = (v: Record<string, unknown>) => JSON.stringify(v);
 
 // ── the tier, and nothing else about the model ────────────────────────────────
 
-test("the judge names the grind tier and sets no dial of its own", async () => {
+test("the judge names the default tier and sets no dial of its own", async () => {
   const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
 
   await reviewDraft(fake, { userText: "what changed?", draft: LONG_DRAFT });
 
   assert.equal(fake.generated.length, 1);
   const asked = fake.generated[0]!;
-  assert.equal(asked.tier, "grind");
-  assert.equal(JUDGE_TIER, "grind");
+  // `default`, not `grind`: the judge has a 25s wall clock and grind's pro
+  // model at `high` never once finished inside it (2026-10-07, six of six
+  // judged drafts timed out, the shortest 2,729 chars), so every draft shipped
+  // unread. A tier the judge cannot finish on is no judge at all.
+  assert.equal(asked.tier, "default");
+  assert.equal(JUDGE_TIER, "default");
   // The WHOLE of what the judge says about the model: a tier, its prompt, its
   // system block and an output ceiling. No model id and no dial crosses the
   // seam — the pair is the adapter's (ADR-028), and this module sending `low`
@@ -146,6 +150,24 @@ test("a measured restatement is declared to the judge before it grades", async (
   });
 
   assert.match(fake.generated[0]!.prompt, /MEASURED: this draft retains almost all/);
+});
+
+test("a draft longer than the judge reads is skipped on purpose, never revised from half of it", async () => {
+  // The judge reads the first 8,000 characters. A revision of that prefix,
+  // swapped in for a 17,614-char walkthrough, would ship the first half of the
+  // answer as the whole of it — so past the cap nothing is asked, the skip says
+  // why, and the draft ships as written. A correction or a forced judgement
+  // does not lift it: the repair would be just as truncated.
+  const long = `${LONG_DRAFT} ${"more of the walkthrough. ".repeat(400)}`;
+  assert.ok(long.length > 8_000);
+
+  for (const args of [{}, { correction: true, priorAssistantText: "No." }, { forceReason: "absent" }]) {
+    const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+    const out = await reviewDraft(fake, { userText: "walk me through it", draft: long, ...args });
+
+    assert.deepEqual(out, { text: long, verdict: "skip", reason: "draft longer than the judge reads" });
+    assert.deepEqual(fake.generated, []);
+  }
 });
 
 // ── the two ways the judge declines to grade ─────────────────────────────────
