@@ -19,7 +19,9 @@
 // Slack answered `invalid_arguments` to a `pending` task status,
 // `streaming_mode_mismatch` to markdown appended into a stream opened in plan
 // mode, and `message_not_in_streaming_state` to a stop on a stream already
-// stopped — and `invalid_arguments` again to a task card carrying any `icon`.
+// stopped — and `invalid_arguments` again to a task card carrying an icon in a
+// shape it does not take. And every message's blocks are held to the shape
+// rules in `slack-block-rules.ts`, confirmed against Slack's own validator.
 // Both clients below refuse those the same way — the call is
 // recorded, it does not land, and the refusal is kept on `refused` — and
 // because the adapter swallows a refused card update by design, a refusal
@@ -37,6 +39,7 @@ import type { FooterKind } from "../../src/slack/footer-kind";
 import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
 import type { DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
+import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES } from "./slack-block-rules";
 
 /** One thing the adapter asked Slack to do, in order. */
 export type SlackCall =
@@ -82,9 +85,6 @@ export interface SlackRefusal {
   error: string;
 }
 
-/** The task statuses Slack accepts. Its typings list `pending` too; the API
- *  answers it with `invalid_arguments`. */
-const SLACK_TASK_STATUSES: ReadonlySet<string> = new Set(["in_progress", "complete", "error"]);
 
 /** Every refusal not yet looked at, from every recording client in this test. */
 const unread: SlackRefusal[] = [];
@@ -103,6 +103,14 @@ function refuse(list: SlackRefusal[], call: string, error: string): void {
   const refusal = { call, error };
   list.push(refusal);
   unread.push(refusal);
+}
+
+/** Refuse a message's blocks the way Slack does, if it would; true when it did.
+ *  `invalid_blocks` is the code Slack's validator gives a bad shape. */
+function refuseBlocks(list: SlackRefusal[], call: string, blocks: readonly unknown[] | undefined): boolean {
+  const why = blocks ? messageBlocksRefusal(blocks) : null;
+  if (why) refuse(list, `${call} with ${why}`, "invalid_blocks");
+  return !!why;
 }
 
 /** Take a client's refusals as expected, so the test it happened in may pass. */
@@ -199,11 +207,13 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         blocks,
         ...(input.blocks ? { blockList: input.blocks } : {}),
       });
+      if (refuseBlocks(refused, "post", input.blocks)) return { ok: false };
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
       return { ok: true, ts: `posted-${++posted}` };
     },
     async updateMessage(input) {
       record({ kind: "update", channel: input.channel, ts: input.ts, text: input.text, blocks: input.blocks });
+      if (refuseBlocks(refused, "update", input.blocks)) return { ok: false };
       return { ok: !opts.messageFails };
     },
     async postAnswer(input) {
@@ -256,14 +266,17 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
       const bad = tasks.find((t) => !SLACK_TASK_STATUSES.has(t.status));
       if (bad) return refuse(refused, `task ${bad.id} as ${String(bad.status)}`, "invalid_arguments");
-      // A card's `icon`, in every shape: the `/debug/slack-stream?chunks=` probe
-      // against production Slack on 2026-10-07 had a `task_update` carrying an
-      // image-URL `name`, a `url`, an `image` element, a named icon and an emoji
-      // all refused — `invalid_arguments`, "failed to match exactly one allowed
-      // schema [json-pointer:/chunks/0]" — and the same chunk without it taken.
-      // `PlanTask` has no such field; this holds one smuggled back in.
-      const iconed = tasks.find((t) => "icon" in t);
-      if (iconed) return refuse(refused, `task ${iconed.id} with an icon`, "invalid_arguments");
+      // A card's `icon` only as Slack's icon object, `{type: "icon", name}`
+      // with a built-in name (`slack-block-rules.ts`). The
+      // `/debug/slack-stream?chunks=` probe against production Slack on
+      // 2026-10-07 refused an image-URL `name`, a `url`, an `image` element and
+      // an emoji — `invalid_arguments`, "failed to match exactly one allowed
+      // schema [json-pointer:/chunks/0]".
+      for (const t of tasks) {
+        if (!("icon" in t)) continue;
+        const why = iconRefusal((t as { icon?: unknown }).icon);
+        if (why) return refuse(refused, `task ${t.id} with ${why}`, "invalid_arguments");
+      }
       if (stopped.has(ts)) return refuse(refused, "task update on a stopped stream", "message_not_in_streaming_state");
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
@@ -363,6 +376,7 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
         text: input.text,
         blocks,
       });
+      if (refuseBlocks(refused, "post", input.blocks)) return { ok: false };
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
       return { ok: true, ts: `posted-${++posted}` } as { ok: boolean };
     },
@@ -386,6 +400,7 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
     },
     async stopStream(channel, ts, blocks) {
       calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length });
+      if (refuseBlocks(refused, "stop", blocks)) return false;
       if (stopped.has(ts)) {
         refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
         return false;
