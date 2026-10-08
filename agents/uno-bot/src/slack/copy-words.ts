@@ -6,8 +6,9 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 /** #886's ceiling for one post: a longer list goes in the thread. */
 export const ONE_POST_CHARS = 1500;
-/** What a thread reply carrying a long list is packed to — under the ~3,900
- *  one Slack message holds (`MAX_POST_CHARS`). */
+/** What a thread reply carrying a long list is packed to. Its own ceiling:
+ *  these posts are not answers, so `MAX_POST_CHARS` (the `markdown` block's
+ *  size) does not govern them. */
 export const THREAD_REPLY_CHARS = 3500;
 
 /**

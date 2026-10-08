@@ -13,6 +13,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { postTextVerified } from "../src/slack/delivery";
+import { MAX_POST_CHARS } from "../src/slack/answer-posts";
 import { sanitizeSlackBlocks } from "../src/slack/mrkdwn";
 import { expectRefusals, recordingPosting } from "./helpers/recording-slack";
 
@@ -47,8 +48,8 @@ async function warnings<T>(fn: () => Promise<T>): Promise<{ result: T; lines: st
 /** Paragraphs long enough that the answer splits into continuation parts. */
 function longAnswer(): string {
   const para = (i: number) => `Paragraph ${i}: ${"word ".repeat(60).trimEnd()}`;
-  const head = Array.from({ length: 12 }, (_, i) => para(i));
-  const tail = Array.from({ length: 12 }, (_, i) => para(i + 12));
+  const head = Array.from({ length: 24 }, (_, i) => para(i));
+  const tail = Array.from({ length: 24 }, (_, i) => para(i + 24));
   return [...head, TABLE_ANSWER, ...tail].join("\n\n");
 }
 
@@ -152,6 +153,24 @@ describe("the fallback ladder", () => {
       lines.some((l) => /markdown block refused/.test(l) && /invalid_blocks/.test(l)),
       `logged the step down with Slack's detail: ${lines.join(" / ")}`,
     );
+  });
+
+  it("cuts a full-size part into sections that each fit, when the markdown block is refused", async () => {
+    const slack = recordingPosting({ refusesBlockTypes: ["markdown"] });
+    const body = Array.from({ length: 50 }, (_, i) => `Paragraph ${i}: ${"word ".repeat(40).trimEnd()}`).join("\n\n");
+    assert.ok(body.length > 10_000 && body.length < MAX_POST_CHARS, `body was ${body.length} chars`);
+    const { result } = await warnings(() =>
+      postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", body, RECIPIENT),
+    );
+    expectRefusals(slack.refused);
+
+    assert.equal(result.ok, true);
+    const fallback = at(slack.of("message"), 1);
+    const sections = blocksOf(fallback).filter((b) => b.type === "section");
+    assert.ok(sections.length > 1, "a full-size part needs several sections");
+    // The strict fake has already held each to 3,000 chars and the message to
+    // 50 blocks; this pins that the part reached Slack whole.
+    assert.equal(fallback.text, body);
   });
 
   it("steps down to bare text when the section blocks are refused too", async () => {
