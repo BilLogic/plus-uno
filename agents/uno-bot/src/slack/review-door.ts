@@ -211,6 +211,11 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   // at once rather than after a write that can take a while.
   if (verdict.outcome === "won") {
     await deps.views.update(request.viewId, noticeView(card, decidedLine(request.decision)));
+  } else if (verdict.post && verdict.post.note.kind !== "cut-off") {
+    // A non-win is answered where the person is looking, which is the pop-up
+    // — even a note the button door would edit onto the card.
+    await deps.views.update(request.viewId, noticeView(card, renderGateNote(verdict.post.note)));
+    return;
   }
   await applyPressVerdict(
     { channel: request.channel, messageTs: request.messageTs, decision: request.decision, userId: request.userId },

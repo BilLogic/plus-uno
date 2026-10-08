@@ -370,6 +370,12 @@ export function ownWords(proposal: Pick<PendingProposal, "stated">): { stated?: 
   return proposal.stated ? { stated: proposal.stated } : {};
 }
 
+/** The card's posted text, spread onto an "expired" or "superseded" lookup:
+ *  what the card is re-rendered from when a gate note is edited onto it. */
+export function ownText(proposal: Partial<Pick<PendingProposal, "proposalText">>): { proposalText?: string } {
+  return proposal.proposalText ? { proposalText: proposal.proposalText } : {};
+}
+
 /**
  * Whether this person may resolve this card. No confirmer set, anyone may;
  * with one, only the people `cardConfirmers` admits — and a signal with no
@@ -595,11 +601,13 @@ export type ProposalLookup =
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
-  | { state: "superseded"; stated?: StatedCardWords }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
-   *  a stated card's own words, whose `expired` line says it instead. */
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords }
+   *  a stated card's own words, whose `expired` line says it instead.
+   *  `proposalText` (both answers) is the card as posted, so the note about
+   *  it can be edited onto it. */
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string }
   | { state: "none" };
 
 /**

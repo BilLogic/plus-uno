@@ -805,7 +805,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
     ...delivery,
     postAnswer: (text, presentation) => noted(delivery.postAnswer(text, presentation)),
     postNote: (text, tag) => noted(delivery.postNote(text, tag)),
-    postGateNote: (note) => noted(delivery.postGateNote(note)),
+    postGateNote: (note, card) => noted(delivery.postGateNote(note, card)),
     card: (proposal) => noted(delivery.card(proposal)),
   };
 }
@@ -1725,7 +1725,7 @@ async function settleVerdict(
   },
 ): Promise<TurnOutcome> {
   const said = verdict.post
-    ? await ctx.deps.delivery.postGateNote(verdict.post.note)
+    ? await ctx.deps.delivery.postGateNote(verdict.post.note, verdict.post.card)
     : undefined;
   const posted = said?.text;
   const executed = await ctx.deps.applyVerdict(verdict);

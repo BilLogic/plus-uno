@@ -70,11 +70,13 @@ export function proposalActionBlocks(label: "Review" | "View" = "Review"): unkno
  *  Review button. Used at post time and again by the doors to re-render the
  *  card once it is decided: the outcome as a context line, and View, which
  *  opens the draft read-only. */
-export function proposalCardBlocks(text: string, resolvedNote?: string): unknown[] {
+export function proposalCardBlocks(text: string, resolvedNote?: string, button?: "Review" | "View"): unknown[] {
   const blocks: unknown[] = [...textSections(text)];
   if (resolvedNote) {
+    // A note on a card still live — one waiting on someone else — keeps
+    // Review; every other note closes the card, so it offers View.
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: resolvedNote }] });
-    blocks.push(...proposalActionBlocks("View"));
+    blocks.push(...proposalActionBlocks(button ?? "View"));
   } else {
     blocks.push(...proposalActionBlocks());
   }

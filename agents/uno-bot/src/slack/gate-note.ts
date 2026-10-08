@@ -9,7 +9,10 @@
 // Four doors post them and not one of them may hold Slack's copy — three live
 // in Gate (`gate/reaction-door.ts`, the button door's resolver, the model's
 // `proposal_resolve`) and one in Turn. They all hand the note to
-// `Delivery.postGateNote`, and `slack/delivery-adapter.ts` calls this.
+// `Delivery.postGateNote`, and `slack/delivery-adapter.ts` calls this. A note
+// about the card's own state — aged out, replaced, waiting on someone else —
+// arrives with the card, and the adapter edits it onto the card as its last
+// line (`renderCardNote`) instead of posting a new message.
 //
 // The wordings themselves are load-bearing and have each been earned:
 //
@@ -156,6 +159,22 @@ export function renderGateNote(note: GateNote): string {
     case "cut-off":
       return cutOffLine(note);
   }
+}
+
+/**
+ * A verdict as the line edited onto its card (`Delivery.postGateNote` with a
+ * card): the same words as in the thread, without the mention of the person
+ * whose gesture it answered — a line on the card stays there for everyone,
+ * and an edit notifies no one anyway.
+ */
+export function renderCardNote(note: GateNote): string {
+  return note.kind === "not-a-confirmer" ? notAConfirmerLine({ ...note, userId: undefined }) : renderGateNote(note);
+}
+
+/** Whether the card a note sits on can still be decided: only one waiting on
+ *  someone else is. Every other card note closes it. */
+export function cardStaysLive(note: GateNote): boolean {
+  return note.kind === "not-a-confirmer";
 }
 
 /**
