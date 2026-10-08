@@ -292,7 +292,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   // state by the loop, and carries the proposal itself — there is nothing to
   // look up, only the claim.
   if (signal.kind === "model") {
-    return claim(signal.pending, signal.decision, signal.userId, deps, signal.messageToUser);
+    return claim(signal.pending, signal.decision, signal.userId, deps, { narrative: signal.messageToUser });
   }
 
   // Parse before any read: a 🎉 in a thread that happens to hold a proposal is
@@ -411,11 +411,11 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
     // The pop-up's ⛔ is Reject, and its reason rides on the note it posts.
     if (decision === "cancel") {
       const reason = signal.note?.trim();
-      return claim(proposal, decision, signal.userId, deps, undefined, reason ? { reason } : {});
+      return claim(proposal, decision, signal.userId, deps, { byCard: true, rejected: reason ? { reason } : {} });
     }
-    return claim(edited(proposal, signal.operations), decision, signal.userId, deps);
+    return claim(edited(proposal, signal.operations), decision, signal.userId, deps, { byCard: true });
   }
-  return claim(proposal, decision, signal.userId, deps);
+  return claim(proposal, decision, signal.userId, deps, { byCard: signal.kind !== "typed" });
 }
 
 /** The card with a pop-up's edited batch in place of its own, the first
@@ -445,18 +445,26 @@ async function askForChanges(
 ): Promise<GateVerdict> {
   const text = note.trim();
   if (!text) return { outcome: "none", proposal, post: null };
-  if (!mayConfirm(proposal, userId, deps.standingConfirmers)) return notAConfirmer(proposal, "cancel", userId, deps);
+  if (!mayConfirm(proposal, userId, deps.standingConfirmers)) return notAConfirmer(proposal, "cancel", userId, deps, true);
   console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: changes asked by ${userId}`);
   return { outcome: "won", proposal, post: null, revise: { note: text } };
 }
 
-/** A signal from someone the card does not accept: nothing resolved, and who
- *  can resolve it named. */
+/**
+ * A signal from someone the card does not accept: nothing resolved, and who
+ * can resolve it named.
+ *
+ * `byCard` is a gesture made ON the card — a reaction, a press, the pop-up —
+ * whose person is looking at the card, so the line goes there. A typed emoji
+ * or the model's call was made in the thread, and is answered there, near the
+ * message, as it always was: a line edited onto a card above would be missed.
+ */
 function notAConfirmer(
   proposal: PendingProposal,
   decision: Decision,
   userId: string | undefined,
   deps: GateDeps,
+  byCard: boolean,
 ): GateVerdict {
   console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: ${userId ?? "no user"} is not a confirmer`);
   return {
@@ -471,7 +479,7 @@ function notAConfirmer(
       },
       replyTs: replyTarget(proposal),
       // The card is still live and waiting on one of them: the line goes on it.
-      ...cardOf(proposal.proposalTs, proposal.proposalText),
+      ...(byCard ? cardOf(proposal.proposalTs, proposal.proposalText) : {}),
     },
   };
 }
@@ -516,17 +524,23 @@ async function claim(
   decision: Decision,
   userId: string | undefined,
   deps: GateDeps,
-  narrative?: string,
-  /** Set for the pop-up's Reject: a ⛔ that says so, with its reason. */
-  rejected?: { reason?: string },
+  opts: {
+    /** The model's own words for the outcome. */
+    narrative?: string;
+    /** Set for the pop-up's Reject: a ⛔ that says so, with its reason. */
+    rejected?: { reason?: string };
+    /** The signal was a gesture on the card itself (`notAConfirmer`). */
+    byCard?: boolean;
+  } = {},
 ): Promise<GateVerdict> {
+  const { narrative, rejected } = opts;
   // A card with a confirmer set resolves only for its members, on every door.
   // Checked BEFORE the claim, because the claim consumes the card: a refused
   // signal has to leave it exactly as it was for the person who may confirm.
   // `none`, not `stale` — nobody else resolved it and it has not aged out;
   // this signal was simply not one the card accepts.
   if (!mayConfirm(proposal, userId, deps.standingConfirmers)) {
-    return notAConfirmer(proposal, decision, userId, deps);
+    return notAConfirmer(proposal, decision, userId, deps, opts.byCard ?? false);
   }
 
   // A person who reacts ✅ and then, unsure it registered, also types "go
