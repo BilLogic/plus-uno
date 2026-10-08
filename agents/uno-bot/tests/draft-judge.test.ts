@@ -292,3 +292,51 @@ test("a throwing adapter fails open too — the judge never blocks a reply", asy
   assert.equal(out.text, LONG_DRAFT);
   assert.equal(out.reason, "socket hang up");
 });
+
+// ── a card table beneath the draft ───────────────────────────────────────────
+//
+// The reader gets the prose and a table of cards beneath it, so the judge is
+// told the table is there and reads its plain list. The list is not the draft:
+// code built it from the lookup's rows, the judge never rewrites it, and its
+// length moves none of the draft's windows.
+
+const LIST = ["Card 1 — #401 — WIP", "Card 2 — #402 — WIP", "Card 3 — #403 — WIP"].join("\n");
+const LONG_LIST = Array.from({ length: 30 }, (_, i) => `Card ${i} with a long title — #${400 + i} — WIP`).join("\n");
+
+test("with a card table attached, the judge is told so and reads the plain list after the draft", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  const out = await reviewDraft(fake, { userText: "which cards are in WIP?", draft: LONG_DRAFT, cardTableList: LIST });
+
+  assert.deepEqual(out, { text: LONG_DRAFT, verdict: "pass" });
+  const { prompt } = fake.generated[0]!;
+  assert.match(prompt, /card table/i);
+  assert.ok(prompt.includes(LIST), "the plain list reaches the judge whole");
+  assert.ok(prompt.indexOf(LIST) > prompt.indexOf(LONG_DRAFT), "the list sits beneath the draft, as the reader sees it");
+});
+
+test("with no card table, the judge's prompt says nothing about one", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  await reviewDraft(fake, { userText: "which cards are in WIP?", draft: LONG_DRAFT });
+
+  assert.doesNotMatch(fake.generated[0]!.prompt, /card table/i);
+});
+
+test("the list does not count toward the draft's length: a short summary over a long list is still skipped", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+
+  const out = await reviewDraft(fake, { userText: "q", draft: "Thirty cards are in WIP.", cardTableList: LONG_LIST });
+
+  assert.equal(out.verdict, "skip");
+  assert.equal(fake.generated.length, 0);
+});
+
+test("the list does not count toward the revision window either", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "pass" })] });
+  const draft = `${LONG_DRAFT} ${"x".repeat(7_900 - LONG_DRAFT.length)}`;
+
+  await reviewDraft(fake, { userText: "q", draft, cardTableList: LONG_LIST });
+
+  assert.doesNotMatch(fake.generated[0]!.system ?? "", /VERDICT ONLY/);
+});

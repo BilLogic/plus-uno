@@ -109,7 +109,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { readCardTable, type CardTable } from "./card-table";
+import { cardList, readCardTable, type CardTable } from "./card-table";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -474,6 +474,9 @@ export interface TurnDeps {
     toolsUsedThisTurn: string[];
     forceReason?: string;
     extraInstruction?: string;
+    /** The plain list of the card table beneath the draft, when one is
+     *  attached — absent otherwise, and the judge is asked as before. */
+    cardTableList?: string;
   }): Promise<TurnJudgement>;
 
   /** Clarify-vs-act: what this tool call still needs before it may be staged,
@@ -1938,6 +1941,9 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
         ? { forceReason: "absence-scope" }
         : {}),
     ...(extra ? { extraInstruction: extra } : {}),
+    // The reader gets the prose AND the table beneath it, so the judge grades
+    // both: a draft that summarises and points at the table has answered.
+    ...(ctx.cardTable ? { cardTableList: cardList(ctx.cardTable) } : {}),
   });
   telemetry.judge = reviewed.verdict;
 

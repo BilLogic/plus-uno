@@ -172,12 +172,22 @@ function cardLine(row: CardTableRow, table: CardTable): string {
 }
 
 /**
- * The message's text copy: the prose, then the plain list of the table's
- * cards, one line each and no more lines than the table has rows.
+ * The plain list of the table's cards, one line each and no more lines than
+ * the table has rows. The draft judge reads it as it stands; the text copy
+ * reads it beneath the prose.
+ *
+ * @param table - The table it lists
+ */
+export function cardList(table: CardTable): string {
+  return table.rows.map((row) => cardLine(row, table)).join("\n");
+}
+
+/**
+ * The message's text copy: the prose, then the plain list.
  *
  * @param prose - The answer as the model wrote it
  * @param table - The table beneath it
  */
 export function withCardList(prose: string, table: CardTable): string {
-  return [prose, "", ...table.rows.map((row) => cardLine(row, table))].join("\n");
+  return [prose, "", cardList(table)].join("\n");
 }

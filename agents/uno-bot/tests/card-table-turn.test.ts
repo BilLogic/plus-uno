@@ -255,3 +255,30 @@ test("a failed lookup is handed back to the model untouched", async () => {
   assert.deepEqual(resultsTheModelRead(h)[0], { ok: false, error: "Notion is down" });
   assert.equal(answerCall(h.delivery.calls).cardTable, undefined);
 });
+
+test("the judge is told a table was attached, and reads the plain list the reader gets", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [ASK] }, { text: "Three cards are in WIP; the table has them." }],
+    toolResult: wipResult(3),
+  });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  assert.equal(h.judged.length, 1);
+  const [judged] = h.judged;
+  assert.equal(judged?.draft, "Three cards are in WIP; the table has them.", "the draft is the prose alone");
+  assert.equal(
+    judged?.cardTableList,
+    ["Card 1 — #401 — WIP", "Card 2 — #402 — WIP", "Card 3 — #403 — WIP"].join("\n"),
+  );
+});
+
+test("with no table attached, the judge is asked exactly as before", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "roadmap_query", args: { design_status: "WIP" } }] }, { text: "Three cards." }],
+    toolResult: wipResult(3),
+  });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  assert.equal(h.judged.length, 1);
+  assert.equal("cardTableList" in h.judged[0]!, false);
+});
