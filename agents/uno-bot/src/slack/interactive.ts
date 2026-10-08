@@ -405,6 +405,7 @@ async function tryAgain(env: Env, payload: InteractionPayload): Promise<void> {
     {
       post: async (message) => (await postMessage(env, message))?.ts ?? null,
       enqueue: (event) => enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event)),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
     },
   );
 }

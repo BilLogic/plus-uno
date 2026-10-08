@@ -75,6 +75,7 @@ import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
 import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
 import { planBlock } from "./plan-block";
+import { retryValue } from "./try-again";
 import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { DELIVERY_RESERVE, SUBREQUEST_CAP } from "../agent/loop-policy";
@@ -262,7 +263,8 @@ export interface SlackDeliveryClient {
     userMsgTs: string;
     stage: DeliveryFailureStage;
     err?: unknown;
-    /** The question, offered back as Try again. */
+    /** The question and who asked it, as the Try again button carries them
+     *  (`try-again.ts` § `retryValue`). */
     ask?: string;
   }): Promise<void>;
   /** Open a plan-mode stream, or report that none opened. */
@@ -1150,7 +1152,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // The checklist is settled by the turn's own `endProgress("error")`
       // before it gets here — a failure message under a step that still claims
       // to be in progress is how the plan stream read after a dead run.
-      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err, ...(ask ? { ask } : {}) });
+      // The button carries who asked, so only they can ask it again.
+      const retry = ask ? retryValue(target.userId, ask) : undefined;
+      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err, ...(retry ? { ask: retry } : {}) });
     },
   };
 }

@@ -11,9 +11,12 @@
 //
 // The question rides on the button as its value (`failure-message.ts`): the
 // failure is the only place that still holds it, and Slack hands the value
-// back on the press. Whoever presses is who asks — the button sits where the
-// asker is reading, and a read asked twice changes nothing, while a write
-// still waits on its card.
+// back on the press. So does who asked it (`retryValue`), and only they are
+// answered: a question asked again runs as the presser's own message, with
+// their access and their name on whatever it stages, so a bystander in a
+// channel thread is told to ask it themselves. A value with no asker in it —
+// a button posted before the asker rode along — still asks for whoever
+// pressed, as it always did.
 //
 // PURE: the door takes its Slack call and the runner by name, and `Env`
 // enters in `interactive.ts`.
@@ -28,7 +31,7 @@ export interface TryAgainPress {
   messageTs: string;
   /** The failure's thread, when it sat in one. */
   threadTs?: string;
-  /** The button's value: the question. */
+  /** The button's value: the question, and who asked it (`retryValue`). */
   value: string | undefined;
 }
 
@@ -37,16 +40,50 @@ export interface TryAgainDoorDeps {
   post(message: { channel: string; thread_ts?: string; text: string }): Promise<string | null>;
   /** Queue a turn on a message. */
   enqueue(event: SlackMessageEvent): Promise<void>;
+  /** Answer the presser alone, where they pressed. */
+  replyEphemeral(text: string): Promise<void>;
 }
 
 /**
- * A press: the question asked again in the failure's thread, as the presser.
+ * The Try again button's value: the question, and the person who asked it.
+ *
+ * @param asker - The Slack id of whoever asked the question that failed
+ * @param question - The question, as they asked it
+ */
+export function retryValue(asker: string, question: string): string {
+  return JSON.stringify({ asker, ask: question });
+}
+
+/** A value read back: the question, and its asker when the value names one. */
+function readRetryValue(value: string): { ask: string; asker?: string } {
+  if (value.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(value) as { asker?: unknown; ask?: unknown };
+      if (typeof parsed.ask === "string" && typeof parsed.asker === "string") {
+        return { ask: parsed.ask, asker: parsed.asker };
+      }
+    } catch {
+      // A question that happens to open with a brace.
+    }
+  }
+  return { ask: value };
+}
+
+/**
+ * A press: the question asked again in the failure's thread, as the presser —
+ * when the presser is who asked it.
  *
  * @param press - Who pressed, where, and the question the button carried
  */
 export async function runTryAgainDoor(press: TryAgainPress, deps: TryAgainDoorDeps): Promise<void> {
-  const question = press.value?.trim() ? press.value : "";
+  const { ask, asker } = readRetryValue(press.value ?? "");
+  const question = ask.trim() ? ask : "";
   if (!question || !SLACK_USER_ID.test(press.userId)) return;
+  if (asker && asker !== press.userId) {
+    const who = SLACK_USER_ID.test(asker) ? `<@${asker}>` : "the person who asked";
+    await deps.replyEphemeral(`Only ${who} can retry this — ask it yourself.`);
+    return;
+  }
   const quoted = escapeSlackText(question)
     .split("\n")
     .map((line) => `>${line}`)

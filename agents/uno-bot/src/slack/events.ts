@@ -7,6 +7,7 @@ import { isSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { failureMessage } from "./failure-message";
+import { retryValue } from "./try-again";
 import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
 import { handleSessionStopped } from "./stop-envelope";
 import { handleAppHomeOpened } from "./home";
@@ -260,7 +261,7 @@ async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent, reply?:
       stage: "internal",
       capacity: isCapacityError(err),
       alertChannel: env.UNO_BOT_ALERT_CHANNEL,
-      ...(msg.text ? { ask: msg.text } : {}),
+      ...(msg.text ? { ask: msg.user ? retryValue(msg.user, msg.text) : msg.text } : {}),
     });
     await postMessage(env, {
       channel: msg.channel,
