@@ -32,6 +32,7 @@
 
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
+import type { CardFixes } from "../turn/delivery";
 
 export type { AssistantContext, VisionReference };
 
@@ -285,6 +286,13 @@ export interface PendingProposal {
    * it, so only the card people were shown offers a share.
    */
   sweepShare?: SweepShare;
+  /**
+   * A sweep card's fixes as its carousel showed them (`ProposalCard.fixes`),
+   * one per operation, in order. A `drop N` revision carries the ones it
+   * keeps, renumbered, so the revised card is a carousel too
+   * (`sweep/cards.ts` `keptFixes`). A re-staged card never carries them.
+   */
+  fixes?: CardFixes;
   /**
    * The card's own slot within its reply thread (`proposalSlot`). Absent —
    * every turn's card — the card holds the thread's slot, and cards there
