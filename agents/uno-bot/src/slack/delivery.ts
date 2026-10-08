@@ -208,6 +208,11 @@ function refusedForBlocks(posted: { ok: boolean; error?: string }): boolean {
   return Array.isArray(messages) && messages.some((m) => /json-pointer:\/blocks(\/|\])/.test(String(m)));
 }
 
+/** A split answer's `(i/n)`, as the small grey line under its part. */
+function markerBlocks(marker: string | null): Array<Record<string, unknown>> {
+  return marker ? [{ type: "context", elements: [{ type: "mrkdwn", text: marker }] }] : [];
+}
+
 function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
@@ -262,7 +267,7 @@ export async function postTextVerified(
   const copyOf = (piece: string, last: boolean): string => (last ? textCopy(piece, presentation) : piece);
 
   const ok = await deliverAnswer(answerMessages(body), {
-    async stream(piece, withFooter) {
+    async stream(piece, withFooter, marker) {
       if (!(deps.streamingOn && threadTs)) return false;
       // An answer carrying a table posts as an ordinary message: Slack
       // does not document a `data_table` in a stream, and a stream's first part
@@ -295,7 +300,8 @@ export async function postTextVerified(
       let stopped = false;
       try {
         const appended = await deps.slack.appendStream(channel, streamTs, piece);
-        const blocks = withFooter && footer.length ? footer : undefined;
+        const closing = [...markerBlocks(marker), ...(withFooter ? footer : [])];
+        const blocks = closing.length ? closing : undefined;
         stopped = await deps.slack.stopStream(channel, streamTs, blocks);
         if (appended && stopped) return true;
         console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
@@ -333,12 +339,17 @@ export async function postTextVerified(
     //
     // The `text` copy is the whole part on every rung: notifications and
     // screen readers read it, and `postMessage` renders it to mrkdwn.
-    async post(piece, withFooter) {
-      const tail = withFooter ? footer : [];
+    //
+    // A split answer's `(i/n)` is a context line under the part on the block
+    // rungs. The section and bare-text rungs have no such line to give it, so
+    // there it leads the part as `_(i/n)_`, the way every part once did.
+    async post(piece, withFooter, marker) {
+      const footing = withFooter ? footer : [];
+      const tail = [...markerBlocks(marker), ...footing];
       const copy = copyOf(piece, withFooter);
-      const send = (blocks?: Array<Record<string, unknown>>) =>
+      const send = (blocks?: Array<Record<string, unknown>>, text = copy) =>
         deps.slack
-          .postMessage({ channel, thread_ts: threadTs, text: copy, ...(blocks ? { blocks } : {}) })
+          .postMessage({ channel, thread_ts: threadTs, text, ...(blocks ? { blocks } : {}) })
           .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
 
       const tabled = withFooter && table.length > 0;
@@ -353,13 +364,14 @@ export async function postTextVerified(
         posted = await send([{ type: "markdown", text: prose }, ...tail]);
         if (posted.ok) return true;
       }
+      const numbered = (text: string) => (marker ? `_${marker}_\n\n${text}` : text);
       if (refusedForBlocks(posted)) {
         console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
-        posted = await send([...textSections(prose), ...tail]);
+        posted = await send([...textSections(numbered(prose)), ...footing], numbered(copy));
         if (posted.ok) return true;
       }
       console.warn(`[slack] ${refusedForBlocks(posted) ? "section blocks refused" : "post failed"} (${refusalOf(posted)}); retrying as plain text`);
-      posted = await send();
+      posted = await send(undefined, numbered(copy));
       return !!posted.ok;
     },
   });
