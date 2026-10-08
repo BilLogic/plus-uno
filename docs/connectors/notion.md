@@ -124,6 +124,8 @@ Two limits the Worker now handles, worth knowing because they shape what you wri
 
 **Tables land as real tables** (2026-08-22). The header row sets the column count and every data row is padded or truncated to match — Notion rejects the *entire request* if any row's cell count differs from `table_width`, and a ragged row is what an unescaped `|` inside a cell produces.
 
+**Attribution.** A page the bot creates, and each run of blocks it appends, opens with the line "Written by le goat on behalf of {name}", {name} being the requester's Slack display name (on a Worker-staged card, whoever pressed ✅). The Worker adds it, so a body starts with its own first line. A `replace` or `insert` edits a human's text where it stands and a property change writes no body, so those carry no line.
+
 **Headings inside a body are `heading_3` on purpose.** Section headings own `heading_2`, and `fetchNotionPRD` walks that outline downstream to find Acceptance Criteria and Implementation Notes. A `##` inside a section body is subordinate to its section and renders that way.
 
 <!-- ide-only -->
