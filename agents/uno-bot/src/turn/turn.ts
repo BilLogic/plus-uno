@@ -1142,13 +1142,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     });
   };
 
-  // The card table: the last lookup this turn that qualified for one. Kept as
+  // The card table: the first lookup this turn that qualified for one. Kept as
   // each result comes back rather than read off the run afterwards, because
   // the model has to be TOLD whether a table was attached while it can still
   // write its prose around it — a summary over a table, the plain list without.
   let cardTable: CardTable | undefined;
   const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string => {
-    const reading = readCardTable(name, args, text);
+    const reading = readCardTable(name, args, text, cardTable);
     if (reading.table) cardTable = reading.table;
     return reading.result;
   };

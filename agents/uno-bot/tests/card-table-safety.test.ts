@@ -11,12 +11,14 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { postTextVerified } from "../src/slack/delivery";
-import type { CardTable } from "../src/turn/index";
+import { cardList, type CardTable } from "../src/turn/index";
 import { expectRefusals, recordingPosting } from "./helpers/recording-slack";
 
 const RECIPIENT = { userId: "U1", team: "T1" };
 const PROSE = "Three cards are in WIP; two have no Dev Status yet.";
 const LIST = ["Card 1 — #401 — WIP", "Card 2 — #402 — WIP", "Card 3 — #403 — WIP"].join("\n");
+/** The same cards as a Markdown bullet list, each title linked to its card. */
+const MARKDOWN_LIST = [1, 2, 3].map((i) => `- [Card ${i}](https://www.notion.so/card-${i}) — #40${i} — WIP`).join("\n");
 
 type Block = { type: string; text?: unknown };
 
@@ -100,12 +102,65 @@ describe("a card table Slack refuses", () => {
     const messages = slack.of("message");
     assert.equal(messages.length, 2);
     assert.deepEqual(typesOf(messages[1]!), ["markdown", "context"]);
-    assert.equal(blocksOf(messages[1]!)[0]!.text, `${PROSE}\n\n${LIST}`);
+    assert.equal(blocksOf(messages[1]!)[0]!.text, `${PROSE}\n\n${MARKDOWN_LIST}`);
     assert.equal(messages[1]!.text, `${PROSE}\n\n${LIST}`);
     assert.ok(
       lines.some((l) => /card table refused/.test(l) && /json-pointer:\/blocks\/1/.test(l)),
       `logged the step down with Slack's detail: ${lines.join(" / ")}`,
     );
+  });
+
+  it("escapes each title for Markdown, so a title cannot restyle the list", async () => {
+    const table = wip();
+    table.rows[0]!.title = "1. *Bold* plan_v2 [draft]";
+    const slack = recordingPosting({ refusesBlockTypes: ["data_table"] });
+    await warnings(() =>
+      postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", PROSE, RECIPIENT, undefined, {
+        cardTable: table,
+      }),
+    );
+    expectRefusals(slack.refused);
+
+    const markdown = String(blocksOf(slack.of("message")[1]!)[0]!.text);
+    assert.equal(
+      markdown.split("\n").find((l) => l.includes("card-1")),
+      "- [1\\. \\*Bold\\* plan\\_v2 \\[draft\\]](https://www.notion.so/card-1) — #401 — WIP",
+    );
+  });
+
+  it("posts the list as its own message after the prose, when the two together would pass the Markdown cap", async () => {
+    // Prose that fits one part on its own, but not beside a 30-card list.
+    const prose = "word ".repeat(2150).trimEnd();
+    const table: CardTable = {
+      ...wip(),
+      rows: Array.from({ length: 30 }, (_, i) => ({
+        title: `A card with a long, descriptive title, number ${i + 1}`,
+        url: `https://www.notion.so/card-${i + 1}`,
+        cardNumber: 400 + i + 1,
+        designStatus: "WIP",
+        devStatus: null,
+      })),
+      total: 30,
+    };
+    const slack = recordingPosting({ refusesBlockTypes: ["data_table"] });
+    const { result } = await warnings(() =>
+      postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", prose, RECIPIENT, undefined, {
+        cardTable: table,
+      }),
+    );
+    expectRefusals(slack.refused);
+
+    assert.equal(result.ok, true);
+    const messages = slack.of("message");
+    assert.equal(messages.length, 3, "the refused post, the prose, then the list");
+    assert.deepEqual(typesOf(messages[1]!), ["markdown"], "the prose goes alone, no footer yet");
+    assert.equal(blocksOf(messages[1]!)[0]!.text, prose);
+    assert.deepEqual(typesOf(messages[2]!), ["markdown", "context"], "the list carries the footer");
+    const list = String(blocksOf(messages[2]!)[0]!.text);
+    assert.equal(list.split("\n").length, 30);
+    assert.ok(list.startsWith("- [A card with a long, descriptive title, number 1](https://www.notion.so/card-1)"));
+    assert.equal(messages[2]!.threadTs, "100.1", "in the same thread");
+    assert.equal(messages[2]!.text, cardList(table), "its text copy is the plain list");
   });
 
   it("then steps down to section blocks carrying the list, when the Markdown is refused too", async () => {

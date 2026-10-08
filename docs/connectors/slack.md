@@ -106,14 +106,14 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 #### Roadmap cards: the card table
 
-**A list of Roadmap cards goes in the card table, not a Markdown table.** The model sets `as_table` on `roadmap_query`, and code builds a Slack `data_table` from the cards that lookup returned, so every row is a real card with a working link. The persona asks for it at 3 or more cards; two stay in the prose.
+**A list of Roadmap cards appears only in the card table or the plain list.** The model sets `as_table` on `roadmap_query`, and code builds a Slack `data_table` from the cards that lookup returned, so every row is a real card with a working link. The floor is 3 cards, in code and persona alike; two stay in the prose.
 
-- **When it appears:** the lookup asked for it and returned 2 or more *definite* cards — an enumeration's (Design Status and/or person), or a title search's `contains` hits. Did-you-mean guesses stay in the prose. One table per answer: the last qualifying lookup of the turn.
+- **When it appears:** the lookup asked for it and returned 3 or more *definite* cards — an enumeration's (Design Status and/or person), or a title search's `contains` hits. Did-you-mean guesses stay in the prose. One table per answer, and the first qualifying lookup of the turn wins: a later one is told `table_attached: false` with a `table_reason` naming the attached table, and the model writes those cards as prose or the plain list. A later lookup that does not qualify leaves it in place.
 - **What it holds:** the card title linked to its Notion card, card number, Design Status, Dev Status. Pillars and people are left out to keep the columns narrow. The page size is the row count (at most 30), so every row shows at once.
-- **Caption:** the count and the filter (`13 cards · Design Status WIP`), or `first 30 of 41 · …` when the lookup listed only part of what matched.
+- **Caption:** the count and the filter (`13 cards · Design Status WIP`), or `first 30 of 41 · …` when the lookup listed only part of what matched — `first 30 of at least 41 · …` when the board read itself stopped short. Partial is the lookup's word (its `truncated` flag, more matches than its 30-row cap, or the turn's budget cutting it short), read from the lookup rather than the rows.
 - **Prose:** the model's result says `table_attached` and `row_count`. With a table, the answer gives the count, what stands out and what to act on, names at most 3 cards, and points at the table in one short phrase. Without one (`table_attached: false`), it writes the plain list.
 - **Text copy:** the prose, then one plain line per card (`title — #412 — WIP`). Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
-- **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
+- **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its cards appended to the Markdown as a bullet list with each title escaped and linked; when prose and list together would pass the 12,000-character Markdown cap, the list follows as its own message in the thread, carrying the footer. Then the usual rungs below apply. The step down is logged.
 
 ### What the Worker does on each path
 

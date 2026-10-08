@@ -32,6 +32,9 @@ import { splitBalanced } from "./split";
 // short; this is where the Worker enforces it, per message, not per answer.
 export const MAX_POST_CHARS = 11_000;
 
+/** Slack's cap on the Markdown in one message's `markdown` blocks. */
+export const MARKDOWN_MESSAGE_CHARS = 12_000;
+
 // Headroom for the `_(10/10)_` marker line a continuation carries, reserved
 // before the split so a numbered piece cannot end up over the limit.
 const MARKER_RESERVE = 16;

@@ -1,8 +1,9 @@
 // A card table, as Slack's `data_table` block.
 //
 // The turn hands over the table as DATA (`turn/card-table.ts`) and this is
-// where it becomes Slack's: the header row, a linked title, the number cells,
-// the caption's words. Verified live in Bill's DM on 2026-10-07 — a
+// where it becomes Slack's: the header row, a linked title, the number cells.
+// The caption's words are the turn's, since the model is told them too.
+// Verified live in Bill's DM on 2026-10-07 — a
 // `data_table` posts between the answer's `markdown` block and the footer's
 // `context` block, in one chat.postMessage.
 //
@@ -15,7 +16,9 @@
 // Pure: no Env, no client. The rules the block is held to in the suite are in
 // `tests/helpers/slack-block-rules.ts`.
 
-import type { CardTable, CardTableRow } from "../turn/card-table";
+import { cardFacts, cardTableCaption, type CardTable, type CardTableRow } from "../turn/card-table";
+
+export { cardTableCaption };
 
 /** Shown in a cell the card has no value for — Slack refuses an empty one. */
 const NO_VALUE = "—";
@@ -36,28 +39,6 @@ function numberCell(n: number | null) {
 }
 
 /**
- * What the table holds, in a line: the count and the filter —
- * "13 cards · Design Status WIP" — and, when the lookup listed only the first
- * of its matches, "first 30 of 41 · Design Status WIP". A partial read with no
- * larger count to give says so plainly, so a cut list never reads as the whole
- * board.
- */
-export function cardTableCaption(table: CardTable): string {
-  const n = table.rows.length;
-  const count = !table.partial
-    ? `${n} card${n === 1 ? "" : "s"}`
-    : table.total > n
-      ? `first ${n} of ${table.total}`
-      : `at least ${n} cards`;
-  const filters = [
-    table.filter.designStatus ? `Design Status ${table.filter.designStatus}` : null,
-    table.filter.person ? `with ${table.filter.person}` : null,
-    table.filter.title ? `title contains "${table.filter.title}"` : null,
-  ];
-  return [count, ...filters].filter(Boolean).join(" · ");
-}
-
-/**
  * The `data_table` block for a card table: every row on one page, so a list
  * the lookup capped at 30 never pages five at a time.
  */
@@ -71,4 +52,26 @@ export function cardTableBlock(table: CardTable): Record<string, unknown> {
       ...table.rows.map((row) => [titleCell(row), numberCell(row.cardNumber), raw(row.designStatus), raw(row.devStatus)]),
     ],
   };
+}
+
+/** A title as Markdown link text that reads as written: the characters that
+ *  would style, link or list it are escaped, and so is a leading `1. `. */
+function escapeTitle(title: string): string {
+  return title.replace(/[\\`*_~[\]<>]/g, "\\$&").replace(/^(\d+)([.)]) /, "$1\\$2 ");
+}
+
+/**
+ * The cards as a Markdown bullet list, each title linked to its card — what
+ * the answer's Markdown carries when Slack refuses the table, so the reader
+ * keeps the list and its links. Its lines match the plain list's.
+ *
+ * @param table - The table it stands in for
+ */
+export function markdownCardList(table: CardTable): string {
+  return table.rows
+    .map((row) => {
+      const url = row.url.replace(/\(/g, "%28").replace(/\)/g, "%29");
+      return `- ${[`[${escapeTitle(row.title)}](${url})`, ...cardFacts(row, table)].join(" — ")}`;
+    })
+    .join("\n");
 }

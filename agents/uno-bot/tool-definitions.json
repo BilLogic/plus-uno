@@ -24,7 +24,7 @@
         },
         "as_table": {
           "type": "boolean",
-          "description": "Show the cards as a sortable table beneath your answer, built from this lookup's rows — the one way to present 3 or more cards. Set it when listing cards by design_status and/or person, or every card with a phrase in its title; a title search tables only the cards that contain the phrase, so offer the similar ones in prose. The result says `table_attached` and `row_count`: when true, the reader sees every card in the table, so give the count, what stands out and what to act on, naming at most 3 cards, and point at the table in one short phrase; when false, list the cards in your answer."
+          "description": "Show the cards as a sortable table beneath your answer, built from this lookup's rows. A list of Roadmap cards appears only in this card table or the plain list; set it for 3 or more cards, listed by design_status and/or person, or every card with a phrase in its title. A title search tables only the cards that contain the phrase, so offer the similar ones in prose. The result says `table_attached` and `row_count`: when true, the reader sees every card in the table, so give the count, what stands out and what to act on, naming at most 3 cards, and point at the table in one short phrase; when false, write those cards as the plain list. One card table per answer: once one is attached, a later lookup's result says `table_attached: false` and `table_reason`."
         }
       }
     }

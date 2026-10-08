@@ -11,13 +11,13 @@
 // answer path rather than read it (`tests/stream-recipient.test.ts`, #654).
 
 import { decideStream, type StreamRecipient } from "./stream-recipient";
-import { answerMessages, deliverAnswer } from "./answer-posts";
+import { answerMessages, deliverAnswer, MARKDOWN_MESSAGE_CHARS } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
-import { cardTableBlock } from "./card-table-block";
-import { withCardList, type CardTable } from "../turn/card-table";
+import { cardTableBlock, markdownCardList } from "./card-table-block";
+import { cardList, withCardList, type CardTable } from "../turn/card-table";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -321,7 +321,8 @@ export async function postTextVerified(
     // two calls, not three.
     //
     // A part carrying a card table has one rung more, at the top: the same
-    // Markdown without the table, its cards appended as a plain list. Any
+    // Markdown without the table, its cards appended as a Markdown list (or
+    // posted after it, when the two would pass the Markdown cap). Any
     // block refusal while the table is aboard counts as the table's, rather
     // than only one whose json-pointer lands on the `data_table`. The table is
     // the newest and least proven block in the message, Slack does not always
@@ -335,22 +336,37 @@ export async function postTextVerified(
     async post(piece, withFooter) {
       const tail = withFooter ? footer : [];
       const copy = copyOf(piece, withFooter);
-      const send = (blocks?: Array<Record<string, unknown>>) =>
+      const send = (blocks?: Array<Record<string, unknown>>, text = copy) =>
         deps.slack
-          .postMessage({ channel, thread_ts: threadTs, text: copy, ...(blocks ? { blocks } : {}) })
+          .postMessage({ channel, thread_ts: threadTs, text, ...(blocks ? { blocks } : {}) })
           .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
 
-      const tabled = withFooter && table.length > 0;
+      const tabled = withFooter && cardTable !== undefined;
       let posted = await send([{ type: "markdown", text: piece }, ...(tabled ? table : []), ...tail]);
       if (posted.ok) return true;
       // A card table steps down first, to the same answer without it and its
-      // cards as a plain list in the Markdown — so a rendering problem never
-      // costs the reader the list. Every rung below carries that list too.
-      const prose = tabled ? copy : piece;
+      // cards as a Markdown list beneath the prose — so a rendering problem
+      // never costs the reader the list. Every rung below carries that list too.
+      const prose = tabled ? `${piece}\n\n${markdownCardList(cardTable)}` : piece;
       if (tabled && refusedForBlocks(posted)) {
         console.warn(`[slack] card table refused (${refusalOf(posted)}); retrying without it, the cards as a list`);
-        posted = await send([{ type: "markdown", text: prose }, ...tail]);
-        if (posted.ok) return true;
+        if (prose.length <= MARKDOWN_MESSAGE_CHARS) {
+          posted = await send([{ type: "markdown", text: prose }, ...tail]);
+          if (posted.ok) return true;
+        } else {
+          // Prose and list together would pass Slack's Markdown cap, and that
+          // call is doomed. The prose goes alone, then the list follows in the
+          // thread as its own message, carrying the footer where the answer
+          // now ends. Each text copy is its own message's words.
+          posted = await send([{ type: "markdown", text: piece }], piece);
+          if (posted.ok) {
+            const list = cardList(cardTable);
+            const followed = await send([{ type: "markdown", text: markdownCardList(cardTable) }, ...tail], list);
+            if (followed.ok) return true;
+            console.warn(`[slack] card list follow-up refused (${refusalOf(followed)}); retrying as plain text`);
+            return !!(await send(undefined, list)).ok;
+          }
+        }
       }
       if (refusedForBlocks(posted)) {
         console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);

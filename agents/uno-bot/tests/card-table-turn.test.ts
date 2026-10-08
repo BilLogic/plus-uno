@@ -9,7 +9,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { runTurn, type CardTable, type DeliveryCall } from "../src/turn/index";
+import type { LoopBudget } from "../src/agent/loop";
+import { cardTableCaption, runTurn, type CardTable, type DeliveryCall } from "../src/turn/index";
 import { harness, request } from "./helpers/turn-harness";
 
 /** One card as `roadmap_query` reports it. */
@@ -130,8 +131,8 @@ test("a lookup that did not ask for a table attaches none, and says so", async (
   assert.equal(resultsTheModelRead(h)[0]?.table_attached, false);
 });
 
-test("one card or none is never a table, though the lookup asked for one", async () => {
-  for (const n of [1, 0]) {
+test("two cards, one or none is never a table, though the lookup asked for one", async () => {
+  for (const n of [2, 1, 0]) {
     const h = harness({ replies: [{ toolCalls: [ASK] }, { text: "Here." }], toolResult: wipResult(n) });
     const outcome = await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
 
@@ -143,30 +144,46 @@ test("one card or none is never a table, though the lookup asked for one", async
   }
 });
 
-test("two flagged lookups in one turn: the last that qualifies is the table", async () => {
-  const bryan = JSON.stringify({
+test("two flagged lookups in one turn: the first that qualifies is the table, and the second is told no", async () => {
+  const review = JSON.stringify({
     ok: true,
-    filters: { person: "Bryan" },
-    count: 2,
-    cards: [card(7, { design_status: "Under Review" }), card(8, { design_status: "Shipped" })],
+    filters: { design_status: "Under Review" },
+    count: 4,
+    cards: [7, 8, 9, 10].map((n) => card(n, { design_status: "Under Review" })),
     note: "Complete result set from the live Roadmap board — safe to enumerate as the full answer.",
   });
-  const results = [wipResult(5), bryan, wipResult(1)];
+  const results = [wipResult(5), review];
   const h = harness({
     replies: [
       { toolCalls: [ASK] },
-      { toolCalls: [{ name: "roadmap_query", args: { person: "Bryan", as_table: true } }] },
-      { toolCalls: [ASK] },
+      { toolCalls: [{ name: "roadmap_query", args: { design_status: "Under Review", as_table: true } }] },
       { text: "Done." },
     ],
     toolResultFor: () => results.shift() ?? "{}",
   });
-  await runTurn(request({ text: "WIP, then Bryan's" }), h.deps);
+  await runTurn(request({ text: "WIP, then Under Review" }), h.deps);
 
   const table = answerCall(h.delivery.calls).cardTable as CardTable;
-  assert.deepEqual(table.rows.map((r) => r.title), ["Card 7", "Card 8"]);
-  assert.deepEqual(table.filter, { person: "Bryan" });
-  assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, true, false]);
+  assert.deepEqual(table.rows.map((r) => r.title), ["Card 1", "Card 2", "Card 3", "Card 4", "Card 5"]);
+  assert.deepEqual(table.filter, { designStatus: "WIP" });
+  const [first, second] = resultsTheModelRead(h);
+  assert.equal(first?.table_attached, true);
+  assert.equal(second?.table_attached, false);
+  assert.equal("row_count" in (second ?? {}), false);
+  assert.equal(second?.table_reason, "one card table per answer; already attached: 5 cards · Design Status WIP");
+});
+
+test("a later lookup that narrows to one card keeps the table, and is told no", async () => {
+  const results = [wipResult(5), wipResult(1)];
+  const h = harness({
+    replies: [{ toolCalls: [ASK] }, { toolCalls: [ASK] }, { text: "Done." }],
+    toolResultFor: () => results.shift() ?? "{}",
+  });
+  await runTurn(request({ text: "WIP, then the one I mean" }), h.deps);
+
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.equal(table.rows.length, 5);
+  assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, false]);
 });
 
 /** The lookup's result for a title search: `hits` cards with the phrase in
@@ -209,8 +226,8 @@ test("a flagged title search tables only the cards whose titles contain the phra
   assert.equal(stored.includes("Boarding pass"), false, "no guess is remembered as shown");
 });
 
-test("a title search with one hit, or only similar guesses, attaches nothing", async () => {
-  for (const [hits, similar] of [[1, 4], [0, 5]] as const) {
+test("a title search with two hits or one, or only similar guesses, attaches nothing", async () => {
+  for (const [hits, similar] of [[2, 4], [1, 4], [0, 5]] as const) {
     const h = harness({ replies: [{ toolCalls: [TITLE_ASK] }, { text: "Did you mean…" }], toolResult: titleResult(hits, similar) });
     await runTurn(request({ text: "the onboarding card?" }), h.deps);
 
@@ -234,17 +251,17 @@ test("a title search that listed only the first of its hits is a partial table",
   assert.equal(table.partial, true);
 });
 
-test("an enumeration then a flagged title search: the title search's hits are the table", async () => {
-  const results = [wipResult(5), titleResult(2, 3)];
+test("a flagged title search then an enumeration: the title search's hits are the table", async () => {
+  const results = [titleResult(3, 3), wipResult(5)];
   const h = harness({
-    replies: [{ toolCalls: [ASK] }, { toolCalls: [TITLE_ASK] }, { text: "Done." }],
+    replies: [{ toolCalls: [TITLE_ASK] }, { toolCalls: [ASK] }, { text: "Done." }],
     toolResultFor: () => results.shift() ?? "{}",
   });
-  await runTurn(request({ text: "WIP, then onboarding" }), h.deps);
+  await runTurn(request({ text: "onboarding, then WIP" }), h.deps);
 
   const table = answerCall(h.delivery.calls).cardTable as CardTable;
-  assert.deepEqual(table.rows.map((r) => r.title), ["Onboarding 1", "Onboarding 2"]);
-  assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, true]);
+  assert.deepEqual(table.rows.map((r) => r.title), ["Onboarding 1", "Onboarding 2", "Onboarding 3"]);
+  assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, false]);
 });
 
 test("a failed lookup is handed back to the model untouched", async () => {
@@ -281,4 +298,75 @@ test("with no table attached, the judge is asked exactly as before", async () =>
 
   assert.equal(h.judged.length, 1);
   assert.equal("cardTableList" in h.judged[0]!, false);
+});
+
+test("a complete list missing a card's link is still a complete list, not the first of more", async () => {
+  const whole = JSON.parse(wipResult(13)) as { cards: Array<Record<string, unknown>> };
+  whole.cards[4] = { ...whole.cards[4], url: null };
+  const h = harness({
+    replies: [{ toolCalls: [ASK] }, { text: "Twelve." }],
+    toolResult: JSON.stringify({ ...whole, matched: 13, truncated: false }),
+  });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.equal(table.rows.length, 12);
+  assert.equal(table.partial, false);
+  assert.equal(cardTableCaption(table), "12 cards · Design Status WIP");
+});
+
+test("a board too large to read in full gives its count as a floor", async () => {
+  const cut = JSON.parse(wipResult(30)) as Record<string, unknown>;
+  const h = harness({
+    replies: [{ toolCalls: [ASK] }, { text: "At least 41." }],
+    toolResult: JSON.stringify({ ...cut, matched: 41, truncated: true }),
+  });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.equal(table.partial, true);
+  assert.equal(cardTableCaption(table), "first 30 of at least 41 · Design Status WIP");
+});
+
+test("a null or malformed card is skipped, not thrown on", async () => {
+  const whole = JSON.parse(wipResult(4)) as { cards: unknown[] };
+  const h = harness({
+    replies: [{ toolCalls: [ASK] }, { text: "Four." }],
+    toolResult: JSON.stringify({ ...whole, cards: [null, ...whole.cards, 7, "Card 9"] }),
+  });
+  const outcome = await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  assert.equal(outcome.disposition, "answered");
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.deepEqual(table.rows.map((r) => r.title), ["Card 1", "Card 2", "Card 3", "Card 4"]);
+});
+
+test("a lookup the budget cut short still tables its cards, as a partial list, and keeps the notice", async () => {
+  // Every lookup trips the budget, so the loop appends its cut-short notice
+  // after the lookup's JSON.
+  let trips = 0;
+  const budget: LoopBudget = {
+    used: () => 0,
+    trips: () => trips,
+    withLookupLimit: async (_limit, fn) => {
+      const out = await fn();
+      trips++;
+      return out;
+    },
+    isBudgetError: () => false,
+    breakdown: () => "test",
+  };
+  const h = harness({ replies: [{ toolCalls: [ASK] }, { text: "At least five." }], toolResult: wipResult(5), budget });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  assert.equal(table.rows.length, 5);
+  assert.equal(table.partial, true);
+  assert.equal(cardTableCaption(table), "at least 5 cards · Design Status WIP");
+  const [read] = h.provider.transcript
+    .flatMap((e) => (e.kind === "results" ? e.results : []))
+    .filter((r) => r.name === "roadmap_query");
+  const [json, ...rest] = read!.text.split("\n");
+  assert.equal((JSON.parse(json!) as Record<string, unknown>).table_attached, true);
+  assert.match(rest.join("\n"), /this lookup was cut short/);
 });
