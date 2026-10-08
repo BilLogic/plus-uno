@@ -143,7 +143,7 @@ export async function executeRelayDm(
       console.warn(`[relay] couldn't remember the DM: ${err instanceof Error ? err.message : String(err)}`),
     );
 
-  await tellThread(`:incoming_envelope: Sent to <@${recipient}>.`);
+  await tellThread(`:white_check_mark: Sent to <@${recipient}>.`);
   return JSON.stringify({
     ok: true,
     status: "sent",

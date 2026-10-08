@@ -238,7 +238,7 @@ function stopText(userId: string, cardLive: boolean): string {
  * to add a sentence about a card the person can see above them anyway.
  */
 export function inThreadStopLine(userId: string): string {
-  return `:octagonal_sign: <@${userId}> pressed stop. ${STOPPING_PROMISE} ${NOTHING_UNDONE}`;
+  return `:no_entry: <@${userId}> pressed stop. ${STOPPING_PROMISE} ${NOTHING_UNDONE}`;
 }
 
 /**

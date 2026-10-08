@@ -596,7 +596,7 @@ export async function postReviewRequest(env: Env, input: ReviewRequestInput) {
   const what = rowFor(input.toolName)?.reviewRequest ?? input.toolName;
   const reviewers = (input.reviewerUserIds ?? []).map((id) => `<@${id}>`).join(" ");
   const lines = [
-    `:eyes: *Review request* — a ${what} is ready.`,
+    `*Review request* — a ${what} is ready.`,
     input.artifactUrl ? `Artifact: ${input.artifactUrl}` : "",
     `Requested by <@${input.requesterUserId}> · thread in <#${input.originChannel}>`,
     reviewers ? `Suggested reviewers: ${reviewers}` : "",

@@ -281,8 +281,8 @@ function caveatText(caveat: CardCaveat): string {
   }
   if (caveat.kind === "bundle-incomplete") {
     return (
-      `:rotating_light: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +
-      `:white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
+      `:warning: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +
+      `A :white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
     );
   }
   if (caveat.kind === "repo-visibility") {
@@ -293,16 +293,16 @@ function caveatText(caveat: CardCaveat): string {
         : ["the issue", "once it's filed", "Check the body"];
     const who =
       caveat.visibility === "public"
-        ? `:globe_with_meridians: *${caveat.repo}* is public — anyone can read ${what} ${when}.`
+        ? `:warning: *${caveat.repo}* is public — anyone can read ${what} ${when}.`
         : caveat.visibility === "private"
-          ? `:lock: *${caveat.repo}* is private — only people with access to it can read ${what}.`
-          : `:globe_with_meridians: *${caveat.repo}* may be public — I couldn't check, so treat ${what} as readable by anyone.`;
+          ? `*${caveat.repo}* is private — only people with access to it can read ${what}.`
+          : `:warning: *${caveat.repo}* may be public — I couldn't check, so treat ${what} as readable by anyone.`;
     // A DM's footer names the requester and links nothing, so the card
     // promises no link either.
     const footer = caveat.fromDm ? "I add a footer naming you." : "I add a footer naming you and linking this thread.";
     return `${who} ${check} for anything from a DM or private channel before you approve; ${footer}`;
   }
-  return ":mag: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.";
+  return ":warning: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.";
 }
 
 function renderFields(fields: ReadonlyArray<CardField>): string {
@@ -403,7 +403,7 @@ export function withOperationPlan(
   return {
     text: collapsed,
     followUp: packMessages(
-      `:package: *The full plan for the card below — ${operations.length} operations, in order:*`,
+      `*The full plan for the card below — ${operations.length} operations, in order:*`,
       full,
     ),
   };
@@ -441,7 +441,8 @@ function packMessages(lead: string, lines: string[]): string[] {
 
 function planHead(operations: number, groups: number): string {
   const where = groups === 1 ? "" : ` across ${groups} targets`;
-  return `:package: *This one ✅ runs ${operations} operations${where}, in order:*`;
+  // Plain, not bold: the group headings under it are the bold lines.
+  return `This one ✅ runs ${operations} operations${where}, in order:`;
 }
 
 function planBody(

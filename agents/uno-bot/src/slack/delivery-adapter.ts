@@ -301,7 +301,7 @@ export function consoleWorkingLog(line: string, outcome: WorkingSignalOutcome): 
  *  presentation, and this is the one caller. */
 export function threadTitleFrom(text: string): string {
   const oneLine = text.replace(/\s+/g, " ").trim();
-  if (!oneLine) return "Chat with UNO Bot";
+  if (!oneLine) return "Chat with le goat";
   if (oneLine.length <= 60) return oneLine;
   const cut = oneLine.slice(0, 60);
   const brk = cut.lastIndexOf(" ");
@@ -822,7 +822,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         .postMessage({
           channel,
           thread_ts: replyTs,
-          text: `:hourglass_flowing_sand: ${text}`,
+          text,
         })
         .catch(() => {});
     },

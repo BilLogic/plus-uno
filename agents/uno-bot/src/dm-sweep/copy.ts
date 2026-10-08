@@ -62,7 +62,7 @@ export function askText(o: { when: string; what: string }): string {
 export function raiseNote(o: { topic: string; sources: readonly [string, string] }): string {
   const [a, b] = o.sources.map(plain);
   return (
-    `:mag: While answering a question, uno-bot noticed that ${a} and ${b} disagree on ${plain(o.topic)}. ` +
+    `While answering a question, le goat noticed that ${a} and ${b} disagree on ${plain(o.topic)}. ` +
     "Whoever owns it may want to check which one is right."
   );
 }

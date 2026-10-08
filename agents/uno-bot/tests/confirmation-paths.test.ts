@@ -356,11 +356,11 @@ describe("a card with a confirmer set", () => {
   it("names the confirmers in Slack, and the person who was refused", () => {
     assert.equal(
       renderGateNote({ kind: "not-a-confirmer", confirmers: ["U0000007", "U0000008"], userId: "U0000002" }),
-      ":lock: <@U0000002> Only <@U0000007> or <@U0000008> can confirm or cancel this proposal — nothing was executed.",
+      ":warning: <@U0000002> Only <@U0000007> or <@U0000008> can confirm or cancel this proposal — nothing was executed.",
     );
     assert.equal(
       renderGateNote({ kind: "not-a-confirmer", confirmers: [] }),
-      ":lock: Nobody here can confirm or cancel this proposal — nothing was executed.",
+      ":warning: Nobody here can confirm or cancel this proposal — nothing was executed.",
     );
   });
 });
@@ -1152,7 +1152,7 @@ describe("Gate imports no Slack module", () => {
 // A card the Worker states itself — the library card, the weekly DS
 // precedence card — answers the gate in its own words (`PendingProposal.stated`).
 // The generic lines assume a card someone asked for: "tell me what to change",
-// "ask me again", "the newest :warning: card". None of that is true here.
+// "ask me again", "the newest card". None of that is true here.
 describe("a stated card answers in its own words", () => {
   const HOUR_MS = 60 * 60 * 1000;
   const WORDS = {
@@ -1278,7 +1278,7 @@ describe("a stated card answers in its own words", () => {
   it("leaves a turn's card on the generic lines", async () => {
     const { notes } = await press(await staged(), "cancel");
     assert.deepEqual(notes, [`:no_entry: Cancelled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
-    assert.match(renderGateNote({ kind: "superseded" }), /newest :warning: card/);
+    assert.match(renderGateNote({ kind: "superseded" }), /newest card in this thread/);
     assert.match(renderGateNote({ kind: "expired" }), /Ask me again/);
   });
 });
