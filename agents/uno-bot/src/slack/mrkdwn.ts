@@ -53,10 +53,7 @@ export function sanitizeSlackMarkup(text: string): string {
     (match, inner: string | undefined, offset: number) => {
       // A `>` run opening a line is mrkdwn's quote marker (`>` or `>>>`).
       if (match[0] === ">" && (offset === 0 || text[offset - 1] === "\n")) return match;
-      if (inner !== undefined) {
-        const safe = validMarkup(inner);
-        return safe === null ? escapeBare(match) : `<${safe}>`;
-      }
+      if (inner !== undefined) return keepOrEscapeToken(match, inner);
       if (match === "&") return ENTITY.test(text.slice(offset)) ? "&" : "&amp;";
       return match === "<" ? "&lt;" : "&gt;";
     },
@@ -69,7 +66,8 @@ export function sanitizeSlackMarkup(text: string): string {
  * Blocks are what a reader sees whenever a message has them — an answer's
  * sections, a proposal card — so a pass over `text` alone would guard the
  * notification copy and leave the message itself exposed. `plain_text` objects
- * are left alone: Slack parses no markup there. Returns a copy.
+ * are left alone: Slack parses no markup there. A `markdown` block takes the
+ * narrower `sanitizeMarkdownMarkup`. Returns a copy.
  */
 export function sanitizeSlackBlocks<T>(blocks: T): T {
   const walk = (node: unknown): unknown => {
@@ -78,9 +76,43 @@ export function sanitizeSlackBlocks<T>(blocks: T): T {
     const out: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(node)) out[key] = walk(value);
     if (out.type === "mrkdwn" && typeof out.text === "string") out.text = sanitizeSlackMarkup(out.text);
+    if (out.type === "markdown" && typeof out.text === "string") out.text = sanitizeMarkdownMarkup(out.text);
     return out;
   };
   return walk(blocks) as T;
+}
+
+/**
+ * The markup pass for a `markdown` block: escape only the `<…>` tokens Slack
+ * cannot parse, and leave every other character as the model wrote it.
+ *
+ * A `markdown` block carries the answer's Markdown AS WRITTEN — that is the
+ * point of it — so `sanitizeSlackMarkup`'s full pass is the wrong one here.
+ * Its entity escaping of every bare `&`, `<` and `>` exists for mrkdwn, where
+ * those are control characters; in Markdown they are prose (`x & y`, `1 < 2`,
+ * `->`), and whether this block decodes `&amp;` back for display is unproven,
+ * so escaping them risks a reader seeing entities in a table cell.
+ *
+ * What still holds is the reason the pass exists at all: a `<…>` token Slack
+ * cannot parse blanks the whole message (live 2026-09-22, `<@teammate>` in a
+ * code fence). So a `<…>` holding valid markup — a real `<@U…>`, `<#C…>`,
+ * `<!here>`, `<https://…|label>` — stays, and any other `<…>` is escaped,
+ * fences included, exactly as the full pass would. That is the one place an
+ * entity can show; a blank message is the worse outcome. Idempotent.
+ */
+export function sanitizeMarkdownMarkup(text: string): string {
+  return text.replace(/<([^<>\n]*)>/g, keepOrEscapeToken);
+}
+
+/** One `<…>` token, both passes' way: the valid markup it holds, normalised,
+ *  or the whole token entity-escaped when Slack could not parse it.
+ *
+ * @param token - The token, brackets included
+ * @param inner - What sits between the brackets
+ */
+function keepOrEscapeToken(token: string, inner: string): string {
+  const safe = validMarkup(inner);
+  return safe === null ? escapeBare(token) : `<${safe}>`;
 }
 
 /**

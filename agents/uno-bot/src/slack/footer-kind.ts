@@ -39,9 +39,10 @@ export function footerKindFor(body: string, hint?: FooterKind): FooterKind {
   const text = body.trim();
   if (!text) return "full";
 
-  // Any citation, link, or list means it is making checkable claims.
+  // Any citation, link, list or table means it is making checkable claims; a
+  // Markdown table's rows open with `|`.
   const hasLink = /<https?:\/\/[^>]+>/.test(text) || /https?:\/\//.test(text);
-  const hasList = /(^|\n)\s*[•\-\d]/.test(text);
+  const hasList = /(^|\n)\s*[•\-\d|]/.test(text);
   const isLong = text.length > ACK_MAX_CHARS;
   if (hasLink || hasList || isLong) return "full";
 

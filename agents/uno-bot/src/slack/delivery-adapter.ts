@@ -77,6 +77,7 @@ import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
 import { readoutFor } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
+import { estateIcon, type SlackIcon } from "./estate-glyphs";
 import {
   settledStatus,
   WORKING_STATUS,
@@ -129,6 +130,10 @@ export interface PlanTask {
   output?: string;
   /** The links it read that the thread may see (`card-sources.ts`). */
   sources?: CardSource[];
+  /** The glyph of the estate it reads (`estate-glyphs.ts`), or none. Not text,
+   *  so it rides every update of the card, not only the first: Slack replaces
+   *  a card's non-text fields rather than appending to them. */
+  icon?: SlackIcon;
 }
 
 /** A card as the adapter keeps it: a `PlanTask`, or a call announced and not
@@ -828,6 +833,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (!words) return;
       const ts = planTs;
       const id = `tool-${event.seq}`;
+      const icon = estateIcon(words.estate, event.args);
       // EVERY WORD ON A CARD IS PLAIN TEXT, passed once as it arrives here —
       // the narration, the query, a tool's output or error, a source's name.
       // Slack shows these fields unparsed, so markup is turned into the words
@@ -835,7 +841,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // says why that is as safe as the escaper against a blanked message).
       // Once, here, because the pass decodes entities and is not idempotent.
       /** The card as a call first puts it on the checklist. */
-      const fresh: Card = { id, title: toPlainText(words.title), status: "pending" };
+      const fresh: Card = { id, title: toPlainText(words.title), status: "pending", ...(icon ? { icon } : {}) };
       switch (event.phase) {
         case "announced": {
           // What the call looks for, after the narration that introduced it.

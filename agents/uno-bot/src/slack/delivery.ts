@@ -15,6 +15,7 @@ import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
+import { refusalDetail } from "./api";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -46,7 +47,7 @@ export interface PostingClient {
     thread_ts?: string;
     text: string;
     blocks?: Array<Record<string, unknown>>;
-  }): Promise<{ ok: boolean }>;
+  }): Promise<{ ok: boolean; error?: string }>;
   startStream(
     channel: string,
     threadTs: string,
@@ -183,6 +184,28 @@ export { renderDeliveredBody, textSections } from "./render";
 //
 // `kind === "none"` still means no footer at all: a short acknowledgement is
 // not making checkable claims and does not need the label.
+/** Slack's error code and its own account of a refused post, for the log. */
+function refusalOf(posted: { ok: boolean; error?: string }): string {
+  return `${posted.error ?? "no error code"}${refusalDetail(posted)}`;
+}
+
+/** Slack's codes for a payload whose blocks it will not take. */
+const BLOCK_REFUSALS = new Set(["invalid_blocks", "invalid_blocks_format"]);
+
+/**
+ * Whether Slack refused a post BECAUSE OF ITS BLOCKS — the only refusal a
+ * plainer rung of blocks could get past. `invalid_arguments` counts only when
+ * Slack's own messages point into `/blocks`; anything else (`ratelimited`,
+ * `channel_not_found`, a thrown call) would fail the next block rung the same
+ * way, so the answer goes straight to bare text instead.
+ */
+function refusedForBlocks(posted: { ok: boolean; error?: string }): boolean {
+  if (BLOCK_REFUSALS.has(posted.error ?? "")) return true;
+  if (posted.error !== "invalid_arguments") return false;
+  const messages = (posted as { response_metadata?: { messages?: unknown } }).response_metadata?.messages;
+  return Array.isArray(messages) && messages.some((m) => /json-pointer:\/blocks(\/|\])/.test(String(m)));
+}
+
 function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
@@ -262,17 +285,38 @@ export async function postTextVerified(
       }
     },
 
+    // THE LADDER. A part goes out as the model's Markdown in one `markdown`
+    // block, which renders tables, headings, lists, links and code as
+    // written — the `section` blocks this used to post are mrkdwn-only, so
+    // every table became `• a — b — c` lines with its header row gone. If
+    // Slack refuses the block, the part steps down to those `section` blocks,
+    // footer and all; if it refuses them too, to bare text. Each step down
+    // logs what Slack said, so a refusal is a line in the tail rather than a
+    // worse-looking answer nobody can explain.
+    //
+    // Only a refusal of the BLOCKS steps down a rung (`refusedForBlocks`).
+    // Any other failure — rate limit, missing channel — would refuse the
+    // section rung too, so it goes straight to bare text: a doomed post costs
+    // two calls, not three.
+    //
+    // The `text` copy is the whole part on every rung: notifications and
+    // screen readers read it, and `postMessage` renders it to mrkdwn.
     async post(piece, withFooter) {
-      const blocks = [...textSections(piece), ...(withFooter ? footer : [])];
-      let posted = await deps.slack
-        .postMessage({ channel, thread_ts: threadTs, text: piece, blocks })
-        .catch(() => ({ ok: false as const }));
-      if (!posted.ok) {
-        console.warn("[slack] blocks post failed; retrying as plain text");
-        posted = await deps.slack
-          .postMessage({ channel, thread_ts: threadTs, text: piece })
-          .catch(() => ({ ok: false as const }));
+      const tail = withFooter ? footer : [];
+      const send = (blocks?: Array<Record<string, unknown>>) =>
+        deps.slack
+          .postMessage({ channel, thread_ts: threadTs, text: piece, ...(blocks ? { blocks } : {}) })
+          .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
+
+      let posted = await send([{ type: "markdown", text: piece }, ...tail]);
+      if (posted.ok) return true;
+      if (refusedForBlocks(posted)) {
+        console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
+        posted = await send([...textSections(piece), ...tail]);
+        if (posted.ok) return true;
       }
+      console.warn(`[slack] ${refusedForBlocks(posted) ? "section blocks refused" : "post failed"} (${refusalOf(posted)}); retrying as plain text`);
+      posted = await send();
       return !!posted.ok;
     },
   });
