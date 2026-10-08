@@ -31,6 +31,7 @@
 
 import type { ProposalOperation } from "../thread-state/index";
 import type { ToolProgressEvent } from "../agent/tool-progress";
+import { withCardList, type CardTable } from "./card-table";
 
 /** How far a turn got before it failed. Drives what the message the person
  *  sees can honestly promise (`slack/failure-message.ts`). */
@@ -406,8 +407,16 @@ export interface Delivery {
    */
   toolProgress(event: ToolProgressEvent): void;
 
-  /** The answer. A progress surface still open closes INTO it. */
-  postAnswer(text: string): Promise<PostResult>;
+  /**
+   * The answer. A progress surface still open closes INTO it.
+   *
+   * `cardTable` rides beneath the answer when the turn's lookups left one
+   * (`turn/card-table.ts`). The text copy the result reports is then the prose
+   * AND its plain list — what a notification shows and what the thread
+   * remembers — so a later turn knows which cards were shown. Absent, the
+   * answer posts exactly as it always has.
+   */
+  postAnswer(text: string, cardTable?: CardTable): Promise<PostResult>;
 
   /** A note that is not an answer: a clarifying question, a cancellation, a
    *  "you just cancelled that" bounce. No footer, no confidence pre-check.
@@ -462,7 +471,7 @@ export type DeliveryCall =
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string; backstop?: true }
   | { kind: "toolProgress"; event: ToolProgressEvent }
-  | { kind: "answer"; text: string }
+  | { kind: "answer"; text: string; cardTable?: CardTable }
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote }
   | { kind: "proposal"; card: ProposalCard }
@@ -585,8 +594,11 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "toolProgress", event });
     },
 
-    async postAnswer(text) {
-      calls.push({ kind: "answer", text });
+    async postAnswer(prose, cardTable) {
+      calls.push({ kind: "answer", text: prose, ...(cardTable ? { cardTable } : {}) });
+      // The text copy the Slack adapter reports: the prose, and the table's
+      // plain list beneath it when there is one.
+      const text = cardTable ? withCardList(prose, cardTable) : prose;
       if (opts.answerFails) return { ok: false, text };
       posted.push(text);
       return { ok: true, text, ts: `answer-${calls.length}` };

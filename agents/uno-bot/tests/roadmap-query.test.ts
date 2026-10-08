@@ -209,3 +209,19 @@ test("a board too large to read fully never calls its count complete", async () 
   assert.match(out.note, /at least 9/i);
   assert.doesNotMatch(out.note, /complete set/i);
 });
+
+// An enumeration lists the first 30 of what matched. A card table's caption
+// says "first 30 of 41" when that happens, so the result carries the total and
+// whether the read itself was cut short — as fields, not only inside the note.
+test("an enumeration longer than the list reports how many matched", async () => {
+  const bills = (r: Row): Row => ({
+    ...r,
+    properties: { ...r.properties, Contributor: { type: "people", people: [{ name: "Bill Guo" }] } },
+  });
+  board = Array.from({ length: 41 }, (_, i) => bills(card(4000 + i, `Bill's card ${i + 1}`)));
+  const out = (await roadmapQuery({ person: "Bill" })) as Result & { matched?: number; truncated?: boolean };
+
+  assert.equal(out.count, 30);
+  assert.equal(out.matched, 41);
+  assert.equal(out.truncated, false);
+});

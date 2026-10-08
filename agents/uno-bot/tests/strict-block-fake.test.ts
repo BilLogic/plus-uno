@@ -108,6 +108,68 @@ describe("the strict fake refuses what Slack refuses", () => {
   });
 });
 
+describe("the strict fake holds a data_table to Slack's rules", () => {
+  const raw = (text: string) => ({ type: "raw_text", text });
+  const num = (value: number) => ({ type: "raw_number", value, text: String(value) });
+  const link = (text: string, url: string) => ({
+    type: "rich_text",
+    elements: [{ type: "rich_text_section", elements: [{ type: "link", url, text }] }],
+  });
+  const header = [raw("Card"), raw("#"), raw("Design Status"), raw("Dev Status")];
+  const row = (n: number) => [link(`Card ${n}`, `https://www.notion.so/card-${n}`), num(n), raw("WIP"), raw("Not started")];
+  const table = (over: Record<string, unknown> = {}) => ({
+    type: "data_table",
+    caption: "2 cards · Design Status WIP",
+    page_size: 2,
+    rows: [header, row(1), row(2)],
+    ...over,
+  });
+
+  it("accepts a card table between the answer and its footer", async () => {
+    assert.deepEqual(await verdicts([markdown("Two cards are in WIP."), table(), footer]), []);
+  });
+
+  it("refuses one without a caption", async () => {
+    const { caption: _caption, ...uncaptioned } = table();
+    assert.equal((await verdicts([uncaptioned])).length, 3);
+    assert.equal((await verdicts([table({ caption: "" })])).length, 3);
+  });
+
+  it("takes 2 to 201 rows, the header among them", async () => {
+    assert.equal((await verdicts([table({ rows: [header] })])).length, 3);
+    assert.deepEqual(await verdicts([table({ rows: [header, row(1)] })]), []);
+    const rows = (n: number) => [header, ...Array.from({ length: n }, (_, i) => row(i))];
+    assert.deepEqual(await verdicts([table({ rows: rows(200) })]), []);
+    assert.equal((await verdicts([table({ rows: rows(201) })])).length, 3);
+  });
+
+  it("refuses rich text in the header row", async () => {
+    assert.equal((await verdicts([table({ rows: [[link("Card", "https://x.test"), raw("#")], row(1).slice(0, 2)] })])).length, 3);
+  });
+
+  it("refuses rows of different lengths", async () => {
+    assert.equal((await verdicts([table({ rows: [header, row(1), row(2).slice(0, 3)] })])).length, 3);
+  });
+
+  it("takes at most 20 columns", async () => {
+    const wide = (n: number) => [Array.from({ length: n }, (_, i) => raw(`h${i}`)), Array.from({ length: n }, () => raw("x"))];
+    assert.deepEqual(await verdicts([table({ rows: wide(20) })]), []);
+    assert.equal((await verdicts([table({ rows: wide(21) })])).length, 3);
+  });
+
+  it("holds the cells to 20,000 characters", async () => {
+    const cells = (chars: number) => [[raw("h")], [raw("a".repeat(chars - 1))]];
+    assert.deepEqual(await verdicts([table({ rows: cells(20_000) })]), []);
+    assert.equal((await verdicts([table({ rows: cells(20_001) })])).length, 3);
+  });
+
+  it("refuses a number cell without its text", async () => {
+    // Slack's docs make `text` optional; Slack refused it live on 2026-10-07.
+    const bare = [link("Card 1", "https://x.test"), { type: "raw_number", value: 1 }, raw("WIP"), raw("Not started")];
+    assert.equal((await verdicts([table({ rows: [header, bare] })])).length, 3);
+  });
+});
+
 describe("the stream fake takes a named icon on a task", () => {
   // Any shape at all, past the type: judging it is the fake's job here.
   const task = (icon: unknown) => ({ id: "t1", title: "Reading Notion", status: "in_progress" as const, icon: icon as never });

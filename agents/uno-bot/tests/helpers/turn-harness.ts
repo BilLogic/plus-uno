@@ -257,6 +257,7 @@ export function harness(opts: {
         cancelKey: opts.cancelKey ?? null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),
         onToolProgress: req.onToolProgress,
+        reviseLookupResult: req.reviseLookupResult,
         onSpend: (s) => {
           spend = s;
         },

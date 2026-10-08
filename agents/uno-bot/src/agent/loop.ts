@@ -237,6 +237,15 @@ export interface LoopInput {
    * from; `tool-progress.ts` says why it is not `onToolResult` widened.
    */
   onToolProgress?: (event: ToolProgressEvent) => void;
+  /**
+   * The turn's last word on a lookup's result before the model reads it: the
+   * text it returns is what goes into the `tool_result`. Called for a lookup
+   * that ran, never for one refused before it could. How Turn keeps the card
+   * table its lookups qualify for, and tells the model it did
+   * (`turn/card-table.ts`). Absent, the model reads the result as the tool
+   * answered it.
+   */
+  reviseLookupResult?: (name: string, args: Record<string, unknown>, text: string) => string;
   /** Called once, as the turn finishes, with what it ran on and spent — the
    *  facts of the `[uno-bot] request done` line, for the usage record. */
   onSpend?: (spend: TurnSpend) => void;
@@ -341,6 +350,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
           // a catch that ate the throw. The counter sees it either way, so a
           // short read cannot pass as a whole one.
           if (deps.budget.trips() > tripsBefore) text = markPartialLookup(text);
+          if (input.reviseLookupResult) text = input.reviseLookupResult(call.name, call.args, text);
           const { error } = toolResultDigest(call.name, text);
           input.onToolProgress?.(finishedProgress(progress, text, error));
         } catch (err) {
