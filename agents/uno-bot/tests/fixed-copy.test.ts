@@ -83,6 +83,9 @@ const FIXED_COPY: Record<string, string[]> = {
   "slack/delivery.ts": [],
   "slack/delivery-adapter.ts": [],
   "slack/api.ts": [],
+  // The feedback buttons under an answer, and the pop-up they open
+  "slack/feedback.ts": [],
+  "slack/feedback-door.ts": [],
   // App Home and the welcome
   "slack/home.ts": [GOAT],
   "slack/assistant.ts": [GOAT],

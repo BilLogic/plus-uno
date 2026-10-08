@@ -25,6 +25,7 @@ const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "image",
   "divider",
   "header",
+  "context_actions",
 ]);
 
 /** A `data_table`'s rows, header included, and its columns, per Slack's block
@@ -180,6 +181,16 @@ function blockRefusal(block: unknown): string | null {
     const n = Array.isArray(block.elements) ? block.elements.length : 0;
     if (n < CONTEXT_ELEMENTS.min || n > CONTEXT_ELEMENTS.max) return `a context of ${n} elements`;
   }
+  if (type === "context_actions") {
+    // The block reference (read 2026-10-08): 1 to 5 elements, each a
+    // `feedback_buttons` or an `icon_button`. Posted live with one
+    // `feedback_buttons` in Bill's DM on 2026-10-08.
+    const elements = Array.isArray(block.elements) ? block.elements : [];
+    if (elements.length < 1 || elements.length > 5) return `a context_actions of ${elements.length} elements`;
+    if (!elements.every((e) => isShape(e) && (e.type === "feedback_buttons" || e.type === "icon_button"))) {
+      return "a context_actions element that is not feedback_buttons or icon_button";
+    }
+  }
   if (type === "data_table") {
     const why = dataTableRefusal(block);
     if (why) return why;
@@ -273,6 +284,7 @@ const ALERT_LEVELS: ReadonlySet<string> = new Set(["default", "info", "warning",
 const INPUT_VALUE_CHARS = 3000;
 const SELECT_OPTIONS = { min: 1, max: 100 };
 const OPTION_TEXT_CHARS = 75;
+const RADIO_OPTIONS = { min: 1, max: 10 };
 
 /** Why Slack would refuse an input or an alert in a view, or null. */
 function viewOnlyRefusal(block: Shape): string | null {
@@ -300,6 +312,16 @@ function viewOnlyRefusal(block: Shape): string | null {
     for (const o of options) {
       const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
       if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a select option without short text";
+    }
+    return null;
+  }
+  if (element.type === "radio_buttons") {
+    // The radio buttons reference (read 2026-10-08): 1 to 10 options.
+    const options = Array.isArray(element.options) ? element.options : [];
+    if (options.length < RADIO_OPTIONS.min || options.length > RADIO_OPTIONS.max) return `radio buttons of ${options.length} options`;
+    for (const o of options) {
+      const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
+      if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a radio option without short text";
     }
     return null;
   }

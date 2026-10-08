@@ -66,6 +66,7 @@ export type SlackCall =
       team?: string;
       footerHint?: FooterKind;
       presentation?: Presentation;
+      feedback?: { turnId: string };
     }
   | {
       kind: "failure";
@@ -287,6 +288,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         ...(input.recipient.team === undefined ? {} : { team: input.recipient.team }),
         ...(input.footerHint === undefined ? {} : { footerHint: input.footerHint }),
         ...(input.presentation === undefined ? {} : { presentation: input.presentation }),
+        ...(input.feedback === undefined ? {} : { feedback: input.feedback }),
       });
       // Closing a stream INTO the answer appends the answer as markdown, and a
       // plan-mode stream takes task and plan chunks only. The client's type
