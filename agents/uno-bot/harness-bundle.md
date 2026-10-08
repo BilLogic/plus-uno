@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **155,156 chars from 16 files**, against an assembled budget of 175,500 (20,344 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 134,772 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **156,041 chars from 16 files**, against an assembled budget of 175,500 (19,459 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 135,657 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,296 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,692 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 113,690 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 17,115 (−5,803 ide-only) | 130,847 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 134,131 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 140,647 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 145,310 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 155,156 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 18,000 (−5,803 ide-only) | 131,732 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 135,016 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 141,532 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 146,195 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 156,041 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -988,7 +988,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 | System | Day-of | — |
 ```
 
-**The one place a table does not survive** is the blocks fallback, used when a streamed reply fails to post: a `section` block cannot hold one, so the Worker degrades it there to a bullet per row (`**Column:** value · **Column:** value`). A rare, graceful downgrade — not a reason to avoid tables.
+**A table renders as a table on every answer path**: the streamed part goes out as `markdown_text`, and every posted part (channel answers, continuation parts, every answer while streaming is off) as a `markdown` block. The one rung where a table degrades is the `section` fallback, reached only when Slack refuses the `markdown` block: a `section` cannot hold a table, so each row becomes `• a — b — c` and the header row is dropped. A refusal is logged, so a degraded table is a line in the tail.
 
 *(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
 
@@ -996,14 +996,16 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 | Path | What is sent | Converted by |
 |---|---|---|
-| Streamed reply (when streaming is on) | `markdown_text` — your Markdown, with only the markup pass below | `sanitizeStreamChunk` in `appendStream` / `stopStream` |
-| Blocks fallback (stream failed) | `section` blocks, which are mrkdwn-only | `toSlackMrkdwn` in `textSections` |
-| `chat.postMessage` `text` | mrkdwn | `toSlackMrkdwn` in `postMessage` |
-| Proposal card | mrkdwn sections + ✅/⛔ buttons | `toSlackMrkdwn` via `textSections` |
+| Streamed first part (streaming on, in a thread) | `markdown_text` — your Markdown, with only the markup pass below | `sanitizeStreamChunk` in `appendStream` / `stopStream` |
+| Posted part (channel answers, continuation parts, streaming off, a stream that failed) | one `markdown` block — your Markdown as written — plus the footer `context` block on the last part | nothing; `sanitizeMarkdownMarkup` escapes only unparseable `<…>` |
+| Fallback rung 1 (Slack refused the `markdown` block) | `section` blocks, which are mrkdwn-only, plus the footer | `toSlackMrkdwn` in `textSections` |
+| Fallback rung 2 (Slack refused the sections too) | bare `text`, no footer | `toSlackMrkdwn` in `postMessage` |
+| `chat.postMessage` `text`, every rung | the whole part as mrkdwn, for notifications and screen readers | `toSlackMrkdwn` in `postMessage` |
+| Proposal card, Figma library posts | mrkdwn sections (+ ✅/⛔ buttons on a card) | `toSlackMrkdwn` via `textSections` |
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). Worker code escapes a title inside a link label (`escapeSlackText`).
+**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). A `markdown` block keeps your `&`, `<` and `>` as written and escapes only a `<…>` token that is not valid markup (`sanitizeMarkdownMarkup`). Worker code escapes a title inside a link label (`escapeSlackText`).
 
 #### Streamed text
 
@@ -1015,7 +1017,7 @@ Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading`
 
 **A task card's icon is a named Slack icon, and nothing else.** The shape is `icon: {type: "icon", name}` with one of Slack's built-in names, on the `task_update` chunk and on a static plan's `task_card` alike. Production took `globe`, `book`, `map`, `code`, `comment`, `folder`, `cube` and `image` on 2026-10-07, and refused with `invalid_arguments` (`failed to match exactly one allowed schema [json-pointer:/chunks/0]`) an image URL as `name`, a `url`, an `image` element, an emoji and an unknown name; `call`, `email`, `file`, `link` and `user` fail the validator too. Each card shows its estate's glyph — Notion `book`, blueprint `map`, GitHub `code`, Slack `comment`, Storybook `cube`, Figma `image`, and a link on no estate's host `globe` — and a card reading no estate shows none (`agents/uno-bot/src/slack/estate-glyphs.ts`). To recheck, send raw chunks to a test DM through `/debug/slack-stream?…&chunks=`.
 
-Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
+Block Kit **is** wired (`delivery.ts` posts a `markdown` block with a `section` and a bare-text fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 
 ### The same Markdown goes everywhere else too
 
