@@ -189,6 +189,23 @@ function refusalOf(posted: { ok: boolean; error?: string }): string {
   return `${posted.error ?? "no error code"}${refusalDetail(posted)}`;
 }
 
+/** Slack's codes for a payload whose blocks it will not take. */
+const BLOCK_REFUSALS = new Set(["invalid_blocks", "invalid_blocks_format"]);
+
+/**
+ * Whether Slack refused a post BECAUSE OF ITS BLOCKS — the only refusal a
+ * plainer rung of blocks could get past. `invalid_arguments` counts only when
+ * Slack's own messages point into `/blocks`; anything else (`ratelimited`,
+ * `channel_not_found`, a thrown call) would fail the next block rung the same
+ * way, so the answer goes straight to bare text instead.
+ */
+function refusedForBlocks(posted: { ok: boolean; error?: string }): boolean {
+  if (BLOCK_REFUSALS.has(posted.error ?? "")) return true;
+  if (posted.error !== "invalid_arguments") return false;
+  const messages = (posted as { response_metadata?: { messages?: unknown } }).response_metadata?.messages;
+  return Array.isArray(messages) && messages.some((m) => /json-pointer:\/blocks(\/|\])/.test(String(m)));
+}
+
 function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
@@ -277,6 +294,11 @@ export async function postTextVerified(
     // logs what Slack said, so a refusal is a line in the tail rather than a
     // worse-looking answer nobody can explain.
     //
+    // Only a refusal of the BLOCKS steps down a rung (`refusedForBlocks`).
+    // Any other failure — rate limit, missing channel — would refuse the
+    // section rung too, so it goes straight to bare text: a doomed post costs
+    // two calls, not three.
+    //
     // The `text` copy is the whole part on every rung: notifications and
     // screen readers read it, and `postMessage` renders it to mrkdwn.
     async post(piece, withFooter) {
@@ -288,10 +310,12 @@ export async function postTextVerified(
 
       let posted = await send([{ type: "markdown", text: piece }, ...tail]);
       if (posted.ok) return true;
-      console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
-      posted = await send([...textSections(piece), ...tail]);
-      if (posted.ok) return true;
-      console.warn(`[slack] section blocks refused (${refusalOf(posted)}); retrying as plain text`);
+      if (refusedForBlocks(posted)) {
+        console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
+        posted = await send([...textSections(piece), ...tail]);
+        if (posted.ok) return true;
+      }
+      console.warn(`[slack] ${refusedForBlocks(posted) ? "section blocks refused" : "post failed"} (${refusalOf(posted)}); retrying as plain text`);
       posted = await send();
       return !!posted.ok;
     },

@@ -23,6 +23,11 @@ test("anything with a list is substantive", () => {
   assert.equal(footerKindFor(list), "full");
 });
 
+test("a short table is substantive — its rows are structure", () => {
+  const table = "| Phase | Owner |\n|---|---|\n| Intake | Lead |";
+  assert.equal(footerKindFor(table), "full");
+});
+
 test("a long prose answer is substantive even with no link or list", () => {
   const long = "The tutor check-in happens in the In-session phase. ".repeat(6);
   assert.equal(footerKindFor(long), "full");

@@ -46,14 +46,7 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   // after itself.
   const stopTs = url.searchParams.get("stop");
   if (stopTs) {
-    const r = await countedFetch("https://slack.com/api/chat.stopStream", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-      },
-      body: JSON.stringify({ channel, ts: stopTs }),
-    });
+    const r = await slackPost(env, "chat.stopStream", { channel, ts: stopTs });
     return { body: { stopped: stopTs, slack: await r.json() } };
   }
   // ?chunks=<JSON array> — the checklist probe: open the stream in plan mode,
@@ -63,8 +56,8 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   // Same reach as ?text=: a DM or the alert channel, and only so much of it.
   const chunksParam = url.searchParams.get("chunks");
   if (chunksParam !== null) {
-    const refusal = probeTextRefusal(channel, chunksParam, env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL);
-    if (refusal) return { body: { ok: false, error: refusal.replace(/^text/, "chunks") }, status: 400 };
+    const refusal = probeTextRefusal(channel, chunksParam, env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL, "chunks");
+    if (refusal) return { body: { ok: false, error: refusal }, status: 400 };
     let chunks: unknown;
     try {
       chunks = JSON.parse(chunksParam);
@@ -92,15 +85,7 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   // invisible in the Messages tab until you click "N replies"; broadcasting
   // puts it in the main timeline too.
   if (url.searchParams.get("broadcast")) payload.reply_broadcast = true;
-  const call = (method: string, body: Record<string, unknown>) =>
-    countedFetch(`https://slack.com/api/${method}`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-      },
-      body: JSON.stringify(body),
-    });
+  const call = (method: string, body: Record<string, unknown>) => slackPost(env, method, body);
   const res = await call("chat.startStream", payload);
   const slack = (await res.json()) as { ok?: boolean; ts?: string };
   // ?text= — the markup probe (docs/connectors/slack.md § Streamed text):
@@ -138,8 +123,8 @@ export const slackPostProbe: ProbeRun = async (env, url) => {
   if (!channel) return { body: { ok: false, error: "channel required" }, status: 400 };
   const alertChannel = env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL;
   const blocksParam = url.searchParams.get("blocks") ?? "";
-  const refusal = probeTextRefusal(channel, blocksParam, alertChannel);
-  if (refusal) return { body: { ok: false, error: refusal.replace(/^text/, "blocks") }, status: 400 };
+  const refusal = probeTextRefusal(channel, blocksParam, alertChannel, "blocks");
+  if (refusal) return { body: { ok: false, error: refusal }, status: 400 };
   const text = url.searchParams.get("text");
   if (text && text.length > PROBE_TEXT_LIMIT)
     return { body: { ok: false, error: `text is ${text.length} chars; the probe takes at most ${PROBE_TEXT_LIMIT}` }, status: 400 };
@@ -155,31 +140,28 @@ export const slackPostProbe: ProbeRun = async (env, url) => {
   if (threadTs) payload.thread_ts = threadTs;
   if (text) payload.text = text;
   payload.blocks = blocks;
-  const res = await countedFetch("https://slack.com/api/chat.postMessage", {
+  const res = await slackPost(env, "chat.postMessage", payload);
+  return { body: { sent: payload, slack: await res.json() } };
+};
+
+/** One Slack Web API call as the bot, the body sent as JSON exactly as given —
+ *  the stream and post probes' one way out, unsanitised on purpose. */
+function slackPost(env: Env, method: string, body: Record<string, unknown>): Promise<Response> {
+  return countedFetch(`https://slack.com/api/${method}`, {
     method: "POST",
     headers: {
       "content-type": "application/json; charset=utf-8",
       authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
-  return { body: { sent: payload, slack: await res.json() } };
-};
+}
 
 /** Open a plan-mode stream, append `chunks` raw in one call, close it, and
  *  report Slack's three verdicts verbatim. */
 async function probeChunks(env: Env, channel: string, url: URL, chunks: unknown[]): Promise<Record<string, unknown>> {
   const call = async (method: string, body: Record<string, unknown>) =>
-    (await (
-      await countedFetch(`https://slack.com/api/${method}`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-          authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-        },
-        body: JSON.stringify(body),
-      })
-    ).json()) as { ok?: boolean; ts?: string };
+    (await (await slackPost(env, method, body)).json()) as { ok?: boolean; ts?: string };
   const open: Record<string, unknown> = { channel, task_display_mode: url.searchParams.get("mode") || "plan" };
   const threadTs = url.searchParams.get("thread_ts");
   if (threadTs) open.thread_ts = threadTs;
@@ -193,12 +175,17 @@ async function probeChunks(env: Env, channel: string, url: URL, chunks: unknown[
 /** The longest raw text the markup probe streams. */
 export const PROBE_TEXT_LIMIT = 2_000;
 
-/** Why the markup probe will not stream `text` to `channel`, or null if it will. */
-export function probeTextRefusal(channel: string, text: string, alertChannel: string): string | null {
-  if (!text) return "text is empty";
-  if (text.length > PROBE_TEXT_LIMIT) return `text is ${text.length} chars; the probe takes at most ${PROBE_TEXT_LIMIT}`;
+/**
+ * Why a probe will not send raw `text` to `channel`, or null if it will.
+ *
+ * @param label - The parameter the text came in on (`text`, `chunks`,
+ *   `blocks`), which the refusal names
+ */
+export function probeTextRefusal(channel: string, text: string, alertChannel: string, label = "text"): string | null {
+  if (!text) return `${label} is empty`;
+  if (text.length > PROBE_TEXT_LIMIT) return `${label} is ${text.length} chars; the probe takes at most ${PROBE_TEXT_LIMIT}`;
   if (!channel.startsWith("D") && channel !== alertChannel)
-    return `text= streams raw text only to a DM (D…) or the alert channel ${alertChannel}, not ${channel}`;
+    return `${label}= streams raw text only to a DM (D…) or the alert channel ${alertChannel}, not ${channel}`;
   return null;
 }
 

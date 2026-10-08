@@ -347,6 +347,10 @@ export interface RecordingPostingOptions {
    *  answer's fallback ladder is reachable. Answered `invalid_blocks`, with
    *  `response_metadata.messages` naming the block. */
   refusesBlockTypes?: readonly string[];
+  /** Fail every post with this error code and `response_metadata.messages` —
+   *  a failure that is not about the blocks (`ratelimited`), or one that
+   *  points at them only through its messages (`invalid_arguments`). */
+  postFailsWith?: { error: string; messages?: readonly string[] };
   /** Refuse `appendStream`, so the finish-failed fallback is reachable. */
   appendFails?: boolean;
   /** Refuse `stopStream`. */
@@ -401,6 +405,10 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
           error: "invalid_blocks",
           response_metadata: { messages: [`[ERROR] unsupported type: ${type} [json-pointer:/blocks/${at}]`] },
         } as { ok: boolean };
+      }
+      if (opts.postFailsWith) {
+        const { error, messages } = opts.postFailsWith;
+        return { ok: false, error, ...(messages ? { response_metadata: { messages } } : {}) } as { ok: boolean };
       }
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
       return { ok: true, ts: `posted-${++posted}` } as { ok: boolean };
