@@ -115,6 +115,7 @@ import {
   asSweepRevision,
   holdsInsert,
   INSERT_CARD_REFUSAL,
+  keptFixes,
   replacedBlocks,
   sweepCardInstruction,
   sweepCardPick,
@@ -1638,7 +1639,11 @@ async function dropFromSweepCard(
       deps.usage.writeTimeoutMs,
     );
   await recordSuperseded(retiredAhead);
-  const card = asSweepRevision(
+  // The fixes left, renumbered, so the revision is a carousel as its card
+  // was. Only fixes staged one per operation can be picked by the same index;
+  // anything else revises to the text card.
+  const fixes = pending.fixes?.items.length === all.length ? keptFixes(pending.fixes, kept) : undefined;
+  const built = asSweepRevision(
     await buildCard(
       { kind: "proposal", operations, toolName: first.toolName, input: first.input },
       deps,
@@ -1646,6 +1651,7 @@ async function dropFromSweepCard(
       request.surface === "assistant",
     ),
   );
+  const card: ProposalCard = fixes ? { ...built, fixes } : built;
   const posted = await delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error("[turn] sweep card revision was not staged");
@@ -1665,6 +1671,7 @@ async function dropFromSweepCard(
     ...inheritedTerms(pending),
     ttlMs: leftMs,
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
+    ...(fixes ? { fixes } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
     // The same card minus some items, so a drift card's own gate words stay
     // (`figma-drift/copy.ts` `driftCardWords`); a sweep card has none.
@@ -1828,8 +1835,9 @@ export async function restageExecution(
   // is a group DM's share: only the card people were shown offers one
   // (`sweep/share.ts`). Nor are a stated card's own words: the fresh card is
   // an ordinary one, with a ⚠️ and a ⛔ that runs nothing, so "Intake only"
-  // would misstate it.
-  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, ...kept } = original;
+  // would misstate it. Nor are a sweep card's fixes: the fresh card holds
+  // what never ran, so they no longer line up with its operations.
+  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, fixes: _fixes, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,
