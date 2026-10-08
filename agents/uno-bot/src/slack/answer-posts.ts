@@ -23,10 +23,14 @@
 
 import { splitBalanced } from "./split";
 
-// Slack chat.postMessage hard-fails past 40k chars and renders poorly long
-// before that; AGENTS.md tells the model to keep it short, and this is where
-// the Worker enforces it — per message now, not per answer.
-export const MAX_POST_CHARS = 3900;
+// One part is one `markdown` block, which Slack caps at 12,000 characters —
+// and the streamed part's `markdown_text` at the same — so a part is held to
+// that with headroom. The 3,900 it was until #962 was the `section` path's
+// size, and split a 17,600-character answer into seven parts where two fit.
+// The `section` fallback is unaffected: `textSections` cuts a part into
+// ≤2,900-character sections of its own. AGENTS.md tells the model to keep it
+// short; this is where the Worker enforces it, per message, not per answer.
+export const MAX_POST_CHARS = 11_000;
 
 // Headroom for the `_(10/10)_` marker line a continuation carries, reserved
 // before the split so a numbered piece cannot end up over the limit.

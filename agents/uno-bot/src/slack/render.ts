@@ -12,7 +12,7 @@
 import { toSlackMrkdwn } from "./mrkdwn";
 import { splitBalanced } from "./split";
 
-// A section's text field caps at 3000 chars, below the 3,900 a single message
+// A section's text field caps at 3000 chars, below the 11,000 a single message
 // is held to — so even one message's worth of body can overflow one block.
 const SECTION_CHARS = 2900;
 

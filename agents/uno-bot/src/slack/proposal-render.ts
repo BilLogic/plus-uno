@@ -342,8 +342,8 @@ const MAX_BLOCKS = 50;
 const SECTION_LIMIT = 3000;
 const MESSAGE_TEXT_LIMIT = 40000;
 
-/** What one follow-up message is packed to — under the ~3,900 a single message
- *  is held to elsewhere, so a chunk always posts as one message. */
+/** What one follow-up message is packed to, so a chunk always posts as one
+ *  message. Its own ceiling, not the answer path's `MAX_POST_CHARS`. */
 const FOLLOW_UP_CHARS = 3500;
 
 /** How much of a replacement's text a plan line echoes, either side of the →. */

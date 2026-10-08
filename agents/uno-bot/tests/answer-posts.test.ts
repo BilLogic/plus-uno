@@ -34,14 +34,14 @@ describe("a short answer", () => {
   });
 });
 
-describe("a 10,000-character answer", () => {
-  const source = paragraphs(50, 200);
+describe("a 20,000-character answer", () => {
+  const source = paragraphs(100, 200);
   const body = source.join("\n\n");
   const messages = answerMessages(body);
 
   it("becomes several messages", () => {
-    assert.ok(body.length > 10_000, `body was ${body.length} chars`);
-    assert.ok(messages.length > 1, "a 10k body posted as one message");
+    assert.ok(body.length > 20_000, `body was ${body.length} chars`);
+    assert.ok(messages.length > 1, "a 20k body posted as one message");
   });
 
   it("keeps every message under the limit", () => {
@@ -69,6 +69,16 @@ describe("a 10,000-character answer", () => {
       const holders = messages.filter((m) => m.includes(paragraph));
       assert.equal(holders.length, 1, `paragraph ${JSON.stringify(paragraph.slice(0, 24))} was cut`);
     }
+  });
+});
+
+describe("the part size", () => {
+  it("fits a part in one markdown block: a 17,600-character answer is two parts, not seven", () => {
+    const body = paragraphs(88, 200).join("\n\n");
+    assert.ok(body.length > 17_500, `body was ${body.length} chars`);
+    const messages = answerMessages(body);
+    assert.equal(messages.length, 2);
+    for (const m of messages) assert.ok(m.length <= 12_000, `a part of ${m.length} chars overflows the markdown block`);
   });
 });
 
