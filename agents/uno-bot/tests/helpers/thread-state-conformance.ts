@@ -1047,15 +1047,16 @@ export function runThreadStateConformance(
 
   // A stated card's own words ride the two answers whose generic wording is
   // wrong on it — "ask me again", "the newest :warning: card" — so the gate
-  // can say them instead (`PendingProposal.stated`).
+  // can say them instead (`PendingProposal.stated`). Every card's posted text
+  // rides them too, so the gate's note can be edited onto the card itself.
   it("a stated card's words ride its superseded and expired answers", async () => {
     const { store, clock } = setup();
     const stated = { cancelled: "Intake only", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
     clock.advance(LONG_TTL_MS + HOUR_MS);
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?" });
   });
 
   it("a retired stated card carries its words, and a turn's card answers as it always has", async () => {
@@ -1063,13 +1064,13 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", stated }));
     await store.retireProposal("1700.2");
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
     await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
     await store.retireProposal("1700.4");
-    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded" });
+    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?" });
     await store.putProposal(proposal({ proposalTs: "1700.6", threadTs: "1700.5" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
-    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired" });
+    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?" });
   });
 
   it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {

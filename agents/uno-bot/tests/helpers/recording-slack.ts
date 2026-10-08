@@ -74,6 +74,7 @@ export type SlackCall =
       threadTs?: string;
       userMsgTs: string;
       stage: DeliveryFailureStage;
+      ask?: string;
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "tasks"; channel: string; ts: string; tasks: PlanTask[] }
@@ -311,6 +312,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         ...(input.threadTs === undefined ? {} : { threadTs: input.threadTs }),
         userMsgTs: input.userMsgTs,
         stage: input.stage,
+        ...(input.ask === undefined ? {} : { ask: input.ask }),
       });
     },
     async startStream(channel, threadTs, userId, team) {

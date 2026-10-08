@@ -6,7 +6,7 @@ import { engagesOnSweepCard, isSweepCardPost } from "../sweep/cards";
 import { isSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
-import { buildFailureMessage } from "./failure-message";
+import { failureMessage } from "./failure-message";
 import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
 import { handleSessionStopped } from "./stop-envelope";
 import { handleAppHomeOpened } from "./home";
@@ -252,17 +252,21 @@ async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent, reply?:
     return await onMessage(env, msg, reply);
   } catch (err) {
     console.error(`[slack] onMessage failed: ${err instanceof Error ? err.message : String(err)}`);
+    // This is the outermost catch, so it genuinely knows the least: the
+    // "internal" stage promises correspondingly little. The named stages
+    // (context / agent / delivery) are raised at their own call sites. It
+    // still holds the question, so Try again is offered.
+    const failure = failureMessage({
+      stage: "internal",
+      capacity: isCapacityError(err),
+      alertChannel: env.UNO_BOT_ALERT_CHANNEL,
+      ...(msg.text ? { ask: msg.text } : {}),
+    });
     await postMessage(env, {
       channel: msg.channel,
       thread_ts: replyThreadTs(msg),
-      // This is the outermost catch, so it genuinely knows the least: the
-      // "internal" stage promises correspondingly little. The named stages
-      // (context / agent / delivery) are raised at their own call sites.
-      text: buildFailureMessage({
-        stage: "internal",
-        capacity: isCapacityError(err),
-        alertChannel: env.UNO_BOT_ALERT_CHANNEL,
-      }),
+      text: failure.text,
+      blocks: failure.blocks,
     }).catch(() => {});
     return "handled";
   }

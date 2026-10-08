@@ -131,8 +131,8 @@ function slackClientFor(env: Env): SlackDeliveryClient {
         ...(presentation ? { presentation } : {}),
         ...(feedback ? { feedback } : {}),
       }),
-    postFailure: ({ channel, threadTs, userMsgTs, stage, err }) =>
-      postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage),
+    postFailure: ({ channel, threadTs, userMsgTs, stage, err, ask }) =>
+      postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage, ask),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team, "plan"),
     async appendTasks(channel, ts, tasks) {

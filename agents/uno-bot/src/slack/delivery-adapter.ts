@@ -73,7 +73,7 @@ import { SLACK_TS, turnIdOf } from "../usage/record";
 import type { SlackMessageMetadata } from "./api";
 import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
-import { renderGateNote } from "./gate-note";
+import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
 import { planBlock } from "./plan-block";
 import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
@@ -262,6 +262,8 @@ export interface SlackDeliveryClient {
     userMsgTs: string;
     stage: DeliveryFailureStage;
     err?: unknown;
+    /** The question, offered back as Try again. */
+    ask?: string;
   }): Promise<void>;
   /** Open a plan-mode stream, or report that none opened. */
   startStream(
@@ -1082,7 +1084,26 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // A gate verdict is spelled HERE and nowhere else (#623): every
     // `:hourglass:`, the one `<@user>`, and the line that points at the live
     // card. Gate hands over which verdict it is; `slack/gate-note.ts` says it.
-    postGateNote: (note) => postNote(renderGateNote(note)),
+    //
+    // A note about a card's own state is edited onto that card instead: its
+    // words as posted, the note as its last line, and Review while it can
+    // still be decided or View once it cannot. An edit Slack refuses posts the
+    // note in the thread as before, so the person is never left with silence.
+    async postGateNote(note, card) {
+      if (!card) return postNote(renderGateNote(note));
+      const line = renderCardNote(note);
+      const updated = await slack
+        .updateMessage({
+          channel,
+          ts: card.ts,
+          text: card.text,
+          blocks: proposalCardBlocks(card.text, line, cardStaysLive(note) ? "Review" : "View"),
+        })
+        .catch(() => ({ ok: false }));
+      if (updated.ok) return { ok: true, text: line, ts: card.ts };
+      console.warn(`[slack] gate note could not be edited onto ${channel}/${card.ts}; posting it`);
+      return postNote(renderGateNote(note));
+    },
 
     async card(card: ProposalCard): Promise<PostResult> {
       // THE CARD ARRIVES AS DATA and is spelled here (#623): the turn decided
@@ -1125,11 +1146,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       };
     },
 
-    async postFailure(stage: DeliveryFailureStage, err) {
+    async postFailure(stage: DeliveryFailureStage, err, ask) {
       // The checklist is settled by the turn's own `endProgress("error")`
       // before it gets here — a failure message under a step that still claims
       // to be in progress is how the plan stream read after a dead run.
-      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err });
+      await slack.postFailure({ channel, threadTs: replyTs, userMsgTs, stage, err, ...(ask ? { ask } : {}) });
     },
   };
 }

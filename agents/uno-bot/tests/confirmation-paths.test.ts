@@ -332,7 +332,7 @@ describe("a card with a confirmer set", () => {
       assert.equal(verdict.execute, undefined, door.name);
       assert.deepEqual(
         verdict.post,
-        { note: { kind: "not-a-confirmer", confirmers: [OWNER], userId: OUTSIDER }, replyTs: THREAD },
+        { note: { kind: "not-a-confirmer", confirmers: [OWNER], userId: OUTSIDER }, replyTs: THREAD, card: { ts: CARD_TS, text: PROPOSAL.proposalText } },
         door.name,
       );
       assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found", door.name);
@@ -1130,10 +1130,20 @@ describe("the button door", () => {
   it("answers a press from outside the confirmer set with who can confirm, and keeps the card", async () => {
     const threadState = createInMemoryThreadState();
     await threadState.putProposal({ ...PROPOSAL, confirmers: ["U7"] });
-    const { ephemerals, replacements, ran } = await drive({ threadState, userId: "U2" });
-    assert.deepEqual(ephemerals, [
-      renderGateNote({ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }),
-    ]);
+    const { delivery, ephemerals, replacements, ran } = await drive({ threadState, userId: "U2" });
+    // The card is waiting on someone else, so the line goes on the card.
+    assert.deepEqual(
+      delivery.calls.filter((c) => c.kind === "gate-note"),
+      [
+        {
+          kind: "gate-note",
+          note: { kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" },
+          card: { ts: CARD_TS, text: PROPOSAL.proposalText },
+        },
+      ],
+    );
+    assert.deepEqual(delivery.posted, [], "and no message");
+    assert.deepEqual(ephemerals, []);
     assert.deepEqual(ran, []);
     assert.deepEqual(replacements, []);
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
@@ -1252,12 +1262,19 @@ describe("a stated card answers in its own words", () => {
     assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS, words: WORDS.expired });
     assert.equal(renderGateNote(verdict.post!.note), WORDS.expired);
 
-    // Through the button door it is said to the presser alone, and nothing runs.
+    // Through the button door it is said on the card itself, nothing is
+    // posted, and nothing runs.
     clock = 1_000_000;
     const pressed = await stagedStated(STATED, at);
     clock += 73 * HOUR_MS;
-    const { ephemerals, notes } = await press(pressed, "confirm");
-    assert.deepEqual(ephemerals, [WORDS.expired]);
+    const { delivery, ephemerals, notes } = await press(pressed, "confirm");
+    assert.deepEqual(
+      delivery.calls.filter((c) => c.kind === "gate-note").map((c) => c.kind === "gate-note" && c.card?.ts),
+      [CARD_TS],
+    );
+    assert.equal(renderGateNote(delivery.gateNotes[0]!), WORDS.expired);
+    assert.deepEqual(delivery.posted, []);
+    assert.deepEqual(ephemerals, []);
     assert.deepEqual(notes, []);
   });
 

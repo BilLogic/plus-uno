@@ -26,6 +26,7 @@ import {
   cutOffTakeable,
   ownTtl,
   ownWords,
+  ownText,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
@@ -195,12 +196,12 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       if (!rec) return { state: "none" };
       // A live successor beats the TTL — the ordering, and the third card it
       // stops the person from asking for, are in `ProposalLookup`.
-      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal) };
+      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
         proposals.delete(proposalTs);
-        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal) };
+        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal) };
+      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
       return { state: "found", proposal: rec.proposal, createdAt: rec.createdAt };
     },
 

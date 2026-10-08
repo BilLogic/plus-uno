@@ -805,7 +805,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
     ...delivery,
     postAnswer: (text, presentation) => noted(delivery.postAnswer(text, presentation)),
     postNote: (text, tag) => noted(delivery.postNote(text, tag)),
-    postGateNote: (note) => noted(delivery.postGateNote(note)),
+    postGateNote: (note, card) => noted(delivery.postGateNote(note, card)),
     card: (proposal) => noted(delivery.card(proposal)),
   };
 }
@@ -1183,7 +1183,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // Close the progress surface before the failure message, or the checklist
     // sits open above it forever, still claiming a step is in progress.
     await delivery.endProgress("error");
-    await delivery.postFailure("agent", err);
+    await delivery.postFailure("agent", err, request.text);
     telemetry.interim = interimCount;
     return {
       disposition: "failed",
@@ -1725,7 +1725,7 @@ async function settleVerdict(
   },
 ): Promise<TurnOutcome> {
   const said = verdict.post
-    ? await ctx.deps.delivery.postGateNote(verdict.post.note)
+    ? await ctx.deps.delivery.postGateNote(verdict.post.note, verdict.post.card)
     : undefined;
   const posted = said?.text;
   const executed = await ctx.deps.applyVerdict(verdict);
@@ -2014,7 +2014,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   if (!posted.ok) {
     // Never post a completion signal for a reply that was never delivered.
     console.error("[turn] reply delivery failed after retry");
-    await delivery.postFailure("delivery");
+    await delivery.postFailure("delivery", undefined, request.text);
     return {
       disposition: "failed",
       failure: { stage: "delivery" },

@@ -52,6 +52,8 @@ import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
 import { TRY_ASKING_ACTION_PREFIX, runTryAskingDoor } from "./try-asking";
+import { runTryAgainDoor } from "./try-again";
+import { TRY_AGAIN_ACTION_ID } from "./failure-message";
 import { handleReminderButton } from "./gate";
 import { REMINDER_ACTION_PREFIX } from "../commitments/copy";
 import { FEEDBACK_ACTION_ID, FEEDBACK_VIEW_CALLBACK_ID, feedbackAckFor, type FeedbackViewState } from "./feedback";
@@ -162,6 +164,7 @@ export function handleInteraction(
 async function dispatchAction(env: Env, actionId: string, payload: InteractionPayload): Promise<void> {
   if (actionId === "uno_stop_run") return stopRun(env, payload);
   if (actionId.startsWith(TRY_ASKING_ACTION_PREFIX)) return tryAsking(env, payload);
+  if (actionId === TRY_AGAIN_ACTION_ID) return tryAgain(env, payload);
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
@@ -382,6 +385,30 @@ async function stopRun(env: Env, payload: InteractionPayload): Promise<void> {
 // them (`try-asking.ts`).
 //
 // `Env` enters here and stops here.
+// A failure's Try again button: the question asked again in the failure's
+// thread, as the presser (`try-again.ts`).
+//
+// `Env` enters here and stops here.
+async function tryAgain(env: Env, payload: InteractionPayload): Promise<void> {
+  const userId = payload.user?.id;
+  const channel = payload.channel?.id;
+  const messageTs = payload.message?.ts;
+  if (!userId || !channel || !messageTs) return;
+  await runTryAgainDoor(
+    {
+      userId,
+      channel,
+      messageTs,
+      ...(payload.message?.thread_ts ? { threadTs: payload.message.thread_ts } : {}),
+      value: payload.actions?.[0]?.value,
+    },
+    {
+      post: async (message) => (await postMessage(env, message))?.ts ?? null,
+      enqueue: (event) => enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event)),
+    },
+  );
+}
+
 async function tryAsking(env: Env, payload: InteractionPayload): Promise<void> {
   const userId = payload.user?.id;
   if (!userId) return;

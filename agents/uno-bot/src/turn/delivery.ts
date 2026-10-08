@@ -357,6 +357,14 @@ export type GateNote =
       mention?: string;
     };
 
+/** The card a gate note is about: its ts, and its posted text, which is what
+ *  it is re-rendered from when the note is edited onto it. Gate's `GateCard`,
+ *  restated in the port's words. */
+export interface NoteCard {
+  ts: string;
+  text: string;
+}
+
 /** What a post actually did. `text` is what was posted, which is not always
  *  what was handed in — the body is stripped and capped on the way out. */
 export interface PostResult {
@@ -471,8 +479,14 @@ export interface Delivery {
    * carries an emoji and one of them a user mention. Handing over the verdict
    * is what lets those lines be spelled once, in the adapter, and asserted as
    * meanings in `tests/confirmation-paths.test.ts`.
+   *
+   * `card` is set when the note is about that card's own state — it aged out,
+   * a revision replaced it, it is waiting on someone else. The note then goes
+   * ON the card, as its last line, and no new message is posted; a surface
+   * that cannot edit the card posts it as before. The result's `ts` is then
+   * the card's.
    */
-  postGateNote(note: GateNote): Promise<PostResult>;
+  postGateNote(note: GateNote, card?: NoteCard): Promise<PostResult>;
 
   /**
    * Stage a proposal card — the agreed hand-over (#623):
@@ -494,8 +508,10 @@ export interface Delivery {
   card(proposal: ProposalCard): Promise<PostResult>;
 
   /** Make a failure visible. Best-effort and never throwing, because the one
-   *  thing worse than an error message is silence. */
-  postFailure(stage: DeliveryFailureStage, err?: unknown): Promise<void>;
+   *  thing worse than an error message is silence. `ask` is the person's
+   *  question when the turn can run again on it: a surface that can offer a
+   *  retry offers it on this. */
+  postFailure(stage: DeliveryFailureStage, err?: unknown, ask?: string): Promise<void>;
 }
 
 // ── The recording adapter ────────────────────────────────────────────────────
@@ -512,9 +528,9 @@ export type DeliveryCall =
   | { kind: "toolProgress"; event: ToolProgressEvent }
   | { kind: "answer"; text: string; presentation?: Presentation }
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
-  | { kind: "gate-note"; note: GateNote }
+  | { kind: "gate-note"; note: GateNote; card?: NoteCard }
   | { kind: "proposal"; card: ProposalCard }
-  | { kind: "failure"; stage: DeliveryFailureStage; message?: string };
+  | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
 
 export interface RecordingDelivery extends Delivery {
   /** Everything the turn did, in order. */
@@ -650,11 +666,13 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts: `note-${calls.length}` };
     },
 
-    async postGateNote(note) {
-      calls.push({ kind: "gate-note", note });
+    async postGateNote(note, card) {
+      calls.push({ kind: "gate-note", note, ...(card ? { card } : {}) });
       gateNotes.push(note);
       const text = spelling.gateNote(note);
       if (opts.noteFails) return { ok: false, text };
+      // A note edited onto its card is not a post: the thread gains nothing.
+      if (card) return { ok: true, text, ts: card.ts };
       posted.push(text);
       return { ok: true, text, ts: `note-${calls.length}` };
     },
@@ -677,11 +695,12 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts };
     },
 
-    async postFailure(stage, err) {
+    async postFailure(stage, err, ask) {
       calls.push({
         kind: "failure",
         stage,
         ...(err === undefined ? {} : { message: err instanceof Error ? err.message : String(err) }),
+        ...(ask === undefined ? {} : { ask }),
       });
     },
   };

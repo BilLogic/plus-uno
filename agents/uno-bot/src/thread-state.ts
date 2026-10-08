@@ -58,6 +58,7 @@ import {
   cutOffTakeable,
   ownTtl,
   ownWords,
+  ownText,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
@@ -367,13 +368,13 @@ export class ThreadState extends DurableObject<Env> {
     if (!rec) return { state: "none" };
     const proposal = (rec.payload as PendingProposal | null) ?? {};
     if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at))) {
-      return { state: "superseded", ...ownWords(proposal) };
+      return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
     }
     if (at - rec.createdAt > recordTtlMs(rec)) {
       await this.storage.delete(proposalKey(proposalTs));
-      return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal) };
+      return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal) };
     }
-    if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal) };
+    if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
     return {
       state: "found",
       proposal: rec.payload as PendingProposal,

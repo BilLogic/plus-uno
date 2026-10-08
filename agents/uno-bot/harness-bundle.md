@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,698 chars from 16 files**, against an assembled budget of 175,500 (7,802 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 147,314 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,996 chars from 16 files**, against an assembled budget of 175,500 (7,504 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 147,612 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,599 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,995 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,411 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 28,936 (−6,098 ide-only) | 143,389 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 146,673 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,189 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 157,852 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 167,698 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 29,234 (−6,098 ide-only) | 143,687 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 146,971 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,487 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 158,150 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 167,996 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -965,7 +965,7 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): a card with one Review button, whose pop-up ends in Approve · Needs changes · Reject (Needs changes requires a note and becomes a revision turn that supersedes the card; Reject takes an optional reason); a decided card shows its outcome and View. A ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, still approves or cancels, unadvertised; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake — as does a card nobody decides. A library edited but not published posts with no card.
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): a card with one Review button, whose pop-up ends in Approve · Needs changes · Reject (Needs changes requires a note and becomes a revision turn that supersedes the card; Reject takes an optional reason); a decided card shows its outcome and View. A ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, still approves or cancels, unadvertised; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. Both answers, and a refusal that names who can confirm, are one line edited onto the card itself rather than a new message. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake — as does a card nobody decides. A library edited but not published posts with no card.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
@@ -1135,7 +1135,7 @@ Uses the model's default voice for chat; the bot's specific register lives in `a
 - **Glanceable, not paragraphs.** `**Bold label**` lines in place of `#` headings, `-` bullets two levels deep at most, and a table for any grid of three or more rows.
 - **Summarize, link the artifact** — the link sits on the name of the thing (`[the Roadmap card](url)`); steps are summarized, not transcribed.
 - **Human, contraction-y, low ceremony.** Brief and clear over formal; no jokes that don't serve the task.
-- **A failure says what did not change and names one next step** (retry, adjust or escalate) — a bare "something went wrong" helps nobody.
+- **A failure says what did not change and names one next step** (retry, adjust or escalate) — a bare "something went wrong" helps nobody. The Worker's own failure post is that shape in blocks: a bold progress line with the next step, a ⚠️ line, and a Try again button that asks the question again as the person.
 - **Confirm before real-world side-effects** (the proposal gate) — but gate only genuinely risky ops; no confirmation fatigue.
 - **On behalf of** — acting for a person, say so, and surface what was done + a link.
 - **A post in a channel** — top level rather than a thread reply — is a summary plus a link; the detail goes in its thread or on the linked page.

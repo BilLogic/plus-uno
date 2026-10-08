@@ -132,7 +132,23 @@ export async function applyPressVerdict(
 
   if (verdict.outcome !== "won") {
     // Expired, already resolved, or a press that lost the race. Never silence.
-    if (verdict.post) await deps.replyEphemeral(renderGateNote(verdict.post.note));
+    // A note about the card's own state — aged out, replaced, waiting on
+    // someone else — goes on the card, where the person pressed; anything
+    // else is answered aside, and so is an edit Slack would not take.
+    const post = verdict.post;
+    if (!post) return;
+    if (post.card) {
+      const said = await deps
+        .delivery({
+          channel: request.channel,
+          replyTs: post.replyTs,
+          userMsgTs: verdict.proposal?.userMsgTs ?? request.messageTs,
+          userId: request.userId,
+        })
+        .postGateNote(post.note, post.card);
+      if (said.ok) return;
+    }
+    await deps.replyEphemeral(renderGateNote(post.note));
     return;
   }
 
