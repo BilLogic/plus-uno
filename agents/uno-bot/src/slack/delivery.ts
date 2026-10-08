@@ -375,12 +375,19 @@ export async function postTextVerified(
       let stopped = false;
       try {
         const appended = await deps.slack.appendStream(channel, streamTs, piece);
-        // No feedback buttons on a streamed answer: blocks in a stream's stop
-        // are proven for the marker and the footer only, and a refused stop
-        // re-posts the whole answer.
+        // The feedback buttons ride the stop on the last part, at its very
+        // end. The marker and the footer are the blocks a stop is proven for;
+        // the buttons are not, so a stop that refuses them stops again
+        // without them — a refused stop would otherwise fall through to
+        // posting the whole answer a second time beneath the stream.
         const closing = [...markerBlocks(marker), ...(withFooter ? footer : [])];
         const blocks = closing.length ? closing : undefined;
-        stopped = await deps.slack.stopStream(channel, streamTs, blocks);
+        const voting = withFooter && feedback.length > 0;
+        stopped = await deps.slack.stopStream(channel, streamTs, voting ? [...closing, ...feedback] : blocks);
+        if (!stopped && voting) {
+          console.warn("[slack] feedback buttons refused on the stream's stop; stopping without them");
+          stopped = await deps.slack.stopStream(channel, streamTs, blocks);
+        }
         if (appended && stopped) return true;
         console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
         if (!stopped) await deps.slack.stopStream(channel, streamTs).catch(() => {});
