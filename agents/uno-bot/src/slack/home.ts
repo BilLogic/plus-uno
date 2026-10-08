@@ -30,7 +30,7 @@ import { dmWatchHomeStateFor } from "../dm-watch/env";
 // action a new user can take that changes what I can answer, so it sits high
 // rather than below three screens of capability copy (it used to be last).
 const HOME_INTRO = [
-  { type: "header", text: { type: "plain_text", text: "UNO Bot 🐐", emoji: true } },
+  { type: "header", text: { type: "plain_text", text: "le goat 🐐", emoji: true } },
   {
     type: "section",
     text: {
@@ -50,7 +50,7 @@ const HOME_BODY = [
         type: "mrkdwn",
         text:
           "• *Answer, grounded* — Roadmap card status / owner / pillar, how a product flow works, design-system components & tokens, and any linked Notion, Figma, or Slack doc\n" +
-          "• *Create — with your :white_check_mark:* — draft a PRD, file or update a card, kick off a component build or prototype, share work for feedback\n" +
+          "• *Create — with your approval* — draft a PRD, file or update a card, kick off a component build or prototype, share work for feedback\n" +
           "• *Hand off* — anything that needs real code, I write a ready-to-paste prompt for your IDE agent (Claude Code, Cursor, Codex, Antigravity)",
       },
     },
@@ -62,7 +62,7 @@ const HOME_BODY = [
         type: "mrkdwn",
         text:
           "• *DM me* — right here in the *Messages* tab ↑. It's an ordinary chat: no threads to start, just keep talking\n" +
-          "• *In a channel* — `@UNO Bot` your question; I'll answer in a thread\n" +
+          "• *In a channel* — `@le goat` your question; I'll answer in a thread\n" +
           "• *In a thread* — once I'm in, just reply; no need to re-tag. Or right-click any message → *More actions* for the shortcuts\n" +
           "• *Slash commands* — `/uno-research`, `/uno-synthesize`, `/uno-prototype`, `/uno-review`, `/uno-publish`, `/uno-maintain`\n" +
           "• *Change the effort* — `/grind` runs it on the deep model, `/chill` keeps it short and cheap",
@@ -84,7 +84,7 @@ const HOME_BODY = [
         {
           type: "button",
           style: "danger",
-          text: { type: "plain_text", text: "✋ Stop what I'm running", emoji: true },
+          text: { type: "plain_text", text: "Stop what I'm running" },
           action_id: "uno_stop_run",
           value: "stop",
         },
@@ -118,17 +118,17 @@ const HOME_BODY = [
       elements: [
         {
           type: "button",
-          text: { type: "plain_text", text: "📚 Storybook", emoji: true },
+          text: { type: "plain_text", text: "Storybook" },
           url: "https://plus-uno.netlify.app/storybook/",
         },
         {
           type: "button",
-          text: { type: "plain_text", text: "🗺️ Service blueprint", emoji: true },
+          text: { type: "plain_text", text: "Service blueprint" },
           url: "https://plus-uno.netlify.app/blueprint/",
         },
         {
           type: "button",
-          text: { type: "plain_text", text: "💻 Repo", emoji: true },
+          text: { type: "plain_text", text: "Repo" },
           url: "https://github.com/BilLogic/plus-uno",
         },
       ],
@@ -139,7 +139,7 @@ const HOME_BODY = [
         {
           type: "mrkdwn",
           text:
-            "Reads are free and instant. Anything I'd create or change in Notion or GitHub always waits for your :white_check_mark: first — the friction is the feature.",
+            "Reads are free and instant. Anything I'd create or change in Notion or GitHub always waits for your approval first — the friction is the feature.",
         },
       ],
     },
@@ -168,7 +168,7 @@ const connectBlocks = (url: string) => [
       {
         type: "button",
         style: "primary",
-        text: { type: "plain_text", text: "🔗 Link your Slack", emoji: true },
+        text: { type: "plain_text", text: "Link your Slack" },
         url,
       },
     ],

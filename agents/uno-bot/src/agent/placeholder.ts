@@ -142,12 +142,12 @@ export function placeholderRefusal(
   const surface = notionSurfaceName(input);
   const title = typeof input.title === "string" ? input.title.trim() : "";
   if (!title) {
-    return `:memo: That ${surface} has no *title* yet. Give me a one-liner and I'll stage it.`;
+    return `That ${surface} has no *title* yet. Give me a one-liner and I'll stage it.`;
   }
   const hit = findPlaceholder(notionCreateFields(input), sourceTextOf(input));
   if (!hit) return null;
   return (
-    `:memo: I won't file that ${surface} yet — the *${hit.field}* is still a placeholder (\`${hit.text}\`). ` +
+    `I won't file that ${surface} yet — the *${hit.field}* is still a placeholder (\`${hit.text}\`). ` +
     "Send me the real wording for that one and I'll stage it."
   );
 }

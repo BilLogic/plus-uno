@@ -227,7 +227,7 @@ export function sessionTitle(text: string): string {
     .replace(/['\u2019]/g, "")
     .replace(/[^\p{L}\p{N}_-]+/gu, " ")
     .trim();
-  if (!/[\p{L}\p{N}]/u.test(words)) return "Chat with UNO Bot";
+  if (!/[\p{L}\p{N}]/u.test(words)) return "Chat with le goat";
   if (words.length <= SESSION_TITLE_MAX) return words;
   const cut = words.slice(0, SESSION_TITLE_MAX + 1);
   const brk = cut.lastIndexOf(" ");
@@ -251,10 +251,10 @@ export function formatAssistantContext(ctx: AssistantContext | null | undefined)
 // A panel opened: greet once, offer the starter chips, name the thread. The
 // welcome is protocol (like the Worker's own 👀/⏳ posts), not the model
 // talking — so it's a fixed line, kept to one breath, and the chips do the rest.
-const WELCOME =
-  "Hey — I'm UNO Bot :goat:. Ask me about Roadmap cards, how a product flow works, " +
+export const WELCOME =
+  "Hey — I'm le goat :goat:. Ask me about Roadmap cards, how a product flow works, " +
   "or design-system components — or drop a Notion/Figma link and I'll dig in. " +
-  "Anything I'd create or change in Notion or GitHub waits for your :white_check_mark: first.";
+  "Anything I'd create or change in Notion or GitHub waits for your approval first.";
 
 // First-contact onboarding (ADR-020): when the panel opens for someone who
 // hasn't connected their own Slack history, the welcome carries the one-tap

@@ -106,7 +106,7 @@ async function alertCapacity(deps: PostingDeps, err: unknown): Promise<void> {
       .postMessage({
         channel: deps.alertChannel,
         text:
-          ":rotating_light: uno-bot replies are failing on model *capacity/quota* — users are getting errors until this clears.\n" +
+          ":warning: le goat's replies are failing on model *capacity/quota* — users are getting errors until this clears.\n" +
           `> ${snippet}\n` +
           "Check GCP Console → IAM & Admin → Quotas (filter *Vertex AI* + the active model), or point `GEMINI_MODEL` at a model with headroom.",
       })

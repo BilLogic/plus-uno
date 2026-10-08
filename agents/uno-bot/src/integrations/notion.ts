@@ -14,6 +14,7 @@
 
 import type { Env } from "../types";
 import { countedFetch, subrequestBudgetSpent, rethrowIfBudget } from "../net";
+import { attributionBlock } from "./notion-attribution";
 import { isPlainRichText, RICH_TEXT_TYPES, richTextLinks, type RichTextRun } from "./notion-rich-text";
 import {
   chunkBlocks,
@@ -1161,6 +1162,9 @@ export interface NotionCreateInput {
   roadmapCard?: string;
   /** Decisions DB: Status select — Proposed | Accepted | Rejected | Superseded. */
   decisionStatus?: string;
+  /** Whom the page is written for: its body opens with the attribution line
+   *  naming them (`notion-attribution.ts`). */
+  onBehalfOf?: string;
 }
 
 interface SurfacePlan {
@@ -1265,6 +1269,7 @@ export async function notionCreate(
     acceptanceCriteria: isPrdShaped ? input.acceptanceCriteria : undefined,
     sourceUrl: input.sourceUrl,
   });
+  if (input.onBehalfOf?.trim()) children.unshift(attributionBlock(input.onBehalfOf.trim()));
 
   // Notion accepts at most 100 blocks per request. A long PRD — summary, eight
   // sections of several paragraphs each, acceptance criteria, plus the two
@@ -1478,6 +1483,10 @@ export interface NotionUpdateInput {
   replace?: NotionBlockReplacement[];
   /** New blocks placed right after a named block, on the same stamp check. */
   insert?: NotionBlockInsertion[];
+  /** Whom the append is written for: the appended blocks open with the
+   *  attribution line naming them. A replace, an insert and a property change
+   *  carry no line — they edit what is already there. */
+  onBehalfOf?: string;
 }
 
 /**
@@ -1977,6 +1986,7 @@ export async function notionUpdate(
       if (s.body?.trim()) children.push(...bodyToBlocks(s.body));
     }
     if (input.append?.text?.trim()) children.push(...bodyToBlocks(input.append.text));
+    if (children.length && input.onBehalfOf?.trim()) children.unshift(attributionBlock(input.onBehalfOf.trim()));
     // Batched at Notion's 100-block-per-request limit. `appended` counts what
     // actually landed, so a partial failure reports the truth rather than the
     // total we hoped for.
