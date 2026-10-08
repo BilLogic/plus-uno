@@ -114,6 +114,60 @@ describe("the card offers Review", () => {
     assert.doesNotMatch(card.text, /white_check_mark|no_entry|✅|⛔/);
   });
 
+  it("is short in the thread: a summary, the body's size, the LLM line and Review; the draft rides in the text", () => {
+    const body = "Problem: tutors read goal cycles differently. ".repeat(14).trim();
+    const card = renderProposalCard({
+      kind: "confirm",
+      verb: "create a Notion page",
+      fields: [
+        { label: "title", value: "Goal cycle resets per session" },
+        { label: "database", value: "Roadmap" },
+        { label: "properties", under: [{ field: { label: "product_pillar", value: "Toolkit" } }, { field: { label: "design_status", value: "Need PRD" } }] },
+        { label: "body", value: body },
+      ],
+      caveats: [],
+      operations: [],
+    });
+    const blocks = (card.blocks ?? proposalCardBlocks(card.text)) as CardBlock[];
+    const words = blocks.map((b) => JSON.stringify(b));
+
+    assert.equal(blocks[0]!.type, "section");
+    assert.match(words[0]!, /:warning: Ready to \*create a Notion page\*: _Goal cycle resets per session_ · Roadmap · Toolkit · Need PRD/);
+    assert.match(words[1]!, new RegExp(`Body ${body.length} characters · review before approving`));
+    assert.match(words[2]!, /LLM-written · check before acting/);
+    assert.deepEqual(cardButtons(blocks), ["Review"]);
+    assert.equal(blocks.length, 4);
+    assert.doesNotMatch(words.join(""), /Problem: tutors/, "the draft lives in the pop-up");
+    // Notifications, history and the model reading it back get the whole draft.
+    assert.ok(card.text.includes(body));
+  });
+
+  it("keeps a stated card whole", () => {
+    const text = "The library published 3 changes.\n\n:white_check_mark: files the intake; :no_entry: files nothing.";
+    const blocks = proposalCardBlocks(text) as CardBlock[];
+    assert.match(JSON.stringify(blocks[0]), /The library published 3 changes/);
+    assert.doesNotMatch(JSON.stringify(blocks), /Ready to|LLM-written/);
+  });
+
+  it("stays short once decided, with the outcome and View", () => {
+    const card = renderProposalCard({
+      kind: "confirm",
+      verb: "file a GitHub issue",
+      fields: [
+        { label: "title", value: "Badge colour drift" },
+        { label: "body", value: "The warning badge differs between code and Figma." },
+      ],
+      caveats: [],
+      operations: [],
+    });
+    const blocks = proposalCardBlocks(card.text, ":white_check_mark: Approved by <@U2>") as CardBlock[];
+    const words = JSON.stringify(blocks);
+    assert.match(words, /Ready to \*file a GitHub issue\*: _Badge colour drift_/);
+    assert.match(words, /Approved by <@U2>/);
+    assert.doesNotMatch(words, /review before approving/);
+    assert.deepEqual(cardButtons(blocks), ["View"]);
+  });
+
   it("keeps a decided card's draft one press away, as View", () => {
     const blocks = proposalCardBlocks("(card)", ":white_check_mark: Approved by <@U2>") as CardBlock[];
     assert.deepEqual(cardButtons(blocks), ["View"]);
