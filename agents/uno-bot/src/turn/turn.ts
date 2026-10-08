@@ -759,14 +759,29 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
  * A card sent back with Needs changes stays locked until its revision
  * replaces it (`ThreadState.markRevising`). The revision is the asker's turn
  * in the card's thread; one that ends without staging it — it failed, or
- * answered instead — unlocks the card, or nothing could ever decide it.
+ * answered instead — unlocks the card, or nothing could ever decide it, and
+ * edits it back to its live form, so it stops saying it is being revised.
  */
-async function unlockRevision(request: TurnRequest, cardLive: boolean, deps: Pick<TurnDeps, "threadState">): Promise<void> {
+async function unlockRevision(
+  request: TurnRequest,
+  cardLive: boolean,
+  deps: Pick<TurnDeps, "threadState" | "delivery">,
+): Promise<void> {
   const pending = request.pending;
   if (!cardLive || !pending?.revising || pending.revising.userId !== request.userId) return;
-  await deps.threadState.clearRevising(pending.proposalTs).catch((err: unknown) => {
+  try {
+    await deps.threadState.clearRevising(pending.proposalTs);
+  } catch (err) {
     console.warn(`[turn] revising mark on ${pending.proposalTs} not cleared: ${err instanceof Error ? err.message : String(err)}`);
-  });
+    return;
+  }
+  await deps.delivery
+    .reopenCard({
+      ts: pending.proposalTs,
+      text: pending.proposalText,
+      ...(pending.proposalBlocks ? { blocks: pending.proposalBlocks } : {}),
+    })
+    .catch(() => {});
 }
 
 /** What a card this turn stages is recorded with (`usage/proposal-events.ts`). */

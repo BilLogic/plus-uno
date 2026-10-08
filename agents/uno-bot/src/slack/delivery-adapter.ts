@@ -1107,6 +1107,13 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       return postNote(renderGateNote(note));
     },
 
+    async reopenCard(card) {
+      const updated = await slack
+        .updateMessage({ channel, ts: card.ts, text: card.text, blocks: card.blocks ?? proposalCardBlocks(card.text) })
+        .catch(() => ({ ok: false }));
+      if (!updated.ok) console.warn(`[slack] card ${channel}/${card.ts} could not be reopened`);
+    },
+
     async card(card: ProposalCard): Promise<PostResult> {
       // THE CARD ARRIVES AS DATA and is spelled here (#623): the turn decided
       // what a person is being asked to approve, and this is where that becomes

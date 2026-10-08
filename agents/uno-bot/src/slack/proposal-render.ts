@@ -261,9 +261,14 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
  *
  * Each change is written where this module wrote the field — its
  * `• *Label:* value` line, labelled from the input key's last segment as
- * `renderField` labels it — and, failing that, where its old value appears
- * exactly once (a plan line naming another operation's title). A value the
- * draft never showed is left to the edit line beside it.
+ * `renderField` labels it — and only where that line's whole value is the old
+ * one: a line that merely starts with it (`Goal` on a card showing `Goal
+ * cycles`) holds another value, and is left alone. The thread's summary is
+ * read off these lines (`shortCardOf`), so it follows the edit. Failing a
+ * line, the old value is replaced where it stands whole exactly once, wrapped
+ * the way a plan line wraps a value (`` `Goal` ``, `*Goal*`), and never
+ * inside a longer value. A value the draft never showed is left to the edit
+ * line beside it.
  *
  * @param text - The card's text as posted
  * @param changes - The pop-up's changes: input key, value before and after
@@ -274,17 +279,38 @@ export function withEditedFields(text: string, changes: ReadonlyArray<{ key: str
     if (!change.from) continue;
     const label = humanizeParamKey(change.key.split(".").at(-1) ?? change.key);
     const line = `• *${label}:* ${change.from}`;
-    const at = out.indexOf(line);
+    const at = wholeLineAt(out, line);
     if (at !== -1) {
       out = `${out.slice(0, at)}• *${label}:* ${change.to}${out.slice(at + line.length)}`;
       continue;
     }
-    const first = out.indexOf(change.from);
-    if (first !== -1 && out.indexOf(change.from, first + 1) === -1) {
-      out = `${out.slice(0, first)}${change.to}${out.slice(first + change.from.length)}`;
-    }
+    const alone = wrappedOnceAt(out, change.from);
+    if (alone !== -1) out = `${out.slice(0, alone)}${change.to}${out.slice(alone + change.from.length)}`;
   }
   return out;
+}
+
+/** Where `line` stands as a whole line of `text` — nothing but indentation
+ *  before it, and its line ending where it does — or -1. */
+function wholeLineAt(text: string, line: string): number {
+  for (let at = text.indexOf(line); at !== -1; at = text.indexOf(line, at + 1)) {
+    const before = text.slice(text.lastIndexOf("\n", at - 1) + 1, at);
+    const after = text[at + line.length];
+    if (/^\s*$/.test(before) && (after === undefined || after === "\n")) return at;
+  }
+  return -1;
+}
+
+/** The marks a plan line wraps a value in, each with its closing mark. */
+const WRAPS: Readonly<Record<string, string>> = { "`": "`", "*": "*", _: "_", '"': '"', "“": "”" };
+
+/** Where `value` appears in `text` exactly once and wrapped whole in one pair
+ *  of `WRAPS`, or -1. */
+function wrappedOnceAt(text: string, value: string): number {
+  const first = text.indexOf(value);
+  if (first === -1 || text.indexOf(value, first + 1) !== -1) return -1;
+  const close = WRAPS[text[first - 1] ?? ""];
+  return close !== undefined && text[first + value.length] === close ? first : -1;
 }
 
 function clip(text: string, max: number): string {

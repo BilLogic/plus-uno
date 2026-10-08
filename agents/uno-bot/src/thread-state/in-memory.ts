@@ -30,6 +30,7 @@ import {
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
+  withLiveMark,
   type Execution,
   type HistoryTurn,
   type PendingProposal,
@@ -195,8 +196,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       const rec = proposals.get(proposalTs);
       if (!rec || rec.retired || rec.supersededBy) return "gone";
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return "gone";
-      if (rec.proposal.revising) return "already";
-      rec.proposal = { ...rec.proposal, revising: { userId } };
+      if (withLiveMark(rec.proposal, now()).revising) return "already";
+      rec.proposal = { ...rec.proposal, revising: { userId, at: now() } };
       return "marked";
     },
 
@@ -218,7 +219,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal) };
       }
       if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
-      return { state: "found", proposal: rec.proposal, createdAt: rec.createdAt };
+      return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt };
     },
 
     async getProposalByThread(ref) {
@@ -232,7 +233,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue; // keyed on the card's thread
         if (!best || rec.createdAt > best.createdAt) best = rec;
       }
-      return best?.proposal ?? null;
+      return best ? withLiveMark(best.proposal, now()) : null;
     },
 
     async getProposalsByChannel(channel) {
@@ -241,7 +242,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         .filter((rec) => !rec.supersededBy && !rec.retired)
         .filter((rec) => rec.proposal.channel === channel)
         .sort((a, b) => b.createdAt - a.createdAt)
-        .map((rec) => rec.proposal);
+        .map((rec) => withLiveMark(rec.proposal, now()));
     },
 
     // The delete IS the claim — see the interface. Nothing is awaited between
@@ -256,7 +257,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async claimProposal(proposalTs) {
       const rec = proposals.get(proposalTs);
       // A card being revised is refused too: its revision is on the way.
-      if (!rec || rec.retired || rec.supersededBy || rec.proposal.revising) return false;
+      if (!rec || rec.retired || rec.supersededBy || withLiveMark(rec.proposal, now()).revising) return false;
       return proposals.delete(proposalTs);
     },
 

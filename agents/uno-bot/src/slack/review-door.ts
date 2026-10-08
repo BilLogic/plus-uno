@@ -32,8 +32,9 @@
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { Delivery } from "../turn/index";
 import { lookAtProposal, resolveSignal, type GateRestage, type GateVerdict, type ReviewDecision } from "../gate/index";
-import { applyPressVerdict, decidedCard, type ButtonDoorTarget, type CardMessage } from "./button-door";
+import { applyPressVerdict, decidedCard, liveCard, type ButtonDoorTarget, type CardMessage } from "./button-door";
 import { renderGateNote } from "./gate-note";
+import { escapeSlackText } from "./mrkdwn";
 import { withEditedFields } from "./proposal-render";
 import {
   alertBlock,
@@ -54,6 +55,7 @@ import {
   reviewFields,
   stateValues,
   FIELD_BLOCK_PREFIX,
+  type EditableField,
   type ReadOptions,
   type FieldChange,
   type ReviewViewState,
@@ -123,6 +125,10 @@ export interface ReviewDecisionRequest {
   /** The pop-up's state from the press (`view.state.values`): the fields as
    *  the person left them. Absent, the card runs as staged. */
   state?: ReviewViewState;
+  /** The fields the pop-up offered, read back off its blocks
+   *  (`fieldsFromBlocks`), each with the draft value it opened with. Present,
+   *  Approve reads the card and the options only for what `state` changed. */
+  fields?: readonly EditableField[];
 }
 
 /** Open the pop-up on a card: loading first, then the draft or why there is
@@ -140,7 +146,10 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
   });
   console.log(`[review] opened ${request.channel}/${request.messageTs} by=${request.userId} state=${look.state}`);
   const view =
-    look.state === "live"
+    look.state === "live" && look.proposal.revising
+      ? // Sent back with Needs changes: the revised card is the one to decide.
+        noticeView(card, "This proposal is being revised. Decide on the revised card when it posts in the thread.")
+      : look.state === "live"
       ? draftView(
           card,
           look.proposal,
@@ -236,6 +245,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
       reword: (text, note) => ({
         text: edits.changes.length ? withEditedFields(text, edits.changes) : text,
         note: edits.edited.length ? `${editedNote(request.userId, edits.edited)}\n${note}` : note,
+        edited: edits.changes.length > 0,
       }),
       replaceCard: (message) => deps.updateCard(request.channel, request.messageTs, message),
     },
@@ -265,15 +275,67 @@ async function applyRevise(
     request.viewId,
     noticeView(card, "Sent back with your note. I'm revising the draft, and the new card posts in the thread."),
   );
+  // Live, not decided: nothing is decided until the revision replaces it, and
+  // a revision that never comes hands the card back (`startRevision`, Turn's
+  // unlock). Review stays, and opens on "being revised" meanwhile.
   await deps.updateCard(
     request.channel,
     request.messageTs,
     decidedCard(
       verdict.proposal,
-      `:pencil2: Needs changes, asked by <@${request.userId}>. The revised draft follows in the thread.`,
+      `:pencil2: Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,
+      verdict.proposal.proposalText,
+      { button: "Review" },
     ),
   );
   await deps.revise({ proposal: verdict.proposal, note: verdict.revise.note, userId: request.userId });
+}
+
+/** What starting a revision needs: Slack, bound once in `slack/interactive.ts`. */
+export interface RevisionDeps {
+  threadState: ThreadState;
+  /** Post a line in the card's thread: the ts it landed on, or null. */
+  postInThread(text: string): Promise<string | null>;
+  /** Queue the revision turn on the posted note, as the asker's own reply. */
+  queueTurn(noteTs: string): Promise<void>;
+  /** Edit the card in place (`chat.update`). */
+  updateCard(message: CardMessage): Promise<void>;
+}
+
+/**
+ * Needs changes, handed to uno-bot: the note goes into the card's thread as a
+ * line naming who asked, and the revision turn is queued on that line. The
+ * card is still pending, so the turn sees it and its revision replaces it.
+ *
+ * A revision that cannot start — the note did not post, or the turn could not
+ * be queued — would leave the card locked with nothing to unlock it, so the
+ * mark is lifted, the card goes back to its live form, and the thread is told
+ * to ask again.
+ */
+export async function startRevision(
+  request: { proposal: PendingProposal; note: string; userId: string },
+  deps: RevisionDeps,
+): Promise<void> {
+  const { proposal, note, userId } = request;
+  const where = `${proposal.channel}/${proposal.proposalTs}`;
+  const noteTs = await deps
+    .postInThread(`:pencil2: <@${userId}> asked for changes: ${escapeSlackText(note)}`)
+    .catch(() => null);
+  if (noteTs) {
+    try {
+      await deps.queueTurn(noteTs);
+      return;
+    } catch (err) {
+      console.error(`[review] revision turn not queued on ${where}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  } else {
+    console.error(`[review] needs-changes note did not post on ${where}`);
+  }
+  await deps.threadState.clearRevising(proposal.proposalTs).catch(() => {});
+  await deps.updateCard(liveCard(proposal)).catch(() => {});
+  await deps
+    .postInThread(":warning: I couldn't start the revision. Reply here with what to change and I'll revise the draft.")
+    .catch(() => null);
 }
 
 function decidedLine(decision: "confirm" | "cancel"): string {
@@ -294,37 +356,53 @@ function decidedLine(decision: "confirm" | "cancel"): string {
  * so what is checked here is what the claim wins.
  *
  * The seam every decision that writes from the pop-up reads its edits through.
+ *
+ * READS ONLY FOR WHAT CHANGED. When the request carries the fields the pop-up
+ * opened with, a state that leaves every one at its draft value is no edit,
+ * and costs no read beyond the claim's own; otherwise only a select the state
+ * changed has its options read again.
  */
 export async function reviewEdits(
-  request: Pick<ReviewDecisionRequest, "channel" | "messageTs" | "userId" | "state">,
+  request: Pick<ReviewDecisionRequest, "channel" | "messageTs" | "userId" | "state" | "fields">,
   deps: Pick<ReviewDoorDeps, "threadState" | "standingConfirmers" | "fieldOptions">,
 ): Promise<
   | { ok: true; operations?: ProposalOperation[]; edited: string[]; changes: FieldChange[] }
   | { ok: false; view: Record<string, unknown> }
 > {
   if (!request.state) return { ok: true, edited: [], changes: [] };
+  const changed = request.fields ? changedKeys(request.fields, request.state) : undefined;
+  if (changed && !changed.size) return { ok: true, edited: [], changes: [] };
   const look = await lookAtProposal(request.messageTs, request.userId, {
     threadState: deps.threadState,
     standingConfirmers: deps.standingConfirmers,
   });
   if (look.state !== "live" || !look.mayDecide) return { ok: true, edited: [], changes: [] };
-  const fields = await reviewFields(look.proposal, deps.fieldOptions);
+  const fields = await reviewFields(look.proposal, deps.fieldOptions, changed);
   const checked = checkEdits(look.proposal, fields, request.state);
   if (!checked.ok) {
     const card: ReviewedCard = { channel: request.channel, ts: request.messageTs };
+    // Redrawn whole: a select left unread keeps the options it opened with.
+    const shown = request.fields ? request.fields.map((f) => fields.find((g) => g.key === f.key) ?? f) : fields;
     return {
       ok: false,
       view: draftView(
         card,
         look.proposal,
         { mayDecide: true, confirmers: look.confirmers },
-        { fields, values: stateValues(fields, request.state), alert: { level: "error", text: checked.alert } },
+        { fields: shown, values: stateValues(shown, request.state), alert: { level: "error", text: checked.alert } },
       ),
     };
   }
   return checked.edited.length
     ? { ok: true, operations: checked.operations, edited: checked.edited, changes: checked.changes }
     : { ok: true, edited: [], changes: [] };
+}
+
+/** The keys of the fields `state` holds at something other than the value the
+ *  pop-up opened with. */
+function changedKeys(fields: readonly EditableField[], state: ReviewViewState): Set<string> {
+  const values = stateValues(fields, state);
+  return new Set(fields.filter((f) => values.has(f.key) && values.get(f.key) !== f.value).map((f) => f.key));
 }
 
 /**

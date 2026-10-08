@@ -259,9 +259,10 @@ export interface PendingProposal {
    * the revision is being written (`ThreadState.markRevising`). The card stays
    * findable, for the revision turn that replaces it, and is decided by no one
    * meanwhile — the claim refuses it, and Gate answers every signal on it with
-   * "being revised".
+   * "being revised". `at` is when it was marked: past `REVISING_MARK_MS` the
+   * mark reads as cleared (`withLiveMark`).
    */
-  revising?: { userId: string };
+  revising?: { userId: string; at?: number };
   /**
    * What a ⛔ still runs, when the card says so. Absent — every turn's card —
    * a cancel runs nothing. Only a card the Worker stages itself sets it: the
@@ -382,6 +383,27 @@ export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;
 /** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */
 export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number {
   return proposal.ttlMs ?? PROPOSAL_TTL_MS;
+}
+
+/**
+ * How long a Needs changes mark holds a card. A revision turn stages or
+ * clears well inside it; a Worker that died mid-revision clears nothing, and
+ * without a bound its card would stay undecidable until it aged out.
+ */
+export const REVISING_MARK_MS = 15 * 60 * 1000;
+
+/**
+ * The card as every lookup hands it back: a mark past `REVISING_MARK_MS`
+ * reads as cleared. A mark written before marks carried a time keeps holding.
+ *
+ * @param proposal - The stored card
+ * @param at - The store's now
+ */
+export function withLiveMark(proposal: PendingProposal, at: number): PendingProposal {
+  const since = proposal.revising?.at;
+  if (since === undefined || at - since <= REVISING_MARK_MS) return proposal;
+  const { revising: _, ...rest } = proposal;
+  return rest;
 }
 
 /** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
@@ -793,7 +815,8 @@ export interface ThreadState {
    * every lookup, because the revision turn has to find it to replace it,
    * and `claimProposal` refuses it until the mark clears. One read-modify-
    * write, as the claim is, so a racing Approve and Needs changes have one
-   * winner between them.
+   * winner between them. The mark lapses after `REVISING_MARK_MS`: every
+   * lookup, the claim and a second mark then read it as cleared.
    */
   markRevising(proposalTs: string, userId: string): Promise<"marked" | "already" | "gone">;
 

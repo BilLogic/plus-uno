@@ -19,6 +19,7 @@ import {
   type ReviewDoorDeps,
   type ReviewViewState,
 } from "../src/slack/review-door";
+import { fieldsFromBlocks } from "../src/slack/review-fields";
 import { recordingViews } from "./helpers/recording-slack";
 import { CONFIRM_FOOTER, proposalCardBlocks } from "../src/slack/proposal-render";
 import { cardWords } from "./helpers/card-message";
@@ -373,5 +374,118 @@ describe("a notion_update draft", () => {
     await runReviewDecision(approve({ "uno_field:0.append.text": text("  ") }), emptied.deps);
     assert.deepEqual(emptied.ran, []);
     assert.match(alerts(emptied.views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Text to append can't be empty/);
+  });
+});
+
+describe("an approved edit, written onto the card", () => {
+  const goalText = (title: string) =>
+    [":warning: About to *create a Notion page*:", `• *Title:* ${title}`, "• *Summary:* Goal cycles reset per session.", CONFIRM_FOOTER].join(
+      "\n",
+    );
+
+  it("replaces a field line only when its whole value is the old one", async () => {
+    const threadState = await staged({ proposalText: goalText("Goal"), input: { ...PROPOSAL.input, title: "Goal" } });
+    const { deps, cardUpdates } = harness(threadState);
+    await runReviewDecision(approve({ "uno_field:0.title": text("Retention") }), deps);
+    const words = cardUpdates[0]!.text;
+    assert.match(words, /• \*Title:\* Retention\n/);
+    assert.match(words, /• \*Summary:\* Goal cycles reset per session\./);
+  });
+
+  it("never splices the old value into a longer one it only starts", async () => {
+    // The card shows "Goal cycles"; the draft's title was "Goal".
+    const threadState = await staged({ proposalText: goalText("Goal cycles"), input: { ...PROPOSAL.input, title: "Goal" } });
+    const { deps, cardUpdates } = harness(threadState);
+    await runReviewDecision(approve({ "uno_field:0.title": text("Retention") }), deps);
+    const words = cardUpdates[0]!.text;
+    assert.doesNotMatch(words, /Retention cycles/);
+    assert.match(words, /• \*Title:\* Goal cycles\n/);
+    assert.match(cardUpdates[0]!.note, /edited Title/);
+  });
+
+  const ownLayout = [
+    { type: "section", block_id: "own_layout", text: { type: "mrkdwn", text: "*Reflection redesign*" } },
+    {
+      type: "actions",
+      block_id: "uno_proposal_actions",
+      elements: [{ type: "button", action_id: "uno_proposal_review", text: { type: "plain_text", text: "Review" }, value: "review" }],
+    },
+  ];
+
+  it("drops a card's own blocks for its text when an edit changed what they show", async () => {
+    const { deps } = harness(await staged({ proposalBlocks: ownLayout }));
+    const updates: unknown[][] = [];
+    deps.updateCard = async (_channel, _ts, message) => void updates.push(message.blocks);
+    await runReviewDecision(approve({ "uno_field:0.title": text("Reflection, shorter form") }), deps);
+    const shown = JSON.stringify(updates[0]);
+    assert.doesNotMatch(shown, /own_layout/);
+    assert.doesNotMatch(shown, /Reflection redesign/);
+    assert.match(shown, /Reflection, shorter form/);
+  });
+
+  it("keeps a card's own blocks when nothing was edited", async () => {
+    const { deps } = harness(await staged({ proposalBlocks: ownLayout }));
+    const updates: unknown[][] = [];
+    deps.updateCard = async (_channel, _ts, message) => void updates.push(message.blocks);
+    await runReviewDecision(approve({ "uno_field:0.title": text("Reflection redesign") }), deps);
+    assert.match(JSON.stringify(updates[0]), /own_layout/);
+  });
+});
+
+describe("Approve reads only what an edit needs", () => {
+  /** The fields the pop-up was opened with, as its submitted blocks carry them. */
+  async function openedFields(threadState: ThreadState) {
+    const { deps, views } = harness(threadState);
+    await runReviewOpen(open(), deps);
+    return fieldsFromBlocks(blocksOf(views.calls[1]!.view));
+  }
+
+  /** The store, counting its reads of a card by ts. */
+  function counted(threadState: ThreadState) {
+    let reads = 0;
+    const store: ThreadState = {
+      ...threadState,
+      getProposalByTs: (ts) => {
+        reads++;
+        return threadState.getProposalByTs(ts);
+      },
+    };
+    return { store, reads: () => reads };
+  }
+
+  const untouched = {
+    "uno_field:0.title": text("Reflection redesign"),
+    "uno_field:0.properties.product_pillar": picked("Tutor Experience"),
+  };
+
+  it("reads neither the card again nor the options when nothing was edited", async () => {
+    const base = await staged();
+    const fields = await openedFields(base);
+    const { store, reads } = counted(base);
+    const { deps, ran, optionReads } = harness(store);
+    await runReviewDecision({ ...approve(untouched), fields }, deps);
+    assert.equal(ran.length, 1);
+    assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
+    assert.deepEqual(optionReads, []);
+    // The claim's own read, and nothing before it.
+    assert.equal(reads(), 1);
+  });
+
+  it("reads no options when only a text was edited", async () => {
+    const base = await staged();
+    const fields = await openedFields(base);
+    const { deps, ran, optionReads } = harness(base);
+    await runReviewDecision({ ...approve({ ...untouched, "uno_field:0.title": text("Reflection v2") }), fields }, deps);
+    assert.equal(ran[0]?.execute?.input.title, "Reflection v2");
+    assert.deepEqual(optionReads, []);
+  });
+
+  it("still holds a changed option to the database's live options", async () => {
+    const base = await staged();
+    const fields = await openedFields(base);
+    const { deps, ran, optionReads } = harness(base, { pillars: ["Tutor Experience", "Student Experience"] });
+    await runReviewDecision({ ...approve({ ...untouched, "uno_field:0.properties.product_pillar": picked("Universal") }), fields }, deps);
+    assert.deepEqual(ran, []);
+    assert.deepEqual(optionReads, ["roadmap/Product Pillar"]);
   });
 });

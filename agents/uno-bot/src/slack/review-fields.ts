@@ -193,8 +193,14 @@ function writePath(input: Input, path: string, value: string): Input {
  *
  * @param proposal - The card, as the Gate holds it
  * @param readOptions - The live option read; each source is read once
+ * @param selects - When set, only these keys' selects have their options read;
+ *   any other select is left out, unread — Approve's check of what changed
  */
-export async function reviewFields(proposal: PendingProposal, readOptions: ReadOptions | undefined): Promise<EditableField[]> {
+export async function reviewFields(
+  proposal: PendingProposal,
+  readOptions: ReadOptions | undefined,
+  selects?: ReadonlySet<string>,
+): Promise<EditableField[]> {
   const reads = new Map<string, Promise<string[] | null>>();
   const optionsOf = (source: OptionSource) => {
     const id = `${source.database}/${source.property}`;
@@ -213,6 +219,7 @@ export async function reviewFields(proposal: PendingProposal, readOptions: ReadO
       if (value.length > MAX_INPUT_CHARS) continue;
       const field: EditableField = { key: `${index}.${spec.path}`, label: spec.label, kind: spec.kind, required: !!spec.required, value };
       if (spec.options) {
+        if (selects && !selects.has(field.key)) continue;
         const options = (await optionsOf(spec.options))?.filter((o) => o.length <= MAX_OPTION_CHARS).slice(0, MAX_OPTIONS);
         if (!options?.length) continue;
         field.options = options;
