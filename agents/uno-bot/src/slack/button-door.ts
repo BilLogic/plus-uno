@@ -26,6 +26,39 @@ import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { renderGateNote, statedCancelledNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
+import { notedCardBlocks } from "./proposal-render";
+import type { PendingProposal } from "../thread-state/index";
+
+/** A card's message as it is edited: the fallback copy, and the blocks. */
+export interface CardMessage {
+  text: string;
+  blocks: unknown[];
+}
+
+/**
+ * A decided card, as its message is edited: the card as posted — its own
+ * blocks when it had any, its text otherwise — with the outcome as its last
+ * line and View, and the outcome in the fallback copy too. A stated card gets
+ * no button (`notedCardBlocks`).
+ *
+ * @param pending - The card's record
+ * @param note - The outcome, mrkdwn
+ * @param text - The card's words, when they changed on the way: an approval
+ *   with edits says what was approved
+ */
+export function decidedCard(
+  pending: Pick<PendingProposal, "proposalText" | "proposalBlocks" | "stated">,
+  note: string,
+  text: string = pending.proposalText,
+): CardMessage {
+  return {
+    text: `${text}\n${note}`,
+    blocks: notedCardBlocks(
+      { text, ...(pending.proposalBlocks ? { blocks: pending.proposalBlocks } : {}), stated: !!pending.stated },
+      note,
+    ),
+  };
+}
 
 /** One button press, in the facts the envelope already has. */
 export interface ButtonRequest {
@@ -74,8 +107,8 @@ export interface ButtonDoorDeps {
   /** A press that did not win is answered where the person is looking. */
   replyEphemeral(text: string): Promise<void>;
 
-  /** After a win, the card is re-rendered without its buttons. */
-  replaceCard(proposalText: string, note: string): Promise<void>;
+  /** After a win, the card is edited to its outcome (`decidedCard`). */
+  replaceCard(message: CardMessage): Promise<void>;
 
   /** Stage a fresh card for what a cut-off run never finished — see
    *  `ReactionDoorDeps.restage`. */
@@ -123,7 +156,11 @@ export async function runButtonDoor(
 export async function applyPressVerdict(
   request: ButtonRequest,
   verdict: GateVerdict,
-  deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers">,
+  deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers"> & {
+    /** The decided card's words and outcome line, changed on the way: the
+     *  pop-up's approval with edits says what was approved, and by whom. */
+    reword?(text: string, note: string): { text: string; note: string };
+  },
 ): Promise<void> {
   if (verdict.post?.note.kind === "cut-off" && verdict.proposal) {
     await speakCutOff(request, verdict, verdict.proposal, verdict.post, deps);
@@ -189,7 +226,8 @@ export async function applyPressVerdict(
         : rejected
           ? `:no_entry: Rejected by <@${request.userId}>${rejected.reason ? `: ${escapeSlackText(rejected.reason)}` : ""}`
           : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
-  await deps.replaceCard(pending.proposalText, note);
+  const words = deps.reword ? deps.reword(pending.proposalText, note) : { text: pending.proposalText, note };
+  await deps.replaceCard(decidedCard(pending, words.note, words.text));
 }
 
 /**
@@ -226,7 +264,6 @@ async function speakCutOff(
     () => (verdict.restage ? "waiting-on-person" : "idle"),
   );
   await deps.replaceCard(
-    pending.proposalText,
-    ":warning: This run was cut off before it reported back — see the thread for what finished.",
+    decidedCard(pending, ":warning: This run was cut off before it reported back — see the thread for what finished."),
   );
 }

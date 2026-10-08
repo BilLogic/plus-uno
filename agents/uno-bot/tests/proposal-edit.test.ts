@@ -21,6 +21,7 @@ import {
 } from "../src/slack/review-door";
 import { recordingViews } from "./helpers/recording-slack";
 import { CONFIRM_FOOTER, proposalCardBlocks } from "../src/slack/proposal-render";
+import { cardWords } from "./helpers/card-message";
 
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
@@ -63,7 +64,7 @@ function harness(threadState: ThreadState, opts: { pillars?: string[] | null } =
     views: views.client,
     delivery: () => delivery,
     applyVerdict: async (verdict) => void ran.push(verdict),
-    updateCard: async (_channel, _ts, text, note) => void cardUpdates.push({ text, note }),
+    updateCard: async (_channel, _ts, message) => void cardUpdates.push(cardWords(message)),
     restage: async () => {},
     revise: async () => {},
     fieldOptions: async (source) => {

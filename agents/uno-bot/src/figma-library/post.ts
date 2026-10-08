@@ -197,8 +197,13 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
     const release = releaseBlocks(changeSet, intake);
     let sent = { ok: false } as { ok: boolean; ts?: string };
     let listed = false;
+    // The blocks it went up with, kept on the record so a decision or a gate
+    // note edits its line onto them rather than onto the text alone.
+    let ownBlocks: unknown[] | undefined;
     if (release.length) {
-      sent = await deps.post({ text: card.text, blocks: [...release, ...proposalCardBlocks(copy.footer)] });
+      const blocks = [...release, ...proposalCardBlocks(copy.footer)];
+      sent = await deps.post({ text: card.text, blocks });
+      if (sent.ok) ownBlocks = blocks;
       listed = sent.ok && release.some((b) => b.type === "data_table");
       if (!sent.ok) console.warn(`[figma-library] release blocks for ${intake.key} refused — posting the card as text`);
     }
@@ -219,6 +224,7 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
         userMsgTs: ts,
         proposalTs: ts,
         proposalText: card.text,
+        ...(ownBlocks ? { proposalBlocks: ownBlocks } : {}),
         // Nobody asked: the Worker staged it.
         requesterUserId: "",
         ttlMs: LIBRARY_CARD_TTL_MS,
@@ -244,6 +250,7 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
       // closes this card (`figma-library/track.ts`).
       draft: { title: intake.title, body: intake.body },
       cardText: card.text,
+      ...(ownBlocks ? { cardBlocks: ownBlocks } : {}),
     });
     waiting.shift();
     posted += 1;

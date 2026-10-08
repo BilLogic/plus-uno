@@ -32,7 +32,7 @@
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { Delivery } from "../turn/index";
 import { lookAtProposal, resolveSignal, type GateRestage, type GateVerdict, type ReviewDecision } from "../gate/index";
-import { applyPressVerdict, type ButtonDoorTarget } from "./button-door";
+import { applyPressVerdict, decidedCard, type ButtonDoorTarget, type CardMessage } from "./button-door";
 import { renderGateNote } from "./gate-note";
 import { withEditedFields } from "./proposal-render";
 import {
@@ -81,7 +81,7 @@ export interface ReviewDoorDeps {
   applyVerdict(verdict: GateVerdict): Promise<void>;
   /** The card, edited in place to its outcome (`chat.update`): a view has no
    *  `response_url` for the message it was opened from. */
-  updateCard(channel: string, ts: string, text: string, note: string): Promise<void>;
+  updateCard(channel: string, ts: string, message: CardMessage): Promise<void>;
   /** See `ButtonDoorDeps.restage`. */
   restage(restage: GateRestage, delivery: Delivery): Promise<void>;
   /**
@@ -233,13 +233,11 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
       // The card records who edited what, above who decided, and from then on
       // says what was approved: the edited values, not the draft's, which is
       // also what View opens.
-      replaceCard: (text, note) =>
-        deps.updateCard(
-          request.channel,
-          request.messageTs,
-          edits.changes.length ? withEditedFields(text, edits.changes) : text,
-          edits.edited.length ? `${editedNote(request.userId, edits.edited)}\n${note}` : note,
-        ),
+      reword: (text, note) => ({
+        text: edits.changes.length ? withEditedFields(text, edits.changes) : text,
+        note: edits.edited.length ? `${editedNote(request.userId, edits.edited)}\n${note}` : note,
+      }),
+      replaceCard: (message) => deps.updateCard(request.channel, request.messageTs, message),
     },
   );
   // A cut-off card speaks in the thread, and the pop-up points there.
@@ -270,8 +268,10 @@ async function applyRevise(
   await deps.updateCard(
     request.channel,
     request.messageTs,
-    verdict.proposal.proposalText,
-    `:pencil2: Needs changes, asked by <@${request.userId}>. The revised draft follows in the thread.`,
+    decidedCard(
+      verdict.proposal,
+      `:pencil2: Needs changes, asked by <@${request.userId}>. The revised draft follows in the thread.`,
+    ),
   );
   await deps.revise({ proposal: verdict.proposal, note: verdict.revise.note, userId: request.userId });
 }

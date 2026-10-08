@@ -217,17 +217,33 @@ export interface GateVerdict {
  * The card a note is about, when the note is about the card's own state: it
  * aged out, a revision replaced it, or it is waiting on someone else. Such a
  * note belongs ON the card, as its last line, rather than in a new message —
- * `Delivery.postGateNote` takes it there. `text` is the card as posted, what
- * it is re-rendered from.
+ * `Delivery.postGateNote` takes it there. `text` is the card as posted, and
+ * `blocks` its own blocks when it had any: what the note is edited onto.
+ * `stated` marks a card the Worker stated itself, which is edited without a
+ * Review or View button.
  */
 export interface GateCard {
   ts: string;
   text: string;
+  blocks?: unknown[];
+  stated?: true;
 }
 
-/** The card a note is about, when its words are known. */
-function cardOf(ts: string, text: string | undefined): { card?: GateCard } {
-  return text ? { card: { ts, text } } : {};
+/** The card a note is about, when its words are known: a staged proposal, or
+ *  what an "expired" or "superseded" lookup kept of one. */
+function cardOf(
+  ts: string,
+  posted: { proposalText?: string; proposalBlocks?: unknown[]; stated?: unknown },
+): { card?: GateCard } {
+  if (!posted.proposalText) return {};
+  return {
+    card: {
+      ts,
+      text: posted.proposalText,
+      ...(posted.proposalBlocks ? { blocks: posted.proposalBlocks } : {}),
+      ...(posted.stated ? { stated: true as const } : {}),
+    },
+  };
 }
 
 /** What a cut-off verdict asks to have staged again. */
@@ -324,7 +340,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       post: {
         note: { kind: "superseded", ...(found.stated ? { stated: true } : {}) },
         replyTs: replyTargetOf(signal),
-        ...cardSignalled(signal, found.proposalText),
+        ...cardSignalled(signal, found),
       },
     };
   }
@@ -345,7 +361,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
           ...(found.stated ? { words: found.stated.expired } : {}),
         },
         replyTs: replyTargetOf(signal),
-        ...cardSignalled(signal, found.proposalText),
+        ...cardSignalled(signal, found),
       },
     };
   }
@@ -500,7 +516,7 @@ function notAConfirmer(
       },
       replyTs: replyTarget(proposal),
       // The card is still live and waiting on one of them: the line goes on it.
-      ...(byCard ? cardOf(proposal.proposalTs, proposal.proposalText) : {}),
+      ...(byCard ? cardOf(proposal.proposalTs, proposal) : {}),
     },
   };
 }
@@ -519,8 +535,8 @@ function notAConfirmer(
  */
 export type ProposalLook =
   | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[] }
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string }
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   /** Decided, cut off, or never a card: nothing here is waiting on anyone. */
   | { state: "gone" };
 
@@ -594,7 +610,7 @@ async function claim(
         replyTs: replyTarget(proposal),
         // A replaced card says so on itself; a lost race is about this
         // person's signal, not the card, and is said in the thread.
-        ...(why.state === "superseded" ? cardOf(proposal.proposalTs, proposal.proposalText) : {}),
+        ...(why.state === "superseded" ? cardOf(proposal.proposalTs, proposal) : {}),
       },
     };
   }
@@ -720,8 +736,8 @@ async function locate(
   deps: GateDeps,
 ): Promise<
   | { state: "found"; proposal: PendingProposal }
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string }
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   | { state: "cut-off"; execution: Execution }
   | { state: "several"; count: number }
   | { state: "none" }
@@ -771,8 +787,11 @@ function threadRefOf(
 
 /** The card a by-ts signal was placed on: a reaction's or a press's own
  *  message. A typed signal names no card. */
-function cardSignalled(signal: Exclude<GateSignal, { kind: "model" }>, text: string | undefined): { card?: GateCard } {
-  return signal.kind === "typed" ? {} : cardOf(signal.messageTs, text);
+function cardSignalled(
+  signal: Exclude<GateSignal, { kind: "model" }>,
+  posted: Parameters<typeof cardOf>[1],
+): { card?: GateCard } {
+  return signal.kind === "typed" ? {} : cardOf(signal.messageTs, posted);
 }
 
 /** Where to answer a signal whose proposal was never found. */

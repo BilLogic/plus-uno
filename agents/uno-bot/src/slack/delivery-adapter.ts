@@ -71,7 +71,7 @@ import type { FooterKind } from "./footer-kind";
 import type { AnswerFeedback } from "./feedback";
 import { SLACK_TS, turnIdOf } from "../usage/record";
 import type { SlackMessageMetadata } from "./api";
-import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
+import { notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
 import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
 import { planBlock } from "./plan-block";
@@ -1099,7 +1099,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           channel,
           ts: card.ts,
           text: card.text,
-          blocks: proposalCardBlocks(card.text, line, cardStaysLive(note) ? "Review" : "View"),
+          blocks: notedCardBlocks(card, line, cardStaysLive(note) ? "Review" : "View"),
         })
         .catch(() => ({ ok: false }));
       if (updated.ok) return { ok: true, text: line, ts: card.ts };
@@ -1125,6 +1125,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // kept alongside as the notification/fallback copy, and it is what the
       // button handler re-renders the card from.
       const blocks = rendered.blocks ?? proposalCardBlocks(rendered.text);
+      // Its own blocks, as long as they are what went up: the record keeps
+      // them so a note or a decision is edited onto them.
+      let own = rendered.blocks;
       const metadata = card.tag ? { event_type: card.tag.eventType, event_payload: card.tag.payload } : undefined;
       let posted = await slack.postMessage({
         channel,
@@ -1140,11 +1143,13 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (!posted.ok) {
         console.warn("[slack] proposal with blocks failed; retrying text-only");
         posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text, ...(metadata ? { metadata } : {}) });
+        own = undefined;
       }
       return {
         ok: !!posted.ok,
         text: rendered.text,
         ...(posted.ok && posted.ts ? { ts: posted.ts } : {}),
+        ...(posted.ok && own ? { blocks: own } : {}),
       };
     },
 

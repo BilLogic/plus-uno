@@ -21,6 +21,7 @@ import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
 import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
 import { verdictEvents } from "../src/usage/index";
 import { recordingViews, type RecordingViews } from "./helpers/recording-slack";
+import { cardWords } from "./helpers/card-message";
 
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
@@ -56,7 +57,7 @@ function harness(threadState: ThreadState, opts: { views?: RecordingViews } = {}
     views: views.client,
     delivery: () => delivery,
     applyVerdict: async (verdict) => void ran.push(verdict),
-    updateCard: async (channel, ts, text, note) => void cardUpdates.push({ channel, ts, text, note }),
+    updateCard: async (channel, ts, message) => void cardUpdates.push({ channel, ts, ...cardWords(message) }),
     restage: async () => {},
     revise: async (request) => void revisions.push(request),
   };

@@ -21,6 +21,9 @@ import { implementPrTitle, trackLibraryIntakes, type TrackDeps, type TrackedPubl
 import { resolveSignal, type GateSignal } from "../src/gate/index";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { implementPayload } from "../src/tools/implement";
+import { runButtonDoor, type CardMessage } from "../src/slack/button-door";
+import { recordingDelivery } from "../src/turn/index";
+import { cardWords } from "./helpers/card-message";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 
 const FILE_KEY = "zAecJNRdvJzAUOcjV32tRX";
@@ -627,6 +630,44 @@ describe("the library card at the Gate", () => {
     });
   });
 
+  /** A member's press on the card, and the message the card was edited to. */
+  async function decide(threadState: ReturnType<typeof createInMemoryThreadState>, card: PendingProposal, decision: "confirm" | "cancel") {
+    const replaced: CardMessage[] = [];
+    await runButtonDoor(
+      { channel: CHANNEL, messageTs: card.proposalTs, decision, userId: MEMBERS[0]! },
+      {
+        threadState,
+        delivery: () => recordingDelivery(),
+        applyVerdict: async () => {},
+        replyEphemeral: async () => {},
+        replaceCard: async (message) => void replaced.push(message),
+        restage: async () => {},
+      },
+    );
+    assert.equal(replaced.length, 1, "the card is edited once");
+    return replaced[0]!.blocks as Array<Record<string, any>>;
+  }
+
+  it("keeps its release card and table once decided, and gains no Review or View", async () => {
+    for (const decision of ["confirm", "cancel"] as const) {
+      const { threadState, card } = await stagedCard();
+      const blocks = await decide(threadState, card, decision);
+      assert.deepEqual(blocks.map((b) => b.type).slice(0, 2), ["card", "data_table"], decision);
+      assert.match(JSON.stringify(blocks.at(-1)), decision === "confirm" ? /Approved by/ : /decided by/, decision);
+      assert.equal(blocks.filter((b) => b.type === "actions").length, 0, `${decision}: a stated card is decided by its footer`);
+    }
+  });
+
+  it("is decided from its text when Slack refused its release card", async () => {
+    const changeSet = await foundPublish();
+    const morning = postDeps([changeSet], { refuseTables: true });
+    await postLibraryFindings(morning.deps);
+    const blocks = await decide(morning.threadState, morning.staged[0]!, "confirm");
+    assert.ok(!JSON.stringify(blocks).includes("data_table"), "never a table it was not posted with");
+    assert.match(JSON.stringify(blocks), /Approved by/);
+    assert.equal(blocks.filter((b) => b.type === "actions").length, 0);
+  });
+
   it("files the intake only on a member's ⛔", async () => {
     const { threadState, card } = await stagedCard();
     const verdict = await resolveSignal(react(card, "no_entry", MEMBERS[0]!), { threadState });
@@ -703,7 +744,8 @@ describe("the morning tracker", () => {
       postToThread: async (channel, ts, text) => {
         calls.push(`thread ${channel}/${ts}: ${text}`);
       },
-      closeCard: async (channel, ts, text, note) => {
+      closeCard: async (channel, ts, message) => {
+        const { text, note } = cardWords(message);
         calls.push(`edit ${channel}/${ts}: ${note}`);
         edits.push({ text, note });
       },
@@ -822,6 +864,7 @@ describe("a library card nobody decides", () => {
   function world(tracked: TrackedPublish[], now: number) {
     const calls: string[] = [];
     const edits: Array<{ text: string; note: string }> = [];
+    const closed: Array<Array<Record<string, any>>> = [];
     const store = kv(tracked);
     const deps: TrackDeps = {
       tracked: store,
@@ -844,14 +887,25 @@ describe("a library card nobody decides", () => {
       postToThread: async (channel, ts, text) => {
         calls.push(`thread ${channel}/${ts}: ${text}`);
       },
-      closeCard: async (channel, ts, text, note) => {
+      closeCard: async (channel, ts, message) => {
         calls.push(`edit ${channel}/${ts}`);
-        edits.push({ text, note });
+        edits.push(cardWords(message));
+        closed.push(message.blocks as Array<Record<string, any>>);
       },
       now: () => now,
     };
-    return { deps, calls, edits, store };
+    return { deps, calls, edits, closed, store };
   }
+
+  it("closes a card posted with its release card on those blocks, with no button", async () => {
+    const release = [{ type: "section", text: { type: "mrkdwn", text: "release" } }];
+    const { deps, closed } = world([undecided({ cardBlocks: release })], POSTED_AT + 73 * HOUR);
+    await trackLibraryIntakes(deps);
+    assert.equal(closed.length, 1);
+    assert.deepEqual(closed[0]![0], release[0], "its own blocks lead");
+    assert.match(JSON.stringify(closed[0]!.at(-1)), /No decision in 72 h/);
+    assert.equal(closed[0]!.filter((b) => b.type === "actions").length, 0);
+  });
 
   it("files the intake and closes the card once its 72 hours pass, and only once", async () => {
     const { deps, calls, edits, store } = world([undecided()], POSTED_AT + 73 * HOUR);

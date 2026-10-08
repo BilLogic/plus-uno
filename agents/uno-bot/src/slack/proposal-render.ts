@@ -100,6 +100,57 @@ export function proposalCardBlocks(text: string, resolvedNote?: string, button?:
   return blocks;
 }
 
+/** A card as posted, which a note or a decision is edited onto: its text, its
+ *  own blocks when it had any, and whether the Worker stated it itself. */
+export interface PostedCard {
+  text: string;
+  blocks?: unknown[];
+  stated?: boolean;
+}
+
+/**
+ * A posted card with a note as its last line: a gate note, or the outcome a
+ * decision came to.
+ *
+ * A card posted with blocks of its own — a sweep card's carousel, a Figma
+ * library card's release card and table, a Figma preview — keeps them: its
+ * button row comes off, the note goes on, and the row comes back with `button`
+ * where it had one. A text-only card is re-rendered from its text
+ * (`proposalCardBlocks`). A stated card is decided by what its own footer
+ * says, and is edited without a Review or View button.
+ *
+ * @param card - The card as posted
+ * @param note - Its last line, mrkdwn
+ * @param button - Review while it can still be decided, View once it cannot
+ */
+export function notedCardBlocks(card: PostedCard, note: string, button: "Review" | "View" = "View"): unknown[] {
+  if (!card.blocks) {
+    const blocks = proposalCardBlocks(card.text, note, button);
+    return card.stated ? blocks.filter((b) => !isActionRow(b)) : blocks;
+  }
+  const hadButton = card.blocks.some(isActionRow);
+  const blocks = [...card.blocks.filter((b) => !isActionRow(b)), context(note)];
+  if (hadButton && !card.stated) blocks.push(...proposalActionBlocks(button));
+  return blocks;
+}
+
+/**
+ * The blocks a card went up with, when they are its own — a carousel, a
+ * release card, a preview — rather than its text re-rendered, which is what
+ * every edit falls back to anyway (`notedCardBlocks`). What a poster keeps on
+ * the record as `PendingProposal.proposalBlocks`.
+ *
+ * @param card - The card's text, and the blocks it was posted with
+ */
+export function ownBlocksOf(card: { text: string; blocks: unknown[] }): unknown[] | undefined {
+  return JSON.stringify(card.blocks) === JSON.stringify(proposalCardBlocks(card.text)) ? undefined : card.blocks;
+}
+
+/** The card's own button row (`proposalActionBlocks`). */
+function isActionRow(block: unknown): boolean {
+  return (block as { block_id?: string } | null)?.block_id === "uno_proposal_actions";
+}
+
 function context(text: string): unknown {
   return { type: "context", elements: [{ type: "mrkdwn", text }] };
 }

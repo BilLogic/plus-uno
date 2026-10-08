@@ -218,6 +218,16 @@ export interface PendingProposal {
   userMsgTs: string;
   proposalTs: string;
   proposalText: string;
+  /**
+   * The card's own blocks as posted, when it had blocks of its own rather than
+   * its text in sections: a sweep card's carousel, a Figma library card's
+   * release card and table, a Figma preview's screenshot. A note or a decision
+   * is edited onto these (`slack/proposal-render.ts` `notedCardBlocks`), so the
+   * card keeps its layout. Absent — a text-only card, or one that stepped down
+   * to its text when Slack refused its blocks — it is re-rendered from
+   * `proposalText`.
+   */
+  proposalBlocks?: unknown[];
   /** Who asked. Kept for the record, not a lock: who may confirm is
    *  `confirmers` (the requester-only lock was removed 2026-07-14, see
    *  gate/reaction-door.ts). */
@@ -378,10 +388,20 @@ export function ownWords(proposal: Pick<PendingProposal, "stated">): { stated?: 
   return proposal.stated ? { stated: proposal.stated } : {};
 }
 
-/** The card's posted text, spread onto an "expired" or "superseded" lookup:
- *  what the card is re-rendered from when a gate note is edited onto it. */
-export function ownText(proposal: Partial<Pick<PendingProposal, "proposalText">>): { proposalText?: string } {
-  return proposal.proposalText ? { proposalText: proposal.proposalText } : {};
+/** The card as posted — its text, and its own blocks when it had any — spread
+ *  onto an "expired" or "superseded" lookup: what a gate note is edited onto. */
+export function ownText(
+  proposal: Partial<Pick<PendingProposal, "proposalText" | "proposalBlocks">>,
+): { proposalText?: string; proposalBlocks?: unknown[] } {
+  return proposal.proposalText
+    ? { proposalText: proposal.proposalText, ...(proposal.proposalBlocks ? { proposalBlocks: proposal.proposalBlocks } : {}) }
+    : {};
+}
+
+/** The blocks a card went up with, spread onto the proposal staged from it —
+ *  absent for a card posted as its text. */
+export function ownBlocks(posted: { blocks?: unknown[] }): { proposalBlocks?: unknown[] } {
+  return posted.blocks ? { proposalBlocks: posted.blocks } : {};
 }
 
 /**
@@ -609,13 +629,13 @@ export type ProposalLookup =
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
    *  a stated card's own words, whose `expired` line says it instead.
-   *  `proposalText` (both answers) is the card as posted, so the note about
-   *  it can be edited onto it. */
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string }
+   *  `proposalText` and `proposalBlocks` (both answers) are the card as
+   *  posted, so the note about it can be edited onto it. */
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   | { state: "none" };
 
 /**
