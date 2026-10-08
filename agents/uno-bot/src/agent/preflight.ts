@@ -64,7 +64,7 @@ export async function preflight(
         const near = closestComponents(component, known);
         return {
           ask:
-            `:mag: I don't find a *${component}* component in the design-system library` +
+            `I don't find a *${component}* component in the design-system library` +
             (near.length ? ` — closest matches: ${near.map((n) => `\`${n}\``).join(", ")}.` : ".") +
             "\nWhich component did you mean? (If this is genuinely new, it needs a PRD + review first — I won't scaffold a library component from scratch.)",
         };
@@ -74,7 +74,7 @@ export async function preflight(
       if (!ctx.prd?.id && !ctx.implementPrdUrl) {
         return {
           ask:
-            ":memo: Before I implement a component I need its *Notion PRD*.\n" +
+            "Before I implement a component I need its *Notion PRD*.\n" +
             "• Ask from a thread whose first message links the PRD, or\n" +
             "• paste the PRD link here and I'll use it.\n\n" +
             "I won't implement a component without a PRD.",
@@ -89,7 +89,7 @@ export async function preflight(
       if (!figmaUrl || !/node-id=/.test(figmaUrl)) {
         return {
           ask:
-            ":frame_with_picture: To scaffold a prototype I need a *Figma link with a specific frame selected* — the URL should contain a `node-id`.\n" +
+            "To scaffold a prototype I need a *Figma link with a specific frame selected* — the URL should contain a `node-id`.\n" +
             "Paste that frame link and I'll build straight from it.",
         };
       }
@@ -105,7 +105,7 @@ export async function preflight(
       if (surface === "prd" && (!title || summary.length < 30)) {
         return {
           ask:
-            ":memo: That PRD is a little thin to file. Give me a clear *title* and a couple of sentences of *summary* (what it is + why), and I'll draft the card.",
+            "That PRD is a little thin to file. Give me a clear *title* and a couple of sentences of *summary* (what it is + why), and I'll draft the card.",
         };
       }
       if (surface === "decision") {
@@ -121,7 +121,7 @@ export async function preflight(
         if (!title || !roadmap) {
           return {
             ask:
-              ":memo: To log a decision I need a one-line *title* and the *Roadmap card* URL (properties.roadmap_card). Optional: Status (Proposed/Accepted/…), Evidence URL (Slack/Figma/Zoom), and a short Why in sections.",
+              "To log a decision I need a one-line *title* and the *Roadmap card* URL (properties.roadmap_card). Optional: Status (Proposed/Accepted/…), Evidence URL (Slack/Figma/Zoom), and a short Why in sections.",
           };
         }
       }
@@ -152,7 +152,7 @@ export async function preflight(
       if (surface === "prd" && (summary.length + sectionChars > 12000 || sections.length > 10)) {
         return {
           ask:
-            ":memo: That PRD is very large for a Slack-filed card — thread drafts are for alignment; the full document of record is edited in Notion or the IDE. " +
+            "That PRD is very large for a Slack-filed card — thread drafts are for alignment; the full document of record is edited in Notion or the IDE. " +
             "Two options: I trim it to the essentials, file that card, and hand you a ready-to-paste IDE prompt for `skills/uno-synthesize` to expand it there — or we tighten it together first. Which do you want?",
         };
       }
@@ -175,7 +175,7 @@ export async function preflight(
           .join(", ");
         return {
           ask:
-            `:e-mail: I can't send that yet — ${rawRecipients.length === 0 ? "there's no recipient" : `these recipients don't look like real email addresses: ${badList || "(non-string values)"}`}. ` +
+            `I can't send that yet — ${rawRecipients.length === 0 ? "there's no recipient" : `these recipients don't look like real email addresses: ${badList || "(non-string values)"}`}. ` +
             "Give me the exact address(es) to send to — I never guess or invent one.",
         };
       }
@@ -183,7 +183,7 @@ export async function preflight(
       if (body.length < 40) {
         return {
           ask:
-            ":e-mail: That email body is too thin to send. Write out (or dictate) the full message — a couple of real sentences minimum — and I'll stage it.",
+            "That email body is too thin to send. Write out (or dictate) the full message — a couple of real sentences minimum — and I'll stage it.",
         };
       }
       return null;
@@ -195,13 +195,13 @@ export async function preflight(
       if (!relayRecipientId(input.recipient)) {
         return {
           ask:
-            ":incoming_envelope: Who should get this? I need the exact person — tell me who you mean, " +
+            "Who should get this? I need the exact person — tell me who you mean, " +
             "and if the name matches more than one teammate I'll ask which one before staging anything.",
         };
       }
       const text = typeof input.text === "string" ? input.text.trim() : "";
       if (!text) {
-        return { ask: ":incoming_envelope: What should the DM say? Give me the message and I'll stage it for your ✅." };
+        return { ask: "What should the DM say? Give me the message and I'll stage it for your ✅." };
       }
       return null;
     }
@@ -217,7 +217,7 @@ export async function preflight(
       if (target.misconfigured) {
         return { ask: `:x: I can't file a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
       }
-      return { ask: `:mag: ${target.error} Which of those should this intake go on?` };
+      return { ask: `${target.error} Which of those should this intake go on?` };
     }
 
     case "github_issue_update": {
@@ -231,14 +231,14 @@ export async function preflight(
       if (target.misconfigured) {
         return { ask: `:x: I can't update a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
       }
-      return { ask: `:mag: ${target.error} Which of those is the issue on?` };
+      return { ask: `${target.error} Which of those is the issue on?` };
     }
 
     case "github_workflow_run": {
       // Only a workflow the repo list names, on a repo it lists — refused here,
       // naming what IS allowed, so nothing unlisted is ever put on a card.
       const checked = checkWorkflowRun(input, resolveRepoFor(ctx.env, input.repo));
-      return checked.ok ? null : { ask: `:gear: ${checked.error}` };
+      return checked.ok ? null : { ask: checked.error };
     }
 
     case "shareout_post": {
@@ -248,7 +248,7 @@ export async function preflight(
       if (summary.length < 15) {
         return {
           ask:
-            ":mega: Before I share this out, give me one or two sentences on *what it is and what feedback you want* (a link to the prototype/frame/PRD helps too).",
+            "Before I share this out, give me one or two sentences on *what it is and what feedback you want* (a link to the prototype/frame/PRD helps too).",
         };
       }
 

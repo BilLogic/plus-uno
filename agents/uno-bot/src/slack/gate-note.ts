@@ -25,8 +25,8 @@
 //     send them to.
 //   • A STATED CARD (the library card, the weekly DS precedence card) is one
 //     nobody asked for, with no ⚠️ and a ⛔ that means what its footer says.
-//     "Tell me what to change", "ask me again" and "the newest :warning: card"
-//     are all wrong on it, so it carries its own words for a ⛔ and a late
+//     "Tell me what to change", "ask me again" and "the newest card" are all
+//     wrong on it, so it carries its own words for a ⛔ and a late
 //     decision (`PendingProposal.stated`, written beside each card's copy),
 //     and a replaced card or a gesture beside it gets a stated line here.
 //     These follow the Figma copy rules (`docs/connectors/slack.md` § Figma
@@ -41,7 +41,7 @@ import { gateWordsFor } from "../agent/tool-table";
 
 /** The lost race. */
 export const STALE_POST =
-  ":hourglass: That proposal was already resolved — another confirmation got there first, " +
+  "That proposal was already resolved — another confirmation got there first, " +
   "so nothing was executed twice.";
 
 /**
@@ -50,7 +50,7 @@ export const STALE_POST =
  */
 export function expiredPost(ttlMs?: number): string {
   return (
-    ":hourglass: That proposal had already expired — nothing was executed. " +
+    "That proposal had already expired — nothing was executed. " +
     `It stayed live for ${lifetimeWords(ttlMs ?? PROPOSAL_TTL_MS)}. ` +
     "Ask me again and I'll set the same thing up fresh."
   );
@@ -69,10 +69,10 @@ function lifetimeWords(ms: number): string {
 
 /** The ✅/⛔ on a proposal a revision replaced (#573). */
 export const SUPERSEDED_POST =
-  ":arrows_counterclockwise: That proposal was replaced by a newer one — nothing was executed. " +
-  "Confirm on the newest :warning: card in this thread instead.";
+  "That proposal was replaced by a newer one — nothing was executed. " +
+  "Confirm on the newest card in this thread instead.";
 
-/** The ✅/⛔ on a stated card a revision replaced: it has no ⚠️ to point at. */
+/** The ✅/⛔ on a stated card a revision replaced. */
 export const STATED_SUPERSEDED_POST =
   "That card was revised, so nothing ran. Decide on the newest card in this thread.";
 
@@ -130,8 +130,8 @@ export function renderGateNote(note: GateNote): string {
         );
       }
       return (
-        `:eyes: <@${note.userId}> I saw your :${note.glyph}:, but it is not on the proposal I am holding — ` +
-        `nothing was executed. Use the buttons on the :warning: card for *${note.toolName}* just above, ` +
+        `:warning: <@${note.userId}> I saw your :${note.glyph}:, but it is not on the proposal I am holding — ` +
+        `nothing was executed. Use the buttons on the card for *${note.toolName}* just above, ` +
         `or react there.`
       );
     case "which-card":
@@ -139,13 +139,13 @@ export function renderGateNote(note: GateNote): string {
       // sits in a card's own thread and answers that card. Two cards are two different writes, and a ✅ outside both threads says
       // nothing about which one it meant. Guessing runs the wrong one.
       return (
-        `:point_up: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
-        `nothing was executed. React on the :warning: card you mean, or use its buttons.`
+        `:warning: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
+        `nothing was executed. React on the card you mean, or use its buttons.`
       );
     case "not-a-confirmer":
       return notAConfirmerLine(note);
     case "resolve-failed":
-      return `:warning: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
+      return `:x: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
     case "cut-off":
       return cutOffLine(note);
   }
@@ -163,7 +163,7 @@ function notAConfirmerLine(note: Extract<GateNote, { kind: "not-a-confirmer" }>)
   const can = who.length
     ? `Only ${joinNames(who)} can confirm or cancel this proposal`
     : "Nobody here can confirm or cancel this proposal";
-  return `:lock: ${to}${can} — nothing was executed.`;
+  return `:warning: ${to}${can} — nothing was executed.`;
 }
 
 /** "a", "a or b", "a, b or c". */

@@ -94,7 +94,7 @@ const ONE_MESSAGE = { chars: 40_000, blocks: 50 };
 /** What a card is edited to when it is taken back. */
 export const DM_CARD_NOT_STAGED =
   ":warning: This card didn't go through, so it can't be confirmed. Its fixes come back on a fresh card.";
-export const DM_CARD_SWITCHED_OFF = ':no_entry_sign: Withdrawn: you turned off "Catch decisions from my DMs".';
+export const DM_CARD_SWITCHED_OFF = ':no_entry: Withdrawn: you turned off "Catch decisions from my DMs".';
 
 /** One finding from a person's DMs, as the queue keeps it until its card. */
 export interface DmCaptureFinding {
@@ -653,7 +653,7 @@ export async function dropDmCapture(
 export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard {
   const n = items.length;
   const lines = [
-    `:mag: **${SWEEP_CARD_MARK}** — from your DMs: you settled ${n === 1 ? "something" : `${n} things`} that a page doesn't say yet.`,
+    `**${SWEEP_CARD_MARK}** — from your DMs: you settled ${n === 1 ? "something" : `${n} things`} that a page doesn't say yet.`,
     "",
   ];
   items.forEach((item, i) => {

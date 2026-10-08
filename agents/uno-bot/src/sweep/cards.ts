@@ -208,7 +208,7 @@ export function destinationKey(d: Destination): string {
 export function sweepCard(plan: SweepCardPlan): ProposalCard {
   const n = plan.items.length;
   const lines = [
-    `:mag: **${SWEEP_CARD_MARK}** — ${captureLead(plan.items) ?? `this thread settled ${n === 1 ? "something" : `${n} things`} a linked page still says the old way.`}`,
+    `**${SWEEP_CARD_MARK}** — ${captureLead(plan.items) ?? `this thread settled ${n === 1 ? "something" : `${n} things`} a linked page still says the old way.`}`,
     "",
   ];
   plan.items.forEach((item, i) => {
@@ -309,7 +309,7 @@ export function holdsInsert(operations: readonly Pick<ProposalOperation, "toolNa
 
 /** What a worded revision of a card holding an added answer is told. */
 export const INSERT_CARD_REFUSAL =
-  ":lock: This sweep card adds text after a block, which a reply in words can't restage exactly, so the card stays as it is. " +
+  ":warning: This sweep card adds text after a block, which a reply in words can't restage exactly, so the card stays as it is. " +
   "Reply `drop N` to leave a fix out, or ⛔ the card and ask me.";
 
 /** Whether a bot post is part of a sweep card: tagged as one, or — read
@@ -358,7 +358,7 @@ export function sweepPostMetadata(role: "revision" | "result" | "note"): {
 export function asSweepRevision(card: ProposalCard): ProposalCard {
   return {
     ...card,
-    lead: `:mag: **${SWEEP_CARD_MARK}** — revised${card.lead ? `: ${card.lead}` : "."}`,
+    lead: `**${SWEEP_CARD_MARK}** — revised${card.lead ? `: ${card.lead}` : "."}`,
     tag: sweepTag("revision"),
   };
 }

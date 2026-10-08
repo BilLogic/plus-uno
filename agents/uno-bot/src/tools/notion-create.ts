@@ -101,7 +101,7 @@ export async function executeNotionCreate(
       channel: slack.channel,
       thread_ts: slack.threadTs,
       // Escaped inside the label: a `>` in the title would end the link.
-      text: `:memo: Created on *${created.label}*: <${created.url}|${escapeSlackText(title)}>`,
+      text: `:white_check_mark: Created on *${created.label}*: <${created.url}|${escapeSlackText(title)}>`,
     });
     return JSON.stringify({
       ok: true,
