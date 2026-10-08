@@ -21,6 +21,7 @@ import { implementPrTitle, trackLibraryIntakes, type TrackDeps, type TrackedPubl
 import { resolveSignal, type GateSignal } from "../src/gate/index";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { implementPayload } from "../src/tools/implement";
+import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 
 const FILE_KEY = "zAecJNRdvJzAUOcjV32tRX";
 const CHANNEL = "C072E8SFLKV";
@@ -140,9 +141,10 @@ function nodesOf(library: FigmaComponentsResponse, label: (nodeId: string) => st
 }
 
 /** The morning post on fakes, staging into a real in-memory ThreadState. */
-function postDeps(findings: LibraryChangeSet[]) {
+function postDeps(findings: LibraryChangeSet[], opts: { refuseTables?: boolean } = {}) {
   const threadState = createInMemoryThreadState({ now: () => Date.UTC(2026, 8, 30, 14, 0) });
   const posts: Array<{ text: string; blocks: unknown[] }> = [];
+  const refused: Array<{ text: string; blocks: unknown[] }> = [];
   const replies: Array<{ ts: string; text: string }> = [];
   const staged: PendingProposal[] = [];
   const store = { findings: kv(findings), tracked: kv<TrackedPublish[]>([]), unpublished: kv<LibraryChangeSet | null>(null) };
@@ -151,6 +153,13 @@ function postDeps(findings: LibraryChangeSet[]) {
     registry: async () => REGISTRY,
     members: async () => MEMBERS,
     async post(message) {
+      // Slack's verdict on the blocks, as the live API gives it.
+      const why = messageBlocksRefusal(message.blocks);
+      const table = message.blocks.some((b) => (b as { type?: string }).type === "data_table");
+      if (why || (opts.refuseTables && table)) {
+        refused.push(message);
+        return { ok: false };
+      }
       posts.push(message);
       return { ok: true, ts: `1790000000.00000${posts.length}` };
     },
@@ -164,7 +173,7 @@ function postDeps(findings: LibraryChangeSet[]) {
     channel: CHANNEL,
     now: () => Date.UTC(2026, 8, 30, 14, 0),
   };
-  return { deps, posts, replies, staged, threadState, store };
+  return { deps, posts, refused, replies, staged, threadState, store };
 }
 
 /** A change set with no new version: an Accordion variant renamed, and
@@ -450,7 +459,70 @@ describe("the morning post", () => {
     assert.equal(day2.store.unpublished.value, null);
   });
 
-  it("puts the whole list in the card's thread when it would make the card too long", async () => {
+  it("leads with a release card, then a table of every changed component, then Review", async () => {
+    const morning = postDeps([await foundPublish()]);
+    await postLibraryFindings(morning.deps);
+    const blocks = morning.posts[0]!.blocks as Array<Record<string, any>>;
+    assert.deepEqual(blocks.map((b) => b.type).slice(0, 2), ["card", "data_table"]);
+
+    const card = blocks[0]!;
+    assert.equal(card.title.text, 'Library published: "Badge sizes + accordion copy"');
+    assert.equal(card.subtitle.text, "by coco");
+    assert.equal(card.body.text, "Adds lg badge");
+    assert.match(card.icon.image_url, /figma\.com/);
+    assert.deepEqual(
+      card.actions.map((a: any) => [a.text.text, a.url]),
+      [["View version", `https://www.figma.com/design/${FILE_KEY}?version-id=2210000000000000002`]],
+    );
+
+    const table = blocks[1]!;
+    assert.equal(table.caption, "3 components changed: 1 new, 2 updated.");
+    const text = (cell: any) => cell.text ?? cell.elements[0].elements[0].text;
+    assert.deepEqual(
+      table.rows.map((row: any[]) => row.map(text)),
+      [
+        ["Component", "Change", "Code"],
+        ["accordion", "updated", "Accordion"],
+        ["badge", "updated", "Badge"],
+        ["sparkline", "new", "No code mapping yet"],
+      ],
+    );
+    assert.equal(table.rows[1][0].elements[0].elements[0].url, "https://www.figma.com/design/x?node-id=13667-6004");
+
+    // The decision stays last: what ✅ and ⛔ do, and the Review button.
+    assert.match(JSON.stringify(blocks.at(-2)), /files the intake only/);
+    assert.equal(blocks.at(-1)!.type, "actions");
+    // The text copy is the whole card still: notifications and a decided
+    // card's re-render read it.
+    assert.match(morning.posts[0]!.text, /^• \*Has code:\* accordion, badge$/m);
+  });
+
+  it("posts the card without its release card and table when Slack refuses them, and the list still reaches the thread", async () => {
+    const changeSet = await foundPublish();
+    const extra = Array.from({ length: 60 }, (_, i) => ({
+      key: `k-extra-${i}`,
+      name: "Default",
+      description: "",
+      nodeId: `50:${i}`,
+      containingFrame: `extra component number ${i}`,
+      setNodeId: `500:${i}`,
+    }));
+    const big: LibraryChangeSet = {
+      ...changeSet,
+      created: [...changeSet.created, ...extra],
+      newComponentIds: [...(changeSet.newComponentIds ?? []), ...extra.map((c) => c.setNodeId)],
+    };
+    const morning = postDeps([big], { refuseTables: true });
+    await postLibraryFindings(morning.deps);
+    assert.equal(morning.refused.length, 1);
+    assert.equal(morning.posts.length, 1);
+    assert.ok(!JSON.stringify(morning.posts[0]!.blocks).includes("data_table"));
+    assert.equal(morning.staged.length, 1);
+    assert.equal(morning.replies.length, 1);
+    assert.match(morning.replies[0]!.text, /^All 63 components in this publish:/);
+  });
+
+  it("lists every component in the table when the card's text had to cap its list", async () => {
     const changeSet = await foundPublish();
     // Sixty more unmapped components, each a new set.
     const extra = Array.from({ length: 60 }, (_, i) => ({
@@ -472,13 +544,14 @@ describe("the morning post", () => {
     assert.ok(text.length <= 1500, `${text.length} chars`);
     assert.match(text, /^63 components changed: 61 new, 2 updated\.$/m);
     assert.match(text, /\*No code mapping yet:\* .* and \d+ more$/m);
-    // The thread reply names all 63, under the same two groups.
-    assert.equal(morning.replies.length, 1);
-    assert.equal(morning.replies[0]!.ts, morning.staged[0]!.proposalTs);
-    assert.match(morning.replies[0]!.text, /^All 63 components in this publish:/);
+    // The table names all 63, so nothing spills into the thread.
+    const table = (morning.posts[0]!.blocks as Array<Record<string, any>>).find((b) => b.type === "data_table")!;
+    assert.equal(table.rows.length, 64);
+    const names = JSON.stringify(table.rows);
     for (const name of ["accordion", "badge", "sparkline", "extra component number 0", "extra component number 59"]) {
-      assert.ok(morning.replies[0]!.text.includes(name), name);
+      assert.ok(names.includes(name), name);
     }
+    assert.deepEqual(morning.replies, []);
   });
 
   it("keeps the findings when the registry or the members cannot be read", async () => {
