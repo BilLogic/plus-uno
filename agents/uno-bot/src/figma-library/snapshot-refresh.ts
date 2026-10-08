@@ -41,7 +41,9 @@ export interface RefreshOwed {
 }
 
 export interface SnapshotRefreshDeps {
-  owed: { read(): Promise<RefreshOwed | null>; clear(): Promise<void> };
+  /** What is owed; `settle` takes off the versions a dispatch covered, and
+   *  only those, so a publish recorded meanwhile stays owed. */
+  owed: { read(): Promise<RefreshOwed | null>; settle(versionIds: readonly string[]): Promise<void> };
   /** Send the `repository_dispatch`: ok on GitHub's 204. */
   dispatch(eventType: string, payload: Record<string, unknown>): Promise<{ ok: boolean; status: number }>;
   dryRun?: boolean;
@@ -66,6 +68,17 @@ export interface SnapshotRefreshReport {
  */
 export function owedWith(owed: RefreshOwed | null, versionIds: readonly string[], at: string): RefreshOwed {
   return { versionIds: [...new Set([...versionIds, ...(owed?.versionIds ?? [])])], since: owed?.since ?? at };
+}
+
+/**
+ * What is still owed once a dispatch covered `sent`: null when nothing is.
+ *
+ * @param owed - What is owed now
+ * @param sent - The versions the dispatch covered
+ */
+export function owedAfter(owed: RefreshOwed | null, sent: readonly string[]): RefreshOwed | null {
+  const left = (owed?.versionIds ?? []).filter((id) => !sent.includes(id));
+  return left.length ? { versionIds: left, since: owed!.since } : null;
 }
 
 /**
@@ -98,6 +111,6 @@ export async function runSnapshotRefresh(deps: SnapshotRefreshDeps): Promise<Sna
     return done(false, `the dispatch failed (${err instanceof Error ? err.message : String(err)}) — still owed, so the next run tries again`);
   }
   if (!answer.ok) return done(false, `GitHub refused the dispatch (${answer.status}) — still owed, so the next run tries again`);
-  await deps.owed.clear();
+  await deps.owed.settle(versionIds);
   return done(true, `started the refresh for ${what}`);
 }

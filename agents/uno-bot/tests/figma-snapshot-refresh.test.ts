@@ -11,6 +11,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import {
+  owedAfter,
   owedWith,
   REFRESH_EVENT,
   REFRESH_OWED_KV_KEY,
@@ -35,9 +36,13 @@ function owedStore(initial: RefreshOwed | null) {
     get reads() {
       return reads;
     },
+    /** What a poll writes meanwhile. */
+    record(next: RefreshOwed) {
+      value = next;
+    },
     store: {
       read: async () => ((reads += 1), value ? structuredClone(value) : null),
-      clear: async () => void (value = null),
+      settle: async (sent: readonly string[]) => void (value = owedAfter(value, sent)),
     } satisfies SnapshotRefreshDeps["owed"],
   };
 }
@@ -114,6 +119,23 @@ describe("the snapshot refresh job", () => {
     assert.equal(report.summary, "would start the refresh for 2 publish(es), newest version 2210000000000000004");
     assert.deepEqual(gh.sent, []);
     assert.deepEqual(owed.value, OWED);
+  });
+
+  it("keeps a publish the poll recorded while the dispatch was out", async () => {
+    const owed = owedStore(OWED);
+    const gh = dispatcher();
+    const report = await runSnapshotRefresh({
+      owed: owed.store,
+      async dispatch(eventType, payload) {
+        // The poll records a newer publish between this job's read and its settle.
+        owed.record(owedWith(owed.value, ["2210000000000000005"], "2026-09-30T22:00:00.000Z"));
+        return gh.dispatch(eventType, payload);
+      },
+    });
+    assert.equal(report.dispatched, true);
+    assert.deepEqual(owed.value, { versionIds: ["2210000000000000005"], since: OWED.since }, "the newer one is still owed");
+    assert.deepEqual(owedAfter(OWED, OWED.versionIds), null);
+    assert.deepEqual(owedAfter(null, ["4"]), null);
   });
 
   it("merges a new publish into what is owed: newest first, each once, from the first one's date", () => {

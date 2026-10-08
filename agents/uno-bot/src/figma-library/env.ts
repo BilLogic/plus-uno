@@ -21,7 +21,7 @@ import { githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolve
 import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
 import { repositoryDispatch } from "../tools/github-dispatch";
-import { REFRESH_OWED_KV_KEY, runSnapshotRefresh, type RefreshOwed, type SnapshotRefreshReport } from "./snapshot-refresh";
+import { owedAfter, REFRESH_OWED_KV_KEY, runSnapshotRefresh, type RefreshOwed, type SnapshotRefreshReport } from "./snapshot-refresh";
 import type { ComponentRegistry, LibraryChangeSet } from "./draft";
 import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostResult } from "./post";
 import { windowInWords } from "../slack/copy-words";
@@ -179,7 +179,10 @@ export async function runSnapshotRefreshOnEnv(env: Env, opts: { dryRun: boolean 
   return runSnapshotRefresh({
     owed: {
       read: owed.read,
-      async clear() {
+      async settle(sent) {
+        // Read again: a poll may have recorded a publish since this job read.
+        const left = owedAfter(await owed.read(), sent);
+        if (left) return owed.write(left);
         charge(1, "kv");
         await kv.delete(REFRESH_OWED_KV_KEY);
       },
