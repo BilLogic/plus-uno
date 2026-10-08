@@ -282,3 +282,106 @@ test("with no table attached, the judge is asked exactly as before", async () =>
   assert.equal(h.judged.length, 1);
   assert.equal("cardTableList" in h.judged[0]!, false);
 });
+
+/** Run `fn` with console.log captured. */
+async function logged<T>(fn: () => Promise<T>): Promise<{ result: T; lines: string[] }> {
+  const orig = console.log;
+  const lines: string[] = [];
+  console.log = (...args: unknown[]) => {
+    lines.push(args.map(String).join(" "));
+  };
+  try {
+    return { result: await fn(), lines };
+  } finally {
+    console.log = orig;
+  }
+}
+
+test("a draft that types out the table's rows posts without them, and the text copy lists them once", async () => {
+  const rows = Array.from({ length: 13 }, (_, i) => {
+    const n = i + 1;
+    // The shapes a model types a row in: the plain list, a bullet, a linked
+    // title, another case and spacing.
+    if (n % 4 === 1) return `Card ${n} — #${400 + n} — WIP`;
+    if (n % 4 === 2) return `• Card ${n} — #${400 + n} — WIP`;
+    if (n % 4 === 3) return `- [Card ${n}](https://www.notion.so/card-${n}) (#${400 + n}) · WIP`;
+    return `*  <https://www.notion.so/card-${n}|CARD   ${n}>  —  #${400 + n}`;
+  });
+  const draft = [
+    "Thirteen cards are in WIP.",
+    "",
+    ...rows,
+    "",
+    "Card 3 (#403) has been in WIP since August, and Card 7 and Card 9 have no owner.",
+    "",
+    "Want me to chase the owners?",
+  ].join("\n");
+  const h = harness({ replies: [{ toolCalls: [ASK] }, { text: draft }], toolResult: wipResult(13) });
+
+  const { result: outcome, lines } = await logged(() => runTurn(request({ text: "which cards are in WIP?" }), h.deps));
+
+  const prose = [
+    "Thirteen cards are in WIP.",
+    "",
+    "Card 3 (#403) has been in WIP since August, and Card 7 and Card 9 have no owner.",
+    "",
+    "Want me to chase the owners?",
+  ].join("\n");
+  assert.equal(answerCall(h.delivery.calls).text, prose);
+  const stored = outcome.wrote.turns.find((t) => t.role === "assistant")?.content ?? "";
+  assert.ok(stored.startsWith(prose));
+  assert.equal(stored.split("\n").filter((l) => l.includes("#401")).length, 1, "the text copy lists each card once");
+  assert.ok(lines.some((l) => /\[card-table\].*removed 13\b/.test(l)), `logged: ${lines.join(" | ")}`);
+});
+
+test("a line with no card number is never touched, though it names a card", async () => {
+  const draft = ["Thirteen cards are in WIP.", "", "Card 1", "Card 2 — WIP"].join("\n");
+  const h = harness({ replies: [{ toolCalls: [ASK] }, { text: draft }], toolResult: wipResult(13) });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  assert.equal(answerCall(h.delivery.calls).text, draft);
+});
+
+test("with no table attached, a typed list is the answer and stays", async () => {
+  const draft = ["Three cards:", "Card 1 — #401 — WIP", "Card 2 — #402 — WIP", "Card 3 — #403 — WIP"].join("\n");
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "roadmap_query", args: { design_status: "WIP" } }] }, { text: draft }],
+    toolResult: wipResult(3),
+  });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  assert.equal(answerCall(h.delivery.calls).text, draft);
+});
+
+test("once a table is attached, the model is told the rows are the table's, not invited to list them", async () => {
+  const cut = JSON.parse(wipResult(30)) as Record<string, unknown>;
+  const h = harness({
+    replies: [{ toolCalls: [ASK] }, { text: "The first 30 of 41." }],
+    toolResult: JSON.stringify({
+      ...cut,
+      matched: 41,
+      truncated: false,
+      note:
+        "Complete result set from the live Roadmap board — safe to enumerate as the full answer. Cite the board and link cards you name." +
+        " (11 more rows truncated — say the list is the first 30.)",
+    }),
+  });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  const note = String(resultsTheModelRead(h)[0]?.note);
+  assert.doesNotMatch(note, /safe to enumerate/i);
+  assert.doesNotMatch(note, /say the list is the first/i);
+  assert.match(note, /card table/i);
+  assert.match(note, /\b30\b/);
+  assert.match(note, /\b41\b/, "the partial fact survives, worded for the caption");
+});
+
+test("with no table attached, the lookup's own note reaches the model unchanged", async () => {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "roadmap_query", args: { design_status: "WIP" } }] }, { text: "Thirteen." }],
+    toolResult: wipResult(13),
+  });
+  await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
+
+  assert.match(String(resultsTheModelRead(h)[0]?.note), /safe to enumerate/);
+});

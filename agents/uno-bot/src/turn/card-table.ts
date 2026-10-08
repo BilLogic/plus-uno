@@ -18,7 +18,11 @@
 // WHAT THE MODEL IS TOLD. The lookup's result gains `table_attached`, and
 // `row_count` when it is true, so the model writes its prose knowing what the
 // reader will see beneath it — a summary when a table is there, the plain list
-// when one is not.
+// when one is not. With a table, the lookup's `note` is replaced too: its own
+// is written for a model that lists the cards itself.
+//
+// ROWS TYPED TWICE. A model told all that still types the rows out at times,
+// so `withoutRepeatedRows` takes them out of the prose before it posts.
 //
 // THE PLAIN LIST is the answer of record: notifications, screen readers, the
 // thread's stored history and every later turn read the message's text copy,
@@ -122,7 +126,7 @@ export function readCardTable(name: string, args: Record<string, unknown>, resul
   const result = JSON.stringify({
     ...parsed,
     table_attached: table !== undefined,
-    ...(table ? { row_count: table.rows.length } : {}),
+    ...(table ? { row_count: table.rows.length, note: tableNote(table) } : {}),
   });
   return table ? { result, table } : { result };
 }
@@ -153,6 +157,39 @@ function tableOf(parsed: LookupResult): CardTable | undefined {
     total: matched,
     partial: matched > rows.length || parsed.truncated === true,
   };
+}
+
+/**
+ * The lookup's note, rewritten for a turn whose table is attached.
+ *
+ * The lookup's own note is written for a model that lists the cards itself —
+ * "safe to enumerate", "say the list is the first 30" — and a model told that
+ * types the rows out above a table that already shows them. This one says the
+ * rows are the table's and keeps the partial facts, worded as what the table
+ * shows rather than as a list to give.
+ */
+function tableNote(table: CardTable): string {
+  const n = table.rows.length;
+  const which = [
+    table.filter.designStatus ? `in Design Status ${table.filter.designStatus}` : null,
+    table.filter.person ? `with ${table.filter.person}` : null,
+    table.filter.title ? `with "${table.filter.title}" in the title` : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  const shows = !table.partial
+    ? `all ${n} cards ${which} (the complete set)`
+    : table.total > n
+      ? `the first ${n} of ${table.total} cards ${which}; say the table holds the first ${n} and give the total`
+      : `${n} cards ${which}, from a partial read of the board; say there may be more`;
+  return (
+    `A card table is posted beneath your answer. It shows ${shows}. ` +
+    "The rows belong to the table, so do not type them out: give the count, what stands out and any actions, " +
+    "and name at most 3 cards, linked." +
+    (table.filter.title
+      ? ' Cards with title_match "similar" are not in the table; offer those as \'did you mean\' only if they help.'
+      : "")
+  );
 }
 
 /**
@@ -190,4 +227,73 @@ export function cardList(table: CardTable): string {
  */
 export function withCardList(prose: string, table: CardTable): string {
   return [prose, "", cardList(table)].join("\n");
+}
+
+/** What `withoutRepeatedRows` left of the prose, and how many lines it took. */
+export interface RowsRemoved {
+  text: string;
+  removed: number;
+}
+
+const fold = (s: string): string => s.toLowerCase().replace(/\s+/g, " ").trim();
+
+/** Words a typed row may carry beside its title, number and statuses. */
+const ROW_LABELS = /\b(?:design|dev|status)\b/g;
+
+/**
+ * Whether one line of prose is a row of the table typed out again: it names a
+ * card's number AND its title, and once those, the card's statuses, a bullet,
+ * link wrapping and separators are taken away, nothing is left. A sentence
+ * that names a card says something more, so it stays.
+ */
+function repeatsRow(line: string, rows: CardTableRow[]): boolean {
+  if (!/#\d/.test(line)) return false;
+  // Link wrapping goes first: Slack's `<url|title>` and markdown's
+  // `[title](url)` keep the title and lose the address.
+  const plain = fold(line.replace(/<[^|>\s]+\|([^>]*)>/g, "$1").replace(/\[([^\]]*)\]\([^)\s]*\)/g, "$1"));
+  return rows.some((row) => {
+    if (row.cardNumber === null) return false;
+    const number = new RegExp(`#${row.cardNumber}(?!\\d)`);
+    const title = fold(row.title);
+    if (!number.test(plain) || !plain.includes(title)) return false;
+    let rest = plain.replace(title, " ").replace(number, " ");
+    for (const status of [row.designStatus, row.devStatus]) {
+      if (status) rest = rest.split(fold(status)).join(" ");
+    }
+    return !/[\p{L}\p{N}]/u.test(rest.replace(ROW_LABELS, " "));
+  });
+}
+
+/**
+ * The prose with every line that repeats a row of the table taken out.
+ *
+ * The table already shows the rows and the text copy lists them beneath the
+ * prose, so a row the model typed as well prints every card twice. Whole lines
+ * only, and only a line with a card number in it: a sentence that names a card
+ * is the model's to write. The blank lines a removed list leaves behind close
+ * up into one.
+ *
+ * @param prose - The answer as the model wrote it
+ * @param table - The table beneath it
+ */
+export function withoutRepeatedRows(prose: string, table: CardTable): RowsRemoved {
+  const kept: string[] = [];
+  let removed = 0;
+  let gap = false;
+  for (const line of prose.split("\n")) {
+    if (repeatsRow(line, table.rows)) {
+      removed++;
+      gap = true;
+      continue;
+    }
+    const blank = !line.trim();
+    // A blank line after a removal, beside another blank or at the start, is
+    // the gap the removed list left.
+    if (blank && gap && (kept.length === 0 || !kept[kept.length - 1]!.trim())) continue;
+    if (!blank) gap = false;
+    kept.push(line);
+  }
+  if (!removed) return { text: prose, removed: 0 };
+  while (kept.length && !kept[kept.length - 1]!.trim()) kept.pop();
+  return { text: kept.join("\n"), removed };
 }

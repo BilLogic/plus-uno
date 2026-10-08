@@ -109,7 +109,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { cardList, readCardTable, type CardTable } from "./card-table";
+import { cardList, readCardTable, withoutRepeatedRows, type CardTable } from "./card-table";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -1969,9 +1969,21 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     );
   }
 
+  // Rows the model typed out as well as the table come out here, after the
+  // judge (whose revision could type them too) and before the one call every
+  // Delivery shares, so Slack, the recording Delivery and the thread's memory
+  // all get the same prose. A rule that must hold on every provider lives in
+  // code, not in the persona.
+  let prose = reviewed.text;
+  if (ctx.cardTable) {
+    const stripped = withoutRepeatedRows(prose, ctx.cardTable);
+    if (stripped.removed) console.log(`[card-table] removed ${stripped.removed} repeated row line(s) from the prose`);
+    prose = stripped.text;
+  }
+
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
-  const posted = await delivery.postAnswer(reviewed.text, ctx.cardTable);
+  const posted = await delivery.postAnswer(prose, ctx.cardTable);
 
   // The receipt rides the USER turn, keyed by the user message's ts. It
   // describes the TURN, not the message, and the user ts is the only id this
