@@ -67,7 +67,7 @@ describe("an answer carrying a card table", () => {
 });
 
 describe("a split answer carrying a card table", () => {
-  it("puts the table on the last part only, beside the footer, and its list in that part's text copy", async () => {
+  it("puts the table on the last part only, above its (i/n) line and the footer, and its list in that part's text copy", async () => {
     const para = (i: number) => `Paragraph ${i}: ${"word ".repeat(60).trimEnd()}`;
     const prose = Array.from({ length: 48 }, (_, i) => para(i)).join("\n\n");
     const slack = recordingPosting();
@@ -80,7 +80,7 @@ describe("a split answer carrying a card table", () => {
     assert.equal(slack.of("startStream").length, 0, "not even the first part streams");
     messages.forEach((message, i) => {
       const last = i === messages.length - 1;
-      assert.deepEqual(typesOf(message), last ? ["markdown", "data_table", "context"] : ["markdown"], `part ${i + 1}`);
+      assert.deepEqual(typesOf(message), last ? ["markdown", "data_table", "context", "context"] : ["markdown", "context"], `part ${i + 1}`);
       assert.equal(message.text.endsWith(LIST), last, `part ${i + 1}'s text copy carries the list only if last`);
     });
   });

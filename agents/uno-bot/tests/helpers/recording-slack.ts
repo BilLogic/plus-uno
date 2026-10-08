@@ -337,7 +337,14 @@ export type PostingCall =
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "appendStream"; channel: string; ts: string; text: string }
-  | { kind: "stopStream"; channel: string; ts: string; blocks: boolean };
+  | {
+      kind: "stopStream";
+      channel: string;
+      ts: string;
+      blocks: boolean;
+      /** The blocks the stop carried, when it carried any. */
+      blockList?: unknown[];
+    };
 
 export interface RecordingPostingOptions {
   /** What `startStream` opens. `null` is a stream Slack would not open. */
@@ -436,7 +443,7 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
       return !opts.appendFails;
     },
     async stopStream(channel, ts, blocks) {
-      calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length });
+      calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length, ...(blocks?.length ? { blockList: blocks } : {}) });
       if (refuseBlocks(refused, "stop", blocks)) return false;
       if (stopped.has(ts)) {
         refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
