@@ -247,12 +247,14 @@ describe("the checklist", () => {
     await delivery.endProgress("complete");
     for (const call of slack.of("tasks")) assert.ok(call.tasks.every((t) => !("icon" in t)));
 
-    // Slack answered every icon shape tried on 2026-10-07 with
-    // `invalid_arguments`; a card carrying one must fail here too.
+    // Slack answered an image-URL icon with `invalid_arguments` on
+    // 2026-10-07; a card carrying one must fail here too.
     const strict = recordingSlack();
     const iconed = { id: "t1", title: "Reading GitHub", status: "in_progress" as const, icon: "https://example.test/github.png" };
     await strict.client.appendTasks("C123", "stream-1", [iconed]);
-    assert.deepEqual(expectRefusals(strict.refused), [{ call: "task t1 with an icon", error: "invalid_arguments" }]);
+    assert.deepEqual(expectRefusals(strict.refused), [
+      { call: "task t1 with an icon that is not an object", error: "invalid_arguments" },
+    ]);
     assert.equal(strict.landed.length, 0);
   });
 });
