@@ -69,6 +69,19 @@ describe("estate glyphs on task cards", () => {
     assert.deepEqual(icons.get("tool-4"), { type: "icon", name: "globe" });
   });
 
+  it("tells our own site's estates apart by path, and gives its other paths the globe", async () => {
+    const icons = await streamIcons([
+      { name: "source_read", args: { url: "https://plus-uno.netlify.app/storybook/?path=/docs/badge--docs" } },
+      { name: "source_read", args: { url: "https://plus-uno.netlify.app/blueprint/phase/in-session" } },
+      { name: "source_read", args: { url: "https://plus-uno.netlify.app/storybook-old/x" } },
+      { name: "source_read", args: { url: "https://plus-uno.netlify.app/home" } },
+    ]);
+    assert.deepEqual(icons.get("tool-1"), { type: "icon", name: "cube" });
+    assert.deepEqual(icons.get("tool-2"), { type: "icon", name: "map" });
+    assert.deepEqual(icons.get("tool-3"), { type: "icon", name: "globe" });
+    assert.deepEqual(icons.get("tool-4"), { type: "icon", name: "globe" });
+  });
+
   it("carries the same icons on the static plan in a top-level DM", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), { channel: "D123", userMsgTs: "100.1", userId: "U1", team: "T1" });

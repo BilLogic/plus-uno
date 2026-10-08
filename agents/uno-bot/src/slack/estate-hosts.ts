@@ -1,4 +1,5 @@
-// Which estate a link lives on, from its host — the rule that decides whether
+// Which estate a link lives on, from its host (and, on our own site, its
+// path) — the rule that decides whether
 // a source may ride on a card at all (`card-sources.ts`). Two hand-written
 // copies had once drifted on which GitHub content host counted; one table
 // keeps that from happening again.
@@ -16,7 +17,17 @@ const ESTATE_HOSTS: ReadonlyArray<readonly [Estate, readonly string[]]> = [
   ["notion", ["notion.so", "notion.site"]],
 ];
 
+/** The estates our own Netlify site serves, each under a path prefix of the
+ *  one host — so a link to it says which estate it is by its path, not its
+ *  host. Other paths there are prototypes and previews: no estate. */
+const OWN_SITE = "plus-uno.netlify.app";
+const OWN_SITE_PATHS: ReadonlyArray<readonly [Estate, string]> = [
+  ["storybook", "/storybook"],
+  ["blueprint", "/blueprint"],
+];
+
 const isHost = (host: string, domain: string): boolean => host === domain || host.endsWith(`.${domain}`);
+const underPath = (path: string, prefix: string): boolean => path === prefix || path.startsWith(`${prefix}/`);
 
 /**
  * The estate a host belongs to, or null for one that is none of them.
@@ -43,5 +54,8 @@ export function estateOfUrl(raw: unknown): Estate | null {
     return null;
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+  if (url.hostname.toLowerCase() === OWN_SITE) {
+    return OWN_SITE_PATHS.find(([, prefix]) => underPath(url.pathname, prefix))?.[0] ?? null;
+  }
   return estateOfHost(url.hostname);
 }

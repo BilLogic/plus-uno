@@ -53,10 +53,7 @@ export function sanitizeSlackMarkup(text: string): string {
     (match, inner: string | undefined, offset: number) => {
       // A `>` run opening a line is mrkdwn's quote marker (`>` or `>>>`).
       if (match[0] === ">" && (offset === 0 || text[offset - 1] === "\n")) return match;
-      if (inner !== undefined) {
-        const safe = validMarkup(inner);
-        return safe === null ? escapeBare(match) : `<${safe}>`;
-      }
+      if (inner !== undefined) return keepOrEscapeToken(match, inner);
       if (match === "&") return ENTITY.test(text.slice(offset)) ? "&" : "&amp;";
       return match === "<" ? "&lt;" : "&gt;";
     },
@@ -104,10 +101,18 @@ export function sanitizeSlackBlocks<T>(blocks: T): T {
  * entity can show; a blank message is the worse outcome. Idempotent.
  */
 export function sanitizeMarkdownMarkup(text: string): string {
-  return text.replace(/<([^<>\n]*)>/g, (match, inner: string) => {
-    const safe = validMarkup(inner);
-    return safe === null ? escapeBare(match) : `<${safe}>`;
-  });
+  return text.replace(/<([^<>\n]*)>/g, keepOrEscapeToken);
+}
+
+/** One `<…>` token, both passes' way: the valid markup it holds, normalised,
+ *  or the whole token entity-escaped when Slack could not parse it.
+ *
+ * @param token - The token, brackets included
+ * @param inner - What sits between the brackets
+ */
+function keepOrEscapeToken(token: string, inner: string): string {
+  const safe = validMarkup(inner);
+  return safe === null ? escapeBare(token) : `<${safe}>`;
 }
 
 /**

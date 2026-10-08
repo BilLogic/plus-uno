@@ -172,6 +172,39 @@ describe("the fallback ladder", () => {
       `logged the second step down: ${lines.join(" / ")}`,
     );
   });
+
+  it("goes straight to bare text when the refusal is not about the blocks", async () => {
+    for (const error of ["ratelimited", "channel_not_found"]) {
+      const slack = recordingPosting({ postFailsWith: { error } });
+      const { result } = await warnings(() =>
+        postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", TABLE_ANSWER, RECIPIENT),
+      );
+
+      assert.equal(result.ok, false);
+      const messages = slack.of("message");
+      assert.equal(messages.length, 2, `${error}: a doomed post costs two calls, not three`);
+      assert.equal(at(blocksOf(at(messages, 0)), 0).type, "markdown");
+      assert.equal(at(messages, 1).blocks, false, `${error}: the second call is bare text`);
+    }
+  });
+
+  it("treats invalid_arguments as a block refusal only when Slack points into /blocks", async () => {
+    const intoBlocks = recordingPosting({
+      postFailsWith: { error: "invalid_arguments", messages: ["[ERROR] must be a valid block [json-pointer:/blocks/0]"] },
+    });
+    await warnings(() =>
+      postTextVerified(intoBlocks.deps({ streamingOn: false }), "C1", "100.1", TABLE_ANSWER, RECIPIENT),
+    );
+    assert.equal(intoBlocks.of("message").length, 3, "every rung is tried");
+
+    const elsewhere = recordingPosting({
+      postFailsWith: { error: "invalid_arguments", messages: ["[ERROR] missing required field [json-pointer:/channel]"] },
+    });
+    await warnings(() =>
+      postTextVerified(elsewhere.deps({ streamingOn: false }), "C1", "100.1", TABLE_ANSWER, RECIPIENT),
+    );
+    assert.equal(elsewhere.of("message").length, 2, "straight to bare text");
+  });
 });
 
 describe("the markup pass over a markdown block", () => {
