@@ -1210,6 +1210,52 @@
       ],
       "textRegex": "^(?:\\uD83C\\uDF89 ?)?(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))",
       "judgeNote": "AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. The one place a reply may carry an emoji: a single 🎉 at the very start of the first line, on a shipped, merged or published outcome. Deterministic: at most that one opening 🎉, and no other emoji anywhere. For the judge: the 🎉 is optional and never the point — the first sentence still says what the merge means; no emoji sits in the bold lead's middle, a bullet or a link; and the reply does not claim facts about the PR it did not read (a reply that says it has not opened the PR is fine). A second emoji, or a 🚀 or ✨ in place of the 🎉, fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]"
+    },
+    {
+      "id": "CH1",
+      "name": "a count across a status compares, so it is a bar chart under a one-line takeaway",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "How are Bill's Roadmap cards spread across Design Status? I want the shape of it."
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "expectToolCalled": {
+        "tool": "present",
+        "args": {
+          "shape": "chart",
+          "lookup": "roadmap_query",
+          "group_by": "design_status"
+        }
+      },
+      "textRegex": "^(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))\\*\\*[^*\\n]+\\*\\*",
+      "judgeNote": "AUTHORED 2026-10-08 with the charts ticket of the presentation spec. Cards counted per Design Status are numbers that compare, so the answer is a chart: the turn reads Bill's cards with roadmap_query and asks present for a chart grouped by design_status, counting cards (no measure). Code counts the groups from the lookup's rows; the model types no number it was not handed. Deterministic: a present call with shape chart, lookup roadmap_query and group_by design_status, and a reply that opens with one **bold** sentence and carries no emoji. For the judge: the bold lead is the takeaway (where most cards sit), any count the prose names matches what present's result returned, and the cards are not listed out under the chart. A plain bullet list of statuses, a table in place of the chart, or a count the result did not give, fails. [samples:3 — whether the model asks for a chart or a table is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]"
+    },
+    {
+      "id": "CH2",
+      "name": "a list of cards to scan is a table, not a chart",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "Which Roadmap cards are WIP right now?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "expectToolCalled": {
+        "tool": "roadmap_query",
+        "args": {
+          "design_status": "WIP"
+        }
+      },
+      "textRegex": "^(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))",
+      "judgeNote": "AUTHORED 2026-10-08 with the charts ticket of the presentation spec. The contrast to CH1: the reader wants the cards themselves, to scan and open, so the answer is a result table of the WIP cards (roadmap_query's as_table, or present with shape table), and no chart. A chart is for numbers that compare or trend; one bar holding every WIP card shows nothing. Deterministic: roadmap_query runs with design_status WIP, and the reply carries no emoji. For the judge: the reply gives the count and what stands out, names at most 3 cards, and does not ask present for a chart. A chart, or the cards typed out as a list above a table, fails. [samples:3 — whether the model asks for a chart or a table is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]"
     }
   ]
 }

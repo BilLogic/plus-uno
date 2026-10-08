@@ -287,14 +287,13 @@
   },
   {
     "name": "present",
-    "description": "Ungated, fetches nothing. Show rows a lookup already returned THIS turn beneath your answer, as a sortable table or as cards. TABLE: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. CARDS: linkable items the reader will open — Figma frames, Roadmap cards, Help Center articles, components. One item posts as one card, 2 to 10 as a carousel; more are cut to the first 10. Each card shows the logo of where it leads, a title, a subtitle and link buttons built from the row's own links; rows with no link are left out. Name the title field first in `columns`, then optionally the subtitle field. The result says `table_attached` or `cards_attached`: when true, lead with the takeaway and what stands out, name at most 3 items, and leave the rest to what is attached; when false, its `error` says why, and you list the items in your answer yourself.",
+    "description": "Ungated, fetches nothing. Show rows a lookup already returned THIS turn beneath your answer, as a sortable table, as cards or as a chart. TABLE: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. CARDS: linkable items the reader will open — Figma frames, Roadmap cards, Help Center articles, components. One item posts as one card, 2 to 10 as a carousel; more are cut to the first 10. Each card shows the logo of where it leads, a title, a subtitle and link buttons built from the row's own links; rows with no link are left out. Name the title field first in `columns`, then optionally the subtitle field. The result says `table_attached` or `cards_attached`: when true, lead with the takeaway and what stands out, name at most 3 items, and leave the rest to what is attached; when false, its `error` says why, and you list the items in your answer yourself. CHARTS: when the rows hold numbers that compare (cards per Design Status, issues per owner) or trend (sessions per week), ask for shape 'chart' instead, with group_by and, to sum a numeric field rather than count rows, measure. Code counts or sums each group from the lookup's rows; you never type a value. At least 3 groups, at most 2 charts per answer. The result says `chart_attached` and hands back `values` and `total`: lead with the takeaway, and any number you give is one of those. A chart that cannot be grounded (a partial list, too few groups, a field the rows lack) comes back `chart_attached: false` with the rows attached as a table and a line beneath it saying why.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "shape",
         "lookup",
-        "columns",
         "takeaway"
       ],
       "properties": {
@@ -302,9 +301,28 @@
           "type": "string",
           "enum": [
             "table",
-            "cards"
+            "cards",
+            "chart"
           ],
-          "description": "The shape to show: 'table' for records to scan or compare, 'cards' for linkable items to open."
+          "description": "The shape to show: 'table' for records to scan or compare, 'cards' for linkable items to open, 'chart' for their counts or sums per group."
+        },
+        "chart": {
+          "type": "string",
+          "enum": [
+            "bar",
+            "line",
+            "area",
+            "pie"
+          ],
+          "description": "For shape 'chart': 'bar' to compare groups, 'line' or 'area' for a trend over ordered groups such as weeks, 'pie' for parts of a whole. Default 'bar'."
+        },
+        "group_by": {
+          "type": "string",
+          "description": "For shape 'chart': the field to group the rows by, exactly as the rows carry it (e.g. 'design_status')."
+        },
+        "measure": {
+          "type": "string",
+          "description": "For shape 'chart': a numeric field to sum per group. Omit to count the rows in each group."
         },
         "lookup": {
           "type": "string",
@@ -319,7 +337,7 @@
           "items": {
             "type": "string"
           },
-          "description": "For a table, 1 to 4 field names exactly as the rows carry them, the identifying field first (e.g. ['title', 'scenario', 'lane']). For cards, the title field, then optionally the subtitle field (e.g. ['name', 'page'])."
+          "description": "For a table, 1 to 4 field names exactly as the rows carry them, the identifying field first (e.g. ['title', 'scenario', 'lane']). For cards, the title field, then optionally the subtitle field (e.g. ['name', 'page']). For a chart, the columns its fallback table shows."
         },
         "takeaway": {
           "type": "string",

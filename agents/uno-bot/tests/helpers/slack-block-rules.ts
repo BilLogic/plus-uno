@@ -10,11 +10,12 @@
 
 /** The block types the Worker sends: answers (`section`, `markdown`, the
  *  footer's `context`, the result table's `data_table`, the answer cards'
- *  `card` and `carousel`), the checklist (`plan`), proposal cards (`actions`,
- *  `image`), the Sources box (`container`) and the rest of its layouts. Slack
- *  knows more, but one the Worker never sends is a typo or a new shape nobody
- *  proved, and either should fail a test before it reaches Slack. An unknown
- *  `type` was refused by blocks.validate on 2026-10-07
+ *  `card` and `carousel`, a chart's `data_visualization`), the checklist
+ *  (`plan`), proposal cards (`actions`, `image`), the Sources box
+ *  (`container`) and the rest of its layouts. Slack knows more, but one the
+ *  Worker never sends is a typo or a new shape nobody proved, and either
+ *  should fail a test before it reaches Slack. An unknown `type` was refused
+ *  by blocks.validate on 2026-10-07
  *  (`invalid_blocks`, "must be a valid enum value"). */
 const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "section",
@@ -23,6 +24,7 @@ const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "data_table",
   "card",
   "carousel",
+  "data_visualization",
   "plan",
   "actions",
   "image",
@@ -247,6 +249,54 @@ function cardRefusal(card: unknown): string | null {
   return null;
 }
 
+/** A `data_visualization`'s limits, per Slack's block reference (read
+ *  2026-10-08): a title of 50 characters; 1–12 pie segments or series; 1–20
+ *  points per series; labels, series names and categories of 20 characters;
+ *  axis titles of 50. Two per message, which the live API enforced in Bill's
+ *  DM on 2026-10-07. */
+const VIZ = { title: 50, label: 20, axis: 50, series: 12, points: 20, perMessage: 2 };
+
+/** Why Slack would refuse a `data_visualization`, or null. */
+function dataVisualizationRefusal(block: Shape): string | null {
+  if (!nonEmpty(block.title) || String(block.title).length > VIZ.title) return "a data_visualization title missing or over 50 chars";
+  const chart = isShape(block.chart) ? block.chart : null;
+  if (!chart) return "a data_visualization without a chart";
+  const labelOk = (l: unknown) => nonEmpty(l) && String(l).length <= VIZ.label;
+  if (chart.type === "pie") {
+    const segments = Array.isArray(chart.segments) ? chart.segments : [];
+    if (segments.length < 1 || segments.length > VIZ.series) return `a pie of ${segments.length} segments`;
+    for (const s of segments) {
+      if (!isShape(s) || !labelOk(s.label)) return "a pie segment label missing or over 20 chars";
+      if (typeof s.value !== "number" || s.value <= 0) return "a pie segment of no positive value";
+    }
+    return null;
+  }
+  if (!["bar", "line", "area"].includes(String(chart.type))) return `a ${String(chart.type)} chart`;
+  const axis = isShape(chart.axis_config) ? chart.axis_config : null;
+  const categories = axis && Array.isArray(axis.categories) ? axis.categories : null;
+  if (!categories || categories.length === 0) return "a chart without axis categories";
+  if (!categories.every(labelOk)) return "a chart category over 20 chars";
+  for (const key of ["x_label", "y_label"] as const) {
+    if (axis && key in axis && String(axis[key]).length > VIZ.axis) return `a chart ${key} over 50 chars`;
+  }
+  const series = Array.isArray(chart.series) ? chart.series : [];
+  if (series.length < 1 || series.length > VIZ.series) return `a chart of ${series.length} series`;
+  const names = new Set<string>();
+  for (const s of series) {
+    if (!isShape(s) || !labelOk(s.name)) return "a series name missing or over 20 chars";
+    if (names.has(String(s.name))) return "two series of one name";
+    names.add(String(s.name));
+    const data = Array.isArray(s.data) ? s.data : [];
+    if (data.length < 1 || data.length > VIZ.points) return `a series of ${data.length} points`;
+    const labels = data.map((d) => (isShape(d) ? d.label : undefined));
+    if (labels.length !== categories.length || !categories.every((c) => labels.includes(c))) {
+      return "a series without exactly one point per category";
+    }
+    if (!data.every((d) => isShape(d) && typeof d.value === "number")) return "a data point of no number";
+  }
+  return null;
+}
+
 /** Why Slack would refuse one block, or null. */
 function blockRefusal(block: unknown): string | null {
   if (!isShape(block)) return "a block that is not an object";
@@ -273,6 +323,10 @@ function blockRefusal(block: unknown): string | null {
   }
   if (type === "data_table") {
     const why = dataTableRefusal(block);
+    if (why) return why;
+  }
+  if (type === "data_visualization") {
+    const why = dataVisualizationRefusal(block);
     if (why) return why;
   }
   if (type === "container") {
@@ -320,6 +374,8 @@ export function messageBlocksRefusal(blocks: readonly unknown[]): string | null 
   }
   if (markdownChars > MARKDOWN_MESSAGE_CHARS) return `${markdownChars} chars of markdown in one message`;
   if (tableChars > DATA_TABLE_CHARS) return `${tableChars} chars of table cells in one message`;
+  const charts = blocks.filter((b) => isShape(b) && b.type === "data_visualization").length;
+  if (charts > VIZ.perMessage) return `${charts} data_visualization blocks in one message`;
   return null;
 }
 
