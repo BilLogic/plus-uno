@@ -93,6 +93,13 @@ covered. The eval judge restates grind's row because a Node script cannot import
 the Worker's TypeScript; `scripts/eval-judge.test.mjs` reads
 `gemini-tiers.ts` and fails if the restatement drifts.
 
+**The draft judge moved to `default` (2026-10-07, #964).** The latency was not a
+cost per judgement, it was the judgement: grind at `high` never finished inside
+the draft judge's 25s timer, so six of six judged drafts that day shipped
+unread, the shortest 2,729 characters. The draft judge names `default` now —
+still a tier, still no level of its own, so the rule above holds; only which
+tier changed. The eval judge stays on `grind`: it has no Turn waiting on it.
+
 `docs/plans/2026-08-07-006` stays as written; it is the record of the decision
 this one reverses, and the "one dial, held constant" reasoning in it is the
 reasoning this ADR answers.

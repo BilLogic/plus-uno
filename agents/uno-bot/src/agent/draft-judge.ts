@@ -25,12 +25,11 @@
 // caller chose is not a tier (ADR-028), so the judge was assembling a
 // configuration nobody had named or measured.
 //
-// The judge now names `grind` and nothing else: the model, the thinking level,
+// The judge now names a tier and nothing else: the model, the thinking level,
 // the prompt cache, the backup model and the per-call telemetry are the
-// adapter's. On the Gemini lane that means `gemini-3.1-pro-preview` at `high`
-// — where this module used to send that generation's flash model at `low` —
-// which is more thinking and more latency per judged draft, accepted as part of
-// the decision (2026-09-18) to stop maintaining an unnamed dial pair here.
+// adapter's. It named `grind` from 2026-09-18 and `default` since 2026-10-07,
+// when grind's thinking turned out not to fit the judge's timer at all —
+// JUDGE_TIER says why.
 //
 // Taking a `ModelProvider` rather than an `Env` is also what lets the Node
 // suite DRIVE the judge: tests/draft-judge.test.ts runs verdict parsing, the
@@ -130,12 +129,26 @@ const JUDGE_MAX_TOKENS = 6000;
 /**
  * The tier the judge grades on — the ONLY thing it says about the model.
  *
- * `grind` because a judge should be at least as strong as what it grades, and
- * because a tier is a model AND a thinking level moving together (ADR-028): the
- * judge naming a level of its own is how it ended up on a configuration no tier
- * described. Exported so the test can assert the tier rather than infer it.
+ * A tier because a tier is a model AND a thinking level moving together
+ * (ADR-028): the judge naming a level of its own is how it ended up on a
+ * configuration no tier described. Exported so the test can assert the tier
+ * rather than infer it.
+ *
+ * `default`, and no longer `grind`. #605 moved the judge to grind on the theory
+ * that a judge should be at least as strong as what it grades, and accepted
+ * "more latency" for it. It was not more latency, it was no judgement: on the
+ * Gemini lane grind is `gemini-3.1-pro-preview` at `high`, and on 2026-10-07
+ * every judged draft in `wrangler tail` — six of six across five builds, from
+ * 2,729 to 17,614 characters — hit JUDGE_TIMEOUT_MS and shipped unread. The
+ * 2.7k timeout is what names the cause: a pass verdict is a dozen output
+ * tokens, so the time was pro's high-level thinking, not the length of the
+ * draft or of a revision. Before #605 the judge ran this same flash model at
+ * `low`; `default` is that model one rung up, and it is the tier
+ * most drafts are written on, so the judge is still as strong as what it
+ * usually grades. A grind turn is now graded by a lighter tier than wrote it —
+ * accepted, because the other choice is a timer no grind judgement fits in.
  */
-export const JUDGE_TIER: ModelTier = "grind";
+export const JUDGE_TIER: ModelTier = "default";
 
 /** Appended to the judge system prompt ONLY on a detected correction turn — the
  *  one-obligation-per-field rule that governs tool payloads applies here too.
@@ -274,6 +287,22 @@ export async function reviewDraft(
       `[uno-bot] draft-judge build=${BUILD} verdict=skip reason=short draft_chars=${draft.length} correction=no`,
     );
     return judgeSkipped(draft, "draft shorter than the judged floor");
+  }
+
+  // Past MAX_DRAFT_CHARS the judge reads only a prefix, and a revision of a
+  // prefix cannot stand in for the whole: swapped in for a 17k walkthrough it
+  // would ship the first half as the answer. Neither MIN_REVISION_RATIO nor the
+  // vocabulary guard is built to catch "faithful but truncated", so nothing is
+  // asked. No caller lifts this — a correction or a forced repair would be just
+  // as truncated — and the skip is logged so it never reads as a pass. While
+  // the judge sat on grind this case was masked by the timeout, which fired
+  // before any revision could come back.
+  if (draft.trim().length > MAX_DRAFT_CHARS) {
+    console.log(
+      `[uno-bot] draft-judge build=${BUILD} verdict=skip reason=long draft_chars=${draft.length} ` +
+        `correction=${correction ? "yes" : "no"} forced=${forceReason ?? "no"}`,
+    );
+    return judgeSkipped(draft, "draft longer than the judge reads");
   }
 
   // Deterministic mirror of shouldRejectRevision: a post-correction reply that
