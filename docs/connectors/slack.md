@@ -117,6 +117,15 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the row's identifying field, its other values, the column headers' words, a bullet or link), so every row prints once. A Roadmap card counts as typed out only when the line names its number too. A sentence that names a row stays. The count removed is logged as `[result-table]`.
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
 
+#### Numbers that compare or trend: charts
+
+**A count or sum per group is a chart, computed by code.** The model calls `present` with shape `chart`, the lookup, the kind (`bar` to compare, `line` or `area` for a trend, `pie` for parts of a whole), `group_by`, and `measure` to sum a numeric field instead of counting rows. Code groups that lookup's rows and posts a Slack `data_visualization` block; the result hands the model the same `values` and `total`, so every number about the chart is grounded like a fetched one.
+
+- **Limits:** at least 3 points; at most 20 (12 for a pie); at most 2 charts per message, the cap Slack enforces live. Labels and the series name are cut to 20 characters and the title (code's: `Cards by Design Status`) to 50. A bar or pie runs largest first; a line or area runs in label order.
+- **Ungroundable → table:** a partial list (the first 30 of 41 would understate every bar), fewer than 3 groups, a group field the rows lack, a measure that is not a number on every row, or labels that collide once cut. The rows post as a result table instead, with a `context` line beneath: `⚠️ Not charted: only 2 groups to compare.` A lookup missing from this turn gets the refusal alone.
+- **Text copy:** each chart adds a line of its top 5 values (`Cards by Design Status: WIP 3 · Under Review 2 · Shipped 1`), and a ⚠️ line adds its sentence, so a notification carries the gist.
+- **Placement and fallback:** charts sit after the `markdown` block, before any table, ⚠️ line and footer, and the answer posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without charts or table, their text in the Markdown.
+
 ### What the Worker does on each path
 
 | Path | What is sent | Converted by |
