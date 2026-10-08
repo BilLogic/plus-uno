@@ -17,9 +17,10 @@ import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
+import { chartBlock } from "./chart-block";
 import { sourcesBox } from "./sources-box";
 import { answerCardsBlock } from "./answer-cards-block";
-import { textCopy, type Presentation } from "../turn/presentation";
+import { textCopy, warningLine, type Presentation } from "../turn/presentation";
 import { feedbackBlock, type AnswerFeedback } from "./feedback";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
@@ -221,10 +222,12 @@ interface Beneath {
   line?: string;
 }
 
-/** A part's Markdown with the plain text of the given extras: the rows and
- *  cards as lists, the links as a line. */
+/** A part's Markdown with the plain text of the given extras: the charts'
+ *  top values, the rows and cards as lists, the ⚠️ line, the links as a line. */
 function withPlain(piece: string, shown: readonly Beneath[]): string {
   const part: Presentation = Object.assign({}, ...shown.map((b) => b.part ?? {}));
+  const charts = shown.flatMap((b) => b.part?.charts ?? []);
+  if (charts.length) part.charts = charts;
   const lines = shown.flatMap((b) => (b.line ? [b.line] : []));
   return [textCopy(piece, part), ...lines].join("\n\n");
 }
@@ -264,11 +267,12 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
  * @param recipient who a stream would be for
  * @param footerHint forces the footer variant; absent = classify from the body
  * @param extras what rides beneath the answer: the turn's presentation, whose
- *   result table posts as a `data_table`, whose cards as a `card` or
- *   `carousel` and whose sources as a closed Sources box, between the last
- *   part's `markdown` block and its footer, each with its plain text appended
- *   to that part's text copy; and the feedback
- *   buttons, under a substantive answer's footer, tied to `feedback.turnId`
+ *   charts post as `data_visualization`s, result table as a `data_table`,
+ *   cards as a `card` or `carousel`, the ⚠️ line as a `context` and sources
+ *   as a closed Sources box, in that order between the last part's `markdown`
+ *   block and its footer, each with its plain text appended to that part's
+ *   text copy; and the feedback buttons, under a substantive answer's footer,
+ *   tied to `feedback.turnId`
  */
 export async function postTextVerified(
   deps: PostingDeps,
@@ -290,27 +294,38 @@ export async function postTextVerified(
   const body = renderDeliveredBody(text);
   const { presentation } = extras;
   const resultTable = presentation?.table;
+  const charts = presentation?.charts ?? [];
   const cards = presentation?.cards;
-  // A table of rows is a checkable claim however short the prose above it:
-  // the honesty line goes beneath it even when the prose alone would read as
-  // an acknowledgement. So is a set of cards.
+  // A chart, a table of rows or a set of cards is a checkable claim however
+  // short the prose above it: the honesty line goes beneath it even when the
+  // prose alone would read as an acknowledgement.
   const footerKind: FooterKind =
-    (resultTable || cards) && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
+    (charts.length || resultTable || cards) && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
   const footer = footerBlocks(footerKind);
   // The feedback buttons ride a full footer only: an acknowledgement has
   // nothing to judge, and a draft is the person's own words.
   const feedback = extras.feedback && footerKind === "full" ? [feedbackBlock(extras.feedback)] : [];
-  // The table, the cards and the box ride where the footer does — the
-  // answer's last part, where it ends — and their plain text rides that part's
-  // text copy, which is what a notification shows and what the thread
-  // remembers.
+  // The charts, the table, the cards, the ⚠️ line and the box ride where the
+  // footer does — the answer's last part, where it ends — and their plain text
+  // rides that part's text copy, which is what a notification shows and what
+  // the thread remembers.
   const box = sourcesBox(presentation?.sources);
-  // What rides beneath the last part, in order: the table, the cards, the box.
-  // Each carries its own plain text, so a refused one steps down on its own
-  // while the others stay aboard.
+  const degraded = presentation?.degraded;
+  // What rides beneath the last part, in order: the charts, the table, the
+  // cards, the ⚠️ line saying why a chart became that table, the box. Each
+  // carries its own plain text, so a refused one steps down on its own while
+  // the others stay aboard.
   const beneath: Beneath[] = [
+    ...charts.map((c) => ({ name: "chart", block: chartBlock(c) as unknown as Record<string, unknown>, part: { charts: [c] } })),
     ...(resultTable ? [{ name: "result table", block: resultTableBlock(resultTable), part: { table: resultTable } }] : []),
     ...(cards ? [{ name: "answer cards", block: answerCardsBlock(cards), part: { cards } }] : []),
+    ...(degraded
+      ? [{
+          name: "⚠️ line",
+          block: { type: "context", elements: [{ type: "mrkdwn", text: warningLine(degraded) }] },
+          part: { degraded },
+        }]
+      : []),
     ...(box ? [{ name: "Sources box", block: box.block, line: box.line }] : []),
   ];
   const copyOf = (piece: string, last: boolean): string => (last ? withPlain(piece, beneath) : piece);
@@ -318,9 +333,9 @@ export async function postTextVerified(
   const ok = await deliverAnswer(answerMessages(body), {
     async stream(piece, withFooter, marker) {
       if (!(deps.streamingOn && threadTs)) return false;
-      // An answer carrying a table, cards or a box posts as an ordinary
-      // message: Slack does not document them in a stream, and a stream's
-      // first part is not where they ride on a split answer anyway.
+      // An answer carrying a chart, a table, cards or a box posts as an
+      // ordinary message: Slack does not document them in a stream, and a
+      // stream's first part is not where they ride on a split answer anyway.
       if (beneath.length > 0) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision
@@ -379,17 +394,18 @@ export async function postTextVerified(
     // section rung too, so it goes straight to bare text: a doomed post costs
     // two calls, not three.
     //
-    // A part carrying a table, cards or a Sources box has rungs more, at the
-    // top: each refused one steps down on its own to its plain text in the
-    // Markdown (the rows as a plain list, the cards' linked so every item
-    // still opens, the links as a line) while the others stay aboard. When
-    // Slack's json-pointer lands on one of them, that one steps down; any
-    // other block refusal while they are aboard counts as all of theirs. They
-    // are the newest and least proven blocks in the message, Slack does not
-    // always point (`invalid_blocks` can arrive with no messages at all), and
-    // the costs are lopsided: blaming them wrongly spends one extra call
-    // before the section rung, while missing their refusal would drop the
-    // prose's Markdown to sections for nothing.
+    // A part carrying charts, a table, cards or a Sources box has rungs more,
+    // at the top: each refused one steps down on its own to its plain text in
+    // the Markdown (the charts' top values, the rows as a plain list, the
+    // cards' linked so every item still opens, the ⚠️ line, the links as a
+    // line) while the others stay aboard. When Slack's json-pointer lands on
+    // one of them, that one steps down; any other block refusal while they
+    // are aboard counts as all of theirs. They are the newest and least proven
+    // blocks in the message, Slack does not always point (`invalid_blocks` can
+    // arrive with no messages at all), and the costs are lopsided: blaming
+    // them wrongly spends one extra call before the section rung, while
+    // missing their refusal would drop the prose's Markdown to sections for
+    // nothing.
     //
     // The `text` copy is the whole part on every rung: notifications and
     // screen readers read it, and `postMessage` renders it to mrkdwn.

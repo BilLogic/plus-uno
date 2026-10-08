@@ -1,0 +1,46 @@
+{
+  "case": "CH1",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the charts ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=CH1`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "How are Bill's Roadmap cards spread across Design Status? I want the shape of it.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "roadmap_query",
+              "args": {
+                "person": "Bill"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "present",
+              "args": {
+                "shape": "chart",
+                "lookup": "roadmap_query",
+                "chart": "bar",
+                "group_by": "design_status",
+                "takeaway": "Half of Bill's cards are WIP."
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Half of Bill's cards are WIP.**\n\nThree of his six cards are WIP, two are Under Review and one has shipped, so most of his work is still in design."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "roadmap_query",
+          "text": "{\"ok\": true, \"filters\": {\"person\": \"Bill\"}, \"count\": 6, \"matched\": 6, \"truncated\": false, \"cards\": [{\"title\": \"Card 1\", \"url\": \"https://www.notion.so/card-1\", \"card_number\": 401, \"design_status\": \"WIP\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 2\", \"url\": \"https://www.notion.so/card-2\", \"card_number\": 402, \"design_status\": \"WIP\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 3\", \"url\": \"https://www.notion.so/card-3\", \"card_number\": 403, \"design_status\": \"WIP\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 4\", \"url\": \"https://www.notion.so/card-4\", \"card_number\": 404, \"design_status\": \"Under Review\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 5\", \"url\": \"https://www.notion.so/card-5\", \"card_number\": 405, \"design_status\": \"Under Review\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 6\", \"url\": \"https://www.notion.so/card-6\", \"card_number\": 406, \"design_status\": \"Shipped\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}], \"note\": \"Complete result set from the live Roadmap board.\"}"
+        }
+      ]
+    }
+  ]
+}
