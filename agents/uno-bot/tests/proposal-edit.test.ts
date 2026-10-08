@@ -64,6 +64,7 @@ function harness(threadState: ThreadState, opts: { pillars?: string[] | null } =
     applyVerdict: async (verdict) => void ran.push(verdict),
     updateCard: async (_channel, _ts, text, note) => void cardUpdates.push({ text, note }),
     restage: async () => {},
+    revise: async () => {},
     fieldOptions: async (source) => {
       optionReads.push(`${source.database}/${source.property}`);
       return opts.pillars === undefined ? PILLARS : opts.pillars;
@@ -97,7 +98,9 @@ type Block = {
 };
 
 const blocksOf = (view: unknown) => (view as { blocks: Block[] }).blocks;
-const inputs = (view: unknown) => blocksOf(view).filter((b) => b.type === "input");
+/** The draft's field inputs — not the note every confirmer's view also carries. */
+const inputs = (view: unknown) =>
+  blocksOf(view).filter((b) => b.type === "input" && (b.block_id ?? "").startsWith("uno_field:"));
 const alerts = (view: unknown) => blocksOf(view).filter((b) => b.type === "alert");
 
 describe("the pop-up offers the draft's fields", () => {

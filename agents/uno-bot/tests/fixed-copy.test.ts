@@ -71,6 +71,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "slack/button-door.ts": [],
   "slack/review-door.ts": [],
   "slack/review-view.ts": [],
+  "slack/interactive.ts": [],
   "slack/review-fields.ts": [],
   "slack/batch-result.ts": [],
   "turn/turn.ts": [],

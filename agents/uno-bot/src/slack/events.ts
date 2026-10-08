@@ -316,7 +316,7 @@ function conversationTs(e: ThreadedEvent): string {
   return isDm(e.channel) ? (e.thread_ts ?? DM_CONVERSATION) : (e.thread_ts ?? e.ts);
 }
 
-function conversationKey(e: ThreadedEvent): string {
+export function conversationKey(e: ThreadedEvent): string {
   return `${e.channel}:${conversationTs(e)}`;
 }
 
