@@ -55,10 +55,18 @@ export type ReviewViewState = Record<
   Record<string, { type?: string; value?: string | null; selected_option?: { value?: string } | null }>
 >;
 
-/** An edit the guards took: the batch with it applied, and the labels of the
- *  fields that changed. */
+/** One field an edit changed: its key, and its value before and after. */
+export interface FieldChange {
+  key: string;
+  from: string;
+  to: string;
+}
+
+/** An edit the guards took: the batch with it applied, the labels of the
+ *  fields that changed, and each change — what the decided card is
+ *  re-rendered with (`proposal-render.ts` § `withEditedFields`). */
 export type CheckedEdits =
-  | { ok: true; operations: ProposalOperation[]; edited: string[] }
+  | { ok: true; operations: ProposalOperation[]; edited: string[]; changes: FieldChange[] }
   | { ok: false; alert: string };
 
 /** Every input's block id starts with this; the rest is the field's key. */
@@ -317,7 +325,10 @@ export function checkEdits(proposal: PendingProposal, fields: readonly EditableF
     }
     return { toolName: op.toolName, input };
   });
-  return { ok: true, operations, edited: checked.edited };
+  const changes = fields
+    .filter((field) => checked.changed.has(field.key))
+    .map((field) => ({ key: field.key, from: field.value, to: checked.changed.get(field.key)! }));
+  return { ok: true, operations, edited: checked.edited, changes };
 }
 
 /** The card's line for an approved edit: who changed which fields. */

@@ -205,6 +205,38 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
   return { summary, size };
 }
 
+/**
+ * A card's text with the Review pop-up's edits in place of the draft's values:
+ * what an approved card says from then on, in the thread and in View.
+ *
+ * Each change is written where this module wrote the field — its
+ * `• *Label:* value` line, labelled from the input key's last segment as
+ * `renderField` labels it — and, failing that, where its old value appears
+ * exactly once (a plan line naming another operation's title). A value the
+ * draft never showed is left to the edit line beside it.
+ *
+ * @param text - The card's text as posted
+ * @param changes - The pop-up's changes: input key, value before and after
+ */
+export function withEditedFields(text: string, changes: ReadonlyArray<{ key: string; from: string; to: string }>): string {
+  let out = text;
+  for (const change of changes) {
+    if (!change.from) continue;
+    const label = humanizeParamKey(change.key.split(".").at(-1) ?? change.key);
+    const line = `• *${label}:* ${change.from}`;
+    const at = out.indexOf(line);
+    if (at !== -1) {
+      out = `${out.slice(0, at)}• *${label}:* ${change.to}${out.slice(at + line.length)}`;
+      continue;
+    }
+    const first = out.indexOf(change.from);
+    if (first !== -1 && out.indexOf(change.from, first + 1) === -1) {
+      out = `${out.slice(0, first)}${change.to}${out.slice(first + change.from.length)}`;
+    }
+  }
+  return out;
+}
+
 function clip(text: string, max: number): string {
   const line = text.split("\n")[0] ?? "";
   return line.length > max ? `${line.slice(0, max - 1)}…` : line;
