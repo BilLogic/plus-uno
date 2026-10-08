@@ -1,0 +1,16 @@
+{
+  "case": "E5",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the one-voice ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case's regex agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=E5`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "The Badge component PR just merged! Can you tell the thread what that means for designers, in a couple of lines?",
+      "replies": [
+        {
+          "text": "🎉 **Designers can use the new Badge straight from the library.**\n\nI haven't opened the PR itself, so check its description for any renamed variants before you swap old badges out."
+        }
+      ]
+    }
+  ]
+}

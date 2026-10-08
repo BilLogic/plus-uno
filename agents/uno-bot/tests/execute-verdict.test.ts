@@ -793,6 +793,23 @@ test("a budget stop in the task-completion write still posts the result and the 
   assert.ok(executionCalls.includes("end 1700000000.000300"));
 });
 
+// Code sends two reactions, 👀 on arrival and ❌ on a failure (AGENT.md
+// § Emoji budget). A decided card used to collect a 🤝 or a 👋 on the
+// requester's message as well, which the persona never described.
+test("a won verdict, confirmed or cancelled, adds no reaction", async () => {
+  for (const decision of ["confirm", "cancel"] as const) {
+    calls = [];
+    const run = await executeVerdict();
+    const verdict = won([{ toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } }]);
+    await run(env(), { ...verdict, decision } as GateVerdict);
+    assert.deepEqual(
+      calls.filter((c) => c.url.includes("reactions.add")).map((c) => c.body?.name),
+      [],
+      `a ${decision} reacted`,
+    );
+  }
+});
+
 // Body content the bot writes into Notion opens with whom it was written for,
 // so a reader knows the words are the bot's and whom to ask about them.
 

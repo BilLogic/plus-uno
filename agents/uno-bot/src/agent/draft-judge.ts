@@ -8,7 +8,9 @@
 //
 // Hard policies:
 //   • SKIP entirely for short replies (< MIN_DRAFT_CHARS) — quick lookups and
-//     acknowledgements never pay the judge tax.
+//     acknowledgements never pay the judge tax — unless the draft carries an
+//     emoji, which is read at any length (`voice/emoji.ts`), and a breach of
+//     the count fails whatever the judge says.
 //   • VERDICT ONLY past the revision window (MAX_DRAFT_CHARS): a long draft
 //     is read whole and graded, but no rewrite of it ever ships.
 //   • FAIL OPEN: any judge error/timeout/unparseable output → send the
@@ -41,6 +43,7 @@
 import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
 import type { ModelProvider, ModelText } from "./model-provider";
 import type { ModelTier } from "./routing";
+import { emojiIn, replyEmojiBreach } from "../voice/emoji";
 import { BUILD } from "../version";
 
 // ── the condensed rubric ────────────────────────────────────────────────────
@@ -94,6 +97,7 @@ HARD GATES (any one → verdict "fail"):
 - Bracket citations: [1]-style footnotes, [RM-2292]-style ticket brackets, or a repo path in brackets used as a citation. Link at the point of mention instead.
 - Leaks internal mechanics: tool names in snake_case, "Worker", "KV", model/tier names, token or tool budgets.
 - Placeholder text left in ("TODO", "[insert …]", "lorem").
+- Emoji, code "gate:emoji": a reply carries none, or one 🎉 opening its first line on a shipped, merged or published outcome. Fail more than one emoji, any other emoji or Slack :shortcode:, a 🎉 on anything else, and any emoji at all in an error, a refusal or a plain factual answer. The revision drops them.
 
 Do NOT fail a draft for facts you cannot verify, for tone, or for length alone. Prefer "pass" when in doubt.
 
@@ -210,6 +214,27 @@ function cardTableNote(list: string): string {
   );
 }
 
+/** What code counted of the draft's emoji, before the judge reads it. */
+interface EmojiReading {
+  count: number;
+  /** Set when the count or the place breaks the budget on its own. */
+  breach: string | null;
+}
+
+function readEmoji(draft: string): EmojiReading {
+  return { count: emojiIn(draft).length, breach: replyEmojiBreach(draft) };
+}
+
+function emojiNote(emoji: EmojiReading): string {
+  if (emoji.breach) {
+    return `MEASURED: this draft ${emoji.breach}, which breaks the emoji budget. Fail it with "gate:emoji", and the revision drops them.\n\n`;
+  }
+  if (emoji.count > 0) {
+    return "MEASURED: this draft opens with a 🎉. It passes the emoji gate only on a shipped, merged or published outcome; anywhere else fail it with \"gate:emoji\" and drop it.\n\n";
+  }
+  return "";
+}
+
 export interface JudgeOutcome {
   /** The text to send: the revised draft on a usable "fail", else the original. */
   text: string;
@@ -264,6 +289,7 @@ async function callJudgeModel(
     extraInstruction?: string;
     mode: JudgeMode;
     cardTableList?: string;
+    emoji: EmojiReading;
   },
 ): Promise<ModelText> {
   const prompt =
@@ -280,6 +306,9 @@ async function callJudgeModel(
     // without knowing which tools ran — the judge was scoring that dimension
     // blind on every non-correction turn.
     `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` +
+    // Counted by code, like the restatement above: what the judge is left to
+    // read is only whether a lone opening 🎉 sits on a real outcome.
+    emojiNote(ctx.emoji) +
     `User message:\n${userText.slice(0, MAX_USER_CHARS)}\n\n` +
     // Never sliced: `reviewDraft` only asks about a draft that fits its mode's
     // window, so the judge always reads the draft whole.
@@ -345,10 +374,13 @@ export async function reviewDraft(
   const { userText, draft, priorAssistantText, forceReason, extraInstruction, cardTableList } = args;
   const correction = args.correction === true;
   const toolsUsedThisTurn = args.toolsUsedThisTurn ?? [];
+  // An emoji lifts the floor too: replies carry so few that reading each one
+  // costs little, and a one-line reply is exactly where a stray 🚀 lands.
+  const emoji = readEmoji(draft);
   // The length floor is BYPASSED on a correction. The 2026-08-17 denial that
   // started all this was short, so it was never judged — the one turn where the
   // judge had something to catch is the one it sat out.
-  if (!correction && !forceReason && draft.trim().length < MIN_DRAFT_CHARS) {
+  if (!correction && !forceReason && emoji.count === 0 && draft.trim().length < MIN_DRAFT_CHARS) {
     // Skips used to bypass telemetry entirely, so "the judge never ran" and
     // "the judge passed it" looked identical in the logs.
     console.log(
@@ -406,6 +438,7 @@ export async function reviewDraft(
         extraInstruction,
         mode,
         cardTableList,
+        emoji,
       }),
       new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
     ]);
@@ -443,6 +476,10 @@ export async function reviewDraft(
           if (revised) console.warn("[draft-judge] revision past the revision window — ignored, sending the original draft");
         } else if (revised.length < draft.trim().length * MIN_REVISION_RATIO) {
           console.warn("[draft-judge] fail verdict but truncated revision — sending the original draft");
+        } else if (replyEmojiBreach(revised)) {
+          // The judge is held to the budget it grades: a rewrite that keeps or
+          // adds an emoji the count refuses fixes nothing.
+          console.warn("[draft-judge] revision breaks the emoji budget — sending the original draft");
         } else if (shouldRejectRevision(draft, revised)) {
           // Length was the ONLY check until 2026-08-06, and a degenerate
           // revision is usually longer than the draft, so it passed. One
@@ -459,6 +496,12 @@ export async function reviewDraft(
         console.warn(`[draft-judge] unparseable judge output (${raw.slice(0, 120)}) — sending the original draft`);
       }
     }
+    // A breach is a fail on the count alone. The judge reading a draft with
+    // two emoji and passing it does not make the second one fit.
+    if (emoji.breach && verdict === "pass") {
+      verdict = "fail";
+      failed = ["gate:emoji"];
+    }
   } catch (err) {
     verdict = "error"; // fail open
     reason = err instanceof Error ? err.message : String(err);
@@ -470,7 +513,7 @@ export async function reviewDraft(
       `failed=[${failed.join(",")}] ` +
       `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length} ` +
       `correction=${correction ? "yes" : "no"} stalled=${stalled ? "yes" : "no"} ` +
-      `forced=${forceReason ?? "no"} mode=${mode} ` +
+      `forced=${forceReason ?? "no"} mode=${mode} emoji=${emoji.count} ` +
       `tools=[${toolsUsedThisTurn.join(",")}]`,
   );
   if (verdict === "skip") return judgeSkipped(text, reason);
