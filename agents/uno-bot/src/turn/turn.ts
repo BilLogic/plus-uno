@@ -109,7 +109,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { judgedList, presentedProse, presenter, type Presentation } from "./presentation";
+import { judgedList, presentedProse, presenter, type Presenter } from "./presentation";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -1122,7 +1122,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // comes back, rather than being read off the run afterwards, because the
   // model has to be TOLD what rides beneath its answer while it can still write
   // its prose around it — a summary over a table, the plain list without.
-  const presenting = presenter();
+  const presenting = presenter({ now: () => deps.now?.() ?? Date.now() });
 
   // The checklist: one task card per lookup that has words for one on its tool
   // table row. The loop reports every call it runs through the lookup path; a
@@ -1132,6 +1132,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // A finished card's links are also the presentation step's, for the
   // Sources box beneath the answer.
   const showToolProgress = (event: ToolProgressEvent): void => {
+    // A lookup refused before it ran never reaches `reviseLookupResult`, so
+    // the presentation step hears of it here: a budget refusal is a ⚠️ line.
+    if (event.phase === "refused") presenting.refused(event.name, event.reason);
     if (!taskCardFor(event.name)) return;
     delivery.toolProgress(event);
     if (event.phase === "finished" && event.sources) presenting.sourcesRead(event.sources);
@@ -1205,7 +1208,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // second message beside it. Every other exit below closes it itself, because
   // nothing that follows them would.
   if (result.kind === "text") {
-    const presentation = presenting.presentation();
+    // An answer the loop synthesised once its round-trips ran out rests on
+    // fewer lookups than it wanted: a ⚠️ line says so.
+    if (result.cutShort) presenting.budgetSpent();
     return finishTextTurn(result.text, {
       request,
       deps,
@@ -1216,7 +1221,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       correction,
       telemetry,
       memory,
-      ...(presentation ? { presentation } : {}),
+      presenting,
     });
   }
 
@@ -1849,8 +1854,9 @@ interface TextTurnCtx {
   correction: boolean;
   telemetry: TurnTelemetry;
   memory: ThreadMemory;
-  /** What this turn's lookups left to post beneath the answer. */
-  presentation?: Presentation;
+  /** The turn's presentation step: what its lookups left to post beneath the
+   *  answer, read once the pre-checks below have added their ⚠️ lines. */
+  presenting: Presenter;
 }
 
 /**
@@ -1915,6 +1921,9 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     try {
       if (judgeAbsence(deps.deliveredBody(draft)) === "unscoped") {
         absenceRepair = absenceRepairInstruction(run.absence);
+        // The repair rewrites the claim; the ⚠️ line keeps the scope in front
+        // of the reader whatever the rewrite says.
+        ctx.presenting.absenceFired(run.absence);
         console.log(`[absence] unscoped claim over ${run.absence.visibility} — forcing repair`);
       }
     } catch (err) {
@@ -1923,6 +1932,10 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
       );
     }
   }
+
+  // Everything that rides beneath the answer is known from here on: the
+  // lookups' table and ⚠️ lines, and the absence check's line above.
+  const presentation = ctx.presenting.presentation();
 
   // ONE judge call carries both repairs when both fire. Sent as two sibling
   // instructions they compete and the model does one.
@@ -1947,7 +1960,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
     // both: a draft that summarises and points at the table has answered.
-    ...(judgedList(ctx.presentation) ? { tableList: judgedList(ctx.presentation) } : {}),
+    ...(judgedList(presentation) ? { tableList: judgedList(presentation) } : {}),
   });
   telemetry.judge = reviewed.verdict;
 
@@ -1978,13 +1991,13 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // Delivery shares, so Slack, the recording Delivery and the thread's memory
   // all get the same prose. A rule that must hold on every provider lives in
   // code, not in the persona.
-  const stripped = presentedProse(reviewed.text, ctx.presentation);
+  const stripped = presentedProse(reviewed.text, presentation);
   if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
   const prose = stripped.text;
 
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
-  const posted = await delivery.postAnswer(prose, ctx.presentation);
+  const posted = await delivery.postAnswer(prose, presentation);
 
   // The receipt rides the USER turn, keyed by the user message's ts. It
   // describes the TURN, not the message, and the user ts is the only id this

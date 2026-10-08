@@ -18,9 +18,11 @@ import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
 import { chartBlock } from "./chart-block";
+import { toSlackMrkdwn } from "./mrkdwn";
 import { sourcesBox } from "./sources-box";
 import { answerCardsBlock } from "./answer-cards-block";
-import { textCopy, warningLine, type Presentation } from "../turn/presentation";
+import { textCopy, type Presentation } from "../turn/presentation";
+import { signed } from "../turn/warning-line";
 import { feedbackBlock, type AnswerFeedback } from "./feedback";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
@@ -228,6 +230,8 @@ function withPlain(piece: string, shown: readonly Beneath[]): string {
   const part: Presentation = Object.assign({}, ...shown.map((b) => b.part ?? {}));
   const charts = shown.flatMap((b) => b.part?.charts ?? []);
   if (charts.length) part.charts = charts;
+  const warnings = shown.flatMap((b) => b.part?.warnings ?? []);
+  if (warnings.length) part.warnings = warnings;
   const lines = shown.flatMap((b) => (b.line ? [b.line] : []));
   return [textCopy(piece, part), ...lines].join("\n\n");
 }
@@ -253,6 +257,16 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
   return note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : [];
+}
+
+/**
+ * A ⚠️ line as Slack shows it: one `context` line, sign first, beneath the
+ * cards and above the Sources box. A context line and not Slack's `alert`
+ * block, which Slack refuses in a message (live 2026-10-07); a context line
+ * renders on every client, phone included.
+ */
+function warningBlock(line: string): Record<string, unknown> {
+  return { type: "context", elements: [{ type: "mrkdwn", text: signed(toSlackMrkdwn(line)) }] };
 }
 
 /**
@@ -296,11 +310,13 @@ export async function postTextVerified(
   const resultTable = presentation?.table;
   const charts = presentation?.charts ?? [];
   const cards = presentation?.cards;
+  const warnings = presentation?.warnings ?? [];
   // A chart, a table of rows or a set of cards is a checkable claim however
-  // short the prose above it: the honesty line goes beneath it even when the
-  // prose alone would read as an acknowledgement.
-  const footerKind: FooterKind =
-    (charts.length || resultTable || cards) && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
+  // short the prose above it, and so is anything a ⚠️ line qualifies: the
+  // honesty line goes beneath it even when the prose alone would read as an
+  // acknowledgement.
+  const qualified = charts.length > 0 || Boolean(resultTable) || Boolean(cards) || warnings.length > 0;
+  const footerKind: FooterKind = qualified && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
   const footer = footerBlocks(footerKind);
   // The feedback buttons ride a full footer only: an acknowledgement has
   // nothing to judge, and a draft is the person's own words.
@@ -310,22 +326,14 @@ export async function postTextVerified(
   // rides that part's text copy, which is what a notification shows and what
   // the thread remembers.
   const box = sourcesBox(presentation?.sources);
-  const degraded = presentation?.degraded;
   // What rides beneath the last part, in order: the charts, the table, the
-  // cards, the ⚠️ line saying why a chart became that table, the box. Each
-  // carries its own plain text, so a refused one steps down on its own while
-  // the others stay aboard.
+  // cards, the ⚠️ lines, the box. Each carries its own plain text, so a
+  // refused one steps down on its own while the others stay aboard.
   const beneath: Beneath[] = [
     ...charts.map((c) => ({ name: "chart", block: chartBlock(c) as unknown as Record<string, unknown>, part: { charts: [c] } })),
     ...(resultTable ? [{ name: "result table", block: resultTableBlock(resultTable), part: { table: resultTable } }] : []),
     ...(cards ? [{ name: "answer cards", block: answerCardsBlock(cards), part: { cards } }] : []),
-    ...(degraded
-      ? [{
-          name: "⚠️ line",
-          block: { type: "context", elements: [{ type: "mrkdwn", text: warningLine(degraded) }] },
-          part: { degraded },
-        }]
-      : []),
+    ...warnings.map((w) => ({ name: "⚠️ line", block: warningBlock(w), part: { warnings: [w] } })),
     ...(box ? [{ name: "Sources box", block: box.block, line: box.line }] : []),
   ];
   const copyOf = (piece: string, last: boolean): string => (last ? withPlain(piece, beneath) : piece);
@@ -336,6 +344,9 @@ export async function postTextVerified(
       // An answer carrying a chart, a table, cards or a box posts as an
       // ordinary message: Slack does not document them in a stream, and a
       // stream's first part is not where they ride on a split answer anyway.
+      // An answer with a ⚠️ line posts as one too: a stream has no text copy,
+      // and the line's sentence must reach the notification as well as the
+      // block.
       if (beneath.length > 0) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision

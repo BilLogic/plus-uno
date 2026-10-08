@@ -159,7 +159,7 @@ test("fewer than 3 points falls back to the result table, with a ⚠️ line in 
   assert.equal(presentation?.charts, undefined, "no chart");
   assert.ok(presentation?.table, "the rows post as a table");
   assert.equal(presentation.table.lookup, "roadmap_query");
-  assert.match(presentation.degraded ?? "", /only 2 groups/);
+  assert.match((presentation.warnings ?? []).join("\n"), /only 2 groups/);
   assert.equal(told[0]!.chart_attached, false);
   assert.equal(told[0]!.table_attached, true);
   assert.match(String(told[0]!.error), /only 2 groups/);
@@ -174,11 +174,11 @@ test("values that cannot be grounded fall back too: a partial list, or a measure
   const partial = await turn([chartOf()], { result: roadmapResult(undefined, { matched: 41 }) });
   assert.equal(partial.presentation?.charts, undefined);
   assert.ok(partial.presentation?.table);
-  assert.match(partial.presentation?.degraded ?? "", /first 6 of 41/);
+  assert.match((partial.presentation?.warnings ?? []).join("\n"), /first 6 of 41/);
 
   const words = await turn([chartOf({ measure: "dev_status" })]);
   assert.equal(words.presentation?.charts, undefined);
-  assert.match(words.presentation?.degraded ?? "", /dev_status/);
+  assert.match((words.presentation?.warnings ?? []).join("\n"), /dev_status/);
 
   const missing = await turn([chartOf({ group_by: "pillar" })]);
   assert.equal(missing.presentation?.charts, undefined);

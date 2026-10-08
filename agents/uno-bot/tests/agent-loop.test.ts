@@ -416,7 +416,7 @@ test("hitting the iteration ceiling triggers the tools-disabled synthesis pass",
 
   const result = await runLoop(loopInput(provider, rec));
 
-  assert.deepEqual(result, { kind: "text", text: "here is what I gathered" });
+  assert.deepEqual(result, { kind: "text", text: "here is what I gathered", cutShort: true });
   assert.equal(provider.sends.length, MAX_ITERATIONS + 1);
   // Every iteration ran with tools; only the synthesis pass did not.
   assert.deepEqual(
@@ -439,7 +439,7 @@ test("no iteration budget left goes straight to the synthesis pass", async () =>
 
   const result = await runLoop(loopInput(provider, rec));
 
-  assert.deepEqual(result, { kind: "text", text: "answering from nothing" });
+  assert.deepEqual(result, { kind: "text", text: "answering from nothing", cutShort: true });
   assert.deepEqual(
     provider.sends.map((s) => s.toolsEnabled),
     [false],

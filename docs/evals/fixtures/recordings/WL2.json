@@ -1,0 +1,32 @@
+{
+  "case": "WL2",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the ⚠️-line ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case's regex agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=WL2`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "What Design Status is the Session Sign Up card in?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "Session Sign Up"
+              }
+            }
+          ]
+        },
+        {
+          "text": "**[Session Sign Up](https://www.notion.so/example-2410) is in WIP.** I read the Roadmap board just now."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "roadmap_query",
+          "text": "{\"ok\": true, \"hits\": 1, \"cards\": [{\"title\": \"Session Sign Up\", \"url\": \"https://www.notion.so/example-2410\", \"card_number\": 2410, \"design_status\": \"WIP\"}]}"
+        }
+      ]
+    }
+  ]
+}

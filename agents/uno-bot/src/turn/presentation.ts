@@ -10,10 +10,11 @@
 // model writes the plain list instead. Nothing the model types becomes a cell.
 //
 // THE PRESENTATION is the data the turn hands Delivery beside the prose: the
-// result table, up to 2 charts, the sentence saying why a chart became a
-// table, and the answer cards. Each shape is one field on it, built here from
-// the same recorded lookups and spelled for Slack on the posting side, so a
-// new shape never needs a new argument on the Delivery seam.
+// result table, up to 2 charts, the answer cards and the ⚠️ lines
+// (`turn/warning-line.ts`, which every lookup result and the model's
+// `conflict` shape also pass through). Each shape is one field on it, built
+// here from the same recorded lookups and spelled for Slack on the posting
+// side, so a new shape never needs a new argument on the Delivery seam.
 //
 // WHAT THE MODEL IS TOLD. A Roadmap lookup that asked for a table gains
 // `table_attached`, and `row_count` and a rewritten `note` when it is true.
@@ -26,8 +27,8 @@
 // refused.
 //
 // A CHART THAT CANNOT BE GROUNDED (`turn/chart.ts` says why) degrades to the
-// lookup's rows as a result table, and the reason rides as `degraded`, which
-// the posting side shows as a ⚠️ line and the text copy repeats.
+// lookup's rows as a result table, and the reason rides as the ⚠️ log's
+// `degraded` line, under the same two-line cap as every other trigger.
 //
 // THE SOURCES are every link the turn's lookups read, as their task cards
 // carry them: each once, in the order read. Which of them a thread may see,
@@ -52,6 +53,8 @@ import {
   type RowsRemoved,
 } from "./result-table";
 import { cardList, cardsOf, type AnswerCards } from "./answer-cards";
+import { signed, warningLog } from "./warning-line";
+import type { AbsenceContext } from "../agent/absence";
 
 /** What rides beneath an answer. */
 export interface Presentation {
@@ -59,9 +62,10 @@ export interface Presentation {
   table?: ResultTable;
   /** Up to 2 charts, in the order they were asked for. */
   charts?: Chart[];
-  /** Why a chart the model asked for is the table instead, as one sentence
-   *  for the reader: "Not charted: only 2 groups to compare." */
-  degraded?: string;
+  /** The ⚠️ lines (`turn/warning-line.ts`): at most two sentences, each
+   *  without its sign, which the posting side places. A chart that fell back
+   *  to a table says why here: "Not charted: only 2 groups to compare." */
+  warnings?: readonly string[];
   /** The links the turn's lookups read, each once, in the order read. */
   sources?: readonly TaskCardSource[];
   /** The answer cards, when the model asked for its linkable items as cards. */
@@ -81,6 +85,12 @@ export interface Presenter {
    * the text the model reads — rewritten when it carries a table's news.
    */
   revise(name: string, args: Record<string, unknown>, text: string): string;
+  /** A lookup refused before it ran, with the refusal's error. */
+  refused(name: string, error: string): void;
+  /** The loop ran out of round-trips and answered from what it had. */
+  budgetSpent(): void;
+  /** The absence pre-check fired on the draft. */
+  absenceFired(ctx: AbsenceContext): void;
   /** The links a finished lookup read, as its task card carries them. */
   sourcesRead(sources: readonly TaskCardSource[]): void;
   /** What the turn's lookups left to post beneath the answer, if anything. */
@@ -178,12 +188,16 @@ function fallbackColumns(result: Record<string, unknown>, groupBy: string, measu
   return [...new Set([name, groupBy, measure].filter((f): f is string => !!f))];
 }
 
-/** A fresh presenter, for one turn. */
-export function presenter(): Presenter {
+/**
+ * A fresh presenter, for one turn.
+ *
+ * @param opts.now - The turn's clock, read for the ⚠️ line's freshness cutoff
+ */
+export function presenter(opts: { now?: () => number } = {}): Presenter {
   const lookups = new Map<string, Recorded>();
+  const warnings = warningLog(opts.now);
   let table: ResultTable | undefined;
   const charts: Chart[] = [];
-  let degraded: string | undefined;
   const sources = new Map<string, TaskCardSource>();
   let cards: AnswerCards | undefined;
 
@@ -246,7 +260,7 @@ export function presenter(): Presenter {
     const fallback = tableFrom(lookup, recorded, args, named.length ? named : fallbackColumns(recorded.result, groupBy, measure));
     if (typeof fallback === "string") return refuseChart(`No chart: ${reading.refusal}`);
     table = fallback;
-    degraded = `Not charted: ${reading.refusal}`;
+    warnings.degraded(`Not charted: ${reading.refusal}`);
     return answer({
       ok: false,
       chart_attached: false,
@@ -272,11 +286,29 @@ export function presenter(): Presenter {
     return answer({ ok: true, cards_attached: true, card_count: cards.cards.length, note: cardsNote(cards) });
   };
 
+  /** The model's conflict line: placed under the answer by code, or refused. */
+  const conflict = (args: Record<string, unknown>): string => {
+    const taken = warnings.conflict(args.line);
+    return taken.ok
+      ? answer({
+          ok: true,
+          warning_attached: true,
+          note: "The line is posted beneath your answer with its ⚠️. Do not repeat the conflict in your prose or type ⚠️ yourself.",
+        })
+      : answer({
+          ok: false,
+          warning_attached: false,
+          error: taken.refusal,
+          note: "No ⚠️ line was added. If the conflict still matters, say it plainly in one sentence of your prose, without ⚠️.",
+        });
+  };
+
   /** The model's `present` call, answered from the recorded lookups. */
   const present = (args: Record<string, unknown>): string => {
     const shape = args.shape ?? "table";
+    if (shape === "conflict") return conflict(args);
     if (shape !== "table" && shape !== "cards" && shape !== "chart") {
-      return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table, cards or a chart.`);
+      return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table, cards, a chart or a conflict.`);
     }
     const lookup = typeof args.lookup === "string" ? args.lookup.trim() : "";
     const recorded = lookups.get(lookup);
@@ -293,7 +325,7 @@ export function presenter(): Presenter {
     if (typeof made === "string") return refuse(made);
     // A table asked for in its own right replaces a fallback, and its reason.
     table = made;
-    degraded = undefined;
+    warnings.degraded(undefined);
     return answer({
       ok: true,
       table_attached: true,
@@ -306,6 +338,7 @@ export function presenter(): Presenter {
   return {
     revise(name, args, text) {
       if (name === PRESENT_TOOL) return present(args);
+      warnings.lookup(name, text);
       const parsed = parse(text);
       if (!parsed || parsed.ok !== true) return text;
       lookups.set(name, { args, result: parsed });
@@ -314,7 +347,7 @@ export function presenter(): Presenter {
       const cards = args.as_table === true ? roadmapCards(parsed as RoadmapResult) : undefined;
       if (cards) {
         table = roadmapTable(cards);
-        degraded = undefined;
+        warnings.degraded(undefined);
       }
       return JSON.stringify({
         ...parsed,
@@ -322,17 +355,27 @@ export function presenter(): Presenter {
         ...(cards ? { row_count: cards.rows.length, note: cardTableNote(cards) } : {}),
       });
     },
+    refused(name, error) {
+      warnings.refused(name, error);
+    },
+    budgetSpent() {
+      warnings.budgetSpent();
+    },
+    absenceFired(ctx) {
+      warnings.absenceFired(ctx);
+    },
     sourcesRead(read) {
       for (const source of read) if (!sources.has(source.url)) sources.set(source.url, source);
     },
     presentation() {
-      if (!table && charts.length === 0 && !sources.size && !cards) return undefined;
+      const lines = warnings.lines();
+      if (!table && charts.length === 0 && !sources.size && !cards && !lines.length) return undefined;
       return {
         ...(table ? { table } : {}),
         ...(charts.length ? { charts: [...charts] } : {}),
-        ...(table && degraded ? { degraded } : {}),
         ...(sources.size ? { sources: [...sources.values()] } : {}),
         ...(cards ? { cards } : {}),
+        ...(lines.length ? { warnings: lines } : {}),
       };
     },
   };
@@ -360,8 +403,8 @@ export function presentedProse(prose: string, presentation: Presentation | undef
 
 /**
  * The message's text copy: the prose, then each chart's top values, a table's
- * plain list and the ⚠️ line, in the order they post. What a notification
- * shows, a screen reader reads and the thread remembers.
+ * plain list, the cards' list and the ⚠️ lines, in the order they post. What a
+ * notification shows, a screen reader reads and the thread remembers.
  *
  * @param prose - The answer as it posts
  * @param presentation - What rides beneath it
@@ -372,13 +415,8 @@ export function textCopy(prose: string, presentation: Presentation | undefined):
   let copy = charts.length ? [prose, "", ...charts].join("\n") : prose;
   if (presentation.table) copy = withResultList(copy, presentation.table);
   if (presentation.cards) copy = [copy, "", cardList(presentation.cards)].join("\n");
-  return presentation.degraded ? [copy, "", warningLine(presentation.degraded)].join("\n") : copy;
-}
-
-/** The ⚠️ line a degraded chart leaves, as it posts and as the text copy
- *  carries it. */
-export function warningLine(sentence: string): string {
-  return `⚠️ ${sentence}`;
+  const lines = presentation.warnings ?? [];
+  return lines.length ? `${copy}\n\n${lines.map(signed).join("\n")}` : copy;
 }
 
 /**

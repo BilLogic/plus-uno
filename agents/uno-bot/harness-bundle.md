@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,743 chars from 16 files**, against an assembled budget of 175,500 (9,757 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 145,359 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,698 chars from 16 files**, against an assembled budget of 175,500 (7,802 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 147,314 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,223 (−7,696 ide-only) | 10,223 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,982 | 30,233 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,974 | 58,248 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,641 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,583 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,337 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,540 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,187 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,575 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,971 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,387 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 27,005 (−5,910 ide-only) | 141,434 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 144,718 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 151,234 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 155,897 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 165,743 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,998 | 58,272 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,665 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,607 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,361 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,564 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,211 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,599 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,995 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,411 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 28,936 (−5,910 ide-only) | 143,389 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 146,673 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,189 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 157,852 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 167,698 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -349,7 +349,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 ## Grounding (no claims without a fetched source)
 
 - **Roadmap ≠ blueprint — two different languages** (`CONTEXT.md` is the law; route by FRAME words, not topic words). Blueprint answers cite the rows and attribute each activity to its `lane` actor. Report in the vocabulary of the estate actually read; empty result → say WHICH estate. Deeper card content than `roadmap_query` returns → `source_read` on its url.
-- **Two sources, one time axis (ADR-021).** Blueprint = how it works *today*; cards + PRDs = what's *planned*. **One carve-out:** the blueprint also carries a labelled future layer, marked by **`status`** on both `paths` and `cells` (the values: `CONTEXT.md` § Two vocabularies). **Only `status: live` describes how the service works today** — report every other status as future or as fading. Check THAT scenario for rows with `status <> 'live'` before telling anyone it has no future state. (Path names no longer carry `Planned:` / `Prototype:` prefixes — matching on one finds nothing.) A conflicting in-flight card is a planned change, not an error — word it by decision status ("this is changing" only if decided, "might change" if still exploratory). **Surface conflicts with both sources named and attributed.** Full routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis — read it before answering a conflict.
+- **Two sources, one time axis (ADR-021).** Blueprint = how it works *today*; cards + PRDs = what's *planned*. **One carve-out:** the blueprint also carries a labelled future layer, marked by **`status`** on both `paths` and `cells` (the values: `CONTEXT.md` § Two vocabularies). **Only `status: live` describes how the service works today** — report every other status as future or as fading. Check THAT scenario for rows with `status <> 'live'` before telling anyone it has no future state. (Path names no longer carry `Planned:` / `Prototype:` prefixes — matching on one finds nothing.) A conflicting in-flight card is a planned change, not an error — word it by decision status ("this is changing" only if decided, "might change" if exploratory). **Surface a conflict as one sentence naming both sources, via `present` shape `conflict`.** Full routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis — read it before answering a conflict.
 - **Every card lookup ends in a match or in named candidates.** Vague description, no clear match → offer the closest candidates (name + status + link) from `roadmap_query`'s ranked matches; asking for the Notion link is the LAST resort. When the user names a *specific* artifact, find THAT one — **a named thing is often a PRD or doc, not a card**, so no exact card match → search the doc surfaces too (`notion_search`) before concluding. Still nothing → list candidates AS candidates, naming which estates you checked. Presenting neighbors as if they were the asked-for thing is a wrong answer.
 - **Read every linked source** (`source_read` on any URL/PRD/Figma frame in the request) and answer from the fetched content, cited. Fetch fails → say you couldn't open it and why. "Who owns this?" → the page's people property, not roles or LinkedIn.
 - **Unreachable Notion link — exhaust fallbacks before asking:** (1) try it as a public web page; (2) search the team workspace for the same title; (3) only then grant steps, with the caveat that only pages IN the PLUS team workspace can be shared with the bot.
@@ -1020,7 +1020,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 **A count or sum per group is a chart, computed by code.** The model calls `present` with shape `chart`, the lookup, the kind (`bar` to compare, `line` or `area` for a trend, `pie` for parts of a whole), `group_by`, and `measure` to sum a numeric field instead of counting rows. Code groups that lookup's rows and posts a Slack `data_visualization` block; the result hands the model the same `values` and `total`, so every number about the chart is grounded like a fetched one.
 
 - **Limits:** at least 3 points; at most 20 (12 for a pie); at most 2 charts per message, the cap Slack enforces live. Labels and the series name are cut to 20 characters and the title (code's: `Cards by Design Status`) to 50. A bar or pie runs largest first; a line or area runs in label order.
-- **Ungroundable → table:** a partial list (the first 30 of 41 would understate every bar), fewer than 3 groups, a group field the rows lack, a measure that is not a number on every row, or labels that collide once cut. The rows post as a result table instead, with a `context` line beneath: `⚠️ Not charted: only 2 groups to compare.` A lookup missing from this turn gets the refusal alone.
+- **Ungroundable → table:** a partial list (the first 30 of 41 would understate every bar), fewer than 3 groups, a group field the rows lack, a measure that is not a number on every row, or labels that collide once cut. The rows post as a result table instead, and the reason rides as a ⚠️ line (below): `⚠️ Not charted: only 2 groups to compare.` A lookup missing from this turn gets the refusal alone.
 - **Text copy:** each chart adds a line of its top 5 values (`Cards by Design Status: WIP 3 · Under Review 2 · Shipped 1`), and a ⚠️ line adds its sentence, so a notification carries the gist.
 - **Placement and fallback:** charts sit after the `markdown` block, before any table, ⚠️ line, Sources box and footer, and the answer posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without charts or table, their text in the Markdown.
 
@@ -1036,6 +1036,15 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Links:** a row's `url` is the first button, "Open"; its other http(s) fields follow, labelled by field name, up to Slack's 3. A row with no link is left out; a list with none is refused, and the model names the items in prose.
 - **Logos:** a card's icon is the logo of the estate its first link leads to (`estateOfUrl`), as a PNG image Slack fetches by URL; an SVG image does not render. PLUS, uno-blueprint, GitHub and Slack are served from `public/uno-bot/logos/` on plus-uno.netlify.app; Figma, Notion, Storybook and Metabase use Google's favicon service for their domain. A link on no estate's host carries the PLUS mark. Task cards keep Slack's named icons, since Slack refuses images there.
 - **Placement and fallback:** as the table's: after the `markdown` block, before the footer, always as an ordinary message. If Slack refuses the blocks, the answer goes out again without them, each card a linked Markdown line in the prose. The text copy carries the same lines.
+
+#### The ⚠️ line: what the reader has to see
+
+**A caution goes on its own line under the answer, apart from the prose.** Each ⚠️ line is a `context` block after any charts, table and cards, before the Sources box and footer: one sentence, at most two lines per answer. Slack's `alert` block is not used, because Slack refuses it in a message.
+
+- **Code adds it** from what the turn already knows, one line per trigger however often it fires: a lookup reported `truncated` or `partial`; a source errored, timed out or refused access (an argument the tool refused is not a source failure, and a retry that came back whole clears it); the lookup budget refused a lookup, cut one short, or ended the loop in a synthesis pass; blueprint rows whose newest `updatedAt` is older than 180 days; the absence pre-check fired; a chart fell back to a table (`Not charted: …`, withdrawn when a table asked for in its own right replaces it). The turn has no wall-clock budget, so the call budget is the only budget line.
+- **The model adds one, for an estate conflict:** two sources it read this turn disagree (the blueprint says one thing, a Roadmap card or PRD another). It calls `present` with shape `conflict` and the disagreement as one sentence in `line`; code places the ⚠️. Refused, in the call's own result: fewer than two sources answered this turn, more than one sentence, an emoji, over 240 characters, a second conflict, or two lines already held. A ⚠️ the model typed at the start of `line` is dropped.
+- **Order and cap:** lines keep the order their triggers were first met; a third is dropped.
+- **Text copy:** each line, sign first, after the prose and any chart, table or card lists, so notifications carry it. An answer with a ⚠️ line posts as an ordinary message rather than a stream, which has no text copy. A refused ⚠️ block steps down to its sentence in the Markdown, like any other block beneath the answer.
 
 ### What the Worker does on each path
 
