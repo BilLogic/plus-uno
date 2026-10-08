@@ -42,6 +42,7 @@ import {
 } from "../src/ds-precedence/env";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
+import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { resolveSignal, type GateSignal } from "../src/gate/index";
 import { createInMemoryThreadState, proposalSlot, type PendingProposal } from "../src/thread-state/index";
 
@@ -453,6 +454,81 @@ describe("the morning post", () => {
     assert.equal(ops[0]!.input.issue_number, 900);
     assert.match(String(ops[0]!.input.comment), /TreeSelect/);
     assert.equal(ops.some((o) => o.toolName === "github_issue_create"), false);
+  });
+
+  /** A report of `n` disagreements, one component each. */
+  const reportOf = (n: number): PrecedenceReport => ({
+    checkedAt: "2026-10-02T22:00:00.000Z",
+    weekOf: "2026-10-02",
+    items: Array.from({ length: n }, (_, i) => ({
+      key: `Component${i + 1}:missing`,
+      component: `Component${i + 1}`,
+      kind: "missing-in-figma" as const,
+      summary: "code has it, the library has no published component for it",
+      codeUrl: `https://github.com/${REPO}/blob/main/Component${i + 1}.md`,
+      figmaUrl: `https://www.figma.com/design/KEY?node-id=1-${i + 1}`,
+      winner: "code" as const,
+      loser: "library" as const,
+    })),
+  });
+  type Table = { caption: string; rows: Array<Array<{ type: string; text?: string; value?: number }>> };
+  const tableIn = (post: Post): Table | undefined =>
+    (post.blocks as Array<Record<string, unknown>> | undefined)?.find((b) => b.type === "data_table") as Table | undefined;
+
+  it("posts thirty items as one table in one message, the drop number first", async () => {
+    const { deps, posts } = postDeps(reportOf(30), null);
+    await postPrecedenceReport(deps);
+    assert.equal(posts.length, 2, "the list and its card, nothing spilled into the thread");
+    const list = posts[0]!;
+    assert.equal(messageBlocksRefusal(list.blocks!), null);
+    const table = tableIn(list);
+    assert.ok(table, JSON.stringify(list.blocks));
+    assert.equal(table.rows[0]![0]!.text, "#");
+    assert.equal(table.rows.length, 31, "a header and a row per item");
+    assert.deepEqual(
+      table.rows.slice(1).map((r) => r[0]),
+      Array.from({ length: 30 }, (_, i) => ({ type: "raw_number", value: i + 1, text: String(i + 1) })),
+    );
+    assert.match(JSON.stringify(table.rows[1]), /"url":"https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/main\/Component1\.md"/);
+    assert.match(JSON.stringify(table.rows[1]), /"url":"https:\/\/www\.figma\.com\/design\/KEY\?node-id=1-1"/);
+    // The finding leads and the `drop` instruction closes, around the table.
+    assert.match(JSON.stringify(list.blocks![0]), /Code and the library disagree on 30 components/);
+    assert.match(JSON.stringify(list.blocks!.at(-1)), /Reply `drop 2` for any that's deliberate/);
+  });
+
+  it("a drop still names the item the table numbered", async () => {
+    const { deps, posts, recorded } = postDeps(reportOf(30), null);
+    await postPrecedenceReport(deps);
+    const thread = recorded.at(-1)!;
+    assert.equal(thread.items.find((i) => i.n === 27)?.component, "Component27");
+    assert.equal(tableIn(posts[0]!)!.rows[27]![0]!.value, 27);
+    assert.match(JSON.stringify(tableIn(posts[0]!)!.rows[27]), /Component27/);
+  });
+
+  it("past thirty, the table holds the first thirty and the thread the rest, under their own numbers", async () => {
+    const { deps, posts } = postDeps(reportOf(33), null);
+    await postPrecedenceReport(deps);
+    const table = tableIn(posts[0]!)!;
+    assert.equal(table.rows.length, 31);
+    assert.match(JSON.stringify(posts[0]!.blocks![0]), /and 3 more, listed in the thread/);
+    const spilled = posts.slice(1, -1).map((p) => p.text).join("\n");
+    assert.match(spilled, /^31\. Component31: /m);
+    assert.match(spilled, /^33\. Component33: /m);
+    assert.doesNotMatch(spilled, /^30\. /m);
+  });
+
+  it("a refused table steps down to the plain list, the rest in the thread", async () => {
+    const { deps, posts } = postDeps(reportOf(30), null);
+    const post = deps.post;
+    deps.post = async (m) => (JSON.stringify(m.blocks ?? []).includes("data_table") ? (posts.push(m), { ok: false }) : post(m));
+    const result = await postPrecedenceReport(deps);
+    assert.equal(result.posted, true);
+    const plain = posts[1]!;
+    assert.equal(plain.blocks, undefined);
+    assert.match(plain.text, /^1\. Component1: /m);
+    assert.match(plain.text, /listed in the thread/);
+    const spilled = posts.filter((p) => p.thread_ts && !p.blocks).map((p) => p.text).join("\n");
+    assert.match(spilled, /^30\. Component30: /m);
   });
 
   it("records the list thread before its card, so a card that fails still leaves a list thread", async () => {

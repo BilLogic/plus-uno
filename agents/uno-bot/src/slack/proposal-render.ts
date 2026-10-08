@@ -472,6 +472,11 @@ function planLines(op: PlannedOperation, n: number): string[] {
 /** A run of operations that land on the SAME thing, in batch order. */
 export interface OperationGroup {
   heading: string;
+  /** The heading in plain words, for where mrkdwn does not render: a result
+   *  table's cell. */
+  name: string;
+  /** Where the target lives, when its input gives a real address. */
+  url?: string;
   /** Indices into the batch — so a caller can pair a group with whatever else
    *  it holds per operation (the Gate's outcomes) without re-deriving order. */
   members: number[];
@@ -489,10 +494,10 @@ export function groupOperations(operations: ReadonlyArray<PlannedOperation>): Op
   const groups: OperationGroup[] = [];
   const byKey = new Map<string, OperationGroup>();
   operations.forEach((op, i) => {
-    const { key, heading } = operationGroupKey(op);
+    const { key, ...target } = operationGroupKey(op);
     let group = byKey.get(key);
     if (!group) {
-      group = { heading, members: [] };
+      group = { ...target, members: [] };
       byKey.set(key, group);
       groups.push(group);
     }
@@ -501,39 +506,48 @@ export function groupOperations(operations: ReadonlyArray<PlannedOperation>): Op
   return groups;
 }
 
+/** A group's key, its card heading, the heading in plain words, and its link. */
+interface GroupKey {
+  key: string;
+  heading: string;
+  name: string;
+  url?: string;
+}
+
+/** A target whose card heading is its plain name in bold. */
+const bolded = (key: string, name: string): GroupKey => ({ key, heading: `*${name}*`, name });
+
 /** What an operation lands ON, in the words its own input uses — a Notion page,
  *  a data source, a repo, a channel, a recipient. Never invented: an input that
  *  names no target gets the tool's own generic heading, because a wrong target
  *  on a card is worse than a vague one. */
-function operationGroupKey(op: PlannedOperation): { key: string; heading: string } {
+function operationGroupKey(op: PlannedOperation): GroupKey {
   const str = (k: string): string =>
     typeof op.input[k] === "string" ? (op.input[k] as string).trim() : "";
 
   if (op.toolName === "notion_create") {
     const source = str("database") || str("data_source") || str("surface");
     return source
-      ? { key: `source:${source.toLowerCase()}`, heading: `*${source}* (Notion data source)` }
-      : { key: "source:notion", heading: "*Notion*" };
+      ? { key: `source:${source.toLowerCase()}`, heading: `*${source}* (Notion data source)`, name: `${source} (Notion data source)` }
+      : bolded("source:notion", "Notion");
   }
   if (op.toolName === "email_send") {
     const to = str("to") || str("recipient");
-    return to
-      ? { key: `email:${to.toLowerCase()}`, heading: `*${to}*` }
-      : { key: "email:", heading: "*Gmail*" };
+    return to ? bolded(`email:${to.toLowerCase()}`, to) : bolded("email:", "Gmail");
   }
   if (op.toolName === "dm_relay") {
+    // A table cell renders no mention, so the plain name is the kind of
+    // target; the text copy beside the table names the person.
     const id = relayRecipientId(op.input.recipient);
-    return id
-      ? { key: `dm:${id}`, heading: `*<@${id}>*` }
-      : { key: "dm:", heading: "*a DM*" };
+    return id ? { key: `dm:${id}`, heading: `*<@${id}>*`, name: "a DM" } : bolded("dm:", "a DM");
   }
   if (op.toolName === "shareout_post") {
     const channel = str("channel") || "#plus-design-feedback";
-    return { key: `channel:${channel.toLowerCase()}`, heading: `*${channel}*` };
+    return bolded(`channel:${channel.toLowerCase()}`, channel);
   }
   if (op.toolName === "component_implement" || op.toolName === "prototype_scaffold") {
     const repo = str("repo") || str("repository");
-    if (repo) return { key: `repo:${repo.toLowerCase()}`, heading: `*${repo}*` };
+    if (repo) return bolded(`repo:${repo.toLowerCase()}`, repo);
   }
   const pageUrl = str("page_url") || str("url");
   const title = str("title") || str("page_title") || str("page");
@@ -541,14 +555,13 @@ function operationGroupKey(op: PlannedOperation): { key: string; heading: string
     // Only a real URL becomes a link, and the title is escaped inside its
     // label: a `>` in either would end the link early.
     const linked = /^https?:\/\/[^\s|<>]+$/.test(pageUrl);
-    const label = escapeSlackText(title || (linked ? "this Notion page" : pageUrl));
+    const name = title || (linked ? "this Notion page" : pageUrl);
+    const label = escapeSlackText(name);
     const heading = linked ? `*<${pageUrl}|${label}>*` : `*${label}*`;
-    return { key: `page:${(pageUrl || title).toLowerCase()}`, heading };
+    return { key: `page:${(pageUrl || title).toLowerCase()}`, heading, name, ...(linked ? { url: pageUrl } : {}) };
   }
   const target = operationTarget(op.input);
-  return target
-    ? { key: `other:${target.toLowerCase()}`, heading: `*${target}*` }
-    : { key: `tool:${op.toolName}`, heading: `*${op.toolName}*` };
+  return target ? bolded(`other:${target.toLowerCase()}`, target) : bolded(`tool:${op.toolName}`, op.toolName);
 }
 
 /** One operation's kinds, each with its own detail lines. A `notion_update`

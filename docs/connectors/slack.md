@@ -116,6 +116,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Text copy:** the prose, then a plain line per row, written by code from the table's rows. Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
 - **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the row's identifying field, its other values, the column headers' words, a bullet or link), so every row prints once. A Roadmap card counts as typed out only when the line names its number too. A sentence that names a row stays. The count removed is logged as `[result-table]`.
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
+- **Worker posts:** two fixed messages are result tables too, under a head line, falling back to their plain list when Slack refuses the table. A **batch result** (two or more operations) has a Where, What and Result row per operation: Result reads `done` or `failed: <reason>`, Where links the target and What links the item the operation created. A batch of more than 30 operations posts the list alone, and one operation posts no table. The **weekly precedence list** has the drop number in the first column, so `drop N` names the row a reader sees. The table holds up to 30 items in one message, and any items past 30 go in the thread under their own numbers.
 
 #### Sources box and link previews
 
@@ -255,7 +256,7 @@ Every Figma message passes these eight:
 5. No decorative emoji: 🎉 appears only on a ship, and 🐐 only in the label.
 6. The words match the table above.
 7. Anything written into Figma leads with `🐐 le goat (uno-bot) · AI-generated`.
-8. Under 1,500 characters; a longer list goes in the thread.
+8. Under 1,500 characters; a longer list goes in the thread. The weekly precedence list is the exception: its items are a result table of up to 30 rows in one message.
 
 **At the gate,** the library card, the weekly precedence card and the drift card answer in their own words, because the gate's shared lines assume a card someone asked for. A ⛔ closes the card with what it did ("Intake only", "Nothing filed this week", "No intake filed") and who decided. A ✅ or ⛔ after the window is told the card closed and what happens next. A replaced card, or a reaction beside one, points at the card itself, with no ⚠️ to name. Each card's lines sit beside its copy (`PendingProposal.stated`), and the same test holds them to this section.
 <!-- /ide-only -->

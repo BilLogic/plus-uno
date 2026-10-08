@@ -20,6 +20,7 @@ import assert from "node:assert/strict";
 import type { Env } from "../src/types";
 import type { GateVerdict } from "../src/gate/index";
 import type { ProposalEventLog } from "../src/usage/index";
+import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 
 interface Call {
   url: string;
@@ -27,6 +28,7 @@ interface Call {
 }
 
 let calls: Call[] = [];
+let refuseTables = false;
 
 globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   const url = String(input);
@@ -43,6 +45,10 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   if (String(body?.text ?? "").includes("EXPLODE")) throw new Error("socket hang up");
   const reply = (payload: unknown) =>
     new Response(JSON.stringify(payload), { status: 200, headers: { "content-type": "application/json" } });
+  // Slack refusing a table, on demand.
+  if (refuseTables && url.includes("chat.postMessage") && JSON.stringify(body?.blocks ?? []).includes("data_table")) {
+    return reply({ ok: false, error: "invalid_blocks" });
+  }
   if (url.includes("slack.com/api/chat.getPermalink")) {
     const u = new URL(url);
     const channel = u.searchParams.get("channel");
@@ -875,4 +881,69 @@ test("a property-only Notion update writes no attribution: there is no body to a
   const writes = notionWrites();
   assert.equal(writes.length, 1, JSON.stringify(writes));
   assert.deepEqual(Object.keys(writes[0]!.body), ["properties"]);
+});
+
+// A batch's result is a result table — where, what and result, a row per
+// operation — under a one-line head. A failure reads "failed" and its reason,
+// and a created item is linked from its row.
+test("a batch result posts as a table of where, what and result, linking what it created", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([
+      { toolName: "notion_create", input: { surface: "intake", title: "Fix the tutor table", summary: "The table overflows." } },
+      { toolName: "not_a_tool", input: {} },
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+    ]),
+  );
+  const result = posts().find((p) => p.channel === "D0REQUESTER" && Array.isArray(p.blocks));
+  assert.ok(result, posts().map((p) => p.text).join("\n---\n"));
+  assert.equal(result.thread_ts, "1700000000.000100");
+  const blocks = result.blocks as Array<Record<string, unknown>>;
+  assert.equal(messageBlocksRefusal(blocks), null);
+  const table = blocks.find((b) => b.type === "data_table") as { caption: string; rows: unknown[][] } | undefined;
+  assert.ok(table, JSON.stringify(blocks));
+  assert.match(table.caption, /3 operations: 2 done, 1 failed/);
+  const cell = (c: unknown): string => JSON.stringify(c);
+  assert.deepEqual(table.rows[0]!.map((c) => (c as { text: string }).text), ["Where", "What", "Result"]);
+  assert.equal(table.rows.length, 4, "a row per operation, under the header");
+  assert.match(cell(table.rows[1]![2]), /"text":"done"/);
+  assert.match(cell(table.rows[2]![2]), /"text":"failed: [^"]+"/);
+  assert.match(cell(table.rows[3]![2]), /"text":"done"/);
+  assert.match(cell(table.rows[1]), /"type":"link","url":"https:\/\/www\.notion\.so\/9f9f/, "the created page is linked");
+  // The text copy still names every operation: notifications and the thread's
+  // history read it.
+  assert.match(String(result.text), /2 done, 1 failed/);
+});
+
+test("a refused batch table steps down to the text it always posted", async () => {
+  calls = [];
+  refuseTables = true;
+  try {
+    const run = await executeVerdict();
+    await run(
+      env(),
+      won([
+        { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+        { toolName: "not_a_tool", input: {} },
+      ]),
+    );
+  } finally {
+    refuseTables = false;
+  }
+  const inThread = posts().filter((p) => p.channel === "D0REQUESTER");
+  assert.equal(inThread.length, 2, "the table, then the text alone");
+  assert.equal(inThread[1]!.blocks, undefined);
+  assert.match(String(inThread[1]!.text), /1 done, 1 failed/);
+});
+
+test("a one-operation result posts no table", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(NOTION_ENV),
+    won([{ toolName: "notion_create", input: { surface: "intake", title: "Fix the tutor table", summary: "The table overflows." } }]),
+  );
+  assert.equal(JSON.stringify(posts()).includes("data_table"), false);
 });

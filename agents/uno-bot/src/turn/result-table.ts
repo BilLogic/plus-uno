@@ -50,6 +50,9 @@ export interface ResultRow {
   cells: ResultCell[];
   /** Where the first column links, when the row carries an address. */
   url?: string;
+  /** Where each column links, in column order, for a row with more than one
+   *  address or one that is not in the first column. Overrides `url`. */
+  links?: Array<string | undefined>;
   /** The row as one line of the plain list. */
   line: string;
   /** What a line of prose must name, all of it, to be this row typed out. An

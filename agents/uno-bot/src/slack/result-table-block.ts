@@ -25,11 +25,17 @@ const NO_VALUE = "—";
 
 const raw = (text: string | null) => ({ type: "raw_text", text: text || NO_VALUE });
 
-function linkCell(row: ResultRow, title: string) {
+function linkCell(url: string, title: string) {
   return {
     type: "rich_text",
-    elements: [{ type: "rich_text_section", elements: [{ type: "link", url: row.url, text: title }] }],
+    elements: [{ type: "rich_text_section", elements: [{ type: "link", url, text: title }] }],
   };
+}
+
+/** Where a cell links: the row's own list when it has one, else its address
+ *  on the first column. */
+function linkOf(row: ResultRow, column: number): string | undefined {
+  return row.links ? row.links[column] : column === 0 ? row.url : undefined;
 }
 
 function cellOf(value: ResultCell, numeric: boolean) {
@@ -41,7 +47,8 @@ function cellOf(value: ResultCell, numeric: boolean) {
 /**
  * The `data_table` block for a result table: every row on one page, so a list
  * of up to 30 never pages five at a time. The first column links to the row's
- * address when it has one and a value to link.
+ * address when it has one and a value to link — or each column to its own,
+ * for a row that lists them (`ResultRow.links`).
  */
 export function resultTableBlock(table: ResultTable): Record<string, unknown> {
   return {
@@ -51,11 +58,10 @@ export function resultTableBlock(table: ResultTable): Record<string, unknown> {
     rows: [
       table.columns.map((c) => raw(c.label)),
       ...table.rows.map((row) =>
-        row.cells.map((value, i) =>
-          i === 0 && row.url && typeof value === "string" && value
-            ? linkCell(row, value)
-            : cellOf(value, table.columns[i]!.numeric),
-        ),
+        row.cells.map((value, i) => {
+          const url = linkOf(row, i);
+          return url && typeof value === "string" && value ? linkCell(url, value) : cellOf(value, table.columns[i]!.numeric);
+        }),
       ),
     ],
   };
