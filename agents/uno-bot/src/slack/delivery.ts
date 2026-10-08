@@ -16,6 +16,8 @@ import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
+import { cardTableBlock } from "./card-table-block";
+import { withCardList, type CardTable } from "../turn/card-table";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -223,6 +225,9 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
  * @param text the answer body
  * @param recipient who a stream would be for
  * @param footerHint forces the footer variant; absent = classify from the body
+ * @param extras what rides beneath the answer: a card table, posted as a
+ *   `data_table` between the last part's `markdown` block and its footer, with
+ *   its plain list appended to that part's text copy
  */
 export async function postTextVerified(
   deps: PostingDeps,
@@ -239,9 +244,21 @@ export async function postTextVerified(
    *  under the PERSON'S name, and the standard "check before acting" line is
    *  wrong for that. Absent = classify from the body. */
   footerHint?: FooterKind,
+  extras: { cardTable?: CardTable } = {},
 ): Promise<{ ok: boolean; text: string }> {
   const body = renderDeliveredBody(text);
-  const footer = footerBlocks(footerKindFor(body, footerHint));
+  const { cardTable } = extras;
+  // A table of cards is a checkable claim however short the prose above it:
+  // the honesty line goes beneath it even when the prose alone would read as
+  // an acknowledgement.
+  const footerKind: FooterKind = cardTable && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
+  const footer = footerBlocks(footerKind);
+  // The table rides where the footer does — the answer's last part, where it
+  // ends — and its plain list rides that part's text copy, which is what a
+  // notification shows and what the thread remembers.
+  const table = cardTable ? [cardTableBlock(cardTable)] : [];
+  const copyOf = (piece: string, last: boolean): string =>
+    last && cardTable ? withCardList(piece, cardTable) : piece;
 
   const ok = await deliverAnswer(answerMessages(body), {
     async stream(piece, withFooter) {
@@ -303,12 +320,13 @@ export async function postTextVerified(
     // screen readers read it, and `postMessage` renders it to mrkdwn.
     async post(piece, withFooter) {
       const tail = withFooter ? footer : [];
+      const copy = copyOf(piece, withFooter);
       const send = (blocks?: Array<Record<string, unknown>>) =>
         deps.slack
-          .postMessage({ channel, thread_ts: threadTs, text: piece, ...(blocks ? { blocks } : {}) })
+          .postMessage({ channel, thread_ts: threadTs, text: copy, ...(blocks ? { blocks } : {}) })
           .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
 
-      let posted = await send([{ type: "markdown", text: piece }, ...tail]);
+      let posted = await send([{ type: "markdown", text: piece }, ...(withFooter ? table : []), ...tail]);
       if (posted.ok) return true;
       if (refusedForBlocks(posted)) {
         console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
@@ -321,5 +339,5 @@ export async function postTextVerified(
     },
   });
 
-  return { ok, text: body };
+  return { ok, text: cardTable ? withCardList(body, cardTable) : body };
 }

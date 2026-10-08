@@ -190,6 +190,9 @@ export interface AgentInput {
    *  `onToolProgress`. Turn wires it on every turn; Delivery decides whether
    *  the surface shows it. */
   onToolProgress?: (event: ToolProgressEvent) => void;
+  /** The turn's last word on a lookup's result before the model reads it —
+   *  see `loop.ts` `reviseLookupResult`. */
+  reviseLookupResult?: (name: string, args: Record<string, unknown>, text: string) => string;
 }
 
 /**
@@ -296,6 +299,7 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
       onToolCall: input.onToolCall,
       onToolResult: input.onToolResult,
       onToolProgress: input.onToolProgress,
+      ...(input.reviseLookupResult ? { reviseLookupResult: input.reviseLookupResult } : {}),
       onSpend: (s) => {
         spend = s;
       },

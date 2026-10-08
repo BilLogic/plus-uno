@@ -21,6 +21,10 @@
         "card_number": {
           "type": "number",
           "description": "The card's numeric id as shown on the board (e.g. 2436)."
+        },
+        "as_table": {
+          "type": "boolean",
+          "description": "Show the cards as a sortable table beneath your answer, built from this lookup's rows. Set it when listing cards by design_status and/or person. The result says `table_attached` and `row_count`: when true, the reader sees every card in the table, so summarise rather than list them; when false, list the cards in your answer."
         }
       }
     }

@@ -154,6 +154,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         ...(req.preflight ? { preflight: req.preflight } : {}),
         onInterim: req.onInterim,
         onToolProgress: req.onToolProgress,
+        reviseLookupResult: req.reviseLookupResult,
         ...(reporters.onDials ? { onDials: reporters.onDials } : {}),
         ...(reporters.onToolCall ? { onToolCall: reporters.onToolCall } : {}),
         ...(reporters.onToolResult ? { onToolResult: reporters.onToolResult } : {}),

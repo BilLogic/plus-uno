@@ -37,7 +37,7 @@ import type {
 } from "../../src/slack/delivery-adapter";
 import type { FooterKind } from "../../src/slack/footer-kind";
 import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
-import type { DeliveryFailureStage } from "../../src/turn/index";
+import { withCardList, type CardTable, type DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
 import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES } from "./slack-block-rules";
 
@@ -64,6 +64,7 @@ export type SlackCall =
       userId: string;
       team?: string;
       footerHint?: FooterKind;
+      cardTable?: CardTable;
     }
   | {
       kind: "failure";
@@ -225,6 +226,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         userId: input.recipient.userId,
         ...(input.recipient.team === undefined ? {} : { team: input.recipient.team }),
         ...(input.footerHint === undefined ? {} : { footerHint: input.footerHint }),
+        ...(input.cardTable === undefined ? {} : { cardTable: input.cardTable }),
       });
       // Closing a stream INTO the answer appends the answer as markdown, and a
       // plan-mode stream takes task and plan chunks only. The client's type
@@ -236,7 +238,9 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         stopped.add(handed);
       }
       if (opts.answerThrows !== undefined) throw opts.answerThrows;
-      return { ok: true, text: input.text };
+      // What the posting path reports it posted: a card table's plain list
+      // rides the text copy beneath the prose.
+      return { ok: true, text: input.cardTable ? withCardList(input.text, input.cardTable) : input.text };
     },
     async postFailure(input) {
       record({

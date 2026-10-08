@@ -109,6 +109,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
+import { readCardTable, type CardTable } from "./card-table";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -369,6 +370,10 @@ export interface TurnAgentRequest {
   /** Where each lookup is in its life — the checklist's feed. Turn filters it
    *  to the calls that get a task card and hands those to Delivery. */
   onToolProgress(event: ToolProgressEvent): void;
+  /** Turn's last word on each lookup's result before the model reads it — how
+   *  it keeps the card table a lookup qualified for and tells the model so
+   *  (`turn/card-table.ts`). Returns the text the model reads. */
+  reviseLookupResult(name: string, args: Record<string, unknown>, text: string): string;
   /** The same clarify-vs-act check Turn runs after the loop returns, with this
    *  thread's PRD already bound, so the loop can put a refusal to the model as
    *  the call's own result instead of the person seeing the first one. */
@@ -794,7 +799,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
   };
   return {
     ...delivery,
-    postAnswer: (text) => noted(delivery.postAnswer(text)),
+    postAnswer: (text, cardTable) => noted(delivery.postAnswer(text, cardTable)),
     postNote: (text, tag) => noted(delivery.postNote(text, tag)),
     postGateNote: (note) => noted(delivery.postGateNote(note)),
     card: (proposal) => noted(delivery.card(proposal)),
@@ -1134,6 +1139,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     });
   };
 
+  // The card table: the last lookup this turn that qualified for one. Kept as
+  // each result comes back rather than read off the run afterwards, because
+  // the model has to be TOLD whether a table was attached while it can still
+  // write its prose around it — a summary over a table, the plain list without.
+  let cardTable: CardTable | undefined;
+  const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string => {
+    const reading = readCardTable(name, args, text);
+    if (reading.table) cardTable = reading.table;
+    return reading.result;
+  };
+
   let run: TurnAgentRun;
   try {
     run = await deps.runAgent({
@@ -1150,6 +1166,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       preflight: preflightCall,
       onInterim: (text) => postInterim(text),
       onToolProgress: showToolProgress,
+      reviseLookupResult,
       cancelSince: startedAt,
     });
   } catch (err) {
@@ -1192,6 +1209,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       correction,
       telemetry,
       memory,
+      ...(cardTable ? { cardTable } : {}),
     });
   }
 
@@ -1824,6 +1842,8 @@ interface TextTurnCtx {
   correction: boolean;
   telemetry: TurnTelemetry;
   memory: ThreadMemory;
+  /** The card table this turn's lookups left, to post beneath the answer. */
+  cardTable?: CardTable;
 }
 
 /**
@@ -1943,7 +1963,9 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     );
   }
 
-  const posted = await delivery.postAnswer(reviewed.text);
+  // The table rides with the answer; what comes back as `posted.text` is then
+  // the prose and its plain list, which is what the thread remembers below.
+  const posted = await delivery.postAnswer(reviewed.text, ctx.cardTable);
 
   // The receipt rides the USER turn, keyed by the user message's ts. It
   // describes the TURN, not the message, and the user ts is the only id this

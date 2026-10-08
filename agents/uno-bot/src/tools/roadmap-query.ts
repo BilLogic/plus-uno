@@ -189,6 +189,9 @@ export async function executeRoadmapQuery(
 
     let results: (RoadmapCard & { match_score?: number; title_match?: "contains" | "similar" })[];
     let containsCount: number | undefined;
+    // An enumeration's whole match count, beside the first rows it lists — the
+    // number a card table's caption gives as "first 30 of 41".
+    let matched: number | undefined;
     let note: string;
     if (title) {
       const ranked = cards
@@ -225,6 +228,7 @@ export async function executeRoadmapQuery(
           : "No Roadmap card resembles that title (the whole board was searched for those words, so this is a real absence, not a search miss). Say so plainly — and if the thing they named might be a doc rather than a card, check the docs before concluding.";
     } else {
       results = cards.slice(0, MAX_ENUMERATION_ROWS);
+      matched = cards.length;
       note =
         (truncated
           ? "PARTIAL result set — the board has more rows than could be read. Say the list is partial; never present it as the whole board."
@@ -243,6 +247,8 @@ export async function executeRoadmapQuery(
       },
       count: results.length,
       ...(containsCount !== undefined ? { contains_count: containsCount } : {}),
+      ...(matched !== undefined ? { matched } : {}),
+      truncated,
       cards: results,
       note,
     });
