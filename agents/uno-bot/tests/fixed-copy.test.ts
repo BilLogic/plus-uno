@@ -11,7 +11,8 @@
 //     reactions: "A ✅ there files it" is an instruction, not decoration.
 //   • 🐐 once on the App Home and once in the welcome, and nowhere else.
 //   • The reminder vocabulary 🙌 ⏳ 🙅 🤔 is protocol — a person answers a
-//     reminder by reacting with it — so the files that write reminders keep it.
+//     reminder by reacting with it, by Slack's name for it — and a button
+//     says the same answer in words, so no copy string carries the glyph.
 //   • The bot is "le goat" wherever it names itself, never "UNO Bot".
 //
 // Two checks, the way tests/figma-copy.test.ts pins the Figma messages:
@@ -42,8 +43,6 @@ const SRC = join(process.cwd(), "src");
 const STATUS = ["⚠", "❌", "✅", "⛔", "✏"];
 /** The two signs that are also the gate's reactions, so may be named mid-line. */
 const GATE = ["✅", "⛔"];
-/** How a person answers a reminder. */
-const REMINDER = ["🙌", "⏳", "🙅", "🤔"];
 const GOAT = "🐐";
 
 /** Slack shortcodes the copy writes, as the glyph a person sees. */
@@ -100,11 +99,11 @@ const FIXED_COPY: Record<string, string[]> = {
   "sweep/share.ts": [],
   "sweep/run.ts": [],
   "dm-watch/capture.ts": [],
-  "dm-watch/copy.ts": REMINDER,
-  "dm-sweep/copy.ts": REMINDER,
-  "follow-through/copy.ts": REMINDER,
+  "dm-watch/copy.ts": [],
+  "dm-sweep/copy.ts": [],
+  "follow-through/copy.ts": [],
   "follow-through/run.ts": [],
-  "commitments/copy.ts": REMINDER,
+  "commitments/copy.ts": [],
   // Figma library, drift and the weekly precedence thread. 🎉 marks a merged
   // PR, the one ship tests/figma-copy.test.ts allows.
   "figma-library/draft.ts": [],
@@ -272,6 +271,19 @@ describe("the per-file emoji allowlist", () => {
       if (extra.includes(GOAT)) {
         const goats = strings.flatMap(emojiIn).filter((e) => e === GOAT).length;
         assert.equal(goats, 1, `${file}: ${GOAT} once`);
+      }
+    });
+  }
+});
+
+describe("a button's label", () => {
+  // The reminder vocabulary is how a person REACTS; a button says its answer
+  // in words, so a label carries no glyph even in a file that keeps them.
+  for (const file of Object.keys(FIXED_COPY)) {
+    it(`${file} labels its buttons in words`, () => {
+      const src = readFileSync(join(SRC, file), "utf8");
+      for (const m of src.matchAll(/\blabel:\s*(["'`])((?:(?!\1).)*)\1/g)) {
+        assert.deepEqual(emojiIn(m[2]!), [], `${file}: label ${JSON.stringify(m[2])}`);
       }
     });
   }

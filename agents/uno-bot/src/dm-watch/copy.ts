@@ -21,14 +21,14 @@ export const DM_WATCH_LABELS: Readonly<Record<DmWatchFeature, string>> = {
 
 /** The answers under a reminder about a promise made to the owner. */
 export const MADE_TO_CHOICES: readonly ReminderChoice[] = [
-  { glyph: "raised_hands", label: "🙌 Got it" },
-  { glyph: "hourglass_flowing_sand", label: "⏳ Wait 2 more days" },
-  { glyph: "no_good", label: "🙅 Drop it" },
+  { glyph: "raised_hands", label: "Got it" },
+  { glyph: "hourglass_flowing_sand", label: "Wait 2 more days" },
+  { glyph: "no_good", label: "Drop it" },
 ];
 /** The same, once both ⏳ are spent: no ⏳ is offered that could bring nothing. */
 export const MADE_TO_LAST_CHOICES: readonly ReminderChoice[] = [
-  { glyph: "raised_hands", label: "🙌 Got it" },
-  { glyph: "no_good", label: "🙅 Drop it" },
+  { glyph: "raised_hands", label: "Got it" },
+  { glyph: "no_good", label: "Drop it" },
 ];
 /** A promise the owner made, once both ⏳ are spent. */
 export const MADE_LAST_CHOICES: readonly ReminderChoice[] = [
