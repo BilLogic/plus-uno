@@ -50,7 +50,7 @@ const cards = {
 };
 
 describe("a run of refusals beneath an answer", () => {
-  it("still posts the answer, within four posts, every extra as text", async () => {
+  it("still posts the answer, within three posts, every extra as text", async () => {
     const slack = recordingPosting({ refusesBlockTypes: ["data_visualization", "data_table", "carousel", "context_actions"] });
     const orig = console.warn;
     console.warn = () => {};
@@ -67,8 +67,8 @@ describe("a run of refusals beneath an answer", () => {
 
     assert.equal(result.ok, true);
     const messages = slack.of("message");
-    // The buttons, one pointed step-down, then everything left at once.
-    assert.ok(messages.length <= 4, `${messages.length} posts`);
+    // One pointed step-down, buttons kept, then everything left at once.
+    assert.ok(messages.length <= 3, `${messages.length} posts`);
     const last = messages.at(-1)!;
     assert.deepEqual(
       (last.blockList as Array<{ type: string }>).map((b) => b.type),

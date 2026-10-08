@@ -457,38 +457,43 @@ export async function postTextVerified(
         ...aboard.map((b) => b.block),
         ...tail,
       ];
-      const first = dressed();
-      // The feedback buttons ride the first rung only, at its very end. Any
-      // block refusal while they are aboard drops them and resends the same
-      // message — the table's rule, one rung higher: they are the newest
-      // block in the message, and a missing vote costs less than a worse answer.
-      const voting = withFooter && feedback.length > 0;
-      let posted = await send(voting ? [...first, ...feedback] : first);
+      // The feedback buttons ride the block rungs at the very end, from the
+      // first post on. They are the newest block in the message, so a refusal
+      // Slack does not point elsewhere drops them first and resends the same
+      // message: a missing vote costs less than a worse answer. A refusal
+      // Slack points at an extra steps that extra down and keeps them.
+      let voting = withFooter && feedback.length > 0;
+      const blocks = () => (voting ? [...dressed(), ...feedback] : dressed());
+      let posted = await send(blocks());
       if (posted.ok) return true;
-      if (voting && refusedForBlocks(posted)) {
-        console.warn(`[slack] feedback buttons refused (${refusalOf(posted)}); retrying without them`);
-        posted = await send(first);
-        if (posted.ok) return true;
-      }
       // Each refused extra steps down to its plain text in the Markdown, so a
       // rendering problem never costs the reader its rows or links, and the
       // rest stay aboard. Every rung below carries all of them as text.
       //
       // ONE POINTED STEP. The extra Slack points at steps down alone once;
-      // a second refusal takes every extra still aboard down together. One
-      // post per extra would spend the reserve the answer is posted from
-      // (`DELIVERY_RESERVE`), and a second refusal says the blocks are the
-      // trouble, not one of them.
+      // a refusal after it takes every extra still aboard down together, the
+      // buttons with them. One post per extra would spend the reserve the
+      // answer is posted from (`DELIVERY_RESERVE`), and a second refusal says
+      // the blocks are the trouble, not one of them.
       let pointedOnce = false;
-      while (aboard.length > 0 && refusedForBlocks(posted)) {
+      while ((voting || aboard.length > 0) && refusedForBlocks(posted)) {
         const at = pointedOnce ? null : pointedBlock(posted);
         const culprit = at === null ? undefined : aboard[at - 1];
         if (culprit) pointedOnce = true;
-        const out = culprit ? [culprit] : aboard;
-        console.warn(`[slack] ${out.map((b) => b.name).join(" and ")} refused (${refusalOf(posted)}); retrying without, as text`);
+        // Not pointed at an extra — at the buttons, at nothing, or past the
+        // pointed step — the buttons go: alone the first time, while no extra
+        // has stepped down yet, and with every extra after that.
+        const out = culprit ? [culprit] : voting && !pointedOnce ? [] : aboard;
+        if (!culprit && voting) {
+          voting = false;
+          console.warn(`[slack] feedback buttons refused (${refusalOf(posted)}); retrying without them`);
+        }
+        if (out.length) {
+          console.warn(`[slack] ${out.map((b) => b.name).join(" and ")} refused (${refusalOf(posted)}); retrying without, as text`);
+        }
         aboard = aboard.filter((b) => !out.includes(b));
         fallen = beneath.filter((b) => fallen.includes(b) || out.includes(b));
-        posted = await send(dressed());
+        posted = await send(blocks());
         if (posted.ok) return true;
       }
       const prose = withFooter && beneath.length > 0 ? copy : piece;
