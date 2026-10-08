@@ -25,9 +25,11 @@ import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
-import { conversationsOpen, deleteMessage, postToResponseUrl } from "./api";
+import { conversationsOpen, deleteMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
-import { proposalCardBlocks } from "./proposal-render";
+import { REVIEW_ACTION_ID, proposalCardBlocks } from "./proposal-render";
+import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "./review-door";
+import { REVIEW_APPROVE_ACTION_ID, reviewedCardOf } from "./review-view";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
@@ -47,6 +49,10 @@ interface InteractionPayload {
   message?: { ts?: string; thread_ts?: string };
   actions?: Array<{ action_id?: string; value?: string; selected_options?: { value?: string }[] }>;
   callback_id?: string;
+  /** A click's one-use, three-second key to `views.open`. */
+  trigger_id?: string;
+  /** Set when the click was inside a modal rather than on a message. */
+  view?: { id?: string; private_metadata?: string };
 }
 
 export function parseInteraction(rawBody: string): InteractionPayload | null {
@@ -113,6 +119,8 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
+  if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
+  if (actionId === REVIEW_APPROVE_ACTION_ID) return decideInReview(env, payload, "confirm");
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
   // No silent catch-all. This used to fall through to the feedback handler,
@@ -172,6 +180,58 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
     replaceCard: (text, note) => replaceCard(payload, text, note),
     // This door runs inside `waitUntil`, so a re-staged card's preview waits
     // only briefly for the Figma rate budget.
+    restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
+  };
+}
+
+// Review on a proposal card, and a decision inside the pop-up it opens.
+//
+// The Slack envelope for the review door (`review-door.ts`): a card click
+// carries the card in `message`, a click in the pop-up carries it in the
+// view's `private_metadata`, and `Env` becomes the door's named dependencies.
+// The block_actions ack has already gone by the time this runs, inside
+// `waitUntil` — the door opens its loading view first so the trigger, which
+// lives three seconds from the click, is spent before anything is read.
+//
+// `Env` enters here and stops here.
+async function openReview(env: Env, payload: InteractionPayload): Promise<void> {
+  const triggerId = payload.trigger_id;
+  const channel = payload.channel?.id;
+  const messageTs = payload.message?.ts;
+  const userId = payload.user?.id;
+  if (!triggerId || !channel || !messageTs || !userId) return;
+  await runReviewOpen({ triggerId, channel, messageTs, userId }, reviewDoorDeps(env));
+}
+
+async function decideInReview(env: Env, payload: InteractionPayload, decision: "confirm" | "cancel"): Promise<void> {
+  const viewId = payload.view?.id;
+  const card = reviewedCardOf(payload.view?.private_metadata);
+  const userId = payload.user?.id;
+  if (!viewId || !card || !userId) return;
+  await runReviewDecision(
+    { viewId, channel: card.channel, messageTs: card.ts, userId, decision },
+    reviewDoorDeps(env),
+  );
+}
+
+/** `Env`, once, as the dependencies the review door reads. */
+function reviewDoorDeps(env: Env): ReviewDoorDeps {
+  const threadState = threadStateFor(env);
+  return {
+    threadState,
+    standingConfirmers: standingConfirmersOf(env),
+    views: {
+      open: (triggerId, view) => viewsOpen(env, triggerId, view),
+      update: (viewId, view) => viewsUpdate(env, viewId, view),
+    },
+    delivery: (target) => slackDelivery(env, target),
+    applyVerdict: (verdict) => executeVerdict(env, verdict),
+    updateCard: async (channel, ts, text, note) => {
+      const res = await updateMessage(env, { channel, ts, text: `${text}\n${note}`, blocks: proposalCardBlocks(text, note) });
+      // Cosmetic, as the button door's re-render is: the decision is already
+      // announced in the thread.
+      if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);
+    },
     restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
   };
 }
