@@ -497,6 +497,14 @@ export interface Delivery {
   postGateNote(note: GateNote, card?: NoteCard): Promise<PostResult>;
 
   /**
+   * Edit a card back to its live form, as it was posted: its words, its own
+   * blocks or its text, and Review — no note. What a card sent back with Needs
+   * changes returns to when the revision turn stages no revision, so the card
+   * that is decidable again also looks it. Posts nothing; best-effort.
+   */
+  reopenCard(card: NoteCard): Promise<void>;
+
+  /**
    * Stage a proposal card — the agreed hand-over (#623):
    * `Turn ──► Delivery.card({ kind, subject, fields, actions })`.
    *
@@ -537,6 +545,7 @@ export type DeliveryCall =
   | { kind: "answer"; text: string; presentation?: Presentation }
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote; card?: NoteCard }
+  | { kind: "reopen-card"; card: NoteCard }
   | { kind: "proposal"; card: ProposalCard }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
 
@@ -684,6 +693,10 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       if (card) return { ok: true, text, ts: card.ts };
       posted.push(text);
       return { ok: true, text, ts: `note-${calls.length}` };
+    },
+
+    async reopenCard(card) {
+      calls.push({ kind: "reopen-card", card });
     },
 
     async card(proposal) {

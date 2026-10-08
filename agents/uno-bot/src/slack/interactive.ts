@@ -28,7 +28,14 @@ import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
-import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps, type ReviewViewState } from "./review-door";
+import {
+  checkedEditsView,
+  runReviewDecision,
+  runReviewOpen,
+  startRevision,
+  type ReviewDoorDeps,
+  type ReviewViewState,
+} from "./review-door";
 import {
   REVIEW_APPROVE_ACTION_ID,
   REVIEW_CALLBACK_ID,
@@ -37,12 +44,11 @@ import {
   reviewNoteOf,
   reviewedCardOf,
 } from "./review-view";
-import type { OptionSource } from "./review-fields";
+import { fieldsFromBlocks, type OptionSource } from "./review-fields";
 import { databaseOptions } from "../integrations/notion";
 import type { ReviewDecision } from "../gate/index";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { conversationKey, enqueueAgentJob } from "./events";
-import { escapeSlackText } from "./mrkdwn";
 import type { SlackMessageEvent } from "./types";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
@@ -263,6 +269,7 @@ async function decideInReview(env: Env, payload: InteractionPayload, decision: R
   if (!viewId || !card || !userId) return;
   const state = payload.view?.state?.values;
   const note = reviewNoteOf(payload.view?.state);
+  const blocks = payload.view?.blocks;
   await runReviewDecision(
     {
       viewId,
@@ -272,18 +279,18 @@ async function decideInReview(env: Env, payload: InteractionPayload, decision: R
       decision,
       ...(note ? { note } : {}),
       ...(state ? { state } : {}),
+      ...(Array.isArray(blocks) ? { fields: fieldsFromBlocks(blocks) } : {}),
     },
     reviewDoorDeps(env),
   );
 }
 
 /**
- * Needs changes, handed to uno-bot: the note goes into the card's thread as a
- * line naming who asked, and a turn is queued on that line as the confirmer's
- * own reply — the same synthetic message the shortcuts and slash commands
- * build, so history, the pending card it revises, the supersession and the
- * visible-failure backstops all run unchanged. The card is still pending, so
- * the turn sees it and its revision replaces it.
+ * Needs changes, handed to uno-bot (`startRevision`): the note posts in the
+ * card's thread, and a turn is queued on that line as the confirmer's own
+ * reply — the same synthetic message the shortcuts and slash commands build,
+ * so history, the pending card it revises, the supersession and the
+ * visible-failure backstops all run unchanged.
  */
 async function reviseFromReview(
   env: Env,
@@ -291,31 +298,24 @@ async function reviseFromReview(
 ): Promise<void> {
   const { proposal, note, userId } = request;
   const thread = proposalReplyThread(proposal);
-  const posted = await postMessage(env, {
-    channel: proposal.channel,
-    thread_ts: thread,
-    text: `:pencil2: <@${userId}> asked for changes: ${escapeSlackText(note)}`,
+  await startRevision(request, {
+    threadState: threadStateFor(env),
+    postInThread: async (text) => (await postMessage(env, { channel: proposal.channel, thread_ts: thread, text }))?.ts ?? null,
+    queueTurn: async (noteTs) => {
+      const event: SlackMessageEvent = {
+        type: "message",
+        channel: proposal.channel,
+        user: userId,
+        text: `Needs changes on the proposal card above: ${note}`,
+        ts: noteTs,
+        thread_ts: thread,
+      };
+      await enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event));
+    },
+    updateCard: async (message) => {
+      await updateMessage(env, { channel: proposal.channel, ts: proposal.proposalTs, text: message.text, blocks: message.blocks });
+    },
   });
-  if (!posted?.ts) {
-    console.error(`[interactive] needs-changes note did not post on ${proposal.channel}/${proposal.proposalTs}`);
-    // No revision turn will run, so nothing would lift the Gate's lock.
-    await threadStateFor(env).clearRevising(proposal.proposalTs).catch(() => {});
-    await postMessage(env, {
-      channel: proposal.channel,
-      thread_ts: thread,
-      text: ":warning: I couldn't start the revision. Reply here with what to change and I'll revise the draft.",
-    }).catch(() => {});
-    return;
-  }
-  const event: SlackMessageEvent = {
-    type: "message",
-    channel: proposal.channel,
-    user: userId,
-    text: `Needs changes on the proposal card above: ${note}`,
-    ts: posted.ts,
-    thread_ts: thread,
-  };
-  await enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event));
 }
 
 /** Where a pop-up select's options live, as the Worker's bindings name them. */

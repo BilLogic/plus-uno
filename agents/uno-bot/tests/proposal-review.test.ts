@@ -10,12 +10,21 @@ import assert from "node:assert/strict";
 import { resolveSignal, runReactionDoor, type GateSignal, type GateVerdict } from "../src/gate/index";
 import {
   PROPOSAL_TTL_MS,
+  REVISING_MARK_MS,
   createInMemoryThreadState,
   type PendingProposal,
   type ThreadState,
 } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
-import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
+import {
+  checkedEditsView,
+  runReviewDecision,
+  runReviewOpen,
+  startRevision,
+  type ReviewDoorDeps,
+  type RevisionDeps,
+} from "../src/slack/review-door";
+import type { CardMessage } from "../src/slack/button-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
 import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
 import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
@@ -421,13 +430,42 @@ describe("Needs changes in the pop-up", () => {
     assert.equal(revisions[0]?.note, "Call it Reflection v2");
     assert.equal(revisions[0]?.userId, "U2");
     assert.equal(revisions[0]?.proposal.proposalTs, CARD_TS);
-    // The card says who asked for changes, and loses its decision.
+    // The card says who asked for changes.
     assert.equal(cardUpdates.length, 1);
     assert.match(cardUpdates[0]!.note, /^:pencil2: .*<@U2>/);
     // The pop-up confirms it in one line, with nothing left to press.
     assert.equal(views.calls.length, 1);
     assert.deepEqual(actionIds(views.calls[0]!.view), []);
     assert.match(viewText(views.calls[0]!.view), /revis/i);
+  });
+
+  it("leaves the card live while it is revised: Review stays, and opens on 'being revised'", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    const edited: CardMessage[] = [];
+    deps.updateCard = async (_channel, _ts, message) => void edited.push(message);
+    await runReviewDecision(decide("revise", "Call it Reflection v2"), deps);
+
+    assert.equal(edited.length, 1);
+    assert.deepEqual(cardButtons(edited[0]!.blocks), ["Review"]);
+    assert.match(cardWords(edited[0]!).note, /being revised/i);
+
+    await runReviewOpen(open(), deps);
+    const view = views.calls.at(-1)!.view;
+    assert.match(viewText(view), /being revised/);
+    assert.deepEqual(actionIds(view), []);
+  });
+
+  it("lapses on its own, so a Worker that died mid-revision cannot hold the card", async () => {
+    let t = 1_700_000_000_000;
+    const threadState = await staged({}, () => t);
+    const { deps, ran } = harness(threadState);
+    await runReviewDecision(decide("revise", "Call it Reflection v2"), deps);
+    assert.equal((await resolveSignal({ kind: "button", messageTs: CARD_TS, decision: "confirm", userId: "U2" }, { threadState })).outcome, "stale");
+
+    t += REVISING_MARK_MS + 1;
+    await runReviewDecision(approve(), deps);
+    assert.equal(ran.length, 1);
   });
 
   it("is superseded by the revised card, so a late ✅ on it runs nothing", async () => {
@@ -495,11 +533,27 @@ describe("Needs changes in the pop-up", () => {
     };
     await runTurn(turnRequest({ text: "Needs changes on the proposal card above: shorter", pending: pending! }), broken);
 
+    // The card is back as it was posted: its words, Review, no note.
+    const reopened = t.delivery.calls.filter((c) => c.kind === "reopen-card");
+    assert.deepEqual(reopened, [{ kind: "reopen-card", card: { ts: PENDING.proposalTs, text: PENDING.proposalText } }]);
+
     const verdict = await resolveSignal(
       { kind: "button", messageTs: PENDING.proposalTs, decision: "confirm", userId: "U1" },
       { threadState: t.threadState },
     );
     assert.equal(verdict.outcome, "won");
+  });
+
+  it("reopens no card when the revision turn stages its revision", async () => {
+    const t = turnHarness({
+      replies: [{ text: "Revised.", toolCalls: [{ name: "notion_create", args: { title: "Reflection, shorter" } }] }],
+    });
+    await t.threadState.putProposal(PENDING);
+    assert.equal(await t.threadState.markRevising(PENDING.proposalTs, "U1"), "marked");
+    const [pending] = await t.threadState.getProposalsByChannel(PENDING.channel);
+    const outcome = await runTurn(turnRequest({ text: "Needs changes on the proposal card above: shorter", pending: pending! }), t.deps);
+    assert.equal(outcome.disposition, "staged");
+    assert.deepEqual(t.delivery.calls.filter((c) => c.kind === "reopen-card"), []);
   });
 
   it("keeps the note and the decisions through Check edits, the submit the note's input needs", async () => {
@@ -547,6 +601,65 @@ describe("Needs changes in the pop-up", () => {
     await runReviewDecision(decide("revise", "shorter please"), deps);
     assert.deepEqual(revisions, []);
     assert.match(viewText(views.calls[0]!.view), /already resolved/);
+  });
+});
+
+describe("starting the revision", () => {
+  /** A card sent back with Needs changes, and the revision's dependencies on
+   *  recordings: what was posted, queued and edited. */
+  async function sentBack(opts: { notePosts?: boolean; queueFails?: boolean } = {}) {
+    const threadState = await staged();
+    assert.equal(await threadState.markRevising(CARD_TS, "U2"), "marked");
+    const posted: string[] = [];
+    const queued: string[] = [];
+    const edited: CardMessage[] = [];
+    const deps: RevisionDeps = {
+      threadState,
+      postInThread: async (text) => {
+        posted.push(text);
+        return opts.notePosts === false && posted.length === 1 ? null : `1700000000.00030${posted.length}`;
+      },
+      queueTurn: async (noteTs) => {
+        if (opts.queueFails) throw new Error("queue unavailable");
+        queued.push(noteTs);
+      },
+      updateCard: async (message) => void edited.push(message),
+    };
+    const request = { proposal: { ...PROPOSAL, revising: { userId: "U2" } }, note: "Call it Reflection v2", userId: "U2" };
+    return { threadState, deps, request, posted, queued, edited };
+  }
+
+  /** The card is decidable again, and shows as it was posted: Review, no note. */
+  async function assertReopened(threadState: ThreadState, edited: CardMessage[], posted: string[]) {
+    assert.equal(edited.length, 1);
+    assert.equal(edited[0]!.text, PROPOSAL.proposalText);
+    assert.deepEqual(cardButtons(edited[0]!.blocks), ["Review"]);
+    assert.doesNotMatch(JSON.stringify(edited[0]!.blocks), /pencil2|revis/i);
+    assert.match(posted.at(-1)!, /couldn't start the revision\. Reply here with what to change/);
+    const verdict = await resolveSignal({ kind: "button", messageTs: CARD_TS, decision: "confirm", userId: "U2" }, { threadState });
+    assert.equal(verdict.outcome, "won");
+  }
+
+  it("posts the note in the thread and queues the revision turn on it", async () => {
+    const { deps, request, posted, queued, edited } = await sentBack();
+    await startRevision(request, deps);
+    assert.equal(posted.length, 1);
+    assert.match(posted[0]!, /^:pencil2: <@U2> asked for changes: Call it Reflection v2$/);
+    assert.deepEqual(queued, ["1700000000.000301"]);
+    assert.deepEqual(edited, []);
+  });
+
+  it("reopens the card and says so when the note does not post", async () => {
+    const { threadState, deps, request, posted, queued, edited } = await sentBack({ notePosts: false });
+    await startRevision(request, deps);
+    assert.deepEqual(queued, []);
+    await assertReopened(threadState, edited, posted);
+  });
+
+  it("reopens the card and says so when the revision turn cannot be queued", async () => {
+    const { threadState, deps, request, posted, edited } = await sentBack({ queueFails: true });
+    await startRevision(request, deps);
+    await assertReopened(threadState, edited, posted);
   });
 });
 

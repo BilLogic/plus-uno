@@ -131,7 +131,7 @@ export function createDurableObjectThreadState(
     // The delete IS the claim, and it is the Durable Object's input gate that
     // makes it one: of two racing resolvers exactly one hop returns true.
     claimProposal(proposalTs: string): Promise<boolean> {
-      return hop().claimProposal(proposalTs);
+      return hop().claimProposal(proposalTs, now());
     },
 
     // ----- executions -----

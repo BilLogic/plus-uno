@@ -29,6 +29,7 @@ import {
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
+  REVISING_MARK_MS,
   RUN_LEASE_MS,
   proposalOperations,
   unfinishedOperations,
@@ -576,6 +577,24 @@ export function runThreadStateConformance(
     await store.clearRevising("1700.2");
     const found = await store.getProposalByTs("1700.2");
     assert.equal(found.state === "found" && found.proposal.revising, undefined);
+    assert.equal(await store.claimProposal("1700.2"), true);
+  });
+
+  // A Worker that dies mid-revision never clears its mark, so the mark lapses
+  // on its own long before the card does.
+  it("a mark older than its bound reads as cleared: found unmarked, claimable, and markable again", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.markRevising("1700.2", "U2");
+    clock.advance(REVISING_MARK_MS - 1_000);
+    assert.equal(await store.claimProposal("1700.2"), false);
+    clock.advance(2_000);
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state === "found" && found.proposal.revising, undefined);
+    assert.equal((await store.getProposalByThread(THREAD))?.revising, undefined);
+    assert.equal((await store.getProposalsByChannel(THREAD.channel))[0]?.revising, undefined);
+    assert.equal(await store.markRevising("1700.2", "U3"), "marked");
+    clock.advance(REVISING_MARK_MS + 1);
     assert.equal(await store.claimProposal("1700.2"), true);
   });
 

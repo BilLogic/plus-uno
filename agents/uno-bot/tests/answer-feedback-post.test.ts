@@ -15,6 +15,7 @@ import { postTextVerified } from "../src/slack/delivery";
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
 import { FEEDBACK_ACTION_ID, feedbackOf } from "../src/slack/feedback";
 import { MAX_POST_CHARS } from "../src/slack/answer-posts";
+import type { Chart } from "../src/turn/chart";
 import { expectRefusals, recordingPosting, recordingSlack } from "./helpers/recording-slack";
 
 const RECIPIENT = { userId: "U1", team: "T1" };
@@ -115,6 +116,55 @@ describe("an answer's feedback buttons", () => {
     assert.equal(posts.length, 2);
     assert.deepEqual(blocksOf(posts[1]).map((b) => b.type), ["markdown", "context"]);
     assert.ok(lines.some((l) => /feedback buttons refused/.test(l)));
+  });
+
+  const chart: Chart = {
+    kind: "bar",
+    title: "Cards by Design Status",
+    lookup: "notion_query",
+    groupBy: "Design Status",
+    measure: null,
+    points: [
+      { label: "WIP", value: 3 },
+      { label: "Done", value: 2 },
+    ],
+    valueLabel: "Cards",
+    groupLabel: "Design Status",
+    total: 5,
+  };
+
+  it("stay aboard when Slack points at a chart instead: the chart steps down, the buttons keep", async () => {
+    const slack = recordingPosting({ refusesBlockTypes: ["data_visualization"] });
+    const { result, lines } = await warnings(() =>
+      postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", ANSWER, RECIPIENT, undefined, {
+        presentation: { charts: [chart] },
+        feedback: FEEDBACK,
+      }),
+    );
+    expectRefusals(slack.refused);
+
+    assert.equal(result.ok, true);
+    const posts = slack.of("message");
+    assert.equal(posts.length, 2);
+    assert.deepEqual(blocksOf(posts[1]).map((b) => b.type), ["markdown", "context", "context_actions"]);
+    assert.match(posts[1]!.text, /Cards by Design Status/);
+    assert.ok(!lines.some((l) => /feedback buttons refused/.test(l)));
+  });
+
+  it("are dropped alone when Slack points at them, and the chart stays", async () => {
+    const slack = recordingPosting({ refusesBlockTypes: ["context_actions"] });
+    const { result } = await warnings(() =>
+      postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", ANSWER, RECIPIENT, undefined, {
+        presentation: { charts: [chart] },
+        feedback: FEEDBACK,
+      }),
+    );
+    expectRefusals(slack.refused);
+
+    assert.equal(result.ok, true);
+    const posts = slack.of("message");
+    assert.equal(posts.length, 2);
+    assert.deepEqual(blocksOf(posts[1]).map((b) => b.type), ["markdown", "data_visualization", "context"]);
   });
 
   it("are left off a post with no turn to tie them to", async () => {
