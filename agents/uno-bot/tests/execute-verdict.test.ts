@@ -430,7 +430,7 @@ test("an approved issue follow-up comments with the requester's footer, then clo
   );
   const comment = String(github[0]!.body?.body);
   assert.ok(comment.startsWith("Fixed in r384."), comment);
-  assert.match(comment, /Posted from Slack by uno-bot on behalf of Bill Guo, posted from a private conversation/);
+  assert.match(comment, /Posted from Slack by le goat on behalf of Bill Guo, posted from a private conversation/);
   assert.doesNotMatch(comment, /slack\.com/);
   assert.deepEqual(github[1]!.body, { state: "closed", state_reason: "completed" });
 
@@ -464,7 +464,7 @@ test("an approved intake naming a listed repo is filed there, with the two fixed
   assert.deepEqual(filings.map((c) => c.url), ["https://api.github.com/repos/BilLogic/plus-marketing-website/issues"]);
   const sent = filings[0]!.body!;
   assert.deepEqual(sent.labels, ["harness-intake", "needs-triage"]);
-  assert.match(String(sent.body), /^The hero button links nowhere\.\n\n---\nFiled from Slack by uno-bot on behalf of Bill Guo/);
+  assert.match(String(sent.body), /^The hero button links nowhere\.\n\n---\nFiled from Slack by le goat on behalf of Bill Guo/);
   assert.equal(sent.repo, undefined, "the repo is the URL's, never a field of the model's");
   assert.ok(posts().some((p) => /on BilLogic\/plus-marketing-website/.test(String(p.text))));
 });

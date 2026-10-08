@@ -64,7 +64,8 @@ describe("a good answer", () => {
     const { log, views, deps } = door();
     await runFeedbackTap(tap(valueOf("up")), deps);
 
-    assert.deepEqual(await log.get(ANSWER, "U1"), {
+    assert.deepEqual(await log.get("C1", ANSWER, "U1"), {
+      channel: "C1",
       answerTs: ANSWER,
       userId: "U1",
       turnId: TURN,
@@ -82,8 +83,8 @@ describe("a bad answer", () => {
     const { log, deps } = door();
     await runFeedbackTap(tap(valueOf("down")), deps);
 
-    assert.equal((await log.get(ANSWER, "U1"))?.rating, "down");
-    assert.equal((await log.get(ANSWER, "U1"))?.reason, null);
+    assert.equal((await log.get("C1", ANSWER, "U1"))?.rating, "down");
+    assert.equal((await log.get("C1", ANSWER, "U1"))?.reason, null);
   });
 
   it("opens a pop-up offering the four reasons and a note", async () => {
@@ -107,7 +108,7 @@ describe("a bad answer", () => {
     const view = (views.calls[0] as { view: unknown }).view;
     await runFeedbackReason({ userId: "U1", view: submitted(view, "missing_source", null) }, deps);
 
-    const row = await log.get(ANSWER, "U1");
+    const row = await log.get("C1", ANSWER, "U1");
     assert.equal(row?.reason, "missing_source");
     assert.equal(row?.hasNote, false);
     assert.equal(row?.turnId, TURN);
@@ -131,7 +132,7 @@ describe("a bad answer", () => {
     const view = (views.calls[0] as { view: unknown }).view;
     await runFeedbackReason({ userId: "U1", view: submitted(view, "too_long", "Half of this was the plan again.") }, deps);
 
-    assert.equal((await log.get(ANSWER, "U1"))?.hasNote, true);
+    assert.equal((await log.get("C1", ANSWER, "U1"))?.hasNote, true);
     assert.equal(notes.length, 1);
     assert.equal(notes[0]!.channel, "C1");
     assert.equal(notes[0]!.threadTs, "1700000000.000100");
@@ -140,11 +141,28 @@ describe("a bad answer", () => {
     assert.match(notes[0]!.text, /Half of this was the plan again\./);
   });
 
+  it("posts the note as words, never as a mention or a link", async () => {
+    const { views, notes, deps } = door();
+    await runFeedbackTap(tap(valueOf("down")), deps);
+    const view = (views.calls[0] as { view: unknown }).view;
+    await runFeedbackReason(
+      { userId: "U1", view: submitted(view, "other", "<!channel> see <https://evil.example|the doc> & more") },
+      deps,
+    );
+
+    const text = notes[0]!.text;
+    assert.doesNotMatch(text, /<!channel>/);
+    assert.doesNotMatch(text, /<https:/);
+    assert.match(text, /&lt;!channel&gt;/);
+    assert.match(text, /&amp; more/);
+    assert.match(text, /^<@U1> /, "the presser's own mention still renders");
+  });
+
   it("still records the press when the pop-up cannot open", async () => {
     const { log, deps } = door();
     await runFeedbackTap(tap(valueOf("down")), { ...deps, openView: async () => null });
 
-    assert.equal((await log.get(ANSWER, "U1"))?.rating, "down");
+    assert.equal((await log.get("C1", ANSWER, "U1"))?.rating, "down");
   });
 });
 

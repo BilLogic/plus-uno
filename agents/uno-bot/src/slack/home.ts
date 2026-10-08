@@ -17,7 +17,8 @@
 
 import type { Env } from "../types";
 import type { SlackAppHomeOpenedEvent } from "./types";
-import { slackCall } from "./api";
+import { refusalDetail, slackCall } from "./api";
+import { refusedForBlocks } from "./delivery";
 import { tryAskingButtons } from "./try-asking";
 import { slackConnectUrl } from "../oauth/slack";
 import { dmWatchHomeBlocks, type DmAccess, type DmWatchFeature } from "../dm-watch/index";
@@ -61,21 +62,30 @@ const CAPABILITIES = [
   },
 ] as const;
 
-const homeBody = (connected: boolean) => [
+/** The capabilities as three cards side by side. Card and carousel blocks are
+ *  allowed on a Home tab per Slack's block reference (both list "Home tabs"
+ *  among their surfaces); the icons are Slack's named ones, so nothing is
+ *  fetched. */
+const capabilityCards = () => [
+  {
+    type: "carousel",
+    elements: CAPABILITIES.map((c) => ({
+      type: "card",
+      slack_icon: { type: "icon", name: c.icon },
+      title: { type: "plain_text", text: c.title },
+      body: { type: "mrkdwn", text: c.body },
+    })),
+  },
+];
+
+/** The same capabilities as plain sections, for when Slack refuses the cards. */
+const capabilitySections = () =>
+  CAPABILITIES.map((c) => ({ type: "section", text: { type: "mrkdwn", text: `*${c.title}*\n${c.body}` } }));
+
+const homeBody = (connected: boolean, carousel: boolean) => [
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*What I can do*" } },
-    // Three cards side by side. Card and carousel blocks are allowed on a Home
-    // tab per Slack's block reference (both list "Home tabs" among their
-    // surfaces); the icons are Slack's named ones, so nothing is fetched.
-    {
-      type: "carousel",
-      elements: CAPABILITIES.map((c) => ({
-        type: "card",
-        slack_icon: { type: "icon", name: c.icon },
-        title: { type: "plain_text", text: c.title },
-        body: { type: "mrkdwn", text: c.body },
-      })),
-    },
+    ...(carousel ? capabilityCards() : capabilitySections()),
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*How to reach me*" } },
     {
@@ -198,34 +208,59 @@ const connectBlocks = (url: string) => [
  *
  * @param input.connectUrl - Where to connect, or null when OAuth is not set up
  * @param input.viewer - Whether this person has connected, and their switches
+ * @param input.carousel - The capabilities as cards (the default), or as
+ *   plain sections when Slack has refused the cards
  */
 export function homeView(input: {
   connectUrl: string | null;
   viewer: { connected: boolean; on: readonly DmWatchFeature[]; refused?: Exclude<DmAccess, { ok: true }> };
+  carousel?: boolean;
 }) {
   const { viewer, connectUrl } = input;
   const notice = viewer.refused ? { refused: viewer.refused, connectUrl } : undefined;
   const personal = viewer.connected ? dmWatchHomeBlocks(viewer.on, notice) : connectUrl ? connectBlocks(connectUrl) : [];
-  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...homeBody(viewer.connected)] };
+  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...homeBody(viewer.connected, input.carousel ?? true)] };
 }
 
-async function buildHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
+async function homeViewBuilder(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
   const viewer = await dmWatchHomeStateFor(env, userId);
-  return homeView({ connectUrl: slackConnectUrl(env), viewer: refused ? { ...viewer, refused } : viewer });
+  const input = { connectUrl: slackConnectUrl(env), viewer: refused ? { ...viewer, refused } : viewer };
+  return (carousel: boolean) => homeView({ ...input, carousel });
+}
+
+/**
+ * Publish a Home view, and publish it again without the carousel when Slack
+ * refuses its blocks. A refused view leaves the OLD one up with no signal to
+ * the person, so the cards — the newest blocks on the tab — are the ones to
+ * give up rather than the whole refresh. Any other refusal is returned as is.
+ *
+ * @param publish - `views.publish` for this person, with Slack's answer
+ * @param build - The view, with or without the carousel
+ */
+export async function publishHome(
+  publish: (view: Record<string, unknown>) => Promise<{ ok: boolean; error?: string }>,
+  build: (carousel: boolean) => Record<string, unknown>,
+  userId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const first = await publish(build(true));
+  if (first.ok || !refusedForBlocks(first)) return first;
+  console.warn(`[home] view refused for ${userId} (${first.error}${refusalDetail(first)}); republishing without the carousel`);
+  return publish(build(false));
 }
 
 /** Publish this person's Home view — on opening the tab, and again after they
  *  change a switch, so the ticks show what was saved and a switch that stayed
  *  off says why. */
 export async function publishHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>): Promise<void> {
-  await slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId, refused) });
+  const build = await homeViewBuilder(env, userId, refused);
+  await publishHome((view) => slackCall(env, "views.publish", { user_id: userId, view }), build, userId);
 }
 
 /** Same publish, but hands Slack's verdict back. Nothing in the event path
  *  reads it — a rejected view just leaves the old one up — so /debug/home is
  *  the only way to find out whether a block is valid. */
 export async function publishHomeViewForDebug(env: Env, userId: string): Promise<unknown> {
-  return slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId) });
+  return slackCall(env, "views.publish", { user_id: userId, view: (await homeViewBuilder(env, userId))(true) });
 }
 
 export async function handleAppHomeOpened(env: Env, event: SlackAppHomeOpenedEvent): Promise<void> {

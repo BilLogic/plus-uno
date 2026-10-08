@@ -409,9 +409,9 @@ export async function postTextVerified(
     // at the top: each refused one steps down on its own to its plain text in
     // the Markdown (the charts' top values, the rows as a plain list, the
     // cards' linked so every item still opens, the ⚠️ line, the links as a
-    // line) while the others stay aboard. When Slack's json-pointer lands on
-    // one of them, that one steps down; any other block refusal while they
-    // are aboard counts as all of theirs. They are the newest and least proven
+    // line) while the others stay aboard. The first time Slack's json-pointer
+    // lands on one of them, that one steps down; any other block refusal
+    // while they are aboard counts as all of theirs. They are the newest and least proven
     // blocks in the message, Slack does not always point (`invalid_blocks` can
     // arrive with no messages at all), and the costs are lopsided: blaming
     // them wrongly spends one extra call before the section rung, while
@@ -466,9 +466,17 @@ export async function postTextVerified(
       // Each refused extra steps down to its plain text in the Markdown, so a
       // rendering problem never costs the reader its rows or links, and the
       // rest stay aboard. Every rung below carries all of them as text.
+      //
+      // ONE POINTED STEP. The extra Slack points at steps down alone once;
+      // a second refusal takes every extra still aboard down together. One
+      // post per extra would spend the reserve the answer is posted from
+      // (`DELIVERY_RESERVE`), and a second refusal says the blocks are the
+      // trouble, not one of them.
+      let pointedOnce = false;
       while (aboard.length > 0 && refusedForBlocks(posted)) {
-        const at = pointedBlock(posted);
+        const at = pointedOnce ? null : pointedBlock(posted);
         const culprit = at === null ? undefined : aboard[at - 1];
+        if (culprit) pointedOnce = true;
         const out = culprit ? [culprit] : aboard;
         console.warn(`[slack] ${out.map((b) => b.name).join(" and ")} refused (${refusalOf(posted)}); retrying without, as text`);
         aboard = aboard.filter((b) => !out.includes(b));

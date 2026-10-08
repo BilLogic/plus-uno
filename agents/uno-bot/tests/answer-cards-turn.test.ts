@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 
 import { runTurn, type DeliveryCall, type Presentation } from "../src/turn/index";
 import { postTextVerified } from "../src/slack/delivery";
+import { cardList } from "../src/turn/answer-cards";
 import { harness, request } from "./helpers/turn-harness";
 import { expectRefusals, recordingPosting, type RecordingPostingOptions } from "./helpers/recording-slack";
 
@@ -155,7 +156,7 @@ test("each card carries the logo of the estate its link leads to, served from ou
       ["Notion", "https://www.google.com/s2/favicons?domain=notion.so&sz=64"],
       ["GitHub", "https://plus-uno.netlify.app/uno-bot/logos/github.png"],
       ["uno-blueprint", "https://plus-uno.netlify.app/uno-bot/logos/uno-blueprint.png"],
-      ["Storybook", "https://www.google.com/s2/favicons?domain=storybook.js.org&sz=64"],
+      ["Storybook", "https://plus-uno.netlify.app/uno-bot/logos/plus.png"],
       ["Slack", "https://plus-uno.netlify.app/uno-bot/logos/slack.png"],
       ["PLUS", "https://plus-uno.netlify.app/uno-bot/logos/plus.png"],
     ],
@@ -201,4 +202,13 @@ test("an answer with cards posts as an ordinary message, never a stream", async 
 
   const { slack } = await posted(answer.text, answer.presentation!);
   assert.equal(slack.of("startStream").length, 0);
+});
+
+test("a card's title loses its brackets in the linked list, so the link still parses", () => {
+  const list = cardList({
+    lookup: "figma_search",
+    total: 1,
+    cards: [{ title: "Onboarding [v2]  draft", links: [{ label: "Open", url: "https://www.figma.com/design/FILE" }] }],
+  });
+  assert.equal(list, "- [Onboarding v2 draft](https://www.figma.com/design/FILE)");
 });

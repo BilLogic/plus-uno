@@ -49,16 +49,16 @@ export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", gl
 export const CARD_FOOTERS: Record<"card_todo" | "card_unowned" | "card_stale", ReminderFooter> = {
   card_todo: {
     choices: [
-      { glyph: "white_check_mark", label: "✅ Draft it" },
-      { glyph: "no_good", label: "🙅 Drop it" },
+      { glyph: "white_check_mark", label: "Draft it" },
+      { glyph: "no_good", label: "Drop it" },
     ],
   },
   card_unowned: "Reply here with an @mention, or \"me\", and I'll draft the Contributor change",
   card_stale: {
     choices: [
-      { glyph: "raised_hands", label: "🙌 Done" },
-      { glyph: "hourglass_flowing_sand", label: "⏳ Still on it" },
-      { glyph: "no_good", label: "🙅 Drop it" },
+      { glyph: "raised_hands", label: "Done" },
+      { glyph: "hourglass_flowing_sand", label: "Still on it" },
+      { glyph: "no_good", label: "Drop it" },
     ],
   },
 };

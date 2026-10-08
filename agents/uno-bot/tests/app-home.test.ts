@@ -8,7 +8,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { homeView } from "../src/slack/home";
+import { homeView, publishHome } from "../src/slack/home";
 import { promptsFor } from "../src/slack/assistant";
 import { TRY_ASKING_ACTION_PREFIX, runTryAskingDoor, type TryAskingDoorDeps } from "../src/slack/try-asking";
 import type { SlackMessageEvent } from "../src/slack/types";
@@ -66,6 +66,56 @@ describe("the App Home view", () => {
     assert.ok(stop);
     assert.equal(stop.text.text, "Stop what I'm running");
     assert.equal(stop.style, "danger");
+  });
+});
+
+// ── publishing it ────────────────────────────────────────────────────────────
+
+describe("publishing the App Home", () => {
+  const build = (carousel: boolean) =>
+    homeView({ connectUrl: null, viewer: { connected: false, on: [] }, carousel }) as { blocks: Block[] };
+
+  /** Publish against a Slack that answers each call in turn. */
+  async function publishAgainst(answers: Array<{ ok: boolean; error?: string }>) {
+    const sent: Array<{ blocks: Block[] }> = [];
+    const lines: string[] = [];
+    const orig = console.warn;
+    console.warn = (...args: unknown[]) => void lines.push(args.map(String).join(" "));
+    try {
+      await publishHome(
+        async (v) => {
+          sent.push(v as { blocks: Block[] });
+          return answers[sent.length - 1] ?? { ok: true };
+        },
+        build,
+        "U1",
+      );
+    } finally {
+      console.warn = orig;
+    }
+    return { sent, lines };
+  }
+
+  it("publishes once when Slack takes it", async () => {
+    const { sent } = await publishAgainst([{ ok: true }]);
+    assert.equal(sent.length, 1);
+    assert.ok(sent[0]!.blocks.some((b) => b.type === "carousel"));
+  });
+
+  it("republishes without the carousel when Slack refuses its blocks, and says so in the log", async () => {
+    const { sent, lines } = await publishAgainst([{ ok: false, error: "invalid_blocks" }, { ok: true }]);
+    assert.equal(sent.length, 2);
+    const plain = sent[1]!.blocks;
+    assert.ok(!plain.some((b) => b.type === "carousel" || b.type === "card"));
+    assert.equal(messageBlocksRefusal(plain), null);
+    const text = JSON.stringify(plain);
+    for (const title of ["Answer, grounded", "Create, with your approval", "Hand off to code"]) assert.ok(text.includes(title), title);
+    assert.ok(lines.some((l) => /U1/.test(l) && /invalid_blocks/.test(l) && /carousel/.test(l)), lines.join(" / "));
+  });
+
+  it("does not republish when Slack refuses for another reason", async () => {
+    const { sent } = await publishAgainst([{ ok: false, error: "ratelimited" }]);
+    assert.equal(sent.length, 1);
   });
 });
 

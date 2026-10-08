@@ -89,7 +89,7 @@ test("the body carries the draft verbatim, then the footer naming the requester 
   const body = renderIssueBody(DRAFT, { requester: "Bill Guo", permalink: PERMALINK });
 
   assert.ok(body.startsWith(DRAFT.body), body);
-  assert.match(body, /Filed from Slack by uno-bot on behalf of Bill Guo/);
+  assert.match(body, /Filed from Slack by le goat on behalf of Bill Guo/);
   assert.ok(body.includes(PERMALINK), body);
   // The footer sits BELOW the draft, set apart, so a reader can tell the
   // requester's words from the bot's.
@@ -136,7 +136,7 @@ test("an approved intake is filed with exactly the two triage labels, the footer
   assert.deepEqual([...sent.labels], ["harness-intake", "needs-triage"]);
   assert.deepEqual([...sent.labels], [...INTAKE_LABELS]);
   assert.ok(sent.body.startsWith(DRAFT.body), sent.body);
-  assert.match(sent.body, /Filed from Slack by uno-bot on behalf of Bill Guo/);
+  assert.match(sent.body, /Filed from Slack by le goat on behalf of Bill Guo/);
   assert.ok(sent.body.includes(PERMALINK), sent.body);
 });
 

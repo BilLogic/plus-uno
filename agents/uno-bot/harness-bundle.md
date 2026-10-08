@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,996 chars from 16 files**, against an assembled budget of 175,500 (7,504 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 147,612 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **168,084 chars from 16 files**, against an assembled budget of 175,500 (7,416 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 147,700 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,599 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,995 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,411 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 29,234 (−6,098 ide-only) | 143,687 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 146,971 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,487 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 158,150 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 167,996 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 29,322 (−6,098 ide-only) | 143,775 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 147,059 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,575 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 158,238 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 168,084 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 93,513 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 93,536 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 25,518 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 25,541 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -397,7 +397,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 
 **Write standard Markdown** — `**bold**`, `_italic_`, `- bullets`, `[label](url)`, `> quotes`, fenced code, and **tables**. Slack renders all of it; the Worker converts wherever a different form is needed. A Markdown table is right for a grid (3+ rows comparing the same fields) you composed yourself; keep it to 2–4 narrow columns so it survives a phone. Prose in a table is worse than prose. One hard rule: people and channels are always Slack IDs (`<@U…>`, `<#C…>`) — a plain `@handle` pings nobody. Details in `docs/connectors/slack.md` § Message formatting.
 
-**3 or more rows a lookup returned go in the result table:** for Roadmap cards set `as_table` on the `roadmap_query` that lists them; for any other lookup's rows call `present` with that lookup, up to 4 short fields and your takeaway. Two rows stay in the prose. **Items the reader will open** (Figma frames, Roadmap cards, articles, components) go in cards: `present` with `shape: "cards"` and the title field first. `table_attached` / `cards_attached: true` → lead with the takeaway, give what stands out and what to act on (naming up to 3 rows); the rows are theirs alone. `false` → write the plain list, linked. Counts that compare: `present` shape `chart`.
+**2 or more rows a lookup returned go in the result table:** for Roadmap cards set `as_table` on the `roadmap_query` that lists them; for any other lookup's rows call `present` with that lookup, up to 4 short fields and your takeaway. One row stays in the prose. **Items the reader will open** (Figma frames, Roadmap cards, articles, components) go in cards: `present` with `shape: "cards"` and the title field first. `table_attached` / `cards_attached: true` → lead with the takeaway, give what stands out and what to act on (naming up to 3 rows); the rows are theirs alone. `false` → write the plain list, linked. Counts that compare: `present` shape `chart`.
 
 ## Run setup (two model providers)
 
@@ -1003,7 +1003,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 #### Lookup rows: the result table
 
-**Rows a lookup returned go in the result table, not a Markdown table.** Code builds a Slack `data_table` from the rows that lookup returned this turn, so every cell is a real value and every link works. The model only chooses: for Roadmap cards it sets `as_table` on `roadmap_query` (the Roadmap preset); for any other lookup it calls `present` with the lookup, up to 4 of its rows' fields and a one-line takeaway. The persona asks for a table at 3 or more rows; two stay in the prose.
+**Rows a lookup returned go in the result table, not a Markdown table.** Code builds a Slack `data_table` from the rows that lookup returned this turn, so every cell is a real value and every link works. The model only chooses: for Roadmap cards it sets `as_table` on `roadmap_query` (the Roadmap preset); for any other lookup it calls `present` with the lookup, up to 4 of its rows' fields and a one-line takeaway. The persona asks for a table at 2 or more rows, the threshold code builds one at (`MIN_ROWS`); one row stays in the prose.
 
 - **When it appears:** the request named a lookup this turn made, and that lookup returned 2 or more rows. The Roadmap preset takes only *definite* cards: an enumeration's (Design Status and/or person), or a title search's `contains` hits; did-you-mean guesses stay in the prose. One table per answer: the last request of the turn that produced one.
 - **Refusals:** a lookup missing from this turn, a field absent from the rows, long text (over 120 characters or multi-line), a list, a bare link, or more than 4 columns. The refusal is the `present` call's own result, worded for the model, which then writes the plain list.
@@ -1034,7 +1034,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 - **Shape:** one item posts as a `card` block, 2 to 10 as a `carousel`; more are cut to the first 10 and the model is told the total. One set of cards per answer. No hero images.
 - **Links:** a row's `url` is the first button, "Open"; its other http(s) fields follow, labelled by field name, up to Slack's 3. A row with no link is left out; a list with none is refused, and the model names the items in prose.
-- **Logos:** a card's icon is the logo of the estate its first link leads to (`estateOfUrl`), as a PNG image Slack fetches by URL; an SVG image does not render. PLUS, uno-blueprint, GitHub and Slack are served from `public/uno-bot/logos/` on plus-uno.netlify.app; Figma, Notion, Storybook and Metabase use Google's favicon service for their domain. A link on no estate's host carries the PLUS mark. Task cards keep Slack's named icons, since Slack refuses images there.
+- **Logos:** a card's icon is the logo of the estate its first link leads to (`estateOfUrl`), as a PNG image Slack fetches by URL; an SVG image does not render. PLUS, uno-blueprint, GitHub and Slack are served from `public/uno-bot/logos/` on plus-uno.netlify.app; Storybook, our own design system, carries the PLUS mark; Figma and Notion use Google's favicon service for their domain. A link on no estate's host carries the PLUS mark. Task cards keep Slack's named icons, since Slack refuses images there.
 - **Placement and fallback:** as the table's: after the `markdown` block, before the footer, always as an ordinary message. If Slack refuses the blocks, the answer goes out again without them, each card a linked Markdown line in the prose. The text copy carries the same lines.
 
 #### The ⚠️ line: what the reader has to see
@@ -1487,9 +1487,9 @@ The same end-of-day read also looks for **commitments**: someone in a swept thre
 
 Three more follow-ups ride the commitments' schedule and limits: the same end-of-day detection, the 9 am ET weekday morning post, and one follow-up at most and then lapsed. They have a morning budget of their own, two a person: a person's own reminders (promises, "remind me") go first and keep their own two, so a card backlog leaves them on time. The code is `agents/uno-bot/src/follow-through/`.
 
-- **F3, a card to-do with no card.** A thread or a running note says to create a Roadmap card ("Bill to create a card for the facelift last stage", "can someone make a card for this"). Two working days on, uno-bot searches the Roadmap by the to-do's words; a matching card closes it silently. Otherwise it asks "Want me to draft a Roadmap card for …?", mentioning the assignee, or the note's takers when nobody was named. "✅ Draft it" (a button, or the reaction) from the assignee or anyone who posted in the thread stages the drafted card (the PRD template, its own ✅ files it); "🙅 Drop it" drops it. A message kept as a card to-do is passed over as a promise, so it gets one reminder, not two. Running notes reach it through the notes job, team notes only.
+- **F3, a card to-do with no card.** A thread or a running note says to create a Roadmap card ("Bill to create a card for the facelift last stage", "can someone make a card for this"). Two working days on, uno-bot searches the Roadmap by the to-do's words; a matching card closes it silently. Otherwise it asks "Want me to draft a Roadmap card for …?", mentioning the assignee, or the note's takers when nobody was named. "Draft it" (a button, or a ✅ reaction) from the assignee or anyone who posted in the thread stages the drafted card (the PRD template, its own ✅ files it); "Drop it" (or 🙅) drops it. A message kept as a card to-do is passed over as a promise, so it gets one reminder, not two. Running notes reach it through the notes job, team notes only.
 - **F4, an active card with no owner.** A card in WIP or Under Review with an empty Contributor and no edit for 7 days; a card waiting in Need PRD / Under Playground or Ready for Design is queued work, and is passed over. "Who should take …?" mentions the card's creator. Only someone the question asked (the card's creator, or a person it mentioned) can name the owner: their reply naming exactly one person ("@Maya"), or their own "me", "mine" or "I'll take it", stages the Contributor change. The follow-up closes once the card shows a Contributor; a proposal nobody applies leaves it open for its follow-up. Cards uno-bot's own integration created are passed over.
-- **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. "Is it still moving?" mentions the Contributors, with buttons: 🙌 Done, ⏳ Still on it (checked again in 3 weeks), 🙅 Drop it. After 🙌 or 🙅 from an owner, uno-bot lists the card's live Design Status options in the thread, read from the Roadmap schema, Shipped and Under Dev first for 🙌 and Archived first for 🙅. The owner replies with a number or a name typed whole, and that stages the move on a ✅ card. The first other reply gets the options again, once, and stages nothing; after that, and after 72 h, replies are the thread's own. Only an owner's reply counts.
+- **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. "Is it still moving?" mentions the Contributors, with buttons Done, Still on it (checked again in 3 weeks) and Drop it, or the reactions 🙌 ⏳ 🙅. After 🙌 or 🙅 from an owner, uno-bot lists the card's live Design Status options in the thread, read from the Roadmap schema, Shipped and Under Dev first for 🙌 and Archived first for 🙅. The owner replies with a number or a name typed whole, and that stages the move on a ✅ card. The first other reply gets the options again, once, and stages nothing; after that, and after 72 h, replies are the thread's own. Only an owner's reply counts.
 - **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most two new card questions a channel each morning. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
 - **Replies:** the thread of an F4 question or an F5 options list carries a KV mark while it waits, so a short reply anywhere else costs no database read. A failed reply check hands the reply to the thread as usual.
 - **Passed over:** a card with nobody to ask in Slack, or no channel, is marked in KV and looked at again a week on; a stale card with a recent comment, once that comment is three weeks old.

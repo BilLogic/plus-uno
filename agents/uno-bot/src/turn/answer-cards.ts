@@ -19,6 +19,8 @@
 // PURE: no Env, no Slack shape. What a card LOOKS like in Slack — its block
 // and its estate's logo — is `slack/answer-cards-block.ts`'s.
 
+import { linkLabel } from "./link-label";
+
 /** One link button on a card. */
 export interface CardLink {
   label: string;
@@ -148,12 +150,13 @@ export function cardsOf(lookup: string, result: Record_, request: CardsRequest):
 }
 
 /**
- * The cards as a plain list, one linked Markdown line each.
+ * The cards as a plain list, one linked Markdown line each, the title's
+ * brackets dropped so the link still parses (as the Sources line's).
  *
  * @param cards - The cards it lists
  */
 export function cardList(cards: AnswerCards): string {
   return cards.cards
-    .map((c) => `- [${c.title}](${c.links[0]!.url})${c.subtitle ? ` — ${c.subtitle}` : ""}`)
+    .map((c) => `- [${linkLabel(c.title) || c.links[0]!.url}](${c.links[0]!.url})${c.subtitle ? ` — ${c.subtitle}` : ""}`)
     .join("\n");
 }

@@ -835,7 +835,7 @@ export async function draftCard(c: CommitmentRecord, text: CommitmentText, deps:
     input: {
       surface: "prd",
       title,
-      summary: `Drafted by uno-bot from a to-do in ${where} to create this card. Fill in the PRD sections and set the Contributor before it moves on.`,
+      summary: `Drafted by le goat from a to-do in ${where} to create this card. Fill in the PRD sections and set the Contributor before it moves on.`,
       ...(text.sourceUrl ? { source_url: text.sourceUrl } : {}),
       ...(pillar ? { properties: { product_pillar: pillar } } : {}),
     },

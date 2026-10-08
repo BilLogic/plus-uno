@@ -11,7 +11,8 @@
 //     reactions: "A ✅ there files it" is an instruction, not decoration.
 //   • 🐐 once on the App Home and once in the welcome, and nowhere else.
 //   • The reminder vocabulary 🙌 ⏳ 🙅 🤔 is protocol — a person answers a
-//     reminder by reacting with it — so the files that write reminders keep it.
+//     reminder by reacting with it, by Slack's name for it — and a button
+//     says the same answer in words, so no copy string carries the glyph.
 //   • The bot is "le goat" wherever it names itself, never "UNO Bot".
 //
 // Two checks, the way tests/figma-copy.test.ts pins the Figma messages:
@@ -30,6 +31,7 @@ import { renderGateNote } from "../src/slack/gate-note";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { buildFailureMessage } from "../src/slack/failure-message";
+import { emojiIn as countEmoji } from "../src/voice/emoji";
 import type { GateNote } from "../src/turn/index";
 import type { OperationOutcome } from "../src/gate/index";
 
@@ -41,8 +43,6 @@ const SRC = join(process.cwd(), "src");
 const STATUS = ["⚠", "❌", "✅", "⛔", "✏"];
 /** The two signs that are also the gate's reactions, so may be named mid-line. */
 const GATE = ["✅", "⛔"];
-/** How a person answers a reminder. */
-const REMINDER = ["🙌", "⏳", "🙅", "🤔"];
 const GOAT = "🐐";
 
 /** Slack shortcodes the copy writes, as the glyph a person sees. */
@@ -99,11 +99,12 @@ const FIXED_COPY: Record<string, string[]> = {
   "sweep/share.ts": [],
   "sweep/run.ts": [],
   "dm-watch/capture.ts": [],
-  "dm-watch/copy.ts": REMINDER,
-  "dm-sweep/copy.ts": REMINDER,
-  "follow-through/copy.ts": REMINDER,
+  "dm-watch/copy.ts": [],
+  "dm-sweep/copy.ts": [],
+  "follow-through/copy.ts": [],
   "follow-through/run.ts": [],
-  "commitments/copy.ts": REMINDER,
+  "commitments/copy.ts": [],
+  "commitments/remind.ts": [],
   // Figma library, drift and the weekly precedence thread. 🎉 marks a merged
   // PR, the one ship tests/figma-copy.test.ts allows.
   "figma-library/draft.ts": [],
@@ -122,6 +123,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "tools/relay-dm.ts": [],
   "tools/relayed-dm-render.ts": [],
   "tools/github-issue.ts": [],
+  "tools/github-issue-render.ts": [],
   "tools/github-issue-update.ts": [],
   "tools/github-workflow.ts": [],
 };
@@ -224,11 +226,10 @@ export function stringLiterals(src: string): string[] {
   return out;
 }
 
-/** Every emoji in a piece of copy, as the glyph a person sees. */
+/** Every emoji in a piece of copy, as the glyph a person sees: the voice's own
+ *  counter, the one the draft judge reads, with a shortcode read as its glyph. */
 function emojiIn(text: string): string[] {
-  const glyphs = (text.replace(/\uFE0F/g, "").match(/\p{Extended_Pictographic}/gu) ?? []).filter((g) => !"©®™↔↩↪".includes(g));
-  const codes = [...text.matchAll(/(?<![\w}$-]):([a-z][a-z0-9_+-]*):(?![\w])/g)].map((m) => SHORTCODES[m[1]!] ?? `:${m[1]}:`);
-  return [...glyphs, ...codes];
+  return countEmoji(text).map((e) => (e.startsWith(":") ? (SHORTCODES[e.slice(1, -1)] ?? e) : e.replace(/\uFE0F/g, "")));
 }
 
 function filesUnder(dir: string): string[] {
@@ -277,6 +278,19 @@ describe("the per-file emoji allowlist", () => {
   }
 });
 
+describe("a button's label", () => {
+  // The reminder vocabulary is how a person REACTS; a button says its answer
+  // in words, so a label carries no glyph even in a file that keeps them.
+  for (const file of Object.keys(FIXED_COPY)) {
+    it(`${file} labels its buttons in words`, () => {
+      const src = readFileSync(join(SRC, file), "utf8");
+      for (const m of src.matchAll(/\blabel:\s*(["'`])((?:(?!\1).)*)\1/g)) {
+        assert.deepEqual(emojiIn(m[2]!), [], `${file}: label ${JSON.stringify(m[2])}`);
+      }
+    });
+  }
+});
+
 describe("the self-name", () => {
   it('is "le goat" everywhere the code names the bot, never "UNO Bot"', () => {
     for (const path of filesUnder(SRC)) {
@@ -284,6 +298,17 @@ describe("the self-name", () => {
         assert.doesNotMatch(s, /\buno bot\b/i, `${path.slice(SRC.length + 1)}: ${JSON.stringify(s.slice(0, 120))}`);
       }
     }
+  });
+
+  it('is "le goat" where copy credits the bot or sends a person to it', () => {
+    // "uno-bot" stays where it names the #uno-bot channel, a marker or an
+    // operator's run report; a person reads "by …" and "a DM with …".
+    const named = Object.keys(FIXED_COPY).flatMap((file) =>
+      stringLiterals(readFileSync(join(SRC, file), "utf8"))
+        .filter((s) => /\bby uno-bot\b|\ba DM with uno-bot\b/.test(s))
+        .map((s) => `${file}: ${s.slice(0, 120)}`),
+    );
+    assert.deepEqual(named, []);
   });
 
   it("is what the App Home, the welcome and an untitled chat say", () => {
