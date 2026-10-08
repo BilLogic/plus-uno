@@ -403,7 +403,9 @@ export type PostingCall =
       blocks: boolean;
       /** The blocks themselves, when there were any — what an answer's
        *  `markdown` block and its fallback rungs are asserted on. */
-      blockList?: unknown[];
+      blockList?: unknown[];      /** The unfurl flags, as sent: false keeps Slack from previewing links. */
+      unfurlLinks?: boolean;
+      unfurlMedia?: boolean;
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "appendStream"; channel: string; ts: string; text: string }
@@ -468,6 +470,8 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
         text: input.text,
         blocks,
         ...(input.blocks ? { blockList: input.blocks } : {}),
+        ...(input.unfurl_links === undefined ? {} : { unfurlLinks: input.unfurl_links }),
+        ...(input.unfurl_media === undefined ? {} : { unfurlMedia: input.unfurl_media }),
       });
       if (refuseBlocks(refused, "post", input.blocks)) return { ok: false, error: "invalid_blocks" };
       const at = (input.blocks ?? []).findIndex((b) => opts.refusesBlockTypes?.includes(String(b.type)));
