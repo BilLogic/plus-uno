@@ -125,6 +125,45 @@ describe("an answer's feedback buttons", () => {
   });
 });
 
+describe("a streamed answer's feedback buttons", () => {
+  it("ride the stream's stop, beneath the footer, and nothing is posted beside it", async () => {
+    const slack = recordingPosting();
+    const posted = await postTextVerified(slack.deps(), "C1", "100.1", ANSWER, RECIPIENT, undefined, { feedback: FEEDBACK });
+
+    assert.equal(posted.ok, true);
+    assert.equal(slack.of("message").length, 0);
+    const stops = slack.of("stopStream");
+    assert.equal(stops.length, 1);
+    assert.deepEqual(blocksOf(stops[0]).map((b) => b.type), ["context", "context_actions"]);
+    assert.equal(blocksOf(stops[0])[1]!.elements![0]!.type, "feedback_buttons");
+  });
+
+  it("are dropped from a refused stop, which stops again without them and never re-posts the answer", async () => {
+    const slack = recordingPosting({ refusesBlockTypes: ["context_actions"] });
+    const { result, lines } = await warnings(() =>
+      postTextVerified(slack.deps(), "C1", "100.1", ANSWER, RECIPIENT, undefined, { feedback: FEEDBACK }),
+    );
+    expectRefusals(slack.refused);
+
+    assert.equal(result.ok, true);
+    assert.equal(slack.of("message").length, 0, "the streamed answer is not posted a second time");
+    const stops = slack.of("stopStream");
+    assert.deepEqual(stops.map((s) => blocksOf(s).map((b) => b.type)), [["context", "context_actions"], ["context"]]);
+    assert.ok(lines.some((l) => /feedback buttons refused/.test(l)));
+  });
+
+  it("stay off a streamed first part of a split answer, and ride its last", async () => {
+    const para = (i: number) => `Paragraph ${i}: ${"word ".repeat(60).trimEnd()}`;
+    const long = Array.from({ length: 48 }, (_, i) => para(i)).join("\n\n");
+    const slack = recordingPosting();
+    await postTextVerified(slack.deps(), "C1", "100.1", long, RECIPIENT, undefined, { feedback: FEEDBACK });
+
+    assert.ok(!blocksOf(slack.of("stopStream")[0]).some((b) => b.type === "context_actions"));
+    const posts = slack.of("message");
+    assert.ok(blocksOf(posts.at(-1)).some((b) => b.type === "context_actions"));
+  });
+});
+
 describe("the Delivery adapter", () => {
   it("hands the posting path the turn the answer belongs to", async () => {
     const target: SlackDeliveryTarget = {
