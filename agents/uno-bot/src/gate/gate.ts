@@ -95,6 +95,13 @@ export type GateSignal =
        *  reason, when one was given. */
       note?: string;
       userId: string;
+      /**
+       * The batch as the pop-up's edits left it, already checked by the door
+       * against the guards a draft passes (`slack/review-fields.ts`). Absent,
+       * the card runs as staged. Applied only to the card the claim wins, so
+       * it is what the execution record and the run both carry.
+       */
+      operations?: ProposalOperation[];
     }
   | {
       kind: "typed";
@@ -384,8 +391,17 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       const reason = signal.note?.trim();
       return claim(proposal, decision, signal.userId, deps, undefined, reason ? { reason } : {});
     }
+    return claim(edited(proposal, signal.operations), decision, signal.userId, deps);
   }
   return claim(proposal, decision, signal.userId, deps);
+}
+
+/** The card with a pop-up's edited batch in place of its own, the first
+ *  operation mirrored where the one-operation readers look. */
+function edited(proposal: PendingProposal, operations: ProposalOperation[] | undefined): PendingProposal {
+  const [first] = operations ?? [];
+  if (!first) return proposal;
+  return { ...proposal, operations, toolName: first.toolName, input: first.input };
 }
 
 /**

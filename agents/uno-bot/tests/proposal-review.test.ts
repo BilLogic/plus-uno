@@ -15,7 +15,7 @@ import {
   type ThreadState,
 } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
-import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
+import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
 import type { ProposalCard } from "../src/turn/index";
 import { verdictEvents } from "../src/usage/index";
@@ -150,7 +150,7 @@ describe("Review opens the draft", () => {
     await runReviewOpen(open(), deps);
     const draft = views.calls[1]!.view as {
       blocks: Array<{ type: string; elements?: Array<{ style?: string; text: { text: string } }> }>;
-      submit?: unknown;
+      submit?: { text: string };
     };
     assert.deepEqual(actionIds(draft), DECISION_ROW);
     assert.deepEqual(
@@ -163,7 +163,8 @@ describe("Review opens the draft", () => {
     );
     // The note Needs changes needs and Reject may carry sits just above it.
     assert.equal(draft.blocks.at(-2)?.type, "input");
-    assert.equal(draft.submit, undefined, "the footer carries no decision");
+    // Slack requires a submit beside an input; it checks, never decides.
+    assert.equal(draft.submit?.text, "Check edits", "the footer carries no decision");
   });
 
   it("carries the card it is about, so the decision finds it", async () => {
@@ -374,6 +375,19 @@ describe("Needs changes in the pop-up", () => {
 
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "superseded");
     assert.deepEqual((await react(threadState, "white_check_mark")).filter((v) => v.execute), []);
+  });
+
+  it("keeps the note and the decisions through Check edits, the submit the note's input needs", async () => {
+    const { deps, views } = harness(await staged());
+    await runReviewOpen(open(), deps);
+    const draft = views.calls[1]!.view as Record<string, unknown>;
+    const checked = checkedEditsView({
+      ...draft,
+      state: { values: { uno_review_note: { uno_review_note_input: { type: "plain_text_input", value: "shorter" } } } },
+    });
+    assert.deepEqual(actionIds(checked), DECISION_ROW);
+    assert.ok((checked.blocks as Array<{ block_id?: string }>).some((b) => b.block_id === "uno_review_note"));
+    assert.equal((checked.submit as { text: string }).text, "Check edits");
   });
 
   it("is refused in the view without a note, and leaves the card as it was", async () => {
