@@ -76,7 +76,7 @@ export interface TurnRecordFacts {
 }
 
 /** A Slack message ts: seconds, a dot, a sequence. */
-const SLACK_TS = /^\d{9,}\.\d+$/;
+export const SLACK_TS = /^\d{9,}\.\d+$/;
 
 /** When the ask was made, epoch ms. */
 export function askedAtOf(askTs: string, startedAt: number): number {

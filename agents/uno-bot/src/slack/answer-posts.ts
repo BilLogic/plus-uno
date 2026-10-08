@@ -10,6 +10,8 @@
 // So the limit stays (Slack renders badly long before its 40k hard failure) and
 // the answer stops being cut to fit it: the body is split into continuation
 // messages in the same thread, in order, numbered when there is more than one.
+// The number is not part of a message's Markdown: it rides under the part as a
+// small grey context line (`partMarker`), so it never competes with the answer.
 //
 // Where the cut goes, in preference order: a blank line between paragraphs; a
 // line boundary inside one (`splitBalanced`, which also keeps a code fence
@@ -32,8 +34,9 @@ import { splitBalanced } from "./split";
 // short; this is where the Worker enforces it, per message, not per answer.
 export const MAX_POST_CHARS = 11_000;
 
-// Headroom for the `_(10/10)_` marker line a continuation carries, reserved
-// before the split so a numbered piece cannot end up over the limit.
+// Headroom for the `_(10/10)_` line a part carries on the fallback rungs, where
+// there is no context block to hold its marker, reserved before the split so a
+// numbered piece cannot end up over the limit there either.
 const MARKER_RESERVE = 16;
 
 const PARAGRAPH_JOIN = "\n\n";
@@ -46,15 +49,20 @@ const FENCE = /^\s*```/;
  * reading order when it does not.
  *
  * A single piece is returned untouched — a short answer must look exactly as
- * it always has. Several pieces each lead with `_(i/n)_`, so a person reading
- * the thread knows at a glance that a message is a continuation and how many
- * are still coming.
+ * it always has. Several pieces are returned bare; `deliverAnswer` hands each
+ * its `partMarker`, so a person reading the thread knows at a glance that a
+ * message is a continuation and how many are still coming.
  */
 export function answerMessages(body: string): string[] {
   const budget = MAX_POST_CHARS - MARKER_RESERVE;
   const pieces = pack(atomicUnits(body), budget);
-  if (pieces.length <= 1) return [body];
-  return pieces.map((piece, i) => `_(${i + 1}/${pieces.length})_\n\n${piece}`);
+  return pieces.length <= 1 ? [body] : pieces;
+}
+
+/** The `(i/n)` a part of a split answer carries, or null for a lone answer.
+ *  `i` counts from 0. */
+export function partMarker(i: number, n: number): string | null {
+  return n > 1 ? `(${i + 1}/${n})` : null;
 }
 
 /**
@@ -150,9 +158,9 @@ export interface AnswerTransport {
    * off, unavailable, or failed half-way — the caller then falls back to
    * `post`, because a duplicated answer is bad and a missing one is worse.
    */
-  stream(text: string, withFooter: boolean): Promise<boolean>;
+  stream(text: string, withFooter: boolean, marker: string | null): Promise<boolean>;
   /** An ordinary message in the thread. */
-  post(text: string, withFooter: boolean): Promise<boolean>;
+  post(text: string, withFooter: boolean, marker: string | null): Promise<boolean>;
 }
 
 /**
@@ -172,10 +180,11 @@ export async function deliverAnswer(pieces: string[], transport: AnswerTransport
   let ok = true;
   for (const [i, piece] of pieces.entries()) {
     const withFooter = i === pieces.length - 1;
-    if (i === 0 && (await transport.stream(piece, withFooter))) continue;
+    const marker = partMarker(i, pieces.length);
+    if (i === 0 && (await transport.stream(piece, withFooter, marker))) continue;
     // Sequential, not a parallel fan-out: Slack orders by arrival, so posting
     // the pieces at once can land (2/3) above (1/3).
-    ok = (await transport.post(piece, withFooter)) && ok;
+    ok = (await transport.post(piece, withFooter, marker)) && ok;
   }
   return ok;
 }

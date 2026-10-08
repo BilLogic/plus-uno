@@ -13,6 +13,7 @@ import {
   REMINDER_CHOICES,
   reminderAnswer,
   reminderBlocks,
+  reminderText,
   SELF_REMINDER_CHOICES,
   SELF_REMINDER_LAST_CHOICES,
 } from "../src/commitments/index";
@@ -50,6 +51,50 @@ describe("reminderBlocks with answers", () => {
   it("with words only, is the body and a context line — what an answer leaves behind", () => {
     const answered = reminderBlocks("Body", "Nice, marked done.") as Block[];
     assert.deepEqual(answered.map((b) => b.type), ["section", "context"]);
+    assert.equal(footerLabels(answered), "Nice, marked done.");
+  });
+});
+
+describe("a promise reminder", () => {
+  const permalink = "https://plus.slack.com/archives/C1/p100";
+  const body = reminderText({ promiser: "U1", what: "send Bryan the onboarding notes", deadlineLabel: "Thu", promisedLabel: "Mon", permalink });
+  const blocks = reminderBlocks(body, { choices: REMINDER_CHOICES }) as Block[];
+
+  it("leads with a card-like heading: what was promised, by when", () => {
+    assert.deepEqual(blocks.map((b) => b.type), ["section", "context", "actions"]);
+    assert.equal(blocks[0]!.text!.text, "*You said you'd send Bryan the onboarding notes by Thu*");
+  });
+
+  it("puts the mention, the question and the original link under the heading, small", () => {
+    const [line] = blocks[1]!.elements! as Array<{ type: string; text: string }>;
+    assert.equal(line!.type, "mrkdwn");
+    assert.match(line!.text, /^<@U1> /);
+    assert.match(line!.text, /Is it done, or does the date need to move\?/);
+    assert.ok(line!.text.endsWith(`<${permalink}|Original message>`));
+  });
+
+  it("names the day it was said when no deadline was", () => {
+    const undated = reminderText({ promiser: "U1", what: "review the PRD", deadlineLabel: null, promisedLabel: "Tue", permalink: null });
+    assert.equal(undated.split("\n")[0], "*On Tue you said you'd review the PRD*");
+    assert.doesNotMatch(undated, /Original message/);
+  });
+
+  it("keeps all four answers, in words", () => {
+    const buttons = blocks[2]!.elements! as Array<{ value: string; text: { text: string } }>;
+    assert.deepEqual(
+      buttons.map((b) => [b.text.text, b.value]),
+      [
+        ["Done", "raised_hands"],
+        ["Later", "hourglass_flowing_sand"],
+        ["Dropped", "no_good"],
+        ["Wasn't a promise", "thinking_face"],
+      ],
+    );
+  });
+
+  it("keeps its heading when an answer replaces the buttons", () => {
+    const answered = reminderBlocks(body, "Nice, marked done.") as Block[];
+    assert.deepEqual(answered.map((b) => b.type), ["section", "context", "context"]);
     assert.equal(footerLabels(answered), "Nice, marked done.");
   });
 });
