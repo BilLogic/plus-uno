@@ -94,6 +94,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "oauth/slack.ts": [],
   // End-of-day sweep, DM watch, follow-through, reminders
   "sweep/cards.ts": [],
+  "slack/sweep-card-blocks.ts": [],
   "sweep/share.ts": [],
   "sweep/run.ts": [],
   "dm-watch/capture.ts": [],

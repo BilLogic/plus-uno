@@ -83,6 +83,14 @@ export function cardBlock(card: AnswerCard): Record<string, unknown> {
  * @param cards - The cards, 1 to 10
  */
 export function answerCardsBlock(cards: AnswerCards): Record<string, unknown> {
-  const blocks = cards.cards.map(cardBlock);
-  return blocks.length === 1 ? blocks[0]! : { type: "carousel", elements: blocks };
+  return carouselOf(cards.cards.map(cardBlock));
+}
+
+/**
+ * One `card` alone, or two to ten in a `carousel`.
+ *
+ * @param cards - The `card` blocks, 1 to 10
+ */
+export function carouselOf(cards: Record<string, unknown>[]): Record<string, unknown> {
+  return cards.length === 1 ? cards[0]! : { type: "carousel", elements: cards };
 }

@@ -53,7 +53,7 @@
 
 import { isSubrequestBudgetError, rethrowIfBudget } from "../net";
 import { proposalReplyThread, SWEEP_KEY, type PendingProposal } from "../thread-state/index";
-import type { ProposalCard } from "../turn/index";
+import type { CardFix, ProposalCard } from "../turn/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { isMorningRunTime } from "../commitments/due";
@@ -652,33 +652,41 @@ export async function dropDmCapture(
 /** The card, as data. Page words are escaped; the DM is linked, never quoted. */
 export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard {
   const n = items.length;
-  const lines = [
-    `**${SWEEP_CARD_MARK}** — from your DMs: you settled ${n === 1 ? "something" : `${n} things`} that a page doesn't say yet.`,
-    "",
-  ];
-  items.forEach((item, i) => {
+  const head = `**${SWEEP_CARD_MARK}** — from your DMs: you settled ${n === 1 ? "something" : `${n} things`} that a page doesn't say yet.`;
+  // Only the owner confirms, so no card names anyone; the DM is a button.
+  const fixes: CardFix[] = items.map((item, i) => {
     const page = `<${item.target.url}|${escapeSlackText(flat(item.target.title) || "untitled")}>`;
     const where = `   - <${item.permalink}|where you said it>`;
+    const fix = {
+      page: { title: flat(item.target.title), url: item.target.url },
+      where: { label: "Your DM", url: item.permalink },
+    };
     if (item.add) {
       const place = item.add.section
         ? `add under ${page} › *${escapeSlackText(flat(item.add.section))}*`
         : `add a new section *${escapeSlackText(flat(item.add.newSection ?? ""))}* to ${page}`;
-      lines.push(`${i + 1}. ${place}`, `   - adds: “${escapeSlackText(flat(item.replacement))}”`, where);
-      return;
+      return {
+        ...fix,
+        change: `Adds: “${flat(item.replacement)}”`,
+        detail: [`${i + 1}. ${place}`, `   - adds: “${escapeSlackText(flat(item.replacement))}”`, where].join("\n"),
+      };
     }
     const { before, after } = changedSpan(item.original, item.replacement);
-    lines.push(
-      `${i + 1}. ${page}`,
-      `   - page says: “${escapeSlackText(flat(item.sourceSays))}”`,
-      `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
-      where,
-    );
+    return {
+      ...fix,
+      change: `“${before}” → “${after}”`,
+      detail: [
+        `${i + 1}. ${page}`,
+        `   - page says: “${escapeSlackText(flat(item.sourceSays))}”`,
+        `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
+        where,
+      ].join("\n"),
+    };
   });
-  lines.push(
-    "",
+  const tail =
     `Only you can confirm. One ✅ applies ${n === 1 ? "it" : `all ${n}`}; reply \`drop 2\` to leave one out. ` +
-      `Nothing from your DMs goes anywhere else. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
-  );
+    `Nothing from your DMs goes anywhere else. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`;
+  const lines = [head, "", ...fixes.map((f) => f.detail), "", tail];
   const operations = items.map((item) =>
     itemOperation({ target: item.target, blockId: item.blockId, lastEditedTime: item.lastEditedTime, replacement: item.replacement, add: item.add }),
   );
@@ -689,6 +697,7 @@ export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard 
     fields: [],
     caveats: [],
     operations,
+    fixes: { head, items: fixes, tail },
   };
 }
 

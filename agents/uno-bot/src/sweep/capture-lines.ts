@@ -103,6 +103,32 @@ export function captureItemLines(
   ];
 }
 
+/**
+ * What a fix's own card says beside its page (`ProposalCard.fixes`): what it
+ * writes, in plain words, where it was said, and how the page was found.
+ * Plain text, never escaped: a card's body and buttons are plain_text.
+ *
+ * @param item - The finding
+ * @param change - What its replace changes, before → after
+ */
+export function captureFixWords(
+  item: PendingFinding,
+  change: { before: string; after: string },
+): { change: string; where?: { label: string; url: string }; note?: string } {
+  const { evidence } = item;
+  const record = evidence.record;
+  const where = record
+    ? { label: record.kind === "note" ? "Note" : "Card", url: recordLink(record.url, record.entryIds[0]) }
+    : evidence.permalinks[0]
+      ? { label: "Thread", url: evidence.permalinks[0] }
+      : undefined;
+  return {
+    change: item.add ? `Adds: “${flat(item.replacement)}”` : `“${change.before}” → “${change.after}”`,
+    ...(where ? { where } : {}),
+    ...(item.target.foundBy === "search" ? { note: FOUND_BY_SEARCH } : {}),
+  };
+}
+
 /** A note's link to the block that records it; a card comment's, to the card. */
 function recordLink(url: string, entryId: string | undefined): string {
   if (!entryId || entryId.startsWith("comment:")) return url;

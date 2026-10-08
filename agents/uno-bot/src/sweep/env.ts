@@ -77,7 +77,8 @@ import {
   updateMessage,
   type SlackMessageMetadata,
 } from "../slack/api";
-import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { postWithPlainRung, proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { refusedForBlocks } from "../slack/delivery";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
@@ -258,13 +259,18 @@ async function sweepDepsFor(
           // A card whose plan did not go up ahead of it is not posted at all.
           if (!sent.ok) return { ok: false };
         }
-        const res = await postMessage(env, {
-          channel: to.channel,
-          text: card.text,
-          blocks: card.blocks,
-          metadata: tagOf(tag, "card"),
-          ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
-        });
+        const res = await postWithPlainRung(
+          (blocks) =>
+            postMessage(env, {
+              channel: to.channel,
+              text: card.text,
+              blocks,
+              metadata: tagOf(tag, "card"),
+              ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
+            }),
+          card,
+          refusedForBlocks,
+        );
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       async findPosted(to, cardKey, since) {

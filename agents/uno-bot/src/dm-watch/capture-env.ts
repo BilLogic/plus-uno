@@ -18,7 +18,8 @@ import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
 import { conversationsHistorySince, conversationsOpen, getBotIdentity, postMessage } from "../slack/api";
 import { SWEEP_CARD_EVENT } from "../sweep/cards";
-import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { postWithPlainRung, proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { refusedForBlocks } from "../slack/delivery";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
@@ -86,7 +87,11 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
     bot: {
       dmChannel: (userId) => conversationsOpen(env, userId),
       async post(channel, message) {
-        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, metadata: message.metadata });
+        const res = await postWithPlainRung(
+          (blocks) => postMessage(env, { channel, text: message.text, blocks, metadata: message.metadata }),
+          message,
+          refusedForBlocks,
+        );
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       withdraw: (channel, ts, text) => withdrawCaptureCard(env, channel, ts, text),
