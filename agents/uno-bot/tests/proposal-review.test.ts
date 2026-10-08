@@ -221,6 +221,19 @@ describe("Review opens the draft", () => {
     assert.deepEqual(actionIds(view), []);
   });
 
+  it("keeps the note and the decision row on a draft too long for one view, and says some was left out", async () => {
+    const paragraphs = Array.from({ length: 140 }, (_, n) => `Paragraph ${n}: ${"words ".repeat(480)}`);
+    const { deps, views } = harness(await staged({ proposalText: paragraphs.join("\n\n") }));
+    await runReviewOpen(open(), deps);
+    const view = views.calls[1]!.view as { blocks: Array<{ type: string; block_id?: string }> };
+    assert.ok(view.blocks.length <= 100, `${view.blocks.length} blocks`);
+    assert.deepEqual(actionIds(view), DECISION_ROW);
+    assert.equal(view.blocks.at(-1)!.block_id, "uno_review_decision", "the decision row is last");
+    assert.ok(view.blocks.some((b) => b.block_id === "uno_review_note"), "the note input is kept");
+    assert.match(viewText(view), /left out/i);
+    assert.match(viewText(view), /Paragraph 0:/, "the draft still opens the view");
+  });
+
   it("stops when Slack will not open the view", async () => {
     const views = recordingViews({ openFails: true });
     const reads: string[] = [];
