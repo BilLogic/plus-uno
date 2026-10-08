@@ -81,6 +81,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "slack/events.ts": [],
   "slack/shortcuts.ts": [],
   "slack/session-stop.ts": [],
+  "slack/try-asking.ts": [],
   "slack/delivery.ts": [],
   "slack/delivery-adapter.ts": [],
   "slack/api.ts": [],
