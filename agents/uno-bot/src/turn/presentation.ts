@@ -9,8 +9,8 @@
 // field its rows do not carry, is refused in the call's own result, and the
 // model writes the plain list instead. Nothing the model types becomes a cell.
 //
-// THE PRESENTATION is the data the turn hands Delivery beside the prose. Today
-// it holds the one result table; each new shape is one more field on it, built
+// THE PRESENTATION is the data the turn hands Delivery beside the prose: the
+// result table and the answer cards. Each shape is one field on it, built
 // here from the same recorded lookups and spelled for Slack on the posting
 // side, so a new shape never needs a new argument on the Delivery seam.
 //
@@ -20,7 +20,8 @@
 // refusal. Either way the model writes its prose knowing what the reader will
 // see beneath it — a summary when a table is there, the plain list when not.
 //
-// ONE TABLE PER ANSWER: the last request that produced one wins.
+// ONE TABLE AND ONE SET OF CARDS PER ANSWER: of each, the last request that
+// produced one wins.
 //
 // THE SOURCES are every link the turn's lookups read, as their task cards
 // carry them: each once, in the order read. Which of them a thread may see,
@@ -43,6 +44,7 @@ import {
   type RoadmapResult,
   type RowsRemoved,
 } from "./result-table";
+import { cardList, cardsOf, type AnswerCards } from "./answer-cards";
 
 /** What rides beneath an answer. */
 export interface Presentation {
@@ -50,6 +52,8 @@ export interface Presentation {
   table?: ResultTable;
   /** The links the turn's lookups read, each once, in the order read. */
   sources?: readonly TaskCardSource[];
+  /** The answer cards, when the model asked for its linkable items as cards. */
+  cards?: AnswerCards;
 }
 
 /** The tool the model asks for a shape with. */
@@ -129,28 +133,59 @@ function attachedNote(table: ResultTable): string {
 
 const NO_TABLE_NOTE = "No table is attached. If the rows answer the question, list them in your answer yourself.";
 
+/** What `present` answers when cards are attached. */
+function cardsNote(cards: AnswerCards): string {
+  const n = cards.cards.length;
+  const shows = cards.total > n ? `the first ${n} of ${cards.total} linked items; say so and give the total` : `all ${n} linked items`;
+  return (
+    `${n === 1 ? "A card is" : "A carousel of cards is"} posted beneath your answer. It shows ${shows}, ` +
+    "each with its link buttons. Do not list them again: lead with your takeaway in one sentence, then what stands out, naming at most 3."
+  );
+}
+
+const NO_CARDS_NOTE = "No cards are attached. Name the items in your answer yourself, linked.";
+
 /** A fresh presenter, for one turn. */
 export function presenter(): Presenter {
   const lookups = new Map<string, Recorded>();
   let table: ResultTable | undefined;
   const sources = new Map<string, TaskCardSource>();
+  let cards: AnswerCards | undefined;
 
   const answer = (body: Record<string, unknown>): string => JSON.stringify(body);
   const refuse = (error: string): string => answer({ ok: false, table_attached: false, error, note: NO_TABLE_NOTE });
 
   /** The model's `present` call, answered from the recorded lookups. */
+  const refuseCards = (error: string): string =>
+    answer({ ok: false, cards_attached: false, error, note: NO_CARDS_NOTE });
+
+  /** A `present` call for cards, answered from the recorded lookup. */
+  const presentCards = (lookup: string, recorded: Recorded, args: Record<string, unknown>): string => {
+    const columns = Array.isArray(args.columns) ? args.columns.filter((c): c is string => typeof c === "string") : [];
+    const reading = cardsOf(lookup, recorded.result, {
+      ...(typeof args.list === "string" && args.list ? { list: args.list } : {}),
+      columns,
+    });
+    if ("refusal" in reading) return refuseCards(reading.refusal);
+    cards = reading.cards;
+    return answer({ ok: true, cards_attached: true, card_count: cards.cards.length, note: cardsNote(cards) });
+  };
+
   const present = (args: Record<string, unknown>): string => {
     const shape = args.shape ?? "table";
-    if (shape !== "table") return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table.`);
+    if (shape !== "table" && shape !== "cards") {
+      return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table or cards.`);
+    }
     const lookup = typeof args.lookup === "string" ? args.lookup.trim() : "";
     const recorded = lookups.get(lookup);
     if (!recorded) {
       const made = [...lookups.keys()];
-      return refuse(
-        `No ${lookup || "named"} lookup ran this turn, so there are no rows to table.` +
-          (made.length ? ` Lookups that did: ${made.join(", ")}.` : ""),
-      );
+      const why =
+        `No ${lookup || "named"} lookup ran this turn, so there are no rows to ${shape === "cards" ? "make cards of" : "table"}.` +
+        (made.length ? ` Lookups that did: ${made.join(", ")}.` : "");
+      return shape === "cards" ? refuseCards(why) : refuse(why);
     }
+    if (shape === "cards") return presentCards(lookup, recorded, args);
     if (lookup === "roadmap_query") {
       const cards = roadmapCards(recorded.result as RoadmapResult);
       if (!cards) return refuse("That Roadmap lookup has fewer than two definite cards; name them in prose.");
@@ -195,8 +230,12 @@ export function presenter(): Presenter {
       for (const source of read) if (!sources.has(source.url)) sources.set(source.url, source);
     },
     presentation() {
-      if (!table && !sources.size) return undefined;
-      return { ...(table ? { table } : {}), ...(sources.size ? { sources: [...sources.values()] } : {}) };
+      if (!table && !sources.size && !cards) return undefined;
+      return {
+        ...(table ? { table } : {}),
+        ...(sources.size ? { sources: [...sources.values()] } : {}),
+        ...(cards ? { cards } : {}),
+      };
     },
   };
 }
@@ -226,15 +265,20 @@ export function presentedProse(prose: string, presentation: Presentation | undef
  * @param presentation - What rides beneath it
  */
 export function textCopy(prose: string, presentation: Presentation | undefined): string {
-  return presentation?.table ? withResultList(prose, presentation.table) : prose;
+  const tabled = presentation?.table ? withResultList(prose, presentation.table) : prose;
+  return presentation?.cards ? [tabled, "", cardList(presentation.cards)].join("\n") : tabled;
 }
 
 /**
- * What the draft judge is shown of the presentation: the table's plain list,
- * or undefined when there is no table.
+ * What the draft judge is shown of the presentation: the table's plain list
+ * and the cards', or undefined when there is neither.
  *
  * @param presentation - What rides beneath the draft
  */
 export function judgedList(presentation: Presentation | undefined): string | undefined {
-  return presentation?.table ? resultList(presentation.table) : undefined;
+  const lists = [
+    presentation?.table ? resultList(presentation.table) : null,
+    presentation?.cards ? cardList(presentation.cards) : null,
+  ].filter((l): l is string => l !== null);
+  return lists.length ? lists.join("\n") : undefined;
 }

@@ -122,6 +122,15 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 **Code lists the links an answer read; the prose ends on its last point.** Every link the turn's lookups read, as their task cards carry it, is gathered once in the order read, and the ones a thread may see (`slack/card-sources.ts`) fold into a closed `container` titled `Sources (n)` beneath the answer, after any table. At most 10; fewer than 3 make no box, and those links sit on names in the prose. The title is the count alone. The links also ride the text copy as one `Sources:` line, and a refused box steps down to the answer with that line in its Markdown. Every answer post sets `unfurl_links` and `unfurl_media` to false.
 
+#### Linkable items: answer cards
+
+**Items the reader will open go in cards.** The model calls `present` with `shape: "cards"`, the lookup, its title field and optionally a subtitle field; code builds every card from that lookup's rows (`turn/answer-cards.ts`, block in `slack/answer-cards-block.ts`).
+
+- **Shape:** one item posts as a `card` block, 2 to 10 as a `carousel`; more are cut to the first 10 and the model is told the total. One set of cards per answer. No hero images.
+- **Links:** a row's `url` is the first button, "Open"; its other http(s) fields follow, labelled by field name, up to Slack's 3. A row with no link is left out; a list with none is refused, and the model names the items in prose.
+- **Logos:** a card's icon is the logo of the estate its first link leads to (`estateOfUrl`), as a PNG image Slack fetches by URL; an SVG image does not render. PLUS, uno-blueprint, GitHub and Slack are served from `public/uno-bot/logos/` on plus-uno.netlify.app; Figma, Notion, Storybook and Metabase use Google's favicon service for their domain. A link on no estate's host carries the PLUS mark. Task cards keep Slack's named icons, since Slack refuses images there.
+- **Placement and fallback:** as the table's: after the `markdown` block, before the footer, always as an ordinary message. If Slack refuses the blocks, the answer goes out again without them, each card a linked Markdown line in the prose. The text copy carries the same lines.
+
 ### What the Worker does on each path
 
 | Path | What is sent | Converted by |

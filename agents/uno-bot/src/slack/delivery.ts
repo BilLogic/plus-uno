@@ -18,6 +18,7 @@ import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
 import { sourcesBox } from "./sources-box";
+import { answerCardsBlock } from "./answer-cards-block";
 import { textCopy, type Presentation } from "../turn/presentation";
 import { feedbackBlock, type AnswerFeedback } from "./feedback";
 
@@ -211,6 +212,35 @@ function refusedForBlocks(posted: { ok: boolean; error?: string }): boolean {
   return Array.isArray(messages) && messages.some((m) => /json-pointer:\/blocks(\/|\])/.test(String(m)));
 }
 
+/** A block that rides beneath an answer's last part, with its plain text:
+ *  the presentation part whose list `textCopy` writes, or a line of its own. */
+interface Beneath {
+  name: string;
+  block: Record<string, unknown>;
+  part?: Presentation;
+  line?: string;
+}
+
+/** A part's Markdown with the plain text of the given extras: the rows and
+ *  cards as lists, the links as a line. */
+function withPlain(piece: string, shown: readonly Beneath[]): string {
+  const part: Presentation = Object.assign({}, ...shown.map((b) => b.part ?? {}));
+  const lines = shown.flatMap((b) => (b.line ? [b.line] : []));
+  return [textCopy(piece, part), ...lines].join("\n\n");
+}
+
+/** The index of the block Slack's json-pointer names in a refused post, or
+ *  null when it names none. */
+function pointedBlock(posted: { ok: boolean; error?: string }): number | null {
+  const messages = (posted as { response_metadata?: { messages?: unknown } }).response_metadata?.messages;
+  if (!Array.isArray(messages)) return null;
+  for (const m of messages) {
+    const hit = /json-pointer:\/blocks\/(\d+)/.exec(String(m));
+    if (hit) return Number(hit[1]);
+  }
+  return null;
+}
+
 /** A split answer's `(i/n)`, as the small grey line under its part. */
 function markerBlocks(marker: string | null): Array<Record<string, unknown>> {
   return marker ? [{ type: "context", elements: [{ type: "mrkdwn", text: marker }] }] : [];
@@ -234,9 +264,10 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
  * @param recipient who a stream would be for
  * @param footerHint forces the footer variant; absent = classify from the body
  * @param extras what rides beneath the answer: the turn's presentation, whose
- *   result table posts as a `data_table` and whose sources as a closed
- *   Sources box, between the last part's `markdown` block and its footer, each
- *   with its plain text appended to that part's text copy; and the feedback
+ *   result table posts as a `data_table`, whose cards as a `card` or
+ *   `carousel` and whose sources as a closed Sources box, between the last
+ *   part's `markdown` block and its footer, each with its plain text appended
+ *   to that part's text copy; and the feedback
  *   buttons, under a substantive answer's footer, tied to `feedback.turnId`
  */
 export async function postTextVerified(
@@ -259,30 +290,38 @@ export async function postTextVerified(
   const body = renderDeliveredBody(text);
   const { presentation } = extras;
   const resultTable = presentation?.table;
+  const cards = presentation?.cards;
   // A table of rows is a checkable claim however short the prose above it:
   // the honesty line goes beneath it even when the prose alone would read as
-  // an acknowledgement.
-  const footerKind: FooterKind = resultTable && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
+  // an acknowledgement. So is a set of cards.
+  const footerKind: FooterKind =
+    (resultTable || cards) && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
   const footer = footerBlocks(footerKind);
   // The feedback buttons ride a full footer only: an acknowledgement has
   // nothing to judge, and a draft is the person's own words.
   const feedback = extras.feedback && footerKind === "full" ? [feedbackBlock(extras.feedback)] : [];
-  // The table rides where the footer does — the answer's last part, where it
-  // ends — and its plain list rides that part's text copy, which is what a
-  // notification shows and what the thread remembers.
+  // The table, the cards and the box ride where the footer does — the
+  // answer's last part, where it ends — and their plain text rides that part's
+  // text copy, which is what a notification shows and what the thread
+  // remembers.
   const box = sourcesBox(presentation?.sources);
-  // What rides beneath the last part, in order: the table, then the box.
-  const extraBlocks = [...(resultTable ? [resultTableBlock(resultTable)] : []), ...(box ? [box.block] : [])];
-  const withBox = (copy: string): string => (box ? `${copy}\n\n${box.line}` : copy);
-  const copyOf = (piece: string, last: boolean): string => (last ? withBox(textCopy(piece, presentation)) : piece);
+  // What rides beneath the last part, in order: the table, the cards, the box.
+  // Each carries its own plain text, so a refused one steps down on its own
+  // while the others stay aboard.
+  const beneath: Beneath[] = [
+    ...(resultTable ? [{ name: "result table", block: resultTableBlock(resultTable), part: { table: resultTable } }] : []),
+    ...(cards ? [{ name: "answer cards", block: answerCardsBlock(cards), part: { cards } }] : []),
+    ...(box ? [{ name: "Sources box", block: box.block, line: box.line }] : []),
+  ];
+  const copyOf = (piece: string, last: boolean): string => (last ? withPlain(piece, beneath) : piece);
 
   const ok = await deliverAnswer(answerMessages(body), {
     async stream(piece, withFooter, marker) {
       if (!(deps.streamingOn && threadTs)) return false;
-      // An answer carrying a table or a box posts as an ordinary message:
-      // Slack does not document either in a stream, and a stream's first part
-      // is not where they ride on a split answer anyway.
-      if (extraBlocks.length) return false;
+      // An answer carrying a table, cards or a box posts as an ordinary
+      // message: Slack does not document them in a stream, and a stream's
+      // first part is not where they ride on a split answer anyway.
+      if (beneath.length > 0) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision
       // itself is `decideStream`. Until #572 the answer path passed neither
@@ -340,14 +379,16 @@ export async function postTextVerified(
     // section rung too, so it goes straight to bare text: a doomed post costs
     // two calls, not three.
     //
-    // A part carrying a table or a Sources box has one rung more, at the top:
-    // the same Markdown without them, the rows appended as a plain list and
-    // the links as a line. Any block refusal while either is aboard counts as
-    // theirs, rather than only one whose json-pointer lands on it. They are
-    // the newest and least proven blocks in the message, Slack does not always
-    // point (`invalid_blocks` can arrive with no messages at all), and the
-    // costs are lopsided: blaming the table wrongly spends one extra call
-    // before the section rung, while missing a table refusal would drop the
+    // A part carrying a table, cards or a Sources box has rungs more, at the
+    // top: each refused one steps down on its own to its plain text in the
+    // Markdown (the rows as a plain list, the cards' linked so every item
+    // still opens, the links as a line) while the others stay aboard. When
+    // Slack's json-pointer lands on one of them, that one steps down; any
+    // other block refusal while they are aboard counts as all of theirs. They
+    // are the newest and least proven blocks in the message, Slack does not
+    // always point (`invalid_blocks` can arrive with no messages at all), and
+    // the costs are lopsided: blaming them wrongly spends one extra call
+    // before the section rung, while missing their refusal would drop the
     // prose's Markdown to sections for nothing.
     //
     // The `text` copy is the whole part on every rung: notifications and
@@ -375,8 +416,14 @@ export async function postTextVerified(
           })
           .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
 
-      const dressed = withFooter && extraBlocks.length > 0;
-      const first = [{ type: "markdown", text: piece }, ...(dressed ? extraBlocks : []), ...tail];
+      let aboard: Beneath[] = withFooter ? beneath : [];
+      let fallen: Beneath[] = [];
+      const dressed = () => [
+        { type: "markdown", text: fallen.length ? withPlain(piece, fallen) : piece },
+        ...aboard.map((b) => b.block),
+        ...tail,
+      ];
+      const first = dressed();
       // The feedback buttons ride the first rung only, at its very end. Any
       // block refusal while they are aboard drops them and resends the same
       // message — the table's rule, one rung higher: they are the newest
@@ -389,17 +436,20 @@ export async function postTextVerified(
         posted = await send(first);
         if (posted.ok) return true;
       }
-      // A table or box steps down first, to the same answer without them, the
-      // rows as a plain list and the links as a line in the Markdown — so a
-      // rendering problem never costs the reader either. Every rung below
-      // carries them too.
-      const prose = dressed ? copy : piece;
-      if (dressed && refusedForBlocks(posted)) {
-        const what = [resultTable && "result table", box && "Sources box"].filter(Boolean).join(" and ");
-        console.warn(`[slack] ${what} refused (${refusalOf(posted)}); retrying without, as text`);
-        posted = await send([{ type: "markdown", text: prose }, ...tail]);
+      // Each refused extra steps down to its plain text in the Markdown, so a
+      // rendering problem never costs the reader its rows or links, and the
+      // rest stay aboard. Every rung below carries all of them as text.
+      while (aboard.length > 0 && refusedForBlocks(posted)) {
+        const at = pointedBlock(posted);
+        const culprit = at === null ? undefined : aboard[at - 1];
+        const out = culprit ? [culprit] : aboard;
+        console.warn(`[slack] ${out.map((b) => b.name).join(" and ")} refused (${refusalOf(posted)}); retrying without, as text`);
+        aboard = aboard.filter((b) => !out.includes(b));
+        fallen = beneath.filter((b) => fallen.includes(b) || out.includes(b));
+        posted = await send(dressed());
         if (posted.ok) return true;
       }
+      const prose = withFooter && beneath.length > 0 ? copy : piece;
       const numbered = (text: string) => (marker ? `_${marker}_\n\n${text}` : text);
       if (refusedForBlocks(posted)) {
         console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
@@ -412,5 +462,5 @@ export async function postTextVerified(
     },
   });
 
-  return { ok, text: withBox(textCopy(body, presentation)) };
+  return { ok, text: withPlain(body, beneath) };
 }

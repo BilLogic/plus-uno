@@ -205,7 +205,7 @@ or
  *  would print every row twice. */
 function tableNote(list: string): string {
   return (
-    "TABLE ATTACHED. Beneath the draft, the reader sees a sortable table of these rows, " +
+    "TABLE ATTACHED. Beneath the draft, the reader sees these rows as a sortable table or as cards, " +
     "built by code from the lookup's own rows (the message's plain-text copy lists them the same way):\n" +
     `${list}\n` +
     "Judge the draft as the reader sees it, with this table beneath it: a draft that gives the count, " +
