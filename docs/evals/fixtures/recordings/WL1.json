@@ -1,0 +1,57 @@
+{
+  "case": "WL1",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the ⚠️-line ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case's regex agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=WL1`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "How do goal cycles work today, and is anything on the Roadmap going to change that?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "goal cycles"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "goal cycle"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "present",
+              "args": {
+                "shape": "conflict",
+                "line": "The blueprint says goal cycles reset weekly; Roadmap card #2569 plans to count sessions instead."
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Today a goal cycle starts when a tutor sets a goal on the student card and resets every week.** Tutors review progress in the session wrap-up at the end of each cycle, per the [Goal Setting](https://blueprint.example/cell/goal-setting) cell.\n\nThe Roadmap has one change planned: [Goal cycle resets per session](https://www.notion.so/example-2569) (Need PRD) would count cycles by sessions attended. I read both just now."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "search_blueprint",
+          "text": "{\"ok\": true, \"query\": \"goal cycles\", \"count\": 1, \"rows\": [{\"title\": \"Goal Setting\", \"scenario\": \"Goal Setting\", \"description\": \"A tutor sets a goal on the student card; the cycle resets weekly and is reviewed in the session wrap-up.\", \"url\": \"https://blueprint.example/cell/goal-setting\"}]}"
+        },
+        {
+          "tool": "roadmap_query",
+          "text": "{\"ok\": true, \"hits\": 1, \"cards\": [{\"title\": \"Goal cycle resets per session\", \"url\": \"https://www.notion.so/example-2569\", \"card_number\": 2569, \"design_status\": \"Need PRD\"}]}"
+        }
+      ]
+    }
+  ]
+}

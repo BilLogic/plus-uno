@@ -21,11 +21,11 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **61** (B×7 · C×1 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
+| cases | **63** (B×7 · C×1 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1 · WL×2) |
 | blockers | 30 |
-| turns · sample runs | 71 · 181 |
+| turns · sample runs | 73 · 187 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 44 |
+| recorded, so the pull-request gate reaches them | 46 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
@@ -559,6 +559,22 @@ _advisory · 3 samples · recorded_
 - **Trigger:** "The Badge component PR just merged! Can you tell the thread what that means for designers, in a couple of lines?"
 - **Asserted:** `expectKind`: `["text"]` · `textRegex`: `"^(?:\\uD83C\\uDF89 ?)?(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. The one place a reply may carry an emoji: a single 🎉 at the very start of the first line, on a shipped, merged or published outcome. Deterministic: at most that one opening 🎉, and no other emoji anywhere. For the judge: the 🎉 is optional and never the point — the first sentence still says what the merge means; no emoji sits in the bold lead's middle, a bullet or a link; and the reply does not claim facts about the PR it did not read (a reply that says it has not opened the PR is fine). A second emoji, or a 🚀 or ✨ in place of the 🎉, fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
+
+## WL1 — a conflict between the blueprint and the Roadmap goes in a ⚠️ line placed by code
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "How do goal cycles work today, and is anything on the Roadmap going to change that?"
+- **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"present","args":{"shape":"conflict"}}` · `textRegex`: `"^(?![\\s\\S]*⚠[\\s\\S]*⚠)[^⚠]*\\n⚠️ [^\\n]+$"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the ⚠️-line ticket of the presentation spec. The blueprint is today's journey and a Roadmap card or PRD is the plan; when the two the turn read disagree, the reader must see it before acting (AGENT.md § Answer shapes). The conflict goes in ONE `present` call with shape `conflict`, and code places it as a ⚠️ line under the answer; the model never types ⚠️ into its prose. Deterministic: a `present` call with shape `conflict`, and exactly one ⚠️ in the message text, at the start of its last line. For the judge: the line is one sentence that names both sides and the card ("The blueprint says cycles reset weekly; Roadmap card #2569 plans to count sessions instead."), the prose answers the question from the blueprint and says what the card plans, and the conflict is not repeated as a sentence in the prose. A ⚠️ typed into the prose, two ⚠️ lines, or a reply that blends the two estates into one account fails. When the reads genuinely agree, no conflict line is right and the deterministic half fails honestly; the judge says so. [samples:3 — whether to flag a conflict is judgement, and judgement is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
+
+## WL2 — a clean single-estate answer carries no ⚠️ line
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "What Design Status is the Session Sign Up card in?"
+- **Asserted:** `expectKind`: `["text"]` · `textRegex`: `"^(?![\\s\\S]*(?:⚠|:warning:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the ⚠️-line ticket of the presentation spec. The contrast to WL1: one lookup, one estate, nothing to disagree with, so nothing earns a ⚠️ (AGENT.md § Answer shapes). Deterministic: no ⚠️ anywhere in the message text. For the judge: the reply gives the card's Design Status with the card linked, and does not invent a caution ("this may change") to fill the space. A `present` call with shape `conflict`, or any ⚠️, fails. [samples:3 — whether to flag a conflict is judgement, and judgement is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]
 
 ## Written down, and not in the fixture
 

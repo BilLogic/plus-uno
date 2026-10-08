@@ -1210,6 +1210,44 @@
       ],
       "textRegex": "^(?:\\uD83C\\uDF89 ?)?(?![\\s\\S]*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))",
       "judgeNote": "AUTHORED 2026-10-08 with the one-voice ticket of the presentation spec. The one place a reply may carry an emoji: a single 🎉 at the very start of the first line, on a shipped, merged or published outcome. Deterministic: at most that one opening 🎉, and no other emoji anywhere. For the judge: the 🎉 is optional and never the point — the first sentence still says what the merge means; no emoji sits in the bold lead's middle, a bullet or a link; and the reply does not claim facts about the PR it did not read (a reply that says it has not opened the PR is fine). A second emoji, or a 🚀 or ✨ in place of the 🎉, fails. [samples:3 — the shape of a reply is phrasing, and phrasing is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]"
+    },
+    {
+      "id": "WL1",
+      "name": "a conflict between the blueprint and the Roadmap goes in a ⚠️ line placed by code",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "How do goal cycles work today, and is anything on the Roadmap going to change that?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "expectToolCalled": {
+        "tool": "present",
+        "args": {
+          "shape": "conflict"
+        }
+      },
+      "textRegex": "^(?![\\s\\S]*⚠[\\s\\S]*⚠)[^⚠]*\\n⚠️ [^\\n]+$",
+      "judgeNote": "AUTHORED 2026-10-08 with the ⚠️-line ticket of the presentation spec. The blueprint is today's journey and a Roadmap card or PRD is the plan; when the two the turn read disagree, the reader must see it before acting (AGENT.md § Answer shapes). The conflict goes in ONE `present` call with shape `conflict`, and code places it as a ⚠️ line under the answer; the model never types ⚠️ into its prose. Deterministic: a `present` call with shape `conflict`, and exactly one ⚠️ in the message text, at the start of its last line. For the judge: the line is one sentence that names both sides and the card (\"The blueprint says cycles reset weekly; Roadmap card #2569 plans to count sessions instead.\"), the prose answers the question from the blueprint and says what the card plans, and the conflict is not repeated as a sentence in the prose. A ⚠️ typed into the prose, two ⚠️ lines, or a reply that blends the two estates into one account fails. When the reads genuinely agree, no conflict line is right and the deterministic half fails honestly; the judge says so. [samples:3 — whether to flag a conflict is judgement, and judgement is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]"
+    },
+    {
+      "id": "WL2",
+      "name": "a clean single-estate answer carries no ⚠️ line",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "What Design Status is the Session Sign Up card in?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "textRegex": "^(?![\\s\\S]*(?:⚠|:warning:))",
+      "judgeNote": "AUTHORED 2026-10-08 with the ⚠️-line ticket of the presentation spec. The contrast to WL1: one lookup, one estate, nothing to disagree with, so nothing earns a ⚠️ (AGENT.md § Answer shapes). Deterministic: no ⚠️ anywhere in the message text. For the judge: the reply gives the card's Design Status with the card linked, and does not invent a caution (\"this may change\") to fill the space. A `present` call with shape `conflict`, or any ⚠️, fails. [samples:3 — whether to flag a conflict is judgement, and judgement is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the regex agree; the Monday run against the deployment is the measurement.]"
     }
   ]
 }
