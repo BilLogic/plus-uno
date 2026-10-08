@@ -69,6 +69,9 @@ const FIXED_COPY: Record<string, string[]> = {
   "slack/gate-note.ts": [],
   "slack/proposal-render.ts": [],
   "slack/button-door.ts": [],
+  "slack/review-door.ts": [],
+  "slack/review-view.ts": [],
+  "slack/interactive.ts": [],
   "slack/batch-result.ts": [],
   "turn/turn.ts": [],
   // Failure, and the doors a request comes in by

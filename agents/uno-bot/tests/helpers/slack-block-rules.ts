@@ -241,8 +241,28 @@ export function viewRefusal(view: unknown): string | null {
   const blocks = Array.isArray(view.blocks) ? view.blocks : [];
   if (blocks.length > MAX_VIEW_BLOCKS) return `${blocks.length} blocks in one view`;
   for (const block of blocks) {
-    const why = blockRefusal(block);
+    const why = isShape(block) && block.type === "input" ? inputRefusal(block) : blockRefusal(block);
     if (why) return why;
   }
+  return null;
+}
+
+/** A `plain_text_input`'s cap, per its element reference: 3,000 characters. */
+const PLAIN_TEXT_INPUT_CHARS = 3000;
+
+/**
+ * An `input` block — a view's, never a message's, so `blockRefusal` refuses it
+ * and only a view reaches this. The Review pop-up's note took this shape, with
+ * `optional` and no `submit` on the view, at blocks.validate on 2026-10-08
+ * (`ok`); the same validator refused a `plain_text_input` outside an `input`
+ * ("unsupported type: plain_text_input" in an `actions`).
+ */
+function inputRefusal(block: Shape): string | null {
+  const label = block.label;
+  if (!isShape(label) || label.type !== "plain_text" || !nonEmpty(label.text)) return "an input without a plain_text label";
+  const element = block.element;
+  if (!isShape(element) || element.type !== "plain_text_input") return "an input whose element is not a plain_text_input";
+  const max = element.max_length;
+  if (typeof max === "number" && max > PLAIN_TEXT_INPUT_CHARS) return `a plain_text_input of max_length ${max}`;
   return null;
 }

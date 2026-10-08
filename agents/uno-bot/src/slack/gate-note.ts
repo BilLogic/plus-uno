@@ -36,7 +36,7 @@
 
 import type { GateNote } from "../turn/index";
 import { PROPOSAL_TTL_MS, type StatedCardWords } from "../thread-state/index";
-import { SLACK_USER_ID } from "./mrkdwn";
+import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import { gateWordsFor } from "../agent/tool-table";
 
 /** The lost race. */
@@ -90,6 +90,12 @@ export function defaultNarrative(decision: "confirm" | "cancel"): string {
   return decision === "confirm" ? "Got it — kicking that off." : "Cancelled.";
 }
 
+/** The pop-up's Reject, and the reason given with it: the person's own words,
+ *  so text and never markup. */
+export function rejectedLine(reason?: string): string {
+  return reason ? `Rejected, so nothing runs. Reason: ${escapeSlackText(reason)}` : "Rejected, so nothing runs.";
+}
+
 /**
  * A ⛔ on a card that runs part of itself on a cancel. Worded from each row's
  * own operation kind, so it says what goes ahead rather than naming a tool.
@@ -110,6 +116,7 @@ export function renderGateNote(note: GateNote): string {
     case "resolved":
       // A stated card's ⛔ says what its footer promised, in the card's words.
       if (note.decision === "cancel" && note.cancelled) return `${note.cancelled}.`;
+      if (note.decision === "cancel" && note.rejected && !note.stillRuns?.length) return rejectedLine(note.rejected.reason);
       return note.stillRuns?.length ? cancelStillRuns(note.stillRuns) : defaultNarrative(note.decision);
     case "said":
       return note.text;

@@ -25,11 +25,22 @@ import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
-import { conversationsOpen, deleteMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
+import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID, proposalCardBlocks } from "./proposal-render";
 import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "./review-door";
-import { REVIEW_APPROVE_ACTION_ID, reviewedCardOf } from "./review-view";
+import {
+  REVIEW_APPROVE_ACTION_ID,
+  REVIEW_CHANGES_ACTION_ID,
+  REVIEW_REJECT_ACTION_ID,
+  reviewNoteOf,
+  reviewedCardOf,
+} from "./review-view";
+import type { ReviewDecision } from "../gate/index";
+import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
+import { conversationKey, enqueueAgentJob } from "./events";
+import { escapeSlackText } from "./mrkdwn";
+import type { SlackMessageEvent } from "./types";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
@@ -46,13 +57,14 @@ interface InteractionPayload {
   response_url?: string;
   user?: { id?: string };
   channel?: { id?: string };
-  message?: { ts?: string; thread_ts?: string };
+  message?: { ts?: string; thread_ts?: string; text?: string };
   actions?: Array<{ action_id?: string; value?: string; selected_options?: { value?: string }[] }>;
   callback_id?: string;
   /** A click's one-use, three-second key to `views.open`. */
   trigger_id?: string;
-  /** Set when the click was inside a modal rather than on a message. */
-  view?: { id?: string; private_metadata?: string };
+  /** Set when the click was inside a modal rather than on a message; `state`
+   *  holds what its inputs held at the click. */
+  view?: { id?: string; private_metadata?: string; state?: unknown };
 }
 
 export function parseInteraction(rawBody: string): InteractionPayload | null {
@@ -121,6 +133,8 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId === REVIEW_APPROVE_ACTION_ID) return decideInReview(env, payload, "confirm");
+  if (actionId === REVIEW_CHANGES_ACTION_ID) return decideInReview(env, payload, "revise");
+  if (actionId === REVIEW_REJECT_ACTION_ID) return decideInReview(env, payload, "cancel");
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
   // No silent catch-all. This used to fall through to the feedback handler,
@@ -200,18 +214,59 @@ async function openReview(env: Env, payload: InteractionPayload): Promise<void> 
   const messageTs = payload.message?.ts;
   const userId = payload.user?.id;
   if (!triggerId || !channel || !messageTs || !userId) return;
-  await runReviewOpen({ triggerId, channel, messageTs, userId }, reviewDoorDeps(env));
+  const cardText = payload.message?.text;
+  await runReviewOpen({ triggerId, channel, messageTs, userId, ...(cardText ? { cardText } : {}) }, reviewDoorDeps(env));
 }
 
-async function decideInReview(env: Env, payload: InteractionPayload, decision: "confirm" | "cancel"): Promise<void> {
+async function decideInReview(env: Env, payload: InteractionPayload, decision: ReviewDecision): Promise<void> {
   const viewId = payload.view?.id;
   const card = reviewedCardOf(payload.view?.private_metadata);
   const userId = payload.user?.id;
   if (!viewId || !card || !userId) return;
+  const note = reviewNoteOf(payload.view?.state);
   await runReviewDecision(
-    { viewId, channel: card.channel, messageTs: card.ts, userId, decision },
+    { viewId, channel: card.channel, messageTs: card.ts, userId, decision, ...(note ? { note } : {}) },
     reviewDoorDeps(env),
   );
+}
+
+/**
+ * Needs changes, handed to uno-bot: the note goes into the card's thread as a
+ * line naming who asked, and a turn is queued on that line as the confirmer's
+ * own reply — the same synthetic message the shortcuts and slash commands
+ * build, so history, the pending card it revises, the supersession and the
+ * visible-failure backstops all run unchanged. The card is still pending, so
+ * the turn sees it and its revision replaces it.
+ */
+async function reviseFromReview(
+  env: Env,
+  request: { proposal: PendingProposal; note: string; userId: string },
+): Promise<void> {
+  const { proposal, note, userId } = request;
+  const thread = proposalReplyThread(proposal);
+  const posted = await postMessage(env, {
+    channel: proposal.channel,
+    thread_ts: thread,
+    text: `:pencil2: <@${userId}> asked for changes: ${escapeSlackText(note)}`,
+  });
+  if (!posted?.ts) {
+    console.error(`[interactive] needs-changes note did not post on ${proposal.channel}/${proposal.proposalTs}`);
+    await postMessage(env, {
+      channel: proposal.channel,
+      thread_ts: thread,
+      text: ":warning: I couldn't start the revision. Reply here with what to change and I'll revise the draft.",
+    }).catch(() => {});
+    return;
+  }
+  const event: SlackMessageEvent = {
+    type: "message",
+    channel: proposal.channel,
+    user: userId,
+    text: `Needs changes on the proposal card above: ${note}`,
+    ts: posted.ts,
+    thread_ts: thread,
+  };
+  await enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event));
 }
 
 /** `Env`, once, as the dependencies the review door reads. */
@@ -233,6 +288,7 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);
     },
     restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
+    revise: (request) => reviseFromReview(env, request),
   };
 }
 

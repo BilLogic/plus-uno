@@ -14,8 +14,21 @@ import { CONFIRM_FOOTER } from "./proposal-render";
 import { SLACK_USER_ID } from "./mrkdwn";
 import type { PendingProposal, StatedCardWords } from "../thread-state/index";
 
-/** The Approve button inside the pop-up; `slack/interactive.ts` routes it. */
+/** The decision row inside the pop-up; `slack/interactive.ts` routes all three. */
 export const REVIEW_APPROVE_ACTION_ID = "uno_review_approve";
+export const REVIEW_CHANGES_ACTION_ID = "uno_review_changes";
+export const REVIEW_REJECT_ACTION_ID = "uno_review_reject";
+
+/** The note input: Needs changes' note, Reject's reason. A decision press
+ *  carries it in the view's state under these ids (`reviewNoteOf`). */
+const NOTE_BLOCK_ID = "uno_review_note";
+const NOTE_ACTION_ID = "uno_review_note_input";
+
+/** Slack's cap on a `plain_text_input`. */
+const NOTE_MAX_CHARS = 3000;
+
+/** Said above the row when Needs changes was pressed with no note. */
+const NOTE_NEEDED = ":warning: Needs changes needs a note: write what to change, then press it again.";
 
 /** The card a view is about, as `private_metadata` carries it. */
 export interface ReviewedCard {
@@ -58,33 +71,84 @@ export function loadingView(card: ReviewedCard): View {
  *
  * `mayDecide` false is the same draft read-only: no decision row, and a line
  * naming who can decide instead.
+ *
+ * A confirmer's view ends with the note and then the decision row — Approve,
+ * Needs changes, Reject, in that order. The note is optional to Slack, because
+ * Approve ignores it and Reject takes it as an optional reason; Needs changes
+ * without one is refused by the door, which re-renders this view with
+ * `noteNeeded`.
  */
 export function draftView(
   card: ReviewedCard,
   proposal: PendingProposal,
   access: { mayDecide: boolean; confirmers: readonly string[] },
+  opts: { noteNeeded?: boolean } = {},
 ): View {
-  const body = proposal.proposalText.replace(CONFIRM_FOOTER, "").trim();
-  const blocks: unknown[] = [...textSections(body)];
+  const blocks: unknown[] = [...textSections(draftBody(proposal.proposalText))];
   if (access.mayDecide) {
     blocks.push({ type: "divider" });
-    blocks.push({
-      type: "actions",
-      block_id: "uno_review_decision",
-      elements: [
-        {
-          type: "button",
-          action_id: REVIEW_APPROVE_ACTION_ID,
-          style: "primary",
-          text: { type: "plain_text", text: "Approve" },
-          value: "confirm",
-        },
-      ],
-    });
+    blocks.push(noteInput());
+    if (opts.noteNeeded) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: NOTE_NEEDED }] });
+    blocks.push(decisionRow());
   } else {
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: readOnlyLine(access.confirmers) }] });
   }
   return modal(card, blocks);
+}
+
+/** The card's text without its footer, which points at the pop-up itself. */
+function draftBody(text: string): string {
+  return text.replace(CONFIRM_FOOTER, "").trim();
+}
+
+function noteInput(): unknown {
+  return {
+    type: "input",
+    block_id: NOTE_BLOCK_ID,
+    optional: true,
+    label: { type: "plain_text", text: "Note" },
+    hint: { type: "plain_text", text: "Needed for Needs changes: I revise the draft from it. Optional for Reject, as the reason." },
+    element: { type: "plain_text_input", action_id: NOTE_ACTION_ID, multiline: true, max_length: NOTE_MAX_CHARS },
+  };
+}
+
+function decisionRow(): unknown {
+  const button = (action_id: string, text: string, value: string, style?: "primary" | "danger") => ({
+    type: "button",
+    action_id,
+    ...(style ? { style } : {}),
+    text: { type: "plain_text", text },
+    value,
+  });
+  return {
+    type: "actions",
+    block_id: "uno_review_decision",
+    elements: [
+      button(REVIEW_APPROVE_ACTION_ID, "Approve", "confirm", "primary"),
+      button(REVIEW_CHANGES_ACTION_ID, "Needs changes", "revise"),
+      button(REVIEW_REJECT_ACTION_ID, "Reject", "cancel", "danger"),
+    ],
+  };
+}
+
+/** What the note input holds, from a decision press's `view.state.values` —
+ *  trimmed, and empty when there is none. */
+export function reviewNoteOf(state: unknown): string {
+  const values = (state as { values?: Record<string, Record<string, { value?: unknown }>> } | undefined)?.values;
+  const value = values?.[NOTE_BLOCK_ID]?.[NOTE_ACTION_ID]?.value;
+  return typeof value === "string" ? value.trim() : "";
+}
+
+/**
+ * A decided card, opened from View: its own words, read-only. The record is
+ * gone once a card is decided, so the words are the card's message as Slack
+ * hands it with the click, outcome line included.
+ */
+export function decidedView(card: ReviewedCard, cardText: string): View {
+  return modal(card, [
+    ...textSections(draftBody(cardText)),
+    { type: "context", elements: [{ type: "mrkdwn", text: "Read-only. This proposal has already been decided." }] },
+  ]);
 }
 
 function readOnlyLine(confirmers: readonly string[]): string {
