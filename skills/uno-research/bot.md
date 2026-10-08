@@ -30,8 +30,6 @@ People — 2–4 suggestions, scannable:
 For *{topic}*, talk to:
 - **{Name}** — {role}. {one-line why, from their bio}. [LinkedIn]({linkedin})
 - **{Name}** — {role}. {one-line why}. [LinkedIn]({linkedin})
-
-Want me to summarize what you learn after you chat? (I can synthesize the thread.)
 ```
 
 Findings from the repo or Slack:

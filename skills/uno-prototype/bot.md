@@ -20,7 +20,7 @@ Turn a written requirement into a build from Slack. A designer names a design-sy
    - **`component_implement(component, notion_prd_url?, notes?)`** — fires `figma-implement.yml`; a draft PR updating a DS-library component. Use for "implement Badge", "go ahead with the Badge change".
    - **`prototype_scaffold(figma_url, notion_prd_url?, slug?, notes?)`** — fires `figma-implement-design.yml`; scaffolds `prototypes/{slug}/` and opens a draft PR. Use for "build this <figma.com/…>", "scaffold a prototype for this frame". `slug` is optional, derived from the node name.
 
-   Missing params → gather them in words first; intent genuinely unclear → ask. One Proposal per message, batching writes. Alongside the call, write the structural preview — a warm one-line lead-in plus 2–4 terse `-` bullets; the Worker appends the ⚠️ footer and the confirmation prompt. Done when the card is staged and its bullets name the workflow, the PR to open, the files touched, and the picks from step 6.
+   Missing params → gather them in words first; intent genuinely unclear → ask. One Proposal per message, batching writes. Alongside the call, write the card's lead (`agents/uno-bot/AGENT.md § Proposal gate`, rule 3). Done when the card is staged and its bullets name the workflow, the PR to open, the files touched, and the picks from step 6.
 8. **Carry the outcome.** Until the Worker posts the real result the action stays in future tense ("I'll open the PR once you confirm"); the Worker also announces the PR to `#plus-design` itself. Done when the Worker's outcome message is in the thread — then offer the stage-lens review (**uno-review**) as the next step.
 
 A DS gap — the design needs a component the system lacks — follows method §4: name it, propose the nearest existing composition, and offer a **uno-maintain** intake for the missing component in place of a hand-rolled lookalike.
@@ -32,7 +32,7 @@ Asked for a prompt-spec (flow map, wireframe, concept image, storyboard, interac
 ## Output — the staged card's preview
 
 ```
-{one warm line — what this run does and for whom}
+{one line — what this run does and for whom}
 - Workflow: {figma-implement | figma-implement-design} → draft PR
 - Touches: {component path | prototypes/{slug}/}
 - PRD: [{title}]({url}) · fidelity: {hi-fi | mid-fi}
