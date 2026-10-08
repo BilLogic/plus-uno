@@ -7,7 +7,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { runReactionDoor, type GateVerdict } from "../src/gate/index";
+import { resolveSignal, runReactionDoor, type GateSignal, type GateVerdict } from "../src/gate/index";
 import {
   PROPOSAL_TTL_MS,
   createInMemoryThreadState,
@@ -17,7 +17,8 @@ import {
 import { recordingDelivery } from "../src/turn/index";
 import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
-import type { ProposalCard } from "../src/turn/index";
+import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
+import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
 import { verdictEvents } from "../src/usage/index";
 import { recordingViews, type RecordingViews } from "./helpers/recording-slack";
 
@@ -111,6 +112,60 @@ describe("the card offers Review", () => {
       operations: [],
     } as unknown as ProposalCard);
     assert.doesNotMatch(card.text, /white_check_mark|no_entry|✅|⛔/);
+  });
+
+  it("is short in the thread: a summary, the body's size, the LLM line and Review; the draft rides in the text", () => {
+    const body = "Problem: tutors read goal cycles differently. ".repeat(14).trim();
+    const card = renderProposalCard({
+      kind: "confirm",
+      verb: "create a Notion page",
+      fields: [
+        { label: "title", value: "Goal cycle resets per session" },
+        { label: "database", value: "Roadmap" },
+        { label: "properties", under: [{ field: { label: "product_pillar", value: "Toolkit" } }, { field: { label: "design_status", value: "Need PRD" } }] },
+        { label: "body", value: body },
+      ],
+      caveats: [],
+      operations: [],
+    });
+    const blocks = (card.blocks ?? proposalCardBlocks(card.text)) as CardBlock[];
+    const words = blocks.map((b) => JSON.stringify(b));
+
+    assert.equal(blocks[0]!.type, "section");
+    assert.match(words[0]!, /:warning: Ready to \*create a Notion page\*: _Goal cycle resets per session_ · Roadmap · Toolkit · Need PRD/);
+    assert.match(words[1]!, new RegExp(`Body ${body.length} characters · review before approving`));
+    assert.match(words[2]!, /LLM-written · check before acting/);
+    assert.deepEqual(cardButtons(blocks), ["Review"]);
+    assert.equal(blocks.length, 4);
+    assert.doesNotMatch(words.join(""), /Problem: tutors/, "the draft lives in the pop-up");
+    // Notifications, history and the model reading it back get the whole draft.
+    assert.ok(card.text.includes(body));
+  });
+
+  it("keeps a stated card whole", () => {
+    const text = "The library published 3 changes.\n\n:white_check_mark: files the intake; :no_entry: files nothing.";
+    const blocks = proposalCardBlocks(text) as CardBlock[];
+    assert.match(JSON.stringify(blocks[0]), /The library published 3 changes/);
+    assert.doesNotMatch(JSON.stringify(blocks), /Ready to|LLM-written/);
+  });
+
+  it("stays short once decided, with the outcome and View", () => {
+    const card = renderProposalCard({
+      kind: "confirm",
+      verb: "file a GitHub issue",
+      fields: [
+        { label: "title", value: "Badge colour drift" },
+        { label: "body", value: "The warning badge differs between code and Figma." },
+      ],
+      caveats: [],
+      operations: [],
+    });
+    const blocks = proposalCardBlocks(card.text, ":white_check_mark: Approved by <@U2>") as CardBlock[];
+    const words = JSON.stringify(blocks);
+    assert.match(words, /Ready to \*file a GitHub issue\*: _Badge colour drift_/);
+    assert.match(words, /Approved by <@U2>/);
+    assert.doesNotMatch(words, /review before approving/);
+    assert.deepEqual(cardButtons(blocks), ["View"]);
   });
 
   it("keeps a decided card's draft one press away, as View", () => {
@@ -218,6 +273,19 @@ describe("Review opens the draft", () => {
     const view = views.calls[1]!.view;
     assert.match(viewText(view), /already been decided/);
     assert.deepEqual(actionIds(view), []);
+  });
+
+  it("keeps the note and the decision row on a draft too long for one view, and says some was left out", async () => {
+    const paragraphs = Array.from({ length: 140 }, (_, n) => `Paragraph ${n}: ${"words ".repeat(480)}`);
+    const { deps, views } = harness(await staged({ proposalText: paragraphs.join("\n\n") }));
+    await runReviewOpen(open(), deps);
+    const view = views.calls[1]!.view as { blocks: Array<{ type: string; block_id?: string }> };
+    assert.ok(view.blocks.length <= 100, `${view.blocks.length} blocks`);
+    assert.deepEqual(actionIds(view), DECISION_ROW);
+    assert.equal(view.blocks.at(-1)!.block_id, "uno_review_decision", "the decision row is last");
+    assert.ok(view.blocks.some((b) => b.block_id === "uno_review_note"), "the note input is kept");
+    assert.match(viewText(view), /left out/i);
+    assert.match(viewText(view), /Paragraph 0:/, "the draft still opens the view");
   });
 
   it("stops when Slack will not open the view", async () => {
@@ -375,6 +443,62 @@ describe("Needs changes in the pop-up", () => {
 
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "superseded");
     assert.deepEqual((await react(threadState, "white_check_mark")).filter((v) => v.execute), []);
+  });
+
+  it("locks the card while it is revised: no door approves, rejects or revises it again", async () => {
+    const threadState = await staged();
+    const { deps, revisions } = harness(threadState);
+    await runReviewDecision(decide("revise", "Call it Reflection v2"), deps);
+    assert.equal(revisions.length, 1);
+
+    const signals: GateSignal[] = [
+      { kind: "review", messageTs: CARD_TS, decision: "confirm", userId: "U2" },
+      { kind: "review", messageTs: CARD_TS, decision: "cancel", userId: "U2" },
+      { kind: "review", messageTs: CARD_TS, decision: "revise", note: "and shorter", userId: "U2" },
+      { kind: "button", messageTs: CARD_TS, decision: "confirm", userId: "U2" },
+      { kind: "reaction", messageTs: CARD_TS, channel: CHANNEL, thread: THREAD, glyph: "white_check_mark", userId: "U2" },
+      { kind: "typed", channel: CHANNEL, thread: THREAD, text: "✅", userId: "U2" },
+      { kind: "model", pending: PROPOSAL, decision: "confirm", userId: "U2" },
+    ];
+    for (const signal of signals) {
+      const verdict = await resolveSignal(signal, { threadState });
+      assert.notEqual(verdict.outcome, "won", signal.kind);
+      assert.equal(verdict.execute, undefined, signal.kind);
+      assert.equal(verdict.revise, undefined, signal.kind);
+      assert.equal(verdict.post?.note.kind, "being-revised", signal.kind);
+    }
+    // Still the card the revision turn finds and replaces.
+    assert.equal((await threadState.getProposalByThread({ channel: CHANNEL, thread: THREAD }))?.proposalTs, CARD_TS);
+  });
+
+  it("is idempotent: a second Needs changes starts no second revision", async () => {
+    const threadState = await staged();
+    const { deps, views, revisions, cardUpdates } = harness(threadState);
+    await runReviewDecision(decide("revise", "Call it Reflection v2"), deps);
+    await runReviewDecision(decide("revise", "Call it Reflection v2", "U3"), deps);
+    assert.equal(revisions.length, 1);
+    assert.equal(cardUpdates.length, 1);
+    assert.match(viewText(views.calls.at(-1)!.view), /being revised/);
+  });
+
+  it("unlocks when the revision turn fails, so the card can be decided again", async () => {
+    const t = turnHarness();
+    await t.threadState.putProposal(PENDING);
+    assert.equal(await t.threadState.markRevising(PENDING.proposalTs, "U1"), "marked");
+    const [pending] = await t.threadState.getProposalsByChannel(PENDING.channel);
+    const broken: TurnDeps = {
+      ...t.deps,
+      async runAgent() {
+        throw new Error("the run stopped");
+      },
+    };
+    await runTurn(turnRequest({ text: "Needs changes on the proposal card above: shorter", pending: pending! }), broken);
+
+    const verdict = await resolveSignal(
+      { kind: "button", messageTs: PENDING.proposalTs, decision: "confirm", userId: "U1" },
+      { threadState: t.threadState },
+    );
+    assert.equal(verdict.outcome, "won");
   });
 
   it("keeps the note and the decisions through Check edits, the submit the note's input needs", async () => {

@@ -107,6 +107,15 @@ export function createDurableObjectThreadState(
       return hop().retireProposal(proposalTs, now());
     },
 
+    // Needs changes' lock: one hop, so of two racing presses one marks it.
+    markRevising(proposalTs: string, userId: string): Promise<"marked" | "already" | "gone"> {
+      return hop().markRevising(proposalTs, userId, now());
+    },
+
+    clearRevising(proposalTs: string): Promise<void> {
+      return hop().clearRevising(proposalTs);
+    },
+
     getProposalByTs(proposalTs: string): Promise<ProposalLookup> {
       return hop().getProposalByTs(proposalTs, now());
     },

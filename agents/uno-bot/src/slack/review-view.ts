@@ -42,8 +42,9 @@ export interface ReviewedCard {
 /** Slack's modal title cap is 24 characters. */
 const TITLE = "Review proposal";
 
-/** Slack's cap on a view's blocks. The draft's sections stay well under it:
- *  a card's text is held to one message, at most fourteen 2,900-char sections. */
+/** Slack's cap on a view's blocks. A draft can pass it — a long draft's
+ *  sections plus its field inputs — so `fitBody` trims the draft to the room
+ *  left once the decision row and the note are reserved. */
 const MAX_VIEW_BLOCKS = 100;
 
 type View = Record<string, unknown>;
@@ -126,22 +127,47 @@ export function draftView(
   opts: { noteNeeded?: boolean } = {},
 ): View {
   const fields = access.mayDecide ? (edit?.fields ?? []) : [];
-  const blocks: unknown[] = [];
-  if (fields.length && edit?.alert) blocks.push(alertBlock(edit.alert.level, edit.alert.text));
-  blocks.push(...textSections(draftBody(proposal.proposalText)));
-  if (fields.length) {
-    blocks.push({ type: "divider" });
-    blocks.push(...fieldInputBlocks(fields, edit?.values));
-  }
+  const head: unknown[] = fields.length && edit?.alert ? [alertBlock(edit.alert.level, edit.alert.text)] : [];
+  const draft = textSections(draftBody(proposal.proposalText));
+  const inputs = fieldInputBlocks(fields, edit?.values);
+  const tail: unknown[] = [];
   if (access.mayDecide) {
-    blocks.push({ type: "divider" });
-    blocks.push(noteInput());
-    if (opts.noteNeeded) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: NOTE_NEEDED }] });
-    blocks.push(decisionRow());
+    tail.push({ type: "divider" });
+    tail.push(noteInput());
+    if (opts.noteNeeded) tail.push({ type: "context", elements: [{ type: "mrkdwn", text: NOTE_NEEDED }] });
+    tail.push(decisionRow());
   } else {
-    blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: readOnlyLine(access.confirmers) }] });
+    tail.push({ type: "context", elements: [{ type: "mrkdwn", text: readOnlyLine(access.confirmers) }] });
   }
-  return modal(card, blocks, access.mayDecide ? { submit: CHECK_EDITS } : {});
+  const body = fitBody(draft, inputs, MAX_VIEW_BLOCKS - head.length - tail.length);
+  return modal(card, [...head, ...body, ...tail], access.mayDecide ? { submit: CHECK_EDITS } : {});
+}
+
+/** Said where a draft too long for one view was cut. */
+const LEFT_OUT =
+  "Part of this draft is too long for the pop-up and was left out here. Approving runs all of it, as staged.";
+
+/**
+ * The draft's sections and the field inputs, inside the blocks the view has
+ * left once its alert, note and decision row are reserved — so a long draft
+ * can never push the decision out of the view. Past the room, the draft's
+ * later sections go first, then the later inputs (an input not offered is a
+ * field approved as staged), and a line says some was left out.
+ */
+function fitBody(draft: unknown[], inputs: unknown[], room: number): unknown[] {
+  const divided = inputs.length ? [{ type: "divider" }, ...inputs] : [];
+  if (draft.length + divided.length <= room) return [...draft, ...divided];
+  const space = room - 1; // the left-out line
+  // The draft keeps at least its opening section; the inputs take what they
+  // need of the rest.
+  const keptInputs = Math.max(0, Math.min(inputs.length, space - 2));
+  const keptDivided = keptInputs ? [{ type: "divider" }, ...inputs.slice(0, keptInputs)] : [];
+  const keptDraft = Math.max(0, space - keptDivided.length);
+  return [
+    ...draft.slice(0, keptDraft),
+    { type: "context", elements: [{ type: "mrkdwn", text: LEFT_OUT }] },
+    ...keptDivided,
+  ];
 }
 
 /** The card's text without its footer, which points at the pop-up itself. */

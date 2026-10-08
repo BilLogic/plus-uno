@@ -158,6 +158,35 @@ describe("the Gate names the card", () => {
     assert.deepEqual(verdict.post?.card, { ts: OLD_CARD, text: old.proposalText });
   });
 
+  it("for a non-confirmer only when the gesture was made on the card", async () => {
+    const threadState = createInMemoryThreadState();
+    const live = card({ confirmers: [BEA] });
+    await threadState.putProposal(live);
+    const deps = { threadState };
+
+    for (const signal of [
+      { kind: "reaction" as const, messageTs: OLD_CARD, channel: CHANNEL, thread: ROOT, glyph: "white_check_mark", userId: MAYA },
+      { kind: "button" as const, messageTs: OLD_CARD, decision: "confirm" as const, userId: MAYA },
+      { kind: "review" as const, messageTs: OLD_CARD, decision: "confirm" as const, userId: MAYA },
+    ]) {
+      const verdict = await resolveSignal(signal, deps);
+      assert.equal(verdict.post?.note.kind, "not-a-confirmer", signal.kind);
+      assert.deepEqual(verdict.post?.card, { ts: OLD_CARD, text: live.proposalText }, signal.kind);
+    }
+
+    // A typed ✅ or the model's resolve is answered near the message, as
+    // before: the card is not where that person was looking.
+    for (const signal of [
+      { kind: "typed" as const, channel: CHANNEL, thread: ROOT, text: "✅", userId: MAYA },
+      { kind: "model" as const, pending: live, decision: "confirm" as const, userId: MAYA },
+    ]) {
+      const verdict = await resolveSignal(signal, deps);
+      assert.equal(verdict.post?.note.kind, "not-a-confirmer", signal.kind);
+      assert.equal(verdict.post?.card, undefined, signal.kind);
+    }
+    assert.equal((await threadState.getProposalByTs(OLD_CARD)).state, "found");
+  });
+
   it("and not for a lost race, which is about the signal rather than the card", async () => {
     const threadState = createInMemoryThreadState();
     const live = card();

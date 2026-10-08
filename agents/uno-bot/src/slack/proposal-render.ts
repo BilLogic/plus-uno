@@ -20,6 +20,7 @@
 import { textSections } from "./render";
 import { sweepCardBlocks } from "./sweep-card-blocks";
 import { escapeSlackText } from "./mrkdwn";
+import { footerNoteFor } from "./footer-kind";
 import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
@@ -66,12 +67,28 @@ export function proposalActionBlocks(label: "Review" | "View" = "Review"): unkno
   ];
 }
 
-/** A text-only card as blocks: the text in ≤3000-char sections, then the
- *  Review button. Used at post time and again by the doors to re-render the
- *  card once it is decided: the outcome as a context line, and View, which
- *  opens the draft read-only. */
+/**
+ * A text-only card as blocks. Used at post time and again by the doors to
+ * re-render the card once it is decided: the outcome as a context line, and
+ * View, which opens the draft read-only.
+ *
+ * A turn's card — one that ends with `CONFIRM_FOOTER` — is SHORT in the
+ * thread: one summary line, the body's size, the LLM line and Review. Its
+ * whole draft is the text (Slack's notification and fallback copy, history,
+ * what the model reads back) and the Review pop-up, where it is decided. The
+ * summary is read off that text (`shortCardOf`), so a decided card, which the
+ * doors re-render from its text, stays short too. Any other card — a stated
+ * one with its own footer — shows its text whole, as before.
+ */
 export function proposalCardBlocks(text: string, resolvedNote?: string, button?: "Review" | "View"): unknown[] {
-  const blocks: unknown[] = [...textSections(text)];
+  const short = shortCardOf(text);
+  const blocks: unknown[] = short
+    ? [
+        { type: "section", text: { type: "mrkdwn", text: short.summary } },
+        context(resolvedNote ? short.size : `${short.size} · review before approving`),
+        context(footerNoteFor("full")),
+      ]
+    : [...textSections(text)];
   if (resolvedNote) {
     // A note on a card still live — one waiting on someone else — keeps
     // Review; every other note closes the card, so it offers View.
@@ -81,6 +98,148 @@ export function proposalCardBlocks(text: string, resolvedNote?: string, button?:
     blocks.push(...proposalActionBlocks());
   }
   return blocks;
+}
+
+function context(text: string): unknown {
+  return { type: "context", elements: [{ type: "mrkdwn", text }] };
+}
+
+/** Field labels whose value is the draft's prose: what the size line counts. */
+const BODY_LABELS = new Set(["body", "summary", "text", "content", "message", "notes", "description"]);
+/** Field labels that name the thing being written: the summary's title. */
+const TITLE_LABELS = new Set(["title", "page title", "subject", "name"]);
+/** A key field the summary names beside the title: short, one line. */
+const KEY_FIELD_CHARS = 40;
+const KEY_FIELDS = 3;
+const SUMMARY_TITLE_CHARS = 80;
+
+/** One `• *Label:* value` line of a card's text, with what continues it. */
+interface DraftField {
+  label: string;
+  value: string;
+  nested: boolean;
+}
+
+/**
+ * A turn's card, as the thread shows it: the summary line and the size line,
+ * read off the card's own text — or null for a card that is not a turn's
+ * (no `CONFIRM_FOOTER`), which shows its text whole.
+ *
+ * Reads only lines this module writes: the `About to` heading, the field
+ * bullets, a revision's linked page line, the caveats and the plan head.
+ */
+export function shortCardOf(text: string): { summary: string; size: string } | null {
+  const at = text.lastIndexOf(CONFIRM_FOOTER);
+  if (at === -1) return null;
+  const draft = text.slice(0, at).trimEnd();
+  const lines = draft.split("\n");
+
+  const fields: DraftField[] = [];
+  let heading: string | undefined;
+  let page: string | undefined;
+  let operations: string | undefined;
+  let warnings = 0;
+  let inField = false;
+  for (const line of lines) {
+    const head = /^:warning: About to \*(.+)\*:$/.exec(line);
+    if (head) {
+      heading = head[1];
+      inField = false;
+      continue;
+    }
+    const field = /^(\s*)• \*([^*]+):\*\s?(.*)$/.exec(line);
+    if (field) {
+      fields.push({ label: field[2]!.trim(), value: field[3]!, nested: field[1]!.length > 0 });
+      inField = true;
+      continue;
+    }
+    if (line.startsWith(":warning:")) {
+      warnings++;
+      inField = false;
+      continue;
+    }
+    const plan = /^Approving runs (\d+) operations/.exec(line);
+    if (plan) {
+      operations = plan[1];
+      inField = false;
+      continue;
+    }
+    const linked = /^\*<[^|>]+\|([^>]+)>\*/.exec(line);
+    if (linked && !page) {
+      page = linked[1];
+      continue;
+    }
+    // A multi-line value — a body — continues its field until the next bullet.
+    if (inField && fields.length && !/^\s*◦ /.test(line)) fields.at(-1)!.value += `\n${line}`;
+  }
+
+  const lower = (f: DraftField) => f.label.toLowerCase();
+  const target = fields.find((f) => lower(f) === "target")?.value.trim();
+  const titled = fields.find((f) => !f.nested && TITLE_LABELS.has(lower(f)))?.value.trim();
+  const title = titled || target || page;
+  const keys = fields
+    .filter((f) => f.value.trim() && !f.value.includes("\n") && f.value.trim().length <= KEY_FIELD_CHARS)
+    .filter((f) => !TITLE_LABELS.has(lower(f)) && !BODY_LABELS.has(lower(f)) && lower(f) !== "target")
+    .filter((f) => !/https?:\/\//.test(f.value))
+    .slice(0, KEY_FIELDS)
+    .map((f) => f.value.trim());
+  if (titled && target) keys.unshift(target);
+
+  const verb = heading ?? (page ? (gateWordsFor("notion_update")?.verb ?? "update a Notion page") : undefined);
+  const named = title ? `_${clip(title, SUMMARY_TITLE_CHARS)}_` : "";
+  const after = [named, ...keys].filter(Boolean).join(" · ");
+  const summary = verb
+    ? `:warning: Ready to *${verb}*${after ? `: ${after}` : ""}`
+    : `:warning: Ready for review: ${clip(lines.find((l) => l.trim())?.trim() ?? "a proposal", SUMMARY_TITLE_CHARS)}`;
+
+  // The size of the prose the pop-up holds: its body field, or the draft.
+  const body = fields
+    .filter((f) => BODY_LABELS.has(lower(f)))
+    .sort((a, b) => b.value.trim().length - a.value.trim().length)[0];
+  const sizeOf = (label: string, n: number) => `${label} ${n.toLocaleString("en-US")} characters`;
+  const size = [
+    body ? sizeOf(body.label, body.value.trim().length) : sizeOf("Draft", draft.length),
+    ...(operations ? [`${operations} operations`] : []),
+    ...(warnings ? [`${warnings} warning${warnings === 1 ? "" : "s"} in the draft`] : []),
+  ].join(" · ");
+  return { summary, size };
+}
+
+/**
+ * A card's text with the Review pop-up's edits in place of the draft's values:
+ * what an approved card says from then on, in the thread and in View.
+ *
+ * Each change is written where this module wrote the field — its
+ * `• *Label:* value` line, labelled from the input key's last segment as
+ * `renderField` labels it — and, failing that, where its old value appears
+ * exactly once (a plan line naming another operation's title). A value the
+ * draft never showed is left to the edit line beside it.
+ *
+ * @param text - The card's text as posted
+ * @param changes - The pop-up's changes: input key, value before and after
+ */
+export function withEditedFields(text: string, changes: ReadonlyArray<{ key: string; from: string; to: string }>): string {
+  let out = text;
+  for (const change of changes) {
+    if (!change.from) continue;
+    const label = humanizeParamKey(change.key.split(".").at(-1) ?? change.key);
+    const line = `• *${label}:* ${change.from}`;
+    const at = out.indexOf(line);
+    if (at !== -1) {
+      out = `${out.slice(0, at)}• *${label}:* ${change.to}${out.slice(at + line.length)}`;
+      continue;
+    }
+    const first = out.indexOf(change.from);
+    if (first !== -1 && out.indexOf(change.from, first + 1) === -1) {
+      out = `${out.slice(0, first)}${change.to}${out.slice(first + change.from.length)}`;
+    }
+  }
+  return out;
+}
+
+function clip(text: string, max: number): string {
+  const line = text.split("\n")[0] ?? "";
+  return line.length > max ? `${line.slice(0, max - 1)}…` : line;
 }
 
 /**

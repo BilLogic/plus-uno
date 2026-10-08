@@ -113,6 +113,11 @@ function thirdPerson(phrase: string): string {
   return phrase.replace(/^(\w+)/, (verb) => (/(s|sh|ch|x)$/.test(verb) ? `${verb}es` : `${verb}s`));
 }
 
+/** A signal on a card sent back with Needs changes, while its revision is
+ *  written. Nothing ran, and the new card is where to decide. */
+export const BEING_REVISED_POST =
+  "That proposal is being revised, so nothing ran. Decide on the revised card when it posts in the thread.";
+
 /** One verdict, as the line a person reads. */
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
@@ -154,6 +159,8 @@ export function renderGateNote(note: GateNote): string {
       );
     case "not-a-confirmer":
       return notAConfirmerLine(note);
+    case "being-revised":
+      return BEING_REVISED_POST;
     case "resolve-failed":
       return `:x: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
     case "cut-off":

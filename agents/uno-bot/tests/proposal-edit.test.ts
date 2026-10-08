@@ -20,6 +20,7 @@ import {
   type ReviewViewState,
 } from "../src/slack/review-door";
 import { recordingViews } from "./helpers/recording-slack";
+import { CONFIRM_FOOTER, proposalCardBlocks } from "../src/slack/proposal-render";
 
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
@@ -152,6 +153,44 @@ describe("Approve with edits", () => {
     assert.deepEqual(cardUpdates.map((u) => u.note), [
       ":pencil2: <@U2> edited Title\n:white_check_mark: Approved by <@U2>",
     ]);
+  });
+
+  it("leaves the card and View showing the edited values, not the draft's", async () => {
+    const proposalText = [
+      ":warning: About to *create a Notion page*:",
+      "• *Surface:* prd",
+      "• *Title:* Reflection redesign",
+      "• *Summary:* Tutors reflect after each session;\nthe form is too long to finish.",
+      "• *Properties:*",
+      "    • *Product pillar:* Tutor Experience",
+      CONFIRM_FOOTER,
+    ].join("\n");
+    const threadState = await staged({ proposalText, input: { ...PROPOSAL.input, summary: "Tutors reflect after each session;\nthe form is too long to finish." } });
+    const { deps, views, cardUpdates } = harness(threadState);
+    await runReviewDecision(
+      approve({
+        "uno_field:0.title": text("Reflection, shorter form"),
+        "uno_field:0.summary": text("One question after each session."),
+        "uno_field:0.properties.product_pillar": picked("Universal"),
+      }),
+      deps,
+    );
+    const [update] = cardUpdates;
+    assert.match(update!.note, /^:pencil2: <@U2> edited Title, Summary, Product Pillar\n:white_check_mark: Approved by <@U2>$/);
+    for (const edited of ["Reflection, shorter form", "One question after each session.", "Universal"]) {
+      assert.ok(update!.text.includes(edited), edited);
+    }
+    for (const stale of ["Reflection redesign", "too long to finish", "Tutor Experience"]) {
+      assert.ok(!update!.text.includes(stale), stale);
+    }
+    // The card in the thread, re-rendered from that text, names the edit.
+    assert.match(JSON.stringify(proposalCardBlocks(update!.text, update!.note)), /_Reflection, shorter form_/);
+
+    // View, once decided, opens what the card now says.
+    await runReviewOpen({ ...open(), cardText: `${update!.text}\n${update!.note}` }, deps);
+    const view = JSON.stringify(views.calls.at(-1)!.view);
+    assert.match(view, /Reflection, shorter form/);
+    assert.doesNotMatch(view, /Reflection redesign/);
   });
 
   it("writes a picked option under the property the executor reads", async () => {

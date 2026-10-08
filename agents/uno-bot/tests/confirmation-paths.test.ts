@@ -330,9 +330,16 @@ describe("a card with a confirmer set", () => {
       const verdict = await resolveSignal(door.signal, { threadState });
       assert.equal(verdict.outcome, "none", door.name);
       assert.equal(verdict.execute, undefined, door.name);
+      // On the card for a gesture made on it; near the message for one typed
+      // or made by the model.
+      const onCard = door.signal.kind !== "typed" && door.signal.kind !== "model";
       assert.deepEqual(
         verdict.post,
-        { note: { kind: "not-a-confirmer", confirmers: [OWNER], userId: OUTSIDER }, replyTs: THREAD, card: { ts: CARD_TS, text: PROPOSAL.proposalText } },
+        {
+          note: { kind: "not-a-confirmer", confirmers: [OWNER], userId: OUTSIDER },
+          replyTs: THREAD,
+          ...(onCard ? { card: { ts: CARD_TS, text: PROPOSAL.proposalText } } : {}),
+        },
         door.name,
       );
       assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found", door.name);

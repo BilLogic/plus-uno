@@ -6,7 +6,8 @@
 // reaction, a typed emoji and the model's call, so the confirmer set, standing
 // confirmers, TTL, supersession and the one-winner claim are the Gate's and
 // not this file's. Reject is a ⛔ with a reason. Needs changes claims nothing:
-// the card stays pending for the revision turn that replaces it.
+// it locks the card as being revised, pending for the revision turn that
+// replaces it.
 //
 // OPEN BEFORE READING. Slack's `trigger_id` lives three seconds, and a cold
 // Durable Object read can spend most of that. So the door opens a loading view
@@ -33,6 +34,7 @@ import type { Delivery } from "../turn/index";
 import { lookAtProposal, resolveSignal, type GateRestage, type GateVerdict, type ReviewDecision } from "../gate/index";
 import { applyPressVerdict, type ButtonDoorTarget } from "./button-door";
 import { renderGateNote } from "./gate-note";
+import { withEditedFields } from "./proposal-render";
 import {
   alertBlock,
   closedView,
@@ -53,6 +55,7 @@ import {
   stateValues,
   FIELD_BLOCK_PREFIX,
   type ReadOptions,
+  type FieldChange,
   type ReviewViewState,
 } from "./review-fields";
 import type { ProposalOperation } from "../thread-state/index";
@@ -181,7 +184,8 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   }
 
   // Only Approve writes, so only Approve's edits are checked and carried.
-  const edits = request.decision === "confirm" ? await reviewEdits(request, deps) : { ok: true as const, edited: [] };
+  const edits =
+    request.decision === "confirm" ? await reviewEdits(request, deps) : { ok: true as const, edited: [], changes: [] };
   if (!edits.ok) {
     console.log(`[review] edit refused on ${request.channel}/${request.messageTs} by=${request.userId}`);
     await deps.views.update(request.viewId, edits.view);
@@ -226,12 +230,14 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
       restage: deps.restage,
       // A non-win is answered where the person is looking, which is the pop-up.
       replyEphemeral: async (text) => void (await deps.views.update(request.viewId, noticeView(card, text))),
-      // The card records who edited what, above who decided.
+      // The card records who edited what, above who decided, and from then on
+      // says what was approved: the edited values, not the draft's, which is
+      // also what View opens.
       replaceCard: (text, note) =>
         deps.updateCard(
           request.channel,
           request.messageTs,
-          text,
+          edits.changes.length ? withEditedFields(text, edits.changes) : text,
           edits.edited.length ? `${editedNote(request.userId, edits.edited)}\n${note}` : note,
         ),
     },
@@ -293,14 +299,15 @@ export async function reviewEdits(
   request: Pick<ReviewDecisionRequest, "channel" | "messageTs" | "userId" | "state">,
   deps: Pick<ReviewDoorDeps, "threadState" | "standingConfirmers" | "fieldOptions">,
 ): Promise<
-  { ok: true; operations?: ProposalOperation[]; edited: string[] } | { ok: false; view: Record<string, unknown> }
+  | { ok: true; operations?: ProposalOperation[]; edited: string[]; changes: FieldChange[] }
+  | { ok: false; view: Record<string, unknown> }
 > {
-  if (!request.state) return { ok: true, edited: [] };
+  if (!request.state) return { ok: true, edited: [], changes: [] };
   const look = await lookAtProposal(request.messageTs, request.userId, {
     threadState: deps.threadState,
     standingConfirmers: deps.standingConfirmers,
   });
-  if (look.state !== "live" || !look.mayDecide) return { ok: true, edited: [] };
+  if (look.state !== "live" || !look.mayDecide) return { ok: true, edited: [], changes: [] };
   const fields = await reviewFields(look.proposal, deps.fieldOptions);
   const checked = checkEdits(look.proposal, fields, request.state);
   if (!checked.ok) {
@@ -315,7 +322,9 @@ export async function reviewEdits(
       ),
     };
   }
-  return checked.edited.length ? { ok: true, operations: checked.operations, edited: checked.edited } : { ok: true, edited: [] };
+  return checked.edited.length
+    ? { ok: true, operations: checked.operations, edited: checked.edited, changes: checked.changes }
+    : { ok: true, edited: [], changes: [] };
 }
 
 /**

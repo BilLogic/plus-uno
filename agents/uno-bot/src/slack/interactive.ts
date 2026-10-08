@@ -298,6 +298,8 @@ async function reviseFromReview(
   });
   if (!posted?.ts) {
     console.error(`[interactive] needs-changes note did not post on ${proposal.channel}/${proposal.proposalTs}`);
+    // No revision turn will run, so nothing would lift the Gate's lock.
+    await threadStateFor(env).clearRevising(proposal.proposalTs).catch(() => {});
     await postMessage(env, {
       channel: proposal.channel,
       thread_ts: thread,
@@ -405,6 +407,7 @@ async function tryAgain(env: Env, payload: InteractionPayload): Promise<void> {
     {
       post: async (message) => (await postMessage(env, message))?.ts ?? null,
       enqueue: (event) => enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event)),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
     },
   );
 }

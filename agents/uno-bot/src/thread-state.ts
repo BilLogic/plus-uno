@@ -351,6 +351,30 @@ export class ThreadState extends DurableObject<Env> {
     return { retired: true };
   }
 
+  // Needs changes' lock — the contract is on the interface. The mark rides on
+  // the payload, so every lookup hands it back unchanged, and the input gate
+  // stays closed across the read and the write, so two presses mark it once.
+  async markRevising(proposalTs: string, userId: string, at: number): Promise<"marked" | "already" | "gone"> {
+    const key = proposalKey(proposalTs);
+    const rec = await this.storage.get<ProposalRecord>(key);
+    if (!rec || rec.retired || rec.supersededBy) return "gone";
+    if (at - rec.createdAt > recordTtlMs(rec)) return "gone";
+    const pending = rec.payload as PendingProposal | null;
+    if (!pending) return "gone";
+    if (pending.revising) return "already";
+    await this.storage.put<ProposalRecord>(key, { ...rec, payload: { ...pending, revising: { userId } } });
+    return "marked";
+  }
+
+  async clearRevising(proposalTs: string): Promise<void> {
+    const key = proposalKey(proposalTs);
+    const rec = await this.storage.get<ProposalRecord>(key);
+    const pending = rec?.payload as PendingProposal | null | undefined;
+    if (!rec || !pending?.revising) return;
+    const { revising: _, ...rest } = pending;
+    await this.storage.put<ProposalRecord>(key, { ...rec, payload: rest });
+  }
+
   // Is the card that retired another one still around to be looked at? Its own
   // retirement does not matter: a chain still ends in a live newest card.
   private async successorIsLive(ts: string, at: number): Promise<boolean> {
@@ -430,6 +454,8 @@ export class ThreadState extends DurableObject<Env> {
     const key = proposalKey(proposalTs);
     const rec = await this.storage.get<ProposalRecord>(key);
     if (!rec || rec.retired || rec.supersededBy) return false;
+    // A card being revised is refused too: its revision is on the way.
+    if ((rec.payload as PendingProposal | null)?.revising) return false;
     return this.storage.delete(key);
   }
 

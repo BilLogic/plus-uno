@@ -13,7 +13,7 @@ import { runTurn, type TurnDeps } from "../src/turn/index";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
 import { postVisibleFailure } from "../src/slack/delivery";
 import { TRY_AGAIN_ACTION_ID } from "../src/slack/failure-message";
-import { runTryAgainDoor } from "../src/slack/try-again";
+import { retryValue, runTryAgainDoor } from "../src/slack/try-again";
 import type { SlackMessageEvent } from "../src/slack/types";
 import { harness, request } from "./helpers/turn-harness";
 import { recordingPosting, recordingSlack } from "./helpers/recording-slack";
@@ -21,6 +21,26 @@ import { recordingPosting, recordingSlack } from "./helpers/recording-slack";
 const QUESTION = "how many Roadmap cards are in WIP?";
 
 type Block = Record<string, any>;
+
+/** The Try again door on recordings: what it posted, queued and said aside. */
+function door() {
+  const posted: Array<{ channel: string; thread_ts?: string; text: string }> = [];
+  const queued: SlackMessageEvent[] = [];
+  const ephemeral: string[] = [];
+  return {
+    posted,
+    queued,
+    ephemeral,
+    deps: {
+      post: async (m: { channel: string; thread_ts?: string; text: string }) => {
+        posted.push(m);
+        return `9.00000${posted.length}`;
+      },
+      enqueue: async (event: SlackMessageEvent) => void queued.push(event),
+      replyEphemeral: async (text: string) => void ephemeral.push(text),
+    },
+  };
+}
 
 /** The one failure post, and its blocks. */
 function failurePost(posting: ReturnType<typeof recordingPosting>): { text: string; blocks: Block[] } {
@@ -43,11 +63,19 @@ describe("at the Turn seam", () => {
     assert.equal(failure?.kind === "failure" && failure.ask, QUESTION);
   });
 
-  it("the Slack adapter passes the question on to the post", async () => {
+  it("the Slack adapter passes the question on to the post, with who asked it", async () => {
     const slack = recordingSlack();
-    const delivery = deliveryAdapter(slack.deps(false), { channel: "C1", replyTs: "1.000100", userMsgTs: "1.000100", userId: "U1" });
+    const delivery = deliveryAdapter(slack.deps(false), { channel: "C1", replyTs: "1.000100", userMsgTs: "1.000100", userId: "U0000001" });
     await delivery.postFailure("agent", new Error("x"), QUESTION);
-    assert.deepEqual(slack.of("failure").map((f) => f.ask), [QUESTION]);
+    const [ask] = slack.of("failure").map((f) => f.ask);
+    // Pressed by the asker, the button asks exactly the question again.
+    const d = door();
+    await runTryAgainDoor({ userId: "U0000001", channel: "C1", messageTs: "1.000200", value: ask }, d.deps);
+    assert.equal(d.queued[0]?.text, QUESTION);
+    // Pressed by anyone else, it asks nothing.
+    const other = door();
+    await runTryAgainDoor({ userId: "U0000002", channel: "C1", messageTs: "1.000200", value: ask }, other.deps);
+    assert.deepEqual(other.queued, []);
   });
 });
 
@@ -98,21 +126,29 @@ describe("the failure post", () => {
 });
 
 describe("Try again", () => {
-  function door() {
-    const posted: Array<{ channel: string; thread_ts?: string; text: string }> = [];
-    const queued: SlackMessageEvent[] = [];
-    return {
-      posted,
-      queued,
-      deps: {
-        post: async (m: { channel: string; thread_ts?: string; text: string }) => {
-          posted.push(m);
-          return `9.00000${posted.length}`;
-        },
-        enqueue: async (event: SlackMessageEvent) => void queued.push(event),
-      },
-    };
-  }
+  it("honours only the person who asked: anyone else is told to ask it themselves", async () => {
+    const d = door();
+    const value = retryValue("U0000001", QUESTION);
+    await runTryAgainDoor({ userId: "U0000002", channel: "C1", messageTs: "1.000200", threadTs: "1.000100", value }, d.deps);
+    assert.deepEqual([d.posted, d.queued], [[], []]);
+    assert.deepEqual(d.ephemeral, ["Only <@U0000001> can retry this — ask it yourself."]);
+
+    const asker = door();
+    await runTryAgainDoor({ userId: "U0000001", channel: "C1", messageTs: "1.000200", threadTs: "1.000100", value }, asker.deps);
+    assert.equal(asker.queued[0]?.user, "U0000001");
+    assert.equal(asker.queued[0]?.text, QUESTION);
+    assert.deepEqual(asker.ephemeral, []);
+  });
+
+  it("the failure's button carries the asker, and still fits Slack's value", async () => {
+    const posting = recordingPosting();
+    await postVisibleFailure(posting.deps(), "C1", "1.000100", "1.000100", new Error("boom"), "agent", retryValue("U0000001", QUESTION));
+    const { blocks } = failurePost(posting);
+    const value = String(blocks.at(-1)!.elements[0].value);
+    const d = door();
+    await runTryAgainDoor({ userId: "U0000003", channel: "C1", messageTs: "1.000200", value }, d.deps);
+    assert.match(d.ephemeral[0] ?? "", /Only <@U0000001>/);
+  });
 
   it("asks the question again in the failure's thread, as the presser's own message", async () => {
     const d = door();
