@@ -27,7 +27,7 @@
 // put the proposal in front of a person in the first place.
 
 import type { Env, SlackContext } from "../types";
-import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
+import { postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
 import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
 import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
@@ -139,13 +139,9 @@ async function runWonVerdict(
 ): Promise<OperationOutcome[] | undefined> {
   const store = threadStateFor(env);
 
-  await addReaction(
-    env,
-    pending.channel,
-    pending.userMsgTs,
-    verdict.decision === "confirm" ? "handshake" : "wave",
-  );
-
+  // No reaction here: code reacts 👀 on arrival and ❌ on a failure, and
+  // nothing else (AGENT.md § Emoji budget). The verdict's own post says what
+  // was decided; a 🤝 or 👋 on the requester's message said it twice.
   const proposed = proposalOperations(pending).length;
   const run = verdict.execute;
   if (!run) {
