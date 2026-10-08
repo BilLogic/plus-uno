@@ -25,6 +25,8 @@ import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from 
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { DESIGN_STATUS_NOT_SET } from "./review-draft";
+import { createdDesignStatus } from "../integrations/notion";
 
 // One shared confirmation footer on every card. It names no approver, since
 // the confirmer set decides who may, and it points at the one button: the
@@ -163,11 +165,17 @@ const KEY_FIELD_CHARS = 40;
 const KEY_FIELDS = 3;
 const SUMMARY_TITLE_CHARS = 80;
 
-/** One `• *Label:* value` line of a card's text, with what continues it. */
+/** Labels that name how a call is shaped, not what it writes: a surface, a
+ *  section's heading, a link back. Never a key in the summary. */
+const SHAPE_LABELS = new Set(["surface", "heading", "source link", "page link", "link"]);
+
+/** One `• *Label:* value` line of a card's text, with what continues it and
+ *  the field it sits under, if any. */
 interface DraftField {
   label: string;
   value: string;
   nested: boolean;
+  parent?: string;
 }
 
 /**
@@ -199,7 +207,9 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
     }
     const field = /^(\s*)• \*([^*]+):\*\s?(.*)$/.exec(line);
     if (field) {
-      fields.push({ label: field[2]!.trim(), value: field[3]!, nested: field[1]!.length > 0 });
+      const nested = field[1]!.length > 0;
+      const parent = nested ? [...fields].reverse().find((f) => !f.nested)?.label : undefined;
+      fields.push({ label: field[2]!.trim(), value: field[3]!, nested, ...(parent ? { parent } : {}) });
       inField = true;
       continue;
     }
@@ -227,12 +237,23 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
   const target = fields.find((f) => lower(f) === "target")?.value.trim();
   const titled = fields.find((f) => !f.nested && TITLE_LABELS.has(lower(f)))?.value.trim();
   const title = titled || target || page;
-  const keys = fields
+  // A nested field is a key only under Properties: under Sections it is a
+  // heading, which the summary has no use for.
+  const keyFields = fields
     .filter((f) => f.value.trim() && !f.value.includes("\n") && f.value.trim().length <= KEY_FIELD_CHARS)
     .filter((f) => !TITLE_LABELS.has(lower(f)) && !BODY_LABELS.has(lower(f)) && lower(f) !== "target")
-    .filter((f) => !/https?:\/\//.test(f.value))
-    .slice(0, KEY_FIELDS)
+    .filter((f) => !SHAPE_LABELS.has(lower(f)) && (!f.nested || f.parent?.toLowerCase() === "properties"))
+    .filter((f) => !/https?:\/\//.test(f.value));
+  // A create on a Roadmap surface names the Design Status its write sets
+  // (`createdDesignStatus`), as the pop-up does (`review-draft.ts`) — never a
+  // drafted one, which the create does not write as the property.
+  const surface = fields.find((f) => !f.nested && lower(f) === "surface")?.value.trim().toLowerCase();
+  const roadmap = surface === "prd" || surface === "intake";
+  const keys = keyFields
+    .filter((f) => !(roadmap && lower(f) === "design status"))
+    .slice(0, KEY_FIELDS - (roadmap ? 1 : 0))
     .map((f) => f.value.trim());
+  if (roadmap) keys.push(createdDesignStatus(surface!) ?? `Design Status: ${DESIGN_STATUS_NOT_SET}`);
   if (titled && target) keys.unshift(target);
 
   const verb = heading ?? (page ? (gateWordsFor("notion_update")?.verb ?? "update a Notion page") : undefined);

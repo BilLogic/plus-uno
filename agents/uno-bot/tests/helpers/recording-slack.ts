@@ -40,7 +40,7 @@ import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
 import { textCopy, type Presentation, type DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
 import type { ReviewViews } from "../../src/slack/review-door";
-import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES, viewRefusal } from "./slack-block-rules";
+import { iconRefusal, messageBlocksRefusal, MAX_VIEW_STACK, SLACK_TASK_STATUSES, viewRefusal } from "./slack-block-rules";
 
 /** One thing the adapter asked Slack to do, in order. */
 export type SlackCall =
@@ -121,6 +121,7 @@ function refuseBlocks(list: SlackRefusal[], call: string, blocks: readonly unkno
 /** One views call the review door made, in order. */
 export type ViewCall =
   | { kind: "open"; triggerId: string; view: unknown }
+  | { kind: "push"; triggerId: string; view: unknown }
   | { kind: "update"; viewId: string; view: unknown };
 
 export interface RecordingViews {
@@ -136,6 +137,9 @@ export interface RecordingViews {
  * recorded, refused (`invalid_arguments`, the code views calls give a bad
  * shape) and fails the test unless taken (`expectRefusals`). An update to a
  * view that was never opened is refused as Slack refuses it (`not_found`).
+ * `views.push` stacks a view over the open ones and answers its id (`V2`,
+ * `V3`); past Slack's three views in a stack it is refused
+ * (`push_limit_reached`), and with nothing open there is nothing to push over.
  *
  * @param opts.openFails - Refuse every open, as an expired trigger is refused
  * @param opts.alreadyOpen - Views open before the test began: the pop-up a
@@ -145,6 +149,8 @@ export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string
   const calls: ViewCall[] = [];
   const refused: SlackRefusal[] = [];
   const opened = new Set<string>(opts.alreadyOpen ?? []);
+  // One modal stack: the open view, then each view pushed over it.
+  const stack: string[] = [...(opts.alreadyOpen ?? [])];
   const client: ReviewViews = {
     async open(triggerId, view) {
       calls.push({ kind: "open", triggerId, view });
@@ -155,7 +161,28 @@ export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string
         return null;
       }
       opened.add("V1");
+      stack.splice(0, stack.length, "V1");
       return "V1";
+    },
+    async push(triggerId, view) {
+      calls.push({ kind: "push", triggerId, view });
+      const why = viewRefusal(view);
+      if (why) {
+        refuse(refused, `views.push with ${why}`, "invalid_arguments");
+        return null;
+      }
+      if (!stack.length) {
+        refuse(refused, "views.push with no view open", "not_found");
+        return null;
+      }
+      if (stack.length >= MAX_VIEW_STACK) {
+        refuse(refused, `views.push onto ${stack.length} views`, "push_limit_reached");
+        return null;
+      }
+      const id = `V${stack.length + 1}`;
+      stack.push(id);
+      opened.add(id);
+      return id;
     },
     async update(viewId, view) {
       calls.push({ kind: "update", viewId, view });

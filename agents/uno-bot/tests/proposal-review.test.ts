@@ -17,9 +17,9 @@ import {
 } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
 import {
-  checkedEditsView,
   runReviewDecision,
   runReviewOpen,
+  runReviewPush,
   startRevision,
   type ReviewDoorDeps,
   type RevisionDeps,
@@ -82,8 +82,8 @@ const approve = (userId = "U2", viewId = "V1") => ({
   decision: "confirm" as const,
 });
 
-/** A confirmer's decision row, in Bill's order. */
-const DECISION_ROW = ["uno_review_approve", "uno_review_changes", "uno_review_reject"];
+/** A confirmer's decision row in the body; Approve is the footer's submit. */
+const DECISION_ROW = ["uno_review_changes", "uno_review_reject"];
 
 /** Every action element a view offers. */
 function actionIds(view: unknown): string[] {
@@ -210,26 +210,29 @@ describe("Review opens the draft", () => {
     assert.match(viewText(views.calls[1]!.view), /Reflection redesign/);
   });
 
-  it("gives a confirmer Approve, Needs changes and Reject, as the last row of the body", async () => {
+  it("puts Approve in the footer, Needs changes and Reject last in the body, and holds no input", async () => {
     const { deps, views } = harness(await staged());
     await runReviewOpen(open(), deps);
     const draft = views.calls[1]!.view as {
-      blocks: Array<{ type: string; elements?: Array<{ style?: string; text: { text: string } }> }>;
+      blocks: Array<{ type: string; accessory?: { action_id: string; text: { text: string } }; elements?: Array<{ style?: string; text: { text: string } }> }>;
       submit?: { text: string };
+      close?: { text: string };
     };
+    assert.equal(draft.submit?.text, "Approve");
+    assert.equal(draft.close?.text, "Close");
     assert.deepEqual(actionIds(draft), DECISION_ROW);
     assert.deepEqual(
       draft.blocks.at(-1)?.elements?.map((e) => [e.text.text, e.style ?? "default"]),
       [
-        ["Approve", "primary"],
         ["Needs changes", "default"],
         ["Reject", "danger"],
       ],
     );
-    // The note Needs changes needs and Reject may carry sits just above it.
-    assert.equal(draft.blocks.at(-2)?.type, "input");
-    // Slack requires a submit beside an input; it checks, never decides.
-    assert.equal(draft.submit?.text, "Check edits", "the footer carries no decision");
+    assert.deepEqual(draft.blocks.filter((b) => b.type === "input"), []);
+    // Edit fields sits at the top, beside the draft.
+    assert.equal(draft.blocks[0]?.accessory?.action_id, "uno_review_edit");
+    assert.equal(draft.blocks[0]?.accessory?.text.text, "Edit fields");
+    assert.doesNotMatch(viewText(draft), /Check edits|uno_review_approve/);
   });
 
   it("carries the card it is about, so the decision finds it", async () => {
@@ -242,9 +245,12 @@ describe("Review opens the draft", () => {
   it("shows a non-confirmer the same draft read-only, naming who can decide", async () => {
     const { deps, views } = harness(await staged({ confirmers: ["U07CONFIRM"] }));
     await runReviewOpen(open("U2"), deps);
-    const draft = views.calls[1]!.view;
+    const draft = views.calls[1]!.view as { submit?: unknown; close?: { text: string } };
     assert.match(viewText(draft), /Reflection redesign/);
     assert.deepEqual(actionIds(draft), []);
+    assert.doesNotMatch(viewText(draft), /uno_review_edit/);
+    assert.equal(draft.submit, undefined, "only Close");
+    assert.equal(draft.close?.text, "Close");
     assert.match(viewText(draft), /<@U07CONFIRM>/);
   });
 
@@ -285,17 +291,17 @@ describe("Review opens the draft", () => {
     assert.deepEqual(actionIds(view), []);
   });
 
-  it("keeps the note and the decision row on a draft too long for one view, and says some was left out", async () => {
-    const paragraphs = Array.from({ length: 140 }, (_, n) => `Paragraph ${n}: ${"words ".repeat(480)}`);
-    const { deps, views } = harness(await staged({ proposalText: paragraphs.join("\n\n") }));
+  it("keeps the decision row on a draft too long for one view, and says some was left out", async () => {
+    const sections = Array.from({ length: 140 }, (_, n) => ({ heading: `Part ${n}`, body: `Paragraph ${n}: ${"words ".repeat(80)}` }));
+    const { deps, views } = harness(await staged({ input: { surface: "prd", title: "Reflection redesign", sections } }));
     await runReviewOpen(open(), deps);
     const view = views.calls[1]!.view as { blocks: Array<{ type: string; block_id?: string }> };
     assert.ok(view.blocks.length <= 100, `${view.blocks.length} blocks`);
     assert.deepEqual(actionIds(view), DECISION_ROW);
     assert.equal(view.blocks.at(-1)!.block_id, "uno_review_decision", "the decision row is last");
-    assert.ok(view.blocks.some((b) => b.block_id === "uno_review_note"), "the note input is kept");
     assert.match(viewText(view), /left out/i);
     assert.match(viewText(view), /Paragraph 0:/, "the draft still opens the view");
+    assert.deepEqual(views.refused, []);
   });
 
   it("stops when Slack will not open the view", async () => {
@@ -556,20 +562,7 @@ describe("Needs changes in the pop-up", () => {
     assert.deepEqual(t.delivery.calls.filter((c) => c.kind === "reopen-card"), []);
   });
 
-  it("keeps the note and the decisions through Check edits, the submit the note's input needs", async () => {
-    const { deps, views } = harness(await staged());
-    await runReviewOpen(open(), deps);
-    const draft = views.calls[1]!.view as Record<string, unknown>;
-    const checked = checkedEditsView({
-      ...draft,
-      state: { values: { uno_review_note: { uno_review_note_input: { type: "plain_text_input", value: "shorter" } } } },
-    });
-    assert.deepEqual(actionIds(checked), DECISION_ROW);
-    assert.ok((checked.blocks as Array<{ block_id?: string }>).some((b) => b.block_id === "uno_review_note"));
-    assert.equal((checked.submit as { text: string }).text, "Check edits");
-  });
-
-  it("is refused in the view without a note, and leaves the card as it was", async () => {
+  it("is refused without a note, and leaves the card as it was", async () => {
     const threadState = await staged();
     const { deps, views, ran, cardUpdates, revisions } = harness(threadState);
     await runReviewDecision(decide("revise", "   "), deps);
@@ -577,11 +570,7 @@ describe("Needs changes in the pop-up", () => {
     assert.deepEqual(revisions, []);
     assert.deepEqual(ran, []);
     assert.deepEqual(cardUpdates, []);
-    // The draft stays open with its decisions, and says what is missing.
-    const view = views.calls.at(-1)!.view;
-    assert.deepEqual(actionIds(view), DECISION_ROW);
-    assert.match(viewText(view), /note/i);
-    assert.match(viewText(view), /Reflection redesign/);
+    assert.match(viewText(views.calls.at(-1)!.view), /needs a note/i);
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
   });
 

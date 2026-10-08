@@ -127,6 +127,18 @@ export async function viewsOpen(env: Env, triggerId: string, view: Record<string
   return typeof id === "string" ? id : null;
 }
 
+/**
+ * Push a view over the modal a click came from (`views.push`), on that
+ * click's `trigger_id`. The pushed view's id, or null when Slack refused.
+ * Slack keeps at most three views in a stack.
+ */
+export async function viewsPush(env: Env, triggerId: string, view: Record<string, unknown>): Promise<string | null> {
+  const res = await slackCall<SlackResponse>(env, "views.push", { trigger_id: triggerId, view: withSafeBlocks(view) });
+  if (!res.ok) return null;
+  const id = (res.view as { id?: unknown } | undefined)?.id;
+  return typeof id === "string" ? id : null;
+}
+
 /** Replace an open modal's contents. Whether Slack took it. */
 export async function viewsUpdate(env: Env, viewId: string, view: Record<string, unknown>): Promise<boolean> {
   const res = await slackCall<SlackResponse>(env, "views.update", { view_id: viewId, view: withSafeBlocks(view) });
