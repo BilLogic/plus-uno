@@ -321,7 +321,16 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
 /** One thing the posting functions asked Slack to do, in order. */
 export type PostingCall =
   | { kind: "react"; channel: string; ts: string; name: string }
-  | { kind: "message"; channel: string; threadTs?: string; text: string; blocks: boolean }
+  | {
+      kind: "message";
+      channel: string;
+      threadTs?: string;
+      text: string;
+      blocks: boolean;
+      /** The blocks themselves, when there were any — what an answer's
+       *  `markdown` block and its fallback rungs are asserted on. */
+      blockList?: unknown[];
+    }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
   | { kind: "appendStream"; channel: string; ts: string; text: string }
   | { kind: "stopStream"; channel: string; ts: string; blocks: boolean };
@@ -333,6 +342,11 @@ export interface RecordingPostingOptions {
   messageFails?: boolean;
   /** Refuse only a post carrying blocks. */
   blocksFail?: boolean;
+  /** Refuse a post whose blocks include any of these types, the way Slack
+   *  refuses a block it will not take on a surface — so each rung of the
+   *  answer's fallback ladder is reachable. Answered `invalid_blocks`, with
+   *  `response_metadata.messages` naming the block. */
+  refusesBlockTypes?: readonly string[];
   /** Refuse `appendStream`, so the finish-failed fallback is reachable. */
   appendFails?: boolean;
   /** Refuse `stopStream`. */
@@ -375,8 +389,19 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
         ...(input.thread_ts === undefined ? {} : { threadTs: input.thread_ts }),
         text: input.text,
         blocks,
+        ...(input.blocks ? { blockList: input.blocks } : {}),
       });
-      if (refuseBlocks(refused, "post", input.blocks)) return { ok: false };
+      if (refuseBlocks(refused, "post", input.blocks)) return { ok: false, error: "invalid_blocks" };
+      const at = (input.blocks ?? []).findIndex((b) => opts.refusesBlockTypes?.includes(String(b.type)));
+      if (at >= 0) {
+        const type = String(input.blocks?.[at]?.type);
+        refuse(refused, `post with a ${type} block`, "invalid_blocks");
+        return {
+          ok: false,
+          error: "invalid_blocks",
+          response_metadata: { messages: [`[ERROR] unsupported type: ${type} [json-pointer:/blocks/${at}]`] },
+        } as { ok: boolean };
+      }
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
       return { ok: true, ts: `posted-${++posted}` } as { ok: boolean };
     },
