@@ -30,7 +30,9 @@ import {
   rowsFrom,
   setsIn,
   snapshotFrom,
-  versionsFrom, fetchNodeHashes } from './snapshot-figma-components.mjs';
+  versionsFrom, fetchNodeHashes,
+  figmaGet, backoffMs, waitBudget, FigmaBusyError,
+  MAX_ATTEMPTS, MAX_WAIT_MS, NODES_SPACING_MS, EXIT_BUSY } from './snapshot-figma-components.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -332,4 +334,126 @@ test('a chunk that fails once and then succeeds is not a failure', async () => {
   const { hashes, failed } = await fetchNodeHashes(rows, 'KEY', 'token', get, 0);
   assert.deepEqual(failed, [], 'the retry is what the retry is for');
   assert.equal(Object.keys(hashes).length, 60);
+});
+
+// ── a rate limit is waited out, not a failure (#898) ────────────────────────
+//
+// The refresh now runs itself once per publish, on the budget Bill's own tools
+// share, so a 429 is an ordinary answer. These drive `figmaGet` over a fake
+// fetch and a sleep that only records how long it was asked to wait.
+
+/** A fetch that answers from a script: each entry a status, an optional Retry-After and a body. */
+function scriptedFetch(answers) {
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(url);
+    const a = answers.shift() ?? { status: 200, body: {} };
+    return {
+      ok: a.status >= 200 && a.status < 300,
+      status: a.status,
+      headers: { get: (h) => (h.toLowerCase() === 'retry-after' ? (a.retryAfter ?? null) : null) },
+      json: async () => a.body ?? {},
+      text: async () => JSON.stringify(a.body ?? {}),
+    };
+  };
+  return { fetchImpl, calls };
+}
+
+/** A sleep that waits for nothing and keeps the waits it was asked for. */
+function recordedSleep() {
+  const waits = [];
+  return { waits, sleep: async (ms) => void waits.push(ms) };
+}
+
+const quiet = () => {};
+
+test('a 429 with Retry-After waits that long, then returns the answer', async () => {
+  const { fetchImpl, calls } = scriptedFetch([{ status: 429, retryAfter: '60' }, { status: 200, body: { ok: 1 } }]);
+  const { waits, sleep } = recordedSleep();
+  const body = await figmaGet('/files/K/components', 't', { fetchImpl, sleep, log: quiet });
+  assert.deepEqual(body, { ok: 1 });
+  assert.deepEqual(waits, [60_000]);
+  assert.equal(calls.length, 2);
+});
+
+test('a 429 with no Retry-After waits 5 s, then 10 s, doubling', async () => {
+  const { fetchImpl } = scriptedFetch([{ status: 429 }, { status: 429 }, { status: 200, body: {} }]);
+  const { waits, sleep } = recordedSleep();
+  await figmaGet('/files/K/versions', 't', { fetchImpl, sleep, log: quiet });
+  assert.deepEqual(waits, [5_000, 10_000]);
+  assert.equal(backoffMs(9, null), MAX_WAIT_MS, 'never more than five minutes at once');
+  assert.equal(backoffMs(1, '86400'), MAX_WAIT_MS, 'whatever Retry-After asks');
+});
+
+test('a 5xx is waited out too; any other refusal throws at once', async () => {
+  const ok = scriptedFetch([{ status: 503 }, { status: 200, body: { ok: 1 } }]);
+  assert.deepEqual(await figmaGet('/files/K/components', 't', { ...ok, ...recordedSleep(), log: quiet }), { ok: 1 });
+
+  const gone = scriptedFetch([{ status: 404, body: { err: 'Not found' } }]);
+  const { waits, sleep } = recordedSleep();
+  await assert.rejects(figmaGet('/files/K/components', 't', { fetchImpl: gone.fetchImpl, sleep, log: quiet }), /Figma API 404/);
+  assert.deepEqual(waits, [], 'a 404 is not waited on');
+});
+
+test('it gives up after six tries, or once the run has waited its budget, as busy', async () => {
+  const always = scriptedFetch(Array.from({ length: 10 }, () => ({ status: 429, retryAfter: '1' })));
+  const tries = recordedSleep();
+  await assert.rejects(figmaGet('/x', 't', { fetchImpl: always.fetchImpl, sleep: tries.sleep, log: quiet }), FigmaBusyError);
+  assert.equal(always.calls.length, MAX_ATTEMPTS);
+  assert.equal(tries.waits.length, MAX_ATTEMPTS - 1);
+
+  // The budget is the run's, shared across calls: what one spent, the next cannot.
+  const budget = waitBudget(90_000);
+  const first = scriptedFetch([{ status: 429, retryAfter: '60' }, { status: 200, body: {} }]);
+  await figmaGet('/a', 't', { fetchImpl: first.fetchImpl, sleep: recordedSleep().sleep, budget, log: quiet });
+  const second = scriptedFetch([{ status: 429, retryAfter: '60' }]);
+  await assert.rejects(
+    figmaGet('/b', 't', { fetchImpl: second.fetchImpl, sleep: recordedSleep().sleep, budget, log: quiet }),
+    (e) => e instanceof FigmaBusyError && /after 60 s of waiting this run/.test(e.message),
+  );
+  assert.equal(EXIT_BUSY, 75, 'EX_TEMPFAIL, so the workflow can tell busy from broken');
+});
+
+test('node fetches are paced at uno-bot\'s half of Tier 1, and a chunk 429\'d once is not a failure', async () => {
+  const rows = Array.from({ length: 150 }, (_, i) => ({ nodeId: `1:${i}`, name: `C${i}` }));
+  const answers = [];
+  for (let chunk = 0; chunk < 3; chunk += 1) {
+    if (chunk === 1) answers.push({ status: 429, retryAfter: '30' });
+    answers.push({ status: 200, body: null });
+  }
+  const { waits, sleep } = recordedSleep();
+  let n = 0;
+  const fetchImpl = async (url) => {
+    const a = answers[n++];
+    const ids = new URL(url).searchParams.get('ids').split(',');
+    return {
+      ok: a.status === 200,
+      status: a.status,
+      headers: { get: (h) => (h.toLowerCase() === 'retry-after' ? (a.retryAfter ?? null) : null) },
+      json: async () => ({ nodes: Object.fromEntries(ids.map((id) => [id, { document: { id } }])) }),
+      text: async () => '',
+    };
+  };
+  const budget = waitBudget();
+  const get = (endpoint, token) => figmaGet(endpoint, token, { fetchImpl, sleep, budget, log: quiet });
+  const { hashes, failed } = await fetchNodeHashes(rows, 'KEY', 'token', get, 0, { paceMs: NODES_SPACING_MS, sleep });
+  assert.deepEqual(failed, []);
+  assert.equal(Object.keys(hashes).length, 150);
+  assert.deepEqual(waits, [NODES_SPACING_MS, 30_000, NODES_SPACING_MS], 'a gap between chunks, and the 429 waited out');
+  assert.equal(NODES_SPACING_MS, 12_000, 'five a minute');
+});
+
+test('a chunk Figma kept refusing is reported as busy, so the CLI writes nothing and exits 75', async () => {
+  const rows = Array.from({ length: 60 }, (_, i) => ({ nodeId: `1:${i}`, name: `C${i}` }));
+  let calls = 0;
+  const get = async (url) => {
+    calls += 1;
+    if (url.includes('1:50')) throw new FigmaBusyError(url, 429, 600_000);
+    const ids = new URL(`https://x${url}`).searchParams.get('ids').split(',');
+    return { nodes: Object.fromEntries(ids.map((id) => [id, { document: { id } }])) };
+  };
+  const { failed } = await fetchNodeHashes(rows, 'KEY', 'token', get, 0);
+  assert.equal(failed.length, 1);
+  assert.equal(failed[0].busy, true);
+  assert.equal(calls, 2, 'the backoff spent its tries already: no second round');
 });
