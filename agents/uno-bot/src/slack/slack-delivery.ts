@@ -28,7 +28,7 @@ import {
   stopStream,
   updateMessage,
 } from "./api";
-import { renameSession, setSessionStatus } from "./assistant";
+import { renameSession, setSessionStatus, setStatusLine } from "./assistant";
 import {
   DEFAULT_ALERT_CHANNEL,
   postTextVerified,
@@ -126,8 +126,8 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       await slackCall(env, "reactions.remove", { channel, timestamp: ts, name });
     },
     postMessage: (input) => postMessage(env, input),
-    postAnswer: ({ channel, threadTs, text, recipient, footerHint, cardTable }) =>
-      postTextVerified(posting, channel, threadTs, text, recipient, footerHint, cardTable ? { cardTable } : {}),
+    postAnswer: ({ channel, threadTs, text, recipient, footerHint, presentation }) =>
+      postTextVerified(posting, channel, threadTs, text, recipient, footerHint, presentation ? { presentation } : {}),
     postFailure: ({ channel, threadTs, userMsgTs, stage, err }) =>
       postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage),
     startStream: (channel, threadTs, userId, team) =>
@@ -145,6 +145,7 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
+    setStatusLine: (channel, threadTs, text) => setStatusLine(env, channel, threadTs, text),
   });
 }
 

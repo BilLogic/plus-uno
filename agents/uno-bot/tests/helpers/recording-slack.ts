@@ -37,7 +37,7 @@ import type {
 } from "../../src/slack/delivery-adapter";
 import type { FooterKind } from "../../src/slack/footer-kind";
 import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
-import { withCardList, type CardTable, type DeliveryFailureStage } from "../../src/turn/index";
+import { textCopy, type Presentation, type DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
 import type { ReviewViews } from "../../src/slack/review-door";
 import { iconRefusal, messageBlocksRefusal, SLACK_TASK_STATUSES, viewRefusal } from "./slack-block-rules";
@@ -65,7 +65,7 @@ export type SlackCall =
       userId: string;
       team?: string;
       footerHint?: FooterKind;
-      cardTable?: CardTable;
+      presentation?: Presentation;
     }
   | {
       kind: "failure";
@@ -79,6 +79,7 @@ export type SlackCall =
   | { kind: "heading"; channel: string; ts: string; title: string }
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
+  | { kind: "statusLine"; channel: string; threadTs: string; text: string }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
 
 /** A call Slack would have refused, and the error code it would have said. */
@@ -242,6 +243,8 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
   // `startStream` is the checklist's — and a stopped stream takes nothing more.
   const planStreams = new Set<string>();
   const stopped = new Set<string>();
+  // Threads whose session was last moved off `processing`.
+  const settledThreads = new Set<string>();
   // Every call but a task append lands the moment it is made.
   const record = (call: SlackCall): void => {
     calls.push(call);
@@ -283,7 +286,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         userId: input.recipient.userId,
         ...(input.recipient.team === undefined ? {} : { team: input.recipient.team }),
         ...(input.footerHint === undefined ? {} : { footerHint: input.footerHint }),
-        ...(input.cardTable === undefined ? {} : { cardTable: input.cardTable }),
+        ...(input.presentation === undefined ? {} : { presentation: input.presentation }),
       });
       // Closing a stream INTO the answer appends the answer as markdown, and a
       // plan-mode stream takes task and plan chunks only. The client's type
@@ -295,9 +298,9 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         stopped.add(handed);
       }
       if (opts.answerThrows !== undefined) throw opts.answerThrows;
-      // What the posting path reports it posted: a card table's plain list
-      // rides the text copy beneath the prose.
-      return { ok: true, text: input.cardTable ? withCardList(input.text, input.cardTable) : input.text };
+      // What the posting path reports it posted: a table's plain list rides
+      // the text copy beneath the prose.
+      return { ok: true, text: textCopy(input.text, input.presentation) };
     },
     async postFailure(input) {
       record({
@@ -353,11 +356,21 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     },
     async setSessionStatus(channel, threadTs, status) {
       record({ kind: "status", channel, threadTs, status });
+      if (status !== "processing") settledThreads.add(threadTs);
+      else settledThreads.delete(threadTs);
       if (opts.statusThrows !== undefined) throw opts.statusThrows;
       return opts.status ?? { ok: true };
     },
     async renameSession(channel, threadTs, title) {
       record({ kind: "rename", channel, threadTs, title });
+    },
+    // Slack would not refuse a status line sent after the settle — it would
+    // do worse: the bridged call moves the session back to `processing`, and
+    // nothing clears it for the hour Slack takes to time it out. Held as a
+    // refusal so a line that lands late fails the test it happened in.
+    async setStatusLine(channel, threadTs, text) {
+      record({ kind: "statusLine", channel, threadTs, text });
+      if (settledThreads.has(threadTs)) refuse(refused, "status line after the settle", "reraised_processing");
     },
   };
 

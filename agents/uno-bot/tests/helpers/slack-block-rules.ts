@@ -33,6 +33,9 @@ const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
 const DATA_TABLE_ROWS = { min: 2, max: 201 };
 const DATA_TABLE_COLUMNS = 20;
 
+/** The fields a `data_table` takes, per the block reference. */
+const DATA_TABLE_FIELDS: ReadonlySet<string> = new Set(["type", "block_id", "caption", "rows", "page_size", "row_header_column_index"]);
+
 /** Characters across every cell of a `data_table` — and across every table in
  *  one message, which the reference caps at the same 20,000. */
 const DATA_TABLE_CHARS = 20_000;
@@ -136,9 +139,13 @@ function dataTableChars(block: Shape): number {
  * row has the same number of cells; at most 20 columns; 20,000 characters
  * across the cells. And one the reference gets wrong: a `raw_number` cell
  * without `text` was refused by the live API in Bill's DM on 2026-10-07,
- * though the schema leaves `text` optional.
+ * though the schema leaves `text` optional. The live API also refuses any
+ * field the reference does not list: the `table` block's `column_settings`
+ * was answered "invalid additional property" on 2026-10-08.
  */
 function dataTableRefusal(block: Shape): string | null {
+  const extra = Object.keys(block).find((k) => !DATA_TABLE_FIELDS.has(k));
+  if (extra) return `a data_table with ${extra}`;
   if (!nonEmpty(block.caption)) return "a data_table without a caption";
   const rows = Array.isArray(block.rows) ? block.rows : [];
   if (rows.length < DATA_TABLE_ROWS.min || rows.length > DATA_TABLE_ROWS.max) return `a data_table of ${rows.length} rows`;

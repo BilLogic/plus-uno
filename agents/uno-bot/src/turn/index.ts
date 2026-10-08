@@ -22,4 +22,5 @@ export * from "./delivery";
 export * from "./request";
 export * from "./antecedent";
 export * from "./intake-channel";
-export * from "./card-table";
+export * from "./result-table";
+export * from "./presentation";

@@ -1,5 +1,6 @@
-// A list of Roadmap cards reaches the person as a card table, built from the
-// cards the lookup returned — never from what the model typed.
+// A list of Roadmap cards reaches the person as a result table in its Roadmap
+// preset, built from the cards the lookup returned — never from what the model
+// typed.
 //
 // Driven across `runTurn` on the Turn harness: the model asks `roadmap_query`
 // for a table, the faked lookup answers with real-shaped cards, and the case
@@ -9,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { runTurn, type CardTable, type DeliveryCall } from "../src/turn/index";
+import { runTurn, type DeliveryCall, type ResultTable } from "../src/turn/index";
 import { harness, request } from "./helpers/turn-harness";
 
 /** One card as `roadmap_query` reports it. */
@@ -48,6 +49,13 @@ function resultsTheModelRead(h: ReturnType<typeof harness>): Array<Record<string
     .map((r) => JSON.parse(r.text) as Record<string, unknown>);
 }
 
+/** The table Delivery was handed beneath the answer, if any. */
+const tableOf = (answer: Extract<DeliveryCall, { kind: "answer" }>): ResultTable | undefined =>
+  answer.presentation?.table;
+
+/** The first column of each row: the card titles. */
+const titles = (table: ResultTable): unknown[] => table.rows.map((r) => r.cells[0]);
+
 /** The answer Delivery was handed. */
 function answerCall(calls: DeliveryCall[]): Extract<DeliveryCall, { kind: "answer" }> {
   const answer = calls.find((c): c is Extract<DeliveryCall, { kind: "answer" }> => c.kind === "answer");
@@ -65,16 +73,12 @@ test("a flagged enumeration of 13 cards hands Delivery the answer and a 13-row c
   assert.equal(outcome.disposition, "answered");
   const answer = answerCall(h.delivery.calls);
   assert.equal(answer.text, "Thirteen cards are in WIP; the table has them.");
-  const table = answer.cardTable as CardTable;
+  const table = tableOf(answer)!;
   assert.equal(table.rows.length, 13);
-  assert.deepEqual(table.rows[0], {
-    title: "Card 1",
-    url: "https://www.notion.so/card-1",
-    cardNumber: 401,
-    designStatus: "WIP",
-    devStatus: "Not started",
-  });
-  assert.deepEqual(table.filter, { designStatus: "WIP" });
+  assert.deepEqual(table.columns.map((c) => c.label), ["Card", "#", "Design Status", "Dev Status"]);
+  assert.deepEqual(table.rows[0]!.cells, ["Card 1", 401, "WIP", "Not started"]);
+  assert.equal(table.rows[0]!.url, "https://www.notion.so/card-1");
+  assert.equal(table.caption, "13 cards · Design Status WIP");
 });
 
 test("the model is told the table was attached, and how many rows it holds", async () => {
@@ -112,7 +116,7 @@ test("a list the lookup cut short is a partial table, with the whole count besid
   });
   await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
 
-  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  const table = tableOf(answerCall(h.delivery.calls))!;
   assert.equal(table.rows.length, 30);
   assert.equal(table.total, 41);
   assert.equal(table.partial, true);
@@ -126,7 +130,7 @@ test("a lookup that did not ask for a table attaches none, and says so", async (
   });
   await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
 
-  assert.equal(answerCall(h.delivery.calls).cardTable, undefined);
+  assert.equal(tableOf(answerCall(h.delivery.calls)), undefined);
   assert.equal(resultsTheModelRead(h)[0]?.table_attached, false);
 });
 
@@ -135,7 +139,7 @@ test("one card or none is never a table, though the lookup asked for one", async
     const h = harness({ replies: [{ toolCalls: [ASK] }, { text: "Here." }], toolResult: wipResult(n) });
     const outcome = await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
 
-    assert.equal(answerCall(h.delivery.calls).cardTable, undefined, `${n} cards`);
+    assert.equal(tableOf(answerCall(h.delivery.calls)), undefined, `${n} cards`);
     const [result] = resultsTheModelRead(h);
     assert.equal(result?.table_attached, false, `${n} cards`);
     assert.equal("row_count" in (result ?? {}), false, `${n} cards`);
@@ -163,9 +167,9 @@ test("two flagged lookups in one turn: the last that qualifies is the table", as
   });
   await runTurn(request({ text: "WIP, then Bryan's" }), h.deps);
 
-  const table = answerCall(h.delivery.calls).cardTable as CardTable;
-  assert.deepEqual(table.rows.map((r) => r.title), ["Card 7", "Card 8"]);
-  assert.deepEqual(table.filter, { person: "Bryan" });
+  const table = tableOf(answerCall(h.delivery.calls))!;
+  assert.deepEqual(titles(table), ["Card 7", "Card 8"]);
+  assert.equal(table.caption, "2 cards · with Bryan");
   assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, true, false]);
 });
 
@@ -197,9 +201,9 @@ test("a flagged title search tables only the cards whose titles contain the phra
   });
   const outcome = await runTurn(request({ text: "which cards mention onboarding?" }), h.deps);
 
-  const table = answerCall(h.delivery.calls).cardTable as CardTable;
-  assert.deepEqual(table.rows.map((r) => r.title), ["Onboarding 1", "Onboarding 2", "Onboarding 3"]);
-  assert.deepEqual(table.filter, { title: "onboarding" });
+  const table = tableOf(answerCall(h.delivery.calls))!;
+  assert.deepEqual(titles(table), ["Onboarding 1", "Onboarding 2", "Onboarding 3"]);
+  assert.equal(table.caption, '3 cards · title contains "onboarding"');
   assert.equal(table.partial, false);
   const [result] = resultsTheModelRead(h);
   assert.equal(result?.table_attached, true);
@@ -214,7 +218,7 @@ test("a title search with one hit, or only similar guesses, attaches nothing", a
     const h = harness({ replies: [{ toolCalls: [TITLE_ASK] }, { text: "Did you mean…" }], toolResult: titleResult(hits, similar) });
     await runTurn(request({ text: "the onboarding card?" }), h.deps);
 
-    assert.equal(answerCall(h.delivery.calls).cardTable, undefined, `${hits} hits`);
+    assert.equal(tableOf(answerCall(h.delivery.calls)), undefined, `${hits} hits`);
     const [result] = resultsTheModelRead(h);
     assert.equal(result?.table_attached, false, `${hits} hits`);
     assert.equal("row_count" in (result ?? {}), false, `${hits} hits`);
@@ -228,7 +232,7 @@ test("a title search that listed only the first of its hits is a partial table",
   });
   await runTurn(request({ text: "which cards mention onboarding?" }), h.deps);
 
-  const table = answerCall(h.delivery.calls).cardTable as CardTable;
+  const table = tableOf(answerCall(h.delivery.calls))!;
   assert.equal(table.rows.length, 30);
   assert.equal(table.total, 41);
   assert.equal(table.partial, true);
@@ -242,8 +246,8 @@ test("an enumeration then a flagged title search: the title search's hits are th
   });
   await runTurn(request({ text: "WIP, then onboarding" }), h.deps);
 
-  const table = answerCall(h.delivery.calls).cardTable as CardTable;
-  assert.deepEqual(table.rows.map((r) => r.title), ["Onboarding 1", "Onboarding 2"]);
+  const table = tableOf(answerCall(h.delivery.calls))!;
+  assert.deepEqual(titles(table), ["Onboarding 1", "Onboarding 2"]);
   assert.deepEqual(resultsTheModelRead(h).map((r) => r.table_attached), [true, true]);
 });
 
@@ -253,7 +257,7 @@ test("a failed lookup is handed back to the model untouched", async () => {
   await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
 
   assert.deepEqual(resultsTheModelRead(h)[0], { ok: false, error: "Notion is down" });
-  assert.equal(answerCall(h.delivery.calls).cardTable, undefined);
+  assert.equal(tableOf(answerCall(h.delivery.calls)), undefined);
 });
 
 test("the judge is told a table was attached, and reads the plain list the reader gets", async () => {
@@ -267,7 +271,7 @@ test("the judge is told a table was attached, and reads the plain list the reade
   const [judged] = h.judged;
   assert.equal(judged?.draft, "Three cards are in WIP; the table has them.", "the draft is the prose alone");
   assert.equal(
-    judged?.cardTableList,
+    judged?.tableList,
     ["Card 1 — #401 — WIP", "Card 2 — #402 — WIP", "Card 3 — #403 — WIP"].join("\n"),
   );
 });
@@ -280,7 +284,7 @@ test("with no table attached, the judge is asked exactly as before", async () =>
   await runTurn(request({ text: "which cards are in WIP?" }), h.deps);
 
   assert.equal(h.judged.length, 1);
-  assert.equal("cardTableList" in h.judged[0]!, false);
+  assert.equal("tableList" in h.judged[0]!, false);
 });
 
 /** Run `fn` with console.log captured. */
@@ -331,7 +335,7 @@ test("a draft that types out the table's rows posts without them, and the text c
   const stored = outcome.wrote.turns.find((t) => t.role === "assistant")?.content ?? "";
   assert.ok(stored.startsWith(prose));
   assert.equal(stored.split("\n").filter((l) => l.includes("#401")).length, 1, "the text copy lists each card once");
-  assert.ok(lines.some((l) => /\[card-table\].*removed 13\b/.test(l)), `logged: ${lines.join(" | ")}`);
+  assert.ok(lines.some((l) => /\[result-table\].*removed 13\b/.test(l)), `logged: ${lines.join(" | ")}`);
 });
 
 test("a line with no card number is never touched, though it names a card", async () => {

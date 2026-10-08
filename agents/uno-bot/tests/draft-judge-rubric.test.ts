@@ -84,3 +84,11 @@ test("the judge still carries the dimensions the rubric names as gating", () => 
   }
   assert.match(JUDGE_SYSTEM, /HARD GATES/, "the judge prompt dropped its hard gates");
 });
+
+test("the judge fails a reply that breaks the emoji budget", () => {
+  const gate = JUDGE_SYSTEM.split("\n").find((l) => /emoji/i.test(l) && l.trimStart().startsWith("-"));
+  assert.ok(gate, "the judge prompt names no emoji gate");
+  assert.match(gate!, /🎉/, "the gate names the one emoji a reply may carry");
+  assert.match(gate!, /error|refusal|factual/i, "the gate names where no emoji belongs at all");
+  assert.match(gate!, /gate:emoji/, "the gate has a failure code");
+});

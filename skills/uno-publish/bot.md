@@ -34,13 +34,13 @@ Sign-off tally:
 
 ```
 **Handoff sign-off — {project}**
-- Dev — ✅ {name} / waiting
-- PM — ✅ {name} / waiting
-- Stakeholder — ✅ {name} / waiting
+- Dev — signed off by {name} / waiting
+- PM — signed off by {name} / waiting
+- Stakeholder — signed off by {name} / waiting
 {3 of 3 → "gate passed"; otherwise who is still owed}
 ```
 
-Errors: `❌ Couldn't {action}: {reason}.` with the valid options named.
+A failure caused by a wrong input names the valid options as its next step.
 
 ## Hand-offs
 
