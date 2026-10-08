@@ -13,17 +13,19 @@
 // the block's are rich text. A source is kept as `{text, url}` and spelled as
 // Slack's `{type: "url", …}`. That spelling is the same on the stream chunk,
 // so `cardLinks` is the one place it is written, and `api.ts` imports it for
-// the chunk.
+// the chunk. The card's icon rides out through it too, as `estate-glyphs.ts`
+// built it.
 //
-// NO ICON. Slack refuses a `task_update` chunk carrying any `icon` — every
-// shape tried live on 2026-10-07 (an image URL, `url`, an `image` element, a
-// named icon, an emoji) came back `invalid_arguments`, despite the reference
-// page's example (docs/connectors/slack.md § Task cards). The block's icon
-// was never seen to work either, so a card carries none on either path.
+// NAMED ICONS ONLY. Slack takes a card's `icon` as `{type: "icon", name}`
+// with one of its built-in names — globe, book, map, code, comment, folder,
+// cube and image were all accepted live on 2026-10-07, on the stream chunk.
+// An image URL, a `url`, an `image` element, an emoji or an unknown name is
+// refused with `invalid_arguments` (docs/connectors/slack.md § Task cards).
 //
 // PURE: no `Env`, so the adapter can import it without importing `api.ts`.
 
 import type { PlanTask } from "./delivery-adapter";
+import type { SlackIcon } from "./estate-glyphs";
 
 /** Slack's limit on the tasks one `plan` block may hold. */
 export const PLAN_BLOCK_MAX_TASKS = 50;
@@ -44,20 +46,23 @@ function richText(text: string): Record<string, unknown> {
 }
 
 /**
- * A card's sources as Slack spells them, on a stream chunk and on a block
- * alike — ready to spread into either.
+ * A card's sources and icon as Slack spells them, on a stream chunk and on a
+ * block alike — ready to spread into either.
  *
- * @param task - The card's kept sources (`{text, url}`)
+ * @param task - The card's kept sources (`{text, url}`) and its icon
  * @param textPass - The path's own pass over a source's name: the chunk's
  *   markup pass, or the block's cut. A URL goes as the tool returned it, since
  *   a link is not text to escape.
  */
 export function cardLinks(
-  task: { readonly sources?: ReadonlyArray<{ text: string; url: string }> },
+  task: { readonly sources?: ReadonlyArray<{ text: string; url: string }>; readonly icon?: SlackIcon },
   textPass: (text: string) => string,
 ): Record<string, unknown> {
-  const { sources } = task;
-  return sources?.length ? { sources: sources.map((s) => ({ type: "url", text: textPass(s.text), url: s.url })) } : {};
+  const { sources, icon } = task;
+  return {
+    ...(sources?.length ? { sources: sources.map((s) => ({ type: "url", text: textPass(s.text), url: s.url })) } : {}),
+    ...(icon ? { icon } : {}),
+  };
 }
 
 /** One card as a `task_card` block element. */

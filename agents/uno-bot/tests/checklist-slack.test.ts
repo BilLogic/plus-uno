@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
 import { finishedProgress, type ToolProgressEvent } from "../src/agent/tool-progress";
-import { expectRefusals, recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
+import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
 const TARGET: SlackDeliveryTarget = {
   channel: "C123",
@@ -238,24 +238,20 @@ describe("the checklist", () => {
     assert.deepEqual(appends(slack), [["understand:in_progress"]]);
   });
 
-  it("sends no card an icon, and the strict client refuses one the way Slack does", async () => {
+  it("sends a card's icon on every update of it, and the opening card none", async () => {
+    // An icon is not text: Slack replaces it on an update rather than
+    // appending to it, so it rides each update the way the status does.
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
     await delivery.beginProgress("Working on it");
     await threeLookups(delivery);
     await delivery.endProgress("complete");
-    for (const call of slack.of("tasks")) assert.ok(call.tasks.every((t) => !("icon" in t)));
 
-    // Slack answered an image-URL icon with `invalid_arguments` on
-    // 2026-10-07; a card carrying one must fail here too.
-    const strict = recordingSlack();
-    const iconed = { id: "t1", title: "Reading GitHub", status: "in_progress" as const, icon: "https://example.test/github.png" };
-    await strict.client.appendTasks("C123", "stream-1", [iconed]);
-    assert.deepEqual(expectRefusals(strict.refused), [
-      { call: "task t1 with an icon that is not an object", error: "invalid_arguments" },
-    ]);
-    assert.equal(strict.landed.length, 0);
+    const sent = slack.of("tasks").flatMap((call) => call.tasks);
+    for (const t of sent.filter((t) => t.id === "tool-2")) assert.deepEqual(t.icon, { type: "icon", name: "book" });
+    assert.equal(sent.filter((t) => t.id === "tool-2").length, 2, "opened, then settled");
+    assert.ok(sent.filter((t) => t.id === "understand").every((t) => !("icon" in t)));
   });
 });
 

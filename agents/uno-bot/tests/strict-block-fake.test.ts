@@ -109,7 +109,8 @@ describe("the strict fake refuses what Slack refuses", () => {
 });
 
 describe("the stream fake takes a named icon on a task", () => {
-  const task = (icon: unknown) => ({ id: "t1", title: "Reading Notion", status: "in_progress" as const, icon });
+  // Any shape at all, past the type: judging it is the fake's job here.
+  const task = (icon: unknown) => ({ id: "t1", title: "Reading Notion", status: "in_progress" as const, icon: icon as never });
 
   it("lands a card with a named Slack icon", async () => {
     const slack = recordingSlack();
