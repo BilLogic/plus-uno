@@ -26,6 +26,7 @@ import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { DESIGN_STATUS_NOT_SET } from "./review-draft";
+import { createdDesignStatus } from "../integrations/notion";
 
 // One shared confirmation footer on every card. It names no approver, since
 // the confirmer set decides who may, and it points at the one button: the
@@ -243,13 +244,16 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
     .filter((f) => !TITLE_LABELS.has(lower(f)) && !BODY_LABELS.has(lower(f)) && lower(f) !== "target")
     .filter((f) => !SHAPE_LABELS.has(lower(f)) && (!f.nested || f.parent?.toLowerCase() === "properties"))
     .filter((f) => !/https?:\/\//.test(f.value));
-  const keys = keyFields.slice(0, KEY_FIELDS).map((f) => f.value.trim());
-  // A Roadmap PRD card says when its draft named no Design Status, as the
-  // pop-up does (`review-draft.ts`).
+  // A create on a Roadmap surface names the Design Status its write sets
+  // (`createdDesignStatus`), as the pop-up does (`review-draft.ts`) — never a
+  // drafted one, which the create does not write as the property.
   const surface = fields.find((f) => !f.nested && lower(f) === "surface")?.value.trim().toLowerCase();
-  if (surface === "prd" && !fields.some((f) => lower(f) === "design status") && keys.length < KEY_FIELDS) {
-    keys.push(`Design Status: ${DESIGN_STATUS_NOT_SET}`);
-  }
+  const roadmap = surface === "prd" || surface === "intake";
+  const keys = keyFields
+    .filter((f) => !(roadmap && lower(f) === "design status"))
+    .slice(0, KEY_FIELDS - (roadmap ? 1 : 0))
+    .map((f) => f.value.trim());
+  if (roadmap) keys.push(createdDesignStatus(surface!) ?? `Design Status: ${DESIGN_STATUS_NOT_SET}`);
   if (titled && target) keys.unshift(target);
 
   const verb = heading ?? (page ? (gateWordsFor("notion_update")?.verb ?? "update a Notion page") : undefined);

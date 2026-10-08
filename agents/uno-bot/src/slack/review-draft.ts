@@ -13,11 +13,12 @@
 import { textSections } from "./render";
 import { escapeSlackText } from "./mrkdwn";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { createdDesignStatus } from "../integrations/notion";
 import type { ProposalOperation } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
 
-/** Said where a Roadmap card's draft names no Design Status. */
+/** Said where a Roadmap card's write sets no Design Status. */
 export const DESIGN_STATUS_NOT_SET = "not set";
 
 /** Slack's cap on a `header` block's text. */
@@ -69,7 +70,9 @@ function notionCreate(input: Input): ReadOperation {
   if (surface === "prd" || surface === "intake") {
     const pillar = prop("product_pillar") || str(input.product_pillar);
     if (pillar) properties.push(["Product Pillar", pillar]);
-    properties.push(["Design Status", prop("design_status") || DESIGN_STATUS_NOT_SET]);
+    // What the write sets, not what the model drafted: a drafted Design
+    // Status is not a property the create writes.
+    properties.push(["Design Status", createdDesignStatus(surface) ?? DESIGN_STATUS_NOT_SET]);
     ["productpillar", "designstatus"].forEach((k) => shown.add(k));
   }
   if (surface === "decision") {

@@ -34,6 +34,15 @@ const TEAM_MAX = 200;
  *  queryDatabaseRows and so never got a maxPages. */
 export const TEAM_MAX_PAGES = 3;
 const DESIGN_STATUS_NEED_PRD = "Need PRD / Under Playground";
+
+/**
+ * The Design Status a `notion_create` on this surface writes, or null when it
+ * writes none. `planSurface` sets it from here, and the Review pop-up and the
+ * card's summary show it from here, so what a confirmer reads is what lands.
+ */
+export function createdDesignStatus(surface: string): string | null {
+  return surface.trim().toLowerCase() === "prd" ? DESIGN_STATUS_NEED_PRD : null;
+}
 const REQUEST_TIMEOUT_MS = 10000;
 const MAX_RICH_TEXT = 1900; // Notion caps a single rich_text content at 2000
 
@@ -1177,7 +1186,7 @@ function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreate
   switch (surface) {
     case "prd": {
       const properties: Record<string, unknown> = {
-        "Design Status": { status: { name: DESIGN_STATUS_NEED_PRD } },
+        "Design Status": { status: { name: createdDesignStatus("prd")! } },
         "Current Team": { multi_select: [{ name: "Design" }] },
       };
       if (input.productPillar?.trim()) {

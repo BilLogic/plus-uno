@@ -15,6 +15,7 @@ import { runReviewDecision, runReviewOpen, runReviewPush, type ReviewDoorDeps } 
 import { CONFIRM_FOOTER, proposalCardBlocks } from "../src/slack/proposal-render";
 import type { GateVerdict } from "../src/gate/index";
 import { recordingViews } from "./helpers/recording-slack";
+import { createdDesignStatus } from "../src/integrations/notion";
 
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
@@ -109,11 +110,11 @@ function lines(view: { blocks: Array<Record<string, unknown>> }): string[] {
 const indexOf = (all: string[], pattern: RegExp) => all.findIndex((l) => pattern.test(l));
 
 describe("the draft reads as a draft", () => {
-  it("leads with the key properties, by the database's names, and Design Status not set when the draft has none", async () => {
+  it("leads with the key properties, by the database's names, and the Design Status the create writes", async () => {
     const all = lines(await draftOf());
     const words = all.join("\n");
     assert.match(all[0]!, /New PRD card on the Roadmap/);
-    const order = [/\*Title:\* Goal cycle resets per session/, /\*Product Pillar:\* Toolkit/, /\*Design Status:\* not set/, /\*Summary:\* Tutors read/];
+    const order = [/\*Title:\* Goal cycle resets per session/, /\*Product Pillar:\* Toolkit/, /\*Design Status:\* Need PRD \/ Under Playground/, /\*Summary:\* Tutors read/];
     const at = order.map((p) => words.search(p));
     assert.ok(at.every((i) => i >= 0), JSON.stringify(at));
     assert.deepEqual([...at].sort((a, b) => a - b), at, "Title, Product Pillar, Design Status, Summary");
@@ -121,10 +122,18 @@ describe("the draft reads as a draft", () => {
     assert.doesNotMatch(words, /Surface|Properties:|Sections:|\bprd\b|Product pillar|Heading:|Body:/);
   });
 
-  it("names the Design Status the draft gives", async () => {
-    const words = lines(await draftOf({ input: { ...PRD_INPUT, properties: { product_pillar: "Toolkit", design_status: "Need PRD" } } })).join("\n");
-    assert.match(words, /\*Design Status:\* Need PRD/);
-    assert.doesNotMatch(words, /not set|Design status/);
+  it("shows the Design Status the write sets, from the code that sets it, whatever the draft says", async () => {
+    // The create writes this value; a drafted one is not the property.
+    assert.equal(createdDesignStatus("prd"), "Need PRD / Under Playground");
+    const words = lines(await draftOf({ input: { ...PRD_INPUT, properties: { product_pillar: "Toolkit", design_status: "Shipped" } } })).join("\n");
+    assert.ok(words.includes(`*Design Status:* ${createdDesignStatus("prd")}`), words);
+    assert.doesNotMatch(words, /not set|Shipped|Design status/);
+  });
+
+  it("says not set only where the write sets none: an intake card", async () => {
+    assert.equal(createdDesignStatus("intake"), null);
+    const words = lines(await draftOf({ input: { surface: "intake", title: "Fix the badge" } })).join("\n");
+    assert.match(words, /\*Design Status:\* not set/);
   });
 
   it("writes the body as headings and paragraphs, in the draft's section order, whatever order the keys came in", async () => {
@@ -204,15 +213,13 @@ describe("the draft reads as a draft", () => {
 describe("the thread card's summary", () => {
   const summaryOf = (text: string) => JSON.stringify((proposalCardBlocks(text) as unknown[])[0]);
 
-  it("names the key properties, not how the call is shaped", () => {
-    const text = PRD_TEXT.replace("    • *Product pillar:* Toolkit", "    • *Product pillar:* Toolkit\n    • *Design status:* Need PRD");
-    const summary = summaryOf(text);
-    assert.match(summary, /_Goal cycle resets per session_ · Toolkit · Need PRD/);
-    assert.doesNotMatch(summary, /· prd|Context/);
-  });
-
-  it("says Design Status: not set on a PRD card whose draft has none", () => {
-    assert.match(summaryOf(PRD_TEXT), /_Goal cycle resets per session_ · Toolkit · Design Status: not set/);
+  it("names the key properties and the Design Status the write sets, not how the call is shaped", () => {
+    const text = PRD_TEXT.replace("    • *Product pillar:* Toolkit", "    • *Product pillar:* Toolkit\n    • *Design status:* Shipped");
+    for (const card of [PRD_TEXT, text]) {
+      const summary = summaryOf(card);
+      assert.match(summary, /_Goal cycle resets per session_ · Toolkit · Need PRD \/ Under Playground/);
+      assert.doesNotMatch(summary, /· prd|Context|Shipped|not set/);
+    }
   });
 });
 
