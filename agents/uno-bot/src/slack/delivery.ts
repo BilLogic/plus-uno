@@ -15,6 +15,7 @@ import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
+import { refusalDetail } from "./api";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -46,7 +47,7 @@ export interface PostingClient {
     thread_ts?: string;
     text: string;
     blocks?: Array<Record<string, unknown>>;
-  }): Promise<{ ok: boolean }>;
+  }): Promise<{ ok: boolean; error?: string }>;
   startStream(
     channel: string,
     threadTs: string,
@@ -183,6 +184,11 @@ export { renderDeliveredBody, textSections } from "./render";
 //
 // `kind === "none"` still means no footer at all: a short acknowledgement is
 // not making checkable claims and does not need the label.
+/** Slack's error code and its own account of a refused post, for the log. */
+function refusalOf(posted: { ok: boolean; error?: string }): string {
+  return `${posted.error ?? "no error code"}${refusalDetail(posted)}`;
+}
+
 function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
@@ -262,17 +268,31 @@ export async function postTextVerified(
       }
     },
 
+    // THE LADDER. A part goes out as the model's Markdown in one `markdown`
+    // block, which renders tables, headings, lists, links and code as
+    // written — the `section` blocks this used to post are mrkdwn-only, so
+    // every table became `• a — b — c` lines with its header row gone. If
+    // Slack refuses the block, the part steps down to those `section` blocks,
+    // footer and all; if it refuses them too, to bare text. Each step down
+    // logs what Slack said, so a refusal is a line in the tail rather than a
+    // worse-looking answer nobody can explain.
+    //
+    // The `text` copy is the whole part on every rung: notifications and
+    // screen readers read it, and `postMessage` renders it to mrkdwn.
     async post(piece, withFooter) {
-      const blocks = [...textSections(piece), ...(withFooter ? footer : [])];
-      let posted = await deps.slack
-        .postMessage({ channel, thread_ts: threadTs, text: piece, blocks })
-        .catch(() => ({ ok: false as const }));
-      if (!posted.ok) {
-        console.warn("[slack] blocks post failed; retrying as plain text");
-        posted = await deps.slack
-          .postMessage({ channel, thread_ts: threadTs, text: piece })
-          .catch(() => ({ ok: false as const }));
-      }
+      const tail = withFooter ? footer : [];
+      const send = (blocks?: Array<Record<string, unknown>>) =>
+        deps.slack
+          .postMessage({ channel, thread_ts: threadTs, text: piece, ...(blocks ? { blocks } : {}) })
+          .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
+
+      let posted = await send([{ type: "markdown", text: piece }, ...tail]);
+      if (posted.ok) return true;
+      console.warn(`[slack] markdown block refused (${refusalOf(posted)}); retrying as section blocks`);
+      posted = await send([...textSections(piece), ...tail]);
+      if (posted.ok) return true;
+      console.warn(`[slack] section blocks refused (${refusalOf(posted)}); retrying as plain text`);
+      posted = await send();
       return !!posted.ok;
     },
   });

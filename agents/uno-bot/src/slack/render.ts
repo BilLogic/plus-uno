@@ -98,8 +98,9 @@ export function renderDeliveredBody(text: string): string {
   // block and a heading as heading styling, and only the plain-text fallback
   // omits them. Rendered in a real client, the table renders as a real table.
   //
-  // So the Markdown path leaves the model's Markdown alone. The mrkdwn paths —
-  // the blocks fallback and `postMessage`'s `text` — still degrade a table to
+  // So the Markdown paths — the stream and the posted `markdown` block — leave
+  // the model's Markdown alone. The mrkdwn paths — the `section` fallback and
+  // `postMessage`'s `text` — still degrade a table to
   // bullets inside `toSlackMrkdwn`, because a `section` block genuinely cannot
   // hold one. The lesson kept: read the RENDER, never the stored text.
   const cleaned = stripTrailingConfidence(text);

@@ -100,7 +100,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 | System | Day-of | — |
 ```
 
-**The one place a table does not survive** is the blocks fallback, used when a streamed reply fails to post: a `section` block cannot hold one, so the Worker degrades it there to a bullet per row (`**Column:** value · **Column:** value`). A rare, graceful downgrade — not a reason to avoid tables.
+**A table renders as a table on every answer path**: the streamed part goes out as `markdown_text`, and every posted part (channel answers, continuation parts, every answer while streaming is off) as a `markdown` block. The one rung where a table degrades is the `section` fallback, reached only when Slack refuses the `markdown` block: a `section` cannot hold a table, so each row becomes `• a — b — c` and the header row is dropped. A refusal is logged, so a degraded table is a line in the tail.
 
 *(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
 
@@ -108,14 +108,16 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 | Path | What is sent | Converted by |
 |---|---|---|
-| Streamed reply (when streaming is on) | `markdown_text` — your Markdown, with only the markup pass below | `sanitizeStreamChunk` in `appendStream` / `stopStream` |
-| Blocks fallback (stream failed) | `section` blocks, which are mrkdwn-only | `toSlackMrkdwn` in `textSections` |
-| `chat.postMessage` `text` | mrkdwn | `toSlackMrkdwn` in `postMessage` |
-| Proposal card | mrkdwn sections + ✅/⛔ buttons | `toSlackMrkdwn` via `textSections` |
+| Streamed first part (streaming on, in a thread) | `markdown_text` — your Markdown, with only the markup pass below | `sanitizeStreamChunk` in `appendStream` / `stopStream` |
+| Posted part (channel answers, continuation parts, streaming off, a stream that failed) | one `markdown` block — your Markdown as written — plus the footer `context` block on the last part | nothing; `sanitizeMarkdownMarkup` escapes only unparseable `<…>` |
+| Fallback rung 1 (Slack refused the `markdown` block) | `section` blocks, which are mrkdwn-only, plus the footer | `toSlackMrkdwn` in `textSections` |
+| Fallback rung 2 (Slack refused the sections too) | bare `text`, no footer | `toSlackMrkdwn` in `postMessage` |
+| `chat.postMessage` `text`, every rung | the whole part as mrkdwn, for notifications and screen readers | `toSlackMrkdwn` in `postMessage` |
+| Proposal card, Figma library posts | mrkdwn sections (+ ✅/⛔ buttons on a card) | `toSlackMrkdwn` via `textSections` |
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). Worker code escapes a title inside a link label (`escapeSlackText`).
+**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). A `markdown` block keeps your `&`, `<` and `>` as written and escapes only a `<…>` token that is not valid markup (`sanitizeMarkdownMarkup`). Worker code escapes a title inside a link label (`escapeSlackText`).
 
 #### Streamed text
 
@@ -127,7 +129,7 @@ Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading`
 
 **A task card carries no icon.** Slack's reference page shows an `icon` on a `task_update` chunk, but on 2026-10-07 production refused every shape tried with `invalid_arguments` (`failed to match exactly one allowed schema [json-pointer:/chunks/0]`): an image URL as `name`, a `url`, an `image` element, a named icon, an emoji. The same chunk without `icon` was taken, as were `details`, `output`, `sources` and `plan_update`. To recheck, send raw chunks to a test DM through `/debug/slack-stream?…&chunks=`.
 
-Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
+Block Kit **is** wired (`delivery.ts` posts a `markdown` block with a `section` and a bare-text fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 
 ### The same Markdown goes everywhere else too
 
