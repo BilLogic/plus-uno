@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,772 chars from 16 files**, against an assembled budget of 175,500 (16,728 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,388 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **159,225 chars from 16 files**, against an assembled budget of 175,500 (16,275 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,841 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,223 (−7,696 ide-only) | 10,223 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,969 | 30,220 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,616 | 57,877 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,270 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,972 | 71,287 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 78,000 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 83,287 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,687 | 90,016 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,418 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,814 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 113,812 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 20,609 (−5,803 ide-only) | 134,463 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 137,747 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 144,263 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 148,926 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 158,772 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,995 | 30,246 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,616 | 57,903 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,296 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,972 | 71,313 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 78,026 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 83,313 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,687 | 90,042 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,444 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,840 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 113,838 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 21,036 (−5,803 ide-only) | 134,916 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 138,200 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 144,716 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 149,379 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 159,225 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -233,7 +233,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **superseded card** | a proposal card retired by a revision staged later in the same reply thread, or retired the moment a turn commits to writing that revision: it executes nothing and answers that it was replaced — a different answer from expired, which is the card's TTL running out | "expired card" |
 | **agent session** | the Slack object a uno-bot conversation runs inside on the agent surface, addressed by `channel_id` + `thread_ts` and moved between four lifecycle statuses — `active` · `processing` · `suspended` · `closed` — with `agents.sessions.setStatus`. Replaces `assistant.threads.*`, deprecated February 2027. While it sits in `processing` Slack offers a stop control on the session (`agent_session_stopped`); a press moves no status, so the app transitions the session itself | "assistant thread", "the panel thread" |
 | **working signal** | what tells a person a turn is in flight: the **agent session** moved to `processing` when the work starts and settled on every exit, raised and cleared as ONE pairing by `withWorkingSignal` (`agents/uno-bot/src/turn/delivery.ts`), whose `finally` makes the clear survive a new exit. Only the settle takes it down — posting the answer does not — and each half logs a `[working]` line with the turn's external spend. Turn owns that pairing; the one other settler is the in-thread stop door (`slack/stop-doors.ts`), as Slack requires on a stop press (#576) | "the thinking indicator", "the status line" (the status is what Slack is told; the signal is what the person sees) |
-| **checklist** | the Slack `plan` a person watches while a turn works: a **task card** per tool call (in progress → complete or error), the answer posted beneath. A task card is neither a Roadmap card nor a **proposal card**: it approves nothing | "plan stream", "progress surface", "steps" |
+| **checklist** | the Slack `plan` a person watches while a turn works: a **task card** per lookup or routing choice, consecutive lookups of one kind sharing one, the answer posted beneath. A task card is neither a Roadmap card nor a **proposal card**: it approves nothing | "plan stream", "progress surface", "steps" |
 | **card table** | the sortable table of Roadmap cards beneath an answer, built from the cards one lookup returned, not from the model's text. One per answer at most; the prose summarises it and the text copy lists it for later turns. Not a Markdown table or the **tool table** | "data table", "the grid" |
 | **corpus** | the harness's one reader of repo files (`scripts/lib/corpus.mjs`): which documents exist under a path, what a file says, where a doc's frontmatter stops, its markdown links, its heading outline. A check asks it rather than the filesystem, and it takes a root so its test reads a fixture tree — the listing and the read taking the same root is what keeps a second one from appearing | "the walker", "the parser" (there is one of each) |
 | **ratchet** | a check's recorded baseline, and the module that owns it (`scripts/lib/ratchet.mjs`): the READ — no check parses a record itself, and what it gates on that the module does not own comes back through `envelope()`; which direction fails; the stale-entry and placeholder-reason sweeps; and the `--update` write, a MERGE in the record's own ENCODING, so a no-movement write moves no byte and a key the module does not own survives it. Each record's SHAPE is one row in `ratchet-shapes.mjs`; the invariant is asserted against all of them in `ratchet-conformance.mjs`. A recorded count may fall and a rise is a finding; an entry the run stops finding is one too, since a ratchet that only grows is a list; an absent or unreadable record fails loudly, because an empty baseline reads green | "the whitelist", "the exceptions file", "the allow-list" |
@@ -1031,6 +1031,8 @@ Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading`
 #### Task cards
 
 **A task card's icon is a named Slack icon, and nothing else.** The shape is `icon: {type: "icon", name}` with one of Slack's built-in names, on the `task_update` chunk and on a static plan's `task_card` alike. Production took `globe`, `book`, `map`, `code`, `comment`, `folder`, `cube` and `image` on 2026-10-07, and refused with `invalid_arguments` (`failed to match exactly one allowed schema [json-pointer:/chunks/0]`) an image URL as `name`, a `url`, an `image` element, an emoji and an unknown name; `call`, `email`, `file`, `link` and `user` fail the validator too. Each card shows its estate's glyph — Notion `book`, blueprint `map`, GitHub `code`, Slack `comment`, Storybook `cube`, Figma `image`, and a link on no estate `globe`; on `plus-uno.netlify.app` the path decides, so `/storybook/…` is Storybook, `/blueprint/…` the blueprint, and any other path `globe` — and a card reading no estate shows none (`agents/uno-bot/src/slack/estate-glyphs.ts`). To recheck, send raw chunks to a test DM through `/debug/slack-stream?…&chunks=`.
+
+**The working status names the card in progress** ("is checking the Roadmap board…"). `agents.sessions.setStatus` takes a lifecycle value and no words, so the words go by the bridged `assistant.threads.setStatus`, always non-empty, on the checklist's own update chain, and stop before the settle: a line landing after it would move the session back to `processing` (`agents/uno-bot/src/slack/assistant.ts` § `setStatusLine`).
 
 Block Kit **is** wired (`delivery.ts` posts a `markdown` block with a `section` and a bare-text fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 
