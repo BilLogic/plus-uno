@@ -265,7 +265,7 @@ Every Figma message passes these eight:
 5. No decorative emoji: 🎉 appears only on a ship, and 🐐 only in the label.
 6. The words match the table above.
 7. Anything written into Figma leads with `🐐 le goat (uno-bot) · AI-generated`.
-8. Under 1,500 characters; a longer list goes in the thread. The weekly precedence list is the exception: its items are a result table of up to 30 rows in one message.
+8. Under 1,500 characters; a longer list goes in the thread. Two exceptions carry their list as a result table in one message: the weekly precedence list (up to 30 rows), and the library publish post, which leads with a release card and a table of every changed component above its decision, so its thread gets the list only when the table could not post.
 
 **At the gate,** the library card, the weekly precedence card and the drift card answer in their own words, because the gate's shared lines assume a card someone asked for. A ⛔ closes the card with what it did ("Intake only", "Nothing filed this week", "No intake filed") and who decided. A ✅ or ⛔ after the window is told the card closed and what happens next. A replaced card, or a reaction beside one, points at the card itself, with no ⚠️ to name. Each card's lines sit beside its copy (`PendingProposal.stated`), and the same test holds them to this section.
 <!-- /ide-only -->
