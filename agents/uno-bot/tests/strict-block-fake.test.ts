@@ -7,7 +7,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { expectRefusals, recordingPosting, recordingSlack } from "./helpers/recording-slack";
+import { expectRefusals, recordingPosting, recordingSlack, recordingViews } from "./helpers/recording-slack";
 import { planBlock } from "../src/slack/plan-block";
 import { textSections } from "../src/slack/render";
 
@@ -193,5 +193,42 @@ describe("the stream fake takes a named icon on a task", () => {
       assert.deepEqual(expectRefusals(slack.refused).map((r) => r.error), ["invalid_arguments"], JSON.stringify(icon));
       assert.equal(slack.landed.length, 0);
     }
+  });
+});
+
+describe("the views fake holds a modal to Slack's view rules", () => {
+  const modal = (extra: Record<string, unknown> = {}, blocks: unknown[] = [section("The draft")]) => ({
+    type: "modal",
+    title: { type: "plain_text", text: "Review proposal" },
+    close: { type: "plain_text", text: "Close" },
+    blocks,
+    ...extra,
+  });
+  const input = {
+    type: "input",
+    block_id: "note",
+    label: { type: "plain_text", text: "Note" },
+    element: { type: "plain_text_input", action_id: "v" },
+  };
+
+  it("refuses an input in a view with no submit", async () => {
+    const views = recordingViews({ alreadyOpen: ["V1"] });
+    assert.equal(await views.client.update("V1", modal({}, [input])), false);
+    assert.equal(await views.client.update("V1", modal({ submit: { type: "plain_text", text: "Send" } }, [input])), true);
+    assert.deepEqual(expectRefusals(views.refused).map((r) => r.error), ["invalid_arguments"]);
+  });
+
+  it("refuses a third footer button: the footer is submit and close", async () => {
+    const views = recordingViews({ alreadyOpen: ["V1"] });
+    assert.equal(await views.client.update("V1", modal({ approve: { type: "plain_text", text: "Approve" } })), false);
+    assert.deepEqual(expectRefusals(views.refused).map((r) => r.error), ["invalid_arguments"]);
+  });
+
+  it("pushes at most three views in one stack", async () => {
+    const views = recordingViews({ alreadyOpen: ["V1"] });
+    assert.equal(await views.client.push("T", modal()), "V2");
+    assert.equal(await views.client.push("T", modal()), "V3");
+    assert.equal(await views.client.push("T", modal()), null);
+    assert.deepEqual(expectRefusals(views.refused).map((r) => r.error), ["push_limit_reached"]);
   });
 });

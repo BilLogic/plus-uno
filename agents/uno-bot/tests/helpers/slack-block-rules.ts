@@ -416,6 +416,17 @@ const MAX_VIEW_BLOCKS = 100;
 /** A view's `private_metadata`, per the view reference: 3,000 characters. */
 const VIEW_METADATA_CHARS = 3000;
 
+/** Every field a modal view takes, per the view reference. Its footer is
+ *  `submit` and `close` and nothing else: a third button has no field to go
+ *  in, so it must be an actions block in the body. */
+const VIEW_FIELDS: ReadonlySet<string> = new Set([
+  "type", "title", "blocks", "close", "submit", "private_metadata", "callback_id",
+  "clear_on_close", "notify_on_close", "external_id", "submit_disabled",
+]);
+
+/** Views in one modal stack, per `views.push`: the first and two pushed. */
+export const MAX_VIEW_STACK = 3;
+
 /**
  * Why Slack would refuse a modal view (`views.open`, `views.update`), or null.
  *
@@ -426,6 +437,8 @@ const VIEW_METADATA_CHARS = 3000;
  */
 export function viewRefusal(view: unknown): string | null {
   if (!isShape(view) || view.type !== "modal") return "a view that is not a modal";
+  const extra = Object.keys(view).find((key) => !VIEW_FIELDS.has(key));
+  if (extra) return `a view field ${extra} (a footer holds only submit and close)`;
   for (const key of ["title", "close", "submit"] as const) {
     const label = view[key];
     if (label === undefined && key !== "title") continue;

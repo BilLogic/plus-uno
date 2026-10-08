@@ -25,28 +25,33 @@ import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
-import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
+import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
 import {
-  checkedEditsView,
   runReviewDecision,
   runReviewOpen,
+  runReviewPush,
+  saveReviewEdits,
   startRevision,
   type ReviewDoorDeps,
   type ReviewViewState,
 } from "./review-door";
 import {
-  REVIEW_APPROVE_ACTION_ID,
   REVIEW_CALLBACK_ID,
   REVIEW_CHANGES_ACTION_ID,
+  REVIEW_CHANGES_CALLBACK_ID,
+  REVIEW_EDIT_ACTION_ID,
+  REVIEW_EDIT_CALLBACK_ID,
   REVIEW_REJECT_ACTION_ID,
+  REVIEW_REJECT_CALLBACK_ID,
+  NOTE_BLOCK_ID,
+  noticeView,
   reviewNoteOf,
   reviewedCardOf,
 } from "./review-view";
-import { fieldsFromBlocks, type OptionSource } from "./review-fields";
+import type { OptionSource } from "./review-fields";
 import { databaseOptions } from "../integrations/notion";
-import type { ReviewDecision } from "../gate/index";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { conversationKey, enqueueAgentJob } from "./events";
 import type { SlackMessageEvent } from "./types";
@@ -79,7 +84,14 @@ interface InteractionPayload {
   trigger_id?: string;
   /** Set when the click was inside a modal rather than on a message, and on a
    *  modal's submit. `state.values` holds its inputs as the person left them. */
-  view?: { id?: string; private_metadata?: string; callback_id?: string; state?: { values?: ReviewViewState } } & Record<
+  view?: {
+    id?: string;
+    /** The first view in a stack: the draft, under a view pushed over it. */
+    root_view_id?: string;
+    private_metadata?: string;
+    callback_id?: string;
+    state?: { values?: ReviewViewState };
+  } & Record<
     string,
     unknown
   >;
@@ -106,7 +118,7 @@ export function handleInteraction(
   env: Env,
   payload: InteractionPayload,
   ctx: ExecutionContext,
-): Response {
+): Response | Promise<Response> {
   switch (payload.type) {
     // Message shortcut — the context-menu entry on a message. Slack wants a 200
     // within 3000ms and does not retry a timeout, so every slow step (permalink,
@@ -135,7 +147,7 @@ export function handleInteraction(
       }));
       return new Response("", { status: 200 });
     }
-    // A modal sent: the Review pop-up's Check edits, or the feedback pop-up.
+    // A modal sent: one of the Review pop-up's views, or the feedback pop-up.
     // Each is answered in the ack itself, inside Slack's three seconds, and
     // anything slower runs after it.
     case "view_submission": {
@@ -149,14 +161,7 @@ export function handleInteraction(
         }));
         return ack ? Response.json(ack) : new Response("", { status: 200 });
       }
-      // The Review pop-up's Check edits: `response_action: "update"` is the
-      // only way a submit keeps its modal open, redrawn with the edits kept
-      // and one alert about them. Nothing is read.
-      if (!payload.view || callbackId !== REVIEW_CALLBACK_ID) {
-        console.log(`[interactive] unhandled view_submission ${callbackId ?? "(none)"}`);
-        return new Response("", { status: 200 });
-      }
-      return Response.json({ response_action: "update", view: checkedEditsView(payload.view) });
+      return submitReview(env, payload, ctx);
     }
     default:
       console.log(`[interactive] unhandled type: ${payload.type}`);
@@ -175,9 +180,9 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
-  if (actionId === REVIEW_APPROVE_ACTION_ID) return decideInReview(env, payload, "confirm");
-  if (actionId === REVIEW_CHANGES_ACTION_ID) return decideInReview(env, payload, "revise");
-  if (actionId === REVIEW_REJECT_ACTION_ID) return decideInReview(env, payload, "cancel");
+  if (actionId === REVIEW_CHANGES_ACTION_ID) return pushInReview(env, payload, "changes");
+  if (actionId === REVIEW_REJECT_ACTION_ID) return pushInReview(env, payload, "reject");
+  if (actionId === REVIEW_EDIT_ACTION_ID) return pushInReview(env, payload, "edit");
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
@@ -262,27 +267,69 @@ async function openReview(env: Env, payload: InteractionPayload): Promise<void> 
   await runReviewOpen({ triggerId, channel, messageTs, userId, ...(cardText ? { cardText } : {}) }, reviewDoorDeps(env));
 }
 
-async function decideInReview(env: Env, payload: InteractionPayload, decision: ReviewDecision): Promise<void> {
-  const viewId = payload.view?.id;
+/** Needs changes, Reject or Edit fields, pressed on the draft: the view that
+ *  holds its input, pushed over it on the click's trigger. */
+async function pushInReview(env: Env, payload: InteractionPayload, step: "changes" | "reject" | "edit"): Promise<void> {
+  const triggerId = payload.trigger_id;
   const card = reviewedCardOf(payload.view?.private_metadata);
   const userId = payload.user?.id;
-  if (!viewId || !card || !userId) return;
-  const state = payload.view?.state?.values;
-  const note = reviewNoteOf(payload.view?.state);
-  const blocks = payload.view?.blocks;
-  await runReviewDecision(
-    {
-      viewId,
-      channel: card.channel,
-      messageTs: card.ts,
-      userId,
-      decision,
-      ...(note ? { note } : {}),
-      ...(state ? { state } : {}),
-      ...(Array.isArray(blocks) ? { fields: fieldsFromBlocks(blocks) } : {}),
-    },
-    reviewDoorDeps(env),
+  if (!triggerId || !card || !userId) return;
+  await runReviewPush({ triggerId, card, userId, step }, reviewDoorDeps(env));
+}
+
+/**
+ * A Review view's submit: Approve on the draft, Send changes, Reject, or Save
+ * edits. A decision is acked at once with a line that says it is under way,
+ * and the door answers in the same view once the Gate has (`showIn`). Save
+ * edits is answered in the ack: Slack's error under a refused field, or an
+ * empty ack that closes the view onto the redrawn draft.
+ */
+async function submitReview(env: Env, payload: InteractionPayload, ctx: ExecutionContext): Promise<Response> {
+  const view = payload.view;
+  const callbackId = view?.callback_id;
+  const card = reviewedCardOf(view?.private_metadata);
+  const userId = payload.user?.id;
+  const viewId = view?.id;
+  const known = [REVIEW_CALLBACK_ID, REVIEW_CHANGES_CALLBACK_ID, REVIEW_REJECT_CALLBACK_ID, REVIEW_EDIT_CALLBACK_ID];
+  if (!view || !callbackId || !known.includes(callbackId) || !card || !userId || !viewId) {
+    console.log(`[interactive] unhandled view_submission ${callbackId ?? "(none)"}`);
+    return new Response("", { status: 200 });
+  }
+  const rootViewId = view.root_view_id && view.root_view_id !== viewId ? view.root_view_id : undefined;
+  const deps = reviewDoorDeps(env);
+
+  if (callbackId === REVIEW_EDIT_CALLBACK_ID) {
+    if (!rootViewId) return new Response("", { status: 200 });
+    const blocks = Array.isArray(view.blocks) ? view.blocks : [];
+    const ack = await saveReviewEdits({ rootViewId, card, userId, blocks, ...(view.state?.values ? { state: view.state.values } : {}) }, deps);
+    return ack ? Response.json(ack) : new Response("", { status: 200 });
+  }
+
+  const note = reviewNoteOf(view.state);
+  if (callbackId === REVIEW_CHANGES_CALLBACK_ID && !note) {
+    return Response.json({ response_action: "errors", errors: { [NOTE_BLOCK_ID]: "Write what to change, so I can revise the draft." } });
+  }
+  const decision = callbackId === REVIEW_CALLBACK_ID ? "confirm" : callbackId === REVIEW_CHANGES_CALLBACK_ID ? "revise" : "cancel";
+  const underWay = { confirm: "Approving…", revise: "Sending your note…", cancel: "Rejecting…" }[decision];
+  ctx.waitUntil(
+    runReviewDecision(
+      {
+        viewId,
+        ...(rootViewId ? { rootViewId } : {}),
+        channel: card.channel,
+        messageTs: card.ts,
+        userId,
+        decision,
+        ...(note ? { note } : {}),
+        // Only the draft carries saved edits, and only Approve writes them.
+        ...(decision === "confirm" && card.edits ? { edits: card.edits } : {}),
+      },
+      deps,
+    ).catch((err) => {
+      console.error(`[interactive] review ${decision} failed: ${err instanceof Error ? err.message : String(err)}`);
+    }),
   );
+  return Response.json({ response_action: "update", view: noticeView(card, underWay) });
 }
 
 /**
@@ -331,6 +378,7 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
     standingConfirmers: standingConfirmersOf(env),
     views: {
       open: (triggerId, view) => viewsOpen(env, triggerId, view),
+      push: (triggerId, view) => viewsPush(env, triggerId, view),
       update: (viewId, view) => viewsUpdate(env, viewId, view),
     },
     delivery: (target) => slackDelivery(env, target),
