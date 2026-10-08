@@ -71,7 +71,7 @@ import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
 import { renderGateNote } from "./gate-note";
 import { planBlock } from "./plan-block";
-import type { CardTable, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
+import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
@@ -226,8 +226,8 @@ export interface SlackDeliveryClient {
     text: string;
     recipient: { userId: string; team?: string };
     footerHint?: FooterKind;
-    /** The card table beneath the answer, when the turn left one. */
-    cardTable?: CardTable;
+    /** What rides beneath the answer, when the turn left anything. */
+    presentation?: Presentation;
   }): Promise<{ ok: boolean; text: string }>;
   /** The visible failure: the ❌ and the message that says how far it got. */
   postFailure(input: {
@@ -881,7 +881,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       }
     },
 
-    async postAnswer(text, cardTable): Promise<PostResult> {
+    async postAnswer(text, presentation): Promise<PostResult> {
       // The checklist settles and its stream stops FIRST, then the answer
       // posts beneath it the ordinary way. The stream's ts is not handed on:
       // the answer is markdown, and markdown appended into a stream opened in
@@ -897,9 +897,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         // the ids and it never handed them over (#572).
         recipient: { userId: target.userId, team: target.team },
         footerHint: target.footerHint,
-        // Handed on as data: the block and the plain list are the posting
-        // path's to spell (`slack/card-table-block.ts`).
-        ...(cardTable ? { cardTable } : {}),
+        // Handed on as data: the blocks and the plain list are the posting
+        // path's to spell (`slack/result-table-block.ts`).
+        ...(presentation ? { presentation } : {}),
       });
       return { ok: posted.ok, text: posted.text };
     },

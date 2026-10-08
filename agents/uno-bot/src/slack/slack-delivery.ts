@@ -126,8 +126,8 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       await slackCall(env, "reactions.remove", { channel, timestamp: ts, name });
     },
     postMessage: (input) => postMessage(env, input),
-    postAnswer: ({ channel, threadTs, text, recipient, footerHint, cardTable }) =>
-      postTextVerified(posting, channel, threadTs, text, recipient, footerHint, cardTable ? { cardTable } : {}),
+    postAnswer: ({ channel, threadTs, text, recipient, footerHint, presentation }) =>
+      postTextVerified(posting, channel, threadTs, text, recipient, footerHint, presentation ? { presentation } : {}),
     postFailure: ({ channel, threadTs, userMsgTs, stage, err }) =>
       postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage),
     startStream: (channel, threadTs, userId, team) =>

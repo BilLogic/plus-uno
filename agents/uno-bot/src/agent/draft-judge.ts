@@ -194,14 +194,14 @@ VERDICT ONLY. This draft is long, and it ships as written whatever you find, so 
 or
   {"verdict":"fail","failed":["D9","gate:formatting"]}`;
 
-/** Told to the judge ONLY when a card table rides beneath the draft: that it
- *  is there, what it lists, and that it is not the judge's to rewrite. The
- *  rows came from the Roadmap lookup itself, so grading them against the
- *  rubric would be grading the board, and a revision that pasted them back
- *  into the prose would print every card twice. */
-function cardTableNote(list: string): string {
+/** Told to the judge ONLY when a result table rides beneath the draft: that
+ *  it is there, what it lists, and that it is not the judge's to rewrite. The
+ *  rows came from a lookup itself, so grading them against the rubric would be
+ *  grading the source, and a revision that pasted them back into the prose
+ *  would print every row twice. */
+function tableNote(list: string): string {
   return (
-    "CARD TABLE ATTACHED. Beneath the draft, the reader sees a sortable table of these Roadmap cards, " +
+    "TABLE ATTACHED. Beneath the draft, the reader sees a sortable table of these rows, " +
     "built by code from the lookup's own rows (the message's plain-text copy lists them the same way):\n" +
     `${list}\n` +
     "Judge the draft as the reader sees it, with this table beneath it: a draft that gives the count, " +
@@ -263,7 +263,7 @@ async function callJudgeModel(
     stalled: boolean;
     extraInstruction?: string;
     mode: JudgeMode;
-    cardTableList?: string;
+    tableList?: string;
   },
 ): Promise<ModelText> {
   const prompt =
@@ -287,7 +287,7 @@ async function callJudgeModel(
     // What the reader sees beneath the draft. Without it a summary that points
     // at the table ("thirteen cards, the table has them") reads as a reply that
     // never answered, and D1 fails the very shape the persona asks for.
-    (ctx.cardTableList ? `\n\n${cardTableNote(ctx.cardTableList)}` : "") +
+    (ctx.tableList ? `\n\n${tableNote(ctx.tableList)}` : "") +
     // A deterministic pre-check already decided WHAT is wrong; passing its one
     // sentence through beats asking the judge to rediscover it, and a specific
     // instruction is what keeps the repair from producing generic filler.
@@ -330,7 +330,7 @@ export async function reviewDraft(
     /** One extra line appended to the judge prompt. Carries the specific repair
      *  the caller's own check already identified. */
     extraInstruction?: string;
-    /** The plain list of the card table beneath the draft, when one is
+    /** The plain list of the result table beneath the draft, when one is
      *  attached. The judge reads it; it never counts toward the draft's
      *  length, so it moves neither the floor nor either window. Those
      *  windows measure what the model wrote and what a rewrite would have to
@@ -339,10 +339,10 @@ export async function reviewDraft(
      *  call the same summary without a table never pays, and a long answer
      *  could be pushed into verdict-only by rows the judge was never going to
      *  rewrite. */
-    cardTableList?: string;
+    tableList?: string;
   },
 ): Promise<JudgeOutcome> {
-  const { userText, draft, priorAssistantText, forceReason, extraInstruction, cardTableList } = args;
+  const { userText, draft, priorAssistantText, forceReason, extraInstruction, tableList } = args;
   const correction = args.correction === true;
   const toolsUsedThisTurn = args.toolsUsedThisTurn ?? [];
   // The length floor is BYPASSED on a correction. The 2026-08-17 denial that
@@ -405,7 +405,7 @@ export async function reviewDraft(
         stalled,
         extraInstruction,
         mode,
-        cardTableList,
+        tableList,
       }),
       new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
     ]);
