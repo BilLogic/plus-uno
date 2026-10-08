@@ -725,6 +725,8 @@ export function dmCaptureProposal(
     confirmers: [posted.owner],
     sweepRun: posted.runDate,
     supersedeKey: SWEEP_KEY,
+    // What its carousel showed, so a `drop N` revision is a carousel too.
+    ...(card.fixes ? { fixes: card.fixes } : {}),
   };
 }
 

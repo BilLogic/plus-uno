@@ -28,7 +28,7 @@
 import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalOperation, SweepShare } from "../thread-state/index";
-import type { CardFix, ProposalCard } from "../turn/index";
+import type { CardFix, CardFixes, ProposalCard } from "../turn/index";
 import { STANDING_TOO, addedContent, captureConfirmers, captureFixWords, captureItemLines, captureLead } from "./capture-lines";
 import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
@@ -383,6 +383,29 @@ export function sweepCardPick(text: string, count: number): number[] | null {
   const named = new Set(numbers.map((n) => n - 1));
   const keep = m[1]!.toLowerCase().startsWith("keep");
   return Array.from({ length: count }, (_, i) => i).filter((i) => named.has(i) === keep);
+}
+
+/**
+ * The fixes a `drop N` revision shows: the kept ones, renumbered from 1 so the
+ * next `drop N` names the card that reads N, under a head and a confirm line
+ * whose counts are the revision's own. The confirmers' sentence is the card's,
+ * since the same people may confirm; the revision keeps its card's deadline,
+ * so the "expires in" hours are not repeated.
+ *
+ * @param fixes - The card's fixes, as staged with it
+ * @param kept - The 0-based indexes kept (`sweepCardPick`), in card order
+ */
+export function keptFixes(fixes: CardFixes, kept: readonly number[]): CardFixes {
+  const n = kept.length;
+  const items = kept.map((at, i) => {
+    const fix = fixes.items[at]!;
+    return { ...fix, detail: fix.detail.replace(/^\d+\. /, `${i + 1}. `) };
+  });
+  const applies = `One ✅ applies ${n === 1 ? "it" : `all ${n}`}${n === 1 ? "." : "; reply `drop 2` to leave one out."}`;
+  const tail = fixes.tail
+    .replace(/One ✅ applies (?:it|all \d+); reply `drop 2` to leave one out\./, applies)
+    .replace(/Expires in \d+ h, with no reminder\./, "Expires when the card it revises would have, with no reminder.");
+  return { head: `**${SWEEP_CARD_MARK}** — revised: ${n === 1 ? "one fix" : `${n} fixes`} left.`, items, tail };
 }
 
 /**
