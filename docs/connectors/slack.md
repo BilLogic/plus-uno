@@ -109,7 +109,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 | Path | What is sent | Converted by |
 |---|---|---|
 | Streamed first part (streaming on, in a thread) | `markdown_text` — your Markdown, with only the markup pass below | `sanitizeStreamChunk` in `appendStream` / `stopStream` |
-| Posted part (channel answers, continuation parts, streaming off, a stream that failed) | one `markdown` block — your Markdown as written — plus the footer `context` block on the last part | only `sanitizeMarkdownMarkup`, which escapes unparseable `<…>` |
+| Posted part (channel answers, continuation parts, streaming off, a stream that failed) | one `markdown` block — your Markdown as written — plus the footer `context` block on the last part | none — Slack turns it into rich text itself, and shows an escaped `&lt;` as written |
 | Fallback rung 1 (Slack refused the `markdown` block for its blocks: `invalid_blocks`, `invalid_blocks_format`, or `invalid_arguments` pointing into `/blocks`) | `section` blocks, which are mrkdwn-only, plus the footer | `toSlackMrkdwn` in `textSections` |
 | Fallback rung 2 (Slack refused the sections too, or refused the first post for anything other than its blocks) | bare `text`, no footer | `toSlackMrkdwn` in `postMessage` |
 | `chat.postMessage` `text`, every rung | the whole part as mrkdwn, for notifications and screen readers | `toSlackMrkdwn` in `postMessage` |
@@ -117,7 +117,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). A `markdown` block keeps your `&`, `<` and `>` as written and escapes only a `<…>` token that is not valid markup (`sanitizeMarkdownMarkup`). Worker code escapes a title inside a link label (`escapeSlackText`).
+**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). A `markdown` block gets no pass: Slack converts it to rich text, so an unparseable `<…>` shows as plain text rather than blanking the message, and an escaped `&lt;` would show as those characters (live 2026-10-07). Worker code escapes a title inside a link label (`escapeSlackText`).
 
 #### Streamed text
 
