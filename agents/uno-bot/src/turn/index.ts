@@ -24,3 +24,4 @@ export * from "./antecedent";
 export * from "./intake-channel";
 export * from "./result-table";
 export * from "./presentation";
+export * from "./answer-cards";

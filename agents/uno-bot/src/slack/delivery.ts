@@ -17,6 +17,7 @@ import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
+import { answerCardsBlock } from "./answer-cards-block";
 import { textCopy, type Presentation } from "../turn/presentation";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
@@ -226,9 +227,9 @@ function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
  * @param recipient who a stream would be for
  * @param footerHint forces the footer variant; absent = classify from the body
  * @param extras what rides beneath the answer: the turn's presentation, whose
- *   result table posts as a `data_table` between the last part's `markdown`
- *   block and its footer, with its plain list appended to that part's text
- *   copy
+ *   result table posts as a `data_table` and whose cards as a `card` or
+ *   `carousel`, between the last part's `markdown` block and its footer, with
+ *   their plain lists appended to that part's text copy
  */
 export async function postTextVerified(
   deps: PostingDeps,
@@ -250,24 +251,29 @@ export async function postTextVerified(
   const body = renderDeliveredBody(text);
   const { presentation } = extras;
   const resultTable = presentation?.table;
+  const cards = presentation?.cards;
   // A table of rows is a checkable claim however short the prose above it:
   // the honesty line goes beneath it even when the prose alone would read as
-  // an acknowledgement.
-  const footerKind: FooterKind = resultTable && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
+  // an acknowledgement. So is a set of cards.
+  const footerKind: FooterKind =
+    (resultTable || cards) && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
   const footer = footerBlocks(footerKind);
-  // The table rides where the footer does — the answer's last part, where it
-  // ends — and its plain list rides that part's text copy, which is what a
-  // notification shows and what the thread remembers.
-  const table = resultTable ? [resultTableBlock(resultTable)] : [];
+  // The table and the cards ride where the footer does — the answer's last
+  // part, where it ends — and their plain lists ride that part's text copy,
+  // which is what a notification shows and what the thread remembers.
+  const beneath = [
+    ...(resultTable ? [resultTableBlock(resultTable)] : []),
+    ...(cards ? [answerCardsBlock(cards)] : []),
+  ];
   const copyOf = (piece: string, last: boolean): string => (last ? textCopy(piece, presentation) : piece);
 
   const ok = await deliverAnswer(answerMessages(body), {
     async stream(piece, withFooter) {
       if (!(deps.streamingOn && threadTs)) return false;
-      // An answer carrying a table posts as an ordinary message: Slack
-      // does not document a `data_table` in a stream, and a stream's first part
-      // is not where the table rides on a split answer anyway.
-      if (resultTable) return false;
+      // An answer carrying a table or cards posts as an ordinary message:
+      // Slack does not document either in a stream, and a stream's first part
+      // is not where they ride on a split answer anyway.
+      if (beneath.length > 0) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision
       // itself is `decideStream`. Until #572 the answer path passed neither
@@ -321,15 +327,16 @@ export async function postTextVerified(
     // section rung too, so it goes straight to bare text: a doomed post costs
     // two calls, not three.
     //
-    // A part carrying a table has one rung more, at the top: the same
-    // Markdown without the table, its rows appended as a plain list. Any
-    // block refusal while the table is aboard counts as the table's, rather
-    // than only one whose json-pointer lands on the `data_table`. The table is
-    // the newest and least proven block in the message, Slack does not always
-    // point (`invalid_blocks` can arrive with no messages at all), and the
-    // costs are lopsided: blaming the table wrongly spends one extra call
-    // before the section rung, while missing a table refusal would drop the
-    // prose's Markdown to sections for nothing.
+    // A part carrying a table or cards has one rung more, at the top: the
+    // same Markdown without them, their rows appended as a plain list (the
+    // cards' linked, so every item still opens). Any block refusal while they
+    // are aboard counts as theirs, rather than only one whose json-pointer
+    // lands on the `data_table` or the `carousel`. They are the newest and
+    // least proven blocks in the message, Slack does not always point
+    // (`invalid_blocks` can arrive with no messages at all), and the costs are
+    // lopsided: blaming them wrongly spends one extra call before the section
+    // rung, while missing their refusal would drop the prose's Markdown to
+    // sections for nothing.
     //
     // The `text` copy is the whole part on every rung: notifications and
     // screen readers read it, and `postMessage` renders it to mrkdwn.
@@ -341,15 +348,16 @@ export async function postTextVerified(
           .postMessage({ channel, thread_ts: threadTs, text: copy, ...(blocks ? { blocks } : {}) })
           .catch((err: unknown) => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }));
 
-      const tabled = withFooter && table.length > 0;
-      let posted = await send([{ type: "markdown", text: piece }, ...(tabled ? table : []), ...tail]);
+      const tabled = withFooter && beneath.length > 0;
+      let posted = await send([{ type: "markdown", text: piece }, ...(tabled ? beneath : []), ...tail]);
       if (posted.ok) return true;
-      // A table steps down first, to the same answer without it and its
-      // rows as a plain list in the Markdown — so a rendering problem never
+      // A table or cards step down first, to the same answer without them and
+      // their rows as a plain list in the Markdown — so a rendering problem never
       // costs the reader the list. Every rung below carries that list too.
       const prose = tabled ? copy : piece;
       if (tabled && refusedForBlocks(posted)) {
-        console.warn(`[slack] result table refused (${refusalOf(posted)}); retrying without it, the rows as a list`);
+        const aboard = [resultTable ? "result table" : null, cards ? "answer cards" : null].filter(Boolean).join(" and ");
+        console.warn(`[slack] ${aboard} refused (${refusalOf(posted)}); retrying without them, the rows as a list`);
         posted = await send([{ type: "markdown", text: prose }, ...tail]);
         if (posted.ok) return true;
       }

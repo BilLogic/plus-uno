@@ -9,17 +9,19 @@
 // these rules are the copy of its answers that a suite can run offline.
 
 /** The block types the Worker sends: answers (`section`, `markdown`, the
- *  footer's `context`, the card table's `data_table`), the checklist (`plan`),
- *  proposal cards (`actions`, `image`) and the rest of its layouts. Slack knows
- *  many more — `carousel`, `card` — but one the Worker never sends is a typo or
- *  a new shape nobody proved, and either should fail a test before it reaches
- *  Slack. An unknown `type` was refused by blocks.validate on 2026-10-07
+ *  footer's `context`, the result table's `data_table`, the answer cards'
+ *  `card` and `carousel`), the checklist (`plan`), proposal cards (`actions`,
+ *  `image`) and the rest of its layouts. Slack knows more, but one the Worker
+ *  never sends is a typo or a new shape nobody proved, and either should fail
+ *  a test before it reaches Slack. An unknown `type` was refused by blocks.validate on 2026-10-07
  *  (`invalid_blocks`, "must be a valid enum value"). */
 const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "section",
   "markdown",
   "context",
   "data_table",
+  "card",
+  "carousel",
   "plan",
   "actions",
   "image",
@@ -166,6 +168,50 @@ function dataTableRefusal(block: Shape): string | null {
   return null;
 }
 
+/** A card's title and subtitle, and its buttons, per Slack's card block
+ *  reference (read 2026-10-08): 150 characters each, at most 3 buttons. */
+const CARD_TITLE_CHARS = 150;
+const CARD_BUTTONS = 3;
+
+/** A carousel's cards, per its block reference: 1 to 10. */
+const CAROUSEL_CARDS = { min: 1, max: 10 };
+
+/**
+ * Why Slack would refuse a `card`, or null.
+ *
+ * From the block reference: a title, subtitle or body is a text object; at
+ * most 3 buttons; `icon` and `slack_icon` exclusive. And from the live API: a
+ * card's `icon` is an image element Slack fetches, and an SVG one does not
+ * render, so the rule wants an https PNG or JPG URL or a favicon service's.
+ */
+function cardRefusal(card: unknown): string | null {
+  if (!isShape(card) || card.type !== "card") return "a carousel element that is not a card";
+  if (!("title" in card) && !("body" in card) && !("actions" in card) && !("hero_image" in card)) return "an empty card";
+  for (const key of ["title", "subtitle"] as const) {
+    if (!(key in card)) continue;
+    const text = card[key];
+    if (!isShape(text) || (text.type !== "plain_text" && text.type !== "mrkdwn") || !nonEmpty(text.text)) {
+      return `a card ${key} that is not a text object`;
+    }
+    if (String(text.text).length > CARD_TITLE_CHARS) return `a card ${key} of ${String(text.text).length} chars`;
+  }
+  if ("icon" in card && "slack_icon" in card) return "a card with both icon and slack_icon";
+  if ("icon" in card) {
+    const icon = card.icon;
+    if (!isShape(icon) || icon.type !== "image" || !nonEmpty(icon.alt_text)) return "a card icon that is not an image element";
+    const url = String(icon.image_url ?? "");
+    if (!/^https:\/\//.test(url) || /\.svg(\?|$)/i.test(url)) return `a card icon at ${url}`;
+  }
+  const actions = Array.isArray(card.actions) ? card.actions : [];
+  if (actions.length > CARD_BUTTONS) return `a card of ${actions.length} buttons`;
+  for (const button of actions) {
+    if (!isShape(button) || button.type !== "button") return "a card action that is not a button";
+    const label = button.text;
+    if (!isShape(label) || label.type !== "plain_text" || !nonEmpty(label.text)) return "a card button without a label";
+  }
+  return null;
+}
+
 /** Why Slack would refuse one block, or null. */
 function blockRefusal(block: unknown): string | null {
   if (!isShape(block)) return "a block that is not an object";
@@ -183,6 +229,18 @@ function blockRefusal(block: unknown): string | null {
   if (type === "data_table") {
     const why = dataTableRefusal(block);
     if (why) return why;
+  }
+  if (type === "card") {
+    const why = cardRefusal(block);
+    if (why) return why;
+  }
+  if (type === "carousel") {
+    const cards = Array.isArray(block.elements) ? block.elements : [];
+    if (cards.length < CAROUSEL_CARDS.min || cards.length > CAROUSEL_CARDS.max) return `a carousel of ${cards.length} cards`;
+    for (const card of cards) {
+      const why = cardRefusal(card);
+      if (why) return why;
+    }
   }
   if (type === "plan") {
     // A plan's title is required: blocks.validate on 2026-10-07 refused one
