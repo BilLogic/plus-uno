@@ -104,6 +104,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "follow-through/copy.ts": [],
   "follow-through/run.ts": [],
   "commitments/copy.ts": [],
+  "commitments/remind.ts": [],
   // Figma library, drift and the weekly precedence thread. 🎉 marks a merged
   // PR, the one ship tests/figma-copy.test.ts allows.
   "figma-library/draft.ts": [],
@@ -122,6 +123,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "tools/relay-dm.ts": [],
   "tools/relayed-dm-render.ts": [],
   "tools/github-issue.ts": [],
+  "tools/github-issue-render.ts": [],
   "tools/github-issue-update.ts": [],
   "tools/github-workflow.ts": [],
 };
@@ -296,6 +298,17 @@ describe("the self-name", () => {
         assert.doesNotMatch(s, /\buno bot\b/i, `${path.slice(SRC.length + 1)}: ${JSON.stringify(s.slice(0, 120))}`);
       }
     }
+  });
+
+  it('is "le goat" where copy credits the bot or sends a person to it', () => {
+    // "uno-bot" stays where it names the #uno-bot channel, a marker or an
+    // operator's run report; a person reads "by …" and "a DM with …".
+    const named = Object.keys(FIXED_COPY).flatMap((file) =>
+      stringLiterals(readFileSync(join(SRC, file), "utf8"))
+        .filter((s) => /\bby uno-bot\b|\ba DM with uno-bot\b/.test(s))
+        .map((s) => `${file}: ${s.slice(0, 120)}`),
+    );
+    assert.deepEqual(named, []);
   });
 
   it("is what the App Home, the welcome and an untitled chat say", () => {

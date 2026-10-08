@@ -75,9 +75,9 @@ export function renderCommentBody(text: string, filing: IssueFiling): string {
  *  so and links nothing: the repo is public and the place stays private. */
 function withSlackFooter(text: string, filing: IssueFiling, verb: "Filed" | "Posted"): string {
   const footer = filing.privatePlace
-    ? [`${verb} from Slack by uno-bot on behalf of ${filing.requester}, ${verb.toLowerCase()} from a private conversation.`]
+    ? [`${verb} from Slack by le goat on behalf of ${filing.requester}, ${verb.toLowerCase()} from a private conversation.`]
     : [
-        `${verb} from Slack by uno-bot on behalf of ${filing.requester}.`,
+        `${verb} from Slack by le goat on behalf of ${filing.requester}.`,
         `Source thread: ${filing.permalink ?? "(thread link unavailable)"}`,
       ];
   return [text, "", "---", ...footer].join("\n");

@@ -267,7 +267,7 @@ async function updater(requested?: string) {
 test("a comment POSTs the body to the issue's comments endpoint, and answers its link", async () => {
   calls = [];
   reply = { status: 201, body: { html_url: `https://github.com/${SITE}/issues/12#issuecomment-9` } };
-  const posted = await (await updater(SITE)).comment(12, "text\n\n---\nPosted from Slack by uno-bot on behalf of Bill Guo.");
+  const posted = await (await updater(SITE)).comment(12, "text\n\n---\nPosted from Slack by le goat on behalf of Bill Guo.");
 
   assert.deepEqual(posted, { url: `https://github.com/${SITE}/issues/12#issuecomment-9` });
   assert.equal(calls.length, 1);
@@ -275,7 +275,7 @@ test("a comment POSTs the body to the issue's comments endpoint, and answers its
   assert.equal(call.method, "POST");
   assert.equal(call.url, `https://api.github.com/repos/${SITE}/issues/12/comments`);
   assert.equal(call.headers.authorization, "Bearer ghp_test");
-  assert.deepEqual(call.body, { body: "text\n\n---\nPosted from Slack by uno-bot on behalf of Bill Guo." });
+  assert.deepEqual(call.body, { body: "text\n\n---\nPosted from Slack by le goat on behalf of Bill Guo." });
 });
 
 test("a close PATCHes the issue with its state and reason; a reopen says reopened", async () => {
