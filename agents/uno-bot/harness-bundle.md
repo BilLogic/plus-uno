@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **159,930 chars from 16 files**, against an assembled budget of 175,500 (15,570 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 139,546 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **161,067 chars from 16 files**, against an assembled budget of 175,500 (14,433 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 140,683 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,223 (−7,696 ide-only) | 10,223 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,992 | 30,243 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,789 | 58,073 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,466 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,408 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,162 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,365 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,012 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,400 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,796 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,212 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 21,367 (−5,803 ide-only) | 135,621 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 138,905 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 145,421 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 150,084 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 159,930 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,982 | 30,233 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,947 | 58,221 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,614 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,556 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,310 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,513 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,160 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,548 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 99,944 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,360 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 22,356 (−5,803 ide-only) | 136,758 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 140,042 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 146,558 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 151,221 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 161,067 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -234,7 +234,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **agent session** | the Slack object a uno-bot conversation runs inside on the agent surface, addressed by `channel_id` + `thread_ts` and moved between four lifecycle statuses — `active` · `processing` · `suspended` · `closed` — with `agents.sessions.setStatus`. Replaces `assistant.threads.*`, deprecated February 2027. While it sits in `processing` Slack offers a stop control on the session (`agent_session_stopped`); a press moves no status, so the app transitions the session itself | "assistant thread", "the panel thread" |
 | **working signal** | what tells a person a turn is in flight: the **agent session** moved to `processing` when the work starts and settled on every exit, raised and cleared as ONE pairing by `withWorkingSignal` (`agents/uno-bot/src/turn/delivery.ts`), whose `finally` makes the clear survive a new exit. Only the settle takes it down — posting the answer does not — and each half logs a `[working]` line with the turn's external spend. Turn owns that pairing; the one other settler is the in-thread stop door (`slack/stop-doors.ts`), as Slack requires on a stop press (#576) | "the thinking indicator", "the status line" (the status is what Slack is told; the signal is what the person sees) |
 | **checklist** | the Slack `plan` a person watches while a turn works: a **task card** per run of like lookups or per routing choice, the answer posted beneath. A task card is neither a Roadmap card nor a **proposal card**: it approves nothing | "plan stream", "progress surface", "steps" |
-| **card table** | the sortable table of Roadmap cards beneath an answer, built from the cards one lookup returned, not from the model's text. One per answer at most; the prose summarises it and the text copy lists it for later turns. Not a Markdown table or the **tool table** | "data table", "the grid" |
+| **result table** | the sortable table beneath an answer, filled by code from one lookup's rows; the model picks the lookup and up to 4 fields (`present`), Roadmap cards its preset. One per answer; the text copy lists it. Not a Markdown table or the **tool table** | "card table", "data table" |
 | **corpus** | the harness's one reader of repo files (`scripts/lib/corpus.mjs`): which documents exist under a path, what a file says, where a doc's frontmatter stops, its markdown links, its heading outline. A check asks it rather than the filesystem, and it takes a root so its test reads a fixture tree — the listing and the read taking the same root is what keeps a second one from appearing | "the walker", "the parser" (there is one of each) |
 | **ratchet** | a check's recorded baseline, and the module that owns it (`scripts/lib/ratchet.mjs`): the READ — no check parses a record itself, and what it gates on that the module does not own comes back through `envelope()`; which direction fails; the stale-entry and placeholder-reason sweeps; and the `--update` write, a MERGE in the record's own ENCODING, so a no-movement write moves no byte and a key the module does not own survives it. Each record's SHAPE is one row in `ratchet-shapes.mjs`; the invariant is asserted against all of them in `ratchet-conformance.mjs`. A recorded count may fall and a rise is a finding; an entry the run stops finding is one too, since a ratchet that only grows is a list; an absent or unreadable record fails loudly, because an empty baseline reads green | "the whitelist", "the exceptions file", "the allow-list" |
 | **recording** | a case's captured model replies, tool results and subject — the local eval transport's input (`docs/evals/fixtures/recordings/`); `source` is `authored` or `captured`, written down rather than inferred, and it reaches the results file | "fixture" (a fixture is what a case ASSERTS; a recording is what answered it) |
@@ -395,9 +395,9 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 - **Single-reply architecture:** one run, one message. The Worker fan-outs successful gated artifacts to `#plus-design` (leave that to it) — so no promised status updates (at most one brief interim post on a long turn, offered as an aside). Detail too long for Slack goes on the relevant Notion card (`notion_update`, gated) and is linked.
 - **Multi-target asks: land the top one, offer the next.** "Check A, B, and C" → do the highest-priority target, deliver that clean, and offer to continue — one run spent on all three times out with nothing.
 
-**Write standard Markdown** — `**bold**`, `_italic_`, `- bullets`, `[label](url)`, `> quotes`, fenced code, and **tables**. Slack renders all of it; the Worker converts wherever a different form is needed. A Markdown table is right when the content really is a grid (3+ rows comparing the same fields) of anything but Roadmap cards; keep it to 2–4 narrow columns so it survives a phone. Prose in a table is worse than prose. One hard rule: people and channels are always Slack IDs (`<@U…>`, `<#C…>`) — a plain `@handle` pings nobody. Details in `docs/connectors/slack.md` § Message formatting.
+**Write standard Markdown** — `**bold**`, `_italic_`, `- bullets`, `[label](url)`, `> quotes`, fenced code, and **tables**. Slack renders all of it; the Worker converts wherever a different form is needed. A Markdown table is right for a grid (3+ rows comparing the same fields) you composed yourself; keep it to 2–4 narrow columns so it survives a phone. Prose in a table is worse than prose. One hard rule: people and channels are always Slack IDs (`<@U…>`, `<#C…>`) — a plain `@handle` pings nobody. Details in `docs/connectors/slack.md` § Message formatting.
 
-**3 or more Roadmap cards always go in the card table:** set `as_table` on the `roadmap_query` that lists them. Two cards stay in the prose. `table_attached: true` → the reader sees every row beneath your answer, so the prose gives the count, what stands out and what to act on (naming up to 3 cards when they're the point) plus one short phrase pointing at the table; the rows belong to the table alone. `table_attached: false` → write the plain list.
+**3 or more rows a lookup returned go in the result table:** for Roadmap cards set `as_table` on the `roadmap_query` that lists them; for any other lookup's rows (blueprint cells or findings, issues, Notion results) call `present` with that lookup, up to 4 short fields and your takeaway. Two rows stay in the prose. `table_attached: true` → the reader sees every row beneath your answer, so the prose leads with the takeaway, gives what stands out and what to act on (naming up to 3 rows when they're the point) plus one short phrase pointing at the table; the rows belong to the table alone. `table_attached: false` → write the plain list.
 
 ## Run setup (two model providers)
 
@@ -1001,16 +1001,17 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 *(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
 
-#### Roadmap cards: the card table
+#### Lookup rows: the result table
 
-**A list of Roadmap cards goes in the card table, not a Markdown table.** The model sets `as_table` on `roadmap_query`, and code builds a Slack `data_table` from the cards that lookup returned, so every row is a real card with a working link. The persona asks for it at 3 or more cards; two stay in the prose.
+**Rows a lookup returned go in the result table, not a Markdown table.** Code builds a Slack `data_table` from the rows that lookup returned this turn, so every cell is a real value and every link works. The model only chooses: for Roadmap cards it sets `as_table` on `roadmap_query` (the Roadmap preset); for any other lookup it calls `present` with the lookup, up to 4 of its rows' fields and a one-line takeaway. The persona asks for a table at 3 or more rows; two stay in the prose.
 
-- **When it appears:** the lookup asked for it and returned 2 or more *definite* cards — an enumeration's (Design Status and/or person), or a title search's `contains` hits. Did-you-mean guesses stay in the prose. One table per answer: the last qualifying lookup of the turn.
-- **What it holds:** the card title linked to its Notion card, card number, Design Status, Dev Status. Pillars and people are left out to keep the columns narrow. The page size is the row count (at most 30), so every row shows at once.
-- **Caption:** the count and the filter (`13 cards · Design Status WIP`), or `first 30 of 41 · …` when the lookup listed only part of what matched.
-- **Prose:** the model's result says `table_attached` and `row_count`. With a table, the answer gives the count, what stands out and what to act on, names at most 3 cards, and points at the table in one short phrase. Without one (`table_attached: false`), it writes the plain list.
-- **Text copy:** the prose, then a plain line per card, written by code from the table's rows. Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
-- **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the card's title and number, its statuses, a bullet or link), so every card prints once. A sentence that names a card stays. The count removed is logged as `[card-table]`.
+- **When it appears:** the request named a lookup this turn made, and that lookup returned 2 or more rows. The Roadmap preset takes only *definite* cards: an enumeration's (Design Status and/or person), or a title search's `contains` hits; did-you-mean guesses stay in the prose. One table per answer: the last request of the turn that produced one.
+- **Refusals:** a lookup missing from this turn, a field absent from the rows, long text (over 120 characters or multi-line), a list, a bare link, or more than 4 columns. The refusal is the `present` call's own result, worded for the model, which then writes the plain list.
+- **What it holds:** the Roadmap preset shows the card title linked to its Notion card, card number, Design Status and Dev Status. Any other table shows the chosen fields under headers made from their names (`design_status` → Design Status); the first column links to each row's `url` when it has one. A field that is numbers throughout posts as `raw_number` cells, so Slack sorts it as numbers. `data_table` has no alignment setting (`column_settings` is refused), so alignment is Slack's own. At most 30 rows, all on one page.
+- **Caption:** written by code: the count, the lookup's filters and whether the list is partial (`13 cards · Design Status WIP`, `first 30 of 57 · "onboarding" · phase Onboarding`, or `at least 12 …` on a partial read with no larger count).
+- **Prose:** the model's result says `table_attached`. With a table, the answer leads with the takeaway, gives what stands out and what to act on, names at most 3 rows, and points at the table in one short phrase. Without one, it writes the plain list.
+- **Text copy:** the prose, then a plain line per row, written by code from the table's rows. Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
+- **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the row's identifying field, its other values, the column headers' words, a bullet or link), so every row prints once. A Roadmap card counts as typed out only when the line names its number too. A sentence that names a row stays. The count removed is logged as `[result-table]`.
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
 
 ### What the Worker does on each path

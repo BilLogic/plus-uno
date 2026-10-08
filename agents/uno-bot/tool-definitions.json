@@ -286,6 +286,48 @@
     }
   },
   {
+    "name": "present",
+    "description": "Ungated, fetches nothing. Show rows a lookup already returned THIS turn as a sortable table beneath your answer: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. The result says `table_attached`: when true, lead with the takeaway and what stands out, name at most 3 rows, and leave the rest to the table; when false, its `error` says why, and you list the rows in your answer yourself.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shape",
+        "lookup",
+        "columns",
+        "takeaway"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": [
+            "table"
+          ],
+          "description": "The shape to show: 'table'."
+        },
+        "lookup": {
+          "type": "string",
+          "description": "The tool whose rows to show, as named this turn, e.g. 'search_blueprint'. Its most recent result is used."
+        },
+        "list": {
+          "type": "string",
+          "description": "Which list in that result, by its key (e.g. 'rows', 'findings', 'matches'). Omit for the first list of records."
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "1 to 4 field names exactly as the rows carry them, the identifying field first (e.g. ['title', 'scenario', 'lane'])."
+        },
+        "takeaway": {
+          "type": "string",
+          "description": "The one-sentence takeaway the table supports, as your answer will lead with it."
+        }
+      }
+    }
+  },
+  {
     "name": "reminder_set",
     "description": "Direct, ungated. When the person asks you to remind THEM of something ('remind me Thursday to review the PRD', 'remind me in 2 days about this thread'), set it here. Pass `when` as they said it and `what` as a short verb phrase in your own words, no quote ('review the PRD', 'come back to this thread'). It is delivered at the first weekday 9 am ET run on or after that day, in this DM or thread, mentioning only them; they answer 🙌 done or ⏳ snooze. On ok, reply with exactly `confirm` (\"Got it, Thu 9 am ET.\") and nothing else. On `ask`, nothing was set: ask that one question, then call again with their answer. Only for the asker: never set one for someone else. No proposal card.",
     "input_schema": {
