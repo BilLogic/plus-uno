@@ -68,12 +68,12 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake — as does a card nobody decides. A library edited but not published posts with no card.
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): a card with Approve / Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake — as does a card nobody decides. A library edited but not published posts with no card.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
 
-**Reactions outside the gates are free-form — and they're the bot's wit channel.** uno-bot may react with any workspace emoji — standard or custom — to acknowledge, celebrate, or signal state (e.g. 🛠 working, 🎉 shipped, or a fitting custom emoji; 👀/⏳/✅/⚠️ are the Worker's automatic signals — the bot doesn't duplicate them). Replies are word-budgeted; reactions aren't — content-matched and specific beats a reflexive 👍 (register details: `agents/uno-bot/AGENT.md § Slack etiquette`). Only the gate semantics above are reserved: ✅ (and 👍) and ⛔ (and ❌) carry meaning on proposal cards, and ✅/🔁/❌ on review verdicts, so the bot never reacts with those on a pending proposal itself.
+**Reactions outside the gates are the bot's wit channel.** Code adds 👀 when a message arrives and ❌ when a turn fails, and no other reaction. The model adds at most one per message, any workspace emoji, standard or custom, matched to the content (the budget: `agents/uno-bot/AGENT.md § Emoji budget`; the register: § Slack etiquette). Only the gate semantics above are reserved: ✅ (and 👍) and ⛔ (and ❌) carry meaning on proposal cards, and ✅/🔁/❌ on review verdicts, so `slack_react` refuses the card set and the ❌ on a failure is code's.
 
 ## Message formatting — write standard Markdown
 
@@ -125,7 +125,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 | Fallback rung 1 (Slack refused the `markdown` block for its blocks: `invalid_blocks`, `invalid_blocks_format`, or `invalid_arguments` pointing into `/blocks`) | `section` blocks, which are mrkdwn-only, plus the footer | `toSlackMrkdwn` in `textSections` |
 | Fallback rung 2 (Slack refused the sections too, or refused the first post for anything other than its blocks) | bare `text`, no footer | `toSlackMrkdwn` in `postMessage` |
 | `chat.postMessage` `text`, every rung | the whole part as mrkdwn, for notifications and screen readers | `toSlackMrkdwn` in `postMessage` |
-| Proposal card, Figma library posts | mrkdwn sections (+ ✅/⛔ buttons on a card) | `toSlackMrkdwn` via `textSections` |
+| Proposal card, Figma library posts | mrkdwn sections (+ Approve / Cancel buttons on a card) | `toSlackMrkdwn` via `textSections` |
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
@@ -197,16 +197,17 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 
 ## Writing style (all Slack output)
 
-Uses the model's default voice for chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Identity & voice`.
+Uses the model's default voice for chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Identity & voice`, and its emoji budget in § Emoji budget there.
 
-- **Lead with the answer / outcome** — no preamble, no restating the ask back.
-- **Glanceable, not paragraphs.** `**Bold label**` lines + `-` bullets for structure; don't over-format.
-- **Summarize, link the artifact** (`[label](url)`) — don't transcribe steps.
+- **Lead with the answer / outcome** — the first line is one `**bold**` sentence that answers; no preamble, no restating the ask back.
+- **Glanceable, not paragraphs.** `**Bold label**` lines in place of `#` headings, `-` bullets two levels deep at most, and a table for any grid of three or more rows.
+- **Summarize, link the artifact** — the link sits on the name of the thing (`[the Roadmap card](url)`); steps are summarized, not transcribed.
 - **Human, contraction-y, low ceremony.** Brief and clear over formal; no jokes that don't serve the task.
-- **Errors are actionable** — name 2–3 next steps (retry / adjust / escalate), never a bare "something went wrong."
+- **A failure says what did not change and names one next step** (retry, adjust or escalate) — a bare "something went wrong" helps nobody.
 - **Confirm before real-world side-effects** (the proposal gate) — but gate only genuinely risky ops; no confirmation fatigue.
 - **On behalf of** — acting for a person, say so, and surface what was done + a link.
-- **One length rule, and it lives here.** Past ~1,500 chars of prose (lists are exempt — they stay scannable at any length), lead with a 2–3 bullet summary and put the detail after it. One message holds **11,000 characters** — the `markdown` block's 12,000 with headroom, `MAX_POST_CHARS` in `agents/uno-bot/src/slack/answer-posts.ts`. Past that the Worker splits the answer into continuation messages in the same thread, at paragraph boundaries, each one led by `_(i/n)_`; nothing is cut and nothing is lost. That is a fallback, not a licence to write long: a reply that runs to three messages is usually a reply that should have threaded the detail or put it on the relevant Notion card with a link. There is no Gist tool. *(Every other number that used to float around — "~4,000" here, ">3000" in `AGENT.md` — now points at this one.)*
+- **A post in a channel** — top level rather than a thread reply — is a summary plus a link; the detail goes in its thread or on the linked page.
+- **One length rule, and it lives here.** Past ~600 characters of prose (lists are exempt — they stay scannable at any length), lead with a 2–3 line summary and put the detail after it. One message holds **11,000 characters** — the `markdown` block's 12,000 with headroom, `MAX_POST_CHARS` in `agents/uno-bot/src/slack/answer-posts.ts`. Past that the Worker splits the answer into continuation messages in the same thread, at paragraph boundaries, each one led by `_(i/n)_`; nothing is cut and nothing is lost. That is a fallback, not a licence to write long: a reply that runs to three messages is usually a reply that should have threaded the detail or put it on the relevant Notion card with a link. There is no Gist tool. *(Every other number that used to float around — "~4,000" here, ">3000" in `AGENT.md` — now points at this one.)*
 
 <!-- Grounded in Slack's own docs (fetched 2026-07-08): Formatting message text · Block Kit · chat.postMessage · Agent design · App design guidelines. -->
 
