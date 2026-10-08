@@ -7,7 +7,7 @@
 // holds.
 import { fakeProvider, type FakeProvider } from "../../src/agent/providers/fake";
 import { SubrequestBudgetError } from "../../src/net";
-import { proposalCardBlocks, renderProposalCard } from "../../src/slack/proposal-render";
+import { ownBlocksOf, proposalCardBlocks, renderProposalCard } from "../../src/slack/proposal-render";
 import {
   createInMemorySweepStore,
   modelDriftDetector,
@@ -337,7 +337,8 @@ export function sweepHarness(opts: {
         posted.push({ channel: to.channel, threadTs: to.threadTs, text: card.text, blocks: card.blocks, ts, cardKey: tag.cardKey, digest: tag.digest });
         // A stop after Slack took the post, before the job heard back.
         once("post");
-        return { ok: true, ts };
+        const own = ownBlocksOf(card);
+        return { ok: true, ts, ...(own ? { blocks: own } : {}) };
       },
       async findPosted(to, cardKey) {
         if (unknownSearches.left > 0) {

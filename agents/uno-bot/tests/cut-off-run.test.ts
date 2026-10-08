@@ -42,6 +42,7 @@ import { renderGateNote } from "../src/slack/gate-note";
 import { sanitizeSlackMarkup } from "../src/slack/mrkdwn";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { harness, postsOf, request } from "./helpers/turn-harness";
+import { cardWords } from "./helpers/card-message";
 
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
@@ -319,7 +320,7 @@ describe("the later looks", () => {
         delivery: () => delivery,
         applyVerdict: async (v) => void applied.push(v),
         replyEphemeral: async (text) => void ephemerals.push(text),
-        replaceCard: async (_text, note) => void replaced.push(note),
+        replaceCard: async (message) => void replaced.push(cardWords(message).note),
         restage: async (r) => void restaged.push(r),
       },
     );

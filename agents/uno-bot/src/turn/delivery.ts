@@ -360,12 +360,13 @@ export type GateNote =
       mention?: string;
     };
 
-/** The card a gate note is about: its ts, and its posted text, which is what
- *  it is re-rendered from when the note is edited onto it. Gate's `GateCard`,
+/** The card a gate note is about: its ts, its posted text, and its own blocks
+ *  when it had any — what the note is edited onto. Gate's `GateCard`,
  *  restated in the port's words. */
 export interface NoteCard {
   ts: string;
   text: string;
+  blocks?: unknown[];
 }
 
 /** What a post actually did. `text` is what was posted, which is not always
@@ -375,6 +376,10 @@ export interface PostResult {
   text: string;
   /** The ts it landed on, where the adapter knows one. */
   ts?: string;
+  /** On a card: its own blocks, when it went up with them — a carousel, a
+   *  preview — rather than its text. Opaque here; staged with the card
+   *  (`PendingProposal.proposalBlocks`) so a note is edited onto them. */
+  blocks?: unknown[];
 }
 
 export interface Delivery {
@@ -568,8 +573,9 @@ export interface RecordingDelivery extends Delivery {
  * lookalike.
  */
 export interface DeliverySpelling {
-  /** The card's text, and anything the adapter would post BEFORE it. */
-  card(card: ProposalCard): { text: string; followUp?: string[] };
+  /** The card's text, anything the adapter would post BEFORE it, and its own
+   *  blocks when it has any. */
+  card(card: ProposalCard): { text: string; followUp?: string[]; blocks?: unknown[] };
   gateNote(note: GateNote): string;
 }
 
@@ -681,7 +687,7 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
     },
 
     async card(proposal) {
-      const { text, followUp } = spelling.card(proposal);
+      const { text, followUp, blocks } = spelling.card(proposal);
       // A plan too long for one Slack message goes out as its own messages
       // BEFORE the card, so the buttons stay last — recorded here in that same
       // order, and recorded whether or not the card itself then lands.
@@ -695,7 +701,7 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       posted.push(text);
       const ts = `card-${++staged}`;
       stagedAt.push(ts);
-      return { ok: true, text, ts };
+      return { ok: true, text, ts, ...(blocks ? { blocks } : {}) };
     },
 
     async postFailure(stage, err, ask) {

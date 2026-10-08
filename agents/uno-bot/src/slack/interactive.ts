@@ -27,7 +27,7 @@ import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
-import { REVIEW_ACTION_ID, proposalCardBlocks } from "./proposal-render";
+import { REVIEW_ACTION_ID } from "./proposal-render";
 import { checkedEditsView, runReviewDecision, runReviewOpen, type ReviewDoorDeps, type ReviewViewState } from "./review-door";
 import {
   REVIEW_APPROVE_ACTION_ID,
@@ -47,7 +47,7 @@ import type { SlackMessageEvent } from "./types";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
-import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
+import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
@@ -229,7 +229,7 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
     delivery: (target) => slackDelivery(env, target),
     applyVerdict: (verdict) => executeVerdict(env, verdict),
     replyEphemeral: (text) => replyEphemeral(payload, text),
-    replaceCard: (text, note) => replaceCard(payload, text, note),
+    replaceCard: (message) => replaceCard(payload, message),
     // This door runs inside `waitUntil`, so a re-staged card's preview waits
     // only briefly for the Figma rate budget.
     restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
@@ -335,8 +335,8 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
     },
     delivery: (target) => slackDelivery(env, target),
     applyVerdict: (verdict) => executeVerdict(env, verdict),
-    updateCard: async (channel, ts, text, note) => {
-      const res = await updateMessage(env, { channel, ts, text: `${text}\n${note}`, blocks: proposalCardBlocks(text, note) });
+    updateCard: async (channel, ts, message) => {
+      const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
       // Cosmetic, as the button door's re-render is: the decision is already
       // announced in the thread.
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);
@@ -359,12 +359,12 @@ async function replyEphemeral(payload: InteractionPayload, text: string): Promis
   }).catch(() => {});
 }
 
-async function replaceCard(payload: InteractionPayload, text: string, note: string): Promise<void> {
+async function replaceCard(payload: InteractionPayload, message: CardMessage): Promise<void> {
   if (!payload.response_url) return;
   await postToResponseUrl(payload.response_url, {
     replace_original: true,
-    text,
-    blocks: proposalCardBlocks(text, note),
+    text: message.text,
+    blocks: message.blocks,
   }).catch((err: unknown) => {
     // Cosmetic: the action already happened and was announced in the thread.
     console.warn(`[interactive] card re-render failed: ${err instanceof Error ? err.message : String(err)}`);

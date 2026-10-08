@@ -57,6 +57,7 @@ import {
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
 import { STALE_POST, STATED_SUPERSEDED_POST, renderGateNote } from "../src/slack/gate-note";
 import { verdictEvents } from "../src/usage/index";
+import { cardWords } from "./helpers/card-message";
 
 // ── one staged proposal, and the five signals that resolve it ────────────────
 
@@ -1016,8 +1017,8 @@ describe("the button door", () => {
         async replyEphemeral(text) {
           ephemerals.push(text);
         },
-        async replaceCard(text, note) {
-          replacements.push({ text, note });
+        async replaceCard(message) {
+          replacements.push(cardWords(message));
         },
         async restage(restage) {
           restaged.push(restage);
@@ -1221,7 +1222,7 @@ describe("a stated card answers in its own words", () => {
         delivery: () => delivery,
         applyVerdict: async () => {},
         replyEphemeral: async (text) => void ephemerals.push(text),
-        replaceCard: async (_text, note) => void notes.push(note),
+        replaceCard: async (message) => void notes.push(cardWords(message).note),
         restage: async () => {},
       },
     );

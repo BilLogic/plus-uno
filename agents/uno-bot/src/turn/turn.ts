@@ -72,6 +72,7 @@ import { describeIssueUpdate, issueUpdateFromInput, type IssueUpdate } from "../
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
+  ownBlocks,
   cardConfirmers,
   mayConfirm,
   ownWords,
@@ -1504,6 +1505,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // door re-renders the resolved card from this field, so a second rendering
     // that drifted would repaint the card with words it never had (#623).
     proposalText: posted.text,
+    ...ownBlocks(posted),
     requesterUserId: request.userId,
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
@@ -1667,6 +1669,7 @@ async function dropFromSweepCard(
     userMsgTs: request.userMsgTs,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    ...ownBlocks(posted),
     requesterUserId: request.userId,
     ...inheritedTerms(pending),
     ttlMs: leftMs,
@@ -1836,8 +1839,9 @@ export async function restageExecution(
   // (`sweep/share.ts`). Nor are a stated card's own words: the fresh card is
   // an ordinary one, with a ⚠️ and a ⛔ that runs nothing, so "Intake only"
   // would misstate it. Nor are a sweep card's fixes: the fresh card holds
-  // what never ran, so they no longer line up with its operations.
-  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, fixes: _fixes, ...kept } = original;
+  // what never ran, so they no longer line up with its operations. Nor are
+  // the old card's blocks: the fresh card went up with its own.
+  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,
@@ -1845,6 +1849,7 @@ export async function restageExecution(
     input: first.input,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    ...ownBlocks(posted),
     // The ask's own card, carried across however many re-stagings.
     originProposalTs: stagingCardOf(original),
   };

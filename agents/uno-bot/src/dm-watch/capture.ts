@@ -52,7 +52,7 @@
 // `./capture-env.ts`.
 
 import { isSubrequestBudgetError, rethrowIfBudget } from "../net";
-import { proposalReplyThread, SWEEP_KEY, type PendingProposal } from "../thread-state/index";
+import { ownBlocks, proposalReplyThread, SWEEP_KEY, type PendingProposal } from "../thread-state/index";
 import type { CardFix, ProposalCard } from "../turn/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { escapeSlackText } from "../slack/mrkdwn";
@@ -183,10 +183,12 @@ export type DmCapturePostDeps = Common & {
   bot: {
     /** The owner's DM with uno-bot. */
     dmChannel(userId: string): Promise<string | null>;
+    /** `blocks` on the answer: the card's own blocks, when it went up with
+     *  them rather than stepping down to its text. */
     post(
       channel: string,
       message: { text: string; blocks: unknown[]; metadata: { event_type: string; event_payload: Record<string, string> } },
-    ): Promise<{ ok: boolean; ts?: string }>;
+    ): Promise<{ ok: boolean; ts?: string; blocks?: unknown[] }>;
     /** Take a posted card back: retired in ThreadState, then edited to say why. */
     withdraw(channel: string, ts: string, text: string): Promise<void>;
     /** Take a posted card back entirely: retired, then deleted (`chat.delete`). */
@@ -558,6 +560,9 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
 
   // An earlier try's card, found by its tag.
   let ts: string | null = null;
+  // The carousel it went up with, when this try posted it; a card an earlier
+  // try left up is staged on its text.
+  let blocks: unknown[] | undefined;
   const prior = await deps.bot.findPosted(dm, cardKey, tsOf(Date.parse(`${deps.runDate}T00:00:00Z`)));
   if (prior === "unknown") return report("handled", "could not tell whether an earlier try posted — held for the next try");
   if (prior) {
@@ -578,8 +583,16 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
     });
     if (!posted.ok || !posted.ts) return report("handled", "Slack refused the post — kept for tomorrow");
     ts = posted.ts;
+    blocks = posted.blocks;
   }
-  const proposal = dmCaptureProposal(card, { owner: user, channel: dm, ts, text: rendered.text, runDate: deps.runDate });
+  const proposal = dmCaptureProposal(card, {
+    owner: user,
+    channel: dm,
+    ts,
+    text: rendered.text,
+    ...(blocks ? { blocks } : {}),
+    runDate: deps.runDate,
+  });
   try {
     await deps.stage(proposal);
   } catch (err) {
@@ -705,7 +718,7 @@ export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard 
  *  uno-bot, its own thread, that only the owner can resolve. */
 export function dmCaptureProposal(
   card: ProposalCard,
-  posted: { owner: string; channel: string; ts: string; text: string; runDate: string },
+  posted: { owner: string; channel: string; ts: string; text: string; blocks?: unknown[]; runDate: string },
 ): PendingProposal {
   const operations = card.operations ?? [];
   const first = operations[0]!;
@@ -719,6 +732,7 @@ export function dmCaptureProposal(
     userMsgTs: posted.ts,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    ...ownBlocks(posted),
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
     ttlMs: SWEEP_CARD_TTL_MS,

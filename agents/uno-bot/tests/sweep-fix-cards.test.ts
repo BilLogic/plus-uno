@@ -106,6 +106,12 @@ test("three fixes post as three cards in a carousel, numbered as `drop N` names 
   assert.equal(blocks.at(-1)!.type, "actions");
 });
 
+test("the staged card keeps the carousel it went up with, for a note or a decision to edit onto", async () => {
+  const { post, staged } = await postedCard();
+  assert.deepEqual(staged.proposalBlocks, post.blocks);
+  assert.ok((staged.proposalBlocks as Block[]).some((b) => b.type === "carousel"));
+});
+
 test("\"drop 2\" leaves out the fix on the second card", async () => {
   const { post, staged } = await postedCard();
   const second = ((post.blocks as Block[]).find((b) => b.type === "carousel")!.elements as Block[])[1]!;
