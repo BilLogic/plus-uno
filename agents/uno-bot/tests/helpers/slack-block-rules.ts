@@ -248,8 +248,60 @@ export function viewRefusal(view: unknown): string | null {
   const blocks = Array.isArray(view.blocks) ? view.blocks : [];
   if (blocks.length > MAX_VIEW_BLOCKS) return `${blocks.length} blocks in one view`;
   for (const block of blocks) {
-    const why = blockRefusal(block);
+    const why = isShape(block) && VIEW_ONLY_BLOCKS.has(String(block.type)) ? viewOnlyRefusal(block) : blockRefusal(block);
     if (why) return why;
   }
+  // The view reference: "submit is required when an input block is within the
+  // blocks array".
+  if (blocks.some((b) => isShape(b) && b.type === "input") && view.submit === undefined) {
+    return "an input block in a view with no submit";
+  }
   return null;
+}
+
+/** Blocks a view takes and a message does not: the pop-up's fields, and the
+ *  alert, which Slack refuses in a message (live 2026-10-08, "Block type is
+ *  not supported in this container"). */
+const VIEW_ONLY_BLOCKS: ReadonlySet<string> = new Set(["input", "alert"]);
+
+/** An alert's text, per the alert block reference (read 2026-10-08). */
+const ALERT_TEXT_CHARS = 200;
+const ALERT_LEVELS: ReadonlySet<string> = new Set(["default", "info", "warning", "error", "success"]);
+
+/** A `plain_text_input`'s value, and a `static_select`'s options and their
+ *  text, per the element references (read 2026-10-08). */
+const INPUT_VALUE_CHARS = 3000;
+const SELECT_OPTIONS = { min: 1, max: 100 };
+const OPTION_TEXT_CHARS = 75;
+
+/** Why Slack would refuse an input or an alert in a view, or null. */
+function viewOnlyRefusal(block: Shape): string | null {
+  if (block.type === "alert") {
+    const text = isShape(block.text) ? block.text.text : undefined;
+    if (!nonEmpty(text)) return "an alert without text";
+    if (String(text).length > ALERT_TEXT_CHARS) return `an alert of ${String(text).length} chars`;
+    if (block.level !== undefined && !ALERT_LEVELS.has(String(block.level))) return `an alert at level ${String(block.level)}`;
+    return null;
+  }
+  if (!isShape(block.label) || block.label.type !== "plain_text" || !nonEmpty(block.label.text)) {
+    return "an input without a plain_text label";
+  }
+  const element = block.element;
+  if (!isShape(element)) return "an input without an element";
+  if (element.type === "plain_text_input") {
+    if (typeof element.initial_value === "string" && element.initial_value.length > INPUT_VALUE_CHARS) {
+      return `an input value of ${element.initial_value.length} chars`;
+    }
+    return null;
+  }
+  if (element.type === "static_select") {
+    const options = Array.isArray(element.options) ? element.options : [];
+    if (options.length < SELECT_OPTIONS.min || options.length > SELECT_OPTIONS.max) return `a select of ${options.length} options`;
+    for (const o of options) {
+      const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
+      if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a select option without short text";
+    }
+    return null;
+  }
+  return `an input of ${String(element.type)}`;
 }

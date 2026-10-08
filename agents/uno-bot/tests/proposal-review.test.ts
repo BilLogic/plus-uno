@@ -116,10 +116,11 @@ describe("Review opens the draft", () => {
   it("gives a confirmer one Approve, as the last row of the body", async () => {
     const { deps, views } = harness(await staged());
     await runReviewOpen(open(), deps);
-    const draft = views.calls[1]!.view as { blocks: Array<{ type: string }>; submit?: unknown };
+    const draft = views.calls[1]!.view as { blocks: Array<{ type: string }>; submit?: { text: string } };
     assert.deepEqual(actionIds(draft), ["uno_review_approve"]);
     assert.equal(draft.blocks.at(-1)?.type, "actions");
-    assert.equal(draft.submit, undefined, "the footer carries no decision");
+    // Slack requires a submit beside the editable fields; it checks, never decides.
+    assert.equal(draft.submit?.text, "Check edits", "the footer carries no decision");
   });
 
   it("carries the card it is about, so the decision finds it", async () => {
