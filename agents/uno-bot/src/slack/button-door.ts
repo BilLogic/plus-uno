@@ -38,8 +38,8 @@ export interface CardMessage {
 /**
  * A decided card, as its message is edited: the card as posted — its own
  * blocks when it had any, its text otherwise — with the outcome as its last
- * line and View, and the outcome in the fallback copy too. A stated card gets
- * no button (`notedCardBlocks`).
+ * line and View where it had a button (`notedCardBlocks`), and the outcome
+ * in the fallback copy too.
  *
  * @param pending - The card's record
  * @param note - The outcome, mrkdwn
@@ -47,14 +47,14 @@ export interface CardMessage {
  *   with edits says what was approved
  */
 export function decidedCard(
-  pending: Pick<PendingProposal, "proposalText" | "proposalBlocks" | "stated">,
+  pending: Pick<PendingProposal, "proposalText" | "proposalBlocks">,
   note: string,
   text: string = pending.proposalText,
 ): CardMessage {
   return {
     text: `${text}\n${note}`,
     blocks: notedCardBlocks(
-      { text, ...(pending.proposalBlocks ? { blocks: pending.proposalBlocks } : {}), stated: !!pending.stated },
+      { text, ...(pending.proposalBlocks ? { blocks: pending.proposalBlocks } : {}) },
       note,
     ),
   };

@@ -179,8 +179,7 @@ async function closeExpired(deps: TrackDeps, card: TrackedPublish, intake: { num
     const note = expiredCardNote(intake.url);
     await deps.closeCard(card.channel, card.ts, {
       text: `${card.cardText!}\n${note}`,
-      // A stated card: closed without a button, as a decided one is.
-      blocks: notedCardBlocks({ text: card.cardText!, ...(card.cardBlocks ? { blocks: card.cardBlocks } : {}), stated: true }, note),
+      blocks: notedCardBlocks({ text: card.cardText!, ...(card.cardBlocks ? { blocks: card.cardBlocks } : {}) }, note),
     });
     delete card.closePending;
     return true;

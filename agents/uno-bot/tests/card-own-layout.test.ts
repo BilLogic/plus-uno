@@ -192,7 +192,9 @@ describe("the record keeps a card's own blocks", () => {
   });
 });
 
-describe("a stated card gains no Review or View", () => {
+describe("the button follows the card's own", () => {
+  // A stated card is posted with Review like any other: the pop-up is where
+  // decisions are made.
   const stated = (over: Partial<PendingProposal> = {}) => {
     const { proposalBlocks: _blocks, ...textOnly } = proposal({
       proposalText: "*DS precedence this week* · 2 mismatches\n\n:white_check_mark: files both; :no_entry: files nothing.",
@@ -202,7 +204,7 @@ describe("a stated card gains no Review or View", () => {
     return textOnly;
   };
 
-  it("under a late reaction", async () => {
+  it("a stated card offers View once a late reaction finds it closed", async () => {
     const slack = await reactOn(async (s, clock) => {
       await s.putProposal(stated());
       clock.at += 72 * HOUR + 1;
@@ -210,13 +212,29 @@ describe("a stated card gains no Review or View", () => {
     const blocks = edit(slack);
     assert.match(JSON.stringify(blocks), /DS precedence this week/, "its own words stay");
     assert.equal(lastLine(blocks), "That card expired, so nothing was filed.");
-    assert.deepEqual(buttons(blocks), []);
+    assert.deepEqual(buttons(blocks), ["View"]);
   });
 
-  it("under a gate note that leaves it live", async () => {
+  it("a stated card keeps Review under a gate note that leaves it live", async () => {
     const slack = await reactOn(async (s) => void (await s.putProposal(stated({ confirmers: [BEA] }))), MAYA);
     const blocks = edit(slack);
     assert.match(lastLine(blocks), new RegExp(`Only <@${BEA}> can confirm`));
-    assert.deepEqual(buttons(blocks), []);
+    assert.deepEqual(buttons(blocks), ["Review"], "decided in the pop-up, so it stays reachable");
+  });
+
+  it("a card posted without a button gains neither Review nor View", async () => {
+    const own = [{ type: "section", text: { type: "mrkdwn", text: "*Library published* · 3 components" } }];
+    for (const live of [true, false]) {
+      const slack = await reactOn(
+        async (s, clock) => {
+          await s.putProposal(proposal({ proposalBlocks: own, ...(live ? { confirmers: [BEA] } : {}) }));
+          if (!live) clock.at += 72 * HOUR + 1;
+        },
+        live ? MAYA : BEA,
+      );
+      const blocks = edit(slack);
+      assert.deepEqual(blocks[0], own[0], live ? "live" : "closed");
+      assert.deepEqual(buttons(blocks), [], live ? "live" : "closed");
+    }
   });
 });

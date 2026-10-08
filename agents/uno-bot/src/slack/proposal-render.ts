@@ -100,12 +100,11 @@ export function proposalCardBlocks(text: string, resolvedNote?: string, button?:
   return blocks;
 }
 
-/** A card as posted, which a note or a decision is edited onto: its text, its
- *  own blocks when it had any, and whether the Worker stated it itself. */
+/** A card as posted, which a note or a decision is edited onto: its text, and
+ *  its own blocks when it had any. */
 export interface PostedCard {
   text: string;
   blocks?: unknown[];
-  stated?: boolean;
 }
 
 /**
@@ -115,9 +114,10 @@ export interface PostedCard {
  * A card posted with blocks of its own — a sweep card's carousel, a Figma
  * library card's release card and table, a Figma preview — keeps them: its
  * button row comes off, the note goes on, and the row comes back with `button`
- * where it had one. A text-only card is re-rendered from its text
- * (`proposalCardBlocks`). A stated card is decided by what its own footer
- * says, and is edited without a Review or View button.
+ * where it had one. Decisions are made in the Review pop-up, so a card still
+ * live keeps Review and a decided one offers View; a card posted without the
+ * row gains neither. A text-only card is re-rendered from its text
+ * (`proposalCardBlocks`), which carries the row it was posted with.
  *
  * @param card - The card as posted
  * @param note - Its last line, mrkdwn
@@ -125,12 +125,11 @@ export interface PostedCard {
  */
 export function notedCardBlocks(card: PostedCard, note: string, button: "Review" | "View" = "View"): unknown[] {
   if (!card.blocks) {
-    const blocks = proposalCardBlocks(card.text, note, button);
-    return card.stated ? blocks.filter((b) => !isActionRow(b)) : blocks;
+    return proposalCardBlocks(card.text, note, button);
   }
   const hadButton = card.blocks.some(isActionRow);
   const blocks = [...card.blocks.filter((b) => !isActionRow(b)), context(note)];
-  if (hadButton && !card.stated) blocks.push(...proposalActionBlocks(button));
+  if (hadButton) blocks.push(...proposalActionBlocks(button));
   return blocks;
 }
 

@@ -219,21 +219,18 @@ export interface GateVerdict {
  * note belongs ON the card, as its last line, rather than in a new message —
  * `Delivery.postGateNote` takes it there. `text` is the card as posted, and
  * `blocks` its own blocks when it had any: what the note is edited onto.
- * `stated` marks a card the Worker stated itself, which is edited without a
- * Review or View button.
  */
 export interface GateCard {
   ts: string;
   text: string;
   blocks?: unknown[];
-  stated?: true;
 }
 
 /** The card a note is about, when its words are known: a staged proposal, or
  *  what an "expired" or "superseded" lookup kept of one. */
 function cardOf(
   ts: string,
-  posted: { proposalText?: string; proposalBlocks?: unknown[]; stated?: unknown },
+  posted: { proposalText?: string; proposalBlocks?: unknown[] },
 ): { card?: GateCard } {
   if (!posted.proposalText) return {};
   return {
@@ -241,7 +238,6 @@ function cardOf(
       ts,
       text: posted.proposalText,
       ...(posted.proposalBlocks ? { blocks: posted.proposalBlocks } : {}),
-      ...(posted.stated ? { stated: true as const } : {}),
     },
   };
 }

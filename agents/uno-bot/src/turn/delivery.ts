@@ -361,14 +361,12 @@ export type GateNote =
     };
 
 /** The card a gate note is about: its ts, its posted text, and its own blocks
- *  when it had any — what the note is edited onto. `stated` marks a card the
- *  Worker stated itself, edited without a Review or View button. Gate's
- *  `GateCard`, restated in the port's words. */
+ *  when it had any — what the note is edited onto. Gate's `GateCard`,
+ *  restated in the port's words. */
 export interface NoteCard {
   ts: string;
   text: string;
   blocks?: unknown[];
-  stated?: true;
 }
 
 /** What a post actually did. `text` is what was posted, which is not always

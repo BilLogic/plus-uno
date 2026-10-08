@@ -648,13 +648,13 @@ describe("the library card at the Gate", () => {
     return replaced[0]!.blocks as Array<Record<string, any>>;
   }
 
-  it("keeps its release card and table once decided, and gains no Review or View", async () => {
+  it("keeps its release card and table once decided, and offers View", async () => {
     for (const decision of ["confirm", "cancel"] as const) {
       const { threadState, card } = await stagedCard();
       const blocks = await decide(threadState, card, decision);
       assert.deepEqual(blocks.map((b) => b.type).slice(0, 2), ["card", "data_table"], decision);
-      assert.match(JSON.stringify(blocks.at(-1)), decision === "confirm" ? /Approved by/ : /decided by/, decision);
-      assert.equal(blocks.filter((b) => b.type === "actions").length, 0, `${decision}: a stated card is decided by its footer`);
+      assert.match(JSON.stringify(blocks.at(-2)), decision === "confirm" ? /Approved by/ : /decided by/, decision);
+      assert.deepEqual(blocks.filter((b) => b.type === "actions").flatMap((b) => b.elements.map((e: any) => e.text.text)), ["View"], decision);
     }
   });
 
@@ -665,7 +665,7 @@ describe("the library card at the Gate", () => {
     const blocks = await decide(morning.threadState, morning.staged[0]!, "confirm");
     assert.ok(!JSON.stringify(blocks).includes("data_table"), "never a table it was not posted with");
     assert.match(JSON.stringify(blocks), /Approved by/);
-    assert.equal(blocks.filter((b) => b.type === "actions").length, 0);
+    assert.equal(blocks.at(-1)!.type, "actions", "View, as it was posted with Review");
   });
 
   it("files the intake only on a member's ⛔", async () => {
@@ -897,7 +897,7 @@ describe("a library card nobody decides", () => {
     return { deps, calls, edits, closed, store };
   }
 
-  it("closes a card posted with its release card on those blocks, with no button", async () => {
+  it("closes a card posted with its release card on those blocks", async () => {
     const release = [{ type: "section", text: { type: "mrkdwn", text: "release" } }];
     const { deps, closed } = world([undecided({ cardBlocks: release })], POSTED_AT + 73 * HOUR);
     await trackLibraryIntakes(deps);
