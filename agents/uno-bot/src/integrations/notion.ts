@@ -2072,6 +2072,7 @@ const ROADMAP_PAGE_SIZE = 100;
 export const ROADMAP_MAX_PAGES = 5;
 const ROADMAP_TITLE_PROP = "Name";
 const ROADMAP_ID_PROP = "ID";
+export const ROADMAP_STATUS_PROP = "Design Status";
 
 /**
  * Server-side prefilter. Notion can't fuzzy-rank, but it CAN find every row whose
@@ -2086,7 +2087,7 @@ function roadmapFilter(opts: {
 }): unknown {
   const clauses: unknown[] = [];
   if (opts.designStatus) {
-    clauses.push({ property: "Design Status", status: { equals: opts.designStatus } });
+    clauses.push({ property: ROADMAP_STATUS_PROP, status: { equals: opts.designStatus } });
   }
   if (opts.cardNumber != null) {
     // A card number is a unique key — ANDing a half-remembered title against it
@@ -2146,7 +2147,7 @@ export async function queryRoadmapCards(
           if (t) title = t;
         } else if (prop.type === "unique_id") {
           cardNumber = prop.unique_id?.number ?? null;
-        } else if (prop.type === "status" && name === "Design Status") {
+        } else if (prop.type === "status" && name === ROADMAP_STATUS_PROP) {
           designStatus = prop.status?.name ?? null;
         } else if (prop.type === "status" && name === "Dev Status") {
           devStatus = prop.status?.name ?? null;
