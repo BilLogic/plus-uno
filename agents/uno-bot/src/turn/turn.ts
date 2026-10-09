@@ -2005,13 +2005,11 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // lookups' table and ⚠️ lines, and the absence check's line above.
   const presentation = ctx.presenting.presentation();
 
-  // A draft over its prose budget (`turn/prose-budget.ts`) — long above a
-  // table or cards, or long at all — is shortened to its takeaway by the same
-  // judge call, at any length the judge reads; `presentedProse` is the
-  // backstop when the shortening misses.
-  const budget = proseBudgetRepair(draft, presentation);
-  if (budget) console.log(`[prose-budget] ${budget.reason}: asking the judge to shorten the draft`);
-  const walkRepair = budget?.instruction;
+  // A draft over its prose budget beside a table (`turn/prose-budget.ts`) is
+  // shortened to its takeaway by the same judge call, at any length the judge
+  // reads; `presentedProse` is the backstop when the shortening misses.
+  const walkRepair = proseBudgetRepair(draft, presentation);
+  if (walkRepair) console.log("[prose-budget] draft walks its table: asking the judge to shorten it");
 
   // ONE judge call carries every repair that fires. Sent as sibling
   // instructions they compete and the model does one.
@@ -2032,10 +2030,10 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
       ? { forceReason: verdict.kind }
       : absenceRepair
         ? { forceReason: "absence-scope" }
-        : budget
-          ? { forceReason: budget.reason }
+        : walkRepair
+          ? { forceReason: "table-walk" }
           : {}),
-    ...(budget ? { shorten: true } : {}),
+    ...(walkRepair ? { shorten: true } : {}),
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
     // both: a draft that summarises and points at the table has answered.

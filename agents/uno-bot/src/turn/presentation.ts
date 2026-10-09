@@ -87,7 +87,7 @@ import { rowFor } from "../agent/tool-table";
 import type { AbsenceContext } from "../agent/absence";
 import { splitCutShort } from "../agent/loop-policy";
 import { hasWovenConfidence } from "../agent/confidence";
-import { measureProse, overBudget, withinListBudget, MAX_LIST_ITEMS, MAX_PROSE_CHARS, type Overrun } from "./prose-budget";
+import { measureProse, overBudget, withinListBudget, MAX_LIST_ITEMS, MAX_PROSE_CHARS } from "./prose-budget";
 
 /** What rides beneath an answer. */
 export interface Presentation {
@@ -537,55 +537,34 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
   };
 }
 
-/** What the judge is asked to repair when the draft is over its prose
- *  budget: the reason, which rides as its forced reason, and the instruction. */
-export interface ProseRepair {
-  reason: Overrun;
-  instruction: string;
-}
-
 /**
  * What the judge is asked to SHORTEN when the draft is over its prose budget
- * (`turn/prose-budget.ts`): above a table, cards or a table it typed itself,
+ * (`turn/prose-budget.ts`): beside a table, cards or a table it typed itself,
  * more than 3 list items, more than 1,000 characters or more than 3 of the
- * table's rows named; any answer, more than 3,000 characters. Folded into the
- * one judge call the turn already makes; undefined when the draft is within
- * it.
+ * table's rows named. Folded into the one judge call the turn already makes;
+ * undefined when the draft is within it, or has no rows beneath it.
  *
  * @param draft - The answer as the model wrote it
  * @param presentation - What rides beneath it
  */
-export function proseBudgetRepair(draft: string, presentation: Presentation | undefined): ProseRepair | undefined {
+export function proseBudgetRepair(draft: string, presentation: Presentation | undefined): string | undefined {
   const table = presentation?.table;
   const named = table ? namedRows(draft, table).length : 0;
   const measure = measureProse(draft);
-  const reason = overBudget(measure, !!(table || presentation?.cards), named, MAX_NAMED_ROWS);
-  if (!reason) return undefined;
-  const keep = `Keep the confidence clause and any caveat as they are${measure.typedTable ? ", and keep the table as it is" : ""}.`;
-  if (reason === "long-answer") {
-    return {
-      reason,
-      instruction:
-        `LONG ANSWER. The draft runs ${measure.chars} characters of prose, and an answer stays short. ` +
-        "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
-        `in at most ${MAX_LIST_ITEMS} list items and ${MAX_PROSE_CHARS} characters, naming at most ${MAX_NAMED_ROWS} items, linked. ` +
-        keep,
-    };
-  }
+  if (!overBudget(measure, !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return undefined;
   const what = table ? "table" : presentation?.cards ? "set of cards" : "table in the draft";
   const over = [
     measure.items > MAX_LIST_ITEMS ? `${measure.items} list items` : null,
     measure.chars > MAX_PROSE_CHARS ? `${measure.chars} characters` : null,
     named > MAX_NAMED_ROWS ? `names ${named} rows of the table` : null,
   ].filter(Boolean);
-  return {
-    reason,
-    instruction:
-      `TABLE WALK. The ${what} shows every row, yet the prose around it runs long: ${over.join("; ")}. ` +
-      "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
-      `in at most ${MAX_LIST_ITEMS} list items and ${MAX_PROSE_CHARS} characters, naming at most ${MAX_NAMED_ROWS} rows, linked; ` +
-      `leave the rest to the ${what}. ${keep}`,
-  };
+  return (
+    `TABLE WALK. The ${what} shows every row, yet the prose around it runs long: ${over.join("; ")}. ` +
+    "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
+    `in at most ${MAX_LIST_ITEMS} list items and ${MAX_PROSE_CHARS} characters, naming at most ${MAX_NAMED_ROWS} rows, linked; ` +
+    `leave the rest to the ${what}. Keep the confidence clause and any caveat as they are` +
+    `${measure.typedTable ? ", and keep the table as it is" : ""}.`
+  );
 }
 
 /** A line the backstop never takes out: the confidence clause, which says

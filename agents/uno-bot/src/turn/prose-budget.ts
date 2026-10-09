@@ -1,5 +1,5 @@
-// The prose budget — how long an answer may run: above a table or cards that
-// already show its rows, and at all (CONTEXT.md § result table).
+// The prose budget — how long an answer may run above a table or cards that
+// already show its rows (CONTEXT.md § result table).
 //
 // THE RULE. With rows beneath it, the answer is the takeaway, what stands out
 // and what to act on, naming at most 3 rows; the rows are the table's. Live on
@@ -22,13 +22,13 @@
 // `present`, typed its own table after a 10,198-character walk, and nothing
 // armed. The typed table stays; the budget is on the prose around it.
 //
-// AND ANY ANSWER, rows beneath or not, past 3,000 visible characters: three
-// times the short ceiling above, and about twice what the draft judge's notes
-// measure a full answer at ("a couple of citations and a caveat lands around
-// 1100-1400 characters"). An answer that stays short (spec #982) is never
-// near it; the r525 walk was three times it. What counts is prose: a typed
-// table and a fenced code block are measured out, so a long table or a setup
-// script is not a long answer.
+// A typed table and a fenced code block are not prose: they are measured
+// out, so a long table or a setup script beside a table is not a walk.
+//
+// NO TABLE, NO BUDGET. The defect is the rows printed twice, once in the prose
+// and once in the table; an answer with no table beneath it is as long as the
+// question asks. A general 3,000-character cap was weighed and dropped: it
+// would have cut walkthroughs asked for at length.
 //
 // WHAT IS DONE. Over budget, the turn asks the one judge call it already makes
 // to SHORTEN the answer to the takeaway (`turn/presentation.ts`), at any
@@ -45,9 +45,6 @@ export const MAX_LIST_ITEMS = 3;
 /** At most this many visible characters beside a table or cards: the draft
  *  judge's floor. */
 export const MAX_PROSE_CHARS = 1_000;
-
-/** At most this many visible characters in any answer. */
-export const LONG_ANSWER_CHARS = 3_000;
 
 /** A line that opens a list item: a bullet or a number. */
 const LIST_ITEM = /^\s*(?:[-*+•◦▪▫‣]︎?|\d+[.)])\s+/;
@@ -119,25 +116,20 @@ export function measureProse(prose: string): ProseMeasure {
   };
 }
 
-/** Why the prose is over the budget, or null when it is within it. */
-export type Overrun = "table-walk" | "long-answer";
-
 /**
- * Whether a measure is over the budget, and which: with rows beneath it (a
- * table or cards attached, or a typed table), more than 3 list items, more than
- * 1,000 characters or more than 3 of the table's rows named; with or without,
- * more than 3,000 characters.
+ * Whether the prose is over the budget: with rows beneath it (a table or cards
+ * attached, or a typed table), more than 3 list items, more than 1,000
+ * characters or more than 3 of the table's rows named. With no rows beneath
+ * it, never.
  *
  * @param measure - The prose's measure
  * @param rowsBeneath - A table or cards ride beneath the answer
  * @param named - How many of the table's rows the prose names
  * @param maxNamed - At most this many may be named
  */
-export function overBudget(measure: ProseMeasure, rowsBeneath: boolean, named: number, maxNamed: number): Overrun | null {
-  if ((rowsBeneath || measure.typedTable) && (measure.items > MAX_LIST_ITEMS || measure.chars > MAX_PROSE_CHARS || named > maxNamed)) {
-    return "table-walk";
-  }
-  return measure.chars > LONG_ANSWER_CHARS ? "long-answer" : null;
+export function overBudget(measure: ProseMeasure, rowsBeneath: boolean, named: number, maxNamed: number): boolean {
+  if (!rowsBeneath && !measure.typedTable) return false;
+  return measure.items > MAX_LIST_ITEMS || measure.chars > MAX_PROSE_CHARS || named > maxNamed;
 }
 
 /** A line that introduces what follows it: a heading, a line ending in ':',

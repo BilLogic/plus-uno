@@ -1,12 +1,13 @@
-// An answer stays short, with or without `present`.
+// An answer beside a table stays short, whether `present` attached the table
+// or the model typed it.
 //
 // Live on r525 the pain-points answer never called `present`: the model typed
 // its own Markdown table after a 10,198-character walk of every phase and
 // scenario. The prose budget armed only on a table `present` attached, so it
 // never fired, and the draft was past the judge's rewrite window, so the judge
-// could only grade it. Now a typed table counts as rows beneath the prose, any
-// answer far past the short size is over budget, and the judge is asked to
-// shorten it whatever its length. Driven across `runTurn`.
+// could only grade it. Now a typed table counts as rows beneath the prose, and
+// the judge is asked to shorten a draft over the budget whatever its length.
+// An answer with no table beneath it has no budget. Driven across `runTurn`.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -77,12 +78,15 @@ test("the live r525 shape: a long walk and a typed table, no present, asks the j
   assert.match(judged.extraInstruction ?? "", /keep the table as it is/);
 });
 
-test("any answer far past the short size is shortened, table or not", async () => {
-  const prose = [LEAD, "", ...walk(3), CLAUSE].join("\n");
-  const { judged } = await turn(prose);
-  assert.equal(judged.shorten, true);
-  assert.equal(judged.forceReason, "long-answer");
-  assert.match(judged.extraInstruction ?? "", /LONG ANSWER/);
+test("a long answer with no table beneath it is untouched: no shorten, no cut", async () => {
+  // The budget is against duplicating a table's rows. An answer asked to be
+  // long ("walk me through the setup") has no table to leave its rows to.
+  const prose = [LEAD, "", ...walk(9), CLAUSE].join("\n");
+  assert.ok(prose.length > 8_000);
+  const { text, judged } = await turn(prose);
+  assert.notEqual(judged.shorten, true);
+  assert.doesNotMatch(judged.extraInstruction ?? "", /TABLE WALK/);
+  assert.equal(text, prose);
 });
 
 test("the shortened answer ships", async () => {
@@ -96,7 +100,6 @@ test("the shortened answer ships", async () => {
 
 test("an answer of ordinary length with no table is not asked to shorten", async () => {
   const prose = [LEAD, "", ...walk(1, "and why."), CLAUSE].join("\n");
-  assert.ok(prose.length < 3_000);
   const { text, judged } = await turn(prose);
   assert.notEqual(judged.shorten, true);
   assert.equal(text, prose);

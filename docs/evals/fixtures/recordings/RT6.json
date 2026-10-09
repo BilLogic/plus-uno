@@ -2,7 +2,7 @@
   "case": "RT6",
   "source": "authored",
   "recordedAt": "2026-10-09",
-  "note": "AUTHORED in the shape of the live r525 reply to this prompt, not captured off the Worker: no present call, a walk of every phase and scenario past 10,000 characters, then a Markdown table the model typed itself. The walk is the model's own prose from the r522 and r524 replies to this prompt, joined to reach r525's length. Nothing is attached, so only the prose budget's typed-table and long-answer measures catch it; the replay's judge passes the draft unchanged, so this proves the backstop holds the reply that posts to 3 list items. It proves nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=RT6`) after the next deploy.",
+  "note": "AUTHORED in the shape of the live r525 reply to this prompt, not captured off the Worker: no present call, a walk of every phase and scenario past 10,000 characters, then a Markdown table the model typed itself. The walk is the model's own prose from the r522 and r524 replies to this prompt, joined to reach r525's length. Nothing is attached, so only the prose budget's typed-table measure catches it; the replay's judge passes the draft unchanged, so this proves the backstop holds the reply that posts to 3 list items. It proves nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=RT6`) after the next deploy.",
   "turns": [
     {
       "prompt": "What are the main tutor pain points in the blueprint, by scenario?",

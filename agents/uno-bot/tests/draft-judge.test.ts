@@ -447,7 +447,7 @@ test("a draft forced to shorten is rewritten past the revision window, and the s
     out = await reviewDraft(fake, {
       userText: "walk me through it",
       draft: WALKTHROUGH,
-      forceReason: "long-answer",
+      forceReason: "table-walk",
       shorten: true,
     });
   });
@@ -457,7 +457,7 @@ test("a draft forced to shorten is rewritten past the revision window, and the s
   assert.ok(asked.prompt.includes(TAIL), "read whole");
   assert.match(asked.system ?? "", /SHORTEN/);
   assert.doesNotMatch(asked.system ?? "", /VERDICT ONLY/);
-  assert.match(lines.at(-1)!, /revised=true .*forced=long-answer mode=shorten/);
+  assert.match(lines.at(-1)!, /revised=true .*forced=table-walk mode=shorten/);
 });
 
 test("a shorten rewrite that is no shorter, or says what the draft never did, is refused", async () => {
@@ -465,7 +465,7 @@ test("a shorten rewrite that is no shorter, or says what the draft never did, is
   const invented = "Every tutor loves the onboarding flow and nothing needs changing anywhere in the service today.";
   for (const revised of [sameLength, invented]) {
     const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "fail", failed: ["gate:length"], revised })] });
-    const out = await reviewDraft(fake, { userText: "q", draft: WALKTHROUGH, forceReason: "long-answer", shorten: true });
+    const out = await reviewDraft(fake, { userText: "q", draft: WALKTHROUGH, forceReason: "table-walk", shorten: true });
     assert.equal(out.text, WALKTHROUGH);
   }
 });

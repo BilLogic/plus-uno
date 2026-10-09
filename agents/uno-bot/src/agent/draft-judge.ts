@@ -152,7 +152,8 @@ const JUDGE_MAX_TOKENS = 6000;
 // rewrite asked to be short that is not is no shortening, and the bound keeps
 // it far inside JUDGE_MAX_TOKENS, which is what makes a shortened rewrite of a
 // draft past the revision window safe to ship: it cannot be a cut-off prefix
-// of a long answer. The turn's own long-answer ceiling (`turn/prose-budget.ts`).
+// of a long answer. Three times the prose budget beside a table
+// (`turn/prose-budget.ts`), so a shortening that overshoots still ships.
 const MAX_SHORTENED_CHARS = 3_000;
 // How much of a shortened draft's vocabulary must be the draft's own: a
 // shortening keeps the draft's words and drops most of them, so the measure is
