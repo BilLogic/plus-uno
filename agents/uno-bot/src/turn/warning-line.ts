@@ -1,10 +1,14 @@
 // The ⚠️ line — what the reader must not miss, one sentence under the answer,
 // beside the footer (CONTEXT.md § presentation; spec #982).
 //
-// CODE WRITES IT FROM WHAT THE TURN ALREADY KNOWS. Five triggers, each read off
+// CODE WRITES IT FROM WHAT THE TURN ALREADY KNOWS. Eight triggers, each read off
 // a fact the turn holds rather than off the prose:
 //
 //   • partial   a lookup reported `truncated` or `partial`
+//   • at least  a chart across lookups drew a value its lookup read only part
+//               of (`atLeast`), named with the count read — which says more
+//               than `partial` does for that lookup, so it takes that line's
+//               place
 //   • failed    a lookup's source errored, timed out or refused access — and
 //               no later call of the same lookup came back whole
 //   • budget    a lookup was refused or cut short for the turn's lookup
@@ -13,6 +17,8 @@
 //   • absence   the absence pre-check fired (`agent/absence.ts`)
 //   • degraded  a shape the presentation step asked for posted plainer, the
 //               reason worded by the step that fell back (`degraded`)
+//   • uncounted a chart across lookups left out values its source offers
+//               (`uncounted`), named
 //
 // Each trigger is ONE line however often it fires: three partial lookups are
 // one sentence naming their three sources. The turn has no wall-clock budget
@@ -147,7 +153,9 @@ type Entry =
   | { kind: "stale"; sources: SourceName[]; days: number }
   | { kind: "absence"; scope: string }
   | { kind: "conflict"; line: string }
-  | { kind: "degraded"; line: string | undefined };
+  | { kind: "degraded"; line: string | undefined }
+  | { kind: "uncounted"; values: string[] }
+  | { kind: "atLeast"; bounds: Array<{ name: string; value: number }>; whole: string };
 
 /** One turn's ⚠️ lines, collected as its triggers are met. */
 export interface WarningLog {
@@ -169,6 +177,13 @@ export interface WarningLog {
    * the place it was first met.
    */
   degraded(line: string | undefined): void;
+  /** Values a chart across lookups did not count, though its source offers
+   *  them — each named once. */
+  uncounted(values: readonly string[]): void;
+  /** Values a chart across lookups drew at the count their lookup read, which
+   *  read only part of its source: at least that many. Replaces the lookup's
+   *  `partial` line. */
+  atLeast(lookup: string, bounds: ReadonlyArray<{ name: string; value: number }>): void;
   /** The lines as they post, sign-less, at most `MAX_WARNING_LINES`. */
   lines(): string[];
 }
@@ -218,6 +233,14 @@ export function warningLog(now: () => number = Date.now): WarningLog {
         return e.line;
       case "degraded":
         return e.line ?? null;
+      case "atLeast": {
+        const [first, ...rest] = e.bounds.map((b, i) => `${b.name}${i === 0 ? " shows" : ""} at least ${b.value}`);
+        return `${joined([first!, ...rest])}; ${e.whole} has more than could be read.`;
+      }
+      case "uncounted":
+        return `Not counted: ${joined(e.values)} ${e.values.length > 1 ? "were" : "was"} not looked up, so the chart leaves ${
+          e.values.length > 1 ? "them" : "it"
+        } out.`;
     }
   };
 
@@ -276,6 +299,25 @@ export function warningLog(now: () => number = Date.now): WarningLog {
       const found = entries.find((e): e is Extract<Entry, { kind: "degraded" }> => e.kind === "degraded");
       if (found) found.line = line;
       else if (line) entries.push({ kind: "degraded", line });
+    },
+    atLeast(lookup, bounds) {
+      if (!bounds.length) return;
+      const source = sourceOf(lookup);
+      // The partial line said "something may be missing" of this source; this
+      // one says which value and how much was read, so it takes that place.
+      const at = entries.findIndex((e) => e.kind === "partial");
+      const partial = entries[at] as Extract<Entry, { kind: "partial" }> | undefined;
+      if (partial && source) partial.sources = partial.sources.filter((s) => s.label !== source.label);
+      const whole = lookup === "roadmap_query" ? "the board" : source ? source.subject : "the source";
+      const line: Entry = { kind: "atLeast", bounds: [], whole };
+      if (partial && !partial.sources.length) entries.splice(at, 1, line);
+      const found = entry("atLeast", () => line as Extract<Entry, { kind: "atLeast" }>);
+      for (const b of bounds) if (!found.bounds.some((x) => x.name === b.name)) found.bounds.push({ ...b });
+    },
+    uncounted(values) {
+      if (!values.length) return;
+      const found = entry("uncounted", () => ({ kind: "uncounted", values: [] }));
+      for (const value of values) if (!found.values.includes(value)) found.values.push(value);
     },
     conflict(raw) {
       if (conflicted) return { ok: false, refusal: "One conflict line per answer, and this answer has it." };
