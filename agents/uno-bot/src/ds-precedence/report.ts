@@ -1,44 +1,49 @@
-// The weekly DS precedence check, drafted: the list the #plus-universal
-// thread opens with, the one `harness-intake` issue it files or updates, and
-// the card that does it.
+// The weekly DS precedence check, drafted: the report the morning posts in
+// #plus-universal on the shared decision card (`slack/decision-cards.ts`),
+// each card's proposal, and the week's one `harness-intake` issue.
 //
-// ONE INTAKE, EVER OPEN. The issue's body opens with `PRECEDENCE_MARKER`; the
-// morning post looks for an open `harness-intake` carrying it, and when there
-// is one the card comments this week's list on it (`github_issue_update`)
-// rather than filing a second. The comment is the update in place: the tool
-// can comment, relabel and close, and editing a body is none of those.
+// ONE CARD PER COMPONENT. The parent line says how many components disagree
+// and that code wins; each card names the component, the side that needs the
+// fix, and what differs, with Review, Code and Figma. Nothing on the card or
+// in the proposal says what to type or react: Review is the gate. Approve
+// adds the component to the week's intake; Reject means the difference is
+// deliberate, and nothing is written.
 //
-// Items keep the number they were posted with, so `drop 2` means the same
-// item on every revision of the card. The list posts as a result table with
-// that number in its first column, up to 30 rows in the one message; the
-// plain mrkdwn list is its fallback when Slack refuses the table.
-//
-// THE WORDS are #886 § 3.4's (approved 2026-09-30): the list leads with the
-// finding, the rule is one clause and a link, and the reply verb is `drop` —
-// the sweep's verb — where it used to be `dispute`. The list ends with that
-// instruction; the card in its thread carries the one ✅/⛔ footer, beside its
-// buttons. `docs/connectors/slack.md` § Figma messages holds the rules, and
-// tests/figma-copy.test.ts pins them.
+// ONE INTAKE A WEEK. Every card's operation is the same Worker tool,
+// `ds_precedence_intake` (`./intake.ts`), and it decides where the component
+// goes when it runs, not when the card posts: the first Approve of the week
+// files the intake, whose body opens with that week's marker
+// (`precedenceMarker`), and every later Approve finds it open and comments the
+// component on it.
 //
 // Pure: no `Env`, no fetch.
 
-import type { ProposalOperation, StatedCardWords } from "../thread-state/index";
+import type { ProposalOperation, ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { resultTableBlock } from "../slack/result-table-block";
-import { MAX_ROWS, type ResultTable } from "../turn/result-table";
-import { largestFitting, namesInWords, ONE_POST_CHARS, packLines, shortDate, windowInWords } from "../slack/copy-words";
-import { SOURCE_NAMES, type Disagreement } from "./compare";
+import { shortDate, windowInWords } from "../slack/copy-words";
+import { SOURCE_NAMES, type Disagreement, type DsSource } from "./compare";
 
-/** The hidden line the weekly intake's body opens with. */
-export const PRECEDENCE_MARKER = "<!-- uno-bot:ds-precedence -->";
-export const PRECEDENCE_INTAKE_TITLE = "Weekly DS precedence check: code and the Figma library disagree";
+/** The Worker tool every card runs (`./intake.ts`). */
+export const PRECEDENCE_INTAKE_TOOL = "ds_precedence_intake";
 
-/** A disagreement with the number the thread gave it. */
-export type NumberedItem = Disagreement & { n: number };
+/** What every week's intake body opens with, before its week. */
+export const PRECEDENCE_MARKER = "<!-- uno-bot:ds-precedence";
 
-/** Where the card's ✅ writes: a new intake, or the one already open. */
-export type IntakeTarget = { kind: "create" } | { kind: "update"; issue: number; url: string };
+/**
+ * The hidden line one week's intake body opens with, which a later Approve
+ * that week finds it by.
+ *
+ * @param weekOf - The check's date, `YYYY-MM-DD`
+ */
+export function precedenceMarker(weekOf: string): string {
+  return `${PRECEDENCE_MARKER} week=${weekOf} -->`;
+}
+
+/** The week's intake title. */
+export function precedenceIntakeTitle(weekOf: string): string {
+  return `DS precedence, week of ${shortDate(weekOf)}: code and the library disagree`;
+}
 
 const RULE = `${SOURCE_NAMES.code} > ${SOURCE_NAMES.library} > ${SOURCE_NAMES["spec-pages"]}`;
 
@@ -52,132 +57,64 @@ export function precedenceRuleUrl(repo: string): string {
   return `https://github.com/${repo}/blob/main/AGENTS.md#conventions--what-agents-obey`;
 }
 
+/** One component and everything that differs about it, in check order. */
+export interface ComponentFinding {
+  component: string;
+  items: Disagreement[];
+}
+
+/** The disagreements grouped by component, in the order the check found them. */
+export function byComponent(items: readonly Disagreement[]): ComponentFinding[] {
+  const out: ComponentFinding[] = [];
+  for (const item of items) {
+    const found = out.find((c) => c.component === item.component);
+    if (found) found.items.push(item);
+    else out.push({ component: item.component, items: [item] });
+  }
+  return out;
+}
+
+/** A card's id: the component's name, with only Slack-safe characters. */
+export function componentId(component: string): string {
+  return component.replace(/[^A-Za-z0-9_-]+/g, "-") || "component";
+}
+
+/** The side that needs the fix, as a card's subtitle names it. */
+const SIDE: Record<DsSource, string> = { code: "Code side", library: "Library side", "spec-pages": "Spec pages side" };
+
+/** What differs, plain: no backticks, a capital first, a full stop last. */
+function differs(finding: ComponentFinding): string {
+  const text = finding.items.map((i) => i.summary.replace(/`/g, "")).join("; ");
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}.`;
+}
+
 /**
- * The item numbers a reply drops. Only a reply that STARTS with `drop` and a
- * number counts — `drop 2`, `drop #2, 4`, `drop 1 and 3`, then anything —
- * after any leading @mentions. "I wouldn't drop 2" and "should we drop 3?" are
- * a conversation, and go to the agent. `dispute`, the verb a thread posted
- * before #886 asks for, still works the same way.
+ * The report's parent line: how many components disagree, and the rule, in
+ * plain words with the rule linked. mrkdwn.
  *
- * @param text - The reply
- */
-export function droppedItems(text: string): number[] {
-  const m = /^\s*(?:<@[A-Z0-9]+>[\s,:]*)*(?:drop|dispute)\s+((?:#?\d+)(?:\s*(?:,|and|&)\s*#?\d+)*)(?![\w.]*\?)(?!\w)/i.exec(text);
-  if (!m) return [];
-  return [...new Set(m[1]!.match(/\d+/g)!.map(Number))].sort((a, b) => a - b);
-}
-
-/** "item 2", "items 2 and 4", "items 1, 2 and 3". */
-function itemWords(ns: readonly number[]): string {
-  return `item${ns.length === 1 ? "" : "s"} ${namesInWords(ns.map(String))}`;
-}
-
-function itemLine(i: NumberedItem): string {
-  return `${i.n}. ${escapeSlackText(i.component)}: ${escapeSlackText(i.summary)} · <${i.codeUrl}|code> · <${i.figmaUrl}|Figma>`;
-}
-
-/** The list post, and the items that would not fit in it. */
-export interface PrecedenceList {
-  /** The list as plain mrkdwn, cut at one post's length: the post when Slack
-   *  refuses the table. */
-  text: string;
-  /** Replies for the thread, before the card: the items past the cut, with
-   *  the numbers they were given. */
-  overflow: string[];
-  /** The list as one result table: the post the thread opens with. */
-  table: {
-    /** Its text copy — the finding, every tabled item and the instruction —
-     *  which notifications read and the plain rung does not need. */
-    text: string;
-    blocks: Array<Record<string, unknown>>;
-    /** The items past the table's thirty rows, for the thread. */
-    overflow: string[];
-  };
-}
-
-/**
- * The items as a result table, the drop number first, so the number a reply
- * names is the one the row shows. The component links to its code and the
- * last column to its library component.
- */
-function itemsTable(items: readonly NumberedItem[], total: number, components: number): ResultTable {
-  return {
-    lookup: "ds_precedence",
-    columns: [
-      { label: "#", numeric: true },
-      { label: "Component", numeric: false },
-      { label: "Disagreement", numeric: false },
-      { label: "Library", numeric: false },
-    ],
-    rows: items.map((i) => ({
-      // A cell is plain text, where backticks would show as written.
-      cells: [i.n, i.component, i.summary.replace(/`/g, ""), "Figma"],
-      links: [undefined, i.codeUrl, undefined, i.figmaUrl],
-      line: itemLine(i),
-      names: [],
-      mentions: [],
-    })),
-    caption:
-      total > items.length
-        ? `The first ${items.length} of ${total} disagreements; the rest are in the thread`
-        : `${total} disagreement${total === 1 ? "" : "s"} across ${components} component${components === 1 ? "" : "s"}`,
-    total,
-    partial: total > items.length,
-    labels: [],
-  };
-}
-
-/**
- * The list the weekly thread opens with (#886 § 3.4), in Slack mrkdwn. It
- * leads with the finding; N counts the components named in the items, so the
- * count is the names. The library is always the side that loses in this
- * check (`findDisagreements`), which is what the rule clause says.
- *
- * @param items - This week's disagreements
- * @param weekOf - The check's date, `YYYY-MM-DD`
+ * @param components - How many components disagree, held-back ones included
  * @param ruleUrl - Where the precedence rule is written (`precedenceRuleUrl`)
  */
-export function precedenceList(items: readonly NumberedItem[], weekOf: string, ruleUrl: string): PrecedenceList {
-  const components = new Set(items.map((i) => i.component)).size;
-  const head = [
-    `*Code and the library disagree on ${components} component${components === 1 ? "" : "s"}* (week of ${shortDate(weekOf)})`,
-    `Code wins by our <${ruleUrl}|precedence rule>, so the library side needs the fix unless it's deliberate.`,
-    "",
-  ];
-  const tail = ["", `Reply \`drop ${items[Math.min(1, items.length - 1)]!.n}\` for any that's deliberate, and I'll revise the card.`];
-  const lines = items.map(itemLine);
-  const more = (k: number) => `and ${lines.length - k} more, listed in the thread.`;
-  const table = tabled(items, components, head, tail, more);
-  const whole = [...head, ...lines, ...tail].join("\n");
-  if (whole.length <= ONE_POST_CHARS || lines.length < 2) return { text: whole, overflow: [], table };
-
-  // Too long for one post: as many items as fit, the rest counted here and
-  // listed in the thread under their own numbers.
-  const cut = (k: number) => [...head, ...lines.slice(0, k), more(k), ...tail].join("\n");
-  const shown = largestFitting(1, lines.length - 1, (k) => cut(k).length <= ONE_POST_CHARS);
-  return { text: cut(shown), overflow: packLines(lines.slice(shown)), table };
+export function precedenceParent(components: number, ruleUrl: string): string {
+  const what = components === 1 ? "1 component" : `${components} components`;
+  return `Code and the library disagree on ${what}. <${ruleUrl}|Code wins> unless a difference is deliberate.`;
 }
 
 /**
- * The list as a result table between the finding and the instruction: up to
- * thirty items in the one message, any past that in the thread as before.
+ * One component as its card: the component, the side that needs the fix,
+ * what differs, and its code and library as the card's second and third
+ * buttons.
  */
-function tabled(
-  items: readonly NumberedItem[],
-  components: number,
-  head: string[],
-  tail: string[],
-  more: (k: number) => string,
-): PrecedenceList["table"] {
-  const rows = items.slice(0, MAX_ROWS);
-  const rest = items.slice(MAX_ROWS).map(itemLine);
-  const lead = [...head.filter(Boolean), ...(rest.length ? [more(rows.length)] : [])].join("\n");
-  const close = tail.filter(Boolean).join("\n");
-  const section = (text: string) => ({ type: "section", text: { type: "mrkdwn", text } });
+export function precedenceItem(finding: ComponentFinding): ReportItem {
+  const first = finding.items[0]!;
   return {
-    text: [lead, "", ...rows.map(itemLine), "", close].join("\n"),
-    blocks: [section(lead), resultTableBlock(itemsTable(rows, items.length, components)), section(close)],
-    overflow: packLines(rest),
+    id: componentId(finding.component),
+    title: finding.component,
+    subtitle: SIDE[first.loser],
+    body: differs(finding),
+    open: { label: "Code", url: first.codeUrl },
+    also: { label: "Figma", url: first.figmaUrl },
+    done: "added to this week's DS precedence intake.",
   };
 }
 
@@ -185,106 +122,94 @@ function cell(text: string): string {
   return text.replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " ");
 }
 
-function table(items: readonly NumberedItem[]): string[] {
+/** The component's section of the intake: its heading and its table. */
+export function intakeSection(finding: ComponentFinding): string {
   return [
-    "| # | Component | Disagreement | Code | Figma | Loses |",
-    "|---|---|---|---|---|---|",
-    ...items.map(
-      (i) =>
-        `| ${i.n} | ${cell(i.component)} | ${cell(i.summary)} | [code](${i.codeUrl}) | [Figma](${i.figmaUrl}) | ${SOURCE_NAMES[i.loser]} |`,
-    ),
-  ];
+    `### ${finding.component}`,
+    "",
+    "| Disagreement | Code | Figma | Loses |",
+    "|---|---|---|---|",
+    ...finding.items.map((i) => `| ${cell(i.summary)} | [code](${i.codeUrl}) | [Figma](${i.figmaUrl}) | ${SOURCE_NAMES[i.loser]} |`),
+  ].join("\n");
 }
 
-/** The intake a first week files. */
-export function intakeBody(items: readonly NumberedItem[], weekOf: string): string {
+/**
+ * The intake the week's first Approve files: the week's marker, what the
+ * check compares and the rule, then the approved component's section.
+ *
+ * @param weekOf - The check's date
+ * @param section - The first component's section (`intakeSection`)
+ */
+export function intakeBody(weekOf: string, section: string): string {
   return [
-    PRECEDENCE_MARKER,
+    precedenceMarker(weekOf),
     "",
     "## What disagrees",
     "",
     `uno-bot's weekly check compares the component index and each component's props (\`component-registry.json\`) with the published ${SOURCE_NAMES.library}, when no library publish is carrying the component. ` +
       `Where they disagree, the DS precedence rule decides — ${RULE} — and the losing artifact is listed here. Existence and variant axes only; token values are out of scope.`,
     "",
-    `### Week of ${weekOf}`,
+    `Each component below was approved in #plus-universal; one rejected there was deliberate, and is not listed.`,
     "",
-    ...table(items),
+    section,
     "",
     "## Done when",
     "",
     "- [ ] Each losing artifact is brought in line with the winner, or the disagreement is recorded as deliberate in the component's `figmaMeta`",
-    "",
-    "The next week that finds disagreements comments its list here while this issue is open.",
   ].join("\n");
 }
 
-/** The comment a later week adds to the open intake. */
-export function intakeComment(items: readonly NumberedItem[], weekOf: string): string {
-  return [`### Week of ${weekOf}`, "", ...table(items)].join("\n");
-}
-
 /**
- * The card's batch: file the intake, or comment on the one already open.
+ * A card's one operation: add its component to the week's intake, filing the
+ * intake when the week has none open.
  *
- * @param items - The items not disputed
- * @param target - Where the ✅ writes
+ * @param finding - The component
  * @param weekOf - The check's date
  */
-export function precedenceOperations(
-  items: readonly NumberedItem[],
-  target: IntakeTarget,
-  weekOf: string,
-): ProposalOperation[] {
-  if (target.kind === "update") {
-    return [{ toolName: "github_issue_update", input: { issue_number: target.issue, comment: intakeComment(items, weekOf) } }];
-  }
-  return [{ toolName: "github_issue_create", input: { title: PRECEDENCE_INTAKE_TITLE, body: intakeBody(items, weekOf) } }];
+export function precedenceOperation(finding: ComponentFinding, weekOf: string): ProposalOperation {
+  return { toolName: PRECEDENCE_INTAKE_TOOL, input: { week_of: weekOf, component: finding.component, section: intakeSection(finding) } };
 }
 
 /**
- * The card as data: a `stated` card whose one footer says what ✅ and ⛔ do
- * and names the items, so its single operation is in words. A revision leads
- * with what it left out.
+ * One component as the proposal Review shows and decides: what differs, both
+ * sources, and where Approve writes. No footer: the card's Review is the
+ * only instruction.
  *
- * @param items - The items the card files
- * @param dropped - Item numbers dropped by a reply
- * @param target - Where the ✅ writes
- * @param operations - Its batch
- * @param ttlHours - How long it stays live, as the card states it
+ * @param finding - The component
+ * @param weekOf - The check's date
  */
-export function precedenceCard(
-  items: readonly NumberedItem[],
-  dropped: readonly number[],
-  target: IntakeTarget,
-  operations: ProposalOperation[],
-  ttlHours: number,
-): ProposalCard {
-  const which = itemWords(items.map((i) => i.n));
-  const approve =
-    target.kind === "update"
-      ? `:white_check_mark: adds ${which} to the <${target.url}|weekly intake>.`
-      : `:white_check_mark: files ${which} as the weekly intake.`;
+export function precedenceCard(finding: ComponentFinding, weekOf: string): ProposalCard {
+  const first = finding.items[0]!;
+  const lines = finding.items.map((i) => `• ${escapeSlackText(i.summary)}`);
   return {
     kind: "stated",
-    verb: target.kind === "update" ? "update the weekly intake" : "file the weekly intake",
-    ...(dropped.length ? { lead: `Revised without ${itemWords(dropped)}.` } : {}),
-    footer: `${approve} :no_entry: files nothing.\nAnyone in this channel can decide, for the next ${windowInWords(ttlHours)}.`,
-    fields: target.kind === "update" ? [{ label: "intake", value: `#${target.issue}` }] : [{ label: "intake", value: PRECEDENCE_INTAKE_TITLE }],
+    verb: "add this to the week's intake",
+    lead: [
+      `*${escapeSlackText(finding.component)}* · ${SIDE[first.loser].toLowerCase()} needs the fix · <${first.codeUrl}|code> · <${first.figmaUrl}|Figma>`,
+      ...lines,
+      `Approving adds it to the DS precedence intake for the week of ${shortDate(weekOf)}, filing the intake if this is the week's first.`,
+    ].join("\n"),
+    footer: "",
+    fields: [],
     caveats: [],
-    operations,
+    operations: [precedenceOperation(finding, weekOf)],
   };
 }
 
 /**
- * What the weekly card says at the gate (`PendingProposal.stated`). A ⛔ files
- * nothing, as the footer says; and a late ✅ or ⛔ is told the card closed,
- * rather than "ask me again" — a later week's check is what asks again.
+ * What a weekly card says at the gate (`PendingProposal.stated`): a Reject
+ * means the difference is deliberate, and a card that closes undecided files
+ * nothing — a later week's check is what asks again.
  *
- * @param windowHours - The card's whole window, from the first post
+ * @param windowHours - The card's whole window
  */
 export function precedenceCardWords(windowHours: number): StatedCardWords {
   return {
-    cancelled: "Nothing filed this week",
+    cancelled: "Left as deliberate, nothing filed",
     expired: `That card closed after ${windowInWords(windowHours)} with no decision, so nothing was filed.`,
   };
 }
+
+/** What a turn says when it would change a weekly card. */
+export const PRECEDENCE_REVISION_REFUSAL =
+  "A DS precedence card is decided as it stands: press Review on it, and Approve adds the component to this week's intake or Reject leaves the difference as deliberate.";

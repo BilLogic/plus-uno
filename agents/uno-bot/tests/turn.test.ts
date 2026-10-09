@@ -31,7 +31,8 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
-import { PRECEDENCE_INTAKE_TITLE } from "../src/ds-precedence/report";
+/** A Worker-keyed card's intake title, as the fixtures below file it. */
+const PRECEDENCE_INTAKE_TITLE = "Weekly DS precedence check: code and the Figma library disagree";
 import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";

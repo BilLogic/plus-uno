@@ -33,7 +33,6 @@ import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
 import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { recordSweepRestageFor } from "../sweep/env";
-import { recordPrecedenceRestageFor } from "../ds-precedence/env";
 import { fetchFigmaImagePngUrl, parseFigmaUrl, type FigmaRenderOptions } from "../integrations/figma";
 import { figmaClientFor } from "../figma/production";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
@@ -319,9 +318,9 @@ export function restageFor(
 
 /**
  * The records kept against a card that follow it when a cut-off run is
- * re-staged: the sweep's items, and the weekly DS precedence thread's live
- * card. Each reads nothing for a card that is not its own.
+ * re-staged: the sweep's items. It reads nothing for a card that is not its
+ * own.
  */
 async function followRestageFor(env: Env, from: PendingProposal, to: PendingProposal): Promise<void> {
-  await Promise.all([recordSweepRestageFor(env, from, to), recordPrecedenceRestageFor(env, from, to)]);
+  await recordSweepRestageFor(env, from, to);
 }

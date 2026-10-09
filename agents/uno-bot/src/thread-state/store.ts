@@ -308,8 +308,8 @@ export interface PendingProposal {
    * The card's own slot within its reply thread (`proposalSlot`). Absent —
    * every turn's card — the card holds the thread's slot, and cards there
    * replace one another. A card the Worker stages into a thread people also
-   * talk in sets one — `"sweep"` for an end-of-day sweep card, `"ds-precedence"`
-   * for the weekly DS precedence card — so it and a turn's card stay live side
+   * talk in sets one — `"sweep"` for an end-of-day sweep card, a report
+   * item's own key for each card of a decision report — so it and a turn's card stay live side
    * by side, and only a card with the same key replaces it. A turn's batch
    * revises it only when it touches it (`turn/turn.ts`); while both are live,
    * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
@@ -319,8 +319,8 @@ export interface PendingProposal {
   /**
    * On a keyed card: what a turn in its thread posts, in place of a card,
    * when its batch would touch this one. A near-copy would otherwise stay live
-   * beside it, and both could run. The weekly DS precedence card points at
-   * `drop N`, the one way it is revised.
+   * beside it, and both could run. A weekly DS precedence card points at
+   * its Review, the one way it is decided.
    */
   refuseRevision?: string;
   /**

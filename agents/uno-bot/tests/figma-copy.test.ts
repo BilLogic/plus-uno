@@ -1,6 +1,6 @@
 // Every Figma message uno-bot's code writes, against the copy Bill approved in
 // #886 (2026-09-30) — the library publish card, its thread, the post for a
-// library edited but not published, the weekly precedence thread, the drift
+// library edited but not published, the weekly precedence report, the drift
 // question and its withdrawal, the comment-decision thread (#900), and what
 // each card says at the gate.
 //
@@ -29,14 +29,15 @@ import {
 import { libraryCard, LIBRARY_CARD_TTL_MS } from "../src/figma-library/post";
 import { expiredCardNote, prClosedLine, prMergedLine, prOpenedLine } from "../src/figma-library/track";
 import {
+  byComponent,
   precedenceCard,
   precedenceCardWords,
-  precedenceList,
-  precedenceOperations,
+  precedenceItem,
+  precedenceParent,
   precedenceRuleUrl,
-  type IntakeTarget,
-  type NumberedItem,
+  PRECEDENCE_REVISION_REFUSAL,
 } from "../src/ds-precedence/report";
+import type { Disagreement } from "../src/ds-precedence/compare";
 import { PRECEDENCE_CARD_TTL_MS } from "../src/ds-precedence/jobs";
 import { CONFIRM_FOOTER, renderProposalCard } from "../src/slack/proposal-render";
 import { renderGateNote, statedCancelledNote } from "../src/slack/gate-note";
@@ -316,15 +317,6 @@ describe("the consent a stated card's footer carries", () => {
     assert.deepEqual(alone.operations.map((o) => o.toolName), ["github_issue_create"]);
     assert.doesNotMatch(alone.footer!, /drafts the code/);
   });
-
-  it("the precedence card names its one write", () => {
-    for (const target of [{ kind: "create" }, { kind: "update", issue: 9, url: "https://github.com/o/r/issues/9" }] as IntakeTarget[]) {
-      const operations = precedenceOperations(THREE, target, "2026-09-28");
-      assert.equal(operations.length, 1);
-      const built = precedenceCard(THREE, [], target, operations, 144);
-      assert.match(built.footer!, target.kind === "create" ? /files items 1, 2 and 3 as the weekly intake/ : /adds items 1, 2 and 3 to the/);
-    }
-  });
 });
 
 describe("the full list in the card's thread", () => {
@@ -394,14 +386,13 @@ describe("the library card's thread (#886 § 3.2)", () => {
   });
 });
 
-// ── The weekly precedence thread (#886 § 3.4) ────────────────────────────────
+// ── The weekly precedence report (shared decision card) ──────────────────────
 
 const REPO = "BilLogic/plus-uno";
 const RULE_URL = precedenceRuleUrl(REPO);
 
-function item(n: number, component: string, summary: string): NumberedItem {
+function item(n: number, component: string, summary: string): Disagreement {
   return {
-    n,
     key: `${component}:${n}`,
     component,
     kind: "axis-values",
@@ -413,82 +404,52 @@ function item(n: number, component: string, summary: string): NumberedItem {
   };
 }
 
-const THREE: NumberedItem[] = [
+const THREE = byComponent([
   item(1, "Button", 'code has `size="xs"`, the library doesn\'t'),
   item(2, "Badge", 'the library has `tone="neon"`, code doesn\'t'),
   item(3, "Card", "code has it, the library has no published component for it"),
-];
+]);
 
-describe("the weekly precedence thread", () => {
-  it("leads with the finding, links the rule, and ends with the `drop` instruction", () => {
-    const list = precedenceList(THREE, "2026-09-28", RULE_URL);
-    assert.deepEqual(list.overflow, []);
+describe("the weekly precedence report", () => {
+  it("opens with one plain line: the count, and the rule linked", () => {
+    const parent = precedenceParent(3, RULE_URL);
+    assert.equal(parent, `Code and the library disagree on 3 components. <${RULE_URL}|Code wins> unless a difference is deliberate.`);
+    assert.equal(precedenceParent(1, RULE_URL).split(".")[0], "Code and the library disagree on 1 component");
+    passesChecklist(parent);
+  });
+
+  it("gives each component a card: its name, the side that needs the fix, and what differs, plainly", () => {
+    const button = precedenceItem(THREE[0]!);
+    assert.deepEqual(button, {
+      id: "Button",
+      title: "Button",
+      subtitle: "Library side",
+      body: 'Code has size="xs", the library doesn\'t.',
+      open: { label: "Code", url: `https://github.com/${REPO}/blob/main/Button.md` },
+      also: { label: "Figma", url: `https://www.figma.com/design/${FILE_KEY}?node-id=1-1` },
+      done: "added to this week's DS precedence intake.",
+    });
+    for (const f of THREE) passesChecklist([precedenceItem(f).title, precedenceItem(f).body].join("\n"));
+  });
+
+  it("Review shows the whole item, and says nothing to type or react", () => {
+    const text = renderProposalCard(precedenceCard(THREE[0]!, "2026-09-28")).text;
     assert.equal(
-      list.text,
+      text,
       [
-        "*Code and the library disagree on 3 components* (week of Sep 28)",
-        `Code wins by our <${RULE_URL}|precedence rule>, so the library side needs the fix unless it's deliberate.`,
-        "",
-        `1. Button: code has \`size="xs"\`, the library doesn't · <https://github.com/${REPO}/blob/main/Button.md|code> · <https://www.figma.com/design/${FILE_KEY}?node-id=1-1|Figma>`,
-        `2. Badge: the library has \`tone="neon"\`, code doesn't · <https://github.com/${REPO}/blob/main/Badge.md|code> · <https://www.figma.com/design/${FILE_KEY}?node-id=1-2|Figma>`,
-        `3. Card: code has it, the library has no published component for it · <https://github.com/${REPO}/blob/main/Card.md|code> · <https://www.figma.com/design/${FILE_KEY}?node-id=1-3|Figma>`,
-        "",
-        "Reply `drop 2` for any that's deliberate, and I'll revise the card.",
+        `*Button* · library side needs the fix · <https://github.com/${REPO}/blob/main/Button.md|code> · <https://www.figma.com/design/${FILE_KEY}?node-id=1-1|Figma>`,
+        '• code has `size="xs"`, the library doesn\'t',
+        "Approving adds it to the DS precedence intake for the week of Sep 28, filing the intake if this is the week's first.",
       ].join("\n"),
     );
-    passesChecklist(list.text);
-  });
-
-  it("counts components, not items, so the count is the names", () => {
-    const twice = [item(1, "Button", "code has `size=\"xs\"`, the library doesn't"), item(2, "Button", "code has a `tone` prop (`a`), and no variant in the library carries it")];
-    const { text } = precedenceList(twice, "2026-09-28", RULE_URL);
-    assert.match(text.split("\n")[0]!, /^\*Code and the library disagree on 1 component\* /);
-    const named = new Set(text.split("\n").flatMap((l) => /^\d+\. ([^:]+):/.exec(l)?.slice(1) ?? []));
-    assert.equal(named.size, 1);
-  });
-
-  it("past 1,500 characters, counts the rest and lists them in the thread under their own numbers", () => {
-    const many = Array.from({ length: 30 }, (_, i) => item(i + 1, `Component${i + 1}`, "code has it, the library has no published component for it"));
-    const { text, overflow } = precedenceList(many, "2026-09-28", RULE_URL);
     passesChecklist(text);
-    const shown = text.split("\n").filter((l) => /^\d+\. /.test(l)).length;
-    const rest = Number(/^and (\d+) more, listed in the thread\.$/m.exec(text)?.[1]);
-    assert.equal(shown + rest, 30);
-    assert.match(overflow.join("\n"), new RegExp(`^${shown + 1}\\. Component${shown + 1}: `, "m"));
-    assert.match(overflow.join("\n"), /^30\. Component30: /m);
-    assert.equal(text.split("\n").at(-1), "Reply `drop 2` for any that's deliberate, and I'll revise the card.");
+    assert.doesNotMatch(text, /\bdrop\b|\bskip\b|[Rr]eply/);
   });
 
-  const cardText = (items: NumberedItem[], dropped: number[], target: IntakeTarget, hours = 144) =>
-    renderProposalCard(precedenceCard(items, dropped, target, precedenceOperations(items, target, "2026-09-28"), hours)).text;
-
-  it("puts the one footer on the card, beside its buttons", () => {
-    const text = cardText(THREE, [], { kind: "create" });
-    assert.equal(
-      text,
-      ":white_check_mark: files items 1, 2 and 3 as the weekly intake. :no_entry: files nothing.\nAnyone in this channel can decide, for the next 6 days.",
-    );
-    passesChecklist(text, { gate: true });
-  });
-
-  it("links the open weekly intake when the ✅ adds to it", () => {
-    const text = cardText(THREE, [], { kind: "update", issue: 900, url: "https://github.com/o/r/issues/900" });
-    assert.equal(text.split("\n")[0], ":white_check_mark: adds items 1, 2 and 3 to the <https://github.com/o/r/issues/900|weekly intake>. :no_entry: files nothing.");
-    passesChecklist(text, { gate: true });
-  });
-
-  it("a revision leads with what it left out, and states its time left", () => {
-    const text = cardText([THREE[0]!, THREE[2]!], [2], { kind: "create" }, 30);
-    assert.equal(
-      text,
-      [
-        "Revised without item 2.",
-        "",
-        ":white_check_mark: files items 1 and 3 as the weekly intake. :no_entry: files nothing.",
-        "Anyone in this channel can decide, for the next 30 h.",
-      ].join("\n"),
-    );
-    passesChecklist(text, { gate: true });
+  it("a turn that would change a card is pointed at its Review", () => {
+    passesChecklist(PRECEDENCE_REVISION_REFUSAL);
+    assert.match(PRECEDENCE_REVISION_REFUSAL, /press Review/);
+    assert.doesNotMatch(PRECEDENCE_REVISION_REFUSAL, /\bdrop\b|`/);
   });
 });
 
@@ -529,18 +490,18 @@ describe("what a stated card says at the gate", () => {
     assert.equal(noCode.expired, "That card closed after 72 h with no decision. I file its intake the morning after, so the publish isn't lost.");
   });
 
-  it("the precedence card: a ⛔ files nothing, and its window is the whole six days", () => {
+  it("a precedence card: a Reject leaves the difference as deliberate, and its window is the whole six days", () => {
     assert.deepEqual(weekly, {
-      cancelled: "Nothing filed this week",
+      cancelled: "Left as deliberate, nothing filed",
       expired: "That card closed after 6 days with no decision, so nothing was filed.",
     });
   });
 
   it("a ⛔ closes either card with what it did and who decided", () => {
     assert.equal(statedCancelledNote(drafting, "U0AAAAAA2"), ":no_entry: Intake only, decided by <@U0AAAAAA2>.");
-    assert.equal(statedCancelledNote(weekly, "U0AAAAAA2"), ":no_entry: Nothing filed this week, decided by <@U0AAAAAA2>.");
+    assert.equal(statedCancelledNote(weekly, "U0AAAAAA2"), ":no_entry: Left as deliberate, nothing filed, decided by <@U0AAAAAA2>.");
     // Only a Slack id is mentioned; anything else would blank the post.
-    assert.equal(statedCancelledNote(weekly, "someone"), ":no_entry: Nothing filed this week.");
+    assert.equal(statedCancelledNote(weekly, "someone"), ":no_entry: Left as deliberate, nothing filed.");
     passesGateAnswer(statedCancelledNote(drafting, "U0AAAAAA2"), [":no_entry:"]);
     passesGateAnswer(statedCancelledNote(weekly, "U0AAAAAA2"), [":no_entry:"]);
   });
@@ -560,7 +521,7 @@ describe("what a stated card says at the gate", () => {
       assert.doesNotMatch(text, /github_issue_create|an issue/, text);
     }
     assert.equal(renderGateNote(answers[0]![0]), "Intake only.");
-    assert.equal(renderGateNote(answers[1]![0]), "Nothing filed this week.");
+    assert.equal(renderGateNote(answers[1]![0]), "Left as deliberate, nothing filed.");
   });
 });
 

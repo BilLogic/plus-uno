@@ -1,14 +1,14 @@
 // The weekly DS precedence check bound to `Env` — the only file in the folder
 // that names it. The code side is read from `GITHUB_REPO`, the harness repo,
 // where the intake is filed too; the library is `FIGMA_FILE_KEY` over REST;
-// the thread goes to #plus-universal (`PLUS_UNIVERSAL_CHANNEL_ID`), as the
-// library card's does. The report and the posted thread are JSON in
-// HARNESS_KV beside the library poll's keys.
+// the report goes to #plus-universal (`PLUS_UNIVERSAL_CHANNEL_ID`), as the
+// library card's does. The report and each posted message's record are JSON
+// in HARNESS_KV beside the library poll's keys; each report's cards and their
+// decisions are on ThreadState, as every decision report's are.
 
 import type { Env } from "../types";
 import { charge } from "../net";
-import type { SlackMessageEvent } from "../slack/types";
-import { postMessage } from "../slack/api";
+import { postMessage, updateMessage } from "../slack/api";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import type { PendingProposal } from "../thread-state/index";
@@ -21,13 +21,10 @@ import type { LibraryChangeSet } from "../figma-library/draft";
 import type { TrackedPublish } from "../figma-library/track";
 import type { JobContext } from "../scheduled/runs";
 import { inFlightComponents, type PrecedenceRegistry } from "./compare";
-import { droppedItems, PRECEDENCE_MARKER, precedenceRuleUrl } from "./report";
+import { precedenceRuleUrl } from "./report";
 import {
-  disputePrecedenceItems,
-  followRestagedCard,
   postPrecedenceReport,
   precedenceChannel,
-  PRECEDENCE_KEY,
   runPrecedenceCheck,
   type CheckResult,
   type PostedThread,
@@ -36,11 +33,11 @@ import {
 } from "./jobs";
 
 const REPORT_KV_KEY = "ds-precedence:report";
-/** Every list thread is recorded under its own ts, so a later week's thread
- *  never displaces an earlier one's. */
+/** Every posted report is recorded under its own ts, so a later week's never
+ *  displaces an earlier one's. */
 const THREAD_KV_PREFIX = "ds-precedence:thread:";
-/** How long a list thread stays one: well past its card's six days, so the
- *  replies people still add to it are not taken as turns. */
+/** How long a report's thread stays one: well past its cards' six days, so
+ *  the replies people still add to it are not taken as turns. */
 const THREAD_RECORD_TTL_S = 30 * 24 * 60 * 60;
 const INDEX_FILE = "design-system/agent-views/components/index.md";
 
@@ -95,17 +92,19 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
   if (!channel) return { posted: false, summary: "PLUS_UNIVERSAL_CHANNEL_ID not set — nothing posted" };
   const target = resolveRepoFor(env, undefined);
   if (!target.ok) return { posted: false, summary: `no repo: ${target.error}` };
-  const reads = githubLibraryReads(env, target.entry);
   return postPrecedenceReport(
     {
       report: kvJson<PrecedenceReport | null>(env, REPORT_KV_KEY, null),
       recordThread: (thread) => threadRecord(env, thread.ts).write(thread),
       members: () => channelMembers(env, channel),
-      async openIntake() {
-        const open = (await reads.openIntakes()).find((i) => i.body.includes(PRECEDENCE_MARKER));
-        return open ? { number: open.number, url: open.url } : null;
+      async post(message) {
+        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
+        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
-      post: (message) => post(env, channel, message),
+      async edit(ts, message) {
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      },
+      reports: threadStateFor(env),
       stage: (proposal) => stageWeeklyCard(env, proposal),
       channel,
       ruleUrl: precedenceRuleUrl(target.entry.repo),
@@ -116,63 +115,10 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
 }
 
 /**
- * Whether a message could drop items from the weekly thread: a person's reply
- * (or "also send to channel" broadcast) in a #plus-universal thread that starts
- * with `drop N` (or the older `dispute N`). Reads nothing — the dispatch uses
- * it to queue the reply on the thread's runner, where `handleDsPrecedenceReply`
- * decides.
- *
- * @param env - Worker bindings
- * @param event - The message
- */
-export function isDsPrecedenceCandidate(env: Env, event: SlackMessageEvent): boolean {
-  const channel = env.PLUS_UNIVERSAL_CHANNEL_ID?.trim();
-  if (!channel || event.channel !== channel || !event.thread_ts || !env.HARNESS_KV) return false;
-  if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
-  return droppedItems(event.text ?? "").length > 0;
-}
-
-/**
- * A queued reply that drops items from the live weekly thread: revise its
- * card. Runs at the head of the thread's job (`slack/message-job.ts`).
- *
- * @param env - Worker bindings
- * @param event - The message
- * @returns Whether it was a drop, handled — the turn is then skipped
- */
-export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent): Promise<boolean> {
-  if (!isDsPrecedenceCandidate(env, event)) return false;
-  const store = threadStateFor(env);
-  return disputePrecedenceItems(
-    {
-      thread: threadRecord(env, event.thread_ts!),
-      post: (message) => post(env, event.channel, message),
-      stage: (proposal) => stageWeeklyCard(env, proposal),
-      async restore(proposal) {
-        // Back in place, not staged anew: its staged row stands. A revision
-        // this retires is superseded on the record, as any card is.
-        const { retired } = await store.putProposal(proposal);
-        await recordProposalEvents(proposalEventLogFor(env), supersededEvents(retired, Date.now(), "worker"));
-      },
-      async retire(ts) {
-        await store.retireProposal(ts);
-      },
-      superseded: (tss) => recordProposalEvents(proposalEventLogFor(env), supersededEvents(tss, Date.now(), "worker")),
-      card: async (ts) => {
-        const found = await store.getProposalByTs(ts);
-        return found.state === "found" ? found.proposal : null;
-      },
-      now: () => Date.now(),
-    },
-    { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" },
-  );
-}
-
-/**
- * Whether a #plus-universal thread is a weekly DS precedence list thread —
- * any week's, for `THREAD_RECORD_TTL_S` after its list posted, whether or not
- * uno-bot has answered there since. One KV read, and only for a thread reply
- * in that channel.
+ * Whether a #plus-universal thread is a weekly DS precedence report's — any
+ * week's, for `THREAD_RECORD_TTL_S` after it posted, whether or not uno-bot
+ * has answered there since. One KV read, and only for a thread reply in that
+ * channel.
  *
  * @param env - Worker bindings
  * @param channel - The reply's channel
@@ -182,20 +128,6 @@ export async function isWeeklyPrecedenceThread(env: Env, channel: string, thread
   if (!env.HARNESS_KV || channel !== env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()) return false;
   const thread = await threadRecord(env, threadTs).read();
   return !!thread && thread.channel === channel && thread.ts === threadTs;
-}
-
-/**
- * A cut-off run's fresh card, when it re-stages a weekly card: its list
- * thread's record follows it (`followRestagedCard`). Any other card reads
- * nothing.
- *
- * @param env - Worker bindings
- * @param from - The card re-staged
- * @param to - The fresh card
- */
-export async function recordPrecedenceRestageFor(env: Env, from: PendingProposal, to: PendingProposal): Promise<void> {
-  if (from.supersedeKey !== PRECEDENCE_KEY) return;
-  await followRestagedCard(threadRecord(env, from.replyTs ?? from.threadTs), from, to);
 }
 
 /**
@@ -212,7 +144,7 @@ async function stageWeeklyCard(env: Env, proposal: PendingProposal): Promise<voi
   ]);
 }
 
-/** One list thread's record in HARNESS_KV, kept `THREAD_RECORD_TTL_S`. */
+/** One report thread's record in HARNESS_KV, kept `THREAD_RECORD_TTL_S`. */
 function threadRecord(env: Env, threadTs: string): { read(): Promise<PostedThread | null>; write(t: PostedThread | null): Promise<void> } {
   const key = `${THREAD_KV_PREFIX}${threadTs}`;
   return {
@@ -227,18 +159,4 @@ function threadRecord(env: Env, threadTs: string): { read(): Promise<PostedThrea
       await env.HARNESS_KV.put(key, JSON.stringify(thread), { expirationTtl: THREAD_RECORD_TTL_S });
     },
   };
-}
-
-async function post(
-  env: Env,
-  channel: string,
-  message: { text: string; blocks?: unknown[]; thread_ts?: string },
-): Promise<{ ok: boolean; ts?: string }> {
-  const res = await postMessage(env, {
-    channel,
-    text: message.text,
-    ...(message.blocks ? { blocks: message.blocks } : {}),
-    ...(message.thread_ts ? { thread_ts: message.thread_ts } : {}),
-  });
-  return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
 }

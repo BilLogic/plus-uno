@@ -1,10 +1,10 @@
 // One queued `message` job, from the dedup claim to the turn — the part of
 // `onMessage` that decides WHAT runs, on named dependencies so the orderings
-// that matter are driven with fakes (tests/ds-precedence-queued.test.ts).
+// that matter are driven with fakes (tests/message-job.test.ts).
 //
-// A reply handled ahead of the turn — a `drop N` in a weekly DS precedence
-// list thread, a "yes, it's up to date" to a file-drift ask, an answer under a
-// card follow-up — is handled HERE, at the head of the thread's own job, and
+// A reply handled ahead of the turn — a "yes, it's up to date" to a
+// file-drift ask, a reword in a Figma comment-decision thread, an answer
+// under a card follow-up — is handled HERE, at the head of the thread's own job, and
 // nowhere earlier. Which handler, if any, was decided when the message was
 // queued (`chainReplyHandlers`), so a reply no handler wanted pays no claim
 // and no second engagement check here. For a handled reply:
@@ -12,16 +12,15 @@
 //     `message` event and its `app_mention` twin try it once between them;
 //     one that is handled also marks the message's own key done, so the twin
 //     that lands second runs no turn;
-//   • the thread's runner takes one job at a time, so two quick disputes each
-//     read the thread record the other left;
-//   • a dispute that is NOT handled (not a list thread) leaves the message's
+//   • the thread's runner takes one job at a time, so two quick replies each
+//     read the record the other left;
+//   • a dispute that is NOT handled (not its thread) leaves the message's
 //     key alone and takes the ordinary path exactly as the message would have
 //     without it: a subtype such as a `thread_broadcast` is skipped unclaimed,
 //     and a reply the engagement gate would not have queued runs nothing —
 //     so an `app_mention` twin arriving second still gets its turn;
 //   • a handler that throws falls through to the ordinary turn in the same
-//     job, so the reply is answered rather than dropped. The DS revision
-//     relies on this. The drift handler catches its own failures but a
+//     job, so the reply is answered rather than dropped. The drift handler catches its own failures but a
 //     budget stop, which it re-throws as on main; the card handler catches
 //     every failure, a budget stop included.
 
@@ -33,9 +32,9 @@ export interface MessageJobDeps {
   claim(runKey: string): Promise<RunClaim>;
   /** Mark a run key done. Best-effort. */
   markDone(runKey: string): Promise<void>;
-  /** Whether the event could be a weekly-thread dispute, or a "yes, it's up
-   *  to date" to a file-drift ask (`figma-drift/`) — no reads. Both take this
-   *  one path. */
+  /** Whether the event could be a reply a handler takes ahead of the turn —
+   *  a "yes, it's up to date" to a file-drift ask (`figma-drift/`), say — no
+   *  reads. Every handler takes this one path. */
   disputeCandidate(event: SlackMessageEvent): boolean;
   /** Handle it; true when it did, and the turn is then skipped. */
   dispute(event: SlackMessageEvent): Promise<boolean>;
