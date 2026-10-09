@@ -2089,6 +2089,13 @@ const ROADMAP_PAGE_SIZE = 100;
 // lookups now filter SERVER-side (below) so position stops mattering; this cap
 // only bounds unfiltered enumeration, and truncation is reported, never hidden.
 export const ROADMAP_MAX_PAGES = 5;
+// A read the server filters to one Design Status goes further, so a count per
+// status is exact: the board's largest status (Need PRD / Under Playground)
+// holds more than 500 cards. Measured live 2026-10-09, one read per status for
+// all seven cost 15 Notion subrequests with that status cut at five pages; ten
+// pages adds at most five, about 25 of the 38-subrequest lookup ceiling with
+// the model's round-trips. A read the ceiling stops still says `truncated`.
+export const ROADMAP_STATUS_MAX_PAGES = 10;
 const ROADMAP_TITLE_PROP = "Name";
 const ROADMAP_ID_PROP = "ID";
 export const ROADMAP_STATUS_PROP = "Design Status";
@@ -2146,7 +2153,7 @@ export async function queryRoadmapCards(
     env,
     env.NOTION_ROADMAP_DB_ID,
     {
-      maxPages: ROADMAP_MAX_PAGES,
+      maxPages: opts.designStatus ? ROADMAP_STATUS_MAX_PAGES : ROADMAP_MAX_PAGES,
       pageSize: ROADMAP_PAGE_SIZE,
       errorLabel: "roadmap query failed",
       filter: roadmapFilter(opts),

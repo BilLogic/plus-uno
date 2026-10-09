@@ -19,12 +19,18 @@
 // without the field is passed over. Which of the field's values no call
 // counted is the presenter's to say, from the source's own options.
 //
+// A CALL THAT READ ONLY PART OF ITS SOURCE is still a point: its count is what
+// it read, a true lower bound, and the reading names it (`atLeast`) so the
+// reader and the model are told "at least". The board's largest status holds
+// more than one read can page through, so refusing would leave the question
+// with no chart at all.
+//
 // WHEN THERE IS NO CHART. A chart that cannot be drawn honestly is refused with
 // one sentence for the reader. Grouped by a field: the list was partial
 // (counting the first 30 of 41 would understate every bar), a group field the
 // rows do not carry, or a measure that is not a number on every row. Across
-// lookups: a call that read only part of its source or reported no whole
-// count, or calls made with different other filters. Either way: fewer than 3
+// lookups: a call that reported no whole count, or calls made with different
+// other filters. Either way: fewer than 3
 // points, more than Slack draws, or labels that collide once cut to Slack's 20
 // characters. The presenter posts the sentence as a ⚠️ line, beneath the
 // lookup's rows as a result table when one lookup's rows were being grouped.
@@ -217,9 +223,18 @@ export interface AcrossRequest {
   takeaway?: string;
 }
 
-/** A chart across lookups, with the full name of every value it counted
- *  (its points' labels are cut to Slack's 20 characters). */
-export type AcrossReading = { chart: Chart; counted: string[]; calls: LookupCall[] } | { refusal: string };
+/** A value a call read only part of, and the count it read: at least that. */
+export interface LowerBound {
+  name: string;
+  value: number;
+}
+
+/** A chart across lookups, with the full name of every value it counted (its
+ *  points' labels are cut to Slack's 20 characters) and those whose count is
+ *  only a lower bound. */
+export type AcrossReading =
+  | { chart: Chart; counted: string[]; atLeast: LowerBound[]; calls: LookupCall[] }
+  | { refusal: string };
 
 /** Flags a lookup sets when what it counted is not the whole match. */
 const PARTIAL_FLAGS = ["truncated", "partial", "has_more", "hasMore", "more"] as const;
@@ -284,7 +299,8 @@ function countedName(call: LookupCall, across: string, list: string | undefined)
  * call's other filters must match — a WIP count for Bill beside a Shipped count
  * for the whole board compares nothing — and the chart is refused when they do
  * not. Two calls that counted the same value, in any case, are one point: the
- * later is a retry.
+ * later is a retry. A call that read only part of its source is a point at the
+ * count it read, named in `atLeast`.
  *
  * @param lookup - The tool that ran, once per group
  * @param calls - Every call of it this turn, in the order made
@@ -309,13 +325,12 @@ export function chartAcross(lookup: string, calls: readonly LookupCall[], reques
   }
 
   const sums = new Map<string, number>();
+  const atLeast: LowerBound[] = [];
   for (const { name, call } of byValue.values()) {
-    if (PARTIAL_FLAGS.some((flag) => call.result[flag] === true)) {
-      return { refusal: `the ${name} lookup read only part of the source, so its count could be short.` };
-    }
     const whole = wholeOf(lookup, call.result, request.list);
     if (whole === undefined) return { refusal: `the ${name} lookup reported no whole count, only the rows it listed.` };
     sums.set(name, whole);
+    if (PARTIAL_FLAGS.some((flag) => call.result[flag] === true)) atLeast.push({ name, value: whole });
   }
 
   const first = made[0]!.result;
@@ -327,7 +342,7 @@ export function chartAcross(lookup: string, calls: readonly LookupCall[], reques
   });
   if ("refusal" in reading) return reading;
   const counted = [...byValue.values()];
-  return { chart: reading.chart, counted: counted.map((c) => c.name), calls: counted.map((c) => c.call) };
+  return { chart: reading.chart, counted: counted.map((c) => c.name), atLeast, calls: counted.map((c) => c.call) };
 }
 
 /**

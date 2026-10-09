@@ -47,6 +47,7 @@ import {
   type Chart,
   type ChartKind,
   type LookupCall,
+  type LowerBound,
 } from "./chart";
 import {
   roadmapCards,
@@ -64,6 +65,7 @@ import {
 import { cardList, cardsOf, type AnswerCards } from "./answer-cards";
 import { signed, warningLog } from "./warning-line";
 import type { AbsenceContext } from "../agent/absence";
+import { splitCutShort } from "../agent/loop-policy";
 
 /** What rides beneath an answer. */
 export interface Presentation {
@@ -192,6 +194,13 @@ function chartNote(chart: Chart): string {
   );
 }
 
+/** What `present` adds when bars of a chart across lookups are lower bounds:
+ *  their lookups read only part of the board. */
+function lowerBoundNote(bounds: readonly LowerBound[]): string {
+  const named = bounds.map((b) => `${b.name} (${b.value})`).join(", ");
+  return `The read stopped short for ${named}, so each is a lower bound, as is \`total\`: say "at least" for them and for any total.`;
+}
+
 /** What `present` answers when a chart across lookups is refused: the counts
  *  could not be grounded together, so the model is not handed them to type. */
 const NO_ACROSS_NOTE =
@@ -286,8 +295,19 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       table = undefined;
       tableCall = undefined;
     }
-    const note = chartNote(reading.chart) + (replaced ? " It replaces the card table an earlier lookup attached; that table no longer posts." : "");
-    return attachChart(reading.chart, { table_attached: table !== undefined }, note);
+    warnings.atLeast(lookup, reading.atLeast);
+    const note =
+      chartNote(reading.chart) +
+      (reading.atLeast.length ? ` ${lowerBoundNote(reading.atLeast)}` : "") +
+      (replaced ? " It replaces the card table an earlier lookup attached; that table no longer posts." : "");
+    return attachChart(
+      reading.chart,
+      {
+        table_attached: table !== undefined,
+        ...(reading.atLeast.length ? { at_least: Object.fromEntries(reading.atLeast.map((b) => [b.name, b.value])) } : {}),
+      },
+      note,
+    );
   };
 
   /** A `present` call asking for a chart: drawn from the recorded lookup's
@@ -404,23 +424,28 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
     revise(name, args, text) {
       if (name === PRESENT_TOOL) return present(args);
       warnings.lookup(name, text);
-      const parsed = parse(text);
+      // A read the turn's budget cut short carries the loop's stamp after its
+      // JSON: still the lookup's result, and partial whatever its flags say.
+      const { body, stamp } = splitCutShort(text);
+      const parsed = parse(body);
       if (!parsed || parsed.ok !== true) return text;
-      const call: Recorded = { args, result: parsed };
+      const call: Recorded = { args, result: stamp ? { ...parsed, truncated: true } : parsed };
       calls.set(name, [...(calls.get(name) ?? []), call]);
       // The Roadmap preset's own door: the lookup asked for its table itself.
       if (name !== "roadmap_query") return text;
-      const cards = args.as_table === true ? roadmapCards(parsed as RoadmapResult) : undefined;
+      const cards = args.as_table === true ? roadmapCards(call.result as RoadmapResult) : undefined;
       if (cards) {
         table = roadmapTable(cards);
         tableCall = call;
         warnings.degraded(undefined);
       }
-      return JSON.stringify({
-        ...parsed,
-        table_attached: cards !== undefined,
-        ...(cards ? { row_count: cards.rows.length, note: cardTableNote(cards) } : {}),
-      });
+      return (
+        JSON.stringify({
+          ...parsed,
+          table_attached: cards !== undefined,
+          ...(cards ? { row_count: cards.rows.length, note: cardTableNote(cards) } : {}),
+        }) + stamp
+      );
     },
     refused(name, error) {
       warnings.refused(name, error);
