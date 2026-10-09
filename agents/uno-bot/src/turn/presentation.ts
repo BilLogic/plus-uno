@@ -595,8 +595,11 @@ export function presentedProse(prose: string, presentation: Presentation | undef
     const takeaway = presentation?.charts?.find((c) => c.takeaway)?.takeaway;
     if (!prose.trim() && takeaway) return { text: takeaway, removed: 0 };
   }
-  if (!overBudget(measureProse(out.text), !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return out;
-  const trimmed = withinListBudget(out.text, carriesConfidence);
+  const measure = measureProse(out.text);
+  if (!overBudget(measure, !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return out;
+  // Beside a table the whole walk goes, since the table carries the rows;
+  // beside cards alone, the first 3 items stay.
+  const trimmed = withinListBudget(out.text, carriesConfidence, table || measure.typedTable ? 0 : MAX_LIST_ITEMS);
   return { ...out, text: trimmed.text, ...(trimmed.removed ? { trimmed: trimmed.removed } : {}) };
 }
 

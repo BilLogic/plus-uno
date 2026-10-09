@@ -32,10 +32,12 @@
 //
 // WHAT IS DONE. Over budget, the turn asks the one judge call it already makes
 // to SHORTEN the answer to the takeaway (`turn/presentation.ts`), at any
-// length the judge reads (`agent/draft-judge.ts`). When the prose that ships
-// is still over — the judge erred or passed it — `withinListBudget` is the
-// backstop: it takes out list items past the first 3, and nothing that is not
-// a list item.
+// length the judge reads and on a longer clock (`agent/draft-judge.ts`). When
+// the prose that ships is still over — the judge erred, timed out or passed it
+// — `withinListBudget` is the backstop: beside a table it takes the whole walk
+// out, every list and the labels that only introduced it, since the table
+// carries the rows; beside cards alone it keeps the first 3 top-level items.
+// Nothing that is not a list item or such a label goes.
 //
 // PURE: no Env, no Slack shape.
 
@@ -149,20 +151,28 @@ export interface ItemsRemoved {
 }
 
 /**
- * The prose with the list items past the first 3 taken out: the backstop for
- * a reply still over the budget when it ships.
+ * The prose with its list items past the first `maxItems` taken out: the
+ * backstop for a reply still over the budget when it ships.
+ *
+ * BESIDE A TABLE, `maxItems` is 0 and the whole walk goes: the table carries
+ * the rows. Live on r526 a keep of "the first 3" kept 3 nesting levels of one
+ * phase, a fragment that read as arbitrary. BESIDE CARDS ONLY, the first 3
+ * top-level items stay, each with everything nested in it.
  *
  * A list item goes with the lines indented beneath it, unless one of them is a
  * line `keep` holds (the confidence clause). A paragraph, a line that is not a
- * list item, and the clause always stay. A label over a list this emptied — a
- * heading, "**Also:**", "Phase: Onboarding" — goes with it, and so does a rule
- * left with nothing after it or beside another. With nothing to take out, the
- * prose stands as written; it is never swapped for a takeaway.
+ * list item, a typed table and the clause always stay. A label that only
+ * introduced what went — "Phase: Onboarding", "**Also:**", "Here is the
+ * breakdown:", a heading — goes with it; a heading over a paragraph that stays
+ * keeps its place. A rule left with nothing after it or beside another goes.
+ * With nothing to take out, the prose stands as written; it is never swapped
+ * for a takeaway.
  *
  * @param prose - The answer as it would post
  * @param keep - A line that never goes
+ * @param maxItems - Top-level list items that stay: 0 beside a table
  */
-export function withinListBudget(prose: string, keep: (line: string) => boolean): ItemsRemoved {
+export function withinListBudget(prose: string, keep: (line: string) => boolean, maxItems: number): ItemsRemoved {
   const lines = prose.split("\n");
   const skip = notProse(lines);
   const gone = new Set<number>();
@@ -172,18 +182,19 @@ export function withinListBudget(prose: string, keep: (line: string) => boolean)
     if (skip[i] || !LIST_ITEM.test(lines[i]!)) continue;
     let end = i + 1;
     while (end < lines.length && lines[end]!.trim() && indentOf(lines[end]!) > indentOf(lines[i]!)) end++;
-    if (seen++ < MAX_LIST_ITEMS || lines.slice(i, end).some(keep)) continue;
-    for (let j = i; j < end; j++) gone.add(j);
-    removed++;
+    // One top-level item, whatever is nested in it.
+    if (seen++ >= maxItems && !lines.slice(i, end).some(keep)) {
+      for (let j = i; j < end; j++) gone.add(j);
+      removed++;
+    }
     i = end - 1;
   }
   if (!removed) return { text: prose, removed: 0 };
 
-  // A label goes when every list item beneath it went.
-  for (let i = 0; i < lines.length; i++) {
+  // Bottom-up, so a label over labels that went is decided after them.
+  for (let i = lines.length - 1; i >= 0; i--) {
     if (gone.has(i) || skip[i] || !isLabel(lines[i]!) || keep(lines[i]!)) continue;
-    const items = listUnder(lines, i);
-    if (items.length && items.every((k) => gone.has(k))) gone.add(i);
+    if (introducesOnlyGone(lines, i, gone, skip, keep)) gone.add(i);
   }
 
   const kept = lines.filter((_, i) => !gone.has(i));
@@ -202,22 +213,36 @@ export function withinListBudget(prose: string, keep: (line: string) => boolean)
   return { text: out.join("\n"), removed };
 }
 
-/** The list items directly under the label at `at`: after any blank lines,
- *  the run of items and their indented lines, up to the first line that is
- *  neither. */
-function listUnder(lines: readonly string[], at: number): number[] {
-  let j = at + 1;
-  while (j < lines.length && !lines[j]!.trim()) j++;
-  const items: number[] = [];
-  for (; j < lines.length; j++) {
+/**
+ * Whether the label at `at` introduced only what went: everything after it, up
+ * to the first line that stays and is not a list item, went, and something
+ * did. A list item that stays means it still introduces a list. A heading
+ * whose own section goes on into a paragraph keeps its place over it; a
+ * paragraph past a label that went, or the confidence clause, is not its
+ * section's.
+ */
+function introducesOnlyGone(
+  lines: readonly string[],
+  at: number,
+  gone: ReadonlySet<number>,
+  skip: readonly boolean[],
+  keep: (line: string) => boolean,
+): boolean {
+  const heading = /^\s*#{1,6}\s/.test(lines[at]!);
+  let any = false;
+  let ownSection = true;
+  for (let j = at + 1; j < lines.length; j++) {
     const line = lines[j]!;
-    if (!line.trim()) {
-      const next = lines.slice(j + 1).find((l) => l.trim());
-      if (next === undefined || !LIST_ITEM.test(next)) break;
+    if (!line.trim()) continue;
+    if (gone.has(j)) {
+      any = true;
+      if (isLabel(line)) ownSection = false;
       continue;
     }
-    if (!LIST_ITEM.test(line) && indentOf(line) === 0) break;
-    items.push(j);
+    if (!skip[j] && (LIST_ITEM.test(line) || indentOf(line) > 0)) return false;
+    const paragraph = !skip[j] && !isLabel(line) && !RULE.test(line) && !keep(line);
+    if (heading && ownSection && paragraph) return false;
+    return any;
   }
-  return items;
+  return any;
 }
