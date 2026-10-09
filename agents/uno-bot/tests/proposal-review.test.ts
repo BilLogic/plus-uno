@@ -26,6 +26,7 @@ import {
 } from "../src/slack/review-door";
 import type { CardMessage } from "../src/slack/button-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
+import { draftSubmitOf } from "../src/slack/review-view";
 import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
 import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
 import { verdictEvents } from "../src/usage/index";
@@ -82,8 +83,8 @@ const approve = (userId = "U2", viewId = "V1") => ({
   decision: "confirm" as const,
 });
 
-/** A confirmer's decision row, the body's last block: all three decisions. */
-const DECISION_ROW = ["uno_review_approve", "uno_review_changes", "uno_review_reject"];
+/** A confirmer's draft has one button, Edit fields; its decision is an input. */
+const DECISION_ROW: string[] = [];
 
 /** Every action element a view offers. */
 function actionIds(view: unknown): string[] {
@@ -210,30 +211,58 @@ describe("Review opens the draft", () => {
     assert.match(viewText(views.calls[1]!.view), /Reflection redesign/);
   });
 
-  it("puts Approve, Needs changes and Reject in one row at the foot, Close alone in the footer, and holds no input", async () => {
+  it("ends with the decision and a note, and Submit in the footer beside Close", async () => {
     const { deps, views } = harness(await staged());
     await runReviewOpen(open(), deps);
     const draft = views.calls[1]!.view as {
-      blocks: Array<{ type: string; accessory?: { action_id: string; text: { text: string } }; elements?: Array<{ style?: string; text: { text: string } }> }>;
+      blocks: Array<{
+        type: string;
+        block_id?: string;
+        optional?: boolean;
+        accessory?: { action_id: string; text: { text: string } };
+        element?: { type: string; options?: Array<{ value: string; text: { text: string } }> };
+      }>;
       submit?: { text: string };
       close?: { text: string };
     };
-    assert.equal(draft.submit, undefined, "no footer submit: the decisions sit together in the row");
+    assert.equal(draft.submit?.text, "Submit");
     assert.equal(draft.close?.text, "Close");
-    assert.deepEqual(actionIds(draft), DECISION_ROW);
+    const inputs = draft.blocks.filter((b) => b.type === "input");
+    assert.deepEqual(inputs.map((b) => b.block_id), ["uno_review_choice", "uno_review_note"]);
+    assert.equal(inputs[0]!.element?.type, "radio_buttons");
     assert.deepEqual(
-      draft.blocks.at(-1)?.elements?.map((e) => [e.text.text, e.style ?? "default"]),
+      inputs[0]!.element?.options?.map((o) => [o.value, o.text.text]),
       [
-        ["Approve", "primary"],
-        ["Needs changes", "default"],
-        ["Reject", "danger"],
+        ["confirm", "Approve"],
+        ["revise", "Needs changes"],
+        ["cancel", "Reject"],
       ],
     );
-    assert.deepEqual(draft.blocks.filter((b) => b.type === "input"), []);
+    assert.notEqual(inputs[0]!.optional, true, "the decision is required");
+    assert.equal(inputs[1]!.optional, true);
+    assert.equal(draft.blocks.at(-1)!.block_id, "uno_review_note", "the note is last, just above the footer");
+    assert.deepEqual(actionIds(draft), [], "no decision buttons in the body");
     // Edit fields sits at the top, beside the draft.
     assert.equal(draft.blocks[0]?.accessory?.action_id, "uno_review_edit");
     assert.equal(draft.blocks[0]?.accessory?.text.text, "Edit fields");
-    assert.doesNotMatch(viewText(draft), /Check edits/);
+  });
+
+  it("reads the decision and note from Submit, and asks for a note before Needs changes", () => {
+    const state = (decision?: string, note?: string) => ({
+      values: {
+        uno_review_choice: { uno_review_choice_input: decision ? { selected_option: { value: decision } } : {} },
+        uno_review_note: { uno_review_note_input: { value: note ?? null } },
+      },
+    });
+    assert.deepEqual(draftSubmitOf(state("confirm")), { ok: true, decision: "confirm", note: "" });
+    assert.deepEqual(draftSubmitOf(state("cancel", "  not now ")), { ok: true, decision: "cancel", note: "not now" });
+    assert.deepEqual(draftSubmitOf(state("revise", "Shorter goals")), { ok: true, decision: "revise", note: "Shorter goals" });
+    const blank = draftSubmitOf(state("revise", "  "));
+    assert.equal(blank.ok, false);
+    assert.match(!blank.ok ? blank.errors.uno_review_note! : "", /what to change/);
+    const none = draftSubmitOf(state());
+    assert.equal(none.ok, false);
+    assert.match(!none.ok ? none.errors.uno_review_choice! : "", /Choose/);
   });
 
   it("carries the card it is about, so the decision finds it", async () => {
@@ -292,14 +321,14 @@ describe("Review opens the draft", () => {
     assert.deepEqual(actionIds(view), []);
   });
 
-  it("keeps the decision row on a draft too long for one view, and says some was left out", async () => {
+  it("keeps the decision on a draft too long for one view, and says some was left out", async () => {
     const sections = Array.from({ length: 140 }, (_, n) => ({ heading: `Part ${n}`, body: `Paragraph ${n}: ${"words ".repeat(80)}` }));
     const { deps, views } = harness(await staged({ input: { surface: "prd", title: "Reflection redesign", sections } }));
     await runReviewOpen(open(), deps);
     const view = views.calls[1]!.view as { blocks: Array<{ type: string; block_id?: string }> };
     assert.ok(view.blocks.length <= 100, `${view.blocks.length} blocks`);
     assert.deepEqual(actionIds(view), DECISION_ROW);
-    assert.equal(view.blocks.at(-1)!.block_id, "uno_review_decision", "the decision row is last");
+    assert.equal(view.blocks.at(-1)!.block_id, "uno_review_note", "the decision is last");
     assert.match(viewText(view), /left out/i);
     assert.match(viewText(view), /Paragraph 0:/, "the draft still opens the view");
     assert.deepEqual(views.refused, []);

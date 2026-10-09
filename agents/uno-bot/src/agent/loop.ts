@@ -335,11 +335,16 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         // one, so a call to it is refused here, before any dispatch.
         text = JSON.stringify({ ok: false, error: `'${call.name}' is not a tool you can call` });
         refused(text);
-      } else if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
-        text = budgetRefusedResult();
+      } else if (
+        !rowFor(call.name)?.fetchesNothing &&
+        (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING)
+      ) {
+        text = budgetRefusedResult({ presentStillWorks: deps.budget.used() < LOOKUP_CEILING });
         refused(text);
       } else {
-        toolCallsUsed++;
+        // A call that fetches nothing is no lookup, so it spends none of the
+        // count: an answer's shape is chosen after the lookups are done.
+        if (!rowFor(call.name)?.fetchesNothing) toolCallsUsed++;
         input.onToolProgress?.({ ...progress, phase: "started" });
         // Enforced, not forecast: the ceiling refuses the call that would cross
         // it, so a tool can start with any headroom and simply return less.

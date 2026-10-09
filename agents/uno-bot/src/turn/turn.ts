@@ -110,7 +110,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { judgedList, presentedProse, presenter, type Presenter } from "./presentation";
+import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -480,6 +480,9 @@ export interface TurnDeps {
     /** The plain list of the result table beneath the draft, when one is
      *  attached — absent otherwise, and the judge is asked as before. */
     tableList?: string;
+    /** The draft is over its prose budget: shorten it, at any length the
+     *  judge reads. */
+    shorten?: boolean;
   }): Promise<TurnJudgement>;
 
   /** Clarify-vs-act: what this tool call still needs before it may be staged,
@@ -570,6 +573,14 @@ export interface TurnDeps {
    * @param text the model's draft, before posting
    */
   deliveredBody(text: string): string;
+
+  /**
+   * Every value a lookup's filter can take, as its source offers them — the
+   * Roadmap board's Design Statuses — or null where none are known. Read only
+   * after a chart across lookups is drawn on that field, so the chart can name
+   * the values no lookup counted. Absent, none are known.
+   */
+  lookupOptions?(lookup: string, field: string): Promise<readonly string[] | null>;
 
   /** Structured state + progressive summarisation (`CONTEXT_STATE`). Flagged
    *  off in production; see the header of `agent/context-state.ts`. */
@@ -1978,13 +1989,31 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     }
   }
 
+  // A chart across lookups names the values its source offers that no lookup
+  // counted. Read here, once a chart needs it, so no other turn pays for it;
+  // a failed read leaves the chart as drawn, with nothing named.
+  for (const { lookup, field } of ctx.presenting.chartedAcross()) {
+    try {
+      const options = await deps.lookupOptions?.(lookup, field);
+      if (options?.length) ctx.presenting.optionsOffered(lookup, field, options);
+    } catch (err) {
+      console.warn(`[chart] ${lookup} ${field} options unread: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
   // Everything that rides beneath the answer is known from here on: the
   // lookups' table and ⚠️ lines, and the absence check's line above.
   const presentation = ctx.presenting.presentation();
 
-  // ONE judge call carries both repairs when both fire. Sent as two sibling
+  // A draft over its prose budget beside a table (`turn/prose-budget.ts`) is
+  // shortened to its takeaway by the same judge call, at any length the judge
+  // reads; `presentedProse` is the backstop when the shortening misses.
+  const walkRepair = proseBudgetRepair(draft, presentation);
+  if (walkRepair) console.log("[prose-budget] draft walks its table: asking the judge to shorten it");
+
+  // ONE judge call carries every repair that fires. Sent as sibling
   // instructions they compete and the model does one.
-  const extra = [repairInstruction(verdict) ?? undefined, absenceRepair]
+  const extra = [repairInstruction(verdict) ?? undefined, absenceRepair, walkRepair]
     .filter(Boolean)
     .join("\n\n");
 
@@ -2001,7 +2030,10 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
       ? { forceReason: verdict.kind }
       : absenceRepair
         ? { forceReason: "absence-scope" }
-        : {}),
+        : walkRepair
+          ? { forceReason: "table-walk" }
+          : {}),
+    ...(walkRepair ? { shorten: true } : {}),
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
     // both: a draft that summarises and points at the table has answered.
@@ -2031,13 +2063,15 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     );
   }
 
-  // Rows the model typed out as well as the table come out here, after the
+  // Rows the model typed out as well as the table come out here, and list
+  // items past the first 3 when the prose is still over budget, after the
   // judge (whose revision could type them too) and before the one call every
   // Delivery shares, so Slack, the recording Delivery and the thread's memory
   // all get the same prose. A rule that must hold on every provider lives in
   // code, not in the persona.
   const stripped = presentedProse(reviewed.text, presentation);
   if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
+  if (stripped.trimmed) console.log(`[result-table] trimmed ${stripped.trimmed} list item(s) past the first 3; prose over budget`);
   const prose = stripped.text;
 
   // The table rides with the answer; what comes back as `posted.text` is then

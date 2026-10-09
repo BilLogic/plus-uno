@@ -15,8 +15,10 @@
 //     titles really contain the phrase. The "similar" did-you-mean guesses stay
 //     in the prose, so a guess never sits in a grid that reads as fact.
 //   • Any other lookup, through `present`: the rows are the first list of
-//     records in its result (or the one it names), the columns the fields the
-//     model chose, each one held to what the rows carry.
+//     records in its result (or the one it names) — every call of it this
+//     turn, merged (`mergedLookup`) — and the columns the fields the model
+//     chose, each one held to what the rows carry, a property bag's fields
+//     included. The result itself offers which (`tableOffer`).
 // Either way it is a `ResultTable`: the cells, the caption, the plain list and
 // what the duplicate-row strip looks for, all computed here.
 //
@@ -27,7 +29,8 @@
 //
 // ROWS TYPED TWICE. A model told the rows are the table's still types them out
 // at times, so `withoutRepeatedRows` takes them out of the prose before it
-// posts.
+// posts. One that walks more than 3 of them in sentences of its own is
+// counted by `namedRows`, for the prose budget (`turn/prose-budget.ts`).
 //
 // PURE: no Env, no Slack shape. What the table LOOKS like in Slack — the block
 // — is `slack/result-table-block.ts`'s. Which table a turn posts, and what the
@@ -273,14 +276,19 @@ type Record_ = Record<string, unknown>;
 const isRecord = (v: unknown): v is Record_ => typeof v === "object" && v !== null && !Array.isArray(v);
 const isAddress = (v: unknown): v is string => typeof v === "string" && /^https?:\/\//.test(v);
 
-/** A field name as a header: `design_status` → "Design Status". */
+/** A field name as a header: `design_status` → "Design Status", and a field
+ *  of a property bag by its own name, `meta.Year` → "Year". */
 export function labelOf(field: string): string {
-  return field
+  // A bag's name never holds a dot (`flatRow`), so the first dot ends it and
+  // every dot after belongs to the field's own name: `meta.Est. Hours`.
+  const dot = field.indexOf(".");
+  const label = (dot >= 0 ? field.slice(dot + 1) : field)
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .split(/[_\s]+/)
     .filter(Boolean)
     .map((w) => w[0]!.toUpperCase() + w.slice(1))
     .join(" ");
+  return label || field;
 }
 
 /** A value as a cell: text, a number, or nothing. */
@@ -301,39 +309,174 @@ function columnRefusal(field: string, rows: Record_[], usable: string[]): string
   return null;
 }
 
+/**
+ * A row with each property bag opened one level: a field holding a record of
+ * plain values (`meta: { Year, Status }`, how a Notion catalog row carries its
+ * properties) also reads as `meta.Year` and `meta.Status`, so those can be
+ * columns. Without it, every such row offered its title and nothing else.
+ */
+function flatRow(row: Record_): Record_ {
+  const flat: Record_ = {};
+  for (const [key, value] of Object.entries(row)) {
+    flat[key] = value;
+    if (!isRecord(value)) continue;
+    for (const [sub, v] of Object.entries(value)) if (typeof v !== "object" || v === null) flat[`${key}.${sub}`] = v;
+  }
+  return flat;
+}
+
 /** The fields a column could be drawn from. */
 function usableFields(rows: Record_[]): string[] {
   const fields = [...new Set(rows.flatMap((r) => Object.keys(r)))];
   return fields.filter((f) => columnRefusal(f, rows, []) === null);
 }
 
-/** The list of records a result holds under `key`, or its first one. */
-export function listOf(result: Record_, key: string | undefined): { key: string; rows: Record_[] } | null {
-  const lists = Object.entries(result).filter(
+/** Every list of records a result holds, by key, in the result's order. */
+function listsOf(result: Record_): Array<[string, Record_[]]> {
+  return Object.entries(result).filter(
     ([, v]) => Array.isArray(v) && v.length > 0 && v.every(isRecord),
   ) as Array<[string, Record_[]]>;
+}
+
+/** The list of records a result holds under `key`, or its first one. */
+export function listOf(result: Record_, key: string | undefined): { key: string; rows: Record_[] } | null {
+  const lists = listsOf(result);
   const found = key ? lists.find(([k]) => k === key) : lists[0];
   return found ? { key: found[0], rows: found[1] } : null;
 }
 
+/** The fields a whole count behind the list under `key` may be reported in. */
+const countFields = (key: string): string[] => [`${key}Total`, `${key.replace(/s$/, "")}Total`, "matched", "total"];
+
 /** The whole count behind a list, when the result reports one. */
 export function wholeCount(result: Record_, key: string): number | undefined {
-  const singular = key.replace(/s$/, "");
-  for (const field of [`${key}Total`, `${singular}Total`, "matched", "total"]) {
+  for (const field of countFields(key)) {
     if (typeof result[field] === "number") return result[field];
   }
   return undefined;
 }
 
+/** Fewer rows than this are not offered as a table: a grid starts at 3. A
+ *  table the model asks for itself still needs only `MIN_ROWS`. */
+const OFFER_MIN_ROWS = 3;
+
+/** Fields kept for the machine and never offered as a column: identifiers,
+ *  retrieval scores and provenance, timestamps. `present` still takes one the
+ *  model names. */
+const MACHINE_FIELD = /^(id|kind|score|matchedBy|matched_by)$|[_.](id|score)$|Id$|Score$|At$|_at$/;
+
+/** The fields a list of rows offers as columns, in the order the rows carry
+ *  them. */
+function offeredColumns(rows: Record_[]): string[] {
+  return usableFields(rows.map(flatRow)).filter((f) => !MACHINE_FIELD.test(f));
+}
+
+/** What a result offers as a table. */
+export interface TableOffer {
+  /** The list's key, as `present` takes it. */
+  list: string;
+  /** How many rows the table would show. */
+  count: number;
+  /** The fields a column can show, in the order the rows carry them. */
+  columns: string[];
+}
+
+/**
+ * What a result offers as a table: its main list (the one `present` reads
+ * when no `list` is named), when it holds 3 or more records and a field a
+ * column can show. The lookup's result carries it, so the model reads which
+ * rows can post as a table, and under which columns, at the point it chooses
+ * how to answer.
+ *
+ * @param result - A lookup's result, parsed
+ */
+export function tableOffer(result: Record_): TableOffer | undefined {
+  const list = listOf(result, undefined);
+  if (!list || list.rows.length < OFFER_MIN_ROWS) return undefined;
+  const columns = offeredColumns(list.rows);
+  return columns.length ? { list: list.key, count: list.rows.length, columns } : undefined;
+}
+
+/** What a row is known by when two calls return it: its id when it has one,
+ *  else its address, else all of it. */
+function rowKey(row: Record_): string {
+  const id = row.id;
+  if ((typeof id === "string" && id.trim()) || (typeof id === "number" && Number.isFinite(id))) return `id:${String(id)}`;
+  return isAddress(row.url) ? row.url : JSON.stringify(row);
+}
+
+/** An argument merged calls did not share: each value they ran with. */
+export interface Varied {
+  readonly varied: readonly unknown[];
+}
+
+const isVaried = (v: unknown): v is Varied => isRecord(v) && Array.isArray(v.varied);
+
+/** A call's main list and the columns it offers, as one comparable string. */
+function shapeOf(result: Record_): string {
+  const list = listOf(result, undefined);
+  return list ? `${list.key}:${offeredColumns(list.rows).sort().join(",")}` : "";
+}
+
+/**
+ * Several calls of one lookup, as one result: what a turn that searched a
+ * source several times — once per phase, once per scenario — shows as one
+ * table, chart or set of cards.
+ *
+ * WHICH CALLS. The last call, and every earlier one whose main list offers the
+ * same columns: the same search run under another term or filter. A call of
+ * another shape — an orientation search listing paths before the cells — is
+ * another list, and stays out.
+ *
+ * Each list of records is those calls' rows in call order, a row two calls
+ * returned kept once. Everything else is the last call's, except what would
+ * misstate the merged lists. A whole count belongs to one call's query, so it
+ * is dropped and the rows shown are the count; the list is partial when any
+ * call's was, or matched more than it returned. An argument every call shared
+ * stays as it is, and one they did not becomes `Varied`, so the caption names
+ * each value the calls ran with.
+ *
+ * @param calls - The lookup's calls this turn, in order, at least one
+ */
+export function mergedLookup(calls: ReadonlyArray<{ args: Record_; result: Record_ }>): { args: Record_; result: Record_ } {
+  const last = calls[calls.length - 1]!;
+  const shape = shapeOf(last.result);
+  const merged = calls.filter((c) => c === last || (shape !== "" && shapeOf(c.result) === shape));
+  if (merged.length === 1) return last;
+  const result: Record_ = { ...last.result };
+  let partial = merged.some((c) => c.result.truncated === true);
+  for (const key of new Set(merged.flatMap((c) => listsOf(c.result).map(([k]) => k)))) {
+    const seen = new Map<string, Record_>();
+    for (const call of merged) {
+      const rows = listOf(call.result, key)?.rows ?? [];
+      if ((wholeCount(call.result, key) ?? 0) > rows.length) partial = true;
+      for (const row of rows) if (!seen.has(rowKey(row))) seen.set(rowKey(row), row);
+    }
+    result[key] = [...seen.values()];
+    for (const field of countFields(key)) delete result[field];
+  }
+  if (partial) result.truncated = true;
+  const names = [...new Set(merged.flatMap((c) => Object.keys(c.args)))];
+  const args: Record_ = {};
+  for (const name of names) {
+    const values = [...new Map(merged.map((c) => [JSON.stringify(c.args[name]), c.args[name]])).values()];
+    args[name] = values.length === 1 ? values[0] : ({ varied: values } as Varied);
+  }
+  return { args, result };
+}
+
 /** The lookup's arguments as the caption's filter: `"onboarding" · phase
- *  Onboarding`. Free text is quoted; a filter is named by its field. */
+ *  Onboarding`, and `phase Onboarding / Pre-session` where merged calls ran
+ *  under each. Free text is quoted; a filter is named by its field. */
 function filterOf(args: Record_): string[] {
   const FREE_TEXT = new Set(["query", "keywords", "title", "q"]);
-  return Object.entries(args)
-    .filter(([, v]) => (typeof v === "string" && v.trim()) || typeof v === "number")
-    .map(([k, v]) =>
-      FREE_TEXT.has(k) ? `"${String(v)}"` : `${k.replace(/^filter_/, "").replace(/_/g, " ")} ${String(v)}`,
-    );
+  const shown = (v: unknown): v is string | number => (typeof v === "string" && !!v.trim()) || typeof v === "number";
+  return Object.entries(args).flatMap(([k, v]) => {
+    const values = isVaried(v) ? v.varied.filter(shown) : shown(v) ? [v] : [];
+    if (!values.length) return [];
+    const said = values.map((x) => (FREE_TEXT.has(k) ? `"${String(x)}"` : String(x))).join(" / ");
+    return [FREE_TEXT.has(k) ? said : `${k.replace(/^filter_/, "").replace(/_/g, " ")} ${said}`];
+  });
 }
 
 /** What a list holds, by its key: "findings", or "finding" for one. */
@@ -366,17 +509,18 @@ export function tableOf(lookup: string, args: Record_, result: Record_, request:
     };
   }
   if (list.rows.length < MIN_ROWS) return { refusal: "One row is an answer in prose, not a table." };
+  const records = list.rows.map(flatRow);
 
   const fields = [...new Set(request.columns.map((c) => c.trim()).filter(Boolean))];
   if (fields.length === 0) return { refusal: "Name at least one column." };
   if (fields.length > MAX_COLUMNS) return { refusal: `At most ${MAX_COLUMNS} columns; you named ${fields.length}.` };
-  const usable = usableFields(list.rows);
+  const usable = usableFields(records);
   for (const field of fields) {
-    const refusal = columnRefusal(field, list.rows, usable);
+    const refusal = columnRefusal(field, records, usable);
     if (refusal) return { refusal };
   }
 
-  const shown = list.rows.slice(0, MAX_ROWS);
+  const shown = records.slice(0, MAX_ROWS);
   const columns = fields.map((field) => ({
     label: labelOf(field),
     numeric: shown.every((r) => cellOf(r[field]) === null || typeof cellOf(r[field]) === "number"),
@@ -449,9 +593,16 @@ export function withResultList(prose: string, table: ResultTable): string {
 export interface RowsRemoved {
   text: string;
   removed: number;
+  /** List items the prose budget's backstop took out (`turn/prose-budget.ts`). */
+  trimmed?: number;
 }
 
 const fold = (s: string): string => s.toLowerCase().replace(/\s+/g, " ").trim();
+
+/** Link wrapping taken off: Slack's `<url|title>` and markdown's
+ *  `[title](url)` keep the title and lose the address. */
+const unlinked = (s: string): string =>
+  s.replace(/<[^|>\s]+\|([^>]*)>/g, "$1").replace(/\[([^\]]*)\]\([^)\s]*\)/g, "$1");
 const escape = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** A name as a pattern: a card number `#401` never matches inside `#4012`. */
@@ -466,9 +617,8 @@ const namePattern = (name: string): RegExp =>
  * stays.
  */
 function repeatsRow(line: string, table: ResultTable, labels: RegExp | null): boolean {
-  // Link wrapping goes first: Slack's `<url|title>` and markdown's
-  // `[title](url)` keep the title and lose the address.
-  const plain = fold(line.replace(/<[^|>\s]+\|([^>]*)>/g, "$1").replace(/\[([^\]]*)\]\([^)\s]*\)/g, "$1"));
+  // Link wrapping goes first.
+  const plain = fold(unlinked(line));
   return table.rows.some((row) => {
     if (row.names.length === 0) return false;
     const names = row.names.map(namePattern);
@@ -515,4 +665,51 @@ export function withoutRepeatedRows(prose: string, table: ResultTable): RowsRemo
   if (!removed) return { text: prose, removed: 0 };
   while (kept.length && !kept[kept.length - 1]!.trim()) kept.pop();
   return { text: kept.join("\n"), removed };
+}
+
+// ── Rows walked in prose ────────────────────────────────────────────────────
+//
+// Told the rows are the table's, a model still walks them at times, each in a
+// sentence that says more than the row, so no line reads as a row typed out
+// and `withoutRepeatedRows` leaves every one. How many of the table's rows the
+// prose names is one of the measures of a reply that is too long beside its
+// table; the rest, and what is done about it, are `turn/prose-budget.ts`'s.
+
+/** At most this many rows the prose names beside the table: the ones that
+ *  stand out. */
+export const MAX_NAMED_ROWS = 3;
+
+/** How a line of prose names each row: a pattern per row, or null for a row
+ *  only its link names. A row is named by its link, or by its first column
+ *  when no other row shares that value — a phase or scenario every other row
+ *  carries too names none of them. */
+function rowNamers(table: ResultTable): Array<RegExp | null> {
+  const firsts = table.rows.map((row) => (typeof row.cells[0] === "string" ? fold(row.cells[0]) : ""));
+  return firsts.map((first) =>
+    first.length >= 4 && firsts.filter((f) => f === first).length === 1
+      ? new RegExp(`(?<![\\p{L}\\p{N}])${escape(first)}(?![\\p{L}\\p{N}])`, "u")
+      : null,
+  );
+}
+
+/** The rows one line names, by index. */
+function rowsIn(line: string, table: ResultTable, namers: Array<RegExp | null>): number[] {
+  const plain = fold(unlinked(line));
+  return table.rows.flatMap((row, i) => {
+    const addresses = [row.url, ...(row.links ?? [])].filter((u): u is string => !!u);
+    const linked = addresses.some((u) => new RegExp(`${escape(u)}(?![\\w/-])`).test(line));
+    return linked || namers[i]?.test(plain) ? [i] : [];
+  });
+}
+
+/**
+ * The rows the prose names, by index, in the order it first names them.
+ *
+ * @param prose - The answer as the model wrote it, before any strip, so a row
+ *   it typed out counts too
+ * @param table - The table beneath it
+ */
+export function namedRows(prose: string, table: ResultTable): number[] {
+  const namers = rowNamers(table);
+  return [...new Set(prose.split("\n").flatMap((line) => rowsIn(line, table, namers)))];
 }

@@ -38,6 +38,17 @@ export interface TaskCardSource {
    * Absent everywhere else.
    */
   readonly visibility?: string;
+  /**
+   * What the lookup queried, as against one of the rows it found: the
+   * `collection` it searched (the Roadmap board, a scoped Notion database) or
+   * the `page` it read whole. An answer stands on what it queried whatever it
+   * names, so the Sources box keeps this one and a row only when the prose
+   * names it (`slack/sources-box.ts`).
+   */
+  readonly queried?: "collection" | "page";
+  /** The row's number as its estate shows it — a Roadmap card's — so prose
+   *  that writes "#412" names it. */
+  readonly number?: number;
 }
 
 /** What a card says beyond its title. Every method answers null (or none)
@@ -47,7 +58,8 @@ export interface TaskCardReadout {
   details(args: Record<string, unknown>): string | null;
   /** What came back, as a glance — "4 pages", "no matches". */
   output(result: string): string | null;
-  /** The links the result names, at most `MAX_SOURCES`, each once. */
+  /** The links the result names, each once — every row's, since an answer
+   *  may name any of them. A card shows the first few. */
   sources(result: string): TaskCardSource[];
   /** Where the call is routed, for a tool whose code routes it — which repo,
    *  which Notion database — or null where it routes nowhere in particular. */
@@ -72,10 +84,6 @@ export interface TaskCardDecision {
   /** The step's title. */
   readonly title: string;
 }
-
-/** How many links one card carries. Enough to open the source behind a claim;
- *  few enough that a card stays a line, not a reading list. */
-export const MAX_SOURCES = 5;
 
 /** The tools that get a card: ungated rows whose taskCard is not null. */
 type CardTool = {
@@ -136,12 +144,12 @@ function countOutput(list: string, one: string, none = "no matches", many?: stri
 /** The links the rows of `list` carry, named by the first label field present.
  *  Only a row's own `url` / `link` — never a URL found inside its content,
  *  which is what the page SAYS, not what the lookup READ. */
-function rowLinks(list: string, labels: readonly string[], visibilityFrom?: string) {
+function rowLinks(list: string, labels: readonly string[], opts: { visibilityFrom?: string; numberFrom?: string } = {}) {
   return (result: string): TaskCardSource[] => {
     const p = succeeded(result);
     const rows = p?.[list];
     if (!p || !Array.isArray(rows)) return [];
-    const visibility = visibilityFrom ? str(p[visibilityFrom]) : null;
+    const visibility = opts.visibilityFrom ? str(p[opts.visibilityFrom]) : null;
     return unique(
       rows.flatMap((row) => {
         if (!row || typeof row !== "object") return [];
@@ -149,18 +157,31 @@ function rowLinks(list: string, labels: readonly string[], visibilityFrom?: stri
         const url = httpUrl(r.url) ?? httpUrl(r.link);
         if (!url) return [];
         const text = labels.map((k) => str(r[k])).find(Boolean) ?? url;
-        return [{ text, url, ...(visibility ? { visibility } : {}) }];
+        const number = opts.numberFrom ? r[opts.numberFrom] : undefined;
+        return [{ text, url, ...(visibility ? { visibility } : {}), ...(typeof number === "number" ? { number } : {}) }];
       }),
     );
   };
 }
 
-/** The one link a single-document read returned. */
+/** The one link a single-document read returned: the page it read. */
 function ownLink(result: string): TaskCardSource[] {
   const p = succeeded(result);
   const url = p && httpUrl(p.url);
   if (!p || !url) return [];
-  return [{ text: str(p.title) ?? url, url }];
+  return [{ text: str(p.title) ?? url, url, queried: "page" }];
+}
+
+/** The collection a lookup queried — the payload's `field`, a `{ title, url }`
+ *  the tool writes when it has the collection's link — then its rows' links. */
+function collectionThenRows(field: string, rows: (result: string) => TaskCardSource[]) {
+  return (result: string): TaskCardSource[] => {
+    const p = succeeded(result);
+    const collection = p?.[field] as Payload | undefined;
+    const url = collection && typeof collection === "object" ? httpUrl(collection.url) : null;
+    const own: TaskCardSource[] = url ? [{ text: str(collection!.title) ?? url, url, queried: "collection" }] : [];
+    return unique([...own, ...rows(result)]);
+  };
 }
 
 const httpUrl = (v: unknown): string | null => {
@@ -170,7 +191,7 @@ const httpUrl = (v: unknown): string | null => {
 
 function unique(sources: TaskCardSource[]): TaskCardSource[] {
   const seen = new Set<string>();
-  return sources.filter((s) => !seen.has(s.url) && seen.add(s.url)).slice(0, MAX_SOURCES);
+  return sources.filter((s) => !seen.has(s.url) && seen.add(s.url));
 }
 
 const noSources = (): TaskCardSource[] => [];
@@ -232,7 +253,7 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
     details: (args) =>
       typeof args.card_number === "number" ? `#${args.card_number}` : arg("title", "person", "design_status")(args),
     output: countOutput("cards", "card", "no matching cards"),
-    sources: rowLinks("cards", ["title"]),
+    sources: collectionThenRows("board", rowLinks("cards", ["title"], { numberFrom: "card_number" })),
   },
   notion_search: {
     details: (args) => {
@@ -242,7 +263,7 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
       return query ? `${query} in ${scope}` : scope;
     },
     output: countOutput("results", "page"),
-    sources: rowLinks("results", ["title", "name"]),
+    sources: collectionThenRows("database", rowLinks("results", ["title", "name"])),
     decision: notionScopeDecision,
   },
   source_read: {
@@ -319,7 +340,7 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
   slack_search: {
     details: arg("query"),
     output: countOutput("results", "message"),
-    sources: rowLinks("results", ["channel"], "visibility"),
+    sources: rowLinks("results", ["channel"], { visibilityFrom: "visibility" }),
   },
   read_reference: {
     details: arg("name"),

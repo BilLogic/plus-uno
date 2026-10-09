@@ -126,6 +126,25 @@ describe("a task card's details, output and sources", () => {
     assert.equal(card.output, "no matching cards");
   });
 
+  it("a card carries at most five links, however many rows the lookup read", async () => {
+    const results = Array.from({ length: 12 }, (_, i) => ({ title: `p${i}`, url: `https://www.notion.so/p${i}` }));
+    const card = await finishedCard("notion_search", { query: "x" }, { ok: true, count: 12, results });
+    assert.deepEqual(card.sources?.map((s) => s.url), results.slice(0, 5).map((r) => r.url));
+  });
+
+  it("a Roadmap card's first link is the board it queried", async () => {
+    const card = await finishedCard("roadmap_query", { design_status: "WIP" }, {
+      ok: true,
+      count: 1,
+      board: { title: "Roadmap", url: "https://www.notion.so/roadmapdb" },
+      cards: [{ title: "Tutor import v2", url: "https://www.notion.so/Tutor-import-v2-abc" }],
+    });
+    assert.deepEqual(card.sources, [
+      { text: "Roadmap", url: "https://www.notion.so/roadmapdb" },
+      { text: "Tutor import v2", url: "https://www.notion.so/Tutor-import-v2-abc" },
+    ]);
+  });
+
   it("a static plan's card spells its sources as Slack's url sources", () => {
     const url = "https://www.notion.so/Recap-1";
     const block = planBlock("Working on it", [

@@ -1,0 +1,32 @@
+{
+  "case": "RT5",
+  "source": "authored",
+  "recordedAt": "2026-10-09",
+  "note": "AUTHORED with the result-table reach ticket, not captured off the Worker. The search returns 3 rows, so its result offers a table; the draw names the one lane that answers and calls no present. It proves the turn and the case agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=RT5`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "In the blueprint, who sends tutors the clearance email?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "clearance email"
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Front Stage Actions sends it: the [Clearance email](https://plus-uno.netlify.app/blueprint/?cell=cell-2) cell, in Employment & Access.** I read it just now from the current blueprint."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "search_blueprint",
+          "text": "{\"ok\": true, \"query\": \"clearance email\", \"count\": 3, \"matched\": 3, \"retrieval\": \"hybrid\", \"truncated\": false, \"capped_by\": null, \"cached\": false, \"age_ms\": 0, \"thin\": false, \"rows\": [{\"kind\": \"cell\", \"id\": \"cell-1\", \"title\": \"Obtain clearances\", \"lane\": \"Regular Tutor\", \"step\": \"Clearance\", \"scenario\": \"Employment & Access\", \"phase\": \"Onboarding\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=cell-1\", \"matchedBy\": \"vector+keyword\"}, {\"kind\": \"cell\", \"id\": \"cell-2\", \"title\": \"Clearance email\", \"lane\": \"Front Stage Actions\", \"step\": \"Clearance\", \"scenario\": \"Employment & Access\", \"phase\": \"Onboarding\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=cell-2\", \"matchedBy\": \"vector+keyword+structural\"}, {\"kind\": \"cell\", \"id\": \"cell-3\", \"title\": \"Send clearances\", \"lane\": \"CPO\", \"step\": \"Clearance\", \"scenario\": \"Employment & Access\", \"phase\": \"Onboarding\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=cell-3\", \"matchedBy\": \"keyword\"}], \"notes\": [\"Cite the rows you rely on, linked.\"]}"
+        }
+      ]
+    }
+  ]
+}

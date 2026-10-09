@@ -57,7 +57,7 @@ import { GATE_RESERVED } from "../gate/reactions";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
-import { acknowledgement, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText } from "../commitments/copy";
+import { acknowledgement, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
 import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type DetectedCommitment, type EvidenceJudge } from "../commitments/detector";
 import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnooze, nudgeAt, rearmedDueAt } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
@@ -677,37 +677,47 @@ export interface DmReminderDoorDeps {
  * — the reaction is then its own, and the gate never sees it.
  */
 export async function answerDmReminder(r: DmReminderReaction, deps: DmReminderDoorDeps): Promise<boolean> {
+  return (await answerDmReminderPress(r, deps)).claimed;
+}
+
+/** `answerDmReminder` for a button: the same door, saying why a press it
+ *  claimed changed nothing, so the tapper can be told. */
+export async function answerDmReminderPress(r: DmReminderReaction, deps: DmReminderDoorDeps): Promise<ReminderOutcome> {
   try {
     return await answerOrThrow(r, deps);
   } catch (err) {
     // Fail open, as the thread reminders' door does.
     rethrowIfBudget(err);
     console.error(`[dm-watch] reminder lookup for ${r.channel} ${r.messageTs} failed, passing on: ${err instanceof Error ? err.message : String(err)}`);
-    return false;
+    return { claimed: false, failed: true };
   }
 }
 
-async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): Promise<boolean> {
+async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): Promise<ReminderOutcome> {
   // Every DM reminder is in a person's DM with uno-bot.
-  if (!r.channel.startsWith("D")) return false;
+  if (!r.channel.startsWith("D")) return { claimed: false };
   const answer = reminderAnswer(r.glyph);
-  if (!answer && !GATE_RESERVED.has(r.glyph.replace(/::skin-tone-\d$/, ""))) return false;
+  if (!answer && !GATE_RESERVED.has(r.glyph.replace(/::skin-tone-\d$/, ""))) return { claimed: false };
   const bot = await deps.botUserId();
-  if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return false;
+  if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return { claimed: false };
   const c = await deps.records.byReminderTs(r.channel, r.messageTs);
-  if (!c) return false;
-  if (!answer || r.userId !== c.ownerId || !LIVE_STATES.includes(c.state)) return true;
+  if (!c) return { claimed: false };
+  const refused = (why: string): ReminderOutcome => ({ claimed: true, refused: why });
+  if (!answer) return refused(TAP_REFUSED.notAnAnswer);
+  // A DM reminder is its owner's alone.
+  if (r.userId !== c.ownerId) return refused(TAP_REFUSED.notYours(c.ownerId));
+  if (!LIVE_STATES.includes(c.state)) return refused(TAP_REFUSED.settled);
   const now = deps.now();
   let ack: string;
   if (answer === "soon") {
     // Twice at most; each one is a check-back the morning will make.
-    if (!maySnooze(c.snoozes)) return true;
+    if (!maySnooze(c.snoozes)) return refused(TAP_REFUSED.snoozeSpent);
     const dueAt = rearmedDueAt(now);
     await deps.records.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt });
     const day = dayLabel(etDayOf(nudgeAt(dueAt)), etDayOf(now));
     ack = c.kind === "made" ? acknowledgement("soon", day) : madeToAcknowledgement("soon", day);
   } else if (c.kind === "made_to") {
-    if (answer === "not_promise") return true;
+    if (answer === "not_promise") return refused(TAP_REFUSED.notAnAnswer);
     await deps.records.update(c.id, { state: answer === "done" ? "done" : "dropped", resolvedAt: now });
     ack = madeToAcknowledgement(answer);
   } else {
@@ -717,8 +727,9 @@ async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): P
   const body = await deps.reminderBody(r.channel, r.messageTs);
   if (!body || !(await deps.update(r.channel, r.messageTs, { text: body, blocks: reminderBlocks(body, ack) }))) {
     console.warn(`[dm-watch] ${c.id}: answered, but reminder ${r.messageTs} could not be edited`);
+    return { claimed: true, unedited: true };
   }
-  return true;
+  return { claimed: true };
 }
 
 // ── Shared ───────────────────────────────────────────────────────────────────

@@ -5,14 +5,15 @@
 // Renders and posts nothing; `review-door.ts` decides which view to show and
 // hands it to Slack.
 //
-// THE DRAFT HOLDS NO INPUT, AND NO SUBMIT. Slack's view footer holds two
-// buttons, submit and close, so three decisions cannot all sit there. They sit
-// together instead, as the body's last row, in the order a person reads them:
-// Approve, Needs changes, Reject. The footer is Close alone, which Slack allows
-// because the draft has no input. The fields are an Edit fields button at the
-// top. Needs changes, Reject and Edit fields each push a view of their own
-// (`views.push`) holding the one input it needs, with its own submit; Approve
-// needs no input and decides from the row.
+// THE DECISION IS AN INPUT, AND SUBMIT IS THE FOOTER. Slack's view footer
+// holds two buttons, submit and close, and nothing custom, so three decision
+// buttons cannot sit there. The draft ends instead with the decision as a
+// choice — Approve, Needs changes, Reject — and a note, and the footer's
+// Submit decides it, beside Close: the decision is always one press from the
+// fixed foot of the pop-up, however long the draft. Needs changes needs the
+// note; Reject takes it as an optional reason. The fields are an Edit fields
+// button at the top, which pushes a view of its own (`views.push`) with Save
+// edits as its submit.
 //
 // SAVED EDITS RIDE IN THE DRAFT'S `private_metadata`. Edit fields' Save edits
 // writes the values that differ from the draft into the parent view's
@@ -30,20 +31,19 @@ import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, labelsOf, withValues, type EditableField } from "./review-fields";
 import { caveatsOf, draftHeadline, readableDraft } from "./review-draft";
 import type { PendingProposal, StatedCardWords } from "../thread-state/index";
+import type { ReviewDecision } from "../gate/index";
 
-/** The draft's buttons; `slack/interactive.ts` routes all four. */
-export const REVIEW_APPROVE_ACTION_ID = "uno_review_approve";
-export const REVIEW_CHANGES_ACTION_ID = "uno_review_changes";
-export const REVIEW_REJECT_ACTION_ID = "uno_review_reject";
+/** The draft's one button; `slack/interactive.ts` routes it. */
 export const REVIEW_EDIT_ACTION_ID = "uno_review_edit";
 
 /** Each view's `callback_id`, which names its submit to the endpoint. The
- *  draft has no submit now; its callback still decides Approve for a draft
- *  opened before the row held it. */
+ *  draft's submit decides it. */
 export const REVIEW_CALLBACK_ID = "uno_review_draft";
-export const REVIEW_CHANGES_CALLBACK_ID = "uno_review_changes_note";
-export const REVIEW_REJECT_CALLBACK_ID = "uno_review_reject_note";
 export const REVIEW_EDIT_CALLBACK_ID = "uno_review_edit_fields";
+
+/** The decision input: Approve, Needs changes or Reject. */
+export const CHOICE_BLOCK_ID = "uno_review_choice";
+const CHOICE_ACTION_ID = "uno_review_choice_input";
 
 /** The note input: Needs changes' note, Reject's reason. */
 export const NOTE_BLOCK_ID = "uno_review_note";
@@ -135,7 +135,7 @@ export interface DraftAccess {
  * proposal that file cannot read shows the card's text instead.
  *
  * A confirmer's view has Edit fields at the top when the draft has fields to
- * edit, and Approve, Needs changes and Reject as the body's last row. `mayDecide` false is the same draft read-only: Close alone, and a
+ * edit, ends with the decision and a note, and has Submit as its footer. `mayDecide` false is the same draft read-only: Close alone, and a
  * line naming who can decide.
  *
  * `opts.edits` are the values Save edits kept: the draft shows them in place,
@@ -165,25 +165,18 @@ export function draftView(
   if (edited.length) head.push(context(`:pencil2: Edited here: ${edited.join(", ")}. Approve writes these values.`));
 
   const tail: unknown[] = access.mayDecide
-    ? [
-        { type: "divider" },
-        {
-          type: "actions",
-          block_id: "uno_review_decision",
-          elements: [
-            button(REVIEW_APPROVE_ACTION_ID, "Approve", "confirm", "primary"),
-            button(REVIEW_CHANGES_ACTION_ID, "Needs changes", "revise"),
-            button(REVIEW_REJECT_ACTION_ID, "Reject", "cancel", "danger"),
-          ],
-        },
-      ]
+    ? [{ type: "divider" }, choiceInput(), noteInput()]
     : [context(readOnlyLine(access.confirmers))];
   const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
   return modal(
     { channel: card.channel, ts: card.ts, ...(Object.keys(edits).length ? { edits } : {}) },
     [...head, ...fitted, ...tail],
+    access.mayDecide ? { submit: SUBMIT } : {},
   );
 }
+
+/** The draft's footer submit, which decides it. */
+const SUBMIT = "Submit";
 
 /** Said where a draft too long for one view was cut. */
 const LEFT_OUT =
@@ -202,36 +195,55 @@ function draftBody(text: string): string {
   return text.replace(CONFIRM_FOOTER, "").trim();
 }
 
-function noteInput(opts: { required: boolean; label: string; hint: string }): unknown {
+const CHOICES: ReadonlyArray<[ReviewDecision, string]> = [
+  ["confirm", "Approve"],
+  ["revise", "Needs changes"],
+  ["cancel", "Reject"],
+];
+
+function choiceInput(): unknown {
+  return {
+    type: "input",
+    block_id: CHOICE_BLOCK_ID,
+    label: { type: "plain_text", text: "Decision" },
+    element: {
+      type: "radio_buttons",
+      action_id: CHOICE_ACTION_ID,
+      options: CHOICES.map(([value, text]) => ({ value, text: { type: "plain_text", text } })),
+    },
+  };
+}
+
+function noteInput(): unknown {
   return {
     type: "input",
     block_id: NOTE_BLOCK_ID,
-    optional: !opts.required,
-    label: { type: "plain_text", text: opts.label },
-    hint: { type: "plain_text", text: opts.hint },
+    optional: true,
+    label: { type: "plain_text", text: "Note" },
+    hint: { type: "plain_text", text: "Needs changes: what should change. I revise the draft from it. Reject: an optional reason." },
     element: { type: "plain_text_input", action_id: NOTE_ACTION_ID, multiline: true, max_length: NOTE_MAX_CHARS },
   };
 }
 
-/** Needs changes, pushed over the draft: the note uno-bot revises from. */
-export function changesView(card: ReviewedCard): View {
-  return modal(
-    { channel: card.channel, ts: card.ts },
-    [noteInput({ required: true, label: "What should change?", hint: "I revise the draft from this note, and the new card posts in the thread." })],
-    { submit: "Send changes", callbackId: REVIEW_CHANGES_CALLBACK_ID, title: "Needs changes" },
-  );
-}
+type ViewValues = { values?: Record<string, Record<string, { value?: unknown; selected_option?: { value?: unknown } }>> };
 
-/** Reject, pushed over the draft: an optional reason. */
-export function rejectView(card: ReviewedCard): View {
-  return modal(
-    { channel: card.channel, ts: card.ts },
-    [
-      line("Rejecting closes this proposal, and nothing runs."),
-      noteInput({ required: false, label: "Reason", hint: "Optional. It shows on the card and in the thread." }),
-    ],
-    { submit: "Reject", callbackId: REVIEW_REJECT_CALLBACK_ID, title: "Reject proposal" },
-  );
+/**
+ * The draft's Submit, read from its `view.state`: the decision and the
+ * trimmed note, or the errors Slack shows under the input that needs one —
+ * no choice made, or Needs changes with no note.
+ */
+export function draftSubmitOf(
+  state: unknown,
+): { ok: true; decision: ReviewDecision; note: string } | { ok: false; errors: Record<string, string> } {
+  const values = (state as ViewValues | undefined)?.values;
+  const picked = values?.[CHOICE_BLOCK_ID]?.[CHOICE_ACTION_ID]?.selected_option?.value;
+  const decision = CHOICES.find(([value]) => value === picked)?.[0];
+  if (!decision) return { ok: false, errors: { [CHOICE_BLOCK_ID]: "Choose Approve, Needs changes or Reject." } };
+  const note = reviewNoteOf(state);
+  if (decision === "revise" && !note) {
+    return { ok: false, errors: { [NOTE_BLOCK_ID]: "Write what to change, so I can revise the draft." } };
+  }
+  return { ok: true, decision, note };
 }
 
 /** Edit fields, pushed over the draft, while the fields' options are read. */
@@ -259,8 +271,8 @@ export function editView(card: ReviewedCard, fields: readonly EditableField[], v
 
 /** What the note input holds, from a submit's `view.state` — trimmed, and
  *  empty when there is none. */
-export function reviewNoteOf(state: unknown): string {
-  const values = (state as { values?: Record<string, Record<string, { value?: unknown }>> } | undefined)?.values;
+function reviewNoteOf(state: unknown): string {
+  const values = (state as ViewValues | undefined)?.values;
   const value = values?.[NOTE_BLOCK_ID]?.[NOTE_ACTION_ID]?.value;
   return typeof value === "string" ? value.trim() : "";
 }

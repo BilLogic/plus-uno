@@ -38,17 +38,11 @@ import {
   type ReviewViewState,
 } from "./review-door";
 import {
-  REVIEW_APPROVE_ACTION_ID,
   REVIEW_CALLBACK_ID,
-  REVIEW_CHANGES_ACTION_ID,
-  REVIEW_CHANGES_CALLBACK_ID,
   REVIEW_EDIT_ACTION_ID,
   REVIEW_EDIT_CALLBACK_ID,
-  REVIEW_REJECT_ACTION_ID,
-  REVIEW_REJECT_CALLBACK_ID,
-  NOTE_BLOCK_ID,
+  draftSubmitOf,
   noticeView,
-  reviewNoteOf,
   reviewedCardOf,
 } from "./review-view";
 import type { OptionSource } from "./review-fields";
@@ -67,7 +61,8 @@ import { TRY_ASKING_ACTION_PREFIX, runTryAskingDoor } from "./try-asking";
 import { runTryAgainDoor } from "./try-again";
 import { TRY_AGAIN_ACTION_ID } from "./failure-message";
 import { handleReminderButton } from "./gate";
-import { REMINDER_ACTION_PREFIX } from "../commitments/copy";
+import { REMINDER_ACTION_PREFIX, type ReminderOutcome } from "../commitments/copy";
+import { tapReply } from "../commitments/press";
 import { FEEDBACK_ACTION_ID, FEEDBACK_VIEW_CALLBACK_ID, feedbackAckFor, type FeedbackViewState } from "./feedback";
 import { runFeedbackReason, runFeedbackTap, type FeedbackDoorDeps } from "./feedback-door";
 import { answerFeedbackLogFor } from "../usage/feedback-env";
@@ -181,10 +176,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
-  if (actionId === REVIEW_APPROVE_ACTION_ID) return approveInReview(env, payload);
-  if (actionId === REVIEW_CHANGES_ACTION_ID) return pushInReview(env, payload, "changes");
-  if (actionId === REVIEW_REJECT_ACTION_ID) return pushInReview(env, payload, "reject");
-  if (actionId === REVIEW_EDIT_ACTION_ID) return pushInReview(env, payload, "edit");
+  if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
@@ -196,15 +188,26 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
 
 // A button under a reminder (commitment, card follow-up, DM ask). It is the
 // reaction it is labelled with, tapped: the action id carries the glyph's Slack
-// name, and the reminder doors do the rest (`handleReminderButton`).
+// name, and the reminder doors do the rest (`handleReminderButton`). A tap
+// that changed nothing tells the tapper why, to them alone: a button that
+// does nothing reads as broken.
 async function answerFromButton(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
   const channel = payload.channel?.id;
   const messageTs = payload.message?.ts;
   const userId = payload.user?.id;
   const glyph = payload.actions?.[0]?.value || actionId.slice(REMINDER_ACTION_PREFIX.length);
   if (!channel || !messageTs || !userId || !glyph) return;
-  const claimed = await handleReminderButton(env, { channel, messageTs, glyph, userId });
-  console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} claimed=${claimed}`);
+  let outcome: ReminderOutcome | "error";
+  try {
+    outcome = await handleReminderButton(env, { channel, messageTs, glyph, userId });
+  } catch (err) {
+    // A budget stop included: the tapper hears it failed, not that it was ignored.
+    console.error(`[interactive] reminder ${glyph} on ${channel}/${messageTs} failed: ${err instanceof Error ? err.message : String(err)}`);
+    outcome = "error";
+  }
+  const line = tapReply(outcome);
+  console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} outcome=${JSON.stringify(outcome)}`);
+  if (line) await replyEphemeral(payload, line);
 }
 
 // ✅ Approve / ⛔ Cancel on a proposal card (2026-08-22).
@@ -269,45 +272,19 @@ async function openReview(env: Env, payload: InteractionPayload): Promise<void> 
   await runReviewOpen({ triggerId, channel, messageTs, userId, ...(cardText ? { cardText } : {}) }, reviewDoorDeps(env));
 }
 
-/** Needs changes, Reject or Edit fields, pressed on the draft: the view that
- *  holds its input, pushed over it on the click's trigger. */
-async function pushInReview(env: Env, payload: InteractionPayload, step: "changes" | "reject" | "edit"): Promise<void> {
+/** Edit fields, pressed on the draft: the fields, pushed over it on the
+ *  click's trigger. */
+async function editInReview(env: Env, payload: InteractionPayload): Promise<void> {
   const triggerId = payload.trigger_id;
   const card = reviewedCardOf(payload.view?.private_metadata);
   const userId = payload.user?.id;
   if (!triggerId || !card || !userId) return;
-  await runReviewPush({ triggerId, card, userId, step }, reviewDoorDeps(env));
+  await runReviewPush({ triggerId, card, userId }, reviewDoorDeps(env));
 }
 
 /**
- * Approve, pressed in the draft's decision row. The draft has no input, so
- * Approve needs no view of its own: the draft turns to a line that says it is
- * under way, and the door answers in the same view once the Gate has — the
- * same decision, edits and checks as the old footer submit.
- */
-async function approveInReview(env: Env, payload: InteractionPayload): Promise<void> {
-  const card = reviewedCardOf(payload.view?.private_metadata);
-  const userId = payload.user?.id;
-  const viewId = payload.view?.id;
-  if (!card || !userId || !viewId) return;
-  const deps = reviewDoorDeps(env);
-  await deps.views.update(viewId, noticeView(card, "Approving…"));
-  await runReviewDecision(
-    {
-      viewId,
-      channel: card.channel,
-      messageTs: card.ts,
-      userId,
-      decision: "confirm",
-      ...(card.edits ? { edits: card.edits } : {}),
-    },
-    deps,
-  );
-}
-
-/**
- * A Review view's submit: Send changes, Reject, Save edits, or Approve from a
- * draft opened before Approve moved into its row. A decision is acked at once with a line that says it is under way,
+ * A Review view's submit: the draft's Submit, which decides it, or Save
+ * edits. A decision is acked at once with a line that says it is under way,
  * and the door answers in the same view once the Gate has (`showIn`). Save
  * edits is answered in the ack: Slack's error under a refused field, or an
  * empty ack that closes the view onto the redrawn draft.
@@ -318,7 +295,7 @@ async function submitReview(env: Env, payload: InteractionPayload, ctx: Executio
   const card = reviewedCardOf(view?.private_metadata);
   const userId = payload.user?.id;
   const viewId = view?.id;
-  const known = [REVIEW_CALLBACK_ID, REVIEW_CHANGES_CALLBACK_ID, REVIEW_REJECT_CALLBACK_ID, REVIEW_EDIT_CALLBACK_ID];
+  const known = [REVIEW_CALLBACK_ID, REVIEW_EDIT_CALLBACK_ID];
   if (!view || !callbackId || !known.includes(callbackId) || !card || !userId || !viewId) {
     console.log(`[interactive] unhandled view_submission ${callbackId ?? "(none)"}`);
     return new Response("", { status: 200 });
@@ -333,11 +310,9 @@ async function submitReview(env: Env, payload: InteractionPayload, ctx: Executio
     return ack ? Response.json(ack) : new Response("", { status: 200 });
   }
 
-  const note = reviewNoteOf(view.state);
-  if (callbackId === REVIEW_CHANGES_CALLBACK_ID && !note) {
-    return Response.json({ response_action: "errors", errors: { [NOTE_BLOCK_ID]: "Write what to change, so I can revise the draft." } });
-  }
-  const decision = callbackId === REVIEW_CALLBACK_ID ? "confirm" : callbackId === REVIEW_CHANGES_CALLBACK_ID ? "revise" : "cancel";
+  const submitted = draftSubmitOf(view.state);
+  if (!submitted.ok) return Response.json({ response_action: "errors", errors: submitted.errors });
+  const { decision, note } = submitted;
   const underWay = { confirm: "Approving…", revise: "Sending your note…", cancel: "Rejecting…" }[decision];
   ctx.waitUntil(
     runReviewDecision(

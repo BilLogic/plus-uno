@@ -1,0 +1,32 @@
+{
+  "case": "RT4",
+  "source": "authored",
+  "recordedAt": "2026-10-09",
+  "note": "AUTHORED with the result-table reach ticket, not captured off the Worker. The search returns 3 rows, so its result offers a table; the draw answers the yes/no question in prose and calls no present. It proves the turn and the case agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=RT4`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Does the blueprint have a scenario for tutor no-shows?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "tutor no-show"
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Yes: the blueprint has a [Tutor No-Show](https://plus-uno.netlify.app/blueprint/?cell=cell-1) scenario, in the In-session phase.** I read it just now from the current blueprint."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "search_blueprint",
+          "text": "{\"ok\": true, \"query\": \"tutor no-show\", \"count\": 3, \"matched\": 3, \"retrieval\": \"hybrid\", \"truncated\": false, \"capped_by\": null, \"cached\": false, \"age_ms\": 0, \"thin\": false, \"rows\": [{\"kind\": \"cell\", \"id\": \"cell-1\", \"title\": \"Tutor does not join\", \"lane\": \"Regular Tutor\", \"step\": \"Join\", \"scenario\": \"Tutor No-Show\", \"phase\": \"In-session\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=cell-1\", \"matchedBy\": \"vector+keyword+structural\"}, {\"kind\": \"cell\", \"id\": \"cell-2\", \"title\": \"Supervisor reassigns\", \"lane\": \"Back Stage Actions\", \"step\": \"Cover\", \"scenario\": \"Tutor No-Show\", \"phase\": \"In-session\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=cell-2\", \"matchedBy\": \"keyword+structural\"}, {\"kind\": \"cell\", \"id\": \"cell-3\", \"title\": \"Strike recorded\", \"lane\": \"Back Stage Actions\", \"step\": \"Follow-up\", \"scenario\": \"Tutor No-Show\", \"phase\": \"Post-session\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=cell-3\", \"matchedBy\": \"structural\"}], \"notes\": [\"Cite the rows you rely on, linked.\"]}"
+        }
+      ]
+    }
+  ]
+}
