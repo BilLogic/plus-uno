@@ -13,9 +13,9 @@ import assert from "node:assert/strict";
 
 import { recordingDelivery, runTurn } from "../src/turn/index";
 import { createInMemoryThreadState, type PendingProposal, type ReportItem, type ThreadState } from "../src/thread-state/index";
-import { NEEDS_CHANGES_LEAD, runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
+import { NEEDS_CHANGES_LEAD, cardSentBack, runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import { decisionReport, itemProposal, reportItems, reportRecord, type ReportMessage } from "../src/slack/decision-cards";
-import { CHANNEL, CONVERSATION, REF, harness as turnHarness, request } from "./helpers/turn-harness";
+import { CHANNEL, CONVERSATION, harness as turnHarness, request } from "./helpers/turn-harness";
 import { recordingViews } from "./helpers/recording-slack";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 
@@ -50,9 +50,13 @@ function itemStaged(id: string, n: number): PendingProposal {
   };
 }
 
+/** The clock every store, door and turn here reads. */
+const clock = { now: NOW };
+
 /** A report of three items in the thread, each staged — the last one newest. */
 async function staged(): Promise<ThreadState> {
-  const store = createInMemoryThreadState({ now: () => NOW });
+  clock.now = NOW;
+  const store = createInMemoryThreadState({ now: () => clock.now });
   await store.putReport(reportRecord(CHANNEL, MSG, decisionReport(items, "Three pages still state the old way."), TTL));
   for (const [i, it] of items.entries()) await store.putProposal(itemStaged(it.id, i + 1));
   return store;
@@ -62,19 +66,20 @@ type Card = { title: { text: string }; subtitle?: { text: string }; body: { text
 const cards = (blocks: unknown[]) => (blocks[1] as { elements: Card[] }).elements;
 
 /** Needs changes on one item from its Review, and the revision turn it queues
- *  — handed the thread's card as the Slack door reads it. */
-async function sendBack(store: ThreadState, id: string, redraft: { text: string; content?: string }) {
+ *  — handed the card the note names, as the Slack door reads it. With no
+ *  redraft, the item is only sent back and no turn runs. */
+async function sendBack(store: ThreadState, id: string, redraft?: { text: string; content?: string }) {
   const edits: Array<{ ts: string; message: ReportMessage }> = [];
   const h = turnHarness({
     threadState: store,
-    now: () => NOW,
+    now: () => clock.now,
     replies: [
-      redraft.content === undefined
-        ? { text: redraft.text }
+      !redraft || redraft.content === undefined
+        ? { text: redraft?.text ?? "" }
         : { text: redraft.text, toolCalls: [{ name: "notion_update", args: { page_url: "https://www.notion.so/page2", replace: [{ block_id: "b2", content: redraft.content }] } }] },
     ],
   });
-  h.deps.reportItems = reportItems(store, async (ts, message) => void edits.push({ ts, message }), () => NOW);
+  h.deps.reportItems = reportItems(store, async (ts, message) => void edits.push({ ts, message }), () => clock.now);
   const turns: Array<Awaited<ReturnType<typeof runTurn>>> = [];
   const deps: ReviewDoorDeps = {
     threadState: store,
@@ -83,11 +88,12 @@ async function sendBack(store: ThreadState, id: string, redraft: { text: string;
     applyVerdict: async () => [],
     updateCard: async (_channel, ts, message) => void edits.push({ ts, message }),
     restage: async () => {},
-    revise: async ({ note, userId }) => {
-      const pending = await store.getProposalByThread(REF);
+    revise: async ({ proposal, note, userId }) => {
+      if (!redraft) return;
+      const pending = await cardSentBack(store, proposal.proposalTs);
       turns.push(await runTurn(request({ userId, text: `${NEEDS_CHANGES_LEAD}${note}`, pending }), h.deps));
     },
-    now: () => NOW,
+    now: () => clock.now,
   };
   await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: itemProposal(MSG, id).proposalTs, userId: BILL, decision: "revise", note: "the cap is 600" }, deps);
   return { edits, turns, delivery: h.delivery };
@@ -156,5 +162,52 @@ describe("Needs changes on one item of a report", () => {
       [],
       "no card edited at an item's key, which is no Slack message",
     );
+  });
+
+  it("revises the item the note names when the same person sent back another before it", async () => {
+    const store = await staged();
+    await sendBack(store, "c3");
+    const { edits } = await sendBack(store, "c2", { text: "Page 2 now says the cap is 600.", content: "The cap is 600" });
+
+    const shown = cards(edits.at(-1)!.message.blocks);
+    assert.equal(shown[1]!.actions[0]!.action_id, "uno_decision_review:c2~1", "c2 is the one revised");
+    assert.equal(shown[2]!.actions[0]!.action_id, "uno_decision_review:c3", "c3 is not");
+    assert.equal(shown[2]!.subtitle!.text, "Changes asked by <@U1>", "c3 still waits on its own revision");
+    const three = await store.getProposalByTs(itemProposal(MSG, "c3").proposalTs);
+    assert.equal(three.state === "found" && three.proposal.revising?.userId, BILL);
+  });
+
+  it("stages the redraft for the time the item had left, not a fresh window", async () => {
+    const store = await staged();
+    clock.now = NOW + 60 * 60_000;
+    await sendBack(store, "c2", { text: "Page 2 now says the cap is 600.", content: "The cap is 600" });
+
+    const revised = await store.getProposalByTs(itemProposal(MSG, "c2~1").proposalTs);
+    assert.equal(revised.state === "found" && revised.proposal.ttlMs, TTL - 60 * 60_000, "72 hours less the one gone");
+  });
+
+  it("leaves the old card live and in place when the redraft fails to save", async () => {
+    const real = await staged();
+    const store: ThreadState = {
+      ...real,
+      async putProposal(p) {
+        if (p.item?.id === "c2~1") throw new Error("storage unavailable");
+        return real.putProposal(p);
+      },
+    };
+    const { edits, turns } = await sendBack(store, "c2", { text: "Page 2 now says the cap is 600.", content: "The cap is 600" });
+
+    assert.equal(turns[0]!.disposition, "failed");
+    const old = await real.getProposalByTs(itemProposal(MSG, "c2").proposalTs);
+    assert.equal(old.state, "found", "the old draft is live again");
+    if (old.state === "found") {
+      assert.equal(old.proposal.revising, undefined, "and decidable");
+      assert.deepEqual(old.proposal.operations, itemStaged("c2", 2).operations);
+    }
+    assert.equal((await real.getProposalByTs(itemProposal(MSG, "c2~1").proposalTs)).state, "none");
+    const two = cards(edits.at(-1)!.message.blocks)[1]!;
+    assert.equal(two.actions[0]!.action_id, "uno_decision_review:c2", "the old card stays in the report");
+    assert.equal(two.body.text, "Page says 2 · decision says 3.");
+    assert.equal(two.subtitle!.text, "Bill · card comment", "open again");
   });
 });

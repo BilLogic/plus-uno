@@ -149,6 +149,11 @@ export function itemProposal(
   };
 }
 
+/** The entry id an item's next revision takes: `c2` → `c2~1` → `c2~2`. */
+export function revisionId(id: string): string {
+  return `${baseId(id)}~${Number(id.split("~")[1] ?? 0) + 1}`;
+}
+
 /** An entry id without its revision suffix. */
 function baseId(id: string): string {
   return id.split("~")[0]!;
@@ -302,8 +307,7 @@ export async function replaceItem(
   oldId: string,
   item: ReportItem,
 ): Promise<{ id: string; message: ReportMessage } | null> {
-  const rev = Number(oldId.split("~")[1] ?? 0) + 1;
-  const id = `${baseId(oldId)}~${rev}`;
+  const id = revisionId(oldId);
   const record = await store.updateReport(messageTs, { id: oldId, replace: { id, item } });
   return record ? { id, message: reportMessage(record) } : null;
 }
@@ -313,11 +317,12 @@ export async function replaceItem(
  * (`TurnDeps.reportItems`), whichever report it is — none needs a step of
  * its own.
  *
- * `revise` puts the redraft in place of the item (`replaceItem`): the item as
- * it was — its title, who and where, its sources — saying what the revision
- * now does, under the same number. What Review shows is the card as a turn
- * spells it; `show` redraws the report's message once the revision is staged.
- * Null when the store has no such report or item.
+ * `revise` readies the redraft of an item: the item as it was — its title,
+ * who and where, its sources — saying what the revision now does. What Review
+ * shows is the card as a turn spells it. Its `place`, called once the
+ * revision is staged, puts it in the item's place under the same number
+ * (`replaceItem`) and redraws the report's message. Null when the store has
+ * no such report or item.
  *
  * `reopen` puts an item sent back for changes back to open, Review and all,
  * when its turn staged no revision (`settleItem`).
@@ -342,15 +347,15 @@ export function reportItems(
       const lead = cardLead(card);
       // What it wrote before no longer describes the write.
       const { done: _done, ...kept } = before;
-      const replaced = await replaceItem(store, target.messageTs, target.id, {
-        ...kept,
-        body: (lead && toPlainText(lead).trim()) || `Revised: ${card.verb}.`,
-      });
-      if (!replaced) return null;
+      const item: ReportItem = { ...kept, body: (lead && toPlainText(lead).trim()) || `Revised: ${card.verb}.` };
       return {
         text: renderProposalCard(card).text,
-        staged: itemProposal(target.messageTs, replaced.id),
-        show: () => redraw(target.messageTs, replaced.message),
+        staged: itemProposal(target.messageTs, revisionId(target.id)),
+        async place() {
+          const replaced = await replaceItem(store, target.messageTs, target.id, item);
+          if (replaced) await redraw(target.messageTs, replaced.message);
+          else console.warn(`[decision-cards] ${target.messageTs} has no item ${target.id} to replace`);
+        },
       };
     },
     async reopen(target: { messageTs: string; id: string }): Promise<void> {

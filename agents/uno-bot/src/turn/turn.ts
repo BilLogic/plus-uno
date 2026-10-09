@@ -551,11 +551,11 @@ export interface TurnDeps {
    */
   reportItems?: {
     /**
-     * Put a revision of one item in place of its card: the same card in the
-     * report's message, under the same number, open again as a new proposal.
-     * Answers what Review shows, the fields the proposal is staged with, and
-     * `show`, which redraws the report's message once it is staged; null when
-     * the report has no such item, and the revision posts as its own card.
+     * A revision of one item, ready to go in place of its card: what Review
+     * shows, the fields its proposal is staged with, and `place`, which puts
+     * it in the report's message under the same number, open — called once it
+     * is staged. Null when the report has no such item, and the revision
+     * posts as its own card.
      */
     revise(
       item: { messageTs: string; id: string },
@@ -563,7 +563,7 @@ export interface TurnDeps {
     ): Promise<{
       text: string;
       staged: Pick<PendingProposal, "proposalTs" | "userMsgTs" | "supersedeKey" | "item">;
-      show(): Promise<void>;
+      place(): Promise<void>;
     } | null>;
     /** Put an item sent back for changes back to open on the report's
      *  message, when its turn staged no revision. Best-effort. */
@@ -692,8 +692,7 @@ export function settlementOf(settle: {
  * the turn is handed and takes down whatever the turn raised, whichever door
  * it left by.
  */
-export async function runTurn(given: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
-  const request = await withItemSentBack(given, deps.threadState);
+export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
   // The card THIS REPLY THREAD was holding when the turn began — and the grain
   // is the whole of it.
   //
@@ -793,24 +792,6 @@ export async function runTurn(given: TurnRequest, deps: TurnDeps): Promise<TurnO
 }
 
 /**
- * The request with the card it revises when its asker sent back an item of a
- * decision report. The thread's card is its newest, and a report holds one
- * per item in one thread, so the item this person sent back with Needs
- * changes — their newest mark — is the one their turn revises. Any other
- * request, unchanged.
- */
-async function withItemSentBack(request: TurnRequest, threadState: ThreadState): Promise<TurnRequest> {
-  const pending = request.pending;
-  if (!pending?.item || pending.revising?.userId === request.userId) return request;
-  const thread = proposalReplyThread(pending);
-  const live = await threadState.getProposalsByChannel(request.channel).catch(() => []);
-  const marked = live
-    .filter((p) => p.item && proposalReplyThread(p) === thread && p.revising?.userId === request.userId)
-    .sort((a, b) => (b.revising!.at ?? 0) - (a.revising!.at ?? 0))[0];
-  return marked ? { ...request, pending: marked } : request;
-}
-
-/**
  * A card sent back with Needs changes stays locked until its revision
  * replaces it (`ThreadState.markRevising`). The revision is the asker's turn
  * in the card's thread; one that ends without staging it — it failed, or
@@ -824,6 +805,10 @@ async function unlockRevision(
 ): Promise<void> {
   const pending = request.pending;
   if (!cardLive || !pending?.revising || pending.revising.userId !== request.userId) return;
+  // An item that revises its own way (a Figma comment decision,
+  // `figma-comments/revise.ts`) is never revised by a turn: its lock is its
+  // own revision's, which lifts it, so a turn answering beside it leaves it.
+  if (pending.item && pending.refuseRevision) return;
   try {
     await deps.threadState.clearRevising(pending.proposalTs);
   } catch (err) {
@@ -833,7 +818,9 @@ async function unlockRevision(
   // An item's card is in its report's message, which its key is not: the
   // report redraws it open.
   if (pending.item) {
-    await deps.reportItems?.reopen(pending.item).catch(() => {});
+    await deps.reportItems?.reopen(pending.item).catch((err: unknown) => {
+      console.warn(`[turn] item ${pending.item!.id} of ${pending.item!.messageTs} not reopened: ${err instanceof Error ? err.message : String(err)}`);
+    });
     return;
   }
   await deps.delivery
@@ -1507,6 +1494,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   }
   // And it keeps the card's deadline, read before the card is retired.
   const sweepLeftMs = replaced?.sweepRun ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  // An item of a report keeps its window too: its revision lives as long as
+  // the item had left, as the report's own revisions do.
+  const itemLeftMs = replaced?.item ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  if (itemLeftMs !== undefined && itemLeftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED);
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
   if (sweepLeftMs !== undefined && sweepLeftMs <= 0) {
     await delivery.postNote(CARD_CLOSED, sweepTag("note"));
     await memory.remember(CARD_CLOSED);
@@ -1587,7 +1582,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(request.replyTs ? { replyTs: request.replyTs } : {}),
     userMsgTs: request.userMsgTs,
     proposalTs: posted.ts,
-    // What the adapter actually posted, never a copy rendered here: the button
+    // What the adapter actually posted — or, for an item revised in place,
+    // what the report's port spelled for its Review — never a copy rendered
+    // here: the button
     // door re-renders the resolved card from this field, so a second rendering
     // that drifted would repaint the card with words it never had (#623).
     proposalText: posted.text,
@@ -1617,12 +1614,26 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
       : {}),
     // An item revised in place is keyed on its report's message and its new
-    // entry, in the item's own slot.
-    ...(inPlace ? inPlace.staged : {}),
+    // entry, in the item's own slot, for the time the item had left.
+    ...(inPlace ? { ...inPlace.staged, ttlMs: itemLeftMs } : {}),
   };
-  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
-  // Redrawn once staged, so a Review on the new card finds its proposal.
-  await inPlace?.show();
+  let retiredByStaging: string[];
+  try {
+    ({ retired: retiredByStaging } = await threadState.putProposal(proposal));
+  } catch (err) {
+    if (!inPlace || !replaced) throw err;
+    // The revision never staged, so the item it would have replaced goes back
+    // as it was, for the time it had left, and its card is left alone.
+    console.error(`[turn] revision of item ${replaced.item!.id} not staged: ${err instanceof Error ? err.message : String(err)}`);
+    const { revising: _lock, ...unlocked } = replaced;
+    await threadState.putProposal({ ...unlocked, ttlMs: itemLeftMs }).catch((restoreErr: unknown) => {
+      console.error(`[turn] item ${replaced.item!.id} not restored: ${restoreErr instanceof Error ? restoreErr.message : String(restoreErr)}`);
+    });
+    return { disposition: "failed", failure: { stage: "delivery" }, wrote: memory.wrote(), telemetry };
+  }
+  // Swapped into the report only once staged, so a Review on the new card
+  // finds its proposal.
+  await inPlace?.place();
   // On the record as soon as it is stored, so a ✅ that lands before the turn
   // finishes finds the staged row and the turn id it joins to; a ticket that
   // ✅ files waits on that row until the turn writes its own (`runTurn`).
