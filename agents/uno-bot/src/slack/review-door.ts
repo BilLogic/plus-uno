@@ -321,10 +321,13 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   // decides and whose args the write carries. A card no longer live gets the
   // Gate's own answer below.
   let own: ReviewChoice | undefined;
-  let live: PendingProposal | undefined;
+  const look = await deps.threadState.getProposalByTs(request.messageTs).catch(() => ({ state: "none" }) as const);
+  const live = look?.state === "found" ? look.proposal : undefined;
+  if (live?.choices?.length && !request.choice) {
+    await show(noticeView(card, "Choose one of this card's answers. Press Review again."));
+    return;
+  }
   if (request.choice) {
-    const look = await deps.threadState.getProposalByTs(request.messageTs).catch(() => null);
-    live = look?.state === "found" ? look.proposal : undefined;
     own = live?.choices?.find((c) => c.value === request.choice);
     if (live && !own) {
       await show(noticeView(card, "That answer isn't on this card any more, so nothing changed. Press Review again."));
@@ -352,7 +355,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
       ...(note ? { note } : {}),
       ...(operations ? { operations } : {}),
     },
-    gateDeps,
+    { ...gateDeps, proposalRead: { ts: request.messageTs, lookup: look } },
   );
   console.log(
     `[review] ${decision}${own ? ` (${own.value})` : ""} on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,

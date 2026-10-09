@@ -168,7 +168,7 @@ export function draftView(
   if (edited.length) head.push(context(`:pencil2: Edited here: ${edited.join(", ")}. Approve writes these values.`));
 
   const tail: unknown[] = access.mayDecide
-    ? [{ type: "divider" }, choiceInput(proposal.choices), noteInput()]
+    ? [{ type: "divider" }, choiceInput(proposal.choices), noteInput(Boolean(proposal.choices?.length))]
     : [context(readOnlyLine(access.confirmers))];
   const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
   return modal(
@@ -221,13 +221,13 @@ function choiceInput(own?: readonly ReviewChoice[]): unknown {
   };
 }
 
-function noteInput(): unknown {
+function noteInput(own = false): unknown {
   return {
     type: "input",
     block_id: NOTE_BLOCK_ID,
     optional: true,
     label: { type: "plain_text", text: "Note" },
-    hint: { type: "plain_text", text: "Needs changes: what should change. I revise the draft from it. Reject: an optional reason." },
+    hint: { type: "plain_text", text: own ? "Optional context for your answer." : "Needs changes: what should change. I revise the draft from it. Reject: an optional reason." },
     element: { type: "plain_text_input", action_id: NOTE_ACTION_ID, multiline: true, max_length: NOTE_MAX_CHARS },
   };
 }

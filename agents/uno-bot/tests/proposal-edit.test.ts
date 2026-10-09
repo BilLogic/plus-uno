@@ -522,14 +522,14 @@ describe("Approve reads only what an edit needs", () => {
     return { store, reads: () => reads };
   }
 
-  it("reads neither the card again nor the options when nothing was edited", async () => {
+  it("reads no options or live page when nothing was edited", async () => {
     const { store, reads } = counted(await staged());
     const { deps, ran, optionReads } = harness(store);
     await runReviewDecision(approve({}), deps);
     assert.equal(ran.length, 1);
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
     assert.deepEqual(optionReads, []);
-    // The claim's own read, and nothing before it.
+    // The answer authorization shares its read with the gate.
     assert.equal(reads(), 1);
   });
 

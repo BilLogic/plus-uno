@@ -276,6 +276,7 @@ describe("a card's own answers in the Review pop-up", () => {
     assert.equal(viewRefusal(view), null);
     const options = radioOf(view);
     assert.deepEqual(options.map((o) => o.text.text), ["Done", "Still on it", "Drop it"]);
+    assert.doesNotMatch(JSON.stringify(view), /Needs changes|Reject:/, "the note describes this card's answers");
     assert.deepEqual(draftSubmitOf(submitOf(options[1]!.value)), { ok: true, decision: "cancel", note: "", choice: "still" });
     assert.deepEqual(draftSubmitOf(submitOf(options[2]!.value)), { ok: true, decision: "confirm", note: "", choice: "drop" });
   });
@@ -304,5 +305,12 @@ describe("a card's own answers in the Review pop-up", () => {
     await runReviewDecision({ ...decide("c1", "confirm"), choice: "ship-it" }, deps);
     assert.equal(ran.length, 0);
     assert.match(JSON.stringify(views.calls.at(-1)!.view), /That answer isn't on this card any more/);
+  });
+
+  it("a default decision cannot bypass a card's own answers", async () => {
+    const { deps, ran, views } = harness(await withOwn());
+    await runReviewDecision(decide("c1", "confirm"), deps);
+    assert.equal(ran.length, 0);
+    assert.match(JSON.stringify(views.calls.at(-1)!.view), /Choose one of this card's answers/);
   });
 });
