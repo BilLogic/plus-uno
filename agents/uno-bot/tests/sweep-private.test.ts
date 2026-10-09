@@ -91,16 +91,22 @@ test("a public drift and a private drift make two cards, each in its own thread,
       [FEEDBACK, priv.root.ts],
     ].sort(),
   );
-  const publicCard = h.posted.find((p) => p.channel === DESIGN)!;
-  const privateCard = h.posted.find((p) => p.channel === FEEDBACK)!;
+  // Everything each report says: its text, its cards, and its fixes' Review.
+  const said = (channel: string) => {
+    const post = h.posted.find((p) => p.channel === channel)!;
+    const fixes = h.staged.filter((p) => p.channel === channel).map((p) => p.proposalText);
+    return [post.text, JSON.stringify(post.blocks), ...fixes].join("\n");
+  };
+  const publicCard = said(DESIGN);
+  const privateCard = said(FEEDBACK);
   for (const leak of [FEEDBACK, PAGE_B.url, "Owner: Quinn", "<@U0PRIV>", "<@U0QUIET>", "<@U0CY>"]) {
-    assert.ok(!publicCard.text.includes(leak), `the public card carries nothing of the private one: ${leak}`);
+    assert.ok(!publicCard.includes(leak), `the public report carries nothing of the private one: ${leak}`);
   }
   for (const leak of [DESIGN, PAGE_A.url, "<@U0ADE>", "<@U0STARTER>"]) {
-    assert.ok(!privateCard.text.includes(leak), `the private card carries nothing of the public one: ${leak}`);
+    assert.ok(!privateCard.includes(leak), `the private report carries nothing of the public one: ${leak}`);
   }
   const privateStaged = h.staged.find((p) => p.channel === FEEDBACK)!;
-  assert.match(privateCard.text, /<@U0PRIV>/, "a Contributor outside the channel is passed over for the starter");
+  assert.match(privateCard, /<@U0PRIV>/, "a Contributor outside the channel is passed over for the starter");
   assert.deepEqual(privateStaged.confirmers, ["U0PRIV", "U0QUIET"], "confirmers come from that channel");
   assert.equal(privateStaged.sweepShare, undefined, "a private channel's card never offers to share");
 });

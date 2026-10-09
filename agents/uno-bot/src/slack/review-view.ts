@@ -127,6 +127,9 @@ export function loadingView(card: ReviewedCard): View {
 export interface DraftAccess {
   mayDecide: boolean;
   confirmers: readonly string[];
+  /** When an item of a decision report closes undecided: its card shows
+   *  neither who decides nor when, so the decision's own pop-up says both. */
+  closesAt?: number;
 }
 
 /**
@@ -165,7 +168,7 @@ export function draftView(
   if (edited.length) head.push(context(`:pencil2: Edited here: ${edited.join(", ")}. Approve writes these values.`));
 
   const tail: unknown[] = access.mayDecide
-    ? [{ type: "divider" }, choiceInput(), noteInput()]
+    ? [{ type: "divider" }, choiceInput(), noteInput(), ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : [])]
     : [context(readOnlyLine(access.confirmers))];
   const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
   return modal(
@@ -287,6 +290,15 @@ export function decidedView(card: ReviewedCard, cardText: string): View {
     ...textSections(draftBody(cardText)),
     context("Read-only. This proposal has already been decided."),
   ]);
+}
+
+/** Who may decide a report's item and until when: "Open until Mon 9:00 ET ·
+ *  <@A> or <@B> can decide." */
+export function openLine(closesAt: number, confirmers: readonly string[]): string {
+  const when = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "numeric", minute: "2-digit", hourCycle: "h23" }).format(new Date(closesAt));
+  const who = confirmers.filter((id) => SLACK_USER_ID.test(id)).map((id) => `<@${id}>`);
+  const names = who.length <= 1 ? (who[0] ?? "") : `${who.slice(0, -1).join(", ")} or ${who.at(-1)!}`;
+  return `Open until ${when} ET${names ? ` · ${names} can decide.` : "."}`;
 }
 
 function readOnlyLine(confirmers: readonly string[]): string {
