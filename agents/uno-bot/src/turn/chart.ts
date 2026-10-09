@@ -8,6 +8,14 @@
 // the presenter hands the same values back to the model in the call's result,
 // the text copy repeats them, and the draft judge reads them.
 //
+// A COUNT ACROSS LOOKUPS. Some counts take one lookup per group — cards per
+// Design Status is one `roadmap_query` per status, most of which list only
+// their first 30 cards. Grouping one lookup's rows cannot draw that, so the
+// model may name a field the calls were made with instead (`across`), and each
+// call of the lookup becomes one point: labelled by its value of that field,
+// valued at the whole count the call itself reported (`matched`, not the rows
+// it listed). Still code's numbers, from what the lookups returned.
+//
 // WHEN THERE IS NO CHART. A chart that cannot be drawn honestly is refused with
 // one sentence for the reader: the list was partial (counting the first 30 of
 // 41 would understate every bar), fewer than 3 points, a group field the rows
@@ -143,12 +151,24 @@ export function chartOf(lookup: string, result: Record_, request: ChartRequest):
     if (key === null) return { refusal: `${groupBy} holds lists or records, which cannot be grouped.` };
     sums.set(key, (sums.get(key) ?? 0) + (measure ? (row[measure] as number) : 1));
   }
+  return drawn(lookup, request.kind, sums, { groupBy, measure, noun, ...(request.takeaway ? { takeaway: request.takeaway } : {}) });
+}
+
+/** A chart of grouped values, or why there is none: the checks every chart
+ *  answers to, whichever way its values were counted. */
+function drawn(
+  lookup: string,
+  kind: ChartKind,
+  sums: Map<string, number>,
+  of: { groupBy: string; measure: string | null; noun: string; takeaway?: string },
+): ChartReading {
+  const { groupBy, measure, noun } = of;
   if (sums.size < MIN_POINTS) return { refusal: `only ${sums.size} group${sums.size === 1 ? "" : "s"} to compare.` };
-  if (sums.size > MAX_POINTS[request.kind]) {
-    return { refusal: `${sums.size} groups are more than a ${request.kind} chart shows (${MAX_POINTS[request.kind]}).` };
+  if (sums.size > MAX_POINTS[kind]) {
+    return { refusal: `${sums.size} groups are more than a ${kind} chart shows (${MAX_POINTS[kind]}).` };
   }
 
-  const trend = request.kind === "line" || request.kind === "area";
+  const trend = kind === "line" || kind === "area";
   const ordered = [...sums].sort(([a, x], [b, y]) =>
     trend ? a.localeCompare(b, undefined, { numeric: true }) : y - x || a.localeCompare(b),
   );
@@ -156,14 +176,14 @@ export function chartOf(lookup: string, result: Record_, request: ChartRequest):
   if (new Set(points.map((p) => p.label)).size !== points.length) {
     return { refusal: `two ${groupBy} values read the same in their first ${LABEL_CHARS} characters.` };
   }
-  if (request.kind === "pie" && points.some((p) => p.value <= 0)) return { refusal: "a pie needs every value above zero." };
+  if (kind === "pie" && points.some((p) => p.value <= 0)) return { refusal: "a pie needs every value above zero." };
 
   const groupLabel = labelOf(groupBy);
   const valueLabel = measure ? labelOf(measure) : labelOf(noun);
-  const takeaway = request.takeaway?.trim();
+  const takeaway = of.takeaway?.trim();
   return {
     chart: {
-      kind: request.kind,
+      kind,
       title: clip(`${valueLabel} by ${groupLabel}`, TITLE_CHARS),
       lookup,
       groupBy,
@@ -175,6 +195,73 @@ export function chartOf(lookup: string, result: Record_, request: ChartRequest):
       ...(takeaway ? { takeaway } : {}),
     },
   };
+}
+
+/** One call of a lookup, as the presenter recorded it. */
+export interface LookupCall {
+  args: Record_;
+  result: Record_;
+}
+
+/** What the model asked for when each call of a lookup is one point. */
+export interface AcrossRequest {
+  kind: ChartKind;
+  /** The field each call was made with, which labels its point. */
+  across: string;
+  list?: string;
+  takeaway?: string;
+}
+
+/** The value a call was made with for `field`: as its result reports its
+ *  filters, else as it was asked. */
+function calledWith(call: LookupCall, field: string): string | null {
+  const filters = (call.result.filters ?? {}) as Record_;
+  for (const value of [filters[field], call.args[field]]) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  return null;
+}
+
+/** The whole count one call reported, beyond the rows it listed, and what
+ *  its rows are when it listed any. */
+function totalOf(lookup: string, result: Record_, key: string | undefined): { total: number; noun?: string } | null {
+  const found = rowsOf(lookup, result, key);
+  if (found) return { total: found.total, noun: found.noun };
+  const whole = wholeCount(result, key ?? "");
+  return whole === undefined ? null : { total: whole };
+}
+
+/**
+ * A chart with one point per call of a lookup, each valued at the whole count
+ * that call reported, or the sentence saying why there is none.
+ *
+ * @param lookup - The tool that ran, once per group
+ * @param calls - Every call of it this turn, in the order made
+ * @param request - The model's choice of kind and the field the calls differ by
+ */
+export function chartAcross(lookup: string, calls: readonly LookupCall[], request: AcrossRequest): ChartReading {
+  const across = request.across.trim();
+  // A later call with the same value is a retry: it wins.
+  const byValue = new Map<string, LookupCall>();
+  for (const call of calls) {
+    const value = calledWith(call, across);
+    if (value !== null) byValue.set(value, call);
+  }
+  if (!byValue.size) return { refusal: `no ${lookup} lookup this turn was made with a ${across} to label it by.` };
+
+  const sums = new Map<string, number>();
+  let noun: string | undefined;
+  for (const [value, call] of byValue) {
+    if (call.result.truncated === true) {
+      return { refusal: `the ${value} lookup read only part of the source, so its count could be short.` };
+    }
+    const counted = totalOf(lookup, call.result, request.list);
+    if (!counted) return { refusal: `the ${value} lookup reported no count.` };
+    sums.set(value, counted.total);
+    noun ??= counted.noun;
+  }
+  return drawn(lookup, request.kind, sums, { groupBy: across, measure: null, noun: noun ?? "rows", ...(request.takeaway ? { takeaway: request.takeaway } : {}) });
 }
 
 /** How many of a chart's points its text line names. */

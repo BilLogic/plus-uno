@@ -161,9 +161,10 @@ export function harness(opts: {
   delivery?: RecordingDelivery;
   threadState?: ThreadState;
   toolResult?: string;
-  /** A lookup's result by tool name, for a case where one lookup fails and
-   *  another does not. Wins over `toolResult`. */
-  toolResultFor?: (name: string) => string;
+  /** A lookup's result by tool name and the call's arguments, for a case
+   *  where one lookup fails and another does not, or where each call of one
+   *  lookup answers for its own filter. Wins over `toolResult`. */
+  toolResultFor?: (name: string, args: Record<string, unknown>) => string;
   /** How long each lookup takes, in ms. Absent, it answers at once — which
    *  is faster than any Slack call, so what Slack is told mid-lookup needs it. */
   toolDelayMs?: number;
@@ -234,10 +235,10 @@ export function harness(opts: {
       const result = await runLoop({
         provider,
         deps: {
-          async executeUngatedTool(name) {
+          async executeUngatedTool(name, args) {
             executed.push(name);
             if (opts.toolDelayMs) await new Promise((resolve) => setTimeout(resolve, opts.toolDelayMs));
-            return opts.toolResultFor?.(name) ?? opts.toolResult ?? JSON.stringify({ ok: true, rows: [] });
+            return opts.toolResultFor?.(name, args) ?? opts.toolResult ?? JSON.stringify({ ok: true, rows: [] });
           },
           // The real store, as production wires it (`threadStateFor(env)`).
           threadState,

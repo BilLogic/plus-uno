@@ -38,7 +38,7 @@
 // PURE: no Env, no Slack shape.
 
 import type { TaskCardSource } from "../agent/task-card-readout";
-import { chartLine, chartOf, CHART_KINDS, type Chart, type ChartKind } from "./chart";
+import { chartAcross, chartLine, chartOf, CHART_KINDS, type Chart, type ChartKind, type LookupCall } from "./chart";
 import {
   roadmapCards,
   roadmapTable,
@@ -97,10 +97,7 @@ export interface Presenter {
   presentation(): Presentation | undefined;
 }
 
-interface Recorded {
-  args: Record<string, unknown>;
-  result: Record<string, unknown>;
-}
+type Recorded = LookupCall;
 
 const parse = (text: string): Record<string, unknown> | null => {
   try {
@@ -180,6 +177,9 @@ function chartNote(chart: Chart): string {
   );
 }
 
+const NO_ACROSS_NOTE =
+  "No chart is attached. Give the counts in a sentence of your prose, each as its lookup reported it, and say which could be short.";
+
 /** The fields a fallback table shows when the model named none: the row's
  *  name, the field it grouped by, and the field it summed. */
 function fallbackColumns(result: Record<string, unknown>, groupBy: string, measure: string | undefined): string[] {
@@ -195,6 +195,8 @@ function fallbackColumns(result: Record<string, unknown>, groupBy: string, measu
  */
 export function presenter(opts: { now?: () => number } = {}): Presenter {
   const lookups = new Map<string, Recorded>();
+  /** Every call of each lookup, in the order made, for a chart across them. */
+  const calls = new Map<string, Recorded[]>();
   const warnings = warningLog(opts.now);
   let table: ResultTable | undefined;
   const charts: Chart[] = [];
@@ -226,6 +228,32 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
   const refuseChart = (error: string): string =>
     answer({ ok: false, chart_attached: false, table_attached: false, error, note: NO_TABLE_NOTE });
 
+  const attachChart = (chart: Chart): string => {
+    charts.push(chart);
+    return answer({
+      ok: true,
+      chart_attached: true,
+      title: chart.title,
+      values: Object.fromEntries(chart.points.map((p) => [p.label, p.value])),
+      total: chart.total,
+      note: chartNote(chart),
+    });
+  };
+
+  /** A chart with one point per call of the lookup, each that call's whole
+   *  count. Refused without a fallback table: its counts come from several
+   *  lookups, so there is no one list of rows to show instead. */
+  const presentAcross = (lookup: string, kind: ChartKind, across: string, args: Record<string, unknown>): string => {
+    const reading = chartAcross(lookup, calls.get(lookup) ?? [], {
+      kind,
+      across,
+      ...(typeof args.list === "string" && args.list ? { list: args.list } : {}),
+      ...(typeof args.takeaway === "string" ? { takeaway: args.takeaway } : {}),
+    });
+    if ("chart" in reading) return attachChart(reading.chart);
+    return answer({ ok: false, chart_attached: false, table_attached: false, error: `No chart: ${reading.refusal}`, note: NO_ACROSS_NOTE });
+  };
+
   /** A `present` call asking for a chart: drawn from the recorded lookup, or
    *  degraded to the rows it would have counted, as a table with the reason
    *  beside it. */
@@ -233,6 +261,8 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
     if (charts.length >= MAX_CHARTS) return refuseChart(`At most ${MAX_CHARTS} charts per answer, and ${MAX_CHARTS} are already attached.`);
     const kind = String(args.chart ?? "bar") as ChartKind;
     if (!CHART_KINDS.includes(kind)) return refuseChart(`'${kind}' is not a chart; ask for one of ${CHART_KINDS.join(", ")}.`);
+    const across = typeof args.across === "string" ? args.across.trim() : "";
+    if (across) return presentAcross(lookup, kind, across, args);
     const groupBy = typeof args.group_by === "string" ? args.group_by.trim() : "";
     if (!groupBy) return refuseChart("Name the field to group the rows by in group_by.");
     const measured = typeof args.measure === "string" ? args.measure.trim() : "";
@@ -244,18 +274,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       ...(typeof args.list === "string" && args.list ? { list: args.list } : {}),
       ...(typeof args.takeaway === "string" ? { takeaway: args.takeaway } : {}),
     });
-    if ("chart" in reading) {
-      const chart = reading.chart;
-      charts.push(chart);
-      return answer({
-        ok: true,
-        chart_attached: true,
-        title: chart.title,
-        values: Object.fromEntries(chart.points.map((p) => [p.label, p.value])),
-        total: chart.total,
-        note: chartNote(chart),
-      });
-    }
+    if ("chart" in reading) return attachChart(reading.chart);
     const named = columnsOf(args);
     const fallback = tableFrom(lookup, recorded, args, named.length ? named : fallbackColumns(recorded.result, groupBy, measure));
     if (typeof fallback === "string") return refuseChart(`No chart: ${reading.refusal}`);
@@ -342,6 +361,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       const parsed = parse(text);
       if (!parsed || parsed.ok !== true) return text;
       lookups.set(name, { args, result: parsed });
+      calls.set(name, [...(calls.get(name) ?? []), { args, result: parsed }]);
       // The Roadmap preset's own door: the lookup asked for its table itself.
       if (name !== "roadmap_query") return text;
       const cards = args.as_table === true ? roadmapCards(parsed as RoadmapResult) : undefined;

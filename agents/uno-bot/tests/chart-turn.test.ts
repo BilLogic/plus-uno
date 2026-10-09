@@ -42,7 +42,7 @@ const chartOf = (args: Record<string, unknown> = {}): Call => ({
 });
 
 /** Run one turn: the lookups, the model's `present` calls, then its prose. */
-async function turn(presents: Call[], opts: { result?: string; lookups?: Call[]; prose?: string; resultFor?: (name: string) => string } = {}) {
+async function turn(presents: Call[], opts: { result?: string; lookups?: Call[]; prose?: string; resultFor?: (name: string, args: Record<string, unknown>) => string } = {}) {
   const h = harness({
     replies: [
       ...(opts.lookups ?? [ROADMAP]).map((c) => ({ toolCalls: [c] })),
@@ -220,4 +220,85 @@ test("a chart Slack refuses steps down to the prose with the values as text, nev
   assert.deepEqual(blocks.map((b) => b.type), ["markdown", "container", "context"]);
   assert.match(String(blocks[0]!.text), /Cards by Design Status: WIP 3 · Under Review 2 · Shipped 1/);
   assert.match(text, /WIP 3/);
+});
+
+/** The board's eight Design Statuses, and how many cards each holds. */
+const BOARD: Array<[string, number]> = [
+  ["Backlog", 41],
+  ["Scoping", 12],
+  ["WIP", 33],
+  ["Under Review", 7],
+  ["Ready for QA", 4],
+  ["Design QA", 0],
+  ["Shipped", 58],
+  ["On Hold", 3],
+];
+
+/** `roadmap_query` for one Design Status: its first 30 cards listed, the whole
+ *  count in `matched`, as the tool answers an enumeration. */
+function statusResult(status: string, matched: number, extra: Record<string, unknown> = {}): string {
+  const cards = Array.from({ length: Math.min(matched, 30) }, (_, i) => card(i + 1, status));
+  return JSON.stringify({ ok: true, filters: { design_status: status }, count: cards.length, matched, truncated: false, cards, ...extra });
+}
+
+const perStatus = (board = BOARD) => ({
+  lookups: board.map(([status]): Call => ({ name: "roadmap_query", args: { design_status: status } })),
+  resultFor: (name: string, args: Record<string, unknown>) => {
+    const row = board.find(([s]) => s === args.design_status);
+    return name === "roadmap_query" && row ? statusResult(row[0], row[1]) : "{}";
+  },
+});
+
+const acrossStatuses = (args: Record<string, unknown> = {}): Call => ({
+  name: "present",
+  args: { shape: "chart", lookup: "roadmap_query", chart: "bar", across: "design_status", takeaway: "Most cards are Shipped or in the Backlog.", ...args },
+});
+
+test("one lookup per Design Status charts as one bar per lookup, each bar that lookup's whole count, truncated ones included", async () => {
+  const { presentation, told, answer } = await turn([acrossStatuses()], perStatus());
+
+  const chart = presentation?.charts?.[0];
+  assert.ok(chart, "a chart rides with the answer");
+  assert.equal(chart.kind, "bar");
+  assert.deepEqual(chart.points, [
+    { label: "Shipped", value: 58 },
+    { label: "Backlog", value: 41 },
+    { label: "WIP", value: 33 },
+    { label: "Scoping", value: 12 },
+    { label: "Under Review", value: 7 },
+    { label: "Ready for QA", value: 4 },
+    { label: "On Hold", value: 3 },
+    { label: "Design QA", value: 0 },
+  ]);
+  assert.equal(chart.title, "Cards by Design Status");
+  assert.equal(presentation?.table, undefined, "no table beside a grounded chart");
+  assert.equal(presentation?.warnings, undefined, "no ⚠️ line: the totals are whole even where the rows were cut");
+  assert.equal(told[0]!.chart_attached, true);
+  assert.equal(told[0]!.total, 158, "the model is handed code's total");
+  assert.equal((told[0]!.values as Record<string, number>).Backlog, 41);
+
+  const { blocks, text } = await posted(answer.text, presentation);
+  assert.ok(blocks.some((b) => b.type === "data_visualization"), "Slack draws the chart");
+  assert.match(text, /^Cards by Design Status: Shipped 58 · Backlog 41 · WIP 33 · Scoping 12 · Under Review 7 · 3 more$/m);
+});
+
+test("a chart across lookups is refused when one of them read only part of the board, or carries no value for the field", async () => {
+  const partialBoard = perStatus();
+  const partial = await turn([acrossStatuses()], {
+    ...partialBoard,
+    resultFor: (name, args) =>
+      args.design_status === "Backlog" ? statusResult("Backlog", 41, { truncated: true }) : partialBoard.resultFor(name, args),
+  });
+  assert.equal(partial.presentation?.charts, undefined);
+  assert.equal(partial.told[0]!.chart_attached, false);
+  assert.match(String(partial.told[0]!.error), /Backlog/);
+  assert.match(String(partial.told[0]!.error), /part of the board|short/);
+
+  const unnamed = await turn([acrossStatuses({ across: "person" })], perStatus());
+  assert.equal(unnamed.presentation?.charts, undefined);
+  assert.match(String(unnamed.told[0]!.error), /person/);
+
+  const two = await turn([acrossStatuses()], perStatus(BOARD.slice(0, 2)));
+  assert.equal(two.presentation?.charts, undefined);
+  assert.match(String(two.told[0]!.error), /only 2/);
 });
