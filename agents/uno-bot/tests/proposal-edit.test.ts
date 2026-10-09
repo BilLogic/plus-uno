@@ -351,25 +351,42 @@ describe("a notion_update draft", () => {
     proposalText: ":warning: About to *update a Notion page*",
   };
 
-  it("offers the title it sets and the text it writes, and never where it writes", async () => {
-    const { deps, views } = harness(await staged(UPDATE));
+  /** The Roadmap's Design Status options, as the live schema offers them. */
+  const STATUSES = ["In Review", "Shipped", "Archived"];
+
+  it("offers the title it sets, the Design Status it moves to and the text it writes, and never where it writes", async () => {
+    const { deps, views, optionReads } = harness(await staged(UPDATE), { pillars: STATUSES });
     const edit = await editFields(deps, views);
     const fields = inputs(edit);
     assert.deepEqual(
-      fields.map((f) => [f.block_id, f.label?.text, f.element?.initial_value]),
+      fields.map((f) => [f.block_id, f.label?.text, f.element?.initial_value ?? f.element?.initial_option?.value]),
       [
         ["uno_field:0.properties.Name", "Title", "Reflection redesign v2"],
+        ["uno_field:0.properties.Design Status", "Design Status", "In Review"],
         ["uno_field:0.append.text", "Text to append", "Progress: the form is down to three questions."],
         ["uno_field:0.append.sections.0.body", "Section to append: Open questions", "Does the mentor see the answers?"],
         ["uno_field:0.replace.0.content", "Replacement text", "Tutors answer three questions."],
       ],
     );
+    // The status is a select of the board's own options, read live.
+    assert.deepEqual(fields[1]!.element?.options?.map((o) => o.value), STATUSES);
+    assert.deepEqual(optionReads, ["roadmap/Design Status"]);
     // The page, the block and its stamp, and any other property stay locked.
     const offered = JSON.stringify(fields.map((f) => [f.block_id, f.label?.text]));
-    for (const locked of ["page_url", ".block_id", "last_edited_time", "Design Status"]) {
+    for (const locked of ["page_url", ".block_id", "last_edited_time"]) {
       assert.ok(!offered.includes(locked), locked);
     }
     assert.deepEqual(views.refused, []);
+  });
+
+  it("writes a picked Design Status under the property the update names, and refuses one the board lacks", async () => {
+    const { deps, ran } = harness(await staged(UPDATE), { pillars: STATUSES });
+    await runReviewDecision(approve({ "0.properties.Design Status": "Archived" }), deps);
+    assert.deepEqual(ran[0]?.execute?.input.properties, { Name: "Reflection redesign v2", "Design Status": "Archived" });
+
+    const refused = harness(await staged(UPDATE), { pillars: STATUSES });
+    await runReviewDecision(approve({ "0.properties.Design Status": "Ready for QA" }), refused.deps);
+    assert.equal(refused.ran.length, 0);
   });
 
   it("offers no title when the update does not set one", async () => {

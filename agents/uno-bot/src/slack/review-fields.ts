@@ -106,7 +106,8 @@ const squash = (name: string) => name.toLowerCase().replace(/[\s_]+/g, "");
 /**
  * A `notion_update`'s fields are the text it writes and the title it sets, so
  * they follow the call's own shape: one per appended text, section body and
- * replacement, and a title only when `properties` sets one. The page, a
+ * replacement, a title only when `properties` sets one, and a Design Status
+ * only when `properties` sets one (a Roadmap select). The page, a
  * replacement's block and its stamp, and every other property stay locked.
  * Each is offered only where the call writes something, since a required
  * field the draft left out would otherwise open as an empty input.
@@ -118,6 +119,13 @@ function notionUpdateFields(input: Input): FieldSpec[] {
     (key) => TITLE_NAMES.has(squash(key)) && !key.includes(".") && typeof props(input)[key] === "string",
   );
   if (title) specs.push({ path: `properties.${title}`, label: "Title", kind: "text", required: true });
+  // A Roadmap card's move: any of the board's own Design Status options.
+  const status = Object.keys(props(input)).find(
+    (key) => squash(key) === "designstatus" && !key.includes(".") && typeof props(input)[key] === "string",
+  );
+  if (status) {
+    specs.push({ path: `properties.${status}`, label: "Design Status", kind: "select", required: true, options: { database: "roadmap", property: "Design Status" } });
+  }
   const append = input.append && typeof input.append === "object" ? (input.append as Input) : {};
   if (typeof append.text === "string") specs.push({ path: "append.text", label: "Text to append", kind: "multiline", required: true });
   const sections = Array.isArray(append.sections) ? append.sections : [];
