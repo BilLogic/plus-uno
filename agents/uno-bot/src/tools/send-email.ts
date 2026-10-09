@@ -76,7 +76,7 @@ export async function executeSendEmail(
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `:white_check_mark: Sent — *${subject}* to ${recipients}.`,
+      text: `Sent "${subject}" to ${recipients}.`,
     });
     return JSON.stringify({
       ok: true,

@@ -25,8 +25,8 @@ function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-// Render one confirmed change for the success echo: "*Real Name* → `new value`",
-// value codified. `entry` is notionUpdate's real schema name, optionally with a
+// Render one confirmed change for the success echo: "Real Name is now new value",
+// in plain words. `entry` is notionUpdate's real schema name, optionally with a
 // "(note)" suffix; the value comes from the requested input matched by name.
 function echoUpdatedField(entry: string, properties?: Record<string, string>): string {
   const m = entry.match(/^(.*?)(?:\s+\((.*)\))?$/);
@@ -39,7 +39,7 @@ function echoUpdatedField(entry: string, properties?: Record<string, string>): s
       if (normalizeName(k) === target) { value = v; break; }
     }
   }
-  const base = value ? `*${name}* → \`${value}\`` : `*${name}*`;
+  const base = value ? `${name} is now ${value}` : `${name} is set`;
   return note ? `${base} (${note})` : base;
 }
 
@@ -137,13 +137,10 @@ export async function executeNotionUpdate(
     // The name is read only when there is body content to attribute.
     const onBehalfOf = append ? await requesterName(env, slack) : undefined;
     const r = await notionUpdate(env, pageId, { properties, append, replace, insert, onBehalfOf });
-    const parts: string[] = [];
-    // Name each concrete change with its NEW value codified, e.g.
-    // "set *Dev Status* → `Ready for Dev`" — not a bare property name (2026-07-14).
-    if (r.updated.length) parts.push(`set ${r.updated.map((u) => echoUpdatedField(u, properties)).join(", ")}`);
-    if (r.replaced) parts.push(`replaced ${r.replaced} block(s)`);
-    if (r.inserted) parts.push(`added ${r.inserted} block(s)`);
-    if (r.appended) parts.push(`appended ${r.appended} block(s)`);
+    // Name each property change with its NEW value, e.g. "Dev Status is now
+    // Ready for Dev" — not a bare property name (2026-07-14). Body edits go
+    // unnamed: the confirmation is one plain sentence, never a block count.
+    const set = r.updated.map((u) => echoUpdatedField(u, properties));
     const skippedNote = r.skipped.length ? ` — couldn't set: ${r.skipped.join("; ")}` : "";
     // A refused replace is NOT a quiet no-op: the page still says what it said,
     // and the person who asked for the correction has to hear that.
@@ -164,7 +161,7 @@ export async function executeNotionUpdate(
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `:pencil2: Updated the Notion page — ${parts.join("; ")}${skippedNote}${refusedNote}.`,
+      text: `Updated the Notion page${set.length ? `: ${set.join(", ")}` : ""}${skippedNote}${refusedNote}.`,
     });
     return JSON.stringify({ ok: true, status: "updated", ...r });
   } catch (err) {

@@ -23,7 +23,7 @@ export async function executeNotionArchive(
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `:white_check_mark: Archived *${title}*. (Recoverable from Notion's trash.)`,
+      text: `Archived ${title}, which stays recoverable from Notion's trash.`,
     });
     return JSON.stringify({ ok: true, status: "archived", message: `Archived '${title}'.` });
   } catch (err) {
