@@ -32,6 +32,7 @@ import {
   FIGMA_NOTE,
   FIGMA_TRUNCATION_NOTE,
   figmaCommentsCapNote,
+  MAX_PINNED_CHARS,
   MAX_PINNED_THREADS,
   MAX_TEXT_LAYERS,
   type FigmaNode,
@@ -478,6 +479,40 @@ describe("the comments pinned to a pasted frame (#899)", () => {
       payload.note,
       `${FIGMA_NOTE} ${FIGMA_COMMENTS_NOTE} ${figmaCommentsCapNote(MAX_PINNED_THREADS, MAX_PINNED_THREADS + 5)}`,
     );
+  });
+
+  it("stops listing at the text cap too, newest first, and always lists the newest thread", async () => {
+    const long = (i: number, chars: number) =>
+      comment(`c${i}`, {
+        created_at: new Date(Date.UTC(2026, 8, 1 + i)).toISOString(),
+        message: `${i}`.padEnd(chars, "x"),
+        client_meta: pinnedTo(NODE),
+      });
+    const third = Math.floor(MAX_PINNED_CHARS * 0.4);
+    const payload = await pasted([0, 1, 2, 3].map((i) => long(i, third)));
+    const threads = payload.comments as Array<{ text: string }>;
+    assert.deepEqual(
+      threads.map((t) => t.text[0]),
+      ["3", "2"],
+      "a third would cross the cap, so it and every older one stop",
+    );
+    assert.equal(payload.comment_threads, 4);
+    assert.equal(payload.comments_truncated, true);
+    assert.match(String(payload.note), /Only the 2 threads with the newest activity are listed, of 4 pinned here/);
+
+    const one = await pasted([long(0, MAX_PINNED_CHARS * 2)]);
+    assert.equal((one.comments as unknown[]).length, 1);
+    assert.equal(one.comments_truncated, false);
+  });
+
+  it("names an unnamed layer as such, so it never reads as the frame itself", async () => {
+    const figma = createInMemoryFigma();
+    figma.seedFile(FILE, {
+      nodes: { [NODE]: { ...FRAME, children: [{ id: "158:21799", type: "RECTANGLE" }] } },
+      comments: [comment("c1", { client_meta: pinnedTo("158:21799") })],
+    });
+    const payload = describeFigmaFrame(URL, await fetchFigmaFrame(figma, FILE, NODE));
+    assert.equal((payload.comments as Array<{ layer?: string }>)[0]!.layer, "(unnamed)");
   });
 
   it("asks Figma for the node and the file's comments once each, or the node alone when told to", async () => {

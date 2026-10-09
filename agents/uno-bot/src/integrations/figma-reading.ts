@@ -105,6 +105,12 @@ export const FIGMA_COMMENTS_UNREAD_NOTE =
 
 /** The most threads one read lists, newest activity first. */
 export const MAX_PINNED_THREADS = 20;
+/**
+ * The most comment text one read lists, roots and replies together — what a
+ * web page's read carries. The thread with the newest activity is listed
+ * whatever its length.
+ */
+export const MAX_PINNED_CHARS = 8_000;
 
 /** Appended when more threads are pinned than are listed. */
 export function figmaCommentsCapNote(listed: number, total: number): string {
@@ -155,7 +161,7 @@ export interface PinnedThread {
   replies: PinnedReply[];
 }
 
-/** The threads pinned to a frame: the newest `MAX_PINNED_THREADS`, and how many there are. */
+/** The threads pinned to a frame: the newest that fit both caps, and how many there are. */
 export interface PinnedComments {
   threads: PinnedThread[];
   total: number;
@@ -166,8 +172,10 @@ const when = (iso: string | null | undefined): number => (iso ? Date.parse(iso) 
 
 /**
  * The comment threads pinned to `frame` or to any node inside it, newest
- * activity first — a root's, its replies' or its resolution's — capped at
- * `MAX_PINNED_THREADS`, with the uncapped count beside them.
+ * activity first — a root's, its replies' or its resolution's — up to
+ * `MAX_PINNED_THREADS` and `MAX_PINNED_CHARS`, with the uncapped count beside
+ * them. The cap stops at the first thread that doesn't fit, so what is listed
+ * is always the newest, and what isn't is older.
  *
  * The walk covers the whole subtree, uncapped, unlike the text walk: a
  * comment on the 300th layer is as pinned to the frame as one on the first.
@@ -193,7 +201,7 @@ export function pinnedThreads(frame: FigmaNode, comments: readonly FigmaCommentL
     .map((root) => {
       const replies = [...(repliesTo.get(root.id) ?? [])].sort((a, b) => when(a.created_at) - when(b.created_at));
       const pinnedTo = root.client_meta!.node_id!;
-      const layer = pinnedTo === frame.id ? "" : layers.get(pinnedTo)!;
+      const layer = pinnedTo === frame.id ? "" : layers.get(pinnedTo) || "(unnamed)";
       const thread: PinnedThread = {
         by: root.user.handle,
         at: root.created_at,
@@ -208,7 +216,15 @@ export function pinnedThreads(frame: FigmaNode, comments: readonly FigmaCommentL
     })
     .sort((a, b) => b.activity - a.activity);
 
-  return { threads: kept.slice(0, MAX_PINNED_THREADS).map((k) => k.thread), total: kept.length };
+  const threads: PinnedThread[] = [];
+  let chars = 0;
+  for (const { thread } of kept) {
+    const size = thread.text.length + thread.replies.reduce((n, r) => n + r.text.length, 0);
+    if (threads.length === MAX_PINNED_THREADS || (threads.length && chars + size > MAX_PINNED_CHARS)) break;
+    threads.push(thread);
+    chars += size;
+  }
+  return { threads, total: kept.length };
 }
 
 /** A pasted frame's read: what the node walk found and, when asked for, the comments pinned in it. */
