@@ -1,0 +1,50 @@
+{
+  "case": "RT6",
+  "source": "authored",
+  "recordedAt": "2026-10-09",
+  "note": "AUTHORED from the live r521 reply to this prompt, not captured off the Worker: the draft walks every row of the table it asked for and closes on its freshness line, as that reply did, so the replay proves the turn holds the reply that posts to 3 rows when the judge's redraft does not come back (the replay's judge passes the draft unchanged). It proves nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=RT6`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "What are the main tutor pain points in the blueprint, by scenario?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "tutor pain points"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "present",
+              "args": {
+                "shape": "table",
+                "lookup": "search_blueprint",
+                "list": "rows",
+                "columns": [
+                  "title",
+                  "scenario",
+                  "lane"
+                ],
+                "takeaway": "Most tutor friction sits where a rule holds a tutor in place and only a supervisor can release it."
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Most tutor friction sits where a rule holds a tutor in place and only a supervisor can release it.**\n\nHere is the scenario-by-scenario breakdown:\n\nPhase: Onboarding\n• *Scenario: Session Sign Up*\n    ◦ In Session Sign Up › No conflicts — Back Stage Touchpoints × [Review scheduling](https://plus-uno.netlify.app/blueprint/?cell=a0000000-0000-4000-8000-000000130208), scheduling stays locked until the last onboarding module is done, so a delayed tutor misses shift selection.\n\nPhase: Pre-session\n• *Scenario: Call-off Request*\n    ◦ In Call-off Request › Under 12 hours — Regular Tutor × [Files late call-off](https://plus-uno.netlify.app/blueprint/?cell=b0000000-0000-4000-8000-000000180303), a late call-off strips the tutor from the roster at once while the excuse waits on a supervisor.\n\nPhase: In-session\n• *Scenario: Student Just Joined*\n    ◦ In Student Just Joined › Few or none by 10 min — Lead Tutor × [Wait 10 minutes](https://plus-uno.netlify.app/blueprint/?cell=b2000000-0000-4000-8000-000000000031), tutors cannot end or repurpose a session with no students and wait idle for a supervisor.\n\nPhase: In-session\n• *Scenario: Help Request*\n    ◦ In Help Request › Routed out — Regular Tutor × [Resolve issue](https://plus-uno.netlify.app/blueprint/?cell=b3000000-0000-4000-8000-000000000033), problems are routed by hand to Slack channels, with no ticketing tool behind them.\n\nPhase: Post-session\n• *Scenario: Reporting Hours*\n    ◦ In Reporting Hours › Deadline missed — Regular Tutor × [Miss reporting deadline](https://plus-uno.netlify.app/blueprint/?cell=b0000000-0000-4000-8000-0000001e1103), hours logged in PLUS do not reach Workday, so a missed deadline delays the paycheck.\n\nI searched the blueprint just now, so these pain points are current."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "search_blueprint",
+          "text": "{\"ok\": true, \"query\": \"tutor pain points\", \"count\": 5, \"matched\": 5, \"retrieval\": \"hybrid\", \"truncated\": false, \"capped_by\": null, \"cached\": false, \"age_ms\": 0, \"thin\": false, \"rows\": [{\"kind\": \"cell\", \"id\": \"a0000000-0000-4000-8000-000000130208\", \"title\": \"Review scheduling\", \"lane\": \"Back Stage Touchpoints\", \"scenario\": \"Session Sign Up\", \"phase\": \"Onboarding\", \"path\": \"No conflicts\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=a0000000-0000-4000-8000-000000130208\", \"matchedBy\": \"vector+keyword\"}, {\"kind\": \"cell\", \"id\": \"b0000000-0000-4000-8000-000000180303\", \"title\": \"Files late call-off\", \"lane\": \"Regular Tutor\", \"scenario\": \"Call-off Request\", \"phase\": \"Pre-session\", \"path\": \"Under 12 hours\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=b0000000-0000-4000-8000-000000180303\", \"matchedBy\": \"vector+keyword\"}, {\"kind\": \"cell\", \"id\": \"b2000000-0000-4000-8000-000000000031\", \"title\": \"Wait 10 minutes\", \"lane\": \"Lead Tutor\", \"scenario\": \"Student Just Joined\", \"phase\": \"In-session\", \"path\": \"Few or none by 10 min\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=b2000000-0000-4000-8000-000000000031\", \"matchedBy\": \"vector+keyword\"}, {\"kind\": \"cell\", \"id\": \"b3000000-0000-4000-8000-000000000033\", \"title\": \"Resolve issue\", \"lane\": \"Regular Tutor\", \"scenario\": \"Help Request\", \"phase\": \"In-session\", \"path\": \"Routed out\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=b3000000-0000-4000-8000-000000000033\", \"matchedBy\": \"vector+keyword\"}, {\"kind\": \"cell\", \"id\": \"b0000000-0000-4000-8000-0000001e1103\", \"title\": \"Miss reporting deadline\", \"lane\": \"Regular Tutor\", \"scenario\": \"Reporting Hours\", \"phase\": \"Post-session\", \"path\": \"Deadline missed\", \"url\": \"https://plus-uno.netlify.app/blueprint/?cell=b0000000-0000-4000-8000-0000001e1103\", \"matchedBy\": \"vector+keyword\"}], \"notes\": [\"Cite the rows you rely on, linked.\"]}"
+        }
+      ]
+    }
+  ]
+}
