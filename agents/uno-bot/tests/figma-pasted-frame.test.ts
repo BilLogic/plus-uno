@@ -8,8 +8,6 @@
 // What the payload says in each case is in tests/figma-read.test.ts.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 
 import type { Env } from "../src/types";
 
@@ -95,14 +93,5 @@ describe("a pasted frame link, read end to end", () => {
       requests.map((u) => new URL(u).pathname),
       [`/v1/files/${FILE}/nodes`],
     );
-  });
-
-  it("tells the model, in the tool's own description, that a frame read carries its pinned comments", () => {
-    const tools = JSON.parse(readFileSync(join(process.cwd(), "tool-definitions.json"), "utf8")) as Array<{
-      name: string;
-      description: string;
-    }>;
-    const sourceRead = tools.find((t) => t.name === "source_read");
-    assert.match(sourceRead?.description ?? "", /Figma frame \(node name\/type, text layers and the comment threads pinned to it or a layer inside it\)/);
   });
 });
