@@ -271,6 +271,36 @@ test("an issue list offers its issues as a table", async () => {
   assert.deepEqual(read!.table_ready, { matches: { count: 3, columns: ["number", "title", "updated"] } });
 });
 
+test("a row's property bag reaches the table: each short field in it is a column, headed by its own name", async () => {
+  const results = [2019, 2021, 2023].map((year, i) => ({
+    title: `Paper ${i + 1}`,
+    url: `https://www.notion.so/paper-${i + 1}`,
+    meta: { Year: String(year), Status: "Published", Abstract: "A long abstract. ".repeat(10) },
+  }));
+  const result = JSON.stringify({ ok: true, scope: "research_papers", count: 3, results });
+  const ask = { name: "notion_search", args: { query: "tutor feedback", scope: "research_papers" } };
+  const h = harness({
+    replies: [
+      { toolCalls: [ask] },
+      { toolCalls: [{ name: "present", args: { shape: "table", lookup: "notion_search", columns: ["title", "meta.Year"] } }] },
+      { text: "**Three papers.**" },
+    ],
+    toolResultFor: () => result,
+  });
+  await runTurn(request({ text: "papers on tutor feedback?" }), h.deps);
+
+  const [read] = readOf(h, "notion_search");
+  assert.deepEqual(read!.table_ready, { results: { count: 3, columns: ["title", "meta.Year", "meta.Status"] } });
+  const table = answerOf(h)!.presentation!.table!;
+  assert.deepEqual(table.columns.map((c) => c.label), ["Title", "Year"]);
+  assert.deepEqual(table.rows.map((r) => r.cells), [
+    ["Paper 1", "2019"],
+    ["Paper 2", "2021"],
+    ["Paper 3", "2023"],
+  ]);
+  assert.equal(table.rows[0]!.url, "https://www.notion.so/paper-1");
+});
+
 test("a failed lookup, or one row, offers no table", async () => {
   for (const result of [JSON.stringify({ ok: false, error: "down" }), blueprintResult(1)]) {
     const h = harness({ replies: [{ toolCalls: [SEARCH] }, { text: "x" }], toolResultFor: () => result });

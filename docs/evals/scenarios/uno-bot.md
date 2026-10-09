@@ -21,11 +21,11 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **65** (B×7 · C×1 · CH×2 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1 · WL×2) |
+| cases | **68** (B×7 · C×1 · CH×2 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · RT×3 · S×3 · T×2 · V×1 · W×1 · WL×2) |
 | blockers | 30 |
-| turns · sample runs | 75 · 193 |
+| turns · sample runs | 78 · 202 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 48 |
+| recorded, so the pull-request gate reaches them | 51 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
@@ -575,6 +575,30 @@ _advisory · 3 samples · recorded_
 - **Trigger:** "Which Roadmap cards are WIP right now?"
 - **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"roadmap_query","args":{"design_status":"WIP"}}` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-08 with the charts ticket of the presentation spec. The contrast to CH1: the reader wants the cards themselves, to scan and open, so the answer is a result table of the WIP cards (roadmap_query's as_table, or present with shape table), and no chart. A chart is for numbers that compare or trend; one bar holding every WIP card shows nothing. Deterministic: roadmap_query runs with design_status WIP, and the reply carries no emoji. For the judge: the reply gives the count and what stands out, names at most 3 cards, and does not ask present for a chart. A chart, or the cards typed out as a list above a table, fails. [samples:3 — whether the model asks for a chart or a table is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
+
+## RT1 — blueprint findings by scenario post as a result table
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "What pain points does the blueprint record for tutors, by scenario?"
+- **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"present","args":{"shape":"table","lookup":"search_blueprint"}}` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 from a live miss on r518: this question came back as a long sectioned list with every pain point typed out, and `present` was never called. Pain points the blueprint records are rows of one shape (a cell or finding, its scenario, its lane), so they post as a result table beneath the answer: the turn searches the blueprint, once or once per phase, then asks `present` for a table of `search_blueprint` with up to 4 of the columns the result's `table_ready` names, a scenario column among them when the rows carry one. Deterministic: a present call with shape table and lookup search_blueprint, and no emoji. For the judge: the reply leads with a one-sentence takeaway (where tutors hit the most friction), names at most 3 rows, words each row by its status, and does not type the table's rows out as bullets above it. Every pain point listed in prose fails, and so does a pain point with no row behind it. [samples:3 — whether the model asks for a table or writes the rows out is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
+
+## RT2 — an issue list posts as a result table
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "Which open intake issues on plus-uno are about uno-bot?"
+- **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"present","args":{"shape":"table","lookup":"github_intake_search"}}` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 from a live miss on r518: an intake list came back as a bullet list of issues, and once the lookups were spent `present` was refused with them. Open intakes are rows of one shape (number, title, link, last update), so they post as a result table: the turn runs github_intake_search on plus-uno and asks `present` for a table of `github_intake_search`, list `matches`. Deterministic: a present call with shape table and lookup github_intake_search, and no emoji. For the judge: the reply gives the count and what stands out (the oldest, or the one most in the way), names at most 3 issues, linked, and leaves the rest to the table. Staging github_issue_create or github_issue_update fails: nothing was asked to be filed. When the search returns one intake or none, a prose answer is right and the deterministic half fails honestly; the judge says so. [samples:3 — whether the model asks for a table or writes the rows out is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
+
+## RT3 — research papers on a theme post as a result table
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "Which research papers do we have on tutor feedback? Give me the list."
+- **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"present","args":{"shape":"table","lookup":"notion_search"}}` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 beside RT1 and RT2, from the same live miss on r518: the third estate, so the result table is shown to reach Notion research as well as the blueprint and GitHub. Research papers on a theme are rows of one shape (title, link, year or status), so they post as a result table: the turn runs notion_search with scope research_papers and asks `present` for a table of `notion_search`. Deterministic: a present call with shape table and lookup notion_search, and no emoji. For the judge: the reply leads with the theme the papers share in one sentence, names at most 3 papers, linked, and leaves the rest to the table. A plain bullet list of the papers fails. When the search returns one paper or none, a prose answer is right and the deterministic half fails honestly; the judge says so. [samples:3 — whether the model asks for a table or writes the rows out is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
 
 ## WL1 — a conflict between the blueprint and the Roadmap goes in a ⚠️ line placed by code
 

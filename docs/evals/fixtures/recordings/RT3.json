@@ -1,0 +1,47 @@
+{
+  "case": "RT3",
+  "source": "authored",
+  "recordedAt": "2026-10-09",
+  "note": "AUTHORED with the result-table reach ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=RT3`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Which research papers do we have on tutor feedback? Give me the list.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "tutor feedback",
+                "scope": "research_papers"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "present",
+              "args": {
+                "shape": "table",
+                "lookup": "notion_search",
+                "list": "results",
+                "columns": ["title", "meta.Year"],
+                "takeaway": "Three papers look at how tutors give feedback in session."
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Three papers look at how tutors give feedback in session.**\n\nThe newest one is the place to start: it covers feedback timing, which the other two only touch on."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "notion_search",
+          "text": "{\"ok\": true, \"scope\": \"research_papers\", \"label\": \"Research Papers\", \"count\": 3, \"scanned\": 40, \"results\": [{\"title\": \"Feedback moves in math tutoring\", \"url\": \"https://www.notion.so/paper-1\", \"meta\": {\"Year\": \"2023\", \"Status\": \"Published\"}}, {\"title\": \"Praise and persistence in tutoring\", \"url\": \"https://www.notion.so/paper-2\", \"meta\": {\"Year\": \"2021\", \"Status\": \"Published\"}}, {\"title\": \"Timing of tutor feedback\", \"url\": \"https://www.notion.so/paper-3\", \"meta\": {\"Year\": \"2024\", \"Status\": \"Published\"}}], \"note\": \"Complete scan of 40 rows. source_read a hit for full content; cite the page you used.\"}"
+        }
+      ]
+    }
+  ]
+}

@@ -15,8 +15,10 @@
 //     titles really contain the phrase. The "similar" did-you-mean guesses stay
 //     in the prose, so a guess never sits in a grid that reads as fact.
 //   • Any other lookup, through `present`: the rows are the first list of
-//     records in its result (or the one it names), the columns the fields the
-//     model chose, each one held to what the rows carry.
+//     records in its result (or the one it names) — every call of it this
+//     turn, merged (`mergedLookup`) — and the columns the fields the model
+//     chose, each one held to what the rows carry, a property bag's fields
+//     included. The result itself offers which (`tableOffer`).
 // Either way it is a `ResultTable`: the cells, the caption, the plain list and
 // what the duplicate-row strip looks for, all computed here.
 //
@@ -273,9 +275,11 @@ type Record_ = Record<string, unknown>;
 const isRecord = (v: unknown): v is Record_ => typeof v === "object" && v !== null && !Array.isArray(v);
 const isAddress = (v: unknown): v is string => typeof v === "string" && /^https?:\/\//.test(v);
 
-/** A field name as a header: `design_status` → "Design Status". */
+/** A field name as a header: `design_status` → "Design Status", and a field
+ *  of a property bag by its own name, `meta.Year` → "Year". */
 export function labelOf(field: string): string {
   return field
+    .slice(field.lastIndexOf(".") + 1)
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .split(/[_\s]+/)
     .filter(Boolean)
@@ -299,6 +303,22 @@ function columnRefusal(field: string, rows: Record_[], usable: string[]): string
   if (values.some((v) => typeof v === "string" && (v.length > LONG_TEXT || v.includes("\n"))))
     return `'${field}' is long text, which a table cell cannot show; summarise it in your prose instead.`;
   return null;
+}
+
+/**
+ * A row with each property bag opened one level: a field holding a record of
+ * plain values (`meta: { Year, Status }`, how a Notion catalog row carries its
+ * properties) also reads as `meta.Year` and `meta.Status`, so those can be
+ * columns. Without it, every such row offered its title and nothing else.
+ */
+function flatRow(row: Record_): Record_ {
+  const flat: Record_ = {};
+  for (const [key, value] of Object.entries(row)) {
+    flat[key] = value;
+    if (!isRecord(value)) continue;
+    for (const [sub, v] of Object.entries(value)) if (typeof v !== "object" || v === null) flat[`${key}.${sub}`] = v;
+  }
+  return flat;
 }
 
 /** The fields a column could be drawn from. */
@@ -343,7 +363,7 @@ export function wholeCount(result: Record_, key: string): number | undefined {
 export function tableOffer(result: Record_): Record<string, { count: number; columns: string[] }> {
   const offer: Record<string, { count: number; columns: string[] }> = {};
   for (const [key, rows] of listsOf(result)) {
-    const columns = rows.length >= MIN_ROWS ? usableFields(rows) : [];
+    const columns = rows.length >= MIN_ROWS ? usableFields(rows.map(flatRow)) : [];
     if (columns.length) offer[key] = { count: rows.length, columns };
   }
   return offer;
@@ -429,17 +449,18 @@ export function tableOf(lookup: string, args: Record_, result: Record_, request:
     };
   }
   if (list.rows.length < MIN_ROWS) return { refusal: "One row is an answer in prose, not a table." };
+  const records = list.rows.map(flatRow);
 
   const fields = [...new Set(request.columns.map((c) => c.trim()).filter(Boolean))];
   if (fields.length === 0) return { refusal: "Name at least one column." };
   if (fields.length > MAX_COLUMNS) return { refusal: `At most ${MAX_COLUMNS} columns; you named ${fields.length}.` };
-  const usable = usableFields(list.rows);
+  const usable = usableFields(records);
   for (const field of fields) {
-    const refusal = columnRefusal(field, list.rows, usable);
+    const refusal = columnRefusal(field, records, usable);
     if (refusal) return { refusal };
   }
 
-  const shown = list.rows.slice(0, MAX_ROWS);
+  const shown = records.slice(0, MAX_ROWS);
   const columns = fields.map((field) => ({
     label: labelOf(field),
     numeric: shown.every((r) => cellOf(r[field]) === null || typeof cellOf(r[field]) === "number"),
