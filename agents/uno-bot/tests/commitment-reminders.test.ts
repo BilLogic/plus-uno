@@ -18,6 +18,7 @@ import type { ScheduledJob } from "../src/scheduled/runs";
 import { runSweepJob, type SweepSlackMessage } from "../src/sweep/index";
 import {
   answerReminder,
+  answerReminderPress,
   commitmentThreadHook,
   createInMemoryCommitmentStore,
   modelCommitmentDetector,
@@ -435,6 +436,55 @@ describe("answers", () => {
 
   it("the reminder's glyphs are none of the gate's", () => {
     for (const name of Object.keys(REMINDER_REACTIONS)) assert.equal(GATE_RESERVED.has(name), false, name);
+  });
+});
+
+describe("a tap the door refuses says why", () => {
+  // A button press always answers whoever pressed it: a reaction can be left
+  // unanswered, a tap that does nothing reads as a broken button.
+  async function tapped() {
+    const { store } = await sweptPromise();
+    const m = mornings({ store, now: at(32, 13) });
+    await m.run();
+    const reminderTs = m.posts[0]!.ts;
+    const press = (glyph: string, userId = MAYA, messageTs = reminderTs) =>
+      answerReminderPress(
+        { channel: DESIGN, messageTs, glyph, userId },
+        { store, update: m.deps.slack.update, botUserId: async () => BOT, now: () => m.clock.now },
+      );
+    return { store, m, reminderTs, press };
+  }
+
+  it("someone else's promise names whose it is, and changes nothing", async () => {
+    const { store, m, press } = await tapped();
+    const outcome = await press("raised_hands", BEA);
+    assert.equal(outcome.claimed, true);
+    assert.equal(outcome.claimed && outcome.refused, `Only <@${MAYA}> can answer this reminder, so that tap changed nothing.`);
+    assert.equal(only(store).state, "nudged");
+    assert.equal(m.updates.length, 0);
+  });
+
+  it("a settled reminder says it is settled", async () => {
+    const { press } = await tapped();
+    assert.deepEqual(await press("raised_hands"), { claimed: true });
+    const again = await press("no_good");
+    assert.equal(again.claimed && again.refused, "This one's already been answered, so that tap changed nothing.");
+  });
+
+  it("a ⏳ past the cap says it can't be put off again", async () => {
+    const { m, reminderTs, press } = await tapped();
+    await press("hourglass_flowing_sand");
+    m.clock.now = at(37, 13);
+    await m.run();
+    const followUp = m.posts[1]!.ts;
+    assert.deepEqual(await press("hourglass_flowing_sand", MAYA, followUp), { claimed: true });
+    const third = await press("hourglass_flowing_sand", MAYA, reminderTs);
+    assert.equal(third.claimed && third.refused, "This can't be put off again, so that tap changed nothing.");
+  });
+
+  it("a message no reminder holds is not the door's", async () => {
+    const { press } = await tapped();
+    assert.deepEqual(await press("raised_hands", MAYA, "1790000000.000001"), { claimed: false });
   });
 });
 

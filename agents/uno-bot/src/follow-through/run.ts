@@ -66,7 +66,7 @@ import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalCard } from "../turn/index";
 import type { PendingProposal, ProposalOperation } from "../thread-state/index";
-import { reminderBlocks } from "../commitments/copy";
+import { reminderBlocks, TAP_REFUSED } from "../commitments/copy";
 import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, TEXT_KEEP_MS } from "../commitments/due";
 import type { CommitmentAction } from "../commitments/run";
 import { cardTodoId, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
@@ -424,7 +424,7 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
       remindedOn: null,
       resolvedAt: null,
     });
-    texts[id] = { what: todo.what, bodies: {}, participants: participants.filter((p) => p !== owner) };
+    texts[id] = { what: todo.what, bodies: {} };
   }
   if (deps.dryRun || !rows.length) return rows;
   await keepRows(deps.store, rows, texts);
@@ -759,30 +759,32 @@ export interface CardReaction {
  * A reaction on a card follow-up, answered. The follow-up owns every reaction
  * on it, whether or not one changed anything: nothing on it reaches the gate.
  *
+ * Anyone may answer: a card is the team's, not a promise one person made, so
+ * whoever knows where it stands says so, and the edit names them.
+ *
  * @param c - The follow-up's row
  * @param r - The reaction
  * @param deps - The store, the reads, the edit, the staging
+ * @returns Why the answer changed nothing, or nothing when it landed
  */
-export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, deps: AnswerDeps): Promise<void> {
-  if (c.kind === "thread_promise" || c.kind === "card_unowned") return;
+export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, deps: AnswerDeps): Promise<string | void> {
+  if (c.kind === "thread_promise" || c.kind === "card_unowned") return TAP_REFUSED.notAnAnswer;
+  if (r.userId === deps.config.botUserId) return;
   const kind = c.kind as "card_todo" | "card_stale";
   const answer = cardAnswer(kind, r.glyph);
-  if (!answer || !LIVE_STATES.includes(c.state) || r.userId === deps.config.botUserId) return;
+  if (!answer) return TAP_REFUSED.notAnAnswer;
+  if (!LIVE_STATES.includes(c.state)) return TAP_REFUSED.settled;
   const text = await deps.store.text(c.id);
   const people = [c.promiserId, ...(text?.mentions ?? [])];
-  // The owners answer; the draft may also be asked for by anyone who posted
-  // in the to-do's thread.
-  const allowed = answer === "draft" ? [...people, ...(text?.participants ?? [])] : people;
-  if (!allowed.includes(r.userId)) return;
   const now = deps.now();
   const thread = { channel: r.channel, channelKind: c.channelKind, threadTs: c.threadTs || c.nudgeTs || r.messageTs };
   const confirmers = [...new Set([...people, r.userId])];
 
   let staged = false;
   if (answer === "draft") {
-    if (!text) return;
+    if (!text) return TAP_REFUSED.gone;
     staged = await deps.stage({ card: await draftCard(c, text, deps), ...thread, confirmers, slot: proposalSlotFor(c) });
-    if (!staged) return;
+    if (!staged) return DRAFT_NOT_POSTED;
     await deps.store.update(c.id, { state: "done", resolvedAt: now });
   } else if (answer === "still_on_it") {
     // Checked again in three weeks: moved by then, it settles; if not, the one
@@ -795,7 +797,7 @@ export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, d
     const options = text?.card ? orderStatusOptions(await deps.reads.statusOptions(), choice, text.card.status) : [];
     if (text?.card && options.length) {
       await deps.post(thread, statusChoiceText({ owner: r.userId, card: text.card, options }));
-      await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false, listedAt: now, reposted: false } }, now + TEXT_KEEP_MS);
+      await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false, listedAt: now, reposted: false, by: r.userId } }, now + TEXT_KEEP_MS);
       await deps.markReplyThread(thread.channel, thread.threadTs, CHOICE_TTL_MS);
       staged = true;
     }
@@ -803,8 +805,12 @@ export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, d
   } else {
     await deps.store.update(c.id, { state: "dropped", resolvedAt: now });
   }
-  await acknowledge(deps, c, text, r, cardAcknowledgement(answer, staged));
+  await acknowledge(deps, c, text, r, `${cardAcknowledgement(answer, staged)} Answered by <@${r.userId}>.`);
 }
+
+/** Why a ✅ on F3 changed nothing when the draft did not go up: the row stays
+ *  live, so another tap tries again. */
+const DRAFT_NOT_POSTED = "The draft card didn't go up, so nothing changed. Try again in a moment.";
 
 async function acknowledge(deps: Pick<AnswerDeps, "update">, c: CommitmentRecord, text: CommitmentText | null, r: { channel: string; messageTs: string }, ack: string): Promise<void> {
   const body = text?.bodies[r.messageTs];
@@ -965,8 +971,9 @@ async function ownerReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps
 }
 
 /**
- * Under F5's list, the owner's pick stages the Design Status change — only the
- * owner's reply counts, and only while the choice is open (`CHOICE_TTL_MS`).
+ * Under F5's list, a pick stages the Design Status change — only a reply from
+ * an owner or from whoever answered counts, and only while the choice is open
+ * (`CHOICE_TTL_MS`).
  * A reply that is no listed option gets the options again, on one line, once;
  * after that, replies are the thread's own. The value staged is the schema's
  * own spelling, and `notion_update` exact-matches it again when it runs.
@@ -976,7 +983,7 @@ async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDep
   const choosing = text?.choosing;
   if (!text?.card || !choosing || choosing.staged || deps.now() > choosing.listedAt + CHOICE_TTL_MS) return false;
   const owners = [c.promiserId, ...(text.mentions ?? [])];
-  if (!owners.includes(reply.user)) return false;
+  if (!owners.includes(reply.user) && reply.user !== choosing.by) return false;
   const thread = { channel: reply.channel, channelKind: c.channelKind, threadTs: reply.threadTs };
   const status = pickStatus(reply.text, choosing.options);
   const keep = choosing.listedAt + CHOICE_TTL_MS + TEXT_KEEP_MS;

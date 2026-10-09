@@ -75,6 +75,8 @@ import {
   SELF_REMINDER_CHOICES,
   selfReminderText,
   snoozeAcknowledgement,
+  TAP_REFUSED,
+  type ReminderOutcome,
 } from "./copy";
 import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample } from "./detector";
 import {
@@ -619,10 +621,12 @@ export interface ReminderReaction {
 
 export interface ReminderDoorDeps {
   store: CommitmentStore;
-  /** A reaction on a card follow-up (`../follow-through/`): its own answers. */
-  cards?(c: CommitmentRecord, r: ReminderReaction): Promise<void>;
-  /** A reaction on a DM ask (`../dm-sweep/`): its own answers. */
-  dm?(c: CommitmentRecord, r: ReminderReaction): Promise<void>;
+  /** A reaction on a card follow-up (`../follow-through/`): its own answers,
+   *  and why one changed nothing. */
+  cards?(c: CommitmentRecord, r: ReminderReaction): Promise<string | void>;
+  /** A reaction on a DM ask (`../dm-sweep/`): its own answers, and why one
+   *  changed nothing. */
+  dm?(c: CommitmentRecord, r: ReminderReaction): Promise<string | void>;
   update: CommitmentSlack["update"];
   botUserId(): Promise<string | undefined>;
   now(): number;
@@ -637,6 +641,17 @@ export interface ReminderDoorDeps {
  * @param deps - The store, the in-place edit, the bot's id, the clock
  */
 export async function answerReminder(r: ReminderReaction, deps: ReminderDoorDeps): Promise<boolean> {
+  return (await answerReminderPress(r, deps)).claimed;
+}
+
+/**
+ * `answerReminder` for a button: the same door, saying why a press it claimed
+ * changed nothing, so the tapper can be told.
+ *
+ * @param r - The press, in a reaction's facts
+ * @param deps - The store, the in-place edit, the bot's id, the clock
+ */
+export async function answerReminderPress(r: ReminderReaction, deps: ReminderDoorDeps): Promise<ReminderOutcome> {
   try {
     return await answerOrThrow(r, deps);
   } catch (err) {
@@ -644,31 +659,32 @@ export async function answerReminder(r: ReminderReaction, deps: ReminderDoorDeps
     // not yet migrated) must never keep a card's ✅ or ⛔ from the gate.
     rethrowIfBudget(err);
     console.error(`[commitments] reminder lookup for ${r.channel} ${r.messageTs} failed, passing to the gate: ${err instanceof Error ? err.message : String(err)}`);
-    return false;
+    return { claimed: false };
   }
 }
 
-async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promise<boolean> {
+async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promise<ReminderOutcome> {
   const answer = reminderAnswer(r.glyph);
   // Only a reminder glyph, or a gate glyph a reminder must swallow, is worth
   // the lookup: every 🎉 in every channel arrives here.
-  if (!answer && !GATE_RESERVED.has(r.glyph.replace(/::skin-tone-\d$/, ""))) return false;
+  if (!answer && !GATE_RESERVED.has(r.glyph.replace(/::skin-tone-\d$/, ""))) return { claimed: false };
   const bot = await deps.botUserId();
-  if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return false;
+  if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return { claimed: false };
   const c = await deps.store.byReminderTs(r.messageTs);
-  if (!c || c.channel !== r.channel) return false;
-  if (isCardKind(c.kind)) {
+  if (!c || c.channel !== r.channel) return { claimed: false };
+  if (isCardKind(c.kind) || isDmKind(c.kind)) {
     // Whatever the glyph, a card follow-up's own: its ✅ drafts a card, and
-    // never reaches the gate.
-    if (deps.cards) await deps.cards(c, r);
-    return true;
+    // never reaches the gate. A DM ask's likewise.
+    const answers = isCardKind(c.kind) ? deps.cards : deps.dm;
+    const refused = answers ? await answers(c, r) : TAP_REFUSED.gone;
+    return refused ? { claimed: true, refused } : { claimed: true };
   }
-  if (isDmKind(c.kind)) {
-    if (deps.dm) await deps.dm(c, r);
-    return true;
-  }
+  const refused = (why: string): ReminderOutcome => ({ claimed: true, refused: why });
 
-  if (!answer || r.userId !== c.promiserId || !LIVE_STATES.includes(c.state)) return true;
+  if (!answer) return refused(TAP_REFUSED.notAnAnswer);
+  // A promise is its promiser's to answer: nobody settles it for them.
+  if (r.userId !== c.promiserId) return refused(TAP_REFUSED.notYours(c.promiserId));
+  if (!LIVE_STATES.includes(c.state)) return refused(TAP_REFUSED.settled);
   const now = deps.now();
   let ack: string;
   if (c.kind === "self_reminder") {
@@ -681,11 +697,11 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
       await deps.store.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt });
       ack = snoozeAcknowledgement(dayLabel(etDayOf(dueAt), etDayOf(now)));
     } else {
-      return true;
+      return refused(answer === "soon" ? TAP_REFUSED.snoozeSpent : TAP_REFUSED.notAnAnswer);
     }
   } else if (answer === "soon") {
     // Capped: a third ⏳ leaves the commitment where it is.
-    if (!maySnooze(c.snoozes)) return true;
+    if (!maySnooze(c.snoozes)) return refused(TAP_REFUSED.snoozeSpent);
     const dueAt = rearmedDueAt(now);
     // The date moves; the reminder and its follow-up stay the only two posts.
     await deps.store.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt });
@@ -698,11 +714,11 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
   const body = (await deps.store.text(c.id))?.bodies[r.messageTs];
   if (!body) {
     console.warn(`[commitments] ${c.id}: answered, but reminder ${r.messageTs} has no kept body to edit`);
-    return true;
+    return { claimed: true };
   }
   const edited = await deps.update(r.channel, r.messageTs, { text: body, blocks: reminderBlocks(body, ack) });
   if (!edited) console.warn(`[commitments] ${c.id}: answered, but reminder ${r.messageTs} could not be edited`);
-  return true;
+  return { claimed: true };
 }
 
 // ── Shared ───────────────────────────────────────────────────────────────────

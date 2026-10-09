@@ -31,6 +31,7 @@ import { standingConfirmersOf } from "./standing-confirmers";
 import { reactionRecorderFor } from "../usage/resolution-env";
 import { reminderDoorFor } from "../commitments/env";
 import { dmReminderDoorFor } from "../dm-watch/env";
+import type { ReminderOutcome } from "../commitments/copy";
 
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
   if (event.item.type !== "message") return;
@@ -50,8 +51,9 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
 /**
  * A tap on one of a reminder's buttons. A button stands in for the reaction it
  * is labelled with, so it takes the same two doors a reaction on a reminder
- * does — the answer, the store write and the in-place edit are theirs, and a
- * tap on a card the store no longer holds changes nothing.
+ * does — the answer, the store write and the in-place edit are theirs. Unlike
+ * a reaction, a tap is never left unanswered: the outcome says why one that
+ * changed nothing did not, for the tapper to be told.
  *
  * @param env - Worker bindings
  * @param press - The tap: the reminder it sits on, the glyph it stands for, who pressed
@@ -59,9 +61,9 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
 export async function handleReminderButton(
   env: Env,
   press: { channel: string; messageTs: string; glyph: string; userId: string },
-): Promise<boolean> {
+): Promise<ReminderOutcome> {
   const door = eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env));
-  return door ? door(press) : false;
+  return door ? door(press) : { claimed: false };
 }
 
 /**
@@ -97,15 +99,28 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
 
     recordReaction: reactionRecorderFor(env),
 
-    ...withReminder(eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env))),
+    ...withReminder(claimedOf(eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env)))),
   };
 }
 
+/** A press, to a reminder door: whether it was a reminder's, and why it
+ *  changed nothing when it didn't. */
+type ReminderPressDoor = (r: { channel: string; messageTs: string; glyph: string; userId: string; messageAuthorId?: string }) => Promise<ReminderOutcome>;
+
 /** A DM reminder's door first — it looks only at DMs — then the thread
  *  reminders'. Either claiming the reaction keeps it from the gate. */
-function eitherDoor(first: ReactionDoorDeps["reminder"], second: ReactionDoorDeps["reminder"]): ReactionDoorDeps["reminder"] {
+function eitherDoor(first: ReminderPressDoor | undefined, second: ReminderPressDoor | undefined): ReminderPressDoor | undefined {
   if (!first || !second) return first ?? second;
-  return async (r) => (await first(r)) || second(r);
+  return async (r) => {
+    const outcome = await first(r);
+    return outcome.claimed ? outcome : second(r);
+  };
+}
+
+/** A reaction needs only whether a reminder claimed it: one left unanswered is
+ *  no broken button. */
+function claimedOf(door: ReminderPressDoor | undefined): ReactionDoorDeps["reminder"] {
+  return door ? async (r) => (await door(r)).claimed : undefined;
 }
 
 function withReminder(reminder: ReactionDoorDeps["reminder"]): Pick<ReactionDoorDeps, "reminder"> {

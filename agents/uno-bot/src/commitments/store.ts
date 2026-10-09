@@ -223,12 +223,11 @@ export interface CommitmentText {
   card?: { title: string; url: string; status: string | null };
   /** Where a card to-do was read: the thread's permalink or the note's link. */
   sourceUrl?: string;
-  /** A thread card to-do's other posters, who may ask for the draft too. */
-  participants?: string[];
   /** A stuck card whose owner answered 🙌 or 🙅: the Design Status options
    *  offered, in the order shown, until one is picked and staged or the
-   *  choice lapses; `reposted` once the list went up a second time. */
-  choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean; listedAt: number; reposted: boolean };
+   *  choice lapses; `reposted` once the list went up a second time; `by`
+   *  whoever answered, whose pick counts beside the owners'. */
+  choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean; listedAt: number; reposted: boolean; by?: string };
   /** A `dm_disagreement`'s two sources, in the detector's short names, and
    *  the team channel its note would go to. `what` holds the topic. */
   raise?: { sources: [string, string]; to: "plus-design" | "plus-universal" };

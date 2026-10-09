@@ -61,7 +61,7 @@ import { TRY_ASKING_ACTION_PREFIX, runTryAskingDoor } from "./try-asking";
 import { runTryAgainDoor } from "./try-again";
 import { TRY_AGAIN_ACTION_ID } from "./failure-message";
 import { handleReminderButton } from "./gate";
-import { REMINDER_ACTION_PREFIX } from "../commitments/copy";
+import { REMINDER_ACTION_PREFIX, TAP_REFUSED } from "../commitments/copy";
 import { FEEDBACK_ACTION_ID, FEEDBACK_VIEW_CALLBACK_ID, feedbackAckFor, type FeedbackViewState } from "./feedback";
 import { runFeedbackReason, runFeedbackTap, type FeedbackDoorDeps } from "./feedback-door";
 import { answerFeedbackLogFor } from "../usage/feedback-env";
@@ -187,15 +187,19 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
 
 // A button under a reminder (commitment, card follow-up, DM ask). It is the
 // reaction it is labelled with, tapped: the action id carries the glyph's Slack
-// name, and the reminder doors do the rest (`handleReminderButton`).
+// name, and the reminder doors do the rest (`handleReminderButton`). A tap
+// that changed nothing tells the tapper why, to them alone: a button that
+// does nothing reads as broken.
 async function answerFromButton(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
   const channel = payload.channel?.id;
   const messageTs = payload.message?.ts;
   const userId = payload.user?.id;
   const glyph = payload.actions?.[0]?.value || actionId.slice(REMINDER_ACTION_PREFIX.length);
   if (!channel || !messageTs || !userId || !glyph) return;
-  const claimed = await handleReminderButton(env, { channel, messageTs, glyph, userId });
-  console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} claimed=${claimed}`);
+  const outcome = await handleReminderButton(env, { channel, messageTs, glyph, userId });
+  const refused = outcome.claimed ? outcome.refused : TAP_REFUSED.gone;
+  console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} claimed=${outcome.claimed}${refused ? ` refused="${refused}"` : ""}`);
+  if (refused) await replyEphemeral(payload, refused);
 }
 
 // ✅ Approve / ⛔ Cancel on a proposal card (2026-08-22).

@@ -123,7 +123,7 @@ export function dmAsksFor(
  *
  * @param env - Worker bindings
  */
-export function dmAnswerFor(env: Env): ((c: CommitmentRecord, r: ReminderReaction) => Promise<void>) | undefined {
+export function dmAnswerFor(env: Env): ((c: CommitmentRecord, r: ReminderReaction) => Promise<string | void>) | undefined {
   const store = commitmentStoreFor(env);
   if (!store) return undefined;
   return answerDmAsk({
