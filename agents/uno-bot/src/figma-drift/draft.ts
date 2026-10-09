@@ -1,5 +1,5 @@
-// The hand-off a drift card's ✅ files, one per file, drafted spec-grade so a
-// human or their agent can run it as it stands:
+// The hand-off a drift card's Approve files, one per file, drafted spec-grade
+// so a human or their agent can run it as it stands:
 //
 //   • the project lane — a Roadmap card from the PRD template
 //     (`notion_create`, surface `prd`), for a Figma file;
@@ -22,15 +22,15 @@
 //     from the file's side. The tool's footer links nothing from such a place
 //     either (`isPrivateConversation`);
 //   • a Roadmap card from a private channel carries the thread's words, after
-//     a ✅ from someone in the channel, and no link back to it; one from a
-//     group DM carries neither words nor link (#742 amendment 2).
+//     an Approve from someone in the channel, and no link back to it; one
+//     from a group DM carries neither words nor link (#742 amendment 2).
 // Any paraphrase that reaches GitHub has its `@handle`s set in code, so an
 // issue body pings no GitHub user.
 //
 // PURE: no `Env`, no fetch.
 
 import type { ProposalOperation } from "../thread-state/index";
-import { fileKeyOf, type FileDriftFinding, type IntakeLane } from "./finding";
+import type { FileDriftFinding, IntakeLane } from "./finding";
 
 /** Characters of a drafted title. */
 const TITLE_CHARS = 90;
@@ -101,7 +101,7 @@ export interface IntakeDraftInput {
 }
 
 /**
- * The one operation a drift card's ✅ runs for a file.
+ * The one operation a drift card's Approve runs for a file.
  *
  * @param input - The file's findings and what the morning read for them
  */
@@ -155,27 +155,6 @@ export function draftIntake(input: IntakeDraftInput): { operation: ProposalOpera
   return { lane, title, operation: { toolName: "github_issue_create", input: { title, body } } };
 }
 
-/**
- * The file an intake operation drafts for, read back off the operation — how
- * a "yes" knows which files a card, revised or not, still files.
- *
- * @param op - A drift card's operation
- */
-export function fileKeyOfOperation(op: Pick<ProposalOperation, "toolName" | "input">): string | null {
-  if (op.toolName === "github_issue_create") {
-    const m = String(op.input.body ?? "").match(/<!-- uno-bot:file-drift:(\S+) -->/);
-    return m ? m[1]! : null;
-  }
-  if (op.toolName === "notion_create") {
-    const sections = Array.isArray(op.input.sections) ? (op.input.sections as Array<{ heading?: unknown; body?: unknown }>) : [];
-    const file = sections.find((s) => s.heading === FILE_HEADING);
-    const url = String(file?.body ?? "").split(/\s/)[0] ?? "";
-    if (!url) return null;
-    return fileKeyOf(url, /(^|\.)figma\.com$/i.test(hostOf(url)) ? "figma" : "github");
-  }
-  return null;
-}
-
 const FILE_HEADING = "The file";
 
 function fileMarker(fileKey: string): string {
@@ -218,14 +197,6 @@ function factsOf(
     shows: wordless ? "The file shows the change its owner confirms was settled" : `The file shows: ${said}`,
     sourceUrl: links[0] ?? first.target.url,
   };
-}
-
-function hostOf(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return "";
-  }
 }
 
 function flat(text: string): string {

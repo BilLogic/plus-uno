@@ -3,8 +3,9 @@
 //
 // A FILE DRIFT is a point a Slack thread settled that a linked file may not
 // show yet: a Figma file, the design-system code, Storybook, a GitHub file.
-// uno-bot cannot write any of them, so it never tries. It asks the thread
-// whether the file is up to date, and drafts the hand-off a ✅ files:
+// uno-bot cannot write any of them, so it never tries. It tells the thread
+// what the file has not caught up with, and drafts the hand-off its card's
+// Approve files:
 //
 //   • a Figma file → a Roadmap card from the PRD template (the project lane);
 //   • code, Storybook or a repo file → a `harness-intake` GitHub issue (the
@@ -19,11 +20,35 @@
 
 import type { ChannelKind, FindingEvidence, FindingTarget, TargetKind } from "../sweep/finding";
 
-/** The drift card's own slot in its thread, beside a sweep card and a turn's
- *  card (`proposalSlot`). */
-export const DRIFT_KEY = "figma-drift";
+/** The slot a drift card took before the drift report moved to the shared
+ *  card: one message, one proposal, a ✅/⛔ footer. Such a card lives out its
+ *  72 h as it posted; nothing stages under this key any more. */
+export const LEGACY_DRIFT_KEY = "figma-drift";
 
-/** Which hand-off a ✅ files. */
+/**
+ * Whether a reply answers such a card's footer in its own words — `drop 2`,
+ * `skip`, or a bare "yes" — which decide nothing now.
+ *
+ * @param text - The reply, as Slack sent it
+ */
+export function answersLegacyDriftCard(text: string): boolean {
+  const t = text
+    .replace(/<@[A-Z0-9]+>/g, " ")
+    .replace(/[’‘]/g, "'")
+    .replace(/`/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase()
+    .replace(/[.!,\s]+$/, "");
+  return (
+    /^(drop|keep) \d+((\s*,\s*|\s+and\s+)\d+)*$/.test(t) ||
+    t === "skip" ||
+    /^(yes|yep|yeah|yup)(,? (it'?s |it is )?(already )?(up[ -]to[ -]date|current|updated))?$/.test(t) ||
+    /^(it'?s |it is )?already (updated|current|up[ -]to[ -]date)$/.test(t)
+  );
+}
+
+/** Which hand-off a card's Approve files. */
 export type IntakeLane = "roadmap" | "maintain";
 
 /**
