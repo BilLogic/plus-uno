@@ -1,15 +1,18 @@
-// A reply over a result table names at most 3 of its rows: the table shows
-// them all.
+// A reply over a result table, or over cards, stays short: the takeaway, what
+// stands out and what to act on, at most 3 rows. The table shows the rest.
 //
-// Live on r521, a pain-points answer by scenario posted its table and then
-// walked every row above it, each in a sentence that said more than the row,
-// so no line read as a row typed out and the strip of typed-out rows left all
-// of them. Two seams answer it, both driven across `runTurn` here:
-//   • the redraft — a draft that names more than 3 rows asks the one judge
-//     call the turn already makes to rewrite it to the takeaway;
-//   • the backstop — when the prose that ships still names more (the judge
-//     erred, or the draft was past its rewrite window), list items naming rows
-//     past the first 3 come out, and nothing else does.
+// Live on r521, and again on r524 after the first fix, a pain-points answer by
+// scenario posted its table and walked every phase and scenario above it in
+// nested bullets. On r524 the cells it linked were not the table's rows (other
+// calls, other rows), so a rule that counted only the table's rows never
+// fired. The measure is the prose's own shape: more than 3 list items, more
+// characters than the judge's floor, or more than 3 of the table's rows named.
+// Two seams answer it, both driven across `runTurn` here:
+//   • the redraft — a draft over the budget asks the one judge call the turn
+//     already makes to rewrite it to the takeaway;
+//   • the backstop — when the prose that ships is still over (the judge erred,
+//     or the draft was past its rewrite window), list items past the first 3
+//     come out, and nothing else does.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -35,7 +38,14 @@ function blueprintResult(n: number, scenario = (i: number) => `Scenario ${i}`): 
 
 const SEARCH = { name: "search_blueprint", args: { query: "pain points" } };
 
-/** One turn: the search, a `present` table, then `prose`. */
+const TABLE = {
+  shape: "table",
+  lookup: "search_blueprint",
+  columns: ["title", "scenario"],
+  takeaway: "Clearance is the biggest snag.",
+};
+
+/** One turn: the search, a `present` call, then `prose`. */
 async function turn(
   prose: string,
   opts: {
@@ -45,24 +55,7 @@ async function turn(
     judge?: (call: JudgeCall) => { text: string; verdict: string };
   } = {},
 ) {
-  const present =
-    opts.present === null
-      ? []
-      : [
-          {
-            toolCalls: [
-              {
-                name: "present",
-                args: opts.present ?? {
-                  shape: "table",
-                  lookup: "search_blueprint",
-                  columns: ["title", "scenario"],
-                  takeaway: "Clearance is the biggest snag.",
-                },
-              },
-            ],
-          },
-        ];
+  const present = opts.present === null ? [] : [{ toolCalls: [{ name: "present", args: opts.present ?? TABLE }] }];
   const h = harness({
     replies: [{ toolCalls: [opts.lookup ?? SEARCH] }, ...present, { text: prose }],
     toolResultFor: () => opts.result ?? blueprintResult(5),
@@ -71,61 +64,100 @@ async function turn(
   await runTurn(request({ text: "What are the main tutor pain points in the blueprint, by scenario?" }), h.deps);
   const answer = h.delivery.calls.find((c): c is Extract<DeliveryCall, { kind: "answer" }> => c.kind === "answer");
   assert.ok(answer, "an answer was posted");
-  assert.ok(answer.presentation?.table, "a table rides with the answer");
-  return { text: answer.text, judged: h.judged };
+  assert.ok(answer.presentation?.table || answer.presentation?.cards, "a table or cards ride with the answer");
+  const instruction = h.judged[0]?.extraInstruction ?? "";
+  return { text: answer.text, judged: h.judged, instruction };
 }
 
-/** A bullet that names pain point `n` in a sentence that says more. */
-const walked = (n: number, indent = "") => `${indent}- [Pain point ${n}](${cell(n)}) holds tutors up for reasons of its own.`;
+/** A bullet that links `url` in a sentence that says more. */
+const item = (n: number, url = cell(n), indent = "") =>
+  `${indent}- [Pain point ${n}](${url}) holds tutors up for reasons of its own.`;
+
+/** A cell the table does not hold: another call's row. */
+const other = (n: number) => `https://blueprint.example/other-${n}`;
 
 const CLAUSE = "I searched the blueprint just now, so these are current.";
 
 // ── The redraft ─────────────────────────────────────────────────────────────
 
-test("a draft naming more than 3 rows asks the one judge call to redraft it to the takeaway", async () => {
+test("a draft walking more than 3 list items asks the one judge call to redraft it, and the redraft ships", async () => {
   const redraft = `**Clearance is the biggest snag.** [Pain point 1](${cell(1)}) stands out; fix it first. ${CLAUSE}`;
-  const { text, judged } = await turn(["**Clearance is the biggest snag.**", walked(1), walked(2), walked(3), walked(4), CLAUSE].join("\n"), {
-    judge: (call) => ({ text: call.extraInstruction ? redraft : call.draft, verdict: "fail" }),
-  });
+  const { text, judged, instruction } = await turn(
+    ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), CLAUSE].join("\n"),
+    { judge: (call) => ({ text: call.extraInstruction ? redraft : call.draft, verdict: "fail" }) },
+  );
 
   assert.equal(judged.length, 1, "no extra model call");
   assert.equal(judged[0]!.forceReason, "table-walk");
-  assert.match(judged[0]!.extraInstruction ?? "", /names 4 rows/);
-  assert.match(judged[0]!.extraInstruction ?? "", /at most 3/);
-  assert.match(judged[0]!.extraInstruction ?? "", /confidence clause/);
-  assert.equal(text, redraft, "the redraft ships");
+  assert.match(instruction, /TABLE WALK/);
+  assert.match(instruction, /4 list items/);
+  assert.match(instruction, /at most 3/);
+  assert.match(instruction, /confidence clause/);
+  assert.equal(text, redraft);
 });
 
-test("rows the strip takes out as typed-out still count toward the redraft", async () => {
-  const { judged } = await turn(
-    ["**Clearance is the biggest snag.**", "- Pain point 1 — Scenario 1", "- Pain point 2 — Scenario 2", walked(3), walked(4)].join("\n"),
+test("the live r524 shape: cells the table does not hold, walked in nested bullets, still ask for the redraft", async () => {
+  const prose = [
+    "**Clearance is the biggest snag.**",
+    "",
+    `- **Scenario A**`,
+    item(101, other(101), "  "),
+    item(102, other(102), "  "),
+    `- **Scenario B**`,
+    item(103, other(103), "  "),
+    CLAUSE,
+  ].join("\n");
+  const { instruction } = await turn(prose);
+  assert.match(instruction, /TABLE WALK/);
+  assert.match(instruction, /5 list items/);
+  assert.doesNotMatch(instruction, /rows of the table/, "none of the cells it links are the table's rows");
+});
+
+test("rows of the table named in sentences count, typed-out rows the strip takes out included", async () => {
+  const { instruction } = await turn(
+    [
+      `**Clearance is the biggest snag.** [Pain point 3](${cell(3)}) and [Pain point 4](${cell(4)}) stand out.`,
+      "- Pain point 1 — Scenario 1",
+      "- Pain point 2 — Scenario 2",
+      CLAUSE,
+    ].join("\n"),
   );
-  assert.match(judged[0]!.extraInstruction ?? "", /names 4 rows/);
+  assert.match(instruction, /names 4 rows of the table/);
 });
 
-test("a draft naming up to 3 rows asks the judge nothing extra and stands", async () => {
-  const prose = ["**Clearance is the biggest snag.**", walked(1), walked(2), walked(3), CLAUSE].join("\n");
-  const { text, judged } = await turn(prose);
-  assert.doesNotMatch(judged[0]!.extraInstruction ?? "", /TABLE WALK/);
+test("a draft past the judge's floor in characters asks for the redraft, though it has no list", async () => {
+  const long = "Tutors wait on clearance, on modules and on supervisors, and each wait costs them a shift. ".repeat(12);
+  const { instruction } = await turn(`**Clearance is the biggest snag.** ${long}${CLAUSE}`);
+  assert.match(instruction, /TABLE WALK/);
+  assert.match(instruction, /characters/);
+});
+
+test("a short draft with up to 3 list items asks the judge nothing extra and stands", async () => {
+  const prose = ["**Clearance is the biggest snag.**", item(1), item(2), item(3), CLAUSE].join("\n");
+  const { text, instruction } = await turn(prose);
+  assert.doesNotMatch(instruction, /TABLE WALK/);
   assert.equal(text, prose);
 });
 
-test("a first column every row shares names no row: a walk by scenario is not counted", async () => {
+test("a first column every row shares names no row", async () => {
   const result = blueprintResult(5, (n) => (n % 2 ? "Employment & Access" : "Onboarding Modules"));
-  const prose = [
-    "**Clearance is the biggest snag.**",
-    "- Employment & Access is where most tutors wait.",
-    "- Onboarding Modules lock scheduling.",
-    "- Employment & Access again, for the second district.",
-    "- Onboarding Modules have no saved progress.",
-    CLAUSE,
-  ].join("\n");
-  const { text, judged } = await turn(prose, {
+  const prose =
+    "**Clearance is the biggest snag.** Employment & Access is where most tutors wait, Onboarding Modules lock scheduling, " +
+    `Employment & Access again for the second district, and Onboarding Modules save no progress. ${CLAUSE}`;
+  const { text, instruction } = await turn(prose, {
     result,
     present: { shape: "table", lookup: "search_blueprint", columns: ["scenario", "title"] },
   });
-  assert.doesNotMatch(judged[0]!.extraInstruction ?? "", /TABLE WALK/);
+  assert.doesNotMatch(instruction, /TABLE WALK/);
   assert.equal(text, prose);
+});
+
+test("cards beneath the answer hold it to the same budget", async () => {
+  const { instruction } = await turn(
+    ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), CLAUSE].join("\n"),
+    { present: { shape: "cards", lookup: "search_blueprint", columns: ["title"] } },
+  );
+  assert.match(instruction, /TABLE WALK/);
 });
 
 // ── The backstop ────────────────────────────────────────────────────────────
@@ -133,29 +165,36 @@ test("a first column every row shares names no row: a walk by scenario is not co
 // The harness judge hands the draft back unchanged, as a judge that erred or
 // gave a verdict only does.
 
-test("the live shape: list items past the first 3 rows come out, the lead, a middle paragraph and the confidence clause stay", async () => {
+test("the live r524 shape: list items past the first 3 come out with their headings and rules; the lead, the clause and a middle paragraph stay", async () => {
   const prose = [
     "**Clearance is the biggest snag.**",
     "",
-    "Here is the scenario-by-scenario breakdown:",
+    CLAUSE,
     "",
-    "Phase: Onboarding",
-    "• *Scenario 1*",
-    `    ◦ In <${cell(1)}|Pain point 1>, tutors wait weeks for clearance.`,
-    `    ◦ In [Pain point 2](${cell(2)}), the quiz locks scheduling.`,
+    "---",
+    "",
+    "### 1. Phase: Pre-session",
+    "",
+    "* **Scenario: Call-off Request**",
+    `  * **Volume:** call-offs run high: [Initial need](${other(1)}).`,
+    `  * **No swaps:** tutors vacate outright: [Swaps](${other(2)}).`,
+    `  * **Chasing:** supervisors chase coverage: [Coverage](${other(3)}).`,
     "",
     "Most of this sits before a first session.",
     "",
-    "Phase: Pre-session",
-    "• *Scenario 3*",
-    `    ◦ In [Pain point 3](${cell(3)}), call-offs strip the roster.`,
-    `    ◦ In [Pain point 4](${cell(4)}), coverage runs through Slack.`,
+    "---",
     "",
-    "Phase: Post-session",
-    "• *Scenario 5*",
-    `    ◦ In [Pain point 5](${cell(5)}), hours do not reach Workday.`,
+    "### 2. Phase: Onboarding",
     "",
-    CLAUSE,
+    "* **Scenario: Session Sign Up**",
+    `  * **Gating:** scheduling is currently locked: [Review scheduling](${other(4)}).`,
+    "",
+    "---",
+    "",
+    "### 3. Phase: Post-session",
+    "",
+    "* **Scenario: Reporting Hours**",
+    `  * **Timesheets:** hours do not reach Workday: [Miss deadline](${other(5)}).`,
   ].join("\n");
   const { text } = await turn(prose);
 
@@ -164,61 +203,59 @@ test("the live shape: list items past the first 3 rows come out, the lead, a mid
     [
       "**Clearance is the biggest snag.**",
       "",
-      "Here is the scenario-by-scenario breakdown:",
+      CLAUSE,
       "",
-      "Phase: Onboarding",
-      "• *Scenario 1*",
-      `    ◦ In <${cell(1)}|Pain point 1>, tutors wait weeks for clearance.`,
-      `    ◦ In [Pain point 2](${cell(2)}), the quiz locks scheduling.`,
+      "---",
+      "",
+      "### 1. Phase: Pre-session",
+      "",
+      "* **Scenario: Call-off Request**",
+      `  * **Volume:** call-offs run high: [Initial need](${other(1)}).`,
+      `  * **No swaps:** tutors vacate outright: [Swaps](${other(2)}).`,
       "",
       "Most of this sits before a first session.",
-      "",
-      "Phase: Pre-session",
-      "• *Scenario 3*",
-      `    ◦ In [Pain point 3](${cell(3)}), call-offs strip the roster.`,
-      "",
-      CLAUSE,
     ].join("\n"),
   );
 });
 
 test("prose with no blank lines keeps its bold lead and its closing clause", async () => {
-  const prose = ["**Clearance is the biggest snag.**", walked(1), walked(2), walked(3), walked(4), walked(5), CLAUSE].join("\n");
+  const prose = ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), item(5), CLAUSE].join("\n");
   const { text } = await turn(prose);
-  assert.equal(text, ["**Clearance is the biggest snag.**", walked(1), walked(2), walked(3), CLAUSE].join("\n"));
+  assert.equal(text, ["**Clearance is the biggest snag.**", item(1), item(2), item(3), CLAUSE].join("\n"));
 });
 
-test("a list item carrying the confidence clause stays, whatever row it names", async () => {
+test("a list item carrying the confidence clause stays, wherever it falls", async () => {
   const last = `- [Pain point 5](${cell(5)}) is the newest; ${CLAUSE}`;
-  const prose = ["**Clearance is the biggest snag.**", walked(1), walked(2), walked(3), walked(4), last].join("\n");
+  const prose = ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), last].join("\n");
   const { text } = await turn(prose);
-  assert.equal(text, ["**Clearance is the biggest snag.**", walked(1), walked(2), walked(3), last].join("\n"));
+  assert.equal(text, ["**Clearance is the biggest snag.**", item(1), item(2), item(3), last].join("\n"));
 });
 
-test("an intro or heading over a list the backstop emptied goes with it", async () => {
+test("a heading or an intro over a list the backstop emptied goes with it; one over a list that survives stays", async () => {
   const prose = [
-    `**Clearance is the biggest snag.** [Pain point 1](${cell(1)}), [Pain point 2](${cell(2)}) and [Pain point 3](${cell(3)}) stand out.`,
+    "**Clearance is the biggest snag.**",
     "",
-    "**By scenario:**",
-    walked(4),
+    "### By scenario",
+    item(1),
+    item(2),
+    item(3),
     "",
-    "### Also",
-    walked(5),
+    "**Also:**",
+    item(4),
+    "",
+    "### Later",
+    item(5),
     "",
     CLAUSE,
   ].join("\n");
   const { text } = await turn(prose);
   assert.equal(
     text,
-    [
-      `**Clearance is the biggest snag.** [Pain point 1](${cell(1)}), [Pain point 2](${cell(2)}) and [Pain point 3](${cell(3)}) stand out.`,
-      "",
-      CLAUSE,
-    ].join("\n"),
+    ["**Clearance is the biggest snag.**", "", "### By scenario", item(1), item(2), item(3), "", CLAUSE].join("\n"),
   );
 });
 
-test("the Roadmap preset, which carries no takeaway, is held to 3 rows the same way", async () => {
+test("the Roadmap preset, which carries no takeaway, is held to 3 items the same way", async () => {
   const cards = Array.from({ length: 5 }, (_, i) => ({
     title: `Card ${i + 1}`,
     url: `https://www.notion.so/card-${i + 1}`,
