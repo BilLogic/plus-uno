@@ -1,14 +1,14 @@
 ---
 embodiment: all
 disclosure: reference
-summary: The end-of-day sweep — what it reads, where its drift cards go, who may confirm, drop or revise one, how it asks about a read-only file, how its commitment reminders nudge a promiser, its card follow-ups, and what it asks in a person's DM with uno-bot.
+summary: The end-of-day sweep — what it reads, where its drift reports go, who may decide a fix, how it asks about a read-only file, how its commitment reminders nudge a promiser, its card follow-ups, and what it asks in a person's DM with uno-bot.
 ---
 
 # The end-of-day sweep
 
 <!-- canonical per ADR-017 (docs/adr/) · disclosed reference, read through read_reference · distilled 2026-09-29 from #742 (both amendments), #749, #750, #751, #764 and #795 · the code is agents/uno-bot/src/sweep/. -->
 
-The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a proposal card until a person confirms it. Every write waits for that ✅.
+The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a card in a report until a person approves it in Review. Every write waits for that Approve.
 
 ## What it reads
 
@@ -19,7 +19,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and the fix goes on a card in their DM with uno-bot that only they can confirm (ADR-032).
 - **When:** the end-of-day run at 00:00 ET, just after each workday ends, reads each channel since its cursor, which lives in the usage database. It is dated to the day it sweeps, so Friday is swept at Saturday 00:00 and its cards post Monday.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
-- **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
+- **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can Reject a wrong target. A search that fails finds nothing and holds nothing up.
 - **Figma comments:** one more end-of-day job reads the comment threads under a file's 📐 Specs or 🔍 For Review pages, in the six Figma teams (MISC aside), created or resolved since it switched on. A thread that reads like a decision becomes its own card in a #plus-design thread for the file (§ Figma comment decisions).
 - **Running notes and Roadmap cards:** two more end-of-day jobs read the Design Running Notes and the Roadmap cards edited since their own cursors. A note's new blocks, or a card's new comments and body edits, are the record. Only team notes are read. A 1:1 note (tagged `1:1` in *Note Type*, or titled as one), or any page that is not a row of the running-notes database, stays unread, and so does a 1:1 that a thread links or a search finds.
 
@@ -35,41 +35,39 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 #uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
 
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
-- **Group DM:** the card goes back in that group DM, and its ✅ applies the fix only. Once that batch has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. Its ✅ posts that note; its ⛔ drops it. It has the fix card's confirmers and 72 h. A revised or re-staged fix card offers no share.
+- **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. Its ✅ posts that note; its ⛔ drops it. It has the fix's confirmers and 72 h. A re-staged fix offers no share.
 - **DM with uno-bot:** the card goes back in that DM, for its person alone (§ DMs with uno-bot).
-- **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private card. A DM with uno-bot is the exception: it takes nothing off a channel card.
+- **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private report. A DM with uno-bot is the exception: it takes nothing off a channel card.
 
-## The card
+## The report
 
-- **Timing:** the card posts at the next weekday morning run (9 am ET), so its 72 h start when people can act on it.
-- **One live card per thread,** holding up to 10 fixes. More fixes, and a later day's fixes for a thread whose card is still live, wait in the queue until that card is resolved or expires, then go out on the next one. A fix the thread has already had on a card (proposed, dropped or applied) is left off later ones.
-- **Beside a turn's card:** the sweep card has its own slot in the thread, so an unrelated ask made there (filing an issue, say) stages as its own card and leaves the sweep card live.
+- **Timing:** the report posts at the next weekday morning run (9 am ET), so its 72 h start when people can act on it.
+- **The shape:** the shared decision card (`docs/connectors/slack.md` § Two gates). A parent line says in one plain sentence what the sweep found: one fix names its page ("This thread settled something that *Session Wrap-up PRD* still states the old way."), several are counted. Then one card per fix, a carousel when there are several: the page as its title, its owner and where it was said ("@Bea · from this thread", "from the running notes", "from a card comment", plus "page found by search"), and "Page says … · decision says …" as its body, clipped at 200 characters. Each card has **Review** and **Open page**. The parent line carries no mark and no instructions: the buttons are the instructions.
+- **Each fix is its own proposal.** Review opens that fix alone and shows its whole change: the page and owner, "Page says now", "Will say" (or where an answer goes and what it adds), and where it was said with its link. Approve writes that one block, Reject drops it, and the card redraws in place: "Approved by @X · written 9:41" with what the page now says, or "Rejected by @X". The other cards wait on their own decisions.
+- **One live report per thread,** holding up to 10 fixes. More fixes, and a later day's fixes for a thread whose report is still live, wait in the queue until every fix on it is decided or expires, then go out on the next one; the parent line says "Showing 10 of N". A fix the thread has already had on a report (proposed, dropped or applied) is left off later ones.
+- **Beside a turn's card:** the report's fixes have their own slots in the thread, so an unrelated ask made there (filing an issue, say) stages as its own card and leaves them live.
 - **Each fix** is one `notion_update` in-place replace of a whole block, stamped with the `last_edited_time` the sweep read (ADR-029). If the block has moved since then, the write is refused and nothing is written. The block keeps its type: a list item stays a list item, a to-do keeps its tick, a heading its level.
 - **Plain words only:** a replace writes plain text, so the sweep offers only text blocks of plain words on one line. Code, a table row, and a block with a link, a mention or formatting are left alone, and a replace onto a block that has gained any of those since the read is refused. A drafted fix that adds a line break is discarded.
-- **One card per fix:** the fixes ride in a carousel, each card numbered as `drop N` names it, with its page, owner, before → after and an Open button. What the page and the thread say folds into a closed box beneath. The message text is still the whole card and opens with the sweep's mark, so a post read without its tag is still a sweep card. A card Slack refuses, or one too long for the box, posts as that text.
-- **Shown whole:** the card shows every fix's full change, before → after, with a little context either side. A card holds only as many fixes as one Slack message shows in full; the rest wait for the next card.
 - **Whole blocks only:** the detector sees every block it may rewrite in full, and a block too long for that is left alone. A drafted fix that carries a truncation mark, or comes back much shorter than its block when no one in the thread asked for a removal, is discarded.
 - **Owner:** each fix names one owner, who is @-mentioned. That is whoever claimed or did the work in the thread; failing that, the linked card's `Contributor`; failing that, the thread starter.
-- **Who can confirm:** the owners plus everyone who posted in the thread. A ✅ from anyone else gets the note naming who can.
-- **Expiry:** after 72 hours unanswered, the card expires with no re-ping.
+- **Who can decide:** the owners plus everyone who posted in the thread, and the team's standing confirmers. Anyone else's Submit gets the line naming who can.
+- **Expiry:** after 72 hours undecided, a fix closes with nothing written and no re-ping.
+- **A fix that did not stage** says so on its card, with nothing to review, and comes back in the next morning's report.
 
 ## Answers and decisions no page holds yet
 
-- **An answer given only in chat (C3):** a thread asks a question, someone answers it, and no page it links or a search finds states that answer. The card goes in that thread, mentions whoever answered, and proposes the exact page, the section and the line: "add under *Tutor Training PRD › Session setup*: 'Ratio is 1 tutor to 4–5 students.'" When no section fits, it opens a new section at the end of the closest page. Its ✅ writes the line after the section's last block, stamped like a replace: if that block has moved since the read, nothing is written. It is always a proposal card, and it files no intake and no ticket. A card that adds an answer is revised by `drop N` alone; for any other change, ⛔ it and ask.
-- **A decision in a note or on a card (C4):** a running note, or a card's comment or edit, records a decision a page still states the old way. It has no thread, so the card goes by its target: #plus-universal for a design-system target (a `Universal`-pillar card), #plus-design for anything else. The owner is the target card's `Contributor`, then the note's takers or the card's own Contributors. Those people can confirm. The card links the note block or the card it came from.
+- **An answer given only in chat (C3):** a thread asks a question, someone answers it, and no page it links or a search finds states that answer. The card goes in that thread, mentions whoever answered, and proposes the exact page, the section and the line: "add under *Tutor Training PRD › Session setup*: 'Ratio is 1 tutor to 4–5 students.'" When no section fits, it opens a new section at the end of the closest page. Its Approve writes the line after the section's last block, stamped like a replace: if that block has moved since the read, nothing is written. It is always a fix in a sweep report, and it files no intake and no ticket.
+- **A decision in a note or on a card (C4):** a running note, or a card's comment or edit, records a decision a page still states the old way. It has no thread, so the card goes by its target: #plus-universal for a design-system target (a `Universal`-pillar card), #plus-design for anything else. The owner is the target card's `Contributor`, then the note's takers or the card's own Contributors. Those people can decide. The fix's Review links the note block or the card it came from.
 - **Discussion is not a decision:** options weighed, a question, a proposal or a to-do in a note produces nothing.
 
-## Dropping, revising, declining
+## Deciding, and replies in the thread
 
-In a thread uno-bot entered through a sweep card, it answers a reply only when the reply is addressed to the card, before the card is decided and after: an @mention, a typed ✅ or ⛔, or a whole reply that picks fixes by number ("drop 2", "keep 1 and 3", "remove 1, 3 and 4"). A sentence with a number in it ("change 2 buttons to secondary") is the thread's own conversation, and so is the rest. A revised card, the batch result and the sweep's notes carry the sweep's mark, and none of them makes the thread uno-bot's conversation.
+In a thread uno-bot entered through a sweep report, it answers a reply only when the reply is addressed to it: an @mention, or a typed ✅ or ⛔, which decides nothing and points at Review. The rest is the thread's own conversation. The report and the sweep's notes carry the sweep's tag, and none of them makes the thread uno-bot's conversation.
 
-- **"drop 2", "keep 1 and 3":** the Worker applies these itself, by number: the revision is the card's own fixes minus the dropped ones, renumbered from 1 in the same carousel, and it replaces the card, keeping its confirmers and its deadline — a revision lives only as long as the card had left. Dropping every fix cancels the card.
-- **Any other change to the fixes** comes to you: stage the same batch without the operations the reply leaves out, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.
-- **Only a confirmer can revise.** Anyone else is told who can, and the card stays as it is. This holds on every card that names its confirmers.
-- **Change only what was asked:** a revision holds the card's own fixes, minus the dropped ones, each exactly as it was. A batch that touches none of the card's blocks is a separate ask, staged beside it.
-- **⛔** declines the whole card.
+- **Every fix is decided in its own Review:** Approve · Needs changes · Reject, sent with Submit. A typed emoji, a typed number and your `proposal_resolve` decide no fix.
+- **A fix is the page's text as the thread settled it,** so it is decided as drafted. A batch you stage that touches a fix's block is refused with that line; say so, and point at Reject with what they want instead, or at editing the page.
 
-Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its card posted is one that expired.
+Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its report posted is one that expired.
 
 ## Drift in a read-only file
 
