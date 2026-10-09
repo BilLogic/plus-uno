@@ -155,8 +155,7 @@ test("the issue link is posted back in the thread and comes back in the gate's n
   const note = batchOutcomeNote(outcomes);
   assert.ok(note.includes(FILED.url), note);
   assert.doesNotMatch(note, /Notion/, "a GitHub issue is not a Notion link");
-  assert.equal(posted.length, 1);
-  assert.ok(posted[0]!.includes(FILED.url), String(posted[0]));
+  assert.deepEqual(posted, [`Filed <${FILED.url}|#701 ${DRAFT.title}> on ${REPO} for triage.`]);
 });
 
 for (const [status, cause] of [

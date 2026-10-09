@@ -167,8 +167,7 @@ test("an approved comment is posted with the footer, on the default repo", async
   assert.ok(body.includes(PERMALINK), body);
   // Nothing to label, so the repo's labels are never read.
   assert.deepEqual(github.labelReads, []);
-  assert.equal(posted.length, 1);
-  assert.ok(posted[0]!.includes(`${UNO}#688`), String(posted[0]));
+  assert.deepEqual(posted, [`Updated <https://github.com/${UNO}/issues/688|${UNO}#688>: commented.`]);
 });
 
 test("a DM's comment carries no link into the DM, and its permalink is never fetched", async () => {
@@ -211,10 +210,14 @@ test("close carries its reason, after the comment that explains it", async () =>
 
 test("labels are added and removed in the repo's own spelling", async () => {
   const github = fakeGithub();
-  const { deps: d } = deps(github);
+  const { deps: d, posted } = deps(github);
   const result = parse(
     await updateGithubIssue({ issue_number: 688, add_labels: ["enhancement"], remove_labels: ["bug"] }, d),
   );
+  // One plain sentence in the thread, saying what changed.
+  assert.deepEqual(posted, [
+    `Updated <https://github.com/${UNO}/issues/688|${UNO}#688>: added label \`enhancement\`, removed label \`bug\`.`,
+  ]);
   assert.equal(result.ok, true, String(result.error));
   assert.deepEqual(
     github.steps.map(({ repo: _repo, ...s }) => s),

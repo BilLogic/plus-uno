@@ -136,7 +136,7 @@ export async function updateGithubIssue(
   }
 
   const summary = describeIssueUpdate(update).join(" · ");
-  await say(deps, `:white_check_mark: Updated <${issueUrl}|${ref}> — ${summary}.`);
+  await say(deps, `Updated <${issueUrl}|${ref}>: ${describeIssueUpdate(update).map(stepDone).join(", ")}.`);
   return JSON.stringify({
     ok: true,
     status: "updated",
@@ -153,6 +153,13 @@ function apiState(change: IssueUpdate["state"] & string): {
 } {
   if (change === "open") return { state: "open", reason: "reopened" };
   return { state: "closed", reason: change === "closed_completed" ? "completed" : "not_planned" };
+}
+
+/** One step of the update as the thread's confirmation says it: "add label
+ *  `bug`" → "added label `bug`", "close as completed" → "closed as completed". */
+function stepDone(step: string): string {
+  if (step === "comment") return "commented";
+  return step.replace(/^(add|remove|reopen|close)\b/, (verb) => (verb.endsWith("e") ? `${verb}d` : `${verb}ed`));
 }
 
 function pastTense(done: string[]): string {

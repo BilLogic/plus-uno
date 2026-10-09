@@ -274,7 +274,7 @@ describe("an approved relay", () => {
     const notes = slack.posts.filter((p) => p.channel === "C1");
     assert.equal(notes.length, 1);
     assert.equal(notes[0]!.thread_ts, CONTEXT.replyTs);
-    assert.match(notes[0]!.text, /Sent to <@U0COCO>/);
+    assert.equal(notes[0]!.text, "Sent to <@U0COCO>.");
   });
 
   it("links a DM-origin request without promising the recipient they can open it", async () => {
