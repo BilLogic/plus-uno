@@ -25,7 +25,7 @@ import {
 } from "../src/commitments/index";
 import { ASK_FOOTER } from "../src/dm-sweep/copy";
 import { MADE_LAST_CHOICES, MADE_TO_CHOICES, MADE_TO_LAST_CHOICES } from "../src/dm-watch/index";
-import { cardAnswer, CARD_FOOTERS } from "../src/follow-through/copy";
+import { cardAnswer } from "../src/follow-through/copy";
 
 type Block = { type: string; block_id?: string; elements?: Array<Record<string, unknown>>; text?: { text: string } };
 
@@ -121,17 +121,17 @@ describe("every offered button means something to the door it goes through", () 
     });
   }
 
+  // A card follow-up posted before the shared card still shows these buttons
+  // until it closes: Draft it · Drop it, and Done · Still on it · Drop it.
+  const cardButtons = {
+    card_todo: ["white_check_mark", "no_good"],
+    card_stale: ["raised_hands", "hourglass_flowing_sand", "no_good"],
+  } as const;
   for (const kind of ["card_todo", "card_stale"] as const) {
-    it(`a ${kind} follow-up`, () => {
-      const footer = CARD_FOOTERS[kind];
-      assert.ok(typeof footer !== "string", "a card follow-up with an answer to tap has buttons");
-      for (const c of footer.choices) assert.notEqual(cardAnswer(kind, c.glyph), null, `${c.label} (${c.glyph}) answers nothing`);
+    it(`a ${kind} follow-up posted before the shared card`, () => {
+      for (const glyph of cardButtons[kind]) assert.notEqual(cardAnswer(kind, glyph), null, `${glyph} answers nothing`);
     });
   }
-
-  it("the follow-up that wants a typed reply has no buttons", () => {
-    assert.equal(typeof CARD_FOOTERS.card_unowned, "string");
-  });
 });
 
 describe("a press through both reminder doors", () => {

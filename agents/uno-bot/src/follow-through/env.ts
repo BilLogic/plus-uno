@@ -7,13 +7,15 @@
 //     one Notion person — exactly one either way, or nobody.
 //   • The store: commitment reminders' own (`USAGE_DB` + HARNESS_KV).
 //   • Slack: `chat.postMessage`, `chat.update` and `chat.getPermalink` with the
-//     bot token; a proposal card rendered by the proposal renderer, posted in
-//     the follow-up's thread and staged the sweep's way (`stageSweepCard`), so
-//     it lands on the usage record as staged.
+//     bot token. The morning's cards post as a decision report, whose record
+//     and each card's proposal live in ThreadState, each staged the sweep's
+//     way (`stageSweepCard`) so it lands on the usage record as staged. A
+//     follow-up posted before the shared card stages its proposal card the
+//     same way, posted in its thread.
 //   • The thread marks: the sweep card's (`markSweepThread`), so the team's
 //     replies under a follow-up don't start turns; and the follow-up reply
-//     mark (`./reply-mark.ts`), so only a reply in a thread holding an F4
-//     question or an F5 list reaches the D1 read that finds its follow-up.
+//     mark (`./reply-mark.ts`), so only a reply in a thread holding an older
+//     F4 question or F5 list reaches the D1 read that finds its follow-up.
 //   • A running note's card to-dos: a hook the capture sweep's notes job calls
 //     for each team note past its guard (`cardTodoNoteHookFor`).
 //
@@ -179,8 +181,10 @@ export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?
   const store = storeFor(env);
   if (!store || !env.HARNESS_KV) return undefined;
   const kv = env.HARNESS_KV;
+  const threadState = threadStateFor(env);
   return cardFollowUps({
     reads: readsFor(env),
+    people: peopleFor(env),
     slack: {
       permalink: (channel, ts) => measured(() => getPermalink(env, channel, ts)),
       async post(to, message) {
@@ -192,10 +196,20 @@ export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?
         });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
+      async edit(channel, ts, message) {
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      },
     },
+    reports: threadState,
+    stage: (proposal, channelKind) =>
+      stageSweepCard(
+        proposal,
+        { threadState, proposalEvents: proposalEventLogFor(env), markThread: (channel, thread) => markSweepThread(kv, channel, thread) },
+        Date.now(),
+        channelKind,
+      ),
     store,
     markThread: (channel, thread) => markSweepThread(kv, channel, thread),
-    markReplyThread: (channel, thread, ttlMs) => markReplyThread(kv, channel, thread, ttlMs),
     config: configFor(env, botUserId),
     dryRun: opts.dryRun,
   });

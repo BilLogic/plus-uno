@@ -234,6 +234,9 @@ export interface CommitmentText {
    *  choice lapses; `reposted` once the list went up a second time; `by`
    *  whoever answered, whose pick counts beside the owners'. */
   choosing?: { answer: "done" | "drop"; options: string[]; staged: boolean; listedAt: number; reposted: boolean; by?: string };
+  /** A card follow-up posted on the shared decision card: answered through
+   *  its Review alone, never a tap, a reaction or a typed reply. */
+  onCard?: boolean;
   /** A `dm_disagreement`'s two sources, in the detector's short names, and
    *  the team channel its note would go to. `what` holds the topic. */
   raise?: { sources: [string, string]; to: "plus-design" | "plus-universal" };

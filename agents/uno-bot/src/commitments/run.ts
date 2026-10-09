@@ -348,7 +348,13 @@ export function fewShotExamples(
  * evidence and say their own words. Absent, a card row due is left alone.
  */
 export type NudgeDeps = Omit<CommitmentDeps, "detector"> & {
-  cards?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
+  /** `flush`, when present, runs once every row due has been handed over:
+   *  what `due` held back to post together goes up then, and each action it
+   *  returns replaces `due`'s for that row. */
+  cards?: {
+    due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction>;
+    flush?(now: number, runDate: string): Promise<CommitmentAction[]>;
+  };
   /** The handler for the DM kinds (`../dm-sweep/`), which post only in their
    *  own DM. Absent, a DM row due is left alone. */
   dm?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
@@ -412,6 +418,13 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
     actions.push(action);
     // A rehearsal marks nothing, so the same row would come back: it shows one.
     if (deps.dryRun) break;
+  }
+  if (deps.cards?.flush && !deps.dryRun) {
+    for (const flushed of await deps.cards.flush(now, runDate)) {
+      const i = actions.findIndex((a) => a.id === flushed.id);
+      if (i >= 0) actions[i] = flushed;
+      else actions.push(flushed);
+    }
   }
   return report("handled", null);
 }

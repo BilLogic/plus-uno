@@ -1,20 +1,26 @@
 // What a card follow-up says, and what each answer to it means.
 //
-// Fixed by the scenario table: F3 offers to draft the card ("Want me to draft
-// the card for <X>?"), F4 asks who is taking the card ("Who's taking
-// <card>?"), F5 asks whether it is still moving ("Still moving?"). Each
+// A follow-up goes up on the shared decision card (§ On the shared decision
+// card, at the end): F3's card holds the drafted Roadmap card, F4's the
+// Contributor change, F5's the Design Status move, each behind Review. Each
 // mentions its owner and nobody else by default — the assignee or a note's
 // takers, the card's creator, its Contributors — and never the lead unless the
 // lead is that person.
 //
+// A follow-up posted before the shared card keeps its own words until it
+// closes: the buttons and reactions that answer it, the edit that replaces
+// them, F4's typed owner and F5's typed Design Status. Those are the rest of
+// this file.
+//
 // Every Notion string (a title, a status) and every to-do summary is escaped
-// with `escapeSlackText` before it reaches a message: a title holding
+// with `escapeSlackText` before it reaches mrkdwn: a title holding
 // `<!channel>` pings nobody. A link is Slack's own `<url|label>`.
 //
 // PURE: no `Env`, no Slack module, no Workers global.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import { reminderAnswer, type ReminderFooter } from "../commitments/copy";
+import { reminderAnswer } from "../commitments/copy";
+import type { ReportItem } from "../thread-state/index";
 
 /** F3's draft is asked for with ✅ (or ✔️) alone — not 👍, which reads as a
  *  nod rather than "draft it". */
@@ -42,26 +48,6 @@ export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", gl
   }
   return null;
 }
-
-/** What sits under each kind's first message and its follow-up: buttons where a
- *  tap answers it, a line of words where only a typed reply can (F4 names a
- *  person). */
-export const CARD_FOOTERS: Record<"card_todo" | "card_unowned" | "card_stale", ReminderFooter> = {
-  card_todo: {
-    choices: [
-      { glyph: "white_check_mark", label: "Draft it" },
-      { glyph: "no_good", label: "Drop it" },
-    ],
-  },
-  card_unowned: "Reply here with an @mention, or \"me\", and I'll draft the Contributor change",
-  card_stale: {
-    choices: [
-      { glyph: "raised_hands", label: "Done" },
-      { glyph: "hourglass_flowing_sand", label: "Still on it" },
-      { glyph: "no_good", label: "Drop it" },
-    ],
-  },
-};
 
 /** What replaces the legend once someone answers. */
 export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", staged: boolean): string {
@@ -100,44 +86,6 @@ function cardLink(card: { title: string; url: string }): string {
   return card.url ? `<${card.url}|${title}>` : title;
 }
 
-/**
- * F3's offer.
- *
- * @param input.people - The assignee, or the note's takers
- * @param input.what - The card's subject, as the detector summarised it
- * @param input.sourceUrl - The thread's permalink or the note's link, when known
- * @param input.fromNote - Whether a running note, not a thread, held the to-do
- */
-export function todoOfferText(input: { people: readonly string[]; what: string; sourceUrl: string | null; fromNote: boolean }): string {
-  const where = input.fromNote ? "the running note" : "this thread";
-  const from = input.sourceUrl ? `<${input.sourceUrl}|${where}>` : where;
-  return `${mentionsOf(input.people)} Want me to draft a Roadmap card for ${escapeSlackText(input.what)}? It came up as a to-do in ${from}, and I couldn't find one.`;
-}
-
-/** F4's question. */
-export function unownedText(input: { creator: string; card: { title: string; url: string; status: string | null } }): string {
-  const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
-  return `<@${input.creator}> Who should take ${cardLink(input.card)}? It's been${status} for over a week with no Contributor.`;
-}
-
-/** F5's question. */
-export function staleText(input: { people: readonly string[]; card: { title: string; url: string; status: string | null } }): string {
-  const status = input.card.status ? ` in *${escapeSlackText(input.card.status)}*` : "";
-  return `${mentionsOf(input.people)} Checking in on ${cardLink(input.card)}: it's been${status} for about three weeks with no comments. Is it still moving?`;
-}
-
-/** The one follow-up, a week on. */
-export function cardFollowUpText(kind: "card_todo" | "card_unowned" | "card_stale", people: readonly string[]): string {
-  switch (kind) {
-    case "card_todo":
-      return `${mentionsOf(people)} Still want that card drafted?`;
-    case "card_unowned":
-      return `${mentionsOf(people)} This card still has no Contributor. Reply with an @mention, or "me", and I'll draft the change.`;
-    case "card_stale":
-      return `${mentionsOf(people)} Checking in once more. Is it still moving?`;
-  }
-}
-
 /** The owner's choice of Design Status, numbered as `pickStatus` reads it. */
 export function statusChoiceText(input: { owner: string; card: { title: string; url: string }; options: readonly string[] }): string {
   const list = input.options.map((o, i) => `${i + 1}. ${escapeSlackText(o)}`).join("\n");
@@ -154,3 +102,127 @@ export function draftTitle(what: string): string {
   const t = what.replace(/\s+/g, " ").trim();
   return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
 }
+
+// ── On the shared decision card ──────────────────────────────────────────────
+//
+// A parent line naming the people asked, then one card per follow-up, each
+// with Review and Open (`slack/decision-cards.ts`). Review is the only way to
+// answer: no glyph, nothing to type. A card's title and body are plain text,
+// so nothing in them is escaped; its subtitle and the parent line are mrkdwn.
+
+type Kind = "card_todo" | "card_unowned" | "card_stale";
+
+/**
+ * The parent line: whom it is for, and what the job found, in one sentence.
+ *
+ * @param kinds - Each card's kind, in the order shown
+ * @param people - Everyone it mentions
+ * @param first - The first ask, or the one follow-up a week on
+ */
+export function followUpParent(kinds: readonly Kind[], people: readonly string[], first: boolean): string {
+  const n = kinds.length;
+  const one = new Set(kinds).size === 1 ? kinds[0]! : null;
+  const who = mentionsOf(people);
+  const lead = who ? `${who} ` : "";
+  if (!first) {
+    const noun = one === "card_todo" ? (n === 1 ? "this to-do" : `these ${n} to-dos`) : n === 1 ? "this card" : `these ${n} cards`;
+    return `${lead}Checking in once more on ${noun}.`;
+  }
+  switch (one) {
+    case "card_todo":
+      return n === 1
+        ? `${lead}A to-do to make a Roadmap card came up, and I couldn't find the card.`
+        : `${lead}${n} to-dos to make Roadmap cards came up, and I couldn't find the cards.`;
+    case "card_unowned":
+      return n === 1
+        ? `${lead}A Roadmap card has been worked for over a week with no Contributor.`
+        : `${lead}${n} Roadmap cards have been worked for over a week with no Contributor.`;
+    case "card_stale":
+      return n === 1 ? `${lead}Checking in on a Roadmap card that has gone quiet.` : `${lead}Checking in on ${n} Roadmap cards that have gone quiet.`;
+    default:
+      return `${lead}Checking in on ${n} Roadmap cards.`;
+  }
+}
+
+function oneLine(text: string): string {
+  return text.replace(/\s+/g, " ").trim() || "untitled";
+}
+
+function statusWords(status: string | null): string {
+  return status ? escapeSlackText(oneLine(status)) : "no Design Status";
+}
+
+/** F3's card: the to-do, who and where, and the drafted card behind Review. */
+export function todoItem(input: { id: string; owner: string; what: string; sourceUrl: string; fromNote: boolean }): ReportItem {
+  return {
+    id: input.id,
+    title: draftTitle(input.what) || "untitled",
+    subtitle: `<@${input.owner}> · from ${input.fromNote ? "the running note" : "this thread"}`,
+    body: "No Roadmap card found for this. Review holds the drafted card.",
+    done: "the drafted Roadmap card is filed.",
+    open: { label: input.fromNote ? "Open note" : "Open thread", url: input.sourceUrl },
+  };
+}
+
+/** F4's card: the card, its status, and a week with no Contributor. */
+export function unownedItem(input: { id: string; creator: string; card: { title: string; url: string; status: string | null } }): ReportItem {
+  return {
+    id: input.id,
+    title: oneLine(input.card.title),
+    subtitle: `<@${input.creator}> · ${statusWords(input.card.status)} · no Contributor for a week`,
+    body: "Who should take it? Approve makes the person asked its Contributor.",
+    done: "the person asked is its Contributor.",
+    open: { label: "Open card", url: input.card.url },
+  };
+}
+
+/**
+ * F5's card: the card, its status, three quiet weeks, and the move behind
+ * Review.
+ *
+ * @param input.to - The Design Status Review proposes, the schema's spelling
+ */
+export function staleItem(input: { id: string; people: readonly string[]; card: { title: string; url: string; status: string | null }; to: string }): ReportItem {
+  const now = input.card.status ? oneLine(input.card.status) : "its status";
+  return {
+    id: input.id,
+    title: oneLine(input.card.title),
+    subtitle: `${mentionsOf(input.people)} · ${statusWords(input.card.status)} · no comments for 3 weeks`,
+    body: `Is it still moving? Approve moves it to ${oneLine(input.to)}, or pick another Design Status in Review. Reject leaves it in ${now}.`,
+    done: "its Design Status is moved.",
+    open: { label: "Open card", url: input.card.url },
+  };
+}
+
+/** What Review shows for F3's drafted card. */
+export function todoReviewLead(title: string): string {
+  return `Draft Roadmap card for the to-do: *${escapeSlackText(oneLine(title))}*, on the PRD template and linked to where it came up. Approve files it; Edit fields changes its title, summary or pillar first.`;
+}
+
+/** What Review shows for F4's Contributor change. */
+export function unownedReviewLead(card: { title: string; url: string }, slackUser: string): string {
+  return `Contributor for <${card.url}|${escapeSlackText(oneLine(card.title))}>: <@${slackUser}>, the person asked. Approve sets it; Reject leaves the card as it is.`;
+}
+
+/** What Review shows for F5's status change. */
+export function staleReviewLead(card: { title: string; url: string; status: string | null }, to: string): string {
+  const from = card.status ? ` in *${escapeSlackText(card.status)}*` : "";
+  return `<${card.url}|${escapeSlackText(oneLine(card.title))}> has sat${from} with no comments for about three weeks. Approve moves it to *${escapeSlackText(to)}*; Edit fields picks another Design Status (Archived retires it). Reject leaves it as it is.`;
+}
+
+/** F4's card when the person asked has no Notion match: nothing to review. */
+export const NO_NOTION_MATCH = "No Notion match for the person asked, so set the Contributor on the card";
+
+/** A card that went up and did not stage: it comes back the next morning. */
+export const FOLLOW_UP_NOT_STAGED = "Didn't go through, so it comes back tomorrow morning";
+
+/** A tap or a reaction on a follow-up that is on the shared card. */
+export const ANSWER_ON_CARD = "Press Review on its card to answer this one, so that changed nothing.";
+
+/** What a turn that would revise a follow-up's card is told instead: the
+ *  pop-up is the one way to change it. */
+export const FOLLOW_UP_REVISION: Record<Kind, string> = {
+  card_todo: "To change the drafted card, press Review on it and use Edit fields before you approve.",
+  card_unowned: "To give this card to someone else, set its Contributor in Notion and Reject this one.",
+  card_stale: "To move this card somewhere else, press Review on it and pick the Design Status under Edit fields.",
+};
