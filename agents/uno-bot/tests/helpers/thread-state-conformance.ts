@@ -1139,7 +1139,7 @@ export function runThreadStateConformance(
   // rides them too, so the gate's note can be edited onto the card itself.
   it("a stated card's words ride its superseded and expired answers", async () => {
     const { store, clock } = setup();
-    const stated = { cancelled: "Intake only", expired: "That card closed after 3 days with no decision." };
+    const stated = { cancelled: "Rejected, nothing filed", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
     assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });

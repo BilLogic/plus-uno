@@ -466,7 +466,6 @@ describe("the morning post", () => {
     assert.notEqual(button!.supersedeKey, tree!.supersedeKey, "each card its own slot");
     assert.deepEqual(button!.confirmers, MEMBERS);
     assert.equal(button!.ttlMs, PRECEDENCE_CARD_TTL_MS);
-    assert.equal(button!.onCancel, undefined, "a Reject runs nothing");
     assert.deepEqual(button!.operations!.map((o) => o.toolName), [PRECEDENCE_INTAKE_TOOL]);
     assert.equal(button!.operations![0]!.input.week_of, "2026-10-02");
     assert.match(String(button!.operations![0]!.input.section), /^### Button\n/);
