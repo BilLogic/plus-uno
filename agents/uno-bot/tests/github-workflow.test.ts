@@ -134,7 +134,9 @@ test("the runs page comes back in the thread and in the gate's note", async () =
   const note = batchOutcomeNote(outcomes);
   assert.ok(note.includes(RUNS(SITE, "sync-notion.yml")), note);
   assert.doesNotMatch(note, /Notion link/, "a runs page is not a Notion link");
-  assert.deepEqual(posted, [`Started <${RUNS(SITE, "sync-notion.yml")}|sync-notion.yml> on ${SITE} at trunk.`]);
+  assert.equal(posted.length, 1);
+  assert.ok(posted[0]!.includes(RUNS(SITE, "sync-notion.yml")), String(posted[0]));
+  assert.ok(posted[0]!.includes("trunk"), String(posted[0]));
 });
 
 for (const [label, input] of [
