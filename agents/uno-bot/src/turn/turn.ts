@@ -1935,15 +1935,13 @@ export async function restageExecution(
     await deps.delivery.postFailure("delivery");
     return null;
   }
-  // A cancel run is not carried over: part of the original may already have
-  // happened, and a ⛔ on the fresh card must run nothing a second time. Nor
-  // is a group DM's share: only the card people were shown offers one
-  // (`sweep/share.ts`). Nor are a stated card's own words: the fresh card is
-  // an ordinary one, with a ⚠️ and a ⛔ that runs nothing, so "Intake only"
-  // would misstate it. Nor are a sweep card's fixes: the fresh card holds
+  // A group DM's share is not carried over: only the card people were shown
+  // offers one (`sweep/share.ts`). Nor are a stated card's own words: the
+  // fresh card is an ordinary one, with a ⚠️, and the gate's shared lines fit
+  // it. Nor are a sweep card's fixes: the fresh card holds
   // what never ran, so they no longer line up with its operations. Nor are
   // the old card's blocks: the fresh card went up with its own.
-  const { onCancel: _onCancel, sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, ...kept } = original;
+  const { sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,
