@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,154 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,239 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,159 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,244 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1421,7 +1421,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job.
 - **DMs with uno-bot:** each 1:1 DM uno-bot answered in lately, read by one more end-of-day job with no opt-in, since uno-bot is a party to it (§ DMs with uno-bot).
-- **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and the fix goes on a card in their DM with uno-bot that only they can confirm (ADR-032).
+- **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and each fix goes on its own decision card in their DM with uno-bot, decided only by them, in Review. The card links the DM (Open DM), and its words stay in the DM (ADR-032).
 - **When:** the end-of-day run at 00:00 ET, just after each workday ends, reads each channel since its cursor, which lives in the usage database. It is dated to the day it sweeps, so Friday is swept at Saturday 00:00 and its cards post Monday.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
 - **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.
