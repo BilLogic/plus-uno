@@ -45,8 +45,12 @@ import {
   type DmWatchFeature,
   type InMemoryDmWatchRecords,
   type OwnerSlack,
+  withdrawFixes,
 } from "../src/dm-watch/index";
 import { at, BOT, notionPage, ts } from "./helpers/sweep-harness";
+import { harness, request } from "./helpers/turn-harness";
+import { runTurn } from "../src/turn/index";
+import { resultMetadataFor } from "../src/agent/resolve-proposal";
 
 const MAYA = "U0MAYA";
 const BEA = "U0BEA";
@@ -90,7 +94,7 @@ interface World {
   logs: string[];
   posts: Post[];
   removed: string[];
-  withdrawn: { ts: string; ids: string[]; text: string }[];
+  withdrawn: { ts: string; ids: string[] | null; text: string }[];
   edits: { ts: string; message: ReportMessage }[];
   staged: PendingProposal[];
   clock: { now: number };
@@ -263,17 +267,14 @@ function readDeps(w: World, now = EOD): DmCaptureReadDeps {
  *  the cards it took out of reach say why. No ids: a card from before the
  *  shared card, retired whole. */
 function withdraw(w: World) {
-  return async (_channel: string, ts: string, ids: readonly string[], text: string) => {
-    w.withdrawn.push({ ts, ids: [...ids], text });
-    if (!ids.length) {
+  return async (_channel: string, ts: string, ids: readonly string[] | null, text: string) => {
+    w.withdrawn.push({ ts, ids: ids ? [...ids] : null, text });
+    if (!ids) {
       await w.threadState.retireProposal(ts);
       return;
     }
-    for (const id of ids) {
-      if ((await w.threadState.retireProposal(`${ts}#${id}`)).retired) {
-        await w.threadState.updateReport(ts, { id, state: { kind: "not-staged", note: text } });
-      }
-    }
+    const message = await withdrawFixes(w.threadState, ts, ids, text);
+    if (message) w.edits.push({ ts, message });
   };
 }
 
@@ -422,7 +423,7 @@ describe("the switch", () => {
     w.kv.set(MAYA, [{ ...({} as DmCaptureFinding), id: "x", state: "proposed", cardChannel: "D-UNO", proposalTs: "1.1" }]);
     const legacy = { sweepRun: "2026-09-30", proposalTs: "1.1", threadTs: "1.1", replyTs: "1.1" } as PendingProposal;
     await dropDmCapture(MAYA, { queue: common(w, WED).queue, liveCards: async () => [legacy], withdraw: withdraw(w) });
-    assert.deepEqual(w.withdrawn, [{ ts: "1.1", ids: [], text: DM_CARD_SWITCHED_OFF }]);
+    assert.deepEqual(w.withdrawn, [{ ts: "1.1", ids: null, text: DM_CARD_SWITCHED_OFF }]);
   });
 
   it("turned off mid-read: nothing of the run is kept", async () => {
@@ -747,6 +748,125 @@ describe("the morning post, retried", () => {
       },
     });
     assert.equal(w.kv.has(MAYA), false);
+  });
+});
+
+describe("a fix on the card, held to the sweep's rules", () => {
+  /** Maya's fix, posted and staged on Wednesday morning. */
+  async function postedFix() {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    await runDmCapturePost(postJob(MAYA), postDeps(w));
+    return { w, fix: w.staged[0]! };
+  }
+
+  it("is a sweep card with its own slot: no fix on the card replaces another", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    w.messages.get(DM_BEA)!.push({ ts: ts(29, 17, 5), user: BEA, text: `and the owner is now Kai ${PAGE.url}` });
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    await runDmCapturePost(postJob(MAYA), postDeps(w));
+    assert.deepEqual(w.staged.map((p) => p.sweepRun), ["2026-09-30", "2026-09-30"]);
+    assert.equal(new Set(w.staged.map((p) => p.supersedeKey)).size, 2);
+    assert.equal((await liveIn(w)).length, 2, "both stay live");
+  });
+
+  it("a Needs changes revision that adds a write past the drafted edit is refused, and the fix stays", async () => {
+    const { w, fix } = await postedFix();
+    const extra = {
+      page_url: PAGE.url,
+      replace: [{ block_id: PAGE.blocks[1]!.id, last_edited_time: PAGE.blocks[1]!.lastEditedTime, content: "Owner: Bea" }],
+    };
+    const h = harness({
+      replies: [{ text: "Revised.", toolCalls: [{ name: "notion_update", args: { ...(fix.input as object), replace: [...(fix.input.replace as unknown[]), ...extra.replace] } }] }],
+    });
+    await h.threadState.putProposal(fix);
+    const outcome = await runTurn(request({ text: "also make Bea the owner", pending: fix, userId: MAYA, channel: fix.channel }), h.deps);
+    assert.equal(outcome.disposition, "asked");
+    assert.equal((await h.threadState.getProposalByTs(fix.proposalTs)).state, "found");
+    assert.equal(w.staged.length, 1);
+  });
+
+  it("a typed `drop 1` under the card decides nothing: the fix is decided in Review", async () => {
+    const { fix } = await postedFix();
+    const h = harness({ replies: [{ text: "Press Review on the card to decide it." }] });
+    await h.threadState.putProposal(fix);
+    const outcome = await runTurn(request({ text: "drop 1", pending: fix, userId: MAYA, channel: fix.channel }), h.deps);
+    assert.notEqual(outcome.disposition, "staged");
+    assert.equal((await h.threadState.getProposalByTs(fix.proposalTs)).state, "found");
+  });
+
+  it("a decided fix posts its result with the sweep's tag, so the DM's reads take it as uno-bot's", async () => {
+    const { fix } = await postedFix();
+    assert.deepEqual(resultMetadataFor(fix), { metadata: { event_type: "uno_sweep_card", event_payload: { role: "result" } } });
+  });
+});
+
+describe("the morning post, when Slack or the run falls short", () => {
+  it("cards Slack refuses step down to plain text, with a Review per fix", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    const deps = postDeps(w);
+    await runDmCapturePost(postJob(MAYA), {
+      ...deps,
+      bot: {
+        ...deps.bot,
+        async post(channel, message) {
+          if (cardsIn(message.blocks).length) return { ok: false, refused: true };
+          return deps.bot.post(channel, message);
+        },
+      },
+    });
+    assert.equal(w.posts.length, 1);
+    const blocks = JSON.stringify(w.posts[0]!.blocks);
+    const id = `${DM_BEA}:${PAGE.blocks[0]!.id}`;
+    assert.ok(blocks.includes(`${DECISION_REVIEW_ACTION_PREFIX}${id}`), "Review still opens the fix");
+    assert.ok(blocks.includes(`archives/${DM_BEA}/p`), "the DM, linked");
+    assert.doesNotMatch(blocks, GATE_WORDS);
+    assert.equal(w.staged.length, 1);
+    assert.equal(w.kv.get(MAYA)?.[0]?.state, "proposed");
+  });
+
+  it("turned off when every fix failed to stage: each card says it was withdrawn", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    const report = await runDmCapturePost(postJob(MAYA), postDeps(w, WED, {
+      async stage() {
+        await w.records.setSwitch(MAYA, CAPTURE_FEATURE, false, { now: WED, readThrough: "0" });
+        throw new Error("Durable Object reset");
+      },
+    }));
+    assert.equal(report.outcome, "skipped");
+    const [card] = cardsIn(w.edits.at(-1)!.message.blocks);
+    assert.equal(card!.subtitle?.text, DM_CARD_SWITCHED_OFF);
+    assert.deepEqual(card!.actions.map((a) => a.text.text), ["Open page", "Open DM"]);
+    assert.equal(w.kv.has(MAYA), false);
+  });
+
+  it("a budget stop partway marks the cards it never staged, so no Review is left without a fix behind it", async () => {
+    const w = world();
+    await turnOn(w, MAYA, [CAPTURE_FEATURE]);
+    w.messages.get(DM_BEA)!.push({ ts: ts(29, 17, 5), user: BEA, text: `and the owner is now Kai ${PAGE.url}` });
+    await runDmCaptureRead(readJob(MAYA), readDeps(w));
+    const deps = postDeps(w);
+    await assert.rejects(
+      runDmCapturePost(postJob(MAYA), {
+        ...deps,
+        async stage(p) {
+          if (w.staged.length) throw new SubrequestBudgetError(1);
+          await deps.stage(p);
+        },
+      }),
+      SubrequestBudgetError,
+    );
+    assert.deepEqual(w.removed, [], "the staged fix stays up");
+    const cards = cardsIn(w.edits.at(-1)!.message.blocks);
+    assert.deepEqual(cards.map((c) => c.actions[0]!.text.text), ["Review", "Open page"]);
+    assert.equal(cards[1]!.subtitle?.text, DM_CARD_NOT_STAGED);
+    assert.deepEqual(w.kv.get(MAYA)?.map((f) => f.state), ["proposed", "queued"]);
   });
 });
 

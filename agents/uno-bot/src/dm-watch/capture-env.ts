@@ -19,6 +19,7 @@ import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
 import { conversationsHistorySince, conversationsOpen, getBotIdentity, postMessage, updateMessage } from "../slack/api";
 import { SWEEP_CARD_EVENT } from "../sweep/cards";
+import { refusedForBlocks } from "../slack/delivery";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
@@ -87,7 +88,7 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
       dmChannel: (userId) => conversationsOpen(env, userId),
       async post(channel, message) {
         const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, metadata: message.metadata });
-        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
+        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false, refused: refusedForBlocks(res) };
       },
       async edit(channel, ts, message) {
         await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });

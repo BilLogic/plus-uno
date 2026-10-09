@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,519 chars from 16 files**, against an assembled budget of 175,500 (981 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,135 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,538 chars from 16 files**, against an assembled budget of 175,500 (962 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,154 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,613 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,454 (−15,411 ide-only) | 101,109 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 115,809 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,355 (−6,177 ide-only) | 150,206 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 153,490 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,006 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,669 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,519 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,374 (−6,177 ide-only) | 150,225 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 153,509 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,025 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,688 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,538 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,239 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,302 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,244 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,307 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -984,7 +984,7 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
 ## Two gates — never conflate
 
 1. **Proposal-confirmation gate** (uno-bot side-effect proposals): the card in the thread is short — a ⚠️ *Ready to {verb}* summary line (title · key fields), the body's size, the LLM-written line and one Review button — while its message text carries the whole draft for notifications and history. Review opens the draft in a pop-up, written for a person: key properties by their database names (Design Status is the value the create writes, *not set* where it writes none), then the body as headings and paragraphs, then the card's ⚠️ caveats; the thread summary uses the same key properties. A view footer holds only submit and close, so the decision is an input: a confirmer's draft ends with a Decision choice (**Approve** · Needs changes · Reject) and a Note (required for Needs changes, an optional reason for Reject), and the footer's **Submit** decides it beside Close. Edit fields sits at the top and pushes a view of its own (`views.push`) with the fields (Save edits, which keeps the edits on the draft's `private_metadata`; Approve checks them again against the live card and options). A non-confirmer sees the draft with Close only. Approve with edits leaves the card showing the edited values under a ✏️ line naming who edited which fields. Needs changes requires a note and locks the card ("being revised" to every other signal, a second Needs changes included) until the revision turn supersedes it, or unlocks it if that turn stages nothing; Reject takes an optional reason. A decided card stays short, with its outcome and View; a card posted with blocks of its own (a sweep card's carousel, the Figma library card's release card and table) keeps them under that line. A note on a card still live keeps its Review; a card posted without the button gains neither. A ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, is the quiet, unadvertised fallback; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. Both answers, and a refusal that names who can confirm a gesture made on the card (reaction, button, pop-up), are one line edited onto the card itself rather than a new message; a typed emoji or the model's resolve from someone else is answered near their message. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake — as does a card nobody decides. A library edited but not published posts with no card.
-   **A report's decision card** (`agents/uno-bot/src/slack/decision-cards.ts`): a plain parent line, then one card per item (ten at most), each with Review and Open. Each item is its own proposal, decided only in its pop-up.
+   **A report's decision card** (`agents/uno-bot/src/slack/decision-cards.ts`): a plain parent line, then one card per item (ten at most), each with Review and one or two Open buttons. Each item is its own proposal, decided only in its pop-up.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
@@ -1421,7 +1421,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Private channels:** read only when they are also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`. A private channel off the allowlist stays unread, whatever the sweep list says.
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job.
 - **DMs with uno-bot:** each 1:1 DM uno-bot answered in lately, read by one more end-of-day job with no opt-in, since uno-bot is a party to it (§ DMs with uno-bot).
-- **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and each fix goes on its own decision card in their DM with uno-bot, decided only by them, in Review. The card links the DM (Open DM), and its words stay in the DM (ADR-032).
+- **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and each fix goes on its own decision card in their DM with uno-bot, decided only by them, in Review. The card links the DM (Open DM), and its words stay in the DM; its subtitle reads "Your DM" and the day, naming nobody in it (ADR-032).
 - **When:** the end-of-day run at 00:00 ET, just after each workday ends, reads each channel since its cursor, which lives in the usage database. It is dated to the day it sweeps, so Friday is swept at Saturday 00:00 and its cards post Monday.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
 - **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can drop a wrong target with one reply. A search that fails finds nothing and holds nothing up.

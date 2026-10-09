@@ -23,14 +23,14 @@ import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
 import { conversationsOpen, conversationsReplies, deleteMessage, getBotIdentity, postMessage, slackReadAs, updateMessage, usersInfo } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
-import { itemProposalKey, markNotStaged } from "../slack/decision-cards";
+import { itemProposalKey } from "../slack/decision-cards";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { measured } from "../sweep/env";
 import type { SweepSlackMessage } from "../sweep/run";
 import { modelCommitmentDetector, modelEvidenceJudge } from "../commitments/detector";
 import { createD1DmWatchRecords } from "./d1";
 import type { ReminderOutcome } from "../commitments/copy";
-import { dropDmCapture, type DmCaptureFinding, type DmCaptureQueue, type DmHolds } from "./capture";
+import { dropDmCapture, withdrawFixes, type DmCaptureFinding, type DmCaptureQueue, type DmHolds } from "./capture";
 import {
   accessOf,
   answerDmReminderPress,
@@ -297,23 +297,20 @@ export function dmCaptureQueueFor(env: Env): DmCaptureQueue | null {
   };
 }
 
-/** Take a DM Capture report's fixes back: each out of reach in ThreadState
- *  first, so Review can't decide it, then its card redrawn to say why. No
- *  ids: a card from before the shared card, retired whole and edited to
- *  `note`. */
-export async function withdrawCaptureCard(env: Env, channel: string, ts: string, ids: readonly string[], note: string): Promise<void> {
+/** Take a DM Capture report's fixes back (`withdrawFixes`): each out of
+ *  reach in ThreadState first, so Review can't decide it, then the report
+ *  redrawn to say why. `null`: a card from before the shared card, retired
+ *  whole and edited to `note`. */
+export async function withdrawCaptureCard(env: Env, channel: string, ts: string, ids: readonly string[] | null, note: string): Promise<void> {
   const store = threadStateFor(env);
-  if (!ids.length) {
+  if (!ids) {
     // Edited only when it was this call that took it out of reach: a card
     // already claimed, running or gone keeps what it says.
     const { retired } = await store.retireProposal(ts);
     if (retired) await updateMessage(env, { channel, ts, text: note });
     return;
   }
-  // Likewise each card: one already decided keeps its own state.
-  const retired: string[] = [];
-  for (const id of ids) if ((await store.retireProposal(itemProposalKey(ts, id))).retired) retired.push(id);
-  const message = retired.length ? await markNotStaged(store, ts, retired, note) : null;
+  const message = await withdrawFixes(store, ts, ids, note);
   if (message) await updateMessage(env, { channel, ts, ...message });
 }
 
