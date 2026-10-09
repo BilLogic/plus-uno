@@ -75,6 +75,7 @@ import {
   DRIFT_NO_REVISION,
   DRIFT_NOT_POSTED_TEXT,
   DRIFT_NOT_STAGED,
+  legacyCaughtUpText,
   elsewhereLine,
   pillarNote,
   type DriftFileWords,
@@ -86,10 +87,10 @@ import { draftIntake, matchPillar, pillarCandidates } from "./draft";
 import { askGroupOf, type FileDriftFinding } from "./finding";
 
 /** Reports with cards per morning; files whose card would be past it wait. */
-export const MAX_CARDS_PER_MORNING = 4;
+export const MAX_REPORTS_PER_MORNING = 4;
 /** Cards one report holds; a thread's files past it wait. Under the
  *  carousel's ten, so a report never holds any back. */
-export const MAX_FILES_PER_CARD = 5;
+export const MAX_CARDS_PER_REPORT = 5;
 /** Threads given the pointers alone per morning; the rest wait. */
 export const MAX_QUESTIONS_PER_MORNING = 4;
 /** Figma decisions the morning looks at before asking; a thread whose look
@@ -168,6 +169,9 @@ export interface LiveAskFile {
   /** On pointers alone: the proposal of the card drafting the file's intake,
    *  so a re-check can tell a card whose Approve filed it. */
   intakeKey?: string;
+  /** The same, on a question from before the shared card: its card's ts,
+   *  which was its proposal's. */
+  cardTs?: string;
 }
 
 /** A report posted and still within its 72 h: the message to edit, and the
@@ -181,6 +185,9 @@ export interface LiveAsk {
   role: "card" | "question";
   askedAt: number;
   files: LiveAskFile[];
+  /** On a card from before the shared card — one whose files carry no
+   *  `itemId` — its question, struck through once its files catch up. */
+  headline?: string;
 }
 
 /** The queue, the marks and the live asks, behind one port. */
@@ -431,7 +438,7 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
     .filter((x) => x.mine.length)
     .sort((a, b) => earliest(a.t.findings) - earliest(b.t.findings));
   drafting.forEach(({ t, mine }, i) => {
-    const kept = i < MAX_CARDS_PER_MORNING ? mine.slice(0, MAX_FILES_PER_CARD) : [];
+    const kept = i < MAX_REPORTS_PER_MORNING ? mine.slice(0, MAX_CARDS_PER_REPORT) : [];
     for (const g of mine) if (!kept.includes(g)) waiting.add(g);
     t.drafts = kept;
   });
@@ -866,9 +873,18 @@ export interface DriftRecheckDeps {
   /** Whether a card's Approve filed it, off the usage record. Without one,
    *  every caught-up pointer message is edited. */
   cardFiled?(proposalTs: string): Promise<boolean>;
+  /** The live card from before the shared card in a thread
+   *  (`LEGACY_DRIFT_KEY`), a `drop N` revision of it included. */
+  legacyCard(channel: string, thread: string): Promise<PendingProposal | null>;
   meter?: { headroom(): { subrequests: number; d1Queries: number } };
   now(): number;
   dryRun?: boolean;
+}
+
+/** Whether a live record's cards are withdrawn one by one: a report's on the
+ *  shared card. A card from before it, and pointers, go whole. */
+function perCard(ask: LiveAsk): boolean {
+  return ask.role === "card" && ask.files.some((f) => f.itemId);
 }
 
 /** One card or pointer message withdrawn — or, on a dry run, that would be. */
@@ -931,15 +947,9 @@ export async function recheckLiveAsks(
       continue;
     }
     if (opts.fileKey && !ask.files.some((f) => f.fileKey === opts.fileKey)) continue;
-    if (ask.role === "card" && !ask.files.some((f) => f.itemId)) {
-      // A card from before the shared card: it lives out its 72 h as it is.
-      if (!deps.dryRun) await deps.store.dropLiveAsk(ask);
-      notes.push(`${ask.channel}:${ask.ts}: a card from before the shared card, left as it is`);
-      continue;
-    }
     // Code and Storybook can't be looked at: a card's file of theirs stays,
-    // and so do pointers that name one.
-    if (ask.role === "question" ? !ask.files.every((f) => isFigmaKind(f.kind)) : !ask.files.some((f) => isFigmaKind(f.kind))) continue;
+    // and so does a message withdrawn whole that names one.
+    if (perCard(ask) ? !ask.files.some((f) => isFigmaKind(f.kind)) : !ask.files.every((f) => isFigmaKind(f.kind))) continue;
     live.push(ask);
   }
 
@@ -947,6 +957,8 @@ export async function recheckLiveAsks(
   let waiting = 0;
   let partly = 0;
   for (const ask of live.sort((a, b) => a.askedAt - b.askedAt)) {
+    // Read before any card goes: a withdrawal takes its file off the record.
+    const eachCard = perCard(ask);
     const open = ask.files.filter((f) => f.caughtUpAt === undefined && isFigmaKind(f.kind));
     // One report naming more files than the cap is still looked at, alone.
     if (checked > 0 && checked + open.length > MAX_RECHECKS_PER_RUN) {
@@ -970,18 +982,19 @@ export async function recheckLiveAsks(
         f.caughtUpAt = check.change.at;
         changed = true;
         // A card goes at once, its own file's catching up enough.
-        if (ask.role === "card") await withdrawCard(ask, f, deps, withdrawn, notes, now);
+        if (eachCard) await withdrawCard(ask, f, deps, withdrawn, notes, now);
       } else if (check.judged) {
         f.checkedThrough = check.change.at;
         changed = true;
       }
     }
-    if (ask.role === "card") {
+    if (eachCard) {
       if (deps.dryRun) continue;
       if (!ask.files.length) await deps.store.dropLiveAsk(ask);
       else if (changed) await deps.store.saveLiveAsk(ask);
     } else if (ask.files.every((f) => f.caughtUpAt !== undefined)) {
-      await withdrawPointers(ask, deps, withdrawn, notes);
+      if (ask.role === "card") await withdrawLegacyCard(ask, deps, withdrawn, notes);
+      else await withdrawPointers(ask, deps, withdrawn, notes);
     } else {
       if (ask.files.some((f) => f.caughtUpAt !== undefined)) partly += 1;
       if (changed && !deps.dryRun) await deps.store.saveLiveAsk(ask);
@@ -1060,6 +1073,44 @@ async function withdrawCard(
   withdrawn.push(entry);
 }
 
+/**
+ * A card from before the shared card, once every file it names shows its
+ * decision: retired first, so no ✅ can file it, then edited to strike its
+ * question through, and recorded as cancelled by the Worker — the way such a
+ * card was always withdrawn. One already decided or lapsed is left as it says.
+ */
+async function withdrawLegacyCard(ask: LiveAsk, deps: DriftRecheckDeps, withdrawn: DriftWithdrawal[], notes: string[]): Promise<void> {
+  const text = legacyCaughtUpText(ask.headline ?? LEGACY_HEADLINE, Math.max(...ask.files.map((f) => f.caughtUpAt!)));
+  const files = ask.files.map((f) => f.fileKey);
+  if (deps.dryRun) {
+    withdrawn.push({ channel: ask.channel, ts: ask.ts, role: ask.role, files, text });
+    return;
+  }
+  ensureHeadroom(deps, WITHDRAWAL_COST);
+  let card: PendingProposal | null = null;
+  let retired = false;
+  try {
+    card = await deps.legacyCard(ask.channel, ask.threadTs);
+    if (card) retired = await deps.retire(card.proposalTs);
+  } catch (err) {
+    swallowed(err, "legacy card");
+    return;
+  }
+  if (!card || !retired) {
+    await deps.store.dropLiveAsk(ask);
+    notes.push(`${ask.channel}:${ask.ts}: its card is no longer live`);
+    return;
+  }
+  const live = card;
+  await step(() => deps.edit(live.channel, live.proposalTs, { text, blocks: textSections(text) }), "edit");
+  await step(() => deps.recordWithdrawn(live.proposalTs), "record");
+  await deps.store.dropLiveAsk(ask);
+  withdrawn.push({ channel: live.channel, ts: live.proposalTs, role: ask.role, files, text });
+}
+
+/** The question a card from before the shared card asked about one Figma file. */
+const LEGACY_HEADLINE = "Is the Figma file still current?";
+
 /** Edit caught-up pointers in place. */
 async function withdrawPointers(ask: LiveAsk, deps: DriftRecheckDeps, withdrawn: DriftWithdrawal[], notes: string[]): Promise<void> {
   const text = caughtUpText(ask.files.length, Math.max(...ask.files.map((f) => f.caughtUpAt!)));
@@ -1088,7 +1139,12 @@ async function withdrawPointers(ask: LiveAsk, deps: DriftRecheckDeps, withdrawn:
  *  failed, so the message waits for the next run rather than be edited. */
 async function cardFiled(ask: LiveAsk, deps: DriftRecheckDeps): Promise<"filed" | "open" | "unknown"> {
   if (!deps.cardFiled) return "open";
-  for (const key of new Set(ask.files.flatMap((f) => (f.intakeKey ? [f.intakeKey] : [])))) {
+  // A question from before the shared card names its card by `cardTs`.
+  const keys = ask.files.flatMap((f) => {
+    const key = f.intakeKey ?? f.cardTs;
+    return key ? [key] : [];
+  });
+  for (const key of new Set(keys)) {
     try {
       if (await deps.cardFiled(key)) return "filed";
     } catch (err) {

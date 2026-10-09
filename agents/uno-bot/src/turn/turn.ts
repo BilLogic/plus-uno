@@ -122,6 +122,8 @@ import {
   sweepCardPick,
   sweepTag,
 } from "../sweep/cards";
+import { answersLegacyDriftCard, LEGACY_DRIFT_KEY } from "../figma-drift/finding";
+import { LEGACY_DRIFT_REPLY } from "../figma-drift/copy";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
@@ -984,6 +986,20 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
   }
 
+  // A file-drift card from before the shared card (`figma-drift/`) still asks
+  // for `drop N`, `skip` or "yes" in its footer. Those words decide nothing
+  // now, so they get one line pointing at Review, never a model revision.
+  if (request.pending?.supersedeKey === LEGACY_DRIFT_KEY && answersLegacyDriftCard(request.text)) {
+    await delivery.postNote(LEGACY_DRIFT_REPLY);
+    await memory.remember(LEGACY_DRIFT_REPLY);
+    return {
+      disposition: "asked",
+      posted: LEGACY_DRIFT_REPLY,
+      wrote: memory.wrote(),
+      telemetry: { tier: "chill", route: "legacy-drift-reply", trivial: true, correction: false, tools: [], references: [], interim: 0 },
+    };
+  }
+
   // ── A cut-off run in this thread ───────────────────────────────────────────
   //
   // A card approved here whose run never reported back (`ThreadState`'s
@@ -1699,8 +1715,6 @@ async function dropFromSweepCard(
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
     ...(fixes ? { fixes } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
-    // The same card minus some items, so any gate words of its own stay; a
-    // sweep card has none.
     ...ownWords(pending),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.

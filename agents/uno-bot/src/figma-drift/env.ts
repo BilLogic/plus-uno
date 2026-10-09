@@ -43,7 +43,8 @@ import { SWEEP_CARD_EVENT } from "../sweep/cards";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { ScheduledJob } from "../scheduled/runs";
 import { DRIFT_CARD_TTL_MS } from "./copy";
-import type { FileDriftFinding, FileDriftSink } from "./finding";
+import { LEGACY_DRIFT_KEY, type FileDriftFinding, type FileDriftSink } from "./finding";
+import { proposalReplyThread } from "../thread-state/index";
 import { modelFrameJudge } from "./judge";
 import {
   recheckLiveAsks,
@@ -203,6 +204,10 @@ function recheckDepsFor(env: Env, kv: KVNamespace, dryRun: boolean): Parameters<
     reports: threadState,
     async recordWithdrawn(proposalTs) {
       await recordProposalEvents(proposalEventLogFor(env), [proposalEvent(proposalTs, "cancelled", Date.now(), "worker")]);
+    },
+    async legacyCard(channel, thread) {
+      const cards = await threadState.getProposalsByChannel(channel);
+      return cards.find((p) => p.supersedeKey === LEGACY_DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
     },
     async cardFiled(ts) {
       return (await proposalEventLogFor(env).eventsOf(ts)).some((e) => e.event === "confirmed");

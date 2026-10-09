@@ -32,6 +32,7 @@ import {
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { PRECEDENCE_INTAKE_TITLE } from "../src/ds-precedence/report";
+import { LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
 import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
@@ -1282,6 +1283,34 @@ test("a revision refused from outside the set names the standing confirmers too"
   assert.equal(outcome.disposition, "asked");
   assert.match(outcome.posted ?? "", /Only <@U0OWNER> or <@U0LEAD> can change/);
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
+// A file-drift card from before the shared card still says `drop N`, `skip`
+// and "yes" in its footer. Those words decide nothing now: they get one line
+// pointing at Review, with no model call and no revision. Anything else said
+// under it is the thread's own conversation.
+test("a reply in an old file-drift card's own words gets one line pointing at Review, never a revision", async () => {
+  const figma = { toolName: "notion_create", input: { surface: "prd", title: "Update Recap in Figma" } };
+  const code = { toolName: "github_issue_create", input: { title: "Update Button.jsx in code", body: "b" } };
+  const oldCard: PendingProposal = {
+    ...PENDING,
+    operations: [figma, code],
+    toolName: figma.toolName,
+    input: figma.input,
+    ttlMs: 72 * 60 * 60 * 1000,
+    confirmers: ["U0OWNER"],
+    supersedeKey: "figma-drift",
+    stated: { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." },
+  };
+  for (const text of ["drop 2", "skip", "yes"]) {
+    const h = harness();
+    await h.threadState.putProposal(oldCard);
+    const outcome = await runTurn(request({ text, pending: oldCard, userId: "U0OWNER" }), h.deps);
+    assert.equal(outcome.disposition, "asked", text);
+    assert.equal(outcome.posted, LEGACY_DRIFT_REPLY, text);
+    assert.equal(h.provider.sends.length, 0, `${text}: no model call`);
+    assert.equal((await h.threadState.getProposalByTs(oldCard.proposalTs)).state, "found", `${text}: the card stays as it is`);
+  }
 });
 
 // A drop is a revision on the usage record like any other: the card it

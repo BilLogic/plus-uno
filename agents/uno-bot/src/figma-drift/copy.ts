@@ -69,9 +69,23 @@ export interface DriftFileWords {
   change: FileChange;
 }
 
-/** A file linked by its title, escaped. */
+/**
+ * A file as the report names it: "<file> — <frame>" for a Figma link to a
+ * frame, the file's name taken from the link and the frame's from its read;
+ * otherwise the title the sweep read.
+ *
+ * @param file - The file, its title as the sweep read it
+ */
+export function fileName(file: Pick<AskedFileWords, "title" | "url">): string {
+  const title = flat(file.title);
+  const fromLink = figmaFileName(file.url);
+  if (!fromLink) return title || "this file";
+  return title && title.toLowerCase() !== fromLink.toLowerCase() ? `${fromLink} — ${title}` : fromLink;
+}
+
+/** A file linked by its name, escaped. */
 export function fileLink(file: Pick<AskedFileWords, "title" | "url">): string {
-  return `<${file.url}|${escapeSlackText(flat(file.title) || "this file")}>`;
+  return `<${file.url}|${escapeSlackText(fileName(file))}>`;
 }
 
 /** A moment as its ET day, "Sep 24". */
@@ -113,7 +127,7 @@ export function elsewhereLine(file: Pick<AskedFileWords, "title" | "url">, cardL
  */
 export function driftItem(input: DriftFileWords & { id: string; owner: string | null; lane: IntakeLane }): ReportItem {
   const { file, change } = input;
-  const title = flat(file.title) || "this file";
+  const title = fileName(file);
   const when = change.kind === "unknown" ? null : `last changed ${dayWords(change.at)}`;
   const subtitle = [input.owner ? `<@${input.owner}>` : null, when].filter(Boolean).join(" · ");
   return {
@@ -202,6 +216,28 @@ export function pillarNote(note: string): string {
   return `_Product Pillar: ${escapeSlackText(note)}_`;
 }
 
+// ── Cards from before the shared card ────────────────────────────────────────
+//
+// A card posted before the drift report moved to the shared card is one
+// message and one proposal, with a ✅/⛔ footer and `drop N`/`skip` in its
+// words. It lives out its 72 h as it posted; these are the two lines it may
+// still need.
+
+/**
+ * Such a card, edited once every file it names shows its decision: its own
+ * question struck through.
+ *
+ * @param headline - Its question, as its live record kept it
+ * @param at - The latest change that showed it
+ */
+export function legacyCaughtUpText(headline: string, at: number): string {
+  return `~${headline}~ Yes, updated ${dayWords(at)}. Nothing to do.`;
+}
+
+/** What a reply that answers such a card's footer in words is told. */
+export const LEGACY_DRIFT_REPLY =
+  "That card is decided from its Review button now: Approve files its intakes as drafted, and Reject files nothing.";
+
 // ── Words ────────────────────────────────────────────────────────────────────
 
 function isFigma(kind: TargetKind): boolean {
@@ -246,6 +282,19 @@ const COUNTS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "
 
 function countWords(n: number): string {
   return COUNTS[n] ?? String(n);
+}
+
+/** A Figma frame link's file name, off its slug ("Session-Recap" →
+ *  "Session Recap"); null for any other link, or one naming no frame. */
+function figmaFileName(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (!/(^|\.)figma\.com$/i.test(u.hostname) || !u.searchParams.get("node-id")) return null;
+    const slug = u.pathname.split("/")[3];
+    return slug ? decodeURIComponent(slug).replace(/[-_]+/g, " ").trim() || null : null;
+  } catch {
+    return null;
+  }
 }
 
 function flat(text: string): string {

@@ -20,6 +20,34 @@
 
 import type { ChannelKind, FindingEvidence, FindingTarget, TargetKind } from "../sweep/finding";
 
+/** The slot a drift card took before the drift report moved to the shared
+ *  card: one message, one proposal, a ✅/⛔ footer. Such a card lives out its
+ *  72 h as it posted; nothing stages under this key any more. */
+export const LEGACY_DRIFT_KEY = "figma-drift";
+
+/**
+ * Whether a reply answers such a card's footer in its own words — `drop 2`,
+ * `skip`, or a bare "yes" — which decide nothing now.
+ *
+ * @param text - The reply, as Slack sent it
+ */
+export function answersLegacyDriftCard(text: string): boolean {
+  const t = text
+    .replace(/<@[A-Z0-9]+>/g, " ")
+    .replace(/[’‘]/g, "'")
+    .replace(/`/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase()
+    .replace(/[.!,\s]+$/, "");
+  return (
+    /^(drop|keep) \d+((\s*,\s*|\s+and\s+)\d+)*$/.test(t) ||
+    t === "skip" ||
+    /^(yes|yep|yeah|yup)(,? (it'?s |it is )?(already )?(up[ -]to[ -]date|current|updated))?$/.test(t) ||
+    /^(it'?s |it is )?already (updated|current|up[ -]to[ -]date)$/.test(t)
+  );
+}
+
 /** Which hand-off a card's Approve files. */
 export type IntakeLane = "roadmap" | "maintain";
 

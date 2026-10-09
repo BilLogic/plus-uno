@@ -52,6 +52,7 @@ import {
   DRIFT_NOT_POSTED_TEXT,
   DRIFT_NOT_STAGED,
   elsewhereLine,
+  fileName,
   pillarNote,
   type DriftFileWords,
 } from "../src/figma-drift/copy";
@@ -572,7 +573,7 @@ describe("what a stated card says at the gate", () => {
 // ✅ or ⛔ does, and nothing asks for a typed `skip`, "yes" or `drop N`.
 
 describe("the drift card (#886 § 3.3)", () => {
-  const FILE = { title: "Goal Setting / Card 2482", url: "https://www.figma.com/design/K/Goal-Setting?node-id=1-2", kind: "figma" as const };
+  const FILE = { title: "Goal states", url: "https://www.figma.com/design/K/Goal-Setting?node-id=1-2", kind: "figma" as const };
   const CODE = { title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" as const };
   const SEP_24 = Date.UTC(2026, 8, 24, 16);
   const one: DriftFileWords = { file: FILE, threadSays: "tooltips on option chips", decidedAt: SEP_24, change: { kind: "unchanged", at: Date.UTC(2026, 8, 20, 15) } };
@@ -595,7 +596,7 @@ describe("the drift card (#886 § 3.3)", () => {
   it("a file drafted in another thread is a one-line pointer, linked when the link could be read", () => {
     assert.equal(
       elsewhereLine(FILE, "https://plus.slack.com/archives/C0/p1"),
-      "The intake for <https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting / Card 2482> is drafted <https://plus.slack.com/archives/C0/p1|in another thread>.",
+      "The intake for <https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting — Goal states> is drafted <https://plus.slack.com/archives/C0/p1|in another thread>.",
     );
     assert.match(elsewhereLine(FILE, null), /is drafted in another thread\.$/);
     passesChecklist(elsewhereLine(FILE, null));
@@ -605,11 +606,11 @@ describe("the drift card (#886 § 3.3)", () => {
     const item = driftItem({ id: "1", ...one, owner: MERYEM, lane: "roadmap" });
     assert.deepEqual(item, {
       id: "1",
-      title: "Goal Setting / Card 2482",
+      title: "Goal Setting — Goal states",
       subtitle: "<@U0MERYEM1> · last changed Sep 20",
       body: 'Thread settled "tooltips on option chips" on Sep 24 · the file has not changed since Sep 20.',
       open: { label: "Open in Figma", url: FILE.url },
-      done: "a Roadmap card to update Goal Setting / Card 2482",
+      done: "a Roadmap card to update Goal Setting — Goal states",
     });
     const changed = driftItem({ id: "2", ...one, change: { kind: "changed", at: Date.UTC(2026, 8, 26, 18) }, owner: null, lane: "roadmap" });
     assert.equal(changed.subtitle, "last changed Sep 26");
@@ -622,6 +623,13 @@ describe("the drift card (#886 § 3.3)", () => {
     for (const i of [item, changed, code]) assert.doesNotMatch(JSON.stringify(i), GATE_WORDS);
   });
 
+  it("names a linked frame after its file, and anything else by the title read", () => {
+    assert.equal(fileName(FILE), "Goal Setting — Goal states", "the file off the link, the frame off its read");
+    assert.equal(fileName({ ...FILE, title: "Goal Setting" }), "Goal Setting", "a frame read under the file's own name says it once");
+    assert.equal(fileName({ ...FILE, url: "https://www.figma.com/design/K/Goal-Setting" }), "Goal states", "a link to no frame");
+    assert.equal(fileName(CODE), "Button.jsx");
+  });
+
   it("a long paraphrase is cut inside the quote, so the card's body keeps what the file did", () => {
     const item = driftItem({ id: "1", ...one, threadSays: "word ".repeat(80), owner: null, lane: "roadmap" });
     assert.ok(item.body.length <= 200, `${item.body.length}`);
@@ -632,7 +640,7 @@ describe("the drift card (#886 § 3.3)", () => {
     const text = renderProposalCard(driftReview({ ...one, lane: "roadmap", note: null }, { toolName: "notion_create", input: {} })).text;
     assert.equal(
       text,
-      '*<https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting / Card 2482>:* this thread settled "tooltips on option chips" on Sep 24, and the file hasn\'t changed since Sep 20.',
+      '*<https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting — Goal states>:* this thread settled "tooltips on option chips" on Sep 24, and the file hasn\'t changed since Sep 20.',
     );
     passesChecklist(text);
     const noted = renderProposalCard(driftReview({ ...one, lane: "roadmap", note: pillarNote("left unset") }, { toolName: "notion_create", input: {} })).text;

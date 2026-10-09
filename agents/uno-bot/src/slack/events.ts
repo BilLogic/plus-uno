@@ -87,10 +87,10 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   switch (event.type) {
     case "message": {
       const msg = event as SlackMessageEvent;
-      // A `drop N` reply in the weekly DS precedence thread, a "yes, it's
-      // up to date" in a thread asked about a file, and an answer under a card
-      // follow-up are queued like a turn and handled at the head of the
-      // thread's job (`message-job.ts`).
+      // A `drop N` reply in the weekly DS precedence thread, a reply in a
+      // Figma comment-decision thread, and an answer under a card follow-up
+      // are queued like a turn and handled at the head of the thread's job
+      // (`message-job.ts`).
       // The handler chosen here rides on the job, so the job re-derives
       // nothing and a reply no handler wants pays no claim there.
       const reply = await replyHandlerAt(env, msg);

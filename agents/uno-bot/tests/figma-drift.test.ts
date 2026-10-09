@@ -27,13 +27,17 @@ import {
   type DriftPostDeps,
   type DriftRecheckDeps,
 } from "../src/figma-drift/run";
-import { DRIFT_CARD_TTL_MS, DRIFT_NO_REVISION, driftCardWords } from "../src/figma-drift/copy";
+import { DRIFT_CARD_TTL_MS, DRIFT_NO_REVISION, driftCardWords, LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
 import { FRAME_MATCH_SYSTEM, frameMatchPrompt, modelFrameJudge, parseFrameMatch } from "../src/figma-drift/judge";
 import { fakeProvider, type FakeProvider } from "../src/agent/providers/fake";
 import type { FigmaNode } from "../src/integrations/figma-reading";
 import { githubInert, matchPillar, NEUTRAL_SETTLED } from "../src/figma-drift/draft";
-import { fileKeyOf } from "../src/figma-drift/finding";
-import { itemProposalKey, settleItem, type ReportMessage } from "../src/slack/decision-cards";
+import { answersLegacyDriftCard, fileKeyOf, LEGACY_DRIFT_KEY } from "../src/figma-drift/finding";
+import { itemProposalKey, itemText, settleItem, type ReportMessage } from "../src/slack/decision-cards";
+import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
+import { recordingDelivery } from "../src/turn/index";
+import { proposalReplyThread, type PendingProposal } from "../src/thread-state/index";
+import { recordingViews } from "./helpers/recording-slack";
 import { resolveSignal } from "../src/gate/index";
 import { renderGateNote } from "../src/slack/gate-note";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
@@ -718,6 +722,10 @@ function recheck(
     async cardFiled(proposalTs) {
       return (await h.proposalEvents.eventsOf(proposalTs)).some((e) => e.event === "confirmed");
     },
+    async legacyCard(channel, thread) {
+      const cards = await h.threadState.getProposalsByChannel(channel);
+      return cards.find((p) => p.supersedeKey === LEGACY_DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
+    },
     now: () => h.clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
@@ -1233,5 +1241,127 @@ describe("a file-change notification (#896)", () => {
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     assert.equal(await recheckOnUpdate(FILE_KEY, { ...r.deps, store: drifts }), null);
     assert.deepEqual(r.edits, []);
+  });
+});
+
+describe("a drift card decided in Review", () => {
+  it("keeps a Reject's reason on the card and in View", async () => {
+    const { h, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const [report] = m.posted;
+    const updates: Array<{ ts: string; message: { blocks: unknown[] } }> = [];
+    const deps: ReviewDoorDeps = {
+      threadState: h.threadState,
+      views: recordingViews({ alreadyOpen: ["V1"] }).client,
+      delivery: () => recordingDelivery(),
+      applyVerdict: async () => [],
+      updateCard: async (_channel, ts, message) => void updates.push({ ts, message }),
+      restage: async () => {},
+      revise: async () => {},
+      now: () => h.clock.now,
+    };
+    await runReviewDecision(
+      { viewId: "V1", channel: DESIGN, messageTs: itemProposalKey(report!.ts, "1"), userId: "U0BEA", decision: "cancel", note: "Already updated" },
+      deps,
+    );
+    assert.deepEqual(updates.map((u) => u.ts), [report!.ts], "the report, redrawn");
+    const [card] = cardsOf(updates[0]!.message.blocks);
+    assert.equal(card!.subtitle!.text, "Rejected by <@U0BEA>");
+    assert.equal(card!.body!.text, "Nothing written. Reason: Already updated");
+    assert.deepEqual(labels(card!), ["View", "Open in Figma"]);
+    assert.match(itemText((await h.threadState.getReport(report!.ts))!, "1") ?? "", /Reason: Already updated$/, "View shows it too");
+  });
+});
+
+// ── Cards from before the shared card ─────────────────────────────────────────
+//
+// A card posted before the drift report moved to the shared card lives out its
+// 72 h: one message, one proposal under `LEGACY_DRIFT_KEY`, a ✅/⛔ footer, and
+// a live record with no `itemId` (a question's record names it by `cardTs`).
+
+describe("a card from before the shared card", () => {
+  const OLD_CARD = ts(30, 13, 0, 1);
+  const OLD_QUESTION = ts(30, 13, 0, 2);
+  const OTHER_THREAD = ts(29, 17);
+
+  /** The old card in the recap thread, its live record, and a question in another thread pointing at it. */
+  async function legacy(h: SweepHarness, drifts: InMemoryDriftStore, t: ReturnType<typeof thread>): Promise<void> {
+    const op = { toolName: "notion_create", input: { surface: "prd", title: "Update Session Recap in Figma" } };
+    const card: PendingProposal = {
+      operations: [op],
+      toolName: op.toolName,
+      input: op.input,
+      channel: DESIGN,
+      threadTs: t.root.ts,
+      replyTs: t.root.ts,
+      userMsgTs: t.root.ts,
+      proposalTs: OLD_CARD,
+      proposalText: "*Is the Figma file still current?* …",
+      requesterUserId: "",
+      ttlMs: DRIFT_CARD_TTL_MS,
+      confirmers: ["U0BEA"],
+      supersedeKey: LEGACY_DRIFT_KEY,
+      stated: driftCardWords(72),
+    };
+    await h.threadState.putProposal(card);
+    const file = {
+      fileKey: `figma:${FILE_KEY}`,
+      kind: "figma" as const,
+      url: FIGMA_A.url,
+      decidedAt: at(29, 16),
+      threadSays: "The recap drops the Share button.",
+      sourceSays: "It has a Share button.",
+      checkedThrough: at(29, 16),
+    };
+    const old = { channel: DESIGN, headline: "Is the Figma file still current?", askedAt: at(30, 13) };
+    await drifts.saveLiveAsk({ ...old, ts: OLD_CARD, threadTs: t.root.ts, role: "card", files: [file] });
+    await drifts.saveLiveAsk({ ...old, ts: OLD_QUESTION, threadTs: OTHER_THREAD, role: "question", files: [{ ...file, cardTs: OLD_CARD }] });
+  }
+
+  async function caughtUp() {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0BEA", when: ts(29, 16) }]);
+    const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [] });
+    const figma = createInMemoryFigma();
+    seedFigmaFile(figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    await legacy(h, drifts, t);
+    return { h, drifts, figma };
+  }
+
+  it("is still withdrawn whole once its file catches up: retired, its question struck through, recorded", async () => {
+    const { h, drifts, figma } = await caughtUp();
+    const r = recheck(h, drifts, figma, { judge: async () => "shows" });
+    await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(
+      r.edits.map((e) => [e.ts, e.text]),
+      [
+        [OLD_CARD, "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."],
+        [OLD_QUESTION, "The file now shows this thread's decision, updated Sep 30. Nothing to do."],
+      ],
+    );
+    assert.notEqual((await h.threadState.getProposalByTs(OLD_CARD)).state, "found", "no ✅ can file it now");
+    assert.deepEqual((await h.proposalEvents.eventsOf(OLD_CARD)).map((e) => e.event), ["cancelled"]);
+    assert.deepEqual(await drifts.liveAsks(), []);
+  });
+
+  it("leaves its question as it is when the card's ✅ already filed the intake", async () => {
+    const { h, drifts, figma } = await caughtUp();
+    await recordProposalEvents(h.proposalEvents, [proposalEvent(OLD_CARD, "confirmed", at(30, 15), "reaction")]);
+    await h.threadState.retireProposal(OLD_CARD);
+    const r = recheck(h, drifts, figma, { judge: async () => "shows" });
+    const result = await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(r.edits, [], "neither the filed card nor its question says there is nothing to do");
+    assert.match(result.note ?? "", /its card filed the intake/);
+  });
+
+  it("reads its footer's `drop 2`, `skip` or yes as words to answer with one line, and nothing else", () => {
+    for (const text of ["drop 2", "drop 1 and 2", "keep 1", "skip", "Skip.", "`skip`", "yes", "yep, it's up to date", "already updated", "<@U0BOT> skip"]) {
+      assert.equal(answersLegacyDriftCard(text), true, text);
+    }
+    for (const text of ["yes please file it", "what does drop 2 do?", "skip the recap for now, we'll revisit", "is the frame updated?"]) {
+      assert.equal(answersLegacyDriftCard(text), false, text);
+    }
+    assert.doesNotMatch(LEGACY_DRIFT_REPLY, GATE_WORDS);
+    assert.match(LEGACY_DRIFT_REPLY, /Review/);
   });
 });
