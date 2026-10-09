@@ -1,9 +1,9 @@
 // One queued `message` job, from the dedup claim to the turn — the part of
 // `onMessage` that decides WHAT runs, on named dependencies so the orderings
-// that matter are driven with fakes (tests/ds-precedence-queued.test.ts).
+// that matter are driven with fakes (tests/message-job.test.ts).
 //
-// A reply handled ahead of the turn — a `drop N` in a weekly DS precedence
-// list thread, an answer under a card follow-up — is handled HERE, at the head
+// A reply handled ahead of the turn — a typed gate emoji in a weekly DS
+// precedence thread, a Figma rewording, or a card follow-up answer — is handled HERE, at the head
 // of the thread's own job, and nowhere earlier. Which handler, if any, was
 // decided when the message was queued (`chainReplyHandlers`), so a reply no
 // handler wanted pays no claim and no second engagement check here. For a handled reply:
@@ -11,17 +11,16 @@
 //     `message` event and its `app_mention` twin try it once between them;
 //     one that is handled also marks the message's own key done, so the twin
 //     that lands second runs no turn;
-//   • the thread's runner takes one job at a time, so two quick disputes each
-//     read the thread record the other left;
-//   • a dispute that is NOT handled (not a list thread) leaves the message's
+//   • the thread's runner takes one job at a time, so two quick replies each
+//     read the record the other left;
+//   • a dispute that is NOT handled (not its thread) leaves the message's
 //     key alone and takes the ordinary path exactly as the message would have
 //     without it: a subtype such as a `thread_broadcast` is skipped unclaimed,
 //     and a reply the engagement gate would not have queued runs nothing —
 //     so an `app_mention` twin arriving second still gets its turn;
 //   • a handler that throws falls through to the ordinary turn in the same
-//     job, so the reply is answered rather than dropped. The DS revision
-//     relies on this. The card handler catches every failure, a budget stop
-//     included.
+//     job, so the reply is answered rather than dropped. The card handler
+//     catches every failure, a budget stop included.
 
 import type { RunClaim } from "../thread-state/index";
 import type { SlackMessageEvent } from "./types";

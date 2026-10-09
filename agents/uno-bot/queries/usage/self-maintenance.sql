@@ -10,9 +10,10 @@
 --     proposal_events does not store a card's supersedeKey, so its cards are
 --     told apart by who staged them and what they run: worker cards (via
 --     'worker') whose every operation is one of Reconcile's own tools —
---     github_issue_create and github_issue_update (the weekly DS precedence
---     check, src/ds-precedence/) and component_implement (the library
---     watcher, src/figma-library/). Capture's worker cards run notion_update
+--     ds_precedence_intake (the weekly DS precedence check,
+--     src/ds-precedence/, whose older cards ran github_issue_create and
+--     github_issue_update), and github_issue_create and component_implement
+--     (the library watcher, src/figma-library/). Capture's worker cards run notion_update
 --     or sweep_share_post and never count. The residual: a future Capture
 --     card that only files a GitHub intake would read as Reconcile.
 --     proposed = those cards; accepted = those with a ✅ (a re-stage's
@@ -72,7 +73,7 @@ WITH
       AND json_array_length(s.tools) > 0
       AND NOT EXISTS (
         SELECT 1 FROM json_each(s.tools)
-        WHERE value NOT IN ('github_issue_create', 'github_issue_update', 'component_implement')
+        WHERE value NOT IN ('ds_precedence_intake', 'github_issue_create', 'github_issue_update', 'component_implement')
       )
   ),
   fixes(job, fix_ms) AS (
