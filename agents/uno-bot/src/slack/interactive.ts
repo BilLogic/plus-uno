@@ -389,7 +389,7 @@ async function reviseFromReview(
       await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {
-      await updateMessage(env, { channel: proposal.channel, ts: proposal.item?.messageTs ?? proposal.proposalTs, text: message.text, blocks: message.blocks });
+      await updateMessage(env, { channel: proposal.channel, ts: proposal.item?.messageTs ?? proposal.proposalTs, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
     },
   });
 }
@@ -415,7 +415,8 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
     // its card whether its write went through.
     applyVerdict: (verdict) => runVerdict(env, verdict),
     updateCard: async (channel, ts, message) => {
-      const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      // A report's tag rides its redraw, so a search by it still finds the message.
+      const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
       // Cosmetic, as the button door's re-render is: the decision is already
       // announced in the thread.
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);

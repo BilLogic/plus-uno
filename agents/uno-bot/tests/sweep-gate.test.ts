@@ -1,11 +1,12 @@
-// A sweep card through Gate: who may confirm it, what one ✅ runs, and what
-// becomes of each item.
+// A sweep report's fixes through Gate: who may decide one, what its Approve
+// runs, and what becomes of each item.
 //
-// The card is staged by a real morning job into the in-memory ThreadState,
-// resolved by `resolveSignal` exactly as a reaction on it would be, and its
-// batch run through `runOperations` against a fake Notion that refuses a
-// replace whose stamp has moved — the integration's own rule (ADR-029). What
-// became of each item is then recorded as the executor records it.
+// The report is staged by a real morning job into the in-memory ThreadState,
+// one proposal per fix; each is decided by `resolveSignal` exactly as its
+// Review pop-up's Submit would, and its operation run through
+// `runOperations` against a fake Notion that refuses a replace whose stamp
+// has moved — the integration's own rule (ADR-029). What became of each item
+// is then recorded as the executor records it.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -27,9 +28,9 @@ const END_OF_DAY: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel"
 const MORNING: ScheduledJob = { key: "sweep-post", kind: "sweep-post" };
 const ROOT = ts(29, 15);
 
-/** A card with `n` fixes on one page, owned alternately by Ade and Bea, in a
+/** A report of `n` fixes on one page, owned alternately by Ade and Bea, in a
  *  thread Sam started — staged by a real night and morning. */
-async function stagedCard(n: number, page: SweepSource = pageWith(n)) {
+async function stagedReport(n: number, page: SweepSource = pageWith(n)) {
   const history = [msg("U0SAM", ROOT, `PRD: <${page.url}>`, { reply_count: 2, latest_reply: ts(29, 17) })];
   const replies = [msg("U0ADE", ts(29, 16), "I'll take the date."), msg("U0BEA", ts(29, 17), "Owner is me now.")];
   const h = sweepHarness({
@@ -53,8 +54,8 @@ async function stagedCard(n: number, page: SweepSource = pageWith(n)) {
   await runSweepJob(END_OF_DAY, h.deps);
   h.clock.now = at(30, 14);
   await runSweepJob(MORNING, h.deps);
-  assert.equal(h.staged.length, 1);
-  return { h, card: h.staged[0]! };
+  assert.equal(h.staged.length, n, "one proposal per fix");
+  return { h, fixes: [...h.staged] };
 }
 
 function pageWith(n: number): SweepSource {
@@ -66,15 +67,6 @@ function pageWith(n: number): SweepSource {
     })),
   });
 }
-
-const react = (card: PendingProposal, userId: string, glyph = "white_check_mark") => ({
-  kind: "reaction" as const,
-  messageTs: card.proposalTs,
-  channel: card.channel,
-  thread: ROOT,
-  glyph,
-  userId,
-});
 
 /** A fake Notion page: a replace lands only on the stamp it read, and only on
  *  a block of plain words — the integration's own two refusals. */
@@ -111,9 +103,17 @@ function fakeNotion(page: SweepSource) {
   return { blocks, formatted, execute };
 }
 
-test("a ✅ from someone neither an owner nor in the thread executes nothing", async () => {
-  const { h, card } = await stagedCard(2);
-  const verdict = await resolveSignal(react(card, "U0BYSTANDER"), { threadState: h.threadState });
+/** A Review decision on one fix, as its pop-up's Submit sends it. */
+const review = (fix: PendingProposal, userId: string, decision: "confirm" | "cancel" = "confirm") => ({
+  kind: "review" as const,
+  messageTs: fix.proposalTs,
+  decision,
+  userId,
+});
+
+test("an Approve from someone neither an owner nor in the thread executes nothing", async () => {
+  const { h, fixes } = await stagedReport(2);
+  const verdict = await resolveSignal(review(fixes[0]!, "U0BYSTANDER"), { threadState: h.threadState });
   assert.equal(verdict.outcome, "none");
   assert.equal(verdict.execute, undefined);
   assert.deepEqual(verdict.post?.note, {
@@ -121,67 +121,85 @@ test("a ✅ from someone neither an owner nor in the thread executes nothing", a
     confirmers: ["U0ADE", "U0BEA", "U0SAM"],
     userId: "U0BYSTANDER",
   });
-  assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "still live for its confirmers");
+  assert.equal((await h.threadState.getProposalByTs(fixes[0]!.proposalTs)).state, "found", "still live for its confirmers");
 });
 
-// The Worker stages a sweep card, so the Worker puts it on the usage record:
-// its ✅ or ⛔ then pairs with a staged row, as any card's does.
-for (const [glyph, outcome] of [
-  ["white_check_mark", "confirmed"],
-  ["no_entry", "cancelled"],
+test("a typed ✅ under a sweep report decides nothing: each fix is decided in its own Review", async () => {
+  const { h, fixes } = await stagedReport(2);
+  const verdict = await resolveSignal(
+    { kind: "typed", channel: DESIGN, thread: ROOT, text: "✅", userId: "U0ADE" },
+    { threadState: h.threadState },
+  );
+  assert.equal(verdict.execute, undefined);
+  assert.deepEqual(verdict.post?.note, { kind: "review-only" });
+  for (const fix of fixes) assert.equal((await h.threadState.getProposalByTs(fix.proposalTs)).state, "found");
+});
+
+// The Worker stages each fix, so the Worker puts it on the usage record: its
+// Approve or Reject then pairs with a staged row, as any card's does.
+for (const [decision, outcome] of [
+  ["confirm", "confirmed"],
+  ["cancel", "cancelled"],
 ] as const) {
-  test(`a sweep card has a staged row, and its ${outcome === "confirmed" ? "✅" : "⛔"} pairs with it`, async () => {
-    const { h, card } = await stagedCard(2);
-    const [staged] = await h.proposalEvents.eventsOf(card.proposalTs);
+  test(`a sweep fix has a staged row, and its ${decision === "confirm" ? "Approve" : "Reject"} pairs with it`, async () => {
+    const { h, fixes } = await stagedReport(2);
+    const fix = fixes[0]!;
+    const [staged] = await h.proposalEvents.eventsOf(fix.proposalTs);
     assert.equal(staged?.event, "staged");
     assert.equal(staged?.via, "worker");
-    const verdict = await resolveSignal(react(card, "U0ADE", glyph), { threadState: h.threadState });
+    const verdict = await resolveSignal(review(fix, "U0ADE", decision), { threadState: h.threadState });
     assert.equal(verdict.outcome, "won");
     await recordProposalEvents(h.proposalEvents, verdictEvents(verdict, h.clock.now + 60_000));
     assert.deepEqual(
-      (await h.proposalEvents.eventsOf(card.proposalTs)).map((e) => e.event),
+      (await h.proposalEvents.eventsOf(fix.proposalTs)).map((e) => e.event),
       ["staged", outcome],
     );
   });
 }
 
-test("a thread participant's ✅ executes", async () => {
-  const { h, card } = await stagedCard(2);
+test("a thread participant's Approve runs that fix and no other", async () => {
+  const { h, fixes } = await stagedReport(2);
   // Sam started the thread and owns neither fix.
-  const verdict = await resolveSignal(react(card, "U0SAM"), { threadState: h.threadState });
+  const verdict = await resolveSignal(review(fixes[1]!, "U0SAM"), { threadState: h.threadState });
   assert.equal(verdict.outcome, "won");
-  assert.equal(verdict.execute?.operations.length, 2);
+  assert.deepEqual(verdict.execute?.operations, fixes[1]!.operations);
+  assert.equal((await h.threadState.getProposalByTs(fixes[0]!.proposalTs)).state, "found", "the other waits on its own decision");
 });
 
-test("an owner's ✅ runs the card's whole batch inside one invocation's budget", async () => {
-  const page = pageWith(10);
-  const { h, card } = await stagedCard(10, page);
+test("an Approve records only its own item; the rest stay proposed", async () => {
+  const page = pageWith(3);
+  const { h, fixes } = await stagedReport(3, page);
   const notion = fakeNotion(page);
 
-  const verdict: GateVerdict = await resolveSignal(react(card, "U0ADE"), { threadState: h.threadState });
+  const verdict: GateVerdict = await resolveSignal(review(fixes[1]!, "U0ADE"), { threadState: h.threadState });
   assert.equal(verdict.outcome, "won");
   const { outcomes, spent } = await runMetered(async () => {
     const outcomes = await runOperations(verdict.execute!.operations, notion.execute);
     return { outcomes, spent: subrequestsUsed() };
   });
-
-  assert.equal(outcomes.length, 10);
-  assert.ok(outcomes.every((o) => o.ok));
-  assert.ok(spent <= 50, `ten fixes spent ${spent} of an invocation's 50`);
-  assert.equal(await recordSweepResolution(h.store, card, outcomes, at(30, 15)), 10);
-  assert.ok(h.store.items().every((i) => i.status === "confirmed" && i.resolvedAt === at(30, 15)));
+  assert.equal(outcomes.length, 1);
+  assert.ok(spent <= 50);
+  assert.equal(await recordSweepResolution(h.store, fixes[1]!, outcomes, at(30, 15)), 1);
+  const own = fixes[1]!.item!.id;
+  assert.deepEqual(
+    h.store.items().map((i) => [i.blockId, i.status]),
+    h.store.items().map((i) => [i.blockId, i.blockId === own ? "confirmed" : "proposed"]),
+  );
+  assert.equal(h.store.items().filter((i) => i.status === "confirmed").length, 1);
 });
 
 test("a moved stamp writes nothing and is recorded as refused_stale", async () => {
   const page = pageWith(2);
-  const { h, card } = await stagedCard(2, page);
+  const { h, fixes } = await stagedReport(2, page);
   const notion = fakeNotion(page);
   // Someone edited the first block in Notion after the sweep read it.
   notion.blocks.set("blk-0", { stamp: "2026-09-30T09:00:00.000Z", text: "Line 0, edited by hand" });
 
-  const verdict = await resolveSignal(react(card, "U0BEA"), { threadState: h.threadState });
-  const outcomes = await runOperations(verdict.execute!.operations, notion.execute);
-  await recordSweepResolution(h.store, card, outcomes, at(30, 15));
+  for (const fix of fixes) {
+    const verdict = await resolveSignal(review(fix, "U0BEA"), { threadState: h.threadState });
+    const outcomes = await runOperations(verdict.execute!.operations, notion.execute);
+    await recordSweepResolution(h.store, fix, outcomes, at(30, 15));
+  }
 
   assert.equal(notion.blocks.get("blk-0")!.text, "Line 0, edited by hand", "the hand edit survives");
   assert.equal(notion.blocks.get("blk-1")!.text, "Line 1 (fixed)");
@@ -198,65 +216,71 @@ test("a moved stamp writes nothing and is recorded as refused_stale", async () =
 // its own outcome, not a moved block and not a failure.
 test("a block refused for its formatting is recorded as refused_unwritable", async () => {
   const page = pageWith(2);
-  const { h, card } = await stagedCard(2, page);
+  const { h, fixes } = await stagedReport(2, page);
   const notion = fakeNotion(page);
   notion.formatted.add("blk-0");
 
-  const verdict = await resolveSignal(react(card, "U0BEA"), { threadState: h.threadState });
+  const verdict = await resolveSignal(review(fixes[0]!, "U0BEA"), { threadState: h.threadState });
   const outcomes = await runOperations(verdict.execute!.operations, notion.execute);
-  await recordSweepResolution(h.store, card, outcomes, at(30, 15));
+  await recordSweepResolution(h.store, fixes[0]!, outcomes, at(30, 15));
 
   assert.deepEqual(
     h.store.items().map((i) => [i.blockId, i.status]),
     [
       ["blk-0", "refused_unwritable"],
-      ["blk-1", "confirmed"],
+      ["blk-1", "proposed"],
     ],
   );
 });
 
-test("a ⛔ drops every item; a revision keeps what it kept and drops the rest", async () => {
-  const cancelled = await stagedCard(2);
-  await recordSweepResolution(cancelled.h.store, cancelled.card, undefined, at(30, 15));
-  assert.deepEqual(cancelled.h.store.items().map((i) => i.status), ["dropped", "dropped"]);
-
-  const revised = await stagedCard(3);
-  // "drop 2": the same batch without its second operation, on a new card.
-  const [first, second, third] = revised.card.operations!;
-  const dropped = (second!.input.replace as Array<{ block_id: string }>)[0]!.block_id;
-  const revision: PendingProposal = { ...revised.card, proposalTs: "1790776000.000001", operations: [first!, third!] };
-  assert.deepEqual(await recordSweepRevision(revised.h.store, revised.card, revision, at(30, 15)), { kept: 2, dropped: 1 });
-  for (const item of revised.h.store.items()) {
-    if (item.blockId === dropped) {
-      assert.deepEqual([item.status, item.proposalTs], ["dropped", revised.card.proposalTs]);
-    } else {
-      assert.deepEqual([item.status, item.proposalTs], ["proposed", revision.proposalTs], item.blockId);
-      assert.equal(item.postedAt, at(30, 14), "the revision keeps the card's deadline, so its posted time stands");
-    }
-  }
+test("a Reject drops its own item and no other", async () => {
+  const { h, fixes } = await stagedReport(2);
+  await recordSweepResolution(h.store, fixes[0]!, undefined, at(30, 15));
+  assert.deepEqual(
+    h.store.items().map((i) => [i.blockId, i.status]),
+    [
+      ["blk-0", "dropped"],
+      ["blk-1", "proposed"],
+    ],
+  );
 });
 
-test("a card staged beside a sweep card, not in its place, moves and drops none of its items", async () => {
-  const { h, card } = await stagedCard(2);
+test("a fix revised in place keeps its item on the report, and the revision's Reject drops only it", async () => {
+  const { h, fixes } = await stagedReport(2);
+  const fix = fixes[0]!;
+  const op = fix.operations![0]!;
+  const reworded = { ...op, input: { ...op.input, replace: [{ ...(op.input.replace as Array<Record<string, unknown>>)[0]!, content: "Line 0, reworded" }] } };
+  const revision: PendingProposal = { ...fix, operations: [reworded], proposalTs: `${fix.item!.messageTs}#${fix.item!.id}~1`, item: { messageTs: fix.item!.messageTs, id: `${fix.item!.id}~1` } };
+  assert.deepEqual(await recordSweepRevision(h.store, fix, revision, at(30, 15)), { kept: 1, dropped: 0 });
+  assert.ok(h.store.items().every((i) => i.status === "proposed" && i.proposalTs === fix.item!.messageTs), "still on the report's message");
+
+  await recordSweepResolution(h.store, revision, undefined, at(30, 16));
+  assert.deepEqual(
+    h.store.items().map((i) => [i.blockId, i.status]),
+    h.store.items().map((i) => [i.blockId, i.blockId === fix.item!.id ? "dropped" : "proposed"]),
+  );
+});
+
+test("a card staged beside a sweep fix, not in its place, moves and drops none of its items", async () => {
+  const { h, fixes } = await stagedReport(2);
   const beside: PendingProposal = {
-    ...card,
+    ...fixes[0]!,
     proposalTs: "1790776900.000001",
     operations: [{ toolName: "github_issue_create", input: { title: "Card copy" } }],
     sweepRun: undefined,
   };
-  assert.deepEqual(await recordSweepRevision(h.store, card, beside, at(30, 15)), { kept: 0, dropped: 0 });
-  assert.ok(h.store.items().every((i) => i.status === "proposed" && i.proposalTs === card.proposalTs));
+  assert.deepEqual(await recordSweepRevision(h.store, fixes[0]!, beside, at(30, 15)), { kept: 0, dropped: 0 });
+  assert.ok(h.store.items().every((i) => i.status === "proposed" && i.proposalTs === fixes[0]!.item?.messageTs));
 });
 
-test("a cut-off sweep card re-staged moves the items still to run to the fresh card, and leaves the rest", async () => {
-  const { h, card } = await stagedCard(3);
-  const [done, ...toRun] = card.operations!;
-  const fresh: PendingProposal = { ...card, proposalTs: "1790777000.000001", operations: toRun };
-  assert.equal(await recordSweepRestage(h.store, card, fresh, at(30, 16)), 2);
-  const doneBlock = (done!.input.replace as Array<{ block_id: string }>)[0]!.block_id;
+test("a cut-off sweep fix re-staged moves its item to the fresh card, and leaves the rest", async () => {
+  const { h, fixes } = await stagedReport(3);
+  const cut = fixes[1]!;
+  const fresh: PendingProposal = { ...cut, proposalTs: "1790777000.000001", item: undefined };
+  assert.equal(await recordSweepRestage(h.store, cut, fresh, at(30, 16)), 1);
+  const report = cut.item!.messageTs;
   for (const item of h.store.items()) {
     assert.equal(item.status, "proposed");
-    assert.equal(item.proposalTs, item.blockId === doneBlock ? card.proposalTs : fresh.proposalTs, item.blockId);
-    if (item.blockId !== doneBlock) assert.equal(item.postedAt, at(30, 16), "the fresh card's 72 h start now");
+    assert.equal(item.proposalTs, item.blockId === cut.item!.id ? fresh.proposalTs : report, item.blockId);
   }
 });

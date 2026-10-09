@@ -135,13 +135,44 @@ export const slackPostProbe: ProbeRun = async (env, url) => {
     return { body: { ok: false, error: "blocks is not JSON" }, status: 400 };
   }
   if (!Array.isArray(blocks)) return { body: { ok: false, error: "blocks must be a JSON array" }, status: 400 };
+  // A DM fixture can exercise report redraws without touching a real card.
+  // The probe edits only the message created by this call, twice at most.
+  const metadataParam = url.searchParams.get("metadata");
+  const editsParam = url.searchParams.get("edits");
+  let metadata: { event_type: string; event_payload: Record<string, unknown> } | undefined;
+  let edits: Array<{ text: string; blocks: unknown[] }> = [];
+  if (metadataParam !== null || editsParam !== null) {
+    const bad = (error: string) => ({ body: { ok: false, error }, status: 400 });
+    if (!channel.startsWith("D")) return bad("report fixtures use a DM");
+    if ((metadataParam?.length ?? 0) > PROBE_TEXT_LIMIT || (editsParam?.length ?? 0) > PROBE_TEXT_LIMIT) return bad("report fixture is too large");
+    try {
+      const tag = JSON.parse(metadataParam ?? "null");
+      if (tag?.event_type !== "uno_preview_report" || !tag.event_payload || typeof tag.event_payload !== "object" || Array.isArray(tag.event_payload)) return bad("report fixture needs uno_preview_report metadata");
+      metadata = tag;
+      const drawn = JSON.parse(editsParam ?? "[]");
+      if (!Array.isArray(drawn) || drawn.length > 2 || drawn.some((e) => !e || typeof e.text !== "string" || e.text.length > PROBE_TEXT_LIMIT || !Array.isArray(e.blocks))) return bad("report fixture needs at most two text-and-blocks edits");
+      edits = drawn;
+    } catch {
+      return bad("report fixture is not JSON");
+    }
+  }
   const payload: Record<string, unknown> = { channel };
   const threadTs = url.searchParams.get("thread_ts");
   if (threadTs) payload.thread_ts = threadTs;
   if (text) payload.text = text;
   payload.blocks = blocks;
+  if (metadata) payload.metadata = metadata;
   const res = await slackPost(env, "chat.postMessage", payload);
-  return { body: { sent: payload, slack: await res.json() } };
+  const posted = await res.json() as { ok?: boolean; ts?: string };
+  if (!metadata || !posted.ok || !posted.ts) return { body: { sent: payload, slack: posted } };
+  const updates: unknown[] = [];
+  for (const edit of edits) {
+    const result = await (await slackPost(env, "chat.update", { channel, ts: posted.ts, text: edit.text, blocks: edit.blocks, metadata })).json() as { ok?: boolean };
+    updates.push(result);
+    if (!result.ok) return { body: { sent: payload, slack: posted, updates } };
+  }
+  const read = await (await slackPost(env, "conversations.replies", { channel, ts: posted.ts, limit: 1, include_all_metadata: true })).json() as { ok?: boolean; error?: string; messages?: Array<{ metadata?: unknown }> };
+  return { body: { sent: payload, slack: posted, updates, metadata: read.messages?.[0]?.metadata, ...(read.ok ? {} : { readError: read.error }) } };
 };
 
 /** One Slack Web API call as the bot, the body sent as JSON exactly as given —
