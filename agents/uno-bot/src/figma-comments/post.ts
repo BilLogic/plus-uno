@@ -124,9 +124,9 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
       decisions: [],
     };
     const carded: string[] = [];
-    let n = 0;
     for (const d of waiting) {
-      n += 1;
+      // Numbered by the cards that went up, so a card that failed leaves no gap.
+      const n = thread.decisions.length + 1;
       const staged = await postDecision(deps, thread, n, d);
       if (!staged) continue;
       thread.decisions.push({ n, commentId: d.commentId, cardTs: staged, decision: d });

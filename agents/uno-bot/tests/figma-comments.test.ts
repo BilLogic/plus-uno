@@ -503,6 +503,7 @@ describe("the morning's thread in #plus-design (#900)", () => {
     const report = await runSweepJob(MORNING, h.deps);
     assert.match(report.summary, /1 decision\(s\) on GoalFile1 did not go through and wait for tomorrow$/);
     assert.equal(h.figma.messages[1]!.edited, "This decision didn't go through, so it's queued again for tomorrow morning.");
+    assert.match(h.figma.messages[2]!.text, /^\*1 · "States are all in/, "the next card takes the number, so the thread has no gap");
     assert.deepEqual(
       h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId),
       ["c1"],
