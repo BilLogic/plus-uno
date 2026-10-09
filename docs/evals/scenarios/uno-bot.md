@@ -21,11 +21,11 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **68** (B×7 · C×1 · CH×2 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · RT×3 · S×3 · T×2 · V×1 · W×1 · WL×2) |
+| cases | **70** (B×7 · C×1 · CH×2 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · RT×5 · S×3 · T×2 · V×1 · W×1 · WL×2) |
 | blockers | 30 |
-| turns · sample runs | 78 · 202 |
+| turns · sample runs | 80 · 208 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 51 |
+| recorded, so the pull-request gate reaches them | 53 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
@@ -599,6 +599,22 @@ _advisory · 3 samples · recorded_
 - **Trigger:** "Which research papers do we have on tutor feedback? Give me the list."
 - **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"present","args":{"shape":"table","lookup":"notion_search"}}` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 beside RT1 and RT2, from the same live miss on r518: the third estate, so the result table is shown to reach Notion research as well as the blueprint and GitHub. Research papers on a theme are rows of one shape (title, link, year or status), so they post as a result table: the turn runs notion_search with scope research_papers and asks `present` for a table of `notion_search`. Deterministic: a present call with shape table and lookup notion_search, and no emoji. For the judge: the reply leads with the theme the papers share in one sentence, names at most 3 papers, linked, and leaves the rest to the table. A plain bullet list of the papers fails. When the search returns one paper or none, a prose answer is right and the deterministic half fails honestly; the judge says so. [samples:3 — whether the model asks for a table or writes the rows out is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
+
+## RT4 — a yes/no blueprint question is answered in prose, with no table
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "Does the blueprint have a scenario for tutor no-shows?"
+- **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"present"` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 with RT1–RT3, as their counterweight: a search that returns 3 or more rows offers them as a table, and the offer must not turn every answer into one. The question is yes or no, so the answer is one sentence that says which, citing the scenario's row when there is one, and no `present` call. Deterministic: present is never called, and no emoji. For the judge: the reply opens on yes or no, links the scenario or the closest row when it relies on one, and does not list the search's rows. A table, or a list of every row the search returned, fails. [samples:3 — whether the model asks for a table or answers in prose is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
+
+## RT5 — a single-answer lookup is answered in prose, with no table
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "In the blueprint, who sends tutors the clearance email?"
+- **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"present"` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 with RT1–RT3, as their counterweight: the search returns several cells, but the question has one answer, the lane that sends the email. The reply names it in a sentence and links the cell it rests on, and calls no `present`. Deterministic: present is never called, and no emoji. For the judge: the reply gives the one lane, attributed to its cell, and does not table or list the other rows the search returned. A table fails, and so does a lane with no row behind it. [samples:3 — whether the model asks for a table or answers in prose is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
 
 ## WL1 — a conflict between the blueprint and the Roadmap goes in a ⚠️ line placed by code
 

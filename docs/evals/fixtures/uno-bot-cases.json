@@ -1327,6 +1327,40 @@
       "judgeNote": "AUTHORED 2026-10-09 beside RT1 and RT2, from the same live miss on r518: the third estate, so the result table is shown to reach Notion research as well as the blueprint and GitHub. Research papers on a theme are rows of one shape (title, link, year or status), so they post as a result table: the turn runs notion_search with scope research_papers and asks `present` for a table of `notion_search`. Deterministic: a present call with shape table and lookup notion_search, and no emoji. For the judge: the reply leads with the theme the papers share in one sentence, names at most 3 papers, linked, and leaves the rest to the table. A plain bullet list of the papers fails. When the search returns one paper or none, a prose answer is right and the deterministic half fails honestly; the judge says so. [samples:3 — whether the model asks for a table or writes the rows out is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]"
     },
     {
+      "id": "RT4",
+      "name": "a yes/no blueprint question is answered in prose, with no table",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "Does the blueprint have a scenario for tutor no-shows?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "present",
+      "textRegex": "^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))",
+      "judgeNote": "AUTHORED 2026-10-09 with RT1–RT3, as their counterweight: a search that returns 3 or more rows offers them as a table, and the offer must not turn every answer into one. The question is yes or no, so the answer is one sentence that says which, citing the scenario's row when there is one, and no `present` call. Deterministic: present is never called, and no emoji. For the judge: the reply opens on yes or no, links the scenario or the closest row when it relies on one, and does not list the search's rows. A table, or a list of every row the search returned, fails. [samples:3 — whether the model asks for a table or answers in prose is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]"
+    },
+    {
+      "id": "RT5",
+      "name": "a single-answer lookup is answered in prose, with no table",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "In the blueprint, who sends tutors the clearance email?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "present",
+      "textRegex": "^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))",
+      "judgeNote": "AUTHORED 2026-10-09 with RT1–RT3, as their counterweight: the search returns several cells, but the question has one answer, the lane that sends the email. The reply names it in a sentence and links the cell it rests on, and calls no `present`. Deterministic: present is never called, and no emoji. For the judge: the reply gives the one lane, attributed to its cell, and does not table or list the other rows the search returned. A table fails, and so does a lane with no row behind it. [samples:3 — whether the model asks for a table or answers in prose is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]"
+    },
+    {
       "id": "WL1",
       "name": "a conflict between the blueprint and the Roadmap goes in a ⚠️ line placed by code",
       "blocker": false,
