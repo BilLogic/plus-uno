@@ -440,6 +440,19 @@ async function applyRevise(
  */
 export const NEEDS_CHANGES_LEAD = "Needs changes on the proposal card above: ";
 
+/**
+ * The card a Needs changes sent back, as its revision turn revises it: the
+ * one the note names, not the thread's newest — a report holds one card per
+ * item in one thread. Null once it is decided, replaced or closed.
+ *
+ * @param store - The thread store
+ * @param key - The card's key, as the note carries it (`SlackMessageEvent.revises`)
+ */
+export async function cardSentBack(store: Pick<ThreadState, "getProposalByTs">, key: string): Promise<PendingProposal | null> {
+  const look = await store.getProposalByTs(key);
+  return look.state === "found" ? look.proposal : null;
+}
+
 /** What starting a revision needs: Slack, bound once in `slack/interactive.ts`. */
 export interface RevisionDeps {
   threadState: ThreadState;

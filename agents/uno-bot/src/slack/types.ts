@@ -38,6 +38,10 @@ export interface SlackMessageEvent {
    *  shortcut is the only setter — a draft goes out under the USER'S name, so
    *  the standard disclaimer describes the wrong risk. */
   footerHint?: "full" | "draft" | "none";
+  /** Also synthetic-only: on the note a Review's Needs changes queues, the
+   *  key of the card it sent back — the card its turn revises, whatever else
+   *  is live in the thread (`cardSentBack`). */
+  revises?: string;
   /** Workspace the message came from. Slack includes it on message events;
    *  chat.startStream needs it as recipient_team_id. */
   team?: string;
