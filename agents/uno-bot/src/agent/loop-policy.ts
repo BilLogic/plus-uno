@@ -104,12 +104,22 @@ export const BUDGET_EXHAUSTED_LOOKUP_NOTE =
  *  knows a budget refusal from a source failure (`turn/warning-line.ts`). */
 export const BUDGET_REFUSAL_ERROR = "no more lookups available this turn";
 
-/** The tool result a refused lookup reports, ready to hand back. */
-export function budgetRefusedResult(): string {
+/** Added when the COUNT of lookups refused, and the turn has round-trips
+ *  left: `present` fetches nothing, so it still runs. At the subrequest
+ *  ceiling the next pass answers with tools off, so nothing is promised. */
+const PRESENT_STILL_WORKS = " `present` is no lookup either: it still shows the rows you have as a table.";
+
+/**
+ * The tool result a refused lookup reports, ready to hand back.
+ *
+ * @param opts.presentStillWorks - The count of lookups refused, not the
+ *   subrequest ceiling, so the turn can still ask for a table
+ */
+export function budgetRefusedResult(opts: { presentStillWorks?: boolean } = {}): string {
   return JSON.stringify({
     ok: false,
     error: BUDGET_REFUSAL_ERROR,
-    note: BUDGET_EXHAUSTED_LOOKUP_NOTE,
+    note: BUDGET_EXHAUSTED_LOOKUP_NOTE + (opts.presentStillWorks ? PRESENT_STILL_WORKS : ""),
   });
 }
 
