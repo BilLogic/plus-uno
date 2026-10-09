@@ -89,6 +89,14 @@ export const FIGMA_PER_MINUTE: Readonly<Record<FigmaTier, number>> = { 1: 10, 2:
 /** uno-bot's share of each tier: half, rounded down. */
 export const UNO_SHARE_PER_MINUTE: Readonly<Record<FigmaTier, number>> = { 1: 5, 2: 12, 3: 25 };
 
+/**
+ * The snapshot-refresh Action's Tier 1 pace (`scripts/snapshot-figma-
+ * components.mjs` `NODES_SPACING_MS`, held equal by a test): uno-bot's share,
+ * which it has to itself because the Worker dispatches it only after the
+ * end-of-day run's Figma jobs (`src/scheduled/runs.ts`).
+ */
+export const SNAPSHOT_REFRESH_PER_MINUTE = UNO_SHARE_PER_MINUTE[1];
+
 const DEFAULT_TIMEOUT_MS = 15_000;
 const DEFAULT_MAX_WAIT_MS = 60_000;
 const DEFAULT_ATTEMPTS = 3;

@@ -42,9 +42,10 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * What a scheduled job does. `noop` proves the path and does nothing else.
  * The Figma library's four: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, the morning track follows
- * each posted card to its PR, and `figma-snapshot-refresh` — right after the
- * poll, and again in the morning — starts the refresh of the repo's library
- * snapshot once per publish (src/figma-poll.ts, src/figma-library/). The
+ * each posted card to its PR, and `figma-snapshot-refresh` — at the end of
+ * the end-of-day run, once its Figma reads are done — starts the refresh of
+ * the repo's library snapshot once per publish, and again each night until it
+ * lands (src/figma-poll.ts, src/figma-library/). The
  * usage record's two: the end-of-day classify jobs label a batch of channel
  * asks each, and the purge — in both runs — keeps text under its 14 days
  * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
@@ -184,9 +185,6 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
-    // A refresh of the repo's library snapshot the end-of-day run could not
-    // start — GitHub refused it — is tried again here (#898).
-    { key: "figma-snapshot-refresh", kind: "figma-snapshot-refresh" },
     { key: "sweep-post", kind: "sweep-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
     { key: "commitment-nudge", kind: "commitment-nudge" },
@@ -203,8 +201,6 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-poll", kind: "figma-library-poll" },
     // Second, so a rehearsal reaches it before the batches spend the ceiling.
     { key: "ds-precedence-check", kind: "ds-precedence-check", after: ["figma-library-poll"], weekday: FRIDAY },
-    // A publish the poll found starts the repo snapshot's refresh tonight (#898).
-    { key: "figma-snapshot-refresh", kind: "figma-snapshot-refresh", after: ["figma-library-poll"] },
     // Early too, for the same reason: one Roadmap read, a few lookups a card.
     { key: "card-follow-through", kind: "card-follow-through" },
     // A live drift question is looked at again in both runs, so a file that
@@ -214,6 +210,19 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     // so a night whose sweep fits in one finds the later ones done
     // (src/figma-notify/backstop.ts).
     ...Array.from({ length: BACKSTOP_JOBS }, (_, i) => ({ key: `figma-backstop-${i + 1}`, kind: "figma-backstop" as const })),
+    // A publish the poll found starts the repo snapshot's refresh tonight
+    // (#898) — after every job of the run that reads Figma, so the Action's
+    // node fetches never share uno-bot's half of Tier 1 with the Worker's own.
+    {
+      key: "figma-snapshot-refresh",
+      kind: "figma-snapshot-refresh",
+      after: [
+        "figma-library-poll",
+        "ds-precedence-check",
+        "figma-drift-recheck",
+        ...Array.from({ length: BACKSTOP_JOBS }, (_, i) => `figma-backstop-${i + 1}`),
+      ],
+    },
     // One job per classification batch, each an alarm of its own. Each takes
     // whatever is still pending, so a quiet day's later jobs find nothing.
     ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({

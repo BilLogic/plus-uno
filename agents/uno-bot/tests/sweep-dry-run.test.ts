@@ -139,12 +139,10 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 10);
+  assert.equal(body.planned.length, 9);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["figma-library-post", "handled", 0],
     ["figma-library-track", "handled", 0],
-    // No HARNESS_KV bound: nothing recorded, nothing to refresh.
-    ["figma-snapshot-refresh", "handled", 0],
     ["sweep-post", "handled", 0],
     ["ds-precedence-post", "handled", 0],
     ["commitment-nudge", "handled", 0],

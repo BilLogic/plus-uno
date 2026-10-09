@@ -108,8 +108,9 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
   },
-  // Both runs: a publish the poll found starts the refresh of the repo's
-  // library snapshot, once (src/figma-library/snapshot-refresh.ts).
+  // End of day, last of the Figma jobs: a publish the poll found starts the
+  // refresh of the repo's library snapshot, and again each night until it
+  // lands (src/figma-library/snapshot-refresh.ts).
   "figma-snapshot-refresh": async (env, _job, { dryRun }) => {
     const report = await runSnapshotRefreshOnEnv(env, { dryRun });
     console.log(`[figma-library] snapshot refresh: ${report.summary}`);
