@@ -6,8 +6,8 @@
 // nobody needs code started within minutes. It fetches the DS file's components
 // and published versions from the Figma REST API, diffs them against the
 // snapshot in KV, and when something changed it adds one change set to the
-// findings in KV. A new published version also owes the repo's copy of the
-// snapshot a refresh, recorded in KV for the `figma-snapshot-refresh` job
+// findings in KV. A new version, labelled or not, also owes the repo's copy of
+// the snapshot a refresh, recorded in KV for the `figma-snapshot-refresh` job
 // (src/figma-library/snapshot-refresh.ts). It posts nothing. The morning
 // run's `figma-library-post` job reads the findings and turns each into a
 // drafted intake and one card in
@@ -66,6 +66,7 @@ export const MAX_FINDINGS = 5;
 export interface Snapshot {
   lastChecked: string;
   components: LibraryComponent[];
+  /** Every recent version id, labelled or not (`everyVersionIdIn`). */
   versionIds: string[];
   nodeHashes: Record<string, string>;
 }
@@ -131,10 +132,12 @@ function diffComponents(oldComponents: LibraryComponent[], newComponents: Librar
  * @param opts - `dryRun` reads and diffs, and writes nothing
  */
 export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean } = {}): Promise<PollResult> {
-  const [components, versions] = await Promise.all([
+  const [components, versionsResponse] = await Promise.all([
     deps.figma.components(deps.fileKey).then(componentsFrom),
-    deps.figma.versions(deps.fileKey).then(versionsFrom),
+    deps.figma.versions(deps.fileKey),
   ]);
+  const versions = versionsFrom(versionsResponse);
+  const everyVersionId = everyVersionIdIn(versionsResponse);
   console.log(`[figma-poll] ${components.length} components, ${versions.length} recent published versions`);
   const at = new Date(deps.now()).toISOString();
 
@@ -142,7 +145,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   if (!snapshot) {
     const nodeHashes = await fetchNodeHashes(deps.figma, deps.fileKey, components);
     if (!opts.dryRun) {
-      await deps.snapshot.write({ lastChecked: at, components, versionIds: versions.map((v) => v.id), nodeHashes });
+      await deps.snapshot.write({ lastChecked: at, components, versionIds: everyVersionId, nodeHashes });
     }
     return { ran: true, summary: `initialized snapshot: ${components.length} components, ${Object.keys(nodeHashes).length} node hashes` };
   }
@@ -198,13 +201,18 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
     if (!opts.dryRun) await deps.findings.write(kept);
   }
 
-  // A publish owes the repo's copy a refresh (#898). Recorded before the
-  // snapshot moves on: a poll stopped in between finds the same versions again
-  // and merges the same ids; one that finished never reports them twice. A
-  // library edited with no new version owes nothing.
+  // A publish owes the repo's copy a refresh (#898), labelled or not: a
+  // publish left with no label or description reads like an autosave here, so
+  // every new version counts, and one that changed nothing costs a refresh
+  // that finds nothing. Recorded before the snapshot moves on: a poll stopped
+  // in between finds the same versions again and merges the same ids; one
+  // that finished never reports them twice. A library edited with no new
+  // version owes nothing.
   let refreshOwed: number | undefined;
-  if (newVersions.length && deps.owed) {
-    const owed = owedWith(await deps.owed.read(), newVersions.map((v) => v.id), at);
+  const newVersionIds = everyVersionId.filter((id) => !known.has(id));
+  if (newVersionIds.length && deps.owed) {
+    const labelled = new Set(newVersions.map((v) => v.id));
+    const owed = owedWith(await deps.owed.read(), newVersionIds, at, newVersionIds.filter((id) => !labelled.has(id)));
     refreshOwed = owed.versionIds.length;
     if (!opts.dryRun) await deps.owed.write(owed);
   }
@@ -213,12 +221,12 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
     await deps.snapshot.write({
       lastChecked: at,
       components,
-      versionIds: versions.map((v) => v.id),
+      versionIds: everyVersionId,
       nodeHashes: refreshedHashes ?? snapshot.nodeHashes ?? {},
     });
   }
 
-  if (!changed) return { ran: true, summary: "no changes since last check" };
+  if (!changed) return { ran: true, summary: "no changes since last check", ...(refreshOwed !== undefined ? { refreshOwed } : {}) };
   return {
     ran: true,
     summary: `changes detected — created:${diff.created.length} modified:${diff.modified.length} deleted:${diff.deleted.length} versions:${newVersions.length}`,
@@ -269,8 +277,10 @@ export function componentsFrom(result: FigmaComponentsResponse): LibraryComponen
   return mapped.filter((c) => !isIgnoredComponent(c));
 }
 
-/** Recent intentional publishes only, newest first — Figma autosaves have a
- *  null label AND description. */
+/** Recent labelled publishes only, newest first — what the release card
+ *  counts. Figma autosaves have a null label AND description, and so does a
+ *  publish left without either, so this cannot tell those two apart; the
+ *  snapshot refresh counts every version instead (`everyVersionIdIn`). */
 export function versionsFrom(result: FigmaVersionsResponse): PublishedVersion[] {
   return (result.versions ?? [])
     .slice(0, 30)
@@ -283,6 +293,12 @@ export function versionsFrom(result: FigmaVersionsResponse): PublishedVersion[] 
       createdAt: v.created_at,
       user: v.user?.handle ?? "Unknown",
     }));
+}
+
+/** Every recent version id, newest first, labelled or not — what the poll
+ *  remembers having seen, and what owes the repo's snapshot a refresh. */
+export function everyVersionIdIn(result: FigmaVersionsResponse): string[] {
+  return (result.versions ?? []).slice(0, 30).map((v) => v.id);
 }
 
 // ─── Node hashes (visual-change detection when metadata alone is silent) ────

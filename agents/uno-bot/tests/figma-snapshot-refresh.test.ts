@@ -135,6 +135,25 @@ describe("the snapshot refresh job", () => {
     assert.equal(w.gh.sent.length, 1);
   });
 
+  it("starts the refresh for a publish with no label, and settles it once GitHub takes the dispatch", async () => {
+    // The repo's snapshot records labelled versions only, so it never shows
+    // this one landing: the accepted dispatch is the most there is to wait for.
+    const w = world({ versionIds: [V5, V4], unlabelled: [V5], since: OWED.since });
+    const report = await w.night();
+    assert.deepEqual(w.gh.sent, [{ eventType: REFRESH_EVENT, payload: { figma_version_id: V5 } }]);
+    assert.equal(report.dispatched, true);
+    assert.deepEqual(w.owed.value, { versionIds: [V4], since: OWED.since, tries: 1, lastTry: "GitHub accepted the dispatch, and nothing has landed since" }, "the labelled one waits to land");
+
+    const unlabelledOnly = world({ versionIds: [V5], unlabelled: [V5], since: OWED.since }, { answers: [{ ok: false, status: 403 }] });
+    await unlabelledOnly.night();
+    assert.deepEqual(unlabelledOnly.owed.value?.unlabelled, [V5], "refused, it stays owed");
+    await unlabelledOnly.night();
+    assert.equal(unlabelledOnly.owed.value, null, "accepted, nothing is owed");
+    assert.equal(unlabelledOnly.gh.sent.length, 2);
+    await unlabelledOnly.night();
+    assert.equal(unlabelledOnly.gh.sent.length, 2, "and nothing is sent again");
+  });
+
   it("completes a run that gave up on a later night: still owed, so it is sent again (AC 2)", async () => {
     const w = world(OWED);
     await w.night();
