@@ -387,7 +387,7 @@ describe("the gate notes", () => {
     { kind: "superseded" },
     { kind: "superseded", stated: true },
     { kind: "resolved", decision: "confirm" },
-    { kind: "resolved", decision: "cancel", stillRuns: ["notion_create"] },
+    { kind: "resolved", decision: "cancel" },
     { kind: "not-on-the-card", toolName: "notion_create", glyph: "white_check_mark", userId: "U0000002" },
     { kind: "not-on-the-card", toolName: "notion_create", glyph: "no_entry", userId: "U0000002", stated: true },
     { kind: "which-card", count: 2 },

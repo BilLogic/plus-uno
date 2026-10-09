@@ -13,8 +13,8 @@
 //     card in it. The card files the weekly intake, or comments on the one
 //     already open. Confirmers are the channel's members, read now, as the
 //     library card reads them; the card lives six days, so it has gone before
-//     the next week's thread opens. It has no `onCancel`: its one operation is
-//     the intake, so a ⛔ files nothing.
+//     the next week's thread opens. Its one operation is the intake, so a ⛔
+//     files nothing.
 //     Every morning rather than only Monday's: a morning whose reads fail keeps
 //     the report, and the next one posts it.
 //   • the DROP — a reply in that thread starting `drop 2` (or `dispute 2`,

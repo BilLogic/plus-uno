@@ -46,6 +46,7 @@ import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
 import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
+import { cardSentBack } from "./review-door";
 
 // Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
 export type {
@@ -536,11 +537,14 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     [{ turns: history, participants }, pending, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
       // The card, by contrast, is the REPLY THREAD's: in a DM a card staged
-      // under one ask is no business of the next unthreaded ask.
-      threadStateFor(env).getProposalByThread({
-        channel,
-        thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }),
-      }),
+      // under one ask is no business of the next unthreaded ask. A Needs
+      // changes note names the card it sent back, and revises that one.
+      event.revises
+        ? cardSentBack(threadStateFor(env), event.revises)
+        : threadStateFor(env).getProposalByThread({
+            channel,
+            thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }),
+          }),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
         : Promise.resolve(null),
