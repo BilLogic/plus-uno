@@ -40,7 +40,6 @@
 import type { GateNote } from "../turn/index";
 import { PROPOSAL_TTL_MS, type StatedCardWords } from "../thread-state/index";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
-import { gateWordsFor } from "../agent/tool-table";
 
 /** The lost race. */
 export const STALE_POST =
@@ -99,20 +98,6 @@ export function rejectedLine(reason?: string): string {
   return reason ? `Rejected, so nothing runs. Reason: ${escapeSlackText(reason)}` : "Rejected, so nothing runs.";
 }
 
-/**
- * A ⛔ on a card that runs part of itself on a cancel. Worded from each row's
- * own operation kind, so it says what goes ahead rather than naming a tool.
- */
-function cancelStillRuns(toolNames: readonly string[]): string {
-  const kinds = [...new Set(toolNames.map((name) => thirdPerson(gateWordsFor(name)?.kind ?? name)))];
-  return `Cancelled — this card still ${kinds.join(" and ")} on a cancel, so that part goes ahead.`;
-}
-
-/** "file an issue" → "files an issue": a row's kind is a bare verb phrase. */
-function thirdPerson(phrase: string): string {
-  return phrase.replace(/^(\w+)/, (verb) => (/(s|sh|ch|x)$/.test(verb) ? `${verb}es` : `${verb}s`));
-}
-
 /** A signal on a card sent back with Needs changes, while its revision is
  *  written. Nothing ran, and the new card is where to decide. */
 export const BEING_REVISED_POST =
@@ -128,8 +113,8 @@ export function renderGateNote(note: GateNote): string {
     case "resolved":
       // A stated card's ⛔ says what its footer promised, in the card's words.
       if (note.decision === "cancel" && note.cancelled) return `${note.cancelled}.`;
-      if (note.decision === "cancel" && note.rejected && !note.stillRuns?.length) return rejectedLine(note.rejected.reason);
-      return note.stillRuns?.length ? cancelStillRuns(note.stillRuns) : defaultNarrative(note.decision);
+      if (note.decision === "cancel" && note.rejected) return rejectedLine(note.rejected.reason);
+      return defaultNarrative(note.decision);
     case "said":
       return note.text;
     case "already-resolved":

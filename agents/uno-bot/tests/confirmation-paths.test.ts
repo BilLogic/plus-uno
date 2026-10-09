@@ -480,73 +480,6 @@ describe("standing confirmers", () => {
   });
 });
 
-// A card the Worker stages itself may say what a ⛔ still runs — the library
-// card files its intake either way. A turn's card never sets it, so a cancel
-// there still runs nothing (the describe above).
-describe("a card that names what a cancel still runs", () => {
-  const INTAKE = { toolName: "github_issue_create", input: { title: "Figma publish", body: "…" } };
-  const DISPATCH = { toolName: "component_implement", input: { component: "Badge" } };
-  const CARD: PendingProposal = {
-    ...PROPOSAL,
-    toolName: INTAKE.toolName,
-    input: INTAKE.input,
-    operations: [INTAKE, DISPATCH],
-    onCancel: [INTAKE],
-  };
-
-  async function stagedCard(): Promise<ThreadState> {
-    const store = createInMemoryThreadState();
-    await store.putProposal(CARD);
-    return store;
-  }
-
-  it("runs only those operations on a ⛔, on every door, and says so", async () => {
-    const cancels: Array<{ name: string; signal: GateSignal }> = [
-      { name: "reaction", signal: reaction({ glyph: "no_entry" }) },
-      { name: "button", signal: button("cancel") },
-      { name: "typed", signal: typed("⛔") },
-      { name: "model", signal: { kind: "model", pending: CARD, decision: "cancel" } },
-    ];
-    for (const door of cancels) {
-      const verdict = await resolveSignal(door.signal, { threadState: await stagedCard() });
-      assert.equal(verdict.outcome, "won", door.name);
-      assert.equal(verdict.decision, "cancel", door.name);
-      assert.deepEqual(verdict.execute?.operations, [INTAKE], door.name);
-      if (door.signal.kind !== "model") {
-        assert.deepEqual(
-          verdict.post?.note,
-          { kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"] },
-          door.name,
-        );
-      }
-    }
-  });
-
-  it("runs the whole batch on a ✅", async () => {
-    const verdict = await resolveSignal(button("confirm"), { threadState: await stagedCard() });
-    assert.deepEqual(verdict.execute?.operations, [INTAKE, DISPATCH]);
-  });
-
-  it("records the cancel's run as the execution, so a cut-off one offers back only it", async () => {
-    let clock = 1_000_000;
-    const threadState = createInMemoryThreadState({ now: () => clock });
-    await threadState.putProposal(CARD);
-    await resolveSignal(button("cancel"), { threadState });
-    clock += EXECUTION_CUTOFF_MS + 1;
-    const execution = await threadState.takeCutOffExecution(CARD_TS);
-    assert.ok(execution);
-    assert.deepEqual(execution.proposal.operations, [INTAKE]);
-    assert.equal(execution.proposal.onCancel, undefined);
-  });
-
-  it("says in Slack what the cancel still does", () => {
-    assert.equal(
-      renderGateNote({ kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"] }),
-      "Cancelled — this card still files an issue on a cancel, so that part goes ahead.",
-    );
-  });
-});
-
 describe("a card that is no longer there", () => {
   it("tells a card with its own lifetime how long it was live", async () => {
     const HOUR_MS = 60 * 60 * 1000;
@@ -1185,7 +1118,7 @@ describe("Gate imports no Slack module", () => {
 describe("a stated card answers in its own words", () => {
   const HOUR_MS = 60 * 60 * 1000;
   const WORDS = {
-    cancelled: "Intake only",
+    cancelled: "Rejected, nothing filed",
     expired:
       "That card closed after 72 h with no decision, so nothing was drafted. " +
       "I file its intake the morning after, so the publish isn't lost.",
@@ -1196,7 +1129,6 @@ describe("a stated card answers in its own words", () => {
     toolName: INTAKE.toolName,
     input: INTAKE.input,
     operations: [INTAKE],
-    onCancel: [INTAKE],
     ttlMs: 72 * HOUR_MS,
     stated: WORDS,
   };
@@ -1229,7 +1161,7 @@ describe("a stated card answers in its own words", () => {
     return { delivery, ephemerals, notes };
   }
 
-  it("says the card's phrase for a ⛔ in the thread, on every door", async () => {
+  it("says the card's phrase for a ⛔ in the thread, on every door, and runs nothing", async () => {
     const cancels: Array<{ name: string; signal: GateSignal }> = [
       { name: "reaction", signal: reaction({ glyph: "no_entry" }) },
       { name: "button", signal: button("cancel") },
@@ -1238,19 +1170,26 @@ describe("a stated card answers in its own words", () => {
     for (const door of cancels) {
       const verdict = await resolveSignal(door.signal, { threadState: await stagedStated() });
       assert.equal(verdict.outcome, "won", door.name);
-      assert.deepEqual(verdict.execute?.operations, [INTAKE], door.name);
-      assert.deepEqual(
-        verdict.post?.note,
-        { kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"], cancelled: "Intake only" },
-        door.name,
-      );
-      assert.equal(renderGateNote(verdict.post!.note), "Intake only.", door.name);
+      assert.equal(verdict.execute, undefined, door.name);
+      assert.deepEqual(verdict.post?.note, { kind: "resolved", decision: "cancel", cancelled: "Rejected, nothing filed" }, door.name);
+      assert.equal(renderGateNote(verdict.post!.note), "Rejected, nothing filed.", door.name);
     }
+  });
+
+  it("a library card staged while a ⛔ filed its intake: the ⛔ runs nothing and says the intake comes at the window's close", async () => {
+    // As such a card is still stored: its old cancel batch, and its old words.
+    const legacy = { ...STATED, onCancel: [INTAKE], stated: { ...WORDS, cancelled: "Intake only" } } as PendingProposal;
+    const verdict = await resolveSignal(button("cancel"), { threadState: await stagedStated(legacy) });
+    assert.equal(verdict.outcome, "won");
+    assert.equal(verdict.execute, undefined);
+    assert.equal(renderGateNote(verdict.post!.note), "No code drafted. Its intake is filed when the card's window closes.");
+    const { notes } = await press(await stagedStated(legacy), "cancel");
+    assert.deepEqual(notes, [`:no_entry: No code drafted. Its intake is filed when the card's window closes, decided by <@${PRESSER}>.`]);
   });
 
   it("closes the card with what the ⛔ did and who decided", async () => {
     const { notes, delivery } = await press(await stagedStated(), "cancel");
-    assert.deepEqual(notes, [`:no_entry: Intake only, decided by <@${PRESSER}>.`]);
+    assert.deepEqual(notes, [`:no_entry: Rejected, nothing filed, decided by <@${PRESSER}>.`]);
     assert.equal(delivery.gateNotes.length, 1);
   });
 
