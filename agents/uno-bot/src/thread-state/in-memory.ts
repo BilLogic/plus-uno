@@ -27,10 +27,13 @@ import {
   ownTtl,
   ownWords,
   ownText,
+  REPORT_GRACE_MS,
+  changedReport,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
   withLiveMark,
+  type DecisionReportRecord,
   type Execution,
   type HistoryTurn,
   type PendingProposal,
@@ -83,6 +86,13 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
   const history = new Map<string, HistoryRecord>();
   const proposals = new Map<string, ProposalRecord>();
+  const reports = new Map<string, { report: DecisionReportRecord; createdAt: number }>();
+  /** A report's record while it lasts: its items' TTL, then the grace. */
+  const liveReport = (messageTs: string) => {
+    const rec = reports.get(messageTs);
+    if (rec && now() - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) reports.delete(messageTs);
+    return reports.get(messageTs) ?? null;
+  };
   const assistantContext = new Map<string, AssistantContextRecord>();
   const cancels = new Map<string, { at: number }>();
   const activeRuns = new Map<string, ActiveRunRecord>();
@@ -259,6 +269,24 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // A card being revised is refused too: its revision is on the way.
       if (!rec || rec.retired || rec.supersededBy || withLiveMark(rec.proposal, now()).revising) return false;
       return proposals.delete(proposalTs);
+    },
+
+    // ----- decision reports -----
+
+    async putReport(report) {
+      reports.set(report.messageTs, { report: structuredClone(report), createdAt: now() });
+    },
+
+    async getReport(messageTs) {
+      return structuredClone(liveReport(messageTs)?.report ?? null);
+    },
+
+    async updateReport(messageTs, change) {
+      const rec = liveReport(messageTs);
+      const next = rec ? changedReport(rec.report, change) : null;
+      if (!rec || !next) return null;
+      reports.set(messageTs, { ...rec, report: next });
+      return structuredClone(next);
     },
 
     // ----- executions -----

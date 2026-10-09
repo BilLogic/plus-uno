@@ -30,9 +30,11 @@ import {
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   REVISING_MARK_MS,
+  REPORT_GRACE_MS,
   RUN_LEASE_MS,
   proposalOperations,
   unfinishedOperations,
+  type DecisionReportRecord,
   type PendingProposal,
   type ThreadState,
   type ThreadStateDeps,
@@ -1160,5 +1162,49 @@ export function runThreadStateConformance(
     await store.putProposal(proposal({ confirmers: ["U7", "U8"] }));
     const found = await store.getProposalByTs("1700.2");
     assert.deepEqual(found.state === "found" && found.proposal.confirmers, ["U7", "U8"]);
+  });
+
+  // ── Decision reports ───────────────────────────────────────────────────────
+
+  const report = (): DecisionReportRecord => ({
+    channel: "C1",
+    messageTs: "1700.9",
+    parent: "Two pages.",
+    held: 0,
+    entries: ["a", "b"].map((id) => ({ id, item: { id, title: id, body: id, open: { url: `https://x/${id}` } }, state: { kind: "open" as const } })),
+    ttlMs: HOUR_MS,
+  });
+
+  it("a report keeps each item's state, decided one after the other or at once", async () => {
+    const { store } = setup();
+    await store.putReport(report());
+    await Promise.all([
+      store.updateReport("1700.9", { id: "a", state: { kind: "approved", by: "U1", at: 5 } }),
+      store.updateReport("1700.9", { id: "b", state: { kind: "rejected", by: "U2" } }),
+    ]);
+    const kept = await store.getReport("1700.9");
+    assert.deepEqual(kept?.entries.map((e) => e.state.kind), ["approved", "rejected"]);
+    assert.equal(await store.updateReport("1700.9", { id: "zz", state: { kind: "expired" } }), null, "no such item");
+    assert.equal(await store.updateReport("1700.0", { id: "a", state: { kind: "expired" } }), null, "no such report");
+  });
+
+  it("a report's item is replaced by its revision in place, open again under a new id", async () => {
+    const { store } = setup();
+    await store.putReport(report());
+    await store.updateReport("1700.9", { id: "a", state: { kind: "changes-asked", by: "U1" } });
+    const next = await store.updateReport("1700.9", { id: "a", replace: { id: "a~1", item: { id: "a", title: "a2", body: "a2", open: { url: "https://x/a" } } } });
+    assert.deepEqual(next?.entries.map((e) => [e.id, e.item.title, e.state.kind]), [
+      ["a~1", "a2", "open"],
+      ["b", "b", "open"],
+    ]);
+  });
+
+  it("a report outlives its items' TTL by the grace, and no longer", async () => {
+    const { store, clock } = setup();
+    await store.putReport(report());
+    clock.advance(HOUR_MS + REPORT_GRACE_MS);
+    assert.notEqual(await store.getReport("1700.9"), null);
+    clock.advance(1);
+    assert.equal(await store.getReport("1700.9"), null);
   });
 }

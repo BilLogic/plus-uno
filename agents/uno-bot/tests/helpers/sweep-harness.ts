@@ -167,7 +167,7 @@ export interface FigmaRecords {
   misc: { files: string[]; at: number } | null;
   threads: Map<string, DecisionThread>;
   /** Every message the post sent to #plus-design, in order; `edited` holds a later edit. */
-  messages: Array<{ ts: string; text: string; threadTs: string | null; blocks?: unknown[]; edited?: string }>;
+  messages: Array<{ ts: string; text: string; threadTs: string | null; blocks?: unknown[]; edited?: string; editedBlocks?: unknown[] }>;
   /** Every KV note prefix listed, in order. */
   listed: string[];
 }
@@ -319,8 +319,10 @@ export function sweepHarness(opts: {
           async edit(ts, message) {
             const m = figmaRecords.messages.find((x) => x.ts === ts);
             if (m) m.edited = message.text;
+            if (m && message.blocks) m.editedBlocks = message.blocks;
           },
           members: async () => (opts.figma!.members === undefined ? [] : opts.figma!.members),
+          reports: threadState,
           async stage(proposal) {
             once("stage");
             staged.push(proposal);

@@ -167,6 +167,7 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
             },
             members: () => channelMembers(env, channel),
             stage: (proposal) => stageDecisionCard(env, proposal),
+            reports: threadStateFor(env),
           },
         }
       : {}),
@@ -267,6 +268,10 @@ export async function handleFigmaDecisionReply(env: Env, event: SlackMessageEven
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       stage: (proposal) => stageDecisionCard(env, proposal),
+      async edit(ts, message) {
+        await updateMessage(env, { channel: event.channel, ts, text: message.text, blocks: message.blocks });
+      },
+      reports: store,
       async restore(proposal) {
         // Back in place, not staged anew: its staged row stands.
         const { retired } = await store.putProposal(proposal);

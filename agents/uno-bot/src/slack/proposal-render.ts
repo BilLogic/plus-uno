@@ -18,8 +18,7 @@
 // call that fetches it is a named client on `TurnDeps.cards`, wired in
 // `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
-import { sweepCardBlocks } from "./sweep-card-blocks";
-import { escapeSlackText } from "./mrkdwn";
+import { sweepCardBlocks } from "./sweep-card-blocks";import { escapeSlackText } from "./mrkdwn";
 import { footerNoteFor } from "./footer-kind";
 import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
@@ -486,8 +485,10 @@ function statedText(card: ProposalCard): string {
   const lead = cardLead(card);
   if (lead) lines.push(lead, "");
   for (const caveat of card.caveats) lines.push(caveatText(caveat));
-  lines.push(card.footer ?? CONFIRM_FOOTER);
-  return lines.join("\n");
+  // An empty footer is a card with none: an item of a decision report, whose
+  // Review is its only instruction (`decision-cards.ts`).
+  if (card.footer !== "") lines.push(card.footer ?? CONFIRM_FOOTER);
+  return lines.join("\n").trimEnd();
 }
 
 function targetWords(target: { title: string; parent?: string }): string {

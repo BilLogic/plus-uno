@@ -118,6 +118,10 @@ function thirdPerson(phrase: string): string {
 export const BEING_REVISED_POST =
   "That proposal is being revised, so nothing ran. Decide on the revised card when it posts in the thread.";
 
+/** A typed emoji or a worded answer to one item of a decision report, which
+ *  only its own Review decides. */
+export const REVIEW_ONLY_POST = "Each card here is decided from its own Review button, so nothing ran.";
+
 /** One verdict, as the line a person reads. */
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
@@ -138,16 +142,14 @@ export function renderGateNote(note: GateNote): string {
       // Say where the card is, and name who is being answered: this is the one
       // verdict aimed at a specific person's specific gesture, so it is the one
       // that mentions them.
+      // It points at Review, the one gate a card teaches: the reactions a
+      // card still takes are a fallback, never advertised.
       if (note.stated) {
-        return (
-          `<@${note.userId}> I saw your :${note.glyph}:, but it's not on the card, so nothing ran. ` +
-          `Use the card's buttons, or react on the card itself.`
-        );
+        return `<@${note.userId}> I saw your :${note.glyph}:, but it's not on the card, so nothing ran. Press Review on the card to decide it.`;
       }
       return (
         `:warning: <@${note.userId}> I saw your :${note.glyph}:, but it is not on the proposal I am holding — ` +
-        `nothing was executed. Use the buttons on the card for *${note.toolName}* just above, ` +
-        `or react there.`
+        `nothing was executed. Press Review on the card for *${note.toolName}* just above.`
       );
     case "which-card":
       // Only an unthreaded DM line reaches this: anywhere else a typed emoji
@@ -155,8 +157,10 @@ export function renderGateNote(note: GateNote): string {
       // nothing about which one it meant. Guessing runs the wrong one.
       return (
         `:warning: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
-        `nothing was executed. React on the card you mean, or use its buttons.`
+        `nothing was executed. Press Review on the card you mean.`
       );
+    case "review-only":
+      return REVIEW_ONLY_POST;
     case "not-a-confirmer":
       return notAConfirmerLine(note);
     case "being-revised":

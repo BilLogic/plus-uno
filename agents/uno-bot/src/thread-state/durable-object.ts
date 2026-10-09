@@ -35,10 +35,12 @@ import type { AssistantContext } from "../slack/types";
 import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type {
   CutOffNoteReport,
+  DecisionReportRecord,
   Execution,
   HistoryTurn,
   PendingProposal,
   ProposalLookup,
+  ReportChange,
   RunClaim,
   StagingReport,
   ThreadRef,
@@ -132,6 +134,20 @@ export function createDurableObjectThreadState(
     // makes it one: of two racing resolvers exactly one hop returns true.
     claimProposal(proposalTs: string): Promise<boolean> {
       return hop().claimProposal(proposalTs, now());
+    },
+
+    // ----- decision reports -----
+
+    putReport(report: DecisionReportRecord): Promise<void> {
+      return hop().putReport(report, now());
+    },
+
+    getReport(messageTs: string): Promise<DecisionReportRecord | null> {
+      return hop().getReport(messageTs, now());
+    },
+
+    updateReport(messageTs: string, change: ReportChange): Promise<DecisionReportRecord | null> {
+      return hop().updateReport(messageTs, change, now());
     },
 
     // ----- executions -----

@@ -661,9 +661,10 @@ describe("the drift question (#886 § 3.3)", () => {
 // ── The comment-decision thread (#886 § 3.5, #900) ──────────────────────────
 //
 // § 3.5 gives the parent and one reply. Where the code goes past it — the
-// number on each card, the whole drafted text under the update line, "✅
-// writes it" for one write and "✅ files the intake" for an intake, the
-// commenter by Figma handle — follows its register.
+// number on each card, the whole drafted text under the update line in what
+// Review shows, the commenter by Figma handle — follows its register. The
+// cards are the shared decision card's, decided from Review alone, so no line
+// says what ✅ or ⛔ does.
 
 describe("the comment-decision thread (#886 § 3.5)", () => {
   const FILE = { title: "Goal Setting / Card 2482 / Sarah", url: "https://www.figma.com/design/GoalFile1" };
@@ -705,20 +706,17 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
     update: { kind: "intake", title: "Goal chips use the Badge pill variant" },
   };
 
-  it("the parent names the file and the count, and asks one named person once", () => {
+  it("the parent names the file and the count, for one named person, in one plain sentence", () => {
     const three = decisionParent({ ...FILE, owner: { slack: "U0AAAAAA1" } }, 3);
-    assert.equal(
-      three,
-      "*3 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions*\n<@U0AAAAAA1>, can you check the updates I've drafted below?",
-    );
+    assert.equal(three, "<@U0AAAAAA1>, 3 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions.");
     passesChecklist(three);
     assert.equal(three.match(/<@U/g)?.length, 1, "the owner, once");
     const one = decisionParent({ ...FILE, owner: { figma: "bea" } }, 1);
-    assert.equal(one, "*1 comment in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> reads like a decision*\nbea, can you check the update I've drafted below?");
+    assert.equal(one, "bea, 1 comment in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> reads like a decision.");
     passesChecklist(one);
   });
 
-  it("each reply leads with its number and the quote, says who said it where and when, and has one footer", () => {
+  it("what Review shows leads with the number and the quote, says who said it where and when, and has no footer", () => {
     const prdCard = renderProposalCard(decisionCard(1, base, COMMENT)).text;
     assert.equal(
       prdCard,
@@ -727,8 +725,6 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
         `sarah on the Specs page, resolved Sep 29 · <${COMMENT}|see comment>`,
         `• *PRD › Goal states:* add this rule · <${PRD.url}|page>`,
         "> The progress bar stays hidden until the first goal is set.",
-        "",
-        ":white_check_mark: writes it · :no_entry: drops it",
       ].join("\n"),
     );
     const statusCard = renderProposalCard(decisionCard(2, status, COMMENT)).text;
@@ -736,8 +732,7 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
     assert.match(statusCard, /^• \*Card 2482 › Design Status:\* WIP → Under Review · <https:\/\/www\.notion\.so\/c\|card>$/m);
     const intakeCard = renderProposalCard(decisionCard(3, intake, COMMENT)).text;
     assert.match(intakeCard, /^• \*Intake:\* "Goal chips use the Badge pill variant"\n> …$/m, "with the body it files");
-    assert.match(intakeCard, /\n\n:white_check_mark: files the intake · :no_entry: drops it$/);
-    for (const text of [prdCard, statusCard, intakeCard]) passesChecklist(text, { gate: true });
+    for (const text of [prdCard, statusCard, intakeCard]) passesChecklist(text);
   });
 
   it("a ⛔ closes a decision card with what it did and who decided, and a late answer says nothing was written", () => {
