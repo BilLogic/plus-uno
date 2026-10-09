@@ -23,13 +23,14 @@ import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
 import { conversationsOpen, conversationsReplies, deleteMessage, getBotIdentity, postMessage, slackReadAs, updateMessage, usersInfo } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
+import { itemProposalKey } from "../slack/decision-cards";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { measured } from "../sweep/env";
 import type { SweepSlackMessage } from "../sweep/run";
 import { modelCommitmentDetector, modelEvidenceJudge } from "../commitments/detector";
 import { createD1DmWatchRecords } from "./d1";
 import type { ReminderOutcome } from "../commitments/copy";
-import { dropDmCapture, type DmCaptureFinding, type DmCaptureQueue, type DmHolds } from "./capture";
+import { dropDmCapture, withdrawFixes, type DmCaptureFinding, type DmCaptureQueue, type DmHolds } from "./capture";
 import {
   accessOf,
   answerDmReminderPress,
@@ -102,7 +103,7 @@ export async function setDmWatchOnEnv(env: Env, userId: string, selected: readon
       await dropDmCapture(id, {
         queue,
         liveCards: (channel) => threadStateFor(env).getProposalsByChannel(channel),
-        withdraw: (channel, ts, text) => withdrawCaptureCard(env, channel, ts, text),
+        withdraw: (channel, ts, ids, note) => withdrawCaptureCard(env, channel, ts, ids, note),
       });
     },
   });
@@ -296,17 +297,28 @@ export function dmCaptureQueueFor(env: Env): DmCaptureQueue | null {
   };
 }
 
-/** Take a DM Capture card back: out of reach in ThreadState first, so it
- *  can't be ✅'d, then edited to say why. */
-export async function withdrawCaptureCard(env: Env, channel: string, ts: string, text: string): Promise<void> {
-  // Edited only when it was this call that took it out of reach: a card
-  // already claimed, running or gone keeps what it says.
-  const { retired } = await threadStateFor(env).retireProposal(ts);
-  if (retired) await updateMessage(env, { channel, ts, text });
+/** Take a DM Capture report's fixes back (`withdrawFixes`): each out of
+ *  reach in ThreadState first, so Review can't decide it, then the report
+ *  redrawn to say why. `null`: a card from before the shared card, retired
+ *  whole and edited to `note`. */
+export async function withdrawCaptureCard(env: Env, channel: string, ts: string, ids: readonly string[] | null, note: string): Promise<void> {
+  const store = threadStateFor(env);
+  if (!ids) {
+    // Edited only when it was this call that took it out of reach: a card
+    // already claimed, running or gone keeps what it says.
+    const { retired } = await store.retireProposal(ts);
+    if (retired) await updateMessage(env, { channel, ts, text: note });
+    return;
+  }
+  const message = await withdrawFixes(store, ts, ids, note);
+  if (message) await updateMessage(env, { channel, ts, ...message });
 }
 
-/** Take a DM Capture card back entirely: retired, then deleted. */
-export async function removeCaptureCard(env: Env, channel: string, ts: string): Promise<void> {
-  await threadStateFor(env).retireProposal(ts);
+/** Take a DM Capture report back entirely: its fixes retired, then the
+ *  message deleted. */
+export async function removeCaptureCard(env: Env, channel: string, ts: string, ids: readonly string[]): Promise<void> {
+  const store = threadStateFor(env);
+  await store.retireProposal(ts);
+  for (const id of ids) await store.retireProposal(itemProposalKey(ts, id));
   await deleteMessage(env, channel, ts);
 }

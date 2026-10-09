@@ -23,22 +23,25 @@
 //   What they find is queued for the morning. It posts nothing.
 //
 //   `runDmCapturePost` — the weekday morning `dm-capture-post` job, one per
-//   person. The findings whose morning has come go on ONE proposal card in the
-//   person's DM with uno-bot, staged as a sweep card with `confirmers:
-//   [owner]`: only they can ✅ it. Never #uno-bot, a thread, a channel card,
-//   or anyone else's job. One live card at a time — a revision a `drop N`
-//   made of it counts, found through its reply thread — and it is shown whole
-//   in one message or not at all. A quiet day posts nothing.
+//   person. The findings whose morning has come go up as ONE report on the
+//   shared decision card (`slack/decision-cards.ts`) in the person's DM with
+//   uno-bot: a parent line, then a card per fix with Review, Open page and
+//   Open DM. Each fix is its own proposal with `confirmers: [owner]`: only
+//   they can decide it, in Review. Never #uno-bot, a thread, a channel card,
+//   or anyone else's job. At most ten cards; the rest stay queued. One report
+//   at a time: while any of its fixes is live, the rest wait. A quiet day
+//   posts nothing.
 //
-//   `dropDmCapture` — the switch turned off: every live card it posted is
-//   withdrawn, and its queue dropped. Both jobs check the switch again right
-//   before each write, so a switch turned off mid-run keeps nothing.
+//   `dropDmCapture` — the switch turned off: every fix still live on a card it
+//   posted is withdrawn, and its queue dropped. Both jobs check the switch
+//   again right before each write, so a switch turned off mid-run keeps
+//   nothing.
 //
 // WHAT IS KEPT (ADR-030, ADR-032). Nothing in D1 but the switch and the read
 // positions. A finding waits in KV (`DmCaptureQueue`), with an expiry: its
 // permalink, its target (the page and the block), its state, and the edit the
 // card shows. No quote of the DM, no id of the other person, and no message
-// text: the card links the message instead of quoting it, and an edit that
+// text: the card links the message (Open DM) instead of quoting it, and an edit that
 // repeats `DM_QUOTE_RUN` of the DM's words in a row, not already on the page,
 // is dropped (`quotesDm`).
 //
@@ -52,12 +55,32 @@
 // `./capture-env.ts`.
 
 import { isSubrequestBudgetError, rethrowIfBudget } from "../net";
-import { ownBlocks, proposalReplyThread, SWEEP_KEY, type PendingProposal } from "../thread-state/index";
-import type { CardFix, ProposalCard } from "../turn/index";
+import {
+  proposalReplyThread,
+  type PendingProposal,
+  type ProposalOperation,
+  type ReportItem,
+  type StatedCardWords,
+  type ThreadState,
+} from "../thread-state/index";
+import type { ProposalCard } from "../turn/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { escapeSlackText } from "../slack/mrkdwn";
+import { renderProposalCard } from "../slack/proposal-render";
+import {
+  DECISION_REVIEW_ACTION_PREFIX,
+  decisionReport,
+  itemProposal,
+  itemProposalKey,
+  markNotStaged,
+  plain,
+  reportRecord,
+  type ReportMessage,
+  type ReportStore,
+} from "../slack/decision-cards";
+import { textSections } from "../slack/render";
 import { isMorningRunTime } from "../commitments/due";
-import { changedSpan, itemOperation, MAX_ITEMS_PER_CARD, operationsDigest, SWEEP_CARD_EVENT, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS } from "../sweep/cards";
+import { changedSpan, itemOperation, operationsDigest, SWEEP_CARD_EVENT, SWEEP_CARD_TTL_MS } from "../sweep/cards";
 import type { CaptureDetector } from "../sweep/capture-detector";
 import type { DriftDetector } from "../sweep/detector";
 import { classifyLink, linksIn, type FindingAddition, type FindingTarget, type SweepMessage, type SweepSource, type TargetKind } from "../sweep/finding";
@@ -82,19 +105,20 @@ import { CAPTURE_FEATURE, positionScope, type DmReadPosition, type DmWatchRecord
 /** What one window may spend: two model calls, the pages it reads and
  *  searches for, and what a stop saves. */
 export const DM_CAPTURE_COST = { subrequests: 12, d1Queries: 2 };
-/** What the morning card may spend: the bot DM, the post, the staging and its
- *  record, a withdraw held back, and the queue. */
+/** What the morning report may spend before its fixes: the bot DM, the look
+ *  for an earlier try, the post, its record, an edit, and a withdraw held
+ *  back. */
 export const DM_CAPTURE_POST_COST = { subrequests: 8, d1Queries: 3 };
+/** What each fix on it adds: its staging, its usage row, and the queue. */
+export const DM_CAPTURE_ITEM_COST = { subrequests: 3, d1Queries: 1 };
 /** Words in a row that make a quote (#864's rule for what leaves a DM): an
  *  edit repeating this many of the DM's words, not already on the page, is
  *  dropped. */
 export const DM_QUOTE_RUN = 5;
-/** Slack's limits on one message: the card is shown whole or not at all. */
-const ONE_MESSAGE = { chars: 40_000, blocks: 50 };
-/** What a card is edited to when it is taken back. */
-export const DM_CARD_NOT_STAGED =
-  ":warning: This card didn't go through, so it can't be confirmed. Its fixes come back on a fresh card.";
-export const DM_CARD_SWITCHED_OFF = ':no_entry: Withdrawn: you turned off "Catch decisions from my DMs".';
+/** What a card says, with nothing to review, when its fix did not stage or
+ *  was taken back. */
+export const DM_CARD_NOT_STAGED = "Didn't go through, so it comes back on a later card.";
+export const DM_CARD_SWITCHED_OFF = 'Withdrawn: you turned off "Catch decisions from my DMs".';
 
 /** One finding from a person's DMs, as the queue keeps it until its card. */
 export interface DmCaptureFinding {
@@ -183,28 +207,33 @@ export type DmCapturePostDeps = Common & {
   bot: {
     /** The owner's DM with uno-bot. */
     dmChannel(userId: string): Promise<string | null>;
-    /** `blocks` on the answer: the card's own blocks, when it went up with
-     *  them rather than stepping down to its text. */
+    /** `refused` when Slack refused the blocks themselves, so the plain rung
+     *  can go up in their place. */
     post(
       channel: string,
       message: { text: string; blocks: unknown[]; metadata: { event_type: string; event_payload: Record<string, string> } },
-    ): Promise<{ ok: boolean; ts?: string; blocks?: unknown[] }>;
-    /** Take a posted card back: retired in ThreadState, then edited to say why. */
-    withdraw(channel: string, ts: string, text: string): Promise<void>;
-    /** Take a posted card back entirely: retired, then deleted (`chat.delete`). */
-    remove(channel: string, ts: string): Promise<void>;
-    /** This job's card under `cardKey`, posted since `since`, by its tag;
+    ): Promise<{ ok: boolean; ts?: string; refused?: boolean }>;
+    /** Edit the report's message in place (`chat.update`). */
+    edit(channel: string, ts: string, message: ReportMessage): Promise<void>;
+    /** Take a report's fixes back (`withdrawFixes`) and edit its message to
+     *  say so. `null` for a card from before the shared card: retired whole,
+     *  and edited to `note`. */
+    withdraw(channel: string, ts: string, ids: readonly string[] | null, note: string): Promise<void>;
+    /** Take a report back entirely: its fixes retired, then the message
+     *  deleted (`chat.delete`). */
+    remove(channel: string, ts: string, ids: readonly string[]): Promise<void>;
+    /** This job's message under `cardKey`, posted since `since`, by its tag;
      *  null when surely not there, "unknown" when Slack would not say. */
     findPosted(channel: string, cardKey: string, since: string): Promise<{ ts: string; digest: string } | null | "unknown">;
   };
-  render(card: ProposalCard): { text: string; blocks: unknown[]; followUp?: string[] };
-  /** Stage the card, as a sweep card is staged (`stageSweepCard`). */
+  /** Where the report's record is kept, and each card's decision lands. */
+  reports: Pick<ThreadState, "putReport" | "getReport" | "updateReport" | "getProposalByTs">;
+  /** Stage one fix, as a sweep card is staged (`stageSweepCard`). */
   stage(proposal: PendingProposal): Promise<void>;
-  /** The live cards ThreadState holds in a channel — a card and any revision
-   *  of it share its reply thread. */
+  /** The live proposals ThreadState holds in a channel. */
   liveCards(channel: string): Promise<PendingProposal[]>;
-  /** Whether a posted card was ever staged, and whether it is still live or
-   *  was since confirmed, dropped or taken (`sweepCardState`). */
+  /** Whether a fix's proposal was ever staged, and whether it is still live
+   *  or was since decided (`sweepCardState`). */
   cardState(proposalTs: string): Promise<SweepCardState>;
 };
 
@@ -485,14 +514,18 @@ function fixKey(f: Pick<DmCaptureFinding, "target" | "blockId" | "add">): string
 // ── Morning ──────────────────────────────────────────────────────────────────
 
 /**
- * The weekday morning `dm-capture-post` job for `job.user`: one card, in their
- * DM with uno-bot, only they can confirm.
+ * The weekday morning `dm-capture-post` job for `job.user`: one report, in
+ * their DM with uno-bot, on the shared decision card — a card per fix, each
+ * its own proposal, that only they can decide.
  *
- * A POSTED CARD IS STAGED, OR TAKEN BACK. The card is tagged with its key and
- * the digest of what it shows. A retry first looks for an earlier try's card
- * by that tag: one already staged is recorded, one with the same digest is
- * staged as it is, any other is deleted. A budget stop after the post deletes
- * the card before rethrowing, so no card is left up that a ✅ cannot run.
+ * A POSTED REPORT IS STAGED, OR TAKEN BACK. The message is tagged with its key
+ * and the digest of what it shows. A fix is marked carded as soon as it is
+ * staged, so a retry never cards it twice. A retry first looks for an earlier
+ * try's message by that tag: one with a fix already staged is the morning's
+ * report, and its other cards say they didn't go through; one with none
+ * staged and the same digest is staged as it is; any other is deleted. A
+ * budget stop before any fix is staged deletes the message before rethrowing,
+ * so no card is left up that Review cannot decide.
  *
  * @throws A budget stop — the runner defers
  */
@@ -508,152 +541,236 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
     if (!deps.dryRun) await deps.queue.clear(user);
     return report("skipped", "no switch on");
   }
-  const queue = await deps.queue.load(user);
+  let queue = await deps.queue.load(user);
   if (await liveCard(queue, now, deps)) return report("handled", null, "a card is still live — the rest waits");
   const due = queue
     .filter((f) => f.state === "queued" && f.ownerId === user && postableAt(f.detectedAt) <= now)
-    .sort((a, b) => a.driftAt - b.driftAt || a.id.localeCompare(b.id))
-    .slice(0, MAX_ITEMS_PER_CARD);
+    .sort((a, b) => a.driftAt - b.driftAt || a.id.localeCompare(b.id));
   if (!due.length) return report("handled", null, "nothing due");
 
-  // Shown whole, in one message, or not offered: the owner confirms exactly
-  // what they read. What does not fit waits; a fix too long to show even
-  // alone leaves the queue.
-  const fits = (items: DmCaptureFinding[]) => {
-    const r = deps.render(dmCaptureCard(items));
-    return !r.followUp?.length && r.text.length <= ONE_MESSAGE.chars && r.blocks.length <= ONE_MESSAGE.blocks;
-  };
-  let n = due.length;
-  while (n > 0 && !fits(due.slice(0, n))) n -= 1;
-  if (n === 0) {
-    if (!deps.dryRun) await deps.queue.save(user, queue.filter((f) => f.id !== due[0]!.id));
-    return report("handled", "a fix too long to show whole on a card — not offered");
-  }
-  const items = due.slice(0, n);
-  const card = dmCaptureCard(items);
-  const rendered = deps.render(card);
-  if (deps.dryRun) return { ...report("handled", null, `would post 1 card holding ${items.length} fix(es)`), text: rendered.text };
-  ensureHeadroom(deps, DM_CAPTURE_POST_COST);
+  // The first ten are shown; the parent line counts every fix due, and the
+  // rest stay queued for the next card.
+  const built = decisionReport(due.map(dmCaptureItem), dmCaptureParent(due));
+  const shown = due.slice(0, built.shown.length);
+  const fixes = `${shown.length} fix(es)`;
+  if (deps.dryRun) return { ...report("handled", null, `would post 1 card holding ${fixes}`), text: built.text };
+  ensureHeadroom(deps, {
+    subrequests: DM_CAPTURE_POST_COST.subrequests + shown.length * DM_CAPTURE_ITEM_COST.subrequests,
+    d1Queries: DM_CAPTURE_POST_COST.d1Queries + shown.length * DM_CAPTURE_ITEM_COST.d1Queries,
+  });
   // The owner's DM with uno-bot, top level: never a thread, a channel or
   // anyone else.
   const dm = await deps.bot.dmChannel(user);
   if (!dm) return report("handled", "the owner's DM with uno-bot could not be opened — kept for tomorrow");
   const cardKey = `${deps.runDate}:dm-capture:${user}`;
-  const digest = operationsDigest(card.operations ?? []);
-  const record = async (ts: string) => {
-    const ids = new Set(items.map((f) => f.id));
-    if (!(await stillOn())) {
-      // Turned off while the card went up: it is taken back, and nothing kept.
-      try {
-        await deps.bot.withdraw(dm, ts, DM_CARD_SWITCHED_OFF);
-      } finally {
-        await deps.queue.clear(user);
-      }
-      return report("skipped", "the switch went off while the card posted — withdrawn");
-    }
-    await deps.queue.save(
-      user,
-      queue.map((f) => (ids.has(f.id) ? { ...f, state: "proposed" as const, cardChannel: dm, proposalTs: ts, postedAt: now } : f)),
-    );
-    return report("handled", null, `posted 1 card holding ${items.length} fix(es)`);
-  };
+  const digest = operationsDigest(shown.map(fixOperation));
 
-  // An earlier try's card, found by its tag.
+  // An earlier try's message, found by its tag.
   let ts: string | null = null;
-  // The carousel it went up with, when this try posted it; a card an earlier
-  // try left up is staged on its text.
-  let blocks: unknown[] | undefined;
   const prior = await deps.bot.findPosted(dm, cardKey, tsOf(Date.parse(`${deps.runDate}T00:00:00Z`)));
   if (prior === "unknown") return report("handled", "could not tell whether an earlier try posted — held for the next try");
   if (prior) {
-    // Staged by the earlier try — live, or since confirmed, dropped or
-    // running: recorded as posted and left alone. Only a card never staged is
-    // staged now, or taken back.
-    const state = await deps.cardState(prior.ts);
-    if (state.state !== "unstaged") return record(prior.ts);
-    if (prior.digest === digest) ts = prior.ts;
-    else await deps.bot.remove(dm, prior.ts);
+    // A fix it staged — live, or since decided — makes it the morning's
+    // report: left up, with its unstaged cards saying so. Only a message with
+    // nothing staged is staged now, or taken back.
+    const record = await deps.reports.getReport(prior.ts);
+    const staged: string[] = [];
+    for (const entry of record?.entries ?? []) {
+      if ((await deps.cardState(itemProposalKey(prior.ts, entry.id))).state !== "unstaged") staged.push(entry.id);
+    }
+    if (staged.length) {
+      const unstaged = (record?.entries ?? []).filter((e) => !staged.includes(e.id)).map((e) => e.id);
+      queue = queue.map((f) => (staged.includes(f.id) ? carded(f, dm, prior.ts, now) : f));
+      await deps.queue.save(user, queue);
+      await notStaged(deps, dm, prior.ts, unstaged);
+      return report("handled", null, `recorded an earlier try's card holding ${staged.length} fix(es)`);
+    }
+    if (prior.digest === digest && record) ts = prior.ts;
+    else await deps.bot.remove(dm, prior.ts, (record?.entries ?? []).map((e) => e.id));
   }
   if (!ts) {
     // Tagged as a sweep card, so the DM's own reads take it as uno-bot's post
     // — context, never something the person said.
-    const posted = await deps.bot.post(dm, {
-      ...rendered,
-      metadata: { event_type: SWEEP_CARD_EVENT, event_payload: { role: "card", card_key: cardKey, digest } },
-    });
+    const metadata = { event_type: SWEEP_CARD_EVENT, event_payload: { role: "card", card_key: cardKey, digest } };
+    let posted = await deps.bot.post(dm, { text: built.text, blocks: built.blocks, metadata });
+    // Cards Slack refuses step down to the plain rung, so the morning's fixes
+    // still go up, each with its Review.
+    if (!posted.ok && posted.refused) posted = await deps.bot.post(dm, { text: built.text, blocks: dmCapturePlainRung(built.text.split("\n")[0]!, built.shown), metadata });
     if (!posted.ok || !posted.ts) return report("handled", "Slack refused the post — kept for tomorrow");
     ts = posted.ts;
-    blocks = posted.blocks;
-  }
-  const proposal = dmCaptureProposal(card, {
-    owner: user,
-    channel: dm,
-    ts,
-    text: rendered.text,
-    ...(blocks ? { blocks } : {}),
-    runDate: deps.runDate,
-  });
-  try {
-    await deps.stage(proposal);
-  } catch (err) {
-    if (isSubrequestBudgetError(err)) {
-      // No card left up that a ✅ cannot run: the retry posts afresh.
-      await deps.bot.remove(dm, ts).catch(() => undefined);
-      throw err;
+    try {
+      // Where each card's decision lands: without it, no card can be staged.
+      await deps.reports.putReport(reportRecord(dm, ts, built, SWEEP_CARD_TTL_MS));
+    } catch (err) {
+      await deps.bot.remove(dm, ts, []).catch(rethrowIfBudget);
+      rethrowIfBudget(err);
+      return report("handled", `posted but its record was not kept (${err instanceof Error ? err.message : String(err)}) — taken back, kept for tomorrow`);
     }
-    await deps.bot.withdraw(dm, ts, DM_CARD_NOT_STAGED).catch(rethrowIfBudget);
-    return report("handled", `posted but not staged (${err instanceof Error ? err.message : String(err)}) — withdrawn, kept for tomorrow`);
   }
-  return record(ts);
+
+  const staged: string[] = [];
+  const failed: string[] = [];
+  for (const f of shown) {
+    try {
+      await deps.stage(dmCaptureProposal(f, { owner: user, channel: dm, ts, runDate: deps.runDate }));
+    } catch (err) {
+      if (isSubrequestBudgetError(err)) {
+        // No card left up that Review cannot decide: with nothing staged, the
+        // message goes and the retry posts afresh; with some, the rest say
+        // they didn't go through, and the retry finds it by its tag.
+        if (!staged.length) await deps.bot.remove(dm, ts, []).catch(() => undefined);
+        else await notStaged(deps, dm, ts, shown.filter((s) => !staged.includes(s.id)).map((s) => s.id)).catch(() => undefined);
+        throw err;
+      }
+      console.error(`[dm-capture] ${user}: fix ${f.id} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
+      failed.push(f.id);
+      continue;
+    }
+    staged.push(f.id);
+    // At once, so a stop after this never cards it again.
+    queue = queue.map((q) => (q.id === f.id ? carded(q, dm, ts, now) : q));
+    await deps.queue.save(user, queue);
+  }
+  if (failed.length) await notStaged(deps, dm, ts, failed);
+  if (!(await stillOn())) {
+    // Turned off while the report went up: every card is taken back — the
+    // ones that never staged too — and nothing kept.
+    try {
+      await deps.bot.withdraw(dm, ts, shown.map((s) => s.id), DM_CARD_SWITCHED_OFF);
+    } finally {
+      await deps.queue.clear(user);
+    }
+    return report("skipped", "the switch went off while the card posted — withdrawn");
+  }
+  const note = failed.length ? `${failed.length} fix(es) posted but not staged — kept for tomorrow` : null;
+  return report("handled", note, `posted 1 card holding ${staged.length} fix(es)`);
 }
 
-/** Whether a card went out on a thread: the card itself, or a revision of it,
- *  which lives in the card's reply thread. */
-function inThread(card: PendingProposal, threadTs: string): boolean {
-  return !!card.sweepRun && (card.proposalTs === threadTs || proposalReplyThread(card) === threadTs);
+/** A fix as its card went up: carded, on that message. */
+function carded(f: DmCaptureFinding, channel: string, messageTs: string, now: number): DmCaptureFinding {
+  return { ...f, state: "proposed", cardChannel: channel, proposalTs: messageTs, postedAt: now };
 }
 
-/** Whether a card this job posted — or a revision a `drop N` made of it — is
- *  still live. */
+/** Cards that showed and never staged say so, with nothing to review. */
+async function notStaged(deps: Pick<DmCapturePostDeps, "reports" | "bot">, channel: string, ts: string, ids: readonly string[]): Promise<void> {
+  if (!ids.length) return;
+  const message = await markNotStaged(deps.reports, ts, ids, DM_CARD_NOT_STAGED).catch((err: unknown) => {
+    rethrowIfBudget(err);
+    return null;
+  });
+  if (message) await deps.bot.edit(channel, ts, message).catch(rethrowIfBudget);
+}
+
+/**
+ * Cards taken back: each says `note`, with nothing to review — drawn as a
+ * card never staged is, since neither has anything left to decide. The
+ * report's message as it now reads, or null when the store has no report.
+ */
+export function markWithdrawn(store: ReportStore, ts: string, ids: readonly string[], note: string): Promise<ReportMessage | null> {
+  return markNotStaged(store, ts, ids, note);
+}
+
+/**
+ * Take a report's fixes back: each one still live is retired, so Review can
+ * no longer decide it, and every card it took out of reach — or that never
+ * staged — is marked withdrawn. A card already decided keeps its state. The
+ * message as it now reads, or null when no card changed.
+ *
+ * @param store - The thread store
+ * @param ts - The report's message
+ * @param ids - The fixes to take back
+ * @param note - What each card says
+ */
+export async function withdrawFixes(
+  store: ReportStore & Pick<ThreadState, "retireProposal">,
+  ts: string,
+  ids: readonly string[],
+  note: string,
+): Promise<ReportMessage | null> {
+  const neverStaged = new Set((await store.getReport(ts))?.entries.filter((e) => e.state.kind === "not-staged").map((e) => e.id));
+  const taken: string[] = [];
+  for (const id of ids) if ((await store.retireProposal(itemProposalKey(ts, id))).retired || neverStaged.has(id)) taken.push(id);
+  return taken.length ? markWithdrawn(store, ts, taken, note) : null;
+}
+
+/**
+ * The report as plain text, for when Slack refuses its cards: each fix on a
+ * line with its page and DM linked, and a Review button per fix — the same
+ * action ids as the cards', so each still opens its own proposal.
+ *
+ * @param head - The report's parent line, as posted
+ * @param items - The cards the report shows
+ */
+export function dmCapturePlainRung(head: string, items: readonly ReportItem[]): unknown[] {
+  const lines = items.map((item, i) => `${i + 1}. <${item.open.url}|${escapeSlackText(item.title)}> · <${item.also!.url}|your DM>: ${escapeSlackText(item.body)}`);
+  return [
+    ...textSections([head, "", ...lines].join("\n")),
+    {
+      type: "actions",
+      elements: items.map((item, i) => ({
+        type: "button",
+        action_id: `${DECISION_REVIEW_ACTION_PREFIX}${item.id}`,
+        text: plain(`Review ${i + 1}`),
+        value: item.id,
+      })),
+    },
+  ];
+}
+
+/** Whether a proposal belongs to one of these messages: an item of the
+ *  report, or a card from before the shared card — the card itself, or a
+ *  revision in its reply thread. */
+function onMessage(card: PendingProposal, messages: ReadonlySet<string>): boolean {
+  if (card.item) return messages.has(card.item.messageTs);
+  return !!card.sweepRun && (messages.has(card.proposalTs) || messages.has(proposalReplyThread(card)));
+}
+
+/** Whether a card this job posted still has a fix to decide. */
 async function liveCard(queue: readonly DmCaptureFinding[], now: number, deps: Pick<DmCapturePostDeps, "liveCards">): Promise<boolean> {
   const posted = new Map<string, Set<string>>();
   for (const f of queue) {
     if (f.state !== "proposed" || !f.cardChannel || !f.proposalTs || (f.postedAt ?? 0) + SWEEP_CARD_TTL_MS <= now) continue;
     posted.set(f.cardChannel, (posted.get(f.cardChannel) ?? new Set()).add(f.proposalTs));
   }
-  for (const [channel, threads] of posted) {
-    const cards = await deps.liveCards(channel);
-    if (cards.some((c) => [...threads].some((t) => inThread(c, t)))) return true;
+  for (const [channel, messages] of posted) {
+    if ((await deps.liveCards(channel)).some((c) => onMessage(c, messages))) return true;
   }
   return false;
 }
 
 /**
- * DM Capture went off: every live card it posted — or a revision of one — is
- * taken back, so it can no longer be ✅'d, and what it found is dropped.
+ * DM Capture went off: every fix still live on a card it posted is taken
+ * back, so Review can no longer decide it, and what it found is dropped.
  */
 export async function dropDmCapture(
   userId: string,
   deps: {
     queue: DmCaptureQueue;
     liveCards(channel: string): Promise<PendingProposal[]>;
-    withdraw(channel: string, ts: string, text: string): Promise<void>;
+    withdraw(channel: string, ts: string, ids: readonly string[] | null, note: string): Promise<void>;
   },
 ): Promise<void> {
   const queue = await deps.queue.load(userId);
-  const threads = new Map<string, Set<string>>();
+  const posted = new Map<string, Set<string>>();
   for (const f of queue) {
-    if (f.state === "proposed" && f.cardChannel && f.proposalTs) threads.set(f.cardChannel, (threads.get(f.cardChannel) ?? new Set()).add(f.proposalTs));
+    if (f.state === "proposed" && f.cardChannel && f.proposalTs) posted.set(f.cardChannel, (posted.get(f.cardChannel) ?? new Set()).add(f.proposalTs));
   }
   try {
-    for (const [channel, ts] of threads) {
+    for (const [channel, messages] of posted) {
+      // Each message once, with the ids of its fixes still live; a card from
+      // before the shared card is withdrawn whole, by its own ts.
+      const live = new Map<string, string[] | null>();
       for (const card of await deps.liveCards(channel)) {
-        if (![...ts].some((t) => inThread(card, t))) continue;
+        if (!onMessage(card, messages)) continue;
+        if (card.item) live.set(card.item.messageTs, [...(live.get(card.item.messageTs) ?? []), card.item.id]);
+        else live.set(card.proposalTs, null);
+      }
+      for (const [ts, ids] of live) {
         // One card that will not withdraw does not keep the others, or the
         // queue, around.
-        await deps.withdraw(channel, card.proposalTs, DM_CARD_SWITCHED_OFF).catch((err: unknown) => {
+        await deps.withdraw(channel, ts, ids, DM_CARD_SWITCHED_OFF).catch((err: unknown) => {
           rethrowIfBudget(err);
-          console.warn(`[dm-capture] ${userId}: card ${card.proposalTs} not withdrawn: ${err instanceof Error ? err.message : String(err)}`);
+          console.warn(`[dm-capture] ${userId}: card ${ts} not withdrawn: ${err instanceof Error ? err.message : String(err)}`);
         });
       }
     }
@@ -662,85 +779,127 @@ export async function dropDmCapture(
   }
 }
 
-/** The card, as data. Page words are escaped; the DM is linked, never quoted. */
-export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard {
-  const n = items.length;
-  const head = `**${SWEEP_CARD_MARK}** — from your DMs: you settled ${n === 1 ? "something" : `${n} things`} that a page doesn't say yet.`;
-  // Only the owner confirms, so no card names anyone; the DM is a button.
-  const fixes: CardFix[] = items.map((item, i) => {
-    const page = `<${item.target.url}|${escapeSlackText(flat(item.target.title) || "untitled")}>`;
-    const where = `   - <${item.permalink}|where you said it>`;
-    const fix = {
-      page: { title: flat(item.target.title), url: item.target.url },
-      where: { label: "Your DM", url: item.permalink },
-    };
-    if (item.add) {
-      const place = item.add.section
-        ? `add under ${page} › *${escapeSlackText(flat(item.add.section))}*`
-        : `add a new section *${escapeSlackText(flat(item.add.newSection ?? ""))}* to ${page}`;
-      return {
-        ...fix,
-        change: `Adds: “${flat(item.replacement)}”`,
-        detail: [`${i + 1}. ${place}`, `   - adds: “${escapeSlackText(flat(item.replacement))}”`, where].join("\n"),
-      };
-    }
-    const { before, after } = changedSpan(item.original, item.replacement);
-    return {
-      ...fix,
-      change: `“${before}” → “${after}”`,
-      detail: [
-        `${i + 1}. ${page}`,
-        `   - page says: “${escapeSlackText(flat(item.sourceSays))}”`,
-        `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
-        where,
-      ].join("\n"),
-    };
-  });
-  const tail =
-    `Only you can confirm. One ✅ applies ${n === 1 ? "it" : `all ${n}`}; reply \`drop 2\` to leave one out. ` +
-    `Nothing from your DMs goes anywhere else. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`;
-  const lines = [head, "", ...fixes.map((f) => f.detail), "", tail];
-  const operations = items.map((item) =>
-    itemOperation({ target: item.target, blockId: item.blockId, lastEditedTime: item.lastEditedTime, replacement: item.replacement, add: item.add }),
-  );
+/** The day a DM said it, as ET's calendar has it: "Sep 29". */
+function dayOf(ms: number): string {
+  return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "short", day: "numeric" }).format(new Date(ms));
+}
+
+/** A page title for a card: plain text, with nothing Slack could read as a
+ *  mention in the message's fallback text. */
+function cardTitle(title: string): string {
+  return flat(title).replace(/[<>]/g, "") || "untitled";
+}
+
+/** The page, linked, its title escaped. */
+function pageLink(f: Pick<DmCaptureFinding, "target">): string {
+  return `<${f.target.url}|${escapeSlackText(flat(f.target.title) || "untitled")}>`;
+}
+
+/**
+ * The report's parent line: what the DMs settled that a page doesn't say, in
+ * one plain sentence. Counts every fix due, the held-back ones too.
+ *
+ * @param due - Every fix due this morning
+ */
+export function dmCaptureParent(due: readonly DmCaptureFinding[]): string {
+  if (due.length > 1) return `Your DMs settled ${due.length} things your pages don't say yet.`;
+  const f = due[0]!;
+  return f.add ? `Your DMs settled something that ${pageLink(f)} doesn't say yet.` : `Your DMs settled something that ${pageLink(f)} still states the old way.`;
+}
+
+/**
+ * One fix as its card: the page, when and where it was said, and the change.
+ * Open goes to the page, and Open DM links the message — linked, never
+ * quoted, and the other person never named.
+ *
+ * @param f - A fix due this morning
+ */
+export function dmCaptureItem(f: DmCaptureFinding): ReportItem {
+  const added = flat(f.replacement);
+  const change = f.add
+    ? { body: f.add.section ? `Adds under ${flat(f.add.section)}: “${added}”` : `Adds a new section, ${flat(f.add.newSection ?? "")}: “${added}”`, done: `“${added}”` }
+    : (() => {
+        const { before, after } = changedSpan(f.original, f.replacement);
+        return { body: `Page says “${before}” · decision says “${after}”`, done: `“${added}”` };
+      })();
   return {
-    kind: "confirm",
-    verb: n === 1 ? "apply this Notion fix" : `apply these ${n} Notion fixes`,
-    lead: lines.join("\n"),
-    fields: [],
-    caveats: [],
-    operations,
-    fixes: { head, items: fixes, tail },
+    id: f.id,
+    title: cardTitle(f.target.title),
+    subtitle: `Your DM · ${dayOf(f.driftAt)}`,
+    body: change.body,
+    done: change.done,
+    open: { label: "Open page", url: f.target.url },
+    also: { label: "Open DM", url: f.permalink },
   };
 }
 
-/** The card as ThreadState stages it: a sweep card in the owner's DM with
- *  uno-bot, its own thread, that only the owner can resolve. */
-export function dmCaptureProposal(
-  card: ProposalCard,
-  posted: { owner: string; channel: string; ts: string; text: string; blocks?: unknown[]; runDate: string },
-): PendingProposal {
-  const operations = card.operations ?? [];
-  const first = operations[0]!;
+/**
+ * One fix as Review shows and decides it: the page, what it says, the edit,
+ * and a link to where it was said. No footer: Review is the gate.
+ *
+ * @param f - The fix
+ */
+export function dmCaptureCard(f: DmCaptureFinding): ProposalCard {
+  const lines = [`*${pageLink(f)}*`];
+  if (f.add) {
+    lines.push(
+      f.add.section ? `Add under *${escapeSlackText(flat(f.add.section))}*:` : `Add a new section, *${escapeSlackText(flat(f.add.newSection ?? ""))}*:`,
+      `“${escapeSlackText(flat(f.replacement))}”`,
+    );
+  } else {
+    const { before, after } = changedSpan(f.original, f.replacement);
+    lines.push(`Page says: “${escapeSlackText(flat(f.sourceSays))}”`, `Change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`);
+  }
+  lines.push(`From <${f.permalink}|your DM> on ${dayOf(f.driftAt)}. Only you can decide it, and nothing from your DMs goes anywhere else.`);
   return {
-    operations,
-    toolName: first.toolName,
-    input: first.input,
+    kind: "stated",
+    verb: "apply this Notion fix",
+    lead: lines.join("\n"),
+    footer: "",
+    fields: [],
+    caveats: [],
+    operations: [fixOperation(f)],
+  };
+}
+
+/** What a DM Capture card says at the gate (`PendingProposal.stated`). */
+export const DM_CAPTURE_WORDS: StatedCardWords = {
+  cancelled: "Rejected, nothing written",
+  expired: `That card closed after ${SWEEP_CARD_TTL_MS / 3_600_000} h with no decision, so nothing was written.`,
+};
+
+/** A fix's one write. */
+function fixOperation(f: DmCaptureFinding): ProposalOperation {
+  return itemOperation({ target: f.target, blockId: f.blockId, lastEditedTime: f.lastEditedTime, replacement: f.replacement, add: f.add });
+}
+
+/**
+ * One fix as ThreadState stages it: an item of the report in the owner's DM
+ * with uno-bot, that only the owner can decide. It is a sweep card too
+ * (`sweepRun`), so it is held to the sweep's rules — a revision may only drop
+ * the drafted edit, never add a write past it (ADR-032), its result posts
+ * with the sweep's tag, and its outcome is recorded as a sweep card's — while
+ * its own key (`itemProposal`) keeps it from replacing the other fixes on the
+ * card.
+ */
+export function dmCaptureProposal(f: DmCaptureFinding, posted: { owner: string; channel: string; ts: string; runDate: string }): PendingProposal {
+  const operation = fixOperation(f);
+  return {
+    operations: [operation],
+    toolName: operation.toolName,
+    input: operation.input,
     channel: posted.channel,
     threadTs: posted.ts,
     replyTs: posted.ts,
-    userMsgTs: posted.ts,
-    proposalTs: posted.ts,
-    proposalText: posted.text,
-    ...ownBlocks(posted),
+    ...itemProposal(posted.ts, f.id),
+    // The fix's whole text, which Review shows.
+    proposalText: renderProposalCard(dmCaptureCard(f)).text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
     ttlMs: SWEEP_CARD_TTL_MS,
     confirmers: [posted.owner],
+    stated: DM_CAPTURE_WORDS,
     sweepRun: posted.runDate,
-    supersedeKey: SWEEP_KEY,
-    // What its carousel showed, so a `drop N` revision is a carousel too.
-    ...(card.fixes ? { fixes: card.fixes } : {}),
   };
 }
 
