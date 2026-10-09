@@ -87,6 +87,8 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 | Research Papers | `85af6f14-7e96-4ed7-aa92-687579a14b4f` | `research_papers` | prior research to cite before re-running |
 | Banners | `36eb7cca-4982-81f4-ad99-e53e62d9506a` | `banners` | live in-product banner copy/state |
 
+**Team Member Database › Figma User ID** (rich_text) is optional, and each member fills in their own. It lets a Figma commenter be matched to a teammate. To find your id, open figma.com signed in and copy the number after `fuid=` in the address bar; pasting the whole URL works too.
+
 **Not tracked** (deliberate — noise or wrong owner for bot grounding): Help Center Articles Dev Page, Tasks Tracker on HC Content, Content HQ editorial / meeting / social DBs, demo pages. Use `scope: "any"` only as a last resort when the surface is unknown.
 
 **Findability rule:** access ≠ search. Workspace `/v1/search` is weak inside known DBs — prefer the catalog scope (direct `databases/{id}/query`). Empty results usually mean the DB isn't shared with the uno-bot Notion integration (Connections), not that the row doesn't exist.

@@ -14,7 +14,7 @@ import { createD1UsageLog } from "./d1";
 import { createD1ProposalEventLog } from "./proposal-events-d1";
 import type { ProposalEventLog } from "./proposal-events";
 import type { UsageLog } from "./store";
-import type { TeamRoles } from "./roles";
+import type { FigmaPeople, TeamRoles } from "./roles";
 import { charge, rethrowIfBudget } from "../net";
 import { findTeamMembers } from "../integrations/notion";
 import { slackDirectoryFor } from "../tools/slack-people";
@@ -100,14 +100,33 @@ export function testChannelIdsOf(env: Pick<Env, "TEST_CHANNEL_IDS">): string[] {
  *   empty map
  */
 export async function teamRolesFor(env: Pick<Env, "HARNESS_KV">): Promise<TeamRoles> {
-  if (!env.HARNESS_KV) return {};
+  return (await storedTeamRoles(env))?.roles ?? {};
+}
+
+/**
+ * The stored Figma user id → Slack id map, kept with the role map: how a
+ * Figma commenter is known to be a teammate (`./roles.ts` `slackPersonOfFigma`).
+ * Empty — every commenter then maps to nobody — on the same terms as
+ * `teamRolesFor`, and for a map stored before Figma ids were kept.
+ *
+ * @throws A budget stop, rather than an empty map: the caller treats the
+ *   commenter as unmapped (public facts only, no write proposals) or defers
+ */
+export async function figmaPeopleFor(env: Pick<Env, "HARNESS_KV">): Promise<FigmaPeople> {
+  return (await storedTeamRoles(env))?.figmaPeople ?? {};
+}
+
+/** The stored map, or null when none is stored, KV is not bound or the read
+ *  fails. One KV read, charged to the internal bucket. */
+async function storedTeamRoles(env: Pick<Env, "HARNESS_KV">): Promise<StoredTeamRoles | null> {
+  if (!env.HARNESS_KV) return null;
   try {
     charge(1, "kv");
-    return (await env.HARNESS_KV.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json"))?.roles ?? {};
+    return await env.HARNESS_KV.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json");
   } catch (err) {
     rethrowIfBudget(err);
     console.warn(`[usage] team roles not read: ${err instanceof Error ? err.message : String(err)}`);
-    return {};
+    return null;
   }
 }
 
@@ -134,10 +153,10 @@ export async function runTeamRolesSync(env: Env, opts: { dryRun: boolean }): Pro
         charge(1, "kv");
         return kv.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json");
       },
-      async write(stored) {
+      async write(stored, ttlS) {
         if (!kv) return;
         charge(1, "kv");
-        await kv.put(TEAM_ROLES_KV_KEY, JSON.stringify(stored), { expirationTtl: TEAM_ROLES_TTL_S });
+        await kv.put(TEAM_ROLES_KV_KEY, JSON.stringify(stored), { expirationTtl: ttlS });
       },
       now: () => Date.now(),
     },
