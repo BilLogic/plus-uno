@@ -948,9 +948,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // nothing to put in it and the client renders an empty bubble for the
       // whole run (tried, reverted — see api.ts).
       if (!deps.planStream) return;
-      // The checklist opens under the progress label and is retitled once from
-      // the ask.
-      const heading = ask ? checklistHeading(ask) : "";
+      // DM progress keeps the working label; channel checklists use the ask
+      // as their heading so the thread remains identifiable.
+      const heading = ask && !isAssistantThread(channel) ? checklistHeading(ask) : "";
       if (!replyTs) {
         await beginStaticPlan(label);
         // A static plan is rewritten once at settle anyway, so its retitle
