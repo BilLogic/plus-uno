@@ -38,7 +38,16 @@
 // PURE: no Env, no Slack shape.
 
 import type { TaskCardSource } from "../agent/task-card-readout";
-import { chartAcross, chartLine, chartOf, CHART_KINDS, type Chart, type ChartKind, type LookupCall } from "./chart";
+import {
+  chartAcross,
+  chartLine,
+  chartOf,
+  uncountedOf,
+  CHART_KINDS,
+  type Chart,
+  type ChartKind,
+  type LookupCall,
+} from "./chart";
 import {
   roadmapCards,
   roadmapTable,
@@ -93,6 +102,12 @@ export interface Presenter {
   absenceFired(ctx: AbsenceContext): void;
   /** The links a finished lookup read, as its task card carries them. */
   sourcesRead(sources: readonly TaskCardSource[]): void;
+  /** The lookup and field of each chart drawn across lookups — whose options
+   *  the turn reads, so the chart can say which values it left out. */
+  chartedAcross(): ReadonlyArray<{ lookup: string; field: string }>;
+  /** Every value the source offers for a field a chart across lookups
+   *  counted: any no lookup counted are named in a ⚠️ line. */
+  optionsOffered(lookup: string, field: string, options: readonly string[]): void;
   /** What the turn's lookups left to post beneath the answer, if anything. */
   presentation(): Presentation | undefined;
 }
@@ -177,8 +192,11 @@ function chartNote(chart: Chart): string {
   );
 }
 
+/** What `present` answers when a chart across lookups is refused: the counts
+ *  could not be grounded together, so the model is not handed them to type. */
 const NO_ACROSS_NOTE =
-  "No chart is attached. Give the counts in a sentence of your prose, each as its lookup reported it, and say which could be short.";
+  "No chart is attached, and a line beneath your answer tells the reader why, so do not repeat it. " +
+  "Those counts could not be grounded together; answer from what each lookup's own note says it holds.";
 
 /** The fields a fallback table shows when the model named none: the row's
  *  name, the field it grouped by, and the field it summed. */
@@ -194,11 +212,16 @@ function fallbackColumns(result: Record<string, unknown>, groupBy: string, measu
  * @param opts.now - The turn's clock, read for the ⚠️ line's freshness cutoff
  */
 export function presenter(opts: { now?: () => number } = {}): Presenter {
-  const lookups = new Map<string, Recorded>();
-  /** Every call of each lookup, in the order made, for a chart across them. */
+  /** Every call of each lookup, in the order made: a table, cards or a
+   *  grouped chart read the latest, a chart across lookups reads them all. */
   const calls = new Map<string, Recorded[]>();
+  const latest = (lookup: string): Recorded | undefined => calls.get(lookup)?.at(-1);
   const warnings = warningLog(opts.now);
   let table: ResultTable | undefined;
+  /** The call whose own `as_table` attached the table, while it stands. */
+  let tableCall: Recorded | undefined;
+  /** Each chart across lookups: the field, and the values it counted in full. */
+  const drawnAcross: Array<{ lookup: string; field: string; counted: readonly string[] }> = [];
   const charts: Chart[] = [];
   const sources = new Map<string, TaskCardSource>();
   let cards: AnswerCards | undefined;
@@ -228,7 +251,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
   const refuseChart = (error: string): string =>
     answer({ ok: false, chart_attached: false, table_attached: false, error, note: NO_TABLE_NOTE });
 
-  const attachChart = (chart: Chart): string => {
+  const attachChart = (chart: Chart, extra: Record<string, unknown> = {}, note = chartNote(chart)): string => {
     charts.push(chart);
     return answer({
       ok: true,
@@ -236,13 +259,16 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       title: chart.title,
       values: Object.fromEntries(chart.points.map((p) => [p.label, p.value])),
       total: chart.total,
-      note: chartNote(chart),
+      ...extra,
+      note,
     });
   };
 
   /** A chart with one point per call of the lookup, each that call's whole
-   *  count. Refused without a fallback table: its counts come from several
-   *  lookups, so there is no one list of rows to show instead. */
+   *  count. A card table one of those calls attached with `as_table` gives
+   *  way to it: the chart counts those cards. Refused with the reason as a ⚠️
+   *  line and no fallback table, since the counts come from several lookups
+   *  and there is no one list of rows to show instead. */
   const presentAcross = (lookup: string, kind: ChartKind, across: string, args: Record<string, unknown>): string => {
     const reading = chartAcross(lookup, calls.get(lookup) ?? [], {
       kind,
@@ -250,20 +276,38 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       ...(typeof args.list === "string" && args.list ? { list: args.list } : {}),
       ...(typeof args.takeaway === "string" ? { takeaway: args.takeaway } : {}),
     });
-    if ("chart" in reading) return attachChart(reading.chart);
-    return answer({ ok: false, chart_attached: false, table_attached: false, error: `No chart: ${reading.refusal}`, note: NO_ACROSS_NOTE });
+    if ("refusal" in reading) {
+      warnings.degraded(`Not charted: ${reading.refusal}`);
+      return answer({ ok: false, chart_attached: false, table_attached: false, error: `No chart: ${reading.refusal}`, note: NO_ACROSS_NOTE });
+    }
+    drawnAcross.push({ lookup, field: across, counted: reading.counted });
+    const replaced = tableCall !== undefined && reading.calls.includes(tableCall);
+    if (replaced) {
+      table = undefined;
+      tableCall = undefined;
+    }
+    const note = chartNote(reading.chart) + (replaced ? " It replaces the card table an earlier lookup attached; that table no longer posts." : "");
+    return attachChart(reading.chart, { table_attached: table !== undefined }, note);
   };
 
-  /** A `present` call asking for a chart: drawn from the recorded lookup, or
-   *  degraded to the rows it would have counted, as a table with the reason
-   *  beside it. */
+  /** A `present` call asking for a chart: drawn from the recorded lookup's
+   *  rows grouped by a field (`group_by`), or from every call of it, one point
+   *  each (`across`). A grouped chart that cannot be grounded degrades to the
+   *  rows it would have counted, as a table with the reason beside it. */
   const presentChart = (lookup: string, recorded: Recorded, args: Record<string, unknown>): string => {
-    if (charts.length >= MAX_CHARTS) return refuseChart(`At most ${MAX_CHARTS} charts per answer, and ${MAX_CHARTS} are already attached.`);
+    if (charts.length >= MAX_CHARTS) {
+      return refuseChart(`At most ${MAX_CHARTS} charts per answer, and ${MAX_CHARTS} are already attached.`);
+    }
     const kind = String(args.chart ?? "bar") as ChartKind;
     if (!CHART_KINDS.includes(kind)) return refuseChart(`'${kind}' is not a chart; ask for one of ${CHART_KINDS.join(", ")}.`);
     const across = typeof args.across === "string" ? args.across.trim() : "";
-    if (across) return presentAcross(lookup, kind, across, args);
     const groupBy = typeof args.group_by === "string" ? args.group_by.trim() : "";
+    if (across && groupBy) {
+      return refuseChart(
+        "Ask with group_by or across, not both: group_by groups one lookup's rows, across makes each call of the lookup one point.",
+      );
+    }
+    if (across) return presentAcross(lookup, kind, across, args);
     if (!groupBy) return refuseChart("Name the field to group the rows by in group_by.");
     const measured = typeof args.measure === "string" ? args.measure.trim() : "";
     const measure = measured && measured !== "count" ? measured : undefined;
@@ -279,6 +323,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
     const fallback = tableFrom(lookup, recorded, args, named.length ? named : fallbackColumns(recorded.result, groupBy, measure));
     if (typeof fallback === "string") return refuseChart(`No chart: ${reading.refusal}`);
     table = fallback;
+    tableCall = undefined;
     warnings.degraded(`Not charted: ${reading.refusal}`);
     return answer({
       ok: false,
@@ -330,9 +375,9 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table, cards, a chart or a conflict.`);
     }
     const lookup = typeof args.lookup === "string" ? args.lookup.trim() : "";
-    const recorded = lookups.get(lookup);
+    const recorded = latest(lookup);
     if (!recorded) {
-      const made = [...lookups.keys()];
+      const made = [...calls.keys()];
       const why =
         `No ${lookup || "named"} lookup ran this turn, so there are no rows to ${shape === "cards" ? "make cards of" : shape === "chart" ? "chart" : "table"}.` +
         (made.length ? ` Lookups that did: ${made.join(", ")}.` : "");
@@ -344,6 +389,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
     if (typeof made === "string") return refuse(made);
     // A table asked for in its own right replaces a fallback, and its reason.
     table = made;
+    tableCall = undefined;
     warnings.degraded(undefined);
     return answer({
       ok: true,
@@ -360,13 +406,14 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       warnings.lookup(name, text);
       const parsed = parse(text);
       if (!parsed || parsed.ok !== true) return text;
-      lookups.set(name, { args, result: parsed });
-      calls.set(name, [...(calls.get(name) ?? []), { args, result: parsed }]);
+      const call: Recorded = { args, result: parsed };
+      calls.set(name, [...(calls.get(name) ?? []), call]);
       // The Roadmap preset's own door: the lookup asked for its table itself.
       if (name !== "roadmap_query") return text;
       const cards = args.as_table === true ? roadmapCards(parsed as RoadmapResult) : undefined;
       if (cards) {
         table = roadmapTable(cards);
+        tableCall = call;
         warnings.degraded(undefined);
       }
       return JSON.stringify({
@@ -386,6 +433,14 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
     },
     sourcesRead(read) {
       for (const source of read) if (!sources.has(source.url)) sources.set(source.url, source);
+    },
+    chartedAcross() {
+      return drawnAcross.map(({ lookup, field }) => ({ lookup, field }));
+    },
+    optionsOffered(lookup, field, options) {
+      for (const drawn of drawnAcross) {
+        if (drawn.lookup === lookup && drawn.field === field) warnings.uncounted(uncountedOf(drawn.counted, options));
+      }
     },
     presentation() {
       const lines = warnings.lines();

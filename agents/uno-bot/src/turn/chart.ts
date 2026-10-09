@@ -11,18 +11,23 @@
 // A COUNT ACROSS LOOKUPS. Some counts take one lookup per group — cards per
 // Design Status is one `roadmap_query` per status, most of which list only
 // their first 30 cards. Grouping one lookup's rows cannot draw that, so the
-// model may name a field the calls were made with instead (`across`), and each
-// call of the lookup becomes one point: labelled by its value of that field,
-// valued at the whole count the call itself reported (`matched`, not the rows
-// it listed). Still code's numbers, from what the lookups returned.
+// model may name the field the calls were made with instead (`across`), and
+// each call becomes one point: named by the value its own rows carry (the
+// filter it was asked with only when it returned none), valued at the WHOLE
+// count it reported (`matched`, never the rows it listed). Calls whose other
+// filters differ count different things, so they are no chart; a call made
+// without the field is passed over. Which of the field's values no call
+// counted is the presenter's to say, from the source's own options.
 //
 // WHEN THERE IS NO CHART. A chart that cannot be drawn honestly is refused with
-// one sentence for the reader: the list was partial (counting the first 30 of
-// 41 would understate every bar), fewer than 3 points, a group field the rows
-// do not carry, a measure that is not a number on every row, more groups than
-// Slack draws, or labels that collide once cut to Slack's 20 characters. The
-// presenter turns that into the lookup's rows as a result table and the
-// sentence as a ⚠️ line.
+// one sentence for the reader. Grouped by a field: the list was partial
+// (counting the first 30 of 41 would understate every bar), a group field the
+// rows do not carry, or a measure that is not a number on every row. Across
+// lookups: a call that read only part of its source or reported no whole
+// count, or calls made with different other filters. Either way: fewer than 3
+// points, more than Slack draws, or labels that collide once cut to Slack's 20
+// characters. The presenter posts the sentence as a ⚠️ line, beneath the
+// lookup's rows as a result table when one lookup's rows were being grouped.
 //
 // PURE: no Env, no Slack shape. What the chart looks like in Slack is
 // `slack/chart-block.ts`'s; which charts a turn posts is
@@ -206,62 +211,135 @@ export interface LookupCall {
 /** What the model asked for when each call of a lookup is one point. */
 export interface AcrossRequest {
   kind: ChartKind;
-  /** The field each call was made with, which labels its point. */
+  /** The field each call was made with, which names its point. */
   across: string;
   list?: string;
   takeaway?: string;
 }
 
-/** The value a call was made with for `field`: as its result reports its
- *  filters, else as it was asked. */
-function calledWith(call: LookupCall, field: string): string | null {
-  const filters = (call.result.filters ?? {}) as Record_;
-  for (const value of [filters[field], call.args[field]]) {
-    if (typeof value === "string" && value.trim()) return value.trim();
-    if (typeof value === "number" && Number.isFinite(value)) return String(value);
-  }
+/** A chart across lookups, with the full name of every value it counted
+ *  (its points' labels are cut to Slack's 20 characters). */
+export type AcrossReading = { chart: Chart; counted: string[]; calls: LookupCall[] } | { refusal: string };
+
+/** Flags a lookup sets when what it counted is not the whole match. */
+const PARTIAL_FLAGS = ["truncated", "partial", "has_more", "hasMore", "more"] as const;
+
+/** A call's filters: the ones its result echoes, else the ones it was asked
+ *  with. */
+function filtersOf(call: LookupCall): Record_ {
+  const echoed = call.result.filters;
+  return typeof echoed === "object" && echoed !== null && !Array.isArray(echoed) ? (echoed as Record_) : call.args;
+}
+
+/** A filter value as a name, or null when the call was not made with one. */
+function nameOf(value: unknown): string | null {
+  if (typeof value === "string" && value.trim()) return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
   return null;
 }
 
-/** The whole count one call reported, beyond the rows it listed, and what
- *  its rows are when it listed any. */
-function totalOf(lookup: string, result: Record_, key: string | undefined): { total: number; noun?: string } | null {
-  const found = rowsOf(lookup, result, key);
-  if (found) return { total: found.total, noun: found.noun };
-  const whole = wholeCount(result, key ?? "");
-  return whole === undefined ? null : { total: whole };
+/** Every filter but `across`, as one comparable string, and as words for a
+ *  refusal: `person "Bill"`, or `no other filter`. */
+function otherFilters(call: LookupCall, across: string): { key: string; words: string } {
+  const others = Object.entries(filtersOf(call))
+    .filter(([field, value]) => field !== across && field !== "as_table" && nameOf(value) !== null)
+    .sort(([a], [b]) => a.localeCompare(b));
+  return {
+    key: JSON.stringify(others),
+    words: others.length ? others.map(([field, value]) => `${field} "${nameOf(value)}"`).join(", ") : "no other filter",
+  };
+}
+
+/** The whole count a call reported — never the rows it listed, which stop at
+ *  the first 30. Roadmap enumerations report it as `matched`. */
+function wholeOf(lookup: string, result: Record_, key: string | undefined): number | undefined {
+  if (lookup === "roadmap_query") return typeof result.matched === "number" ? result.matched : undefined;
+  return wholeCount(result, listOf(result, key)?.key ?? key ?? "");
+}
+
+/** What a call's rows are, for the axis: "cards" for the Roadmap. */
+function nounFor(lookup: string, result: Record_, key: string | undefined): string {
+  if (lookup === "roadmap_query") return "cards";
+  const list = listOf(result, key);
+  return list ? nounOf(list.key, 2) : "rows";
+}
+
+/** The value a call counted, as its own rows spell it; the filter it was asked
+ *  with only when it returned no rows to read. */
+function countedName(call: LookupCall, across: string, list: string | undefined): string | null {
+  const rows = Array.isArray(call.result.cards) ? (call.result.cards as Record_[]) : (listOf(call.result, list)?.rows ?? []);
+  for (const row of rows) {
+    const own = nameOf(row?.[across]);
+    if (own) return own;
+  }
+  return nameOf(filtersOf(call)[across]) ?? nameOf(call.args[across]);
 }
 
 /**
  * A chart with one point per call of a lookup, each valued at the whole count
  * that call reported, or the sentence saying why there is none.
  *
+ * Only calls made with `across` are points; a call made without it (a lookup by
+ * person alone) is passed over. The points must answer one question, so every
+ * call's other filters must match — a WIP count for Bill beside a Shipped count
+ * for the whole board compares nothing — and the chart is refused when they do
+ * not. Two calls that counted the same value, in any case, are one point: the
+ * later is a retry.
+ *
  * @param lookup - The tool that ran, once per group
  * @param calls - Every call of it this turn, in the order made
  * @param request - The model's choice of kind and the field the calls differ by
  */
-export function chartAcross(lookup: string, calls: readonly LookupCall[], request: AcrossRequest): ChartReading {
+export function chartAcross(lookup: string, calls: readonly LookupCall[], request: AcrossRequest): AcrossReading {
   const across = request.across.trim();
-  // A later call with the same value is a retry: it wins.
-  const byValue = new Map<string, LookupCall>();
-  for (const call of calls) {
-    const value = calledWith(call, across);
-    if (value !== null) byValue.set(value, call);
+  const made = calls.filter((call) => nameOf(filtersOf(call)[across]) ?? nameOf(call.args[across]));
+  if (!made.length) return { refusal: `no ${lookup} lookup this turn was made with a ${across} to count by.` };
+
+  const filterSets = new Map(made.map((call) => [otherFilters(call, across).key, otherFilters(call, across).words]));
+  if (filterSets.size > 1) {
+    return {
+      refusal: `the ${lookup} lookups were made with different filters besides ${across} (${[...filterSets.values()].join("; ")}), so their counts do not compare.`,
+    };
   }
-  if (!byValue.size) return { refusal: `no ${lookup} lookup this turn was made with a ${across} to label it by.` };
+
+  const byValue = new Map<string, { name: string; call: LookupCall }>();
+  for (const call of made) {
+    const name = countedName(call, across, request.list)!;
+    byValue.set(name.toLowerCase(), { name, call });
+  }
 
   const sums = new Map<string, number>();
-  let noun: string | undefined;
-  for (const [value, call] of byValue) {
-    if (call.result.truncated === true) {
-      return { refusal: `the ${value} lookup read only part of the source, so its count could be short.` };
+  for (const { name, call } of byValue.values()) {
+    if (PARTIAL_FLAGS.some((flag) => call.result[flag] === true)) {
+      return { refusal: `the ${name} lookup read only part of the source, so its count could be short.` };
     }
-    const counted = totalOf(lookup, call.result, request.list);
-    if (!counted) return { refusal: `the ${value} lookup reported no count.` };
-    sums.set(value, counted.total);
-    noun ??= counted.noun;
+    const whole = wholeOf(lookup, call.result, request.list);
+    if (whole === undefined) return { refusal: `the ${name} lookup reported no whole count, only the rows it listed.` };
+    sums.set(name, whole);
   }
-  return drawn(lookup, request.kind, sums, { groupBy: across, measure: null, noun: noun ?? "rows", ...(request.takeaway ? { takeaway: request.takeaway } : {}) });
+
+  const first = made[0]!.result;
+  const reading = drawn(lookup, request.kind, sums, {
+    groupBy: across,
+    measure: null,
+    noun: nounFor(lookup, first, request.list),
+    ...(request.takeaway ? { takeaway: request.takeaway } : {}),
+  });
+  if ("refusal" in reading) return reading;
+  const counted = [...byValue.values()];
+  return { chart: reading.chart, counted: counted.map((c) => c.name), calls: counted.map((c) => c.call) };
+}
+
+/**
+ * The values a chart across lookups left out: those the source offers that no
+ * lookup counted, in the source's order, matched ignoring case.
+ *
+ * @param counted - The values the chart counted, in full
+ * @param options - Every value the source offers for the field
+ */
+export function uncountedOf(counted: readonly string[], options: readonly string[]): string[] {
+  const seen = new Set(counted.map((c) => c.toLowerCase()));
+  return options.filter((o) => !seen.has(o.toLowerCase()));
 }
 
 /** How many of a chart's points its text line names. */

@@ -205,6 +205,9 @@ export function harness(opts: {
   providerUsage?: Partial<ModelUsage>;
   /** The turn's clock. Absent, the real one. */
   now?: () => number;
+  /** The values a lookup's filter can take, as the board offers them. Absent,
+   *  none are known. */
+  lookupOptions?: TurnDeps["lookupOptions"];
   /** A DM ask's in-turn classifier. Absent, DM asks are recorded unlabelled. */
   classifyAsk?: (text: string) => Promise<SubType | null>;
   /** The stored role map a staged card reads. Absent, none is stored. */
@@ -323,6 +326,7 @@ export function harness(opts: {
     },
 
     ...(opts.now ? { now: opts.now } : {}),
+    ...(opts.lookupOptions ? { lookupOptions: opts.lookupOptions } : {}),
 
     // The three reads a card needs, answering with the STRUCTURES the turn
     // puts on the card — never words, which are the adapter's (#623).
