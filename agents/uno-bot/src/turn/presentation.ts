@@ -567,10 +567,39 @@ export function proseBudgetRepair(draft: string, presentation: Presentation | un
   );
 }
 
+/** A line's words, without its sign, emphasis or spacing. */
+const bare = (line: string): string =>
+  line
+    .replace(/⚠️|⚠|:warning:/g, "")
+    .replace(/[*_]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+/**
+ * The prose without a line that only repeats a ⚠️ line posted beneath it. The
+ * sign is code's to place, and a model that has seen the line in a thread
+ * types it too: live on r528 the partial line posted twice, once in the prose
+ * and once beneath it.
+ *
+ * @param prose - The answer as the model wrote it
+ * @param warnings - The ⚠️ lines posted beneath it, without their sign
+ */
+function withoutWarningLines(prose: string, warnings: readonly string[]): string {
+  if (!warnings.length) return prose;
+  const said = new Set(warnings.map(bare));
+  const lines = prose.split("\n");
+  const kept = lines.filter((line) => !said.has(bare(line)));
+  if (kept.length === lines.length) return prose;
+  while (kept.length && !kept[kept.length - 1]!.trim()) kept.pop();
+  return kept.join("\n");
+}
+
 /** A line the backstop never takes out: the confidence clause, which says
- *  what was checked or how sure. A bare "currently" in a row's sentence is
- *  not one. */
-const carriesConfidence = (line: string): boolean => hasWovenConfidence(line);
+ *  what was checked or how sure, or that it was read "just now" ("I queried
+ *  the blueprint just now", which names no verb `hasWovenConfidence` knows).
+ *  A bare "currently" in a row's sentence is not one. */
+const carriesConfidence = (line: string): boolean => hasWovenConfidence(line) || /\bjust\s+now\b/i.test(line);
 
 /**
  * The prose as it posts beneath a presentation: every line that types out a
@@ -583,6 +612,7 @@ const carriesConfidence = (line: string): boolean => hasWovenConfidence(line);
  * @param presentation - What rides beneath it
  */
 export function presentedProse(prose: string, presentation: Presentation | undefined): RowsRemoved {
+  prose = withoutWarningLines(prose, presentation?.warnings ?? []);
   const table = presentation?.table;
   let out: RowsRemoved = { text: prose, removed: 0 };
   let named = 0;

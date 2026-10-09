@@ -525,7 +525,12 @@ export async function reviewDraft(
           if (!revised) {
             console.warn("[draft-judge] shorten asked, no revision — sending the original draft");
           } else if (revised.length >= draft.trim().length || revised.length > MAX_SHORTENED_CHARS) {
-            console.warn("[draft-judge] shortened revision is not short — sending the original draft");
+            // Its length is logged so the ceiling can be tuned against what
+            // the judge actually writes.
+            console.warn(
+              `[draft-judge] shortened revision is not short (revised_chars=${revised.length} ` +
+                `draft_chars=${draft.trim().length} max=${MAX_SHORTENED_CHARS}) — sending the original draft`,
+            );
           } else if (retainedVocabulary(revised, draft) < MIN_SHORTENED_FROM_DRAFT) {
             console.warn("[draft-judge] shortened revision says what the draft did not — sending the original draft");
           } else if (replyEmojiBreach(revised)) {
