@@ -124,6 +124,17 @@ or
 const MIN_DRAFT_CHARS = 1000;
 // Hard wall-clock cap; past it the original draft ships (fail open).
 const JUDGE_TIMEOUT_MS = 25_000;
+// A SHORTEN's own cap. A shorten reads a long draft and writes the short answer
+// in its place, more work than a verdict or a light repair: live on r526 a
+// 7,458-character shorten ran past 25s and the walk shipped as written. The
+// turn has no wall-clock limit of its own — it runs in a Durable Object alarm,
+// which has no cut-off (`turn/warning-line.ts`), and the answer is posted
+// through the API after it, so no Slack deadline is pending — and its interim
+// line already speaks at 75s (`INTERIM_BACKSTOP_MS`), so the cost of waiting
+// is the reader's alone, and a walk shipped beside its own table costs them
+// more. 60s is 2.4 times the verdict clock and still ends the call well inside
+// a turn whose loop routinely runs 50 to 100s.
+const SHORTEN_TIMEOUT_MS = 60_000;
 // Inputs are capped so the judge call stays cheap and bounded.
 const MAX_USER_CHARS = 2_000;
 const MAX_PRIOR_CHARS = 4_000;
@@ -454,6 +465,7 @@ export async function reviewDraft(
     correction && !!priorAssistantText && looksLikeStalledCorrection(priorAssistantText, draft);
 
   const startedAt = Date.now();
+  const timeoutMs = mode === "shorten" ? SHORTEN_TIMEOUT_MS : JUDGE_TIMEOUT_MS;
   let verdict: JudgeOutcome["verdict"] = "error";
   let reason = "";
   let failed: string[] = [];
@@ -472,12 +484,12 @@ export async function reviewDraft(
         tableList,
         emoji,
       }),
-      new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
+      new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), timeoutMs)),
     ]);
 
     if (answer === "__timeout__") {
       verdict = "error";
-      reason = `timed out after ${JUDGE_TIMEOUT_MS}ms`;
+      reason = `timed out after ${timeoutMs}ms`;
       console.warn("[draft-judge] timed out — sending the original draft");
     } else if (answer.ok === false && answer.unavailable === true) {
       // NEVER ASKED: the adapter has no credential, so there is no judgement to

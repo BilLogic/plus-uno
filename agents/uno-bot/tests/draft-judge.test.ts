@@ -470,6 +470,26 @@ test("a shorten rewrite that is no shorter, or says what the draft never did, is
   }
 });
 
+test("a shorten has longer than a verdict to come back: 40s is inside its window, not past it", async (t) => {
+  // Live on r526 a 7,458-character shorten timed out at the judge's 25s and
+  // the draft shipped unshortened. A judge that answers in 40s now lands.
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const reply = verdictJson({ verdict: "fail", failed: ["gate:length"], revised: SHORT });
+  const slow = {
+    name: "slow",
+    generate: () =>
+      new Promise((resolve) => setTimeout(() => resolve({ ok: true, model: "slow", text: reply }), 40_000)),
+  } as unknown as Parameters<typeof reviewDraft>[0];
+
+  const pending = reviewDraft(slow, { userText: "q", draft: WALKTHROUGH, forceReason: "table-walk", shorten: true });
+  t.mock.timers.tick(40_000);
+  assert.equal((await pending).text, SHORT);
+
+  const verdictOnly = reviewDraft(slow, { userText: "q", draft: WALKTHROUGH });
+  t.mock.timers.tick(40_000);
+  assert.equal((await verdictOnly).verdict, "error", "a verdict keeps the 25s clock");
+});
+
 test("shorten takes a rewrite of a draft inside the revision window too, however much shorter", async () => {
   const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "fail", failed: ["gate:length"], revised: SHORT })] });
   const draft = `${LONG_DRAFT} ${TAIL}`;
