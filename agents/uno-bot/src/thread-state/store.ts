@@ -397,6 +397,9 @@ export interface DecisionReportRecord {
   /** How long its items stay decidable — the record outlives them by
    *  `REPORT_GRACE_MS`, so a late View still reads it. */
   ttlMs: number;
+  /** Blocks the report posted below its cards — the library release's table
+   *  of changed components — drawn again under them on every redraw. */
+  after?: unknown[];
 }
 
 /** One change to a report: an item's state, or an item replaced by its
