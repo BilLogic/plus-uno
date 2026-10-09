@@ -73,6 +73,33 @@ export function acknowledgement(answer: ReminderAnswer, checkBackDay?: string): 
   }
 }
 
+/** Why a tapped answer changed nothing, in the words the tapper sees, only to
+ *  them. A reaction can go unanswered; a button that does nothing reads as
+ *  broken, so every refused tap is told why. */
+export const TAP_REFUSED = {
+  settled: "This one's already been answered, so that tap changed nothing.",
+  snoozeSpent: "This can't be put off again, so that tap changed nothing.",
+  notAnAnswer: "That answer doesn't apply here any more, so nothing changed.",
+  gone: "I'm no longer tracking this one, so that tap changed nothing.",
+  notYours: (owner: string) => `Only <@${owner}> can answer this reminder, so that tap changed nothing.`,
+} as const;
+
+/** A tap the door could not record (a store error, a budget stop): said
+ *  plainly, never passed off as a reminder it no longer tracks. */
+export const TAP_FAILED = "I couldn't record that. Try again in a minute.";
+
+/** A tap that landed on a message the edit then missed. */
+export const TAP_RECORDED = "Got it, that's recorded, though I couldn't update the message to show it.";
+
+/** What one kind's own answers made of a press: why it changed nothing, or
+ *  that it landed but the message still shows its buttons. Nothing when it
+ *  landed and shows. */
+export type TapAnswer = { refused: string } | { unedited: true };
+
+/** What a reminder door made of a press: not a reminder's (or the lookup
+ *  failed), or the reminder's, with why it changed nothing when it didn't. */
+export type ReminderOutcome = { claimed: false; failed?: true } | { claimed: true; refused?: string; unedited?: true };
+
 /** Characters of a summary a reminder repeats. */
 export const MAX_WHAT_CHARS = 140;
 
