@@ -324,7 +324,7 @@ describe("the route on the Worker's bindings", () => {
    *  AgentRunner over in-memory storage. */
   function workerEnv(over: Partial<Env> = {}) {
     const storage = createInMemoryRunnerStorage();
-    const kv = new Map<string, { value: string; ttl?: number }>();
+    const kv = new Map<string, { value: string; ttl?: number; metadata?: unknown }>();
     const names: string[] = [];
     let runner: AgentRunner | undefined;
     const env = {
@@ -335,8 +335,12 @@ describe("the route on the Worker's bindings", () => {
           if (!hit) return null;
           return type === "json" ? JSON.parse(hit.value) : hit.value;
         },
-        async put(key: string, value: string, opts?: { expirationTtl?: number }) {
-          kv.set(key, { value, ...(opts?.expirationTtl ? { ttl: opts.expirationTtl } : {}) });
+        async put(key: string, value: string, opts?: { expirationTtl?: number; metadata?: unknown }) {
+          kv.set(key, {
+            value,
+            ...(opts?.expirationTtl ? { ttl: opts.expirationTtl } : {}),
+            ...(opts?.metadata ? { metadata: opts.metadata } : {}),
+          });
         },
       },
       AGENT_RUNNER: {
@@ -363,6 +367,8 @@ describe("the route on the Worker's bindings", () => {
     assert.equal(note[0]![0], "figma-notify:commented:2026-10-03:FILEKEY1");
     assert.deepEqual(JSON.parse(note[0]![1].value), { at: "2026-10-03T16:00:00Z" });
     assert.equal(note[0]![1].ttl, COMMENTED_TTL_S);
+    // Its time as metadata too, so the comment read lists a day with one call (#900).
+    assert.deepEqual(note[0]![1].metadata, { at: "2026-10-03T16:00:00Z" });
 
     // A redelivery reaches the same runner and is refused there.
     assert.equal((await handleFigmaEvents(post(COMMENT), figmaEventsDepsFor(w.env))).status, 200);

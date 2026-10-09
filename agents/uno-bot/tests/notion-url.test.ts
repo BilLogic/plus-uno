@@ -226,3 +226,28 @@ test("a PRD poll root posted with an app.notion.com link still yields the PRD", 
     url: "https://www.notion.so/DS-Update-Tag-26bb7cca49828002a07ee3bd6c5bfc4c",
   });
 });
+
+test("a page read lists the pages nested in its body, and keeps them out of its text (#900)", async () => {
+  // A Roadmap card: its PRD is a subpage, which is how the comment read finds it.
+  serve({
+    "GET /v1/pages/": { body: { id: "9c0d7cca-4982-8100-9b41-000000000900", properties: { Name: title("Goal Setting") } } },
+    "GET /v1/blocks/": {
+      body: {
+        results: [
+          { id: "b1", type: "paragraph", paragraph: { rich_text: [{ plain_text: "TLDR: goals for tutors" }] } },
+          { id: "7d1a7cca-4982-8100-9b41-0000000009aa", type: "child_page", child_page: { title: "PRD" } },
+          { id: "7d1a7cca-4982-8100-9b41-0000000009bb", type: "child_page", child_page: { title: "  " } },
+        ],
+        has_more: false,
+      },
+    },
+  });
+  const { readNotionPage } = await notion();
+  const page = await readNotionPage(ENV, "9c0d7cca498281009b41000000000900");
+  assert.deepEqual(page.subpages, [{ id: "7d1a7cca498281009b410000000009aa", title: "PRD" }]);
+  assert.equal(page.text, "TLDR: goals for tutors");
+  assert.deepEqual(
+    page.blocks.map((b) => b.id),
+    ["b1"],
+  );
+});

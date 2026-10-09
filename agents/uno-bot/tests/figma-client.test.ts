@@ -97,6 +97,12 @@ const WEBHOOK = {
 const SHAPES: Shape[] = [
   { method: "file", call: (f) => f.file(KEY, { depth: 2 }), send: { method: "GET", url: `${API}/v1/files/${KEY}?depth=2` } },
   {
+    method: "file",
+    call: (f) => f.file(KEY, { ids: [A, B] }),
+    send: { method: "GET", url: `${API}/v1/files/${KEY}?ids=158%3A21725,200%3A1` },
+  },
+  { method: "fileMeta", call: (f) => f.fileMeta(KEY), send: { method: "GET", url: `${API}/v1/files/${KEY}/meta` } },
+  {
     method: "nodes",
     call: (f) => f.nodes(KEY, [A, B], { geometry: "paths" }),
     send: { method: "GET", url: `${API}/v1/files/${KEY}/nodes?ids=158%3A21725,200%3A1&geometry=paths` },

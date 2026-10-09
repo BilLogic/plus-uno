@@ -51,7 +51,10 @@ export type JobBody = (env: Env, job: ScheduledJob, ctx: JobContext) => Promise<
 const sweepBody: JobBody = async (env, job, ctx) => {
   // Drift in a file uno-bot cannot write, queued for the morning's ask.
   // Never a DM's: what a DM finds stays in it, and a drafted intake would not.
-  const fileDrift = job.kind === "sweep-post" || job.kind === "sweep-dms" ? undefined : fileDriftSinkFor(env);
+  const fileDrift =
+    job.kind === "sweep-post" || job.kind === "sweep-dms" || job.kind === "sweep-figma-comments" || job.kind === "sweep-figma-post"
+      ? undefined
+      : fileDriftSinkFor(env);
   const report = await runSweepJobOnEnv(env, job, ctx, {
     ...sweepHooks(env, job, ctx),
     ...(fileDrift ? { fileDrift } : {}),
@@ -130,6 +133,10 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "sweep-cards": sweepBody,
   // Morning: the findings whose morning has come become proposal cards.
   "sweep-post": sweepBody,
+  // End of day: decisions in the day's Figma comments, kept for the morning;
+  // morning: one #plus-design thread per file (src/figma-comments/).
+  "sweep-figma-comments": sweepBody,
+  "sweep-figma-post": sweepBody,
   // End of day: label one batch of the channel asks still holding text, and
   // null that text in the same write. Counts only — never the model's words.
   "usage-classify": async (env, job, { dryRun }) => {

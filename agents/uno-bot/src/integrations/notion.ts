@@ -586,6 +586,9 @@ export interface NotionPageContent {
    * never saw (ADR-029). Same order as `text`, one entry per rendered line.
    */
   blocks: NotionPageBlock[];
+  /** The pages nested in its body (`child_page` blocks), in order: how a
+   *  Roadmap card's PRD subpage is found. They carry no text of their own. */
+  subpages: Array<{ id: string; title: string }>;
   /** The database the page is a row of, dashes removed; null for a page that
    *  is no database's row. */
   parentDatabaseId: string | null;
@@ -726,6 +729,7 @@ export async function readNotionPage(
     // Block text — paginate a few pages of top-level children.
     const lines: string[] = [];
     const blocks: NotionPageBlock[] = [];
+    const subpages: NotionPageContent["subpages"] = [];
     let cursor: string | undefined;
     let partial = false;
     let truncated = false;
@@ -751,6 +755,11 @@ export async function readNotionPage(
         results?: Record<string, unknown>[]; has_more?: boolean; next_cursor?: string;
       };
       for (const block of bData.results ?? []) {
+        if (block.type === "child_page") {
+          const title = (block.child_page as { title?: string } | undefined)?.title?.trim();
+          if (block.id && title) subpages.push({ id: String(block.id).replace(/-/g, ""), title });
+          continue;
+        }
         const line = blockText(block);
         if (!line) continue;
         lines.push(line);
@@ -780,6 +789,7 @@ export async function readNotionPage(
       people,
       text: lines.join("\n").slice(0, READ_TEXT_CAP),
       blocks,
+      subpages,
       parentDatabaseId: page.parent?.database_id?.replace(/-/g, "") ?? null,
       parentType: page.parent?.type ?? null,
       truncated: truncated || partial,

@@ -288,8 +288,9 @@ function offeredFor(source: SweepSource, record: SweepRecord): SweepBlock[] {
  * an existing heading goes under that heading instead. On a page longer than
  * the read, the end is not known: neither a new section nor a section that
  * runs past the last block read has a place, and the answer is dropped.
+ * The Figma comment read places a PRD line the same way (`figma-comments/`).
  */
-function placeFor(
+export function placeFor(
   source: SweepSource,
   sectionId: string,
   newSection: string,
@@ -321,7 +322,7 @@ function placeFor(
 }
 
 /** Why a line may not be added, or null when it may. */
-function addedProblem(text: string): string | null {
+export function addedProblem(text: string): string | null {
   if (!text) return "empty";
   if (text.includes("\n")) return "more than one line";
   if (text.length > MAX_ADDED_CHARS) return "too long";

@@ -397,6 +397,13 @@ async function applyRevise(
   await deps.revise({ proposal: verdict.proposal, note: verdict.revise.note, userId: request.userId });
 }
 
+/**
+ * What the revision turn's message says before the note: the asker's own
+ * reply as the turn reads it. A card that revises its own way (a Figma
+ * comment decision, `figma-comments/revise.ts`) reads the note after it.
+ */
+export const NEEDS_CHANGES_LEAD = "Needs changes on the proposal card above: ";
+
 /** What starting a revision needs: Slack, bound once in `slack/interactive.ts`. */
 export interface RevisionDeps {
   threadState: ThreadState;

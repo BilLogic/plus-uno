@@ -1,7 +1,8 @@
 // Every Figma message uno-bot's code writes, against the copy Bill approved in
 // #886 (2026-09-30) — the library publish card, its thread, the post for a
 // library edited but not published, the weekly precedence thread, the drift
-// question and its withdrawal, and what each card says at the gate.
+// question and its withdrawal, the comment-decision thread (#900), and what
+// each card says at the gate.
 //
 // Two things are pinned, the way tests/share-out.test.ts pins its post:
 //   • each renderer's words, as literals: its first line, its counts against
@@ -55,6 +56,9 @@ import {
 } from "../src/figma-drift/copy";
 import type { GateNote } from "../src/turn/index";
 import { STANDING_TOO } from "../src/sweep/capture-lines";
+import { decisionCard, decisionCardWords, decisionParent, rewordInstead, whichOne } from "../src/figma-comments/copy";
+import { DECISION_CARD_TTL_MS } from "../src/figma-comments/post";
+import type { QueuedDecision } from "../src/figma-comments/queue";
 
 // ── The doc ──────────────────────────────────────────────────────────────────
 
@@ -650,5 +654,104 @@ describe("the drift question (#886 § 3.3)", () => {
       passesGateAnswer(renderGateNote(note));
     }
     assert.equal(renderGateNote({ kind: "expired", ttlMs: DRIFT_CARD_TTL_MS, words: words.expired }), words.expired);
+  });
+});
+
+// ── The comment-decision thread (#886 § 3.5, #900) ──────────────────────────
+//
+// § 3.5 gives the parent and one reply. Where the code goes past it — the
+// number on each card, the whole drafted text under the update line, "✅
+// writes it" for one write and "✅ files the intake" for an intake, the
+// commenter by Figma handle — follows its register.
+
+describe("the comment-decision thread (#886 § 3.5)", () => {
+  const FILE = { title: "Goal Setting / Card 2482 / Sarah", url: "https://www.figma.com/design/GoalFile1" };
+  const PRD = { title: "PRD", url: "https://www.notion.so/24820000000000000000000000000002" };
+  const COMMENT = "https://www.figma.com/design/GoalFile1?node-id=4-1#c1";
+  const base: QueuedDecision = {
+    commentId: "c1",
+    nodeId: "4:1",
+    quote: "Keep the progress bar hidden until the first goal is set",
+    by: "sarah",
+    section: "Specs",
+    page: "Goal states",
+    createdAt: "2026-09-29T15:00:00Z",
+    resolvedAt: "2026-09-29T18:00:00Z",
+    decision: "The progress bar stays hidden until the first goal is set.",
+    route: "prd",
+    operation: {
+      toolName: "notion_update",
+      input: { page_url: PRD.url, insert: [{ after_block_id: "b2", last_edited_time: "2026-09-02T10:00:00.000Z", content: "The progress bar stays hidden until the first goal is set." }] },
+    },
+    update: { kind: "prd", change: "add", section: "Goal states", page: PRD },
+    confidence: 0.9,
+  };
+  const status: QueuedDecision = {
+    ...base,
+    commentId: "c3",
+    quote: "Moving this card to Under Review",
+    resolvedAt: null,
+    route: "card",
+    operation: { toolName: "notion_update", input: { page_url: "https://www.notion.so/c", properties: { "Design Status": "Under Review" } } },
+    update: { kind: "card", card: 2482, field: "Design Status", from: "WIP", to: "Under Review", url: "https://www.notion.so/c" },
+  };
+  const intake: QueuedDecision = {
+    ...base,
+    commentId: "c4",
+    quote: "Goal chips use Badge's pill variant everywhere",
+    route: "design-system",
+    operation: { toolName: "github_issue_create", input: { title: "Goal chips use the Badge pill variant", body: "…" } },
+    update: { kind: "intake", title: "Goal chips use the Badge pill variant" },
+  };
+
+  it("the parent names the file and the count, and asks one named person once", () => {
+    const three = decisionParent({ ...FILE, owner: { slack: "U0AAAAAA1" } }, 3);
+    assert.equal(
+      three,
+      "*3 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions*\n<@U0AAAAAA1>, can you check the updates I've drafted below?",
+    );
+    passesChecklist(three);
+    assert.equal(three.match(/<@U/g)?.length, 1, "the owner, once");
+    const one = decisionParent({ ...FILE, owner: { figma: "bea" } }, 1);
+    assert.equal(one, "*1 comment in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> reads like a decision*\nbea, can you check the update I've drafted below?");
+    passesChecklist(one);
+  });
+
+  it("each reply leads with its number and the quote, says who said it where and when, and has one footer", () => {
+    const prdCard = renderProposalCard(decisionCard(1, base, COMMENT)).text;
+    assert.equal(
+      prdCard,
+      [
+        '*1 · "Keep the progress bar hidden until the first goal is set"*',
+        `sarah on the Specs page, resolved Sep 29 · <${COMMENT}|see comment>`,
+        `• *PRD › Goal states:* add this rule · <${PRD.url}|page>`,
+        "> The progress bar stays hidden until the first goal is set.",
+        "",
+        ":white_check_mark: writes it · :no_entry: drops it",
+      ].join("\n"),
+    );
+    const statusCard = renderProposalCard(decisionCard(2, status, COMMENT)).text;
+    assert.match(statusCard, /^sarah on the Specs page, commented Sep 29 · /m);
+    assert.match(statusCard, /^• \*Card 2482 › Design Status:\* WIP → Under Review · <https:\/\/www\.notion\.so\/c\|card>$/m);
+    const intakeCard = renderProposalCard(decisionCard(3, intake, COMMENT)).text;
+    assert.match(intakeCard, /^• \*Intake:\* "Goal chips use the Badge pill variant"\n> …$/m, "with the body it files");
+    assert.match(intakeCard, /\n\n:white_check_mark: files the intake · :no_entry: drops it$/);
+    for (const text of [prdCard, statusCard, intakeCard]) passesChecklist(text, { gate: true });
+  });
+
+  it("a ⛔ closes a decision card with what it did and who decided, and a late answer says nothing was written", () => {
+    const words = decisionCardWords();
+    assert.equal(statedCancelledNote(words, "U0AAAAAA2"), ":no_entry: Dropped, nothing written, decided by <@U0AAAAAA2>.");
+    assert.equal(words.expired, "That card closed after 72 h with no decision, so nothing was written.");
+    passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
+    passesGateAnswer(renderGateNote({ kind: "expired", ttlMs: DECISION_CARD_TTL_MS, words: words.expired }));
+  });
+
+  it("the lines a reply gets hold to the vocabulary, and point at Review", () => {
+    for (const text of [rewordInstead(2), whichOne([1, 3])]) {
+      assert.match(text, /press Review on .* card and choose Needs changes/i);
+      assertVocabulary(text);
+      assert.ok(text.length < 200, text);
+    }
   });
 });

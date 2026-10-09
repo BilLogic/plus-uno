@@ -44,7 +44,9 @@ function notesOn(env: Env): FigmaNotes {
     },
     async put(key, value, ttlS) {
       charge(1, "kv");
-      await kv.put(key, JSON.stringify(value), { expirationTtl: ttlS });
+      // The time rides as metadata too, so the comment read lists a day's notes
+      // with their times in one call rather than a get each (#900).
+      await kv.put(key, JSON.stringify(value), { expirationTtl: ttlS, metadata: value });
     },
   };
 }

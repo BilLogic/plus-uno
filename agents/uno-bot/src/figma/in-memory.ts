@@ -12,7 +12,10 @@
 //   • a webhook's passcode reads back as an empty string;
 //   • a webhook's delivery history is what the test seeded, and an unknown
 //     webhook's is a 404;
-//   • a comment is posted as the token's owner (`me`), whoever asked.
+//   • a comment is posted as the token's owner (`me`), whoever asked;
+//   • a file read to a `depth` stops that many levels below the document (1
+//     is the pages alone), and one read for `ids` holds only the paths down to
+//     those nodes, with their subtrees.
 // Refusals are `FigmaRequestError`s worded like the REST client's.
 //
 // PURE: no `Env`, no fetch.
@@ -51,6 +54,8 @@ export interface SeedFile {
   versions?: FigmaVersionsResponse;
   comments?: FigmaComment[];
   devResources?: FigmaDevResource[];
+  /** Who made the file, as `/meta` says. */
+  creator?: FigmaUser;
 }
 
 /** One call the fake answered or refused. */
@@ -93,6 +98,23 @@ interface StoredFile {
   versions: FigmaVersionsResponse;
   comments: FigmaComment[];
   devResources: FigmaDevResource[];
+  creator: FigmaUser | null;
+}
+
+/** The tree cut `depth` levels below `node`, as Figma's `depth` cuts it. */
+function toDepth(node: FigmaNode, depth: number): FigmaNode {
+  if (depth <= 0) {
+    const { children: _cut, ...rest } = node;
+    return rest;
+  }
+  return node.children ? { ...node, children: node.children.map((c) => toDepth(c, depth - 1)) } : node;
+}
+
+/** Only the paths from `node` down to `ids`, with their subtrees; null when none is under it. */
+function toPaths(node: FigmaNode, ids: ReadonlySet<string>): FigmaNode | null {
+  if (node.id && ids.has(node.id)) return node;
+  const kept = (node.children ?? []).map((c) => toPaths(c, ids)).filter((c): c is FigmaNode => c !== null);
+  return kept.length ? { ...node, children: kept } : null;
 }
 
 /**
@@ -148,6 +170,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         versions: { versions: [] },
         comments: [],
         devResources: [],
+        creator: null,
       };
       files.set(fileKey, {
         name: seed.name ?? current.name,
@@ -158,6 +181,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         versions: clone(seed.versions ?? current.versions),
         comments: clone(seed.comments ?? current.comments),
         devResources: clone(seed.devResources ?? current.devResources),
+        creator: clone(seed.creator ?? current.creator),
       });
     },
     seedTeam(teamId, list) {
@@ -178,7 +202,15 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
     async file(key, o) {
       const entry = enter("file", [key, o]);
       const f = fileOf("file", key);
-      return landed(entry, { name: f.name, lastModified: f.lastModified, document: f.document });
+      let document = f.document;
+      if (o?.ids?.length) document = toPaths(document, new Set(o.ids)) ?? { ...document, children: [] };
+      if (o?.depth !== undefined) document = toDepth(document, o.depth);
+      return landed(entry, { name: f.name, lastModified: f.lastModified, document });
+    },
+    async fileMeta(key, o) {
+      const entry = enter("fileMeta", [key, o]);
+      const f = fileOf("file meta", key);
+      return landed(entry, { file: { name: f.name, ...(f.creator ? { creator: f.creator } : {}), last_touched_at: f.lastModified } });
     },
     async nodes(key, ids, o) {
       const entry = enter("nodes", [key, ids, o]);

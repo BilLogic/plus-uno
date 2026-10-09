@@ -38,7 +38,7 @@
 
 /** The subset of a Figma node the text and comment walks look at. */
 export interface FigmaNode {
-  /** Figma's node id, e.g. "158:21725"; on every node a `/nodes` read returns. */
+  /** Figma's node id, e.g. "158:21725"; on every node a read returns. */
   id?: string;
   name?: string;
   type?: string;

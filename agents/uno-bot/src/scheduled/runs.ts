@@ -35,6 +35,11 @@ export const DM_SWEEP_KEY = "sweep:dms";
 export const NOTES_SWEEP_KEY = "sweep:notes";
 export const CARDS_SWEEP_KEY = "sweep:cards";
 
+/** The end-of-day read of Figma comment decisions, and the morning post of
+ *  their threads in #plus-design (src/figma-comments/). */
+export const FIGMA_COMMENTS_SWEEP_KEY = "sweep:figma-comments";
+export const FIGMA_DECISIONS_POST_KEY = "sweep:figma-post";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -59,6 +64,11 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * decisions told to it (src/dm-sweep/), `sweep-notes` and `sweep-cards` read
  * the running notes and Roadmap cards edited that day for recorded decisions,
  * and the morning `sweep-post` stages them as proposal cards (src/sweep/).
+ * Figma comment decisions, a sweep source too: the end-of-day
+ * `sweep-figma-comments` reads the day's commented and changed files for
+ * decisions under Specs and For Review, and the morning `sweep-figma-post`
+ * opens one #plus-design thread per file, a card per decision
+ * (src/figma-comments/).
  * The weekly DS precedence check's two: Friday's end-of-day check, and the morning
  * post that opens its thread in #plus-universal (src/ds-precedence/).
  * The morning `commitment-nudge` reminds each promiser whose commitment is due,
@@ -98,6 +108,8 @@ export type ScheduledJobKind =
   | "sweep-notes"
   | "sweep-cards"
   | "sweep-post"
+  | "sweep-figma-comments"
+  | "sweep-figma-post"
   | "ds-precedence-check"
   | "ds-precedence-post"
   | "commitment-nudge"
@@ -186,6 +198,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
     { key: "sweep-post", kind: "sweep-post" },
+    { key: FIGMA_DECISIONS_POST_KEY, kind: "sweep-figma-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
     { key: "commitment-nudge", kind: "commitment-nudge" },
     // Before the post, so a question its file caught up with overnight is
@@ -287,10 +300,11 @@ export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as con
  * job, the spread-in batches and the sweep jobs included. The end-of-day run
  * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
  * `sweep:<channel>`, then one `sweep-group-dms` job, keyed `sweep:group-dms`,
- * then one `sweep-dms` job, keyed `sweep:dms`, then the running-notes and Roadmap-card jobs, keyed `sweep:notes` and
- * `sweep:cards` — only while the sweep is on at all, so a blank list still
- * sweeps nothing. Both runs add one DM watch job per person in
- * `dmWatchers`: `dm-promise-read:<user>` at the end of the day,
+ * then one `sweep-dms` job, keyed `sweep:dms`, then the running-notes and
+ * Roadmap-card jobs, keyed `sweep:notes` and `sweep:cards`, then the Figma
+ * comment read, keyed `sweep:figma-comments` — only while the sweep is on at
+ * all, so a blank list still sweeps nothing. Both runs add one DM watch job
+ * per person in `dmWatchers`: `dm-promise-read:<user>` at the end of the day,
  * `dm-promise-nudge:<user>` in the morning; and one per person in
  * `dmCapturers`: `dm-capture-read:<user>`, then `dm-capture-post:<user>`.
  *
@@ -317,6 +331,9 @@ export function planRun(
           { key: DM_SWEEP_KEY, kind: "sweep-dms" },
           { key: NOTES_SWEEP_KEY, kind: "sweep-notes" },
           { key: CARDS_SWEEP_KEY, kind: "sweep-cards" },
+          // After the backstop, so a change it found is among the files whose
+          // comments are read (src/figma-comments/read.ts).
+          { key: FIGMA_COMMENTS_SWEEP_KEY, kind: "sweep-figma-comments", after: [`figma-backstop-${BACKSTOP_JOBS}`] },
         ]
       : [];
   const kind = name === "end-of-day" ? "dm-promise-read" : "dm-promise-nudge";

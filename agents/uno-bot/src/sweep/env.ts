@@ -83,6 +83,7 @@ import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
+import { figmaCommentsFor } from "../figma-comments/env";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { OperationOutcome } from "../gate/index";
@@ -214,6 +215,16 @@ async function sweepDepsFor(
   const provider = selectProvider(env);
   const detector = modelDriftDetector(provider);
   const capture = modelCaptureDetector(provider);
+  // Figma comment decisions (`../figma-comments/`): none without a Figma token.
+  // The card lookup and the detector are measured like the sweep's own reads,
+  // so one that came back short at the ceiling is the budget stop, never "no
+  // card" or "no decision"; the Figma client throws its stop itself.
+  const fc = figmaCommentsFor(env, kv, provider);
+  const figmaComments = fc && {
+    ...fc,
+    card: (n: number) => measured(() => fc.card(n)),
+    detector: { detect: (input: Parameters<typeof fc.detector.detect>[0]) => measured(() => fc.detector.detect(input)) },
+  };
   const store: SweepStore = { ...createD1SweepRecords({ db }), ...kvQueue(kv) };
   const directory = slackDirectoryFor(env);
   const bot = await measured(() => getBotIdentity(env));
@@ -238,6 +249,7 @@ async function sweepDepsFor(
     },
     search: sweepSearchFor(env),
     notion: sweepNotionFor(env),
+    ...(figmaComments ? { figmaComments } : {}),
     store,
     delivery: {
       render(card) {
@@ -545,6 +557,7 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
       parentType: page.parentType,
       properties: page.properties,
       truncated: page.truncated,
+      ...(page.subpages.length ? { subpages: page.subpages } : {}),
     };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;

@@ -139,11 +139,13 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 9);
+  assert.equal(body.planned.length, 10);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["figma-library-post", "handled", 0],
     ["figma-library-track", "handled", 0],
     ["sweep-post", "handled", 0],
+    // No sweep store bound: the Figma decision post says so and spends nothing.
+    ["sweep:figma-post", "handled", 0],
     ["ds-precedence-post", "handled", 0],
     ["commitment-nudge", "handled", 0],
     ["figma-drift-recheck", "handled", 0],
@@ -205,7 +207,7 @@ test("the end-of-day probe plans one sweep job per SWEEP_CHANNELS entry, #uno-bo
   };
   assert.deepEqual(
     body.planned.map((j) => j.key).filter((k) => k.startsWith("sweep:")),
-    ["sweep:C0DESIGN", "sweep:C0OTHER", "sweep:group-dms", "sweep:dms", "sweep:notes", "sweep:cards"],
+    ["sweep:C0DESIGN", "sweep:C0OTHER", "sweep:group-dms", "sweep:dms", "sweep:notes", "sweep:cards", "sweep:figma-comments"],
   );
   const keys = body.planned.map((j) => j.key);
   assert.ok(keys.indexOf("sweep:C0OTHER") < keys.indexOf("usage-text-purge"), "the sweeps run before the purge");
