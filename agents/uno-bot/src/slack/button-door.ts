@@ -27,7 +27,7 @@ import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index
 import { renderGateNote, statedCancelledNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { notedCardBlocks, proposalCardBlocks } from "./proposal-render";
-import type { ChosenAs, PendingProposal, ReportItemState } from "../thread-state/index";
+import { statedCancelOf, type ChosenAs, type PendingProposal, type ReportItemState } from "../thread-state/index";
 import type { OperationOutcome } from "../gate/run-batch";
 import { failureReason, settleItem, type ReportStore } from "./decision-cards";
 
@@ -274,7 +274,7 @@ export async function applyPressVerdict(
     request.decision === "confirm"
       ? `:white_check_mark: Approved by <@${request.userId}>`
       : pending.stated
-        ? statedCancelledNote(pending.stated, request.userId)
+        ? statedCancelledNote({ cancelled: statedCancelOf(pending)! }, request.userId)
         : rejected
           ? `:no_entry: Rejected by <@${request.userId}>${rejected.reason ? `: ${escapeSlackText(rejected.reason)}` : ""}`
           : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
