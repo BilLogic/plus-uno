@@ -132,6 +132,18 @@ export function wasCutShort(resultText: string): boolean {
 }
 
 /**
+ * A result as the tool returned it, before `markPartialLookup`'s stamp, and the
+ * stamp itself ("" when there is none) — so a reader of the tool's JSON can
+ * still parse it and hand the stamp on.
+ *
+ * @param resultText - A tool result, stamped or not
+ */
+export function splitCutShort(resultText: string): { body: string; stamp: string } {
+  const at = resultText.indexOf(`\n\n${CUT_SHORT_STAMP}`);
+  return at < 0 ? { body: resultText, stamp: "" } : { body: resultText.slice(0, at), stamp: resultText.slice(at) };
+}
+
+/**
  * Stamp a tool result the budget cut short. Appended rather than merged into the
  * JSON: the result may be any shape, and the model reads the text either way.
  *

@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 
 import { runTurn, type DeliveryCall, type Presentation } from "../src/turn/index";
 import { postTextVerified } from "../src/slack/delivery";
+import type { LoopBudget } from "../src/agent/loop";
 import { harness, request } from "./helpers/turn-harness";
 import { expectRefusals, recordingPosting } from "./helpers/recording-slack";
 
@@ -374,23 +375,85 @@ test("calls are one chart only when their other filters match: a person-only cal
   }
 });
 
-test("a lookup with no whole count, or any partial flag, refuses the chart, and the model is not asked to type the counts", async () => {
-  const withoutMatched = (a: Record<string, unknown>): string => {
+test("a lookup with no whole count refuses the chart, and the model is not asked to type the counts", async () => {
+  const withoutMatched = (a: Record<string, unknown>): string | undefined => {
+    if (a.design_status !== "Under Review") return undefined;
     const { matched: _drop, ...rest } = JSON.parse(statusResult(a)) as Record<string, unknown>;
     return JSON.stringify(rest);
   };
-  const cases: Array<[string, (args: Record<string, unknown>) => string | undefined, RegExp]> = [
-    ["truncated", (a) => (a.design_status === "WIP" ? statusResult(a, { truncated: true }) : undefined), /WIP.*part of/],
-    ["has_more", (a) => (a.design_status === "Shipped" ? statusResult(a, { has_more: true }) : undefined), /Shipped.*part of/],
-    ["no matched", (a) => (a.design_status === "Under Review" ? withoutMatched(a) : undefined), /Under Review.*no whole count/],
-  ];
-  for (const [why, override, error] of cases) {
-    const { presentation, told } = await turn([acrossStatuses()], across(everyStatus, override));
-    assert.equal(presentation?.charts, undefined, why);
-    assert.match(String(told[0]!.error), error, why);
-    assert.match((presentation?.warnings ?? []).join("\n"), /Not charted:/, why);
-    assert.doesNotMatch(String(told[0]!.note), /give the counts|list them|type/i, `${why}: no counts to type`);
-  }
+  const { presentation, told } = await turn([acrossStatuses()], across(everyStatus, withoutMatched));
+
+  assert.equal(presentation?.charts, undefined);
+  assert.match(String(told[0]!.error), /Under Review.*no whole count/);
+  assert.match((presentation?.warnings ?? []).join("\n"), /Not charted:/);
+  assert.doesNotMatch(String(told[0]!.note), /give the counts|list them|type/i, "no counts to type");
+});
+
+/** Need PRD as a read cut short returns it: the first 30 of the 500 cards it
+ *  managed to read, `truncated` because the board holds more. */
+const needPrdCut = (a: Record<string, unknown>): string | undefined =>
+  a.design_status === "Need PRD / Under Playground" ? statusResult(a, { matched: 500, truncated: true }) : undefined;
+
+test("a status read cut short still charts: its bar is the count read, and a ⚠️ line says it is at least that", async () => {
+  const { presentation, told, answer } = await turn([acrossStatuses()], { ...across(everyStatus, needPrdCut), options: OPTIONS });
+
+  const chart = presentation?.charts?.[0];
+  assert.ok(chart, "the chart draws");
+  assert.deepEqual(chart.points[0], { label: "Need PRD / Under Pl…", value: 500 });
+  const lines = presentation?.warnings ?? [];
+  assert.deepEqual(lines, ["Need PRD / Under Playground shows at least 500; the board has more than could be read."]);
+
+  assert.equal(told[0]!.chart_attached, true);
+  assert.deepEqual(told[0]!.at_least, { "Need PRD / Under Playground": 500 });
+  assert.match(String(told[0]!.note), /at least/);
+
+  const { text } = await posted(answer.text, presentation);
+  assert.match(text, /^⚠️ Need PRD \/ Under Playground shows at least 500; the board has more than could be read\.$/m);
+});
+
+test("two statuses cut short share one ⚠️ line; has_more marks a lower bound too", async () => {
+  const both = (a: Record<string, unknown>): string | undefined =>
+    needPrdCut(a) ?? (a.design_status === "Shipped" ? statusResult(a, { has_more: true }) : undefined);
+  const { presentation, told } = await turn([acrossStatuses()], across(everyStatus, both));
+
+  assert.equal(presentation?.charts?.length, 1);
+  assert.deepEqual(presentation?.warnings, [
+    "Need PRD / Under Playground shows at least 500 and Shipped at least 58; the board has more than could be read.",
+  ]);
+  assert.deepEqual(told[0]!.at_least, { "Need PRD / Under Playground": 500, Shipped: 58 });
+});
+
+test("a status read the turn's budget cut short is still a bar, at least what it read", async () => {
+  let trips = 0;
+  const budget: LoopBudget = {
+    used: () => 0,
+    trips: () => trips,
+    withLookupLimit: (_limit, fn) => fn(),
+    isBudgetError: () => false,
+    breakdown: () => "test",
+  };
+  const h = harness({
+    replies: [
+      ...everyStatus.map((c) => ({ toolCalls: [c] })),
+      { toolCalls: [acrossStatuses()] },
+      { text: "**Need PRD holds the most cards.**" },
+    ],
+    toolResultFor: (_name, args) => {
+      const cut = needPrdCut(args);
+      if (cut) trips += 1;
+      return cut ?? statusResult(args);
+    },
+    budget,
+  });
+  await runTurn(request({ text: "How many Roadmap cards are in each Design Status?" }), h.deps);
+  const answer = h.delivery.calls.find((c): c is Extract<DeliveryCall, { kind: "answer" }> => c.kind === "answer");
+
+  assert.deepEqual(answer?.presentation?.charts?.[0]?.points[0], { label: "Need PRD / Under Pl…", value: 500 });
+  assert.match((answer?.presentation?.warnings ?? []).join("\n"), /Need PRD \/ Under Playground shows at least 500/);
+  const read = h.provider.transcript
+    .flatMap((e) => (e.kind === "results" ? e.results : []))
+    .find((r) => r.name === "roadmap_query" && r.text.includes("Need PRD"));
+  assert.match(String(read?.text), /cut short/, "the model still reads the stamp on the short read");
 });
 
 test("a card table one status lookup asked for does not post beside the chart that counts it", async () => {
