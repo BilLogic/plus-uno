@@ -122,7 +122,6 @@ import {
   sweepCardPick,
   sweepTag,
 } from "../sweep/cards";
-import { DRIFT_KEY } from "../figma-drift/finding";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
@@ -980,9 +979,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // operations minus the dropped ones, byte for byte, so there is nothing for
   // a model to reproduce. Anything else said under the card still goes to the
   // model, and its revision is still held to the subset rule below.
-  // A file-drift card (`figma-drift/`) holds one intake per file and is read
-  // the same way: "drop 2" leaves a file out.
-  if (request.pending?.sweepRun || request.pending?.supersedeKey === DRIFT_KEY) {
+  if (request.pending?.sweepRun) {
     const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
     if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
   }
@@ -1702,8 +1699,8 @@ async function dropFromSweepCard(
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
     ...(fixes ? { fixes } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
-    // The same card minus some items, so a drift card's own gate words stay
-    // (`figma-drift/copy.ts` `driftCardWords`); a sweep card has none.
+    // The same card minus some items, so any gate words of its own stay; a
+    // sweep card has none.
     ...ownWords(pending),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.

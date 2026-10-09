@@ -12,9 +12,11 @@
 //     (ADR-030), and expire.
 //   • Slack: `chat.postMessage` in the thread, tagged with the sweep's message
 //     metadata so a reply under it is read by the sweep thread's rule
-//     (`isSweepCardPost`); `chat.getPermalink`; `chat.update` to withdraw.
+//     (`isSweepCardPost`); `chat.getPermalink`; `chat.update` to redraw a
+//     report or edit the pointers.
 //   • Staging: the sweep's own (`stageSweepCard`) — ThreadState, the staged
-//     row on the usage record, and the thread mark.
+//     row on the usage record, and the thread mark — one card at a time; each
+//     report's record in ThreadState beside them (`putReport`).
 //   • The file: the Figma client (`src/figma/`) — `/versions` for a file's
 //     last change and its newest publish's handle, `/nodes` for the linked
 //     frame; no client, and no file is looked at, without a token.
@@ -28,10 +30,7 @@
 import type { Env } from "../types";
 import { budgetHeadroom, charge } from "../net";
 import { getPermalink, postMessage, updateMessage, type SlackMessageMetadata } from "../slack/api";
-import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
-import type { SlackMessageEvent } from "../slack/types";
 import { threadStateFor } from "../thread-state/production";
-import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { proposalEvent, recordProposalEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { databaseOptions } from "../integrations/notion";
@@ -44,12 +43,9 @@ import { SWEEP_CARD_EVENT } from "../sweep/cards";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { ScheduledJob } from "../scheduled/runs";
 import { DRIFT_CARD_TTL_MS } from "./copy";
-import { standingConfirmersOf } from "../slack/standing-confirmers";
-import { DRIFT_KEY, type FileDriftFinding, type FileDriftSink } from "./finding";
+import type { FileDriftFinding, FileDriftSink } from "./finding";
 import { modelFrameJudge } from "./judge";
 import {
-  answerDriftAsk,
-  isDriftAnswerCandidate,
   recheckLiveAsks,
   recheckOnUpdate,
   runDriftAsks,
@@ -118,19 +114,14 @@ export async function runDriftAsksOnEnv(
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       permalink: (channel, ts) => measured(() => getPermalink(env, channel, ts)),
-      async withdraw(channel, ts, text) {
-        // Out of reach first: a card that says it didn't go through can't be ✅'d.
-        await threadState.retireProposal(ts);
-        await updateMessage(env, { channel, ts, text, metadata: driftTag("drift-withdrawn") });
+      async edit(channel, ts, message) {
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, metadata: driftTag("drift-card") });
       },
       async markThread(channel, threadTs) {
         if (!(await threadState.readHistory({ channel, thread: threadTs })).length) await markSweepThread(kv, channel, threadTs);
       },
     },
-    render(card) {
-      const rendered = renderProposalCard(card);
-      return { text: rendered.text, blocks: rendered.blocks ?? proposalCardBlocks(rendered.text) };
-    },
+    reports: threadState,
     async stage(proposal, channelKind) {
       await stageSweepCard(
         proposal,
@@ -145,9 +136,6 @@ export async function runDriftAsksOnEnv(
     },
     async cardLive(ts) {
       return (await threadState.getProposalByTs(ts)).state === "found";
-    },
-    async threadBusy(channel, threadTs) {
-      return !!(await driftCardIn(env, channel, threadTs));
     },
     ...(figma ? { figma, judge: modelFrameJudge(selectProvider(env)) } : {}),
     async pillarOptions() {
@@ -167,7 +155,8 @@ export async function runDriftAsksOnEnv(
 
 /**
  * The `figma-drift-recheck` job on `Env`, in both scheduled runs: each live
- * question whose Figma files now all show their decision is edited in place.
+ * card whose Figma file now shows its decision, and each pointer-only message
+ * whose files all do, is edited in place.
  *
  * @param env - Worker bindings
  * @param job - The job
@@ -205,15 +194,15 @@ function recheckDepsFor(env: Env, kv: KVNamespace, dryRun: boolean): Parameters<
   return {
     store: kvDriftStore(kv),
     ...(figma ? { figma, judge: modelFrameJudge(selectProvider(env)) } : {}),
-    liveCard: (channel, thread) => driftCardIn(env, channel, thread),
     async retire(ts) {
       return (await threadState.retireProposal(ts)).retired;
     },
-    async edit(channel, ts, text) {
-      await updateMessage(env, { channel, ts, text, metadata: driftTag("drift-withdrawn") });
+    async edit(channel, ts, message) {
+      await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, metadata: driftTag("drift-withdrawn") });
     },
-    async recordWithdrawn(proposal) {
-      await recordProposalEvents(proposalEventLogFor(env), [proposalEvent(proposal.proposalTs, "cancelled", Date.now(), "worker")]);
+    reports: threadState,
+    async recordWithdrawn(proposalTs) {
+      await recordProposalEvents(proposalEventLogFor(env), [proposalEvent(proposalTs, "cancelled", Date.now(), "worker")]);
     },
     async cardFiled(ts) {
       return (await proposalEventLogFor(env).eventsOf(ts)).some((e) => e.event === "confirmed");
@@ -224,78 +213,6 @@ function recheckDepsFor(env: Env, kv: KVNamespace, dryRun: boolean): Parameters<
   };
 }
 
-/**
- * Whether a message could be a "yes, it's up to date" or a `skip` — no reads.
- *
- * @param env - Worker bindings
- * @param event - The message
- */
-export function isDriftAnswerCandidateFor(env: Env, event: SlackMessageEvent): boolean {
-  return !!env.HARNESS_KV && isDriftAnswerCandidate(event);
-}
-
-/**
- * Whether a message is a candidate answer in a thread uno-bot asked about a
- * file — one KV read, and only for a candidate — so the event handler queues
- * it without queueing every "yes" in every thread.
- *
- * @param env - Worker bindings
- * @param event - The message
- */
-export async function isDriftAnswerFor(env: Env, event: SlackMessageEvent): Promise<boolean> {
-  if (!env.HARNESS_KV || !isDriftAnswerCandidate(event)) return false;
-  try {
-    return Object.keys(await kvDriftStore(env.HARNESS_KV).asked(event.channel, event.thread_ts!)).length > 0;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * A queued reply that says an asked file is up to date, or `skip`: withdraw
- * its card. Runs at the head of the thread's job (`slack/message-job.ts`).
- *
- * @param env - Worker bindings
- * @param event - The message
- * @returns Whether a card was withdrawn — the turn is then skipped
- */
-export async function handleDriftAnswer(env: Env, event: SlackMessageEvent): Promise<boolean> {
-  if (!env.HARNESS_KV || !isDriftAnswerCandidate(event)) return false;
-  const store = kvDriftStore(env.HARNESS_KV);
-  const threadState = threadStateFor(env);
-  // `answerDriftAsk` catches its own failures but a budget stop, so a reply
-  // it could not read takes the ordinary engagement rule, never a turn.
-  return answerDriftAsk(
-    { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" },
-    {
-      asked: (channel, threadTs) => store.asked(channel, threadTs),
-      liveCard: (channel, thread) => driftCardIn(env, channel, thread),
-      standingConfirmers: standingConfirmersOf(env),
-      async hasTurnCard(channel, thread) {
-        const cards = await threadState.getProposalsByChannel(channel);
-        return cards.some((p) => !p.supersedeKey && !p.sweepRun && proposalReplyThread(p) === thread);
-      },
-      async retire(ts) {
-        return (await threadState.retireProposal(ts)).retired;
-      },
-      async edit(channel, ts, text) {
-        await updateMessage(env, { channel, ts, text, metadata: driftTag("drift-withdrawn") });
-      },
-      async post(channel, threadTs, text) {
-        await postMessage(env, { channel, thread_ts: threadTs, text, metadata: driftTag("drift-question") });
-      },
-      async recordWithdrawn(proposal, user) {
-        await recordProposalEvents(proposalEventLogFor(env), [
-          { ...proposalEvent(proposal.proposalTs, "cancelled", Date.now(), "typed"), actorId: user },
-        ]);
-      },
-      liveAsksIn: (channel, threadTs) => store.liveAsksIn(channel, threadTs),
-      saveLiveAsk: (ask) => store.saveLiveAsk(ask),
-      dropLiveAsk: (ask) => store.dropLiveAsk(ask),
-    },
-  );
-}
-
 /** The Figma reads a drift job makes, each measured against the budget. */
 function figmaFor(env: Env): Pick<FigmaClient, "versions" | "nodes"> | undefined {
   const figma = figmaClientFor(env);
@@ -304,12 +221,6 @@ function figmaFor(env: Env): Pick<FigmaClient, "versions" | "nodes"> | undefined
     versions: (fileKey, opts) => measured(() => figma.versions(fileKey, opts)),
     nodes: (fileKey, ids, opts) => measured(() => figma.nodes(fileKey, ids, opts)),
   };
-}
-
-/** The live drift card in a thread, a revision of it included. */
-async function driftCardIn(env: Env, channel: string, thread: string): Promise<PendingProposal | null> {
-  const cards = await threadStateFor(env).getProposalsByChannel(channel);
-  return cards.find((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
 }
 
 /** The sweep's tag, with this job's role: a reply under it is read by the

@@ -3,8 +3,9 @@
 //
 // A FILE DRIFT is a point a Slack thread settled that a linked file may not
 // show yet: a Figma file, the design-system code, Storybook, a GitHub file.
-// uno-bot cannot write any of them, so it never tries. It asks the thread
-// whether the file is up to date, and drafts the hand-off a ✅ files:
+// uno-bot cannot write any of them, so it never tries. It tells the thread
+// what the file has not caught up with, and drafts the hand-off its card's
+// Approve files:
 //
 //   • a Figma file → a Roadmap card from the PRD template (the project lane);
 //   • code, Storybook or a repo file → a `harness-intake` GitHub issue (the
@@ -19,11 +20,7 @@
 
 import type { ChannelKind, FindingEvidence, FindingTarget, TargetKind } from "../sweep/finding";
 
-/** The drift card's own slot in its thread, beside a sweep card and a turn's
- *  card (`proposalSlot`). */
-export const DRIFT_KEY = "figma-drift";
-
-/** Which hand-off a ✅ files. */
+/** Which hand-off a card's Approve files. */
 export type IntakeLane = "roadmap" | "maintain";
 
 /**

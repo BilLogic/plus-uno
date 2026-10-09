@@ -42,7 +42,7 @@ import { isIntakeChannel } from "../turn/intake-channel";
 import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { handleFigmaDecisionReply, isFigmaDecisionCandidate, isFigmaDecisionThread } from "../figma-comments/env";
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
-import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor, recheckOnUpdateOnEnv } from "../figma-drift/env";
+import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
 import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
@@ -466,9 +466,8 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
 
 /**
  * The ahead-of-the-turn handler a message is for, decided once when it is
- * queued: a weekly DS precedence `drop N` in one of its list threads, a "yes,
- * it's up to date" in a thread asked about a file, a reply in a Figma
- * comment-decision thread, which may reword one of its decisions, or an
+ * queued: a weekly DS precedence `drop N` in one of its list threads, a reply
+ * in a Figma comment-decision thread, which may reword one of its decisions, or an
  * answer in a thread holding a card follow-up (each one KV read, and only for
  * a message of the right shape). Null for none.
  *
@@ -481,20 +480,17 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
  */
 export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<string | null> {
   if (isDsPrecedenceCandidate(env, msg) && (await isWeeklyPrecedenceThread(env, msg.channel, msg.thread_ts!))) return "ds-precedence";
-  if (await isDriftAnswerFor(env, msg)) return "figma-drift";
   if (isFigmaDecisionCandidate(env, msg) && (await isFigmaDecisionThread(env, msg.channel, msg.thread_ts!))) return "figma-decisions";
   if (await mayBeCardReply(env, msg)) return "follow-through";
   return null;
 }
 
 /** The replies handled ahead of the turn, in the order tried: a weekly DS
- *  precedence `drop N` (a throw runs the turn), an answer about a file's drift
- *  (it catches its own failures but a budget stop, as on main), and an answer
- *  under a card follow-up (it catches every failure). */
+ *  precedence `drop N` (a throw runs the turn), a Figma comment-decision
+ *  reply, and an answer under a card follow-up (it catches every failure). */
 export function replyHandlersFor(env: Env): ReplyHandler[] {
   return [
     { name: "ds-precedence", candidate: (e) => isDsPrecedenceCandidate(env, e), handle: (e) => handleDsPrecedenceReply(env, e) },
-    { name: "figma-drift", candidate: (e) => isDriftAnswerCandidateFor(env, e), handle: (e) => handleDriftAnswer(env, e) },
     { name: "figma-decisions", candidate: (e) => isFigmaDecisionCandidate(env, e), handle: (e) => handleFigmaDecisionReply(env, e) },
     { name: "follow-through", candidate: (e) => isCardReplyCandidate(env, e), handle: (e) => handleCardReplyOnEnv(env, e) },
   ];

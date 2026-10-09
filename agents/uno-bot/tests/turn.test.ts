@@ -1284,36 +1284,6 @@ test("a revision refused from outside the set names the standing confirmers too"
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
 });
 
-// A file-drift card holds one intake per file and is read the same way: "drop
-// 2" leaves the second file out, in the card's own slot, with its confirmers.
-test("a confirmer's \"drop 2\" leaves a file off a file-drift card, without the model", async () => {
-  const h = harness();
-  const figma = { toolName: "notion_create", input: { surface: "prd", title: "Update Recap in Figma" } };
-  const code = { toolName: "github_issue_create", input: { title: "Update Button.jsx in code", body: "b" } };
-  const driftCard: PendingProposal = {
-    ...PENDING,
-    operations: [figma, code],
-    toolName: figma.toolName,
-    input: figma.input,
-    ttlMs: 72 * 60 * 60 * 1000,
-    confirmers: ["U0OWNER"],
-    supersedeKey: "figma-drift",
-    stated: { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." },
-  };
-  await h.threadState.putProposal(driftCard);
-
-  const outcome = await runTurn(request({ text: "drop 2", pending: driftCard, userId: "U0OWNER" }), h.deps);
-
-  assert.equal(outcome.disposition, "staged");
-  assert.deepEqual(outcome.staged!.proposal.operations, [figma]);
-  assert.equal(outcome.staged!.proposal.supersedeKey, "figma-drift", "it stays in the drift card's slot");
-  assert.deepEqual(outcome.staged!.proposal.stated, driftCard.stated, "the same card, so the gate keeps its words (#897)");
-  assert.equal(outcome.staged!.proposal.sweepRun, undefined, "it is not a sweep card");
-  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
-  assert.equal(h.provider.sends.length, 0, "no model call");
-  assert.equal((await h.threadState.getProposalByTs(driftCard.proposalTs)).state, "superseded");
-});
-
 // A drop is a revision on the usage record like any other: the card it
 // replaces is superseded, the revision has a staged row, and that row names the
 // Worker's own card as its root. And the revision carries the sweep's mark and
