@@ -13,11 +13,17 @@
 //   • Slack: `chat.postMessage` and `chat.update` in #plus-design
 //     (`PLUS_DESIGN_CHANNEL_ID`), its members, and a card staged in ThreadState
 //     and put on the usage record as staged by the Worker.
+//   • A reply rewording a decision (`./revise.ts`): the thread's record, the
+//     card in ThreadState, the page read fresh as the sweep reads one, and the
+//     revised card staged the same way.
 //
 // Every KV call is charged to the invocation's internal bucket.
 
 import type { Env } from "../types";
 import type { ModelProvider } from "../agent/model-provider";
+import { selectProvider } from "../agent/run-agent";
+import type { SlackMessageEvent } from "../slack/types";
+import { measured, readSource } from "../sweep/env";
 import { charge } from "../net";
 import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
@@ -29,6 +35,7 @@ import type { PendingProposal } from "../thread-state/index";
 import { proposalEventLogFor } from "../usage/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { modelDecisionDetector } from "./detector";
+import { reviseDecision } from "./revise";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "./queue";
 
 const DAY_S = 24 * 60 * 60;
@@ -188,4 +195,83 @@ export async function stageDecisionCard(env: Env, proposal: PendingProposal): Pr
     ...supersededEvents(retired, now, "worker"),
     stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
   ]);
+}
+
+// ── A reply in a decision thread ──────────────────────────────────────────────
+
+/**
+ * Whether a message may be a reply rewording a decision: a person's reply in a
+ * #plus-design thread, with text. Shape only — whether the thread is a
+ * decision thread is one KV read, in `isFigmaDecisionThread`.
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ */
+export function isFigmaDecisionCandidate(env: Env, event: SlackMessageEvent): boolean {
+  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
+  if (!channel || event.channel !== channel || !event.thread_ts || event.thread_ts === event.ts || !env.HARNESS_KV) return false;
+  if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
+  return !!event.text?.trim();
+}
+
+/**
+ * Whether a #plus-design thread is a comment-decision thread, for as long as
+ * its record lasts. One KV read, and only for a reply in that channel.
+ *
+ * @param env - Worker bindings
+ * @param channel - The reply's channel
+ * @param threadTs - The reply's thread
+ */
+export async function isFigmaDecisionThread(env: Env, channel: string, threadTs: string): Promise<boolean> {
+  if (!env.HARNESS_KV || channel !== env.PLUS_DESIGN_CHANNEL_ID?.trim()) return false;
+  const thread = await decisionThreadsOn(env.HARNESS_KV).read(threadTs);
+  return !!thread && thread.channel === channel && thread.ts === threadTs;
+}
+
+/**
+ * A queued reply in a decision thread: revise the decision it rewords. Runs
+ * at the head of the thread's job (`slack/message-job.ts`).
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ * @returns Whether it was a rewording, handled — the turn is then skipped
+ */
+export async function handleFigmaDecisionReply(env: Env, event: SlackMessageEvent): Promise<boolean> {
+  if (!isFigmaDecisionCandidate(env, event)) return false;
+  const kv = env.HARNESS_KV!;
+  const threads = decisionThreadsOn(kv);
+  const store = threadStateFor(env);
+  const events = proposalEventLogFor(env);
+  return reviseDecision(
+    {
+      thread: { read: () => threads.read(event.thread_ts!), write: (t) => threads.write(t) },
+      async card(ts) {
+        const found = await store.getProposalByTs(ts);
+        return found.state === "found" ? found.proposal : null;
+      },
+      page: (url) => measured(() => readSource(env, url, "notion")),
+      detector: modelDecisionDetector(selectProvider(env)),
+      async post(message) {
+        const res = await postMessage(env, {
+          channel: event.channel,
+          text: message.text,
+          thread_ts: message.thread_ts,
+          ...(message.blocks ? { blocks: message.blocks } : {}),
+        });
+        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
+      },
+      stage: (proposal) => stageDecisionCard(env, proposal),
+      async restore(proposal) {
+        // Back in place, not staged anew: its staged row stands.
+        const { retired } = await store.putProposal(proposal);
+        await recordProposalEvents(events, supersededEvents(retired, Date.now(), "worker"));
+      },
+      async retire(ts) {
+        await store.retireProposal(ts);
+      },
+      superseded: (tss) => recordProposalEvents(events, supersededEvents(tss, Date.now(), "worker")),
+      now: () => Date.now(),
+    },
+    { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" },
+  );
 }

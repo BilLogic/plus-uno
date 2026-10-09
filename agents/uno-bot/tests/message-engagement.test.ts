@@ -302,3 +302,50 @@ test("another thread in #plus-universal with a live card keeps the ordinary rule
   const other = post({ channel: UNIVERSAL, ts: "1759500100.000002", thread_ts: "1759400000.000001", text: "looks good" });
   assert.equal(await engages(other, weeklyEnv()), true);
 });
+
+// ── Figma comment-decision threads (#900) ──────────────────────────────────
+// uno-bot opens one #plus-design thread per Figma file whose comments read
+// like decisions, a card per decision. People talk about the decisions there,
+// so — as in a weekly list thread — a reply is not a turn: an @mention or a
+// typed gate emoji engages. A reply rewording a decision is queued for its own
+// handler before this check (`figma-comments/revise.ts`).
+
+const PLUS_DESIGN = "C03FC8AS69K";
+const DECISIONS = "1759600000.000001";
+
+function decisionEnv(): Env {
+  return {
+    ...ENV,
+    PLUS_DESIGN_CHANNEL_ID: PLUS_DESIGN,
+    HARNESS_KV: {
+      get: async (key: string) => (key === `figma-decisions:thread:${DECISIONS}` ? { channel: PLUS_DESIGN, ts: DECISIONS } : null),
+    },
+    THREAD_STATE: {
+      idFromName: (name: string) => name,
+      get: () => ({
+        // A decision card is live in the thread.
+        async getProposalByThread() {
+          return { proposalTs: "1759600000.000002", supersedeKey: "figma-decision:c1" };
+        },
+        async readHistory() {
+          return [];
+        },
+      }),
+    },
+  } as unknown as Env;
+}
+
+const decisionReply = (text: string, thread = DECISIONS) => post({ channel: PLUS_DESIGN, ts: "1759600100.000001", thread_ts: thread, text });
+
+test("a plain reply in a Figma decision thread does not engage, though its cards are live", async () => {
+  assert.equal(await engages(decisionReply("nice, the second one looks right"), decisionEnv()), false);
+});
+
+test("an @mention or a typed gate emoji in a Figma decision thread engages", async () => {
+  assert.equal(await engages(decisionReply(`<@${BOT}> where did the third one come from?`), decisionEnv()), true);
+  assert.equal(await engages(decisionReply("✅"), decisionEnv()), true);
+});
+
+test("another #plus-design thread with a live card keeps the ordinary rule", async () => {
+  assert.equal(await engages(decisionReply("looks good", "1759500000.000009"), decisionEnv()), true);
+});

@@ -25,6 +25,11 @@ import { candidateThreads, readable } from "../src/figma-comments/threads";
 import { dividerSection, pageOf, pagesOf } from "../src/figma-comments/sections";
 import { cardNumbersOf } from "../src/figma-comments/title";
 import { modelDecisionDetector, type DecisionInput } from "../src/figma-comments/detector";
+import { numberedReply, readsAsWording, reviseDecision, type ReviseDeps } from "../src/figma-comments/revise";
+import { isFigmaDecisionCandidate, isFigmaDecisionThread } from "../src/figma-comments/env";
+import { replyHandlerAt } from "../src/slack/events";
+import type { SlackMessageEvent } from "../src/slack/types";
+import type { Env } from "../src/types";
 import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness } from "./helpers/sweep-harness";
 
 const NIGHT: ScheduledJob = { key: "sweep:figma-comments", kind: "sweep-figma-comments" };
@@ -616,4 +621,154 @@ describe("the comment-decision detector's eval cases", () => {
       assert.deepEqual(kept, c.expect.decisions);
     });
   }
+});
+
+describe("a reply with new wording revises a decision's draft (#900 AC 4)", () => {
+  /** A morning's thread posted, and the revision's dependencies over the same harness. */
+  async function revisable(replies: string[] = []) {
+    const { h, client } = await nightHarness({ replies: [REPLY, ...replies] });
+    await runSweepJob(NIGHT, h.deps);
+    h.clock.now = at(30, 13);
+    await runSweepJob(MORNING, h.deps);
+    h.clock.now = at(30, 15);
+    const parent = h.figma.messages[0]!;
+    const fc = h.deps.figmaComments!;
+    const deps: ReviseDeps = {
+      thread: { read: () => fc.threads!.read(parent.ts), write: (t) => fc.threads!.write(t) },
+      async card(ts) {
+        const found = await h.threadState.getProposalByTs(ts);
+        return found.state === "found" ? found.proposal : null;
+      },
+      page: (url) => h.deps.sources.read(url, "notion"),
+      detector: modelDecisionDetector(h.provider),
+      post: (m) => fc.slack!.post(m),
+      stage: (p) => fc.slack!.stage(p),
+      async restore(p) {
+        await h.threadState.putProposal(p);
+      },
+      async retire(ts) {
+        await h.threadState.retireProposal(ts);
+      },
+      superseded: async () => {},
+      now: () => h.clock.now,
+    };
+    const reply = (text: string, user = "U0MERYEM") => reviseDecision(deps, { channel: DESIGN, threadTs: parent.ts, user, text });
+    return { h, client, parent, deps, reply };
+  }
+  const cardReply = (value: string) =>
+    JSON.stringify({ decisions: [{ thread_id: "c3", route: "card", decision: `The card moves to ${value}.`, card: 2482, field: "Design Status", value, confidence: 0.9 }] });
+
+  it("restages decision 2 in its own slot with the new wording, the same people and the time left", async () => {
+    const { h, parent, reply } = await revisable([cardReply("Ready for Dev")]);
+    const before = h.figma.threads.get(parent.ts)!.decisions[1]!;
+    assert.equal(await reply("2: Move it to Ready for Dev instead"), true);
+
+    const prompt = String((h.provider.generated.at(-1) as { prompt?: string }).prompt);
+    assert.match(prompt, /^REWORDING: a teammate rewrote thread c3's decision as: "Move it to Ready for Dev instead"$/m);
+    const revised = h.staged.at(-1)!;
+    assert.equal(revised.supersedeKey, "figma-decision:c3");
+    assert.deepEqual(revised.operations, [{ toolName: "notion_update", input: { page_url: CARD_URL, properties: { "Design Status": "Ready for Dev" } } }]);
+    assert.deepEqual(revised.confirmers, ["U0MERYEM", "U0SARAH"]);
+    assert.equal(revised.ttlMs, at(30, 13) + DECISION_CARD_TTL_MS - at(30, 15), "the 72 h the thread started with, less the two since");
+    const card = h.figma.messages.at(-1)!;
+    assert.equal(card.threadTs, parent.ts);
+    assert.match(card.text, /^\*2 · "States are all in, moving this card to Under Review"\*\n/);
+    assert.match(card.text, /• \*Card 2482 › Design Status:\* WIP → Ready for Dev · </);
+    // The old card is out of reach, and the thread's record names the new one.
+    assert.notEqual((await h.threadState.getProposalByTs(before.cardTs)).state, "found");
+    assert.equal(h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs, card.ts);
+    // The other decisions are untouched.
+    assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 4);
+  });
+
+  it("drafts a PRD decision again against the page as it reads now", async () => {
+    const reworded = JSON.stringify({
+      decisions: [
+        {
+          thread_id: "c1",
+          route: "prd",
+          decision: "The bar waits for a saved goal.",
+          section_block_id: "h-goal",
+          text: "The progress bar stays hidden until a goal is saved.",
+          confidence: 0.9,
+        },
+      ],
+    });
+    const { h, reply } = await revisable([reworded]);
+    const reads = h.sourceReads.filter((u) => u === PRD_URL).length;
+    assert.equal(await reply("1. Hide the bar until a goal is saved"), true);
+    assert.equal(h.sourceReads.filter((u) => u === PRD_URL).length, reads + 1, "the PRD was read again");
+    assert.deepEqual((h.staged.at(-1)!.operations![0]!.input as { insert: unknown[] }).insert, [
+      { after_block_id: "b-goal-2", last_edited_time: "2026-09-02T10:00:00.000Z", content: "The progress bar stays hidden until a goal is saved." },
+    ]);
+    assert.match(h.figma.messages.at(-1)!.text, /^> The progress bar stays hidden until a goal is saved\.$/m);
+  });
+
+  it("asks which one when a reply names no number and several are open, and rewords the only one left without", async () => {
+    const { h, parent, reply } = await revisable([cardReply("Ready for Dev")]);
+    assert.equal(await reply("Move it to Ready for Dev instead"), true);
+    assert.equal(h.figma.messages.at(-1)!.text, "Which one? Reply with its number and the new wording, like `1: …`.");
+    for (const d of h.figma.threads.get(parent.ts)!.decisions.filter((x) => x.n !== 2)) await h.threadState.retireProposal(d.cardTs);
+    assert.equal(await reply("Move it to Ready for Dev instead"), true);
+    assert.equal(h.staged.at(-1)!.supersedeKey, "figma-decision:c3");
+  });
+
+  it("leaves a thank-you or a typed ✅ to the ordinary path", async () => {
+    const { h, reply } = await revisable();
+    const posted = h.figma.messages.length;
+    assert.equal(await reply("thanks!"), false);
+    assert.equal(await reply("✅"), false);
+    assert.equal(h.figma.messages.length, posted);
+  });
+
+  it("refuses someone who may not decide, a number not in the thread, and a card already closed", async () => {
+    const { h, parent, reply } = await revisable();
+    assert.equal(await reply("2: Ready for Dev", "U0OTHER"), true);
+    assert.equal(
+      h.figma.messages.at(-1)!.text,
+      ":warning: <@U0OTHER> Only <@U0MERYEM> or <@U0SARAH> can change this proposal, so it stays as it is — ask one of them if it needs a change.",
+    );
+    assert.equal(await reply("9: anything at all"), true);
+    assert.equal(h.figma.messages.at(-1)!.text, "There's no decision 9 in this thread.");
+    await h.threadState.retireProposal(h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs);
+    assert.equal(await reply("2: Ready for Dev"), true);
+    assert.equal(h.figma.messages.at(-1)!.text, "Decision 2's card has already been decided or has closed, so there's nothing to change.");
+  });
+
+  it("keeps the card as it is when the wording cannot be drafted, or the revision does not stage", async () => {
+    const { h, parent, reply } = await revisable(['{"decisions":[]}', cardReply("Ready for Dev")]);
+    const old = h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs;
+    assert.equal(await reply("2: something the detector cannot place"), true);
+    assert.equal(h.figma.messages.at(-1)!.text, "I couldn't draft decision 2 with that wording, so its card stays as it is.");
+    assert.equal((await h.threadState.getProposalByTs(old)).state, "found");
+
+    h.faults.stage = new Error("ThreadState unavailable");
+    assert.equal(await reply("2: Move it to Ready for Dev instead"), true);
+    assert.equal(h.figma.messages.at(-1)!.text, "That revised card didn't go through, so decision 2's card before it still stands. Try the reply again.");
+    assert.equal((await h.threadState.getProposalByTs(old)).state, "found", "the old card is back in place");
+    assert.equal(h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs, old);
+  });
+
+  it("reads a numbered reply in any of its shapes, mentions aside", () => {
+    assert.deepEqual(numberedReply("2: Ready for Dev"), { n: 2, wording: "Ready for Dev" });
+    assert.deepEqual(numberedReply("<@U0BOT> 3) keep it hidden"), { n: 3, wording: "keep it hidden" });
+    assert.deepEqual(numberedReply("1 - shorter copy"), { n: 1, wording: "shorter copy" });
+    assert.equal(numberedReply("2024 was a good year"), null);
+    assert.equal(readsAsWording("ok thanks"), false);
+    assert.equal(readsAsWording("<@U0BOT> 👍"), false);
+    assert.equal(readsAsWording("Keep it hidden please"), true);
+  });
+
+  it("queues a reply in a decision thread for its own handler, and leaves one elsewhere alone", async () => {
+    const record = { channel: DESIGN, ts: "1790700000.000100", fileKey: FILE, title: "x", confirmers: [], expiresAt: 0, decisions: [] };
+    const kv = { get: async (key: string) => (key === `figma-decisions:thread:${record.ts}` ? record : null), put: async () => {} };
+    const env = { PLUS_DESIGN_CHANNEL_ID: DESIGN, HARNESS_KV: kv } as unknown as Env;
+    const event = { type: "message", channel: DESIGN, thread_ts: record.ts, ts: "1790700100.000100", user: "U0MERYEM", text: "2: Ready for Dev" } as SlackMessageEvent;
+    assert.equal(isFigmaDecisionCandidate(env, event), true);
+    assert.equal(await isFigmaDecisionThread(env, DESIGN, record.ts), true);
+    assert.equal(await replyHandlerAt(env, event), "figma-decisions");
+    assert.equal(await replyHandlerAt(env, { ...event, thread_ts: "1790700000.000999" }), null, "another #plus-design thread");
+    assert.equal(isFigmaDecisionCandidate(env, { ...event, bot_id: "B1" }), false, "never a bot's own post");
+    assert.equal(isFigmaDecisionCandidate(env, { ...event, channel: "C0ELSE" }), false);
+  });
 });

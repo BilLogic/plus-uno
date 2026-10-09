@@ -374,7 +374,7 @@ async function readFile(
 }
 
 /** A card's fields the detector may change: everything it reads but its name and number. */
-function fieldsOf(page: SweepSource): Record<string, string> {
+export function fieldsOf(page: SweepSource): Record<string, string> {
   const fields: Record<string, string> = {};
   for (const [name, value] of Object.entries(page.properties ?? {})) {
     if (!NOT_FIELDS.has(name.trim().toLowerCase()) && value.trim()) fields[name] = value;

@@ -82,6 +82,13 @@ export interface DecisionInput {
   cards: ShownCard[];
   /** The page a `prd` decision writes to: the card's PRD, else the card; null with no card. */
   prd: SweepSource | null;
+  /**
+   * A decision a teammate reworded in its #plus-design thread (`./revise.ts`):
+   * the detector drafts that thread's update again, on the same route, with
+   * their words as the decision. Only a decision on that thread and route is
+   * kept.
+   */
+  rewording?: { threadId: string; route: DecisionRoute; wording: string };
 }
 
 /** One validated decision. */
@@ -173,6 +180,14 @@ export function decisionPrompt(input: DecisionInput): string {
     lines.push(`[thread ${t.id}] ${where} · ${t.resolved ? "resolved" : "open"}`);
     for (const c of t.comments) lines.push(`  ${c.by} (${c.at.slice(0, 10)}): ${cap(c.text, MAX_MESSAGE_CHARS)}`);
   }
+  if (input.rewording) {
+    const r = input.rewording;
+    lines.push(
+      "",
+      `REWORDING: a teammate rewrote thread ${r.threadId}'s decision as: "${cap(r.wording, MAX_MESSAGE_CHARS)}"`,
+      `It is settled. Draft that one decision again on the ${r.route} route, saying exactly what the teammate wrote, and nothing else.`,
+    );
+  }
   return lines.join("\n");
 }
 
@@ -203,6 +218,7 @@ export function parseDecisionReply(text: string, input: DecisionInput): Detected
     else if (route === "card") found = cardDecision(f, input.cards, base);
     else if (route === "design-system") found = intakeDecision(f, base);
     if (!found) continue;
+    if (input.rewording && (found.threadId !== input.rewording.threadId || found.route !== input.rewording.route)) continue;
     decided.add(threadId);
     out.push(found);
   }
