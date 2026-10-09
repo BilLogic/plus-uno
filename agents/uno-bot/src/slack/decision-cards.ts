@@ -21,6 +21,7 @@
 // No Env, no Slack client: the store-backed helpers take the store as a port.
 
 import { carouselOf, logoFor } from "./answer-cards-block";
+import { escapeSlackText } from "./mrkdwn";
 import { textSections } from "./render";
 import type {
   DecisionReportRecord,
@@ -230,7 +231,9 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
   }
   const head = parentLine(record);
   const blocks = record.entries.length ? [...textSections(head), carouselOf(record.entries.map(entryCard))] : textSections(head);
-  const text = [head, ...record.entries.map((e) => `• ${clip(e.item.title, CARD_TITLE_CHARS)}: ${shownAs(e).body}`)].join("\n");
+  // The fallback is mrkdwn and a card's words are plain text: escaped, so a
+  // title holding `<!channel>` pings nobody from the notification either.
+  const text = [head, ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${escapeSlackText(shownAs(e).body)}`)].join("\n");
   return { text, blocks };
 }
 
