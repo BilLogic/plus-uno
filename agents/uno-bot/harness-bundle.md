@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **169,769 chars from 16 files**, against an assembled budget of 175,500 (5,731 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 149,385 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **170,353 chars from 16 files**, against an assembled budget of 175,500 (5,147 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 149,969 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,616 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 100,012 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,428 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 30,990 (−6,098 ide-only) | 145,460 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 148,744 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 155,260 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 159,923 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 169,769 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 31,574 (−6,098 ide-only) | 146,044 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 149,328 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 155,844 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 160,507 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 170,353 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1019,6 +1019,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 **A count or sum per group is a chart, computed by code.** The model calls `present` with shape `chart`, the lookup, the kind (`bar` to compare, `line` or `area` for a trend, `pie` for parts of a whole), `group_by`, and `measure` to sum a numeric field instead of counting rows. Code groups that lookup's rows and posts a Slack `data_visualization` block; the result hands the model the same `values` and `total`, so every number about the chart is grounded like a fetched one.
 
+- **Across lookups:** a count that takes one lookup per group — cards per Design Status is one `roadmap_query` per status — names `across` (the argument the calls differ by) in place of `group_by`. Each call of the lookup this turn is one point, labelled by that argument and valued at the whole count the call reported (`matched`, so a status listing its first 30 of 41 is 41); a retry with the same value replaces the earlier call. A call that read only part of the board is refused with its name, and the refusal posts no table, since there is no one list of rows to fall back to.
 - **Limits:** at least 3 points; at most 20 (12 for a pie); at most 2 charts per message, the cap Slack enforces live. Labels and the series name are cut to 20 characters and the title (code's: `Cards by Design Status`) to 50. A bar or pie runs largest first; a line or area runs in label order.
 - **Ungroundable → table:** a partial list (the first 30 of 41 would understate every bar), fewer than 3 groups, a group field the rows lack, a measure that is not a number on every row, or labels that collide once cut. The rows post as a result table instead, and the reason rides as a ⚠️ line (below): `⚠️ Not charted: only 2 groups to compare.` A lookup missing from this turn gets the refusal alone.
 - **Text copy:** each chart adds a line of its top 5 values (`Cards by Design Status: WIP 3 · Under Review 2 · Shipped 1`), and a ⚠️ line adds its sentence, so a notification carries the gist.
