@@ -1135,10 +1135,10 @@ describe("wiring", () => {
     assert.equal(threadHooks(bare, { dryRun: false, runDate: utcDay(EOD) }), undefined);
   });
 
-  it("the message job tries the DS dispute first, then a drift answer, then a Figma decision's rewording, then the card follow-up reply", () => {
+  it("the message job tries the DS dispute first, then a Figma decision's rewording, then the card follow-up reply — no typed answer to a drift card", () => {
     const handlers = replyHandlersFor({ PLUS_DESIGN_CHANNEL_ID: DESIGN, USAGE_DB: {}, HARNESS_KV: {} } as unknown as Env);
-    assert.deepEqual(handlers.map((h) => h.name), ["ds-precedence", "figma-drift", "figma-decisions", "follow-through"]);
-    const card = handlers[3]!;
+    assert.deepEqual(handlers.map((h) => h.name), ["ds-precedence", "figma-decisions", "follow-through"]);
+    const card = handlers[2]!;
     const reply = { type: "message", channel: DESIGN, thread_ts: "1790700000.000100", ts: "1790700100.000100", user: MAYA, text: "Shipped" } as SlackMessageEvent;
     assert.equal(card.candidate(reply), true, "a short reply in a design thread is the card handler's to check");
     assert.equal(card.candidate({ ...reply, thread_ts: undefined }), false, "a top-level message is never a follow-up reply");

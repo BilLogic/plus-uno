@@ -43,18 +43,20 @@ import { PRECEDENCE_CARD_TTL_MS } from "../src/ds-precedence/jobs";
 import { CONFIRM_FOOTER, renderProposalCard } from "../src/slack/proposal-render";
 import { renderGateNote, statedCancelledNote } from "../src/slack/gate-note";
 import {
-  askLead,
+  caughtUpNote,
   caughtUpText,
-  confirmedText,
   driftCardWords,
-  driftFooter,
+  driftItem,
+  driftParent,
+  driftReview,
   DRIFT_CARD_TTL_MS,
-  DRIFT_NOT_STAGED_TEXT,
-  partlyAnsweredText,
-  skippedSharedText,
-  skippedText,
-  withdrawnElsewhereText,
-  type AskItem,
+  DRIFT_NO_REVISION,
+  DRIFT_NOT_POSTED_TEXT,
+  DRIFT_NOT_STAGED,
+  elsewhereLine,
+  fileName,
+  pillarNote,
+  type DriftFileWords,
 } from "../src/figma-drift/copy";
 import type { GateNote } from "../src/turn/index";
 import { STANDING_TOO } from "../src/sweep/capture-lines";
@@ -614,85 +616,99 @@ describe("what a stated card says at the gate", () => {
   });
 });
 
-// ── The drift question (#886 § 3.3) ──────────────────────────────────────────
+// ── The drift card (#886 § 3.3, on the shared decision card) ────────────────
 //
-// § 3.3 gives three lines: the question, its two-line body, and the edit that
-// withdraws it. The rest — a file that changed but can't be confirmed, code
-// and Storybook, several files, the card's footer, the lines a `yes` and a
-// `skip` leave, and the gate's words — follow its register and are Bill's to
-// confirm.
+// § 3.3's question now reads as the shared card's parent line, and each file
+// it names is a card of its own, decided from Review alone: no line says what
+// ✅ or ⛔ does, and nothing asks for a typed `skip`, "yes" or `drop N`.
 
-describe("the drift question (#886 § 3.3)", () => {
-  const FILE = { title: "Goal Setting / Card 2482", url: "https://www.figma.com/design/K/Goal-Setting?node-id=1-2", kind: "figma" as const };
+describe("the drift card (#886 § 3.3)", () => {
+  const FILE = { title: "Goal states", url: "https://www.figma.com/design/K/Goal-Setting?node-id=1-2", kind: "figma" as const };
   const CODE = { title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" as const };
   const SEP_24 = Date.UTC(2026, 8, 24, 16);
-  const one: AskItem = { file: FILE, threadSays: "tooltips on option chips", decidedAt: SEP_24, change: { kind: "unchanged", at: Date.UTC(2026, 8, 20, 15) } };
+  const one: DriftFileWords = { file: FILE, threadSays: "tooltips on option chips", decidedAt: SEP_24, change: { kind: "unchanged", at: Date.UTC(2026, 8, 20, 15) } };
   const MERYEM = "U0MERYEM1";
+  const GATE_WORDS = /:white_check_mark:|:no_entry:|✅|⛔|`skip`|\bskip\b|\bdrop \d|reply "?yes/i;
 
-  function driftCard(items: AskItem[], lanes: Array<"roadmap" | "maintain">): string {
-    return renderProposalCard({
-      kind: "stated",
-      verb: "file this Roadmap card",
-      lead: askLead({ mentions: [MERYEM], items }),
-      footer: driftFooter(lanes),
-      fields: [],
-      caveats: [],
-      operations: [],
-    }).text;
-  }
+  it("the parent says what the thread settled that its files have not caught up with, in one plain sentence", () => {
+    assert.equal(driftParent(["figma"]), "This thread settled a decision that its Figma file has not caught up with.");
+    assert.equal(driftParent(["figma", "figma-library"]), "This thread settled two decisions that their Figma files have not caught up with.");
+    assert.equal(driftParent(["design-system-code"]), "This thread settled a decision that the code has not caught up with.");
+    assert.equal(driftParent(["storybook"]), "This thread settled a decision that Storybook has not caught up with.");
+    assert.equal(driftParent(["figma", "storybook", "github"]), "This thread settled three decisions that their files have not caught up with.");
+    for (const kinds of [["figma"], ["figma", "storybook"]] as const) {
+      const text = driftParent([...kinds]);
+      passesChecklist(text);
+      assert.doesNotMatch(text, GATE_WORDS);
+    }
+  });
 
-  it("reads as § 3.3: the question, what the thread settled and when, the file's last change, one action from one person", () => {
-    const text = driftCard([one], ["roadmap"]);
+  it("a file drafted in another thread is a one-line pointer, linked when the link could be read", () => {
+    assert.equal(
+      elsewhereLine(FILE, "https://plus.slack.com/archives/C0/p1"),
+      "The intake for <https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting — Goal states> is drafted <https://plus.slack.com/archives/C0/p1|in another thread>.",
+    );
+    assert.match(elsewhereLine(FILE, null), /is drafted in another thread\.$/);
+    passesChecklist(elsewhereLine(FILE, null));
+  });
+
+  it("each file's card: the file, its owner and last change, what the thread settled, and Open to the frame", () => {
+    const item = driftItem({ id: "1", ...one, owner: MERYEM, lane: "roadmap" });
+    assert.deepEqual(item, {
+      id: "1",
+      title: "Goal Setting — Goal states",
+      subtitle: "<@U0MERYEM1> · last changed Sep 20",
+      body: 'Thread settled "tooltips on option chips" on Sep 24 · the file has not changed since Sep 20.',
+      open: { label: "Open in Figma", url: FILE.url },
+      done: "a Roadmap card to update Goal Setting — Goal states",
+    });
+    const changed = driftItem({ id: "2", ...one, change: { kind: "changed", at: Date.UTC(2026, 8, 26, 18) }, owner: null, lane: "roadmap" });
+    assert.equal(changed.subtitle, "last changed Sep 26");
+    assert.equal(changed.body, 'Thread settled "tooltips on option chips" on Sep 24 · the file changed Sep 26, unconfirmed.');
+    const code = driftItem({ id: "3", ...one, file: CODE, change: { kind: "unknown" }, owner: MERYEM, lane: "maintain" });
+    assert.equal(code.subtitle, "<@U0MERYEM1>");
+    assert.equal(code.body, 'Thread settled "tooltips on option chips" on Sep 24 · the code may not show it yet.');
+    assert.deepEqual(code.open, { label: "Open on GitHub", url: CODE.url });
+    assert.equal(code.done, "an intake to update Button.jsx");
+    for (const i of [item, changed, code]) assert.doesNotMatch(JSON.stringify(i), GATE_WORDS);
+  });
+
+  it("names a linked frame after its file, and anything else by the title read", () => {
+    assert.equal(fileName(FILE), "Goal Setting — Goal states", "the file off the link, the frame off its read");
+    assert.equal(fileName({ ...FILE, title: "Goal Setting" }), "Goal Setting", "a frame read under the file's own name says it once");
+    assert.equal(fileName({ ...FILE, url: "https://www.figma.com/design/K/Goal-Setting" }), "Goal states", "a link to no frame");
+    assert.equal(fileName(CODE), "Button.jsx");
+  });
+
+  it("a long paraphrase is cut inside the quote, so the card's body keeps what the file did", () => {
+    const item = driftItem({ id: "1", ...one, threadSays: "word ".repeat(80), owner: null, lane: "roadmap" });
+    assert.ok(item.body.length <= 200, `${item.body.length}`);
+    assert.match(item.body, /…" on Sep 24 · the file has not changed since Sep 20\.$/);
+  });
+
+  it("what Review shows: the file linked, what was settled and when, and no footer", () => {
+    const text = renderProposalCard(driftReview({ ...one, lane: "roadmap", note: null }, { toolName: "notion_create", input: {} })).text;
     assert.equal(
       text,
-      [
-        "*Is the Figma file still current?* This thread settled \"tooltips on option chips\" on Sep 24, and <https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting / Card 2482> hasn't changed since Sep 20.",
-        "<@U0MERYEM1>, update the frame, or reply `skip` if the decision didn't touch Figma.",
-        "",
-        ":white_check_mark: files a Roadmap card for the update. :no_entry: files nothing.",
-        "The people named here and anyone who posted in this thread can decide, for the next 72 h. The team's standing confirmers can too.",
-      ].join("\n"),
+      '*<https://www.figma.com/design/K/Goal-Setting?node-id=1-2|Goal Setting — Goal states>:* this thread settled "tooltips on option chips" on Sep 24, and the file hasn\'t changed since Sep 20.',
     );
-    passesChecklist(text, { gate: true });
-  });
-
-  it("names the standing confirmers in plain words, and leaves them off a card in a 1:1 DM", () => {
-    assert.ok(driftFooter(["roadmap"]).endsWith(`for the next 72 h.${STANDING_TOO}`));
-    assert.doesNotMatch(driftFooter(["roadmap"]), /<@|<!/);
-    assert.ok(driftFooter(["roadmap"], false).endsWith("for the next 72 h."));
-  });
-
-  it("several files, code among them: numbered for `drop`, and one footer naming both intakes", () => {
-    const text = driftCard([one, { ...one, file: CODE, change: { kind: "unknown" } }], ["roadmap", "maintain"]);
-    assert.match(text, /^\*Are these files still current\?\* This thread settled a decision about each of these files:\n1\. /);
-    assert.match(text, /\n2\. <[^>]+\|Button\.jsx>: settled "tooltips on option chips" on Sep 24, and it may not show it yet\.\n/);
-    assert.match(text, /\n:white_check_mark: files both intakes; reply `drop 2` to leave one out\. :no_entry: files nothing\.\n/);
-    passesChecklist(text, { gate: true });
-  });
-
-  it("the question alone points at the card and carries no gate", () => {
-    const text = askLead({ mentions: [MERYEM], items: [{ ...one, change: { kind: "changed", at: Date.UTC(2026, 8, 26, 18) }, elsewhere: { cardLink: "https://plus.slack.com/archives/C0/p1" } }] });
-    assert.match(text, /, and <[^>]+\|Goal Setting \/ Card 2482> last changed Sep 26\.\n/);
-    assert.match(text, /Its intake is drafted <https:\/\/plus\.slack\.com\/archives\/C0\/p1\|in another thread>\.$/);
     passesChecklist(text);
+    const noted = renderProposalCard(driftReview({ ...one, lane: "roadmap", note: pillarNote("left unset") }, { toolName: "notion_create", input: {} })).text;
+    assert.match(noted, /\n_Product Pillar: left unset_$/);
   });
 
-  it("is withdrawn by editing the same message, striking the question through", () => {
-    const headline = "Is the Figma file still current?";
-    const withdrawn = [
-      [caughtUpText(headline, Date.UTC(2026, 8, 30, 18)), "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."],
-      [confirmedText(headline, MERYEM), "~Is the Figma file still current?~ Yes, confirmed by <@U0MERYEM1>. Nothing to do."],
-      [skippedText(headline, MERYEM), "~Is the Figma file still current?~ Skipped by <@U0MERYEM1>. Nothing to do."],
-    ];
-    for (const [text, expected] of withdrawn) {
-      assert.equal(text, expected);
-      passesChecklist(text!);
+  it("is withdrawn in place once its file catches up, and a card that didn't stage says so", () => {
+    assert.equal(caughtUpNote(Date.UTC(2026, 8, 30, 18)), "Updated Sep 30. Nothing to do.");
+    assert.equal(caughtUpText(1, Date.UTC(2026, 8, 30, 18)), "The file now shows this thread's decision, updated Sep 30. Nothing to do.");
+    assert.equal(caughtUpText(2, Date.UTC(2026, 9, 1, 18)), "The files now show this thread's decisions, updated Oct 1. Nothing to do.");
+    for (const text of [caughtUpNote(Date.UTC(2026, 8, 30, 18)), caughtUpText(2, SEP_24), DRIFT_NOT_STAGED, DRIFT_NOT_POSTED_TEXT, DRIFT_NO_REVISION]) {
+      passesChecklist(text);
+      assert.doesNotMatch(text, GATE_WORDS);
     }
-    for (const text of [withdrawnElsewhereText(1), withdrawnElsewhereText(2), partlyAnsweredText([2]), skippedSharedText([]), skippedSharedText([2]), DRIFT_NOT_STAGED_TEXT]) passesChecklist(text);
-    assert.equal(DRIFT_NOT_STAGED_TEXT, "This question didn't go through, so its intake can't be filed from here. I'll ask again.");
+    assert.match(DRIFT_NO_REVISION, /Review/);
   });
 
-  it("answers the gate in its own words: a ⛔ files nothing, and a late decision is told nothing was filed", () => {
+  it("answers the gate in its own words: a Reject files nothing, and a late decision is told nothing was filed", () => {
     const words = driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000);
     assert.deepEqual(words, { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." });
     assert.equal(statedCancelledNote(words, "U0AAAAAA2"), ":no_entry: No intake filed, decided by <@U0AAAAAA2>.");
