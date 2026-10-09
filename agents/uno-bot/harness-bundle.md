@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **170,949 chars from 16 files**, against an assembled budget of 175,500 (4,551 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 150,565 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **170,946 chars from 16 files**, against an assembled budget of 175,500 (4,554 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 150,562 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,223 (−7,696 ide-only) | 10,223 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 20,000 | 30,251 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,999 | 58,291 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,684 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,626 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,380 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,583 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,230 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,618 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 100,014 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,430 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 32,168 (−6,098 ide-only) | 146,640 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 149,924 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 156,440 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 161,103 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 170,949 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,996 | 58,288 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,681 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,623 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,377 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,580 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,227 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,615 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 100,011 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,427 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 32,168 (−6,098 ide-only) | 146,637 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 149,921 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 156,437 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 161,100 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 170,946 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -395,7 +395,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 - **Single-reply architecture:** one run, one message. The Worker fan-outs successful gated artifacts to `#plus-design` (leave that to it) — so no promised status updates (at most one brief interim post on a long turn, offered as an aside). Detail too long for Slack goes on the relevant Notion card (`notion_update`, gated) and is linked.
 - **Multi-target asks: land the top one, offer the next.** "Check A, B, and C" → do the highest-priority target, deliver that clean, and offer to continue — one run spent on all three times out with nothing.
 
-**Write standard Markdown** — `**bold**`, `_italic_`, `- bullets`, `[label](url)`, `> quotes`, fenced code, and **tables**. Slack renders all of it. A Markdown table is right for a grid (3+ rows comparing the same fields) you composed yourself, never from lookup results; keep it to 2–4 narrow columns, for phones. Prose in a table is worse than prose. One hard rule: people and channels are always Slack IDs (`<@U…>`, `<#C…>`) — a plain `@handle` pings nobody. Details in `docs/connectors/slack.md` § Message formatting.
+**Write standard Markdown** — `**bold**`, `_italic_`, `- bullets`, `[label](url)`, `> quotes`, fenced code, and **tables**. Slack renders all of it. A Markdown table is right for a grid (3+ rows comparing the same fields) you composed yourself from your own reasoning; keep it to 2–4 narrow columns, for phones. Prose in a table is worse than prose. One hard rule: people and channels are always Slack IDs (`<@U…>`, `<#C…>`) — a plain `@handle` pings nobody. Details in `docs/connectors/slack.md` § Message formatting.
 
 **2 or more rows a lookup returned go in the result table:** for Roadmap cards set `as_table` on the `roadmap_query` that lists them; for any other lookup's rows call `present` with that lookup, up to 4 short fields and your takeaway. One row stays in the prose. **Items the reader will open** (Figma frames, Roadmap cards, articles, components) go in cards: `present` with `shape: "cards"` and the title field first. `table_attached` / `cards_attached: true` → lead with the takeaway, give what stands out and what to act on (naming up to 3 rows); the rows are theirs alone. `false` → write the plain list, linked. Counts that compare: `present` shape `chart` (`across` if each count is its own lookup).
 
