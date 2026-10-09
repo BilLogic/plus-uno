@@ -18,20 +18,23 @@
 //
 // WHAT THE MODEL IS TOLD. A Roadmap lookup that asked for a table gains
 // `table_attached`, and `row_count` and a rewritten `note` when it is true.
-// Any other lookup whose rows could post as a table gains `table_ready` — each
-// list of 2 or more records, its count and the fields a column can show — and
-// a `table_note` saying how to ask. The offer rides on the result because that
-// is what the model is reading when it chooses a shape: with the request left
-// to the persona and `present`'s own description, a blueprint pain-points
-// answer and an issue list went out as prose (live, r515).
+// Any other lookup whose main list holds 3 or more records gains
+// `table_ready` — the list, its count and the fields a column can show — and,
+// on its first call of the turn, a `table_note` saying how to ask and when not
+// to. The offer rides on the result because that is what the model is reading
+// when it chooses a shape: with the request left to the persona and
+// `present`'s own description, a blueprint pain-points answer and an issue
+// list went out as prose (live on r515, and again on r518). A tool whose rows
+// are never a table to scan says so in its row (`offersTable: false`).
 // `present` answers `table_attached` with the caption and row count, or the
 // refusal. Either way the model writes its prose knowing what the reader will
 // see beneath it — a summary when a table is there, the plain list when not.
 //
 // A LOOKUP CALLED SEVERAL TIMES IS ONE SET OF ROWS. A turn that searched the
-// blueprint once per phase shows every row those searches returned, each once
-// (`mergedLookup`); the Roadmap preset alone stays its last call's, since its
-// caption names that call's filters.
+// blueprint once per phase shows every row those searches returned, each once,
+// where the searches return rows of one shape (`mergedLookup`). The Roadmap
+// lookup is read at its last call for every shape, since its preset's caption
+// names that call's filters.
 //
 // ONE TABLE AND ONE SET OF CARDS PER ANSWER: of each, the last request that
 // produced one wins. AT MOST 2 CHARTS, Slack's cap per message: a third is
@@ -67,6 +70,7 @@ import {
 } from "./result-table";
 import { cardList, cardsOf, type AnswerCards } from "./answer-cards";
 import { signed, warningLog } from "./warning-line";
+import { rowFor } from "../agent/tool-table";
 import type { AbsenceContext } from "../agent/absence";
 
 /** What rides beneath an answer. */
@@ -171,12 +175,14 @@ function attachedNote(table: ResultTable): string {
 
 const NO_TABLE_NOTE = "No table is attached. If the rows answer the question, list them in your answer yourself.";
 
-/** What a lookup's offer of a table tells the model to do with it. */
-function offerNote(lookup: string): string {
+/** What a lookup's offer of a table tells the model to do with it, on the
+ *  lookup's first call of the turn. */
+function offerNote(lookup: string, list: string): string {
   return (
-    `Rows of one shape, listed in table_ready with the fields a column can show. When 2 or more of them answer the question, ` +
-    `call present with shape "table", lookup "${lookup}", the list's key and up to 4 of its columns instead of listing them yourself; ` +
-    "it tables every row this lookup returned this turn."
+    "table_ready names this result's main list, its row count and the fields a column can show. " +
+    `When 3 or more of those rows are the answer, a list to scan or compare, call present with shape "table", lookup "${lookup}", ` +
+    `list "${list}" and up to 4 of those columns, and write the takeaway rather than the rows; later calls of this lookup add their rows to it. ` +
+    "For a yes/no question, a single answer or a conversational reply, answer in prose without a table."
   );
 }
 
@@ -216,8 +222,16 @@ function fallbackColumns(result: Record<string, unknown>, groupBy: string, measu
  * @param opts.now - The turn's clock, read for the ⚠️ line's freshness cutoff
  */
 export function presenter(opts: { now?: () => number } = {}): Presenter {
-  /** Each lookup's calls this turn, in order. */
-  const lookups = new Map<string, Recorded[]>();
+  /** Every call of each lookup, in the order made. */
+  const calls = new Map<string, Recorded[]>();
+  const latest = (lookup: string): Recorded | undefined => calls.get(lookup)?.at(-1);
+  /** The rows a table, cards or a grouped chart of `lookup` read: the
+   *  Roadmap lookup's last call, or every call of one shape merged. */
+  const rowsOf = (lookup: string): Recorded | undefined => {
+    const made = calls.get(lookup);
+    if (!made) return undefined;
+    return lookup === "roadmap_query" ? made.at(-1) : mergedLookup(made);
+  };
   const warnings = warningLog(opts.now);
   let table: ResultTable | undefined;
   const charts: Chart[] = [];
@@ -231,7 +245,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
    *  model. */
   const tableFrom = (lookup: string, recorded: Recorded, args: Record<string, unknown>, columns: string[]): ResultTable | string => {
     if (lookup === "roadmap_query") {
-      const cards = roadmapCards(lookups.get(lookup)!.at(-1)!.result as RoadmapResult);
+      const cards = roadmapCards(latest(lookup)!.result as RoadmapResult);
       return cards ? roadmapTable(cards) : "That Roadmap lookup has fewer than two definite cards; name them in prose.";
     }
     if (columns.length > MAX_COLUMNS) return `At most ${MAX_COLUMNS} columns; you named ${columns.length}.`;
@@ -334,15 +348,14 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table, cards, a chart or a conflict.`);
     }
     const lookup = typeof args.lookup === "string" ? args.lookup.trim() : "";
-    const calls = lookups.get(lookup);
-    if (!calls) {
-      const made = [...lookups.keys()];
+    const recorded = rowsOf(lookup);
+    if (!recorded) {
+      const made = [...calls.keys()];
       const why =
         `No ${lookup || "named"} lookup ran this turn, so there are no rows to ${shape === "cards" ? "make cards of" : shape === "chart" ? "chart" : "table"}.` +
         (made.length ? ` Lookups that did: ${made.join(", ")}.` : "");
       return shape === "cards" ? refuseCards(why) : shape === "chart" ? refuseChart(why) : refuse(why);
     }
-    const recorded = mergedLookup(calls);
     if (shape === "cards") return presentCards(lookup, recorded, args);
     if (shape === "chart") return presentChart(lookup, recorded, args);
     const made = tableFrom(lookup, recorded, args, columnsOf(args));
@@ -365,13 +378,12 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       warnings.lookup(name, text);
       const parsed = parse(text);
       if (!parsed || parsed.ok !== true) return text;
-      const calls = [...(lookups.get(name) ?? []), { args, result: parsed }];
-      lookups.set(name, calls);
+      const first = !calls.has(name);
+      calls.set(name, [...(calls.get(name) ?? []), { args, result: parsed }]);
       if (name !== "roadmap_query") {
-        const offer = tableOffer(mergedLookup(calls).result);
-        return Object.keys(offer).length
-          ? JSON.stringify({ ...parsed, table_ready: offer, table_note: offerNote(name) })
-          : text;
+        const offer = rowFor(name)?.offersTable === false ? undefined : tableOffer(rowsOf(name)!.result);
+        if (!offer) return text;
+        return JSON.stringify({ ...parsed, table_ready: offer, ...(first ? { table_note: offerNote(name, offer.list) } : {}) });
       }
       // The Roadmap preset's own door: the lookup asked for its table itself.
       const cards = args.as_table === true ? roadmapCards(parsed as RoadmapResult) : undefined;

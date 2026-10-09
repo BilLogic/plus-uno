@@ -278,13 +278,16 @@ const isAddress = (v: unknown): v is string => typeof v === "string" && /^https?
 /** A field name as a header: `design_status` → "Design Status", and a field
  *  of a property bag by its own name, `meta.Year` → "Year". */
 export function labelOf(field: string): string {
-  return field
-    .slice(field.lastIndexOf(".") + 1)
+  // A bag's name never holds a dot (`flatRow`), so the first dot ends it and
+  // every dot after belongs to the field's own name: `meta.Est. Hours`.
+  const dot = field.indexOf(".");
+  const label = (dot >= 0 ? field.slice(dot + 1) : field)
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .split(/[_\s]+/)
     .filter(Boolean)
     .map((w) => w[0]!.toUpperCase() + w.slice(1))
     .join(" ");
+  return label || field;
 }
 
 /** A value as a cell: text, a number, or nothing. */
@@ -352,71 +355,127 @@ export function wholeCount(result: Record_, key: string): number | undefined {
   return undefined;
 }
 
+/** Fewer rows than this are not offered as a table: a grid starts at 3. A
+ *  table the model asks for itself still needs only `MIN_ROWS`. */
+const OFFER_MIN_ROWS = 3;
+
+/** Fields kept for the machine and never offered as a column: identifiers,
+ *  retrieval scores and provenance, timestamps. `present` still takes one the
+ *  model names. */
+const MACHINE_FIELD = /^(id|kind|score|matchedBy|matched_by)$|[_.](id|score)$|Id$|Score$|At$|_at$/;
+
+/** The fields a list of rows offers as columns, in the order the rows carry
+ *  them. */
+function offeredColumns(rows: Record_[]): string[] {
+  return usableFields(rows.map(flatRow)).filter((f) => !MACHINE_FIELD.test(f));
+}
+
+/** What a result offers as a table. */
+export interface TableOffer {
+  /** The list's key, as `present` takes it. */
+  list: string;
+  /** How many rows the table would show. */
+  count: number;
+  /** The fields a column can show, in the order the rows carry them. */
+  columns: string[];
+}
+
 /**
- * What a result offers as a table: each list of 2 or more records that has a
- * field a column can show, with those fields in the order the rows carry them.
- * The lookup's result carries it, so the model reads which rows can post as a
- * table, and under which columns, at the point it chooses how to answer.
+ * What a result offers as a table: its main list (the one `present` reads
+ * when no `list` is named), when it holds 3 or more records and a field a
+ * column can show. The lookup's result carries it, so the model reads which
+ * rows can post as a table, and under which columns, at the point it chooses
+ * how to answer.
  *
  * @param result - A lookup's result, parsed
  */
-export function tableOffer(result: Record_): Record<string, { count: number; columns: string[] }> {
-  const offer: Record<string, { count: number; columns: string[] }> = {};
-  for (const [key, rows] of listsOf(result)) {
-    const columns = rows.length >= MIN_ROWS ? usableFields(rows.map(flatRow)) : [];
-    if (columns.length) offer[key] = { count: rows.length, columns };
-  }
-  return offer;
+export function tableOffer(result: Record_): TableOffer | undefined {
+  const list = listOf(result, undefined);
+  if (!list || list.rows.length < OFFER_MIN_ROWS) return undefined;
+  const columns = offeredColumns(list.rows);
+  return columns.length ? { list: list.key, count: list.rows.length, columns } : undefined;
 }
 
-/** What a row is known by when two calls return it: its address, its id, or
- *  all of it. */
-const rowKey = (row: Record_): string =>
-  isAddress(row.url) ? row.url : typeof row.id === "string" || typeof row.id === "number" ? `id:${row.id}` : JSON.stringify(row);
+/** What a row is known by when two calls return it: its id when it has one,
+ *  else its address, else all of it. */
+function rowKey(row: Record_): string {
+  const id = row.id;
+  if ((typeof id === "string" && id.trim()) || (typeof id === "number" && Number.isFinite(id))) return `id:${String(id)}`;
+  return isAddress(row.url) ? row.url : JSON.stringify(row);
+}
+
+/** An argument merged calls did not share: each value they ran with. */
+export interface Varied {
+  readonly varied: readonly unknown[];
+}
+
+const isVaried = (v: unknown): v is Varied => isRecord(v) && Array.isArray(v.varied);
+
+/** A call's main list and the columns it offers, as one comparable string. */
+function shapeOf(result: Record_): string {
+  const list = listOf(result, undefined);
+  return list ? `${list.key}:${offeredColumns(list.rows).sort().join(",")}` : "";
+}
 
 /**
  * Several calls of one lookup, as one result: what a turn that searched a
  * source several times — once per phase, once per scenario — shows as one
  * table, chart or set of cards.
  *
- * Each list of records is every call's rows in call order, a row two calls
+ * WHICH CALLS. The last call, and every earlier one whose main list offers the
+ * same columns: the same search run under another term or filter. A call of
+ * another shape — an orientation search listing paths before the cells — is
+ * another list, and stays out.
+ *
+ * Each list of records is those calls' rows in call order, a row two calls
  * returned kept once. Everything else is the last call's, except what would
- * misstate the merged lists: a whole count belongs to one call's query, so it
+ * misstate the merged lists. A whole count belongs to one call's query, so it
  * is dropped and the rows shown are the count; the list is partial when any
- * call's was; and the arguments are those every call shared, which is the
- * filter the caption can honestly name.
+ * call's was, or matched more than it returned. An argument every call shared
+ * stays as it is, and one they did not becomes `Varied`, so the caption names
+ * each value the calls ran with.
  *
  * @param calls - The lookup's calls this turn, in order, at least one
  */
 export function mergedLookup(calls: ReadonlyArray<{ args: Record_; result: Record_ }>): { args: Record_; result: Record_ } {
   const last = calls[calls.length - 1]!;
-  if (calls.length === 1) return last;
+  const shape = shapeOf(last.result);
+  const merged = calls.filter((c) => c === last || (shape !== "" && shapeOf(c.result) === shape));
+  if (merged.length === 1) return last;
   const result: Record_ = { ...last.result };
-  const keys = new Set(calls.flatMap((c) => listsOf(c.result).map(([k]) => k)));
-  for (const key of keys) {
+  let partial = merged.some((c) => c.result.truncated === true);
+  for (const key of new Set(merged.flatMap((c) => listsOf(c.result).map(([k]) => k)))) {
     const seen = new Map<string, Record_>();
-    for (const call of calls) {
-      for (const row of listOf(call.result, key)?.rows ?? []) if (!seen.has(rowKey(row))) seen.set(rowKey(row), row);
+    for (const call of merged) {
+      const rows = listOf(call.result, key)?.rows ?? [];
+      if ((wholeCount(call.result, key) ?? 0) > rows.length) partial = true;
+      for (const row of rows) if (!seen.has(rowKey(row))) seen.set(rowKey(row), row);
     }
     result[key] = [...seen.values()];
     for (const field of countFields(key)) delete result[field];
   }
-  if (calls.some((c) => c.result.truncated === true)) result.truncated = true;
-  const args = Object.fromEntries(
-    Object.entries(last.args).filter(([k, v]) => calls.every((c) => JSON.stringify(c.args[k]) === JSON.stringify(v))),
-  );
+  if (partial) result.truncated = true;
+  const names = [...new Set(merged.flatMap((c) => Object.keys(c.args)))];
+  const args: Record_ = {};
+  for (const name of names) {
+    const values = [...new Map(merged.map((c) => [JSON.stringify(c.args[name]), c.args[name]])).values()];
+    args[name] = values.length === 1 ? values[0] : ({ varied: values } as Varied);
+  }
   return { args, result };
 }
 
 /** The lookup's arguments as the caption's filter: `"onboarding" · phase
- *  Onboarding`. Free text is quoted; a filter is named by its field. */
+ *  Onboarding`, and `phase Onboarding / Pre-session` where merged calls ran
+ *  under each. Free text is quoted; a filter is named by its field. */
 function filterOf(args: Record_): string[] {
   const FREE_TEXT = new Set(["query", "keywords", "title", "q"]);
-  return Object.entries(args)
-    .filter(([, v]) => (typeof v === "string" && v.trim()) || typeof v === "number")
-    .map(([k, v]) =>
-      FREE_TEXT.has(k) ? `"${String(v)}"` : `${k.replace(/^filter_/, "").replace(/_/g, " ")} ${String(v)}`,
-    );
+  const shown = (v: unknown): v is string | number => (typeof v === "string" && !!v.trim()) || typeof v === "number";
+  return Object.entries(args).flatMap(([k, v]) => {
+    const values = isVaried(v) ? v.varied.filter(shown) : shown(v) ? [v] : [];
+    if (!values.length) return [];
+    const said = values.map((x) => (FREE_TEXT.has(k) ? `"${String(x)}"` : String(x))).join(" / ");
+    return [FREE_TEXT.has(k) ? said : `${k.replace(/^filter_/, "").replace(/_/g, " ")} ${said}`];
+  });
 }
 
 /** What a list holds, by its key: "findings", or "finding" for one. */

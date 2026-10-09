@@ -98,18 +98,28 @@ export function outOfIterationBudget(used: number): boolean {
 
 /** Fed back as a tool result when the lookup budget is spent. */
 export const BUDGET_EXHAUSTED_LOOKUP_NOTE =
-  "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups, and neither is `present`, which still shows the rows you have as a table. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction). If you couldn't gather everything the user asked for, deliver what you DO have and briefly offer to continue on the SPECIFIC missing piece (e.g. \"I've got X — want me to check Y next?\") — framed as a natural next step, never as an error or a limit.";
+  "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction). If you couldn't gather everything the user asked for, deliver what you DO have and briefly offer to continue on the SPECIFIC missing piece (e.g. \"I've got X — want me to check Y next?\") — framed as a natural next step, never as an error or a limit.";
 
 /** The `error` a lookup refused for budget reports: how the turn's ⚠️ line
  *  knows a budget refusal from a source failure (`turn/warning-line.ts`). */
 export const BUDGET_REFUSAL_ERROR = "no more lookups available this turn";
 
-/** The tool result a refused lookup reports, ready to hand back. */
-export function budgetRefusedResult(): string {
+/** Added when the COUNT of lookups refused, and the turn has round-trips
+ *  left: `present` fetches nothing, so it still runs. At the subrequest
+ *  ceiling the next pass answers with tools off, so nothing is promised. */
+const PRESENT_STILL_WORKS = " `present` is no lookup either: it still shows the rows you have as a table.";
+
+/**
+ * The tool result a refused lookup reports, ready to hand back.
+ *
+ * @param opts.presentStillWorks - The count of lookups refused, not the
+ *   subrequest ceiling, so the turn can still ask for a table
+ */
+export function budgetRefusedResult(opts: { presentStillWorks?: boolean } = {}): string {
   return JSON.stringify({
     ok: false,
     error: BUDGET_REFUSAL_ERROR,
-    note: BUDGET_EXHAUSTED_LOOKUP_NOTE,
+    note: BUDGET_EXHAUSTED_LOOKUP_NOTE + (opts.presentStillWorks ? PRESENT_STILL_WORKS : ""),
   });
 }
 

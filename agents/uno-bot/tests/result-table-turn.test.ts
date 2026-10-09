@@ -13,6 +13,7 @@ import { runTurn, type DeliveryCall, type ResultTable } from "../src/turn/index"
 import { postTextVerified } from "../src/slack/delivery";
 import { harness, request } from "./helpers/turn-harness";
 import { recordingPosting } from "./helpers/recording-slack";
+import { LOOKUP_CEILING } from "../src/agent/loop-policy";
 
 /** One blueprint finding as `search_blueprint` reports it. */
 function finding(n: number, over: Record<string, unknown> = {}) {
@@ -222,12 +223,12 @@ test("present on the Roadmap lookup posts its preset, exactly as the lookup's ow
 
 // ── Reach: the result offers its rows as a table ────────────────────────────
 //
-// Live on r515 a blueprint pain-points question and a GitHub issue list both
-// came back as prose. Nothing the model read when it chose a shape said these
-// rows could be a table, which fields would make columns, or that a turn's
-// several searches could be one table, and once the turn's lookups were spent
-// `present` was refused with them. Roadmap was the only preset in use because
-// its lookup is the only one whose result said so.
+// Live on r515, and again on r518, a blueprint pain-points question and an
+// issue list both came back as prose. Nothing the model read when it chose a
+// shape said these rows could be a table, which fields would make columns, or
+// that a turn's several searches could be one table; and once the turn's
+// lookups were spent `present` was refused with them. Roadmap was the only
+// preset in use because its lookup is the only one whose result said so.
 
 /** The results of `name` the model read, parsed, in call order. */
 function readOf(h: ReturnType<typeof harness>, name: string): Array<Record<string, unknown>> {
@@ -241,96 +242,97 @@ function readOf(h: ReturnType<typeof harness>, name: string): Array<Record<strin
 const answerOf = (h: ReturnType<typeof harness>) =>
   h.delivery.calls.find((c): c is Extract<DeliveryCall, { kind: "answer" }> => c.kind === "answer");
 
-test("a result with several rows of one shape offers them as a table, naming the fields a column can be", async () => {
+/** One turn: the lookups, each in its own round-trip, then `present` when
+ *  asked for, then prose. */
+async function reach(
+  lookups: Array<{ name: string; args: Record<string, unknown> }>,
+  resultFor: (name: string, args: Record<string, unknown>) => string,
+  presentArgs?: Record<string, unknown>,
+) {
   const h = harness({
-    replies: [{ toolCalls: [SEARCH] }, { text: "Three pain points." }],
-    toolResultFor: () => blueprintResult(3, { findings: [{ severity: "high", title: "Gate" }] }),
+    replies: [
+      ...lookups.map((c) => ({ toolCalls: [c] })),
+      ...(presentArgs ? [{ toolCalls: [{ name: "present", args: presentArgs }] }] : []),
+      { text: "**Clearance is the biggest snag.**" },
+    ],
+    toolResultFor: resultFor,
   });
   await runTurn(request({ text: "pain points?" }), h.deps);
+  return h;
+}
+
+test("a result with 3 or more rows of one shape offers its main list as a table, naming the fields a column can be", async () => {
+  const h = await reach([SEARCH], () => blueprintResult(3, { findings: [1, 2, 3].map((n) => ({ severity: "high", summary: `Gap ${n}` })) }));
 
   const [read] = readOf(h, "search_blueprint");
-  assert.deepEqual(read!.table_ready, { rows: { count: 3, columns: ["title", "scenario", "lane", "count"] } });
-  assert.match(String(read!.table_note), /present/);
+  assert.deepEqual(read!.table_ready, { list: "rows", count: 3, columns: ["title", "scenario", "lane", "count"] }, "the main list only");
+  const note = String(read!.table_note);
+  assert.match(note, /present/);
+  assert.match(note, /list "rows"/, "the note names the list parameter");
+  assert.match(note, /yes\/no/, "and says when a table is wrong");
   assert.deepEqual(read!.rows, JSON.parse(blueprintResult(3)).rows, "the rows themselves are untouched");
 });
 
-test("an issue list offers its issues as a table", async () => {
-  const matches = [930, 874, 816].map((n) => ({
-    number: n,
-    title: `Issue ${n}`,
-    url: `https://example.com/o/r/issues/${n}`,
-    updated: "2026-10-08",
+test("the fields a reader never reads as a column are not offered", async () => {
+  const rows = [1, 2, 3].map((n) => ({
+    kind: "cell",
+    id: `cell-${n}`,
+    title: `Cell ${n}`,
+    lane: "Regular Tutor",
+    score: 0.6,
+    matchedBy: "vector",
+    updatedAt: "2026-10-01",
+    service_id: "svc",
+    url: `https://blueprint.example/cell-${n}`,
   }));
-  const h = harness({
-    replies: [{ toolCalls: [{ name: "github_intake_search", args: { keywords: "uno-bot" } }] }, { text: "Three." }],
-    toolResultFor: () => JSON.stringify({ ok: true, repo: "o/r", keywords: "uno-bot", count: 3, matches, note: "Name the closest." }),
-  });
-  await runTurn(request({ text: "open intakes?" }), h.deps);
-
-  const [read] = readOf(h, "github_intake_search");
-  assert.deepEqual(read!.table_ready, { matches: { count: 3, columns: ["number", "title", "updated"] } });
+  const h = await reach([SEARCH], () => JSON.stringify({ ok: true, query: "x", count: 3, rows }));
+  const [read] = readOf(h, "search_blueprint");
+  assert.deepEqual((read!.table_ready as { columns: string[] }).columns, ["title", "lane"]);
 });
 
-test("a row's property bag reaches the table: each short field in it is a column, headed by its own name", async () => {
-  const results = [2019, 2021, 2023].map((year, i) => ({
-    title: `Paper ${i + 1}`,
-    url: `https://www.notion.so/paper-${i + 1}`,
-    meta: { Year: String(year), Status: "Published", Abstract: "A long abstract. ".repeat(10) },
-  }));
-  const result = JSON.stringify({ ok: true, scope: "research_papers", count: 3, results });
-  const ask = { name: "notion_search", args: { query: "tutor feedback", scope: "research_papers" } };
-  const h = harness({
-    replies: [
-      { toolCalls: [ask] },
-      { toolCalls: [{ name: "present", args: { shape: "table", lookup: "notion_search", columns: ["title", "meta.Year"] } }] },
-      { text: "**Three papers.**" },
-    ],
-    toolResultFor: () => result,
-  });
-  await runTurn(request({ text: "papers on tutor feedback?" }), h.deps);
-
-  const [read] = readOf(h, "notion_search");
-  assert.deepEqual(read!.table_ready, { results: { count: 3, columns: ["title", "meta.Year", "meta.Status"] } });
-  const table = answerOf(h)!.presentation!.table!;
-  assert.deepEqual(table.columns.map((c) => c.label), ["Title", "Year"]);
-  assert.deepEqual(table.rows.map((r) => r.cells), [
-    ["Paper 1", "2019"],
-    ["Paper 2", "2021"],
-    ["Paper 3", "2023"],
-  ]);
-  assert.equal(table.rows[0]!.url, "https://www.notion.so/paper-1");
-});
-
-test("a failed lookup, or one row, offers no table", async () => {
-  for (const result of [JSON.stringify({ ok: false, error: "down" }), blueprintResult(1)]) {
-    const h = harness({ replies: [{ toolCalls: [SEARCH] }, { text: "x" }], toolResultFor: () => result });
-    await runTurn(request({ text: "pain points?" }), h.deps);
-    const [read] = readOf(h, "search_blueprint");
-    assert.equal(read!.table_ready, undefined);
+test("two rows, a failed lookup, or a tool that opts out offers no table", async () => {
+  const matches = [930, 874, 816].map((n) => ({ number: n, title: `Issue ${n}`, url: `https://example.com/issues/${n}` }));
+  const cases: Array<[{ name: string; args: Record<string, unknown> }, string]> = [
+    [SEARCH, blueprintResult(2)],
+    [SEARCH, JSON.stringify({ ok: false, error: "down" })],
+    [{ name: "github_intake_search", args: { keywords: "uno-bot" } }, JSON.stringify({ ok: true, count: 3, matches })],
+  ];
+  for (const [call, result] of cases) {
+    const h = await reach([call], () => result);
+    const [read] = readOf(h, call.name);
+    assert.equal(read!.table_ready, undefined, `${call.name}: ${result.slice(0, 40)}`);
     assert.equal(read!.table_note, undefined);
   }
 });
 
-test("a turn that searched one lookup several times tables every row it returned, each once", async () => {
-  const byPhase = (phase: string, ns: number[]) =>
-    JSON.stringify({
-      ok: true,
-      query: "pain points",
-      count: ns.length,
-      matched: 40,
-      rows: ns.map((n) => finding(n, { scenario: `${phase} scenario` })),
-    });
-  const h = harness({
-    replies: [
-      { toolCalls: [{ name: "search_blueprint", args: { query: "pain points", filter_phase: "Onboarding" } }] },
-      { toolCalls: [{ name: "search_blueprint", args: { query: "pain points", filter_phase: "Pre-session" } }] },
-      { toolCalls: [present({ columns: ["title", "scenario"] })] },
-      { text: "**Clearance is the biggest snag.**" },
-    ],
-    toolResultFor: (_name, args) =>
-      args.filter_phase === "Onboarding" ? byPhase("Onboarding", [1, 2]) : byPhase("Pre-session", [2, 3, 4]),
+test("a later call of the lookup carries the offer without the note again", async () => {
+  const h = await reach(
+    [SEARCH, { name: "search_blueprint", args: { query: "onboarding pain points", filter_phase: "Pre-session" } }],
+    () => blueprintResult(3),
+  );
+  const [first, second] = readOf(h, "search_blueprint");
+  assert.ok(first!.table_note);
+  assert.ok(second!.table_ready);
+  assert.equal(second!.table_note, undefined);
+});
+
+/** A blueprint search by phase: rows `ns`, of `matched` that matched. */
+const byPhase = (phase: string, ns: number[], matched = ns.length) =>
+  JSON.stringify({
+    ok: true,
+    query: "pain points",
+    count: ns.length,
+    matched,
+    rows: ns.map((n) => finding(n, { scenario: `${phase} scenario` })),
   });
-  await runTurn(request({ text: "pain points by scenario?" }), h.deps);
+const phaseSearch = (phase: string) => ({ name: "search_blueprint", args: { query: "pain points", filter_phase: phase } });
+
+test("a turn that searched one lookup once per phase tables every row it returned, each once, and names the filter that varied", async () => {
+  const h = await reach(
+    [phaseSearch("Onboarding"), phaseSearch("Pre-session")],
+    (_n, args) => (args.filter_phase === "Onboarding" ? byPhase("Onboarding", [1, 2]) : byPhase("Pre-session", [2, 3, 4])),
+    { shape: "table", lookup: "search_blueprint", columns: ["title", "scenario"] },
+  );
 
   const table = answerOf(h)!.presentation!.table!;
   assert.deepEqual(table.rows.map((r) => r.cells), [
@@ -339,24 +341,132 @@ test("a turn that searched one lookup several times tables every row it returned
     ["Pain point 3", "Pre-session scenario"],
     ["Pain point 4", "Pre-session scenario"],
   ]);
-  assert.equal(table.caption, '4 rows · "pain points"', "the filters the calls shared, and the rows shown");
+  assert.equal(table.caption, '4 rows · "pain points" · phase Onboarding / Pre-session');
+  assert.equal(table.partial, false);
   const reads = readOf(h, "search_blueprint");
-  assert.equal((reads[1]!.table_ready as Record<string, { count: number }>).rows!.count, 4, "the offer counts the turn's rows so far");
+  assert.equal((reads[1]!.table_ready as { count: number }).count, 4, "the offer counts the rows the table would show");
 });
 
-test("present still answers once the turn's lookups are spent: it fetches nothing", async () => {
-  const searches = Array.from({ length: 13 }, (_, i) => ({
-    toolCalls: [{ name: "search_blueprint", args: { query: `pain points ${i}` } }],
+test("merged calls stay partial when any call matched more than it returned", async () => {
+  const h = await reach(
+    [phaseSearch("Onboarding"), phaseSearch("Pre-session")],
+    (_n, args) => (args.filter_phase === "Onboarding" ? byPhase("Onboarding", [1, 2], 40) : byPhase("Pre-session", [3, 4])),
+    { shape: "table", lookup: "search_blueprint", columns: ["title", "scenario"] },
+  );
+  const table = answerOf(h)!.presentation!.table!;
+  assert.equal(table.partial, true);
+  assert.equal(table.caption, 'at least 4 rows · "pain points" · phase Onboarding / Pre-session');
+});
+
+test("an orientation search of another shape is not merged into the table", async () => {
+  const paths = [1, 2, 3].map((n) => ({ kind: "path", title: `Path ${n}`, phase: "Onboarding", url: `https://blueprint.example/path-${n}` }));
+  const h = await reach(
+    [{ name: "search_blueprint", args: { granularity: "path", filter_path_kind: "exception" } }, phaseSearch("Onboarding"), phaseSearch("Pre-session")],
+    (_n, args) =>
+      args.granularity
+        ? JSON.stringify({ ok: true, query: "", count: 3, rows: paths })
+        : args.filter_phase === "Onboarding"
+          ? byPhase("Onboarding", [1, 2])
+          : byPhase("Pre-session", [3]),
+    { shape: "table", lookup: "search_blueprint", columns: ["title", "scenario"] },
+  );
+  const table = answerOf(h)!.presentation!.table!;
+  assert.deepEqual(table.rows.map((r) => r.cells[0]), ["Pain point 1", "Pain point 2", "Pain point 3"]);
+});
+
+test("rows with an empty id are told apart by their address", async () => {
+  const rows = (ns: number[]) => ns.map((n) => ({ id: "", title: `Row ${n}`, lane: "Tutor", url: `https://blueprint.example/r-${n}` }));
+  const h = await reach(
+    [phaseSearch("Onboarding"), phaseSearch("Pre-session")],
+    (_n, args) => JSON.stringify({ ok: true, query: "pain points", rows: args.filter_phase === "Onboarding" ? rows([1, 2]) : rows([2, 3]) }),
+    { shape: "table", lookup: "search_blueprint", columns: ["title"] },
+  );
+  assert.deepEqual(answerOf(h)!.presentation!.table!.rows.map((r) => r.cells[0]), ["Row 1", "Row 2", "Row 3"]);
+});
+
+test("the Roadmap lookup's table, chart and cards read its last call alone", async () => {
+  const cards = (status: string, ns: number[]) =>
+    JSON.stringify({
+      ok: true,
+      filters: { design_status: status },
+      count: ns.length,
+      cards: ns.map((n) => ({ title: `Card ${n}`, url: `https://www.notion.so/card-${n}`, card_number: n, design_status: status, dev_status: `Dev ${n}` })),
+    });
+  const calls = [
+    { name: "roadmap_query", args: { design_status: "WIP" } },
+    { name: "roadmap_query", args: { design_status: "Shipped" } },
+  ];
+  const resultFor = (_n: string, args: Record<string, unknown>) => (args.design_status === "WIP" ? cards("WIP", [1, 2, 3]) : cards("Shipped", [4, 5, 6]));
+
+  const tabled = await reach(calls, resultFor, { shape: "table", lookup: "roadmap_query", columns: ["title"] });
+  assert.deepEqual(answerOf(tabled)!.presentation!.table!.rows.map((r) => r.cells[0]), ["Card 4", "Card 5", "Card 6"]);
+
+  const charted = await reach(calls, resultFor, { shape: "chart", lookup: "roadmap_query", group_by: "dev_status" });
+  const [told] = readOf(charted, "present");
+  assert.equal(told!.total, 3, "the chart counts the last call's cards");
+
+  const carded = await reach(calls, resultFor, { shape: "cards", lookup: "roadmap_query", columns: ["title"] });
+  assert.deepEqual(answerOf(carded)!.presentation!.cards!.cards.map((c) => c.title), ["Card 4", "Card 5", "Card 6"]);
+});
+
+test("a row's property bag reaches the table: each short field in it is a column, headed by its own name", async () => {
+  const results = [2019, 2021, 2023].map((year, i) => ({
+    title: `Paper ${i + 1}`,
+    url: `https://www.notion.so/paper-${i + 1}`,
+    meta: { Year: String(year), "Est. Hours": "3", Abstract: "A long abstract. ".repeat(10) },
   }));
-  const h = harness({
-    replies: [...searches, { toolCalls: [present(COLUMNS)] }, { text: "**Clearance is the biggest snag.**" }],
-    toolResultFor: () => blueprintResult(3),
-  });
-  await runTurn(request({ text: "pain points?" }), h.deps);
+  const h = await reach(
+    [{ name: "notion_search", args: { query: "tutor feedback", scope: "research_papers" } }],
+    () => JSON.stringify({ ok: true, scope: "research_papers", count: 3, results }),
+    { shape: "table", lookup: "notion_search", columns: ["title", "meta.Year", "meta.Est. Hours"] },
+  );
+
+  const [read] = readOf(h, "notion_search");
+  assert.deepEqual((read!.table_ready as { columns: string[] }).columns, ["title", "meta.Year", "meta.Est. Hours"]);
+  const table = answerOf(h)!.presentation!.table!;
+  assert.deepEqual(table.columns.map((c) => c.label), ["Title", "Year", "Est. Hours"]);
+  assert.deepEqual(table.rows.map((r) => r.cells), [
+    ["Paper 1", "2019", "3"],
+    ["Paper 2", "2021", "3"],
+    ["Paper 3", "2023", "3"],
+  ]);
+  assert.equal(table.rows[0]!.url, "https://www.notion.so/paper-1");
+});
+
+test("present still answers once the turn's lookups are counted out, and the refusal says so", async () => {
+  const searches = Array.from({ length: 13 }, (_, i) => ({ name: "search_blueprint", args: { query: `pain points ${i}` } }));
+  const h = await reach(searches, () => blueprintResult(3), present(COLUMNS).args);
 
   const reads = readOf(h, "search_blueprint");
   assert.equal(reads.at(-1)!.ok, false, "the thirteenth search was refused");
+  assert.match(String(reads.at(-1)!.note), /present/, "and the refusal says present still works");
   const [told] = readOf(h, "present");
   assert.equal(told!.table_attached, true);
   assert.ok(answerOf(h)!.presentation?.table);
 });
+
+test("a lookup refused at the subrequest ceiling promises no present: the turn is answering now", async () => {
+  let spent = 0;
+  const budget = {
+    used: () => spent,
+    trips: () => 0,
+    withLookupLimit: async <T>(_limit: number, fn: () => Promise<T>) => {
+      const out = await fn();
+      spent = LOOKUP_CEILING;
+      return out;
+    },
+    isBudgetError: () => false,
+    breakdown: () => "test",
+  };
+  const h = harness({
+    replies: [{ toolCalls: [SEARCH, { name: "search_blueprint", args: { query: "more" } }] }, { text: "**Clearance.**" }],
+    toolResultFor: () => blueprintResult(3),
+    budget,
+  });
+  await runTurn(request({ text: "pain points?" }), h.deps);
+
+  const reads = readOf(h, "search_blueprint");
+  assert.equal(reads[1]!.ok, false, "the second search was refused at the ceiling");
+  assert.doesNotMatch(String(reads[1]!.note), /present/);
+});
+

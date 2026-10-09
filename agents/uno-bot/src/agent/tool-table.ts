@@ -165,13 +165,21 @@ export type ToolRow = {
        * `agent/loop.ts`.
        */
       readonly fetchesNothing?: true;
+      /**
+       * False for a lookup whose rows are never a table to scan — a duplicate
+       * check inside a filing, a profile, a thread — so its result is not
+       * offered as one. Absent, a result of 3 or more rows of one shape is.
+       * Read by `turn/presentation.ts`.
+       */
+      readonly offersTable?: false;
     }
-  | { readonly access: "control"; readonly gate?: undefined; readonly taskCard?: undefined; readonly fetchesNothing?: undefined }
+  | { readonly access: "control"; readonly gate?: undefined; readonly taskCard?: undefined; readonly fetchesNothing?: undefined; readonly offersTable?: undefined }
   | {
       readonly access: "gated" | "worker";
       readonly gate: GateWords;
       readonly taskCard?: undefined;
       readonly fetchesNothing?: undefined;
+      readonly offersTable?: undefined;
     }
 );
 
@@ -214,12 +222,14 @@ export const TOOL_TABLE = {
     retrieval: true,
     reviewRequest: null,
     taskCard: { title: "Checking open intakes on GitHub", estate: "github" },
+    offersTable: false,
   },
   slack_user_profile: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
     taskCard: { title: "Looking someone up in Slack", estate: "slack" },
+    offersTable: false,
   },
   slack_channel_members: {
     access: "ungated",
@@ -232,6 +242,7 @@ export const TOOL_TABLE = {
     retrieval: true,
     reviewRequest: null,
     taskCard: { title: "Reading the Slack thread", estate: "slack" },
+    offersTable: false,
   },
   slack_react: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
   // The answer's shape: a table of rows a lookup already returned this turn.

@@ -339,7 +339,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         !rowFor(call.name)?.fetchesNothing &&
         (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING)
       ) {
-        text = budgetRefusedResult();
+        text = budgetRefusedResult({ presentStillWorks: deps.budget.used() < LOOKUP_CEILING });
         refused(text);
       } else {
         // A call that fetches nothing is no lookup, so it spends none of the
