@@ -38,6 +38,13 @@ export interface TaskCardSource {
    * Absent everywhere else.
    */
   readonly visibility?: string;
+  /**
+   * The board, database or page the lookup queried or read, as against one
+   * of the rows it found. An answer stands on what it queried whatever it
+   * names, so the Sources box keeps this one and a row only when the prose
+   * names it (`slack/sources-box.ts`).
+   */
+  readonly queried?: true;
 }
 
 /** What a card says beyond its title. Every method answers null (or none)
@@ -47,7 +54,8 @@ export interface TaskCardReadout {
   details(args: Record<string, unknown>): string | null;
   /** What came back, as a glance — "4 pages", "no matches". */
   output(result: string): string | null;
-  /** The links the result names, at most `MAX_SOURCES`, each once. */
+  /** The links the result names, each once — every row's, since an answer
+   *  may name any of them; a card shows the first `MAX_SOURCES`. */
   sources(result: string): TaskCardSource[];
   /** Where the call is routed, for a tool whose code routes it — which repo,
    *  which Notion database — or null where it routes nowhere in particular. */
@@ -73,7 +81,7 @@ export interface TaskCardDecision {
   readonly title: string;
 }
 
-/** How many links one card carries. Enough to open the source behind a claim;
+/** How many links one card carries (the Slack adapter cuts them). Enough to open the source behind a claim;
  *  few enough that a card stays a line, not a reading list. */
 export const MAX_SOURCES = 5;
 
@@ -155,12 +163,21 @@ function rowLinks(list: string, labels: readonly string[], visibilityFrom?: stri
   };
 }
 
-/** The one link a single-document read returned. */
+/** The one link a single-document read returned: the page it read. */
 function ownLink(result: string): TaskCardSource[] {
   const p = succeeded(result);
   const url = p && httpUrl(p.url);
   if (!p || !url) return [];
-  return [{ text: str(p.title) ?? url, url }];
+  return [{ text: str(p.title) ?? url, url, queried: true }];
+}
+
+/** The board a Roadmap lookup queried, then the cards it found. */
+function boardThenRows(result: string): TaskCardSource[] {
+  const p = succeeded(result);
+  const board = p?.board as Payload | undefined;
+  const url = board && httpUrl(board.url);
+  const own: TaskCardSource[] = url ? [{ text: str(board.title) ?? url, url, queried: true }] : [];
+  return unique([...own, ...rowLinks("cards", ["title"])(result)]);
 }
 
 const httpUrl = (v: unknown): string | null => {
@@ -170,7 +187,7 @@ const httpUrl = (v: unknown): string | null => {
 
 function unique(sources: TaskCardSource[]): TaskCardSource[] {
   const seen = new Set<string>();
-  return sources.filter((s) => !seen.has(s.url) && seen.add(s.url)).slice(0, MAX_SOURCES);
+  return sources.filter((s) => !seen.has(s.url) && seen.add(s.url));
 }
 
 const noSources = (): TaskCardSource[] => [];
@@ -232,7 +249,7 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
     details: (args) =>
       typeof args.card_number === "number" ? `#${args.card_number}` : arg("title", "person", "design_status")(args),
     output: countOutput("cards", "card", "no matching cards"),
-    sources: rowLinks("cards", ["title"]),
+    sources: boardThenRows,
   },
   notion_search: {
     details: (args) => {

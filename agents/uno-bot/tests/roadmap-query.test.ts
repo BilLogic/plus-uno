@@ -225,3 +225,10 @@ test("an enumeration longer than the list reports how many matched", async () =>
   assert.equal(out.matched, 41);
   assert.equal(out.truncated, false);
 });
+
+test("a lookup names the board it queried, so the answer can cite it", async () => {
+  board = BOARD;
+  const out = (await roadmapQuery({ title: "DS Update" })) as Result & { board?: { title: string; url: string } };
+
+  assert.deepEqual(out.board, { title: "Roadmap", url: "https://www.notion.so/roadmapdb" });
+});
