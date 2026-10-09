@@ -372,6 +372,34 @@ describe("a notion_update draft", () => {
     assert.deepEqual(views.refused, []);
   });
 
+  /** The Roadmap's Design Status options, as the live schema offers them. */
+  const STATUSES = ["In Review", "Shipped", "Archived"];
+  const WITH_SELECT: Partial<PendingProposal> = {
+    ...UPDATE,
+    selects: [{ path: "properties.Design Status", label: "Design Status", source: { database: "roadmap", property: "Design Status" } }],
+  };
+
+  it("offers a select its stager names, from the database's live options", async () => {
+    const { deps, views, optionReads } = harness(await staged(WITH_SELECT), { pillars: STATUSES });
+    const fields = inputs(await editFields(deps, views));
+    const status = fields.find((f) => f.block_id === "uno_field:0.properties.Design Status")!;
+    assert.equal(status.label?.text, "Design Status");
+    assert.deepEqual(status.element?.options?.map((o) => o.value), STATUSES);
+    assert.equal(status.element?.initial_option?.value, "In Review");
+    assert.deepEqual(optionReads, ["roadmap/Design Status"]);
+    assert.deepEqual(views.refused, []);
+  });
+
+  it("writes a picked value of a stager's select, and refuses one the database lacks", async () => {
+    const { deps, ran } = harness(await staged(WITH_SELECT), { pillars: STATUSES });
+    await runReviewDecision(approve({ "0.properties.Design Status": "Archived" }), deps);
+    assert.deepEqual(ran[0]?.execute?.input.properties, { Name: "Reflection redesign v2", "Design Status": "Archived" });
+
+    const refused = harness(await staged(WITH_SELECT), { pillars: STATUSES });
+    await runReviewDecision(approve({ "0.properties.Design Status": "Ready for QA" }), refused.deps);
+    assert.equal(refused.ran.length, 0);
+  });
+
   it("offers no title when the update does not set one", async () => {
     const { deps, views } = harness(
       await staged({ ...UPDATE, input: { page_url: UPDATE.input!.page_url, append: { text: "A dated pulse." } } }),
@@ -494,14 +522,14 @@ describe("Approve reads only what an edit needs", () => {
     return { store, reads: () => reads };
   }
 
-  it("reads neither the card again nor the options when nothing was edited", async () => {
+  it("reads no options or live page when nothing was edited", async () => {
     const { store, reads } = counted(await staged());
     const { deps, ran, optionReads } = harness(store);
     await runReviewDecision(approve({}), deps);
     assert.equal(ran.length, 1);
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
     assert.deepEqual(optionReads, []);
-    // The claim's own read, and nothing before it.
+    // The answer authorization shares its read with the gate.
     assert.equal(reads(), 1);
   });
 

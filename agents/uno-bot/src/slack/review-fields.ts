@@ -227,7 +227,12 @@ function draftFields(proposal: PendingProposal): Array<{ field: EditableField; s
   const out: Array<{ field: EditableField; source?: OptionSource }> = [];
   for (const [index, op] of proposalOperations(proposal).entries()) {
     const table = FIELDS[op.toolName] ?? [];
-    for (const spec of typeof table === "function" ? table(op.input) : table) {
+    // The stager's own selects for this operation (`PendingProposal.selects`):
+    // a follow-up's Design Status, say, which no other update offers.
+    const own: FieldSpec[] = (proposal.selects ?? [])
+      .filter((s) => (s.op ?? 0) === index)
+      .map((s) => ({ path: s.path, label: s.label, kind: "select", required: true, options: s.source }));
+    for (const spec of [...(typeof table === "function" ? table(op.input) : table), ...own]) {
       if (spec.applies && !spec.applies(op.input)) continue;
       const raw = spec.read ? spec.read(op.input) : readPath(op.input, spec.path);
       if (raw !== undefined && typeof raw !== "string") continue;
