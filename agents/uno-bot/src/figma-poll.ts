@@ -8,8 +8,9 @@
 // snapshot in KV, and when something changed it adds one change set to the
 // findings in KV. A new published version also owes the repo's copy of the
 // snapshot a refresh, recorded in KV for the `figma-snapshot-refresh` job
-// (src/figma-library/snapshot-refresh.ts). It posts nothing. The morning run's `figma-library-post` job
-// reads the findings and turns each into a drafted intake and one card in
+// (src/figma-library/snapshot-refresh.ts). It posts nothing. The morning
+// run's `figma-library-post` job reads the findings and turns each into a
+// drafted intake and one card in
 // #plus-universal (src/figma-library/post.ts) — findings post at the next
 // morning run, like every proactive job.
 //

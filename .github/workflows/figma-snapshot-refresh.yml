@@ -11,16 +11,18 @@ name: Refresh Figma Component Snapshot
 # date refresh near the age ceiling), or a "no change" summary that closes any
 # stale refresh PR → stop. Never a cron: a refresh follows a library publish
 # somebody meant, and each one is a PR a human reviews.
-#   • ONCE PER PUBLISH (#898). uno-bot's end-of-day poll, finding a newly
-#     published library version, sends `repository_dispatch`
-#     `figma-library-published` (agents/uno-bot/src/figma-library/
-#     snapshot-refresh.ts), once, retried the next morning if GitHub refused it.
-#     Its payload's version id is shown in the summary and goes nowhere else.
+#   • ONCE PER PUBLISH (#898). uno-bot's end-of-day run, once its Figma jobs
+#     are done, sends `repository_dispatch` `figma-library-published` for a
+#     newly published library version (agents/uno-bot/src/figma-library/
+#     snapshot-refresh.ts). The version stays owed until this run's snapshot
+#     lands on main or on the refresh branch, so each night re-sends what has
+#     not. Its payload's version id is shown in the summary and goes nowhere
+#     else.
 #   • BY HAND, still: `gh workflow run figma-snapshot-refresh.yml` (from main).
 # A RATE LIMIT IS WAITED OUT. The script waits out Figma's 429s (up to 30
 # minutes in all) and paces its node fetches; a run that still cannot finish
-# writes nothing and says Figma was busy (exit 75), and the next publish or a
-# re-run completes it.
+# writes nothing and says Figma was busy (exit 75), and uno-bot's next night
+# completes it.
 #
 # Why this replaces the old poller's shape. The retired figma-library-poll.yml
 # committed straight to main with "[skip ci]" and `git push || true`, so a
@@ -58,7 +60,7 @@ env:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    # The paced node fetches take about 6 minutes, and a rate limit may add up
+    # The paced node fetches take about 8 minutes, and a rate limit may add up
     # to 30 more of waiting.
     timeout-minutes: 45
 
@@ -119,7 +121,7 @@ jobs:
             {
               echo "## Figma component snapshot: Figma was busy"
               echo
-              echo "Figma kept rate-limiting after the script waited, so nothing was written. Re-run this workflow, or the next publish will."
+              echo "Figma kept rate-limiting after the script waited, so nothing was written. uno-bot sends the refresh again tomorrow night, or re-run this workflow."
             } >> "$GITHUB_STEP_SUMMARY"
             echo "::error::Figma kept rate-limiting; nothing was written."
             exit 1
