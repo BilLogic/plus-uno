@@ -31,7 +31,7 @@ const card = (n: number, status: string) => ({
 /** Bill's cards: 3 WIP, 2 Under Review, 1 Shipped — unless the statuses say otherwise. */
 function roadmapResult(statuses = ["WIP", "Under Review", "WIP", "Shipped", "WIP", "Under Review"], extra: Record<string, unknown> = {}): string {
   const cards = statuses.map((s, i) => card(i + 1, s));
-  return JSON.stringify({ ok: true, filters: { person: "Bill" }, count: cards.length, matched: cards.length, truncated: false, cards, ...extra });
+  return JSON.stringify({ ok: true, board: { title: "Roadmap", url: "https://www.notion.so/roadmapdb" }, filters: { person: "Bill" }, count: cards.length, matched: cards.length, truncated: false, cards, ...extra });
 }
 
 const ROADMAP: Call = { name: "roadmap_query", args: { person: "Bill" } };

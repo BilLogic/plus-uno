@@ -31,8 +31,9 @@
 // `degraded` line, under the same two-line cap as every other trigger.
 //
 // THE SOURCES are every link the turn's lookups read, as their task cards
-// carry them: each once, in the order read. Which of them a thread may see,
-// and whether there are enough to fold into a box, is the posting side's call
+// carry them: each once, in the order read. Which of them the answer used,
+// which a thread may see, and whether to fold them into a box, is the posting
+// side's call, made against the prose
 // (`slack/card-sources.ts`, `slack/sources-box.ts`).
 //
 // PURE: no Env, no Slack shape.

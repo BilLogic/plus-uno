@@ -129,7 +129,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 #### Sources box and link previews
 
-**Code lists the links an answer read; the prose ends on its last point.** Every link the turn's lookups read, as their task cards carry it, is gathered once in the order read, and the ones a thread may see (`slack/card-sources.ts`) fold into a closed `container` titled `Sources (n)` beneath the answer, after any table. At most 10; fewer than 3 make no box, and those links sit on names in the prose. The title is the count alone. The links also ride the text copy as one `Sources:` line, and a refused box steps down to the answer with that line in its Markdown. Every answer post sets `unfurl_links` and `unfurl_media` to false.
+**Code lists the links an answer used; the prose ends on its last point.** Used means the board or page a lookup queried, once, and the rows the prose names by link or by name; a lookup's other rows are what it read on the way, and stay on its task card. They are gathered once in the order read, and the ones a thread may see (`slack/card-sources.ts`) fold into a closed `container` titled `Sources (n)` beneath the answer, after any table. At most 10. One or two links the prose already carries make no box; a queried board the prose leaves unlinked gets one even alone. The title is the count alone. The links also ride the text copy as one `Sources:` line, and a refused box steps down to the answer with that line in its Markdown. Every answer post sets `unfurl_links` and `unfurl_media` to false.
 
 #### Linkable items: answer cards
 

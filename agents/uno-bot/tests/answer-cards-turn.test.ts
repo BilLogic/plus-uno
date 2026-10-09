@@ -178,7 +178,9 @@ test("a refused card falls back to the plain rung: the prose with the cards as a
 
 test("cards and a Sources box each step down on their own: a refused carousel leaves the box aboard", async () => {
   const { answer } = await turn();
-  const sources = [1, 2, 3].map((n) => ({ text: `Page ${n}`, url: `https://www.notion.so/page-${n}` }));
+  // Three pages the turn read whole, so the answer cites them whether or not
+  // its prose names them.
+  const sources = [1, 2, 3].map((n) => ({ text: `Page ${n}`, url: `https://www.notion.so/page-${n}`, queried: true as const }));
   const presentation: Presentation = { ...answer.presentation!, sources };
 
   const both = await posted(answer.text, presentation);
