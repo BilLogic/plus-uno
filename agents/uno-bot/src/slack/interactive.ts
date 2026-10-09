@@ -380,6 +380,7 @@ async function reviseFromReview(
         text: `${NEEDS_CHANGES_LEAD}${note}`,
         ts: noteTs,
         thread_ts: thread,
+        revises: proposal.proposalTs,
       };
       // A Figma comment decision revises its own way: its handler takes the
       // note at the head of the job (`figma-comments/revise.ts`). Every other
