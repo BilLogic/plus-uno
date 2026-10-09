@@ -1,25 +1,29 @@
 // The daily role-map sync: the Notion Team Members roster matched against the
-// Slack directory (`./roles.ts` `buildRoleMap`), the Slack-id → role map and
-// the Figma-id → Slack-id map kept in KV together, for turns and Figma jobs to
-// read without calling Notion.
+// Slack directory (`./roles.ts` `matchRoster`), the Slack-id → role map kept
+// in KV for turns to read. The Figma-id → Slack-id map is kept beside it, so a
+// Figma commenter can be matched to a teammate without a call to Notion.
 //
 // One Notion query, paged, and one users.list read, paged — both inside the
 // run's lookup ceiling. A read that fails or stops short writes nothing, so a
 // failed sync keeps the last map until its TTL runs out. The map lives in KV
 // only: D1 holds no names, ids or roles beyond a kickoff's `aimed_at_role`
-// (ADR-030). The job logs counts; a dry run lists the names that found no
-// one, so the CMS can be fixed.
+// (ADR-030). The job logs counts, Figma User ID cells it cannot read among
+// them; a dry run lists the names that found no one, so the CMS can be fixed.
 //
 // A read that succeeds can still come back hollow — the database moved, rows
 // restricted, a Group option renamed so nothing maps. So a new map that is
 // empty, or under half the size of the stored one, does not replace a stored
-// map that has entries; the run says so and the old map stands.
+// map that has entries; the run says so and the old roles stand, with the
+// expiry they already had. The Figma map is not held back with them: it is
+// rebuilt from every read that succeeds, so an id taken off a row stops
+// mapping at the next good sync, and a fall from some ids to none is called
+// out in the summary rather than held.
 //
 // Free of `Env`: its reads and its store are passed in (`./production.ts`
 // binds them), so the Node suite drives it with fakes.
 
 import { rethrowIfBudget } from "../net";
-import { buildRoleMap, type DirectoryPerson, type FigmaPeople, type RosterRow, type TeamRoles } from "./roles";
+import { matchRoster, type DirectoryPerson, type FigmaPeople, type RosterRow, type TeamRoles } from "./roles";
 
 /** The KV key the map is kept under. */
 export const TEAM_ROLES_KV_KEY = "team-roles:map";
@@ -27,6 +31,9 @@ export const TEAM_ROLES_KV_KEY = "team-roles:map";
 /** How long a stored map lasts: a few days, so a weekend and a failed sync or
  *  two keep it, and a roster nobody syncs any more stops being read. */
 export const TEAM_ROLES_TTL_S = 4 * 24 * 60 * 60;
+
+/** KV's shortest expiry: kept roles near the end of theirs are written for this long. */
+const MIN_TTL_S = 60;
 
 /** users.list pages read at most (200 members a page). A directory longer than
  *  this is a read that stopped short, and writes nothing. */
@@ -49,7 +56,8 @@ export interface TeamRolesSyncDeps {
   listUsers(cursor?: string): Promise<{ ok: boolean; error?: string; members?: DirectoryPerson[]; next_cursor?: string }>;
   /** The map stored now, or null when there is none. */
   read(): Promise<StoredTeamRoles | null>;
-  write(stored: StoredTeamRoles): Promise<void>;
+  /** Store the map, to lapse in `ttlS` seconds. */
+  write(stored: StoredTeamRoles, ttlS: number): Promise<void>;
   now(): number;
 }
 
@@ -60,10 +68,12 @@ export interface TeamRolesSyncReport {
   unmatched: number;
   ambiguous: number;
   summary: string;
-  /** True when the new map shrank too far and the stored one was kept. */
+  /** True when the new roles shrank too far and the stored ones were kept. */
   keptPrevious?: boolean;
   unmatchedNames?: string[];
   ambiguousNames?: string[];
+  /** Rows whose Figma User ID could not be read. */
+  unreadableFigmaNames?: string[];
 }
 
 function kept(why: string): TeamRolesSyncReport {
@@ -98,8 +108,10 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
     if (!cursor) break;
   }
 
-  const match = buildRoleMap(roster.members, directory);
+  const match = matchRoster(roster.members, directory);
   let counts = `${match.matched} matched, ${match.unmatched.length} unmatched, ${match.ambiguous.length} ambiguous`;
+  const unreadable = match.unreadableFigma.length;
+  if (unreadable) counts += `, ${unreadable} unreadable Figma id${unreadable === 1 ? "" : "s"}`;
   const figmaIds = Object.keys(match.figmaPeople).length;
   if (figmaIds) counts += `, ${figmaIds} Figma id${figmaIds === 1 ? "" : "s"}`;
 
@@ -113,10 +125,19 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
   const had = Object.keys(match.roles).length;
   const of = previous ? Object.keys(previous.roles).length : 0;
   const shrunk = shrankTooFar(had, of);
-  if (shrunk) counts += ` — kept previous map: new map had ${had} of ${of}`;
+  if (shrunk) counts += ` — kept previous roles: new map had ${had} of ${of}`;
+  const figmaBefore = Object.keys(previous?.figmaPeople ?? {}).length;
+  if (figmaBefore && !figmaIds) counts += ` — warning: Figma ids fell from ${figmaBefore} to 0`;
 
-  const write = !opts.dryRun && !shrunk;
-  if (write) await deps.write({ at: deps.now(), roles: match.roles, figmaPeople: match.figmaPeople });
+  const write = !opts.dryRun;
+  if (write) {
+    const now = deps.now();
+    // Kept roles keep their own build time and lapse when they would have.
+    const held = shrunk && previous ? previous : null;
+    const at = held ? held.at : now;
+    const ttlS = Math.max(MIN_TTL_S, TEAM_ROLES_TTL_S - Math.floor((now - at) / 1000));
+    await deps.write({ at, roles: held ? held.roles : match.roles, figmaPeople: match.figmaPeople }, ttlS);
+  }
   return {
     written: write,
     matched: match.matched,
@@ -124,7 +145,9 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
     ambiguous: match.ambiguous.length,
     summary: opts.dryRun ? `dry run, nothing written: ${counts}` : counts,
     ...(shrunk ? { keptPrevious: true } : {}),
-    ...(opts.dryRun ? { unmatchedNames: match.unmatched, ambiguousNames: match.ambiguous } : {}),
+    ...(opts.dryRun
+      ? { unmatchedNames: match.unmatched, ambiguousNames: match.ambiguous, unreadableFigmaNames: match.unreadableFigma }
+      : {}),
   };
 }
 

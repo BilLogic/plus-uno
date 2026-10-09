@@ -167,7 +167,7 @@ function buildChildren(input: PrdInput): unknown[] {
 // absent we fall back to name-only suggestions (unchanged behavior).
 // "Figma User ID" (rich_text) is optional and filled in by each member: the
 // daily role-map sync (`usage/team-roles-sync.ts`) maps it to the member's
-// Slack person, so a Figma commenter can be told to be a teammate.
+// Slack person, so a Figma commenter can be known to be a teammate.
 
 type NotionRichText = { plain_text?: string }[];
 interface TeamMemberProps {
@@ -193,7 +193,8 @@ export interface TeamMember {
   website?: string;
   /** Slack user id (e.g. "U0123ABC"), if the DB carries one — enables @-mention. */
   slackUserId?: string;
-  /** The member's Figma user id, when they have filled it in. */
+  /** The member's Figma User ID cell as they filled it in; `usage/roles.ts`
+   *  `normaliseFigmaId` reads the id out of it. */
   figmaUserId?: string;
 }
 

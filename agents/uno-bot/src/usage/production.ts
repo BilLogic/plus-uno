@@ -105,12 +105,12 @@ export async function teamRolesFor(env: Pick<Env, "HARNESS_KV">): Promise<TeamRo
 
 /**
  * The stored Figma user id → Slack id map, kept with the role map: how a
- * Figma commenter is told to be a teammate (`./roles.ts` `slackPersonOfFigma`).
+ * Figma commenter is known to be a teammate (`./roles.ts` `slackPersonOfFigma`).
  * Empty — every commenter then maps to nobody — on the same terms as
  * `teamRolesFor`, and for a map stored before Figma ids were kept.
  *
- * @throws A budget stop, which is the caller's to handle rather than an
- *   empty map
+ * @throws A budget stop, rather than an empty map: the caller treats the
+ *   commenter as unmapped (public facts only, no write proposals) or defers
  */
 export async function figmaPeopleFor(env: Pick<Env, "HARNESS_KV">): Promise<FigmaPeople> {
   return (await storedTeamRoles(env))?.figmaPeople ?? {};
@@ -153,10 +153,10 @@ export async function runTeamRolesSync(env: Env, opts: { dryRun: boolean }): Pro
         charge(1, "kv");
         return kv.get<StoredTeamRoles>(TEAM_ROLES_KV_KEY, "json");
       },
-      async write(stored) {
+      async write(stored, ttlS) {
         if (!kv) return;
         charge(1, "kv");
-        await kv.put(TEAM_ROLES_KV_KEY, JSON.stringify(stored), { expirationTtl: TEAM_ROLES_TTL_S });
+        await kv.put(TEAM_ROLES_KV_KEY, JSON.stringify(stored), { expirationTtl: ttlS });
       },
       now: () => Date.now(),
     },
