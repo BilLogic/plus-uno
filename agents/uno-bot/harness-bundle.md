@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **169,853 chars from 16 files**, against an assembled budget of 175,500 (5,647 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 149,469 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **169,863 chars from 16 files**, against an assembled budget of 175,500 (5,637 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 149,479 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -23,18 +23,18 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 20,000 | 30,251 | 20,000 (constitution) |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,997 | 58,289 | 28,000 (persona) |
 | 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,682 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,624 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,378 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,581 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,228 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,616 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 100,012 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,428 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 31,074 (−6,098 ide-only) | 145,544 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 148,828 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 155,344 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 160,007 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 169,853 | — |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,907 | 71,634 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,388 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,591 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,238 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,626 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,964 ide-only) | 100,022 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,438 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 31,074 (−6,098 ide-only) | 145,554 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 148,838 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 155,354 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 160,017 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 169,863 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -476,7 +476,7 @@ Turn a written requirement into a build from Slack. A designer names a design-sy
 ## Execute — one prototype turn
 
 1. **Read the method.** The pointer at the foot of this file names it; make that `read_reference` call before anything below — the PRD gate, the grounding ritual, the prompt-spec skeleton and the two hard gates are its sections, and every step here is their Slack rendering. Done when the method is in this turn's context.
-2. **Sort the ask.** A build or update verb on a named DS component, or a pasted Figma frame with a build verb, is an implement ask. "Check / look at / compare / what does X do" is a question — answer it or `source_read` the link, and stage nothing. Asked *about* a frame → answer from the screenshot and text layers, within `agents/uno-bot/AGENT.md § My lane`. Done when you know whether this turn answers, asks, or stages.
+2. **Sort the ask.** A build or update verb on a named DS component, or a pasted Figma frame with a build verb, is an implement ask. "Check / look at / compare / what does X do" is a question — answer it or `source_read` the link, and stage nothing. Asked *about* a frame → answer from the screenshot, text layers and comments, within `agents/uno-bot/AGENT.md § My lane`. Done when you know whether this turn answers, asks, or stages.
 3. **Hold the PRD gate** (method §0) — every fidelity, every route. A PRD is one of: a Notion PRD URL, a thread whose root links one, or a PRD pasted inline this turn with its sections. None in hand → say a PRD is required, route to **uno-synthesize**, and stage nothing; every PRD link you cite is one you fetched. Done when the PRD is read this turn, or the turn has ended at the route.
 4. **Confirm fidelity first.** "Hi-fi via the DS library, or a quick mid-fi draft?" — the designer chooses; a brief that states it, or delegates it ("your call"), counts as answered. Done when fidelity is stated in the thread.
 5. **Ground the brief** (method §1), batched in one step: `source_read` the PRD and the frame; for a component ask, `github_read` confirms it exists under `design-system/src/components` with the library's exact casing (`Badge`, `CardSurface`); token values come from `design-system/src/tokens/`; current-state flow claims come from `search_blueprint`, cited by cell. Done when each claim in the preview traces to something read this turn; a claim with no source is a gap for step 6.
