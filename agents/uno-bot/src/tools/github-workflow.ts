@@ -67,8 +67,7 @@ export async function runGithubWorkflow(
 
   await say(
     deps,
-    `:white_check_mark: Started \`${workflow}\` on ${repo} at \`${ref}\` — ` +
-      `follow it on <${runs}|its runs page>.`,
+    `Started <${runs}|${workflow}> on ${repo} at ${ref}.`,
   );
   return JSON.stringify({
     ok: true,

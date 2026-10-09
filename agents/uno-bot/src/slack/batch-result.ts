@@ -29,7 +29,7 @@ function headOf(outcomes: OperationOutcome[]): string {
   const failed = outcomes.filter((o) => !o.ok).length;
   return failed
     ? `:warning: Ran ${outcomes.length} operations — ${outcomes.length - failed} done, ${failed} failed:`
-    : `:white_check_mark: Ran all ${outcomes.length} operations:`;
+    : `Ran all ${outcomes.length} operations:`;
 }
 
 const planOf = (outcomes: OperationOutcome[]) => outcomes.map((o) => ({ toolName: o.toolName, input: o.input ?? {} }));
@@ -56,7 +56,7 @@ export function batchResultMessage(outcomes: OperationOutcome[]): string | null 
     for (const i of group.members) {
       const o = outcomes[i]!;
       // In words: a sign on every row would put one per operation on the
-      // message, and the head line already carries the one sign it needs.
+      // message, and the head line carries the one sign a partial run needs.
       lines.push(`  ${i + 1}. *${operationKindSummary(planned[i]!)}* — ${o.ok ? "done" : "failed"}: ${o.message}`);
     }
   }

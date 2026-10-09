@@ -165,6 +165,9 @@ function buildChildren(input: PrdInput): unknown[] {
 // by name. If a "Slack ID" text property is later added to the DB, we read it
 // here so find_experts can @-mention the right person (D5 "right person"); when
 // absent we fall back to name-only suggestions (unchanged behavior).
+// "Figma User ID" (rich_text) is optional and filled in by each member: the
+// daily role-map sync (`usage/team-roles-sync.ts`) maps it to the member's
+// Slack person, so a Figma commenter can be known to be a teammate.
 
 type NotionRichText = { plain_text?: string }[];
 interface TeamMemberProps {
@@ -177,6 +180,7 @@ interface TeamMemberProps {
   "Personal Website"?: { url?: string | null };
   "Google Scholar"?: { url?: string | null };
   "Slack ID"?: { rich_text?: NotionRichText };
+  "Figma User ID"?: { rich_text?: NotionRichText };
 }
 
 export interface TeamMember {
@@ -189,6 +193,9 @@ export interface TeamMember {
   website?: string;
   /** Slack user id (e.g. "U0123ABC"), if the DB carries one — enables @-mention. */
   slackUserId?: string;
+  /** The member's Figma User ID cell as they filled it in; `usage/roles.ts`
+   *  `normaliseFigmaId` reads the id out of it. */
+  figmaUserId?: string;
 }
 
 /** Normalize a raw "Slack ID" cell to a bare user id: strip <@…>, leading @. */
@@ -246,6 +253,7 @@ export async function findTeamMembers(
           linkedin: p.LinkedIn?.url ?? undefined,
           website: p["Personal Website"]?.url ?? p["Google Scholar"]?.url ?? undefined,
           slackUserId: normalizeSlackId(plain(p["Slack ID"]?.rich_text)) ?? undefined,
+          figmaUserId: plain(p["Figma User ID"]?.rich_text) || undefined,
         });
       }
       pages++;

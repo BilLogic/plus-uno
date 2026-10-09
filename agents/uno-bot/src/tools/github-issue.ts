@@ -96,8 +96,7 @@ export async function fileGithubIssue(
   await say(
     deps,
     // The title is escaped inside the label: a `>` in it would end the link.
-    `:white_check_mark: Filed <${issue.url}|#${issue.number} ${escapeSlackText(draft.title)}> on ${repo} — ` +
-      `labelled \`${INTAKE_LABELS.join("` + `")}\`, so it's in the triage queue.`,
+    `Filed <${issue.url}|#${issue.number} ${escapeSlackText(draft.title)}> on ${repo} for triage.`,
   );
   return JSON.stringify({
     ok: true,

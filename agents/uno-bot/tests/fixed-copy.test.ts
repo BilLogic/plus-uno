@@ -402,6 +402,10 @@ describe("the gate notes", () => {
       assertBudget(renderGateNote(note));
     });
   }
+
+  it("acknowledges an approval in one plain sentence", () => {
+    assert.equal(renderGateNote({ kind: "resolved", decision: "confirm" }), "Got it — kicking that off.");
+  });
 });
 
 describe("the proposal card", () => {
@@ -453,6 +457,17 @@ describe("the batch result", () => {
     assert.match(text, /failed/);
     const allDone = batchResultMessage(outcomes.map((o) => ({ ...o, ok: true })))!;
     assertBudget(allDone);
+  });
+
+  it("opens a batch that all landed with a plain line, no sign", () => {
+    const outcomes: OperationOutcome[] = Array.from({ length: 3 }, (_, n) => ({
+      toolName: "notion_update",
+      input: { page_id: `p${n}` },
+      ok: true,
+      result: "{}",
+      message: "updated",
+    }));
+    assert.equal(batchResultMessage(outcomes)!.split("\n")[0], "Ran all 3 operations:");
   });
 });
 

@@ -416,7 +416,7 @@ async function applyRevise(
     ? await settleItem(deps.threadState, item, { kind: "changes-asked", by: request.userId }, (deps.now ?? Date.now)())
     : decidedCard(
         verdict.proposal,
-        `:pencil2: Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,
+        `Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,
         verdict.proposal.proposalText,
         { button: "Review" },
       );
@@ -460,7 +460,7 @@ export async function startRevision(
   const { proposal, note, userId } = request;
   const where = `${proposal.channel}/${proposal.proposalTs}`;
   const noteTs = await deps
-    .postInThread(`:pencil2: <@${userId}> asked for changes: ${escapeSlackText(note)}`)
+    .postInThread(`<@${userId}> asked for changes: ${escapeSlackText(note)}`)
     .catch(() => null);
   if (noteTs) {
     try {
