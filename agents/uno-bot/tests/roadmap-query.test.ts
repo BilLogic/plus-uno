@@ -232,3 +232,30 @@ test("a lookup names the board it queried, so the answer can cite it", async () 
 
   assert.deepEqual(out.board, { title: "Roadmap", url: "https://www.notion.so/roadmapdb" });
 });
+
+// Asked for Shipped on 2026-10-08, the note opened "Complete result set … safe
+// to enumerate" and closed "(212 more rows truncated — say the list is the
+// first 30.)": a list cut to its first 30 is partial, whatever the read was.
+const withBill = (r: Row): Row => ({
+  ...r,
+  properties: { ...r.properties, Contributor: { type: "people", people: [{ name: "Bill Guo" }] } },
+});
+
+test("an enumeration cut to its first rows is called partial, never complete", async () => {
+  board = Array.from({ length: 41 }, (_, i) => withBill(card(6000 + i, `Shipped card ${i + 1}`)));
+  const out = await roadmapQuery({ person: "Bill" });
+
+  assert.equal(out.count, 30);
+  assert.match(out.note, /partial/i);
+  assert.match(out.note, /first 30 of 41/i);
+  assert.doesNotMatch(out.note, /complete|safe to enumerate/i);
+});
+
+test("an enumeration that fits the list is still the complete set", async () => {
+  board = Array.from({ length: 12 }, (_, i) => withBill(card(7000 + i, `Shipped card ${i + 1}`)));
+  const out = await roadmapQuery({ person: "Bill" });
+
+  assert.equal(out.count, 12);
+  assert.match(out.note, /complete result set/i);
+  assert.doesNotMatch(out.note, /partial|truncated/i);
+});
