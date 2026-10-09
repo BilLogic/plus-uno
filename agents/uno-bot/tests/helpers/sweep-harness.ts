@@ -7,7 +7,6 @@
 // holds.
 import { fakeProvider, type FakeProvider } from "../../src/agent/providers/fake";
 import { SubrequestBudgetError } from "../../src/net";
-import { ownBlocksOf, proposalCardBlocks, renderProposalCard } from "../../src/slack/proposal-render";
 import {
   createInMemorySweepStore,
   modelDriftDetector,
@@ -119,8 +118,8 @@ export interface SweepHarness {
   provider: FakeProvider;
   /** Detector replies not yet used. */
   replies: string[];
-  /** Every card posted, with the key it was tagged with; `withdrawn` holds
-   *  the text a withdrawn card was edited to. */
+  /** Every report posted, with the key it was tagged with; `withdrawn` holds
+   *  the text a withdrawn report was edited to. */
   posted: Array<{
     channel: string;
     threadTs: string | null;
@@ -131,6 +130,9 @@ export interface SweepHarness {
     cardKey: string;
     digest: string;
     withdrawn?: string;
+    /** What an edit in place made of it: its text and blocks. */
+    edited?: string;
+    editedBlocks?: unknown[];
   }>;
   staged: PendingProposal[];
   /** Every Slack read, as `method channel [ts]`. */
@@ -422,19 +424,22 @@ export function sweepHarness(opts: {
     ...(figmaComments ? { figmaComments } : {}),
     store: faultyStore,
     delivery: {
-      render(card) {
-        const rendered = renderProposalCard(card);
-        return { text: rendered.text, blocks: rendered.blocks ?? proposalCardBlocks(rendered.text) };
-      },
-      async post(to, card, tag) {
+      async post(to, message, tag) {
         nextTs += 1;
         const ts = `${Math.floor(clock.now / 1000)}.${String(900000 + nextTs)}`;
-        posted.push({ channel: to.channel, threadTs: to.threadTs, text: card.text, blocks: card.blocks, ts, cardKey: tag.cardKey, digest: tag.digest });
+        posted.push({ channel: to.channel, threadTs: to.threadTs, text: message.text, blocks: message.blocks, ts, cardKey: tag.cardKey, digest: tag.digest });
         // A stop after Slack took the post, before the job heard back.
         once("post");
-        const own = ownBlocksOf(card);
-        return { ok: true, ts, ...(own ? { blocks: own } : {}) };
+        return { ok: true, ts };
       },
+      async edit(channel, messageTs, message) {
+        const report = posted.find((p) => p.channel === channel && p.ts === messageTs);
+        if (report) {
+          report.edited = message.text;
+          report.editedBlocks = message.blocks;
+        }
+      },
+      reports: threadState,
       async findPosted(to, cardKey) {
         if (unknownSearches.left > 0) {
           unknownSearches.left -= 1;
@@ -462,8 +467,8 @@ export function sweepHarness(opts: {
       async liveCards(channel) {
         return (await threadState.getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
       },
-      async withdraw(channel, messageTs, text, cardKey) {
-        await threadState.retireProposal(messageTs);
+      async withdraw(channel, messageTs, text, cardKey, proposalKeys) {
+        for (const key of proposalKeys) await threadState.retireProposal(key);
         const card = posted.find((p) => p.channel === channel && p.ts === messageTs);
         if (card) {
           card.withdrawn = text;

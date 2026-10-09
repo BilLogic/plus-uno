@@ -26,14 +26,15 @@
 //     A finding older than 30 days is dropped as the queue is read. A card's
 //     snapshot waits under `sweep:card:` from before its post until it is
 //     staged or released.
-//   • Delivery: `chat.postMessage` in the destination, the card rendered by the
-//     proposal renderer and tagged with its key in message metadata, and
-//     `ThreadState.putProposal`. A card is found again by that tag
-//     (`include_all_metadata`), and withdrawn with `chat.update`.
+//   • Delivery: `chat.postMessage` in the destination, the report drawn by the
+//     shared decision card (`slack/decision-cards.ts`) and tagged with its key
+//     in message metadata; its record and each fix's proposal in ThreadState
+//     (`putReport`, `putProposal`). A report is found again by that tag
+//     (`include_all_metadata`), and edited or withdrawn with `chat.update`.
 //   • The DM job: the DMs uno-bot answered in, from the usage record
 //     (`dm-sweep/active.ts`); a DM's history and replies read with their
 //     message tags, on the bot's `im:history`.
-//   • A group DM's share: once its fix card's ✅ has written a page, a
+//   • A group DM's share: once one of its fixes has written a page, a
 //     separate share card posted and staged in the same thread
 //     (`offerSweepShareFor`); its own ✅ runs `sweep_share_post`.
 //
@@ -77,7 +78,7 @@ import {
   updateMessage,
   type SlackMessageMetadata,
 } from "../slack/api";
-import { ownBlocksOf, postWithPlainRung, proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
+import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { refusedForBlocks } from "../slack/delivery";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
@@ -96,7 +97,7 @@ import { markSweepThread } from "./thread-mark";
 import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import { classifyLink, type ChannelKind, type SweepSource, type TargetKind } from "./finding";
-import { SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
+import { plainReportBlocks, SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
 import { stageSweepShare } from "./share";
 import { activeDmsFor } from "../dm-sweep/env";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
@@ -252,44 +253,25 @@ async function sweepDepsFor(
     ...(figmaComments ? { figmaComments } : {}),
     store,
     delivery: {
-      render(card) {
-        const rendered = renderProposalCard(card);
-        return {
-          text: rendered.text,
-          blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
-          ...(rendered.followUp?.length ? { followUp: rendered.followUp } : {}),
-        };
-      },
-      async post(to, card, tag) {
-        for (const text of card.followUp ?? []) {
-          const sent = await postMessage(env, {
+      async post(to, message, tag) {
+        const send = (blocks: unknown[]) =>
+          postMessage(env, {
             channel: to.channel,
-            text,
-            metadata: tagOf(tag, "plan"),
+            text: message.text,
+            blocks,
+            metadata: tagOf(tag, "card"),
             ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
           });
-          // A card whose plan did not go up ahead of it is not posted at all.
-          if (!sent.ok) return { ok: false };
-        }
-        let sent: unknown[] = card.blocks;
-        const res = await postWithPlainRung(
-          (blocks) => {
-            sent = blocks;
-            return postMessage(env, {
-              channel: to.channel,
-              text: card.text,
-              blocks,
-              metadata: tagOf(tag, "card"),
-              ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
-            });
-          },
-          card,
-          refusedForBlocks,
-        );
-        // Its own blocks only when they are what went up, not its text rung.
-        const own = sent === card.blocks ? ownBlocksOf(card) : undefined;
-        return res.ok && res.ts ? { ok: true, ts: res.ts, ...(own ? { blocks: own } : {}) } : { ok: false };
+        let res = await send(message.blocks);
+        // Cards Slack refuses step down to sections, each with its own Review.
+        if (!res.ok && refusedForBlocks(res)) res = await send(plainReportBlocks(message.blocks));
+        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
+      async edit(channel, ts, message) {
+        // Its tag stays: an edit that names no metadata leaves the message's own.
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      },
+      reports: threadStateFor(env),
       async findPosted(to, cardKey, since) {
         // The card's own message: its tag's type, key and role — never merely
         // the latest tagged message, which may be a follow-up or another card.
@@ -333,9 +315,10 @@ async function sweepDepsFor(
       async liveCards(channel) {
         return (await threadStateFor(env).getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
       },
-      async withdraw(channel, ts, text, cardKey) {
-        // Out of reach first: a card that says it didn't go through can't be ✅'d.
-        await threadStateFor(env).retireProposal(ts);
+      async withdraw(channel, ts, text, cardKey, proposalKeys) {
+        // Out of reach first: a report that says it didn't go through can't be decided.
+        const store = threadStateFor(env);
+        for (const key of proposalKeys) await store.retireProposal(key);
         await updateMessage(env, {
           channel,
           ts,

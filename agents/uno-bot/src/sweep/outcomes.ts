@@ -7,13 +7,15 @@
 // (`agent/resolve-proposal.ts`), and the Slack turn envelope, once a turn has
 // staged a revision of a sweep card (`slack/turn-adapter.ts`). Each item is
 // found by its card's ts and its block id, since one item is one operation
-// with one replace.
+// with one replace. A fix of a sweep report is its own proposal, keyed by its
+// message and its block (`PendingProposal.item`): its items are found by the
+// message, and only its own block is touched.
 //
 //   ✅ ran it      → `confirmed` when the write landed, `refused_unwritable` when
 //                    the block cannot take a text replace, `refused_stale` when the
 //                    integration refused it because the block moved since the
 //                    sweep read it, `failed` for any other error.
-//   ⛔             → every item `dropped`.
+//   ⛔ / Reject    → every item `dropped` (a report's fix: its own item).
 //   a revision    → each item still on the new card moves to it, its 72 h
 //                    restarted with the card's; each one left off is `dropped`
 //                    (a reply dropping an item is how a person says "not this
@@ -29,6 +31,17 @@
 import type { OperationOutcome } from "../gate/index";
 import { proposalOperations, type PendingProposal, type ProposalOperation } from "../thread-state/index";
 import type { SweepItemStatus, SweepRecords } from "./store";
+
+/** The message a proposal's items were recorded under: a report's, for one
+ *  of its fixes; the card's own ts otherwise. */
+function cardTsOf(proposal: Pick<PendingProposal, "proposalTs" | "item">): string {
+  return proposal.item?.messageTs ?? proposal.proposalTs;
+}
+
+/** The blocks a proposal's operations touch. */
+function blocksOf(proposal: PendingProposal): Set<string> {
+  return new Set(proposalOperations(proposal).map(replacedBlockOf).filter((b): b is string => !!b));
+}
 
 /** The block id an item's operation replaces — or, for an added answer, the
  *  block it goes in after — or null for any other op. */
@@ -86,10 +99,11 @@ export async function recordSweepResolution(
   now: number,
 ): Promise<number> {
   if (!proposal.sweepRun) return 0;
-  const items = await store.itemsForProposal(proposal.proposalTs);
+  const items = await store.itemsForProposal(cardTsOf(proposal));
   let updated = 0;
   if (!outcomes) {
-    for (const item of items.filter((i) => i.status === "proposed")) {
+    const own = proposal.item ? blocksOf(proposal) : null;
+    for (const item of items.filter((i) => i.status === "proposed" && (!own || own.has(i.blockId)))) {
       await store.updateItem(item.itemId, { status: "dropped", resolvedAt: now });
       updated += 1;
     }
@@ -125,11 +139,12 @@ export async function recordSweepRevision(
   if (!replaced.sweepRun || !revision.sweepRun || replaced.proposalTs === revision.proposalTs) {
     return { kept: 0, dropped: 0 };
   }
-  const stillThere = new Set(proposalOperations(revision).map(replacedBlockOf).filter((b): b is string => !!b));
+  const stillThere = blocksOf(revision);
+  const own = replaced.item ? blocksOf(replaced) : null;
   let kept = 0;
   let dropped = 0;
-  for (const item of await store.itemsForProposal(replaced.proposalTs)) {
-    if (item.status !== "proposed") continue;
+  for (const item of await store.itemsForProposal(cardTsOf(replaced))) {
+    if (item.status !== "proposed" || (own && !own.has(item.blockId))) continue;
     if (stillThere.has(item.blockId)) {
       // The revision keeps the card's deadline (`turn.ts`), so the item keeps
       // its posted time: the morning's liveness check reads the same deadline.
@@ -160,9 +175,9 @@ export async function recordSweepRestage(
   now: number,
 ): Promise<number> {
   if (!from.sweepRun || from.proposalTs === to.proposalTs) return 0;
-  const toRun = new Set(proposalOperations(to).map(replacedBlockOf).filter((b): b is string => !!b));
+  const toRun = blocksOf(to);
   let moved = 0;
-  for (const item of await store.itemsForProposal(from.proposalTs)) {
+  for (const item of await store.itemsForProposal(cardTsOf(from))) {
     if (item.status !== "proposed" || !toRun.has(item.blockId)) continue;
     await store.updateItem(item.itemId, { proposalTs: to.proposalTs, postedAt: now });
     moved += 1;

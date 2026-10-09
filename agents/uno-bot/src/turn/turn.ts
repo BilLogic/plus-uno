@@ -982,7 +982,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // model, and its revision is still held to the subset rule below.
   // A file-drift card (`figma-drift/`) holds one intake per file and is read
   // the same way: "drop 2" leaves a file out.
-  if (request.pending?.sweepRun || request.pending?.supersedeKey === DRIFT_KEY) {
+  // A sweep report's fix is its own proposal, decided in its Review: no pick.
+  if ((request.pending?.sweepRun && !request.pending.item) || request.pending?.supersedeKey === DRIFT_KEY) {
     const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
     if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
   }
@@ -1073,7 +1074,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   }
 
   // A reply under a sweep card is most often someone dropping an item from it.
-  if (request.pending?.sweepRun) modelBlocks.push(sweepCardInstruction());
+  // A sweep report's fix is decided in its Review alone: nothing to drop.
+  if (request.pending?.sweepRun && !request.pending.item) modelBlocks.push(sweepCardInstruction());
 
   // The antecedent window: what "this" points at. Only for a top-level channel
   // @mention with a dangling pronoun, and only ever ONE page of the

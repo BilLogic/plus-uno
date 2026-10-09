@@ -1,35 +1,39 @@
-// The morning's proposal cards: which findings share a card, what the card
-// runs, who may confirm it, and what it says.
+// The morning's sweep reports: which findings share a report, what each fix
+// runs, who may decide it, and what the report says.
 //
-// ONE LIVE CARD PER PLACE. A source thread (or a team channel, for the
-// findings that go there) holds at most one live sweep card, of at most
-// `MAX_ITEMS_PER_CARD` in-place replacements. More fixes than that, and a new
-// day's fixes for a place whose card is still live, wait in the queue until
-// that card is resolved or lapses; nothing is dropped for want of room. A
-// sweep card lives beside a turn's card in the same thread without either
-// retiring the other (`proposalSlot`). A card's key is its content — the post
-// date, the destination and its first fix's block — so a retried morning never
-// mistakes one card for another. A fix is one `notion_update` operation with
-// one `replace`, stamped with the `last_edited_time` the sweep read (ADR-029):
-// the integration refuses it, unwritten, when the block has moved since.
+// ONE LIVE REPORT PER PLACE. A source thread (or a team channel, for the
+// findings that go there) holds at most one live sweep report, of at most
+// `MAX_ITEMS_PER_CARD` in-place replacements — the shared card's carousel
+// (`slack/decision-cards.ts`). More fixes than that, and a new day's fixes
+// for a place whose report is still live, wait in the queue until it is
+// decided or lapses; nothing is dropped for want of room, and the parent line
+// counts what waits. A report's key is its content — the post date, the
+// destination and its first fix's block — so a retried morning never mistakes
+// one report for another. A fix is one `notion_update` operation with one
+// `replace`, stamped with the `last_edited_time` the sweep read (ADR-029): the
+// integration refuses it, unwritten, when the block has moved since.
 //
-// CONFIRMERS are the card's owners plus everyone who posted in the thread, and
-// the card lives 72 hours, with no re-ping when it lapses. Each item names its
-// owner, who is @-mentioned; nobody else is.
+// EACH FIX IS ITS OWN PROPOSAL: its card's Review opens it alone, decided in
+// the pop-up, and its card redraws in place. CONFIRMERS are the report's
+// owners plus everyone who posted in the thread, and each fix lives 72 hours,
+// with no re-ping when it lapses. Each card names its owner, who is
+// @-mentioned; nobody else is.
 //
-// A GROUP DM'S CARD carries the pages it fixes (`sweepShareOf`), so that once
-// its ✅ has written one, a separate share card can offer a reworded note
-// (`./share.ts`). Its own ✅ applies the fix and nothing more. A private
-// channel's card carries nothing to share.
+// A GROUP DM'S FIX carries its page (`sweepShareOf`), so that once its write
+// lands, a separate share card can offer a reworded note (`./share.ts`). A
+// private channel's carries nothing to share.
 //
-// PURE: no `Env`, no Slack call. The card is data (`ProposalCard`); Slack
-// renders it (`slack/proposal-render.ts`).
+// The `drop N` reading, `keptFixes` and the revision wording below belong to
+// the DM capture card (`dm-watch/capture.ts`), which still stages one batch.
+//
+// PURE: no `Env`, no Slack call. A report is data (`ReportItem`); the shared
+// builder draws it.
 
 import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
-import type { ProposalOperation, SweepShare } from "../thread-state/index";
-import type { CardFix, CardFixes, ProposalCard } from "../turn/index";
-import { STANDING_TOO, addedContent, captureConfirmers, captureFixWords, captureItemLines, captureLead } from "./capture-lines";
+import type { ProposalOperation, ReportItem, StatedCardWords, SweepShare } from "../thread-state/index";
+import type { CardFixes, ProposalCard } from "../turn/index";
+import { FOUND_BY_SEARCH, addedContent, saidAt, saidIn } from "./capture-lines";
 import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
 
@@ -49,7 +53,6 @@ export const SWEEP_CARD_EVENT = "uno_sweep_card";
 /** The tag a withdrawn sweep card is retagged with (`SweepDelivery.withdraw`). */
 export const WITHDRAWN_SWEEP_CARD_EVENT = "uno_sweep_card_withdrawn";
 
-const QUOTE_CHARS = 200;
 /** Unchanged text shown either side of a fix's changed span. */
 const CONTEXT_CHARS = 40;
 
@@ -64,6 +67,9 @@ export interface SweepCardPlan {
   operations: ProposalOperation[];
   /** Owners first, then the thread's other posters, each once. */
   confirmers: string[];
+  /** The place's findings past the card's ten, still queued: the report's
+   *  parent line counts them as held for its next run. */
+  rest?: PendingFinding[];
 }
 
 /** The operation one item runs. */
@@ -118,7 +124,9 @@ export function planSweepCards(
     .map((g) => {
       const items = [...g.items].sort((a, b) => a.driftAt - b.driftAt || a.id.localeCompare(b.id));
       const chunk = items.slice(0, MAX_ITEMS_PER_CARD);
-      return cardPlan(`${postDate}:${destinationKey(g.destination)}:${chunk[0]!.blockId}`, g.destination, chunk);
+      const rest = items.slice(MAX_ITEMS_PER_CARD);
+      const plan = cardPlan(`${postDate}:${destinationKey(g.destination)}:${chunk[0]!.blockId}`, g.destination, chunk);
+      return rest.length ? { ...plan, rest } : plan;
     })
     .sort((a, b) => a.items[0]!.driftAt - b.items[0]!.driftAt || a.key.localeCompare(b.key));
 }
@@ -200,48 +208,125 @@ export function destinationKey(d: Destination): string {
   return d.rung === "private" || d.rung === "thread" ? `${d.channel}:${d.threadTs ?? ""}` : d.channel;
 }
 
+/** Whether a destination is the thread its items came from. */
+function inThread(d: Destination): boolean {
+  return d.rung === "thread" || (d.rung === "private" && d.threadTs !== null);
+}
+
 /**
- * The card as data: a lead listing each fix beside its owner, then the batch.
+ * The report's parent line: what the morning found, in one plain sentence —
+ * no mark, no instructions; the cards' buttons are the instructions. One item
+ * names its page; several are counted. mrkdwn: a page title is escaped.
  *
- * @param plan - The planned card
+ * @param items - Every item waiting for the place, shown or held
+ * @param destination - Where the report posts
  */
-export function sweepCard(plan: SweepCardPlan): ProposalCard {
-  const n = plan.items.length;
-  const head = `**${SWEEP_CARD_MARK}** — ${captureLead(plan.items) ?? `this thread settled ${n === 1 ? "something" : `${n} things`} a linked page still says the old way.`}`;
-  const items: CardFix[] = plan.items.map((item, i) => {
-    const evidence = item.evidence.permalinks[0] ? ` ([where](${item.evidence.permalinks[0]}))` : "";
-    const { before, after } = changedSpan(item.original, item.replacement);
-    const fix = {
-      page: { title: flat(item.target.title), url: item.target.url },
-      owner: item.owner,
-      ...captureFixWords(item, { before, after }),
-    };
-    const capture = captureItemLines(item, i, { before, after });
-    if (capture) return { ...fix, detail: capture.join("\n") };
-    // Page and thread words are text: a title or block holding `<!channel>`
-    // pings nobody. The link is Slack's own `<url|label>`, so a `]` in a title
-    // cannot break a Markdown one.
-    const detail = [
-      `${i + 1}. <@${item.owner}> · <${item.target.url}|${escapeSlackText(flat(item.target.title) || "untitled")}>`,
-      `   - page says: “${escapeSlackText(quote(item.sourceSays))}”`,
-      `   - thread says: “${escapeSlackText(quote(item.threadSays))}”${evidence}`,
-      `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
-    ].join("\n");
-    return { ...fix, detail };
-  });
-  const tail =
-    `One ✅ applies ${n === 1 ? "it" : `all ${n}`}; reply \`drop 2\` to leave one out. ` +
-    `${captureConfirmers(plan.items) ?? `The owners named above and anyone who posted in this thread can confirm.${STANDING_TOO}`} ` +
-    `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`;
+export function sweepParent(items: readonly PendingFinding[], destination: Destination): string {
+  const n = items.length;
+  const here = inThread(destination);
+  const sources = [...new Set(items.map((f) => saidIn(f, here)))];
+  const adds = items.filter((f) => f.add).length;
+  if (n === 1) {
+    const f = items[0]!;
+    const who = capitalised(sources[0]!);
+    const page = `*${escapeSlackText(flat(f.target.title) || "untitled")}*`;
+    return f.add ? `${who} answered something that ${page} doesn't say yet.` : `${who} settled something that ${page} still states the old way.`;
+  }
+  const who = sources.length === 1 ? capitalised(sources[0]!) : "The team";
+  if (adds === n) return `${who} answered ${n} things that no page has written down yet.`;
+  if (adds) return `${who} settled or answered ${n} things that pages don't say yet.`;
+  return `${who} settled ${n} things that linked pages still state the old way.`;
+}
+
+/**
+ * One fix as its card in the report: the page names it, its owner and where
+ * it was said under that, and what the page says beside what was decided.
+ * Its id is its block, unique on a card (`itemRecord`). Open goes to the page.
+ *
+ * @param f - The finding
+ * @param destination - Where the report posts
+ */
+export function sweepItem(f: PendingFinding, destination: Destination): ReportItem {
+  const where = [`<@${f.owner}>`, `from ${saidIn(f, inThread(destination))}`, ...(f.target.foundBy === "search" ? [FOUND_BY_SEARCH] : [])];
   return {
-    kind: "confirm",
-    verb: n === 1 ? "apply this Notion fix" : `apply these ${n} Notion fixes`,
-    lead: [head, "", ...items.map((f) => f.detail), "", tail].join("\n"),
-    fields: [],
-    caveats: [],
-    operations: plan.operations,
-    fixes: { head, items, tail },
+    // Carded findings always name a block (`planSweepCards`).
+    id: f.blockId!,
+    title: flat(f.target.title) || "untitled",
+    subtitle: where.join(" · "),
+    body: f.add
+      ? `No page says this yet · decision says “${flat(f.threadSays)}”`
+      : `Page says “${flat(f.sourceSays)}” · decision says “${flat(f.threadSays)}”`,
+    // Once written, the card says what the page now holds.
+    done: flat(f.replacement),
+    open: { label: "Open page", url: f.target.url },
   };
+}
+
+/**
+ * One fix's whole change, as its Review pop-up shows it: the page and its
+ * owner, the block's words now and what they become — or where an answer
+ * goes and what it adds — and where it was said. Shown whole, however long: a
+ * person decides exactly what will be written. mrkdwn: Notion's and Slack's
+ * words are escaped, so a block holding `<!channel>` pings nobody.
+ *
+ * @param f - The finding
+ */
+export function sweepItemText(f: PendingFinding): string {
+  const at = saidAt(f);
+  const quoted = `“${escapeSlackText(flat(f.threadSays))}”`;
+  const why = `Why: ${capitalised(saidIn(f, true))} said ${quoted}${at ? ` · <${at}|see it>` : ""}`;
+  const page = `*${escapeSlackText(flat(f.target.title) || "untitled")}* · owner <@${f.owner}>`;
+  if (f.add) {
+    const place = f.add.section ? `Goes under: ${escapeSlackText(flat(f.add.section))}` : `Opens a new section: ${escapeSlackText(flat(f.add.newSection ?? ""))}`;
+    return [page, place, `Adds: ${escapeSlackText(f.replacement)}`, why].join("\n");
+  }
+  return [page, `Page says now: ${escapeSlackText(f.original)}`, `Will say: ${escapeSlackText(f.replacement)}`, why].join("\n");
+}
+
+/** What a sweep fix says at the gate (`PendingProposal.stated`). */
+export function sweepItemWords(): StatedCardWords {
+  return {
+    cancelled: "Rejected, nothing written",
+    expired: "That fix closed after 72 h with no decision, so nothing was written.",
+  };
+}
+
+/** What a turn says in a sweep report's thread when its batch would change a
+ *  fix: a fix is the page's text as the thread settled it, so it is decided,
+ *  never redrafted. */
+export const SWEEP_REVISE_INSTEAD =
+  "A sweep fix is the page's text as the thread settled it, so it isn't redrafted. Reject it in Review with what you want instead, or edit the page.";
+
+/**
+ * A report's plain rung, for a workspace whose Slack refuses `card` blocks:
+ * the parent line, then each card as a section of its title, subtitle and
+ * body with its own Review beside it, so every fix stays decidable from its
+ * own button; Open is the title's link.
+ *
+ * @param blocks - The report's blocks (`decisionReport`)
+ */
+export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
+  return blocks.flatMap((block) => {
+    const b = block as Record<string, any>;
+    const cards: Record<string, any>[] = b.type === "card" ? [b] : b.type === "carousel" ? b.elements : [];
+    if (!cards.length) return [block];
+    return cards.map((card) => {
+      const actions = (card.actions ?? []) as Record<string, any>[];
+      const review = actions.find((a) => typeof a.action_id === "string");
+      const open = actions.find((a) => typeof a.url === "string" && a !== review);
+      const title = escapeSlackText(String(card.title?.text ?? ""));
+      const lines = [
+        open ? `*<${open.url}|${title}>*` : `*${title}*`,
+        ...(card.subtitle?.text ? [String(card.subtitle.text)] : []),
+        escapeSlackText(String(card.body?.text ?? "")),
+      ];
+      return { type: "section", text: { type: "mrkdwn", text: lines.join("\n") }, ...(review ? { accessory: review } : {}) };
+    });
+  });
+}
+
+function capitalised(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /**
@@ -276,11 +361,6 @@ export function changedSpan(original: string, replacement: string): { before: st
 
 function flat(text: string): string {
   return text.replace(/\s+/g, " ").trim();
-}
-
-function quote(text: string): string {
-  const f = flat(text);
-  return f.length > QUOTE_CHARS ? `${f.slice(0, QUOTE_CHARS - 1)}…` : f;
 }
 
 /** The blocks a batch replaces in place — what says a later card revises a

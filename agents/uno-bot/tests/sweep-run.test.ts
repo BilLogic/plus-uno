@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 
 import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
+import { itemProposalKey } from "../src/slack/decision-cards";
 import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
 import { recordSweepResolution } from "../src/sweep/outcomes";
 import { resolveSignal } from "../src/gate/index";
@@ -99,27 +100,31 @@ test("two drifts from two owners in one thread make one card, in that thread, wi
   const [card] = h.posted;
   assert.equal(card!.channel, DESIGN);
   assert.equal(card!.threadTs, t.root.ts, "in the thread the evidence is in");
-  assert.match(card!.text, /<@U0ADE>/);
-  assert.match(card!.text, /<@U0BEA>/);
-  assert.doesNotMatch(card!.text, /<@U0STARTER>/, "only owners are mentioned");
+  const shown = JSON.stringify(card!.blocks);
+  assert.match(shown, /<@U0ADE>/);
+  assert.match(shown, /<@U0BEA>/);
+  assert.doesNotMatch(shown, /<@U0STARTER>/, "only owners are mentioned");
 
-  const [staged] = h.staged;
-  assert.equal(staged!.operations!.length, 2);
-  assert.ok(staged!.operations!.every((op) => op.toolName === "notion_update"));
-  assert.deepEqual((staged!.operations![0]!.input.replace as unknown[])[0], {
+  // One proposal per fix, each its own operation.
+  assert.equal(h.staged.length, 2);
+  for (const staged of h.staged) {
+    assert.equal(staged.operations!.length, 1);
+    assert.equal(staged.operations![0]!.toolName, "notion_update");
+    assert.deepEqual(staged.confirmers, ["U0ADE", "U0BEA", "U0STARTER"], "owners plus everyone who posted");
+    assert.equal(staged.ttlMs, SWEEP_CARD_TTL_MS);
+    assert.equal(staged.sweepRun, "2026-09-30");
+    assert.equal(staged.replyTs, t.root.ts);
+  }
+  assert.deepEqual((h.staged[0]!.operations![0]!.input.replace as unknown[])[0], {
     block_id: PAGE_A.blocks[0]!.id,
     last_edited_time: PAGE_A.blocks[0]!.lastEditedTime,
     content: "Launch date: November 1",
   });
-  assert.deepEqual(staged!.confirmers, ["U0ADE", "U0BEA", "U0STARTER"], "owners plus everyone who posted");
-  assert.equal(staged!.ttlMs, SWEEP_CARD_TTL_MS);
-  assert.equal(staged!.sweepRun, "2026-09-30");
-  assert.equal(staged!.replyTs, t.root.ts);
   assert.deepEqual(
     h.store.items().map((i) => [i.blockId, i.ownerId, i.status, i.proposalTs]),
     [
-      [PAGE_A.blocks[0]!.id, "U0ADE", "proposed", staged!.proposalTs],
-      [PAGE_A.blocks[1]!.id, "U0BEA", "proposed", staged!.proposalTs],
+      [PAGE_A.blocks[0]!.id, "U0ADE", "proposed", card!.ts],
+      [PAGE_A.blocks[1]!.id, "U0BEA", "proposed", card!.ts],
     ],
   );
   assert.equal(morning.cards.length, 1);
@@ -196,8 +201,9 @@ test("12 edits make one card of ten in the thread, and the other two wait for it
   h.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, h.deps);
 
-  assert.deepEqual(h.posted.map((p) => p.threadTs), [t.root.ts], "one live card per thread");
-  assert.equal(h.staged[0]!.operations!.length, MAX_ITEMS_PER_CARD);
+  assert.deepEqual(h.posted.map((p) => p.threadTs), [t.root.ts], "one live report per thread");
+  assert.equal(h.staged.length, MAX_ITEMS_PER_CARD, "ten fixes, ten proposals");
+  assert.match(h.posted[0]!.text, /Showing 10 of 12; the rest come in the next report\./, "the parent line counts what waits");
   assert.equal((await h.store.pendingFindings()).length, 2, "the overflow waits in the queue");
   assert.match(morning.note ?? "", /2 fix\(es\) wait/);
 
@@ -206,12 +212,12 @@ test("12 edits make one card of ten in the thread, and the other two wait for it
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1);
 
-  // Once it is resolved, the two that waited go out on the next card.
-  await recordSweepResolution(h.store, h.staged[0]!, undefined, at(31, 15));
+  // Once every fix is decided, the two that waited go out on the next report.
+  for (const fix of [...h.staged]) await recordSweepResolution(h.store, fix, undefined, at(31, 15));
   h.clock.now = at(32, 13);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 2);
-  assert.equal(h.staged[1]!.operations!.length, 2);
+  assert.equal(h.staged.length, MAX_ITEMS_PER_CARD + 2);
   assert.deepEqual(await h.store.pendingFindings(), []);
 });
 
@@ -225,7 +231,7 @@ test("a card that lapsed unanswered frees its thread for the fixes that waited",
   h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 2);
-  assert.equal(h.staged[1]!.operations!.length, 2);
+  assert.equal(h.staged.length, MAX_ITEMS_PER_CARD + 2);
 });
 
 // A revision whose record never landed leaves the items on the card it
@@ -430,15 +436,15 @@ test("a stop in stage is finished by the retry, and a stage that fails outright 
   other.clock.now = at(30, 13, 7);
   await runSweepJob(MORNING, other.deps);
   assert.equal(other.staged.length, 1);
-  assert.notEqual(other.staged[0]!.proposalTs, other.posted[0]!.ts, "the withdrawn card is not the one staged");
+  assert.notEqual(other.staged[0]!.item?.messageTs, other.posted[0]!.ts, "the withdrawn report is not the one staged");
 });
 
 // A try that staged its card and stopped before recording it as posted: the
 // retry finds the card staged. Resolved meanwhile, it stays resolved — staged
 // afresh, a ✅'d card could run twice and a ⛔'d one would come back.
-for (const [glyph, name, status] of [
-  ["✅", "confirmed", "confirmed"],
-  ["⛔", "cancelled", "dropped"],
+for (const [decision, name, status] of [
+  ["confirm", "confirmed", "confirmed"],
+  ["cancel", "cancelled", "dropped"],
 ] as const) {
   test(`a card ${name} between a stopped try and its retry is recorded with its items resolved, never staged again`, async () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
@@ -451,10 +457,10 @@ for (const [glyph, name, status] of [
     await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
     const card = h.staged[0]!;
 
-    // Resolved through the gate, as a typed emoji would: the claim takes it
-    // out of ThreadState, and the decision goes on the record.
+    // Decided in its Review: the claim takes it out of ThreadState, and the
+    // decision goes on the record.
     const verdict = await resolveSignal(
-      { kind: "typed", channel: card.channel, thread: t.root.ts, text: glyph, userId: "U0ADE" },
+      { kind: "review", messageTs: card.proposalTs, decision, userId: "U0ADE" },
       { threadState: h.threadState },
     );
     assert.equal(verdict.outcome, "won");
@@ -465,8 +471,8 @@ for (const [glyph, name, status] of [
     assert.equal(h.staged.length, 1, "not staged again");
     assert.equal(h.posted.length, 1, "nor posted again");
     assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-    assert.match(retry.note ?? "", /already staged by an earlier try, and resolved since/);
-    assert.ok(h.store.items().every((i) => i.proposalTs === card.proposalTs), "its items are recorded on the card");
+    assert.match(retry.note ?? "", /already staged by an earlier try/);
+    assert.ok(h.store.items().every((i) => i.proposalTs === card.item?.messageTs), "its items are recorded on the report");
     // And resolved as the card was, rather than left at proposed.
     assert.deepEqual(
       h.store.items().map((i) => i.status),
@@ -475,6 +481,47 @@ for (const [glyph, name, status] of [
     assert.deepEqual(await h.store.pendingFindings(), [], "its fix is not queued to come back");
   });
 }
+
+test("a fix that fails to stage says so on its card and comes back tomorrow; the others stay decidable", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [
+    { user: "U0ADE", when: ts(29, 16) },
+    { user: "U0BEA", when: ts(29, 17) },
+  ]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [
+      reply(
+        drift({ source: PAGE_A, block: PAGE_A.blocks[0]!.id, evidence: [ts(29, 16)], claimedBy: "U0ADE" }),
+        drift({ source: PAGE_A, block: PAGE_A.blocks[1]!.id, evidence: [ts(29, 17)], claimedBy: "U0BEA", replacement: "Owner: Bea" }),
+      ),
+    ],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  // The first fix's staging fails outright; the second's goes through.
+  h.faults.stage = new Error("ThreadState unavailable");
+  h.clock.now = at(30, 13);
+  const morning = await runSweepJob(MORNING, h.deps);
+
+  const report = h.posted[0]!;
+  assert.equal(report.withdrawn, undefined, "the report stands");
+  const cards = (report.editedBlocks as Array<Record<string, any>>)[1]!.elements as Array<Record<string, any>>;
+  assert.equal(cards[0]!.subtitle.text, "Didn't go through, so it comes back in tomorrow's report.");
+  assert.deepEqual(cards[0]!.actions.map((a: Record<string, any>) => a.text.text), ["Open page"], "nothing to review");
+  assert.deepEqual(cards[1]!.actions.map((a: Record<string, any>) => a.text.text), ["Review", "Open page"]);
+  assert.equal((await h.threadState.getProposalByTs(itemProposalKey(report.ts, PAGE_A.blocks[1]!.id))).state, "found");
+  assert.deepEqual((await h.store.pendingFindings()).map((f) => f.blockId), [PAGE_A.blocks[0]!.id], "the failed fix stays queued");
+  assert.match(morning.note ?? "", /1 fix\(es\) posted but not staged/);
+
+  // Once the live report is decided, the next morning offers it again.
+  const live = h.staged.at(-1)!;
+  await recordSweepResolution(h.store, live, undefined, at(30, 15));
+  h.clock.now = at(31, 13);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 2);
+  assert.equal(h.staged.at(-1)!.item?.id, PAGE_A.blocks[0]!.id);
+});
 
 test("a card staged into a thread the bot had no history in marks the thread; one with history is left unmarked", async () => {
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
@@ -555,61 +602,23 @@ test("a card whose budget is not there is not started: the job defers before pos
   await assertOneStagedCard(h);
 });
 
-test("a card shows every fix whole: it holds only as many as one message fits, and the rest wait", async () => {
-  // Three linked pages of four long blocks, each fix nearly twice its block.
-  const pages = ["b", "c", "d"].map((p, n) =>
-    notionPage(`888888888888888888888888888888${p}${p}`, {
-      blocks: Array.from({ length: 4 }, (_, i) => ({
-        id: `blk-${n}${i}`,
-        lastEditedTime: "2026-09-01T10:00:00.000Z",
-        text: `Block ${n}${i}: ${"alpha beta gamma ".repeat(110).trim()}`,
-      })),
-    }),
-  );
-  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: pages.map((p) => p.url) }, [{ user: "U0ADE", when: ts(29, 16) }]);
-  const found = pages.flatMap((page) =>
-    page.blocks.map((b) => ({ page, b, fix: `${b.text.slice(0, 9)} ${"delta epsilon zeta omega ".repeat(150).trim()}` })),
-  );
-  const fixes = found.map((f) => f.fix);
-  const h = sweepHarness({
-    channels: channelOf(t),
-    sources: pages,
-    detectorReplies: [reply(...found.map((f) => drift({ source: f.page, block: f.b.id, evidence: [ts(29, 16)], replacement: f.fix })))],
-    now: at(29, 22),
-  });
-  await runSweepJob(END_OF_DAY, h.deps);
-  h.clock.now = at(30, 13);
-  const morning = await runSweepJob(MORNING, h.deps);
-
-  const held = h.staged[0]!.operations!.length;
-  assert.ok(held > 0 && held < 10, `the card holds ${held}`);
-  for (const op of h.staged[0]!.operations!) {
-    const content = (op.input.replace as Array<{ content: string }>)[0]!.content;
-    assert.ok(fixes.includes(content));
-    assert.ok(h.posted[0]!.text.includes(content.slice(10)), "each fix it holds is shown whole");
-  }
-  assert.doesNotMatch(h.posted[0]!.text, / … /, "nothing elided");
-  assert.equal((await h.store.pendingFindings()).length, 12 - held, "the rest wait in the queue");
-  assert.match(morning.note ?? "", /wait for room on a card/);
-});
-
-test("a fix too long to show whole even alone is not offered", async () => {
+test("a long fix is clipped on its card and shown whole in its Review", async () => {
+  const long = `Launch date: November 1, ${"after the tutor pilot closes and the survey is in, ".repeat(20).trim()}`;
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const h = sweepHarness({
     channels: channelOf(t),
     sources: [PAGE_A],
-    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE", replacement: long }))],
     now: at(29, 22),
   });
   await runSweepJob(END_OF_DAY, h.deps);
-  // A renderer that can only show the card by moving its plan to a follow-up.
-  const render = h.deps.delivery.render;
-  h.deps.delivery.render = (card) => ({ ...render(card), followUp: ["the plan"] });
   h.clock.now = at(30, 13);
-  const morning = await runSweepJob(MORNING, h.deps);
-  assert.equal(h.posted.length, 0);
-  assert.match(morning.note ?? "", /too long to show whole on a card — not offered/);
-  assert.deepEqual(await h.store.pendingFindings(), []);
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1, "offered, however long");
+  const card = (h.posted[0]!.blocks as Array<Record<string, any>>)[1]!;
+  assert.ok(card.body.text.length <= 200, "the card's body holds 200 characters");
+  assert.ok(h.staged[0]!.proposalText.includes(`Will say: ${long}`), "the pop-up shows the whole change");
 });
 
 /** A card posted in the morning whose staging stopped, in a thread whose page
@@ -654,7 +663,7 @@ test("a card finished on a later morning stages what it showed, not what the que
   assert.equal(h.posted.length, 1, "no second card");
   assert.equal(h.staged.length, 1);
   const staged = h.staged[0]!;
-  assert.equal(staged.proposalTs, shown.ts);
+  assert.equal(staged.item?.messageTs, shown.ts, "staged as a fix of the report it showed");
   assert.deepEqual((staged.operations![0]!.input.replace as unknown[])[0], {
     block_id: page.blocks[0]!.id,
     last_edited_time: "2026-09-01T10:00:00.000Z",
@@ -673,7 +682,7 @@ test("a posted card whose digest differs from its snapshot is withdrawn, never s
 
   assert.match(shown.withdrawn ?? "", /didn't go through/);
   assert.match(morning.note ?? "", /other fixes than its snapshot/);
-  assert.ok(h.staged.every((s) => s.proposalTs !== shown.ts), "the mismatched card is never staged");
+  assert.ok(h.staged.every((s) => s.item?.messageTs !== shown.ts), "the mismatched report is never staged");
 });
 
 test("a card that cannot be found for sure is held, not posted again; once found it is staged", async () => {
@@ -722,13 +731,16 @@ test("a card still unknown after its 72 h is released and its fix carded afresh"
   assert.equal(h.staged.length, 1);
 });
 
-/** Exactly one card posted and staged, every item on it, none left without a ts. */
+/** Exactly one report posted, each of its fixes staged, every item on it,
+ *  none left without a ts. */
 async function assertOneStagedCard(h: ReturnType<typeof sweepHarness>): Promise<void> {
   assert.equal(h.posted.length, 1, "posted once");
   assert.equal(h.posted[0]!.withdrawn, undefined);
   const card = h.posted[0]!;
-  assert.equal((await h.threadState.getProposalByTs(card.ts)).state, "found", "and stageable");
   assert.ok(h.store.items().length > 0);
+  for (const item of h.store.items()) {
+    assert.equal((await h.threadState.getProposalByTs(itemProposalKey(card.ts, item.blockId))).state, "found", "and decidable");
+  }
   assert.ok(
     h.store.items().every((i) => i.proposalTs === card.ts && i.postedAt !== null),
     "no item stuck without its card's ts",
@@ -947,7 +959,7 @@ test("a dry run returns the findings and the card text, and writes and posts not
   real.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, { ...real.deps, dryRun: true });
   assert.equal(morning.cards.length, 1);
-  assert.match(morning.cards[0]!.text, /End-of-day sweep/);
+  assert.match(morning.cards[0]!.text, /^This thread settled something that \*Page aaaa\* still states the old way\./);
   assert.deepEqual(real.posted, []);
   assert.deepEqual(real.staged, []);
   assert.equal((await real.store.pendingFindings()).length, 1, "the queue is untouched");
