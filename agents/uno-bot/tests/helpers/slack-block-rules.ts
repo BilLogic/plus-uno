@@ -9,29 +9,71 @@
 // these rules are the copy of its answers that a suite can run offline.
 
 /** The block types the Worker sends: answers (`section`, `markdown`, the
- *  footer's `context`, the card table's `data_table`), the checklist (`plan`),
- *  proposal cards (`actions`, `image`) and the rest of its layouts. Slack knows
- *  many more — `carousel`, `card` — but one the Worker never sends is a typo or
- *  a new shape nobody proved, and either should fail a test before it reaches
- *  Slack. An unknown `type` was refused by blocks.validate on 2026-10-07
+ *  footer's `context`, the result table's `data_table`, the answer cards'
+ *  `card` and `carousel`, a chart's `data_visualization`), the checklist
+ *  (`plan`), proposal cards (`actions`, `image`), the Sources box
+ *  (`container`) and the rest of its layouts. Slack knows more, but one the
+ *  Worker never sends is a typo or a new shape nobody proved, and either
+ *  should fail a test before it reaches Slack. An unknown `type` was refused
+ *  by blocks.validate on 2026-10-07
  *  (`invalid_blocks`, "must be a valid enum value"). */
 const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "section",
   "markdown",
   "context",
   "data_table",
+  "card",
+  "carousel",
+  "data_visualization",
   "plan",
   "actions",
   "image",
   "divider",
   "header",
+  "container",
+  "context_actions",
 ]);
+
+/** What a `container` holds, per its block reference (read 2026-10-08): 1 to
+ *  10 child blocks, of these types only. Live on 2026-10-07 Slack refused an
+ *  `alert` inside one ("unsupported type: alert"), and the reference lists no
+ *  `markdown` or `data_visualization`. Its title is plain_text, 150 at most. */
+const CONTAINER_CHILD_TYPES: ReadonlySet<string> = new Set([
+  "actions", "context", "divider", "file", "header", "image", "input", "rich_text", "section", "table", "video",
+]);
+const CONTAINER_CHILDREN = { min: 1, max: 10 };
+const CONTAINER_TITLE_CHARS = 150;
+
+/** Why Slack would refuse a `container`, or null. */
+function containerRefusal(block: Shape): string | null {
+  const title = block.title;
+  if (!isShape(title) || title.type !== "plain_text" || !nonEmpty(title.text)) return "a container without a plain_text title";
+  if (String(title.text).length > CONTAINER_TITLE_CHARS) return `a container title of ${String(title.text).length} chars`;
+  const children = Array.isArray(block.child_blocks) ? block.child_blocks : [];
+  if (children.length < CONTAINER_CHILDREN.min || children.length > CONTAINER_CHILDREN.max) {
+    return `a container of ${children.length} child blocks`;
+  }
+  for (const child of children) {
+    const type = isShape(child) ? String(child.type) : "non-object";
+    if (!CONTAINER_CHILD_TYPES.has(type)) return `a ${type} block inside a container`;
+    if (type !== "rich_text" && type !== "input" && type !== "table" && type !== "file" && type !== "video") {
+      const why = blockRefusal(child);
+      if (why) return `${why} inside a container`;
+    } else if (type === "rich_text" && !Array.isArray((child as Shape).elements)) {
+      return "a rich_text without elements inside a container";
+    }
+  }
+  return null;
+}
 
 /** A `data_table`'s rows, header included, and its columns, per Slack's block
  *  reference (read 2026-10-07): 1 to 200 data rows under the header, 1 to 20
  *  columns. */
 const DATA_TABLE_ROWS = { min: 2, max: 201 };
 const DATA_TABLE_COLUMNS = 20;
+
+/** The fields a `data_table` takes, per the block reference. */
+const DATA_TABLE_FIELDS: ReadonlySet<string> = new Set(["type", "block_id", "caption", "rows", "page_size", "row_header_column_index"]);
 
 /** Characters across every cell of a `data_table` — and across every table in
  *  one message, which the reference caps at the same 20,000. */
@@ -136,9 +178,13 @@ function dataTableChars(block: Shape): number {
  * row has the same number of cells; at most 20 columns; 20,000 characters
  * across the cells. And one the reference gets wrong: a `raw_number` cell
  * without `text` was refused by the live API in Bill's DM on 2026-10-07,
- * though the schema leaves `text` optional.
+ * though the schema leaves `text` optional. The live API also refuses any
+ * field the reference does not list: the `table` block's `column_settings`
+ * was answered "invalid additional property" on 2026-10-08.
  */
 function dataTableRefusal(block: Shape): string | null {
+  const extra = Object.keys(block).find((k) => !DATA_TABLE_FIELDS.has(k));
+  if (extra) return `a data_table with ${extra}`;
   if (!nonEmpty(block.caption)) return "a data_table without a caption";
   const rows = Array.isArray(block.rows) ? block.rows : [];
   if (rows.length < DATA_TABLE_ROWS.min || rows.length > DATA_TABLE_ROWS.max) return `a data_table of ${rows.length} rows`;
@@ -159,6 +205,125 @@ function dataTableRefusal(block: Shape): string | null {
   return null;
 }
 
+/** A card's title and subtitle, and its buttons, per Slack's card block
+ *  reference (read 2026-10-08): 150 characters each, at most 3 buttons. */
+const CARD_TITLE_CHARS = 150;
+const CARD_BUTTONS = 3;
+/** A card's body and subtext: 200 characters each, per the same reference. */
+const CARD_BODY_CHARS = 200;
+
+/** The names a card's `slack_icon` takes, per Slack's icon object reference
+ *  (read 2026-10-08). A wider list than a task card's (`SLACK_ICON_NAMES`),
+ *  which is what live Slack accepted there. */
+const CARD_ICON_NAMES: ReadonlySet<string> = new Set([
+  "archive", "book", "bookmark", "bot", "bug", "calendar", "call", "caret-left", "caret-right", "check", "clipboard",
+  "code", "comment", "compass", "copy", "cube", "download", "edit", "email", "eye-closed", "eye-open", "file", "flag",
+  "folder", "gear", "globe", "heart", "help", "image", "info", "key", "lightbulb", "link", "map", "mobile",
+  "new-window", "pin", "plus", "refine", "refresh", "rocket", "save", "screen", "share", "sparkle", "star",
+  "star-filled", "tag", "thumbs-down", "thumbs-up", "trash", "upload", "user", "warning",
+]);
+
+/** A carousel's cards, per its block reference: 1 to 10. */
+const CAROUSEL_CARDS = { min: 1, max: 10 };
+
+/**
+ * Why Slack would refuse a `card`, or null.
+ *
+ * From the block reference: a title, subtitle or body is a text object; at
+ * most 3 buttons; `icon` and `slack_icon` exclusive. And from the live API: a
+ * card's `icon` is an image element Slack fetches, and an SVG one does not
+ * render, so the rule wants an https PNG or JPG URL or a favicon service's.
+ */
+function cardRefusal(card: unknown): string | null {
+  if (!isShape(card) || card.type !== "card") return "a carousel element that is not a card";
+  if (!("title" in card) && !("body" in card) && !("actions" in card) && !("hero_image" in card)) return "an empty card";
+  for (const key of ["title", "subtitle"] as const) {
+    if (!(key in card)) continue;
+    const text = card[key];
+    if (!isShape(text) || (text.type !== "plain_text" && text.type !== "mrkdwn") || !nonEmpty(text.text)) {
+      return `a card ${key} that is not a text object`;
+    }
+    if (String(text.text).length > CARD_TITLE_CHARS) return `a card ${key} of ${String(text.text).length} chars`;
+  }
+  for (const key of ["body", "subtext"] as const) {
+    if (!(key in card)) continue;
+    const text = card[key];
+    if (!isShape(text) || (text.type !== "plain_text" && text.type !== "mrkdwn") || !nonEmpty(text.text)) {
+      return `a card ${key} that is not a text object`;
+    }
+    if (String(text.text).length > CARD_BODY_CHARS) return `a card ${key} of ${String(text.text).length} chars`;
+  }
+  if ("icon" in card && "slack_icon" in card) return "a card with both icon and slack_icon";
+  if ("slack_icon" in card) {
+    const icon = card.slack_icon;
+    if (!isShape(icon) || icon.type !== "icon" || !CARD_ICON_NAMES.has(String(icon.name))) {
+      return `a card slack_icon ${JSON.stringify(icon)}`;
+    }
+  }
+  if ("icon" in card) {
+    const icon = card.icon;
+    if (!isShape(icon) || icon.type !== "image" || !nonEmpty(icon.alt_text)) return "a card icon that is not an image element";
+    const url = String(icon.image_url ?? "");
+    if (!/^https:\/\//.test(url) || /\.svg(\?|$)/i.test(url)) return `a card icon at ${url}`;
+  }
+  const actions = Array.isArray(card.actions) ? card.actions : [];
+  if (actions.length > CARD_BUTTONS) return `a card of ${actions.length} buttons`;
+  for (const button of actions) {
+    if (!isShape(button) || button.type !== "button") return "a card action that is not a button";
+    const label = button.text;
+    if (!isShape(label) || label.type !== "plain_text" || !nonEmpty(label.text)) return "a card button without a label";
+  }
+  return null;
+}
+
+/** A `data_visualization`'s limits, per Slack's block reference (read
+ *  2026-10-08): a title of 50 characters; 1–12 pie segments or series; 1–20
+ *  points per series; labels, series names and categories of 20 characters;
+ *  axis titles of 50. Two per message, which the live API enforced in Bill's
+ *  DM on 2026-10-07. */
+const VIZ = { title: 50, label: 20, axis: 50, series: 12, points: 20, perMessage: 2 };
+
+/** Why Slack would refuse a `data_visualization`, or null. */
+function dataVisualizationRefusal(block: Shape): string | null {
+  if (!nonEmpty(block.title) || String(block.title).length > VIZ.title) return "a data_visualization title missing or over 50 chars";
+  const chart = isShape(block.chart) ? block.chart : null;
+  if (!chart) return "a data_visualization without a chart";
+  const labelOk = (l: unknown) => nonEmpty(l) && String(l).length <= VIZ.label;
+  if (chart.type === "pie") {
+    const segments = Array.isArray(chart.segments) ? chart.segments : [];
+    if (segments.length < 1 || segments.length > VIZ.series) return `a pie of ${segments.length} segments`;
+    for (const s of segments) {
+      if (!isShape(s) || !labelOk(s.label)) return "a pie segment label missing or over 20 chars";
+      if (typeof s.value !== "number" || s.value <= 0) return "a pie segment of no positive value";
+    }
+    return null;
+  }
+  if (!["bar", "line", "area"].includes(String(chart.type))) return `a ${String(chart.type)} chart`;
+  const axis = isShape(chart.axis_config) ? chart.axis_config : null;
+  const categories = axis && Array.isArray(axis.categories) ? axis.categories : null;
+  if (!categories || categories.length === 0) return "a chart without axis categories";
+  if (!categories.every(labelOk)) return "a chart category over 20 chars";
+  for (const key of ["x_label", "y_label"] as const) {
+    if (axis && key in axis && String(axis[key]).length > VIZ.axis) return `a chart ${key} over 50 chars`;
+  }
+  const series = Array.isArray(chart.series) ? chart.series : [];
+  if (series.length < 1 || series.length > VIZ.series) return `a chart of ${series.length} series`;
+  const names = new Set<string>();
+  for (const s of series) {
+    if (!isShape(s) || !labelOk(s.name)) return "a series name missing or over 20 chars";
+    if (names.has(String(s.name))) return "two series of one name";
+    names.add(String(s.name));
+    const data = Array.isArray(s.data) ? s.data : [];
+    if (data.length < 1 || data.length > VIZ.points) return `a series of ${data.length} points`;
+    const labels = data.map((d) => (isShape(d) ? d.label : undefined));
+    if (labels.length !== categories.length || !categories.every((c) => labels.includes(c))) {
+      return "a series without exactly one point per category";
+    }
+    if (!data.every((d) => isShape(d) && typeof d.value === "number")) return "a data point of no number";
+  }
+  return null;
+}
+
 /** Why Slack would refuse one block, or null. */
 function blockRefusal(block: unknown): string | null {
   if (!isShape(block)) return "a block that is not an object";
@@ -173,9 +338,39 @@ function blockRefusal(block: unknown): string | null {
     const n = Array.isArray(block.elements) ? block.elements.length : 0;
     if (n < CONTEXT_ELEMENTS.min || n > CONTEXT_ELEMENTS.max) return `a context of ${n} elements`;
   }
+  if (type === "context_actions") {
+    // The block reference (read 2026-10-08): 1 to 5 elements, each a
+    // `feedback_buttons` or an `icon_button`. Posted live with one
+    // `feedback_buttons` in Bill's DM on 2026-10-08.
+    const elements = Array.isArray(block.elements) ? block.elements : [];
+    if (elements.length < 1 || elements.length > 5) return `a context_actions of ${elements.length} elements`;
+    if (!elements.every((e) => isShape(e) && (e.type === "feedback_buttons" || e.type === "icon_button"))) {
+      return "a context_actions element that is not feedback_buttons or icon_button";
+    }
+  }
   if (type === "data_table") {
     const why = dataTableRefusal(block);
     if (why) return why;
+  }
+  if (type === "data_visualization") {
+    const why = dataVisualizationRefusal(block);
+    if (why) return why;
+  }
+  if (type === "container") {
+    const why = containerRefusal(block);
+    if (why) return why;
+  }
+  if (type === "card") {
+    const why = cardRefusal(block);
+    if (why) return why;
+  }
+  if (type === "carousel") {
+    const cards = Array.isArray(block.elements) ? block.elements : [];
+    if (cards.length < CAROUSEL_CARDS.min || cards.length > CAROUSEL_CARDS.max) return `a carousel of ${cards.length} cards`;
+    for (const card of cards) {
+      const why = cardRefusal(card);
+      if (why) return why;
+    }
   }
   if (type === "plan") {
     // A plan's title is required: blocks.validate on 2026-10-07 refused one
@@ -206,5 +401,121 @@ export function messageBlocksRefusal(blocks: readonly unknown[]): string | null 
   }
   if (markdownChars > MARKDOWN_MESSAGE_CHARS) return `${markdownChars} chars of markdown in one message`;
   if (tableChars > DATA_TABLE_CHARS) return `${tableChars} chars of table cells in one message`;
+  const charts = blocks.filter((b) => isShape(b) && b.type === "data_visualization").length;
+  if (charts > VIZ.perMessage) return `${charts} data_visualization blocks in one message`;
   return null;
+}
+
+/** A modal's title, close and submit labels: 24 characters each, per Slack's
+ *  view reference (read 2026-10-08). */
+const VIEW_LABEL_CHARS = 24;
+
+/** Blocks in one view, per the view reference: 100, against a message's 50. */
+const MAX_VIEW_BLOCKS = 100;
+
+/** A view's `private_metadata`, per the view reference: 3,000 characters. */
+const VIEW_METADATA_CHARS = 3000;
+
+/** Every field a modal view takes, per the view reference. Its footer is
+ *  `submit` and `close` and nothing else: a third button has no field to go
+ *  in, so it must be an actions block in the body. */
+const VIEW_FIELDS: ReadonlySet<string> = new Set([
+  "type", "title", "blocks", "close", "submit", "private_metadata", "callback_id",
+  "clear_on_close", "notify_on_close", "external_id", "submit_disabled",
+]);
+
+/** Views in one modal stack, per `views.push`: the first and two pushed. */
+export const MAX_VIEW_STACK = 3;
+
+/**
+ * Why Slack would refuse a modal view (`views.open`, `views.update`), or null.
+ *
+ * The block rules are a message's, one by one; only the count differs. A
+ * view's labels are plain_text and capped, and so is its `private_metadata`.
+ *
+ * @param view - The `view` a views call carries
+ */
+export function viewRefusal(view: unknown): string | null {
+  if (!isShape(view) || view.type !== "modal") return "a view that is not a modal";
+  const extra = Object.keys(view).find((key) => !VIEW_FIELDS.has(key));
+  if (extra) return `a view field ${extra} (a footer holds only submit and close)`;
+  for (const key of ["title", "close", "submit"] as const) {
+    const label = view[key];
+    if (label === undefined && key !== "title") continue;
+    if (!isShape(label) || label.type !== "plain_text" || !nonEmpty(label.text)) return `a view ${key} that is not plain_text`;
+    if (String(label.text).length > VIEW_LABEL_CHARS) return `a view ${key} of ${String(label.text).length} chars`;
+  }
+  if (typeof view.private_metadata === "string" && view.private_metadata.length > VIEW_METADATA_CHARS) {
+    return `private_metadata of ${view.private_metadata.length} chars`;
+  }
+  const blocks = Array.isArray(view.blocks) ? view.blocks : [];
+  if (blocks.length > MAX_VIEW_BLOCKS) return `${blocks.length} blocks in one view`;
+  for (const block of blocks) {
+    const why = isShape(block) && VIEW_ONLY_BLOCKS.has(String(block.type)) ? viewOnlyRefusal(block) : blockRefusal(block);
+    if (why) return why;
+  }
+  // The view reference: "submit is required when an input block is within the
+  // blocks array".
+  if (blocks.some((b) => isShape(b) && b.type === "input") && view.submit === undefined) {
+    return "an input block in a view with no submit";
+  }
+  return null;
+}
+
+/** Blocks a view takes and a message does not: the pop-up's fields, and the
+ *  alert, which Slack refuses in a message (live 2026-10-08, "Block type is
+ *  not supported in this container"). */
+const VIEW_ONLY_BLOCKS: ReadonlySet<string> = new Set(["input", "alert"]);
+
+/** An alert's text, per the alert block reference (read 2026-10-08). */
+const ALERT_TEXT_CHARS = 200;
+const ALERT_LEVELS: ReadonlySet<string> = new Set(["default", "info", "warning", "error", "success"]);
+
+/** A `plain_text_input`'s value, and a `static_select`'s options and their
+ *  text, per the element references (read 2026-10-08). */
+const INPUT_VALUE_CHARS = 3000;
+const SELECT_OPTIONS = { min: 1, max: 100 };
+const OPTION_TEXT_CHARS = 75;
+const RADIO_OPTIONS = { min: 1, max: 10 };
+
+/** Why Slack would refuse an input or an alert in a view, or null. */
+function viewOnlyRefusal(block: Shape): string | null {
+  if (block.type === "alert") {
+    const text = isShape(block.text) ? block.text.text : undefined;
+    if (!nonEmpty(text)) return "an alert without text";
+    if (String(text).length > ALERT_TEXT_CHARS) return `an alert of ${String(text).length} chars`;
+    if (block.level !== undefined && !ALERT_LEVELS.has(String(block.level))) return `an alert at level ${String(block.level)}`;
+    return null;
+  }
+  if (!isShape(block.label) || block.label.type !== "plain_text" || !nonEmpty(block.label.text)) {
+    return "an input without a plain_text label";
+  }
+  const element = block.element;
+  if (!isShape(element)) return "an input without an element";
+  if (element.type === "plain_text_input") {
+    if (typeof element.initial_value === "string" && element.initial_value.length > INPUT_VALUE_CHARS) {
+      return `an input value of ${element.initial_value.length} chars`;
+    }
+    return null;
+  }
+  if (element.type === "static_select") {
+    const options = Array.isArray(element.options) ? element.options : [];
+    if (options.length < SELECT_OPTIONS.min || options.length > SELECT_OPTIONS.max) return `a select of ${options.length} options`;
+    for (const o of options) {
+      const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
+      if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a select option without short text";
+    }
+    return null;
+  }
+  if (element.type === "radio_buttons") {
+    // The radio buttons reference (read 2026-10-08): 1 to 10 options.
+    const options = Array.isArray(element.options) ? element.options : [];
+    if (options.length < RADIO_OPTIONS.min || options.length > RADIO_OPTIONS.max) return `radio buttons of ${options.length} options`;
+    for (const o of options) {
+      const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
+      if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a radio option without short text";
+    }
+    return null;
+  }
+  return `an input of ${String(element.type)}`;
 }

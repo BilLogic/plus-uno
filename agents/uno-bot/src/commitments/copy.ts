@@ -37,7 +37,7 @@ export function reminderAnswer(name: string): ReminderAnswer | null {
 export interface ReminderChoice {
   /** Slack's name for the glyph, as a reaction event sends it: the answer's key. */
   glyph: string;
-  /** The button's label, glyph first. */
+  /** The button's label. */
   label: string;
 }
 
@@ -49,12 +49,14 @@ export type ReminderFooter = string | { hint?: string; choices: readonly Reminde
 /** The button row's action ids all start here; the glyph follows. */
 export const REMINDER_ACTION_PREFIX = "uno_reminder_";
 
-/** The answers under a reminder until someone answers it. */
+/** The answers under a reminder until someone answers it. The labels are
+ *  words: the glyphs still answer as reactions, but a button is no place for
+ *  one. */
 export const REMINDER_CHOICES: readonly ReminderChoice[] = [
-  { glyph: "raised_hands", label: "🙌 Done" },
-  { glyph: "hourglass_flowing_sand", label: "⏳ Need more time" },
-  { glyph: "no_good", label: "🙅 Not doing this" },
-  { glyph: "thinking_face", label: "🤔 Wasn't a promise" },
+  { glyph: "raised_hands", label: "Done" },
+  { glyph: "hourglass_flowing_sand", label: "Later" },
+  { glyph: "no_good", label: "Dropped" },
+  { glyph: "thinking_face", label: "Wasn't a promise" },
 ];
 
 /** What replaces the legend once the promiser answers. */
@@ -70,6 +72,33 @@ export function acknowledgement(answer: ReminderAnswer, checkBackDay?: string): 
       return "My mistake, thanks.";
   }
 }
+
+/** Why a tapped answer changed nothing, in the words the tapper sees, only to
+ *  them. A reaction can go unanswered; a button that does nothing reads as
+ *  broken, so every refused tap is told why. */
+export const TAP_REFUSED = {
+  settled: "This one's already been answered, so that tap changed nothing.",
+  snoozeSpent: "This can't be put off again, so that tap changed nothing.",
+  notAnAnswer: "That answer doesn't apply here any more, so nothing changed.",
+  gone: "I'm no longer tracking this one, so that tap changed nothing.",
+  notYours: (owner: string) => `Only <@${owner}> can answer this reminder, so that tap changed nothing.`,
+} as const;
+
+/** A tap the door could not record (a store error, a budget stop): said
+ *  plainly, never passed off as a reminder it no longer tracks. */
+export const TAP_FAILED = "I couldn't record that. Try again in a minute.";
+
+/** A tap that landed on a message the edit then missed. */
+export const TAP_RECORDED = "Got it, that's recorded, though I couldn't update the message to show it.";
+
+/** What one kind's own answers made of a press: why it changed nothing, or
+ *  that it landed but the message still shows its buttons. Nothing when it
+ *  landed and shows. */
+export type TapAnswer = { refused: string } | { unedited: true };
+
+/** What a reminder door made of a press: not a reminder's (or the lookup
+ *  failed), or the reminder's, with why it changed nothing when it didn't. */
+export type ReminderOutcome = { claimed: false; failed?: true } | { claimed: true; refused?: string; unedited?: true };
 
 /** Characters of a summary a reminder repeats. */
 export const MAX_WHAT_CHARS = 140;
@@ -104,7 +133,9 @@ function original(permalink: string | null): string {
 }
 
 /**
- * The first reminder.
+ * The first reminder, laid out like a card: a bold heading line saying what
+ * was promised and by when, then a line under it with the mention, the
+ * question and the link back (`reminderBlocks` sets that line small).
  *
  * @param input.promiser - The one Slack user id it mentions
  * @param input.what - The cleaned summary (`cleanWhat`)
@@ -120,11 +151,11 @@ export function reminderText(input: {
   promisedLabel: string;
   permalink: string | null;
 }): string {
-  const link = original(input.permalink);
+  const link = input.permalink ? ` · <${input.permalink}|Original message>` : "";
   if (input.deadlineLabel) {
-    return `Hi <@${input.promiser}>, you mentioned you'd ${input.what} by ${input.deadlineLabel}. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or does the date need to move?${link}`;
+    return `*You said you'd ${input.what} by ${input.deadlineLabel}*\n<@${input.promiser}> I haven't spotted it yet. Is it done, or does the date need to move?${link}`;
   }
-  return `Hi <@${input.promiser}>, on ${input.promisedLabel} you mentioned you'd ${input.what}. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or still in progress?${link}`;
+  return `*On ${input.promisedLabel} you said you'd ${input.what}*\n<@${input.promiser}> I haven't spotted it yet. Is it done, or still in progress?${link}`;
 }
 
 /** The second and last reminder. */
@@ -132,11 +163,25 @@ export function followUpText(promiser: string): string {
   return `<@${promiser}> Checking in once more. Is it done, or does it need more time?`;
 }
 
+/** A body whose first line is wholly bold is a heading with a line under it. */
+const HEADED = /^(\*[^*\n]+\*)\n(.+)$/s;
+
 /** A reminder as Slack blocks: its body, then either the answers as buttons
  *  (with a hint line under them, when the footer has one) or a line of words,
- *  such as an answer's acknowledgement, as a context line. */
+ *  such as an answer's acknowledgement, as a context line.
+ *
+ *  A body that opens with a bold heading line (`reminderText`) is laid out the
+ *  way a card is: the heading as the section, the lines under it as a small
+ *  context line. Any other body is one section, as every reminder was before,
+ *  so a reminder posted in that shape still edits in it. */
 export function reminderBlocks(body: string, footer: ReminderFooter): unknown[] {
-  const blocks: unknown[] = [{ type: "section", text: { type: "mrkdwn", text: body } }];
+  const headed = HEADED.exec(body);
+  const blocks: unknown[] = headed
+    ? [
+        { type: "section", text: { type: "mrkdwn", text: headed[1] } },
+        { type: "context", elements: [{ type: "mrkdwn", text: headed[2] }] },
+      ]
+    : [{ type: "section", text: { type: "mrkdwn", text: body } }];
   if (typeof footer === "string") {
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: footer }] });
     return blocks;
@@ -157,7 +202,10 @@ export function reminderBlocks(body: string, footer: ReminderFooter): unknown[] 
 
 /** The labels a footer shows, for a test or a log: its buttons, or its words. */
 export function footerLabels(blocks: readonly unknown[]): string {
-  const rest = blocks.slice(1) as Array<{ type: string; elements: Array<{ text: string | { text: string } }> }>;
+  const first = blocks[0] as { text?: { text?: string } } | undefined;
+  // A headed reminder spends two blocks on its body: the heading and the line under it.
+  const heading = /^\*[^*\n]+\*$/.test(first?.text?.text ?? "");
+  const rest = blocks.slice(heading ? 2 : 1) as Array<{ type: string; elements: Array<{ text: string | { text: string } }> }>;
   return rest
     .flatMap((b) => b.elements.map((e) => (typeof e.text === "string" ? e.text : e.text.text)))
     .join(" · ");
@@ -171,11 +219,11 @@ export function footerLabels(blocks: readonly unknown[]): string {
 
 /** The answers under a "remind me" while a ⏳ can still bring it back. */
 export const SELF_REMINDER_CHOICES: readonly ReminderChoice[] = [
-  { glyph: "raised_hands", label: "🙌 Done" },
-  { glyph: "hourglass_flowing_sand", label: "⏳ Snooze 2 days" },
+  { glyph: "raised_hands", label: "Done" },
+  { glyph: "hourglass_flowing_sand", label: "Snooze 2 days" },
 ];
 /** The answer under its last allowed post. */
-export const SELF_REMINDER_LAST_CHOICES: readonly ReminderChoice[] = [{ glyph: "raised_hands", label: "🙌 Done" }];
+export const SELF_REMINDER_LAST_CHOICES: readonly ReminderChoice[] = [{ glyph: "raised_hands", label: "Done" }];
 
 /**
  * The reminder a person asked for, mentioning only them.

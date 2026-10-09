@@ -65,6 +65,10 @@ function matches(r: Row, f: Filter): boolean {
   if (typeof title?.contains === "string") {
     return titleOf(r).toLowerCase().includes(title.contains.toLowerCase());
   }
+  const status = f.status as { equals?: string } | undefined;
+  if (typeof status?.equals === "string") {
+    return (r.properties["Design Status"] as { status: { name: string } }).status.name === status.equals;
+  }
   throw new Error(`the stub cannot evaluate ${JSON.stringify(f)}`);
 }
 
@@ -224,4 +228,68 @@ test("an enumeration longer than the list reports how many matched", async () =>
   assert.equal(out.count, 30);
   assert.equal(out.matched, 41);
   assert.equal(out.truncated, false);
+});
+
+test("a lookup names the board it queried, so the answer can cite it", async () => {
+  board = BOARD;
+  const out = (await roadmapQuery({ title: "DS Update" })) as Result & { board?: { title: string; url: string } };
+
+  assert.deepEqual(out.board, { title: "Roadmap", url: "https://www.notion.so/roadmapdb" });
+});
+
+// Asked for Shipped on 2026-10-08, the note opened "Complete result set … safe
+// to enumerate" and closed "(212 more rows truncated — say the list is the
+// first 30.)": a list cut to its first 30 is partial, whatever the read was.
+const withBill = (r: Row): Row => ({
+  ...r,
+  properties: { ...r.properties, Contributor: { type: "people", people: [{ name: "Bill Guo" }] } },
+});
+
+test("an enumeration cut to its first rows is called partial, never complete", async () => {
+  board = Array.from({ length: 41 }, (_, i) => withBill(card(6000 + i, `Shipped card ${i + 1}`)));
+  const out = await roadmapQuery({ person: "Bill" });
+
+  assert.equal(out.count, 30);
+  assert.match(out.note, /partial/i);
+  assert.match(out.note, /first 30 of 41/i);
+  assert.doesNotMatch(out.note, /complete|safe to enumerate/i);
+});
+
+test("an enumeration that fits the list is still the complete set", async () => {
+  board = Array.from({ length: 12 }, (_, i) => withBill(card(7000 + i, `Shipped card ${i + 1}`)));
+  const out = await roadmapQuery({ person: "Bill" });
+
+  assert.equal(out.count, 12);
+  assert.match(out.note, /complete result set/i);
+  assert.doesNotMatch(out.note, /partial|truncated/i);
+});
+
+// A count per Design Status reads one status at a time, and the board's
+// largest status (Need PRD / Under Playground) holds more than 500 cards, the
+// five pages an unfiltered read stops at. Measured on the live board
+// 2026-10-09: all seven statuses cost 15 Notion reads with Need PRD cut at five
+// pages, so a status read goes to ten pages for an exact count.
+test("a read filtered to one Design Status counts up to 1,000 cards exactly, and says when it stops short", async () => {
+  board = Array.from({ length: 966 }, (_, i) => card(9000 + i, `Playground idea ${i + 1}`));
+  const whole = (await roadmapQuery({ design_status: "Need PRD / Under Playground" })) as Result & {
+    matched?: number;
+    truncated?: boolean;
+  };
+  assert.equal(requests.length, 10, "966 cards are ten pages");
+  assert.equal(whole.matched, 966);
+  assert.equal(whole.truncated, false);
+
+  board = Array.from({ length: 1200 }, (_, i) => card(9000 + i, `Playground idea ${i + 1}`));
+  const cut = (await roadmapQuery({ design_status: "Need PRD / Under Playground" })) as Result & {
+    matched?: number;
+    truncated?: boolean;
+  };
+  assert.equal(requests.length, 10, "the status read stops at ten pages");
+  assert.equal(cut.matched, 1000);
+  assert.equal(cut.truncated, true);
+
+  board = Array.from({ length: 966 }, (_, i) => card(9000 + i, `Playground idea ${i + 1}`));
+  const unfiltered = (await roadmapQuery({ person: "Nobody" })) as Result & { truncated?: boolean };
+  assert.equal(requests.length, 5, "a read with no server filter keeps the five-page cap");
+  assert.equal(unfiltered.truncated, true);
 });

@@ -106,7 +106,7 @@ const parse = (result: string) => JSON.parse(result) as { ok: boolean; error?: s
 test("a comment carries the text verbatim, then the footer naming the requester and the thread", () => {
   const body = renderCommentBody("Repro: open the card twice.", { requester: "Bill Guo", permalink: PERMALINK });
   assert.ok(body.startsWith("Repro: open the card twice.\n\n---\n"), body);
-  assert.match(body, /Posted from Slack by uno-bot on behalf of Bill Guo\./);
+  assert.match(body, /Posted from Slack by le goat on behalf of Bill Guo\./);
   assert.ok(body.includes(PERMALINK), body);
 });
 
@@ -163,7 +163,7 @@ test("an approved comment is posted with the footer, on the default repo", async
   assert.equal(step.issue, 688);
   const body = (step as { body: string }).body;
   assert.ok(body.startsWith("Repro: open the card twice."), body);
-  assert.match(body, /Posted from Slack by uno-bot on behalf of Bill Guo/);
+  assert.match(body, /Posted from Slack by le goat on behalf of Bill Guo/);
   assert.ok(body.includes(PERMALINK), body);
   // Nothing to label, so the repo's labels are never read.
   assert.deepEqual(github.labelReads, []);

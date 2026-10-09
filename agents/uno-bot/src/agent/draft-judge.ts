@@ -8,9 +8,13 @@
 //
 // Hard policies:
 //   • SKIP entirely for short replies (< MIN_DRAFT_CHARS) — quick lookups and
-//     acknowledgements never pay the judge tax.
+//     acknowledgements never pay the judge tax — unless the draft carries an
+//     emoji, which is read at any length (`voice/emoji.ts`), and a breach of
+//     the count fails whatever the judge says.
 //   • VERDICT ONLY past the revision window (MAX_DRAFT_CHARS): a long draft
-//     is read whole and graded, but no rewrite of it ever ships.
+//     is read whole and graded, but no rewrite of it ever ships — unless the
+//     caller asks it to SHORTEN the draft (`shorten`), whose rewrite is short
+//     by construction.
 //   • FAIL OPEN: any judge error/timeout/unparseable output → send the
 //     ORIGINAL draft unchanged. The judge can only ever improve a reply,
 //     never block one.
@@ -38,9 +42,10 @@
 // correction gate, the skip and the fail-open on the fake adapter, with no
 // credential and no Workers runtime.
 
-import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
+import { shouldRejectRevision, looksLikeStalledCorrection, retainedVocabulary } from "./revision-guard";
 import type { ModelProvider, ModelText } from "./model-provider";
 import type { ModelTier } from "./routing";
+import { emojiIn, replyEmojiBreach } from "../voice/emoji";
 import { BUILD } from "../version";
 
 // ── the condensed rubric ────────────────────────────────────────────────────
@@ -94,6 +99,7 @@ HARD GATES (any one → verdict "fail"):
 - Bracket citations: [1]-style footnotes, [RM-2292]-style ticket brackets, or a repo path in brackets used as a citation. Link at the point of mention instead.
 - Leaks internal mechanics: tool names in snake_case, "Worker", "KV", model/tier names, token or tool budgets.
 - Placeholder text left in ("TODO", "[insert …]", "lorem").
+- Emoji, code "gate:emoji": a reply carries none, or one 🎉 opening its first line on a shipped, merged or published outcome. Fail more than one emoji, any other emoji or Slack :shortcode:, a 🎉 on anything else, and any emoji at all in an error, a refusal or a plain factual answer. The revision drops them.
 
 Do NOT fail a draft for facts you cannot verify, for tone, or for length alone. Prefer "pass" when in doubt.
 
@@ -118,6 +124,17 @@ or
 const MIN_DRAFT_CHARS = 1000;
 // Hard wall-clock cap; past it the original draft ships (fail open).
 const JUDGE_TIMEOUT_MS = 25_000;
+// A SHORTEN's own cap. A shorten reads a long draft and writes the short answer
+// in its place, more work than a verdict or a light repair: live on r526 a
+// 7,458-character shorten ran past 25s and the walk shipped as written. The
+// turn has no wall-clock limit of its own — it runs in a Durable Object alarm,
+// which has no cut-off (`turn/warning-line.ts`), and the answer is posted
+// through the API after it, so no Slack deadline is pending — and its interim
+// line already speaks at 75s (`INTERIM_BACKSTOP_MS`), so the cost of waiting
+// is the reader's alone, and a walk shipped beside its own table costs them
+// more. 60s is 2.4 times the verdict clock and still ends the call well inside
+// a turn whose loop routinely runs 50 to 100s.
+const SHORTEN_TIMEOUT_MS = 60_000;
 // Inputs are capped so the judge call stays cheap and bounded.
 const MAX_USER_CHARS = 2_000;
 const MAX_PRIOR_CHARS = 4_000;
@@ -142,6 +159,17 @@ const MAX_VERDICT_DRAFT_CHARS = 32_000;
 const MIN_REVISION_RATIO = 0.25;
 // Room for a full revised draft to come back in the same call.
 const JUDGE_MAX_TOKENS = 6000;
+// A shortened draft must come back no longer than this, or the draft ships. A
+// rewrite asked to be short that is not is no shortening, and the bound keeps
+// it far inside JUDGE_MAX_TOKENS, which is what makes a shortened rewrite of a
+// draft past the revision window safe to ship: it cannot be a cut-off prefix
+// of a long answer. Three times the prose budget beside a table
+// (`turn/prose-budget.ts`), so a shortening that overshoots still ships.
+const MAX_SHORTENED_CHARS = 3_000;
+// How much of a shortened draft's vocabulary must be the draft's own: a
+// shortening keeps the draft's words and drops most of them, so the measure is
+// the rewrite's words found in the draft, not the draft's found in the rewrite.
+const MIN_SHORTENED_FROM_DRAFT = 0.5;
 
 /**
  * The tier the judge grades on — the ONLY thing it says about the model.
@@ -187,6 +215,10 @@ Failure code: "gate:correction".`;
  *  `revised` field in this mode anyway (`reviewDraft`); telling the judge not
  *  to write one is what keeps the call to a verdict's worth of output, and so
  *  inside the timer. */
+const SHORTEN = `
+
+SHORTEN. This draft runs far past the short answer it should be. Fail it with "gate:length" and return in "revised" the short answer the instruction below describes, in the draft's own words and facts: nothing it does not say. Keep its confidence clause and any caveat as they are, and keep any table it holds as it is.`;
+
 const VERDICT_ONLY = `
 
 VERDICT ONLY. This draft is long, and it ships as written whatever you find, so do NOT rewrite it and do NOT include a "revised" field. Judge the WHOLE draft, to its last line, against the same rubric and gates. Reply with STRICT JSON only:
@@ -194,20 +226,41 @@ VERDICT ONLY. This draft is long, and it ships as written whatever you find, so 
 or
   {"verdict":"fail","failed":["D9","gate:formatting"]}`;
 
-/** Told to the judge ONLY when a card table rides beneath the draft: that it
- *  is there, what it lists, and that it is not the judge's to rewrite. The
- *  rows came from the Roadmap lookup itself, so grading them against the
- *  rubric would be grading the board, and a revision that pasted them back
- *  into the prose would print every card twice. */
-function cardTableNote(list: string): string {
+/** Told to the judge ONLY when a result table rides beneath the draft: that
+ *  it is there, what it lists, and that it is not the judge's to rewrite. The
+ *  rows came from a lookup itself, so grading them against the rubric would be
+ *  grading the source, and a revision that pasted them back into the prose
+ *  would print every row twice. */
+function tableNote(list: string): string {
   return (
-    "CARD TABLE ATTACHED. Beneath the draft, the reader sees a sortable table of these Roadmap cards, " +
+    "TABLE ATTACHED. Beneath the draft, the reader sees these rows as a sortable table or as cards, " +
     "built by code from the lookup's own rows (the message's plain-text copy lists them the same way):\n" +
     `${list}\n` +
     "Judge the draft as the reader sees it, with this table beneath it: a draft that gives the count, " +
     "what stands out and points at the table HAS answered. The table is not part of the draft — " +
     "do not grade its rows, and never copy them into a revision."
   );
+}
+
+/** What code counted of the draft's emoji, before the judge reads it. */
+interface EmojiReading {
+  count: number;
+  /** Set when the count or the place breaks the budget on its own. */
+  breach: string | null;
+}
+
+function readEmoji(draft: string): EmojiReading {
+  return { count: emojiIn(draft).length, breach: replyEmojiBreach(draft) };
+}
+
+function emojiNote(emoji: EmojiReading): string {
+  if (emoji.breach) {
+    return `MEASURED: this draft ${emoji.breach}, which breaks the emoji budget. Fail it with "gate:emoji", and the revision drops them.\n\n`;
+  }
+  if (emoji.count > 0) {
+    return "MEASURED: this draft opens with a 🎉. It passes the emoji gate only on a shipped, merged or published outcome; anywhere else fail it with \"gate:emoji\" and drop it.\n\n";
+  }
+  return "";
 }
 
 export interface JudgeOutcome {
@@ -224,7 +277,7 @@ export interface JudgeOutcome {
 
 /** How a draft is judged, decided by its length alone and logged on every
  *  verdict line: `revise` may ship the judge's rewrite, `verdict` never does. */
-type JudgeMode = "revise" | "verdict";
+type JudgeMode = "revise" | "verdict" | "shorten";
 
 /** What a skip with no reason is recorded as — a bug, named rather than blank. */
 const UNRECORDED_SKIP_REASON = "skipped for no recorded reason";
@@ -263,7 +316,8 @@ async function callJudgeModel(
     stalled: boolean;
     extraInstruction?: string;
     mode: JudgeMode;
-    cardTableList?: string;
+    tableList?: string;
+    emoji: EmojiReading;
   },
 ): Promise<ModelText> {
   const prompt =
@@ -280,6 +334,9 @@ async function callJudgeModel(
     // without knowing which tools ran — the judge was scoring that dimension
     // blind on every non-correction turn.
     `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` +
+    // Counted by code, like the restatement above: what the judge is left to
+    // read is only whether a lone opening 🎉 sits on a real outcome.
+    emojiNote(ctx.emoji) +
     `User message:\n${userText.slice(0, MAX_USER_CHARS)}\n\n` +
     // Never sliced: `reviewDraft` only asks about a draft that fits its mode's
     // window, so the judge always reads the draft whole.
@@ -287,14 +344,16 @@ async function callJudgeModel(
     // What the reader sees beneath the draft. Without it a summary that points
     // at the table ("thirteen cards, the table has them") reads as a reply that
     // never answered, and D1 fails the very shape the persona asks for.
-    (ctx.cardTableList ? `\n\n${cardTableNote(ctx.cardTableList)}` : "") +
+    (ctx.tableList ? `\n\n${tableNote(ctx.tableList)}` : "") +
     // A deterministic pre-check already decided WHAT is wrong; passing its one
     // sentence through beats asking the judge to rediscover it, and a specific
     // instruction is what keeps the repair from producing generic filler.
     (ctx.extraInstruction ? `\n\n${ctx.extraInstruction}` : "");
 
   const system =
-    JUDGE_SYSTEM + (ctx.correction ? CORRECTION_GATE : "") + (ctx.mode === "verdict" ? VERDICT_ONLY : "");
+    JUDGE_SYSTEM +
+    (ctx.correction ? CORRECTION_GATE : "") +
+    (ctx.mode === "verdict" ? VERDICT_ONLY : ctx.mode === "shorten" ? SHORTEN : "");
 
   // A tier, a system block, a prompt and a ceiling. Whether that is Gemini or
   // Claude, which model the tier resolves to, what level it thinks at and
@@ -330,7 +389,7 @@ export async function reviewDraft(
     /** One extra line appended to the judge prompt. Carries the specific repair
      *  the caller's own check already identified. */
     extraInstruction?: string;
-    /** The plain list of the card table beneath the draft, when one is
+    /** The plain list of the result table beneath the draft, when one is
      *  attached. The judge reads it; it never counts toward the draft's
      *  length, so it moves neither the floor nor either window. Those
      *  windows measure what the model wrote and what a rewrite would have to
@@ -339,16 +398,25 @@ export async function reviewDraft(
      *  call the same summary without a table never pays, and a long answer
      *  could be pushed into verdict-only by rows the judge was never going to
      *  rewrite. */
-    cardTableList?: string;
+    tableList?: string;
+    /** The turn found the draft over its prose budget and asks for it
+     *  SHORTENED: judged in shorten mode at any length the judge reads, and a
+     *  rewrite ships only if it is short, shorter than the draft and in the
+     *  draft's own words. Set with a `forceReason` and an `extraInstruction`
+     *  saying what the short answer keeps. */
+    shorten?: boolean;
   },
 ): Promise<JudgeOutcome> {
-  const { userText, draft, priorAssistantText, forceReason, extraInstruction, cardTableList } = args;
+  const { userText, draft, priorAssistantText, forceReason, extraInstruction, tableList } = args;
   const correction = args.correction === true;
   const toolsUsedThisTurn = args.toolsUsedThisTurn ?? [];
+  // An emoji lifts the floor too: replies carry so few that reading each one
+  // costs little, and a one-line reply is exactly where a stray 🚀 lands.
+  const emoji = readEmoji(draft);
   // The length floor is BYPASSED on a correction. The 2026-08-17 denial that
   // started all this was short, so it was never judged — the one turn where the
   // judge had something to catch is the one it sat out.
-  if (!correction && !forceReason && draft.trim().length < MIN_DRAFT_CHARS) {
+  if (!correction && !forceReason && emoji.count === 0 && draft.trim().length < MIN_DRAFT_CHARS) {
     // Skips used to bypass telemetry entirely, so "the judge never ran" and
     // "the judge passed it" looked identical in the logs.
     console.log(
@@ -371,8 +439,15 @@ export async function reviewDraft(
   // fail ships the draft as written, with the failed codes on the verdict line.
   // A forced repair (correction, confidence, absence) gets a verdict and no
   // repair past this line: a repair is a rewrite, and a rewrite is what this
-  // window cannot trust.
-  const mode: JudgeMode = draft.trim().length > MAX_DRAFT_CHARS ? "verdict" : "revise";
+  // window cannot trust. A SHORTEN is the exception, at any length the judge
+  // reads: its rewrite is bounded by MAX_SHORTENED_CHARS, far inside the
+  // output ceiling, so it cannot come back as a cut-off prefix. Live on r525 a
+  // 10,198-character walk was graded and shipped as written for want of it.
+  const mode: JudgeMode = args.shorten
+    ? "shorten"
+    : draft.trim().length > MAX_DRAFT_CHARS
+      ? "verdict"
+      : "revise";
 
   // Past the verdict window nothing is asked, so the call stays bounded. No
   // caller lifts this, and the skip is logged so it never reads as a pass.
@@ -390,6 +465,7 @@ export async function reviewDraft(
     correction && !!priorAssistantText && looksLikeStalledCorrection(priorAssistantText, draft);
 
   const startedAt = Date.now();
+  const timeoutMs = mode === "shorten" ? SHORTEN_TIMEOUT_MS : JUDGE_TIMEOUT_MS;
   let verdict: JudgeOutcome["verdict"] = "error";
   let reason = "";
   let failed: string[] = [];
@@ -405,14 +481,15 @@ export async function reviewDraft(
         stalled,
         extraInstruction,
         mode,
-        cardTableList,
+        tableList,
+        emoji,
       }),
-      new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
+      new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), timeoutMs)),
     ]);
 
     if (answer === "__timeout__") {
       verdict = "error";
-      reason = `timed out after ${JUDGE_TIMEOUT_MS}ms`;
+      reason = `timed out after ${timeoutMs}ms`;
       console.warn("[draft-judge] timed out — sending the original draft");
     } else if (answer.ok === false && answer.unavailable === true) {
       // NEVER ASKED: the adapter has no credential, so there is no judgement to
@@ -441,8 +518,33 @@ export async function reviewDraft(
           // against the draft; none of them can tell a faithful prefix of a
           // long answer from the answer.
           if (revised) console.warn("[draft-judge] revision past the revision window — ignored, sending the original draft");
+        } else if (mode === "shorten") {
+          // Its own guards: a shortening is meant to drop most of the draft, so
+          // the length ratio and the retained-vocabulary test below would
+          // refuse the very rewrite asked for.
+          if (!revised) {
+            console.warn("[draft-judge] shorten asked, no revision — sending the original draft");
+          } else if (revised.length >= draft.trim().length || revised.length > MAX_SHORTENED_CHARS) {
+            // Its length is logged so the ceiling can be tuned against what
+            // the judge actually writes.
+            console.warn(
+              `[draft-judge] shortened revision is not short (revised_chars=${revised.length} ` +
+                `draft_chars=${draft.trim().length} max=${MAX_SHORTENED_CHARS}) — sending the original draft`,
+            );
+          } else if (retainedVocabulary(revised, draft) < MIN_SHORTENED_FROM_DRAFT) {
+            console.warn("[draft-judge] shortened revision says what the draft did not — sending the original draft");
+          } else if (replyEmojiBreach(revised)) {
+            console.warn("[draft-judge] revision breaks the emoji budget — sending the original draft");
+          } else {
+            text = revised;
+            revisedUsed = true;
+          }
         } else if (revised.length < draft.trim().length * MIN_REVISION_RATIO) {
           console.warn("[draft-judge] fail verdict but truncated revision — sending the original draft");
+        } else if (replyEmojiBreach(revised)) {
+          // The judge is held to the budget it grades: a rewrite that keeps or
+          // adds an emoji the count refuses fixes nothing.
+          console.warn("[draft-judge] revision breaks the emoji budget — sending the original draft");
         } else if (shouldRejectRevision(draft, revised)) {
           // Length was the ONLY check until 2026-08-06, and a degenerate
           // revision is usually longer than the draft, so it passed. One
@@ -459,6 +561,12 @@ export async function reviewDraft(
         console.warn(`[draft-judge] unparseable judge output (${raw.slice(0, 120)}) — sending the original draft`);
       }
     }
+    // A breach is a fail on the count alone. The judge reading a draft with
+    // two emoji and passing it does not make the second one fit.
+    if (emoji.breach && verdict === "pass") {
+      verdict = "fail";
+      failed = ["gate:emoji"];
+    }
   } catch (err) {
     verdict = "error"; // fail open
     reason = err instanceof Error ? err.message : String(err);
@@ -470,7 +578,7 @@ export async function reviewDraft(
       `failed=[${failed.join(",")}] ` +
       `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length} ` +
       `correction=${correction ? "yes" : "no"} stalled=${stalled ? "yes" : "no"} ` +
-      `forced=${forceReason ?? "no"} mode=${mode} ` +
+      `forced=${forceReason ?? "no"} mode=${mode} emoji=${emoji.count} ` +
       `tools=[${toolsUsedThisTurn.join(",")}]`,
   );
   if (verdict === "skip") return judgeSkipped(text, reason);

@@ -19,7 +19,8 @@
 // `executeGithubIssueCreate`, the binding at the foot of this file.
 
 import type { Env, SlackContext } from "../types";
-import { conversationsInfo, getPermalink, postMessage, usersInfo } from "../slack/api";
+import { conversationsInfo, getPermalink, postMessage } from "../slack/api";
+import { requesterName } from "./requester-name";
 import { escapeSlackText } from "../slack/mrkdwn";
 import {
   GithubRequestError,
@@ -187,12 +188,7 @@ export async function isPrivateConversation(env: Env, channel: string): Promise<
 export function slackFilingDeps(env: Env, slack: SlackContext): SlackFilingDeps {
   let privately: Promise<boolean> | undefined;
   return {
-    async requesterName() {
-      if (!slack.requestedBy) return "a Slack teammate";
-      const res = await usersInfo(env, slack.requestedBy).catch(() => null);
-      const user = res?.ok ? res.user : undefined;
-      return user?.profile?.display_name || user?.real_name || user?.name || "a Slack teammate";
-    },
+    requesterName: () => requesterName(env, slack),
     // By the conversation's kind, read once per filing.
     requestedPrivately: () => (privately ??= isPrivateConversation(env, slack.channel)),
     async threadPermalink() {

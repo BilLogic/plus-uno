@@ -66,12 +66,14 @@ import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalCard } from "../turn/index";
 import type { PendingProposal, ProposalOperation } from "../thread-state/index";
-import { reminderBlocks } from "../commitments/copy";
-import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, TEXT_KEEP_MS } from "../commitments/due";
+import { reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
+import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, maySnooze, TEXT_KEEP_MS } from "../commitments/due";
 import type { CommitmentAction } from "../commitments/run";
-import { cardTodoId, LIVE_STATES, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
+import { cardTodoId, LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
 import {
+  answeredBy,
   cardAcknowledgement,
+  DRAFT_NOT_POSTED,
   cardAnswer,
   cardFollowUpText,
   CARD_FOOTERS,
@@ -747,74 +749,96 @@ export interface AnswerDeps {
   now(): number;
 }
 
-/** A reaction on a card follow-up, in the facts the envelope has. */
+/** A reaction or a tap on a card follow-up, in the facts the envelope has. */
 export interface CardReaction {
   channel: string;
   messageTs: string;
   glyph: string;
   userId: string;
+  /** A tap is a deliberate answer; a reaction may only mean "seen". */
+  via?: "button" | "reaction";
 }
 
 /**
- * A reaction on a card follow-up, answered. The follow-up owns every reaction
- * on it, whether or not one changed anything: nothing on it reaches the gate.
+ * A reaction or a tap on a card follow-up, answered. The follow-up owns every
+ * one, whether or not it changed anything: nothing on it reaches the gate.
+ *
+ * A tap is anyone's to give: a card is the team's, not a promise one person
+ * made, so whoever knows where it stands answers, and the edit names them. A
+ * reaction may be a casual "seen", so it counts only from the people asked
+ * (and, for a draft, anyone who posted in the to-do's thread).
  *
  * @param c - The follow-up's row
- * @param r - The reaction
+ * @param r - The reaction or tap
  * @param deps - The store, the reads, the edit, the staging
+ * @returns Why it changed nothing, or that the edit missed; nothing when it landed and shows
  */
-export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, deps: AnswerDeps): Promise<void> {
-  if (c.kind === "thread_promise" || c.kind === "card_unowned") return;
+export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, deps: AnswerDeps): Promise<TapAnswer | void> {
+  if (c.kind === "thread_promise" || c.kind === "card_unowned") return { refused: TAP_REFUSED.notAnAnswer };
+  if (r.userId === deps.config.botUserId) return;
   const kind = c.kind as "card_todo" | "card_stale";
   const answer = cardAnswer(kind, r.glyph);
-  if (!answer || !LIVE_STATES.includes(c.state) || r.userId === deps.config.botUserId) return;
+  if (!answer) return { refused: TAP_REFUSED.notAnAnswer };
+  if (!LIVE_STATES.includes(c.state)) return { refused: TAP_REFUSED.settled };
   const text = await deps.store.text(c.id);
   const people = [c.promiserId, ...(text?.mentions ?? [])];
-  // The owners answer; the draft may also be asked for by anyone who posted
-  // in the to-do's thread.
-  const allowed = answer === "draft" ? [...people, ...(text?.participants ?? [])] : people;
-  if (!allowed.includes(r.userId)) return;
+  if (r.via !== "button") {
+    const allowed = answer === "draft" ? [...people, ...(text?.participants ?? [])] : people;
+    if (!allowed.includes(r.userId)) return { refused: TAP_REFUSED.notYours(c.promiserId) };
+  }
+  if (answer === "still_on_it" && !maySnooze(c.snoozes)) return { refused: TAP_REFUSED.snoozeSpent };
   const now = deps.now();
   const thread = { channel: r.channel, channelKind: c.channelKind, threadTs: c.threadTs || c.nudgeTs || r.messageTs };
   const confirmers = [...new Set([...people, r.userId])];
+  if (answer === "draft" && !text) return { refused: TAP_REFUSED.gone };
+
+  // Two answers at once both read a live row: the claim lets one through, and
+  // it comes before anything is posted or staged.
+  const patch: CommitmentPatch =
+    answer === "still_on_it"
+      ? // Checked again in three weeks: moved by then, it settles; if not, the
+        // one follow-up asks. Capped like a promise's ⏳.
+        { state: "snoozed", snoozes: c.snoozes + 1, dueAt: now + STALE_AFTER_MS }
+      : { state: answer === "draft" || answer === "done" ? "done" : "dropped", resolvedAt: now };
+  if (!(await deps.store.claim(c.id, patch))) return { refused: TAP_REFUSED.settled };
 
   let staged = false;
   if (answer === "draft") {
-    if (!text) return;
-    staged = await deps.stage({ card: await draftCard(c, text, deps), ...thread, confirmers, slot: proposalSlotFor(c) });
-    if (!staged) return;
-    await deps.store.update(c.id, { state: "done", resolvedAt: now });
-  } else if (answer === "still_on_it") {
-    // Checked again in three weeks: moved by then, it settles; if not, the one
-    // follow-up asks.
-    await deps.store.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt: now + STALE_AFTER_MS });
-  } else if (kind === "card_stale") {
-    // The owner suggests where the card goes: the board's live options, the
-    // likely ones for this answer first, and the pick stages the move.
+    staged = await deps.stage({ card: await draftCard(c, text!, deps), ...thread, confirmers, slot: proposalSlotFor(c) });
+    if (!staged) {
+      // Nothing went up: the follow-up is live again for another try.
+      await deps.store.update(c.id, { state: c.state, resolvedAt: null });
+      return { refused: DRAFT_NOT_POSTED };
+    }
+  } else if (kind === "card_stale" && answer !== "still_on_it") {
+    // Whoever answered picks where the card goes: the board's live options,
+    // the likely ones for this answer first, and the pick stages the move.
     const choice = answer === "done" ? "done" : "drop";
     const options = text?.card ? orderStatusOptions(await deps.reads.statusOptions(), choice, text.card.status) : [];
     if (text?.card && options.length) {
       await deps.post(thread, statusChoiceText({ owner: r.userId, card: text.card, options }));
-      await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false, listedAt: now, reposted: false } }, now + TEXT_KEEP_MS);
+      await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false, listedAt: now, reposted: false, by: r.userId } }, now + TEXT_KEEP_MS);
       await deps.markReplyThread(thread.channel, thread.threadTs, CHOICE_TTL_MS);
       staged = true;
     }
-    await deps.store.update(c.id, { state: answer === "done" ? "done" : "dropped", resolvedAt: now });
-  } else {
-    await deps.store.update(c.id, { state: "dropped", resolvedAt: now });
   }
-  await acknowledge(deps, c, text, r, cardAcknowledgement(answer, staged));
+  const shown = await acknowledge(deps, c, text, r, `${cardAcknowledgement(answer, staged)} ${answeredBy(r.userId)}`);
+  return shown ? undefined : { unedited: true };
 }
 
-async function acknowledge(deps: Pick<AnswerDeps, "update">, c: CommitmentRecord, text: CommitmentText | null, r: { channel: string; messageTs: string }, ack: string): Promise<void> {
+/** Replace a follow-up's buttons with its answer; false when the message
+ *  still shows them. */
+async function acknowledge(deps: Pick<AnswerDeps, "update">, c: CommitmentRecord, text: CommitmentText | null, r: { channel: string; messageTs: string }, ack: string): Promise<boolean> {
   const body = text?.bodies[r.messageTs];
   if (!body) {
     console.warn(`[follow-through] ${c.id}: answered, but ${r.messageTs} has no kept body to edit`);
-    return;
+    return false;
   }
   if (!(await deps.update(r.channel, r.messageTs, { text: body, blocks: reminderBlocks(body, ack) }))) {
     console.warn(`[follow-through] ${c.id}: answered, but ${r.messageTs} could not be edited`);
+    return false;
   }
+  return true;
 }
 
 /**
@@ -835,7 +859,7 @@ export async function draftCard(c: CommitmentRecord, text: CommitmentText, deps:
     input: {
       surface: "prd",
       title,
-      summary: `Drafted by uno-bot from a to-do in ${where} to create this card. Fill in the PRD sections and set the Contributor before it moves on.`,
+      summary: `Drafted by le goat from a to-do in ${where} to create this card. Fill in the PRD sections and set the Contributor before it moves on.`,
       ...(text.sourceUrl ? { source_url: text.sourceUrl } : {}),
       ...(pillar ? { properties: { product_pillar: pillar } } : {}),
     },
@@ -843,7 +867,7 @@ export async function draftCard(c: CommitmentRecord, text: CommitmentText, deps:
   return {
     kind: "confirm",
     verb: "file this Roadmap card",
-    lead: `:memo: Draft card for the to-do: *${escapeLead(title)}*. A ✅ from the people named above, or whoever asked for it, files it. Expires in 72 h.`,
+    lead: `Draft card for the to-do: *${escapeLead(title)}*. A ✅ from the people named above, or whoever asked for it, files it. Expires in 72 h.`,
     fields: [],
     caveats: [],
     operations: [operation],
@@ -856,7 +880,7 @@ export function statusCard(card: { title: string; url: string }, status: string,
   return {
     kind: "confirm",
     verb: `move this card to ${status}`,
-    lead: `:card_index_dividers: ${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it. Expires in 72 h.`,
+    lead: `${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it. Expires in 72 h.`,
     fields: [],
     caveats: [],
     operations: [{ toolName: "notion_update", input: { page_url: card.url, properties: { "Design Status": status } } }],
@@ -868,7 +892,7 @@ export function contributorCard(card: { title: string; url: string }, slackUser:
   return {
     kind: "confirm",
     verb: "set this card's Contributor",
-    lead: `:bust_in_silhouette: Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it. Expires in 72 h.`,
+    lead: `Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it. Expires in 72 h.`,
     fields: [],
     caveats: [],
     operations: [{ toolName: "notion_update", input: { page_url: card.url, properties: { Contributor: notionUser } } }],
@@ -965,8 +989,9 @@ async function ownerReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps
 }
 
 /**
- * Under F5's list, the owner's pick stages the Design Status change — only the
- * owner's reply counts, and only while the choice is open (`CHOICE_TTL_MS`).
+ * Under F5's list, a pick stages the Design Status change — only a reply from
+ * an owner or from whoever answered counts, and only while the choice is open
+ * (`CHOICE_TTL_MS`).
  * A reply that is no listed option gets the options again, on one line, once;
  * after that, replies are the thread's own. The value staged is the schema's
  * own spelling, and `notion_update` exact-matches it again when it runs.
@@ -976,7 +1001,7 @@ async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDep
   const choosing = text?.choosing;
   if (!text?.card || !choosing || choosing.staged || deps.now() > choosing.listedAt + CHOICE_TTL_MS) return false;
   const owners = [c.promiserId, ...(text.mentions ?? [])];
-  if (!owners.includes(reply.user)) return false;
+  if (!owners.includes(reply.user) && reply.user !== choosing.by) return false;
   const thread = { channel: reply.channel, channelKind: c.channelKind, threadTs: reply.threadTs };
   const status = pickStatus(reply.text, choosing.options);
   const keep = choosing.listedAt + CHOICE_TTL_MS + TEXT_KEEP_MS;
@@ -994,7 +1019,7 @@ async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDep
   });
   if (!staged) return true;
   await deps.store.saveText(c.id, { ...text, choosing: { ...choosing, staged: true } }, keep);
-  await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, cardAcknowledgement("status", true));
+  await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, `${cardAcknowledgement("status", true)} ${answeredBy(choosing.by ?? reply.user)}`);
   return true;
 }
 

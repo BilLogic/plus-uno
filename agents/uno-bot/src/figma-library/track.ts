@@ -43,6 +43,7 @@
 import { namesInWords, windowInWords } from "../slack/copy-words";
 import { rethrowIfBudget } from "../net";
 import { LIBRARY_CARD_TTL_MS } from "./post";
+import { notedCardBlocks } from "../slack/proposal-render";
 
 /** A posted library card, followed until its PR merges or it ages out. */
 export interface TrackedPublish {
@@ -63,6 +64,9 @@ export interface TrackedPublish {
    *  before they were kept. */
   draft?: { title: string; body: string };
   cardText?: string;
+  /** The card's own blocks — its release card and table — when it went up
+   *  with them; absent, it is closed from `cardText`. */
+  cardBlocks?: unknown[];
   /** This job filed the intake at expiry and the card's edit has not landed
    *  yet: the next look tries the edit again, and files nothing. */
   closePending?: true;
@@ -102,8 +106,9 @@ export interface TrackDeps {
     fileIntake(draft: { title: string; body: string }, card: { channel: string; ts: string }): Promise<{ number: number; url: string }>;
   };
   postToThread(channel: string, ts: string, text: string): Promise<void>;
-  /** Edit a card to its text and a closing line, with no buttons. */
-  closeCard(channel: string, ts: string, text: string, note: string): Promise<void>;
+  /** Edit a card to its closing message: its own blocks, or its text, with a
+   *  closing line and no buttons. */
+  closeCard(channel: string, ts: string, message: { text: string; blocks: unknown[] }): Promise<void>;
   now(): number;
 }
 
@@ -171,7 +176,11 @@ export interface TrackResult {
  */
 async function closeExpired(deps: TrackDeps, card: TrackedPublish, intake: { number: number; url: string }): Promise<boolean> {
   try {
-    await deps.closeCard(card.channel, card.ts, card.cardText!, expiredCardNote(intake.url));
+    const note = expiredCardNote(intake.url);
+    await deps.closeCard(card.channel, card.ts, {
+      text: `${card.cardText!}\n${note}`,
+      blocks: notedCardBlocks({ text: card.cardText!, ...(card.cardBlocks ? { blocks: card.cardBlocks } : {}) }, note),
+    });
     delete card.closePending;
     return true;
   } catch (err) {

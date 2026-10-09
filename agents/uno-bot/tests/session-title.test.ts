@@ -58,6 +58,6 @@ describe("the session title Slack is sent", () => {
   });
 
   it("falls back to a name when nothing nameable is left", async () => {
-    assert.equal(await titleSentFor("??? :) …"), "Chat with UNO Bot");
+    assert.equal(await titleSentFor("??? :) …"), "Chat with le goat");
   });
 });

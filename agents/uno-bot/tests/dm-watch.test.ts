@@ -36,6 +36,7 @@ import {
   type DmWatchFeature,
   type InMemoryDmWatchRecords,
   type OwnerSlack,
+  answerDmReminderPress,
 } from "../src/dm-watch/index";
 import { homeView } from "../src/slack/home";
 import { at, BOT, ts } from "./helpers/sweep-harness";
@@ -360,7 +361,7 @@ describe("the morning reminder", () => {
     assert.equal((await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU))).summary, "nothing due");
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, FRI));
     assert.equal(w.posts.length, 1);
-    assert.match(w.posts[0]!.text, new RegExp(`^Hi <@${MAYA}>, on Tue you mentioned you'd review the PRD`));
+    assert.match(w.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd review the PRD\\*\\n<@${MAYA}> `));
     // Re-armed to the end of Tue Oct 6: the follow-up goes on Wed.
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13)));
     assert.equal(w.posts.length, 1);
@@ -448,6 +449,21 @@ describe("answering a DM reminder", () => {
     assert.equal(w.records.rows()[0]!.snoozes, 2);
     await door("no_good");
     assert.equal(w.records.rows()[0]!.state, "dropped");
+  });
+
+  it("a tap it refuses says why: past the ⏳ cap, already answered, someone else's", async () => {
+    const { w, row } = await remindedWorld();
+    const press = (glyph: string, userId = MAYA) =>
+      answerDmReminderPress(
+        { channel: `D-UNO-${MAYA}`, messageTs: row.nudgeTs!, glyph, userId },
+        { records: w.records, reminderBody: async () => "body", update: async () => true, botUserId: async () => BOT, now: () => at(31, 15) },
+      );
+    assert.deepEqual(await press("hourglass_flowing_sand"), { claimed: true });
+    assert.deepEqual(await press("hourglass_flowing_sand"), { claimed: true });
+    assert.deepEqual(await press("hourglass_flowing_sand"), { claimed: true, refused: "This can't be put off again, so that tap changed nothing." });
+    assert.deepEqual(await press("raised_hands", BEA), { claimed: true, refused: `Only <@${MAYA}> can answer this reminder, so that tap changed nothing.` });
+    assert.deepEqual(await press("raised_hands"), { claimed: true });
+    assert.deepEqual(await press("no_good"), { claimed: true, refused: "This one's already been answered, so that tap changed nothing." });
   });
 
   it("anyone else's reaction, and a reaction outside a DM, changes nothing", async () => {

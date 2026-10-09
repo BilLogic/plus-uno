@@ -13,8 +13,15 @@ import {
   REMINDER_CHOICES,
   reminderAnswer,
   reminderBlocks,
+  reminderText,
   SELF_REMINDER_CHOICES,
   SELF_REMINDER_LAST_CHOICES,
+  eitherDoor,
+  tapReply,
+  TAP_FAILED,
+  TAP_RECORDED,
+  TAP_REFUSED,
+  type ReminderOutcome,
 } from "../src/commitments/index";
 import { ASK_FOOTER } from "../src/dm-sweep/copy";
 import { MADE_LAST_CHOICES, MADE_TO_CHOICES, MADE_TO_LAST_CHOICES } from "../src/dm-watch/index";
@@ -54,6 +61,50 @@ describe("reminderBlocks with answers", () => {
   });
 });
 
+describe("a promise reminder", () => {
+  const permalink = "https://plus.slack.com/archives/C1/p100";
+  const body = reminderText({ promiser: "U1", what: "send Bryan the onboarding notes", deadlineLabel: "Thu", promisedLabel: "Mon", permalink });
+  const blocks = reminderBlocks(body, { choices: REMINDER_CHOICES }) as Block[];
+
+  it("leads with a card-like heading: what was promised, by when", () => {
+    assert.deepEqual(blocks.map((b) => b.type), ["section", "context", "actions"]);
+    assert.equal(blocks[0]!.text!.text, "*You said you'd send Bryan the onboarding notes by Thu*");
+  });
+
+  it("puts the mention, the question and the original link under the heading, small", () => {
+    const [line] = blocks[1]!.elements! as Array<{ type: string; text: string }>;
+    assert.equal(line!.type, "mrkdwn");
+    assert.match(line!.text, /^<@U1> /);
+    assert.match(line!.text, /Is it done, or does the date need to move\?/);
+    assert.ok(line!.text.endsWith(`<${permalink}|Original message>`));
+  });
+
+  it("names the day it was said when no deadline was", () => {
+    const undated = reminderText({ promiser: "U1", what: "review the PRD", deadlineLabel: null, promisedLabel: "Tue", permalink: null });
+    assert.equal(undated.split("\n")[0], "*On Tue you said you'd review the PRD*");
+    assert.doesNotMatch(undated, /Original message/);
+  });
+
+  it("keeps all four answers, in words", () => {
+    const buttons = blocks[2]!.elements! as Array<{ value: string; text: { text: string } }>;
+    assert.deepEqual(
+      buttons.map((b) => [b.text.text, b.value]),
+      [
+        ["Done", "raised_hands"],
+        ["Later", "hourglass_flowing_sand"],
+        ["Dropped", "no_good"],
+        ["Wasn't a promise", "thinking_face"],
+      ],
+    );
+  });
+
+  it("keeps its heading when an answer replaces the buttons", () => {
+    const answered = reminderBlocks(body, "Nice, marked done.") as Block[];
+    assert.deepEqual(answered.map((b) => b.type), ["section", "context", "context"]);
+    assert.equal(footerLabels(answered), "Nice, marked done.");
+  });
+});
+
 describe("every offered button means something to the door it goes through", () => {
   const reminderSets: Array<[string, readonly { glyph: string; label: string }[]]> = [
     ["a promise reminder", REMINDER_CHOICES],
@@ -80,5 +131,55 @@ describe("every offered button means something to the door it goes through", () 
 
   it("the follow-up that wants a typed reply has no buttons", () => {
     assert.equal(typeof CARD_FOOTERS.card_unowned, "string");
+  });
+});
+
+describe("a press through both reminder doors", () => {
+  const press = { channel: "C1", messageTs: "1.1", glyph: "raised_hands", userId: "U1", via: "button" as const };
+  const door = (outcome: ReminderOutcome, seen: string[], name: string) => async () => {
+    seen.push(name);
+    return outcome;
+  };
+
+  it("the first door to claim it answers, refusal and all, and the second is never asked", async () => {
+    const seen: string[] = [];
+    const both = eitherDoor(door({ claimed: true, refused: "why" }, seen, "dm"), door({ claimed: true }, seen, "thread"))!;
+    assert.deepEqual(await both(press), { claimed: true, refused: "why" });
+    assert.deepEqual(seen, ["dm"]);
+  });
+
+  it("passes to the second door's refusal when the first does not claim it", async () => {
+    const seen: string[] = [];
+    const both = eitherDoor(door({ claimed: false }, seen, "dm"), door({ claimed: true, refused: "why" }, seen, "thread"))!;
+    assert.deepEqual(await both(press), { claimed: true, refused: "why" });
+    assert.deepEqual(seen, ["dm", "thread"]);
+  });
+
+  it("unclaimed by both, a failed lookup in either is the outcome", async () => {
+    const both = eitherDoor(door({ claimed: false, failed: true }, [], "dm"), door({ claimed: false }, [], "thread"))!;
+    assert.deepEqual(await both(press), { claimed: false, failed: true });
+    const neither = eitherDoor(door({ claimed: false }, [], "dm"), door({ claimed: false }, [], "thread"))!;
+    assert.deepEqual(await neither(press), { claimed: false });
+  });
+});
+
+describe("what a tapper is told", () => {
+  it("nothing, when the answer shows on the message", () => {
+    assert.equal(tapReply({ claimed: true }), null);
+  });
+
+  it("the door's reason, when it refused", () => {
+    assert.equal(tapReply({ claimed: true, refused: TAP_REFUSED.settled }), TAP_REFUSED.settled);
+  });
+
+  it("that it was recorded, when the edit missed", () => {
+    assert.equal(tapReply({ claimed: true, unedited: true }), TAP_RECORDED);
+  });
+
+  it("no longer tracked for a message no reminder holds; a failure for an error, never the same line", () => {
+    assert.equal(tapReply({ claimed: false }), TAP_REFUSED.gone);
+    assert.equal(tapReply({ claimed: false, failed: true }), TAP_FAILED);
+    assert.equal(tapReply("error"), TAP_FAILED);
+    assert.notEqual(TAP_FAILED, TAP_REFUSED.gone);
   });
 });

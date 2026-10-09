@@ -100,13 +100,47 @@ export function outOfIterationBudget(used: number): boolean {
 export const BUDGET_EXHAUSTED_LOOKUP_NOTE =
   "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction). If you couldn't gather everything the user asked for, deliver what you DO have and briefly offer to continue on the SPECIFIC missing piece (e.g. \"I've got X — want me to check Y next?\") — framed as a natural next step, never as an error or a limit.";
 
-/** The tool result a refused lookup reports, ready to hand back. */
-export function budgetRefusedResult(): string {
+/** The `error` a lookup refused for budget reports: how the turn's ⚠️ line
+ *  knows a budget refusal from a source failure (`turn/warning-line.ts`). */
+export const BUDGET_REFUSAL_ERROR = "no more lookups available this turn";
+
+/** Added when the COUNT of lookups refused, and the turn has round-trips
+ *  left: `present` fetches nothing, so it still runs. At the subrequest
+ *  ceiling the next pass answers with tools off, so nothing is promised. */
+const PRESENT_STILL_WORKS = " `present` is no lookup either: it still shows the rows you have as a table.";
+
+/**
+ * The tool result a refused lookup reports, ready to hand back.
+ *
+ * @param opts.presentStillWorks - The count of lookups refused, not the
+ *   subrequest ceiling, so the turn can still ask for a table
+ */
+export function budgetRefusedResult(opts: { presentStillWorks?: boolean } = {}): string {
   return JSON.stringify({
     ok: false,
-    error: "no more lookups available this turn",
-    note: BUDGET_EXHAUSTED_LOOKUP_NOTE,
+    error: BUDGET_REFUSAL_ERROR,
+    note: BUDGET_EXHAUSTED_LOOKUP_NOTE + (opts.presentStillWorks ? PRESENT_STILL_WORKS : ""),
   });
+}
+
+/** How `markPartialLookup`'s stamp opens. */
+const CUT_SHORT_STAMP = "(system: this lookup was cut short";
+
+/** True when the budget cut this result short (`markPartialLookup`). */
+export function wasCutShort(resultText: string): boolean {
+  return resultText.includes(CUT_SHORT_STAMP);
+}
+
+/**
+ * A result as the tool returned it, before `markPartialLookup`'s stamp, and the
+ * stamp itself ("" when there is none) — so a reader of the tool's JSON can
+ * still parse it and hand the stamp on.
+ *
+ * @param resultText - A tool result, stamped or not
+ */
+export function splitCutShort(resultText: string): { body: string; stamp: string } {
+  const at = resultText.indexOf(`\n\n${CUT_SHORT_STAMP}`);
+  return at < 0 ? { body: resultText, stamp: "" } : { body: resultText.slice(0, at), stamp: resultText.slice(at) };
 }
 
 /**
@@ -116,7 +150,7 @@ export function budgetRefusedResult(): string {
  * @param resultText - Whatever the tool returned
  */
 export function markPartialLookup(resultText: string): string {
-  return `${resultText}\n\n(system: this lookup was cut short — the turn ran out of lookup capacity mid-read, so the result above is INCOMPLETE. Nothing found here does NOT mean nothing exists; treat it as unread, not empty, and say which part you couldn't check rather than reporting it as absent.)`;
+  return `${resultText}\n\n${CUT_SHORT_STAMP} — the turn ran out of lookup capacity mid-read, so the result above is INCOMPLETE. Nothing found here does NOT mean nothing exists; treat it as unread, not empty, and say which part you couldn't check rather than reporting it as absent.)`;
 }
 
 /** Injected as a final user turn to force a tools-disabled synthesis pass. */

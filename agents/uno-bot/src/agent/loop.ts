@@ -79,7 +79,9 @@ export interface TurnDials {
 }
 
 export type AgentResult =
-  | { kind: "text"; text: string }
+  /** `cutShort`: the answer came from the tools-disabled synthesis pass, once
+   *  the loop's round-trips ran out — what Turn's ⚠️ line reads. */
+  | { kind: "text"; text: string; cutShort?: true }
   /**
    * The turn was stopped, and the answer goes undelivered.
    *
@@ -240,9 +242,9 @@ export interface LoopInput {
   /**
    * The turn's last word on a lookup's result before the model reads it: the
    * text it returns is what goes into the `tool_result`. Called for a lookup
-   * that ran, never for one refused before it could. How Turn keeps the card
-   * table its lookups qualify for, and tells the model it did
-   * (`turn/card-table.ts`). Absent, the model reads the result as the tool
+   * that ran, never for one refused before it could. How Turn's presentation
+   * step records what the turn fetched and answers `present` from it
+   * (`turn/presentation.ts`). Absent, the model reads the result as the tool
    * answered it.
    */
   reviseLookupResult?: (name: string, args: Record<string, unknown>, text: string) => string;
@@ -333,11 +335,16 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         // one, so a call to it is refused here, before any dispatch.
         text = JSON.stringify({ ok: false, error: `'${call.name}' is not a tool you can call` });
         refused(text);
-      } else if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
-        text = budgetRefusedResult();
+      } else if (
+        !rowFor(call.name)?.fetchesNothing &&
+        (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING)
+      ) {
+        text = budgetRefusedResult({ presentStillWorks: deps.budget.used() < LOOKUP_CEILING });
         refused(text);
       } else {
-        toolCallsUsed++;
+        // A call that fetches nothing is no lookup, so it spends none of the
+        // count: an answer's shape is chosen after the lookups are done.
+        if (!rowFor(call.name)?.fetchesNothing) toolCallsUsed++;
         input.onToolProgress?.({ ...progress, phase: "started" });
         // Enforced, not forecast: the ceiling refuses the call that would cross
         // it, so a tool can start with any headroom and simply return less.
@@ -670,5 +677,5 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     console.log("[stop] stopped after the synthesis pass, answer undelivered");
     return finish({ kind: "stopped" });
   }
-  return finish({ kind: "text", text: final.text || CLARIFY_FALLBACK });
+  return finish({ kind: "text", text: final.text || CLARIFY_FALLBACK, cutShort: true });
 }

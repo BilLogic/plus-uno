@@ -39,6 +39,7 @@ import { figmaClientFor } from "../figma/production";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
+import { databaseOptions, ROADMAP_STATUS_PROP } from "../integrations/notion";
 import type { TurnOrigin } from "../usage/index";
 import {
   NO_PROPOSAL_EVENT_LOG,
@@ -211,6 +212,13 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     describeAssistantContext: (context) => formatAssistantContext(context),
 
     deliveredBody: (text) => renderDeliveredBody(text),
+
+    // The Roadmap's Design Statuses, the one filter whose options a chart
+    // across lookups can read today.
+    lookupOptions: async (lookup, field) =>
+      lookup === "roadmap_query" && field === "design_status"
+        ? databaseOptions(env, env.NOTION_ROADMAP_DB_ID, ROADMAP_STATUS_PROP)
+        : null,
 
     // Phase 5 — structured state, drift detection and progressive
     // summarisation. FLAGGED OFF by default; see the header of

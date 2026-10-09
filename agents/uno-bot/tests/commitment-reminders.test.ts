@@ -18,6 +18,7 @@ import type { ScheduledJob } from "../src/scheduled/runs";
 import { runSweepJob, type SweepSlackMessage } from "../src/sweep/index";
 import {
   answerReminder,
+  answerReminderPress,
   commitmentThreadHook,
   createInMemoryCommitmentStore,
   modelCommitmentDetector,
@@ -239,7 +240,7 @@ describe("the morning run", () => {
     assert.deepEqual(mentions(nudge!.text), [MAYA]);
     assert.equal(
       nudge!.text,
-      `Hi <@${MAYA}>, you mentioned you'd share the Figma link for the reflection screens by Thu. I haven't spotted it yet, so I'm checking in to make sure things keep moving. Is it done, or does the date need to move? <https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}|Original message>`,
+      `*You said you'd share the Figma link for the reflection screens by Thu*\n<@${MAYA}> I haven't spotted it yet. Is it done, or does the date need to move? · <https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}|Original message>`,
     );
     assert.deepEqual(footerLabels(nudge!.blocks), REMINDER_CHOICES.map((c) => c.label).join(" · "));
     const row = only(store);
@@ -257,7 +258,7 @@ describe("the morning run", () => {
     // Tue + two working days: due Thursday night, nudged Friday.
     const m = mornings({ store, now: at(32, 13) });
     await m.run();
-    assert.match(m.posts[0]!.text, new RegExp(`^Hi <@${MAYA}>, on Tue you mentioned you'd share the Figma link for the reflection screens\\. I haven't spotted it yet.*Is it done, or still in progress\\?`));
+    assert.match(m.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd share the Figma link for the reflection screens\\*\\n<@${MAYA}> I haven't spotted it yet\\. Is it done, or still in progress\\?`));
   });
 
   it("no answer brings one follow-up, then the commitment lapses", async () => {
@@ -296,7 +297,7 @@ describe("the morning run", () => {
     const m = mornings({ store, now: at(32, 18), dryRun: true });
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["nudged"]);
-    assert.match(report.actions[0]!.text ?? "", /you mentioned you'd share the Figma link/);
+    assert.match(report.actions[0]!.text ?? "", /You said you'd share the Figma link/);
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).state, "open");
   });
@@ -435,6 +436,84 @@ describe("answers", () => {
 
   it("the reminder's glyphs are none of the gate's", () => {
     for (const name of Object.keys(REMINDER_REACTIONS)) assert.equal(GATE_RESERVED.has(name), false, name);
+  });
+});
+
+describe("a tap the door refuses says why", () => {
+  // A button press always answers whoever pressed it: a reaction can be left
+  // unanswered, a tap that does nothing reads as a broken button.
+  async function tapped() {
+    const { store } = await sweptPromise();
+    const m = mornings({ store, now: at(32, 13) });
+    await m.run();
+    const reminderTs = m.posts[0]!.ts;
+    const press = (glyph: string, userId = MAYA, messageTs = reminderTs) =>
+      answerReminderPress(
+        { channel: DESIGN, messageTs, glyph, userId },
+        { store, update: m.deps.slack.update, botUserId: async () => BOT, now: () => m.clock.now },
+      );
+    return { store, m, reminderTs, press };
+  }
+
+  it("someone else's promise names whose it is, and changes nothing", async () => {
+    const { store, m, press } = await tapped();
+    const outcome = await press("raised_hands", BEA);
+    assert.equal(outcome.claimed, true);
+    assert.equal(outcome.claimed && outcome.refused, `Only <@${MAYA}> can answer this reminder, so that tap changed nothing.`);
+    assert.equal(only(store).state, "nudged");
+    assert.equal(m.updates.length, 0);
+  });
+
+  it("a settled reminder says it is settled", async () => {
+    const { press } = await tapped();
+    assert.deepEqual(await press("raised_hands"), { claimed: true });
+    const again = await press("no_good");
+    assert.equal(again.claimed && again.refused, "This one's already been answered, so that tap changed nothing.");
+  });
+
+  it("a ⏳ past the cap says it can't be put off again", async () => {
+    const { m, reminderTs, press } = await tapped();
+    await press("hourglass_flowing_sand");
+    m.clock.now = at(37, 13);
+    await m.run();
+    const followUp = m.posts[1]!.ts;
+    assert.deepEqual(await press("hourglass_flowing_sand", MAYA, followUp), { claimed: true });
+    const third = await press("hourglass_flowing_sand", MAYA, reminderTs);
+    assert.equal(third.claimed && third.refused, "This can't be put off again, so that tap changed nothing.");
+  });
+
+  it("two answers at once: one lands, the other is told it was already answered", async () => {
+    const { store, m, press } = await tapped();
+    const [first, second] = await Promise.all([press("raised_hands"), press("no_good")]);
+    assert.deepEqual([first, second].filter((o) => o.claimed && !o.refused), [{ claimed: true }]);
+    assert.deepEqual([first, second].find((o) => o.claimed && o.refused), { claimed: true, refused: "This one's already been answered, so that tap changed nothing." });
+    assert.equal(m.updates.length, 1);
+    assert.notEqual(only(store).state, "nudged");
+  });
+
+  it("an answer whose message could not be edited still lands, and says it was recorded", async () => {
+    const { store, m, reminderTs } = await tapped();
+    const outcome = await answerReminderPress(
+      { channel: DESIGN, messageTs: reminderTs, glyph: "raised_hands", userId: MAYA },
+      { store, update: async () => false, botUserId: async () => BOT, now: () => m.clock.now },
+    );
+    assert.deepEqual(outcome, { claimed: true, unedited: true });
+    assert.equal(only(store).state, "done");
+  });
+
+  it("a store that fails says so, rather than passing for no reminder", async () => {
+    const { store, m, reminderTs } = await tapped();
+    const broken = { ...store, byReminderTs: async () => { throw new Error("D1 down"); } };
+    const outcome = await answerReminderPress(
+      { channel: DESIGN, messageTs: reminderTs, glyph: "raised_hands", userId: MAYA },
+      { store: broken, update: m.deps.slack.update, botUserId: async () => BOT, now: () => m.clock.now },
+    );
+    assert.deepEqual(outcome, { claimed: false, failed: true });
+  });
+
+  it("a message no reminder holds is not the door's", async () => {
+    const { press } = await tapped();
+    assert.deepEqual(await press("raised_hands", MAYA, "1790000000.000001"), { claimed: false });
   });
 });
 

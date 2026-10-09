@@ -91,6 +91,7 @@ import { claudeProvider } from "./providers/claude";
 import type { ModelTier } from "./routing";
 import type { ModelProvider, SystemBlock, ToolSpec } from "./model-provider";
 import type { ToolBody } from "./tool-bodies";
+import { oneReactionPerMessage } from "../tools/slack-react";
 import { isToolName, type ToolName } from "./tool-table";
 import { TOOLS, TOOLS_BY_NAME } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
@@ -380,6 +381,8 @@ const turnScope = new AsyncLocalStorage<{
   /** Names read_reference served this turn, in call order — the receipt that
    *  outlives the turn in place of the text (#423). */
   references: string[];
+  /** Messages `slack_react` has reacted to this turn — one each. */
+  reacted: Set<string>;
   receipt?: RetrievalReceipt;
   /** Set when a slack_search this turn came back EMPTY — carries the mode it
    *  ran under, so the delivery path can check the reply does not overclaim the
@@ -421,12 +424,14 @@ async function withTurnScope(
     tools: Set<string>;
     correction: boolean;
     references: string[];
+    reacted: Set<string>;
     receipt?: RetrievalReceipt;
     absence?: AbsenceContext;
   } = {
     tools: new Set<string>(),
     correction: opts.correction,
     references: [],
+    reacted: new Set<string>(),
   };
   const result = await turnScope.run(store, fn);
   return {
@@ -561,6 +566,11 @@ const TURN_WRAPPERS: Partial<Record<ToolName, (body: ToolBody) => ToolBody>> = {
     const out = await body(env, input, slack);
     recordReferenceHit(out);
     return out;
+  },
+  // One model-chosen reaction per message, counted over the turn.
+  slack_react: (body) => {
+    const store = turnScope.getStore();
+    return store ? oneReactionPerMessage(body, store.reacted) : body;
   },
 };
 

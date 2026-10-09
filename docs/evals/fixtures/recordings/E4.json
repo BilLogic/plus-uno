@@ -1,0 +1,16 @@
+{
+  "case": "E4",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the one-voice ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case's regex agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=E4`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Walk me through everything that happens between me asking you to file a Roadmap card and the card actually existing.",
+      "replies": [
+        {
+          "text": "**You ask, I stage a card, someone confirms, and only then does the Roadmap card get created.**\n\n- I draft the card from your ask and show it to you before anything happens.\n- Approving it files it; Cancel stops it.\n- Once it's filed, I post the link in the thread.\n\nThe detail:\n\n- **The draft.** I gather what's missing first — title, pillar, what it's for — and ask rather than guess. Every value on the card is one you gave me or one the board already offers.\n- **The confirmation card.** It shows my one-line lead, then every field I'd write, then Approve and Cancel. Nothing is written yet.\n  - Anyone in the thread can approve, unless the card names who may.\n  - It expires after an hour, and a revised card replaces the old one.\n- **The write.** On approval the card is created on the Roadmap board, and I post its link here. If the write fails, I say so and nothing half-exists.\n\nThis is how the gate is built, so it holds for every card I file."
+        }
+      ]
+    }
+  ]
+}

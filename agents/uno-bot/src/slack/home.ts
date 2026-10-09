@@ -17,8 +17,9 @@
 
 import type { Env } from "../types";
 import type { SlackAppHomeOpenedEvent } from "./types";
-import { slackCall } from "./api";
-import { SUGGESTED_PROMPTS } from "./assistant";
+import { refusalDetail, slackCall } from "./api";
+import { refusedForBlocks } from "./delivery";
+import { tryAskingButtons } from "./try-asking";
 import { slackConnectUrl } from "../oauth/slack";
 import { dmWatchHomeBlocks, type DmAccess, type DmWatchFeature } from "../dm-watch/index";
 import { dmWatchHomeStateFor } from "../dm-watch/env";
@@ -30,7 +31,7 @@ import { dmWatchHomeStateFor } from "../dm-watch/env";
 // action a new user can take that changes what I can answer, so it sits high
 // rather than below three screens of capability copy (it used to be last).
 const HOME_INTRO = [
-  { type: "header", text: { type: "plain_text", text: "UNO Bot 🐐", emoji: true } },
+  { type: "header", text: { type: "plain_text", text: "le goat 🐐", emoji: true } },
   {
     type: "section",
     text: {
@@ -41,19 +42,50 @@ const HOME_INTRO = [
   },
 ];
 
-const HOME_BODY = [
+/** What I can do, one card each: a title and a body of at most 200
+ *  characters, the most a card's body holds. */
+const CAPABILITIES = [
+  {
+    icon: "book",
+    title: "Answer, grounded",
+    body: "Roadmap card status, owner and pillar, how a product flow works, design-system components and tokens, and any linked Notion, Figma or Slack doc. Cited, live.",
+  },
+  {
+    icon: "edit",
+    title: "Create, with your approval",
+    body: "Draft a PRD, file or update a card, start a component build or prototype, share work for feedback. Nothing is written until someone approves it.",
+  },
+  {
+    icon: "code",
+    title: "Hand off to code",
+    body: "Anything that needs real code, I write as a ready-to-paste prompt for your IDE agent: Claude Code, Cursor, Codex or Antigravity.",
+  },
+] as const;
+
+/** The capabilities as three cards side by side. Card and carousel blocks are
+ *  allowed on a Home tab per Slack's block reference (both list "Home tabs"
+ *  among their surfaces); the icons are Slack's named ones, so nothing is
+ *  fetched. */
+const capabilityCards = () => [
+  {
+    type: "carousel",
+    elements: CAPABILITIES.map((c) => ({
+      type: "card",
+      slack_icon: { type: "icon", name: c.icon },
+      title: { type: "plain_text", text: c.title },
+      body: { type: "mrkdwn", text: c.body },
+    })),
+  },
+];
+
+/** The same capabilities as plain sections, for when Slack refuses the cards. */
+const capabilitySections = () =>
+  CAPABILITIES.map((c) => ({ type: "section", text: { type: "mrkdwn", text: `*${c.title}*\n${c.body}` } }));
+
+const homeBody = (connected: boolean, carousel: boolean) => [
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*What I can do*" } },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text:
-          "• *Answer, grounded* — Roadmap card status / owner / pillar, how a product flow works, design-system components & tokens, and any linked Notion, Figma, or Slack doc\n" +
-          "• *Create — with your :white_check_mark:* — draft a PRD, file or update a card, kick off a component build or prototype, share work for feedback\n" +
-          "• *Hand off* — anything that needs real code, I write a ready-to-paste prompt for your IDE agent (Claude Code, Cursor, Codex, Antigravity)",
-      },
-    },
+    ...(carousel ? capabilityCards() : capabilitySections()),
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*How to reach me*" } },
     {
@@ -62,7 +94,7 @@ const HOME_BODY = [
         type: "mrkdwn",
         text:
           "• *DM me* — right here in the *Messages* tab ↑. It's an ordinary chat: no threads to start, just keep talking\n" +
-          "• *In a channel* — `@UNO Bot` your question; I'll answer in a thread\n" +
+          "• *In a channel* — `@le goat` your question; I'll answer in a thread\n" +
           "• *In a thread* — once I'm in, just reply; no need to re-tag. Or right-click any message → *More actions* for the shortcuts\n" +
           "• *Slash commands* — `/uno-research`, `/uno-synthesize`, `/uno-prototype`, `/uno-review`, `/uno-publish`, `/uno-maintain`\n" +
           "• *Change the effort* — `/grind` runs it on the deep model, `/chill` keeps it short and cheap",
@@ -84,7 +116,7 @@ const HOME_BODY = [
         {
           type: "button",
           style: "danger",
-          text: { type: "plain_text", text: "✋ Stop what I'm running", emoji: true },
+          text: { type: "plain_text", text: "Stop what I'm running" },
           action_id: "uno_stop_run",
           value: "stop",
         },
@@ -103,32 +135,27 @@ const HOME_BODY = [
     },
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*Try asking*" } },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        // Single source of truth: the same four starter prompts the assistant
-        // panel offers as chips (assistant.ts) — imported, not hand-copied.
-        text: SUGGESTED_PROMPTS.map((p) => `› _${p.message}_`).join("\n"),
-      },
-    },
+    // The assistant panel's starters (assistant.ts), as buttons that ask them
+    // in the person's DM (try-asking.ts) — the set that works for them, so
+    // someone who has not linked their Slack is not offered a search of it.
+    { type: "actions", elements: tryAskingButtons(connected) },
     { type: "divider" },
     {
       type: "actions",
       elements: [
         {
           type: "button",
-          text: { type: "plain_text", text: "📚 Storybook", emoji: true },
+          text: { type: "plain_text", text: "Storybook" },
           url: "https://plus-uno.netlify.app/storybook/",
         },
         {
           type: "button",
-          text: { type: "plain_text", text: "🗺️ Service blueprint", emoji: true },
+          text: { type: "plain_text", text: "Service blueprint" },
           url: "https://plus-uno.netlify.app/blueprint/",
         },
         {
           type: "button",
-          text: { type: "plain_text", text: "💻 Repo", emoji: true },
+          text: { type: "plain_text", text: "Repo" },
           url: "https://github.com/BilLogic/plus-uno",
         },
       ],
@@ -139,7 +166,7 @@ const HOME_BODY = [
         {
           type: "mrkdwn",
           text:
-            "Reads are free and instant. Anything I'd create or change in Notion or GitHub always waits for your :white_check_mark: first — the friction is the feature.",
+            "Reads are free and instant. Anything I'd create or change in Notion or GitHub always waits for your approval first — the friction is the feature.",
         },
       ],
     },
@@ -168,7 +195,7 @@ const connectBlocks = (url: string) => [
       {
         type: "button",
         style: "primary",
-        text: { type: "plain_text", text: "🔗 Link your Slack", emoji: true },
+        text: { type: "plain_text", text: "Link your Slack" },
         url,
       },
     ],
@@ -181,34 +208,59 @@ const connectBlocks = (url: string) => [
  *
  * @param input.connectUrl - Where to connect, or null when OAuth is not set up
  * @param input.viewer - Whether this person has connected, and their switches
+ * @param input.carousel - The capabilities as cards (the default), or as
+ *   plain sections when Slack has refused the cards
  */
 export function homeView(input: {
   connectUrl: string | null;
   viewer: { connected: boolean; on: readonly DmWatchFeature[]; refused?: Exclude<DmAccess, { ok: true }> };
+  carousel?: boolean;
 }) {
   const { viewer, connectUrl } = input;
   const notice = viewer.refused ? { refused: viewer.refused, connectUrl } : undefined;
   const personal = viewer.connected ? dmWatchHomeBlocks(viewer.on, notice) : connectUrl ? connectBlocks(connectUrl) : [];
-  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...HOME_BODY] };
+  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...homeBody(viewer.connected, input.carousel ?? true)] };
 }
 
-async function buildHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
+async function homeViewBuilder(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
   const viewer = await dmWatchHomeStateFor(env, userId);
-  return homeView({ connectUrl: slackConnectUrl(env), viewer: refused ? { ...viewer, refused } : viewer });
+  const input = { connectUrl: slackConnectUrl(env), viewer: refused ? { ...viewer, refused } : viewer };
+  return (carousel: boolean) => homeView({ ...input, carousel });
+}
+
+/**
+ * Publish a Home view, and publish it again without the carousel when Slack
+ * refuses its blocks. A refused view leaves the OLD one up with no signal to
+ * the person, so the cards — the newest blocks on the tab — are the ones to
+ * give up rather than the whole refresh. Any other refusal is returned as is.
+ *
+ * @param publish - `views.publish` for this person, with Slack's answer
+ * @param build - The view, with or without the carousel
+ */
+export async function publishHome(
+  publish: (view: Record<string, unknown>) => Promise<{ ok: boolean; error?: string }>,
+  build: (carousel: boolean) => Record<string, unknown>,
+  userId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const first = await publish(build(true));
+  if (first.ok || !refusedForBlocks(first)) return first;
+  console.warn(`[home] view refused for ${userId} (${first.error}${refusalDetail(first)}); republishing without the carousel`);
+  return publish(build(false));
 }
 
 /** Publish this person's Home view — on opening the tab, and again after they
  *  change a switch, so the ticks show what was saved and a switch that stayed
  *  off says why. */
 export async function publishHomeView(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>): Promise<void> {
-  await slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId, refused) });
+  const build = await homeViewBuilder(env, userId, refused);
+  await publishHome((view) => slackCall(env, "views.publish", { user_id: userId, view }), build, userId);
 }
 
 /** Same publish, but hands Slack's verdict back. Nothing in the event path
  *  reads it — a rejected view just leaves the old one up — so /debug/home is
  *  the only way to find out whether a block is valid. */
 export async function publishHomeViewForDebug(env: Env, userId: string): Promise<unknown> {
-  return slackCall(env, "views.publish", { user_id: userId, view: await buildHomeView(env, userId) });
+  return slackCall(env, "views.publish", { user_id: userId, view: (await homeViewBuilder(env, userId))(true) });
 }
 
 export async function handleAppHomeOpened(env: Env, event: SlackAppHomeOpenedEvent): Promise<void> {

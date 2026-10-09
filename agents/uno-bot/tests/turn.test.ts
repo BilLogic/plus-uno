@@ -1124,7 +1124,7 @@ test("a revision from outside the confirmer set is refused and leaves the card l
 
   assert.equal(outcome.disposition, "asked");
   assert.equal(outcome.staged, undefined);
-  assert.match(outcome.posted ?? "", /^:lock: <@U0BYSTANDER> Only <@U0OWNER> or <@U0POSTER> can change this proposal/);
+  assert.match(outcome.posted ?? "", /^:warning: <@U0BYSTANDER> Only <@U0OWNER> or <@U0POSTER> can change this proposal/);
   assert.equal((await h.threadState.getProposalByTs(held.proposalTs)).state, "found");
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, held.proposalTs);
 });

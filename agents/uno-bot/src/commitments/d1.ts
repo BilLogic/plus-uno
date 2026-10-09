@@ -95,6 +95,18 @@ const FOR_CARDS = `${SELECT} WHERE card_id IN (SELECT value FROM json_each(?)) O
 const BY_REMINDER = `${SELECT} WHERE nudge_ts = ? UNION ALL ${SELECT} WHERE followup_ts = ? LIMIT 1`;
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
+
+/** A patch's named fields as an UPDATE's SET, or null when it names none. */
+function setClause(patch: CommitmentPatch): { sql: string; values: unknown[] } | null {
+  const sets: string[] = [];
+  const values: unknown[] = [];
+  for (const [field, column] of Object.entries(PATCH_COLUMNS) as [keyof CommitmentPatch, string][]) {
+    if (patch[field] === undefined) continue;
+    sets.push(`${column} = ?`);
+    values.push(patch[field]);
+  }
+  return sets.length ? { sql: sets.join(", "), values } : null;
+}
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
 
 function toRow(r: CommitmentRecord): Row {
@@ -207,16 +219,22 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
       return results.map(fromRow);
     },
     async update(id, patch) {
-      const sets: string[] = [];
-      const values: unknown[] = [];
-      for (const [field, column] of Object.entries(PATCH_COLUMNS) as [keyof CommitmentPatch, string][]) {
-        if (patch[field] === undefined) continue;
-        sets.push(`${column} = ?`);
-        values.push(patch[field]);
-      }
-      if (!sets.length) return;
+      const set = setClause(patch);
+      if (!set) return;
       chargeD1Query();
-      await db.prepare(`UPDATE commitments SET ${sets.join(", ")} WHERE commitment_id = ?`).bind(...values, id).run();
+      await db.prepare(`UPDATE commitments SET ${set.sql} WHERE commitment_id = ?`).bind(...set.values, id).run();
+    },
+    async claim(id, patch) {
+      const set = setClause(patch);
+      if (!set) return false;
+      chargeD1Query();
+      const live = LIVE_STATES.map(() => "?").join(", ");
+      // One statement: the state test and the write cannot interleave with another claim.
+      const changed = await db
+        .prepare(`UPDATE commitments SET ${set.sql} WHERE commitment_id = ? AND state IN (${live}) RETURNING commitment_id`)
+        .bind(...set.values, id, ...LIVE_STATES)
+        .first();
+      return changed !== null;
     },
   };
 }

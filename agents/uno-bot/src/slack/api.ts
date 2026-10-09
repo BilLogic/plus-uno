@@ -114,6 +114,37 @@ export async function postToResponseUrl(
   });
 }
 
+/**
+ * Open a modal on an interaction's `trigger_id` (valid three seconds, one use).
+ * The opened view's id, which `viewsUpdate` fills in later, or null when Slack
+ * refused — an expired trigger answers `expired_trigger_id`. A view's blocks
+ * take the same markup pass as a message's.
+ */
+export async function viewsOpen(env: Env, triggerId: string, view: Record<string, unknown>): Promise<string | null> {
+  const res = await slackCall<SlackResponse>(env, "views.open", { trigger_id: triggerId, view: withSafeBlocks(view) });
+  if (!res.ok) return null;
+  const id = (res.view as { id?: unknown } | undefined)?.id;
+  return typeof id === "string" ? id : null;
+}
+
+/**
+ * Push a view over the modal a click came from (`views.push`), on that
+ * click's `trigger_id`. The pushed view's id, or null when Slack refused.
+ * Slack keeps at most three views in a stack.
+ */
+export async function viewsPush(env: Env, triggerId: string, view: Record<string, unknown>): Promise<string | null> {
+  const res = await slackCall<SlackResponse>(env, "views.push", { trigger_id: triggerId, view: withSafeBlocks(view) });
+  if (!res.ok) return null;
+  const id = (res.view as { id?: unknown } | undefined)?.id;
+  return typeof id === "string" ? id : null;
+}
+
+/** Replace an open modal's contents. Whether Slack took it. */
+export async function viewsUpdate(env: Env, viewId: string, view: Record<string, unknown>): Promise<boolean> {
+  const res = await slackCall<SlackResponse>(env, "views.update", { view_id: viewId, view: withSafeBlocks(view) });
+  return res.ok;
+}
+
 // Slack READ methods reject JSON bodies (invalid_arguments — the
 // conversations.replies lesson, 2026-07-10): they take GET query params.
 async function slackGet<T extends SlackResponse>(
@@ -271,6 +302,9 @@ export interface PostMessageInput {
   blocks?: unknown[];
   /** Also show this threaded reply in the main conversation. */
   reply_broadcast?: boolean;
+  /** False keeps Slack from previewing the links in the message. */
+  unfurl_links?: boolean;
+  unfurl_media?: boolean;
   /** The app's own tag, read back with `include_all_metadata`. */
   metadata?: SlackMessageMetadata;
 }
@@ -596,7 +630,7 @@ export async function postReviewRequest(env: Env, input: ReviewRequestInput) {
   const what = rowFor(input.toolName)?.reviewRequest ?? input.toolName;
   const reviewers = (input.reviewerUserIds ?? []).map((id) => `<@${id}>`).join(" ");
   const lines = [
-    `:eyes: *Review request* — a ${what} is ready.`,
+    `*Review request* — a ${what} is ready.`,
     input.artifactUrl ? `Artifact: ${input.artifactUrl}` : "",
     `Requested by <@${input.requesterUserId}> · thread in <#${input.originChannel}>`,
     reviewers ? `Suggested reviewers: ${reviewers}` : "",

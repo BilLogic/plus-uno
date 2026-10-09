@@ -52,8 +52,8 @@
 // `./capture-env.ts`.
 
 import { isSubrequestBudgetError, rethrowIfBudget } from "../net";
-import { proposalReplyThread, SWEEP_KEY, type PendingProposal } from "../thread-state/index";
-import type { ProposalCard } from "../turn/index";
+import { ownBlocks, proposalReplyThread, SWEEP_KEY, type PendingProposal } from "../thread-state/index";
+import type { CardFix, ProposalCard } from "../turn/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { isMorningRunTime } from "../commitments/due";
@@ -94,7 +94,7 @@ const ONE_MESSAGE = { chars: 40_000, blocks: 50 };
 /** What a card is edited to when it is taken back. */
 export const DM_CARD_NOT_STAGED =
   ":warning: This card didn't go through, so it can't be confirmed. Its fixes come back on a fresh card.";
-export const DM_CARD_SWITCHED_OFF = ':no_entry_sign: Withdrawn: you turned off "Catch decisions from my DMs".';
+export const DM_CARD_SWITCHED_OFF = ':no_entry: Withdrawn: you turned off "Catch decisions from my DMs".';
 
 /** One finding from a person's DMs, as the queue keeps it until its card. */
 export interface DmCaptureFinding {
@@ -183,10 +183,12 @@ export type DmCapturePostDeps = Common & {
   bot: {
     /** The owner's DM with uno-bot. */
     dmChannel(userId: string): Promise<string | null>;
+    /** `blocks` on the answer: the card's own blocks, when it went up with
+     *  them rather than stepping down to its text. */
     post(
       channel: string,
       message: { text: string; blocks: unknown[]; metadata: { event_type: string; event_payload: Record<string, string> } },
-    ): Promise<{ ok: boolean; ts?: string }>;
+    ): Promise<{ ok: boolean; ts?: string; blocks?: unknown[] }>;
     /** Take a posted card back: retired in ThreadState, then edited to say why. */
     withdraw(channel: string, ts: string, text: string): Promise<void>;
     /** Take a posted card back entirely: retired, then deleted (`chat.delete`). */
@@ -558,6 +560,9 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
 
   // An earlier try's card, found by its tag.
   let ts: string | null = null;
+  // The carousel it went up with, when this try posted it; a card an earlier
+  // try left up is staged on its text.
+  let blocks: unknown[] | undefined;
   const prior = await deps.bot.findPosted(dm, cardKey, tsOf(Date.parse(`${deps.runDate}T00:00:00Z`)));
   if (prior === "unknown") return report("handled", "could not tell whether an earlier try posted — held for the next try");
   if (prior) {
@@ -578,8 +583,16 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
     });
     if (!posted.ok || !posted.ts) return report("handled", "Slack refused the post — kept for tomorrow");
     ts = posted.ts;
+    blocks = posted.blocks;
   }
-  const proposal = dmCaptureProposal(card, { owner: user, channel: dm, ts, text: rendered.text, runDate: deps.runDate });
+  const proposal = dmCaptureProposal(card, {
+    owner: user,
+    channel: dm,
+    ts,
+    text: rendered.text,
+    ...(blocks ? { blocks } : {}),
+    runDate: deps.runDate,
+  });
   try {
     await deps.stage(proposal);
   } catch (err) {
@@ -652,33 +665,41 @@ export async function dropDmCapture(
 /** The card, as data. Page words are escaped; the DM is linked, never quoted. */
 export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard {
   const n = items.length;
-  const lines = [
-    `:mag: **${SWEEP_CARD_MARK}** — from your DMs: you settled ${n === 1 ? "something" : `${n} things`} that a page doesn't say yet.`,
-    "",
-  ];
-  items.forEach((item, i) => {
+  const head = `**${SWEEP_CARD_MARK}** — from your DMs: you settled ${n === 1 ? "something" : `${n} things`} that a page doesn't say yet.`;
+  // Only the owner confirms, so no card names anyone; the DM is a button.
+  const fixes: CardFix[] = items.map((item, i) => {
     const page = `<${item.target.url}|${escapeSlackText(flat(item.target.title) || "untitled")}>`;
     const where = `   - <${item.permalink}|where you said it>`;
+    const fix = {
+      page: { title: flat(item.target.title), url: item.target.url },
+      where: { label: "Your DM", url: item.permalink },
+    };
     if (item.add) {
       const place = item.add.section
         ? `add under ${page} › *${escapeSlackText(flat(item.add.section))}*`
         : `add a new section *${escapeSlackText(flat(item.add.newSection ?? ""))}* to ${page}`;
-      lines.push(`${i + 1}. ${place}`, `   - adds: “${escapeSlackText(flat(item.replacement))}”`, where);
-      return;
+      return {
+        ...fix,
+        change: `Adds: “${flat(item.replacement)}”`,
+        detail: [`${i + 1}. ${place}`, `   - adds: “${escapeSlackText(flat(item.replacement))}”`, where].join("\n"),
+      };
     }
     const { before, after } = changedSpan(item.original, item.replacement);
-    lines.push(
-      `${i + 1}. ${page}`,
-      `   - page says: “${escapeSlackText(flat(item.sourceSays))}”`,
-      `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
-      where,
-    );
+    return {
+      ...fix,
+      change: `“${before}” → “${after}”`,
+      detail: [
+        `${i + 1}. ${page}`,
+        `   - page says: “${escapeSlackText(flat(item.sourceSays))}”`,
+        `   - change: “${escapeSlackText(before)}” → “${escapeSlackText(after)}”`,
+        where,
+      ].join("\n"),
+    };
   });
-  lines.push(
-    "",
+  const tail =
     `Only you can confirm. One ✅ applies ${n === 1 ? "it" : `all ${n}`}; reply \`drop 2\` to leave one out. ` +
-      `Nothing from your DMs goes anywhere else. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
-  );
+    `Nothing from your DMs goes anywhere else. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`;
+  const lines = [head, "", ...fixes.map((f) => f.detail), "", tail];
   const operations = items.map((item) =>
     itemOperation({ target: item.target, blockId: item.blockId, lastEditedTime: item.lastEditedTime, replacement: item.replacement, add: item.add }),
   );
@@ -689,6 +710,7 @@ export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard 
     fields: [],
     caveats: [],
     operations,
+    fixes: { head, items: fixes, tail },
   };
 }
 
@@ -696,7 +718,7 @@ export function dmCaptureCard(items: readonly DmCaptureFinding[]): ProposalCard 
  *  uno-bot, its own thread, that only the owner can resolve. */
 export function dmCaptureProposal(
   card: ProposalCard,
-  posted: { owner: string; channel: string; ts: string; text: string; runDate: string },
+  posted: { owner: string; channel: string; ts: string; text: string; blocks?: unknown[]; runDate: string },
 ): PendingProposal {
   const operations = card.operations ?? [];
   const first = operations[0]!;
@@ -710,12 +732,15 @@ export function dmCaptureProposal(
     userMsgTs: posted.ts,
     proposalTs: posted.ts,
     proposalText: posted.text,
+    ...ownBlocks(posted),
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
     ttlMs: SWEEP_CARD_TTL_MS,
     confirmers: [posted.owner],
     sweepRun: posted.runDate,
     supersedeKey: SWEEP_KEY,
+    // What its carousel showed, so a `drop N` revision is a carousel too.
+    ...(card.fixes ? { fixes: card.fixes } : {}),
   };
 }
 

@@ -18,6 +18,7 @@
 
 import type { Env } from "../types";
 import {
+  canonicalNotionUrl,
   databaseOptions,
   queryRoadmapCards,
   ROADMAP_STATUS_PROP,
@@ -229,16 +230,23 @@ export async function executeRoadmapQuery(
     } else {
       results = cards.slice(0, MAX_ENUMERATION_ROWS);
       matched = cards.length;
+      // A list cut to its first rows is partial however fully the board was
+      // read, so "complete" is only for a read that was whole and a list that
+      // holds every match.
       note =
         (truncated
           ? "PARTIAL result set — the board has more rows than could be read. Say the list is partial; never present it as the whole board."
-          : "Complete result set from the live Roadmap board — safe to enumerate as the full answer.") +
+          : cards.length > MAX_ENUMERATION_ROWS
+            ? `PARTIAL result set — the first ${MAX_ENUMERATION_ROWS} of ${cards.length} matching cards. Say the list is the first ${MAX_ENUMERATION_ROWS} of ${cards.length}; never present it as the whole set.`
+            : "Complete result set from the live Roadmap board — safe to enumerate as the full answer.") +
         " Cite the board and link cards you name." +
-        (cards.length > MAX_ENUMERATION_ROWS ? ` (${cards.length - MAX_ENUMERATION_ROWS} more rows truncated — say the list is the first ${MAX_ENUMERATION_ROWS}.)` : "");
+        (truncated && cards.length > MAX_ENUMERATION_ROWS ? ` (${cards.length - MAX_ENUMERATION_ROWS} more rows truncated — say the list is the first ${MAX_ENUMERATION_ROWS}.)` : "");
     }
 
     return JSON.stringify({
       ok: true,
+      // The board itself, for the answer to cite once whichever cards it names.
+      board: { title: "Roadmap", url: canonicalNotionUrl(null, env.NOTION_ROADMAP_DB_ID) },
       filters: {
         ...(designStatus ? { design_status: designStatus } : {}),
         ...(title ? { title } : {}),

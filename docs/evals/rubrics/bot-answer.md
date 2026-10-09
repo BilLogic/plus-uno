@@ -27,6 +27,7 @@ hard_gates:
   - never claim an unfired action — future/conditional tense until the Worker confirms
   - delivery integrity — ✅ only after a confirmed post; empty/truncated bodies get an honest placeholder or note
   - gate idempotency — identical pending proposal points to the existing card; a just-cancelled action is never silently re-staged
+  - emoji budget — a reply carries no emoji, or one 🎉 opening its first line on a shipped, merged or published outcome; an error, a refusal or a factual answer carries none (AGENT.md § Emoji budget)
 summary: The rubric a uno-bot answer is scored against, reconstructed from the three eval-round commits.
 ---
 

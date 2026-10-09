@@ -10,6 +10,7 @@ import {
   answerMessages,
   deliverAnswer,
   MAX_POST_CHARS,
+  partMarker,
   type AnswerTransport,
 } from "../src/slack/answer-posts";
 import { renderDeliveredBody } from "../src/slack/render";
@@ -50,18 +51,12 @@ describe("a 20,000-character answer", () => {
     }
   });
 
-  it("numbers them (i/n), in order", () => {
-    messages.forEach((m, i) => {
-      assert.ok(
-        m.startsWith(`_(${i + 1}/${messages.length})_\n\n`),
-        `message ${i} opened with ${JSON.stringify(m.slice(0, 20))}`,
-      );
-    });
+  it("carries no number in the Markdown: the (i/n) is a line of its own", () => {
+    for (const m of messages) assert.doesNotMatch(m, /^_\(\d+\/\d+\)_/);
   });
 
   it("loses nothing and reorders nothing", () => {
-    const rejoined = messages.map((m) => m.replace(/^_\(\d+\/\d+\)_\n\n/, "")).join("\n\n");
-    assert.equal(rejoined, body);
+    assert.equal(messages.join("\n\n"), body);
   });
 
   it("leaves every paragraph whole, in exactly one message", () => {
@@ -113,15 +108,15 @@ describe("the truncation notice", () => {
 
 /** Records what a transport was asked to send, in the order it was asked. */
 function recordingTransport(streamOn: boolean) {
-  const sent: Array<{ via: "stream" | "post"; text: string; withFooter: boolean }> = [];
+  const sent: Array<{ via: "stream" | "post"; text: string; withFooter: boolean; marker: string | null }> = [];
   const transport: AnswerTransport = {
-    async stream(text, withFooter) {
+    async stream(text, withFooter, marker) {
       if (!streamOn) return false;
-      sent.push({ via: "stream", text, withFooter });
+      sent.push({ via: "stream", text, withFooter, marker });
       return true;
     },
-    async post(text, withFooter) {
-      sent.push({ via: "post", text, withFooter });
+    async post(text, withFooter, marker) {
+      sent.push({ via: "post", text, withFooter, marker });
       return true;
     },
   };
@@ -157,10 +152,22 @@ describe("delivering the pieces", () => {
     );
   });
 
-  it("falls back to a plain post when the stream declines", async () => {
+  it("hands each part its (i/n), in order", async () => {
+    const parts = answerMessages(paragraphs(100, 200).join("\n\n"));
+    assert.ok(parts.length > 1);
+    const { sent, transport } = recordingTransport(true);
+    await deliverAnswer(parts, transport);
+    assert.deepEqual(
+      sent.map((s) => s.marker),
+      parts.map((_, i) => `(${i + 1}/${parts.length})`),
+    );
+  });
+
+  it("falls back to a plain post when the stream declines, with no number on a lone answer", async () => {
     const { sent, transport } = recordingTransport(false);
     await deliverAnswer(["only one"], transport);
-    assert.deepEqual(sent, [{ via: "post", text: "only one", withFooter: true }]);
+    assert.deepEqual(sent, [{ via: "post", text: "only one", withFooter: true, marker: null }]);
+    assert.equal(partMarker(0, 1), null);
   });
 
   it("reports failure when a continuation does not post", async () => {

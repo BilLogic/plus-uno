@@ -21,6 +21,8 @@ import { createD1ResolutionLog } from "../../src/usage/resolution-d1";
 import { runResolutionLogConformance } from "../helpers/resolution-log-conformance";
 import { runCategoryConformance, runUsageLogConformance, turnRecord } from "../helpers/usage-log-conformance";
 import { createD1ProposalEventLog } from "../../src/usage/proposal-events-d1";
+import { createD1AnswerFeedbackLog } from "../../src/usage/feedback-d1";
+import { runAnswerFeedbackConformance } from "../helpers/answer-feedback-conformance";
 import { runProposalEventConformance, stagedRow } from "../helpers/proposal-events-conformance";
 
 const bindings = env as unknown as {
@@ -35,6 +37,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await bindings.USAGE_DB.prepare("DELETE FROM turns").run();
   await bindings.USAGE_DB.prepare("DELETE FROM proposal_events").run();
+  await bindings.USAGE_DB.prepare("DELETE FROM answer_feedback").run();
 });
 
 runUsageLogConformance("d1", () => createD1UsageLog({ db: bindings.USAGE_DB }), {
@@ -72,6 +75,19 @@ runProposalEventConformance(
   }),
   { it: (name, fn) => it(name, fn) },
 );
+
+runAnswerFeedbackConformance("d1", () => createD1AnswerFeedbackLog({ db: bindings.USAGE_DB }), {
+  it: (name, fn) => it(name, fn),
+});
+
+describe("[d1] answer feedback", () => {
+  it("refuses a reason the schema does not name", async () => {
+    const log = createD1AnswerFeedbackLog({ db: bindings.USAGE_DB });
+    await expect(
+      log.record({ channel: "C1", answerTs: "1.2", userId: "U1", turnId: null, rating: "down", reason: "rude" as never, hasNote: false, at: 1 }),
+    ).rejects.toThrow(/CHECK/);
+  });
+});
 
 describe("[d1] proposal events", () => {
   it("refuses an event kind the schema does not name", async () => {

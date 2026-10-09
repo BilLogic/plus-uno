@@ -49,16 +49,16 @@ export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", gl
 export const CARD_FOOTERS: Record<"card_todo" | "card_unowned" | "card_stale", ReminderFooter> = {
   card_todo: {
     choices: [
-      { glyph: "white_check_mark", label: "✅ Draft it" },
-      { glyph: "no_good", label: "🙅 Drop it" },
+      { glyph: "white_check_mark", label: "Draft it" },
+      { glyph: "no_good", label: "Drop it" },
     ],
   },
   card_unowned: "Reply here with an @mention, or \"me\", and I'll draft the Contributor change",
   card_stale: {
     choices: [
-      { glyph: "raised_hands", label: "🙌 Done" },
-      { glyph: "hourglass_flowing_sand", label: "⏳ Still on it" },
-      { glyph: "no_good", label: "🙅 Drop it" },
+      { glyph: "raised_hands", label: "Done" },
+      { glyph: "hourglass_flowing_sand", label: "Still on it" },
+      { glyph: "no_good", label: "Drop it" },
     ],
   },
 };
@@ -80,6 +80,16 @@ export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", sta
       return staged ? "Understood. Pick the card's new Design Status in this thread." : "Understood. I won't ask again.";
   }
 }
+
+/** Ends the edit that replaces a follow-up's buttons: anyone may answer one,
+ *  so the thread sees who did. */
+export function answeredBy(user: string): string {
+  return `Answered by <@${user}>.`;
+}
+
+/** Why a Draft it changed nothing when the draft did not go up: the row stays
+ *  live, so another tap tries again. */
+export const DRAFT_NOT_POSTED = "The draft card didn't go up, so nothing changed. Try again in a moment.";
 
 function mentionsOf(people: readonly string[]): string {
   return [...new Set(people.filter(Boolean))].map((p) => `<@${p}>`).join(" ");

@@ -13,7 +13,6 @@
 
 import type { Env } from "../types";
 import { conversationsMembers, getPermalink, postMessage, updateMessage } from "../slack/api";
-import { proposalCardBlocks } from "../slack/proposal-render";
 import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
@@ -154,8 +153,8 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
       async postToThread(channel, ts, text) {
         await postMessage(env, { channel, thread_ts: ts, text });
       },
-      async closeCard(channel, ts, text, note) {
-        const res = await updateMessage(env, { channel, ts, text: `${text}\n${note}`, blocks: proposalCardBlocks(text, note) });
+      async closeCard(channel, ts, message) {
+        const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
         if (!res.ok) throw new Error(res.error ?? "chat.update failed");
       },
       now: () => Date.now(),

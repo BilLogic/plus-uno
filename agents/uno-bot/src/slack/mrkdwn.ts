@@ -30,7 +30,6 @@
 export function escapeSlackText(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-
 /**
  * Keep the `<…>` markup Slack can parse, and entity-escape every other `<`,
  * `>` and bare `&`.

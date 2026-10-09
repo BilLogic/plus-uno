@@ -206,7 +206,7 @@ describe("the checklist", () => {
         kind: "message",
         channel: "C123",
         threadTs: "100.1",
-        text: ":hourglass_flowing_sand: Still on it — this one needs a longer dig.",
+        text: "Still on it — this one needs a longer dig.",
         blocks: false,
       },
     ]);
@@ -222,7 +222,7 @@ describe("the checklist", () => {
     await delivery.endProgress("complete");
 
     assert.deepEqual(slack.calls, [
-      { kind: "message", channel: "C123", threadTs: "100.1", text: ":hourglass_flowing_sand: Checking the board", blocks: false },
+      { kind: "message", channel: "C123", threadTs: "100.1", text: "Checking the board", blocks: false },
     ]);
   });
 

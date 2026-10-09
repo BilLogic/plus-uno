@@ -49,6 +49,62 @@ export function renderRelayedDm(dm: RelayedDm): string {
   return lines.join("\n");
 }
 
+/** The longest message a card's body holds, per Slack's card reference. */
+const CARD_BODY_CHARS = 200;
+/** The longest text a section holds. */
+const SECTION_CHARS = 3000;
+
+const mrkdwn = (text: string) => ({ type: "mrkdwn", text });
+
+/** A long message as sections, cut at line ends where it can be. */
+function sectionsOf(text: string): Array<Record<string, unknown>> {
+  const out: Array<Record<string, unknown>> = [];
+  let rest = text;
+  while (rest.length > SECTION_CHARS) {
+    const cut = rest.lastIndexOf("\n", SECTION_CHARS);
+    const at = cut > 0 ? cut : SECTION_CHARS;
+    out.push({ type: "section", text: mrkdwn(rest.slice(0, at)) });
+    rest = rest.slice(at).replace(/^\n/, "");
+  }
+  if (rest) out.push({ type: "section", text: mrkdwn(rest) });
+  return out;
+}
+
+/**
+ * The DM as Slack blocks: a card with who asked as its title, the message as
+ * its body and an "Open the thread" button back to where it was asked.
+ *
+ * The text copy (`renderRelayedDm`) still carries the attribution and the
+ * link, because notifications, a client that cannot draw the card and the
+ * bot's memory of the DM all read the text. A message longer than a card's
+ * body sits whole beneath the card instead. A request made in the
+ * requester's own DM gets no button — its link opens for them alone — and
+ * the line saying so stays under the card.
+ */
+export function renderRelayedDmBlocks(dm: RelayedDm): Array<Record<string, unknown>> {
+  const text = dm.text.trim();
+  const fits = text.length <= CARD_BODY_CHARS;
+  const button = dm.permalink && !dm.originIsDm;
+  const card: Record<string, unknown> = {
+    type: "card",
+    title: mrkdwn(`<@${dm.requesterId}> asked me to pass this on`),
+    ...(fits ? { body: mrkdwn(text) } : {}),
+    ...(button
+      ? { actions: [{ type: "button", text: { type: "plain_text", text: "Open the thread" }, url: dm.permalink }] }
+      : {}),
+  };
+  const blocks: Array<Record<string, unknown>> = [card, ...(fits ? [] : sectionsOf(text))];
+  if (dm.permalink && dm.originIsDm) {
+    blocks.push({
+      type: "context",
+      elements: [
+        mrkdwn(`Asked in <@${dm.requesterId}>'s DM with me. <${dm.permalink}|The request> is in their DM, so only they can open it.`),
+      ],
+    });
+  }
+  return blocks;
+}
+
 /** A Slack user id — `U…` or, on Enterprise Grid, `W…`. */
 const USER_ID_RE = /^[UW][A-Z0-9]{2,}$/;
 

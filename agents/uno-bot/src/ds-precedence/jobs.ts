@@ -281,7 +281,15 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
   if (opts.dryRun) return { posted: false, summary: `would post ${items.length} item(s) and a card` };
 
   const words = precedenceList(items, weekOf, deps.ruleUrl);
-  const list = await deps.post({ text: words.text });
+  // The table, and the plain list if Slack refuses it — each with the items it
+  // had no room for, which go in the thread.
+  let overflow = words.table.overflow;
+  let list = await deps.post({ text: words.table.text, blocks: words.table.blocks });
+  if (!list.ok || !list.ts) {
+    console.warn("[ds-precedence] the list table was refused — posting the plain list");
+    overflow = words.overflow;
+    list = await deps.post({ text: words.text });
+  }
   if (!list.ok || !list.ts) {
     console.error("[ds-precedence] the list did not post — report kept for tomorrow");
     return { posted: false, summary: "list post failed; kept" };
@@ -305,7 +313,7 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
   await deps.recordThread(base);
   // The items the list post had no room for, before the card, so the card
   // stays the last thing in the thread.
-  for (const text of words.overflow) {
+  for (const text of overflow) {
     const spilled = await deps.post({ text, thread_ts: list.ts });
     if (!spilled.ok) console.error("[ds-precedence] part of the list did not post in the thread");
   }

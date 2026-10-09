@@ -1,0 +1,33 @@
+{
+  "case": "CH2",
+  "source": "authored",
+  "recordedAt": "2026-10-08",
+  "note": "AUTHORED with the charts ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=CH2`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Which Roadmap cards are WIP right now?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "roadmap_query",
+              "args": {
+                "design_status": "WIP",
+                "as_table": true
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Four cards are WIP right now.**\n\nCard 1 is the oldest of them; the table below has all four, linked."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "roadmap_query",
+          "text": "{\"ok\": true, \"filters\": {\"design_status\": \"WIP\"}, \"count\": 4, \"matched\": 4, \"truncated\": false, \"cards\": [{\"title\": \"Card 1\", \"url\": \"https://www.notion.so/card-1\", \"card_number\": 401, \"design_status\": \"WIP\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 2\", \"url\": \"https://www.notion.so/card-2\", \"card_number\": 402, \"design_status\": \"WIP\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 3\", \"url\": \"https://www.notion.so/card-3\", \"card_number\": 403, \"design_status\": \"WIP\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}, {\"title\": \"Card 4\", \"url\": \"https://www.notion.so/card-4\", \"card_number\": 404, \"design_status\": \"WIP\", \"dev_status\": null, \"pillars\": [], \"people\": {\"Contributor\": [\"Bill Guo\"]}}], \"note\": \"Complete result set from the live Roadmap board.\"}"
+        }
+      ]
+    }
+  ]
+}

@@ -13,6 +13,7 @@
 import type { Env } from "../types";
 import { rethrowIfBudget } from "../net";
 import {
+  canonicalNotionUrl,
   notionSearch,
   findTeamMembers,
   queryThirdPartyApps,
@@ -248,6 +249,8 @@ async function searchCatalogScope(
     ok: true,
     scope,
     label: cfg.label,
+    // The database itself, for the answer to cite once whichever rows it names.
+    database: { title: cfg.label, url: canonicalNotionUrl(null, databaseId.trim()) },
     count: results.length,
     scanned: rows.length,
     results: results.map((r) => ({

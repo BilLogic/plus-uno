@@ -122,7 +122,7 @@ export function figmaNodeUrl(fileKey: string, nodeId: string): string {
   return `https://www.figma.com/design/${fileKey}?node-id=${nodeId.replace(/:/g, "-")}`;
 }
 
-function versionUrl(fileKey: string, versionId: string): string {
+export function versionUrl(fileKey: string, versionId: string): string {
   return `https://www.figma.com/design/${fileKey}?version-id=${versionId}`;
 }
 
@@ -296,7 +296,7 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
     if (v.description) lines.push(`  > ${v.description.replace(/\n/g, "\n  > ")}`);
   }
   if (!changeSet.versions.length) lines.push("- No published version: the component metadata changed without one.");
-  lines.push(`- Found by uno-bot's end-of-day library poll on ${changeSet.detectedAt.slice(0, 10)}.`, "");
+  lines.push(`- Found by le goat's end-of-day library poll on ${changeSet.detectedAt.slice(0, 10)}.`, "");
 
   lines.push("## Changed components", "");
   if (rows.length) {
@@ -341,7 +341,7 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
   };
 }
 
-function firstLine(text: string): string {
+export function firstLine(text: string): string {
   return text.split("\n")[0]!.trim().slice(0, 80);
 }
 
@@ -352,7 +352,7 @@ function firstLine(text: string): string {
 // Every Figma-sourced string is escaped.
 
 const HAS_CODE = "Has code";
-const NO_CODE_YET = "No code mapping yet";
+export const NO_CODE_YET = "No code mapping yet";
 
 /** The library file itself, which an edited-not-published post links. */
 function libraryUrl(fileKey: string): string {
@@ -370,7 +370,7 @@ function codeGroups(intake: PublishIntake): Array<{ label: string; names: string
 
 /** "7 components changed: 2 new, 5 updated." — the count is the rows, and so
  *  is the list under it. */
-function countLine(rows: readonly IntakeRow[]): string {
+export function countLine(rows: readonly IntakeRow[]): string {
   if (!rows.length) return "No changed components found. The version has the details.";
   const parts = (["new", "updated", "removed"] as const)
     .map((change) => ({ change, n: rows.filter((r) => r.change === change).length }))

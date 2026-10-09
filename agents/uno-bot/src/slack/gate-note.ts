@@ -9,11 +9,14 @@
 // Four doors post them and not one of them may hold Slack's copy — three live
 // in Gate (`gate/reaction-door.ts`, the button door's resolver, the model's
 // `proposal_resolve`) and one in Turn. They all hand the note to
-// `Delivery.postGateNote`, and `slack/delivery-adapter.ts` calls this.
+// `Delivery.postGateNote`, and `slack/delivery-adapter.ts` calls this. A note
+// about the card's own state — aged out, replaced, waiting on someone else —
+// arrives with the card, and the adapter edits it onto the card as its last
+// line (`renderCardNote`) instead of posting a new message.
 //
 // The wordings themselves are load-bearing and have each been earned:
 //
-//   • THE LOST RACE is one wording for all four doors, and deliberately
+//   • THE LOST RACE is one wording for every door, and deliberately
 //     without a mention: the model's signal has no user, and a message that
 //     differs by door is a message that drifts by door.
 //   • AN AGED-OUT CARD is never met with silence. Live 2026-07-10, silence
@@ -25,8 +28,8 @@
 //     send them to.
 //   • A STATED CARD (the library card, the weekly DS precedence card) is one
 //     nobody asked for, with no ⚠️ and a ⛔ that means what its footer says.
-//     "Tell me what to change", "ask me again" and "the newest :warning: card"
-//     are all wrong on it, so it carries its own words for a ⛔ and a late
+//     "Tell me what to change", "ask me again" and "the newest card" are all
+//     wrong on it, so it carries its own words for a ⛔ and a late
 //     decision (`PendingProposal.stated`, written beside each card's copy),
 //     and a replaced card or a gesture beside it gets a stated line here.
 //     These follow the Figma copy rules (`docs/connectors/slack.md` § Figma
@@ -36,12 +39,12 @@
 
 import type { GateNote } from "../turn/index";
 import { PROPOSAL_TTL_MS, type StatedCardWords } from "../thread-state/index";
-import { SLACK_USER_ID } from "./mrkdwn";
+import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import { gateWordsFor } from "../agent/tool-table";
 
 /** The lost race. */
 export const STALE_POST =
-  ":hourglass: That proposal was already resolved — another confirmation got there first, " +
+  "That proposal was already resolved — another confirmation got there first, " +
   "so nothing was executed twice.";
 
 /**
@@ -50,7 +53,7 @@ export const STALE_POST =
  */
 export function expiredPost(ttlMs?: number): string {
   return (
-    ":hourglass: That proposal had already expired — nothing was executed. " +
+    "That proposal had already expired — nothing was executed. " +
     `It stayed live for ${lifetimeWords(ttlMs ?? PROPOSAL_TTL_MS)}. ` +
     "Ask me again and I'll set the same thing up fresh."
   );
@@ -69,10 +72,10 @@ function lifetimeWords(ms: number): string {
 
 /** The ✅/⛔ on a proposal a revision replaced (#573). */
 export const SUPERSEDED_POST =
-  ":arrows_counterclockwise: That proposal was replaced by a newer one — nothing was executed. " +
-  "Confirm on the newest :warning: card in this thread instead.";
+  "That proposal was replaced by a newer one — nothing was executed. " +
+  "Confirm on the newest card in this thread instead.";
 
-/** The ✅/⛔ on a stated card a revision replaced: it has no ⚠️ to point at. */
+/** The ✅/⛔ on a stated card a revision replaced. */
 export const STATED_SUPERSEDED_POST =
   "That card was revised, so nothing ran. Decide on the newest card in this thread.";
 
@@ -90,6 +93,12 @@ export function defaultNarrative(decision: "confirm" | "cancel"): string {
   return decision === "confirm" ? "Got it — kicking that off." : "Cancelled.";
 }
 
+/** The pop-up's Reject, and the reason given with it: the person's own words,
+ *  so text and never markup. */
+export function rejectedLine(reason?: string): string {
+  return reason ? `Rejected, so nothing runs. Reason: ${escapeSlackText(reason)}` : "Rejected, so nothing runs.";
+}
+
 /**
  * A ⛔ on a card that runs part of itself on a cancel. Worded from each row's
  * own operation kind, so it says what goes ahead rather than naming a tool.
@@ -104,12 +113,18 @@ function thirdPerson(phrase: string): string {
   return phrase.replace(/^(\w+)/, (verb) => (/(s|sh|ch|x)$/.test(verb) ? `${verb}es` : `${verb}s`));
 }
 
+/** A signal on a card sent back with Needs changes, while its revision is
+ *  written. Nothing ran, and the new card is where to decide. */
+export const BEING_REVISED_POST =
+  "That proposal is being revised, so nothing ran. Decide on the revised card when it posts in the thread.";
+
 /** One verdict, as the line a person reads. */
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
     case "resolved":
       // A stated card's ⛔ says what its footer promised, in the card's words.
       if (note.decision === "cancel" && note.cancelled) return `${note.cancelled}.`;
+      if (note.decision === "cancel" && note.rejected && !note.stillRuns?.length) return rejectedLine(note.rejected.reason);
       return note.stillRuns?.length ? cancelStillRuns(note.stillRuns) : defaultNarrative(note.decision);
     case "said":
       return note.text;
@@ -130,8 +145,8 @@ export function renderGateNote(note: GateNote): string {
         );
       }
       return (
-        `:eyes: <@${note.userId}> I saw your :${note.glyph}:, but it is not on the proposal I am holding — ` +
-        `nothing was executed. Use the buttons on the :warning: card for *${note.toolName}* just above, ` +
+        `:warning: <@${note.userId}> I saw your :${note.glyph}:, but it is not on the proposal I am holding — ` +
+        `nothing was executed. Use the buttons on the card for *${note.toolName}* just above, ` +
         `or react there.`
       );
     case "which-card":
@@ -139,16 +154,34 @@ export function renderGateNote(note: GateNote): string {
       // sits in a card's own thread and answers that card. Two cards are two different writes, and a ✅ outside both threads says
       // nothing about which one it meant. Guessing runs the wrong one.
       return (
-        `:point_up: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
-        `nothing was executed. React on the :warning: card you mean, or use its buttons.`
+        `:warning: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
+        `nothing was executed. React on the card you mean, or use its buttons.`
       );
     case "not-a-confirmer":
       return notAConfirmerLine(note);
+    case "being-revised":
+      return BEING_REVISED_POST;
     case "resolve-failed":
-      return `:warning: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
+      return `:x: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
     case "cut-off":
       return cutOffLine(note);
   }
+}
+
+/**
+ * A verdict as the line edited onto its card (`Delivery.postGateNote` with a
+ * card): the same words as in the thread, without the mention of the person
+ * whose gesture it answered — a line on the card stays there for everyone,
+ * and an edit notifies no one anyway.
+ */
+export function renderCardNote(note: GateNote): string {
+  return note.kind === "not-a-confirmer" ? notAConfirmerLine({ ...note, userId: undefined }) : renderGateNote(note);
+}
+
+/** Whether the card a note sits on can still be decided: only one waiting on
+ *  someone else is. Every other card note closes it. */
+export function cardStaysLive(note: GateNote): boolean {
+  return note.kind === "not-a-confirmer";
 }
 
 /**
@@ -163,7 +196,7 @@ function notAConfirmerLine(note: Extract<GateNote, { kind: "not-a-confirmer" }>)
   const can = who.length
     ? `Only ${joinNames(who)} can confirm or cancel this proposal`
     : "Nobody here can confirm or cancel this proposal";
-  return `:lock: ${to}${can} — nothing was executed.`;
+  return `:warning: ${to}${can} — nothing was executed.`;
 }
 
 /** "a", "a or b", "a, b or c". */
