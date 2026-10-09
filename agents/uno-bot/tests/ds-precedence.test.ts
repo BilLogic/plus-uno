@@ -426,7 +426,6 @@ describe("the morning post", () => {
     const p = staged[0]!;
     assert.deepEqual(p.confirmers, MEMBERS);
     assert.equal(p.ttlMs, PRECEDENCE_CARD_TTL_MS);
-    assert.equal(p.onCancel, undefined);
     assert.deepEqual(p.stated, {
       cancelled: "Nothing filed this week",
       expired: "That card closed after 6 days with no decision, so nothing was filed.",

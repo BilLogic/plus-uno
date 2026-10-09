@@ -216,7 +216,7 @@ test("a single-operation batch keeps the per-tool result it always had", () => {
 });
 
 test("a stated card is its lead and its one footer — no preamble, no plan, no second footer", () => {
-  const footer = ":white_check_mark: files the intake and drafts the code. :no_entry: files the intake only.";
+  const footer = ":white_check_mark: files the intake and drafts the code. :no_entry: files nothing.";
   const card = renderProposalCard({
     kind: "stated",
     verb: "file this intake and start the implementation",

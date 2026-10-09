@@ -264,15 +264,6 @@ export interface PendingProposal {
    */
   revising?: { userId: string; at?: number };
   /**
-   * What a ⛔ still runs, when the card says so. Absent — every turn's card —
-   * a cancel runs nothing. Only a card the Worker stages itself sets it: the
-   * Figma library card files its intake whichever way it is decided and only
-   * the implementation waits on the ✅ (`figma-library/post.ts`). The card's
-   * own copy states it, since a cancel that does something is not what any
-   * other card means by one.
-   */
-  onCancel?: ProposalOperation[];
-  /**
    * The card's own words for the gate's answers, on a card the Worker states
    * itself (`ProposalCard.kind: "stated"` — the library card, the weekly DS
    * precedence card). Absent — every turn's card — the generic lines in
@@ -400,6 +391,9 @@ export interface DecisionReportRecord {
   /** How long its items stay decidable — the record outlives them by
    *  `REPORT_GRACE_MS`, so a late View still reads it. */
   ttlMs: number;
+  /** Blocks the report posted below its cards — the library release's table
+   *  of changed components — drawn again under them on every redraw. */
+  after?: unknown[];
   /** Set when Slack refused its cards and it posted as plain sections: every
    *  redraw is plain too. */
   plain?: boolean;
@@ -436,29 +430,34 @@ export function changedReport(report: DecisionReportRecord, change: ReportChange
  * own in `slack/gate-note.ts`, which needs no words from the card.
  */
 export interface StatedCardWords {
-  /** What a ⛔ did, as a phrase with no person in it: "Intake only". The card
-   *  ends `:no_entry: <phrase>, decided by <@U>.` and the ⛔'s note in the
-   *  thread is `<phrase>.` */
+  /** What a ⛔ did, as a phrase with no person in it: "Rejected, nothing
+   *  filed". The card ends `:no_entry: <phrase>, decided by <@U>.` and the
+   *  ⛔'s note in the thread is `<phrase>.` */
   cancelled: string;
   /** The answer to a ✅ or ⛔ that came after the card's window closed. */
   expired: string;
 }
 
+/** What a ⛔ did on a library card staged while a ⛔ still filed its intake. */
+export const LEGACY_LIBRARY_CANCELLED = "No code drafted. Its intake is filed when the card's window closes";
+
+/**
+ * What a ⛔ did on a stated card, in its own words — or nothing, on any other
+ * card. A library card staged before a ⛔ stopped filing its intake still
+ * carries the batch that did (`onCancel`) and the words "Intake only"; its ⛔
+ * now runs nothing, and the tracker files its intake when its window closes
+ * (`figma-library/track.ts`), so it says that instead.
+ *
+ * @param proposal - The card, as stored
+ */
+export function statedCancelOf(proposal: PendingProposal): string | undefined {
+  if (!proposal.stated) return undefined;
+  return "onCancel" in proposal ? LEGACY_LIBRARY_CANCELLED : proposal.stated.cancelled;
+}
+
 /** The card the ask behind this proposal staged: its origin, or itself. */
 export function stagingCardOf(proposal: Pick<PendingProposal, "proposalTs" | "originProposalTs">): string {
   return proposal.originProposalTs ?? proposal.proposalTs;
-}
-
-/**
- * The proposal a won ⛔ runs as: its `onCancel` batch in place of its own,
- * with no cancel run of its own — so the execution record, a cut-off note and
- * any re-staged card all describe what the cancel actually started.
- */
-export function cancelRunOf(proposal: PendingProposal): PendingProposal | null {
-  const operations = proposal.onCancel;
-  if (!operations?.length) return null;
-  const { onCancel: _onCancel, ...rest } = proposal;
-  return { ...rest, operations, toolName: operations[0]!.toolName, input: operations[0]!.input };
 }
 
 /** What a staging did beside storing the card: the ts of each live card in
