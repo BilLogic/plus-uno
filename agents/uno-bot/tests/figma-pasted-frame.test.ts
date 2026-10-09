@@ -48,11 +48,12 @@ const COMMENTS = [
 ];
 
 let requests: string[] = [];
+let nodeName: string | undefined = FRAME.name;
 globalThis.fetch = (async (input: unknown) => {
   const url = String(input);
   requests.push(url);
   if (url.includes(`/v1/files/${FILE}/nodes`)) {
-    return Response.json({ name: "Sessions", nodes: { [NODE]: { document: FRAME } } });
+    return Response.json({ name: "Sessions", nodes: { [NODE]: { document: { ...FRAME, name: nodeName } } } });
   }
   if (url.includes(`/v1/files/${FILE}/comments`)) return Response.json({ comments: COMMENTS });
   throw new Error(`no stub for ${url}`);
@@ -62,6 +63,16 @@ globalThis.fetch = (async (input: unknown) => {
 const env = (): Env => ({ FIGMA_ACCESS_TOKEN: "figd_test" }) as Env;
 
 describe("a pasted frame link, read end to end", () => {
+  it("uses the file's name when the linked frame has no name", async () => {
+    nodeName = undefined;
+    try {
+      const { executeReadSource } = await import("../src/tools/read-source.js");
+      const payload = JSON.parse(await executeReadSource(env(), { url: LINK }));
+      assert.equal(payload.title, "Sessions");
+    } finally {
+      nodeName = FRAME.name;
+    }
+  });
   it("brings the threads pinned to the frame into the turn's source_read", async () => {
     requests = [];
     const { executeReadSource } = await import("../src/tools/read-source.js");
