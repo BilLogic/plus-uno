@@ -22,15 +22,10 @@ import type { CardFix, CardFixes } from "../turn/index";
 import { carouselOf, logoFor } from "./answer-cards-block";
 import { textSections } from "./render";
 import { foldedBox } from "./sources-box";
-// Slack's limits on a card's words, and a carousel's cards (also a box's
-// children), as the shared decision card holds them.
-import { CARD_BODY_CHARS as BODY_CHARS, CARD_TITLE_CHARS as TITLE_CHARS, MAX_REPORT_ITEMS as MAX_FIXES } from "./decision-cards";
+import { CARD_BODY_CHARS, CARD_TITLE_CHARS, MAX_REPORT_ITEMS, clip, plain } from "./decision-cards";
 
 /** The closed box's title. */
 export const FIX_DETAIL_TITLE = "Page says / thread says";
-
-const clip = (s: string, max: number): string => (s.length <= max ? s : `${s.slice(0, max - 1)}…`);
-const plain = (text: string) => ({ type: "plain_text", text });
 
 /** One fix's card. */
 function fixCard(fix: CardFix, n: number): Record<string, unknown> {
@@ -40,9 +35,9 @@ function fixCard(fix: CardFix, n: number): Record<string, unknown> {
   return {
     type: "card",
     icon: { type: "image", image_url: logo.url, alt_text: logo.name },
-    title: plain(clip(title, TITLE_CHARS)),
+    title: plain(clip(title, CARD_TITLE_CHARS)),
     ...(by ? { subtitle: { type: "mrkdwn", text: by } } : {}),
-    body: plain(clip(fix.change, BODY_CHARS)),
+    body: plain(clip(fix.change, CARD_BODY_CHARS)),
     actions: [
       { type: "button", text: plain("Open"), url: fix.page.url },
       ...(fix.where ? [{ type: "button", text: plain(fix.where.label), url: fix.where.url }] : []),
@@ -58,7 +53,7 @@ function fixCard(fix: CardFix, n: number): Record<string, unknown> {
  */
 export function sweepCardBlocks(fixes: CardFixes, footer: string): unknown[] | null {
   const { items } = fixes;
-  if (items.length === 0 || items.length > MAX_FIXES) return null;
+  if (items.length === 0 || items.length > MAX_REPORT_ITEMS) return null;
   const details = items.map((fix) => textSections(fix.detail));
   // One section per fix, or the box would need more children than it holds.
   if (details.some((d) => d.length !== 1)) return null;

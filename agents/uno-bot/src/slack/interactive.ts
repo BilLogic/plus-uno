@@ -25,10 +25,10 @@ import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
-import { conversationsOpen, conversationsReplies, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
-import { executeVerdict } from "../agent/resolve-proposal";
+import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
+import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
-import { DECISION_REVIEW_ACTION_PREFIX, itemCardText, itemOfKey, reviewKeyOf, withItemCardFrom } from "./decision-cards";
+import { DECISION_REVIEW_ACTION_PREFIX, reviewPressOf } from "./decision-cards";
 import {
   NEEDS_CHANGES_LEAD,
   runReviewDecision,
@@ -75,7 +75,7 @@ interface InteractionPayload {
   response_url?: string;
   user?: { id?: string };
   channel?: { id?: string };
-  message?: { ts?: string; thread_ts?: string; text?: string; blocks?: unknown[] };
+  message?: { ts?: string; thread_ts?: string; text?: string };
   actions?: Array<{ action_id?: string; value?: string; selected_options?: { value?: string }[] }>;
   callback_id?: string;
   /** A click's one-use, three-second key to `views.open`. */
@@ -271,32 +271,21 @@ async function openReview(env: Env, payload: InteractionPayload, itemAction?: st
   const ts = payload.message?.ts;
   const userId = payload.user?.id;
   if (!triggerId || !channel || !ts || !userId) return;
-  // An item of a decision report: its own proposal, and its own card's words
-  // for View once that proposal is gone.
-  const itemKey = itemAction ? reviewKeyOf(itemAction, ts) : null;
-  const messageTs = itemKey ?? ts;
-  const item = itemKey ? itemOfKey(itemKey) : null;
-  const cardText = item ? itemCardText(payload.message?.blocks ?? [], item.itemId) : payload.message?.text;
-  await runReviewOpen({ triggerId, channel, messageTs, userId, ...(cardText ? { cardText } : {}) }, reviewDoorDeps(env));
-}
-
-/**
- * Edit a card in place. An item of a decision report shares its message with
- * the report's other items, so its card is set into the message as Slack
- * holds it now, read just before: an item decided meanwhile keeps its own
- * state. A failed read falls back to the blocks the item was staged with.
- * Two items decided in the same instant can still race, the later edit
- * restoring the other's card; its decision stands either way, and View tells
- * the truth.
- */
-async function editCard(env: Env, channel: string, key: string, message: { text: string; blocks: unknown[] }) {
-  const item = itemOfKey(key);
-  if (!item) return updateMessage(env, { channel, ts: key, text: message.text, blocks: message.blocks });
-  const read = await conversationsReplies(env, channel, item.messageTs, 1).catch(() => null);
-  const live = read?.ok ? read.messages?.find((m) => m.ts === item.messageTs) : undefined;
-  const blocks = live?.blocks ? withItemCardFrom(live.blocks, message.blocks, item.itemId) : message.blocks;
-  // The text copy stays the report's own: the decision is on the card.
-  return updateMessage(env, { channel, ts: item.messageTs, text: live?.text ?? message.text, blocks });
+  // An item of a decision report: its own proposal, which a press names by
+  // its message and its id.
+  const press = itemAction ? reviewPressOf(itemAction, ts) : null;
+  const cardText = press ? undefined : payload.message?.text;
+  await runReviewOpen(
+    {
+      triggerId,
+      channel,
+      messageTs: press?.key ?? ts,
+      userId,
+      ...(cardText ? { cardText } : {}),
+      ...(press ? { item: press.item } : {}),
+    },
+    reviewDoorDeps(env),
+  );
 }
 
 /** Edit fields, pressed on the draft: the fields, pushed over it on the
@@ -394,7 +383,7 @@ async function reviseFromReview(
       await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {
-      await editCard(env, proposal.channel, proposal.proposalTs, message);
+      await updateMessage(env, { channel: proposal.channel, ts: proposal.item?.messageTs ?? proposal.proposalTs, text: message.text, blocks: message.blocks });
     },
   });
 }
@@ -416,9 +405,11 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       update: (viewId, view) => viewsUpdate(env, viewId, view),
     },
     delivery: (target) => slackDelivery(env, target),
-    applyVerdict: (verdict) => executeVerdict(env, verdict),
+    // With each operation's outcome, so an item of a decision report says on
+    // its card whether its write went through.
+    applyVerdict: (verdict) => runVerdict(env, verdict),
     updateCard: async (channel, ts, message) => {
-      const res = await editCard(env, channel, ts, message);
+      const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
       // Cosmetic, as the button door's re-render is: the decision is already
       // announced in the thread.
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);

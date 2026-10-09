@@ -35,7 +35,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { cancelRunOf, cardConfirmers, itemOfKey, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { cancelRunOf, cardConfirmers, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -305,7 +305,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   // state by the loop, and carries the proposal itself — there is nothing to
   // look up, only the claim.
   if (signal.kind === "model") {
-    if (itemOfKey(signal.pending.proposalTs)) return reviewOnly(signal.pending, signal.decision);
+    if (signal.pending.item) return reviewOnly(signal.pending, signal.decision);
     return claim(signal.pending, signal.decision, signal.userId, deps, { narrative: signal.messageToUser });
   }
 
@@ -430,7 +430,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   // item is decided in its own Review pop-up and nowhere else. A reaction or
   // an old card button never reaches here — neither carries an item's key, so
   // the pointer branch above has already answered it.
-  if (signal.kind === "typed" && itemOfKey(proposal.proposalTs)) return reviewOnly(proposal, decision);
+  if (signal.kind === "typed" && proposal.item) return reviewOnly(proposal, decision);
 
   if (signal.kind === "review") {
     if (signal.decision === "revise") return askForChanges(proposal, signal.note ?? "", signal.userId, deps);

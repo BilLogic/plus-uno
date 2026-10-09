@@ -322,6 +322,7 @@ export function sweepHarness(opts: {
             if (m && message.blocks) m.editedBlocks = message.blocks;
           },
           members: async () => (opts.figma!.members === undefined ? [] : opts.figma!.members),
+          reports: threadState,
           async stage(proposal) {
             once("stage");
             staged.push(proposal);

@@ -25,8 +25,7 @@
 // PURE.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import type { DecisionItem } from "../slack/decision-cards";
-import type { StatedCardWords } from "../thread-state/index";
+import type { ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { dayWords } from "../figma-drift/copy";
 import type { DecisionUpdate } from "./draft";
@@ -152,7 +151,7 @@ export function decisionCard(n: number, d: QueuedDecision, commentUrl: string): 
  * @param d - A decision with an operation
  * @param commentUrl - Its comment's link
  */
-export function decisionItem(n: number, d: QueuedDecision, commentUrl: string): DecisionItem {
+export function decisionItem(n: number, d: QueuedDecision, commentUrl: string): ReportItem {
   const drafted = draftedText(d);
   const target = d.update.kind === "prd" ? { label: "Open page", url: d.update.page.url } : d.update.kind === "card" ? { label: "Open card", url: d.update.url } : null;
   return {
@@ -160,6 +159,8 @@ export function decisionItem(n: number, d: QueuedDecision, commentUrl: string): 
     title: `${n} · ${d.quote}`,
     subtitle: `${escapeSlackText(d.by)} · ${d.section} page · ${whenWords(d)}`,
     body: drafted ? `${updateWords(d.update)}. ${drafted}` : updateWords(d.update),
+    // Once written, the card says what the write made.
+    ...(drafted ? { done: drafted } : {}),
     open: { label: "Open comment", url: commentUrl },
     ...(target ? { also: target } : {}),
   };

@@ -31,7 +31,9 @@
 // Takes named dependencies, as the button door does; `Env` is turned into
 // `ReviewDoorDeps` once, in `slack/interactive.ts`. PURE by design: no `Env`,
 // no Workers global, no fetch — so `tests/proposal-review.test.ts` drives it.
-import { itemOfKey, type PendingProposal, type ThreadState } from "../thread-state/index";
+import type { PendingProposal, ThreadState } from "../thread-state/index";
+import { currentReport, itemText, settleItem } from "./decision-cards";
+import type { OperationOutcome } from "../gate/run-batch";
 import type { Delivery } from "../turn/index";
 import { lookAtProposal, resolveSignal, type GateRestage, type GateVerdict, type ReviewDecision } from "../gate/index";
 import { applyPressVerdict, decidedCard, liveCard, type ButtonDoorTarget, type CardMessage } from "./button-door";
@@ -88,12 +90,14 @@ export interface ReviewDoorDeps {
   /** Where a win speaks — see `ButtonDoorDeps.delivery`. */
   delivery(target: ButtonDoorTarget): Delivery;
   /** The confirmed tool and its record — see `ButtonDoorDeps.applyVerdict`. */
-  applyVerdict(verdict: GateVerdict): Promise<void>;
-  /** The card, edited in place to its outcome (`chat.update`): a view has no
-   *  `response_url` for the message it was opened from. `ts` is the card's
-   *  proposal key — an item of a decision report names its message and its
-   *  card (`thread-state` `itemOfKey`), and only that card is edited. */
+  applyVerdict(verdict: GateVerdict): Promise<readonly OperationOutcome[] | void>;
+  /** The card's message, edited in place to its outcome (`chat.update`): a
+   *  view has no `response_url` for the message it was opened from. For an
+   *  item of a decision report, the report's whole message, drawn again from
+   *  its record. */
   updateCard(channel: string, ts: string, message: CardMessage): Promise<void>;
+  /** The clock an item's decision is stamped with. Absent, `Date.now`. */
+  now?(): number;
   /** See `ButtonDoorDeps.restage`. */
   restage(restage: GateRestage, delivery: Delivery): Promise<void>;
   /**
@@ -113,12 +117,16 @@ export interface ReviewDoorDeps {
 export interface ReviewOpenRequest {
   triggerId: string;
   channel: string;
-  /** The card the button sits on. */
+  /** The card the button sits on, by its proposal key: the card's ts, or an
+   *  item's key (`itemProposal`) for an item of a decision report. */
   messageTs: string;
   userId: string;
   /** The card's own text, as the click carries it: what View shows once the
    *  record is gone. */
   cardText?: string;
+  /** An item of a decision report: its message and its id. View reads its
+   *  words off the report's record. */
+  item?: { messageTs: string; id: string };
 }
 
 /** A decision submitted from the pop-up. */
@@ -128,7 +136,7 @@ export interface ReviewDecisionRequest {
   /** The draft under the view the decision came from, when it came from a
    *  pushed view, so the answer replaces it too. */
   rootViewId?: string;
-  /** The card, as the view's `private_metadata` names it. */
+  /** The card, as the view's `private_metadata` names it: its proposal key. */
   channel: string;
   messageTs: string;
   userId: string;
@@ -160,10 +168,15 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
     standingConfirmers: deps.standingConfirmers,
   });
   console.log(`[review] opened ${request.channel}/${request.messageTs} by=${request.userId} state=${look.state}`);
-  const view =
+  // An item no longer live: its words come off the report's record, and one
+  // whose time ran out is shown closed on its card from now on.
+  const item = request.item && look.state !== "live" ? await reportItem(request.channel, request.item, deps) : null;
+  const view = item
+    ? decidedView(card, item)
+    :
     look.state === "live" && look.proposal.revising
       ? // Sent back with Needs changes: the revised card is the one to decide.
-        noticeView(card, "This proposal is being revised. Decide on the revised card when it posts in the thread.")
+        noticeView(card, request.item ? "This proposal is being revised. Its card shows the revised draft once it is ready." : "This proposal is being revised. Decide on the revised card when it posts in the thread.")
       : look.state === "live"
       ? draftView(
           card,
@@ -175,6 +188,16 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
         ? decidedView(card, request.cardText)
         : closedView(card, look);
   await deps.views.update(viewId, view);
+}
+
+/** An item's words for View, off its report's record — redrawing the
+ *  report's message first, so an item whose time ran out reads as closed. */
+async function reportItem(channel: string, item: { messageTs: string; id: string }, deps: ReviewDoorDeps): Promise<string | null> {
+  const now = (deps.now ?? Date.now)();
+  const message = await currentReport(deps.threadState, item.messageTs, now).catch(() => null);
+  if (message) await deps.updateCard(channel, item.messageTs, message);
+  const record = await deps.threadState.getReport(item.messageTs).catch(() => null);
+  return record ? itemText(record, item.id) : null;
 }
 
 /** Edit fields, pressed on the draft: the view that holds the fields. */
@@ -346,7 +369,9 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
         note: edits.edited.length ? `${editedNote(request.userId, edits.edited)}\n${note}` : note,
         edited: edits.changes.length > 0,
       }),
-      replaceCard: (message) => deps.updateCard(request.channel, request.messageTs, message),
+      replaceCard: (message) => deps.updateCard(request.channel, verdict.proposal?.item?.messageTs ?? request.messageTs, message),
+      reports: deps.threadState,
+      ...(deps.now ? { now: deps.now } : {}),
     },
   );
   // A cut-off card speaks in the thread, and the pop-up points there.
@@ -381,23 +406,21 @@ async function applyRevise(
     return;
   }
   await showIn(request, deps)(
-    noticeView(card, "Sent back with your note. I'm revising the draft, and the new card posts in the thread."),
+    noticeView(card, verdict.proposal.item ? "Sent back with your note. I'm revising the draft, and its card shows the revision once it is ready." : "Sent back with your note. I'm revising the draft, and the new card posts in the thread."),
   );
   // Live, not decided: nothing is decided until the revision replaces it, and
   // a revision that never comes hands the card back (`startRevision`, Turn's
   // unlock). Review stays, and opens on "being revised" meanwhile.
-  await deps.updateCard(
-    request.channel,
-    request.messageTs,
-    decidedCard(
-      verdict.proposal,
-      itemOfKey(verdict.proposal.proposalTs)
-        ? `Changes asked by <@${request.userId}>`
-        : `:pencil2: Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,
-      verdict.proposal.proposalText,
-      { button: "Review" },
-    ),
-  );
+  const { item } = verdict.proposal;
+  const message = item
+    ? await settleItem(deps.threadState, item, { kind: "changes-asked", by: request.userId }, (deps.now ?? Date.now)())
+    : decidedCard(
+        verdict.proposal,
+        `:pencil2: Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,
+        verdict.proposal.proposalText,
+        { button: "Review" },
+      );
+  if (message) await deps.updateCard(request.channel, item?.messageTs ?? request.messageTs, message);
   await deps.revise({ proposal: verdict.proposal, note: verdict.revise.note, userId: request.userId });
 }
 
@@ -415,7 +438,8 @@ export interface RevisionDeps {
   postInThread(text: string): Promise<string | null>;
   /** Queue the revision turn on the posted note, as the asker's own reply. */
   queueTurn(noteTs: string): Promise<void>;
-  /** Edit the card in place (`chat.update`). */
+  /** Edit the card's message in place (`chat.update`): an item's report
+   *  message, or the card's own. */
   updateCard(message: CardMessage): Promise<void>;
 }
 
@@ -449,7 +473,11 @@ export async function startRevision(
     console.error(`[review] needs-changes note did not post on ${where}`);
   }
   await deps.threadState.clearRevising(proposal.proposalTs).catch(() => {});
-  await deps.updateCard(liveCard(proposal)).catch(() => {});
+  // An item goes back to open on its report; any other card to how it posted.
+  const live = proposal.item
+    ? await settleItem(deps.threadState, proposal.item, { kind: "open" }, Date.now()).catch(() => null)
+    : liveCard(proposal);
+  if (live) await deps.updateCard(live).catch(() => {});
   await deps
     .postInThread(":warning: I couldn't start the revision. Reply here with what to change and I'll revise the draft.")
     .catch(() => null);

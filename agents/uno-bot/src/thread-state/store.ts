@@ -331,6 +331,93 @@ export interface PendingProposal {
    * re-staged card still resolves the ask that started it (`stagingCardOf`).
    */
   originProposalTs?: string;
+  /**
+   * Set on one item of a decision report (`slack/decision-cards.ts`): the
+   * message its card is in, and its id there. Several items share one
+   * message, so `proposalTs` is a key built from both rather than the ts; an
+   * edit goes to `messageTs`, and the message is rebuilt from the report's
+   * record (`DecisionReportRecord`). An item is decided in its Review pop-up
+   * and nowhere else.
+   */
+  item?: { messageTs: string; id: string };
+}
+
+// ── Decision reports ─────────────────────────────────────────────────────────
+
+/** One item a report asks someone to decide, as its card shows it. */
+export interface ReportItem {
+  /** Stable within the report. No `#` or `~`: the builder uses both. */
+  id: string;
+  /** The page, file, component or comment the item is about. Plain text. */
+  title: string;
+  /** Who and where — owner · source — as mrkdwn, so a mention resolves. */
+  subtitle?: string;
+  /** What changes, plain: "Page says X · decision says Y". */
+  body: string;
+  /** The item's source. Label defaults to "Open". */
+  open: { label?: string; url: string };
+  /** A second source, as the card's third button. */
+  also?: { label: string; url: string };
+  /** What the card says once written, after "Written: ". Absent, its body. */
+  done?: string;
+}
+
+/** Where one item of a report stands. `at` is epoch ms. */
+export type ReportItemState =
+  | { kind: "open" }
+  | { kind: "changes-asked"; by: string }
+  | { kind: "approved"; by: string; at: number }
+  | { kind: "failed"; by: string; at: number; reason: string }
+  | { kind: "rejected"; by: string; reason?: string }
+  | { kind: "expired" }
+  /** Shown, but its proposal never staged: nothing to decide. */
+  | { kind: "not-staged"; note: string };
+
+/** One card of a report: the item, the id its proposal is keyed by (the
+ *  item's own id, then `~n` for its n-th revision) and where it stands. */
+export interface ReportEntry {
+  id: string;
+  item: ReportItem;
+  state: ReportItemState;
+}
+
+/**
+ * A decision report's message, as the store keeps it: what it was posted
+ * with and where each item stands. Every edit of the message is rebuilt from
+ * this, never read back from Slack, so items decided one after another each
+ * keep their own state.
+ */
+export interface DecisionReportRecord {
+  channel: string;
+  messageTs: string;
+  parent: string;
+  /** Items past the shown ones, waiting for the report's next run. */
+  held: number;
+  entries: ReportEntry[];
+  /** How long its items stay decidable — the record outlives them by
+   *  `REPORT_GRACE_MS`, so a late View still reads it. */
+  ttlMs: number;
+}
+
+/** One change to a report: an item's state, or an item replaced by its
+ *  revision under a new id, open. */
+export type ReportChange =
+  | { id: string; state: ReportItemState }
+  | { id: string; replace: { id: string; item: ReportItem } };
+
+/** How long a report's record outlives its items' TTL. */
+export const REPORT_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** A report with one change applied, or null when it names no entry. */
+export function changedReport(report: DecisionReportRecord, change: ReportChange): DecisionReportRecord | null {
+  const at = report.entries.findIndex((e) => e.id === change.id);
+  if (at === -1) return null;
+  const entries = [...report.entries];
+  entries[at] =
+    "state" in change
+      ? { ...entries[at]!, state: change.state }
+      : { id: change.replace.id, item: change.replace.item, state: { kind: "open" } };
+  return { ...report, entries };
 }
 
 /**
@@ -515,30 +602,6 @@ export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "thread
   const thread = proposalReplyThread(proposal);
   const key = slotKeyOf(proposal);
   return key ? `${thread}#${key}` : thread;
-}
-
-/**
- * The key one item of a decision report is staged under: the message its card
- * is in, and its id within the report (`slack/decision-cards.ts`). Several
- * items share one message, so the message's ts alone cannot name one; a
- * Slack ts holds no `#`, so a card's own ts is never an item's key. Every
- * lookup, claim and record takes the key as it takes a ts; only an edit of
- * the message reads the ts back out of it (`cardMessageTs`).
- */
-export function itemProposalKey(messageTs: string, itemId: string): string {
-  return `${messageTs}#${itemId}`;
-}
-
-/** The message and item a proposal key names, or null for a card's own ts. */
-export function itemOfKey(key: string): { messageTs: string; itemId: string } | null {
-  const at = key.indexOf("#");
-  return at > 0 && at < key.length - 1 ? { messageTs: key.slice(0, at), itemId: key.slice(at + 1) } : null;
-}
-
-/** The Slack message a proposal's card is on: an item's message, or the
- *  card's own ts. */
-export function cardMessageTs(key: string): string {
-  return itemOfKey(key)?.messageTs ?? key;
 }
 
 /** The end-of-day sweep card's slot key. */
@@ -913,6 +976,22 @@ export interface ThreadState {
    * and has to be undone by hand.
    */
   claimProposal(proposalTs: string): Promise<boolean>;
+
+  // ----- decision reports -----
+
+  /** Keep a report's record, keyed by its message; a second put replaces it. */
+  putReport(report: DecisionReportRecord): Promise<void>;
+
+  /** A report's record, or null once it is gone (`REPORT_GRACE_MS` past its TTL). */
+  getReport(messageTs: string): Promise<DecisionReportRecord | null>;
+
+  /**
+   * Apply one change to a report — an item decided, or replaced by its
+   * revision — and answer with the record as it now stands, or null when
+   * there is no such report or entry. One read-modify-write, as the claim is,
+   * so two items decided at once both land.
+   */
+  updateReport(messageTs: string, change: ReportChange): Promise<DecisionReportRecord | null>;
 
   // ----- executions: a won ✅, from the claim until its outcome is told -----
 

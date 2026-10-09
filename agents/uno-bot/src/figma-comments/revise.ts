@@ -17,12 +17,12 @@
 // THE REVISION is the decision drafted again (`./detector.ts` with
 // `rewording`), on the same route and against a fresh read of its page, so a
 // PRD line or a card field is stamped with what the page says now. The
-// revised card goes up in the thread, numbered as before, and is staged in
-// the decision's own slot with its confirmers and the time its thread has
-// left. As the weekly precedence card's `drop N` does, the old card is
-// retired BEFORE the revised one posts, so a ✅ racing the reply cannot run
-// the draft the person just pushed back on; a revision that fails to post or
-// stage puts the old card back, and says so in one line. A Needs changes that
+// revised card replaces the old one in place, in its report's carousel under
+// the same number (`replaceItem`), and is staged as a new proposal in the
+// decision's own slot with its confirmers and the time its thread has left.
+// The old card is retired BEFORE the revision is staged, so an Approve racing
+// the reply cannot run the draft the person just pushed back on; a revision
+// that fails to stage puts the old card back, and says so in one line. A Needs changes that
 // comes to nothing lifts the card's lock, so it can be decided again.
 //
 // WHO MAY. Only the card's confirmers reword it; anyone else is told who can,
@@ -35,13 +35,11 @@ import { rethrowIfBudget } from "../net";
 import { typedEmojiDecision } from "../gate/reactions";
 import type { PendingProposal } from "../thread-state/index";
 import { revisionRefusal } from "../turn/turn";
-import { renderProposalCard } from "../slack/proposal-render";
 import { NEEDS_CHANGES_LEAD } from "../slack/review-door";
 import type { SweepSource } from "../sweep/finding";
 import type { DecisionDetector, ShownCard } from "./detector";
-import { decisionCard, decisionItem, whichOne } from "./copy";
-import { decisionReportBlocks, decisionReportText } from "../slack/decision-cards";
-import { itemProposalKey } from "../thread-state/index";
+import { decisionItem, whichOne } from "./copy";
+import { itemProposal, replaceItem, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import { commentUrl, draftDecision } from "./draft";
 import { stagedDecision } from "./post";
 import { fieldsOf } from "./read";
@@ -56,6 +54,10 @@ export interface ReviseDeps {
   page(url: string): Promise<SweepSource | null>;
   detector: DecisionDetector;
   post(message: { text: string; blocks?: unknown[]; thread_ts: string }): Promise<{ ok: boolean; ts?: string }>;
+  /** Edit a report's message in place (`chat.update`). */
+  edit(ts: string, message: ReportMessage): Promise<void>;
+  /** Where the thread's reports and their items' states are kept. */
+  reports: ReportStore;
   /** Stage a card anew: on the usage record as staged. */
   stage(proposal: PendingProposal): Promise<void>;
   /** Put a retired card back in place; its staged row stands. */
@@ -146,7 +148,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
     await deps.post({ text, thread_ts: thread.ts });
     return true;
   };
-  const live = async (cardTs: string) => (deps.now() < thread.expiresAt ? deps.card(cardTs) : null);
+  const live = async (proposalKey: string) => (deps.now() < thread.expiresAt ? deps.card(proposalKey) : null);
 
   let entry: DecisionThread["decisions"][number] | undefined;
   let wording: string;
@@ -154,7 +156,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
     // The card this person sent back with Needs changes: the newest mark.
     let marked: { entry: DecisionThread["decisions"][number]; at: number } | null = null;
     for (const d of thread.decisions) {
-      const card = await live(d.cardTs);
+      const card = await live(d.proposalKey);
       if (card?.revising?.userId === reply.user && (!marked || (card.revising.at ?? 0) >= marked.at)) {
         marked = { entry: d, at: card.revising.at ?? 0 };
       }
@@ -168,7 +170,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
       if (!entry) return say(`There's no decision ${cue!.n} in this thread.`);
     } else {
       const open: typeof thread.decisions = [];
-      for (const d of thread.decisions) if (await live(d.cardTs)) open.push(d);
+      for (const d of thread.decisions) if (await live(d.proposalKey)) open.push(d);
       if (!open.length) return false;
       if (open.length > 1) return say(whichOne(open.map((d) => d.n)));
       entry = open[0]!;
@@ -176,7 +178,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
     wording = cue!.wording;
   }
 
-  const old = await live(entry.cardTs);
+  const old = await live(entry.proposalKey);
   if (!old) return say(`Decision ${entry.n}'s card has already been decided or has closed, so there's nothing to change.`);
   // A Needs changes that comes to nothing lifts the lock it put on the card.
   const unlock = async () => {
@@ -207,35 +209,41 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
   // Back in place as it was before anyone sent it back: no lock.
   const { revising: _lock, ...unlocked } = old;
   const restore = () => deps.restore({ ...unlocked, ttlMs });
+  const { item } = old;
+  if (!item) {
+    await unlock();
+    return say(`Decision ${n}'s card can't be revised in place, so it stays as it is.`);
+  }
   await deps.retire(old.proposalTs);
   const link = commentUrl(thread.fileKey, revised.nodeId, revised.commentId);
-  const text = renderProposalCard(decisionCard(n, revised, link)).text;
-  // The revised card goes up on its own, under the same number.
-  const report = { parent: `Decision ${n}, reworded.`, items: [decisionItem(n, revised, link)] };
-  const blocks = decisionReportBlocks(report);
-  const sent = await deps.post({ text: decisionReportText(report), blocks, thread_ts: thread.ts });
-  if (!sent.ok || !sent.ts) {
-    console.error(`[figma-comments] the revised card for decision ${n} did not post; the old card is restored`);
-    await restore();
-    return true;
+  const before = (await deps.reports.getReport(item.messageTs))?.entries.find((e) => e.id === item.id)?.item;
+  // In place: the same card in the report, under the same number, open again
+  // as a new proposal.
+  const replaced = before ? await replaceItem(deps.reports, item.messageTs, item.id, decisionItem(n, revised, link)) : null;
+  let staged = false;
+  if (replaced) {
+    try {
+      await deps.stage(stagedDecision(thread, { messageTs: item.messageTs, id: replaced.id }, n, revised, ttlMs));
+      staged = true;
+      await deps.thread.write({
+        ...thread,
+        decisions: thread.decisions.map((d) => (d.n === n ? { ...d, proposalKey: itemProposal(item.messageTs, replaced.id).proposalTs, decision: revised! } : d)),
+      });
+    } catch (err) {
+      rethrowIfBudget(err);
+      console.error(`[figma-comments] revision of decision ${n} ${staged ? "staged but not recorded" : "not staged"}: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
-  const key = itemProposalKey(sent.ts, revised.commentId);
-  try {
-    await deps.stage(stagedDecision(thread, key, { text, blocks }, n, revised, ttlMs));
-    await deps.thread.write({
-      ...thread,
-      decisions: thread.decisions.map((d) => (d.n === n ? { ...d, cardTs: key, decision: revised! } : d)),
-    });
-  } catch (err) {
-    rethrowIfBudget(err);
-    console.error(`[figma-comments] revision of decision ${n} posted but not recorded: ${err instanceof Error ? err.message : String(err)}`);
+  if (!replaced || !staged) {
     // The old card shares the revision's slot, so restoring it retires the
-    // revision if it was staged; the record still names the old card.
+    // revision if it was staged; the report shows the old card again.
     const restored = await restore().then(
       () => true,
       () => false,
     );
-    await deps.retire(key).catch(() => {});
+    if (replaced && before) {
+      await deps.reports.updateReport(item.messageTs, { id: replaced.id, replace: { id: item.id, item: before } }).catch(() => null);
+    }
     await say(
       restored
         ? `That revised card didn't go through, so decision ${n}'s card before it still stands. Try again from its Review button.`
@@ -243,6 +251,10 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
     ).catch(() => {});
     return true;
   }
+  await deps.edit(item.messageTs, replaced.message).catch((err: unknown) => {
+    rethrowIfBudget(err);
+    console.warn(`[figma-comments] decision ${n}'s card not redrawn: ${err instanceof Error ? err.message : String(err)}`);
+  });
   // Superseded on the record only once the revision is in place.
   await deps.superseded([old.proposalTs]);
   return true;

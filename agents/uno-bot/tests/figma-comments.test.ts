@@ -469,7 +469,6 @@ describe("the morning's thread in #plus-design (#900)", () => {
     const card = (posted.blocks as Card[])[1]!;
     assert.equal(card.body.text.length, 200);
     assert.ok(!JSON.stringify(posted.blocks).includes("The end."), "the card shows a cut of it");
-    assert.deepEqual(h.staged[0]!.proposalBlocks, posted.blocks, "kept, so a decided card is edited in place");
   });
 
   it("stages each decision on its own, for the card's people, for 72 hours — and writes nothing (AC 3)", async () => {
@@ -478,7 +477,7 @@ describe("the morning's thread in #plus-design (#900)", () => {
     assert.equal(h.staged.length, 4);
     for (const [i, p] of h.staged.entries()) {
       const id = ["c1", "c3", "c4", "c9"][i]!;
-      assert.equal(p.supersedeKey, `figma-decision:${id}`);
+      assert.equal(p.supersedeKey, `report-item:${parent.ts}:${id}`);
       assert.equal(p.proposalTs, `${parent.ts}#${id}`, "its own proposal, on its card in the message");
       assert.equal(p.threadTs, parent.ts);
       assert.deepEqual(p.confirmers, ["U0MERYEM", "U0SARAH"]);
@@ -553,9 +552,8 @@ describe("the morning's thread in #plus-design (#900)", () => {
     const parent = h.figma.messages[0]!;
     const cards = (parent.editedBlocks as Array<{ elements?: Card[] }>)[1]!.elements!;
     assert.equal(cards[0]!.subtitle!.text, "Didn't go through, so it's queued again for tomorrow morning.");
-    assert.deepEqual(cards[0]!.actions.map((a) => a.text.text), ["View", "Open comment", "Open page"]);
+    assert.deepEqual(cards[0]!.actions.map((a) => a.text.text), ["Open comment", "Open page"], "nothing to review");
     assert.deepEqual(cards.slice(1).map((c) => c.actions[0]!.text.text), ["Review", "Review", "Review"], "the others stand");
-    assert.equal(parent.edited, parent.text, "the message's text copy is kept");
     assert.deepEqual(
       h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId),
       ["c1"],
@@ -609,6 +607,25 @@ describe("the morning's thread in #plus-design (#900)", () => {
     assert.equal(next.length, 1, "the morning's message, in the same thread");
     assert.equal((next[0]!.blocks as Array<{ elements?: Card[] }>)[1]!.elements![0]!.title.text.startsWith("1 · "), true);
     assert.equal(h.staged.length, 4);
+  });
+
+  it("counts in its parent line the cards it carries, not the decisions said as plain replies", async () => {
+    const noPrd: SweepSource = { ...CARD, subpages: [] };
+    const reply = JSON.stringify({
+      decisions: [
+        { thread_id: "c1", route: "prd", decision: "The progress bar stays hidden until the first goal is set.", confidence: 0.9 },
+        { thread_id: "c3", route: "card", decision: "The card moves to Under Review.", card: 2482, field: "Design Status", value: "Under Review", confidence: 0.88 },
+      ],
+    });
+    const { h } = await nightHarness({ sources: [noPrd, PRD], replies: [reply] });
+    await runSweepJob(NIGHT, h.deps);
+    h.clock.now = at(30, 13);
+    await runSweepJob(MORNING, h.deps);
+    const [parent, ...notes] = h.figma.messages;
+    const blocks = parent!.blocks as Array<{ type: string; text?: { text: string } }>;
+    assert.equal(blocks[1]!.type, "card", "the status decision carries the one card");
+    assert.match(blocks[0]!.text!.text, /, 1 comment in .* reads like a decision\.$/);
+    assert.equal(notes.length, 1, "the PRD decision with no PRD is a plain reply, not counted");
   });
 
   it("shows ten cards a morning and holds the rest in the file's queue for the next", async () => {
@@ -850,6 +867,8 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
       page: (url) => h.deps.sources.read(url, "notion"),
       detector: modelDecisionDetector(h.provider),
       post: (m) => fc.slack!.post(m),
+      edit: (ts, m) => fc.slack!.edit(ts, m),
+      reports: h.threadState,
       stage: (p) => fc.slack!.stage(p),
       async restore(p) {
         await h.threadState.putProposal(p);
@@ -876,20 +895,22 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
     const prompt = String((h.provider.generated.at(-1) as { prompt?: string }).prompt);
     assert.match(prompt, /^REWORDING: a teammate rewrote thread c3's decision as: "Move it to Ready for Dev instead"$/m);
     const revised = h.staged.at(-1)!;
-    assert.equal(revised.supersedeKey, "figma-decision:c3");
+    assert.equal(revised.supersedeKey, before.proposalKey.replace(/^(.*)#c3$/, "report-item:$1:c3"), "the slot its card had");
     assert.deepEqual(revised.operations, [{ toolName: "notion_update", input: { page_url: CARD_URL, properties: { "Design Status": "Ready for Dev" } } }]);
     assert.deepEqual(revised.confirmers, ["U0MERYEM", "U0SARAH"]);
     assert.equal(revised.ttlMs, at(30, 13) + DECISION_CARD_TTL_MS - at(30, 15), "the 72 h the thread started with, less the two since");
-    const card = h.figma.messages.at(-1)!;
-    assert.equal(card.threadTs, parent.ts);
-    // The revised card goes up on its own, under the same number.
-    const shown = (card.blocks as Card[])[1]!;
-    assert.equal(shown.title.text, "2 · States are all in, moving this card to Under Review");
-    assert.equal(shown.body.text, "Card 2482 › Design Status: WIP → Ready for Dev");
+    // The revised card replaces the old one in place, under the same number:
+    // no new message.
+    assert.equal(h.figma.messages.filter((m) => m.threadTs === parent.ts).length, 0);
+    const shown = (parent.editedBlocks as Array<{ elements?: Card[] }>)[1]!.elements!;
+    assert.equal(shown.length, 4);
+    assert.equal(shown[1]!.title.text, "2 · States are all in, moving this card to Under Review");
+    assert.equal(shown[1]!.body.text, "Card 2482 › Design Status: WIP → Ready for Dev");
+    assert.equal(shown[1]!.actions[0]!.value, "c3~1", "a new proposal behind it");
     assert.match(revised.proposalText, /• \*Card 2482 › Design Status:\* WIP → Ready for Dev · </);
     // The old card is out of reach, and the thread's record names the new one.
-    assert.notEqual((await h.threadState.getProposalByTs(before.cardTs)).state, "found");
-    assert.equal(h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs, `${card.ts}#c3`);
+    assert.notEqual((await h.threadState.getProposalByTs(before.proposalKey)).state, "found");
+    assert.equal(h.figma.threads.get(parent.ts)!.decisions[1]!.proposalKey, `${parent.ts}#c3~1`);
     // The other decisions are untouched.
     assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 4);
   });
@@ -924,9 +945,9 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
       h.figma.messages.at(-1)!.text,
       "Which one? Press Review on that decision's card and choose Needs changes, or start the reply with its number, like `1: …`.",
     );
-    for (const d of h.figma.threads.get(parent.ts)!.decisions.filter((x) => x.n !== 2)) await h.threadState.retireProposal(d.cardTs);
+    for (const d of h.figma.threads.get(parent.ts)!.decisions.filter((x) => x.n !== 2)) await h.threadState.retireProposal(d.proposalKey);
     assert.equal(await reply("Reword to: Move it to Ready for Dev instead"), true);
-    assert.equal(h.staged.at(-1)!.supersedeKey, "figma-decision:c3");
+    assert.equal(h.staged.at(-1)!.supersedeKey, `report-item:${parent.ts}:c3`);
   });
 
   it("leaves the thread's talk alone: chat, questions for uno-bot, numbers in passing, thank-yous", async () => {
@@ -955,19 +976,19 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
 
   it("takes Review's Needs changes as the new wording for the card it was pressed on", async () => {
     const { h, parent, reply } = await revisable([cardReply("Ready for Dev")]);
-    const card = h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs;
+    const card = h.figma.threads.get(parent.ts)!.decisions[1]!.proposalKey;
     assert.equal(await h.threadState.markRevising(card, "U0SARAH"), "marked");
     assert.equal(await reply(`${NEEDS_CHANGES_LEAD}Move it to Ready for Dev instead`, "U0SARAH"), true);
     const prompt = String((h.provider.generated.at(-1) as { prompt?: string }).prompt);
     assert.match(prompt, /^REWORDING: a teammate rewrote thread c3's decision as: "Move it to Ready for Dev instead"$/m);
-    assert.equal(h.staged.at(-1)!.supersedeKey, "figma-decision:c3");
+    assert.equal(h.staged.at(-1)!.supersedeKey, `report-item:${parent.ts}:c3`);
     assert.notEqual((await h.threadState.getProposalByTs(card)).state, "found", "the card sent back is replaced");
-    assert.equal((h.figma.messages.at(-1)!.blocks as Card[])[1]!.title.text.startsWith("2 · "), true);
+    assert.equal((parent.editedBlocks as Array<{ elements?: Card[] }>)[1]!.elements![1]!.title.text.startsWith("2 · "), true);
   });
 
   it("lifts the Needs changes lock when the new wording cannot be drafted", async () => {
     const { h, parent, reply } = await revisable(['{"decisions":[]}']);
-    const card = h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs;
+    const card = h.figma.threads.get(parent.ts)!.decisions[1]!.proposalKey;
     await h.threadState.markRevising(card, "U0SARAH");
     assert.equal(await reply(`${NEEDS_CHANGES_LEAD}something nobody can place`, "U0SARAH"), true);
     assert.equal(h.figma.messages.at(-1)!.text, "I couldn't draft decision 2 with that wording, so its card stays as it is.");
@@ -990,14 +1011,14 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
     );
     assert.equal(await reply("9: anything at all"), true);
     assert.equal(h.figma.messages.at(-1)!.text, "There's no decision 9 in this thread.");
-    await h.threadState.retireProposal(h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs);
+    await h.threadState.retireProposal(h.figma.threads.get(parent.ts)!.decisions[1]!.proposalKey);
     assert.equal(await reply("2: Ready for Dev"), true);
     assert.equal(h.figma.messages.at(-1)!.text, "Decision 2's card has already been decided or has closed, so there's nothing to change.");
   });
 
   it("keeps the card as it is when the wording cannot be drafted, or the revision does not stage", async () => {
     const { h, parent, reply } = await revisable(['{"decisions":[]}', cardReply("Ready for Dev")]);
-    const old = h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs;
+    const old = h.figma.threads.get(parent.ts)!.decisions[1]!.proposalKey;
     assert.equal(await reply("2: something the detector cannot place"), true);
     assert.equal(h.figma.messages.at(-1)!.text, "I couldn't draft decision 2 with that wording, so its card stays as it is.");
     assert.equal((await h.threadState.getProposalByTs(old)).state, "found");
@@ -1006,7 +1027,7 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
     assert.equal(await reply("2: Move it to Ready for Dev instead"), true);
     assert.equal(h.figma.messages.at(-1)!.text, "That revised card didn't go through, so decision 2's card before it still stands. Try again from its Review button.");
     assert.equal((await h.threadState.getProposalByTs(old)).state, "found", "the old card is back in place");
-    assert.equal(h.figma.threads.get(parent.ts)!.decisions[1]!.cardTs, old);
+    assert.equal(h.figma.threads.get(parent.ts)!.decisions[1]!.proposalKey, old);
   });
 
   it("reads a reword only on an explicit cue: a number first, or a reword verb", () => {
