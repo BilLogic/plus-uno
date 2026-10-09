@@ -54,3 +54,21 @@ test("frame citations are named without rewriting links inside a quoted comment"
   assert.match(posted.text, /^On \[Session card\]/);
   assert.ok(posted.text.includes(quote), "quoted source text stays verbatim");
 });
+
+test("closing freshness receipts use their meaning, while quoted receipts remain source text", async () => {
+  for (const receipt of [
+    "I read the Figma frame and its pinned comment thread just now, so this is current.",
+    "I checked the linked frame and comments just now, so the answer is current.",
+  ]) {
+    for (const quote of [`> ${receipt}`, `\`${receipt}\``, `“${receipt}”`]) {
+      const prefix = `On [Session card](${URL}), Coco wrote:\n${quote}`;
+      for (const answer of [prefix, `${prefix}\n\n${receipt}`]) {
+        const h = harness({ replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }], toolResult: JSON.stringify({ ok: true, source_type: "figma", url: URL, title: "Session card", content: "Join" }) });
+        await runTurn(request({ text: `${URL} what does this comment say?` }), h.deps);
+        const posted = h.delivery.calls.find((c) => c.kind === "answer");
+        assert.ok(posted?.kind === "answer");
+        assert.equal(posted.text, prefix);
+      }
+    }
+  }
+});

@@ -16,10 +16,16 @@ export function figmaAnswerCopy(text: string, sources: readonly TaskCardSource[]
     const title = read.title.replace(/[\\[\]<>]/g, "\\$&");
     return `[${title}](${url})`;
   };
-  return text
-    .split(/(```[\s\S]*?```|`[^`\n]*`|“[^”]*”|"[^"\n]*"|^\s*>[^\n]*$)/gm)
-    .map((part, i) => i % 2 ? part : part.replace(/\[[^\]\n]*\]\((https?:\/\/[^\s)]+)\)|<(https?:\/\/[^|>\s]+)\|[^>\n]*>/g, (match, markdownUrl: string | undefined, slackUrl: string | undefined) => named(markdownUrl ?? slackUrl!, match)))
+  const parts = text.split(/(```[\s\S]*?```|`[^`\n]*`|“[^”]*”|"[^"\n]*"|^\s*>[^\n]*$)/gm);
+  return parts
+    .map((part, i) => {
+      if (i % 2) return part;
+      const linked = part.replace(/\[[^\]\n]*\]\((https?:\/\/[^\s)]+)\)|<(https?:\/\/[^|>\s]+)\|[^>\n]*>/g, (match, markdownUrl: string | undefined, slackUrl: string | undefined) => named(markdownUrl ?? slackUrl!, match));
+      // Only the closing unquoted passage can be a retrieval receipt.
+      return i === parts.length - 1
+        ? linked.replace(/(?:^|\s+)I (?:read|checked|fetched) [^\n.!?]*?\bjust now(?:,?\s+so [^\n.!?]*?\bcurrent)?[.!]?\s*$/i, "")
+        : linked;
+    })
     .join("")
-    .replace(/(?:^|\s+)I (?:read|checked|fetched) (?:the )?(?:comment thread|comments|frame) (?:on (?:the )?(?:linked )?(?:Figma )?frame )?just now(?:,?\s+so (?:this|the)(?: (?:transcript|answer|reading))? is current)?[.!]?\s*$/i, "")
     .trimEnd();
 }
