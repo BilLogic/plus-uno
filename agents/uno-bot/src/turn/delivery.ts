@@ -343,6 +343,10 @@ export type GateNote =
   /** A signal on a card someone sent back with Needs changes: its revision
    *  is being written, so nothing decides it meanwhile. */
   | { kind: "being-revised" }
+  /** A typed emoji or the model's call on one item of a decision report
+   *  (`slack/decision-cards.ts`): such an item is decided in its Review
+   *  pop-up and nowhere else, so nothing resolved. */
+  | { kind: "review-only" }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string }
   /**

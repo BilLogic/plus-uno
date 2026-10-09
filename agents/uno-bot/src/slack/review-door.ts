@@ -31,7 +31,7 @@
 // Takes named dependencies, as the button door does; `Env` is turned into
 // `ReviewDoorDeps` once, in `slack/interactive.ts`. PURE by design: no `Env`,
 // no Workers global, no fetch — so `tests/proposal-review.test.ts` drives it.
-import type { PendingProposal, ThreadState } from "../thread-state/index";
+import { itemOfKey, type PendingProposal, type ThreadState } from "../thread-state/index";
 import type { Delivery } from "../turn/index";
 import { lookAtProposal, resolveSignal, type GateRestage, type GateVerdict, type ReviewDecision } from "../gate/index";
 import { applyPressVerdict, decidedCard, liveCard, type ButtonDoorTarget, type CardMessage } from "./button-door";
@@ -90,7 +90,9 @@ export interface ReviewDoorDeps {
   /** The confirmed tool and its record — see `ButtonDoorDeps.applyVerdict`. */
   applyVerdict(verdict: GateVerdict): Promise<void>;
   /** The card, edited in place to its outcome (`chat.update`): a view has no
-   *  `response_url` for the message it was opened from. */
+   *  `response_url` for the message it was opened from. `ts` is the card's
+   *  proposal key — an item of a decision report names its message and its
+   *  card (`thread-state` `itemOfKey`), and only that card is edited. */
   updateCard(channel: string, ts: string, message: CardMessage): Promise<void>;
   /** See `ButtonDoorDeps.restage`. */
   restage(restage: GateRestage, delivery: Delivery): Promise<void>;
@@ -389,7 +391,9 @@ async function applyRevise(
     request.messageTs,
     decidedCard(
       verdict.proposal,
-      `:pencil2: Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,
+      itemOfKey(verdict.proposal.proposalTs)
+        ? `Changes asked by <@${request.userId}>`
+        : `:pencil2: Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,
       verdict.proposal.proposalText,
       { button: "Review" },
     ),

@@ -649,6 +649,7 @@ export interface ConversationsRepliesResult extends SlackOk {
     files?: SlackEventFile[];
     subtype?: string;
     metadata?: SlackMessageMetadata;
+    blocks?: unknown[];
   }>;
   has_more?: boolean;
   response_metadata?: { next_cursor?: string };

@@ -517,6 +517,30 @@ export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "thread
   return key ? `${thread}#${key}` : thread;
 }
 
+/**
+ * The key one item of a decision report is staged under: the message its card
+ * is in, and its id within the report (`slack/decision-cards.ts`). Several
+ * items share one message, so the message's ts alone cannot name one; a
+ * Slack ts holds no `#`, so a card's own ts is never an item's key. Every
+ * lookup, claim and record takes the key as it takes a ts; only an edit of
+ * the message reads the ts back out of it (`cardMessageTs`).
+ */
+export function itemProposalKey(messageTs: string, itemId: string): string {
+  return `${messageTs}#${itemId}`;
+}
+
+/** The message and item a proposal key names, or null for a card's own ts. */
+export function itemOfKey(key: string): { messageTs: string; itemId: string } | null {
+  const at = key.indexOf("#");
+  return at > 0 && at < key.length - 1 ? { messageTs: key.slice(0, at), itemId: key.slice(at + 1) } : null;
+}
+
+/** The Slack message a proposal's card is on: an item's message, or the
+ *  card's own ts. */
+export function cardMessageTs(key: string): string {
+  return itemOfKey(key)?.messageTs ?? key;
+}
+
 /** The end-of-day sweep card's slot key. */
 export const SWEEP_KEY = "sweep";
 

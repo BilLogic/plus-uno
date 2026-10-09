@@ -25,9 +25,10 @@ import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
-import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
+import { conversationsOpen, conversationsReplies, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
+import { DECISION_REVIEW_ACTION_PREFIX, itemCardText, itemOfKey, reviewKeyOf, withItemCardFrom } from "./decision-cards";
 import {
   NEEDS_CHANGES_LEAD,
   runReviewDecision,
@@ -74,7 +75,7 @@ interface InteractionPayload {
   response_url?: string;
   user?: { id?: string };
   channel?: { id?: string };
-  message?: { ts?: string; thread_ts?: string; text?: string };
+  message?: { ts?: string; thread_ts?: string; text?: string; blocks?: unknown[] };
   actions?: Array<{ action_id?: string; value?: string; selected_options?: { value?: string }[] }>;
   callback_id?: string;
   /** A click's one-use, three-second key to `views.open`. */
@@ -177,6 +178,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
+  if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
@@ -263,14 +265,38 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
 // lives three seconds from the click, is spent before anything is read.
 //
 // `Env` enters here and stops here.
-async function openReview(env: Env, payload: InteractionPayload): Promise<void> {
+async function openReview(env: Env, payload: InteractionPayload, itemAction?: string): Promise<void> {
   const triggerId = payload.trigger_id;
   const channel = payload.channel?.id;
-  const messageTs = payload.message?.ts;
+  const ts = payload.message?.ts;
   const userId = payload.user?.id;
-  if (!triggerId || !channel || !messageTs || !userId) return;
-  const cardText = payload.message?.text;
+  if (!triggerId || !channel || !ts || !userId) return;
+  // An item of a decision report: its own proposal, and its own card's words
+  // for View once that proposal is gone.
+  const itemKey = itemAction ? reviewKeyOf(itemAction, ts) : null;
+  const messageTs = itemKey ?? ts;
+  const item = itemKey ? itemOfKey(itemKey) : null;
+  const cardText = item ? itemCardText(payload.message?.blocks ?? [], item.itemId) : payload.message?.text;
   await runReviewOpen({ triggerId, channel, messageTs, userId, ...(cardText ? { cardText } : {}) }, reviewDoorDeps(env));
+}
+
+/**
+ * Edit a card in place. An item of a decision report shares its message with
+ * the report's other items, so its card is set into the message as Slack
+ * holds it now, read just before: an item decided meanwhile keeps its own
+ * state. A failed read falls back to the blocks the item was staged with.
+ * Two items decided in the same instant can still race, the later edit
+ * restoring the other's card; its decision stands either way, and View tells
+ * the truth.
+ */
+async function editCard(env: Env, channel: string, key: string, message: { text: string; blocks: unknown[] }) {
+  const item = itemOfKey(key);
+  if (!item) return updateMessage(env, { channel, ts: key, text: message.text, blocks: message.blocks });
+  const read = await conversationsReplies(env, channel, item.messageTs, 1).catch(() => null);
+  const live = read?.ok ? read.messages?.find((m) => m.ts === item.messageTs) : undefined;
+  const blocks = live?.blocks ? withItemCardFrom(live.blocks, message.blocks, item.itemId) : message.blocks;
+  // The text copy stays the report's own: the decision is on the card.
+  return updateMessage(env, { channel, ts: item.messageTs, text: live?.text ?? message.text, blocks });
 }
 
 /** Edit fields, pressed on the draft: the fields, pushed over it on the
@@ -368,7 +394,7 @@ async function reviseFromReview(
       await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {
-      await updateMessage(env, { channel: proposal.channel, ts: proposal.proposalTs, text: message.text, blocks: message.blocks });
+      await editCard(env, proposal.channel, proposal.proposalTs, message);
     },
   });
 }
@@ -392,7 +418,7 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
     delivery: (target) => slackDelivery(env, target),
     applyVerdict: (verdict) => executeVerdict(env, verdict),
     updateCard: async (channel, ts, message) => {
-      const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      const res = await editCard(env, channel, ts, message);
       // Cosmetic, as the button door's re-render is: the decision is already
       // announced in the thread.
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);

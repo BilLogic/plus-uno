@@ -19,6 +19,7 @@
 // `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
 import { sweepCardBlocks } from "./sweep-card-blocks";
+import { decidedItemBlocks, holdsItem } from "./decision-cards";
 import { escapeSlackText } from "./mrkdwn";
 import { footerNoteFor } from "./footer-kind";
 import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
@@ -121,11 +122,17 @@ export interface PostedCard {
  * row gains neither. A text-only card is re-rendered from its text
  * (`proposalCardBlocks`), which carries the row it was posted with.
  *
+ * One item of a decision report (`decision-cards.ts`) is noted on its own
+ * card instead: the note's last line becomes its subtitle and its Review is
+ * relabelled, with every other card left as it is.
+ *
  * @param card - The card as posted
  * @param note - Its last line, mrkdwn
  * @param button - Review while it can still be decided, View once it cannot
+ * @param itemId - The report item the note is about, when it is one
  */
-export function notedCardBlocks(card: PostedCard, note: string, button: "Review" | "View" = "View"): unknown[] {
+export function notedCardBlocks(card: PostedCard, note: string, button: "Review" | "View" = "View", itemId?: string): unknown[] {
+  if (itemId && card.blocks && holdsItem(card.blocks, itemId)) return decidedItemBlocks(card.blocks, itemId, note, button);
   if (!card.blocks) {
     return proposalCardBlocks(card.text, note, button);
   }

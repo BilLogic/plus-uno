@@ -35,7 +35,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { cancelRunOf, cardConfirmers, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { cancelRunOf, cardConfirmers, itemOfKey, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -305,6 +305,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   // state by the loop, and carries the proposal itself — there is nothing to
   // look up, only the claim.
   if (signal.kind === "model") {
+    if (itemOfKey(signal.pending.proposalTs)) return reviewOnly(signal.pending, signal.decision);
     return claim(signal.pending, signal.decision, signal.userId, deps, { narrative: signal.messageToUser });
   }
 
@@ -424,6 +425,13 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   // Needs changes included, which is how two presses start one revision.
   if (proposal.revising) return beingRevised(proposal, decision);
 
+  // One item of a decision report shares its thread, and its message, with
+  // the report's other items, so a typed emoji cannot say which it means: an
+  // item is decided in its own Review pop-up and nowhere else. A reaction or
+  // an old card button never reaches here — neither carries an item's key, so
+  // the pointer branch above has already answered it.
+  if (signal.kind === "typed" && itemOfKey(proposal.proposalTs)) return reviewOnly(proposal, decision);
+
   if (signal.kind === "review") {
     if (signal.decision === "revise") return askForChanges(proposal, signal.note ?? "", signal.userId, deps);
     // The pop-up's ⛔ is Reject, and its reason rides on the note it posts.
@@ -475,6 +483,13 @@ async function askForChanges(
   }
   console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: changes asked by ${userId}`);
   return { outcome: "won", proposal, post: null, revise: { note: text } };
+}
+
+/** A typed emoji or the model's call on one item of a decision report:
+ *  nothing resolved, and Review named as the way to decide it. */
+function reviewOnly(proposal: PendingProposal, decision: Decision): GateVerdict {
+  console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs}: a report item, decided from Review only`);
+  return { outcome: "none", proposal, decision, post: { note: { kind: "review-only" }, replyTs: replyTarget(proposal) } };
 }
 
 /** A signal on a card whose revision is being written: nothing resolved. */

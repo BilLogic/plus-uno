@@ -27,7 +27,7 @@ import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index
 import { renderGateNote, statedCancelledNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { notedCardBlocks, proposalCardBlocks } from "./proposal-render";
-import type { PendingProposal } from "../thread-state/index";
+import { itemOfKey, type PendingProposal } from "../thread-state/index";
 
 /** A card's message as it is edited: the fallback copy, and the blocks. */
 export interface CardMessage {
@@ -52,14 +52,21 @@ export interface CardMessage {
  * @param opts.button - View once decided; Review on a card still live
  */
 export function decidedCard(
-  pending: Pick<PendingProposal, "proposalText" | "proposalBlocks">,
+  pending: Pick<PendingProposal, "proposalText" | "proposalBlocks"> & Partial<Pick<PendingProposal, "proposalTs">>,
   note: string,
   text: string = pending.proposalText,
   opts: { edited?: boolean; button?: "Review" | "View" } = {},
 ): CardMessage {
+  const button = opts.button ?? "View";
+  // One item of a decision report shares its message with the others, so its
+  // blocks are always the message's own: only its card is noted, and the
+  // edited words live in its proposal, which View opens.
+  const item = pending.proposalTs ? itemOfKey(pending.proposalTs) : null;
+  if (item && pending.proposalBlocks) {
+    return { text: `${text}\n${note}`, blocks: notedCardBlocks({ text, blocks: pending.proposalBlocks }, note, button, item.itemId) };
+  }
   const stale = opts.edited || text !== pending.proposalText;
   const own = pending.proposalBlocks && !stale ? pending.proposalBlocks : undefined;
-  const button = opts.button ?? "View";
   return {
     text: `${text}\n${note}`,
     blocks: notedCardBlocks({ text, ...(own ? { blocks: own } : {}) }, note, button),
@@ -236,8 +243,12 @@ export async function applyPressVerdict(
   // stage it again, so it closes in the card's own words.
   // The pop-up's Reject names itself, and its reason, on the card it closed.
   const rejected = post.note.kind === "resolved" ? post.note.rejected : undefined;
-  const note =
-    request.decision === "confirm"
+  // One item of a decision report reads who decided and what, plainly, as
+  // its subtitle; its reason and its words stay in View.
+  const item = itemOfKey(pending.proposalTs);
+  const note = item
+    ? `${request.decision === "confirm" ? "Approved" : "Rejected"} by <@${request.userId}>`
+    : request.decision === "confirm"
       ? `:white_check_mark: Approved by <@${request.userId}>`
       : pending.stated
         ? statedCancelledNote(pending.stated, request.userId)
