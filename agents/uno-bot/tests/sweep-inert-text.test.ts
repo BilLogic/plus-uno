@@ -1,11 +1,14 @@
 // Notion-sourced words on a Worker post are text, never markup: a page titled
-// `<!channel>` pings nobody. Asserted on what Slack receives — the rendered
-// card's blocks after the same sanitize pass `slack/api.ts` runs.
+// `<!channel>` pings nobody. Asserted on what Slack receives — a report's
+// blocks, or a card's, after the same sanitize pass `slack/api.ts` runs — and
+// on what a sweep fix's Review pop-up shows.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { asSweepRevision, cardPlan, sweepCard } from "../src/sweep/cards";
+import { asSweepRevision, cardPlan, sweepItem, sweepItemText, sweepParent } from "../src/sweep/cards";
+import { decisionReport, itemText, reportRecord } from "../src/slack/decision-cards";
+import { sweepReport } from "../src/sweep/run";
 import type { PendingFinding } from "../src/sweep/store";
 import type { Destination } from "../src/sweep/finding";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
@@ -65,31 +68,48 @@ function assertInert(texts: string[]): void {
   }
 }
 
-test("a fix card shows a hostile page title as text, linked to the page", () => {
-  const texts = delivered(sweepCard(cardPlan("k", HERE, [finding()])));
+/** Every mrkdwn text Slack would receive for a sweep report — its fallback
+ *  text and every mrkdwn object in its blocks, sanitized as `slack/api.ts`
+ *  does — and each fix's text as its Review pop-up shows it. */
+function reported(items: PendingFinding[]): string[] {
+  const report = sweepReport(cardPlan("k", HERE, items));
+  const mrkdwn: string[] = [];
+  const walk = (v: unknown): void => {
+    if (Array.isArray(v)) return v.forEach(walk);
+    if (v && typeof v === "object") {
+      const o = v as Record<string, unknown>;
+      if (o.type === "mrkdwn" && typeof o.text === "string") mrkdwn.push(o.text);
+      Object.values(o).forEach(walk);
+    }
+  };
+  walk(sanitizeSlackBlocks(report.blocks));
+  return [sanitizeSlackMarkup(report.text), ...mrkdwn, ...items.map(sweepItemText)];
+}
+
+test("a sweep report shows a hostile page title as text", () => {
+  const texts = reported([finding()]);
   assertInert(texts);
-  const card = texts.join("\n");
-  assert.ok(card.includes(`<${PAGE_URL}|Tutor guide [v2] &lt;!channel&gt; &lt;@U0123ABCD&gt;`), card);
-  assert.ok(card.includes("&amp; more"));
-  assert.ok(card.includes(`<@${OWNER}>`), "the owner is still mentioned");
+  const all = texts.join("\n");
+  assert.ok(all.includes("*Tutor guide [v2] &lt;!channel&gt; &lt;@U0123ABCD&gt;"), all);
+  assert.ok(all.includes("&amp; more"));
+  assert.ok(all.includes(`<@${OWNER}>`), "the owner is still mentioned");
 });
 
-test("a fix card's quotes and before → after show mention markup as text", () => {
-  const card = delivered(sweepCard(cardPlan("k", HERE, [finding()]))).join("\n");
-  assert.ok(card.includes("October 15 &lt;!here&gt; &amp; soon"), card);
-  assert.ok(card.includes("moved &lt;@U0123ABCD&gt; to"), card);
-  assert.ok(card.includes("&lt;!channel&gt;"), card);
+test("a sweep fix's words, on its card and in its pop-up, show mention markup as text", () => {
+  const all = reported([finding()]).join("\n");
+  assert.ok(all.includes("moved &lt;@U0123ABCD&gt; to"), all);
+  assert.ok(all.includes("Page says now: Launch date: October 15 &lt;!here&gt;"), all);
+  assert.ok(all.includes("Will say: Launch date: November 1 &lt;!channel&gt;"), all);
 });
 
-test("a multi-fix card's plan shows replacement text as text", () => {
+test("a several-fix report shows each replacement as text", () => {
   const items = [
     finding(),
     finding({ id: "C1:1.0:b2", blockId: "b2", original: "Owner: design", replacement: "Owner: <!subteam^S0ABC123> & co" }),
   ];
-  const texts = delivered(sweepCard(cardPlan("k", HERE, items)));
+  const texts = reported(items);
   assertInert(texts);
-  const all = texts.join("\n");
-  assert.ok(all.includes("_Owner: &lt;!subteam^S0ABC123&gt; &amp; co_"), all);
+  assert.ok(texts.join("\n").includes("Will say: Owner: &lt;!subteam^S0ABC123&gt; &amp; co"));
 });
 
 test("a revision card of a sweep card shows the page title, its parent and previews as text", () => {
@@ -124,4 +144,28 @@ test("an archive card's target shows the page title as text", () => {
     target: { title: HOSTILE, parent: "Roadmap <!here>", url: PAGE_URL },
   });
   assertInert(texts);
+});
+
+test("a long fix's card keeps the decision in view: each half is clipped on its own, and View shows both whole", () => {
+  const long = finding({
+    sourceSays: `Reward Eligible percentage is not defined yet: ${"5/10 or 5/29 depending on the denominator, ".repeat(6)}`,
+    threadSays: `Obsolete: the percentage was deleted from the report, ${"per the card comment, ".repeat(6)}`,
+  });
+  const item = sweepItem(long, HERE);
+  assert.ok(item.body.length <= 200, `${item.body.length} characters`);
+  assert.match(item.body, /^Page says “Reward Eligible.*…” · decision says “Obsolete: the percentage was deleted.*…”$/);
+  const record = reportRecord("C1", "1790000000.000100", decisionReport([item], "parent"), 1000);
+  const view = itemText(record, item.id)!;
+  assert.ok(view.includes("per the card comment, per the card comment, per the card comment, per the card comment, per the card comment, per the card comment"), "View keeps the whole decision");
+});
+
+test("the parent line reads as the design words it: one fix names its page and source, several count the pages", () => {
+  const record = { kind: "card" as const, url: "https://www.notion.so/card", title: "Card", entryIds: ["comment:c1"] };
+  const one = finding({ target: { url: PAGE_URL, kind: "notion", writable: true, title: "Teacher Insights Report — Part 2", pillars: [] } });
+  assert.equal(
+    sweepParent([{ ...one, evidence: { ...one.evidence, record } }], { rung: "design", channel: "plus-design" }),
+    "A card comment settled something that *Teacher Insights Report — Part 2* still states the old way.",
+  );
+  const pages = ["a", "b", "c"].map((p) => finding({ id: p, blockId: p, target: { url: `${PAGE_URL}${p}`, kind: "notion", writable: true, title: p, pillars: [] } }));
+  assert.equal(sweepParent(pages, HERE), "3 pages still state what their threads changed.");
 });
