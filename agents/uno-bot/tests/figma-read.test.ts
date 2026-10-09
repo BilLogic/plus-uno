@@ -30,6 +30,7 @@ import {
   FIGMA_COMMENTS_UNREAD_NOTE,
   FIGMA_NO_COMMENTS_NOTE,
   FIGMA_NOTE,
+  FIGMA_REPLIES_CAP_NOTE,
   FIGMA_TRUNCATION_NOTE,
   figmaCommentsCapNote,
   MAX_PINNED_CHARS,
@@ -37,7 +38,7 @@ import {
   MAX_TEXT_LAYERS,
   type FigmaNode,
 } from "../src/integrations/figma-reading";
-import { fetchFigmaFrame, fetchFigmaImagePngUrl, fetchFigmaNode } from "../src/integrations/figma";
+import { COMMENTS_MAX_WAIT_MS, fetchFigmaFrame, fetchFigmaImagePngUrl, fetchFigmaNode } from "../src/integrations/figma";
 import { FigmaRateLimitError, FigmaRequestError, type FigmaComment } from "../src/figma/client";
 import { createInMemoryFigma } from "../src/figma/in-memory";
 import { createFigmaRestClient } from "../src/figma/rest";
@@ -332,7 +333,28 @@ describe("the comments pinned to a pasted frame (#899)", () => {
     return describeFigmaFrame(URL, await fetchFigmaFrame(seeded(comments), FILE, NODE));
   }
 
-  /** The fields a frame read carried before #899, as it reads this frame. */
+  /**
+   * The payload a frame read handed the model before #899, note included,
+   * pinned as text so AC 3 compares with that reading and not with this
+   * branch's own constants.
+   */
+  const BEFORE_899 = {
+    ok: true,
+    source_type: "figma",
+    url: URL,
+    title: "Session card",
+    node_type: "FRAME",
+    content: "Today's session\nJoin",
+    text_layers: 2,
+    text_layers_truncated: false,
+    note:
+      "The frame's name, node type and text layers — nothing else. This payload carries no fills, " +
+      "tokens, variable bindings or measurements: never state one from it, and never report one as " +
+      "absent, because they are unread here rather than missing. Visual judgement comes from the " +
+      "frame's rendered image when one is attached to this turn; this text describes no pixels.",
+  };
+
+  /** The fields a frame read carries besides its note and its comments. */
   const TODAY = {
     ok: true,
     source_type: "figma",
@@ -429,10 +451,21 @@ describe("the comments pinned to a pasted frame (#899)", () => {
     assert.equal(payload.comment_threads, 1);
   });
 
-  it("reads a frame with no comments as it read before (AC 3)", async () => {
+  it("reads a frame with no comments as it read before, its note saying none is pinned (AC 3)", async () => {
+    const { note: noteBefore, ...fieldsBefore } = BEFORE_899;
     for (const comments of [[], [comment("sibling", { client_meta: pinnedTo("200:1") }), comment("page", {})]]) {
-      const payload = await pasted(comments);
-      assert.deepEqual(payload, { ...TODAY, note: `${FIGMA_NOTE} ${FIGMA_NO_COMMENTS_NOTE}` });
+      const { note, ...fields } = await pasted(comments);
+      assert.deepEqual(fields, fieldsBefore, "every field but the note is the one a read carried before #899");
+      // The note is the one deliberate change. Its opening scopes "name, node
+      // type and text layers" to the frame itself, since the payload can now
+      // carry comments; the rest of it is unchanged; and it gains one sentence
+      // saying no comment is pinned.
+      const reworded = FIGMA_NOTE.replace(
+        "Of the frame itself, this payload carries its name, node type and text layers only: no fills, tokens, variable bindings or measurements. Never",
+        "The frame's name, node type and text layers — nothing else. This payload carries no fills, tokens, variable bindings or measurements: never",
+      );
+      assert.equal(reworded, noteBefore, "only the opening of the note was reworded");
+      assert.equal(note, `${FIGMA_NOTE} ${FIGMA_NO_COMMENTS_NOTE}`);
     }
     // The text read itself is the drift check's, unchanged.
     assert.deepEqual(await fetchFigmaNode(seeded([]), FILE, NODE), {
@@ -505,6 +538,91 @@ describe("the comments pinned to a pasted frame (#899)", () => {
     assert.equal(one.comments_truncated, false);
   });
 
+  it("keeps the newest thread inside the text cap, cutting its earlier replies and saying how many", async () => {
+    const root = comment("root", {
+      created_at: "2026-09-01T00:00:00Z",
+      message: "Which empty state?",
+      client_meta: pinnedTo(NODE),
+    });
+    const replies = Array.from({ length: 30 }, (_, i) =>
+      comment(`r${i}`, {
+        parent_id: "root",
+        created_at: new Date(Date.UTC(2026, 8, 2 + i)).toISOString(),
+        message: `reply ${i} `.padEnd(1_000, "x"),
+      }),
+    );
+    const payload = await pasted([root, ...replies]);
+    const [thread] = payload.comments as Array<{ text: string; replies: Array<{ text: string }>; replies_unread?: number }>;
+    const chars = thread!.text.length + thread!.replies.reduce((n, r) => n + r.text.length, 0);
+    assert.ok(chars <= MAX_PINNED_CHARS, `${chars} chars listed, past the ${MAX_PINNED_CHARS} cap`);
+    assert.equal(thread!.text, "Which empty state?", "the opening comment is kept");
+    assert.equal(thread!.replies.at(-1)!.text.startsWith("reply 29 "), true, "the newest reply is kept");
+    assert.equal(thread!.replies_unread, 30 - thread!.replies.length);
+    assert.ok(String(payload.note).includes(FIGMA_REPLIES_CAP_NOTE));
+
+    // An opening comment longer than the cap on its own is cut to it.
+    const huge = await pasted([comment("huge", { message: "y".repeat(MAX_PINNED_CHARS * 2), client_meta: pinnedTo(NODE) })]);
+    const [cut] = huge.comments as Array<{ text: string; text_truncated?: boolean }>;
+    assert.ok(cut!.text.length <= MAX_PINNED_CHARS);
+    assert.equal(cut!.text_truncated, true);
+  });
+
+  it("leaves out a comment pinned to the page itself when the link names a page", async () => {
+    const PAGE = "0:1";
+    const figma = createInMemoryFigma();
+    figma.seedFile(FILE, {
+      nodes: { [PAGE]: { id: PAGE, name: "Sessions", type: "CANVAS", children: [FRAME] } },
+      comments: [
+        comment("on-page", { message: "Whole page: ship Friday", client_meta: pinnedTo(PAGE) }),
+        comment("on-frame", { message: "On the card", client_meta: pinnedTo(NODE) }),
+      ],
+    });
+    const payload = describeFigmaFrame(URL, await fetchFigmaFrame(figma, FILE, PAGE));
+    const threads = payload.comments as Array<{ text: string; layer?: string }>;
+    assert.deepEqual(
+      threads.map((t) => [t.layer, t.text]),
+      [["Session card", "On the card"]],
+    );
+    assert.equal(payload.comment_threads, 1);
+  });
+
+  it("still reads the frame when the comments call is the one the turn's budget stops", async () => {
+    let calls = 0;
+    const figma = createFigmaRestClient({
+      token: "figd_test",
+      async sleep() {},
+      async transport(url) {
+        // The turn has one lookup left: the first request through is served,
+        // the next is the budget stop.
+        if (++calls > 1) throw new SubrequestBudgetError(38);
+        if (url.includes("/nodes")) return Response.json({ nodes: { [NODE]: { document: FRAME } } });
+        return Response.json({ comments: [] });
+      },
+    });
+    const payload = describeFigmaFrame(URL, await fetchFigmaFrame(figma, FILE, NODE));
+    assert.equal(payload.content, "Today's session\nJoin");
+    assert.equal(payload.comments_unread, new SubrequestBudgetError(38).message);
+  });
+
+  it("gives up on a rate-limited comments read within seconds, keeping the frame", async () => {
+    const clock = { t: 0 };
+    const figma = createFigmaRestClient({
+      token: "figd_test",
+      now: () => clock.t,
+      async sleep(ms) {
+        clock.t += ms;
+      },
+      async transport(url) {
+        if (url.includes("/nodes")) return Response.json({ nodes: { [NODE]: { document: FRAME } } });
+        return new Response("rate limited", { status: 429, headers: { "Retry-After": "30" } });
+      },
+    });
+    const payload = describeFigmaFrame(URL, await fetchFigmaFrame(figma, FILE, NODE));
+    assert.equal(payload.content, "Today's session\nJoin");
+    assert.equal(typeof payload.comments_unread, "string");
+    assert.ok(clock.t <= 5_000, `the frame read was held ${clock.t} ms by its comments`);
+  });
+
   it("names an unnamed layer as such, so it never reads as the frame itself", async () => {
     const figma = createInMemoryFigma();
     figma.seedFile(FILE, {
@@ -519,8 +637,8 @@ describe("the comments pinned to a pasted frame (#899)", () => {
     const figma = seeded([]);
     await fetchFigmaFrame(figma, FILE, NODE);
     assert.deepEqual(figma.calls(), [
-      { method: "comments", args: [FILE, { timeoutMs: 8000, attempts: 2 }] },
       { method: "nodes", args: [FILE, [NODE], { timeoutMs: 8000 }] },
+      { method: "comments", args: [FILE, { timeoutMs: 8000, attempts: 2, maxWaitMs: COMMENTS_MAX_WAIT_MS }] },
     ]);
 
     const textOnly = seeded([comment("c1", { client_meta: pinnedTo(NODE) })]);
