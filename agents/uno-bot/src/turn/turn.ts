@@ -110,7 +110,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { judgedList, presentedProse, presenter, tableWalkRepair, type Presenter } from "./presentation";
+import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -480,6 +480,9 @@ export interface TurnDeps {
     /** The plain list of the result table beneath the draft, when one is
      *  attached — absent otherwise, and the judge is asked as before. */
     tableList?: string;
+    /** The draft is over its prose budget: shorten it, at any length the
+     *  judge reads. */
+    shorten?: boolean;
   }): Promise<TurnJudgement>;
 
   /** Clarify-vs-act: what this tool call still needs before it may be staged,
@@ -2002,11 +2005,13 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // lookups' table and ⚠️ lines, and the absence check's line above.
   const presentation = ctx.presenting.presentation();
 
-  // A draft over the prose budget above a table or cards (`turn/prose-budget.ts`) is redrafted
-  // to its takeaway by the same judge call; `presentedProse` is the backstop
-  // when the redraft misses.
-  const walkRepair = tableWalkRepair(draft, presentation);
-  if (walkRepair) console.log("[result-table] draft over the prose budget; asking the judge to redraft");
+  // A draft over its prose budget (`turn/prose-budget.ts`) — long above a
+  // table or cards, or long at all — is shortened to its takeaway by the same
+  // judge call, at any length the judge reads; `presentedProse` is the
+  // backstop when the shortening misses.
+  const budget = proseBudgetRepair(draft, presentation);
+  if (budget) console.log(`[prose-budget] ${budget.reason}: asking the judge to shorten the draft`);
+  const walkRepair = budget?.instruction;
 
   // ONE judge call carries every repair that fires. Sent as sibling
   // instructions they compete and the model does one.
@@ -2027,9 +2032,10 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
       ? { forceReason: verdict.kind }
       : absenceRepair
         ? { forceReason: "absence-scope" }
-        : walkRepair
-          ? { forceReason: "table-walk" }
+        : budget
+          ? { forceReason: budget.reason }
           : {}),
+    ...(budget ? { shorten: true } : {}),
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
     // both: a draft that summarises and points at the table has answered.
