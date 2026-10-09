@@ -45,8 +45,9 @@
 // `degraded` line, under the same two-line cap as every other trigger.
 //
 // THE SOURCES are every link the turn's lookups read, as their task cards
-// carry them: each once, in the order read. Which of them a thread may see,
-// and whether there are enough to fold into a box, is the posting side's call
+// carry them: each once, in the order read. Which of them the answer used,
+// which a thread may see, and whether to fold them into a box, is the posting
+// side's call, made against the prose
 // (`slack/card-sources.ts`, `slack/sources-box.ts`).
 //
 // PURE: no Env, no Slack shape.
@@ -500,7 +501,12 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       warnings.absenceFired(ctx);
     },
     sourcesRead(read) {
-      for (const source of read) if (!sources.has(source.url)) sources.set(source.url, source);
+      for (const source of read) {
+        const was = sources.get(source.url);
+        // A page a search found and a later lookup read whole was queried.
+        if (!was) sources.set(source.url, source);
+        else if (source.queried && was.queried !== "collection") sources.set(source.url, { ...was, queried: source.queried });
+      }
     },
     chartedAcross() {
       return drawnAcross.map(({ lookup, field }) => ({ lookup, field }));

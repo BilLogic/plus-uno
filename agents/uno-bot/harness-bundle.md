@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,695 chars from 16 files**, against an assembled budget of 175,500 (2,805 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,311 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,846 chars from 16 files**, against an assembled budget of 175,500 (2,654 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,462 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,610 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 100,006 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,422 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 33,922 (−6,098 ide-only) | 148,386 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 151,670 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 158,186 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 162,849 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 172,695 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,073 (−6,098 ide-only) | 148,537 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 151,821 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 158,337 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 163,000 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 172,846 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1028,7 +1028,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 #### Sources box and link previews
 
-**Code lists the links an answer read; the prose ends on its last point.** Every link the turn's lookups read, as their task cards carry it, is gathered once in the order read, and the ones a thread may see (`slack/card-sources.ts`) fold into a closed `container` titled `Sources (n)` beneath the answer, after any table. At most 10; fewer than 3 make no box, and those links sit on names in the prose. The title is the count alone. The links also ride the text copy as one `Sources:` line, and a refused box steps down to the answer with that line in its Markdown. Every answer post sets `unfurl_links` and `unfurl_media` to false.
+**Code lists the links an answer used; the prose ends on its last point.** Used means the Roadmap board or scoped Notion database a lookup queried, or a page it read whole, once, plus the rows the prose names: by whole link, a card's number (`#412`), or a title of 2+ words no other row shares (`slack/sources-box.ts`). The ones a thread may see fold into a closed `container` titled `Sources (n)` after any table, at most 10. A box needs 3+ used links, except that an unlinked board or database opens one alone, listing only links the prose leaves out. The title is the count alone. The links also ride the text copy as one `Sources:` line, and a refused box steps down to the answer with that line in its Markdown. Every answer post sets `unfurl_links` and `unfurl_media` to false.
 
 #### Linkable items: answer cards
 

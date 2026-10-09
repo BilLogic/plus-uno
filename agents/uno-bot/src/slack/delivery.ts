@@ -325,7 +325,7 @@ export async function postTextVerified(
   // footer does — the answer's last part, where it ends — and their plain text
   // rides that part's text copy, which is what a notification shows and what
   // the thread remembers.
-  const box = sourcesBox(presentation?.sources);
+  const box = sourcesBox(presentation?.sources, text);
   // What rides beneath the last part, in order: the charts, the table, the
   // cards, the ⚠️ lines, the box. Each carries its own plain text, so a
   // refused one steps down on its own while the others stay aboard.

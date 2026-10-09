@@ -230,6 +230,13 @@ test("an enumeration longer than the list reports how many matched", async () =>
   assert.equal(out.truncated, false);
 });
 
+test("a lookup names the board it queried, so the answer can cite it", async () => {
+  board = BOARD;
+  const out = (await roadmapQuery({ title: "DS Update" })) as Result & { board?: { title: string; url: string } };
+
+  assert.deepEqual(out.board, { title: "Roadmap", url: "https://www.notion.so/roadmapdb" });
+});
+
 // Asked for Shipped on 2026-10-08, the note opened "Complete result set … safe
 // to enumerate" and closed "(212 more rows truncated — say the list is the
 // first 30.)": a list cut to its first 30 is partial, whatever the read was.

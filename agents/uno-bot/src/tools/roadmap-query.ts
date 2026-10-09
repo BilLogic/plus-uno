@@ -18,6 +18,7 @@
 
 import type { Env } from "../types";
 import {
+  canonicalNotionUrl,
   databaseOptions,
   queryRoadmapCards,
   ROADMAP_STATUS_PROP,
@@ -244,6 +245,8 @@ export async function executeRoadmapQuery(
 
     return JSON.stringify({
       ok: true,
+      // The board itself, for the answer to cite once whichever cards it names.
+      board: { title: "Roadmap", url: canonicalNotionUrl(null, env.NOTION_ROADMAP_DB_ID) },
       filters: {
         ...(designStatus ? { design_status: designStatus } : {}),
         ...(title ? { title } : {}),

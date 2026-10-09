@@ -80,7 +80,7 @@ import type { Presentation, Delivery, DeliveryFailureStage, PostResult, Proposal
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { DELIVERY_RESERVE, SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
-import { MAX_SOURCES, readoutFor, type TaskCardDecision } from "../agent/task-card-readout";
+import { readoutFor, type TaskCardDecision } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
 import { estateIcon, type SlackIcon } from "./estate-glyphs";
 import {
@@ -89,6 +89,11 @@ import {
   type SessionStatus,
   type StatusResult,
 } from "./session-status";
+
+/** How many links one card carries: enough to open the source behind a
+ *  claim, few enough that a card stays a line, not a reading list. A lookup
+ *  hands over every link it read; the card shows the first of them. */
+const MAX_SOURCES = 5;
 
 /** Where this turn is happening, as Slack knows it. */
 export interface SlackDeliveryTarget {
@@ -1045,7 +1050,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           // A call folded into the overflow card has no card of its own to
           // carry a readout; only its status counts there.
           const output = event.output ? toPlainText(event.output) : "";
-          const sources = threadVisibleSources(event.sources ?? []).map((s) => ({ ...s, text: toPlainText(s.text) }));
+          const sources = threadVisibleSources(event.sources ?? [])
+            .slice(0, MAX_SOURCES)
+            .map((s) => ({ ...s, text: toPlainText(s.text) }));
           moveCall(ts, id, "complete", { ...(output ? { output } : {}), ...(sources.length ? { sources } : {}) });
           return;
         }

@@ -39,6 +39,19 @@ const ROWS: Row[] = [
       { text: "Tutor import table", url: "https://www.notion.so/plus/Tutor-import-table-def" },
     ],
   },
+  {
+    name: "roadmap_query",
+    args: { design_status: "WIP" },
+    details: "WIP",
+    result: ok({ count: 1, board: { title: "Roadmap", url: "https://www.notion.so/roadmapdb" }, cards: [
+      { title: "Tutor import v2", url: "https://www.notion.so/plus/Tutor-import-v2-abc" },
+    ] }),
+    output: "1 card",
+    sources: [
+      { text: "Roadmap", url: "https://www.notion.so/roadmapdb", queried: "collection" },
+      { text: "Tutor import v2", url: "https://www.notion.so/plus/Tutor-import-v2-abc" },
+    ],
+  },
   { name: "roadmap_query", args: { card_number: 412 }, details: "#412", result: ok({ count: 0, cards: [] }), output: "no matching cards", sources: [] },
   { name: "roadmap_query", args: { design_status: "In review" }, details: "In review", result: failed("bad status"), output: null, sources: [] },
   // notion_search
@@ -59,7 +72,7 @@ const ROWS: Row[] = [
     details: "https://www.figma.com/design/KEY/File?node-id=1-2",
     result: ok({ source_type: "figma", url: "https://www.figma.com/design/KEY/File?node-id=1-2", title: "Tutor card", content: "…" }),
     output: "Read Tutor card",
-    sources: [{ text: "Tutor card", url: "https://www.figma.com/design/KEY/File?node-id=1-2" }],
+    sources: [{ text: "Tutor card", url: "https://www.figma.com/design/KEY/File?node-id=1-2", queried: "page" }],
   },
   { name: "source_read", args: { text: "see https://example.com/a for it" }, details: "https://example.com/a", result: failed("fetch 404"), output: null, sources: [] },
   // search_blueprint
@@ -159,9 +172,11 @@ describe("a task card's readout", () => {
     }
   });
 
-  it("caps the sources a card carries", () => {
+  // The card's cap is the card's (`tests/checklist-sources.test.ts`): the
+  // answer may name the twelfth row, and the Sources box cites what it names.
+  it("lists every row's link, in the order read", () => {
     const results = Array.from({ length: 12 }, (_, i) => ({ title: `p${i}`, url: `https://www.notion.so/p${i}` }));
-    assert.equal(readoutFor("notion_search")!.sources(ok({ count: 12, results })).length, 5);
+    assert.equal(readoutFor("notion_search")!.sources(ok({ count: 12, results })).length, 12);
   });
 
   it("never lists one link twice", () => {
