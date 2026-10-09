@@ -227,7 +227,10 @@ function chartNote(chart: Chart): string {
  *  their lookups read only part of the board. */
 function lowerBoundNote(bounds: readonly LowerBound[]): string {
   const named = bounds.map((b) => `${b.name} (${b.value})`).join(", ");
-  return `The read stopped short for ${named}, so each is a lower bound, as is \`total\`: say "at least" for them and for any total.`;
+  return (
+    `The read stopped short for ${named}, so each is a lower bound, as is \`total\`: say "at least" for them and for any total, ` +
+    "since the chart is not exact for those bars either."
+  );
 }
 
 /** What `present` answers when a chart across lookups is refused: the counts
