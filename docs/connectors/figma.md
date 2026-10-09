@@ -14,7 +14,7 @@ summary: PLUS Figma files follow How We Fig — five stage folders per team, `<P
 
 ## Annotation category labels
 
-Every annotation carries exactly one category label. Six exist, and a file adds a seventh only by retiring one:
+Every annotation carries exactly one category label. There are six:
 
 | Label | Colour | What it holds |
 |---|---|---|
@@ -25,21 +25,23 @@ Every annotation carries exactly one category label. Six exist, and a file adds 
 | `Tooltip` | teal | hover and help text |
 | `Accessibility` | pink | focus order, keyboard, labels, contrast |
 
-The first four are Figma's presets, kept at their preset colours. `Logic / data` and `Tooltip` are the file's own and earn the slot on volume — 94 notes each across Web App Specs. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
+The first four are Figma's presets, kept at their preset colours; `Logic / data` and `Tooltip` are the file's own. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
 
 **`Logic / data` is not `Development`, and the test is the reader.** A product rule a non-engineer can review is `Logic / data`; an endpoint only a developer can review is `Development`. Ask *could a non-engineer tell me this is wrong?* — yes is `Logic / data`.
 
-**Status is never a category.** Build status, scope and on-hold go in section names. Figma allows one category per annotation, so a status label steals the slot from the type; `Update`, `Spec` and `Deferred` were retired for this.
+**Status lives in section names.** Build status, scope and on-hold go there: Figma allows one category per annotation, so a status label would take the type's slot.
 
-**Component construction and usage go in the component's `description`, not an annotation.** Dev Mode already shows component name, variant props and token bindings, so an annotation restating one is deleted rather than moved. Guidance on using the component belongs in the description, where it travels with the component instead of one frame.
+<!-- ide-only -->
+**Component construction and usage go in the component's `description`.** Dev Mode already shows name, variant props and token bindings; usage guidance in the description travels with the component instead of one frame.
 
 **Analytics and responsive have no label.** What is recorded sits in `Logic / data`; responsive behaviour sits in its own section, which annotations point at. Add an `Analytics` label only once specs carry event names and payloads.
 
 ### Why the list drifts
 
-Annotation categories are per-file and are not shared through a library. Pasting a layer into another file recreates its category there unless the label **and** the colour both match, so a near-duplicate spawns silently. Web App Specs reached 18 that way — `Behaviour` beside `Behavior`, three separate `Tooltip`s — before the 2026-10-09 consolidation re-pointed 391 annotations onto the six above. Preferring the presets is the cheapest defence, since every file already has them at a fixed colour.
+Annotation categories are per-file; a library does not carry them. Pasting a layer into another file recreates its category there unless the label **and** the colour both match, so a near-duplicate spawns silently. Preferring the presets is the cheapest defence, since every file already has them at a fixed colour.
 
-The Plugin API has `addAnnotationCategoryAsync` and nothing else: **no rename, no recolour, no remove.** A category is retired by re-pointing every annotation off it and then deleting it by hand in the Figma UI, and `getAnnotationCategoriesAsync` may serve the old list for a while afterwards.
+To retire a category, re-point every annotation off it first, then delete it; `getAnnotationCategoriesAsync` may serve the old list for a while afterwards.
+<!-- /ide-only -->
 
 ## Teams and stage folders
 
