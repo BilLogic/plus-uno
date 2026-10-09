@@ -1135,7 +1135,7 @@ describe("wiring", () => {
     assert.equal(threadHooks(bare, { dryRun: false, runDate: utcDay(EOD) }), undefined);
   });
 
-  it("the message job tries the DS dispute first, then a Figma decision's rewording, then the card follow-up reply — no typed answer to a drift card", () => {
+  it("the message job tries a typed gate emoji in a DS precedence thread first, then a Figma decision's rewording, then the card follow-up reply — no typed answer to a drift card", () => {
     const handlers = replyHandlersFor({ PLUS_DESIGN_CHANNEL_ID: DESIGN, USAGE_DB: {}, HARNESS_KV: {} } as unknown as Env);
     assert.deepEqual(handlers.map((h) => h.name), ["ds-precedence", "figma-decisions", "follow-through"]);
     const card = handlers[2]!;

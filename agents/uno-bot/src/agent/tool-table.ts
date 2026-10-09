@@ -406,6 +406,19 @@ export const TOOL_TABLE = {
       nouns: ["note", "share", "post"],
     },
   },
+  // A weekly DS precedence card's one operation (src/ds-precedence/intake.ts):
+  // file the week's intake, or comment on it once the week has one. The
+  // Worker stages it; the model is never offered it.
+  ds_precedence_intake: {
+    access: "worker",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "add this to the week's DS precedence intake",
+      kind: "file an issue",
+      nouns: ["intake", "issue", "precedence"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 

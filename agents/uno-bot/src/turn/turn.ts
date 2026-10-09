@@ -1470,8 +1470,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // newest is only one of them: the batch is checked against every live fix.
   const replaced = await cardRevised(request.pending, result.operations, threadState);
 
-  // A keyed card that revises only its own way (the weekly DS precedence
-  // card, through `drop N`) is not revised by a turn at all: the batch is
+  // A keyed card that revises only its own way (a weekly DS precedence card,
+  // decided as it stands in its Review) is not revised by a turn at all: the batch is
   // refused with the card's note, rather than staged as a near-copy that
   // stays live beside it — two live cards could both run.
   if (replaced?.refuseRevision) {

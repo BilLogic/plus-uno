@@ -7,7 +7,7 @@
 // is here: the clipping to Block Kit's limits, the held-back count, the
 // record the store keeps (`reportRecord`), the fields each item's proposal is
 // staged with (`itemProposal`), and every state a card can show — open,
-// changes asked, approved and written, approved and not written, rejected,
+// changes asked, approved and written, approved and not written, rejected, noted,
 // closed with no decision, and never staged. None of it teaches a gate of
 // its own: no ✅/⛔ footer, nothing to type.
 //
@@ -195,6 +195,8 @@ function shownAs(entry: ReportEntry): { subtitle?: string; body: string; button:
       return { subtitle: `Approved by ${by(state.by)} · not written: ${state.reason}`, body: "Nothing written.", button: "View" };
     case "rejected":
       return { subtitle: `Rejected by ${by(state.by)}`, body: state.reason ? `Nothing written. Reason: ${state.reason}` : "Nothing written.", button: "View" };
+    case "noted":
+      return { subtitle: `Noted by ${by(state.by)}`, body: `Note: ${state.note}`, button: "View" };
     case "expired":
       return { subtitle: "Closed, no decision", body: item.body, button: "View" };
     case "not-staged":

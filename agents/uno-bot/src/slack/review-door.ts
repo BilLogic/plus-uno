@@ -415,7 +415,7 @@ async function applyRevise(
     return;
   }
   await showIn(request, deps)(
-    noticeView(card, verdict.proposal.item ? "Sent back with your note. I'm revising the draft, and its card shows the revision once it is ready." : "Sent back with your note. I'm revising the draft, and the new card posts in the thread."),
+    noticeView(card, verdict.proposal.afterNeedsChanges ?? (verdict.proposal.item ? "Sent back with your note. I'm revising the draft, and its card shows the revision once it is ready." : "Sent back with your note. I'm revising the draft, and the new card posts in the thread.")),
   );
   // Live, not decided: nothing is decided until the revision replaces it, and
   // a revision that never comes hands the card back (`startRevision`, Turn's
