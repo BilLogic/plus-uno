@@ -110,7 +110,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { judgedList, presentedProse, presenter, type Presenter } from "./presentation";
+import { judgedList, presentedProse, presenter, tableWalkRepair, type Presenter } from "./presentation";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -2002,9 +2002,15 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // lookups' table and ⚠️ lines, and the absence check's line above.
   const presentation = ctx.presenting.presentation();
 
-  // ONE judge call carries both repairs when both fire. Sent as two sibling
+  // A draft that walks more than 3 of the table's rows beneath it is redrafted
+  // to its takeaway by the same judge call; `presentedProse` is the backstop
+  // when the redraft misses.
+  const walkRepair = tableWalkRepair(draft, presentation);
+  if (walkRepair) console.log("[result-table] draft walks the table; asking the judge to redraft");
+
+  // ONE judge call carries every repair that fires. Sent as sibling
   // instructions they compete and the model does one.
-  const extra = [repairInstruction(verdict) ?? undefined, absenceRepair]
+  const extra = [repairInstruction(verdict) ?? undefined, absenceRepair, walkRepair]
     .filter(Boolean)
     .join("\n\n");
 
@@ -2021,7 +2027,9 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
       ? { forceReason: verdict.kind }
       : absenceRepair
         ? { forceReason: "absence-scope" }
-        : {}),
+        : walkRepair
+          ? { forceReason: "table-walk" }
+          : {}),
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
     // both: a draft that summarises and points at the table has answered.
@@ -2051,13 +2059,15 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     );
   }
 
-  // Rows the model typed out as well as the table come out here, after the
+  // Rows the model typed out as well as the table come out here, and list
+  // items past the first 3 rows when the redraft missed, after the
   // judge (whose revision could type them too) and before the one call every
   // Delivery shares, so Slack, the recording Delivery and the thread's memory
   // all get the same prose. A rule that must hold on every provider lives in
   // code, not in the persona.
   const stripped = presentedProse(reviewed.text, presentation);
   if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
+  if (stripped.trimmed) console.log(`[result-table] trimmed ${stripped.trimmed} list item(s) past the first rows named`);
   const prose = stripped.text;
 
   // The table rides with the answer; what comes back as `posted.text` is then

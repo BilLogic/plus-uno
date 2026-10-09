@@ -73,7 +73,10 @@ import {
   tableOffer,
   withResultList,
   withoutRepeatedRows,
+  namedRows,
+  withinNamedRows,
   MAX_COLUMNS,
+  MAX_NAMED_ROWS,
   type CardTable,
   type ResultTable,
   type RoadmapResult,
@@ -84,6 +87,7 @@ import { signed, warningLog } from "./warning-line";
 import { rowFor } from "../agent/tool-table";
 import type { AbsenceContext } from "../agent/absence";
 import { splitCutShort } from "../agent/loop-policy";
+import { claimsFreshness, hasWovenConfidence } from "../agent/confidence";
 
 /** What rides beneath an answer. */
 export interface Presentation {
@@ -171,7 +175,7 @@ function cardTableNote(table: CardTable): string {
   return (
     `A card table is posted beneath your answer. It shows ${shows}. ` +
     "The rows belong to the table, so do not type them out: give the count, what stands out and any actions, " +
-    "and name at most 3 cards, linked." +
+    `and name at most ${MAX_NAMED_ROWS} cards, linked.` +
     (table.filter.title
       ? ' Cards with title_match "similar" are not in the table; offer those as \'did you mean\' only if they help.'
       : "")
@@ -183,7 +187,7 @@ function attachedNote(table: ResultTable): string {
   return (
     `A table is posted beneath your answer, captioned "${table.caption}". ` +
     "Its rows belong to the table, so do not type them out: lead with your takeaway in one sentence, " +
-    "then what stands out and any actions, naming at most 3 rows." +
+    `then what stands out and any actions, naming at most ${MAX_NAMED_ROWS} rows.` +
     (table.partial ? " The list is partial; say so." : "")
   );
 }
@@ -207,7 +211,7 @@ function cardsNote(cards: AnswerCards): string {
   const shows = cards.total > n ? `the first ${n} of ${cards.total} linked items; say so and give the total` : `all ${n} linked items`;
   return (
     `${n === 1 ? "A card is" : "A carousel of cards is"} posted beneath your answer. It shows ${shows}, ` +
-    "each with its link buttons. Do not list them again: lead with your takeaway in one sentence, then what stands out, naming at most 3."
+    `each with its link buttons. Do not list them again: lead with your takeaway in one sentence, then what stands out, naming at most ${MAX_NAMED_ROWS}.`
   );
 }
 
@@ -534,10 +538,35 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
 }
 
 /**
+ * What the judge is asked to repair when the draft walks the table: it names
+ * more than 3 of the rows posted beneath it. Folded into the one judge call
+ * the turn already makes; undefined when there is nothing to repair.
+ *
+ * @param draft - The answer as the model wrote it
+ * @param presentation - What rides beneath it
+ */
+export function tableWalkRepair(draft: string, presentation: Presentation | undefined): string | undefined {
+  const table = presentation?.table;
+  const named = table ? namedRows(draft, table).length : 0;
+  if (named <= MAX_NAMED_ROWS) return undefined;
+  return (
+    `TABLE WALK. The draft names ${named} rows of the table posted beneath it, and the table shows every row. ` +
+    "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
+    `naming at most ${MAX_NAMED_ROWS} rows, linked, and leave the rest to the table. ` +
+    "Keep the confidence clause and any caveat as they are."
+  );
+}
+
+/** A line the backstop never takes out: the confidence clause. */
+const carriesConfidence = (line: string): boolean => hasWovenConfidence(line) || claimsFreshness(line);
+
+/**
  * The prose as it posts beneath a presentation: every line that types out a
- * row of the table taken out, since the table already shows them. A turn with
- * no table posts its prose as written; one whose prose came back empty posts
- * the takeaway the model asked for the table with.
+ * row of the table taken out, since the table already shows them, and — when
+ * it still names more than 3 of its rows, the judge's redraft having missed —
+ * the list items naming rows past the first 3. A turn with no table posts its
+ * prose as written; one whose prose came back empty posts the takeaway the
+ * model asked for the table with.
  *
  * @param prose - The answer as the model wrote it
  * @param presentation - What rides beneath it
@@ -548,9 +577,13 @@ export function presentedProse(prose: string, presentation: Presentation | undef
     const takeaway = presentation?.charts?.find((c) => c.takeaway)?.takeaway;
     return { text: !prose.trim() && takeaway ? takeaway : prose, removed: 0 };
   }
+  // Counted before the strip, so a row it takes out as typed-out still counts.
+  const named = namedRows(prose, table);
   const stripped = withoutRepeatedRows(prose, table);
   if (!stripped.text.trim() && table.takeaway) return { text: table.takeaway, removed: stripped.removed };
-  return stripped;
+  if (named.length <= MAX_NAMED_ROWS) return stripped;
+  const trimmed = withinNamedRows(stripped.text, table, new Set(named.slice(0, MAX_NAMED_ROWS)), carriesConfidence);
+  return { ...stripped, text: trimmed.text, ...(trimmed.removed ? { trimmed: trimmed.removed } : {}) };
 }
 
 /**
