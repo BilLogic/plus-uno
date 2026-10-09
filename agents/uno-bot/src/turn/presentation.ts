@@ -74,7 +74,6 @@ import {
   withResultList,
   withoutRepeatedRows,
   namedRows,
-  withinNamedRows,
   MAX_COLUMNS,
   MAX_NAMED_ROWS,
   type CardTable,
@@ -87,7 +86,8 @@ import { signed, warningLog } from "./warning-line";
 import { rowFor } from "../agent/tool-table";
 import type { AbsenceContext } from "../agent/absence";
 import { splitCutShort } from "../agent/loop-policy";
-import { claimsFreshness, hasWovenConfidence } from "../agent/confidence";
+import { hasWovenConfidence } from "../agent/confidence";
+import { measureProse, overBudget, withinListBudget, MAX_LIST_ITEMS, MAX_PROSE_CHARS } from "./prose-budget";
 
 /** What rides beneath an answer. */
 export interface Presentation {
@@ -538,52 +538,67 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
 }
 
 /**
- * What the judge is asked to repair when the draft walks the table: it names
- * more than 3 of the rows posted beneath it. Folded into the one judge call
- * the turn already makes; undefined when there is nothing to repair.
+ * What the judge is asked to repair when the draft runs long above a table or
+ * cards (`turn/prose-budget.ts`): more than 3 list items, more than 1,000
+ * characters, or more than 3 of the table's rows named. Folded into the one
+ * judge call the turn already makes; undefined when the draft is within it.
  *
  * @param draft - The answer as the model wrote it
  * @param presentation - What rides beneath it
  */
 export function tableWalkRepair(draft: string, presentation: Presentation | undefined): string | undefined {
   const table = presentation?.table;
+  if (!table && !presentation?.cards) return undefined;
   const named = table ? namedRows(draft, table).length : 0;
-  if (named <= MAX_NAMED_ROWS) return undefined;
+  const measure = measureProse(draft);
+  if (!overBudget(measure, named, MAX_NAMED_ROWS)) return undefined;
+  const what = table ? "table" : "set of cards";
+  const over = [
+    measure.items > MAX_LIST_ITEMS ? `${measure.items} list items` : null,
+    measure.chars > MAX_PROSE_CHARS ? `${measure.chars} characters` : null,
+    named > MAX_NAMED_ROWS ? `names ${named} rows of the table` : null,
+  ].filter(Boolean);
   return (
-    `TABLE WALK. The draft names ${named} rows of the table posted beneath it, and the table shows every row. ` +
+    `TABLE WALK. The ${what} posted beneath this draft shows every row, yet the draft runs long: ${over.join("; ")}. ` +
     "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
-    `naming at most ${MAX_NAMED_ROWS} rows, linked, and leave the rest to the table. ` +
-    "Keep the confidence clause and any caveat as they are."
+    `in at most ${MAX_LIST_ITEMS} list items and ${MAX_PROSE_CHARS} characters, naming at most ${MAX_NAMED_ROWS} rows, linked; ` +
+    `leave the rest to the ${what}. Keep the confidence clause and any caveat as they are.`
   );
 }
 
-/** A line the backstop never takes out: the confidence clause. */
-const carriesConfidence = (line: string): boolean => hasWovenConfidence(line) || claimsFreshness(line);
+/** A line the backstop never takes out: the confidence clause, which says
+ *  what was checked or how sure. A bare "currently" in a row's sentence is
+ *  not one. */
+const carriesConfidence = (line: string): boolean => hasWovenConfidence(line);
 
 /**
  * The prose as it posts beneath a presentation: every line that types out a
  * row of the table taken out, since the table already shows them, and — when
- * it still names more than 3 of its rows, the judge's redraft having missed —
- * the list items naming rows past the first 3. A turn with no table posts its
- * prose as written; one whose prose came back empty posts the takeaway the
- * model asked for the table with.
+ * the prose is still over the budget for an answer above a table or cards, the
+ * judge's redraft having missed — the list items past the first 3. A turn
+ * with neither posts its prose as written; one whose prose came back empty
+ * posts the takeaway the model asked for the table or chart with.
  *
  * @param prose - The answer as the model wrote it
  * @param presentation - What rides beneath it
  */
 export function presentedProse(prose: string, presentation: Presentation | undefined): RowsRemoved {
   const table = presentation?.table;
-  if (!table) {
+  let out: RowsRemoved = { text: prose, removed: 0 };
+  let named = 0;
+  if (table) {
+    // Counted before the strip, so a row it takes out as typed-out still counts.
+    named = namedRows(prose, table).length;
+    out = withoutRepeatedRows(prose, table);
+    if (!out.text.trim() && table.takeaway) return { text: table.takeaway, removed: out.removed };
+  } else {
     const takeaway = presentation?.charts?.find((c) => c.takeaway)?.takeaway;
-    return { text: !prose.trim() && takeaway ? takeaway : prose, removed: 0 };
+    if (!prose.trim() && takeaway) return { text: takeaway, removed: 0 };
+    if (!presentation?.cards) return out;
   }
-  // Counted before the strip, so a row it takes out as typed-out still counts.
-  const named = namedRows(prose, table);
-  const stripped = withoutRepeatedRows(prose, table);
-  if (!stripped.text.trim() && table.takeaway) return { text: table.takeaway, removed: stripped.removed };
-  if (named.length <= MAX_NAMED_ROWS) return stripped;
-  const trimmed = withinNamedRows(stripped.text, table, new Set(named.slice(0, MAX_NAMED_ROWS)), carriesConfidence);
-  return { ...stripped, text: trimmed.text, ...(trimmed.removed ? { trimmed: trimmed.removed } : {}) };
+  if (!overBudget(measureProse(out.text), named, MAX_NAMED_ROWS)) return out;
+  const trimmed = withinListBudget(out.text, carriesConfidence);
+  return { ...out, text: trimmed.text, ...(trimmed.removed ? { trimmed: trimmed.removed } : {}) };
 }
 
 /**

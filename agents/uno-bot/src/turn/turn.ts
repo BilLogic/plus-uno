@@ -2002,11 +2002,11 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // lookups' table and ⚠️ lines, and the absence check's line above.
   const presentation = ctx.presenting.presentation();
 
-  // A draft that walks more than 3 of the table's rows beneath it is redrafted
+  // A draft over the prose budget above a table or cards (`turn/prose-budget.ts`) is redrafted
   // to its takeaway by the same judge call; `presentedProse` is the backstop
   // when the redraft misses.
   const walkRepair = tableWalkRepair(draft, presentation);
-  if (walkRepair) console.log("[result-table] draft walks the table; asking the judge to redraft");
+  if (walkRepair) console.log("[result-table] draft over the prose budget; asking the judge to redraft");
 
   // ONE judge call carries every repair that fires. Sent as sibling
   // instructions they compete and the model does one.
@@ -2060,14 +2060,14 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   }
 
   // Rows the model typed out as well as the table come out here, and list
-  // items past the first 3 rows when the redraft missed, after the
+  // items past the first 3 when the prose is still over budget, after the
   // judge (whose revision could type them too) and before the one call every
   // Delivery shares, so Slack, the recording Delivery and the thread's memory
   // all get the same prose. A rule that must hold on every provider lives in
   // code, not in the persona.
   const stripped = presentedProse(reviewed.text, presentation);
   if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
-  if (stripped.trimmed) console.log(`[result-table] trimmed ${stripped.trimmed} list item(s) past the first rows named`);
+  if (stripped.trimmed) console.log(`[result-table] trimmed ${stripped.trimmed} list item(s) past the first 3; prose over budget`);
   const prose = stripped.text;
 
   // The table rides with the answer; what comes back as `posted.text` is then
