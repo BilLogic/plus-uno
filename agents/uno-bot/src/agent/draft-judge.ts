@@ -12,7 +12,9 @@
 //     emoji, which is read at any length (`voice/emoji.ts`), and a breach of
 //     the count fails whatever the judge says.
 //   • VERDICT ONLY past the revision window (MAX_DRAFT_CHARS): a long draft
-//     is read whole and graded, but no rewrite of it ever ships.
+//     is read whole and graded, but no rewrite of it ever ships — unless the
+//     caller asks it to SHORTEN the draft (`shorten`), whose rewrite is short
+//     by construction.
 //   • FAIL OPEN: any judge error/timeout/unparseable output → send the
 //     ORIGINAL draft unchanged. The judge can only ever improve a reply,
 //     never block one.
@@ -40,7 +42,7 @@
 // correction gate, the skip and the fail-open on the fake adapter, with no
 // credential and no Workers runtime.
 
-import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
+import { shouldRejectRevision, looksLikeStalledCorrection, retainedVocabulary } from "./revision-guard";
 import type { ModelProvider, ModelText } from "./model-provider";
 import type { ModelTier } from "./routing";
 import { emojiIn, replyEmojiBreach } from "../voice/emoji";
@@ -146,6 +148,17 @@ const MAX_VERDICT_DRAFT_CHARS = 32_000;
 const MIN_REVISION_RATIO = 0.25;
 // Room for a full revised draft to come back in the same call.
 const JUDGE_MAX_TOKENS = 6000;
+// A shortened draft must come back no longer than this, or the draft ships. A
+// rewrite asked to be short that is not is no shortening, and the bound keeps
+// it far inside JUDGE_MAX_TOKENS, which is what makes a shortened rewrite of a
+// draft past the revision window safe to ship: it cannot be a cut-off prefix
+// of a long answer. Three times the prose budget beside a table
+// (`turn/prose-budget.ts`), so a shortening that overshoots still ships.
+const MAX_SHORTENED_CHARS = 3_000;
+// How much of a shortened draft's vocabulary must be the draft's own: a
+// shortening keeps the draft's words and drops most of them, so the measure is
+// the rewrite's words found in the draft, not the draft's found in the rewrite.
+const MIN_SHORTENED_FROM_DRAFT = 0.5;
 
 /**
  * The tier the judge grades on — the ONLY thing it says about the model.
@@ -191,6 +204,10 @@ Failure code: "gate:correction".`;
  *  `revised` field in this mode anyway (`reviewDraft`); telling the judge not
  *  to write one is what keeps the call to a verdict's worth of output, and so
  *  inside the timer. */
+const SHORTEN = `
+
+SHORTEN. This draft runs far past the short answer it should be. Fail it with "gate:length" and return in "revised" the short answer the instruction below describes, in the draft's own words and facts: nothing it does not say. Keep its confidence clause and any caveat as they are, and keep any table it holds as it is.`;
+
 const VERDICT_ONLY = `
 
 VERDICT ONLY. This draft is long, and it ships as written whatever you find, so do NOT rewrite it and do NOT include a "revised" field. Judge the WHOLE draft, to its last line, against the same rubric and gates. Reply with STRICT JSON only:
@@ -249,7 +266,7 @@ export interface JudgeOutcome {
 
 /** How a draft is judged, decided by its length alone and logged on every
  *  verdict line: `revise` may ship the judge's rewrite, `verdict` never does. */
-type JudgeMode = "revise" | "verdict";
+type JudgeMode = "revise" | "verdict" | "shorten";
 
 /** What a skip with no reason is recorded as — a bug, named rather than blank. */
 const UNRECORDED_SKIP_REASON = "skipped for no recorded reason";
@@ -323,7 +340,9 @@ async function callJudgeModel(
     (ctx.extraInstruction ? `\n\n${ctx.extraInstruction}` : "");
 
   const system =
-    JUDGE_SYSTEM + (ctx.correction ? CORRECTION_GATE : "") + (ctx.mode === "verdict" ? VERDICT_ONLY : "");
+    JUDGE_SYSTEM +
+    (ctx.correction ? CORRECTION_GATE : "") +
+    (ctx.mode === "verdict" ? VERDICT_ONLY : ctx.mode === "shorten" ? SHORTEN : "");
 
   // A tier, a system block, a prompt and a ceiling. Whether that is Gemini or
   // Claude, which model the tier resolves to, what level it thinks at and
@@ -369,6 +388,12 @@ export async function reviewDraft(
      *  could be pushed into verdict-only by rows the judge was never going to
      *  rewrite. */
     tableList?: string;
+    /** The turn found the draft over its prose budget and asks for it
+     *  SHORTENED: judged in shorten mode at any length the judge reads, and a
+     *  rewrite ships only if it is short, shorter than the draft and in the
+     *  draft's own words. Set with a `forceReason` and an `extraInstruction`
+     *  saying what the short answer keeps. */
+    shorten?: boolean;
   },
 ): Promise<JudgeOutcome> {
   const { userText, draft, priorAssistantText, forceReason, extraInstruction, tableList } = args;
@@ -403,8 +428,15 @@ export async function reviewDraft(
   // fail ships the draft as written, with the failed codes on the verdict line.
   // A forced repair (correction, confidence, absence) gets a verdict and no
   // repair past this line: a repair is a rewrite, and a rewrite is what this
-  // window cannot trust.
-  const mode: JudgeMode = draft.trim().length > MAX_DRAFT_CHARS ? "verdict" : "revise";
+  // window cannot trust. A SHORTEN is the exception, at any length the judge
+  // reads: its rewrite is bounded by MAX_SHORTENED_CHARS, far inside the
+  // output ceiling, so it cannot come back as a cut-off prefix. Live on r525 a
+  // 10,198-character walk was graded and shipped as written for want of it.
+  const mode: JudgeMode = args.shorten
+    ? "shorten"
+    : draft.trim().length > MAX_DRAFT_CHARS
+      ? "verdict"
+      : "revise";
 
   // Past the verdict window nothing is asked, so the call stays bounded. No
   // caller lifts this, and the skip is logged so it never reads as a pass.
@@ -474,6 +506,22 @@ export async function reviewDraft(
           // against the draft; none of them can tell a faithful prefix of a
           // long answer from the answer.
           if (revised) console.warn("[draft-judge] revision past the revision window — ignored, sending the original draft");
+        } else if (mode === "shorten") {
+          // Its own guards: a shortening is meant to drop most of the draft, so
+          // the length ratio and the retained-vocabulary test below would
+          // refuse the very rewrite asked for.
+          if (!revised) {
+            console.warn("[draft-judge] shorten asked, no revision — sending the original draft");
+          } else if (revised.length >= draft.trim().length || revised.length > MAX_SHORTENED_CHARS) {
+            console.warn("[draft-judge] shortened revision is not short — sending the original draft");
+          } else if (retainedVocabulary(revised, draft) < MIN_SHORTENED_FROM_DRAFT) {
+            console.warn("[draft-judge] shortened revision says what the draft did not — sending the original draft");
+          } else if (replyEmojiBreach(revised)) {
+            console.warn("[draft-judge] revision breaks the emoji budget — sending the original draft");
+          } else {
+            text = revised;
+            revisedUsed = true;
+          }
         } else if (revised.length < draft.trim().length * MIN_REVISION_RATIO) {
           console.warn("[draft-judge] fail verdict but truncated revision — sending the original draft");
         } else if (replyEmojiBreach(revised)) {

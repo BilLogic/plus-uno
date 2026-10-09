@@ -17,12 +17,25 @@
 //     A takeaway, a confidence clause and 3 linked rows come to about 700.
 //   • ROWS NAMED: more than 3 of the table's rows, counted by the caller
 //     (`namedRows`), which catches a walk written as sentences.
+// Rows beneath are a table or cards `present` attached, or a Markdown table
+// the model typed into the prose itself: live on r525 it never called
+// `present`, typed its own table after a 10,198-character walk, and nothing
+// armed. The typed table stays; the budget is on the prose around it.
+//
+// A typed table and a fenced code block are not prose: they are measured
+// out, so a long table or a setup script beside a table is not a walk.
+//
+// NO TABLE, NO BUDGET. The defect is the rows printed twice, once in the prose
+// and once in the table; an answer with no table beneath it is as long as the
+// question asks. A general 3,000-character cap was weighed and dropped: it
+// would have cut walkthroughs asked for at length.
 //
 // WHAT IS DONE. Over budget, the turn asks the one judge call it already makes
-// to redraft the answer to the takeaway (`turn/presentation.ts`). When the
-// prose that ships is still over — the judge erred, or the draft was past its
-// rewrite window — `withinListBudget` is the backstop: it takes out list items
-// past the first 3, and nothing that is not a list item.
+// to SHORTEN the answer to the takeaway (`turn/presentation.ts`), at any
+// length the judge reads (`agent/draft-judge.ts`). When the prose that ships
+// is still over — the judge erred or passed it — `withinListBudget` is the
+// backstop: it takes out list items past the first 3, and nothing that is not
+// a list item.
 //
 // PURE: no Env, no Slack shape.
 
@@ -36,6 +49,15 @@ export const MAX_PROSE_CHARS = 1_000;
 /** A line that opens a list item: a bullet or a number. */
 const LIST_ITEM = /^\s*(?:[-*+•◦▪▫‣]︎?|\d+[.)])\s+/;
 
+/** A row of a typed Markdown table: `| a | b |`. */
+const TABLE_ROW = /^\s*\|.*\|\s*$/;
+
+/** A typed table's header rule: `| --- | :-: |`. */
+const TABLE_RULE = /^\s*\|(?:\s*:?-{3,}:?\s*\|)+\s*$/;
+
+/** A code fence. */
+const FENCE = /^\s*```/;
+
 /** A horizontal rule: `---`, `***`, `___`. */
 const RULE = /^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/;
 
@@ -46,28 +68,67 @@ const indentOf = (line: string): number => /^\s*/.exec(line)![0].length;
 const visible = (s: string): string =>
   s.replace(/<[^|>\s]+\|([^>]*)>/g, "$1").replace(/\[([^\]]*)\]\([^)\s]*\)/g, "$1");
 
+/** Which lines are not prose: a fenced code block's, fences included, and a
+ *  typed table's — two or more `|` rows, one of them its header rule. */
+function notProse(lines: readonly string[]): boolean[] {
+  const out = lines.map(() => false);
+  let fenced = false;
+  for (const [i, line] of lines.entries()) {
+    if (FENCE.test(line)) {
+      out[i] = true;
+      fenced = !fenced;
+    } else if (fenced) out[i] = true;
+  }
+  for (let i = 0; i < lines.length; i++) {
+    if (out[i] || !TABLE_ROW.test(lines[i]!)) continue;
+    let end = i;
+    while (end < lines.length && !out[end] && TABLE_ROW.test(lines[end]!)) end++;
+    if (end - i >= 2 && lines.slice(i, end).some((l) => TABLE_RULE.test(l))) for (let j = i; j < end; j++) out[j] = true;
+    i = end - 1;
+  }
+  return out;
+}
+
 /** What the prose measures against the budget. */
 export interface ProseMeasure {
   /** List items, at any depth. */
   items: number;
-  /** Visible characters. */
+  /** Visible characters of prose. */
   chars: number;
+  /** A Markdown table is typed into the answer. */
+  typedTable: boolean;
 }
 
 /**
- * How the prose measures against the budget.
+ * How the prose measures against the budget: a typed table and a code block
+ * are not prose, and count toward neither.
  *
  * @param prose - The answer
  */
 export function measureProse(prose: string): ProseMeasure {
+  const lines = prose.split("\n");
+  const skip = notProse(lines);
+  const kept = lines.filter((_, i) => !skip[i]);
   return {
-    items: prose.split("\n").filter((line) => LIST_ITEM.test(line)).length,
-    chars: visible(prose).trim().length,
+    items: kept.filter((line) => LIST_ITEM.test(line)).length,
+    chars: visible(kept.join("\n")).trim().length,
+    typedTable: lines.some((line, i) => skip[i] && TABLE_RULE.test(line)),
   };
 }
 
-/** Whether a measure is over the budget, with `named` of the table's rows. */
-export function overBudget(measure: ProseMeasure, named: number, maxNamed: number): boolean {
+/**
+ * Whether the prose is over the budget: with rows beneath it (a table or cards
+ * attached, or a typed table), more than 3 list items, more than 1,000
+ * characters or more than 3 of the table's rows named. With no rows beneath
+ * it, never.
+ *
+ * @param measure - The prose's measure
+ * @param rowsBeneath - A table or cards ride beneath the answer
+ * @param named - How many of the table's rows the prose names
+ * @param maxNamed - At most this many may be named
+ */
+export function overBudget(measure: ProseMeasure, rowsBeneath: boolean, named: number, maxNamed: number): boolean {
+  if (!rowsBeneath && !measure.typedTable) return false;
   return measure.items > MAX_LIST_ITEMS || measure.chars > MAX_PROSE_CHARS || named > maxNamed;
 }
 
@@ -103,11 +164,12 @@ export interface ItemsRemoved {
  */
 export function withinListBudget(prose: string, keep: (line: string) => boolean): ItemsRemoved {
   const lines = prose.split("\n");
+  const skip = notProse(lines);
   const gone = new Set<number>();
   let seen = 0;
   let removed = 0;
   for (let i = 0; i < lines.length; i++) {
-    if (!LIST_ITEM.test(lines[i]!)) continue;
+    if (skip[i] || !LIST_ITEM.test(lines[i]!)) continue;
     let end = i + 1;
     while (end < lines.length && lines[end]!.trim() && indentOf(lines[end]!) > indentOf(lines[i]!)) end++;
     if (seen++ < MAX_LIST_ITEMS || lines.slice(i, end).some(keep)) continue;
@@ -119,7 +181,7 @@ export function withinListBudget(prose: string, keep: (line: string) => boolean)
 
   // A label goes when every list item beneath it went.
   for (let i = 0; i < lines.length; i++) {
-    if (gone.has(i) || !isLabel(lines[i]!) || keep(lines[i]!)) continue;
+    if (gone.has(i) || skip[i] || !isLabel(lines[i]!) || keep(lines[i]!)) continue;
     const items = listUnder(lines, i);
     if (items.length && items.every((k) => gone.has(k))) gone.add(i);
   }
