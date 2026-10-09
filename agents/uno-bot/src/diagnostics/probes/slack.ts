@@ -8,6 +8,7 @@ import { BUILD } from "../../version";
 import type { Env } from "../../types";
 import type { ProbeRun } from "../probe";
 import { DEFAULT_ALERT_CHANNEL } from "../../slack/delivery";
+import { conversationsReplies } from "../../slack/api";
 
 // What the LIVE INSTALL actually grants for search — the three questions the
 // assistant.search.context plan could not answer from the manifest (a manifest
@@ -171,7 +172,7 @@ export const slackPostProbe: ProbeRun = async (env, url) => {
     updates.push(result);
     if (!result.ok) return { body: { sent: payload, slack: posted, updates } };
   }
-  const read = await (await slackPost(env, "conversations.replies", { channel, ts: posted.ts, limit: 1, include_all_metadata: true })).json() as { ok?: boolean; error?: string; messages?: Array<{ metadata?: unknown }> };
+  const read = await conversationsReplies(env, channel, posted.ts, 1, { includeMetadata: true });
   return { body: { sent: payload, slack: posted, updates, metadata: read.messages?.[0]?.metadata, ...(read.ok ? {} : { readError: read.error }) } };
 };
 
