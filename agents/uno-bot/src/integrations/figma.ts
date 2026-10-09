@@ -103,7 +103,7 @@ async function readFrameDoc(figma: Pick<FigmaClient, "nodes">, fileKey: string, 
   const data = await figma.nodes(fileKey, [nodeId], { timeoutMs: NODE_FETCH_TIMEOUT_MS });
   const doc = data.nodes?.[nodeId]?.document;
   if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
-  return doc;
+  return { ...doc, name: doc.name?.trim() || data.name?.trim() || "Figma frame" };
 }
 
 /** A node's name, type and text layers. */

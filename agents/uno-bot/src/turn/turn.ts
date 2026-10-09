@@ -111,6 +111,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
+import { figmaAnswerCopy } from "./figma-answer-copy";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -2157,7 +2158,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   const stripped = presentedProse(reviewed.text, presentation);
   if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
   if (stripped.trimmed) console.log(`[result-table] trimmed ${stripped.trimmed} list item(s) past the first 3; prose over budget`);
-  const prose = stripped.text;
+  const prose = figmaAnswerCopy(stripped.text, presentation?.sources);
 
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
