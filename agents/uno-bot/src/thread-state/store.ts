@@ -264,15 +264,6 @@ export interface PendingProposal {
    */
   revising?: { userId: string; at?: number };
   /**
-   * What a ⛔ still runs, when the card says so. Absent — every turn's card —
-   * a cancel runs nothing. Only a card the Worker stages itself sets it: the
-   * Figma library card files its intake whichever way it is decided and only
-   * the implementation waits on the ✅ (`figma-library/post.ts`). The card's
-   * own copy states it, since a cancel that does something is not what any
-   * other card means by one.
-   */
-  onCancel?: ProposalOperation[];
-  /**
    * The card's own words for the gate's answers, on a card the Worker states
    * itself (`ProposalCard.kind: "stated"` — the library card, the weekly DS
    * precedence card). Absent — every turn's card — the generic lines in
@@ -308,8 +299,8 @@ export interface PendingProposal {
    * The card's own slot within its reply thread (`proposalSlot`). Absent —
    * every turn's card — the card holds the thread's slot, and cards there
    * replace one another. A card the Worker stages into a thread people also
-   * talk in sets one — `"sweep"` for an end-of-day sweep card, `"ds-precedence"`
-   * for the weekly DS precedence card — so it and a turn's card stay live side
+   * talk in sets one — `"sweep"` for an end-of-day sweep card, a report
+   * item's own key for each card of a decision report — so it and a turn's card stay live side
    * by side, and only a card with the same key replaces it. A turn's batch
    * revises it only when it touches it (`turn/turn.ts`); while both are live,
    * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
@@ -319,10 +310,16 @@ export interface PendingProposal {
   /**
    * On a keyed card: what a turn in its thread posts, in place of a card,
    * when its batch would touch this one. A near-copy would otherwise stay live
-   * beside it, and both could run. The weekly DS precedence card points at
-   * `drop N`, the one way it is revised.
+   * beside it, and both could run. A weekly DS precedence card points at
+   * its Review, the one way it is decided.
    */
   refuseRevision?: string;
+  /**
+   * What Review's pop-up says once Needs changes is accepted, on a card that
+   * does something other than redraft (a weekly DS precedence card writes the
+   * note on its intake). Absent, the pop-up says the draft is being revised.
+   */
+  afterNeedsChanges?: string;
   /**
    * The card a person's ask first staged, when this one re-stages it after a
    * cut-off run (`turn/turn.ts` `restageExecution`), or the sweep card the
@@ -369,6 +366,9 @@ export type ReportItemState =
   | { kind: "approved"; by: string; at: number }
   | { kind: "failed"; by: string; at: number; reason: string }
   | { kind: "rejected"; by: string; reason?: string }
+  /** Sent back with a note against the item, the note written where
+   *  the report keeps its record (a weekly DS precedence intake): closed. */
+  | { kind: "noted"; by: string; note: string }
   | { kind: "expired" }
   /** Shown, but its proposal never staged: nothing to decide. */
   | { kind: "not-staged"; note: string };
@@ -397,6 +397,9 @@ export interface DecisionReportRecord {
   /** How long its items stay decidable — the record outlives them by
    *  `REPORT_GRACE_MS`, so a late View still reads it. */
   ttlMs: number;
+  /** Blocks the report posted below its cards — the library release's table
+   *  of changed components — drawn again under them on every redraw. */
+  after?: unknown[];
 }
 
 /** One change to a report: an item's state, or an item replaced by its
@@ -427,29 +430,34 @@ export function changedReport(report: DecisionReportRecord, change: ReportChange
  * own in `slack/gate-note.ts`, which needs no words from the card.
  */
 export interface StatedCardWords {
-  /** What a ⛔ did, as a phrase with no person in it: "Intake only". The card
-   *  ends `:no_entry: <phrase>, decided by <@U>.` and the ⛔'s note in the
-   *  thread is `<phrase>.` */
+  /** What a ⛔ did, as a phrase with no person in it: "Rejected, nothing
+   *  filed". The card ends `:no_entry: <phrase>, decided by <@U>.` and the
+   *  ⛔'s note in the thread is `<phrase>.` */
   cancelled: string;
   /** The answer to a ✅ or ⛔ that came after the card's window closed. */
   expired: string;
 }
 
+/** What a ⛔ did on a library card staged while a ⛔ still filed its intake. */
+export const LEGACY_LIBRARY_CANCELLED = "No code drafted. Its intake is filed when the card's window closes";
+
+/**
+ * What a ⛔ did on a stated card, in its own words — or nothing, on any other
+ * card. A library card staged before a ⛔ stopped filing its intake still
+ * carries the batch that did (`onCancel`) and the words "Intake only"; its ⛔
+ * now runs nothing, and the tracker files its intake when its window closes
+ * (`figma-library/track.ts`), so it says that instead.
+ *
+ * @param proposal - The card, as stored
+ */
+export function statedCancelOf(proposal: PendingProposal): string | undefined {
+  if (!proposal.stated) return undefined;
+  return "onCancel" in proposal ? LEGACY_LIBRARY_CANCELLED : proposal.stated.cancelled;
+}
+
 /** The card the ask behind this proposal staged: its origin, or itself. */
 export function stagingCardOf(proposal: Pick<PendingProposal, "proposalTs" | "originProposalTs">): string {
   return proposal.originProposalTs ?? proposal.proposalTs;
-}
-
-/**
- * The proposal a won ⛔ runs as: its `onCancel` batch in place of its own,
- * with no cancel run of its own — so the execution record, a cut-off note and
- * any re-staged card all describe what the cancel actually started.
- */
-export function cancelRunOf(proposal: PendingProposal): PendingProposal | null {
-  const operations = proposal.onCancel;
-  if (!operations?.length) return null;
-  const { onCancel: _onCancel, ...rest } = proposal;
-  return { ...rest, operations, toolName: operations[0]!.toolName, input: operations[0]!.input };
 }
 
 /** What a staging did beside storing the card: the ts of each live card in
@@ -1155,4 +1163,53 @@ export interface ThreadState {
   /** Release the lease. Best-effort by contract: a missed mark self-heals when
    *  the lease goes stale, at the cost of one re-run. */
   markRunDone(eventId: string): Promise<void>;
+
+  /**
+   * Ask to file the one issue a key stands for (the weekly DS precedence
+   * intake, keyed by its week). One hop, with the input gate closed, so of two
+   * racing callers exactly one is told "claimed" and files; the other is told
+   * "busy" until that one settles, then "filed" with the issue. A lease older
+   * than `FILING_LEASE_MS` was a caller killed mid-filing, and is reclaimed.
+   */
+  claimFiling(key: string): Promise<FilingClaim>;
+
+  /** Settle a claimed filing: the issue it filed, or null to release the
+   *  claim with nothing filed. */
+  settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
+}
+
+// ── One filing per key ───────────────────────────────────────────────────────
+
+/** An issue a filing made. */
+export interface FiledIssue {
+  number: number;
+  url: string;
+}
+
+/** The answer to "may I file it?" (`ThreadState.claimFiling`). */
+export type FilingClaim = { state: "claimed" } | { state: "busy" } | { state: "filed"; issue: FiledIssue };
+
+/** A filing as stored: when it was claimed or settled, and its issue once filed. */
+export interface FilingRecord {
+  at: number;
+  issue?: FiledIssue;
+}
+
+/** How long a claim on a filing holds before it is taken as abandoned. */
+export const FILING_LEASE_MS = 2 * 60 * 1000;
+/** How long a filed issue is remembered: past any week's cards. */
+export const FILING_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * A claim against a filing's record: its answer, and the record to store when
+ * the claim is taken (null when nothing changes).
+ *
+ * @param record - The stored record, if any
+ * @param at - Now
+ */
+export function claimedFiling(record: FilingRecord | undefined, at: number): { claim: FilingClaim; store: FilingRecord | null } {
+  const live = record && at - record.at < FILING_TTL_MS ? record : undefined;
+  if (live?.issue) return { claim: { state: "filed", issue: live.issue }, store: null };
+  if (live && at - live.at < FILING_LEASE_MS) return { claim: { state: "busy" }, store: null };
+  return { claim: { state: "claimed" }, store: { at } };
 }

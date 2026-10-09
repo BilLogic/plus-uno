@@ -7,18 +7,18 @@
 //   • The pages, the search and the two detectors: the sweep's
 //     (`sweep/env.ts`), each read measured so a short read throws as the
 //     budget stop it was.
-//   • The card: the proposal renderer; `conversations.open` for the owner's DM
-//     with uno-bot, `chat.postMessage` there, and `stageSweepCard` — a staged
-//     row on the usage record that names no channel, since it is a DM.
+//   • The report: `conversations.open` for the owner's DM with uno-bot,
+//     `chat.postMessage` and `chat.update` there, its record in ThreadState,
+//     and `stageSweepCard` for each fix — a staged row on the usage record
+//     that names no channel, since it is a DM.
 //
 // A Worker without USAGE_DB or HARNESS_KV keeps no switches and runs no job.
 
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
-import { conversationsHistorySince, conversationsOpen, getBotIdentity, postMessage } from "../slack/api";
+import { conversationsHistorySince, conversationsOpen, getBotIdentity, postMessage, updateMessage } from "../slack/api";
 import { SWEEP_CARD_EVENT } from "../sweep/cards";
-import { ownBlocksOf, postWithPlainRung, proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { refusedForBlocks } from "../slack/delivery";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
@@ -87,21 +87,14 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
     bot: {
       dmChannel: (userId) => conversationsOpen(env, userId),
       async post(channel, message) {
-        let sent: unknown[] = message.blocks;
-        const res = await postWithPlainRung(
-          (blocks) => {
-            sent = blocks;
-            return postMessage(env, { channel, text: message.text, blocks, metadata: message.metadata });
-          },
-          message,
-          refusedForBlocks,
-        );
-        // Its own blocks only when they are what went up, not its text rung.
-        const own = sent === message.blocks ? ownBlocksOf(message) : undefined;
-        return res.ok && res.ts ? { ok: true, ts: res.ts, ...(own ? { blocks: own } : {}) } : { ok: false };
+        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, metadata: message.metadata });
+        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false, refused: refusedForBlocks(res) };
       },
-      withdraw: (channel, ts, text) => withdrawCaptureCard(env, channel, ts, text),
-      remove: (channel, ts) => removeCaptureCard(env, channel, ts),
+      async edit(channel, ts, message) {
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      },
+      withdraw: (channel, ts, ids, note) => withdrawCaptureCard(env, channel, ts, ids, note),
+      remove: (channel, ts, ids) => removeCaptureCard(env, channel, ts, ids),
       async findPosted(channel, cardKey, since) {
         // One page of the DM's top level since the run's date: the job's card
         // is among the first messages uno-bot posts there that morning.
@@ -117,14 +110,7 @@ export async function runDmCapturePostOnEnv(env: Env, job: ScheduledJob, opts: J
         return res.response_metadata?.next_cursor ? "unknown" : null;
       },
     },
-    render(card) {
-      const rendered = renderProposalCard(card);
-      return {
-        text: rendered.text,
-        blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
-        ...(rendered.followUp?.length ? { followUp: rendered.followUp } : {}),
-      };
-    },
+    reports: threadStateFor(env),
     stage: (proposal) =>
       stageSweepCard(proposal, { threadState: threadStateFor(env), proposalEvents: proposalEventLogFor(env) }, Date.now(), "dm"),
     liveCards: (channel) => threadStateFor(env).getProposalsByChannel(channel),

@@ -7,7 +7,7 @@
 // is here: the clipping to Block Kit's limits, the held-back count, the
 // record the store keeps (`reportRecord`), the fields each item's proposal is
 // staged with (`itemProposal`), and every state a card can show — open,
-// changes asked, approved and written, approved and not written, rejected,
+// changes asked, approved and written, approved and not written, rejected, noted,
 // closed with no decision, and never staged. None of it teaches a gate of
 // its own: no ✅/⛔ footer, nothing to type.
 //
@@ -21,7 +21,10 @@
 // No Env, no Slack client: the store-backed helpers take the store as a port.
 
 import { carouselOf, logoFor } from "./answer-cards-block";
+import { toPlainText } from "./mrkdwn";
+import { cardLead, renderProposalCard } from "./proposal-render";
 import { textSections } from "./render";
+import type { ProposalCard } from "../turn/index";
 import type {
   DecisionReportRecord,
   PendingProposal,
@@ -77,6 +80,8 @@ export interface DecisionReport extends ReportMessage {
   parent: string;
   shown: ReportItem[];
   held: ReportItem[];
+  /** Blocks below the cards, kept on the record (`DecisionReportRecord.after`). */
+  after?: unknown[];
 }
 
 /**
@@ -87,12 +92,14 @@ export interface DecisionReport extends ReportMessage {
  * @param allItems - Every item waiting, oldest first
  * @param parent - What the job found, in one plain sentence: no emoji, no
  *   mark, no instructions. mrkdwn.
+ * @param opts - `after`: blocks posted below the cards, such as a table
  */
-export function decisionReport(allItems: readonly ReportItem[], parent: string): DecisionReport {
+export function decisionReport(allItems: readonly ReportItem[], parent: string, opts: { after?: unknown[] } = {}): DecisionReport {
   const shown = allItems.slice(0, MAX_REPORT_ITEMS);
   const held = allItems.slice(MAX_REPORT_ITEMS);
-  const message = reportMessage(reportRecord("", "", { parent, shown, held }, 0));
-  return { ...message, parent, shown, held };
+  const after = opts.after?.length ? { after: opts.after } : {};
+  const message = reportMessage(reportRecord("", "", { parent, shown, held, ...after }, 0));
+  return { ...message, parent, shown, held, ...after };
 }
 
 /**
@@ -106,7 +113,7 @@ export function decisionReport(allItems: readonly ReportItem[], parent: string):
 export function reportRecord(
   channel: string,
   messageTs: string,
-  report: Pick<DecisionReport, "parent" | "shown" | "held">,
+  report: Pick<DecisionReport, "parent" | "shown" | "held" | "after">,
   ttlMs: number,
 ): DecisionReportRecord {
   return {
@@ -116,6 +123,7 @@ export function reportRecord(
     held: report.held.length,
     entries: report.shown.map((item) => ({ id: item.id, item, state: { kind: "open" } })),
     ttlMs,
+    ...(report.after?.length ? { after: report.after } : {}),
   };
 }
 
@@ -144,6 +152,11 @@ export function itemProposal(
     supersedeKey: `report-item:${messageTs}:${baseId(id)}`,
     item: { messageTs, id },
   };
+}
+
+/** The entry id an item's next revision takes: `c2` → `c2~1` → `c2~2`. */
+export function revisionId(id: string): string {
+  return `${baseId(id)}~${Number(id.split("~")[1] ?? 0) + 1}`;
 }
 
 /** An entry id without its revision suffix. */
@@ -181,6 +194,8 @@ function shownAs(entry: ReportEntry): { subtitle?: string; body: string; button:
       return { subtitle: `Approved by ${by(state.by)} · not written: ${state.reason}`, body: "Nothing written.", button: "View" };
     case "rejected":
       return { subtitle: `Rejected by ${by(state.by)}`, body: state.reason ? `Nothing written. Reason: ${state.reason}` : "Nothing written.", button: "View" };
+    case "noted":
+      return { subtitle: `Noted by ${by(state.by)}`, body: `Note: ${state.note}`, button: "View" };
     case "expired":
       return { subtitle: "Closed, no decision", body: item.body, button: "View" };
     case "not-staged":
@@ -219,8 +234,8 @@ function parentLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entr
 
 /**
  * A report's message as its record stands: the parent line, then each card in
- * its state, one card or a carousel. A report with no items is its parent
- * line alone.
+ * its state, one card or a carousel, then any blocks it posted below them. A
+ * report with no items is its parent line and those blocks.
  *
  * @param record - The report's record
  */
@@ -229,7 +244,11 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
     throw new Error(`a decision report holds at most ${MAX_REPORT_ITEMS} items; hold the rest back (decisionReport)`);
   }
   const head = parentLine(record);
-  const blocks = record.entries.length ? [...textSections(head), carouselOf(record.entries.map(entryCard))] : textSections(head);
+  const blocks = [
+    ...textSections(head),
+    ...(record.entries.length ? [carouselOf(record.entries.map(entryCard))] : []),
+    ...(record.after ?? []),
+  ];
   const text = [head, ...record.entries.map((e) => `• ${clip(e.item.title, CARD_TITLE_CHARS)}: ${shownAs(e).body}`)].join("\n");
   return { text, blocks };
 }
@@ -299,10 +318,62 @@ export async function replaceItem(
   oldId: string,
   item: ReportItem,
 ): Promise<{ id: string; message: ReportMessage } | null> {
-  const rev = Number(oldId.split("~")[1] ?? 0) + 1;
-  const id = `${baseId(oldId)}~${rev}`;
+  const id = revisionId(oldId);
   const record = await store.updateReport(messageTs, { id: oldId, replace: { id, item } });
   return record ? { id, message: reportMessage(record) } : null;
+}
+
+/**
+ * What a revision turn does to an item of a decision report
+ * (`TurnDeps.reportItems`), whichever report it is — none needs a step of
+ * its own.
+ *
+ * `revise` readies the redraft of an item: the item as it was — its title,
+ * who and where, its sources — saying what the revision now does. What Review
+ * shows is the card as a turn spells it. Its `place`, called once the
+ * revision is staged, puts it in the item's place under the same number
+ * (`replaceItem`) and redraws the report's message. Null when the store has
+ * no such report or item.
+ *
+ * `reopen` puts an item sent back for changes back to open, Review and all,
+ * when its turn staged no revision (`settleItem`).
+ *
+ * @param store - The thread store
+ * @param edit - Edit the report's message in place (`chat.update`)
+ * @param now - The clock, for items whose time ran out
+ */
+export function reportItems(
+  store: ReportStore,
+  edit: (messageTs: string, message: ReportMessage) => Promise<void>,
+  now: () => number,
+) {
+  const redraw = (messageTs: string, message: ReportMessage) =>
+    edit(messageTs, message).catch((err: unknown) => {
+      console.warn(`[decision-cards] ${messageTs} not redrawn: ${err instanceof Error ? err.message : String(err)}`);
+    });
+  return {
+    async revise(target: { messageTs: string; id: string }, card: ProposalCard) {
+      const before = (await store.getReport(target.messageTs))?.entries.find((e) => e.id === target.id)?.item;
+      if (!before) return null;
+      const lead = cardLead(card);
+      // What it wrote before no longer describes the write.
+      const { done: _done, ...kept } = before;
+      const item: ReportItem = { ...kept, body: (lead && toPlainText(lead).trim()) || `Revised: ${card.verb}.` };
+      return {
+        text: renderProposalCard(card).text,
+        staged: itemProposal(target.messageTs, revisionId(target.id)),
+        async place() {
+          const replaced = await replaceItem(store, target.messageTs, target.id, item);
+          if (replaced) await redraw(target.messageTs, replaced.message);
+          else console.warn(`[decision-cards] ${target.messageTs} has no item ${target.id} to replace`);
+        },
+      };
+    },
+    async reopen(target: { messageTs: string; id: string }): Promise<void> {
+      const message = await settleItem(store, target, { kind: "open" }, now());
+      if (message) await redraw(target.messageTs, message);
+    },
+  };
 }
 
 /**

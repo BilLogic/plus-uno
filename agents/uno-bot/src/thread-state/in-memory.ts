@@ -29,12 +29,14 @@ import {
   ownText,
   REPORT_GRACE_MS,
   changedReport,
+  claimedFiling,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
   withLiveMark,
   type DecisionReportRecord,
   type Execution,
+  type FilingRecord,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
@@ -97,6 +99,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const cancels = new Map<string, { at: number }>();
   const activeRuns = new Map<string, ActiveRunRecord>();
   const events = new Map<string, EventRecord>();
+  const filings = new Map<string, FilingRecord>();
   const executions = new Map<string, Execution>();
 
   /** Take an execution if it has been cut off; drop it if it has aged out;
@@ -411,6 +414,17 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async markRunDone(eventId) {
       const existing = events.get(eventId);
       events.set(eventId, { seenAt: existing?.seenAt ?? now(), status: "done" });
+    },
+
+    async claimFiling(key) {
+      const { claim, store } = claimedFiling(filings.get(key), now());
+      if (store) filings.set(key, store);
+      return claim;
+    },
+
+    async settleFiling(key, issue) {
+      if (issue) filings.set(key, { at: now(), issue });
+      else filings.delete(key);
     },
   };
 }

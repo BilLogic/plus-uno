@@ -1,27 +1,17 @@
-// The library publish card's release card and its table of changed
-// components — the blocks above the decision on the #plus-universal post.
+// The library publish report's table of changed components — the block under
+// its decision card on the #plus-universal post.
 //
-// The release card says who published which version, with the version's own
-// description and a button to it, under Figma's logo. The table beneath is a
-// result table (CONTEXT.md § result table) of every changed component: its
+// A result table (CONTEXT.md § result table) of every changed component: its
 // name linked to its Figma node, what happened to it, and the code it maps
-// to. Both are built from the change set and its drafted intake, so every
-// name and link is one the poll found.
-//
-// The card's text copy (`draft.ts` `publishCard`) is unchanged and stays the
-// answer of record: notifications read it, a decided card is re-rendered
-// from it, and it is the whole post when Slack refuses these blocks.
+// to, built from the drafted intake, so every name and link is one the poll
+// found. The report keeps it on its record (`DecisionReportRecord.after`), so
+// a decision redraws the card above it and the table stays.
 //
 // Pure: no Env, no client.
 
 import type { ResultTable } from "../turn/result-table";
 import { resultTableBlock } from "../slack/result-table-block";
-import { LOGOS } from "../slack/answer-cards-block";
-import { NO_CODE_YET, countLine, firstLine, versionUrl, type LibraryChangeSet, type PublishIntake } from "./draft";
-
-/** A card's title and subtitle hold 150 characters, its body 200. */
-const TITLE_CHARS = 150;
-const BODY_CHARS = 200;
+import { NO_CODE_YET, countLine, type PublishIntake } from "./draft";
 
 /** The most rows a data table holds, and the most cell characters. */
 const TABLE_ROWS = 200;
@@ -29,29 +19,6 @@ const TABLE_CHARS = 20_000;
 
 /** Rows shown per page: the size every other table of ours pages at. */
 const PAGE_ROWS = 30;
-
-const cut = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
-const plain = (text: string) => ({ type: "plain_text", text });
-
-/**
- * The release card, or null for a change set with no published version.
- *
- * @param changeSet - What the poll found
- */
-export function releaseCardBlock(changeSet: LibraryChangeSet): Record<string, unknown> | null {
-  const newest = changeSet.versions[0];
-  if (!newest) return null;
-  const label = newest.label || firstLine(newest.description) || "untitled";
-  const description = newest.description.trim();
-  return {
-    type: "card",
-    icon: { type: "image", image_url: LOGOS.figma.url, alt_text: LOGOS.figma.name },
-    title: plain(cut(`Library published: "${label}"`, TITLE_CHARS)),
-    subtitle: plain(cut(`by ${newest.user}`, TITLE_CHARS)),
-    ...(description ? { body: plain(cut(description, BODY_CHARS)) } : {}),
-    actions: [{ type: "button", text: plain("View version"), url: versionUrl(changeSet.fileKey, newest.id) }],
-  };
-}
 
 /**
  * Every changed component as a result table, or null when there is none or
@@ -88,17 +55,11 @@ export function changedComponentsTable(intake: PublishIntake): ResultTable | nul
 }
 
 /**
- * The blocks above the decision: the release card, then the table. Empty when
- * there is neither.
+ * The table block under the card, or null when there is no table to show.
  *
- * @param changeSet - What the poll found
- * @param intake - Its drafted intake
+ * @param intake - The drafted intake
  */
-export function releaseBlocks(changeSet: LibraryChangeSet, intake: PublishIntake): Array<Record<string, unknown>> {
-  const card = releaseCardBlock(changeSet);
+export function componentTableBlock(intake: PublishIntake): Record<string, unknown> | null {
   const table = changedComponentsTable(intake);
-  return [
-    ...(card ? [card] : []),
-    ...(table ? [{ ...resultTableBlock(table), page_size: Math.min(table.rows.length, PAGE_ROWS) }] : []),
-  ];
+  return table ? { ...resultTableBlock(table), page_size: Math.min(table.rows.length, PAGE_ROWS) } : null;
 }

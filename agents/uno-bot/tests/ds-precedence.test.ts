@@ -1,7 +1,8 @@
 // The weekly DS precedence check, end to end on fakes: the end-of-day check
 // compares the component index and the registry's props with the Figma
-// library, the next morning run posts one thread in #plus-universal with a
-// card that files or updates one intake, and a reply drops an item.
+// library, the next morning run posts one report of shared decision cards in
+// #plus-universal — one card per component — and each card's Approve adds its
+// component to the week's one intake, filing it on the first.
 //
 // The fixtures are drawn from the manual first pass of this check (#339): the
 // five button sets that split what code keeps as one `fill` prop, a code
@@ -19,14 +20,13 @@ import {
   parseComponentIndex,
   type PrecedenceRegistry,
 } from "../src/ds-precedence/compare";
-import { droppedItems, PRECEDENCE_MARKER, precedenceOperations, precedenceRuleUrl } from "../src/ds-precedence/report";
-import { replyHandlerAt } from "../src/slack/events";
+import { PRECEDENCE_INTAKE_TOOL, precedenceMarker, precedenceRuleUrl } from "../src/ds-precedence/report";
+import { addToWeeklyIntake, type IntakeDeps } from "../src/ds-precedence/intake";
+import { disputePrecedenceItem } from "../src/ds-precedence/dispute";
 import {
-  disputePrecedenceItems,
-  followRestagedCard,
+  NOT_STAGED,
   postPrecedenceReport,
   precedenceChannel,
-  type DisputeDeps,
   runPrecedenceCheck,
   PRECEDENCE_CARD_TTL_MS,
   type CheckDeps,
@@ -34,23 +34,22 @@ import {
   type PostDeps,
   type PrecedenceReport,
 } from "../src/ds-precedence/jobs";
-import {
-  handleDsPrecedenceReply,
-  isDsPrecedenceCandidate,
-  isWeeklyPrecedenceThread,
-  recordPrecedenceRestageFor,
-} from "../src/ds-precedence/env";
-import type { SlackMessageEvent } from "../src/slack/types";
+import { isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
+import { TOOL_TABLE } from "../src/agent/tool-table";
 import type { Env } from "../src/types";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
-import { resolveSignal, type GateSignal } from "../src/gate/index";
-import { createInMemoryThreadState, proposalSlot, type PendingProposal } from "../src/thread-state/index";
+import { recordingViews } from "./helpers/recording-slack";
+import type { OperationOutcome } from "../src/gate/run-batch";
+import { itemProposal } from "../src/slack/decision-cards";
+import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
+import type { CardMessage } from "../src/slack/button-door";
+import { recordingDelivery } from "../src/turn/index";
+import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../src/thread-state/index";
 
 const FILE_KEY = "zAecJNRdvJzAUOcjV32tRX";
 const REPO = "BilLogic/plus-uno";
 const CHANNEL = "C072E8SFLKV";
 const MEMBERS = ["U0MEMBER1", "U0MEMBER2"];
-const OUTSIDER = "U0OUTSIDE";
 
 // ── Fixtures (#339) ──────────────────────────────────────────────────────────
 
@@ -285,37 +284,39 @@ const AGREEING: FigmaComponentsResponse = {
 interface Post {
   text: string;
   blocks?: unknown[];
-  thread_ts?: string;
 }
 
-function postDeps(report: PrecedenceReport | null, openIntake: { number: number; url: string } | null) {
+/** The report's message ts, and a clock ten minutes after it. */
+const MSG = "1759500000.000001";
+const NOW = Number(MSG) * 1000 + 10 * 60_000;
+
+function postDeps(report: PrecedenceReport | null, store: ThreadState = createInMemoryThreadState({ now: () => NOW })) {
   const posts: Post[] = [];
+  const edits: Array<{ ts: string; message: Post }> = [];
   const staged: PendingProposal[] = [];
   const reportBox = kv<PrecedenceReport | null>(report);
-  const threadBox = kv<PostedThread | null>(null);
   const recorded: PostedThread[] = [];
   let n = 0;
   const deps: PostDeps = {
     report: reportBox.store,
-    recordThread: async (thread) => {
-      recorded.push(thread);
-      await threadBox.store.write(thread);
-    },
+    recordThread: async (thread) => void recorded.push(thread),
     members: async () => [...MEMBERS],
-    openIntake: async () => openIntake,
     post: async (message) => {
       posts.push(message);
       n += 1;
       return { ok: true, ts: `1759500000.00000${n}` };
     },
+    edit: async (ts, message) => void edits.push({ ts, message }),
+    reports: store,
     stage: async (proposal) => {
       staged.push(proposal);
+      await store.putProposal(proposal);
     },
     channel: CHANNEL,
     ruleUrl: precedenceRuleUrl(REPO),
-    now: () => Date.UTC(2026, 9, 5, 14, 0),
+    now: () => NOW,
   };
-  return { deps, posts, staged, reportBox, threadBox, recorded };
+  return { deps, posts, edits, staged, reportBox, recorded, store };
 }
 
 describe("the end-of-day check", () => {
@@ -361,18 +362,18 @@ describe("the end-of-day check", () => {
     // check, deferred on a budget stop, runs at 05:10 UTC.
     const { deps, report } = checkDeps(LIBRARY);
     await runPrecedenceCheck({ ...deps, now: () => Date.UTC(2026, 11, 5, 5, 10), runDate: "2026-12-04" });
-    const morning = postDeps(report.box.value, null);
+    const morning = postDeps(report.box.value);
     await postPrecedenceReport(morning.deps);
-    assert.match(morning.posts[0]!.text, /\(week of Dec 4\)/);
     assert.equal(morning.recorded[0]!.weekOf, "2026-12-04");
-    assert.match(JSON.stringify(morning.staged[0]!.operations), /Week of 2026-12-04/);
+    assert.equal(morning.staged[0]!.operations![0]!.input.week_of, "2026-12-04");
+    assert.match(morning.staged[0]!.proposalText, /week of Dec 4/);
   });
 
   it("a report kept before the run's date was recorded is labelled with its check's date", async () => {
     const kept = { checkedAt: "2026-09-25T22:00:00.000Z", items: (await weekReport()).items };
-    const morning = postDeps(kept, null);
+    const morning = postDeps(kept);
     await postPrecedenceReport(morning.deps);
-    assert.match(morning.posts[0]!.text, /\(week of Sep 25\)/);
+    assert.equal(morning.staged[0]!.operations![0]!.input.week_of, "2026-09-25");
   });
 });
 
@@ -382,6 +383,37 @@ async function weekReport(): Promise<PrecedenceReport> {
   return report.box.value!;
 }
 
+type Card = {
+  title: { text: string };
+  subtitle?: { text: string };
+  body: { text: string };
+  actions: Array<{ text: { text: string }; action_id?: string; url?: string }>;
+};
+/** The cards of a report message: a carousel's, or its one card. */
+function cardsIn(blocks: unknown[]): Card[] {
+  const second = blocks[1] as { type: string; elements?: Card[] } & Card;
+  return second.type === "carousel" ? second.elements! : [second];
+}
+
+/** No typed gate copy: nothing to react, type, drop or skip. */
+const GATE_WORDS = /:white_check_mark:|:no_entry:|✅|⛔|\bdrop\b|\bskip\b|\bdispute\b|[Rr]eply\b/;
+
+/** A report of `n` disagreements, one component each. */
+const reportOf = (n: number): PrecedenceReport => ({
+  checkedAt: "2026-10-02T22:00:00.000Z",
+  weekOf: "2026-10-02",
+  items: Array.from({ length: n }, (_, i) => ({
+    key: `Component${i + 1}:missing`,
+    component: `Component${i + 1}`,
+    kind: "missing-in-figma" as const,
+    summary: "code has it, the library has no published component for it",
+    codeUrl: `https://github.com/${REPO}/blob/main/Component${i + 1}.md`,
+    figmaUrl: `https://www.figma.com/design/KEY?node-id=1-${i + 1}`,
+    winner: "code" as const,
+    loser: "library" as const,
+  })),
+});
+
 describe("the morning post", () => {
   it("lands where pickDestination sends a design-system finding: #plus-universal, never #plus-design", () => {
     assert.equal(precedenceChannel({ plusUniversal: CHANNEL, plusDesign: "C0DESIGN" }), CHANNEL);
@@ -389,576 +421,357 @@ describe("the morning post", () => {
   });
 
   it("a clean week posts nothing", async () => {
-    const { deps, posts, staged } = postDeps(null, null);
+    const { deps, posts, staged } = postDeps(null);
     const result = await postPrecedenceReport(deps);
     assert.equal(result.posted, false);
     assert.deepEqual(posts, []);
     assert.deepEqual(staged, []);
   });
 
-  it("posts one thread in #plus-universal: the list, then a card that files one intake", async () => {
-    const { deps, posts, staged, reportBox, threadBox } = postDeps(await weekReport(), null);
+  it("posts one message: a plain parent line, then one card per component with Review, Code and Figma", async () => {
+    const { deps, posts, reportBox, recorded } = postDeps(await weekReport());
     const result = await postPrecedenceReport(deps);
     assert.equal(result.posted, true);
-    assert.equal(posts.length, 2);
-    const [list, card] = posts;
-    assert.equal(list!.thread_ts, undefined);
-    // #886 § 3.4: the finding first, the rule as a clause and a link, every
-    // item under its component, and the `drop` instruction last.
-    const lines = list!.text.split("\n");
-    assert.equal(lines[0], "*Code and the library disagree on 2 components* (week of Oct 2)");
-    assert.equal(
-      lines[1],
-      `Code wins by our <https://github.com/${REPO}/blob/main/AGENTS.md#conventions--what-agents-obey|precedence rule>, so the library side needs the fix unless it's deliberate.`,
+    assert.equal(posts.length, 1, "one message, nothing in a thread");
+    const [message] = posts;
+    assert.equal(messageBlocksRefusal(message!.blocks!), null);
+    assert.match(
+      JSON.stringify(message!.blocks![0]),
+      new RegExp(
+        `Code and the library disagree on 2 components\\. <https://github\\.com/${REPO}/blob/main/AGENTS\\.md#conventions--what-agents-obey\\|Code wins> unless a difference is deliberate\\.`,
+      ),
     );
-    assert.match(lines[3]!, /^1\. Button: code has one `fill` prop .* · <https:\/\/github\.com\/.*\|code> · <https:\/\/www\.figma\.com\/.*\|Figma>$/);
-    assert.match(lines[4]!, /^2\. TreeSelect: code has it, the library has no published component for it · </);
-    assert.equal(lines.at(-1), "Reply `drop 2` for any that's deliberate, and I'll revise the card.");
-    assert.doesNotMatch(list!.text, /loses|dispute|BS4|:white_check_mark:/);
-    // The card in the thread: its one footer, beside its buttons.
-    assert.equal(card!.thread_ts, "1759500000.000001");
-    assert.equal(
-      card!.text,
-      ":white_check_mark: files items 1 and 2 as the weekly intake. :no_entry: files nothing.\nAnyone in this channel can decide, for the next 6 days.",
-    );
-
-    assert.equal(staged.length, 1);
-    const p = staged[0]!;
-    assert.deepEqual(p.confirmers, MEMBERS);
-    assert.equal(p.ttlMs, PRECEDENCE_CARD_TTL_MS);
-    assert.equal(p.onCancel, undefined);
-    assert.deepEqual(p.stated, {
-      cancelled: "Nothing filed this week",
-      expired: "That card closed after 6 days with no decision, so nothing was filed.",
-    });
-    assert.equal(p.proposalTs, "1759500000.000002");
-    assert.equal(p.replyTs, "1759500000.000001");
-    assert.equal(p.operations?.length, 1);
-    assert.equal(p.operations![0]!.toolName, "github_issue_create");
-    const body = String(p.operations![0]!.input.body);
-    assert.ok(body.startsWith(PRECEDENCE_MARKER));
-    assert.match(body, /Button/);
-    assert.match(body, /TreeSelect/);
+    const [button, tree] = cardsIn(message!.blocks!);
+    assert.equal(button!.title.text, "Button");
+    assert.equal(button!.subtitle!.text, "Library side");
+    assert.match(button!.body.text, /^Code has one fill prop \(/, "plain words, no backticks");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
+    assert.match(button!.actions[1]!.url!, /^https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/main\//);
+    assert.match(button!.actions[2]!.url!, /^https:\/\/www\.figma\.com\//);
+    assert.equal(tree!.title.text, "TreeSelect");
+    assert.equal(tree!.body.text, "Code has it, the library has no published component for it.");
+    assert.doesNotMatch(JSON.stringify(message), GATE_WORDS);
 
     assert.equal(reportBox.box.value, null, "the report is handed off");
-    assert.equal(threadBox.box.value?.ts, "1759500000.000001");
+    assert.deepEqual(recorded, [{ channel: CHANNEL, ts: MSG, weekOf: "2026-10-02" }]);
   });
 
-  it("updates an open weekly intake in place rather than filing a second", async () => {
-    const { deps, staged, posts } = postDeps(await weekReport(), { number: 900, url: `https://github.com/${REPO}/issues/900` });
+  it("stages each component as its own proposal: the week's intake, decided by the channel's members, for six days", async () => {
+    const { deps, staged } = postDeps(await weekReport());
     await postPrecedenceReport(deps);
-    assert.match(posts[1]!.text, new RegExp(`^:white_check_mark: adds items 1 and 2 to the <https://github\\.com/${REPO}/issues/900\\|weekly intake>\\. :no_entry: files nothing\\.`));
-    const ops = staged[0]!.operations!;
-    assert.equal(ops.length, 1);
-    assert.equal(ops[0]!.toolName, "github_issue_update");
-    assert.equal(ops[0]!.input.issue_number, 900);
-    assert.match(String(ops[0]!.input.comment), /TreeSelect/);
-    assert.equal(ops.some((o) => o.toolName === "github_issue_create"), false);
-  });
-
-  /** A report of `n` disagreements, one component each. */
-  const reportOf = (n: number): PrecedenceReport => ({
-    checkedAt: "2026-10-02T22:00:00.000Z",
-    weekOf: "2026-10-02",
-    items: Array.from({ length: n }, (_, i) => ({
-      key: `Component${i + 1}:missing`,
-      component: `Component${i + 1}`,
-      kind: "missing-in-figma" as const,
-      summary: "code has it, the library has no published component for it",
-      codeUrl: `https://github.com/${REPO}/blob/main/Component${i + 1}.md`,
-      figmaUrl: `https://www.figma.com/design/KEY?node-id=1-${i + 1}`,
-      winner: "code" as const,
-      loser: "library" as const,
-    })),
-  });
-  type Table = { caption: string; rows: Array<Array<{ type: string; text?: string; value?: number }>> };
-  const tableIn = (post: Post): Table | undefined =>
-    (post.blocks as Array<Record<string, unknown>> | undefined)?.find((b) => b.type === "data_table") as Table | undefined;
-
-  it("posts thirty items as one table in one message, the drop number first", async () => {
-    const { deps, posts } = postDeps(reportOf(30), null);
-    await postPrecedenceReport(deps);
-    assert.equal(posts.length, 2, "the list and its card, nothing spilled into the thread");
-    const list = posts[0]!;
-    assert.equal(messageBlocksRefusal(list.blocks!), null);
-    const table = tableIn(list);
-    assert.ok(table, JSON.stringify(list.blocks));
-    assert.equal(table.rows[0]![0]!.text, "#");
-    assert.equal(table.rows.length, 31, "a header and a row per item");
-    assert.deepEqual(
-      table.rows.slice(1).map((r) => r[0]),
-      Array.from({ length: 30 }, (_, i) => ({ type: "raw_number", value: i + 1, text: String(i + 1) })),
-    );
-    assert.match(JSON.stringify(table.rows[1]), /"url":"https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/main\/Component1\.md"/);
-    assert.match(JSON.stringify(table.rows[1]), /"url":"https:\/\/www\.figma\.com\/design\/KEY\?node-id=1-1"/);
-    // The finding leads and the `drop` instruction closes, around the table.
-    assert.match(JSON.stringify(list.blocks![0]), /Code and the library disagree on 30 components/);
-    assert.match(JSON.stringify(list.blocks!.at(-1)), /Reply `drop 2` for any that's deliberate/);
-  });
-
-  it("a drop still names the item the table numbered", async () => {
-    const { deps, posts, recorded } = postDeps(reportOf(30), null);
-    await postPrecedenceReport(deps);
-    const thread = recorded.at(-1)!;
-    assert.equal(thread.items.find((i) => i.n === 27)?.component, "Component27");
-    assert.equal(tableIn(posts[0]!)!.rows[27]![0]!.value, 27);
-    assert.match(JSON.stringify(tableIn(posts[0]!)!.rows[27]), /Component27/);
-  });
-
-  it("past thirty, the table holds the first thirty and the thread the rest, under their own numbers", async () => {
-    const { deps, posts } = postDeps(reportOf(33), null);
-    await postPrecedenceReport(deps);
-    const table = tableIn(posts[0]!)!;
-    assert.equal(table.rows.length, 31);
-    assert.match(JSON.stringify(posts[0]!.blocks![0]), /and 3 more, listed in the thread/);
-    const spilled = posts.slice(1, -1).map((p) => p.text).join("\n");
-    assert.match(spilled, /^31\. Component31: /m);
-    assert.match(spilled, /^33\. Component33: /m);
-    assert.doesNotMatch(spilled, /^30\. /m);
-  });
-
-  it("a refused table steps down to the plain list, the rest in the thread", async () => {
-    const { deps, posts } = postDeps(reportOf(30), null);
-    const post = deps.post;
-    deps.post = async (m) => (JSON.stringify(m.blocks ?? []).includes("data_table") ? (posts.push(m), { ok: false }) : post(m));
-    const result = await postPrecedenceReport(deps);
-    assert.equal(result.posted, true);
-    const plain = posts[1]!;
-    assert.equal(plain.blocks, undefined);
-    assert.match(plain.text, /^1\. Component1: /m);
-    assert.match(plain.text, /listed in the thread/);
-    const spilled = posts.filter((p) => p.thread_ts && !p.blocks).map((p) => p.text).join("\n");
-    assert.match(spilled, /^30\. Component30: /m);
-  });
-
-  it("records the list thread before its card, so a card that fails still leaves a list thread", async () => {
-    const { deps, recorded, staged } = postDeps(await weekReport(), null);
-    const post = deps.post;
-    deps.post = async (m) => (m.thread_ts ? { ok: false } : post(m));
-    const result = await postPrecedenceReport(deps);
-    assert.equal(result.posted, true);
-    assert.deepEqual(staged, []);
-    assert.equal(recorded.length, 1);
-    assert.equal(recorded[0]!.ts, "1759500000.000001");
-    assert.equal(recorded[0]!.cardTs, "", "no card, but the thread is known");
-  });
-
-  it("keeps the report for tomorrow when the members cannot be read", async () => {
-    const { deps, posts, reportBox } = postDeps(await weekReport(), null);
-    deps.members = async () => null;
-    const result = await postPrecedenceReport(deps);
-    assert.equal(result.posted, false);
-    assert.deepEqual(posts, []);
-    assert.notEqual(reportBox.box.value, null);
-  });
-
-  it("only a #plus-universal member can decide the card", async () => {
-    const { deps, staged } = postDeps(await weekReport(), null);
-    await postPrecedenceReport(deps);
-    const threadState = createInMemoryThreadState();
-    const card = staged[0]!;
-    await threadState.putProposal(card);
-    const react = (glyph: string, userId: string): GateSignal => ({
-      kind: "reaction",
-      messageTs: card.proposalTs,
-      channel: CHANNEL,
-      thread: card.replyTs!,
-      glyph,
-      userId,
+    assert.equal(staged.length, 2, "one proposal per card");
+    const [button, tree] = staged;
+    assert.equal(button!.proposalTs, itemProposal(MSG, "Button").proposalTs);
+    assert.deepEqual(button!.item, { messageTs: MSG, id: "Button" });
+    assert.notEqual(button!.supersedeKey, tree!.supersedeKey, "each card its own slot");
+    assert.deepEqual(button!.confirmers, MEMBERS);
+    assert.equal(button!.ttlMs, PRECEDENCE_CARD_TTL_MS);
+    assert.deepEqual(button!.operations!.map((o) => o.toolName), [PRECEDENCE_INTAKE_TOOL]);
+    assert.equal(button!.operations![0]!.input.week_of, "2026-10-02");
+    assert.match(String(button!.operations![0]!.input.section), /^### Button\n/);
+    assert.doesNotMatch(String(button!.operations![0]!.input.section), /TreeSelect/, "only its own component");
+    assert.match(button!.proposalText, /Button/);
+    assert.match(button!.proposalText, /intake for the week of Oct 2/);
+    assert.deepEqual(button!.stated, {
+      cancelled: "Left as deliberate, nothing filed",
+      expired: "That card closed after 6 days with no decision, so nothing was filed.",
     });
-    const refused = await resolveSignal(react("white_check_mark", OUTSIDER), { threadState });
-    assert.equal(refused.outcome, "none");
-    assert.equal(refused.execute, undefined);
-    const won = await resolveSignal(react("white_check_mark", MEMBERS[0]!), { threadState });
-    assert.equal(won.outcome, "won");
-    assert.deepEqual(won.execute!.operations.map((op) => op.toolName), ["github_issue_create"]);
+    for (const p of staged) assert.doesNotMatch(`${p.proposalText} ${p.refuseRevision}`, GATE_WORDS);
   });
 
-  it("a turn's card in the weekly thread leaves the weekly card live, and its ✅ still works", async () => {
-    const { deps, staged } = postDeps(await weekReport(), null);
+  it("several disagreements on one component are one card", async () => {
+    const two = reportOf(1);
+    two.items.push({ ...two.items[0]!, key: "Component1:size:axis-values", kind: "axis-values", summary: "code has `size=\"xs\"`, the library doesn't" });
+    const { deps, posts, staged } = postDeps(two);
     await postPrecedenceReport(deps);
-    const threadState = createInMemoryThreadState();
-    const weekly = staged[0]!;
-    await threadState.putProposal(weekly);
-    // A turn answering an @mention in the same thread: it sees the weekly card
-    // as the thread's pending card, but does not revise it.
-    assert.equal(proposalSlot(weekly), `${weekly.replyTs}#ds-precedence`, "the weekly card holds its own slot");
-    const agentCard: PendingProposal = {
-      toolName: "notion_create",
-      input: { title: "x" },
-      channel: CHANNEL,
-      threadTs: weekly.threadTs,
-      replyTs: weekly.replyTs!,
-      userMsgTs: "1759500009.000001",
-      proposalTs: "1759500009.000002",
-      proposalText: "card",
-      requesterUserId: MEMBERS[0]!,
-    };
-    await threadState.putProposal(agentCard);
-    assert.equal((await threadState.getProposalByTs(weekly.proposalTs)).state, "found");
-    assert.equal((await threadState.getProposalByTs(agentCard.proposalTs)).state, "found");
-    const won = await resolveSignal(
-      { kind: "reaction", messageTs: weekly.proposalTs, channel: CHANNEL, thread: weekly.replyTs!, glyph: "white_check_mark", userId: MEMBERS[1]! },
-      { threadState },
-    );
-    assert.equal(won.outcome, "won");
-    assert.deepEqual(won.execute!.operations.map((op) => op.toolName), ["github_issue_create"]);
+    const cards = cardsIn(posts[0]!.blocks!);
+    assert.equal(cards.length, 1);
+    assert.equal(cards[0]!.body.text, 'Code has it, the library has no published component for it; code has size="xs", the library doesn\'t.');
+    assert.equal(staged.length, 1);
+    assert.match(String(staged[0]!.operations![0]!.input.section), /xs/);
   });
 
-  it("a ⛔ runs nothing: the card's one operation is the intake", async () => {
-    const { deps, staged } = postDeps(await weekReport(), null);
+  it("shows ten cards and keeps the rest for tomorrow's report, under the same week", async () => {
+    const { deps, posts, staged, reportBox } = postDeps(reportOf(12));
     await postPrecedenceReport(deps);
-    const threadState = createInMemoryThreadState();
-    const card = staged[0]!;
-    await threadState.putProposal(card);
-    const verdict = await resolveSignal(
-      { kind: "reaction", messageTs: card.proposalTs, channel: CHANNEL, thread: card.replyTs!, glyph: "no_entry", userId: MEMBERS[1]! },
-      { threadState },
-    );
-    assert.equal(verdict.decision, "cancel");
-    assert.equal(verdict.execute, undefined);
+    assert.equal(cardsIn(posts[0]!.blocks!).length, 10);
+    assert.match(JSON.stringify(posts[0]!.blocks![0]), /disagree on 12 components\..*Showing 10 of 12; the rest come in the next report\./);
+    assert.equal(staged.length, 10);
+    assert.deepEqual(reportBox.box.value?.items.map((i) => i.component), ["Component11", "Component12"]);
+    assert.equal(reportBox.box.value?.weekOf, "2026-10-02");
+
+    const tomorrow = postDeps(reportBox.box.value);
+    await postPrecedenceReport(tomorrow.deps);
+    assert.equal(cardsIn(tomorrow.posts[0]!.blocks!).length, 2);
+    assert.equal(tomorrow.staged[0]!.operations![0]!.input.week_of, "2026-10-02");
+    assert.equal(tomorrow.reportBox.box.value, null);
+  });
+
+  it("a card that does not stage says so with nothing to review, and posts again tomorrow", async () => {
+    const { deps, edits, reportBox } = postDeps(await weekReport());
+    const stage = deps.stage;
+    deps.stage = async (p) => (p.item?.id === "TreeSelect" ? Promise.reject(new Error("DO down")) : stage(p));
+    const result = await postPrecedenceReport(deps);
+    assert.equal(result.posted, true);
+    assert.equal(edits.length, 1);
+    assert.equal(edits[0]!.ts, MSG);
+    const [, tree] = cardsIn(edits[0]!.message.blocks!);
+    assert.equal(tree!.subtitle!.text, NOT_STAGED);
+    assert.deepEqual(tree!.actions.map((a) => a.text.text), ["Code", "Figma"], "no Review");
+    assert.deepEqual(reportBox.box.value?.items.map((i) => i.component), ["TreeSelect"]);
+  });
+
+  it("keeps the report for tomorrow when the members cannot be read, or the message does not post", async () => {
+    const unread = postDeps(await weekReport());
+    unread.deps.members = async () => null;
+    assert.equal((await postPrecedenceReport(unread.deps)).posted, false);
+    assert.deepEqual(unread.posts, []);
+    assert.notEqual(unread.reportBox.box.value, null);
+
+    const refused = postDeps(await weekReport());
+    refused.deps.post = async () => ({ ok: false });
+    assert.equal((await postPrecedenceReport(refused.deps)).posted, false);
+    assert.deepEqual(refused.staged, []);
+    assert.notEqual(refused.reportBox.box.value, null);
+  });
+
+  it("a dry run drafts and posts, stages and writes nothing", async () => {
+    const { deps, posts, staged, reportBox } = postDeps(await weekReport());
+    const result = await postPrecedenceReport(deps, { dryRun: true });
+    assert.equal(result.posted, false);
+    assert.match(result.summary, /would post 2 component card/);
+    assert.deepEqual(posts, []);
+    assert.deepEqual(staged, []);
+    assert.equal(reportBox.box.writes, 0);
   });
 });
 
-describe("a dispute in the thread", () => {
-  async function posted() {
-    const { deps, staged, threadBox } = postDeps(await weekReport(), null);
-    await postPrecedenceReport(deps);
-    return { thread: threadBox.box.value!, first: staged[0]! };
-  }
+// ── The week's intake ────────────────────────────────────────────────────────
 
-  it("reads `drop N` replies, and nothing looser", () => {
-    assert.deepEqual(droppedItems("drop 2"), [2]);
-    assert.deepEqual(droppedItems("drop #1 and 3, see the set"), [1, 3]);
-    assert.deepEqual(droppedItems("Drop 2, 4"), [2, 4]);
-    assert.deepEqual(droppedItems("<@UBOT> drop 2 — it is on its way"), [2]);
-    assert.deepEqual(droppedItems("item 2 looks wrong"), []);
-    // Only a reply that STARTS with the word counts.
-    assert.deepEqual(droppedItems("I wouldn't drop 2"), []);
-    assert.deepEqual(droppedItems("should we drop 3?"), []);
-    assert.deepEqual(droppedItems("drop 3?"), [], "a question, not a drop");
-    assert.deepEqual(droppedItems("dropped 2 already"), []);
+type Issue = { number: number; url: string; body: string };
+
+/** A harness repo — every intake updated this week, open or closed — the
+ *  week's filing on a ThreadState, and every write made. */
+function github(issues: Issue[] = [], store: ThreadState = createInMemoryThreadState({ now: () => NOW })) {
+  const created: Array<{ title: string; body: string }> = [];
+  const comments: Array<{ issue_number: number; comment: string }> = [];
+  const lookups = { count: 0 };
+  const deps: IntakeDeps = {
+    filing: { claim: (key) => store.claimFiling(key), settle: (key, issue) => store.settleFiling(key, issue) },
+    async intakesSince() {
+      lookups.count += 1;
+      return { intakes: [...issues], complete: true };
+    },
+    async create(input) {
+      // A real round trip: the other Approve runs meanwhile.
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      created.push(input);
+      const number = 1100 + created.length;
+      issues.push({ number, url: `https://github.com/${REPO}/issues/${number}`, body: input.body });
+      return JSON.stringify({ ok: true, issue_number: number, issue_url: `https://github.com/${REPO}/issues/${number}` });
+    },
+    async comment(input) {
+      comments.push(input);
+      return JSON.stringify({ ok: true });
+    },
+    sleep: (ms) => new Promise((resolve) => setTimeout(resolve, Math.min(ms, 2))),
+  };
+  return { deps, created, comments, lookups, store };
+}
+
+const section = (component: string) => ({ week_of: "2026-10-02", component, section: `### ${component}\n\n| … |` });
+
+describe("the week's intake", () => {
+  it("is a Worker tool: staged by the morning post, offered to no model", () => {
+    assert.equal(TOOL_TABLE[PRECEDENCE_INTAKE_TOOL].access, "worker");
   });
 
-  it("still reads `dispute N`, the verb a thread posted before #886 asks for", () => {
-    assert.deepEqual(droppedItems("dispute 2"), [2]);
-    assert.deepEqual(droppedItems("<@UBOT> dispute #1 and 3"), [1, 3]);
-    assert.deepEqual(droppedItems("I wouldn't dispute 2"), []);
+  it("the first Approve of the week files it; each later one comments on it, read from the store", async () => {
+    const gh = github();
+    await addToWeeklyIntake(section("Button"), gh.deps);
+    await addToWeeklyIntake(section("TreeSelect"), gh.deps);
+    await addToWeeklyIntake(section("Badge"), gh.deps);
+    assert.equal(gh.created.length, 1);
+    assert.equal(gh.created[0]!.title, "DS precedence, week of Oct 2: code and the library disagree");
+    assert.ok(gh.created[0]!.body.startsWith(precedenceMarker("2026-10-02")));
+    assert.match(gh.created[0]!.body, /### Button/);
+    assert.deepEqual(gh.comments.map((c) => [c.issue_number, c.comment.split("\n")[0]]), [
+      [1101, "### TreeSelect"],
+      [1101, "### Badge"],
+    ]);
+    assert.equal(gh.lookups.count, 1, "only the first looks on GitHub");
   });
 
-  const NOW = Date.UTC(2026, 9, 5, 16, 0);
+  it("two Approves back to back make one intake and one comment", async () => {
+    const gh = github();
+    const results = await Promise.all([addToWeeklyIntake(section("Button"), gh.deps), addToWeeklyIntake(section("TreeSelect"), gh.deps)]);
+    for (const r of results) assert.equal(JSON.parse(r).ok, true, r);
+    assert.equal(gh.created.length, 1, "one intake");
+    assert.equal(gh.comments.length, 1, "the other comments on it");
+    assert.equal(gh.comments[0]!.issue_number, 1101);
+  });
 
-  /** The posted thread, its first card live in an in-memory ThreadState, and
-   *  the dispute's dependencies over both. */
-  async function world(opts: {
-    postFails?: boolean;
-    stageThrows?: boolean;
-    writeThrows?: boolean;
-    restoreThrows?: boolean;
-    onPost?: (m: Post) => Promise<void>;
-  } = {}) {
-    const { thread, first } = await posted();
-    const threadState = createInMemoryThreadState({ now: () => NOW });
-    await threadState.putProposal(first);
-    const record = kv<PostedThread | null>(thread);
-    const posts: Post[] = [];
-    const superseded: string[] = [];
-    let n = 0;
-    const deps: DisputeDeps = {
-      thread: {
-        read: record.store.read,
-        write: async (v) => {
-          if (opts.writeThrows) throw new Error("KV down");
-          await record.store.write(v);
-        },
+  it("an intake filed before the store knew of it — closed mid-week, even — is commented on, never filed twice", async () => {
+    const closed = { number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: `${precedenceMarker("2026-10-02")}\n\nclosed on Wednesday` };
+    const gh = github([closed]);
+    await addToWeeklyIntake(section("Button"), gh.deps);
+    await addToWeeklyIntake(section("TreeSelect"), gh.deps);
+    assert.deepEqual(gh.created, []);
+    assert.deepEqual(gh.comments.map((c) => c.issue_number), [1090, 1090]);
+    assert.equal(gh.lookups.count, 1, "found once, then read from the store");
+  });
+
+  it("a new week files its own intake, whatever last week's left open", async () => {
+    const gh = github([{ number: 900, url: "u", body: `${precedenceMarker("2026-09-25")}\n\nlast week` }]);
+    await addToWeeklyIntake(section("Button"), gh.deps);
+    assert.equal(gh.created.length, 1);
+    assert.deepEqual(gh.comments, []);
+  });
+
+  it("files nothing when this week's intakes cannot all be read, and the next Approve tries again", async () => {
+    const gh = github();
+    gh.deps.intakesSince = async () => Promise.reject(new Error("GitHub 502"));
+    const result = JSON.parse(await addToWeeklyIntake(section("Button"), gh.deps)) as { ok: boolean; error: string };
+    assert.equal(result.ok, false);
+    assert.match(result.error, /GitHub 502/);
+    gh.deps.intakesSince = async () => ({ intakes: [], complete: false });
+    assert.equal(JSON.parse(await addToWeeklyIntake(section("Button"), gh.deps)).ok, false);
+    assert.deepEqual(gh.created, []);
+    gh.deps.intakesSince = async () => ({ intakes: [], complete: true });
+    await addToWeeklyIntake(section("Button"), gh.deps);
+    assert.equal(gh.created.length, 1, "the claim was released");
+  });
+});
+
+// ── Deciding a card ──────────────────────────────────────────────────────────
+
+describe("deciding a weekly card in its Review", () => {
+  /** The morning's report posted onto a ThreadState, and a review door whose
+   *  Approve runs the card's intake, and whose Needs changes disputes it, on a
+   *  fake repo. */
+  async function decided() {
+    const posted = postDeps(await weekReport());
+    await postPrecedenceReport(posted.deps);
+    const gh = github([], posted.store);
+    const updates: Array<{ ts: string; message: CardMessage }> = [];
+    const said: string[] = [];
+    const views = recordingViews({ alreadyOpen: ["V1"] });
+    const deps: ReviewDoorDeps = {
+      threadState: posted.store,
+      views: views.client,
+      delivery: () => recordingDelivery(),
+      applyVerdict: async (v): Promise<OperationOutcome[]> => {
+        const outcomes: OperationOutcome[] = [];
+        for (const op of v.execute?.operations ?? []) {
+          const result = await addToWeeklyIntake(op.input, gh.deps);
+          outcomes.push({ toolName: op.toolName, ok: JSON.parse(result).ok !== false, result, message: "Added." });
+        }
+        return outcomes;
       },
-      post: async (m) => {
-        posts.push(m);
-        await opts.onPost?.(m);
-        n += 1;
-        return opts.postFails && m.blocks ? { ok: false } : { ok: true, ts: `175960000${n}.000001` };
-      },
-      stage: async (p) => {
-        if (opts.stageThrows && p.proposalTs !== first.proposalTs) throw new Error("ThreadState down");
-        await threadState.putProposal(p);
-      },
-      restore: async (p) => {
-        if (opts.restoreThrows) throw new Error("ThreadState down");
-        await threadState.putProposal(p);
-      },
-      retire: async (ts) => {
-        await threadState.retireProposal(ts);
-      },
-      superseded: async (tss) => {
-        superseded.push(...tss);
-      },
-      card: async (ts) => {
-        const found = await threadState.getProposalByTs(ts);
-        return found.state === "found" ? found.proposal : null;
-      },
+      updateCard: async (_channel, ts, message) => void updates.push({ ts, message }),
+      restage: async () => {},
+      revise: (request) =>
+        disputePrecedenceItem(
+          {
+            store: posted.store,
+            name: async (id) => (id === MEMBERS[0] ? "Maya" : "Bill"),
+            write: (input) => addToWeeklyIntake(input, gh.deps),
+            edit: async (ts, message) => void updates.push({ ts, message }),
+            say: async (text) => void said.push(text),
+            now: () => NOW,
+          },
+          request,
+        ),
       now: () => NOW,
     };
-    const dispute = (text: string, threadTs = thread.ts) =>
-      disputePrecedenceItems(deps, { channel: CHANNEL, threadTs, user: MEMBERS[0]!, text });
-    return { thread, first, threadState, record, posts, deps, dispute, superseded };
+    const decide = (id: string, decision: "confirm" | "cancel" | "revise", userId: string, note?: string) =>
+      runReviewDecision(
+        { viewId: "V1", channel: CHANNEL, messageTs: itemProposal(MSG, id).proposalTs, userId, decision, ...(note ? { note } : {}) },
+        deps,
+      );
+    return { decide, gh, updates, said, views, store: posted.store };
   }
 
-  it("revises the card without the dropped item, in the same thread", async () => {
-    const w = await world();
-    assert.equal(await w.dispute("drop 2 — TreeSelect is on its way"), true);
-    assert.equal(w.posts.length, 1);
-    assert.equal(w.posts[0]!.thread_ts, w.thread.ts);
-    // The revision says what it left out, then its one footer.
-    assert.equal(
-      w.posts[0]!.text,
-      [
-        "Revised without item 2.",
-        "",
-        ":white_check_mark: files item 1 as the weekly intake. :no_entry: files nothing.",
-        "Anyone in this channel can decide, for the next 6 days.",
-      ].join("\n"),
-    );
-    const revised = await w.threadState.getProposalByTs(w.record.box.value!.cardTs);
-    assert.equal(revised.state, "found");
-    const p = revised.state === "found" ? revised.proposal : null;
-    assert.equal(p!.supersedeKey, w.first.supersedeKey, "the revision shares the weekly card's key");
-    assert.deepEqual(p!.confirmers, MEMBERS);
-    const body = String(p!.operations![0]!.input.body);
-    assert.match(body, /Button/);
-    assert.doesNotMatch(body, /TreeSelect/);
-    assert.ok((p!.ttlMs ?? 0) < PRECEDENCE_CARD_TTL_MS, "a revision does not extend the card's life");
-    // Its late-decision line still names the whole six days, not what was left.
-    assert.deepEqual(p!.stated, w.first.stated);
-    assert.deepEqual(w.record.box.value?.disputed, [2]);
-    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
-    assert.deepEqual(w.superseded, [w.first.proposalTs], "superseded on the usage record once the revision is in place");
+  it("Approve on one card files the week's intake, Approve on the next comments on it, and each card says who decided", async () => {
+    const { decide, gh, updates } = await decided();
+    await decide("TreeSelect", "confirm", MEMBERS[0]!);
+    await decide("Button", "confirm", MEMBERS[1]!);
+    assert.equal(gh.created.length, 1, "one intake for the week");
+    assert.match(gh.created[0]!.body, /### TreeSelect/);
+    assert.equal(gh.comments.length, 1);
+    assert.match(gh.comments[0]!.comment, /^### Button/);
+    const [button, tree] = cardsIn(updates.at(-1)!.message.blocks);
+    assert.match(tree!.subtitle!.text, /^Approved by <@U0MEMBER1> · written /);
+    assert.match(button!.subtitle!.text, /^Approved by <@U0MEMBER2> · written /);
+    assert.equal(button!.body.text, "Written: added to this week's DS precedence intake.");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
   });
 
-  it("dropping every item withdraws the card", async () => {
-    const w = await world();
-    assert.equal(await w.dispute("drop 1, 2"), true);
-    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "superseded");
-    assert.equal(
-      w.posts[0]!.text,
-      `Every item is dropped, so the card is withdrawn and nothing is filed this week (dropped by <@${MEMBERS[0]}>).`,
-    );
+  it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Noted by", async () => {
+    const { decide, gh, updates, store, views } = await decided();
+    await decide("Button", "revise", MEMBERS[0]!, "ghost is library-only on purpose");
+    const popUp = JSON.stringify(views.calls.map((c) => c.view));
+    assert.match(popUp, /Your note goes on this week's intake\./, "the pop-up says where the note goes");
+    assert.doesNotMatch(popUp, /revising the draft/);
+    assert.equal(gh.created.length, 1, "no intake yet, so the dispute files it");
+    assert.match(gh.created[0]!.body, /\*\*Button\*\*: disputed by Maya — ghost is library-only on purpose/);
+    const [button] = cardsIn(updates.at(-1)!.message.blocks);
+    assert.equal(button!.subtitle!.text, "Noted by <@U0MEMBER1>");
+    assert.equal(button!.body.text, "Note: ghost is library-only on purpose");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+    assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "Button").proposalTs)).state, "found", "nothing else decides it");
+
+    await decide("TreeSelect", "revise", MEMBERS[1]!, "the library is right, code is behind");
+    assert.equal(gh.created.length, 1);
+    assert.deepEqual(gh.comments.map((c) => c.comment), ["**TreeSelect**: disputed by Bill — the library is right, code is behind"]);
   });
 
-  it("a `dispute N` reply revises the card exactly as `drop N` does", async () => {
-    const byDrop = await world();
-    const byDispute = await world();
-    await byDrop.dispute("drop 2");
-    await byDispute.dispute("dispute 2");
-    assert.equal(byDispute.posts[0]!.text, byDrop.posts[0]!.text);
-    assert.deepEqual(byDispute.record.box.value?.disputed, [2]);
+  it("a dispute that does not reach the intake puts the card back to open and says so", async () => {
+    const { decide, gh, updates, said, store } = await decided();
+    gh.deps.intakesSince = async () => Promise.reject(new Error("GitHub 502"));
+    await decide("Button", "revise", MEMBERS[0]!, "deliberate");
+    const [button] = cardsIn(updates.at(-1)!.message.blocks);
+    assert.equal(button!.subtitle!.text, "Library side");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
+    assert.match(said[0]!, /didn't reach this week's intake/);
+    const live = await store.getProposalByTs(itemProposal(MSG, "Button").proposalTs);
+    assert.equal(live.state, "found");
+    assert.equal(live.state === "found" && live.proposal.revising, undefined, "the lock is lifted");
   });
 
-  it("the old card is retired before the revision posts, so a racing ✅ runs nothing", async () => {
-    const outcomes: string[] = [];
-    const w = await world({
-      onPost: async (m) => {
-        if (!m.blocks) return;
-        const verdict = await resolveSignal(
-          { kind: "reaction", messageTs: w.first.proposalTs, channel: CHANNEL, thread: w.thread.ts, glyph: "white_check_mark", userId: MEMBERS[1]! },
-          { threadState: w.threadState },
-        );
-        outcomes.push(verdict.outcome);
-      },
-    });
-    await w.dispute("drop 2");
-    assert.equal(outcomes.length, 1);
-    assert.notEqual(outcomes[0], "won", "a confirm on the retired card resolves nothing");
+  it("Reject leaves the difference as deliberate and writes nothing", async () => {
+    const { decide, gh, updates } = await decided();
+    await decide("Button", "cancel", MEMBERS[0]!, "ghost is library-only on purpose");
+    assert.deepEqual(gh.created, []);
+    assert.deepEqual(gh.comments, []);
+    const [button] = cardsIn(updates.at(-1)!.message.blocks);
+    assert.equal(button!.subtitle!.text, "Rejected by <@U0MEMBER1>");
   });
 
-  it("a revision that fails to post restores the old card", async () => {
-    const w = await world({ postFails: true });
-    assert.equal(await w.dispute("drop 2"), true);
-    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
-    assert.equal(w.record.box.value?.cardTs, w.first.proposalTs);
-    assert.deepEqual(w.record.box.value?.disputed, []);
-  });
-
-  it("a revision that posts but does not stage restores the old card and says so, and later disputes still work", async () => {
-    const w = await world({ stageThrows: true });
-    assert.equal(await w.dispute("drop 2"), true, "no fall-through to a turn");
-    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
-    assert.equal(w.record.box.value?.cardTs, w.first.proposalTs, "the record names the live card");
-    assert.deepEqual(w.superseded, [], "the restored card is not superseded on the record");
-    assert.equal(w.posts.at(-1)!.text, "That revised card didn't go through, so the card before it still stands. Try the `drop` again.");
-    // The next drop is judged against the card that is actually live.
-    const posted = w.posts.length;
-    assert.equal(await w.dispute("drop 9"), true);
-    assert.match(w.posts[posted]!.text, /not on this week's list/);
-  });
-
-  it("a revision whose record does not write restores the old card over it", async () => {
-    const w = await world({ writeThrows: true });
-    assert.equal(await w.dispute("drop 2"), true);
-    assert.equal((await w.threadState.getProposalByTs(w.first.proposalTs)).state, "found");
-    const revisionTs = w.posts.find((m) => m.blocks) ? "1759600001.000001" : "";
-    assert.notEqual((await w.threadState.getProposalByTs(revisionTs)).state, "found", "the revision is not live");
-    assert.match(w.posts.at(-1)!.text, /didn't go through/);
-  });
-
-  it("a revision that fails and whose old card cannot be put back says neither went through", async () => {
-    const w = await world({ stageThrows: true, restoreThrows: true });
-    assert.equal(await w.dispute("drop 2"), true);
-    const last = w.posts.at(-1)!.text;
-    assert.match(last, /didn't go through/);
-    assert.doesNotMatch(last, /still stands/, "the old card is not live, so the reply does not say it is");
-  });
-
-  it("a card re-staged after a cut-off is followed by the record, so a later dispute revises it", async () => {
-    const w = await world();
-    // What a cut-off re-stage does: a fresh card, the old one's terms, rooted
-    // at it (`restageExecution`).
-    const restaged: PendingProposal = { ...w.first, proposalTs: "1759600500.000001", originProposalTs: w.first.proposalTs };
-    await w.threadState.putProposal(restaged);
-    await followRestagedCard(w.deps.thread, w.first, restaged);
-    assert.equal(w.record.box.value?.cardTs, restaged.proposalTs);
-
-    assert.equal(await w.dispute("drop 2"), true);
-    assert.ok(w.posts[0]!.blocks, "a revised card, not \"already decided or expired\"");
-    assert.equal((await w.threadState.getProposalByTs(restaged.proposalTs)).state, "superseded");
-  });
-
-  it("a re-staged card that is not the thread's live one moves nothing", async () => {
-    const w = await world();
-    const other: PendingProposal = { ...w.first, proposalTs: "1.1" };
-    await followRestagedCard(w.deps.thread, other, { ...other, proposalTs: "1.2" });
-    assert.equal(w.record.box.value?.cardTs, w.first.proposalTs);
-  });
-
-  it("a dispute that changes nothing says why in one line", async () => {
-    const w = await world();
-    await w.dispute("drop 9");
-    assert.match(w.posts.at(-1)!.text, /^Item 9 is not on this week's list\.$/);
-    await w.dispute("drop 2");
-    await w.dispute("drop 2");
-    assert.match(w.posts.at(-1)!.text, /^Item 2 is already dropped\.$/);
-    assert.deepEqual(w.record.box.value?.disputed, [2]);
-  });
-
-  it("a dispute after the card is decided revises nothing, so no second intake is filed", async () => {
-    const w = await world();
-    const won = await resolveSignal(
-      { kind: "reaction", messageTs: w.first.proposalTs, channel: CHANNEL, thread: w.thread.ts, glyph: "white_check_mark", userId: MEMBERS[0]! },
-      { threadState: w.threadState },
-    );
-    assert.equal(won.outcome, "won");
-    assert.equal(await w.dispute("drop 2"), true);
-    assert.equal(w.posts.length, 1);
-    assert.match(w.posts[0]!.text, /already been decided or has expired/);
-    assert.equal(w.posts[0]!.blocks, undefined, "no revised card");
-  });
-
-  it("leaves a reply outside a list thread, or one that is no drop, to the ordinary path", async () => {
-    const w = await world();
-    assert.equal(await w.dispute("thanks!"), false);
-    // A `drop 1` on some other card's thread — a sweep card's — is not this
-    // card's to answer: it goes on to the turn, which reads it there.
-    assert.equal(await w.dispute("drop 1", "1.2"), false);
-    assert.deepEqual(w.posts, []);
-  });
-
-  it("the operations a card runs follow the target", () => {
-    const items = [{ n: 1, component: "Button", summary: "s", codeUrl: "c", figmaUrl: "f", loser: "library" }] as never;
-    assert.equal(precedenceOperations(items, { kind: "create" }, "2026-10-02")[0]!.toolName, "github_issue_create");
-    assert.equal(
-      precedenceOperations(items, { kind: "update", issue: 7, url: "u" }, "2026-10-02")[0]!.toolName,
-      "github_issue_update",
-    );
+  it("only a #plus-universal member can decide a card", async () => {
+    const { decide, gh } = await decided();
+    await decide("Button", "confirm", "U0OUTSIDE");
+    assert.deepEqual(gh.created, []);
   });
 });
 
-describe("the Slack hook", () => {
-  const thread = {
-    channel: CHANNEL,
-    ts: "1759500000.000001",
-    items: [{ n: 1 }, { n: 2 }],
-    disputed: [2],
-    expiresAt: Date.now() + PRECEDENCE_CARD_TTL_MS,
-  } as unknown as PostedThread;
-  const env = (reads: string[], cardState = "found") =>
+describe("the report's thread", () => {
+  const env = (reads: string[]) =>
     ({
       PLUS_UNIVERSAL_CHANNEL_ID: CHANNEL,
-      // The ThreadState namespace, as far as the card lookup reaches it.
-      THREAD_STATE: {
-        idFromName: (name: string) => name,
-        get: () => ({ getProposalByTs: async () => ({ state: cardState }) }),
-      },
       HARNESS_KV: {
         get: async (key: string) => {
           reads.push(key);
-          return thread;
+          return key.endsWith(MSG) ? { channel: CHANNEL, ts: MSG, weekOf: "2026-10-02" } : null;
         },
       },
     }) as unknown as Env;
-  const msg = (over: Partial<SlackMessageEvent>): SlackMessageEvent =>
-    ({ type: "message", channel: CHANNEL, thread_ts: thread.ts, ts: "1759500001.000001", user: "U1", text: "drop 1", ...over }) as SlackMessageEvent;
 
-  it("reads nothing for a message that cannot be a drop", async () => {
-    const reads: string[] = [];
-    assert.equal(await handleDsPrecedenceReply(env(reads), msg({ text: "looks right to me" })), false);
-    assert.equal(await handleDsPrecedenceReply(env(reads), msg({ channel: "C0OTHER" })), false);
-    assert.equal(await handleDsPrecedenceReply(env(reads), msg({ thread_ts: undefined })), false);
-    assert.deepEqual(reads, []);
-  });
-
-  it("queues a `drop N` for this handler only in a list thread — under any other card it stays free", async () => {
-    // `drop` is the sweep's verb too: a `drop 2` under a follow-up or a sweep
-    // card in #plus-universal must reach the handlers after this one.
-    const listed = {
-      PLUS_UNIVERSAL_CHANNEL_ID: CHANNEL,
-      HARNESS_KV: { get: async (key: string) => (key.endsWith(thread.ts) ? thread : null) },
-    } as unknown as Env;
-    assert.equal(await replyHandlerAt(listed, msg({ text: "drop 2" })), "ds-precedence");
-    assert.notEqual(await replyHandlerAt(listed, msg({ text: "drop 2", thread_ts: "1759599999.000001" })), "ds-precedence");
-  });
-
-  it("queues a person's `drop N` reply or broadcast in a #plus-universal thread, and nothing else", () => {
-    const e = env([]);
-    assert.equal(isDsPrecedenceCandidate(e, msg({})), true);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "<@UBOT> drop 1" })), true);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "<@UBOT> dispute 1" })), true, "the verb before #886");
-    assert.equal(isDsPrecedenceCandidate(e, msg({ subtype: "thread_broadcast" })), true);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ subtype: "message_changed" })), false);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ bot_id: "B1" })), false);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ channel: "C0OTHER" })), false);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ thread_ts: undefined })), false);
-    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "I wouldn't drop 1" })), false);
-  });
-
-  it("a cut-off re-stage of the weekly card moves its thread's record; any other card reads nothing", async () => {
-    const reads: string[] = [];
-    const puts: Array<[string, PostedThread]> = [];
-    const e = {
-      HARNESS_KV: {
-        get: async (key: string) => {
-          reads.push(key);
-          return { ...thread, cardTs: "1759500000.000002" };
-        },
-        put: async (key: string, value: string) => {
-          puts.push([key, JSON.parse(value) as PostedThread]);
-        },
-      },
-    } as unknown as Env;
-    const from = { supersedeKey: "ds-precedence", proposalTs: "1759500000.000002", replyTs: thread.ts, threadTs: thread.ts } as PendingProposal;
-    await recordPrecedenceRestageFor(e, from, { ...from, proposalTs: "1759500900.000001" });
-    assert.equal(puts.length, 1);
-    assert.match(puts[0]![0], new RegExp(thread.ts.replace(".", "\\.")));
-    assert.equal(puts[0]![1].cardTs, "1759500900.000001");
-
-    reads.length = 0;
-    await recordPrecedenceRestageFor(e, { ...from, supersedeKey: "sweep" }, { ...from, proposalTs: "2.2" });
-    assert.deepEqual(reads, []);
-  });
-
-  it("knows the weekly thread, so its replies are not all turns", async () => {
-    assert.equal(await isWeeklyPrecedenceThread(env([]), CHANNEL, thread.ts), true);
+  it("is known, so its replies are not all turns", async () => {
+    assert.equal(await isWeeklyPrecedenceThread(env([]), CHANNEL, MSG), true);
     assert.equal(await isWeeklyPrecedenceThread(env([]), CHANNEL, "1.1"), false);
     const reads: string[] = [];
-    assert.equal(await isWeeklyPrecedenceThread(env(reads), "C0OTHER", thread.ts), false);
+    assert.equal(await isWeeklyPrecedenceThread(env(reads), "C0OTHER", MSG), false);
     assert.deepEqual(reads, [], "another channel reads nothing");
   });
 });

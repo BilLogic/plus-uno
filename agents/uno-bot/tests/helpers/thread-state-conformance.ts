@@ -31,6 +31,7 @@ import {
   PROPOSAL_TTL_MS,
   REVISING_MARK_MS,
   REPORT_GRACE_MS,
+  FILING_LEASE_MS,
   RUN_LEASE_MS,
   proposalOperations,
   unfinishedOperations,
@@ -1052,6 +1053,26 @@ export function runThreadStateConformance(
     assert.equal(await store.claimRun("Ev1"), "done");
   });
 
+  // ----- one filing per key -----
+
+  it("a filing is claimed once; the next caller is told busy, then filed with the issue", async () => {
+    const { store } = setup();
+    assert.deepEqual(await store.claimFiling("week"), { state: "claimed" });
+    assert.deepEqual(await store.claimFiling("week"), { state: "busy" });
+    await store.settleFiling("week", { number: 7, url: "https://github.com/o/r/issues/7" });
+    assert.deepEqual(await store.claimFiling("week"), { state: "filed", issue: { number: 7, url: "https://github.com/o/r/issues/7" } });
+    assert.deepEqual(await store.claimFiling("another week"), { state: "claimed" });
+  });
+
+  it("a released or abandoned filing claim can be claimed again", async () => {
+    const { store, clock } = setup();
+    await store.claimFiling("week");
+    await store.settleFiling("week", null);
+    assert.deepEqual(await store.claimFiling("week"), { state: "claimed" });
+    clock.advance(FILING_LEASE_MS + 1);
+    assert.deepEqual(await store.claimFiling("week"), { state: "claimed" }, "a lease past its time was a caller killed mid-filing");
+  });
+
   it("the one-shot dedup and the lease share one record", async () => {
     const { store } = setup();
     assert.equal(await store.claimRun("Ev1"), "claimed");
@@ -1118,7 +1139,7 @@ export function runThreadStateConformance(
   // rides them too, so the gate's note can be edited onto the card itself.
   it("a stated card's words ride its superseded and expired answers", async () => {
     const { store, clock } = setup();
-    const stated = { cancelled: "Intake only", expired: "That card closed after 3 days with no decision." };
+    const stated = { cancelled: "Rejected, nothing filed", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
     assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });

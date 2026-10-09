@@ -35,7 +35,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { cancelRunOf, cardConfirmers, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { cardConfirmers, mayConfirm, proposalOperations, statedCancelOf, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -639,10 +639,8 @@ async function claim(
   // write is logged and the run goes ahead untracked, as every run did before
   // the record existed: refusing to run an approved card over bookkeeping
   // would be a worse answer to the person than the rare untracked cut-off.
-  // What runs: the card on a ✅; on a ⛔, only what the card said a cancel
-  // still runs (`PendingProposal.onCancel`), which every turn's card leaves
-  // unset — so for them a cancel runs nothing, as it always has.
-  const run = decision === "confirm" ? proposal : cancelRunOf(proposal);
+  // What runs: the card on a ✅; a ⛔ runs nothing.
+  const run = decision === "confirm" ? proposal : null;
   if (run) {
     await deps.threadState.beginExecution(run).catch((err: unknown) => {
       console.warn(
@@ -663,8 +661,7 @@ async function claim(
         : {
             kind: "resolved",
             decision,
-            ...(decision === "cancel" && run ? { stillRuns: proposalOperations(run).map((op) => op.toolName) } : {}),
-            ...(decision === "cancel" && proposal.stated ? { cancelled: proposal.stated.cancelled } : {}),
+            ...(decision === "cancel" && proposal.stated ? { cancelled: statedCancelOf(proposal) } : {}),
             ...(decision === "cancel" && rejected ? { rejected } : {}),
           },
       replyTs: replyTarget(proposal),

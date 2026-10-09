@@ -3,7 +3,7 @@
 // confirm and the Review button.
 //
 // The sweep hands the fixes over as DATA (`ProposalCard.fixes`, built in
-// `sweep/cards.ts` and `dm-watch/capture.ts`); the text copy stays the whole
+// `sweep/cards.ts`); the text copy stays the whole
 // card, so the sweep's mark leads it and an untagged post is still read as a
 // sweep card (`isSweepCardPost`). Each card is numbered as `drop N` names it —
 // the number leads its title — and carries the page's link, its owner, what

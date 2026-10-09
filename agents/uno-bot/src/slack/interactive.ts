@@ -52,6 +52,8 @@ import { databaseOptions } from "../integrations/notion";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { conversationKey, enqueueAgentJob, replyHandlerAt } from "./events";
 import type { SlackMessageEvent } from "./types";
+import { isPrecedenceCard } from "../ds-precedence/dispute";
+import { disputeOnEnv } from "../tools/ds-precedence-intake";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
@@ -363,6 +365,9 @@ async function reviseFromReview(
   request: { proposal: PendingProposal; note: string; userId: string },
 ): Promise<void> {
   const { proposal, note, userId } = request;
+  // A weekly DS precedence card is not redrafted: its Needs changes is a
+  // dispute, written on the week's intake (`ds-precedence/dispute.ts`).
+  if (isPrecedenceCard(proposal)) return disputeOnEnv(env, request);
   const thread = proposalReplyThread(proposal);
   await startRevision(request, {
     threadState: threadStateFor(env),
@@ -375,6 +380,7 @@ async function reviseFromReview(
         text: `${NEEDS_CHANGES_LEAD}${note}`,
         ts: noteTs,
         thread_ts: thread,
+        revises: proposal.proposalTs,
       };
       // A Figma comment decision revises its own way: its handler takes the
       // note at the head of the job (`figma-comments/revise.ts`). Every other
