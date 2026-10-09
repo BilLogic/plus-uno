@@ -1,5 +1,8 @@
-// The Figma library's two morning jobs, bound to `Env` — the only file in the
-// folder that names it. The post reads the registry from GitHub and the
+// The Figma library's jobs, bound to `Env` — the only file in the folder that
+// names it. The snapshot refresh (`./snapshot-refresh.ts`) reads what the poll
+// left owed in HARNESS_KV, reads the repo's snapshot from GitHub, and sends
+// `repository_dispatch` with GITHUB_TOKEN, the way `component_implement`
+// starts `figma-implement.yml`. The post reads the registry from GitHub and the
 // channel's members from Slack, posts the card, and stages it in ThreadState;
 // the tracker reads GitHub and posts in the card's thread, and files and closes
 // a card nobody decided. Findings and the tracked cards are JSON in HARNESS_KV
@@ -14,13 +17,23 @@ import { conversationsMembers, getPermalink, postMessage, updateMessage } from "
 import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
-import { githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
+import { GithubRequestError, githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
+import { repositoryDispatch } from "../tools/github-dispatch";
+import {
+  BLOCKED_LABEL,
+  REFRESH_BRANCH,
+  REFRESH_OWED_KV_KEY,
+  runSnapshotRefresh,
+  SNAPSHOT_PATH,
+  type RefreshOwed,
+  type SnapshotRefreshReport,
+} from "./snapshot-refresh";
 import type { ComponentRegistry, LibraryChangeSet } from "./draft";
 import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostResult } from "./post";
 import { windowInWords } from "../slack/copy-words";
-import { rethrowIfBudget } from "../net";
+import { charge, rethrowIfBudget } from "../net";
 import { trackLibraryIntakes, type TrackedPublish, type TrackResult } from "./track";
 
 export const TRACKED_KV_KEY = "figma-poll:tracked";
@@ -157,4 +170,61 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
     },
     opts,
   );
+}
+
+/**
+ * The `figma-snapshot-refresh` job on `Env` (#898): settle what the repo's
+ * snapshot now records, and start the refresh for whatever the poll found
+ * published that it does not.
+ *
+ * @param env - Worker bindings
+ * @param opts - `dryRun` reads what is owed and what landed, and dispatches,
+ *   files and writes nothing
+ */
+export async function runSnapshotRefreshOnEnv(env: Env, opts: { dryRun: boolean }): Promise<SnapshotRefreshReport | { summary: string }> {
+  const kv = env.HARNESS_KV;
+  if (!kv) return { summary: "HARNESS_KV not bound — no publish is recorded, so nothing to refresh" };
+  const owed = kvJson<RefreshOwed | null>(env, REFRESH_OWED_KV_KEY, null);
+  const target = resolveRepoFor(env, undefined);
+  return runSnapshotRefresh({
+    owed: {
+      read: owed.read,
+      async update(change) {
+        // Read again: a poll may have recorded a publish since this job read.
+        const next = change(await owed.read());
+        if (next) return owed.write(next);
+        charge(1, "kv");
+        await kv.delete(REFRESH_OWED_KV_KEY);
+      },
+    },
+    async landed() {
+      if (!target.ok) throw new Error(`no repo: ${target.error}`);
+      const reads = githubLibraryReads(env, target.entry);
+      const [onMain, onBranch] = await Promise.all([
+        reads.rawFile(SNAPSHOT_PATH).then(versionIdsIn),
+        // No refresh branch is no refresh waiting for review, not a failure.
+        reads.rawFile(SNAPSHOT_PATH, REFRESH_BRANCH).then(versionIdsIn, (err: unknown) => {
+          if (err instanceof GithubRequestError && err.status === 404) return [];
+          throw err;
+        }),
+      ]);
+      return [...onMain, ...onBranch];
+    },
+    async dispatch(eventType, payload) {
+      // Unset, the refresh stays owed and every run says why.
+      if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) throw new Error("GITHUB_TOKEN or GITHUB_REPO is not set");
+      return repositoryDispatch(env, eventType, payload);
+    },
+    async fileBlocked(issue) {
+      if (!target.ok) throw new Error(`no repo: ${target.error}`);
+      return (await githubIssueClient(env, target.entry).createIssue({ ...issue, labels: [BLOCKED_LABEL] })).number;
+    },
+    dryRun: opts.dryRun,
+  });
+}
+
+/** The version ids a snapshot file records (`versionIds[].id`). */
+function versionIdsIn(text: string): string[] {
+  const parsed = JSON.parse(text) as { versionIds?: Array<{ id?: unknown }> };
+  return (parsed.versionIds ?? []).flatMap((v) => (typeof v?.id === "string" ? [v.id] : []));
 }

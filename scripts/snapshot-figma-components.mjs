@@ -36,6 +36,25 @@
  * it names what is missing and exits 1. A refresher that quietly wrote
  * something else would be worse than one that cannot run.
  *
+ * A RATE LIMIT IS WAITED OUT, NOT A FAILURE (#898). The refresh runs itself
+ * once per library publish, on the same Figma budget Bill's own tools use, so
+ * a 429 is expected sooner or later. Each call retries a 429 or a 5xx the way
+ * the Worker's Figma client does (agents/uno-bot/src/figma/rest.ts): three
+ * tries, each wait at least Figma's `Retry-After` and at least 1 s doubling,
+ * and a wait the run cannot afford — half an hour across every call — fails
+ * at once rather than retrying early into the same limit. The 38 node fetches
+ * (1,891 components in chunks of 50; Tier 1, the scarce tier) are paced at
+ * uno-bot's half of it, one every 12 s, and the first chunk Figma keeps
+ * refusing ends them. A run that cannot finish writes nothing, as before, and
+ * exits 75 (EX_TEMPFAIL) rather than 1, so its workflow can say "Figma was
+ * busy" rather than "something broke".
+ *
+ * WHY NOT IMPORT rest.ts. It is TypeScript in the Worker's own package, its
+ * imports are extensionless, and it meters every call against a Worker
+ * invocation's subrequest budget (`countedFetch`). The workflow runs this file
+ * on bare Node with no install, so the policy is restated here and its pace is
+ * held to the Worker's `SNAPSHOT_REFRESH_PER_MINUTE` by a test.
+ *
  * Usage:
  *   npm run snapshot:figma-components               fetch and write the snapshot
  *   npm run snapshot:figma-components -- --dry-run  fetch, print the delta, write nothing
@@ -201,14 +220,83 @@ export function snapshotFrom({ rows, versions, nodeHashes, fileKey, now }) {
 
 /* ------------------------------------------------------------------ fetch */
 
-async function figmaGet(endpoint, token) {
-  const res = await fetch(`https://api.figma.com/v1${endpoint}`, {
-    headers: { 'X-Figma-Token': token },
-  });
-  if (!res.ok) {
-    throw new Error(`Figma API ${res.status} on ${endpoint}: ${(await res.text()).slice(0, 200)}`);
+/** Tries per call, the first included: rest.ts `DEFAULT_ATTEMPTS`. */
+export const MAX_ATTEMPTS = 3;
+/** The first retry's least wait; each later one doubles (rest.ts `BACKOFF_MS`). */
+export const BASE_WAIT_MS = 1_000;
+/** All the waiting one run may do, every call together. */
+export const WAIT_BUDGET_MS = 30 * 60_000;
+/** The gap between node fetches: five a minute, uno-bot's half of Figma's
+ *  Tier 1 (rest.ts `SNAPSHOT_REFRESH_PER_MINUTE`, held equal by a test). */
+export const NODES_SPACING_MS = 12_000;
+/** The exit code for "Figma kept refusing": a temporary failure (EX_TEMPFAIL). */
+export const EXIT_BUSY = 75;
+
+/** Figma kept answering 429 or 5xx past the tries or the run's wait budget. */
+export class FigmaBusyError extends Error {
+  constructor(endpoint, status, waitedMs) {
+    super(`Figma kept answering ${status} on ${endpoint}, after ${Math.round(waitedMs / 1000)} s of waiting this run`);
+    this.name = 'FigmaBusyError';
+    this.status = status;
+    this.waitedMs = waitedMs;
   }
-  return res.json();
+}
+
+const sleepFor = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * How long to wait before the next try: at least Figma's `Retry-After`
+ * (seconds) and at least 1 s doubling with each try, as rest.ts waits. Never
+ * capped: a long `Retry-After` is what Figma needs, and retrying before it
+ * only spends a try on the same refusal.
+ *
+ * @param {number} attempt - The try that was refused, from 1
+ * @param {string|null} retryAfter - The header, as sent
+ */
+export function backoffMs(attempt, retryAfter) {
+  const seconds = retryAfter === null || retryAfter === undefined || retryAfter === '' ? NaN : Number(retryAfter);
+  const asked = Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : 0;
+  return Math.max(asked, BASE_WAIT_MS * 2 ** (attempt - 1));
+}
+
+/** A run's shared wait budget: what every call has waited so far, and the cap. */
+export function waitBudget(maxMs = WAIT_BUDGET_MS) {
+  return { waitedMs: 0, maxMs };
+}
+
+/**
+ * One Figma REST read that waits out a 429 or a 5xx rather than failing on it.
+ * Any other refusal throws at once, as it always did. A wait past the tries or
+ * past what the run's budget has left throws now, without sleeping: a
+ * `Retry-After` of an hour fails now, not in an hour.
+ *
+ * @param {string} endpoint - The path after /v1
+ * @param {string} token - The Figma token
+ * @param {object} [opts]
+ * @param {typeof fetch} [opts.fetchImpl]
+ * @param {(ms: number) => Promise<void>} [opts.sleep]
+ * @param {{waitedMs: number, maxMs: number}} [opts.budget] - Shared across a run's calls
+ * @param {(line: string) => void} [opts.log]
+ * @throws {FigmaBusyError} When the tries or the budget run out
+ */
+export async function figmaGet(endpoint, token, { fetchImpl = fetch, sleep = sleepFor, budget = waitBudget(), log = console.warn } = {}) {
+  for (let attempt = 1; ; attempt += 1) {
+    const res = await fetchImpl(`https://api.figma.com/v1${endpoint}`, {
+      headers: { 'X-Figma-Token': token },
+    });
+    if (res.ok) return res.json();
+    const detail = (await res.text().catch(() => '')).slice(0, 200);
+    if (res.status !== 429 && res.status < 500) {
+      throw new Error(`Figma API ${res.status} on ${endpoint}: ${detail}`);
+    }
+    const wait = backoffMs(attempt, res.headers.get('retry-after'));
+    if (attempt >= MAX_ATTEMPTS || budget.waitedMs + wait > budget.maxMs) {
+      throw new FigmaBusyError(endpoint, res.status, budget.waitedMs);
+    }
+    log(`  … Figma said ${res.status} on ${endpoint}; waiting ${Math.round(wait / 1000)} s (try ${attempt + 1} of ${MAX_ATTEMPTS})`);
+    budget.waitedMs += wait;
+    await sleep(wait);
+  }
 }
 
 /**
@@ -223,12 +311,16 @@ async function figmaGet(endpoint, token) {
  * line in scrollback.
  *
  * A retry first, because the failure this guards is usually transient; then the
- * caller decides, and it refuses to write.
+ * caller decides, and it refuses to write. A rate limit is waited out inside
+ * `get` (`figmaGet`), so a chunk it gave up on is not tried a second time, and
+ * no later chunk is tried at all. `paceMs` spaces the chunks, Tier 1 calls all
+ * of them.
  */
-export async function fetchNodeHashes(rows, fileKey, token, get = figmaGet, pauseMs = 2000) {
+export async function fetchNodeHashes(rows, fileKey, token, get = figmaGet, pauseMs = 2000, { paceMs = 0, sleep = sleepFor } = {}) {
   const hashes = {};
   const failed = [];
   for (let i = 0; i < rows.length; i += 50) {
+    if (i > 0 && paceMs > 0) await sleep(paceMs);
     const chunk = rows.slice(i, i + 50);
     const ids = chunk.map((c) => c.nodeId).filter(Boolean).join(',');
     if (!ids) continue;
@@ -244,15 +336,27 @@ export async function fetchNodeHashes(rows, fileKey, token, get = figmaGet, paus
         break;
       } catch (e) {
         lastError = e;
+        // `get` already spent its tries on a rate limit; a second round would
+        // only spend the run's budget again.
+        if (e instanceof FigmaBusyError) break;
         if (attempt === 0) {
           console.warn(`  ! node hashes for one chunk failed (${e.message}) — retrying once`);
-          if (pauseMs > 0) await new Promise((r) => setTimeout(r, pauseMs));
+          if (pauseMs > 0) await sleep(pauseMs);
         }
       }
     }
     if (lastError) {
-      failed.push({ from: i, count: chunk.length, message: lastError.message });
+      const busy = lastError instanceof FigmaBusyError;
+      failed.push({ from: i, count: chunk.length, message: lastError.message, busy });
       console.warn(`  ! node hashes for components ${i}-${i + chunk.length - 1} failed: ${lastError.message}`);
+      // Figma is rate-limiting this token: every chunk after this one would
+      // be one more Tier 1 call into the same limit, and the run writes
+      // nothing whatever they return.
+      if (busy) {
+        const rest = rows.length - (i + chunk.length);
+        if (rest > 0) failed.push({ from: i + chunk.length, count: rest, message: 'not fetched: Figma was rate-limiting', busy });
+        break;
+      }
     }
   }
   return { hashes, failed };
@@ -283,8 +387,19 @@ async function main() {
     process.exit(1);
   }
 
-  const rows = rowsFrom(await figmaGet(`/files/${fileKey}/components`, token));
-  const versions = versionsFrom(await figmaGet(`/files/${fileKey}/versions`, token));
+  // One wait budget for the whole run: every call's backoff draws on it.
+  const budget = waitBudget();
+  const get = (endpoint, tok) => figmaGet(endpoint, tok, { budget });
+  let rows;
+  let versions;
+  try {
+    rows = rowsFrom(await get(`/files/${fileKey}/components`, token));
+    versions = versionsFrom(await get(`/files/${fileKey}/versions`, token));
+  } catch (e) {
+    if (!(e instanceof FigmaBusyError)) throw e;
+    console.error(`[snapshot:figma-components] ${e.message}. Nothing was written; re-run when Figma answers.`);
+    process.exit(EXIT_BUSY);
+  }
   const { created, deleted, renamed } = diff(previous.components, rows);
 
   console.log(
@@ -301,7 +416,7 @@ async function main() {
     return;
   }
 
-  const { hashes: nodeHashes, failed } = await fetchNodeHashes(rows, fileKey, token);
+  const { hashes: nodeHashes, failed } = await fetchNodeHashes(rows, fileKey, token, get, 2000, { paceMs: NODES_SPACING_MS });
   if (failed.length) {
     // NOTHING IS WRITTEN. A snapshot is the baseline, so a partial one is worse
     // than an old one: the old file is visibly out of date and says so, while a
@@ -317,7 +432,7 @@ async function main() {
         'components as having none, so it is refused rather than recorded. Re-run when the\n' +
         'API is answering; the file on disk is unchanged and still says when it was captured.',
     );
-    process.exit(1);
+    process.exit(failed.some((f) => f.busy) ? EXIT_BUSY : 1);
   }
   const snapshot = snapshotFrom({ rows, versions, nodeHashes, fileKey, now: new Date() });
   fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2) + '\n');

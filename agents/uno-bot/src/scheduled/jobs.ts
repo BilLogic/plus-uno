@@ -16,7 +16,7 @@ import { runFigmaPoll } from "../figma-poll";
 import { selectProvider } from "../agent/run-agent";
 import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
 import { askCategoriesFor, proposalEventLogFor, runTeamRolesSync } from "../usage/production";
-import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
+import { runLibraryPost, runLibraryTrack, runSnapshotRefreshOnEnv } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
@@ -110,6 +110,14 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: link each posted card's PR, and close its intake on merge.
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
+  // End of day, last of the Figma jobs: a publish the poll found starts the
+  // refresh of the repo's library snapshot, and again each night until it
+  // lands (src/figma-library/snapshot-refresh.ts).
+  "figma-snapshot-refresh": async (env, _job, { dryRun }) => {
+    const report = await runSnapshotRefreshOnEnv(env, { dryRun });
+    console.log(`[figma-library] snapshot refresh: ${report.summary}`);
+    return report;
   },
   // End of day, one per swept channel: read the day, keep its drift findings
   // for the morning (src/sweep/run.ts).

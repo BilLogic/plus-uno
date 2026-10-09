@@ -53,6 +53,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
     "figma-backstop",
     "figma-backstop",
     "figma-backstop",
+    "figma-snapshot-refresh",
     "usage-classify",
     "usage-classify",
     "usage-classify",
@@ -177,6 +178,14 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-backstop-1", "figma-backstop", undefined],
     ["figma-backstop-2", "figma-backstop", undefined],
     ["figma-backstop-3", "figma-backstop", undefined],
+    // A publish the poll found starts the repo snapshot's refresh (#898), once
+    // every job that reads Figma is done: the Action's node fetches then have
+    // uno-bot's half of Tier 1 to themselves.
+    [
+      "figma-snapshot-refresh",
+      "figma-snapshot-refresh",
+      ["figma-library-poll", "ds-precedence-check", "figma-drift-recheck", "figma-backstop-1", "figma-backstop-2", "figma-backstop-3"],
+    ],
     // One job per classification batch.
     ["usage-classify-1", "usage-classify", undefined],
     ["usage-classify-2", "usage-classify", undefined],

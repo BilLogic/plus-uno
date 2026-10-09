@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,897 chars from 16 files**, against an assembled budget of 175,500 (2,603 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,513 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,010 chars from 16 files**, against an assembled budget of 175,500 (1,490 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,626 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -23,18 +23,18 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 20,000 | 30,251 | 20,000 (constitution) |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,991 | 58,283 | 28,000 (persona) |
 | 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,676 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,897 | 71,618 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,372 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,575 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,222 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,610 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,344 (−13,594 ide-only) | 99,996 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,412 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,130 (−6,177 ide-only) | 148,584 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 151,868 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 158,384 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 163,047 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 172,897 | — |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 71,621 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,375 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,578 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,225 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,613 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,454 (−15,123 ide-only) | 101,109 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 115,525 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,130 (−6,177 ide-only) | 149,697 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 152,981 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 159,497 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,160 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,010 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -476,7 +476,7 @@ Turn a written requirement into a build from Slack. A designer names a design-sy
 ## Execute — one prototype turn
 
 1. **Read the method.** The pointer at the foot of this file names it; make that `read_reference` call before anything below — the PRD gate, the grounding ritual, the prompt-spec skeleton and the two hard gates are its sections, and every step here is their Slack rendering. Done when the method is in this turn's context.
-2. **Sort the ask.** A build or update verb on a named DS component, or a pasted Figma frame with a build verb, is an implement ask. "Check / look at / compare / what does X do" is a question — answer it or `source_read` the link, and stage nothing. Asked *about* a frame → answer from the screenshot and text layers, within `agents/uno-bot/AGENT.md § My lane`. Done when you know whether this turn answers, asks, or stages.
+2. **Sort the ask.** A build or update verb on a named DS component, or a pasted Figma frame with a build verb, is an implement ask. "Check / look at / compare / what does X do" is a question — answer it or `source_read` the link, and stage nothing. Asked *about* a frame → answer from its screenshot, text and comments, within `agents/uno-bot/AGENT.md § My lane`. Done when you know whether this turn answers, asks, or stages.
 3. **Hold the PRD gate** (method §0) — every fidelity, every route. A PRD is one of: a Notion PRD URL, a thread whose root links one, or a PRD pasted inline this turn with its sections. None in hand → say a PRD is required, route to **uno-synthesize**, and stage nothing; every PRD link you cite is one you fetched. Done when the PRD is read this turn, or the turn has ended at the route.
 4. **Confirm fidelity first.** "Hi-fi via the DS library, or a quick mid-fi draft?" — the designer chooses; a brief that states it, or delegates it ("your call"), counts as answered. Done when fidelity is stated in the thread.
 5. **Ground the brief** (method §1), batched in one step: `source_read` the PRD and the frame; for a component ask, `github_read` confirms it exists under `design-system/src/components` with the library's exact casing (`Badge`, `CardSurface`); token values come from `design-system/src/tokens/`; current-state flow claims come from `search_blueprint`, cited by cell. Done when each claim in the preview traces to something read this turn; a claim with no source is a gap for step 6.
@@ -731,16 +731,32 @@ A PRD is offered, drafted, then filed on approval.
 
 # Figma Workspace Conventions
 
-<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma. -->
+<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma · annotation categories consolidated 2026-10-09. -->
 
 ## Canvas vs comments
 
 - **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas, never only in a comment.
-- **Comment pins = human dialogue.** uno-bot reads them only for decisions (#900).
+- **Comment pins = human dialogue.** uno-bot reads them with a pasted frame (#899) and for decisions (#900).
 
 ## Annotation category labels
 
-Every annotation carries one category label: `Interaction` · `Content` · `Layout` · `Token-Style` · `Behavior` · `Accessibility`. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
+Every annotation carries exactly one category label. There are six:
+
+| Label | Colour | What it holds |
+|---|---|---|
+| `Development` | green | API, field names, implementation and component-construction constraints |
+| `Interaction` | blue | click, hover, focus, tap; when a thing shows, hides, enables or disables |
+| `Content` | orange | copy, labels, empty states, string templates |
+| `Logic / data` | violet | conditions, what is counted, what is derived, where a number comes from, what is recorded |
+| `Tooltip` | teal | hover and help text |
+| `Accessibility` | pink | focus order, keyboard, labels, contrast |
+
+The first four are Figma's presets, kept at their preset colours; `Logic / data` and `Tooltip` are the file's own. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
+
+**`Logic / data` is not `Development`, and the test is the reader.** A product rule a non-engineer can review is `Logic / data`; an endpoint only a developer can review is `Development`. Ask *could a non-engineer tell me this is wrong?* — yes is `Logic / data`.
+
+**Status lives in section names.** Build status, scope and on-hold go there: Figma allows one category per annotation, so a status label would take the type's slot.
+
 
 ## Teams and stage folders
 
@@ -1365,7 +1381,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
 |---|---|---|---|---|---|---|---|
 | Figma library sync | Worker scheduled runs: poll at end of day, post + track next morning | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
-| Figma snapshot refresh | on demand (`workflow_dispatch` from `main`) | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks), otherwise the run ends green | GHA · Figma REST, no model call | Bill | built |
+| Figma snapshot refresh | each publish (uno-bot `repository_dispatch`, #898) or `workflow_dispatch` | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks) | GHA · Figma REST, no model call | Bill | built |
 | Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 read it, in `src/figma-comments/`) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times (details: `docs/connectors/figma.md`) | CF Worker · no model call | Bill | built (live once subscribed, #895) |
 | Figma notification subscriptions | on demand (`workflow_dispatch` from `main`) | uno-maintain (cross-estate sync) | Actions executes; `create` waits for the `uno-bot-production` reviewer | `figma-subscriptions.yml` → `agents/uno-bot/scripts/figma-subscriptions.mjs`: `list`, `create` (only what is missing; stops at the first failure), `status` (each subscription's newest deliveries). Defaults: FILE_COMMENT and FILE_UPDATE on all six teams, the 12 of #896 | GHA · Figma REST, no model call | Bill | built |
 | Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
