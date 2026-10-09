@@ -10,7 +10,7 @@ summary: PLUS Figma files follow How We Fig — five stage folders per team, `<P
 ## Canvas vs comments
 
 - **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas, never only in a comment.
-- **Comment pins = the team's dialogue.** uno-bot reads them for one thing: a thread under 📐 Specs or 🔍 For Review that reads like a decision becomes a drafted PRD, card or intake update, which a person ✅s in #plus-design (#900). What binds still lives on the canvas or on the page it was decided into.
+- **Comment pins = human dialogue.** uno-bot reads them only for decisions (#900).
 
 ## Annotation category labels
 
