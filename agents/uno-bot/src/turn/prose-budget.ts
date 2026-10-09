@@ -229,6 +229,13 @@ function introducesOnlyGone(
   keep: (line: string) => boolean,
 ): boolean {
   const heading = /^\s*#{1,6}\s/.test(lines[at]!);
+  // An intro ending in ':' introduces what comes next, whatever follows that:
+  // when that went, so does the intro (live on r528, "Here is the
+  // scenario-by-scenario breakdown across the journey:" stood over nothing).
+  if (lines[at]!.trim().replace(/[*_]+$/, "").endsWith(":")) {
+    const next = lines.findIndex((l, j) => j > at && l.trim());
+    if (next >= 0 && gone.has(next)) return true;
+  }
   let any = false;
   let ownSection = true;
   for (let j = at + 1; j < lines.length; j++) {
@@ -239,7 +246,10 @@ function introducesOnlyGone(
       if (isLabel(line)) ownSection = false;
       continue;
     }
-    if (!skip[j] && (LIST_ITEM.test(line) || indentOf(line) > 0)) return false;
+    // A list item that stays means the label still introduces a list — unless
+    // it stayed only for the confidence clause it carries, which no label
+    // introduces.
+    if (!skip[j] && (LIST_ITEM.test(line) || indentOf(line) > 0)) return keep(line) ? any : false;
     const paragraph = !skip[j] && !isLabel(line) && !RULE.test(line) && !keep(line);
     if (heading && ownSection && paragraph) return false;
     return any;

@@ -244,7 +244,8 @@ export function warningLog(now: () => number = Date.now): WarningLog {
     }
   };
 
-  const all = (): string[] => entries.map(sentence).filter((s): s is string => s !== null);
+  // Each sentence once: two triggers that word the same thing are one line.
+  const all = (): string[] => [...new Set(entries.map(sentence).filter((s): s is string => s !== null))];
 
   return {
     lookup(name, text) {
