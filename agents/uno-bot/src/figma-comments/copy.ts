@@ -103,7 +103,7 @@ export function decisionCard(n: number, d: QueuedDecision, commentUrl: string): 
 export function decisionCardWords(): StatedCardWords {
   return {
     cancelled: "Dropped, nothing written",
-    expired: "This card closed after 72 h without a decision, so nothing was written. Ask me here if it should still be.",
+    expired: "That card closed after 72 h with no decision, so nothing was written.",
   };
 }
 
