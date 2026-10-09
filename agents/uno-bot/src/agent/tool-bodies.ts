@@ -47,6 +47,7 @@ import { executeGithubIssueCreate } from "../tools/github-issue";
 import { executeGithubIssueUpdate } from "../tools/github-issue-update";
 import { executeGithubWorkflowRun } from "../tools/github-workflow";
 import { executeSweepSharePost } from "../tools/sweep-share-post";
+import { executeDsPrecedenceIntake } from "../tools/ds-precedence-intake";
 import type { ToolName } from "./tool-table";
 
 /**
@@ -89,6 +90,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   github_issue_update: (env, input, slack) => executeGithubIssueUpdate(env, input, slack),
   github_workflow_run: (env, input, slack) => executeGithubWorkflowRun(env, input, slack),
   sweep_share_post: (env, input) => executeSweepSharePost(env, input),
+  ds_precedence_intake: (env, input, slack) => executeDsPrecedenceIntake(env, input, slack),
   // Answered by Turn's presentation step from the turn's own lookups, which
   // replaces this result before the model reads it (`turn/presentation.ts`).
   // A run with no presentation step — none today — gets the plain refusal.

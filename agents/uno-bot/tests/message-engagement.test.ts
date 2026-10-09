@@ -26,9 +26,12 @@ let pending: Record<string, unknown> | null = null;
 let history: unknown[] = [];
 /** Threads marked as entered through a sweep card (`sweep/thread-mark.ts`). */
 const marks = new Set<string>();
-globalThis.fetch = (async (input: unknown) => {
+/** Every `chat.postMessage` body, in order. */
+const posted: Array<Record<string, unknown>> = [];
+globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   const url = String(input instanceof Request ? input.url : input);
   slackCalls.push(url.replace("https://slack.com/api/", ""));
+  if (url.endsWith("chat.postMessage")) posted.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
   const body = url.endsWith("auth.test")
     ? { ok: true, user_id: BOT, bot_id: "BBOT" }
     : { ok: true, messages: thread };
@@ -236,13 +239,13 @@ test("in a thread entered through a sweep card, a decided card's result, notes a
   }
 });
 
-// ── The weekly DS precedence list threads ───────────────────────────────────
-// uno-bot posts a list and a card there on a schedule, which leaves a live
-// card and uno-bot's own posts in the thread. People reply to each other about
-// the list, so a reply is not a turn: an @mention or a typed gate emoji
-// engages, and nothing else does — not uno-bot having answered there, not a
-// newer week's thread, not a card that never posted. Every list thread is
-// recorded under its own ts.
+// ── The weekly DS precedence report threads ─────────────────────────────────
+// uno-bot posts a report of cards there on a schedule, which leaves live
+// cards and uno-bot's own posts in the thread. People reply to each other
+// about the cards, so a reply is not a turn: an @mention engages, and nothing
+// else does — not a typed gate emoji (each card is decided in its Review), not
+// uno-bot having answered there, not a newer week's thread, not a card that
+// never posted. Every report thread is recorded under its own ts.
 
 const UNIVERSAL = "C072E8SFLKV";
 const LAST_WEEK = "1759000000.000001";
@@ -280,9 +283,26 @@ test("a plain reply in a list thread does not engage, though a card is live ther
   assert.equal(await engages(listReply("agree with 2, the set exists"), weeklyEnv()), false);
 });
 
-test("an @mention or a typed gate emoji in a list thread engages", async () => {
+test("only an @mention in a report thread engages: a typed ✅ or ⛔ starts no turn", async () => {
   assert.equal(await engages(listReply(`<@${BOT}> why is Button listed?`), weeklyEnv()), true);
-  assert.equal(await engages(listReply("✅"), weeklyEnv()), true);
+  assert.equal(await engages(listReply("✅"), weeklyEnv()), false);
+  assert.equal(await engages(listReply("⛔"), weeklyEnv()), false);
+});
+
+test("a typed ✅ in a report thread is answered ahead of the turn with the review-only line", async () => {
+  const { replyHandlerAt } = await import("../src/slack/events.js");
+  const { handlePrecedenceGateReply } = await import("../src/ds-precedence/env.js");
+  const { REVIEW_ONLY_POST } = await import("../src/slack/gate-note.js");
+  assert.equal(await replyHandlerAt(weeklyEnv(), listReply("✅")), "ds-precedence");
+  assert.notEqual(await replyHandlerAt(weeklyEnv(), listReply("✅", "1759599999.000001")), "ds-precedence", "another thread stays free");
+  assert.equal(await replyHandlerAt(weeklyEnv(), listReply("agree with Button")), null);
+  posted.length = 0;
+  assert.equal(await handlePrecedenceGateReply(weeklyEnv(), listReply("✅")), true);
+  assert.equal(posted.length, 1);
+  assert.deepEqual(
+    { channel: posted[0]!.channel, thread_ts: posted[0]!.thread_ts, text: posted[0]!.text },
+    { channel: UNIVERSAL, thread_ts: THIS_WEEK, text: REVIEW_ONLY_POST },
+  );
 });
 
 test("uno-bot having answered in a list thread (a typed ✅, a mention) does not make every reply a turn", async () => {

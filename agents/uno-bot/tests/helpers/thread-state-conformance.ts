@@ -31,6 +31,7 @@ import {
   PROPOSAL_TTL_MS,
   REVISING_MARK_MS,
   REPORT_GRACE_MS,
+  FILING_LEASE_MS,
   RUN_LEASE_MS,
   proposalOperations,
   unfinishedOperations,
@@ -1050,6 +1051,26 @@ export function runThreadStateConformance(
     await store.markRunDone("Ev1");
     clock.advance(RUN_LEASE_MS + 1);
     assert.equal(await store.claimRun("Ev1"), "done");
+  });
+
+  // ----- one filing per key -----
+
+  it("a filing is claimed once; the next caller is told busy, then filed with the issue", async () => {
+    const { store } = setup();
+    assert.deepEqual(await store.claimFiling("week"), { state: "claimed" });
+    assert.deepEqual(await store.claimFiling("week"), { state: "busy" });
+    await store.settleFiling("week", { number: 7, url: "https://github.com/o/r/issues/7" });
+    assert.deepEqual(await store.claimFiling("week"), { state: "filed", issue: { number: 7, url: "https://github.com/o/r/issues/7" } });
+    assert.deepEqual(await store.claimFiling("another week"), { state: "claimed" });
+  });
+
+  it("a released or abandoned filing claim can be claimed again", async () => {
+    const { store, clock } = setup();
+    await store.claimFiling("week");
+    await store.settleFiling("week", null);
+    assert.deepEqual(await store.claimFiling("week"), { state: "claimed" });
+    clock.advance(FILING_LEASE_MS + 1);
+    assert.deepEqual(await store.claimFiling("week"), { state: "claimed" }, "a lease past its time was a caller killed mid-filing");
   });
 
   it("the one-shot dedup and the lease share one record", async () => {
