@@ -1,8 +1,8 @@
 // The review door — a proposal card's Review pop-up, opened and decided.
 //
-// Review on the card opens a modal with the whole draft. Its decisions sit in
-// one row at its foot — Approve (decides from the row), Needs changes and
-// Reject (pushed views, each with its own submit) — and are the Gate's fifth signal (`review`), resolved by
+// Review on the card opens a modal with the whole draft. Its decision —
+// Approve, Needs changes or Reject, chosen above the footer and sent with its
+// Submit — is the Gate's fifth signal (`review`), resolved by
 // the same `resolveSignal` as a reaction, a typed emoji and the model's call,
 // so the confirmer set, standing confirmers, TTL, supersession and the
 // one-winner claim are the Gate's and not this file's. Reject is a ⛔ with a
@@ -39,7 +39,6 @@ import { renderGateNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { withEditedFields } from "./proposal-render";
 import {
-  changesView,
   closedView,
   decidedView,
   draftView,
@@ -47,7 +46,6 @@ import {
   editView,
   loadingView,
   noticeView,
-  rejectView,
   reviewMetadata,
   METADATA_MAX_CHARS,
   type ReviewedCard,
@@ -123,11 +121,10 @@ export interface ReviewOpenRequest {
 
 /** A decision submitted from the pop-up. */
 export interface ReviewDecisionRequest {
-  /** The view the decision was made from: the draft for Approve, the pushed
-   *  view for Needs changes and Reject. */
+  /** The draft the decision was submitted from. */
   viewId: string;
-  /** The draft under a pushed view, so the answer replaces it too and the
-   *  stack closes onto the same line. */
+  /** The draft under the view the decision came from, when it came from a
+   *  pushed view, so the answer replaces it too. */
   rootViewId?: string;
   /** The card, as the view's `private_metadata` names it. */
   channel: string;
@@ -178,30 +175,23 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
   await deps.views.update(viewId, view);
 }
 
-/** A button on the draft that pushes a view of its own. */
+/** Edit fields, pressed on the draft: the view that holds the fields. */
 export interface ReviewPushRequest {
   triggerId: string;
   /** The card, as the draft's `private_metadata` names it, with its saved
    *  edits. */
   card: ReviewedCard;
   userId: string;
-  step: "changes" | "reject" | "edit";
 }
 
 /**
- * Needs changes, Reject or Edit fields, pressed on the draft: the view that
- * holds its input, pushed over it. The note views need nothing read; Edit
- * fields pushes a loading view, then fills it with the fields and the live
- * options their selects may take, each holding the value the draft shows.
+ * Edit fields, pressed on the draft: a loading view pushed over it, then
+ * filled with the fields and the live options their selects may take, each
+ * holding the value the draft shows.
  */
 export async function runReviewPush(request: ReviewPushRequest, deps: ReviewDoorDeps): Promise<void> {
   const { card } = request;
   const where = `${card.channel}/${card.ts}`;
-  if (request.step !== "edit") {
-    const pushed = await deps.views.push(request.triggerId, request.step === "changes" ? changesView(card) : rejectView(card));
-    if (!pushed) console.warn(`[review] views.push refused for ${request.step} on ${where}`);
-    return;
-  }
   const viewId = await deps.views.push(request.triggerId, editLoadingView(card));
   if (!viewId) {
     console.warn(`[review] views.push refused for edit on ${where}`);
@@ -292,10 +282,10 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   const gateDeps = { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers };
   const show = showIn(request, deps);
 
-  // Needs changes with nothing to change: the note's view requires one, so
+  // Needs changes with nothing to change: Submit requires a note for it, so
   // only a blank one gets here. uno-bot never guesses at a revision.
   if (request.decision === "revise" && !note) {
-    await show(noticeView(card, ":warning: Needs changes needs a note. Press Needs changes again and write what to change."));
+    await show(noticeView(card, ":warning: Needs changes needs a note. Press Review again, choose Needs changes and write what to change."));
     return;
   }
 

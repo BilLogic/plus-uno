@@ -92,7 +92,7 @@ const approve = (edits: Record<string, string>, userId = "U2") => ({
 
 /** Edit fields, pressed on the draft: the pushed view, filled. */
 async function editFields(deps: ReviewDoorDeps, views: { calls: Array<{ kind: string; view: unknown }> }, edits?: Record<string, string>) {
-  await runReviewPush({ triggerId: "T.edit", card: { channel: CHANNEL, ts: CARD_TS, ...(edits ? { edits } : {}) }, userId: "U2", step: "edit" }, deps);
+  await runReviewPush({ triggerId: "T.edit", card: { channel: CHANNEL, ts: CARD_TS, ...(edits ? { edits } : {}) }, userId: "U2" }, deps);
   return views.calls.at(-1)!.view;
 }
 
@@ -253,7 +253,7 @@ describe("an edit the guards refuse", () => {
     // still carried to the next Approve.
     assert.match(JSON.stringify(blocksOf(view)), /\*Title:\* TBD/);
     assert.deepEqual(reviewedCardOf((view as { private_metadata: string }).private_metadata)?.edits, { "0.title": "TBD" });
-    assert.match(JSON.stringify(blocksOf(view)), /uno_review_approve/);
+    assert.equal((view as { submit?: { text: string } }).submit?.text, "Submit");
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
     assert.deepEqual(views.refused, []);
   });
