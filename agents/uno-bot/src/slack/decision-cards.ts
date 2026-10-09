@@ -23,6 +23,7 @@
 import { carouselOf, logoFor } from "./answer-cards-block";
 import { escapeSlackText } from "./mrkdwn";
 import { textSections } from "./render";
+import { itemProposalKey } from "../thread-state/index";
 import type {
   DecisionReportRecord,
   PendingProposal,
@@ -127,11 +128,9 @@ export function reportRecord(
   };
 }
 
-/** The key one item's proposal is staged under: its message and its entry id.
- *  A Slack ts holds no `#`, so it never collides with a card's own ts. */
-export function itemProposalKey(messageTs: string, id: string): string {
-  return `${messageTs}#${id}`;
-}
+/** The key one item's proposal is staged under (`thread-state`, where the
+ *  turn reads it too). */
+export { itemProposalKey };
 
 /**
  * What an item's proposal is staged with, beside its own operations, words

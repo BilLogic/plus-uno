@@ -82,6 +82,7 @@ import {
   slotKeyOf,
   stagingCardOf,
   SWEEP_KEY,
+  itemProposalKey,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -123,7 +124,6 @@ import {
   sweepTag,
 } from "../sweep/cards";
 import { DRIFT_KEY } from "../figma-drift/finding";
-import { itemProposalKey } from "../slack/decision-cards";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,

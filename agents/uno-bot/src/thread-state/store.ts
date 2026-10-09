@@ -402,6 +402,13 @@ export interface DecisionReportRecord {
   metadata?: { event_type: string; event_payload: Record<string, unknown> };
 }
 
+/** The key one item of a report's proposal is staged under: its message and
+ *  its entry id. A Slack ts holds no `#`, so it never collides with a card's
+ *  own ts. */
+export function itemProposalKey(messageTs: string, id: string): string {
+  return `${messageTs}#${id}`;
+}
+
 /** One change to a report: an item's state, or an item replaced by its
  *  revision under a new id, open. */
 export type ReportChange =
