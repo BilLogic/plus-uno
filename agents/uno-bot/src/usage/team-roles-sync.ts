@@ -1,6 +1,7 @@
 // The daily role-map sync: the Notion Team Members roster matched against the
-// Slack directory (`./roles.ts` `buildRoleMap`), the Slack-id → role map kept
-// in KV for turns to read.
+// Slack directory (`./roles.ts` `buildRoleMap`), the Slack-id → role map and
+// the Figma-id → Slack-id map kept in KV together, for turns and Figma jobs to
+// read without calling Notion.
 //
 // One Notion query, paged, and one users.list read, paged — both inside the
 // run's lookup ceiling. A read that fails or stops short writes nothing, so a
@@ -18,7 +19,7 @@
 // binds them), so the Node suite drives it with fakes.
 
 import { rethrowIfBudget } from "../net";
-import { buildRoleMap, type DirectoryPerson, type RosterRow, type TeamRoles } from "./roles";
+import { buildRoleMap, type DirectoryPerson, type FigmaPeople, type RosterRow, type TeamRoles } from "./roles";
 
 /** The KV key the map is kept under. */
 export const TEAM_ROLES_KV_KEY = "team-roles:map";
@@ -36,6 +37,8 @@ export interface StoredTeamRoles {
   /** When it was built, epoch ms. */
   at: number;
   roles: TeamRoles;
+  /** Figma user id → Slack id. Absent from a map stored before it was kept. */
+  figmaPeople?: FigmaPeople;
 }
 
 /** What the sync reads and where it writes. */
@@ -97,6 +100,8 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
 
   const match = buildRoleMap(roster.members, directory);
   let counts = `${match.matched} matched, ${match.unmatched.length} unmatched, ${match.ambiguous.length} ambiguous`;
+  const figmaIds = Object.keys(match.figmaPeople).length;
+  if (figmaIds) counts += `, ${figmaIds} Figma id${figmaIds === 1 ? "" : "s"}`;
 
   let previous: StoredTeamRoles | null;
   try {
@@ -111,7 +116,7 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
   if (shrunk) counts += ` — kept previous map: new map had ${had} of ${of}`;
 
   const write = !opts.dryRun && !shrunk;
-  if (write) await deps.write({ at: deps.now(), roles: match.roles });
+  if (write) await deps.write({ at: deps.now(), roles: match.roles, figmaPeople: match.figmaPeople });
   return {
     written: write,
     matched: match.matched,

@@ -9,6 +9,7 @@ import {
   buildRoleMap,
   normalisePersonName,
   roleOf,
+  slackPersonOfFigma,
   syncTeamRoles,
   DIRECTORY_MAX_PAGES,
   TEAM_ROLES_KV_KEY,
@@ -18,7 +19,7 @@ import {
   type TeamRolesSyncDeps,
 } from "../src/usage/index";
 import { SubrequestBudgetError } from "../src/net";
-import { teamRolesFor } from "../src/usage/production";
+import { figmaPeopleFor, teamRolesFor } from "../src/usage/production";
 import type { Env } from "../src/types";
 
 const ROSTER: RosterRow[] = [
@@ -132,6 +133,60 @@ test("someone off the map, or nobody at all, has no role", () => {
   assert.equal(roleOf("toString", {}), null);
 });
 
+// ── Figma commenters ────────────────────────────────────────────────────────
+
+test("a Figma user id maps to the Slack person its row matches; an unmapped id to nobody", () => {
+  const { figmaPeople } = buildRoleMap(
+    [
+      { name: "Cy Diaz", group: "Product Designer", figmaUserId: "1105000000000000001" },
+      { name: "Ana Pérez", group: "Product Manager" },
+    ],
+    DIRECTORY,
+  );
+  assert.equal(slackPersonOfFigma("1105000000000000001", figmaPeople), "U0CY00001");
+  assert.equal(slackPersonOfFigma("9999999999999999999", figmaPeople), null);
+  assert.equal(slackPersonOfFigma(null, figmaPeople), null);
+  // Inherited keys are not people.
+  assert.equal(slackPersonOfFigma("toString", figmaPeople), null);
+});
+
+test("a Figma id maps whatever the row's group; never for a Past Collaborator", () => {
+  const { figmaPeople, roles } = buildRoleMap(
+    [
+      { name: "Dee Evans", group: "Researcher", figmaUserId: "1105000000000000004" },
+      { name: "Eli Fox", group: "Software Developer", affiliation: "Past Collaborators", figmaUserId: "1105000000000000005" },
+    ],
+    DIRECTORY,
+  );
+  assert.deepEqual(figmaPeople, { "1105000000000000004": "U0DEE0001" });
+  assert.deepEqual(roles, {});
+});
+
+test("a Figma id follows the role map's matching: no match, an ambiguous name or a row's own Slack id", () => {
+  const { figmaPeople } = buildRoleMap(
+    [
+      { name: "Gus Hale", group: "Researcher", figmaUserId: "1105000000000000007" },
+      { name: "Cy Diaz", group: "Product Designer", figmaUserId: "1105000000000000003" },
+      { name: "Nobody Listed", figmaUserId: "1105000000000000008", slackUserId: "U0ZED0001" },
+    ],
+    [...DIRECTORY, { id: "U0CY00002", real_name: "cy diaz" }, { id: "U0ZED0001", real_name: "Zed Young" }],
+  );
+  assert.deepEqual(figmaPeople, { "1105000000000000008": "U0ZED0001" });
+});
+
+test("one Figma id two rows give to different people maps to nobody", () => {
+  const { figmaPeople } = buildRoleMap(
+    [
+      { name: "Ana Pérez", figmaUserId: "1105000000000000001" },
+      { name: "Cy Diaz", figmaUserId: "1105000000000000001" },
+      { name: "Dee Evans", figmaUserId: "1105000000000000004" },
+      { name: "dee evans", figmaUserId: "1105000000000000004" },
+    ],
+    DIRECTORY,
+  );
+  assert.deepEqual(figmaPeople, { "1105000000000000004": "U0DEE0001" });
+});
+
 test("the person an ask is aimed at is the first one it names other than the asker", () => {
   assert.equal(aimedAtOf("<@U1> <@U2|bo> file it", "U1"), "U2");
   assert.equal(aimedAtOf("<@U1> only me", "U1"), null);
@@ -170,8 +225,32 @@ test("a sync reads every directory page and stores the map, reporting counts onl
   const deps = syncDeps();
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.equal(deps.pages, 2);
-  assert.deepEqual(deps.written, [{ at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" } }]);
+  assert.deepEqual(deps.written, [{ at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" }, figmaPeople: {} }]);
   assert.deepEqual(report, { written: true, matched: 3, unmatched: 0, ambiguous: 0, summary: "3 matched, 0 unmatched, 0 ambiguous" });
+});
+
+test("a sync stores the Figma ids with the roles, so a webhook job never reads Notion", async () => {
+  const deps = syncDeps({
+    roster: async () => ({
+      members: ROSTER.map((row) => (row.name === "Dee Evans" ? { ...row, figmaUserId: "1105000000000000004" } : row)),
+      truncated: false,
+    }),
+  });
+  const report = await syncTeamRoles(deps, { dryRun: false });
+  assert.deepEqual(deps.written[0]?.figmaPeople, { "1105000000000000004": "U0DEE0001" });
+  assert.equal(report.summary, "3 matched, 0 unmatched, 0 ambiguous, 1 Figma id");
+  const kv = fakeKv(async (key) => (key === TEAM_ROLES_KV_KEY ? deps.written[0] : null));
+  assert.equal(slackPersonOfFigma("1105000000000000004", await figmaPeopleFor(kv)), "U0DEE0001");
+  assert.equal(slackPersonOfFigma("1105000000000000009", await figmaPeopleFor(kv)), null);
+});
+
+test("a map stored before Figma ids, no map, no KV or a failed read maps no Figma id", async () => {
+  const old: StoredTeamRoles = { at: 1, roles: { U0ANA0001: "pm" } };
+  assert.deepEqual(await figmaPeopleFor(fakeKv(async () => old)), {});
+  assert.deepEqual(await figmaPeopleFor(fakeKv(async () => null)), {});
+  assert.deepEqual(await figmaPeopleFor({}), {});
+  assert.deepEqual(await figmaPeopleFor(fakeKv(async () => { throw new Error("kv down"); })), {});
+  await assert.rejects(figmaPeopleFor(fakeKv(async () => { throw new SubrequestBudgetError(38); })), SubrequestBudgetError);
 });
 
 test("a dry run lists the unmatched and ambiguous names and writes nothing", async () => {

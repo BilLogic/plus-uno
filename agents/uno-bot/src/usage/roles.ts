@@ -11,16 +11,31 @@
 // a daily job (`./team-roles-sync.ts`) and kept in KV; a turn reads the stored
 // map and never calls Notion. `buildRoleMap` is the matching rule.
 //
+// The same match, by the same rule, maps a Figma user id to a Slack person:
+// a member who fills in their row's optional Figma User ID is the Slack
+// person their row matches, whatever their group. No Figma API returns an
+// email, so the id is the only join from a Figma commenter to a teammate.
+//
 // The roles are for analytics only, never for access: nothing is allowed or
 // refused on them. They are only as trustworthy as their inputs — names match
 // on Slack real and display names, which each member edits, and anyone who
-// can edit Team Members can set a row's group or Slack id.
+// can edit Team Members can set a row's group, Slack id or Figma id. So a
+// Figma commenter who maps to a teammate is a claim the CMS makes, not proof:
+// what they ask for still goes through the ✅.
 
 /** The three roles "can you file that?" bounces between. */
 export type TeamRole = "pm" | "dev" | "design";
 
 /** A Slack-id → role map, as the sync stores it. */
 export type TeamRoles = Readonly<Record<string, TeamRole>>;
+
+/** A Figma user id → Slack id map, as the sync stores it. */
+export type FigmaPeople = Readonly<Record<string, string>>;
+
+/** The Slack person a Figma user id maps to, or null when it maps to nobody. */
+export function slackPersonOfFigma(figmaUserId: string | null | undefined, people: FigmaPeople = {}): string | null {
+  return (figmaUserId && Object.hasOwn(people, figmaUserId) ? people[figmaUserId] : undefined) ?? null;
+}
 
 /** A person's role, or null when they are not on the map. */
 export function roleOf(userId: string | null | undefined, roles: TeamRoles = {}): TeamRole | null {
@@ -45,6 +60,8 @@ export interface RosterRow {
   affiliation?: string;
   /** The row's own Slack id, when the database carries one. */
   slackUserId?: string;
+  /** The row's Figma user id, when the member has filled it in. */
+  figmaUserId?: string;
 }
 
 /** One Slack member, as the directory lists them. */
@@ -72,6 +89,9 @@ export interface RoleMatch {
   /** Rows with a role whose name more than one Slack member carries, or whose
    *  member another row gives a different role. */
   ambiguous: string[];
+  /** Each Figma user id a row carries, to the one Slack member that row
+   *  matched. An id two rows give different members maps to nobody. */
+  figmaPeople: FigmaPeople;
 }
 
 /**
@@ -81,6 +101,10 @@ export interface RoleMatch {
  * a member two rows give different roles. A row's own Slack id, when it has
  * one, is taken as the match — but only when it is an active, non-bot member
  * of the directory; otherwise the row is unmatched.
+ *
+ * A row's Figma user id maps to the member the row matched, by the same rule,
+ * whether or not the row has a role. Only the role rows count towards
+ * `matched`, `unmatched` and `ambiguous`.
  *
  * @param roster - The Team Members rows
  * @param directory - The workspace's members
@@ -100,14 +124,22 @@ export function buildRoleMap(roster: readonly RosterRow[], directory: readonly D
   const ambiguous: string[] = [];
   /** Each member's roles, and the rows that gave them. */
   const given = new Map<string, { roles: Set<TeamRole>; names: string[] }>();
+  /** Each Figma id's members, from every row that carries it. */
+  const figma = new Map<string, Set<string>>();
   for (const row of roster) {
     if (row.affiliation === PAST_COLLABORATORS) continue;
-    const role = row.group && Object.hasOwn(GROUP_ROLES, row.group) ? GROUP_ROLES[row.group] : undefined;
-    if (!role) continue;
     const ids = row.slackUserId
       ? active.has(row.slackUserId) ? [row.slackUserId] : []
       : [...(byName.get(normalisePersonName(row.name)) ?? [])];
     const [id] = ids;
+    if (row.figmaUserId) {
+      const members = figma.get(row.figmaUserId) ?? new Set<string>();
+      // A row that matches nobody, or more than one member, maps its id to nobody.
+      members.add(id && ids.length === 1 ? id : "");
+      figma.set(row.figmaUserId, members);
+    }
+    const role = row.group && Object.hasOwn(GROUP_ROLES, row.group) ? GROUP_ROLES[row.group] : undefined;
+    if (!role) continue;
     if (!id) unmatched.push(row.name);
     else if (ids.length > 1) ambiguous.push(row.name);
     else {
@@ -128,7 +160,12 @@ export function buildRoleMap(roster: readonly RosterRow[], directory: readonly D
     roles[id] = role;
     matched += entry.names.length;
   }
-  return { roles, matched, unmatched, ambiguous };
+  const figmaPeople: Record<string, string> = {};
+  for (const [figmaId, members] of figma) {
+    const [id] = members;
+    if (id && members.size === 1) figmaPeople[figmaId] = id;
+  }
+  return { roles, matched, unmatched, ambiguous, figmaPeople };
 }
 
 /** A Slack user mention as it arrives in message text: `<@U123>` or `<@U123|name>`. */
