@@ -340,9 +340,52 @@ export interface PendingProposal {
    * and nowhere else.
    */
   item?: { messageTs: string; id: string };
+  /**
+   * The card's own answers, offered in the Review pop-up in place of Approve,
+   * Needs changes and Reject (`ReviewChoice`). Absent, those three.
+   */
+  choices?: ReviewChoice[];
+  /**
+   * Selects the stager offers under Edit fields beside the tool's own fields
+   * (`slack/review-fields.ts`): a value at `path` in operation `op` (default
+   * 0), from a database's live options, exact-matched again on Approve.
+   */
+  selects?: ProposalSelect[];
+}
+
+/**
+ * One answer a card offers in its Review pop-up. Choosing it decides the card
+ * as its `verdict`: `confirm` runs the batch with `args` merged into each
+ * operation's input, `cancel` writes nothing. The decided card names it:
+ * "<past or label> · <@who>", with `decided` as its body when set.
+ */
+export interface ReviewChoice {
+  /** Unique within the card; no `:`. */
+  value: string;
+  /** The radio option's text, mrkdwn. */
+  label: string;
+  verdict: "confirm" | "cancel";
+  /** Merged into each operation's input on confirm, objects key by key. */
+  args?: Record<string, unknown>;
+  /** How the decided card names it, mrkdwn ("Dropped"); absent, `label`. */
+  past?: string;
+  /** The decided card's body after this choice, plain text. */
+  decided?: string;
+}
+
+/** A select a stager offers under Edit fields (`PendingProposal.selects`). */
+export interface ProposalSelect {
+  op?: number;
+  /** Dot path in the operation's input. */
+  path: string;
+  label: string;
+  source: { database: "roadmap" | "decisions"; property: string };
 }
 
 // ── Decision reports ─────────────────────────────────────────────────────────
+
+/** The answer an item was decided by: its value, its name on the decided card, and its decided body. */
+export type ChosenAs = Pick<ReviewChoice, "value" | "label" | "decided">;
 
 /** One item a report asks someone to decide, as its card shows it. */
 export interface ReportItem {
@@ -362,13 +405,14 @@ export interface ReportItem {
   done?: string;
 }
 
-/** Where one item of a report stands. `at` is epoch ms. */
+/** Where one item of a report stands. `at` is epoch ms. `as` is the card's
+ *  own answer, when it was decided by one (`ReviewChoice`). */
 export type ReportItemState =
   | { kind: "open" }
   | { kind: "changes-asked"; by: string }
-  | { kind: "approved"; by: string; at: number }
-  | { kind: "failed"; by: string; at: number; reason: string }
-  | { kind: "rejected"; by: string; reason?: string }
+  | { kind: "approved"; by: string; at: number; as?: ChosenAs }
+  | { kind: "failed"; by: string; at: number; reason: string; as?: ChosenAs }
+  | { kind: "rejected"; by: string; reason?: string; as?: ChosenAs }
   | { kind: "expired" }
   /** Shown, but its proposal never staged: nothing to decide. */
   | { kind: "not-staged"; note: string };

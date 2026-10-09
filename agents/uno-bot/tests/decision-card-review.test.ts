@@ -8,14 +8,15 @@ import assert from "node:assert/strict";
 
 import { resolveSignal, type GateVerdict } from "../src/gate/index";
 import type { OperationOutcome } from "../src/gate/run-batch";
-import { createInMemoryThreadState, type PendingProposal, type ReportItem, type ThreadState } from "../src/thread-state/index";
+import { createInMemoryThreadState, type PendingProposal, type ReportItem, type ReviewChoice, type ThreadState } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
 import { runReviewDecision, runReviewOpen, startRevision, type ReviewDoorDeps } from "../src/slack/review-door";
+import { CHOICE_BLOCK_ID, draftSubmitOf } from "../src/slack/review-view";
 import type { CardMessage } from "../src/slack/button-door";
 import { decisionReport, itemProposal, markNotStaged, replaceItem, reportRecord } from "../src/slack/decision-cards";
 import { renderGateNote } from "../src/slack/gate-note";
 import { recordingViews } from "./helpers/recording-slack";
-import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { messageBlocksRefusal, viewRefusal } from "./helpers/slack-block-rules";
 
 const CHANNEL = "C0DESIGN";
 /** The report went up as a reply in a thread, not as its parent. */
@@ -204,5 +205,90 @@ describe("Review on one item of a report", () => {
     const model = await resolveSignal({ kind: "model", pending, decision: "confirm", userId: "U0BILL" }, { threadState: store });
     assert.equal(model.outcome, "none");
     assert.equal((await store.getProposalByTs(pending.proposalTs)).state, "found");
+  });
+});
+
+// ── A card's own answers ─────────────────────────────────────────────────────
+//
+// A proposal may carry its own answers (`PendingProposal.choices`), offered in
+// the pop-up's decision input in place of Approve, Needs changes and Reject.
+// The chosen one decides as its verdict, its args ride the write, and the
+// decided card names it.
+
+describe("a card's own answers in the Review pop-up", () => {
+  const OWN: ReviewChoice[] = [
+    { value: "done", label: "Done", verdict: "confirm" },
+    { value: "still", label: "Still on it", verdict: "cancel", decided: "Nothing written. Checked again Oct 30." },
+    { value: "drop", label: "Drop it", past: "Dropped", verdict: "confirm", args: { replace: [{ block_id: "b1", content: "Archived" }] } },
+  ];
+
+  async function withOwn(): Promise<ThreadState> {
+    const store = await staged();
+    await store.putProposal({ ...itemStaged("c1", 1), choices: OWN });
+    return store;
+  }
+
+  /** The decision input's options, as the draft view offers them. */
+  const radioOf = (view: unknown) => {
+    const blocks = (view as { blocks: Array<{ block_id?: string; element?: { options?: Array<{ value: string; text: { type: string; text: string } }> } }> }).blocks;
+    return blocks.find((b) => b.block_id === CHOICE_BLOCK_ID)!.element!.options!;
+  };
+  const openOn = async (deps: ReviewDoorDeps, views: { calls: Array<{ view: unknown }> }, id: string) => {
+    await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: itemProposal(MSG, id).proposalTs, userId: "U0BILL", item: { messageTs: MSG, id } }, deps);
+    return views.calls.at(-1)!.view;
+  };
+  const submitOf = (value: string, note?: string) => ({
+    values: {
+      [CHOICE_BLOCK_ID]: { uno_review_choice_input: { selected_option: { value } } },
+      ...(note ? { uno_review_note: { uno_review_note_input: { value: note } } } : {}),
+    },
+  });
+
+  it("with none, offers Approve, Needs changes and Reject, read by Submit as before", async () => {
+    const { deps, views } = harness(await staged());
+    const view = await openOn(deps, views, "c2");
+    assert.deepEqual(radioOf(view).map((o) => [o.value, o.text.type, o.text.text]), [
+      ["confirm", "plain_text", "Approve"],
+      ["revise", "plain_text", "Needs changes"],
+      ["cancel", "plain_text", "Reject"],
+    ]);
+    assert.deepEqual(draftSubmitOf(submitOf("cancel", "not now")), { ok: true, decision: "cancel", note: "not now" });
+    assert.deepEqual(draftSubmitOf({ values: {} }), { ok: false, errors: { [CHOICE_BLOCK_ID]: "Choose Approve, Needs changes or Reject." } });
+  });
+
+  it("with its own, offers those instead, and Submit reads the chosen one with its verdict", async () => {
+    const { deps, views } = harness(await withOwn());
+    const view = await openOn(deps, views, "c1");
+    assert.equal(viewRefusal(view), null);
+    const options = radioOf(view);
+    assert.deepEqual(options.map((o) => o.text.text), ["Done", "Still on it", "Drop it"]);
+    assert.deepEqual(draftSubmitOf(submitOf(options[1]!.value)), { ok: true, decision: "cancel", note: "", choice: "still" });
+    assert.deepEqual(draftSubmitOf(submitOf(options[2]!.value)), { ok: true, decision: "confirm", note: "", choice: "drop" });
+  });
+
+  it("decides as the chosen one: its args merged into the write, and the card named for it", async () => {
+    const store = await withOwn();
+    const { deps, ran, updates } = harness(store);
+    await runReviewDecision({ ...decide("c1", "confirm"), choice: "drop" }, deps);
+    assert.deepEqual(ran[0]!.execute?.input, { page_url: "https://www.notion.so/page1", replace: [{ block_id: "b1", content: "Archived" }] });
+    const [one] = cards(updates.at(-1)!.message.blocks);
+    assert.equal(one!.subtitle!.text, "Dropped · <@U0BILL>");
+  });
+
+  it("a cancel answer writes nothing, and the card says what it means", async () => {
+    const { deps, ran, updates } = harness(await withOwn());
+    // The form's own verdict is never trusted: the card's decides.
+    await runReviewDecision({ ...decide("c1", "confirm"), choice: "still" }, deps);
+    assert.ok(!ran.some((v) => v.execute), "nothing runs");
+    const [one] = cards(updates.at(-1)!.message.blocks);
+    assert.equal(one!.subtitle!.text, "Still on it · <@U0BILL>");
+    assert.equal(one!.body.text, "Nothing written. Checked again Oct 30.");
+  });
+
+  it("an answer the card does not offer changes nothing", async () => {
+    const { deps, ran, views } = harness(await withOwn());
+    await runReviewDecision({ ...decide("c1", "confirm"), choice: "ship-it" }, deps);
+    assert.equal(ran.length, 0);
+    assert.match(JSON.stringify(views.calls.at(-1)!.view), /That answer isn't on this card any more/);
   });
 });

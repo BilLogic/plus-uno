@@ -31,7 +31,7 @@
 // Takes named dependencies, as the button door does; `Env` is turned into
 // `ReviewDoorDeps` once, in `slack/interactive.ts`. PURE by design: no `Env`,
 // no Workers global, no fetch — so `tests/proposal-review.test.ts` drives it.
-import type { PendingProposal, ThreadState } from "../thread-state/index";
+import { proposalOperations, type PendingProposal, type ReviewChoice, type ThreadState } from "../thread-state/index";
 import { currentReport, itemText, settleItem } from "./decision-cards";
 import type { OperationOutcome } from "../gate/run-batch";
 import type { Delivery } from "../turn/index";
@@ -144,6 +144,9 @@ export interface ReviewDecisionRequest {
   decision: ReviewDecision;
   /** Needs changes' note, Reject's reason. */
   note?: string;
+  /** One of the card's own answers (`PendingProposal.choices`), by value:
+   *  its verdict decides in place of `decision`, and its args ride the write. */
+  choice?: string;
   /** The edits Save edits kept on the draft (field key → value). Approve
    *  checks them again before the claim. */
   edits?: Readonly<Record<string, string>>;
@@ -314,30 +317,48 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
     return;
   }
 
+  // One of the card's own answers: held to the card's own list, whose verdict
+  // decides and whose args the write carries. A card no longer live gets the
+  // Gate's own answer below.
+  let own: ReviewChoice | undefined;
+  let live: PendingProposal | undefined;
+  if (request.choice) {
+    const look = await deps.threadState.getProposalByTs(request.messageTs).catch(() => null);
+    live = look?.state === "found" ? look.proposal : undefined;
+    own = live?.choices?.find((c) => c.value === request.choice);
+    if (live && !own) {
+      await show(noticeView(card, "That answer isn't on this card any more, so nothing changed. Press Review again."));
+      return;
+    }
+  }
+  const decision: ReviewDecision = own?.verdict ?? request.decision;
+
   // Only Approve writes, so only Approve's edits are checked and carried.
   const edits =
-    request.decision === "confirm" ? await reviewEdits(request, deps) : { ok: true as const, edited: [], changes: [] };
+    decision === "confirm" ? await reviewEdits(request, deps) : { ok: true as const, edited: [], changes: [] };
   if (!edits.ok) {
     console.log(`[review] edit refused on ${request.channel}/${request.messageTs} by=${request.userId}`);
     await show(edits.view);
     return;
   }
+  const operations =
+    own?.args && decision === "confirm" && live ? withArgs(edits.operations ?? proposalOperations(live), own.args) : edits.operations;
   const verdict = await resolveSignal(
     {
       kind: "review",
       messageTs: request.messageTs,
-      decision: request.decision,
+      decision,
       userId: request.userId,
       ...(note ? { note } : {}),
-      ...(edits.operations ? { operations: edits.operations } : {}),
+      ...(operations ? { operations } : {}),
     },
     gateDeps,
   );
   console.log(
-    `[review] ${request.decision} on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,
+    `[review] ${decision}${own ? ` (${own.value})` : ""} on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,
   );
 
-  if (request.decision === "revise") {
+  if (decision === "revise") {
     await applyRevise(request, card, verdict, deps);
     return;
   }
@@ -345,7 +366,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   // Said in the pop-up before the run starts, so the person sees it register
   // at once rather than after a write that can take a while.
   if (verdict.outcome === "won") {
-    await show(noticeView(card, decidedLine(request.decision)));
+    await show(noticeView(card, own ? ownLine(own) : decidedLine(decision)));
   } else if (verdict.post && verdict.post.note.kind !== "cut-off") {
     // A non-win is answered where the person is looking, which is the pop-up
     // — even a note the button door would edit onto the card.
@@ -353,7 +374,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
     return;
   }
   await applyPressVerdict(
-    { channel: request.channel, messageTs: request.messageTs, decision: request.decision, userId: request.userId },
+    { channel: request.channel, messageTs: request.messageTs, decision, userId: request.userId, ...(own ? { as: { value: own.value, label: own.past ?? own.label, ...(own.decided ? { decided: own.decided } : {}) } } : {}) },
     verdict,
     {
       delivery: deps.delivery,
@@ -481,6 +502,33 @@ export async function startRevision(
   await deps
     .postInThread(":warning: I couldn't start the revision. Reply here with what to change and I'll revise the draft.")
     .catch(() => null);
+}
+
+/** What the pop-up says once one of the card's own answers wins. */
+function ownLine(own: ReviewChoice): string {
+  return own.verdict === "confirm"
+    ? `${own.label}. I'm running it now, and the outcome posts in the thread.`
+    : `${own.label}. Nothing will run.`;
+}
+
+/**
+ * Each operation with a card's own answer's args merged into its input:
+ * objects key by key, anything else replaced.
+ */
+export function withArgs(operations: readonly ProposalOperation[], args: Record<string, unknown>): ProposalOperation[] {
+  return operations.map((op) => ({ ...op, input: merged(op.input, args) }));
+}
+
+function merged(base: Record<string, unknown>, over: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(over)) {
+    const was = out[key];
+    out[key] =
+      value && typeof value === "object" && !Array.isArray(value) && was && typeof was === "object" && !Array.isArray(was)
+        ? merged(was as Record<string, unknown>, value as Record<string, unknown>)
+        : value;
+  }
+  return out;
 }
 
 function decidedLine(decision: "confirm" | "cancel"): string {

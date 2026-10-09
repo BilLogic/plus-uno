@@ -11,7 +11,10 @@
 // choice — Approve, Needs changes, Reject — and a note, and the footer's
 // Submit decides it, beside Close: the decision is always one press from the
 // fixed foot of the pop-up, however long the draft. Needs changes needs the
-// note; Reject takes it as an optional reason. The fields are an Edit fields
+// note; Reject takes it as an optional reason. A card with answers of its
+// own (`PendingProposal.choices`: a follow-up's Done · Still on it · Drop it)
+// offers those in the same input instead, each deciding as its verdict. The
+// fields are an Edit fields
 // button at the top, which pushes a view of its own (`views.push`) with Save
 // edits as its submit.
 //
@@ -30,7 +33,7 @@ import { CONFIRM_FOOTER } from "./proposal-render";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, labelsOf, withValues, type EditableField } from "./review-fields";
 import { caveatsOf, draftHeadline, readableDraft } from "./review-draft";
-import type { PendingProposal, StatedCardWords } from "../thread-state/index";
+import type { PendingProposal, ReviewChoice, StatedCardWords } from "../thread-state/index";
 import type { ReviewDecision } from "../gate/index";
 
 /** The draft's one button; `slack/interactive.ts` routes it. */
@@ -165,7 +168,7 @@ export function draftView(
   if (edited.length) head.push(context(`:pencil2: Edited here: ${edited.join(", ")}. Approve writes these values.`));
 
   const tail: unknown[] = access.mayDecide
-    ? [{ type: "divider" }, choiceInput(), noteInput()]
+    ? [{ type: "divider" }, choiceInput(proposal.choices), noteInput()]
     : [context(readOnlyLine(access.confirmers))];
   const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
   return modal(
@@ -201,16 +204,20 @@ const CHOICES: ReadonlyArray<[ReviewDecision, string]> = [
   ["cancel", "Reject"],
 ];
 
-function choiceInput(): unknown {
+/** A card's own answer, as its radio option's value carries it: the verdict
+ *  and the answer, so Submit is read without the card. The door holds both
+ *  to the card's own list before anything runs. */
+const OWN_CHOICE = "choice:";
+
+function choiceInput(own?: readonly ReviewChoice[]): unknown {
+  const options = own?.length
+    ? own.map((c) => ({ value: `${OWN_CHOICE}${c.verdict}:${c.value}`, text: { type: "mrkdwn", text: c.label } }))
+    : CHOICES.map(([value, text]) => ({ value, text: { type: "plain_text", text } }));
   return {
     type: "input",
     block_id: CHOICE_BLOCK_ID,
     label: { type: "plain_text", text: "Decision" },
-    element: {
-      type: "radio_buttons",
-      action_id: CHOICE_ACTION_ID,
-      options: CHOICES.map(([value, text]) => ({ value, text: { type: "plain_text", text } })),
-    },
+    element: { type: "radio_buttons", action_id: CHOICE_ACTION_ID, options },
   };
 }
 
@@ -234,9 +241,13 @@ type ViewValues = { values?: Record<string, Record<string, { value?: unknown; se
  */
 export function draftSubmitOf(
   state: unknown,
-): { ok: true; decision: ReviewDecision; note: string } | { ok: false; errors: Record<string, string> } {
+): { ok: true; decision: ReviewDecision; note: string; choice?: string } | { ok: false; errors: Record<string, string> } {
   const values = (state as ViewValues | undefined)?.values;
   const picked = values?.[CHOICE_BLOCK_ID]?.[CHOICE_ACTION_ID]?.selected_option?.value;
+  // One of the card's own answers: its verdict decides, and the door checks
+  // the answer against the card.
+  const own = typeof picked === "string" ? /^choice:(confirm|cancel):(.+)$/.exec(picked) : null;
+  if (own) return { ok: true, decision: own[1] as "confirm" | "cancel", note: reviewNoteOf(state), choice: own[2]! };
   const decision = CHOICES.find(([value]) => value === picked)?.[0];
   if (!decision) return { ok: false, errors: { [CHOICE_BLOCK_ID]: "Choose Approve, Needs changes or Reject." } };
   const note = reviewNoteOf(state);
