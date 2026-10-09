@@ -187,28 +187,168 @@ test("a Roadmap count answer that names no card still cites the board", async ()
   assert.deepEqual(linksIn(box), [BOARD]);
 });
 
-/** A blueprint search that found these cells. */
-function blueprintResult(names: readonly string[]): string {
+test("a Roadmap answer that links its one card cites the board alone, and the card stays on its name", async () => {
+  const { box } = await answer(
+    [{ name: "roadmap_query", result: roadmapResult([1, 2, 3, 4, 5]) }],
+    "**There are 5 cards in WIP.** The oldest is [Card 3 redesign](https://www.notion.so/card-3).",
+  );
+
+  assert.deepEqual(linksIn(box), [BOARD]);
+});
+
+test("a Roadmap card is named by its number as the prose writes it, #12 or card 13, and #1 is not #12", async () => {
+  const { box } = await answer(
+    [{ name: "roadmap_query", result: roadmapResult([1, 12, 13, 14]) }],
+    "**Two of the 4 cards in WIP are blocked:** #12 waits on copy, and card 13 on engineering.",
+  );
+
+  assert.deepEqual(linksIn(box), [BOARD, "https://www.notion.so/card-12", "https://www.notion.so/card-13"]);
+});
+
+const APP = "https://plus-uno.netlify.app/blueprint/";
+const cell = (n: number) => `${APP}?cell=c${n}`;
+
+/** A blueprint search, its rows shaped as `BlueprintRow`: a cell's title is
+ *  its content cut to 80 characters, and its url opens it in the app. */
+function blueprintResult(contents: readonly string[]): string {
   return JSON.stringify({
     ok: true,
-    count: names.length,
-    rows: names.map((name, i) => ({ name, url: `https://plus-uno.netlify.app/blueprint/?cell=c${i + 1}` })),
+    query: "reminders",
+    count: contents.length,
+    blueprint: { title: "uno-blueprint", url: APP },
+    rows: contents.map((content, i) => ({
+      kind: "cell",
+      id: `c${i + 1}`,
+      title: content.slice(0, 80),
+      snippet: content,
+      lane: "Regular Tutor",
+      url: cell(i + 1),
+    })),
   });
 }
 
-test("a blueprint answer cites the cells it names", async () => {
-  const cells = ["Tutor signs in", "Session reminder", "Reflection form", "Payout export", "Clearance check", "Match review"];
+test("a blueprint answer cites the blueprint once and the cells it names, by link or by their whole title", async () => {
+  const contents = [
+    "Tutor signs in to the portal with their school account before the first session begins",
+    "Tutor gets a reminder text a day before the session and often misses it in the noise",
+    "Reconfirm the tutor call",
+    "Coordinator exports the payout sheet at the end of every month for the finance team",
+    "Tutor fills the reflection form after the session, usually days late or not at all",
+  ];
   const { box } = await answer(
-    [{ name: "search_blueprint", result: blueprintResult(cells) }],
-    "**Three cells carry the pain.** Tutors stall at the reflection form, miss the session reminder, and wait on the clearance check.",
+    [{ name: "search_blueprint", result: blueprintResult(contents) }],
+    `**Reminders are where tutors slip.** The <${cell(2)}|day-before reminder> is easy to miss, the [reflection form](${cell(5)}) comes in late, and coordinators lean on Reconfirm the tutor call to catch it.`,
   );
 
-  assert.deepEqual(box!.title, { type: "plain_text", text: "Sources (3)" });
-  assert.deepEqual(linksIn(box), [
-    "https://plus-uno.netlify.app/blueprint/?cell=c2",
-    "https://plus-uno.netlify.app/blueprint/?cell=c3",
-    "https://plus-uno.netlify.app/blueprint/?cell=c5",
-  ]);
+  assert.deepEqual(box!.title, { type: "plain_text", text: "Sources (4)" });
+  assert.deepEqual(linksIn(box), [APP, cell(2), cell(3), cell(5)]);
+});
+
+test("a link in Slack's own <url|text> form names its row", async () => {
+  const { box } = await answer(
+    [{ name: "notion_search", result: notionResult(notion(5)) }],
+    `See <${notion(5)[0]}|the first>, <${notion(5)[2]}|the third> and <${notion(5)[4]}>.`,
+  );
+
+  assert.deepEqual(linksIn(box), [notion(5)[0], notion(5)[2], notion(5)[4]]);
+});
+
+test("a link is matched whole: /page-1 is not named by /page-10", async () => {
+  const urls = Array.from({ length: 12 }, (_, i) => `https://www.notion.so/page-${i + 1}`);
+  const { box } = await answer(
+    [{ name: "notion_search", result: notionResult(urls) }],
+    `See [ten](${urls[9]}), [eleven](${urls[10]}). And ${urls[11]}.`,
+  );
+
+  assert.deepEqual(linksIn(box), urls.slice(9));
+});
+
+/** A Notion search whose rows carry these titles. */
+function titled(titles: readonly string[]): string {
+  return JSON.stringify({
+    ok: true,
+    count: titles.length,
+    results: titles.map((title, i) => ({ title, url: `https://www.notion.so/t-${i + 1}` })),
+  });
+}
+
+test("a one-word title is named only by its link: 'Session' is not cited by 'tutors miss the session'", async () => {
+  const { box } = await answer(
+    [{ name: "notion_search", result: titled(["Session", "Onboarding", "Tutor import v2", "Reflection form v3", "Payout export"]) }],
+    "**Tutors miss the session during onboarding.** Tutor import v2, Reflection form v3 and Payout export cover it.",
+  );
+
+  assert.deepEqual(linksIn(box), ["https://www.notion.so/t-3", "https://www.notion.so/t-4", "https://www.notion.so/t-5"]);
+});
+
+test("a title two rows share names neither of them", async () => {
+  const { box } = await answer(
+    [{ name: "notion_search", result: titled(["Weekly sync", "Weekly sync", "Tutor import v2", "Reflection form v3", "Payout export"]) }],
+    "**The Weekly sync covers it.** Tutor import v2, Reflection form v3 and Payout export carry the detail.",
+  );
+
+  assert.deepEqual(linksIn(box), ["https://www.notion.so/t-3", "https://www.notion.so/t-4", "https://www.notion.so/t-5"]);
+});
+
+test("a hyphen continues a name: 'Tutor import' is not named by 'Tutor import-v2'", async () => {
+  const { box } = await answer(
+    [{ name: "notion_search", result: titled(["Tutor import", "Reflection form v3", "Payout export", "Match review"]) }],
+    "**Tutor import-v2 replaced it.** Reflection form v3, Payout export and Match review carry the detail.",
+  );
+
+  assert.deepEqual(linksIn(box), ["https://www.notion.so/t-2", "https://www.notion.so/t-3", "https://www.notion.so/t-4"]);
+});
+
+test("a title is matched as written, brackets and all: '[DS] Token update'", async () => {
+  const { box } = await answer(
+    [{ name: "notion_search", result: titled(["[DS] Token update", "Reflection form v3", "Payout export"]) }],
+    "**[DS]  Token update shipped it.** Reflection form v3 and Payout export follow.",
+  );
+
+  assert.deepEqual(linksIn(box), ["https://www.notion.so/t-1", "https://www.notion.so/t-2", "https://www.notion.so/t-3"]);
+});
+
+test("two rows named without a queried collection make no box, linked or not", async () => {
+  const { types } = await answer(
+    [{ name: "notion_search", result: titled(["Tutor import v2", "Reflection form v3", "Payout export"]) }],
+    "**Tutor import v2 and Reflection form v3 cover it.**",
+  );
+
+  assert.deepEqual(types, ["markdown"]);
+});
+
+test("a page a search found and then read whole is cited, though the prose only paraphrases it", async () => {
+  const { box } = await answer(
+    [
+      { name: "notion_search", result: notionResult(notion(4)) },
+      { name: "source_read", result: JSON.stringify({ ok: true, url: notion(4)[2], title: "Page 3", content: "…" }) },
+    ],
+    "**Onboarding is written up once, and it is current.**",
+  );
+
+  assert.deepEqual(linksIn(box), [notion(4)[2]]);
+});
+
+test("a search scoped to a Notion database cites that database once", async () => {
+  const db = "https://www.notion.so/successdb";
+  const scoped = (urls: string[]) =>
+    JSON.stringify({
+      ok: true,
+      scope: "success_stories",
+      label: "Success Stories",
+      database: { title: "Success Stories", url: db },
+      count: urls.length,
+      results: urls.map((url, i) => ({ title: `Story ${i + 1} recap`, url })),
+    });
+  const { box } = await answer(
+    [
+      { name: "notion_search", result: scoped(notion(3)) },
+      { name: "notion_search", result: scoped(notion(3)) },
+    ],
+    "**Three stories mention reflection.**",
+  );
+
+  assert.deepEqual(linksIn(box), [db]);
 });
 
 test("only links the thread may see are counted: a page from the open web does not make a third", async () => {

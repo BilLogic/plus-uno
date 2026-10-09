@@ -311,3 +311,15 @@ test("an enrichment nobody asked for is silent — no key, no note", () => {
   }
   assert.equal(notes.find((n) => n.includes("failure to LOOK")), undefined);
 });
+
+// ── What the answer cites ────────────────────────────────────────────────────
+
+test("a search names the blueprint it queried, so the answer can cite it once", () => {
+  const { rest } = payload();
+  assert.deepEqual(rest.blueprint, { title: "uno-blueprint", url: "https://uno-blueprint.example/" });
+});
+
+test("with no app configured there is no blueprint link to cite", () => {
+  const rest = blueprintSearchPayload({ query: "x", scope: {}, appUrl: undefined, read: readResult() });
+  assert.equal(rest.blueprint, undefined);
+});

@@ -251,6 +251,8 @@ export function blueprintSearchPayload({
   return {
     ok: true,
     query,
+    // The blueprint itself, for the answer to cite once whichever cells it names.
+    ...(appUrl ? { blueprint: { title: "uno-blueprint", url: appUrl } } : {}),
     ...(hasFilter(scope) || scope.granularity ? { scope } : {}),
     count: rows.length,
     ...(matched !== undefined ? { matched } : {}),

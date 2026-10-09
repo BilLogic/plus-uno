@@ -366,7 +366,12 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       warnings.absenceFired(ctx);
     },
     sourcesRead(read) {
-      for (const source of read) if (!sources.has(source.url)) sources.set(source.url, source);
+      for (const source of read) {
+        const was = sources.get(source.url);
+        // A page a search found and a later lookup read whole was queried.
+        if (!was) sources.set(source.url, source);
+        else if (source.queried && !was.queried) sources.set(source.url, { ...was, queried: true });
+      }
     },
     presentation() {
       const lines = warnings.lines();
