@@ -87,6 +87,8 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 | Research Papers | `85af6f14-7e96-4ed7-aa92-687579a14b4f` | `research_papers` | prior research to cite before re-running |
 | Banners | `36eb7cca-4982-81f4-ad99-e53e62d9506a` | `banners` | live in-product banner copy/state |
 
+**Team Member Database › Figma User ID** (rich_text) is optional, and each member fills in their own: the bare numeric id, nothing around it. The daily role-map sync (`agents/uno-bot/src/usage/team-roles-sync.ts`) maps it to the Slack person the row matches by name, so a Figma commenter is known as a teammate. A commenter whose id no row carries is unmapped. The value is a member's claim about themselves, so a request from a mapped commenter still goes through the ✅.
+
 **Not tracked** (deliberate — noise or wrong owner for bot grounding): Help Center Articles Dev Page, Tasks Tracker on HC Content, Content HQ editorial / meeting / social DBs, demo pages. Use `scope: "any"` only as a last resort when the surface is unknown.
 
 **Findability rule:** access ≠ search. Workspace `/v1/search` is weak inside known DBs — prefer the catalog scope (direct `databases/{id}/query`). Empty results usually mean the DB isn't shared with the uno-bot Notion integration (Connections), not that the row doesn't exist.
