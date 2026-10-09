@@ -130,11 +130,14 @@ export interface SweepHarness {
     cardKey: string;
     digest: string;
     withdrawn?: string;
-    /** What an edit in place made of it: its text and blocks. */
+    /** What an edit in place made of it: its text, blocks and metadata. */
     edited?: string;
     editedBlocks?: unknown[];
+    editedMetadata?: unknown;
   }>;
   staged: PendingProposal[];
+  /** Set on, Slack refuses a post holding `card` blocks. */
+  cardsRefused: { on: boolean };
   /** Every Slack read, as `method channel [ts]`. */
   reads: string[];
   clock: { now: number };
@@ -244,6 +247,7 @@ export function sweepHarness(opts: {
   const staged: PendingProposal[] = [];
   const reads: string[] = [];
   const budget = { replies: Infinity };
+  const cardsRefused = { on: false };
   const headroom = { subrequests: Infinity, d1Queries: Infinity };
   const broken = new Set<string>();
   const rateLimited = new Set<string>();
@@ -425,6 +429,10 @@ export function sweepHarness(opts: {
     store: faultyStore,
     delivery: {
       async post(to, message, tag) {
+        // A workspace that refuses `card` blocks, as Slack answers one.
+        if (cardsRefused.on && message.blocks.some((b) => ["card", "carousel"].includes(String((b as { type?: string }).type)))) {
+          return { ok: false, refusedBlocks: true };
+        }
         nextTs += 1;
         const ts = `${Math.floor(clock.now / 1000)}.${String(900000 + nextTs)}`;
         posted.push({ channel: to.channel, threadTs: to.threadTs, text: message.text, blocks: message.blocks, ts, cardKey: tag.cardKey, digest: tag.digest });
@@ -437,6 +445,7 @@ export function sweepHarness(opts: {
         if (report) {
           report.edited = message.text;
           report.editedBlocks = message.blocks;
+          report.editedMetadata = message.metadata;
         }
       },
       reports: threadState,
@@ -506,6 +515,7 @@ export function sweepHarness(opts: {
     replies,
     posted,
     staged,
+    cardsRefused,
     reads,
     clock,
     budget,

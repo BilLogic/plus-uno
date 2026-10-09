@@ -6,7 +6,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { asSweepRevision, cardPlan, sweepItemText } from "../src/sweep/cards";
+import { asSweepRevision, cardPlan, sweepItem, sweepItemText, sweepParent } from "../src/sweep/cards";
+import { decisionReport, itemText, reportRecord } from "../src/slack/decision-cards";
 import { sweepReport } from "../src/sweep/run";
 import type { PendingFinding } from "../src/sweep/store";
 import type { Destination } from "../src/sweep/finding";
@@ -143,4 +144,28 @@ test("an archive card's target shows the page title as text", () => {
     target: { title: HOSTILE, parent: "Roadmap <!here>", url: PAGE_URL },
   });
   assertInert(texts);
+});
+
+test("a long fix's card keeps the decision in view: each half is clipped on its own, and View shows both whole", () => {
+  const long = finding({
+    sourceSays: `Reward Eligible percentage is not defined yet: ${"5/10 or 5/29 depending on the denominator, ".repeat(6)}`,
+    threadSays: `Obsolete: the percentage was deleted from the report, ${"per the card comment, ".repeat(6)}`,
+  });
+  const item = sweepItem(long, HERE);
+  assert.ok(item.body.length <= 200, `${item.body.length} characters`);
+  assert.match(item.body, /^Page says “Reward Eligible.*…” · decision says “Obsolete: the percentage was deleted.*…”$/);
+  const record = reportRecord("C1", "1790000000.000100", decisionReport([item], "parent"), 1000);
+  const view = itemText(record, item.id)!;
+  assert.ok(view.includes("per the card comment, per the card comment, per the card comment, per the card comment, per the card comment, per the card comment"), "View keeps the whole decision");
+});
+
+test("the parent line reads as the design words it: one fix names its page and source, several count the pages", () => {
+  const record = { kind: "card" as const, url: "https://www.notion.so/card", title: "Card", entryIds: ["comment:c1"] };
+  const one = finding({ target: { url: PAGE_URL, kind: "notion", writable: true, title: "Teacher Insights Report — Part 2", pillars: [] } });
+  assert.equal(
+    sweepParent([{ ...one, evidence: { ...one.evidence, record } }], { rung: "design", channel: "plus-design" }),
+    "A card comment settled something that *Teacher Insights Report — Part 2* still states the old way.",
+  );
+  const pages = ["a", "b", "c"].map((p) => finding({ id: p, blockId: p, target: { url: `${PAGE_URL}${p}`, kind: "notion", writable: true, title: p, pillars: [] } }));
+  assert.equal(sweepParent(pages, HERE), "3 pages still state what their threads changed.");
 });

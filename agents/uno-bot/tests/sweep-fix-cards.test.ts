@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { runSweepJob, type SweepSource } from "../src/sweep/index";
-import { plainReportBlocks } from "../src/sweep/cards";
+import type { PendingProposal } from "../src/thread-state/index";
 import { dmCaptureCard } from "../src/dm-watch/capture";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import type { GateVerdict } from "../src/gate/index";
@@ -41,7 +41,7 @@ const FIXES = ["Launch: November", "Owner: Bea", "Scope: tutors and students"];
 
 /** Three fixes on one page, from a thread Sam started, posted by a real
  *  night and morning. */
-async function postedCard() {
+async function postedCard(opts: { cardsRefused?: boolean } = {}) {
   const history = [msg("U0SAM", ROOT, `PRD: <${PAGE.url}>`, { reply_count: 3, latest_reply: ts(29, 16, 2) })];
   const replies = [
     msg("U0ADE", ts(29, 16, 0), "Launch slips to November."),
@@ -67,6 +67,7 @@ async function postedCard() {
     now: at(29, 22),
   });
   await runSweepJob(END_OF_DAY, h.deps);
+  h.cardsRefused.on = opts.cardsRefused === true;
   h.clock.now = at(30, 14);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1);
@@ -82,7 +83,7 @@ test("three fixes post as a parent line and three cards in a carousel, each with
   assert.equal(messageBlocksRefusal(blocks), null);
   assert.equal(blocks.length, 2, "the parent line, then the carousel: nothing else");
   assert.equal(blocks[0]!.type, "section");
-  assert.match(String(blocks[0]!.text.text), /^This thread settled 3 things that linked pages still state the old way\.$/);
+  assert.match(String(blocks[0]!.text.text), /^\*Reflection PRD\* still states 3 things its thread changed\.$/);
 
   const carousel = blocks[1]!;
   assert.equal(carousel.type, "carousel");
@@ -146,26 +147,12 @@ test("each fix is its own proposal: one operation, keyed by the message and its 
   assert.deepEqual(record?.entries.map((e) => e.id), PAGE.blocks.map((b) => b.id));
 });
 
-test("where Slack refuses cards, the report steps down to sections that each keep their own Review", async () => {
-  const { post } = await postedCard();
-  const plain = plainReportBlocks(post.blocks) as Block[];
-  assert.equal(messageBlocksRefusal(plain), null);
-  assert.equal(plain.some((b) => b.type === "card" || b.type === "carousel"), false);
-  assert.equal(plain[0], (post.blocks as Block[])[0], "the parent line stays");
-  const fixes = plain.slice(1);
-  assert.equal(fixes.length, 3);
-  fixes.forEach((b, i) => {
-    assert.equal(b.type, "section");
-    assert.equal(b.accessory.action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);
-    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\n<@U0`));
-  });
-});
-
-test("Review decides one fix: Approve runs only it, and its card redraws as approved while the others stay open", async () => {
-  const { h, post } = await postedCard();
+/** The review door over a harness's store: what ran, and every redraw of a
+ *  report's message — its blocks and the metadata sent with them. */
+function reviewDoor(h: Awaited<ReturnType<typeof postedCard>>["h"]) {
   const views = recordingViews({ alreadyOpen: ["V1"] });
   const ran: GateVerdict[] = [];
-  const updates: Array<{ ts: string; blocks: unknown[] }> = [];
+  const updates: Array<{ ts: string; blocks: unknown[]; metadata?: unknown }> = [];
   const deps: ReviewDoorDeps = {
     threadState: h.threadState,
     views: views.client,
@@ -174,22 +161,70 @@ test("Review decides one fix: Approve runs only it, and its card redraws as appr
       ran.push(v);
       return [{ toolName: "notion_update", ok: true, result: "{}", message: "Updated." }];
     },
-    updateCard: async (_channel, ts, message) => void updates.push({ ts, blocks: message.blocks }),
+    updateCard: async (_channel, ts, message) => void updates.push({ ts, blocks: message.blocks, metadata: message.metadata }),
     restage: async () => {},
     revise: async () => {},
     now: () => h.clock.now,
   };
-  const second = h.staged[1]!;
-  await runReviewDecision({ viewId: "V1", channel: DESIGN, messageTs: second.proposalTs, userId: "U0BEA", decision: "confirm" }, deps);
+  const decide = (fix: PendingProposal, userId: string, decision: "confirm" | "cancel", note?: string) =>
+    runReviewDecision({ viewId: "V1", channel: DESIGN, messageTs: fix.proposalTs, userId, decision, ...(note ? { note } : {}) }, deps);
+  return { ran, updates, decide, views };
+}
 
-  assert.equal(ran.length, 1);
-  assert.deepEqual(ran[0]!.execute?.operations, second.operations, "only that fix runs");
-  assert.equal(updates.at(-1)!.ts, post.ts, "the report's own message is edited");
-  const cards = (updates.at(-1)!.blocks as Block[])[1]!.elements as Block[];
+test("where Slack refuses cards, the report posts as sections that each keep their own Review", async () => {
+  const { post } = await postedCard({ cardsRefused: true });
+  const blocks = post.blocks as Block[];
+  assert.equal(messageBlocksRefusal(blocks), null);
+  assert.equal(blocks.some((b) => b.type === "card" || b.type === "carousel"), false);
+  assert.match(String(blocks[0]!.text.text), /^\*Reflection PRD\* still states 3 things/, "the parent line stays");
+  const fixes = blocks.slice(1);
+  assert.equal(fixes.length, 3);
+  fixes.forEach((b, i) => {
+    assert.equal(b.type, "section");
+    assert.equal(b.accessory.action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);
+    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\n<@U0`));
+  });
+});
+
+test("a decision on a report that posted plain redraws it plain", async () => {
+  const { h, post } = await postedCard({ cardsRefused: true });
+  const door = reviewDoor(h);
+  await door.decide(h.staged[1]!, "U0BEA", "confirm");
+
+  const redrawn = door.updates.at(-1)!;
+  assert.equal(redrawn.ts, post.ts);
+  const blocks = redrawn.blocks as Block[];
+  assert.equal(blocks.some((b) => b.type === "card" || b.type === "carousel"), false, "still plain");
+  assert.match(blocks[2]!.text.text, /Approved by <@U0BEA> · written /);
+  assert.equal(blocks[2]!.accessory.text.text, "View");
+  assert.equal(blocks[1]!.accessory.text.text, "Review");
+  assert.equal(messageBlocksRefusal(blocks), null);
+});
+
+test("every redraw of a report sends its tag again, so a search by its key still finds it", async () => {
+  const { h, post } = await postedCard();
+  const door = reviewDoor(h);
+  await door.decide(h.staged[0]!, "U0ADE", "cancel", "not yet");
+  assert.deepEqual(door.updates.at(-1)!.metadata, {
+    event_type: "uno_sweep_card",
+    event_payload: { card_key: post.cardKey, digest: post.digest, role: "card" },
+  });
+});
+
+test("Review decides one fix: Approve runs only it, and its card redraws as approved while the others stay open", async () => {
+  const { h, post } = await postedCard();
+  const door = reviewDoor(h);
+  const second = h.staged[1]!;
+  await door.decide(second, "U0BEA", "confirm");
+
+  assert.equal(door.ran.length, 1);
+  assert.deepEqual(door.ran[0]!.execute?.operations, second.operations, "only that fix runs");
+  assert.equal(door.updates.at(-1)!.ts, post.ts, "the report's own message is edited");
+  const cards = (door.updates.at(-1)!.blocks as Block[])[1]!.elements as Block[];
   assert.match(cards[1]!.subtitle.text, /^Approved by <@U0BEA> · written /);
   assert.equal(plainOf(cards[1]!.body), `Written: ${FIXES[1]}`);
   assert.deepEqual(cards[0]!.actions.map((a: Block) => a.text.text), ["Review", "Open page"], "the others wait on their own decisions");
-  assert.equal(messageBlocksRefusal(updates.at(-1)!.blocks as Block[]), null);
+  assert.equal(messageBlocksRefusal(door.updates.at(-1)!.blocks as Block[]), null);
 });
 
 test("a DM capture card is a carousel of its fixes too, with no owner to name", () => {

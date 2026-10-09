@@ -123,6 +123,7 @@ import {
   sweepTag,
 } from "../sweep/cards";
 import { DRIFT_KEY } from "../figma-drift/finding";
+import { itemProposalKey } from "../slack/decision-cards";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
@@ -1411,15 +1412,18 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // card is touched by a batch replacing one of its blocks; any other keyed
   // card by a batch aiming one of its tools at the same target — the weekly
   // card's own intake, not a separate issue filed or commented on beside it.
-  const replaced =
-    request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
+  // A sweep report's fixes are each live under their own key, and the thread's
+  // newest is only one of them: the batch is checked against every live fix.
+  const replaced = await cardRevised(request.pending, result.operations, threadState);
 
   // A keyed card that revises only its own way (the weekly DS precedence
   // card, through `drop N`) is not revised by a turn at all: the batch is
   // refused with the card's note, rather than staged as a near-copy that
   // stays live beside it — two live cards could both run.
   if (replaced?.refuseRevision) {
-    await delivery.postNote(replaced.refuseRevision);
+    // Tagged as the sweep's own note under a sweep fix, so it leaves the
+    // thread the team's.
+    await delivery.postNote(replaced.refuseRevision, replaced.sweepRun ? sweepTag("note") : undefined);
     await memory.remember(replaced.refuseRevision);
     return { disposition: "asked", posted: replaced.refuseRevision, wrote: memory.wrote(), telemetry };
   }
@@ -2615,6 +2619,31 @@ function isSubsetOf(revised: readonly ProposalOperation[], original: readonly Pr
 function touchesBlocksOf(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
   const theirs = replacedBlocks(proposalOperations(card));
   return [...replacedBlocks(operations)].some((b) => theirs.has(b));
+}
+
+/**
+ * The card a turn's batch revises: the pending card, unless it is keyed
+ * apart and the batch leaves it alone (null). A fix of a sweep report is one
+ * of several live fixes in its thread, so every live fix of that report is
+ * checked, and the one whose block the batch touches is the card revised.
+ */
+async function cardRevised(
+  pending: PendingProposal | null,
+  operations: readonly ProposalOperation[],
+  threadState: Pick<ThreadState, "getReport" | "getProposalByTs">,
+): Promise<PendingProposal | null> {
+  if (!pending) return null;
+  if (pending.item && pending.sweepRun) {
+    const { messageTs } = pending.item;
+    const record = await threadState.getReport(messageTs).catch(() => null);
+    for (const entry of record?.entries ?? [pending.item]) {
+      if ("state" in entry && entry.state.kind !== "open" && entry.state.kind !== "changes-asked") continue;
+      const look = await threadState.getProposalByTs(itemProposalKey(messageTs, entry.id)).catch(() => null);
+      if (look?.state === "found" && touchesCard(operations, look.proposal)) return look.proposal;
+    }
+    return null;
+  }
+  return slotKeyOf(pending) && !touchesCard(operations, pending) ? null : pending;
 }
 
 /**

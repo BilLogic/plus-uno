@@ -31,6 +31,7 @@
 
 import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
+import { clip } from "../slack/decision-cards";
 import type { ProposalOperation, ReportItem, StatedCardWords, SweepShare } from "../thread-state/index";
 import type { CardFixes, ProposalCard } from "../turn/index";
 import { FOUND_BY_SEARCH, addedContent, saidAt, saidIn } from "./capture-lines";
@@ -223,20 +224,22 @@ function inThread(d: Destination): boolean {
  */
 export function sweepParent(items: readonly PendingFinding[], destination: Destination): string {
   const n = items.length;
-  const here = inThread(destination);
-  const sources = [...new Set(items.map((f) => saidIn(f, here)))];
-  const adds = items.filter((f) => f.add).length;
+  const pageOf = (f: PendingFinding) => `*${escapeSlackText(flat(f.target.title) || "untitled")}*`;
   if (n === 1) {
     const f = items[0]!;
-    const who = capitalised(sources[0]!);
-    const page = `*${escapeSlackText(flat(f.target.title) || "untitled")}*`;
-    return f.add ? `${who} answered something that ${page} doesn't say yet.` : `${who} settled something that ${page} still states the old way.`;
+    const who = capitalised(saidIn(f, inThread(destination)));
+    return f.add ? `${who} answered something that ${pageOf(f)} doesn't say yet.` : `${who} settled something that ${pageOf(f)} still states the old way.`;
   }
-  const who = sources.length === 1 ? capitalised(sources[0]!) : "The team";
-  if (adds === n) return `${who} answered ${n} things that no page has written down yet.`;
-  if (adds) return `${who} settled or answered ${n} things that pages don't say yet.`;
-  return `${who} settled ${n} things that linked pages still state the old way.`;
+  if (items.every((f) => f.add)) return `${n} answers are on no page yet.`;
+  const pages = new Set(items.map((f) => f.target.url)).size;
+  return pages === 1 ? `${pageOf(items[0]!)} still states ${n} things its thread changed.` : `${pages} pages still state what their threads changed.`;
 }
+
+/** Characters of each quote on a card: the two halves of a body, with their
+ *  words around them, fit its 200. */
+const QUOTE_CHARS = 84;
+/** An added answer's one quote, in the same 200. */
+const ADD_QUOTE_CHARS = 160;
 
 /**
  * One fix as its card in the report: the page names it, its owner and where
@@ -253,11 +256,14 @@ export function sweepItem(f: PendingFinding, destination: Destination): ReportIt
     id: f.blockId!,
     title: flat(f.target.title) || "untitled",
     subtitle: where.join(" · "),
+    // Each half clipped on its own, so the decision always shows; View and
+    // Review show both whole.
     body: f.add
-      ? `No page says this yet · decision says “${flat(f.threadSays)}”`
-      : `Page says “${flat(f.sourceSays)}” · decision says “${flat(f.threadSays)}”`,
+      ? `No page says this yet · decision says “${clip(f.threadSays, ADD_QUOTE_CHARS)}”`
+      : `Page says “${clip(f.sourceSays, QUOTE_CHARS)}” · decision says “${clip(f.threadSays, QUOTE_CHARS)}”`,
     // Once written, the card says what the page now holds.
     done: flat(f.replacement),
+    detail: sweepItemText(f),
     open: { label: "Open page", url: f.target.url },
   };
 }
@@ -296,34 +302,6 @@ export function sweepItemWords(): StatedCardWords {
  *  never redrafted. */
 export const SWEEP_REVISE_INSTEAD =
   "A sweep fix is the page's text as the thread settled it, so it isn't redrafted. Reject it in Review with what you want instead, or edit the page.";
-
-/**
- * A report's plain rung, for a workspace whose Slack refuses `card` blocks:
- * the parent line, then each card as a section of its title, subtitle and
- * body with its own Review beside it, so every fix stays decidable from its
- * own button; Open is the title's link.
- *
- * @param blocks - The report's blocks (`decisionReport`)
- */
-export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
-  return blocks.flatMap((block) => {
-    const b = block as Record<string, any>;
-    const cards: Record<string, any>[] = b.type === "card" ? [b] : b.type === "carousel" ? b.elements : [];
-    if (!cards.length) return [block];
-    return cards.map((card) => {
-      const actions = (card.actions ?? []) as Record<string, any>[];
-      const review = actions.find((a) => typeof a.action_id === "string");
-      const open = actions.find((a) => typeof a.url === "string" && a !== review);
-      const title = escapeSlackText(String(card.title?.text ?? ""));
-      const lines = [
-        open ? `*<${open.url}|${title}>*` : `*${title}*`,
-        ...(card.subtitle?.text ? [String(card.subtitle.text)] : []),
-        escapeSlackText(String(card.body?.text ?? "")),
-      ];
-      return { type: "section", text: { type: "mrkdwn", text: lines.join("\n") }, ...(review ? { accessory: review } : {}) };
-    });
-  });
-}
 
 function capitalised(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
@@ -415,6 +393,12 @@ const PICK = /^\s*(drop|remove|keep(?: only)?)\s+((?:#?\d{1,2})(?:\s*(?:,|and|&)
  */
 export function engagesOnSweepCard(text: string): boolean {
   return typedEmojiDecision(text) !== null || PICK.test(text.trim());
+}
+
+/** The tag a sweep report's own message carries: its key and its
+ *  operations' digest, which a retry finds it by. Sent again on every edit. */
+export function sweepReportMetadata(tag: { cardKey: string; digest: string }): { event_type: string; event_payload: Record<string, string> } {
+  return { event_type: SWEEP_CARD_EVENT, event_payload: { card_key: tag.cardKey, digest: tag.digest, role: "card" } };
 }
 
 /** The sweep's tag on a post that answers a sweep card — its batch result,

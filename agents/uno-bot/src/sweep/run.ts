@@ -112,6 +112,7 @@ import {
   sweepItemText,
   sweepItemWords,
   sweepParent,
+  sweepReportMetadata,
   sweepShareOf,
   SWEEP_CARD_TTL_MS,
   SWEEP_REVISE_INSTEAD,
@@ -122,6 +123,7 @@ import {
   itemProposal,
   itemProposalKey,
   markNotStaged,
+  plainReportBlocks,
   reportRecord,
   type DecisionReport,
   type ReportStore,
@@ -261,6 +263,8 @@ export interface DmThreadVerdict {
 export interface SweepReportMessage {
   text: string;
   blocks: unknown[];
+  /** Its tag, which an edit sends again. */
+  metadata?: { event_type: string; event_payload: Record<string, unknown> };
 }
 
 /** Where a card lands: a thread, or the top of a channel. */
@@ -279,14 +283,15 @@ export interface CardTag {
 /** A search for a posted card by its tag: found, surely not there, or not
  *  known — a failed read, or more pages than the search reads. */
 export type PostedCard =
-  | { state: "found"; ts: string; text: string; digest: string }
+  | { state: "found"; ts: string; text: string; digest: string; plain?: boolean }
   | { state: "absent" }
   | { state: "unknown"; why: string };
 
 /** Posting and staging, and the reads the morning needs. */
 export interface SweepDelivery {
-  /** Post the report, tagged with its key and digest. */
-  post(to: CardPlace, message: SweepReportMessage, tag: CardTag): Promise<{ ok: boolean; ts?: string }>;
+  /** Post the report, tagged with its key and digest. `refusedBlocks` when
+   *  Slack refused its blocks, so it may step down to plain sections. */
+  post(to: CardPlace, message: SweepReportMessage, tag: CardTag): Promise<{ ok: boolean; ts?: string; refusedBlocks?: boolean }>;
   /** Edit a posted report in place (`chat.update`): a fix that did not stage
    *  says so on its card. */
   edit(channel: string, ts: string, message: SweepReportMessage): Promise<void>;
@@ -1225,13 +1230,18 @@ async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string):
   const digest = operationsDigest(plan.operations);
   await deps.store.saveCard({ key: plan.key, destination: plan.destination, items: plan.items, digest });
   await deps.store.addItems(plan.items.map((f) => itemRecord(f, plan, now)));
-  const sent = await deps.delivery.post(to, { text: report.text, blocks: report.blocks }, { cardKey: plan.key, digest });
+  const tag = { cardKey: plan.key, digest };
+  let sent = await deps.delivery.post(to, { text: report.text, blocks: report.blocks }, tag);
+  // Cards Slack refuses step down to sections, each with its own Review, and
+  // the report's record keeps every redraw plain from then on.
+  const plain = !sent.ok && sent.refusedBlocks === true;
+  if (plain) sent = await deps.delivery.post(to, { text: report.text, blocks: plainReportBlocks(report.blocks) }, tag);
   if (!sent.ok || !sent.ts) {
     await release(deps, plan.key);
     notes.push(`${plan.key}: the post failed — kept for tomorrow`);
     return;
   }
-  const staged = await stageReport(ctx, plan, report, { channel: to.channel, root: to.threadTs ?? sent.ts, ts: sent.ts, postDate }, now);
+  const staged = await stageReport(ctx, plan, report, { channel: to.channel, root: to.threadTs ?? sent.ts, ts: sent.ts, postDate, ...(plain ? { plain: true } : {}) }, now);
   if (!staged.length) return;
   await deps.store.removeFindings(staged.map((f) => f.id));
   ctx.cards.push({ ...card, proposalTs: sent.ts });
@@ -1275,7 +1285,7 @@ async function stageReport(
   ctx: MorningCtx,
   plan: SweepCardPlan,
   report: DecisionReport,
-  posted: { channel: string; root: string; ts: string; postDate: string },
+  posted: { channel: string; root: string; ts: string; postDate: string; plain?: boolean },
   postedAt: number,
   skip: ReadonlySet<string> = new Set(),
 ): Promise<PendingFinding[]> {
@@ -1291,7 +1301,11 @@ async function stageReport(
   try {
     // A retry keeps the record an earlier try made, and the decisions on it.
     if (!(await deps.delivery.reports.getReport(posted.ts))) {
-      await deps.delivery.reports.putReport(reportRecord(posted.channel, posted.ts, report, SWEEP_CARD_TTL_MS));
+      await deps.delivery.reports.putReport({
+        ...reportRecord(posted.channel, posted.ts, report, SWEEP_CARD_TTL_MS),
+        ...(posted.plain ? { plain: true } : {}),
+        metadata: sweepReportMetadata({ cardKey: plan.key, digest: operationsDigest(plan.operations) }),
+      });
     }
   } catch (err) {
     if (isSubrequestBudgetError(err)) throw err;
@@ -1407,7 +1421,7 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
     ctx,
     plan,
     sweepReport(plan),
-    { channel: to.channel, root: to.threadTs ?? posted.ts, ts: posted.ts, postDate },
+    { channel: to.channel, root: to.threadTs ?? posted.ts, ts: posted.ts, postDate, ...(posted.plain ? { plain: true } : {}) },
     Number.isFinite(postedAt) ? postedAt : now,
     already,
   );

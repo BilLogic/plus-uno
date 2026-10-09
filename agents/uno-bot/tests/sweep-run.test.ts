@@ -506,6 +506,10 @@ test("a fix that fails to stage says so on its card and comes back tomorrow; the
 
   const report = h.posted[0]!;
   assert.equal(report.withdrawn, undefined, "the report stands");
+  assert.deepEqual(report.editedMetadata, {
+    event_type: "uno_sweep_card",
+    event_payload: { card_key: report.cardKey, digest: report.digest, role: "card" },
+  }, "the edit sends the report's tag again");
   const cards = (report.editedBlocks as Array<Record<string, any>>)[1]!.elements as Array<Record<string, any>>;
   assert.equal(cards[0]!.subtitle.text, "Didn't go through, so it comes back in tomorrow's report.");
   assert.deepEqual(cards[0]!.actions.map((a: Record<string, any>) => a.text.text), ["Open page"], "nothing to review");

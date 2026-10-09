@@ -97,7 +97,7 @@ import { markSweepThread } from "./thread-mark";
 import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import { classifyLink, type ChannelKind, type SweepSource, type TargetKind } from "./finding";
-import { plainReportBlocks, SWEEP_CARD_EVENT, sweepPostMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
+import { SWEEP_CARD_EVENT, sweepPostMetadata, sweepReportMetadata, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
 import { stageSweepShare } from "./share";
 import { activeDmsFor } from "../dm-sweep/env";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
@@ -262,14 +262,13 @@ async function sweepDepsFor(
             metadata: tagOf(tag, "card"),
             ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
           });
-        let res = await send(message.blocks);
-        // Cards Slack refuses step down to sections, each with its own Review.
-        if (!res.ok && refusedForBlocks(res)) res = await send(plainReportBlocks(message.blocks));
-        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
+        const res = await send(message.blocks);
+        if (res.ok && res.ts) return { ok: true, ts: res.ts };
+        return { ok: false, ...(refusedForBlocks(res) ? { refusedBlocks: true } : {}) };
       },
       async edit(channel, ts, message) {
-        // Its tag stays: an edit that names no metadata leaves the message's own.
-        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+        // Its tag rides every edit, so a later search by its key still finds it.
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
       },
       reports: threadStateFor(env),
       async findPosted(to, cardKey, since) {
@@ -290,7 +289,10 @@ async function sweepDepsFor(
           const hit = (res.messages ?? []).find(isCard);
           if (hit) {
             const digest = hit.metadata?.event_payload.digest;
-            return { state: "found", ts: hit.ts, text: hit.text ?? "", digest: typeof digest === "string" ? digest : "" };
+            // Posted as plain sections when Slack refused its cards.
+            const blocks = (hit as { blocks?: Array<{ type?: string }> }).blocks ?? [];
+            const plain = blocks.length > 0 && !blocks.some((b) => b.type === "card" || b.type === "carousel");
+            return { state: "found", ts: hit.ts, text: hit.text ?? "", digest: typeof digest === "string" ? digest : "", ...(plain ? { plain } : {}) };
           }
           cursor = res.response_metadata?.next_cursor;
           if (!cursor) return { state: "absent" };
@@ -489,7 +491,7 @@ export async function recordSweepRestageFor(env: Env, from: PendingProposal, to:
 /** The tag a sweep card's messages carry in Slack's message metadata: its
  *  key, its operations' digest, and which message this is. */
 function tagOf(tag: CardTag, role: "card" | "plan"): SlackMessageMetadata {
-  return { event_type: SWEEP_CARD_EVENT, event_payload: { card_key: tag.cardKey, digest: tag.digest, role } };
+  return role === "card" ? sweepReportMetadata(tag) : { event_type: SWEEP_CARD_EVENT, event_payload: { card_key: tag.cardKey, digest: tag.digest, role } };
 }
 
 /** A read that tripped the budget is the budget stop, whatever it returned. */

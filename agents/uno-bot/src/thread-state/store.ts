@@ -360,6 +360,9 @@ export interface ReportItem {
   also?: { label: string; url: string };
   /** What the card says once written, after "Written: ". Absent, its body. */
   done?: string;
+  /** The item's whole words, mrkdwn, when its body is a shortened view of
+   *  them: View shows them once its proposal is gone. */
+  detail?: string;
 }
 
 /** Where one item of a report stands. `at` is epoch ms. */
@@ -397,6 +400,12 @@ export interface DecisionReportRecord {
   /** How long its items stay decidable — the record outlives them by
    *  `REPORT_GRACE_MS`, so a late View still reads it. */
   ttlMs: number;
+  /** Set when Slack refused its cards and it posted as plain sections: every
+   *  redraw is plain too. */
+  plain?: boolean;
+  /** The Slack message metadata it posted with, sent again on every edit so
+   *  the tag a later search finds it by stays. */
+  metadata?: { event_type: string; event_payload: Record<string, unknown> };
 }
 
 /** One change to a report: an item's state, or an item replaced by its

@@ -67,10 +67,12 @@ export function failureReason(message: string): string {
   return line || "the write failed";
 }
 
-/** A message: its fallback text and its blocks. */
+/** A message: its fallback text and its blocks, and the metadata it posted
+ *  with when it carries any — an edit sends it again. */
 export interface ReportMessage {
   text: string;
   blocks: unknown[];
+  metadata?: { event_type: string; event_payload: Record<string, unknown> };
 }
 
 /** A report ready to post: its message, the items it shows and the ones held. */
@@ -230,20 +232,50 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
     throw new Error(`a decision report holds at most ${MAX_REPORT_ITEMS} items; hold the rest back (decisionReport)`);
   }
   const head = parentLine(record);
-  const blocks = record.entries.length ? [...textSections(head), carouselOf(record.entries.map(entryCard))] : textSections(head);
+  const drawn = record.entries.length ? [...textSections(head), carouselOf(record.entries.map(entryCard))] : textSections(head);
+  // A report that posted plain stays plain: Slack refused its cards once.
+  const blocks = record.plain ? plainReportBlocks(drawn) : drawn;
   // The fallback is mrkdwn and a card's words are plain text: escaped, so a
   // title holding `<!channel>` pings nobody from the notification either.
   const text = [head, ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${escapeSlackText(shownAs(e).body)}`)].join("\n");
-  return { text, blocks };
+  return { text, blocks, ...(record.metadata ? { metadata: record.metadata } : {}) };
 }
 
-/** One item's words — title, state and body, unclipped — for View once its
+/**
+ * A report's plain rung, for a workspace whose Slack refuses `card` blocks:
+ * the parent line, then each card as a section of its title, subtitle and
+ * body with its own Review (or View) beside it, so every item stays
+ * decidable from its own button; Open is the title's link.
+ *
+ * @param blocks - The report's blocks (`decisionReport`)
+ */
+export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
+  return blocks.flatMap((block) => {
+    const b = block as Record<string, any>;
+    const cards: Record<string, any>[] = b.type === "card" ? [b] : b.type === "carousel" ? b.elements : [];
+    if (!cards.length) return [block];
+    return cards.map((card) => {
+      const actions = (card.actions ?? []) as Record<string, any>[];
+      const review = actions.find((a) => typeof a.action_id === "string");
+      const open = actions.find((a) => typeof a.url === "string" && a !== review);
+      const title = escapeSlackText(String(card.title?.text ?? ""));
+      const lines = [
+        open ? `*<${open.url}|${title}>*` : `*${title}*`,
+        ...(card.subtitle?.text ? [String(card.subtitle.text)] : []),
+        escapeSlackText(String(card.body?.text ?? "")),
+      ];
+      return { type: "section", text: { type: "mrkdwn", text: lines.join("\n") }, ...(review ? { accessory: review } : {}) };
+    });
+  });
+}
+
+/** One item's words — title, state and body, then its whole detail — for View once its
  *  proposal is gone; null when the record has no such entry. */
 export function itemText(record: DecisionReportRecord, id: string): string | null {
   const entry = record.entries.find((e) => e.id === id);
   if (!entry) return null;
   const shown = shownAs(entry);
-  return [entry.item.title, shown.subtitle, shown.body].filter(Boolean).join("\n");
+  return [entry.item.title, shown.subtitle, shown.body, entry.item.detail].filter(Boolean).join("\n");
 }
 
 // ── Changing a report ────────────────────────────────────────────────────────
