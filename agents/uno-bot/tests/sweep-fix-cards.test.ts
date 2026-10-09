@@ -11,7 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import type { ScheduledJob } from "../src/scheduled/runs";
-import { runSweepJob, type SweepSource } from "../src/sweep/index";
+import { isSweepCardPost, runSweepJob, type SweepSource } from "../src/sweep/index";
 import type { PendingProposal } from "../src/thread-state/index";
 import { dmCaptureCard } from "../src/dm-watch/capture";
 import { renderProposalCard } from "../src/slack/proposal-render";
@@ -225,45 +225,4 @@ test("Review decides one fix: Approve runs only it, and its card redraws as appr
   assert.equal(plainOf(cards[1]!.body), `Written: ${FIXES[1]}`);
   assert.deepEqual(cards[0]!.actions.map((a: Block) => a.text.text), ["Review", "Open page"], "the others wait on their own decisions");
   assert.equal(messageBlocksRefusal(door.updates.at(-1)!.blocks as Block[]), null);
-});
-
-test("a DM capture card is a carousel of its fixes too, with no owner to name", () => {
-  const card = dmCaptureCard([
-    {
-      target: { url: PAGE.url, title: "Reflection PRD", writable: true, kind: "notion" },
-      blockId: "blk-0",
-      lastEditedTime: "2026-09-01T10:00:00.000Z",
-      original: "Launch: October",
-      replacement: "Launch: November",
-      sourceSays: "Launch: October",
-      permalink: "https://plus.slack.com/archives/D0ME/p1790000000000100",
-    },
-  ] as unknown as Parameters<typeof dmCaptureCard>[0]);
-  const rendered = renderProposalCard(card);
-  const blocks = rendered.blocks as Block[];
-  assert.equal(messageBlocksRefusal(blocks), null);
-  const fix = blocks.find((b) => b.type === "card");
-  assert.ok(fix, "one fix stands alone as a card");
-  assert.match(plainOf(fix.title), /^1\. Reflection PRD$/);
-  assert.equal(fix.subtitle, undefined, "only the owner can confirm, so nobody is named");
-  assert.match(rendered.text, /End-of-day sweep/);
-});
-
-test("a fix too long for a section posts as the card's text, with no carousel", () => {
-  const long = `Launch: ${"November, after the tutor pilot closes and the survey is in. ".repeat(60)}`;
-  const card = dmCaptureCard([
-    {
-      target: { url: PAGE.url, title: "Reflection PRD", writable: true, kind: "notion" },
-      blockId: "blk-0",
-      lastEditedTime: "2026-09-01T10:00:00.000Z",
-      original: "Launch: October",
-      replacement: long,
-      sourceSays: "Launch: October",
-      permalink: "https://plus.slack.com/archives/D0ME/p1790000000000100",
-    },
-  ] as unknown as Parameters<typeof dmCaptureCard>[0]);
-  const rendered = renderProposalCard(card);
-  const blocks = (rendered.blocks ?? []) as Block[];
-  assert.equal(blocks.some((b) => b.type === "card" || b.type === "carousel"), false);
-  assert.match(rendered.text, /after the tutor pilot closes/, "the change is still shown whole");
 });

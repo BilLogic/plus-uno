@@ -127,7 +127,8 @@ import {
   sweepCardPick,
   sweepTag,
 } from "../sweep/cards";
-import { DRIFT_KEY } from "../figma-drift/finding";
+import { answersLegacyDriftCard, LEGACY_DRIFT_KEY } from "../figma-drift/finding";
+import { LEGACY_DRIFT_REPLY } from "../figma-drift/copy";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
@@ -1022,12 +1023,24 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // operations minus the dropped ones, byte for byte, so there is nothing for
   // a model to reproduce. Anything else said under the card still goes to the
   // model, and its revision is still held to the subset rule below.
-  // A file-drift card (`figma-drift/`) holds one intake per file and is read
-  // the same way: "drop 2" leaves a file out.
-  // A sweep report's fix is its own proposal, decided in its Review: no pick.
-  if ((request.pending?.sweepRun && !request.pending.item) || request.pending?.supersedeKey === DRIFT_KEY) {
+  // A sweep report item decides in Review; legacy reports keep typed picks.
+  if (request.pending?.sweepRun && !request.pending.item) {
     const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
     if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
+  }
+
+  // A file-drift card from before the shared card (`figma-drift/`) still asks
+  // for `drop N`, `skip` or "yes" in its footer. Those words decide nothing
+  // now, so they get one line pointing at Review, never a model revision.
+  if (request.pending?.supersedeKey === LEGACY_DRIFT_KEY && answersLegacyDriftCard(request.text)) {
+    await delivery.postNote(LEGACY_DRIFT_REPLY);
+    await memory.remember(LEGACY_DRIFT_REPLY);
+    return {
+      disposition: "asked",
+      posted: LEGACY_DRIFT_REPLY,
+      wrote: memory.wrote(),
+      telemetry: { tier: "chill", route: "legacy-drift-reply", trivial: true, correction: false, tools: [], references: [], interim: 0 },
+    };
   }
 
   // ── A cut-off run in this thread ───────────────────────────────────────────
@@ -1805,8 +1818,6 @@ async function dropFromSweepCard(
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
     ...(fixes ? { fixes } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
-    // The same card minus some items, so a drift card's own gate words stay
-    // (`figma-drift/copy.ts` `driftCardWords`); a sweep card has none.
     ...ownWords(pending),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.

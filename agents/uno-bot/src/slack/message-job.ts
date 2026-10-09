@@ -3,11 +3,10 @@
 // that matter are driven with fakes (tests/ds-precedence-queued.test.ts).
 //
 // A reply handled ahead of the turn — a `drop N` in a weekly DS precedence
-// list thread, a "yes, it's up to date" to a file-drift ask, an answer under a
-// card follow-up — is handled HERE, at the head of the thread's own job, and
-// nowhere earlier. Which handler, if any, was decided when the message was
-// queued (`chainReplyHandlers`), so a reply no handler wanted pays no claim
-// and no second engagement check here. For a handled reply:
+// list thread, an answer under a card follow-up — is handled HERE, at the head
+// of the thread's own job, and nowhere earlier. Which handler, if any, was
+// decided when the message was queued (`chainReplyHandlers`), so a reply no
+// handler wanted pays no claim and no second engagement check here. For a handled reply:
 //   • the dispute has its own claim (`dispute:` + channel + ts), so the
 //     `message` event and its `app_mention` twin try it once between them;
 //     one that is handled also marks the message's own key done, so the twin
@@ -21,9 +20,8 @@
 //     so an `app_mention` twin arriving second still gets its turn;
 //   • a handler that throws falls through to the ordinary turn in the same
 //     job, so the reply is answered rather than dropped. The DS revision
-//     relies on this. The drift handler catches its own failures but a
-//     budget stop, which it re-throws as on main; the card handler catches
-//     every failure, a budget stop included.
+//     relies on this. The card handler catches every failure, a budget stop
+//     included.
 
 import type { RunClaim } from "../thread-state/index";
 import type { SlackMessageEvent } from "./types";
@@ -33,9 +31,7 @@ export interface MessageJobDeps {
   claim(runKey: string): Promise<RunClaim>;
   /** Mark a run key done. Best-effort. */
   markDone(runKey: string): Promise<void>;
-  /** Whether the event could be a weekly-thread dispute, or a "yes, it's up
-   *  to date" to a file-drift ask (`figma-drift/`) — no reads. Both take this
-   *  one path. */
+  /** Whether the event could be a reply handled ahead of the turn — no reads. */
   disputeCandidate(event: SlackMessageEvent): boolean;
   /** Handle it; true when it did, and the turn is then skipped. */
   dispute(event: SlackMessageEvent): Promise<boolean>;

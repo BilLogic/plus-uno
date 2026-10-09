@@ -1,8 +1,9 @@
 // File drift, a day at a time: the end-of-day sweep finds a decision a Figma
-// file (or code) may not show yet, the weekday morning run asks the thread
-// "Is the Figma file still current?" with a drafted intake — once it has
-// looked at the file — and a "yes", a `skip` or the file catching up
-// withdraws it (#897).
+// file (or code) may not show yet, and the weekday morning run — once it has
+// looked at the file — posts the thread a report on the shared decision card:
+// a parent line, then one card per file with its drafted intake, decided in
+// Review alone. The file catching up withdraws its card (#897); nothing typed
+// in the thread decides one.
 //
 // The night runs through the sweep harness — its fake Slack, the real
 // detector over recorded replies — with the in-memory drift store as its
@@ -11,7 +12,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { DRIFT_DETECTOR_SYSTEM, runSweepJob, stageSweepCard, type SweepSlackMessage, type SweepSource } from "../src/sweep/index";
 import { createInMemoryDriftStore, type InMemoryDriftStore } from "../src/figma-drift/in-memory";
@@ -19,26 +19,51 @@ import { FigmaRequestError } from "../src/figma/client";
 import { createInMemoryFigma, type InMemoryFigma } from "../src/figma/in-memory";
 import { SubrequestBudgetError } from "../src/net";
 import {
-  answerDriftAsk,
-  isDriftAnswerCandidate,
   MAX_LOOKS_PER_MORNING,
   MAX_RECHECKS_PER_RUN,
   recheckLiveAsks,
   recheckOnUpdate,
   runDriftAsks,
-  type DriftAnswerDeps,
   type DriftPostDeps,
   type DriftRecheckDeps,
 } from "../src/figma-drift/run";
-import { askLead, DRIFT_CARD_TTL_MS, driftAnswer, driftCardWords, skippedSharedText } from "../src/figma-drift/copy";
+import { DRIFT_CARD_TTL_MS, DRIFT_NO_REVISION, driftCardWords, LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
 import { FRAME_MATCH_SYSTEM, frameMatchPrompt, modelFrameJudge, parseFrameMatch } from "../src/figma-drift/judge";
 import { fakeProvider, type FakeProvider } from "../src/agent/providers/fake";
 import type { FigmaNode } from "../src/integrations/figma-reading";
-import { fileKeyOfOperation, githubInert, matchPillar, NEUTRAL_SETTLED } from "../src/figma-drift/draft";
-import { DRIFT_KEY, fileKeyOf } from "../src/figma-drift/finding";
-import { proposalReplyThread } from "../src/thread-state/index";
+import { githubInert, matchPillar, NEUTRAL_SETTLED } from "../src/figma-drift/draft";
+import { answersLegacyDriftCard, fileKeyOf, LEGACY_DRIFT_KEY } from "../src/figma-drift/finding";
+import { itemProposalKey, itemText, settleItem, type ReportMessage } from "../src/slack/decision-cards";
+import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
+import { recordingDelivery } from "../src/turn/index";
+import { proposalReplyThread, type PendingProposal } from "../src/thread-state/index";
+import { recordingViews } from "./helpers/recording-slack";
+import { resolveSignal } from "../src/gate/index";
+import { renderGateNote } from "../src/slack/gate-note";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
+import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { at, DESIGN, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
+
+type Card = {
+  type: string;
+  title?: { text: string };
+  subtitle?: { text: string };
+  body?: { text: string };
+  actions?: Array<{ text: { text: string }; action_id?: string; url?: string }>;
+};
+
+/** The cards a message shows, a lone card or a carousel's. */
+function cardsOf(blocks: unknown[] | undefined): Card[] {
+  return ((blocks ?? []) as Array<Card & { elements?: Card[] }>).flatMap((b) =>
+    b.type === "carousel" ? b.elements! : b.type === "card" ? [b] : [],
+  );
+}
+
+/** A card's button labels. */
+const labels = (card: Card) => card.actions!.map((a) => a.text.text);
+
+/** Words a drift message no longer teaches: a gate footer, or a typed answer. */
+const GATE_WORDS = /:white_check_mark:|:no_entry:|✅|⛔|`skip`|\bskip\b|\bdrop \d|reply "?yes|still current\?/i;
 
 const EOD: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN };
 const MORNING = { key: "figma-drift-post" };
@@ -123,7 +148,9 @@ interface Posted {
   text: string;
   ts: string;
   card: boolean;
-  withdrawn?: string;
+  blocks?: unknown[];
+  /** The message as its last edit left it. */
+  edited?: ReportMessage;
 }
 
 /** A frame whose text layers are `texts`. */
@@ -181,25 +208,21 @@ function morning(
       async post(to, message) {
         seq += 1;
         const ts = `${Math.floor(h.clock.now / 1000)}.${String(800000 + seq)}`;
-        posted.push({ channel: to.channel, threadTs: to.threadTs, text: message.text, ts, card: message.card });
+        posted.push({ channel: to.channel, threadTs: to.threadTs, text: message.text, ts, card: message.card, ...(message.blocks ? { blocks: message.blocks } : {}) });
         return { ok: true, ts };
       },
       async permalink(channel, ts) {
         return `https://plus.slack.com/archives/${channel}/p${ts.replace(".", "")}`;
       },
-      async withdraw(channel, ts, text) {
-        await h.threadState.retireProposal(ts);
+      async edit(channel, ts, message) {
         const p = posted.find((m) => m.channel === channel && m.ts === ts);
-        if (p) p.withdrawn = text;
+        if (p) p.edited = message;
       },
       async markThread(channel, threadTs) {
         marked.push(`${channel}:${threadTs}`);
       },
     },
-    render(card) {
-      const rendered = renderProposalCard(card);
-      return { text: rendered.text, blocks: rendered.blocks ?? proposalCardBlocks(rendered.text) };
-    },
+    reports: h.threadState,
     async stage(proposal, channelKind) {
       await stageSweepCard(
         proposal,
@@ -211,10 +234,6 @@ function morning(
     async cardLive(ts) {
       return (await h.threadState.getProposalByTs(ts)).state === "found";
     },
-    async threadBusy(channel, threadTs) {
-      const cards = await h.threadState.getProposalsByChannel(channel);
-      return cards.some((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === threadTs);
-    },
     figma,
     judge: modelFrameJudge(provider),
     async pillarOptions() {
@@ -225,41 +244,6 @@ function morning(
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
   return { deps, posted, marked, figma, provider };
-}
-
-/** The answer's deps over the harness's ThreadState and usage record. */
-function answerDeps(h: SweepHarness, drifts: InMemoryDriftStore, posted: Posted[]): DriftAnswerDeps & { notes: string[] } {
-  const notes: string[] = [];
-  return {
-    notes,
-    asked: (channel, threadTs) => drifts.asked(channel, threadTs),
-    async hasTurnCard(channel, thread) {
-      const cards = await h.threadState.getProposalsByChannel(channel);
-      return cards.some((p) => !p.supersedeKey && !p.sweepRun && proposalReplyThread(p) === thread);
-    },
-    async liveCard(channel, thread) {
-      const cards = await h.threadState.getProposalsByChannel(channel);
-      return cards.find((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
-    },
-    async retire(ts) {
-      return (await h.threadState.retireProposal(ts)).retired;
-    },
-    async edit(channel, ts, text) {
-      const p = posted.find((m) => m.channel === channel && m.ts === ts);
-      if (p) p.withdrawn = text;
-    },
-    async post(channel, threadTs, text) {
-      notes.push(`${channel}:${threadTs} ${text}`);
-    },
-    async recordWithdrawn(proposal, user) {
-      await recordProposalEvents(h.proposalEvents, [
-        { ...proposalEvent(proposal.proposalTs, "cancelled", h.clock.now, "typed"), actorId: user },
-      ]);
-    },
-    liveAsksIn: (channel, threadTs) => drifts.liveAsksIn(channel, threadTs),
-    saveLiveAsk: (ask) => drifts.saveLiveAsk(ask),
-    dropLiveAsk: (ask) => drifts.dropLiveAsk(ask),
-  };
 }
 
 describe("a Figma drift at the morning run", () => {
@@ -280,40 +264,52 @@ describe("a Figma drift at the morning run", () => {
     const m = morning(h, drifts);
     const report = await runDriftAsks(MORNING, m.deps);
 
-    assert.equal(m.posted.length, 1, "one ask");
+    assert.equal(m.posted.length, 1, "one report");
     const [card] = m.posted;
     assert.equal(card!.channel, DESIGN);
     assert.equal(card!.threadTs, t.root.ts, "in the thread the evidence is in");
     assert.ok(m.posted.every((p) => p.channel !== UNO_BOT && p.channel !== "C0PLUSDESIGN"));
+    assert.equal(messageBlocksRefusal(card!.blocks!), null, "Slack takes it");
     assert.equal(
-      card!.text.split("\n").slice(0, 2).join("\n"),
-      [
-        "*Is the Figma file still current?* This thread settled \"The recap drops the Share button; tutors see it automatically\" on Sep 29, and <https://www.figma.com/design/AbC123xyz/Session-Recap?node-id=1-2|Session Recap> hasn't changed since Sep 20.",
-        "<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma.",
-      ].join("\n"),
-      "#886 § 3.3, word for word",
+      card!.text.split("\n")[0],
+      "This thread settled a decision that its Figma file has not caught up with.",
+      "the parent line: one plain sentence",
     );
-    assert.match(card!.text, /\n\n:white_check_mark: files a Roadmap card for the update\. :no_entry: files nothing\.\nThe people named here and anyone who posted in this thread can decide, for the next 72 h\. The team's standing confirmers can too\.$/);
-    assert.doesNotMatch(card!.text, /Last published by|:art:|:warning:|About to/, "the publisher is the intake's, and the card has one footer");
+    const [one] = cardsOf(card!.blocks);
+    assert.equal(cardsOf(card!.blocks).length, 1, "one card for the one file");
+    assert.equal(one!.title!.text, "Session Recap");
+    assert.equal(one!.subtitle!.text, "<@U0BEA> · last changed Sep 20", "the owner, and the file's last change");
+    assert.equal(
+      one!.body!.text,
+      'Thread settled "The recap drops the Share button; tutors see it automatically" on Sep 29 · the file has not changed since Sep 20.',
+    );
+    assert.deepEqual(labels(one!), ["Review", "Open in Figma"]);
+    assert.equal(one!.actions![1]!.url, FIGMA_A.url, "Open goes to the frame the thread linked");
+    assert.doesNotMatch(JSON.stringify(card!.blocks) + card!.text, GATE_WORDS, "no ✅/⛔ footer, no typed answer to teach");
     assert.doesNotMatch(card!.text, /<@bea/, "the publisher is never @-mentioned");
 
     const staged = await h.threadState.getProposalsByChannel(DESIGN);
     assert.equal(staged.length, 1);
     const proposal = staged[0]!;
+    assert.equal(proposal.proposalTs, itemProposalKey(card!.ts, "1"), "the card's own proposal, which its Review opens");
+    assert.deepEqual(proposal.item, { messageTs: card!.ts, id: "1" });
     assert.equal(proposal.operations!.length, 1, "one intake operation");
     assert.equal(proposal.operations![0]!.toolName, "notion_create");
     const input = proposal.operations![0]!.input as Record<string, unknown>;
     assert.equal(input.surface, "prd");
     assert.match(String(input.title), /^Update Session Recap in Figma: /);
-    assert.equal(proposal.supersedeKey, DRIFT_KEY, "its own slot in the thread");
     assert.equal(proposal.ttlMs, DRIFT_CARD_TTL_MS);
     assert.deepEqual(proposal.confirmers, ["U0BEA", "U0STARTER", "U0ADE"], "the owner plus everyone who posted");
     assert.equal(proposal.replyTs, t.root.ts);
     assert.equal(proposal.sweepRun, undefined, "not a sweep card: it holds no sweep items");
     assert.deepEqual(proposal.stated, driftCardWords(72), "the gate answers in the card's own words");
+    assert.equal(proposal.refuseRevision, DRIFT_NO_REVISION, "a turn does not redraft it beside the card");
+    assert.match(proposal.proposalText, /^\*<https:\/\/www\.figma\.com\/design\/AbC123xyz\/Session-Recap\?node-id=1-2\|Session Recap>:\* this thread settled /, "what Review shows");
     const sections = (input.sections as Array<{ heading: string; body: string }>).map((s) => s.body).join("\n");
     assert.match(sections, /Last published by bea\.designs on 2026-09-20\./, "the publisher is on the intake");
 
+    const record = await h.threadState.getReport(card!.ts);
+    assert.deepEqual(record?.entries.map((e) => [e.id, e.state.kind]), [["1", "open"]], "the report's record, where the card's decision lands");
     const events = await h.proposalEvents.eventsOf(proposal.proposalTs);
     assert.deepEqual(events.map((e) => [e.event, e.via]), [["staged", "worker"]], "staging is on the usage record");
     assert.deepEqual(await drifts.pending(), [], "an asked finding leaves the queue");
@@ -342,8 +338,10 @@ describe("a Figma drift at the morning run", () => {
     const { h, m } = await sweptRecap();
     m.figma.failNext("versions", new FigmaRequestError(503, "Figma versions 503: Service unavailable"));
     await runDriftAsks(MORNING, m.deps);
-    assert.equal(m.posted.length, 1, "the ask goes out");
-    assert.match(m.posted[0]!.text, /\|Session Recap> may not show it yet\.\n/);
+    assert.equal(m.posted.length, 1, "the report goes out");
+    const [card] = cardsOf(m.posted[0]!.blocks);
+    assert.match(card!.body!.text, / · the file may not show it yet\.$/);
+    assert.equal(card!.subtitle!.text, "<@U0BEA>", "no last change it could not read");
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
     assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/);
     assert.equal(m.figma.calls().length, 1, "a failed read is not tried again for the publisher");
@@ -365,7 +363,7 @@ describe("a Figma drift at the morning run", () => {
     assert.deepEqual(m.posted, []);
   });
 
-  it("asks two threads about the same file with one intake and two asks, one per thread", async () => {
+  it("asks two threads about the same file with one intake: a card in the first, a pointer in the other", async () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
     const { h, drifts } = night({
@@ -389,10 +387,16 @@ describe("a Figma drift at the morning run", () => {
     );
     const staged = await h.threadState.getProposalsByChannel(DESIGN);
     assert.equal(staged.length, 1, "one intake for the file");
-    assert.match(m.posted[1]!.text, /^\*Is the Figma file still current\?\* This thread settled /);
-    assert.match(m.posted[1]!.text, /Its intake is drafted <https:\/\/plus\.slack\.com\/archives\/C0DESIGN\/p\d+\|in another thread>\.$/);
-    assert.match(m.posted[1]!.text, /\n<@U0BEA>, update the frame/, "the owner is mentioned");
-    assert.doesNotMatch(m.posted[1]!.text, /<@U0CY>/, "the thread's other posters are not pinged");
+    assert.equal(
+      m.posted[1]!.text,
+      [
+        "This thread settled a decision that its Figma file has not caught up with.",
+        `The intake for <${FIGMA_B.url}|Session Recap> is drafted <https://plus.slack.com/archives/C0DESIGN/p${m.posted[0]!.ts.replace(".", "")}|in another thread>.`,
+      ].join("\n"),
+      "no card here: the parent line and a one-line pointer",
+    );
+    assert.equal(m.posted[1]!.blocks, undefined, "nothing to decide in this thread");
+    assert.doesNotMatch(m.posted[1]!.text, /<@U/, "a pointer pings nobody");
     assert.deepEqual(staged[0]!.confirmers, ["U0STARTER", "U0ADE", "U0BEA", "U0CY"], "both threads' people may decide");
     assert.ok(m.marked.includes(`${DESIGN}:${two.root.ts}`), "the asked thread is marked, so its replies stay the team's");
   });
@@ -440,8 +444,12 @@ describe("a Figma drift at the morning run", () => {
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
 
-    assert.match(m.posted[0]!.text, /^\*Is the code still current\?\* This thread settled .+ and <[^>]+\|Button\.jsx> may not show it yet\.\n<@U0ADE>, update the code, or reply `skip` if the decision didn't touch it\./);
-    assert.match(m.posted[0]!.text, /:white_check_mark: files an intake for the update\./);
+    assert.match(m.posted[0]!.text, /^This thread settled a decision that the code has not caught up with\.\n/);
+    const [card] = cardsOf(m.posted[0]!.blocks);
+    assert.equal(card!.subtitle!.text, "<@U0ADE>");
+    assert.match(card!.body!.text, / · the code may not show it yet\.$/);
+    assert.deepEqual(labels(card!), ["Review", "Open on GitHub"]);
+    assert.doesNotMatch(m.posted[0]!.text, GATE_WORDS);
     assert.equal(m.figma.calls().length, 0, "code is not Figma's to look at");
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
     const op = proposal!.operations![0]!;
@@ -525,7 +533,7 @@ describe("the Product Pillar on a Roadmap intake", () => {
     const m = morning(h, drifts, { options });
     await runDriftAsks(MORNING, m.deps);
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
-    return { input: proposal!.operations![0]!.input as Record<string, unknown>, text: m.posted[0]!.text };
+    return { input: proposal!.operations![0]!.input as Record<string, unknown>, text: proposal!.proposalText, posted: m.posted[0]!.text };
   }
 
   it("is a linked card's pillar when the Roadmap offers it", async () => {
@@ -534,7 +542,7 @@ describe("the Product Pillar on a Roadmap intake", () => {
     assert.doesNotMatch(text, /Product Pillar:/);
   });
 
-  it("is left out, and noted on the card, when the value is not an option", async () => {
+  it("is left out, and noted where Review shows the intake, when the value is not an option", async () => {
     const { input, text } = await askedWith(["Made Up"], ["Tutor Experience", "Universal"]);
     assert.equal(input.properties, undefined, "an unknown value is never invented");
     assert.match(text, /Product Pillar: “Made Up” is not an option on the Roadmap, so left unset/);
@@ -549,80 +557,6 @@ describe("the Product Pillar on a Roadmap intake", () => {
   it("takes the Roadmap's own spelling of a matching value", () => {
     assert.deepEqual(matchPillar(["tutor experience"], ["Tutor Experience"]), { pillar: "Tutor Experience", note: null });
     assert.deepEqual(matchPillar([], ["Universal"]), { pillar: null, note: null });
-  });
-});
-
-describe("a yes in an asked thread", () => {
-  async function askedCard() {
-    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
-    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
-    const { h, drifts } = night({
-      threads: [one, two],
-      sources: [FIGMA_A, FIGMA_B],
-      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
-    });
-    await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13);
-    const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    h.clock.now = at(30, 15);
-    return { h, drifts, m, one, two, card: card!, deps: answerDeps(h, drifts, m.posted) };
-  }
-
-  it("closes the question and withdraws the drafted card at once, not after 72 h", async () => {
-    const { h, drifts, one, two, card, m, deps } = await askedCard();
-    const handled = await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "yes, it's up to date" }, deps);
-
-    assert.equal(handled, true);
-    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "retired: no ✅ can file it");
-    assert.equal(m.posted[0]!.withdrawn, "~Is the Figma file still current?~ Yes, confirmed by <@U0ADE>. Nothing to do.");
-    const events = await h.proposalEvents.eventsOf(card.proposalTs);
-    assert.deepEqual(events.map((e) => [e.event, e.via, e.actorId]), [
-      ["staged", "worker", null],
-      ["cancelled", "typed", "U0ADE"],
-    ]);
-    assert.deepEqual(deps.notes, [], "answered in the card's own thread: nothing more is posted");
-    assert.deepEqual(
-      (await drifts.liveAsks()).map((a) => [a.threadTs, a.role]),
-      [[two.root.ts, "question"]],
-      "the card's record goes, so no later look at the file edits over the answer",
-    );
-  });
-
-  it("withdraws the card from the other asked thread too, and says so there", async () => {
-    const { h, two, card, deps } = await askedCard();
-    const handled = await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0CY", text: "Yep" }, deps);
-    assert.equal(handled, true);
-    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-    assert.deepEqual(deps.notes, [`${DESIGN}:${two.root.ts} Thanks, I've withdrawn the drafted intake in the other thread.`]);
-  });
-
-  it("leaves the card alone for someone who may not decide it, a question, or a no", async () => {
-    const { h, one, card, deps } = await askedCard();
-    for (const [user, text] of [
-      ["U0STRANGER", "yes"],
-      ["U0ADE", "is it up to date?"],
-      ["U0ADE", "no, not yet"],
-    ] as const) {
-      assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user, text }, deps), false, `${user}: ${text}`);
-    }
-    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-  });
-
-  it("lets a standing confirmer withdraw the card they were not asked on", async () => {
-    const { h, one, card, deps } = await askedCard();
-    const handled = await answerDriftAsk(
-      { channel: DESIGN, threadTs: one.root.ts, user: "U0LEAD", text: "yes" },
-      { ...deps, standingConfirmers: ["U0LEAD"] },
-    );
-    assert.equal(handled, true);
-    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-  });
-
-  it("answers nothing in a thread that was never asked", async () => {
-    const { deps } = await askedCard();
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: ts(29, 9), user: "U0ADE", text: "yes" }, deps), false);
   });
 });
 
@@ -652,20 +586,48 @@ describe("two files discussed in one thread", () => {
     return { h, drifts, m, t };
   }
 
-  it("make one card with one operation per file, and one ask naming both", async () => {
+  it("make one report: a carousel of two cards, each its own proposal with its own Review", async () => {
     const { h, m, t } = await twoFiles();
-    assert.equal(m.posted.length, 1, "one ask for the thread");
-    assert.equal(m.posted[0]!.threadTs, t.root.ts);
-    assert.match(
-      m.posted[0]!.text,
-      /^\*Are these files still current\?\* This thread settled a decision about each of these files:\n1\. <[^>]+\|Session Recap>: settled "[^"]+" on Sep 29, and it hasn't changed since Sep 20\.\n2\. <[^>]+\|Button\.jsx>: settled "[^"]+" on Sep 29, and it may not show it yet\.\n<@U0ADE>, update them, or reply `skip` if the decisions didn't touch them\./,
+    assert.equal(m.posted.length, 1, "one report for the thread");
+    const [report] = m.posted;
+    assert.equal(report!.threadTs, t.root.ts);
+    assert.equal(messageBlocksRefusal(report!.blocks!), null);
+    assert.equal(report!.text.split("\n")[0], "This thread settled two decisions that their files have not caught up with.");
+    assert.equal((report!.blocks![1] as { type: string }).type, "carousel");
+    const cards = cardsOf(report!.blocks);
+    assert.deepEqual(cards.map((c) => c.title!.text), ["Session Recap", "Button.jsx"]);
+    assert.deepEqual(cards.map((c) => c.actions![0]!.action_id), ["uno_decision_review:1", "uno_decision_review:2"], "each Review opens its own card");
+    assert.doesNotMatch(report!.text + JSON.stringify(report!.blocks), GATE_WORDS, "no `drop 2`, no footer");
+
+    const staged = (await h.threadState.getProposalsByChannel(DESIGN)).sort((a, b) => a.proposalTs.localeCompare(b.proposalTs));
+    assert.deepEqual(
+      staged.map((p) => [p.proposalTs, p.operations!.map((op) => op.toolName)]),
+      [
+        [itemProposalKey(report!.ts, "1"), ["notion_create"]],
+        [itemProposalKey(report!.ts, "2"), ["github_issue_create"]],
+      ],
+      "one intake per card, so deciding one leaves the other",
     );
-    assert.match(m.posted[0]!.text, /:white_check_mark: files both intakes; reply `drop 2` to leave one out\. :no_entry: files nothing\./);
-    const cards = await h.threadState.getProposalsByChannel(DESIGN);
-    assert.equal(cards.length, 1, "one card, so neither retires the other");
-    assert.deepEqual(cards[0]!.operations!.map((op) => op.toolName), ["notion_create", "github_issue_create"]);
-    assert.deepEqual(cards[0]!.operations!.map(fileKeyOfOperation), [`figma:${FILE_KEY}`, fileKeyOf(CODE.url, CODE.kind)]);
-    assert.deepEqual(cards[0]!.confirmers, ["U0ADE", "U0STARTER"]);
+    for (const p of staged) assert.deepEqual(p.confirmers, ["U0ADE", "U0STARTER"]);
+  });
+
+  it("are decided one at a time in Review, and a typed ✅ in the thread decides neither", async () => {
+    const { h, m, t } = await twoFiles();
+    const [report] = m.posted;
+    const typed = await resolveSignal({ kind: "typed", channel: DESIGN, thread: t.root.ts, text: "✅", userId: "U0ADE" }, { threadState: h.threadState });
+    assert.equal(typed.outcome, "none");
+    assert.equal(renderGateNote(typed.post!.note), "Each card here is decided from its own Review button, so nothing ran.");
+
+    const key = itemProposalKey(report!.ts, "2");
+    const approved = await resolveSignal({ kind: "review", messageTs: key, decision: "confirm", userId: "U0ADE" }, { threadState: h.threadState });
+    assert.equal(approved.outcome, "won");
+    assert.deepEqual(approved.execute?.operations.map((op) => op.toolName), ["github_issue_create"], "Approve files that card's intake alone");
+    const message = await settleItem(h.threadState, { messageTs: report!.ts, id: "2" }, { kind: "approved", by: "U0ADE", at: h.clock.now }, h.clock.now);
+    const cards = cardsOf(message!.blocks);
+    assert.match(cards[1]!.subtitle!.text, /^Approved by <@U0ADE> · written /);
+    assert.equal(cards[1]!.body!.text, "Written: an intake to update Button.jsx");
+    assert.deepEqual(labels(cards[0]!), ["Review", "Open in Figma"], "the other card is still open");
+    assert.equal((await h.threadState.getProposalByTs(itemProposalKey(report!.ts, "1"))).state, "found");
   });
 
   it("wait while the thread's card is live, rather than stage a second card over it", async () => {
@@ -679,25 +641,10 @@ describe("two files discussed in one thread", () => {
     h.clock.now = at(31, 13);
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1, "nothing new in a thread whose card is live");
-    assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 1);
+    assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 2);
     assert.equal((await drifts.pending()).length, 1, "the new file waits in the queue");
   });
-
-  it("stays on a yes from a thread that discussed only one of its files, and says which to drop", async () => {
-    const { h, drifts, m } = await twoFiles();
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    // A second thread asked about the code file alone.
-    const second = ts(29, 19);
-    await drifts.saveAsked(DESIGN, second, {
-      [fileKeyOf(CODE.url, CODE.kind)]: { cardChannel: DESIGN, cardThread: card!.replyTs!, people: ["U0CY"], kind: CODE.kind, askedAt: at(30, 13) },
-    });
-    const deps = answerDeps(h, drifts, m.posted);
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: second, user: "U0CY", text: "yes" }, deps), true);
-    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "the card stays");
-    assert.match(deps.notes[0]!, /Reply `drop 2` under it/);
-  });
 });
-
 describe("what a GitHub issue carries from a private place", () => {
   it("files neither the thread's words nor a link from a private channel", async () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [CODE.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
@@ -730,184 +677,6 @@ describe("what a GitHub issue carries from a private place", () => {
   });
 });
 
-describe("a yes that cannot be read", () => {
-  it("answers false, without throwing, when the ask record cannot be read", async () => {
-    const deps: DriftAnswerDeps = {
-      asked: async () => {
-        throw new Error("KV down");
-      },
-      liveCard: async () => null,
-      hasTurnCard: async () => false,
-      retire: async () => true,
-      edit: async () => {},
-      post: async () => {},
-      recordWithdrawn: async () => {},
-      liveAsksIn: async () => [],
-      saveLiveAsk: async () => {},
-      dropLiveAsk: async () => {},
-    };
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: "1.0", user: "U0ADE", text: "yes" }, deps), false);
-  });
-
-  it("still records the withdrawal when the edit fails after the card was retired", async () => {
-    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
-    const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
-    await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13);
-    const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    h.clock.now = at(30, 15);
-    const deps = answerDeps(h, drifts, m.posted);
-    deps.edit = async () => {
-      throw new Error("chat.update 500");
-    };
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "yes" }, deps), true);
-    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
-    const events = await h.proposalEvents.eventsOf(card!.proposalTs);
-    assert.deepEqual(events.map((e) => e.event), ["staged", "cancelled"]);
-  });
-
-  it("leaves a bare yes to a live turn card in the same thread, but takes an explicit one", async () => {
-    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
-    const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
-    await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13);
-    const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    // Someone asked uno-bot for something in the thread: a turn's card.
-    await h.threadState.putProposal({
-      ...card!,
-      proposalTs: ts(30, 15),
-      supersedeKey: undefined,
-      confirmers: undefined,
-      operations: [{ toolName: "github_issue_create", input: { title: "x", body: "y" } }],
-    });
-    const deps = answerDeps(h, drifts, m.posted);
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "yes" }, deps), false);
-    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "the Figma is up to date" }, deps), true);
-    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
-  });
-});
-
-describe("the ask's words (#886 § 3.3)", () => {
-  const RECAP = { title: "Recap <!channel>", url: "https://www.figma.com/design/K/x?node-id=1-2", kind: "figma" as const };
-  const BUTTON = { title: "Button.jsx", url: "https://github.com/o/r/blob/main/b.jsx", kind: "design-system-code" as const };
-  const STORY = { title: "Button", url: "https://plus-uno.netlify.app/storybook/?path=/docs/button", kind: "storybook" as const };
-  const decided = at(24, 16);
-  const item = (file: typeof RECAP | typeof BUTTON | typeof STORY, change: Parameters<typeof askLead>[0]["items"][number]["change"]) => ({
-    file,
-    threadSays: "Tooltips on option chips.",
-    decidedAt: decided,
-    change,
-  });
-
-  it("names the file by its title, linked and escaped, and says it hasn't changed since", () => {
-    assert.equal(
-      askLead({ mentions: ["U0BEA"], items: [item(RECAP, { kind: "unchanged", at: at(20, 15) })] }),
-      [
-        "*Is the Figma file still current?* This thread settled \"Tooltips on option chips\" on Sep 24, and <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;> hasn't changed since Sep 20.",
-        "<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma.",
-      ].join("\n"),
-    );
-  });
-
-  it("says when a file changed after the decision it couldn't confirm, and that an unread one may not show it", () => {
-    const changed = askLead({ mentions: ["U0BEA"], items: [item(RECAP, { kind: "changed", at: at(26, 18) })] });
-    assert.match(changed, /\|Recap &lt;!channel&gt;> last changed Sep 26\.\n/);
-    const unread = askLead({ mentions: ["U0BEA"], items: [item(RECAP, { kind: "unknown" })] });
-    assert.match(unread, /\|Recap &lt;!channel&gt;> may not show it yet\.\n/);
-  });
-
-  it("asks about code and Storybook in their own words", () => {
-    assert.equal(
-      askLead({ mentions: ["U0ADE"], items: [item(BUTTON, { kind: "unknown" })] }),
-      [
-        "*Is the code still current?* This thread settled \"Tooltips on option chips\" on Sep 24, and <https://github.com/o/r/blob/main/b.jsx|Button.jsx> may not show it yet.",
-        "<@U0ADE>, update the code, or reply `skip` if the decision didn't touch it.",
-      ].join("\n"),
-    );
-    assert.match(askLead({ mentions: ["U0ADE"], items: [item(STORY, { kind: "unknown" })] }), /^\*Is Storybook still current\?\*[^\n]+\n<@U0ADE>, update Storybook, or reply `skip` if the decision didn't touch it\.$/);
-  });
-
-  it("numbers a card's own files, so `drop 2` names one, and points at an intake drafted elsewhere", () => {
-    const text = askLead({
-      mentions: ["U0BEA", "U0ADE"],
-      items: [
-        item(RECAP, { kind: "unchanged", at: at(20, 15) }),
-        item(BUTTON, { kind: "unknown" }),
-        { ...item(STORY, { kind: "unknown" }), elsewhere: { cardLink: "https://plus.slack.com/archives/C0DESIGN/p1" } },
-      ],
-    });
-    assert.equal(
-      text,
-      [
-        "*Are these files still current?* This thread settled a decision about each of these files:",
-        "1. <https://www.figma.com/design/K/x?node-id=1-2|Recap &lt;!channel&gt;>: settled \"Tooltips on option chips\" on Sep 24, and it hasn't changed since Sep 20.",
-        "2. <https://github.com/o/r/blob/main/b.jsx|Button.jsx>: settled \"Tooltips on option chips\" on Sep 24, and it may not show it yet.",
-        "• <https://plus-uno.netlify.app/storybook/?path=/docs/button|Button>: settled \"Tooltips on option chips\" on Sep 24, and it may not show it yet. Its intake is drafted <https://plus.slack.com/archives/C0DESIGN/p1|in another thread>.",
-        "<@U0BEA> <@U0ADE>, update them, or reply `skip` if the decisions didn't touch them.",
-      ].join("\n"),
-    );
-  });
-
-  it("asks the question alone with the card's link, or without one it could not read", () => {
-    const alone = askLead({ mentions: ["U0BEA"], items: [{ ...item(RECAP, { kind: "unknown" }), elsewhere: { cardLink: null } }] });
-    assert.match(alone, /\n<@U0BEA>, update the frame, or reply `skip` if the decision didn't touch Figma\. Its intake is drafted in another thread\.$/);
-  });
-
-  it("escapes the thread's words, and dates each by its ET day", () => {
-    const text = askLead({
-      mentions: [],
-      // 02:00 UTC on Sep 25 is still Sep 24 in ET.
-      items: [{ ...item(RECAP, { kind: "unknown" }), threadSays: "Ping <!here> about it.", decidedAt: at(25, 2) }],
-    });
-    assert.match(text, /settled "Ping &lt;!here&gt; about it" on Sep 24,/);
-    assert.match(text, /\nUpdate the frame, or reply `skip`/, "with no owner, the ask still names the action");
-  });
-});
-
-describe("an answer in an asked thread", () => {
-  it("reads a bare affirmative, an explicit 'the file is current', or the ask's `skip`", () => {
-    const bare = ["yes", "Yes!", "yep", "yes it is", "yes, up to date", "it's up to date", "It’s up to date.", "already updated", "already updated :white_check_mark:", "<@U0BOT> yes"];
-    for (const text of bare) assert.equal(driftAnswer(text), "bare", text);
-    for (const text of ["the Figma is up to date", "Figma's updated", "yep, the file is current", "code is up to date now"]) {
-      assert.equal(driftAnswer(text), "explicit", text);
-    }
-    for (const text of ["skip", "Skip.", "`skip`", "<@U0BOT> skip"]) assert.equal(driftAnswer(text), "skip", text);
-  });
-
-  it("reads an approval, a plan or a question as the thread's own conversation", () => {
-    const not = [
-      "yes please file it",
-      "yes, go ahead",
-      "yeah we should update the figma",
-      "correct, ship it Friday",
-      "all good, merging now",
-      "yes let's do option B",
-      "yes, file the Roadmap card",
-      "please update it",
-      "no",
-      "not yet",
-      "isn't up to date",
-      "is it up to date?",
-      "lunch?",
-      "I'll update it tomorrow",
-      "correct",
-      "yes but the spacing still needs work",
-      "skip it?",
-      "let's skip the standup",
-    ];
-    for (const text of not) assert.equal(driftAnswer(text), null, text);
-    assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", user: "U0ADE", text: "yes" }), true);
-    assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", user: "U0ADE", text: "skip" }), true);
-    assert.equal(isDriftAnswerCandidate({ user: "U0ADE", text: "yes" }), false, "a top-level message answers nothing");
-    assert.equal(isDriftAnswerCandidate({ thread_ts: "1.0", bot_id: "B1", user: "U0BOT", text: "yes" }), false);
-  });
-});
-
 // ── #897: the file, looked at before the ask and while it is live ────────────
 
 /** The recap thread, swept, with the morning ready to run against `file`. */
@@ -933,28 +702,29 @@ function recheck(
   drifts: InMemoryDriftStore,
   figma: InMemoryFigma,
   opts: { judge?: string[] | DriftRecheckDeps["judge"]; dryRun?: boolean } = {},
-): { deps: DriftRecheckDeps; edits: Array<{ channel: string; ts: string; text: string }>; provider: FakeProvider } {
-  const edits: Array<{ channel: string; ts: string; text: string }> = [];
+): { deps: DriftRecheckDeps; edits: Array<{ channel: string; ts: string; text: string; blocks: unknown[] }>; provider: FakeProvider } {
+  const edits: Array<{ channel: string; ts: string; text: string; blocks: unknown[] }> = [];
   const provider = fakeProvider({ generateReplies: Array.isArray(opts.judge) ? opts.judge : [] });
   const deps: DriftRecheckDeps = {
     store: drifts,
     figma,
     judge: typeof opts.judge === "function" ? opts.judge : modelFrameJudge(provider),
-    async liveCard(channel, thread) {
-      const cards = await h.threadState.getProposalsByChannel(channel);
-      return cards.find((p) => p.supersedeKey === DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
-    },
     async retire(ts) {
       return (await h.threadState.retireProposal(ts)).retired;
     },
-    async edit(channel, ts, text) {
-      edits.push({ channel, ts, text });
+    async edit(channel, ts, message) {
+      edits.push({ channel, ts, text: message.text, blocks: message.blocks });
     },
-    async recordWithdrawn(proposal) {
-      await recordProposalEvents(h.proposalEvents, [proposalEvent(proposal.proposalTs, "cancelled", h.clock.now, "worker")]);
+    reports: h.threadState,
+    async recordWithdrawn(proposalTs) {
+      await recordProposalEvents(h.proposalEvents, [proposalEvent(proposalTs, "cancelled", h.clock.now, "worker")]);
     },
     async cardFiled(proposalTs) {
       return (await h.proposalEvents.eventsOf(proposalTs)).some((e) => e.event === "confirmed");
+    },
+    async legacyCard(channel, thread) {
+      const cards = await h.threadState.getProposalsByChannel(channel);
+      return cards.find((p) => p.supersedeKey === LEGACY_DRIFT_KEY && proposalReplyThread(p) === thread) ?? null;
     },
     now: () => h.clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
@@ -989,7 +759,9 @@ describe("the drift check, before the ask (#897)", () => {
     const { h, drifts, m } = await recapMorning({ changedAt: CHANGED_AFTER, judge: [NOT_SHOWN] });
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1);
-    assert.match(m.posted[0]!.text, /\|Session Recap> last changed Sep 29\.\n<@U0BEA>, update the frame/);
+    const [card] = cardsOf(m.posted[0]!.blocks);
+    assert.equal(card!.subtitle!.text, "<@U0BEA> · last changed Sep 29");
+    assert.match(card!.body!.text, / · the file changed Sep 29, unconfirmed\.$/);
     const [live] = await drifts.liveAsks();
     assert.equal(live!.files[0]!.checkedThrough, Date.parse(CHANGED_AFTER), "the version judged is not judged again");
     assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 1);
@@ -1024,7 +796,7 @@ describe("the drift check, before the ask (#897)", () => {
     const m = morning(h, drifts, { changedAt: CHANGED_AFTER, judge: [SHOWS] });
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1);
-    assert.match(m.posted[0]!.text, /last changed Sep 29\./);
+    assert.match(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, /last changed Sep 29$/);
     assert.equal(m.provider.generated.length, 0);
     assert.deepEqual(m.figma.calls().map((c) => c.method), ["versions"]);
   });
@@ -1077,37 +849,41 @@ describe("the drift check, before the ask (#897)", () => {
   });
 });
 
-describe("the drift check, while the question is live (#897)", () => {
-  it("edits the live card in place, retires it, and posts nothing, once the frame shows the decision", async () => {
+describe("the drift check, while the report is live (#897)", () => {
+  it("redraws the file's card in place, retires it, and posts nothing, once the frame shows the decision", async () => {
     const { h, drifts, m, t } = await recapMorning();
     await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    const [report] = m.posted;
+    const key = itemProposalKey(report!.ts, "1");
     const [live] = await drifts.liveAsks();
     assert.deepEqual(
-      { role: live!.role, ts: live!.ts, threadTs: live!.threadTs, headline: live!.headline },
-      { role: "card", ts: card!.proposalTs, threadTs: t.root.ts, headline: "Is the Figma file still current?" },
+      { role: live!.role, ts: live!.ts, threadTs: live!.threadTs, itemId: live!.files[0]!.itemId },
+      { role: "card", ts: report!.ts, threadTs: t.root.ts, itemId: "1" },
     );
 
     // The designer updates the frame on Sep 30; the end-of-day run looks again.
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
-    const report = await recheckLiveAsks(RECHECK, r.deps);
+    const result = await recheckLiveAsks(RECHECK, r.deps);
 
-    assert.deepEqual(r.edits, [{ channel: DESIGN, ts: card!.proposalTs, text: "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do." }]);
+    assert.deepEqual(r.edits.map((e) => [e.channel, e.ts]), [[DESIGN, report!.ts]], "the report itself, edited");
+    const [card] = cardsOf(r.edits[0]!.blocks);
+    assert.equal(card!.subtitle!.text, "Updated Sep 30. Nothing to do.");
+    assert.deepEqual(labels(card!), ["Open in Figma"], "no Review: nothing left to decide");
     assert.equal(m.posted.length, 1, "edited, not replied to");
-    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "retired: no ✅ can file it");
-    const events = await h.proposalEvents.eventsOf(card!.proposalTs);
+    assert.notEqual((await h.threadState.getProposalByTs(key)).state, "found", "retired: no Approve can file it");
+    const events = await h.proposalEvents.eventsOf(key);
     assert.deepEqual(events.map((e) => [e.event, e.via, e.actorId]), [
       ["staged", "worker", null],
       ["cancelled", "worker", null],
     ]);
     assert.deepEqual(await drifts.liveAsks(), []);
-    assert.equal(report.withdrawn.length, 1);
-    assert.match(report.summary, /^looked at 1 decision\(s\), withdrew 1 question\(s\)$/);
+    assert.equal(result.withdrawn.length, 1);
+    assert.match(result.summary, /^looked at 1 decision\(s\), withdrew 1 question\(s\)$/);
   });
 
-  it("edits the question in the other thread too", async () => {
+  it("edits the pointer in the other thread too", async () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
     const { h, drifts } = night({
@@ -1125,14 +901,13 @@ describe("the drift check, while the question is live (#897)", () => {
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: async () => "shows" });
     await recheckLiveAsks(RECHECK, r.deps);
-    assert.deepEqual(
-      r.edits.map((e) => [e.ts, e.text]),
-      m.posted.map((p) => [p.ts, "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."]),
-    );
+    assert.deepEqual(r.edits.map((e) => e.ts), m.posted.map((p) => p.ts));
+    assert.equal(cardsOf(r.edits[0]!.blocks)[0]!.subtitle!.text, "Updated Sep 30. Nothing to do.");
+    assert.equal(r.edits[1]!.text, "The file now shows this thread's decision, updated Sep 30. Nothing to do.");
     assert.equal(m.posted.length, 2, "nothing posted");
   });
 
-  it("leaves a question whose frame doesn't show it, judges each change once, and withdraws it when one does", async () => {
+  it("leaves a card whose frame doesn't show it, judges each change once, and withdraws it when one does", async () => {
     const { h, drifts, m } = await recapMorning();
     await runDriftAsks(MORNING, m.deps);
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z" });
@@ -1152,10 +927,10 @@ describe("the drift check, while the question is live (#897)", () => {
     h.clock.now = at(32, 4);
     const third = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     await recheckLiveAsks(RECHECK, third.deps);
-    assert.deepEqual(third.edits.map((e) => e.text), ["~Is the Figma file still current?~ Yes, updated Oct 1. Nothing to do."]);
+    assert.deepEqual(third.edits.map((e) => cardsOf(e.blocks)[0]!.subtitle!.text), ["Updated Oct 1. Nothing to do."]);
   });
 
-  it("waits until every file a question names shows its decision", async () => {
+  it("withdraws each file's card as its own file catches up", async () => {
     const other = figmaFile("9-9", { url: "https://www.figma.com/design/ZzOther9/Onboarding?node-id=9-9", title: "Onboarding" });
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url, other.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({
@@ -1171,14 +946,15 @@ describe("the drift check, while the question is live (#897)", () => {
       nodes: { "9:9": frame(["Onboarding"]) },
     });
     await runDriftAsks(MORNING, m.deps);
-    assert.match(m.posted[0]!.text, /^\*Are these files still current\?\*/);
+    assert.equal(m.posted[0]!.text.split("\n")[0], "This thread settled two decisions that their Figma files have not caught up with.");
 
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const first = recheck(h, drifts, m.figma, { judge: async () => "shows" });
-    const report = await recheckLiveAsks(RECHECK, first.deps);
-    assert.deepEqual(first.edits, [], "one file of two is not the question answered");
-    assert.match(report.summary, /1 question\(s\) wait for their other files/);
+    await recheckLiveAsks(RECHECK, first.deps);
+    const after = cardsOf(first.edits[0]!.blocks);
+    assert.deepEqual(after.map((c) => c.subtitle!.text), ["Updated Sep 30. Nothing to do.", "<@U0ADE> · last changed Sep 20"]);
+    assert.deepEqual(labels(after[1]!), ["Review", "Open in Figma"], "the other file's card stays to decide");
 
     m.figma.seedFile("ZzOther9", {
       versions: { versions: [{ id: "2", label: null, description: null, created_at: "2026-10-01T15:00:00Z", user: { handle: "bea.designs" } }] },
@@ -1186,10 +962,11 @@ describe("the drift check, while the question is live (#897)", () => {
     h.clock.now = at(32, 4);
     const second = recheck(h, drifts, m.figma, { judge: async () => "shows" });
     await recheckLiveAsks(RECHECK, second.deps);
-    assert.deepEqual(second.edits.map((e) => e.text), ["~Are these files still current?~ Yes, updated Oct 1. Nothing to do."]);
+    assert.deepEqual(cardsOf(second.edits[0]!.blocks).map((c) => c.subtitle!.text), ["Updated Sep 30. Nothing to do.", "Updated Oct 1. Nothing to do."]);
+    assert.deepEqual(await drifts.liveAsks(), []);
   });
 
-  it("leaves a question that names code, which it can't look at", async () => {
+  it("withdraws a Figma file's card and leaves the code's, which it can't look at", async () => {
     const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url, CODE.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({
       threads: [t],
@@ -1203,43 +980,44 @@ describe("the drift check, while the question is live (#897)", () => {
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: async () => "shows" });
-    const report = await recheckLiveAsks(RECHECK, r.deps);
-    assert.deepEqual(r.edits, []);
-    assert.equal(report.checked, 0);
+    const result = await recheckLiveAsks(RECHECK, r.deps);
+    assert.equal(result.checked, 1, "the Figma file alone is looked at");
+    const cards = cardsOf(r.edits[0]!.blocks);
+    assert.equal(cards[0]!.subtitle!.text, "Updated Sep 30. Nothing to do.");
+    assert.deepEqual(labels(cards[1]!), ["Review", "Open on GitHub"]);
+    assert.deepEqual((await drifts.liveAsks())[0]!.files.map((f) => f.kind), ["design-system-code"]);
   });
 
   it("leaves a card someone already decided", async () => {
     const { h, drifts, m } = await recapMorning();
     await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    await h.threadState.retireProposal(card!.proposalTs);
+    await h.threadState.retireProposal(itemProposalKey(m.posted[0]!.ts, "1"));
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
-    const report = await recheckLiveAsks(RECHECK, r.deps);
+    const result = await recheckLiveAsks(RECHECK, r.deps);
     assert.deepEqual(r.edits, [], "the card already says what happened");
     assert.deepEqual(await drifts.liveAsks(), []);
-    assert.match(report.note ?? "", /its card is no longer live/);
+    assert.match(result.note ?? "", /its card is no longer live/);
   });
 
   it("looks and judges on a dry run, and edits, retires and writes nothing", async () => {
     const { h, drifts, m } = await recapMorning();
     await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
+    const key = itemProposalKey(m.posted[0]!.ts, "1");
     const before = await drifts.liveAsks();
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS], dryRun: true });
-    const report = await recheckLiveAsks(RECHECK, r.deps);
+    const result = await recheckLiveAsks(RECHECK, r.deps);
     assert.equal(r.provider.generated.length, 1);
-    assert.deepEqual(report.withdrawn.map((w) => w.text), ["~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."]);
-    assert.match(report.summary, /would withdraw 1 question/);
+    assert.deepEqual(result.withdrawn.map((w) => w.text), ["Updated Sep 30. Nothing to do."]);
+    assert.match(result.summary, /would withdraw 1 question/);
     assert.deepEqual(r.edits, []);
-    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
+    assert.equal((await h.threadState.getProposalByTs(key)).state, "found");
     assert.deepEqual(await drifts.liveAsks(), before);
   });
 });
-
 describe("no re-ping (#897)", () => {
   it("after 72 h with no answer, later mornings ask nothing and the file catching up edits nothing", async () => {
     const { h, drifts, m, t } = await recapMorning();
@@ -1269,26 +1047,6 @@ describe("no re-ping (#897)", () => {
     assert.equal(report.checked, 0);
     assert.equal(m.posted.length, 1);
     assert.deepEqual(await drifts.liveAsks(), []);
-  });
-});
-
-describe("a skip in an asked thread", () => {
-  it("withdraws the card in its own words, and a later look at the file edits nothing", async () => {
-    const { h, drifts, m, t } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    h.clock.now = at(30, 15);
-    const deps = answerDeps(h, drifts, m.posted);
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: t.root.ts, user: "U0BEA", text: "skip" }, deps), true);
-    assert.equal(m.posted[0]!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0BEA>. Nothing to do.");
-    assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
-    assert.deepEqual(await drifts.liveAsks(), []);
-
-    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
-    h.clock.now = at(31, 4);
-    const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
-    await recheckLiveAsks(RECHECK, r.deps);
-    assert.deepEqual(r.edits, []);
   });
 });
 
@@ -1373,7 +1131,6 @@ describe("the drift check's limits (#897 review)", () => {
       ts: ts(30, 13, 0, 1),
       threadTs: ts(29, 15),
       role: "question",
-      headline: "Are these files still current?",
       askedAt: at(30, 13),
       files: keys.map((key) => ({
         fileKey: `figma:${key}`,
@@ -1389,128 +1146,7 @@ describe("the drift check's limits (#897 review)", () => {
     const r = recheck(h, drifts, figma, { judge: async () => "shows" });
     const report = await recheckLiveAsks(RECHECK, r.deps);
     assert.equal(report.checked, keys.length);
-    assert.deepEqual(r.edits.map((e) => e.text), ["~Are these files still current?~ Yes, updated Sep 30. Nothing to do."]);
-  });
-});
-
-describe("a skip under the question alone (#897 review)", () => {
-  /** Two threads about one file: the card in the first, the question alone in the second. */
-  async function twoThreads() {
-    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
-    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
-    const { h, drifts } = night({
-      threads: [one, two],
-      sources: [FIGMA_A, FIGMA_B],
-      replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)])), reply(fileDrift(FIGMA_B, [ts(29, 18)]))],
-    });
-    await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13);
-    const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    h.clock.now = at(30, 15);
-    return { h, drifts, m, one, two, card: card!, deps: answerDeps(h, drifts, m.posted) };
-  }
-
-  it("strikes through its own question and leaves the card the other thread's decision drafted", async () => {
-    const { h, drifts, m, one, two, card, deps } = await twoThreads();
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0CY", text: "skip" }, deps), true);
-
-    const question = m.posted.find((p) => p.threadTs === two.root.ts)!;
-    assert.equal(question.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0CY>. Nothing to do.");
-    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "the first thread's card stays");
-    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, undefined);
-    assert.deepEqual(deps.notes, [], "nothing posted");
-    assert.deepEqual(
-      (await drifts.liveAsks()).map((a) => [a.threadTs, a.role]),
-      [[one.root.ts, "card"]],
-      "the card is still looked at; the skipped question is not",
-    );
-  });
-
-  it("leaves both alone for someone who didn't post in that thread", async () => {
-    const { h, m, two, card, deps } = await twoThreads();
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0STRANGER", text: "skip" }, deps), false);
-    assert.equal(m.posted.find((p) => p.threadTs === two.root.ts)!.withdrawn, undefined);
-    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-  });
-
-  it("lets a standing confirmer skip the question alone too", async () => {
-    const { m, two, deps } = await twoThreads();
-    const handled = await answerDriftAsk(
-      { channel: DESIGN, threadTs: two.root.ts, user: "U0LEAD", text: "skip" },
-      { ...deps, standingConfirmers: ["U0LEAD"] },
-    );
-    assert.equal(handled, true);
-    assert.equal(m.posted.find((p) => p.threadTs === two.root.ts)!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0LEAD>. Nothing to do.");
-  });
-});
-
-describe("a skip under a card another thread's decision also drafted (#897 review)", () => {
-  /** Thread one holds the card; thread two's question points at it. */
-  async function shared(oneUrls: string[] = [FIGMA_A.url], extra: SweepSource[] = []) {
-    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: oneUrls }, [{ user: "U0ADE", when: ts(29, 16) }]);
-    const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
-    const { h, drifts } = night({
-      threads: [one, two],
-      sources: [FIGMA_A, FIGMA_B, ...extra],
-      replies: [
-        reply(fileDrift(FIGMA_A, [ts(29, 16)]), ...extra.map((x) => fileDrift(x, [ts(29, 16)]))),
-        reply(fileDrift(FIGMA_B, [ts(29, 18)])),
-      ],
-    });
-    await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13);
-    const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    h.clock.now = at(30, 15);
-    return { h, drifts, m, one, two, card: card!, deps: answerDeps(h, drifts, m.posted) };
-  }
-
-  it("keeps the card for the other thread's decision, and withdraws it once that thread skips too", async () => {
-    const { h, m, one, two, card, deps } = await shared();
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "skip" }, deps), true);
-    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found", "thread two's decision still files");
-    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, undefined);
-    assert.deepEqual(deps.notes, [`${DESIGN}:${one.root.ts} ${skippedSharedText([])}`]);
-
-    // Thread two's skip leaves no decision on the card.
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: two.root.ts, user: "U0CY", text: "skip" }, deps), true);
-    assert.equal(m.posted.find((p) => p.threadTs === two.root.ts)!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0CY>. Nothing to do.");
-    assert.notEqual((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-    assert.equal(m.posted.find((p) => p.threadTs === one.root.ts)!.withdrawn, "~Is the Figma file still current?~ Skipped by <@U0CY>. Nothing to do.");
-  });
-
-  it("names the `drop N` for a file only the skipping thread decided", async () => {
-    const { h, card, one, deps } = await shared([FIGMA_A.url, CODE.url], [CODE]);
-    assert.deepEqual(card.operations!.map(fileKeyOfOperation), [`figma:${FILE_KEY}`, fileKeyOf(CODE.url, CODE.kind)]);
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "skip" }, deps), true);
-    assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
-    assert.deepEqual(deps.notes, [`${DESIGN}:${one.root.ts} ${skippedSharedText([2])}`]);
-    assert.match(deps.notes[0]!, /Reply `drop 2` under it/);
-  });
-
-  it("keeps the card for a thread asked on a later morning, pointing at it", async () => {
-    const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
-    const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
-    await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13);
-    const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
-    const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    // The next night, another thread settles something on the same file.
-    const two = thread({ user: "U0BEA", when: ts(30, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(30, 18) }]);
-    await drifts.add([{ ...(await pendingOf(h, drifts, two, FIGMA_B))!, detectedAt: at(30, 22) }]);
-    h.clock.now = at(31, 13);
-    await runDriftAsks(MORNING, m.deps);
-    assert.deepEqual(m.posted.map((p) => [p.threadTs, p.card]), [
-      [one.root.ts, true],
-      [two.root.ts, false],
-    ]);
-    const deps = answerDeps(h, drifts, m.posted);
-    assert.equal(await answerDriftAsk({ channel: DESIGN, threadTs: one.root.ts, user: "U0ADE", text: "skip" }, deps), true);
-    assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "thread two's question still points at a live card");
+    assert.deepEqual(r.edits.map((e) => e.text), ["The files now show this thread's decisions, updated Sep 30. Nothing to do."]);
   });
 });
 
@@ -1532,13 +1168,13 @@ describe("a caught-up card's withdrawal and the budget (#897 review)", () => {
 
     const retry = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     await recheckLiveAsks(RECHECK, retry.deps);
-    assert.deepEqual(retry.edits.map((e) => e.ts), [card!.proposalTs]);
+    assert.deepEqual(retry.edits.map((e) => e.ts), [card!.item!.messageTs], "the report, redrawn");
     assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
   });
 });
 
 describe("a question whose card was filed (#897 review)", () => {
-  it("is left as it is once the file catches up, since its ✅ filed an intake", async () => {
+  it("is left as it is once the file catches up, since its card's Approve filed an intake", async () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
     const { h, drifts } = night({
@@ -1551,8 +1187,8 @@ describe("a question whose card was filed (#897 review)", () => {
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
-    // Someone ✅s the card: the intake is filed.
-    await recordProposalEvents(h.proposalEvents, [proposalEvent(card!.proposalTs, "confirmed", at(30, 15), "reaction")]);
+    // Someone approves the card in Review: the intake is filed.
+    await recordProposalEvents(h.proposalEvents, [proposalEvent(card!.proposalTs, "confirmed", at(30, 15), "button")]);
     await h.threadState.retireProposal(card!.proposalTs);
 
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
@@ -1578,7 +1214,8 @@ describe("a file-change notification (#896)", () => {
     const report = await recheckOnUpdate(FILE_KEY, { ...r.deps, store: drifts });
 
     assert.ok(report);
-    assert.deepEqual(r.edits.map((e) => [e.ts, e.text]), [[card!.proposalTs, "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."]]);
+    assert.deepEqual(r.edits.map((e) => e.ts), [card!.item!.messageTs]);
+    assert.equal(cardsOf(r.edits[0]!.blocks)[0]!.subtitle!.text, "Updated Sep 30. Nothing to do.");
     assert.notEqual((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found");
     assert.equal(m.posted.length, 1, "edited, not replied to");
   });
@@ -1604,5 +1241,127 @@ describe("a file-change notification (#896)", () => {
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     assert.equal(await recheckOnUpdate(FILE_KEY, { ...r.deps, store: drifts }), null);
     assert.deepEqual(r.edits, []);
+  });
+});
+
+describe("a drift card decided in Review", () => {
+  it("keeps a Reject's reason on the card and in View", async () => {
+    const { h, m } = await recapMorning();
+    await runDriftAsks(MORNING, m.deps);
+    const [report] = m.posted;
+    const updates: Array<{ ts: string; message: { blocks: unknown[] } }> = [];
+    const deps: ReviewDoorDeps = {
+      threadState: h.threadState,
+      views: recordingViews({ alreadyOpen: ["V1"] }).client,
+      delivery: () => recordingDelivery(),
+      applyVerdict: async () => [],
+      updateCard: async (_channel, ts, message) => void updates.push({ ts, message }),
+      restage: async () => {},
+      revise: async () => {},
+      now: () => h.clock.now,
+    };
+    await runReviewDecision(
+      { viewId: "V1", channel: DESIGN, messageTs: itemProposalKey(report!.ts, "1"), userId: "U0BEA", decision: "cancel", note: "Already updated" },
+      deps,
+    );
+    assert.deepEqual(updates.map((u) => u.ts), [report!.ts], "the report, redrawn");
+    const [card] = cardsOf(updates[0]!.message.blocks);
+    assert.equal(card!.subtitle!.text, "Rejected by <@U0BEA>");
+    assert.equal(card!.body!.text, "Nothing written. Reason: Already updated");
+    assert.deepEqual(labels(card!), ["View", "Open in Figma"]);
+    assert.match(itemText((await h.threadState.getReport(report!.ts))!, "1") ?? "", /Reason: Already updated$/, "View shows it too");
+  });
+});
+
+// ── Cards from before the shared card ─────────────────────────────────────────
+//
+// A card posted before the drift report moved to the shared card lives out its
+// 72 h: one message, one proposal under `LEGACY_DRIFT_KEY`, a ✅/⛔ footer, and
+// a live record with no `itemId` (a question's record names it by `cardTs`).
+
+describe("a card from before the shared card", () => {
+  const OLD_CARD = ts(30, 13, 0, 1);
+  const OLD_QUESTION = ts(30, 13, 0, 2);
+  const OTHER_THREAD = ts(29, 17);
+
+  /** The old card in the recap thread, its live record, and a question in another thread pointing at it. */
+  async function legacy(h: SweepHarness, drifts: InMemoryDriftStore, t: ReturnType<typeof thread>): Promise<void> {
+    const op = { toolName: "notion_create", input: { surface: "prd", title: "Update Session Recap in Figma" } };
+    const card: PendingProposal = {
+      operations: [op],
+      toolName: op.toolName,
+      input: op.input,
+      channel: DESIGN,
+      threadTs: t.root.ts,
+      replyTs: t.root.ts,
+      userMsgTs: t.root.ts,
+      proposalTs: OLD_CARD,
+      proposalText: "*Is the Figma file still current?* …",
+      requesterUserId: "",
+      ttlMs: DRIFT_CARD_TTL_MS,
+      confirmers: ["U0BEA"],
+      supersedeKey: LEGACY_DRIFT_KEY,
+      stated: driftCardWords(72),
+    };
+    await h.threadState.putProposal(card);
+    const file = {
+      fileKey: `figma:${FILE_KEY}`,
+      kind: "figma" as const,
+      url: FIGMA_A.url,
+      decidedAt: at(29, 16),
+      threadSays: "The recap drops the Share button.",
+      sourceSays: "It has a Share button.",
+      checkedThrough: at(29, 16),
+    };
+    const old = { channel: DESIGN, headline: "Is the Figma file still current?", askedAt: at(30, 13) };
+    await drifts.saveLiveAsk({ ...old, ts: OLD_CARD, threadTs: t.root.ts, role: "card", files: [file] });
+    await drifts.saveLiveAsk({ ...old, ts: OLD_QUESTION, threadTs: OTHER_THREAD, role: "question", files: [{ ...file, cardTs: OLD_CARD }] });
+  }
+
+  async function caughtUp() {
+    const t = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0BEA", when: ts(29, 16) }]);
+    const { h, drifts } = night({ threads: [t], sources: [FIGMA_A], replies: [] });
+    const figma = createInMemoryFigma();
+    seedFigmaFile(figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 4);
+    await legacy(h, drifts, t);
+    return { h, drifts, figma };
+  }
+
+  it("is still withdrawn whole once its file catches up: retired, its question struck through, recorded", async () => {
+    const { h, drifts, figma } = await caughtUp();
+    const r = recheck(h, drifts, figma, { judge: async () => "shows" });
+    await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(
+      r.edits.map((e) => [e.ts, e.text]),
+      [
+        [OLD_CARD, "~Is the Figma file still current?~ Yes, updated Sep 30. Nothing to do."],
+        [OLD_QUESTION, "The file now shows this thread's decision, updated Sep 30. Nothing to do."],
+      ],
+    );
+    assert.notEqual((await h.threadState.getProposalByTs(OLD_CARD)).state, "found", "no ✅ can file it now");
+    assert.deepEqual((await h.proposalEvents.eventsOf(OLD_CARD)).map((e) => e.event), ["cancelled"]);
+    assert.deepEqual(await drifts.liveAsks(), []);
+  });
+
+  it("leaves its question as it is when the card's ✅ already filed the intake", async () => {
+    const { h, drifts, figma } = await caughtUp();
+    await recordProposalEvents(h.proposalEvents, [proposalEvent(OLD_CARD, "confirmed", at(30, 15), "reaction")]);
+    await h.threadState.retireProposal(OLD_CARD);
+    const r = recheck(h, drifts, figma, { judge: async () => "shows" });
+    const result = await recheckLiveAsks(RECHECK, r.deps);
+    assert.deepEqual(r.edits, [], "neither the filed card nor its question says there is nothing to do");
+    assert.match(result.note ?? "", /its card filed the intake/);
+  });
+
+  it("reads its footer's `drop 2`, `skip` or yes as words to answer with one line, and nothing else", () => {
+    for (const text of ["drop 2", "drop 1 and 2", "keep 1", "skip", "Skip.", "`skip`", "yes", "yep, it's up to date", "already updated", "<@U0BOT> skip"]) {
+      assert.equal(answersLegacyDriftCard(text), true, text);
+    }
+    for (const text of ["yes please file it", "what does drop 2 do?", "skip the recap for now, we'll revisit", "is the frame updated?"]) {
+      assert.equal(answersLegacyDriftCard(text), false, text);
+    }
+    assert.doesNotMatch(LEGACY_DRIFT_REPLY, GATE_WORDS);
+    assert.match(LEGACY_DRIFT_REPLY, /Review/);
   });
 });
