@@ -3,9 +3,9 @@
 // left owed in HARNESS_KV, reads the repo's snapshot from GitHub, and sends
 // `repository_dispatch` with GITHUB_TOKEN, the way `component_implement`
 // starts `figma-implement.yml`. The post reads the registry from GitHub and the
-// channel's members from Slack, posts the card, and stages it in ThreadState;
-// the tracker reads GitHub and posts in the card's thread, and files and closes
-// a card nobody decided. Findings and the tracked cards are JSON in HARNESS_KV
+// channel's members from Slack, posts the card, and keeps its report and
+// stages it in ThreadState; the tracker reads GitHub and posts in the card's
+// thread, and files and closes a card nobody decided. Findings and the tracked cards are JSON in HARNESS_KV
 // beside the poll's snapshot.
 //
 // The repo is `GITHUB_REPO`, the harness repo: the registry lives there, the
@@ -100,6 +100,11 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
         const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
+      async edit(ts, message) {
+        const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+        if (!res.ok) throw new Error(res.error ?? "chat.update failed");
+      },
+      reports: threadStateFor(env),
       async reply(ts, text) {
         const res = await postMessage(env, { channel, thread_ts: ts, text });
         if (!res.ok) throw new Error(res.error ?? "chat.postMessage failed");
@@ -145,7 +150,7 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
         },
         close: (issue) => writes.setState(issue, "closed", "completed"),
         intakesSince: (since) => reads.intakesSince(since),
-        // The ✅ path's filing, minus the ✅: the same labels, and the same
+        // Approve's filing, with no Approve: the same labels, and the same
         // footer naming where it came from.
         async fileIntake(draft, card) {
           const permalink = await getPermalink(env, card.channel, card.ts).catch((err: unknown) => {
@@ -162,6 +167,7 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
       async postToThread(channel, ts, text) {
         await postMessage(env, { channel, thread_ts: ts, text });
       },
+      reports: threadStateFor(env),
       async closeCard(channel, ts, message) {
         const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
         if (!res.ok) throw new Error(res.error ?? "chat.update failed");

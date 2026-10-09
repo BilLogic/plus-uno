@@ -18,11 +18,13 @@ import { SubrequestBudgetError } from "../src/net";
 import { draftPublishIntake, type ComponentRegistry, type LibraryChangeSet } from "../src/figma-library/draft";
 import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostDeps } from "../src/figma-library/post";
 import { implementPrTitle, trackLibraryIntakes, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
-import { resolveSignal, type GateSignal } from "../src/gate/index";
-import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
+import { resolveSignal, type GateSignal, type GateVerdict } from "../src/gate/index";
+import { createInMemoryThreadState, type PendingProposal, type ReportItemState, type ThreadState } from "../src/thread-state/index";
 import { implementPayload } from "../src/tools/implement";
 import type { RefreshOwed } from "../src/figma-library/snapshot-refresh";
-import { runButtonDoor, type CardMessage } from "../src/slack/button-door";
+import type { CardMessage } from "../src/slack/button-door";
+import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
+import { recordingViews } from "./helpers/recording-slack";
 import { recordingDelivery } from "../src/turn/index";
 import { cardWords } from "./helpers/card-message";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
@@ -153,6 +155,7 @@ function postDeps(findings: LibraryChangeSet[], opts: { refuseTables?: boolean }
   const refused: Array<{ text: string; blocks: unknown[] }> = [];
   const replies: Array<{ ts: string; text: string }> = [];
   const staged: PendingProposal[] = [];
+  const edits: Array<{ text: string; blocks: unknown[] }> = [];
   const store = { findings: kv(findings), tracked: kv<TrackedPublish[]>([]), unpublished: kv<LibraryChangeSet | null>(null) };
   const deps: PostDeps = {
     ...store,
@@ -176,10 +179,14 @@ function postDeps(findings: LibraryChangeSet[], opts: { refuseTables?: boolean }
       staged.push(proposal);
       await threadState.putProposal(proposal);
     },
+    reports: threadState,
+    async edit(_ts, message) {
+      edits.push(message);
+    },
     channel: CHANNEL,
     now: () => Date.UTC(2026, 8, 30, 14, 0),
   };
-  return { deps, posts, refused, replies, staged, threadState, store };
+  return { deps, posts, refused, replies, staged, edits, threadState, store };
 }
 
 /** A change set with no new version: an Accordion variant renamed, and
@@ -361,59 +368,98 @@ describe("the drafted intake", () => {
 // ── The morning post ─────────────────────────────────────────────────────────
 
 describe("the morning post", () => {
-  it("posts one #plus-universal message whose card files one intake and one dispatch", async () => {
+  const VERSION = "2210000000000000002";
+  const LIBRARY = `https://www.figma.com/design/${FILE_KEY}`;
+
+  it("posts the publish as one shared decision card over the table of changed components", async () => {
     const morning = postDeps([await foundPublish()]);
     const result = await postLibraryFindings(morning.deps);
     assert.equal(result.posted, 1);
     assert.equal(morning.posts.length, 1);
-    assert.equal(morning.staged.length, 1);
+    const posted = morning.posts[0]!;
+    const blocks = posted.blocks as Array<Record<string, any>>;
+    assert.deepEqual(blocks.map((b) => b.type), ["section", "card", "data_table"]);
 
+    // The parent line: what the job found, one plain sentence.
+    assert.equal(blocks[0]!.text.text, 'coco published "Badge sizes + accordion copy" to the library: 3 components changed, 2 of them have code.');
+    assert.match(posted.text, /^coco published "Badge sizes \+ accordion copy" to the library/);
+
+    const card = blocks[1]!;
+    assert.equal(card.title.text, "Badge sizes + accordion copy");
+    assert.equal(card.subtitle.text, "coco · Sep 29");
+    assert.equal(card.body.text, "1 new, 2 updated. Accordion and Badge have code that can be drafted to match.");
+    assert.match(card.icon.image_url, /figma\.com/);
+    assert.deepEqual(
+      card.actions.map((a: any) => [a.text.text, a.url ?? a.action_id]),
+      [
+        ["Review", `uno_decision_review:${VERSION}`],
+        ["Open library", LIBRARY],
+        ["View version", `${LIBRARY}?version-id=${VERSION}`],
+      ],
+    );
+
+    const table = blocks[2]!;
+    assert.equal(table.caption, "3 components changed: 1 new, 2 updated.");
+    const text = (cell: any) => cell.text ?? cell.elements[0].elements[0].text;
+    assert.deepEqual(
+      table.rows.map((row: any[]) => row.map(text)),
+      [
+        ["Component", "Change", "Code"],
+        ["accordion", "updated", "Accordion"],
+        ["badge", "updated", "Badge"],
+        ["sparkline", "new", "No code mapping yet"],
+      ],
+    );
+    assert.equal(table.rows[1][0].elements[0].elements[0].url, "https://www.figma.com/design/x?node-id=13667-6004");
+
+    // No gate of its own: no ✅/⛔ footer, nothing to type.
+    for (const words of [posted.text, JSON.stringify(blocks)]) {
+      assert.doesNotMatch(words, /:white_check_mark:|:no_entry:|✅|⛔|\bdrop \d|\bskip\b|intake only/i);
+    }
+    // The table names every component, so nothing spills into the thread.
+    assert.deepEqual(morning.replies, []);
+    assert.deepEqual(morning.store.findings.value, []);
+  });
+
+  it("stages the card as the report's one item: Approve files the intake and drafts every mapped component", async () => {
+    const morning = postDeps([await foundPublish()]);
+    await postLibraryFindings(morning.deps);
+    const ts = "1790000000.000001";
     const card = morning.staged[0]!;
+    assert.deepEqual(card.item, { messageTs: ts, id: VERSION });
+    assert.equal(card.proposalTs, `${ts}#${VERSION}`);
     assert.equal(card.channel, CHANNEL);
     assert.deepEqual(card.operations?.map((op) => op.toolName), ["github_issue_create", "component_implement"]);
-    assert.deepEqual(card.onCancel?.map((op) => op.toolName), ["github_issue_create"]);
+    assert.deepEqual(card.operations?.[1]!.input, { component: "Accordion, Badge", library_publish: VERSION });
+    assert.equal("onCancel" in card, false, "Reject runs nothing");
     assert.deepEqual(card.confirmers, MEMBERS);
     assert.equal(card.ttlMs, LIBRARY_CARD_TTL_MS);
     assert.equal(LIBRARY_CARD_TTL_MS, 72 * 60 * 60 * 1000);
-    // Its own words at the gate: a ⛔ is "intake only", and a late decision
-    // is told the intake gets filed, not to ask again.
     assert.deepEqual(card.stated, {
-      cancelled: "Intake only",
+      cancelled: "Rejected, nothing filed",
       expired:
         "That card closed after 72 h with no decision, so nothing was drafted. " +
         "I file its intake the morning after, so the publish isn't lost.",
     });
-    assert.equal(card.proposalTs, card.replyTs);
+    // The pop-up's text: the publish and its components, with no footer.
+    assert.match(card.proposalText, /^• \*Has code:\* accordion, badge$/m);
+    assert.doesNotMatch(card.proposalText, /:white_check_mark:|:no_entry:/);
 
-    // The approved card (#886 § 3.1): who published what, every changed
-    // component under its group, and one footer.
-    assert.equal(
-      morning.posts[0]!.text,
-      [
-        `*Library published: "Badge sizes + accordion copy"* by coco · <https://www.figma.com/design/${FILE_KEY}?version-id=2210000000000000002|view version>`,
-        "> Adds lg badge",
-        "",
-        "3 components changed: 1 new, 2 updated.",
-        "• *Has code:* accordion, badge",
-        "• *No code mapping yet:* sparkline",
-        "",
-        ":white_check_mark: files the intake and drafts the code for Accordion and Badge. :no_entry: files the intake only.",
-        "Anyone in this channel can decide, for the next 72 h.",
-      ].join("\n"),
-    );
-    // Short enough to keep its list, so nothing spills into the thread.
-    assert.deepEqual(morning.replies, []);
+    // Its record, where a decision lands, keeps the table under the card.
+    const record = await morning.threadState.getReport(ts);
+    assert.equal(record?.entries[0]!.id, VERSION);
+    assert.equal((record?.after?.[0] as { type?: string })?.type, "data_table");
 
-    // Nothing waits any more; the card is tracked.
-    assert.deepEqual(morning.store.findings.value, []);
-    assert.equal(morning.store.tracked.value.length, 1);
-    assert.equal(morning.store.tracked.value[0]!.implement, "Accordion, Badge");
-    // What an expiry nobody decides needs: the intake to file, the card to edit.
-    assert.equal(morning.store.tracked.value[0]!.draft?.title, "Figma library publish: Badge sizes + accordion copy — 3 components");
-    assert.equal(morning.store.tracked.value[0]!.cardText, morning.posts[0]!.text);
+    // Tracked to its outcome: the item, the components it dispatches and the
+    // draft an expiry files.
+    const tracked = morning.store.tracked.value[0]!;
+    assert.equal(tracked.item, VERSION);
+    assert.equal(tracked.ts, ts);
+    assert.equal(tracked.implement, "Accordion, Badge");
+    assert.equal(tracked.draft?.title, "Figma library publish: Badge sizes + accordion copy — 3 components");
   });
 
-  it("says plainly when the library was edited and not published, and offers no ✅", async () => {
+  it("says plainly when the library was edited and not published, and offers no Review", async () => {
     const morning = postDeps([await foundEditOnly()]);
     const result = await postLibraryFindings(morning.deps);
     assert.equal(result.posted, 1);
@@ -426,7 +472,6 @@ describe("the morning post", () => {
     );
     // No button row, nothing staged, nothing to track, and it waits no more.
     assert.ok(!JSON.stringify(morning.posts[0]!.blocks).includes('"actions"'), JSON.stringify(morning.posts[0]!.blocks));
-    assert.doesNotMatch(morning.posts[0]!.text, /:white_check_mark:|:no_entry:/);
     assert.deepEqual(morning.staged, []);
     assert.deepEqual(morning.store.tracked.value, []);
     assert.deepEqual(morning.store.findings.value, []);
@@ -456,54 +501,17 @@ describe("the morning post", () => {
     day2.store.unpublished = kv(day1.store.unpublished.value);
     day2.deps.unpublished = day2.store.unpublished;
     await postLibraryFindings(day2.deps);
-    const card = day2.posts[0]!.text;
-    assert.match(card, /^4 components changed: 1 new, 3 updated\.$/m);
-    assert.match(card, /^• \*Has code:\* accordion, badge, tooltip$/m);
-    assert.match(card, /drafts the code for Accordion, Badge and Tooltip\./);
-    // The intake carries it too, and nothing waits any more.
+    const blocks = day2.posts[0]!.blocks as Array<Record<string, any>>;
+    assert.match(blocks[0]!.text.text, /: 4 components changed, 3 of them have code\.$/);
+    assert.equal(blocks[1]!.body.text, "1 new, 3 updated. Accordion, Badge and Tooltip have code that can be drafted to match.");
+    // The intake and the dispatch carry it too, and nothing waits any more.
     assert.match(String(day2.staged[0]!.operations![0]!.input.body), /tooltip/);
+    assert.equal(day2.staged[0]!.operations![1]!.input.component, "Accordion, Badge, Tooltip");
     assert.equal(day2.store.unpublished.value, null);
   });
 
-  it("leads with a release card, then a table of every changed component, then Review", async () => {
-    const morning = postDeps([await foundPublish()]);
-    await postLibraryFindings(morning.deps);
-    const blocks = morning.posts[0]!.blocks as Array<Record<string, any>>;
-    assert.deepEqual(blocks.map((b) => b.type).slice(0, 2), ["card", "data_table"]);
-
-    const card = blocks[0]!;
-    assert.equal(card.title.text, 'Library published: "Badge sizes + accordion copy"');
-    assert.equal(card.subtitle.text, "by coco");
-    assert.equal(card.body.text, "Adds lg badge");
-    assert.match(card.icon.image_url, /figma\.com/);
-    assert.deepEqual(
-      card.actions.map((a: any) => [a.text.text, a.url]),
-      [["View version", `https://www.figma.com/design/${FILE_KEY}?version-id=2210000000000000002`]],
-    );
-
-    const table = blocks[1]!;
-    assert.equal(table.caption, "3 components changed: 1 new, 2 updated.");
-    const text = (cell: any) => cell.text ?? cell.elements[0].elements[0].text;
-    assert.deepEqual(
-      table.rows.map((row: any[]) => row.map(text)),
-      [
-        ["Component", "Change", "Code"],
-        ["accordion", "updated", "Accordion"],
-        ["badge", "updated", "Badge"],
-        ["sparkline", "new", "No code mapping yet"],
-      ],
-    );
-    assert.equal(table.rows[1][0].elements[0].elements[0].url, "https://www.figma.com/design/x?node-id=13667-6004");
-
-    // The decision stays last: what ✅ and ⛔ do, and the Review button.
-    assert.match(JSON.stringify(blocks.at(-2)), /files the intake only/);
-    assert.equal(blocks.at(-1)!.type, "actions");
-    // The text copy is the whole card still: notifications and a decided
-    // card's re-render read it.
-    assert.match(morning.posts[0]!.text, /^• \*Has code:\* accordion, badge$/m);
-  });
-
-  it("posts the card without its release card and table when Slack refuses them, and the list still reaches the thread", async () => {
+  /** The publish with sixty more unmapped components, each a new set. */
+  async function bigPublish(): Promise<LibraryChangeSet> {
     const changeSet = await foundPublish();
     const extra = Array.from({ length: 60 }, (_, i) => ({
       key: `k-extra-${i}`,
@@ -513,44 +521,29 @@ describe("the morning post", () => {
       containingFrame: `extra component number ${i}`,
       setNodeId: `500:${i}`,
     }));
-    const big: LibraryChangeSet = {
+    return {
       ...changeSet,
       created: [...changeSet.created, ...extra],
       newComponentIds: [...(changeSet.newComponentIds ?? []), ...extra.map((c) => c.setNodeId)],
     };
-    const morning = postDeps([big], { refuseTables: true });
+  }
+
+  it("posts the card without its table when Slack refuses it, and the list goes in the thread", async () => {
+    const morning = postDeps([await bigPublish()], { refuseTables: true });
     await postLibraryFindings(morning.deps);
     assert.equal(morning.refused.length, 1);
     assert.equal(morning.posts.length, 1);
-    assert.ok(!JSON.stringify(morning.posts[0]!.blocks).includes("data_table"));
+    const blocks = morning.posts[0]!.blocks as Array<Record<string, any>>;
+    assert.deepEqual(blocks.map((b) => b.type), ["section", "card"]);
     assert.equal(morning.staged.length, 1);
+    assert.equal((await morning.threadState.getReport("1790000000.000001"))?.after, undefined, "never redrawn with a table it did not post");
     assert.equal(morning.replies.length, 1);
     assert.match(morning.replies[0]!.text, /^All 63 components in this publish:/);
   });
 
-  it("lists every component in the table when the card's text had to cap its list", async () => {
-    const changeSet = await foundPublish();
-    // Sixty more unmapped components, each a new set.
-    const extra = Array.from({ length: 60 }, (_, i) => ({
-      key: `k-extra-${i}`,
-      name: "Default",
-      description: "",
-      nodeId: `50:${i}`,
-      containingFrame: `extra component number ${i}`,
-      setNodeId: `500:${i}`,
-    }));
-    const big: LibraryChangeSet = {
-      ...changeSet,
-      created: [...changeSet.created, ...extra],
-      newComponentIds: [...(changeSet.newComponentIds ?? []), ...extra.map((c) => c.setNodeId)],
-    };
-    const morning = postDeps([big]);
+  it("names every component in the table, however long the list", async () => {
+    const morning = postDeps([await bigPublish()]);
     await postLibraryFindings(morning.deps);
-    const text = morning.posts[0]!.text;
-    assert.ok(text.length <= 1500, `${text.length} chars`);
-    assert.match(text, /^63 components changed: 61 new, 2 updated\.$/m);
-    assert.match(text, /\*No code mapping yet:\* .* and \d+ more$/m);
-    // The table names all 63, so nothing spills into the thread.
     const table = (morning.posts[0]!.blocks as Array<Record<string, any>>).find((b) => b.type === "data_table")!;
     assert.equal(table.rows.length, 64);
     const names = JSON.stringify(table.rows);
@@ -558,6 +551,22 @@ describe("the morning post", () => {
       assert.ok(names.includes(name), name);
     }
     assert.deepEqual(morning.replies, []);
+    // The pop-up's text caps its list instead.
+    assert.match(morning.staged[0]!.proposalText, /\*No code mapping yet:\* .* and \d+ more$/m);
+  });
+
+  it("says on the card when it could not be staged, with nothing to review", async () => {
+    const morning = postDeps([await foundPublish()]);
+    morning.deps.stage = async () => {
+      throw new Error("DO unavailable");
+    };
+    await postLibraryFindings(morning.deps);
+    assert.equal(morning.edits.length, 1);
+    const card = (morning.edits[0]!.blocks as Array<Record<string, any>>)[1]!;
+    assert.match(card.subtitle.text, /^Couldn't be staged for review/);
+    assert.deepEqual(card.actions.map((a: any) => a.text.text), ["Open library", "View version"]);
+    // Still tracked, so its intake is filed when its window closes.
+    assert.equal(morning.store.tracked.value.length, 1);
   });
 
   it("keeps the findings when the registry or the members cannot be read", async () => {
@@ -580,103 +589,99 @@ describe("the morning post", () => {
   });
 });
 
-// ── The Gate on the card ─────────────────────────────────────────────────────
+// ── Deciding the card ────────────────────────────────────────────────────────
 
-describe("the library card at the Gate", () => {
+describe("the library card in Review", () => {
   async function stagedCard() {
     const morning = postDeps([await foundPublish()]);
     await postLibraryFindings(morning.deps);
     return { threadState: morning.threadState, card: morning.staged[0]! };
   }
-  const react = (card: PendingProposal, glyph: string, userId: string): GateSignal => ({
-    kind: "reaction",
-    messageTs: card.proposalTs,
-    channel: CHANNEL,
-    thread: card.proposalTs,
-    glyph,
-    userId,
-  });
 
-  it("runs nothing on a ✅ from someone outside #plus-universal", async () => {
+  /** A Submit from the Review pop-up, and what it ran and redrew. */
+  async function submit(threadState: ThreadState, card: PendingProposal, decision: "confirm" | "cancel", userId = MEMBERS[0]!) {
+    const ran: GateVerdict[] = [];
+    const updates: Array<{ ts: string; message: CardMessage }> = [];
+    const deps: ReviewDoorDeps = {
+      threadState,
+      views: recordingViews({ alreadyOpen: ["V1"] }).client,
+      delivery: () => recordingDelivery(),
+      applyVerdict: async (v) => {
+        ran.push(v);
+        return (v.execute?.operations ?? []).map((op) => ({ toolName: op.toolName, ok: true, result: "{}", message: "Done." }));
+      },
+      updateCard: async (_channel, ts, message) => void updates.push({ ts, message }),
+      restage: async () => {},
+      revise: async () => {},
+      now: () => Date.UTC(2026, 8, 30, 15, 0),
+    };
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: card.proposalTs, userId, decision }, deps);
+    return { ran, updates };
+  }
+
+  it("runs nothing on a Submit from someone outside #plus-universal", async () => {
     const { threadState, card } = await stagedCard();
-    const verdict = await resolveSignal(react(card, "white_check_mark", OUTSIDER), { threadState });
-    assert.equal(verdict.outcome, "none");
-    assert.equal(verdict.execute, undefined);
+    const { ran } = await submit(threadState, card, "confirm", OUTSIDER);
+    assert.equal(ran.filter((v) => v.execute).length, 0);
     assert.equal((await threadState.getProposalByTs(card.proposalTs)).state, "found");
   });
 
-  it("files the intake and sends one dispatch with the right payload on a member's ✅", async () => {
+  it("is not decided by a ✅ on its message or typed in its thread", async () => {
     const { threadState, card } = await stagedCard();
-    const verdict = await resolveSignal(react(card, "white_check_mark", MEMBERS[1]!), { threadState });
-    assert.equal(verdict.outcome, "won");
-    const ops = verdict.execute!.operations;
-    assert.deepEqual(ops.map((op) => op.toolName), ["github_issue_create", "component_implement"]);
-    assert.match(String(ops[0]!.input.body), /uno-bot:figma-publish:2210000000000000002/);
+    const ts = card.item!.messageTs;
+    const signals: GateSignal[] = [
+      { kind: "reaction", messageTs: ts, channel: CHANNEL, thread: ts, glyph: "white_check_mark", userId: MEMBERS[0]! },
+      { kind: "typed", channel: CHANNEL, thread: ts, text: "✅", userId: MEMBERS[0]! },
+    ];
+    for (const signal of signals) {
+      const verdict = await resolveSignal(signal, { threadState });
+      assert.equal(verdict.execute, undefined, signal.kind);
+    }
+    assert.equal((await threadState.getProposalByTs(card.proposalTs)).state, "found");
+  });
+
+  it("Approve files the intake and dispatches the implementation for every mapped component", async () => {
+    const { threadState, card } = await stagedCard();
+    const { ran, updates } = await submit(threadState, card, "confirm");
+    const execute = ran[0]!.execute!;
+    assert.deepEqual(execute.operations.map((op) => op.toolName), ["github_issue_create", "component_implement"]);
+    assert.match(String(execute.operations[0]!.input.body), /uno-bot:figma-publish:2210000000000000002/);
 
     // The dispatch the executor would send, from where the card was approved.
-    const built = implementPayload(ops[1]!.input, {
-      channel: verdict.execute!.channel,
-      threadTs: verdict.execute!.threadTs,
-      userMsgTs: verdict.execute!.userMsgTs,
-    });
-    assert.deepEqual(built, {
+    const ts = card.item!.messageTs;
+    assert.deepEqual(implementPayload(execute.operations[1]!.input, execute), {
       ok: true,
       component: "Accordion, Badge",
       payload: {
         component: "Accordion, Badge",
         notes: undefined,
-        thread_ts: card.proposalTs,
+        thread_ts: ts,
         channel: CHANNEL,
-        message_ts: card.proposalTs,
+        message_ts: ts,
         figma_version_id: "2210000000000000002",
       },
     });
+
+    // The report's message, drawn again: who approved, View, and the table.
+    assert.equal(updates.length, 1);
+    assert.equal(updates[0]!.ts, ts);
+    const blocks = updates[0]!.message.blocks as Array<Record<string, any>>;
+    assert.deepEqual(blocks.map((b) => b.type), ["section", "card", "data_table"]);
+    assert.match(blocks[1]!.subtitle.text, /^Approved by <@U0MEMBER1> · written/);
+    assert.equal(blocks[1]!.body.text, "Written: the intake, and code drafts started for Accordion and Badge.");
+    assert.deepEqual(blocks[1]!.actions.map((a: any) => a.text.text), ["View", "Open library", "View version"]);
   });
 
-  /** A member's press on the card, and the message the card was edited to. */
-  async function decide(threadState: ReturnType<typeof createInMemoryThreadState>, card: PendingProposal, decision: "confirm" | "cancel") {
-    const replaced: CardMessage[] = [];
-    await runButtonDoor(
-      { channel: CHANNEL, messageTs: card.proposalTs, decision, userId: MEMBERS[0]! },
-      {
-        threadState,
-        delivery: () => recordingDelivery(),
-        applyVerdict: async () => {},
-        replyEphemeral: async () => {},
-        replaceCard: async (message) => void replaced.push(message),
-        restage: async () => {},
-      },
-    );
-    assert.equal(replaced.length, 1, "the card is edited once");
-    return replaced[0]!.blocks as Array<Record<string, any>>;
-  }
-
-  it("keeps its release card and table once decided, and offers View", async () => {
-    for (const decision of ["confirm", "cancel"] as const) {
-      const { threadState, card } = await stagedCard();
-      const blocks = await decide(threadState, card, decision);
-      assert.deepEqual(blocks.map((b) => b.type).slice(0, 2), ["card", "data_table"], decision);
-      assert.match(JSON.stringify(blocks.at(-2)), decision === "confirm" ? /Approved by/ : /decided by/, decision);
-      assert.deepEqual(blocks.filter((b) => b.type === "actions").flatMap((b) => b.elements.map((e: any) => e.text.text)), ["View"], decision);
-    }
-  });
-
-  it("is decided from its text when Slack refused its release card", async () => {
-    const changeSet = await foundPublish();
-    const morning = postDeps([changeSet], { refuseTables: true });
-    await postLibraryFindings(morning.deps);
-    const blocks = await decide(morning.threadState, morning.staged[0]!, "confirm");
-    assert.ok(!JSON.stringify(blocks).includes("data_table"), "never a table it was not posted with");
-    assert.match(JSON.stringify(blocks), /Approved by/);
-    assert.equal(blocks.at(-1)!.type, "actions", "View, as it was posted with Review");
-  });
-
-  it("files the intake only on a member's ⛔", async () => {
+  it("Reject files nothing", async () => {
     const { threadState, card } = await stagedCard();
-    const verdict = await resolveSignal(react(card, "no_entry", MEMBERS[0]!), { threadState });
-    assert.equal(verdict.outcome, "won");
-    assert.equal(verdict.decision, "cancel");
-    assert.deepEqual(verdict.execute!.operations.map((op) => op.toolName), ["github_issue_create"]);
+    const { ran, updates } = await submit(threadState, card, "cancel");
+    assert.equal(ran.length, 1);
+    assert.equal(ran[0]!.decision, "cancel");
+    assert.equal(ran[0]!.execute, undefined, "no intake, no dispatch");
+    const blocks = updates[0]!.message.blocks as Array<Record<string, any>>;
+    assert.equal(blocks[1]!.subtitle.text, "Rejected by <@U0MEMBER1>");
+    assert.equal(blocks[1]!.body.text, "Nothing written.");
+    assert.equal(blocks.at(-1)!.type, "data_table");
   });
 });
 
@@ -744,6 +749,7 @@ describe("the morning tracker", () => {
           return { number: 990, url: "https://github.com/o/r/issues/990" };
         },
       },
+      reports: createInMemoryThreadState(),
       postToThread: async (channel, ts, text) => {
         calls.push(`thread ${channel}/${ts}: ${text}`);
       },
@@ -864,7 +870,7 @@ describe("a library card nobody decides", () => {
   });
 
   /** The tracker over GitHub with no intake carrying the card's marker. */
-  function world(tracked: TrackedPublish[], now: number) {
+  function world(tracked: TrackedPublish[], now: number, reports: ThreadState = createInMemoryThreadState({ now: () => now })) {
     const calls: string[] = [];
     const edits: Array<{ text: string; note: string }> = [];
     const closed: Array<Array<Record<string, any>>> = [];
@@ -887,6 +893,7 @@ describe("a library card nobody decides", () => {
           return { number: 990, url: "https://github.com/o/r/issues/990" };
         },
       },
+      reports,
       postToThread: async (channel, ts, text) => {
         calls.push(`thread ${channel}/${ts}: ${text}`);
       },
@@ -899,6 +906,42 @@ describe("a library card nobody decides", () => {
     };
     return { deps, calls, edits, closed, store };
   }
+
+  /** A card posted as the shared decision card, its record in the store. */
+  async function sharedCard(state?: ReportItemState) {
+    const posted = postDeps([await foundPublish()]);
+    await postLibraryFindings(posted.deps);
+    const tracked = posted.store.tracked.value[0]!;
+    if (state) await posted.threadState.updateReport(tracked.ts, { id: tracked.item!, state });
+    return { tracked, reports: posted.threadState };
+  }
+
+  it("files the intake once its 72 hours pass, closes its card with no decision and says so in its thread", async () => {
+    const { tracked, reports } = await sharedCard();
+    const { deps, calls, closed, store } = world([tracked], tracked.postedAt + 73 * HOUR, reports);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 1);
+    assert.deepEqual(calls, [
+      `file "${tracked.draft!.title}" from ${CHANNEL}/${tracked.ts}`,
+      `edit ${CHANNEL}/${tracked.ts}`,
+      `thread ${CHANNEL}/${tracked.ts}: No decision in 72 h. I filed the <https://github.com/o/r/issues/990|intake> so the publish isn't lost.`,
+    ]);
+    const [, card, table] = closed[0]!;
+    assert.equal(card!.subtitle.text, "Closed, no decision");
+    assert.deepEqual(card!.actions.map((a: any) => a.text.text), ["View", "Open library", "View version"]);
+    assert.equal(table!.type, "data_table");
+    assert.deepEqual(store.value, []);
+  });
+
+  it("files nothing for a card rejected in Review, and stops following it", async () => {
+    const { tracked, reports } = await sharedCard({ kind: "rejected", by: "U0MEMBER1" });
+    const { deps, calls, store } = world([tracked], tracked.postedAt + 73 * HOUR, reports);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 0);
+    assert.equal(result.dropped, 1);
+    assert.deepEqual(calls, []);
+    assert.deepEqual(store.value, []);
+  });
 
   it("closes a card posted with its release card on those blocks", async () => {
     const release = [{ type: "section", text: { type: "mrkdwn", text: "release" } }];

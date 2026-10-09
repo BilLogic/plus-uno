@@ -1,5 +1,5 @@
 // A Figma library publish, drafted: the one `harness-intake` issue it becomes,
-// and the summary the #plus-universal card leads with.
+// and the words of the #plus-universal report that asks whether to file it.
 //
 // The intake is the spec — the Notion PRD the poll used to file is gone — so it
 // is written to be run by a human or an agent as it stands: per changed
@@ -12,9 +12,10 @@
 // Pure: no `Env`, no fetch. The registry arrives as data (the post job reads it
 // from GitHub), so tests/figma-library.test.ts drafts from a recorded diff.
 
-import type { StatedCardWords } from "../thread-state/index";
+import type { ReportItem, StatedCardWords } from "../thread-state/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { largestFitting, namesInWords, ONE_POST_CHARS, THREAD_REPLY_CHARS, windowInWords } from "../slack/copy-words";
+import { largestFitting, namesInWords, ONE_POST_CHARS, shortDate, THREAD_REPLY_CHARS, windowInWords } from "../slack/copy-words";
+import { CARD_BODY_CHARS } from "../slack/decision-cards";
 
 /** A component as the poll keeps it in its snapshot. */
 export interface LibraryComponent {
@@ -98,7 +99,7 @@ export interface PublishIntake {
   title: string;
   body: string;
   rows: IntakeRow[];
-  /** The registry names a ✅ implements, sorted — every mapped row. */
+  /** The registry names an Approve drafts code for, sorted — every mapped row. */
   implement: string[];
   /** Figma names with no code mapping. */
   unmapped: string[];
@@ -325,7 +326,7 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
     ...(unmapped.length ? ["- [ ] Each \"no code mapping\" row is mapped in its MDX `figmaMeta`, or confirmed Figma-only"] : []),
     "",
     implement.length && newest
-      ? `A ✅ on the #plus-universal card dispatches \`figma-implement.yml\` for: ${implement.join(", ")}.`
+      ? `Approving the #plus-universal card dispatches \`figma-implement.yml\` for: ${implement.join(", ")}.`
       : "Nothing here is dispatched: no changed component has a code mapping, or no version was published.",
   );
 
@@ -354,8 +355,9 @@ export function firstLine(text: string): string {
 const HAS_CODE = "Has code";
 export const NO_CODE_YET = "No code mapping yet";
 
-/** The library file itself, which an edited-not-published post links. */
-function libraryUrl(fileKey: string): string {
+/** The library file itself: what an edited-not-published post links, and
+ *  the card's Open. */
+export function libraryUrl(fileKey: string): string {
   return `https://www.figma.com/design/${fileKey}`;
 }
 
@@ -368,15 +370,20 @@ function codeGroups(intake: PublishIntake): Array<{ label: string; names: string
   return groups.filter((g) => g.names.length);
 }
 
+/** "2 new, 5 updated" — what happened to the rows, by kind. */
+function changeParts(rows: readonly IntakeRow[]): string {
+  return (["new", "updated", "removed"] as const)
+    .map((change) => ({ change, n: rows.filter((r) => r.change === change).length }))
+    .filter((p) => p.n)
+    .map((p) => `${p.n} ${p.change}`)
+    .join(", ");
+}
+
 /** "7 components changed: 2 new, 5 updated." — the count is the rows, and so
  *  is the list under it. */
 export function countLine(rows: readonly IntakeRow[]): string {
   if (!rows.length) return "No changed components found. The version has the details.";
-  const parts = (["new", "updated", "removed"] as const)
-    .map((change) => ({ change, n: rows.filter((r) => r.change === change).length }))
-    .filter((p) => p.n)
-    .map((p) => `${p.n} ${p.change}`);
-  return `${rows.length} component${rows.length === 1 ? "" : "s"} changed: ${parts.join(", ")}.`;
+  return `${rows.length} component${rows.length === 1 ? "" : "s"} changed: ${changeParts(rows)}.`;
 }
 
 /** A group's line, its names capped at `cap` with the rest counted. */
@@ -386,63 +393,93 @@ function groupLine(group: { label: string; names: string[] }, cap = Infinity): s
   return `• *${group.label}:* ${shown.join(", ")}${rest ? ` and ${rest} more` : ""}`;
 }
 
-/** The library card, as the parts its renderer and its post need. */
-export interface PublishCardCopy {
-  /** Who published what, the count, and every name under Has code and No
-   *  code mapping yet — capped only when the card would pass `ONE_POST_CHARS`. */
-  lead: string;
-  /** What ✅ and ⛔ each do, and who decides for how long. */
-  footer: string;
-  /** The complete list, for the card's thread, when the lead had to cap it. */
-  overflow: string[];
+/** The publish's name: its label, else its description's first line. */
+function versionName(version: PublishedVersion): string {
+  return version.label || firstLine(version.description) || "untitled";
 }
 
 /**
- * The library publish card's words.
+ * The report's parent line: who published what, and how much of it has code.
+ * One plain sentence, mrkdwn.
  *
  * @param changeSet - What the poll found; it carries a published version
  * @param intake - Its drafted intake
- * @param ttlHours - How long the card stays open
  */
-export function publishCard(changeSet: LibraryChangeSet, intake: PublishIntake, ttlHours: number): PublishCardCopy {
+export function releaseParent(changeSet: LibraryChangeSet, intake: PublishIntake): string {
+  const newest = changeSet.versions[0];
+  const who = newest ? `${escapeSlackText(newest.user)} published "${escapeSlackText(versionName(newest))}"` : "A version was published";
+  const n = intake.rows.length;
+  const coded = intake.rows.filter((r) => r.code).length;
+  if (!n) return `${who} to the library, with no changed components found.`;
+  const code = n === 1 ? (coded ? "and it has code" : "with no code yet") : coded ? `${coded} of them ${coded === 1 ? "has" : "have"} code` : "none of them has code yet";
+  return `${who} to the library: ${n} component${n === 1 ? "" : "s"} changed, ${code}.`;
+}
+
+/**
+ * The publish as the report's one item. A publish is one decision — file the
+ * intake and draft code for every mapped component, or file nothing — so it
+ * is one card, not one per component. Open goes to the library, and the
+ * version is the third button.
+ *
+ * @param changeSet - What the poll found; it carries a published version
+ * @param intake - Its drafted intake
+ */
+export function releaseItem(changeSet: LibraryChangeSet, intake: PublishIntake): ReportItem {
+  const newest = changeSet.versions[0];
+  const names = intake.implement;
+  const counted = `${changeParts(intake.rows)}.`;
+  const named = (list: string) => `${counted} ${list} ${names.length === 1 ? "has" : "have"} code that can be drafted to match.`;
+  const body = !intake.rows.length
+    ? countLine(intake.rows)
+    : !names.length
+      ? `${counted} Nothing here has code yet, so there's nothing to draft.`
+      : named(namesInWords(names)).length <= CARD_BODY_CHARS
+        ? named(namesInWords(names))
+        : named(`${names.length} components`);
+  return {
+    id: intake.key,
+    title: newest ? versionName(newest) : "Library publish",
+    ...(newest ? { subtitle: `${escapeSlackText(newest.user)} · ${shortDate(newest.createdAt)}` } : {}),
+    body,
+    open: { label: "Open library", url: libraryUrl(changeSet.fileKey) },
+    ...(newest ? { also: { label: "View version", url: versionUrl(changeSet.fileKey, newest.id) } } : {}),
+    done: names.length && intake.versionId ? `the intake, and code drafts started for ${namesInWords(names)}.` : "the intake.",
+  };
+}
+
+/**
+ * What the Review pop-up shows of a publish: who published what, the count,
+ * and every name under Has code and No code mapping yet — capped only past
+ * `ONE_POST_CHARS`, the whole list then going in the thread when the post
+ * carries no table. No footer: the pop-up's own Approve and Reject decide.
+ *
+ * @param changeSet - What the poll found; it carries a published version
+ * @param intake - Its drafted intake
+ */
+export function publishLead(changeSet: LibraryChangeSet, intake: PublishIntake): string {
   const newest = changeSet.versions[0];
   const head: string[] = [];
   if (newest) {
-    const label = escapeSlackText(newest.label || firstLine(newest.description) || "untitled");
     head.push(
-      `*Library published: "${label}"* by ${escapeSlackText(newest.user)} · <${versionUrl(changeSet.fileKey, newest.id)}|view version>`,
+      `*Library published: "${escapeSlackText(versionName(newest))}"* by ${escapeSlackText(newest.user)} · <${versionUrl(changeSet.fileKey, newest.id)}|view version>`,
     );
     if (newest.description) head.push(`> ${escapeSlackText(newest.description.slice(0, 300)).replace(/\n/g, "\n> ")}`);
   }
   head.push("", countLine(intake.rows));
 
-  const implement = intake.implement.map(escapeSlackText);
-  const footer = [
-    implement.length
-      ? `:white_check_mark: files the intake and drafts the code for ${namesInWords(implement)}. :no_entry: files the intake only.`
-      : intake.rows.length
-        ? ":white_check_mark: and :no_entry: both file the intake. Nothing here has code yet, so there's nothing to draft."
-        : ":white_check_mark: and :no_entry: both file the intake. There's nothing to draft.",
-    `Anyone in this channel can decide, for the next ${windowInWords(ttlHours)}.`,
-  ].join("\n");
-
   const groups = codeGroups(intake);
-  const fits = (lead: string) => lead.length + 2 + footer.length <= ONE_POST_CHARS;
+  const fits = (lead: string) => lead.length <= ONE_POST_CHARS;
   const full = [...head, ...groups.map((g) => groupLine(g))].join("\n");
-  if (fits(full)) return { lead: full, footer, overflow: [] };
-
-  // Too long for one post: each group keeps as many names as fit, the rest
-  // are counted, and the whole list goes in the thread.
+  if (fits(full)) return full;
   const leadAt = (cap: number) => [...head, ...groups.map((g) => groupLine(g, cap))].join("\n");
-  const cap = largestFitting(1, Math.max(...groups.map((g) => g.names.length)) - 1, (c) => fits(leadAt(c)));
-  return { lead: leadAt(cap), footer, overflow: componentListMessages(intake) };
+  return leadAt(largestFitting(1, Math.max(...groups.map((g) => g.names.length)) - 1, (c) => fits(leadAt(c))));
 }
 
 /**
- * What the library card says at the gate (`PendingProposal.stated`). A ⛔
- * files the intake only, as the footer says; and a card nobody decides is
- * filed the morning after its window (`track.ts`), so a late ✅ or ⛔ is told
- * that rather than "ask me again", which nobody can do for a publish.
+ * What the library card says at the gate (`PendingProposal.stated`). Reject
+ * files nothing; and a card nobody decides is filed the morning after its
+ * window (`track.ts`), so a late decision is told that rather than "ask me
+ * again", which nobody can do for a publish.
  *
  * @param intake - Its drafted intake
  * @param ttlHours - How long the card stays open
@@ -450,7 +487,7 @@ export function publishCard(changeSet: LibraryChangeSet, intake: PublishIntake, 
 export function libraryCardWords(intake: PublishIntake, ttlHours: number): StatedCardWords {
   const drafts = intake.implement.length > 0 && !!intake.versionId;
   return {
-    cancelled: "Intake only",
+    cancelled: "Rejected, nothing filed",
     expired:
       `That card closed after ${windowInWords(ttlHours)} with no decision${drafts ? ", so nothing was drafted" : ""}. ` +
       "I file its intake the morning after, so the publish isn't lost.",

@@ -4,7 +4,7 @@
 // incorporated.
 //
 // A POLL, NOT A WEBHOOK. The Worker has no GitHub webhook route, so this looks
-// once a morning: a PR opened after the ✅ is linked the next morning, and one
+// once a morning: a PR opened after an Approve is linked the next morning, and one
 // merged is closed out the morning after that. Two reads a run find what is
 // new — the repo's recent pulls, and its `harness-intake` issues updated since
 // the oldest card — and each card is matched in memory:
@@ -16,27 +16,31 @@
 // A PR once linked is read back by its number, so one that stays open past the
 // recent-pulls window is still seen merging.
 //
-// AN EXPIRED CARD IS CLOSED OUT (#886 § 3.1). Both the ✅ and the ⛔ file the
-// intake, marker and all, so a card past its 72 hours with no intake was never
-// decided. Before filing, the job looks again, wider than the morning's one
-// page — every intake updated since the card posted — and files nothing when
-// that page is full, because a duplicate intake and a "No decision" stamped on
-// a decided card are worse than a day's wait. Then it files the intake itself
-// — the same draft, labels and footer the ✅ path uses, so the publish is not
-// lost — writes that down at once, and edits the card: its buttons go, and its
-// last line says what happened. An edit that fails is tried again the next
-// morning (`closePending`), and nothing is filed twice. One ambiguity is
-// accepted: a ✅ whose filing failed also leaves no intake, and that card is
-// filed here too, with the same "No decision" line. A card tracked before the
-// card kept its draft has nothing to file from, and ages out as before.
-// A card whose PR never appears (a ⛔, a failed run) is dropped after
-// `TRACK_DAYS`.
+// AN EXPIRED CARD IS CLOSED OUT (#886 § 3.1). An Approve files the intake,
+// marker and all, and a Reject files nothing and says so on the report's
+// record — so a card past its 72 hours with no intake, whose record does not
+// say rejected, was never decided. Before filing, the job looks again, wider
+// than the morning's one page — every intake updated since the card posted —
+// and files nothing when that page is full, because a duplicate intake and a
+// closed card that was decided are worse than a day's wait. Then it files the
+// intake itself — the same draft, labels and footer Approve's filing uses, so
+// the publish is not lost — writes that down at once, closes the card ("Closed,
+// no decision", its report redrawn from the record) and says in its thread
+// what it filed. An edit that fails is tried again the next morning
+// (`closePending`), and nothing is filed twice. One ambiguity is accepted: an
+// Approve whose filing failed also leaves no intake, and that card is filed
+// here too. A card tracked before the shared card has no item; its intake
+// files the same way, and its own text is edited to a closing line. A card
+// tracked before the card kept its draft has nothing to file from, and ages
+// out as before. A card whose PR never appears (a Reject, a failed run) is
+// dropped after `TRACK_DAYS`.
 //
 // Subrequest math, per job: 2 reads, then per card at most 1 read (its linked
 // PR) and 5 writes (a PR linked and merged in one look: intake comment, thread
-// post, intake comment, close, thread post; an expiry is 4: the wider look, a
-// permalink, the filing, the edit) for at most `MAX_TRACKED_PER_RUN` cards —
-// 2 + 6 × 5 = 32, under the lookup ceiling of 38. KV is the internal bucket.
+// post, intake comment, close, thread post; an expiry is 5: the wider look, a
+// permalink, the filing, the edit and the thread line) for at most
+// `MAX_TRACKED_PER_RUN` cards — 2 + 6 × 5 = 32, under the lookup ceiling of 38.
+// The report's record is a Durable Object hop; KV is the internal bucket.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
@@ -44,6 +48,7 @@ import { namesInWords, windowInWords } from "../slack/copy-words";
 import { rethrowIfBudget } from "../net";
 import { LIBRARY_CARD_TTL_MS } from "./post";
 import { notedCardBlocks } from "../slack/proposal-render";
+import { settleItem, type ReportStore } from "../slack/decision-cards";
 
 /** A posted library card, followed until its PR merges or it ages out. */
 export interface TrackedPublish {
@@ -55,17 +60,19 @@ export interface TrackedPublish {
   /** The card's message ts — the thread to post in. */
   ts: string;
   postedAt: number;
-  /** The component list the ✅ dispatches, or null when it dispatches nothing. */
+  /** The component list Approve dispatches, or null when it dispatches nothing. */
   implement: string | null;
   intake?: { number: number; url: string };
   pr?: { number: number; url: string };
-  /** The intake as drafted, and the card as posted: what an expired card
-   *  needs to file the one and close the other. Absent on a card tracked
-   *  before they were kept. */
+  /** The intake as drafted: what an expired card files. Absent on a card
+   *  tracked before it was kept. */
   draft?: { title: string; body: string };
+  /** The card's entry id in its report (`decision-cards.ts`): where its
+   *  decision is read and its closing drawn. Absent on a card posted before
+   *  the shared card, which is closed from its own text below. */
+  item?: string;
   cardText?: string;
-  /** The card's own blocks — its release card and table — when it went up
-   *  with them; absent, it is closed from `cardText`. */
+  /** A pre-shared card's own blocks, when it went up with them. */
   cardBlocks?: unknown[];
   /** This job filed the intake at expiry and the card's edit has not landed
    *  yet: the next look tries the edit again, and files nothing. */
@@ -101,25 +108,32 @@ export interface TrackDeps {
     /** Every intake updated since `since`, up to a page of 100, and whether
      *  that was all of them. */
     intakesSince(since: string): Promise<{ intakes: IntakeRef[]; complete: boolean }>;
-    /** File an expired card's intake, as its ✅ would have; the card is where
-     *  its footer points. */
+    /** File an expired card's intake, as its Approve would have; the card is
+     *  where its footer points. */
     fileIntake(draft: { title: string; body: string }, card: { channel: string; ts: string }): Promise<{ number: number; url: string }>;
   };
   postToThread(channel: string, ts: string, text: string): Promise<void>;
-  /** Edit a card to its closing message: its own blocks, or its text, with a
-   *  closing line and no buttons. */
+  /** The reports' records: what a card's decision was, and its closing. */
+  reports: ReportStore;
+  /** Edit a card's message in place: its report redrawn closed, or a
+   *  pre-shared card's own blocks with a closing line and no buttons. */
   closeCard(channel: string, ts: string, message: { text: string; blocks: unknown[] }): Promise<void>;
   now(): number;
 }
 
-/** The line an expired card ends with (#886 § 3.1). */
+/** The line a pre-shared expired card ends with (#886 § 3.1). */
 export function expiredCardNote(intakeUrl: string): string {
   return `_No decision in ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)}. Filed the <${intakeUrl}|intake> so it isn't lost._`;
 }
 
+/** What an expired card's thread is told, under the card closed with no
+ *  decision. */
+export function expiredThreadLine(intakeUrl: string): string {
+  return `No decision in ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)}. I filed the <${intakeUrl}|intake> so the publish isn't lost.`;
+}
+
 // ── The card's thread, as the PR moves (#886 § 3.2) ──────────────────────────
-// Plain links, and one 🎉 — on the merge, naming what now matches. A ✅ only
-// ever means "approve", so it appears in none of these.
+// Plain links, and one 🎉 — on the merge, naming what now matches.
 
 type Link = { number: number; url: string };
 
@@ -176,6 +190,17 @@ export interface TrackResult {
  */
 async function closeExpired(deps: TrackDeps, card: TrackedPublish, intake: { number: number; url: string }): Promise<boolean> {
   try {
+    if (card.item) {
+      const message = await settleItem(deps.reports, { messageTs: card.ts, id: card.item }, { kind: "expired" }, deps.now());
+      if (message) await deps.closeCard(card.channel, card.ts, message);
+      delete card.closePending;
+      // Told once the card is closed; a line that fails is not tried again.
+      await deps.postToThread(card.channel, card.ts, expiredThreadLine(intake.url)).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        console.error(`[figma-library] expired card ${card.key}: thread line not posted — ${err instanceof Error ? err.message : String(err)}`);
+      });
+      return true;
+    }
     const note = expiredCardNote(intake.url);
     await deps.closeCard(card.channel, card.ts, {
       text: `${card.cardText!}\n${note}`,
@@ -235,17 +260,33 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
 
     // An expired card whose intake this job already filed: only the edit is
     // left to do.
-    if (card.closePending && card.intake && card.cardText) {
+    if (card.closePending && card.intake && (card.item || card.cardText)) {
       // Tried each morning until it lands, or until the card ages out.
       const landed = opts.dryRun || (await closeExpired(deps, card, card.intake));
       if (landed || age > TRACK_DAYS * DAY_MS) done.add(card.key);
       continue;
     }
 
-    // Past its window with no intake and no PR: nobody decided — once a wider
-    // look agrees. File the intake the ✅ or ⛔ would have filed, write that
-    // down, then close the card.
-    if (!pr && !card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && card.cardText) {
+    // Past its window with no intake and no PR: nobody decided — unless its
+    // record says rejected, and once a wider look agrees. File the intake
+    // Approve would have filed, write that down, then close the card.
+    if (!pr && !card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && (card.item || card.cardText)) {
+      if (card.item) {
+        let decided: string | undefined;
+        try {
+          decided = (await deps.reports.getReport(card.ts))?.entries.find((e) => e.id === card.item)?.state.kind;
+        } catch (err) {
+          rethrowIfBudget(err);
+          console.error(`[figma-library] expired card ${card.key}: could not read its decision — ${err instanceof Error ? err.message : String(err)}`);
+          continue;
+        }
+        if (decided === "rejected") {
+          // Rejected in Review: nothing to file, and nothing more to follow.
+          dropped += 1;
+          done.add(card.key);
+          continue;
+        }
+      }
       let look: { intakes: IntakeRef[]; complete: boolean };
       try {
         look = await deps.github.intakesSince(new Date(card.postedAt - CLOCK_SLACK_MS).toISOString());
