@@ -2,7 +2,8 @@
 // sweep source (#900, Seam 2).
 //
 // SWITCH-ON. The first run reads nothing: it records the watermark, and only
-// comments created or resolved after it are ever read (`./threads.ts`).
+// comments created or resolved after it are ever read (`./threads.ts`) — a
+// reply after it on an older thread among them.
 //
 // THE WINDOW is (from, until]: from the last finished read's end to this run's
 // start, kept with the watermark in the sweep's cursor table under
@@ -25,10 +26,12 @@
 //   2. its pages to depth 2 (Tier 1), and a read for the ids that sit deeper;
 //      only threads pinned under 📐 Specs or 🔍 For Review stay (`./sections.ts`);
 //   3. its cards, from `Card <n>` in its title (`./title.ts`): each card's page,
-//      and its PRD subpage — else the card page — as the PRD; the owner is the
-//      first card's first Contributor who is a Slack person, the confirmers
-//      every card's Contributors. A file with no card names its creator (`/meta`) and can
-//      route a decision only to an intake;
+//      offering only its status, owner and timing fields, and the first card's
+//      PRD subpage as the PRD — a card with none has no PRD, and a behaviour
+//      decision is then said in the thread, never written into the card's
+//      body. The confirmers are every card's Contributors; the owner asked is
+//      the card's design owner — the first Contributor the team's roles name a
+//      designer — else the file's creator (`/meta`), by Figma handle;
 //   4. one model call (`./detector.ts`), and each decision drafted
 //      (`./draft.ts`) and queued for the morning (`./queue.ts`).
 // A file with no thread in its window costs one call.
@@ -47,10 +50,11 @@ import { readUsable } from "../sweep/surfaces";
 import type { SweepSource } from "../sweep/finding";
 import type { SweepRunOutcome } from "../sweep/store";
 import { contributorsOf, MAX_FAILED_NIGHTS, readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sweep/run";
-import { candidateThreads, type CommentThread, type ReadWindow } from "./threads";
+import { candidateThreads, readComments, type CommentThread, type ReadWindow } from "./threads";
+import { roleOf } from "../usage/roles";
 import { DECISION_SECTIONS, pageOf, pagesOf, type FilePage, type NodePlace } from "./sections";
 import { cardNumbersOf } from "./title";
-import type { ShownCard, ShownThread } from "./detector";
+import { isDecisionField, type ShownCard, type ShownThread } from "./detector";
 import { commentUrl, draftDecision } from "./draft";
 import { mergeQueuedFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
 
@@ -66,8 +70,6 @@ export const MISC_REFRESH_MS = 7 * DAY_MS;
 export const MAX_CARDS_PER_FILE = 3;
 /** Characters of the root comment a card quotes. */
 export const QUOTE_CHARS = 200;
-/** Card fields never offered: a card's name and its number are not decided in a comment. */
-const NOT_FIELDS = new Set(["name", "id"]);
 /** A stop that is a quota's, not the file's: held, never counted. */
 const QUOTA = /\b429\b|quota|rate.?limit|resource.?exhausted/i;
 
@@ -313,16 +315,14 @@ async function readFile(
     }
     const first = cardPages[0];
     if (first) {
+      // Only a PRD subpage is a PRD: a card's own body is not one.
       const sub = first.subpages?.find((s) => /^prd\b/i.test(s.title));
-      prd = (sub ? await readUsable(deps.sources, deps.config, `https://www.notion.so/${sub.id}`, "notion") : null) ?? first;
-      // The first card's first Contributor who is a Slack person.
-      const lead = await contributorsOf(deps, first.contributors, resolved);
-      owner = lead[0] ? { slack: lead[0] } : null;
+      prd = sub ? await readUsable(deps.sources, deps.config, `https://www.notion.so/${sub.id}`, "notion") : null;
       confirmers = [...new Set(await contributorsOf(deps, cardPages.flatMap((p) => p.contributors), resolved))];
-    } else {
-      const handle = (await fc.figma.fileMeta(fileKey)).file.creator?.handle;
-      owner = handle ? { figma: handle } : null;
+      const designer = await designOwnerOf(fc, confirmers);
+      if (designer) owner = { slack: designer };
     }
+    owner ??= await creatorOf(fc, fileKey);
   } catch (err) {
     return failure("its card could not be read", err);
   }
@@ -333,7 +333,7 @@ async function readFile(
     page: page.name,
     ...(layer ? { layer } : {}),
     resolved: !!thread.root.resolved_at,
-    comments: [thread.root, ...thread.replies].map((c) => ({ by: c.user.handle, at: c.created_at, text: c.message })),
+    comments: readComments(thread).map((c) => ({ by: c.user.handle, at: c.created_at, text: c.message })),
   }));
   const fileUrl = `https://www.figma.com/design/${encodeURIComponent(fileKey)}`;
   const detected = await fc.detector.detect({ file: { title, url: fileUrl }, threads: shown, cards, prd });
@@ -344,23 +344,27 @@ async function readFile(
     const at = counted.find((c) => c.thread.root.id === d.threadId);
     if (!at) continue;
     const root = at.thread.root;
-    const quote = quoteOf(root.message);
+    // What the card quotes: the root, or for an open root from before the
+    // watermark, the first reply after it — never a comment the read may not read.
+    const said = readComments(at.thread)[0]!;
+    const quote = quoteOf(said.message);
     const { operation, update } = draftDecision(d, {
       prd,
+      card: cards[0]?.number ?? null,
       file: { title },
       commentUrl: commentUrl(fileKey, at.thread.nodeId, root.id),
       quote,
-      by: root.user.handle,
+      by: said.user.handle,
       where: `${at.page.section} › ${at.page.name}`,
     });
     decisions.push({
       commentId: root.id,
       nodeId: at.thread.nodeId,
       quote,
-      by: root.user.handle,
+      by: said.user.handle,
       section: at.page.section!,
       page: at.page.name,
-      createdAt: root.created_at,
+      createdAt: said.created_at,
       resolvedAt: root.resolved_at ?? null,
       decision: d.decision,
       route: d.route,
@@ -373,11 +377,35 @@ async function readFile(
   return { ok: true, file: { fileKey, title, url: fileUrl, owner, confirmers, decisions, runDate: deps.runDate, foundAt: deps.now() } };
 }
 
-/** A card's fields the detector may change: everything it reads but its name and number. */
+/**
+ * The card's design owner: the first of its Contributors, as Slack ids, whom
+ * the team's roles name a designer. The Roadmap's people fields are
+ * Contributor and Dev, so a designer among the Contributors is how a card
+ * names who owns its design. Null when none is, or the roles are unread.
+ */
+async function designOwnerOf(fc: SweepFigmaComments, contributors: readonly string[]): Promise<string | null> {
+  if (!contributors.length) return null;
+  const roles = await fc.roles();
+  return contributors.find((id) => roleOf(id, roles) === "design") ?? null;
+}
+
+/** The file's creator by Figma handle, or null when the file's meta has none or cannot be read. */
+async function creatorOf(fc: SweepFigmaComments, fileKey: string): Promise<FileOwner | null> {
+  try {
+    const handle = (await fc.figma.fileMeta(fileKey)).file.creator?.handle;
+    return handle ? { figma: handle } : null;
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[figma-comments] ${fileKey}'s creator not read: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  }
+}
+
+/** A card's fields the detector may change: its status, owner and timing fields, as it reads them. */
 export function fieldsOf(page: SweepSource): Record<string, string> {
   const fields: Record<string, string> = {};
   for (const [name, value] of Object.entries(page.properties ?? {})) {
-    if (!NOT_FIELDS.has(name.trim().toLowerCase()) && value.trim()) fields[name] = value;
+    if (isDecisionField(name) && value.trim()) fields[name] = value;
   }
   if (page.contributors.length && !Object.keys(fields).some((k) => k.toLowerCase() === "contributor")) {
     fields.Contributor = page.contributors.join(", ");

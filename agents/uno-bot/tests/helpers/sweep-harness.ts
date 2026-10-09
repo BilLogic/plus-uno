@@ -26,6 +26,7 @@ import type { SearchHit } from "../../src/sweep/search";
 import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../../src/usage/index";
 import type { InMemoryFigma } from "../../src/figma/in-memory";
+import type { TeamRoles } from "../../src/usage/roles";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
 
@@ -216,6 +217,8 @@ export function sweepHarness(opts: {
     cards?: Record<number, { url: string; title: string }>;
     miscTeamId?: string;
     members?: string[] | null;
+    /** The team's roles by Slack id: who is a designer. None unless set. */
+    roles?: TeamRoles;
   };
 }): SweepHarness {
   const clock = { now: opts.now };
@@ -287,6 +290,7 @@ export function sweepHarness(opts: {
         async card(number) {
           return opts.figma!.cards?.[number] ?? null;
         },
+        roles: async () => opts.figma!.roles ?? {},
         detector: modelDecisionDetector(provider),
         ...(opts.figma.miscTeamId ? { miscTeamId: opts.figma.miscTeamId } : {}),
         queue: {

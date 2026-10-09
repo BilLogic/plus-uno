@@ -4,18 +4,20 @@
 // What each port becomes:
 //   • Figma: the Worker's one client (`figmaClientFor`), paced and retried.
 //   • The notes: HARNESS_KV lists under the notification route's prefixes,
-//     each key's time read from its metadata; a note written before the
-//     metadata was costs one get.
+//     each key's time read from its metadata; a note with none has no time.
 //   • A card: `queryRoadmapCards` by its number, one Notion query.
+//   • The team's roles: the role map the daily sync keeps (`teamRolesFor`),
+//     one KV read, which names a card's design owner.
 //   • The detector: the Worker's one ModelProvider.
 //   • The queue, the carded marks, MISC's list and each thread's record:
 //     HARNESS_KV, with an expiry. The queue holds words, so never D1 (ADR-030).
 //   • Slack: `chat.postMessage` and `chat.update` in #plus-design
 //     (`PLUS_DESIGN_CHANNEL_ID`), its members, and a card staged in ThreadState
 //     and put on the usage record as staged by the Worker.
-//   • A reply rewording a decision (`./revise.ts`): the thread's record, the
-//     card in ThreadState, the page read fresh as the sweep reads one, and the
-//     revised card staged the same way.
+//   • New wording for a decision (`./revise.ts`) — Review's Needs changes, or
+//     a reply on an explicit cue: the thread's record, the card in
+//     ThreadState and its Needs changes lock, the page read fresh as the
+//     sweep reads one, and the revised card staged the same way.
 //
 // Every KV call is charged to the invocation's internal bucket.
 
@@ -24,7 +26,7 @@ import type { ModelProvider } from "../agent/model-provider";
 import { selectProvider } from "../agent/run-agent";
 import type { SlackMessageEvent } from "../slack/types";
 import { measured, readSource } from "../sweep/env";
-import { charge } from "../net";
+import { charge, rethrowIfBudget } from "../net";
 import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
 import { queryRoadmapCards } from "../integrations/notion";
@@ -32,7 +34,8 @@ import { postMessage, updateMessage } from "../slack/api";
 import { channelMembers } from "../figma-library/env";
 import { threadStateFor } from "../thread-state/production";
 import type { PendingProposal } from "../thread-state/index";
-import { proposalEventLogFor } from "../usage/production";
+import { proposalEventLogFor, teamRolesFor } from "../usage/production";
+import { getBotIdentity } from "../slack/api";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { modelDecisionDetector } from "./detector";
 import { reviseDecision } from "./revise";
@@ -92,10 +95,11 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
         for (let page = 0; page < LIST_PAGES; page++) {
           charge(1, "kv");
           const res = await kv.list<{ at?: string }>({ prefix, ...(cursor ? { cursor } : {}) });
-          for (const k of res.keys) {
-            const at = k.metadata?.at ?? (await json<{ at?: string }>(k.name))?.at ?? null;
-            out.push({ key: k.name, at });
-          }
+          // A key's time is its metadata, read with the list. A note written
+          // before the route kept metadata has none and reads as null — for
+          // a `changed:` note, no window holds it — rather than costing a
+          // get each night until it expires.
+          for (const k of res.keys) out.push({ key: k.name, at: k.metadata?.at ?? null });
           if (res.list_complete) break;
           cursor = res.cursor;
         }
@@ -107,6 +111,7 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
       const card = rows.find((r) => r.card_number === number);
       return card ? { url: card.url, title: card.title } : null;
     },
+    roles: () => teamRolesFor(env),
     detector: modelDecisionDetector(provider),
     ...(miscTeamId ? { miscTeamId } : {}),
     queue: {
@@ -238,6 +243,7 @@ export async function isFigmaDecisionThread(env: Env, channel: string, threadTs:
  */
 export async function handleFigmaDecisionReply(env: Env, event: SlackMessageEvent): Promise<boolean> {
   if (!isFigmaDecisionCandidate(env, event)) return false;
+  const text = event.text ?? "";
   const kv = env.HARNESS_KV!;
   const threads = decisionThreadsOn(kv);
   const store = threadStateFor(env);
@@ -269,9 +275,24 @@ export async function handleFigmaDecisionReply(env: Env, event: SlackMessageEven
       async retire(ts) {
         await store.retireProposal(ts);
       },
+      clearRevising: (ts) => store.clearRevising(ts),
       superseded: (tss) => recordProposalEvents(events, supersededEvents(tss, Date.now(), "worker")),
       now: () => Date.now(),
     },
-    { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" },
+    { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text, mentionsBot: await mentionsBot(env, text) },
   );
+}
+
+/**
+ * Whether a message @mentions uno-bot. With the bot's identity unread, any
+ * mention counts: a question for the turn taken as new wording would retire a
+ * card, and a rewording sent to the turn costs only an answer.
+ */
+async function mentionsBot(env: Env, text: string): Promise<boolean> {
+  if (!/<@[A-Z0-9]+/.test(text)) return false;
+  const identity = await getBotIdentity(env).catch((err: unknown) => {
+    rethrowIfBudget(err);
+    return null;
+  });
+  return identity ? text.includes(`<@${identity.userId}`) : true;
 }

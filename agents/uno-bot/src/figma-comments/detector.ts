@@ -20,11 +20,13 @@
 //     intake's title and body.
 //   • `none` — anything else, which yields nothing.
 //
-// THE PARSE REFUSES a thread it was not shown; a route with no target (`prd`
-// with no PRD, `card` with no card); a block or heading it was not offered; a
-// field the card does not have; a rewrite `replacementProblem` refuses; an
+// THE PARSE REFUSES a thread it was not shown; `card` with no card; a block or
+// heading it was not offered; a field the card does not have, or one that is
+// not its status, owner or timing; a rewrite `replacementProblem` refuses; an
 // added line that is empty, breaks or runs long; and a confidence under the
-// sweep's floor. One decision per thread: the first that passes.
+// sweep's floor. A `prd` decision on a file with no PRD is kept with no
+// target, so the thread is told; one naming a block is dropped. One decision
+// per thread: the first that passes.
 //
 // PURE: the provider is a parameter. Eval cases:
 // docs/evals/fixtures/figma-decision-cases.json (tests/figma-comments.test.ts).
@@ -54,6 +56,23 @@ const MAX_PRD_CHARS = 8_000;
 const MAX_TOKENS = 4_000;
 
 export type DecisionRoute = "prd" | "card" | "design-system";
+
+/** Card fields a comment may decide, by name: status, owner and timing — the
+ *  Roadmap's Status, Design Status and Dev Status; Contributor and Dev; Design
+ *  Timeline, Dev Timeline, Release Version and Goal/Quarter. */
+const DECISION_FIELD = /\bstatus\b|\bcontributors?\b|^dev$|\bowners?\b|\btimeline\b|\bdates?\b|\bdue\b|\brelease\b|\bquarter\b/i;
+
+/**
+ * Whether a card field is one a comment may decide: its status, its owner or
+ * its timing (#891). Every other field — the pillar, the tags, the links, the
+ * priority — is not a decision a comment settles: it is never offered, and a
+ * reply naming it is dropped.
+ *
+ * @param name - The field's name, as the card has it
+ */
+export function isDecisionField(name: string): boolean {
+  return DECISION_FIELD.test(name.trim());
+}
 
 /** One thread, as the detector is shown it. */
 export interface ShownThread {
@@ -98,7 +117,7 @@ export interface DetectedDecision {
   /** The decision, restated in one sentence. */
   decision: string;
   confidence: number;
-  /** `prd`: the block rewritten, or the block a line goes in after. */
+  /** `prd`: the block rewritten, or the block a line goes in after; absent with no PRD. */
   prd?:
     | { kind: "change"; block: SweepBlock; replacement: string; section: string | null }
     | { kind: "add"; anchorId: string; anchorEditedTime: string; text: string; section: string };
@@ -128,7 +147,8 @@ export const DECISION_DETECTOR_SYSTEM = [
   '{"decisions":[{"thread_id":"…","route":"prd"|"card"|"design-system"|"none","decision":"…","block_id":"…","replacement":"…","section_block_id":"…","text":"…","card":0,"field":"…","value":"…","title":"…","body":"…","confidence":0.0}]}',
   "- thread_id: a thread id as listed; decision: what was decided, one sentence, no names.",
   "- Give only the keys your route uses; prd takes either block_id and replacement, or section_block_id and text.",
-  "- card: the card's number as listed. With no PRD listed there is no prd route; with no card listed there is no card route.",
+  "- card: the card's number as listed, and only a status, owner or timing field it lists. With no card listed there is no card route.",
+  "- With no PRD listed, a behaviour or scope decision still takes route prd, with no block_id, section_block_id or text: it is reported, not written.",
   "- confidence: 0 to 1 that this thread settled what you say, and that it belongs where you put it.",
   'Nothing → {"decisions":[]}.',
 ].join("\n");
@@ -172,7 +192,7 @@ export function decisionPrompt(input: DecisionInput): string {
     lines.push("blocks (id · full text):", ...(offered.length ? offered.map((b) => `${b.id} · ${b.text}`) : ["(none)"]));
     lines.push("body:", cap(prd.blocks.map((b) => b.text).join("\n"), MAX_PRD_CHARS));
   } else {
-    lines.push("PRD: none — the prd route is not available");
+    lines.push("PRD: none — a prd decision names no block, and is reported rather than written");
   }
   lines.push("", "THREADS:");
   for (const t of input.threads) {
@@ -214,7 +234,7 @@ export function parseDecisionReply(text: string, input: DecisionInput): Detected
     const route = str(f.route);
     const base = { threadId, decision, confidence };
     let found: DetectedDecision | null = null;
-    if (route === "prd") found = prdDecision(f, input.prd, base);
+    if (route === "prd") found = input.prd ? prdDecision(f, input.prd, base) : unplacedPrdDecision(f, base);
     else if (route === "card") found = cardDecision(f, input.cards, base);
     else if (route === "design-system") found = intakeDecision(f, base);
     if (!found) continue;
@@ -249,11 +269,22 @@ function prdDecision(f: Record<string, unknown>, prd: SweepSource | null, base: 
   };
 }
 
+/**
+ * A behaviour or scope decision on a file with no PRD: kept with no target,
+ * so it is said in the thread rather than lost. One that names a block or a
+ * section names something it was never shown, and is dropped.
+ */
+function unplacedPrdDecision(f: Record<string, unknown>, base: Base): DetectedDecision | null {
+  if (str(f.block_id) || str(f.section_block_id)) return null;
+  return { ...base, route: "prd" };
+}
+
 function cardDecision(f: Record<string, unknown>, cards: readonly ShownCard[], base: Base): DetectedDecision | null {
   const card = cards.find((c) => c.number === Number(f.card)) ?? (cards.length === 1 ? cards[0] : undefined);
   if (!card) return null;
   const asked = str(f.field).toLowerCase();
-  const field = Object.keys(card.fields).find((k) => k.toLowerCase() === asked);
+  // Status, owner or timing only, whatever else the card was read with.
+  const field = Object.keys(card.fields).find((k) => k.toLowerCase() === asked && isDecisionField(k));
   const to = str(f.value);
   if (!field || !to || to.includes("\n") || to.length > MAX_VALUE_CHARS) return null;
   const from = card.fields[field] ?? null;

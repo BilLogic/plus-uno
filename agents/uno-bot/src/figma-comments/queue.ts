@@ -19,6 +19,7 @@ import type { PendingProposal, ProposalOperation } from "../thread-state/index";
 import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
+import type { TeamRoles } from "../usage/roles";
 
 /** One decision waiting for its morning. */
 export interface QueuedDecision {
@@ -37,8 +38,8 @@ export interface QueuedDecision {
   /** The decision, restated in one sentence. */
   decision: string;
   route: DecisionRoute;
-  /** What its ✅ runs. */
-  operation: ProposalOperation;
+  /** What its ✅ runs; null for a PRD decision with no PRD, which is said in the thread and carded nowhere. */
+  operation: ProposalOperation | null;
   /** What its card says the ✅ does. */
   update: DecisionUpdate;
   confidence: number;
@@ -46,9 +47,10 @@ export interface QueuedDecision {
 
 /** Who a file's thread asks. */
 export type FileOwner =
-  /** A card's first Contributor, as a Slack id. */
+  /** The card's design owner, as a Slack id. */
   | { slack: string }
-  /** A file with no card: its creator, by Figma handle until #902 maps Figma people to Slack. */
+  /** No design owner in Slack: the file's creator, by Figma handle, since
+   *  nothing maps a Figma person to a Slack one. */
   | { figma: string };
 
 /** One file's decisions, waiting for the morning. */
@@ -65,6 +67,9 @@ export interface QueuedFile {
   decisions: QueuedDecision[];
   runDate: string;
   foundAt: number;
+  /** The #plus-design thread a morning opened for it and could not finish:
+   *  the next morning posts in it rather than opening a second. */
+  threadTs?: string;
 }
 
 /** The KV records both jobs keep. */
@@ -108,6 +113,9 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   notes: { list(prefix: string): Promise<Array<{ key: string; at: string | null }>> };
   /** A Roadmap card by its number, or null when the Roadmap has none. */
   card(number: number): Promise<{ url: string; title: string } | null>;
+  /** The team's roles by Slack id (`usage/roles.ts`): how a card's design
+   *  owner is told from its other Contributors. Empty when unread. */
+  roles(): Promise<TeamRoles>;
   detector: DecisionDetector;
   /** MISC's team id, from `FIGMA_TEAM_IDS`; absent, nothing is skipped as MISC. */
   miscTeamId?: string;
@@ -137,5 +145,5 @@ export interface SweepFigmaComments extends FigmaCommentStores {
 export function mergeQueuedFile(older: QueuedFile | null, newer: QueuedFile): QueuedFile {
   if (!older) return newer;
   const fresh = new Set(newer.decisions.map((d) => d.commentId));
-  return { ...newer, decisions: [...older.decisions.filter((d) => !fresh.has(d.commentId)), ...newer.decisions] };
+  return { ...newer, ...(older.threadTs ? { threadTs: older.threadTs } : {}), decisions: [...older.decisions.filter((d) => !fresh.has(d.commentId)), ...newer.decisions] };
 }

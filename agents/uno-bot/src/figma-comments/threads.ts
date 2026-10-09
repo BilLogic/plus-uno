@@ -5,8 +5,9 @@
 // reach #plus-design (#891 story 16). A root resolved after it counts as
 // read — resolving is the newest thing said about that thread — but its
 // replies from before the watermark stay unread. A thread whose root came
-// before the watermark is read only once that root is resolved: until then
-// its root is unread, and a new reply alone would be read out of its thread.
+// before the watermark and is still open is read by its replies alone: a
+// reply after the watermark is read, the root it answers is not, and the
+// thread is shown and quoted by its first such reply.
 //
 // THE WINDOW. Each night reads (from, until]: a thread is looked at when one
 // of its readable comments was created in it, or its root was resolved in it.
@@ -35,6 +36,9 @@ export interface ReadWindow {
 /** A thread a night looks at: its root and the replies it may read, oldest first. */
 export interface CommentThread {
   root: FigmaComment;
+  /** Whether the root itself may be read; false for an open root from before
+   *  the watermark, whose thread is read by its replies alone. */
+  rootRead: boolean;
   replies: FigmaComment[];
   /** The node its root is pinned to. */
   nodeId: string;
@@ -55,8 +59,18 @@ export function readable(c: Pick<FigmaComment, "created_at" | "resolved_at" | "p
 }
 
 /**
- * The threads tonight's read looks at: pinned roots it may read, with
- * activity in the window, each carrying only the replies it may read.
+ * A thread's comments the read may show, oldest first: the root when it may
+ * be read, then its readable replies. The first is what a card quotes.
+ *
+ * @param t - The thread
+ */
+export function readComments(t: CommentThread): FigmaComment[] {
+  return t.rootRead ? [t.root, ...t.replies] : t.replies;
+}
+
+/**
+ * The threads tonight's read looks at: pinned roots with activity in the
+ * window, each carrying only the replies it may read.
  *
  * @param comments - Every comment on the file, roots and replies
  * @param window - The watermark and tonight's bounds
@@ -74,12 +88,15 @@ export function candidateThreads(comments: readonly FigmaComment[], window: Read
   for (const root of comments) {
     if (root.parent_id) continue;
     const nodeId = root.client_meta?.node_id;
-    if (!nodeId || !readable(root, window.watermark)) continue;
+    if (!nodeId) continue;
     const own = (replies.get(root.id) ?? []).sort((a, b) => time(a.created_at) - time(b.created_at));
-    const rootCreatedReadable = time(root.created_at) > window.watermark;
+    const rootRead = readable(root, window.watermark);
+    if (!rootRead && !own.length) continue;
     const active =
-      inWindow(root.resolved_at) || (rootCreatedReadable && inWindow(root.created_at)) || own.some((r) => inWindow(r.created_at));
-    if (active) threads.push({ root, replies: own, nodeId });
+      (rootRead && inWindow(root.resolved_at)) ||
+      (time(root.created_at) > window.watermark && inWindow(root.created_at)) ||
+      own.some((r) => inWindow(r.created_at));
+    if (active) threads.push({ root, rootRead, replies: own, nodeId });
   }
   return threads;
 }

@@ -29,6 +29,7 @@ import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updat
 import { executeVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
 import {
+  NEEDS_CHANGES_LEAD,
   runReviewDecision,
   runReviewOpen,
   runReviewPush,
@@ -48,7 +49,7 @@ import {
 import type { OptionSource } from "./review-fields";
 import { databaseOptions } from "../integrations/notion";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
-import { conversationKey, enqueueAgentJob } from "./events";
+import { conversationKey, enqueueAgentJob, replyHandlerAt } from "./events";
 import type { SlackMessageEvent } from "./types";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
@@ -356,11 +357,15 @@ async function reviseFromReview(
         type: "message",
         channel: proposal.channel,
         user: userId,
-        text: `Needs changes on the proposal card above: ${note}`,
+        text: `${NEEDS_CHANGES_LEAD}${note}`,
         ts: noteTs,
         thread_ts: thread,
       };
-      await enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event));
+      // A Figma comment decision revises its own way: its handler takes the
+      // note at the head of the job (`figma-comments/revise.ts`). Every other
+      // card goes to the turn, as before.
+      const own = (await replyHandlerAt(env, event)) === "figma-decisions" ? "figma-decisions" : null;
+      await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {
       await updateMessage(env, { channel: proposal.channel, ts: proposal.proposalTs, text: message.text, blocks: message.blocks });

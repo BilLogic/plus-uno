@@ -9,6 +9,9 @@
 //   card          → `notion_update` `properties` on the card. The tool matches
 //                   the field to the Roadmap's live schema and reports a value
 //                   that is not an option rather than creating it.
+//   prd, no PRD   → nothing: the card has no PRD subpage (or the file no
+//                   card), so the decision is said in the thread and carded
+//                   nowhere, rather than written into the card's own body.
 //   design-system → `github_issue_create`. The tool adds the `harness-intake`
 //                   labels and its footer. A file in the six teams counts like
 //                   a public design channel (ADR-031), so the body may carry the
@@ -28,11 +31,15 @@ import type { DetectedDecision } from "./detector";
 export type DecisionUpdate =
   | { kind: "prd"; change: "add" | "change"; section: string | null; page: { title: string; url: string } }
   | { kind: "card"; card: number; field: string; from: string | null; to: string; url: string }
-  | { kind: "intake"; title: string };
+  | { kind: "intake"; title: string }
+  /** A behaviour or scope decision with no PRD to write to: no card, or a card with no PRD subpage. */
+  | { kind: "no-prd"; card: number | null };
 
 /** Where the decision was said, for the intake's body. */
 export interface DraftContext {
   prd: SweepSource | null;
+  /** The file's first card, which a PRD decision with no PRD names. */
+  card: number | null;
   file: { title: string };
   /** The comment's own link in Figma. */
   commentUrl: string;
@@ -44,12 +51,14 @@ export interface DraftContext {
 }
 
 /**
- * The operation a decision's ✅ runs, and what its card says it does.
+ * The operation a decision's ✅ runs, and what its card says it does; no
+ * operation for a PRD decision with no PRD.
  *
  * @param d - A validated decision
  * @param ctx - The page it writes to, and where it was said
  */
-export function draftDecision(d: DetectedDecision, ctx: DraftContext): { operation: ProposalOperation; update: DecisionUpdate } {
+export function draftDecision(d: DetectedDecision, ctx: DraftContext): { operation: ProposalOperation | null; update: DecisionUpdate } {
+  if (d.route === "prd" && !ctx.prd) return { operation: null, update: { kind: "no-prd", card: ctx.card } };
   if (d.route === "prd" && d.prd && ctx.prd) {
     const page = { title: ctx.prd.title, url: ctx.prd.url };
     if (d.prd.kind === "change") {

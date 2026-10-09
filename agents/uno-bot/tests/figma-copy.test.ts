@@ -660,9 +660,9 @@ describe("the drift question (#886 § 3.3)", () => {
 // ── The comment-decision thread (#886 § 3.5, #900) ──────────────────────────
 //
 // § 3.5 gives the parent and one reply. Where the code goes past it — the
-// number a reply names, the drafted words under the update line, "✅ writes
-// it" for one write and "✅ files the intake" for an intake, the commenter by
-// Figma handle until #902 — follows its register and is Bill's to confirm.
+// number on each card, the whole drafted text under the update line, "✅
+// writes it" for one write and "✅ files the intake" for an intake, the
+// commenter by Figma handle — follows its register.
 
 describe("the comment-decision thread (#886 § 3.5)", () => {
   const FILE = { title: "Goal Setting / Card 2482 / Sarah", url: "https://www.figma.com/design/GoalFile1" };
@@ -727,15 +727,15 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
         `• *PRD › Goal states:* add this rule · <${PRD.url}|page>`,
         "> The progress bar stays hidden until the first goal is set.",
         "",
-        ':white_check_mark: writes it · :no_entry: drops it · reply "1: …" to change the wording',
+        ":white_check_mark: writes it · :no_entry: drops it",
       ].join("\n"),
     );
     const statusCard = renderProposalCard(decisionCard(2, status, COMMENT)).text;
     assert.match(statusCard, /^sarah on the Specs page, commented Sep 29 · /m);
     assert.match(statusCard, /^• \*Card 2482 › Design Status:\* WIP → Under Review · <https:\/\/www\.notion\.so\/c\|card>$/m);
     const intakeCard = renderProposalCard(decisionCard(3, intake, COMMENT)).text;
-    assert.match(intakeCard, /^• \*Intake:\* "Goal chips use the Badge pill variant"$/m);
-    assert.match(intakeCard, /:white_check_mark: files the intake · :no_entry: drops it · reply "3: …" to change the wording$/);
+    assert.match(intakeCard, /^• \*Intake:\* "Goal chips use the Badge pill variant"\n> …$/m, "with the body it files");
+    assert.match(intakeCard, /\n\n:white_check_mark: files the intake · :no_entry: drops it$/);
     for (const text of [prdCard, statusCard, intakeCard]) passesChecklist(text, { gate: true });
   });
 
@@ -747,8 +747,9 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
     passesGateAnswer(renderGateNote({ kind: "expired", ttlMs: DECISION_CARD_TTL_MS, words: words.expired }));
   });
 
-  it("the lines a reply gets hold to the vocabulary", () => {
+  it("the lines a reply gets hold to the vocabulary, and point at Review", () => {
     for (const text of [rewordInstead(2), whichOne([1, 3])]) {
+      assert.match(text, /press Review on .* card and choose Needs changes/i);
       assertVocabulary(text);
       assert.ok(text.length < 200, text);
     }
