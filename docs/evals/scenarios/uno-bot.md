@@ -21,11 +21,11 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **71** (B×7 · C×1 · CH×3 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · RT×5 · S×3 · T×2 · V×1 · W×1 · WL×2) |
+| cases | **72** (B×7 · C×1 · CH×3 · D×1 · DQ×4 · E×5 · G×8 · GU×2 · I×4 · M×1 · P×6 · R×15 · RT×6 · S×3 · T×2 · V×1 · W×1 · WL×2) |
 | blockers | 30 |
-| turns · sample runs | 81 · 211 |
+| turns · sample runs | 82 · 214 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
-| recorded, so the pull-request gate reaches them | 54 |
+| recorded, so the pull-request gate reaches them | 55 |
 | **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, I1, I2, I3, I4, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
@@ -623,6 +623,14 @@ _advisory · 3 samples · recorded_
 - **Trigger:** "In the blueprint, who sends tutors the clearance email?"
 - **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"present"` · `textRegex`: `"^(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 with RT1–RT3, as their counterweight: the search returns several cells, but the question has one answer, the lane that sends the email. The reply names it in a sentence and links the cell it rests on, and calls no `present`. Deterministic: present is never called, and no emoji. For the judge: the reply gives the one lane, attributed to its cell, and does not table or list the other rows the search returned. A table fails, and so does a lane with no row behind it. [samples:3 — whether the model asks for a table or answers in prose is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
+
+## RT6 — a reply over a result table names at most 3 of its rows
+
+_advisory · 3 samples · recorded_
+
+- **Trigger:** "What are the main tutor pain points in the blueprint, by scenario?"
+- **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"present","args":{"shape":"table","lookup":"search_blueprint"}}` · `textRegex`: `"^(?![\\s\\S]*(?:\\?cell=[\\s\\S]*){4})(?!(?:(?!\\n⚠️ [^\\n]+(?:\\n⚠️ [^\\n]+)?$)[\\s\\S])*(?:[☀-➿]|\\uD83C[\\uDC00-\\uDFFF]|\\uD83D[\\uDC00-\\uDFFF]|\\uD83E[\\uDC00-\\uDFFF]|:[a-z][a-z0-9_+-]*:))"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-10-09 from a live miss on r521: this question posted a correct result table, and the prose above it walked every scenario in nested bullets, each row restated in a sentence of its own. With a table attached the answer is the takeaway, what stands out and what to act on, naming at most 3 rows. A draft that names more is sent back through the draft judge to be rewritten, and if the reply that ships still names more, the list items naming rows past the first 3 come out. Deterministic: a present call with shape table and lookup search_blueprint, at most 3 blueprint cell links in the reply, and no emoji. For the judge: the reply leads with a one-sentence takeaway (where tutors hit the most friction), stays short, and leaves the rows to the table. A reply that walks the scenarios one by one fails, and so does a reply that lost its confidence clause. [samples:3 — whether the model walks the rows is a choice, and a choice is what sampling measures.] [blocker:false until captured — the recording is authored, so the pull-request gate proves only that the turn and the case agree; the Monday run against the deployment is the measurement.]
 
 ## WL1 — a conflict between the blueprint and the Roadmap goes in a ⚠️ line placed by code
 

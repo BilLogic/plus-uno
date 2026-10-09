@@ -29,7 +29,8 @@
 //
 // ROWS TYPED TWICE. A model told the rows are the table's still types them out
 // at times, so `withoutRepeatedRows` takes them out of the prose before it
-// posts.
+// posts. One that walks more than 3 of them in sentences of its own is
+// counted by `namedRows`, and `withinNamedRows` is the backstop that trims it.
 //
 // PURE: no Env, no Slack shape. What the table LOOKS like in Slack — the block
 // — is `slack/result-table-block.ts`'s. Which table a turn posts, and what the
@@ -592,9 +593,17 @@ export function withResultList(prose: string, table: ResultTable): string {
 export interface RowsRemoved {
   text: string;
   removed: number;
+  /** List items `withinNamedRows` took out: they named rows past the first
+   *  3. */
+  trimmed?: number;
 }
 
 const fold = (s: string): string => s.toLowerCase().replace(/\s+/g, " ").trim();
+
+/** Link wrapping taken off: Slack's `<url|title>` and markdown's
+ *  `[title](url)` keep the title and lose the address. */
+const unlinked = (s: string): string =>
+  s.replace(/<[^|>\s]+\|([^>]*)>/g, "$1").replace(/\[([^\]]*)\]\([^)\s]*\)/g, "$1");
 const escape = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** A name as a pattern: a card number `#401` never matches inside `#4012`. */
@@ -609,9 +618,8 @@ const namePattern = (name: string): RegExp =>
  * stays.
  */
 function repeatsRow(line: string, table: ResultTable, labels: RegExp | null): boolean {
-  // Link wrapping goes first: Slack's `<url|title>` and markdown's
-  // `[title](url)` keep the title and lose the address.
-  const plain = fold(line.replace(/<[^|>\s]+\|([^>]*)>/g, "$1").replace(/\[([^\]]*)\]\([^)\s]*\)/g, "$1"));
+  // Link wrapping goes first.
+  const plain = fold(unlinked(line));
   return table.rows.some((row) => {
     if (row.names.length === 0) return false;
     const names = row.names.map(namePattern);
@@ -659,3 +667,133 @@ export function withoutRepeatedRows(prose: string, table: ResultTable): RowsRemo
   while (kept.length && !kept[kept.length - 1]!.trim()) kept.pop();
   return { text: kept.join("\n"), removed };
 }
+
+// ── Rows walked in prose ────────────────────────────────────────────────────
+//
+// Told the rows are the table's, a model still walks them at times, each in a
+// sentence that says more than the row, so no line reads as a row typed out
+// and `withoutRepeatedRows` leaves every one. Live on r521, a pain-points
+// answer by scenario posted its table beneath a nested walk of every row. The
+// turn first asks the judge to redraft such a draft (`turn/presentation.ts`);
+// what still names too many rows when it ships loses the list items that name
+// rows past the first 3, and nothing else.
+
+/** At most this many rows the prose names beside the table: the ones that
+ *  stand out. */
+export const MAX_NAMED_ROWS = 3;
+
+/** How a line of prose names each row: a pattern per row, or null for a row
+ *  only its link names. A row is named by its link, or by its first column
+ *  when no other row shares that value — a phase or scenario every other row
+ *  carries too names none of them. */
+function rowNamers(table: ResultTable): Array<RegExp | null> {
+  const firsts = table.rows.map((row) => (typeof row.cells[0] === "string" ? fold(row.cells[0]) : ""));
+  return firsts.map((first) =>
+    first.length >= 4 && firsts.filter((f) => f === first).length === 1
+      ? new RegExp(`(?<![\\p{L}\\p{N}])${escape(first)}(?![\\p{L}\\p{N}])`, "u")
+      : null,
+  );
+}
+
+/** The rows one line names, by index. */
+function rowsIn(line: string, table: ResultTable, namers: Array<RegExp | null>): number[] {
+  const plain = fold(unlinked(line));
+  return table.rows.flatMap((row, i) => {
+    const addresses = [row.url, ...(row.links ?? [])].filter((u): u is string => !!u);
+    const linked = addresses.some((u) => new RegExp(`${escape(u)}(?![\\w/-])`).test(line));
+    return linked || namers[i]?.test(plain) ? [i] : [];
+  });
+}
+
+/**
+ * The rows the prose names, by index, in the order it first names them.
+ *
+ * @param prose - The answer as the model wrote it, before any strip, so a row
+ *   it typed out counts too
+ * @param table - The table beneath it
+ */
+export function namedRows(prose: string, table: ResultTable): number[] {
+  const namers = rowNamers(table);
+  return [...new Set(prose.split("\n").flatMap((line) => rowsIn(line, table, namers)))];
+}
+
+const LIST_ITEM = /^\s*(?:[-*+•◦▪▫‣]︎?|\d+[.)])\s+/;
+const indentOf = (line: string): number => /^\s*/.exec(line)![0].length;
+
+/** A line that introduces what follows it: a heading, a bold line, a line
+ *  ending in ':', or a short label with no closing full stop. */
+const isLabel = (line: string): boolean => {
+  const t = line.trim();
+  if (!t || LIST_ITEM.test(line)) return false;
+  const bare = t.replace(/[*_]+$/, "");
+  return /^#{1,6}\s/.test(t) || bare.endsWith(":") || (t.length <= 60 && !/[.!?]$/.test(bare));
+};
+
+/**
+ * The prose with the list items that name rows past the first `kept` taken
+ * out: the backstop for a reply that still walks the table when it ships.
+ *
+ * A list item goes, with the lines indented beneath it, when everything it
+ * names is a row past the first 3 and no line of it is one `keep` holds (the
+ * confidence clause). A paragraph or a line that is not a list item always
+ * stays. A label over a list this emptied — "**By scenario:**", a heading,
+ * "Phase: Onboarding" — goes with it. With nothing to take out, the prose
+ * stands as written.
+ *
+ * @param prose - The answer as it would post
+ * @param table - The table beneath it
+ * @param kept - The rows the prose may still name: the first 3 it named
+ * @param keep - A line that never goes
+ */
+export function withinNamedRows(
+  prose: string,
+  table: ResultTable,
+  kept: ReadonlySet<number>,
+  keep: (line: string) => boolean,
+): RowsRemoved {
+  const namers = rowNamers(table);
+  const lines = prose.split("\n");
+  const gone = new Set<number>();
+  let removed = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (!LIST_ITEM.test(lines[i]!)) continue;
+    let end = i + 1;
+    while (end < lines.length && lines[end]!.trim() && indentOf(lines[end]!) > indentOf(lines[i]!)) end++;
+    const block = lines.slice(i, end);
+    const rows = block.flatMap((line) => rowsIn(line, table, namers));
+    if (!rows.length || rows.some((r) => kept.has(r)) || block.some(keep)) continue;
+    for (let j = i; j < end; j++) gone.add(j);
+    removed++;
+    i = end - 1;
+  }
+  if (!removed) return { text: prose, removed: 0 };
+
+  // A label goes when every list item beneath it went.
+  for (let i = 0; i < lines.length; i++) {
+    if (gone.has(i) || !isLabel(lines[i]!) || keep(lines[i]!)) continue;
+    let j = i + 1;
+    while (j < lines.length && !lines[j]!.trim()) j++;
+    const items: number[] = [];
+    while (j < lines.length) {
+      const line = lines[j]!;
+      if (line.trim() && !LIST_ITEM.test(line) && indentOf(line) === 0) break;
+      if (!line.trim()) {
+        let next = j + 1;
+        while (next < lines.length && !lines[next]!.trim()) next++;
+        if (next >= lines.length || !LIST_ITEM.test(lines[next]!)) break;
+      } else items.push(j);
+      j++;
+    }
+    if (items.length && items.every((k) => gone.has(k))) gone.add(i);
+  }
+
+  const out: string[] = [];
+  for (const [i, line] of lines.entries()) {
+    if (gone.has(i)) continue;
+    if (!line.trim() && (!out.length || !out[out.length - 1]!.trim())) continue;
+    out.push(line);
+  }
+  while (out.length && !out[out.length - 1]!.trim()) out.pop();
+  return { text: out.join("\n"), removed };
+}
+

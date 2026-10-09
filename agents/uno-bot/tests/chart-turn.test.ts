@@ -406,6 +406,9 @@ test("a status read cut short still charts: its bar is the count read, and a ⚠
   assert.equal(told[0]!.chart_attached, true);
   assert.deepEqual(told[0]!.at_least, { "Need PRD / Under Playground": 500 });
   assert.match(String(told[0]!.note), /at least/);
+  // Live, a model told only "at least" still pointed at the chart "for the
+  // exact breakdown".
+  assert.match(String(told[0]!.note), /chart is not exact for/);
 
   const { text } = await posted(answer.text, presentation);
   assert.match(text, /^⚠️ Need PRD \/ Under Playground shows at least 500; the board has more than could be read\.$/m);

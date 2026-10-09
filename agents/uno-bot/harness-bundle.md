@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,846 chars from 16 files**, against an assembled budget of 175,500 (2,654 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,462 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,882 chars from 16 files**, against an assembled budget of 175,500 (2,618 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,498 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,610 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,354 (−11,563 ide-only) | 100,006 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,422 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,073 (−6,098 ide-only) | 148,537 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 151,821 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 158,337 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 163,000 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 172,846 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,109 (−6,098 ide-only) | 148,573 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 151,857 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 158,373 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 163,036 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,798 (−605 ide-only) | 172,882 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1010,9 +1010,10 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Refusals:** a lookup missing from this turn, a field absent from the rows, long text (over 120 characters or multi-line), a list, a bare link, or more than 4 columns. The refusal is the `present` call's own result, worded for the model, which then writes the plain list.
 - **What it holds:** the Roadmap preset shows the card title linked to its Notion card, card number, Design Status and Dev Status. Any other table shows the chosen fields under headers made from their names (`design_status` → Design Status); a field inside a row's property bag is named after the bag and a dot and headed by its own name (`meta.Year` → Year), and its values are text, so they sort as text; the first column links to each row's `url` when it has one. A field that is numbers throughout posts as `raw_number` cells, so Slack sorts it as numbers. `data_table` has no alignment setting (`column_settings` is refused), so alignment is Slack's own. At most 30 rows, all on one page.
 - **Caption:** written by code: the count, the lookup's filters and whether the list is partial (`13 cards · Design Status WIP`, `first 30 of 57 · "onboarding" · phase Onboarding`, or `at least 12 …` on a partial read with no larger count).
-- **Prose:** the model's result says `table_attached`. With a table, the answer leads with the takeaway, gives what stands out and what to act on, names at most 3 rows, and points at the table in one short phrase. Without one, it writes the plain list.
-- **Text copy:** the prose, then a plain line per row, written by code from the table's rows. Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
-- **Rows typed twice:** with a table attached, the Worker removes each line of the prose that is only a row of it (the row's identifying field, its other values, the column headers' words, a bullet or link), so every row prints once. A Roadmap card counts as typed out only when the line names its number too. A sentence that names a row stays. The count removed is logged as `[result-table]`.
+- **Prose:** the model's result says `table_attached`. With a table, the answer leads with the takeaway, gives what stands out and what to act on, and names at most 3 rows; without one, it writes the plain list.
+- **Text copy:** the prose, then a plain line per row, written by code. Notifications, screen readers, the stored history and later turns read this copy, so it is the answer of record.
+- **Rows typed twice:** the Worker removes each prose line that is only a row (its identifying field, other values, the headers' words, a bullet or link); a Roadmap card only when the line names its number too. A sentence naming a row stays.
+- **Rows walked:** a draft naming over 3 rows (by link, or a first-column value no other row shares) goes back through the judge's one call to be redrafted. If what ships still does, list items naming rows past the first 3 come out, and nothing else.
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
 - **Worker posts:** two fixed messages are result tables too, under a head line, falling back to their plain list when Slack refuses the table. A **batch result** (two or more operations) has a Where, What and Result row per operation: Result reads `done` or `failed: <reason>`, Where links the target and What links the item the operation created. A batch of more than 30 operations posts the list alone, and one operation posts no table. The **weekly precedence list** has the drop number in the first column, so `drop N` names the row a reader sees. The table holds up to 30 items in one message, and any items past 30 go in the thread under their own numbers.
 
