@@ -159,6 +159,16 @@ export function runCommitmentRecordsConformance(
     assert.equal(await records.byReminderTs("333.3"), null);
   });
 
+  it("a claim moves only a live row, and says whether it did", async () => {
+    const records = make();
+    await records.addCommitments([commitmentRow({ state: "nudged" })]);
+    assert.equal(await records.claim(commitmentRow().id, { state: "snoozed", snoozes: 1, dueAt: 7 }), true);
+    assert.equal(await records.claim(commitmentRow().id, { state: "done", resolvedAt: 5 }), true);
+    assert.equal(await records.claim(commitmentRow().id, { state: "dropped", resolvedAt: 6 }), false);
+    assert.equal(await records.claim("nobody", { state: "done", resolvedAt: 6 }), false);
+    assert.deepEqual(await records.get(commitmentRow().id), { ...commitmentRow(), state: "done", snoozes: 1, dueAt: 7, resolvedAt: 5 });
+  });
+
   it("an update changes only the fields it names", async () => {
     const records = make();
     await records.addCommitments([commitmentRow()]);
