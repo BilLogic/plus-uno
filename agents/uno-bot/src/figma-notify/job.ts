@@ -22,6 +22,7 @@
 // PURE: what the job calls arrives by name (`slack/events.ts` binds it).
 
 import type { FigmaEventJob } from "./event";
+import { messageOf } from "./route";
 
 /** What a FILE_UPDATE and an ask call, bound to `Env` by the runner's dispatch. */
 export interface FigmaEventReaders {
@@ -35,10 +36,6 @@ export interface FigmaEventReaders {
 export interface FigmaEventResult {
   line: string;
   outcome: "handled" | "deferred";
-}
-
-function messageOf(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
 }
 
 /**

@@ -3,17 +3,19 @@
 //
 // THE REPLY is plain text: Figma shows a comment as typed, so Slack's markup
 // would arrive as asterisks and angle brackets. It leads with the label, says
-// the answer in at most three lines, and ends with one source link. An answer
-// with nothing to link is not posted as an answer: the reply says it could not
-// find this, and points at #plus-design, so uno-bot never guesses in a file.
+// the answer in at most three lines, and ends with one source link — one the
+// answer itself cites, and that a public thread may carry. An answer with no
+// such link is not posted as an answer: the reply says it could not find this,
+// and points at #plus-design, so uno-bot never guesses in a file.
 //
 // THE LEAD in #plus-design is a Figma message like the rest
-// (docs/connectors/slack.md § Figma messages): it opens with what happened,
-// quotes the ask, and asks for one action. The card under it carries the gate.
+// (docs/connectors/slack.md § Figma messages): one line asking one named
+// person — the file's design owner, else the asker — to review the draft,
+// with the ask quoted. The card under it carries the gate.
 //
 // PURE.
 
-import { toPlainText } from "../slack/mrkdwn";
+import { escapeSlackText, toPlainText } from "../slack/mrkdwn";
 import { FIGMA_LABEL } from "./trigger";
 
 /** Lines of answer a reply carries, at most. */
@@ -30,6 +32,8 @@ export type FigmaReply =
   | { kind: "question"; lines: string[] }
   | { kind: "drafted"; link: string | null }
   | { kind: "not-teammate" }
+  /** A teammate's change that could not be drafted: no #plus-design to draft it in, or Slack refused the card. */
+  | { kind: "not-drafted" }
   | { kind: "failed" };
 
 /**
@@ -54,6 +58,8 @@ export function figmaReplyText(reply: FigmaReply): string {
           "I draft changes only for teammates whose Figma account is on Team Members, so I haven't drafted this one.",
           "Ask in #plus-design.",
         ];
+      case "not-drafted":
+        return ["I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."];
       case "failed":
         return ["I couldn't answer this just now. Ask in #plus-design."];
     }
@@ -69,7 +75,7 @@ const SLACK_LINK = /<(https?:\/\/[^|>\s]+)(?:\|[^>]*)?>/g;
 const BARE_LINK = /https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"]/g;
 
 /**
- * The turn's answer as plain lines, and the first link it cites.
+ * The turn's answer as plain lines, and the links it cites, in the order it cites them.
  *
  * Link markup becomes its label, emphasis, headings, bullets and fences go,
  * and a line that is only a "Sources:" heading or list is dropped: the reply
@@ -77,7 +83,7 @@ const BARE_LINK = /https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"]/g;
  *
  * @param text - The answer as the turn wrote it
  */
-export function plainAnswer(text: string): { lines: string[]; source: string | null } {
+export function plainAnswer(text: string): { lines: string[]; cited: string[] } {
   const cited: Array<{ at: number; url: string }> = [];
   for (const re of [MD_LINK, SLACK_LINK, BARE_LINK]) {
     for (const m of text.matchAll(re)) cited.push({ at: m.index ?? 0, url: re === MD_LINK ? m[2]! : re === SLACK_LINK ? m[1]! : m[0] });
@@ -98,7 +104,7 @@ export function plainAnswer(text: string): { lines: string[]; source: string | n
     .filter((l) => l && !/^sources?\b\s*:?/i.test(l))
     .slice(0, MAX_ANSWER_LINES)
     .map(capLine);
-  return { lines, source: cited[0]?.url ?? null };
+  return { lines, cited: [...new Set(cited.map((c) => c.url))] };
 }
 
 /** A line cut to `MAX_LINE_CHARS`, at a sentence end when one is close enough. */
@@ -112,7 +118,9 @@ function capLine(line: string): string {
 /** What the #plus-design lead names. */
 export interface AskLead {
   /** The asker's Slack id. */
-  slackId: string;
+  asker: string;
+  /** Who is asked to review: the file's design owner, else the asker. */
+  owner: string;
   file: { title: string; url: string };
   /** The ask, one line and short. */
   quote: string;
@@ -121,15 +129,17 @@ export interface AskLead {
 }
 
 /**
- * The #plus-design post a change asked for in Figma opens: what happened,
- * the ask, and one action. The card goes in its thread.
+ * The #plus-design post a change asked for in Figma opens, in one line: the
+ * one person asked, what happened, the ask, and one action. The card goes in
+ * its thread. The file's title and the ask are people's words, escaped so
+ * they read as typed.
  *
- * @param lead - Who asked, in which file, and what
+ * @param lead - Who asked, who reviews, in which file, and what
  */
 export function askLeadText(lead: AskLead): string {
-  return [
-    `<@${lead.slackId}> asked for a change in a Figma comment on <${lead.file.url}|${lead.file.title}>.`,
-    `> ${lead.quote} (<${lead.commentUrl}|comment>)`,
-    "The draft is in this thread. Review it to approve, change or drop it; nothing is written from Figma.",
-  ].join("\n");
+  const file = `<${lead.file.url}|${escapeSlackText(lead.file.title)}>`;
+  const quote = `“${escapeSlackText(lead.quote)}” (<${lead.commentUrl}|comment>)`;
+  return lead.owner === lead.asker
+    ? `<@${lead.asker}>, you asked in a Figma comment on ${file}: ${quote}. Can you review the draft below?`
+    : `<@${lead.owner}>, <@${lead.asker}> asked in a Figma comment on ${file}: ${quote}. Can you review the draft below?`;
 }

@@ -62,7 +62,8 @@ function answer(status: number, body: string): Response {
 const ok = (): Response => answer(200, "ok");
 const unauthorized = (): Response => answer(401, "unauthorized");
 
-function messageOf(err: unknown): string {
+/** An error's message, for a log line — shared by the Figma notification jobs. */
+export function messageOf(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 

@@ -5,7 +5,9 @@
 // no progress and no reactions, so those are no-ops. The answer and any note
 // are KEPT rather than posted: the job turns them into one plain reply after
 // the turn ends (`./copy.ts`), because a comment cannot be edited into shape
-// the way a Slack message can.
+// the way a Slack message can. So an answer or a note reports no ts — nothing
+// was posted, as the Slack adapter's answer reports none — and the turn reads
+// none from either.
 //
 // A CARD IS THE ONE THING POSTED MID-TURN, and it goes to Slack, never to
 // Figma: `stage` posts it in #plus-design, where Review decides it. With no
@@ -17,7 +19,6 @@
 // PURE: what posts the card arrives by name.
 
 import type { TaskCardSource } from "../agent/task-card-readout";
-import { threadVisibleSources } from "../slack/card-sources";
 import { describeCard, describeGateNote, type Delivery, type PostResult, type ProposalCard } from "../turn/index";
 
 /** What a Figma ask's turn left for the reply. */
@@ -26,13 +27,11 @@ export interface FigmaAskDelivery extends Delivery {
   readonly answer: () => string | null;
   /** Notes, oldest first: a clarifying question, a refusal. */
   readonly notes: () => string[];
-  /** The links the turn's lookups read, that a public thread may carry. */
-  readonly sources: () => string[];
+  /** Every link the turn's lookups read, with what each tool said of who may see it. */
+  readonly sources: () => TaskCardSource[];
   /** Why a card the turn tried to stage did not stage: no way to stage one
    *  was given, or #plus-design refused the post; null when none was refused. */
   readonly refusedCard: () => "not-allowed" | "not-posted" | null;
-  /** Whether the turn said it failed. */
-  readonly failed: () => boolean;
 }
 
 /**
@@ -43,9 +42,8 @@ export interface FigmaAskDelivery extends Delivery {
 export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise<PostResult> } = {}): FigmaAskDelivery {
   let answer: string | null = null;
   const notes: string[] = [];
-  const sources: string[] = [];
+  const sources: TaskCardSource[] = [];
   let refused: "not-allowed" | "not-posted" | null = null;
-  let failed = false;
   const quiet = async (): Promise<void> => {};
 
   return {
@@ -53,7 +51,6 @@ export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise
     notes: () => [...notes],
     sources: () => [...sources],
     refusedCard: () => refused,
-    failed: () => failed,
 
     react: quiet,
     removeReaction: quiet,
@@ -63,22 +60,22 @@ export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise
     endProgress: quiet,
     reopenCard: quiet,
     postInterim() {},
+    // A failure is told in the reply the job posts, from the turn's outcome.
+    postFailure: quiet,
 
     toolProgress(event) {
-      if (event.phase !== "finished" || !event.sources) return;
-      for (const s of threadVisibleSources(event.sources as readonly TaskCardSource[])) {
-        if (!sources.includes(s.url)) sources.push(s.url);
-      }
+      if (event.phase !== "finished") return;
+      for (const s of event.sources ?? []) if (!sources.some((k) => k.url === s.url)) sources.push(s);
     },
 
     async postAnswer(text) {
       answer = text;
-      return { ok: true, text, ts: "figma-answer" };
+      return { ok: true, text };
     },
 
     async postNote(text) {
       notes.push(text);
-      return { ok: true, text, ts: `figma-note-${notes.length}` };
+      return { ok: true, text };
     },
 
     async postGateNote(note) {
@@ -95,10 +92,6 @@ export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise
       const posted = await opts.stage(card);
       if (!posted.ok || !posted.ts) refused = "not-posted";
       return posted;
-    },
-
-    async postFailure() {
-      failed = true;
     },
   };
 }

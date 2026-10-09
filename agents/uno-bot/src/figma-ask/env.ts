@@ -10,15 +10,22 @@
 //     (ADR-030).
 //   • The turn: `runTurn` on the shared dependency builder, as Slack's and the
 //     eval's turns are, with the ThreadState Durable Object and a verdict that
-//     executes. It runs as a person in #plus-design.
+//     executes. It runs in #plus-design with the `figma` origin, so Slack is
+//     read at public visibility only (`turn/env-deps.ts`).
 //   • #plus-design (`PLUS_DESIGN_CHANNEL_ID`): the lead is `chat.postMessage`,
 //     its link `chat.getPermalink`, and the card the Slack Delivery's own,
-//     posted in the lead's thread with Review.
+//     posted in the lead's thread with Review. Who the lead asks is the
+//     night's design-owner rule (`figma-comments/read.ts`), on the night's
+//     reads: the Roadmap card, its Contributors, the Slack directory, the roles.
 //
 // Every KV call is charged to the invocation's internal bucket.
 
 import type { Env } from "../types";
-import { charge } from "../net";
+import { charge, rethrowIfBudget } from "../net";
+import { designOwnerOfFile, type DesignOwnerReads } from "../figma-comments/read";
+import { queryRoadmapCards } from "../integrations/notion";
+import { readSource } from "../sweep/env";
+import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import { runVerdict } from "../agent/resolve-proposal";
 import { figmaClientFor } from "../figma/production";
 import { getPermalink, postMessage } from "../slack/api";
@@ -26,7 +33,7 @@ import { slackDelivery } from "../slack/slack-delivery";
 import { threadStateFor } from "../thread-state/production";
 import { buildTurnDeps } from "../turn/env-deps";
 import { runTurn } from "../turn/index";
-import { figmaPeopleFor } from "../usage/production";
+import { figmaPeopleFor, teamRolesFor } from "../usage/production";
 import { answerFigmaAsk, ASK_MARK_TTL_S, type AskMark, type FigmaAskDeps, type FigmaAskResult } from "./job";
 
 /** One key per comment asked about. */
@@ -65,10 +72,11 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
           threadState,
           delivery,
           applyVerdict: (verdict) => runVerdict(env, verdict),
-          // No Slack message to thread a tool's own post off: the ask is in Figma.
-          toolThreadTs: request.conversationTs,
-          // A person asked, in a file the team works in; recorded as #plus-design.
-          origin: "slack",
+          // No `toolThreadTs`: the ask is in Figma, so a tool has no Slack
+          // message to thread its own post off. A card's lead is the thread
+          // its ✅ runs in, from the moved record (`./job.ts`).
+          // Public visibility only, and recorded as a Figma ask.
+          origin: "figma",
         }),
       ),
     ...(channel
@@ -81,10 +89,43 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
             },
             permalink: (ts) => getPermalink(env, channel, ts).catch(() => null),
             cardDelivery: (leadTs, slackId) => slackDelivery(env, { channel, replyTs: leadTs, userMsgTs: leadTs, userId: slackId }),
+            designOwner: (title) => designOwnerOfFile(designOwnerReads(env), title),
           },
         }
       : {}),
     now: () => Date.now(),
+  };
+}
+
+/**
+ * What finding a file's design owner reads, on `Env` — the night's reads
+ * (`figma-comments/env.ts`, `sweep/env.ts`): the card by number from the
+ * Roadmap, its page's Contributors by name, each name looked up in the Slack
+ * directory, and the team's roles.
+ */
+function designOwnerReads(env: Env): DesignOwnerReads {
+  const directory = slackDirectoryFor(env);
+  return {
+    async card(number) {
+      const { rows } = await queryRoadmapCards(env, { cardNumber: number });
+      const card = rows.find((r) => r.card_number === number);
+      return card ? { url: card.url } : null;
+    },
+    async contributors(url) {
+      const page = await readSource(env, url, "notion");
+      const ids: string[] = [];
+      for (const name of page?.contributors ?? []) {
+        try {
+          const r = JSON.parse(await findSlackUsers(directory, name)) as { ok?: boolean; matches?: { id?: string }[] };
+          const id = r.ok && r.matches?.length === 1 ? r.matches[0]!.id : undefined;
+          if (id) ids.push(id);
+        } catch (err) {
+          rethrowIfBudget(err);
+        }
+      }
+      return ids;
+    },
+    roles: () => teamRolesFor(env),
   };
 }
 

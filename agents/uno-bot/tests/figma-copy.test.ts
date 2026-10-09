@@ -771,16 +771,28 @@ describe("@uno in a Figma comment (#903)", () => {
     }
   });
 
-  it("the #plus-design lead says what happened first, quotes the ask, and asks for one action", () => {
-    const text = askLeadText({
-      slackId: "U1",
-      file: { title: "Goal Setting / Card 2482 / Meryem", url: "https://www.figma.com/design/F" },
-      quote: "please add to the PRD: hide the bar until the first goal",
-      commentUrl: "https://www.figma.com/design/F?node-id=1-2#3",
-    });
+  const LEAD = {
+    asker: "U1",
+    owner: "U2",
+    file: { title: "Goal Setting / Card 2482 / Meryem", url: "https://www.figma.com/design/F" },
+    quote: "please add to the PRD: hide the bar until the first goal",
+    commentUrl: "https://www.figma.com/design/F?node-id=1-2#3",
+  };
+
+  it("the #plus-design lead asks one named person, the design owner, for one action, in one line", () => {
+    const text = askLeadText(LEAD);
     passesChecklist(text);
-    assert.match(text.split("\n")[0]!, /^<@U1> asked for a change in a Figma comment on /);
-    assert.match(text, /^> please add to the PRD/m);
-    assert.match(text.split("\n").at(-1)!, /^The draft is in this thread\. Review it/);
+    assert.equal(text.split("\n").length, 1);
+    assert.equal(
+      text,
+      "<@U2>, <@U1> asked in a Figma comment on <https://www.figma.com/design/F|Goal Setting / Card 2482 / Meryem>: “please add to the PRD: hide the bar until the first goal” (<https://www.figma.com/design/F?node-id=1-2#3|comment>). Can you review the draft below?",
+    );
+  });
+
+  it("with no design owner, the lead asks the asker", () => {
+    const text = askLeadText({ ...LEAD, owner: "U1" });
+    passesChecklist(text);
+    assert.match(text, /^<@U1>, you asked in a Figma comment on .*\. Can you review the draft below\?$/);
+    assert.equal(text.match(/<@/g)!.length, 1, "one person, named once");
   });
 });

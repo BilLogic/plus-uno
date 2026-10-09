@@ -2,8 +2,14 @@
 // the user linked (outside this conversation's own memory) — sign-off tallies,
 // reviewer verdicts, source discussions. Runs inline in the agent loop (no gate).
 
-import type { Env } from "../types";
-import { conversationsReplies } from "../slack/api";
+//
+// On a `publicOnly` turn (an ask from a Figma comment, whose answer people
+// outside the team can read) only a public channel's thread is read: the
+// channel is checked first, and a private one, a DM or a group DM is refused.
+
+import type { Env, SlackContext } from "../types";
+import { conversationsInfo, conversationsReplies } from "../slack/api";
+import { rethrowIfBudget } from "../net";
 
 // Slack permalink: https://<ws>.slack.com/archives/<CHANNEL>/p<10 digits><6 digits>
 // where the message ts is "<10>.<6>". A ?thread_ts= param may also appear.
@@ -13,11 +19,21 @@ function parseSlackLink(link: string): { channel: string; ts: string } | null {
   return { channel: m[1]!, ts: `${m[2]!}.${m[3]!}` };
 }
 
-export async function executeSlackThreadRead(env: Env, input: Record<string, unknown>): Promise<string> {
+export async function executeSlackThreadRead(
+  env: Env,
+  input: Record<string, unknown>,
+  slack?: Pick<SlackContext, "publicOnly">,
+): Promise<string> {
   const link = typeof input.link === "string" ? input.link.trim() : "";
   const parsed = link ? parseSlackLink(link) : null;
   if (!parsed) {
     return JSON.stringify({ ok: false, error: "couldn't parse a Slack channel + message ts from that link" });
+  }
+  if (slack?.publicOnly && !(await isPublicChannel(env, parsed.channel))) {
+    return JSON.stringify({
+      ok: false,
+      error: "this answer is posted outside Slack, so only a public channel's thread can be read; that one is private or could not be checked",
+    });
   }
 
   try {
@@ -47,5 +63,17 @@ export async function executeSlackThreadRead(env: Env, input: Record<string, unk
     });
   } catch (err) {
     return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
+  }
+}
+
+/** Whether Slack says a channel is public; a lookup that fails counts as not. */
+async function isPublicChannel(env: Env, channel: string): Promise<boolean> {
+  try {
+    const info = await conversationsInfo(env, channel);
+    const c = info.ok ? info.channel : undefined;
+    return !!c && c.is_private === false && !c.is_im && !c.is_mpim;
+  } catch (err) {
+    rethrowIfBudget(err);
+    return false;
   }
 }

@@ -85,10 +85,13 @@ export interface TurnWiring {
   applyVerdict(verdict: GateVerdict): Promise<OperationOutcome[] | void>;
   /** The REAL ts a tool's own posts thread off: the person's message in Slack,
    *  the eval conversation's one ts otherwise. Not the conversation key, which
-   *  the request already carries and cancel reads. */
-  toolThreadTs: string;
-  /** Where the turn came from, for the usage record's test-traffic rule: a
-   *  person in Slack, or a debug route (the eval transport). */
+   *  the request already carries and cancel reads. Absent for an ask made in
+   *  Figma, which has no Slack message to thread under. */
+  toolThreadTs?: string;
+  /** Where the turn came from: a person in Slack, a Figma comment, or a debug
+   *  route (the eval transport). The usage record's test-traffic rule reads
+   *  it, and a Figma turn reads Slack at public visibility only, because its
+   *  answer lands in a file people outside the team can open. */
   origin: TurnOrigin;
   reporters?: TurnReporters;
 }
@@ -102,7 +105,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
   // required argument, below, because the cancel check is its only reader.
   const slack = {
     channel: request.channel,
-    threadTs: wiring.toolThreadTs,
+    ...(wiring.toolThreadTs ? { threadTs: wiring.toolThreadTs } : {}),
+    ...(wiring.origin === "figma" ? { publicOnly: true } : {}),
     userMsgTs: request.userMsgTs,
     requestedBy: request.userId,
     ...(request.conversationType ? { conversationType: request.conversationType } : {}),

@@ -13,7 +13,8 @@ import { createInMemoryFigma, type InMemoryFigma } from "../src/figma/in-memory"
 import { FigmaRateLimitError, type FigmaComment } from "../src/figma/client";
 import { runFigmaEventJob } from "../src/figma-notify/job";
 import { readFigmaEvent, jobOf, eventIdOf, type FigmaEventJob } from "../src/figma-notify/event";
-import { answerFigmaAsk, type AskMark, type FigmaAskDeps } from "../src/figma-ask/job";
+import { answerFigmaAsk, MAX_ASK_TRIES, type AskMark, type FigmaAskDeps } from "../src/figma-ask/job";
+import type { FigmaAskDelivery } from "../src/figma-ask/delivery";
 import { FIGMA_LABEL } from "../src/figma-ask/trigger";
 import { CANT_FIND_LINE } from "../src/figma-ask/copy";
 import { candidateThreads } from "../src/figma-comments/threads";
@@ -45,14 +46,14 @@ function comment(id: string, message: string, over: Partial<FigmaComment> = {}):
 }
 
 /** What the route queues for a comment, read from a payload as Figma sends it. */
-function queuedFor(c: FigmaComment): FigmaEventJob {
+function queuedFor(c: FigmaComment, fragments: unknown[] = [{ text: c.message }]): FigmaEventJob {
   const event = readFigmaEvent({
     event_type: "FILE_COMMENT",
     timestamp: c.created_at,
     webhook_id: "3301",
     file_key: FILE,
     file_name: "Goal Setting / Card 2482 / Meryem",
-    comment: [{ text: c.message }],
+    comment: fragments,
     comment_id: c.id,
     parent_id: c.parent_id ?? "",
     created_at: c.created_at,
@@ -71,7 +72,10 @@ interface World {
   leads: string[];
   /** The card Delivery, per lead. */
   cards: RecordingDelivery[];
-  run(c: FigmaComment): Promise<{ outcome: string; line: string }>;
+  /** Run the job the route queues for `c`, from the payload's fragments (its text, by default). */
+  run(c: FigmaComment, fragments?: unknown[]): Promise<{ outcome: string; line: string }>;
+  /** The design owner #plus-design's lead resolves; null for none. */
+  owner: { slack: string | null };
   /** Replies uno-bot posted on the file, in order. */
   replies(): Array<{ root: string; message: string }>;
 }
@@ -83,12 +87,14 @@ function world(opts: { replies?: ScriptedReply[]; people?: Record<string, string
   const marks = new Map<string, AskMark>();
   const leads: string[] = [];
   const cards: RecordingDelivery[] = [];
+  const owner: { slack: string | null } = { slack: "UOWNER" };
   const deps: FigmaAskDeps = {
     figma,
     people: async () => opts.people ?? { [SARAH.id]: "USARAH" },
+    // Stored as KV stores it: a copy, never the object the job holds.
     marks: {
-      get: async (id) => marks.get(id) ?? null,
-      put: async (id, mark) => void marks.set(id, mark),
+      get: async (id) => structuredClone(marks.get(id) ?? null),
+      put: async (id, mark) => void marks.set(id, structuredClone(mark)),
     },
     threadState: h.threadState,
     answer: (request, delivery) => runTurn(request, { ...h.deps, delivery }),
@@ -107,6 +113,7 @@ function world(opts: { replies?: ScriptedReply[]; people?: Record<string, string
               cards.push(d);
               return d;
             },
+            designOwner: async () => owner.slack,
           },
         }),
     now: () => NOW,
@@ -117,8 +124,9 @@ function world(opts: { replies?: ScriptedReply[]; people?: Record<string, string
     marks,
     leads,
     cards,
-    async run(c) {
-      const result = await runFigmaEventJob(queuedFor(c), { onAsk: (job) => answerFigmaAsk(job, deps) });
+    owner,
+    async run(c, fragments) {
+      const result = await runFigmaEventJob(queuedFor(c, fragments), { onAsk: (job) => answerFigmaAsk(job, deps) });
       return { outcome: result.outcome, line: result.line };
     },
     replies: () =>
@@ -156,6 +164,27 @@ describe("which comments are asks", () => {
       assert.deepEqual(w.figma.calls().map((c) => c.method), [], "no comment read for a comment with no trigger");
     });
   }
+});
+
+describe("a mention picked from Figma's list", () => {
+  // Figma sends a picked person as `{ mention: <user id> }` and spells them
+  // "@Name" in the comment's own `message`.
+  it("fires when the comment names uno-bot", async () => {
+    const w = world();
+    const c = comment("100", "hey @uno bot when does the bar show?");
+    w.figma.seedFile(FILE, { comments: [c] });
+    await w.run(c, [{ text: "hey " }, { mention: "1999999" }, { text: " when does the bar show?" }]);
+    assert.equal(w.replies().length, 1);
+  });
+
+  it("reads the comment and stays quiet when the mention is someone else", async () => {
+    const w = world();
+    const c = comment("100", "hey @Meryem can you check the bar?");
+    w.figma.seedFile(FILE, { comments: [c] });
+    const { line } = await w.run(c, [{ text: "hey " }, { mention: "1500002" }, { text: " can you check the bar?" }]);
+    assert.match(line, /no @uno in it/);
+    assert.deepEqual(w.replies(), []);
+  });
 });
 
 describe("the reply", () => {
@@ -196,6 +225,33 @@ describe("the reply", () => {
     assert.match(message, new RegExp(`Source: ${PRD}$`));
   });
 
+  it("says it couldn't find this when the turn read a page but the answer cites nothing", async () => {
+    const w = world();
+    // A turn whose lookup returns the PRD, and whose answer cites nothing.
+    const h = harness({
+      replies: [
+        { text: "Checking.", toolCalls: [{ name: "notion_search", args: { query: "progress bar" } }] },
+        { text: "Hidden until the first goal is set." },
+      ],
+      toolResult: JSON.stringify({ ok: true, count: 1, results: [{ title: "Goal Setting PRD", url: PRD }] }),
+    });
+    let read: string[] = [];
+    w.deps.answer = async (request, delivery) => {
+      const outcome = await runTurn(request, { ...h.deps, delivery });
+      read = (delivery as FigmaAskDelivery).sources().map((s) => s.url);
+      return outcome;
+    };
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.ok(read.includes(PRD), `the turn read the PRD: ${read.join(", ")}`);
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+
+  it("carries no Slack link a public thread may not: a cited permalink no public search vouched for is no source", async () => {
+    const w = world({ replies: [{ text: "Hidden, per <https://plus.slack.com/archives/C0PRIV1/p1700000000000100|the thread>." }] });
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+
   it("reads the ask, the file and the thread so far, and answers from #plus-design's public view", async () => {
     let seen: { text: string; channel: string; userId: string; scope: string } | null = null;
     const w = world();
@@ -224,13 +280,15 @@ describe("a change request", () => {
     { text: "Drafting it.", toolCalls: [{ name: "notion_create", args: { title: "Hide the progress bar until the first goal" } }] },
   ];
 
-  it("is drafted as a card in #plus-design under a lead naming who asked, and the reply links it", async () => {
+  it("is drafted as a card in #plus-design under a lead asking the design owner, and the reply links it", async () => {
     const w = world({ replies: STAGES });
     await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
 
     assert.equal(w.leads.length, 1);
-    assert.match(w.leads[0]!, /^<@USARAH> asked for a change in a Figma comment on <https:\/\/www\.figma\.com\/design\/FILEKEY1\|Goal Setting \/ Card 2482 \/ Meryem>\./);
-    assert.match(w.leads[0]!, /please add to the PRD: hide the bar until the first goal/);
+    assert.match(
+      w.leads[0]!,
+      /^<@UOWNER>, <@USARAH> asked in a Figma comment on <https:\/\/www\.figma\.com\/design\/FILEKEY1\|Goal Setting \/ Card 2482 \/ Meryem>: “please add to the PRD: hide the bar until the first goal” \(<[^>]+\|comment>\)\. Can you review the draft below\?$/,
+    );
     assert.equal(w.cards.length, 1);
     assert.equal(w.cards[0]!.stagedCards.length, 1, "one card, staged in the lead's thread");
 
@@ -256,6 +314,58 @@ describe("a change request", () => {
     assert.deepEqual(w.leads, []);
     assert.deepEqual(w.cards, []);
     assert.match(w.replies()[0]!.message, /^🐐 le goat \(uno-bot\) · AI-generated\nI draft changes only for teammates/);
+  });
+
+  it("asks the file's creator when no design owner resolves, and the asker when nobody does", async () => {
+    const creator = world({ replies: STAGES, people: { [SARAH.id]: "USARAH", "1500002": "UCREATOR" } });
+    creator.owner.slack = null;
+    creator.figma.seedFile(FILE, { creator: { id: "1500002", handle: "meryem" } });
+    await ask(creator, comment("100", "@uno add it to the PRD"));
+    assert.match(creator.leads[0]!, /^<@UCREATOR>, <@USARAH> asked in a Figma comment on /);
+
+    const nobody = world({ replies: STAGES, people: { [SARAH.id]: "USARAH" } });
+    nobody.owner.slack = null;
+    nobody.figma.seedFile(FILE, { creator: { id: "1500002", handle: "meryem" } });
+    await ask(nobody, comment("100", "@uno add it to the PRD"));
+    assert.match(nobody.leads[0]!, /^<@USARAH>, you asked in a Figma comment on .*Can you review the draft below\?$/);
+  });
+
+  it("escapes the file's title and the ask, so Slack shows them as typed", async () => {
+    const w = world({ replies: STAGES });
+    w.figma.seedFile(FILE, { name: "Q&A <draft>" });
+    await ask(w, comment("100", "@uno add <b>this</b> & that to the PRD"));
+    assert.match(w.leads[0]!, /\|Q&amp;A &lt;draft&gt;>/);
+    assert.match(w.leads[0]!, /“add &lt;b&gt;this&lt;\/b&gt; &amp; that to the PRD”/);
+  });
+
+  it("says it couldn't be drafted when #plus-design is not configured, rather than claim a draft", async () => {
+    const w = world({ replies: STAGES, design: false });
+    await ask(w, comment("100", "@uno add it to the PRD"));
+    assert.deepEqual(w.replies().map((r) => r.message), [
+      [FIGMA_LABEL, "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
+    ]);
+  });
+
+  it("never posts a second card: a stop after the card posted defers, and the retry only replies", async () => {
+    const w = world({ replies: STAGES });
+    const answer = w.deps.answer;
+    let turns = 0;
+    w.deps.answer = async (request, delivery) => {
+      turns += 1;
+      const outcome = await answer(request, delivery);
+      if (turns === 1) throw new SubrequestBudgetError(38);
+      return outcome;
+    };
+    const c = comment("100", "@uno add it to the PRD");
+    assert.equal((await ask(w, c)).outcome, "deferred");
+    assert.deepEqual(w.replies(), [], "a stop inside the turn defers rather than reply");
+    assert.equal((await w.run(c)).outcome, "handled");
+    assert.equal(turns, 1, "no second turn");
+    assert.equal(w.leads.length, 1);
+    assert.equal(w.cards.length, 1, "one card");
+    assert.match(w.replies()[0]!.message, /I drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
+    const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
+    assert.ok(staged, "the card's record still moved to its thread");
   });
 
   it("a stranger is answered from public facts only, and told the turn so", async () => {
@@ -354,5 +464,19 @@ describe("the budget", () => {
     };
     assert.equal((await ask(w, comment("100", "@uno add it to the PRD"))).outcome, "deferred");
     assert.deepEqual(w.replies(), []);
+  });
+
+  it(`gives up after ${MAX_ASK_TRIES} stopped tries: says so on the comment, and lets the job go`, async () => {
+    const w = world();
+    w.deps.people = async () => {
+      throw new SubrequestBudgetError(38);
+    };
+    const c = comment("100", "@uno when does the bar show?");
+    const outcomes = [(await ask(w, c)).outcome];
+    for (let i = 1; i < MAX_ASK_TRIES; i++) outcomes.push((await w.run(c)).outcome);
+    assert.deepEqual(outcomes, [...Array(MAX_ASK_TRIES - 1).fill("deferred"), "handled"]);
+    assert.equal(MAX_ASK_TRIES, 5);
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, "I couldn't answer this just now. Ask in #plus-design."].join("\n")]);
+    assert.equal((await w.run(c)).line.includes("already replied"), true, "and is never tried again");
   });
 });

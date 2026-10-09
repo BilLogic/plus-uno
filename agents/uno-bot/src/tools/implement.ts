@@ -113,7 +113,7 @@ export async function executeImplement(
   // Full-thread context for the runner (approved 2026-07-12): the whole
   // triggering thread, names resolved, capped + truncation-noted. Fail-open —
   // a null transcript never blocks the confirmed dispatch.
-  const transcript = await fetchThreadTranscript(env, slack.channel, slack.threadTs);
+  const transcript = slack.threadTs ? await fetchThreadTranscript(env, slack.channel, slack.threadTs) : null;
 
   const result = await repositoryDispatch(
     env,
