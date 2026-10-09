@@ -261,7 +261,7 @@ Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bol
 <!-- ide-only -->
 ## Figma messages
 
-The words uno-bot's own code writes about Figma follow the copy Bill approved in #886 (2026-09-30): the library publish card and its thread, the post for a library edited but not published, the weekly precedence thread, the drift question with the edit that withdraws it (§ 3.3), and the comment-decision thread in #plus-design (§ 3.5), whose replies are numbered so a reply can name one to reword. A new Figma message follows it too. `agents/uno-bot/tests/figma-copy.test.ts` pins each renderer to this section, and reads the Not column below as words no message may use.
+The words uno-bot's own code writes about Figma follow the copy Bill approved in #886 (2026-09-30): the library publish card and its thread, the post for a library edited but not published, the weekly precedence thread, the drift question with the edit that withdraws it (§ 3.3), and the comment-decision thread in #plus-design (§ 3.5), whose cards are numbered. A new Figma message follows it too. `agents/uno-bot/tests/figma-copy.test.ts` pins each renderer to this section, and reads the Not column below as words no message may use.
 
 **A proactive post** speaks first, in someone's channel or file, so it earns the interruption in its first line: it opens with the fact, asks one named person for one action, and keeps wit for a success post. ✅ and ⛔ appear only as the gate, 🐐 only in the label, and one 🎉 when something ships.
 

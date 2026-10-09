@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,917 chars from 16 files**, against an assembled budget of 175,500 (2,583 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,533 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,897 chars from 16 files**, against an assembled budget of 175,500 (2,603 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,513 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -28,13 +28,13 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,575 | 7,000 (Worker face) |
 | 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,222 | 7,000 (Worker face) |
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,610 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,344 (−13,565 ide-only) | 99,996 | — |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 3,344 (−13,594 ide-only) | 99,996 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,373 (−4,814 ide-only) | 114,412 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,130 (−6,213 ide-only) | 148,584 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,130 (−6,177 ide-only) | 148,584 | — |
 | 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 151,868 | — |
 | 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 158,384 | — |
 | 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 163,047 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,822 (−605 ide-only) | 172,917 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 172,897 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 96,930 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 97,999 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 28,935 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,004 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1366,7 +1366,7 @@ THE standing-automation registry. An automation absent from the table below is u
 |---|---|---|---|---|---|---|---|
 | Figma library sync | Worker scheduled runs: poll at end of day, post + track next morning | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
 | Figma snapshot refresh | on demand (`workflow_dispatch` from `main`) | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks), otherwise the run ends green | GHA · Figma REST, no model call | Bill | built |
-| Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 (`src/figma-comments/`) and @uno replies #903 read it) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times (details: `docs/connectors/figma.md`) | CF Worker · no model call | Bill | built (live once subscribed, #895) |
+| Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 read it, in `src/figma-comments/`) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times (details: `docs/connectors/figma.md`) | CF Worker · no model call | Bill | built (live once subscribed, #895) |
 | Figma notification subscriptions | on demand (`workflow_dispatch` from `main`) | uno-maintain (cross-estate sync) | Actions executes; `create` waits for the `uno-bot-production` reviewer | `figma-subscriptions.yml` → `agents/uno-bot/scripts/figma-subscriptions.mjs`: `list`, `create` (only what is missing; stops at the first failure), `status` (each subscription's newest deliveries). Defaults: FILE_COMMENT and FILE_UPDATE on all six teams, the 12 of #896 | GHA · Figma REST, no model call | Bill | built |
 | Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
 | Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
@@ -1474,11 +1474,11 @@ When a thread settles something a linked Figma file, `design-system/` code, Stor
 
 A decision settled in a Figma comment reaches the PRD, the Roadmap card or the design-system pipeline the same way a thread's drift does: drafted, then held on a card until a person confirms it (#900). The code is `agents/uno-bot/src/figma-comments/`.
 
-- **What it reads:** comments created after the read switched on, or threads resolved after it, on nodes under a file's 📐 Specs or 🔍 For Review pages (a page is in the section of the last divider page above it). A comment left on the page, or under Cover, WIP, Playground or Archive, stays unread. MISC's files are left out.
-- **What a decision becomes:** behaviour or scope → a line added to, or a block rewritten in, the card's PRD; status, owner or timing → one of the card's fields; a design-system change → a `harness-intake` issue. A visual detail or an open question becomes nothing. A file joins its card by `Card <n>` in its title; a file with no card can only file an intake.
-- **The thread:** the next weekday morning run posts one thread per file in #plus-design. The parent names the file and how many comments read like decisions, and asks the owner once: the card's first Contributor, or a card-less file's creator by their Figma handle. Each decision is a numbered reply of its own, quoting the comment and saying who wrote it, on which page and when, and what its ✅ writes. Its ✅ writes that one thing; its ⛔ drops it.
-- **Changing the wording:** a reply `2: <new wording>` drafts decision 2 again with those words and replaces its card in place, keeping its confirmers and the time it has left. With one decision open, a reply that reads as wording needs no number; with several, uno-bot asks which. Only the card's confirmers may change it. In that thread, anything else engages uno-bot only by an @mention or a typed ✅ or ⛔.
-- **Terms:** a card's confirmers are the file's cards' Contributors (#plus-design's members for a file with no card). It's open for 72 h, with no re-ping. A thread is carded once: a later reply in it is not read again.
+- **What it reads:** comments created after the read switched on, or threads resolved after it, on nodes under a file's 📐 Specs or 🔍 For Review pages (a page is in the section of the last divider page above it). On a thread older than the switch-on and still open, a new reply is read and its root is not; the card quotes that reply. A comment left on the page, or under Cover, WIP, Playground or Archive, stays unread. MISC's files are left out.
+- **What a decision becomes:** behaviour or scope → a line added to, or a block rewritten in, the card's PRD subpage; status, owner or timing → that one card field, from its status, owner and timing fields only (Status, Design Status, Dev Status, Contributor, Dev, a timeline, Release Version, Goal/Quarter); a design-system change → a `harness-intake` issue. A visual detail or an open question becomes nothing. A file joins its card by `Card <n>` in its title. With no PRD subpage, or no card, a behaviour decision is a plain reply saying no PRD was found, with no card, and nothing is written into the card's body.
+- **The thread:** the next weekday morning run posts one thread per file in #plus-design. The parent names the file and how many comments read like decisions, and asks one owner once: the card's **design owner**, the first of its Contributors whom the team's roles (the daily role-map sync) name a designer; with none in Slack, the file's creator by Figma handle; with neither, someone on the card. Each decision is a numbered card of its own, quoting the comment and saying who wrote it, on which page and when, what its ✅ writes, and the whole text that write makes (a PRD line, or the intake's body). A card past 1,500 characters shows a cut of the text in the thread; its Review pop-up and its message text hold all of it. It is decided from its Review button like every card: Approve writes that one thing, Reject drops it.
+- **Changing the wording:** Review's **Needs changes** on a card takes its note as the new wording: decision N is drafted again on the same route against its page as it reads now, and the revised card replaces it in place, keeping its number, confirmers and time left. A typed reply rewords only on an explicit cue — `2: <new wording>`, `#2 …`, or `reword 2: …` — from one of the card's confirmers. Every other reply in the thread, and any reply that @mentions uno-bot, is left to the ordinary path: there uno-bot answers an @mention or a typed ✅ or ⛔ only.
+- **Terms:** a card's confirmers are the file's cards' Contributors (#plus-design's members for a file with no card). It's open for 72 h, with no re-ping. A thread is carded once: a later reply in it is not read again. A morning starts a file only when its budget covers every card; a parent whose cards all failed says so and is reused the next morning, so a file has one parent.
 
 ## Commitment reminders
 
