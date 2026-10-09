@@ -574,7 +574,8 @@ const TURN_WRAPPERS: Partial<Record<ToolName, (body: ToolBody) => ToolBody>> = {
   },
 };
 
-async function executeUngatedTool(
+/** One ungated tool, as the agent run executes it: the table's body behind the turn's wrappers. Exported for `tests/turn-origin-visibility.test.ts`. */
+export async function executeUngatedTool(
   env: Env,
   name: string,
   input: Record<string, unknown>,
