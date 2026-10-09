@@ -81,6 +81,16 @@ export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", sta
   }
 }
 
+/** Ends the edit that replaces a follow-up's buttons: anyone may answer one,
+ *  so the thread sees who did. */
+export function answeredBy(user: string): string {
+  return `Answered by <@${user}>.`;
+}
+
+/** Why a Draft it changed nothing when the draft did not go up: the row stays
+ *  live, so another tap tries again. */
+export const DRAFT_NOT_POSTED = "The draft card didn't go up, so nothing changed. Try again in a moment.";
+
 function mentionsOf(people: readonly string[]): string {
   return [...new Set(people.filter(Boolean))].map((p) => `<@${p}>`).join(" ");
 }

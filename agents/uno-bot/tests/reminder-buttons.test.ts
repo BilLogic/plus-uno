@@ -16,6 +16,12 @@ import {
   reminderText,
   SELF_REMINDER_CHOICES,
   SELF_REMINDER_LAST_CHOICES,
+  eitherDoor,
+  tapReply,
+  TAP_FAILED,
+  TAP_RECORDED,
+  TAP_REFUSED,
+  type ReminderOutcome,
 } from "../src/commitments/index";
 import { ASK_FOOTER } from "../src/dm-sweep/copy";
 import { MADE_LAST_CHOICES, MADE_TO_CHOICES, MADE_TO_LAST_CHOICES } from "../src/dm-watch/index";
@@ -125,5 +131,55 @@ describe("every offered button means something to the door it goes through", () 
 
   it("the follow-up that wants a typed reply has no buttons", () => {
     assert.equal(typeof CARD_FOOTERS.card_unowned, "string");
+  });
+});
+
+describe("a press through both reminder doors", () => {
+  const press = { channel: "C1", messageTs: "1.1", glyph: "raised_hands", userId: "U1", via: "button" as const };
+  const door = (outcome: ReminderOutcome, seen: string[], name: string) => async () => {
+    seen.push(name);
+    return outcome;
+  };
+
+  it("the first door to claim it answers, refusal and all, and the second is never asked", async () => {
+    const seen: string[] = [];
+    const both = eitherDoor(door({ claimed: true, refused: "why" }, seen, "dm"), door({ claimed: true }, seen, "thread"))!;
+    assert.deepEqual(await both(press), { claimed: true, refused: "why" });
+    assert.deepEqual(seen, ["dm"]);
+  });
+
+  it("passes to the second door's refusal when the first does not claim it", async () => {
+    const seen: string[] = [];
+    const both = eitherDoor(door({ claimed: false }, seen, "dm"), door({ claimed: true, refused: "why" }, seen, "thread"))!;
+    assert.deepEqual(await both(press), { claimed: true, refused: "why" });
+    assert.deepEqual(seen, ["dm", "thread"]);
+  });
+
+  it("unclaimed by both, a failed lookup in either is the outcome", async () => {
+    const both = eitherDoor(door({ claimed: false, failed: true }, [], "dm"), door({ claimed: false }, [], "thread"))!;
+    assert.deepEqual(await both(press), { claimed: false, failed: true });
+    const neither = eitherDoor(door({ claimed: false }, [], "dm"), door({ claimed: false }, [], "thread"))!;
+    assert.deepEqual(await neither(press), { claimed: false });
+  });
+});
+
+describe("what a tapper is told", () => {
+  it("nothing, when the answer shows on the message", () => {
+    assert.equal(tapReply({ claimed: true }), null);
+  });
+
+  it("the door's reason, when it refused", () => {
+    assert.equal(tapReply({ claimed: true, refused: TAP_REFUSED.settled }), TAP_REFUSED.settled);
+  });
+
+  it("that it was recorded, when the edit missed", () => {
+    assert.equal(tapReply({ claimed: true, unedited: true }), TAP_RECORDED);
+  });
+
+  it("no longer tracked for a message no reminder holds; a failure for an error, never the same line", () => {
+    assert.equal(tapReply({ claimed: false }), TAP_REFUSED.gone);
+    assert.equal(tapReply({ claimed: false, failed: true }), TAP_FAILED);
+    assert.equal(tapReply("error"), TAP_FAILED);
+    assert.notEqual(TAP_FAILED, TAP_REFUSED.gone);
   });
 });

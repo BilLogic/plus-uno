@@ -66,6 +66,13 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
         .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
         .map((r) => ({ ...r }));
     },
+    async claim(id, patch) {
+      const row = rows.get(id);
+      if (!row || !LIVE_STATES.includes(row.state)) return false;
+      const defined = Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined));
+      rows.set(id, { ...row, ...defined });
+      return true;
+    },
     async update(id, patch) {
       const row = rows.get(id);
       if (!row) return;

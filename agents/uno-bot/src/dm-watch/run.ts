@@ -689,7 +689,7 @@ export async function answerDmReminderPress(r: DmReminderReaction, deps: DmRemin
     // Fail open, as the thread reminders' door does.
     rethrowIfBudget(err);
     console.error(`[dm-watch] reminder lookup for ${r.channel} ${r.messageTs} failed, passing on: ${err instanceof Error ? err.message : String(err)}`);
-    return { claimed: false };
+    return { claimed: false, failed: true };
   }
 }
 
@@ -727,6 +727,7 @@ async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): P
   const body = await deps.reminderBody(r.channel, r.messageTs);
   if (!body || !(await deps.update(r.channel, r.messageTs, { text: body, blocks: reminderBlocks(body, ack) }))) {
     console.warn(`[dm-watch] ${c.id}: answered, but reminder ${r.messageTs} could not be edited`);
+    return { claimed: true, unedited: true };
   }
   return { claimed: true };
 }

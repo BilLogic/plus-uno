@@ -61,7 +61,8 @@ import { TRY_ASKING_ACTION_PREFIX, runTryAskingDoor } from "./try-asking";
 import { runTryAgainDoor } from "./try-again";
 import { TRY_AGAIN_ACTION_ID } from "./failure-message";
 import { handleReminderButton } from "./gate";
-import { REMINDER_ACTION_PREFIX, TAP_REFUSED } from "../commitments/copy";
+import { REMINDER_ACTION_PREFIX, type ReminderOutcome } from "../commitments/copy";
+import { tapReply } from "../commitments/press";
 import { FEEDBACK_ACTION_ID, FEEDBACK_VIEW_CALLBACK_ID, feedbackAckFor, type FeedbackViewState } from "./feedback";
 import { runFeedbackReason, runFeedbackTap, type FeedbackDoorDeps } from "./feedback-door";
 import { answerFeedbackLogFor } from "../usage/feedback-env";
@@ -196,10 +197,17 @@ async function answerFromButton(env: Env, payload: InteractionPayload, actionId:
   const userId = payload.user?.id;
   const glyph = payload.actions?.[0]?.value || actionId.slice(REMINDER_ACTION_PREFIX.length);
   if (!channel || !messageTs || !userId || !glyph) return;
-  const outcome = await handleReminderButton(env, { channel, messageTs, glyph, userId });
-  const refused = outcome.claimed ? outcome.refused : TAP_REFUSED.gone;
-  console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} claimed=${outcome.claimed}${refused ? ` refused="${refused}"` : ""}`);
-  if (refused) await replyEphemeral(payload, refused);
+  let outcome: ReminderOutcome | "error";
+  try {
+    outcome = await handleReminderButton(env, { channel, messageTs, glyph, userId });
+  } catch (err) {
+    // A budget stop included: the tapper hears it failed, not that it was ignored.
+    console.error(`[interactive] reminder ${glyph} on ${channel}/${messageTs} failed: ${err instanceof Error ? err.message : String(err)}`);
+    outcome = "error";
+  }
+  const line = tapReply(outcome);
+  console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} outcome=${JSON.stringify(outcome)}`);
+  if (line) await replyEphemeral(payload, line);
 }
 
 // ✅ Approve / ⛔ Cancel on a proposal card (2026-08-22).

@@ -32,6 +32,7 @@ import { reactionRecorderFor } from "../usage/resolution-env";
 import { reminderDoorFor } from "../commitments/env";
 import { dmReminderDoorFor } from "../dm-watch/env";
 import type { ReminderOutcome } from "../commitments/copy";
+import { eitherDoor, type ReminderPressDoor } from "../commitments/press";
 
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
   if (event.item.type !== "message") return;
@@ -63,7 +64,7 @@ export async function handleReminderButton(
   press: { channel: string; messageTs: string; glyph: string; userId: string },
 ): Promise<ReminderOutcome> {
   const door = eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env));
-  return door ? door(press) : { claimed: false };
+  return door ? door({ ...press, via: "button" }) : { claimed: false };
 }
 
 /**
@@ -100,20 +101,6 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
     recordReaction: reactionRecorderFor(env),
 
     ...withReminder(claimedOf(eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env)))),
-  };
-}
-
-/** A press, to a reminder door: whether it was a reminder's, and why it
- *  changed nothing when it didn't. */
-type ReminderPressDoor = (r: { channel: string; messageTs: string; glyph: string; userId: string; messageAuthorId?: string }) => Promise<ReminderOutcome>;
-
-/** A DM reminder's door first — it looks only at DMs — then the thread
- *  reminders'. Either claiming the reaction keeps it from the gate. */
-function eitherDoor(first: ReminderPressDoor | undefined, second: ReminderPressDoor | undefined): ReminderPressDoor | undefined {
-  if (!first || !second) return first ?? second;
-  return async (r) => {
-    const outcome = await first(r);
-    return outcome.claimed ? outcome : second(r);
   };
 }
 

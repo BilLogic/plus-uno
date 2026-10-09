@@ -196,6 +196,9 @@ export interface CommitmentRecords {
    *  its follow-up. */
   byReminderTs(ts: string): Promise<CommitmentRecord | null>;
   update(id: string, patch: CommitmentPatch): Promise<void>;
+  /** `update`, only while the row is live (`LIVE_STATES`): true when it
+   *  changed. Two answers at once both read a live row; one claim wins. */
+  claim(id: string, patch: CommitmentPatch): Promise<boolean>;
   /** Every row whose id starts with `prefix`, in id order — one range read on
    *  the key (the DM sweep's raises in one DM). */
   byIdPrefix(prefix: string): Promise<CommitmentRecord[]>;
@@ -223,6 +226,9 @@ export interface CommitmentText {
   card?: { title: string; url: string; status: string | null };
   /** Where a card to-do was read: the thread's permalink or the note's link. */
   sourceUrl?: string;
+  /** A thread card to-do's other posters, whose ✅ reaction may ask for the
+   *  draft too (a tap is anyone's). */
+  participants?: string[];
   /** A stuck card whose owner answered 🙌 or 🙅: the Design Status options
    *  offered, in the order shown, until one is picked and staged or the
    *  choice lapses; `reposted` once the list went up a second time; `by`

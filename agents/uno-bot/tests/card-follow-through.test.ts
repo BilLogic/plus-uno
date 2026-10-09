@@ -279,26 +279,16 @@ describe("F3: a to-do to make a card", () => {
     assert.match(a.edits[0]!.footer, /draft card is in this thread/);
   });
 
-  it("🙅 from anyone drops it, and the edit names who answered", async () => {
+  it("🙅 from the assignee drops it; from anyone else changes nothing", async () => {
     const { store } = await keptTodo();
     const rm = roadmap();
     await morning(store, rm, at(32, 13)).run();
     const row = only(store);
     const a = answers(store, rm);
-    assert.equal(await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "no_good", userId: ADE }, a.deps), undefined);
+    await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "no_good", userId: ADE }, a.deps);
+    assert.equal(only(store).state, "nudged");
+    await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "no_good", userId: MAYA }, a.deps);
     assert.equal(only(store).state, "dropped");
-    assert.equal(a.staged.length, 0);
-    assert.equal(a.edits[0]!.footer, `Understood. I won't ask again. Answered by <@${ADE}>.`);
-  });
-
-  it("a tap on a follow-up already answered says so", async () => {
-    const { store } = await keptTodo();
-    const rm = roadmap();
-    await morning(store, rm, at(32, 13)).run();
-    const a = answers(store, rm);
-    await answerCardFollowUp(only(store), { channel: DESIGN, messageTs: only(store).nudgeTs!, glyph: "no_good", userId: MAYA }, a.deps);
-    const refused = await answerCardFollowUp(only(store), { channel: DESIGN, messageTs: only(store).nudgeTs!, glyph: "white_check_mark", userId: ADE }, a.deps);
-    assert.equal(refused, "This one's already been answered, so that tap changed nothing.");
     assert.equal(a.staged.length, 0);
   });
 
@@ -613,7 +603,7 @@ describe("F5: a stuck card", () => {
     assert.equal(a.staged.length, 0);
   });
 
-  it("only the owner's reply, or the answerer's, counts", async () => {
+  it("only the owner's reply counts", async () => {
     const { a, reply } = await answered("raised_hands");
     assert.equal(await reply(BEA, "Shipped"), false);
     assert.equal(await reply(BEA, "1"), false);
@@ -621,7 +611,7 @@ describe("F5: a stuck card", () => {
     assert.equal(a.said.length, 1);
   });
 
-  it("anyone may answer: their tap lists the options for them, and their pick stages the move", async () => {
+  it("a reaction from anyone but the owner lists nothing", async () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [stuck()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
@@ -629,27 +619,8 @@ describe("F5: a stuck card", () => {
     const row = only(store);
     const a = answers(store, rm);
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "raised_hands", userId: BEA }, a.deps);
-    assert.equal(only(store).state, "done");
-    assert.match(a.said[0]!.text, /^<@U0BEA> Which Design Status/);
-    assert.equal(a.edits[0]!.footer, `Nice. Pick the card's new Design Status in this thread. Answered by <@${BEA}>.`);
-    assert.equal(await handleCardReply({ channel: DESIGN, threadTs: row.nudgeTs!, user: BEA, text: "Shipped" }, a.deps), true);
-    assert.equal(a.staged.length, 1);
-    assert.ok(a.staged[0]!.confirmers.includes(BEA));
-  });
-
-  it("anyone's Still on it on the follow-up a week on snoozes it, and names them", async () => {
-    const store = createInMemoryCommitmentStore();
-    const rm = roadmap({ cards: [stuck()] });
-    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    await morning(store, rm, at(30, 13)).run();
-    await morning(store, rm, at(42, 13)).run(); // the first morning past a week
-    const row = only(store);
-    assert.ok(row.followupTs);
-    const a = answers(store, rm);
-    await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.followupTs!, glyph: "hourglass_flowing_sand", userId: ADE }, a.deps);
-    assert.equal(only(store).state, "snoozed");
-    assert.equal(a.edits[0]!.ts, row.followupTs);
-    assert.equal(a.edits[0]!.footer, `Got it. I'll leave it be for now. Answered by <@${ADE}>.`);
+    assert.equal(only(store).state, "nudged");
+    assert.equal(a.said.length, 0);
   });
 
   it("settles on its own when someone comments before the morning", async () => {
@@ -1018,14 +989,16 @@ describe("F3 answers", () => {
     assert.equal(only(store).state, "nudged");
   });
 
-  it("anyone may ask for the draft, and may confirm it beside the people named", async () => {
+  it("someone who posted in the thread may ask for the draft; an outsider may not", async () => {
     const { store } = await keptTodo();
     await morning(store, roadmap(), at(32, 13)).run();
     const row = only(store);
     const a = answers(store, roadmap());
     await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "white_check_mark", userId: ADE }, a.deps);
+    assert.equal(a.staged.length, 0);
+    await answerCardFollowUp(row, { channel: DESIGN, messageTs: row.nudgeTs!, glyph: "white_check_mark", userId: BEA }, a.deps);
     assert.equal(a.staged.length, 1);
-    assert.deepEqual(new Set(a.staged[0]!.confirmers), new Set([MAYA, ADE]));
+    assert.deepEqual(new Set(a.staged[0]!.confirmers), new Set([MAYA, BEA]));
   });
 
   it("two drafts in one thread stand side by side, each in its own slot", async () => {
@@ -1320,5 +1293,113 @@ describe("a card's Contributors", () => {
       { id: "n-bot", name: "" },
       { id: "n-maya", name: "Maya Chen" },
     ]);
+  });
+});
+
+// ── Button taps ──────────────────────────────────────────────────────────────
+//
+// A tap is a deliberate answer, so anyone may give one; a reaction can be a
+// casual "seen", so it still counts only from the people asked. A tap that
+// changes nothing says why.
+
+describe("a tap on a card follow-up's buttons", () => {
+  const tap = (row: CommitmentRecord, glyph: string, userId: string, messageTs = row.nudgeTs!) =>
+    ({ channel: DESIGN, messageTs, glyph, userId, via: "button" as const });
+
+  async function stuckAsked() {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({ cards: [stuck()] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    await morning(store, rm, at(30, 13)).run();
+    return { store, rm, row: only(store), a: answers(store, rm) };
+  }
+  const stuck = (over: Partial<ActiveCard> = {}) =>
+    card({ designStatus: "Under Review", contributors: [{ id: "n-maya", name: "Maya Chen" }], lastEditedAt: EOD - 22 * DAY, ...over });
+
+  it("Drop it from someone the follow-up never asked drops a to-do, and the edit names them", async () => {
+    const { store } = await keptTodo();
+    const rm = roadmap();
+    await morning(store, rm, at(32, 13)).run();
+    const row = only(store);
+    const a = answers(store, rm);
+    assert.equal(await answerCardFollowUp(row, tap(row, "no_good", ADE), a.deps), undefined);
+    assert.equal(only(store).state, "dropped");
+    assert.equal(a.edits[0]!.footer, `Understood. I won't ask again. Answered by <@${ADE}>.`);
+  });
+
+  it("Draft it from anyone stages the draft, and they may confirm it beside the people named", async () => {
+    const { store } = await keptTodo();
+    await morning(store, roadmap(), at(32, 13)).run();
+    const row = only(store);
+    const a = answers(store, roadmap());
+    await answerCardFollowUp(row, tap(row, "white_check_mark", ADE), a.deps);
+    assert.equal(a.staged.length, 1);
+    assert.deepEqual(new Set(a.staged[0]!.confirmers), new Set([MAYA, ADE]));
+  });
+
+  it("a tap on a follow-up already answered says so", async () => {
+    const { store } = await keptTodo();
+    await morning(store, roadmap(), at(32, 13)).run();
+    const a = answers(store, roadmap());
+    await answerCardFollowUp(only(store), tap(only(store), "no_good", MAYA), a.deps);
+    assert.deepEqual(await answerCardFollowUp(only(store), tap(only(store), "white_check_mark", ADE), a.deps), {
+      refused: "This one's already been answered, so that tap changed nothing.",
+    });
+    assert.equal(a.staged.length, 0);
+  });
+
+  it("two answers at once: one lands, the other is told it was already answered", async () => {
+    const { store, row, a } = await stuckAsked();
+    const results = await Promise.all([
+      answerCardFollowUp(row, tap(row, "no_good", ADE), a.deps),
+      answerCardFollowUp(row, tap(row, "hourglass_flowing_sand", BEA), a.deps),
+    ]);
+    assert.equal(results.filter((r) => r === undefined).length, 1);
+    assert.deepEqual(results.find((r) => r !== undefined), { refused: "This one's already been answered, so that tap changed nothing." });
+    assert.equal(a.edits.length, 1);
+    assert.notEqual(only(store).state, "nudged");
+  });
+
+  it("a stuck card's Done from anyone lists the options for them; their pick counts, a bystander's does not, and the last edit still names them", async () => {
+    const { store, row, a } = await stuckAsked();
+    await answerCardFollowUp(row, tap(row, "raised_hands", BEA), a.deps);
+    assert.equal(only(store).state, "done");
+    assert.match(a.said[0]!.text, /^<@U0BEA> Which Design Status/);
+    assert.equal(a.edits[0]!.footer, `Nice. Pick the card's new Design Status in this thread. Answered by <@${BEA}>.`);
+    const reply = (user: string, text: string) => handleCardReply({ channel: DESIGN, threadTs: row.nudgeTs!, user, text }, a.deps);
+    assert.equal(await reply(ADE, "Shipped"), false);
+    assert.equal(a.staged.length, 0);
+    assert.equal(await reply(BEA, "Shipped"), true);
+    assert.equal(a.staged.length, 1);
+    assert.ok(a.staged[0]!.confirmers.includes(BEA));
+    assert.equal(a.edits.at(-1)!.footer, `Thanks. The status change is in this thread; a ✅ there applies it. Answered by <@${BEA}>.`);
+  });
+
+  it("Still on it from anyone on the follow-up a week on snoozes it, and names them", async () => {
+    const { store, rm } = await stuckAsked();
+    await morning(store, rm, at(42, 13)).run(); // the first morning past a week
+    const row = only(store);
+    assert.ok(row.followupTs);
+    const a = answers(store, rm);
+    await answerCardFollowUp(row, tap(row, "hourglass_flowing_sand", ADE, row.followupTs!), a.deps);
+    assert.equal(only(store).state, "snoozed");
+    assert.equal(a.edits[0]!.ts, row.followupTs);
+    assert.equal(a.edits[0]!.footer, `Got it. I'll leave it be for now. Answered by <@${ADE}>.`);
+  });
+
+  it("Still on it past the snooze cap says it can't be put off again", async () => {
+    const { store, row, a } = await stuckAsked();
+    await store.update(row.id, { snoozes: 2 });
+    assert.deepEqual(await answerCardFollowUp(only(store), tap(row, "hourglass_flowing_sand", MAYA), a.deps), {
+      refused: "This can't be put off again, so that tap changed nothing.",
+    });
+    assert.equal(only(store).state, "nudged");
+  });
+
+  it("an answer whose message could not be edited still lands, and says it was recorded", async () => {
+    const { store, row, a } = await stuckAsked();
+    a.deps.update = async () => false;
+    assert.deepEqual(await answerCardFollowUp(row, tap(row, "hourglass_flowing_sand", MAYA), a.deps), { unedited: true });
+    assert.equal(only(store).state, "snoozed");
   });
 });

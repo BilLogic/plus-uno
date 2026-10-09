@@ -84,9 +84,21 @@ export const TAP_REFUSED = {
   notYours: (owner: string) => `Only <@${owner}> can answer this reminder, so that tap changed nothing.`,
 } as const;
 
-/** What a reminder door made of a press: not a reminder's at all, or the
- *  reminder's, with why it changed nothing when it didn't. */
-export type ReminderOutcome = { claimed: false } | { claimed: true; refused?: string };
+/** A tap the door could not record (a store error, a budget stop): said
+ *  plainly, never passed off as a reminder it no longer tracks. */
+export const TAP_FAILED = "I couldn't record that. Try again in a minute.";
+
+/** A tap that landed on a message the edit then missed. */
+export const TAP_RECORDED = "Got it, that's recorded, though I couldn't update the message to show it.";
+
+/** What one kind's own answers made of a press: why it changed nothing, or
+ *  that it landed but the message still shows its buttons. Nothing when it
+ *  landed and shows. */
+export type TapAnswer = { refused: string } | { unedited: true };
+
+/** What a reminder door made of a press: not a reminder's (or the lookup
+ *  failed), or the reminder's, with why it changed nothing when it didn't. */
+export type ReminderOutcome = { claimed: false; failed?: true } | { claimed: true; refused?: string; unedited?: true };
 
 /** Characters of a summary a reminder repeats. */
 export const MAX_WHAT_CHARS = 140;

@@ -51,7 +51,7 @@
 // `./env.ts`.
 
 import { rethrowIfBudget } from "../net";
-import { reminderAnswer, reminderBlocks, TAP_REFUSED } from "../commitments/copy";
+import { reminderAnswer, reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import { dayLabel, etDayOf, rearmedDueAt, TEXT_KEEP_MS } from "../commitments/due";
 import { MAX_HOLDS, type CommitmentAction, type ReminderReaction } from "../commitments/run";
 import { LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
@@ -427,16 +427,17 @@ export interface DmAnswerDeps {
  *
  * @param deps - The store, the in-place edit, the clock
  */
-export function answerDmAsk(deps: DmAnswerDeps): (c: CommitmentRecord, r: ReminderReaction) => Promise<string | void> {
+export function answerDmAsk(deps: DmAnswerDeps): (c: CommitmentRecord, r: ReminderReaction) => Promise<TapAnswer | void> {
   return async (c, r) => {
-    if (c.kind !== "dm_unanswered" || reminderAnswer(r.glyph) !== "not_doing") return TAP_REFUSED.notAnAnswer;
-    if (r.userId !== c.promiserId) return TAP_REFUSED.notYours(c.promiserId);
-    if (c.state !== "nudged") return TAP_REFUSED.settled;
-    await deps.store.update(c.id, { state: "dropped", resolvedAt: deps.now() });
+    if (c.kind !== "dm_unanswered" || reminderAnswer(r.glyph) !== "not_doing") return { refused: TAP_REFUSED.notAnAnswer };
+    if (r.userId !== c.promiserId) return { refused: TAP_REFUSED.notYours(c.promiserId) };
+    if (c.state !== "nudged" || !(await deps.store.claim(c.id, { state: "dropped", resolvedAt: deps.now() }))) return { refused: TAP_REFUSED.settled };
     const body = (await deps.store.text(c.id))?.bodies[r.messageTs];
-    if (!body) return;
+    if (!body) return { unedited: true };
     const edited = await deps.update(r.channel, r.messageTs, { text: body, blocks: reminderBlocks(body, ASK_DROPPED) });
-    if (!edited) console.warn(`[dm-sweep] ${c.id}: dropped, but ask ${r.messageTs} could not be edited`);
+    if (edited) return;
+    console.warn(`[dm-sweep] ${c.id}: dropped, but ask ${r.messageTs} could not be edited`);
+    return { unedited: true };
   };
 }
 

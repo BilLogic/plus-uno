@@ -30,7 +30,7 @@ import { threadStateFor } from "../thread-state/production";
 import { proposalEventLogFor } from "../usage/production";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { CommitmentRecord } from "../commitments/store";
-import { TAP_REFUSED } from "../commitments/copy";
+import { TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import type { ReminderReaction } from "../commitments/run";
 import { commitmentStoreFor as storeFor } from "../commitments/store-env";
 import { measured } from "../sweep/env";
@@ -275,11 +275,11 @@ async function stageCardOnEnv(env: Env, kv: KVNamespace, p: CardProposal): Promi
  *
  * @param env - Worker bindings
  */
-export function cardAnswerFor(env: Env): ((c: CommitmentRecord, r: ReminderReaction) => Promise<string | void>) | undefined {
+export function cardAnswerFor(env: Env): ((c: CommitmentRecord, r: ReminderReaction) => Promise<TapAnswer | void>) | undefined {
   if (!storeFor(env)) return undefined;
   return async (c, r) => {
     const deps = answerDepsFor(env, (await getBotIdentity(env))?.userId ?? null);
-    return deps ? answerCardFollowUp(c, r, deps) : TAP_REFUSED.gone;
+    return deps ? answerCardFollowUp(c, r, deps) : { refused: TAP_REFUSED.gone };
   };
 }
 

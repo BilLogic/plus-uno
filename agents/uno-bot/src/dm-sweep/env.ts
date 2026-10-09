@@ -27,6 +27,7 @@ import { proposalEventLogFor } from "../usage/production";
 import { commitmentStoreFor } from "../commitments/store-env";
 import type { CommitmentAction, ReminderReaction } from "../commitments/run";
 import type { CommitmentRecord } from "../commitments/store";
+import type { TapAnswer } from "../commitments/copy";
 import { activeDms } from "./active";
 import { modelDmDetector } from "./detector";
 import { answerDmAsk, dmAsksDue, dmThreadHook } from "./run";
@@ -123,7 +124,7 @@ export function dmAsksFor(
  *
  * @param env - Worker bindings
  */
-export function dmAnswerFor(env: Env): ((c: CommitmentRecord, r: ReminderReaction) => Promise<string | void>) | undefined {
+export function dmAnswerFor(env: Env): ((c: CommitmentRecord, r: ReminderReaction) => Promise<TapAnswer | void>) | undefined {
   const store = commitmentStoreFor(env);
   if (!store) return undefined;
   return answerDmAsk({
