@@ -215,7 +215,6 @@ function blueprintResult(contents: readonly string[]): string {
     ok: true,
     query: "reminders",
     count: contents.length,
-    blueprint: { title: "uno-blueprint", url: APP },
     rows: contents.map((content, i) => ({
       kind: "cell",
       id: `c${i + 1}`,
@@ -227,21 +226,31 @@ function blueprintResult(contents: readonly string[]): string {
   });
 }
 
-test("a blueprint answer cites the blueprint once and the cells it names, by link or by their whole title", async () => {
-  const contents = [
-    "Tutor signs in to the portal with their school account before the first session begins",
-    "Tutor gets a reminder text a day before the session and often misses it in the noise",
-    "Reconfirm the tutor call",
-    "Coordinator exports the payout sheet at the end of every month for the finance team",
-    "Tutor fills the reflection form after the session, usually days late or not at all",
-  ];
+const CELLS = [
+  "Tutor signs in to the portal with their school account before the first session begins",
+  "Tutor gets a reminder text a day before the session and often misses it in the noise",
+  "Reconfirm the tutor call",
+  "Coordinator exports the payout sheet at the end of every month for the finance team",
+  "Tutor fills the reflection form after the session, usually days late or not at all",
+];
+
+test("a blueprint answer cites the cells it names, by link or by their whole title", async () => {
   const { box } = await answer(
-    [{ name: "search_blueprint", result: blueprintResult(contents) }],
+    [{ name: "search_blueprint", result: blueprintResult(CELLS) }],
     `**Reminders are where tutors slip.** The <${cell(2)}|day-before reminder> is easy to miss, the [reflection form](${cell(5)}) comes in late, and coordinators lean on Reconfirm the tutor call to catch it.`,
   );
 
-  assert.deepEqual(box!.title, { type: "plain_text", text: "Sources (4)" });
-  assert.deepEqual(linksIn(box), [APP, cell(2), cell(3), cell(5)]);
+  assert.deepEqual(box!.title, { type: "plain_text", text: "Sources (3)" });
+  assert.deepEqual(linksIn(box), [cell(2), cell(3), cell(5)]);
+});
+
+test("the blueprint opens no box on its own: an answer that links one cell has none", async () => {
+  const { types } = await answer(
+    [{ name: "search_blueprint", result: JSON.stringify({ ...JSON.parse(blueprintResult(CELLS)), blueprint: { title: "uno-blueprint", url: APP } }) }],
+    `**Reminders are where tutors slip.** The <${cell(2)}|day-before reminder> is easy to miss.`,
+  );
+
+  assert.deepEqual(types, ["markdown"]);
 });
 
 test("a link in Slack's own <url|text> form names its row", async () => {
@@ -317,16 +326,28 @@ test("two rows named without a queried collection make no box, linked or not", a
   assert.deepEqual(types, ["markdown"]);
 });
 
+/** A page `source_read` read whole. */
+const readWhole = (url: string, title: string) => JSON.stringify({ ok: true, url, title, content: "…" });
+
 test("a page a search found and then read whole is cited, though the prose only paraphrases it", async () => {
   const { box } = await answer(
     [
       { name: "notion_search", result: notionResult(notion(4)) },
-      { name: "source_read", result: JSON.stringify({ ok: true, url: notion(4)[2], title: "Page 3", content: "…" }) },
+      { name: "source_read", result: readWhole(notion(4)[2]!, "Page 3") },
     ],
+    "**Onboarding is written up in three places.** Page 1 and Page 4 are older; the current one says the same.",
+  );
+
+  assert.deepEqual(linksIn(box), [notion(4)[0], notion(4)[2], notion(4)[3]]);
+});
+
+test("a page read whole opens no box on its own: only the board or a scoped database does", async () => {
+  const { types } = await answer(
+    [{ name: "source_read", result: readWhole(notion(1)[0]!, "Page 1") }],
     "**Onboarding is written up once, and it is current.**",
   );
 
-  assert.deepEqual(linksIn(box), [notion(4)[2]]);
+  assert.deepEqual(types, ["markdown"]);
 });
 
 test("a search scoped to a Notion database cites that database once", async () => {

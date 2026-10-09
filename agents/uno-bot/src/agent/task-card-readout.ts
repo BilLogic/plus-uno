@@ -39,12 +39,13 @@ export interface TaskCardSource {
    */
   readonly visibility?: string;
   /**
-   * The board, database or page the lookup queried or read, as against one
-   * of the rows it found. An answer stands on what it queried whatever it
+   * What the lookup queried, as against one of the rows it found: the
+   * `collection` it searched (the Roadmap board, a scoped Notion database) or
+   * the `page` it read whole. An answer stands on what it queried whatever it
    * names, so the Sources box keeps this one and a row only when the prose
    * names it (`slack/sources-box.ts`).
    */
-  readonly queried?: true;
+  readonly queried?: "collection" | "page";
   /** The row's number as its estate shows it — a Roadmap card's — so prose
    *  that writes "#412" names it. */
   readonly number?: number;
@@ -168,7 +169,7 @@ function ownLink(result: string): TaskCardSource[] {
   const p = succeeded(result);
   const url = p && httpUrl(p.url);
   if (!p || !url) return [];
-  return [{ text: str(p.title) ?? url, url, queried: true }];
+  return [{ text: str(p.title) ?? url, url, queried: "page" }];
 }
 
 /** The collection a lookup queried — the payload's `field`, a `{ title, url }`
@@ -178,7 +179,7 @@ function collectionThenRows(field: string, rows: (result: string) => TaskCardSou
     const p = succeeded(result);
     const collection = p?.[field] as Payload | undefined;
     const url = collection && typeof collection === "object" ? httpUrl(collection.url) : null;
-    const own: TaskCardSource[] = url ? [{ text: str(collection!.title) ?? url, url, queried: true }] : [];
+    const own: TaskCardSource[] = url ? [{ text: str(collection!.title) ?? url, url, queried: "collection" }] : [];
     return unique([...own, ...rows(result)]);
   };
 }
@@ -278,7 +279,7 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
   search_blueprint: {
     details: arg("query"),
     output: countOutput("rows", "match", "no matches", "matches"),
-    sources: collectionThenRows("blueprint", rowLinks("rows", ["name", "label", "title"])),
+    sources: rowLinks("rows", ["name", "label", "title"]),
   },
   github_read: {
     details: arg("search", "path"),

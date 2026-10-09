@@ -48,7 +48,7 @@ const ROWS: Row[] = [
     ] }),
     output: "1 card",
     sources: [
-      { text: "Roadmap", url: "https://www.notion.so/roadmapdb", queried: true },
+      { text: "Roadmap", url: "https://www.notion.so/roadmapdb", queried: "collection" },
       { text: "Tutor import v2", url: "https://www.notion.so/plus/Tutor-import-v2-abc" },
     ],
   },
@@ -72,7 +72,7 @@ const ROWS: Row[] = [
     details: "https://www.figma.com/design/KEY/File?node-id=1-2",
     result: ok({ source_type: "figma", url: "https://www.figma.com/design/KEY/File?node-id=1-2", title: "Tutor card", content: "…" }),
     output: "Read Tutor card",
-    sources: [{ text: "Tutor card", url: "https://www.figma.com/design/KEY/File?node-id=1-2", queried: true }],
+    sources: [{ text: "Tutor card", url: "https://www.figma.com/design/KEY/File?node-id=1-2", queried: "page" }],
   },
   { name: "source_read", args: { text: "see https://example.com/a for it" }, details: "https://example.com/a", result: failed("fetch 404"), output: null, sources: [] },
   // search_blueprint

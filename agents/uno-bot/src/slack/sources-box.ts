@@ -3,8 +3,8 @@
 //
 // The turn hands over every link its lookups read (`turn/presentation.ts`).
 // What the answer USED is fewer: the collection each lookup queried (the
-// Roadmap board, a Notion database, the blueprint) or the page it read whole,
-// once, and the rows the prose names. A lookup's other rows are what it read
+// Roadmap board, a scoped Notion database) or the page it read whole, once,
+// and the rows the prose names. A lookup's other rows are what it read
 // on the way, and listing them is how a Roadmap status answer came to cite
 // ten cards it never mentioned (r515). Of those, this keeps the ones a thread
 // may see (`card-sources.ts`) and spells them as Slack's.
@@ -17,6 +17,7 @@
 // A BOX at three or more used links. Below three, only a queried collection
 // the prose leaves unlinked makes one, since nothing else says where the
 // answer came from; that box lists the used links the prose leaves unlinked.
+// A page read whole, or a blueprint cell, counts toward three and no further.
 //
 // A container takes no `markdown` child, so the links are one `rich_text`
 // bullet list. Its title is the count alone, never a freshness note: when the
@@ -116,7 +117,7 @@ export function sourcesBox(sources: readonly TaskCardSource[] | undefined, prose
   const visible = new Set(threadVisibleSources(used).map(({ url }) => url));
   let kept = used.filter(({ url }) => visible.has(url));
   if (kept.length < MIN_SOURCES) {
-    if (!kept.some((s) => s.queried && !linked(s.url, prose))) return null;
+    if (!kept.some((s) => s.queried === "collection" && !linked(s.url, prose))) return null;
     kept = kept.filter(({ url }) => !linked(url, prose));
   }
   const shown: CardSource[] = kept.slice(0, MAX_BOX_SOURCES).map(({ text, url }) => ({ text, url }));

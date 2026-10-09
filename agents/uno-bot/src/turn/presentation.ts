@@ -505,7 +505,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
         const was = sources.get(source.url);
         // A page a search found and a later lookup read whole was queried.
         if (!was) sources.set(source.url, source);
-        else if (source.queried && !was.queried) sources.set(source.url, { ...was, queried: true });
+        else if (source.queried && was.queried !== "collection") sources.set(source.url, { ...was, queried: source.queried });
       }
     },
     chartedAcross() {
