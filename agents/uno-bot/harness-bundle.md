@@ -28,7 +28,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,578 | 7,000 (Worker face) |
 | 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,225 | 7,000 (Worker face) |
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,613 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,454 (−15,123 ide-only) | 101,109 | — |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,454 (−15,359 ide-only) | 101,109 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,846 (−4,814 ide-only) | 115,998 | — |
 | 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,130 (−6,177 ide-only) | 150,170 | — |
 | 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 153,454 | — |
