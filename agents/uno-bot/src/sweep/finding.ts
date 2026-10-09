@@ -99,6 +99,9 @@ export interface SweepSource {
   /** Notion only: the page runs past the blocks read, so its last block read
    *  is not its end. */
   truncated?: boolean;
+  /** Notion only: the pages nested in its body, in order, each by its id and
+   *  title — a Roadmap card's PRD among them. */
+  subpages?: Array<{ id: string; title: string }>;
 }
 
 /** The target a finding is about. */

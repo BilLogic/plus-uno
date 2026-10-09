@@ -69,6 +69,7 @@ import {
   type FigmaComponentsResponse,
   type FigmaDevResourcesCreated,
   type FigmaDevResourcesResponse,
+  type FigmaFileMetaResponse,
   type FigmaFileResponse,
   type FigmaFolderFilesResponse,
   type FigmaImagesResponse,
@@ -220,7 +221,12 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
 
   return {
     file: (key, opts = {}) =>
-      call<FigmaFileResponse>({ what: "file", tier: 1, method: "GET", path: `${file(key)}${query({ depth: opts.depth })}` }, opts),
+      call<FigmaFileResponse>(
+        { what: "file", tier: 1, method: "GET", path: `${file(key)}${query({ ids: opts.ids, depth: opts.depth })}` },
+        opts,
+      ),
+    fileMeta: (key, opts) =>
+      call<FigmaFileMetaResponse>({ what: "file meta", tier: 3, method: "GET", path: `${file(key)}/meta` }, opts),
     nodes: (key, ids, opts = {}) =>
       call<FigmaNodesResponse>(
         {

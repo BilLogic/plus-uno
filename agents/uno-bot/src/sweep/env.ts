@@ -545,6 +545,7 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
       parentType: page.parentType,
       properties: page.properties,
       truncated: page.truncated,
+      ...(page.subpages.length ? { subpages: page.subpages } : {}),
     };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;

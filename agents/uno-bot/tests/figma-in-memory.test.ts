@@ -55,6 +55,44 @@ describe("the shared fake Figma", () => {
     assert.equal((await figma.nodes(KEY, [FRAME])).nodes?.[FRAME]?.document?.name, "Recap");
   });
 
+  it("reads a file to a depth, or only the paths down to some nodes, as Figma does", async () => {
+    const figma = createInMemoryFigma();
+    const document = {
+      id: "0:0",
+      name: "Document",
+      type: "DOCUMENT",
+      children: [
+        { id: "0:1", name: "Cover", type: "CANVAS", children: [{ id: "1:1", name: "Cover frame", type: "FRAME" }] },
+        {
+          id: "0:2",
+          name: "Goal states",
+          type: "CANVAS",
+          children: [{ id: "2:1", name: "Empty", type: "FRAME", children: [{ id: "2:2", name: "Bar", type: "RECTANGLE" }] }],
+        },
+      ],
+    };
+    figma.seedFile(KEY, { document, creator: ME });
+    const pages = (await figma.file(KEY, { depth: 1 })).document;
+    assert.deepEqual(
+      pages.children?.map((p) => [p.name, p.children]),
+      [
+        ["Cover", undefined],
+        ["Goal states", undefined],
+      ],
+    );
+    const two = (await figma.file(KEY, { depth: 2 })).document;
+    assert.deepEqual(two.children?.[1]?.children, [{ id: "2:1", name: "Empty", type: "FRAME" }]);
+    const path = (await figma.file(KEY, { ids: ["2:2"] })).document;
+    assert.deepEqual(
+      path.children?.map((p) => p.name),
+      ["Goal states"],
+      "only the page on the path",
+    );
+    assert.equal(path.children?.[0]?.children?.[0]?.children?.[0]?.name, "Bar");
+    assert.deepEqual((await figma.file(KEY, { ids: ["9:9"] })).document.children, []);
+    assert.deepEqual(await figma.fileMeta(KEY), { file: { name: KEY, creator: ME, last_touched_at: (await figma.file(KEY)).lastModified } });
+  });
+
   it("404s a file, team or folder nobody seeded", async () => {
     const figma = seeded();
     await assert.rejects(figma.nodes("Unknown", [FRAME]), { status: 404 });

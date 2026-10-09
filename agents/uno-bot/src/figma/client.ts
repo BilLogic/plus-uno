@@ -52,6 +52,21 @@ export interface FigmaFileResponse {
   document: FigmaNode;
 }
 
+/**
+ * GET /v1/files/:key/meta, as far as uno-bot reads it: the file without its
+ * tree. `creator` is who made the file — a User, so a handle and an id, never
+ * an email (developers.figma.com/docs/rest-api/files-endpoints, read
+ * 2026-10-08; not yet probed on this token).
+ */
+export interface FigmaFileMetaResponse {
+  file: {
+    name: string;
+    creator?: FigmaUser;
+    folder_name?: string;
+    last_touched_at?: string;
+  };
+}
+
 /** One entry of a /nodes response; null when the id names nothing in the file. */
 export interface FigmaNodeEntry {
   document?: FigmaNode;
@@ -237,8 +252,14 @@ export interface FigmaNewWebhook {
 
 /** Every Figma REST call uno-bot makes. */
 export interface FigmaClient {
-  /** The whole file. Tier 1. */
-  file(fileKey: string, opts?: FigmaCallOptions & { depth?: number }): Promise<FigmaFileResponse>;
+  /**
+   * The whole file, `depth` levels of it (1 is the pages alone), or — with
+   * `ids` — only the path from the document down to those nodes and the
+   * subtrees under them. Tier 1.
+   */
+  file(fileKey: string, opts?: FigmaCallOptions & { depth?: number; ids?: readonly string[] }): Promise<FigmaFileResponse>;
+  /** The file's name and creator, without its tree. Tier 3. */
+  fileMeta(fileKey: string, opts?: FigmaCallOptions): Promise<FigmaFileMetaResponse>;
   /** Some nodes of a file, by id. Tier 1. */
   nodes(
     fileKey: string,
