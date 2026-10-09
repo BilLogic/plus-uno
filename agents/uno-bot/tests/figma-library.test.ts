@@ -219,7 +219,7 @@ describe("the end-of-day poll", () => {
     assert.deepEqual(changeSet!.newComponentIds, ["400:1"]);
     assert.deepEqual(changeSet!.removedComponentIds, []);
     assert.deepEqual(result.pending, 1);
-    assert.deepEqual(snapshot.value?.versionIds, ["2210000000000000002", "2210000000000000001"]);
+    assert.deepEqual(snapshot.value?.versionIds, ["2210000000000000002", "2210000000000000003", "2210000000000000001"]);
   });
 
   it("records a component as removed only when none of its variants is left", async () => {
@@ -303,7 +303,7 @@ describe("the end-of-day poll", () => {
     const result = await pollFigmaLibrary(deps);
     assert.match(result.summary, /versions:1/);
     assert.deepEqual(snapshot.value?.nodeHashes, {});
-    assert.deepEqual(snapshot.value?.versionIds, ["2210000000000000002", "2210000000000000001"]);
+    assert.deepEqual(snapshot.value?.versionIds, ["2210000000000000002", "2210000000000000003", "2210000000000000001"]);
   });
 
   it("stops on a budget stop in the hashes before writing anything, so the retry still sees the publish", async () => {
@@ -1023,8 +1023,8 @@ describe("the refresh a publish owes the repo's snapshot (#898)", () => {
   it("owes one refresh for a publish, recorded before the poll moves its snapshot on", async () => {
     const { deps, owed, snapshot } = pollDeps(AFTER);
     const result = await pollFigmaLibrary(deps);
-    assert.deepEqual(owed.value, { versionIds: ["2210000000000000002"], since: FOUND_AT });
-    assert.equal(result.refreshOwed, 1);
+    assert.deepEqual(owed.value, { versionIds: ["2210000000000000002", "2210000000000000003"], unlabelled: ["2210000000000000003"], since: FOUND_AT });
+    assert.equal(result.refreshOwed, 2);
 
     // A poll stopped before its snapshot write still left the refresh owed.
     const again = pollDeps(AFTER);
@@ -1032,7 +1032,7 @@ describe("the refresh a publish owes the repo's snapshot (#898)", () => {
       throw new Error("KV down");
     };
     await assert.rejects(pollFigmaLibrary(again.deps), /KV down/);
-    assert.deepEqual(again.owed.value?.versionIds, ["2210000000000000002"]);
+    assert.deepEqual(again.owed.value?.versionIds, ["2210000000000000002", "2210000000000000003"]);
     assert.equal(snapshot.value?.versionIds[0], "2210000000000000002");
   });
 
@@ -1045,7 +1045,7 @@ describe("the refresh a publish owes the repo's snapshot (#898)", () => {
     await assert.rejects(pollFigmaLibrary(stopped.deps));
     stopped.deps.snapshot.write = write;
     await pollFigmaLibrary(stopped.deps);
-    assert.deepEqual(stopped.owed.value?.versionIds, ["2210000000000000002"], "the retry merged the same id");
+    assert.deepEqual(stopped.owed.value?.versionIds, ["2210000000000000002", "2210000000000000003"], "the retry merged the same ids");
 
     await pollFigmaLibrary(stopped.deps);
     assert.equal(stopped.owed.writes.length, 2, "the finished poll's snapshot knows the version: nothing new is owed");
@@ -1064,7 +1064,7 @@ describe("the refresh a publish owes the repo's snapshot (#898)", () => {
     });
     deps.now = () => Date.UTC(2026, 8, 30, 22, 0);
     await pollFigmaLibrary(deps);
-    assert.deepEqual(owed.value, { versionIds: ["2210000000000000004", "2210000000000000002"], since: FOUND_AT });
+    assert.deepEqual(owed.value, { versionIds: ["2210000000000000004", "2210000000000000002", "2210000000000000003"], unlabelled: ["2210000000000000003"], since: FOUND_AT });
   });
 
   it("owes nothing for a library edited with no new version, or a quiet day", async () => {
@@ -1084,10 +1084,29 @@ describe("the refresh a publish owes the repo's snapshot (#898)", () => {
     assert.equal(quiet.owed.value, null);
   });
 
+  it("owes a refresh for a publish left with no label or description, and posts no card for it", async () => {
+    const unlabelled = pollDeps(BEFORE);
+    unlabelled.figma.seedFile(FILE_KEY, {
+      versions: {
+        versions: [
+          { id: "2210000000000000006", label: null, description: null, created_at: "2026-09-29T21:00:00Z", user: { handle: "bill" } },
+          VERSIONS.versions![2]!,
+        ],
+      },
+    });
+    const result = await pollFigmaLibrary(unlabelled.deps);
+    assert.deepEqual(unlabelled.owed.value, { versionIds: ["2210000000000000006"], unlabelled: ["2210000000000000006"], since: FOUND_AT });
+    assert.equal(result.refreshOwed, 1);
+    assert.deepEqual(unlabelled.findings.value, [], "the release card still counts labelled publishes only");
+
+    await pollFigmaLibrary(unlabelled.deps);
+    assert.equal(unlabelled.owed.writes.length, 1, "the next poll knows the version: nothing new is owed");
+  });
+
   it("says what it would owe on a dry run, and writes nothing", async () => {
     const { deps, owed } = pollDeps(AFTER);
     const result = await pollFigmaLibrary(deps, { dryRun: true });
-    assert.equal(result.refreshOwed, 1);
+    assert.equal(result.refreshOwed, 2);
     assert.deepEqual(owed.writes, []);
   });
 });

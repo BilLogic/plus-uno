@@ -23,6 +23,13 @@
 // what they record. Whatever is still owed is dispatched again, so a run that
 // gave up is completed by a later night's.
 //
+// UNLABELLED, SETTLED ON DISPATCH. A publish left with no label or
+// description reads like an autosave, so the poll owes a refresh for every new
+// version and marks those (`unlabelled`). The repo's snapshot records labelled
+// versions only and never shows one of them landing, so the dispatch GitHub
+// accepts settles it; a version that changed nothing costs one refresh that
+// finds nothing.
+//
 // ONE REFRESH PER PUBLISH, ONE RUN AT A TIME. The job runs once a night,
 // after every job of that run that reads Figma, so the Action's node fetches
 // never share uno-bot's half of Figma's Tier 1 with the Worker's own. A run
@@ -67,6 +74,9 @@ export const BLOCKED_LABEL = "automation-blocked";
 export interface RefreshOwed {
   /** Published version ids, newest first. */
   versionIds: string[];
+  /** The ones among them with no label or description, which the repo's
+   *  snapshot never records: each is settled by the refresh GitHub accepts. */
+  unlabelled?: string[];
   /** When the oldest of them was found. */
   since: string;
   /** Nights that tried to start the refresh since a version last landed. */
@@ -110,9 +120,18 @@ export interface SnapshotRefreshReport {
  * @param owed - What was owed already, or null
  * @param versionIds - The publishes the poll just found, newest first
  * @param at - When it found them, ISO
+ * @param unlabelled - Those of them with no label or description
  */
-export function owedWith(owed: RefreshOwed | null, versionIds: readonly string[], at: string): RefreshOwed {
-  return { ...owed, versionIds: [...new Set([...versionIds, ...(owed?.versionIds ?? [])])], since: owed?.since ?? at };
+export function owedWith(
+  owed: RefreshOwed | null,
+  versionIds: readonly string[],
+  at: string,
+  unlabelled: readonly string[] = [],
+): RefreshOwed {
+  const merged: RefreshOwed = { ...owed, versionIds: [...new Set([...versionIds, ...(owed?.versionIds ?? [])])], since: owed?.since ?? at };
+  const quiet = [...new Set([...unlabelled, ...(owed?.unlabelled ?? [])])];
+  if (quiet.length) merged.unlabelled = quiet;
+  return merged;
 }
 
 /**
@@ -139,7 +158,9 @@ export function coveredBy(owed: readonly string[], recorded: readonly string[]):
  */
 export function owedAfter(owed: RefreshOwed | null, landed: readonly string[]): RefreshOwed | null {
   const left = (owed?.versionIds ?? []).filter((id) => !landed.includes(id));
-  return left.length ? { versionIds: left, since: owed!.since } : null;
+  if (!left.length) return null;
+  const unlabelled = (owed!.unlabelled ?? []).filter((id) => left.includes(id));
+  return { versionIds: left, since: owed!.since, ...(unlabelled.length ? { unlabelled } : {}) };
 }
 
 /**
@@ -191,13 +212,18 @@ export async function runSnapshotRefresh(deps: SnapshotRefreshDeps): Promise<Sna
     lastTry = `the dispatch failed (${messageOf(err)})`;
   }
 
+  // A publish with no label is one the repo's snapshot never records, so the
+  // refresh GitHub accepts settles it; a labelled one waits to land.
+  const sent = dispatched ? left.filter((id) => owed.unlabelled?.includes(id)) : [];
+  const waiting = left.filter((id) => !sent.includes(id));
+
   // A version that landed resets the count; otherwise this night is one more.
   const tries = (covered.length ? 0 : (owed.tries ?? 0)) + 1;
   let blockedIssue = covered.length ? undefined : owed.blockedIssue;
   let filed = "";
-  if (tries >= STALL_LIMIT && blockedIssue === undefined) {
+  if (waiting.length && tries >= STALL_LIMIT && blockedIssue === undefined) {
     try {
-      blockedIssue = await deps.fileBlocked(blockedIssueFor({ ...owed, versionIds: left }, tries, lastTry));
+      blockedIssue = await deps.fileBlocked(blockedIssueFor({ ...owed, versionIds: waiting }, tries, lastTry));
       filed = `; filed #${blockedIssue}`;
     } catch (err) {
       rethrowIfBudget(err);
@@ -205,7 +231,7 @@ export async function runSnapshotRefresh(deps: SnapshotRefreshDeps): Promise<Sna
     }
   }
   await deps.owed.update((current) => {
-    const still = covered.length ? owedAfter(current, covered) : current;
+    const still = covered.length || sent.length ? owedAfter(current, [...covered, ...sent]) : current;
     if (!still) return null;
     return { ...still, tries, lastTry, ...(blockedIssue === undefined ? {} : { blockedIssue }) };
   });
