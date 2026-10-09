@@ -10,7 +10,7 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`, and the alarm's own `gc:next`.
+// `run:{user}`, `filing:{key}`, and the alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
 //
@@ -22,7 +22,7 @@
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
-// `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
+// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
 //
 // There is NO `fetch()` and no route table. Until #494 this class carried a
@@ -61,6 +61,8 @@ import {
   ownText,
   REPORT_GRACE_MS,
   changedReport,
+  claimedFiling,
+  FILING_TTL_MS,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
@@ -68,6 +70,9 @@ import {
   type CutOffNoteReport,
   type DecisionReportRecord,
   type Execution,
+  type FiledIssue,
+  type FilingClaim,
+  type FilingRecord,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
@@ -235,6 +240,11 @@ export class ThreadState extends DurableObject<Env> {
     const actx = await this.storage.list<AssistantContextRecord>({ prefix: "actx:" });
     for (const [key, rec] of actx) {
       if (now - rec.updatedAt > HISTORY_TTL_MS) await this.storage.delete(key);
+      else remaining++;
+    }
+    const filings = await this.storage.list<FilingRecord>({ prefix: "filing:" });
+    for (const [key, rec] of filings) {
+      if (now - rec.at > FILING_TTL_MS) await this.storage.delete(key);
       else remaining++;
     }
 
@@ -715,6 +725,25 @@ export class ThreadState extends DurableObject<Env> {
       status: "done",
     });
   }
+
+  // ----- one filing per key -----
+  //
+  // A read and a write with no await on anything but storage between them, so
+  // the input gate keeps a second claim out until the first is stored.
+
+  async claimFiling(key: string, at: number): Promise<FilingClaim> {
+    const { claim, store } = claimedFiling(await this.storage.get<FilingRecord>(filingKey(key)), at);
+    if (store) {
+      await this.storage.put<FilingRecord>(filingKey(key), store);
+      await this.ensureGcAlarm();
+    }
+    return claim;
+  }
+
+  async settleFiling(key: string, issue: FiledIssue | null, at: number): Promise<void> {
+    if (issue) await this.storage.put<FilingRecord>(filingKey(key), { at, issue });
+    else await this.storage.delete(filingKey(key));
+  }
 }
 
 function historyKey(channel: string, thread: string): string {
@@ -743,6 +772,10 @@ interface ReportRecord {
 
 function executionKey(ts: string): string {
   return `exec:${ts}`;
+}
+
+function filingKey(key: string): string {
+  return `filing:${key}`;
 }
 
 function eventKey(eventId: string): string {

@@ -427,7 +427,7 @@ async function applyRevise(
     return;
   }
   await showIn(request, deps)(
-    noticeView(card, verdict.proposal.item ? "Sent back with your note. I'm revising the draft, and its card shows the revision once it is ready." : "Sent back with your note. I'm revising the draft, and the new card posts in the thread."),
+    noticeView(card, verdict.proposal.afterNeedsChanges ?? (verdict.proposal.item ? "Sent back with your note. I'm revising the draft, and its card shows the revision once it is ready." : "Sent back with your note. I'm revising the draft, and the new card posts in the thread.")),
   );
   // Live, not decided: nothing is decided until the revision replaces it, and
   // a revision that never comes hands the card back (`startRevision`, Turn's
@@ -451,6 +451,19 @@ async function applyRevise(
  * comment decision, `figma-comments/revise.ts`) reads the note after it.
  */
 export const NEEDS_CHANGES_LEAD = "Needs changes on the proposal card above: ";
+
+/**
+ * The card a Needs changes sent back, as its revision turn revises it: the
+ * one the note names, not the thread's newest — a report holds one card per
+ * item in one thread. Null once it is decided, replaced or closed.
+ *
+ * @param store - The thread store
+ * @param key - The card's key, as the note carries it (`SlackMessageEvent.revises`)
+ */
+export async function cardSentBack(store: Pick<ThreadState, "getProposalByTs">, key: string): Promise<PendingProposal | null> {
+  const look = await store.getProposalByTs(key);
+  return look.state === "found" ? look.proposal : null;
+}
 
 /** What starting a revision needs: Slack, bound once in `slack/interactive.ts`. */
 export interface RevisionDeps {

@@ -122,7 +122,8 @@ import {
   sweepCardPick,
   sweepTag,
 } from "../sweep/cards";
-import { DRIFT_KEY } from "../figma-drift/finding";
+import { answersLegacyDriftCard, LEGACY_DRIFT_KEY } from "../figma-drift/finding";
+import { LEGACY_DRIFT_REPLY } from "../figma-drift/copy";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   withWorkingSignal,
@@ -546,6 +547,31 @@ export interface TurnDeps {
   onRestaged?(from: PendingProposal, to: PendingProposal): Promise<void>;
 
   /**
+   * The items of a decision report, as a revision turn changes them. Absent,
+   * every revision posts as its own card.
+   */
+  reportItems?: {
+    /**
+     * A revision of one item, ready to go in place of its card: what Review
+     * shows, the fields its proposal is staged with, and `place`, which puts
+     * it in the report's message under the same number, open — called once it
+     * is staged. Null when the report has no such item, and the revision
+     * posts as its own card.
+     */
+    revise(
+      item: { messageTs: string; id: string },
+      card: ProposalCard,
+    ): Promise<{
+      text: string;
+      staged: Pick<PendingProposal, "proposalTs" | "userMsgTs" | "supersedeKey" | "item">;
+      place(): Promise<void>;
+    } | null>;
+    /** Put an item sent back for changes back to open on the report's
+     *  message, when its turn staged no revision. Best-effort. */
+    reopen(item: { messageTs: string; id: string }): Promise<void>;
+  };
+
+  /**
    * One page of the conversation before this message, for the antecedent
    * window — already reduced to author and text, newest last.
    *
@@ -776,14 +802,26 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
 async function unlockRevision(
   request: TurnRequest,
   cardLive: boolean,
-  deps: Pick<TurnDeps, "threadState" | "delivery">,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "reportItems">,
 ): Promise<void> {
   const pending = request.pending;
   if (!cardLive || !pending?.revising || pending.revising.userId !== request.userId) return;
+  // An item that revises its own way (a Figma comment decision,
+  // `figma-comments/revise.ts`) is never revised by a turn: its lock is its
+  // own revision's, which lifts it, so a turn answering beside it leaves it.
+  if (pending.item && pending.refuseRevision) return;
   try {
     await deps.threadState.clearRevising(pending.proposalTs);
   } catch (err) {
     console.warn(`[turn] revising mark on ${pending.proposalTs} not cleared: ${err instanceof Error ? err.message : String(err)}`);
+    return;
+  }
+  // An item's card is in its report's message, which its key is not: the
+  // report redraws it open.
+  if (pending.item) {
+    await deps.reportItems?.reopen(pending.item).catch((err: unknown) => {
+      console.warn(`[turn] item ${pending.item!.id} of ${pending.item!.messageTs} not reopened: ${err instanceof Error ? err.message : String(err)}`);
+    });
     return;
   }
   await deps.delivery
@@ -980,11 +1018,23 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // operations minus the dropped ones, byte for byte, so there is nothing for
   // a model to reproduce. Anything else said under the card still goes to the
   // model, and its revision is still held to the subset rule below.
-  // A file-drift card (`figma-drift/`) holds one intake per file and is read
-  // the same way: "drop 2" leaves a file out.
-  if (request.pending?.sweepRun || request.pending?.supersedeKey === DRIFT_KEY) {
+  if (request.pending?.sweepRun) {
     const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
     if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
+  }
+
+  // A file-drift card from before the shared card (`figma-drift/`) still asks
+  // for `drop N`, `skip` or "yes" in its footer. Those words decide nothing
+  // now, so they get one line pointing at Review, never a model revision.
+  if (request.pending?.supersedeKey === LEGACY_DRIFT_KEY && answersLegacyDriftCard(request.text)) {
+    await delivery.postNote(LEGACY_DRIFT_REPLY);
+    await memory.remember(LEGACY_DRIFT_REPLY);
+    return {
+      disposition: "asked",
+      posted: LEGACY_DRIFT_REPLY,
+      wrote: memory.wrote(),
+      telemetry: { tier: "chill", route: "legacy-drift-reply", trivial: true, correction: false, tools: [], references: [], interim: 0 },
+    };
   }
 
   // ── A cut-off run in this thread ───────────────────────────────────────────
@@ -1412,8 +1462,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   const replaced =
     request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
 
-  // A keyed card that revises only its own way (the weekly DS precedence
-  // card, through `drop N`) is not revised by a turn at all: the batch is
+  // A keyed card that revises only its own way (a weekly DS precedence card,
+  // decided as it stands in its Review) is not revised by a turn at all: the batch is
   // refused with the card's note, rather than staged as a near-copy that
   // stays live beside it — two live cards could both run.
   if (replaced?.refuseRevision) {
@@ -1457,6 +1507,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   }
   // And it keeps the card's deadline, read before the card is retired.
   const sweepLeftMs = replaced?.sweepRun ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  // An item of a report keeps its window too: its revision lives as long as
+  // the item had left, as the report's own revisions do.
+  const itemLeftMs = replaced?.item ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  if (itemLeftMs !== undefined && itemLeftMs <= 0) {
+    await delivery.postNote(CARD_CLOSED);
+    await memory.remember(CARD_CLOSED);
+    return { disposition: "asked", posted: CARD_CLOSED, wrote: memory.wrote(), telemetry };
+  }
   if (sweepLeftMs !== undefined && sweepLeftMs <= 0) {
     await delivery.postNote(CARD_CLOSED, sweepTag("note"));
     await memory.remember(CARD_CLOSED);
@@ -1502,7 +1560,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
   // whether there is anything to send at all (#623).
-  const posted = await delivery.card(card);
+  //
+  // An item of a decision report revises in place: its own card in the
+  // report's message, under the same number (`reportItems`), whichever report
+  // it is. An item whose report is gone posts as its own card, as any other.
+  const inPlace = replaced?.item && deps.reportItems
+    ? await deps.reportItems.revise(replaced.item, card).catch((err: unknown) => {
+        console.warn(`[turn] item ${replaced.item!.id} not revised in place: ${err instanceof Error ? err.message : String(err)}`);
+        return null;
+      })
+    : null;
+  const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
     return {
@@ -1527,7 +1595,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(request.replyTs ? { replyTs: request.replyTs } : {}),
     userMsgTs: request.userMsgTs,
     proposalTs: posted.ts,
-    // What the adapter actually posted, never a copy rendered here: the button
+    // What the adapter actually posted — or, for an item revised in place,
+    // what the report's port spelled for its Review — never a copy rendered
+    // here: the button
     // door re-renders the resolved card from this field, so a second rendering
     // that drifted would repaint the card with words it never had (#623).
     proposalText: posted.text,
@@ -1556,8 +1626,27 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(request.intakeChannel
       ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
       : {}),
+    // An item revised in place is keyed on its report's message and its new
+    // entry, in the item's own slot, for the time the item had left.
+    ...(inPlace ? { ...inPlace.staged, ttlMs: itemLeftMs } : {}),
   };
-  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  let retiredByStaging: string[];
+  try {
+    ({ retired: retiredByStaging } = await threadState.putProposal(proposal));
+  } catch (err) {
+    if (!inPlace || !replaced) throw err;
+    // The revision never staged, so the item it would have replaced goes back
+    // as it was, for the time it had left, and its card is left alone.
+    console.error(`[turn] revision of item ${replaced.item!.id} not staged: ${err instanceof Error ? err.message : String(err)}`);
+    const { revising: _lock, ...unlocked } = replaced;
+    await threadState.putProposal({ ...unlocked, ttlMs: itemLeftMs }).catch((restoreErr: unknown) => {
+      console.error(`[turn] item ${replaced.item!.id} not restored: ${restoreErr instanceof Error ? restoreErr.message : String(restoreErr)}`);
+    });
+    return { disposition: "failed", failure: { stage: "delivery" }, wrote: memory.wrote(), telemetry };
+  }
+  // Swapped into the report only once staged, so a Review on the new card
+  // finds its proposal.
+  await inPlace?.place();
   // On the record as soon as it is stored, so a ✅ that lands before the turn
   // finishes finds the staged row and the turn id it joins to; a ticket that
   // ✅ files waits on that row until the turn writes its own (`runTurn`).
@@ -1702,8 +1791,6 @@ async function dropFromSweepCard(
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
     ...(fixes ? { fixes } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
-    // The same card minus some items, so a drift card's own gate words stay
-    // (`figma-drift/copy.ts` `driftCardWords`); a sweep card has none.
     ...ownWords(pending),
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.

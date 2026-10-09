@@ -26,7 +26,10 @@ import { dividerSection, pageOf, pagesOf } from "../src/figma-comments/sections"
 import { cardNumbersOf } from "../src/figma-comments/title";
 import { modelDecisionDetector, type DecisionInput } from "../src/figma-comments/detector";
 import { numberedReply, reviseDecision, rewordCue, type ReviseDeps } from "../src/figma-comments/revise";
-import { NEEDS_CHANGES_LEAD } from "../src/slack/review-door";
+import { NEEDS_CHANGES_LEAD, cardSentBack } from "../src/slack/review-door";
+import { reportItems } from "../src/slack/decision-cards";
+import { runTurn } from "../src/turn/index";
+import { harness as turnHarness, request as turnRequest } from "./helpers/turn-harness";
 import { isFigmaDecisionCandidate, isFigmaDecisionThread } from "../src/figma-comments/env";
 import { replyHandlerAt } from "../src/slack/events";
 import type { SlackMessageEvent } from "../src/slack/types";
@@ -984,6 +987,33 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
     assert.equal(h.staged.at(-1)!.supersedeKey, `report-item:${parent.ts}:c3`);
     assert.notEqual((await h.threadState.getProposalByTs(card)).state, "found", "the card sent back is replaced");
     assert.equal((parent.editedBlocks as Array<{ elements?: Card[] }>)[1]!.elements![1]!.title.text.startsWith("2 · "), true);
+  });
+
+  it("revises on its own path after Review's Needs changes, with a turn answering beside it reopening nothing", async () => {
+    const { h, parent, reply } = await revisable([cardReply("Ready for Dev")]);
+    const card = h.figma.threads.get(parent.ts)!.decisions[1]!.proposalKey;
+    assert.equal(await h.threadState.markRevising(card, "U0SARAH"), "marked");
+
+    // A turn on the same card that answers rather than redrafting, as the
+    // general path would run one — wired to reopen report items.
+    const t = turnHarness({ threadState: h.threadState, now: () => h.clock.now, replies: [{ text: "Its own thread is rewording that one." }] });
+    const redrawn: string[] = [];
+    t.deps.reportItems = reportItems(h.threadState, async (ts) => void redrawn.push(ts), () => h.clock.now);
+    const pending = await cardSentBack(h.threadState, card);
+    const outcome = await runTurn(
+      turnRequest({ userId: "U0SARAH", channel: DESIGN, conversationTs: parent.ts, replyTs: parent.ts, text: `${NEEDS_CHANGES_LEAD}Move it to Ready for Dev instead`, pending }),
+      t.deps,
+    );
+    assert.equal(outcome.disposition, "answered");
+    assert.deepEqual(redrawn, [], "the card is not reopened");
+    const held = await h.threadState.getProposalByTs(card);
+    assert.equal(held.state === "found" && held.proposal.revising?.userId, "U0SARAH", "its lock is its own revision's");
+
+    // Its own revision still runs, and replaces the card in place.
+    assert.equal(await reply(`${NEEDS_CHANGES_LEAD}Move it to Ready for Dev instead`, "U0SARAH"), true);
+    assert.equal(h.staged.at(-1)!.supersedeKey, `report-item:${parent.ts}:c3`);
+    assert.notEqual((await h.threadState.getProposalByTs(card)).state, "found", "the card sent back is replaced");
+    assert.equal((parent.editedBlocks as Array<{ elements?: Card[] }>)[1]!.elements![1]!.actions[0]!.value, "c3~1");
   });
 
   it("lifts the Needs changes lock when the new wording cannot be drafted", async () => {

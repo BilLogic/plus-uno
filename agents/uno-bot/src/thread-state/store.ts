@@ -299,8 +299,8 @@ export interface PendingProposal {
    * The card's own slot within its reply thread (`proposalSlot`). Absent —
    * every turn's card — the card holds the thread's slot, and cards there
    * replace one another. A card the Worker stages into a thread people also
-   * talk in sets one — `"sweep"` for an end-of-day sweep card, `"ds-precedence"`
-   * for the weekly DS precedence card — so it and a turn's card stay live side
+   * talk in sets one — `"sweep"` for an end-of-day sweep card, a report
+   * item's own key for each card of a decision report — so it and a turn's card stay live side
    * by side, and only a card with the same key replaces it. A turn's batch
    * revises it only when it touches it (`turn/turn.ts`); while both are live,
    * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
@@ -310,10 +310,16 @@ export interface PendingProposal {
   /**
    * On a keyed card: what a turn in its thread posts, in place of a card,
    * when its batch would touch this one. A near-copy would otherwise stay live
-   * beside it, and both could run. The weekly DS precedence card points at
-   * `drop N`, the one way it is revised.
+   * beside it, and both could run. A weekly DS precedence card points at
+   * its Review, the one way it is decided.
    */
   refuseRevision?: string;
+  /**
+   * What Review's pop-up says once Needs changes is accepted, on a card that
+   * does something other than redraft (a weekly DS precedence card writes the
+   * note on its intake). Absent, the pop-up says the draft is being revised.
+   */
+  afterNeedsChanges?: string;
   /**
    * The card a person's ask first staged, when this one re-stages it after a
    * cut-off run (`turn/turn.ts` `restageExecution`), or the sweep card the
@@ -404,6 +410,8 @@ export type ReportItemState =
   | { kind: "approved"; by: string; at: number; as?: ChosenAs }
   | { kind: "failed"; by: string; at: number; reason: string; as?: ChosenAs }
   | { kind: "rejected"; by: string; reason?: string; as?: ChosenAs }
+  /** A note written to the report's record closes the item. */
+  | { kind: "noted"; by: string; note: string }
   | { kind: "expired" }
   /** Shown, but its proposal never staged: nothing to decide. */
   | { kind: "not-staged"; note: string };
@@ -1198,4 +1206,53 @@ export interface ThreadState {
   /** Release the lease. Best-effort by contract: a missed mark self-heals when
    *  the lease goes stale, at the cost of one re-run. */
   markRunDone(eventId: string): Promise<void>;
+
+  /**
+   * Ask to file the one issue a key stands for (the weekly DS precedence
+   * intake, keyed by its week). One hop, with the input gate closed, so of two
+   * racing callers exactly one is told "claimed" and files; the other is told
+   * "busy" until that one settles, then "filed" with the issue. A lease older
+   * than `FILING_LEASE_MS` was a caller killed mid-filing, and is reclaimed.
+   */
+  claimFiling(key: string): Promise<FilingClaim>;
+
+  /** Settle a claimed filing: the issue it filed, or null to release the
+   *  claim with nothing filed. */
+  settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
+}
+
+// ── One filing per key ───────────────────────────────────────────────────────
+
+/** An issue a filing made. */
+export interface FiledIssue {
+  number: number;
+  url: string;
+}
+
+/** The answer to "may I file it?" (`ThreadState.claimFiling`). */
+export type FilingClaim = { state: "claimed" } | { state: "busy" } | { state: "filed"; issue: FiledIssue };
+
+/** A filing as stored: when it was claimed or settled, and its issue once filed. */
+export interface FilingRecord {
+  at: number;
+  issue?: FiledIssue;
+}
+
+/** How long a claim on a filing holds before it is taken as abandoned. */
+export const FILING_LEASE_MS = 2 * 60 * 1000;
+/** How long a filed issue is remembered: past any week's cards. */
+export const FILING_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * A claim against a filing's record: its answer, and the record to store when
+ * the claim is taken (null when nothing changes).
+ *
+ * @param record - The stored record, if any
+ * @param at - Now
+ */
+export function claimedFiling(record: FilingRecord | undefined, at: number): { claim: FilingClaim; store: FilingRecord | null } {
+  const live = record && at - record.at < FILING_TTL_MS ? record : undefined;
+  if (live?.issue) return { claim: { state: "filed", issue: live.issue }, store: null };
+  if (live && at - live.at < FILING_LEASE_MS) return { claim: { state: "busy" }, store: null };
+  return { claim: { state: "claimed" }, store: { at } };
 }

@@ -7,7 +7,7 @@
 // is here: the clipping to Block Kit's limits, the held-back count, the
 // record the store keeps (`reportRecord`), the fields each item's proposal is
 // staged with (`itemProposal`), and every state a card can show — open,
-// changes asked, approved and written, approved and not written, rejected,
+// changes asked, approved and written, approved and not written, rejected, noted,
 // closed with no decision, and never staged. None of it teaches a gate of
 // its own: no ✅/⛔ footer, nothing to type.
 //
@@ -21,7 +21,10 @@
 // No Env, no Slack client: the store-backed helpers take the store as a port.
 
 import { carouselOf, logoFor } from "./answer-cards-block";
+import { toPlainText } from "./mrkdwn";
+import { cardLead, renderProposalCard } from "./proposal-render";
 import { textSections } from "./render";
+import type { ProposalCard } from "../turn/index";
 import type {
   DecisionReportRecord,
   PendingProposal,
@@ -151,6 +154,11 @@ export function itemProposal(
   };
 }
 
+/** The entry id an item's next revision takes: `c2` → `c2~1` → `c2~2`. */
+export function revisionId(id: string): string {
+  return `${baseId(id)}~${Number(id.split("~")[1] ?? 0) + 1}`;
+}
+
 /** An entry id without its revision suffix. */
 function baseId(id: string): string {
   return id.split("~")[0]!;
@@ -195,6 +203,8 @@ function shownAs(entry: ReportEntry): { subtitle?: string; body: string; button:
       return state.as
         ? { subtitle: `${state.as.label} · ${by(state.by)}`, body: state.as.decided ?? "Nothing written.", button: "View" }
         : { subtitle: `Rejected by ${by(state.by)}`, body: state.reason ? `Nothing written. Reason: ${state.reason}` : "Nothing written.", button: "View" };
+    case "noted":
+      return { subtitle: `Noted by ${by(state.by)}`, body: `Note: ${state.note}`, button: "View" };
     case "expired":
       return { subtitle: "Closed, no decision", body: item.body, button: "View" };
     case "not-staged":
@@ -317,10 +327,62 @@ export async function replaceItem(
   oldId: string,
   item: ReportItem,
 ): Promise<{ id: string; message: ReportMessage } | null> {
-  const rev = Number(oldId.split("~")[1] ?? 0) + 1;
-  const id = `${baseId(oldId)}~${rev}`;
+  const id = revisionId(oldId);
   const record = await store.updateReport(messageTs, { id: oldId, replace: { id, item } });
   return record ? { id, message: reportMessage(record) } : null;
+}
+
+/**
+ * What a revision turn does to an item of a decision report
+ * (`TurnDeps.reportItems`), whichever report it is — none needs a step of
+ * its own.
+ *
+ * `revise` readies the redraft of an item: the item as it was — its title,
+ * who and where, its sources — saying what the revision now does. What Review
+ * shows is the card as a turn spells it. Its `place`, called once the
+ * revision is staged, puts it in the item's place under the same number
+ * (`replaceItem`) and redraws the report's message. Null when the store has
+ * no such report or item.
+ *
+ * `reopen` puts an item sent back for changes back to open, Review and all,
+ * when its turn staged no revision (`settleItem`).
+ *
+ * @param store - The thread store
+ * @param edit - Edit the report's message in place (`chat.update`)
+ * @param now - The clock, for items whose time ran out
+ */
+export function reportItems(
+  store: ReportStore,
+  edit: (messageTs: string, message: ReportMessage) => Promise<void>,
+  now: () => number,
+) {
+  const redraw = (messageTs: string, message: ReportMessage) =>
+    edit(messageTs, message).catch((err: unknown) => {
+      console.warn(`[decision-cards] ${messageTs} not redrawn: ${err instanceof Error ? err.message : String(err)}`);
+    });
+  return {
+    async revise(target: { messageTs: string; id: string }, card: ProposalCard) {
+      const before = (await store.getReport(target.messageTs))?.entries.find((e) => e.id === target.id)?.item;
+      if (!before) return null;
+      const lead = cardLead(card);
+      // What it wrote before no longer describes the write.
+      const { done: _done, ...kept } = before;
+      const item: ReportItem = { ...kept, body: (lead && toPlainText(lead).trim()) || `Revised: ${card.verb}.` };
+      return {
+        text: renderProposalCard(card).text,
+        staged: itemProposal(target.messageTs, revisionId(target.id)),
+        async place() {
+          const replaced = await replaceItem(store, target.messageTs, target.id, item);
+          if (replaced) await redraw(target.messageTs, replaced.message);
+          else console.warn(`[decision-cards] ${target.messageTs} has no item ${target.id} to replace`);
+        },
+      };
+    },
+    async reopen(target: { messageTs: string; id: string }): Promise<void> {
+      const message = await settleItem(store, target, { kind: "open" }, now());
+      if (message) await redraw(target.messageTs, message);
+    },
+  };
 }
 
 /**

@@ -37,6 +37,8 @@ import type {
   CutOffNoteReport,
   DecisionReportRecord,
   Execution,
+  FiledIssue,
+  FilingClaim,
   HistoryTurn,
   PendingProposal,
   ProposalLookup,
@@ -224,6 +226,17 @@ export function createDurableObjectThreadState(
 
     markRunDone(eventId: string): Promise<void> {
       return hop().markRunDone(eventId, now());
+    },
+
+    // ----- one filing per key -----
+
+    // One hop with the input gate closed, so of two racing callers one files.
+    claimFiling(key: string): Promise<FilingClaim> {
+      return hop().claimFiling(key, now());
+    },
+
+    settleFiling(key: string, issue: FiledIssue | null): Promise<void> {
+      return hop().settleFiling(key, issue, now());
     },
   };
 }
