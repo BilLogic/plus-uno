@@ -161,9 +161,9 @@ export function harness(opts: {
   delivery?: RecordingDelivery;
   threadState?: ThreadState;
   toolResult?: string;
-  /** A lookup's result by tool name — and by its arguments, for a case where
-   *  two calls of one lookup answer differently — for a case where one lookup
-   *  fails and another does not. Wins over `toolResult`. */
+  /** A lookup's result by tool name and the call's arguments, for a case
+   *  where one lookup fails and another does not, or where each call of one
+   *  lookup answers for its own filter. Wins over `toolResult`. */
   toolResultFor?: (name: string, args: Record<string, unknown>) => string;
   /** How long each lookup takes, in ms. Absent, it answers at once — which
    *  is faster than any Slack call, so what Slack is told mid-lookup needs it. */
@@ -205,6 +205,9 @@ export function harness(opts: {
   providerUsage?: Partial<ModelUsage>;
   /** The turn's clock. Absent, the real one. */
   now?: () => number;
+  /** The values a lookup's filter can take, as the board offers them. Absent,
+   *  none are known. */
+  lookupOptions?: TurnDeps["lookupOptions"];
   /** A DM ask's in-turn classifier. Absent, DM asks are recorded unlabelled. */
   classifyAsk?: (text: string) => Promise<SubType | null>;
   /** The stored role map a staged card reads. Absent, none is stored. */
@@ -323,6 +326,7 @@ export function harness(opts: {
     },
 
     ...(opts.now ? { now: opts.now } : {}),
+    ...(opts.lookupOptions ? { lookupOptions: opts.lookupOptions } : {}),
 
     // The three reads a card needs, answering with the STRUCTURES the turn
     // puts on the card — never words, which are the adapter's (#623).

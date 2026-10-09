@@ -1,7 +1,7 @@
 // The ⚠️ line — what the reader must not miss, one sentence under the answer,
 // beside the footer (CONTEXT.md § presentation; spec #982).
 //
-// CODE WRITES IT FROM WHAT THE TURN ALREADY KNOWS. Five triggers, each read off
+// CODE WRITES IT FROM WHAT THE TURN ALREADY KNOWS. Seven triggers, each read off
 // a fact the turn holds rather than off the prose:
 //
 //   • partial   a lookup reported `truncated` or `partial`
@@ -13,6 +13,8 @@
 //   • absence   the absence pre-check fired (`agent/absence.ts`)
 //   • degraded  a shape the presentation step asked for posted plainer, the
 //               reason worded by the step that fell back (`degraded`)
+//   • uncounted a chart across lookups left out values its source offers
+//               (`uncounted`), named
 //
 // Each trigger is ONE line however often it fires: three partial lookups are
 // one sentence naming their three sources. The turn has no wall-clock budget
@@ -147,7 +149,8 @@ type Entry =
   | { kind: "stale"; sources: SourceName[]; days: number }
   | { kind: "absence"; scope: string }
   | { kind: "conflict"; line: string }
-  | { kind: "degraded"; line: string | undefined };
+  | { kind: "degraded"; line: string | undefined }
+  | { kind: "uncounted"; values: string[] };
 
 /** One turn's ⚠️ lines, collected as its triggers are met. */
 export interface WarningLog {
@@ -169,6 +172,9 @@ export interface WarningLog {
    * the place it was first met.
    */
   degraded(line: string | undefined): void;
+  /** Values a chart across lookups did not count, though its source offers
+   *  them — each named once. */
+  uncounted(values: readonly string[]): void;
   /** The lines as they post, sign-less, at most `MAX_WARNING_LINES`. */
   lines(): string[];
 }
@@ -218,6 +224,10 @@ export function warningLog(now: () => number = Date.now): WarningLog {
         return e.line;
       case "degraded":
         return e.line ?? null;
+      case "uncounted":
+        return `Not counted: ${joined(e.values)} ${e.values.length > 1 ? "were" : "was"} not looked up, so the chart leaves ${
+          e.values.length > 1 ? "them" : "it"
+        } out.`;
     }
   };
 
@@ -276,6 +286,11 @@ export function warningLog(now: () => number = Date.now): WarningLog {
       const found = entries.find((e): e is Extract<Entry, { kind: "degraded" }> => e.kind === "degraded");
       if (found) found.line = line;
       else if (line) entries.push({ kind: "degraded", line });
+    },
+    uncounted(values) {
+      if (!values.length) return;
+      const found = entry("uncounted", () => ({ kind: "uncounted", values: [] }));
+      for (const value of values) if (!found.values.includes(value)) found.values.push(value);
     },
     conflict(raw) {
       if (conflicted) return { ok: false, refusal: "One conflict line per answer, and this answer has it." };

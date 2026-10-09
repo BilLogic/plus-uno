@@ -571,6 +571,14 @@ export interface TurnDeps {
    */
   deliveredBody(text: string): string;
 
+  /**
+   * Every value a lookup's filter can take, as its source offers them — the
+   * Roadmap board's Design Statuses — or null where none are known. Read only
+   * after a chart across lookups is drawn on that field, so the chart can name
+   * the values no lookup counted. Absent, none are known.
+   */
+  lookupOptions?(lookup: string, field: string): Promise<readonly string[] | null>;
+
   /** Structured state + progressive summarisation (`CONTEXT_STATE`). Flagged
    *  off in production; see the header of `agent/context-state.ts`. */
   contextState?: boolean;
@@ -1975,6 +1983,18 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
       console.warn(
         `[absence] pre-check failed: ${err instanceof Error ? err.message : String(err)} — no escalation`,
       );
+    }
+  }
+
+  // A chart across lookups names the values its source offers that no lookup
+  // counted. Read here, once a chart needs it, so no other turn pays for it;
+  // a failed read leaves the chart as drawn, with nothing named.
+  for (const { lookup, field } of ctx.presenting.chartedAcross()) {
+    try {
+      const options = await deps.lookupOptions?.(lookup, field);
+      if (options?.length) ctx.presenting.optionsOffered(lookup, field, options);
+    } catch (err) {
+      console.warn(`[chart] ${lookup} ${field} options unread: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
