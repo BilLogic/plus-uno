@@ -19,11 +19,12 @@ export const SELF_REPO = "BilLogic/plus-uno";
 /**
  * Where a turn came from, as far as test traffic cares.
  *
- * `slack` is a person in Slack. `debug` is anything reached through a
- * `/debug/*` or `/health/*` route — which is where the eval transport lives —
- * and is test traffic by definition.
+ * `slack` is a person in Slack, and `figma` a person asking @uno in a Figma
+ * comment (`figma-ask/`). `debug` is anything reached through a `/debug/*` or
+ * `/health/*` route — which is where the eval transport lives — and is test
+ * traffic by definition.
  */
-export type TurnOrigin = "slack" | "debug";
+export type TurnOrigin = "slack" | "figma" | "debug";
 
 /** What the model run reported, when one ran — `agent/loop.ts` `TurnSpend`,
  *  as this module reads it. */

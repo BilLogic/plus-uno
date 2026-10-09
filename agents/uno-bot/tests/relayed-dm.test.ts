@@ -360,7 +360,7 @@ describe("an approved relay", () => {
     assert.equal(history.length, 1);
     assert.equal(history[0]!.role, "assistant");
     assert.equal(history[0]!.content, slack.posts.find((p) => p.channel === "D-U0COCO")!.text);
-    assert.deepEqual(await store.readHistory({ channel: "C1", thread: CONTEXT.threadTs }), [], "nothing in the requester's thread");
+    assert.deepEqual(await store.readHistory({ channel: "C1", thread: CONTEXT.threadTs! }), [], "nothing in the requester's thread");
   });
 
   it("remembers nothing for a relay Slack refused", async () => {

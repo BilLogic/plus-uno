@@ -19,9 +19,16 @@
 // pinned to no node — left on the page — has nowhere to be in a section, so it
 // is never a candidate (#891).
 //
+// WHAT IS LEFT TO @uno. A comment that asks uno-bot something was answered as
+// it was made (#903, `../figma-ask/`), and a change it asked for went to
+// #plus-design as its own card; uno-bot's own replies carry its label. Neither
+// is read here, so no ask becomes a second card at night: a thread whose root
+// is an ask is read by its other replies alone, as an old root is.
+//
 // PURE.
 
 import type { FigmaComment } from "../figma/client";
+import { asksUno, isOwnComment } from "../figma-ask/trigger";
 
 /** The night's bounds, epoch ms. */
 export interface ReadWindow {
@@ -53,7 +60,8 @@ const time = (iso: string | null | undefined): number => (iso ? Date.parse(iso) 
  * @param c - The comment
  * @param watermark - Epoch ms
  */
-export function readable(c: Pick<FigmaComment, "created_at" | "resolved_at" | "parent_id">, watermark: number): boolean {
+export function readable(c: Pick<FigmaComment, "created_at" | "resolved_at" | "parent_id" | "message">, watermark: number): boolean {
+  if (asksUno(c.message) || isOwnComment(c.message)) return false;
   if (time(c.created_at) > watermark) return true;
   return !c.parent_id && time(c.resolved_at) > watermark;
 }

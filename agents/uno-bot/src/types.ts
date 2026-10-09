@@ -9,7 +9,16 @@ import type { ThreadState as ThreadStateDurableObject } from "./thread-state";
 // layer and the agent loop reference it without importing the dispatcher.)
 export interface SlackContext {
   channel: string;
-  threadTs: string;
+  /** The real ts a tool's own posts thread off; absent on a turn asked outside
+   *  Slack (a Figma comment), which has no Slack message to thread under. */
+  threadTs?: string;
+  /**
+   * The answer lands where people outside the team may read it (a Figma
+   * comment): Slack is read at public-channel visibility only — no private
+   * search pass, no requester-own search, no thread read in a private
+   * conversation. Set from the turn's origin (`turn/env-deps.ts`).
+   */
+  publicOnly?: boolean;
   /** A REAL message ts to reply under in the requesting conversation, when the
    *  caller knows one — the Gate's reply target. `threadTs` is the conversation
    *  key, which in a threadless DM is not a ts Slack accepts. */

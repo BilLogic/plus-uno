@@ -51,7 +51,7 @@ import type { SweepSource } from "../sweep/finding";
 import type { SweepRunOutcome } from "../sweep/store";
 import { contributorsOf, MAX_FAILED_NIGHTS, readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sweep/run";
 import { candidateThreads, readComments, type CommentThread, type ReadWindow } from "./threads";
-import { roleOf } from "../usage/roles";
+import { roleOf, type TeamRoles } from "../usage/roles";
 import { DECISION_SECTIONS, pageOf, pagesOf, type FilePage, type NodePlace } from "./sections";
 import { cardNumbersOf } from "./title";
 import { isDecisionField, type ShownCard, type ShownThread } from "./detector";
@@ -385,8 +385,39 @@ async function readFile(
  */
 async function designOwnerOf(fc: SweepFigmaComments, contributors: readonly string[]): Promise<string | null> {
   if (!contributors.length) return null;
-  const roles = await fc.roles();
+  return designerAmong(contributors, await fc.roles());
+}
+
+/** The first of a card's Contributors, as Slack ids, the roles name a designer. */
+export function designerAmong(contributors: readonly string[], roles: TeamRoles): string | null {
   return contributors.find((id) => roleOf(id, roles) === "design") ?? null;
+}
+
+/** What finding a file's design owner reads, outside the night's read. */
+export interface DesignOwnerReads {
+  /** A Roadmap card's page, by its number; null when the Roadmap has none. */
+  card(number: number): Promise<{ url: string } | null>;
+  /** A card page's Contributors, as Slack ids. */
+  contributors(cardUrl: string): Promise<string[]>;
+  roles(): Promise<TeamRoles>;
+}
+
+/**
+ * A file's design owner, by the night's rule: the cards its title names
+ * (`Card <n>`, at most `MAX_CARDS_PER_FILE`), their Contributors, and the
+ * first the roles name a designer. Null when no card or no designer does —
+ * the caller falls back as the night does, to the file's creator.
+ *
+ * @param reads - The card, its Contributors and the roles
+ * @param title - The file's title
+ */
+export async function designOwnerOfFile(reads: DesignOwnerReads, title: string): Promise<string | null> {
+  const contributors: string[] = [];
+  for (const number of cardNumbersOf(title).slice(0, MAX_CARDS_PER_FILE)) {
+    const card = await reads.card(number);
+    if (card) contributors.push(...(await reads.contributors(card.url)));
+  }
+  return contributors.length ? designerAmong([...new Set(contributors)], await reads.roles()) : null;
 }
 
 /** The file's creator by Figma handle, or null when the file's meta has none or cannot be read. */

@@ -63,7 +63,7 @@ export async function executeImplementDesign(
   // client_payload ceiling when slug + PRD + notes are ALL present —
   // withThreadTranscript counts defined keys and skips (with a warn) rather
   // than 422 the whole dispatch.
-  const transcript = await fetchThreadTranscript(env, slack.channel, slack.threadTs);
+  const transcript = slack.threadTs ? await fetchThreadTranscript(env, slack.channel, slack.threadTs) : null;
 
   const result = await repositoryDispatch(
     env,

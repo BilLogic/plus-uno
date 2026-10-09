@@ -21,7 +21,13 @@
 // the KV notes hold the file key, the comment, reply and user ids, and times.
 // Never the comment's text, the file's name or anyone's handle: a reader that
 // needs the words re-fetches the comment by id, which also brings its frame
-// anchor — the one thing the payload lacks.
+// anchor — the one thing the payload lacks. One fact about the words rides
+// along: whether a new comment may ask uno-bot something (`asks`,
+// `../figma-ask/`), so a comment that cannot costs Figma no read. It may when
+// its text carries a trigger, or when it carries a mention piece at all: a
+// person picked from Figma's list arrives as `{ mention: <user id> }`, whose
+// name only the comment's own `message` spells, so the job re-reads that and
+// decides.
 //
 // The two notes, in HARNESS_KV with an expiry:
 //   • `figma-notify:commented:<ET date>:<file_key>` — the file got comments
@@ -37,6 +43,7 @@
 // PURE.
 
 import { etDayOf } from "../sweep/schedule";
+import { asksUno, isOwnComment } from "../figma-ask/trigger";
 
 const DAY_S = 24 * 60 * 60;
 
@@ -64,6 +71,8 @@ export type FigmaEvent =
       resolvedAt?: string;
       /** When Figma says the event happened. */
       at?: string;
+      /** A new comment, not uno-bot's own, carrying an @uno trigger or a mention. */
+      asks?: boolean;
     }
   | { type: "FILE_UPDATE"; webhookId: string; fileKey: string; at: string }
   /** An event this route is not subscribed to. Answered and dropped. */
@@ -79,6 +88,9 @@ export interface FigmaEventJob {
   parentId?: string;
   userId?: string;
   at?: string;
+  /** Set on a new comment that may ask uno-bot something; the job decides
+   *  from the comment as Figma stores it (`../figma-ask/`). */
+  asks?: true;
   /** Set when the nightly backstop queued it for a change whose notification
    *  never came (`./backstop.ts`); absent on a notification's own job. */
   via?: "backstop";
@@ -130,6 +142,8 @@ export function readFigmaEvent(payload: Record<string, unknown>): FigmaEvent | n
   const userId = idOf((payload.triggered_by as { id?: unknown } | null | undefined)?.id);
   const createdAt = timeOf(payload.created_at);
   const resolvedAt = timeOf(payload.resolved_at);
+  const text = commentText(payload.comment);
+  const asks = !resolvedAt && !isOwnComment(text) && (asksUno(text) || hasMention(payload.comment));
   return {
     type: "FILE_COMMENT",
     webhookId,
@@ -140,7 +154,22 @@ export function readFigmaEvent(payload: Record<string, unknown>): FigmaEvent | n
     ...(createdAt ? { createdAt } : {}),
     ...(resolvedAt ? { resolvedAt } : {}),
     ...(at ? { at } : {}),
+    ...(asks ? { asks } : {}),
   };
+}
+
+/** A comment's words, from the payload's fragments (`{ text }` or `{ mention }`). */
+function commentText(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (!Array.isArray(value)) return "";
+  return value
+    .map((f) => (f && typeof f === "object" && typeof (f as { text?: unknown }).text === "string" ? (f as { text: string }).text : ""))
+    .join("");
+}
+
+/** Whether the payload's fragments hold a mention piece. */
+function hasMention(value: unknown): boolean {
+  return Array.isArray(value) && value.some((f) => !!f && typeof f === "object" && "mention" in f);
 }
 
 /** The id a redelivery of this event repeats exactly (see the header). */
@@ -164,6 +193,7 @@ export function jobOf(event: Extract<FigmaEvent, { type: "FILE_COMMENT" | "FILE_
     ...(event.parentId ? { parentId: event.parentId } : {}),
     ...(event.userId ? { userId: event.userId } : {}),
     ...(at ? { at } : {}),
+    ...(event.asks ? { asks: true as const } : {}),
   };
 }
 

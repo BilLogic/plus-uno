@@ -66,6 +66,7 @@ import { STANDING_TOO } from "../src/sweep/capture-lines";
 import { decisionCard, decisionCardWords, decisionParent, rewordInstead, whichOne } from "../src/figma-comments/copy";
 import { DECISION_CARD_TTL_MS } from "../src/figma-comments/post";
 import type { QueuedDecision } from "../src/figma-comments/queue";
+import { askLeadText, figmaReplyText, type FigmaReply } from "../src/figma-ask/copy";
 
 // ── The doc ──────────────────────────────────────────────────────────────────
 
@@ -803,5 +804,50 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
       assertVocabulary(text);
       assert.ok(text.length < 200, text);
     }
+  });
+});
+
+describe("@uno in a Figma comment (#903)", () => {
+  const REPLIES: FigmaReply[] = [
+    { kind: "answer", lines: ["Hidden until the first goal is set."], source: "https://www.notion.so/prd" },
+    { kind: "answer", lines: ["Probably hidden."], source: null },
+    { kind: "question", lines: ["Which card is this for?"] },
+    { kind: "drafted", link: "https://plus.slack.com/archives/C1/p1" },
+    { kind: "not-teammate" },
+    { kind: "failed" },
+  ];
+
+  it("every reply leads with the label, the one emoji, and holds to the vocabulary", () => {
+    for (const reply of REPLIES) {
+      const text = figmaReplyText(reply);
+      assert.equal(text.split("\n")[0], "🐐 le goat (uno-bot) · AI-generated", text);
+      passesChecklist(text);
+      assert.equal([...text.matchAll(/\p{Extended_Pictographic}/gu)].length, 1, `🐐 only in the label:\n${text}`);
+    }
+  });
+
+  const LEAD = {
+    asker: "U1",
+    owner: "U2",
+    file: { title: "Goal Setting / Card 2482 / Meryem", url: "https://www.figma.com/design/F" },
+    quote: "please add to the PRD: hide the bar until the first goal",
+    commentUrl: "https://www.figma.com/design/F?node-id=1-2#3",
+  };
+
+  it("the #plus-design lead asks one named person, the design owner, for one action, in one line", () => {
+    const text = askLeadText(LEAD);
+    passesChecklist(text);
+    assert.equal(text.split("\n").length, 1);
+    assert.equal(
+      text,
+      "<@U2>, <@U1> asked in a Figma comment on <https://www.figma.com/design/F|Goal Setting / Card 2482 / Meryem>: “please add to the PRD: hide the bar until the first goal” (<https://www.figma.com/design/F?node-id=1-2#3|comment>). Can you review the draft below?",
+    );
+  });
+
+  it("with no design owner, the lead asks the asker", () => {
+    const text = askLeadText({ ...LEAD, owner: "U1" });
+    passesChecklist(text);
+    assert.match(text, /^<@U1>, you asked in a Figma comment on .*\. Can you review the draft below\?$/);
+    assert.equal(text.match(/<@/g)!.length, 1, "one person, named once");
   });
 });
