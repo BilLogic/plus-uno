@@ -6,11 +6,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-let sent: Array<{ method: string; body: Record<string, unknown> }> = [];
+let sent: Array<{ method: string; httpMethod: string; body: Record<string, unknown> }> = [];
 let reply: Record<string, unknown> = { ok: true, ts: "1.0" };
 globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
-  const method = String(input).replace("https://slack.com/api/", "");
-  sent.push({ method, body: JSON.parse(String(init?.body)) as Record<string, unknown> });
+  const url = new URL(String(input));
+  const method = url.pathname.replace("/api/", "");
+  const httpMethod = init?.method ?? "GET";
+  const body = httpMethod === "GET" ? Object.fromEntries(url.searchParams) : JSON.parse(String(init?.body));
+  sent.push({ method, httpMethod, body });
   return new Response(JSON.stringify(reply), { status: 200, headers: { "content-type": "application/json" } });
 }) as typeof fetch;
 
@@ -37,6 +40,8 @@ test("report previews preserve their metadata through two edits of the message t
   const q = new URLSearchParams({ channel: "D0123", text: "PREVIEW — not live", blocks: JSON.stringify(BLOCKS), metadata: JSON.stringify(metadata), edits: JSON.stringify(edits) });
   const res = await probe(q.toString());
   assert.deepEqual(sent.map((s) => s.method), ["chat.postMessage", "chat.update", "chat.update", "conversations.replies"]);
+  assert.equal(sent.at(-1)!.httpMethod, "GET", "Slack reads take query parameters");
+  assert.deepEqual(sent.at(-1)!.body, { channel: "D0123", ts: "2.0", limit: "1", inclusive: "true", include_all_metadata: "true" });
   for (const call of sent.slice(0, 3)) assert.deepEqual(call.body.metadata, metadata);
   for (const call of sent.slice(1, 3)) assert.equal(call.body.ts, "2.0", "only the newly posted fixture is edited");
   assert.deepEqual(res.body.metadata, metadata);
