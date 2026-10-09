@@ -109,6 +109,18 @@ describe("the shared decision card", () => {
     assert.equal(messageBlocksRefusal(report.blocks), null);
   });
 
+  it("draws blocks a report posted below its cards again under them, whatever state its items are in", () => {
+    const table = { type: "section", text: { type: "mrkdwn", text: "the table" } };
+    const report = decisionReport([item(1)], "One page.", { after: [table] });
+    assert.deepEqual(report.blocks.at(-1), table);
+    const record = reportRecord("C1", "1790000000.000100", report, 3_600_000);
+    const decided = reportMessage({ ...record, entries: [{ ...record.entries[0]!, state: { kind: "rejected", by: "U0BILL" } }] });
+    assert.deepEqual(decided.blocks.at(-1), table);
+    assert.equal(cardsOf(decided.blocks)[0]!.subtitle!.text, "Rejected by <@U0BILL>");
+    // A report with nothing below its cards keeps no such field.
+    assert.equal("after" in reportRecord("C1", "1.1", decisionReport([item(1)], "One page."), 1), false);
+  });
+
   it("states the report in its text copy, item by item, with no instruction to type anything", () => {
     assert.equal(decisionReport([item(1), item(2)], "Two pages.").text, "Two pages.\n• Page 1: Page says 1 · decision says 2.\n• Page 2: Page says 2 · decision says 3.");
   });
