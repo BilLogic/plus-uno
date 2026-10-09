@@ -288,6 +288,16 @@ test("an assembled bundle over its char budget fails the build", () => {
 // overrun — and the build goes on. The ceiling does not soften with it, so a
 // constitution that swells the whole bundle past 175,500 still fails.
 
+/** An always-loaded doc with a long bundled middle, to take padding back out of. */
+const OFFSET_DOC = "docs/connectors/slack.md";
+
+/** `text` with `n` chars cut from the line break nearest its middle — inside the
+ *  bundled body, clear of the frontmatter and of the ide-only blocks at either end. */
+function withoutChars(text, n) {
+  const at = text.indexOf("\n", Math.floor(text.length / 2));
+  return text.slice(0, at) + text.slice(at + n);
+}
+
 /** Run the bundler bare and put the three artifacts back, whatever it wrote. */
 function runBundlerRestoring(args = []) {
   const saved = ARTIFACTS.map(({ rel }) => [inCopy(rel), readFileSync(inCopy(rel), "utf8")]);
@@ -304,8 +314,15 @@ test("a constitution file over its char budget warns and the build goes on", () 
   const rel = "AGENTS.md";
   const size = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8")).body.length;
   const pad = padding(Math.max(0, 20_000 - size) + 500);
+  // The padding is taken back out of another always-loaded doc, so the bundle
+  // stays the size it is and only the constitution's own budget is under test.
+  // Without it the test quietly held the ceiling ~2,500 chars below 175,500.
+  const padded = (body) =>
+    withFile(rel, (abs, original) => writeFileSync(abs, original + pad), () =>
+      withFile(OFFSET_DOC, (abs, original) => writeFileSync(abs, withoutChars(original, pad.length)), body),
+    );
 
-  const assembly = withFile(rel, (abs, original) => writeFileSync(abs, original + pad), () => assemble({ repoRoot }));
+  const assembly = padded(() => assemble({ repoRoot }));
   const errors = assembly.findings.filter((f) => (f.severity ?? "error") === "error");
   assert.deepEqual(errors, [], "an over-budget constitution must not be an error");
   const warning = assembly.findings.find((f) => f.severity === "warning" && /constitution/.test(f.message));
@@ -315,7 +332,7 @@ test("a constitution file over its char budget warns and the build goes on", () 
   assert.match(warning.message, /over by [\d,]+/, "the warning must name the overrun");
   assert.ok(assembly.manifest, "the assembly must still run to the end");
 
-  const cli = withFile(rel, (abs, original) => writeFileSync(abs, original + pad), () => runBundlerRestoring());
+  const cli = padded(() => runBundlerRestoring());
   assert.equal(cli.code, 0, `an over-budget constitution must not fail the build:\n${cli.out}`);
   assert.match(cli.out, /AGENTS\.md \(constitution\): [\d,]+ chars against a budget of 20,000 — over by [\d,]+/);
 });
