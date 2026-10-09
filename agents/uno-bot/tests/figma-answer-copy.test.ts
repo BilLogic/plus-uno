@@ -33,3 +33,14 @@ test("a quoted comment about freshness remains intact", async () => {
   assert.ok(posted?.kind === "answer");
   assert.match(posted.text, /Coco wrote: “I read/);
 });
+
+test("frame citations are named without rewriting links inside a quoted comment", async () => {
+  const quote = `“Check [node 158-21725](${URL}).”`;
+  const answer = `On [node 158-21725](${URL}), Coco wrote: ${quote}`;
+  const h = harness({ replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }], toolResult: JSON.stringify({ ok: true, source_type: "figma", url: URL, title: "Session card", content: "Join" }) });
+  await runTurn(request({ text: `${URL} quote the comment` }), h.deps);
+  const posted = h.delivery.calls.find((c) => c.kind === "answer");
+  assert.ok(posted?.kind === "answer");
+  assert.match(posted.text, /^On \[Session card\]/);
+  assert.ok(posted.text.includes(quote), "quoted source text stays verbatim");
+});

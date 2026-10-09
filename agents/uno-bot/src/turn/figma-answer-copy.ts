@@ -17,7 +17,9 @@ export function figmaAnswerCopy(text: string, sources: readonly TaskCardSource[]
     return `[${title}](${url})`;
   };
   return text
-    .replace(/\[[^\]\n]*\]\((https?:\/\/[^\s)]+)\)|<(https?:\/\/[^|>\s]+)\|[^>\n]*>/g, (match, markdownUrl: string | undefined, slackUrl: string | undefined) => named(markdownUrl ?? slackUrl!, match))
+    .split(/(```[\s\S]*?```|`[^`\n]*`|“[^”]*”|"[^"\n]*"|^\s*>[^\n]*$)/gm)
+    .map((part, i) => i % 2 ? part : part.replace(/\[[^\]\n]*\]\((https?:\/\/[^\s)]+)\)|<(https?:\/\/[^|>\s]+)\|[^>\n]*>/g, (match, markdownUrl: string | undefined, slackUrl: string | undefined) => named(markdownUrl ?? slackUrl!, match)))
+    .join("")
     .replace(/(?:^|\s+)I (?:read|checked|fetched) (?:the )?(?:comment thread|comments|frame) (?:on (?:the )?(?:linked )?Figma frame )?just now(?:,?\s+so (?:this|the) (?:transcript|answer|reading) is current)?[.!]?\s*$/i, "")
     .trimEnd();
 }
