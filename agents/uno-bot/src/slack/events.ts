@@ -45,6 +45,7 @@ import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../f
 import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor, recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
+import { answerFigmaAskOnEnv } from "../figma-ask/env";
 import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
 
 // Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
@@ -229,8 +230,11 @@ export function handOffCutOffRunsFor(env: Env): (due: Execution[]) => Promise<vo
 // runner must then KEEP the job and retry later instead of deleting it.
 export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
   if (job.kind === "figma-event") {
-    await runFigmaEventJob(job.event, { onFileUpdate: (fileKey) => recheckOnUpdateOnEnv(env, fileKey) });
-    return "handled";
+    const { outcome } = await runFigmaEventJob(job.event, {
+      onFileUpdate: (fileKey) => recheckOnUpdateOnEnv(env, fileKey),
+      onAsk: (ask) => answerFigmaAskOnEnv(env, ask),
+    });
+    return outcome;
   }
   if (job.kind === "cut-off") {
     await handleCutOffRun(env, job.proposalTs);
