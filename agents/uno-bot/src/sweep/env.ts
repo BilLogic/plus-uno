@@ -548,7 +548,13 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
     };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;
-  const raw = await executeReadSource(env, { url }, canvas ? { sharedCanvasIds: [canvas] } : undefined);
+  // A frame's text only: the sweep keeps a source's title and text, never its
+  // comments, so reading them would spend one more call against the ceiling
+  // for nothing — and quoting Figma comments is a requester's turn read, which
+  // a sweep job has no requester for (ADR-031).
+  const raw = await executeReadSource(env, { url }, canvas ? { sharedCanvasIds: [canvas] } : undefined, {
+    figmaComments: false,
+  });
   try {
     const r = JSON.parse(raw) as { ok?: boolean; title?: string; content?: string };
     // A Figma file link with no node, or one Figma would not serve, is still

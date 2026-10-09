@@ -5,7 +5,7 @@ summary: PLUS Figma files follow How We Fig — five stage folders per team, `<P
 
 # Figma Workspace Conventions
 
-<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma. -->
+<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma · annotation categories consolidated 2026-10-09. -->
 
 ## Canvas vs comments
 
@@ -14,7 +14,34 @@ summary: PLUS Figma files follow How We Fig — five stage folders per team, `<P
 
 ## Annotation category labels
 
-Every annotation carries one category label: `Interaction` · `Content` · `Layout` · `Token-Style` · `Behavior` · `Accessibility`. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
+Every annotation carries exactly one category label. There are six:
+
+| Label | Colour | What it holds |
+|---|---|---|
+| `Development` | green | API, field names, implementation and component-construction constraints |
+| `Interaction` | blue | click, hover, focus, tap; when a thing shows, hides, enables or disables |
+| `Content` | orange | copy, labels, empty states, string templates |
+| `Logic / data` | violet | conditions, what is counted, what is derived, where a number comes from, what is recorded |
+| `Tooltip` | teal | hover and help text |
+| `Accessibility` | pink | focus order, keyboard, labels, contrast |
+
+The first four are Figma's presets, kept at their preset colours; `Logic / data` and `Tooltip` are the file's own. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
+
+**`Logic / data` is not `Development`, and the test is the reader.** A product rule a non-engineer can review is `Logic / data`; an endpoint only a developer can review is `Development`. Ask *could a non-engineer tell me this is wrong?* — yes is `Logic / data`.
+
+**Status lives in section names.** Build status, scope and on-hold go there: Figma allows one category per annotation, so a status label would take the type's slot.
+
+<!-- ide-only -->
+**Component construction and usage go in the component's `description`.** Dev Mode already shows name, variant props and token bindings; usage guidance in the description travels with the component instead of one frame.
+
+**Analytics and responsive have no label.** What is recorded sits in `Logic / data`; responsive behaviour sits in its own section, which annotations point at. Add an `Analytics` label only once specs carry event names and payloads.
+
+### Why the list drifts
+
+Annotation categories are per-file; a library does not carry them. Pasting a layer into another file recreates its category there unless the label **and** the colour both match, so a near-duplicate spawns silently. Preferring the presets is the cheapest defence, since every file already has them at a fixed colour.
+
+To retire a category, re-point every annotation off it first, then delete it; `getAnnotationCategoriesAsync` may serve the old list for a while afterwards.
+<!-- /ide-only -->
 
 ## Teams and stage folders
 
@@ -67,13 +94,13 @@ The hygiene checklist covers every file outside MISC and `/ Marketing /`:
 
 The conventions above are the workspace's. This section is the Worker's, and it exists because the harness said three things about it that were not true: that Figma was IDE-only (the *MCP* is; Figma is not), that a pasted frame arrives as a human's screenshot (the Worker renders it itself), and that every exact-value limit had the same cause. A capability written down wrong is worse than one not written down — a reader argues with the second and obeys the first.
 
-**Auth:** `FIGMA_ACCESS_TOKEN`, a REST personal token, plus `FIGMA_FILE_KEY` for the DS library. **No MCP anywhere.** Every call goes through one client, `src/figma/` (#892). Every personal token on Bill's account shares one Figma budget per rate-limit tier, so the client paces each tier at half that budget and backs off on a 429; `check:fetch` fails any other file that calls Figma. The reach below uses five of its endpoint families: images, nodes, components, versions and webhooks.
+**Auth:** `FIGMA_ACCESS_TOKEN`, a REST personal token, plus `FIGMA_FILE_KEY` for the DS library. **No MCP anywhere.** Every call goes through one client, `src/figma/` (#892). Every personal token on Bill's account shares one Figma budget per rate-limit tier, so the client paces each tier at half that budget and backs off on a 429; `check:fetch` fails any other file that calls Figma. The reach below uses its endpoint families for images, nodes, comments, components, versions, folders and webhooks.
 
 | Can | Where | Limits |
 |---|---|---|
 | **See a frame as an image** — the Worker renders it, no human screenshot needed | `slack/vision.ts` via `/v1/images` | the **first** frame link with a `node-id` in the message, **one per message**, scale 1, ≤3.5MB; visible on that user turn and its immediate follow-up |
 | See human-pasted images | `slack/vision.ts` | ≤3 files, png/jpeg/gif/webp, ≤3.5MB each |
-| Read a frame's **name**, **node type**, **text layers** | `source_read` → `integrations/figma.ts` | ≤200 text layers, and it reports when it truncated |
+| Read a frame's **name**, **node type**, **text layers**, and the **comment threads pinned to it** or to a layer inside it, each with its author, date, resolved state and replies (#899) | `source_read` → `integrations/figma.ts` | ≤200 text layers, and it reports when it truncated; the threads with the newest activity, up to 20 and 8,000 chars of comment text, with the count; a page's own comments aren't read; a comments read that fails, or would wait over 3 s, keeps the frame and says the comments are unread. The sweep's reads of a frame skip the comments |
 | Render the frame into the ✅ proposal card | `slack/proposal-render.ts` | — |
 | Notice a DS-library publish (component adds, removes, renames, visual changes) and turn it into one intake and one card in #plus-universal | `figma-poll.ts` (end-of-day run) → `figma-library/` (morning run) | `FIGMA_FILE_KEY` only; one poll a weekday; subrequest-budgeted |
 | Hand a frame to a GitHub Action that does the real Figma-to-code work | `prototype_scaffold` / `component_implement` | the runner has depth the Worker doesn't; output is a code PR |
