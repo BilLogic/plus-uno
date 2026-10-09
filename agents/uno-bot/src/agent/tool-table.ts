@@ -158,9 +158,21 @@ export type ToolRow = {
       readonly access: "ungated";
       readonly gate?: undefined;
       readonly taskCard: TaskCardWords | null;
+      /**
+       * Answered inside the turn from what it already fetched, so it spends
+       * no subrequest and no lookup: the loop runs it after the lookup budget
+       * is spent, which is when an answer's shape is chosen. Read by
+       * `agent/loop.ts`.
+       */
+      readonly fetchesNothing?: true;
     }
-  | { readonly access: "control"; readonly gate?: undefined; readonly taskCard?: undefined }
-  | { readonly access: "gated" | "worker"; readonly gate: GateWords; readonly taskCard?: undefined }
+  | { readonly access: "control"; readonly gate?: undefined; readonly taskCard?: undefined; readonly fetchesNothing?: undefined }
+  | {
+      readonly access: "gated" | "worker";
+      readonly gate: GateWords;
+      readonly taskCard?: undefined;
+      readonly fetchesNothing?: undefined;
+    }
 );
 
 export const TOOL_TABLE = {
@@ -225,7 +237,7 @@ export const TOOL_TABLE = {
   // The answer's shape: a table of rows a lookup already returned this turn.
   // Turn's presentation step answers it from those results
   // (`turn/presentation.ts`), so it fetches nothing and is no checklist step.
-  present: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
+  present: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null, fetchesNothing: true },
   // "Remind me": writes only uno-bot's own record, posted back to the asker
   // alone at a morning run (`commitments/remind.ts`).
   reminder_set: {

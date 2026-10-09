@@ -307,22 +307,85 @@ function usableFields(rows: Record_[]): string[] {
   return fields.filter((f) => columnRefusal(f, rows, []) === null);
 }
 
-/** The list of records a result holds under `key`, or its first one. */
-export function listOf(result: Record_, key: string | undefined): { key: string; rows: Record_[] } | null {
-  const lists = Object.entries(result).filter(
+/** Every list of records a result holds, by key, in the result's order. */
+function listsOf(result: Record_): Array<[string, Record_[]]> {
+  return Object.entries(result).filter(
     ([, v]) => Array.isArray(v) && v.length > 0 && v.every(isRecord),
   ) as Array<[string, Record_[]]>;
+}
+
+/** The list of records a result holds under `key`, or its first one. */
+export function listOf(result: Record_, key: string | undefined): { key: string; rows: Record_[] } | null {
+  const lists = listsOf(result);
   const found = key ? lists.find(([k]) => k === key) : lists[0];
   return found ? { key: found[0], rows: found[1] } : null;
 }
 
+/** The fields a whole count behind the list under `key` may be reported in. */
+const countFields = (key: string): string[] => [`${key}Total`, `${key.replace(/s$/, "")}Total`, "matched", "total"];
+
 /** The whole count behind a list, when the result reports one. */
 export function wholeCount(result: Record_, key: string): number | undefined {
-  const singular = key.replace(/s$/, "");
-  for (const field of [`${key}Total`, `${singular}Total`, "matched", "total"]) {
+  for (const field of countFields(key)) {
     if (typeof result[field] === "number") return result[field];
   }
   return undefined;
+}
+
+/**
+ * What a result offers as a table: each list of 2 or more records that has a
+ * field a column can show, with those fields in the order the rows carry them.
+ * The lookup's result carries it, so the model reads which rows can post as a
+ * table, and under which columns, at the point it chooses how to answer.
+ *
+ * @param result - A lookup's result, parsed
+ */
+export function tableOffer(result: Record_): Record<string, { count: number; columns: string[] }> {
+  const offer: Record<string, { count: number; columns: string[] }> = {};
+  for (const [key, rows] of listsOf(result)) {
+    const columns = rows.length >= MIN_ROWS ? usableFields(rows) : [];
+    if (columns.length) offer[key] = { count: rows.length, columns };
+  }
+  return offer;
+}
+
+/** What a row is known by when two calls return it: its address, its id, or
+ *  all of it. */
+const rowKey = (row: Record_): string =>
+  isAddress(row.url) ? row.url : typeof row.id === "string" || typeof row.id === "number" ? `id:${row.id}` : JSON.stringify(row);
+
+/**
+ * Several calls of one lookup, as one result: what a turn that searched a
+ * source several times — once per phase, once per scenario — shows as one
+ * table, chart or set of cards.
+ *
+ * Each list of records is every call's rows in call order, a row two calls
+ * returned kept once. Everything else is the last call's, except what would
+ * misstate the merged lists: a whole count belongs to one call's query, so it
+ * is dropped and the rows shown are the count; the list is partial when any
+ * call's was; and the arguments are those every call shared, which is the
+ * filter the caption can honestly name.
+ *
+ * @param calls - The lookup's calls this turn, in order, at least one
+ */
+export function mergedLookup(calls: ReadonlyArray<{ args: Record_; result: Record_ }>): { args: Record_; result: Record_ } {
+  const last = calls[calls.length - 1]!;
+  if (calls.length === 1) return last;
+  const result: Record_ = { ...last.result };
+  const keys = new Set(calls.flatMap((c) => listsOf(c.result).map(([k]) => k)));
+  for (const key of keys) {
+    const seen = new Map<string, Record_>();
+    for (const call of calls) {
+      for (const row of listOf(call.result, key)?.rows ?? []) if (!seen.has(rowKey(row))) seen.set(rowKey(row), row);
+    }
+    result[key] = [...seen.values()];
+    for (const field of countFields(key)) delete result[field];
+  }
+  if (calls.some((c) => c.result.truncated === true)) result.truncated = true;
+  const args = Object.fromEntries(
+    Object.entries(last.args).filter(([k, v]) => calls.every((c) => JSON.stringify(c.args[k]) === JSON.stringify(v))),
+  );
+  return { args, result };
 }
 
 /** The lookup's arguments as the caption's filter: `"onboarding" · phase
