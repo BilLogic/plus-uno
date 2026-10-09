@@ -14,6 +14,12 @@ import { collectTextLayers, pinnedThreads, type FigmaFrameRead, type FigmaNode }
 const IMAGE_FETCH_TIMEOUT_MS = 8000;
 const NODE_FETCH_TIMEOUT_MS = 8000;
 const COMMENTS_FETCH_TIMEOUT_MS = 8000;
+/**
+ * The most a frame's comments read may wait on pacing and 429 backoff
+ * together. Short, because someone is waiting on the frame: a comments read
+ * the rate budget would hold reports `comments_unread` instead.
+ */
+export const COMMENTS_MAX_WAIT_MS = 3000;
 
 export interface FigmaNodeContent {
   name: string;
@@ -53,13 +59,15 @@ export async function fetchFigmaNode(
  * Read a pasted frame for `source_read`: its name, type and text layers, and
  * the comment threads pinned to it or to a layer inside it (#899).
  *
- * The comments come from one more call, started beside the node read — a
- * different rate tier, so neither waits on the other. The node read decides
- * the outcome as `fetchFigmaNode` does: it throws on a missing client or a
- * refusal. A comments read that fails — a refusal, a rate limit the retries
- * did not get past, a timeout, the turn's budget stop — never costs the
- * frame: its text comes back with `commentsUnread`, which says unknown rather
- * than none, and the loop's trip counter still marks a budget stop partial.
+ * The comments come from one more call, made after the node read has
+ * landed. Made beside it, the comments call could be metered first and spend
+ * a turn's last lookup, leaving the frame — the part that read fine before —
+ * to the budget stop. The node read decides the outcome as `fetchFigmaNode`
+ * does: it throws on a missing client or a refusal. A comments read that
+ * fails — a refusal, a rate limit it may not wait out (`COMMENTS_MAX_WAIT_MS`),
+ * a timeout, the turn's budget stop — never costs the frame: its text comes
+ * back with `commentsUnread`, which says unknown rather than none, and the
+ * loop's trip counter still marks a budget stop partial.
  *
  * @param figma - The Figma client; undefined when the Worker has no token
  * @param opts - `comments: false` reads the node alone, as the sweep does
@@ -72,19 +80,16 @@ export async function fetchFigmaFrame(
 ): Promise<FigmaFrameRead> {
   if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
 
-  // Settled into a value here, so a node read that throws leaves no rejection unhandled.
-  const comments =
-    opts.comments === false
-      ? null
-      : figma.comments(fileKey, { timeoutMs: COMMENTS_FETCH_TIMEOUT_MS, attempts: 2 }).then(
-          (r) => ({ list: r.comments ?? [] }),
-          (err: unknown) => ({ error: err instanceof Error ? err.message : String(err) }),
-        );
   const doc = await readFrameDoc(figma, fileKey, nodeId);
   const content = contentOf(doc);
-  if (!comments) return content;
+  if (opts.comments === false) return content;
 
-  const read = await comments;
+  const read = await figma
+    .comments(fileKey, { timeoutMs: COMMENTS_FETCH_TIMEOUT_MS, attempts: 2, maxWaitMs: COMMENTS_MAX_WAIT_MS })
+    .then(
+      (r) => ({ list: r.comments ?? [] }),
+      (err: unknown) => ({ error: err instanceof Error ? err.message : String(err) }),
+    );
   if ("error" in read) {
     console.warn(`[figma] comments ${fileKey} failed: ${read.error}`);
     return { ...content, commentsUnread: read.error };
