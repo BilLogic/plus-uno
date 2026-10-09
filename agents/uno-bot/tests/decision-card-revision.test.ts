@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 import { recordingDelivery, runTurn } from "../src/turn/index";
 import { createInMemoryThreadState, type PendingProposal, type ReportItem, type ThreadState } from "../src/thread-state/index";
 import { NEEDS_CHANGES_LEAD, runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
-import { decisionReport, itemProposal, itemReviser, reportRecord, type ReportMessage } from "../src/slack/decision-cards";
+import { decisionReport, itemProposal, reportItems, reportRecord, type ReportMessage } from "../src/slack/decision-cards";
 import { CHANNEL, CONVERSATION, REF, harness as turnHarness, request } from "./helpers/turn-harness";
 import { recordingViews } from "./helpers/recording-slack";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
@@ -63,14 +63,18 @@ const cards = (blocks: unknown[]) => (blocks[1] as { elements: Card[] }).element
 
 /** Needs changes on one item from its Review, and the revision turn it queues
  *  — handed the thread's card as the Slack door reads it. */
-async function sendBack(store: ThreadState, id: string, redraft: { text: string; content: string }) {
+async function sendBack(store: ThreadState, id: string, redraft: { text: string; content?: string }) {
   const edits: Array<{ ts: string; message: ReportMessage }> = [];
   const h = turnHarness({
     threadState: store,
     now: () => NOW,
-    replies: [{ text: redraft.text, toolCalls: [{ name: "notion_update", args: { page_url: "https://www.notion.so/page2", replace: [{ block_id: "b2", content: redraft.content }] } }] }],
+    replies: [
+      redraft.content === undefined
+        ? { text: redraft.text }
+        : { text: redraft.text, toolCalls: [{ name: "notion_update", args: { page_url: "https://www.notion.so/page2", replace: [{ block_id: "b2", content: redraft.content }] } }] },
+    ],
   });
-  h.deps.reviseItem = itemReviser(store, async (ts, message) => void edits.push({ ts, message }));
+  h.deps.reportItems = reportItems(store, async (ts, message) => void edits.push({ ts, message }), () => NOW);
   const turns: Array<Awaited<ReturnType<typeof runTurn>>> = [];
   const deps: ReviewDoorDeps = {
     threadState: store,
@@ -121,5 +125,36 @@ describe("Needs changes on one item of a report", () => {
     }
     assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "c2").proposalTs)).state, "found", "the old draft no longer runs");
     assert.equal((await store.getProposalByTs(itemProposal(MSG, "c3").proposalTs)).state, "found", "the newest item was not the one revised");
+  });
+
+  it("puts the item's card back to open, with Review, when the revision turn answers instead of redrafting", async () => {
+    const store = await staged();
+    const { edits, turns } = await sendBack(store, "c2", { text: "The cap is already 600 on that page, so there's nothing to change." });
+
+    assert.equal(turns[0]!.disposition, "answered");
+    const asked = edits.find((e) => cards(e.message.blocks)[1]!.subtitle?.text === "Changes asked by <@U1>");
+    assert.ok(asked, "it read Changes asked while the turn ran");
+    const last = edits.at(-1)!;
+    assert.notEqual(last, asked);
+    const two = cards(last.message.blocks)[1]!;
+    assert.equal(two.subtitle!.text, "Bill · card comment", "open again");
+    assert.deepEqual(two.actions.map((a) => a.text.text), ["Review", "Open"]);
+    assert.equal(two.actions[0]!.action_id, "uno_decision_review:c2", "the same proposal, decidable again");
+    const look = await store.getProposalByTs(itemProposal(MSG, "c2").proposalTs);
+    assert.equal(look.state, "found");
+    if (look.state === "found") assert.equal(look.proposal.revising, undefined, "its lock lifted");
+  });
+
+  it("redraws the report's message, never a message at the item's key, when it reopens an item", async () => {
+    const store = await staged();
+    const { edits, delivery } = await sendBack(store, "c2", { text: "Nothing to change there." });
+
+    assert.deepEqual([...new Set(edits.map((e) => e.ts))], [MSG], "every edit goes to the report's message");
+    assert.equal(messageBlocksRefusal(edits.at(-1)!.message.blocks), null);
+    assert.deepEqual(
+      delivery.calls.filter((c) => c.kind === "reopen-card"),
+      [],
+      "no card edited at an item's key, which is no Slack message",
+    );
   });
 });

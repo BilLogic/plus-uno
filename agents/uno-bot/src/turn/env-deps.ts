@@ -28,7 +28,7 @@ import { runAgent, selectProvider, type AgentResult, type TurnDials } from "../a
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
 import type { GateRestage, GateVerdict, OperationOutcome } from "../gate/index";
 import { conversationsHistoryBefore, updateMessage } from "../slack/api";
-import { itemReviser } from "../slack/decision-cards";
+import { reportItems } from "../slack/decision-cards";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
@@ -202,12 +202,16 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // doors that re-stage a cut-off run (`restageFor`, below).
     cards: cardReadsFor(env),
     onRestaged: (from, to) => followRestageFor(env, from, to),
-    // An item of a decision report, revised in its own card in the report's
-    // message: in this channel, on the turn's own store.
-    reviseItem: itemReviser(wiring.threadState, async (ts, message) => {
-      const res = await updateMessage(env, { channel: request.channel, ts, text: message.text, blocks: message.blocks });
-      if (!res.ok) throw new Error(`chat.update on ${ts} refused`);
-    }),
+    // An item of a decision report, revised or reopened in its own card in
+    // the report's message: in this channel, on the turn's own store.
+    reportItems: reportItems(
+      wiring.threadState,
+      async (ts, message) => {
+        const res = await updateMessage(env, { channel: request.channel, ts, text: message.text, blocks: message.blocks });
+        if (!res.ok) throw new Error(`chat.update on ${ts} refused`);
+      },
+      () => Date.now(),
+    ),
 
     async readAntecedent(channel, beforeTs, limit) {
       const before = await conversationsHistoryBefore(env, channel, beforeTs, limit);

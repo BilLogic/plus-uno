@@ -546,21 +546,29 @@ export interface TurnDeps {
   onRestaged?(from: PendingProposal, to: PendingProposal): Promise<void>;
 
   /**
-   * Put a revision of one item of a decision report in place of its card:
-   * the same card in the report's message, under the same number, open again
-   * as a new proposal. Answers what Review shows, the fields the proposal is
-   * staged with, and `show`, which redraws the report's message once it is
-   * staged; null when the report has no such item, and the revision posts as
-   * its own card. Absent, every revision posts as its own card.
+   * The items of a decision report, as a revision turn changes them. Absent,
+   * every revision posts as its own card.
    */
-  reviseItem?(
-    item: { messageTs: string; id: string },
-    card: ProposalCard,
-  ): Promise<{
-    text: string;
-    staged: Pick<PendingProposal, "proposalTs" | "userMsgTs" | "supersedeKey" | "item">;
-    show(): Promise<void>;
-  } | null>;
+  reportItems?: {
+    /**
+     * Put a revision of one item in place of its card: the same card in the
+     * report's message, under the same number, open again as a new proposal.
+     * Answers what Review shows, the fields the proposal is staged with, and
+     * `show`, which redraws the report's message once it is staged; null when
+     * the report has no such item, and the revision posts as its own card.
+     */
+    revise(
+      item: { messageTs: string; id: string },
+      card: ProposalCard,
+    ): Promise<{
+      text: string;
+      staged: Pick<PendingProposal, "proposalTs" | "userMsgTs" | "supersedeKey" | "item">;
+      show(): Promise<void>;
+    } | null>;
+    /** Put an item sent back for changes back to open on the report's
+     *  message, when its turn staged no revision. Best-effort. */
+    reopen(item: { messageTs: string; id: string }): Promise<void>;
+  };
 
   /**
    * One page of the conversation before this message, for the antecedent
@@ -812,7 +820,7 @@ async function withItemSentBack(request: TurnRequest, threadState: ThreadState):
 async function unlockRevision(
   request: TurnRequest,
   cardLive: boolean,
-  deps: Pick<TurnDeps, "threadState" | "delivery">,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "reportItems">,
 ): Promise<void> {
   const pending = request.pending;
   if (!cardLive || !pending?.revising || pending.revising.userId !== request.userId) return;
@@ -820,6 +828,12 @@ async function unlockRevision(
     await deps.threadState.clearRevising(pending.proposalTs);
   } catch (err) {
     console.warn(`[turn] revising mark on ${pending.proposalTs} not cleared: ${err instanceof Error ? err.message : String(err)}`);
+    return;
+  }
+  // An item's card is in its report's message, which its key is not: the
+  // report redraws it open.
+  if (pending.item) {
+    await deps.reportItems?.reopen(pending.item).catch(() => {});
     return;
   }
   await deps.delivery
@@ -1540,10 +1554,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // whether there is anything to send at all (#623).
   //
   // An item of a decision report revises in place: its own card in the
-  // report's message, under the same number (`reviseItem`), whichever report
+  // report's message, under the same number (`reportItems`), whichever report
   // it is. An item whose report is gone posts as its own card, as any other.
-  const inPlace = replaced?.item && deps.reviseItem
-    ? await deps.reviseItem(replaced.item, card).catch((err: unknown) => {
+  const inPlace = replaced?.item && deps.reportItems
+    ? await deps.reportItems.revise(replaced.item, card).catch((err: unknown) => {
         console.warn(`[turn] item ${replaced.item!.id} not revised in place: ${err instanceof Error ? err.message : String(err)}`);
         return null;
       })

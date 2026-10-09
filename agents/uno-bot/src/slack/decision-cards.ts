@@ -309,36 +309,54 @@ export async function replaceItem(
 }
 
 /**
- * A turn's revision of an item, in place (`TurnDeps.reviseItem`): the item as
+ * What a revision turn does to an item of a decision report
+ * (`TurnDeps.reportItems`), whichever report it is — none needs a step of
+ * its own.
+ *
+ * `revise` puts the redraft in place of the item (`replaceItem`): the item as
  * it was — its title, who and where, its sources — saying what the revision
- * now does, replaced under the same number (`replaceItem`). Any report's item
- * revises this way, with no step of its own. What Review shows is the card as
- * a turn spells it; `show` redraws the report's message once the revision is
- * staged. Null when the store has no such report or item.
+ * now does, under the same number. What Review shows is the card as a turn
+ * spells it; `show` redraws the report's message once the revision is staged.
+ * Null when the store has no such report or item.
+ *
+ * `reopen` puts an item sent back for changes back to open, Review and all,
+ * when its turn staged no revision (`settleItem`).
  *
  * @param store - The thread store
  * @param edit - Edit the report's message in place (`chat.update`)
+ * @param now - The clock, for items whose time ran out
  */
-export function itemReviser(store: ReportStore, edit: (messageTs: string, message: ReportMessage) => Promise<void>) {
-  return async (target: { messageTs: string; id: string }, card: ProposalCard) => {
-    const before = (await store.getReport(target.messageTs))?.entries.find((e) => e.id === target.id)?.item;
-    if (!before) return null;
-    const lead = cardLead(card);
-    // What it wrote before no longer describes the write.
-    const { done: _done, ...kept } = before;
-    const replaced = await replaceItem(store, target.messageTs, target.id, {
-      ...kept,
-      body: (lead && toPlainText(lead).trim()) || `Revised: ${card.verb}.`,
+export function reportItems(
+  store: ReportStore,
+  edit: (messageTs: string, message: ReportMessage) => Promise<void>,
+  now: () => number,
+) {
+  const redraw = (messageTs: string, message: ReportMessage) =>
+    edit(messageTs, message).catch((err: unknown) => {
+      console.warn(`[decision-cards] ${messageTs} not redrawn: ${err instanceof Error ? err.message : String(err)}`);
     });
-    if (!replaced) return null;
-    return {
-      text: renderProposalCard(card).text,
-      staged: itemProposal(target.messageTs, replaced.id),
-      show: () =>
-        edit(target.messageTs, replaced.message).catch((err: unknown) => {
-          console.warn(`[decision-cards] ${target.messageTs} not redrawn: ${err instanceof Error ? err.message : String(err)}`);
-        }),
-    };
+  return {
+    async revise(target: { messageTs: string; id: string }, card: ProposalCard) {
+      const before = (await store.getReport(target.messageTs))?.entries.find((e) => e.id === target.id)?.item;
+      if (!before) return null;
+      const lead = cardLead(card);
+      // What it wrote before no longer describes the write.
+      const { done: _done, ...kept } = before;
+      const replaced = await replaceItem(store, target.messageTs, target.id, {
+        ...kept,
+        body: (lead && toPlainText(lead).trim()) || `Revised: ${card.verb}.`,
+      });
+      if (!replaced) return null;
+      return {
+        text: renderProposalCard(card).text,
+        staged: itemProposal(target.messageTs, replaced.id),
+        show: () => redraw(target.messageTs, replaced.message),
+      };
+    },
+    async reopen(target: { messageTs: string; id: string }): Promise<void> {
+      const message = await settleItem(store, target, { kind: "open" }, now());
+      if (message) await redraw(target.messageTs, message);
+    },
   };
 }
 
