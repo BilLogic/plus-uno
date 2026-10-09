@@ -283,10 +283,11 @@ export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as con
  * job, the spread-in batches and the sweep jobs included. The end-of-day run
  * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
  * `sweep:<channel>`, then one `sweep-group-dms` job, keyed `sweep:group-dms`,
- * then one `sweep-dms` job, keyed `sweep:dms`, then the running-notes and Roadmap-card jobs, keyed `sweep:notes` and
- * `sweep:cards`, then the Figma comment read, keyed `sweep:figma-comments` —
- * only while the sweep is on at all, so a blank list still sweeps nothing. Both runs add one DM watch job per person in
- * `dmWatchers`: `dm-promise-read:<user>` at the end of the day,
+ * then one `sweep-dms` job, keyed `sweep:dms`, then the running-notes and
+ * Roadmap-card jobs, keyed `sweep:notes` and `sweep:cards`, then the Figma
+ * comment read, keyed `sweep:figma-comments` — only while the sweep is on at
+ * all, so a blank list still sweeps nothing. Both runs add one DM watch job
+ * per person in `dmWatchers`: `dm-promise-read:<user>` at the end of the day,
  * `dm-promise-nudge:<user>` in the morning; and one per person in
  * `dmCapturers`: `dm-capture-read:<user>`, then `dm-capture-post:<user>`.
  *
