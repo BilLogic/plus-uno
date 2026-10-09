@@ -166,7 +166,7 @@ describe("Approve with edits", () => {
     assert.equal(ran[0]?.execute?.operations[0]?.input.title, "Reflection, shorter form");
     assert.equal(ran[0]?.execute?.input.summary, PROPOSAL.input.summary);
     assert.deepEqual(cardUpdates.map((u) => u.note), [
-      ":pencil2: <@U2> edited Title\n:white_check_mark: Approved by <@U2>",
+      "<@U2> edited Title\n:white_check_mark: Approved by <@U2>",
     ]);
   });
 
@@ -191,7 +191,7 @@ describe("Approve with edits", () => {
       deps,
     );
     const [update] = cardUpdates;
-    assert.match(update!.note, /^:pencil2: <@U2> edited Title, Summary, Product Pillar\n:white_check_mark: Approved by <@U2>$/);
+    assert.match(update!.note, /^<@U2> edited Title, Summary, Product Pillar\n:white_check_mark: Approved by <@U2>$/);
     for (const edited of ["Reflection, shorter form", "One question after each session.", "Universal"]) {
       assert.ok(update!.text.includes(edited), edited);
     }
@@ -232,7 +232,7 @@ describe("Approve with edits", () => {
     assert.equal(ran.length, 1);
     assert.equal(ran[0]?.execute?.input.title, "Reflection v2");
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
-    assert.match(cardUpdates[0]!.note, /^:pencil2: <@U9> edited Title\n/);
+    assert.match(cardUpdates[0]!.note, /^<@U9> edited Title\n/);
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "none");
   });
 });
@@ -321,7 +321,7 @@ describe("Save edits, the Edit fields view's submit", () => {
     await runReviewDecision({ ...approve(card.edits!), viewId: "V1" }, deps);
     assert.equal(ran[0]?.execute?.input.title, "Reflection v2");
     assert.deepEqual(ran[0]?.execute?.input.properties, { product_pillar: "Universal" });
-    assert.match(cardUpdates[0]!.note, /^:pencil2: <@U2> edited Title, Product Pillar\n/);
+    assert.match(cardUpdates[0]!.note, /^<@U2> edited Title, Product Pillar\n/);
   });
 
   it("opens Edit fields on the values already saved, and keeps them through a second save", async () => {
@@ -403,7 +403,7 @@ describe("a notion_update draft", () => {
       { block_id: "b1", last_edited_time: "2026-10-01T09:00:00.000Z", content: "Tutors answer two questions." },
     ]);
     assert.deepEqual(input.properties, UPDATE.input!.properties);
-    assert.match(cardUpdates[0]!.note, /^:pencil2: <@U2> edited Text to append, Replacement text\n/);
+    assert.match(cardUpdates[0]!.note, /^<@U2> edited Text to append, Replacement text\n/);
   });
 
   it("writes an edited title under the property the update names", async () => {

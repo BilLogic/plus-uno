@@ -5,6 +5,7 @@
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
+import { escapeSlackText } from "../slack/mrkdwn";
 import { sendGmailMessage } from "../integrations/gmail";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,7 +77,7 @@ export async function executeSendEmail(
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `Sent "${subject}" to ${recipients}.`,
+      text: `Sent "${escapeSlackText(subject)}" to ${recipients}.`,
     });
     return JSON.stringify({
       ok: true,

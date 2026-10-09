@@ -468,7 +468,7 @@ describe("Needs changes in the pop-up", () => {
     assert.equal(revisions[0]?.proposal.proposalTs, CARD_TS);
     // The card says who asked for changes.
     assert.equal(cardUpdates.length, 1);
-    assert.match(cardUpdates[0]!.note, /^:pencil2: .*<@U2>/);
+    assert.match(cardUpdates[0]!.note, /^Needs changes, asked by <@U2>/);
     // The pop-up confirms it in one line, with nothing left to press.
     assert.equal(views.calls.length, 1);
     assert.deepEqual(actionIds(views.calls[0]!.view), []);
@@ -663,7 +663,7 @@ describe("starting the revision", () => {
     const { deps, request, posted, queued, edited } = await sentBack();
     await startRevision(request, deps);
     assert.equal(posted.length, 1);
-    assert.match(posted[0]!, /^:pencil2: <@U2> asked for changes: Call it Reflection v2$/);
+    assert.match(posted[0]!, /^<@U2> asked for changes: Call it Reflection v2$/);
     assert.deepEqual(queued, ["1700000000.000301"]);
     assert.deepEqual(edited, []);
   });

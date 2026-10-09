@@ -5,6 +5,7 @@
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
+import { escapeSlackText } from "../slack/mrkdwn";
 import { archiveCard, parseNotionPageId } from "../integrations/notion";
 
 export async function executeNotionArchive(
@@ -23,7 +24,7 @@ export async function executeNotionArchive(
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `Archived ${title}, which stays recoverable from Notion's trash.`,
+      text: `Archived ${escapeSlackText(title)}, which stays recoverable from Notion's trash.`,
     });
     return JSON.stringify({ ok: true, status: "archived", message: `Archived '${title}'.` });
   } catch (err) {

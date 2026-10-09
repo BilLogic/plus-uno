@@ -37,6 +37,8 @@ import {
   codeList,
   describeIssueUpdate,
   issueUpdateFromInput,
+  labelStep,
+  pastTense,
   sameLabel,
   stateWords,
   type IssueUpdate,
@@ -117,9 +119,9 @@ export async function updateGithubIssue(
       commentUrl = (await github.comment(update.issue, renderCommentBody(text, { requester, permalink, privatePlace }))).url;
     }]);
   }
-  if (addLabels.length) steps.push([`add ${codeList(addLabels)}`, () => github.addLabels(update.issue, addLabels)]);
+  if (addLabels.length) steps.push([labelStep("add", addLabels), () => github.addLabels(update.issue, addLabels)]);
   for (const label of removeLabels) {
-    steps.push([`remove \`${label}\``, () => github.removeLabel(update.issue, label)]);
+    steps.push([labelStep("remove", [label]), () => github.removeLabel(update.issue, label)]);
   }
   if (update.state) {
     const { state, reason } = apiState(update.state);
@@ -130,13 +132,14 @@ export async function updateGithubIssue(
     const cause = await step(what, run);
     if (cause) {
       const pending = steps.slice(done.length).map(([w]) => w);
-      const already = done.length ? ` Done before it stopped: ${pastTense(done)}.` : "";
+      const already = done.length ? ` Done before it stopped: ${done.map(pastTense).join(", ")}.` : "";
       return refuse(deps, `${cause}.${already} Not done: ${pending.join(", ")}`, ref);
     }
   }
 
-  const summary = describeIssueUpdate(update).join(" · ");
-  await say(deps, `Updated <${issueUrl}|${ref}>: ${describeIssueUpdate(update).map(stepDone).join(", ")}.`);
+  const described = describeIssueUpdate(update);
+  const summary = described.join(" · ");
+  await say(deps, `Updated <${issueUrl}|${ref}>: ${described.map(pastTense).join(", ")}.`);
   return JSON.stringify({
     ok: true,
     status: "updated",
@@ -153,17 +156,6 @@ function apiState(change: IssueUpdate["state"] & string): {
 } {
   if (change === "open") return { state: "open", reason: "reopened" };
   return { state: "closed", reason: change === "closed_completed" ? "completed" : "not_planned" };
-}
-
-/** One step of the update as the thread's confirmation says it: "add label
- *  `bug`" → "added label `bug`", "close as completed" → "closed as completed". */
-function stepDone(step: string): string {
-  if (step === "comment") return "commented";
-  return step.replace(/^(add|remove|reopen|close)\b/, (verb) => (verb.endsWith("e") ? `${verb}d` : `${verb}ed`));
-}
-
-function pastTense(done: string[]): string {
-  return done.map((d) => (d === "comment" ? "commented" : d)).join(", ");
 }
 
 /** Refused before or during the writes: the thread hears why, and the result
