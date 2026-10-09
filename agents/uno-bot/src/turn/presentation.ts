@@ -538,31 +538,32 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
 }
 
 /**
- * What the judge is asked to repair when the draft runs long above a table or
- * cards (`turn/prose-budget.ts`): more than 3 list items, more than 1,000
- * characters, or more than 3 of the table's rows named. Folded into the one
- * judge call the turn already makes; undefined when the draft is within it.
+ * What the judge is asked to SHORTEN when the draft is over its prose budget
+ * (`turn/prose-budget.ts`): beside a table, cards or a table it typed itself,
+ * more than 3 list items, more than 1,000 characters or more than 3 of the
+ * table's rows named. Folded into the one judge call the turn already makes;
+ * undefined when the draft is within it, or has no rows beneath it.
  *
  * @param draft - The answer as the model wrote it
  * @param presentation - What rides beneath it
  */
-export function tableWalkRepair(draft: string, presentation: Presentation | undefined): string | undefined {
+export function proseBudgetRepair(draft: string, presentation: Presentation | undefined): string | undefined {
   const table = presentation?.table;
-  if (!table && !presentation?.cards) return undefined;
   const named = table ? namedRows(draft, table).length : 0;
   const measure = measureProse(draft);
-  if (!overBudget(measure, named, MAX_NAMED_ROWS)) return undefined;
-  const what = table ? "table" : "set of cards";
+  if (!overBudget(measure, !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return undefined;
+  const what = table ? "table" : presentation?.cards ? "set of cards" : "table in the draft";
   const over = [
     measure.items > MAX_LIST_ITEMS ? `${measure.items} list items` : null,
     measure.chars > MAX_PROSE_CHARS ? `${measure.chars} characters` : null,
     named > MAX_NAMED_ROWS ? `names ${named} rows of the table` : null,
   ].filter(Boolean);
   return (
-    `TABLE WALK. The ${what} posted beneath this draft shows every row, yet the draft runs long: ${over.join("; ")}. ` +
+    `TABLE WALK. The ${what} shows every row, yet the prose around it runs long: ${over.join("; ")}. ` +
     "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
     `in at most ${MAX_LIST_ITEMS} list items and ${MAX_PROSE_CHARS} characters, naming at most ${MAX_NAMED_ROWS} rows, linked; ` +
-    `leave the rest to the ${what}. Keep the confidence clause and any caveat as they are.`
+    `leave the rest to the ${what}. Keep the confidence clause and any caveat as they are` +
+    `${measure.typedTable ? ", and keep the table as it is" : ""}.`
   );
 }
 
@@ -574,10 +575,9 @@ const carriesConfidence = (line: string): boolean => hasWovenConfidence(line);
 /**
  * The prose as it posts beneath a presentation: every line that types out a
  * row of the table taken out, since the table already shows them, and — when
- * the prose is still over the budget for an answer above a table or cards, the
- * judge's redraft having missed — the list items past the first 3. A turn
- * with neither posts its prose as written; one whose prose came back empty
- * posts the takeaway the model asked for the table or chart with.
+ * the prose is still over its budget, the judge's shortening having missed —
+ * the list items past the first 3. One whose prose came back empty posts the
+ * takeaway the model asked for the table or chart with.
  *
  * @param prose - The answer as the model wrote it
  * @param presentation - What rides beneath it
@@ -594,9 +594,8 @@ export function presentedProse(prose: string, presentation: Presentation | undef
   } else {
     const takeaway = presentation?.charts?.find((c) => c.takeaway)?.takeaway;
     if (!prose.trim() && takeaway) return { text: takeaway, removed: 0 };
-    if (!presentation?.cards) return out;
   }
-  if (!overBudget(measureProse(out.text), named, MAX_NAMED_ROWS)) return out;
+  if (!overBudget(measureProse(out.text), !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return out;
   const trimmed = withinListBudget(out.text, carriesConfidence);
   return { ...out, text: trimmed.text, ...(trimmed.removed ? { trimmed: trimmed.removed } : {}) };
 }

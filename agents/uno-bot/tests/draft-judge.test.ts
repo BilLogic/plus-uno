@@ -426,3 +426,53 @@ test("a Slack shortcode counts as an emoji", async () => {
 
   assert.equal(out.verdict, "fail");
 });
+
+// ── shorten: a forced rewrite to the short answer ────────────────────────────
+//
+// Live on r525 a 10,198-character walk shipped as written: its length put it
+// past the revision window, so the judge could only grade it. A turn whose
+// answer is over the prose budget asks for a rewrite to the short answer, and
+// that rewrite is short by construction, so it comes back well inside the
+// output ceiling and the faithful-prefix risk the window guards against does
+// not arise.
+
+/** The walkthrough cut to its point, in its own words. */
+const SHORT = `The blueprint's call-off path is the one that changed. ${TAIL}`;
+
+test("a draft forced to shorten is rewritten past the revision window, and the short rewrite ships", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "fail", failed: ["gate:length"], revised: SHORT })] });
+
+  let out: Awaited<ReturnType<typeof reviewDraft>> | undefined;
+  const lines = await judgeLines(async () => {
+    out = await reviewDraft(fake, {
+      userText: "walk me through it",
+      draft: WALKTHROUGH,
+      forceReason: "table-walk",
+      shorten: true,
+    });
+  });
+
+  assert.deepEqual(out, { text: SHORT, verdict: "fail" });
+  const asked = fake.generated[0]!;
+  assert.ok(asked.prompt.includes(TAIL), "read whole");
+  assert.match(asked.system ?? "", /SHORTEN/);
+  assert.doesNotMatch(asked.system ?? "", /VERDICT ONLY/);
+  assert.match(lines.at(-1)!, /revised=true .*forced=table-walk mode=shorten/);
+});
+
+test("a shorten rewrite that is no shorter, or says what the draft never did, is refused", async () => {
+  const sameLength = WALKTHROUGH.replace("call-off path", "call-off route");
+  const invented = "Every tutor loves the onboarding flow and nothing needs changing anywhere in the service today.";
+  for (const revised of [sameLength, invented]) {
+    const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "fail", failed: ["gate:length"], revised })] });
+    const out = await reviewDraft(fake, { userText: "q", draft: WALKTHROUGH, forceReason: "table-walk", shorten: true });
+    assert.equal(out.text, WALKTHROUGH);
+  }
+});
+
+test("shorten takes a rewrite of a draft inside the revision window too, however much shorter", async () => {
+  const fake = fakeProvider({ generateReplies: [verdictJson({ verdict: "fail", failed: ["gate:length"], revised: SHORT })] });
+  const draft = `${LONG_DRAFT} ${TAIL}`;
+  const out = await reviewDraft(fake, { userText: "q", draft, forceReason: "table-walk", shorten: true });
+  assert.equal(out.text, SHORT, "a rewrite under a quarter of the draft is the point here, not a malfunction");
+});
