@@ -538,51 +538,81 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
 }
 
 /**
- * What the judge is asked to repair when the draft runs long above a table or
- * cards (`turn/prose-budget.ts`): more than 3 list items, more than 1,000
- * characters, or more than 3 of the table's rows named. Folded into the one
- * judge call the turn already makes; undefined when the draft is within it.
+ * What the judge is asked to SHORTEN when the draft is over its prose budget
+ * (`turn/prose-budget.ts`): beside a table, cards or a table it typed itself,
+ * more than 3 list items, more than 1,000 characters or more than 3 of the
+ * table's rows named. Folded into the one judge call the turn already makes;
+ * undefined when the draft is within it, or has no rows beneath it.
  *
  * @param draft - The answer as the model wrote it
  * @param presentation - What rides beneath it
  */
-export function tableWalkRepair(draft: string, presentation: Presentation | undefined): string | undefined {
+export function proseBudgetRepair(draft: string, presentation: Presentation | undefined): string | undefined {
   const table = presentation?.table;
-  if (!table && !presentation?.cards) return undefined;
   const named = table ? namedRows(draft, table).length : 0;
   const measure = measureProse(draft);
-  if (!overBudget(measure, named, MAX_NAMED_ROWS)) return undefined;
-  const what = table ? "table" : "set of cards";
+  if (!overBudget(measure, !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return undefined;
+  const what = table ? "table" : presentation?.cards ? "set of cards" : "table in the draft";
   const over = [
     measure.items > MAX_LIST_ITEMS ? `${measure.items} list items` : null,
     measure.chars > MAX_PROSE_CHARS ? `${measure.chars} characters` : null,
     named > MAX_NAMED_ROWS ? `names ${named} rows of the table` : null,
   ].filter(Boolean);
   return (
-    `TABLE WALK. The ${what} posted beneath this draft shows every row, yet the draft runs long: ${over.join("; ")}. ` +
+    `TABLE WALK. The ${what} shows every row, yet the prose around it runs long: ${over.join("; ")}. ` +
     "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
     `in at most ${MAX_LIST_ITEMS} list items and ${MAX_PROSE_CHARS} characters, naming at most ${MAX_NAMED_ROWS} rows, linked; ` +
-    `leave the rest to the ${what}. Keep the confidence clause and any caveat as they are.`
+    `leave the rest to the ${what}. Keep the confidence clause and any caveat as they are` +
+    `${measure.typedTable ? ", and keep the table as it is" : ""}.`
   );
 }
 
+/** A line's words, without its sign, emphasis or spacing. */
+const bare = (line: string): string =>
+  line
+    .replace(/⚠️|⚠|:warning:/g, "")
+    .replace(/[*_]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+/**
+ * The prose without a line that only repeats a ⚠️ line posted beneath it. The
+ * sign is code's to place, and a model that has seen the line in a thread
+ * types it too: live on r528 the partial line posted twice, once in the prose
+ * and once beneath it.
+ *
+ * @param prose - The answer as the model wrote it
+ * @param warnings - The ⚠️ lines posted beneath it, without their sign
+ */
+function withoutWarningLines(prose: string, warnings: readonly string[]): string {
+  if (!warnings.length) return prose;
+  const said = new Set(warnings.map(bare));
+  const lines = prose.split("\n");
+  const kept = lines.filter((line) => !said.has(bare(line)));
+  if (kept.length === lines.length) return prose;
+  while (kept.length && !kept[kept.length - 1]!.trim()) kept.pop();
+  return kept.join("\n");
+}
+
 /** A line the backstop never takes out: the confidence clause, which says
- *  what was checked or how sure. A bare "currently" in a row's sentence is
- *  not one. */
-const carriesConfidence = (line: string): boolean => hasWovenConfidence(line);
+ *  what was checked or how sure, or that it was read "just now" ("I queried
+ *  the blueprint just now", which names no verb `hasWovenConfidence` knows).
+ *  A bare "currently" in a row's sentence is not one. */
+const carriesConfidence = (line: string): boolean => hasWovenConfidence(line) || /\bjust\s+now\b/i.test(line);
 
 /**
  * The prose as it posts beneath a presentation: every line that types out a
  * row of the table taken out, since the table already shows them, and — when
- * the prose is still over the budget for an answer above a table or cards, the
- * judge's redraft having missed — the list items past the first 3. A turn
- * with neither posts its prose as written; one whose prose came back empty
- * posts the takeaway the model asked for the table or chart with.
+ * the prose is still over its budget, the judge's shortening having missed —
+ * the list items past the first 3. One whose prose came back empty posts the
+ * takeaway the model asked for the table or chart with.
  *
  * @param prose - The answer as the model wrote it
  * @param presentation - What rides beneath it
  */
 export function presentedProse(prose: string, presentation: Presentation | undefined): RowsRemoved {
+  prose = withoutWarningLines(prose, presentation?.warnings ?? []);
   const table = presentation?.table;
   let out: RowsRemoved = { text: prose, removed: 0 };
   let named = 0;
@@ -594,10 +624,12 @@ export function presentedProse(prose: string, presentation: Presentation | undef
   } else {
     const takeaway = presentation?.charts?.find((c) => c.takeaway)?.takeaway;
     if (!prose.trim() && takeaway) return { text: takeaway, removed: 0 };
-    if (!presentation?.cards) return out;
   }
-  if (!overBudget(measureProse(out.text), named, MAX_NAMED_ROWS)) return out;
-  const trimmed = withinListBudget(out.text, carriesConfidence);
+  const measure = measureProse(out.text);
+  if (!overBudget(measure, !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return out;
+  // Beside a table the whole walk goes, since the table carries the rows;
+  // beside cards alone, the first 3 items stay.
+  const trimmed = withinListBudget(out.text, carriesConfidence, table || measure.typedTable ? 0 : MAX_LIST_ITEMS);
   return { ...out, text: trimmed.text, ...(trimmed.removed ? { trimmed: trimmed.removed } : {}) };
 }
 

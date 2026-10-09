@@ -28,10 +28,11 @@ import { measured } from "../sweep/env";
 import type { SweepSlackMessage } from "../sweep/run";
 import { modelCommitmentDetector, modelEvidenceJudge } from "../commitments/detector";
 import { createD1DmWatchRecords } from "./d1";
+import type { ReminderOutcome } from "../commitments/copy";
 import { dropDmCapture, type DmCaptureFinding, type DmCaptureQueue, type DmHolds } from "./capture";
 import {
   accessOf,
-  answerDmReminder,
+  answerDmReminderPress,
   runDmPromiseNudges,
   runDmPromiseRead,
   setDmWatch,
@@ -233,11 +234,11 @@ export async function runDmPromiseNudgesOnEnv(env: Env, job: ScheduledJob, opts:
 }
 
 /** The reaction door's look at DM reminders, or undefined when unbound. */
-export function dmReminderDoorFor(env: Env): ((r: DmReminderReaction) => Promise<boolean>) | undefined {
+export function dmReminderDoorFor(env: Env): ((r: DmReminderReaction) => Promise<ReminderOutcome>) | undefined {
   const records = dmWatchRecordsFor(env);
   if (!records) return undefined;
   return (r) =>
-    answerDmReminder(r, {
+    answerDmReminderPress(r, {
       records,
       async reminderBody(channel, ts) {
         const res = await conversationsReplies(env, channel, ts, 1);

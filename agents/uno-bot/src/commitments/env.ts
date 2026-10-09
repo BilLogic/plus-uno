@@ -28,7 +28,7 @@ import { cardAnswerFor, cardFollowUpsFor } from "../follow-through/env";
 import { dmAnswerFor, dmAsksFor } from "../dm-sweep/env";
 import { commitmentStoreFor } from "./store-env";
 import {
-  answerReminder,
+  answerReminderPress,
   commitmentThreadHook,
   runCommitmentNudges,
   type CommitmentDeps,
@@ -36,6 +36,7 @@ import {
   type NudgeDeps,
   type ReminderReaction,
 } from "./run";
+import type { ReminderOutcome } from "./copy";
 
 /**
  * The end-of-day sweep's per-thread hook, or undefined when the bindings are
@@ -116,18 +117,19 @@ export async function runCommitmentNudgesOnEnv(
 }
 
 /**
- * The reaction door's first look: true when the reacted message is a reminder
- * (`answerReminder`). A Worker without the bindings has no reminders.
+ * The reaction door's first look: whether the reacted message is a reminder,
+ * and why an answer on it changed nothing (`answerReminderPress`). A Worker
+ * without the bindings has no reminders.
  *
  * @param env - Worker bindings
  */
-export function reminderDoorFor(env: Env): ((r: ReminderReaction) => Promise<boolean>) | undefined {
+export function reminderDoorFor(env: Env): ((r: ReminderReaction) => Promise<ReminderOutcome>) | undefined {
   const store = commitmentStoreFor(env);
   if (!store) return undefined;
   const cards = cardAnswerFor(env);
   const dm = dmAnswerFor(env);
   return (r) =>
-    answerReminder(r, {
+    answerReminderPress(r, {
       store,
       ...(cards ? { cards } : {}),
       ...(dm ? { dm } : {}),

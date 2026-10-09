@@ -1,0 +1,173 @@
+// An answer beside a table stays short, whether `present` attached the table
+// or the model typed it.
+//
+// Live on r525 the pain-points answer never called `present`: the model typed
+// its own Markdown table after a 10,198-character walk of every phase and
+// scenario. The prose budget armed only on a table `present` attached, so it
+// never fired, and the draft was past the judge's rewrite window, so the judge
+// could only grade it. Now a typed table counts as rows beneath the prose, and
+// the judge is asked to shorten a draft over the budget whatever its length.
+// An answer with no table beneath it has no budget. Driven across `runTurn`.
+import { test } from "node:test";
+import assert from "node:assert/strict";
+
+import { runTurn, type DeliveryCall } from "../src/turn/index";
+import { harness, request, type JudgeCall } from "./helpers/turn-harness";
+
+const cell = (n: number) => `https://blueprint.example/cell-${n}`;
+
+const RESULT = JSON.stringify({
+  ok: true,
+  query: "pain points",
+  count: 2,
+  rows: [1, 2].map((n) => ({ title: `Pain point ${n}`, url: cell(n) })),
+});
+
+/** One turn: a search, then `prose`, and no `present`. */
+async function turn(prose: string, judge?: (call: JudgeCall) => { text: string; verdict: string }) {
+  const h = harness({
+    replies: [{ toolCalls: [{ name: "search_blueprint", args: { query: "pain points" } }] }, { text: prose }],
+    toolResultFor: () => RESULT,
+    ...(judge ? { judge } : {}),
+  });
+  await runTurn(request({ text: "What are the main tutor pain points in the blueprint, by scenario?" }), h.deps);
+  const answer = h.delivery.calls.find((c): c is Extract<DeliveryCall, { kind: "answer" }> => c.kind === "answer");
+  assert.ok(answer, "an answer was posted");
+  assert.equal(answer.presentation?.table, undefined, "present was never called");
+  return { text: answer.text, judged: h.judged[0]! };
+}
+
+const LEAD = "**Most tutor friction sits where a rule holds a tutor and only a supervisor can release it.**";
+const CLAUSE = "I searched the blueprint just now, so these are current.";
+
+/** A nested walk of `phases` phases, each with 2 scenarios of 2 findings. */
+function walk(phases: number, sentence = "and the reason runs on, because the blueprint records it at length. ".repeat(3)) {
+  const out: string[] = [];
+  let n = 0;
+  for (let p = 1; p <= phases; p++) {
+    out.push(`### Phase ${p}`, "");
+    for (let s = 1; s <= 2; s++) {
+      out.push(`* **Scenario ${p}.${s}**`);
+      for (let f = 1; f <= 2; f++) out.push(`  * **Finding ${++n}:** [cell ${n}](${cell(100 + n)}) ${sentence}`);
+    }
+    out.push("");
+  }
+  return out;
+}
+
+const TABLE = [
+  "Tutor Pain Points Summary Table",
+  "",
+  "| Phase | Scenario | Pain point |",
+  "| --- | --- | --- |",
+  "| Pre-session | Call-off Request | Late call-offs strip the roster |",
+  "| In-session | Help Request | No ticketing tool |",
+  "| Post-session | Reporting Hours | Hours do not reach Workday |",
+];
+
+// ── The redraft ─────────────────────────────────────────────────────────────
+
+test("the live r525 shape: a long walk and a typed table, no present, asks the judge to shorten it", async () => {
+  const prose = [LEAD, "", ...walk(9), ...TABLE, "", CLAUSE].join("\n");
+  assert.ok(prose.length > 8_000, "past the judge's normal rewrite window");
+  const { judged } = await turn(prose);
+
+  assert.equal(judged.shorten, true);
+  assert.equal(judged.forceReason, "table-walk");
+  assert.match(judged.extraInstruction ?? "", /TABLE WALK/);
+  assert.match(judged.extraInstruction ?? "", /keep the table as it is/);
+});
+
+test("a long answer with no table beneath it is untouched: no shorten, no cut", async () => {
+  // The budget is against duplicating a table's rows. An answer asked to be
+  // long ("walk me through the setup") has no table to leave its rows to.
+  const prose = [LEAD, "", ...walk(9), CLAUSE].join("\n");
+  assert.ok(prose.length > 8_000);
+  const { text, judged } = await turn(prose);
+  assert.notEqual(judged.shorten, true);
+  assert.doesNotMatch(judged.extraInstruction ?? "", /TABLE WALK/);
+  assert.equal(text, prose);
+});
+
+test("the shortened answer ships", async () => {
+  const short = `${LEAD} Late call-offs, help routed through Slack and hours that miss Workday stand out. ${CLAUSE}`;
+  const { text } = await turn([LEAD, "", ...walk(4), ...TABLE, "", CLAUSE].join("\n"), (call) => ({
+    text: call.shorten ? short : call.draft,
+    verdict: "fail",
+  }));
+  assert.equal(text, short);
+});
+
+test("an answer of ordinary length with no table is not asked to shorten", async () => {
+  const prose = [LEAD, "", ...walk(1, "and why."), CLAUSE].join("\n");
+  const { text, judged } = await turn(prose);
+  assert.notEqual(judged.shorten, true);
+  assert.equal(text, prose);
+});
+
+test("a typed table and a code block are not prose: neither counts toward the length", async () => {
+  const rows = Array.from({ length: 60 }, (_, i) => `| Phase ${i} | Scenario ${i} | A pain point recorded at some length ${i} |`);
+  const code = ["```", ...Array.from({ length: 60 }, (_, i) => `const step${i} = "a line of a setup script ${i}";`), "```"];
+  const prose = [LEAD, "", "| Phase | Scenario | Pain point |", "| --- | --- | --- |", ...rows, "", ...code, "", CLAUSE].join("\n");
+  assert.ok(prose.length > 6_000);
+  const { text, judged } = await turn(prose);
+  assert.notEqual(judged.shorten, true);
+  assert.equal(text, prose);
+});
+
+// ── The backstop ────────────────────────────────────────────────────────────
+
+test("the backstop beside a table takes the whole walk out: the lead, the typed table and the clause stay", async () => {
+  const prose = [LEAD, "", ...walk(4), ...TABLE, "", CLAUSE].join("\n");
+  const { text } = await turn(prose);
+  assert.equal(text, [LEAD, "", ...TABLE, "", CLAUSE].join("\n"));
+});
+
+test("the live r526 shape: phase labels over 3-level bullets, then a typed table, posts as lead, table and freshness line", async () => {
+  const prose = [
+    LEAD,
+    "",
+    "Here is the breakdown by phase:",
+    "",
+    "Phase: Onboarding",
+    "* **Scenario: Session Sign Up**",
+    "  * **Hard onboarding gate**",
+    `    * [Review scheduling](${cell(201)}): scheduling stays locked until the last module is done.`,
+    "Phase: Pre-session",
+    "* **Scenario: Call-off Request**",
+    "  * **Late call-offs**",
+    `    * [Files late call-off](${cell(202)}): the tutor leaves the roster at once.`,
+    `    * [Supervisor review](${cell(203)}): the excuse waits on a supervisor.`,
+    "Phase: Post-session",
+    "* **Scenario: Reporting Hours**",
+    "  * **Disconnected payroll**",
+    `    * [Miss reporting deadline](${cell(204)}): hours never reach Workday.`,
+    "",
+    ...TABLE,
+    "",
+    CLAUSE,
+  ].join("\n");
+  const { text } = await turn(prose);
+  assert.equal(text, [LEAD, "", ...TABLE, "", CLAUSE].join("\n"));
+});
+
+test("a paragraph between the lists stays, and a heading over it keeps its place", async () => {
+  const prose = [
+    LEAD,
+    "",
+    "### Why it matters",
+    "* **Scenario 1**",
+    ...[301, 302, 303, 304].map((n) => `  * [Finding ${n}](${cell(n)}): one of four.`),
+    "",
+    "Most of this sits before a first session, so fix onboarding first.",
+    "",
+    ...TABLE,
+    "",
+    CLAUSE,
+  ].join("\n");
+  const { text } = await turn(prose);
+  assert.equal(
+    text,
+    [LEAD, "", "### Why it matters", "", "Most of this sits before a first session, so fix onboarding first.", "", ...TABLE, "", CLAUSE].join("\n"),
+  );
+});
