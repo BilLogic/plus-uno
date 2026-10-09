@@ -1,16 +1,19 @@
 // Figma reads for a pasted frame link, over the Figma client (`src/figma/`).
 //
 // `parseFigmaUrl` validates/splits a pasted Figma link (used by the executor
-// and the proposal preview). `fetchFigmaNode` reads a frame's text for
-// `source_read`; `fetchFigmaImagePngUrl` renders a node to a PNG for vision
-// and the Slack proposal preview. Each takes the client rather than `Env`, so
-// tests drive them over the shared fake.
+// and the proposal preview). `fetchFigmaFrame` reads a pasted frame for
+// `source_read` — its text and the comments pinned in it (#899);
+// `fetchFigmaNode` reads a frame's text alone, for the drift check;
+// `fetchFigmaImagePngUrl` renders a node to a PNG for vision and the Slack
+// proposal preview. Each takes the client rather than `Env`, so tests drive
+// them over the shared fake.
 
 import type { FigmaCallOptions, FigmaClient } from "../figma/client";
-import { collectTextLayers } from "./figma-reading";
+import { collectTextLayers, pinnedThreads, type FigmaFrameRead, type FigmaNode } from "./figma-reading";
 
 const IMAGE_FETCH_TIMEOUT_MS = 8000;
 const NODE_FETCH_TIMEOUT_MS = 8000;
+const COMMENTS_FETCH_TIMEOUT_MS = 8000;
 
 export interface FigmaNodeContent {
   name: string;
@@ -43,10 +46,63 @@ export async function fetchFigmaNode(
   nodeId: string,
 ): Promise<FigmaNodeContent> {
   if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
+  return contentOf(await readFrameDoc(figma, fileKey, nodeId));
+}
 
+/**
+ * Read a pasted frame for `source_read`: its name, type and text layers, and
+ * the comment threads pinned to it or to a layer inside it (#899).
+ *
+ * The comments come from one more call, started beside the node read — a
+ * different rate tier, so neither waits on the other. The node read decides
+ * the outcome as `fetchFigmaNode` does: it throws on a missing client or a
+ * refusal. A comments read that fails — a refusal, a rate limit the retries
+ * did not get past, a timeout, the turn's budget stop — never costs the
+ * frame: its text comes back with `commentsUnread`, which says unknown rather
+ * than none, and the loop's trip counter still marks a budget stop partial.
+ *
+ * @param figma - The Figma client; undefined when the Worker has no token
+ * @param opts - `comments: false` reads the node alone, as the sweep does
+ */
+export async function fetchFigmaFrame(
+  figma: Pick<FigmaClient, "nodes" | "comments"> | undefined,
+  fileKey: string,
+  nodeId: string,
+  opts: { comments?: boolean } = {},
+): Promise<FigmaFrameRead> {
+  if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
+
+  // Settled into a value here, so a node read that throws leaves no rejection unhandled.
+  const comments =
+    opts.comments === false
+      ? null
+      : figma.comments(fileKey, { timeoutMs: COMMENTS_FETCH_TIMEOUT_MS, attempts: 2 }).then(
+          (r) => ({ list: r.comments ?? [] }),
+          (err: unknown) => ({ error: err instanceof Error ? err.message : String(err) }),
+        );
+  const doc = await readFrameDoc(figma, fileKey, nodeId);
+  const content = contentOf(doc);
+  if (!comments) return content;
+
+  const read = await comments;
+  if ("error" in read) {
+    console.warn(`[figma] comments ${fileKey} failed: ${read.error}`);
+    return { ...content, commentsUnread: read.error };
+  }
+  // The id the link named is the frame's, whether or not the node echoes it.
+  return { ...content, comments: pinnedThreads({ ...doc, id: doc.id ?? nodeId }, read.list) };
+}
+
+/** The frame's node, or a throw the caller reports as "couldn't read it". */
+async function readFrameDoc(figma: Pick<FigmaClient, "nodes">, fileKey: string, nodeId: string): Promise<FigmaNode> {
   const data = await figma.nodes(fileKey, [nodeId], { timeoutMs: NODE_FETCH_TIMEOUT_MS });
   const doc = data.nodes?.[nodeId]?.document;
   if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
+  return doc;
+}
+
+/** A node's name, type and text layers. */
+function contentOf(doc: FigmaNode): FigmaNodeContent {
   const { texts, truncated } = collectTextLayers(doc);
   return { name: doc.name ?? "(unnamed)", type: doc.type ?? "NODE", texts, truncated };
 }

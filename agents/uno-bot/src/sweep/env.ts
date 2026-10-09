@@ -548,7 +548,11 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
     };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;
-  const raw = await executeReadSource(env, { url }, canvas ? { sharedCanvasIds: [canvas] } : undefined);
+  // A frame's text only: its pinned comments would be one more call against
+  // the ceiling, kept for nothing, and comment decisions are #900's own read.
+  const raw = await executeReadSource(env, { url }, canvas ? { sharedCanvasIds: [canvas] } : undefined, {
+    figmaComments: false,
+  });
   try {
     const r = JSON.parse(raw) as { ok?: boolean; title?: string; content?: string };
     // A Figma file link with no node, or one Figma would not serve, is still

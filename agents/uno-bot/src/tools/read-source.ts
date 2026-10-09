@@ -2,7 +2,9 @@
 // pasted so the bot answers from the actual source instead of its priors
 // (fixes the "doesn't read what it's linked" cluster). Dispatches by domain:
 //   notion.so / app.notion.com → page title + properties (incl. Owner/people) + block text
-//   figma.com  → node name/type + text layers (for review/inspection)
+//   figma.com  → node name/type + text layers (for review/inspection), and
+//                the comment threads pinned to the frame or a layer inside it
+//                (#899)
 //                (the frame IMAGE arrives separately — slack/vision.ts renders
 //                 the first frame link in the message and attaches it to the
 //                 turn, so this branch is not the model's only view of it)
@@ -12,8 +14,8 @@
 
 import type { Env, SlackContext } from "../types";
 import { canonicalNotionUrl, parseNotionPageId, readNotionPage } from "../integrations/notion";
-import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
-import { FIGMA_NOTE, FIGMA_TRUNCATION_NOTE } from "../integrations/figma-reading";
+import { parseFigmaUrl, fetchFigmaFrame } from "../integrations/figma";
+import { describeFigmaFrame } from "../integrations/figma-reading";
 import { figmaClientFor } from "../figma/production";
 import { countedFetch } from "../net";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
@@ -44,10 +46,20 @@ function toGithubRaw(u: URL): string | null {
   return null;
 }
 
+export interface ReadSourceOptions {
+  /**
+   * Read a Figma frame's pinned comments with it (#899) — one more Tier 2
+   * call. Default true: a turn's read brings them. The sweep's reads pass
+   * false, keeping only a frame's text under their lookup ceiling.
+   */
+  figmaComments?: boolean;
+}
+
 export async function executeReadSource(
   env: Env,
   input: Record<string, unknown>,
   slack?: Pick<SlackContext, "sharedCanvasIds">,
+  opts: ReadSourceOptions = {},
 ): Promise<string> {
   const url = firstUrl(input.url) ?? firstUrl(input.text);
   if (!url) {
@@ -137,18 +149,10 @@ export async function executeReadSource(
     if (/(^|\.)figma\.com$/.test(host)) {
       const parts = parseFigmaUrl(url);
       if (!parts) return JSON.stringify({ ok: false, error: "couldn't parse a Figma file/node from that URL (need a node-id)" });
-      const node = await fetchFigmaNode(figmaClientFor(env), parts.fileKey, parts.nodeId);
-      return JSON.stringify({
-        ok: true,
-        source_type: "figma",
-        url,
-        title: node.name,
-        node_type: node.type,
-        content: node.texts.join("\n"),
-        text_layers: node.texts.length,
-        text_layers_truncated: node.truncated,
-        note: node.truncated ? `${FIGMA_NOTE} ${FIGMA_TRUNCATION_NOTE}` : FIGMA_NOTE,
+      const frame = await fetchFigmaFrame(figmaClientFor(env), parts.fileKey, parts.nodeId, {
+        comments: opts.figmaComments !== false,
       });
+      return JSON.stringify(describeFigmaFrame(url, frame));
     }
 
     // ---- GitHub / raw / other http(s) ----
