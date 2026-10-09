@@ -21,7 +21,10 @@
 // No Env, no Slack client: the store-backed helpers take the store as a port.
 
 import { carouselOf, logoFor } from "./answer-cards-block";
+import { toPlainText } from "./mrkdwn";
+import { cardLead, renderProposalCard } from "./proposal-render";
 import { textSections } from "./render";
+import type { ProposalCard } from "../turn/index";
 import type {
   DecisionReportRecord,
   PendingProposal,
@@ -303,6 +306,40 @@ export async function replaceItem(
   const id = `${baseId(oldId)}~${rev}`;
   const record = await store.updateReport(messageTs, { id: oldId, replace: { id, item } });
   return record ? { id, message: reportMessage(record) } : null;
+}
+
+/**
+ * A turn's revision of an item, in place (`TurnDeps.reviseItem`): the item as
+ * it was — its title, who and where, its sources — saying what the revision
+ * now does, replaced under the same number (`replaceItem`). Any report's item
+ * revises this way, with no step of its own. What Review shows is the card as
+ * a turn spells it; `show` redraws the report's message once the revision is
+ * staged. Null when the store has no such report or item.
+ *
+ * @param store - The thread store
+ * @param edit - Edit the report's message in place (`chat.update`)
+ */
+export function itemReviser(store: ReportStore, edit: (messageTs: string, message: ReportMessage) => Promise<void>) {
+  return async (target: { messageTs: string; id: string }, card: ProposalCard) => {
+    const before = (await store.getReport(target.messageTs))?.entries.find((e) => e.id === target.id)?.item;
+    if (!before) return null;
+    const lead = cardLead(card);
+    // What it wrote before no longer describes the write.
+    const { done: _done, ...kept } = before;
+    const replaced = await replaceItem(store, target.messageTs, target.id, {
+      ...kept,
+      body: (lead && toPlainText(lead).trim()) || `Revised: ${card.verb}.`,
+    });
+    if (!replaced) return null;
+    return {
+      text: renderProposalCard(card).text,
+      staged: itemProposal(target.messageTs, replaced.id),
+      show: () =>
+        edit(target.messageTs, replaced.message).catch((err: unknown) => {
+          console.warn(`[decision-cards] ${target.messageTs} not redrawn: ${err instanceof Error ? err.message : String(err)}`);
+        }),
+    };
+  };
 }
 
 /**

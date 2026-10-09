@@ -546,6 +546,23 @@ export interface TurnDeps {
   onRestaged?(from: PendingProposal, to: PendingProposal): Promise<void>;
 
   /**
+   * Put a revision of one item of a decision report in place of its card:
+   * the same card in the report's message, under the same number, open again
+   * as a new proposal. Answers what Review shows, the fields the proposal is
+   * staged with, and `show`, which redraws the report's message once it is
+   * staged; null when the report has no such item, and the revision posts as
+   * its own card. Absent, every revision posts as its own card.
+   */
+  reviseItem?(
+    item: { messageTs: string; id: string },
+    card: ProposalCard,
+  ): Promise<{
+    text: string;
+    staged: Pick<PendingProposal, "proposalTs" | "userMsgTs" | "supersedeKey" | "item">;
+    show(): Promise<void>;
+  } | null>;
+
+  /**
    * One page of the conversation before this message, for the antecedent
    * window — already reduced to author and text, newest last.
    *
@@ -667,7 +684,8 @@ export function settlementOf(settle: {
  * the turn is handed and takes down whatever the turn raised, whichever door
  * it left by.
  */
-export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
+export async function runTurn(given: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
+  const request = await withItemSentBack(given, deps.threadState);
   // The card THIS REPLY THREAD was holding when the turn began — and the grain
   // is the whole of it.
   //
@@ -764,6 +782,24 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   }
   await recordTurn(await labelInTurn(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
+}
+
+/**
+ * The request with the card it revises when its asker sent back an item of a
+ * decision report. The thread's card is its newest, and a report holds one
+ * per item in one thread, so the item this person sent back with Needs
+ * changes — their newest mark — is the one their turn revises. Any other
+ * request, unchanged.
+ */
+async function withItemSentBack(request: TurnRequest, threadState: ThreadState): Promise<TurnRequest> {
+  const pending = request.pending;
+  if (!pending?.item || pending.revising?.userId === request.userId) return request;
+  const thread = proposalReplyThread(pending);
+  const live = await threadState.getProposalsByChannel(request.channel).catch(() => []);
+  const marked = live
+    .filter((p) => p.item && proposalReplyThread(p) === thread && p.revising?.userId === request.userId)
+    .sort((a, b) => (b.revising!.at ?? 0) - (a.revising!.at ?? 0))[0];
+  return marked ? { ...request, pending: marked } : request;
 }
 
 /**
@@ -1502,7 +1538,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
   // whether there is anything to send at all (#623).
-  const posted = await delivery.card(card);
+  //
+  // An item of a decision report revises in place: its own card in the
+  // report's message, under the same number (`reviseItem`), whichever report
+  // it is. An item whose report is gone posts as its own card, as any other.
+  const inPlace = replaced?.item && deps.reviseItem
+    ? await deps.reviseItem(replaced.item, card).catch((err: unknown) => {
+        console.warn(`[turn] item ${replaced.item!.id} not revised in place: ${err instanceof Error ? err.message : String(err)}`);
+        return null;
+      })
+    : null;
+  const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
     return {
@@ -1556,8 +1602,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(request.intakeChannel
       ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
       : {}),
+    // An item revised in place is keyed on its report's message and its new
+    // entry, in the item's own slot.
+    ...(inPlace ? inPlace.staged : {}),
   };
   const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  // Redrawn once staged, so a Review on the new card finds its proposal.
+  await inPlace?.show();
   // On the record as soon as it is stored, so a ✅ that lands before the turn
   // finishes finds the staged row and the turn id it joins to; a ticket that
   // ✅ files waits on that row until the turn writes its own (`runTurn`).
