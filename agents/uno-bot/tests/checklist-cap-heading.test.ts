@@ -116,6 +116,22 @@ describe("the checklist's card cap", () => {
 });
 
 describe("the checklist's heading", () => {
+  it("keeps DM prompts out of the progress message, with or without a Figma link", async () => {
+    for (const ask of ["What is in progress?", "https://figma.com/design/AbC123/Sessions?node-id=1-2 what does this comment say?"]) {
+      for (const threaded of [true, false]) {
+        const slack = recordingSlack();
+        const target = { ...TARGET, channel: "D0BILL", ...(threaded ? {} : { replyTs: undefined }) };
+        const delivery = deliveryAdapter(slack.deps(true), target);
+        await delivery.beginProgress("Working on it", ask);
+        await lookups(delivery, 1);
+        await delivery.postAnswer("Here is the answer.");
+        assert.equal(slack.of("heading").length, 0, "a DM checklist does not repeat the ask as a heading");
+        for (const call of slack.calls) assert.ok(!JSON.stringify(call).includes(ask), JSON.stringify(call));
+        assert.equal(slack.of("answer").length, 1);
+      }
+    }
+  });
+
   it("retitles the checklist once, from the ask, after the stream opens", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
