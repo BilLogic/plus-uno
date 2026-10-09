@@ -148,8 +148,8 @@ describe("the draft reads as a draft", () => {
   it("keeps the card's caveats at the end of the draft, above the decisions", async () => {
     const all = lines(await draftOf());
     const caveat = indexOf(all, /No open questions were named/);
-    assert.equal(caveat, all.length - 3, JSON.stringify(all.slice(-3)));
-    assert.match(all.at(-1)!, /Needs changes Reject/);
+    assert.equal(caveat, all.length - 4, JSON.stringify(all.slice(-4)));
+    assert.deepEqual(all.slice(-3).map((l) => l.split(":")[0]), ["divider", "input", "input"]);
   });
 
   it("reads a notion_update as the page, the properties it sets and the text it writes", async () => {
@@ -223,37 +223,21 @@ describe("the thread card's summary", () => {
   });
 });
 
-describe("Needs changes, Reject and Edit fields push a view of their own", () => {
+describe("Needs changes and Reject are decided from the draft, where they answer", () => {
   const card = { channel: CHANNEL, ts: CARD_TS };
 
-  it("Needs changes pushes a required note, sent with Send changes, and the stack closes on one line", async () => {
+  it("Needs changes hands the note to a revision, and the draft turns to one line", async () => {
     const { deps, views, revisions } = harness(await staged());
-    await runReviewPush({ triggerId: "T.changes", card, userId: "U2", step: "changes" }, deps);
-    const pushed = views.calls[0]!;
-    assert.equal(pushed.kind, "push");
-    const view = pushed.view as { submit: { text: string }; blocks: Array<{ type: string; optional?: boolean }> };
-    assert.equal(view.submit.text, "Send changes");
-    assert.deepEqual(view.blocks.filter((b) => b.type === "input").map((b) => b.optional), [false]);
-
-    await runReviewDecision(
-      { viewId: "V2", rootViewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "revise", note: "Shorter goals" },
-      deps,
-    );
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "revise", note: "Shorter goals" }, deps);
     assert.deepEqual(revisions, ["Shorter goals"]);
-    const answered = views.calls.slice(1).map((c) => (c.kind === "update" ? c.viewId : c.kind));
-    assert.deepEqual(answered, ["V2", "V1"], "the pushed view and the draft under it say the same line");
+    assert.deepEqual(views.calls.map((c) => (c.kind === "update" ? c.viewId : c.kind)), ["V1"]);
     assert.match(JSON.stringify(views.calls.at(-1)!.view), /Sent back with your note/);
     assert.deepEqual(views.refused, []);
   });
 
-  it("Reject pushes an optional reason, submitted with Reject, and runs nothing", async () => {
+  it("Reject runs nothing", async () => {
     const { deps, views, ran } = harness(await staged());
-    await runReviewPush({ triggerId: "T.reject", card, userId: "U2", step: "reject" }, deps);
-    const view = views.calls[0]!.view as { submit: { text: string }; blocks: Array<{ type: string; optional?: boolean }> };
-    assert.equal(view.submit.text, "Reject");
-    assert.deepEqual(view.blocks.filter((b) => b.type === "input").map((b) => b.optional), [true]);
-
-    await runReviewDecision({ viewId: "V2", rootViewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "cancel" }, deps);
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "cancel" }, deps);
     assert.equal(ran[0]?.decision, "cancel");
     assert.equal(ran[0]?.execute, undefined);
     assert.match(JSON.stringify(views.calls.at(-1)!.view), /Rejected/);
@@ -261,7 +245,7 @@ describe("Needs changes, Reject and Edit fields push a view of their own", () =>
 
   it("Edit fields offers a non-confirmer nothing", async () => {
     const { deps, views } = harness(await staged({ confirmers: ["U07CONFIRM"] }));
-    await runReviewPush({ triggerId: "T.edit", card, userId: "U2", step: "edit" }, deps);
+    await runReviewPush({ triggerId: "T.edit", card, userId: "U2" }, deps);
     const shown = views.calls.at(-1)!.view as { submit?: unknown; blocks: Array<{ type: string }> };
     assert.equal(shown.submit, undefined);
     assert.deepEqual(shown.blocks.filter((b) => b.type === "input"), []);
