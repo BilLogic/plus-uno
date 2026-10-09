@@ -6,7 +6,8 @@
 // and that code wins; each card names the component, the side that needs the
 // fix, and what differs, with Review, Code and Figma. Nothing on the card or
 // in the proposal says what to type or react: Review is the gate. Approve
-// adds the component to the week's intake; Reject means the difference is
+// adds the component to the week's intake; Needs changes disputes it, its
+// note written on the intake (`./dispute.ts`); Reject means the difference is
 // deliberate, and nothing is written.
 //
 // ONE INTAKE A WEEK. Every card's operation is the same Worker tool,
@@ -134,6 +135,18 @@ export function intakeSection(finding: ComponentFinding): string {
 }
 
 /**
+ * What a dispute adds to the week's intake: the component, who disputed it,
+ * and their note.
+ *
+ * @param component - The component
+ * @param name - Who disputed it, by display name
+ * @param note - Why, in their words
+ */
+export function disputeSection(component: string, name: string, note: string): string {
+  return `**${component}**: disputed by ${name} — ${note.trim()}`;
+}
+
+/**
  * The intake the week's first Approve files: the week's marker, what the
  * check compares and the rule, then the approved component's section.
  *
@@ -149,7 +162,7 @@ export function intakeBody(weekOf: string, section: string): string {
     `uno-bot's weekly check compares the component index and each component's props (\`component-registry.json\`) with the published ${SOURCE_NAMES.library}, when no library publish is carrying the component. ` +
       `Where they disagree, the DS precedence rule decides — ${RULE} — and the losing artifact is listed here. Existence and variant axes only; token values are out of scope.`,
     "",
-    `Each component below was approved in #plus-universal; one rejected there was deliberate, and is not listed.`,
+    `Each component below was approved in #plus-universal, or disputed there with a note. One rejected there was left as deliberate, and is not listed.`,
     "",
     section,
     "",
@@ -187,7 +200,7 @@ export function precedenceCard(finding: ComponentFinding, weekOf: string): Propo
     lead: [
       `*${escapeSlackText(finding.component)}* · ${SIDE[first.loser].toLowerCase()} needs the fix · <${first.codeUrl}|code> · <${first.figmaUrl}|Figma>`,
       ...lines,
-      `Approving adds it to the DS precedence intake for the week of ${shortDate(weekOf)}, filing the intake if this is the week's first.`,
+      `Approving adds it to the DS precedence intake for the week of ${shortDate(weekOf)}, filing the intake if this is the week's first. Needs changes puts your note on the intake instead, for a library that is right or a difference that is deliberate.`,
     ].join("\n"),
     footer: "",
     fields: [],
@@ -212,4 +225,4 @@ export function precedenceCardWords(windowHours: number): StatedCardWords {
 
 /** What a turn says when it would change a weekly card. */
 export const PRECEDENCE_REVISION_REFUSAL =
-  "A DS precedence card is decided as it stands: press Review on it, and Approve adds the component to this week's intake or Reject leaves the difference as deliberate.";
+  "A DS precedence card is decided as it stands: press Review on it. Approve adds the component to this week's intake, Needs changes puts your note on the intake, and Reject leaves the difference as deliberate.";

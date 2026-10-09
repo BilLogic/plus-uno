@@ -39,7 +39,7 @@ import { runSlackTurn } from "./turn-adapter";
 import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
-import { isWeeklyPrecedenceThread } from "../ds-precedence/env";
+import { handlePrecedenceGateReply, isPrecedenceGateCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { handleFigmaDecisionReply, isFigmaDecisionCandidate, isFigmaDecisionThread } from "../figma-comments/env";
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
 import { handleDriftAnswer, isDriftAnswerCandidateFor, isDriftAnswerFor, recheckOnUpdateOnEnv } from "../figma-drift/env";
@@ -87,8 +87,9 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   switch (event.type) {
     case "message": {
       const msg = event as SlackMessageEvent;
-      // A "yes, it's up to date" in a thread asked about a file, a reply in a
-      // Figma comment-decision thread, and an answer under a card
+      // A typed ✅/⛔ in a weekly DS precedence thread, a "yes, it's up to
+      // date" in a thread asked about a file, a reply in a Figma
+      // comment-decision thread, and an answer under a card
       // follow-up are queued like a turn and handled at the head of the
       // thread's job (`message-job.ts`).
       // The handler chosen here rides on the job, so the job re-derives
@@ -377,13 +378,12 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
     if (env.HARNESS_KV && (await isSweepThread(env.HARNESS_KV, event.channel, event.thread_ts))) {
       return engagesOnSweepCard(event.text ?? "");
     }
-    // A weekly DS precedence report's thread is the same: people talk about
-    // its cards there, not to uno-bot. For as long as it is recorded as one,
-    // only an @mention (above) or a typed gate emoji engages
-    // (`ds-precedence/env.ts`).
-    if (await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts)) {
-      return typedEmojiDecision(event.text ?? "") !== null;
-    }
+    // A weekly DS precedence report's thread is the team's: people talk about
+    // its cards there, not to uno-bot, and each card is decided in its own
+    // Review. For as long as it is recorded as one, only an @mention (above)
+    // engages; a typed gate emoji is answered ahead of the turn with the
+    // review-only line (`handlePrecedenceGateReply`) and starts none.
+    if (await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts)) return false;
     // A Figma comment-decision thread in #plus-design is the same: people talk
     // about the decisions there. A reply rewording one is queued on its own
     // (`figma-comments/revise.ts`); otherwise only an @mention (above) or a
@@ -466,7 +466,8 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
 
 /**
  * The ahead-of-the-turn handler a message is for, decided once when it is
- * queued: a "yes, it's up to date" in a thread asked about a file, a reply in
+ * queued: a typed ✅/⛔ in a weekly DS precedence thread, which gets the
+ * review-only line, a "yes, it's up to date" in a thread asked about a file, a reply in
  * a Figma comment-decision thread, which may reword one of its decisions, or
  * an answer in a thread holding a card follow-up (each one KV read, and only
  * for a message of the right shape). Null for none.
@@ -475,18 +476,21 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
  * @param msg - The message
  */
 export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<string | null> {
+  if (isPrecedenceGateCandidate(env, msg) && (await isWeeklyPrecedenceThread(env, msg.channel, msg.thread_ts!))) return "ds-precedence";
   if (await isDriftAnswerFor(env, msg)) return "figma-drift";
   if (isFigmaDecisionCandidate(env, msg) && (await isFigmaDecisionThread(env, msg.channel, msg.thread_ts!))) return "figma-decisions";
   if (await mayBeCardReply(env, msg)) return "follow-through";
   return null;
 }
 
-/** The replies handled ahead of the turn, in the order tried: an answer about
- *  a file's drift (it catches its own failures but a budget stop, as on main),
+/** The replies handled ahead of the turn, in the order tried: a typed gate
+ *  emoji in a weekly DS precedence thread (a throw runs the turn), an answer
+ *  about a file's drift (it catches its own failures but a budget stop, as on main),
  *  a reply in a Figma comment-decision thread, and an answer under a card
  *  follow-up (it catches every failure). */
 export function replyHandlersFor(env: Env): ReplyHandler[] {
   return [
+    { name: "ds-precedence", candidate: (e) => isPrecedenceGateCandidate(env, e), handle: (e) => handlePrecedenceGateReply(env, e) },
     { name: "figma-drift", candidate: (e) => isDriftAnswerCandidateFor(env, e), handle: (e) => handleDriftAnswer(env, e) },
     { name: "figma-decisions", candidate: (e) => isFigmaDecisionCandidate(env, e), handle: (e) => handleFigmaDecisionReply(env, e) },
     { name: "follow-through", candidate: (e) => isCardReplyCandidate(env, e), handle: (e) => handleCardReplyOnEnv(env, e) },

@@ -22,6 +22,7 @@ import {
 } from "../src/ds-precedence/compare";
 import { PRECEDENCE_INTAKE_TOOL, precedenceMarker, precedenceRuleUrl } from "../src/ds-precedence/report";
 import { addToWeeklyIntake, type IntakeDeps } from "../src/ds-precedence/intake";
+import { disputePrecedenceItem } from "../src/ds-precedence/dispute";
 import {
   NOT_STAGED,
   postPrecedenceReport,
@@ -548,37 +549,49 @@ describe("the morning post", () => {
 
 // ── The week's intake ────────────────────────────────────────────────────────
 
-/** A harness repo's open intakes, and every write made on it. */
-function github(open: Array<{ number: number; url: string; body: string }> = []) {
+type Issue = { number: number; url: string; body: string };
+
+/** A harness repo — every intake updated this week, open or closed — the
+ *  week's filing on a ThreadState, and every write made. */
+function github(issues: Issue[] = [], store: ThreadState = createInMemoryThreadState({ now: () => NOW })) {
   const created: Array<{ title: string; body: string }> = [];
   const comments: Array<{ issue_number: number; comment: string }> = [];
+  const lookups = { count: 0 };
   const deps: IntakeDeps = {
-    openIntakes: async () => open,
+    filing: { claim: (key) => store.claimFiling(key), settle: (key, issue) => store.settleFiling(key, issue) },
+    async intakesSince() {
+      lookups.count += 1;
+      return { intakes: [...issues], complete: true };
+    },
     async create(input) {
+      // A real round trip: the other Approve runs meanwhile.
+      await new Promise((resolve) => setTimeout(resolve, 5));
       created.push(input);
       const number = 1100 + created.length;
-      open.push({ number, url: `https://github.com/${REPO}/issues/${number}`, body: input.body });
+      issues.push({ number, url: `https://github.com/${REPO}/issues/${number}`, body: input.body });
       return JSON.stringify({ ok: true, issue_number: number, issue_url: `https://github.com/${REPO}/issues/${number}` });
     },
     async comment(input) {
       comments.push(input);
       return JSON.stringify({ ok: true });
     },
+    sleep: (ms) => new Promise((resolve) => setTimeout(resolve, Math.min(ms, 2))),
   };
-  return { deps, created, comments, open };
+  return { deps, created, comments, lookups, store };
 }
+
+const section = (component: string) => ({ week_of: "2026-10-02", component, section: `### ${component}\n\n| … |` });
 
 describe("the week's intake", () => {
   it("is a Worker tool: staged by the morning post, offered to no model", () => {
     assert.equal(TOOL_TABLE[PRECEDENCE_INTAKE_TOOL].access, "worker");
   });
 
-  it("the first Approve of the week files it; each later one comments on it", async () => {
+  it("the first Approve of the week files it; each later one comments on it, read from the store", async () => {
     const gh = github();
-    const op = (component: string) => ({ week_of: "2026-10-02", component, section: `### ${component}\n\n| … |` });
-    await addToWeeklyIntake(op("Button"), gh.deps);
-    await addToWeeklyIntake(op("TreeSelect"), gh.deps);
-    await addToWeeklyIntake(op("Badge"), gh.deps);
+    await addToWeeklyIntake(section("Button"), gh.deps);
+    await addToWeeklyIntake(section("TreeSelect"), gh.deps);
+    await addToWeeklyIntake(section("Badge"), gh.deps);
     assert.equal(gh.created.length, 1);
     assert.equal(gh.created[0]!.title, "DS precedence, week of Oct 2: code and the library disagree");
     assert.ok(gh.created[0]!.body.startsWith(precedenceMarker("2026-10-02")));
@@ -587,22 +600,47 @@ describe("the week's intake", () => {
       [1101, "### TreeSelect"],
       [1101, "### Badge"],
     ]);
+    assert.equal(gh.lookups.count, 1, "only the first looks on GitHub");
+  });
+
+  it("two Approves back to back make one intake and one comment", async () => {
+    const gh = github();
+    const results = await Promise.all([addToWeeklyIntake(section("Button"), gh.deps), addToWeeklyIntake(section("TreeSelect"), gh.deps)]);
+    for (const r of results) assert.equal(JSON.parse(r).ok, true, r);
+    assert.equal(gh.created.length, 1, "one intake");
+    assert.equal(gh.comments.length, 1, "the other comments on it");
+    assert.equal(gh.comments[0]!.issue_number, 1101);
+  });
+
+  it("an intake filed before the store knew of it — closed mid-week, even — is commented on, never filed twice", async () => {
+    const closed = { number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: `${precedenceMarker("2026-10-02")}\n\nclosed on Wednesday` };
+    const gh = github([closed]);
+    await addToWeeklyIntake(section("Button"), gh.deps);
+    await addToWeeklyIntake(section("TreeSelect"), gh.deps);
+    assert.deepEqual(gh.created, []);
+    assert.deepEqual(gh.comments.map((c) => c.issue_number), [1090, 1090]);
+    assert.equal(gh.lookups.count, 1, "found once, then read from the store");
   });
 
   it("a new week files its own intake, whatever last week's left open", async () => {
     const gh = github([{ number: 900, url: "u", body: `${precedenceMarker("2026-09-25")}\n\nlast week` }]);
-    await addToWeeklyIntake({ week_of: "2026-10-02", component: "Button", section: "### Button" }, gh.deps);
+    await addToWeeklyIntake(section("Button"), gh.deps);
     assert.equal(gh.created.length, 1);
     assert.deepEqual(gh.comments, []);
   });
 
-  it("files nothing when the open intakes cannot be read, so no second intake goes up blind", async () => {
+  it("files nothing when this week's intakes cannot all be read, and the next Approve tries again", async () => {
     const gh = github();
-    gh.deps.openIntakes = async () => Promise.reject(new Error("GitHub 502"));
-    const result = JSON.parse(await addToWeeklyIntake({ week_of: "2026-10-02", component: "Button", section: "### Button" }, gh.deps)) as { ok: boolean; error: string };
+    gh.deps.intakesSince = async () => Promise.reject(new Error("GitHub 502"));
+    const result = JSON.parse(await addToWeeklyIntake(section("Button"), gh.deps)) as { ok: boolean; error: string };
     assert.equal(result.ok, false);
     assert.match(result.error, /GitHub 502/);
+    gh.deps.intakesSince = async () => ({ intakes: [], complete: false });
+    assert.equal(JSON.parse(await addToWeeklyIntake(section("Button"), gh.deps)).ok, false);
     assert.deepEqual(gh.created, []);
+    gh.deps.intakesSince = async () => ({ intakes: [], complete: true });
+    await addToWeeklyIntake(section("Button"), gh.deps);
+    assert.equal(gh.created.length, 1, "the claim was released");
   });
 });
 
@@ -610,12 +648,14 @@ describe("the week's intake", () => {
 
 describe("deciding a weekly card in its Review", () => {
   /** The morning's report posted onto a ThreadState, and a review door whose
-   *  Approve runs the card's intake on a fake repo. */
+   *  Approve runs the card's intake, and whose Needs changes disputes it, on a
+   *  fake repo. */
   async function decided() {
     const posted = postDeps(await weekReport());
     await postPrecedenceReport(posted.deps);
-    const gh = github();
+    const gh = github([], posted.store);
     const updates: Array<{ ts: string; message: CardMessage }> = [];
+    const said: string[] = [];
     const deps: ReviewDoorDeps = {
       threadState: posted.store,
       views: recordingViews({ alreadyOpen: ["V1"] }).client,
@@ -630,15 +670,26 @@ describe("deciding a weekly card in its Review", () => {
       },
       updateCard: async (_channel, ts, message) => void updates.push({ ts, message }),
       restage: async () => {},
-      revise: async () => {},
+      revise: (request) =>
+        disputePrecedenceItem(
+          {
+            store: posted.store,
+            name: async (id) => (id === MEMBERS[0] ? "Maya" : "Bill"),
+            write: (input) => addToWeeklyIntake(input, gh.deps),
+            edit: async (ts, message) => void updates.push({ ts, message }),
+            say: async (text) => void said.push(text),
+            now: () => NOW,
+          },
+          request,
+        ),
       now: () => NOW,
     };
-    const decide = (id: string, decision: "confirm" | "cancel", userId: string, note?: string) =>
+    const decide = (id: string, decision: "confirm" | "cancel" | "revise", userId: string, note?: string) =>
       runReviewDecision(
         { viewId: "V1", channel: CHANNEL, messageTs: itemProposal(MSG, id).proposalTs, userId, decision, ...(note ? { note } : {}) },
         deps,
       );
-    return { decide, gh, updates };
+    return { decide, gh, updates, said, store: posted.store };
   }
 
   it("Approve on one card files the week's intake, Approve on the next comments on it, and each card says who decided", async () => {
@@ -654,6 +705,35 @@ describe("deciding a weekly card in its Review", () => {
     assert.match(button!.subtitle!.text, /^Approved by <@U0MEMBER2> · written /);
     assert.equal(button!.body.text, "Written: added to this week's DS precedence intake.");
     assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+  });
+
+  it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Disputed by", async () => {
+    const { decide, gh, updates, store } = await decided();
+    await decide("Button", "revise", MEMBERS[0]!, "ghost is library-only on purpose");
+    assert.equal(gh.created.length, 1, "no intake yet, so the dispute files it");
+    assert.match(gh.created[0]!.body, /\*\*Button\*\*: disputed by Maya — ghost is library-only on purpose/);
+    const [button] = cardsIn(updates.at(-1)!.message.blocks);
+    assert.equal(button!.subtitle!.text, "Disputed by <@U0MEMBER1>");
+    assert.equal(button!.body.text, "Note: ghost is library-only on purpose");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+    assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "Button").proposalTs)).state, "found", "nothing else decides it");
+
+    await decide("TreeSelect", "revise", MEMBERS[1]!, "the library is right, code is behind");
+    assert.equal(gh.created.length, 1);
+    assert.deepEqual(gh.comments.map((c) => c.comment), ["**TreeSelect**: disputed by Bill — the library is right, code is behind"]);
+  });
+
+  it("a dispute that does not reach the intake puts the card back to open and says so", async () => {
+    const { decide, gh, updates, said, store } = await decided();
+    gh.deps.intakesSince = async () => Promise.reject(new Error("GitHub 502"));
+    await decide("Button", "revise", MEMBERS[0]!, "deliberate");
+    const [button] = cardsIn(updates.at(-1)!.message.blocks);
+    assert.equal(button!.subtitle!.text, "Library side");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
+    assert.match(said[0]!, /didn't reach this week's intake/);
+    const live = await store.getProposalByTs(itemProposal(MSG, "Button").proposalTs);
+    assert.equal(live.state, "found");
+    assert.equal(live.state === "found" && live.proposal.revising, undefined, "the lock is lifted");
   });
 
   it("Reject leaves the difference as deliberate and writes nothing", async () => {

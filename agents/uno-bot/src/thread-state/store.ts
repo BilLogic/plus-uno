@@ -369,6 +369,9 @@ export type ReportItemState =
   | { kind: "approved"; by: string; at: number }
   | { kind: "failed"; by: string; at: number; reason: string }
   | { kind: "rejected"; by: string; reason?: string }
+  /** Sent back with a note that disputes the item, the note written where
+   *  the report keeps its record (a weekly DS precedence intake): closed. */
+  | { kind: "disputed"; by: string; note: string }
   | { kind: "expired" }
   /** Shown, but its proposal never staged: nothing to decide. */
   | { kind: "not-staged"; note: string };
@@ -1155,4 +1158,53 @@ export interface ThreadState {
   /** Release the lease. Best-effort by contract: a missed mark self-heals when
    *  the lease goes stale, at the cost of one re-run. */
   markRunDone(eventId: string): Promise<void>;
+
+  /**
+   * Ask to file the one issue a key stands for (the weekly DS precedence
+   * intake, keyed by its week). One hop, with the input gate closed, so of two
+   * racing callers exactly one is told "claimed" and files; the other is told
+   * "busy" until that one settles, then "filed" with the issue. A lease older
+   * than `FILING_LEASE_MS` was a caller killed mid-filing, and is reclaimed.
+   */
+  claimFiling(key: string): Promise<FilingClaim>;
+
+  /** Settle a claimed filing: the issue it filed, or null to release the
+   *  claim with nothing filed. */
+  settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
+}
+
+// ── One filing per key ───────────────────────────────────────────────────────
+
+/** An issue a filing made. */
+export interface FiledIssue {
+  number: number;
+  url: string;
+}
+
+/** The answer to "may I file it?" (`ThreadState.claimFiling`). */
+export type FilingClaim = { state: "claimed" } | { state: "busy" } | { state: "filed"; issue: FiledIssue };
+
+/** A filing as stored: when it was claimed or settled, and its issue once filed. */
+export interface FilingRecord {
+  at: number;
+  issue?: FiledIssue;
+}
+
+/** How long a claim on a filing holds before it is taken as abandoned. */
+export const FILING_LEASE_MS = 2 * 60 * 1000;
+/** How long a filed issue is remembered: past any week's cards. */
+export const FILING_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * A claim against a filing's record: its answer, and the record to store when
+ * the claim is taken (null when nothing changes).
+ *
+ * @param record - The stored record, if any
+ * @param at - Now
+ */
+export function claimedFiling(record: FilingRecord | undefined, at: number): { claim: FilingClaim; store: FilingRecord | null } {
+  const live = record && at - record.at < FILING_TTL_MS ? record : undefined;
+  if (live?.issue) return { claim: { state: "filed", issue: live.issue }, store: null };
+  if (live && at - live.at < FILING_LEASE_MS) return { claim: { state: "busy" }, store: null };
+  return { claim: { state: "claimed" }, store: { at } };
 }

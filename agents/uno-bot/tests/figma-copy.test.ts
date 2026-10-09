@@ -439,7 +439,7 @@ describe("the weekly precedence report", () => {
       [
         `*Button* · library side needs the fix · <https://github.com/${REPO}/blob/main/Button.md|code> · <https://www.figma.com/design/${FILE_KEY}?node-id=1-1|Figma>`,
         '• code has `size="xs"`, the library doesn\'t',
-        "Approving adds it to the DS precedence intake for the week of Sep 28, filing the intake if this is the week's first.",
+        "Approving adds it to the DS precedence intake for the week of Sep 28, filing the intake if this is the week's first. Needs changes puts your note on the intake instead, for a library that is right or a difference that is deliberate.",
       ].join("\n"),
     );
     passesChecklist(text);

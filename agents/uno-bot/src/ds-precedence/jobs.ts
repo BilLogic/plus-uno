@@ -14,7 +14,8 @@
 //     card per component, each its own proposal (`itemProposal`), decided by
 //     the channel's members — read now — for six days. A card's Approve runs
 //     `ds_precedence_intake` (`./intake.ts`), which files the week's intake or
-//     comments on it; its Reject leaves the difference as deliberate. Nothing
+//     comments on it; its Needs changes writes a dispute there
+//     (`./dispute.ts`); its Reject leaves the difference as deliberate. Nothing
 //     is typed, and a turn that would change a card is told to use its Review
 //     (`refuseRevision`).
 //     At most ten cards a morning, the carousel's limit: the rest, and any

@@ -9,6 +9,9 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { postMessage, updateMessage } from "../slack/api";
+import { REVIEW_ONLY_POST } from "../slack/gate-note";
+import type { SlackMessageEvent } from "../slack/types";
+import { typedEmojiDecision } from "../gate/reactions";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import type { PendingProposal } from "../thread-state/index";
@@ -128,6 +131,37 @@ export async function isWeeklyPrecedenceThread(env: Env, channel: string, thread
   if (!env.HARNESS_KV || channel !== env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()) return false;
   const thread = await threadRecord(env, threadTs).read();
   return !!thread && thread.channel === channel && thread.ts === threadTs;
+}
+
+/**
+ * Whether a message could be a typed gate emoji in a weekly report's thread:
+ * a person's whole-message ✅ or ⛔ in a #plus-universal thread. Reads
+ * nothing; `replyHandlerAt` then checks the thread.
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ */
+export function isPrecedenceGateCandidate(env: Env, event: SlackMessageEvent): boolean {
+  const channel = env.PLUS_UNIVERSAL_CHANNEL_ID?.trim();
+  if (!channel || event.channel !== channel || !event.thread_ts || !env.HARNESS_KV) return false;
+  if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
+  return typedEmojiDecision(event.text ?? "") !== null;
+}
+
+/**
+ * A typed ✅ or ⛔ in a weekly report's thread, ahead of the turn: each card
+ * is decided in its own Review, so it gets the shared review-only line and
+ * runs nothing, and no turn starts.
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ * @returns Whether it was one, answered
+ */
+export async function handlePrecedenceGateReply(env: Env, event: SlackMessageEvent): Promise<boolean> {
+  if (!isPrecedenceGateCandidate(env, event)) return false;
+  if (!(await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts!))) return false;
+  await postMessage(env, { channel: event.channel, thread_ts: event.thread_ts!, text: REVIEW_ONLY_POST });
+  return true;
 }
 
 /**
