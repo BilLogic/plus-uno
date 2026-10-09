@@ -548,8 +548,10 @@ export async function readSource(env: Env, url: string, kind: TargetKind): Promi
     };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;
-  // A frame's text only: its pinned comments would be one more call against
-  // the ceiling, kept for nothing, and comment decisions are #900's own read.
+  // A frame's text only: the sweep keeps a source's title and text, never its
+  // comments, so reading them would spend one more call against the ceiling
+  // for nothing — and quoting Figma comments is a requester's turn read, which
+  // a sweep job has no requester for (ADR-031).
   const raw = await executeReadSource(env, { url }, canvas ? { sharedCanvasIds: [canvas] } : undefined, {
     figmaComments: false,
   });
