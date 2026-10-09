@@ -6,57 +6,13 @@
 // change text a human already wrote. In-place replacement (ADR-029) is keyed
 // on one comparison and one request body; both are asserted here.
 //
-// HOW THE FETCH IS INJECTED. `net.ts` captures the real `fetch` at module
-// evaluation and routes every outbound call through it (ADR-022), so the seam
-// is module LOAD order: the stub goes onto `globalThis` at the top of this
-// file, and the integration is imported lazily inside each test, which is what
-// evaluates `net.ts` against the stub. Nothing here touches the real Notion API.
+// The fetch stub is `helpers/notion-fetch-stub.ts`, which says why it is
+// installed once and why the integration is imported lazily. Nothing here
+// touches the real Notion API.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-interface Call {
-  url: string;
-  method: string;
-  body: Record<string, unknown> | null;
-}
-
-type Reply = { status?: number; body: unknown };
-type Routes = Record<string, Reply>;
-
-// ONE dispatcher, installed once, with a swappable routing table.
-//
-// It has to be one: `net.ts` binds the real fetch at ITS first evaluation, and
-// nothing re-evaluates it afterwards, so a second stub installed later would
-// never be reached. Per-test isolation therefore comes from swapping the routes
-// and clearing the log, not from re-installing.
-let routes: Routes = {};
-let calls: Call[] = [];
-
-globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
-  const url = String(input);
-  const method = (init?.method ?? "GET").toUpperCase();
-  const body = typeof init?.body === "string" ? (JSON.parse(init.body) as Record<string, unknown>) : null;
-  calls.push({ url, method, body });
-  const key = Object.keys(routes).find((k) => {
-    const [m, suffix] = k.split(" ");
-    return m === method && url.includes(suffix!);
-  });
-  // An unrouted call is a FAILED test, never a default reply: "the write never
-  // happened" is the assertion in half of these, and a permissive stub would
-  // let a real write slip past it unnoticed.
-  if (!key) throw new Error(`no stub route for ${method} ${url}`);
-  const reply = routes[key]!;
-  return new Response(JSON.stringify(reply.body), {
-    status: reply.status ?? 200,
-    headers: { "content-type": "application/json" },
-  });
-}) as typeof fetch;
-
-/** Point the dispatcher at this test's routes and forget the previous log. */
-function serve(next: Routes): void {
-  routes = next;
-  calls = [];
-}
+import { calls, serve, type Routes } from "./helpers/notion-fetch-stub.js";
 
 /** The integration, loaded lazily so `net.ts` evaluates against the stub above
  *  rather than against the real fetch. */

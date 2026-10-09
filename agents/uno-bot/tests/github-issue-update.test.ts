@@ -211,10 +211,14 @@ test("close carries its reason, after the comment that explains it", async () =>
 
 test("labels are added and removed in the repo's own spelling", async () => {
   const github = fakeGithub();
-  const { deps: d } = deps(github);
+  const { deps: d, posted } = deps(github);
   const result = parse(
     await updateGithubIssue({ issue_number: 688, add_labels: ["enhancement"], remove_labels: ["bug"] }, d),
   );
+  // The thread hears what changed.
+  assert.equal(posted.length, 1);
+  assert.match(posted[0]!, /added label `enhancement`/);
+  assert.match(posted[0]!, /removed label `bug`/);
   assert.equal(result.ok, true, String(result.error));
   assert.deepEqual(
     github.steps.map(({ repo: _repo, ...s }) => s),

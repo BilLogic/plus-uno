@@ -430,5 +430,5 @@ export function labelsOf(proposal: PendingProposal, keys: Iterable<string>): str
 
 /** The card's line for an approved edit: who changed which fields. */
 export function editedNote(userId: string, edited: readonly string[]): string {
-  return `:pencil2: <@${userId}> edited ${edited.join(", ")}`;
+  return `<@${userId}> edited ${edited.join(", ")}`;
 }

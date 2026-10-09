@@ -73,12 +73,23 @@ export function issueUpdateFromInput(input: Record<string, unknown>): IssueUpdat
 export function describeIssueUpdate(update: IssueUpdate): string[] {
   const steps: string[] = [];
   if (update.comment) steps.push("comment");
-  if (update.addLabels.length) steps.push(`add ${plural("label", update.addLabels)} ${codeList(update.addLabels)}`);
-  if (update.removeLabels.length) {
-    steps.push(`remove ${plural("label", update.removeLabels)} ${codeList(update.removeLabels)}`);
-  }
+  if (update.addLabels.length) steps.push(labelStep("add", update.addLabels));
+  if (update.removeLabels.length) steps.push(labelStep("remove", update.removeLabels));
   if (update.state) steps.push(stateWords(update.state));
   return steps;
+}
+
+/** A label change as a step: "add label `bug`", "remove labels `a`, `b`". */
+export function labelStep(verb: "add" | "remove", labels: readonly string[]): string {
+  return `${verb} ${plural("label", labels)} ${codeList(labels)}`;
+}
+
+/** A step once it has run, for the thread: "comment" → "commented", "add
+ *  label `bug`" → "added label `bug`", "close as completed" → "closed as
+ *  completed". The success line and a part-way failure both say it this way. */
+export function pastTense(step: string): string {
+  if (step === "comment") return "commented";
+  return step.replace(/^(add|remove|reopen|close)\b/, (verb) => (verb.endsWith("e") ? `${verb}d` : `${verb}ed`));
 }
 
 export function stateWords(state: IssueStateChange): string {
