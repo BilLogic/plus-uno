@@ -165,7 +165,7 @@ test("cards beneath the answer hold it to the same budget", async () => {
 // The harness judge hands the draft back unchanged, as a judge that erred or
 // gave a verdict only does.
 
-test("the live r524 shape: list items past the first 3 come out with their headings and rules; the lead, the clause and a middle paragraph stay", async () => {
+test("the live r524 shape beside a table: the whole walk goes with its emptied headings and rules; the lead, the clause and a middle paragraph stay", async () => {
   const prose = [
     "**Clearance is the biggest snag.**",
     "",
@@ -209,10 +209,6 @@ test("the live r524 shape: list items past the first 3 come out with their headi
       "",
       "### 1. Phase: Pre-session",
       "",
-      "* **Scenario: Call-off Request**",
-      `  * **Volume:** call-offs run high: [Initial need](${other(1)}).`,
-      `  * **No swaps:** tutors vacate outright: [Swaps](${other(2)}).`,
-      "",
       "Most of this sits before a first session.",
     ].join("\n"),
   );
@@ -221,17 +217,17 @@ test("the live r524 shape: list items past the first 3 come out with their headi
 test("prose with no blank lines keeps its bold lead and its closing clause", async () => {
   const prose = ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), item(5), CLAUSE].join("\n");
   const { text } = await turn(prose);
-  assert.equal(text, ["**Clearance is the biggest snag.**", item(1), item(2), item(3), CLAUSE].join("\n"));
+  assert.equal(text, ["**Clearance is the biggest snag.**", CLAUSE].join("\n"));
 });
 
 test("a list item carrying the confidence clause stays, wherever it falls", async () => {
   const last = `- [Pain point 5](${cell(5)}) is the newest; ${CLAUSE}`;
   const prose = ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), last].join("\n");
   const { text } = await turn(prose);
-  assert.equal(text, ["**Clearance is the biggest snag.**", item(1), item(2), item(3), last].join("\n"));
+  assert.equal(text, ["**Clearance is the biggest snag.**", last].join("\n"));
 });
 
-test("a heading or an intro over a list the backstop emptied goes with it; one over a list that survives stays", async () => {
+test("a heading or an intro over a list the backstop emptied goes with it, the confidence clause after it notwithstanding", async () => {
   const prose = [
     "**Clearance is the biggest snag.**",
     "",
@@ -251,11 +247,11 @@ test("a heading or an intro over a list the backstop emptied goes with it; one o
   const { text } = await turn(prose);
   assert.equal(
     text,
-    ["**Clearance is the biggest snag.**", "", "### By scenario", item(1), item(2), item(3), "", CLAUSE].join("\n"),
+    ["**Clearance is the biggest snag.**", "", CLAUSE].join("\n"),
   );
 });
 
-test("the Roadmap preset, which carries no takeaway, is held to 3 items the same way", async () => {
+test("the Roadmap preset, which carries no takeaway, loses its walk the same way", async () => {
   const cards = Array.from({ length: 5 }, (_, i) => ({
     title: `Card ${i + 1}`,
     url: `https://www.notion.so/card-${i + 1}`,
@@ -270,7 +266,26 @@ test("the Roadmap preset, which carries no takeaway, is held to 3 items the same
     result: JSON.stringify({ ok: true, filters: { design_status: "WIP" }, count: 5, matched: 5, cards }),
     present: null,
   });
-  assert.equal(text, ["**Five cards are in WIP.**", card(1), card(2), card(3)].join("\n"));
+  assert.equal(text, "**Five cards are in WIP.**");
+});
+
+test("beside cards alone, the first 3 top-level items stay, each with what is nested in it", async () => {
+  const prose = [
+    "**Clearance is the biggest snag.**",
+    "- **Group A**",
+    item(1, cell(1), "  "),
+    item(2, cell(2), "  "),
+    "- **Group B**",
+    item(3, cell(3), "  "),
+    item(4),
+    item(5),
+    CLAUSE,
+  ].join("\n");
+  const { text } = await turn(prose, { present: { shape: "cards", lookup: "search_blueprint", columns: ["title"] } });
+  assert.equal(
+    text,
+    ["**Clearance is the biggest snag.**", "- **Group A**", item(1, cell(1), "  "), item(2, cell(2), "  "), "- **Group B**", item(3, cell(3), "  "), item(4), CLAUSE].join("\n"),
+  );
 });
 
 test("with no list item to take out, the prose stands as written", async () => {

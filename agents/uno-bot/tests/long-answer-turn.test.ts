@@ -117,14 +117,57 @@ test("a typed table and a code block are not prose: neither counts toward the le
 
 // ── The backstop ────────────────────────────────────────────────────────────
 
-test("the backstop: list items past the first 3 come out; the lead, the typed table and the clause stay", async () => {
+test("the backstop beside a table takes the whole walk out: the lead, the typed table and the clause stay", async () => {
   const prose = [LEAD, "", ...walk(4), ...TABLE, "", CLAUSE].join("\n");
   const { text } = await turn(prose);
+  assert.equal(text, [LEAD, "", ...TABLE, "", CLAUSE].join("\n"));
+});
 
-  const [first] = walk(4, "and the reason runs on, because the blueprint records it at length. ".repeat(3)).slice(2, 3);
-  assert.ok(text.startsWith(`${LEAD}\n\n### Phase 1\n\n${first}`));
-  assert.equal((text.match(/^\s*\* /gm) ?? []).length, 3, "three list items");
-  for (const line of TABLE) if (line) assert.ok(text.includes(line), `the typed table stays: ${line}`);
-  assert.ok(text.endsWith(CLAUSE));
-  assert.doesNotMatch(text, /### Phase 2/, "a heading over an emptied list goes");
+test("the live r526 shape: phase labels over 3-level bullets, then a typed table, posts as lead, table and freshness line", async () => {
+  const prose = [
+    LEAD,
+    "",
+    "Here is the breakdown by phase:",
+    "",
+    "Phase: Onboarding",
+    "* **Scenario: Session Sign Up**",
+    "  * **Hard onboarding gate**",
+    `    * [Review scheduling](${cell(201)}): scheduling stays locked until the last module is done.`,
+    "Phase: Pre-session",
+    "* **Scenario: Call-off Request**",
+    "  * **Late call-offs**",
+    `    * [Files late call-off](${cell(202)}): the tutor leaves the roster at once.`,
+    `    * [Supervisor review](${cell(203)}): the excuse waits on a supervisor.`,
+    "Phase: Post-session",
+    "* **Scenario: Reporting Hours**",
+    "  * **Disconnected payroll**",
+    `    * [Miss reporting deadline](${cell(204)}): hours never reach Workday.`,
+    "",
+    ...TABLE,
+    "",
+    CLAUSE,
+  ].join("\n");
+  const { text } = await turn(prose);
+  assert.equal(text, [LEAD, "", ...TABLE, "", CLAUSE].join("\n"));
+});
+
+test("a paragraph between the lists stays, and a heading over it keeps its place", async () => {
+  const prose = [
+    LEAD,
+    "",
+    "### Why it matters",
+    "* **Scenario 1**",
+    ...[301, 302, 303, 304].map((n) => `  * [Finding ${n}](${cell(n)}): one of four.`),
+    "",
+    "Most of this sits before a first session, so fix onboarding first.",
+    "",
+    ...TABLE,
+    "",
+    CLAUSE,
+  ].join("\n");
+  const { text } = await turn(prose);
+  assert.equal(
+    text,
+    [LEAD, "", "### Why it matters", "", "Most of this sits before a first session, so fix onboarding first.", "", ...TABLE, "", CLAUSE].join("\n"),
+  );
 });
