@@ -24,6 +24,10 @@ import { modelCaptureDetector } from "../../src/sweep/capture-detector";
 import type { EditedRecordRow, RecordComment } from "../../src/sweep/records";
 import type { SearchHit } from "../../src/sweep/search";
 import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
+import { recordProposalEvents, stagedEvent, supersededEvents } from "../../src/usage/index";
+import type { InMemoryFigma } from "../../src/figma/in-memory";
+import { modelDecisionDetector } from "../../src/figma-comments/detector";
+import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
 
 export const DESIGN = "C0DESIGN";
 export const UNIVERSAL = "C0UNIVERSAL";
@@ -151,6 +155,20 @@ export interface SweepHarness {
   sourceReads: string[];
   /** Every search, as `notion <query>` or `github <query>`. */
   searches: string[];
+  /** The Figma comment jobs' own records, when `figma` is wired. */
+  figma: FigmaRecords;
+}
+
+/** What the Figma comment jobs keep, in memory. */
+export interface FigmaRecords {
+  queue: Map<string, QueuedFile>;
+  carded: Set<string>;
+  misc: { files: string[]; at: number } | null;
+  threads: Map<string, DecisionThread>;
+  /** Every message the post sent to #plus-design, in order; `edited` holds a later edit. */
+  messages: Array<{ ts: string; text: string; threadTs: string | null; blocks?: unknown[]; edited?: string }>;
+  /** Every KV note prefix listed, in order. */
+  listed: string[];
 }
 
 export function sweepHarness(opts: {
@@ -187,6 +205,17 @@ export function sweepHarness(opts: {
     comments?: Record<string, RecordComment[]>;
     /** Rows per query page; 25 unless set. */
     pageSize?: number;
+  };
+  /** The Figma comment jobs: the shared fake Figma, the route's KV notes, the
+   *  Roadmap's cards by number, and #plus-design's members (null when they
+   *  cannot be read). The detector answers from the same recorded replies.
+   *  Unset, those jobs skip. */
+  figma?: {
+    client: InMemoryFigma;
+    notes?: Array<{ key: string; at: string | null }>;
+    cards?: Record<number, { url: string; title: string }>;
+    miscTeamId?: string;
+    members?: string[] | null;
   };
 }): SweepHarness {
   const clock = { now: opts.now };
@@ -245,6 +274,65 @@ export function sweepHarness(opts: {
   const sourceReads: string[] = [];
   const searches: string[] = [];
   let nextTs = 0;
+  const figmaRecords: FigmaRecords = { queue: new Map(), carded: new Set(), misc: null, threads: new Map(), messages: [], listed: [] };
+  const figmaComments: SweepFigmaComments | undefined = opts.figma
+    ? {
+        figma: opts.figma.client,
+        notes: {
+          async list(prefix) {
+            figmaRecords.listed.push(prefix);
+            return (opts.figma!.notes ?? []).filter((n) => n.key.startsWith(prefix));
+          },
+        },
+        async card(number) {
+          return opts.figma!.cards?.[number] ?? null;
+        },
+        detector: modelDecisionDetector(provider),
+        ...(opts.figma.miscTeamId ? { miscTeamId: opts.figma.miscTeamId } : {}),
+        queue: {
+          list: async () => [...figmaRecords.queue.values()].map((f) => structuredClone(f)),
+          read: async (fileKey) => structuredClone(figmaRecords.queue.get(fileKey) ?? null),
+          write: async (file) => void figmaRecords.queue.set(file.fileKey, structuredClone(file)),
+          remove: async (fileKey) => void figmaRecords.queue.delete(fileKey),
+        },
+        carded: {
+          has: async (id) => figmaRecords.carded.has(id),
+          add: async (ids) => ids.forEach((id) => figmaRecords.carded.add(id)),
+        },
+        misc: {
+          read: async () => structuredClone(figmaRecords.misc),
+          write: async (value) => void (figmaRecords.misc = structuredClone(value)),
+        },
+        slack: {
+          channel: DESIGN,
+          async post(message) {
+            once("post");
+            nextTs += 1;
+            const ts = `${Math.floor(clock.now / 1000)}.${String(800000 + nextTs)}`;
+            figmaRecords.messages.push({ ts, text: message.text, threadTs: message.thread_ts ?? null, ...(message.blocks ? { blocks: message.blocks } : {}) });
+            return { ok: true, ts };
+          },
+          async edit(ts, message) {
+            const m = figmaRecords.messages.find((x) => x.ts === ts);
+            if (m) m.edited = message.text;
+          },
+          members: async () => (opts.figma!.members === undefined ? [] : opts.figma!.members),
+          async stage(proposal) {
+            once("stage");
+            staged.push(proposal);
+            const { retired } = await threadState.putProposal(proposal);
+            await recordProposalEvents(proposalEvents, [
+              ...supersededEvents(retired, clock.now, "worker"),
+              stagedEvent({ proposal, at: clock.now, via: "worker", channelStored: true }),
+            ]);
+          },
+        },
+        threads: {
+          read: async (ts) => structuredClone(figmaRecords.threads.get(ts) ?? null),
+          write: async (thread) => void figmaRecords.threads.set(thread.ts, structuredClone(thread)),
+        },
+      }
+    : undefined;
 
   const deps: SweepDeps = {
     slack: {
@@ -325,6 +413,7 @@ export function sweepHarness(opts: {
           },
         }
       : {}),
+    ...(figmaComments ? { figmaComments } : {}),
     store: faultyStore,
     delivery: {
       render(card) {
@@ -417,6 +506,7 @@ export function sweepHarness(opts: {
     unknownSearches,
     sourceReads,
     searches,
+    figma: figmaRecords,
   };
 }
 

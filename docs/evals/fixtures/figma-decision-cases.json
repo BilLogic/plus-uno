@@ -1,0 +1,180 @@
+{
+  "_readme": "Eval cases for uno-bot's Figma comment-decision detector (agents/uno-bot/src/figma-comments/detector.ts, #900). Each case is one file's comment threads under Specs or For Review, the cards its title names, the card's PRD, the detector reply recorded for it, and what the parse must keep. agents/uno-bot/tests/figma-comments.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The shapes to tell apart: a settled behaviour rule (PRD: a new line under its section, or a rewrite of the block that states the old rule), a status decision (a card field), a design-system decision (an intake), and a visual detail or an open question (nothing). Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
+  "cases": [
+    {
+      "id": "FD1",
+      "name": "a resolved behaviour rule the PRD does not state yet: one line under its section",
+      "judgeNote": "Sarah's comment, agreed by Meryem and resolved, settles a behaviour rule: the progress bar stays hidden until the first goal is set. The PRD's Goal states section says nothing of it, so the rule is added after that section's last block (b-goal-2), in the PRD's voice.",
+      "input": {
+        "file": { "title": "Goal Setting / Card 2482 / Sarah", "url": "https://www.figma.com/design/GoalFile1" },
+        "threads": [
+          {
+            "id": "c1",
+            "section": "Specs",
+            "page": "Goal states",
+            "layer": "Empty state",
+            "resolved": true,
+            "comments": [
+              { "by": "sarah", "at": "2026-09-29T15:00:00Z", "text": "Keep the progress bar hidden until the first goal is set" },
+              { "by": "meryem", "at": "2026-09-29T16:00:00Z", "text": "Agreed, let's do that." }
+            ]
+          }
+        ],
+        "cards": [
+          { "number": 2482, "title": "Goal Setting", "url": "https://www.notion.so/24820000000000000000000000000001", "fields": { "Design Status": "WIP", "Dev Status": "Not started", "Contributor": "Meryem" } }
+        ],
+        "prd": {
+          "url": "https://www.notion.so/24820000000000000000000000000002",
+          "kind": "notion",
+          "writable": true,
+          "title": "PRD",
+          "blocks": [
+            { "id": "h-goal", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Goal states", "type": "heading_2" },
+            { "id": "b-goal-1", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Goals are set by tutors in the first session.", "type": "paragraph" },
+            { "id": "b-goal-2", "lastEditedTime": "2026-09-02T10:00:00.000Z", "text": "A goal can be edited until the session ends.", "type": "paragraph" },
+            { "id": "h-scope", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Out of scope", "type": "heading_2" },
+            { "id": "b-scope-1", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Sharing goals with parents.", "type": "paragraph" }
+          ],
+          "text": "Goal states\nGoals are set by tutors in the first session.\nA goal can be edited until the session ends.\nOut of scope\nSharing goals with parents.",
+          "pillars": [],
+          "contributors": []
+        }
+      },
+      "recording": {
+        "source": "authored",
+        "reply": "{\"decisions\":[{\"thread_id\":\"c1\",\"route\":\"prd\",\"decision\":\"The progress bar stays hidden until the first goal is set.\",\"section_block_id\":\"h-goal\",\"text\":\"The progress bar stays hidden until the first goal is set.\",\"confidence\":0.9}]}"
+      },
+      "expect": {
+        "decisions": [
+          { "threadId": "c1", "route": "prd", "prd": { "kind": "add", "anchorId": "b-goal-2", "anchorEditedTime": "2026-09-02T10:00:00.000Z", "section": "Goal states", "text": "The progress bar stays hidden until the first goal is set." } }
+        ]
+      }
+    },
+    {
+      "id": "FD2",
+      "name": "a scope change the PRD states the old way: the block rewritten whole",
+      "judgeNote": "The thread decides parents may now see goals, which the PRD's Out of scope block still excludes. The decision rewrites that block (b-scope-1); a reply adding a second contradicting line would leave both readings.",
+      "input": {
+        "file": { "title": "Goal Setting / Card 2482 / Sarah", "url": "https://www.figma.com/design/GoalFile1" },
+        "threads": [
+          {
+            "id": "c2",
+            "section": "For Review",
+            "page": "Parent view",
+            "resolved": true,
+            "comments": [
+              { "by": "bill", "at": "2026-09-29T15:00:00Z", "text": "Decided with the partners: parents can see their child's goals, read-only." }
+            ]
+          }
+        ],
+        "cards": [
+          { "number": 2482, "title": "Goal Setting", "url": "https://www.notion.so/24820000000000000000000000000001", "fields": { "Design Status": "WIP" } }
+        ],
+        "prd": {
+          "url": "https://www.notion.so/24820000000000000000000000000002",
+          "kind": "notion",
+          "writable": true,
+          "title": "PRD",
+          "blocks": [
+            { "id": "h-scope", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Out of scope", "type": "heading_2" },
+            { "id": "b-scope-1", "lastEditedTime": "2026-09-01T10:00:00.000Z", "text": "Sharing goals with parents.", "type": "paragraph" }
+          ],
+          "text": "Out of scope\nSharing goals with parents.",
+          "pillars": [],
+          "contributors": []
+        }
+      },
+      "recording": {
+        "source": "authored",
+        "reply": "{\"decisions\":[{\"thread_id\":\"c2\",\"route\":\"prd\",\"decision\":\"Parents can see their child's goals, read-only.\",\"block_id\":\"b-scope-1\",\"replacement\":\"Editing goals as a parent (parents can see their child's goals, read-only).\",\"confidence\":0.85}]}"
+      },
+      "expect": {
+        "decisions": [
+          { "threadId": "c2", "route": "prd", "prd": { "kind": "change", "blockId": "b-scope-1", "replacement": "Editing goals as a parent (parents can see their child's goals, read-only).", "section": "Out of scope" } }
+        ]
+      }
+    },
+    {
+      "id": "FD3",
+      "name": "a status decision: the card's Design Status, by its own field name",
+      "judgeNote": "Meryem decides the work moves to review. That is the card's status, not a PRD rule: Design Status from WIP to Under Review. The field name matches the card's own field case-insensitively.",
+      "input": {
+        "file": { "title": "Goal Setting / Card 2482 / Sarah", "url": "https://www.figma.com/design/GoalFile1" },
+        "threads": [
+          {
+            "id": "c3",
+            "section": "Specs",
+            "page": "Goal states",
+            "layer": "Progress bar",
+            "resolved": false,
+            "comments": [
+              { "by": "meryem", "at": "2026-09-29T15:30:00Z", "text": "States are all in — moving this card to Under Review today." }
+            ]
+          }
+        ],
+        "cards": [
+          { "number": 2482, "title": "Goal Setting", "url": "https://www.notion.so/24820000000000000000000000000001", "fields": { "Design Status": "WIP", "Dev Status": "Not started" } }
+        ],
+        "prd": null
+      },
+      "recording": {
+        "source": "authored",
+        "reply": "{\"decisions\":[{\"thread_id\":\"c3\",\"route\":\"card\",\"decision\":\"The card moves to Under Review.\",\"card\":2482,\"field\":\"design status\",\"value\":\"Under Review\",\"confidence\":0.88}]}"
+      },
+      "expect": {
+        "decisions": [
+          { "threadId": "c3", "route": "card", "card": { "card": 2482, "field": "Design Status", "from": "WIP", "to": "Under Review" } }
+        ]
+      }
+    },
+    {
+      "id": "FD4",
+      "name": "a design-system decision: an intake, even with no card",
+      "judgeNote": "The thread settles that the goal chip uses the Badge component's pill variant everywhere — a shared component, so a design-system intake. The file has no card, so no other route exists.",
+      "input": {
+        "file": { "title": "Design System (S23)", "url": "https://www.figma.com/design/LibFile1" },
+        "threads": [
+          {
+            "id": "c4",
+            "section": "For Review",
+            "page": "Badges",
+            "resolved": true,
+            "comments": [
+              { "by": "bea", "at": "2026-09-29T17:00:00Z", "text": "Agreed: goal chips use Badge's pill variant everywhere, not the custom chip." }
+            ]
+          }
+        ],
+        "cards": [],
+        "prd": null
+      },
+      "recording": {
+        "source": "authored",
+        "reply": "{\"decisions\":[{\"thread_id\":\"c4\",\"route\":\"design-system\",\"decision\":\"Goal chips use the Badge pill variant everywhere.\",\"title\":\"Goal chips use the Badge pill variant\",\"body\":\"The team agreed in Figma that goal chips use Badge's pill variant everywhere, replacing the custom chip.\",\"confidence\":0.8}]}"
+      },
+      "expect": {
+        "decisions": [
+          { "threadId": "c4", "route": "design-system", "intake": { "title": "Goal chips use the Badge pill variant", "body": "The team agreed in Figma that goal chips use Badge's pill variant everywhere, replacing the custom chip." } }
+        ]
+      }
+    },
+    {
+      "id": "FD5",
+      "name": "a visual detail and an open question: nothing, and a reply that names what was never shown is dropped",
+      "judgeNote": "One thread is about spacing (a visual detail, which stays in Figma) and one is an open question. Neither is a decision. The recorded reply also tries a card route on a file with no card and a PRD block it was never offered; the parse keeps none of it.",
+      "input": {
+        "file": { "title": "Goal Setting / Card 2482 / Sarah", "url": "https://www.figma.com/design/GoalFile1" },
+        "threads": [
+          { "id": "c5", "section": "Specs", "page": "Goal states", "resolved": true, "comments": [{ "by": "sarah", "at": "2026-09-29T15:00:00Z", "text": "Nudge the bar 4px down." }] },
+          { "id": "c6", "section": "Specs", "page": "Goal states", "resolved": false, "comments": [{ "by": "meryem", "at": "2026-09-29T15:10:00Z", "text": "Should the bar animate?" }] }
+        ],
+        "cards": [],
+        "prd": null
+      },
+      "recording": {
+        "source": "authored",
+        "reply": "{\"decisions\":[{\"thread_id\":\"c5\",\"route\":\"none\",\"decision\":\"Spacing.\",\"confidence\":0.9},{\"thread_id\":\"c6\",\"route\":\"card\",\"decision\":\"The bar animates.\",\"card\":2482,\"field\":\"Design Status\",\"value\":\"WIP\",\"confidence\":0.9},{\"thread_id\":\"c6\",\"route\":\"prd\",\"decision\":\"The bar animates.\",\"block_id\":\"b-nowhere\",\"replacement\":\"The bar animates.\",\"confidence\":0.9}]}"
+      },
+      "expect": { "decisions": [] }
+    }
+  ]
+}

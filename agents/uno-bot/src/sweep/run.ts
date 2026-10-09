@@ -113,6 +113,9 @@ import {
 import { MAX_MESSAGE_CHARS, type DriftDetector } from "./detector";
 import type { CaptureDetector } from "./capture-detector";
 import { sweepRecords, type SweepNotion } from "./records";
+import { sweepFigmaComments } from "../figma-comments/read";
+import { postFigmaDecisions } from "../figma-comments/post";
+import type { QueuedFile, SweepFigmaComments } from "../figma-comments/queue";
 import { readUsable, searchGate } from "./surfaces";
 import { findBySearch, looksAnswered, namedThings, questionQuery, type SourceSearch } from "./search";
 import {
@@ -327,6 +330,9 @@ export interface SweepDeps extends Pick<JobContext, "runDate"> {
   /** The running-notes and Roadmap reads (`./records.ts`). Absent, those
    *  two jobs skip. */
   notion?: SweepNotion;
+  /** Figma comment decisions: the night's reads and the morning's posts
+   *  (`../figma-comments/`). Absent, those two jobs skip. */
+  figmaComments?: SweepFigmaComments;
   store: SweepStore;
   delivery: SweepDelivery;
   config: SweepConfig;
@@ -393,7 +399,15 @@ export interface SweepCardReport {
 
 /** What one job came to. */
 export interface SweepJobReport {
-  kind: "sweep-channel" | "sweep-group-dms" | "sweep-dms" | "sweep-post" | "sweep-notes" | "sweep-cards";
+  kind:
+    | "sweep-channel"
+    | "sweep-group-dms"
+    | "sweep-dms"
+    | "sweep-post"
+    | "sweep-notes"
+    | "sweep-cards"
+    | "sweep-figma-comments"
+    | "sweep-figma-post";
   key: string;
   outcome: SweepRunOutcome;
   note: string | null;
@@ -406,6 +420,9 @@ export interface SweepJobReport {
   withheld?: Array<{ id: string; channel: string; channelKind: ChannelKind }>;
   /** Posted this morning — or, on a dry run, what would be. */
   cards: SweepCardReport[];
+  /** The Figma comment jobs: the files whose decisions were kept tonight, or
+   *  posted this morning (`../figma-comments/`). */
+  figmaFiles?: QueuedFile[];
   summary: string;
 }
 
@@ -426,7 +443,11 @@ export async function runSweepJob(job: ScheduledJob, deps: SweepDeps): Promise<S
           ? await sweepDms(job, deps)
           : job.kind === "sweep-notes" || job.kind === "sweep-cards"
             ? await sweepRecords(job, deps)
-            : await sweepChannel(job, deps);
+            : job.kind === "sweep-figma-comments"
+              ? await sweepFigmaComments(job, deps)
+              : job.kind === "sweep-figma-post"
+                ? await postFigmaDecisions(job, deps)
+                : await sweepChannel(job, deps);
   return deps.dryRun ? withheldFromDryRun(report) : report;
 }
 

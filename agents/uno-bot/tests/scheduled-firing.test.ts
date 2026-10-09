@@ -156,6 +156,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
     ["sweep-post", "sweep-post"],
+    // The night's Figma comment decisions, one #plus-design thread per file (#900).
+    ["sweep:figma-post", "sweep-figma-post"],
     ["ds-precedence-post", "ds-precedence-post"],
     ["commitment-nudge", "commitment-nudge"],
     // A live drift question is looked at again before the morning asks anew.
@@ -200,15 +202,18 @@ test("the end-of-day run sweeps each listed channel as its own job, then the gro
   // The sweep jobs go straight before the purge; what the plan holds after it
   // stays after it.
   const purge = jobs.findIndex(([key]) => key === "usage-text-purge");
-  assert.deepEqual(jobs.slice(purge - 6, purge + 1), [
+  assert.deepEqual(jobs.slice(purge - 7, purge + 1), [
     ["sweep:C0DESIGN", "sweep-channel", "C0DESIGN"],
     ["sweep:C0OTHER", "sweep-channel", "C0OTHER"],
     ["sweep:group-dms", "sweep-group-dms", undefined],
     ["sweep:dms", "sweep-dms", undefined],
     ["sweep:notes", "sweep-notes", undefined],
     ["sweep:cards", "sweep-cards", undefined],
+    // Figma comment decisions, a sweep source too, after the backstop (#900).
+    ["sweep:figma-comments", "sweep-figma-comments", undefined],
     ["usage-text-purge", "usage-text-purge", undefined],
   ]);
+  assert.deepEqual(endOfDay.jobs.find((j) => j.kind === "sweep-figma-comments")?.after, ["figma-backstop-3"]);
   assert.deepEqual(jobs.slice(purge + 1).map(([key]) => key), ["proposal-expiry"]);
   // The channels are the end of day's alone: the morning run only posts.
   const morning = planRun("morning", MORNING, ["C0DESIGN"]).jobs;
@@ -230,12 +235,13 @@ test("a firing plans the end-of-day sweep over the channels it was handed", asyn
     },
     sweepChannels: ["C0DESIGN"],
   });
-  assert.deepEqual(runs[0]?.jobs.map((j) => j.key).slice(-7), [
+  assert.deepEqual(runs[0]?.jobs.map((j) => j.key).slice(-8), [
     "sweep:C0DESIGN",
     "sweep:group-dms",
     "sweep:dms",
     "sweep:notes",
     "sweep:cards",
+    "sweep:figma-comments",
     "usage-text-purge",
     "proposal-expiry",
   ]);
