@@ -102,7 +102,12 @@ export interface DecisionThread {
   confirmers: string[];
   /** When its cards lapse, epoch ms. */
   expiresAt: number;
+  /** Each staged decision: its number, and `cardTs`, the key its proposal is
+   *  staged under — its message and its comment id (`itemProposalKey`). */
   decisions: Array<{ n: number; commentId: string; cardTs: string; decision: QueuedDecision }>;
+  /** Cards shown in the thread so far, staged or not: the next card's number
+   *  follows it, so a card that showed and failed is never renumbered onto. */
+  numbered?: number;
 }
 
 /** The night's reads and the morning's posts, as the sweep hands them over. */

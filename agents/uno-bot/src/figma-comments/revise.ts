@@ -39,7 +39,9 @@ import { renderProposalCard } from "../slack/proposal-render";
 import { NEEDS_CHANGES_LEAD } from "../slack/review-door";
 import type { SweepSource } from "../sweep/finding";
 import type { DecisionDetector, ShownCard } from "./detector";
-import { decisionCard, decisionCardBlocks, whichOne } from "./copy";
+import { decisionCard, decisionItem, whichOne } from "./copy";
+import { decisionReportBlocks, decisionReportText } from "../slack/decision-cards";
+import { itemProposalKey } from "../thread-state/index";
 import { commentUrl, draftDecision } from "./draft";
 import { stagedDecision } from "./post";
 import { fieldsOf } from "./read";
@@ -207,19 +209,22 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
   const restore = () => deps.restore({ ...unlocked, ttlMs });
   await deps.retire(old.proposalTs);
   const link = commentUrl(thread.fileKey, revised.nodeId, revised.commentId);
-  const card = renderProposalCard(decisionCard(n, revised, link));
-  const blocks = decisionCardBlocks(n, revised, link, card.text);
-  const sent = await deps.post({ text: card.text, blocks, thread_ts: thread.ts });
+  const text = renderProposalCard(decisionCard(n, revised, link)).text;
+  // The revised card goes up on its own, under the same number.
+  const report = { parent: `Decision ${n}, reworded.`, items: [decisionItem(n, revised, link)] };
+  const blocks = decisionReportBlocks(report);
+  const sent = await deps.post({ text: decisionReportText(report), blocks, thread_ts: thread.ts });
   if (!sent.ok || !sent.ts) {
     console.error(`[figma-comments] the revised card for decision ${n} did not post; the old card is restored`);
     await restore();
     return true;
   }
+  const key = itemProposalKey(sent.ts, revised.commentId);
   try {
-    await deps.stage(stagedDecision(thread, sent.ts, { text: card.text, blocks }, n, revised, ttlMs));
+    await deps.stage(stagedDecision(thread, key, { text, blocks }, n, revised, ttlMs));
     await deps.thread.write({
       ...thread,
-      decisions: thread.decisions.map((d) => (d.n === n ? { ...d, cardTs: sent.ts!, decision: revised! } : d)),
+      decisions: thread.decisions.map((d) => (d.n === n ? { ...d, cardTs: key, decision: revised! } : d)),
     });
   } catch (err) {
     rethrowIfBudget(err);
@@ -230,7 +235,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
       () => true,
       () => false,
     );
-    await deps.retire(sent.ts).catch(() => {});
+    await deps.retire(key).catch(() => {});
     await say(
       restored
         ? `That revised card didn't go through, so decision ${n}'s card before it still stands. Try again from its Review button.`

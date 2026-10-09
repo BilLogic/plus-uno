@@ -1,24 +1,23 @@
-// The words of a comment-decision thread in #plus-design (#886 § 3.5, #900).
+// The words of a comment-decision thread in #plus-design (#886 § 3.5, #900),
+// on the shared decision card (`slack/decision-cards.ts`).
 //
-// The parent names the file and the count, and asks one person to check the
-// drafts. Each decision is a reply of its own, decided from its Review button
-// like every card:
+// The thread opens with one message: a parent line naming the file and the
+// count for its owner, then one card per decision — a carousel when there are
+// several — each with Review and Open comment:
 //
-//   *1 · "Keep the progress bar hidden until the first goal is set"*
-//   sarah on the Specs page, resolved Sep 29 · see comment
-//   • PRD › Goal states: add this rule · page
-//   > The progress bar stays hidden until a goal is set.
-//   ✅ writes it · ⛔ drops it
+//   <@sarah>, 2 comments in Goal Setting read like decisions.
+//   ┌ 1 · Keep the progress bar hidden until the first goal is set
+//   │ sarah · Specs page · resolved Sep 29
+//   │ PRD › Goal states: add this rule. The progress bar stays hidden until…
+//   └ [Review] [Open comment] [Open page]
+//
+// The card is short; the decision's whole text — the quote, who said it where
+// and when, what the write does and every word it writes (the PRD line, the
+// intake's body) — is its proposal's, which Review shows and decides. Nothing
+// on the card or in the text says what to type or react: Review is the gate.
 //
 // Where this goes past § 3.5's example:
 //   • the number, which ties a revision and the thread's record to one card;
-//   • the whole text the write makes under the update line — the PRD line, or
-//     the intake's body — so a ✅ consents to what is written, not to a quote
-//     of the comment. A card past the checklist's 1,500 characters shows a cut
-//     of it in the thread, and the whole of it in its text and in Review;
-//   • "✅ writes it" for one write, "✅ files the intake" for an intake: § 3.5's
-//     "writes both" also counted a Decisions DB row, which this job does not
-//     write;
 //   • the commenter and a file's creator by Figma handle, never mentioned:
 //     nothing maps a Figma person to a Slack one yet.
 // "Read like decisions" admits a judgement call, which invites correction.
@@ -26,47 +25,54 @@
 // PURE.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import { textSections } from "../slack/render";
-import { proposalActionBlocks, proposalCardBlocks } from "../slack/proposal-render";
+import type { DecisionItem } from "../slack/decision-cards";
 import type { StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { dayWords } from "../figma-drift/copy";
 import type { DecisionUpdate } from "./draft";
 import type { FileOwner, QueuedDecision, QueuedFile } from "./queue";
 
-/** A card past this many characters shows a cut of its draft in the thread
- *  (slack.md § Figma messages, checklist 8). */
-export const CARD_CHARS = 1_500;
-/** Characters of the draft a cut card shows. */
-const CUT_DRAFT_CHARS = 600;
+/** The file's name, on one line. */
+function fileName(file: Pick<QueuedFile, "title">): string {
+  return escapeSlackText(file.title.replace(/\s+/g, " ").trim() || "this file");
+}
 
-/** The file's thread opens with this. */
+/**
+ * The thread's parent line: whom it is for, the file and the count, in one
+ * plain sentence.
+ *
+ * @param file - The file
+ * @param count - How many decisions it has, held-back ones included
+ */
 export function decisionParent(file: Pick<QueuedFile, "title" | "url" | "owner">, count: number): string {
-  const title = escapeSlackText(file.title.replace(/\s+/g, " ").trim() || "this file");
-  const head = count === 1 ? `*1 comment in <${file.url}|${title}> reads like a decision*` : `*${count} comments in <${file.url}|${title}> read like decisions*`;
-  return `${head}\n${askOf(file.owner, count)}`;
+  const what = count === 1 ? "1 comment in" : `${count} comments in`;
+  const reads = count === 1 ? "reads like a decision" : "read like decisions";
+  return `${ownerOf(file.owner)}${what} <${file.url}|${fileName(file)}> ${reads}.`;
 }
 
 /** The parent, edited, when none of its cards went up this morning. */
 export function decisionParentWaiting(file: Pick<QueuedFile, "title" | "url">): string {
-  const title = escapeSlackText(file.title.replace(/\s+/g, " ").trim() || "this file");
-  return `*Comments in <${file.url}|${title}> read like decisions*\nTheir cards didn't go through this morning, so they'll post here tomorrow morning.`;
+  return `Comments in <${file.url}|${fileName(file)}> read like decisions. Their cards didn't go through this morning, so they'll post here tomorrow morning.`;
 }
 
-function askOf(owner: FileOwner | null, count: number): string {
-  const what = count === 1 ? "the update I've drafted below" : "the updates I've drafted below";
-  if (owner && "slack" in owner) return `<@${owner.slack}>, can you check ${what}?`;
-  if (owner) return `${escapeSlackText(owner.figma)}, can you check ${what}?`;
-  return `Can someone on the card check ${what}?`;
+/** Whom the parent is for: the owner by Slack mention, else by Figma handle. */
+function ownerOf(owner: FileOwner | null): string {
+  if (owner && "slack" in owner) return `<@${owner.slack}>, `;
+  if (owner) return `${escapeSlackText(owner.figma)}, `;
+  return "";
+}
+
+/** When the comment was resolved or made. */
+function whenWords(d: Pick<QueuedDecision, "resolvedAt" | "createdAt">): string {
+  return d.resolvedAt ? `resolved ${dayWords(Date.parse(d.resolvedAt))}` : `commented ${dayWords(Date.parse(d.createdAt))}`;
 }
 
 /** Who said it, where and when, and the comment's link. */
 function saidLine(d: Pick<QueuedDecision, "by" | "section" | "resolvedAt" | "createdAt">, commentUrl: string): string {
-  const when = d.resolvedAt ? `resolved ${dayWords(Date.parse(d.resolvedAt))}` : `commented ${dayWords(Date.parse(d.createdAt))}`;
-  return `${escapeSlackText(d.by)} on the ${d.section} page, ${when} · <${commentUrl}|see comment>`;
+  return `${escapeSlackText(d.by)} on the ${d.section} page, ${whenWords(d)} · <${commentUrl}|see comment>`;
 }
 
-/** The reply's lead: the quote, who said it where and when, and what the ✅ writes. */
+/** The decision's lead: the quote, who said it where and when, and what the write does. */
 export function decisionLead(
   n: number,
   d: Pick<QueuedDecision, "quote" | "by" | "section" | "resolvedAt" | "createdAt" | "update">,
@@ -75,7 +81,7 @@ export function decisionLead(
   return [`*${n} · "${escapeSlackText(d.quote)}"*`, saidLine(d, commentUrl), `• ${updateLine(d.update)}`].join("\n");
 }
 
-/** What the ✅ writes, in one line. */
+/** What the write does, in one line. */
 export function updateLine(u: DecisionUpdate): string {
   if (u.kind === "card") {
     const change = u.from ? `${escapeSlackText(u.from)} → ${escapeSlackText(u.to)}` : `set to ${escapeSlackText(u.to)}`;
@@ -85,6 +91,14 @@ export function updateLine(u: DecisionUpdate): string {
   if (u.kind === "no-prd") return u.card === null ? "*PRD:* none found" : `*PRD:* none found under Card ${u.card}`;
   const where = u.section ? `PRD › ${escapeSlackText(u.section)}` : "PRD";
   return `*${where}:* ${u.change === "add" ? "add this rule" : "change this rule"} · <${u.page.url}|page>`;
+}
+
+/** What the write does, plain, for a card's body: no markup, no link. */
+function updateWords(u: DecisionUpdate): string {
+  if (u.kind === "card") return `Card ${u.card} › ${u.field}: ${u.from ? `${u.from} → ${u.to}` : `set to ${u.to}`}`;
+  if (u.kind === "intake") return `Intake: "${u.title}"`;
+  if (u.kind === "no-prd") return u.card === null ? "PRD: none found" : `PRD: none found under Card ${u.card}`;
+  return `${u.section ? `PRD › ${u.section}` : "PRD"}: ${u.change === "add" ? "add this rule" : "change this rule"}`;
 }
 
 /** The whole text a decision's write makes — a PRD line, or an intake's body — or null for a card field. */
@@ -102,20 +116,15 @@ function quoted(text: string): string {
     .join("\n");
 }
 
-/** The drafted words, quoted whole under the update so the ✅ sees them. */
+/** The drafted words, quoted whole under the update, so Review shows them. */
 export function draftedWords(d: Pick<QueuedDecision, "operation">): string | null {
   const text = draftedText(d);
   return text ? quoted(text) : null;
 }
 
-/** The card's one footer: what ✅ and ⛔ do. */
-export function decisionFooter(route: QueuedDecision["route"]): string {
-  const yes = route === "design-system" ? ":white_check_mark: files the intake" : ":white_check_mark: writes it";
-  return `${yes} · :no_entry: drops it`;
-}
-
 /**
- * One decision as a `stated` card. Its text carries the whole draft.
+ * One decision as the proposal Review shows and decides: its whole text, and
+ * no footer — the card's Review is the only instruction.
  *
  * @param n - Its number in the thread
  * @param d - The decision
@@ -127,7 +136,7 @@ export function decisionCard(n: number, d: QueuedDecision, commentUrl: string): 
     kind: "stated",
     verb: d.route === "design-system" ? "file this intake" : "write this decision",
     lead: drafted ? `${decisionLead(n, d, commentUrl)}\n${drafted}` : decisionLead(n, d, commentUrl),
-    footer: decisionFooter(d.route),
+    footer: "",
     fields: [],
     caveats: [],
     operations: d.operation ? [d.operation] : [],
@@ -135,29 +144,25 @@ export function decisionCard(n: number, d: QueuedDecision, commentUrl: string): 
 }
 
 /**
- * What a decision card posts as: its whole text, and the blocks the thread
- * shows. A card within `CARD_CHARS` shows its text whole; a longer one shows
- * its lead, the start of the draft and where the rest is, so the thread stays
- * readable — the text, which is the notification and what is staged, keeps
- * every word, and Review shows the whole write.
+ * One decision as its card in the thread's carousel: the quote, who said it
+ * where and when, what the write does and the start of what it writes. Open
+ * goes to the comment, and a PRD or card decision's page is the third button.
  *
  * @param n - Its number in the thread
- * @param d - The decision
+ * @param d - A decision with an operation
  * @param commentUrl - Its comment's link
- * @param text - The card's rendered text
  */
-export function decisionCardBlocks(n: number, d: QueuedDecision, commentUrl: string, text: string): unknown[] {
-  if (text.length <= CARD_CHARS) return proposalCardBlocks(text);
-  const draft = draftedText(d) ?? "";
-  const cut = draft.length > CUT_DRAFT_CHARS ? `${draft.slice(0, CUT_DRAFT_CHARS - 1).trimEnd()}…` : draft;
-  const short = [
-    decisionLead(n, d, commentUrl),
-    ...(cut ? [quoted(cut)] : []),
-    `_The whole text, ${draft.length.toLocaleString("en-US")} characters, is in Review._`,
-    "",
-    decisionFooter(d.route),
-  ].join("\n");
-  return [...textSections(short), ...proposalActionBlocks()];
+export function decisionItem(n: number, d: QueuedDecision, commentUrl: string): DecisionItem {
+  const drafted = draftedText(d);
+  const target = d.update.kind === "prd" ? { label: "Open page", url: d.update.page.url } : d.update.kind === "card" ? { label: "Open card", url: d.update.url } : null;
+  return {
+    id: d.commentId,
+    title: `${n} · ${d.quote}`,
+    subtitle: `${escapeSlackText(d.by)} · ${d.section} page · ${whenWords(d)}`,
+    body: drafted ? `${updateWords(d.update)}. ${drafted}` : updateWords(d.update),
+    open: { label: "Open comment", url: commentUrl },
+    ...(target ? { also: target } : {}),
+  };
 }
 
 /**

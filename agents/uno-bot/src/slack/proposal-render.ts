@@ -493,8 +493,10 @@ function statedText(card: ProposalCard): string {
   const lead = cardLead(card);
   if (lead) lines.push(lead, "");
   for (const caveat of card.caveats) lines.push(caveatText(caveat));
-  lines.push(card.footer ?? CONFIRM_FOOTER);
-  return lines.join("\n");
+  // An empty footer is a card with none: an item of a decision report, whose
+  // Review is its only instruction (`decision-cards.ts`).
+  if (card.footer !== "") lines.push(card.footer ?? CONFIRM_FOOTER);
+  return lines.join("\n").trimEnd();
 }
 
 function targetWords(target: { title: string; parent?: string }): string {

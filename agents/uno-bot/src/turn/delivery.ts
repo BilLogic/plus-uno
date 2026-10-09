@@ -214,6 +214,9 @@ export interface ProposalCard {
    * ✅ runs — "files the intake and drafts the code for Button and Badge" is
    * two operations, both said. That is the consent the plan exists for, kept
    * in words a person reads in one line.
+   *
+   * Empty on an item of a decision report: its card's Review is the only
+   * instruction, and the text is what the pop-up shows.
    */
   footer?: string;
   /** What one ✅ does, in the GATED ROW's own words (`agent/tool-table.ts`

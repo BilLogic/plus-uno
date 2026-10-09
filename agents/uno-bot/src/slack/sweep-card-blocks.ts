@@ -22,15 +22,12 @@ import type { CardFix, CardFixes } from "../turn/index";
 import { carouselOf, logoFor } from "./answer-cards-block";
 import { textSections } from "./render";
 import { foldedBox } from "./sources-box";
+// Slack's limits on a card's words, and a carousel's cards (also a box's
+// children), as the shared decision card holds them.
+import { CARD_BODY_CHARS as BODY_CHARS, CARD_TITLE_CHARS as TITLE_CHARS, MAX_REPORT_ITEMS as MAX_FIXES } from "./decision-cards";
 
 /** The closed box's title. */
 export const FIX_DETAIL_TITLE = "Page says / thread says";
-
-/** Slack's limits on a card's words. */
-const TITLE_CHARS = 150;
-const BODY_CHARS = 200;
-/** A carousel's cards, and a box's children. */
-const MAX_FIXES = 10;
 
 const clip = (s: string, max: number): string => (s.length <= max ? s : `${s.slice(0, max - 1)}…`);
 const plain = (text: string) => ({ type: "plain_text", text });
