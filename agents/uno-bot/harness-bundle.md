@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,439 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,903 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,444 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,908 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1471,7 +1471,8 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 In a thread uno-bot entered through a sweep report, it answers a reply only when the reply is addressed to it: an @mention, or a typed ✅ or ⛔, which decides nothing and points at Review. The rest is the thread's own conversation. The report and the sweep's notes carry the sweep's tag, and none of them makes the thread uno-bot's conversation.
 
 - **Every fix is decided in its own Review:** Approve · Needs changes · Reject, sent with Submit. A typed emoji, a typed number and your `proposal_resolve` decide no fix.
-- **A fix is the page's text as the thread settled it,** so it is decided as drafted. A batch you stage that touches a fix's block is refused with that line; say so, and point at Reject with what they want instead, or at editing the page.
+- **Needs changes revises one fix in place.** Its note reaches you as "Needs changes on the proposal card above: …"; restage that fix's own `notion_update` with the line narrowed or reworded as the note asks — the same block, the same `last_edited_time`, a `replace` only. The revision takes the fix's card in the report under the same number, for the time the fix had left. A batch reaching another block, moving the stamp, or adding a line is refused and the fix stays as drafted. A fix that adds an answer is decided as drafted: Reject it with what it should say.
+- **A reply in the thread that would change a fix** is pointed at that fix's Review and its Needs changes; nothing is staged beside it.
 
 Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its report posted is one that expired.
 

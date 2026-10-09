@@ -66,7 +66,8 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 In a thread uno-bot entered through a sweep report, it answers a reply only when the reply is addressed to it: an @mention, or a typed ✅ or ⛔, which decides nothing and points at Review. The rest is the thread's own conversation. The report and the sweep's notes carry the sweep's tag, and none of them makes the thread uno-bot's conversation.
 
 - **Every fix is decided in its own Review:** Approve · Needs changes · Reject, sent with Submit. A typed emoji, a typed number and your `proposal_resolve` decide no fix.
-- **A fix is the page's text as the thread settled it,** so it is decided as drafted. A batch you stage that touches a fix's block is refused with that line; say so, and point at Reject with what they want instead, or at editing the page.
+- **Needs changes revises one fix in place.** Its note reaches you as "Needs changes on the proposal card above: …"; restage that fix's own `notion_update` with the line narrowed or reworded as the note asks — the same block, the same `last_edited_time`, a `replace` only. The revision takes the fix's card in the report under the same number, for the time the fix had left. A batch reaching another block, moving the stamp, or adding a line is refused and the fix stays as drafted. A fix that adds an answer is decided as drafted: Reject it with what it should say.
+- **A reply in the thread that would change a fix** is pointed at that fix's Review and its Needs changes; nothing is staged beside it.
 
 Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its report posted is one that expired.
 

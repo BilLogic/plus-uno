@@ -148,7 +148,8 @@ export async function recordSweepRevision(
     if (stillThere.has(item.blockId)) {
       // The revision keeps the card's deadline (`turn.ts`), so the item keeps
       // its posted time: the morning's liveness check reads the same deadline.
-      await store.updateItem(item.itemId, { proposalTs: revision.proposalTs });
+      // A report's fix revised in place stays on the report's message.
+      await store.updateItem(item.itemId, { proposalTs: cardTsOf(revision) });
       kept += 1;
     } else {
       await store.updateItem(item.itemId, { status: "dropped", resolvedAt: now });

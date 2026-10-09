@@ -245,6 +245,22 @@ test("a Reject drops its own item and no other", async () => {
   );
 });
 
+test("a fix revised in place keeps its item on the report, and the revision's Reject drops only it", async () => {
+  const { h, fixes } = await stagedReport(2);
+  const fix = fixes[0]!;
+  const op = fix.operations![0]!;
+  const reworded = { ...op, input: { ...op.input, replace: [{ ...(op.input.replace as Array<Record<string, unknown>>)[0]!, content: "Line 0, reworded" }] } };
+  const revision: PendingProposal = { ...fix, operations: [reworded], proposalTs: `${fix.item!.messageTs}#${fix.item!.id}~1`, item: { messageTs: fix.item!.messageTs, id: `${fix.item!.id}~1` } };
+  assert.deepEqual(await recordSweepRevision(h.store, fix, revision, at(30, 15)), { kept: 1, dropped: 0 });
+  assert.ok(h.store.items().every((i) => i.status === "proposed" && i.proposalTs === fix.item!.messageTs), "still on the report's message");
+
+  await recordSweepResolution(h.store, revision, undefined, at(30, 16));
+  assert.deepEqual(
+    h.store.items().map((i) => [i.blockId, i.status]),
+    h.store.items().map((i) => [i.blockId, i.blockId === fix.item!.id ? "dropped" : "proposed"]),
+  );
+});
+
 test("a card staged beside a sweep fix, not in its place, moves and drops none of its items", async () => {
   const { h, fixes } = await stagedReport(2);
   const beside: PendingProposal = {

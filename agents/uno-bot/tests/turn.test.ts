@@ -33,8 +33,8 @@ import {
 import { batchResultMessage } from "../src/slack/batch-result";
 import { PRECEDENCE_INTAKE_TITLE } from "../src/ds-precedence/report";
 import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
-import { sweepTag } from "../src/sweep/cards";
-import { decisionReport, itemProposal, reportRecord } from "../src/slack/decision-cards";
+import { FIX_REVIEW_INSTEAD, FIX_SCOPE_REFUSAL, sweepTag } from "../src/sweep/cards";
+import { decisionReport, itemProposal, reportItems, reportRecord } from "../src/slack/decision-cards";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
@@ -1240,7 +1240,8 @@ test("a worded revision of a sweep card holding an added answer is refused, and 
 });
 
 // A sweep report: three fixes, each its own proposal, keyed by the report's
-// message and its block. The turn's pending card is fix 3.
+// message and its block. The turn's pending card is fix 3 unless a Needs
+// changes sent another back.
 const REPORT_TS = "1700000000.000200";
 const REPORT_FIXES = ["blk-1", "blk-2", "blk-3"].map((block, i) => ({
   block,
@@ -1249,11 +1250,15 @@ const REPORT_FIXES = ["blk-1", "blk-2", "blk-3"].map((block, i) => ({
     replace: [{ block_id: block, last_edited_time: "2026-09-01T10:00:00.000Z", content: `Line ${i + 1}, fixed` }],
   },
 }));
+const reworded = (i: number, content: string, stamp = "2026-09-01T10:00:00.000Z") => ({
+  ...REPORT_FIXES[i]!.input,
+  replace: [{ block_id: REPORT_FIXES[i]!.block, last_edited_time: stamp, content }],
+});
 
 async function sweepReportThread(replies: NonNullable<Parameters<typeof harness>[0]>["replies"]) {
   const h = harness({ replies });
   const items = REPORT_FIXES.map((f) => ({ id: f.block, title: "Reflection PRD", body: "Page says … · decision says …", open: { url: f.input.page_url } }));
-  await h.threadState.putReport(reportRecord(CHANNEL, REPORT_TS, decisionReport(items, "This thread settled 3 things."), 72 * 60 * 60 * 1000));
+  await h.threadState.putReport(reportRecord(CHANNEL, REPORT_TS, decisionReport(items, "Reflection PRD still states 3 things its thread changed."), 72 * 60 * 60 * 1000));
   const fixes: PendingProposal[] = [];
   for (const f of REPORT_FIXES) {
     const fix: PendingProposal = {
@@ -1265,34 +1270,34 @@ async function sweepReportThread(replies: NonNullable<Parameters<typeof harness>
       ttlMs: 72 * 60 * 60 * 1000,
       confirmers: ["U0OWNER"],
       sweepRun: "2026-09-30",
-      refuseRevision: "A sweep fix stays as drafted.",
     };
     await h.threadState.putProposal(fix);
     fixes.push(fix);
   }
-  return { h, fixes };
+  const edits: string[] = [];
+  h.deps.reportItems = reportItems(h.threadState, async (ts) => void edits.push(ts), () => Date.now());
+  /** Fix `i` as Review's Needs changes leaves it: sent back by the owner. */
+  const sentBack = async (i: number) => {
+    await h.threadState.markRevising(fixes[i]!.proposalTs, "U0OWNER");
+    const look = await h.threadState.getProposalByTs(fixes[i]!.proposalTs);
+    assert.equal(look.state, "found");
+    return look.state === "found" ? look.proposal : fixes[i]!;
+  };
+  return { h, fixes, edits, sentBack };
 }
 
-test("a batch rewriting fix 1 of a three-fix sweep report is refused, though the turn's pending card is fix 3", async () => {
-  const rewritten = { ...REPORT_FIXES[0]!.input, replace: [{ ...REPORT_FIXES[0]!.input.replace[0]!, content: "Line 1, never" }] };
-  const { h, fixes } = await sweepReportThread([{ text: "Changed it.", toolCalls: [{ name: "notion_update", args: rewritten }] }]);
+test("a reply's batch rewriting fix 1 of a three-fix sweep report is pointed at Review, though the turn's pending card is fix 3", async () => {
+  const { h, fixes } = await sweepReportThread([{ text: "Changed it.", toolCalls: [{ name: "notion_update", args: reworded(0, "Line 1, never") }] }]);
 
   const outcome = await runTurn(request({ text: "make the first one say never", pending: fixes[2]!, userId: "U0OWNER" }), h.deps);
 
   assert.equal(outcome.disposition, "asked");
   assert.equal(outcome.staged, undefined, "nothing staged beside fix 1");
+  assert.equal(outcome.posted, FIX_REVIEW_INSTEAD);
   for (const fix of fixes) assert.equal((await h.threadState.getProposalByTs(fix.proposalTs)).state, "found");
-});
-
-test("the refusal under a sweep report carries the sweep's tag, so the thread stays the team's", async () => {
-  const rewritten = { ...REPORT_FIXES[1]!.input, replace: [{ ...REPORT_FIXES[1]!.input.replace[0]!, content: "Line 2, never" }] };
-  const { h, fixes } = await sweepReportThread([{ text: "Changed it.", toolCalls: [{ name: "notion_update", args: rewritten }] }]);
-
-  await runTurn(request({ text: "make the second one say never", pending: fixes[2]!, userId: "U0OWNER" }), h.deps);
-
-  const note = h.delivery.calls.find((c) => c.kind === "note" && c.text === "A sweep fix stays as drafted.");
-  assert.ok(note, "the fix's refusal is posted");
-  assert.deepEqual((note as { tag?: unknown }).tag, sweepTag("note"));
+  // Tagged as the sweep's own note, so the thread stays the team's.
+  const note = h.delivery.calls.find((c) => c.kind === "note" && c.text === FIX_REVIEW_INSTEAD);
+  assert.deepEqual((note as { tag?: unknown } | undefined)?.tag, sweepTag("note"));
 });
 
 test("a batch touching none of a sweep report's fixes stages beside them, all left live", async () => {
@@ -1304,6 +1309,41 @@ test("a batch touching none of a sweep report's fixes stages beside them, all le
   assert.equal(outcome.disposition, "staged");
   for (const fix of fixes) assert.equal((await h.threadState.getProposalByTs(fix.proposalTs)).state, "found");
 });
+
+test("Needs changes on a sweep fix rewords its own line in place: same card, new proposal, still a sweep fix", async () => {
+  const { h, fixes, edits, sentBack } = await sweepReportThread([
+    { text: "Reworded.", toolCalls: [{ name: "notion_update", args: reworded(1, "Line 2, reworded") }] },
+  ]);
+  const pending = await sentBack(1);
+
+  const outcome = await runTurn(request({ text: "Needs changes on the proposal card above: say reworded", pending, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  const revised = outcome.staged!.proposal;
+  assert.deepEqual(revised.item, { messageTs: REPORT_TS, id: "blk-2~1" });
+  assert.equal(revised.sweepRun, "2026-09-30", "its outcome is still recorded on the sweep's items");
+  assert.deepEqual(revised.operations, [{ toolName: "notion_update", input: reworded(1, "Line 2, reworded") }]);
+  assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0, "no card of its own");
+  assert.deepEqual(edits, [REPORT_TS], "the report's message is redrawn");
+  assert.notEqual((await h.threadState.getProposalByTs(fixes[1]!.proposalTs)).state, "found", "the old draft no longer runs");
+  assert.equal((await h.threadState.getProposalByTs(fixes[2]!.proposalTs)).state, "found", "the others are untouched");
+});
+
+for (const [name, args] of [
+  ["reaches another fix's line", { ...REPORT_FIXES[1]!.input, replace: [...reworded(1, "Line 2, reworded").replace, ...REPORT_FIXES[2]!.input.replace] }],
+  ["moves its stamp", reworded(1, "Line 2, reworded", "2026-10-01T00:00:00.000Z")],
+] as const) {
+  test(`a Needs changes revision of a sweep fix that ${name} is refused, and the fix stays`, async () => {
+    const { h, fixes, sentBack } = await sweepReportThread([{ text: "Changed it.", toolCalls: [{ name: "notion_update", args }] }]);
+    const pending = await sentBack(1);
+
+    const outcome = await runTurn(request({ text: "Needs changes on the proposal card above: wider", pending, userId: "U0OWNER" }), h.deps);
+
+    assert.equal(outcome.disposition, "asked");
+    assert.equal(outcome.posted, FIX_SCOPE_REFUSAL);
+    assert.equal((await h.threadState.getProposalByTs(fixes[1]!.proposalTs)).state, "found");
+  });
+}
 
 // "drop N" is read by index: the revision is the card's own operations minus
 // the dropped one, byte for byte, with no model call to reproduce them.

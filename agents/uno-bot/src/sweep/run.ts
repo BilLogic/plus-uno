@@ -115,7 +115,6 @@ import {
   sweepReportMetadata,
   sweepShareOf,
   SWEEP_CARD_TTL_MS,
-  SWEEP_REVISE_INSTEAD,
   type SweepCardPlan,
 } from "./cards";
 import {
@@ -1651,7 +1650,6 @@ export function sweepProposal(
     confirmers: [...plan.confirmers],
     sweepRun: posted.postDate,
     stated: sweepItemWords(),
-    refuseRevision: SWEEP_REVISE_INSTEAD,
     // A group DM's fix: what its write shares (`./share.ts`).
     ...(share ? { sweepShare: share } : {}),
   };

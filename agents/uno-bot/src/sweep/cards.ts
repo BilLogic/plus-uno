@@ -297,11 +297,57 @@ export function sweepItemWords(): StatedCardWords {
   };
 }
 
-/** What a turn says in a sweep report's thread when its batch would change a
- *  fix: a fix is the page's text as the thread settled it, so it is decided,
- *  never redrafted. */
-export const SWEEP_REVISE_INSTEAD =
-  "A sweep fix is the page's text as the thread settled it, so it isn't redrafted. Reject it in Review with what you want instead, or edit the page.";
+/**
+ * Whether a revision of one sweep fix keeps to that fix's own edit: in-place
+ * replaces of its own blocks, on its page, each on the stamp the sweep read —
+ * so it may narrow or reword the line and nothing else. Never true of a fix
+ * that adds an answer: the model has no `insert` to restage it with.
+ *
+ * @param operations - The revision's batch
+ * @param fix - The fix it revises
+ */
+export function keepsToFix(
+  operations: readonly Pick<ProposalOperation, "toolName" | "input">[],
+  fix: readonly Pick<ProposalOperation, "toolName" | "input">[],
+): boolean {
+  const own = new Map<string, unknown>();
+  const pages = new Set<unknown>();
+  for (const op of fix) {
+    pages.add(op.input.page_url);
+    for (const entry of (Array.isArray(op.input.replace) ? op.input.replace : []) as Record<string, unknown>[]) {
+      own.set(String(entry.block_id ?? entry.blockId), entry.last_edited_time ?? entry.lastEditedTime);
+    }
+  }
+  return (
+    operations.length > 0 &&
+    operations.every((op) => {
+      const replace = op.input.replace;
+      return (
+        op.toolName === "notion_update" &&
+        pages.has(op.input.page_url) &&
+        !op.input.insert &&
+        Array.isArray(replace) &&
+        replace.length > 0 &&
+        (replace as Record<string, unknown>[]).every((e) => {
+          const block = String(e.block_id ?? e.blockId);
+          return own.has(block) && own.get(block) === (e.last_edited_time ?? e.lastEditedTime);
+        })
+      );
+    })
+  );
+}
+
+/** What a reply in a sweep report's thread that would change a fix is told:
+ *  a fix is revised from its own Review. */
+export const FIX_REVIEW_INSTEAD = "To change a fix, press Review on its card and choose Needs changes.";
+
+/** What a revision of a sweep fix that adds an answer is told. */
+export const FIX_INSERT_REFUSAL =
+  "This fix adds a new line, which a revision can't restage exactly, so it stays as drafted. Reject it in Review with what it should say instead.";
+
+/** What a revision reaching past its sweep fix's own line is told. */
+export const FIX_SCOPE_REFUSAL =
+  "That would change more than this fix's own line, so it stays as drafted. Say what the line should read instead.";
 
 function capitalised(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);

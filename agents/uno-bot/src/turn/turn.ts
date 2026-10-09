@@ -115,7 +115,11 @@ import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presente
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
+  FIX_INSERT_REFUSAL,
+  FIX_REVIEW_INSTEAD,
+  FIX_SCOPE_REFUSAL,
   holdsInsert,
+  keepsToFix,
   INSERT_CARD_REFUSAL,
   keptFixes,
   replacedBlocks,
@@ -1482,15 +1486,31 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // has no `insert` to restage it with, so a worded revision would lose the
   // added text rather than keep it byte for byte.
   if (replaced?.sweepRun && holdsInsert(proposalOperations(replaced))) {
-    await delivery.postNote(INSERT_CARD_REFUSAL, sweepTag("note"));
-    await memory.remember(INSERT_CARD_REFUSAL);
-    return { disposition: "asked", posted: INSERT_CARD_REFUSAL, wrote: memory.wrote(), telemetry };
+    const refusal = replaced.item ? FIX_INSERT_REFUSAL : INSERT_CARD_REFUSAL;
+    await delivery.postNote(refusal, sweepTag("note"));
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+
+  // One fix of a sweep report is revised from its own Review — Needs changes
+  // sends it back to this person's turn — and only within its own edit: its
+  // own blocks, on the stamps the sweep read, narrowed or reworded. A reply
+  // in the thread that would change one is pointed at Review.
+  if (replaced?.sweepRun && replaced.item && replaced.revising?.userId !== request.userId) {
+    await delivery.postNote(FIX_REVIEW_INSTEAD, sweepTag("note"));
+    await memory.remember(FIX_REVIEW_INSTEAD);
+    return { disposition: "asked", posted: FIX_REVIEW_INSTEAD, wrote: memory.wrote(), telemetry };
+  }
+  if (replaced?.sweepRun && replaced.item && !keepsToFix(result.operations, proposalOperations(replaced))) {
+    await delivery.postNote(FIX_SCOPE_REFUSAL, sweepTag("note"));
+    await memory.remember(FIX_SCOPE_REFUSAL);
+    return { disposition: "asked", posted: FIX_SCOPE_REFUSAL, wrote: memory.wrote(), telemetry };
   }
 
   // A sweep card's revision drops fixes and does nothing else: each of its
   // operations must be one of the card's own, as it was. Anything else — a fix
   // rewritten, a stamp changed, one added — is refused and the card stays.
-  if (replaced?.sweepRun && !isSubsetOf(result.operations, proposalOperations(replaced))) {
+  if (replaced?.sweepRun && !replaced.item && !isSubsetOf(result.operations, proposalOperations(replaced))) {
     const refusal =
       ":warning: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
       "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
@@ -1548,7 +1568,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   );
   // A revision of a sweep card is still one, so replies under it are read by
   // the sweep's rule.
-  const card = replaced?.sweepRun ? asSweepRevision(built) : built;
+  // A report's fix is redrawn in its report instead.
+  const card = replaced?.sweepRun && !replaced.item ? asSweepRevision(built) : built;
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
