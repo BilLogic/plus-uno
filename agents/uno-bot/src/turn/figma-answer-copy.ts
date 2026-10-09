@@ -1,6 +1,5 @@
 import type { TaskCardSource } from "../agent/task-card-readout";
 import { parseFigmaUrl } from "../integrations/figma-reading";
-import { escapeSlackText } from "../slack/mrkdwn";
 
 /** Name a read frame from its source, after the judge has finished rewriting.
  * A closing read receipt belongs to Sources; quoted comments stay verbatim. */
@@ -14,7 +13,7 @@ export function figmaAnswerCopy(text: string, sources: readonly TaskCardSource[]
     const frame = parseFigmaUrl(url);
     const read = frames.find((f) => f.fileKey === frame?.fileKey && f.nodeId === frame?.nodeId);
     if (!read) return original;
-    const title = escapeSlackText(read.title).replace(/[\\[\]]/g, "\\$&");
+    const title = read.title.replace(/[\\[\]<>]/g, "\\$&");
     return `[${title}](${url})`;
   };
   return text
