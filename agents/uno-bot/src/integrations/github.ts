@@ -612,9 +612,9 @@ export function githubWorkflowClient(env: Env, target: RepoEntry): GithubWorkflo
  *  `GithubRequestError` on any non-2xx. */
 export interface GithubLibraryReads {
   readonly repo: string;
-  /** A file's whole text from the default branch — no cap, unlike
-   *  `githubReadPath`, whose 12k cap would cut the component registry. */
-  rawFile(path: string): Promise<string>;
+  /** A file's whole text from the default branch, or from `ref` — no cap,
+   *  unlike `githubReadPath`, whose 12k cap would cut the component registry. */
+  rawFile(path: string, ref?: string): Promise<string>;
   /** `harness-intake` issues updated since `since` (ISO), pulls left out. */
   recentIntakes(since: string): Promise<Array<{ number: number; url: string; body: string }>>;
   /** Open `harness-intake` issues, most recently updated first, pulls left
@@ -699,9 +699,10 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
   };
   return {
     repo,
-    async rawFile(path) {
+    async rawFile(path, ref) {
       const clean = path.replace(/^\/+/, "");
-      const res = await get("contents read", `https://api.github.com/repos/${repo}/contents/${clean}`, "application/vnd.github.raw+json");
+      const at = ref ? `?ref=${encodeURIComponent(ref)}` : "";
+      const res = await get("contents read", `https://api.github.com/repos/${repo}/contents/${clean}${at}`, "application/vnd.github.raw+json");
       return res.text();
     },
     async recentIntakes(since) {

@@ -21,6 +21,7 @@ import { implementPrTitle, trackLibraryIntakes, type TrackDeps, type TrackedPubl
 import { resolveSignal, type GateSignal } from "../src/gate/index";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { implementPayload } from "../src/tools/implement";
+import type { RefreshOwed } from "../src/figma-library/snapshot-refresh";
 import { runButtonDoor, type CardMessage } from "../src/slack/button-door";
 import { recordingDelivery } from "../src/turn/index";
 import { cardWords } from "./helpers/card-message";
@@ -121,16 +122,18 @@ function pollDeps(today: FigmaComponentsResponse, findings = kv<LibraryChangeSet
     nodeHashes: {},
   };
   const snapshot = kv<Snapshot | null>(yesterday);
+  const owed = kv<RefreshOwed | null>(null);
   const figma = createInMemoryFigma();
   figma.seedFile(FILE_KEY, { components: today, versions: VERSIONS });
   const deps: PollDeps = {
     figma,
     snapshot,
     findings,
+    owed,
     fileKey: FILE_KEY,
     now: () => Date.UTC(2026, 8, 29, 22, 0),
   };
-  return { deps, snapshot, findings, figma };
+  return { deps, snapshot, findings, figma, owed };
 }
 
 /** Yesterday's publish only: the version the snapshot already knows. */
@@ -1011,5 +1014,80 @@ describe("a library card nobody decides", () => {
     const result = await trackLibraryIntakes(deps, { dryRun: true });
     assert.equal(result.expired, 1);
     assert.deepEqual(calls, []);
+  });
+});
+
+describe("the refresh a publish owes the repo's snapshot (#898)", () => {
+  const FOUND_AT = "2026-09-29T22:00:00.000Z";
+
+  it("owes one refresh for a publish, recorded before the poll moves its snapshot on", async () => {
+    const { deps, owed, snapshot } = pollDeps(AFTER);
+    const result = await pollFigmaLibrary(deps);
+    assert.deepEqual(owed.value, { versionIds: ["2210000000000000002"], since: FOUND_AT });
+    assert.equal(result.refreshOwed, 1);
+
+    // A poll stopped before its snapshot write still left the refresh owed.
+    const again = pollDeps(AFTER);
+    again.deps.snapshot.write = async () => {
+      throw new Error("KV down");
+    };
+    await assert.rejects(pollFigmaLibrary(again.deps), /KV down/);
+    assert.deepEqual(again.owed.value?.versionIds, ["2210000000000000002"]);
+    assert.equal(snapshot.value?.versionIds[0], "2210000000000000002");
+  });
+
+  it("owes nothing more when the same publish is seen again: a retry merges, a finished poll never sees it", async () => {
+    const stopped = pollDeps(AFTER);
+    const write = stopped.deps.snapshot.write;
+    stopped.deps.snapshot.write = async () => {
+      throw new Error("KV down");
+    };
+    await assert.rejects(pollFigmaLibrary(stopped.deps));
+    stopped.deps.snapshot.write = write;
+    await pollFigmaLibrary(stopped.deps);
+    assert.deepEqual(stopped.owed.value?.versionIds, ["2210000000000000002"], "the retry merged the same id");
+
+    await pollFigmaLibrary(stopped.deps);
+    assert.equal(stopped.owed.writes.length, 2, "the finished poll's snapshot knows the version: nothing new is owed");
+  });
+
+  it("owes two publishes found on two days, newest first, from the first one's date", async () => {
+    const { deps, owed, figma } = pollDeps(AFTER);
+    await pollFigmaLibrary(deps);
+    figma.seedFile(FILE_KEY, {
+      versions: {
+        versions: [
+          { id: "2210000000000000004", label: "Spacing tokens", description: "", created_at: "2026-09-30T20:00:00Z", user: { handle: "coco" } },
+          ...VERSIONS.versions!,
+        ],
+      },
+    });
+    deps.now = () => Date.UTC(2026, 8, 30, 22, 0);
+    await pollFigmaLibrary(deps);
+    assert.deepEqual(owed.value, { versionIds: ["2210000000000000004", "2210000000000000002"], since: FOUND_AT });
+  });
+
+  it("owes nothing for a library edited with no new version, or a quiet day", async () => {
+    const edited: FigmaComponentsResponse = {
+      meta: { components: [variant("k-acc-1", "State=Closed", "10:1", "accordion", "13667:6004"), ...BEFORE.meta!.components!.slice(1)] },
+    };
+    const edit = pollDeps(edited);
+    edit.figma.seedFile(FILE_KEY, { versions: KNOWN_VERSION_ONLY });
+    const result = await pollFigmaLibrary(edit.deps);
+    assert.equal(edit.findings.value.length, 1, "the edit is still a finding");
+    assert.equal(edit.owed.value, null, "but nothing was published");
+    assert.equal(result.refreshOwed, undefined);
+
+    const quiet = pollDeps(BEFORE);
+    quiet.figma.seedFile(FILE_KEY, { versions: KNOWN_VERSION_ONLY });
+    await pollFigmaLibrary(quiet.deps);
+    assert.equal(quiet.owed.value, null);
+  });
+
+  it("says what it would owe on a dry run, and writes nothing", async () => {
+    const { deps, owed } = pollDeps(AFTER);
+    const result = await pollFigmaLibrary(deps, { dryRun: true });
+    assert.equal(result.refreshOwed, 1);
+    assert.deepEqual(owed.writes, []);
   });
 });

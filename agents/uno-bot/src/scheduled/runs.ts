@@ -40,9 +40,12 @@ export type ScheduledRunName = "morning" | "end-of-day";
 
 /**
  * What a scheduled job does. `noop` proves the path and does nothing else.
- * The Figma library's three: the end-of-day poll finds a publish, the morning
- * post turns it into a card in #plus-universal, and the morning track follows
- * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
+ * The Figma library's four: the end-of-day poll finds a publish, the morning
+ * post turns it into a card in #plus-universal, the morning track follows
+ * each posted card to its PR, and `figma-snapshot-refresh` — at the end of
+ * the end-of-day run, once its Figma reads are done — starts the refresh of
+ * the repo's library snapshot once per publish, and again each night until it
+ * lands (src/figma-poll.ts, src/figma-library/). The
  * usage record's two: the end-of-day classify jobs label a batch of channel
  * asks each, and the purge — in both runs — keeps text under its 14 days
  * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
@@ -84,6 +87,7 @@ export type ScheduledJobKind =
   | "figma-library-poll"
   | "figma-library-post"
   | "figma-library-track"
+  | "figma-snapshot-refresh"
   | "usage-classify"
   | "usage-text-purge"
   | "ask-resolution"
@@ -206,6 +210,19 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     // so a night whose sweep fits in one finds the later ones done
     // (src/figma-notify/backstop.ts).
     ...Array.from({ length: BACKSTOP_JOBS }, (_, i) => ({ key: `figma-backstop-${i + 1}`, kind: "figma-backstop" as const })),
+    // A publish the poll found starts the repo snapshot's refresh tonight
+    // (#898) — after every job of the run that reads Figma, so the Action's
+    // node fetches never share uno-bot's half of Tier 1 with the Worker's own.
+    {
+      key: "figma-snapshot-refresh",
+      kind: "figma-snapshot-refresh",
+      after: [
+        "figma-library-poll",
+        "ds-precedence-check",
+        "figma-drift-recheck",
+        ...Array.from({ length: BACKSTOP_JOBS }, (_, i) => `figma-backstop-${i + 1}`),
+      ],
+    },
     // One job per classification batch, each an alarm of its own. Each takes
     // whatever is still pending, so a quiet day's later jobs find nothing.
     ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({
