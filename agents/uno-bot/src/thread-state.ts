@@ -8,7 +8,7 @@
 // picks it, is decided in `src/thread-state/durable-object.ts` — the keying
 // seam — and nowhere else; no caller and not this class computes an id.
 //
-// Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`,
+// Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
 // `run:{user}`, and the alarm's own `gc:next`.
 //
@@ -18,7 +18,7 @@
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
 // `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
 // `getProposalByThread`, `getProposalsByChannel`, `claimProposal`,
-// `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
+// `putReport`, `getReport`, `updateReport`, `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
@@ -59,15 +59,19 @@ import {
   ownTtl,
   ownWords,
   ownText,
+  REPORT_GRACE_MS,
+  changedReport,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
   withLiveMark,
   type CutOffNoteReport,
+  type DecisionReportRecord,
   type Execution,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
+  type ReportChange,
   type RunClaim,
   type ThreadRef,
 } from "./thread-state/store";
@@ -207,6 +211,11 @@ export class ThreadState extends DurableObject<Env> {
     const props = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     for (const [key, rec] of props) {
       if (now - rec.createdAt > recordTtlMs(rec)) await this.storage.delete(key);
+      else remaining++;
+    }
+    const reports = await this.storage.list<ReportRecord>({ prefix: "report:" });
+    for (const [key, rec] of reports) {
+      if (now - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) await this.storage.delete(key);
       else remaining++;
     }
     const execs = await this.storage.list<Execution>({ prefix: "exec:" });
@@ -462,6 +471,41 @@ export class ThreadState extends DurableObject<Env> {
     return this.storage.delete(key);
   }
 
+  // ----- decision reports -----
+  //
+  // One record per report message, kept for its items' TTL and then
+  // `REPORT_GRACE_MS`, read on access and swept by the GC alarm. An update is
+  // one read-modify-write with the input gate closed, so two items decided at
+  // once both land.
+
+  async putReport(report: DecisionReportRecord, at: number): Promise<void> {
+    await this.storage.put<ReportRecord>(reportKey(report.messageTs), { report, createdAt: at });
+    await this.ensureGcAlarm();
+  }
+
+  async getReport(messageTs: string, at: number): Promise<DecisionReportRecord | null> {
+    return (await this.liveReport(messageTs, at))?.report ?? null;
+  }
+
+  async updateReport(messageTs: string, change: ReportChange, at: number): Promise<DecisionReportRecord | null> {
+    const rec = await this.liveReport(messageTs, at);
+    const next = rec ? changedReport(rec.report, change) : null;
+    if (!rec || !next) return null;
+    await this.storage.put<ReportRecord>(reportKey(messageTs), { ...rec, report: next });
+    return next;
+  }
+
+  private async liveReport(messageTs: string, at: number): Promise<ReportRecord | null> {
+    const key = reportKey(messageTs);
+    const rec = await this.storage.get<ReportRecord>(key);
+    if (!rec) return null;
+    if (at - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) {
+      await this.storage.delete(key);
+      return null;
+    }
+    return rec;
+  }
+
   // ----- executions -----
   //
   // A won ✅ from the claim until its outcome is told — what `Execution` in
@@ -685,6 +729,16 @@ function recordTtlMs(rec: ProposalRecord): number {
 
 function proposalKey(ts: string): string {
   return `prop:${ts}`;
+}
+
+function reportKey(messageTs: string): string {
+  return `report:${messageTs}`;
+}
+
+/** A decision report's record, as stored: the record and when it was put. */
+interface ReportRecord {
+  report: DecisionReportRecord;
+  createdAt: number;
 }
 
 function executionKey(ts: string): string {

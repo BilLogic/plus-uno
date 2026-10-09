@@ -214,6 +214,9 @@ export interface ProposalCard {
    * ✅ runs — "files the intake and drafts the code for Button and Badge" is
    * two operations, both said. That is the consent the plan exists for, kept
    * in words a person reads in one line.
+   *
+   * Empty on an item of a decision report: its card's Review is the only
+   * instruction, and the text is what the pop-up shows.
    */
   footer?: string;
   /** What one ✅ does, in the GATED ROW's own words (`agent/tool-table.ts`
@@ -343,6 +346,10 @@ export type GateNote =
   /** A signal on a card someone sent back with Needs changes: its revision
    *  is being written, so nothing decides it meanwhile. */
   | { kind: "being-revised" }
+  /** A typed emoji or the model's call on one item of a decision report
+   *  (`slack/decision-cards.ts`): such an item is decided in its Review
+   *  pop-up and nowhere else, so nothing resolved. */
+  | { kind: "review-only" }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string }
   /**

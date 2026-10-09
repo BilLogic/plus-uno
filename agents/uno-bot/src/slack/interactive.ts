@@ -26,8 +26,9 @@ import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
-import { executeVerdict } from "../agent/resolve-proposal";
+import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
+import { DECISION_REVIEW_ACTION_PREFIX, reviewPressOf } from "./decision-cards";
 import {
   NEEDS_CHANGES_LEAD,
   runReviewDecision,
@@ -177,6 +178,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
+  if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
@@ -263,14 +265,27 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
 // lives three seconds from the click, is spent before anything is read.
 //
 // `Env` enters here and stops here.
-async function openReview(env: Env, payload: InteractionPayload): Promise<void> {
+async function openReview(env: Env, payload: InteractionPayload, itemAction?: string): Promise<void> {
   const triggerId = payload.trigger_id;
   const channel = payload.channel?.id;
-  const messageTs = payload.message?.ts;
+  const ts = payload.message?.ts;
   const userId = payload.user?.id;
-  if (!triggerId || !channel || !messageTs || !userId) return;
-  const cardText = payload.message?.text;
-  await runReviewOpen({ triggerId, channel, messageTs, userId, ...(cardText ? { cardText } : {}) }, reviewDoorDeps(env));
+  if (!triggerId || !channel || !ts || !userId) return;
+  // An item of a decision report: its own proposal, which a press names by
+  // its message and its id.
+  const press = itemAction ? reviewPressOf(itemAction, ts) : null;
+  const cardText = press ? undefined : payload.message?.text;
+  await runReviewOpen(
+    {
+      triggerId,
+      channel,
+      messageTs: press?.key ?? ts,
+      userId,
+      ...(cardText ? { cardText } : {}),
+      ...(press ? { item: press.item } : {}),
+    },
+    reviewDoorDeps(env),
+  );
 }
 
 /** Edit fields, pressed on the draft: the fields, pushed over it on the
@@ -368,7 +383,7 @@ async function reviseFromReview(
       await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {
-      await updateMessage(env, { channel: proposal.channel, ts: proposal.proposalTs, text: message.text, blocks: message.blocks });
+      await updateMessage(env, { channel: proposal.channel, ts: proposal.item?.messageTs ?? proposal.proposalTs, text: message.text, blocks: message.blocks });
     },
   });
 }
@@ -390,7 +405,9 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       update: (viewId, view) => viewsUpdate(env, viewId, view),
     },
     delivery: (target) => slackDelivery(env, target),
-    applyVerdict: (verdict) => executeVerdict(env, verdict),
+    // With each operation's outcome, so an item of a decision report says on
+    // its card whether its write went through.
+    applyVerdict: (verdict) => runVerdict(env, verdict),
     updateCard: async (channel, ts, message) => {
       const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
       // Cosmetic, as the button door's re-render is: the decision is already

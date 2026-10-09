@@ -1306,8 +1306,7 @@ describe("a stated card answers in its own words", () => {
     assert.equal(verdict.execute, undefined);
     assert.equal(
       renderGateNote(verdict.post!.note),
-      "<@U2> I saw your :white_check_mark:, but it's not on the card, so nothing ran. " +
-        "Use the card's buttons, or react on the card itself.",
+      "<@U2> I saw your :white_check_mark:, but it's not on the card, so nothing ran. Press Review on the card to decide it.",
     );
   });
 

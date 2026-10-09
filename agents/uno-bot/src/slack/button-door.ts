@@ -27,7 +27,9 @@ import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index
 import { renderGateNote, statedCancelledNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { notedCardBlocks, proposalCardBlocks } from "./proposal-render";
-import type { PendingProposal } from "../thread-state/index";
+import type { PendingProposal, ReportItemState } from "../thread-state/index";
+import type { OperationOutcome } from "../gate/run-batch";
+import { failureReason, settleItem, type ReportStore } from "./decision-cards";
 
 /** A card's message as it is edited: the fallback copy, and the blocks. */
 export interface CardMessage {
@@ -57,9 +59,9 @@ export function decidedCard(
   text: string = pending.proposalText,
   opts: { edited?: boolean; button?: "Review" | "View" } = {},
 ): CardMessage {
+  const button = opts.button ?? "View";
   const stale = opts.edited || text !== pending.proposalText;
   const own = pending.proposalBlocks && !stale ? pending.proposalBlocks : undefined;
-  const button = opts.button ?? "View";
   return {
     text: `${text}\n${note}`,
     blocks: notedCardBlocks({ text, ...(own ? { blocks: own } : {}) }, note, button),
@@ -118,8 +120,17 @@ export interface ButtonDoorDeps {
    *
    * EVERY verdict that has something to post is handed here on a WIN — a press
    * that did not win is answered ephemerally instead, and never reaches this.
+   * Answers with each operation's outcome when the run reports them: an item
+   * of a decision report says on its card whether its write went through.
    */
-  applyVerdict(verdict: GateVerdict): Promise<void>;
+  applyVerdict(verdict: GateVerdict): Promise<readonly OperationOutcome[] | void>;
+
+  /** Where a decision report's items stand (`decision-cards.ts`): an item's
+   *  decision is recorded there and its message drawn again from it. */
+  reports?: ReportStore;
+
+  /** The clock an item's decision is stamped with. Absent, `Date.now`. */
+  now?(): number;
 
   /** A press that did not win is answered where the person is looking. */
   replyEphemeral(text: string): Promise<void>;
@@ -218,12 +229,14 @@ export async function applyPressVerdict(
   });
   // The press runs the tool, and the button is not a Turn — so the working
   // signal is raised and settled here, through the same pairing Turn uses.
+  let outcomes: readonly OperationOutcome[] | undefined;
   await withWorkingSignal(
     door,
     async (delivery) => {
       await delivery.setWorking({ status: "is working on that…" });
       await delivery.postGateNote(post.note);
-      await deps.applyVerdict(verdict);
+      const ran = await deps.applyVerdict(verdict);
+      outcomes = Array.isArray(ran) ? ran : undefined;
     },
     // What the thread needs afterwards, stated rather than defaulted: this
     // door RESOLVED the card, so nothing in the thread is waiting on anybody.
@@ -236,6 +249,23 @@ export async function applyPressVerdict(
   // stage it again, so it closes in the card's own words.
   // The pop-up's Reject names itself, and its reason, on the card it closed.
   const rejected = post.note.kind === "resolved" ? post.note.rejected : undefined;
+  // One item of a decision report: its state goes on the report's record and
+  // the whole message is drawn again from it (`decision-cards.ts`), so the
+  // other items keep theirs. Approved says whether the write went through.
+  if (pending.item) {
+    if (!deps.reports) return;
+    const at = (deps.now ?? Date.now)();
+    const failed = outcomes?.find((o) => !o.ok);
+    const state: ReportItemState =
+      request.decision === "cancel"
+        ? { kind: "rejected", by: request.userId, ...(rejected?.reason ? { reason: rejected.reason } : {}) }
+        : failed
+          ? { kind: "failed", by: request.userId, at, reason: failureReason(failed.message) }
+          : { kind: "approved", by: request.userId, at };
+    const message = await settleItem(deps.reports, pending.item, state, at);
+    if (message) await deps.replaceCard(message);
+    return;
+  }
   const note =
     request.decision === "confirm"
       ? `:white_check_mark: Approved by <@${request.userId}>`

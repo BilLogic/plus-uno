@@ -15,7 +15,8 @@
 // PURE: types and one merge.
 
 import type { FigmaClient } from "../figma/client";
-import type { PendingProposal, ProposalOperation } from "../thread-state/index";
+import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
+import type { ReportStore } from "../slack/decision-cards";
 import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
@@ -102,7 +103,12 @@ export interface DecisionThread {
   confirmers: string[];
   /** When its cards lapse, epoch ms. */
   expiresAt: number;
-  decisions: Array<{ n: number; commentId: string; cardTs: string; decision: QueuedDecision }>;
+  /** Each staged decision: its number, and `proposalKey`, the key its proposal is
+   *  staged under — its message and its comment id (`itemProposalKey`). */
+  decisions: Array<{ n: number; commentId: string; proposalKey: string; decision: QueuedDecision }>;
+  /** Cards shown in the thread so far, staged or not: the next card's number
+   *  follows it, so a card that showed and failed is never renumbered onto. */
+  numbered?: number;
 }
 
 /** The night's reads and the morning's posts, as the sweep hands them over. */
@@ -127,6 +133,9 @@ export interface SweepFigmaComments extends FigmaCommentStores {
     members(): Promise<string[] | null>;
     /** Stage a card the Worker posted, and put it on the usage record. */
     stage(proposal: PendingProposal): Promise<void>;
+    /** Where each morning's report and its items' states are kept
+     *  (`slack/decision-cards.ts`). */
+    reports: ReportStore & Pick<ThreadState, "putReport">;
     channel: string;
   };
   threads?: {
