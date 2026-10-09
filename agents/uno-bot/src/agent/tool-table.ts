@@ -158,9 +158,29 @@ export type ToolRow = {
       readonly access: "ungated";
       readonly gate?: undefined;
       readonly taskCard: TaskCardWords | null;
+      /**
+       * Answered inside the turn from what it already fetched, so it spends
+       * no subrequest and no lookup: the loop runs it after the lookup budget
+       * is spent, which is when an answer's shape is chosen. Read by
+       * `agent/loop.ts`.
+       */
+      readonly fetchesNothing?: true;
+      /**
+       * False for a lookup whose rows are never a table to scan — a duplicate
+       * check inside a filing, a profile, a thread — so its result is not
+       * offered as one. Absent, a result of 3 or more rows of one shape is.
+       * Read by `turn/presentation.ts`.
+       */
+      readonly offersTable?: false;
     }
-  | { readonly access: "control"; readonly gate?: undefined; readonly taskCard?: undefined }
-  | { readonly access: "gated" | "worker"; readonly gate: GateWords; readonly taskCard?: undefined }
+  | { readonly access: "control"; readonly gate?: undefined; readonly taskCard?: undefined; readonly fetchesNothing?: undefined; readonly offersTable?: undefined }
+  | {
+      readonly access: "gated" | "worker";
+      readonly gate: GateWords;
+      readonly taskCard?: undefined;
+      readonly fetchesNothing?: undefined;
+      readonly offersTable?: undefined;
+    }
 );
 
 export const TOOL_TABLE = {
@@ -202,12 +222,14 @@ export const TOOL_TABLE = {
     retrieval: true,
     reviewRequest: null,
     taskCard: { title: "Checking open intakes on GitHub", estate: "github" },
+    offersTable: false,
   },
   slack_user_profile: {
     access: "ungated",
     retrieval: true,
     reviewRequest: null,
     taskCard: { title: "Looking someone up in Slack", estate: "slack" },
+    offersTable: false,
   },
   slack_channel_members: {
     access: "ungated",
@@ -220,12 +242,13 @@ export const TOOL_TABLE = {
     retrieval: true,
     reviewRequest: null,
     taskCard: { title: "Reading the Slack thread", estate: "slack" },
+    offersTable: false,
   },
   slack_react: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
   // The answer's shape: a table of rows a lookup already returned this turn.
   // Turn's presentation step answers it from those results
   // (`turn/presentation.ts`), so it fetches nothing and is no checklist step.
-  present: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
+  present: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null, fetchesNothing: true },
   // "Remind me": writes only uno-bot's own record, posted back to the asker
   // alone at a morning run (`commitments/remind.ts`).
   reminder_set: {

@@ -1,0 +1,46 @@
+{
+  "case": "RT2",
+  "source": "authored",
+  "recordedAt": "2026-10-09",
+  "note": "AUTHORED with the result-table reach ticket, not captured off the Worker. The draw is a reply the case expects; it proves the turn and the case agree, and nothing about the model. Replace it with a capture (`gh workflow run uno-bot-evals.yml -f mode=record -f cases=RT2`) after the next deploy.",
+  "turns": [
+    {
+      "prompt": "Which open intake issues on plus-uno are about uno-bot?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "github_intake_search",
+              "args": {
+                "keywords": "uno-bot"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "present",
+              "args": {
+                "shape": "table",
+                "lookup": "github_intake_search",
+                "list": "matches",
+                "columns": ["title", "number", "updated"],
+                "takeaway": "Three uno-bot intakes are open, the newest updated today."
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Three uno-bot intakes are open, the newest updated today.**\n\nThe EOD sweep summaries one is the freshest and the likeliest to be picked up next."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "github_intake_search",
+          "text": "{\"ok\": true, \"repo\": \"BilLogic/plus-uno\", \"keywords\": \"uno-bot\", \"count\": 3, \"matches\": [{\"number\": 930, \"title\": \"Make EOD sweep summaries more readable and digestible\", \"url\": \"https://github.com/BilLogic/plus-uno/issues/930\", \"updated\": \"2026-10-08T15:00:00Z\"}, {\"number\": 874, \"title\": \"Figma library publish: component metadata change\", \"url\": \"https://github.com/BilLogic/plus-uno/issues/874\", \"updated\": \"2026-09-30T12:00:00Z\"}, {\"number\": 816, \"title\": \"The uno-prototype intake hook advances on agent hand-backs\", \"url\": \"https://github.com/BilLogic/plus-uno/issues/816\", \"updated\": \"2026-09-29T09:00:00Z\"}], \"note\": \"Open intakes that may already cover this. Name the closest by title and link.\"}"
+        }
+      ]
+    }
+  ]
+}

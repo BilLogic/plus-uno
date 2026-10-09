@@ -18,9 +18,23 @@
 //
 // WHAT THE MODEL IS TOLD. A Roadmap lookup that asked for a table gains
 // `table_attached`, and `row_count` and a rewritten `note` when it is true.
+// Any other lookup whose main list holds 3 or more records gains
+// `table_ready` — the list, its count and the fields a column can show — and,
+// on its first call of the turn, a `table_note` saying how to ask and when not
+// to. The offer rides on the result because that is what the model is reading
+// when it chooses a shape: with the request left to the persona and
+// `present`'s own description, a blueprint pain-points answer and an issue
+// list went out as prose (live on r515, and again on r518). A tool whose rows
+// are never a table to scan says so in its row (`offersTable: false`).
 // `present` answers `table_attached` with the caption and row count, or the
 // refusal. Either way the model writes its prose knowing what the reader will
 // see beneath it — a summary when a table is there, the plain list when not.
+//
+// A LOOKUP CALLED SEVERAL TIMES IS ONE SET OF ROWS. A turn that searched the
+// blueprint once per phase shows every row those searches returned, each once,
+// where the searches return rows of one shape (`mergedLookup`). The Roadmap
+// lookup is read at its last call for every shape, since its preset's caption
+// names that call's filters.
 //
 // ONE TABLE AND ONE SET OF CARDS PER ANSWER: of each, the last request that
 // produced one wins. AT MOST 2 CHARTS, Slack's cap per message: a third is
@@ -50,10 +64,12 @@ import {
   type LowerBound,
 } from "./chart";
 import {
+  mergedLookup,
   roadmapCards,
   roadmapTable,
   resultList,
   tableOf,
+  tableOffer,
   withResultList,
   withoutRepeatedRows,
   MAX_COLUMNS,
@@ -64,6 +80,7 @@ import {
 } from "./result-table";
 import { cardList, cardsOf, type AnswerCards } from "./answer-cards";
 import { signed, warningLog } from "./warning-line";
+import { rowFor } from "../agent/tool-table";
 import type { AbsenceContext } from "../agent/absence";
 import { splitCutShort } from "../agent/loop-policy";
 
@@ -172,6 +189,17 @@ function attachedNote(table: ResultTable): string {
 
 const NO_TABLE_NOTE = "No table is attached. If the rows answer the question, list them in your answer yourself.";
 
+/** What a lookup's offer of a table tells the model to do with it, on the
+ *  lookup's first call of the turn. */
+function offerNote(lookup: string, list: string): string {
+  return (
+    "table_ready names this result's main list, its row count and the fields a column can show. " +
+    `When 3 or more of those rows are the answer, a list to scan or compare, call present with shape "table", lookup "${lookup}", ` +
+    `list "${list}" and up to 4 of those columns, and write the takeaway rather than the rows; later calls of this lookup add their rows to it. ` +
+    "For a yes/no question, a single answer or a conversational reply, answer in prose without a table."
+  );
+}
+
 /** What `present` answers when cards are attached. */
 function cardsNote(cards: AnswerCards): string {
   const n = cards.cards.length;
@@ -222,9 +250,16 @@ function fallbackColumns(result: Record<string, unknown>, groupBy: string, measu
  */
 export function presenter(opts: { now?: () => number } = {}): Presenter {
   /** Every call of each lookup, in the order made: a table, cards or a
-   *  grouped chart read the latest, a chart across lookups reads them all. */
+   *  grouped chart read `rowsOf`, a chart across lookups reads them all. */
   const calls = new Map<string, Recorded[]>();
   const latest = (lookup: string): Recorded | undefined => calls.get(lookup)?.at(-1);
+  /** The rows a table, cards or a grouped chart of `lookup` read: the
+   *  Roadmap lookup's last call, or every call of one shape merged. */
+  const rowsOf = (lookup: string): Recorded | undefined => {
+    const made = calls.get(lookup);
+    if (!made) return undefined;
+    return lookup === "roadmap_query" ? made.at(-1) : mergedLookup(made);
+  };
   const warnings = warningLog(opts.now);
   let table: ResultTable | undefined;
   /** The call whose own `as_table` attached the table, while it stands. */
@@ -242,7 +277,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
    *  model. */
   const tableFrom = (lookup: string, recorded: Recorded, args: Record<string, unknown>, columns: string[]): ResultTable | string => {
     if (lookup === "roadmap_query") {
-      const cards = roadmapCards(recorded.result as RoadmapResult);
+      const cards = roadmapCards(latest(lookup)!.result as RoadmapResult);
       return cards ? roadmapTable(cards) : "That Roadmap lookup has fewer than two definite cards; name them in prose.";
     }
     if (columns.length > MAX_COLUMNS) return `At most ${MAX_COLUMNS} columns; you named ${columns.length}.`;
@@ -395,7 +430,7 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       return refuse(`'${String(shape)}' is not a shape you can ask for; ask for a table, cards, a chart or a conflict.`);
     }
     const lookup = typeof args.lookup === "string" ? args.lookup.trim() : "";
-    const recorded = latest(lookup);
+    const recorded = rowsOf(lookup);
     if (!recorded) {
       const made = [...calls.keys()];
       const why =
@@ -429,10 +464,18 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       const { body, stamp } = splitCutShort(text);
       const parsed = parse(body);
       if (!parsed || parsed.ok !== true) return text;
+      const first = !calls.has(name);
       const call: Recorded = { args, result: stamp ? { ...parsed, truncated: true } : parsed };
       calls.set(name, [...(calls.get(name) ?? []), call]);
+      if (name !== "roadmap_query") {
+        const offer = rowFor(name)?.offersTable === false ? undefined : tableOffer(rowsOf(name)!.result);
+        if (!offer) return text;
+        return (
+          JSON.stringify({ ...parsed, table_ready: offer, ...(first ? { table_note: offerNote(name, offer.list) } : {}) }) +
+          stamp
+        );
+      }
       // The Roadmap preset's own door: the lookup asked for its table itself.
-      if (name !== "roadmap_query") return text;
       const cards = args.as_table === true ? roadmapCards(call.result as RoadmapResult) : undefined;
       if (cards) {
         table = roadmapTable(cards);
