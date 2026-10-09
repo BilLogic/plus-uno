@@ -26,18 +26,21 @@
 //   `cardFollowUps` — the morning. `due`, for one due row, looks for the
 //   evidence first: a Roadmap card matching the to-do, a Contributor now set,
 //   a card that moved or was commented on. Found, the row is `auto_done` and
-//   nothing is sent; rejected in its last card's Review, it is answered and
+//   nothing is sent; declined in its last card's Review, it is answered and
 //   nothing is sent. Otherwise its card is held, and `flush` posts the
 //   morning's cards on the shared decision card (`slack/decision-cards.ts`):
 //   one message per person and place, a carousel when there are several,
 //   mentioning only the owners. The one follow-up is armed a week out — so a
-//   card never gets two messages in one week.
+//   card never gets two messages in one week. A stop before `flush` hands the
+//   held rows back (`release`), so the next run posts them.
 //
-// WHAT REVIEW HOLDS. Each card is its own proposal, one item of its report:
-// F3's the drafted Roadmap card (`notion_create`, PRD template), F4's the
-// person asked as Contributor, F5's a move to the likeliest Design Status,
-// another pickable under Edit fields; Reject on F5 means still on it, checked
-// again in three weeks. Every select value is exact-matched against the
+// WHAT REVIEW HOLDS. Each card is its own proposal, one item of its report.
+// F3's is the drafted Roadmap card (`notion_create`, PRD template), decided
+// Approve or Reject. F4 and F5 offer their own answers in place of those
+// (`PendingProposal.choices`): F4's Assign the person asked or Leave it; F5's
+// Done (the Design Status in its select, the board's next by default), Still
+// on it (nothing written, checked again in three weeks, at most twice) or
+// Drop it (archived). Every select value is exact-matched against the
 // Roadmap's own options (hard rule 4): a pillar only when the database has
 // it, a status only when it is one of the board's. No confirmer set: a card
 // is the team's, so anyone may decide it, as anyone could tap its buttons.
@@ -65,7 +68,7 @@ import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type SweepMessage, type SweepThread } from "../sweep/finding";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalCard } from "../turn/index";
-import type { PendingProposal, ProposalOperation, ReportItem, ThreadState } from "../thread-state/index";
+import type { PendingProposal, ProposalOperation, ProposalSelect, ReportItem, ReviewChoice, ThreadState } from "../thread-state/index";
 import { decisionReport, itemProposal, markNotStaged, MAX_REPORT_ITEMS, reportRecord, type ReportStore } from "../slack/decision-cards";
 import { renderProposalCard } from "../slack/proposal-render";
 import { reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
@@ -82,12 +85,13 @@ import {
   FOLLOW_UP_NOT_STAGED,
   FOLLOW_UP_REVISION,
   followUpParent,
-  NO_NOTION_MATCH,
+  staleChoices,
   staleItem,
   staleReviewLead,
   statusChoiceText,
   statusRetryText,
   todoItem,
+  unownedChoices,
   todoReviewLead,
   unownedItem,
   unownedReviewLead,
@@ -102,6 +106,8 @@ import {
   MAX_CARD_POSTS_PER_CHANNEL,
   mayFollowUpCard,
   maybeCondition,
+  LIKELY_STATUSES,
+  nextStatus,
   orderStatusOptions,
   pickStatus,
   STALE_AFTER_MS,
@@ -606,25 +612,37 @@ export interface DueDeps {
 export interface CardFollowUps {
   due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction>;
   flush(now: number, runDate: string): Promise<CommitmentAction[]>;
+  /** Rows held for `flush` and not yet posted. */
+  held(): number;
+  /** A stop before `flush` finished: each held row's `checkedOn` goes back to
+   *  what it was, so the next run posts it rather than tomorrow's. */
+  release(): Promise<void>;
 }
 
-/** One follow-up held for the morning's post: its row, its card, and what its
- *  Review stages — null when there is nothing to stage, `note` saying why. */
+/** One follow-up held for the morning's post: its row, its card, and the
+ *  proposal its Review stages, with the card's own answers. */
 interface Asked {
   c: CommitmentRecord;
   text: CommitmentText;
   people: string[];
   item: ReportItem;
-  card: ProposalCard | null;
-  note?: string;
+  card: ProposalCard;
+  choices?: ReviewChoice[];
+  selects?: ProposalSelect[];
 }
 
 /** Follow-ups that go up together: one person's, in one place, one morning. */
 interface Group {
   to: { channel: string; threadTs: string | null };
   channelKind: ChannelKind;
-  first: boolean;
   asked: Asked[];
+}
+
+/** What the morning holds between `due` and `flush`. */
+interface Morning {
+  groups: Map<string, Group>;
+  /** Held rows by id, with the `checkedOn` each had before. */
+  held: Map<string, string | null>;
 }
 
 /**
@@ -633,14 +651,25 @@ interface Group {
  * handler: one morning job.
  */
 export function cardFollowUps(deps: DueDeps): CardFollowUps {
-  const groups = new Map<string, Group>();
+  const morning: Morning = { groups: new Map(), held: new Map() };
   return {
-    due: (c, now, runDate) => cardFollowUpDue(c, deps, now, runDate, groups),
+    due: (c, now, runDate) => cardFollowUpDue(c, deps, now, runDate, morning),
     async flush(now, runDate) {
       const actions: CommitmentAction[] = [];
-      for (const group of groups.values()) actions.push(...(await postGroup(deps, group, now, runDate)));
-      groups.clear();
+      for (const [key, group] of morning.groups) {
+        actions.push(...(await postGroup(deps, group, now, runDate)));
+        for (const a of group.asked) morning.held.delete(a.c.id);
+        morning.groups.delete(key);
+      }
       return actions;
+    },
+    held: () => morning.held.size,
+    async release() {
+      for (const [id, checkedOn] of morning.held) {
+        await deps.store.update(id, { checkedOn });
+        morning.held.delete(id);
+      }
+      morning.groups.clear();
     },
   };
 }
@@ -654,23 +683,21 @@ export function cardFollowUps(deps: DueDeps): CardFollowUps {
  * @param deps - Its reads, Slack, store and config
  * @param now - Now, epoch ms
  * @param runDate - The morning's date
- * @param groups - The morning's posts so far, by place and person
+ * @param morning - The morning's posts so far, by place and person, and the
+ *   rows held for them
  */
 export async function cardFollowUpDue(
   c: CommitmentRecord,
   deps: DueDeps,
   now: number,
   runDate: string,
-  groups: Map<string, Group> = new Map(),
+  morning: Morning = { groups: new Map(), held: new Map() },
 ): Promise<CommitmentAction> {
   const kind = c.kind as CardKind;
+  const { groups } = morning;
   const settle = async (patch: Parameters<CommitmentStore["update"]>[1]): Promise<void> => {
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate, ...patch });
   };
-  if (c.nudges >= 2) {
-    await settle({ state: "lapsed", resolvedAt: now });
-    return { id: c.id, action: "lapsed", note: "its question and follow-up are spent" };
-  }
   if (c.channel === deps.config.unoBot) {
     await settle({ state: "lapsed", resolvedAt: now });
     return { id: c.id, action: "refused", note: "never posted in #uno-bot" };
@@ -692,16 +719,25 @@ export async function cardFollowUpDue(
     await settle({ state: "auto_done", resolvedAt: now });
     return { id: c.id, action: "auto_done" };
   }
-  // Rejected on its card: the answer was given, so no follow-up asks again.
-  const rejected = await rejectedOnCard(deps, c, text);
-  if (rejected) {
+  // Answered on its last card with a "no": F3's Reject and F4's Leave it
+  // drop it; F5's Still on it writes nothing and checks again three weeks
+  // from that card, at most `MAX_SNOOZES` times.
+  const declined = await declinedOnCard(deps, c, text);
+  if (declined) {
     if (kind === "card_stale" && maySnooze(c.snoozes)) {
-      // Still on it: checked again in three weeks, as a ⏳ was.
-      await settle({ state: "snoozed", snoozes: c.snoozes + 1, dueAt: now + STALE_AFTER_MS });
-      return { id: c.id, action: "held", note: "rejected on its card: still on it, checked again in three weeks" };
+      await settle({ state: "snoozed", snoozes: c.snoozes + 1, dueAt: declined.postedAt + STALE_AFTER_MS });
+      return { id: c.id, action: "held", note: "still on it, on its card: checked again in three weeks" };
+    }
+    if (kind === "card_stale") {
+      await settle({ state: "lapsed", resolvedAt: now });
+      return { id: c.id, action: "lapsed", note: "still on it again, past its snoozes" };
     }
     await settle({ state: "dropped", resolvedAt: now });
-    return { id: c.id, action: "auto_done", note: "rejected on its card" };
+    return { id: c.id, action: "auto_done", note: "declined on its card" };
+  }
+  if (c.nudges >= 2) {
+    await settle({ state: "lapsed", resolvedAt: now });
+    return { id: c.id, action: "lapsed", note: "its question and follow-up are spent" };
   }
 
   const first = c.nudges === 0;
@@ -709,9 +745,11 @@ export async function cardFollowUpDue(
   const key = `${to.channel} ${to.threadTs ?? ""} ${c.promiserId}`;
   const group = groups.get(key);
   // A card's question and a note's offer open a thread at the channel's top,
-  // at most a few a morning; the rest wait a morning, which is no hold.
-  const opened = [...groups.values()].filter((g) => g.first && !g.to.threadTs && g.to.channel === c.channel).length;
-  if (!group && first && !to.threadTs && opened >= MAX_CARD_POSTS_PER_CHANNEL) {
+  // at most a few cards a morning; the rest wait a morning, which is no hold.
+  const opened = [...groups.values()]
+    .filter((g) => !g.to.threadTs && g.to.channel === c.channel)
+    .reduce((n, g) => n + g.asked.filter((a) => a.c.nudges === 0).length, 0);
+  if (first && !to.threadTs && opened >= MAX_CARD_POSTS_PER_CHANNEL) {
     await settle({});
     return { id: c.id, action: "held", note: "the channel's card follow-ups for this morning are posted; tomorrow" };
   }
@@ -720,29 +758,38 @@ export async function cardFollowUpDue(
     return { id: c.id, action: "held", note: "this morning's card for them is full; tomorrow" };
   }
   const people = [c.promiserId, ...(text.mentions ?? [])];
-  const asked = await askFor(deps, c, text, people);
+  const asked = await askFor(deps, c, text, people, now);
+  // Nothing to put behind Review: no card, and the row is checked again.
+  if (typeof asked === "string") return holdCard(deps, c, now, runDate, asked);
   const action = first ? "nudged" : "followed-up";
   if (deps.dryRun) return { id: c.id, action, text: `${asked.item.title}: ${asked.item.body}` };
   // Checked: the row does not come back this morning; `flush` posts it.
+  morning.held.set(c.id, c.checkedOn);
   await settle({});
   if (group) group.asked.push(asked);
-  else groups.set(key, { to, channelKind: c.channelKind, first: first && !to.threadTs, asked: [asked] });
+  else groups.set(key, { to, channelKind: c.channelKind, asked: [asked] });
   return { id: c.id, action, text: `${asked.item.title}: ${asked.item.body}` };
 }
 
-/** Whether the row's last card was rejected in its Review. */
-async function rejectedOnCard(deps: Pick<DueDeps, "reports">, c: CommitmentRecord, text: CommitmentText): Promise<boolean> {
-  if (!text.onCard || c.state !== "nudged" || !c.nudgeTs) return false;
-  const record = await deps.reports.getReport(c.nudgeTs).catch((err: unknown) => {
+/**
+ * Whether the row's last card — its follow-up's, else its first ask's — was
+ * declined in its Review, and when that card posted. Read only for a row
+ * still waiting on that card.
+ */
+async function declinedOnCard(deps: Pick<DueDeps, "reports">, c: CommitmentRecord, text: CommitmentText): Promise<{ postedAt: number } | null> {
+  const last = c.followupTs ?? c.nudgeTs;
+  if (!text.onCard || c.state !== "nudged" || !last) return null;
+  const record = await deps.reports.getReport(last).catch((err: unknown) => {
     rethrowIfBudget(err);
     return null;
   });
   const entry = record?.entries.find((e) => e.id === c.id || e.id.startsWith(`${c.id}~`));
-  return entry?.state.kind === "rejected";
+  return entry?.state.kind === "rejected" ? { postedAt: Math.round(Number(last) * 1000) } : null;
 }
 
-/** A follow-up's card, and the proposal its Review holds. */
-async function askFor(deps: DueDeps, c: CommitmentRecord, text: CommitmentText, people: string[]): Promise<Asked> {
+/** A follow-up's card, the proposal its Review holds and its own answers; or
+ *  why there is nothing to put behind Review. */
+async function askFor(deps: DueDeps, c: CommitmentRecord, text: CommitmentText, people: string[], now: number): Promise<Asked | string> {
   const card = text.card ?? { title: text.what, url: "", status: null };
   switch (c.kind as CardKind) {
     case "card_todo": {
@@ -759,22 +806,31 @@ async function askFor(deps: DueDeps, c: CommitmentRecord, text: CommitmentText, 
       };
     }
     case "card_unowned": {
-      const item = unownedItem({ id: c.id, creator: c.promiserId, card });
       const notionUser = await deps.people.notionUserForSlack(c.promiserId);
-      if (!notionUser) return { c, text, people, item, card: null, note: NO_NOTION_MATCH };
+      if (!notionUser) return "the person asked has no Notion match";
       return {
         c,
         text,
         people,
-        item,
+        item: unownedItem({ id: c.id, creator: c.promiserId, card }),
         card: statedCard("set this card's Contributor", unownedReviewLead(card, c.promiserId), contributorOperation(card, notionUser)),
+        choices: unownedChoices(c.promiserId),
       };
     }
     case "card_stale": {
-      const to = orderStatusOptions(await deps.reads.statusOptions(), "done", card.status)[0] ?? null;
-      const item = staleItem({ id: c.id, people, card, to: to ?? "another status" });
-      if (!to) return { c, text, people, item, card: null, note: "The Roadmap's Design Status options could not be read, so move it on the card" };
-      return { c, text, people, item, card: statedCard(`move this card to ${to}`, staleReviewLead(card, to), statusOperation(card, to)) };
+      const options = await deps.reads.statusOptions();
+      const to = nextStatus(options, card.status);
+      if (!to) return "the Roadmap's Design Status options could not be read";
+      const drop = LIKELY_STATUSES.drop.find((o) => options.includes(o)) ?? null;
+      return {
+        c,
+        text,
+        people,
+        item: staleItem({ id: c.id, people, card, to }),
+        card: statedCard(`move this card to ${to}`, staleReviewLead(card, to), statusOperation(card, to)),
+        choices: staleChoices(now + STALE_AFTER_MS, drop),
+        selects: [{ path: "properties.Design Status", label: "Design Status", source: { database: "roadmap", property: "Design Status" } }],
+      };
     }
   }
 }
@@ -816,13 +872,8 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
     },
   );
 
-  const notes = new Map<string, string[]>();
   const failed: Asked[] = [];
   for (const a of group.asked) {
-    if (!a.card) {
-      notes.set(a.note!, [...(notes.get(a.note!) ?? []), a.c.id]);
-      continue;
-    }
     try {
       if (!kept) throw new Error("its report's record was not kept");
       await deps.stage(itemProposalFor(a, group, thread, sent.ts), group.channelKind);
@@ -832,12 +883,9 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
       failed.push(a);
     }
   }
-  if (failed.length) notes.set(FOLLOW_UP_NOT_STAGED, failed.map((a) => a.c.id));
-  if (kept) {
-    for (const [note, ids] of notes) {
-      const message = await markNotStaged(deps.reports, sent.ts, ids, note).catch(() => null);
-      if (message) await deps.slack.edit(group.to.channel, sent.ts, message).catch(() => {});
-    }
+  if (failed.length && kept) {
+    const message = await markNotStaged(deps.reports, sent.ts, failed.map((a) => a.c.id), FOLLOW_UP_NOT_STAGED).catch(() => null);
+    if (message) await deps.slack.edit(group.to.channel, sent.ts, message).catch(() => {});
   }
   await deps.markThread(group.to.channel, thread);
 
@@ -869,7 +917,7 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
  * team's, so whoever knows where it stands decides it.
  */
 function itemProposalFor(a: Asked, group: Group, thread: string, messageTs: string): PendingProposal {
-  const card = a.card!;
+  const card = a.card;
   const first = card.operations[0]!;
   return {
     operations: card.operations,
@@ -885,6 +933,8 @@ function itemProposalFor(a: Asked, group: Group, thread: string, messageTs: stri
     ttlMs: FOLLOW_THROUGH_CARD_TTL_MS,
     stated: FOLLOW_UP_CARD_WORDS,
     refuseRevision: FOLLOW_UP_REVISION[a.c.kind as CardKind],
+    ...(a.choices ? { choices: a.choices } : {}),
+    ...(a.selects ? { selects: a.selects } : {}),
   };
 }
 

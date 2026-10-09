@@ -145,6 +145,21 @@ export function orderStatusOptions(options: readonly string[], answer: "done" | 
 }
 
 /**
+ * The Design Status a stuck card most likely moved on to: the board's next
+ * option after its own, in the schema's order (WIP → Under Review), never
+ * the drop status. A card at the end of the board, or in a status the schema
+ * no longer has, gets the likeliest done status instead.
+ *
+ * @param options - The schema's options, in its order
+ * @param current - The card's Design Status now
+ */
+export function nextStatus(options: readonly string[], current: string | null): string | null {
+  const at = current === null ? -1 : options.indexOf(current);
+  const next = at >= 0 ? options.slice(at + 1).find((o) => o && !LIKELY_STATUSES.drop.includes(o)) : undefined;
+  return next ?? orderStatusOptions(options, "done", current)[0] ?? null;
+}
+
+/**
  * The option a reply picks: a number from the list, or one option's name
  * typed whole (case and surrounding space aside). Null for anything else.
  *

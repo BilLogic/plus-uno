@@ -20,7 +20,7 @@
 
 import { escapeSlackText } from "../slack/mrkdwn";
 import { reminderAnswer } from "../commitments/copy";
-import type { ReportItem } from "../thread-state/index";
+import type { ReportItem, ReviewChoice } from "../thread-state/index";
 
 /** F3's draft is asked for with ✅ (or ✔️) alone — not 👍, which reads as a
  *  nod rather than "draft it". */
@@ -160,38 +160,73 @@ export function todoItem(input: { id: string; owner: string; what: string; sourc
     subtitle: `<@${input.owner}> · from ${input.fromNote ? "the running note" : "this thread"}`,
     body: "No Roadmap card found for this. Review holds the drafted card.",
     done: "the drafted Roadmap card is filed.",
-    open: { label: input.fromNote ? "Open note" : "Open thread", url: input.sourceUrl },
+    open: { label: "Open source", url: input.sourceUrl },
   };
 }
 
-/** F4's card: the card, its status, and a week with no Contributor. */
+/** F4's card: the card, its status, a week with no Contributor, and what
+ *  each answer does. */
 export function unownedItem(input: { id: string; creator: string; card: { title: string; url: string; status: string | null } }): ReportItem {
   return {
     id: input.id,
     title: oneLine(input.card.title),
     subtitle: `<@${input.creator}> · ${statusWords(input.card.status)} · no Contributor for a week`,
-    body: "Who should take it? Approve makes the person asked its Contributor.",
+    body: "Who should take it? Assign makes the person asked its Contributor. Leave it sets nobody, and I won't ask again until the card changes.",
     done: "the person asked is its Contributor.",
     open: { label: "Open card", url: input.card.url },
   };
 }
 
 /**
- * F5's card: the card, its status, three quiet weeks, and the move behind
- * Review.
+ * F5's card: the card, its status, three quiet weeks, and what each answer
+ * does.
  *
- * @param input.to - The Design Status Review proposes, the schema's spelling
+ * @param input.to - The Design Status Done proposes, the schema's spelling
  */
 export function staleItem(input: { id: string; people: readonly string[]; card: { title: string; url: string; status: string | null }; to: string }): ReportItem {
-  const now = input.card.status ? oneLine(input.card.status) : "its status";
   return {
     id: input.id,
     title: oneLine(input.card.title),
     subtitle: `${mentionsOf(input.people)} · ${statusWords(input.card.status)} · no comments for 3 weeks`,
-    body: `Is it still moving? Approve moves it to ${oneLine(input.to)}, or pick another Design Status in Review. Reject leaves it in ${now}.`,
+    body: `Is it still moving? Done moves it to ${oneLine(input.to)} or another status, Still on it checks again in 3 weeks, Drop it archives it.`,
     done: "its Design Status is moved.",
     open: { label: "Open card", url: input.card.url },
   };
+}
+
+/** A day as ET's calendar has it: "Oct 30". */
+export function etDay(at: number): string {
+  return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "short", day: "numeric" }).format(new Date(at));
+}
+
+/**
+ * F4's answers: Assign the person asked, or Leave it.
+ *
+ * @param creator - The person asked, a Slack id
+ */
+export function unownedChoices(creator: string): ReviewChoice[] {
+  return [
+    { value: "assign", label: `Assign <@${creator}>`, past: `Assigned <@${creator}>`, verdict: "confirm" },
+    { value: "leave", label: "Leave it", past: "Left unassigned", verdict: "cancel", decided: "No Contributor set. Not asked again until the card changes." },
+  ];
+}
+
+/**
+ * F5's answers: Done writes the Design Status in the pop-up's select, Still
+ * on it writes nothing and checks again on `again`, Drop it archives the
+ * card — offered only when the board has that status.
+ *
+ * @param again - When Still on it is checked again, epoch ms
+ * @param drop - The board's drop status, exact, or null when it has none
+ */
+export function staleChoices(again: number, drop: string | null): ReviewChoice[] {
+  return [
+    { value: "done", label: "Done", verdict: "confirm" },
+    { value: "still", label: "Still on it", verdict: "cancel", decided: `Nothing written. Checked again ${etDay(again)}.` },
+    ...(drop
+      ? [{ value: "drop", label: "Drop it", past: "Dropped", verdict: "confirm" as const, args: { properties: { "Design Status": drop } }, decided: `Written: moved to ${drop}.` }]
+      : []),
+  ];
 }
 
 /** What Review shows for F3's drafted card. */
@@ -201,17 +236,14 @@ export function todoReviewLead(title: string): string {
 
 /** What Review shows for F4's Contributor change. */
 export function unownedReviewLead(card: { title: string; url: string }, slackUser: string): string {
-  return `Contributor for <${card.url}|${escapeSlackText(oneLine(card.title))}>: <@${slackUser}>, the person asked. Approve sets it; Reject leaves the card as it is.`;
+  return `<${card.url}|${escapeSlackText(oneLine(card.title))}> has no Contributor. Assign makes <@${slackUser}>, the person asked, its Contributor. Leave it sets nobody, and I won't ask again until the card changes.`;
 }
 
 /** What Review shows for F5's status change. */
 export function staleReviewLead(card: { title: string; url: string; status: string | null }, to: string): string {
   const from = card.status ? ` in *${escapeSlackText(card.status)}*` : "";
-  return `<${card.url}|${escapeSlackText(oneLine(card.title))}> has sat${from} with no comments for about three weeks. Approve moves it to *${escapeSlackText(to)}*; Edit fields picks another Design Status (Archived retires it). Reject leaves it as it is.`;
+  return `<${card.url}|${escapeSlackText(oneLine(card.title))}> has sat${from} with no comments for about three weeks. Done moves it to *${escapeSlackText(to)}*, or the Design Status picked under Edit fields. Still on it writes nothing and checks again in 3 weeks. Drop it archives it.`;
 }
-
-/** F4's card when the person asked has no Notion match: nothing to review. */
-export const NO_NOTION_MATCH = "No Notion match for the person asked, so set the Contributor on the card";
 
 /** A card that went up and did not stage: it comes back the next morning. */
 export const FOLLOW_UP_NOT_STAGED = "Didn't go through, so it comes back tomorrow morning";
@@ -223,6 +255,6 @@ export const ANSWER_ON_CARD = "Press Review on its card to answer this one, so t
  *  pop-up is the one way to change it. */
 export const FOLLOW_UP_REVISION: Record<Kind, string> = {
   card_todo: "To change the drafted card, press Review on it and use Edit fields before you approve.",
-  card_unowned: "To give this card to someone else, set its Contributor in Notion and Reject this one.",
+  card_unowned: "To give this card to someone else, set its Contributor in Notion and choose Leave it in its Review.",
   card_stale: "To move this card somewhere else, press Review on it and pick the Design Status under Edit fields.",
 };

@@ -145,7 +145,7 @@ function morning(
   store: InMemoryCommitmentStore,
   rm: ReturnType<typeof roadmap>,
   now: number,
-  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean } = {},
+  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean; meter?: NudgeDeps["meter"] } = {},
 ) {
   const posts: Array<{ channel: string; threadTs: string | null; text: string; blocks: unknown[]; cards: Card[]; ts: string }> = [];
   const edits: Array<{ ts: string; text: string; cards: Card[] }> = [];
@@ -194,6 +194,7 @@ function morning(
     now: () => now,
     runDate: utcDay(now),
     cards: cardFollowUps(due),
+    ...(opts.meter ? { meter: opts.meter } : {}),
   };
   return { run: () => runCommitmentNudges(NUDGE, deps), posts, edits, marked, staged, threadState };
 }
@@ -229,7 +230,7 @@ async function review(
   posted: { ts: string },
   id: string,
   decision: "confirm" | "cancel",
-  opts: { userId?: string; edits?: Record<string, string> } = {},
+  opts: { userId?: string; edits?: Record<string, string>; choice?: string } = {},
 ) {
   const ran: GateVerdict[] = [];
   const redrawn: Card[][] = [];
@@ -247,14 +248,22 @@ async function review(
     fieldOptions: async (source) => (source.property === "Design Status" ? STATUSES : ["Tutor", "Universal"]),
   };
   await runReviewDecision(
-    { viewId: "V1", channel: DESIGN, messageTs: itemProposal(posted.ts, id).proposalTs, userId: opts.userId ?? ADE, decision, ...(opts.edits ? { edits: opts.edits } : {}) },
+    {
+      viewId: "V1",
+      channel: DESIGN,
+      messageTs: itemProposal(posted.ts, id).proposalTs,
+      userId: opts.userId ?? ADE,
+      decision,
+      ...(opts.edits ? { edits: opts.edits } : {}),
+      ...(opts.choice ? { choice: opts.choice } : {}),
+    },
     deps,
   );
   return { ran, redrawn };
 }
 
 /** Words a card must not teach: a reaction gate, or a word to type. */
-const GATE_WORDS = /✅|⛔|white_check_mark|no_entry|\bdrop\b|\bskip\b|\byes\b|\breply\b|\breact/i;
+const GATE_WORDS = /✅|⛔|white_check_mark|no_entry|`drop|\bdrop \d|\bskip\b|\byes\b|\breply\b|\breact/i;
 
 /** The answer side: what was staged, edited and said. */
 function answers(store: InMemoryCommitmentStore, rm: ReturnType<typeof roadmap>, config: FollowThroughConfig = CONFIG, clock = { now: at(32, 15) }) {
@@ -357,7 +366,7 @@ describe("F3: a to-do to make a card", () => {
     assert.equal(c!.title.text, "The facelift last stage");
     assert.equal(c!.subtitle!.text, "<@U0MAYA> · from this thread");
     assert.equal(c!.body.text, "No Roadmap card found for this. Review holds the drafted card.");
-    assert.deepEqual(c!.actions.map((x) => x.text.text), ["Review", "Open thread"]);
+    assert.deepEqual(c!.actions.map((x) => x.text.text), ["Review", "Open source"]);
     assert.equal(c!.actions[1]!.url, `https://plus.slack.com/archives/${DESIGN}/p${TODO.replace(".", "")}`);
     const row = only(store);
     assert.equal(row.state, "nudged");
@@ -424,7 +433,7 @@ describe("F3: a to-do to make a card", () => {
     assert.equal(second.posts.length, 1);
     assert.match(second.posts[0]!.text, /^<@U0MAYA> Checking in once more on this to-do\./);
     assert.equal(second.posts[0]!.threadTs, ROOT);
-    assert.deepEqual(second.posts[0]!.cards[0]!.actions.map((x) => x.text.text), ["Review", "Open thread"]);
+    assert.deepEqual(second.posts[0]!.cards[0]!.actions.map((x) => x.text.text), ["Review", "Open source"]);
     assert.equal(only(store).followupTs, second.posts[0]!.ts);
     const third = morning(store, rm, at(50, 13));
     await third.run();
@@ -455,7 +464,7 @@ describe("F3: a to-do to make a card", () => {
     assert.ok(!mentions(m.posts[0]!.text).includes(LEAD));
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.subtitle!.text, "<@U0BEA> · from the running note");
-    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open note", "https://www.notion.so/note1"]]);
+    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open source", "https://www.notion.so/note1"]]);
   });
 
   it("a drafted card's pillar is exact-matched against the Roadmap's options", async () => {
@@ -503,26 +512,51 @@ describe("F4: an active card with no owner", () => {
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
     // Its thread is marked, so the team's replies there are not turns.
     assert.deepEqual(m.marked, [`${DESIGN}:${m.posts[0]!.ts}`]);
-    // Review holds the person asked as Contributor; anyone's Approve sets it.
+    // The card says what each answer does.
+    assert.equal(c!.body.text, "Who should take it? Assign makes the person asked its Contributor. Leave it sets nobody, and I won't ask again until the card changes.");
+    // Review offers Assign the person asked, or Leave it; Assign sets them.
     assert.deepEqual(m.staged[0]!.operations, [
       { toolName: "notion_update", input: { page_url: "https://www.notion.so/p1", properties: { Contributor: "n-bea" } } },
     ]);
-    const { ran } = await review(m.threadState, m.posts[0]!, only(store).id, "confirm", { userId: MAYA });
+    assert.deepEqual(m.staged[0]!.choices!.map((x) => [x.value, x.label, x.verdict]), [
+      ["assign", "Assign <@U0BEA>", "confirm"],
+      ["leave", "Leave it", "cancel"],
+    ]);
+    const { ran, redrawn } = await review(m.threadState, m.posts[0]!, only(store).id, "confirm", { userId: MAYA, choice: "assign" });
     assert.deepEqual(ran[0]!.execute?.input.properties, { Contributor: "n-bea" });
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Assigned <@U0BEA> · <@U0MAYA>");
   });
 
-  it("whose creator has no Notion match, goes up with nothing to review and says why", async () => {
+  it("Leave it sets nobody, says so on the card, and is not asked again", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({ cards: [card()] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const m = morning(store, rm, at(30, 13));
+    await m.run();
+    const { ran, redrawn } = await review(m.threadState, m.posts[0]!, only(store).id, "cancel", { userId: BEA, choice: "leave" });
+    assert.ok(!ran.some((v) => v.execute), "nothing runs");
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Left unassigned · <@U0BEA>");
+    assert.equal(redrawn.at(-1)![0]!.body.text, "No Contributor set. Not asked again until the card changes.");
+    const weekOn = morning(store, rm, at(39, 13), { threadState: m.threadState });
+    await weekOn.run();
+    assert.equal(weekOn.posts.length, 0);
+    assert.equal(only(store).state, "dropped");
+  });
+
+  it("whose creator has no Notion match, posts no card and is checked again the next morning", async () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [card()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     rm.people.notionUserForSlack = async () => null;
     const m = morning(store, rm, at(30, 13));
     await m.run();
-    assert.equal(m.staged.length, 0);
-    const [c] = m.edits.at(-1)!.cards;
-    assert.equal(c!.subtitle!.text, "No Notion match for the person asked, so set the Contributor on the card");
-    assert.deepEqual(c!.actions.map((x) => x.text.text), ["Open card"]);
-    assert.equal(only(store).state, "nudged");
+    assert.equal(m.posts.length, 0);
+    assert.equal(only(store).state, "open");
+    assert.equal(only(store).holds, 1);
+    rm.people.notionUserForSlack = async () => "n-bea";
+    const next = morning(store, rm, at(31, 13));
+    await next.run();
+    assert.equal(next.posts.length, 1);
   });
 
   it("is not kept before a week has passed, nor again the same night", async () => {
@@ -676,38 +710,84 @@ describe("F5: a stuck card", () => {
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.title.text, "Facelift — last stage");
     assert.equal(c!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
-    assert.equal(c!.body.text, "Is it still moving? Approve moves it to Shipped, or pick another Design Status in Review. Reject leaves it in Under Review.");
+    assert.equal(c!.body.text, "Is it still moving? Done moves it to Under Dev or another status, Still on it checks again in 3 weeks, Drop it archives it.");
     // Two buttons: Review and Open card. No one-tap Still on it.
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
   });
 
-  it("Review proposes the likeliest Design Status; Approve writes it, or the status picked under Edit fields", async () => {
+  /** A stuck card asked about on the shared card, with a clock its thread store shares. */
+  async function stuckOnCard() {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [stuck()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 13));
+    const clock = { now: at(30, 13) };
+    const threadState = createInMemoryThreadState({ now: () => clock.now });
+    const m = morning(store, rm, clock.now, { threadState });
     await m.run();
+    /** The morning at `when`, on the same thread store. */
+    const on = async (when: number) => {
+      clock.now = when;
+      const later = morning(store, rm, when, { threadState });
+      await later.run();
+      return later;
+    };
+    return { store, rm, m, threadState, on };
+  }
+
+  it("Review offers Done, Still on it and Drop it; Done writes the board's next status by default, or the one picked", async () => {
+    const { store, m, threadState } = await stuckOnCard();
+    // Under Review's next on the board is Under Dev, not Shipped.
     assert.deepEqual(m.staged[0]!.operations, [
-      { toolName: "notion_update", input: { page_url: "https://www.notion.so/p1", properties: { "Design Status": "Shipped" } } },
+      { toolName: "notion_update", input: { page_url: "https://www.notion.so/p1", properties: { "Design Status": "Under Dev" } } },
     ]);
-    const { ran } = await review(m.threadState, m.posts[0]!, only(store).id, "confirm", { userId: BEA, edits: { "0.properties.Design Status": "Archived" } });
-    assert.deepEqual(ran[0]!.execute?.input.properties, { "Design Status": "Archived" });
+    assert.deepEqual(m.staged[0]!.choices!.map((x) => [x.value, x.label, x.verdict]), [
+      ["done", "Done", "confirm"],
+      ["still", "Still on it", "cancel"],
+      ["drop", "Drop it", "confirm"],
+    ]);
+    const { ran, redrawn } = await review(threadState, m.posts[0]!, only(store).id, "confirm", { userId: BEA, choice: "done", edits: { "0.properties.Design Status": "Shipped" } });
+    assert.deepEqual(ran[0]!.execute?.input.properties, { "Design Status": "Shipped" });
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Done · <@U0BEA>");
   });
 
-  it("rejected in Review means still on it: nothing written, and no follow-up until three weeks on", async () => {
-    const store = createInMemoryCommitmentStore();
-    const rm = roadmap({ cards: [stuck()] });
-    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 13));
-    await m.run();
-    const { ran, redrawn } = await review(m.threadState, m.posts[0]!, only(store).id, "cancel", { userId: BEA });
+  it("Drop it archives the card, whatever the select says", async () => {
+    const { store, m, threadState } = await stuckOnCard();
+    const { ran, redrawn } = await review(threadState, m.posts[0]!, only(store).id, "confirm", { userId: ADE, choice: "drop", edits: { "0.properties.Design Status": "Shipped" } });
+    assert.deepEqual(ran[0]!.execute?.input.properties, { "Design Status": "Archived" });
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Dropped · <@U0ADE>");
+    assert.equal(redrawn.at(-1)![0]!.body.text, "Written: moved to Archived.");
+  });
+
+  it("Still on it writes nothing, and the card says when it is checked again: three weeks from the card", async () => {
+    const { store, m, threadState, on } = await stuckOnCard();
+    const { ran, redrawn } = await review(threadState, m.posts[0]!, only(store).id, "cancel", { userId: BEA, choice: "still" });
     assert.ok(!ran.some((v) => v.execute), "nothing runs");
-    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Rejected by <@U0BEA>");
-    const weekOn = morning(store, rm, at(39, 13), { threadState: m.threadState });
-    await weekOn.run();
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Still on it · <@U0BEA>");
+    assert.equal(redrawn.at(-1)![0]!.body.text, "Nothing written. Checked again Oct 21.");
+    const weekOn = await on(at(39, 13));
     assert.equal(weekOn.posts.length, 0);
     assert.equal(only(store).state, "snoozed");
-    assert.equal(only(store).dueAt, at(39, 13) + 21 * DAY);
+    assert.equal(only(store).dueAt, at(30, 13) + 21 * DAY);
+  });
+
+  it("Still on it twice snoozes twice, then the row lapses", async () => {
+    const { store, m, threadState, on } = await stuckOnCard();
+    await review(threadState, m.posts[0]!, only(store).id, "cancel", { userId: MAYA, choice: "still" });
+    await on(at(39, 13));
+    assert.equal(only(store).snoozes, 1);
+    // Three weeks from the first card, unmoved: the follow-up asks, in its thread.
+    const second = await on(at(51, 13));
+    assert.equal(second.posts.length, 1);
+    assert.equal(second.posts[0]!.threadTs, m.posts[0]!.ts);
+    await review(threadState, second.posts[0]!, only(store).id, "cancel", { userId: MAYA, choice: "still" });
+    // A week on, its follow-up's answer is read, not lapsed over.
+    await on(at(59, 13));
+    assert.equal(only(store).state, "snoozed");
+    assert.equal(only(store).snoozes, 2);
+    assert.equal(only(store).dueAt, at(51, 13) + 21 * DAY);
+    const last = await on(at(72, 14)); // 9 am ET, after the clocks change
+    assert.equal(last.posts.length, 0);
+    assert.equal(only(store).state, "lapsed");
   });
 
   it("with a recent comment is not flagged", async () => {
@@ -940,8 +1020,8 @@ describe("shared rules", () => {
         // Bea's: one she created with no Contributor, one she is stuck on.
         card({ pageId: "a" }),
         card({ pageId: "b", designStatus: "Under Review", contributors: [{ id: "n-bea", name: "Bea Ruiz" }], lastEditedAt: EOD - 22 * DAY }),
-        // Maya's.
-        card({ pageId: "c", designStatus: "Under Review", contributors: [{ id: "n-maya", name: "Maya Chen" }], lastEditedAt: EOD - 23 * DAY }),
+        // Maya's, a Universal card: #plus-universal.
+        card({ pageId: "c", pillars: ["Universal"], designStatus: "Under Review", contributors: [{ id: "n-maya", name: "Maya Chen" }], lastEditedAt: EOD - 23 * DAY }),
       ],
     });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
@@ -1202,7 +1282,25 @@ describe("replies under a follow-up", () => {
     assert.deepEqual(report.rows.map((r) => r.cardId), ["w"]);
   });
 
-  it("at most two new card messages a channel each morning", async () => {
+  it("a budget stop between holding the cards and posting them hands the rows back, so the retry posts them", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({ cards: [card({ pageId: "a" }), card({ pageId: "b", lastEditedAt: EOD - 9 * DAY })] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    // Headroom runs out at the check before the post: the start, one per
+    // row, the empty read that ends the loop, then the flush.
+    let checks = 0;
+    const meter = { headroom: () => (++checks >= 5 ? { subrequests: 0, d1Queries: 1000 } : { subrequests: 1000, d1Queries: 1000 }) };
+    const stopped = morning(store, rm, at(30, 13), { meter });
+    await assert.rejects(stopped.run(), SubrequestBudgetError);
+    assert.equal(stopped.posts.length, 0);
+    for (const row of store.rows.values()) assert.equal(row.checkedOn, null, "handed back, not checked for today");
+    const retry = morning(store, rm, at(30, 13, 5));
+    await retry.run();
+    assert.equal(retry.posts.length, 1);
+    assert.equal(retry.posts[0]!.cards.length, 2);
+  });
+
+  it("at most two new card questions a channel each morning", async () => {
     const store = createInMemoryCommitmentStore();
     const creators = ["n-bea", "n-maya", "n-ade"];
     const rm = roadmap({ cards: creators.map((creatorId, i) => card({ pageId: `c${i}`, creatorId, lastEditedAt: EOD - (8 + i) * DAY })) });
