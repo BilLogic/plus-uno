@@ -100,6 +100,15 @@ describe("Review on one item of a report", () => {
     assert.doesNotMatch(draft, /New 1/);
   });
 
+  it("says in the pop-up who can decide the item and when it closes, which its card does not", async () => {
+    const store = await staged();
+    await store.putProposal({ ...itemStaged("c2", 2), confirmers: ["U03FYQJRQHX", "U0BRYAN01"] });
+    const { deps, views } = harness(store);
+    await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: itemProposal(MSG, "c2").proposalTs, userId: "U03FYQJRQHX", item: { messageTs: MSG, id: "c2" } }, deps);
+    // Posted 2026-09-21 10:13 ET; 72 h later.
+    assert.match(JSON.stringify(views.calls.at(-1)!.view), /Open until Thu 10:13 ET · <@U03FYQJRQHX> or <@U0BRYAN01> can decide\./);
+  });
+
   it("decides from Submit: runs only that item, and redraws its report message with who decided, Review to View", async () => {
     const store = await staged();
     const { deps, ran, updates } = harness(store);

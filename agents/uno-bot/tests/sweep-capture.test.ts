@@ -107,10 +107,9 @@ test("a note's decision that contradicts a PRD becomes one card in #plus-design,
   const [card] = h.posted;
   assert.equal(card!.channel, DESIGN, "no thread, not the design system: #plus-design");
   assert.equal(card!.threadTs, null);
-  assert.match(card!.text, /<@U0ADE>/, "the PRD card's Contributor is the owner");
-  assert.ok(card!.text.includes(`${NOTE_URL}#ndec`), "the card cites the note block");
-  assert.match(card!.text, /note says/);
   const [staged] = h.staged;
+  assert.match(JSON.stringify(card!.blocks), /<@U0ADE> · from the running notes/, "the PRD card's Contributor is the owner");
+  assert.ok(staged!.proposalText.includes(`${NOTE_URL}#ndec`), "its Review cites the note block");
   assert.deepEqual((staged!.operations![0]!.input.replace as unknown[])[0], {
     block_id: PRD.blocks[0]!.id,
     last_edited_time: PRD.blocks[0]!.lastEditedTime,
@@ -168,8 +167,7 @@ test("a Universal-pillar card's comment contradicting its PRD lands in #plus-uni
 
   assert.equal(h.posted.length, 1);
   assert.equal(h.posted[0]!.channel, UNIVERSAL);
-  assert.match(h.posted[0]!.text, /<@U0CY>/);
-  assert.match(h.posted[0]!.text, /card says/);
+  assert.match(JSON.stringify(h.posted[0]!.blocks), /<@U0CY> · from a card comment/);
 });
 
 test("a thread's answer no page holds becomes a card in that thread naming the page, the section and the text", async () => {
@@ -225,11 +223,13 @@ test("a thread's answer no page holds becomes a card in that thread naming the p
   const [card] = h.posted;
   assert.equal(card!.channel, DESIGN);
   assert.equal(card!.threadTs, root.ts, "in the source thread");
-  assert.match(card!.text, /<@U0ANS>/, "mentions whoever answered");
-  assert.doesNotMatch(card!.text, /<@U0ASK>/);
-  assert.match(card!.text, /add under .*Tutor Training PRD.* › \*Session setup\*/);
-  assert.match(card!.text, /Ratio is 1 tutor to 4–5 students\./);
-  assert.ok(card!.text.includes(FOUND_BY_SEARCH), "a page found by search says so");
+  const shown = JSON.stringify(card!.blocks);
+  assert.match(shown, /<@U0ANS>/, "mentions whoever answered");
+  assert.doesNotMatch(shown, /<@U0ASK>/);
+  assert.match(shown, /Tutor Training PRD/);
+  assert.ok(shown.includes(FOUND_BY_SEARCH), "a page found by search says so");
+  assert.match(h.staged[0]!.proposalText, /Goes under: Session setup/);
+  assert.match(h.staged[0]!.proposalText, /Adds: Ratio is 1 tutor to 4–5 students\./);
   const op = h.staged[0]!.operations![0]!;
   assert.equal(op.toolName, "notion_update", "a proposal card that writes the text — never an intake");
   assert.deepEqual(op.input.insert, [
@@ -328,7 +328,7 @@ test("a name nobody linked resolves above the floor, and the card says it was fo
   assert.equal(night.findings[0]?.target.foundBy, "search");
   h.clock.now = at(30, 14);
   await runSweepJob(MORNING, h.deps);
-  assert.ok(h.posted[0]!.text.includes(FOUND_BY_SEARCH));
+  assert.ok(JSON.stringify(h.posted[0]!.blocks).includes(FOUND_BY_SEARCH));
   assert.deepEqual(h.searches, ["notion booking flow PRD"]);
 });
 
@@ -539,7 +539,7 @@ test("Thursday's new decision on a card about the same page is its own item, aft
   h.clock.now = at(32, 14);
   const friday = await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 2, `Thursday's decision is proposed (${friday.summary})`);
-  assert.match(h.posted[1]!.text, /tertiary/);
+  assert.match(h.staged.at(-1)!.proposalText, /Will say: Buttons use the tertiary style\./);
 });
 
 test("eighty cards edited in one minute are all read across nights, and the job never stalls at the minute", async () => {

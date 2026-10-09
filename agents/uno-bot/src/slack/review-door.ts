@@ -184,13 +184,22 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
       ? draftView(
           card,
           look.proposal,
-          { mayDecide: look.mayDecide, confirmers: look.confirmers },
+          { mayDecide: look.mayDecide, confirmers: look.confirmers, ...(await itemClosesAt(look.proposal, deps)) },
           { editable: draftValuesOf(look.proposal).size > 0 },
         )
       : look.state === "gone" && request.cardText
         ? decidedView(card, request.cardText)
         : closedView(card, look);
   await deps.views.update(viewId, view);
+}
+
+/** When a report's item closes undecided — its report's post time plus its
+ *  TTL — or nothing for any other card or an unread record. */
+async function itemClosesAt(proposal: PendingProposal, deps: ReviewDoorDeps): Promise<{ closesAt?: number }> {
+  if (!proposal.item) return {};
+  const record = await deps.threadState.getReport(proposal.item.messageTs).catch(() => null);
+  const postedAt = Number(proposal.item.messageTs) * 1000;
+  return record && Number.isFinite(postedAt) ? { closesAt: postedAt + record.ttlMs } : {};
 }
 
 /** An item's words for View, off its report's record — redrawing the

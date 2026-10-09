@@ -35,6 +35,8 @@ import { failureReason, settleItem, type ReportStore } from "./decision-cards";
 export interface CardMessage {
   text: string;
   blocks: unknown[];
+  /** A decision report's tag, sent again with its redraw. */
+  metadata?: { event_type: string; event_payload: Record<string, unknown> };
 }
 
 /**

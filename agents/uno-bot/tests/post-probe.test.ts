@@ -29,6 +29,35 @@ async function probe(q: string): Promise<{ body: Record<string, unknown>; status
 const BLOCKS = [{ type: "markdown", text: "| a | b |\n|---|---|\n| <@x> | 2 |" }];
 const blocksParam = `blocks=${encodeURIComponent(JSON.stringify(BLOCKS))}`;
 
+test("report previews preserve their metadata through two edits of the message they just posted", async () => {
+  sent = [];
+  reply = { ok: true, ts: "2.0", messages: [{ metadata: { event_type: "uno_preview_report", event_payload: { fixture: "sweep" } } }] };
+  const metadata = { event_type: "uno_preview_report", event_payload: { fixture: "sweep" } };
+  const edits = [{ text: "Approved preview", blocks: BLOCKS }, { text: "Closed preview", blocks: BLOCKS }];
+  const q = new URLSearchParams({ channel: "D0123", text: "PREVIEW — not live", blocks: JSON.stringify(BLOCKS), metadata: JSON.stringify(metadata), edits: JSON.stringify(edits) });
+  const res = await probe(q.toString());
+  assert.deepEqual(sent.map((s) => s.method), ["chat.postMessage", "chat.update", "chat.update", "conversations.replies"]);
+  for (const call of sent.slice(0, 3)) assert.deepEqual(call.body.metadata, metadata);
+  for (const call of sent.slice(1, 3)) assert.equal(call.body.ts, "2.0", "only the newly posted fixture is edited");
+  assert.deepEqual(res.body.metadata, metadata);
+});
+
+test("report-preview edits refuse public channels and malformed or oversized fixtures before posting", async () => {
+  sent = [];
+  const metadata = JSON.stringify({ event_type: "uno_preview_report", event_payload: {} });
+  for (const extra of [
+    { channel: "C0ARJ2A3A69", metadata, edits: "[]" },
+    { metadata: JSON.stringify({ event_type: "uno_sweep_card", event_payload: {} }) },
+    { metadata, edits: JSON.stringify([{}, {}, {}]) },
+    { metadata, edits: JSON.stringify([{ text: "x".repeat(2001), blocks: BLOCKS }]) },
+  ]) {
+    const q = new URLSearchParams({ channel: "D0123", blocks: JSON.stringify(BLOCKS) });
+    for (const [key, value] of Object.entries(extra)) if (value !== undefined) q.set(key, value);
+    assert.equal((await probe(q.toString())).status, 400);
+  }
+  assert.equal(sent.length, 0);
+});
+
 test("the post probe refuses a public channel, bad JSON or a non-array before calling Slack", async () => {
   sent = [];
   let res = await probe(`channel=C0PUBLIC1&text=t&${blocksParam}`);

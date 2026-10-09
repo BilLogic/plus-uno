@@ -400,6 +400,9 @@ export interface ReportItem {
   also?: { label: string; url: string };
   /** What the card says once written, after "Written: ". Absent, its body. */
   done?: string;
+  /** The item's whole words, mrkdwn, when its body is a shortened view of
+   *  them: View shows them once its proposal is gone. */
+  detail?: string;
 }
 
 /** Where one item of a report stands. `at` is epoch ms. `as` is the card's
@@ -443,6 +446,19 @@ export interface DecisionReportRecord {
   /** Blocks the report posted below its cards — the library release's table
    *  of changed components — drawn again under them on every redraw. */
   after?: unknown[];
+  /** Set when Slack refused its cards and it posted as plain sections: every
+   *  redraw is plain too. */
+  plain?: boolean;
+  /** The Slack message metadata it posted with, sent again on every edit so
+   *  the tag a later search finds it by stays. */
+  metadata?: { event_type: string; event_payload: Record<string, unknown> };
+}
+
+/** The key one item of a report's proposal is staged under: its message and
+ *  its entry id. A Slack ts holds no `#`, so it never collides with a card's
+ *  own ts. */
+export function itemProposalKey(messageTs: string, id: string): string {
+  return `${messageTs}#${id}`;
 }
 
 /** One change to a report: an item's state, or an item replaced by its

@@ -38,11 +38,12 @@
 //
 //   `sweep-post` (the weekday morning run) takes the findings whose morning has
 //   come (`postableAt`), groups them by destination (`pickDestination`), and
-//   stages the proposal cards (`planSweepCards`) the way the Figma library post
-//   stages without a Turn: post the card, then `putProposal` with its own TTL
-//   and confirmer set. One live card per place: a place whose card is still
-//   live gets none, and what does not fit waits in the queue. A quiet day
-//   posts nothing.
+//   posts each place's report on the shared decision card
+//   (`slack/decision-cards.ts`): a parent line, then a card per fix with
+//   Review and Open page. Each fix is staged as its own proposal, without a
+//   Turn, with its own TTL and the report's confirmers. One live report per
+//   place: a place whose report is still live gets none, and what does not
+//   fit waits in the queue. A quiet day posts nothing.
 //
 // THE AUDIENCE RULE (ADR-031). A run with no requester has no one whose
 // visibility bounds it, so the evidence's own audience does: a finding only
@@ -54,10 +55,11 @@
 //     stays in its thread, its owner is someone in the channel, and nothing of
 //     it — text, link or name — reaches any other message.
 //   • A group DM uno-bot is in is read the same way and its finding posted
-//     back in it. Its card says that a ✅ also posts a reworded note in the
-//     team channel — the page's name, no quote, no names (`./share.ts`).
+//     back in it. Once a fix there is written, a share card offers a reworded
+//     note in the team channel — the page's name, no quote, no names
+//     (`./share.ts`).
 //   • A fix found both in a public thread and in a private place is private:
-//     it goes on the private card, and the public copy leaves the queue.
+//     it goes on the private report, and the public copy leaves the queue.
 //   • A 1:1 DM with uno-bot is read only by `sweep-dms`, and everything it
 //     finds is posted back only in that DM. Its one way out is the ✅ on the
 //     DM sweep's offer to raise a disagreement (`../dm-sweep/`).
@@ -74,17 +76,18 @@
 // that stops at its page cap never moves the cursor past the oldest root it
 // read, and a thread too long to read whole is left with a note.
 //
-// A POSTED CARD IS ALWAYS STAGED, OR WITHDRAWN. A card starts only when the
-// budget left covers all of it (`CARD_COST`). Its items are recorded first,
-// in one statement and without a ts; then it is posted, tagged with its key
-// in Slack's message metadata; then staged; then its items take its ts
-// (`markPosted`). A stop anywhere in that leaves items without a ts, and the
-// next try finds the card by its tag and finishes staging it — or, when it
-// never went up, releases the items and cards the findings afresh. A staging
-// that fails outright edits the card to say it did not go through and
-// releases its items, which stay queued.
+// A POSTED REPORT IS ALWAYS STAGED, OR WITHDRAWN. A report starts only when
+// the budget left covers all of it (`CARD_COST`). Its items are recorded
+// first, in one statement and without a ts; then it is posted, tagged with
+// its key in Slack's message metadata; then its record is kept and each fix
+// staged; then its items take its ts (`markPosted`). A stop anywhere in that
+// leaves items without a ts, and the next try finds the report by its tag and
+// stages the fixes not yet staged — or, when it never went up, releases the
+// items and cards the findings afresh. A fix whose staging fails outright
+// says so on its card and stays queued; a report none of whose fixes staged
+// is edited to say it did not go through, and its items are released.
 //
-// A FIX IS PROPOSED ONCE. A reply under a card is activity past the cursor, so
+// A FIX IS PROPOSED ONCE. A reply under a report is activity past the cursor, so
 // the next night re-reads the thread and the detector may find the same drift
 // again. The morning skips any fix the thread has already had carded —
 // proposed, dropped or applied.
@@ -96,20 +99,34 @@
 
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
-import { proposalReplyThread, SWEEP_KEY, type PendingProposal, type ThreadState } from "../thread-state/index";
+import { proposalReplyThread, type PendingProposal, type ThreadState } from "../thread-state/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
-import type { ProposalCard } from "../turn/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import {
   cardPlan,
   destinationKey,
+  itemOperation,
   operationsDigest,
   planSweepCards,
-  sweepCard,
+  sweepItem,
+  sweepItemText,
+  sweepItemWords,
+  sweepParent,
+  sweepReportMetadata,
   sweepShareOf,
   SWEEP_CARD_TTL_MS,
   type SweepCardPlan,
 } from "./cards";
+import {
+  decisionReport,
+  itemProposal,
+  itemProposalKey,
+  markNotStaged,
+  plainReportBlocks,
+  reportRecord,
+  type DecisionReport,
+  type ReportStore,
+} from "../slack/decision-cards";
 import { MAX_MESSAGE_CHARS, type DriftDetector } from "./detector";
 import type { CaptureDetector } from "./capture-detector";
 import { sweepRecords, type SweepNotion } from "./records";
@@ -241,12 +258,12 @@ export interface DmThreadVerdict {
   answered: boolean;
 }
 
-/** A card as Slack will post it. */
-export interface RenderedSweepCard {
+/** A report's message as Slack will post it (`decisionReport`). */
+export interface SweepReportMessage {
   text: string;
   blocks: unknown[];
-  /** Posted before the card, so its buttons stay last in the thread. */
-  followUp?: string[];
+  /** Its tag, which an edit sends again. */
+  metadata?: { event_type: string; event_payload: Record<string, unknown> };
 }
 
 /** Where a card lands: a thread, or the top of a channel. */
@@ -265,33 +282,36 @@ export interface CardTag {
 /** A search for a posted card by its tag: found, surely not there, or not
  *  known — a failed read, or more pages than the search reads. */
 export type PostedCard =
-  | { state: "found"; ts: string; text: string; digest: string }
+  | { state: "found"; ts: string; text: string; digest: string; plain?: boolean }
   | { state: "absent" }
   | { state: "unknown"; why: string };
 
 /** Posting and staging, and the reads the morning needs. */
 export interface SweepDelivery {
-  render(card: ProposalCard): RenderedSweepCard;
-  /** Post the card — and any follow-up before it — tagged with its key and
-   *  digest; the card's own message as the card, a follow-up as its plan.
-   *  `blocks` is the card's own blocks when it went up with them, and absent
-   *  when Slack refused them and it stepped down to its text. */
-  post(to: CardPlace, card: RenderedSweepCard, tag: CardTag): Promise<{ ok: boolean; ts?: string; blocks?: unknown[] }>;
+  /** Post the report, tagged with its key and digest. `refusedBlocks` when
+   *  Slack refused its blocks, so it may step down to plain sections. */
+  post(to: CardPlace, message: SweepReportMessage, tag: CardTag): Promise<{ ok: boolean; ts?: string; refusedBlocks?: boolean }>;
+  /** Edit a posted report in place (`chat.update`): a fix that did not stage
+   *  says so on its card. */
+  edit(channel: string, ts: string, message: SweepReportMessage): Promise<void>;
+  /** Where each report's record is kept: each fix's decision lands on it, and
+   *  its message is drawn again from it (`slack/decision-cards.ts`). */
+  reports: ReportStore & Pick<ThreadState, "putReport">;
   /** The card's own message under this key, matched by its tag's key and
    *  role. `since` bounds a channel-top search. */
   findPosted(to: CardPlace, cardKey: string, since: string): Promise<PostedCard>;
-  /** Stage the card, as a turn's staging does, in a place of this kind. */
+  /** Stage one fix, as a turn's staging does, in a place of this kind. */
   stage(proposal: PendingProposal, channelKind: ChannelKind): Promise<void>;
   /** The sweep cards ThreadState holds live in a channel — a revision or a
    *  re-staged card among them, whether or not the records caught up. */
   liveCards(channel: string): Promise<PendingProposal[]>;
-  /** Whether a posted card was ever staged, and what became of it
-   *  (`sweepCardState`). */
+  /** Whether one posted fix was ever staged, and what became of it
+   *  (`sweepCardState`), by its proposal's key. */
   cardState(proposalTs: string): Promise<SweepCardState>;
-  /** Retire the card in ThreadState so it can't be ✅'d, replace its text,
-   *  remove its buttons, and retag it so a later search by its key passes it
-   *  over. */
-  withdraw(channel: string, ts: string, text: string, cardKey: string): Promise<void>;
+  /** Retire the report's fixes in ThreadState, by their proposals' keys, so
+   *  none can be decided; replace its text, remove its cards, and retag it so
+   *  a later search by its key passes it over. */
+  withdraw(channel: string, ts: string, text: string, cardKey: string, proposalKeys: readonly string[]): Promise<void>;
   permalink(channel: string, ts: string): Promise<string | null>;
 }
 
@@ -393,6 +413,7 @@ export interface SweepCardReport {
   channel: string;
   threadTs: string | null;
   items: number;
+  /** The report's fallback text, then each fix whole as its Review shows it. */
   text: string;
   proposalTs?: string;
 }
@@ -1157,30 +1178,23 @@ interface MorningCtx {
   permalinks: number;
 }
 
-/** Post one planned card, stage it, and mark its items posted. */
-async function postCard(ctx: MorningCtx, planned: SweepCardPlan, postDate: string): Promise<void> {
+/** Post one planned report, stage each of its fixes, and mark its items posted. */
+async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string): Promise<void> {
   const { deps, now, notes } = ctx;
-  const to = resolveDestination(planned.destination, deps.config);
+  const to = resolveDestination(plan.destination, deps.config);
   if (!to) {
-    notes.push(`${planned.key}: its channel is not configured`);
+    notes.push(`${plan.key}: its channel is not configured`);
     return;
   }
   if (to.channel === deps.config.unoBot) {
     // Unreachable while #uno-bot is never swept; stated so it stays true.
-    notes.push(`${planned.key}: not posted in #uno-bot`);
-    if (!deps.dryRun) await deps.store.removeFindings(planned.items.map((f) => f.id));
+    notes.push(`${plan.key}: not posted in #uno-bot`);
+    if (!deps.dryRun) await deps.store.removeFindings(plan.items.map((f) => f.id));
     return;
   }
 
-  // Every fix is shown whole, so a card holds only as many as one Slack
-  // message shows in full; the rest wait in the queue. A fix too long to show
-  // even alone is not offered.
-  const plan = await fitToOneMessage(ctx, planned);
-  if (!plan) return;
-  const ids = plan.items.map((f) => f.id);
-
-  // Everything the card will send, counted before any of it is: a card that
-  // cannot finish does not start, and the job defers instead.
+  // Everything the report will send, counted before any of it is: a report
+  // that cannot finish does not start, and the job defers instead.
   const posts = 1;
   const links = plan.items.filter((f) => f.evidence.messageTs[0]).length;
   const affordable = Math.min(links, MAX_PERMALINKS - ctx.permalinks);
@@ -1197,17 +1211,17 @@ async function postCard(ctx: MorningCtx, planned: SweepCardPlan, postDate: strin
     });
     if (link) item.evidence.permalinks = [link];
   }
-  const rendered = deps.delivery.render(sweepCard(plan));
-  const report: SweepCardReport = {
+  const report = sweepReport(plan);
+  const card: SweepCardReport = {
     key: plan.key,
     destination: plan.destination,
     channel: to.channel,
     threadTs: to.threadTs,
     items: plan.items.length,
-    text: rendered.text,
+    text: reportText(plan, report),
   };
   if (deps.dryRun) {
-    ctx.cards.push(report);
+    ctx.cards.push(card);
     ctx.carded.push(...plan.items);
     return;
   }
@@ -1215,109 +1229,141 @@ async function postCard(ctx: MorningCtx, planned: SweepCardPlan, postDate: strin
   const digest = operationsDigest(plan.operations);
   await deps.store.saveCard({ key: plan.key, destination: plan.destination, items: plan.items, digest });
   await deps.store.addItems(plan.items.map((f) => itemRecord(f, plan, now)));
-  const sent = await deps.delivery.post(to, rendered, { cardKey: plan.key, digest });
+  const tag = { cardKey: plan.key, digest };
+  let sent = await deps.delivery.post(to, { text: report.text, blocks: report.blocks }, tag);
+  // Cards Slack refuses step down to sections, each with its own Review, and
+  // the report's record keeps every redraw plain from then on.
+  const plain = !sent.ok && sent.refusedBlocks === true;
+  if (plain) sent = await deps.delivery.post(to, { text: report.text, blocks: plainReportBlocks(report.blocks) }, tag);
   if (!sent.ok || !sent.ts) {
     await release(deps, plan.key);
     notes.push(`${plan.key}: the post failed — kept for tomorrow`);
     return;
   }
-  const root = to.threadTs ?? sent.ts;
-  const staged = await stageOrWithdraw(ctx, plan, {
-    channel: to.channel,
-    root,
-    ts: sent.ts,
-    text: rendered.text,
-    ...(sent.blocks ? { blocks: sent.blocks } : {}),
-    postDate,
-  });
-  if (!staged) return;
-  await deps.store.removeFindings(ids);
-  ctx.cards.push({ ...report, proposalTs: sent.ts });
-  ctx.carded.push(...plan.items);
-}
-
-/** Slack's limits on one message: its text, and its blocks. */
-const ONE_MESSAGE = { chars: 40_000, blocks: 50 };
-/** A permalink as long as Slack's, for measuring a card before it has them. */
-const PERMALINK_SIZED = "https://plus.slack.com/archives/C0000000000/p0000000000000000";
-
-/**
- * The longest head of the plan whose card Slack shows in one message, whole —
- * no follow-up, no collapsed plan. The fixes cut stay queued; a first fix too
- * long to show alone leaves the queue with a note, since it can never be
- * shown whole.
- */
-async function fitToOneMessage(ctx: MorningCtx, plan: SweepCardPlan): Promise<SweepCardPlan | null> {
-  const { deps, notes } = ctx;
-  const fits = (items: PendingFinding[]): boolean => {
-    const measured = items.map((f) => ({ ...f, evidence: { ...f.evidence, permalinks: [PERMALINK_SIZED] } }));
-    const card = deps.delivery.render(sweepCard(cardPlan(plan.key, plan.destination, measured)));
-    return !card.followUp?.length && card.text.length <= ONE_MESSAGE.chars && card.blocks.length <= ONE_MESSAGE.blocks;
-  };
-  let n = plan.items.length;
-  while (n > 0 && !fits(plan.items.slice(0, n))) n -= 1;
-  if (n === 0) {
-    const [first] = plan.items;
-    notes.push(`${first!.id}: too long to show whole on a card — not offered`);
-    if (!deps.dryRun) await deps.store.removeFindings([first!.id]);
-    return null;
-  }
-  if (n < plan.items.length) notes.push(`${plan.key}: ${plan.items.length - n} fix(es) wait for room on a card`);
-  return n === plan.items.length ? plan : cardPlan(plan.key, plan.destination, plan.items.slice(0, n));
+  const staged = await stageReport(ctx, plan, report, { channel: to.channel, root: to.threadTs ?? sent.ts, ts: sent.ts, postDate, ...(plain ? { plain: true } : {}) }, now);
+  if (!staged.length) return;
+  await deps.store.removeFindings(staged.map((f) => f.id));
+  ctx.cards.push({ ...card, proposalTs: sent.ts });
+  ctx.carded.push(...staged);
 }
 
 /**
- * Stage a posted card and mark its items posted; when the staging fails
- * outright, edit the card to say so and release its items, which stay queued.
- * A budget stop is rethrown: the next try finds the card by its tag.
+ * A plan's report: a card per fix, and a parent line counting every finding
+ * waiting for the place — the ones past the card's ten are held, and say so.
  */
-async function stageOrWithdraw(
+export function sweepReport(plan: SweepCardPlan): DecisionReport {
+  const all = [...plan.items, ...(plan.rest ?? [])];
+  return decisionReport(
+    all.map((f) => sweepItem(f, plan.destination)),
+    sweepParent(all, plan.destination),
+  );
+}
+
+/** A report as the job's own report shows it — a dry run's preview: what
+ *  posts, then each fix whole. */
+function reportText(plan: SweepCardPlan, report: DecisionReport): string {
+  return [report.text, ...plan.items.map(sweepItemText)].join("\n\n");
+}
+
+/** What a fix that did not stage says on its card. */
+export const NOT_STAGED = "Didn't go through, so it comes back in tomorrow's report.";
+
+/**
+ * Stage each fix of a posted report as its own proposal, after keeping the
+ * report's record that their decisions land on. A fix that does not stage
+ * says so on its card, and its finding stays queued for the next morning; a
+ * report none of whose fixes staged is withdrawn and its findings released.
+ * Then its items take the message's ts. A budget stop is rethrown: the next
+ * try finds the report by its tag and stages what is left.
+ *
+ * @param skip - Fixes an earlier try already staged, by block id, which are
+ *   not staged again
+ * @returns The findings staged now
+ */
+async function stageReport(
   ctx: MorningCtx,
   plan: SweepCardPlan,
-  posted: { channel: string; root: string; ts: string; text: string; blocks?: unknown[]; postDate: string },
-): Promise<boolean> {
+  report: DecisionReport,
+  posted: { channel: string; root: string; ts: string; postDate: string; plain?: boolean },
+  postedAt: number,
+  skip: ReadonlySet<string> = new Set(),
+): Promise<PendingFinding[]> {
   const { deps } = ctx;
+  const keys = plan.items.map((f) => itemProposalKey(posted.ts, f.blockId!));
+  const why = (err: unknown) => (err instanceof Error ? err.message : String(err));
+  const withdraw = async (reason: string): Promise<PendingFinding[]> => {
+    await deps.delivery.withdraw(posted.channel, posted.ts, WITHDRAWN_TEXT, plan.key, keys).catch(rethrowIfBudget);
+    await release(deps, plan.key);
+    ctx.notes.push(`${plan.key}: posted but not staged (${reason}) — withdrawn, kept for tomorrow`);
+    return [];
+  };
   try {
-    await deps.delivery.stage(sweepProposal(plan, posted), plan.items[0]!.evidence.channelKind);
+    // A retry keeps the record an earlier try made, and the decisions on it.
+    if (!(await deps.delivery.reports.getReport(posted.ts))) {
+      await deps.delivery.reports.putReport({
+        ...reportRecord(posted.channel, posted.ts, report, SWEEP_CARD_TTL_MS),
+        ...(posted.plain ? { plain: true } : {}),
+        metadata: sweepReportMetadata({ cardKey: plan.key, digest: operationsDigest(plan.operations) }),
+      });
+    }
   } catch (err) {
     if (isSubrequestBudgetError(err)) throw err;
-    const why = err instanceof Error ? err.message : String(err);
-    await deps.delivery.withdraw(posted.channel, posted.ts, WITHDRAWN_TEXT, plan.key).catch(rethrowIfBudget);
-    await release(deps, plan.key);
-    ctx.notes.push(`${plan.key}: posted but not staged (${why}) — withdrawn, kept for tomorrow`);
-    return false;
+    return withdraw(`its record was not kept: ${why(err)}`);
   }
-  await deps.store.markPosted(plan.key, posted.ts, ctx.now);
+  const staged: PendingFinding[] = [];
+  const failed: PendingFinding[] = [];
+  let reason = "";
+  for (const f of plan.items) {
+    if (skip.has(f.blockId!)) continue;
+    try {
+      await deps.delivery.stage(sweepProposal(plan, f, posted), f.evidence.channelKind);
+      staged.push(f);
+    } catch (err) {
+      if (isSubrequestBudgetError(err)) throw err;
+      reason ||= why(err);
+      failed.push(f);
+    }
+  }
+  if (!staged.length && !skip.size) return withdraw(reason);
+  await deps.store.markPosted(plan.key, posted.ts, postedAt);
   await deps.store.dropCard(plan.key);
-  return true;
+  if (failed.length) {
+    const ids = failed.map((f) => f.blockId!);
+    const marked = await markNotStaged(deps.delivery.reports, posted.ts, ids, NOT_STAGED).catch(() => null);
+    if (marked) await deps.delivery.edit(posted.channel, posted.ts, marked).catch(rethrowIfBudget);
+    // Not carded, so the next morning cards them again from the queue.
+    for (const f of failed) await deps.store.updateItem(`${plan.key}#${f.blockId}`, { status: "failed", resolvedAt: ctx.now });
+    ctx.notes.push(`${plan.key}: ${failed.length} fix(es) posted but not staged (${reason}) — kept for tomorrow`);
+  }
+  return staged;
 }
 
-/** A card that did not go through: its unposted items and its snapshot go;
+/** A report that did not go through: its unposted items and its snapshot go;
  *  its findings, still queued, are carded again. */
 async function release(deps: SweepDeps, cardKey: string): Promise<void> {
   await deps.store.releaseCard(cardKey);
   await deps.store.dropCard(cardKey);
 }
 
-/** What a card that did not go through is edited to say. */
-export const WITHDRAWN_TEXT =
-  ":warning: This end-of-day sweep card didn't go through, so it can't be confirmed. Its fixes are kept, and come back on a fresh card.";
+/** What a report that did not go through is edited to say. */
+export const WITHDRAWN_TEXT = "This end-of-day report didn't go through, so nothing on it can be decided. Its fixes are kept and come back in a fresh report.";
 
 /**
- * Finish a card an earlier try recorded but never marked posted — only ever
- * from its snapshot, the fixes it showed, and only when the card Slack holds
- * carries the same digest. Otherwise:
+ * Finish a report an earlier try recorded but never marked posted — only ever
+ * from its snapshot, the fixes it showed, and only when the report Slack
+ * holds carries the same digest. Otherwise:
  *   • never posted → released, its findings carded afresh;
  *   • posted, but with no snapshot or a digest that differs → withdrawn and
  *     released: staging it would run text nobody was shown;
  *   • not known (a failed read, or too many pages) → held for the next try,
  *     and released once its 72 h would have run out anyway;
- *   • posted and already staged — the earlier try got that far — → recorded
- *     as posted and never staged again: a card someone ✅'d or ⛔'d meanwhile
- *     staged afresh would run, or offer, what was already decided.
+ *   • posted, with some fixes already staged — the earlier try got that far —
+ *     → those are recorded as they stand and never staged again (a fix
+ *     someone decided meanwhile, staged afresh, would run or offer what was
+ *     already decided), and only the rest are staged.
  *
- * @returns `live` when it is staged, `held` when it waits, `decided` when it
- *   was staged and has since been resolved, `released`
+ * @returns `live` when any fix is live, `held` when it waits, `decided` when
+ *   every fix was staged and has since been resolved, `released`
  */
 async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" | "held" | "decided" | "released"> {
   const { deps, notes, now } = ctx;
@@ -1326,7 +1372,7 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
   const to = destination ? resolveDestination(destination, deps.config) : null;
   if (!snapshot || !to) {
     // Nothing to stage from, so nothing is staged; the fixes, still queued,
-    // go out on a fresh card.
+    // go out on a fresh report.
     await release(deps, cardKey);
     notes.push(`${cardKey}: recorded without a snapshot — released`);
     return "released";
@@ -1353,65 +1399,62 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
     await release(deps, cardKey);
     return "released";
   }
+  const keys = plan.items.map((f) => itemProposalKey(posted.ts, f.blockId!));
   if (posted.digest !== snapshot.digest) {
-    await deps.delivery.withdraw(to.channel, posted.ts, WITHDRAWN_TEXT, cardKey).catch(rethrowIfBudget);
+    await deps.delivery.withdraw(to.channel, posted.ts, WITHDRAWN_TEXT, cardKey, keys).catch(rethrowIfBudget);
     await release(deps, cardKey);
-    notes.push(`${cardKey}: the posted card shows other fixes than its snapshot — withdrawn`);
+    notes.push(`${cardKey}: the posted report shows other fixes than its snapshot — withdrawn`);
     return "released";
   }
-  let state: SweepCardState;
+  const states = new Map<string, SweepCardState>();
   try {
-    state = await deps.delivery.cardState(posted.ts);
+    for (const [i, f] of plan.items.entries()) states.set(f.blockId!, await deps.delivery.cardState(keys[i]!));
   } catch (err) {
     rethrowIfBudget(err);
-    notes.push(`${cardKey}: could not tell whether it was already staged (${err instanceof Error ? err.message : String(err)}) — held for the next try`);
+    notes.push(`${cardKey}: could not tell which fixes were already staged (${err instanceof Error ? err.message : String(err)}) — held for the next try`);
     return "held";
   }
-  if (state.state !== "unstaged") {
-    // Staged by the earlier try: record it as posted when it went up, so its
-    // deadline is the card's own, and stage nothing.
-    const postedAt = msOf(posted.ts);
-    await deps.store.markPosted(cardKey, posted.ts, Number.isFinite(postedAt) ? postedAt : now);
-    await deps.store.dropCard(cardKey);
-    await deps.store.removeFindings(plan.items.map((f) => f.id));
-    if (state.state === "live") {
-      notes.push(`${cardKey}: already staged by an earlier try — recorded, not staged again`);
-      ctx.carded.push(...plan.items);
-      return "live";
+  const already = new Set([...states].filter(([, s]) => s.state !== "unstaged").map(([block]) => block));
+  const postedAt = msOf(posted.ts);
+  const staged = await stageReport(
+    ctx,
+    plan,
+    sweepReport(plan),
+    { channel: to.channel, root: to.threadTs ?? posted.ts, ts: posted.ts, postDate, ...(posted.plain ? { plain: true } : {}) },
+    Number.isFinite(postedAt) ? postedAt : now,
+    already,
+  );
+  if (!staged.length && !already.size) return "released";
+  // A fix decided meanwhile, while its item had no ts to be found by, takes
+  // what it came to now rather than sit at proposed.
+  for (const item of await deps.store.itemsForProposal(posted.ts)) {
+    const state = states.get(item.blockId);
+    if (item.status === "proposed" && state?.state === "decided" && state.items) {
+      await deps.store.updateItem(item.itemId, { status: state.items, resolvedAt: now });
     }
-    // Resolved meanwhile, while its items had no card ts to be found by: they
-    // take what the card came to now, rather than sit at proposed.
-    if (state.items) {
-      for (const item of await deps.store.itemsForProposal(posted.ts)) {
-        if (item.status === "proposed") await deps.store.updateItem(item.itemId, { status: state.items, resolvedAt: now });
-      }
-    }
-    notes.push(`${cardKey}: already staged by an earlier try, and resolved since — recorded, not staged again`);
-    return "decided";
   }
-  const staged = await stageOrWithdraw(ctx, plan, {
-    channel: to.channel,
-    root: to.threadTs ?? posted.ts,
-    ts: posted.ts,
-    text: posted.text,
-    postDate,
-  });
-  if (!staged) return "released";
-  // A later night may have queued the same finding again, re-read; it is
-  // carded now, as it was shown.
-  await deps.store.removeFindings(plan.items.map((f) => f.id));
-  notes.push(`${cardKey}: finished staging a card an earlier try posted`);
-  ctx.cards.push({
-    key: cardKey,
-    destination: plan.destination,
-    channel: to.channel,
-    threadTs: to.threadTs,
-    items: plan.items.length,
-    text: posted.text,
-    proposalTs: posted.ts,
-  });
-  ctx.carded.push(...plan.items);
-  return "live";
+  // A later night may have queued the same findings again, re-read; they are
+  // carded now, as they were shown. A fix that failed to stage stays queued.
+  const carded = plan.items.filter((f) => already.has(f.blockId!) || staged.includes(f));
+  await deps.store.removeFindings(carded.map((f) => f.id));
+  ctx.carded.push(...carded);
+  const live = staged.length > 0 || [...states.values()].some((s) => s.state === "live");
+  if (already.size) {
+    notes.push(`${cardKey}: ${already.size} fix(es) already staged by an earlier try — recorded, not staged again`);
+  }
+  if (staged.length) {
+    notes.push(`${cardKey}: finished staging a report an earlier try posted`);
+    ctx.cards.push({
+      key: cardKey,
+      destination: plan.destination,
+      channel: to.channel,
+      threadTs: to.threadTs,
+      items: plan.items.length,
+      text: posted.text,
+      proposalTs: posted.ts,
+    });
+  }
+  return live ? "live" : "decided";
 }
 
 /** One fix, wherever it was found: the page and the block it rewrites. */
@@ -1580,37 +1623,35 @@ export async function sweepCardState(
   return { state: "decided", items: null };
 }
 
-/** The card as ThreadState stages it: no Turn behind it, its own terms. */
+/**
+ * One fix as ThreadState stages it: one item of its report, no Turn behind
+ * it, its own terms — its one operation, the report's confirmers and 72 h.
+ */
 export function sweepProposal(
   plan: SweepCardPlan,
-  posted: { channel: string; root: string; ts: string; text: string; blocks?: unknown[]; postDate: string },
+  f: PendingFinding,
+  posted: { channel: string; root: string; ts: string; postDate: string },
 ): PendingProposal {
-  const first = plan.operations[0]!;
-  const share = sweepShareOf(plan.items);
-  const { fixes } = sweepCard(plan);
+  const operation = itemOperation(f);
+  const share = sweepShareOf([f]);
   return {
-    operations: plan.operations,
-    toolName: first.toolName,
-    input: first.input,
+    operations: [operation],
+    toolName: operation.toolName,
+    input: operation.input,
     channel: posted.channel,
     threadTs: posted.root,
     replyTs: posted.root,
-    userMsgTs: posted.root,
-    proposalTs: posted.ts,
-    proposalText: posted.text,
-    // Its carousel, which a note or a decision is edited onto.
-    ...(posted.blocks ? { proposalBlocks: posted.blocks } : {}),
+    ...itemProposal(posted.ts, f.blockId!),
+    // The fix's whole change, which Review shows.
+    proposalText: sweepItemText(f),
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
     ttlMs: SWEEP_CARD_TTL_MS,
     confirmers: [...plan.confirmers],
     sweepRun: posted.postDate,
-    // Its own slot in the thread, beside any turn's card (`proposalSlot`).
-    supersedeKey: SWEEP_KEY,
-    // A group DM's card: what its ✅ shares, as the card said (`./share.ts`).
+    stated: sweepItemWords(),
+    // A group DM's fix: what its write shares (`./share.ts`).
     ...(share ? { sweepShare: share } : {}),
-    // What its carousel showed, so a `drop N` revision is a carousel too.
-    ...(fixes ? { fixes } : {}),
   };
 }
 
@@ -1655,7 +1696,7 @@ export function plannedCards(deps: SweepDeps, findings: PendingFinding[], postDa
         channel: to.channel,
         threadTs: to.threadTs,
         items: plan.items.length,
-        text: deps.delivery.render(sweepCard(plan)).text,
+        text: reportText(plan, sweepReport(plan)),
       },
     ];
   });

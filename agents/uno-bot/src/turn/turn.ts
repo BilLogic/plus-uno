@@ -82,6 +82,7 @@ import {
   slotKeyOf,
   stagingCardOf,
   SWEEP_KEY,
+  itemProposalKey,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -114,7 +115,11 @@ import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presente
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
+  FIX_INSERT_REFUSAL,
+  FIX_REVIEW_INSTEAD,
+  FIX_SCOPE_REFUSAL,
   holdsInsert,
+  keepsToFix,
   INSERT_CARD_REFUSAL,
   keptFixes,
   replacedBlocks,
@@ -1018,7 +1023,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // operations minus the dropped ones, byte for byte, so there is nothing for
   // a model to reproduce. Anything else said under the card still goes to the
   // model, and its revision is still held to the subset rule below.
-  if (request.pending?.sweepRun) {
+  // A sweep report item decides in Review; legacy reports keep typed picks.
+  if (request.pending?.sweepRun && !request.pending.item) {
     const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
     if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread, staging);
   }
@@ -1123,7 +1129,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   }
 
   // A reply under a sweep card is most often someone dropping an item from it.
-  if (request.pending?.sweepRun) modelBlocks.push(sweepCardInstruction());
+  // A sweep report's fix is decided in its Review alone: nothing to drop.
+  if (request.pending?.sweepRun && !request.pending.item) modelBlocks.push(sweepCardInstruction());
 
   // The antecedent window: what "this" points at. Only for a top-level channel
   // @mention with a dangling pronoun, and only ever ONE page of the
@@ -1459,15 +1466,18 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // card is touched by a batch replacing one of its blocks; any other keyed
   // card by a batch aiming one of its tools at the same target — the weekly
   // card's own intake, not a separate issue filed or commented on beside it.
-  const replaced =
-    request.pending && slotKeyOf(request.pending) && !touchesCard(result.operations, request.pending) ? null : request.pending;
+  // A sweep report's fixes are each live under their own key, and the thread's
+  // newest is only one of them: the batch is checked against every live fix.
+  const replaced = await cardRevised(request.pending, result.operations, threadState);
 
   // A keyed card that revises only its own way (a weekly DS precedence card,
   // decided as it stands in its Review) is not revised by a turn at all: the batch is
   // refused with the card's note, rather than staged as a near-copy that
   // stays live beside it — two live cards could both run.
   if (replaced?.refuseRevision) {
-    await delivery.postNote(replaced.refuseRevision);
+    // Tagged as the sweep's own note under a sweep fix, so it leaves the
+    // thread the team's.
+    await delivery.postNote(replaced.refuseRevision, replaced.sweepRun ? sweepTag("note") : undefined);
     await memory.remember(replaced.refuseRevision);
     return { disposition: "asked", posted: replaced.refuseRevision, wrote: memory.wrote(), telemetry };
   }
@@ -1489,15 +1499,31 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // has no `insert` to restage it with, so a worded revision would lose the
   // added text rather than keep it byte for byte.
   if (replaced?.sweepRun && holdsInsert(proposalOperations(replaced))) {
-    await delivery.postNote(INSERT_CARD_REFUSAL, sweepTag("note"));
-    await memory.remember(INSERT_CARD_REFUSAL);
-    return { disposition: "asked", posted: INSERT_CARD_REFUSAL, wrote: memory.wrote(), telemetry };
+    const refusal = replaced.item ? FIX_INSERT_REFUSAL : INSERT_CARD_REFUSAL;
+    await delivery.postNote(refusal, sweepTag("note"));
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+
+  // One fix of a sweep report is revised from its own Review — Needs changes
+  // sends it back to this person's turn — and only within its own edit: its
+  // own blocks, on the stamps the sweep read, narrowed or reworded. A reply
+  // in the thread that would change one is pointed at Review.
+  if (replaced?.sweepRun && replaced.item && replaced.revising?.userId !== request.userId) {
+    await delivery.postNote(FIX_REVIEW_INSTEAD, sweepTag("note"));
+    await memory.remember(FIX_REVIEW_INSTEAD);
+    return { disposition: "asked", posted: FIX_REVIEW_INSTEAD, wrote: memory.wrote(), telemetry };
+  }
+  if (replaced?.sweepRun && replaced.item && !keepsToFix(result.operations, proposalOperations(replaced))) {
+    await delivery.postNote(FIX_SCOPE_REFUSAL, sweepTag("note"));
+    await memory.remember(FIX_SCOPE_REFUSAL);
+    return { disposition: "asked", posted: FIX_SCOPE_REFUSAL, wrote: memory.wrote(), telemetry };
   }
 
   // A sweep card's revision drops fixes and does nothing else: each of its
   // operations must be one of the card's own, as it was. Anything else — a fix
   // rewritten, a stamp changed, one added — is refused and the card stays.
-  if (replaced?.sweepRun && !isSubsetOf(result.operations, proposalOperations(replaced))) {
+  if (replaced?.sweepRun && !replaced.item && !isSubsetOf(result.operations, proposalOperations(replaced))) {
     const refusal =
       ":warning: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
       "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
@@ -1555,7 +1581,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   );
   // A revision of a sweep card is still one, so replies under it are read by
   // the sweep's rule.
-  const card = replaced?.sweepRun ? asSweepRevision(built) : built;
+  // A report's fix is redrawn in its report instead.
+  const card = replaced?.sweepRun && !replaced.item ? asSweepRevision(built) : built;
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
@@ -2698,6 +2725,31 @@ function isSubsetOf(revised: readonly ProposalOperation[], original: readonly Pr
 function touchesBlocksOf(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
   const theirs = replacedBlocks(proposalOperations(card));
   return [...replacedBlocks(operations)].some((b) => theirs.has(b));
+}
+
+/**
+ * The card a turn's batch revises: the pending card, unless it is keyed
+ * apart and the batch leaves it alone (null). A fix of a sweep report is one
+ * of several live fixes in its thread, so every live fix of that report is
+ * checked, and the one whose block the batch touches is the card revised.
+ */
+async function cardRevised(
+  pending: PendingProposal | null,
+  operations: readonly ProposalOperation[],
+  threadState: Pick<ThreadState, "getReport" | "getProposalByTs">,
+): Promise<PendingProposal | null> {
+  if (!pending) return null;
+  if (pending.item && pending.sweepRun) {
+    const { messageTs } = pending.item;
+    const record = await threadState.getReport(messageTs).catch(() => null);
+    for (const entry of record?.entries ?? [pending.item]) {
+      if ("state" in entry && entry.state.kind !== "open" && entry.state.kind !== "changes-asked") continue;
+      const look = await threadState.getProposalByTs(itemProposalKey(messageTs, entry.id)).catch(() => null);
+      if (look?.state === "found" && touchesCard(operations, look.proposal)) return look.proposal;
+    }
+    return null;
+  }
+  return slotKeyOf(pending) && !touchesCard(operations, pending) ? null : pending;
 }
 
 /**
