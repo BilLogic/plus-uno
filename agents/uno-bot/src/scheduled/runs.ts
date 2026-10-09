@@ -89,8 +89,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * and the morning `dm-promise-nudge` reminds them in their DM with uno-bot
  * (src/dm-watch/). DM Capture's two, one job per person with its switch on:
  * the end-of-day `dm-capture-read` reads their DMs for drift and undocumented
- * answers, and the morning `dm-capture-post` offers the fixes on a card in
- * their DM with uno-bot that only they can confirm (src/dm-watch/capture.ts).
+ * answers, and the morning `dm-capture-post` offers each fix on a decision card in
+ * their DM with uno-bot that only they can decide (src/dm-watch/capture.ts).
  */
 export type ScheduledJobKind =
   | "noop"
