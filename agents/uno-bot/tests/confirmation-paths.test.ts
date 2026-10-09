@@ -1176,6 +1176,17 @@ describe("a stated card answers in its own words", () => {
     }
   });
 
+  it("a library card staged while a ⛔ filed its intake: the ⛔ runs nothing and says the intake comes at the window's close", async () => {
+    // As such a card is still stored: its old cancel batch, and its old words.
+    const legacy = { ...STATED, onCancel: [INTAKE], stated: { ...WORDS, cancelled: "Intake only" } } as PendingProposal;
+    const verdict = await resolveSignal(button("cancel"), { threadState: await stagedStated(legacy) });
+    assert.equal(verdict.outcome, "won");
+    assert.equal(verdict.execute, undefined);
+    assert.equal(renderGateNote(verdict.post!.note), "No code drafted. Its intake is filed when the card's window closes.");
+    const { notes } = await press(await stagedStated(legacy), "cancel");
+    assert.deepEqual(notes, [`:no_entry: No code drafted. Its intake is filed when the card's window closes, decided by <@${PRESSER}>.`]);
+  });
+
   it("closes the card with what the ⛔ did and who decided", async () => {
     const { notes, delivery } = await press(await stagedStated(), "cancel");
     assert.deepEqual(notes, [`:no_entry: Rejected, nothing filed, decided by <@${PRESSER}>.`]);

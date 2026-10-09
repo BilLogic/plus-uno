@@ -27,9 +27,13 @@
 // the publish is not lost — writes that down at once, closes the card ("Closed,
 // no decision", its report redrawn from the record) and says in its thread
 // what it filed. An edit that fails is tried again the next morning
-// (`closePending`), and nothing is filed twice. One ambiguity is accepted: an
-// Approve whose filing failed also leaves no intake, and that card is filed
-// here too. A card tracked before the shared card has no item; its intake
+// (`closePending`), and nothing is filed twice. An Approve whose filing failed
+// also leaves no intake: it is filed here too, but its card keeps saying the
+// write failed, and the thread is told the intake was filed in its place. A
+// record that cannot be read is tried again the next morning, and a day past
+// the window the card is filed the old way, whatever was decided, so it never
+// waits for ever; an edit it cannot make ages out after `TRACK_DAYS`. A card
+// tracked before the shared card has no item; its intake
 // files the same way, and its own text is edited to a closing line. A card
 // tracked before the card kept its draft has nothing to file from, and ages
 // out as before. A card whose PR never appears (a Reject, a failed run) is
@@ -49,6 +53,7 @@ import { rethrowIfBudget } from "../net";
 import { LIBRARY_CARD_TTL_MS } from "./post";
 import { notedCardBlocks } from "../slack/proposal-render";
 import { settleItem, type ReportStore } from "../slack/decision-cards";
+import type { ReportItemState } from "../thread-state/index";
 
 /** A posted library card, followed until its PR merges or it ages out. */
 export interface TrackedPublish {
@@ -132,6 +137,12 @@ export function expiredThreadLine(intakeUrl: string): string {
   return `No decision in ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)}. I filed the <${intakeUrl}|intake> so the publish isn't lost.`;
 }
 
+/** What the thread is told when an approved filing had failed and the
+ *  tracker filed the intake in its place; the card keeps its failure. */
+export function failedFiledLine(intakeUrl: string): string {
+  return `The approved filing didn't go through, so I filed the <${intakeUrl}|intake> now.`;
+}
+
 // ── The card's thread, as the PR moves (#886 § 3.2) ──────────────────────────
 // Plain links, and one 🎉 — on the merge, naming what now matches.
 
@@ -183,6 +194,12 @@ export interface TrackResult {
   summary: string;
 }
 
+/** Where a card's item stands on its report's record; undefined when the
+ *  record or the item is gone. Throws when the record cannot be read. */
+async function itemStateOf(deps: TrackDeps, card: TrackedPublish): Promise<ReportItemState["kind"] | undefined> {
+  return (await deps.reports.getReport(card.ts))?.entries.find((e) => e.id === card.item)?.state.kind;
+}
+
 /**
  * Edit an expired card to its words and its closing line. True when it
  * landed; a failure is logged and the card stays `closePending` for the next
@@ -191,11 +208,17 @@ export interface TrackResult {
 async function closeExpired(deps: TrackDeps, card: TrackedPublish, intake: { number: number; url: string }): Promise<boolean> {
   try {
     if (card.item) {
-      const message = await settleItem(deps.reports, { messageTs: card.ts, id: card.item }, { kind: "expired" }, deps.now());
-      if (message) await deps.closeCard(card.channel, card.ts, message);
+      // An Approve whose write failed keeps saying so on its card; only a
+      // card nobody decided closes with no decision.
+      const failed = (await itemStateOf(deps, card)) === "failed";
+      if (!failed) {
+        const message = await settleItem(deps.reports, { messageTs: card.ts, id: card.item }, { kind: "expired" }, deps.now());
+        if (message) await deps.closeCard(card.channel, card.ts, message);
+      }
       delete card.closePending;
       // Told once the card is closed; a line that fails is not tried again.
-      await deps.postToThread(card.channel, card.ts, expiredThreadLine(intake.url)).catch((err: unknown) => {
+      const line = failed ? failedFiledLine(intake.url) : expiredThreadLine(intake.url);
+      await deps.postToThread(card.channel, card.ts, line).catch((err: unknown) => {
         rethrowIfBudget(err);
         console.error(`[figma-library] expired card ${card.key}: thread line not posted — ${err instanceof Error ? err.message : String(err)}`);
       });
@@ -272,13 +295,16 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
     // Approve would have filed, write that down, then close the card.
     if (!pr && !card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && (card.item || card.cardText)) {
       if (card.item) {
-        let decided: string | undefined;
+        let decided: ReportItemState["kind"] | undefined;
         try {
-          decided = (await deps.reports.getReport(card.ts))?.entries.find((e) => e.id === card.item)?.state.kind;
+          decided = await itemStateOf(deps, card);
         } catch (err) {
           rethrowIfBudget(err);
           console.error(`[figma-library] expired card ${card.key}: could not read its decision — ${err instanceof Error ? err.message : String(err)}`);
-          continue;
+          // Tried again the next morning; a record still unreadable a day
+          // past the window is filed the old way, as every card once was, so
+          // no card waits on it for ever.
+          if (age < LIBRARY_CARD_TTL_MS + DAY_MS) continue;
         }
         if (decided === "rejected") {
           // Rejected in Review: nothing to file, and nothing more to follow.

@@ -422,11 +422,28 @@ export function changedReport(report: DecisionReportRecord, change: ReportChange
  */
 export interface StatedCardWords {
   /** What a ⛔ did, as a phrase with no person in it: "Rejected, nothing
-   *  filed". The card ends `:no_entry: <phrase>, decided by <@U>.` and the ⛔'s note in the
-   *  thread is `<phrase>.` */
+   *  filed". The card ends `:no_entry: <phrase>, decided by <@U>.` and the
+   *  ⛔'s note in the thread is `<phrase>.` */
   cancelled: string;
   /** The answer to a ✅ or ⛔ that came after the card's window closed. */
   expired: string;
+}
+
+/** What a ⛔ did on a library card staged while a ⛔ still filed its intake. */
+export const LEGACY_LIBRARY_CANCELLED = "No code drafted. Its intake is filed when the card's window closes";
+
+/**
+ * What a ⛔ did on a stated card, in its own words — or nothing, on any other
+ * card. A library card staged before a ⛔ stopped filing its intake still
+ * carries the batch that did (`onCancel`) and the words "Intake only"; its ⛔
+ * now runs nothing, and the tracker files its intake when its window closes
+ * (`figma-library/track.ts`), so it says that instead.
+ *
+ * @param proposal - The card, as stored
+ */
+export function statedCancelOf(proposal: PendingProposal): string | undefined {
+  if (!proposal.stated) return undefined;
+  return "onCancel" in proposal ? LEGACY_LIBRARY_CANCELLED : proposal.stated.cancelled;
 }
 
 /** The card the ask behind this proposal staged: its origin, or itself. */

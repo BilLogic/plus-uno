@@ -15,6 +15,7 @@
 import type { Env } from "../types";
 import { conversationsMembers, getPermalink, postMessage, updateMessage } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
+import { figmaClientFor } from "../figma/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { GithubRequestError, githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
@@ -96,6 +97,10 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
         }
       },
       members: () => channelMembers(env, channel),
+      async fileName(fileKey) {
+        const figma = figmaClientFor(env);
+        return figma ? (await figma.fileMeta(fileKey)).file.name || null : null;
+      },
       async post(message) {
         const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };

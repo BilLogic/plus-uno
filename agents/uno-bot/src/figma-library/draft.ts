@@ -418,13 +418,15 @@ export function releaseParent(changeSet: LibraryChangeSet, intake: PublishIntake
 /**
  * The publish as the report's one item. A publish is one decision — file the
  * intake and draft code for every mapped component, or file nothing — so it
- * is one card, not one per component. Open goes to the library, and the
- * version is the third button.
+ * is one card, not one per component. Its subtitle is who published, in
+ * which file, on which day; Open goes to the library, and the version is the
+ * third button.
  *
  * @param changeSet - What the poll found; it carries a published version
  * @param intake - Its drafted intake
+ * @param fileName - The library file's name, or null when Figma would not say
  */
-export function releaseItem(changeSet: LibraryChangeSet, intake: PublishIntake): ReportItem {
+export function releaseItem(changeSet: LibraryChangeSet, intake: PublishIntake, fileName: string | null = null): ReportItem {
   const newest = changeSet.versions[0];
   const names = intake.implement;
   const counted = `${changeParts(intake.rows)}.`;
@@ -439,7 +441,9 @@ export function releaseItem(changeSet: LibraryChangeSet, intake: PublishIntake):
   return {
     id: intake.key,
     title: newest ? versionName(newest) : "Library publish",
-    ...(newest ? { subtitle: `${escapeSlackText(newest.user)} · ${shortDate(newest.createdAt)}` } : {}),
+    ...(newest
+      ? { subtitle: [newest.user, fileName ?? "", shortDate(newest.createdAt)].filter(Boolean).map(escapeSlackText).join(" · ") }
+      : {}),
     body,
     open: { label: "Open library", url: libraryUrl(changeSet.fileKey) },
     ...(newest ? { also: { label: "View version", url: versionUrl(changeSet.fileKey, newest.id) } } : {}),

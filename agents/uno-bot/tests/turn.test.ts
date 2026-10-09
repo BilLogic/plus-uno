@@ -1501,7 +1501,7 @@ test("a revised or re-staged group-DM sweep card carries no share", async () => 
 test("a re-staged stated card leaves its own words behind", async () => {
   const STATED_CARD: PendingProposal = {
     ...SWEEP_CARD,
-    stated: { cancelled: "Intake only", expired: "That card closed after 72 h with no decision." },
+    stated: { cancelled: "Rejected, nothing filed", expired: "That card closed after 72 h with no decision." },
   };
   const h = harness();
   await h.threadState.putProposal(STATED_CARD);

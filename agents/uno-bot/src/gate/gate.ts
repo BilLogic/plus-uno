@@ -35,7 +35,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { cardConfirmers, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { cardConfirmers, mayConfirm, proposalOperations, statedCancelOf, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -661,7 +661,7 @@ async function claim(
         : {
             kind: "resolved",
             decision,
-            ...(decision === "cancel" && proposal.stated ? { cancelled: proposal.stated.cancelled } : {}),
+            ...(decision === "cancel" && proposal.stated ? { cancelled: statedCancelOf(proposal) } : {}),
             ...(decision === "cancel" && rejected ? { rejected } : {}),
           },
       replyTs: replyTarget(proposal),

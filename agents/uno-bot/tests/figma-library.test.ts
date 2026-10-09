@@ -156,11 +156,16 @@ function postDeps(findings: LibraryChangeSet[], opts: { refuseTables?: boolean }
   const replies: Array<{ ts: string; text: string }> = [];
   const staged: PendingProposal[] = [];
   const edits: Array<{ text: string; blocks: unknown[] }> = [];
+  const fileNameReads: string[] = [];
   const store = { findings: kv(findings), tracked: kv<TrackedPublish[]>([]), unpublished: kv<LibraryChangeSet | null>(null) };
   const deps: PostDeps = {
     ...store,
     registry: async () => REGISTRY,
     members: async () => MEMBERS,
+    async fileName(fileKey) {
+      fileNameReads.push(fileKey);
+      return "PLUS BS4 Foundation";
+    },
     async post(message) {
       // Slack's verdict on the blocks, as the live API gives it.
       const why = messageBlocksRefusal(message.blocks);
@@ -186,7 +191,7 @@ function postDeps(findings: LibraryChangeSet[], opts: { refuseTables?: boolean }
     channel: CHANNEL,
     now: () => Date.UTC(2026, 8, 30, 14, 0),
   };
-  return { deps, posts, refused, replies, staged, edits, threadState, store };
+  return { deps, posts, refused, replies, staged, edits, fileNameReads, threadState, store };
 }
 
 /** A change set with no new version: an Accordion variant renamed, and
@@ -386,7 +391,7 @@ describe("the morning post", () => {
 
     const card = blocks[1]!;
     assert.equal(card.title.text, "Badge sizes + accordion copy");
-    assert.equal(card.subtitle.text, "coco · Sep 29");
+    assert.equal(card.subtitle.text, "coco · PLUS BS4 Foundation · Sep 29");
     assert.equal(card.body.text, "1 new, 2 updated. Accordion and Badge have code that can be drafted to match.");
     assert.match(card.icon.image_url, /figma\.com/);
     assert.deepEqual(
@@ -563,10 +568,24 @@ describe("the morning post", () => {
     await postLibraryFindings(morning.deps);
     assert.equal(morning.edits.length, 1);
     const card = (morning.edits[0]!.blocks as Array<Record<string, any>>)[1]!;
-    assert.match(card.subtitle.text, /^Couldn't be staged for review/);
+    assert.equal(card.subtitle.text, "Couldn't be staged for review. I file its intake when its 72 h are up, so the publish isn't lost.");
     assert.deepEqual(card.actions.map((a: any) => a.text.text), ["Open library", "View version"]);
     // Still tracked, so its intake is filed when its window closes.
     assert.equal(morning.store.tracked.value.length, 1);
+  });
+
+  it("reads the file's name once a job, and goes without it when Figma will not say", async () => {
+    const two = postDeps([await foundPublish(), await foundPublish()]);
+    await postLibraryFindings(two.deps);
+    assert.equal(two.posts.length, 2);
+    assert.deepEqual(two.fileNameReads, [FILE_KEY]);
+
+    const silent = postDeps([await foundPublish()]);
+    silent.deps.fileName = async () => {
+      throw new Error("Figma 403");
+    };
+    await postLibraryFindings(silent.deps);
+    assert.equal((silent.posts[0]!.blocks as Array<Record<string, any>>)[1]!.subtitle.text, "coco · Sep 29");
   });
 
   it("keeps the findings when the registry or the members cannot be read", async () => {
@@ -931,6 +950,44 @@ describe("a library card nobody decides", () => {
     assert.deepEqual(card!.actions.map((a: any) => a.text.text), ["View", "Open library", "View version"]);
     assert.equal(table!.type, "data_table");
     assert.deepEqual(store.value, []);
+  });
+
+  it("keeps an approved card's failed write on its card, files the intake and says why in its thread", async () => {
+    const failed: ReportItemState = { kind: "failed", by: "U0MEMBER1", at: POSTED_AT + HOUR, reason: "GitHub said 502" };
+    const { tracked, reports } = await sharedCard(failed);
+    const { deps, calls, store } = world([tracked], tracked.postedAt + 73 * HOUR, reports);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.expired, 1);
+    assert.deepEqual(calls, [
+      `file "${tracked.draft!.title}" from ${CHANNEL}/${tracked.ts}`,
+      `thread ${CHANNEL}/${tracked.ts}: The approved filing didn't go through, so I filed the <https://github.com/o/r/issues/990|intake> now.`,
+    ]);
+    const record = await reports.getReport(tracked.ts);
+    assert.equal(record!.entries[0]!.state.kind, "failed", "not closed as undecided");
+    assert.deepEqual(store.value, []);
+  });
+
+  it("never waits for ever on a record it cannot read: a day past the window it files, and the edit ages out", async () => {
+    const { tracked, reports } = await sharedCard();
+    const unreadable: ThreadState = Object.assign(Object.create(reports), {
+      getReport: async () => {
+        throw new Error("DO unavailable");
+      },
+    });
+    const first = world([tracked], tracked.postedAt + 73 * HOUR, unreadable);
+    await trackLibraryIntakes(first.deps);
+    assert.deepEqual(first.calls, [], "tried again tomorrow");
+    assert.equal(first.store.value.length, 1);
+
+    const next = world(first.store.value, tracked.postedAt + 97 * HOUR, unreadable);
+    await trackLibraryIntakes(next.deps);
+    assert.deepEqual(next.calls, [`file "${tracked.draft!.title}" from ${CHANNEL}/${tracked.ts}`]);
+    assert.equal(next.store.value[0]!.closePending, true);
+
+    const late = world(next.store.value, tracked.postedAt + 15 * 24 * HOUR, unreadable);
+    await trackLibraryIntakes(late.deps);
+    assert.deepEqual(late.calls, [], "filed nothing twice");
+    assert.deepEqual(late.store.value, [], "let go");
   });
 
   it("files nothing for a card rejected in Review, and stops following it", async () => {

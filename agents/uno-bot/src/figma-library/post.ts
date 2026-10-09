@@ -35,15 +35,16 @@
 // findings for tomorrow: a card whose every row read "no code mapping", or one
 // nobody could confirm, would be worse than a day's wait.
 //
-// Subrequest math, per job: the registry (1) and the channel's members (at
-// most 3 pages), then per change set one post — two when Slack refuses its
-// table — an edit when its staging failed, and, only when no table went up,
-// the full list in its thread, a reply per ~3,500 chars of names (about 200
-// names each). Its record and its staging are Durable Object hops and KV is
-// the internal bucket. The poll keeps at most `MAX_FINDINGS` (5) change sets
-// waiting: with a table each that is 1 + 3 + 5 = 9, and even five cards each
-// refused, unstaged and spilling three replies come to 1 + 3 + 5 × 6 = 34,
-// under the lookup ceiling of 38.
+// Subrequest math, per job: the registry (1), the channel's members (at most
+// 3 pages) and the library file's name (1, once a job), then per change set
+// one post — two when Slack refuses its table — an edit when its staging
+// failed, and, only when no table went up, the full list in its thread, a
+// reply per ~3,500 chars of names (about 200 names each). Its record and its
+// staging are Durable Object hops and KV is the internal bucket. The poll
+// keeps at most `MAX_FINDINGS` (5) change sets waiting: with a table each
+// that is 1 + 3 + 1 + 5 = 10, and even five cards each refused, unstaged and
+// spilling three replies come to 1 + 3 + 1 + 5 × 6 = 35, under the lookup
+// ceiling of 38.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
@@ -52,6 +53,7 @@ import type { ProposalCard } from "../turn/index";
 import { renderProposalCard } from "../slack/proposal-render";
 import { textSections } from "../slack/render";
 import { decisionReport, itemProposal, markNotStaged, reportMessage, reportRecord, type DecisionReport, type ReportMessage } from "../slack/decision-cards";
+import { windowInWords } from "../slack/copy-words";
 import { rethrowIfBudget } from "../net";
 import {
   componentListMessages,
@@ -74,7 +76,7 @@ export const LIBRARY_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 
 /** A card whose staging failed says this in place of who and when; the
  *  tracker still files its intake when its window closes. */
-export const NOT_STAGED = "Couldn't be staged for review. I file its intake when its 72 h are up, so the publish isn't lost.";
+export const NOT_STAGED = `Couldn't be staged for review. I file its intake when its ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)} are up, so the publish isn't lost.`;
 
 export interface PostDeps {
   findings: { read(): Promise<LibraryChangeSet[]>; write(findings: LibraryChangeSet[]): Promise<void> };
@@ -86,6 +88,9 @@ export interface PostDeps {
   registry(): Promise<ComponentRegistry | null>;
   /** The channel's member ids, or null when Slack would not say. */
   members(): Promise<string[] | null>;
+  /** The library file's name, for the card's subtitle; null when Figma would
+   *  not say, and the subtitle goes without it. */
+  fileName(fileKey: string): Promise<string | null>;
   /** Post one top-level message in the channel. */
   post(message: { text: string; blocks: unknown[] }): Promise<{ ok: boolean; ts?: string }>;
   /** Edit a posted message in place (`chat.update`). */
@@ -167,6 +172,7 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
   const waiting = [...findings];
   const tracked = await deps.tracked.read();
   let carried = await deps.unpublished.read();
+  const fileNames: Record<string, string | null> = {};
   while (waiting.length) {
     const found = waiting[0]!;
     if (opts.dryRun) {
@@ -195,7 +201,14 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
     const changeSet = carried ? mergeChangeSets(carried, found) : found;
     const intake = draftPublishIntake(changeSet, registry);
     const operations = libraryOperations(intake);
-    const item = releaseItem(changeSet, intake);
+    // Every change set is the same library file: its name is read once.
+    if (!(changeSet.fileKey in fileNames)) {
+      fileNames[changeSet.fileKey] = await deps.fileName(changeSet.fileKey).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+    }
+    const item = releaseItem(changeSet, intake, fileNames[changeSet.fileKey] ?? null);
     const parent = releaseParent(changeSet, intake);
     // The card, then the table under it. Slack refusing the table posts the
     // card alone, and the list goes in the thread instead.

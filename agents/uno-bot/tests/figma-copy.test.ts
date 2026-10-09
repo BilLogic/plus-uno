@@ -29,7 +29,7 @@ import {
   type LibraryComponent,
 } from "../src/figma-library/draft";
 import { libraryCard, LIBRARY_CARD_TTL_MS } from "../src/figma-library/post";
-import { expiredCardNote, expiredThreadLine, prClosedLine, prMergedLine, prOpenedLine } from "../src/figma-library/track";
+import { expiredCardNote, expiredThreadLine, failedFiledLine, prClosedLine, prMergedLine, prOpenedLine } from "../src/figma-library/track";
 import {
   precedenceCard,
   precedenceCardWords,
@@ -220,6 +220,9 @@ describe("the library publish report", () => {
       done: "the intake, and code drafts started for Badge, Button and Card.",
     });
     passesChecklist(item.body);
+    // The library file's name, when Figma gives it, sits between who and when.
+    const named = releaseItem(SEVEN, draftPublishIntake(SEVEN, REGISTRY), "PLUS BS4 Foundation");
+    assert.equal(named.subtitle, "sarah · PLUS BS4 Foundation · Sep 29");
   });
 
   it("what Review shows: the publish, every component under its group, and no footer", () => {
@@ -425,6 +428,12 @@ describe("the library card's thread (#886 § 3.2)", () => {
   it("tells an expired card's thread what it filed, in one plain sentence", () => {
     const line = expiredThreadLine(INTAKE.url);
     assert.equal(line, "No decision in 72 h. I filed the <https://github.com/o/r/issues/45|intake> so the publish isn't lost.");
+    passesChecklist(line);
+  });
+
+  it("tells the thread when it filed an intake an approved write had failed to", () => {
+    const line = failedFiledLine(INTAKE.url);
+    assert.equal(line, "The approved filing didn't go through, so I filed the <https://github.com/o/r/issues/45|intake> now.");
     passesChecklist(line);
   });
 
