@@ -4,7 +4,7 @@
 // the week's intake — "Button: disputed by Maya — ghost is library-only on
 // purpose" — through the same one-at-a-time filing an Approve uses
 // (`./intake.ts`), so a dispute that comes first files the intake with it.
-// Then the card reads "Disputed by X" with the note, and its proposal is
+// Then the card reads "Noted by X" with the note, and its proposal is
 // retired, so nothing else decides it.
 //
 // A dispute whose write fails lifts the card's Needs changes lock, puts it
@@ -58,7 +58,7 @@ export async function disputePrecedenceItem(
 
   if (written) {
     await deps.store.retireProposal(proposal.proposalTs).catch(() => {});
-    const message = await settleItem(deps.store, item, { kind: "disputed", by: userId, note }, deps.now());
+    const message = await settleItem(deps.store, item, { kind: "noted", by: userId, note }, deps.now());
     if (message) await deps.edit(item.messageTs, message).catch(() => {});
     return;
   }

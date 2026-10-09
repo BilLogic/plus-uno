@@ -324,6 +324,12 @@ export interface PendingProposal {
    */
   refuseRevision?: string;
   /**
+   * What Review's pop-up says once Needs changes is accepted, on a card that
+   * does something other than redraft (a weekly DS precedence card writes the
+   * note on its intake). Absent, the pop-up says the draft is being revised.
+   */
+  afterNeedsChanges?: string;
+  /**
    * The card a person's ask first staged, when this one re-stages it after a
    * cut-off run (`turn/turn.ts` `restageExecution`), or the sweep card the
    * Worker staged, when this one revises it. Absent on every other card. The
@@ -369,9 +375,9 @@ export type ReportItemState =
   | { kind: "approved"; by: string; at: number }
   | { kind: "failed"; by: string; at: number; reason: string }
   | { kind: "rejected"; by: string; reason?: string }
-  /** Sent back with a note that disputes the item, the note written where
+  /** Sent back with a note against the item, the note written where
    *  the report keeps its record (a weekly DS precedence intake): closed. */
-  | { kind: "disputed"; by: string; note: string }
+  | { kind: "noted"; by: string; note: string }
   | { kind: "expired" }
   /** Shown, but its proposal never staged: nothing to decide. */
   | { kind: "not-staged"; note: string };

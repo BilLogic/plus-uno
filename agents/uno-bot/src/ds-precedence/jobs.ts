@@ -56,6 +56,7 @@ import {
   precedenceCardWords,
   precedenceItem,
   precedenceParent,
+  PRECEDENCE_NOTE_TAKEN,
   PRECEDENCE_REVISION_REFUSAL,
   type ComponentFinding,
 } from "./report";
@@ -231,6 +232,8 @@ export function stagedComponent(
     confirmers: [...confirmers],
     stated: precedenceCardWords(PRECEDENCE_CARD_TTL_MS / 3_600_000),
     refuseRevision: PRECEDENCE_REVISION_REFUSAL,
+    // Needs changes writes the note on the intake (`./dispute.ts`): no redraft.
+    afterNeedsChanges: PRECEDENCE_NOTE_TAKEN,
   };
 }
 

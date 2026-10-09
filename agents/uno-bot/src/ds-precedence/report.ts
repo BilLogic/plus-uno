@@ -223,6 +223,9 @@ export function precedenceCardWords(windowHours: number): StatedCardWords {
   };
 }
 
+/** What Review's pop-up says once a weekly card's Needs changes is taken. */
+export const PRECEDENCE_NOTE_TAKEN = "Your note goes on this week's intake.";
+
 /** What a turn says when it would change a weekly card. */
 export const PRECEDENCE_REVISION_REFUSAL =
   "A DS precedence card is decided as it stands: press Review on it. Approve adds the component to this week's intake, Needs changes puts your note on the intake, and Reject leaves the difference as deliberate.";

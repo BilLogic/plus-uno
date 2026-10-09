@@ -656,9 +656,10 @@ describe("deciding a weekly card in its Review", () => {
     const gh = github([], posted.store);
     const updates: Array<{ ts: string; message: CardMessage }> = [];
     const said: string[] = [];
+    const views = recordingViews({ alreadyOpen: ["V1"] });
     const deps: ReviewDoorDeps = {
       threadState: posted.store,
-      views: recordingViews({ alreadyOpen: ["V1"] }).client,
+      views: views.client,
       delivery: () => recordingDelivery(),
       applyVerdict: async (v): Promise<OperationOutcome[]> => {
         const outcomes: OperationOutcome[] = [];
@@ -689,7 +690,7 @@ describe("deciding a weekly card in its Review", () => {
         { viewId: "V1", channel: CHANNEL, messageTs: itemProposal(MSG, id).proposalTs, userId, decision, ...(note ? { note } : {}) },
         deps,
       );
-    return { decide, gh, updates, said, store: posted.store };
+    return { decide, gh, updates, said, views, store: posted.store };
   }
 
   it("Approve on one card files the week's intake, Approve on the next comments on it, and each card says who decided", async () => {
@@ -707,13 +708,16 @@ describe("deciding a weekly card in its Review", () => {
     assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
   });
 
-  it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Disputed by", async () => {
-    const { decide, gh, updates, store } = await decided();
+  it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Noted by", async () => {
+    const { decide, gh, updates, store, views } = await decided();
     await decide("Button", "revise", MEMBERS[0]!, "ghost is library-only on purpose");
+    const popUp = JSON.stringify(views.calls.map((c) => c.view));
+    assert.match(popUp, /Your note goes on this week's intake\./, "the pop-up says where the note goes");
+    assert.doesNotMatch(popUp, /revising the draft/);
     assert.equal(gh.created.length, 1, "no intake yet, so the dispute files it");
     assert.match(gh.created[0]!.body, /\*\*Button\*\*: disputed by Maya — ghost is library-only on purpose/);
     const [button] = cardsIn(updates.at(-1)!.message.blocks);
-    assert.equal(button!.subtitle!.text, "Disputed by <@U0MEMBER1>");
+    assert.equal(button!.subtitle!.text, "Noted by <@U0MEMBER1>");
     assert.equal(button!.body.text, "Note: ghost is library-only on purpose");
     assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
     assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "Button").proposalTs)).state, "found", "nothing else decides it");

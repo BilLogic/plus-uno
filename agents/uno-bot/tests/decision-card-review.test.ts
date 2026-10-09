@@ -81,7 +81,7 @@ function harness(threadState: ThreadState, outcomes: OperationOutcome[] = [{ too
 
 type Card = { title: { text: string }; subtitle?: { text: string }; body: { text: string }; actions: Array<{ text: { text: string }; action_id?: string }> };
 const cards = (blocks: unknown[]) => (blocks[1] as { elements: Card[] }).elements;
-const decide = (id: string, decision: "confirm" | "cancel", note?: string) => ({
+const decide = (id: string, decision: "confirm" | "cancel" | "revise", note?: string) => ({
   viewId: "V1",
   channel: CHANNEL,
   messageTs: itemProposal(MSG, id).proposalTs,
@@ -127,6 +127,20 @@ describe("Review on one item of a report", () => {
     assert.equal(last[1]!.subtitle!.text, "Bill · card comment");
     assert.equal(last[2]!.subtitle!.text, "Rejected by <@U0BILL>");
     assert.equal(last[2]!.body.text, "Nothing written. Reason: deliberate");
+  });
+
+  it("after Needs changes the pop-up says the draft is being revised, unless the proposal carries its own line", async () => {
+    const plain = harness(await staged());
+    await runReviewDecision(decide("c1", "revise", "say it shorter"), plain.deps);
+    assert.match(JSON.stringify(plain.views.calls.at(-1)!.view), /I'm revising the draft/);
+
+    const store = await staged();
+    await store.putProposal({ ...itemStaged("c2", 2), afterNeedsChanges: "Your note goes on this week's intake." });
+    const own = harness(store);
+    await runReviewDecision(decide("c2", "revise", "deliberate"), own.deps);
+    const view = JSON.stringify(own.views.calls.at(-1)!.view);
+    assert.match(view, /Your note goes on this week's intake\./);
+    assert.doesNotMatch(view, /revising the draft/);
   });
 
   it("says on the card when an approved write did not go through", async () => {

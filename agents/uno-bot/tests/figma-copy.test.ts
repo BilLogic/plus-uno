@@ -38,6 +38,8 @@ import {
   PRECEDENCE_REVISION_REFUSAL,
 } from "../src/ds-precedence/report";
 import type { Disagreement } from "../src/ds-precedence/compare";
+import { decisionReport, reportMessage, reportRecord } from "../src/slack/decision-cards";
+import type { ReportItemState } from "../src/thread-state/index";
 import { PRECEDENCE_CARD_TTL_MS } from "../src/ds-precedence/jobs";
 import { CONFIRM_FOOTER, renderProposalCard } from "../src/slack/proposal-render";
 import { renderGateNote, statedCancelledNote } from "../src/slack/gate-note";
@@ -444,6 +446,32 @@ describe("the weekly precedence report", () => {
     );
     passesChecklist(text);
     assert.doesNotMatch(text, /\bdrop\b|\bskip\b|[Rr]eply/);
+  });
+
+  it("every state a card can show — its subtitle and body — holds to the vocabulary", () => {
+    const report = decisionReport(THREE.map(precedenceItem), precedenceParent(3, RULE_URL));
+    const states: ReportItemState[] = [
+      { kind: "open" },
+      { kind: "changes-asked", by: "U03FYQJRQHX" },
+      { kind: "approved", by: "U03FYQJRQHX", at: Date.UTC(2026, 9, 5, 15, 0) },
+      { kind: "failed", by: "U03FYQJRQHX", at: Date.UTC(2026, 9, 5, 15, 0), reason: "GitHub answered 502" },
+      { kind: "rejected", by: "U03FYQJRQHX", reason: "the library is ahead on purpose" },
+      { kind: "noted", by: "U03FYQJRQHX", note: "ghost is library-only on purpose" },
+      { kind: "expired" },
+      { kind: "not-staged", note: "Didn't go through, so it posts again tomorrow morning." },
+    ];
+    for (const state of states) {
+      const record = reportRecord("C1", "1759500000.000001", report, 1);
+      record.entries[0] = { ...record.entries[0]!, state };
+      const card = (reportMessage(record).blocks[1] as { elements: Array<{ title: { text: string }; subtitle?: { text: string }; body: { text: string } }> }).elements[0]!;
+      const words = [card.title.text, card.subtitle?.text ?? "", card.body.text].join("\n");
+      assertVocabulary(words);
+      // A retired single word in any form: "Disputed" retires with "dispute".
+      for (const retired of RETIRED.filter((w) => /^[\w-]+$/.test(w))) {
+        assert.doesNotMatch(words.toLowerCase(), new RegExp(`(^|[^\\w-])${retired.toLowerCase()}`), `${state.kind}: "${retired}" is retired`);
+      }
+      assert.doesNotMatch(words, /:[a-z_]+:/, `${state.kind}: no emoji on a card`);
+    }
   });
 
   it("a turn that would change a card is pointed at its Review", () => {
