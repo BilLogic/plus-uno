@@ -10,20 +10,39 @@
 // THE HAND-OFF. The end-of-day poll, on finding a newly published version,
 // adds its id to `figma-poll:refresh-owed` before it moves its own snapshot on
 // — so a poll that stops in between finds the same version again, and one that
-// finished never reports it twice. This job, right after the poll and again
-// the next morning, sends one `repository_dispatch` (`figma-library-published`)
-// for everything owed, then clears it. A refused dispatch leaves it owed, so
-// the next run tries again. Nothing owed — a quiet day, or a library edited
-// with no new version — sends nothing.
+// finished never reports it twice. This job runs later in the same end-of-day
+// run and sends one `repository_dispatch` (`figma-library-published`) for
+// everything owed. Nothing owed — a quiet day, or a library edited with no new
+// version — sends nothing.
 //
-// ONE AT A TIME is the workflow's: its concurrency group runs one refresh and
-// holds the next behind it. Publishes found the same night share a refresh,
-// since a refresh records the library as it then stands.
+// OWED UNTIL IT LANDS. GitHub accepting the dispatch says a run was queued,
+// not that it finished: the run may still give up on a rate limit (exit 75)
+// and write nothing. So a version stays owed until the repo's snapshot records
+// it — on `main`, or on the refresh branch whose draft PR is waiting for
+// review — and each night this job first reads those two files and settles
+// what they record. Whatever is still owed is dispatched again, so a run that
+// gave up is completed by a later night's.
+//
+// ONE REFRESH PER PUBLISH, ONE RUN AT A TIME. The job runs once a night,
+// after every job of that run that reads Figma, so the Action's node fetches
+// never share uno-bot's half of Figma's Tier 1 with the Worker's own. A run
+// takes minutes and the next dispatch is a day away, and the workflow's
+// concurrency group holds any second run behind the first. Publishes found the
+// same night share a refresh, since a refresh records the library as it then
+// stands.
+//
+// A REFRESH THAT KEEPS NOT LANDING IS SAID ONCE. Each night that ends with a
+// refresh still owed after a try — GitHub refused the dispatch, or accepted it
+// and nothing landed — counts one. At `STALL_LIMIT` the job files one
+// `automation-blocked` issue, the label the headless sweeps file a blocked run
+// under (`scripts/prompts/references/headless-intake.md`), and files no other
+// until a version lands and the count starts again.
 //
 // THE PAYLOAD carries the newest version's id, digits only, which the workflow
 // shows in its summary and nowhere else (no `client_payload` reaches a shell).
 //
-// PURE: the store and the dispatch arrive by name; `./env.ts` binds them.
+// PURE: the store, the repo reads, the dispatch and the filing arrive by name;
+// `./env.ts` binds them.
 
 import { rethrowIfBudget } from "../net";
 
@@ -31,6 +50,18 @@ import { rethrowIfBudget } from "../net";
 export const REFRESH_OWED_KV_KEY = "figma-poll:refresh-owed";
 /** The `repository_dispatch` event `figma-snapshot-refresh.yml` runs on. */
 export const REFRESH_EVENT = "figma-library-published";
+/** The repo's snapshot file, and the branch the workflow pushes it to. */
+export const SNAPSHOT_PATH = "scripts/figma-component-snapshot.json";
+export const REFRESH_BRANCH = "chore/figma-snapshot-refresh";
+/**
+ * Nights with a try and still nothing landed before it is said: three
+ * weekday runs. One miss is a busy Figma or a GitHub blip, and the next night
+ * completes it; three in a row is not transient, and a snapshot three working
+ * days behind a publish is as late as nobody being told should get.
+ */
+export const STALL_LIMIT = 3;
+/** The label a blocked automation's issue carries (not `harness-intake`). */
+export const BLOCKED_LABEL = "automation-blocked";
 
 /** The publishes a refresh is owed for. */
 export interface RefreshOwed {
@@ -38,14 +69,28 @@ export interface RefreshOwed {
   versionIds: string[];
   /** When the oldest of them was found. */
   since: string;
+  /** Nights that tried to start the refresh since a version last landed. */
+  tries?: number;
+  /** What the last try came to, for the blocked issue. */
+  lastTry?: string;
+  /** The `automation-blocked` issue filed for these tries, once. */
+  blockedIssue?: number;
 }
 
 export interface SnapshotRefreshDeps {
-  /** What is owed; `settle` takes off the versions a dispatch covered, and
-   *  only those, so a publish recorded meanwhile stays owed. */
-  owed: { read(): Promise<RefreshOwed | null>; settle(versionIds: readonly string[]): Promise<void> };
+  /** What is owed. `update` reads it again and writes what `change` returns
+   *  (null clears it), so a publish the poll recorded meanwhile stays owed. */
+  owed: {
+    read(): Promise<RefreshOwed | null>;
+    update(change: (current: RefreshOwed | null) => RefreshOwed | null): Promise<void>;
+  };
+  /** The version ids the repo's snapshot records, on `main` and on the
+   *  refresh branch together. Throws when they cannot be read. */
+  landed(): Promise<readonly string[]>;
   /** Send the `repository_dispatch`: ok on GitHub's 204. */
   dispatch(eventType: string, payload: Record<string, unknown>): Promise<{ ok: boolean; status: number }>;
+  /** File the `automation-blocked` issue; resolves to its number. */
+  fileBlocked(issue: { title: string; body: string }): Promise<number>;
   dryRun?: boolean;
 }
 
@@ -67,25 +112,41 @@ export interface SnapshotRefreshReport {
  * @param at - When it found them, ISO
  */
 export function owedWith(owed: RefreshOwed | null, versionIds: readonly string[], at: string): RefreshOwed {
-  return { versionIds: [...new Set([...versionIds, ...(owed?.versionIds ?? [])])], since: owed?.since ?? at };
+  return { ...owed, versionIds: [...new Set([...versionIds, ...(owed?.versionIds ?? [])])], since: owed?.since ?? at };
 }
 
 /**
- * What is still owed once a dispatch covered `sent`: null when nothing is.
+ * The owed versions a snapshot recording `recorded` covers: the newest one it
+ * records and every older one. A refresh records the library as it stands, so
+ * a snapshot holding version N holds everything published before it, even an
+ * id its 30-version window has since dropped.
+ *
+ * @param owed - Owed ids, newest first
+ * @param recorded - The ids the snapshot records
+ */
+export function coveredBy(owed: readonly string[], recorded: readonly string[]): string[] {
+  const known = new Set(recorded);
+  const i = owed.findIndex((id) => known.has(id));
+  return i === -1 ? [] : owed.slice(i);
+}
+
+/**
+ * What is still owed once `landed` is recorded: null when nothing is. A
+ * version landing is progress, so the tries start again from none.
  *
  * @param owed - What is owed now
- * @param sent - The versions the dispatch covered
+ * @param landed - The versions the repo's snapshot now records
  */
-export function owedAfter(owed: RefreshOwed | null, sent: readonly string[]): RefreshOwed | null {
-  const left = (owed?.versionIds ?? []).filter((id) => !sent.includes(id));
+export function owedAfter(owed: RefreshOwed | null, landed: readonly string[]): RefreshOwed | null {
+  const left = (owed?.versionIds ?? []).filter((id) => !landed.includes(id));
   return left.length ? { versionIds: left, since: owed!.since } : null;
 }
 
 /**
- * One run of the `figma-snapshot-refresh` job: start the refresh for whatever
- * the poll found published, once.
+ * One run of the `figma-snapshot-refresh` job: settle what the repo's snapshot
+ * now records, and start the refresh for whatever is still owed.
  *
- * @param deps - What is owed, and the dispatch
+ * @param deps - What is owed, the repo reads, the dispatch and the filing
  * @throws Only a budget stop; a refused dispatch is reported and stays owed
  */
 export async function runSnapshotRefresh(deps: SnapshotRefreshDeps): Promise<SnapshotRefreshReport> {
@@ -98,19 +159,83 @@ export async function runSnapshotRefresh(deps: SnapshotRefreshDeps): Promise<Sna
     versionIds,
     summary,
   });
-  if (!versionIds.length) return done(false, "nothing published since the last refresh");
-  const newest = versionIds[0]!;
-  const what = `${versionIds.length} publish(es), newest version ${newest}`;
-  if (deps.dryRun) return done(false, `would start the refresh for ${what}`);
+  if (!owed || !versionIds.length) return done(false, "nothing published since the last refresh");
 
-  let answer: { ok: boolean; status: number };
+  // What landed since the last night. Unreadable, nothing is settled and the
+  // refresh is started again: a second run of an unchanged library is cheap.
+  let covered: string[] = [];
   try {
-    answer = await deps.dispatch(REFRESH_EVENT, { figma_version_id: newest });
+    covered = coveredBy(versionIds, await deps.landed());
   } catch (err) {
     rethrowIfBudget(err);
-    return done(false, `the dispatch failed (${err instanceof Error ? err.message : String(err)}) — still owed, so the next run tries again`);
+    console.warn(`[figma-library] snapshot refresh: the repo's snapshot is unread (${messageOf(err)})`);
   }
-  if (!answer.ok) return done(false, `GitHub refused the dispatch (${answer.status}) — still owed, so the next run tries again`);
-  await deps.owed.settle(versionIds);
-  return done(true, `started the refresh for ${what}`);
+  const left = versionIds.filter((id) => !covered.includes(id));
+  if (!left.length) {
+    if (!deps.dryRun) await deps.owed.update((current) => owedAfter(current, covered));
+    return done(false, `the repo's snapshot records version ${versionIds[0]}: nothing owed`);
+  }
+
+  const newest = left[0]!;
+  const what = `${left.length} publish(es), newest version ${newest}`;
+  if (deps.dryRun) return done(false, `would start the refresh for ${what}`);
+
+  let lastTry: string;
+  let dispatched = false;
+  try {
+    const answer = await deps.dispatch(REFRESH_EVENT, { figma_version_id: newest });
+    dispatched = answer.ok;
+    lastTry = answer.ok ? "GitHub accepted the dispatch, and nothing has landed since" : `GitHub refused the dispatch (${answer.status})`;
+  } catch (err) {
+    rethrowIfBudget(err);
+    lastTry = `the dispatch failed (${messageOf(err)})`;
+  }
+
+  // A version that landed resets the count; otherwise this night is one more.
+  const tries = (covered.length ? 0 : (owed.tries ?? 0)) + 1;
+  let blockedIssue = covered.length ? undefined : owed.blockedIssue;
+  let filed = "";
+  if (tries >= STALL_LIMIT && blockedIssue === undefined) {
+    try {
+      blockedIssue = await deps.fileBlocked(blockedIssueFor({ ...owed, versionIds: left }, tries, lastTry));
+      filed = `; filed #${blockedIssue}`;
+    } catch (err) {
+      rethrowIfBudget(err);
+      filed = `; the blocked issue was not filed (${messageOf(err)}), so the next night tries again`;
+    }
+  }
+  await deps.owed.update((current) => {
+    const still = covered.length ? owedAfter(current, covered) : current;
+    if (!still) return null;
+    return { ...still, tries, lastTry, ...(blockedIssue === undefined ? {} : { blockedIssue }) };
+  });
+
+  const settled = covered.length ? `${covered.length} landed; ` : "";
+  if (dispatched) return done(true, `${settled}started the refresh for ${what}${filed}`);
+  return done(false, `${settled}${lastTry} — still owed, so the next night tries again${filed}`);
+}
+
+/**
+ * The `automation-blocked` issue: what is owed, since when, and what each
+ * night came to — enough for whoever picks it up to start at the right end.
+ */
+export function blockedIssueFor(owed: RefreshOwed, tries: number, lastTry: string): { title: string; body: string } {
+  return {
+    title: `[figma-snapshot-refresh] blocked: the library snapshot has not refreshed after ${tries} nights`,
+    body: [
+      `uno-bot has tried ${tries} nights running to refresh \`${SNAPSHOT_PATH}\`, and the snapshot on \`main\` and on \`${REFRESH_BRANCH}\` still does not record the library's newest publish.`,
+      "",
+      `- Owed since: ${owed.since}`,
+      `- Versions owed, newest first: ${owed.versionIds.join(", ")}`,
+      `- Last night: ${lastTry}`,
+      "",
+      "Where to look: the `Refresh Figma Component Snapshot` runs in Actions. A run that says Figma was busy will be retried each night; a run that failed for another reason, or no run at all, is what this issue is for. A refused dispatch usually means `GITHUB_TOKEN` on the Worker lacks Contents write on the repo. `gh workflow run figma-snapshot-refresh.yml` from `main` runs it by hand.",
+      "",
+      "uno-bot keeps trying each night and files no second issue until a version lands.",
+    ].join("\n"),
+  };
+}
+
+function messageOf(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
