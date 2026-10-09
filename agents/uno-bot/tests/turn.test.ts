@@ -1497,12 +1497,10 @@ test("a revised or re-staged group-DM sweep card carries no share", async () => 
 
 // A stated card (the library card, the weekly precedence card) answers the
 // gate in its own words. The fresh card a cut-off run comes back on is an
-// ordinary one, with a ⛔ that runs nothing, so neither its words nor its
-// cancel run come with it.
-test("a re-staged stated card leaves its own words and its cancel run behind", async () => {
+// ordinary one, so its words do not come with it.
+test("a re-staged stated card leaves its own words behind", async () => {
   const STATED_CARD: PendingProposal = {
     ...SWEEP_CARD,
-    onCancel: [{ toolName: "notion_update", input: FIX_ONE }],
     stated: { cancelled: "Intake only", expired: "That card closed after 72 h with no decision." },
   };
   const h = harness();
@@ -1513,7 +1511,6 @@ test("a re-staged stated card leaves its own words and its cancel run behind", a
   );
   assert.ok(restaged);
   assert.equal(restaged.proposal.stated, undefined);
-  assert.equal(restaged.proposal.onCancel, undefined);
 });
 
 // `sweep_share_post` is the Worker's alone: a model that names it anyway is

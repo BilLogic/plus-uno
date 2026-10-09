@@ -264,15 +264,6 @@ export interface PendingProposal {
    */
   revising?: { userId: string; at?: number };
   /**
-   * What a ⛔ still runs, when the card says so. Absent — every turn's card —
-   * a cancel runs nothing. Only a card the Worker stages itself sets it: the
-   * Figma library card files its intake whichever way it is decided and only
-   * the implementation waits on the ✅ (`figma-library/post.ts`). The card's
-   * own copy states it, since a cancel that does something is not what any
-   * other card means by one.
-   */
-  onCancel?: ProposalOperation[];
-  /**
    * The card's own words for the gate's answers, on a card the Worker states
    * itself (`ProposalCard.kind: "stated"` — the library card, the weekly DS
    * precedence card). Absent — every turn's card — the generic lines in
@@ -430,8 +421,8 @@ export function changedReport(report: DecisionReportRecord, change: ReportChange
  * own in `slack/gate-note.ts`, which needs no words from the card.
  */
 export interface StatedCardWords {
-  /** What a ⛔ did, as a phrase with no person in it: "Intake only". The card
-   *  ends `:no_entry: <phrase>, decided by <@U>.` and the ⛔'s note in the
+  /** What a ⛔ did, as a phrase with no person in it: "Rejected, nothing
+   *  filed". The card ends `:no_entry: <phrase>, decided by <@U>.` and the ⛔'s note in the
    *  thread is `<phrase>.` */
   cancelled: string;
   /** The answer to a ✅ or ⛔ that came after the card's window closed. */
@@ -441,18 +432,6 @@ export interface StatedCardWords {
 /** The card the ask behind this proposal staged: its origin, or itself. */
 export function stagingCardOf(proposal: Pick<PendingProposal, "proposalTs" | "originProposalTs">): string {
   return proposal.originProposalTs ?? proposal.proposalTs;
-}
-
-/**
- * The proposal a won ⛔ runs as: its `onCancel` batch in place of its own,
- * with no cancel run of its own — so the execution record, a cut-off note and
- * any re-staged card all describe what the cancel actually started.
- */
-export function cancelRunOf(proposal: PendingProposal): PendingProposal | null {
-  const operations = proposal.onCancel;
-  if (!operations?.length) return null;
-  const { onCancel: _onCancel, ...rest } = proposal;
-  return { ...rest, operations, toolName: operations[0]!.toolName, input: operations[0]!.input };
 }
 
 /** What a staging did beside storing the card: the ts of each live card in
