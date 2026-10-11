@@ -195,7 +195,7 @@ describe("a task card's readout", () => {
     assert.equal(readoutFor("notion_search")!.sources(ok({ count: 12, results })).length, 12);
   });
 
-  it("github_read's path read lists the github.com page of the repo and ref it read", async () => {
+  it("github_read's path read lists the github.com page of the repo and ref it read, named by its last segment", async () => {
     const read = (input: Record<string, unknown>, kind: "file" | "dir") =>
       readGithub(input, {
         resolveRepo: () => ({ ok: true, entry: { repo: "BilLogic/plus-marketing-website", purpose: "site", workflows: [] }, isDefault: false }),
@@ -204,7 +204,7 @@ describe("a task card's readout", () => {
       });
     const sources = readoutFor("github_read")!.sources;
     assert.deepEqual(sources(await read({ path: "src/hero.astro", repo: "plus-marketing-website" }, "file")), [
-      { text: "src/hero.astro", url: "https://github.com/BilLogic/plus-marketing-website/blob/HEAD/src/hero.astro", queried: "page" },
+      { text: "hero.astro", url: "https://github.com/BilLogic/plus-marketing-website/blob/HEAD/src/hero.astro", queried: "page" },
     ]);
     assert.deepEqual(sources(await read({ path: "src", ref: "launch" }, "dir")), [
       { text: "src", url: "https://github.com/BilLogic/plus-marketing-website/tree/launch/src", queried: "page" },

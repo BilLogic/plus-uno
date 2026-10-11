@@ -63,7 +63,7 @@ import type { HistoryTurn, ThreadRef, ThreadState } from "../thread-state/index"
 import { buildTurnRequest, type Delivery, type PostResult, type ProposalCard, type TurnOutcome, type TurnRequest } from "../turn/index";
 import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
 import type { GapNotes } from "../usage/gap-notes";
-import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply } from "./copy";
+import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply, type FigmaSource } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
 import { askText, asksUno, isOwnComment } from "./trigger";
 
@@ -399,7 +399,7 @@ export function askInstruction(teammate: boolean): string {
 }
 
 /**
- * The source a reply may carry: the first link the answer cites that a lookup
+ * The source a reply may carry, named as the Sources box names it: the first link the answer cites that a lookup
  * of this turn returned, and that a public thread may carry
  * (`threadVisibleSources`, judged with what that lookup said of who may see
  * it). A link the turn read but the answer does not cite is no source; nor is
@@ -410,11 +410,11 @@ export function askInstruction(teammate: boolean): string {
  * @param read - What the turn's lookups returned
  * @param asked - The frame (or the file) the ask was made on
  */
-export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string): string | null {
+export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string): FigmaSource | null {
   for (const url of cited) {
     if (sameFigmaPlace(url, asked)) continue;
     const source = read.find((s) => sameReadLink(url, s.url));
-    if (source && threadVisibleSources([source]).length) return url;
+    if (source && threadVisibleSources([source]).length) return { name: source.text, url };
   }
   return null;
 }

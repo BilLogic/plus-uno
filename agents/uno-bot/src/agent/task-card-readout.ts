@@ -296,8 +296,13 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
       const path = str(p.path);
       return path ? `Read ${path}` : null;
     },
-    // A search's hits, or the one file or directory a path read read.
-    sources: (result) => unique([...rowLinks("hits", ["path"])(result), ...ownLink(result, "path")]),
+    // A search's hits, or the one file or directory a path read read, named
+    // by its last segment: `Button.jsx`, not the whole path.
+    sources: (result) =>
+      unique([
+        ...rowLinks("hits", ["path"])(result),
+        ...ownLink(result, "path").map((s) => ({ ...s, text: s.text.split("/").filter(Boolean).at(-1) ?? s.text })),
+      ]),
     decision: repoDecision,
   },
   github_intake_search: {
