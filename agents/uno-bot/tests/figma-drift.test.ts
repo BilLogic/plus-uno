@@ -361,17 +361,18 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(m.figma.calls().length, 1, "a failed read is not tried again for the publisher");
   });
 
-  it("@-mentions the file's publisher when the Team Members directory maps their Figma id", async () => {
+  it("names a publisher the Team Members directory maps in plain text: no mention, and no say on the card", async () => {
     const t = await sweptRecap();
     const m = morning(t.h, t.drifts, {
-      publisher: { handle: "cy.designs", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" },
+      publisher: { handle: "cy<designs>", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" },
       figmaPeople: { "1105000000000000003": "U0CY" },
     });
     await runDriftAsks(MORNING, m.deps);
     const [card] = cardsOf(m.posted[0]!.blocks);
-    assert.equal(card!.subtitle!.text, "<@U0BEA> · published by <@U0CY> · last changed Sep 20");
+    assert.equal(card!.subtitle!.text, "<@U0BEA> · published by cy&lt;designs&gt; · last changed Sep 20");
+    assert.doesNotMatch(JSON.stringify(m.posted[0]!.blocks) + m.posted[0]!.text, /U0CY/, "the publisher is never @-mentioned");
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
-    assert.ok(proposal!.confirmers?.includes("U0CY"), "the publisher asked may answer the card");
+    assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE"], "the publisher is not added to who may decide");
   });
 
   it("names the owner alone when the publisher is the owner, or is not in the directory", async () => {

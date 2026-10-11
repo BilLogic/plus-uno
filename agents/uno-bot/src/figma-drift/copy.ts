@@ -17,9 +17,9 @@
 // pointer to it. Once a file catches up, its card (or a pointer-only message)
 // is edited in place to say so.
 //
-// MENTIONS: each card's subtitle @-mentions its file's owner, and its last
-// publisher when the Team Members directory maps their Figma id to a Slack
-// person — nobody else.
+// MENTIONS: each card's subtitle @-mentions its file's owner and nobody else.
+// Its last publisher, when the Team Members directory maps their Figma id to
+// a Slack person other than the owner, is named by Figma handle in plain text.
 //
 // EVERY NOTION- AND FIGMA-SOURCED STRING IN mrkdwn IS ESCAPED
 // (`escapeSlackText`): a file title or a thread paraphrase holding
@@ -125,15 +125,19 @@ export function elsewhereLine(file: Pick<AskedFileWords, "title" | "url">, cardL
  *
  * @param input.id - The card's id in its report
  * @param input.owner - The file's owner's Slack id, or null
- * @param input.publisher - Its last publisher's Slack id, when the Team
- *   Members directory maps their Figma id; named only when not the owner
+ * @param input.publisher - Its last publisher, when the Team Members
+ *   directory maps their Figma id; named in plain text, and only when not
+ *   the owner
  * @param input.lane - What Approve files
  */
-export function driftItem(input: DriftFileWords & { id: string; owner: string | null; publisher?: string | null; lane: IntakeLane }): ReportItem {
+export function driftItem(
+  input: DriftFileWords & { id: string; owner: string | null; publisher?: { slackId: string; handle: string } | null; lane: IntakeLane },
+): ReportItem {
   const { file, change } = input;
   const title = fileName(file);
   const when = change.kind === "unknown" ? null : `last changed ${dayWords(change.at)}`;
-  const publisher = input.publisher && input.publisher !== input.owner ? `published by <@${input.publisher}>` : null;
+  const publisher =
+    input.publisher && input.publisher.slackId !== input.owner ? `published by ${escapeSlackText(input.publisher.handle.replace(/\s+/g, " ").trim())}` : null;
   const subtitle = [input.owner ? `<@${input.owner}>` : null, publisher, when].filter(Boolean).join(" · ");
   return {
     id: input.id,
