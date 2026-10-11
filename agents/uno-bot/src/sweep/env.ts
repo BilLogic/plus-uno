@@ -60,6 +60,7 @@ import {
 } from "../net";
 import {
   canonicalNotionUrl,
+  decisionRowsOf,
   listPageComments,
   notionSearch,
   parseNotionPageId,
@@ -84,7 +85,7 @@ import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render
 import { refusedForBlocks } from "../slack/delivery";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
-import { proposalEventLogFor } from "../usage/production";
+import { notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { figmaCommentsFor } from "../figma-comments/env";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
@@ -226,8 +227,13 @@ async function sweepDepsFor(
   const figmaComments = fc && {
     ...fc,
     card: (n: number) => measured(() => fc.card(n)),
+    ...(fc.decisionRows ? { decisionRows: (url: string) => measured(() => fc.decisionRows!(url)) } : {}),
     detector: { detect: (input: Parameters<typeof fc.detector.detect>[0]) => measured(() => fc.detector.detect(input)) },
   };
+  // A key decision's row (`../decisions-db/row.ts`): none without the Decisions DB.
+  const decisions = env.NOTION_DECISIONS_DB_ID
+    ? { rows: (url: string) => measured(() => decisionRowsOf(env, url)), notionPeople: () => notionPeopleFor(env) }
+    : undefined;
   const store: SweepStore = { ...createD1SweepRecords({ db }), ...kvQueue(kv) };
   const directory = slackDirectoryFor(env);
   const bot = await measured(() => getBotIdentity(env));
@@ -253,6 +259,7 @@ async function sweepDepsFor(
     search: sweepSearchFor(env),
     notion: sweepNotionFor(env),
     ...(figmaComments ? { figmaComments } : {}),
+    ...(decisions ? { decisions } : {}),
     store,
     delivery: {
       async post(to, message, tag) {

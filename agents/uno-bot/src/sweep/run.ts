@@ -99,7 +99,7 @@
 
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
-import { proposalReplyThread, type PendingProposal, type ThreadState } from "../thread-state/index";
+import { proposalReplyThread, type PendingProposal, type ProposalOperation, type ThreadState } from "../thread-state/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import {
@@ -133,6 +133,9 @@ import { sweepRecords, type SweepNotion } from "./records";
 import { sweepFigmaComments } from "../figma-comments/read";
 import { postFigmaDecisions } from "../figma-comments/post";
 import type { QueuedFile, SweepFigmaComments } from "../figma-comments/queue";
+import { draftRow, rowUpdateOf, rowWords, type DecisionRow } from "../decisions-db/row";
+import { escapeSlackText } from "../slack/mrkdwn";
+import { notionPersonOfSlack, type NotionPeople } from "../usage/roles";
 import { readUsable, searchGate } from "./surfaces";
 import { findBySearch, looksAnswered, namedThings, questionQuery, type SourceSearch } from "./search";
 import {
@@ -353,6 +356,10 @@ export interface SweepDeps extends Pick<JobContext, "runDate"> {
   /** Figma comment decisions: the night's reads and the morning's posts
    *  (`../figma-comments/`). Absent, those two jobs skip. */
   figmaComments?: SweepFigmaComments;
+  /** The Decisions DB rows of a linked Roadmap card, and the Notion people
+   *  map: what a key decision's row is drafted from (`../decisions-db/row.ts`).
+   *  Absent, no fix carries a row. */
+  decisions?: { rows(cardUrl: string): Promise<DecisionRow[]>; notionPeople(): Promise<NotionPeople> };
   store: SweepStore;
   delivery: SweepDelivery;
   config: SweepConfig;
@@ -914,10 +921,12 @@ async function sweepThread(
   const thread: SweepThread = { channel: t.channel, channelKind: t.channelKind, rootTs: t.rootTs, messages: shown.messages };
   // Drift needs a page or file the thread pointed at — linked or named. A page
   // found only from the question's words is for placing its answer.
-  const detected =
-    driftAsked && (linksNotion || linksFile || named.length)
-      ? await deps.detector.detect({ thread, sources })
-      : { ok: true as const, findings: [] };
+  const drifting = driftAsked && (linksNotion || linksFile || named.length);
+  const rows = drifting ? await cardRows(deps, t.channelKind, sources) : [];
+  const detected = drifting
+    ? await deps.detector.detect({ thread, sources, ...(rows.length ? { rows } : {}) })
+    : { ok: true as const, findings: [] };
+  const notionPeople = detected.ok && detected.findings.some((d) => d.row) ? await deps.decisions!.notionPeople() : {};
   if (!detected.ok) {
     return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !QUOTA.test(detected.error) };
   }
@@ -999,6 +1008,7 @@ async function sweepThread(
       owner,
       confidence: d.confidence,
       participants,
+      ...(d.row ? { row: { ...d.row, notion: notionOfEach([d.row.key.proposer, ...d.row.key.approvers], notionPeople) } } : {}),
     });
   }
 
@@ -1592,6 +1602,51 @@ function placeOf(key: string, config: SweepConfig): { channel: string; threadTs:
   return channel ? { channel, threadTs: threadTs || null } : null;
 }
 
+/**
+ * The Decisions DB rows of the Roadmap cards a thread's sources hold, for a
+ * key decision's row. Only from a public channel, since a row's evidence and
+ * words are read team-wide. A card whose rows will not read offers none, and
+ * the thread goes on without.
+ */
+async function cardRows(deps: SweepDeps, kind: ChannelKind, sources: readonly SweepSource[]): Promise<Array<{ url: string; rows: DecisionRow[] }>> {
+  const roadmap = deps.config.roadmapDb?.replace(/-/g, "");
+  if (!deps.decisions || kind !== "public" || !roadmap) return [];
+  const out: Array<{ url: string; rows: DecisionRow[] }> = [];
+  for (const card of sources.filter((s) => s.kind === "notion" && s.parentDatabaseId === roadmap)) {
+    const rows = await deps.decisions.rows(card.url).catch((err: unknown) => {
+      rethrowIfBudget(err);
+      return null;
+    });
+    if (rows) out.push({ url: card.url, rows });
+  }
+  return out;
+}
+
+/** Each Slack person's Notion user, for those the map places. */
+function notionOfEach(slackIds: readonly string[], people: NotionPeople): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const id of slackIds) {
+    const notion = notionPersonOfSlack(id, people);
+    if (notion) out[id] = notion;
+  }
+  return out;
+}
+
+/**
+ * A fix's Decisions DB row, run by the same Review after the fix: none without
+ * a key decision, or without the evidence's permalink, which is the row's
+ * Evidence.
+ *
+ * @param f - The finding, its permalinks fetched
+ * @param date - The morning's date, `YYYY-MM-DD`
+ */
+export function rowOperations(f: PendingFinding, date: string): ProposalOperation[] {
+  const evidence = f.evidence.permalinks[0];
+  if (!f.row || !evidence) return [];
+  const notion = f.row.notion;
+  return draftRow(f.row.key, { cardUrl: f.row.cardUrl, evidence, decision: f.threadSays, notionOf: (id) => notion[id] ?? null, date }).operations;
+}
+
 /** What a posted card came to, for a retry that finds it already staged. */
 export type SweepCardState =
   | { state: "live" }
@@ -1633,17 +1688,18 @@ export function sweepProposal(
   posted: { channel: string; root: string; ts: string; postDate: string },
 ): PendingProposal {
   const operation = itemOperation(f);
+  const row = rowOperations(f, posted.postDate);
   const share = sweepShareOf([f]);
   return {
-    operations: [operation],
+    operations: [operation, ...row],
     toolName: operation.toolName,
     input: operation.input,
     channel: posted.channel,
     threadTs: posted.root,
     replyTs: posted.root,
     ...itemProposal(posted.ts, f.blockId!),
-    // The fix's whole change, which Review shows.
-    proposalText: sweepItemText(f),
+    // The fix's whole change, which Review shows, and its row.
+    proposalText: row.length && f.row ? `${sweepItemText(f)}\n${escapeSlackText(rowWords(rowUpdateOf(f.row.key)))}` : sweepItemText(f),
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
     ttlMs: SWEEP_CARD_TTL_MS,

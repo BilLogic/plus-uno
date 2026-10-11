@@ -66,11 +66,11 @@ export function parseKeyDecision(raw: unknown, rows: readonly DecisionRow[], aut
   const f = raw as Record<string, unknown>;
   const name = str(f.name);
   const stage = ROW_STAGES.find((s) => s === str(f.stage));
-  const proposer = authors.find((a) => a.toLowerCase() === str(f.proposer).toLowerCase());
+  const proposer = authors.find((a) => a.toLowerCase() === person(f.proposer).toLowerCase());
   if (!name || name.includes("\n") || name.length > MAX_NAME_CHARS || !stage || !proposer) return null;
   const approvers =
     stage === "Accepted"
-      ? [...new Set((Array.isArray(f.approvers) ? f.approvers : []).map((a) => authors.find((x) => x.toLowerCase() === str(a).toLowerCase())))].filter(
+      ? [...new Set((Array.isArray(f.approvers) ? f.approvers : []).map((a) => authors.find((x) => x.toLowerCase() === person(a).toLowerCase())))].filter(
           (a): a is string => !!a && a !== proposer,
         )
       : [];
@@ -136,16 +136,16 @@ export function draftRow(k: KeyDecision, ctx: RowContext): { operations: Proposa
       },
     };
   };
-  if (k.relation.kind === "new") return { operations: [create([])], update: { kind: "new", name: k.name, stage: k.stage } };
+  const update = rowUpdateOf(k);
+  if (k.relation.kind === "new") return { operations: [create([])], update };
   const row = k.relation.row;
-  const was = { name: row.name, url: row.url };
   if (k.relation.kind === "supersede") {
     return {
       operations: [
         create([{ heading: "Supersedes", body: row.url }]),
         { toolName: "notion_update", input: { page_url: row.url, properties: { Status: "Superseded" }, append: { text: `Superseded ${ctx.date} by: ${said}` } } },
       ],
-      update: { kind: "supersede", name: k.name, stage: k.stage, row: was },
+      update,
     };
   }
   const properties: Record<string, string> = {};
@@ -161,8 +161,14 @@ export function draftRow(k: KeyDecision, ctx: RowContext): { operations: Proposa
         input: { page_url: row.url, ...(Object.keys(properties).length ? { properties } : {}), append: { text: `Widened ${ctx.date}: ${said}` } },
       },
     ],
-    update: { kind: "widen", name: k.name, stage: k.stage, row: was },
+    update,
   };
+}
+
+/** What a card says a key decision's row does. */
+export function rowUpdateOf(k: KeyDecision): RowUpdate {
+  if (k.relation.kind === "new") return { kind: "new", name: k.name, stage: k.stage };
+  return { kind: k.relation.kind, name: k.name, stage: k.stage, row: { name: k.relation.row.name, url: k.relation.row.url } };
 }
 
 /**
@@ -198,4 +204,9 @@ function sameName(a: string, b: string): boolean {
 
 function str(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
+}
+
+/** A person as the detector names them: a Slack mention or an `@handle` is its bare name. */
+function person(v: unknown): string {
+  return str(v).replace(/^<@([^>|]+)(?:\|[^>]*)?>$/, "$1").replace(/^@/, "");
 }

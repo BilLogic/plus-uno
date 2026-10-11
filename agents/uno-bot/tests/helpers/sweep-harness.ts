@@ -213,6 +213,9 @@ export function sweepHarness(opts: {
     /** Rows per query page; 25 unless set. */
     pageSize?: number;
   };
+  /** Each Roadmap card's Decisions DB rows by card URL, and the Notion people
+   *  map. Unset, no fix carries a row. */
+  decisions?: { rows: Record<string, DecisionRow[]>; notion: Record<string, string> };
   /** The Figma comment jobs: the shared fake Figma, the route's KV notes, the
    *  Roadmap's cards by number, and #plus-design's members (null when they
    *  cannot be read). The detector answers from the same recorded replies.
@@ -439,6 +442,14 @@ export function sweepHarness(opts: {
         }
       : {}),
     ...(figmaComments ? { figmaComments } : {}),
+    ...(opts.decisions
+      ? {
+          decisions: {
+            rows: async (cardUrl: string) => structuredClone(opts.decisions!.rows[cardUrl] ?? []),
+            notionPeople: async () => opts.decisions!.notion,
+          },
+        }
+      : {}),
     store: faultyStore,
     delivery: {
       async post(to, message, tag) {
