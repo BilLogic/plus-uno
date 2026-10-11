@@ -254,7 +254,9 @@ test("a sync reads every directory page and stores the map, reporting counts onl
   const deps = syncDeps();
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.equal(deps.pages, 2);
-  assert.deepEqual(deps.written, [{ at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" }, figmaPeople: {}, notionPeople: {}, gaps: [] }]);
+  assert.deepEqual(deps.written, [
+    { at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" }, figmaPeople: {}, notionPeople: {}, gaps: [], noNotionPerson: ["Ana Pérez", "  bo   CHEN ", "Cy Diaz"], gapsAt: 1_000 },
+  ]);
   assert.deepEqual(deps.ttls, [TEAM_ROLES_TTL_S]);
   assert.deepEqual(report, { written: true, matched: 3, unmatched: 0, ambiguous: 0, summary: "3 matched, 0 unmatched, 0 ambiguous" });
 });
@@ -390,7 +392,9 @@ test("a kept role map still takes the fresh Figma ids, and keeps its own expiry"
   });
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.equal(report.keptPrevious, true);
-  assert.deepEqual(deps.written, [{ at: 1_000, roles: previous.roles, figmaPeople: { "1105000000000000001": "U0ANA0001" }, notionPeople: {}, gaps: [] }]);
+  assert.deepEqual(deps.written, [
+    { at: 1_000, roles: previous.roles, figmaPeople: { "1105000000000000001": "U0ANA0001" }, notionPeople: {}, gaps: [], noNotionPerson: ["Ana Pérez"], gapsAt: 1_000 + DAY_MS },
+  ]);
   // The roles still lapse when they would have: the write does not renew them.
   assert.deepEqual(deps.ttls, [TEAM_ROLES_TTL_S - DAY_MS / 1000]);
 });
@@ -468,8 +472,36 @@ test("a sync stores the Notion people and the in-scope rows it could not match b
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.deepEqual(deps.written[0]?.notionPeople, { "n-cy": "U0CY00001" });
   assert.deepEqual(deps.written[0]?.gaps, ["Gus Hale"]);
+  assert.deepEqual(deps.written[0]?.noNotionPerson, ["Ana Pérez", "  bo   CHEN "], "matched, in scope, Notion Person empty");
+  assert.equal(deps.written[0]?.gapsAt, 1_000);
   assert.equal(report.summary, "3 matched, 1 unmatched, 0 ambiguous, 1 Notion person");
   const kv = fakeKv(async (key) => (key === TEAM_ROLES_KV_KEY ? deps.written[0] : null));
   assert.deepEqual(await notionPeopleFor(kv), { "n-cy": "U0CY00001" });
   assert.deepEqual(await notionPeopleFor({}), {});
+});
+
+test("Monday's gaps: no Slack match or more than one; never a role conflict or a deactivated account", () => {
+  const { gaps, noNotionPerson } = matchRoster(
+    [
+      { name: "Gus Hale", group: "Product Manager" },
+      { name: "Cy Diaz", group: "Product Designer" },
+      { name: "cy diaz", group: "Product Manager" },
+      { name: "Ana Pérez", group: "Product Manager", notionUserIds: ["n-ana"] },
+      { name: "Twin Name", group: "Software Developer" },
+      { name: "Left Us", group: "Software Developer" },
+      { name: "Gone By Id", group: "Product Designer", slackUserId: "U0GONE001" },
+      { name: "Unknown Id", group: "Product Designer", slackUserId: "U0NOPE001" },
+      { name: "Dee Evans", group: "Researcher" },
+    ],
+    [
+      ...DIRECTORY,
+      { id: "U0TWIN001", real_name: "Twin Name" },
+      { id: "U0TWIN002", real_name: "Twin Name" },
+      { id: "U0LEFT001", real_name: "Left Us", deleted: true },
+      { id: "U0GONE001", real_name: "Someone Else", deleted: true },
+    ],
+  );
+  assert.deepEqual(gaps, ["Gus Hale", "Twin Name", "Unknown Id"]);
+  // Cy matched one person (two roles is a CMS fix, not a gap); Ana has a Notion Person.
+  assert.deepEqual(noNotionPerson, ["Cy Diaz", "cy diaz"]);
 });

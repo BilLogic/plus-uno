@@ -155,6 +155,7 @@ export async function runTeamGapsOnEnv(env: Env, opts: { dryRun: boolean }): Pro
     {
       read: () => storedTeamRoles(env),
       lead: env.LEAD_USER_ID?.trim() || null,
+      now: () => Date.now(),
       async dm(userId, text) {
         const open = await openConversation(env, userId);
         if (!open.ok) return { ok: false, error: open.error };

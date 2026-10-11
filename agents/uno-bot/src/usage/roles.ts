@@ -133,6 +133,13 @@ export interface RosterMatch {
   /** Each Notion user a row's Notion Person names, to the one Slack member
    *  that row matched, by the Figma map's rule. */
   notionPeople: NotionPeople;
+  /** Rows with a role that no active Slack member matches, or more than one
+   *  does — what a person fixes on the row. Not a row whose only match is a
+   *  deactivated account (no longer on the team), and not a row matched to
+   *  one member another row gives a different role (in `ambiguous`). */
+  gaps: string[];
+  /** Rows with a role matched to one Slack member, whose Notion Person is empty. */
+  noNotionPerson: string[];
 }
 
 /**
@@ -154,14 +161,21 @@ export interface RosterMatch {
 export function matchRoster(roster: readonly RosterRow[], directory: readonly DirectoryPerson[]): RosterMatch {
   const byName = new Map<string, Set<string>>();
   const active = new Set<string>();
+  /** Deactivated accounts, by id and by name: a row only they match has left. */
+  const deactivated = new Set<string>();
   for (const person of directory) {
-    if (person.deleted || person.is_bot || person.id === "USLACKBOT") continue;
-    active.add(person.id);
-    for (const name of [person.real_name, person.profile?.display_name]) {
-      const key = name ? normalisePersonName(name) : "";
-      if (key) byName.set(key, (byName.get(key) ?? new Set()).add(person.id));
+    if (person.is_bot || person.id === "USLACKBOT") continue;
+    const names = [person.real_name, person.profile?.display_name].map((n) => (n ? normalisePersonName(n) : "")).filter(Boolean);
+    if (person.deleted) {
+      deactivated.add(person.id);
+      for (const key of names) deactivated.add(`name:${key}`);
+      continue;
     }
+    active.add(person.id);
+    for (const key of names) byName.set(key, (byName.get(key) ?? new Set()).add(person.id));
   }
+  const gaps: string[] = [];
+  const noNotionPerson: string[] = [];
   const unmatched: string[] = [];
   const ambiguous: string[] = [];
   /** Each member's roles, and the rows that gave them. */
@@ -187,9 +201,15 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     }
     const role = row.group && Object.hasOwn(GROUP_ROLES, row.group) ? GROUP_ROLES[row.group] : undefined;
     if (!role) continue;
-    if (!id) unmatched.push(row.name);
-    else if (ids.length > 1) ambiguous.push(row.name);
-    else {
+    const left = row.slackUserId ? deactivated.has(row.slackUserId) : deactivated.has(`name:${normalisePersonName(row.name)}`);
+    if (!id) {
+      unmatched.push(row.name);
+      if (!left) gaps.push(row.name);
+    } else if (ids.length > 1) {
+      ambiguous.push(row.name);
+      gaps.push(row.name);
+    } else {
+      if (!row.notionUserIds?.length) noNotionPerson.push(row.name);
       const entry = given.get(id) ?? { roles: new Set<TeamRole>(), names: [] };
       entry.roles.add(role);
       entry.names.push(row.name);
@@ -207,7 +227,17 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     roles[id] = role;
     matched += entry.names.length;
   }
-  return { roles, matched, unmatched, ambiguous, figmaPeople: soleMembers(figma), unreadableFigma, notionPeople: soleMembers(notion) };
+  return {
+    roles,
+    matched,
+    unmatched,
+    ambiguous,
+    figmaPeople: soleMembers(figma),
+    unreadableFigma,
+    notionPeople: soleMembers(notion),
+    gaps,
+    noNotionPerson,
+  };
 }
 
 /** Each key whose rows all matched the same one member, to that member. */

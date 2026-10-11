@@ -51,10 +51,16 @@ export interface StoredTeamRoles {
   /** Notion user id → Slack id, from each row's Notion Person. Absent from a
    *  map stored before it was kept. */
   notionPeople?: NotionPeople;
-  /** The in-scope rows — a role, not a Past Collaborator — that matched no
-   *  one Slack member: the names Monday's DM to the lead lists
-   *  (`./team-gaps.ts`). */
+  /** The in-scope rows — a role, not a Past Collaborator — that no active
+   *  Slack member matched, or more than one did (`matchRoster` `gaps`): the
+   *  names Monday's DM to the lead lists (`./team-gaps.ts`). */
   gaps?: readonly string[];
+  /** The in-scope rows matched to one member with no Notion Person: the DM's
+   *  second list. */
+  noNotionPerson?: readonly string[];
+  /** When the read that built the two lists ran, epoch ms — unlike `at`,
+   *  never held back with kept roles. */
+  gapsAt?: number;
 }
 
 /** What the sync reads and where it writes. */
@@ -153,7 +159,9 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
         roles: held ? held.roles : match.roles,
         figmaPeople: match.figmaPeople,
         notionPeople: match.notionPeople,
-        gaps: [...new Set([...match.unmatched, ...match.ambiguous])],
+        gaps: match.gaps,
+        noNotionPerson: match.noNotionPerson,
+        gapsAt: now,
       },
       ttlS,
     );
