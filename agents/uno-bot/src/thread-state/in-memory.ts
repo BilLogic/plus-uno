@@ -294,7 +294,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       const rec = liveReport(messageTs);
       const next = rec ? changedReport(rec.report, change) : null;
       if (!rec || !next) return null;
-      reports.set(messageTs, { ...rec, report: next, revision: (rec.revision ?? 0) + 1 });
+      if (next !== rec.report) reports.set(messageTs, { ...rec, report: next, revision: (rec.revision ?? 0) + 1 });
       return structuredClone(next);
     },
 
