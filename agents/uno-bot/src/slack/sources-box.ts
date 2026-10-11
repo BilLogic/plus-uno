@@ -20,8 +20,11 @@
 // A page read whole, or a blueprint cell, counts toward three and no further.
 //
 // A container takes no `markdown` child, so the links are one `rich_text`
-// bullet list. Its title is the count alone, never a freshness note: when the
-// data was read is the footer's and the ⚠️ line's to say.
+// bullet list. Its title is the count alone, never a freshness note. A live
+// read carries no mark; a source its lookup served from cache carries
+// "· read earlier" beside its link, from the lookup's own `cached` field — so
+// freshness is said from data, and the prose never claims it (AGENT.md
+// § Grounding).
 //
 // THE LINE is the same links as one line of Markdown, for the text copy and
 // for the plain rung a refused box steps down to, so the reader keeps them.
@@ -39,6 +42,9 @@ export const MIN_SOURCES = 3;
 
 /** The most links one box lists — a reading list past this is noise. */
 export const MAX_BOX_SOURCES = 10;
+
+/** The mark beside a source its lookup served from cache: not read this turn. */
+const READ_EARLIER = "read earlier";
 
 /** A Sources box and the same links as a line of Markdown. */
 export interface SourcesBox {
@@ -120,7 +126,9 @@ export function sourcesBox(sources: readonly TaskCardSource[] | undefined, prose
     if (!kept.some((s) => s.queried === "collection" && !linked(s.url, prose))) return null;
     kept = kept.filter(({ url }) => !linked(url, prose));
   }
-  const shown: CardSource[] = kept.slice(0, MAX_BOX_SOURCES).map(({ text, url }) => ({ text, url }));
+  const shown: Array<CardSource & { cached?: true }> = kept
+    .slice(0, MAX_BOX_SOURCES)
+    .map(({ text, url, cached }) => ({ text, url, ...(cached ? { cached } : {}) }));
   return {
     block: foldedBox(`Sources (${shown.length})`, [
       {
@@ -129,14 +137,19 @@ export function sourcesBox(sources: readonly TaskCardSource[] | undefined, prose
           {
             type: "rich_text_list",
             style: "bullet",
-            elements: shown.map(({ text, url }) => ({
+            elements: shown.map(({ text, url, cached }) => ({
               type: "rich_text_section",
-              elements: [{ type: "link", url, text: linkLabel(text) || url }],
+              elements: [
+                { type: "link", url, text: linkLabel(text) || url },
+                ...(cached ? [{ type: "text", text: ` · ${READ_EARLIER}` }] : []),
+              ],
             })),
           },
         ],
       },
     ]),
-    line: `Sources: ${shown.map(({ text, url }) => `[${linkLabel(text) || url}](${url})`).join(" · ")}`,
+    line: `Sources: ${shown
+      .map(({ text, url, cached }) => `[${linkLabel(text) || url}](${url})${cached ? ` (${READ_EARLIER})` : ""}`)
+      .join(" · ")}`,
   };
 }

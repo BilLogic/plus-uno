@@ -134,6 +134,9 @@ export interface Presenter {
   optionsOffered(lookup: string, field: string, options: readonly string[]): void;
   /** What the turn's lookups left to post beneath the answer, if anything. */
   presentation(): Presentation | undefined;
+  /** Did a lookup's source fail while none answered — so nothing live stands
+   *  behind the answer, and its prose owes a hedge? */
+  nothingRead(): boolean;
 }
 
 type Recorded = LookupCall;
@@ -511,9 +514,22 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
       for (const source of read) {
         const was = sources.get(source.url);
         // A page a search found and a later lookup read whole was queried.
-        if (!was) sources.set(source.url, source);
-        else if (source.queried && was.queried !== "collection") sources.set(source.url, { ...was, queried: source.queried });
+        if (!was) {
+          sources.set(source.url, source);
+          continue;
+        }
+        let merged = was;
+        if (source.queried && was.queried !== "collection") merged = { ...merged, queried: source.queried };
+        // A source a later lookup read live is no longer only a cached one.
+        if (was.cached && !source.cached) {
+          const { cached: _cached, ...live } = merged;
+          merged = live;
+        }
+        if (merged !== was) sources.set(source.url, merged);
       }
+    },
+    nothingRead() {
+      return warnings.nothingRead();
     },
     chartedAcross() {
       return drawnAcross.map(({ lookup, field }) => ({ lookup, field }));

@@ -16,6 +16,7 @@ import {
 const GROUNDED = { retrievalRan: true } as const;
 const CACHED = { retrievalRan: true, servedFromCache: true } as const;
 const UNGROUNDED = { retrievalRan: false } as const;
+const FAILED = { retrievalRan: true, readFailed: true } as const;
 
 describe("woven confidence detection", () => {
   it("recognises sureness the model earned by looking", () => {
@@ -136,10 +137,37 @@ describe("verdicts", () => {
     assert.equal(needsRepair(v), false);
   });
 
-  it("flags a grounded factual reply with no clause", () => {
+  it("ships a live read with no clause: the Sources box says what was read", () => {
     const v = judgeConfidence("Warm-Up has two paths, and one is an exception.", GROUNDED);
-    assert.equal(v.kind, "absent");
+    assert.equal(v.kind, "ok");
+    assert.equal(needsRepair(v), false);
+  });
+
+  it("ships a cached read with no clause: the Sources box marks it", () => {
+    assert.equal(judgeConfidence("Warm-Up has two paths, and one is an exception.", CACHED).kind, "ok");
+  });
+
+  it("asks for a hedge when every read this turn failed", () => {
+    const v = judgeConfidence("Warm-Up has two paths, and one is an exception.", FAILED);
+    assert.equal(v.kind, "unhedged");
     assert.equal(needsRepair(v), true);
+  });
+
+  it("ships a failed read whose prose says how sure it is", () => {
+    for (const text of [
+      "I couldn't open the board, so treat this as unconfirmed: Warm-Up has two paths.",
+      "The repo names it, though I could not open the story, so treat the status as unconfirmed.",
+    ]) {
+      assert.equal(judgeConfidence(text, FAILED).kind, "ok", text);
+    }
+  });
+
+  it("does not take a claim of having looked as the hedge a failed read owes", () => {
+    assert.equal(judgeConfidence("I checked the board — Warm-Up has two paths.", FAILED).kind, "unhedged");
+  });
+
+  it("flags a freshness claim over a read that failed", () => {
+    assert.equal(judgeConfidence("Checked just now — Warm-Up has two paths.", FAILED).kind, "false-freshness");
   });
 
   it("flags a trailing label rather than letting it be silently stripped", () => {
@@ -226,7 +254,7 @@ describe("verdicts", () => {
   });
 
   it("gives every repairable verdict a specific instruction", () => {
-    for (const kind of ["false-freshness", "trailing-label", "absent"] as const) {
+    for (const kind of ["false-freshness", "trailing-label", "unhedged"] as const) {
       const instruction = repairInstruction({ kind });
       assert.ok(instruction && instruction.length > 40, `${kind} needs a real instruction`);
     }

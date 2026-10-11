@@ -205,9 +205,9 @@ test("both repairs ride ONE judge call, and the forced reason names the confiden
     absence: FOUND_NOTHING,
     replies: [
       SEARCH_REPLY,
-      // Unscoped absence AND no word about what it rests on: both pre-checks
-      // fire on the same draft.
-      { text: "Nobody has mentioned a hard deadline for the reflection redesign." },
+      // Unscoped absence AND the retired trailing label: both pre-checks fire
+      // on the same draft.
+      { text: "Nobody has mentioned a hard deadline for the reflection redesign.\n_Confidence: medium_" },
     ],
   });
   const outcome = await runTurn(request({ text: "has anyone set a deadline?" }), h.deps);
@@ -217,12 +217,12 @@ test("both repairs ride ONE judge call, and the forced reason names the confiden
   // model does one of them.
   assert.equal(h.judged.length, 1);
   const call = h.judged[0]!;
-  assert.match(call.extraInstruction ?? "", /never says what was\s+checked/);
+  assert.match(call.extraInstruction ?? "", /standalone confidence label/);
   assert.match(call.extraInstruction ?? "", /ABSENCE SCOPE/);
   // The force reason is the CONFIDENCE kind when confidence is what fired —
   // the absence scope is carried by the instruction, not by a second reason.
-  assert.equal(call.forceReason, "absent");
-  assert.equal(outcome.telemetry.confidence, "absent");
+  assert.equal(call.forceReason, "trailing-label");
+  assert.equal(outcome.telemetry.confidence, "trailing-label");
   // And the judge is told what actually ran, which is what makes D9 judgeable.
   assert.deepEqual(call.toolsUsedThisTurn, ["slack_search"]);
   assert.equal(call.correction, false);
@@ -292,6 +292,50 @@ test("the same draft over a LIVE read is not escalated", async () => {
   assert.equal(outcome.telemetry.confidence, "ok");
   assert.equal(h.judged[0]!.forceReason, undefined);
   assert.equal(h.judged[0]!.extraInstruction, undefined);
+});
+
+test("a live read with no confidence clause ships as written: the Sources box says what was read", async () => {
+  const h = harness({
+    replies: [
+      { text: "Checking the blueprint.", toolCalls: [{ name: "search_blueprint", args: { query: "call-off" } }] },
+      { text: "A call-off opens the slot a fill-in claims." },
+    ],
+    receipt: { tool: "search_blueprint", query: "call-off", count: 3, scenarios: [] },
+  });
+  const outcome = await runTurn(request(), h.deps);
+
+  assert.equal(outcome.telemetry.confidence, "ok");
+  assert.equal(h.judged[0]!.forceReason, undefined);
+  assert.equal(h.judged[0]!.extraInstruction, undefined);
+});
+
+test("a read that failed asks the prose for a hedge", async () => {
+  const h = harness({
+    replies: [
+      { text: "Checking the board.", toolCalls: [{ name: "roadmap_query", args: { title: "goal cycle" } }] },
+      { text: "The goal cycle card is in Need PRD." },
+    ],
+    toolResultFor: () => JSON.stringify({ ok: false, error: "Notion 502: bad gateway" }),
+  });
+  const outcome = await runTurn(request(), h.deps);
+
+  assert.equal(outcome.telemetry.confidence, "unhedged");
+  assert.equal(h.judged[0]!.forceReason, "unhedged");
+  assert.match(h.judged[0]!.extraInstruction ?? "", /failed to reach its source/);
+});
+
+test("a failed read whose prose already hedges is not escalated", async () => {
+  const h = harness({
+    replies: [
+      { text: "Checking the board.", toolCalls: [{ name: "roadmap_query", args: { title: "goal cycle" } }] },
+      { text: "I could not open the board, so treat this as unconfirmed: the goal cycle card was in Need PRD last week." },
+    ],
+    toolResultFor: () => JSON.stringify({ ok: false, error: "Notion 502: bad gateway" }),
+  });
+  const outcome = await runTurn(request(), h.deps);
+
+  assert.equal(outcome.telemetry.confidence, "ok");
+  assert.equal(h.judged[0]!.forceReason, undefined);
 });
 
 test("a reply Slack never accepted is reported as a failure and never remembered as posted", async () => {

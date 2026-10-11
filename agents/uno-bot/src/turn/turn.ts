@@ -2062,16 +2062,18 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
 
   // The deterministic half of the pre-send check, ahead of the judge.
   //
-  // D9 (one woven confidence clause) was only ever checked INSIDE the judge,
-  // which skips anything under 1500 chars — and almost every blueprint answer
-  // is a few hundred. This runs on the body that will actually SHIP, because
-  // the cap truncates after the judge has scored and can amputate a clause from
-  // a reply already logged as verdict=pass.
+  // D9 (sureness said in prose when it is lower than a live read earns) was
+  // only ever checked INSIDE the judge, which skips anything under its length
+  // floor — and almost every blueprint answer is a few hundred characters.
+  // This runs on the body that will actually SHIP, because the cap truncates
+  // after the judge has scored and can amputate a clause from a reply already
+  // logged as verdict=pass.
   const retrievalRan = retrievalRanIn(run.tools);
   const servedFromCache = run.receipt?.cached === true;
+  const readFailed = ctx.presenting.nothingRead();
   let verdict: ConfidenceVerdict = { kind: "exempt" };
   try {
-    verdict = judgeConfidence(deps.deliveredBody(draft), { retrievalRan, servedFromCache });
+    verdict = judgeConfidence(deps.deliveredBody(draft), { retrievalRan, servedFromCache, readFailed });
   } catch (err) {
     // Fail open, in the same direction as the judge itself: a missing
     // confidence clause is a smaller harm than a dropped answer.
@@ -2164,6 +2166,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     const finalVerdict = judgeConfidence(deps.deliveredBody(reviewed.text), {
       retrievalRan,
       servedFromCache,
+      readFailed,
     });
     console.log(
       `[confidence] pre=${verdict.kind} post=${finalVerdict.kind} ` +

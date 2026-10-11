@@ -186,6 +186,9 @@ export interface WarningLog {
   atLeast(lookup: string, bounds: ReadonlyArray<{ name: string; value: number }>): void;
   /** The lines as they post, sign-less, at most `MAX_WARNING_LINES`. */
   lines(): string[];
+  /** Did a source fail this turn while none answered? Then nothing live
+   *  stands behind the answer (`agent/confidence.ts`). */
+  nothingRead(): boolean;
 }
 
 /**
@@ -336,6 +339,9 @@ export function warningLog(now: () => number = Date.now): WarningLog {
     },
     lines() {
       return all().slice(0, MAX_WARNING_LINES);
+    },
+    nothingRead() {
+      return failed.size > 0 && read.size === 0;
     },
   };
 }

@@ -1,7 +1,10 @@
 // Does this reply say what it rests on?
 //
-// AGENT.md § Grounding requires exactly one woven confidence clause per factual
-// reply, and forbids a trailing "Confidence: high" label. The only thing that
+// AGENT.md § Grounding asks for sureness in prose only when it is lower than a
+// live read earns — a read that failed, an earlier or cached read, an
+// inference — and forbids a trailing "Confidence: high" label. A live read this
+// turn says nothing in prose: the Sources box shows what was read, and marks a
+// cached source from the data (`slack/sources-box.ts`). The only thing that
 // checked that rule was rubric dimension D9 inside the draft judge — which
 // skips any draft under MIN_DRAFT_CHARS (1000, and 1500 when this was written). Almost every blueprint answer
 // in Slack is a few hundred characters, so the rule went unenforced on the
@@ -9,7 +12,7 @@
 // (stripTrailingConfidence) DELETES a malformed label without putting anything
 // back, turning "wrong shape" into "no signal at all".
 //
-// This module is the cheap deterministic half: decide whether a reply needs a
+// This module is the cheap deterministic half: decide whether a reply owes a
 // clause, and whether it has one. It never rewrites prose — a templated
 // sentence is exactly the "house sentence to adapt" the rule bans, and it
 // would fabricate a claim the renderer cannot substantiate. What it produces
@@ -52,6 +55,12 @@ export type ConfidenceContext = {
    * what a freshness claim asserts.
    */
   servedFromCache?: boolean;
+  /**
+   * Did every lookup that ran fail to reach its source? Then nothing live
+   * stands behind the answer, and the prose owes a hedge. A failure a later
+   * call of the same lookup recovered from does not count.
+   */
+  readFailed?: boolean;
 };
 
 export type ConfidenceVerdict =
@@ -64,8 +73,8 @@ export type ConfidenceVerdict =
   | { kind: "false-freshness" }
   /** The model reached for the retired trailing label instead of weaving. */
   | { kind: "trailing-label" }
-  /** Factual, grounded, and says nothing about what it rests on. */
-  | { kind: "absent" }
+  /** Factual, every read this turn failed, and it never says how sure it is. */
+  | { kind: "unhedged" }
   /** Factual, nothing fetched this turn, and it never says so. D9 requires a
    *  from-memory answer to admit it; this branch used to be `exempt`. */
   | { kind: "unsourced" };
@@ -90,7 +99,8 @@ const VERIFIED = [
 const HEDGED = [
   /\bfrom\s+memory\b/i,
   /\bnot\s+(?:entirely\s+|totally\s+|fully\s+)?(?:sure|certain)\b/i,
-  /\b(?:can(?:no|')t|could(?:n'| no)?t)\s+(?:verify|confirm|check|find)\b/i,
+  /\b(?:can(?:no|')t|could(?:n'| no)?t)\s+(?:verify|confirm|check|find|open|read|reach)\b/i,
+  /\bunconfirmed\b/i,
   /\bas\s+far\s+as\s+I\s+can\s+tell\b/i,
   /\bI\s+(?:think|believe|suspect)\b/i,
   /\bworth\s+(?:double-?checking|verifying)\b/i,
@@ -134,6 +144,12 @@ const matchesAny = (text: string, patterns: readonly RegExp[]): boolean =>
 /** True when the reply says what it checked, or how sure it is. */
 export function hasWovenConfidence(text: string): boolean {
   return matchesAny(text, VERIFIED) || matchesAny(text, HEDGED);
+}
+
+/** True when the reply says how sure it is — a hedge, not a claim of having
+ *  looked, which is what a failed read owes. */
+export function hasHedge(text: string): boolean {
+  return matchesAny(text, HEDGED);
 }
 
 /** True when the reply asserts its data is current as of now. */
@@ -230,15 +246,20 @@ export function judgeConfidence(
 
   if (!assertsSomething(deliveredText)) return { kind: "exempt" };
 
-  // A cache hit is not a fetch performed this turn. This is the 2026-08-17
-  // shape: the tool ran, the data did not come from the source.
-  if (ctx.servedFromCache && claimsFreshness(deliveredText)) {
+  // A cache hit, or a read that failed, is not a fetch performed this turn.
+  // The cache case is the 2026-08-17 shape: the tool ran, the data did not
+  // come from the source.
+  if ((ctx.servedFromCache || ctx.readFailed) && claimsFreshness(deliveredText)) {
     return { kind: "false-freshness" };
   }
 
   if (hasTrailingLabel(deliveredText)) return { kind: "trailing-label" };
-  if (hasWovenConfidence(deliveredText)) return { kind: "ok" };
-  return { kind: "absent" };
+  // Every read failed: the answer rests on something other than this turn's
+  // look, and the prose says how sure that makes it.
+  if (ctx.readFailed) return hasHedge(deliveredText) ? { kind: "ok" } : { kind: "unhedged" };
+  // A live read, or a cached one, owes no clause: the Sources box shows what
+  // was read and marks a cached source from the data.
+  return { kind: "ok" };
 }
 
 /** Verdicts that should be repaired rather than delivered as-is. */
@@ -274,11 +295,13 @@ export function repairInstruction(verdict: ConfidenceVerdict): string | null {
         "Weave the same information into a clause where it lands naturally, in " +
         "words that fit this answer, and remove the trailing line."
       );
-    case "absent":
+    case "unhedged":
       return (
-        "This reply states facts drawn from a source but never says what was " +
-        "checked or how sure it is. Add exactly one woven clause — not a " +
-        "trailing label, and not a second one if you find you already had it."
+        "Every lookup this turn failed to reach its source, and the reply states " +
+        "facts without saying so. Add one woven clause saying what the answer " +
+        "rests on instead and how sure that makes it — for example 'I could not " +
+        "open the board, so treat this as unconfirmed'. Not a trailing label, " +
+        "and no claim of having checked anything."
       );
     default:
       return null;
