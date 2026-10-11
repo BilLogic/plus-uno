@@ -288,7 +288,7 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
     // the collection the answer queried. Never both, so a cell answer's box
     // is decided by its cells alone.
     sources: (result) => {
-      const cells = rowLinks("rows", ["name", "label", "title"])(result);
+      const cells = rowLinks("rows", ["breadcrumb", "name", "label", "title"])(result);
       return cells.length ? cells : collectionThenRows("blueprint", () => [])(result);
     },
   },

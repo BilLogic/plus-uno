@@ -329,7 +329,7 @@ test("a scoped browse above cell level links the blueprint app once, named for t
   // url, and an answer citing them with no blueprint source under it.
   const rest = browse(SCENARIOS, { filterPhase: "In-session", granularity: "scenario" });
   assert.deepEqual(rest.blueprint, {
-    title: "Service blueprint · In-session",
+    title: "Service blueprint › In-session",
     url: "https://uno-blueprint.example/",
   });
   const notes = rest.notes as string[];
@@ -338,7 +338,7 @@ test("a scoped browse above cell level links the blueprint app once, named for t
 
 test("a phase-and-scenario scope names both, and an unfiltered rung names the blueprint alone", () => {
   const both = browse(SCENARIOS, { filterPhase: "In-session", filterScenario: "Help Request", granularity: "path" });
-  assert.equal((both.blueprint as { title: string }).title, "Service blueprint · In-session › Help Request");
+  assert.equal((both.blueprint as { title: string }).title, "Service blueprint › In-session › Help Request");
   const phases: BlueprintRow[] = [{ kind: "phase", id: "p-1", title: "Phase: In-session" }];
   assert.equal((browse(phases, { granularity: "phase" }).blueprint as { title: string }).title, "Service blueprint");
 });
@@ -350,6 +350,42 @@ test("cell rows carry their own links, so no blueprint root rides beside them", 
   const rest = browse(cells, { filterPhase: "In-session" });
   assert.equal(rest.blueprint, undefined);
   assert.equal((rest.notes as string[]).find((n) => /`blueprint.url`/.test(n)), undefined);
+});
+
+// ── Rows read as a breadcrumb, with no path kind tag ────────────────────────
+
+test("a cell reads as a › breadcrumb of its values, lane last, and the path loses its kind tag", () => {
+  // The semantic index stores the path as "Standard (happy)", and the title as
+  // a field-named dump. "(happy)" is the path's kind, not its name.
+  const cell: BlueprintRow = {
+    kind: "cell",
+    id: "c-1",
+    title: "Phase: Onboarding · Scenario: Employment & Access · Path: Standard (happy) · Step: PLUS app login · Lane: Storyboard",
+    phase: "Onboarding",
+    scenario: "Employment & Access",
+    path: "Standard (happy)",
+    step: "PLUS app login",
+    lane: "Storyboard",
+    url: "https://uno-blueprint.example/?cell=c-1",
+  };
+  const [row] = browse([cell], {}).rows as Array<Record<string, unknown>>;
+  assert.equal(row!.breadcrumb, "Onboarding › Employment & Access › Standard › PLUS app login (Storyboard)");
+  assert.equal(row!.path, "Standard");
+  assert.equal(row!.pathKind, "happy");
+  assert.doesNotMatch(JSON.stringify(row), /\(happy\)/);
+});
+
+test("a row above cell level stops its breadcrumb at its own level", () => {
+  const [scenario] = browse([{ ...SCENARIOS[0]!, phase: "In-session", scenario: "Help Request" }], {
+    filterPhase: "In-session",
+  }).rows as Array<Record<string, unknown>>;
+  assert.equal(scenario!.breadcrumb, "In-session › Help Request");
+  const [path] = browse(
+    [{ kind: "path", id: "p-1", title: "Phase: In-session · Scenario: Wrap-Up · Path: Late exit (exception)", phase: "In-session", scenario: "Wrap-Up", path: "Late exit" }],
+    {},
+  ).rows as Array<Record<string, unknown>>;
+  assert.equal(path!.breadcrumb, "In-session › Wrap-Up › Late exit");
+  assert.equal(path!.title, "Phase: In-session · Scenario: Wrap-Up · Path: Late exit");
 });
 
 test("a coarse row beside a linked cell adds no root: the cell is the source", () => {

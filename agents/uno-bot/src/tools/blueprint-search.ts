@@ -46,7 +46,7 @@ import {
   type BlueprintEnrichmentOutcome,
   type BlueprintReadResult,
 } from "../integrations/blueprint-read";
-import { appRootUrl } from "../integrations/blueprint-link";
+import { appRootUrl, blueprintBreadcrumb, splitPathKind, withoutPathKind } from "../integrations/blueprint-link";
 import { inventoryNotes } from "./blueprint-inventory-notes";
 import { touchpointNotes } from "./blueprint-touchpoint-notes";
 import {
@@ -82,7 +82,22 @@ function failureOf(
  *  phase then scenario, or the blueprint alone when nothing narrowed it. */
 function blueprintTitle(scope: BlueprintScope): string {
   const where = [scope.filterPhase, scope.filterScenario].filter(Boolean).join(" › ");
-  return where ? `Service blueprint · ${where}` : "Service blueprint";
+  return where ? `Service blueprint › ${where}` : "Service blueprint";
+}
+
+/** One row with its `breadcrumb` and its path kind split off as data. */
+function asRead(row: BlueprintRow): BlueprintRow {
+  const split = row.path ? splitPathKind(row.path) : undefined;
+  const path = split?.name || undefined;
+  const pathKind = row.pathKind ?? split?.kind;
+  const breadcrumb = blueprintBreadcrumb({ ...row, path });
+  return {
+    ...row,
+    title: withoutPathKind(row.title),
+    ...(path ? { path } : {}),
+    ...(pathKind ? { pathKind } : {}),
+    ...(breadcrumb ? { breadcrumb } : {}),
+  };
 }
 
 /** One read, as the payload the model is handed.
@@ -113,9 +128,13 @@ export function blueprintSearchPayload({
   read: BlueprintReadResult<BlueprintRow, BlueprintRetrieval>;
 }): Record<string, unknown> {
   const {
-    rows, retrieval, matched, truncated, capped_by, cached, age_ms, thin, top_score,
+    retrieval, matched, truncated, capped_by, cached, age_ms, thin, top_score,
     enrichments,
   } = read;
+  // The rows as the model and the Sources box read them: each named by its
+  // breadcrumb, and the index's path kind tag moved out of every name into
+  // `pathKind`, so "(happy)" never reaches a label or an answer.
+  const rows = read.rows.map(asRead);
 
   // The corpus-wide count behind the top-k (fused path only). Surfaced as
   // `matched` with its own note, so "113 cells mention Zoom; here are 15" is

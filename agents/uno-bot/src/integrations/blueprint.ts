@@ -145,6 +145,12 @@ export interface BlueprintRow {
    *  On semantic hits it comes from the indexed breadcrumb; on keyword hits from
    *  `paths.name` — never `path_type`, per docs/connectors/supabase/blueprint.md § Paths and the main route. */
   path?: string;
+  /** The path's kind ("happy", "exception"…), split off the name the index
+   *  tags with it. Data for the model; never part of a label. */
+  pathKind?: string;
+  /** The row as a reader names it: a ` › ` breadcrumb, lane last in
+   *  parentheses. Set where the model's view is built (search_blueprint). */
+  breadcrumb?: string;
   /** Deep link that opens this row in the blueprint app. Present only when
    *  BLUEPRINT_APP_URL is set AND the row has an id to link to — a URL that
    *  resolves to nothing is worse than no URL. */
@@ -816,7 +822,7 @@ async function trySemantic(
         step: crumb.step,
         scenario: crumb.scenario,
         // The breadcrumb's leading `Phase:` segment. Without it
-        // the model cannot cite `phase › scenario › path — lane × step` on the
+        // the model cannot cite `phase › scenario › path › step (lane)` on the
         // PRIMARY retrieval path, and guesses the phase from a scenario name
         // that sounds like one.
         phase: crumb.phase,

@@ -295,7 +295,7 @@ test("a blueprint browse above cell level still cites the blueprint, once", asyn
       { kind: "scenario", id: "s1", title: "Phase: In-session · Scenario: Help Request" },
       { kind: "scenario", id: "s2", title: "Phase: In-session · Scenario: Student Just Joined" },
     ],
-    blueprint: { title: "Service blueprint · In-session", url: APP },
+    blueprint: { title: "Service blueprint › In-session", url: APP },
   });
   const { box } = await answer(
     [{ name: "search_blueprint", result: scenarios }],
