@@ -63,6 +63,7 @@ import {
   changedReport,
   expiredReport,
   reportExpiryAt,
+  reportItemLook,
   REPORT_EXPIRY_RETRY_MS,
   type ReportExpiryRecord,
   type ReportExpiryEdit,
@@ -199,12 +200,7 @@ export class ThreadState extends DurableObject<Env> {
     const reports = await this.storage.list<ReportRecord>({ prefix: "report:" });
     const proposals = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     const executions = await this.storage.list<Execution>({ prefix: "exec:" });
-    const look = (key: string) => {
-      const proposal = proposals.get(proposalKey(key));
-      return proposal || executions.has(executionKey(key))
-        ? { expiresAt: proposal ? proposal.createdAt + recordTtlMs(proposal) + 1 : Infinity, executing: executions.has(executionKey(key)) }
-        : undefined;
-    };
+    const look = reportLook(proposals, executions);
     const expired = [...reports.values()].filter((rec) => now - rec.createdAt <= rec.report.ttlMs + REPORT_GRACE_MS && reportExpiryAt(rec, look, now) <= now);
     if (expired.length && this.alarmDeps.handOffExpiredReports) {
       await this.alarmDeps.handOffExpiredReports(expired.map((rec) => rec.report)).catch((err: unknown) => {
@@ -560,10 +556,7 @@ export class ThreadState extends DurableObject<Env> {
       if (!rec || at - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) return null;
       const proposals = await txn.list<ProposalRecord>({ prefix: "prop:" });
       const executions = await txn.list<Execution>({ prefix: "exec:" });
-      const next = expiredReport(rec, (key) => {
-        const proposal = proposals.get(proposalKey(key));
-        return proposal || executions.has(executionKey(key)) ? { expiresAt: proposal ? proposal.createdAt + recordTtlMs(proposal) + 1 : Infinity, executing: executions.has(executionKey(key)) } : undefined;
-      }, at);
+      const next = expiredReport(rec, reportLook(proposals, executions), at);
       if (next !== rec) await txn.put(reportKey(messageTs), next);
       return next.expiryPending ? { report: next.report, revision: next.revision ?? 0 } : null;
     });
@@ -849,6 +842,14 @@ function historyKey(channel: string, thread: string): string {
 // stored opaque, and a record with none reads as the default hour.
 function recordTtlMs(rec: ProposalRecord): number {
   return proposalTtlMs((rec.payload as PendingProposal | null) ?? {});
+}
+
+/** `reportItemLook` over this store's proposal and execution records. */
+function reportLook(proposals: Map<string, ProposalRecord>, executions: Map<string, Execution>) {
+  return reportItemLook((key) => {
+    const proposal = proposals.get(proposalKey(key));
+    return proposal && { createdAt: proposal.createdAt, ttlMs: recordTtlMs(proposal) };
+  }, (key) => executions.has(executionKey(key)));
 }
 
 function proposalKey(ts: string): string {
