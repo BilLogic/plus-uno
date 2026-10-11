@@ -141,7 +141,7 @@ const ROWS: Row[] = [
     details: "ButtonGroup",
     result: ok({ repo: "BilLogic/plus-uno", search: "ButtonGroup", count: 1, hits: [{ path: "src/ButtonGroup.jsx", url: "https://github.com/BilLogic/plus-uno/blob/main/src/ButtonGroup.jsx" }] }),
     output: "1 file",
-    sources: [{ text: "src/ButtonGroup.jsx", url: "https://github.com/BilLogic/plus-uno/blob/main/src/ButtonGroup.jsx" }],
+    sources: [{ text: "ButtonGroup.jsx", url: "https://github.com/BilLogic/plus-uno/blob/main/src/ButtonGroup.jsx" }],
   },
   {
     name: "github_read",

@@ -749,6 +749,46 @@ describe("a GitHub file the turn read directly", () => {
     assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: Button.jsx — ${readUrl}`]);
   });
 
+  describe("after a code search that found it", () => {
+    const HIT = BUTTON.replace("/blob/main/", "/blob/3f9c2a1/");
+    const searched = () =>
+      readGithub(
+        { search: "Button sizes" },
+        {
+          resolveRepo: () => ({ ok: true, entry: { repo: "BilLogic/plus-uno", purpose: "design system", workflows: [] }, isDefault: true }),
+          readPath: async () => {
+            throw new Error("no path read in search mode");
+          },
+          searchCode: async () => [{ path: BUTTON_PATH, url: HIT }],
+        },
+      );
+    const searchedThenRead = async (answer: (readUrl: string) => string) => {
+      const [search, read] = await Promise.all([searched(), readResult("BilLogic/plus-uno", BUTTON_PATH)]);
+      const readUrl = (JSON.parse(read) as { url: string }).url;
+      const w = world({
+        replies: [
+          { text: "Finding the Button.", toolCalls: [{ name: "github_read", args: { search: "Button sizes" } }] },
+          { text: "Reading the Button.", toolCalls: [{ name: "github_read", args: { path: BUTTON_PATH } }] },
+          { text: answer(readUrl) },
+        ],
+        toolResultFor: (name, args) => (name === "github_read" ? (args.search ? search : read) : PRD_FOUND),
+      });
+      await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+      return { readUrl, lines: w.replies().map((r) => r.message.split("\n").at(-1)) };
+    };
+
+    it("names the file by its last segment when the answer links the file read", async () => {
+      const { readUrl, lines } = await searchedThenRead((url) => `It comes in small, medium and large. [Button.jsx](${url})`);
+      assert.deepEqual(lines, [`Source: Button.jsx — ${readUrl}`]);
+    });
+
+    it("names the file by its last segment when the answer writes out its repo path", async () => {
+      const { lines } = await searchedThenRead(() => `It comes in small, medium and large (\`${BUTTON_PATH}\`).`);
+      assert.equal(lines.length, 1);
+      assert.match(lines[0] ?? "", /^Source: Button\.jsx — https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/[^/]+\/design-system\/src\/components\/actions\/Button\/Button\.jsx$/);
+    });
+  });
+
   it("says it couldn't find this when the path the answer names is only the folder of the file read", async () => {
     const read = await readResult("BilLogic/plus-uno", BUTTON_PATH);
     const w = world({

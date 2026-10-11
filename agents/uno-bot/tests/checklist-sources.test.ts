@@ -83,6 +83,24 @@ describe("a task card's details, output and sources", () => {
     assert.deepEqual(card.sources?.map((s) => s.text), ["a.jsx", "fig", "cell", "story"]);
   });
 
+  it("names a GitHub file or folder by its last segment, from a search as from a read", async () => {
+    const BUTTON = "https://github.com/BilLogic/plus-uno/blob/HEAD/design-system/src/components/actions/Button/Button.jsx";
+    const FOLDER = "https://github.com/BilLogic/plus-uno/tree/HEAD/design-system/src/components/actions/Button";
+    const searched = await finishedCard("github_read", { search: "Button" }, {
+      ok: true,
+      hits: [{ path: "design-system/src/components/actions/Button/Button.jsx", url: BUTTON }],
+    });
+    const listed = await finishedCard("github_read", { path: "design-system/src/components/actions/Button" }, {
+      ok: true,
+      path: "design-system/src/components/actions/Button",
+      url: FOLDER,
+      kind: "dir",
+      entries: [],
+    });
+    assert.deepEqual(searched.sources?.map((s) => s.text), ["Button.jsx"]);
+    assert.deepEqual(listed.sources?.map((s) => s.text), ["Button"]);
+  });
+
   it("drops a Slack permalink the search could not vouch for as public", async () => {
     const card = await finishedCard("slack_search", { query: "deadline" }, {
       ok: true,
