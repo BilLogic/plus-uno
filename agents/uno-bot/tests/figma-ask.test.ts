@@ -494,6 +494,22 @@ describe("a change request", () => {
     assert.match(w.replies()[0]!.message, /^🐐 le goat \(uno-bot\) · AI-generated\nI drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
   });
 
+  for (const [write, args, ask_] of [
+    ["notion_update", { page_url: "https://www.notion.so/card-2482", append: "Sessions list newest first" }, "the live app shows sessions oldest first, newest should be first"],
+    ["notion_create", { title: "Heading reads Your schedule" }, 'change the heading on this screen to "Your schedule"'],
+    ["github_issue_create", { title: "Blueprint app: phase filter drops a scenario", body: "Seen in Figma.", repo: "plus-uno-blueprint" }, "the blueprint app's phase filter drops a scenario"],
+  ] as const) {
+    it(`a change routed to ${write} stages one card and the reply links it`, async () => {
+      const w = world({ replies: [{ text: "Drafting it.", toolCalls: [{ name: write, args: { ...args } }] }] });
+      await ask(w, comment("100", `@uno ${ask_}`));
+      assert.equal(w.cards.length, 1);
+      assert.equal(w.cards[0]!.stagedCards.length, 1);
+      const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
+      assert.equal(staged!.toolName, write);
+      assert.match(w.replies()[0]!.message, /I drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
+    });
+  }
+
   it("tells a teammate's turn to propose a change with the write that fits, and a stranger's to propose none", async () => {
     const scopes: string[] = [];
     const w = world();
@@ -505,10 +521,11 @@ describe("a change request", () => {
     await ask(w, comment("100", "@uno the built screen lists sessions oldest first"));
     await ask(w, comment("200", "@uno the built screen lists sessions oldest first", { user: STRANGER }));
     const [teammate, stranger] = scopes;
-    assert.match(teammate!, /change they ask for[^.]*is a proposal/i);
-    assert.match(teammate!, /design change[^;]*`notion_update`/);
-    assert.match(teammate!, /built product[^;]*`github_issue_create`/);
+    assert.match(teammate!, /change they ask for[^.]*is a proposal[^.]*intake/i);
+    assert.match(teammate!, /live PLUS app[^;]*frame's Roadmap card[^;]*`notion_update`[^;]*new Roadmap card \(`notion_create`\)/);
+    assert.match(teammate!, /plus-uno repo[^;]*blueprint[^;]*Storybook[^;]*harness[^;]*prototypes[^;]*`github_issue_create`/);
     assert.match(teammate!, /component[^.]*`component_implement`/);
+    assert.doesNotMatch(teammate!, /built product/);
     assert.doesNotMatch(teammate!, /nothing is written/i);
     assert.match(stranger!, /propose no change/);
     assert.doesNotMatch(stranger!, /notion_update|github_issue_create/);
