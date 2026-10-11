@@ -13,7 +13,8 @@
 //     executes. It runs in #plus-design with the `figma` origin, so every
 //     tool reads at public scope, and an unmapped asker's at public facts
 //     alone (`agent/public-scope.ts`).
-//   • #plus-design (`PLUS_DESIGN_CHANNEL_ID`): the lead is `chat.postMessage`,
+//   • #plus-design (`PLUS_DESIGN_CHANNEL_ID`), or the channel or DM
+//     `FIGMA_ASK_CHANNEL_ID` names when set: the lead is `chat.postMessage`,
 //     its link `chat.getPermalink`, and the card the Slack Delivery's own,
 //     posted in the lead's thread with Review. Whether a card landed under a
 //     lead is `conversations.replies` on its thread: a message the bot posted
@@ -53,7 +54,7 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
   const kv = env.HARNESS_KV;
   if (!figma || !kv) return undefined;
   const threadState = threadStateFor(env);
-  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
+  const channel = env.FIGMA_ASK_CHANNEL_ID?.trim() || env.PLUS_DESIGN_CHANNEL_ID?.trim();
   return {
     figma,
     people: () => figmaPeopleFor(env),

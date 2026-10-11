@@ -24,6 +24,11 @@ import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness } from "./helpers/turn-harness";
 import { readGithub } from "../src/tools/github-read";
 import { gapNotes, type StoredTeamRoles } from "../src/usage/index";
+import { figmaAskDepsFor } from "../src/figma-ask/env";
+import { runReviewDecision } from "../src/slack/review-door";
+import type { GateVerdict } from "../src/gate/gate";
+import type { Env } from "../src/types";
+import { recordingViews } from "./helpers/recording-slack";
 
 const FILE = "FILEKEY1";
 const DESIGN = "CDESIGN1";
@@ -99,6 +104,8 @@ function world(
     people?: Record<string, string>;
     comments?: FigmaComment[];
     design?: boolean;
+    /** Where the lead and its card post; #plus-design by default. */
+    channel?: string;
     toolResultFor?: (name: string, args: Record<string, unknown>) => string;
     preflightAsk?: string;
     /** The stored Team Members map; by default Sarah is mapped, and the rows
@@ -135,6 +142,7 @@ function world(
       return { ok: true };
     },
   });
+  const channel = opts.channel ?? DESIGN;
   const deps: FigmaAskDeps = {
     figma,
     people: async () => opts.people ?? { [SARAH.id]: "USARAH" },
@@ -152,12 +160,12 @@ function world(
       ? {}
       : {
           design: {
-            channel: DESIGN,
+            channel,
             post: async (text) => {
               leads.push(text);
               return { ts: `1760000000.00000${leads.length}` };
             },
-            permalink: async (ts) => `https://plus.slack.com/archives/${DESIGN}/p${ts.replace(".", "")}`,
+            permalink: async (ts) => `https://plus.slack.com/archives/${channel}/p${ts.replace(".", "")}`,
             cardDelivery: (leadTs) => {
               const d = recordingDelivery();
               cards.push(d);
@@ -994,4 +1002,63 @@ describe("a Team Members gap the ask ran into", () => {
     assert.equal(w.replies().length, 1);
     assert.deepEqual(w.notes, []);
   });
+});
+
+describe("where a change request's card posts", () => {
+  const PLUS_DESIGN = "C03FC8AS69K";
+  const LE_GOAT_DM = "D0APTB20SK0";
+  const BILL_SLACK = "U03FYQJRQHX";
+  const STAGES: ScriptedReply[] = [
+    { text: "Drafting it.", toolCalls: [{ name: "notion_create", args: { title: "Hide the progress bar until the first goal" } }] },
+  ];
+  const env = (vars: Partial<Env>) =>
+    ({ FIGMA_ACCESS_TOKEN: "figd_test", HARNESS_KV: {}, THREAD_STATE: {}, PLUS_DESIGN_CHANNEL_ID: PLUS_DESIGN, ...vars }) as unknown as Env;
+
+  it("is the setting's channel when it names one, and #plus-design when it is blank or unset", () => {
+    assert.equal(figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: LE_GOAT_DM }))?.design?.channel, LE_GOAT_DM);
+    assert.equal(figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: "  " }))?.design?.channel, PLUS_DESIGN);
+    assert.equal(figmaAskDepsFor(env({}))?.design?.channel, PLUS_DESIGN);
+  });
+
+  for (const [where, channel] of [
+    ["#plus-design", PLUS_DESIGN],
+    ["the le goat DM", LE_GOAT_DM],
+  ] as const) {
+    it(`posts the lead and card in ${where}, the reply links it there, and Approve there runs the write`, async () => {
+      const w = world({ replies: STAGES, channel });
+      await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
+
+      assert.equal(w.leads.length, 1);
+      assert.match(w.leads[0]!, /^<@UOWNER>, <@USARAH> asked in a Figma comment on /);
+      assert.equal(w.cards[0]!.stagedCards.length, 1);
+      const link = `https://plus.slack.com/archives/${channel}/p1760000000000001`;
+      assert.ok(w.replies()[0]!.message.includes(link), "the Figma reply links the lead where it posted");
+
+      const staged = await w.deps.threadState.getProposalByThread({ channel, thread: "1760000000.000001" });
+      assert.ok(staged, "the card is found from its thread where it posted");
+      assert.equal(staged!.channel, channel);
+
+      const ran: GateVerdict[] = [];
+      const redrawn: string[] = [];
+      await runReviewDecision(
+        { viewId: "V1", channel, messageTs: staged!.proposalTs, userId: BILL_SLACK, decision: "confirm" },
+        {
+          threadState: w.deps.threadState,
+          standingConfirmers: [BILL_SLACK],
+          views: recordingViews({ alreadyOpen: ["V1"] }).client,
+          delivery: () => recordingDelivery(),
+          applyVerdict: async (v) => {
+            ran.push(v);
+            return [{ toolName: v.execute?.toolName ?? "", ok: true, result: "{}", message: "Created." }];
+          },
+          updateCard: async (at) => void redrawn.push(at),
+          restage: async () => {},
+          revise: async () => {},
+        },
+      );
+      assert.equal(ran.length, 1);
+      assert.equal(ran[0]!.execute?.toolName, "notion_create", "Approve runs the drafted write");
+      assert.deepEqual(redrawn, [channel], "the card is redrawn where it posted");
+    });
+  }
 });
