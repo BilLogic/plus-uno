@@ -13,10 +13,10 @@ import {
   repairInstruction,
 } from "../src/agent/confidence";
 
-const GROUNDED = { retrievalRan: true } as const;
-const CACHED = { retrievalRan: true, servedFromCache: true } as const;
-const UNGROUNDED = { retrievalRan: false } as const;
-const FAILED = { retrievalRan: true, readFailed: true } as const;
+const GROUNDED = { retrievalRan: true, blueprintLookupRan: true } as const;
+const CACHED = { retrievalRan: true, blueprintLookupRan: true, servedFromCache: true } as const;
+const UNGROUNDED = { retrievalRan: false, blueprintLookupRan: false } as const;
+const FAILED = { retrievalRan: true, blueprintLookupRan: true, readFailed: true } as const;
 
 describe("woven confidence detection", () => {
   it("recognises sureness the model earned by looking", () => {
@@ -311,5 +311,12 @@ describe("verdicts", () => {
     }
     assert.equal(repairInstruction({ kind: "ok" }), null);
     assert.equal(repairInstruction({ kind: "exempt" }), null);
+  });
+});
+
+describe("an earlier answer named as the basis", () => {
+  it("is no hedge on a turn whose every read failed", () => {
+    const text = "My last search found three cards in review, all owned by Bryan.";
+    assert.equal(judgeConfidence(text, FAILED).kind, "unhedged");
   });
 });

@@ -131,3 +131,63 @@ test("the same answer over a blueprint lookup of this turn is not sent back", as
   assert.equal(outcome.telemetry.confidence, "ok");
   assert.equal(h.judged[0]!.forceReason, undefined);
 });
+
+const GROUNDED_DRAFT =
+  "Here are a few ideas, grounded directly in our current blueprint pain points: " +
+  "a nudge when Session › Live tutoring › Standard › Student goes quiet (Frontstage).";
+
+for (const [name, verdict] of [
+  ["errors", "error"],
+  ["passes unrewritten", "pass"],
+] as const) {
+  test(`a grounding claim the judge ${name} never reaches the reader`, async () => {
+    const h = harness({ replies: [{ text: GROUNDED_DRAFT }], judge: () => ({ text: GROUNDED_DRAFT, verdict }) });
+    await runTurn(newDmAsk(), h.deps);
+
+    const answer = h.delivery.posted.at(-1) ?? "";
+    assert.doesNotMatch(answer, /grounded directly in our current blueprint/);
+    assert.match(answer, /going from my earlier answer, not a fresh look at the blueprint: a nudge when/);
+  });
+}
+
+test("a place named with no word on where it came from gets that word when the judge leaves it out", async () => {
+  const draft = "A quiet-student nudge at Session › Live tutoring › Standard › Student goes quiet (Frontstage).";
+  const h = harness({ replies: [{ text: draft }] });
+  await runTurn(newDmAsk(), h.deps);
+
+  assert.match(h.delivery.posted.at(-1) ?? "", /^From my earlier answer, not a fresh look: A quiet-student nudge/);
+});
+
+test("a turn that looked only in Notion still owes the word on the blueprint places it carries", async () => {
+  const h = harness({
+    replies: [
+      { text: "Checking the Roadmap.", toolCalls: [{ name: "roadmap_query", args: { query: "release" } }] },
+      {
+        text:
+          "According to our current blueprint, the release step is Release › Version cut › Standard › " +
+          "Tag the release (Backstage), and the Roadmap card is In Review.",
+      },
+    ],
+  });
+  const outcome = await runTurn(newDmAsk({ text: "where are we on the release?" }), h.deps);
+
+  assert.deepEqual(h.executed, ["roadmap_query"]);
+  assert.equal(outcome.telemetry.confidence, "carried");
+  assert.equal(h.judged[0]!.forceReason, "carried");
+  assert.doesNotMatch(h.delivery.posted.at(-1) ?? "", /According to our current blueprint/);
+});
+
+test("a Figma or Notion path is not a blueprint place", async () => {
+  const h = harness({
+    replies: [
+      {
+        text:
+          "That rule lives on Specs › Goal states › Live session, and the card's field is Card 12 › Status — " +
+          "the progress bar stays hidden until the tutor joins.",
+      },
+    ],
+  });
+  const outcome = await runTurn(newDmAsk({ text: "where's the progress bar rule?" }), h.deps);
+
+  assert.notEqual(outcome.telemetry.confidence, "carried");
+});

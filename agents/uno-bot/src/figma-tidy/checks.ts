@@ -30,7 +30,6 @@ import { cardNumbersOf } from "../figma-comments/title";
 export const STAGES = ["Playground", "WIP", "Under-Dev", "Specs", "Archive"] as const;
 export type Stage = (typeof STAGES)[number];
 
-export type TidyCheck = "wrong-folder" | "unknown-card" | "no-active-card" | "title";
 
 /** A team's folder, as the read lists it. */
 export interface TidyFolder {
@@ -49,7 +48,8 @@ export interface TidyFile {
   modified?: string;
 }
 
-/** A Roadmap card, as the checks read it. `owner` is its design owner's Slack id. */
+/** A Roadmap card, as the checks read it. `owner` is its design owner's Slack
+ *  id; `designers` its designer Contributors' first names, for a title. */
 export interface TidyCard {
   number: number;
   title: string;
@@ -57,25 +57,37 @@ export interface TidyCard {
   designStatus: string | null;
   devStatus: string | null;
   owner: string | null;
+  designers: string[];
 }
 
-export interface TidyFinding {
+/** Where a file belongs, as the team's folder; null when the team has none by that stage. */
+export interface TidyMove {
+  stage: Stage;
+  folder: TidyFolder | null;
+}
+
+/** One finding: what every check shares, and what each check alone carries. */
+export type TidyFinding = {
   /** File, check and card: what the weeks remember. */
   fingerprint: string;
-  check: TidyCheck;
   file: TidyFile;
   /** The folder it sits in. */
   folder: TidyFolder;
-  /** The card the finding is about; null for no active card. */
-  card: number | null;
-  /** The card as the Roadmap has it, for a wrong folder. */
-  known?: TidyCard;
-  /** Where it belongs, as the team's folder; null when the team has none by that stage. */
-  moveTo?: { stage: Stage; folder: TidyFolder | null };
-  /** The title to paste, for a title finding. */
-  retitle?: { title: string; missing: number[] };
   /** Who the reply mentions; null for the unassigned reply. */
   owner: string | null;
+} & (
+  | { check: "wrong-folder"; card: number; known: TidyCard; moveTo: TidyMove }
+  | { check: "no-active-card"; card: null; moveTo: TidyMove }
+  | { check: "unknown-card"; card: number }
+  /** `retitle` is the title to paste and the cards it adds. */
+  | { check: "title"; card: number; known: TidyCard; retitle: { title: string; missing: number[] } }
+);
+
+export type TidyCheck = TidyFinding["check"];
+
+/** A card counts as deployed when its Dev Status says so, whatever its Design Status. */
+export function isDeployed(card: Pick<TidyCard, "devStatus">): boolean {
+  return /^deployed$/i.test(card.devStatus?.trim() ?? "");
 }
 
 /** A folder's stage, from its name with emoji, case and punctuation set aside. */
@@ -89,7 +101,7 @@ export function stageOfFolder(name: string): Stage | null {
  * when the card's Design Status is one the table doesn't name.
  */
 export function foldersForCard(card: Pick<TidyCard, "designStatus" | "devStatus">): Stage[] | null {
-  if (/^deployed$/i.test(card.devStatus?.trim() ?? "")) return ["Specs"];
+  if (isDeployed(card)) return ["Specs"];
   switch (card.designStatus?.trim()) {
     case "Need PRD / Under Playground":
       return ["Playground"];
@@ -190,18 +202,21 @@ export function cardRefsIn(text: string): number[] {
 }
 
 /**
- * The title with these cards added to its `Card` segment, or a `Card`
- * segment put after the project when it has none.
+ * The whole title, `<Project> / Card <n> & <m> / <designers>`: these cards in
+ * its `Card` segment, or a `Card` segment put after the project when it has
+ * none, and the designers after it when nothing follows it.
  *
  * @param name - The file's title
  * @param cards - Every card the title should name, in order
+ * @param designers - Those cards' designers, for a title that names none
  */
-export function retitled(name: string, cards: readonly number[]): string {
+export function retitled(name: string, cards: readonly number[], designers: readonly string[] = []): string {
   const segments = name.split("/").map((s) => s.trim());
   const cardSegment = `Card ${cards.join(" & ")}`;
-  const at = segments.findIndex((s, i) => i > 0 && cardNumbersOf(`x / ${s}`).length > 0);
+  let at = segments.findIndex((s, i) => i > 0 && cardNumbersOf(`x / ${s}`).length > 0);
   if (at >= 0) segments[at] = cardSegment;
-  else segments.splice(1, 0, cardSegment);
+  else segments.splice((at = 1), 0, cardSegment);
+  if (at === segments.length - 1 && designers.length) segments.push(designers.join(" & "));
   return segments.join(" / ");
 }
 
@@ -244,7 +259,9 @@ export function tidyFindings(
       .flatMap((n) => cards.find((c) => c.number === n) ?? [])
       .sort((a, b) => a.number - b.number);
     if (missing.length) {
-      const lead = numbers.map((n) => cards.find((c) => c.number === n)).find((c) => c?.owner);
+      const named = numbers.flatMap((n) => cards.find((c) => c.number === n) ?? []);
+      const lead = named.find((c) => c.owner);
+      const designers = [...new Set([...named, ...missing].flatMap((c) => c.designers))];
       out.push({
         fingerprint: fingerprintOf(file.key, "title", missing[0]!.number),
         check: "title",
@@ -252,7 +269,10 @@ export function tidyFindings(
         folder,
         card: missing[0]!.number,
         known: missing[0]!,
-        retitle: { title: retitled(file.name, [...numbers, ...missing.map((c) => c.number)]), missing: missing.map((c) => c.number) },
+        retitle: {
+          title: retitled(file.name, [...numbers, ...missing.map((c) => c.number)], designers),
+          missing: missing.map((c) => c.number),
+        },
         owner: lead?.owner ?? missing.find((c) => c.owner)?.owner ?? null,
       });
     }

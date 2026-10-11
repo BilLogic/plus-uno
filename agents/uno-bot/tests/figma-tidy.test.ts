@@ -11,6 +11,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { createInMemoryFigma } from "../src/figma/in-memory";
+import { createFigmaRestClient, FIGMA_PER_MINUTE } from "../src/figma/rest";
 import type { FigmaTeam } from "../src/figma-notify/teams";
 import {
   runTidyPost,
@@ -25,7 +26,7 @@ import {
 } from "../src/figma-tidy/run";
 import { likelyCard, projectWords } from "../src/figma-tidy/checks";
 import { leaveAsIs } from "../src/figma-tidy/run";
-import { tidyChannel } from "../src/figma-tidy/env";
+import { figmaReviewChannel } from "../src/figma-ask/env";
 import type { Env } from "../src/types";
 import { planRun, TIDY_JOBS } from "../src/scheduled/runs";
 import { itemProposal } from "../src/slack/decision-cards";
@@ -68,13 +69,21 @@ function listing(files: ReturnType<typeof file>[]): TidyListing {
   };
 }
 
-const card = (number: number, designStatus: string, owner: string | null, devStatus: string | null = null, title = `Card ${number} work`): TidyCard => ({
+const card = (
+  number: number,
+  designStatus: string,
+  owner: string | null,
+  devStatus: string | null = null,
+  title = `Card ${number} work`,
+  designers: string[] = [],
+): TidyCard => ({
   number,
   title,
   url: `https://www.notion.so/card-${number}`,
   designStatus,
   devStatus,
   owner,
+  designers,
 });
 
 function box<T>(initial: T) {
@@ -304,6 +313,17 @@ describe("the title check", () => {
       'Its pages or Cover name Card 812 and Card 1002, which the title leaves out. Rename it to "AI Indicator / Card 733 & 812 & 1002 / Sarah".',
     );
     assert.deepEqual(c!.actions.map((a) => a.text.text), ["Review", "Open file", "Card 812"]);
+  });
+
+  it("a title with no designers segment gets one, from its cards' designer Contributors", async () => {
+    const w = postWorld({
+      files: [file("u-wip", "F1", "AI Indicator / Card 733")],
+      cards: [card(733, "WIP", "U0SARAH", null, "AI", ["Sarah"]), card(812, "WIP", "U0MERYEM", null, "AI", ["Meryem", "Sarah"])],
+      refs: refs([812]),
+    });
+    await runTidyPost(w.deps);
+    const [c] = cardsIn(w.posts[1]!.blocks!);
+    assert.match(c!.body.text, /Rename it to "AI Indicator \/ Card 733 & 812 \/ Sarah & Meryem"\.$/);
   });
 
   it("a card the Roadmap doesn't have, or one the title already names, is not suggested", async () => {
@@ -544,10 +564,10 @@ describe("answering a card in its Review", () => {
 
 describe("where it posts", () => {
   it("where the Figma Review-card setting says, else #plus-design", () => {
-    assert.equal(tidyChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL, FIGMA_ASK_CHANNEL_ID: "D0APTB20SK0" } as Env), "D0APTB20SK0");
-    assert.equal(tidyChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL, FIGMA_ASK_CHANNEL_ID: " " } as Env), CHANNEL);
-    assert.equal(tidyChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL } as Env), CHANNEL);
-    assert.equal(tidyChannel({} as Env), null);
+    assert.equal(figmaReviewChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL, FIGMA_ASK_CHANNEL_ID: "D0APTB20SK0" } as Env), "D0APTB20SK0");
+    assert.equal(figmaReviewChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL, FIGMA_ASK_CHANNEL_ID: " " } as Env), CHANNEL);
+    assert.equal(figmaReviewChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL } as Env), CHANNEL);
+    assert.equal(figmaReviewChannel({} as Env), null);
   });
 });
 
@@ -657,6 +677,56 @@ describe("the read", () => {
     await runTidyRead(deps);
     assert.equal(figma.calls().filter((c) => c.method === "file").length, 3, "a finished week reads nothing more");
     assert.ok(lists > 0);
+  });
+
+  it("keeps Tier 1 within Figma's pacing across all of Monday's read jobs", async () => {
+    const clock = { t: 0 };
+    const tier1: number[] = [];
+    let used = 0;
+    const at = "2026-10-01T00:00:00Z";
+    const files = Array.from({ length: 60 }, (_, i) => ({ key: `F${i}`, name: `Project ${i} / Card ${i + 1} / Sarah`, last_modified: at }));
+    const pages = [
+      { id: "0:1", name: "- - - 🖼️ Cover - - -", type: "CANVAS", children: [{ id: "1:1", type: "TEXT", characters: "Card 1" }] },
+      { id: "0:2", name: "Flows", type: "CANVAS" },
+    ];
+    // One client for every job, as `figmaClientFor` keeps one per Env; its
+    // sleep moves the clock, so the pacing is what spaces the calls.
+    const figma = createFigmaRestClient({
+      token: "t",
+      now: () => clock.t,
+      sleep: async (ms) => void (clock.t += ms),
+      transport: async (url) => {
+        used += 1;
+        const path = new URL(url).pathname;
+        if (path.startsWith("/v1/files/")) tier1.push(clock.t);
+        const body =
+          path === `/v2/teams/${UNIVERSAL.id}/folders`
+            ? { folders: [FOLDERS[1]] }
+            : path === `/v2/folders/${FOLDERS[1]!.id}/files`
+              ? { files }
+              : { document: { type: "DOCUMENT", children: pages } };
+        return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+      },
+    });
+    const refs = box<TidyRefs | null>(null);
+    const listingStore = box<TidyListing | null>(null);
+    for (let job = 0; job < TIDY_JOBS; job++) {
+      used = 0;
+      // Each job an alarm with a fresh 50; lookups stop at 38.
+      await runTidyRead({
+        figma,
+        teams: [UNIVERSAL],
+        listing: listingStore.store,
+        refs: refs.store,
+        meter: { headroom: () => ({ subrequests: 38 - used }) },
+        runDate: RUN_DATE,
+      });
+    }
+    assert.ok(tier1.length > 20, "the page reads ran");
+    for (const start of tier1) {
+      const inMinute = tier1.filter((t) => t >= start && t < start + 60_000).length;
+      assert.ok(inMinute <= FIGMA_PER_MINUTE[1], `${inMinute} Tier 1 calls in the minute from ${start} ms`);
+    }
   });
 
   it("is planned in Monday's morning run only, the post after every read", () => {

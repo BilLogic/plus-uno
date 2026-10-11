@@ -66,6 +66,7 @@ import type { GapNotes } from "../usage/gap-notes";
 import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply, type FigmaSource } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
 import { askText, asksUno, isOwnComment } from "./trigger";
+import { figmaFileUrl } from "../figma/links";
 
 /** How long a comment's mark is kept: past every Figma redelivery and runner retry. */
 export const ASK_MARK_TTL_S = 8 * 24 * 60 * 60;
@@ -268,7 +269,7 @@ async function draft(
   const slackId = slackPersonOfFigma(comment.user.id, people);
   const root = comments.find((c) => c.id === rootId) ?? comment;
   const nodeId = root.client_meta?.node_id ?? null;
-  const fileUrl = `https://www.figma.com/design/${encodeURIComponent(job.fileKey)}`;
+  const fileUrl = figmaFileUrl(job.fileKey);
   const meta = await fileMeta(deps, job.fileKey);
   const ref: ThreadRef = { channel, thread: `figma:${job.fileKey}:${rootId}` };
   const question = askText(comment.message) || comment.message;
