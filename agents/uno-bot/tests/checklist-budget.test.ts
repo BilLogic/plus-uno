@@ -112,16 +112,15 @@ const checklistCalls = (calls: RecordingSlack["calls"]) =>
   calls.filter((c) => c.kind === "startStream" || c.kind === "tasks" || c.kind === "stopStream");
 
 describe("the checklist on the reference turn", () => {
-  it("spends at most six Slack calls while the lookups run", async () => {
+  it("spends at most six Slack calls on the checklist, settle and stop included", async () => {
     const { slack } = await replay();
-    // Everything up to the settle: the stream's start and one append per
-    // group of lookups. The settle's append and the stop are delivery's,
-    // spent from the reserve as the answer goes out.
-    const settleAt = slack.calls.findIndex((c) => c.kind === "stopStream") - 1;
-    const whileLooking = checklistCalls(slack.calls.slice(0, settleAt));
-    assert.ok(whileLooking.length <= 6, `${whileLooking.length} checklist calls while the lookups ran`);
-    assert.equal(whileLooking.length, 5, "the start and one append for each of the four groups");
-    assert.equal(checklistCalls(slack.calls).length, 7, "and the settle and stop");
+    const all = checklistCalls(slack.calls);
+    assert.ok(all.length <= 6, `${all.length} checklist calls`);
+    assert.deepEqual(
+      all.map((c) => c.kind),
+      ["startStream", "tasks", "tasks", "tasks", "tasks", "stopStream"],
+      "the start, one append for each of the four groups, and the stop that carries the settle",
+    );
     const kinds = slack.calls.map((c) => c.kind);
     assert.ok(kinds.indexOf("stopStream") < kinds.indexOf("answer"), "the stream stops before the answer posts");
   });
@@ -133,7 +132,7 @@ describe("the checklist on the reference turn", () => {
 
   it("ends complete above the answer, every card of it, with nothing ever in error", async () => {
     const { slack } = await replay();
-    const sent = slack.of("tasks").flatMap((c) => c.tasks);
+    const sent = slack.checklist().flatMap((c) => c.tasks);
     assert.ok(sent.every((t) => t.status !== "error"), "Slack titles a plan with an error card 'Something went wrong'");
     const final = new Map(sent.map((t) => [t.id, t.status]));
     assert.ok([...final.values()].every((s) => s === "complete"), JSON.stringify([...final]));
@@ -145,7 +144,7 @@ describe("the checklist on the reference turn", () => {
     const fourth = (await replay()).usedAt.at(-1)!;
     const { slack, ran } = await replay(LOOKUP_CEILING - fourth);
     assert.equal(ran.filter((n) => n === "search_blueprint").length, 3, "the case reaches the ceiling at the fourth search");
-    const sent = slack.of("tasks").flatMap((c) => c.tasks);
+    const sent = slack.checklist().flatMap((c) => c.tasks);
     assert.ok(sent.every((t) => t.status !== "error"));
     const blueprint = sent.filter((t) => t.title === "Searching the blueprint" && t.output).at(-1);
     assert.match(blueprint?.output ?? "", /1 skipped/);

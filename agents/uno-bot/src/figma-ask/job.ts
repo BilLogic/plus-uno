@@ -387,10 +387,11 @@ function askContext(
 }
 
 /**
- * How the turn answers an ask from Figma, and how far a stranger's goes. A
- * teammate's change request is routed to a proposal by name: told only that
- * a change "is drafted as a card", the turn treated it as a question with no
- * source to cite, and staged nothing.
+ * The Figma turn's scope instruction: a question gets a short plain-text
+ * answer citing one link; a teammate's change request is proposed as a write,
+ * named by intake route; a stranger gets public facts and no change.
+ *
+ * @param teammate - Whether the asker maps to a teammate on Team Members
  */
 export function askInstruction(teammate: boolean): string {
   return [
@@ -409,8 +410,9 @@ export function askInstruction(teammate: boolean): string {
 }
 
 /**
- * The source a reply may carry, named as the Sources box names it: the first link the answer cites that a lookup
- * of this turn returned, and that a public thread may carry
+ * The source a reply may carry, named as the Sources box names it: the first
+ * link the answer cites that a lookup of this turn returned, and that a public
+ * thread may carry
  * (`threadVisibleSources`, judged with what that lookup said of who may see
  * it). A link the turn read but the answer does not cite is no source; nor is
  * one the answer cites that no lookup returned; nor the frame the ask was
@@ -439,11 +441,18 @@ function sameReadLink(cited: string, read: string): boolean {
   const a = linkKey(cited);
   const b = linkKey(read);
   if (!a || !b) return cited === read;
-  if (a.repoPage && b.repoPage) return a.repoPage.at === b.repoPage.at && `/${a.repoPage.rest}`.endsWith(`/${b.repoPage.path}`);
+  if (a.github && b.github) {
+    return a.github.repoAndKind === b.github.repoAndKind && `/${a.github.refAndPath}`.endsWith(`/${b.github.pathAfterRef}`);
+  }
   return a.key === b.key;
 }
 
-function linkKey(url: string): { key: string; repoPage?: { at: string; rest: string; path: string } } | null {
+/**
+ * A link as links are compared here: host without `www.`, path without a
+ * trailing slash, no fragment, and the query kept only on Figma, where it
+ * names the frame. Null for what is not a URL.
+ */
+function normalisedLink(url: string): { host: string; path: string; query: string } | null {
   let u: URL;
   try {
     u = new URL(url);
@@ -451,22 +460,42 @@ function linkKey(url: string): { key: string; repoPage?: { at: string; rest: str
     return null;
   }
   const host = u.hostname.toLowerCase().replace(/^www\./, "");
-  const path = u.pathname.replace(/\/+$/, "");
   const query = /(^|\.)figma\.com$/.test(host) ? u.search : "";
-  const key = `${host}${path}${query}`;
-  // github.com/<owner>/<repo>/<blob|tree>/<ref>/<path>: the ref is one segment
-  // in a link a read returned; a cited ref may hold slashes, so the cited
-  // side keeps everything after the kind and matches the read path at its end.
-  const repo = host === "github.com" ? /^\/([^/]+\/[^/]+)\/(blob|tree)\/(.+)$/.exec(path) : null;
+  return { host, path: u.pathname.replace(/\/+$/, ""), query };
+}
+
+/**
+ * What `sameReadLink` compares: the normalised link as one `key`, and for a
+ * GitHub file or directory link (`github.com/<owner>/<repo>/<blob|tree>/<ref>/<path>`)
+ * its parts. A link a read returned holds a one-segment ref; a cited ref may
+ * hold slashes, so the cited side's `refAndPath` is matched at its end against
+ * the read side's `pathAfterRef`.
+ */
+function linkKey(
+  url: string,
+): { key: string; github?: { repoAndKind: string; refAndPath: string; pathAfterRef: string } } | null {
+  const link = normalisedLink(url);
+  if (!link) return null;
+  const key = `${link.host}${link.path}${link.query}`;
+  const repo = link.host === "github.com" ? /^\/([^/]+\/[^/]+)\/(blob|tree)\/(.+)$/.exec(link.path) : null;
   if (!repo) return { key };
-  const rest = repo[3]!;
-  return { key, repoPage: { at: `${repo[1]!.toLowerCase()}/${repo[2]}`, rest, path: rest.split("/").slice(1).join("/") } };
+  const refAndPath = repo[3]!;
+  return {
+    key,
+    github: {
+      repoAndKind: `${repo[1]!.toLowerCase()}/${repo[2]}`,
+      refAndPath,
+      pathAfterRef: refAndPath.split("/").slice(1).join("/"),
+    },
+  };
 }
 
 /** Whether two links open the same Figma frame, or the same file with no frame. */
 function sameFigmaPlace(a: string, b: string): boolean {
   const key = (url: string): string | null => {
-    const file = /^https?:\/\/(?:[\w-]+\.)?figma\.com\/(?:design|file|proto)\/([A-Za-z0-9]+)/i.exec(url)?.[1];
+    const link = normalisedLink(url);
+    if (!link || !/(^|\.)figma\.com$/.test(link.host)) return null;
+    const file = /^\/(?:design|file|proto)\/([A-Za-z0-9]+)/i.exec(link.path)?.[1];
     if (!file) return null;
     return `${file}:${parseFigmaUrl(url)?.nodeId ?? ""}`;
   };

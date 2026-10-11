@@ -27,7 +27,7 @@ async function headingFor(ask: string): Promise<string> {
   await delivery.beginProgress("Working on it", ask);
   delivery.toolProgress({ seq: 1, name: "notion_search", args: {}, phase: "announced" });
   await delivery.endProgress("complete");
-  const headings = slack.of("tasks").flatMap((c) => (c.title ? [c.title] : []));
+  const headings = slack.checklist().flatMap((c) => (c.title ? [c.title] : []));
   assert.equal(headings.length, 1);
   return headings[0]!;
 }
@@ -35,7 +35,7 @@ async function headingFor(ask: string): Promise<string> {
 /** The card as Slack shows it: every update to it laid over the last, since a
  *  card's text goes once and its later updates carry only what changed. */
 function lastCard(slack: RecordingSlack, id: string): PlanTask {
-  const cards = slack.of("tasks").flatMap((call) => call.tasks).filter((t) => t.id === id);
+  const cards = slack.checklist().flatMap((call) => call.tasks).filter((t) => t.id === id);
   assert.ok(cards.length, `card ${id} was sent`);
   return Object.assign({}, ...cards) as PlanTask;
 }

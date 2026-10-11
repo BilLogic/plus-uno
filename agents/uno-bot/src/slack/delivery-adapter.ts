@@ -297,8 +297,9 @@ export interface SlackDeliveryClient {
    *  while opening the next is one transition, not two. `title` retitles the
    *  checklist (a `plan_update`) in the same append. */
   appendTasks(channel: string, ts: string, tasks: readonly PlanTask[], title?: string): Promise<void>;
-  /** Close a stream. */
-  stopStream(channel: string, ts: string): Promise<void>;
+  /** Close a stream. `tasks` and `title` are the checklist's last changes,
+   *  carried by the stop itself rather than by an append of their own. */
+  stopStream(channel: string, ts: string, tasks?: readonly PlanTask[], title?: string): Promise<void>;
   /** Rewrite one of the bot's own messages in place — how a static checklist
    *  settles where no stream could open. */
   updateMessage(input: { channel: string; ts: string; text: string; blocks: unknown[] }): Promise<{ ok: boolean }>;
@@ -562,7 +563,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   // spent 21 of them on one turn and left its last blueprint search refused.
   // So a card's state is kept here as it moves, and the checklist is sent when
   // a group of lookups is announced — which closes the group before it and
-  // opens this one in one append — and once more at settle. A call announced
+  // opens this one in one append — and at settle, inside the stop itself. A call announced
   // with its group shows in progress with it: Slack's statuses are in
   // progress, complete or error, and `pending` is refused (`invalid_arguments`,
   // the whole append with it).
@@ -783,8 +784,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   };
 
   /** Settle every card still open, send the checklist's final state, and
-   *  forget it, so nothing re-uses it. A stream's ts comes back for the caller
-   *  to stop; a static checklist is rewritten here and returns none.
+   *  forget it, so nothing re-uses it. A stream's ts and its last changes come
+   *  back for the caller to stop with; a static checklist is rewritten here
+   *  and returns none.
    *
    *  A card still in progress settles with the turn. A card still PENDING is
    *  a lookup that never ran — a stopped turn answers with some queued — so it
@@ -797,7 +799,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
    *  budget refused did exactly that). A lookup that failed or was skipped
    *  says so in its output; the answer's ⚠️ line says what it cost. Error is
    *  kept for the turn that died. */
-  const settlePlan = async (status: "complete" | "error"): Promise<string | null> => {
+  const settlePlan = async (
+    status: "complete" | "error",
+  ): Promise<{ ts: string; tasks: PlanTask[]; title?: string } | null> => {
     if (!planOpen) return null;
     planOpen = false;
     for (const card of [...cards.values()]) {
@@ -821,15 +825,18 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       return null;
     }
     if (!planTs) return null;
-    await flush();
     const ts = planTs;
     planTs = null;
-    return ts;
+    const heading = headingPending;
+    headingPending = null;
+    return { ts, tasks: changes(), ...(heading ? { title: heading } : {}) };
   };
 
+  // The final state rides the stop: `chat.stopStream` takes the same task
+  // chunks an append does, so settling spends no call of its own.
   const endProgress = async (outcome: "complete" | "error"): Promise<void> => {
-    const ts = await settlePlan(outcome);
-    if (ts) await slack.stopStream(channel, ts).catch(() => {});
+    const last = await settlePlan(outcome);
+    if (last) await slack.stopStream(channel, last.ts, last.tasks, last.title).catch(() => {});
   };
 
   /** Post the static checklist, opening card in progress. A refused post
