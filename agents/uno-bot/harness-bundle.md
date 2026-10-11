@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **175,180 chars from 16 files**, against an assembled budget of 175,500 (320 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,796 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **175,138 chars from 16 files**, against an assembled budget of 175,500 (362 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,754 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -28,13 +28,13 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 84,107 | 7,000 (Worker face) |
 | 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,754 | 7,000 (Worker face) |
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 97,142 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−19,453 ide-only) | 101,703 | — |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−20,220 ide-only) | 101,703 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 116,384 | — |
 | 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,287 (−7,294 ide-only) | 150,713 | — |
 | 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 154,181 | — |
 | 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,697 | — |
 | 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 165,330 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 175,180 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,760 (−605 ide-only) | 175,138 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1397,7 +1397,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned |
 | Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |
 | Weekly direct-fix digest | weekly cron (Mon 09:00 UTC) | uno-maintain (direct-fix digest, method §4) | reviewers/auditor composes → posted via the uno-bot Slack token to #plus-design | `weekly-direct-fix-digest.yml` → `scripts/prompts/uno-direct-fix-digest/SKILL.md` — reads `docs/evals/runs/digest.jsonl` (row shape: method §4), empty week posts nothing, sentinel-verified | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16; posts sentinel-verified) |
-| Figma hygiene sweep | monthly | uno-maintain (hygiene checklist in `docs/connectors/figma.md` § Agent duties in the workspace) | reviewers/auditor | ❌ not built — follow the integrity-sweep pattern; needs Figma API access in the runner | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
+| Figma tidy-up | weekly, Monday's morning run | hygiene checklist (`docs/connectors/figma.md` § Agent duties) | uno-bot | `agents/uno-bot/src/figma-tidy/`: folder and card checks, Review cards in #plus-design | CF Worker · Figma REST, no model call | Bill | built |
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
 | uno-bot evals (weekly drift check) | weekly cron (Mon 08:00 UTC) + on-demand `workflow_dispatch` | uno-bot (R/P regression cases vs live Worker) | LLM judge (Gemini on Vertex) | `uno-bot-evals.yml` → `agents/uno-bot/scripts/run-evals.mjs` | GHA cron → live Worker + Vertex judge · GCP `hcii-plus` | Bill | ✅ live |
 | Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). 34–38s, of which the composite is ~14s; one `npm ci` scoped to `agents/uno-bot` (~11s), which the Worker's `typecheck` and `test` rows need. Was ~40s until #587 moved the workerd conformance step out to its own job | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
