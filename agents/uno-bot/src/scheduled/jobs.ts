@@ -25,6 +25,7 @@ import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { runBackstopOnEnv } from "../figma-notify/env";
+import { runTidyPostOnEnv, runTidyReadOnEnv } from "../figma-tidy/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
@@ -247,6 +248,18 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: a waiting report becomes one thread and one card in #plus-universal.
   "ds-precedence-post": async (env, _job, { dryRun }) => {
     console.log(`[ds-precedence] post: ${(await runDsPrecedencePost(env, { dryRun })).summary}`);
+  },
+  // Monday morning: the next stretch of the teams' folder listing, then the
+  // week's tidy-up cards in #plus-design (src/figma-tidy/).
+  "figma-tidy-read": async (env, job, ctx) => {
+    const report = await runTidyReadOnEnv(env, ctx);
+    console.log(`[figma-tidy] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  "figma-tidy-post": async (env, job, ctx) => {
+    const report = await runTidyPostOnEnv(env, ctx);
+    console.log(`[figma-tidy] ${job.key}: ${report.summary}`);
+    return report;
   },
 };
 

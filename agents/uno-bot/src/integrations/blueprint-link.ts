@@ -147,3 +147,35 @@ export function chunkBody(chunk: string | undefined, title: string | undefined):
   const head = title.trim();
   return text.startsWith(head) ? text.slice(head.length).trim() : text;
 }
+
+/** The labels a blueprint place's segments carry — the contract's, plus the
+ *  `Layer` older answers still say. The one set the answer guard and the
+ *  breadcrumb rewrite both read. */
+export const PLACE_LABEL = `(?:${[...BLUEPRINT_CONTRACT.breadcrumb.labels, "Layer"].join("|")})`;
+const PLACE_VALUE = "[^·›\\n,;.():]+(?:\\((?:happy|variant|exception|named)\\))?";
+/** Two or more labelled segments, `·` or `›` between them — the index's form,
+ *  and the half-converted one an answer carried from an older turn keeps. */
+const LABELLED_PLACE = new RegExp(
+  `\\b${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE}(?:[^\\S\\n]*[·›][^\\S\\n]*${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE})+`,
+  "g",
+);
+
+/** True when the prose names a blueprint place in the index's labelled form. */
+export function namesLabelledPlace(text: string): boolean {
+  return new RegExp(LABELLED_PLACE.source).test(text);
+}
+
+/**
+ * Prose with every labelled blueprint place rewritten as its breadcrumb —
+ * "Phase: Release › Scenario: Version cut" reads "Release › Version cut".
+ *
+ * A place carried over from an earlier answer keeps whatever form that answer
+ * used, so the reader's form is restored on the way out rather than asked of
+ * the model.
+ */
+export function breadcrumbsInProse(text: string): string {
+  return text.replace(LABELLED_PLACE, (match) => {
+    const crumb = blueprintBreadcrumb(parseChunkTitle(match.replace(/›/g, "·")));
+    return crumb ? `${crumb}${/\s*$/.exec(match)![0]}` : match;
+  });
+}

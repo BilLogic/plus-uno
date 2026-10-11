@@ -31,7 +31,9 @@
 //      decision is then said in the thread, never written into the card's
 //      body. The confirmers are every card's Contributors; the owner asked is
 //      the card's design owner — the first Contributor the team's roles name a
-//      designer — else the file's creator (`/meta`), by Figma handle;
+//      designer — else the file's creator (`/meta`), by Figma handle; and
+//      each card's Decisions DB rows, which a key decision's row is weighed
+//      against (`../decisions-db/row.ts`);
 //   4. one model call (`./detector.ts`), and each decision drafted
 //      (`./draft.ts`) and queued for the morning (`./queue.ts`).
 // A file with no thread in its window costs one call.
@@ -46,6 +48,8 @@
 import { isSubrequestBudgetError, rethrowIfBudget } from "../net";
 import type { ScheduledJob } from "../scheduled/runs";
 import { CHANGED_PREFIX, COMMENTED_PREFIX, etDateOf } from "../figma-notify/event";
+import { draftRow, type DecisionRow } from "../decisions-db/row";
+import { notionPersonOfSlack, slackPersonOfFigma } from "../usage/roles";
 import { readUsable } from "../sweep/surfaces";
 import type { SweepSource } from "../sweep/finding";
 import type { SweepRunOutcome } from "../sweep/store";
@@ -57,6 +61,7 @@ import { cardNumbersOf } from "./title";
 import { isDecisionField, type ShownCard, type ShownThread } from "./detector";
 import { commentUrl, draftDecision } from "./draft";
 import { mergeQueuedFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
+import { figmaFileUrl } from "../figma/links";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -305,6 +310,7 @@ async function readFile(
   let prd: SweepSource | null = null;
   let owner: FileOwner | null = null;
   let confirmers: string[] = [];
+  let rows: Record<number, DecisionRow[]> | undefined;
   try {
     for (const number of cardNumbersOf(title).slice(0, MAX_CARDS_PER_FILE)) {
       const found = await fc.card(number);
@@ -312,6 +318,10 @@ async function readFile(
       if (!found || !page) continue;
       cards.push({ number, title: found.title || page.title, url: page.url, fields: fieldsOf(page) });
       cardPages.push(page);
+    }
+    if (fc.decisionRows && cards.length) {
+      rows = {};
+      for (const c of cards) rows[c.number] = await fc.decisionRows(c.url);
     }
     const first = cardPages[0];
     if (first) {
@@ -335,9 +345,10 @@ async function readFile(
     resolved: !!thread.root.resolved_at,
     comments: readComments(thread).map((c) => ({ by: c.user.handle, at: c.created_at, text: c.message })),
   }));
-  const fileUrl = `https://www.figma.com/design/${encodeURIComponent(fileKey)}`;
-  const detected = await fc.detector.detect({ file: { title, url: fileUrl }, threads: shown, cards, prd });
+  const fileUrl = figmaFileUrl(fileKey);
+  const detected = await fc.detector.detect({ file: { title, url: fileUrl }, threads: shown, cards, prd, ...(rows ? { rows } : {}) });
   if (!detected.ok) return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !QUOTA.test(detected.error) };
+  const people = detected.decisions.some((d) => d.row) && fc.people ? await fc.people() : { figma: {}, notion: {} };
 
   const decisions: QueuedDecision[] = [];
   for (const d of detected.decisions) {
@@ -348,15 +359,27 @@ async function readFile(
     // watermark, the first reply after it — never a comment the read may not read.
     const said = readComments(at.thread)[0]!;
     const quote = quoteOf(said.message);
+    const link = commentUrl(fileKey, at.thread.nodeId, root.id);
     const { operation, update } = draftDecision(d, {
       prd,
       card: cards[0]?.number ?? null,
       file: { title },
-      commentUrl: commentUrl(fileKey, at.thread.nodeId, root.id),
+      commentUrl: link,
       quote,
       by: said.user.handle,
       where: `${at.page.section} › ${at.page.name}`,
     });
+    // A commenter is a Notion person through their Figma id's Slack person.
+    const figmaIds = new Map(readComments(at.thread).map((c) => [c.user.handle, c.user.id] as const));
+    const row = d.row
+      ? draftRow(d.row.key, {
+          cardUrl: d.row.card.url,
+          evidence: link,
+          decision: d.decision,
+          notionOf: (handle) => notionPersonOfSlack(slackPersonOfFigma(figmaIds.get(handle), people.figma), people.notion),
+          date: etDateOf(deps.now()),
+        })
+      : null;
     decisions.push({
       commentId: root.id,
       nodeId: at.thread.nodeId,
@@ -371,6 +394,7 @@ async function readFile(
       operation,
       update,
       confidence: d.confidence,
+      ...(row ? { row } : {}),
     });
   }
   if (!decisions.length) return none;

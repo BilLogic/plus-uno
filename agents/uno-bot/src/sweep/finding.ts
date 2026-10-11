@@ -20,6 +20,8 @@
 //
 // PURE: no `Env`, no Slack module, no Workers global.
 
+import type { KeyDecision } from "../decisions-db/row";
+
 /** What kind of conversation a message was read in. */
 export type ChannelKind = "public" | "private" | "group-dm" | "dm";
 
@@ -179,6 +181,10 @@ export interface DriftFinding {
   participants: string[];
   /** Set when the fix adds an answer rather than replacing a block. */
   add?: FindingAddition;
+  /** A key decision's Decisions DB row (`../decisions-db/row.ts`): its card,
+   *  the row as the rules kept it, and the Notion user of each person it
+   *  names. Drafted in the morning, once the evidence has its permalink. */
+  row?: { cardUrl: string; key: KeyDecision; notion: Record<string, string> };
 }
 
 // ── Owner routing ────────────────────────────────────────────────────────────

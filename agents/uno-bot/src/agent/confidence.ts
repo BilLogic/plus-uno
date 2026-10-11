@@ -14,10 +14,11 @@
 // back, turning "wrong shape" into "no signal at all".
 //
 // This module is the cheap deterministic half: decide whether a reply owes a
-// clause, and whether it has one. It never rewrites prose — a templated
-// sentence is exactly the "house sentence to adapt" the rule bans, and it
-// would fabricate a claim the renderer cannot substantiate. What it produces
-// is a verdict the caller can act on by escalating to the judge.
+// clause, and whether it has one. It rewrites prose once, and only as the
+// backstop for a carried answer the judge left as it was (`disclaimCarried`):
+// otherwise a templated sentence is exactly the "house sentence to adapt" the
+// rule bans. What it produces is a verdict the caller can act on by
+// escalating to the judge.
 //
 // Bias: false NEGATIVES are cheap (one extra judge call), false POSITIVES are
 // not (a non-compliant reply ships believing itself checked). Every pattern
@@ -27,6 +28,7 @@
 // fetched from a source is the table's `retrieval` column, and the regexes
 // below are all that is left of this module's own judgement.
 import { rowFor } from "./tool-table";
+import { namesLabelledPlace } from "../integrations/blueprint-link";
 
 /**
  * True when any tool that reaches a source ran this turn.
@@ -46,10 +48,19 @@ export function retrievalRanIn(toolsUsed: readonly string[]): boolean {
   return toolsUsed.some((tool) => rowFor(tool)?.retrieval === true);
 }
 
+/** True when a blueprint lookup ran this turn: a tool whose card names the
+ *  blueprint estate. Only that earns speaking of the blueprint as read. */
+export function blueprintLookupRanIn(toolsUsed: readonly string[]): boolean {
+  return toolsUsed.some((tool) => rowFor(tool)?.taskCard?.estate === "blueprint");
+}
+
 /** What the turn did, as far as the confidence rule cares. */
 export type ConfidenceContext = {
   /** Did a tool that fetches from a source run this turn? */
   retrievalRan: boolean;
+  /** Did a blueprint lookup run this turn? A Notion or Slack look does not
+   *  stand behind a blueprint place or a claim of blueprint grounding. */
+  blueprintLookupRan: boolean;
   /**
    * Did that retrieval actually reach a source, or was it served from cache?
    * A cached hit is NOT "a fetch performed this turn" — which is precisely
@@ -84,7 +95,11 @@ export type ConfidenceVerdict =
   | { kind: "unhedged" }
   /** Factual, nothing fetched this turn, and it never says so. D9 requires a
    *  from-memory answer to admit it; this branch used to be `exempt`. */
-  | { kind: "unsourced" };
+  | { kind: "unsourced" }
+  /** No blueprint lookup this turn, yet it speaks of the blueprint as read:
+   *  it claims to be grounded in it, or names blueprint places without saying
+   *  they come from an earlier answer. History is where those came from. */
+  | { kind: "carried" };
 
 /**
  * Sureness the model EARNED by looking: first-person verification, or a named
@@ -115,6 +130,37 @@ const HEDGED = [
   /\bworth\s+(?:double-?checking|verifying)\b/i,
   /\bmay\s+be\s+(?:out\s+of\s+date|stale)\b/i,
 ];
+
+/** Where an answer from history came from, said. Only the no-lookup checks
+ *  read it: as a general hedge, "my last search found…" would excuse a turn
+ *  whose every read failed. */
+const FROM_EARLIER_ANSWER =
+  /\b(?:my|the|an?|that)\s+(?:earlier|previous|last)\s+(?:answer|reply|look|lookup|search|read)\b/i;
+
+/**
+ * A claim that the answer stands on the blueprint. Only a lookup of this turn
+ * earns it: an answer carried from an earlier turn of the conversation rests
+ * on that turn's lookups, which are not this one's sources.
+ */
+const GROUNDED_IN_BLUEPRINT = [
+  /\b(?:grounded|based|drawn|built|pulled|taken)\s+(?:directly\s+|straight\s+)?(?:in|on|from)\s+(?:our|the)\s+(?:current\s+|live\s+)?blueprint\b/i,
+  /\baccording\s+to\s+(?:our|the)\s+(?:current\s+|live\s+)?blueprint\b/i,
+];
+
+/** A blueprint place as the reader's breadcrumb, whole: four segments, phase
+ *  to step, and the lane in parentheses. A Figma or Notion path
+ *  (`Specs › Goal states`, `Card 12 › Status`) has neither the depth nor the
+ *  lane. The index's labelled form is `namesLabelledPlace`'s. */
+const BREADCRUMB_PLACE = /(?:[^›\n,;.:()]+[^\S\n]›[^\S\n]){3}[^›\n,;.:()]+\([^()\n]{1,40}\)/;
+
+/** Does this reply speak of the blueprint as read? A claim of grounding is
+ *  false whatever else the prose says; a place named is a current-state claim,
+ *  and owes a word on where it came from even inside a suggestion. */
+function speaksOfBlueprintAsRead(text: string): boolean {
+  if (matchesAny(text, GROUNDED_IN_BLUEPRINT)) return true;
+  const namesPlace = BREADCRUMB_PLACE.test(text) || namesLabelledPlace(text);
+  return namesPlace && !hasHedge(text) && !FROM_EARLIER_ANSWER.test(text);
+}
 
 /**
  * Claims that the data is current AS OF NOW. Only true of a live fetch made
@@ -249,6 +295,8 @@ export function judgeConfidence(
     // a hedge does not excuse "I just checked" when nothing was checked.
     // (1) Claiming freshness over data nobody fetched — a false claim.
     if (claimsFreshness(deliveredText)) return { kind: "false-freshness", cause: "unfetched" };
+    // (1b) Speaking of the blueprint as read.
+    if (speaksOfBlueprintAsRead(deliveredText)) return { kind: "carried" };
     // (2) Asserting something factual and never saying it came from memory.
     //
     // This returned `exempt`, on the reading that "no retrieval means no
@@ -260,7 +308,9 @@ export function judgeConfidence(
     // clause appeared was left entirely to the draw.
     if (OFFERED_AS_OPINION.test(deliveredText)) return { kind: "exempt" };
     if (hasTrailingLabel(deliveredText)) return { kind: "trailing-label" };
-    return hasWovenConfidence(deliveredText) ? { kind: "ok" } : { kind: "unsourced" };
+    // Nothing ran, so "my earlier answer" names the basis as truly as "from memory".
+    const saysBasis = hasWovenConfidence(deliveredText) || FROM_EARLIER_ANSWER.test(deliveredText);
+    return saysBasis ? { kind: "ok" } : { kind: "unsourced" };
   }
 
   if (!assertsSomething(deliveredText)) return { kind: "exempt" };
@@ -271,6 +321,8 @@ export function judgeConfidence(
   if ((ctx.servedFromCache || ctx.readFailed) && claimsFreshness(deliveredText)) {
     return { kind: "false-freshness", cause: ctx.readFailed ? "failed" : "cached" };
   }
+  // Other sources looked at, the blueprint not: its places came from history.
+  if (!ctx.blueprintLookupRan && speaksOfBlueprintAsRead(deliveredText)) return { kind: "carried" };
 
   if (hasTrailingLabel(deliveredText)) return { kind: "trailing-label" };
   // Every read failed: the answer rests on something other than this turn's
@@ -320,6 +372,14 @@ export function repairInstruction(verdict: ConfidenceVerdict): string | null {
       );
     case "false-freshness":
       return FALSE_FRESHNESS[verdict.cause];
+    case "carried":
+      return (
+        "CARRIED ANSWER. This turn ran no blueprint lookup, yet the draft speaks of the blueprint as if it " +
+        "had read it. Take out any claim of being grounded in the blueprint, and weave in one " +
+        "clause saying this goes from the earlier answer in this conversation (or from what you " +
+        "already know), not a fresh look. Name each blueprint place as phase › scenario › path › " +
+        "step (lane). Do NOT invent a source or append a label. Change nothing else."
+      );
     case "trailing-label":
       return (
         "This reply ends with a standalone confidence label, which is retired. " +
@@ -337,4 +397,28 @@ export function repairInstruction(verdict: ConfidenceVerdict): string | null {
     default:
       return null;
   }
+}
+
+/** The grounding claim through to the end of its clause: "grounded directly
+ *  in our current blueprint pain points". */
+const GROUNDING_CLAUSE = GROUNDED_IN_BLUEPRINT.map((p) => new RegExp(`${p.source}[^.:;,\\n]*`, "gi"));
+
+/**
+ * A carried answer the judge did not repair, made to say what it rests on.
+ *
+ * The judge is asked first, in the reply's own words; this is what ships when
+ * it errs or passes the draft as it was. Each grounding claim becomes the
+ * basis, said; a place named with no word on its source gets that word ahead
+ * of it. `basis` is "my earlier answer" when there was one.
+ */
+export function disclaimCarried(text: string, basis: string): string {
+  let out = text;
+  for (const clause of GROUNDING_CLAUSE) {
+    out = out.replace(clause, (match) => {
+      const said = `going from ${basis}, not a fresh look at the blueprint`;
+      return /^[A-Z]/.test(match) ? said[0]!.toUpperCase() + said.slice(1) : said;
+    });
+  }
+  if (out !== text) return out;
+  return `From ${basis}, not a fresh look: ${text}`;
 }

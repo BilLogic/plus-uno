@@ -34,6 +34,7 @@ import { isFigmaDecisionCandidate, isFigmaDecisionThread } from "../src/figma-co
 import { replyHandlerAt } from "../src/slack/events";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
+import type { DecisionRow } from "../src/integrations/notion";
 import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness } from "./helpers/sweep-harness";
 
 /** One card of a decision report, as Slack is handed it. */
@@ -182,7 +183,16 @@ function seededFigma(): InMemoryFigma {
 
 /** A harness switched on at the watermark, its clock at the next midnight. */
 async function nightHarness(
-  over: { figma?: InMemoryFigma; replies?: string[]; notes?: typeof NOTES; members?: string[] | null; misc?: string; sources?: SweepSource[] } = {},
+  over: {
+    figma?: InMemoryFigma;
+    replies?: string[];
+    notes?: typeof NOTES;
+    members?: string[] | null;
+    misc?: string;
+    sources?: SweepSource[];
+    decisionRows?: Record<string, DecisionRow[]>;
+    people?: { figma: Record<string, string>; notion: Record<string, string> };
+  } = {},
 ) {
   const client = over.figma ?? seededFigma();
   const h = sweepHarness({
@@ -199,6 +209,8 @@ async function nightHarness(
       roles: { U0MERYEM: "pm", U0SARAH: "design" },
       ...(over.members !== undefined ? { members: over.members } : {}),
       ...(over.misc ? { miscTeamId: over.misc } : {}),
+      ...(over.decisionRows ? { decisionRows: over.decisionRows } : {}),
+      ...(over.people ? { people: over.people } : {}),
     },
   });
   await h.store.saveCursor(COMMENTS_CURSOR, SWITCHED, SWITCH_ON);
@@ -1085,5 +1097,109 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
     assert.equal(await replyHandlerAt(env, { ...event, thread_ts: "1790700000.000999" }), null, "another #plus-design thread");
     assert.equal(isFigmaDecisionCandidate(env, { ...event, bot_id: "B1" }), false, "never a bot's own post");
     assert.equal(isFigmaDecisionCandidate(env, { ...event, channel: "C0ELSE" }), false);
+  });
+});
+
+describe("a key decision gets a Decisions DB row tagged with its card", () => {
+  const SARAH_N = "11111111111111111111111111111111";
+  const MERYEM_N = "22222222222222222222222222222222";
+  const PEOPLE = { figma: { "u-sarah": "U0SARAH", "u-meryem": "U0MERYEM" }, notion: { [SARAH_N]: "U0SARAH", [MERYEM_N]: "U0MERYEM" } };
+  const ROW = { id: "row1", url: "https://www.notion.so/row1", name: "Progress bar visibility", status: "Accepted", signOff: [MERYEM_N] };
+  const C1_URL = "https://www.figma.com/design/GoalFile1?node-id=4-1#c1";
+  const DECISION = "The progress bar stays hidden until the first goal is set.";
+
+  /** c1 — sarah's resolved comment, meryem's "Agreed" — as a key decision with this row. */
+  const keyReply = (row: Record<string, unknown>) =>
+    JSON.stringify({
+      decisions: [{ thread_id: "c1", route: "prd", decision: DECISION, section_block_id: "h-goal", text: DECISION, confidence: 0.9, row }],
+    });
+
+  async function night(row: Record<string, unknown>, rows: (typeof ROW)[] = []) {
+    const { h } = await nightHarness({ replies: [keyReply(row)], decisionRows: { [CARD_URL]: rows }, people: PEOPLE });
+    await runSweepJob(NIGHT, h.deps);
+    return { h, decision: h.figma.queue.get(FILE)?.decisions[0] };
+  }
+
+  it("shows the detector the card's rows, and drafts a new one with Owner the proposer, Sign-off the approver and the comment as Evidence", async () => {
+    const { h, decision } = await night({ name: "Progress bar visibility", stage: "Accepted", proposer: "sarah", approvers: ["meryem"], relation: "new" });
+    assert.match(String((h.provider.generated[0] as { prompt?: string }).prompt), /DECISIONS DB — Card 2482: none yet/);
+    assert.deepEqual(decision?.row?.operations, [
+      {
+        toolName: "notion_create",
+        input: {
+          surface: "decision",
+          title: "Progress bar visibility",
+          properties: { roadmap_card: CARD_URL, status: "Accepted", evidence: C1_URL, owner: [SARAH_N], sign_off: [MERYEM_N] },
+          sections: [
+            { heading: "Decision", body: DECISION },
+            { heading: "Source / Evidence", body: C1_URL },
+          ],
+        },
+      },
+    ]);
+  });
+
+  it("widens the row a decision belongs to rather than adding one, keeping its Owner and Evidence", async () => {
+    const { h, decision } = await night(
+      { name: "Progress bar visibility and animation", stage: "Accepted", proposer: "sarah", approvers: ["meryem"], relation: "widen", row_id: "row1" },
+      [ROW],
+    );
+    assert.match(String((h.provider.generated[0] as { prompt?: string }).prompt), /\[row row1\] Progress bar visibility · Accepted/);
+    assert.deepEqual(decision?.row?.operations, [
+      {
+        toolName: "notion_update",
+        input: {
+          page_url: ROW.url,
+          properties: { Name: "Progress bar visibility and animation" },
+          append: { text: `Widened 2026-09-30: ${DECISION} Evidence: ${C1_URL}` },
+        },
+      },
+    ]);
+  });
+
+  it("supersedes an older row: marks it Superseded, and the new row links it", async () => {
+    const { decision } = await night(
+      { name: "Progress bar shows from the first goal", stage: "Accepted", proposer: "sarah", approvers: ["meryem"], relation: "supersede", row_id: "row1" },
+      [ROW],
+    );
+    const [create, mark] = decision!.row!.operations;
+    assert.equal(create!.toolName, "notion_create");
+    assert.deepEqual((create!.input as { sections: unknown[] }).sections.at(-1), { heading: "Supersedes", body: ROW.url });
+    assert.deepEqual(mark, {
+      toolName: "notion_update",
+      input: { page_url: ROW.url, properties: { Status: "Superseded" }, append: { text: `Superseded 2026-09-30 by: ${DECISION} Evidence: ${C1_URL}` } },
+    });
+  });
+
+  it("adds no row for a decision the card already records", async () => {
+    const same = await night({ name: "Progress bar visibility", stage: "Accepted", proposer: "sarah", approvers: ["meryem"], relation: "same", row_id: "row1" }, [ROW]);
+    assert.equal(same.decision?.row, undefined);
+    const renamed = await night({ name: "progress bar visibility", stage: "Accepted", proposer: "sarah", approvers: [], relation: "new" }, [ROW]);
+    assert.equal(renamed.decision?.row, undefined, "a new row named as an existing one is that row");
+  });
+
+  it("signs off only someone the thread shows approving, never on a proposal, and owns only a mapped proposer", async () => {
+    const outsider = await night({ name: "Progress bar visibility", stage: "Accepted", proposer: "sarah", approvers: ["bill", "sarah"], relation: "new" });
+    const props = (op: { input: unknown } | undefined) => (op?.input as { properties: Record<string, unknown> }).properties;
+    assert.equal(props(outsider.decision?.row?.operations[0]).sign_off, undefined, "nobody in the thread approved it but its proposer");
+    const proposed = await night({ name: "Progress bar visibility", stage: "Proposed", proposer: "sarah", approvers: ["meryem"], relation: "new" });
+    assert.equal(props(proposed.decision?.row?.operations[0]).status, "Proposed");
+    assert.equal(props(proposed.decision?.row?.operations[0]).sign_off, undefined, "a proposal has no sign-off yet");
+    const stranger = await night({ name: "Progress bar visibility", stage: "Accepted", proposer: "nobody", approvers: [], relation: "new" });
+    assert.equal(stranger.decision?.row, undefined, "a proposer the thread never shows is a guess");
+  });
+
+  it("puts the row on the decision's own card, decided by the same Review", async () => {
+    const { h } = await night({ name: "Progress bar visibility", stage: "Accepted", proposer: "sarah", approvers: ["meryem"], relation: "new" });
+    h.clock.now = at(30, 13);
+    await runSweepJob(MORNING, h.deps);
+    assert.equal(h.staged.length, 1, "one card per decision");
+    assert.deepEqual(
+      h.staged[0]!.operations?.map((o) => o.toolName),
+      ["notion_update", "notion_create"],
+    );
+    assert.match(h.staged[0]!.proposalText, /Decisions DB: new row "Progress bar visibility" · Accepted/);
+    const card = (h.figma.messages[0]!.blocks as Card[])[1]!;
+    assert.match(card.body.text, /Decisions DB: new row "Progress bar visibility" · Accepted/);
   });
 });

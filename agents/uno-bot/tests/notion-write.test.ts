@@ -547,3 +547,51 @@ test("a page's comments come back with their text, time and the pages they menti
     },
   ]);
 });
+
+test("a decision row is written with its Owner and Sign-off as Notion people, and its card's rows read back", async () => {
+  const DB = "6279ea4acd844d5190e1e6b6af53bb19";
+  const CARD = "24820000000000000000000000000001";
+  const OWNER = "aaaaaaaa000000000000000000000001";
+  const APPROVER = "aaaaaaaa000000000000000000000002";
+  serve({
+    "POST /pages": { body: { id: "row-new", url: "https://www.notion.so/row-new" } },
+    [`POST /databases/${DB}/query`]: {
+      body: {
+        results: [
+          {
+            id: "row-1",
+            url: "https://www.notion.so/Progress-bar-row1",
+            properties: {
+              Name: { type: "title", title: [{ plain_text: "Progress bar visibility" }] },
+              Status: { type: "select", select: { name: "Accepted" } },
+              "Sign-off": { type: "people", people: [{ id: APPROVER, name: "Meryem" }] },
+            },
+          },
+        ],
+        has_more: false,
+      },
+    },
+  });
+  const { notionCreate, decisionRowsOf } = await notion();
+  const env = { ...ENV, NOTION_DECISIONS_DB_ID: DB } as typeof ENV;
+
+  await notionCreate(env, "decision", {
+    title: "Progress bar visibility",
+    roadmapCard: `https://www.notion.so/${CARD}`,
+    decisionStatus: "Accepted",
+    sourceUrl: "https://www.figma.com/design/F?node-id=4-1#c1",
+    owner: [OWNER],
+    signOff: [APPROVER],
+  });
+  const created = calls[0]!.body!.properties as Record<string, unknown>;
+  assert.deepEqual(created.Owner, { people: [{ id: OWNER }] });
+  assert.deepEqual(created["Sign-off"], { people: [{ id: APPROVER }] });
+  assert.deepEqual(created.Evidence, { url: "https://www.figma.com/design/F?node-id=4-1#c1" });
+
+  const rows = await decisionRowsOf(env, `https://www.notion.so/${CARD}`);
+  assert.deepEqual(rows, [
+    { id: "row-1", url: "https://www.notion.so/Progress-bar-row1", name: "Progress bar visibility", status: "Accepted", signOff: [APPROVER] },
+  ]);
+  const query = calls[1]!;
+  assert.deepEqual((query.body as { filter?: unknown }).filter, { property: "Roadmap Card", relation: { contains: CARD } });
+});

@@ -29,6 +29,7 @@
 import type { ModelProvider } from "../agent/model-provider";
 import type { SweepSource, SweepThread } from "./finding";
 import { RICH_TEXT_TYPES } from "../integrations/notion-rich-text";
+import { parseKeyDecision, ROW_INSTRUCTIONS, shownRows, type DecisionRow, type KeyDecision } from "../decisions-db/row";
 
 /** Findings the detector is less sure of than this are dropped. */
 export const CONFIDENCE_FLOOR = 0.7;
@@ -77,6 +78,8 @@ export const DRIFT_DETECTOR_SYSTEM = [
   "- claimed_by: the Slack user id of whoever claimed or did the work in the thread, or null.",
   "- confidence: 0 to 1 that this is real drift the owner would want fixed.",
   'Nothing drifts → {"findings":[]}.',
+  ROW_INSTRUCTIONS,
+  '- Only on a finding, and only for a card listed under DECISIONS DB; give the row "card_url": that card\'s url. proposer and approvers are Slack user ids.',
 ].join("\n");
 
 /** One validated finding, before owner routing. */
@@ -92,6 +95,16 @@ export interface DetectedDrift {
   evidenceTs: string[];
   claimedBy: string | null;
   confidence: number;
+  /** A key decision: the card it is tied to, and its Decisions DB row. */
+  row?: { cardUrl: string; key: KeyDecision };
+}
+
+/** What one detection reads: the thread, its sources and, when they were
+ *  read, the Decisions DB rows of the Roadmap cards among them. */
+export interface DriftInput {
+  thread: SweepThread;
+  sources: SweepSource[];
+  rows?: Array<{ url: string; rows: DecisionRow[] }>;
 }
 
 /** What one detection came to. A failure is data: the job decides. */
@@ -99,7 +112,7 @@ export type DetectorResult = { ok: true; findings: DetectedDrift[] } | { ok: fal
 
 /** The detector as the sweep job takes it. */
 export interface DriftDetector {
-  detect(input: { thread: SweepThread; sources: SweepSource[] }): Promise<DetectorResult>;
+  detect(input: DriftInput): Promise<DetectorResult>;
 }
 
 /** The detector over a ModelProvider. */
@@ -115,20 +128,20 @@ export function modelDriftDetector(provider: ModelProvider): DriftDetector {
  */
 export async function detectDrift(
   provider: ModelProvider,
-  input: { thread: SweepThread; sources: SweepSource[] },
+  input: DriftInput,
 ): Promise<DetectorResult> {
   const reply = await provider.generate({
     tier: DETECTOR_TIER,
     system: DRIFT_DETECTOR_SYSTEM,
-    prompt: detectorPrompt(input.thread, input.sources),
+    prompt: detectorPrompt(input.thread, input.sources, input.rows),
     maxTokens: DETECTOR_MAX_TOKENS,
   });
   if (!reply.ok) return { ok: false, error: reply.message };
-  return { ok: true, findings: parseDetectorReply(reply.text, input.thread, input.sources) };
+  return { ok: true, findings: parseDetectorReply(reply.text, input.thread, input.sources, input.rows) };
 }
 
 /** The prompt: the thread, oldest first, then each source. */
-export function detectorPrompt(thread: SweepThread, sources: SweepSource[]): string {
+export function detectorPrompt(thread: SweepThread, sources: SweepSource[], rows?: DriftInput["rows"]): string {
   const lines = ["THREAD (oldest first):"];
   for (const m of thread.messages) lines.push(`[${m.ts}] <@${m.user}>: ${cap(m.text, MAX_MESSAGE_CHARS)}`);
   sources.forEach((s, i) => {
@@ -143,6 +156,10 @@ export function detectorPrompt(thread: SweepThread, sources: SweepSource[]): str
       lines.push(cap(s.text, MAX_SOURCE_CHARS));
     }
   });
+  for (const card of rows ?? []) {
+    const shown = shownRows(card.rows);
+    lines.push("", shown.length ? `DECISIONS DB — card ${card.url}:` : `DECISIONS DB — card ${card.url}: none yet`, ...shown);
+  }
   return lines.join("\n");
 }
 
@@ -151,7 +168,7 @@ export function detectorPrompt(thread: SweepThread, sources: SweepSource[]): str
  * dropped, one finding at a time; a reply that is not JSON at all is no
  * findings.
  */
-export function parseDetectorReply(text: string, thread: SweepThread, sources: SweepSource[]): DetectedDrift[] {
+export function parseDetectorReply(text: string, thread: SweepThread, sources: SweepSource[], rows?: DriftInput["rows"]): DetectedDrift[] {
   const raw = jsonObjectIn(text);
   const list = raw && Array.isArray((raw as { findings?: unknown }).findings) ? (raw as { findings: unknown[] }).findings : [];
   const threadTs = new Set(thread.messages.map((m) => m.ts));
@@ -184,6 +201,8 @@ export function parseDetectorReply(text: string, thread: SweepThread, sources: S
       original = block.text;
     }
     const claimed = str(f.claimed_by);
+    const card = rows?.find((c) => c.url === str((f.row as { card_url?: unknown } | undefined)?.card_url));
+    const key = card ? parseKeyDecision(f.row, card.rows, [...new Set(thread.messages.map((m) => m.user))]) : null;
     out.push({
       source,
       blockId,
@@ -195,6 +214,7 @@ export function parseDetectorReply(text: string, thread: SweepThread, sources: S
       evidenceTs: [...new Set(evidenceTs)].sort(),
       claimedBy: claimed || null,
       confidence,
+      ...(card && key ? { row: { cardUrl: card.url, key } } : {}),
     });
   }
   return out;

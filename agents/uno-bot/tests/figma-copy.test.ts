@@ -40,6 +40,8 @@ import {
   PRECEDENCE_REVISION_REFUSAL,
 } from "../src/ds-precedence/report";
 import type { Disagreement } from "../src/ds-precedence/compare";
+import { allClearText, findingBody, ownerLine, tidyCard, tidyItem, tidyParent, TIDY_REVISION_REFUSAL } from "../src/figma-tidy/copy";
+import type { TidyFinding } from "../src/figma-tidy/checks";
 import { decisionReport, reportMessage, reportRecord } from "../src/slack/decision-cards";
 import type { ReportItemState } from "../src/thread-state/index";
 import { PRECEDENCE_CARD_TTL_MS } from "../src/ds-precedence/jobs";
@@ -857,5 +859,52 @@ describe("@uno in a Figma comment (#903)", () => {
     passesChecklist(text);
     assert.match(text, /^<@U1>, you asked in a Figma comment on .*\. Can you review the draft below\?$/);
     assert.equal(text.match(/<@/g)!.length, 1, "one person, named once");
+  });
+});
+
+describe("the weekly Figma tidy-up (#886 § 3.6)", () => {
+  const folder = (name: string) => ({ team: "Universal", id: name, name });
+  const tidyFile = { team: "Universal", folderId: "⏳ WIP", key: "F1", name: "AI Indicator / Card 733 / Sarah" };
+  const findings: TidyFinding[] = [
+    {
+      fingerprint: "F1|wrong-folder|733",
+      check: "wrong-folder",
+      file: tidyFile,
+      folder: folder("⏳ WIP"),
+      card: 733,
+      known: { number: 733, title: "AI Indicator", url: "https://www.notion.so/733", designStatus: "Shipped", devStatus: null, owner: "U1", designers: [] },
+      moveTo: { stage: "Specs", folder: folder("📐 Specs") },
+      owner: "U1",
+    },
+    { fingerprint: "F1|unknown-card|9", check: "unknown-card", file: tidyFile, folder: folder("⏳ WIP"), card: 9, owner: null },
+    {
+      fingerprint: "F2|no-active-card|-",
+      check: "no-active-card",
+      file: { ...tidyFile, key: "F2", name: "Old / Legacy / flows" },
+      folder: folder("⏳ WIP"),
+      card: null,
+      moveTo: { stage: "Archive", folder: folder("🗂️ Archive") },
+      owner: null,
+    },
+  ];
+
+  it("the parent, each owner's reply and the all-clear hold to the checklist", () => {
+    passesChecklist(tidyParent("2026-10-12", 9, 3));
+    passesChecklist(ownerLine("U1", 7, 5));
+    passesChecklist(ownerLine(null, 2, 2));
+    const clear = allClearText(12);
+    assert.equal(clear, "*Figma tidy-up: all clear* 🎉 Last week's 12 items are fixed. Nice work.");
+    passesChecklist(clear, { ship: true });
+  });
+
+  it("every card and what Review shows say no gate words, and use Card <n>", () => {
+    for (const f of findings) {
+      const item = tidyItem(f, null);
+      passesChecklist([item.title, item.subtitle ?? "", item.body].join("\n"));
+      passesChecklist(renderProposalCard(tidyCard(f, null)).text);
+      assert.doesNotMatch(`${item.subtitle} ${item.body}`, /RM-\d|card #/i);
+    }
+    passesChecklist(TIDY_REVISION_REFUSAL);
+    assert.equal(findingBody(findings[2]!, null), "Not on an active card, and not in 🗂️ Archive. Move it to Universal › 🗂️ Archive.");
   });
 });

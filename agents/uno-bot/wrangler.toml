@@ -227,6 +227,13 @@ UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
+# Where a change asked for in a Figma comment posts its lead and Review card
+# (src/figma-ask/env.ts), and where the weekly Figma tidy-up posts its Review
+# cards (src/figma-tidy/env.ts). Bill's le goat DM while uno-bot's Figma flows are in
+# testing, so test cards stay out of #plus-design. Blank or removed → the card
+# posts in #plus-design (PLUS_DESIGN_CHANNEL_ID). Reset it to blank when Bill
+# signs the Figma flows off.
+FIGMA_ASK_CHANNEL_ID = "D0APTB20SK0"
 # ── End-of-day sweep (src/sweep/) ────────────────────────────────────────────
 # The channels the end-of-day run reads for Notion drift, one job per channel:
 # comma-separated channel ids. THIS IS THE ONE LINE TO GROW — add a design

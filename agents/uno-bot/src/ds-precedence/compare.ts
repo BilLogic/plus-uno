@@ -39,6 +39,7 @@
 import type { FigmaComponentsResponse } from "../figma/client";
 import { figmaNodeUrl, type LibraryChangeSet } from "../figma-library/draft";
 import { namesInWords } from "../slack/copy-words";
+import { figmaFileUrl } from "../figma/links";
 
 /** The three DS sources, in precedence order: the first wins. */
 export type DsSource = "code" | "library" | "spec-pages";
@@ -295,7 +296,7 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
           "missing-in-figma",
           "",
           "code has it, the library has no published component for it",
-          `https://www.figma.com/design/${fileKey}`,
+          figmaFileUrl(fileKey),
         );
       }
       continue;

@@ -44,6 +44,7 @@ import { commentUrl, draftDecision } from "./draft";
 import { stagedDecision } from "./post";
 import { fieldsOf } from "./read";
 import type { DecisionThread, QueuedDecision } from "./queue";
+import { figmaFileUrl } from "../figma/links";
 
 export interface ReviseDeps {
   /** The record of the thread the reply is in, or null when it is no decision thread. */
@@ -271,7 +272,7 @@ async function redraft(deps: ReviseDeps, thread: DecisionThread, d: QueuedDecisi
   }
   if ((d.route === "prd" && !prd) || (d.route === "card" && !cards.length)) return null;
   const result = await deps.detector.detect({
-    file: { title: thread.title, url: `https://www.figma.com/design/${encodeURIComponent(thread.fileKey)}` },
+    file: { title: thread.title, url: figmaFileUrl(thread.fileKey) },
     threads: [
       { id: d.commentId, section: d.section, page: d.page, resolved: !!d.resolvedAt, comments: [{ by: d.by, at: d.createdAt, text: d.quote }] },
     ],

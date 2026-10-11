@@ -67,10 +67,14 @@ export async function executeNotionCreate(
     asString(props.evidence) ||
     asString(props.Evidence) ||
     asString(input.evidence);
+  // Decisions DB people: Notion user ids, one or a list.
+  const peopleOf = (v: unknown): string[] => (Array.isArray(v) ? asStringArray(v) : asString(v).split(",").map((x) => x.trim()).filter(Boolean));
+  const owner = peopleOf(props.owner ?? props.Owner);
+  const signOff = peopleOf(props.sign_off ?? props["Sign-off"]);
   const extras: Record<string, string> = {};
   for (const [k, v] of Object.entries(props)) {
-    const key = k.toLowerCase().replace(/[\s_]+/g, "");
-    if (key === "productpillar" || key === "roadmapcard" || key === "status" || key === "evidence") {
+    const key = k.toLowerCase().replace(/[\s_-]+/g, "");
+    if (["productpillar", "roadmapcard", "status", "evidence", "owner", "signoff"].includes(key)) {
       continue;
     }
     if (typeof v === "string" && v.trim()) extras[k] = v.trim();
@@ -95,6 +99,8 @@ export async function executeNotionCreate(
       extras,
       roadmapCard: roadmapCard || undefined,
       decisionStatus: decisionStatus || undefined,
+      ...(surface === "decision" && owner.length ? { owner } : {}),
+      ...(surface === "decision" && signOff.length ? { signOff } : {}),
       onBehalfOf: await requesterName(env, slack),
     });
     await postMessage(env, {

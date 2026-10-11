@@ -44,6 +44,8 @@
 
 import { judgeAbsence, absenceRepairInstruction, type AbsenceContext } from "../agent/absence";
 import {
+  blueprintLookupRanIn,
+  disclaimCarried,
   judgeConfidence,
   needsRepair,
   repairInstruction,
@@ -113,6 +115,7 @@ import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./anteceden
 import { cardThreadOf } from "./request";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { figmaAnswerCopy } from "./figma-answer-copy";
+import { breadcrumbsInProse } from "../integrations/blueprint-link";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   asSweepRevision,
@@ -2070,11 +2073,17 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // after the judge has scored and can amputate a clause from a reply already
   // logged as verdict=pass.
   const retrievalRan = retrievalRanIn(run.tools);
+  const blueprintLookupRan = blueprintLookupRanIn(run.tools);
   const servedFromCache = run.receipt?.cached === true;
   const readFailed = ctx.presenting.readFailed();
   let verdict: ConfidenceVerdict = { kind: "exempt" };
   try {
-    verdict = judgeConfidence(deps.deliveredBody(draft), { retrievalRan, servedFromCache, readFailed });
+    verdict = judgeConfidence(deps.deliveredBody(draft), {
+      retrievalRan,
+      blueprintLookupRan,
+      servedFromCache,
+      readFailed,
+    });
   } catch (err) {
     // Fail open, in the same direction as the judge itself: a missing
     // confidence clause is a smaller harm than a dropped answer.
@@ -2162,13 +2171,21 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // back — turning "wrong shape" into "no signal at all" in the one reply we
   // had already noticed was wrong. Logged so that outcome is countable; looping
   // here would cost another model call per turn and could land in the same
-  // place anyway.
+  // place anyway. The one exception is a carried answer: a blueprint grounding
+  // no lookup of this turn stood on never ships, so code says what it rests
+  // on when the judge errs or passes it as it was.
+  let answer = reviewed.text;
   try {
     const finalVerdict = judgeConfidence(deps.deliveredBody(reviewed.text), {
       retrievalRan,
+      blueprintLookupRan,
       servedFromCache,
       readFailed,
     });
+    if (finalVerdict.kind === "carried") {
+      answer = disclaimCarried(answer, ctx.priorAssistantText ? "my earlier answer" : "what I already know");
+      console.log("[confidence] carried answer left as it was by the judge: disclaimed in code");
+    }
     console.log(
       `[confidence] pre=${verdict.kind} post=${finalVerdict.kind} ` +
         `retrieval=${retrievalRan ? "yes" : "no"} cached=${servedFromCache ? "yes" : "no"} ` +
@@ -2186,10 +2203,12 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // Delivery shares, so Slack, the recording Delivery and the thread's memory
   // all get the same prose. A rule that must hold on every provider lives in
   // code, not in the persona.
-  const stripped = presentedProse(reviewed.text, presentation);
+  const stripped = presentedProse(answer, presentation);
   if (stripped.removed) console.log(`[result-table] removed ${stripped.removed} repeated row line(s) from the prose`);
   if (stripped.trimmed) console.log(`[result-table] trimmed ${stripped.trimmed} list item(s) past the first 3; prose over budget`);
-  const prose = figmaAnswerCopy(stripped.text, presentation?.sources);
+  // A blueprint place carried from an earlier answer keeps that answer's
+  // form; the reader gets the breadcrumb either way.
+  const prose = breadcrumbsInProse(figmaAnswerCopy(stripped.text, presentation?.sources));
 
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.

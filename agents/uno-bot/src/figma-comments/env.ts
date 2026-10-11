@@ -6,6 +6,8 @@
 //   • The notes: HARNESS_KV lists under the notification route's prefixes,
 //     each key's time read from its metadata; a note with none has no time.
 //   • A card: `queryRoadmapCards` by its number, one Notion query.
+//   • A card's Decisions DB rows: `decisionRowsOf`, one Notion query a card;
+//     the Figma and Notion people maps the daily sync keeps, two KV reads.
 //   • The team's roles: the role map the daily sync keeps (`teamRolesFor`),
 //     one KV read, which names a card's design owner.
 //   • The detector: the Worker's one ModelProvider.
@@ -29,12 +31,12 @@ import { measured, readSource } from "../sweep/env";
 import { charge, rethrowIfBudget } from "../net";
 import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
-import { queryRoadmapCards } from "../integrations/notion";
+import { decisionRowsOf, queryRoadmapCards } from "../integrations/notion";
 import { postMessage, updateMessage } from "../slack/api";
 import { channelMembers } from "../figma-library/env";
 import { threadStateFor } from "../thread-state/production";
 import type { PendingProposal } from "../thread-state/index";
-import { proposalEventLogFor, teamRolesFor } from "../usage/production";
+import { figmaPeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { getBotIdentity } from "../slack/api";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { modelDecisionDetector } from "./detector";
@@ -112,6 +114,8 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
       return card ? { url: card.url, title: card.title } : null;
     },
     roles: () => teamRolesFor(env),
+    ...(env.NOTION_DECISIONS_DB_ID ? { decisionRows: (cardUrl: string) => decisionRowsOf(env, cardUrl) } : {}),
+    people: async () => ({ figma: await figmaPeopleFor(env), notion: await notionPeopleFor(env) }),
     detector: modelDecisionDetector(provider),
     ...(miscTeamId ? { miscTeamId } : {}),
     queue: {
