@@ -112,6 +112,9 @@ export interface Env {
   // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
   // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;
+  /** Where a change asked for in a Figma comment posts its lead and Review
+   *  card (`figma-ask/env.ts`). Blank or unset → #plus-design. */
+  FIGMA_ASK_CHANNEL_ID?: string;
   /** The channels the end-of-day sweep reads, comma-separated ids
    *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
   SWEEP_CHANNELS?: string;
