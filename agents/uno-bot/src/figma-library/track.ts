@@ -52,7 +52,7 @@ import { namesInWords, windowInWords } from "../slack/copy-words";
 import { rethrowIfBudget } from "../net";
 import { LIBRARY_CARD_TTL_MS } from "./post";
 import { notedCardBlocks } from "../slack/proposal-render";
-import { settleItem, type ReportStore } from "../slack/decision-cards";
+import { expireItem, type ReportStore } from "../slack/decision-cards";
 import type { ReportItemState } from "../thread-state/index";
 
 /** A posted library card, followed until its PR merges or it ages out. */
@@ -210,18 +210,25 @@ async function closeExpired(deps: TrackDeps, card: TrackedPublish, intake: { num
     if (card.item) {
       // An Approve whose write failed keeps saying so on its card; only a
       // card nobody decided closes with no decision.
-      const failed = (await itemStateOf(deps, card)) === "failed";
-      if (!failed) {
-        const message = await settleItem(deps.reports, { messageTs: card.ts, id: card.item }, { kind: "expired" }, deps.now());
-        if (message) await deps.closeCard(card.channel, card.ts, message);
+      let state = await itemStateOf(deps, card);
+      if (state !== "failed") {
+        // A decision that lands after that read keeps the item; the close
+        // says which, and the card is redrawn either way.
+        const closed = await expireItem(deps.reports, { messageTs: card.ts, id: card.item }, deps.now());
+        if (closed) {
+          state = closed.state;
+          await deps.closeCard(card.channel, card.ts, closed.message);
+        } else state = "expired";
       }
       delete card.closePending;
       // Told once the card is closed; a line that fails is not tried again.
-      const line = failed ? failedFiledLine(intake.url) : expiredThreadLine(intake.url);
-      await deps.postToThread(card.channel, card.ts, line).catch((err: unknown) => {
-        rethrowIfBudget(err);
-        console.error(`[figma-library] expired card ${card.key}: thread line not posted — ${err instanceof Error ? err.message : String(err)}`);
-      });
+      const line = state === "failed" ? failedFiledLine(intake.url) : state === "expired" ? expiredThreadLine(intake.url) : null;
+      if (line) {
+        await deps.postToThread(card.channel, card.ts, line).catch((err: unknown) => {
+          rethrowIfBudget(err);
+          console.error(`[figma-library] expired card ${card.key}: thread line not posted — ${err instanceof Error ? err.message : String(err)}`);
+        });
+      }
       return true;
     }
     const note = expiredCardNote(intake.url);

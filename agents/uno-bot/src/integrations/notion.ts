@@ -167,7 +167,8 @@ function buildChildren(input: PrdInput): unknown[] {
 // absent we fall back to name-only suggestions (unchanged behavior).
 // "Figma User ID" (rich_text) is optional and filled in by each member: the
 // daily role-map sync (`usage/team-roles-sync.ts`) maps it to the member's
-// Slack person, so a Figma commenter can be known to be a teammate.
+// Slack person, so a Figma commenter can be known to be a teammate. "Notion
+// Person" (people) is optional too, and maps the same way for card follow-ups.
 
 type NotionRichText = { plain_text?: string }[];
 interface TeamMemberProps {
@@ -181,6 +182,7 @@ interface TeamMemberProps {
   "Google Scholar"?: { url?: string | null };
   "Slack ID"?: { rich_text?: NotionRichText };
   "Figma User ID"?: { rich_text?: NotionRichText };
+  "Notion Person"?: { people?: { id?: string }[] };
 }
 
 export interface TeamMember {
@@ -196,6 +198,8 @@ export interface TeamMember {
   /** The member's Figma User ID cell as they filled it in; `usage/roles.ts`
    *  `normaliseFigmaId` reads the id out of it. */
   figmaUserId?: string;
+  /** The Notion users in the member's Notion Person cell, when it names any. */
+  notionUserIds?: string[];
 }
 
 /** Normalize a raw "Slack ID" cell to a bare user id: strip <@…>, leading @. */
@@ -244,7 +248,9 @@ export async function findTeamMembers(
         const p = row.properties ?? {};
         const name = plain(p.Name?.title);
         if (!name) continue;
+        const notionUserIds = (p["Notion Person"]?.people ?? []).map((u) => u.id ?? "").filter(Boolean);
         members.push({
+          ...(notionUserIds.length ? { notionUserIds } : {}),
           name,
           group: p.Group?.select?.name ?? undefined,
           role: plain(p["Primary Role"]?.rich_text) || undefined,

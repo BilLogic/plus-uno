@@ -2,9 +2,11 @@
 //
 // What each port becomes:
 //   • The Roadmap reads and the Notion users: `./notion.ts`, each measured.
-//   • People: a Notion user's name matched to one Slack member (the sweep's
-//     directory lookup), and a Slack member's real or display name matched to
-//     one Notion person — exactly one either way, or nobody.
+//   • People: the Team Members directory's Notion people map first
+//     (`./people.ts`, one KV read), then a Notion user's name matched to one
+//     Slack member (the sweep's directory lookup), and a Slack member's real
+//     or display name matched to one Notion person — exactly one either way,
+//     or nobody.
 //   • The store: commitment reminders' own (`USAGE_DB` + HARNESS_KV).
 //   • Slack: `chat.postMessage`, `chat.update` and `chat.getPermalink` with the
 //     bot token. The morning's cards post as a decision report, whose record
@@ -29,7 +31,8 @@ import type { SlackMessageEvent } from "../slack/types";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import { threadStateFor } from "../thread-state/production";
-import { proposalEventLogFor } from "../usage/production";
+import { notionPeopleFor, proposalEventLogFor } from "../usage/production";
+import { throughDirectory } from "./people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { CommitmentRecord } from "../commitments/store";
 import { TAP_REFUSED, type TapAnswer } from "../commitments/copy";
@@ -91,8 +94,13 @@ function readsFor(env: Env): CardReads {
 }
 
 /** People lookups, each answer kept for the life of the object — one job or
- *  one reaction. */
+ *  one reaction: the Team Members directory first, then by name. */
 function peopleFor(env: Env): CardPeople {
+  return throughDirectory(byNameFor(env), () => notionPeopleFor(env));
+}
+
+/** People lookups by name alone. */
+function byNameFor(env: Env): CardPeople {
   const directory = slackDirectoryFor(env);
   const cache = new Map<string, Promise<string | null>>();
   const once = (key: string, fn: () => Promise<string | null>) => {
@@ -108,11 +116,13 @@ function peopleFor(env: Env): CardPeople {
     });
   return {
     slackIdForName,
-    slackIdForNotionUser: (id) =>
-      once(`notion-user:${id}`, async () => {
-        const name = await measured(() => notionUserName(env, id));
-        return name ? slackIdForName(name) : null;
-      }),
+    slackIdForNotionUser: (id, known) =>
+      known?.trim()
+        ? slackIdForName(known)
+        : once(`notion-user:${id}`, async () => {
+            const name = await measured(() => notionUserName(env, id));
+            return name ? slackIdForName(name) : null;
+          }),
     notionUserForSlack: (slackId) =>
       once(`slack-user:${slackId}`, async () => {
         const res = await measured(() => usersInfo(env, slackId));

@@ -25,6 +25,7 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
             Name: { type: "title", title: [{ plain_text: "Cy Diaz" }] },
             Group: { type: "select", select: { name: "Product Designer" } },
             "Figma User ID": text(" 1105000000000000003 "),
+            "Notion Person": { type: "people", people: [{ object: "user", id: "n-cy", name: "Cy Diaz" }] },
           },
         },
         {
@@ -32,6 +33,7 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
             Name: { type: "title", title: [{ plain_text: "Dee Evans" }] },
             Group: { type: "select", select: { name: "Researcher" } },
             "Figma User ID": text(""),
+            "Notion Person": { type: "people", people: [] },
           },
         },
         // A row from before the column existed.
@@ -55,6 +57,19 @@ test("the roster reads a member's Figma User ID, trimmed; an empty or missing ce
     members.map((m) => [m.name, m.figmaUserId]),
     [
       ["Cy Diaz", "1105000000000000003"],
+      ["Dee Evans", undefined],
+      ["Ana Pérez", undefined],
+    ],
+  );
+});
+
+test("the roster reads a member's Notion Person as user ids; an empty or missing cell reads as none", async () => {
+  const { findTeamMembers } = await import("../src/integrations/notion.js");
+  const { members } = await findTeamMembers(ENV);
+  assert.deepEqual(
+    members.map((m) => [m.name, m.notionUserIds]),
+    [
+      ["Cy Diaz", ["n-cy"]],
       ["Dee Evans", undefined],
       ["Ana Pérez", undefined],
     ],

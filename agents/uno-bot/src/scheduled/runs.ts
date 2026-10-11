@@ -80,7 +80,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * The end-of-day `figma-backstop` jobs list every Figma team's folders and
  * queue a change no notification reported (src/figma-notify/backstop.ts).
  * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
- * Team Members database (src/usage/team-roles-sync.ts).
+ * Team Members database (src/usage/team-roles-sync.ts); Monday's
+ * `team-roles-gaps`, after it, DMs the lead the in-scope rows it could not
+ * match (src/usage/team-gaps.ts).
  * The end-of-day `card-follow-through` keeps a follow-up for each active
  * Roadmap card nobody owns or that has stopped moving; the morning
  * `commitment-nudge` asks about it (src/follow-through/).
@@ -117,6 +119,7 @@ export type ScheduledJobKind =
   | "figma-drift-recheck"
   | "figma-backstop"
   | "team-roles-sync"
+  | "team-roles-gaps"
   | "card-follow-through"
   | "dm-promise-read"
   | "dm-promise-nudge"
@@ -177,7 +180,8 @@ const RUN_HOURS: Record<ScheduledRunName, number> = {
  *  teams is 36 listings, a job may make 38, and a third is room to spare. */
 export const BACKSTOP_JOBS = 3;
 
-/** Friday, as `Date.getUTCDay` numbers it. */
+/** Monday and Friday, as `Date.getUTCDay` numbers them. */
+const MONDAY = 1;
 const FRIDAY = 5;
 
 /**
@@ -206,6 +210,8 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
     { key: "figma-drift-post", kind: "figma-drift-post" },
     { key: "team-roles-sync", kind: "team-roles-sync" },
+    // Weekly, from the map the sync just stored: the lead alone is DMed.
+    { key: "team-roles-gaps", kind: "team-roles-gaps", after: ["team-roles-sync"], weekday: MONDAY },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },
