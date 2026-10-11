@@ -16,6 +16,7 @@ import type { ReportItem, StatedCardWords } from "../thread-state/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { largestFitting, namesInWords, ONE_POST_CHARS, shortDate, THREAD_REPLY_CHARS, windowInWords } from "../slack/copy-words";
 import { CARD_BODY_CHARS } from "../slack/decision-cards";
+import { figmaFileUrl } from "../figma/links";
 
 /** A component as the poll keeps it in its snapshot. */
 export interface LibraryComponent {
@@ -358,7 +359,7 @@ export const NO_CODE_YET = "No code mapping yet";
 /** The library file itself: what an edited-not-published post links, and
  *  the card's Open. */
 export function libraryUrl(fileKey: string): string {
-  return `https://www.figma.com/design/${fileKey}`;
+  return figmaFileUrl(fileKey);
 }
 
 /** The card's two groups, every row's name in each, in row order. */

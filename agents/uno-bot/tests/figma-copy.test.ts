@@ -872,7 +872,7 @@ describe("the weekly Figma tidy-up (#886 § 3.6)", () => {
       file: tidyFile,
       folder: folder("⏳ WIP"),
       card: 733,
-      known: { number: 733, title: "AI Indicator", url: "https://www.notion.so/733", designStatus: "Shipped", devStatus: null, owner: "U1" },
+      known: { number: 733, title: "AI Indicator", url: "https://www.notion.so/733", designStatus: "Shipped", devStatus: null, owner: "U1", designers: [] },
       moveTo: { stage: "Specs", folder: folder("📐 Specs") },
       owner: "U1",
     },

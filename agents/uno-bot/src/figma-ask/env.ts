@@ -44,6 +44,15 @@ import { answerFigmaAsk, ASK_MARK_TTL_S, type AskMark, type FigmaAskDeps, type F
 export const ASK_MARK_PREFIX = "figma-ask:";
 
 /**
+ * Where Figma Review cards post — a comment's ask and the weekly tidy-up: the
+ * channel or DM `FIGMA_ASK_CHANNEL_ID` names, else #plus-design; null when
+ * neither is set.
+ */
+export function figmaReviewChannel(env: Env): string | null {
+  return env.FIGMA_ASK_CHANNEL_ID?.trim() || env.PLUS_DESIGN_CHANNEL_ID?.trim() || null;
+}
+
+/**
  * The ask's dependencies on `Env`, or undefined when the Worker has no Figma
  * token or no HARNESS_KV — without the marks, a retry could answer twice.
  *
@@ -54,7 +63,7 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
   const kv = env.HARNESS_KV;
   if (!figma || !kv) return undefined;
   const threadState = threadStateFor(env);
-  const channel = env.FIGMA_ASK_CHANNEL_ID?.trim() || env.PLUS_DESIGN_CHANNEL_ID?.trim();
+  const channel = figmaReviewChannel(env);
   return {
     figma,
     people: () => figmaPeopleFor(env),

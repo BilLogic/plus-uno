@@ -14,13 +14,15 @@ import type { ReportItem, ReviewChoice, StatedCardWords } from "../thread-state/
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { shortDate, windowInWords } from "../slack/copy-words";
-import { cardKey, type TidyFinding } from "./checks";
+import type { ToolName } from "../agent/tool-table";
+import { figmaFileUrl } from "../figma/links";
+import { cardKey, isDeployed, type TidyCard, type TidyFinding, type TidyMove } from "./checks";
 
 /** A reply's cards at most; the rest wait for next week's. */
 export const MAX_ITEMS_PER_OWNER = 5;
 
 /** The tool a card names: "Leave as is" runs it, "Moved it" decides as a cancel. */
-export const TIDY_TOOL = "figma_tidy_up";
+export const TIDY_TOOL: ToolName = "figma_tidy_up";
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
@@ -54,32 +56,30 @@ export function ownerLine(owner: string | null, total: number, shown: number): s
 }
 
 /** Where a finding says to move the file: the team's folder, by its own name. */
-function destination(finding: TidyFinding): string {
-  const to = finding.moveTo!;
-  return `${finding.file.team} › ${to.folder?.name ?? to.stage}`;
+function destination(team: string, to: TidyMove): string {
+  return `${team} › ${to.folder?.name ?? to.stage}`;
 }
 
 /** A card's stage, in its own words. */
-function stageWords(finding: TidyFinding): string {
-  const c = finding.known!;
-  return /^deployed$/i.test(c.devStatus?.trim() ?? "") ? "deployed" : (c.designStatus ?? "");
+function stageWords(c: TidyCard): string {
+  return isDeployed(c) ? "deployed" : (c.designStatus ?? "");
 }
 
 /** What a finding says, plain. */
 export function findingBody(finding: TidyFinding, likely: { number: number; title: string } | null): string {
   switch (finding.check) {
     case "wrong-folder":
-      return `In ${finding.folder.name}, but Card ${finding.card} is ${stageWords(finding)}. Move it to ${destination(finding)}.`;
+      return `In ${finding.folder.name}, but Card ${finding.card} is ${stageWords(finding.known)}. Move it to ${destination(finding.file.team, finding.moveTo)}.`;
     case "no-active-card":
-      return `Not on an active card, and not in ${finding.moveTo!.folder?.name ?? "Archive"}. Move it to ${destination(finding)}.`;
+      return `Not on an active card, and not in ${finding.moveTo.folder?.name ?? "Archive"}. Move it to ${destination(finding.file.team, finding.moveTo)}.`;
     case "unknown-card":
       return likely
         ? `Card ${finding.card} isn't on the Roadmap. Likely Card ${likely.number}, "${likely.title}".`
         : `Card ${finding.card} isn't on the Roadmap, and no card's name matches the project.`;
     case "title": {
-      const named = finding.retitle!.missing.map((n) => `Card ${n}`);
+      const named = finding.retitle.missing.map((n) => `Card ${n}`);
       const list = named.length > 1 ? `${named.slice(0, -1).join(", ")} and ${named.at(-1)}` : named[0];
-      return `Its pages or Cover name ${list}, which the title leaves out. Rename it to "${finding.retitle!.title}".`;
+      return `Its pages or Cover name ${list}, which the title leaves out. Rename it to "${finding.retitle.title}".`;
     }
   }
 }
@@ -96,22 +96,19 @@ export function itemId(finding: TidyFinding): string {
   return `${finding.check}-${finding.file.key.replace(/[^A-Za-z0-9_-]+/g, "-")}-${finding.card ?? 0}`;
 }
 
-export function fileUrl(fileKey: string): string {
-  return `https://www.figma.com/design/${encodeURIComponent(fileKey)}`;
-}
-
 /**
  * One finding as its card: the file, the check and card, what to do, and the
  * file and its card (or the likely one) as buttons.
  */
 export function tidyItem(finding: TidyFinding, likely: { number: number; title: string; url: string } | null): ReportItem {
-  const card = finding.known ? { label: `Card ${finding.known.number}`, url: finding.known.url } : likely ? { label: `Card ${likely.number}`, url: likely.url } : null;
+  const known = "known" in finding ? finding.known : likely;
+  const card = known ? { label: `Card ${known.number}`, url: known.url } : null;
   return {
     id: itemId(finding),
     title: finding.file.name,
     subtitle: finding.card === null ? SUBTITLE[finding.check] : `${SUBTITLE[finding.check]} · Card ${finding.card}`,
     body: findingBody(finding, likely),
-    open: { label: "Open file", url: fileUrl(finding.file.key) },
+    open: { label: "Open file", url: figmaFileUrl(finding.file.key) },
     ...(card ? { also: card } : {}),
   };
 }
@@ -122,7 +119,7 @@ export function tidyCard(finding: TidyFinding, likely: { number: number; title: 
     kind: "stated",
     verb: "tidy this file",
     lead: [
-      `*${escapeSlackText(finding.file.name)}* · <${fileUrl(finding.file.key)}|open file>`,
+      `*${escapeSlackText(finding.file.name)}* · <${figmaFileUrl(finding.file.key)}|open file>`,
       escapeSlackText(findingBody(finding, likely)),
       "Files are moved and renamed in Figma by a person. Answering here records what you did, and Leave as is stops asking until the file's cards change.",
     ].join("\n"),

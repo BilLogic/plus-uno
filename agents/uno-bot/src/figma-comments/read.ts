@@ -61,6 +61,7 @@ import { cardNumbersOf } from "./title";
 import { isDecisionField, type ShownCard, type ShownThread } from "./detector";
 import { commentUrl, draftDecision } from "./draft";
 import { mergeQueuedFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
+import { figmaFileUrl } from "../figma/links";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -344,7 +345,7 @@ async function readFile(
     resolved: !!thread.root.resolved_at,
     comments: readComments(thread).map((c) => ({ by: c.user.handle, at: c.created_at, text: c.message })),
   }));
-  const fileUrl = `https://www.figma.com/design/${encodeURIComponent(fileKey)}`;
+  const fileUrl = figmaFileUrl(fileKey);
   const detected = await fc.detector.detect({ file: { title, url: fileUrl }, threads: shown, cards, prd, ...(rows ? { rows } : {}) });
   if (!detected.ok) return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !QUOTA.test(detected.error) };
   const people = detected.decisions.some((d) => d.row) && fc.people ? await fc.people() : { figma: {}, notion: {} };
