@@ -222,6 +222,9 @@ export interface CommitmentText {
   /** A card follow-up's other people to mention beside the promiser — a
    *  running note's takers, a card's other Contributors. */
   mentions?: string[];
+  /** A card follow-up's Contributors no lookup found in Slack, by name: said
+   *  in plain text on its card rather than dropped. */
+  unmatched?: string[];
   /** A card follow-up's card: its title and link, as Notion gave them. */
   card?: { title: string; url: string; status: string | null };
   /** Where a card to-do was read: the thread's permalink or the note's link. */

@@ -1276,7 +1276,7 @@ test("a worded revision of a sweep card holding an added answer is refused, and 
 
   assert.equal(outcome.disposition, "asked");
   assert.equal(outcome.staged, undefined);
-  assert.match(outcome.posted ?? "", /reply `drop N`/i);
+  assert.match(outcome.posted ?? "", /Reject it in Review, then reply here/);
   assert.equal((await h.threadState.getProposalByTs(card.proposalTs)).state, "found");
 
   // `drop 1` still revises it, by index, keeping the added answer byte for byte.

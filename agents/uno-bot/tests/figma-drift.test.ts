@@ -161,7 +161,7 @@ function frame(texts: readonly string[]): FigmaNode {
 /** What the morning's fake Figma file holds. */
 interface FileOpts {
   /** The newest named version's author and time; null names no publisher. */
-  publisher?: { handle: string; at: string } | null;
+  publisher?: { handle: string; at: string; id?: string } | null;
   /** An autosave after the publish: the file's last change. */
   changedAt?: string;
   /** Node 1-2's text layers now (FIGMA_A's frame); node 3-4 keeps the old ones. */
@@ -178,7 +178,15 @@ function seedFigmaFile(figma: InMemoryFigma, opts: FileOpts): void {
       versions: [
         ...(opts.changedAt ? [{ id: "2210000000000000010", label: null, description: null, created_at: opts.changedAt, user: { handle: "bea.designs" } }] : []),
         ...(publisher
-          ? [{ id: "2210000000000000009", label: "Recap screens", description: "", created_at: publisher.at, user: { handle: publisher.handle } }]
+          ? [
+              {
+                id: "2210000000000000009",
+                label: "Recap screens",
+                description: "",
+                created_at: publisher.at,
+                user: { handle: publisher.handle, ...(publisher.id ? { id: publisher.id } : {}) },
+              },
+            ]
           : []),
       ],
     },
@@ -194,7 +202,7 @@ const NOT_SHOWN = JSON.stringify({ shows: false, confidence: 0.9 });
 function morning(
   h: SweepHarness,
   drifts: InMemoryDriftStore,
-  opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[] } = {},
+  opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[]; figmaPeople?: Record<string, string> } = {},
 ): { deps: DriftPostDeps; posted: Posted[]; marked: string[]; figma: InMemoryFigma; provider: FakeProvider } {
   const posted: Posted[] = [];
   const marked: string[] = [];
@@ -242,6 +250,7 @@ function morning(
     config: { plusDesign: "C0PLUSDESIGN", plusUniversal: "C0UNIVERSAL", unoBot: UNO_BOT },
     now: () => h.clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
+    ...(opts.figmaPeople ? { figmaPeople: async () => opts.figmaPeople! } : {}),
   };
   return { deps, posted, marked, figma, provider };
 }
@@ -350,6 +359,30 @@ describe("a Figma drift at the morning run", () => {
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
     assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/);
     assert.equal(m.figma.calls().length, 1, "a failed read is not tried again for the publisher");
+  });
+
+  it("names a publisher the Team Members directory maps in plain text: no mention, and no say on the card", async () => {
+    const t = await sweptRecap();
+    const m = morning(t.h, t.drifts, {
+      publisher: { handle: "cy<designs>", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" },
+      figmaPeople: { "1105000000000000003": "U0CY" },
+    });
+    await runDriftAsks(MORNING, m.deps);
+    const [card] = cardsOf(m.posted[0]!.blocks);
+    assert.equal(card!.subtitle!.text, "<@U0BEA> · published by cy&lt;designs&gt; · last changed Sep 20");
+    assert.doesNotMatch(JSON.stringify(m.posted[0]!.blocks) + m.posted[0]!.text, /U0CY/, "the publisher is never @-mentioned");
+    const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
+    assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE"], "the publisher is not added to who may decide");
+  });
+
+  it("names the owner alone when the publisher is the owner, or is not in the directory", async () => {
+    const maps: Record<string, string>[] = [{ "1105000000000000002": "U0BEA" }, {}];
+    for (const figmaPeople of maps) {
+      const t = await sweptRecap();
+      const m = morning(t.h, t.drifts, { publisher: { handle: "bea.designs", at: "2026-09-20T10:00:00Z", id: "1105000000000000002" }, figmaPeople });
+      await runDriftAsks(MORNING, m.deps);
+      assert.equal(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, "<@U0BEA> · last changed Sep 20");
+    }
   });
 
   it("names no one for a file with no named version", async () => {

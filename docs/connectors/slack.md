@@ -34,7 +34,7 @@ The Worker's one proactive read of channels, whose rules the bot reads through `
   - #uno-bot stays off the read path, whatever the list says.
 - **Audience rule.** A finding reaches only people who could already see its evidence:
   - a public thread's finding is posted in that thread;
-  - a private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM. After a group-DM fix writes a page, a separate share card there offers a reworded note (page name only, no quote, no names) for rung 3 or 4, and only its own ✅ posts it (`sweep_share_post`, a `worker` tool only the Worker stages);
+  - a private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM. After a group-DM fix writes a page, a separate share card there offers a reworded note (page name only, no quote, no names) for rung 3 or 4, and only its own Approve posts it (`sweep_share_post`, a `worker` tool only the Worker stages);
   - a fix found in both a public thread and a private place goes only on the private card (ADR-031);
   - findings in no thread go to #plus-universal for the design system and to #plus-design otherwise (`pickDestination` in `agents/uno-bot/src/sweep/finding.ts`).
   - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.

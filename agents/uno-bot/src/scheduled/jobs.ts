@@ -15,7 +15,7 @@ import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
 import { selectProvider } from "../agent/run-agent";
 import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
-import { askCategoriesFor, proposalEventLogFor, runTeamRolesSync } from "../usage/production";
+import { askCategoriesFor, proposalEventLogFor, runTeamGapsOnEnv, runTeamRolesSync } from "../usage/production";
 import { runLibraryPost, runLibraryTrack, runSnapshotRefreshOnEnv } from "../figma-library/env";
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
@@ -207,6 +207,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "team-roles-sync": async (env, _job, { dryRun }) => {
     const report = await runTeamRolesSync(env, { dryRun });
     console.log(`[usage] team roles: ${report.summary}`);
+    return report;
+  },
+  // Monday morning, after the sync: the lead alone is DMed the in-scope Team
+  // Members rows that matched no one (src/usage/team-gaps.ts).
+  "team-roles-gaps": async (env, _job, { dryRun }) => {
+    const report = await runTeamGapsOnEnv(env, { dryRun });
+    console.log(`[usage] team gaps: ${report.summary}`);
     return report;
   },
   // End of day: each active Roadmap card nobody owns, or that has stopped
