@@ -28,6 +28,7 @@ import type {
   BlueprintReadResult,
 } from "../src/integrations/blueprint-read";
 import type { BlueprintRetrieval, BlueprintRow } from "../src/integrations/blueprint";
+import type { BlueprintScope } from "../src/integrations/blueprint-scope";
 import {
   cacheNote,
   enrichmentFailureNote,
@@ -310,4 +311,57 @@ test("an enrichment nobody asked for is silent — no key, no note", () => {
     assert.equal(rest[key], undefined, `${key} should be absent when it was not asked for`);
   }
   assert.equal(notes.find((n) => n.includes("failure to LOOK")), undefined);
+});
+
+// ── A browse above cell level still leaves a link ───────────────────────────
+
+const SCENARIOS: BlueprintRow[] = [
+  { kind: "scenario", id: "scn-1", title: "Phase: In-session · Scenario: Help Request" },
+  { kind: "scenario", id: "scn-2", title: "Phase: In-session · Scenario: Student Just Joined" },
+];
+
+function browse(rows: BlueprintRow[], scope: BlueprintScope, app: string | null = "https://uno-blueprint.example/") {
+  return blueprintSearchPayload({ query: "", scope, appUrl: app ?? undefined, read: readResult({ rows }) });
+}
+
+test("a scoped browse above cell level links the blueprint app once, named for the scope", () => {
+  // Live on 2026-10-11: seven scenario rows from a phase browse, none with a
+  // url, and an answer citing them with no blueprint source under it.
+  const rest = browse(SCENARIOS, { filterPhase: "In-session", granularity: "scenario" });
+  assert.deepEqual(rest.blueprint, {
+    title: "Service blueprint · In-session",
+    url: "https://uno-blueprint.example/",
+  });
+  const notes = rest.notes as string[];
+  assert.ok(notes.some((n) => /no link of their own/.test(n) && /`blueprint.url`/.test(n)));
+});
+
+test("a phase-and-scenario scope names both, and an unfiltered rung names the blueprint alone", () => {
+  const both = browse(SCENARIOS, { filterPhase: "In-session", filterScenario: "Help Request", granularity: "path" });
+  assert.equal((both.blueprint as { title: string }).title, "Service blueprint · In-session › Help Request");
+  const phases: BlueprintRow[] = [{ kind: "phase", id: "p-1", title: "Phase: In-session" }];
+  assert.equal((browse(phases, { granularity: "phase" }).blueprint as { title: string }).title, "Service blueprint");
+});
+
+test("cell rows carry their own links, so no blueprint root rides beside them", () => {
+  const cells: BlueprintRow[] = [
+    { kind: "cell", id: "c-1", title: "Reconfirm", url: "https://uno-blueprint.example/?cell=c-1" },
+  ];
+  const rest = browse(cells, { filterPhase: "In-session" });
+  assert.equal(rest.blueprint, undefined);
+  assert.equal((rest.notes as string[]).find((n) => /`blueprint.url`/.test(n)), undefined);
+});
+
+test("a coarse row beside a linked cell adds no root: the cell is the source", () => {
+  const mixed: BlueprintRow[] = [
+    SCENARIOS[0]!,
+    { kind: "cell", id: "c-1", title: "Routed out", url: "https://uno-blueprint.example/?cell=c-1" },
+  ];
+  assert.equal(browse(mixed, { filterPhase: "In-session" }).blueprint, undefined);
+});
+
+test("with no blueprint app configured there is no root to link", () => {
+  const rest = browse(SCENARIOS, { filterPhase: "In-session", granularity: "scenario" }, null);
+  assert.equal(rest.blueprint, undefined);
+  assert.equal((rest.notes as string[]).find((n) => /`blueprint.url`/.test(n)), undefined);
 });

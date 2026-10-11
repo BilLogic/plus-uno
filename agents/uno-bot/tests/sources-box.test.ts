@@ -284,6 +284,28 @@ test("the blueprint opens no box on its own: an answer that links one cell has n
   assert.deepEqual(types, ["markdown"]);
 });
 
+test("a blueprint browse above cell level still cites the blueprint, once", async () => {
+  // Live on 2026-10-11: an answer citing In-session scenarios showed Roadmap
+  // and Decisions in Sources and no blueprint, because no scenario row links.
+  const scenarios = JSON.stringify({
+    ok: true,
+    query: "",
+    count: 2,
+    rows: [
+      { kind: "scenario", id: "s1", title: "Phase: In-session · Scenario: Help Request" },
+      { kind: "scenario", id: "s2", title: "Phase: In-session · Scenario: Student Just Joined" },
+    ],
+    blueprint: { title: "Service blueprint · In-session", url: APP },
+  });
+  const { box } = await answer(
+    [{ name: "search_blueprint", result: scenarios }],
+    "**Help requests are where sessions stall.** In-session › Help Request › Routed out is the weak spot.",
+  );
+
+  assert.deepEqual(box!.title, { type: "plain_text", text: "Sources (1)" });
+  assert.deepEqual(linksIn(box), [APP]);
+});
+
 test("a link in Slack's own <url|text> form names its row", async () => {
   const { box } = await answer(
     [{ name: "notion_search", result: notionResult(notion(5)) }],

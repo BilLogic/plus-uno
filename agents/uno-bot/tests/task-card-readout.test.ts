@@ -92,6 +92,33 @@ const ROWS: Row[] = [
     ],
   },
   { name: "search_blueprint", args: { query: "zzz" }, details: "zzz", result: ok({ count: 0, rows: [] }), output: "no matches", sources: [] },
+  // A scoped browse above cell level: no row has a link, so the blueprint
+  // root the tool names for the scope is the answer's one blueprint source.
+  {
+    name: "search_blueprint",
+    args: { query: "", filter_phase: "In-session", granularity: "scenario" },
+    details: null,
+    result: ok({ count: 2, rows: [
+      { kind: "scenario", title: "Phase: In-session · Scenario: Help Request" },
+      { kind: "scenario", title: "Phase: In-session · Scenario: Wrap-Up" },
+    ], blueprint: { title: "Service blueprint · In-session", url: "https://plus-uno.netlify.app/blueprint/" } }),
+    output: "2 matches",
+    sources: [{ text: "Service blueprint · In-session", url: "https://plus-uno.netlify.app/blueprint/", queried: "collection" }],
+  },
+  // Both kinds: the cells' deep links are the sources, each once, and no root
+  // rides beside them.
+  {
+    name: "search_blueprint",
+    args: { query: "help request" },
+    details: "help request",
+    result: ok({ count: 3, rows: [
+      { kind: "scenario", title: "Help Request" },
+      { kind: "cell", title: "Routed out", url: "https://plus-uno.netlify.app/blueprint/?cell=c1" },
+      { kind: "cell", title: "Routed out again", url: "https://plus-uno.netlify.app/blueprint/?cell=c1" },
+    ], blueprint: { title: "Service blueprint", url: "https://plus-uno.netlify.app/blueprint/" } }),
+    output: "3 matches",
+    sources: [{ text: "Routed out", url: "https://plus-uno.netlify.app/blueprint/?cell=c1" }],
+  },
   // github_read
   {
     name: "github_read",
