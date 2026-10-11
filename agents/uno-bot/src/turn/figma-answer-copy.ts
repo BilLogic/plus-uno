@@ -2,7 +2,7 @@ import type { TaskCardSource } from "../agent/task-card-readout";
 import { parseFigmaUrl } from "../integrations/figma-reading";
 
 /** Name a read frame from its source, after the judge has finished rewriting.
- * A closing read receipt belongs to Sources; quoted comments stay verbatim. */
+ * Quoted comments stay verbatim. */
 export function figmaAnswerCopy(text: string, sources: readonly TaskCardSource[] = []): string {
   const frames = sources.flatMap((source) => {
     const frame = parseFigmaUrl(source.url);
@@ -18,14 +18,11 @@ export function figmaAnswerCopy(text: string, sources: readonly TaskCardSource[]
   };
   const parts = text.split(/(```[\s\S]*?```|`[^`\n]*`|“[^”]*”|"[^"\n]*"|^\s*>[^\n]*$)/gm);
   return parts
-    .map((part, i) => {
-      if (i % 2) return part;
-      const linked = part.replace(/\[[^\]\n]*\]\((https?:\/\/[^\s)]+)\)|<(https?:\/\/[^|>\s]+)\|[^>\n]*>/g, (match, markdownUrl: string | undefined, slackUrl: string | undefined) => named(markdownUrl ?? slackUrl!, match));
-      // Only the closing unquoted passage can be a retrieval receipt.
-      return i === parts.length - 1
-        ? linked.replace(/(?:^|\s+)I (?:read|checked|fetched) [^\n.!?]*?\bjust now(?:,?\s+so [^\n.!?]*?\bcurrent)?[.!]?\s*$/i, "")
-        : linked;
-    })
+    .map((part, i) =>
+      i % 2
+        ? part
+        : part.replace(/\[[^\]\n]*\]\((https?:\/\/[^\s)]+)\)|<(https?:\/\/[^|>\s]+)\|[^>\n]*>/g, (match, markdownUrl: string | undefined, slackUrl: string | undefined) => named(markdownUrl ?? slackUrl!, match)),
+    )
     .join("")
     .trimEnd();
 }
