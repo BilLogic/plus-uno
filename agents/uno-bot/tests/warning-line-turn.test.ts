@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { runTurn, type DeliveryCall, type Presentation } from "../src/turn/index";
 import { postTextVerified } from "../src/slack/delivery";
 import { harness, request } from "./helpers/turn-harness";
+import { markPartialLookup } from "../src/agent/loop-policy";
 import { recordingPosting } from "./helpers/recording-slack";
 
 type Call = { name: string; args: Record<string, unknown> };
@@ -84,6 +85,24 @@ test("a partial lookup leaves one ⚠️ line, posted as a context line above th
     "_LLM-written · check before acting_",
   ]);
   assert.match(message.text, /\n\n⚠️ Only part of the blueprint results came back, so something may be missing\.$/);
+});
+
+test("a search that hit its own row cap is complete: no ⚠️ line, whatever it matched", async () => {
+  // Live 2026-10-11: three blueprint searches, each capped at its 15 rows by
+  // design, posted "Only part of the blueprint results came back".
+  for (const cap of ["semantic", "max_rows"]) {
+    const { warnings } = await turn([[SEARCH]], {
+      search_blueprint: blueprintRows({ truncated: true, capped_by: cap, matched_total: 31 }),
+    });
+    assert.deepEqual(warnings, [], `capped_by=${cap}`);
+  }
+});
+
+test("a search the budget stopped short still says so", async () => {
+  const { warnings } = await turn([[SEARCH]], {
+    search_blueprint: markPartialLookup(blueprintRows({ truncated: true, capped_by: "semantic" })),
+  });
+  assert.deepEqual(warnings, ["This answer stopped before every lookup finished, so some sources went unchecked."]);
 });
 
 test("a clean turn carries no ⚠️ line", async () => {

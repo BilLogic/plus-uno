@@ -4,7 +4,9 @@
 // CODE WRITES IT FROM WHAT THE TURN ALREADY KNOWS. Eight triggers, each read off
 // a fact the turn holds rather than off the prose:
 //
-//   • partial   a lookup reported `truncated` or `partial`
+//   • partial   a lookup reported `truncated` or `partial` — a read that
+//               stopped short. A result that names the row cap it filled
+//               (`capped_by`) read what it set out to, so it is no trigger
 //   • at least  a chart across lookups drew a value its lookup read only part
 //               of (`atLeast`), named with the count read — which says more
 //               than `partial` does for that lookup, so it takes that line's
@@ -103,6 +105,19 @@ function sourceFailed(result: Record<string, unknown>): boolean {
   if (typeof result.reason === "string" && /unreachable|not_configured|timeout/.test(result.reason)) return true;
   if (typeof result.status === "string" && /failed/.test(result.status)) return true;
   return typeof result.error === "string" && SOURCE_FAILURE.test(result.error);
+}
+
+/**
+ * Did the read stop short of what it set out to read? A `partial` result did;
+ * a `truncated` one did unless it names the row cap it filled (`capped_by`):
+ * a search that returned its top rows by design is whole as far as the reader
+ * is concerned (live 2026-10-11: three blueprint searches capped at 15 rows
+ * each posted "Only part of the blueprint results came back"). The tool still
+ * tells the model there is more than it shows.
+ */
+function stoppedShort(result: Record<string, unknown>): boolean {
+  if (result.partial === true) return true;
+  return result.truncated === true && !(typeof result.capped_by === "string" && result.capped_by);
 }
 
 /** The newest `updatedAt` among a result's rows, in ms, or null. */
@@ -279,7 +294,7 @@ export function warningLog(now: () => number = Date.now): WarningLog {
       // that worked left nothing missing.
       failed.delete(name);
       read.add(source.label);
-      if (result.truncated === true || result.partial === true) {
+      if (stoppedShort(result)) {
         addSource(entry("partial", () => ({ kind: "partial", sources: [] })).sources, source);
       }
       const cutoff = FRESHNESS_CUTOFF_DAYS[name];
