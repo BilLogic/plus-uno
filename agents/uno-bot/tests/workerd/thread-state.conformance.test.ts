@@ -166,6 +166,19 @@ describe("[durable-object] the cut-off alarm", () => {
     return { store, stub, alarm, fire, handed };
   }
 
+  // The one alarm, armed by calls racing each other: the sweep's day-away
+  // wake never replaces the sooner cut-off wake an execution asked for.
+  it("keeps the earliest wake when an execution begins among calls that arm the sweep", async () => {
+    for (let round = 0; round < 6; round++) {
+      const { store, alarm } = fresh();
+      const ref = { channel: "C1", thread: `1700.${round}` };
+      const sweeps = Array.from({ length: 6 }, (_, i) => store.appendHistory(ref, { role: "user", content: `t${i}` }));
+      const begin = store.beginExecution(PROPOSAL);
+      await Promise.all(round % 2 ? [begin, ...sweeps] : [...sweeps, begin]);
+      expect(await alarm(), `round ${round}`).toBeLessThanOrEqual(Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
+    }
+  });
+
   it("is armed just past the cut-off when an execution begins", async () => {
     const { store, alarm } = fresh();
     const before = Date.now();

@@ -160,11 +160,12 @@ export class ThreadState extends DurableObject<Env> {
   }
 
   // Ensure a GC alarm is scheduled. Cheap (one storage read) and idempotent —
-  // called after every write so an idle-then-active DO always has a pending sweep.
-  private async ensureGcAlarm(): Promise<void> {
-    const existing = await this.storage.getAlarm();
+  // called inside every write's transaction, so an idle-then-active DO always
+  // has a pending sweep and the wake commits with the write.
+  private async ensureGcAlarm(txn: Txn): Promise<void> {
+    const existing = await txn.getAlarm();
     if (existing === null) {
-      await this.storage.setAlarm(Date.now() + GC_INTERVAL_MS);
+      await txn.setAlarm(Date.now() + GC_INTERVAL_MS);
     }
   }
 
@@ -172,10 +173,10 @@ export class ThreadState extends DurableObject<Env> {
   // earlier alarm already set is kept, never pushed back by a later one. The
   // alarm that is firing may still read back while its handler runs, and is
   // not a sooner one to keep.
-  private async armAlarmBy(at: number, firing = false): Promise<void> {
-    const existing = await this.storage.getAlarm();
+  private async armAlarmBy(txn: Txn, at: number, firing = false): Promise<void> {
+    const existing = await txn.getAlarm();
     const keep = existing !== null && existing <= at && !(firing && existing <= Date.now());
-    if (!keep) await this.storage.setAlarm(at);
+    if (!keep) await txn.setAlarm(at);
   }
 
   // First, hand over any cut-off run nobody has told, so its requester hears
@@ -220,7 +221,7 @@ export class ThreadState extends DurableObject<Env> {
       const expiryAt = reportExpiryAt(rec, look, now);
       next = Math.min(next, expiryAt <= now ? now + REPORT_EXPIRY_RETRY_MS : expiryAt);
     }
-    if (next !== Infinity) await this.armAlarmBy(next, true);
+    if (next !== Infinity) await this.storage.transaction((txn) => this.armAlarmBy(txn, next, true));
   }
 
   // Delete expired records by their own TTL. Keys: event:{id}
@@ -280,8 +281,8 @@ export class ThreadState extends DurableObject<Env> {
         return Infinity;
       }
       await txn.put(GC_NEXT_KEY, now + GC_INTERVAL_MS);
-      return now + GC_INTERVAL_MS;    });
-
+      return now + GC_INTERVAL_MS;
+    });
   }
 
   // ══ The ThreadState RPC surface ════════════════════════════════════════════
@@ -300,7 +301,7 @@ export class ThreadState extends DurableObject<Env> {
   /** Live turns for a conversation, evicting the record if it has aged out.
    *  Expiry is applied on READ rather than by the GC alarm, so a fresh Durable
    *  Object with no alarm scheduled answers identically. */
-  private async liveTurns(ref: ThreadRef, at: number, store: Storage = this.storage): Promise<HistoryTurn[]> {
+  private async liveTurns(ref: ThreadRef, at: number, store: Txn = this.storage): Promise<HistoryTurn[]> {
     const key = historyKey(ref.channel, ref.thread);
     const rec = await store.get<HistoryRecord>(key);
     if (!rec) return [];
@@ -323,9 +324,9 @@ export class ThreadState extends DurableObject<Env> {
     const turns = await this.storage.transaction(async (txn) => {
       const next = [...(await this.liveTurns(ref, at, txn)), turn].slice(-MAX_HISTORY_TURNS);
       await txn.put<HistoryRecord>(historyKey(ref.channel, ref.thread), { turns: next, updatedAt: at });
+      await this.ensureGcAlarm(txn);
       return next;
     });
-    await this.ensureGcAlarm();
     return { length: turns.length };
   }
 
@@ -384,11 +385,11 @@ export class ThreadState extends DurableObject<Env> {
         const item = proposal.item;
         const rec = await txn.get<ReportRecord>(reportKey(item.messageTs));
         if (rec) await txn.put(reportKey(item.messageTs), { ...rec, deadlines: { ...rec.deadlines, [item.id]: expiresAt } });
+        await this.armAlarmBy(txn, expiresAt);
       }
+      await this.ensureGcAlarm(txn);
       return retired;
     });
-    if (proposal.item) await this.armAlarmBy(expiresAt);
-    await this.ensureGcAlarm();
     return { retired };
   }
 
@@ -439,7 +440,7 @@ export class ThreadState extends DurableObject<Env> {
 
   // Is the card that retired another one still around to be looked at? Its own
   // retirement does not matter: a chain still ends in a live newest card.
-  private async successorIsLive(ts: string, at: number, store: Storage): Promise<boolean> {
+  private async successorIsLive(ts: string, at: number, store: Txn): Promise<boolean> {
     const rec = await store.get<ProposalRecord>(proposalKey(ts));
     return !!rec && at - rec.createdAt <= recordTtlMs(rec);
   }
@@ -531,9 +532,11 @@ export class ThreadState extends DurableObject<Env> {
   // expiry are transactions, so a concurrent decision survives a redraw.
 
   async putReport(report: DecisionReportRecord, at: number): Promise<void> {
-    await this.storage.put<ReportRecord>(reportKey(report.messageTs), { report, createdAt: at });
-    await this.armAlarmBy(at + report.ttlMs + 1);
-    await this.ensureGcAlarm();
+    await this.storage.transaction(async (txn) => {
+      await txn.put<ReportRecord>(reportKey(report.messageTs), { report, createdAt: at });
+      await this.armAlarmBy(txn, at + report.ttlMs + 1);
+      await this.ensureGcAlarm(txn);
+    });
   }
 
   async getReport(messageTs: string, at: number): Promise<DecisionReportRecord | null> {
@@ -584,8 +587,8 @@ export class ThreadState extends DurableObject<Env> {
         await txn.delete(key);
         return null;
       }
-      return rec;    });
-
+      return rec;
+    });
   }
 
   // ----- executions -----
@@ -595,14 +598,12 @@ export class ThreadState extends DurableObject<Env> {
   // in one transaction, so a take has exactly one winner as the claim does.
 
   async beginExecution(proposal: PendingProposal, at: number): Promise<void> {
-    await this.storage.put<Execution>(executionKey(proposal.proposalTs), {
-      proposal,
-      startedAt: at,
-      settled: [],
+    await this.storage.transaction(async (txn) => {
+      await txn.put<Execution>(executionKey(proposal.proposalTs), { proposal, startedAt: at, settled: [] });
+      // Woken just past the cut-off, so a run nobody looks at is still told.
+      // The alarm reads its own clock, so it is armed on that clock too.
+      await this.armAlarmBy(txn, Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
     });
-    // Woken just past the cut-off, so a run nobody looks at is still told.
-    // The alarm reads its own clock, so it is armed on that clock too.
-    await this.armAlarmBy(Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
   }
 
   // The fence: a taken execution is reported to the run that is still settling
@@ -680,15 +681,14 @@ export class ThreadState extends DurableObject<Env> {
   // An owed note is the alarm's to come back for.
   async reportCutOffNote(proposalTs: string, posted: boolean): Promise<CutOffNoteReport> {
     const key = executionKey(proposalTs);
-    const report = await this.storage.transaction(async (txn): Promise<CutOffNoteReport> => {
+    return this.storage.transaction(async (txn): Promise<CutOffNoteReport> => {
       const rec = await txn.get<Execution>(key);
       if (!rec || rec.takenAt === undefined || posted) return "told";
       const after = afterFailedNote(rec);
       await txn.put<Execution>(key, after.record);
+      if (after.report === "owed") await this.armAlarmBy(txn, Date.now() + CUT_OFF_SWEEP_RETRY_MS);
       return after.report;
     });
-    if (report === "owed") await this.armAlarmBy(Date.now() + CUT_OFF_SWEEP_RETRY_MS);
-    return report;
   }
 
   // ----- assistant context -----
@@ -702,8 +702,8 @@ export class ThreadState extends DurableObject<Env> {
         await txn.delete(key);
         return null;
       }
-      return rec.context as AssistantContext;    });
-
+      return rec.context as AssistantContext;
+    });
   }
 
   async putAssistantContext(
@@ -711,11 +711,10 @@ export class ThreadState extends DurableObject<Env> {
     context: AssistantContext,
     at: number,
   ): Promise<void> {
-    await this.storage.put<AssistantContextRecord>(
-      assistantContextKey(ref.channel, ref.thread),
-      { context, updatedAt: at },
-    );
-    await this.ensureGcAlarm();
+    await this.storage.transaction(async (txn) => {
+      await txn.put<AssistantContextRecord>(assistantContextKey(ref.channel, ref.thread), { context, updatedAt: at });
+      await this.ensureGcAlarm(txn);
+    });
   }
 
   // ----- cancel -----
@@ -777,9 +776,9 @@ export class ThreadState extends DurableObject<Env> {
         // a stale lease is no longer evidence the event was handled
       }
       await txn.put<EventRecord>(key, { seenAt: at, status: "done" });
+      await this.ensureGcAlarm(txn);
       return false;
     });
-    if (!seen) await this.ensureGcAlarm();
     return { seen };
   }
 
@@ -794,9 +793,9 @@ export class ThreadState extends DurableObject<Env> {
         // Stale "running" lease → the owner was killed mid-run; reclaim.
       }
       await txn.put<EventRecord>(key, { seenAt: at, status: "running" });
+      await this.ensureGcAlarm(txn);
       return "claimed";
     });
-    if (claim === "claimed") await this.ensureGcAlarm();
     return claim;
   }
 
@@ -814,13 +813,14 @@ export class ThreadState extends DurableObject<Env> {
   // the first is stored.
 
   async claimFiling(key: string, at: number): Promise<FilingClaim> {
-    const { claim, stored } = await this.storage.transaction(async (txn) => {
+    return this.storage.transaction(async (txn) => {
       const { claim, store } = claimedFiling(await txn.get<FilingRecord>(filingKey(key)), at);
-      if (store) await txn.put<FilingRecord>(filingKey(key), store);
-      return { claim, stored: !!store };
+      if (store) {
+        await txn.put<FilingRecord>(filingKey(key), store);
+        await this.ensureGcAlarm(txn);
+      }
+      return claim;
     });
-    if (stored) await this.ensureGcAlarm();
-    return claim;
   }
 
   async settleFiling(key: string, issue: FiledIssue | null, at: number): Promise<void> {
@@ -830,12 +830,13 @@ export class ThreadState extends DurableObject<Env> {
 }
 
 /** What a read-modify-write runs against: the object's storage, or the
- *  transaction it runs inside. */
-type Storage = Pick<DurableObjectStorage, "get" | "put" | "delete">;
+ *  transaction it runs inside — alarm included, so a wake is armed in the
+ *  same commit as the write it belongs to. */
+type Txn = Pick<DurableObjectStorage, "get" | "put" | "delete" | "getAlarm" | "setAlarm">;
 
 // Marked, not deleted: a run that is only slow reads the mark at its next
 // operation and stops. A retake of an owed note keeps the first mark.
-async function markTaken(txn: Storage, rec: Execution, at: number): Promise<void> {
+async function markTaken(txn: Txn, rec: Execution, at: number): Promise<void> {
   const { noteOwed: _owed, ...taken } = rec;
   await txn.put<Execution>(executionKey(rec.proposal.proposalTs), { ...taken, takenAt: rec.takenAt ?? at });
 }
