@@ -253,6 +253,18 @@ describe("the morning run", () => {
     assert.deepEqual(m.marked, [`${DESIGN}:${ROOT}`]);
   });
 
+  it("a promise with no thread to answer in posts nothing at the channel's top, and marks nothing", async () => {
+    const { store } = await sweptPromise();
+    // A reminder only ever answers in the promise's own thread, the team's,
+    // which it marks (above). A row with no thread has nowhere to go.
+    const row = only(store);
+    store.rows.set(row.id, { ...row, threadTs: "" });
+    const m = mornings({ store, now: at(32, 13) });
+    await m.run();
+    assert.equal(m.posts.length, 0);
+    assert.deepEqual(m.marked, []);
+  });
+
   it("with no stated deadline, the nudge names the day of the promise", async () => {
     const { store } = await sweptPromise({ reply: promiseReply({ deadline: null }) });
     // Tue + two working days: due Thursday night, nudged Friday.
