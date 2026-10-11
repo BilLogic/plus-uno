@@ -649,10 +649,10 @@ describe("deciding a weekly card in its Review", () => {
   /** The morning's report posted onto a ThreadState, and a review door whose
    *  Approve runs the card's intake, and whose Needs changes disputes it, on a
    *  fake repo. */
-  async function decided() {
+  async function decided(issues: Issue[] = []) {
     const posted = postDeps(await weekReport());
     await postPrecedenceReport(posted.deps);
-    const gh = github([], posted.store);
+    const gh = github(issues, posted.store);
     const updates: Array<{ ts: string; message: CardMessage }> = [];
     const said: string[] = [];
     const views = recordingViews({ alreadyOpen: ["V1"] });
@@ -703,8 +703,26 @@ describe("deciding a weekly card in its Review", () => {
     const [button, tree] = cardsIn(updates.at(-1)!.message.blocks);
     assert.match(tree!.subtitle!.text, /^Approved by <@U0MEMBER1> · written /);
     assert.match(button!.subtitle!.text, /^Approved by <@U0MEMBER2> · written /);
-    assert.equal(button!.body.text, "Written: added to this week's DS precedence intake.");
+    assert.equal(tree!.body.text, "Written: added to DS precedence intake #1101.");
+    assert.equal(button!.body.text, "Written: added to DS precedence intake #1101.");
     assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+  });
+
+  it("names the existing intake found at write time, rather than the draft's destination", async () => {
+    const { decide, gh, updates } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
+    await decide("Button", "confirm", MEMBERS[0]!);
+    assert.equal(gh.created.length, 0);
+    assert.equal(gh.comments[0]!.issue_number, 1090);
+    assert.equal(cardsIn(updates.at(-1)!.message.blocks)[0]!.body.text, "Written: added to DS precedence intake #1090.");
+  });
+
+  it("keeps a failed write as not written even if its result carries a receipt", async () => {
+    const { decide, gh, updates } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
+    gh.deps.comment = async () => JSON.stringify({ ok: false, error: "GitHub unavailable", report_done: "added to intake #1090." });
+    await decide("Button", "confirm", MEMBERS[0]!);
+    const button = cardsIn(updates.at(-1)!.message.blocks)[0]!;
+    assert.match(button.subtitle!.text, /not written/);
+    assert.equal(button.body.text, "Nothing written.");
   });
 
   it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Noted by", async () => {

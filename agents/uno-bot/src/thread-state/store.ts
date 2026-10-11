@@ -410,7 +410,7 @@ export interface ReportItem {
 export type ReportItemState =
   | { kind: "open" }
   | { kind: "changes-asked"; by: string }
-  | { kind: "approved"; by: string; at: number; as?: ChosenAs }
+  | { kind: "approved"; by: string; at: number; as?: ChosenAs; done?: string }
   | { kind: "failed"; by: string; at: number; reason: string; as?: ChosenAs }
   | { kind: "rejected"; by: string; reason?: string; as?: ChosenAs }
   /** A note written to the report's record closes the item. */
