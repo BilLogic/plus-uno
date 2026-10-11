@@ -155,9 +155,11 @@ export interface CardReads {
   botUserId(): Promise<string | null>;
 }
 
-/** Who is who, across Notion and Slack; null when not exactly one person. */
+/** Who is who, across Notion and Slack; null when not exactly one person.
+ *  The Team Members directory is asked first (`./people.ts`). */
 export interface CardPeople {
-  slackIdForNotionUser(notionUserId: string): Promise<string | null>;
+  /** `name`, when the caller already has it, saves reading the Notion user. */
+  slackIdForNotionUser(notionUserId: string, name?: string): Promise<string | null>;
   slackIdForName(name: string): Promise<string | null>;
   notionUserForSlack(slackUserId: string): Promise<string | null>;
 }
@@ -202,7 +204,7 @@ export interface ScanSkips {
 
 export interface ScanDeps extends Pick<JobContext, "runDate"> {
   reads: Pick<CardReads, "activeCards" | "lastCommentAt" | "botUserId">;
-  people: Pick<CardPeople, "slackIdForNotionUser" | "slackIdForName">;
+  people: Pick<CardPeople, "slackIdForNotionUser">;
   store: CommitmentStore;
   skips?: ScanSkips;
   config: FollowThroughConfig;
@@ -308,10 +310,16 @@ async function scanCard(
     skips[id] = now + SKIP_RECHECK_MS;
     return null;
   }
-  const people = await ownersOf(card, condition, deps.people);
+  const { people, unmatched } = await ownersOf(card, condition, deps.people);
+  const who = condition === "unowned" ? "creator" : "Contributor";
+  if (unmatched.length) {
+    // Logged by name, never dropped silently; the card names them too.
+    console.warn(`[follow-through] ${card.pageId}: ${who} not found in Slack: ${unmatched.join(", ")}`);
+    if (people.length) notes.push(`${card.pageId}: ${who} not found in Slack: ${unmatched.join(", ")}`);
+  }
   if (!people.length) {
     // Never a default to the lead: nobody to ask is no message.
-    notes.push(`${card.pageId}: no ${condition === "unowned" ? "creator" : "Contributor"} found in Slack`);
+    notes.push(`${card.pageId}: no ${who} found in Slack${unmatched.length ? `: ${unmatched.join(", ")}` : ""}`);
     skips[id] = now + SKIP_RECHECK_MS;
     return null;
   }
@@ -347,7 +355,13 @@ async function scanCard(
   // which expires, never a row with no wording, which would lapse unasked.
   await deps.store.saveText(
     id,
-    { what: card.title, bodies: {}, mentions: people.slice(1), card: { title: card.title, url: card.url, status: card.designStatus } },
+    {
+      what: card.title,
+      bodies: {},
+      mentions: people.slice(1),
+      card: { title: card.title, url: card.url, status: card.designStatus },
+      ...(unmatched.length ? { unmatched } : {}),
+    },
     now + TEXT_KEEP_MS,
   );
   await deps.store.addCommitments([row]);
@@ -365,18 +379,27 @@ function cardPlace(card: Pick<ActiveCard, "url" | "title" | "pillars">, config: 
   return place && place.channel !== config.unoBot ? place.channel : null;
 }
 
-/** F4 asks the card's creator; F5 its Contributors, in the card's order. */
-async function ownersOf(card: ActiveCard, condition: CardCondition, people: ScanDeps["people"]): Promise<string[]> {
+/** F4 asks the card's creator; F5 its Contributors, in the card's order —
+ *  each through the directory, then by name. `unmatched` names who neither
+ *  found (a creator, whose name the card does not carry, by Notion user id). */
+async function ownersOf(
+  card: ActiveCard,
+  condition: CardCondition,
+  people: ScanDeps["people"],
+): Promise<{ people: string[]; unmatched: string[] }> {
   if (condition === "unowned") {
-    const creator = card.creatorId ? await people.slackIdForNotionUser(card.creatorId) : null;
-    return creator ? [creator] : [];
+    if (!card.creatorId) return { people: [], unmatched: [] };
+    const creator = await people.slackIdForNotionUser(card.creatorId);
+    return creator ? { people: [creator], unmatched: [] } : { people: [], unmatched: [card.creatorId] };
   }
   const ids: string[] = [];
+  const unmatched: string[] = [];
   for (const c of card.contributors) {
-    const id = await people.slackIdForName(c.name);
-    if (id && !ids.includes(id)) ids.push(id);
+    const id = await people.slackIdForNotionUser(c.id, c.name);
+    if (!id) unmatched.push(c.name || c.id);
+    else if (!ids.includes(id)) ids.push(id);
   }
-  return ids;
+  return { people: ids, unmatched };
 }
 
 // ── End of day: card to-dos (F3) ─────────────────────────────────────────────
@@ -826,7 +849,7 @@ async function askFor(deps: DueDeps, c: CommitmentRecord, text: CommitmentText, 
         c,
         text,
         people,
-        item: staleItem({ id: c.id, people, card, to }),
+        item: staleItem({ id: c.id, people, card, to, unmatched: text.unmatched ?? [] }),
         card: statedCard(`move this card to ${to}`, staleReviewLead(card, to), statusOperation(card, to)),
         choices: staleChoices(now + STALE_AFTER_MS, drop),
         selects: [{ path: "properties.Design Status", label: "Design Status", source: { database: "roadmap", property: "Design Status" } }],

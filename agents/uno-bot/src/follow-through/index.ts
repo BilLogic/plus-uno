@@ -8,3 +8,4 @@ export * from "./rules";
 export * from "./copy";
 export * from "./todo";
 export * from "./run";
+export * from "./people";
