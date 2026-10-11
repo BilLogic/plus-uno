@@ -86,6 +86,7 @@ import { cachedReads, checkDecision, isFigmaKind, type FileReads } from "./check
 import type { FrameJudge } from "./judge";
 import { draftIntake, matchPillar, pillarCandidates } from "./draft";
 import { askGroupOf, type FileDriftFinding } from "./finding";
+import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
 
 /** Reports with cards per morning; files whose card would be past it wait. */
 export const MAX_REPORTS_PER_MORNING = 4;
@@ -118,9 +119,11 @@ const WITHDRAWAL_COST = { subrequests: 5, d1Queries: 1 };
  *
  * @param result - The file's `/versions` body
  */
-export function publisherOf(result: FigmaVersionsResponse): { handle: string; at: string } | null {
+export function publisherOf(result: FigmaVersionsResponse): { handle: string; at: string; userId?: string } | null {
   const [newest] = versionsFrom(result);
-  return newest && newest.user !== "Unknown" ? { handle: newest.user, at: newest.createdAt } : null;
+  if (!newest || newest.user === "Unknown") return null;
+  const userId = result.versions?.find((v) => v.id === newest.id)?.user?.id;
+  return { handle: newest.user, at: newest.createdAt, ...(userId ? { userId } : {}) };
 }
 
 /** Where one file's intake is drafted, while its card may be live. */
@@ -248,6 +251,9 @@ export interface DriftPostDeps {
   judge?: FrameJudge;
   /** The Roadmap's Product Pillar options, or null when unread. */
   pillarOptions(): Promise<string[] | null>;
+  /** The Team Members directory's Figma user id → Slack id map, so a card can
+   *  @-mention its file's publisher. Without one, no publisher is mentioned. */
+  figmaPeople?(): Promise<FigmaPeople>;
   config: TeamChannels & { unoBot?: string };
   meter?: { headroom(): { subrequests: number; d1Queries: number } };
   now(): number;
@@ -513,6 +519,8 @@ interface Drafted {
   lane: FileDriftFinding["lane"];
   /** Why its Product Pillar was left off, or null. */
   note: string | null;
+  /** Its file's last publisher as a Slack id, when the directory maps them. */
+  publisher: string | null;
 }
 
 /**
@@ -567,6 +575,7 @@ async function askWithCards(
     if (link) permalinks[f.id] = link;
   }
   let options: Promise<string[] | null> | undefined;
+  let people: Promise<FigmaPeople> | undefined;
   const drafted: Drafted[] = [];
   for (const [i, d] of groups.entries()) {
     const f = d.here;
@@ -587,7 +596,25 @@ async function askWithCards(
           )
         : { pillar: null, note: null };
     const intake = draftIntake({ findings: d.all, pillar: choice.pillar, publisher, permalinks });
-    drafted.push({ ...d, id: String(i + 1), operation: intake.operation, lane: intake.lane, note: choice.note ? pillarNote(choice.note) : null });
+    // A publisher the directory maps is @-mentioned; one it does not, never.
+    const publisherSlack =
+      publisher?.userId && deps.figmaPeople
+        ? slackPersonOfFigma(
+            publisher.userId,
+            await (people ??= deps.figmaPeople()).catch((err: unknown) => {
+              rethrowIfBudget(err);
+              return {};
+            }),
+          )
+        : null;
+    drafted.push({
+      ...d,
+      id: String(i + 1),
+      operation: intake.operation,
+      lane: intake.lane,
+      note: choice.note ? pillarNote(choice.note) : null,
+      publisher: publisherSlack,
+    });
   }
   // Files this thread discussed whose intake is drafted elsewhere: a pointer each.
   const elsewhere = t.findings.filter((f) => !t.drafts.includes(askGroupOf(f)));
@@ -596,7 +623,7 @@ async function askWithCards(
     ...elsewhere.map((f) => elsewhereLine(f.target, linkFor(askGroupOf(f), cardLinks))),
   ].join("\n");
   const report = decisionReport(
-    drafted.map((d) => driftItem({ id: d.id, ...wordsOf(d.here, look), owner: d.here.owner || null, lane: d.lane })),
+    drafted.map((d) => driftItem({ id: d.id, ...wordsOf(d.here, look), owner: d.here.owner || null, publisher: d.publisher, lane: d.lane })),
     parent,
   );
   const ask: DriftAskReport = {
@@ -653,7 +680,8 @@ async function askWithCards(
       // Nobody asked: the Worker staged it.
       requesterUserId: "",
       ttlMs: DRIFT_CARD_TTL_MS,
-      confirmers: [...new Set(d.all.flatMap((f) => [f.owner, ...f.participants]).filter(Boolean))],
+      // The publisher a card mentions may answer it too.
+      confirmers: [...new Set([...d.all.flatMap((f) => [f.owner, ...f.participants]), d.publisher ?? ""].filter(Boolean))],
       // Nobody asked, so the gate's "ask me again" lines would be wrong.
       stated: driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000),
       choices: driftChoices(),

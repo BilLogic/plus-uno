@@ -106,7 +106,7 @@ export interface FigmaVersionsResponse {
     label?: string | null;
     description?: string | null;
     created_at: string;
-    user?: { handle?: string };
+    user?: { handle?: string; id?: string };
   }[];
 }
 
