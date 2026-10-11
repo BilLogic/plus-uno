@@ -419,6 +419,19 @@ export const TOOL_TABLE = {
       nouns: ["intake", "issue", "precedence"],
     },
   },
+  // A weekly Figma tidy-up card's one operation (src/figma-tidy/): "Leave as
+  // is" keeps the item quiet until the file's cards change. The Worker stages
+  // it; the model is never offered it.
+  figma_tidy_up: {
+    access: "worker",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "leave this file as is",
+      kind: "leave a file as is",
+      nouns: ["tidy-up", "file", "item"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 

@@ -182,9 +182,10 @@ const RUN_HOURS: Record<ScheduledRunName, number> = {
  *  teams is 36 listings, a job may make 38, and a third is room to spare. */
 export const BACKSTOP_JOBS = 3;
 
-/** Jobs Monday's morning run gives the Figma tidy-up's listing: about 30
- *  listings, a job may make 38, and a second is room to spare. */
-export const TIDY_JOBS = 2;
+/** Jobs Monday's morning run gives the Figma tidy-up's reads: about 30
+ *  listings, a job may make 38, then two page reads for each changed file
+ *  while the rest last — about 15 files a job. */
+export const TIDY_JOBS = 5;
 
 /** Monday and Friday, as `Date.getUTCDay` numbers them. */
 const MONDAY = 1;

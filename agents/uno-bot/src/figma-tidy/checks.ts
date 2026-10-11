@@ -10,6 +10,10 @@
 //     a likely card by the file's project name.
 //   • NO ACTIVE CARD — a title naming no card, on a file that isn't a library,
 //     template or reference kit and isn't in Archive.
+//   • TITLE — the file's page names or Cover text name a Roadmap card its
+//     title leaves out. The post writes out the whole title to paste, the
+//     missing cards added to its `Card` segment. A file whose pages name a
+//     Roadmap card is on that card, so it is not told to go to Archive.
 //
 // Left out: MISC's files and every `/ Marketing /` file (#891), and a file in
 // a folder that is not one of the five stage folders, whose stage nothing
@@ -26,7 +30,7 @@ import { cardNumbersOf } from "../figma-comments/title";
 export const STAGES = ["Playground", "WIP", "Under-Dev", "Specs", "Archive"] as const;
 export type Stage = (typeof STAGES)[number];
 
-export type TidyCheck = "wrong-folder" | "unknown-card" | "no-active-card";
+export type TidyCheck = "wrong-folder" | "unknown-card" | "no-active-card" | "title";
 
 /** A team's folder, as the read lists it. */
 export interface TidyFolder {
@@ -41,6 +45,8 @@ export interface TidyFile {
   folderId: string;
   key: string;
   name: string;
+  /** Figma's `last_modified`: when the file's pages are read again. */
+  modified?: string;
 }
 
 /** A Roadmap card, as the checks read it. `owner` is its design owner's Slack id. */
@@ -66,6 +72,8 @@ export interface TidyFinding {
   known?: TidyCard;
   /** Where it belongs, as the team's folder; null when the team has none by that stage. */
   moveTo?: { stage: Stage; folder: TidyFolder | null };
+  /** The title to paste, for a title finding. */
+  retitle?: { title: string; missing: number[] };
   /** Who the reply mentions; null for the unassigned reply. */
   owner: string | null;
 }
@@ -139,15 +147,69 @@ export function projectWords(project: string): string[] {
   return [...new Set(project.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3))];
 }
 
+/** A file's title cards, as a skip remembers them: a change to these opens it again. */
+export function cardKey(name: string): string {
+  return [...cardNumbersOf(name)].sort((a, b) => a - b).join(",");
+}
+
+/** What a skip is kept under: the file and the check, whatever the card. */
+export function skipKeyOf(fileKey: string, check: TidyCheck): string {
+  return `${fileKey}|${check}`;
+}
+
 export function fingerprintOf(fileKey: string, check: TidyCheck, card: number | null): string {
   return `${fileKey}|${check}|${card ?? "-"}`;
 }
 
-/** The card numbers every checked file names, each once: what the post asks the Roadmap for. */
-export function cardsNamed(files: readonly TidyFile[], folders: readonly TidyFolder[]): number[] {
+/** The card numbers every checked file names, in its title or its pages, each once: what the post asks the Roadmap for. */
+export function cardsNamed(files: readonly TidyFile[], folders: readonly TidyFolder[], refs: TidyRefsByFile = {}): number[] {
   const out = new Set<number>();
-  for (const f of checkedFiles(files, folders)) for (const n of cardNumbersOf(f.file.name)) out.add(n);
+  for (const f of checkedFiles(files, folders)) for (const n of [...cardNumbersOf(f.file.name), ...(refs[f.file.key] ?? [])]) out.add(n);
   return [...out];
+}
+
+/** The cards each file's page names and Cover text name, by file key. */
+export type TidyRefsByFile = Readonly<Record<string, readonly number[]>>;
+
+/**
+ * The card numbers a piece of text names as `Card <n>`, `Card #<n>` or
+ * `Cards <n> & <m>`, in order, each once. A bare number is not a card: page
+ * names carry dates and sizes.
+ *
+ * @param text - A page's name, or a text layer's characters
+ */
+export function cardRefsIn(text: string): number[] {
+  const out: number[] = [];
+  for (const m of text.matchAll(/\bcards?\s*#?\s*\d+(?:\s*(?:&|,|and)\s*#?\s*\d+)*/gi)) {
+    for (const d of m[0].matchAll(/\d+/g)) {
+      const n = Number(d[0]);
+      if (n > 0 && !out.includes(n)) out.push(n);
+    }
+  }
+  return out;
+}
+
+/**
+ * The title with these cards added to its `Card` segment, or a `Card`
+ * segment put after the project when it has none.
+ *
+ * @param name - The file's title
+ * @param cards - Every card the title should name, in order
+ */
+export function retitled(name: string, cards: readonly number[]): string {
+  const segments = name.split("/").map((s) => s.trim());
+  const cardSegment = `Card ${cards.join(" & ")}`;
+  const at = segments.findIndex((s, i) => i > 0 && cardNumbersOf(`x / ${s}`).length > 0);
+  if (at >= 0) segments[at] = cardSegment;
+  else segments.splice(1, 0, cardSegment);
+  return segments.join(" / ");
+}
+
+/** The files whose pages the title check reads: those checked, outside Archive, and not a kit. */
+export function pageReadFiles(files: readonly TidyFile[], folders: readonly TidyFolder[]): TidyFile[] {
+  return checkedFiles(files, folders)
+    .filter((f) => f.stage !== "Archive" && !isKit(f.file.name))
+    .map((f) => f.file);
 }
 
 /** The files the checks look at, each with its folder and that folder's stage. */
@@ -166,13 +228,36 @@ function checkedFiles(files: readonly TidyFile[], folders: readonly TidyFolder[]
  * @param folders - Every listed folder
  * @param cards - The Roadmap's cards for the numbers the titles name
  */
-export function tidyFindings(files: readonly TidyFile[], folders: readonly TidyFolder[], cards: readonly TidyCard[]): TidyFinding[] {
+export function tidyFindings(
+  files: readonly TidyFile[],
+  folders: readonly TidyFolder[],
+  cards: readonly TidyCard[],
+  refs: TidyRefsByFile = {},
+): TidyFinding[] {
   const out: TidyFinding[] = [];
   const stageFolder = (team: string, stage: Stage) =>
     folders.find((f) => f.team === team && stageOfFolder(f.name) === stage) ?? null;
   for (const { file, folder, stage } of checkedFiles(files, folders)) {
     const numbers = cardNumbersOf(file.name);
+    const missing = (refs[file.key] ?? [])
+      .filter((n) => !numbers.includes(n))
+      .flatMap((n) => cards.find((c) => c.number === n) ?? [])
+      .sort((a, b) => a.number - b.number);
+    if (missing.length) {
+      const lead = numbers.map((n) => cards.find((c) => c.number === n)).find((c) => c?.owner);
+      out.push({
+        fingerprint: fingerprintOf(file.key, "title", missing[0]!.number),
+        check: "title",
+        file,
+        folder,
+        card: missing[0]!.number,
+        known: missing[0]!,
+        retitle: { title: retitled(file.name, [...numbers, ...missing.map((c) => c.number)]), missing: missing.map((c) => c.number) },
+        owner: lead?.owner ?? missing.find((c) => c.owner)?.owner ?? null,
+      });
+    }
     if (!numbers.length) {
+      if (missing.length) continue;
       if (stage !== "Archive" && !isKit(file.name)) {
         out.push({
           fingerprint: fingerprintOf(file.key, "no-active-card", null),

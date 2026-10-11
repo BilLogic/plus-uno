@@ -20,8 +20,11 @@ import {
   type TidyListing,
   type TidyMemory,
   type TidyPostDeps,
+  type TidyRefs,
+  type TidySkips,
 } from "../src/figma-tidy/run";
 import { likelyCard, projectWords } from "../src/figma-tidy/checks";
+import { leaveAsIs } from "../src/figma-tidy/run";
 import { tidyChannel } from "../src/figma-tidy/env";
 import type { Env } from "../src/types";
 import { planRun, TIDY_JOBS } from "../src/scheduled/runs";
@@ -99,6 +102,8 @@ function postWorld(opts: {
   cards?: TidyCard[];
   likely?: Record<string, TidyCard>;
   memory?: TidyMemory | null;
+  refs?: TidyRefs | null;
+  skips?: TidySkips | null;
   store?: ThreadState;
   runDate?: string;
   now?: number;
@@ -109,10 +114,14 @@ function postWorld(opts: {
   const marked: string[] = [];
   const memory = box<TidyMemory | null>(opts.memory ?? null);
   const list = box<TidyListing | null>(listing(opts.files));
+  const refs = box<TidyRefs | null>(opts.refs ?? null);
+  const skips = box<TidySkips | null>(opts.skips ?? null);
   let n = 0;
   const deps: TidyPostDeps = {
     listing: list.store,
     memory: memory.store,
+    refs: refs.store,
+    skips: skips.store,
     roadmap: {
       cards: async (numbers) => (opts.cards ?? []).filter((c) => numbers.includes(c.number)),
       likely: async (project) => opts.likely?.[project] ?? null,
@@ -134,7 +143,7 @@ function postWorld(opts: {
     runDate: opts.runDate ?? RUN_DATE,
     now: () => opts.now ?? NOW,
   };
-  return { deps, posts, staged, memory, list, store, marked };
+  return { deps, posts, staged, memory, list, store, marked, skips };
 }
 
 type Card = {
@@ -276,6 +285,74 @@ describe("the checks, each case", () => {
   });
 });
 
+describe("the title check", () => {
+  const refs = (cards: number[], modified = "2026-10-01T00:00:00Z"): TidyRefs => ({ F1: { modified, cards } });
+
+  it("a title missing a card its pages or Cover reference gets the exact suggested title", async () => {
+    const w = postWorld({
+      files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")],
+      cards: [card(733, "WIP", "U0SARAH"), card(812, "WIP", "U0MERYEM"), card(1002, "WIP", null)],
+      refs: refs([1002, 733, 812]),
+    });
+    await runTidyPost(w.deps);
+    assert.equal(w.posts.length, 2);
+    assert.match(JSON.stringify(w.posts[1]!.blocks![0]), /<@U0SARAH>, 1 of your files needs a tidy\./);
+    const [c] = cardsIn(w.posts[1]!.blocks!);
+    assert.equal(c!.subtitle!.text, "Title misses a card · Card 812");
+    assert.equal(
+      c!.body.text,
+      'Its pages or Cover name Card 812 and Card 1002, which the title leaves out. Rename it to "AI Indicator / Card 733 & 812 & 1002 / Sarah".',
+    );
+    assert.deepEqual(c!.actions.map((a) => a.text.text), ["Review", "Open file", "Card 812"]);
+  });
+
+  it("a card the Roadmap doesn't have, or one the title already names, is not suggested", async () => {
+    const w = postWorld({
+      files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")],
+      cards: [card(733, "WIP", "U0SARAH")],
+      refs: refs([733, 4444]),
+    });
+    await runTidyPost(w.deps);
+    assert.deepEqual(w.posts, []);
+  });
+
+  it("a title naming no card gets one, and is not told to go to Archive when its pages name an active card", async () => {
+    const w = postWorld({
+      files: [file("u-wip", "F1", "Onboarding / Sarah")],
+      cards: [card(812, "WIP", "U0MERYEM")],
+      refs: refs([812]),
+    });
+    await runTidyPost(w.deps);
+    const all = w.posts.slice(1).flatMap((p) => cardsIn(p.blocks!));
+    assert.equal(all.length, 1);
+    assert.match(all[0]!.body.text, /Rename it to "Onboarding \/ Card 812 \/ Sarah"\.$/);
+    assert.match(JSON.stringify(w.posts[1]!.blocks![0]), /<@U0MERYEM>/);
+  });
+});
+
+describe("an item left as is", () => {
+  const files = [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")];
+  const cards = [card(733, "Shipped", "U0SARAH"), card(734, "Shipped", "U0SARAH")];
+
+  it("is silenced on later runs, and not counted open", async () => {
+    const w = postWorld({ files, cards, skips: { "F1|wrong-folder": "733" } });
+    const result = await runTidyPost(w.deps);
+    assert.deepEqual(w.posts, []);
+    assert.equal(result.summary, "nothing to tidy");
+  });
+
+  it("opens again once the file's card changes, and is forgotten", async () => {
+    const w = postWorld({
+      files: [file("u-wip", "F1", "AI Indicator / Card 734 / Sarah")],
+      cards,
+      skips: { "F1|wrong-folder": "733", "F9|title": "1" },
+    });
+    await runTidyPost(w.deps);
+    assert.equal(cardsIn(w.posts[1]!.blocks!)[0]!.subtitle!.text, "Wrong folder · Card 734");
+    assert.deepEqual(w.skips.b.value, { "F9|title": "1" });
+  });
+});
+
 describe("the post", () => {
   const many = (n: number, owner: string, base: number) =>
     Array.from({ length: n }, (_, i) => ({ f: file("u-wip", `${owner}${i}`, `P${base + i} / Card ${base + i} / x`), c: card(base + i, "Shipped", owner) }));
@@ -315,7 +392,7 @@ describe("the post", () => {
       p!.choices!.map((c) => [c.label, c.verdict]),
       [
         ["Moved it", "cancel"],
-        ["Leave as is", "cancel"],
+        ["Leave as is", "confirm"],
       ],
     );
     assert.match(p!.proposalText, /Move it to Universal › 📐 Specs/);
@@ -443,12 +520,19 @@ describe("answering a card in its Review", () => {
     assert.match(c!.subtitle!.text, /<@U0SARAH>/);
   });
 
-  it("Leave as is closes it as left, and writes nothing", async () => {
+  it("Leave as is runs the card's one operation, which keeps the item quiet until the file's cards change", async () => {
     const { answer, updates, ran } = await answered();
     await answer("leave");
-    assert.deepEqual(ran, []);
+    assert.deepEqual(ran, [{ toolName: "figma_tidy_up", input: { file_key: "F1", check: "wrong-folder", card: 733, cards: "733" } }]);
     const [c] = cardsIn(updates.at(-1)!.message.blocks);
     assert.match(c!.subtitle!.text, /Left as is/);
+    assert.equal(c!.body.text, "Not raised again until the file's cards change.");
+
+    const skips = box<TidySkips | null>({ "F2|title": "9" });
+    const result = JSON.parse(await leaveAsIs(skips.store, (ran[0] as { input: Record<string, unknown> }).input)) as { ok: boolean };
+    assert.equal(result.ok, true);
+    assert.deepEqual(skips.b.value, { "F2|title": "9", "F1|wrong-folder": "733" });
+    assert.equal(JSON.parse(await leaveAsIs(skips.store, { file_key: "F1" })).ok, false, "an input without its check is refused");
   });
 
   it("only a channel member can answer", async () => {
@@ -485,9 +569,11 @@ describe("the read", () => {
           headroom -= 3;
           return figma.folderFiles(id);
         },
+        file: (key: string) => figma.file(key),
       },
       teams: [UNIVERSAL, MISC],
       listing: store.store,
+      refs: box<TidyRefs | null>(null).store,
       meter: { headroom: () => ({ subrequests: headroom }) },
       runDate: RUN_DATE,
     };
@@ -501,6 +587,76 @@ describe("the read", () => {
     assert.deepEqual(store.b.value!.folders.map((f) => f.team), Array(5).fill("Universal"), "MISC is never listed");
     const third = await runTidyRead(deps);
     assert.equal(third.listed, 0, "a finished week lists nothing more");
+  });
+
+  it("reads a changed file's page names and Cover text for the cards they name, once per change, within the job's budget", async () => {
+    const figma = createInMemoryFigma();
+    figma.seedTeam(UNIVERSAL.id, [FOLDERS[1]!, FOLDERS[4]!]);
+    const at = "2026-10-01T00:00:00Z";
+    figma.seedFolder("u-wip", [
+      { key: "F1", name: "AI Indicator / Card 733 / Sarah", last_modified: at },
+      { key: "F2", name: "Other / Card 5 / Sarah", last_modified: at },
+      { key: "F3", name: "Third / Card 6 / Sarah", last_modified: at },
+      { key: "K", name: "Design System (S23)", last_modified: at },
+    ]);
+    figma.seedFolder("u-arch", [{ key: "A", name: "Old / Card 1 / Sarah", last_modified: at }]);
+    const page = (id: string, name: string, children: unknown[] = []) => ({ id, name, type: "CANVAS", children });
+    figma.seedFile("F1", {
+      document: {
+        type: "DOCUMENT",
+        children: [
+          page("0:1", "- - - 🖼️ Cover - - -", [
+            { id: "1:1", type: "FRAME", name: "Cover", children: [{ id: "1:2", type: "TEXT", characters: "Cards 733 & 812" }] },
+          ]),
+          page("0:2", "- - - 📐 Specs - - -", [{ id: "2:1", type: "TEXT", characters: "Card 4040 is not on the Cover" }]),
+          page("0:3", "Card 1002 flows"),
+        ],
+      } as never,
+    });
+    figma.seedFile("F2", { document: { type: "DOCUMENT", children: [page("0:1", "Flows")] } as never });
+    figma.seedFile("F3", { document: { type: "DOCUMENT", children: [page("0:1", "Card 9 flows")] } as never });
+    const listingStore = box<TidyListing | null>(null);
+    const refs = box<TidyRefs | null>({ F2: { modified: at, cards: [] }, GONE: { modified: at, cards: [1] } });
+    let headroom = 100;
+    const deps = {
+      figma: {
+        teamFolders: (id: string) => figma.teamFolders(id),
+        folderFiles: (id: string) => figma.folderFiles(id),
+        file: async (key: string, o?: { depth?: number; ids?: readonly string[] }) => {
+          headroom -= 3;
+          return figma.file(key, o);
+        },
+      },
+      teams: [UNIVERSAL],
+      listing: listingStore.store,
+      refs: refs.store,
+      meter: { headroom: () => ({ subrequests: headroom }) },
+      runDate: RUN_DATE,
+    };
+    // The listing first, with no room for any page read.
+    headroom = 5;
+    let lists = 0;
+    deps.figma.folderFiles = (id: string) => {
+      lists += 1;
+      return figma.folderFiles(id);
+    };
+    while (listingStore.b.value?.tasks.length !== 0) {
+      headroom = 5;
+      await runTidyRead(deps);
+    }
+    assert.equal(figma.calls().filter((c) => c.method === "file").length, 0);
+    headroom = 3 * 3; // one file's two reads, and no third
+    const first = await runTidyRead(deps);
+    assert.deepEqual(refs.b.value, { F1: { modified: at, cards: [1002, 733, 812] }, F2: { modified: at, cards: [] } }, "a file the listing no longer has is forgotten");
+    assert.match(first.summary, /next job/);
+    headroom = 100;
+    await runTidyRead(deps);
+    assert.deepEqual((refs.b.value as TidyRefs).F3, { modified: at, cards: [9] });
+    const read = figma.calls().filter((c) => c.method === "file").map((c) => c.args[0]);
+    assert.deepEqual(read, ["F1", "F1", "F3"], "unchanged, Archive and kit files are not read; a file with no Cover is one read");
+    await runTidyRead(deps);
+    assert.equal(figma.calls().filter((c) => c.method === "file").length, 3, "a finished week reads nothing more");
+    assert.ok(lists > 0);
   });
 
   it("is planned in Monday's morning run only, the post after every read", () => {
