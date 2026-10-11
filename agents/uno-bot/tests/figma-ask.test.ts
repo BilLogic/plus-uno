@@ -449,6 +449,41 @@ describe("a change request", () => {
     assert.deepEqual(histories[1], [], "the unmapped asker's turn reads no teammate turn");
   });
 
+  it("a teammate's change to the screen stages one proposal from the write the turn calls, and the reply links its card", async () => {
+    const w = world({
+      replies: [
+        { text: "Drafting it.", toolCalls: [{ name: "notion_update", args: { page_url: "https://www.notion.so/card-2482", append: "Heading: Your schedule" } }] },
+      ],
+    });
+    await ask(w, comment("100", '@uno change the heading on this screen to "Your schedule"'));
+    assert.equal(w.leads.length, 1);
+    assert.equal(w.cards.length, 1);
+    assert.equal(w.cards[0]!.stagedCards.length, 1);
+    const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
+    assert.equal(staged!.toolName, "notion_update");
+    assert.match(w.replies()[0]!.message, /^🐐 le goat \(uno-bot\) · AI-generated\nI drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
+  });
+
+  it("tells a teammate's turn to propose a change with the write that fits, and a stranger's to propose none", async () => {
+    const scopes: string[] = [];
+    const w = world();
+    const answer = w.deps.answer;
+    w.deps.answer = (request, delivery, asker) => {
+      scopes.push(request.scopeInstruction ?? "");
+      return answer(request, delivery, asker);
+    };
+    await ask(w, comment("100", "@uno the built screen lists sessions oldest first"));
+    await ask(w, comment("200", "@uno the built screen lists sessions oldest first", { user: STRANGER }));
+    const [teammate, stranger] = scopes;
+    assert.match(teammate!, /change they ask for[^.]*is a proposal/i);
+    assert.match(teammate!, /design change[^;]*`notion_update`/);
+    assert.match(teammate!, /built product[^;]*`github_issue_create`/);
+    assert.match(teammate!, /component[^.]*`component_implement`/);
+    assert.doesNotMatch(teammate!, /nothing is written/i);
+    assert.match(stranger!, /propose no change/);
+    assert.doesNotMatch(stranger!, /notion_update|github_issue_create/);
+  });
+
   it("an unmapped asker's turn runs with the narrower tools, and a teammate's does not", async () => {
     const w = world();
     await ask(w, comment("100", "@uno when does the bar show?", { user: STRANGER }));

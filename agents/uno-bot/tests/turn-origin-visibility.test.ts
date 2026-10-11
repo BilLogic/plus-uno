@@ -341,13 +341,14 @@ describe("a figma turn for an asker Team Members does not map reads public facts
     for (const name of names) {
       assert.equal(TOOL_TABLE[name as keyof typeof TOOL_TABLE].access, "ungated", name);
     }
-    for (const write of ["notion_create", "github_issue_create", "reminder_set", "slack_react", "proposal_resolve"]) {
+    for (const write of ["notion_create", "notion_update", "github_issue_create", "component_implement", "reminder_set", "slack_react", "proposal_resolve"]) {
       assert.ok(!names.includes(write), write);
     }
   });
 
   it("while a mapped asker's figma turn is still offered the gated tools it may propose", async () => {
-    assert.ok((await offered("figma")).includes("notion_create"));
+    const names = await offered("figma");
+    for (const write of ["notion_create", "notion_update", "github_issue_create", "component_implement"]) assert.ok(names.includes(write), write);
   });
 
   it("reads no Notion and no Slack at all, not even a team surface or a public channel", async () => {
