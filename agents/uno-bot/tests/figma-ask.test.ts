@@ -23,6 +23,7 @@ import { SubrequestBudgetError } from "../src/net";
 import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness } from "./helpers/turn-harness";
 import { readGithub } from "../src/tools/github-read";
+import { gapNotes, type StoredTeamRoles } from "../src/usage/index";
 
 const FILE = "FILEKEY1";
 const DESIGN = "CDESIGN1";
@@ -86,6 +87,10 @@ interface World {
   askers: Array<{ unmappedAsker: boolean; fileKey: string }>;
   /** Replies uno-bot posted on the file, in order. */
   replies(): Array<{ root: string; message: string }>;
+  /** Notes about a Team Members gap, as DMs: to whom, and what. */
+  notes: Array<{ to: string; text: string }>;
+  /** The clock the gap notes' marks read, epoch ms. */
+  clock: { now: number };
 }
 
 function world(
@@ -96,6 +101,10 @@ function world(
     design?: boolean;
     toolResultFor?: (name: string, args: Record<string, unknown>) => string;
     preflightAsk?: string;
+    /** The stored Team Members map; by default Sarah is mapped, and the rows
+     *  "Guest" and "Rae Ng" have no Figma User ID. */
+    roster?: StoredTeamRoles | null;
+    lead?: string | null;
   } = {},
 ): World {
   const figma = createInMemoryFigma({ me: BILL, now: () => NOW });
@@ -108,6 +117,24 @@ function world(
   const leads: string[] = [];
   const cards: RecordingDelivery[] = [];
   const owner: { slack: string | null } = { slack: "UOWNER" };
+  const notes: Array<{ to: string; text: string }> = [];
+  const clock = { now: NOW };
+  /** The 30-day marks, as KV keeps them: each with its expiry. */
+  const gapMarks = new Map<string, number>();
+  const roster: StoredTeamRoles | null =
+    opts.roster === undefined ? { at: NOW, roles: {}, figmaPeople: { [SARAH.id]: "USARAH" }, noFigmaId: ["Guest", "Rae Ng"] } : opts.roster;
+  const gaps = gapNotes({
+    lead: opts.lead === undefined ? "ULEAD" : opts.lead,
+    read: async () => roster,
+    marks: {
+      has: async (key) => (gapMarks.get(key) ?? 0) > clock.now,
+      put: async (key, ttlS) => void gapMarks.set(key, clock.now + ttlS * 1000),
+    },
+    dm: async (to, text) => {
+      notes.push({ to, text });
+      return { ok: true };
+    },
+  });
   const deps: FigmaAskDeps = {
     figma,
     people: async () => opts.people ?? { [SARAH.id]: "USARAH" },
@@ -141,11 +168,14 @@ function world(
             designOwner: async () => owner.slack,
           },
         }),
+    gaps,
     now: () => NOW,
   };
   return {
     figma,
     deps,
+    notes,
+    clock,
     marks,
     leads,
     cards,
@@ -223,7 +253,7 @@ describe("the reply", () => {
     assert.deepEqual(w.replies(), [
       {
         root: "100",
-        message: [FIGMA_LABEL, "Hidden until the first goal is set.", "It shows once a goal exists.", `Source: ${PRD}`].join("\n"),
+        message: [FIGMA_LABEL, "Hidden until the first goal is set.", "It shows once a goal exists.", `Source: Goal Setting PRD — ${PRD}`].join("\n"),
       },
     ]);
   });
@@ -233,7 +263,7 @@ describe("the reply", () => {
     await ask(w, comment("100", "@uno list them"));
     const lines = w.replies()[0]!.message.split("\n");
     assert.equal(lines[0], FIGMA_LABEL);
-    assert.deepEqual(lines.slice(1), ["One.", "Two.", "Three.", `Source: ${PRD}`]);
+    assert.deepEqual(lines.slice(1), ["One.", "Two.", "Three.", `Source: Goal Setting PRD — ${PRD}`]);
   });
 
   it("says it couldn't find this, pointing at #plus-design, when nothing answers it", async () => {
@@ -248,7 +278,7 @@ describe("the reply", () => {
     await ask(w, comment("100", "@uno bar?"));
     const message = w.replies()[0]!.message;
     assert.doesNotMatch(message, /[<>*`]/);
-    assert.match(message, new RegExp(`Source: ${PRD}$`));
+    assert.match(message, new RegExp(`Source: Goal Setting PRD — ${PRD}$`));
   });
 
   it("says it couldn't find this when the turn read a page but the answer cites nothing", async () => {
@@ -569,7 +599,7 @@ describe("a frame's title in the reply", () => {
     });
     await ask(w, comment("100", "@uno when does the bar show?"));
     assert.deepEqual(w.replies().map((r) => r.message), [
-      [FIGMA_LABEL, "It is hidden until the first goal, per Bar [v2] <draft>.", `Source: ${OTHER}`].join("\n"),
+      [FIGMA_LABEL, "It is hidden until the first goal, per Bar [v2] <draft>.", `Source: Bar [v2] <draft> — ${OTHER}`].join("\n"),
     ]);
   });
 });
@@ -622,7 +652,7 @@ describe("a GitHub file the turn read directly", () => {
     const w = await answered(BUTTON, await readResult("BilLogic/plus-uno", BUTTON_PATH));
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
     assert.deepEqual(w.replies().map((r) => r.message), [
-      [FIGMA_LABEL, "It comes in small, medium and large. Button.jsx", `Source: ${BUTTON}`].join("\n"),
+      [FIGMA_LABEL, "It comes in small, medium and large. Button.jsx", `Source: Button.jsx — ${BUTTON}`].join("\n"),
     ]);
   });
 
@@ -630,7 +660,7 @@ describe("a GitHub file the turn read directly", () => {
     for (const cited of [`${BUTTON}#L12`, BUTTON.replace("/blob/main/", "/blob/3f9c2a1/")]) {
       const w = await answered(cited, await readResult("BilLogic/plus-uno", BUTTON_PATH, "main"));
       await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-      assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: ${cited}`], cited);
+      assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: Button.jsx — ${cited}`], cited);
     }
   });
 
@@ -777,5 +807,53 @@ describe("the decision read and the asks", () => {
       threads.map((t) => ({ root: t.root.id, rootRead: t.rootRead, replies: t.replies.map((r) => r.id) })),
       [{ root: "100", rootRead: true, replies: ["102"] }],
     );
+  });
+});
+
+describe("a Team Members gap the ask ran into", () => {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  /** A commenter whose handle is a Team Members name with no Figma User ID. */
+  const RAE = { id: "1500777", handle: "rae ng" };
+
+  it("an asker whose handle names a row with no Figma User ID gets the lead one note, naming them and the column", async () => {
+    const w = world();
+    await ask(w, comment("100", "@uno when does the bar show?", { user: RAE }));
+    assert.equal(w.replies().length, 1, "the asker still gets their answer");
+    assert.equal(w.notes.length, 1);
+    assert.equal(w.notes[0]!.to, "ULEAD");
+    assert.match(w.notes[0]!.text, /Rae Ng/);
+    assert.match(w.notes[0]!.text, /Figma User ID/);
+    assert.doesNotMatch(w.notes[0]!.text, new RegExp(`${RAE.id}|${FILE}|bar`), "no ids, no file, no words of the ask");
+  });
+
+  it("the same person asking again within 30 days is not noted again; after 30 days they are", async () => {
+    const w = world();
+    await ask(w, comment("100", "@uno when does the bar show?", { user: RAE }));
+    w.clock.now = NOW + 29 * DAY_MS;
+    await ask(w, comment("101", "@uno and the label?", { user: RAE }));
+    assert.equal(w.notes.length, 1);
+    w.clock.now = NOW + 31 * DAY_MS;
+    await ask(w, comment("102", "@uno and the colour?", { user: RAE }));
+    assert.equal(w.notes.length, 2);
+  });
+
+  it("an unmapped asker whose handle names no row gets no note", async () => {
+    const w = world();
+    await ask(w, comment("100", "@uno when does the bar show?", { user: { id: "1500998", handle: "visitor" } }));
+    assert.equal(w.replies().length, 1);
+    assert.deepEqual(w.notes, []);
+  });
+
+  it("a mapped asker gets no note", async () => {
+    const w = world({ roster: { at: NOW, roles: {}, figmaPeople: { [SARAH.id]: "USARAH" }, noFigmaId: ["sarah"] } });
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(w.notes, []);
+  });
+
+  it("with LEAD_USER_ID unset, nobody is noted", async () => {
+    const w = world({ lead: null });
+    await ask(w, comment("100", "@uno when does the bar show?", { user: RAE }));
+    assert.equal(w.replies().length, 1);
+    assert.deepEqual(w.notes, []);
   });
 });
