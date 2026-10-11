@@ -187,6 +187,13 @@ export const SHARE_CHANNEL_NAMES: Record<SweepShare["pages"][number]["to"], stri
   "plus-design": "#plus-design",
 };
 
+/** What a share card — a group DM's share, or the DM sweep's raise note —
+ *  says at the gate (`PendingProposal.stated`). */
+export const SHARE_CARD_WORDS: StatedCardWords = {
+  cancelled: "Rejected, nothing posted",
+  expired: "That card closed after 72 h with no decision, so nothing was posted.",
+};
+
 /**
  * The share a group-DM card carries, or undefined for a card from anywhere
  * else: each page its fixes touch, once, in item order, with the team channel
@@ -415,8 +422,8 @@ export function holdsInsert(operations: readonly Pick<ProposalOperation, "toolNa
 
 /** What a worded revision of a card holding an added answer is told. */
 export const INSERT_CARD_REFUSAL =
-  ":warning: This sweep card adds text after a block, which a reply in words can't restage exactly, so the card stays as it is. " +
-  "Reply `drop N` to leave a fix out, or ⛔ the card and ask me.";
+  ":warning: This sweep card adds text after a block, which a revision can't restage exactly, so the card stays as it is. " +
+  "Reject it in Review with what it should say instead.";
 
 /** Whether a bot post is part of a sweep card: tagged as one, or — read
  *  without its metadata — opening as one does. */

@@ -68,7 +68,7 @@ export function raiseNote(o: { topic: string; sources: readonly [string, string]
 }
 
 /**
- * The raise card (C6), as data and its one operation.
+ * The raise card (C6), as data and its one operation: decided from Review.
  *
  * @param o.when - `whenWord`
  * @param o.channel - The team channel's id
@@ -88,7 +88,7 @@ export function raiseCard(o: {
   const lines = [
     `${o.when} I noticed ${a} and ${b} disagree on ${plain(o.topic)}. Want me to post a note about it in ${where}?`,
     "",
-    `✅ posts exactly this note in ${where}. Nothing else from this DM goes with it: no quote, no names. React ⛔ to drop it.`,
+    `Approving posts exactly this note in ${where}. Nothing else from this DM goes with it: no quote, no names.`,
     "",
     `In ${where}:`,
     `> ${text}`,
@@ -96,7 +96,8 @@ export function raiseCard(o: {
     `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   ];
   return {
-    card: { kind: "confirm", verb: `post this note in ${where}`, lead: lines.join("\n"), fields: [], caveats: [], operations: [...operations] },
+    // No footer: Review is the card's only instruction.
+    card: { kind: "stated", verb: `post this note in ${where}`, lead: lines.join("\n"), footer: "", fields: [], caveats: [], operations: [...operations] },
     operations,
   };
 }

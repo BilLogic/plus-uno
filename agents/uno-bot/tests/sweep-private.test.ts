@@ -19,6 +19,7 @@ import {
 import { resolveSignal, type OperationOutcome } from "../src/gate/index";
 import { isSubrequestBudgetError } from "../src/net";
 import { renderProposalCard } from "../src/slack/proposal-render";
+import { renderGateNote } from "../src/slack/gate-note";
 import type { ProposalCard } from "../src/turn/index";
 import {
   at,
@@ -241,7 +242,7 @@ test("the share card appears only after the fix batch wrote a page", async () =>
   assert.deepEqual([staged?.event, staged?.via, staged?.channelId], ["staged", "worker", null]);
 });
 
-test("the share card shows exactly the note its ✅ posts, and the channel it goes to", async () => {
+test("the share card shows exactly the note approving it posts, and the channel it goes to", async () => {
   const { h, fix } = await groupDmCard();
   const { posts, deps } = shareDeps(h);
   const share = (await stageSweepShare(fix, [applied(PAGE_A.url)], deps))!;
@@ -282,6 +283,7 @@ test("the share card is resolved by the gate: a ✅ runs its post, a ⛔ runs no
   const no = await resolveSignal({ ...react("U0BEA", "no_entry"), messageTs: again.proposalTs }, { threadState: h.threadState });
   assert.equal(no.outcome, "won");
   assert.equal(no.execute, undefined, "a ⛔ posts nothing");
+  assert.equal(renderGateNote(no.post!.note), "Rejected, nothing posted.", "in the share card's own words");
 });
 
 test("markup in a page title is inert on the share card and in the note, and the note is byte-equal to the card", async () => {

@@ -56,7 +56,7 @@ import { dayLabel, etDayOf, rearmedDueAt, TEXT_KEEP_MS } from "../commitments/du
 import { MAX_HOLDS, type CommitmentAction, type ReminderReaction } from "../commitments/run";
 import { LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
 import { shareDestination } from "../sweep/finding";
-import { SWEEP_CARD_TTL_MS } from "../sweep/cards";
+import { SHARE_CARD_WORDS, SWEEP_CARD_TTL_MS } from "../sweep/cards";
 import type { DmThread, DmThreadVerdict } from "../sweep/run";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
@@ -400,6 +400,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     // The person the DM is with, and nobody else.
     confirmers: [c.promiserId],
     supersedeKey: raiseSlot(c.id),
+    stated: SHARE_CARD_WORDS,
   };
   const { retired } = await deps.threadState.putProposal(proposal);
   // A DM is never named on the record (`storesChannel`).
@@ -407,7 +408,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     ...supersededEvents(retired, now, "worker"),
     stagedEvent({ proposal, at: now, via: "worker", channelStored: storesChannel("assistant", "im") }),
   ]);
-  // No reminder ts: the card is a proposal, so its ✅ and ⛔ reach the gate.
+  // No reminder ts: the card is a proposal, so its Review reaches the gate.
   await settle(asked);
   return { id: c.id, action: "nudged", text: card.lead ?? "", ts: sent.ts };
 }
