@@ -10,7 +10,9 @@
 //     set (Bill's DM while the Figma flows are in testing), else #plus-design
 //     (`PLUS_DESIGN_CHANNEL_ID`); its members answer. The parent's thread is marked as a
 //     sweep card's is, so the team's replies there are not all turns.
-//   • KV: the week's listing and what the weeks remember, under `figma-tidy:`.
+//   • KV: the week's listing, what the weeks remember, what each file's pages
+//     named and what was left as is (`tools/figma-tidy-up.ts`), under
+//     `figma-tidy:`.
 
 import type { Env } from "../types";
 import { budgetHeadroom, charge } from "../net";
@@ -22,6 +24,7 @@ import { queryRoadmapByNumbers, queryRoadmapCards } from "../integrations/notion
 import { storedTeamRoles } from "../usage/production";
 import { slackPersonOfNotion } from "../usage/roles";
 import { designerAmong } from "../figma-comments/read";
+import { tidySkipsStore } from "../tools/figma-tidy-up";
 import { markSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
@@ -29,14 +32,26 @@ import { proposalEventLogFor } from "../usage/production";
 import type { PendingProposal } from "../thread-state/index";
 import type { JobContext } from "../scheduled/runs";
 import { likelyCard, projectWords, type TidyCard } from "./checks";
-import { runTidyPost, runTidyRead, type TidyListing, type TidyMemory, type TidyPostResult, type TidyReadResult } from "./run";
+import {
+  runTidyPost,
+  runTidyRead,
+  type TidyListing,
+  type TidyMemory,
+  type TidyPostResult,
+  type TidyReadResult,
+  type TidyRefs,
+} from "./run";
 
 const LISTING_KEY = "figma-tidy:listing";
 const MEMORY_KEY = "figma-tidy:memory";
+const REFS_KEY = "figma-tidy:refs";
 /** A listing outlives its Monday by a day. */
 const LISTING_TTL_S = 2 * 24 * 60 * 60;
 /** The memory outlives its five weeks by one, so a quiet stretch keeps it. */
 const MEMORY_TTL_S = 6 * 7 * 24 * 60 * 60;
+/** What a file's pages named outlives a quiet stretch: each write keeps it
+ *  half a year more. */
+const REFS_TTL_S = 26 * 7 * 24 * 60 * 60;
 
 /** The channel the tidy-up posts in: where the Figma Review cards go
  *  (`FIGMA_ASK_CHANNEL_ID`), else #plus-design. */
@@ -76,7 +91,8 @@ export async function runTidyReadOnEnv(env: Env, ctx: JobContext): Promise<TidyR
   }
   return runTidyRead(
     {
-      figma: { teamFolders: (id, o) => figma.teamFolders(id, o), folderFiles: (id, o) => figma.folderFiles(id, o) },
+      figma,
+      refs: kvStore<TidyRefs>(env, REFS_KEY, REFS_TTL_S),
       teams,
       listing: kvStore<TidyListing>(env, LISTING_KEY, LISTING_TTL_S),
       meter: { headroom: budgetHeadroom },
@@ -107,6 +123,8 @@ export async function runTidyPostOnEnv(env: Env, ctx: JobContext): Promise<TidyP
     {
       listing: kvStore<TidyListing>(env, LISTING_KEY, LISTING_TTL_S),
       memory: kvStore<TidyMemory>(env, MEMORY_KEY, MEMORY_TTL_S),
+      refs: kvStore<TidyRefs>(env, REFS_KEY, REFS_TTL_S),
+      skips: tidySkipsStore(env),
       roadmap: {
         async cards(numbers) {
           const rows = await queryRoadmapByNumbers(env, numbers);

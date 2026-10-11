@@ -3,8 +3,10 @@
 //
 // Bill's ruling (2026-10-11): one shared decision card per finding, whose
 // Review pop-up offers "Moved it" and "Leave as is". No API moves or renames a
-// Figma file, so neither answer writes anything: a person moves the file, and
-// the card records who answered and how.
+// Figma file, so neither answer writes to Figma: a person moves the file, and
+// the card records who answered and how. "Leave as is" is the spec's `skip`:
+// its one operation keeps the file and check quiet until the file's title
+// cards change (`leaveAsIs` in `./run.ts`).
 //
 // PURE.
 
@@ -12,12 +14,12 @@ import type { ReportItem, ReviewChoice, StatedCardWords } from "../thread-state/
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { shortDate, windowInWords } from "../slack/copy-words";
-import type { TidyFinding } from "./checks";
+import { cardKey, type TidyFinding } from "./checks";
 
 /** A reply's cards at most; the rest wait for next week's. */
 export const MAX_ITEMS_PER_OWNER = 5;
 
-/** The tool a card names. Neither answer runs it: both decide as a cancel. */
+/** The tool a card names: "Leave as is" runs it, "Moved it" decides as a cancel. */
 export const TIDY_TOOL = "figma_tidy_up";
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
@@ -74,6 +76,11 @@ export function findingBody(finding: TidyFinding, likely: { number: number; titl
       return likely
         ? `Card ${finding.card} isn't on the Roadmap. Likely Card ${likely.number}, "${likely.title}".`
         : `Card ${finding.card} isn't on the Roadmap, and no card's name matches the project.`;
+    case "title": {
+      const named = finding.retitle!.missing.map((n) => `Card ${n}`);
+      const list = named.length > 1 ? `${named.slice(0, -1).join(", ")} and ${named.at(-1)}` : named[0];
+      return `Its pages or Cover name ${list}, which the title leaves out. Rename it to "${finding.retitle!.title}".`;
+    }
   }
 }
 
@@ -81,6 +88,7 @@ const SUBTITLE: Record<TidyFinding["check"], string> = {
   "wrong-folder": "Wrong folder",
   "unknown-card": "Unknown card",
   "no-active-card": "Not on an active card",
+  title: "Title misses a card",
 };
 
 /** A finding's card id: Slack-safe, unique in its reply. */
@@ -116,20 +124,20 @@ export function tidyCard(finding: TidyFinding, likely: { number: number; title: 
     lead: [
       `*${escapeSlackText(finding.file.name)}* · <${fileUrl(finding.file.key)}|open file>`,
       escapeSlackText(findingBody(finding, likely)),
-      "Files are moved and renamed in Figma by a person. Answering here records what you did and writes nothing.",
+      "Files are moved and renamed in Figma by a person. Answering here records what you did, and Leave as is stops asking until the file's cards change.",
     ].join("\n"),
     footer: "",
     fields: [],
     caveats: [],
-    operations: [{ toolName: TIDY_TOOL, input: { file_key: finding.file.key, check: finding.check, card: finding.card } }],
+    operations: [{ toolName: TIDY_TOOL, input: { file_key: finding.file.key, check: finding.check, card: finding.card, cards: cardKey(finding.file.name) } }],
   };
 }
 
-/** The two answers. Both decide the card and write nothing. */
+/** The two answers. Neither writes to Figma. */
 export function tidyChoices(): ReviewChoice[] {
   return [
     { value: "moved", label: "Moved it", verdict: "cancel", decided: "Next week's tidy-up checks the file again." },
-    { value: "leave", label: "Leave as is", past: "Left as is", verdict: "cancel", decided: "Not raised again for 5 weeks." },
+    { value: "leave", label: "Leave as is", past: "Left as is", verdict: "confirm", decided: "Not raised again until the file's cards change." },
   ];
 }
 

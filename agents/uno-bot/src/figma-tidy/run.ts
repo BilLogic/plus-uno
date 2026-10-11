@@ -3,8 +3,15 @@
 //   • the READ — `figma-tidy-read` jobs list every team's stage folders and
 //     their files, MISC left out. A listing is one Tier 2 call, a team of five
 //     folders six, and a job stops while it still has room for one more, so
-//     the listing is cut across `TIDY_READ_JOBS` jobs and kept in one KV key
-//     between them, dated to its Monday. Names and keys only.
+//     the listing is cut across `TIDY_JOBS` jobs and kept in one KV key
+//     between them, dated to its Monday. Names, keys and last changes only.
+//     Once it is done, the same jobs read the pages of each file changed
+//     since its last read, for the title check (`readPages`): two Tier 1
+//     calls a file, so a week reads what its budget allows and the next
+//     week goes on; an unchanged file is never read again.
+//   • SKIP — "Leave as is" keeps a file and check quiet until the file's
+//     title cards change (`leaveAsIs`), so an item stays left as is however
+//     long the file stays as it is.
 //   • the POST — `figma-tidy-post`, after the reads: the cards the titles name,
 //     read from the Roadmap in one query; the checks (`./checks.ts`); then the
 //     week's report on the shared decision card (`slack/decision-cards.ts`):
@@ -12,7 +19,7 @@
 //     mentioning them once, with at most five cards and "and N more". Items
 //     with no owner the Roadmap names go in one unassigned reply. Each card is
 //     its own proposal, answered in its Review pop-up with "Moved it" or
-//     "Leave as is"; neither writes anything (`./copy.ts`).
+//     "Leave as is"; neither writes to Figma (`./copy.ts`).
 //
 // WHAT THE WEEKS REMEMBER. Every card shown is remembered by its fingerprint
 // (file, check and card) for five weeks. A later week shows only what is new,
@@ -22,7 +29,9 @@
 // some, posts one all-clear and then goes quiet.
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
-//   read: one call a listing, three with retries; ~30 for five teams.
+//   read: one call a listing, three with retries; ~30 for five teams. Then
+//         one or two page reads a file (`PAGES_COST` with retries) until
+//         the job's budget is nearly spent.
 //   post: the Roadmap (one query per 100 cards) + a likely card for each
 //         unknown one shown (at most `LIKELY_LOOKUPS`) + members (at most 3
 //         pages) + the parent and one reply per owner. The report records and
@@ -36,7 +45,23 @@ import type { FigmaTeam } from "../figma-notify/teams";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import { renderProposalCard } from "../slack/proposal-render";
 import { decisionReport, itemProposal, markNotStaged, reportRecord, type ReportMessage, type ReportStore } from "../slack/decision-cards";
-import { cardsNamed, isExempt, projectOf, tidyFindings, type TidyCard, type TidyFile, type TidyFinding, type TidyFolder } from "./checks";
+import { pagesOf } from "../figma-comments/sections";
+import { collectTextLayers } from "../integrations/figma-reading";
+import {
+  cardKey,
+  cardRefsIn,
+  cardsNamed,
+  isExempt,
+  pageReadFiles,
+  projectOf,
+  skipKeyOf,
+  tidyFindings,
+  type TidyCard,
+  type TidyCheck,
+  type TidyFile,
+  type TidyFinding,
+  type TidyFolder,
+} from "./checks";
 import {
   allClearText,
   MAX_ITEMS_PER_OWNER,
@@ -61,6 +86,8 @@ export const TIDY_CARD_TTL_MS = 6 * DAY_MS;
 export const LIKELY_LOOKUPS = 5;
 /** External subrequests one listing may take: the client tries a call up to three times. */
 export const LISTING_COST = 3;
+/** External subrequests one file's page and Cover reads may take. */
+export const PAGES_COST = 2 * LISTING_COST;
 
 /** One listing still to make. */
 export type TidyTask = { kind: "team"; team: string; teamId: string } | { kind: "folder"; team: string; folderId: string };
@@ -82,15 +109,29 @@ export interface TidyMemory {
   open: number;
 }
 
+/**
+ * The cards each file's page names and Cover text name, by file key, with the
+ * `last_modified` they were read at: a file is read again only once it changes.
+ */
+export type TidyRefs = Record<string, { modified: string; cards: number[] }>;
+
+/**
+ * Items left as is, by `<file key>|<check>`: the file's title cards when it
+ * was, as `cardKey` writes them. A change to them opens the item again.
+ */
+export type TidySkips = Record<string, string>;
+
 interface Store<T> {
   read(): Promise<T>;
   write(value: T): Promise<void>;
 }
 
 export interface TidyReadDeps {
-  figma: Pick<FigmaClient, "teamFolders" | "folderFiles">;
+  figma: Pick<FigmaClient, "teamFolders" | "folderFiles" | "file">;
   teams: readonly FigmaTeam[];
   listing: Store<TidyListing | null>;
+  /** What each file's pages and Cover named, kept across weeks. */
+  refs: Store<TidyRefs | null>;
   meter?: { headroom(): { subrequests: number } };
   runDate: string;
 }
@@ -103,7 +144,8 @@ export interface TidyReadResult {
 
 /**
  * One read job: start the week's listing, or resume it, and list until it is
- * done or this job's budget is nearly spent.
+ * done or this job's budget is nearly spent; then read the pages of each file
+ * changed since its last read (`readPages`) while the budget lasts.
  *
  * @param deps - The Figma client, the teams and the listing's store
  * @param opts - `dryRun` lists and keeps nothing
@@ -119,9 +161,19 @@ export async function runTidyRead(deps: TidyReadDeps, opts: { dryRun?: boolean }
           folders: [],
           files: [],
         };
-  if (!listing.tasks.length) return { listed: 0, left: 0, summary: "this week's listing is already done" };
   let listed = 0;
   const notes: string[] = [];
+  if (listing.tasks.length) await listMore(deps, listing, notes, opts).then((n) => (listed = n));
+  const pages = listing.tasks.length ? null : await readPages(deps, listing, notes, opts);
+  const end = listing.tasks.length
+    ? `${listing.tasks.length} listing(s) left`
+    : `done: ${listing.files.length} file(s)${pages ? `; pages read for ${pages.read}, ${pages.left} left` : ""}`;
+  return { listed, left: listing.tasks.length, summary: `listed ${listed}; ${end}${notes.length ? ` — ${notes.join("; ")}` : ""}` };
+}
+
+/** List until the week's listing is done or the budget is nearly spent, and keep it. */
+async function listMore(deps: TidyReadDeps, listing: TidyListing, notes: string[], opts: { dryRun?: boolean }): Promise<number> {
+  let listed = 0;
   try {
     while (listing.tasks.length) {
       if ((deps.meter?.headroom().subrequests ?? Infinity) < LISTING_COST) {
@@ -137,7 +189,7 @@ export async function runTidyRead(deps: TidyReadDeps, opts: { dryRun?: boolean }
           listing.tasks.unshift(...folders.map((f): TidyTask => ({ kind: "folder", team: task.team, folderId: f.id })));
         } else {
           const { files } = await deps.figma.folderFiles(task.folderId);
-          listing.files.push(...files.map((f) => ({ team: task.team, folderId: task.folderId, key: f.key, name: f.name })));
+          listing.files.push(...files.map((f) => ({ team: task.team, folderId: task.folderId, key: f.key, name: f.name, modified: f.last_modified })));
           listing.tasks.shift();
         }
         listed += 1;
@@ -155,13 +207,72 @@ export async function runTidyRead(deps: TidyReadDeps, opts: { dryRun?: boolean }
   } finally {
     if (!opts.dryRun) await deps.listing.write(listing);
   }
-  const end = listing.tasks.length ? `${listing.tasks.length} listing(s) left` : `done: ${listing.files.length} file(s)`;
-  return { listed, left: listing.tasks.length, summary: `listed ${listed}; ${end}${notes.length ? ` — ${notes.join("; ")}` : ""}` };
+  return listed;
+}
+
+/**
+ * The title check's reads: each file the checks look at, outside Archive and
+ * not a kit, whose `last_modified` differs from its last read — its page
+ * names (one depth-1 read), and the text under its Cover section's pages
+ * (one more, only when it has a Cover). Both are Tier 1, so a job reads only
+ * while it has room for a file's two, and the next job or next week goes on.
+ * What they named is kept by file; a file the listing no longer has is
+ * forgotten.
+ */
+async function readPages(
+  deps: TidyReadDeps,
+  listing: TidyListing,
+  notes: string[],
+  opts: { dryRun?: boolean },
+): Promise<{ read: number; left: number }> {
+  const kept = (await deps.refs.read()) ?? {};
+  const listed = new Set(listing.files.map((f) => f.key));
+  const refs: TidyRefs = Object.fromEntries(Object.entries(kept).filter(([key]) => listed.has(key)));
+  let changed = Object.keys(refs).length !== Object.keys(kept).length;
+  const due = pageReadFiles(listing.files, listing.folders).filter((f) => refs[f.key]?.modified !== (f.modified ?? ""));
+  let read = 0;
+  for (const file of due) {
+    if ((deps.meter?.headroom().subrequests ?? Infinity) < PAGES_COST) {
+      notes.push("this job's budget is nearly spent — the next job reads the rest of the pages");
+      break;
+    }
+    try {
+      refs[file.key] = { modified: file.modified ?? "", cards: await cardsOnPages(deps.figma, file.key) };
+    } catch (err) {
+      rethrowIfBudget(err);
+      if (!(err instanceof FigmaRequestError && err.status === 404)) {
+        notes.push(`a page read failed (${err instanceof Error ? err.message : String(err)}) — the next job tries again`);
+        break;
+      }
+      refs[file.key] = { modified: file.modified ?? "", cards: [] };
+    }
+    read += 1;
+    changed = true;
+  }
+  if (changed && !opts.dryRun) await deps.refs.write(refs);
+  return { read, left: due.length - read };
+}
+
+/** The cards a file's page names and Cover text name, page names first, each once. */
+async function cardsOnPages(figma: Pick<FigmaClient, "file">, key: string): Promise<number[]> {
+  const pages = pagesOf((await figma.file(key, { depth: 1 })).document);
+  const found = pages.flatMap((p) => cardRefsIn(p.name));
+  const cover = new Set(pages.filter((p) => p.section === "Cover").map((p) => p.id));
+  if (cover.size) {
+    const { document } = await figma.file(key, { ids: [...cover] });
+    for (const page of document.children ?? []) {
+      if (page.id && cover.has(page.id)) found.push(...collectTextLayers(page).texts.flatMap(cardRefsIn));
+    }
+  }
+  return [...new Set(found)];
 }
 
 export interface TidyPostDeps {
   listing: Store<TidyListing | null>;
   memory: Store<TidyMemory | null>;
+  /** What the read found on each file's pages and Cover. */
+  refs: Store<TidyRefs | null>;
+  skips: Store<TidySkips | null>;
   roadmap: {
     /** The Roadmap's cards among these numbers, each with its design owner. */
     cards(numbers: readonly number[]): Promise<TidyCard[]>;
@@ -206,9 +317,11 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
   if (!listing || listing.runDate !== deps.runDate) return { posted: false, summary: "no listing for this week" };
   if (listing.tasks.length) return { posted: false, summary: `the listing stopped short (${listing.tasks.length} left) — no report this week` };
 
-  const numbers = cardsNamed(listing.files, listing.folders);
+  const refs = Object.fromEntries(Object.entries((await deps.refs.read()) ?? {}).map(([key, r]) => [key, r.cards]));
+  const numbers = cardsNamed(listing.files, listing.folders, refs);
   const cards = numbers.length ? await deps.roadmap.cards(numbers) : [];
-  const findings = tidyFindings(listing.files, listing.folders, cards);
+  const { findings, skips } = withoutSkipped(tidyFindings(listing.files, listing.folders, cards, refs), listing.files, await deps.skips.read());
+  if (skips && !opts.dryRun) await deps.skips.write(skips);
 
   const memory = remembered(await deps.memory.read(), deps.runDate);
   const fresh = findings.filter((f) => !memory.shown[f.fingerprint]);
@@ -323,6 +436,51 @@ export function stagedFinding(channel: string, parentTs: string, replyTs: string
     stated: tidyCardWords(TIDY_CARD_TTL_MS / 3_600_000),
     refuseRevision: TIDY_REVISION_REFUSAL,
     choices: tidyChoices(),
+  };
+}
+
+/**
+ * "Leave as is" on a card: its file and check stay quiet until the file's
+ * title cards change. The body of the card's one operation (`TIDY_TOOL`).
+ *
+ * @param skips - Where items left as is are kept
+ * @param input - The operation's input: `file_key`, `check` and `cards`
+ * @returns The executor's JSON result
+ */
+export async function leaveAsIs(skips: Store<TidySkips | null>, input: Record<string, unknown>): Promise<string> {
+  const { file_key: fileKey, check, cards } = input;
+  if (typeof fileKey !== "string" || typeof check !== "string" || typeof cards !== "string") {
+    return JSON.stringify({ ok: false, error: "a tidy-up item needs file_key, check and cards" });
+  }
+  const kept = (await skips.read()) ?? {};
+  await skips.write({ ...kept, [skipKeyOf(fileKey, check as TidyCheck)]: cards });
+  return JSON.stringify({ ok: true });
+}
+
+/**
+ * The findings not left as is, and the skips to keep when any were dropped:
+ * a skip whose file's title cards have changed since is forgotten, and its
+ * item is open again.
+ */
+function withoutSkipped(
+  findings: TidyFinding[],
+  files: readonly TidyFile[],
+  kept: TidySkips | null,
+): { findings: TidyFinding[]; skips: TidySkips | null } {
+  if (!kept) return { findings, skips: null };
+  const skips = { ...kept };
+  let dropped = false;
+  for (const file of files) {
+    for (const [key, cards] of Object.entries(skips)) {
+      if (key.startsWith(`${file.key}|`) && cards !== cardKey(file.name)) {
+        delete skips[key];
+        dropped = true;
+      }
+    }
+  }
+  return {
+    findings: findings.filter((f) => skips[skipKeyOf(f.file.key, f.check)] === undefined),
+    skips: dropped ? skips : null,
   };
 }
 
