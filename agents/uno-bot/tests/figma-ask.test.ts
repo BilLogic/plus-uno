@@ -161,6 +161,7 @@ function world(
       : {
           design: {
             channel,
+            ...(channel === DESIGN || channel === "C03FC8AS69K" ? { name: "#plus-design" } : {}),
             post: async (text) => {
               leads.push(text);
               return { ts: `1760000000.00000${leads.length}` };
@@ -1015,14 +1016,17 @@ describe("where a change request's card posts", () => {
     ({ FIGMA_ACCESS_TOKEN: "figd_test", HARNESS_KV: {}, THREAD_STATE: {}, PLUS_DESIGN_CHANNEL_ID: PLUS_DESIGN, ...vars }) as unknown as Env;
 
   it("is the setting's channel when it names one, and #plus-design when it is blank or unset", () => {
-    assert.equal(figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: LE_GOAT_DM }))?.design?.channel, LE_GOAT_DM);
-    assert.equal(figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: "  " }))?.design?.channel, PLUS_DESIGN);
-    assert.equal(figmaAskDepsFor(env({}))?.design?.channel, PLUS_DESIGN);
+    const dm = figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: LE_GOAT_DM }))?.design;
+    assert.deepEqual([dm?.channel, dm?.name], [LE_GOAT_DM, undefined], "a DM is not named in the reply");
+    for (const vars of [{ FIGMA_ASK_CHANNEL_ID: "  " }, {}]) {
+      const design = figmaAskDepsFor(env(vars))?.design;
+      assert.deepEqual([design?.channel, design?.name], [PLUS_DESIGN, "#plus-design"]);
+    }
   });
 
-  for (const [where, channel] of [
-    ["#plus-design", PLUS_DESIGN],
-    ["the le goat DM", LE_GOAT_DM],
+  for (const [where, channel, drafted] of [
+    ["#plus-design", PLUS_DESIGN, "I drafted this change for approval in #plus-design"],
+    ["the le goat DM", LE_GOAT_DM, "I drafted this change for approval"],
   ] as const) {
     it(`posts the lead and card in ${where}, the reply links it there, and Approve there runs the write`, async () => {
       const w = world({ replies: STAGES, channel });
@@ -1032,7 +1036,11 @@ describe("where a change request's card posts", () => {
       assert.match(w.leads[0]!, /^<@UOWNER>, <@USARAH> asked in a Figma comment on /);
       assert.equal(w.cards[0]!.stagedCards.length, 1);
       const link = `https://plus.slack.com/archives/${channel}/p1760000000000001`;
-      assert.ok(w.replies()[0]!.message.includes(link), "the Figma reply links the lead where it posted");
+      assert.deepEqual(
+        w.replies().map((r) => r.message),
+        [[FIGMA_LABEL, `${drafted}: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n")],
+        "the reply names only the channel the card is in, and links it there",
+      );
 
       const staged = await w.deps.threadState.getProposalByThread({ channel, thread: "1760000000.000001" });
       assert.ok(staged, "the card is found from its thread where it posted");

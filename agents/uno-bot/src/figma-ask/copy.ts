@@ -37,7 +37,8 @@ export interface FigmaSource {
 export type FigmaReply =
   | { kind: "answer"; lines: string[]; source: FigmaSource | null }
   | { kind: "question"; lines: string[] }
-  | { kind: "drafted"; link: string | null }
+  /** `where`: the channel the card is in, by name; absent, the reply names none (a DM). */
+  | { kind: "drafted"; link: string | null; where?: string }
   | { kind: "not-teammate" }
   /** A teammate's change that could not be drafted: no #plus-design to draft it in, or Slack refused the card. */
   | { kind: "not-drafted" }
@@ -74,7 +75,7 @@ export function figmaReplyLines(reply: FigmaReply): string[] {
         return [...reply.lines, "Reply here with @uno and the answer, and I'll pick it up."];
       case "drafted":
         return [
-          `I drafted this change for approval in #plus-design${reply.link ? `: ${reply.link}` : "."}`,
+          `I drafted this change for approval${reply.where ? ` in ${reply.where}` : ""}${reply.link ? `: ${reply.link}` : "."}`,
           "Nothing changes in the file or anywhere else until a teammate approves it there.",
         ];
       case "not-teammate":

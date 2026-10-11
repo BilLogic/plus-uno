@@ -90,6 +90,8 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
       ? {
           design: {
             channel,
+            // Named only where it is #plus-design: a DM is no channel to point at.
+            ...(channel === env.PLUS_DESIGN_CHANNEL_ID?.trim() ? { name: "#plus-design" } : {}),
             async post(text) {
               const res = await postMessage(env, { channel, text });
               return res.ok && res.ts ? { ts: res.ts } : null;
