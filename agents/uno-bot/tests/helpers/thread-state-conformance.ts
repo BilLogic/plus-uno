@@ -96,7 +96,8 @@ export function runThreadStateConformance(
   runner: ConformanceRunner,
 ): void {
   function setup(): { store: ThreadState; clock: TestClock } {
-    const clock = makeTestClock();
+    // Keep runtime alarms in the future; TTL assertions advance only this clock.
+    const clock = makeTestClock(Date.now() + 24 * 60 * 60 * 1000);
     return { store: makeStore({ now: () => clock.now() }), clock };
   }
 

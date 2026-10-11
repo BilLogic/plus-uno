@@ -16,7 +16,7 @@
 // storage. The adapter's production keying — one global `idFromName("uno-bot")`
 // instance — is what runs when nobody passes it.
 import { env, runInDurableObject } from "cloudflare:test";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { internalSubrequestsUsed, runMetered } from "../../src/net";
 import { ThreadState as ThreadStateObject } from "../../src/thread-state";
@@ -39,25 +39,31 @@ describe("[durable-object] report expiry alarm", () => {
 
   it("arms at expiry, hands work outside the object, and retries until the edit is acknowledged", async () => {
     const instance = `report-alarm-${instanceCounter++}`;
-    const store = createDurableObjectThreadState({ namespace, instance, now: () => Date.now() - 2000 });
+    const start = Date.now() + 60_000;
+    const expiredAt = start + 1001;
+    const store = createDurableObjectThreadState({ namespace, instance, now: () => start });
     const stub = namespace.get(namespace.idFromName(instance));
-    const before = Date.now();
     await store.putReport(report());
     const armed = await runInDurableObject(stub, (_o, state) => state.storage.getAlarm());
-    expect(armed).toBeLessThan(before + 100);
+    expect(armed).toBe(start + 1001);
     const handed: DecisionReportRecord[][] = [];
     const fire = () => runInDurableObject(stub, async (_o, state) => {
       await state.storage.deleteAlarm();
-      await new ThreadStateObject(state, env as Env, { handOffExpiredReports: async (due) => void handed.push(due) }).alarm();
+      const clock = vi.spyOn(Date, "now").mockReturnValue(expiredAt);
+      try {
+        await new ThreadStateObject(state, env as Env, { handOffExpiredReports: async (due) => void handed.push(due) }).alarm();
+      } finally {
+        clock.mockRestore();
+      }
     });
     await fire();
     expect(handed[0]?.map((r) => r.messageTs)).toEqual(["1700.9"]);
     expect((await store.getReport("1700.9"))?.entries[0]?.state.kind, "the alarm hands off rather than calling its own stub").toBe("open");
     const retry = await runInDurableObject(stub, (_o, state) => state.storage.getAlarm());
-    expect(retry).toBeLessThanOrEqual(Date.now() + REPORT_EXPIRY_RETRY_MS);
+    expect(retry).toBe(expiredAt + REPORT_EXPIRY_RETRY_MS);
     await fire();
     expect(handed).toHaveLength(2);
-    const liveStore = createDurableObjectThreadState({ namespace, instance });
+    const liveStore = createDurableObjectThreadState({ namespace, instance, now: () => expiredAt });
     const edit = await liveStore.prepareReportExpiry("1700.9");
     expect(edit?.report.entries[0]?.state.kind).toBe("expired");
     await liveStore.acknowledgeReportExpiry("1700.9", edit!.revision);
