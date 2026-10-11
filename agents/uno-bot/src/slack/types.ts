@@ -190,5 +190,6 @@ export type RunnerJobPayload =
   | { kind: "reaction"; event: SlackReactionAddedEvent }
   /** A cut-off run the ThreadState alarm found and nobody has looked at. */
   | { kind: "cut-off"; proposalTs: string }
+  | { kind: "report-expiry"; messageTs: string }
   /** A Figma notification, kept as ids and times (`figma-notify/event.ts`). */
   | { kind: "figma-event"; event: FigmaEventJob };

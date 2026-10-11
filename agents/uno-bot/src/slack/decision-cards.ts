@@ -263,7 +263,7 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
   const blocks = record.plain ? plainReportBlocks(drawn) : drawn;
   // The fallback is mrkdwn and a card's words are plain text: escaped, so a
   // title holding `<!channel>` pings nobody from the notification either.
-  const text = [head, ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${escapeSlackText(shownAs(e).body)}`)].join("\n");
+  const text = [head, ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Closed, no decision. " : ""}${escapeSlackText(shownAs(e).body)}`)].join("\n");
   return { text, blocks, ...(record.metadata ? { metadata: record.metadata } : {}) };
 }
 
