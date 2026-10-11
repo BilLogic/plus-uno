@@ -216,6 +216,42 @@ test("an ordinary bot thread, with history and no card, engages on every reply",
   }
 });
 
+// A card follow-up uno-bot posted at a channel's top starts a thread that is
+// its own: the follow-up job leaves it unmarked, so a reply there is a reply to
+// uno-bot, with the card live or after it closed. One posted into the team's
+// own thread (a to-do's) marks that thread, which stays the team's.
+const FOLLOW_UP_ROOT = { user: BOT, bot_id: "BBOT", ts: "1700.1", text: "<@U0BEA> Checking in on a Roadmap card." };
+const FOLLOW_UP_CARD = { proposalTs: "1700.1", item: { messageTs: "1700.1", id: "card:p1" } };
+
+test("under a follow-up uno-bot started, a plain reply engages, the card live or closed", async () => {
+  thread = [FOLLOW_UP_ROOT];
+  pending = FOLLOW_UP_CARD;
+  try {
+    assert.equal(await engages(inSweepThread("it's done, can u move it to shipped?")), true, "card live");
+    assert.equal(await engages(inSweepThread("✅")), true, "a typed gate word reaches the gate, which answers review-only");
+    pending = null;
+    assert.equal(await engages(inSweepThread("it's done, can u move it to shipped?")), true, "card closed");
+  } finally {
+    thread = ROOT_ONLY;
+    pending = null;
+  }
+});
+
+test("under a follow-up posted into the team's thread, only an @mention or a typed gate word engages", async () => {
+  marks.add(`sweep:thread:${OTHER}:1700.1`);
+  thread = [...ROOT_ONLY, { ...FOLLOW_UP_ROOT, ts: "1700.5" }];
+  pending = FOLLOW_UP_CARD;
+  try {
+    assert.equal(await engages(inSweepThread("it's done, can u move it to shipped?")), false);
+    assert.equal(await engages(inSweepThread("✅")), true);
+    assert.equal(await engages(inSweepThread(`<@${BOT}> move it to shipped`)), true);
+  } finally {
+    marks.clear();
+    thread = ROOT_ONLY;
+    pending = null;
+  }
+});
+
 // A thread the bot entered through a sweep card stays the team's after the
 // card is decided: the batch result, the notes and the history the ✅ left
 // behind invite nothing. Only a pick, a typed gate emoji or an @mention does.
