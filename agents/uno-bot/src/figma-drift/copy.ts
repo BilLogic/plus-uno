@@ -10,8 +10,8 @@
 //     Thread settled "primary buttons use brand-600" on Oct 6 · the file has not changed since Oct 2.
 //     [Review] [Open in Figma]
 //
-// Each card is decided in its Review pop-up alone: Approve files the file's
-// intake, Reject files nothing. Nothing here teaches a gate of its own — no
+// Each card is decided in its Review pop-up alone: File an intake writes;
+// Already updated and Didn't touch this file write nothing. No
 // ✅/⛔ footer, no `drop N`, no typed `skip` or "yes". A file whose intake is
 // drafted in another thread is no card here: the parent gains a one-line
 // pointer to it. Once a file catches up, its card (or a pointer-only message)
@@ -29,7 +29,7 @@
 import { escapeSlackText } from "../slack/mrkdwn";
 import { shortDate, windowInWords } from "../slack/copy-words";
 import { etDayOf } from "../sweep/schedule";
-import type { ProposalOperation, ReportItem, StatedCardWords } from "../thread-state/index";
+import type { ProposalOperation, ReportItem, ReviewChoice, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import type { TargetKind } from "../sweep/finding";
 import type { IntakeLane } from "./finding";
@@ -176,10 +176,19 @@ export function driftCardWords(ttlHours: number): StatedCardWords {
   };
 }
 
+/** The file's three answers; only filing approves the drafted write. */
+export function driftChoices(): ReviewChoice[] {
+  return [
+    { value: "file", label: "File an intake", past: "Intake filed", verdict: "confirm" },
+    { value: "updated", label: "Already updated", verdict: "cancel" },
+    { value: "untouched", label: "Didn't touch this file", verdict: "cancel" },
+  ];
+}
+
 /** What a turn says to Needs changes on a drift card: the intake is drafted
  *  from the thread as it stands, so it is not redrafted. */
 export const DRIFT_NO_REVISION =
-  "This intake is drafted from the thread as it stands, so I don't redraft it. In its Review, Approve files it as it is and Reject files nothing.";
+  "This intake is drafted from the thread as it stands, so I don't redraft it. Choose an answer in its Review; only filing writes the intake.";
 
 // ── Withdrawals: the same message, edited ────────────────────────────────────
 

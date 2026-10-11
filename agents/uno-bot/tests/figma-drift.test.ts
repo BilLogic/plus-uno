@@ -304,6 +304,11 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(proposal.sweepRun, undefined, "not a sweep card: it holds no sweep items");
     assert.deepEqual(proposal.stated, driftCardWords(72), "the gate answers in the card's own words");
     assert.equal(proposal.refuseRevision, DRIFT_NO_REVISION, "a turn does not redraft it beside the card");
+    assert.deepEqual(proposal.choices?.map(({ label, verdict }) => ({ label, verdict })), [
+      { label: "File an intake", verdict: "confirm" },
+      { label: "Already updated", verdict: "cancel" },
+      { label: "Didn't touch this file", verdict: "cancel" },
+    ], "Review offers the three agreed answers, with only filing allowed to write");
     assert.match(proposal.proposalText, /^\*<https:\/\/www\.figma\.com\/design\/AbC123xyz\/Session-Recap\?node-id=1-2\|Session Recap>:\* this thread settled /, "what Review shows");
     const sections = (input.sections as Array<{ heading: string; body: string }>).map((s) => s.body).join("\n");
     assert.match(sections, /Last published by bea\.designs on 2026-09-20\./, "the publisher is on the intake");
@@ -1245,9 +1250,45 @@ describe("a file-change notification (#896)", () => {
 });
 
 describe("a drift card decided in Review", () => {
+  for (const [choice, label, writes] of [
+    ["file", "Intake filed", 1],
+    ["updated", "Already updated", 0],
+    ["untouched", "Didn't touch this file", 0],
+  ] as const) {
+    it(`records ${label} and runs ${writes} intake writes`, async () => {
+      const { h, m } = await recapMorning();
+      await runDriftAsks(MORNING, m.deps);
+      const report = m.posted[0]!;
+      const updates: Array<{ blocks: unknown[] }> = [];
+      let ran = 0;
+      await runReviewDecision(
+        { viewId: "V1", channel: DESIGN, messageTs: itemProposalKey(report.ts, "1"), userId: "U0BEA", decision: "confirm", choice },
+        {
+          threadState: h.threadState,
+          views: recordingViews({ alreadyOpen: ["V1"] }).client,
+          delivery: () => recordingDelivery(),
+          applyVerdict: async (verdict) => {
+            ran += verdict.execute?.operations.length ?? 0;
+            return [];
+          },
+          updateCard: async (_channel, _ts, message) => void updates.push(message),
+          restage: async () => {},
+          revise: async () => {},
+          now: () => h.clock.now,
+        },
+      );
+      assert.equal(ran, writes);
+      const card = cardsOf(updates[0]!.blocks)[0]!;
+      assert.equal(card.subtitle!.text, `${label} · <@U0BEA>`);
+      assert.match(card.body!.text, writes ? /^Written:/ : /^Nothing written\.$/);
+      assert.deepEqual(labels(card), ["View", "Open in Figma"]);
+    });
+  }
+
   it("keeps a Reject's reason on the card and in View", async () => {
     const { h, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    // A report posted before custom choices keeps its original Reject path.
+    await runDriftAsks(MORNING, { ...m.deps, stage: (proposal, kind) => m.deps.stage({ ...proposal, choices: undefined }, kind) });
     const [report] = m.posted;
     const updates: Array<{ ts: string; message: { blocks: unknown[] } }> = [];
     const deps: ReviewDoorDeps = {
