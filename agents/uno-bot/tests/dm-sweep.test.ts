@@ -35,6 +35,7 @@ import { runSweepJob, shadowedByPrivate, type PendingFinding, type SweepSource }
 import type { ScheduledJob } from "../src/scheduled/runs";
 import type { PendingProposal } from "../src/thread-state/index";
 import { renderProposalCard } from "../src/slack/proposal-render";
+import { renderGateNote } from "../src/slack/gate-note";
 import { resolveSignal } from "../src/gate/index";
 import { SWEEP_CARD_EVENT } from "../src/sweep/cards";
 import { at, BOT, DESIGN, msg, notionPage, sweepHarness, ts, UNIVERSAL, type FakeChannel } from "./helpers/sweep-harness";
@@ -589,6 +590,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     );
     assert.equal(no.outcome, "won");
     assert.equal(no.execute, undefined, "⛔ posts nothing");
+    assert.equal(renderGateNote(no.post!.note), "Rejected, nothing posted.", "in the raise card's own words");
     // The card, as Slack returns it that night: uno-bot's, tagged, and the
     // newest thing in the thread — worded just like a disagreement.
     dm.threads![root.ts] = [root, answer, bot(card.ts, card.text, { thread_ts: root.ts, metadata: card.metadata as never })];

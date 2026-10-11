@@ -1,13 +1,14 @@
-// What may leave a group DM once a sweep card there has been ✅'d: a second,
-// separate card that offers a reworded note.
+// What may leave a group DM once a sweep fix there has been approved: a
+// second, separate card that offers a reworded note.
 //
-// Anything found in a group DM stays in it. The fix card's ✅ applies the fix
+// Anything found in a group DM stays in it. A fix's Approve applies the fix
 // and nothing more. When that batch has written at least one page, the Worker
 // stages a SHARE CARD in the same group DM. It shows the note's exact text and
 // names the team channel it would go to — the rung the finding would take with
 // its evidence set aside (`shareDestination`): #plus-universal for the design
-// system, #plus-design otherwise, never #uno-bot. Its ✅ posts exactly that
-// text there (`sweep_share_post`, a `worker` tool); its ⛔ drops it. It has the
+// system, #plus-design otherwise, never #uno-bot. It is decided from Review:
+// Approve posts exactly that text there (`sweep_share_post`, a `worker`
+// tool); Reject drops it. It has the
 // fix card's confirmers, 72 h, and its own slot in the thread
 // (`SWEEP_SHARE_KEY`), so it never replaces the fix card or a turn's card.
 //
@@ -31,7 +32,7 @@ import { escapeSlackText } from "../slack/mrkdwn";
 import type { PendingProposal, ProposalOperation, SweepShare, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
-import { SHARE_CHANNEL_NAMES, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS } from "./cards";
+import { SHARE_CARD_WORDS, SHARE_CHANNEL_NAMES, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS, shareCard } from "./cards";
 
 /** The share card's own slot in its thread (`proposalSlot`). */
 export const SWEEP_SHARE_KEY = "sweep-share";
@@ -104,8 +105,8 @@ export function sweepShareOffer(
 }
 
 /**
- * The share card for its operations: each note quoted exactly as its ✅ posts
- * it, under the channel it goes to. Built from the operations alone, so a
+ * The share card for its operations: each note quoted exactly as approving
+ * posts it, under the channel it goes to. Built from the operations alone, so a
  * share card re-staged after a cut-off shows the same notes as the first.
  *
  * @param operations - The card's `sweep_share_post` operations
@@ -120,7 +121,7 @@ export function sweepShareCard(operations: readonly ProposalOperation[]): Propos
   const lines = [
     `**${SWEEP_CARD_MARK}** — share what this conversation settled?`,
     "",
-    `Nothing from here has left this group DM. ✅ posts exactly ${one ? "this note" : "these notes"} in ${where}; ⛔ drops ${one ? "it" : "them"}.`,
+    `Nothing from here has left this group DM. Approving posts exactly ${one ? "this note" : "these notes"} in ${where}, and nothing else.`,
   ];
   for (const n of notes) lines.push("", `In ${n.where}:`, ...n.text.split("\n").map((l) => `> ${l}`));
   lines.push(
@@ -128,7 +129,7 @@ export function sweepShareCard(operations: readonly ProposalOperation[]): Propos
     "The people who could confirm the fix can confirm this. " +
       `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   );
-  return { kind: "confirm", verb: `post this note in ${where}`, lead: lines.join("\n"), fields: [], caveats: [], operations: [...operations] };
+  return shareCard({ where, lead: lines.join("\n"), operations });
 }
 
 /**
@@ -177,6 +178,7 @@ export async function stageSweepShare(
       ttlMs: SWEEP_CARD_TTL_MS,
       confirmers: [...(fix.confirmers ?? [])],
       supersedeKey: SWEEP_SHARE_KEY,
+      stated: SHARE_CARD_WORDS,
     };
     const { retired } = await deps.threadState.putProposal(proposal);
     const now = deps.now();

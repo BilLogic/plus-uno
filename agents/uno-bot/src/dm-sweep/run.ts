@@ -26,11 +26,12 @@
 //   `dmAsksDue` — the morning's `commitment-nudge` job hands it each DM row
 //   due, as it hands card follow-ups to theirs. F6: "Yesterday I couldn't find
 //   <X>. Did you get it?", once, in the thread; unanswered by its next due
-//   date, it lapses. C6: a proposal card in the thread offering to post a note —
-//   its ✅ runs `sweep_share_post` with a reworded note (`./copy.ts`) in
-//   #plus-universal for the design system, #plus-design otherwise
-//   (`shareDestination`), and its ⛔ drops it. That ✅, by the person the DM is
-//   with, is the only way anything found in a DM reaches a channel. Each raise
+//   date, it lapses. C6: a proposal card in the thread offering to post a note,
+//   decided from Review — Approve runs `sweep_share_post` with a reworded note
+//   (`./copy.ts`) in #plus-universal for the design system, #plus-design
+//   otherwise (`shareDestination`), and Reject drops it. That Approve, by the
+//   person the DM is with, is the only way anything found in a DM reaches a
+//   channel. Each raise
 //   card holds a slot of its own (`raiseSlot`). A thread gets one raise, and a
 //   pair of sources is raised once in a person's DM for `RAISE_QUIET_MS`
 //   whatever became of it (`raisePrefix`). Every post here, the raise card's
@@ -39,7 +40,7 @@
 //
 //   `answerDmAsk` — the reaction door's hand-off for a DM row: 🙅 on the F6
 //   ask from its person drops it. Any other glyph does nothing. The raise
-//   card is a proposal, so its ✅ and ⛔ go to the gate.
+//   card is a proposal, so its Review goes to the gate.
 //
 // WHAT IS KEPT. Rows in `commitments` with `channel_kind` 'dm' — the surface
 // flag — and no text (ADR-030): what uno-bot could not find and what two
@@ -56,7 +57,7 @@ import { dayLabel, etDayOf, rearmedDueAt, TEXT_KEEP_MS } from "../commitments/du
 import { MAX_HOLDS, type CommitmentAction, type ReminderReaction } from "../commitments/run";
 import { LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
 import { shareDestination } from "../sweep/finding";
-import { SWEEP_CARD_TTL_MS } from "../sweep/cards";
+import { SHARE_CARD_WORDS, SWEEP_CARD_TTL_MS } from "../sweep/cards";
 import type { DmThread, DmThreadVerdict } from "../sweep/run";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
@@ -97,7 +98,7 @@ export function dmResultTag(p: { supersedeKey?: string }): { event_type: string;
 }
 
 /** How long an earlier raise about the same two sources keeps a new one
- *  from being offered, whatever became of it (⛔, ✅ or lapsed). */
+ *  from being offered, whatever became of it (rejected, approved or lapsed). */
 export const RAISE_QUIET_MS = 14 * 24 * 60 * 60 * 1000;
 
 /**
@@ -400,6 +401,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     // The person the DM is with, and nobody else.
     confirmers: [c.promiserId],
     supersedeKey: raiseSlot(c.id),
+    stated: SHARE_CARD_WORDS,
   };
   const { retired } = await deps.threadState.putProposal(proposal);
   // A DM is never named on the record (`storesChannel`).
@@ -407,7 +409,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     ...supersededEvents(retired, now, "worker"),
     stagedEvent({ proposal, at: now, via: "worker", channelStored: storesChannel("assistant", "im") }),
   ]);
-  // No reminder ts: the card is a proposal, so its ✅ and ⛔ reach the gate.
+  // No reminder ts: the card is a proposal, so its Review reaches the gate.
   await settle(asked);
   return { id: c.id, action: "nudged", text: card.lead ?? "", ts: sent.ts };
 }

@@ -30,7 +30,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,613 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,454 (−15,866 ide-only) | 101,109 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 115,809 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,344 (−7,288 ide-only) | 150,195 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,344 (−7,294 ide-only) | 150,195 | — |
 | 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 153,479 | — |
 | 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 159,995 | — |
 | 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,658 | — |
@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,333 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,416 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 31,028 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 31,111 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1442,7 +1442,7 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 #uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
 
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
-- **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. Its ✅ posts that note; its ⛔ drops it. It has the fix's confirmers and 72 h. A re-staged fix offers no share.
+- **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. It is decided from Review: Approve posts that note, Reject drops it. It has the fix's confirmers and 72 h. A re-staged fix offers no share.
 - **DM with uno-bot:** the card goes back in that DM, for its person alone (§ DMs with uno-bot).
 - **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private report. A DM with uno-bot is the exception: it takes nothing off a channel card.
 
@@ -1541,10 +1541,10 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 About half the asks happen in people's 1:1 DMs with uno-bot. The end-of-day run reads each DM someone asked uno-bot something in since its last read, both sides of each thread, with the bot token. Everything it finds goes back **only into that same DM thread**, at the next weekday morning run (9 am ET). The code is `agents/uno-bot/src/dm-sweep/`.
 
 - **F6, a question uno-bot could not answer.** uno-bot's answer said it could not find it, or was not sure. The next morning, once: "Yesterday I couldn't find <X>. Did you get it?" An answer given with a source gets none. A reply with the answer or a link is read that night like an answered question in a channel (§ Answers and decisions no page holds yet), and its placement card lands in the DM. 🙅 on the ask drops it. Unanswered, it lapses.
-- **C6, a disagreement uno-bot noticed.** uno-bot's answer said two sources disagree (Figma and code on the warning colour). The next morning, a card: "Yesterday I noticed Figma and the code disagree on the warning colour. Want me to post a note about it in #plus-universal?" (#plus-design when it is not the design system). Its ✅ posts that one reworded note: uno-bot's own summary, with no quote of the DM and no name. ⛔ drops it. The note names no owner and files no intake; whoever owns it picks it up in the channel. One raise a thread, and none about the same two sources in that person's DM for 14 days after an earlier one, whatever became of it.
+- **C6, a disagreement uno-bot noticed.** uno-bot's answer said two sources disagree (Figma and code on the warning colour). The next morning, a card: "Yesterday I noticed Figma and the code disagree on the warning colour. Want me to post a note about it in #plus-universal?" (#plus-design when it is not the design system). It is decided from Review: Approve posts that one reworded note, uno-bot's own summary with no quote of the DM and no name, and Reject drops it. The note names no owner and files no intake; whoever owns it picks it up in the channel. One raise a thread, and none about the same two sources in that person's DM for 14 days after an earlier one, whatever became of it.
 - **C7, a decision told to uno-bot.** The person states a team decision ("we decided the recap goes weekly"); an opinion or a wish is not one. That night the thread gets the drift read, following the links uno-bot's own answers carried too, and the next morning brings a proposal card with the page edit, in the DM.
 - **Own posts:** uno-bot tags every post it makes in a DM (the ask, the raise card and its result, a sweep card), and the next night reads those as context only, so a card is only ever read as its own post.
-- **Leaving the DM:** C6's ✅, by the person the DM is with, is the only way anything found in a DM reaches a channel. Every card here is theirs alone to confirm, and a channel card for the same fix still goes up in its own thread.
+- **Leaving the DM:** C6's Approve in Review, by the person the DM is with, is the only way anything found in a DM reaches a channel. Every card here is theirs alone to confirm, and a channel card for the same fix still goes up in its own thread.
 - **Limits:** F6 and C6 spend the budget uno-bot's own follow-ups share (two a person a morning, after the person's own reminders), so on a busy morning one can slip to the next. Each is asked once.
 - **Stored:** F6 and C6 are `commitments` rows of kind `dm_unanswered` and `dm_disagreement`, and C7's fixes are `sweep_items` rows with `surface = 'dm'`. What uno-bot could not find and what disagrees stay in KV with an expiry, in uno-bot's words (ADR-030). Nothing from a DM feeds another person's job or the commitment detector's examples.
 

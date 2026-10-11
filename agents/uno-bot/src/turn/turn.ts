@@ -1496,9 +1496,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
   }
 
-  // A sweep card that adds an answer is revised by `drop N` alone: the model
+  // A sweep card that adds an answer is never revised in words: the model
   // has no `insert` to restage it with, so a worded revision would lose the
-  // added text rather than keep it byte for byte.
+  // added text rather than keep it byte for byte. The refusal points at
+  // Review: reject it there, then say what it should say.
   if (replaced?.sweepRun && holdsInsert(proposalOperations(replaced))) {
     const refusal = replaced.item ? FIX_INSERT_REFUSAL : INSERT_CARD_REFUSAL;
     await delivery.postNote(refusal, sweepTag("note"));
