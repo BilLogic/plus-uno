@@ -16,7 +16,7 @@
 //     (`slack/decision-cards.ts`): a parent line counting every file the
 //     thread discussed, then one card per file whose intake it drafts, each
 //     its own proposal (`itemProposal`), decided in its own Review pop-up —
-//     Approve files that intake, Reject files nothing. A file whose intake is
+//     File an intake writes; its other choices write nothing. A file whose intake is
 //     drafted in another thread is no card here: the parent gains a one-line
 //     pointer to it, and a thread with only such files gets the pointers
 //     alone. The pointers are a notification, not a write, so they are not
@@ -68,6 +68,7 @@ import {
   caughtUpNote,
   caughtUpText,
   driftCardWords,
+  driftChoices,
   driftItem,
   driftParent,
   driftReview,
@@ -655,6 +656,7 @@ async function askWithCards(
       confirmers: [...new Set(d.all.flatMap((f) => [f.owner, ...f.participants]).filter(Boolean))],
       // Nobody asked, so the gate's "ask me again" lines would be wrong.
       stated: driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000),
+      choices: driftChoices(),
       refuseRevision: DRIFT_NO_REVISION,
     };
     try {
