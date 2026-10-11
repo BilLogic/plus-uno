@@ -91,6 +91,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * the end-of-day `dm-capture-read` reads their DMs for drift and undocumented
  * answers, and the morning `dm-capture-post` offers each fix on a decision card in
  * their DM with uno-bot that only they can decide (src/dm-watch/capture.ts).
+ * The weekly Figma tidy-up's two, Monday morning: `figma-tidy-read` lists the
+ * teams' stage folders, and `figma-tidy-post` checks each file against its
+ * cards and posts the week's Review cards (src/figma-tidy/).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -121,7 +124,9 @@ export type ScheduledJobKind =
   | "dm-promise-read"
   | "dm-promise-nudge"
   | "dm-capture-read"
-  | "dm-capture-post";
+  | "dm-capture-post"
+  | "figma-tidy-read"
+  | "figma-tidy-post";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -177,7 +182,12 @@ const RUN_HOURS: Record<ScheduledRunName, number> = {
  *  teams is 36 listings, a job may make 38, and a third is room to spare. */
 export const BACKSTOP_JOBS = 3;
 
-/** Friday, as `Date.getUTCDay` numbers it. */
+/** Jobs Monday's morning run gives the Figma tidy-up's listing: about 30
+ *  listings, a job may make 38, and a second is room to spare. */
+export const TIDY_JOBS = 2;
+
+/** Monday and Friday, as `Date.getUTCDay` numbers them. */
+const MONDAY = 1;
 const FRIDAY = 5;
 
 /**
@@ -206,6 +216,14 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
     { key: "figma-drift-post", kind: "figma-drift-post" },
     { key: "team-roles-sync", kind: "team-roles-sync" },
+    // Monday: the week's Figma tidy-up, its listing cut into jobs, then the post.
+    ...Array.from({ length: TIDY_JOBS }, (_, i) => ({ key: `figma-tidy-read-${i + 1}`, kind: "figma-tidy-read" as const, weekday: MONDAY })),
+    {
+      key: "figma-tidy-post",
+      kind: "figma-tidy-post",
+      weekday: MONDAY,
+      after: Array.from({ length: TIDY_JOBS }, (_, i) => `figma-tidy-read-${i + 1}`),
+    },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },

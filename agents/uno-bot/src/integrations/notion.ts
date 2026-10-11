@@ -946,6 +946,8 @@ export interface EditedRow {
   values: Record<string, string[]>;
   /** Who created the row, as a Notion user id. */
   createdById: string | null;
+  /** The row's unique id number — a Roadmap card's number — when it has one. */
+  number?: number;
 }
 
 type RawRow = DbQueryRow & { last_edited_time?: string; parent?: { database_id?: string }; created_by?: { id?: string } };
@@ -959,8 +961,10 @@ function toEditedRow(r: RawRow & { in_trash?: boolean }): EditedRow | null {
   const people: Record<string, string[]> = {};
   const persons: Record<string, Array<{ id: string; name: string }>> = {};
   const values: Record<string, string[]> = {};
+  let number: number | undefined;
   for (const [name, prop] of Object.entries(r.properties ?? {})) {
     if (prop.type === "title") title = plain(prop.title) || title;
+    else if (prop.type === "unique_id") number = prop.unique_id?.number ?? undefined;
     else if (prop.type === "people") {
       people[name] = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
       persons[name] = (prop.people ?? []).filter((u) => u.id).map((u) => ({ id: u.id!, name: u.name ?? "" }));
@@ -982,6 +986,7 @@ function toEditedRow(r: RawRow & { in_trash?: boolean }): EditedRow | null {
     persons,
     values,
     createdById: r.created_by?.id ?? null,
+    ...(number !== undefined ? { number } : {}),
   };
 }
 
@@ -1041,6 +1046,30 @@ export async function queryRowsWithStatus(
     },
     "status query failed",
   );
+}
+
+/**
+ * The Roadmap cards with these numbers, as rows: one query per 100 numbers,
+ * the most Notion's compound filter takes. A number the Roadmap lacks is
+ * simply absent. Throws on failure.
+ *
+ * @param env - Carries NOTION_API_KEY and NOTION_ROADMAP_DB_ID
+ * @param numbers - Card numbers
+ */
+export async function queryRoadmapByNumbers(env: Env, numbers: readonly number[]): Promise<EditedRow[]> {
+  if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
+  const rows: EditedRow[] = [];
+  for (let i = 0; i < numbers.length; i += 100) {
+    const chunk = numbers.slice(i, i + 100);
+    const { rows: page } = await queryRowPage(
+      env,
+      env.NOTION_ROADMAP_DB_ID,
+      { page_size: 100, filter: { or: chunk.map((n) => ({ property: ROADMAP_ID_PROP, unique_id: { equals: n } })) } },
+      "roadmap number query failed",
+    );
+    rows.push(...page);
+  }
+  return rows;
 }
 
 /** One database row read again, or null when it is gone or unshared. One
