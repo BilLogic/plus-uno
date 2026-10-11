@@ -172,8 +172,13 @@ export const npmArgs = (row) =>
     ? ['--prefix', 'agents/uno-bot', 'run', '--silent', row.name]
     : ['run', '--silent', row.name];
 
+/** Node's default `maxBuffer` is 1 MiB, and a child that writes past it is
+ *  killed mid-run: the Worker's suite passed that mark in TAP output, and was
+ *  read as a failure with every test green. */
+const SPAWN_MAX_BUFFER = 64 * 1024 * 1024;
+
 const defaultSpawn = (args, repoRoot) =>
-  spawnSync('npm', args, { cwd: repoRoot, encoding: 'utf8', env: process.env });
+  spawnSync('npm', args, { cwd: repoRoot, encoding: 'utf8', env: process.env, maxBuffer: SPAWN_MAX_BUFFER });
 
 const defaultLoad = (modulePath, repoRoot) =>
   import(pathToFileURL(path.join(repoRoot, modulePath)).href);
