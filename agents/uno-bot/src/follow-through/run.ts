@@ -690,9 +690,13 @@ export function cardFollowUps(deps: DueDeps): CardFollowUps {
     async flush(now, runDate) {
       const actions: CommitmentAction[] = [];
       for (const [key, group] of morning.groups) {
-        actions.push(...(await postGroup(deps, group, now, runDate)));
+        const posted = await postGroup(deps, group, now, runDate);
+        actions.push(...posted);
         for (const a of group.asked) morning.held.delete(a.c.id);
         morning.groups.delete(key);
+        // Last, once the group is posted, staged and no longer held: a stop
+        // here costs only the note, never a second post.
+        await noteUntagged(deps, group, posted);
       }
       return actions;
     },
@@ -897,10 +901,6 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
   const sent = await deps.slack.post(group.to, { text: report.text, blocks: report.blocks });
   if (!sent.ok || !sent.ts) return [...(await Promise.all(shown.map((a) => holdCard(deps, a.c, now, runDate, "Slack refused the post")))), ...later];
   const thread = group.to.threadTs ?? sent.ts;
-  // Posted without tagging someone it names: the lead hears which Team
-  // Members cell would let it, once a month at most per person.
-  const untagged = [...new Set(shown.flatMap((a) => a.text.unmatched ?? []))];
-  if (untagged.length && !deps.dryRun) await deps.gaps?.untagged(untagged);
   const kept = await deps.reports.putReport(reportRecord(group.to.channel, sent.ts, report, FOLLOW_THROUGH_CARD_TTL_MS)).then(
     () => true,
     (err: unknown) => {
@@ -952,6 +952,18 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
     actions.push({ id: a.c.id, action: firstAsk ? "nudged" : "followed-up", text: report.text, ts: sent.ts });
   }
   return [...actions, ...later];
+}
+
+/**
+ * The lead hears of each person a posted follow-up names and could not tag,
+ * when a Team Members cell would let it (`../usage/gap-notes.ts`). Throws a
+ * budget stop.
+ */
+async function noteUntagged(deps: Pick<DueDeps, "gaps" | "dryRun">, group: Group, actions: readonly CommitmentAction[]): Promise<void> {
+  if (!deps.gaps || deps.dryRun) return;
+  const posted = new Set(actions.filter((a) => a.action === "nudged" || a.action === "followed-up").map((a) => a.id));
+  const names = [...new Set(group.asked.filter((a) => posted.has(a.c.id)).flatMap((a) => a.text.unmatched ?? []))];
+  if (names.length) await deps.gaps.untagged(names);
 }
 
 /**

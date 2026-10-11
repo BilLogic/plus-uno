@@ -5,16 +5,21 @@
 //   • a Figma @uno ask from a commenter the Figma people map does not know,
 //     whose Figma handle is the name of a row with no readable Figma User ID —
 //     they got a public-only answer (`../figma-ask/job.ts`);
-//   • a card follow-up that posted without tagging someone it named
-//     (`../follow-through/run.ts`).
+//   • a card follow-up that posted without tagging someone it named, whose
+//     row matched no one in Slack (its Slack ID) or has no Notion Person
+//     (`../follow-through/run.ts`). Someone with no in-scope row — a guest,
+//     a Past Collaborator — or whose row already has both is not noted.
 // Each sends one DM to `LEAD_USER_ID` alone: the person's name and the one
 // column to fill on their row, and no id, file or quote. A person is noted
-// once in 30 days, by a mark in KV; unset `LEAD_USER_ID` notes nobody.
+// once in 30 days, by a mark in KV keyed by a hash of their name, so no name
+// shows in a key listing; unset `LEAD_USER_ID` notes nobody.
 //
-// A note is a side remark, so it never fails what it rides on: every error,
-// a budget stop included, is logged and swallowed. Free of `Env`:
-// `./production.ts` binds the read, the marks, the lead and the DM.
+// A note is a side remark, so it fails nothing it rides on: an error is
+// logged and dropped. A budget stop is the exception, rethrown like every
+// other, so each caller notes only once its own work is safely done. Free of
+// `Env`: `./production.ts` binds the read, the marks, the lead and the DM.
 
+import { rethrowIfBudget } from "../net";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { normalisePersonName } from "./roles";
 import type { StoredTeamRoles } from "./team-roles-sync";
@@ -40,7 +45,7 @@ export interface GapNoteDeps {
   dm(userId: string, text: string): Promise<{ ok: boolean; error?: string }>;
 }
 
-/** The two moments a gap is noted. Neither throws. */
+/** The two moments a gap is noted. Each throws a budget stop and nothing else. */
 export interface GapNotes {
   /** A Figma asker the people map does not know, by their Figma handle. */
   figmaAsker(handle: string): Promise<void>;
@@ -48,9 +53,10 @@ export interface GapNotes {
   untagged(names: readonly string[]): Promise<void>;
 }
 
-/** The KV key a person's mark is kept under. */
-export function gapNoteKey(name: string): string {
-  return `gap-note:${normalisePersonName(name)}`;
+/** The KV key a person's mark is kept under: a SHA-256 of their normalised name. */
+export async function gapNoteKey(name: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalisePersonName(name)));
+  return `gap-note:${[...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("")}`;
 }
 
 const WHY: Record<"figma" | "follow-up", string> = {
@@ -76,7 +82,7 @@ function rowNamed(name: string, rows: readonly string[] | undefined): string | n
  */
 export function gapNotes(deps: GapNoteDeps): GapNotes {
   async function note(name: string, column: GapColumn, why: keyof typeof WHY): Promise<void> {
-    const key = gapNoteKey(name);
+    const key = await gapNoteKey(name);
     if (await deps.marks.has(key)) return;
     const res = await deps.dm(deps.lead!, gapNoteText(name, column, why));
     if (!res.ok) {
@@ -90,6 +96,7 @@ export function gapNotes(deps: GapNoteDeps): GapNotes {
     try {
       await run();
     } catch (err) {
+      rethrowIfBudget(err);
       console.warn(`[gap-notes] ${what} not noted: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
@@ -104,12 +111,12 @@ export function gapNotes(deps: GapNoteDeps): GapNotes {
       safely("an untagged person", async () => {
         if (!names.some((n) => n.trim())) return;
         const stored = await deps.read();
+        if (!stored) return;
         for (const name of names) {
-          if (!name.trim()) continue;
-          // A row no single Slack member matched needs its Slack ID; any
-          // other is tagged through its Notion Person.
-          const unmatched = rowNamed(name, stored?.gaps);
-          await note(unmatched ?? name, unmatched ? "Slack ID" : "Notion Person", "follow-up");
+          const unmatched = rowNamed(name, stored.gaps);
+          const noPerson = unmatched ? null : rowNamed(name, stored.noNotionPerson);
+          if (unmatched) await note(unmatched, "Slack ID", "follow-up");
+          else if (noPerson) await note(noPerson, "Notion Person", "follow-up");
         }
       }),
   };
