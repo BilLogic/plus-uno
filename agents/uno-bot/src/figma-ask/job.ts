@@ -405,10 +405,44 @@ export function askInstruction(teammate: boolean): string {
 export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string): string | null {
   for (const url of cited) {
     if (sameFigmaPlace(url, asked)) continue;
-    const source = read.find((s) => s.url === url);
+    const source = read.find((s) => sameReadLink(url, s.url));
     if (source && threadVisibleSources([source]).length) return url;
   }
   return null;
+}
+
+/**
+ * Whether a cited link names what a lookup read: the same link once neither
+ * carries a fragment or a trailing slash, nor a query outside Figma (where the
+ * query is the frame); and a GitHub file or directory on any ref, so a cited
+ * `blob/main/…#L12` is the `blob/HEAD/…` a path read returned.
+ */
+function sameReadLink(cited: string, read: string): boolean {
+  const a = linkKey(cited);
+  const b = linkKey(read);
+  if (!a || !b) return cited === read;
+  if (a.repoPage && b.repoPage) return a.repoPage.at === b.repoPage.at && `/${a.repoPage.rest}`.endsWith(`/${b.repoPage.path}`);
+  return a.key === b.key;
+}
+
+function linkKey(url: string): { key: string; repoPage?: { at: string; rest: string; path: string } } | null {
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return null;
+  }
+  const host = u.hostname.toLowerCase().replace(/^www\./, "");
+  const path = u.pathname.replace(/\/+$/, "");
+  const query = /(^|\.)figma\.com$/.test(host) ? u.search : "";
+  const key = `${host}${path}${query}`;
+  // github.com/<owner>/<repo>/<blob|tree>/<ref>/<path>: the ref is one segment
+  // in a link a read returned; a cited ref may hold slashes, so the cited
+  // side keeps everything after the kind and matches the read path at its end.
+  const repo = host === "github.com" ? /^\/([^/]+\/[^/]+)\/(blob|tree)\/(.+)$/.exec(path) : null;
+  if (!repo) return { key };
+  const rest = repo[3]!;
+  return { key, repoPage: { at: `${repo[1]!.toLowerCase()}/${repo[2]}`, rest, path: rest.split("/").slice(1).join("/") } };
 }
 
 /** Whether two links open the same Figma frame, or the same file with no frame. */

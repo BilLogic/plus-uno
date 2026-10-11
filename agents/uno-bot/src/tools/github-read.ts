@@ -89,6 +89,7 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
         ok: true,
         repo,
         path: r.path,
+        url: githubLink(repo, "tree", r.path, ref),
         kind: "dir",
         entries: r.entries,
         note: "Directory listing — use it to confirm what exists (e.g. a DS component folder). Cite the path.",
@@ -98,6 +99,7 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
       ok: true,
       repo,
       path: r.path,
+      url: githubLink(repo, "blob", r.path, ref),
       kind: "file",
       content: r.text,
       truncated: r.truncated,
@@ -111,6 +113,15 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
       note: "Couldn't read that repo path — tell the user; don't answer from memory.",
     });
   }
+}
+
+/**
+ * The github.com page of what a path read read: `blob` for a file, `tree` for
+ * a directory. A read that named no ref read the default branch, which `HEAD`
+ * names on github.com whatever that branch is called.
+ */
+function githubLink(repo: string, kind: "blob" | "tree", path: string, ref?: string): string {
+  return `https://github.com/${repo}/${kind}/${encodeURIComponent(ref || "HEAD")}/${encodeURI(path)}`;
 }
 
 /**

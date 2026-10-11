@@ -22,6 +22,7 @@ import { recordingDelivery, runTurn, type RecordingDelivery } from "../src/turn/
 import { SubrequestBudgetError } from "../src/net";
 import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness } from "./helpers/turn-harness";
+import { readGithub } from "../src/tools/github-read";
 
 const FILE = "FILEKEY1";
 const DESIGN = "CDESIGN1";
@@ -591,6 +592,64 @@ describe("the source must have been read", () => {
       toolResultFor: (name) => (name === "source_read" ? JSON.stringify({ ok: true, title: "Progress bar", url: FRAME }) : PRD_FOUND),
     });
     await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+});
+
+describe("a GitHub file the turn read directly", () => {
+  const BUTTON = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/actions/Button/Button.jsx";
+  const BUTTON_PATH = "design-system/src/components/actions/Button/Button.jsx";
+  // What github_read itself returns for the read: the real tool, on fake GitHub.
+  const readResult = (repo: string, path: string, ref?: string) =>
+    readGithub(
+      { path, ...(ref ? { ref } : {}) },
+      {
+        resolveRepo: () => ({ ok: true, entry: { repo, purpose: "design system", workflows: [] }, isDefault: true }),
+        readPath: async (_t, p) => ({ path: p, kind: "file", text: "export const SIZES = ['small', 'medium', 'large'];" }),
+        searchCode: async () => [],
+      },
+    );
+  const answered = async (cites: string, read: string) =>
+    world({
+      replies: [
+        { text: "Reading the Button.", toolCalls: [{ name: "github_read", args: { path: BUTTON_PATH } }] },
+        { text: `It comes in small, medium and large. [Button.jsx](${cites})` },
+      ],
+      toolResultFor: (name) => (name === "github_read" ? read : PRD_FOUND),
+    });
+
+  it("posts the answer with that file as its Source", async () => {
+    const w = await answered(BUTTON, await readResult("BilLogic/plus-uno", BUTTON_PATH));
+    await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [
+      [FIGMA_LABEL, "It comes in small, medium and large. Button.jsx", `Source: ${BUTTON}`].join("\n"),
+    ]);
+  });
+
+  it("matches a cited link with a line anchor, or on another ref, to the file read", async () => {
+    for (const cited of [`${BUTTON}#L12`, BUTTON.replace("/blob/main/", "/blob/3f9c2a1/")]) {
+      const w = await answered(cited, await readResult("BilLogic/plus-uno", BUTTON_PATH, "main"));
+      await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+      assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: ${cited}`], cited);
+    }
+  });
+
+  it("says it couldn't find this when the cited file is not the one read", async () => {
+    const w = await answered(BUTTON, await readResult("BilLogic/plus-uno", BUTTON_PATH.replace("Button.jsx", "Button.stories.jsx")));
+    await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+
+  it("says it couldn't find this when the same path was read in another repo", async () => {
+    const w = await answered(BUTTON, await readResult("BilLogic/other-repo", BUTTON_PATH));
+    await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+
+  it("says it couldn't find this when the read was refused as a private repo", async () => {
+    const refused = JSON.stringify({ ok: false, error: "that repo is private, so it is not read for an answer posted outside Slack" });
+    const w = await answered(BUTTON, refused);
+    await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
     assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
   });
 });
