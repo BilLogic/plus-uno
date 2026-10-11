@@ -158,15 +158,14 @@ test("the probe dry-runs the named run's jobs", async () => {
   ]);
 });
 
-test("the probe rehearses Monday's DM to the lead after the role-map sync", async () => {
+test("Monday's morning plans the role-map sync and no weekly gaps DM", async () => {
   const url = new URL("https://w/debug/sweep?dry_run=1&run=morning&weekday=mon");
   const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
   const body = report.body as { jobs: { key: string; outcome: string; subrequests: number }[] };
   const keys = body.jobs.map((j) => j.key);
-  assert.equal(keys.indexOf("team-roles-gaps"), keys.indexOf("team-roles-sync") + 1);
-  // No LEAD_USER_ID: it says so and spends nothing.
-  assert.deepEqual(body.jobs.find((j) => j.key === "team-roles-gaps"), { ...body.jobs.find((j) => j.key === "team-roles-gaps"), outcome: "handled", subrequests: 0 });
+  assert.ok(keys.includes("team-roles-sync"), keys.join(", "));
+  assert.deepEqual(keys.filter((k) => /gap/.test(k)), []);
 });
 
 test("the probe rehearses another weekday's jobs: Friday's DS precedence check on any day", async () => {

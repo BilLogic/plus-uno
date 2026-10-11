@@ -58,6 +58,7 @@ import {
 } from "../src/follow-through/index";
 import { at, BOT, DESIGN, NOTES_DB, notionPage, sweepHarness, ts, UNIVERSAL, UNO_BOT, utcDay } from "./helpers/sweep-harness";
 import { recordingViews } from "./helpers/recording-slack";
+import { gapNotes, type GapNotes, type StoredTeamRoles } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 import type { GateVerdict } from "../src/gate/index";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../src/thread-state/index";
@@ -147,7 +148,7 @@ function morning(
   store: InMemoryCommitmentStore,
   rm: ReturnType<typeof roadmap>,
   now: number,
-  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean; meter?: NudgeDeps["meter"] } = {},
+  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean; meter?: NudgeDeps["meter"]; gaps?: GapNotes } = {},
 ) {
   const posts: Array<{ channel: string; threadTs: string | null; text: string; blocks: unknown[]; cards: Card[]; ts: string }> = [];
   const edits: Array<{ ts: string; text: string; cards: Card[] }> = [];
@@ -179,6 +180,7 @@ function morning(
     store,
     markThread: async (channel, t) => void marked.push(`${channel}:${t}`),
     config: CONFIG,
+    ...(opts.gaps ? { gaps: opts.gaps } : {}),
   };
   const deps: NudgeDeps = {
     slack: {
@@ -1944,6 +1946,122 @@ describe("tagging through the Team Members directory", () => {
     await m.run();
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
     assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
+  });
+
+  /** The lead's notes about Team Members gaps, over a stored map and 30-day marks kept across mornings. */
+  function leadNotes(opts: { lead?: string | null; stored?: StoredTeamRoles; stop?: boolean } = {}) {
+    const notes: Array<{ to: string; text: string }> = [];
+    const marks = new Set<string>();
+    const gaps = gapNotes({
+      lead: opts.lead === undefined ? LEAD : opts.lead,
+      // Kai Lo's row matched him in Slack, and has no Notion Person.
+      read: async () => opts.stored ?? { at: EOD, roles: {}, gaps: [], noNotionPerson: ["Kai Lo"] },
+      marks: { has: async (key) => marks.has(key), put: async (key) => void marks.add(key) },
+      dm: async (to, text) => {
+        if (opts.stop) throw new SubrequestBudgetError(1);
+        notes.push({ to, text });
+        return { ok: true };
+      },
+    });
+    return { notes, gaps };
+  }
+
+  /** A stale card with Maya, whom the directory knows, and Kai Lo, whom nothing does. */
+  async function kaiUnmatched() {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(
+      roadmap({
+        cards: [
+          card({
+            designStatus: "Under Review",
+            lastEditedAt: EOD - 22 * DAY,
+            contributors: [
+              { id: "n-maya", name: "Maya Chen" },
+              { id: "n-kai", name: "Kai Lo" },
+            ],
+          }),
+        ],
+      }),
+    );
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    return { store, rm };
+  }
+
+  it("a follow-up that could not tag someone notes it to the lead once: their name and the column to fill", async () => {
+    const { store, rm } = await kaiUnmatched();
+    const lead = leadNotes();
+    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    await m.run();
+    assert.equal(m.posts.length, 1);
+    assert.equal(lead.notes.length, 1);
+    assert.equal(lead.notes[0]!.to, LEAD);
+    assert.match(lead.notes[0]!.text, /Kai Lo/);
+    assert.match(lead.notes[0]!.text, /Notion Person/);
+    assert.doesNotMatch(lead.notes[0]!.text, /n-kai|Maya|U0MAYA|Under Review/, "no ids, and nothing of the card");
+    // The follow-up a week on, still unable to tag Kai: no second note within 30 days.
+    const later = morning(store, rm, at(38, 13), { gaps: lead.gaps });
+    await later.run();
+    assert.equal(later.posts.length, 1, "the follow-up a week on posted");
+    assert.equal(lead.notes.length, 1);
+  });
+
+  it("someone whose row matched no one in Slack is noted for the row's Slack ID", async () => {
+    const { store, rm } = await kaiUnmatched();
+    const lead = leadNotes({ stored: { at: EOD, roles: {}, gaps: ["kai lo"] } });
+    await morning(store, rm, at(30, 13), { gaps: lead.gaps }).run();
+    assert.equal(lead.notes.length, 1);
+    assert.match(lead.notes[0]!.text, /Slack ID/);
+  });
+
+  it("someone with no in-scope row, or whose row has both cells, is not noted", async () => {
+    // A guest or a Past Collaborator is on neither list; nor is a row with its Slack ID and Notion Person.
+    const { store, rm } = await kaiUnmatched();
+    const lead = leadNotes({ stored: { at: EOD, roles: {}, gaps: ["Gus Hale"], noNotionPerson: ["Ana Pérez"] } });
+    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    await m.run();
+    assert.equal(m.posts.length, 1);
+    assert.deepEqual(lead.notes, []);
+  });
+
+  it("a budget stop during the note never posts the follow-up twice", async () => {
+    const { store, rm } = await kaiUnmatched();
+    const stopping = leadNotes({ stop: true });
+    const stopped = morning(store, rm, at(30, 13), { gaps: stopping.gaps });
+    await assert.rejects(stopped.run(), SubrequestBudgetError);
+    assert.equal(stopped.posts.length, 1);
+    const retry = morning(store, rm, at(30, 13, 5), { gaps: leadNotes().gaps });
+    await retry.run();
+    assert.equal(retry.posts.length, 0, "the retry posts nothing again");
+    assert.equal(only(store).state, "nudged");
+  });
+
+  it("an unowned card whose creator could not be tagged notes nobody: there is no row to name", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(roadmap({ cards: [card({ creatorId: "n-unknown" })] }));
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const lead = leadNotes();
+    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    await m.run();
+    assert.equal(m.posts.length, 0);
+    assert.deepEqual(lead.notes, []);
+  });
+
+  it("with LEAD_USER_ID unset, a follow-up that could not tag someone notes nobody", async () => {
+    const { store, rm } = await kaiUnmatched();
+    const lead = leadNotes({ lead: null });
+    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    await m.run();
+    assert.equal(m.posts.length, 1);
+    assert.deepEqual(lead.notes, []);
+  });
+
+  it("a follow-up that tagged everyone notes nobody", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(roadmap({ cards: [card({ designStatus: "Under Review", lastEditedAt: EOD - 22 * DAY, contributors: [{ id: "n-maya", name: "Maya Chen" }] })] }));
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const lead = leadNotes();
+    await morning(store, rm, at(30, 13), { gaps: lead.gaps }).run();
+    assert.deepEqual(lead.notes, []);
   });
 
   it("a nameless Contributor still unmatched is logged by id, never shown on the card", async () => {

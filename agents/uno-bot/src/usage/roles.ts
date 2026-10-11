@@ -140,6 +140,8 @@ export interface RosterMatch {
   gaps: string[];
   /** Rows with a role matched to one Slack member, whose Notion Person is empty. */
   noNotionPerson: string[];
+  /** Rows, Past Collaborators aside, with no Figma User ID `normaliseFigmaId` reads. */
+  noFigmaId: string[];
 }
 
 /**
@@ -176,6 +178,7 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
   }
   const gaps: string[] = [];
   const noNotionPerson: string[] = [];
+  const noFigmaId: string[] = [];
   const unmatched: string[] = [];
   const ambiguous: string[] = [];
   /** Each member's roles, and the rows that gave them. */
@@ -195,6 +198,7 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     const member = id && ids.length === 1 ? id : "";
     const figmaId = row.figmaUserId?.trim() ? normaliseFigmaId(row.figmaUserId) : undefined;
     if (row.figmaUserId?.trim() && !figmaId) unreadableFigma.push(row.name);
+    if (!figmaId) noFigmaId.push(row.name);
     if (figmaId) figma.set(figmaId, (figma.get(figmaId) ?? new Set<string>()).add(member));
     for (const notionId of new Set(row.notionUserIds ?? [])) {
       if (notionId) notion.set(notionId, (notion.get(notionId) ?? new Set<string>()).add(member));
@@ -237,6 +241,7 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     notionPeople: soleMembers(notion),
     gaps,
     noNotionPerson,
+    noFigmaId,
   };
 }
 
