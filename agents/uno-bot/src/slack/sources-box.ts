@@ -153,3 +153,32 @@ export function sourcesBox(sources: readonly TaskCardSource[] | undefined, prose
       .join(" · ")}`,
   };
 }
+
+/** A line that opens an inline source list: `Sources:`, bold or not. */
+const SOURCES_LINE = /^\s*(?:[*_]{1,2})?sources?(?:[*_]{1,2})?\s*:\s*(?:[*_]{1,2})?\s*(.*)$/i;
+const LIST_ITEM = /^\s*(?:[-*•]|\d+[.)])\s+/;
+
+/**
+ * The prose without the source list it carries inline — a `Sources:` line,
+ * or a `Sources:` heading and the list under it — for an answer whose Sources
+ * box lists them. Each source shows once, in the box (live 2026-10-11: a
+ * revised draft ended in its own `Sources:` line above the box). A sentence
+ * that only mentions sources is prose and stays.
+ *
+ * @param prose - The answer as the model wrote it
+ */
+export function withoutInlineSources(prose: string): string {
+  const out: string[] = [];
+  let inList = false;
+  for (const line of prose.split("\n")) {
+    const opened = SOURCES_LINE.exec(line);
+    if (opened) {
+      inList = !opened[1]!.trim();
+      continue;
+    }
+    if (inList && LIST_ITEM.test(line)) continue;
+    inList = false;
+    out.push(line);
+  }
+  return out.join("\n").replace(/\n{3,}/g, "\n\n").trimEnd();
+}

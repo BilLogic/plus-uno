@@ -467,3 +467,38 @@ test("the thread remembers the links: the text copy lists them", async () => {
   assert.match(result.text, /Sources: \[Page 1\]\(https:\/\/www\.notion\.so\/page-1\)/);
   assert.equal(last.text, result.text);
 });
+
+test("an inline Sources line in the prose goes when the box posts: each source is listed once, in the box", async () => {
+  // Live 2026-10-11: a revised draft ended in its own `Sources:` line, and the
+  // same links sat in the box beneath it.
+  const prose =
+    "**Three pages cover onboarding.** Page 3 is the newest.\n\n" +
+    `Sources: ${notion(3).map((url, i) => `[Page ${i + 1}](${url})`).join(" · ")}`;
+  const { box, last } = await answer([{ name: "notion_search", result: notionResult(notion(3)) }], prose);
+
+  assert.ok(box, "the box still posts: the inline line named the pages it lists");
+  assert.deepEqual(linksIn(box), notion(3));
+  const markdown = JSON.stringify(last.blockList?.find((b) => (b as Block).type === "markdown"));
+  assert.doesNotMatch(markdown, /Sources:/);
+  assert.match(markdown, /Page 3 is the newest/);
+});
+
+test("a bold Sources heading with a list under it goes too, and prose that only mentions sources stays", async () => {
+  const listed =
+    "**Three pages cover onboarding.** Page 3 is the newest.\n\n**Sources:**\n" +
+    notion(3).map((url, i) => `- [Page ${i + 1}](${url})`).join("\n");
+  const one = await answer([{ name: "notion_search", result: notionResult(notion(3)) }], listed);
+  assert.doesNotMatch(JSON.stringify(one.last.blockList), /Sources:\*\*|\[Page 1\]/);
+  assert.ok(one.box);
+
+  const kept = "**Three pages cover onboarding.** Page 1, Page 2 and Page 3 are the sources: Page 3 is the newest.";
+  const two = await answer([{ name: "notion_search", result: notionResult(notion(3)) }], kept);
+  assert.match(JSON.stringify(two.last.blockList), /are the sources: Page 3 is the newest/);
+});
+
+test("without a box the inline Sources line stays: it is then the answer's only list", async () => {
+  const prose = `**One page covers onboarding.**\n\nSources: [Page 1](${notion(1)[0]})`;
+  const { box, last } = await answer([{ name: "notion_search", result: notionResult(notion(1)) }], prose);
+  assert.equal(box, undefined);
+  assert.match(JSON.stringify(last.blockList), /Sources: \[Page 1\]/);
+});

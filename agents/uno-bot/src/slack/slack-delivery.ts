@@ -22,13 +22,12 @@ import {
   appendStream,
   appendTasks,
   postMessage,
-  setPlanTitle,
   slackCall,
   startStream,
   stopStream,
   updateMessage,
 } from "./api";
-import { renameSession, setSessionStatus, setStatusLine } from "./assistant";
+import { renameSession, setSessionStatus } from "./assistant";
 import {
   DEFAULT_ALERT_CHANNEL,
   postTextVerified,
@@ -135,11 +134,8 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage, ask),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team, "plan"),
-    async appendTasks(channel, ts, tasks) {
-      await appendTasks(env, channel, ts, tasks);
-    },
-    async setPlanTitle(channel, ts, title) {
-      await setPlanTitle(env, channel, ts, title);
+    async appendTasks(channel, ts, tasks, title) {
+      await appendTasks(env, channel, ts, tasks, title);
     },
     async stopStream(channel, ts) {
       await stopStream(env, channel, ts);
@@ -148,7 +144,6 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
-    setStatusLine: (channel, threadTs, text) => setStatusLine(env, channel, threadTs, text),
   });
 }
 

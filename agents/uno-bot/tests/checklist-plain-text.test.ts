@@ -25,10 +25,11 @@ async function headingFor(ask: string): Promise<string> {
   const slack = recordingSlack();
   const delivery = deliveryAdapter(slack.deps(true), TARGET);
   await delivery.beginProgress("Working on it", ask);
+  delivery.toolProgress({ seq: 1, name: "notion_search", args: {}, phase: "announced" });
   await delivery.endProgress("complete");
-  const headings = slack.of("heading");
+  const headings = slack.of("tasks").flatMap((c) => (c.title ? [c.title] : []));
   assert.equal(headings.length, 1);
-  return headings[0]!.title;
+  return headings[0]!;
 }
 
 /** The card as Slack shows it: every update to it laid over the last, since a
