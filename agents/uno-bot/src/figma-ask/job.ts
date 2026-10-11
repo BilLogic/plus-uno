@@ -18,7 +18,8 @@
 //   3. WHO ASKED. Figma's user id, through the Team Members map
 //      (`usage/roles.ts`). A teammate's change request is drafted as a card in
 //      #plus-design; anyone the map does not know gets no card, and a turn
-//      that reads public facts alone.
+//      that reads public facts alone. When their handle names a Team Members
+//      row with no Figma User ID, the lead is told (`usage/gap-notes.ts`).
 //   4. THE TURN — the one Slack runs, on a Delivery that keeps the answer
 //      (`./delivery.ts`), with the `figma` origin: every tool reads at public
 //      scope, because the answer lands in a file people outside the team can
@@ -61,6 +62,7 @@ import { threadVisibleSources } from "../slack/card-sources";
 import type { HistoryTurn, ThreadRef, ThreadState } from "../thread-state/index";
 import { buildTurnRequest, type Delivery, type PostResult, type ProposalCard, type TurnOutcome, type TurnRequest } from "../turn/index";
 import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
+import type { GapNotes } from "../usage/gap-notes";
 import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
 import { askText, asksUno, isOwnComment } from "./trigger";
@@ -139,6 +141,9 @@ export interface FigmaAskDeps {
   answer(request: TurnRequest, delivery: Delivery, asker: { unmappedAsker: boolean; fileKey: string }): Promise<TurnOutcome>;
   /** #plus-design; absent, nothing can be drafted. */
   design?: AskDesign;
+  /** Where an asker the people map does not know is noted to the lead, when
+   *  their handle names a Team Members row with no Figma User ID; absent, nobody is. */
+  gaps?: Pick<GapNotes, "figmaAsker">;
   now(): number;
 }
 
@@ -296,6 +301,9 @@ async function draft(
           return result;
         }
       : undefined;
+  // An asker the map does not know gets a public-only answer: a missing
+  // Figma User ID on their row is worth the lead knowing now.
+  if (!slackId) await deps.gaps?.figmaAsker(comment.user.handle);
   const delivery = figmaAskDelivery(stage ? { stage } : {});
 
   const request = buildTurnRequest({

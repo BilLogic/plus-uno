@@ -31,7 +31,7 @@ import type { SlackMessageEvent } from "../slack/types";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import { threadStateFor } from "../thread-state/production";
-import { notionPeopleFor, proposalEventLogFor } from "../usage/production";
+import { gapNotesFor, notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { throughDirectory } from "./people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { CommitmentRecord } from "../commitments/store";
@@ -221,6 +221,7 @@ export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?
     store,
     markThread: (channel, thread) => markSweepThread(kv, channel, thread),
     config: configFor(env, botUserId),
+    gaps: gapNotesFor(env),
     dryRun: opts.dryRun,
   });
 }
