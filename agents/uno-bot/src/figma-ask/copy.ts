@@ -3,10 +3,11 @@
 //
 // THE REPLY is plain text: Figma shows a comment as typed, so Slack's markup
 // would arrive as asterisks and angle brackets. It leads with the label, says
-// the answer in at most three lines, and ends with one source link — one the
-// answer itself cites, and that a public thread may carry. An answer with no
-// such link is not posted as an answer: the reply says it could not find this,
-// and points at #plus-design, so uno-bot never guesses in a file.
+// the answer in at most three lines, and ends with one source line, its name
+// and link — one the answer itself cites, and that a public thread may carry.
+// An answer with no such link is not posted as an answer: the reply says it
+// could not find this, and points at #plus-design, so uno-bot never guesses in
+// a file.
 //
 // THE LEAD in #plus-design is a Figma message like the rest
 // (docs/connectors/slack.md § Figma messages): one line asking one named
@@ -26,9 +27,15 @@ export const MAX_LINE_CHARS = 300;
 /** The reply's last line when there is nothing to link. */
 export const CANT_FIND_LINE = "I couldn't find this in a source I can link, so I won't guess. Ask in #plus-design.";
 
+/** The one source a reply names: the Sources box's name for it, and its link. */
+export interface FigmaSource {
+  name: string;
+  url: string;
+}
+
 /** What a reply says. */
 export type FigmaReply =
-  | { kind: "answer"; lines: string[]; source: string | null }
+  | { kind: "answer"; lines: string[]; source: FigmaSource | null }
   | { kind: "question"; lines: string[] }
   | { kind: "drafted"; link: string | null }
   | { kind: "not-teammate" }
@@ -45,6 +52,14 @@ export function figmaReplyText(reply: FigmaReply): string {
   return [FIGMA_LABEL, ...figmaReplyLines(reply)].join("\n");
 }
 
+/** `Source: <name> — <link>`: Figma posts plain text, so the name sits beside
+ *  the link rather than on it. A name that is only the link is said once. */
+function sourceLine({ name, url }: FigmaSource): string {
+  // Plain text, so a bracket in a title stays, as typed; only lines fold.
+  const label = name.replace(/\s+/g, " ").trim();
+  return label && label !== url ? `Source: ${label} — ${url}` : `Source: ${url}`;
+}
+
 /**
  * What a reply says, under its label: the lines the ask's thread remembers.
  *
@@ -54,7 +69,7 @@ export function figmaReplyLines(reply: FigmaReply): string[] {
   return ((): string[] => {
     switch (reply.kind) {
       case "answer":
-        return reply.source && reply.lines.length ? [...reply.lines, `Source: ${reply.source}`] : [CANT_FIND_LINE];
+        return reply.source && reply.lines.length ? [...reply.lines, sourceLine(reply.source)] : [CANT_FIND_LINE];
       case "question":
         return [...reply.lines, "Reply here with @uno and the answer, and I'll pick it up."];
       case "drafted":

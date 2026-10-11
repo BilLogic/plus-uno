@@ -77,11 +77,23 @@ export type SlackCall =
       ask?: string;
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
-  | { kind: "tasks"; channel: string; ts: string; tasks: PlanTask[] }
-  | { kind: "heading"; channel: string; ts: string; title: string }
-  | { kind: "stopStream"; channel: string; ts: string }
+  | {
+      kind: "tasks";
+      channel: string;
+      ts: string;
+      tasks: PlanTask[];
+      /** The checklist's heading, when this append retitled it. */
+      title?: string;
+    }
+  | {
+      kind: "stopStream";
+      channel: string;
+      ts: string;
+      /** The checklist's last changes, when the stop carried them. */
+      tasks?: PlanTask[];
+      title?: string;
+    }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
-  | { kind: "statusLine"; channel: string; threadTs: string; text: string }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
 
 /** A call Slack would have refused, and the error code it would have said. */
@@ -259,6 +271,27 @@ export interface RecordingSlack {
   deps(planStream?: boolean): SlackDeliveryDeps;
   /** Just the calls of one kind, narrowed. */
   of<K extends SlackCall["kind"]>(kind: K): Array<Extract<SlackCall, { kind: K }>>;
+  /** Every checklist update in order: each append's, and the stop's when it
+   *  carried the last changes. */
+  checklist(): Array<{ ts: string; tasks: PlanTask[]; title?: string }>;
+}
+
+/** Why Slack would refuse these task chunks, or null.
+ *
+ *  A card's `icon` only as Slack's icon object, `{type: "icon", name}` with a
+ *  built-in name (`slack-block-rules.ts`). The `/debug/slack-stream?chunks=`
+ *  probe against production Slack on 2026-10-07 refused an image-URL `name`,
+ *  a `url`, an `image` element and an emoji — `invalid_arguments`, "failed to
+ *  match exactly one allowed schema [json-pointer:/chunks/0]". */
+function taskRefusal(tasks: readonly PlanTask[]): string | null {
+  const bad = tasks.find((t) => !SLACK_TASK_STATUSES.has(t.status));
+  if (bad) return `task ${bad.id} as ${String(bad.status)}`;
+  for (const t of tasks) {
+    if (!("icon" in t)) continue;
+    const why = iconRefusal((t as { icon?: unknown }).icon);
+    if (why) return `task ${t.id} with ${why}`;
+  }
+  return null;
 }
 
 export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack {
@@ -272,8 +305,6 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
   // `startStream` is the checklist's — and a stopped stream takes nothing more.
   const planStreams = new Set<string>();
   const stopped = new Set<string>();
-  // Threads whose session was last moved off `processing`.
-  const settledThreads = new Set<string>();
   // Every call but a task append lands the moment it is made.
   const record = (call: SlackCall): void => {
     calls.push(call);
@@ -354,54 +385,39 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       if (ts) planStreams.add(ts);
       return ts;
     },
-    async appendTasks(channel, ts, tasks) {
-      const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks] };
+    async appendTasks(channel, ts, tasks, title) {
+      const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks], ...(title === undefined ? {} : { title }) };
       record(call);
       const delay = opts.taskDelayMs?.(appends++) ?? 0;
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
-      const bad = tasks.find((t) => !SLACK_TASK_STATUSES.has(t.status));
-      if (bad) return refuse(refused, `task ${bad.id} as ${String(bad.status)}`, "invalid_arguments");
-      // A card's `icon` only as Slack's icon object, `{type: "icon", name}`
-      // with a built-in name (`slack-block-rules.ts`). The
-      // `/debug/slack-stream?chunks=` probe against production Slack on
-      // 2026-10-07 refused an image-URL `name`, a `url`, an `image` element and
-      // an emoji — `invalid_arguments`, "failed to match exactly one allowed
-      // schema [json-pointer:/chunks/0]".
-      for (const t of tasks) {
-        if (!("icon" in t)) continue;
-        const why = iconRefusal((t as { icon?: unknown }).icon);
-        if (why) return refuse(refused, `task ${t.id} with ${why}`, "invalid_arguments");
-      }
+      const why = taskRefusal(tasks);
+      if (why) return refuse(refused, why, "invalid_arguments");
       if (stopped.has(ts)) return refuse(refused, "task update on a stopped stream", "message_not_in_streaming_state");
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
     },
-    async setPlanTitle(channel, ts, title) {
-      record({ kind: "heading", channel, ts, title });
-      if (stopped.has(ts)) refuse(refused, "plan title on a stopped stream", "message_not_in_streaming_state");
-    },
-    async stopStream(channel, ts) {
-      record({ kind: "stopStream", channel, ts });
+    async stopStream(channel, ts, tasks, title) {
+      const carried = tasks?.length || title !== undefined;
+      record({
+        kind: "stopStream",
+        channel,
+        ts,
+        ...(carried ? { tasks: [...(tasks ?? [])] } : {}),
+        ...(title === undefined ? {} : { title }),
+      });
       if (stopped.has(ts)) return refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
+      // Slack checks the stop's chunks as it checks an append's.
+      const why = taskRefusal(tasks ?? []);
+      if (why) return refuse(refused, why, "invalid_arguments");
       stopped.add(ts);
     },
     async setSessionStatus(channel, threadTs, status) {
       record({ kind: "status", channel, threadTs, status });
-      if (status !== "processing") settledThreads.add(threadTs);
-      else settledThreads.delete(threadTs);
       if (opts.statusThrows !== undefined) throw opts.statusThrows;
       return opts.status ?? { ok: true };
     },
     async renameSession(channel, threadTs, title) {
       record({ kind: "rename", channel, threadTs, title });
-    },
-    // Slack would not refuse a status line sent after the settle — it would
-    // do worse: the bridged call moves the session back to `processing`, and
-    // nothing clears it for the hour Slack takes to time it out. Held as a
-    // refusal so a line that lands late fails the test it happened in.
-    async setStatusLine(channel, threadTs, text) {
-      record({ kind: "statusLine", channel, threadTs, text });
-      if (settledThreads.has(threadTs)) refuse(refused, "status line after the settle", "reraised_processing");
     },
   };
 
@@ -420,6 +436,12 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     }),
     of: <K extends SlackCall["kind"]>(kind: K) =>
       calls.filter((call): call is Extract<SlackCall, { kind: K }> => call.kind === kind),
+    checklist: () =>
+      calls.flatMap((call) =>
+        call.kind === "tasks" || (call.kind === "stopStream" && call.tasks)
+          ? [{ ts: call.ts, tasks: call.tasks ?? [], ...(call.title === undefined ? {} : { title: call.title }) }]
+          : [],
+      ),
   };
 }
 

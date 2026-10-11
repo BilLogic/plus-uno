@@ -22,13 +22,12 @@ import {
   appendStream,
   appendTasks,
   postMessage,
-  setPlanTitle,
   slackCall,
   startStream,
   stopStream,
   updateMessage,
 } from "./api";
-import { renameSession, setSessionStatus, setStatusLine } from "./assistant";
+import { renameSession, setSessionStatus } from "./assistant";
 import {
   DEFAULT_ALERT_CHANNEL,
   postTextVerified,
@@ -135,20 +134,24 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage, ask),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team, "plan"),
-    async appendTasks(channel, ts, tasks) {
-      await appendTasks(env, channel, ts, tasks);
+    async appendTasks(channel, ts, tasks, title) {
+      await appendTasks(env, channel, ts, tasks, title);
     },
-    async setPlanTitle(channel, ts, title) {
-      await setPlanTitle(env, channel, ts, title);
-    },
-    async stopStream(channel, ts) {
+    async stopStream(channel, ts, tasks, title) {
+      if (!tasks?.length && !title) {
+        await stopStream(env, channel, ts);
+        return;
+      }
+      // A stop that refused the checklist's last changes left the stream open:
+      // they go as an append, and the stream stops bare.
+      if (await stopStream(env, channel, ts, undefined, { tasks: tasks ?? [], ...(title ? { title } : {}) })) return;
+      await appendTasks(env, channel, ts, tasks ?? [], title);
       await stopStream(env, channel, ts);
     },
     updateMessage: (input) => updateMessage(env, input),
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
-    setStatusLine: (channel, threadTs, text) => setStatusLine(env, channel, threadTs, text),
   });
 }
 

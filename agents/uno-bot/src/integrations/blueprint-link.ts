@@ -49,6 +49,38 @@ export function appRootUrl(appUrl: string | undefined): string | undefined {
   return root ? `${root}/` : undefined;
 }
 
+/** The kinds a path can be (docs/connectors/supabase/blueprint.md § Paths and
+ *  the main route), plus `named`, which the index writes for a prototype path. */
+const PATH_KINDS = ["happy", "variant", "exception", "named"] as const;
+
+/** The index's kind tag on a path name, " (happy)", the kind captured. */
+const PATH_KIND_TAG = new RegExp(`\\s*\\((${PATH_KINDS.join("|")})\\)`, "g");
+
+/** A path name without the index's kind tag: "Standard (happy)" → name
+ *  "Standard", kind "happy". The kind is data the model may use in plain
+ *  words; it is never part of the path's name. */
+export function splitPathKind(path: string): { name: string; kind?: string } {
+  const kind = new RegExp(PATH_KIND_TAG.source).exec(path)?.[1];
+  return { name: path.replace(PATH_KIND_TAG, "").trim(), ...(kind ? { kind } : {}) };
+}
+
+/** Any text with every path kind tag taken out — a row's title carries it. */
+export function withoutPathKind(text: string): string {
+  return text.replace(PATH_KIND_TAG, "");
+}
+
+/** A blueprint place as a reader reads it: its values joined by ` › `, from
+ *  the phase down to the row's own level, the lane last in parentheses —
+ *  "Onboarding › Employment & Access › Standard › PLUS app login (Storyboard)".
+ *  The same breadcrumb names a source in Sources and a place in an answer. */
+export function blueprintBreadcrumb(row: ChunkBreadcrumb): string {
+  const chain = [row.phase, row.scenario, row.path && splitPathKind(row.path).name, row.step]
+    .filter((v): v is string => Boolean(v))
+    .join(" › ");
+  if (!row.lane) return chain;
+  return chain ? `${chain} (${row.lane})` : row.lane;
+}
+
 export interface ChunkBreadcrumb {
   phase?: string;
   scenario?: string;
@@ -69,7 +101,7 @@ export interface ChunkBreadcrumb {
  * one instruction search_blueprint cares most about, "attribute every activity
  * to its layer", had nothing to attribute with on the PRIMARY retrieval path,
  * and the citation format the navigation guide demands
- * (`phase › scenario › path — layer × step`) could not be produced at all. The
+ * (`phase › scenario › path › step (lane)`) could not be produced at all. The
  * data was there the whole time, unparsed.
  *
  * Label-driven, not positional, so BOTH title shapes parse: chunks embedded

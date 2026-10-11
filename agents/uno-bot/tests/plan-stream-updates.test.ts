@@ -50,11 +50,13 @@ const finished = (seq: number): ToolProgressEvent => ({
   phase: "finished",
 });
 
-/** Two lookups, reported the way the loop reports them, a tool run apart. */
+/** Two replies of one lookup each, reported the way the loop reports them, a
+ *  tool run apart: each reply's announcement is a boundary the checklist
+ *  goes out at. */
 async function twoLookups(delivery: ReturnType<typeof deliveryAdapter>): Promise<void> {
-  for (const e of [event(1, "announced"), event(2, "announced"), event(1, "started")]) delivery.toolProgress(e);
+  for (const e of [event(1, "announced"), event(1, "started")]) delivery.toolProgress(e);
   await new Promise((resolve) => setTimeout(resolve, 0));
-  for (const e of [finished(1), event(2, "started")]) delivery.toolProgress(e);
+  for (const e of [finished(1), event(2, "announced"), event(2, "started")]) delivery.toolProgress(e);
   await new Promise((resolve) => setTimeout(resolve, 0));
   delivery.toolProgress(finished(2));
 }
@@ -90,10 +92,9 @@ describe("plan-stream updates", () => {
     // reach Slack ahead of an earlier one.
     assert.deepEqual(slack.landed.map(step), [
       "startStream",
-      "understand:in_progress",
       "understand:complete tool-1:in_progress",
-      // Updates issued while the append before them was still in flight
-      // travel together, the later state of one card winning.
+      // Issued while the append before it was still in flight, it waited —
+      // and carries what changed meanwhile, the later state of a card winning.
       "tool-1:complete tool-2:complete",
       "stopStream",
       "answer",
@@ -114,7 +115,6 @@ describe("plan-stream updates", () => {
     assert.deepEqual(escaped, [], "no task update surfaced as an unhandled rejection");
     // Every update was still offered to Slack, in order, after the one before it failed.
     assert.deepEqual(slack.of("tasks").map(step), [
-      "understand:in_progress",
       "understand:complete tool-1:in_progress",
       "tool-1:complete tool-2:complete",
     ]);
@@ -136,7 +136,8 @@ describe("plan-stream updates", () => {
 
     assert.deepEqual(slack.landed.map(step), [
       "startStream",
-      "understand:in_progress",
+      // The group's append had not left when the turn died, so it carries
+      // the settled state, and the settle has nothing left to send.
       "understand:complete tool-1:error tool-2:error",
       "stopStream",
     ]);

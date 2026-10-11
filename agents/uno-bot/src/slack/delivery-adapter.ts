@@ -13,15 +13,14 @@
 //     status is what makes Slack's native stop button available in a channel
 //     thread at all (#576);
 //   • the checklist (CONTEXT.md). With the plan-stream switch on, a substantive
-//     turn opens a stream in `task_display_mode: "plan"` and each lookup the
-//     turn makes lands as a task card — in progress when it starts, complete
-//     or error when it lands — with the narration that introduced it as its
-//     details, so the person reads one filling-in checklist instead of loose
-//     messages. Consecutive lookups of one kind share a card, a routing
-//     choice is a card of its own, and the working status names the card in
-//     progress. Off, narration is a small ⏳ message and lookups show
-//     nothing. Which it is has never been the turn's business, and now it
-//     cannot be;
+//     turn opens a stream in `task_display_mode: "plan"` with its first group
+//     of lookups, and each lookup lands as a task card — in progress with its
+//     group, complete when the next group starts or the turn answers — with
+//     the narration that introduced it as its details, so the person reads
+//     one filling-in checklist instead of loose messages. Consecutive lookups
+//     of one kind share a card, and a routing choice is a card of its own.
+//     Off, narration is a small ⏳ message and lookups show nothing. Which it
+//     is has never been the turn's business, and now it cannot be;
 //   • the answer posted BENEATH the checklist once its stream is stopped.
 //     Closing the stream into the answer was the first design, and Slack
 //     refuses it: a stream opened in plan mode takes task and plan chunks, and
@@ -78,7 +77,7 @@ import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
 import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
-import { DELIVERY_RESERVE, SUBREQUEST_CAP } from "../agent/loop-policy";
+import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
 import { readoutFor, type TaskCardDecision } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
@@ -157,6 +156,28 @@ interface CallState {
   /** Its readout, or the reason it failed. */
   output?: string;
   sources?: CardSource[];
+  /** It ran and its source failed. */
+  failed?: true;
+  /** It never ran: refused, most often for the turn's budget. */
+  skipped?: true;
+}
+
+/** Whether a call has ended, however it ended. */
+const settled = (c: CallState): boolean => c.status === "complete" || c.status === "error";
+
+/**
+ * What several calls came to, as one card's output: each readout of a call
+ * that read something, then how many failed and how many were skipped.
+ *
+ * @param calls - The calls a card stands for
+ * @param lead - What goes before the list when it is not empty
+ */
+function tally(calls: readonly CallState[], lead = ""): string {
+  const read = calls.flatMap((c) => (c.status === "complete" && !c.failed && !c.skipped && c.output ? [c.output] : []));
+  const failed = calls.filter((c) => c.failed).length;
+  const skipped = calls.filter((c) => c.skipped).length;
+  const parts = [...read, ...(failed ? [`${failed} failed`] : []), ...(skipped ? [`${skipped} skipped`] : [])];
+  return parts.length ? `${lead}${parts.join(" · ")}` : "";
 }
 
 /** The card a checklist opens with, titled with the turn's progress label and
@@ -171,8 +192,12 @@ export const TASK_CARD_CAP = 8;
 /** The overflow card's id, beside the `tool-<seq>` ids it stands in for. */
 const OVERFLOW_CARD = "tool-more";
 
-/** What a card whose lookup never ran says when the checklist settles. */
-const NOT_RUN = "Not run";
+/** What a card whose lookup never ran says: refused, or still queued when
+ *  the turn answered. */
+const SKIPPED = "Skipped";
+
+/** How a card whose lookup's source failed opens its output. */
+const FAILED = "Failed";
 
 /** Slack's cap on a plan or task chunk's text. */
 const HEADING_CHARS = 256;
@@ -191,18 +216,6 @@ export function checklistHeading(ask: string): string {
   const cut = oneLine.slice(0, HEADING_CHARS - 1);
   const brk = cut.lastIndexOf(" ");
   return `${brk > HEADING_CHARS / 2 ? cut.slice(0, brk) : cut}…`;
-}
-
-/**
- * The working indicator's words for a step: its card title, as what le goat
- * "is" doing. Slack shows the line after the app's name, which is why the
- * Gate doors' own line reads "is working on that…".
- *
- * @param title - The card title of the step in progress ("Checking the Roadmap board")
- */
-export function statusLineOf(title: string): string {
-  const words = title.trim();
-  return `is ${words.charAt(0).toLowerCase()}${words.slice(1)}…`;
 }
 
 /** How long an error card's reason may run. A card says THAT a lookup failed
@@ -280,13 +293,13 @@ export interface SlackDeliveryClient {
     team?: string,
   ): Promise<string | null>;
   /** Put task cards into an open stream, or update ones already there — all
-   *  in ONE append, because each append is a subrequest and closing one card
-   *  while opening the next is one transition, not two. */
-  appendTasks(channel: string, ts: string, tasks: readonly PlanTask[]): Promise<void>;
-  /** Retitle an open stream's checklist (a `plan_update`). */
-  setPlanTitle(channel: string, ts: string, title: string): Promise<void>;
-  /** Close a stream. */
-  stopStream(channel: string, ts: string): Promise<void>;
+   *  in ONE append, because each append is a subrequest and closing one group
+   *  while opening the next is one transition, not two. `title` retitles the
+   *  checklist (a `plan_update`) in the same append. */
+  appendTasks(channel: string, ts: string, tasks: readonly PlanTask[], title?: string): Promise<void>;
+  /** Close a stream. `tasks` and `title` are the checklist's last changes,
+   *  carried by the stop itself rather than by an append of their own. */
+  stopStream(channel: string, ts: string, tasks?: readonly PlanTask[], title?: string): Promise<void>;
   /** Rewrite one of the bot's own messages in place — how a static checklist
    *  settles where no stream could open. */
   updateMessage(input: { channel: string; ts: string; text: string; blocks: unknown[] }): Promise<{ ok: boolean }>;
@@ -294,9 +307,6 @@ export interface SlackDeliveryClient {
   setSessionStatus(channel: string, threadTs: string, status: SessionStatus): Promise<StatusResult>;
   /** Name the session, so the conversation is findable in History / Messages. */
   renameSession(channel: string, threadTs: string, title: string): Promise<void>;
-  /** Put words on the working indicator — the step in progress. Never a clear:
-   *  the lifecycle stays `setSessionStatus`'s. */
-  setStatusLine(channel: string, threadTs: string, text: string): Promise<void>;
 }
 
 export interface SlackDeliveryDeps {
@@ -514,11 +524,20 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   const { slack, logWorking } = deps;
   const { channel, replyTs, userMsgTs } = target;
 
-  // The plan stream, if one is open, and the checklist inside it: the opening
-  // card the turn's label names, then one task card per lookup. Every card is
-  // carried WHOLE — a task update REPLACES the card, so an update that re-sent
-  // only an id and a status would wipe the title and details it went out with.
+  // The checklist: the opening card the turn's label names, then one task card
+  // per lookup. Every card is carried WHOLE — a task update REPLACES the card,
+  // so an update that re-sent only an id and a status would wipe the title it
+  // went out with.
+  //
+  // `planOpen` says a checklist was begun; `planTs` is the message it lives in
+  // once one exists. They differ on the stream path, which opens its stream
+  // with the first group of lookups rather than when progress begins: a stream
+  // with nothing in it renders an empty bubble, and a turn that looks nothing
+  // up spends no call on a checklist at all.
+  let planOpen = false;
   let planTs: string | null = null;
+  /** Set once the stream has been asked for, so a refused one is not re-asked. */
+  let streamAsked = false;
   // WHERE NO STREAM CAN OPEN — a top-level DM, which has no thread — the same
   // checklist is a static `plan` block instead: posted once when progress
   // begins, rewritten once at settle, and never touched in between, so a turn
@@ -529,37 +548,32 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   let planMode: "stream" | "static" = "stream";
   /** The static checklist's heading, kept for the rewrite. */
   let planTitle = "";
-  /** Every card on the checklist, by id, as it was last sent — or, while
-   *  pending, as it will be sent when its call starts. */
+  /** A channel checklist's heading, still to ride the stream's first append. */
+  let headingPending: string | null = null;
+  /** Every card on the checklist, by id, in the order each first appeared. */
   const cards = new Map<string, Card>();
   /** The one card in progress, if any. */
   let running: string | null = null;
   /** Narration waiting for the card it introduces. */
   let heldDetails: string | null = null;
 
-  // EVERY update to the open checklist goes through this one chain, and each
-  // link is caught. Two reasons, both seen with fire-and-forget appends: a
-  // refused or thrown append with no catch is an unhandled rejection in the
-  // Worker, and two appends in flight at once can land in either order — a
-  // card's "complete" arriving after the next card's "in progress" reads as a
-  // step that finished before it started. A link waits for the one before it,
-  // so Slack receives updates in the order they were issued; a link that fails
-  // is swallowed, so the chain itself never rejects and the next link still
-  // runs. Whoever settles the stream awaits the chain first.
+  // THE CHECKLIST GOES TO SLACK AT GROUP BOUNDARIES, NOT PER LOOKUP. Every
+  // Slack call is a subrequest out of the turn's fifty, the same fifty its
+  // lookups read from, and a checklist that sent each lookup's start and end
+  // spent 21 of them on one turn and left its last blueprint search refused.
+  // So a card's state is kept here as it moves, and the checklist is sent when
+  // a group of lookups is announced — which closes the group before it and
+  // opens this one in one append — and at settle, inside the stop itself. A call announced
+  // with its group shows in progress with it: Slack's statuses are in
+  // progress, complete or error, and `pending` is refused (`invalid_arguments`,
+  // the whole append with it).
   //
-  // AND A LINK CARRIES EVERY UPDATE ISSUED BEFORE IT LEAVES, as one append.
-  // Each append is a subrequest out of the turn's fifty, and the loop issues
-  // updates in bursts: a reply's whole batch announced at once, and one lookup
-  // finishing in the same breath as the next one starts. Those bursts are
-  // synchronous, so a link queued by the first update of a burst runs after the
-  // last — and closing one card while opening the next costs one call, not two.
-  // Two updates to one card in a burst collapse to the later one; a card keeps
-  // the place its first update gave it.
-  //
-  // A PENDING CARD IS KEPT, NOT SENT. Slack's task status is in progress,
-  // complete or error; `pending` is refused (`invalid_arguments`, the whole
-  // append with it). So an announced call waits here, and its card first
-  // reaches Slack in progress, when the call starts.
+  // EVERY APPEND GOES THROUGH THIS ONE CHAIN, and each link is caught: a
+  // refused append with no catch is an unhandled rejection in the Worker, and
+  // two in flight at once can land in either order. A link carries every
+  // change made before it leaves, and a card whose status and text Slack
+  // already shows is left out, so an append that would change nothing is never
+  // sent. Whoever settles the checklist awaits the chain first.
   //
   // A CARD'S TEXT GOES ONCE. Slack appends a re-sent `details` to the card's
   // existing details rather than replacing it: live, a card read "onboarding"
@@ -569,117 +583,91 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   // once handed over: a refused append leaves the card stuck either way, and
   // re-sending its text would not unstick it.
   let planChain: Promise<void> = Promise.resolve();
-  const outbox = new Map<string, PlanTask>();
   let linkQueued = false;
-  /** What each card's text fields already say on Slack. */
-  const shown = new Map<string, Partial<Pick<PlanTask, "details" | "output" | "sources">>>();
+  /** What each card already shows on Slack: its status and its text. */
+  const shown = new Map<string, Partial<Pick<PlanTask, "status" | "title" | "details" | "output" | "sources">>>();
 
-  /** `task` without the text Slack already shows for it, and that text noted. */
-  const onlyNewText = (task: PlanTask): PlanTask => {
-    const was = shown.get(task.id) ?? {};
-    const { details, output, sources, ...rest } = task;
-    const fresh = {
-      ...(details && details !== was.details ? { details } : {}),
-      ...(output && output !== was.output ? { output } : {}),
-      ...(sources?.length && JSON.stringify(sources) !== JSON.stringify(was.sources) ? { sources } : {}),
-    };
-    shown.set(task.id, { ...was, ...fresh });
-    return { ...rest, ...fresh };
-  };
-
-  // THE WORKING STATUS NAMES THE STEP IN PROGRESS. `agents.sessions.setStatus`
-  // takes a lifecycle value and no words, so the words go by the one method
-  // that still carries them, `assistant.threads.setStatus` (`assistant.ts` §
-  // `setStatusLine`). Slack's bridge maps a non-empty line onto `processing`,
-  // which is what the session already is — and also what makes a line that
-  // lands AFTER the settle dangerous: it would raise the indicator again for
-  // the hour Slack takes to time it out. So the line rides this chain, behind
-  // the card it names, and stops for good once the clear has begun.
-  //
-  // At most one line a link, only when the step changed, and only while the
-  // step it names is still in progress when the link goes — a step that ended
-  // in the same breath is not worth a call. So a turn spends at most one call
-  // per step it shows. Never out of the reserve the answer is posted from:
-  // words on a spinner are not worth an answer that cannot post.
-  /** The step the indicator should name — its card, and its words — and the
-   *  words it names now. */
-  let statusWanted: { card: string; title: string } | null = null;
-  let statusSent: string | null = null;
-  /** Set once the settle begins; no line goes out after it. */
-  let statusClosed = false;
-
-  const sendStatusLine = async (): Promise<void> => {
-    if (!replyTs || statusClosed || !statusWanted || statusWanted.title === statusSent) return;
-    if (cards.get(statusWanted.card)?.status !== "in_progress") return;
-    if (SUBREQUEST_CAP - subrequestsUsed() <= DELIVERY_RESERVE) return;
-    statusSent = statusWanted.title;
-    await slack.setStatusLine(channel, replyTs, statusLineOf(statusWanted.title));
-  };
-
-  /** Queue one link behind every update already issued, unless one is queued
-   *  and not yet run — that one will carry whatever is issued before it does. */
-  const flush = (ts: string): Promise<void> => {
-    if (!linkQueued) {
-      linkQueued = true;
-      planChain = planChain
-        .then(() => {
-          linkQueued = false;
-          const tasks = [...outbox.values()].map(onlyNewText);
-          outbox.clear();
-          return tasks.length ? slack.appendTasks(channel, ts, tasks) : undefined;
-        })
-        .catch(() => {})
-        .then(sendStatusLine)
-        .catch(() => {});
+  /** The cards whose status or text Slack does not show yet, as they go out,
+   *  noted as shown. A card still pending goes out in progress with its group. */
+  const changes = (): PlanTask[] => {
+    const out: PlanTask[] = [];
+    for (const card of cards.values()) {
+      const status: PlanTask["status"] = card.status === "pending" ? "in_progress" : card.status;
+      const was = shown.get(card.id);
+      const { details, output, sources, ...rest } = card;
+      const fresh = {
+        ...(details && details !== was?.details ? { details } : {}),
+        ...(output && output !== was?.output ? { output } : {}),
+        ...(sources?.length && JSON.stringify(sources) !== JSON.stringify(was?.sources) ? { sources } : {}),
+      };
+      if (was?.status === status && was.title === card.title && !Object.keys(fresh).length) continue;
+      shown.set(card.id, { ...was, ...fresh, status, title: card.title });
+      out.push({ ...rest, status, ...fresh });
     }
+    return out;
+  };
+
+  /** Queue one append behind every one already issued, unless one is queued
+   *  and not yet run — that one will carry whatever changes before it does.
+   *  The stream's first append opens the stream. */
+  const flush = (): Promise<void> => {
+    if (planMode === "static" || linkQueued) return planChain;
+    linkQueued = true;
+    planChain = planChain
+      .then(async () => {
+        linkQueued = false;
+        if (!planTs) {
+          if (streamAsked || !replyTs) return;
+          streamAsked = true;
+          planTs = await slack.startStream(channel, replyTs, target.userId, target.team);
+          // No stream, no checklist: narration goes back to being posted.
+          if (!planTs) {
+            planOpen = false;
+            return;
+          }
+        }
+        const tasks = changes();
+        const heading = headingPending;
+        headingPending = null;
+        if (tasks.length || heading) await slack.appendTasks(channel, planTs, tasks, heading ?? undefined);
+      })
+      .catch(() => {});
     return planChain;
   };
 
-  /** Record a card's new state and queue it behind every update already issued. */
-  const update = (ts: string, card: Card): Promise<void> => {
-    cards.set(card.id, card);
-    // A static checklist is only rewritten at settle: the card's new state is
-    // kept, and nothing is sent. Nor is a pending card, on either path.
-    if (planMode === "static" || card.status === "pending") return planChain;
-    outbox.set(card.id, { ...card, status: card.status });
-    return flush(ts);
-  };
-
-  /** Move a card that is on the checklist to a new status. */
-  const move = (ts: string, id: string, status: Card["status"], extra: Partial<PlanTask> = {}): void => {
+  /** Move a card that is on the checklist to a new state. Nothing is sent. */
+  const move = (id: string, status: Card["status"], extra: Partial<PlanTask> = {}): void => {
     const card = cards.get(id);
     if (!card) return;
     if (running === id && status !== "in_progress") running = null;
-    void update(ts, { ...card, ...extra, status });
+    cards.set(id, { ...card, ...extra, status });
   };
 
   // THE CAP. The first `TASK_CARD_CAP` cards are shown; every call after
   // them folds into one overflow card, whose count is how many it holds and
-  // whose status is theirs taken together — pending (so kept, not sent) while
-  // none has started, complete or error once all have settled (error if any
-  // erred), in progress in between. So the checklist never holds more than cap + 1 tool cards, and
-  // a folded call's transitions cost what any card's do: one append each.
-  /** Each folded call's status, by the card id it would have had. */
-  const folded = new Map<string, Card["status"]>();
+  // whose status is theirs taken together — pending while none has started,
+  // complete once all have settled, in progress in between. So the checklist
+  // never holds more than cap + 1 tool cards.
+  /** Each folded call's state, by the card id it would have had. */
+  const folded = new Map<string, CallState>();
 
-  /** Re-send the overflow card from the calls folded into it. */
-  const sendOverflow = (ts: string): void => {
+  /** Redraw the overflow card from the calls folded into it. */
+  const drawOverflow = (): void => {
     const states = [...folded.values()];
-    const settled = states.filter((s) => s === "complete" || s === "error");
-    const failed = states.filter((s) => s === "error").length;
-    const status: Card["status"] = states.every((s) => s === "pending")
+    const status: Card["status"] = states.every((s) => s.status === "pending")
       ? "pending"
-      : settled.length === states.length
-        ? failed
-          ? "error"
-          : "complete"
+      : states.every(settled)
+        ? "complete"
         : "in_progress";
     if (running === OVERFLOW_CARD && status !== "in_progress") running = null;
-    void update(ts, {
+    const output = tally(states);
+    const was = cards.get(OVERFLOW_CARD);
+    cards.set(OVERFLOW_CARD, {
+      ...(was ?? {}),
       id: OVERFLOW_CARD,
       title: `…and ${folded.size} more`,
       status,
-      ...(failed ? { output: `${failed} failed` } : {}),
+      ...(output ? { output } : {}),
     });
   };
 
@@ -687,13 +675,13 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   // way, as the call admitted just before it joins that call's card while the
   // card is still open — three blueprint searches in one reply read as one
   // step that searched three things, not three steps. A card already settled
-  // is not reopened: its output has gone out, and Slack appends a re-sent
+  // is not reopened: its output may have gone out, and Slack appends a re-sent
   // output rather than replacing it. So a later reply's search is a new step.
   //
   // A shared card is drawn from its calls: in progress while any is unsettled,
-  // then complete — or error when any failed, as the overflow card does — with
-  // every call's query as its details and every call's readout as its output.
-  // Its details grow only until the card first goes out, for the same reason.
+  // then complete, with every call's query as its details and every call's
+  // readout as its output. Its details grow only until the card first goes
+  // out, for the same reason.
   /** Each call's own state on the card it shares, by card id then call id. */
   const members = new Map<string, Map<string, CallState>>();
   /** Which card each admitted call is on. */
@@ -721,7 +709,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
    * call before it when the two are consecutive, its own card while there is
    * room, the overflow card after — and say which card is its.
    */
-  const admit = (ts: string, id: string, card: Card, key: string, decision: TaskCardDecision | null): string => {
+  const admit = (id: string, card: Card, key: string, decision: TaskCardDecision | null): string => {
     if (folded.has(id)) return OVERFLOW_CARD;
     const known = cardOf.get(id);
     if (known) return known;
@@ -730,24 +718,21 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       members.get(prior.id)?.set(id, { status: "pending" });
       cardOf.set(id, prior.id);
       if (card.details && !shown.has(prior.id)) {
-        const details = [prior.details, card.details].filter(Boolean).join(" · ");
-        cards.set(prior.id, { ...prior, details });
-        const queued = outbox.get(prior.id);
-        if (queued) outbox.set(prior.id, { ...queued, details });
+        cards.set(prior.id, { ...prior, details: [prior.details, card.details].filter(Boolean).join(" · ") });
       }
       return prior.id;
     }
     if (ownCards() >= TASK_CARD_CAP) {
       lastLookup = null;
-      folded.set(id, "pending");
-      sendOverflow(ts);
+      folded.set(id, { status: "pending" });
+      drawOverflow();
       return OVERFLOW_CARD;
     }
     const decided = decision && lastDecision.get(decision.kind) !== decision.value ? decision : null;
     if (decision) lastDecision.set(decision.kind, decision.value);
     if (decided && ownCards() + 1 < TASK_CARD_CAP) {
       const decisionId = `decision-${id}`;
-      void update(ts, {
+      cards.set(decisionId, {
         id: decisionId,
         title: toPlainText(decided.title),
         status: "pending",
@@ -758,82 +743,100 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     members.set(id, new Map([[id, { status: "pending" }]]));
     cardOf.set(id, id);
     lastLookup = { card: id, key };
-    void update(ts, card);
+    cards.set(id, card);
     return id;
   };
 
   /** A shared card, drawn from its calls. Its output and links wait for the
    *  last of them, so each goes out once. */
-  const drawShared = (ts: string, cardId: string, calls: readonly CallState[]): void => {
-    const unsettled = calls.some((c) => c.status === "pending" || c.status === "in_progress");
-    if (unsettled) {
+  const drawShared = (cardId: string, calls: readonly CallState[]): void => {
+    if (!calls.every(settled)) {
       const status = calls.every((c) => c.status === "pending") ? "pending" : "in_progress";
-      if (cards.get(cardId)?.status !== status) move(ts, cardId, status);
+      if (cards.get(cardId)?.status !== status) move(cardId, status);
       return;
     }
-    const failed = calls.filter((c) => c.status === "error").length;
-    const outputs = calls.flatMap((c) => (c.status === "complete" && c.output ? [c.output] : []));
-    const output =
-      `${calls.length} lookups${outputs.length ? `: ${outputs.join(" · ")}` : ""}` + (failed ? ` · ${failed} failed` : "");
     const seen = new Set<string>();
     const sources = calls
       .flatMap((c) => c.sources ?? [])
       .filter((s) => !seen.has(s.url) && seen.add(s.url))
       .slice(0, MAX_SOURCES);
-    move(ts, cardId, failed ? "error" : "complete", { output, ...(sources.length ? { sources } : {}) });
+    move(cardId, "complete", { output: `${calls.length} lookups${tally(calls, ": ")}`, ...(sources.length ? { sources } : {}) });
   };
 
   /** Move a call's card — its own, its share of a card it joined, or its
    *  share of the overflow card. */
-  const moveCall = (ts: string, id: string, status: Card["status"], extra: Partial<PlanTask> = {}): void => {
+  const moveCall = (id: string, state: CallState): void => {
     if (folded.has(id)) {
-      folded.set(id, status);
-      sendOverflow(ts);
+      folded.set(id, state);
+      drawOverflow();
       return;
     }
     const cardId = cardOf.get(id);
     const calls = cardId ? members.get(cardId) : undefined;
     if (!cardId || !calls) return;
-    calls.set(id, { status, ...(extra.output ? { output: extra.output } : {}), ...(extra.sources ? { sources: extra.sources } : {}) });
-    if (calls.size === 1) move(ts, cardId, status, extra);
-    else drawShared(ts, cardId, [...calls.values()]);
+    calls.set(id, state);
+    if (calls.size === 1) {
+      move(cardId, state.status, {
+        ...(state.output ? { output: state.output } : {}),
+        ...(state.sources ? { sources: state.sources } : {}),
+      });
+    } else drawShared(cardId, [...calls.values()]);
   };
 
-  /** Settle every card still open, wait for every queued update to land, and
-   *  forget the checklist, so nothing re-uses it. A stream's ts comes back for
-   *  the caller to stop; a static checklist is rewritten here and returns none.
+  /** Settle every card still open, send the checklist's final state, and
+   *  forget it, so nothing re-uses it. A stream's ts and its last changes come
+   *  back for the caller to stop with; a static checklist is rewritten here
+   *  and returns none.
    *
    *  A card still in progress settles with the turn. A card still PENDING is
    *  a lookup that never ran — a stopped turn answers with some queued — so it
-   *  settles as an error that says so, whatever the turn's outcome: a tick
-   *  beside a read that never happened would claim work nobody did. */
-  const settlePlan = async (status: "complete" | "error"): Promise<string | null> => {
-    if (!planTs) return null;
-    const ts = planTs;
-    planTs = null;
+   *  settles as skipped: a tick beside a read that never happened, with no
+   *  word, would claim work nobody did.
+   *
+   *  AN ANSWERED TURN ENDS COMPLETE, EVERY CARD OF IT. Slack titles a plan
+   *  from its cards, and a plan holding one error card reads "Something went
+   *  wrong" above the answer that follows it (live 2026-10-11: a search the
+   *  budget refused did exactly that). A lookup that failed or was skipped
+   *  says so in its output; the answer's ⚠️ line says what it cost. Error is
+   *  kept for the turn that died. */
+  const settlePlan = async (
+    status: "complete" | "error",
+  ): Promise<{ ts: string; tasks: PlanTask[]; title?: string } | null> => {
+    if (!planOpen) return null;
+    planOpen = false;
     for (const card of [...cards.values()]) {
-      if (card.status === "in_progress") move(ts, card.id, status);
-      else if (card.status === "pending") move(ts, card.id, "error", { output: NOT_RUN });
+      if (card.status === "in_progress") move(card.id, status);
+      else if (card.status === "pending") move(card.id, status, { output: SKIPPED });
     }
     heldDetails = null;
+    // A stream still being opened has its chance to land first, so the final
+    // state goes into it rather than past it.
     await planChain;
     if (planMode === "static") {
+      if (!planTs) return null;
+      const ts = planTs;
+      planTs = null;
       // The one rewrite, with every card's final state. Best-effort like every
       // card update: a checklist that would not settle is not worth a turn.
       // Nothing for an answer to close, so the answer posts beneath it.
       // Every card has settled above, so none is pending any more.
-      const settled = [...cards.values()].filter((c): c is PlanTask => c.status !== "pending");
-      await slack
-        .updateMessage({ channel, ts, text: planTitle, blocks: [planBlock(planTitle, settled)] })
-        .catch(() => {});
+      const final = [...cards.values()].filter((c): c is PlanTask => c.status !== "pending");
+      await slack.updateMessage({ channel, ts, text: planTitle, blocks: [planBlock(planTitle, final)] }).catch(() => {});
       return null;
     }
-    return ts;
+    if (!planTs) return null;
+    const ts = planTs;
+    planTs = null;
+    const heading = headingPending;
+    headingPending = null;
+    return { ts, tasks: changes(), ...(heading ? { title: heading } : {}) };
   };
 
+  // The final state rides the stop: `chat.stopStream` takes the same task
+  // chunks an append does, so settling spends no call of its own.
   const endProgress = async (outcome: "complete" | "error"): Promise<void> => {
-    const ts = await settlePlan(outcome);
-    if (ts) await slack.stopStream(channel, ts).catch(() => {});
+    const last = await settlePlan(outcome);
+    if (last) await slack.stopStream(channel, last.ts, last.tasks, last.title).catch(() => {});
   };
 
   /** Post the static checklist, opening card in progress. A refused post
@@ -844,6 +847,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       .postMessage({ channel, text: label, blocks: [planBlock(label, [opening])] })
       .catch(() => ({ ok: false as const }));
     if (!posted.ok || !("ts" in posted) || !posted.ts) return;
+    planOpen = true;
     planMode = "static";
     planTitle = label;
     planTs = posted.ts;
@@ -932,9 +936,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // thread waiting on a ✅ settles to `suspended` rather than claiming to
       // be idle (#575).
       if (!replyTs) return;
-      // No step line after this point, and none still in flight when the
-      // settle goes: a line landing after it would raise the indicator again.
-      statusClosed = true;
+      // No checklist update still in flight when the settle goes.
       await planChain;
       await reportStatus(
         "clear",
@@ -944,9 +946,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     },
 
     async beginProgress(label, ask) {
-      // An early stream is only honest in plan mode: with plain text there is
-      // nothing to put in it and the client renders an empty bubble for the
-      // whole run (tried, reverted — see api.ts).
+      // An early checklist is only honest in plan mode: with plain text there
+      // is nothing to put in a stream and the client renders an empty bubble
+      // for the whole run (tried, reverted — see api.ts).
       if (!deps.planStream) return;
       // DM progress keeps the working label; channel checklists use the ask
       // as their heading so the thread remains identifiable.
@@ -958,26 +960,21 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         if (planTs && heading) planTitle = heading;
         return;
       }
-      planTs = await slack.startStream(channel, replyTs, target.userId, target.team);
-      if (!planTs) return;
+      // Nothing goes to Slack yet: the stream opens with the first group of
+      // lookups, and the heading rides its first append.
+      planOpen = true;
       running = OPENING_CARD;
-      const opened = update(planTs, { id: OPENING_CARD, title: label, status: "in_progress" });
-      // The heading goes behind the opening card on the same chain.
-      if (heading) {
-        const ts = planTs;
-        planChain = planChain.then(() => slack.setPlanTitle(channel, ts, heading)).catch(() => {});
-      }
-      await opened;
+      cards.set(OPENING_CARD, { id: OPENING_CARD, title: label, status: "in_progress" });
+      if (heading) headingPending = heading;
     },
 
     endProgress,
 
     postInterim(text, kind = "narration") {
-      if (planTs) {
+      if (planOpen) {
         // The backstop line only says the turn is still alive, and with a
-        // checklist open the running card and the working signal already say
-        // so. Held as details it would read as what the next lookup is for, so
-        // it is dropped.
+        // checklist open the working signal already says so. Held as details
+        // it would read as what the next lookup is for, so it is dropped.
         if (kind === "backstop") return;
         // With a checklist open, narration is not a card of its own: it says
         // what the lookups it introduces are for, so it becomes the details of
@@ -996,12 +993,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     },
 
     toolProgress(event) {
-      // No stream, no checklist: with the switch off the narration above is
-      // the whole of what a person sees, exactly as before there were cards.
-      if (!planTs) return;
+      // No checklist: with the switch off the narration above is the whole of
+      // what a person sees, exactly as before there were cards.
+      if (!planOpen) return;
       const words = taskCardFor(event.name);
       if (!words) return;
-      const ts = planTs;
       const id = `tool-${event.seq}`;
       const icon = estateIcon(words.estate, event.args);
       // EVERY WORD ON A CARD IS PLAIN TEXT, passed once as it arrives here —
@@ -1023,28 +1019,30 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           const query = readoutFor(event.name)?.details(event.args) ?? null;
           const details = toPlainText([heldDetails, query].filter(Boolean).join(" · "));
           heldDetails = null;
-          admit(ts, id, { ...fresh, ...(details ? { details } : {}) }, key, decision);
+          admit(id, { ...fresh, ...(details ? { details } : {}) }, key, decision);
+          // A group of lookups starting is a boundary: the checklist goes out,
+          // carrying the group before it closed and this one open. The whole
+          // group is announced in one breath, and its first call starts in the
+          // same one, so one append carries all of it.
+          void flush();
           return;
         }
         case "started": {
-          const card = admit(ts, id, fresh, key, decision);
+          const card = admit(id, fresh, key, decision);
           // One card in progress at a time: whatever was running — the opening
-          // card, on the first lookup — closes in the same append. Calls that
-          // share a card, folded or consecutive, close nothing as the next starts.
-          if (running && running !== card) move(ts, running, "complete");
+          // card, on the first lookup — closes. Calls that share a card,
+          // folded or consecutive, close nothing as the next starts.
+          if (running && running !== card) move(running, "complete");
           running = card;
           // The choice was made as the call went out, so its step is done.
           const decided = decisionOf.get(id);
-          if (decided) move(ts, decided, "complete");
-          // The indicator names the step: the card's title, or the call's own
-          // where it is folded, since "…and 3 more" names nothing.
-          statusWanted = { card, title: card === OVERFLOW_CARD ? fresh.title : (cards.get(card)?.title ?? fresh.title) };
-          moveCall(ts, id, "in_progress");
+          if (decided) move(decided, "complete");
+          moveCall(id, { status: "in_progress" });
           return;
         }
         case "finished": {
           if (event.error) {
-            moveCall(ts, id, "error", { output: shortReason(toPlainText(event.error)) });
+            moveCall(id, { status: "complete", failed: true, output: `${FAILED}: ${shortReason(toPlainText(event.error))}` });
             return;
           }
           // A call folded into the overflow card has no card of its own to
@@ -1053,11 +1051,13 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           const sources = threadVisibleSources(event.sources ?? [])
             .slice(0, MAX_SOURCES)
             .map((s) => ({ ...s, text: toPlainText(s.text) }));
-          moveCall(ts, id, "complete", { ...(output ? { output } : {}), ...(sources.length ? { sources } : {}) });
+          moveCall(id, { status: "complete", ...(output ? { output } : {}), ...(sources.length ? { sources } : {}) });
           return;
         }
         case "refused":
-          moveCall(ts, id, "error", { output: shortReason(toPlainText(event.reason)) });
+          // Refused before it ran — the budget, most often. Skipped, not
+          // failed: nothing went wrong with the source.
+          moveCall(id, { status: "complete", skipped: true, output: SKIPPED });
           return;
       }
     },

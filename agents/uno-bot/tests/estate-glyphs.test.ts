@@ -30,7 +30,7 @@ async function streamIcons(calls: Array<{ name: string; args?: Record<string, un
   await tick();
   await delivery.postAnswer("Done.");
   const icons = new Map<string, unknown>();
-  for (const call of slack.of("tasks")) for (const t of call.tasks) icons.set(t.id, (t as { icon?: unknown }).icon);
+  for (const call of slack.checklist()) for (const t of call.tasks) icons.set(t.id, (t as { icon?: unknown }).icon);
   return icons;
 }
 

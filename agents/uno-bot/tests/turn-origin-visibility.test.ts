@@ -341,13 +341,42 @@ describe("a figma turn for an asker Team Members does not map reads public facts
     for (const name of names) {
       assert.equal(TOOL_TABLE[name as keyof typeof TOOL_TABLE].access, "ungated", name);
     }
-    for (const write of ["notion_create", "github_issue_create", "reminder_set", "slack_react", "proposal_resolve"]) {
+    for (const write of ["notion_create", "notion_update", "github_issue_create", "component_implement", "reminder_set", "slack_react", "proposal_resolve"]) {
       assert.ok(!names.includes(write), write);
     }
   });
 
   it("while a mapped asker's figma turn is still offered the gated tools it may propose", async () => {
-    assert.ok((await offered("figma")).includes("notion_create"));
+    const names = await offered("figma");
+    for (const write of ["notion_create", "notion_update", "github_issue_create", "component_implement"]) assert.ok(names.includes(write), write);
+  });
+
+  it("is offered exactly the public read tools", async () => {
+    const names = await offered("figma", { unmappedAsker: true });
+    assert.deepEqual(names.sort(), ["github_intake_search", "github_read", "present", "read_reference", "source_read"]);
+  });
+});
+
+describe("a figma turn is not offered a tool public scope always refuses", () => {
+  const ALWAYS_REFUSED = ["search_blueprint", "reminder_set", "slack_search", "slack_thread_read", "slack_user_profile", "slack_channel_members", "slack_react"];
+
+  for (const unmappedAsker of [false, true]) {
+    it(`for ${unmappedAsker ? "an unmapped" : "a mapped"} asker`, async () => {
+      const names = await offered("figma", { unmappedAsker });
+      for (const name of ALWAYS_REFUSED) assert.ok(!names.includes(name), name);
+    });
+  }
+
+  it("a mapped asker keeps the team reads", async () => {
+    const names = await offered("figma");
+    for (const name of ["notion_search", "roadmap_query", "source_read", "github_read"]) assert.ok(names.includes(name), name);
+  });
+
+  it("a Slack turn's roster is every tool with a schema, as before", async () => {
+    const names = await offered("slack");
+    const { readFileSync } = await import("node:fs");
+    const defs = JSON.parse(readFileSync(`${process.cwd()}/tool-definitions.json`, "utf8")) as Array<{ name: string }>;
+    assert.deepEqual(names, defs.map((t) => t.name));
   });
 
   it("reads no Notion and no Slack at all, not even a team surface or a public channel", async () => {

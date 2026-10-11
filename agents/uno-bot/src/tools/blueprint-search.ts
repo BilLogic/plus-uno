@@ -46,7 +46,7 @@ import {
   type BlueprintEnrichmentOutcome,
   type BlueprintReadResult,
 } from "../integrations/blueprint-read";
-import { appRootUrl } from "../integrations/blueprint-link";
+import { appRootUrl, blueprintBreadcrumb, splitPathKind, withoutPathKind } from "../integrations/blueprint-link";
 import { inventoryNotes } from "./blueprint-inventory-notes";
 import { touchpointNotes } from "./blueprint-touchpoint-notes";
 import {
@@ -78,6 +78,28 @@ function failureOf(
   return outcome.disposition;
 }
 
+/** The name the blueprint root goes by in Sources: the scope the turn browsed,
+ *  phase then scenario, or the blueprint alone when nothing narrowed it. */
+function blueprintTitle(scope: BlueprintScope): string {
+  const where = [scope.filterPhase, scope.filterScenario].filter(Boolean).join(" › ");
+  return where ? `Service blueprint › ${where}` : "Service blueprint";
+}
+
+/** One row with its `breadcrumb` and its path kind split off as data. */
+function asRead(row: BlueprintRow): BlueprintRow {
+  const split = row.path ? splitPathKind(row.path) : undefined;
+  const path = split?.name || undefined;
+  const pathKind = row.pathKind ?? split?.kind;
+  const breadcrumb = blueprintBreadcrumb({ ...row, path });
+  return {
+    ...row,
+    title: withoutPathKind(row.title),
+    ...(path ? { path } : {}),
+    ...(pathKind ? { pathKind } : {}),
+    ...(breadcrumb ? { breadcrumb } : {}),
+  };
+}
+
 /** One read, as the payload the model is handed.
  *
  *  PURE, and exported, because this is the half of the tool worth asserting:
@@ -106,9 +128,13 @@ export function blueprintSearchPayload({
   read: BlueprintReadResult<BlueprintRow, BlueprintRetrieval>;
 }): Record<string, unknown> {
   const {
-    rows, retrieval, matched, truncated, capped_by, cached, age_ms, thin, top_score,
+    retrieval, matched, truncated, capped_by, cached, age_ms, thin, top_score,
     enrichments,
   } = read;
+  // The rows as the model and the Sources box read them: each named by its
+  // breadcrumb, and the index's path kind tag moved out of every name into
+  // `pathKind`, so "(happy)" never reaches a label or an answer.
+  const rows = read.rows.map(asRead);
 
   // The corpus-wide count behind the top-k (fused path only). Surfaced as
   // `matched` with its own note, so "113 cells mention Zoom; here are 15" is
@@ -190,6 +216,21 @@ export function blueprintSearchPayload({
   const linking = rows.some((r) => r.url)
     ? "Each row's `url` opens that exact cell in the blueprint app. Link the cells you actually rely on — put the link on the cell's name at the point of mention, and never hand-build or edit one; only use `url` verbatim."
     : undefined;
+  // A row above cell level has no page of its own — the app's URL vocabulary
+  // links cells and slices only — so a browse at scenario, path, step or phase
+  // rung returned rows that left no link anywhere, and the answer standing on
+  // them showed no blueprint source. The app's root stands in for them, ONCE,
+  // named for the scope the turn browsed — and only when no row links a cell,
+  // since a cell's deep link is the better source and the root beside it
+  // would be a second link to the same place.
+  const appRoot = appUrl ? appRootUrl(appUrl) : undefined;
+  const blueprint =
+    appRoot && rows.some((r) => r.kind !== "cell") && !rows.some((r) => r.url)
+      ? { title: blueprintTitle(scope), url: appRoot }
+      : undefined;
+  const rootLinking = blueprint
+    ? "Rows above cell level (a phase, scenario, path, step or lane) have no link of their own. `blueprint.url` opens the blueprint app at its root: link it once, verbatim, where the answer first names the blueprint."
+    : undefined;
   const citing = rows.some((r) => r.links?.length)
     ? "Some rows carry `links` the blueprint authors attached. Link them at the point of mention — they are authored, not constructed, so they are safe to surface."
     : undefined;
@@ -270,6 +311,7 @@ export function blueprintSearchPayload({
     ...(orientation ? { orientation } : {}),
     ...(index ? { index } : {}),
     rows,
+    ...(blueprint ? { blueprint } : {}),
     ...(edges ? { edges } : {}),
     ...(findings ? { findings } : {}),
     ...(typeof findingsTotal === "number" ? { findingsTotal } : {}),
@@ -279,7 +321,7 @@ export function blueprintSearchPayload({
     ...(typeof touchpointsTotal === "number" ? { touchpointsTotal } : {}),
     notes:
       rows.length > 0
-        ? [GROUNDING_NOTE, attribution, conflict, indexNote, indexFailureNote, cacheHitNote, thinNote, matchedCountNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, ...touchpointNoteList, ...failureNotes, truncation, ...inventory].filter(Boolean)
+        ? [GROUNDING_NOTE, attribution, conflict, indexNote, indexFailureNote, cacheHitNote, thinNote, matchedCountNote, linking, rootLinking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, ...touchpointNoteList, ...failureNotes, truncation, ...inventory].filter(Boolean)
         : [
             NO_ROWS_NOTE,
             indexNote,

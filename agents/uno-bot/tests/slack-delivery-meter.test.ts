@@ -37,6 +37,10 @@ test("plan-stream cards and the answer, sent at a spent lookup limit, are neithe
     await withSubrequestLimit(0, async () => {
       await delivery.beginProgress("Working on it");
       delivery.postInterim("Searching the blueprint");
+      const call = { seq: 1, name: "search_blueprint", args: { query: "call-off" } };
+      delivery.toolProgress({ ...call, phase: "announced" });
+      delivery.toolProgress({ ...call, phase: "started" });
+      delivery.toolProgress({ ...call, phase: "finished" });
       const posted = await delivery.postAnswer("Here is the answer.");
       assert.equal(posted.ok, true);
     });
@@ -44,7 +48,7 @@ test("plan-stream cards and the answer, sent at a spent lookup limit, are neithe
     assert.equal(subrequestsUsed(), sent.length, "every delivery call still counted");
   });
   assert.ok(sent.includes("chat.startStream"), sent.join(" "));
-  assert.ok(sent.filter((m) => m === "chat.appendStream").length >= 3, sent.join(" "));
+  assert.ok(sent.filter((m) => m === "chat.appendStream").length >= 2, sent.join(" "));
   assert.ok(sent.includes("chat.stopStream"), sent.join(" "));
 });
 

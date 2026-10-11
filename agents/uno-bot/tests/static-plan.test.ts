@@ -82,11 +82,12 @@ describe("static checklist in a top-level DM", () => {
     const [update] = slack.of("update");
     assert.equal(update!.ts, "posted-1", "the update rewrites the message the plan was posted as");
     const settled = planOf(update!.blocks);
-    assert.deepEqual(statuses(settled), ["understand:complete", "tool-1:complete", "tool-2:error"]);
+    // Complete, failure and all: an answered turn's plan never ends in error.
+    assert.deepEqual(statuses(settled), ["understand:complete", "tool-1:complete", "tool-2:complete"]);
     // The block form's `output` is rich text, not a string.
     assert.deepEqual(settled.tasks[2]!.output, {
       type: "rich_text",
-      elements: [{ type: "rich_text_section", elements: [{ type: "text", text: "Notion said no" }] }],
+      elements: [{ type: "rich_text_section", elements: [{ type: "text", text: "Failed: Notion said no" }] }],
     });
 
     // The answer is its own message, posted after the checklist settles.

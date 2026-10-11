@@ -809,7 +809,7 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
 
 describe("@uno in a Figma comment (#903)", () => {
   const REPLIES: FigmaReply[] = [
-    { kind: "answer", lines: ["Hidden until the first goal is set."], source: "https://www.notion.so/prd" },
+    { kind: "answer", lines: ["Hidden until the first goal is set."], source: { name: "Goal Setting PRD", url: "https://www.notion.so/prd" } },
     { kind: "answer", lines: ["Probably hidden."], source: null },
     { kind: "question", lines: ["Which card is this for?"] },
     { kind: "drafted", link: "https://plus.slack.com/archives/C1/p1" },

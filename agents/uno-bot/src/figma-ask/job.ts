@@ -63,7 +63,7 @@ import type { HistoryTurn, ThreadRef, ThreadState } from "../thread-state/index"
 import { buildTurnRequest, type Delivery, type PostResult, type ProposalCard, type TurnOutcome, type TurnRequest } from "../turn/index";
 import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
 import type { GapNotes } from "../usage/gap-notes";
-import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply } from "./copy";
+import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply, type FigmaSource } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
 import { askText, asksUno, isOwnComment } from "./trigger";
 
@@ -386,21 +386,33 @@ function askContext(
   return lines;
 }
 
-/** How the turn answers an ask from Figma, and how far a stranger's goes. */
+/**
+ * The Figma turn's scope instruction: a question gets a short plain-text
+ * answer citing one link; a teammate's change request is proposed as a write,
+ * named by intake route; a stranger gets public facts and no change.
+ *
+ * @param teammate - Whether the asker maps to a teammate on Team Members
+ */
 export function askInstruction(teammate: boolean): string {
   return [
-    "this ask came from a Figma comment, and the answer is posted back there as plain text.",
-    "Answer in one to three short sentences: no lists, headings or formatting.",
+    "this ask came from a Figma comment, and the reply is posted back there as plain text.",
+    "Answer a question in one to three short sentences: no lists, headings or formatting.",
     "Cite the one link that answers it; when nothing you read answers it, say so plainly rather than guess.",
     teammate
-      ? "A change they ask for is drafted as a card for approval in #plus-design; nothing is written from Figma."
+      ? [
+          "A change they ask for is a proposal, routed as an intake: call the write that fits in this reply, and it waits as a card in #plus-design for the file's design owner to approve.",
+          "Product or design, a bug in the live PLUS app included → the frame's Roadmap card when the file's name has `Card <n>` (`notion_update`, found through `roadmap_query`), else a new Roadmap card (`notion_create`);",
+          "implementation in a listed plus-uno repo — the blueprint, Storybook docs, the harness, prototypes → that repo's GitHub issue (`github_issue_create`);",
+          "a named design-system component change → `component_implement`.",
+        ].join(" ")
       : "The asker is not on Team Members: answer from public facts only, and propose no change of any kind.",
   ].join(" ");
 }
 
 /**
- * The source a reply may carry: the first link the answer cites that a lookup
- * of this turn returned, and that a public thread may carry
+ * The source a reply may carry, named as the Sources box names it: the first
+ * link the answer cites that a lookup of this turn returned, and that a public
+ * thread may carry
  * (`threadVisibleSources`, judged with what that lookup said of who may see
  * it). A link the turn read but the answer does not cite is no source; nor is
  * one the answer cites that no lookup returned; nor the frame the ask was
@@ -410,19 +422,80 @@ export function askInstruction(teammate: boolean): string {
  * @param read - What the turn's lookups returned
  * @param asked - The frame (or the file) the ask was made on
  */
-export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string): string | null {
+export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string): FigmaSource | null {
   for (const url of cited) {
     if (sameFigmaPlace(url, asked)) continue;
-    const source = read.find((s) => s.url === url);
-    if (source && threadVisibleSources([source]).length) return url;
+    const source = read.find((s) => sameReadLink(url, s.url));
+    if (source && threadVisibleSources([source]).length) return { name: source.text, url };
   }
   return null;
+}
+
+/**
+ * Whether a cited link names what a lookup read: the same link once neither
+ * carries a fragment or a trailing slash, nor a query outside Figma (where the
+ * query is the frame); and a GitHub file or directory on any ref, so a cited
+ * `blob/main/…#L12` is the `blob/HEAD/…` a path read returned.
+ */
+function sameReadLink(cited: string, read: string): boolean {
+  const a = linkKey(cited);
+  const b = linkKey(read);
+  if (!a || !b) return cited === read;
+  if (a.github && b.github) {
+    return a.github.repoAndKind === b.github.repoAndKind && `/${a.github.refAndPath}`.endsWith(`/${b.github.pathAfterRef}`);
+  }
+  return a.key === b.key;
+}
+
+/**
+ * A link as links are compared here: host without `www.`, path without a
+ * trailing slash, no fragment, and the query kept only on Figma, where it
+ * names the frame. Null for what is not a URL.
+ */
+function normalisedLink(url: string): { host: string; path: string; query: string } | null {
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return null;
+  }
+  const host = u.hostname.toLowerCase().replace(/^www\./, "");
+  const query = /(^|\.)figma\.com$/.test(host) ? u.search : "";
+  return { host, path: u.pathname.replace(/\/+$/, ""), query };
+}
+
+/**
+ * What `sameReadLink` compares: the normalised link as one `key`, and for a
+ * GitHub file or directory link (`github.com/<owner>/<repo>/<blob|tree>/<ref>/<path>`)
+ * its parts. A link a read returned holds a one-segment ref; a cited ref may
+ * hold slashes, so the cited side's `refAndPath` is matched at its end against
+ * the read side's `pathAfterRef`.
+ */
+function linkKey(
+  url: string,
+): { key: string; github?: { repoAndKind: string; refAndPath: string; pathAfterRef: string } } | null {
+  const link = normalisedLink(url);
+  if (!link) return null;
+  const key = `${link.host}${link.path}${link.query}`;
+  const repo = link.host === "github.com" ? /^\/([^/]+\/[^/]+)\/(blob|tree)\/(.+)$/.exec(link.path) : null;
+  if (!repo) return { key };
+  const refAndPath = repo[3]!;
+  return {
+    key,
+    github: {
+      repoAndKind: `${repo[1]!.toLowerCase()}/${repo[2]}`,
+      refAndPath,
+      pathAfterRef: refAndPath.split("/").slice(1).join("/"),
+    },
+  };
 }
 
 /** Whether two links open the same Figma frame, or the same file with no frame. */
 function sameFigmaPlace(a: string, b: string): boolean {
   const key = (url: string): string | null => {
-    const file = /^https?:\/\/(?:[\w-]+\.)?figma\.com\/(?:design|file|proto)\/([A-Za-z0-9]+)/i.exec(url)?.[1];
+    const link = normalisedLink(url);
+    if (!link || !/(^|\.)figma\.com$/.test(link.host)) return null;
+    const file = /^\/(?:design|file|proto)\/([A-Za-z0-9]+)/i.exec(link.path)?.[1];
     if (!file) return null;
     return `${file}:${parseFigmaUrl(url)?.nodeId ?? ""}`;
   };
