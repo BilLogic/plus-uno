@@ -192,8 +192,8 @@ function shownAs(entry: ReportEntry): { subtitle?: string; body: string; button:
     // Decided by one of the card's own answers: "<label> · <@who>".
     case "approved":
       return state.as
-        ? { subtitle: `${state.as.label} · ${by(state.by)}`, body: state.as.decided ?? `Written: ${item.done ?? item.body}`, button: "View" }
-        : { subtitle: `Approved by ${by(state.by)} · written ${etClock(state.at)}`, body: `Written: ${item.done ?? item.body}`, button: "View" };
+        ? { subtitle: `${state.as.label} · ${by(state.by)}`, body: state.as.decided ?? `Written: ${state.done ?? item.done ?? item.body}`, button: "View" }
+        : { subtitle: `Approved by ${by(state.by)} · written ${etClock(state.at)}`, body: `Written: ${state.done ?? item.done ?? item.body}`, button: "View" };
     case "failed":
       return {
         subtitle: `${state.as ? `${state.as.label} · ${by(state.by)}` : `Approved by ${by(state.by)}`} · not written: ${state.reason}`,
