@@ -1273,7 +1273,7 @@ export interface ThreadState {
 
   /**
    * Ask to file the one issue a key stands for (the weekly DS precedence
-   * intake, keyed by its week). One hop, with the input gate closed, so of two
+   * intake, keyed by its week). One hop and one transaction, so of two
    * racing callers exactly one is told "claimed" and files; the other is told
    * "busy" until that one settles, then "filed" with the issue. A lease older
    * than `FILING_LEASE_MS` was a caller killed mid-filing, and is reclaimed.

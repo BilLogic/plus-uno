@@ -519,9 +519,8 @@ interface Drafted {
   lane: FileDriftFinding["lane"];
   /** Why its Product Pillar was left off, or null. */
   note: string | null;
-  /** Its file's last publisher, when the directory maps them: their Slack id
-   *  and their Figma handle. */
-  publisher: { slackId: string; handle: string } | null;
+  /** Its file's last publisher's Slack id, when the directory maps them. */
+  publisher: { slackId: string } | null;
 }
 
 /**
@@ -597,8 +596,8 @@ async function askWithCards(
           )
         : { pillar: null, note: null };
     const intake = draftIntake({ findings: d.all, pillar: choice.pillar, publisher, permalinks });
-    // A publisher the directory maps is named on the card — in plain text,
-    // never @-mentioned, and given no say on it, until that is agreed.
+    // A publisher the directory maps is @-mentioned on the card and may
+    // decide it; one it does not map is named on the intake alone.
     const publisherSlack =
       publisher?.userId && deps.figmaPeople
         ? slackPersonOfFigma(
@@ -615,7 +614,7 @@ async function askWithCards(
       operation: intake.operation,
       lane: intake.lane,
       note: choice.note ? pillarNote(choice.note) : null,
-      publisher: publisherSlack && publisher ? { slackId: publisherSlack, handle: publisher.handle } : null,
+      publisher: publisherSlack ? { slackId: publisherSlack } : null,
     });
   }
   // Files this thread discussed whose intake is drafted elsewhere: a pointer each.
@@ -682,7 +681,7 @@ async function askWithCards(
       // Nobody asked: the Worker staged it.
       requesterUserId: "",
       ttlMs: DRIFT_CARD_TTL_MS,
-      confirmers: [...new Set(d.all.flatMap((f) => [f.owner, ...f.participants]).filter(Boolean))],
+      confirmers: [...new Set([...d.all.flatMap((f) => [f.owner, ...f.participants]), d.publisher?.slackId].filter((id): id is string => !!id))],
       // Nobody asked, so the gate's "ask me again" lines would be wrong.
       stated: driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000),
       choices: driftChoices(),

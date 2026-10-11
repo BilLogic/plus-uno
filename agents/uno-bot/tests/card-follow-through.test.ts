@@ -63,7 +63,7 @@ import type { GateVerdict } from "../src/gate/index";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
-import { itemProposal } from "../src/slack/decision-cards";
+import { currentReport, itemProposal } from "../src/slack/decision-cards";
 import { ANSWER_ON_CARD } from "../src/follow-through/copy";
 
 const SCAN: ScheduledJob = { key: "card-follow-through", kind: "card-follow-through" };
@@ -198,7 +198,7 @@ function morning(
     cards: cardFollowUps(due),
     ...(opts.meter ? { meter: opts.meter } : {}),
   };
-  return { run: () => runCommitmentNudges(NUDGE, deps), posts, edits, marked, staged, threadState };
+  return { run: () => runCommitmentNudges(NUDGE, deps), cards: deps.cards!, posts, edits, marked, staged, threadState };
 }
 
 /**
@@ -1066,6 +1066,114 @@ describe("shared rules", () => {
     assert.equal(next.posts.length, 1);
     assert.equal(next.staged.length, 1);
     assert.equal(only(store).state, "nudged");
+  });
+});
+
+// ── One card per follow-up ───────────────────────────────────────────────────
+
+describe("one card per follow-up", () => {
+  /** `n` to-dos for Maya in one #plus-design thread, kept at the end of day. */
+  async function manyTodos(n: number) {
+    const store = createInMemoryCommitmentStore();
+    const asks = Array.from({ length: n }, (_, i) => ({ ts: ts(29, 15, i + 1), user: BEA, text: `<@U0MAYA> can you create a card for step ${i + 1}?` }));
+    const thread: SweepThread = { channel: DESIGN, channelKind: "public", rootTs: ROOT, messages: [{ ts: ROOT, user: BEA, text: "Review notes." }, ...asks] };
+    const reply = JSON.stringify({ todos: asks.map((m, i) => ({ message_ts: m.ts, assignee: MAYA, what: `step ${i + 1}`, confidence: 0.9 })) });
+    await recordThreadCardTodos(thread, ts(29, 0), {
+      detector: modelCardTodoDetector(fakeProvider({ generateReplies: [reply] })),
+      store,
+      config: CONFIG,
+      now: () => EOD,
+      runDate: utcDay(EOD),
+    });
+    assert.equal(store.rows.size, n);
+    return store;
+  }
+
+  const oldestFirst = (store: InMemoryCommitmentStore) => [...store.rows.values()].sort((a, b) => a.promisedAt - b.promisedAt);
+
+  /** Every live row due handed to the morning's card handler, oldest first, then
+   *  the morning's post — past the per-person cap, which the job applies. */
+  async function askAll(store: InMemoryCommitmentStore, m: ReturnType<typeof morning>, now: number) {
+    const rows = oldestFirst(store).filter((r) => (r.state === "open" || r.state === "nudged") && r.dueAt <= now);
+    const actions = [];
+    for (const r of rows) actions.push(await m.cards.due(r, now, utcDay(now)));
+    const flushed = await m.cards.flush!(now, utcDay(now));
+    return actions.map((a) => flushed.find((f) => f.id === a.id) ?? a);
+  }
+
+  it("each follow-up is its own card, with its own Review and Open, staged as its own proposal", async () => {
+    const store = await manyTodos(3);
+    const m = morning(store, roadmap(), at(32, 13));
+    await askAll(store, m, at(32, 13));
+    assert.equal(m.posts.length, 1);
+    const post = m.posts[0]!;
+    assert.deepEqual(post.cards.map((c) => c.title.text), ["Step 1", "Step 2", "Step 3"]);
+    for (const c of post.cards) {
+      assert.deepEqual(c.actions.map((x) => x.text.text), ["Review", "Open source"]);
+      assert.ok(c.actions[1]!.url);
+    }
+    assert.equal(new Set(post.cards.map((c) => c.actions[0]!.action_id)).size, 3);
+    assert.equal(m.staged.length, 3);
+    assert.equal(new Set(m.staged.map((p) => p.supersedeKey)).size, 3);
+    for (const r of store.rows.values()) assert.ok(m.staged.some((p) => p.item?.id === r.id && p.item.messageTs === post.ts));
+  });
+
+  it("more than 10: 10 cards show, the parent says the rest come next, and the rest are asked the next morning", async () => {
+    const store = await manyTodos(12);
+    const m = morning(store, roadmap(), at(32, 13));
+    const actions = await askAll(store, m, at(32, 13));
+    assert.equal(m.posts.length, 1);
+    assert.equal(m.posts[0]!.cards.length, 10);
+    assert.match(m.posts[0]!.text.split("\n")[0]!, /Showing 10 of 12; the rest come in the next report\.$/);
+    assert.equal(m.staged.length, 10);
+    const rows = oldestFirst(store);
+    assert.deepEqual(rows.map((r) => r.state), [...Array<string>(10).fill("nudged"), "open", "open"]);
+    for (const r of rows.slice(10)) assert.equal(actions.find((a) => a.id === r.id)?.action, "held");
+    // The next morning asks the two held back, on a report of their own.
+    const next = morning(store, roadmap(), at(33, 13));
+    await askAll(store, next, at(33, 13));
+    assert.deepEqual(next.posts.flatMap((p) => p.cards.map((c) => c.title.text)), ["Step 11", "Step 12"]);
+    assert.equal(oldestFirst(store).filter((r) => r.state === "nudged").length, 12);
+  });
+
+  it("deciding one card settles only that follow-up: the others stay open, Review and all", async () => {
+    const store = await manyTodos(3);
+    const m = morning(store, roadmap(), at(32, 13));
+    await askAll(store, m, at(32, 13));
+    const [first, second, third] = oldestFirst(store);
+    const { ran, redrawn } = await review(m.threadState, m.posts[0]!, second!.id, "cancel", { userId: MAYA });
+    assert.ok(!ran.some((v) => v.execute), "nothing runs");
+    const cards = redrawn.at(-1)!;
+    assert.equal(cards.length, 3);
+    assert.match(cards[1]!.subtitle!.text, /^Rejected by <@U0MAYA>/);
+    for (const i of [0, 2]) {
+      assert.equal(cards[i]!.actions[0]!.text.text, "Review");
+      assert.doesNotMatch(cards[i]!.subtitle!.text, /Rejected|Approved/);
+    }
+    for (const r of [first!, third!]) assert.equal((await m.threadState.getProposalByTs(itemProposal(m.posts[0]!.ts, r.id).proposalTs)).state, "found");
+    // A week on: the rejected to-do is dropped; the two undecided are asked once more.
+    const weekOn = morning(store, roadmap(), at(42, 13), { threadState: m.threadState });
+    await askAll(store, weekOn, at(42, 13));
+    assert.equal((await store.get(second!.id))!.state, "dropped");
+    assert.deepEqual(weekOn.posts.flatMap((p) => p.cards.map((c) => c.title.text)), ["Step 1", "Step 3"]);
+  });
+
+  it("a report already live closes card by card: a decided card keeps its decision, an undecided one closes past 72 h", async () => {
+    const store = await manyTodos(2);
+    const clock = { now: at(32, 13) };
+    const threadState = createInMemoryThreadState({ now: () => clock.now });
+    const m = morning(store, roadmap(), clock.now, { threadState });
+    await askAll(store, m, clock.now);
+    const [first, second] = oldestFirst(store);
+    const decided = await review(threadState, m.posts[0]!, first!.id, "confirm", { userId: MAYA });
+    assert.match(decided.redrawn.at(-1)![0]!.subtitle!.text, /^Approved by <@U0MAYA>/);
+    assert.equal(decided.redrawn.at(-1)![1]!.actions[0]!.text.text, "Review");
+    // Past its 72 h, the report as it is redrawn: the undecided card closed, the decided one as it was.
+    clock.now = at(32, 13) + FOLLOW_THROUGH_CARD_TTL_MS + 60_000;
+    const cards = cardsOf((await currentReport(threadState, m.posts[0]!.ts, clock.now))!.blocks);
+    assert.match(cards[0]!.subtitle!.text, /^Approved by <@U0MAYA>/);
+    assert.equal(cards[1]!.subtitle!.text, "Closed, no decision");
+    assert.deepEqual(cards[1]!.actions.map((x) => x.text.text), ["View", "Open source"]);
   });
 });
 

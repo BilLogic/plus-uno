@@ -782,10 +782,6 @@ export async function cardFollowUpDue(
     await settle({});
     return { id: c.id, action: "held", note: "the channel's card follow-ups for this morning are posted; tomorrow" };
   }
-  if (group && group.asked.length >= MAX_REPORT_ITEMS) {
-    await settle({});
-    return { id: c.id, action: "held", note: "this morning's card for them is full; tomorrow" };
-  }
   const people = [c.promiserId, ...(text.mentions ?? [])];
   const asked = await askFor(deps, c, text, people, now);
   // Nothing to put behind Review: no card, and the row is checked again.
@@ -879,18 +875,23 @@ function statedCard(verb: string, lead: string, operation: ProposalOperation): P
  * The morning's post for one group: the parent line and a card each, posted,
  * its record kept, and each card's proposal staged. A card that showed and
  * did not stage says so, and its row comes back the next morning; a post
- * Slack refused holds every row in it.
+ * Slack refused holds every row in it. Past `MAX_REPORT_ITEMS`, the parent
+ * line says how many wait, and their rows are asked in the next report.
  */
 async function postGroup(deps: DueDeps, group: Group, now: number, runDate: string): Promise<CommitmentAction[]> {
   const kinds = group.asked.map((a) => a.c.kind as CardKind);
-  const people = [...new Set(group.asked.flatMap((a) => a.people))];
+  const shown = group.asked.slice(0, MAX_REPORT_ITEMS);
+  const waiting = group.asked.slice(MAX_REPORT_ITEMS);
+  const people = [...new Set(shown.flatMap((a) => a.people))];
   const first = group.asked.every((a) => a.c.nudges === 0);
   const report = decisionReport(
     group.asked.map((a) => a.item),
     followUpParent(kinds, people, first),
   );
+  // Checked this morning already, so each comes back with the next report.
+  const later: CommitmentAction[] = waiting.map((a) => ({ id: a.c.id, action: "held", note: "past this report's cards; asked in the next report" }));
   const sent = await deps.slack.post(group.to, { text: report.text, blocks: report.blocks });
-  if (!sent.ok || !sent.ts) return Promise.all(group.asked.map((a) => holdCard(deps, a.c, now, runDate, "Slack refused the post")));
+  if (!sent.ok || !sent.ts) return [...(await Promise.all(shown.map((a) => holdCard(deps, a.c, now, runDate, "Slack refused the post")))), ...later];
   const thread = group.to.threadTs ?? sent.ts;
   const kept = await deps.reports.putReport(reportRecord(group.to.channel, sent.ts, report, FOLLOW_THROUGH_CARD_TTL_MS)).then(
     () => true,
@@ -902,7 +903,7 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
   );
 
   const failed: Asked[] = [];
-  for (const a of group.asked) {
+  for (const a of shown) {
     try {
       if (!kept) throw new Error("its report's record was not kept");
       await deps.stage(itemProposalFor(a, group, thread, sent.ts), group.channelKind);
@@ -920,11 +921,11 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
   // there replies are the team talking to each other. One at the channel's top,
   // and any ask again under it, is in a thread uno-bot started, so a reply
   // there is a reply to uno-bot and engages it like any thread it is in.
-  const teamThread = group.asked.find((a) => a.c.threadTs)?.c.threadTs;
+  const teamThread = shown.find((a) => a.c.threadTs)?.c.threadTs;
   if (teamThread) await deps.markThread(group.to.channel, teamThread);
 
   const actions: CommitmentAction[] = [];
-  for (const a of group.asked) {
+  for (const a of shown) {
     if (failed.includes(a)) {
       actions.push(await holdCard(deps, a.c, now, runDate, "its card did not stage"));
       continue;
@@ -942,7 +943,7 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
     await deps.store.saveText(a.c.id, { ...a.text, onCard: true }, now + TEXT_KEEP_MS);
     actions.push({ id: a.c.id, action: firstAsk ? "nudged" : "followed-up", text: report.text, ts: sent.ts });
   }
-  return actions;
+  return [...actions, ...later];
 }
 
 /**

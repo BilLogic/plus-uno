@@ -115,6 +115,14 @@ export function runThreadStateConformance(
 
   // ----- history -----
 
+  it("every one of many turns appended at once is kept", async () => {
+    const { store } = setup();
+    const n = Math.min(24, MAX_HISTORY_TURNS);
+    await Promise.all(Array.from({ length: n }, (_, i) => store.appendHistory(THREAD, { role: "user", content: `t${i}` })));
+    const kept = (await store.readHistory(THREAD)).map((t) => t.content).sort();
+    assert.deepEqual(kept, Array.from({ length: n }, (_, i) => `t${i}`).sort());
+  });
+
   it("history reads back what was appended, in order", async () => {
     const { store } = setup();
     await store.appendHistory(THREAD, { role: "user", content: "one" });
@@ -563,6 +571,30 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "none");
   });
 
+  // The same guard under load, with Needs changes pressed in the middle: a
+  // mark read before a claim must not put the claimed card back, or it is
+  // claimable again once the mark lapses and runs twice.
+  it("a card runs once across many claims racing its revision marks", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal());
+    const race = await Promise.all(
+      Array.from({ length: 24 }, (_, n) =>
+        n % 3 === 0 ? store.markRevising("1700.2", `U${n}`) : n % 3 === 1 ? store.clearRevising("1700.2") : store.claimProposal("1700.2"),
+      ),
+    );
+    const wins = race.filter((r) => r === true).length;
+    clock.advance(REVISING_MARK_MS + 1);
+    const later = await store.claimProposal("1700.2");
+    assert.equal(wins + (later ? 1 : 0), 1, "claimed exactly once over the card's life");
+  });
+
+  it("of many concurrent claims exactly one wins", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal());
+    const results = await Promise.all(Array.from({ length: 24 }, () => store.claimProposal("1700.2")));
+    assert.equal(results.filter(Boolean).length, 1);
+  });
+
   it("claiming a proposal that was never staged is a loss, not an error", async () => {
     const { store } = setup();
     assert.equal(await store.claimProposal("1700.2"), false);
@@ -750,6 +782,33 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.settleOperation("1700.2", 1, true), { taken: true });
     assert.equal(await store.takeCutOffExecution("1700.2"), null);
     assert.deepEqual(await store.findCutOffExecutions(), []);
+  });
+
+  it("every one of many operations settled at once is recorded", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    await Promise.all(Array.from({ length: 24 }, (_, i) => store.settleOperation("1700.2", i, i % 2 === 0)));
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const taken = await store.takeCutOffExecution("1700.2");
+    assert.deepEqual(
+      [...(taken?.settled ?? [])].sort((a, b) => a.index - b.index),
+      Array.from({ length: 24 }, (_, i) => ({ index: i, ok: i % 2 === 0 })),
+    );
+  });
+
+  // A run ending as a look takes it: either the end wins and there is
+  // nothing to take, or the take wins and its fence survives the end.
+  it("an execution ended while it is taken keeps its fence", async () => {
+    for (let round = 0; round < 8; round++) {
+      const { store, clock } = setup();
+      await store.beginExecution(proposal());
+      clock.advance(EXECUTION_CUTOFF_MS + 1);
+      const ends = Array.from({ length: 4 }, () => store.endExecution("1700.2"));
+      const takes = Array.from({ length: 4 }, () => store.takeCutOffExecution("1700.2"));
+      const settled = await Promise.all(round % 2 ? [...takes, ...ends] : [...ends, ...takes]);
+      const took = settled.some((r) => r && typeof r === "object");
+      assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: took }, `round ${round}`);
+    }
   });
 
   it("settling or ending an execution that was never begun is a no-op", async () => {

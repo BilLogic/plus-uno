@@ -7,9 +7,10 @@
 // this is the run that would catch it if it stopped.
 //
 // Why this one file pays for workerd: what is under test here is real Durable
-// Object RPC, real SQLite storage and the real input gate. `claimProposal`
-// returning true exactly once across eight concurrent claims is a property of
-// that gate, and no amount of mocking is evidence about it.
+// Object RPC, real SQLite storage and real concurrent calls. `claimProposal`
+// returning true exactly once across concurrent claims, and every one of many
+// concurrent writes landing, are properties of the object's transactions, and
+// no amount of mocking is evidence about them.
 //
 // Each test gets its own Durable Object instance (`instance:` below) so the
 // suite's "a FRESH, empty store per test" contract holds against durable
@@ -179,6 +180,19 @@ describe("[durable-object] the cut-off alarm", () => {
       });
     return { store, stub, alarm, fire, handed };
   }
+
+  // The one alarm, armed by calls racing each other: the sweep's day-away
+  // wake never replaces the sooner cut-off wake an execution asked for.
+  it("keeps the earliest wake when an execution begins among calls that arm the sweep", async () => {
+    for (let round = 0; round < 6; round++) {
+      const { store, alarm } = fresh();
+      const ref = { channel: "C1", thread: `1700.${round}` };
+      const sweeps = Array.from({ length: 6 }, (_, i) => store.appendHistory(ref, { role: "user", content: `t${i}` }));
+      const begin = store.beginExecution(PROPOSAL);
+      await Promise.all(round % 2 ? [begin, ...sweeps] : [...sweeps, begin]);
+      expect(await alarm(), `round ${round}`).toBeLessThanOrEqual(Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
+    }
+  });
 
   it("is armed just past the cut-off when an execution begins", async () => {
     const { store, alarm } = fresh();

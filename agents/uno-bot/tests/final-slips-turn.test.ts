@@ -74,8 +74,8 @@ test("the live r528 shape: an intro in its own paragraph over the removed walk g
   assert.equal(posted, [LEAD, "", ...TABLE, "", FRESH].join("\n"));
 });
 
-test("an intro ending in ':' goes when what it introduced went, though a confidence bullet stays below it", async () => {
-  const clause = `• ${FRESH}`;
+test("an intro ending in ':' goes when what it introduced went, though a hedge bullet stays below it", async () => {
+  const clause = "• I could not open two of these cells, so treat their lanes as unconfirmed.";
   const prose = [LEAD, "", INTRO, "", ...WALK, clause, "", ...TABLE].join("\n");
   const { prose: posted } = await turn(prose);
   assert.equal(posted, [LEAD, "", clause, "", ...TABLE].join("\n"));

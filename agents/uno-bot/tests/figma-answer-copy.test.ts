@@ -4,12 +4,11 @@ import { runTurn } from "../src/turn/index";
 import { harness, request } from "./helpers/turn-harness";
 
 const URL = "https://www.figma.com/design/AbC123xyz/Sessions?node-id=158-21725";
-const FRESHNESS = "I read the comment thread on the linked Figma frame just now, so this transcript is current.";
 
-test("a pasted-frame answer uses the retrieved title and leaves freshness to Sources, after judge revision too", async () => {
+test("a pasted-frame answer names the frame by its retrieved title, after judge revision too", async () => {
   for (const answer of [
-    `On [node 158-21725](${URL}), Coco said “Use Join.”\n\n${FRESHNESS}`,
-    `On <${URL}|node 158-21725>, Coco said “Use Join.” ${FRESHNESS}`,
+    `On [node 158-21725](${URL}), Coco said “Use Join.”`,
+    `On <${URL}|node 158-21725>, Coco said “Use Join.”`,
   ]) {
     const h = harness({
       replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }],
@@ -20,28 +19,9 @@ test("a pasted-frame answer uses the retrieved title and leaves freshness to Sou
     const posted = h.delivery.calls.find((c) => c.kind === "answer");
     assert.ok(posted?.kind === "answer");
     assert.match(posted.text, /Session (?:&|&amp;) join card/);
-    assert.doesNotMatch(posted.text, /node 158-21725|just now|transcript is current/);
+    assert.doesNotMatch(posted.text, /node 158-21725/);
     assert.match(posted.text, /Coco said “Use Join.”/);
   }
-});
-
-test("a quoted comment about freshness remains intact", async () => {
-  const answer = `Coco wrote: “${FRESHNESS}”`;
-  const h = harness({ replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }], toolResult: JSON.stringify({ ok: true, source_type: "figma", url: URL, title: "Session card", content: "Join" }) });
-  await runTurn(request({ text: `${URL} what does this comment say?` }), h.deps);
-  const posted = h.delivery.calls.find((c) => c.kind === "answer");
-  assert.ok(posted?.kind === "answer");
-  assert.match(posted.text, /Coco wrote: “I read/);
-});
-
-test("the live frame receipt variant is removed while its quoted occurrence is preserved", async () => {
-  const receipt = "I read the comment thread on the frame just now, so this is current.";
-  const answer = `On [node 158-21725](${URL}), Coco wrote: “${receipt}”\n\n${receipt}`;
-  const h = harness({ replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }], toolResult: JSON.stringify({ ok: true, source_type: "figma", url: URL, title: "Session card", content: "Join" }) });
-  await runTurn(request({ text: `${URL} what does this comment say?` }), h.deps);
-  const posted = h.delivery.calls.find((c) => c.kind === "answer");
-  assert.ok(posted?.kind === "answer");
-  assert.equal(posted.text, `On [Session card](${URL}), Coco wrote: “${receipt}”`);
 });
 
 test("frame citations are named without rewriting links inside a quoted comment", async () => {
@@ -53,22 +33,4 @@ test("frame citations are named without rewriting links inside a quoted comment"
   assert.ok(posted?.kind === "answer");
   assert.match(posted.text, /^On \[Session card\]/);
   assert.ok(posted.text.includes(quote), "quoted source text stays verbatim");
-});
-
-test("closing freshness receipts use their meaning, while quoted receipts remain source text", async () => {
-  for (const receipt of [
-    "I read the Figma frame and its pinned comment thread just now, so this is current.",
-    "I checked the linked frame and comments just now, so the answer is current.",
-  ]) {
-    for (const quote of [`> ${receipt}`, `\`${receipt}\``, `“${receipt}”`]) {
-      const prefix = `On [Session card](${URL}), Coco wrote:\n${quote}`;
-      for (const answer of [prefix, `${prefix}\n\n${receipt}`]) {
-        const h = harness({ replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }], toolResult: JSON.stringify({ ok: true, source_type: "figma", url: URL, title: "Session card", content: "Join" }) });
-        await runTurn(request({ text: `${URL} what does this comment say?` }), h.deps);
-        const posted = h.delivery.calls.find((c) => c.kind === "answer");
-        assert.ok(posted?.kind === "answer");
-        assert.equal(posted.text, prefix);
-      }
-    }
-  }
 });

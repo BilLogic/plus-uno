@@ -186,6 +186,9 @@ export interface WarningLog {
   atLeast(lookup: string, bounds: ReadonlyArray<{ name: string; value: number }>): void;
   /** The lines as they post, sign-less, at most `MAX_WARNING_LINES`. */
   lines(): string[];
+  /** Did a source fail this turn while none answered? Then nothing live
+   *  stands behind the answer (`agent/confidence.ts`). */
+  readFailed(): boolean;
 }
 
 /**
@@ -219,7 +222,7 @@ export function warningLog(now: () => number = Date.now): WarningLog {
       case "failed": {
         const names = [...new Map([...failed.values()].map((s) => [s.label, s])).values()];
         if (!names.length) return null;
-        return `${capitalised(joined(names.map((s) => s.subject)))} could not be read just now, so this answer goes without ${names.length > 1 ? "them" : "it"}.`;
+        return `${capitalised(joined(names.map((s) => s.subject)))} could not be read, so this answer goes without ${names.length > 1 ? "them" : "it"}.`;
       }
       case "budget":
         return "This answer stopped before every lookup finished, so some sources went unchecked.";
@@ -336,6 +339,9 @@ export function warningLog(now: () => number = Date.now): WarningLog {
     },
     lines() {
       return all().slice(0, MAX_WARNING_LINES);
+    },
+    readFailed() {
+      return failed.size > 0 && read.size === 0;
     },
   };
 }
