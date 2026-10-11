@@ -148,7 +148,10 @@ export function chunkBody(chunk: string | undefined, title: string | undefined):
   return text.startsWith(head) ? text.slice(head.length).trim() : text;
 }
 
-const PLACE_LABEL = "(?:Phase|Scenario|Path|Step|Layer|Lane)";
+/** The labels a blueprint place's segments carry — the contract's, plus the
+ *  `Layer` older answers still say. The one set the answer guard and the
+ *  breadcrumb rewrite both read. */
+export const PLACE_LABEL = `(?:${[...BLUEPRINT_CONTRACT.breadcrumb.labels, "Layer"].join("|")})`;
 const PLACE_VALUE = "[^·›\\n,;.():]+(?:\\((?:happy|variant|exception|named)\\))?";
 /** Two or more labelled segments, `·` or `›` between them — the index's form,
  *  and the half-converted one an answer carried from an older turn keeps. */
@@ -156,6 +159,11 @@ const LABELLED_PLACE = new RegExp(
   `\\b${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE}(?:[^\\S\\n]*[·›][^\\S\\n]*${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE})+`,
   "g",
 );
+
+/** True when the prose names a blueprint place in the index's labelled form. */
+export function namesLabelledPlace(text: string): boolean {
+  return new RegExp(LABELLED_PLACE.source).test(text);
+}
 
 /**
  * Prose with every labelled blueprint place rewritten as its breadcrumb —
