@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,174 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,400 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,869 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 31,095 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1527,6 +1527,7 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 - **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. Its card mentions the Contributors, with two buttons, Review and Open card. Review offers Done (moves it to the Design Status in its select, the board's next status after its own by default), Still on it (nothing is written, and it is checked again 3 weeks from that card, at most twice, as a promise's ⏳; the card says the date) and Drop it (archived).
 - **Who answers:** anyone. A card is the team's, so whoever knows where it stands decides it in Review.
 - **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most two new card questions a channel each morning; the rest wait for the next. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
+- **Replies:** a follow-up at a channel's top starts uno-bot's own thread, so any reply there engages uno-bot, @mention or not. One posted into a to-do's thread marks it as a sweep card does, and that thread stays the team's.
 - **Posted before the shared card:** a follow-up that went up with buttons (Draft it, Drop it; Done, Still on it, Drop it) or asked for a typed owner or Design Status keeps those answers until it closes. Anyone's tap counts; a reaction counts only from someone it mentioned. Its thread carries a KV mark while it waits for a typed reply, so a short reply anywhere else costs no database read. Once its follow-up goes up on the shared card, the old message's buttons and reactions answer nothing and say to press Review on the card.
 - **A stopped morning:** follow-ups held for the morning's post and not yet posted when the run stops for its budget go back to due, so the retry posts them.
 - **Passed over:** a card with nobody to ask in Slack, or no channel, is marked in KV and looked at again a week on; a stale card with a recent comment, once that comment is three weeks old.

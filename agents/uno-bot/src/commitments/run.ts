@@ -535,7 +535,10 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
     ...(first ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
   });
   await keepText(deps, c.id, { ...text, bodies: { ...text.bodies, [posted.ts]: body } }, now);
-  await deps.markThread(place.channel, place.threadTs ?? posted.ts);
+  // The promise's thread is the team's, so it is marked; a reminder posted at a
+  // channel's top would start uno-bot's own thread, which stays unmarked, as a
+  // card follow-up's does.
+  if (place.threadTs) await deps.markThread(place.channel, place.threadTs);
   return { id: c.id, action, text: body, ts: posted.ts };
 }
 
