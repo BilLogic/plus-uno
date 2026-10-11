@@ -146,8 +146,10 @@ jobs:
         working-directory: agents/uno-bot
         run: npm ci
 
-      # `tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js` —
-      # the largest unit suite in this repository. It is
+      # Clears `.test-build`, then `tsc -p tsconfig.test.json && node --test
+      # .test-build/tests/*.test.js` — the largest unit suite in this
+      # repository. The clear keeps a deleted test from running off its stale
+      # compiled copy; a fresh runner has none, but a reused workspace does. It is
       # also part of `npm run deploy` as of #580, for the direct-push reason
       # above: before that, this suite ran on pull requests and nowhere else, so
       # a push straight to `main` reached production having run none of it.

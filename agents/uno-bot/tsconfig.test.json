@@ -2,6 +2,12 @@
 // compiles the modules under test to .test-build/ and runs node:test over the
 // output. No bundler, and no workerd.
 //
+// `npm test` deletes .test-build/ before it compiles. `tsc` never removes the
+// output of a source that is gone, and the runner globs every compiled test, so
+// a deleted test kept running from its old copy. Running one file by hand
+// (`npx tsc -p tsconfig.test.json && node --test .test-build/tests/<file>.test.js`)
+// needs no clear: it names its file.
+//
 // WHAT IT COMPILES IS A GLOB — `tests/**` and `src/**`, and no per-file
 // inventory (#595). It used to be a hand-kept list of seventy-odd source paths,
 // which was three things at once and honest about none of them: a build input,
