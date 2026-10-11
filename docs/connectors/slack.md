@@ -72,6 +72,8 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
    **A report's decision card** (`agents/uno-bot/src/slack/decision-cards.ts`): a plain parent line, then one card per item (ten at most), each with Review and one or two Open buttons. Each item is its own proposal, decided only in its pop-up.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
+Shared report items redraw to **Closed, no decision** when their window ends, with View instead of Review. The alarm queues the edit; failed edits retry, while decided items and message metadata stay intact.
+
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
 
 **Reactions outside the gates are the bot's wit channel.** Code adds 👀 when a message arrives and ❌ when a turn fails, and no other reaction. The model adds at most one per message, any workspace emoji, standard or custom, matched to the content (the budget: `agents/uno-bot/AGENT.md § Emoji budget`; the register: § Slack etiquette). Only the gate semantics above are reserved: ✅ (and 👍) and ⛔ (and ❌) carry meaning on proposal cards, and ✅/🔁/❌ on review verdicts, so `slack_react` refuses the card set and the ❌ on a failure is code's.

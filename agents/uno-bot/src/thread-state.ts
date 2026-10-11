@@ -61,6 +61,11 @@ import {
   ownText,
   REPORT_GRACE_MS,
   changedReport,
+  expiredReport,
+  reportExpiryAt,
+  REPORT_EXPIRY_RETRY_MS,
+  type ReportExpiryRecord,
+  type ReportExpiryEdit,
   claimedFiling,
   FILING_TTL_MS,
   proposalReplyThread,
@@ -139,6 +144,7 @@ export interface ThreadStateAlarmDeps {
   /** Hand over executions `findCutOffExecutions` found. Takes nothing and
    *  may fail: a record nobody took is found again on the next pass. */
   handOffCutOffRuns?(due: Execution[]): Promise<void>;
+  handOffExpiredReports?(due: DecisionReportRecord[]): Promise<void>;
 }
 
 // Extends the `cloudflare:workers` base class — that is what makes the public
@@ -175,9 +181,8 @@ export class ThreadState extends DurableObject<Env> {
   // First, hand over any cut-off run nobody has told, so its requester hears
   // before the record ages out. Then, when the day's sweep is due and only
   // then, delete expired records by their own TTL — the two-minute passes that
-  // come back for an untold run scan executions and nothing else. Then re-arm
-  // for whichever comes first: the next day's sweep, or the next execution due
-  // a look.
+  // come back for untold runs and report redraws scan their records. Then
+  // re-arm for the next sweep, execution, item deadline or pending redraw.
   async alarm(): Promise<void> {
     const now = Date.now();
 
@@ -190,10 +195,31 @@ export class ThreadState extends DurableObject<Env> {
       });
     }
 
+    const reports = await this.storage.list<ReportRecord>({ prefix: "report:" });
+    const proposals = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
+    const executions = await this.storage.list<Execution>({ prefix: "exec:" });
+    const look = (key: string) => {
+      const proposal = proposals.get(proposalKey(key));
+      return proposal || executions.has(executionKey(key))
+        ? { expiresAt: proposal ? proposal.createdAt + recordTtlMs(proposal) + 1 : Infinity, executing: executions.has(executionKey(key)) }
+        : undefined;
+    };
+    const expired = [...reports.values()].filter((rec) => now - rec.createdAt <= rec.report.ttlMs + REPORT_GRACE_MS && reportExpiryAt(rec, look, now) <= now);
+    if (expired.length && this.alarmDeps.handOffExpiredReports) {
+      await this.alarmDeps.handOffExpiredReports(expired.map((rec) => rec.report)).catch((err: unknown) => {
+        console.error(`[thread-state] report expiry hand-off failed: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    }
+
     const gcAt = (await this.storage.get<number>(GC_NEXT_KEY)) ?? 0;
     let next = now >= gcAt ? await this.collectGarbage(now) : gcAt;
     const execs = await this.storage.list<Execution>({ prefix: "exec:" });
     for (const rec of execs.values()) next = Math.min(next, cutOffSweepAt(rec, now) ?? Infinity);
+    for (const rec of reports.values()) {
+      if (now - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) continue;
+      const expiryAt = reportExpiryAt(rec, look, now);
+      next = Math.min(next, expiryAt <= now ? now + REPORT_EXPIRY_RETRY_MS : expiryAt);
+    }
     if (next !== Infinity) await this.armAlarmBy(next, true);
   }
 
@@ -353,6 +379,15 @@ export class ThreadState extends DurableObject<Env> {
       payload: proposal,
       createdAt: at,
     });
+    if (proposal.item) {
+      const item = proposal.item;
+      const expiresAt = at + proposalTtlMs(proposal) + 1;
+      await this.storage.transaction(async (txn) => {
+        const rec = await txn.get<ReportRecord>(reportKey(item.messageTs));
+        if (rec) await txn.put(reportKey(item.messageTs), { ...rec, deadlines: { ...rec.deadlines, [item.id]: expiresAt } });
+      });
+      await this.armAlarmBy(expiresAt);
+    }
     await this.ensureGcAlarm();
     return { retired };
   }
@@ -484,12 +519,12 @@ export class ThreadState extends DurableObject<Env> {
   // ----- decision reports -----
   //
   // One record per report message, kept for its items' TTL and then
-  // `REPORT_GRACE_MS`, read on access and swept by the GC alarm. An update is
-  // one read-modify-write with the input gate closed, so two items decided at
-  // once both land.
+  // `REPORT_GRACE_MS`, read on access and swept by the GC alarm. Updates and
+  // expiry are transactions, so a concurrent decision survives a redraw.
 
   async putReport(report: DecisionReportRecord, at: number): Promise<void> {
     await this.storage.put<ReportRecord>(reportKey(report.messageTs), { report, createdAt: at });
+    await this.armAlarmBy(at + report.ttlMs + 1);
     await this.ensureGcAlarm();
   }
 
@@ -498,11 +533,38 @@ export class ThreadState extends DurableObject<Env> {
   }
 
   async updateReport(messageTs: string, change: ReportChange, at: number): Promise<DecisionReportRecord | null> {
-    const rec = await this.liveReport(messageTs, at);
-    const next = rec ? changedReport(rec.report, change) : null;
-    if (!rec || !next) return null;
-    await this.storage.put<ReportRecord>(reportKey(messageTs), { ...rec, report: next });
-    return next;
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ReportRecord>(reportKey(messageTs));
+      if (!rec || at - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) return null;
+      const next = changedReport(rec.report, change);
+      if (!next) return null;
+      await txn.put<ReportRecord>(reportKey(messageTs), { ...rec, report: next, revision: (rec.revision ?? 0) + 1 });
+      return next;
+    });
+  }
+
+  async prepareReportExpiry(messageTs: string, at: number): Promise<ReportExpiryEdit | null> {
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ReportRecord>(reportKey(messageTs));
+      if (!rec || at - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) return null;
+      const proposals = await txn.list<ProposalRecord>({ prefix: "prop:" });
+      const executions = await txn.list<Execution>({ prefix: "exec:" });
+      const next = expiredReport(rec, (key) => {
+        const proposal = proposals.get(proposalKey(key));
+        return proposal || executions.has(executionKey(key)) ? { expiresAt: proposal ? proposal.createdAt + recordTtlMs(proposal) + 1 : Infinity, executing: executions.has(executionKey(key)) } : undefined;
+      }, at);
+      if (next !== rec) await txn.put(reportKey(messageTs), next);
+      return next.expiryPending ? { report: next.report, revision: next.revision ?? 0 } : null;
+    });
+  }
+
+  async acknowledgeReportExpiry(messageTs: string, revision: number, at: number): Promise<void> {
+    await this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ReportRecord>(reportKey(messageTs));
+      if (rec && at - rec.createdAt <= rec.report.ttlMs + REPORT_GRACE_MS && (rec.revision ?? 0) === revision) {
+        await txn.put(reportKey(messageTs), { ...rec, expiryPending: false });
+      }
+    });
   }
 
   private async liveReport(messageTs: string, at: number): Promise<ReportRecord | null> {
@@ -765,10 +827,7 @@ function reportKey(messageTs: string): string {
 }
 
 /** A decision report's record, as stored: the record and when it was put. */
-interface ReportRecord {
-  report: DecisionReportRecord;
-  createdAt: number;
-}
+type ReportRecord = ReportExpiryRecord;
 
 function executionKey(ts: string): string {
   return `exec:${ts}`;

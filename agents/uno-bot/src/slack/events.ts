@@ -1,11 +1,11 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
-import { DM_CONVERSATION, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
+import { DM_CONVERSATION, type DecisionReportRecord, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { engagesOnSweepCard, isSweepCardPost } from "../sweep/cards";
 import { isSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
-import { conversationsReplies, getBotIdentity, postMessage } from "./api";
+import { conversationsReplies, getBotIdentity, postMessage, updateMessage } from "./api";
 import { failureMessage } from "./failure-message";
 import { retryValue } from "./try-again";
 import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
@@ -13,6 +13,7 @@ import { handleSessionStopped } from "./stop-envelope";
 import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { cutOffRunJob, handleCutOffRun } from "./cut-off-sweep";
+import { redrawExpiredReport } from "./report-expiry";
 import { extractPrdFromThreadRoot } from "./notion-prd";
 import {
   type SlackMessageEvent,
@@ -187,7 +188,7 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // A cut-off job has nobody waiting on it: the record stays untaken, and
     // the ThreadState alarm hands it over again. A Figma event has no thread
     // to speak in, and never comes this way: its route enqueues it once.
-    if (job.kind === "cut-off" || job.kind === "figma-event") return;
+    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry") return;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -220,6 +221,15 @@ export function handOffCutOffRunsFor(env: Env): (due: Execution[]) => Promise<vo
   };
 }
 
+/** Queue expiry edits outside the owning ThreadState input gate. */
+export function handOffExpiredReportsFor(env: Env): (due: DecisionReportRecord[]) => Promise<void> {
+  return async (due) => {
+    for (const report of due) {
+      await enqueueAgentJob(env, { kind: "report-expiry", messageTs: report.messageTs }, `${report.channel}:report-expiry:${report.messageTs}`);
+    }
+  };
+}
+
 // (The open-stream registry that lived here is gone: a stream is now opened and
 // closed inside delivery, within one function, so there is no window in which a
 // turn can end holding one.)
@@ -229,6 +239,16 @@ export function handOffCutOffRunsFor(env: Env): (due: Execution[]) => Promise<vo
 // the turn's run-lease is held by another (possibly killed) invocation — the
 // runner must then KEEP the job and retry later instead of deleting it.
 export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
+  if (job.kind === "report-expiry") {
+    await redrawExpiredReport(job.messageTs, {
+      store: threadStateFor(env),
+      edit: async (channel, ts, message) => {
+        const result = await updateMessage(env, { channel, ts, ...message });
+        if (!result.ok) throw new Error(result.error ?? "Slack refused the expiry edit");
+      },
+    });
+    return "handled";
+  }
   if (job.kind === "figma-event") {
     await runFigmaEventJob(job.event, { onFileUpdate: (fileKey) => recheckOnUpdateOnEnv(env, fileKey) });
     return "handled";

@@ -26,10 +26,45 @@ import {
   CUT_OFF_SWEEP_RETRY_MS,
   CUT_OFF_SWEEP_SLACK_MS,
   EXECUTION_CUTOFF_MS,
+  REPORT_EXPIRY_RETRY_MS,
+  type DecisionReportRecord,
   type Execution,
   type PendingProposal,
 } from "../../src/thread-state/store";
 import { runThreadStateConformance } from "../helpers/thread-state-conformance";
+
+describe("[durable-object] report expiry alarm", () => {
+  const report = (): DecisionReportRecord => ({ channel: "C1", messageTs: "1700.9", parent: "One page.", held: 0, ttlMs: 1000,
+    entries: [{ id: "a", item: { id: "a", title: "a", body: "a", open: { url: "https://notion.so" } }, state: { kind: "open" } }] });
+
+  it("arms at expiry, hands work outside the object, and retries until the edit is acknowledged", async () => {
+    const instance = `report-alarm-${instanceCounter++}`;
+    const store = createDurableObjectThreadState({ namespace, instance, now: () => Date.now() - 2000 });
+    const stub = namespace.get(namespace.idFromName(instance));
+    const before = Date.now();
+    await store.putReport(report());
+    const armed = await runInDurableObject(stub, (_o, state) => state.storage.getAlarm());
+    expect(armed).toBeLessThan(before + 100);
+    const handed: DecisionReportRecord[][] = [];
+    const fire = () => runInDurableObject(stub, async (_o, state) => {
+      await state.storage.deleteAlarm();
+      await new ThreadStateObject(state, env as Env, { handOffExpiredReports: async (due) => void handed.push(due) }).alarm();
+    });
+    await fire();
+    expect(handed[0]?.map((r) => r.messageTs)).toEqual(["1700.9"]);
+    expect((await store.getReport("1700.9"))?.entries[0]?.state.kind, "the alarm hands off rather than calling its own stub").toBe("open");
+    const retry = await runInDurableObject(stub, (_o, state) => state.storage.getAlarm());
+    expect(retry).toBeLessThanOrEqual(Date.now() + REPORT_EXPIRY_RETRY_MS);
+    await fire();
+    expect(handed).toHaveLength(2);
+    const liveStore = createDurableObjectThreadState({ namespace, instance });
+    const edit = await liveStore.prepareReportExpiry("1700.9");
+    expect(edit?.report.entries[0]?.state.kind).toBe("expired");
+    await liveStore.acknowledgeReportExpiry("1700.9", edit!.revision);
+    await fire();
+    expect(handed).toHaveLength(2);
+  });
+});
 
 // `cloudflare:test`'s env is the wrangler config's bindings; the namespace is
 // typed by the adapter's own deps, so this cast is the only untyped step.
