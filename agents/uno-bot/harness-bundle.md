@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,570 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,904 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 31,265 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 31,599 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -1531,6 +1531,7 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 - **Posted before the shared card:** a follow-up that went up with buttons (Draft it, Drop it; Done, Still on it, Drop it) or asked for a typed owner or Design Status keeps those answers until it closes. Anyone's tap counts; a reaction counts only from someone it mentioned. Its thread carries a KV mark while it waits for a typed reply, so a short reply anywhere else costs no database read. Once its follow-up goes up on the shared card, the old message's buttons and reactions answer nothing and say to press Review on the card.
 - **A stopped morning:** follow-ups held for the morning's post and not yet posted when the run stops for its budget go back to due, so the retry posts them.
 - **Passed over:** a card with nobody to ask in Slack, or no channel, is marked in KV and looked at again a week on; a stale card with a recent comment, once that comment is three weeks old.
+- **Someone it could not tag:** the card names them in plain text. Once it has posted, the lead (`LEAD_USER_ID`) gets a DM naming the person and the Team Members cell that would tag them: the Slack ID when their row matched no one in Slack, the Notion Person when it is empty. Once a person in 30 days; someone with no row gets none.
 - **Evidence first:** each morning re-reads the card. A Contributor set, a status moved, an edit or a comment since closes it with no post.
 - **One message a card a week:** a follow-up's follow-up waits five working days, and a card asked about in the past week is not asked about again.
 - **Proposals** stay decidable for 72 h, one per card, in the follow-up's thread. A card whose proposal did not stage says so and comes back the next morning. Select values are exact-matched: a pillar only when the Roadmap offers it, a status refused rather than created.
