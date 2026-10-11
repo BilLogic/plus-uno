@@ -92,7 +92,7 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
         url: githubLink(repo, "tree", r.path, ref),
         kind: "dir",
         entries: r.entries,
-        note: "Directory listing — use it to confirm what exists (e.g. a DS component folder). Cite the path.",
+        note: "Directory listing — use it to confirm what exists (e.g. a DS component folder). Link it at its `url`.",
       });
     }
     return JSON.stringify({
@@ -103,7 +103,7 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
       kind: "file",
       content: r.text,
       truncated: r.truncated,
-      note: "File contents from the repo. Ground your answer in this and cite the path.",
+      note: "File contents from the repo. Ground your answer in this and link it at its `url`.",
     });
   } catch (err) {
     return JSON.stringify({
