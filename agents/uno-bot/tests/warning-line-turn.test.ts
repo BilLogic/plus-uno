@@ -98,6 +98,17 @@ test("a search that hit its own row cap is complete: no ⚠️ line, whatever it
   }
 });
 
+test("a search that filled its row cap AND stopped short still says it is partial", async () => {
+  // The cap says the rows are the top ones by design; `partial` says a page
+  // of the read failed or was never fetched. The second still costs the reader.
+  for (const cap of ["semantic", "max_rows"]) {
+    const { warnings } = await turn([[SEARCH]], {
+      search_blueprint: blueprintRows({ truncated: true, capped_by: cap, partial: true }),
+    });
+    assert.deepEqual(warnings, ["Only part of the blueprint results came back, so something may be missing."], `capped_by=${cap}`);
+  }
+});
+
 test("a search the budget stopped short still says so", async () => {
   const { warnings } = await turn([[SEARCH]], {
     search_blueprint: markPartialLookup(blueprintRows({ truncated: true, capped_by: "semantic" })),

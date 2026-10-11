@@ -7,6 +7,8 @@
 //   • partial   a lookup reported `truncated` or `partial` — a read that
 //               stopped short. A result that names the row cap it filled
 //               (`capped_by`) read what it set out to, so it is no trigger
+//               — unless it says `partial` too: the cap does not excuse a
+//               page that failed
 //   • at least  a chart across lookups drew a value its lookup read only part
 //               of (`atLeast`), named with the count read — which says more
 //               than `partial` does for that lookup, so it takes that line's
@@ -108,8 +110,8 @@ function sourceFailed(result: Record<string, unknown>): boolean {
 }
 
 /**
- * Did the read stop short of what it set out to read? A `partial` result did;
- * a `truncated` one did unless it names the row cap it filled (`capped_by`):
+ * Did the read stop short of what it set out to read? A `partial` result did,
+ * whatever cap it also filled; a `truncated` one did unless it names the row cap it filled (`capped_by`):
  * a search that returned its top rows by design is whole as far as the reader
  * is concerned (live 2026-10-11: three blueprint searches capped at 15 rows
  * each posted "Only part of the blueprint results came back"). The tool still
