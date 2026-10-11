@@ -967,6 +967,27 @@ describe("a library card nobody decides", () => {
     assert.deepEqual(store.value, []);
   });
 
+  it("keeps a decision that lands as the card closes, and says no decision was made only when none was", async () => {
+    const { tracked, reports } = await sharedCard();
+    // The Approve lands just after the tracker read the item as undecided.
+    let raced = false;
+    const racing: ThreadState = Object.assign(Object.create(reports) as ThreadState, {
+      getReport: async (ts: string) => {
+        const read = await reports.getReport(ts);
+        if (!raced) {
+          raced = true;
+          await reports.updateReport(tracked.ts, { id: tracked.item!, state: { kind: "approved", by: "U0MEMBER1", at: POSTED_AT + HOUR } });
+        }
+        return read;
+      },
+    });
+    const { deps, calls } = world([tracked], tracked.postedAt + 73 * HOUR, racing);
+    await trackLibraryIntakes(deps);
+    assert.ok(raced, "the decision raced the close");
+    assert.equal((await reports.getReport(tracked.ts))!.entries[0]!.state.kind, "approved");
+    assert.deepEqual(calls.filter((c) => c.startsWith("thread ")), [], "no 'no decision' line for a decided card");
+  });
+
   it("never waits for ever on a record it cannot read: a day past the window it files, and the edit ages out", async () => {
     const { tracked, reports } = await sharedCard();
     const unreadable: ThreadState = Object.assign(Object.create(reports), {
