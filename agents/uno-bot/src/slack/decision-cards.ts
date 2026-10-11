@@ -329,6 +329,25 @@ export async function settleItem(
 }
 
 /**
+ * Close one item as expired, and say where it stands after: `expired` when
+ * the close applied, or the decision that landed first and kept the item
+ * (`changedReport`). Null when the store has no such report or item.
+ *
+ * @param store - The thread store
+ * @param item - The item, as its proposal names it
+ * @param now - The clock, for items whose time ran out
+ */
+export async function expireItem(
+  store: ReportStore,
+  item: { messageTs: string; id: string },
+  now: number,
+): Promise<{ state: ReportItemState["kind"]; message: ReportMessage } | null> {
+  const record = await store.updateReport(item.messageTs, { id: item.id, state: { kind: "expired" } });
+  const state = record?.entries.find((e) => e.id === item.id)?.state.kind;
+  return record && state ? { state, message: reportMessage(await withClosed(store, record, now)) } : null;
+}
+
+/**
  * Items shown and never staged: each says so, with nothing to review. The
  * report's message as it now reads, or null when the store has no report.
  *
