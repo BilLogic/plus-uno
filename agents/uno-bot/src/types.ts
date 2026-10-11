@@ -15,7 +15,7 @@ export interface SlackContext {
   /**
    * The answer lands where people outside the team may read it (a Figma
    * comment), so every tool reads at public scope (`agent/public-scope.ts`):
-   * Slack's public channels, Notion's team surfaces, public GitHub repos. Set
+   * no Slack, Notion's team surfaces, public GitHub repos. Set
    * from the turn's origin (`turn/env-deps.ts`).
    */
   publicOnly?: boolean;

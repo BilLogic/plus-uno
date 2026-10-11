@@ -7,15 +7,15 @@
 // refused on a Figma turn until someone classifies it. Each estate keeps the
 // rule the house already keeps for it:
 //
-//   • SLACK — public channels alone. `slack_search` runs no private pass and
-//     `slack_thread_read` refuses a private conversation, in their own bodies.
-//     A canvas, or any other Slack link, is not read through `source_read`.
-//     The people lookups (`slack_user_profile`, `slack_channel_members`) are
-//     refused, since who is in a channel says which private channels exist,
-//     and so is `slack_react`, a write.
+//   • SLACK — none at all, for any asker. A public channel is still the team's
+//     own, and a Figma reply is visible to anyone on the file. Every Slack tool
+//     is refused, and a Slack link, a canvas included, is not read through
+//     `source_read`.
 //   • NOTION — team surfaces alone: a row of the Roadmap, the Help Centers,
 //     the Decisions log or the Marketplace (`sweep/surfaces.ts` §
-//     isTeamSurface). A page with no database parent is refused, a top-level
+//     isTeamSurface). A row whose title property is one that database's
+//     catalog skips is another source sharing it, and is refused: a Tasks
+//     Tracker row on the Tutor Help Center. A page with no database parent is refused, a top-level
 //     page titled as a spec included, because any workspace member can title
 //     a private page that way. A page is checked on the parent Notion reports
 //     before `source_read` returns a word of it; a workspace search keeps
@@ -33,7 +33,7 @@
 //     operations facts) and `reminder_set` (a write).
 //
 // An ASKER TEAM MEMBERS DOES NOT MAP (`SlackContext.unmappedAsker`) gets public
-// facts only: no Slack, no Notion, no blueprint and no Roadmap, only what
+// facts only: no Notion, no blueprint and no Roadmap, only what
 // anyone on the web could open (a public link, a public repo, the comment's
 // own file, uno's own playbook). The model is not offered a gated tool on that
 // turn at all (`toolRosterFor` in `run-agent.ts`), so it can propose no write.
@@ -52,7 +52,7 @@ import { rethrowIfBudget } from "../net";
 import { estateOfUrl } from "../slack/estate-hosts";
 import { isTeamSurface, type SurfaceConfig } from "../sweep/surfaces";
 import { teamSurfacesFor } from "../sweep/team-surfaces";
-import { catalogDatabaseOf } from "../tools/notion-search";
+import { catalogDatabaseOf, catalogSkippedTitlesOf } from "../tools/notion-search";
 import { sourceUrlOf } from "../tools/read-source";
 import type { ToolName } from "./tool-table";
 
@@ -62,10 +62,12 @@ export interface PublicScopeDeps {
   surfaces: SurfaceConfig;
   /** The Roadmap database `roadmap_query` reads; undefined when unset. */
   roadmapDb: string | undefined;
+  /** The title properties a catalog skips on a database: another source's rows. */
+  skippedTitles(databaseId: string): readonly string[];
   /** A `notion_search` catalog scope's database id; undefined for none. */
   catalogDb(scope: string): string | undefined;
   /** A Notion page's title and parent, as Notion reports them. Throws when it cannot be read. */
-  notionPage(pageId: string): Promise<{ title: string; parentDatabaseId: string | null; parentType: string | null }>;
+  notionPage(pageId: string): Promise<{ title: string; parentDatabaseId: string | null; parentType: string | null; titleProperty: string | null }>;
   /** Who can read the repo a GitHub tool's `repo` input resolves to; `unlisted`
    *  when it resolves to none, which the tool itself refuses. */
   repoVisibility(requested: unknown): Promise<RepoVisibility | "unlisted">;
@@ -84,8 +86,6 @@ const CLASSIFIED: Partial<Record<ToolName, "public" | "team">> = {
   present: "public",
   notion_search: "team",
   roadmap_query: "team",
-  slack_search: "team",
-  slack_thread_read: "team",
 };
 
 /**
@@ -153,9 +153,18 @@ export async function runAtPublicScope(
   }
 }
 
-/** A Notion page a public answer may read: a row of a team surface's database. A page with no database parent is none. */
-function onTeamSurface(page: { title: string; parentDatabaseId: string | null; parentType: string | null }, surfaces: SurfaceConfig): boolean {
-  return page.parentDatabaseId !== null && isTeamSurface({ kind: "notion", ...page }, surfaces);
+/**
+ * A Notion page a public answer may read: a row of a team surface's database,
+ * and of that database's own source. A page with no database parent is none.
+ */
+function onTeamSurface(
+  page: { title: string; parentDatabaseId: string | null; parentType: string | null; titleProperty: string | null },
+  deps: Pick<PublicScopeDeps, "surfaces" | "skippedTitles">,
+): boolean {
+  const db = page.parentDatabaseId;
+  if (db === null || !isTeamSurface({ kind: "notion", title: page.title, parentDatabaseId: db, parentType: page.parentType }, deps.surfaces)) return false;
+  const skipped = deps.skippedTitles(db).map((n) => n.toLowerCase());
+  return page.titleProperty === null || !skipped.includes(page.titleProperty.toLowerCase());
 }
 
 /** Why a link may not be read at public scope; null when it may. */
@@ -185,7 +194,7 @@ async function sourceRefusal(
     rethrowIfBudget(err);
     return refuse("that Notion page could not be checked as a team surface, so it is not read");
   }
-  return onTeamSurface(page, deps.surfaces)
+  return onTeamSurface(page, deps)
     ? null
     : refuse("that Notion page is not on a team surface (a row of the Roadmap, the Help Centers, the Decisions log or the Marketplace), so it is not read for an answer posted outside Slack");
 }
@@ -207,14 +216,15 @@ async function notionSearchAtPublicScope(input: Record<string, unknown>, run: ()
     return refuse("the search's result could not be checked, so it is not read");
   }
   if (parsed.ok !== true || !Array.isArray(parsed.results)) return out;
-  const results = (parsed.results as Array<{ title?: unknown; parentDatabaseId?: unknown; parentType?: unknown }>).filter((hit) =>
+  const results = (parsed.results as Array<{ title?: unknown; parentDatabaseId?: unknown; parentType?: unknown; titleProperty?: unknown }>).filter((hit) =>
     onTeamSurface(
       {
         title: typeof hit.title === "string" ? hit.title : "",
         parentDatabaseId: typeof hit.parentDatabaseId === "string" ? hit.parentDatabaseId : null,
         parentType: typeof hit.parentType === "string" ? hit.parentType : null,
+        titleProperty: typeof hit.titleProperty === "string" ? hit.titleProperty : null,
       },
-      deps.surfaces,
+      deps,
     ),
   );
   return JSON.stringify({ ...parsed, count: results.length, results });
@@ -235,6 +245,7 @@ export function publicScopeDepsFor(env: Env): PublicScopeDeps {
   return {
     surfaces: teamSurfacesFor(env),
     roadmapDb: env.NOTION_ROADMAP_DB_ID?.trim() || undefined,
+    skippedTitles: (databaseId) => catalogSkippedTitlesOf(env, databaseId),
     catalogDb: (scope) => catalogDatabaseOf(env, scope),
     notionPage: (pageId) => readNotionPage(env, pageId),
     async repoVisibility(requested) {

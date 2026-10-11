@@ -100,6 +100,22 @@ export function catalogDatabaseOf(env: Env, scope: string): string | undefined {
 }
 
 /**
+ * The title properties a catalog skips on a database: rows of another source
+ * that share the database (the Tasks Tracker's `Task name` on the Tutor Help
+ * Center). Empty for a database no catalog scope names.
+ *
+ * @param env - Worker env
+ * @param databaseId - A database id, dashed or bare
+ */
+export function catalogSkippedTitlesOf(env: Env, databaseId: string): readonly string[] {
+  const bare = (id: string) => id.replace(/-/g, "").toLowerCase();
+  return Object.values(CATALOG_SCOPES).flatMap((c) => {
+    const id = env[c.envKey];
+    return typeof id === "string" && id.trim() && bare(id.trim()) === bare(databaseId) ? (c.skipTitleNames ?? []) : [];
+  });
+}
+
+/**
  * Execute notion_search for the given scope + query.
  *
  * @param env - Worker env (Notion token + DB ids)

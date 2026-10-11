@@ -405,6 +405,25 @@ describe("a change request", () => {
     assert.match(w.replies()[0]!.message, /Source: /);
   });
 
+  it("the thread remembers only what was posted, and an unmapped asker's turn starts with none of a teammate's", async () => {
+    const said = ["One: the bar is hidden.", "Two: it shows after a goal.", "Three: it animates.", "Four: the copy is draft.", "Five: salary bands are next."];
+    const w = world({ replies: [...reads(`${said.join("\n")} [Goal Setting PRD](${PRD})`), LOOKUP, { text: `Nothing else. [Goal Setting PRD](${PRD})` }] });
+    const histories: string[][] = [];
+    const answer = w.deps.answer;
+    w.deps.answer = (request, delivery, asker) => {
+      histories.push((request.history ?? []).map((t) => t.content));
+      return answer(request, delivery, asker);
+    };
+    const root = comment("100", "@uno when does the bar show?");
+    await ask(w, root);
+    const remembered = (await w.deps.threadState.readHistory({ channel: DESIGN, thread: `figma:${FILE}:100` })).filter((t) => t.role === "assistant").map((t) => t.content).join("\n");
+    assert.match(remembered, /One: the bar is hidden/);
+    assert.doesNotMatch(remembered, /Four|Five|salary/);
+
+    await ask(w, comment("101", "@uno what else?", { parent_id: "100", user: STRANGER, client_meta: null }), [root]);
+    assert.deepEqual(histories[1], [], "the unmapped asker's turn reads no teammate turn");
+  });
+
   it("an unmapped asker's turn runs with the narrower tools, and a teammate's does not", async () => {
     const w = world();
     await ask(w, comment("100", "@uno when does the bar show?", { user: STRANGER }));

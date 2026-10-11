@@ -2,7 +2,7 @@
 //
 // An @uno ask in a Figma comment is answered in the file, which people outside
 // the team can open, so a turn wired with the `figma` origin must read at
-// public scope — Slack's public channels, Notion's team surfaces, public
+// public scope — no Slack, Notion's team surfaces, public
 // GitHub repos — an unmapped asker's at public facts alone, and a `slack` turn
 // must keep its reach. Whatever a tool returns is what the answer, and so the
 // reply, can carry: text a tool never returns cannot reach the file. This is
@@ -14,7 +14,7 @@
 //
 // `net.ts` binds `fetch` when it is first evaluated, so the stub goes onto
 // `globalThis` here, at load, and the code under test is imported lazily.
-import { describe, it } from "node:test";
+import { describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
 
 import type { Env } from "../src/types";
@@ -28,6 +28,11 @@ const ROADMAP_DB = "11111111111111111111111111111111";
 /** A 1:1 running note, and a Roadmap card. */
 const PRIVATE_PAGE = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const TEAM_PAGE = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+/** The Tutor Help Center's database, and a Tasks Tracker row that shares it. */
+const HELP_DB = "22222222222222222222222222222222";
+const TASK_PAGE = "dddddddddddddddddddddddddddddddd";
+/** Repos GitHub currently reports private; a test may make one so. */
+const privateRepos = new Set<string>(["BilLogic/plus-private"]);
 /** A top-level workspace page whose title only reads as a spec. */
 const SPOOF_PAGE = "cccccccccccccccccccccccccccccccc";
 const PUBLIC_REPO = "BilLogic/plus-uno";
@@ -67,6 +72,12 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
   if (notionPage === SPOOF_PAGE) {
     return Response.json({ id: notionPage, parent: { type: "workspace", workspace: true }, properties: { title: { type: "title", title: [{ plain_text: "Salary spec" }] } } });
   }
+  if (notionPage === TASK_PAGE) {
+    // As Notion-Version 2022-06-28 reports a row of a multi-source database:
+    // a `database_id` parent naming the database, the Tasks Tracker's own
+    // title property beside the articles'.
+    return Response.json({ id: notionPage, parent: { type: "database_id", database_id: HELP_DB }, properties: { "Task name": { type: "title", title: [{ plain_text: "Payroll fix" }] } } });
+  }
   if (notionPage) {
     const parent = notionPage === PRIVATE_PAGE ? NOTES_DB : ROADMAP_DB;
     const title = notionPage === PRIVATE_PAGE ? "Qi / Bill 1:1" : "Goal setting";
@@ -83,23 +94,25 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
   }
   const notionBlocks = /api\.notion\.com\/v1\/blocks\/(\w+)\/children/.exec(url)?.[1];
   if (notionBlocks) {
-    const text = notionBlocks === PRIVATE_PAGE ? SECRET : "the progress bar ships hidden";
+    const text = notionBlocks === PRIVATE_PAGE || notionBlocks === TASK_PAGE ? SECRET : "the progress bar ships hidden";
     return Response.json({ results: [{ id: "blk1", type: "paragraph", last_edited_time: "2026-10-01T00:00:00.000Z", paragraph: { rich_text: [{ plain_text: text }] } }], has_more: false });
   }
   if (url.includes("api.notion.com/v1/search")) {
-    const row = (id: string, db: string, title: string) => ({
+    const row = (id: string, db: string, title: string, titleProp = "Name") => ({
       object: "page",
       id,
       url: `https://www.notion.so/${id}`,
       parent: { type: "database_id", database_id: db },
-      properties: { Name: { type: "title", title: [{ plain_text: title }] } },
+      properties: { [titleProp]: { type: "title", title: [{ plain_text: title }] } },
     });
-    return Response.json({ results: [row(PRIVATE_PAGE, NOTES_DB, `Qi / Bill 1:1 — ${SECRET}`), row(TEAM_PAGE, ROADMAP_DB, "Goal setting")] });
+    return Response.json({
+      results: [row(PRIVATE_PAGE, NOTES_DB, `Qi / Bill 1:1 — ${SECRET}`), row(TEAM_PAGE, ROADMAP_DB, "Goal setting"), row(TASK_PAGE, HELP_DB, `Payroll fix — ${SECRET}`, "Task name")],
+    });
   }
   const repo = /api\.github\.com\/repos\/([\w-]+\/[\w-]+)(\/contents\/.*)?$/.exec(url);
   if (repo) {
     if (repo[2]) return Response.json({ type: "file", path: "README.md", encoding: "base64", content: btoa(repo[1] === PRIVATE_REPO ? SECRET : "public readme") });
-    return Response.json({ private: repo[1] === PRIVATE_REPO });
+    return Response.json({ private: privateRepos.has(repo[1]!) });
   }
   return Response.json({ ok: false, error: "unexpected" });
 }) as typeof fetch;
@@ -117,6 +130,7 @@ function env(over: Partial<Record<string, string>> = {}): Env {
     NOTION_API_KEY: "ntn_test",
     NOTION_RUNNING_NOTES_DB_ID: NOTES_DB,
     NOTION_ROADMAP_DB_ID: ROADMAP_DB,
+    NOTION_HELP_TUTORS_DB_ID: HELP_DB,
     GITHUB_TOKEN: "ghp_test",
     GITHUB_REPO: PUBLIC_REPO,
     GITHUB_REPOS: JSON.stringify([
@@ -176,19 +190,21 @@ async function offered(origin: TurnOrigin, opts: { unmappedAsker?: boolean } = {
   return toolRosterFor(toolSlackContextFor(request, wiringFor(origin, opts))).map((t) => t.name);
 }
 
-describe("a turn wired with the figma origin reads Slack at public visibility only", () => {
-  it("its slack_search runs no private pass, so an allowlisted private channel's hit never reaches it", async () => {
-    const out = await runTool("figma", "slack_search", { query: "tutor pilot" });
-    assert.doesNotMatch(out, new RegExp(`${SECRET}|${PRIVATE}`));
-    assert.match(out, /the progress bar ships hidden/);
-    assert.ok(sent.every((s) => !s.includes("private_channel")), sent.join("\n"));
-  });
-
-  it("its slack_thread_read refuses a thread in a private channel", async () => {
-    const out = await runTool("figma", "slack_thread_read", { link: `https://plus.slack.com/archives/${PRIVATE}/p1700000000000100` });
-    assert.doesNotMatch(out, new RegExp(SECRET));
-    assert.match(out, /only a public channel's thread/);
-  });
+describe("a turn wired with the figma origin reads no Slack at all", () => {
+  for (const unmappedAsker of [false, true]) {
+    const who = unmappedAsker ? "an unmapped asker" : "a mapped asker";
+    it(`for ${who}, slack_search and slack_thread_read are refused, a public channel included`, async () => {
+      for (const [name, input] of [
+        ["slack_search", { query: "tutor pilot" }],
+        ["slack_thread_read", { link: `https://plus.slack.com/archives/${PUBLIC}/p1700000000000100` }],
+      ] as const) {
+        const out = await runTool("figma", name, input, { unmappedAsker });
+        assert.match(out, /"ok":false/, name);
+        assert.doesNotMatch(out, /the progress bar ships hidden/, name);
+        assert.deepEqual(sent, [], `${name}: nothing was fetched`);
+      }
+    });
+  }
 });
 
 describe("a turn wired with the figma origin reads Notion's team surfaces and public repos alone", () => {
@@ -304,6 +320,12 @@ describe("a figma turn's Notion reach", () => {
     assert.match(out, /not on a team surface/);
   });
 
+  it("refuses a Tasks Tracker row that shares the Help Center's database", async () => {
+    const out = await runTool("figma", "source_read", { url: `https://www.notion.so/payroll-fix-${TASK_PAGE}` });
+    assert.doesNotMatch(out, new RegExp(SECRET));
+    assert.match(out, /not on a team surface/);
+  });
+
   it("refuses a top-level page whose title only reads as a spec", async () => {
     const out = await runTool("figma", "source_read", { url: `https://www.notion.so/salary-spec-${SPOOF_PAGE}` });
     assert.doesNotMatch(out, new RegExp(SECRET));
@@ -347,6 +369,31 @@ describe("a figma turn for an asker Team Members does not map reads public facts
     assert.match(out, /public readme/);
   });
 });
+
+describe("a repo's visibility is asked again after a while", () => {
+  it("a repo made private stops being read once the remembered answer is ten minutes old", async () => {
+    const repo = "BilLogic/plus-soon-private";
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2026-10-11T12:00:00Z") });
+    try {
+      assert.match(await runTool("figma", "github_read", { repo, path: "README.md" }, { env: { GITHUB_REPOS: reposWith(repo) } }), /public readme/);
+      privateRepos.add(repo);
+      mock.timers.tick(11 * 60 * 1000);
+      const out = await runTool("figma", "github_read", { repo, path: "README.md" }, { env: { GITHUB_REPOS: reposWith(repo) } });
+      assert.match(out, /that repo is private/);
+    } finally {
+      mock.timers.reset();
+      privateRepos.delete(repo);
+    }
+  });
+});
+
+/** The repo list with one more repo on it. */
+function reposWith(repo: string): string {
+  return JSON.stringify([
+    { repo: PUBLIC_REPO, purpose: "the harness", workflows: [] },
+    { repo, purpose: "a repo about to go private", workflows: [] },
+  ]);
+}
 
 describe("a turn wired with the slack origin keeps its reach", () => {
   it("its slack_search still runs the allowlisted private pass", async () => {

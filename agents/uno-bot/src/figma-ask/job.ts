@@ -308,7 +308,9 @@ async function draft(
     text: question,
     attachmentsText: [question, "", ...askContext(meta.title, fileUrl, nodeId ? nodeUrl(job.fileKey, nodeId) : null, comment, rootId, comments)].join("\n"),
     scopeInstruction: askInstruction(slackId !== null),
-    history: await deps.threadState.readHistory(ref),
+    // The thread's memory is every commenter's, so an asker Team Members does
+    // not map starts with none of it: a teammate's turn read the team's estates.
+    history: slackId ? await deps.threadState.readHistory(ref) : [],
     pending: null,
   });
 

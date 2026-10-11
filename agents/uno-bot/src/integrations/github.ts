@@ -303,12 +303,14 @@ export function githubIssueClient(env: Env, target: RepoEntry): GithubIssueClien
  *  `turn/delivery.ts`; keep the two in step. */
 export type RepoVisibility = "public" | "private" | "unknown";
 
-/** Answers GitHub gave, kept for the isolate's life: a repo turning private is
- *  rare, and every intake card would otherwise spend a subrequest asking. A
- *  failed lookup is not kept, so the next card asks again. Keyed lower-case
- *  because GitHub repo names are case-insensitive, as the list's own matching
- *  (`repo-list.mjs`) treats them. */
-const visibilityByRepo = new Map<string, "public" | "private">();
+/** Answers GitHub gave, kept for `VISIBILITY_TTL_MS`: every intake card would
+ *  otherwise spend a subrequest asking, and a Figma ask's public scope reads a
+ *  repo only while it is public, so a repo made private must stop being read
+ *  within minutes. A failed lookup is not kept, so the next call asks again.
+ *  Keyed lower-case because GitHub repo names are case-insensitive, as the
+ *  list's own matching (`repo-list.mjs`) treats them. */
+const visibilityByRepo = new Map<string, { visibility: "public" | "private"; at: number }>();
+const VISIBILITY_TTL_MS = 10 * 60 * 1000;
 
 /**
  * Whether a listed repo is public (GET /repos/{repo}), for the intake card's
@@ -318,7 +320,7 @@ const visibilityByRepo = new Map<string, "public" | "private">();
 export async function githubRepoVisibility(env: Env, target: RepoEntry): Promise<RepoVisibility> {
   const repo = target.repo;
   const known = visibilityByRepo.get(repo.toLowerCase());
-  if (known) return known;
+  if (known && Date.now() - known.at < VISIBILITY_TTL_MS) return known.visibility;
   if (!env.GITHUB_TOKEN) return "unknown";
   try {
     const res = await countedFetch(`https://api.github.com/repos/${repo}`, {
@@ -336,7 +338,7 @@ export async function githubRepoVisibility(env: Env, target: RepoEntry): Promise
     const data = (await res.json().catch(() => ({}))) as { private?: unknown };
     if (typeof data.private !== "boolean") return "unknown";
     const visibility = data.private ? "private" : "public";
-    visibilityByRepo.set(repo.toLowerCase(), visibility);
+    visibilityByRepo.set(repo.toLowerCase(), { visibility, at: Date.now() });
     return visibility;
   } catch (err) {
     console.warn(`[github] visibility of ${repo} unread: ${err instanceof Error ? err.message : String(err)}`);

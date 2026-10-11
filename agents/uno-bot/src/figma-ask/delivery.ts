@@ -7,7 +7,9 @@
 // the turn ends (`./copy.ts`), because a comment cannot be edited into shape
 // the way a Slack message can. So an answer or a note reports no ts — nothing
 // was posted, as the Slack adapter's answer reports none — and the turn reads
-// none from either.
+// none from either. What each reports as its `text` is the lines the reply
+// will carry (`plainAnswer`), so the thread remembers what Figma shows and not
+// the lines the reply cut: anyone on the file reads the thread's next answer.
 //
 // A CARD IS THE ONE THING POSTED MID-TURN, and it goes to Slack, never to
 // Figma: `stage` posts it in #plus-design, where Review decides it. With no
@@ -20,6 +22,10 @@
 
 import type { TaskCardSource } from "../agent/task-card-readout";
 import { describeCard, describeGateNote, type Delivery, type PostResult, type ProposalCard } from "../turn/index";
+import { plainAnswer } from "./copy";
+
+/** The lines of `text` the reply carries, as the thread remembers them. */
+const shown = (text: string): string => plainAnswer(text).lines.join("\n");
 
 /** What a Figma ask's turn left for the reply. */
 export interface FigmaAskDelivery extends Delivery {
@@ -70,12 +76,12 @@ export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise
 
     async postAnswer(text) {
       answer = text;
-      return { ok: true, text };
+      return { ok: true, text: shown(text) };
     },
 
     async postNote(text) {
       notes.push(text);
-      return { ok: true, text };
+      return { ok: true, text: shown(text) };
     },
 
     async postGateNote(note) {
