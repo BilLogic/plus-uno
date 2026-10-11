@@ -618,13 +618,15 @@ export const CHECKS = [
   },
   {
     name: 'test',
-    script: 'tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js',
+    script: `node -e "require('fs').rmSync('.test-build',{recursive:true,force:true})" && tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js`,
     pkg: 'bot',
     trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason:
-      '`tsc -p tsconfig.test.json && node --test`. A build step and a test runner; neither ' +
-      'half is a comparison this process could make.',
+      '`tsc -p tsconfig.test.json && node --test`, after clearing `.test-build`. A build step ' +
+      'and a test runner; neither half is a comparison this process could make. The clear is ' +
+      'there because `tsc` never deletes the output of a deleted source and the runner globs ' +
+      'every compiled test, so a removed test kept running from its stale copy.',
     guards:
       "the Worker's unit suite — 723 tests across 65 suites at 2026-09-17, the largest in this repository, and gated by nothing at all until it was composed here: it ran in no workflow, and `npm run deploy` chose `test:bundle` and stopped. 2.2s, measured 2026-09-17. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. #580 finished the job in both directions: `npm test` is in the deploy chain now, so a direct push to unprotected `main` meets it too, and the suite has its own named pull-request job (.github/workflows/uno-bot-checks.yml § tests) so its red is legible from the check list rather than only from a 40-second log. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
   },
