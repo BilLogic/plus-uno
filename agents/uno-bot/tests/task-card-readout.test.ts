@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 
 import { readoutFor, type TaskCardSource } from "../src/agent/task-card-readout";
 import { TOOL_TABLE, taskCardFor, type ToolName } from "../src/agent/tool-table";
+import { readGithub } from "../src/tools/github-read";
 
 const ok = (body: Record<string, unknown>): string => JSON.stringify({ ok: true, ...body });
 const failed = (error: string): string => JSON.stringify({ ok: false, error, note: "say so" });
@@ -142,8 +143,23 @@ const ROWS: Row[] = [
     output: "1 file",
     sources: [{ text: "src/ButtonGroup.jsx", url: "https://github.com/BilLogic/plus-uno/blob/main/src/ButtonGroup.jsx" }],
   },
-  { name: "github_read", args: { path: "README.md" }, details: "README.md", result: ok({ path: "README.md", kind: "file", content: "# hi" }), output: "Read README.md", sources: [] },
-  { name: "github_read", args: { path: "src" }, details: "src", result: ok({ path: "src", kind: "dir", entries: ["a", "b", "c"] }), output: "3 entries" },
+  {
+    name: "github_read",
+    args: { path: "README.md" },
+    details: "README.md",
+    result: ok({ path: "README.md", url: "https://github.com/BilLogic/plus-uno/blob/HEAD/README.md", kind: "file", content: "# hi" }),
+    output: "Read README.md",
+    sources: [{ text: "README.md", url: "https://github.com/BilLogic/plus-uno/blob/HEAD/README.md", queried: "page" }],
+  },
+  {
+    name: "github_read",
+    args: { path: "src" },
+    details: "src",
+    result: ok({ path: "src", url: "https://github.com/BilLogic/plus-uno/tree/HEAD/src", kind: "dir", entries: ["a", "b", "c"] }),
+    output: "3 entries",
+    sources: [{ text: "src", url: "https://github.com/BilLogic/plus-uno/tree/HEAD/src", queried: "page" }],
+  },
+  { name: "github_read", args: { path: "README.md" }, details: "README.md", result: failed("GitHub contents 404"), output: null, sources: [] },
   { name: "github_read", args: { search: "nothing" }, details: "nothing", result: ok({ count: 0, hits: [] }), output: "no matches" },
   // github_intake_search
   {
@@ -218,6 +234,22 @@ describe("a task card's readout", () => {
   it("lists every row's link, in the order read", () => {
     const results = Array.from({ length: 12 }, (_, i) => ({ title: `p${i}`, url: `https://www.notion.so/p${i}` }));
     assert.equal(readoutFor("notion_search")!.sources(ok({ count: 12, results })).length, 12);
+  });
+
+  it("github_read's path read lists the github.com page of the repo and ref it read, named by its last segment", async () => {
+    const read = (input: Record<string, unknown>, kind: "file" | "dir") =>
+      readGithub(input, {
+        resolveRepo: () => ({ ok: true, entry: { repo: "BilLogic/plus-marketing-website", purpose: "site", workflows: [] }, isDefault: false }),
+        readPath: async (_t, path) => (kind === "dir" ? { path, kind, entries: ["a.astro"] } : { path, kind, text: "x" }),
+        searchCode: async () => [],
+      });
+    const sources = readoutFor("github_read")!.sources;
+    assert.deepEqual(sources(await read({ path: "src/hero.astro", repo: "plus-marketing-website" }, "file")), [
+      { text: "hero.astro", url: "https://github.com/BilLogic/plus-marketing-website/blob/HEAD/src/hero.astro", queried: "page" },
+    ]);
+    assert.deepEqual(sources(await read({ path: "src", ref: "launch" }, "dir")), [
+      { text: "src", url: "https://github.com/BilLogic/plus-marketing-website/tree/launch/src", queried: "page" },
+    ]);
   });
 
   it("never lists one link twice", () => {

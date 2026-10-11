@@ -168,12 +168,13 @@ function rowLinks(list: string, labels: readonly string[], opts: { visibilityFro
   };
 }
 
-/** The one link a single-document read returned: the page it read. */
-function ownLink(result: string): TaskCardSource[] {
+/** The one link a single-document read returned: the page it read, named by
+ *  its `label` field. */
+function ownLink(result: string, label = "title"): TaskCardSource[] {
   const p = succeeded(result);
   const url = p && httpUrl(p.url);
   if (!p || !url) return [];
-  return [{ text: str(p.title) ?? url, url, queried: "page" }];
+  return [{ text: str(p[label]) ?? url, url, queried: "page" }];
 }
 
 /** The collection a lookup queried — the payload's `field`, a `{ title, url }`
@@ -302,7 +303,13 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
       const path = str(p.path);
       return path ? `Read ${path}` : null;
     },
-    sources: rowLinks("hits", ["path"]),
+    // A search's hits, or the one file or directory a path read read, named
+    // by its last segment: `Button.jsx`, not the whole path.
+    sources: (result) =>
+      unique([
+        ...rowLinks("hits", ["path"])(result),
+        ...ownLink(result, "path").map((s) => ({ ...s, text: s.text.split("/").filter(Boolean).at(-1) ?? s.text })),
+      ]),
     decision: repoDecision,
   },
   github_intake_search: {
