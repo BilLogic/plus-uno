@@ -7,9 +7,10 @@
 // this is the run that would catch it if it stopped.
 //
 // Why this one file pays for workerd: what is under test here is real Durable
-// Object RPC, real SQLite storage and the real input gate. `claimProposal`
-// returning true exactly once across eight concurrent claims is a property of
-// that gate, and no amount of mocking is evidence about it.
+// Object RPC, real SQLite storage and real concurrent calls. `claimProposal`
+// returning true exactly once across concurrent claims, and every one of many
+// concurrent writes landing, are properties of the object's transactions, and
+// no amount of mocking is evidence about them.
 //
 // Each test gets its own Durable Object instance (`instance:` below) so the
 // suite's "a FRESH, empty store per test" contract holds against durable
