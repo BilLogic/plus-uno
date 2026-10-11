@@ -46,12 +46,12 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,757 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,067 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,762 |
-| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
+| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -1593,7 +1593,7 @@ One canvas-agent conversation. Ledger entries reference it via agentSessionId (c
 ### `audit_findings`
 Audit / whatif / import-sweep outputs. Written by skills (IDE service key or canvas authenticated agent); humans triage by status. Prefixed on 2026-08-30 because the bare word `findings` gave a reader no clue which process produces the rows; the CONCEPT is still a finding everywhere else.
 
-4 of 13 columns described.
+6 of 15 columns described.
 
 | Column | Meaning |
 |---|---|
@@ -1610,6 +1610,8 @@ Audit / whatif / import-sweep outputs. Written by skills (IDE service key or can
 | `status` | — |
 | `created_at` | — |
 | `updated_at` | — |
+| `impact` | How much fixing this finding matters to the service: low, medium or high. Null on a finding recorded before the rating existed, which reads as unrated. |
+| `effort` | How much work the fix takes: low, medium or high. Null on a finding recorded before the rating existed, which reads as unrated. |
 
 ### `authoring_changes`
 Append-only record of every authoring write. Audit-only: the in-memory stack in src/lib/authoringSession.ts is still the undo affordance, and nothing replays `revert` from here. A row with `deleted_kind` set is a deletion and carries the rows it destroyed; `public.trash` is the view over exactly those.
