@@ -910,7 +910,12 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
     const message = await markNotStaged(deps.reports, sent.ts, failed.map((a) => a.c.id), FOLLOW_UP_NOT_STAGED).catch(() => null);
     if (message) await deps.slack.edit(group.to.channel, sent.ts, message).catch(() => {});
   }
-  await deps.markThread(group.to.channel, thread);
+  // Marked only when the follow-up went into the team's own thread (a to-do's):
+  // there replies are the team talking to each other. One at the channel's top,
+  // and any ask again under it, is in a thread uno-bot started, so a reply
+  // there is a reply to uno-bot and engages it like any thread it is in.
+  const teamThread = group.asked.find((a) => a.c.threadTs)?.c.threadTs;
+  if (teamThread) await deps.markThread(group.to.channel, teamThread);
 
   const actions: CommitmentAction[] = [];
   for (const a of group.asked) {
