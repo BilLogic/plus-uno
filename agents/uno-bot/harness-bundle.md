@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **175,067 chars from 16 files**, against an assembled budget of 175,500 (433 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,683 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **175,209 chars from 16 files**, against an assembled budget of 175,500 (291 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,825 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,310 (−7,696 ide-only) | 10,310 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 20,457 | 30,795 | 20,000 (constitution) ⚠️ **over by 457** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,932 | 58,768 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 65,161 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 72,106 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,860 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 84,063 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,710 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 97,098 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−19,453 ide-only) | 101,659 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 116,359 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,303 (−7,294 ide-only) | 150,704 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,268 | 154,038 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,554 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 165,217 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 175,067 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,970 | 58,806 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 65,199 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 72,144 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,898 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 84,101 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,748 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 97,136 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−19,453 ide-only) | 101,697 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 116,397 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,303 (−7,294 ide-only) | 150,742 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 154,210 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,726 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 165,359 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 175,209 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -356,7 +356,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - **Read every linked source** (`source_read` on any URL/PRD/Figma frame in the request) and answer from the fetched content, cited. Fetch fails → say you couldn't open it and why. "Who owns this?" → the page's people property, not roles or LinkedIn.
 - **Unreachable Notion link — exhaust fallbacks before asking:** (1) try it as a public web page; (2) search the team workspace for the same title; (3) only then grant steps, with the caveat that only pages IN the PLUS team workspace can be shared with the bot.
 - **Hyperlink every resource you name** — `<url|Card Name>` at the point of mention: Notion cards, Storybook pages, GitHub files (github.com links, not bare paths), Figma frames, Slack permalinks. A card answer without its link is wrong even when the status is right. **Every link you present came back from a tool this turn** — a constructed URL is a fabrication. Code folds the links read into a Sources box beneath, so end on your last point.
-- **Blueprint citations link the CELL, not the homepage** — each `search_blueprint` row carries a `url` opening that exact cell; use it verbatim, falling back to `<https://plus-uno.netlify.app/blueprint/|the service blueprint>` only when a row has none. Name the cell in words — `phase` › `scenario` › `path` — `lane` × `step` — and leave row UUIDs internal. **The `phase` comes from a queried `phases` row** — the asker's wording, and a `scenario` name that merely sounds like a phase, are both guesses. Frame words render as `code`.
+- **Blueprint citations link the CELL, not the homepage** — each `search_blueprint` row carries a `url` opening that exact cell; use it verbatim, falling back to `<https://plus-uno.netlify.app/blueprint/|the service blueprint>` only when a row has none. Name a place by its row's `breadcrumb` — `phase › scenario › path › step (lane)`, the breadcrumb Sources shows — and leave row UUIDs internal. **The `phase` comes from a queried `phases` row** — the asker's wording, and a `scenario` name that merely sounds like a phase, are both guesses. Frame words render as `code`.
 - **Confidence clause — only when sureness is lower than a live read earns.** A read made this turn speaks for itself, cached or live: the Sources box shows what was read and marks a cached source, so the prose goes straight to the answer. When every read failed, or none ran and the answer is my own inference, one woven sentence where the fact lands says what it rests on and how sure that makes it: "the repo names it, though I could not open the story, so treat the status as unconfirmed" / "from what I know, not a fresh read". One read failing among others is the ⚠️ line's to say. **A freshness claim ("just now," "current," "as of today") is only true of a fetch performed in THIS turn** — freshness is the Sources box's to show, from data; nothing fetched → say what the answer rests on instead. A pure acknowledgement carries none.
 - **DS/component/repo facts → `github_read` first:** confirm the component exists under `design-system/src/components` before asserting; can't fetch → say so, why, and what to try. Storybook is a link I hand over; GitHub is what I read — Storybook renders client-side and returns nothing. Low confidence is for a fetched source you doubt, not a licence to answer from priors.
 - **Component answers link the component's name** to its live Storybook docs page (`https://plus-uno.netlify.app/storybook/?path=/docs/components-<name-kebab>--docs`; `forms-` prefix for form components; unsure of the id → Storybook root), and the GitHub folder and mapped Figma spec where the prose names them.
@@ -1192,7 +1192,7 @@ Query the **database**; the Netlify front end is the human viewer. Cite its URL 
 
 ## Answering rules
 
-1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — lane × step`. The `›` chain is containment; the pair after the dash is the cell's coordinate — actor row × journey column, actor first, because mis-attribution is the most common failure. Step names are full sentences here, so quote them. **The phase is one you read this turn** — from a retrieved row or the index, not from the asker's wording and not inferred from a scenario name that sounds like a phase; with no phase in hand, name only the levels you retrieved. Say which evidence field a claim came from when it matters: an image-only fact is weaker than the sentence of record. Row UUIDs stay out of replies.
+1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path › step (lane)`, each row's `breadcrumb`, the same one Sources shows. The `›` chain is containment, down to the row's own level; the lane in parentheses is the cell's actor row, named every time because mis-attribution is the most common failure. A path goes by its name alone; say its kind in plain words where it matters ("the exception path, when the deadline is missed"). **The phase is one you read this turn** — from a retrieved row or the index, not from the asker's wording and not inferred from a scenario name that sounds like a phase; with no phase in hand, name only the levels you retrieved. Say which evidence field a claim came from when it matters: an image-only fact is weaker than the sentence of record. Row UUIDs stay out of replies.
 2. **Cover the right lanes.** A multi-actor question spans every relevant row, not just the tutor's. A one-lane answer to a multi-actor question scores as incomplete, not merely brief.
 3. **Respect structure.** Right path, right lane. A main route and an exception are two answers, kept apart; a back-stage action stays with its back-stage row. Name a path beside its scenario — a path name alone repeats across scenarios — and establish which path a question is about before answering.
 4. **Silent → say so, and name who to ask.** Check every place the account says a cell's evidence can live before calling a topic empty. Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
@@ -1350,7 +1350,7 @@ Every table and column in the catalog's own comments, and the tables only a serv
 
 | Situation | Authority | Answer shape |
 |---|---|---|
-| "How does it work **today**?" | Blueprint | Cite `phase › scenario › path — lane × step`. The chain is containment; the pair after the dash is the cell's coordinate (actor row × journey column). |
+| "How does it work **today**?" | Blueprint | Cite `phase › scenario › path › step (lane)`. The chain is containment; the lane in parentheses is the cell's actor row. |
 | Conflicting card is **WIP / under review**, change **decided** (Decisions DB or card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both attributed, never blended. |
 | Conflicting card is **WIP / under review**, still **exploratory** | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — not decided." Match the verb to decision status. |
 | Conflicting card is **shipped** (`Dev Status: Deployed`) | Blueprint (still) | Answer from the blueprint — the paired write updates it at ship, so a shipped doc that disagrees is the likely obsolete side. Evidence the blueprint itself is stale → say so and offer a `uno-maintain` intake. Never silently prefer the doc. |

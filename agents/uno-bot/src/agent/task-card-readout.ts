@@ -284,7 +284,14 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
   search_blueprint: {
     details: arg("query"),
     output: countOutput("rows", "match", "no matches", "matches"),
-    sources: rowLinks("rows", ["name", "label", "title"]),
+    // Each cell row's deep link, or — when no row has one, as on a browse
+    // above cell level — the blueprint root the tool names for the scope, as
+    // the collection the answer queried. Never both, so a cell answer's box
+    // is decided by its cells alone.
+    sources: (result) => {
+      const cells = rowLinks("rows", ["breadcrumb", "name", "label", "title"])(result);
+      return cells.length ? cells : collectionThenRows("blueprint", () => [])(result);
+    },
   },
   github_read: {
     details: arg("search", "path"),
