@@ -381,6 +381,9 @@ describe("F3: a to-do to make a card", () => {
     assert.equal(m.staged[0]!.threadTs, ROOT);
     assert.equal(m.staged[0]!.confirmers, undefined);
     assert.doesNotMatch(m.staged[0]!.proposalText, GATE_WORDS);
+    // Posted into the team's own thread, it marks that thread: the replies
+    // there are the team talking to each other, so only an @mention engages.
+    assert.deepEqual(m.marked, [`${DESIGN}:${ROOT}`]);
 
     // The same morning again posts nothing more.
     const again = morning(store, rm, at(32, 13, 30));
@@ -510,8 +513,9 @@ describe("F4: an active card with no owner", () => {
     assert.equal(c!.title.text, "Facelift — last stage");
     assert.equal(c!.subtitle!.text, "<@U0BEA> · WIP · no Contributor for a week");
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
-    // Its thread is marked, so the team's replies there are not turns.
-    assert.deepEqual(m.marked, [`${DESIGN}:${m.posts[0]!.ts}`]);
+    // Posted at the channel's top, it starts a thread that is uno-bot's own:
+    // nothing is marked, so a reply there engages uno-bot with no @mention.
+    assert.deepEqual(m.marked, []);
     // The card says what each answer does.
     assert.equal(c!.body.text, "Who should take it? Assign makes the person asked its Contributor. Leave it sets nobody, and I won't ask again until the card changes.");
     // Review offers Assign the person asked, or Leave it; Assign sets them.
@@ -626,6 +630,8 @@ describe("F4: an active card with no owner", () => {
     assert.equal(later.posts[0]!.threadTs, m.posts[0]!.ts);
     assert.match(later.posts[0]!.text, /^<@U0BEA> Checking in once more on this card\./);
     assert.deepEqual(later.posts[0]!.cards[0]!.actions.map((x) => x.text.text), ["Review", "Open card"]);
+    // Its own thread still: asking again there marks nothing either.
+    assert.deepEqual(later.marked, []);
   });
 
   it("posted before the shared card: \"me\" names the replier; two people, or uno-bot, name nobody", async () => {
