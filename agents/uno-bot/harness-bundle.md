@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,651 chars from 16 files**, against an assembled budget of 175,500 (849 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,267 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,892 chars from 16 files**, against an assembled budget of 175,500 (608 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,508 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,641 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−19,453 ide-only) | 101,202 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 115,902 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,344 (−7,294 ide-only) | 150,288 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,268 | 153,622 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,138 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,801 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,651 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,585 (−7,294 ide-only) | 150,529 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,268 | 153,863 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,379 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 165,042 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,892 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1065,7 +1065,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 **A caution goes on its own line under the answer, apart from the prose.** Each ⚠️ line is a `context` block after any charts, table and cards, before the Sources box and footer: one sentence, at most two lines per answer. Slack's `alert` block is not used, because Slack refuses it in a message.
 
-- **Code adds it** from what the turn already knows, one line per trigger however often it fires: a lookup reported `truncated` or `partial`; a source errored, timed out or refused access (an argument the tool refused is not a source failure, and a retry that came back whole clears it); the lookup budget refused a lookup, cut one short, or ended the loop in a synthesis pass; blueprint rows whose newest `updatedAt` is older than 180 days; the absence pre-check fired; a chart fell back to a table (`Not charted: …`, withdrawn when a table asked for in its own right replaces it). The turn has no wall-clock budget, so the call budget is the only budget line.
+- **Code adds it** from what the turn already knows, one line per trigger however often it fires: a lookup stopped short (`partial`, or `truncated` with no `capped_by` row cap); a source errored, timed out or refused access (an argument the tool refused is not a source failure, and a retry that came back whole clears it); the lookup budget refused a lookup, cut one short, or ended the loop in a synthesis pass; blueprint rows whose newest `updatedAt` is older than 180 days; the absence pre-check fired; a chart fell back to a table (`Not charted: …`, withdrawn when a table asked for in its own right replaces it). The turn has no wall-clock budget, so the call budget is the only budget line.
 - **The model adds one, for an estate conflict:** two sources it read this turn disagree (the blueprint says one thing, a Roadmap card or PRD another). It calls `present` with shape `conflict` and the disagreement as one sentence in `line`; code places the ⚠️. Refused, in the call's own result: fewer than two sources answered this turn, more than one sentence, an emoji, over 240 characters, a second conflict, or two lines already held. A ⚠️ the model typed at the start of `line` is dropped.
 - **Order and cap:** lines keep the order their triggers were first met; a third is dropped.
 - **Text copy:** each line, sign first, after the prose and any chart, table or card lists, so notifications carry it. An answer with a ⚠️ line posts as an ordinary message rather than a stream, which has no text copy. A refused ⚠️ block steps down to its sentence in the Markdown, like any other block beneath the answer.
@@ -1095,7 +1095,7 @@ Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading`
 
 **A task card's icon is a named Slack icon, and nothing else.** The shape is `icon: {type: "icon", name}` with one of Slack's built-in names, on the `task_update` chunk and on a static plan's `task_card` alike. Production took `globe`, `book`, `map`, `code`, `comment`, `folder`, `cube` and `image` on 2026-10-07, and refused with `invalid_arguments` (`failed to match exactly one allowed schema [json-pointer:/chunks/0]`) an image URL as `name`, a `url`, an `image` element, an emoji and an unknown name; `call`, `email`, `file`, `link` and `user` fail the validator too. Each card shows its estate's glyph — Notion `book`, blueprint `map`, GitHub `code`, Slack `comment`, Storybook `cube`, Figma `image`, and a link on no estate `globe`; on `plus-uno.netlify.app` the path decides, so `/storybook/…` is Storybook, `/blueprint/…` the blueprint, and any other path `globe` — and a card reading no estate shows none (`agents/uno-bot/src/slack/estate-glyphs.ts`). To recheck, send raw chunks to a test DM through `/debug/slack-stream?…&chunks=`.
 
-**The working status names the card in progress** ("is checking the Roadmap board…"). `agents.sessions.setStatus` takes a lifecycle value and no words, so the words go by the bridged `assistant.threads.setStatus`, always non-empty, on the checklist's own update chain, and stop before the settle: a line landing after it would move the session back to `processing` (`agents/uno-bot/src/slack/assistant.ts` § `setStatusLine`).
+**The checklist goes to Slack at group boundaries.** Each Slack call spends one of the turn's 50 subrequests, the same ones lookups read from, so the stream opens with the first group of lookups, takes one append as each group is announced and one at settle, and carries its heading in its first append; the working status carries no per-step words. An answered turn's cards all end `complete`, a failed or refused lookup saying `Failed: …` or `Skipped`, because Slack titles a plan holding an `error` card "Something went wrong" (live 2026-10-11). `error` is for a turn that died (`agents/uno-bot/src/slack/delivery-adapter.ts`).
 
 Block Kit **is** wired (`delivery.ts` posts a `markdown` block with a `section` and a bare-text fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 

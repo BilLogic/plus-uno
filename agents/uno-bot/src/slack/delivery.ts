@@ -19,7 +19,7 @@ import { refusalDetail } from "./api";
 import { resultTableBlock } from "./result-table-block";
 import { chartBlock } from "./chart-block";
 import { toSlackMrkdwn } from "./mrkdwn";
-import { sourcesBox } from "./sources-box";
+import { sourcesBox, withoutInlineSources } from "./sources-box";
 import { answerCardsBlock } from "./answer-cards-block";
 import { textCopy, type Presentation } from "../turn/presentation";
 import { signed } from "../turn/warning-line";
@@ -305,8 +305,12 @@ export async function postTextVerified(
   footerHint?: FooterKind,
   extras: { presentation?: Presentation; feedback?: AnswerFeedback } = {},
 ): Promise<{ ok: boolean; text: string }> {
-  const body = renderDeliveredBody(text);
   const { presentation } = extras;
+  // The box is drawn from the prose as the model wrote it, inline source list
+  // included: that list is what names some of the sources the box keeps.
+  const box = sourcesBox(presentation?.sources, text);
+  // With a box beneath it, the prose carries no list of its own.
+  const body = renderDeliveredBody(box ? withoutInlineSources(text) : text);
   const resultTable = presentation?.table;
   const charts = presentation?.charts ?? [];
   const cards = presentation?.cards;
@@ -325,7 +329,6 @@ export async function postTextVerified(
   // footer does — the answer's last part, where it ends — and their plain text
   // rides that part's text copy, which is what a notification shows and what
   // the thread remembers.
-  const box = sourcesBox(presentation?.sources, text);
   // What rides beneath the last part, in order: the charts, the table, the
   // cards, the ⚠️ lines, the box. Each carries its own plain text, so a
   // refused one steps down on its own while the others stay aboard.
