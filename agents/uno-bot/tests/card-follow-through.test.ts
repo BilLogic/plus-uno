@@ -48,6 +48,7 @@ import {
   recordNoteCardTodos,
   recordThreadCardTodos,
   runCardFollowThroughScan,
+  throughDirectory,
   type ActiveCard,
   type AnswerDeps,
   type CardProposal,
@@ -121,7 +122,8 @@ function roadmap(
     },
     people: {
       slackIdForName: async (name: string) => slackByName[name] ?? null,
-      slackIdForNotionUser: async (id: string) => slackByName[nameByNotion[id] ?? ""] ?? null,
+      // A known name is searched as given; otherwise the Notion user's name is read.
+      slackIdForNotionUser: async (id: string, name?: string) => slackByName[name ?? nameByNotion[id] ?? ""] ?? null,
       notionUserForSlack: async (id: string) => notionBySlack[id] ?? null,
     },
   };
@@ -1779,5 +1781,112 @@ describe("a tap on a card follow-up's buttons", () => {
     a.deps.update = async () => false;
     assert.deepEqual(await answerCardFollowUp(row, tap(row, "hourglass_flowing_sand", MAYA), a.deps), { unedited: true });
     assert.equal(only(store).state, "snoozed");
+  });
+});
+
+describe("tagging through the Team Members directory", () => {
+  const ZOE = "U0ZOE";
+  /** The sync's Notion people map, as the directory hands it over. */
+  const DIRECTORY = { "n-zoe": ZOE, "n-lead": LEAD };
+  const withDirectory = (rm: ReturnType<typeof roadmap>) => ({ ...rm, people: throughDirectory(rm.people, async () => DIRECTORY) });
+
+  it("a Contributor the directory maps is tagged without a name search; one it does not is searched by name", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(
+      roadmap({
+        cards: [
+          card({
+            designStatus: "Under Review",
+            lastEditedAt: EOD - 22 * DAY,
+            contributors: [
+              // "Zoe Park" matches nobody by name: only the directory knows her.
+              { id: "n-zoe", name: "Zoe Park" },
+              { id: "n-bea", name: "Bea Ruiz" },
+            ],
+          }),
+        ],
+      }),
+    );
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    assert.equal(only(store).promiserId, ZOE);
+    const m = morning(store, rm, at(30, 13));
+    await m.run();
+    assert.deepEqual(mentions(m.posts[0]!.text), [ZOE, BEA]);
+  });
+
+  it("a Contributor still unmatched is logged by name and named on the card, never dropped silently", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(
+      roadmap({
+        cards: [
+          card({
+            designStatus: "Under Review",
+            lastEditedAt: EOD - 22 * DAY,
+            contributors: [
+              { id: "n-maya", name: "Maya Chen" },
+              { id: "n-kai", name: "Kai Lo" },
+            ],
+          }),
+        ],
+      }),
+    );
+    const report = await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    assert.ok(report.notes.some((n) => n.includes("Kai Lo")), report.summary);
+    const m = morning(store, rm, at(30, 13));
+    await m.run();
+    assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
+    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
+  });
+
+  it("a nameless Contributor still unmatched is logged by id, never shown on the card", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(
+      roadmap({
+        cards: [
+          card({
+            designStatus: "Under Review",
+            lastEditedAt: EOD - 22 * DAY,
+            contributors: [
+              { id: "n-maya", name: "Maya Chen" },
+              { id: "n-nameless", name: "" },
+            ],
+          }),
+        ],
+      }),
+    );
+    const report = await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    assert.ok(report.notes.some((n) => n.includes("n-nameless")), report.summary);
+    const m = morning(store, rm, at(30, 13));
+    await m.run();
+    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
+    assert.doesNotMatch(JSON.stringify(m.posts[0]!.blocks), /n-nameless/);
+  });
+
+  it("a card with nobody matched is passed over, with every name in the run's notes", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(
+      roadmap({
+        cards: [
+          card({
+            designStatus: "Under Review",
+            lastEditedAt: EOD - 22 * DAY,
+            contributors: [
+              { id: "n-kai", name: "Kai Lo" },
+              { id: "n-ivy", name: "Ivy Jun" },
+            ],
+          }),
+        ],
+      }),
+    );
+    const report = await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    assert.equal(store.rows.size, 0);
+    assert.ok(report.notes.some((n) => n.includes("Kai Lo") && n.includes("Ivy Jun")), report.summary);
+  });
+
+  it("an unowned card's creator the directory maps is the one asked", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(roadmap({ cards: [card({ creatorId: "n-zoe" })] }));
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    assert.equal(only(store).promiserId, ZOE);
   });
 });
