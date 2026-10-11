@@ -51,13 +51,16 @@ export function appRootUrl(appUrl: string | undefined): string | undefined {
 
 /** The kinds a path can be (docs/connectors/supabase/blueprint.md § Paths and
  *  the main route), plus `named`, which the index writes for a prototype path. */
-const PATH_KIND_TAG = /\s*\((happy|variant|exception|named)\)/g;
+const PATH_KINDS = ["happy", "variant", "exception", "named"] as const;
+
+/** The index's kind tag on a path name, " (happy)", the kind captured. */
+const PATH_KIND_TAG = new RegExp(`\\s*\\((${PATH_KINDS.join("|")})\\)`, "g");
 
 /** A path name without the index's kind tag: "Standard (happy)" → name
  *  "Standard", kind "happy". The kind is data the model may use in plain
  *  words; it is never part of the path's name. */
 export function splitPathKind(path: string): { name: string; kind?: string } {
-  const kind = /\((happy|variant|exception|named)\)/.exec(path)?.[1];
+  const kind = new RegExp(PATH_KIND_TAG.source).exec(path)?.[1];
   return { name: path.replace(PATH_KIND_TAG, "").trim(), ...(kind ? { kind } : {}) };
 }
 

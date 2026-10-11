@@ -532,6 +532,25 @@ describe("a change request", () => {
     assert.doesNotMatch(stranger!, /notion_update|github_issue_create/);
   });
 
+  it("routes a bug in the live PLUS app to the Roadmap intake, never to a GitHub issue", async () => {
+    const scopes: string[] = [];
+    const w = world();
+    const answer = w.deps.answer;
+    w.deps.answer = (request, delivery, asker) => {
+      scopes.push(request.scopeInstruction ?? "");
+      return answer(request, delivery, asker);
+    };
+    await ask(w, comment("100", "@uno bug: the live app lists sessions oldest first"));
+    // Each route is one clause, ended by a semicolon or a sentence end.
+    const routes = scopes[0]!.split(/;|\.\s/);
+    const appBug = routes.filter((r) => /live PLUS app/.test(r));
+    assert.equal(appBug.length, 1, "one route names the live PLUS app");
+    assert.match(appBug[0]!, /`notion_update`|`notion_create`/);
+    assert.doesNotMatch(appBug[0]!, /github_issue_create/);
+    const github = routes.filter((r) => /github_issue_create/.test(r));
+    assert.ok(github.every((r) => !/live PLUS app|\bbug\b/.test(r)), "the GitHub route claims no live-app bug");
+  });
+
   it("an unmapped asker's turn runs with the narrower tools, and a teammate's does not", async () => {
     const w = world();
     await ask(w, comment("100", "@uno when does the bar show?", { user: STRANGER }));

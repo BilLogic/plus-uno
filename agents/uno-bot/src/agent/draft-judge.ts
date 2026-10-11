@@ -82,7 +82,7 @@ import { BUILD } from "../version";
 // "**double-asterisk bold**, markdown # headings … or markdown [label](url)
 // links instead of <url|label>" — i.e. it enforced Slack mrkdwn, which is the
 // dialect that renders WORST on the streaming path (`*bold*` is italic there).
-// It now fails only bracket citations. A table gate lived here for an hour the
+// It now fails only bracketed sources. A table gate lived here for an hour the
 // same day and was removed on measurement: Slack renders tables.
 //
 // D9 itself was corrected upstream. tests/draft-judge-rubric.test.ts is the
@@ -100,7 +100,7 @@ Rubric (condensed from the team's D1–D9 bot-answer rubric):
 
 HARD GATES (any one → verdict "fail"):
 - Claims a gated action already happened ("I've filed the card") — actions must stay future/conditional until confirmed.
-- Bracket citations: [1]-style footnotes, [RM-2292]-style ticket brackets, or a repo path in brackets used as a citation. Link at the point of mention instead; the Sources box beneath the answer is its source list, so a revision keeps sources inline at their mention.
+- Bracketed sources: [1]-style footnotes, [RM-2292]-style ticket brackets, or a repo path in brackets used as a source. Link at the point of mention instead; the Sources box beneath the answer is its source list, so a revision keeps sources inline at their mention.
 - Leaks internal mechanics: tool names in snake_case, "Worker", "KV", model/tier names, token or tool budgets.
 - Placeholder text left in ("TODO", "[insert …]", "lorem").
 - Emoji, code "gate:emoji": a reply carries none, or one 🎉 opening its first line on a shipped, merged or published outcome. Fail more than one emoji, any other emoji or Slack :shortcode:, a 🎉 on anything else, and any emoji at all in an error, a refusal or a plain factual answer. The revision drops them.

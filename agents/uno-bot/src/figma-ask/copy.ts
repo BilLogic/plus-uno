@@ -3,10 +3,11 @@
 //
 // THE REPLY is plain text: Figma shows a comment as typed, so Slack's markup
 // would arrive as asterisks and angle brackets. It leads with the label, says
-// the answer in at most three lines, and ends with one source line, its name and link — one the
-// answer itself cites, and that a public thread may carry. An answer with no
-// such link is not posted as an answer: the reply says it could not find this,
-// and points at #plus-design, so uno-bot never guesses in a file.
+// the answer in at most three lines, and ends with one source line, its name
+// and link — one the answer itself cites, and that a public thread may carry.
+// An answer with no such link is not posted as an answer: the reply says it
+// could not find this, and points at #plus-design, so uno-bot never guesses in
+// a file.
 //
 // THE LEAD in #plus-design is a Figma message like the rest
 // (docs/connectors/slack.md § Figma messages): one line asking one named
@@ -17,6 +18,7 @@
 
 import { escapeSlackText, toPlainText } from "../slack/mrkdwn";
 import { FIGMA_LABEL } from "./trigger";
+
 /** Lines of answer a reply carries, at most. */
 export const MAX_ANSWER_LINES = 3;
 /** Characters in one line of answer, at most. */
