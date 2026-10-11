@@ -76,6 +76,15 @@ function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
   };
 }
 
+/** The clock every conformance store runs on: a day ahead of the runtime's.
+ *  The Durable Object arms its alarm on the caller's clock and collects on its
+ *  own, so a start in the past fires that alarm at once and its garbage
+ *  collection deletes a record mid-test. TTL assertions advance only this
+ *  clock. */
+export function makeConformanceClock(): TestClock {
+  return makeTestClock(Date.now() + 24 * 60 * 60 * 1000);
+}
+
 /** The one thing the suite needs from its runner: register a named async test.
  *  `node --test`'s `test` and vitest's `it` both satisfy it. */
 export interface ConformanceRunner {
@@ -97,8 +106,7 @@ export function runThreadStateConformance(
   runner: ConformanceRunner,
 ): void {
   function setup(): { store: ThreadState; clock: TestClock } {
-    // Keep runtime alarms in the future; TTL assertions advance only this clock.
-    const clock = makeTestClock(Date.now() + 24 * 60 * 60 * 1000);
+    const clock = makeConformanceClock();
     return { store: makeStore({ now: () => clock.now() }), clock };
   }
 
