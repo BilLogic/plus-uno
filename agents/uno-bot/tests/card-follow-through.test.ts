@@ -1838,6 +1838,30 @@ describe("tagging through the Team Members directory", () => {
     assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
   });
 
+  it("a nameless Contributor still unmatched is logged by id, never shown on the card", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = withDirectory(
+      roadmap({
+        cards: [
+          card({
+            designStatus: "Under Review",
+            lastEditedAt: EOD - 22 * DAY,
+            contributors: [
+              { id: "n-maya", name: "Maya Chen" },
+              { id: "n-nameless", name: "" },
+            ],
+          }),
+        ],
+      }),
+    );
+    const report = await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    assert.ok(report.notes.some((n) => n.includes("n-nameless")), report.summary);
+    const m = morning(store, rm, at(30, 13));
+    await m.run();
+    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
+    assert.doesNotMatch(JSON.stringify(m.posts[0]!.blocks), /n-nameless/);
+  });
+
   it("a card with nobody matched is passed over, with every name in the run's notes", async () => {
     const store = createInMemoryCommitmentStore();
     const rm = withDirectory(

@@ -16,6 +16,7 @@ import {
   canonicalNotionUrl,
   notionSearch,
   findTeamMembers,
+  type TeamMember,
   queryThirdPartyApps,
   queryCatalogDatabase,
   fetchPageTitles,
@@ -92,6 +93,14 @@ const CATALOG_SCOPES: Record<string, CatalogScopeConfig> = {
  * @param env - Worker env (Notion token + DB ids)
  * @param input - Tool args (`query`, optional `scope`)
  */
+/** A member as `find_experts` shows them: Notion user ids are the tagging
+ *  map's join, not something to suggest a person by. */
+function withoutNotionIds(member: TeamMember): Omit<TeamMember, "notionUserIds"> {
+  const shown: TeamMember = { ...member };
+  delete shown.notionUserIds;
+  return shown;
+}
+
 export async function executeNotionSearch(env: Env, input: Record<string, unknown>): Promise<string> {
   const query = typeof input.query === "string" ? input.query.trim() : "";
   const scope = typeof input.scope === "string" ? input.scope.trim().toLowerCase() : "any";
@@ -104,8 +113,7 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
         ok: true,
         scope: "team",
         count: members.length,
-        // Notion user ids are the tagging map's join, not something to suggest by.
-        members: members.map(({ notionUserIds, ...m }) => (void notionUserIds, m)),
+        members: members.map(withoutNotionIds),
         complete: !truncated,
         note:
           (anySlackIds
