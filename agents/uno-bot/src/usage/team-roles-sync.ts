@@ -1,7 +1,9 @@
 // The daily role-map sync: the Notion Team Members roster matched against the
 // Slack directory (`./roles.ts` `matchRoster`), the Slack-id → role map kept
 // in KV for turns to read. The Figma-id → Slack-id map is kept beside it, so a
-// Figma commenter can be matched to a teammate without a call to Notion.
+// Figma commenter can be matched to a teammate without a call to Notion, and
+// so is the Notion-user → Slack-id map card follow-ups tag through, with the
+// names of the in-scope rows that matched nobody for Monday's DM to the lead.
 //
 // One Notion query, paged, and one users.list read, paged — both inside the
 // run's lookup ceiling. A read that fails or stops short writes nothing, so a
@@ -23,7 +25,7 @@
 // binds them), so the Node suite drives it with fakes.
 
 import { rethrowIfBudget } from "../net";
-import { matchRoster, type DirectoryPerson, type FigmaPeople, type RosterRow, type TeamRoles } from "./roles";
+import { matchRoster, type DirectoryPerson, type FigmaPeople, type NotionPeople, type RosterRow, type TeamRoles } from "./roles";
 
 /** The KV key the map is kept under. */
 export const TEAM_ROLES_KV_KEY = "team-roles:map";
@@ -46,6 +48,13 @@ export interface StoredTeamRoles {
   roles: TeamRoles;
   /** Figma user id → Slack id. Absent from a map stored before it was kept. */
   figmaPeople?: FigmaPeople;
+  /** Notion user id → Slack id, from each row's Notion Person. Absent from a
+   *  map stored before it was kept. */
+  notionPeople?: NotionPeople;
+  /** The in-scope rows — a role, not a Past Collaborator — that matched no
+   *  one Slack member: the names Monday's DM to the lead lists
+   *  (`./team-gaps.ts`). */
+  gaps?: string[];
 }
 
 /** What the sync reads and where it writes. */
@@ -114,6 +123,8 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
   if (unreadable) counts += `, ${unreadable} unreadable Figma id${unreadable === 1 ? "" : "s"}`;
   const figmaIds = Object.keys(match.figmaPeople).length;
   if (figmaIds) counts += `, ${figmaIds} Figma id${figmaIds === 1 ? "" : "s"}`;
+  const notionIds = Object.keys(match.notionPeople).length;
+  if (notionIds) counts += `, ${notionIds} Notion ${notionIds === 1 ? "person" : "people"}`;
 
   let previous: StoredTeamRoles | null;
   try {
@@ -136,7 +147,16 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
     const held = shrunk && previous ? previous : null;
     const at = held ? held.at : now;
     const ttlS = Math.max(MIN_TTL_S, TEAM_ROLES_TTL_S - Math.floor((now - at) / 1000));
-    await deps.write({ at, roles: held ? held.roles : match.roles, figmaPeople: match.figmaPeople }, ttlS);
+    await deps.write(
+      {
+        at,
+        roles: held ? held.roles : match.roles,
+        figmaPeople: match.figmaPeople,
+        notionPeople: match.notionPeople,
+        gaps: [...new Set([...match.unmatched, ...match.ambiguous])],
+      },
+      ttlS,
+    );
   }
   return {
     written: write,

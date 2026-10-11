@@ -9,8 +9,10 @@ import {
   matchRoster,
   normaliseFigmaId,
   normalisePersonName,
+  notionPersonOfSlack,
   roleOf,
   slackPersonOfFigma,
+  slackPersonOfNotion,
   syncTeamRoles,
   DIRECTORY_MAX_PAGES,
   TEAM_ROLES_KV_KEY,
@@ -21,7 +23,7 @@ import {
   type TeamRolesSyncDeps,
 } from "../src/usage/index";
 import { SubrequestBudgetError } from "../src/net";
-import { figmaPeopleFor, teamRolesFor } from "../src/usage/production";
+import { figmaPeopleFor, notionPeopleFor, teamRolesFor } from "../src/usage/production";
 import type { Env } from "../src/types";
 
 const ROSTER: RosterRow[] = [
@@ -252,7 +254,7 @@ test("a sync reads every directory page and stores the map, reporting counts onl
   const deps = syncDeps();
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.equal(deps.pages, 2);
-  assert.deepEqual(deps.written, [{ at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" }, figmaPeople: {} }]);
+  assert.deepEqual(deps.written, [{ at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" }, figmaPeople: {}, notionPeople: {}, gaps: [] }]);
   assert.deepEqual(deps.ttls, [TEAM_ROLES_TTL_S]);
   assert.deepEqual(report, { written: true, matched: 3, unmatched: 0, ambiguous: 0, summary: "3 matched, 0 unmatched, 0 ambiguous" });
 });
@@ -388,7 +390,7 @@ test("a kept role map still takes the fresh Figma ids, and keeps its own expiry"
   });
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.equal(report.keptPrevious, true);
-  assert.deepEqual(deps.written, [{ at: 1_000, roles: previous.roles, figmaPeople: { "1105000000000000001": "U0ANA0001" } }]);
+  assert.deepEqual(deps.written, [{ at: 1_000, roles: previous.roles, figmaPeople: { "1105000000000000001": "U0ANA0001" }, notionPeople: {}, gaps: [] }]);
   // The roles still lapse when they would have: the write does not renew them.
   assert.deepEqual(deps.ttls, [TEAM_ROLES_TTL_S - DAY_MS / 1000]);
 });
@@ -427,4 +429,47 @@ test("a turn reads the stored map; no map, no KV or a failed read reads as none"
 
 test("a budget stop reading the stored map is thrown through, not read as no map", async () => {
   await assert.rejects(teamRolesFor(fakeKv(async () => { throw new SubrequestBudgetError(38); })), SubrequestBudgetError);
+});
+
+// ── Notion people (card follow-ups' tagging) ────────────────────────────────
+
+test("a row's Notion Person maps to the Slack person its row matches, by the Figma map's rule", () => {
+  const { notionPeople } = matchRoster(
+    [
+      { name: "Cy Diaz", group: "Product Designer", notionUserIds: ["n-cy"] },
+      { name: "Dee Evans", group: "Researcher", notionUserIds: ["n-dee"] },
+      { name: "Gus Hale", group: "Researcher", notionUserIds: ["n-gus"] },
+      { name: "Nobody Listed", notionUserIds: ["n-zed"], slackUserId: "U0ZED0001" },
+      { name: "Eli Fox", affiliation: "Past Collaborators", notionUserIds: ["n-eli"] },
+      { name: "Ana Pérez", notionUserIds: ["n-twice"] },
+      { name: "Bo Chen", notionUserIds: ["n-twice"] },
+    ],
+    [...DIRECTORY, { id: "U0ZED0001", real_name: "Zed Young" }],
+  );
+  assert.deepEqual(notionPeople, { "n-cy": "U0CY00001", "n-dee": "U0DEE0001", "n-zed": "U0ZED0001" });
+  assert.equal(slackPersonOfNotion("n-cy", notionPeople), "U0CY00001");
+  assert.equal(slackPersonOfNotion("toString", notionPeople), null);
+  assert.equal(notionPersonOfSlack("U0CY00001", notionPeople), "n-cy");
+  assert.equal(notionPersonOfSlack("U0ANA0001", notionPeople), null);
+});
+
+test("a sync stores the Notion people and the in-scope rows it could not match beside the roles", async () => {
+  const deps = syncDeps({
+    roster: async () => ({
+      members: [
+        ...ROSTER.map((row) => (row.name === "Cy Diaz" ? { ...row, notionUserIds: ["n-cy"] } : row)),
+        { name: "Gus Hale", group: "Product Manager" },
+        { name: "Hal Ito", group: "Researcher" },
+        { name: "Ivy Jun", group: "Product Designer", affiliation: "Past Collaborators" },
+      ],
+      truncated: false,
+    }),
+  });
+  const report = await syncTeamRoles(deps, { dryRun: false });
+  assert.deepEqual(deps.written[0]?.notionPeople, { "n-cy": "U0CY00001" });
+  assert.deepEqual(deps.written[0]?.gaps, ["Gus Hale"]);
+  assert.equal(report.summary, "3 matched, 1 unmatched, 0 ambiguous, 1 Notion person");
+  const kv = fakeKv(async (key) => (key === TEAM_ROLES_KV_KEY ? deps.written[0] : null));
+  assert.deepEqual(await notionPeopleFor(kv), { "n-cy": "U0CY00001" });
+  assert.deepEqual(await notionPeopleFor({}), {});
 });

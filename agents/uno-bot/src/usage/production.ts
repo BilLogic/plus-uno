@@ -14,7 +14,7 @@ import { createD1UsageLog } from "./d1";
 import { createD1ProposalEventLog } from "./proposal-events-d1";
 import type { ProposalEventLog } from "./proposal-events";
 import type { UsageLog } from "./store";
-import type { FigmaPeople, TeamRoles } from "./roles";
+import type { FigmaPeople, NotionPeople, TeamRoles } from "./roles";
 import { charge, rethrowIfBudget } from "../net";
 import { findTeamMembers } from "../integrations/notion";
 import { slackDirectoryFor } from "../tools/slack-people";
@@ -116,9 +116,20 @@ export async function figmaPeopleFor(env: Pick<Env, "HARNESS_KV">): Promise<Figm
   return (await storedTeamRoles(env))?.figmaPeople ?? {};
 }
 
+/**
+ * The stored Notion user id → Slack id map, kept with the role map: how a
+ * card follow-up tags a Notion person before it falls back to a name search
+ * (`../follow-through/people.ts`). Empty on the same terms as `teamRolesFor`.
+ *
+ * @throws A budget stop, rather than an empty map
+ */
+export async function notionPeopleFor(env: Pick<Env, "HARNESS_KV">): Promise<NotionPeople> {
+  return (await storedTeamRoles(env))?.notionPeople ?? {};
+}
+
 /** The stored map, or null when none is stored, KV is not bound or the read
  *  fails. One KV read, charged to the internal bucket. */
-async function storedTeamRoles(env: Pick<Env, "HARNESS_KV">): Promise<StoredTeamRoles | null> {
+export async function storedTeamRoles(env: Pick<Env, "HARNESS_KV">): Promise<StoredTeamRoles | null> {
   if (!env.HARNESS_KV) return null;
   try {
     charge(1, "kv");

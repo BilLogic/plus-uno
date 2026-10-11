@@ -104,7 +104,8 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
         ok: true,
         scope: "team",
         count: members.length,
-        members,
+        // Notion user ids are the tagging map's join, not something to suggest by.
+        members: members.map(({ notionUserIds, ...m }) => (void notionUserIds, m)),
         complete: !truncated,
         note:
           (anySlackIds

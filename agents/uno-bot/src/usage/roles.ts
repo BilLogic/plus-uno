@@ -15,6 +15,8 @@
 // row's optional Figma User ID is mapped to the Slack person their row
 // matches, whatever their group. No Figma API returns an email, so the id is
 // the only join, and the map lets a Figma commenter be matched to a teammate.
+// A row's optional Notion Person gives a Notion people map by the same rule,
+// which is how a card follow-up tags a Contributor before it tries a name.
 //
 // The roles are for analytics only, never for access: nothing is allowed or
 // refused on them. The Figma people map is for access: a commenter it does not
@@ -33,6 +35,9 @@ export type TeamRoles = Readonly<Record<string, TeamRole>>;
 /** A Figma user id → Slack id map, as the sync stores it. */
 export type FigmaPeople = Readonly<Record<string, string>>;
 
+/** A Notion user id → Slack id map, as the sync stores it. */
+export type NotionPeople = Readonly<Record<string, string>>;
+
 /** A key's entry in a stored map, or null when it has none. Inherited keys are not entries. */
 function entryOf<T>(key: string | null | undefined, map: Readonly<Record<string, T>>): T | null {
   return (key && Object.hasOwn(map, key) ? map[key] : undefined) ?? null;
@@ -41,6 +46,19 @@ function entryOf<T>(key: string | null | undefined, map: Readonly<Record<string,
 /** The Slack person a Figma user id maps to, or null when it maps to nobody. */
 export function slackPersonOfFigma(figmaUserId: string | null | undefined, people: FigmaPeople = {}): string | null {
   return entryOf(figmaUserId, people);
+}
+
+/** The Slack person a Notion user id maps to, or null when it maps to nobody. */
+export function slackPersonOfNotion(notionUserId: string | null | undefined, people: NotionPeople = {}): string | null {
+  return entryOf(notionUserId, people);
+}
+
+/** The one Notion user a Slack person is mapped from, or null when none is,
+ *  or more than one. */
+export function notionPersonOfSlack(slackUserId: string | null | undefined, people: NotionPeople = {}): string | null {
+  if (!slackUserId) return null;
+  const ids = Object.keys(people).filter((id) => people[id] === slackUserId);
+  return ids.length === 1 ? ids[0]! : null;
 }
 
 /** A person's role, or null when they are not on the map. */
@@ -69,6 +87,8 @@ export interface RosterRow {
   /** The row's Figma User ID cell as the member filled it in;
    *  `normaliseFigmaId` reads the id out of it. */
   figmaUserId?: string;
+  /** The Notion users in the row's Notion Person cell. */
+  notionUserIds?: readonly string[];
 }
 
 /** One Slack member, as the directory lists them. */
@@ -110,6 +130,9 @@ export interface RosterMatch {
   figmaPeople: FigmaPeople;
   /** Rows whose Figma User ID is filled in but holds no id `normaliseFigmaId` reads. */
   unreadableFigma: string[];
+  /** Each Notion user a row's Notion Person names, to the one Slack member
+   *  that row matched, by the Figma map's rule. */
+  notionPeople: NotionPeople;
 }
 
 /**
@@ -120,8 +143,9 @@ export interface RosterMatch {
  * one, is taken as the match — but only when it is an active, non-bot member
  * of the directory; otherwise the row is unmatched.
  *
- * A row's Figma user id maps to the member the row matched, by the same rule,
- * whether or not the row has a role. Only the role rows count towards
+ * A row's Figma user id, and each Notion user its Notion Person names, maps
+ * to the member the row matched, by the same rule, whether or not the row has
+ * a role. Only the role rows count towards
  * `matched`, `unmatched` and `ambiguous`.
  *
  * @param roster - The Team Members rows
@@ -144,6 +168,8 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
   const given = new Map<string, { roles: Set<TeamRole>; names: string[] }>();
   /** Each Figma id's members, from every row that carries it. */
   const figma = new Map<string, Set<string>>();
+  /** Each Notion user's members, from every row that names it. */
+  const notion = new Map<string, Set<string>>();
   const unreadableFigma: string[] = [];
   for (const row of roster) {
     if (row.affiliation === PAST_COLLABORATORS) continue;
@@ -151,13 +177,13 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
       ? active.has(row.slackUserId) ? [row.slackUserId] : []
       : [...(byName.get(normalisePersonName(row.name)) ?? [])];
     const [id] = ids;
+    // A row that matches nobody, or more than one member, maps its ids to nobody.
+    const member = id && ids.length === 1 ? id : "";
     const figmaId = row.figmaUserId?.trim() ? normaliseFigmaId(row.figmaUserId) : undefined;
     if (row.figmaUserId?.trim() && !figmaId) unreadableFigma.push(row.name);
-    if (figmaId) {
-      const members = figma.get(figmaId) ?? new Set<string>();
-      // A row that matches nobody, or more than one member, maps its id to nobody.
-      members.add(id && ids.length === 1 ? id : "");
-      figma.set(figmaId, members);
+    if (figmaId) figma.set(figmaId, (figma.get(figmaId) ?? new Set<string>()).add(member));
+    for (const notionId of new Set(row.notionUserIds ?? [])) {
+      if (notionId) notion.set(notionId, (notion.get(notionId) ?? new Set<string>()).add(member));
     }
     const role = row.group && Object.hasOwn(GROUP_ROLES, row.group) ? GROUP_ROLES[row.group] : undefined;
     if (!role) continue;
@@ -181,12 +207,17 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     roles[id] = role;
     matched += entry.names.length;
   }
-  const figmaPeople: Record<string, string> = {};
-  for (const [figmaId, members] of figma) {
+  return { roles, matched, unmatched, ambiguous, figmaPeople: soleMembers(figma), unreadableFigma, notionPeople: soleMembers(notion) };
+}
+
+/** Each key whose rows all matched the same one member, to that member. */
+function soleMembers(byKey: ReadonlyMap<string, ReadonlySet<string>>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, members] of byKey) {
     const [id] = members;
-    if (id && members.size === 1) figmaPeople[figmaId] = id;
+    if (id && members.size === 1) out[key] = id;
   }
-  return { roles, matched, unmatched, ambiguous, figmaPeople, unreadableFigma };
+  return out;
 }
 
 /** A Slack user mention as it arrives in message text: `<@U123>` or `<@U123|name>`. */
