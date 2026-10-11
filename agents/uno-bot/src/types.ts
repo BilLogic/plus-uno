@@ -14,11 +14,14 @@ export interface SlackContext {
   threadTs?: string;
   /**
    * The answer lands where people outside the team may read it (a Figma
-   * comment): Slack is read at public-channel visibility only — no private
-   * search pass, no requester-own search, no thread read in a private
-   * conversation. Set from the turn's origin (`turn/env-deps.ts`).
+   * comment), so every tool reads at public scope (`agent/public-scope.ts`):
+   * Slack's public channels, Notion's team surfaces, public GitHub repos. Set
+   * from the turn's origin (`turn/env-deps.ts`).
    */
   publicOnly?: boolean;
+  /** On a `publicOnly` turn, the asker is no one Team Members maps: public
+   *  facts only, so no Notion and no Slack at all (`agent/public-scope.ts`). */
+  unmappedAsker?: boolean;
   /** A REAL message ts to reply under in the requesting conversation, when the
    *  caller knows one — the Gate's reply target. `threadTs` is the conversation
    *  key, which in a threadless DM is not a ts Slack accepts. */

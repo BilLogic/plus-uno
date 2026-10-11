@@ -7,8 +7,9 @@
 //
 //   1. THE MARK. `figma-ask:<comment id>` in HARNESS_KV says the comment was
 //      replied to, or what is already done towards a reply: the tries so far,
-//      a card already posted, the reply already drafted. A replied comment is
-//      never answered again, and nothing done is done twice.
+//      a card already posted, the reply already drafted, a reply on its way.
+//      A replied comment is never answered again, and nothing done is done
+//      twice.
 //   2. THE COMMENT, re-read from Figma by id: the route keeps no words. A
 //      comment that is gone, that uno-bot wrote (it leads with the label — its
 //      author is Bill, so the author proves nothing) or that names no trigger
@@ -16,23 +17,29 @@
 //      the comment's `message`, so this is where a mention is decided.
 //   3. WHO ASKED. Figma's user id, through the Team Members map
 //      (`usage/roles.ts`). A teammate's change request is drafted as a card in
-//      #plus-design; anyone the map does not know gets no card.
+//      #plus-design; anyone the map does not know gets no card, and a turn
+//      that reads public facts alone.
 //   4. THE TURN — the one Slack runs, on a Delivery that keeps the answer
-//      (`./delivery.ts`), with the `figma` origin: it reads Slack at public
-//      visibility only, because the answer lands in a file people outside the
-//      team can open (`turn/env-deps.ts`). It reads the ask, the file's name,
-//      the comment's frame link and the thread so far; its memory is the
-//      Figma thread's, so a later ask in the same thread follows on.
+//      (`./delivery.ts`), with the `figma` origin: every tool reads at public
+//      scope, because the answer lands in a file people outside the team can
+//      open (`agent/public-scope.ts`). It reads the ask, the file's name, the
+//      comment's frame link and the thread so far; its memory is the Figma
+//      thread's, so a later ask in the same thread follows on.
 //   5. A CARD, when the turn stages one: a lead in #plus-design asks the
 //      file's design owner (else the file's creator, else the asker) to
 //      review it, and the card goes in the lead's thread with Review. The
-//      mark says a card is on its way before it posts, and which card once it
-//      has, so a retry never posts a second. The card's record then moves to
-//      the lead's thread, as if the turn had run there.
+//      mark says a card is on its way before it posts, the lead once it has
+//      posted, and which card once that has, so a retry never posts a second:
+//      a retry that finds only the lead looks in its thread for the card. The
+//      card's record then moves to the lead's thread, as if the turn had run
+//      there.
 //   6. THE REPLY, on the root comment (Figma threads are one level deep):
-//      the label, 1–3 plain lines and the source the answer cites — one a
-//      public thread may carry — or the can't-find line, or a link to the
-//      card (`./copy.ts`). Drafted into the mark before it posts.
+//      the label, 1–3 plain lines and the source the answer cites — a link a
+//      lookup of this turn returned, that a public thread may carry, and not
+//      the frame asked on — or the can't-find line, or a link to the card
+//      (`./copy.ts`). Drafted into the mark, then marked `replying` before it
+//      posts: a retry that finds `replying` reads the thread for the reply
+//      before it posts again.
 //
 // THE BUDGET. A budget stop or a Figma rate limit, anywhere — the turn
 // included — DEFERS: the runner keeps the job and retries it on a fresh
@@ -46,6 +53,7 @@ import { isSubrequestBudgetError } from "../net";
 import type { TaskCardSource } from "../agent/task-card-readout";
 import type { FigmaClient, FigmaComment } from "../figma/client";
 import { FigmaRateLimitError } from "../figma/client";
+import { parseFigmaUrl } from "../integrations/figma-reading";
 import { commentUrl, nodeUrl } from "../figma-comments/draft";
 import { quoteOf } from "../figma-comments/read";
 import { messageOf } from "../figma-notify/route";
@@ -76,12 +84,15 @@ export interface PostedCard {
 /** What a comment's mark says. */
 export type AskMark =
   | {
-      state: "pending";
+      /** `replying` once the reply is about to post: it may be on the thread. */
+      state: "pending" | "replying";
       /** Tries the budget or a rate limit has stopped. */
       tries: number;
       at: number;
       /** A card is being posted: set before the lead posts. */
       staging?: true;
+      /** The lead in #plus-design, once it has posted. */
+      lead?: { ts: string };
       /** The card that posted. */
       card?: PostedCard;
       /** The reply, drafted and not yet posted. */
@@ -89,7 +100,7 @@ export type AskMark =
     }
   | { state: "replied"; at: number };
 
-type Pending = Extract<AskMark, { state: "pending" }>;
+type Pending = Extract<AskMark, { state: "pending" | "replying" }>;
 
 /** The ask a job names: ids only. */
 export interface FigmaAskJob {
@@ -106,6 +117,8 @@ export interface AskDesign {
   permalink(ts: string): Promise<string | null>;
   /** The Delivery a card posts through, in the lead's thread. */
   cardDelivery(leadTs: string, slackId: string): Delivery;
+  /** The ts of the card uno-bot posted in a lead's thread; null when none did. */
+  cardIn(leadTs: string): Promise<string | null>;
   /** The file's design owner as a Slack id, by its title's cards; null for none. */
   designOwner(title: string): Promise<string | null>;
 }
@@ -120,8 +133,9 @@ export interface FigmaAskDeps {
   };
   /** The store the turn remembers in, and where a staged card is kept. */
   threadState: ThreadState;
-  /** One turn on the ask, speaking through `delivery`. */
-  answer(request: TurnRequest, delivery: Delivery): Promise<TurnOutcome>;
+  /** One turn on the ask, speaking through `delivery`; `unmappedAsker` when
+   *  Team Members does not know the asker, so it reads public facts alone. */
+  answer(request: TurnRequest, delivery: Delivery, asker: { unmappedAsker: boolean }): Promise<TurnOutcome>;
   /** #plus-design; absent, nothing can be drafted. */
   design?: AskDesign;
   now(): number;
@@ -160,15 +174,22 @@ export async function answerFigmaAsk(job: FigmaAskJob, deps: FigmaAskDeps): Prom
       await deps.marks.put(job.commentId, pending);
       return { outcome: "deferred", said: `waiting for a fresh budget (try ${tries} of ${MAX_ASK_TRIES}): ${messageOf(err)}` };
     }
-    return giveUp(job, deps, rootOf.id, err);
+    return giveUp(job, deps, pending, rootOf.id, err);
   }
 }
 
-/** The last try: say so in Figma if Figma will take it, and let the job go. */
-async function giveUp(job: FigmaAskJob, deps: FigmaAskDeps, rootId: string | null, err: unknown): Promise<FigmaAskResult> {
+/**
+ * The last try: say so in Figma if Figma will take it, and let the job go. A
+ * reply already on its way (`replying`) may be on the thread, so no second
+ * one follows it.
+ */
+async function giveUp(job: FigmaAskJob, deps: FigmaAskDeps, pending: Pending, rootId: string | null, err: unknown): Promise<FigmaAskResult> {
   let told = "";
-  if (rootId) {
+  if (pending.state === "replying") {
+    told = ", and posted nothing more: the reply may already be on the comment";
+  } else if (rootId) {
     try {
+      await deps.marks.put(job.commentId, { ...pending, state: "replying", reply: figmaReplyText({ kind: "failed" }), at: deps.now() });
       await deps.figma.replyToComment(job.fileKey, rootId, figmaReplyText({ kind: "failed" }));
       told = ", and said so on the comment";
     } catch (again) {
@@ -190,6 +211,11 @@ async function answer(job: FigmaAskJob, deps: FigmaAskDeps, pending: Pending, ro
 
   let reply = pending.reply ?? null;
   let said = "the drafted reply";
+  // A reply that was on its way when a try stopped may have posted.
+  if (pending.state === "replying" && reply !== null && alreadyPosted(comments, rootId, reply)) {
+    await deps.marks.put(job.commentId, { state: "replied", at: deps.now() });
+    return { outcome: "handled", said: "the reply was already on the comment" };
+  }
   if (reply === null) {
     const drafted = await draft(job, comment, rootId, comments, deps, pending);
     if (drafted.reply === null) {
@@ -199,10 +225,11 @@ async function answer(job: FigmaAskJob, deps: FigmaAskDeps, pending: Pending, ro
     reply = drafted.reply;
     said = drafted.said;
     pending.reply = reply;
-    pending.at = deps.now();
-    await deps.marks.put(job.commentId, pending);
   }
 
+  pending.state = "replying";
+  pending.at = deps.now();
+  await deps.marks.put(job.commentId, pending);
   await deps.figma.replyToComment(job.fileKey, rootId, reply);
   await deps.marks.put(job.commentId, { state: "replied", at: deps.now() });
   return { outcome: "handled", said: `replied: ${said}` };
@@ -223,9 +250,9 @@ async function draft(
     await moveCard(deps.threadState, channel, pending.card, []);
     return { reply: figmaReplyText({ kind: "drafted", link: pending.card.link }), said: "drafted, from an earlier try" };
   }
-  // A try that stopped while a card was posting may have posted it: a second
-  // card is worse than a reply that says this one could not be answered.
-  if (pending.staging) return { reply: figmaReplyText({ kind: "failed" }), said: "failed: a card may have posted on an earlier try" };
+  // A try that stopped while a card was posting may have posted it. No second
+  // card: the lead's thread says whether the first one landed.
+  if (pending.staging) return stagedEarlier(deps, channel, pending);
 
   const people = await deps.people();
   const slackId = slackPersonOfFigma(comment.user.id, people);
@@ -255,6 +282,8 @@ async function draft(
             }),
           );
           if (!lead) return { ok: false, text: "" };
+          pending.lead = { ts: lead.ts };
+          await deps.marks.put(job.commentId, pending);
           const result = await design.cardDelivery(lead.ts, slackId).card(card);
           if (result.ok && result.ts) {
             posted.card = { leadTs: lead.ts, link: await design.permalink(lead.ts), cardTs: result.ts };
@@ -284,7 +313,7 @@ async function draft(
 
   let outcome: TurnOutcome | null = null;
   try {
-    outcome = await deps.answer(request, delivery);
+    outcome = await deps.answer(request, delivery, { unmappedAsker: slackId === null });
   } catch (err) {
     // A stop is a stop wherever it lands: the retry finds the card, if one
     // posted, in the mark.
@@ -293,7 +322,8 @@ async function draft(
   }
 
   if (posted.card) await moveCard(deps.threadState, channel, posted.card, outcome?.wrote.turns ?? []);
-  const reply = replyOf(outcome, delivery, posted.card, slackId !== null);
+  const asked = nodeId ? nodeUrl(job.fileKey, nodeId) : fileUrl;
+  const reply = replyOf(outcome, delivery, posted.card, slackId !== null, asked);
   return reply
     ? { reply: figmaReplyText(reply), said: `${reply.kind}${slackId ? "" : " (not on Team Members)"}` }
     : { reply: null, said: `nothing to say (${outcome?.disposition ?? "no outcome"})` };
@@ -356,21 +386,75 @@ export function askInstruction(teammate: boolean): string {
 }
 
 /**
- * The source a reply may carry: the first link the answer cites that a public
- * thread may carry (`threadVisibleSources`), judged with what the lookup that
- * read it said of who may see it. A link the turn read but the answer does not
- * cite is no source.
+ * The source a reply may carry: the first link the answer cites that a lookup
+ * of this turn returned, and that a public thread may carry
+ * (`threadVisibleSources`, judged with what that lookup said of who may see
+ * it). A link the turn read but the answer does not cite is no source; nor is
+ * one the answer cites that no lookup returned; nor the frame the ask was
+ * made on, which the asker is already looking at.
+ *
+ * @param cited - The links the answer cites, in order
+ * @param read - What the turn's lookups returned
+ * @param asked - The frame (or the file) the ask was made on
  */
-function sourceOf(cited: readonly string[], read: readonly TaskCardSource[]): string | null {
+export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string): string | null {
   for (const url of cited) {
-    const source = read.find((s) => s.url === url) ?? { text: "", url };
-    if (threadVisibleSources([source]).length) return url;
+    if (sameFigmaPlace(url, asked)) continue;
+    const source = read.find((s) => s.url === url);
+    if (source && threadVisibleSources([source]).length) return url;
   }
   return null;
 }
 
+/** Whether two links open the same Figma frame, or the same file with no frame. */
+function sameFigmaPlace(a: string, b: string): boolean {
+  const key = (url: string): string | null => {
+    const file = /^https?:\/\/(?:[\w-]+\.)?figma\.com\/(?:design|file|proto)\/([A-Za-z0-9]+)/i.exec(url)?.[1];
+    if (!file) return null;
+    return `${file}:${parseFigmaUrl(url)?.nodeId ?? ""}`;
+  };
+  const ka = key(a);
+  return ka !== null && ka === key(b);
+}
+
+/** Whether the thread already holds this reply under its root. */
+function alreadyPosted(comments: readonly FigmaComment[], rootId: string, reply: string): boolean {
+  const flat = (text: string) => text.replace(/\s+/g, " ").trim();
+  return comments.some((c) => c.parent_id === rootId && isOwnComment(c.message) && flat(c.message) === flat(reply));
+}
+
+/**
+ * The reply for a try that stopped while a card was posting: a link to the
+ * lead when its thread holds the card — the card's record moved there, as a
+ * try that finished would — and "couldn't draft" when the card never posted.
+ * A thread that cannot be read gets the link: the lead is there to follow.
+ */
+async function stagedEarlier(deps: FigmaAskDeps, channel: string, pending: Pending): Promise<{ reply: string; said: string }> {
+  const design = deps.design;
+  const lead = pending.lead;
+  const never = { reply: figmaReplyText({ kind: "not-drafted" }), said: "not-drafted: the card never posted on an earlier try" };
+  if (!design || !lead) return never;
+  let cardTs: string | null | undefined;
+  try {
+    cardTs = await design.cardIn(lead.ts);
+  } catch (err) {
+    if (waitable(err)) throw err;
+    console.warn(`[figma-ask] the lead's thread ${lead.ts} not read: ${messageOf(err)}`);
+  }
+  if (cardTs === null) return never;
+  const link = await design.permalink(lead.ts);
+  if (cardTs) await moveCard(deps.threadState, channel, { leadTs: lead.ts, link, cardTs }, []);
+  return { reply: figmaReplyText({ kind: "drafted", link }), said: "drafted, from an earlier try's lead" };
+}
+
 /** What the reply says, from what the turn came to; null for nothing. */
-function replyOf(outcome: TurnOutcome | null, delivery: FigmaAskDelivery, card: PostedCard | null, teammate: boolean): FigmaReply | null {
+function replyOf(
+  outcome: TurnOutcome | null,
+  delivery: FigmaAskDelivery,
+  card: PostedCard | null,
+  teammate: boolean,
+  asked: string,
+): FigmaReply | null {
   if (card) return { kind: "drafted", link: card.link };
   const refused = delivery.refusedCard();
   if (refused === "not-allowed") return teammate ? { kind: "not-drafted" } : { kind: "not-teammate" };
@@ -378,7 +462,7 @@ function replyOf(outcome: TurnOutcome | null, delivery: FigmaAskDelivery, card: 
   const answer = delivery.answer();
   if (outcome?.disposition === "answered" && answer !== null) {
     const { lines, cited } = plainAnswer(answer);
-    return { kind: "answer", lines, source: sourceOf(cited, delivery.sources()) };
+    return { kind: "answer", lines, source: sourceOf(cited, delivery.sources(), asked) };
   }
   const note = delivery.notes().at(-1);
   if (outcome?.disposition === "asked" && note) return { kind: "question", lines: plainAnswer(note).lines };

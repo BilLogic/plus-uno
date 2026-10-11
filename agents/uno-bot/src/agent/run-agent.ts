@@ -93,6 +93,7 @@ import type { ModelProvider, SystemBlock, ToolSpec } from "./model-provider";
 import type { ToolBody } from "./tool-bodies";
 import { oneReactionPerMessage } from "../tools/slack-react";
 import { isToolName, type ToolName } from "./tool-table";
+import { publicScopeDepsFor, runAtPublicScope } from "./public-scope";
 import { TOOLS, TOOLS_BY_NAME } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
 import type { ToolProgressEvent } from "./tool-progress";
@@ -595,7 +596,9 @@ export async function executeUngatedTool(
     });
   }
   const wrap = TURN_WRAPPERS[name];
-  return (wrap ? wrap(row.run) : row.run)(env, input, slack);
+  const run = () => (wrap ? wrap(row.run) : row.run)(env, input, slack);
+  // An answer posted outside Slack reads at public scope, every tool alike.
+  return slack.publicOnly ? runAtPublicScope(name, input, slack, run, publicScopeDepsFor(env)) : run();
 }
 
 /**

@@ -67,8 +67,8 @@ export function figmaReplyText(reply: FigmaReply): string {
   return [FIGMA_LABEL, ...body].join("\n");
 }
 
-/** Markdown links, `[label](url)`. */
-const MD_LINK = /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g;
+/** Markdown links, `[label](url)`; a label may hold backslash-escaped characters. */
+const MD_LINK = /\[((?:\\.|[^\]\\\n])+)\]\((https?:\/\/[^\s)]+)\)/g;
 /** Slack links, `<url|label>` or `<url>`. */
 const SLACK_LINK = /<(https?:\/\/[^|>\s]+)(?:\|[^>]*)?>/g;
 /** Bare links. */
@@ -90,7 +90,12 @@ export function plainAnswer(text: string): { lines: string[]; cited: string[] } 
   }
   cited.sort((a, b) => a.at - b.at);
 
-  const plain = toPlainText(text.replace(MD_LINK, "$1").replace(/\*\*|__/g, ""));
+  // A link becomes its label, as typed: the turn escapes a frame's title in
+  // its link (`turn/figma-answer-copy.ts`), and Figma shows a backslash as
+  // one. The labels sit out the markup pass, so a `<` in a title stays.
+  const labels: string[] = [];
+  const held = text.replace(MD_LINK, (_m, label: string) => `\u0000${labels.push(label.replace(/\\(.)/g, "$1").replace(/\*\*/g, "")) - 1}\u0000`);
+  const plain = toPlainText(held.replace(/\*\*|__/g, "")).replace(/\u0000(\d+)\u0000/g, (_m, i: string) => labels[Number(i)] ?? "");
   const lines = plain
     .split("\n")
     .filter((l) => !/^\s*(```|~~~)/.test(l))

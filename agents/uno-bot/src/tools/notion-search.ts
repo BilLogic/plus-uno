@@ -87,6 +87,19 @@ const CATALOG_SCOPES: Record<string, CatalogScopeConfig> = {
 };
 
 /**
+ * A catalog scope's database id as the Worker is configured, or undefined for
+ * a scope that is no catalog or whose id is unset.
+ *
+ * @param env - Worker env
+ * @param scope - Scope name
+ */
+export function catalogDatabaseOf(env: Env, scope: string): string | undefined {
+  const catalog = CATALOG_SCOPES[scope];
+  const id = catalog ? env[catalog.envKey] : undefined;
+  return typeof id === "string" && id.trim() ? id.trim() : undefined;
+}
+
+/**
  * Execute notion_search for the given scope + query.
  *
  * @param env - Worker env (Notion token + DB ids)

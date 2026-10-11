@@ -30,6 +30,11 @@ const SARAH = { id: "1500001", handle: "sarah" };
 const STRANGER = { id: "1500999", handle: "guest" };
 const NOW = Date.parse("2026-10-09T15:00:00Z");
 const PRD = "https://www.notion.so/goal-setting-prd-1";
+/** A lookup that returns the PRD: an answer may cite only what the turn read. */
+const LOOKUP: ScriptedReply = { text: "Checking.", toolCalls: [{ name: "notion_search", args: { query: "progress bar" } }] };
+const PRD_FOUND = JSON.stringify({ ok: true, count: 1, results: [{ title: "Goal Setting PRD", url: PRD }] });
+/** The turn reads the PRD, then answers with `text`. */
+const reads = (text: string): ScriptedReply[] => [LOOKUP, { text }];
 
 function comment(id: string, message: string, over: Partial<FigmaComment> = {}): FigmaComment {
   return {
@@ -76,14 +81,27 @@ interface World {
   run(c: FigmaComment, fragments?: unknown[]): Promise<{ outcome: string; line: string }>;
   /** The design owner #plus-design's lead resolves; null for none. */
   owner: { slack: string | null };
+  /** What each turn was told of its asker. */
+  askers: Array<{ unmappedAsker: boolean }>;
   /** Replies uno-bot posted on the file, in order. */
   replies(): Array<{ root: string; message: string }>;
 }
 
-function world(opts: { replies?: ScriptedReply[]; people?: Record<string, string>; comments?: FigmaComment[]; design?: boolean } = {}): World {
+function world(
+  opts: {
+    replies?: ScriptedReply[];
+    people?: Record<string, string>;
+    comments?: FigmaComment[];
+    design?: boolean;
+    toolResultFor?: (name: string, args: Record<string, unknown>) => string;
+  } = {},
+): World {
   const figma = createInMemoryFigma({ me: BILL, now: () => NOW });
   figma.seedFile(FILE, { name: "Goal Setting / Card 2482 / Meryem", comments: opts.comments ?? [], creator: SARAH });
-  const h = harness({ replies: opts.replies ?? [{ text: `The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})` }] });
+  const h = harness({ replies: opts.replies ?? reads(`The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})`), toolResult: PRD_FOUND, ...(opts.toolResultFor ? { toolResultFor: opts.toolResultFor } : {}) });
+  const askers: Array<{ unmappedAsker: boolean }> = [];
+  /** The card Delivery of each lead, by the lead's ts. */
+  const byLead = new Map<string, RecordingDelivery>();
   const marks = new Map<string, AskMark>();
   const leads: string[] = [];
   const cards: RecordingDelivery[] = [];
@@ -97,7 +115,10 @@ function world(opts: { replies?: ScriptedReply[]; people?: Record<string, string
       put: async (id, mark) => void marks.set(id, structuredClone(mark)),
     },
     threadState: h.threadState,
-    answer: (request, delivery) => runTurn(request, { ...h.deps, delivery }),
+    answer: (request, delivery, asker) => {
+      askers.push(asker);
+      return runTurn(request, { ...h.deps, delivery });
+    },
     ...(opts.design === false
       ? {}
       : {
@@ -108,11 +129,13 @@ function world(opts: { replies?: ScriptedReply[]; people?: Record<string, string
               return { ts: `1760000000.00000${leads.length}` };
             },
             permalink: async (ts) => `https://plus.slack.com/archives/${DESIGN}/p${ts.replace(".", "")}`,
-            cardDelivery: () => {
+            cardDelivery: (leadTs) => {
               const d = recordingDelivery();
               cards.push(d);
+              byLead.set(leadTs, d);
               return d;
             },
+            cardIn: async (leadTs) => byLead.get(leadTs)?.stagedAt[0] ?? null,
             designOwner: async () => owner.slack,
           },
         }),
@@ -125,6 +148,7 @@ function world(opts: { replies?: ScriptedReply[]; people?: Record<string, string
     leads,
     cards,
     owner,
+    askers,
     async run(c, fragments) {
       const result = await runFigmaEventJob(queuedFor(c, fragments), { onAsk: (job) => answerFigmaAsk(job, deps) });
       return { outcome: result.outcome, line: result.line };
@@ -190,7 +214,7 @@ describe("a mention picked from Figma's list", () => {
 describe("the reply", () => {
   it("leads with the label, answers in plain lines, and ends on the source, on the root comment", async () => {
     const w = world({
-      replies: [{ text: `**Hidden** until the first goal is set.\n\n- It shows once a goal exists.\n\nSources: [Goal Setting PRD](${PRD})` }],
+      replies: reads(`**Hidden** until the first goal is set.\n\n- It shows once a goal exists.\n\nSources: [Goal Setting PRD](${PRD})`),
     });
     const root = comment("100", "Should the bar show before a goal?");
     await ask(w, comment("101", "@uno what does the PRD say?", { parent_id: "100", client_meta: null }), [root]);
@@ -203,7 +227,7 @@ describe("the reply", () => {
   });
 
   it("keeps the answer to three lines", async () => {
-    const w = world({ replies: [{ text: `One.\nTwo.\nThree.\nFour.\nFive. [PRD](${PRD})` }] });
+    const w = world({ replies: reads(`One.\nTwo.\nThree.\nFour.\nFive. [PRD](${PRD})`) });
     await ask(w, comment("100", "@uno list them"));
     const lines = w.replies()[0]!.message.split("\n");
     assert.equal(lines[0], FIGMA_LABEL);
@@ -218,7 +242,7 @@ describe("the reply", () => {
   });
 
   it("is plain text: no Slack markup reaches the file", async () => {
-    const w = world({ replies: [{ text: `*Hidden* until <${PRD}|the PRD> says otherwise, per <@U123|meryem>.` }] });
+    const w = world({ replies: reads(`*Hidden* until <${PRD}|the PRD> says otherwise, per <@U123|meryem>.`) });
     await ask(w, comment("100", "@uno bar?"));
     const message = w.replies()[0]!.message;
     assert.doesNotMatch(message, /[<>*`]/);
@@ -256,9 +280,9 @@ describe("the reply", () => {
     let seen: { text: string; channel: string; userId: string; scope: string } | null = null;
     const w = world();
     const answer = w.deps.answer;
-    w.deps.answer = (request, delivery) => {
+    w.deps.answer = (request, delivery, asker) => {
       seen = { text: request.attachmentsText ?? request.text, channel: request.channel, userId: request.userId, scope: request.scopeInstruction ?? "" };
-      return answer(request, delivery);
+      return answer(request, delivery, asker);
     };
     await ask(w, comment("101", "@le goat what does the PRD say?", { parent_id: "100", client_meta: null }), [
       comment("100", "Should the bar show before a goal?", { user: { id: "77", handle: "meryem" } }),
@@ -350,9 +374,9 @@ describe("a change request", () => {
     const w = world({ replies: STAGES });
     const answer = w.deps.answer;
     let turns = 0;
-    w.deps.answer = async (request, delivery) => {
+    w.deps.answer = async (request, delivery, asker) => {
       turns += 1;
-      const outcome = await answer(request, delivery);
+      const outcome = await answer(request, delivery, asker);
       if (turns === 1) throw new SubrequestBudgetError(38);
       return outcome;
     };
@@ -372,13 +396,20 @@ describe("a change request", () => {
     let scope = "";
     const w = world();
     const answer = w.deps.answer;
-    w.deps.answer = (request, delivery) => {
+    w.deps.answer = (request, delivery, asker) => {
       scope = request.scopeInstruction ?? "";
-      return answer(request, delivery);
+      return answer(request, delivery, asker);
     };
     await ask(w, comment("100", "@uno when does the bar show?", { user: STRANGER }));
     assert.match(scope, /public facts only, and propose no change/);
     assert.match(w.replies()[0]!.message, /Source: /);
+  });
+
+  it("an unmapped asker's turn runs with the narrower tools, and a teammate's does not", async () => {
+    const w = world();
+    await ask(w, comment("100", "@uno when does the bar show?", { user: STRANGER }));
+    await ask(w, comment("200", "@uno and the ring?"));
+    assert.deepEqual(w.askers, [{ unmappedAsker: true }, { unmappedAsker: false }]);
   });
 });
 
@@ -445,9 +476,9 @@ describe("the budget", () => {
     let turns = 0;
     const w = world();
     const answer = w.deps.answer;
-    w.deps.answer = (request, delivery) => {
+    w.deps.answer = (request, delivery, asker) => {
       turns += 1;
-      return answer(request, delivery);
+      return answer(request, delivery, asker);
     };
     w.figma.failNext("replyToComment", new FigmaRateLimitError("Figma comment reply 429", 30_000));
     const c = comment("100", "@uno when does the bar show?");
@@ -478,5 +509,155 @@ describe("the budget", () => {
     assert.equal(MAX_ASK_TRIES, 5);
     assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, "I couldn't answer this just now. Ask in #plus-design."].join("\n")]);
     assert.equal((await w.run(c)).line.includes("already replied"), true, "and is never tried again");
+  });
+});
+
+describe("a frame's title in the reply", () => {
+  it("reads as typed: the turn's link markup leaves no backslash in Figma", async () => {
+    const OTHER = "https://www.figma.com/design/FILEKEY1?node-id=56-78";
+    const w = world({
+      replies: [
+        { text: "Reading the frame.", toolCalls: [{ name: "source_read", args: { url: OTHER } }] },
+        { text: `It is hidden until the first goal, per [the frame](${OTHER}).` },
+      ],
+      toolResultFor: (name) => (name === "source_read" ? JSON.stringify({ ok: true, title: "Bar [v2] <draft>", url: OTHER }) : PRD_FOUND),
+    });
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [
+      [FIGMA_LABEL, "It is hidden until the first goal, per Bar [v2] <draft>.", `Source: ${OTHER}`].join("\n"),
+    ]);
+  });
+});
+
+describe("the source must have been read", () => {
+  const FRAME = "https://www.figma.com/design/FILEKEY1?node-id=12-34";
+
+  it("an answer citing a link no lookup of the turn returned says it couldn't find this", async () => {
+    const w = world({ replies: [{ text: `Hidden until the first goal is set. [Goal Setting PRD](${PRD})` }] });
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+
+  it("the frame asked on is no source, though the turn read it", async () => {
+    const w = world({
+      replies: [
+        { text: "Reading the frame.", toolCalls: [{ name: "source_read", args: { url: FRAME } }] },
+        { text: `Hidden, as [the frame](${FRAME}) shows.` },
+      ],
+      toolResultFor: (name) => (name === "source_read" ? JSON.stringify({ ok: true, title: "Progress bar", url: FRAME }) : PRD_FOUND),
+    });
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+});
+
+describe("a try stopped while the card was posting", () => {
+  const STAGES: ScriptedReply[] = [
+    { text: "Drafting it.", toolCalls: [{ name: "notion_create", args: { title: "Hide the progress bar until the first goal" } }] },
+  ];
+
+  /** A world whose marks refuse, once, the first write that `when` matches. */
+  function stoppedAt(when: (mark: AskMark) => boolean): World {
+    const w = world({ replies: STAGES });
+    const put = w.deps.marks.put;
+    let stopped = false;
+    w.deps.marks.put = async (id, mark) => {
+      if (!stopped && when(mark)) {
+        stopped = true;
+        throw new SubrequestBudgetError(38);
+      }
+      return put(id, mark);
+    };
+    return w;
+  }
+
+  it("links the card when it did post, and posts no second one", async () => {
+    const w = stoppedAt((m) => m.state !== "replied" && !!m.card);
+    const c = comment("100", "@uno add it to the PRD");
+    assert.equal((await ask(w, c)).outcome, "deferred");
+    assert.equal((await w.run(c)).outcome, "handled");
+    assert.equal(w.leads.length, 1);
+    assert.equal(w.cards.length, 1, "one card");
+    assert.deepEqual(w.replies().map((r) => r.message), [
+      [
+        FIGMA_LABEL,
+        `I drafted this change for approval in #plus-design: https://plus.slack.com/archives/${DESIGN}/p1760000000000001`,
+        "Nothing changes in the file or anywhere else until a teammate approves it there.",
+      ].join("\n"),
+    ]);
+  });
+
+  it("says it couldn't draft the change when the card never posted, and posts none", async () => {
+    const w = stoppedAt((m) => m.state !== "replied" && !!m.lead);
+    const c = comment("100", "@uno add it to the PRD");
+    assert.equal((await ask(w, c)).outcome, "deferred");
+    assert.equal((await w.run(c)).outcome, "handled");
+    assert.equal(w.cards.length, 0);
+    assert.deepEqual(w.replies().map((r) => r.message), [
+      [FIGMA_LABEL, "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
+    ]);
+  });
+});
+
+describe("a reply on its way", () => {
+  it("is marked replying before it posts, so a Worker killed after it posted never posts it twice", async () => {
+    const w = world();
+    const put = w.deps.marks.put;
+    let killed = false;
+    w.deps.marks.put = async (id, mark) => {
+      if (!killed && mark.state === "replied") {
+        killed = true;
+        throw new Error("the isolate was killed");
+      }
+      return put(id, mark);
+    };
+    const c = comment("100", "@uno when does the bar show?");
+    w.figma.seedFile(FILE, { comments: [c] });
+    await assert.rejects(answerFigmaAsk({ fileKey: FILE, commentId: "100" }, w.deps), /killed/);
+    assert.equal(w.marks.get("100")?.state, "replying");
+    assert.equal(w.replies().length, 1);
+
+    const retry = await answerFigmaAsk({ fileKey: FILE, commentId: "100" }, w.deps);
+    assert.equal(retry.said, "the reply was already on the comment");
+    assert.equal(w.replies().length, 1, "no second reply");
+    assert.equal(w.marks.get("100")?.state, "replied");
+  });
+
+  it("posts on the retry when the thread does not hold it", async () => {
+    let turns = 0;
+    const w = world();
+    const answer = w.deps.answer;
+    w.deps.answer = (request, delivery, asker) => {
+      turns += 1;
+      return answer(request, delivery, asker);
+    };
+    w.figma.failNext("replyToComment", new Error("socket closed"));
+    const c = comment("100", "@uno when does the bar show?");
+    w.figma.seedFile(FILE, { comments: [c] });
+    await assert.rejects(answerFigmaAsk({ fileKey: FILE, commentId: "100" }, w.deps), /socket closed/);
+    assert.equal(w.marks.get("100")?.state, "replying");
+    assert.deepEqual(w.replies(), []);
+
+    await answerFigmaAsk({ fileKey: FILE, commentId: "100" }, w.deps);
+    assert.equal(w.replies().length, 1);
+    assert.equal(turns, 1, "the drafted reply, not a second turn");
+  });
+});
+
+describe("the decision read and the asks", () => {
+  it("still reads an ask in a resolved thread: the resolved decision reaches the night's read", () => {
+    const window = { watermark: 0, from: 0, until: Date.parse("2026-10-10T00:00:00Z") };
+    const threads = candidateThreads(
+      [
+        comment("100", "@uno we decided: hide the bar until the first goal. Add it to the PRD.", { resolved_at: "2026-10-09T16:00:00Z" }),
+        comment("101", `${FIGMA_LABEL}\nI drafted this change for approval in #plus-design.`, { parent_id: "100", user: BILL, client_meta: null }),
+        comment("102", "@goat agreed, hidden it is.", { parent_id: "100", client_meta: null }),
+      ],
+      window,
+    );
+    assert.deepEqual(
+      threads.map((t) => ({ root: t.root.id, rootRead: t.rootRead, replies: t.replies.map((r) => r.id) })),
+      [{ root: "100", rootRead: true, replies: ["102"] }],
+    );
   });
 });

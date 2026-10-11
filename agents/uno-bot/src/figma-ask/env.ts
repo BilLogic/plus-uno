@@ -10,11 +10,14 @@
 //     (ADR-030).
 //   • The turn: `runTurn` on the shared dependency builder, as Slack's and the
 //     eval's turns are, with the ThreadState Durable Object and a verdict that
-//     executes. It runs in #plus-design with the `figma` origin, so Slack is
-//     read at public visibility only (`turn/env-deps.ts`).
+//     executes. It runs in #plus-design with the `figma` origin, so every
+//     tool reads at public scope, and an unmapped asker's at public facts
+//     alone (`agent/public-scope.ts`).
 //   • #plus-design (`PLUS_DESIGN_CHANNEL_ID`): the lead is `chat.postMessage`,
 //     its link `chat.getPermalink`, and the card the Slack Delivery's own,
-//     posted in the lead's thread with Review. Who the lead asks is the
+//     posted in the lead's thread with Review. Whether a card landed under a
+//     lead is `conversations.replies` on its thread: a message the bot posted
+//     there after the lead. Who the lead asks is the
 //     night's design-owner rule (`figma-comments/read.ts`), on the night's
 //     reads: the Roadmap card, its Contributors, the Slack directory, the roles.
 //
@@ -28,7 +31,7 @@ import { readSource } from "../sweep/env";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import { runVerdict } from "../agent/resolve-proposal";
 import { figmaClientFor } from "../figma/production";
-import { getPermalink, postMessage } from "../slack/api";
+import { conversationsReplies, getBotIdentity, getPermalink, postMessage } from "../slack/api";
 import { slackDelivery } from "../slack/slack-delivery";
 import { threadStateFor } from "../thread-state/production";
 import { buildTurnDeps } from "../turn/env-deps";
@@ -65,7 +68,7 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
       },
     },
     threadState,
-    answer: (request, delivery) =>
+    answer: (request, delivery, asker) =>
       runTurn(
         request,
         buildTurnDeps(env, request, {
@@ -75,8 +78,9 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
           // No `toolThreadTs`: the ask is in Figma, so a tool has no Slack
           // message to thread its own post off. A card's lead is the thread
           // its ✅ runs in, from the moved record (`./job.ts`).
-          // Public visibility only, and recorded as a Figma ask.
+          // Public scope, and recorded as a Figma ask.
           origin: "figma",
+          unmappedAsker: asker.unmappedAsker,
         }),
       ),
     ...(channel
@@ -89,6 +93,12 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
             },
             permalink: (ts) => getPermalink(env, channel, ts).catch(() => null),
             cardDelivery: (leadTs, slackId) => slackDelivery(env, { channel, replyTs: leadTs, userMsgTs: leadTs, userId: slackId }),
+            async cardIn(leadTs) {
+              const [bot, thread] = await Promise.all([getBotIdentity(env), conversationsReplies(env, channel, leadTs, 20)]);
+              if (!thread.ok || !bot) throw new Error(`the lead's thread was not read: ${thread.ok ? "no bot identity" : (thread.error ?? "unknown")}`);
+              const card = thread.messages.find((m) => m.ts !== leadTs && ((!!bot.botId && m.bot_id === bot.botId) || m.user === bot.userId));
+              return card?.ts ?? null;
+            },
             designOwner: (title) => designOwnerOfFile(designOwnerReads(env), title),
           },
         }

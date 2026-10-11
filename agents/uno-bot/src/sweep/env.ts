@@ -45,6 +45,7 @@
 // here is measured by the meter's own trip counter, and one that tripped is
 // thrown as the budget stop the job saves and defers on.
 
+import { teamSurfacesFor } from "./team-surfaces";
 import type { Env } from "../types";
 import { LOOKUP_CEILING } from "../agent/loop-policy";
 import { selectProvider } from "../agent/run-agent";
@@ -336,17 +337,10 @@ async function sweepDepsFor(
       unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
       figmaLibraryKey: env.FIGMA_FILE_KEY?.trim() || undefined,
       botUserId: bot?.userId ?? null,
-      runningNotesDb: env.NOTION_RUNNING_NOTES_DB_ID?.trim() || undefined,
       roadmapDb: env.NOTION_ROADMAP_DB_ID?.trim() || undefined,
-      // Where a search hit may come from: the specs and the answers the team
-      // keeps (`./surfaces.ts`).
-      teamSurfaceDbs: [
-        env.NOTION_ROADMAP_DB_ID,
-        env.NOTION_HELP_TUTORS_DB_ID,
-        env.NOTION_HELP_TEACHERS_DB_ID,
-        env.NOTION_DECISIONS_DB_ID,
-        env.NOTION_MARKETPLACE_DB_ID,
-      ].flatMap((id) => (id?.trim() ? [id.trim()] : [])),
+      // Where the running notes live, and where a search hit may come from:
+      // the specs and the answers the team keeps (`./surfaces.ts`).
+      ...teamSurfacesFor(env),
       privateAllowlist: (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
         .split(",")
         .map((id) => id.trim())

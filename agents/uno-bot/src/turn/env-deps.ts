@@ -90,9 +90,12 @@ export interface TurnWiring {
   toolThreadTs?: string;
   /** Where the turn came from: a person in Slack, a Figma comment, or a debug
    *  route (the eval transport). The usage record's test-traffic rule reads
-   *  it, and a Figma turn reads Slack at public visibility only, because its
+   *  it, and a Figma turn reads every estate at public scope, because its
    *  answer lands in a file people outside the team can open. */
   origin: TurnOrigin;
+  /** On a `figma` turn: the asker is no one Team Members maps, so the turn
+   *  reads public facts alone (`agent/public-scope.ts`). */
+  unmappedAsker?: boolean;
   reporters?: TurnReporters;
 }
 
@@ -103,19 +106,21 @@ export interface TurnWiring {
  * the cancel check is its only reader.
  *
  * A `figma` turn's answer lands in a file people outside the team can open, so
- * its context is `publicOnly`: Slack is read at public visibility alone
- * (`tools/slack-search.ts`, `tools/slack-thread-read.ts`). Its own function so
+ * its context is `publicOnly`: every tool reads at public scope
+ * (`agent/public-scope.ts`), and an asker Team Members does not map reads
+ * public facts alone. Its own function so
  * `tests/turn-origin-visibility.test.ts` drives the context `buildTurnDeps`
  * hands the agent run into the tools themselves.
  *
  * @param request - The turn's request
  * @param wiring - The caller's thread ts and origin
  */
-export function toolSlackContextFor(request: TurnRequest, wiring: Pick<TurnWiring, "toolThreadTs" | "origin">): SlackContext {
+export function toolSlackContextFor(request: TurnRequest, wiring: Pick<TurnWiring, "toolThreadTs" | "origin" | "unmappedAsker">): SlackContext {
   return {
     channel: request.channel,
     ...(wiring.toolThreadTs ? { threadTs: wiring.toolThreadTs } : {}),
     ...(wiring.origin === "figma" ? { publicOnly: true } : {}),
+    ...(wiring.origin === "figma" && wiring.unmappedAsker ? { unmappedAsker: true } : {}),
     userMsgTs: request.userMsgTs,
     requestedBy: request.userId,
     ...(request.conversationType ? { conversationType: request.conversationType } : {}),

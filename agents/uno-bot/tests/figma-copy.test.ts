@@ -814,6 +814,7 @@ describe("@uno in a Figma comment (#903)", () => {
     { kind: "question", lines: ["Which card is this for?"] },
     { kind: "drafted", link: "https://plus.slack.com/archives/C1/p1" },
     { kind: "not-teammate" },
+    { kind: "not-drafted" },
     { kind: "failed" },
   ];
 
@@ -824,6 +825,13 @@ describe("@uno in a Figma comment (#903)", () => {
       passesChecklist(text);
       assert.equal([...text.matchAll(/\p{Extended_Pictographic}/gu)].length, 1, `🐐 only in the label:\n${text}`);
     }
+  });
+
+  it("a change that could not be drafted says so, and points at #plus-design", () => {
+    assert.equal(
+      figmaReplyText({ kind: "not-drafted" }),
+      ["🐐 le goat (uno-bot) · AI-generated", "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
+    );
   });
 
   const LEAD = {
