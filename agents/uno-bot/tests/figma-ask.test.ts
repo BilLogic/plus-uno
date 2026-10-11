@@ -735,6 +735,33 @@ describe("a GitHub file the turn read directly", () => {
     }
   });
 
+  it("posts the answer with the file read as its Source when the answer names it by its repo path", async () => {
+    const read = await readResult("BilLogic/plus-uno", BUTTON_PATH);
+    const w = world({
+      replies: [
+        { text: "Reading the Button.", toolCalls: [{ name: "github_read", args: { path: BUTTON_PATH } }] },
+        { text: `It comes in small, medium and large (\`${BUTTON_PATH}\`).` },
+      ],
+      toolResultFor: (name) => (name === "github_read" ? read : PRD_FOUND),
+    });
+    await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+    const readUrl = (JSON.parse(read) as { url: string }).url;
+    assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: Button.jsx — ${readUrl}`]);
+  });
+
+  it("says it couldn't find this when the path the answer names is only the folder of the file read", async () => {
+    const read = await readResult("BilLogic/plus-uno", BUTTON_PATH);
+    const w = world({
+      replies: [
+        { text: "Reading the Button.", toolCalls: [{ name: "github_read", args: { path: BUTTON_PATH } }] },
+        { text: "It comes in small, medium and large (`design-system/src/components/actions/Button`)." },
+      ],
+      toolResultFor: (name) => (name === "github_read" ? read : PRD_FOUND),
+    });
+    await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+  });
+
   it("says it couldn't find this when the cited file is not the one read", async () => {
     const w = await answered(BUTTON, await readResult("BilLogic/plus-uno", BUTTON_PATH.replace("Button.jsx", "Button.stories.jsx")));
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));

@@ -115,3 +115,13 @@ test("another repo's docs/evals/ is an ordinary folder, read like any other", as
   assert.equal(result.ok, true);
   assert.deepEqual(deps.reads, [`${SITE}:docs/evals/cases.yaml`]);
 });
+
+// An answer posted in Figma names its source by a link a lookup returned
+// (`figma-ask/job.ts`), so a read tells the model to link what it read at the
+// `url` it hands back.
+test("a file read tells the model to link its url rather than cite a bare path", async () => {
+  const result = await run({ path: "package.json" }, fakes());
+
+  assert.match(result.note ?? "", /`url`/);
+  assert.doesNotMatch(result.note ?? "", /cite the path/i);
+});

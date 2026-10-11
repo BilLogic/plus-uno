@@ -416,17 +416,49 @@ export function askInstruction(teammate: boolean): string {
  * (`threadVisibleSources`, judged with what that lookup said of who may see
  * it). A link the turn read but the answer does not cite is no source; nor is
  * one the answer cites that no lookup returned; nor the frame the ask was
- * made on, which the asker is already looking at.
+ * made on, which the asker is already looking at. With no such link, a GitHub
+ * file or directory the turn read whose whole repo path the answer writes out —
+ * `design-system/…/Button.jsx`, as `github_read` hands it — is the source, at
+ * the link that read returned.
  *
  * @param cited - The links the answer cites, in order
  * @param read - What the turn's lookups returned
  * @param asked - The frame (or the file) the ask was made on
+ * @param text - The answer, for the repo paths it names
  */
-export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string): FigmaSource | null {
+export function sourceOf(cited: readonly string[], read: readonly TaskCardSource[], asked: string, text = ""): FigmaSource | null {
   for (const url of cited) {
     if (sameFigmaPlace(url, asked)) continue;
     const source = read.find((s) => sameReadLink(url, s.url));
     if (source && threadVisibleSources([source]).length) return { name: source.text, url };
+  }
+  const named = threadVisibleSources(read)
+    .flatMap((s) => {
+      const at = pathAt(text, githubPathOf(s.url));
+      return at === null ? [] : [{ at, source: { name: s.text, url: s.url } }];
+    })
+    .sort((a, b) => a.at - b.at);
+  return named[0]?.source ?? null;
+}
+
+/** The repo path a github.com file or directory link names, decoded; null for any other link. */
+function githubPathOf(url: string): string | null {
+  const path = linkKey(url)?.github?.pathAfterRef;
+  if (!path) return null;
+  try {
+    return decodeURIComponent(path);
+  } catch {
+    return path;
+  }
+}
+
+/** Where `text` writes `path` out whole — not as part of a longer path — or null. */
+function pathAt(text: string, path: string | null): number | null {
+  if (!path) return null;
+  for (let at = text.indexOf(path); at >= 0; at = text.indexOf(path, at + 1)) {
+    const before = text[at - 1] ?? "";
+    const after = text[at + path.length] ?? "";
+    if (!/[\w/.-]/.test(before) && !/[\w/-]/.test(after) && !/^\.\w/.test(text.slice(at + path.length))) return at;
   }
   return null;
 }
@@ -566,7 +598,11 @@ function replyOf(
   const answer = delivery.answer();
   if (outcome?.disposition === "answered" && answer !== null) {
     const { lines, cited } = plainAnswer(answer);
-    return { kind: "answer", lines, source: sourceOf(cited, delivery.sources(), asked) };
+    const read = delivery.sources();
+    const source = sourceOf(cited, read, asked, answer);
+    // Links only, never the answer: what the next live miss needs to be told apart.
+    if (!source) console.log(`[figma-ask] no source: cited=[${cited.join(" ")}] read=[${read.map((s) => s.url).join(" ")}]`);
+    return { kind: "answer", lines, source };
   }
   const note = delivery.notes().at(-1);
   if (outcome?.disposition === "asked" && note) return { kind: "question", lines: plainAnswer(note).lines };
