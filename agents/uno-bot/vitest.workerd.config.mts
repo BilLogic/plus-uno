@@ -5,7 +5,8 @@
 // test in the repository. Exactly one suite genuinely needs Cloudflare's
 // runtime — the ThreadState conformance suite run against the Durable Object
 // adapter, where the thing under test IS Durable Object RPC, SQLite storage and
-// the input gate that makes "the delete is the claim" true. miniflare runs the
+// the transactions that make "the delete is the claim" true under concurrent
+// calls. miniflare runs the
 // real workerd binary, so a pass here is evidence about production rather than
 // about a mock.
 //
