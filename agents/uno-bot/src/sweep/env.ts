@@ -36,7 +36,8 @@
 //     message tags, on the bot's `im:history`.
 //   • A group DM's share: once one of its fixes has written a page, a
 //     separate share card posted and staged in the same thread
-//     (`offerSweepShareFor`); its own ✅ runs `sweep_share_post`.
+//     (`offerSweepShareFor`); its own Approve, in Review, runs
+//     `sweep_share_post`.
 //
 // THE BUDGET, AT EVERY READ. A read that ran into the lookup ceiling may come
 // back short rather than throw — a paging loop that stopped, an executor that

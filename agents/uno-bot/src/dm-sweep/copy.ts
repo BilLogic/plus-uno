@@ -1,5 +1,5 @@
-// What the DM sweep says, in a person's DM with uno-bot and — after their ✅,
-// only then — in a team channel.
+// What the DM sweep says, in a person's DM with uno-bot and — once they
+// approve it in Review, only then — in a team channel.
 //
 // Every line in the DM is uno-bot talking to the one person the DM is with,
 // so none mentions anyone. The one line that may leave the DM is the raise
@@ -12,7 +12,7 @@
 // PURE: no `Env`, no Slack module, no Workers global.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import { SHARE_CHANNEL_NAMES, SWEEP_CARD_TTL_MS } from "../sweep/cards";
+import { SHARE_CHANNEL_NAMES, SWEEP_CARD_TTL_MS, shareCard } from "../sweep/cards";
 import type { ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 
@@ -54,7 +54,7 @@ export function askText(o: { when: string; what: string }): string {
 }
 
 /**
- * The note a raise card's ✅ posts in the team channel: uno-bot's words only.
+ * The note a raise card's Approve posts in the team channel: uno-bot's words only.
  *
  * @param o.topic - What the two sources disagree on (the detector's topic)
  * @param o.sources - Their short names
@@ -96,8 +96,7 @@ export function raiseCard(o: {
     `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   ];
   return {
-    // No footer: Review is the card's only instruction.
-    card: { kind: "stated", verb: `post this note in ${where}`, lead: lines.join("\n"), footer: "", fields: [], caveats: [], operations: [...operations] },
+    card: shareCard({ where, lead: lines.join("\n"), operations }),
     operations,
   };
 }

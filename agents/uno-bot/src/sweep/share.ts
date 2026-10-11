@@ -1,7 +1,7 @@
-// What may leave a group DM once a sweep card there has been ✅'d: a second,
-// separate card that offers a reworded note.
+// What may leave a group DM once a sweep fix there has been approved: a
+// second, separate card that offers a reworded note.
 //
-// Anything found in a group DM stays in it. The fix card's ✅ applies the fix
+// Anything found in a group DM stays in it. A fix's Approve applies the fix
 // and nothing more. When that batch has written at least one page, the Worker
 // stages a SHARE CARD in the same group DM. It shows the note's exact text and
 // names the team channel it would go to — the rung the finding would take with
@@ -32,7 +32,7 @@ import { escapeSlackText } from "../slack/mrkdwn";
 import type { PendingProposal, ProposalOperation, SweepShare, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
-import { SHARE_CARD_WORDS, SHARE_CHANNEL_NAMES, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS } from "./cards";
+import { SHARE_CARD_WORDS, SHARE_CHANNEL_NAMES, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS, shareCard } from "./cards";
 
 /** The share card's own slot in its thread (`proposalSlot`). */
 export const SWEEP_SHARE_KEY = "sweep-share";
@@ -129,8 +129,7 @@ export function sweepShareCard(operations: readonly ProposalOperation[]): Propos
     "The people who could confirm the fix can confirm this. " +
       `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
   );
-  // No footer: Review is the card's only instruction.
-  return { kind: "stated", verb: `post this note in ${where}`, lead: lines.join("\n"), footer: "", fields: [], caveats: [], operations: [...operations] };
+  return shareCard({ where, lead: lines.join("\n"), operations });
 }
 
 /**

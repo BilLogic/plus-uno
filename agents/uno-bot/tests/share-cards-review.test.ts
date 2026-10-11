@@ -69,6 +69,12 @@ describe("the share cards", () => {
     assert.match(INSERT_CARD_REFUSAL, /Review/);
     assert.doesNotMatch(INSERT_CARD_REFUSAL, GATE_WORDS);
   });
+
+  it("the insert refusal asks for the right wording in the thread, since Reject keeps no reason", () => {
+    // Reject's reason is not kept on the card, so the refusal asks for the
+    // right wording as a reply in the thread.
+    assert.match(INSERT_CARD_REFUSAL, /Reject it in Review, then reply here with what it should say\./);
+  });
 });
 
 // ── Closing a share card ─────────────────────────────────────────────────────

@@ -191,8 +191,20 @@ export const SHARE_CHANNEL_NAMES: Record<SweepShare["pages"][number]["to"], stri
  *  says at the gate (`PendingProposal.stated`). */
 export const SHARE_CARD_WORDS: StatedCardWords = {
   cancelled: "Rejected, nothing posted",
-  expired: "That card closed after 72 h with no decision, so nothing was posted.",
+  expired: `That card closed after ${SWEEP_CARD_TTL_MS / 3_600_000} h with no decision, so nothing was posted.`,
 };
+
+/**
+ * A share card, as data: its lead and the posts its Approve runs. A stated
+ * card with no footer, so Review is its only instruction.
+ *
+ * @param o.where - The channel (or channels) it posts in, as people read it
+ * @param o.lead - The whole card, quoting each note exactly
+ * @param o.operations - Its `sweep_share_post` operations
+ */
+export function shareCard(o: { where: string; lead: string; operations: readonly ProposalOperation[] }): ProposalCard {
+  return { kind: "stated", verb: `post this note in ${o.where}`, lead: o.lead, footer: "", fields: [], caveats: [], operations: [...o.operations] };
+}
 
 /**
  * The share a group-DM card carries, or undefined for a card from anywhere
@@ -423,7 +435,7 @@ export function holdsInsert(operations: readonly Pick<ProposalOperation, "toolNa
 /** What a worded revision of a card holding an added answer is told. */
 export const INSERT_CARD_REFUSAL =
   ":warning: This sweep card adds text after a block, which a revision can't restage exactly, so the card stays as it is. " +
-  "Reject it in Review with what it should say instead.";
+  "Reject it in Review, then reply here with what it should say.";
 
 /** Whether a bot post is part of a sweep card: tagged as one, or — read
  *  without its metadata — opening as one does. */
