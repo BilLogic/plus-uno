@@ -484,6 +484,19 @@ export interface ReportExpiryLook { expiresAt: number; executing: boolean }
 export interface ReportExpiryEdit { report: DecisionReportRecord; revision: number }
 export const REPORT_EXPIRY_RETRY_MS = 2 * 60 * 1000;
 
+/** The look every expiry path takes at an item: its staged proposal's own
+ *  window, and whether its write is running. */
+export function reportItemLook(
+  proposal: (key: string) => { createdAt: number; ttlMs: number } | undefined,
+  executing: (key: string) => boolean,
+): (key: string) => ReportExpiryLook | undefined {
+  return (key) => {
+    const staged = proposal(key);
+    const running = executing(key);
+    return staged || running ? { expiresAt: staged ? staged.createdAt + staged.ttlMs + 1 : Infinity, executing: running } : undefined;
+  };
+}
+
 /** The next wake needed by open items or an edit Slack has yet to accept. */
 export function reportExpiryAt(rec: ReportExpiryRecord, look: (key: string) => ReportExpiryLook | undefined, now: number): number {
   let next = rec.expiryPending ? now : Infinity;

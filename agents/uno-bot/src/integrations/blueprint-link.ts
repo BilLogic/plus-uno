@@ -147,3 +147,27 @@ export function chunkBody(chunk: string | undefined, title: string | undefined):
   const head = title.trim();
   return text.startsWith(head) ? text.slice(head.length).trim() : text;
 }
+
+const PLACE_LABEL = "(?:Phase|Scenario|Path|Step|Layer|Lane)";
+const PLACE_VALUE = "[^·›\\n,;.():]+(?:\\((?:happy|variant|exception|named)\\))?";
+/** Two or more labelled segments, `·` or `›` between them — the index's form,
+ *  and the half-converted one an answer carried from an older turn keeps. */
+const LABELLED_PLACE = new RegExp(
+  `\\b${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE}(?:[^\\S\\n]*[·›][^\\S\\n]*${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE})+`,
+  "g",
+);
+
+/**
+ * Prose with every labelled blueprint place rewritten as its breadcrumb —
+ * "Phase: Release › Scenario: Version cut" reads "Release › Version cut".
+ *
+ * A place carried over from an earlier answer keeps whatever form that answer
+ * used, so the reader's form is restored on the way out rather than asked of
+ * the model.
+ */
+export function breadcrumbsInProse(text: string): string {
+  return text.replace(LABELLED_PLACE, (match) => {
+    const crumb = blueprintBreadcrumb(parseChunkTitle(match.replace(/›/g, "·")));
+    return crumb ? `${crumb}${/\s*$/.exec(match)![0]}` : match;
+  });
+}

@@ -81,6 +81,8 @@ export interface PostedCard {
   leadTs: string;
   link: string | null;
   cardTs: string;
+  /** The channel's name the reply gives; absent, it names none. */
+  where?: string;
 }
 
 /** What a comment's mark says. */
@@ -113,6 +115,8 @@ export interface FigmaAskJob {
 /** Where a teammate's change request goes: #plus-design. */
 export interface AskDesign {
   channel: string;
+  /** The channel's name, as the Figma reply gives it; absent for a DM. */
+  name?: string;
   /** Post the lead, top level. */
   post(text: string): Promise<{ ts: string } | null>;
   /** A message's link, or null when Slack will not give one. */
@@ -254,7 +258,7 @@ async function draft(
   // A card a stopped try already posted: its reply, and no second turn.
   if (pending.card) {
     await moveCard(deps.threadState, channel, pending.card, []);
-    return { reply: figmaReplyText({ kind: "drafted", link: pending.card.link }), said: "drafted, from an earlier try" };
+    return { reply: figmaReplyText(draftedReply(pending.card)), said: "drafted, from an earlier try" };
   }
   // A try that stopped while a card was posting may have posted it. No second
   // card: the lead's thread says whether the first one landed.
@@ -292,7 +296,7 @@ async function draft(
           await deps.marks.put(job.commentId, pending);
           const result = await design.cardDelivery(lead.ts, slackId).card(card);
           if (result.ok && result.ts) {
-            posted.card = { leadTs: lead.ts, link: await design.permalink(lead.ts), cardTs: result.ts };
+            posted.card = { leadTs: lead.ts, link: await design.permalink(lead.ts), cardTs: result.ts, ...(design.name ? { where: design.name } : {}) };
             pending.card = posted.card;
             await deps.marks.put(job.commentId, pending);
             // The comment shows the line linking the card, not the card.
@@ -579,8 +583,9 @@ async function stagedEarlier(deps: FigmaAskDeps, channel: string, pending: Pendi
   }
   if (cardTs === null) return never;
   const link = await design.permalink(lead.ts);
-  if (cardTs) await moveCard(deps.threadState, channel, { leadTs: lead.ts, link, cardTs }, []);
-  return { reply: figmaReplyText({ kind: "drafted", link }), said: "drafted, from an earlier try's lead" };
+  const where = design.name ? { where: design.name } : {};
+  if (cardTs) await moveCard(deps.threadState, channel, { leadTs: lead.ts, link, cardTs, ...where }, []);
+  return { reply: figmaReplyText({ kind: "drafted", link, ...where }), said: "drafted, from an earlier try's lead" };
 }
 
 /** What the reply says, from what the turn came to; null for nothing. */
@@ -591,7 +596,7 @@ function replyOf(
   teammate: boolean,
   asked: string,
 ): FigmaReply | null {
-  if (card) return { kind: "drafted", link: card.link };
+  if (card) return draftedReply(card);
   const refused = delivery.refusedCard();
   if (refused === "not-allowed") return teammate ? { kind: "not-drafted" } : { kind: "not-teammate" };
   if (refused === "not-posted") return { kind: "not-drafted" };
@@ -613,7 +618,12 @@ function replyOf(
 
 /** What the comment shows of a posted card: the lines linking it. */
 function draftedLine(card: PostedCard): string {
-  return figmaReplyLines({ kind: "drafted", link: card.link }).join("\n");
+  return figmaReplyLines(draftedReply(card)).join("\n");
+}
+
+/** The reply for a posted card: its link, and its channel's name when it has one. */
+function draftedReply(card: PostedCard): FigmaReply {
+  return { kind: "drafted", link: card.link, ...(card.where ? { where: card.where } : {}) };
 }
 
 /**
