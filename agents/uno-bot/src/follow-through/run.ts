@@ -116,6 +116,7 @@ import {
   type CardCondition,
 } from "./rules";
 import type { CardTodoDetector } from "./todo";
+import type { GapNotes } from "../usage/gap-notes";
 
 /** New card follow-ups one end of day keeps; the rest wait a night. */
 export const MAX_NEW_PER_NIGHT = 15;
@@ -633,6 +634,9 @@ export interface DueDeps {
   store: CommitmentStore;
   markThread(channel: string, thread: string): Promise<void>;
   config: FollowThroughConfig;
+  /** Where someone a posted follow-up could not tag is noted to the lead;
+   *  absent, nobody is. */
+  gaps?: Pick<GapNotes, "untagged">;
   dryRun?: boolean;
 }
 
@@ -893,6 +897,10 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
   const sent = await deps.slack.post(group.to, { text: report.text, blocks: report.blocks });
   if (!sent.ok || !sent.ts) return [...(await Promise.all(shown.map((a) => holdCard(deps, a.c, now, runDate, "Slack refused the post")))), ...later];
   const thread = group.to.threadTs ?? sent.ts;
+  // Posted without tagging someone it names: the lead hears which Team
+  // Members cell would let it, once a month at most per person.
+  const untagged = [...new Set(shown.flatMap((a) => a.text.unmatched ?? []))];
+  if (untagged.length && !deps.dryRun) await deps.gaps?.untagged(untagged);
   const kept = await deps.reports.putReport(reportRecord(group.to.channel, sent.ts, report, FOLLOW_THROUGH_CARD_TTL_MS)).then(
     () => true,
     (err: unknown) => {

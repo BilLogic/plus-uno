@@ -19,7 +19,7 @@ import { charge, rethrowIfBudget } from "../net";
 import { findTeamMembers } from "../integrations/notion";
 import { slackDirectoryFor } from "../tools/slack-people";
 import { openConversation, postMessage } from "../slack/api";
-import { runTeamGaps, type TeamGapsReport } from "./team-gaps";
+import { gapNotes, type GapNotes } from "./gap-notes";
 import {
   syncTeamRoles,
   TEAM_ROLES_KV_KEY,
@@ -144,27 +144,35 @@ export async function storedTeamRoles(env: Pick<Env, "HARNESS_KV">): Promise<Sto
 }
 
 /**
- * Monday's DM on `Env`: the stored map's unmatched names to `LEAD_USER_ID`
- * alone, in their DM with uno-bot, with the bot token.
+ * The Team Members gap notes on `Env`: the stored map, a 30-day mark per
+ * person in HARNESS_KV, and a DM to `LEAD_USER_ID` alone, in their DM with
+ * uno-bot, with the bot token. No HARNESS_KV, or no lead, notes nobody: a
+ * note with no mark would repeat.
  *
  * @param env - Worker bindings
- * @param opts - `dryRun` lists the names and DMs nobody
  */
-export async function runTeamGapsOnEnv(env: Env, opts: { dryRun: boolean }): Promise<TeamGapsReport> {
-  return runTeamGaps(
-    {
-      read: () => storedTeamRoles(env),
-      lead: env.LEAD_USER_ID?.trim() || null,
-      now: () => Date.now(),
-      async dm(userId, text) {
-        const open = await openConversation(env, userId);
-        if (!open.ok) return { ok: false, error: open.error };
-        const res = await postMessage(env, { channel: open.channel, text });
-        return res.ok ? { ok: true } : { ok: false, error: res.error ?? "post failed" };
+export function gapNotesFor(env: Env): GapNotes {
+  const kv = env.HARNESS_KV;
+  return gapNotes({
+    lead: (kv && env.LEAD_USER_ID?.trim()) || null,
+    read: () => storedTeamRoles(env),
+    marks: {
+      async has(key) {
+        charge(1, "kv");
+        return (await kv!.get(key)) !== null;
+      },
+      async put(key, ttlS) {
+        charge(1, "kv");
+        await kv!.put(key, "1", { expirationTtl: ttlS });
       },
     },
-    opts,
-  );
+    async dm(userId, text) {
+      const open = await openConversation(env, userId);
+      if (!open.ok) return { ok: false, error: open.error };
+      const res = await postMessage(env, { channel: open.channel, text });
+      return res.ok ? { ok: true } : { ok: false, error: res.error ?? "post failed" };
+    },
+  });
 }
 
 /**

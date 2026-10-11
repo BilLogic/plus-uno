@@ -36,7 +36,7 @@ import { slackDelivery } from "../slack/slack-delivery";
 import { threadStateFor } from "../thread-state/production";
 import { buildTurnDeps } from "../turn/env-deps";
 import { runTurn } from "../turn/index";
-import { figmaPeopleFor, teamRolesFor } from "../usage/production";
+import { figmaPeopleFor, gapNotesFor, teamRolesFor } from "../usage/production";
 import { answerFigmaAsk, ASK_MARK_TTL_S, type AskMark, type FigmaAskDeps, type FigmaAskResult } from "./job";
 
 /** One key per comment asked about. */
@@ -57,6 +57,7 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
   return {
     figma,
     people: () => figmaPeopleFor(env),
+    gaps: gapNotesFor(env),
     marks: {
       async get(commentId) {
         charge(1, "kv");
