@@ -330,7 +330,7 @@ async function submitReview(env: Env, payload: InteractionPayload, ctx: Executio
 
   const submitted = draftSubmitOf(view.state);
   if (!submitted.ok) return Response.json({ response_action: "errors", errors: submitted.errors });
-  const { decision, note } = submitted;
+  const { decision, note, choice } = submitted;
   const underWay = { confirm: "Approving…", revise: "Sending your note…", cancel: "Rejecting…" }[decision];
   ctx.waitUntil(
     runReviewDecision(
@@ -342,6 +342,7 @@ async function submitReview(env: Env, payload: InteractionPayload, ctx: Executio
         userId,
         decision,
         ...(note ? { note } : {}),
+        ...(choice ? { choice } : {}),
         // Only the draft carries saved edits, and only Approve writes them.
         ...(decision === "confirm" && card.edits ? { edits: card.edits } : {}),
       },

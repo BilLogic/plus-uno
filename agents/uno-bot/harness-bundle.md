@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,364 chars from 16 files**, against an assembled budget of 175,500 (1,136 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,980 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,573 chars from 16 files**, against an assembled budget of 175,500 (927 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,189 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,613 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−16,958 ide-only) | 101,174 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 115,874 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,135 (−7,230 ide-only) | 150,051 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 153,335 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 159,851 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,514 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,364 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,344 (−7,288 ide-only) | 150,260 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 153,544 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,060 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,723 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,573 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,12 +46,12 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 98,465 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,107 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,470 |
-| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 24,805 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 30,802 |
+| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -987,6 +987,8 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
    **A report's decision card** (`agents/uno-bot/src/slack/decision-cards.ts`): a plain parent line, then one card per item (ten at most), each with Review and one or two Open buttons. Each item is its own proposal, decided only in its pop-up.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
+Shared report items redraw to **Closed, no decision** when their window ends, with View instead of Review. The alarm queues the edit; failed edits retry, while decided items and message metadata stay intact.
+
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
 
 **Reactions outside the gates are the bot's wit channel.** Code adds 👀 when a message arrives and ❌ when a turn fails, and no other reaction. The model adds at most one per message, any workspace emoji, standard or custom, matched to the content (the budget: `agents/uno-bot/AGENT.md § Emoji budget`; the register: § Slack etiquette). Only the gate semantics above are reserved: ✅ (and 👍) and ⛔ (and ❌) carry meaning on proposal cards, and ✅/🔁/❌ on review verdicts, so `slack_react` refuses the card set and the ❌ on a failure is code's.
@@ -1483,10 +1485,10 @@ When a thread settles something a linked Figma file, `design-system/` code, Stor
 - **Checked first:** before asking about a Figma file, the morning run reads when the file last changed. If that was after the decision, it also reads the frame the thread linked, and the `chill` tier judges whether the frame's text now shows the decision. A frame that shows it gets no question, and the finding is dropped. The judge sees text only, so a layout or visual decision is still asked about.
 - **The report:** the next weekday morning run posts once in that thread, on the shared decision card (`docs/connectors/slack.md` § Two gates). Its parent line counts every file the thread discussed: "This thread settled two decisions that their Figma files have not caught up with." Each file whose intake the thread drafts is a card in its carousel, titled "<file> — <frame>" when the thread linked a frame and by the file's name otherwise, with its owner @-mentioned and when the file last changed beneath, and the body "Thread settled "<what>" on Oct 6 · the file has not changed since Oct 2." When the file changed after the decision but the frame doesn't show it, the card says it "changed Oct 7, unconfirmed". For code, Storybook or a file that couldn't be read, it says the file "may not show it yet". Each card has **Review** and **Open**, which goes to the frame or file the thread linked. The report goes where `pickDestination` puts it, as a sweep card does.
 - **While it's live:** Figma's file-change notification looks at the file again about 30 minutes after an edit, and both scheduled runs look too. Once a Figma file shows its decision, its card is retired first, so no Approve can file it, then redrawn in place to say "Updated Sep 30. Nothing to do." with Review gone. A pointer-only message is edited to "The file now shows this thread's decision, updated Sep 30. Nothing to do." once every file it names shows its decision. Nothing is posted. A card for code is left for its owner, and so is a pointer whose card's Approve already filed the intake.
-- **The drafted intakes:** each card is its own proposal, holding one intake. Review's **Approve** files a Roadmap card from the PRD template (`notion_create`, surface `prd`) for a Figma file, or a `harness-intake` issue (`github_issue_create`) for code or a repo file; **Reject** files nothing. Review is the only way to decide a card: a typed reply, an emoji or the model's call decides none, and **Needs changes** is answered that the intake is drafted from the thread as it stands. The Product Pillar is only ever a value the Roadmap already offers, taken from a Roadmap card the thread linked (Universal for the design-system library). An unknown value is left out, and Review says so.
+- **The drafted intakes:** each card is its own proposal, holding one intake. Review offers **File an intake**, **Already updated** and **Didn't touch this file**. Filing creates a Roadmap card from the PRD template (`notion_create`, surface `prd`) for a Figma file, or a `harness-intake` issue (`github_issue_create`) for code or a repo file; the other answers close the card with nothing written. Review is the only way to decide a card: a typed reply, an emoji or the model's call decides none. Cards posted before these choices keep Approve/Reject. The Product Pillar is only ever a value the Roadmap already offers, taken from a Roadmap card the thread linked (Universal for the design-system library). An unknown value is left out, and Review says so.
 - **The public repo:** an issue drafted from a private channel, a group DM or a DM carries only the file and one neutral line, with no thread words and no link back. Any `@handle` in an issue's text is set in code. A Roadmap card from a private channel carries the thread's words after an Approve from someone in it.
 - **One intake per file:** when several threads discussed the same file, the first gets its card and the others get a one-line pointer to it in their parent line, with no card. A thread whose files are all drafted elsewhere gets the parent line and its pointers alone, which ping nobody. While that card is live, a new thread about the file gets the pointer too, and a thread whose own drift card is live waits for it. Each thread is asked about a given file once.
-- **Terms:** a card's confirmers are its file's owner plus everyone who posted in the threads that discussed it that morning; the Review pop-up names who can decide. It's open for 72 h. After that it gets no re-ping and no edit, and a late decision is told nothing was filed.
+- **Terms:** a card's confirmers are its file's owner plus everyone who posted in the threads that discussed it that morning; the Review pop-up names who can decide. It's open for 72 h, then redraws to "Closed, no decision" with View instead of Review. It gets no re-ping; a late decision is told nothing was filed.
 
 ## Figma comment decisions
 
@@ -1519,16 +1521,18 @@ The same end-of-day read also looks for **commitments**: someone in a swept thre
 
 Three more follow-ups ride the commitments' schedule and limits: the same end-of-day detection, the 9 am ET weekday morning post, and one follow-up at most and then lapsed. They have a morning budget of their own, two a person: a person's own reminders (promises, "remind me") go first and keep their own two, so a card backlog leaves them on time. The code is `agents/uno-bot/src/follow-through/`.
 
-- **F3, a card to-do with no card.** A thread or a running note says to create a Roadmap card ("Bill to create a card for the facelift last stage", "can someone make a card for this"). Two working days on, uno-bot searches the Roadmap by the to-do's words; a matching card closes it silently. Otherwise it asks "Want me to draft a Roadmap card for …?", mentioning the assignee, or the note's takers when nobody was named. "Draft it" (a button, or a ✅ reaction, § Who answers) stages the drafted card (the PRD template, its own ✅ files it); "Drop it" (or 🙅) drops it. A message kept as a card to-do is passed over as a promise, so it gets one reminder, not two. Running notes reach it through the notes job, team notes only.
-- **F4, an active card with no owner.** A card in WIP or Under Review with an empty Contributor and no edit for 7 days; a card waiting in Need PRD / Under Playground or Ready for Design is queued work, and is passed over. "Who should take …?" mentions the card's creator. Only someone the question asked (the card's creator, or a person it mentioned) can name the owner: their reply naming exactly one person ("@Maya"), or their own "me", "mine" or "I'll take it", stages the Contributor change. The follow-up closes once the card shows a Contributor; a proposal nobody applies leaves it open for its follow-up. Cards uno-bot's own integration created are passed over.
-- **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. "Is it still moving?" mentions the Contributors, with buttons Done, Still on it (checked again in 3 weeks, at most twice, as a promise's ⏳) and Drop it, or the reactions 🙌 ⏳ 🙅. After a Done or a Drop it, uno-bot lists the card's live Design Status options in the thread, mentioning whoever answered, read from the Roadmap schema, Shipped and Under Dev first for 🙌 and Archived first for 🙅. A reply with a number or a name typed whole stages the move on a ✅ card. The first other reply gets the options again, once, and stages nothing; after that, and after 72 h, replies are the thread's own. Only a reply from an owner or from whoever answered counts.
-- **Who answers:** on F3 and F5, anyone's tap on a button. A card is the team's, so whoever knows where it stands answers for it, and the edit that replaces the buttons, the final status edit included, ends "Answered by @name". A reaction may be a casual "seen", so it counts only from someone the follow-up mentioned, and for F3's ✅ also from anyone who posted in the to-do's thread. A tap that changes nothing (the follow-up already answered or closed, a Still on it past its two) gets an ephemeral line to the tapper saying why, as a promise's does.
-- **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most two new card questions a channel each morning. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
-- **Replies:** the thread of an F4 question or an F5 options list carries a KV mark while it waits, so a short reply anywhere else costs no database read. A failed reply check hands the reply to the thread as usual.
+- **The card:** each follow-up goes up on the shared decision card: a parent line mentioning the people asked, then one card per follow-up with Review and Open. One person's follow-ups in one place on one morning share a message, as a carousel. Review is the only answer, decided in the pop-up, nothing to tap or type. A decided card names the answer and who gave it ("Done · @Bea").
+- **F3, a card to-do with no card.** A thread or a running note says to create a Roadmap card ("Bill to create a card for the facelift last stage", "can someone make a card for this"). Two working days on, uno-bot searches the Roadmap by the to-do's words; a matching card closes it silently. Otherwise its card names the to-do, mentioning the assignee, or the note's takers when nobody was named, with Review and Open source. Review holds the drafted card (the PRD template), editable under Edit fields; Approve files it, and Reject drops the to-do. A message kept as a card to-do is passed over as a promise, so it gets one reminder, not two. Running notes reach it through the notes job, team notes only.
+- **F4, an active card with no owner.** A card in WIP or Under Review with an empty Contributor and no edit for 7 days; a card waiting in Need PRD / Under Playground or Ready for Design is queued work, and is passed over. Its card mentions the card's creator. Review offers Assign (the creator becomes its Contributor) or Leave it (nobody is set, and it is not asked about again until the card changes). Another owner is set on the card itself. A creator with no Notion match gets no card that morning; the follow-up is checked again the next, and lapses after three such mornings like any hold. The follow-up closes once the card shows a Contributor; one nobody answers is open for its follow-up. Cards uno-bot's own integration created are passed over.
+- **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. Its card mentions the Contributors, with two buttons, Review and Open card. Review offers Done (moves it to the Design Status in its select, the board's next status after its own by default), Still on it (nothing is written, and it is checked again 3 weeks from that card, at most twice, as a promise's ⏳; the card says the date) and Drop it (archived).
+- **Who answers:** anyone. A card is the team's, so whoever knows where it stands decides it in Review.
+- **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most two new card questions a channel each morning; the rest wait for the next. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
+- **Posted before the shared card:** a follow-up that went up with buttons (Draft it, Drop it; Done, Still on it, Drop it) or asked for a typed owner or Design Status keeps those answers until it closes. Anyone's tap counts; a reaction counts only from someone it mentioned. Its thread carries a KV mark while it waits for a typed reply, so a short reply anywhere else costs no database read. Once its follow-up goes up on the shared card, the old message's buttons and reactions answer nothing and say to press Review on the card.
+- **A stopped morning:** follow-ups held for the morning's post and not yet posted when the run stops for its budget go back to due, so the retry posts them.
 - **Passed over:** a card with nobody to ask in Slack, or no channel, is marked in KV and looked at again a week on; a stale card with a recent comment, once that comment is three weeks old.
 - **Evidence first:** each morning re-reads the card. A Contributor set, a status moved, an edit or a comment since closes it with no post.
 - **One message a card a week:** a follow-up's follow-up waits five working days, and a card asked about in the past week is not asked about again.
-- **Proposal cards** sit in the follow-up's thread for 72 h, in their own slot, confirmable by the people it names and whoever answered. Select values are exact-matched: a pillar only when the Roadmap offers it, a status refused rather than created.
+- **Proposals** stay decidable for 72 h, one per card, in the follow-up's thread. A card whose proposal did not stage says so and comes back the next morning. Select values are exact-matched: a pillar only when the Roadmap offers it, a status refused rather than created.
 - **Stored:** a `commitments` row of kind `card_todo`, `card_unowned` or `card_stale`, keyed to the card's page id. Titles and links stay in KV (ADR-030).
 
 ## DMs with uno-bot
@@ -1591,7 +1595,7 @@ One canvas-agent conversation. Ledger entries reference it via agentSessionId (c
 ### `audit_findings`
 Audit / whatif / import-sweep outputs. Written by skills (IDE service key or canvas authenticated agent); humans triage by status. Prefixed on 2026-08-30 because the bare word `findings` gave a reader no clue which process produces the rows; the CONCEPT is still a finding everywhere else.
 
-4 of 13 columns described.
+6 of 15 columns described.
 
 | Column | Meaning |
 |---|---|
@@ -1608,6 +1612,8 @@ Audit / whatif / import-sweep outputs. Written by skills (IDE service key or can
 | `status` | — |
 | `created_at` | — |
 | `updated_at` | — |
+| `impact` | How much fixing this finding matters to the service: low, medium or high. Null on a finding recorded before the rating existed, which reads as unrated. |
+| `effort` | How much work the fix takes: low, medium or high. Null on a finding recorded before the rating existed, which reads as unrated. |
 
 ### `authoring_changes`
 Append-only record of every authoring write. Audit-only: the in-memory stack in src/lib/authoringSession.ts is still the undo affordance, and nothing replays `revert` from here. A row with `deleted_kind` set is a deletion and carries the rows it destroyed; `public.trash` is the view over exactly those.

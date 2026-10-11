@@ -68,7 +68,7 @@ export async function addToWeeklyIntake(input: Record<string, unknown>, deps: In
   if (!/^\d{4}-\d{2}-\d{2}$/.test(weekOf)) return failed("missing 'week_of'");
   if (!section) return failed("missing 'section'");
   const key = weeklyIntakeKey(weekOf);
-  const comment = (issue: FiledIssue) => deps.comment({ issue_number: issue.number, comment: section });
+  const comment = async (issue: FiledIssue) => intakeReceipt(await deps.comment({ issue_number: issue.number, comment: section }), issue);
 
   for (let tries = 0; tries < BUSY_TRIES; tries++) {
     const claim = await deps.filing.claim(key);
@@ -109,11 +109,20 @@ async function fileOrFind(
       await deps.filing.settle(key, { number: filed.issue_number, url: filed.issue_url });
       release = false;
     }
-    return result;
+    return typeof filed.issue_number === "number" && typeof filed.issue_url === "string"
+      ? intakeReceipt(result, { number: filed.issue_number, url: filed.issue_url })
+      : result;
   } catch (err) {
     const cause = err instanceof Error ? err.message : String(err);
     return failed(`couldn't read this week's intakes, so nothing was filed: ${cause}`);
   } finally {
     if (release) await deps.filing.settle(key, null).catch(() => {});
   }
+}
+
+/** The successful write's actual intake, for the shared report redraw. */
+function intakeReceipt(result: string, issue: FiledIssue): string {
+  const written = JSON.parse(result) as Record<string, unknown>;
+  if (written.ok === false) return result;
+  return JSON.stringify({ ...written, issue_number: issue.number, issue_url: issue.url, report_done: `added to DS precedence intake #${issue.number}.` });
 }

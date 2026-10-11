@@ -152,6 +152,14 @@ export function createDurableObjectThreadState(
       return hop().updateReport(messageTs, change, now());
     },
 
+    prepareReportExpiry(messageTs) {
+      return hop().prepareReportExpiry(messageTs, now());
+    },
+
+    acknowledgeReportExpiry(messageTs, revision) {
+      return hop().acknowledgeReportExpiry(messageTs, revision, now());
+    },
+
     // ----- executions -----
 
     beginExecution(proposal: PendingProposal): Promise<void> {

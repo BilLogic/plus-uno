@@ -337,9 +337,52 @@ export interface PendingProposal {
    * and nowhere else.
    */
   item?: { messageTs: string; id: string };
+  /**
+   * The card's own answers, offered in the Review pop-up in place of Approve,
+   * Needs changes and Reject (`ReviewChoice`). Absent, those three.
+   */
+  choices?: ReviewChoice[];
+  /**
+   * Selects the stager offers under Edit fields beside the tool's own fields
+   * (`slack/review-fields.ts`): a value at `path` in operation `op` (default
+   * 0), from a database's live options, exact-matched again on Approve.
+   */
+  selects?: ProposalSelect[];
+}
+
+/**
+ * One answer a card offers in its Review pop-up. Choosing it decides the card
+ * as its `verdict`: `confirm` runs the batch with `args` merged into each
+ * operation's input, `cancel` writes nothing. The decided card names it:
+ * "<past or label> · <@who>", with `decided` as its body when set.
+ */
+export interface ReviewChoice {
+  /** Unique within the card; no `:`. */
+  value: string;
+  /** The radio option's text, mrkdwn. */
+  label: string;
+  verdict: "confirm" | "cancel";
+  /** Merged into each operation's input on confirm, objects key by key. */
+  args?: Record<string, unknown>;
+  /** How the decided card names it, mrkdwn ("Dropped"); absent, `label`. */
+  past?: string;
+  /** The decided card's body after this choice, plain text. */
+  decided?: string;
+}
+
+/** A select a stager offers under Edit fields (`PendingProposal.selects`). */
+export interface ProposalSelect {
+  op?: number;
+  /** Dot path in the operation's input. */
+  path: string;
+  label: string;
+  source: { database: "roadmap" | "decisions"; property: string };
 }
 
 // ── Decision reports ─────────────────────────────────────────────────────────
+
+/** The answer an item was decided by: its value, its name on the decided card, and its decided body. */
+export type ChosenAs = Pick<ReviewChoice, "value" | "label" | "decided">;
 
 /** One item a report asks someone to decide, as its card shows it. */
 export interface ReportItem {
@@ -362,15 +405,15 @@ export interface ReportItem {
   detail?: string;
 }
 
-/** Where one item of a report stands. `at` is epoch ms. */
+/** Where one item of a report stands. `at` is epoch ms. `as` is the card's
+ *  own answer, when it was decided by one (`ReviewChoice`). */
 export type ReportItemState =
   | { kind: "open" }
   | { kind: "changes-asked"; by: string }
-  | { kind: "approved"; by: string; at: number }
-  | { kind: "failed"; by: string; at: number; reason: string }
-  | { kind: "rejected"; by: string; reason?: string }
-  /** Sent back with a note against the item, the note written where
-   *  the report keeps its record (a weekly DS precedence intake): closed. */
+  | { kind: "approved"; by: string; at: number; as?: ChosenAs; done?: string }
+  | { kind: "failed"; by: string; at: number; reason: string; as?: ChosenAs }
+  | { kind: "rejected"; by: string; reason?: string; as?: ChosenAs }
+  /** A note written to the report's record closes the item. */
   | { kind: "noted"; by: string; note: string }
   | { kind: "expired" }
   /** Shown, but its proposal never staged: nothing to decide. */
@@ -426,6 +469,44 @@ export type ReportChange =
 
 /** How long a report's record outlives its items' TTL. */
 export const REPORT_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Storage envelope for expiry delivery. Revision fences an edit acknowledgement
+ * from a decision that changed the report while Slack was being called. */
+export interface ReportExpiryRecord {
+  report: DecisionReportRecord;
+  createdAt: number;
+  revision?: number;
+  expiryPending?: boolean;
+  /** Staging remembers each item's deadline after its proposal is collected. */
+  deadlines?: Record<string, number>;
+}
+export interface ReportExpiryLook { expiresAt: number; executing: boolean }
+export interface ReportExpiryEdit { report: DecisionReportRecord; revision: number }
+export const REPORT_EXPIRY_RETRY_MS = 2 * 60 * 1000;
+
+/** The next wake needed by open items or an edit Slack has yet to accept. */
+export function reportExpiryAt(rec: ReportExpiryRecord, look: (key: string) => ReportExpiryLook | undefined, now: number): number {
+  let next = rec.expiryPending ? now : Infinity;
+  for (const entry of rec.report.entries) {
+    if (entry.state.kind !== "open" && entry.state.kind !== "changes-asked") continue;
+    const proposal = look(itemProposalKey(rec.report.messageTs, entry.id));
+    next = Math.min(next, proposal?.executing ? now + REPORT_EXPIRY_RETRY_MS : proposal?.expiresAt ?? rec.deadlines?.[entry.id] ?? rec.createdAt + rec.report.ttlMs + 1);
+  }
+  return next;
+}
+
+/** Close only items whose own window ended, leaving in-flight writes alone. */
+export function expiredReport(rec: ReportExpiryRecord, look: (key: string) => ReportExpiryLook | undefined, now: number): ReportExpiryRecord {
+  let changed = false;
+  const entries = rec.report.entries.map((entry): ReportEntry => {
+    if (entry.state.kind !== "open" && entry.state.kind !== "changes-asked") return entry;
+    const proposal = look(itemProposalKey(rec.report.messageTs, entry.id));
+    if (proposal?.executing || now < (proposal?.expiresAt ?? rec.deadlines?.[entry.id] ?? rec.createdAt + rec.report.ttlMs + 1)) return entry;
+    changed = true;
+    return { ...entry, state: { kind: "expired" } };
+  });
+  return changed ? { ...rec, report: { ...rec.report, entries }, revision: (rec.revision ?? 0) + 1, expiryPending: true } : rec;
+}
 
 /** A report with one change applied, or null when it names no entry. */
 export function changedReport(report: DecisionReportRecord, change: ReportChange): DecisionReportRecord | null {
@@ -1016,6 +1097,11 @@ export interface ThreadState {
    * so two items decided at once both land.
    */
   updateReport(messageTs: string, change: ReportChange): Promise<DecisionReportRecord | null>;
+
+  /** Atomically close overdue open items and return a redraw until acknowledged. */
+  prepareReportExpiry(messageTs: string): Promise<ReportExpiryEdit | null>;
+  /** A successful edit acknowledges only the revision actually sent to Slack. */
+  acknowledgeReportExpiry(messageTs: string, revision: number): Promise<void>;
 
   // ----- executions: a won ✅, from the claim until its outcome is told -----
 

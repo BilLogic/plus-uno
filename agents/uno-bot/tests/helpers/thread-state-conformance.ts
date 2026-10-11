@@ -96,7 +96,8 @@ export function runThreadStateConformance(
   runner: ConformanceRunner,
 ): void {
   function setup(): { store: ThreadState; clock: TestClock } {
-    const clock = makeTestClock();
+    // Keep runtime alarms in the future; TTL assertions advance only this clock.
+    const clock = makeTestClock(Date.now() + 24 * 60 * 60 * 1000);
     return { store: makeStore({ now: () => clock.now() }), clock };
   }
 
@@ -1207,6 +1208,36 @@ export function runThreadStateConformance(
     assert.deepEqual(kept?.entries.map((e) => e.state.kind), ["approved", "rejected"]);
     assert.equal(await store.updateReport("1700.9", { id: "zz", state: { kind: "expired" } }), null, "no such item");
     assert.equal(await store.updateReport("1700.0", { id: "a", state: { kind: "expired" } }), null, "no such report");
+  });
+
+  it("expiry preserves a concurrent decision and acknowledges only the version redrawn", async () => {
+    const { store, clock } = setup();
+    await store.putReport(report());
+    clock.advance(HOUR_MS + 1);
+    await Promise.all([
+      store.prepareReportExpiry("1700.9"),
+      store.updateReport("1700.9", { id: "a", state: { kind: "approved", by: "U1", at: 5 } }),
+    ]);
+    assert.deepEqual((await store.getReport("1700.9"))?.entries.map((e) => e.state.kind), ["approved", "expired"]);
+    const edit = await store.prepareReportExpiry("1700.9");
+    assert.ok(edit);
+    await store.updateReport("1700.9", { id: "b", state: { kind: "rejected", by: "U2" } });
+    await store.acknowledgeReportExpiry("1700.9", edit.revision);
+    const changed = await store.prepareReportExpiry("1700.9");
+    assert.ok(changed, "a changed report is still owed a redraw");
+    assert.deepEqual(changed.report.entries.map((e) => e.state.kind), ["approved", "rejected"]);
+    await store.acknowledgeReportExpiry("1700.9", changed.revision);
+    assert.equal(await store.prepareReportExpiry("1700.9"), null);
+  });
+
+  it("expiry remembers a revised item's shorter window after its proposal is collected", async () => {
+    const { store, clock } = setup();
+    await store.putReport(report());
+    await store.putProposal(proposal({ proposalTs: "1700.9#a", ttlMs: 1000, item: { messageTs: "1700.9", id: "a" } }));
+    clock.advance(1001);
+    assert.equal((await store.getProposalByTs("1700.9#a")).state, "expired", "this read collects the proposal");
+    const edit = await store.prepareReportExpiry("1700.9");
+    assert.deepEqual(edit?.report.entries.map((e) => e.state.kind), ["expired", "open"]);
   });
 
   it("a report's item is replaced by its revision in place, open again under a new id", async () => {

@@ -29,6 +29,8 @@ import {
   ownText,
   REPORT_GRACE_MS,
   changedReport,
+  expiredReport,
+  type ReportExpiryRecord,
   claimedFiling,
   proposalReplyThread,
   proposalSlot,
@@ -88,7 +90,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
   const history = new Map<string, HistoryRecord>();
   const proposals = new Map<string, ProposalRecord>();
-  const reports = new Map<string, { report: DecisionReportRecord; createdAt: number }>();
+  const reports = new Map<string, ReportExpiryRecord>();
   /** A report's record while it lasts: its items' TTL, then the grace. */
   const liveReport = (messageTs: string) => {
     const rec = reports.get(messageTs);
@@ -192,6 +194,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // the one a racing ✅ has to be able to find, so it is the last thing to
       // land.
       proposals.set(proposal.proposalTs, { proposal, createdAt: now() });
+      if (proposal.item) {
+        const rec = reports.get(proposal.item.messageTs);
+        if (rec) reports.set(proposal.item.messageTs, { ...rec, deadlines: { ...rec.deadlines, [proposal.item.id]: now() + proposalTtlMs(proposal) + 1 } });
+      }
       return { retired };
     },
 
@@ -288,8 +294,24 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       const rec = liveReport(messageTs);
       const next = rec ? changedReport(rec.report, change) : null;
       if (!rec || !next) return null;
-      reports.set(messageTs, { ...rec, report: next });
+      reports.set(messageTs, { ...rec, report: next, revision: (rec.revision ?? 0) + 1 });
       return structuredClone(next);
+    },
+
+    async prepareReportExpiry(messageTs) {
+      const rec = liveReport(messageTs);
+      if (!rec) return null;
+      const next = expiredReport(rec, (key) => {
+        const proposal = proposals.get(key);
+        return proposal || executions.has(key) ? { expiresAt: proposal ? proposal.createdAt + proposalTtlMs(proposal.proposal) + 1 : rec.createdAt + rec.report.ttlMs + 1, executing: executions.has(key) } : undefined;
+      }, now());
+      reports.set(messageTs, next);
+      return next.expiryPending ? structuredClone({ report: next.report, revision: next.revision ?? 0 }) : null;
+    },
+
+    async acknowledgeReportExpiry(messageTs, revision) {
+      const rec = liveReport(messageTs);
+      if (rec && (rec.revision ?? 0) === revision) reports.set(messageTs, { ...rec, expiryPending: false });
     },
 
     // ----- executions -----
