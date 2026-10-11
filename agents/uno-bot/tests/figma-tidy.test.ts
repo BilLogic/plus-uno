@@ -22,6 +22,8 @@ import {
   type TidyPostDeps,
 } from "../src/figma-tidy/run";
 import { likelyCard, projectWords } from "../src/figma-tidy/checks";
+import { tidyChannel } from "../src/figma-tidy/env";
+import type { Env } from "../src/types";
 import { planRun, TIDY_JOBS } from "../src/scheduled/runs";
 import { itemProposal } from "../src/slack/decision-cards";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
@@ -453,6 +455,15 @@ describe("answering a card in its Review", () => {
     const { answer, updates } = await answered();
     await answer("moved", "U0OUTSIDE");
     assert.deepEqual(updates, []);
+  });
+});
+
+describe("where it posts", () => {
+  it("where the Figma Review-card setting says, else #plus-design", () => {
+    assert.equal(tidyChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL, FIGMA_ASK_CHANNEL_ID: "D0APTB20SK0" } as Env), "D0APTB20SK0");
+    assert.equal(tidyChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL, FIGMA_ASK_CHANNEL_ID: " " } as Env), CHANNEL);
+    assert.equal(tidyChannel({ PLUS_DESIGN_CHANNEL_ID: CHANNEL } as Env), CHANNEL);
+    assert.equal(tidyChannel({} as Env), null);
   });
 });
 

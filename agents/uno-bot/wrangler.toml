@@ -228,7 +228,8 @@ UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # Where a change asked for in a Figma comment posts its lead and Review card
-# (src/figma-ask/env.ts). Bill's le goat DM while uno-bot's Figma flows are in
+# (src/figma-ask/env.ts), and where the weekly Figma tidy-up posts its Review
+# cards (src/figma-tidy/env.ts). Bill's le goat DM while uno-bot's Figma flows are in
 # testing, so test cards stay out of #plus-design. Blank or removed → the card
 # posts in #plus-design (PLUS_DESIGN_CHANNEL_ID). Reset it to blank when Bill
 # signs the Figma flows off.

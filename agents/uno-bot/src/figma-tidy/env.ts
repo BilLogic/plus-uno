@@ -6,8 +6,9 @@
 //     title search for a likely card. A card's owner is its design owner: the
 //     first Contributor, through the Team Members map's Notion people, whom
 //     the team's roles name a designer (the rule `figma-comments/read.ts` uses).
-//   • Slack: #plus-design (`PLUS_DESIGN_CHANNEL_ID`), where the Figma Review
-//     cards post; its members answer. The parent's thread is marked as a
+//   • Slack: where the Figma Review cards post — `FIGMA_ASK_CHANNEL_ID` when
+//     set (Bill's DM while the Figma flows are in testing), else #plus-design
+//     (`PLUS_DESIGN_CHANNEL_ID`); its members answer. The parent's thread is marked as a
 //     sweep card's is, so the team's replies there are not all turns.
 //   • KV: the week's listing and what the weeks remember, under `figma-tidy:`.
 
@@ -37,9 +38,10 @@ const LISTING_TTL_S = 2 * 24 * 60 * 60;
 /** The memory outlives its five weeks by one, so a quiet stretch keeps it. */
 const MEMORY_TTL_S = 6 * 7 * 24 * 60 * 60;
 
-/** The channel the tidy-up posts in: where the Figma Review cards go. */
+/** The channel the tidy-up posts in: where the Figma Review cards go
+ *  (`FIGMA_ASK_CHANNEL_ID`), else #plus-design. */
 export function tidyChannel(env: Env): string | null {
-  return env.PLUS_DESIGN_CHANNEL_ID?.trim() || null;
+  return env.FIGMA_ASK_CHANNEL_ID?.trim() || env.PLUS_DESIGN_CHANNEL_ID?.trim() || null;
 }
 
 function kvStore<T>(env: Env, key: string, ttlS: number): { read(): Promise<T | null>; write(v: T | null): Promise<void> } {
@@ -92,7 +94,7 @@ export async function runTidyReadOnEnv(env: Env, ctx: JobContext): Promise<TidyR
  */
 export async function runTidyPostOnEnv(env: Env, ctx: JobContext): Promise<TidyPostResult> {
   const channel = tidyChannel(env);
-  if (!channel) return { posted: false, summary: "PLUS_DESIGN_CHANNEL_ID not set — nothing posted" };
+  if (!channel) return { posted: false, summary: "no FIGMA_ASK_CHANNEL_ID or PLUS_DESIGN_CHANNEL_ID — nothing posted" };
   const kv = env.HARNESS_KV;
   if (!kv) return { posted: false, summary: "HARNESS_KV not bound — no listing" };
   const stored = await storedTeamRoles(env);
