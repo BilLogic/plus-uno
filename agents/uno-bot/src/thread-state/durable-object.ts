@@ -132,8 +132,8 @@ export function createDurableObjectThreadState(
       return hop().getProposalsByChannel(channel, now());
     },
 
-    // The delete IS the claim, and it is the Durable Object's input gate that
-    // makes it one: of two racing resolvers exactly one hop returns true.
+    // The delete IS the claim, in one transaction with the read before it: of
+    // racing resolvers exactly one hop returns true.
     claimProposal(proposalTs: string): Promise<boolean> {
       return hop().claimProposal(proposalTs, now());
     },
@@ -174,8 +174,8 @@ export function createDurableObjectThreadState(
       return hop().endExecution(proposalTs);
     },
 
-    // A take, like the claim: the Durable Object's input gate is what lets
-    // exactly one of two looks at a stuck card come away with it.
+    // A take, like the claim, is one transaction: exactly one of two looks at
+    // a stuck card comes away with it.
     takeCutOffExecution(proposalTs: string): Promise<Execution | null> {
       return hop().takeCutOffExecution(proposalTs, now());
     },
@@ -238,7 +238,7 @@ export function createDurableObjectThreadState(
 
     // ----- one filing per key -----
 
-    // One hop with the input gate closed, so of two racing callers one files.
+    // One hop, one transaction, so of two racing callers one files.
     claimFiling(key: string): Promise<FilingClaim> {
       return hop().claimFiling(key, now());
     },

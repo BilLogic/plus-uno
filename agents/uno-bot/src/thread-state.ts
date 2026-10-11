@@ -160,11 +160,12 @@ export class ThreadState extends DurableObject<Env> {
   }
 
   // Ensure a GC alarm is scheduled. Cheap (one storage read) and idempotent —
-  // called after every write so an idle-then-active DO always has a pending sweep.
-  private async ensureGcAlarm(): Promise<void> {
-    const existing = await this.storage.getAlarm();
+  // called inside every write's transaction, so an idle-then-active DO always
+  // has a pending sweep and the wake commits with the write.
+  private async ensureGcAlarm(txn: Txn): Promise<void> {
+    const existing = await txn.getAlarm();
     if (existing === null) {
-      await this.storage.setAlarm(Date.now() + GC_INTERVAL_MS);
+      await txn.setAlarm(Date.now() + GC_INTERVAL_MS);
     }
   }
 
@@ -172,10 +173,10 @@ export class ThreadState extends DurableObject<Env> {
   // earlier alarm already set is kept, never pushed back by a later one. The
   // alarm that is firing may still read back while its handler runs, and is
   // not a sooner one to keep.
-  private async armAlarmBy(at: number, firing = false): Promise<void> {
-    const existing = await this.storage.getAlarm();
+  private async armAlarmBy(txn: Txn, at: number, firing = false): Promise<void> {
+    const existing = await txn.getAlarm();
     const keep = existing !== null && existing <= at && !(firing && existing <= Date.now());
-    if (!keep) await this.storage.setAlarm(at);
+    if (!keep) await txn.setAlarm(at);
   }
 
   // First, hand over any cut-off run nobody has told, so its requester hears
@@ -220,7 +221,7 @@ export class ThreadState extends DurableObject<Env> {
       const expiryAt = reportExpiryAt(rec, look, now);
       next = Math.min(next, expiryAt <= now ? now + REPORT_EXPIRY_RETRY_MS : expiryAt);
     }
-    if (next !== Infinity) await this.armAlarmBy(next, true);
+    if (next !== Infinity) await this.storage.transaction((txn) => this.armAlarmBy(txn, next, true));
   }
 
   // Delete expired records by their own TTL. Keys: event:{id}
@@ -228,58 +229,60 @@ export class ThreadState extends DurableObject<Env> {
   // (each card's own, `proposalTtlMs`). Answers when the next sweep is due: a
   // day away if anything remains, never if the store is empty.
   private async collectGarbage(now: number): Promise<number> {
-    let remaining = 0;
-    const events = await this.storage.list<EventRecord>({ prefix: "event:" });
-    for (const [key, rec] of events) {
-      if (now - rec.seenAt > EVENT_DEDUP_TTL_MS) await this.storage.delete(key);
-      else remaining++;
-    }
-    const hist = await this.storage.list<HistoryRecord>({ prefix: "hist:" });
-    for (const [key, rec] of hist) {
-      if (now - rec.updatedAt > HISTORY_TTL_MS) await this.storage.delete(key);
-      else remaining++;
-    }
-    const props = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
-    for (const [key, rec] of props) {
-      if (now - rec.createdAt > recordTtlMs(rec)) await this.storage.delete(key);
-      else remaining++;
-    }
-    const reports = await this.storage.list<ReportRecord>({ prefix: "report:" });
-    for (const [key, rec] of reports) {
-      if (now - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) await this.storage.delete(key);
-      else remaining++;
-    }
-    const execs = await this.storage.list<Execution>({ prefix: "exec:" });
-    for (const [key, rec] of execs) {
-      if (now - rec.startedAt > proposalTtlMs(rec.proposal)) await this.storage.delete(key);
-      else remaining++;
-    }
-    // Active-run pointers: one key per user, overwritten each turn, so this is
-    // a bounded set rather than a leak — but a pointer older than its TTL can
-    // never do anything except be ignored, so drop it rather than keep the
-    // record of who talked to the bot last week.
-    const runs = await this.storage.list<{ at: number }>({ prefix: "run:" });
-    for (const [key, rec] of runs) {
-      if (now - rec.at > CANCEL_TTL_MS) await this.storage.delete(key);
-      else remaining++;
-    }
-    const actx = await this.storage.list<AssistantContextRecord>({ prefix: "actx:" });
-    for (const [key, rec] of actx) {
-      if (now - rec.updatedAt > HISTORY_TTL_MS) await this.storage.delete(key);
-      else remaining++;
-    }
-    const filings = await this.storage.list<FilingRecord>({ prefix: "filing:" });
-    for (const [key, rec] of filings) {
-      if (now - rec.at > FILING_TTL_MS) await this.storage.delete(key);
-      else remaining++;
-    }
+    return this.storage.transaction(async (txn): Promise<number> => {
+      let remaining = 0;
+      const events = await txn.list<EventRecord>({ prefix: "event:" });
+      for (const [key, rec] of events) {
+        if (now - rec.seenAt > EVENT_DEDUP_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const hist = await txn.list<HistoryRecord>({ prefix: "hist:" });
+      for (const [key, rec] of hist) {
+        if (now - rec.updatedAt > HISTORY_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const props = await txn.list<ProposalRecord>({ prefix: "prop:" });
+      for (const [key, rec] of props) {
+        if (now - rec.createdAt > recordTtlMs(rec)) await txn.delete(key);
+        else remaining++;
+      }
+      const reports = await txn.list<ReportRecord>({ prefix: "report:" });
+      for (const [key, rec] of reports) {
+        if (now - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const execs = await txn.list<Execution>({ prefix: "exec:" });
+      for (const [key, rec] of execs) {
+        if (now - rec.startedAt > proposalTtlMs(rec.proposal)) await txn.delete(key);
+        else remaining++;
+      }
+      // Active-run pointers: one key per user, overwritten each turn, so this is
+      // a bounded set rather than a leak — but a pointer older than its TTL can
+      // never do anything except be ignored, so drop it rather than keep the
+      // record of who talked to the bot last week.
+      const runs = await txn.list<{ at: number }>({ prefix: "run:" });
+      for (const [key, rec] of runs) {
+        if (now - rec.at > CANCEL_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const actx = await txn.list<AssistantContextRecord>({ prefix: "actx:" });
+      for (const [key, rec] of actx) {
+        if (now - rec.updatedAt > HISTORY_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const filings = await txn.list<FilingRecord>({ prefix: "filing:" });
+      for (const [key, rec] of filings) {
+        if (now - rec.at > FILING_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
 
-    if (remaining === 0) {
-      await this.storage.delete(GC_NEXT_KEY);
-      return Infinity;
-    }
-    await this.storage.put(GC_NEXT_KEY, now + GC_INTERVAL_MS);
-    return now + GC_INTERVAL_MS;
+      if (remaining === 0) {
+        await txn.delete(GC_NEXT_KEY);
+        return Infinity;
+      }
+      await txn.put(GC_NEXT_KEY, now + GC_INTERVAL_MS);
+      return now + GC_INTERVAL_MS;
+    });
   }
 
   // ══ The ThreadState RPC surface ════════════════════════════════════════════
@@ -287,25 +290,30 @@ export class ThreadState extends DurableObject<Env> {
   // One method per interface method, same names, same arguments, plus the
   // caller's `at` (see the header). These are the methods
   // `createDurableObjectThreadState` calls, and the only door into this state.
+  //
+  // Every read-modify-write runs inside `storage.transaction`. The input gate
+  // alone does not keep two calls apart: once a read resolves, another call
+  // can run before the write if anything stands between them, even one more
+  // async function, and the concurrent-write conformance cases lose updates.
 
   // ----- history -----
 
   /** Live turns for a conversation, evicting the record if it has aged out.
    *  Expiry is applied on READ rather than by the GC alarm, so a fresh Durable
    *  Object with no alarm scheduled answers identically. */
-  private async liveTurns(ref: ThreadRef, at: number): Promise<HistoryTurn[]> {
+  private async liveTurns(ref: ThreadRef, at: number, store: Txn = this.storage): Promise<HistoryTurn[]> {
     const key = historyKey(ref.channel, ref.thread);
-    const rec = await this.storage.get<HistoryRecord>(key);
+    const rec = await store.get<HistoryRecord>(key);
     if (!rec) return [];
     if (at - rec.updatedAt > HISTORY_TTL_MS) {
-      await this.storage.delete(key);
+      await store.delete(key);
       return [];
     }
     return rec.turns;
   }
 
   async readHistory(ref: ThreadRef, at: number): Promise<HistoryTurn[]> {
-    return this.liveTurns(ref, at);
+    return this.storage.transaction((txn) => this.liveTurns(ref, at, txn));
   }
 
   async appendHistory(
@@ -313,13 +321,12 @@ export class ThreadState extends DurableObject<Env> {
     turn: HistoryTurn,
     at: number,
   ): Promise<{ length: number }> {
-    const prev = await this.liveTurns(ref, at);
-    const turns = [...prev, turn].slice(-MAX_HISTORY_TURNS);
-    await this.storage.put<HistoryRecord>(historyKey(ref.channel, ref.thread), {
-      turns,
-      updatedAt: at,
+    const turns = await this.storage.transaction(async (txn) => {
+      const next = [...(await this.liveTurns(ref, at, txn)), turn].slice(-MAX_HISTORY_TURNS);
+      await txn.put<HistoryRecord>(historyKey(ref.channel, ref.thread), { turns: next, updatedAt: at });
+      await this.ensureGcAlarm(txn);
+      return next;
     });
-    await this.ensureGcAlarm();
     return { length: turns.length };
   }
 
@@ -328,16 +335,15 @@ export class ThreadState extends DurableObject<Env> {
     keepRecent: number,
     at: number,
   ): Promise<{ turns: HistoryTurn[]; dropped: number }> {
-    const turns = await this.liveTurns(ref, at);
-    // Nothing to gain once the tail is the whole conversation (or all but the
-    // opening turn, which is kept either way).
-    if (turns.length <= keepRecent + 1) return { turns, dropped: 0 };
-    const kept = [turns[0]!, ...turns.slice(-keepRecent)];
-    await this.storage.put<HistoryRecord>(historyKey(ref.channel, ref.thread), {
-      turns: kept,
-      updatedAt: at,
+    return this.storage.transaction(async (txn) => {
+      const turns = await this.liveTurns(ref, at, txn);
+      // Nothing to gain once the tail is the whole conversation (or all but the
+      // opening turn, which is kept either way).
+      if (turns.length <= keepRecent + 1) return { turns, dropped: 0 };
+      const kept = [turns[0]!, ...turns.slice(-keepRecent)];
+      await txn.put<HistoryRecord>(historyKey(ref.channel, ref.thread), { turns: kept, updatedAt: at });
+      return { turns: kept, dropped: turns.length - kept.length };
     });
-    return { turns: kept, dropped: turns.length - kept.length };
   }
 
   // ----- proposals -----
@@ -356,39 +362,34 @@ export class ThreadState extends DurableObject<Env> {
   // one a racing ✅ has to be able to find, so it is the last thing to land.
   async putProposal(proposal: PendingProposal, at: number): Promise<{ retired: string[] }> {
     const slot = proposalSlot(proposal);
-    const retired: string[] = [];
-    const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
-    for (const [key, rec] of all) {
-      if (key === proposalKey(proposal.proposalTs)) continue;
-      // A record already stamped with a successor is settled. One only RETIRED
-      // still wants this ts — that is the caller who retired it ahead of
-      // staging this very card (#583).
-      if (rec.supersededBy) continue;
-      if (at - rec.createdAt > recordTtlMs(rec)) continue; // already "expired"
-      const pending = rec.payload as PendingProposal | null;
-      if (!pending || pending.channel !== proposal.channel) continue;
-      if (proposalSlot(pending) !== slot) continue;
-      await this.storage.put<ProposalRecord>(key, {
-        ...rec,
-        supersededBy: proposal.proposalTs,
-      });
-      // Reported only if this staging is what took it out of reach.
-      if (!rec.retired) retired.push(pending.proposalTs);
-    }
-    await this.storage.put<ProposalRecord>(proposalKey(proposal.proposalTs), {
-      payload: proposal,
-      createdAt: at,
-    });
-    if (proposal.item) {
-      const item = proposal.item;
-      const expiresAt = at + proposalTtlMs(proposal) + 1;
-      await this.storage.transaction(async (txn) => {
+    const expiresAt = at + proposalTtlMs(proposal) + 1;
+    const retired = await this.storage.transaction(async (txn) => {
+      const retired: string[] = [];
+      const all = await txn.list<ProposalRecord>({ prefix: "prop:" });
+      for (const [key, rec] of all) {
+        if (key === proposalKey(proposal.proposalTs)) continue;
+        // A record already stamped with a successor is settled. One only RETIRED
+        // still wants this ts — that is the caller who retired it ahead of
+        // staging this very card (#583).
+        if (rec.supersededBy) continue;
+        if (at - rec.createdAt > recordTtlMs(rec)) continue; // already "expired"
+        const pending = rec.payload as PendingProposal | null;
+        if (!pending || pending.channel !== proposal.channel) continue;
+        if (proposalSlot(pending) !== slot) continue;
+        await txn.put<ProposalRecord>(key, { ...rec, supersededBy: proposal.proposalTs });
+        // Reported only if this staging is what took it out of reach.
+        if (!rec.retired) retired.push(pending.proposalTs);
+      }
+      await txn.put<ProposalRecord>(proposalKey(proposal.proposalTs), { payload: proposal, createdAt: at });
+      if (proposal.item) {
+        const item = proposal.item;
         const rec = await txn.get<ReportRecord>(reportKey(item.messageTs));
         if (rec) await txn.put(reportKey(item.messageTs), { ...rec, deadlines: { ...rec.deadlines, [item.id]: expiresAt } });
-      });
-      await this.armAlarmBy(expiresAt);
-    }
-    await this.ensureGcAlarm();
+        await this.armAlarmBy(txn, expiresAt);
+      }
+      await this.ensureGcAlarm(txn);
+      return retired;
+    });
     return { retired };
   }
 
@@ -397,44 +398,50 @@ export class ThreadState extends DurableObject<Env> {
   // no-op: there is nothing left that could be acted on.
   async retireProposal(proposalTs: string, at: number): Promise<{ retired: boolean }> {
     const key = proposalKey(proposalTs);
-    const rec = await this.storage.get<ProposalRecord>(key);
-    // Claimed (gone), already retired or replaced, or aged out: this call
-    // retired nothing, and says so.
-    if (!rec || rec.retired || rec.supersededBy) return { retired: false };
-    if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
-    await this.storage.put<ProposalRecord>(key, { ...rec, retired: true });
-    return { retired: true };
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ProposalRecord>(key);
+      // Claimed (gone), already retired or replaced, or aged out: this call
+      // retired nothing, and says so.
+      if (!rec || rec.retired || rec.supersededBy) return { retired: false };
+      if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
+      await txn.put<ProposalRecord>(key, { ...rec, retired: true });
+      return { retired: true };
+    });
   }
 
   // Needs changes' lock — the contract is on the interface. The mark rides on
   // the payload, so every lookup hands it back — read through `withLiveMark`,
-  // which lapses it — and the input gate stays closed across the read and the
-  // write, so two presses mark it once.
+  // which lapses it — and the read and the write are one transaction, so two
+  // presses mark it once.
   async markRevising(proposalTs: string, userId: string, at: number): Promise<"marked" | "already" | "gone"> {
     const key = proposalKey(proposalTs);
-    const rec = await this.storage.get<ProposalRecord>(key);
-    if (!rec || rec.retired || rec.supersededBy) return "gone";
-    if (at - rec.createdAt > recordTtlMs(rec)) return "gone";
-    const pending = rec.payload as PendingProposal | null;
-    if (!pending) return "gone";
-    if (withLiveMark(pending, at).revising) return "already";
-    await this.storage.put<ProposalRecord>(key, { ...rec, payload: { ...pending, revising: { userId, at } } });
-    return "marked";
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ProposalRecord>(key);
+      if (!rec || rec.retired || rec.supersededBy) return "gone";
+      if (at - rec.createdAt > recordTtlMs(rec)) return "gone";
+      const pending = rec.payload as PendingProposal | null;
+      if (!pending) return "gone";
+      if (withLiveMark(pending, at).revising) return "already";
+      await txn.put<ProposalRecord>(key, { ...rec, payload: { ...pending, revising: { userId, at } } });
+      return "marked";
+    });
   }
 
   async clearRevising(proposalTs: string): Promise<void> {
     const key = proposalKey(proposalTs);
-    const rec = await this.storage.get<ProposalRecord>(key);
-    const pending = rec?.payload as PendingProposal | null | undefined;
-    if (!rec || !pending?.revising) return;
-    const { revising: _, ...rest } = pending;
-    await this.storage.put<ProposalRecord>(key, { ...rec, payload: rest });
+    await this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ProposalRecord>(key);
+      const pending = rec?.payload as PendingProposal | null | undefined;
+      if (!rec || !pending?.revising) return;
+      const { revising: _, ...rest } = pending;
+      await txn.put<ProposalRecord>(key, { ...rec, payload: rest });
+    });
   }
 
   // Is the card that retired another one still around to be looked at? Its own
   // retirement does not matter: a chain still ends in a live newest card.
-  private async successorIsLive(ts: string, at: number): Promise<boolean> {
-    const rec = await this.storage.get<ProposalRecord>(proposalKey(ts));
+  private async successorIsLive(ts: string, at: number, store: Txn): Promise<boolean> {
+    const rec = await store.get<ProposalRecord>(proposalKey(ts));
     return !!rec && at - rec.createdAt <= recordTtlMs(rec);
   }
 
@@ -444,22 +451,24 @@ export class ThreadState extends DurableObject<Env> {
   // TTL — the ordering, and the third card it stops the person from asking
   // for, are on `ProposalLookup` in `thread-state/store.ts`.
   async getProposalByTs(proposalTs: string, at: number): Promise<ProposalLookup> {
-    const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
-    if (!rec) return { state: "none" };
-    const proposal = (rec.payload as PendingProposal | null) ?? {};
-    if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at))) {
-      return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
-    }
-    if (at - rec.createdAt > recordTtlMs(rec)) {
-      await this.storage.delete(proposalKey(proposalTs));
-      return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal) };
-    }
-    if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
-    return {
-      state: "found",
-      proposal: withLiveMark(rec.payload as PendingProposal, at),
-      createdAt: rec.createdAt,
-    };
+    return this.storage.transaction(async (txn): Promise<ProposalLookup> => {
+      const rec = await txn.get<ProposalRecord>(proposalKey(proposalTs));
+      if (!rec) return { state: "none" };
+      const proposal = (rec.payload as PendingProposal | null) ?? {};
+      if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at, txn))) {
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
+      }
+      if (at - rec.createdAt > recordTtlMs(rec)) {
+        await txn.delete(proposalKey(proposalTs));
+        return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal) };
+      }
+      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
+      return {
+        state: "found",
+        proposal: withLiveMark(rec.payload as PendingProposal, at),
+        createdAt: rec.createdAt,
+      };
+    });
   }
 
   // Scans the staged set: proposals expire by their TTL, so live cardinality
@@ -495,11 +504,9 @@ export class ThreadState extends DurableObject<Env> {
       .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
-  // The delete IS the claim. A Durable Object handles one event at a time, so of
-  // two racing resolvers exactly one sees `true` — which is the whole
-  // double-execution guard, because `notion_create` is not idempotent. The read
-  // added below is safe inside that guarantee: the input gate stays closed
-  // across a storage await, so no second claim is delivered between the two.
+  // The delete IS the claim, and the read before it is in the same
+  // transaction, so of racing resolvers exactly one sees `true` — which is the
+  // whole double-execution guard, because `notion_create` is not idempotent.
   //
   // A RETIRED or superseded record is refused rather than deleted (#583): two
   // doors reach the claim with a proposal they are holding in memory instead of
@@ -508,12 +515,14 @@ export class ThreadState extends DurableObject<Env> {
   // run lease that makes the race reachable, are on the interface.
   async claimProposal(proposalTs: string, at: number): Promise<boolean> {
     const key = proposalKey(proposalTs);
-    const rec = await this.storage.get<ProposalRecord>(key);
-    if (!rec || rec.retired || rec.supersededBy) return false;
-    // A card being revised is refused too: its revision is on the way.
-    const pending = rec.payload as PendingProposal | null;
-    if (pending && withLiveMark(pending, at).revising) return false;
-    return this.storage.delete(key);
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ProposalRecord>(key);
+      if (!rec || rec.retired || rec.supersededBy) return false;
+      // A card being revised is refused too: its revision is on the way.
+      const pending = rec.payload as PendingProposal | null;
+      if (pending && withLiveMark(pending, at).revising) return false;
+      return txn.delete(key);
+    });
   }
 
   // ----- decision reports -----
@@ -523,9 +532,11 @@ export class ThreadState extends DurableObject<Env> {
   // expiry are transactions, so a concurrent decision survives a redraw.
 
   async putReport(report: DecisionReportRecord, at: number): Promise<void> {
-    await this.storage.put<ReportRecord>(reportKey(report.messageTs), { report, createdAt: at });
-    await this.armAlarmBy(at + report.ttlMs + 1);
-    await this.ensureGcAlarm();
+    await this.storage.transaction(async (txn) => {
+      await txn.put<ReportRecord>(reportKey(report.messageTs), { report, createdAt: at });
+      await this.armAlarmBy(txn, at + report.ttlMs + 1);
+      await this.ensureGcAlarm(txn);
+    });
   }
 
   async getReport(messageTs: string, at: number): Promise<DecisionReportRecord | null> {
@@ -568,32 +579,31 @@ export class ThreadState extends DurableObject<Env> {
   }
 
   private async liveReport(messageTs: string, at: number): Promise<ReportRecord | null> {
-    const key = reportKey(messageTs);
-    const rec = await this.storage.get<ReportRecord>(key);
-    if (!rec) return null;
-    if (at - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) {
-      await this.storage.delete(key);
-      return null;
-    }
-    return rec;
+    return this.storage.transaction(async (txn): Promise<ReportRecord | null> => {
+      const key = reportKey(messageTs);
+      const rec = await txn.get<ReportRecord>(key);
+      if (!rec) return null;
+      if (at - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) {
+        await txn.delete(key);
+        return null;
+      }
+      return rec;
+    });
   }
 
   // ----- executions -----
   //
   // A won ✅ from the claim until its outcome is told — what `Execution` in
-  // `thread-state/store.ts` exists for. Each method is one read-modify-write,
-  // and the input gate stays closed across the storage awaits, so a take has
-  // exactly one winner as the claim does.
+  // `thread-state/store.ts` exists for. Each method is one read-modify-write
+  // in one transaction, so a take has exactly one winner as the claim does.
 
   async beginExecution(proposal: PendingProposal, at: number): Promise<void> {
-    await this.storage.put<Execution>(executionKey(proposal.proposalTs), {
-      proposal,
-      startedAt: at,
-      settled: [],
+    await this.storage.transaction(async (txn) => {
+      await txn.put<Execution>(executionKey(proposal.proposalTs), { proposal, startedAt: at, settled: [] });
+      // Woken just past the cut-off, so a run nobody looks at is still told.
+      // The alarm reads its own clock, so it is armed on that clock too.
+      await this.armAlarmBy(txn, Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
     });
-    // Woken just past the cut-off, so a run nobody looks at is still told.
-    // The alarm reads its own clock, so it is armed on that clock too.
-    await this.armAlarmBy(Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
   }
 
   // The fence: a taken execution is reported to the run that is still settling
@@ -604,43 +614,39 @@ export class ThreadState extends DurableObject<Env> {
     ok: boolean,
   ): Promise<{ taken: boolean }> {
     const key = executionKey(proposalTs);
-    const rec = await this.storage.get<Execution>(key);
-    if (!rec) return { taken: false };
-    if (rec.takenAt !== undefined) return { taken: true };
-    if (!rec.settled.some((s) => s.index === index)) {
-      await this.storage.put<Execution>(key, { ...rec, settled: [...rec.settled, { index, ok }] });
-    }
-    return { taken: false };
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<Execution>(key);
+      if (!rec) return { taken: false };
+      if (rec.takenAt !== undefined) return { taken: true };
+      if (!rec.settled.some((s) => s.index === index)) {
+        await txn.put<Execution>(key, { ...rec, settled: [...rec.settled, { index, ok }] });
+      }
+      return { taken: false };
+    });
   }
 
   // A taken execution is the teller's, and the fence for a run that is only
   // slow: the run's own end leaves it where it is.
   async endExecution(proposalTs: string): Promise<void> {
     const key = executionKey(proposalTs);
-    const rec = await this.storage.get<Execution>(key);
-    if (rec && rec.takenAt === undefined) await this.storage.delete(key);
+    await this.storage.transaction(async (txn) => {
+      const rec = await txn.get<Execution>(key);
+      if (rec && rec.takenAt === undefined) await txn.delete(key);
+    });
   }
 
   async takeCutOffExecution(proposalTs: string, at: number): Promise<Execution | null> {
     const key = executionKey(proposalTs);
-    const rec = await this.storage.get<Execution>(key);
-    if (!rec) return null;
-    if (at - rec.startedAt > proposalTtlMs(rec.proposal)) {
-      await this.storage.delete(key);
-      return null;
-    }
-    if (!cutOffTakeable(rec, at)) return null; // may still be running, or told
-    await this.markTaken(rec, at);
-    return rec;
-  }
-
-  // Marked, not deleted: a run that is only slow reads the mark at its next
-  // operation and stops. A retake of an owed note keeps the first mark.
-  private async markTaken(rec: Execution, at: number): Promise<void> {
-    const { noteOwed: _owed, ...taken } = rec;
-    await this.storage.put<Execution>(executionKey(rec.proposal.proposalTs), {
-      ...taken,
-      takenAt: rec.takenAt ?? at,
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<Execution>(key);
+      if (!rec) return null;
+      if (at - rec.startedAt > proposalTtlMs(rec.proposal)) {
+        await txn.delete(key);
+        return null;
+      }
+      if (!cutOffTakeable(rec, at)) return null; // may still be running, or told
+      await markTaken(txn, rec, at);
+      return rec;
     });
   }
 
@@ -648,17 +654,19 @@ export class ThreadState extends DurableObject<Env> {
   // execution is removed the moment its outcome has been told, and a taken one
   // is skipped.
   async takeCutOffExecutionInThread(ref: ThreadRef, at: number): Promise<Execution | null> {
-    const all = await this.storage.list<Execution>({ prefix: "exec:" });
-    let best: Execution | null = null;
-    for (const rec of all.values()) {
-      if (rec.proposal.channel !== ref.channel) continue;
-      if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
-      if (!cutOffTakeable(rec, at)) continue;
-      if (!best || rec.startedAt > best.startedAt) best = rec;
-    }
-    if (!best) return null;
-    await this.markTaken(best, at);
-    return best;
+    return this.storage.transaction(async (txn) => {
+      const all = await txn.list<Execution>({ prefix: "exec:" });
+      let best: Execution | null = null;
+      for (const rec of all.values()) {
+        if (rec.proposal.channel !== ref.channel) continue;
+        if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
+        if (!cutOffTakeable(rec, at)) continue;
+        if (!best || rec.startedAt > best.startedAt) best = rec;
+      }
+      if (!best) return null;
+      await markTaken(txn, best, at);
+      return best;
+    });
   }
 
   async findCutOffExecutions(at: number): Promise<Execution[]> {
@@ -673,25 +681,29 @@ export class ThreadState extends DurableObject<Env> {
   // An owed note is the alarm's to come back for.
   async reportCutOffNote(proposalTs: string, posted: boolean): Promise<CutOffNoteReport> {
     const key = executionKey(proposalTs);
-    const rec = await this.storage.get<Execution>(key);
-    if (!rec || rec.takenAt === undefined || posted) return "told";
-    const { record, report } = afterFailedNote(rec);
-    await this.storage.put<Execution>(key, record);
-    if (report === "owed") await this.armAlarmBy(Date.now() + CUT_OFF_SWEEP_RETRY_MS);
-    return report;
+    return this.storage.transaction(async (txn): Promise<CutOffNoteReport> => {
+      const rec = await txn.get<Execution>(key);
+      if (!rec || rec.takenAt === undefined || posted) return "told";
+      const after = afterFailedNote(rec);
+      await txn.put<Execution>(key, after.record);
+      if (after.report === "owed") await this.armAlarmBy(txn, Date.now() + CUT_OFF_SWEEP_RETRY_MS);
+      return after.report;
+    });
   }
 
   // ----- assistant context -----
 
   async getAssistantContext(ref: ThreadRef, at: number): Promise<AssistantContext | null> {
-    const key = assistantContextKey(ref.channel, ref.thread);
-    const rec = await this.storage.get<AssistantContextRecord>(key);
-    if (!rec) return null;
-    if (at - rec.updatedAt > HISTORY_TTL_MS) {
-      await this.storage.delete(key);
-      return null;
-    }
-    return rec.context as AssistantContext;
+    return this.storage.transaction(async (txn): Promise<AssistantContext | null> => {
+      const key = assistantContextKey(ref.channel, ref.thread);
+      const rec = await txn.get<AssistantContextRecord>(key);
+      if (!rec) return null;
+      if (at - rec.updatedAt > HISTORY_TTL_MS) {
+        await txn.delete(key);
+        return null;
+      }
+      return rec.context as AssistantContext;
+    });
   }
 
   async putAssistantContext(
@@ -699,11 +711,10 @@ export class ThreadState extends DurableObject<Env> {
     context: AssistantContext,
     at: number,
   ): Promise<void> {
-    await this.storage.put<AssistantContextRecord>(
-      assistantContextKey(ref.channel, ref.thread),
-      { context, updatedAt: at },
-    );
-    await this.ensureGcAlarm();
+    await this.storage.transaction(async (txn) => {
+      await txn.put<AssistantContextRecord>(assistantContextKey(ref.channel, ref.thread), { context, updatedAt: at });
+      await this.ensureGcAlarm(txn);
+    });
   }
 
   // ----- cancel -----
@@ -718,9 +729,12 @@ export class ThreadState extends DurableObject<Env> {
    *  hazard arriving from the other direction — see the interface. */
   async consumeCancel(ref: ThreadRef, at: number, since?: number): Promise<boolean> {
     const key = cancelKey(ref.channel, ref.thread);
-    const rec = await this.storage.get<{ at: number }>(key);
+    const rec = await this.storage.transaction(async (txn) => {
+      const found = await txn.get<{ at: number }>(key);
+      if (found) await txn.delete(key);
+      return found;
+    });
     if (!rec) return false;
-    await this.storage.delete(key);
     if (since !== undefined && rec.at < since) return false;
     return at - rec.at < CANCEL_TTL_MS;
   }
@@ -729,12 +743,12 @@ export class ThreadState extends DurableObject<Env> {
     userId: string,
     at: number,
   ): Promise<{ cancelled: boolean; channel?: string; thread?: string }> {
-    const rec = await this.storage.get<{ channel: string; thread: string; at: number }>(
-      activeRunKey(userId),
-    );
-    if (!rec || at - rec.at > CANCEL_TTL_MS) return { cancelled: false };
-    await this.storage.put(cancelKey(rec.channel, rec.thread), { at });
-    return { cancelled: true, channel: rec.channel, thread: rec.thread };
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<{ channel: string; thread: string; at: number }>(activeRunKey(userId));
+      if (!rec || at - rec.at > CANCEL_TTL_MS) return { cancelled: false };
+      await txn.put(cancelKey(rec.channel, rec.thread), { at });
+      return { cancelled: true, channel: rec.channel, thread: rec.thread };
+    });
   }
 
   async setActiveRun(userId: string, ref: ThreadRef, at: number): Promise<void> {
@@ -753,59 +767,78 @@ export class ThreadState extends DurableObject<Env> {
 
   async checkAndRecordEvent(eventId: string, at: number): Promise<{ seen: boolean }> {
     const key = eventKey(eventId);
-    const existing = await this.storage.get<EventRecord>(key);
-    if (existing && at - existing.seenAt < EVENT_DEDUP_TTL_MS) {
-      const status = existing.status ?? "done"; // legacy records = one-shot
-      if (status === "done") return { seen: true };
-      if (at - existing.seenAt < RUN_LEASE_MS) return { seen: true };
-      // a stale lease is no longer evidence the event was handled
-    }
-    await this.storage.put<EventRecord>(key, { seenAt: at, status: "done" });
-    await this.ensureGcAlarm();
-    return { seen: false };
+    const seen = await this.storage.transaction(async (txn) => {
+      const existing = await txn.get<EventRecord>(key);
+      if (existing && at - existing.seenAt < EVENT_DEDUP_TTL_MS) {
+        const status = existing.status ?? "done"; // legacy records = one-shot
+        if (status === "done") return true;
+        if (at - existing.seenAt < RUN_LEASE_MS) return true;
+        // a stale lease is no longer evidence the event was handled
+      }
+      await txn.put<EventRecord>(key, { seenAt: at, status: "done" });
+      await this.ensureGcAlarm(txn);
+      return false;
+    });
+    return { seen };
   }
 
   async claimRun(eventId: string, at: number): Promise<RunClaim> {
     const key = eventKey(eventId);
-    const existing = await this.storage.get<EventRecord>(key);
-    if (existing && at - existing.seenAt < EVENT_DEDUP_TTL_MS) {
-      const status = existing.status ?? "done";
-      if (status === "done") return "done";
-      if (at - existing.seenAt < RUN_LEASE_MS) return "running";
-      // Stale "running" lease → the owner was killed mid-run; reclaim.
-    }
-    await this.storage.put<EventRecord>(key, { seenAt: at, status: "running" });
-    await this.ensureGcAlarm();
-    return "claimed";
+    const claim = await this.storage.transaction(async (txn): Promise<RunClaim> => {
+      const existing = await txn.get<EventRecord>(key);
+      if (existing && at - existing.seenAt < EVENT_DEDUP_TTL_MS) {
+        const status = existing.status ?? "done";
+        if (status === "done") return "done";
+        if (at - existing.seenAt < RUN_LEASE_MS) return "running";
+        // Stale "running" lease → the owner was killed mid-run; reclaim.
+      }
+      await txn.put<EventRecord>(key, { seenAt: at, status: "running" });
+      await this.ensureGcAlarm(txn);
+      return "claimed";
+    });
+    return claim;
   }
 
   async markRunDone(eventId: string, at: number): Promise<void> {
     const key = eventKey(eventId);
-    const existing = await this.storage.get<EventRecord>(key);
-    await this.storage.put<EventRecord>(key, {
-      seenAt: existing?.seenAt ?? at,
-      status: "done",
+    await this.storage.transaction(async (txn) => {
+      const existing = await txn.get<EventRecord>(key);
+      await txn.put<EventRecord>(key, { seenAt: existing?.seenAt ?? at, status: "done" });
     });
   }
 
   // ----- one filing per key -----
   //
-  // A read and a write with no await on anything but storage between them, so
-  // the input gate keeps a second claim out until the first is stored.
+  // The read and the write are one transaction, so a second claim waits until
+  // the first is stored.
 
   async claimFiling(key: string, at: number): Promise<FilingClaim> {
-    const { claim, store } = claimedFiling(await this.storage.get<FilingRecord>(filingKey(key)), at);
-    if (store) {
-      await this.storage.put<FilingRecord>(filingKey(key), store);
-      await this.ensureGcAlarm();
-    }
-    return claim;
+    return this.storage.transaction(async (txn) => {
+      const { claim, store } = claimedFiling(await txn.get<FilingRecord>(filingKey(key)), at);
+      if (store) {
+        await txn.put<FilingRecord>(filingKey(key), store);
+        await this.ensureGcAlarm(txn);
+      }
+      return claim;
+    });
   }
 
   async settleFiling(key: string, issue: FiledIssue | null, at: number): Promise<void> {
     if (issue) await this.storage.put<FilingRecord>(filingKey(key), { at, issue });
     else await this.storage.delete(filingKey(key));
   }
+}
+
+/** What a read-modify-write runs against: the object's storage, or the
+ *  transaction it runs inside — alarm included, so a wake is armed in the
+ *  same commit as the write it belongs to. */
+type Txn = Pick<DurableObjectStorage, "get" | "put" | "delete" | "getAlarm" | "setAlarm">;
+
+// Marked, not deleted: a run that is only slow reads the mark at its next
+// operation and stops. A retake of an owed note keeps the first mark.
+async function markTaken(txn: Txn, rec: Execution, at: number): Promise<void> {
+  const { noteOwed: _owed, ...taken } = rec;
+  await txn.put<Execution>(executionKey(rec.proposal.proposalTs), { ...taken, takenAt: rec.takenAt ?? at });
 }
 
 function historyKey(channel: string, thread: string): string {
