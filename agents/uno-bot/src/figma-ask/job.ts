@@ -386,14 +386,24 @@ function askContext(
   return lines;
 }
 
-/** How the turn answers an ask from Figma, and how far a stranger's goes. */
+/**
+ * How the turn answers an ask from Figma, and how far a stranger's goes. A
+ * teammate's change request is routed to a proposal by name: told only that
+ * a change "is drafted as a card", the turn treated it as a question with no
+ * source to cite, and staged nothing.
+ */
 export function askInstruction(teammate: boolean): string {
   return [
-    "this ask came from a Figma comment, and the answer is posted back there as plain text.",
-    "Answer in one to three short sentences: no lists, headings or formatting.",
+    "this ask came from a Figma comment, and the reply is posted back there as plain text.",
+    "Answer a question in one to three short sentences: no lists, headings or formatting.",
     "Cite the one link that answers it; when nothing you read answers it, say so plainly rather than guess.",
     teammate
-      ? "A change they ask for is drafted as a card for approval in #plus-design; nothing is written from Figma."
+      ? [
+          "A change they ask for is a proposal, routed as an intake: call the write that fits in this reply, and it waits as a card in #plus-design for the file's design owner to approve.",
+          "Product or design, a bug in the live PLUS app included → the frame's Roadmap card when the file's name has `Card <n>` (`notion_update`, found through `roadmap_query`), else a new Roadmap card (`notion_create`);",
+          "implementation in a listed plus-uno repo — the blueprint, Storybook docs, the harness, prototypes → that repo's GitHub issue (`github_issue_create`);",
+          "a named design-system component change → `component_implement`.",
+        ].join(" ")
       : "The asker is not on Team Members: answer from public facts only, and propose no change of any kind.",
   ].join(" ");
 }
