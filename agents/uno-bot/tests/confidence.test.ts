@@ -67,6 +67,17 @@ describe("freshness claims", () => {
     }
   });
 
+  it("does not treat a failed look as a freshness claim", () => {
+    for (const text of [
+      "I couldn't reach the board just now.",
+      "I could not open the story right now, so treat it as unconfirmed.",
+      "I wasn't able to read it just now.",
+      "The blueprint could not be read at the moment.",
+    ]) {
+      assert.equal(claimsFreshness(text), false, text);
+    }
+  });
+
   it("does not treat a past-tense look as a freshness claim", () => {
     for (const text of [
       "I read this earlier, so it may have moved since.",
@@ -168,6 +179,39 @@ describe("verdicts", () => {
 
   it("flags a freshness claim over a read that failed", () => {
     assert.equal(judgeConfidence("Checked just now — Warm-Up has two paths.", FAILED).kind, "false-freshness");
+    assert.equal(judgeConfidence("I checked just now: Warm-Up has two paths.", FAILED).kind, "false-freshness");
+  });
+
+  it("ships the honest hedge a failed read owes, 'just now' and all", () => {
+    for (const text of [
+      "I couldn't reach the board just now, so treat this as unconfirmed: Warm-Up has two paths.",
+      "I could not open the story right now, so treat the status as unconfirmed.",
+      "I wasn't able to read the board just now; going from memory, Warm-Up has two paths.",
+    ]) {
+      assert.equal(judgeConfidence(text, FAILED).kind, "ok", text);
+    }
+  });
+
+  it("tells the repair why the freshness claim is false", () => {
+    const cached = repairInstruction({ kind: "false-freshness", cause: "cached" })!;
+    const failed = repairInstruction({ kind: "false-freshness", cause: "failed" })!;
+    const unfetched = repairInstruction({ kind: "false-freshness", cause: "unfetched" })!;
+    assert.match(cached, /cache/);
+    assert.doesNotMatch(cached, /failed/);
+    assert.match(failed, /failed/);
+    assert.doesNotMatch(failed, /cache/);
+    assert.match(unfetched, /no lookup ran/);
+    assert.deepEqual(judgeConfidence("Checked just now — two paths.", CACHED), { kind: "false-freshness", cause: "cached" });
+    assert.deepEqual(judgeConfidence("Checked just now — two paths.", FAILED), { kind: "false-freshness", cause: "failed" });
+    assert.deepEqual(judgeConfidence("Warm-Up currently has two paths.", UNGROUNDED), { kind: "false-freshness", cause: "unfetched" });
+  });
+
+  it("still asks a factual answer with no lookup this turn to say what it rests on", () => {
+    // An inference with nothing fetched owes a short basis clause; a live read
+    // and a cached one owe none.
+    const text = "The Warm-Up scenario has two paths, and one is an exception.";
+    assert.equal(judgeConfidence(text, UNGROUNDED).kind, "unsourced");
+    assert.equal(judgeConfidence(`From what I know, not a fresh read: ${text}`, UNGROUNDED).kind, "ok");
   });
 
   it("flags a trailing label rather than letting it be silently stripped", () => {
@@ -254,9 +298,16 @@ describe("verdicts", () => {
   });
 
   it("gives every repairable verdict a specific instruction", () => {
-    for (const kind of ["false-freshness", "trailing-label", "unhedged"] as const) {
-      const instruction = repairInstruction({ kind });
-      assert.ok(instruction && instruction.length > 40, `${kind} needs a real instruction`);
+    for (const verdict of [
+      { kind: "false-freshness", cause: "cached" },
+      { kind: "false-freshness", cause: "failed" },
+      { kind: "false-freshness", cause: "unfetched" },
+      { kind: "trailing-label" },
+      { kind: "unhedged" },
+      { kind: "unsourced" },
+    ] as const) {
+      const instruction = repairInstruction(verdict);
+      assert.ok(instruction && instruction.length > 40, `${JSON.stringify(verdict)} needs a real instruction`);
     }
     assert.equal(repairInstruction({ kind: "ok" }), null);
     assert.equal(repairInstruction({ kind: "exempt" }), null);

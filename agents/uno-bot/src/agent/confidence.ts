@@ -1,10 +1,11 @@
 // Does this reply say what it rests on?
 //
 // AGENT.md § Grounding asks for sureness in prose only when it is lower than a
-// live read earns — a read that failed, an earlier or cached read, an
-// inference — and forbids a trailing "Confidence: high" label. A live read this
-// turn says nothing in prose: the Sources box shows what was read, and marks a
-// cached source from the data (`slack/sources-box.ts`). The only thing that
+// live read earns — every read this turn failed, or none ran and the answer is
+// an inference — and forbids a trailing "Confidence: high" label. A live or
+// cached read this turn says nothing in prose: the Sources box shows what was
+// read, and marks a cached source from the data (`slack/sources-box.ts`). One
+// failed read among others is the ⚠️ line's to say (`turn/warning-line.ts`). The only thing that
 // checked that rule was rubric dimension D9 inside the draft judge — which
 // skips any draft under MIN_DRAFT_CHARS (1000, and 1500 when this was written). Almost every blueprint answer
 // in Slack is a few hundred characters, so the rule went unenforced on the
@@ -63,14 +64,20 @@ export type ConfidenceContext = {
   readFailed?: boolean;
 };
 
+/** Why a freshness claim is false: the rows came from cache, every lookup
+ *  failed, or no lookup ran at all. */
+export type FreshnessCause = "cached" | "failed" | "unfetched";
+
 export type ConfidenceVerdict =
   /** Nothing to check — no retrieval, or nothing factual said. */
   | { kind: "exempt" }
-  /** Carries a woven clause. Ship it. */
+  /** Owes nothing more: a live or cached read, or the hedge or basis clause
+   *  its sureness asks for is there. Ship it. */
   | { kind: "ok" }
   /** Says "just now" over data that was not fetched now. The worst case: not a
-   *  missing claim but a false one. */
-  | { kind: "false-freshness" }
+   *  missing claim but a false one. `cause` is why it was not fetched now, so
+   *  the repair can say so. */
+  | { kind: "false-freshness"; cause: FreshnessCause }
   /** The model reached for the retired trailing label instead of weaving. */
   | { kind: "trailing-label" }
   /** Factual, every read this turn failed, and it never says how sure it is. */
@@ -101,6 +108,8 @@ const HEDGED = [
   /\bnot\s+(?:entirely\s+|totally\s+|fully\s+)?(?:sure|certain)\b/i,
   /\b(?:can(?:no|')t|could(?:n'| no)?t)\s+(?:verify|confirm|check|find|open|read|reach)\b/i,
   /\bunconfirmed\b/i,
+  /\bfrom\s+what\s+I\s+(?:know|recall|remember)\b/i,
+  /\bnot\s+a\s+fresh\s+(?:read|look)\b/i,
   /\bas\s+far\s+as\s+I\s+can\s+tell\b/i,
   /\bI\s+(?:think|believe|suspect)\b/i,
   /\bworth\s+(?:double-?checking|verifying)\b/i,
@@ -152,9 +161,19 @@ export function hasHedge(text: string): boolean {
   return matchesAny(text, HEDGED);
 }
 
-/** True when the reply asserts its data is current as of now. */
+/**
+ * A look that did NOT happen, through to the freshness word that dates it:
+ * "I couldn't reach the board just now". That is the honest hedge a failed
+ * read owes, not a claim that the data is current, so it is taken out before
+ * the freshness patterns run. Bounded to one sentence.
+ */
+const FAILED_LOOK =
+  /\b(?:can(?:no|')t|could(?:n'| no)?t(?:\s+be)?|was(?:n'|\s+no)t\s+able\s+to|unable\s+to|failed\s+to)\b[^.!?\n]*?\b(?:just\s+now|right\s+now|at\s+the\s+moment|currently)\b/gi;
+
+/** True when the reply asserts its data is current as of now. A failed look
+ *  dated "just now" is a hedge, and does not count. */
 export function claimsFreshness(text: string): boolean {
-  return matchesAny(text, FRESHNESS);
+  return matchesAny(text.replace(FAILED_LOOK, ""), FRESHNESS);
 }
 
 /** True when the reply ends in the retired "Confidence: …" label. */
@@ -229,7 +248,7 @@ export function judgeConfidence(
     // source. Checked BEFORE the disclosure branch and after the freshness one:
     // a hedge does not excuse "I just checked" when nothing was checked.
     // (1) Claiming freshness over data nobody fetched — a false claim.
-    if (claimsFreshness(deliveredText)) return { kind: "false-freshness" };
+    if (claimsFreshness(deliveredText)) return { kind: "false-freshness", cause: "unfetched" };
     // (2) Asserting something factual and never saying it came from memory.
     //
     // This returned `exempt`, on the reading that "no retrieval means no
@@ -250,7 +269,7 @@ export function judgeConfidence(
   // The cache case is the 2026-08-17 shape: the tool ran, the data did not
   // come from the source.
   if ((ctx.servedFromCache || ctx.readFailed) && claimsFreshness(deliveredText)) {
-    return { kind: "false-freshness" };
+    return { kind: "false-freshness", cause: ctx.readFailed ? "failed" : "cached" };
   }
 
   if (hasTrailingLabel(deliveredText)) return { kind: "trailing-label" };
@@ -261,6 +280,23 @@ export function judgeConfidence(
   // was read and marks a cached source from the data.
   return { kind: "ok" };
 }
+
+/** The false-freshness repair, by why the claim is false. */
+const FALSE_FRESHNESS: Readonly<Record<FreshnessCause, string>> = {
+  cached:
+    "This reply claims its information is current, but the lookup served its rows from a " +
+    "short-lived cache, not a read made this turn. Take out the freshness claim ('just now', " +
+    "'current') and add nothing in its place: the Sources box beneath marks the cached source.",
+  failed:
+    "This reply claims its information is current, but every lookup this turn failed to reach " +
+    "its source. Replace the freshness claim with one woven clause saying the read failed and " +
+    "how sure that leaves the answer — for example 'I could not open the board, so treat this " +
+    "as unconfirmed'.",
+  unfetched:
+    "This reply claims its information is current, but no lookup ran this turn. Replace the " +
+    "freshness claim with one woven clause saying what the answer rests on — what you already " +
+    "know, not a fresh read — and how sure that makes it.",
+};
 
 /** Verdicts that should be repaired rather than delivered as-is. */
 export function needsRepair(verdict: ConfidenceVerdict): boolean {
@@ -283,12 +319,7 @@ export function repairInstruction(verdict: ConfidenceVerdict): string | null {
         "anything, and do NOT append a trailing label. Change nothing else."
       );
     case "false-freshness":
-      return (
-        "This reply claims its information is current, but nothing was fetched " +
-        "from the source this turn (or it came from cache). Rewrite the " +
-        "confidence clause to say what the answer actually rests on — a " +
-        "re-read or an earlier look earns 'I read this earlier', not 'just now'."
-      );
+      return FALSE_FRESHNESS[verdict.cause];
     case "trailing-label":
       return (
         "This reply ends with a standalone confidence label, which is retired. " +

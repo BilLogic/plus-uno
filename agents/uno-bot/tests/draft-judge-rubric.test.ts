@@ -76,7 +76,8 @@ test("D9 treats the trailing label as retired, not required", () => {
 test("D9 passes a live read that carries no clause", () => {
   // Since 2026-10-11 a live read says nothing in prose: the Sources box shows
   // what was read, so a clause there only repeats it.
-  assert.match(d9Line(), /live read this turn needs no clause/i, "D9 should pass a live read with no clause");
+  assert.match(d9Line(), /live or cached read this turn needs no clause/i, "D9 should pass a live or cached read with no clause");
+  assert.match(d9Line(), /none ran/i, "D9 should still ask an answer with no lookup to say what it rests on");
   assert.doesNotMatch(d9Line(), /or none at all/i, "D9 still fails a reply for carrying no clause");
 });
 

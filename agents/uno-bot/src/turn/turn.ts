@@ -2071,7 +2071,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // logged as verdict=pass.
   const retrievalRan = retrievalRanIn(run.tools);
   const servedFromCache = run.receipt?.cached === true;
-  const readFailed = ctx.presenting.nothingRead();
+  const readFailed = ctx.presenting.readFailed();
   let verdict: ConfidenceVerdict = { kind: "exempt" };
   try {
     verdict = judgeConfidence(deps.deliveredBody(draft), { retrievalRan, servedFromCache, readFailed });

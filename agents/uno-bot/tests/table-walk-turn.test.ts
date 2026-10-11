@@ -76,7 +76,7 @@ const item = (n: number, url = cell(n), indent = "") =>
 /** A cell the table does not hold: another call's row. */
 const other = (n: number) => `https://blueprint.example/other-${n}`;
 
-const CLAUSE = "I searched the blueprint just now, so these are current.";
+const CLAUSE = "I could not open two of these cells, so treat their lanes as unconfirmed.";
 
 // ── The redraft ─────────────────────────────────────────────────────────────
 
@@ -92,7 +92,7 @@ test("a draft walking more than 3 list items asks the one judge call to redraft 
   assert.match(instruction, /TABLE WALK/);
   assert.match(instruction, /4 list items/);
   assert.match(instruction, /at most 3/);
-  assert.match(instruction, /confidence clause/);
+  assert.match(instruction, /hedge on how sure/);
   assert.equal(text, redraft);
 });
 
@@ -220,11 +220,18 @@ test("prose with no blank lines keeps its bold lead and its closing clause", asy
   assert.equal(text, ["**Clearance is the biggest snag.**", CLAUSE].join("\n"));
 });
 
-test("a list item carrying the confidence clause stays, wherever it falls", async () => {
+test("a list item carrying the hedge stays, wherever it falls", async () => {
   const last = `- [Pain point 5](${cell(5)}) is the newest; ${CLAUSE}`;
   const prose = ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), last].join("\n");
   const { text } = await turn(prose);
   assert.equal(text, ["**Clearance is the biggest snag.**", last].join("\n"));
+});
+
+test("a list item that only claims freshness is not kept for it: freshness is the Sources box's", async () => {
+  const last = `- [Pain point 5](${cell(5)}) is the newest; I searched the blueprint just now.`;
+  const prose = ["**Clearance is the biggest snag.**", item(1), item(2), item(3), item(4), last].join("\n");
+  const { text } = await turn(prose);
+  assert.equal(text, "**Clearance is the biggest snag.**");
 });
 
 test("a heading or an intro over a list the backstop emptied goes with it, the confidence clause after it notwithstanding", async () => {

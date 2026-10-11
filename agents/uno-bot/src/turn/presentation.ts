@@ -86,7 +86,7 @@ import { signed, warningLog } from "./warning-line";
 import { rowFor } from "../agent/tool-table";
 import type { AbsenceContext } from "../agent/absence";
 import { splitCutShort } from "../agent/loop-policy";
-import { hasWovenConfidence } from "../agent/confidence";
+import { hasHedge } from "../agent/confidence";
 import { measureProse, overBudget, withinListBudget, MAX_LIST_ITEMS, MAX_PROSE_CHARS } from "./prose-budget";
 
 /** What rides beneath an answer. */
@@ -136,7 +136,7 @@ export interface Presenter {
   presentation(): Presentation | undefined;
   /** Did a lookup's source fail while none answered — so nothing live stands
    *  behind the answer, and its prose owes a hedge? */
-  nothingRead(): boolean;
+  readFailed(): boolean;
 }
 
 type Recorded = LookupCall;
@@ -528,8 +528,8 @@ export function presenter(opts: { now?: () => number } = {}): Presenter {
         if (merged !== was) sources.set(source.url, merged);
       }
     },
-    nothingRead() {
-      return warnings.nothingRead();
+    readFailed() {
+      return warnings.readFailed();
     },
     chartedAcross() {
       return drawnAcross.map(({ lookup, field }) => ({ lookup, field }));
@@ -578,7 +578,7 @@ export function proseBudgetRepair(draft: string, presentation: Presentation | un
     `TABLE WALK. The ${what} shows every row, yet the prose around it runs long: ${over.join("; ")}. ` +
     "Rewrite it to a **bold** one-sentence takeaway, then what stands out and what to act on, " +
     `in at most ${MAX_LIST_ITEMS} list items and ${MAX_PROSE_CHARS} characters, naming at most ${MAX_NAMED_ROWS} rows, linked; ` +
-    `leave the rest to the ${what}. Keep the confidence clause and any caveat as they are` +
+    `leave the rest to the ${what}. Keep any hedge on how sure the answer is, and any caveat, as they are` +
     `${measure.typedTable ? ", and keep the table as it is" : ""}.`
   );
 }
@@ -611,11 +611,11 @@ function withoutWarningLines(prose: string, warnings: readonly string[]): string
   return kept.join("\n");
 }
 
-/** A line the backstop never takes out: the confidence clause, which says
- *  what was checked or how sure, or that it was read "just now" ("I queried
- *  the blueprint just now", which names no verb `hasWovenConfidence` knows).
- *  A bare "currently" in a row's sentence is not one. */
-const carriesConfidence = (line: string): boolean => hasWovenConfidence(line) || /\bjust\s+now\b/i.test(line);
+/** A line the backstop never takes out: a hedge, which says how sure the
+ *  answer is when that is lower than a live read earns ("I could not open the
+ *  story, so treat it as unconfirmed"). A line that only says it was read
+ *  "just now" is not one: freshness is the Sources box's to show. */
+const carriesHedge = (line: string): boolean => hasHedge(line);
 
 /**
  * The prose as it posts beneath a presentation: every line that types out a
@@ -645,7 +645,7 @@ export function presentedProse(prose: string, presentation: Presentation | undef
   if (!overBudget(measure, !!(table || presentation?.cards), named, MAX_NAMED_ROWS)) return out;
   // Beside a table the whole walk goes, since the table carries the rows;
   // beside cards alone, the first 3 items stay.
-  const trimmed = withinListBudget(out.text, carriesConfidence, table || measure.typedTable ? 0 : MAX_LIST_ITEMS);
+  const trimmed = withinListBudget(out.text, carriesHedge, table || measure.typedTable ? 0 : MAX_LIST_ITEMS);
   return { ...out, text: trimmed.text, ...(trimmed.removed ? { trimmed: trimmed.removed } : {}) };
 }
 
