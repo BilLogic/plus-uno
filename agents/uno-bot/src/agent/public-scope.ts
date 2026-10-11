@@ -37,6 +37,7 @@
 // anyone on the web could open (a public link, a public repo, the comment's
 // own file, uno's own playbook). The model is not offered a gated tool on that
 // turn at all (`toolRosterFor` in `run-agent.ts`), so it can propose no write.
+// No asker is offered a tool this rule always refuses.
 //
 // A refusal is an ordinary tool result, `{ ok: false, error }`, so the model
 // reads why and answers from what it has, or says it could not find it.
@@ -54,7 +55,7 @@ import { isTeamSurface, type SurfaceConfig } from "../sweep/surfaces";
 import { teamSurfacesFor } from "../sweep/team-surfaces";
 import { catalogDatabaseOf, catalogSkippedTitlesOf } from "../tools/notion-search";
 import { sourceUrlOf } from "../tools/read-source";
-import type { ToolName } from "./tool-table";
+import { TOOL_TABLE, type ToolName } from "./tool-table";
 
 /** What the rule reads. */
 export interface PublicScopeDeps {
@@ -89,16 +90,20 @@ const CLASSIFIED: Partial<Record<ToolName, "public" | "team">> = {
 };
 
 /**
- * Whether a tool is offered to the model on this turn at all. On an unmapped
- * asker's public-scope turn only the tools that asker may run are offered, so
- * no gated tool is, and no write can be proposed.
+ * Whether a tool is offered to the model on this turn at all. A public-scope
+ * turn is never offered a turn tool `CLASSIFIED` leaves out, since
+ * `runAtPublicScope` refuses it for every asker. An unmapped asker is offered
+ * only the `public` ones, so no gated tool, and no write can be proposed; a
+ * mapped asker keeps the gated tools.
  *
  * @param name - The tool
  * @param slack - The turn's context
  */
 export function offeredAtPublicScope(name: ToolName, slack: Pick<SlackContext, "publicOnly" | "unmappedAsker">): boolean {
-  if (!slack.publicOnly || !slack.unmappedAsker) return true;
-  return CLASSIFIED[name] === "public";
+  if (!slack.publicOnly) return true;
+  const reach = CLASSIFIED[name];
+  if (slack.unmappedAsker) return reach === "public";
+  return TOOL_TABLE[name].access !== "ungated" || reach !== undefined;
 }
 
 const refuse = (error: string): string =>

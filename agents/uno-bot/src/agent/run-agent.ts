@@ -575,9 +575,10 @@ const TURN_WRAPPERS: Partial<Record<ToolName, (body: ToolBody) => ToolBody>> = {
 /**
  * The tools the model is offered on a turn with this context.
  *
- * A `worker` row has no schema and is offered to no one. An unmapped asker's
- * public-scope turn is offered only what that asker may run
- * (`public-scope.ts` § offeredAtPublicScope), so no gated tool and no write.
+ * A `worker` row has no schema and is offered to no one. A public-scope turn
+ * is offered only what its asker may run (`public-scope.ts` §
+ * offeredAtPublicScope): never a tool that scope always refuses, and for an
+ * unmapped asker no gated tool and no write.
  * Exported for `tests/turn-origin-visibility.test.ts`.
  *
  * @param slack - The turn's tool context
