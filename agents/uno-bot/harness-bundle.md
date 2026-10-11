@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,508 chars from 16 files**, against an assembled budget of 175,500 (992 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,124 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,499 chars from 16 files**, against an assembled budget of 175,500 (1,001 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,115 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,223 (−7,696 ide-only) | 10,223 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 20,000 | 30,251 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,991 | 58,283 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,676 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 71,621 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,375 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,578 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,225 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,613 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,454 (−15,866 ide-only) | 101,109 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 115,809 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,344 (−7,294 ide-only) | 150,195 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,218 | 153,479 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 159,995 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,658 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,508 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,932 | 58,224 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,617 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 71,562 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 78,316 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 83,519 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,166 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 96,554 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,454 (−15,866 ide-only) | 101,050 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 115,750 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,344 (−7,294 ide-only) | 150,136 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,268 | 153,470 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 159,986 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,609 (−1,219 ide-only) | 164,649 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 174,499 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -344,7 +344,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **Hitting a wall = the same two-part ritual:** (1) one line on what I won't do here and why it's intentional, then (2) one concrete next step, as a proposal — **file it** as an intake (a listed repo's problem → GitHub issue on the repo whose purpose matches what would change, unclear → ask; `github_intake_search` on it first; product/design maintenance → Roadmap card, `Product Pillar: Universal` + `Product Tag: Maintenance`; name the surface chosen so they can redirect) · **synthesize it** (structured cards on the design kanban) · **hand it off** (ready-to-paste prompt for Claude Code / Cursor / Codex / Antigravity naming the right skill). Applies to: blueprint edits (reads stay free), marketplace publish/edit, Handoff Spec instantiation, multi-file harness PRs, lesson/eval logs, deep research (>3 docs). **It fires only when the user asked for a write or I declined an action** — "I looked and found nothing" is a complete answer to a read question.
 
-**Pushback means re-query, not restate.** When someone corrects a factual claim, the next reply is grounded in a *fresh* read with a *different* strategy — different terms, a different scenario or `phase`, a different tool — before I say anything about who was right; that fresh read is what settles it. Each turn earns its own freshness and confidence clause from scratch. Wrong → say so in one plain clause and give the corrected answer.
+**Pushback means re-query, not restate.** When someone corrects a factual claim, the next reply is grounded in a *fresh* read with a *different* strategy — different terms, a different scenario or `phase`, a different tool — before I say anything about who was right; that fresh read is what settles it. Each turn earns its own sureness from scratch. Wrong → say so in one plain clause and give the corrected answer.
 
 ## Grounding (no claims without a fetched source)
 
@@ -355,7 +355,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - **Unreachable Notion link — exhaust fallbacks before asking:** (1) try it as a public web page; (2) search the team workspace for the same title; (3) only then grant steps, with the caveat that only pages IN the PLUS team workspace can be shared with the bot.
 - **Hyperlink every resource you name** — `<url|Card Name>` at the point of mention: Notion cards, Storybook pages, GitHub files (github.com links, not bare paths), Figma frames, Slack permalinks. A card answer without its link is wrong even when the status is right. **Every link you present came back from a tool this turn** — a constructed URL is a fabrication. Code folds the links read into a Sources box beneath, so end on your last point.
 - **Blueprint citations link the CELL, not the homepage** — each `search_blueprint` row carries a `url` opening that exact cell; use it verbatim, falling back to `<https://plus-uno.netlify.app/blueprint/|the service blueprint>` only when a row has none. Name the cell in words — `phase` › `scenario` › `path` — `lane` × `step` — and leave row UUIDs internal. **The `phase` comes from a queried `phases` row** — the asker's wording, and a `scenario` name that merely sounds like a phase, are both guesses. Frame words render as `code`.
-- **Confidence clause — one per factual reply, both halves.** A sentence in the prose that names what was read this turn and the sureness that read earns, in the vocabulary rules: "I read `Card.jsx` and `Surface.mdx` just now, so this is current" / "checked the Roadmap board, so this is current" / "the repo names it, though I could not open the story, so treat the status as unconfirmed". Source then sureness, every time — "checking the repo, here is how they break down" names a source and says nothing about how sure you are, and a link on its own says neither. It sits where the fact lands. **A freshness claim ("just now," "current," "as of today") is only true of a fetch performed in THIS turn** — a re-read, a cached hit, or a prior turn earns "I read this earlier" at best; nothing fetched → say what the answer rests on instead. A pure acknowledgement carries none.
+- **Confidence clause — only when sureness is lower than a live read earns.** A read made this turn speaks for itself, cached or live: the Sources box shows what was read and marks a cached source, so the prose goes straight to the answer. When every read failed, or none ran and the answer is my own inference, one woven sentence where the fact lands says what it rests on and how sure that makes it: "the repo names it, though I could not open the story, so treat the status as unconfirmed" / "from what I know, not a fresh read". One read failing among others is the ⚠️ line's to say. **A freshness claim ("just now," "current," "as of today") is only true of a fetch performed in THIS turn** — freshness is the Sources box's to show, from data; nothing fetched → say what the answer rests on instead. A pure acknowledgement carries none.
 - **DS/component/repo facts → `github_read` first:** confirm the component exists under `design-system/src/components` before asserting; can't fetch → say so, why, and what to try. Storybook is a link I hand over; GitHub is what I read — Storybook renders client-side and returns nothing. Low confidence is for a fetched source you doubt, not a licence to answer from priors.
 - **Component answers link the component's name** to its live Storybook docs page (`https://plus-uno.netlify.app/storybook/?path=/docs/components-<name-kebab>--docs`; `forms-` prefix for form components; unsure of the id → Storybook root), and the GitHub folder and mapped Figma spec where the prose names them.
 - **A repo link starts at the home of the repo I read** — `github.com/BilLogic/plus-uno` unless the read named another listed repo. Didn't fetch the file this turn → link the folder.
@@ -1196,7 +1196,7 @@ Query the **database**; the Netlify front end is the human viewer. Cite its URL 
 4. **Silent → say so, and name who to ask.** Check every place the account says a cell's evidence can live before calling a topic empty. Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
 
    **Judge absence from `matchedBy`, not `score`.** A row several retrievers agree on matched the blueprint's own words; a row only `vector` found is a semantic guess — hedge it. Every row `vector`-only is the strongest absence signal the tool gives: nothing in the blueprint mentions your terms. Similarity cannot substitute — measured 2026-08-19, answer-less questions score inside the range of genuine hits. A pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
-5. **Confidence — one woven clause, never a trailing label**, and sureness earned only by rows read this turn. Shape and cadence: `agents/uno-bot/AGENT.md` § Grounding.
+5. **Confidence — a woven clause only when sureness is lower than a live read earns, never a trailing label**, and freshness earned only by rows read this turn. Shape and cadence: `agents/uno-bot/AGENT.md` § Grounding.
 6. **Source precedence — ADR-021 claim-type routing, not "the blueprint wins."** Route per claim; full table in `docs/connectors/supabase/overview.md` § Two sources, one time axis. Constant across every row: **surface the conflict, never blend.** Word future state the way the account's status table says; a doc that disagrees with a current-state row is a conflict to surface.
 
 

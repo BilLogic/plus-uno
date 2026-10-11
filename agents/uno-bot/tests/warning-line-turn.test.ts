@@ -108,12 +108,12 @@ test("partial lookups of two sources are still one line, naming both", async () 
 test("a source that errored leaves one line; a retry that came back whole clears it", async () => {
   const down = JSON.stringify({ ok: false, error: "Notion 502: bad gateway" });
   const failed = await turn([[ROADMAP]], { roadmap_query: down });
-  assert.deepEqual(failed.warnings, ["The Roadmap board could not be read just now, so this answer goes without it."]);
+  assert.deepEqual(failed.warnings, ["The Roadmap board could not be read, so this answer goes without it."]);
 
   const timedOut = await turn([[SEARCH]], {
     search_blueprint: JSON.stringify({ ok: false, error: "The operation timed out", reason: "unreachable" }),
   });
-  assert.deepEqual(timedOut.warnings, ["The blueprint could not be read just now, so this answer goes without it."]);
+  assert.deepEqual(timedOut.warnings, ["The blueprint could not be read, so this answer goes without it."]);
 
   let calls = 0;
   const h = harness({
@@ -232,7 +232,7 @@ test("a third line is dropped: two lines at most, in the order their triggers we
 
   assert.deepEqual(warnings, [
     "Only part of the blueprint results came back, so something may be missing.",
-    "The Roadmap board could not be read just now, so this answer goes without it.",
+    "The Roadmap board could not be read, so this answer goes without it.",
   ]);
   assert.equal(told.at(-1)?.warning_attached, false, "the model hears its line will not show");
 

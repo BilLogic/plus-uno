@@ -14,7 +14,7 @@
 //   • LENGTH: more than 1,000 visible characters (links count as their text),
 //     the draft judge's own floor (`MIN_DRAFT_CHARS`): the length below which
 //     the harness already treats an answer as short enough to ship unread.
-//     A takeaway, a confidence clause and 3 linked rows come to about 700.
+//     A takeaway, a hedge and 3 linked rows come to about 700.
 //   • ROWS NAMED: more than 3 of the table's rows, counted by the caller
 //     (`namedRows`), which catches a walk written as sentences.
 // Rows beneath are a table or cards `present` attached, or a Markdown table
@@ -160,7 +160,7 @@ export interface ItemsRemoved {
  * top-level items stay, each with everything nested in it.
  *
  * A list item goes with the lines indented beneath it, unless one of them is a
- * line `keep` holds (the confidence clause). A paragraph, a line that is not a
+ * line `keep` holds (a hedge). A paragraph, a line that is not a
  * list item, a typed table and the clause always stay. A label that only
  * introduced what went — "Phase: Onboarding", "**Also:**", "Here is the
  * breakdown:", a heading — goes with it; a heading over a paragraph that stays
@@ -218,7 +218,7 @@ export function withinListBudget(prose: string, keep: (line: string) => boolean,
  * to the first line that stays and is not a list item, went, and something
  * did. A list item that stays means it still introduces a list. A heading
  * whose own section goes on into a paragraph keeps its place over it; a
- * paragraph past a label that went, or the confidence clause, is not its
+ * paragraph past a label that went, or a hedge, is not its
  * section's.
  */
 function introducesOnlyGone(
@@ -247,7 +247,7 @@ function introducesOnlyGone(
       continue;
     }
     // A list item that stays means the label still introduces a list — unless
-    // it stayed only for the confidence clause it carries, which no label
+    // it stayed only for the hedge it carries, which no label
     // introduces.
     if (!skip[j] && (LIST_ITEM.test(line) || indentOf(line) > 0)) return keep(line) ? any : false;
     const paragraph = !skip[j] && !isLabel(line) && !RULE.test(line) && !keep(line);

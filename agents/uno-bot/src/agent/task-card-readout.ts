@@ -49,6 +49,10 @@ export interface TaskCardSource {
   /** The row's number as its estate shows it — a Roadmap card's — so prose
    *  that writes "#412" names it. */
   readonly number?: number;
+  /** The lookup served it from its cache rather than reading the source this
+   *  turn — its own `cached` field says so. The Sources box marks it, from
+   *  this data, so freshness is never the model's to claim. */
+  readonly cached?: true;
 }
 
 /** What a card says beyond its title. Every method answers null (or none)
@@ -361,5 +365,13 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
  */
 export function readoutFor(name: string): TaskCardReadout | null {
   if (!taskCardFor(name)) return null;
-  return (READOUTS as Record<string, TaskCardReadout>)[name] ?? null;
+  const readout = (READOUTS as Record<string, TaskCardReadout>)[name];
+  if (!readout) return null;
+  return {
+    ...readout,
+    sources: (result) => {
+      const found = readout.sources(result);
+      return succeeded(result)?.cached === true ? found.map((s) => ({ ...s, cached: true as const })) : found;
+    },
+  };
 }

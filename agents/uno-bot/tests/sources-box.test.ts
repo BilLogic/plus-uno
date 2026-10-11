@@ -116,6 +116,37 @@ test("the title is the count alone, with no freshness suffix", async () => {
   assert.equal(box!.title!.text, "Sources (4)");
 });
 
+/** A blueprint search that found these cells, from the cache or live. */
+function cellsResult(cached: boolean): string {
+  return JSON.stringify({
+    ok: true,
+    count: 3,
+    cached,
+    ...(cached ? { age_ms: 40_000 } : {}),
+    rows: [1, 2, 3].map((i) => ({ name: `Cell ${i}`, url: `https://plus-uno.netlify.app/blueprint/?cell=c${i}` })),
+  });
+}
+
+const BLUEPRINT_PROSE = "**Three cells cover it.** Cell 1, Cell 2 and Cell 3 each carry a step.";
+
+test("a source served from cache is marked as read earlier, in the box and in its line", async () => {
+  const { box, last } = await answer([{ name: "search_blueprint", result: cellsResult(true) }], BLUEPRINT_PROSE);
+
+  const listed = JSON.stringify(box?.child_blocks);
+  assert.equal((listed.match(/ · read earlier/g) ?? []).length, 3, "each cached source carries the mark");
+  assert.ok(listed.includes(`{"type":"link","url":"https://plus-uno.netlify.app/blueprint/?cell=c1","text":"Cell 1"},{"type":"text","text":" · read earlier"}`));
+  assert.match(last.text ?? "", /\[Cell 1\]\(https:\/\/plus-uno\.netlify\.app\/blueprint\/\?cell=c1\) \(read earlier\)/);
+  assert.equal(box!.title!.text, "Sources (3)");
+});
+
+test("a source read live this turn carries no mark", async () => {
+  const { box, last } = await answer([{ name: "search_blueprint", result: cellsResult(false) }], BLUEPRINT_PROSE);
+
+  assert.ok(box);
+  assert.doesNotMatch(JSON.stringify(box.child_blocks), /earlier/);
+  assert.doesNotMatch(last.text ?? "", /earlier/);
+});
+
 test("rows the prose never names are not sources: a search's every hit is what it read, not what the answer used", async () => {
   const { box } = await answer(
     [{ name: "notion_search", result: notionResult(notion(8)) }],
