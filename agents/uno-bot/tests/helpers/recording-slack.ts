@@ -85,7 +85,14 @@ export type SlackCall =
       /** The checklist's heading, when this append retitled it. */
       title?: string;
     }
-  | { kind: "stopStream"; channel: string; ts: string }
+  | {
+      kind: "stopStream";
+      channel: string;
+      ts: string;
+      /** The checklist's last changes, when the stop carried them. */
+      tasks?: PlanTask[];
+      title?: string;
+    }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
 
@@ -264,6 +271,27 @@ export interface RecordingSlack {
   deps(planStream?: boolean): SlackDeliveryDeps;
   /** Just the calls of one kind, narrowed. */
   of<K extends SlackCall["kind"]>(kind: K): Array<Extract<SlackCall, { kind: K }>>;
+  /** Every checklist update in order: each append's, and the stop's when it
+   *  carried the last changes. */
+  checklist(): Array<{ ts: string; tasks: PlanTask[]; title?: string }>;
+}
+
+/** Why Slack would refuse these task chunks, or null.
+ *
+ *  A card's `icon` only as Slack's icon object, `{type: "icon", name}` with a
+ *  built-in name (`slack-block-rules.ts`). The `/debug/slack-stream?chunks=`
+ *  probe against production Slack on 2026-10-07 refused an image-URL `name`,
+ *  a `url`, an `image` element and an emoji — `invalid_arguments`, "failed to
+ *  match exactly one allowed schema [json-pointer:/chunks/0]". */
+function taskRefusal(tasks: readonly PlanTask[]): string | null {
+  const bad = tasks.find((t) => !SLACK_TASK_STATUSES.has(t.status));
+  if (bad) return `task ${bad.id} as ${String(bad.status)}`;
+  for (const t of tasks) {
+    if (!("icon" in t)) continue;
+    const why = iconRefusal((t as { icon?: unknown }).icon);
+    if (why) return `task ${t.id} with ${why}`;
+  }
+  return null;
 }
 
 export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack {
@@ -362,26 +390,25 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       record(call);
       const delay = opts.taskDelayMs?.(appends++) ?? 0;
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
-      const bad = tasks.find((t) => !SLACK_TASK_STATUSES.has(t.status));
-      if (bad) return refuse(refused, `task ${bad.id} as ${String(bad.status)}`, "invalid_arguments");
-      // A card's `icon` only as Slack's icon object, `{type: "icon", name}`
-      // with a built-in name (`slack-block-rules.ts`). The
-      // `/debug/slack-stream?chunks=` probe against production Slack on
-      // 2026-10-07 refused an image-URL `name`, a `url`, an `image` element and
-      // an emoji — `invalid_arguments`, "failed to match exactly one allowed
-      // schema [json-pointer:/chunks/0]".
-      for (const t of tasks) {
-        if (!("icon" in t)) continue;
-        const why = iconRefusal((t as { icon?: unknown }).icon);
-        if (why) return refuse(refused, `task ${t.id} with ${why}`, "invalid_arguments");
-      }
+      const why = taskRefusal(tasks);
+      if (why) return refuse(refused, why, "invalid_arguments");
       if (stopped.has(ts)) return refuse(refused, "task update on a stopped stream", "message_not_in_streaming_state");
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
     },
-    async stopStream(channel, ts) {
-      record({ kind: "stopStream", channel, ts });
+    async stopStream(channel, ts, tasks, title) {
+      const carried = tasks?.length || title !== undefined;
+      record({
+        kind: "stopStream",
+        channel,
+        ts,
+        ...(carried ? { tasks: [...(tasks ?? [])] } : {}),
+        ...(title === undefined ? {} : { title }),
+      });
       if (stopped.has(ts)) return refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
+      // Slack checks the stop's chunks as it checks an append's.
+      const why = taskRefusal(tasks ?? []);
+      if (why) return refuse(refused, why, "invalid_arguments");
       stopped.add(ts);
     },
     async setSessionStatus(channel, threadTs, status) {
@@ -409,6 +436,12 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     }),
     of: <K extends SlackCall["kind"]>(kind: K) =>
       calls.filter((call): call is Extract<SlackCall, { kind: K }> => call.kind === kind),
+    checklist: () =>
+      calls.flatMap((call) =>
+        call.kind === "tasks" || (call.kind === "stopStream" && call.tasks)
+          ? [{ ts: call.ts, tasks: call.tasks ?? [], ...(call.title === undefined ? {} : { title: call.title }) }]
+          : [],
+      ),
   };
 }
 

@@ -38,12 +38,12 @@ const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0
 /** Every card as Slack last saw it, by id. */
 function lastSeen(slack: RecordingSlack): Map<string, { title: string; status: string; output?: string }> {
   const out = new Map<string, { title: string; status: string; output?: string }>();
-  for (const call of slack.of("tasks")) for (const t of call.tasks) out.set(t.id, t);
+  for (const call of slack.checklist()) for (const t of call.tasks) out.set(t.id, t);
   return out;
 }
 
 /** Every heading the checklist was given: each rides an append. */
-const headings = (slack: RecordingSlack): string[] => slack.of("tasks").flatMap((c) => (c.title ? [c.title] : []));
+const headings = (slack: RecordingSlack): string[] => slack.checklist().flatMap((c) => (c.title ? [c.title] : []));
 
 /** Run `n` lookups the way the loop reports a reply that asks for all of them. */
 async function lookups(
@@ -82,7 +82,7 @@ describe("the checklist's card cap", () => {
     assert.equal(more.title, "…and 3 more");
     assert.equal(more.status, "complete");
     // Never a card past the ninth, at any point.
-    for (const call of slack.of("tasks")) {
+    for (const call of slack.checklist()) {
       for (const t of call.tasks) assert.ok(t.id === "understand" || toolCards.includes(t.id), t.id);
     }
   });
@@ -145,7 +145,7 @@ describe("the checklist's heading", () => {
     await delivery.postAnswer("Here it is.");
 
     assert.deepEqual(headings(slack), ["Did the session-notes redesign ship? Asking for the Q3 recap."]);
-    assert.equal(slack.of("tasks")[0]!.title, headings(slack)[0], "the heading costs no call of its own");
+    assert.equal(slack.checklist()[0]!.title, headings(slack)[0], "the heading costs no call of its own");
   });
 
   it("keeps the heading within Slack's 256-character cap", async () => {
@@ -192,7 +192,7 @@ describe("the checklist's heading", () => {
 });
 
 describe("the checklist's Slack spend", () => {
-  it("is the stream's start, one append per group of lookups and one at settle, however many calls", async () => {
+  it("is the stream's start, one append per group of lookups and the stop that settles it, however many calls", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
@@ -202,7 +202,7 @@ describe("the checklist's Slack spend", () => {
 
     assert.deepEqual(
       slack.calls.map((c) => c.kind),
-      ["startStream", "tasks", "tasks", "stopStream"],
+      ["startStream", "tasks", "stopStream"],
     );
     assert.equal(headings(slack).length, 1);
   });

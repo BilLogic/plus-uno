@@ -522,23 +522,29 @@ export async function appendTasks(
     const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
       channel,
       ts,
-      chunks: [
-        ...(title ? [{ type: "plan_update", title: title.slice(0, 256) }] : []),
-        ...tasks.map((task) => ({
-          type: "task_update",
-          id: task.id,
-          title: chunkText(task.title),
-          status: task.status,
-          ...(task.details ? { details: chunkText(task.details) } : {}),
-          ...(task.output ? { output: chunkText(task.output) } : {}),
-          ...cardLinks(task, chunkText),
-        })),
-      ],
+      chunks: planChunks(tasks, title),
     });
     return !!res.ok;
   } catch {
     return false;
   }
+}
+
+/** Plan steps as stream chunks — what `appendTasks` sends and what
+ *  `stopStream` carries as a checklist's last changes. */
+function planChunks(tasks: readonly TaskChunk[], title?: string): Array<Record<string, unknown>> {
+  return [
+    ...(title ? [{ type: "plan_update", title: title.slice(0, 256) }] : []),
+    ...tasks.map((task) => ({
+      type: "task_update",
+      id: task.id,
+      title: chunkText(task.title),
+      status: task.status,
+      ...(task.details ? { details: chunkText(task.details) } : {}),
+      ...(task.output ? { output: chunkText(task.output) } : {}),
+      ...cardLinks(task, chunkText),
+    })),
+  ];
 }
 
 /**
@@ -554,20 +560,29 @@ function chunkText(text: string): string {
 }
 
 /** Close the stream. Blocks are only accepted here — which is why the feedback
- *  footer can ride along on the final frame. */
+ *  footer can ride along on the final frame. `plan` is a checklist's last
+ *  changes, sent as the same chunks an append takes. */
 export async function stopStream(
   env: Env,
   channel: string,
   ts: string,
   blocks?: Array<Record<string, unknown>>,
+  plan?: { tasks: readonly TaskChunk[]; title?: string },
 ): Promise<boolean> {
   // The held tail, if any: an unclosed `<…` the stream ended on goes out escaped.
   const tail = streamPiece(ts, "", true);
+  const chunks = plan ? planChunks(plan.tasks, plan.title) : [];
   try {
+    // Slack takes `markdown_text` or `chunks`, never both, so with chunks
+    // going the tail rides as a markdown chunk of its own.
     const res = await slackCall<SlackResponse>(env, "chat.stopStream", {
       channel,
       ts,
-      ...(tail ? { markdown_text: tail } : {}),
+      ...(chunks.length
+        ? { chunks: [...(tail ? [{ type: "markdown_text", text: tail }] : []), ...chunks] }
+        : tail
+          ? { markdown_text: tail }
+          : {}),
       ...(blocks?.length ? { blocks } : {}),
     });
     return !!res.ok;

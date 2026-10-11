@@ -59,7 +59,7 @@ async function batch(delivery: ReturnType<typeof deliveryAdapter>, calls: readon
  *  text fields as Slack shows them (each sent once). */
 function board(slack: RecordingSlack): PlanTask[] {
   const out = new Map<string, PlanTask>();
-  for (const call of slack.of("tasks")) {
+  for (const call of slack.checklist()) {
     for (const t of call.tasks) out.set(t.id, { ...out.get(t.id), ...t } as PlanTask);
   }
   return [...out.values()].filter((t) => t.id !== "understand");
