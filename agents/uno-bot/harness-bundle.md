@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **175,199 chars from 16 files**, against an assembled budget of 175,500 (301 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,815 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **175,180 chars from 16 files**, against an assembled budget of 175,500 (320 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,796 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -29,12 +29,12 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 90,754 | 7,000 (Worker face) |
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 97,142 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−19,453 ide-only) | 101,703 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,657 (−4,814 ide-only) | 116,403 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,287 (−7,294 ide-only) | 150,732 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 154,200 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,716 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 165,349 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 175,199 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 116,384 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,287 (−7,294 ide-only) | 150,713 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 154,181 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 160,697 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 165,330 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,802 (−605 ide-only) | 175,180 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,11 +46,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 99,904 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 100,795 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 31,599 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 32,490 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -868,7 +868,7 @@ Canonical decision log for the design org. One row per durable decision; lineage
 - **Source / Evidence:** cite what **Evidence** URL points at; add secondary links here
 - **Affects:** screens / components / R-IDs when known
 
-**Bot:** `notion_create` surface `decision` (✅-gated) — requires `title` + `properties.roadmap_card` (page URL/id); set `Status` (default `Proposed`), `Evidence` via `source_url` or `properties.evidence`, and body sections. **IDE:** `writers/notion` creates/updates the same schema via Notion MCP.
+**Bot:** `notion_create` surface `decision` (✅-gated) — requires `title` + `properties.roadmap_card` (page URL/id); sets `status` (default `Proposed`), `evidence`, `owner` and `sign_off` (Notion user ids) and body sections. **IDE:** `writers/notion`, same schema via Notion MCP.
 
 **Hub embeds:** linked Decisions views filter **Roadmap Card contains This page** (set once in Notion UI — API can't set self-page filters). Running notes: team template filters Status = Proposed; 1:1 filters Active (Proposed + Accepted) ± Owner.
 
@@ -1500,6 +1500,7 @@ A decision settled in a Figma comment reaches the PRD, the Roadmap card or the d
 - **What a decision becomes:** behaviour or scope → a line added to, or a block rewritten in, the card's PRD subpage; status, owner or timing → that one card field, from its status, owner and timing fields only (Status, Design Status, Dev Status, Contributor, Dev, a timeline, Release Version, Goal/Quarter); a design-system change → a `harness-intake` issue. A visual detail or an open question becomes nothing. A file joins its card by `Card <n>` in its title. With no PRD subpage, or no card, a behaviour decision is a plain reply saying no PRD was found, with no card, and nothing is written into the card's body.
 - **The thread:** the next weekday morning run posts one message per file in #plus-design, on the shared decision card (`docs/connectors/slack.md` § Two gates). Its parent line names the file and how many comments read like decisions, for one owner: the card's **design owner**, the first of its Contributors whom the team's roles (the daily role-map sync) name a designer; with none in Slack, the file's creator by Figma handle; with neither, nobody. Each decision is a numbered card in its carousel: the quote, who wrote it on which page and when, what the write does and the start of what it writes, with Review, Open comment, and the PRD page or Roadmap card it writes to. Review shows the whole text the write makes (a PRD line, or the intake's body); Approve writes that one thing, Reject drops it. Ten cards a morning at most: the rest stay in the file's queue entry and post in the same thread the next morning.
 - **Changing the wording:** Review's **Needs changes** on a card takes its note as the new wording: decision N is drafted again on the same route against its page as it reads now, and the revised card replaces it in place in the carousel, under the same number, as a new proposal with the same confirmers and time left. A typed reply rewords only on an explicit cue — `2: <new wording>`, `#2 …`, or `reword 2: …` — from one of the card's confirmers. Every other reply in the thread, and any reply that @mentions uno-bot, is left to the ordinary path: there uno-bot answers an @mention, and a typed ✅ or ⛔ decides no card.
+- **Key decisions:** a build rule tied to a Roadmap card, settled or concretely proposed, also drafts its Decisions DB row (`notion.md` § Decisions DB), run by the same card's Review after the update; a swept thread's fix carries one the same way, from a public channel only. The detector weighs it against the card's rows: one row per decision area, so a decision that widens a row renames it and adds a dated line, keeping its Owner and Evidence; one that replaces a row's adds a row linking it and marks the older Superseded; one a row already records adds nothing. Status follows the stage (Proposed, Accepted, Rejected). Owner is the proposer, and Sign-off only someone the evidence shows approving an Accepted decision, each placed through the Notion people map; the row's Evidence is the comment's link or the thread's permalink. The code is `agents/uno-bot/src/decisions-db/row.ts`.
 - **Terms:** a card's confirmers are the file's cards' Contributors (#plus-design's members for a file with no card). It's open for 72 h, with no re-ping. A thread is carded once: a later reply in it is not read again. A morning starts a file only when its budget covers every card; a parent whose cards all failed says so and is reused the next morning, so a file has one parent.
 
 ## Commitment reminders
