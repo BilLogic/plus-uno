@@ -42,7 +42,16 @@ export type FigmaReply =
  * @param reply - What the turn came to
  */
 export function figmaReplyText(reply: FigmaReply): string {
-  const body = ((): string[] => {
+  return [FIGMA_LABEL, ...figmaReplyLines(reply)].join("\n");
+}
+
+/**
+ * What a reply says, under its label: the lines the ask's thread remembers.
+ *
+ * @param reply - What the turn came to
+ */
+export function figmaReplyLines(reply: FigmaReply): string[] {
+  return ((): string[] => {
     switch (reply.kind) {
       case "answer":
         return reply.source && reply.lines.length ? [...reply.lines, `Source: ${reply.source}`] : [CANT_FIND_LINE];
@@ -64,7 +73,6 @@ export function figmaReplyText(reply: FigmaReply): string {
         return ["I couldn't answer this just now. Ask in #plus-design."];
     }
   })();
-  return [FIGMA_LABEL, ...body].join("\n");
 }
 
 /** Markdown links, `[label](url)`; a label may hold backslash-escaped characters. */

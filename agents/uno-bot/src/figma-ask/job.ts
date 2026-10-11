@@ -61,7 +61,7 @@ import { threadVisibleSources } from "../slack/card-sources";
 import type { HistoryTurn, ThreadRef, ThreadState } from "../thread-state/index";
 import { buildTurnRequest, type Delivery, type PostResult, type ProposalCard, type TurnOutcome, type TurnRequest } from "../turn/index";
 import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
-import { askLeadText, figmaReplyText, plainAnswer, type FigmaReply } from "./copy";
+import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
 import { askText, asksUno, isOwnComment } from "./trigger";
 
@@ -290,6 +290,8 @@ async function draft(
             posted.card = { leadTs: lead.ts, link: await design.permalink(lead.ts), cardTs: result.ts };
             pending.card = posted.card;
             await deps.marks.put(job.commentId, pending);
+            // The comment shows the line linking the card, not the card.
+            return { ...result, shown: draftedLine(posted.card) };
           }
           return result;
         }
@@ -492,15 +494,25 @@ function replyOf(
   return { kind: "failed" };
 }
 
+/** What the comment shows of a posted card: the lines linking it. */
+function draftedLine(card: PostedCard): string {
+  return figmaReplyLines({ kind: "drafted", link: card.link }).join("\n");
+}
+
 /**
  * A posted card's record, moved to the lead's thread in #plus-design, and the
- * turn's memory with it — as if the turn had run there. Only while the card
- * is still live and not already there: one already decided stays decided.
+ * turn's memory with it — as if the turn had run there, so the lead's thread
+ * remembers the card's own words where the Figma thread remembers only the
+ * line linking it. Only while the card is still live and not already there:
+ * one already decided stays decided.
  */
 async function moveCard(store: ThreadState, channel: string, card: PostedCard, turns: readonly HistoryTurn[]): Promise<void> {
   const found = await store.getProposalByTs(card.cardTs);
   if (found.state !== "found" || found.proposal.threadTs === card.leadTs) return;
   await store.putProposal({ ...found.proposal, threadTs: card.leadTs, replyTs: card.leadTs });
   const there: ThreadRef = { channel, thread: card.leadTs };
-  for (const turn of turns) await store.appendHistory(there, turn);
+  const linking = draftedLine(card);
+  for (const turn of turns) {
+    await store.appendHistory(there, turn.role === "assistant" && turn.content === linking ? { ...turn, content: found.proposal.proposalText } : turn);
+  }
 }

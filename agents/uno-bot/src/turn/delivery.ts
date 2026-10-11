@@ -381,6 +381,11 @@ export interface PostResult {
   text: string;
   /** The ts it landed on, where the adapter knows one. */
   ts?: string;
+  /** What the conversation the turn answers shows of this post, when that is
+   *  not `text`: a Figma ask's card posts in #plus-design and the comment
+   *  shows only the line linking it. The thread remembers this; `text` stays
+   *  the card's own words. */
+  shown?: string;
   /** On a card: its own blocks, when it went up with them — a carousel, a
    *  preview — rather than its text. Opaque here; staged with the card
    *  (`PendingProposal.proposalBlocks`) so a note is edited onto them. */

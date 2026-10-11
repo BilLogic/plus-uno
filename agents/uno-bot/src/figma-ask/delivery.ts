@@ -87,7 +87,7 @@ export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise
     async postGateNote(note) {
       const text = describeGateNote(note);
       notes.push(text);
-      return { ok: true, text };
+      return { ok: true, text: shown(text) };
     },
 
     async card(card) {

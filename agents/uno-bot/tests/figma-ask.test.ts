@@ -94,11 +94,12 @@ function world(
     comments?: FigmaComment[];
     design?: boolean;
     toolResultFor?: (name: string, args: Record<string, unknown>) => string;
+    preflightAsk?: string;
   } = {},
 ): World {
   const figma = createInMemoryFigma({ me: BILL, now: () => NOW });
   figma.seedFile(FILE, { name: "Goal Setting / Card 2482 / Meryem", comments: opts.comments ?? [], creator: SARAH });
-  const h = harness({ replies: opts.replies ?? reads(`The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})`), toolResult: PRD_FOUND, ...(opts.toolResultFor ? { toolResultFor: opts.toolResultFor } : {}) });
+  const h = harness({ replies: opts.replies ?? reads(`The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})`), toolResult: PRD_FOUND, ...(opts.toolResultFor ? { toolResultFor: opts.toolResultFor } : {}), ...(opts.preflightAsk ? { preflightAsk: opts.preflightAsk } : {}) });
   const askers: Array<{ unmappedAsker: boolean; fileKey: string }> = [];
   /** The card Delivery of each lead, by the lead's ts. */
   const byLead = new Map<string, RecordingDelivery>();
@@ -320,6 +321,30 @@ describe("a change request", () => {
     assert.deepEqual(w.replies().map((r) => r.message), [
       [FIGMA_LABEL, `I drafted this change for approval in #plus-design: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n"),
     ]);
+  });
+
+  it("leaves the Figma thread only what Figma showed; the card's words go to the lead's thread", async () => {
+    const w = world({ replies: STAGES });
+    await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
+    const link = `https://plus.slack.com/archives/${DESIGN}/p1760000000000001`;
+    const figmaThread = await w.deps.threadState.readHistory({ channel: DESIGN, thread: `figma:${FILE}:100` });
+    assert.deepEqual(
+      figmaThread.filter((t) => t.role === "assistant").map((t) => t.content),
+      [[`I drafted this change for approval in #plus-design: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n")],
+    );
+    const lead = await w.deps.threadState.readHistory({ channel: DESIGN, thread: "1760000000.000001" });
+    const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
+    assert.deepEqual(lead.filter((t) => t.role === "assistant").map((t) => t.content), [staged!.proposalText]);
+  });
+
+  it("remembers a clarifying question as the lines Figma posted, not the whole note", async () => {
+    const question = ["Which PRD should this go in?", "The goal-setting one or the onboarding one?", "Or both?", "Line four the reply cut.", "Line five the reply cut."].join("\n");
+    const w = world({ replies: [...STAGES, ...STAGES], preflightAsk: question });
+    await ask(w, comment("100", "@uno add it to the PRD"));
+    const remembered = (await w.deps.threadState.readHistory({ channel: DESIGN, thread: `figma:${FILE}:100` }))
+      .filter((t) => t.role === "assistant")
+      .map((t) => t.content);
+    assert.deepEqual(remembered, [["Which PRD should this go in?", "The goal-setting one or the onboarding one?", "Or both?"].join("\n")]);
   });
 
   it("writes nothing from Figma: the card waits in #plus-design's thread, and Figma gets only the reply", async () => {
