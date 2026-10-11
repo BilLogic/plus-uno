@@ -127,15 +127,15 @@ The morning run's `figma-library-track` job then follows each card: when the Act
 
 | Tool | A teammate's ask | An unmapped commenter's ask |
 |---|---|---|
-| `source_read` | Notion: a row of the Roadmap, the Help Centers, the Decisions log or the Marketplace, checked on the parent Notion reports; a page with no database parent is refused. Figma: the file the comment sits on, its frames without their comments; any other file is refused. Slack links are refused. Other links read as on any turn | the same, with every Notion page refused |
+| `source_read` | Notion: a row of the Roadmap, the Help Centers, the Decisions log or the Marketplace, checked on the parent Notion reports; a row of another source sharing that database (a Tasks Tracker row on the Tutor Help Center) and a page with no database parent are refused. Figma: the file the comment sits on, its frames without their comments; any other file is refused. Slack links are refused. Other links read as on any turn | the same, with every Notion page refused |
 | `github_read`, `github_intake_search` | public repos, by GitHub's own flag | the same |
 | `read_reference`, `present` | as on any turn | the same |
 | `notion_search` | hits on a team surface alone; a catalog scope only when its database is one | refused |
 | `roadmap_query` | when the Roadmap is a configured team surface | refused |
-| `slack_search`, `slack_thread_read` | public channels alone | refused |
-| everything else ungated: `search_blueprint`, `reminder_set`, `slack_react`, `slack_user_profile`, `slack_channel_members` | refused | refused |
+| every Slack tool: `slack_search`, `slack_thread_read`, `slack_react`, `slack_user_profile`, `slack_channel_members` | refused: a public channel is still the team's own | refused |
+| `search_blueprint`, `reminder_set` | refused | refused |
 
-A refusal is an ordinary tool result, so the answer says what could not be read. A teammate's ask can still stage a card, whose write waits for its ✅ in #plus-design. An unmapped commenter's turn is offered no gated tool at all, so it proposes no write.
+A refusal is an ordinary tool result, so the answer says what could not be read. GitHub's answer on a repo's visibility is kept ten minutes, so a repo made private stops being read within that. The ask's thread remembers only the lines the reply posted, and an unmapped commenter's turn starts with none of the thread's memory. A teammate's ask can still stage a card, whose write waits for its ✅ in #plus-design. An unmapped commenter's turn is offered no gated tool at all, so it proposes no write.
 
 **Notifications (#895).** Figma tells uno-bot when a subscribed team's file gets a comment or changes, at `POST /figma/events`. Figma sends a passcode, not a signature: the route compares it with `FIGMA_WEBHOOK_PASSCODE`, whose one twin is the GitHub secret the setup uses. A delivery without it gets 401, and nothing is answered 400, because Figma switches off a webhook that gets a 400 for a wrong passcode. A delivery carries no event id, so the route derives one from what a retry repeats (the comment's id, or the file and the event's time), and the `figma/events` runner claims it and queues one job in a single step; a redelivery is answered 200 and does nothing. KV keeps which files got comments each ET day (8 days) and each file's last change (30 days), as ids and times only: the comment's words, the file's name and the commenter's handle stay in Figma. A change's job runs the drift re-check (#897) for that file, which withdraws a live question the file has caught up with about 30 minutes after the edit; for a file no live question names, it costs one KV read. A comment that asks uno-bot something gets its answer from its job (#903); any other comment's job only logs, and comment decisions (#900) read each day's notes at midnight instead.
 
