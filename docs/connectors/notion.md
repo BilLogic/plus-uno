@@ -63,7 +63,7 @@ Canonical decision log for the design org. One row per durable decision; lineage
 - **Source / Evidence:** cite what **Evidence** URL points at; add secondary links here
 - **Affects:** screens / components / R-IDs when known
 
-**Bot:** `notion_create` surface `decision` (✅-gated) — requires `title` + `properties.roadmap_card` (page URL/id); set `Status` (default `Proposed`), `Evidence` via `source_url` or `properties.evidence`, and body sections. **IDE:** `writers/notion` creates/updates the same schema via Notion MCP.
+**Bot:** `notion_create` surface `decision` (✅-gated) — requires `title` + `properties.roadmap_card` (page URL/id); sets `status` (default `Proposed`), `evidence`, `owner` and `sign_off` (Notion user ids) and body sections. **IDE:** `writers/notion`, same schema via Notion MCP.
 
 **Hub embeds:** linked Decisions views filter **Roadmap Card contains This page** (set once in Notion UI — API can't set self-page filters). Running notes: team template filters Status = Proposed; 1:1 filters Active (Proposed + Accepted) ± Owner.
 

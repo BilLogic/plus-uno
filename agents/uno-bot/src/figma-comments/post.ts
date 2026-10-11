@@ -45,7 +45,7 @@ import type { SweepRunOutcome } from "../sweep/store";
 import { readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sweep/run";
 import { decisionCard, decisionCardWords, decisionItem, decisionParent, decisionParentWaiting, noPrdNote, rewordInstead } from "./copy";
 import { commentUrl } from "./draft";
-import type { DecisionThread, QueuedDecision, QueuedFile } from "./queue";
+import { operationsOf, type DecisionThread, type QueuedDecision, type QueuedFile } from "./queue";
 
 /** How long a decision card stays confirmable. */
 export const DECISION_CARD_TTL_MS = 72 * 60 * 60 * 1000;
@@ -101,8 +101,8 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
       if (!deps.dryRun) await fc.queue.remove(file.fileKey);
       continue;
     }
-    const cardable = waiting.filter((d) => d.operation);
-    const told = waiting.filter((d) => !d.operation);
+    const cardable = waiting.filter((d) => operationsOf(d).length);
+    const told = waiting.filter((d) => !operationsOf(d).length);
     const showing = Math.min(cardable.length, MAX_REPORT_ITEMS);
     if (deps.dryRun) {
       posted.push({ ...file, decisions: [...cardable.slice(0, showing), ...told] });
@@ -260,7 +260,7 @@ async function stageDecision(deps: SweepDeps, thread: DecisionThread, item: { me
  * @param thread - The file's thread
  * @param item - Its report's message and its entry id
  * @param n - Its number in the thread
- * @param d - A decision with an operation
+ * @param d - A decision with an operation or a row
  * @param ttlMs - How long it stays confirmable
  */
 export function stagedDecision(
@@ -270,11 +270,12 @@ export function stagedDecision(
   d: QueuedDecision,
   ttlMs: number,
 ): PendingProposal {
-  const operation = d.operation!;
+  const operations = operationsOf(d);
+  const [first] = operations;
   return {
-    operations: [operation],
-    toolName: operation.toolName,
-    input: operation.input,
+    operations,
+    toolName: first!.toolName,
+    input: first!.input,
     channel: thread.channel,
     threadTs: thread.ts,
     replyTs: thread.ts,

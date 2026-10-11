@@ -25,6 +25,7 @@ import type { SearchHit } from "../../src/sweep/search";
 import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../../src/usage/index";
 import type { InMemoryFigma } from "../../src/figma/in-memory";
+import type { DecisionRow } from "../../src/integrations/notion";
 import type { TeamRoles } from "../../src/usage/roles";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
@@ -212,6 +213,9 @@ export function sweepHarness(opts: {
     /** Rows per query page; 25 unless set. */
     pageSize?: number;
   };
+  /** Each Roadmap card's Decisions DB rows by card URL, and the Notion people
+   *  map. Unset, no fix carries a row. */
+  decisions?: { rows: Record<string, DecisionRow[]>; notion: Record<string, string> };
   /** The Figma comment jobs: the shared fake Figma, the route's KV notes, the
    *  Roadmap's cards by number, and #plus-design's members (null when they
    *  cannot be read). The detector answers from the same recorded replies.
@@ -224,6 +228,10 @@ export function sweepHarness(opts: {
     members?: string[] | null;
     /** The team's roles by Slack id: who is a designer. None unless set. */
     roles?: TeamRoles;
+    /** Each card's Decisions DB rows, by card URL. Unset, rows are not wired. */
+    decisionRows?: Record<string, DecisionRow[]>;
+    /** The Figma and Notion people maps, each to Slack ids. None unless set. */
+    people?: { figma: Record<string, string>; notion: Record<string, string> };
   };
 }): SweepHarness {
   const clock = { now: opts.now };
@@ -297,6 +305,14 @@ export function sweepHarness(opts: {
           return opts.figma!.cards?.[number] ?? null;
         },
         roles: async () => opts.figma!.roles ?? {},
+        ...(opts.figma.decisionRows
+          ? {
+              async decisionRows(cardUrl: string) {
+                return structuredClone(opts.figma!.decisionRows![cardUrl] ?? []);
+              },
+            }
+          : {}),
+        people: async () => opts.figma!.people ?? { figma: {}, notion: {} },
         detector: modelDecisionDetector(provider),
         ...(opts.figma.miscTeamId ? { miscTeamId: opts.figma.miscTeamId } : {}),
         queue: {
@@ -426,6 +442,14 @@ export function sweepHarness(opts: {
         }
       : {}),
     ...(figmaComments ? { figmaComments } : {}),
+    ...(opts.decisions
+      ? {
+          decisions: {
+            rows: async (cardUrl: string) => structuredClone(opts.decisions!.rows[cardUrl] ?? []),
+            notionPeople: async () => opts.decisions!.notion,
+          },
+        }
+      : {}),
     store: faultyStore,
     delivery: {
       async post(to, message, tag) {

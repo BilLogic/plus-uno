@@ -1235,6 +1235,9 @@ export interface NotionCreateInput {
   roadmapCard?: string;
   /** Decisions DB: Status select — Proposed | Accepted | Rejected | Superseded. */
   decisionStatus?: string;
+  /** Decisions DB: Owner and Sign-off, as Notion user ids. */
+  owner?: string[];
+  signOff?: string[];
   /** Whom the page is written for: its body opens with the attribution line
    *  naming them (`notion-attribution.ts`). */
   onBehalfOf?: string;
@@ -1286,6 +1289,9 @@ function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreate
       }
       const evidence = input.sourceUrl?.trim() || input.extras?.evidence?.trim();
       if (evidence) properties.Evidence = { url: evidence };
+      const people = (ids: string[] | undefined) => (ids ?? []).flatMap((v) => extractNotionIds(v)).map((id) => ({ id }));
+      if (people(input.owner).length) properties.Owner = { people: people(input.owner) };
+      if (people(input.signOff).length) properties["Sign-off"] = { people: people(input.signOff) };
       return {
         databaseId: env.NOTION_DECISIONS_DB_ID,
         properties,
@@ -2206,6 +2212,49 @@ function roadmapFilter(opts: {
   }
   if (!clauses.length) return undefined;
   return clauses.length === 1 ? clauses[0] : { and: clauses };
+}
+
+/** One Decisions DB row tagged with a card, as a decision is weighed against it. */
+export interface DecisionRow {
+  id: string;
+  url: string;
+  name: string;
+  /** Its Status option, as stored; empty when unset. */
+  status: string;
+  /** Its Sign-off, as Notion user ids. */
+  signOff: string[];
+}
+
+/**
+ * The Decisions DB rows tagged with a Roadmap card: what a new decision is
+ * deduped, widened and superseded against. Read-only.
+ *
+ * @param env - Worker bindings
+ * @param cardUrl - The card's page URL or id
+ * @throws When the database is not configured, the card has no id, or the query fails
+ */
+export async function decisionRowsOf(env: Env, cardUrl: string): Promise<DecisionRow[]> {
+  if (!env.NOTION_DECISIONS_DB_ID) throw new Error("NOTION_DECISIONS_DB_ID not configured");
+  const [card] = extractNotionIds(cardUrl);
+  if (!card) throw new Error("a Roadmap card id is required");
+  const { rows } = await queryDatabaseRows(
+    env,
+    env.NOTION_DECISIONS_DB_ID,
+    { maxPages: 2, errorLabel: "decisions query failed", filter: { property: "Roadmap Card", relation: { contains: card } } },
+    (r): DecisionRow | null => {
+      if (!r.id || r.archived) return null;
+      let name = "";
+      let status = "";
+      let signOff: string[] = [];
+      for (const [prop, value] of Object.entries(r.properties ?? {})) {
+        if (value.type === "title") name = plain(value.title);
+        else if (prop === "Status" && value.type === "select") status = value.select?.name ?? "";
+        else if (prop === "Sign-off" && value.type === "people") signOff = (value.people ?? []).map((u) => u.id ?? "").filter(Boolean);
+      }
+      return { id: r.id, url: canonicalNotionUrl(r.url, r.id), name, status, signOff };
+    },
+  );
+  return rows;
 }
 
 export async function queryRoadmapCards(
