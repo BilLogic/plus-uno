@@ -96,6 +96,9 @@ export interface TurnWiring {
   /** On a `figma` turn: the asker is no one Team Members maps, so the turn
    *  reads public facts alone (`agent/public-scope.ts`). */
   unmappedAsker?: boolean;
+  /** On a `figma` turn: the file the comment sits on, the one Figma file its
+   *  tools may read (`agent/public-scope.ts`). */
+  figmaFileKey?: string;
   reporters?: TurnReporters;
 }
 
@@ -115,12 +118,13 @@ export interface TurnWiring {
  * @param request - The turn's request
  * @param wiring - The caller's thread ts and origin
  */
-export function toolSlackContextFor(request: TurnRequest, wiring: Pick<TurnWiring, "toolThreadTs" | "origin" | "unmappedAsker">): SlackContext {
+export function toolSlackContextFor(request: TurnRequest, wiring: Pick<TurnWiring, "toolThreadTs" | "origin" | "unmappedAsker" | "figmaFileKey">): SlackContext {
   return {
     channel: request.channel,
     ...(wiring.toolThreadTs ? { threadTs: wiring.toolThreadTs } : {}),
     ...(wiring.origin === "figma" ? { publicOnly: true } : {}),
     ...(wiring.origin === "figma" && wiring.unmappedAsker ? { unmappedAsker: true } : {}),
+    ...(wiring.origin === "figma" && wiring.figmaFileKey ? { figmaFileKey: wiring.figmaFileKey } : {}),
     userMsgTs: request.userMsgTs,
     requestedBy: request.userId,
     ...(request.conversationType ? { conversationType: request.conversationType } : {}),

@@ -22,6 +22,9 @@ export interface SlackContext {
   /** On a `publicOnly` turn, the asker is no one Team Members maps: public
    *  facts only, so no Notion and no Slack at all (`agent/public-scope.ts`). */
   unmappedAsker?: boolean;
+  /** On a `publicOnly` turn asked in a Figma comment: the file the comment
+   *  sits on, the one Figma file the turn may read (`agent/public-scope.ts`). */
+  figmaFileKey?: string;
   /** A REAL message ts to reply under in the requesting conversation, when the
    *  caller knows one — the Gate's reply target. `threadTs` is the conversation
    *  key, which in a threadless DM is not a ts Slack accepts. */

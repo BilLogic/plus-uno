@@ -93,7 +93,7 @@ import type { ModelProvider, SystemBlock, ToolSpec } from "./model-provider";
 import type { ToolBody } from "./tool-bodies";
 import { oneReactionPerMessage } from "../tools/slack-react";
 import { isToolName, type ToolName } from "./tool-table";
-import { publicScopeDepsFor, runAtPublicScope } from "./public-scope";
+import { offeredAtPublicScope, publicScopeDepsFor, runAtPublicScope } from "./public-scope";
 import { TOOLS, TOOLS_BY_NAME } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
 import type { ToolProgressEvent } from "./tool-progress";
@@ -257,10 +257,7 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
   // refuses a schema with no row and a row with no schema, and building the
   // model's roster through it is what makes that refusal reach a deployment.
   // `tool-definitions.json` is still where every schema is written.
-  // A `worker` row has no schema and is offered to no one.
-  const tools: ToolSpec[] = TOOLS.flatMap((t) =>
-    t.schema ? [{ name: t.name, description: t.schema.description, input_schema: t.schema.input_schema }] : [],
-  );
+  const tools = toolRosterFor(slack);
 
   // Keyed like the CONVERSATION, not the thread. `/stop` arrives carrying only
   // a channel, so the key it can compute is the one this must read: a DM
@@ -574,6 +571,22 @@ const TURN_WRAPPERS: Partial<Record<ToolName, (body: ToolBody) => ToolBody>> = {
     return store ? oneReactionPerMessage(body, store.reacted) : body;
   },
 };
+
+/**
+ * The tools the model is offered on a turn with this context.
+ *
+ * A `worker` row has no schema and is offered to no one. An unmapped asker's
+ * public-scope turn is offered only what that asker may run
+ * (`public-scope.ts` § offeredAtPublicScope), so no gated tool and no write.
+ * Exported for `tests/turn-origin-visibility.test.ts`.
+ *
+ * @param slack - The turn's tool context
+ */
+export function toolRosterFor(slack: Pick<SlackContext, "publicOnly" | "unmappedAsker">): ToolSpec[] {
+  return TOOLS.flatMap((t) =>
+    t.schema && offeredAtPublicScope(t.name, slack) ? [{ name: t.name, description: t.schema.description, input_schema: t.schema.input_schema }] : [],
+  );
+}
 
 /** One ungated tool, as the agent run executes it: the table's body behind the turn's wrappers. Exported for `tests/turn-origin-visibility.test.ts`. */
 export async function executeUngatedTool(

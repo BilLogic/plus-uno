@@ -67,7 +67,9 @@ export type ToolBody = (
 export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   roadmap_query: (env, input) => executeRoadmapQuery(env, input),
   notion_search: (env, input) => executeNotionSearch(env, input),
-  source_read: (env, input, slack) => executeReadSource(env, input, slack),
+  // A Figma frame's comments stay unread on a public-scope turn: the file's
+  // other threads are not this ask's to post (`agent/public-scope.ts`).
+  source_read: (env, input, slack) => executeReadSource(env, input, slack, slack.publicOnly ? { figmaComments: false } : {}),
   search_blueprint: (env, input) => executeBlueprintSearch(env, input),
   github_read: (env, input) => executeGithubRead(env, input),
   github_intake_search: (env, input) => executeGithubIntakeSearch(env, input),

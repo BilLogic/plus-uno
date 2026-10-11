@@ -82,7 +82,7 @@ interface World {
   /** The design owner #plus-design's lead resolves; null for none. */
   owner: { slack: string | null };
   /** What each turn was told of its asker. */
-  askers: Array<{ unmappedAsker: boolean }>;
+  askers: Array<{ unmappedAsker: boolean; fileKey: string }>;
   /** Replies uno-bot posted on the file, in order. */
   replies(): Array<{ root: string; message: string }>;
 }
@@ -99,7 +99,7 @@ function world(
   const figma = createInMemoryFigma({ me: BILL, now: () => NOW });
   figma.seedFile(FILE, { name: "Goal Setting / Card 2482 / Meryem", comments: opts.comments ?? [], creator: SARAH });
   const h = harness({ replies: opts.replies ?? reads(`The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})`), toolResult: PRD_FOUND, ...(opts.toolResultFor ? { toolResultFor: opts.toolResultFor } : {}) });
-  const askers: Array<{ unmappedAsker: boolean }> = [];
+  const askers: Array<{ unmappedAsker: boolean; fileKey: string }> = [];
   /** The card Delivery of each lead, by the lead's ts. */
   const byLead = new Map<string, RecordingDelivery>();
   const marks = new Map<string, AskMark>();
@@ -409,7 +409,7 @@ describe("a change request", () => {
     const w = world();
     await ask(w, comment("100", "@uno when does the bar show?", { user: STRANGER }));
     await ask(w, comment("200", "@uno and the ring?"));
-    assert.deepEqual(w.askers, [{ unmappedAsker: true }, { unmappedAsker: false }]);
+    assert.deepEqual(w.askers, [{ unmappedAsker: true, fileKey: FILE }, { unmappedAsker: false, fileKey: FILE }]);
   });
 });
 
@@ -621,6 +621,21 @@ describe("a reply on its way", () => {
     assert.equal(retry.said, "the reply was already on the comment");
     assert.equal(w.replies().length, 1, "no second reply");
     assert.equal(w.marks.get("100")?.state, "replied");
+  });
+
+  it("knows its reply on the comment when Figma stored it escaped", async () => {
+    const reply = [FIGMA_LABEL, "Tutors \\& teachers see the bar <after> the first goal."].join("\n");
+    const w = world();
+    w.marks.set("100", { state: "replying", tries: 0, reply, at: NOW });
+    w.figma.seedFile(FILE, {
+      comments: [
+        comment("100", "@uno when does the bar show?"),
+        comment("101", [FIGMA_LABEL, "Tutors &amp; teachers see the bar &lt;after&gt; the first goal."].join("\n"), { parent_id: "100", user: BILL, client_meta: null }),
+      ],
+    });
+    const retry = await answerFigmaAsk({ fileKey: FILE, commentId: "100" }, w.deps);
+    assert.equal(retry.said, "the reply was already on the comment");
+    assert.equal(w.replies().length, 0, "no second reply");
   });
 
   it("posts on the retry when the thread does not hold it", async () => {

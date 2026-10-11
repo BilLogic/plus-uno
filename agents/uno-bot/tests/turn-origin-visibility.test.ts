@@ -28,7 +28,12 @@ const ROADMAP_DB = "11111111111111111111111111111111";
 /** A 1:1 running note, and a Roadmap card. */
 const PRIVATE_PAGE = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const TEAM_PAGE = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+/** A top-level workspace page whose title only reads as a spec. */
+const SPOOF_PAGE = "cccccccccccccccccccccccccccccccc";
 const PUBLIC_REPO = "BilLogic/plus-uno";
+/** The file the comment sits on, and another file the same token can open. */
+const ASKED_FILE = "FILEKEY1";
+const OTHER_FILE = "OTHERKEY9";
 const PRIVATE_REPO = "BilLogic/plus-private";
 
 /** Every Slack call sent, as `method body`. */
@@ -59,10 +64,22 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     return Response.json({ ok: true, user: { id: "U9", real_name: "Qi", profile: { title: SECRET } }, members: ["U9"] });
   }
   const notionPage = /api\.notion\.com\/v1\/pages\/(\w+)/.exec(url)?.[1];
+  if (notionPage === SPOOF_PAGE) {
+    return Response.json({ id: notionPage, parent: { type: "workspace", workspace: true }, properties: { title: { type: "title", title: [{ plain_text: "Salary spec" }] } } });
+  }
   if (notionPage) {
     const parent = notionPage === PRIVATE_PAGE ? NOTES_DB : ROADMAP_DB;
     const title = notionPage === PRIVATE_PAGE ? "Qi / Bill 1:1" : "Goal setting";
     return Response.json({ id: notionPage, parent: { type: "database_id", database_id: parent }, properties: { Name: { type: "title", title: [{ plain_text: title }] } } });
+  }
+  if (url.includes("api.figma.com") && url.includes("/comments")) {
+    return Response.json({ comments: [{ id: "c1", file_key: ASKED_FILE, parent_id: "", user: { id: "1", handle: "qi" }, created_at: "2026-10-01T00:00:00Z", resolved_at: null, message: SECRET, client_meta: { node_id: "1:2" } }] });
+  }
+  if (url.includes("api.figma.com") && url.includes("/nodes")) {
+    return Response.json({
+      name: "Goal Setting",
+      nodes: { "1:2": { document: { id: "1:2", name: "Frame", type: "FRAME", children: [{ id: "1:3", name: "copy", type: "TEXT", characters: "the progress bar ships hidden" }] } } },
+    });
   }
   const notionBlocks = /api\.notion\.com\/v1\/blocks\/(\w+)\/children/.exec(url)?.[1];
   if (notionBlocks) {
@@ -88,7 +105,7 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
 }) as typeof fetch;
 
 /** A Worker with the stored workspace token and one allowlisted private channel. */
-function env(): Env {
+function env(over: Partial<Record<string, string>> = {}): Env {
   const kv = new Map<string, string>([["slack_oauth_token", JSON.stringify({ access_token: "xoxp-legacy-test" })]]);
   return {
     SLACK_BOT_TOKEN: "xoxb-test",
@@ -106,11 +123,18 @@ function env(): Env {
       { repo: PUBLIC_REPO, purpose: "the harness", workflows: [] },
       { repo: PRIVATE_REPO, purpose: "private work", workflows: [] },
     ]),
+    FIGMA_ACCESS_TOKEN: "figd_test",
+    ...over,
   } as unknown as Env;
 }
 
 /** Run one tool the way a turn with `origin` runs it, from the context the wiring builds. */
-async function runTool(origin: TurnOrigin, name: string, input: Record<string, unknown>, opts: { unmappedAsker?: boolean } = {}): Promise<string> {
+async function runTool(
+  origin: TurnOrigin,
+  name: string,
+  input: Record<string, unknown>,
+  opts: { unmappedAsker?: boolean; env?: Partial<Record<string, string>> } = {},
+): Promise<string> {
   const { toolSlackContextFor } = await import("../src/turn/env-deps.js");
   const { executeUngatedTool } = await import("../src/agent/run-agent.js");
   const { buildTurnRequest } = await import("../src/turn/index.js");
@@ -123,12 +147,33 @@ async function runTool(origin: TurnOrigin, name: string, input: Record<string, u
     threaded: true,
     text: "what did we decide about the tutor pilot?",
   });
-  const slack = toolSlackContextFor(
-    request,
-    origin === "figma" ? { origin, ...(opts.unmappedAsker ? { unmappedAsker: true } : {}) } : { origin, toolThreadTs: "1700000000.000200" },
-  );
+  const slack = toolSlackContextFor(request, wiringFor(origin, opts));
   sent.length = 0;
-  return executeUngatedTool(env(), name, input, slack);
+  return executeUngatedTool(env(opts.env), name, input, slack);
+}
+
+/** The wiring a turn of `origin` is built with: a Figma ask names the file its comment sits on. */
+function wiringFor(origin: TurnOrigin, opts: { unmappedAsker?: boolean } = {}) {
+  return origin === "figma"
+    ? { origin, figmaFileKey: ASKED_FILE, ...(opts.unmappedAsker ? { unmappedAsker: true } : {}) }
+    : { origin, toolThreadTs: "1700000000.000200" };
+}
+
+/** The tool names a turn of `origin` offers the model. */
+async function offered(origin: TurnOrigin, opts: { unmappedAsker?: boolean } = {}): Promise<string[]> {
+  const { toolSlackContextFor } = await import("../src/turn/env-deps.js");
+  const { toolRosterFor } = await import("../src/agent/run-agent.js");
+  const { buildTurnRequest } = await import("../src/turn/index.js");
+  const request = buildTurnRequest({
+    userId: "U1",
+    channel: "CDESIGN1",
+    channelType: "channel",
+    conversationTs: "figma:FILEKEY1:100",
+    userMsgTs: "figma:100",
+    threaded: true,
+    text: "what did we decide?",
+  });
+  return toolRosterFor(toolSlackContextFor(request, wiringFor(origin, opts))).map((t) => t.name);
 }
 
 describe("a turn wired with the figma origin reads Slack at public visibility only", () => {
@@ -191,7 +236,98 @@ describe("a turn wired with the figma origin reads Notion's team surfaces and pu
   });
 });
 
+describe("a figma turn runs only the tools classified for public scope", () => {
+  it("refuses the blueprint, a reminder and a Slack reaction, fetching nothing", async () => {
+    for (const [name, input] of [
+      ["search_blueprint", { query: "booking" }],
+      ["reminder_set", { text: "check the pilot", when: "tomorrow" }],
+      ["slack_react", { channel: PUBLIC, ts: "1700000000.000100", emoji: "eyes" }],
+    ] as const) {
+      const out = await runTool("figma", name, input);
+      assert.match(out, /"ok":false/, name);
+      assert.deepEqual(sent, [], `${name}: nothing was fetched`);
+    }
+  });
+
+  it("queries the Roadmap for a mapped asker, whose cards are a team surface", async () => {
+    await runTool("figma", "roadmap_query", { title: "goal setting" });
+    assert.ok(sent.some((s) => s.includes("api.notion.com")), "the board was queried");
+  });
+
+  it("refuses the Roadmap when the board is not a configured team surface", async () => {
+    const out = await runTool("figma", "roadmap_query", { title: "goal setting" }, { env: { NOTION_ROADMAP_DB_ID: "" } });
+    assert.match(out, /"ok":false/);
+    assert.deepEqual(sent, []);
+  });
+
+  it("refuses a tool no one has classified, without running it", async () => {
+    const { runAtPublicScope, publicScopeDepsFor } = await import("../src/agent/public-scope.js");
+    let ran = false;
+    const out = await runAtPublicScope(
+      "brand_new_tool" as never,
+      {},
+      { publicOnly: true },
+      async () => {
+        ran = true;
+        return SECRET;
+      },
+      publicScopeDepsFor(env()),
+    );
+    assert.equal(ran, false);
+    assert.doesNotMatch(out, new RegExp(SECRET));
+    assert.match(out, /"ok":false/);
+  });
+});
+
+describe("a figma turn reads the file its comment sits on, and no other", () => {
+  for (const unmappedAsker of [false, true]) {
+    const who = unmappedAsker ? "an unmapped asker" : "a mapped asker";
+    it(`for ${who}, another Figma file is refused unread`, async () => {
+      const out = await runTool("figma", "source_read", { url: `https://www.figma.com/design/${OTHER_FILE}/Payroll?node-id=1-2` }, { unmappedAsker });
+      assert.match(out, /"ok":false/);
+      assert.deepEqual(sent, []);
+    });
+
+    it(`for ${who}, the asked file's frame is read without its comments`, async () => {
+      const out = await runTool("figma", "source_read", { url: `https://www.figma.com/design/${ASKED_FILE}/Goal-Setting?node-id=1-2` }, { unmappedAsker });
+      assert.match(out, /the progress bar ships hidden/);
+      assert.doesNotMatch(out, new RegExp(SECRET));
+      assert.ok(sent.every((s) => !s.includes("/comments")), sent.join("\n"));
+    });
+  }
+});
+
+describe("a figma turn's Notion reach", () => {
+  it("refuses a private page on the app.notion.com host", async () => {
+    const out = await runTool("figma", "source_read", { url: `https://app.notion.com/p/${PRIVATE_PAGE}` });
+    assert.doesNotMatch(out, new RegExp(SECRET));
+    assert.match(out, /not on a team surface/);
+  });
+
+  it("refuses a top-level page whose title only reads as a spec", async () => {
+    const out = await runTool("figma", "source_read", { url: `https://www.notion.so/salary-spec-${SPOOF_PAGE}` });
+    assert.doesNotMatch(out, new RegExp(SECRET));
+    assert.match(out, /not on a team surface/);
+  });
+});
+
 describe("a figma turn for an asker Team Members does not map reads public facts alone", () => {
+  it("is offered no gated or write tool at all", async () => {
+    const { TOOL_TABLE } = await import("../src/agent/tool-table.js");
+    const names = await offered("figma", { unmappedAsker: true });
+    assert.ok(names.length > 0);
+    for (const name of names) {
+      assert.equal(TOOL_TABLE[name as keyof typeof TOOL_TABLE].access, "ungated", name);
+    }
+    for (const write of ["notion_create", "github_issue_create", "reminder_set", "slack_react", "proposal_resolve"]) {
+      assert.ok(!names.includes(write), write);
+    }
+  });
+
+  it("while a mapped asker's figma turn is still offered the gated tools it may propose", async () => {
+    assert.ok((await offered("figma")).includes("notion_create"));
+  });
+
   it("reads no Notion and no Slack at all, not even a team surface or a public channel", async () => {
     for (const [name, input] of [
       ["notion_search", { query: "goal setting" }],

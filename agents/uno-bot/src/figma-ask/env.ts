@@ -81,6 +81,7 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
           // Public scope, and recorded as a Figma ask.
           origin: "figma",
           unmappedAsker: asker.unmappedAsker,
+          figmaFileKey: asker.fileKey,
         }),
       ),
     ...(channel

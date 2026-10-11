@@ -134,8 +134,9 @@ export interface FigmaAskDeps {
   /** The store the turn remembers in, and where a staged card is kept. */
   threadState: ThreadState;
   /** One turn on the ask, speaking through `delivery`; `unmappedAsker` when
-   *  Team Members does not know the asker, so it reads public facts alone. */
-  answer(request: TurnRequest, delivery: Delivery, asker: { unmappedAsker: boolean }): Promise<TurnOutcome>;
+   *  Team Members does not know the asker, so it reads public facts alone,
+   *  and `fileKey` the file the comment sits on, the one Figma file it reads. */
+  answer(request: TurnRequest, delivery: Delivery, asker: { unmappedAsker: boolean; fileKey: string }): Promise<TurnOutcome>;
   /** #plus-design; absent, nothing can be drafted. */
   design?: AskDesign;
   now(): number;
@@ -313,7 +314,7 @@ async function draft(
 
   let outcome: TurnOutcome | null = null;
   try {
-    outcome = await deps.answer(request, delivery, { unmappedAsker: slackId === null });
+    outcome = await deps.answer(request, delivery, { unmappedAsker: slackId === null, fileKey: job.fileKey });
   } catch (err) {
     // A stop is a stop wherever it lands: the retry finds the card, if one
     // posted, in the mark.
@@ -417,10 +418,28 @@ function sameFigmaPlace(a: string, b: string): boolean {
   return ka !== null && ka === key(b);
 }
 
-/** Whether the thread already holds this reply under its root. */
+/**
+ * Whether the thread already holds this reply under its root. Figma hands a
+ * posted message back with `&`, `<` and `>` as entities, and the drafted reply
+ * may still carry a markdown backslash escape, so both sides are compared
+ * unescaped and with their whitespace collapsed.
+ */
 function alreadyPosted(comments: readonly FigmaComment[], rootId: string, reply: string): boolean {
-  const flat = (text: string) => text.replace(/\s+/g, " ").trim();
+  const flat = (text: string) => unescaped(text).replace(/\s+/g, " ").trim();
   return comments.some((c) => c.parent_id === rootId && isOwnComment(c.message) && flat(c.message) === flat(reply));
+}
+
+/** Text with HTML entities decoded, in one pass, and backslash escapes dropped. */
+function unescaped(text: string): string {
+  const named: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
+  return text
+    .replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/gi, (match, name: string) => {
+      const n = name.toLowerCase();
+      if (!n.startsWith("#")) return named[n] ?? match;
+      const code = n.startsWith("#x") ? parseInt(n.slice(2), 16) : Number(n.slice(1));
+      return code <= 0x10ffff ? String.fromCodePoint(code) : match;
+    })
+    .replace(/\\([\\`*_{}[\]()#+\-.!&<>|~])/g, "$1");
 }
 
 /**
