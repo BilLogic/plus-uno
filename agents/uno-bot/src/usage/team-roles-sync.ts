@@ -54,7 +54,7 @@ export interface StoredTeamRoles {
   /** The in-scope rows — a role, not a Past Collaborator — that matched no
    *  one Slack member: the names Monday's DM to the lead lists
    *  (`./team-gaps.ts`). */
-  gaps?: string[];
+  gaps?: readonly string[];
 }
 
 /** What the sync reads and where it writes. */

@@ -18,6 +18,8 @@ import type { FigmaPeople, NotionPeople, TeamRoles } from "./roles";
 import { charge, rethrowIfBudget } from "../net";
 import { findTeamMembers } from "../integrations/notion";
 import { slackDirectoryFor } from "../tools/slack-people";
+import { openConversation, postMessage } from "../slack/api";
+import { runTeamGaps, type TeamGapsReport } from "./team-gaps";
 import {
   syncTeamRoles,
   TEAM_ROLES_KV_KEY,
@@ -139,6 +141,29 @@ export async function storedTeamRoles(env: Pick<Env, "HARNESS_KV">): Promise<Sto
     console.warn(`[usage] team roles not read: ${err instanceof Error ? err.message : String(err)}`);
     return null;
   }
+}
+
+/**
+ * Monday's DM on `Env`: the stored map's unmatched names to `LEAD_USER_ID`
+ * alone, in their DM with uno-bot, with the bot token.
+ *
+ * @param env - Worker bindings
+ * @param opts - `dryRun` lists the names and DMs nobody
+ */
+export async function runTeamGapsOnEnv(env: Env, opts: { dryRun: boolean }): Promise<TeamGapsReport> {
+  return runTeamGaps(
+    {
+      read: () => storedTeamRoles(env),
+      lead: env.LEAD_USER_ID?.trim() || null,
+      async dm(userId, text) {
+        const open = await openConversation(env, userId);
+        if (!open.ok) return { ok: false, error: open.error };
+        const res = await postMessage(env, { channel: open.channel, text });
+        return res.ok ? { ok: true } : { ok: false, error: res.error ?? "post failed" };
+      },
+    },
+    opts,
+  );
 }
 
 /**
