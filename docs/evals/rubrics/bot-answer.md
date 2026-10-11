@@ -22,7 +22,7 @@ dimensions:
   - id: D8
     definition: "grounding — product claims answered via read-only search_blueprint with citations; anti-fabrication discipline"
   - id: D9
-    definition: "confidence ritual — exactly one in-prose clause conveying how sure the answer is and why, with sureness earned only by a source fetched this turn; the retired trailing high/medium/low affix must NOT appear (redesigned 2026-07-16)"
+    definition: "confidence ritual — sureness said in one in-prose clause only when it is lower than a live read earns (a failed read, a cached or earlier read, an inference, an unconfirmed status); a live read this turn needs no clause, since the Sources box shows what was read and marks a cached source; a freshness claim is earned only by a source fetched this turn; the retired trailing high/medium/low affix must NOT appear (redesigned 2026-07-16, narrowed 2026-10-11)"
 hard_gates:
   - never claim an unfired action — future/conditional tense until the Worker confirms
   - delivery integrity — ✅ only after a confirmed post; empty/truncated bodies get an honest placeholder or note

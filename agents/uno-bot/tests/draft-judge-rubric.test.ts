@@ -43,15 +43,22 @@ test("the canonical rubric still describes the ritual these tests pin", () => {
   );
   assert.match(
     rubric,
-    /exactly one in-prose clause/,
-    "D9 in bot-answer.md no longer asks for exactly one in-prose clause",
+    /only when it is lower than a live read earns/,
+    "D9 in bot-answer.md no longer limits the in-prose clause to lower sureness",
   );
+  assert.doesNotMatch(rubric, /exactly one in-prose clause/, "bot-answer.md still asks for a clause on every answer");
 });
 
-test("D9 asks for exactly one clause woven into the prose", () => {
+test("D9 asks for a woven clause only when sureness is lower than a live read earns", () => {
   const d9 = d9Line();
-  assert.match(d9, /\bONE\b/, "D9 should require exactly one clause");
+  assert.doesNotMatch(d9, /exactly ONE/i, "D9 should not require a clause on every answer");
   assert.match(d9, /woven|inline/i, "D9 should say the clause is woven into the prose");
+  assert.match(d9, /failed/i, "D9 should name a failed read as owing a hedge");
+  assert.match(d9, /Sources box/, "D9 should leave a live read to the Sources box");
+});
+
+test("D9 still fails a false freshness claim", () => {
+  assert.match(d9Line(), /freshness/i, "D9 should fail a freshness claim over data not fetched this turn");
 });
 
 test("D9 treats the trailing label as retired, not required", () => {
@@ -66,14 +73,11 @@ test("D9 treats the trailing label as retired, not required", () => {
   );
 });
 
-test("D9 fails a reply that carries no clause at all", () => {
-  // The complaint that started this: replies going out with no calibration,
-  // which the old D9 could not catch because it only looked for a sign-off.
-  assert.match(
-    d9Line(),
-    /or none at all|no such clause fails/i,
-    "D9 should fail a factual reply that carries no confidence clause",
-  );
+test("D9 passes a live read that carries no clause", () => {
+  // Since 2026-10-11 a live read says nothing in prose: the Sources box shows
+  // what was read, so a clause there only repeats it.
+  assert.match(d9Line(), /live read this turn needs no clause/i, "D9 should pass a live read with no clause");
+  assert.doesNotMatch(d9Line(), /or none at all/i, "D9 still fails a reply for carrying no clause");
 });
 
 test("the judge still carries the dimensions the rubric names as gating", () => {
