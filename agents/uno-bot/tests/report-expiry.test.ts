@@ -4,6 +4,8 @@ import { expiryEdits, expiryFetchResponse } from "./helpers/report-expiry-fetch"
 import { createInMemoryThreadState, itemProposalKey, type DecisionReportRecord } from "../src/thread-state/index";
 import { redrawExpiredReport } from "../src/slack/report-expiry";
 import { handOffExpiredReportsFor, onRunnerJob } from "../src/slack/events";
+import { createInMemoryRunnerStorage } from "../src/runner/storage";
+import { enqueueThreadJob, type RunnerJob } from "../src/runner/queue";
 import type { Env } from "../src/types";
 
 const report = (): DecisionReportRecord => ({
@@ -100,5 +102,47 @@ describe("the report expiry job", () => {
     assert.deepEqual(expiryEdits.map((e) => e.metadata), [report().metadata, report().metadata]);
     await onRunnerJob(env, { kind: "report-expiry", messageTs: "1700.9" });
     assert.equal(expiryEdits.length, 2);
+  });
+
+  it("ends the job on a permanent Slack error, logged once, and keeps retrying a transient one", async () => {
+    let now = 0;
+    const store = createInMemoryThreadState({ now: () => now });
+    await store.putReport(report());
+    now = 1001;
+    const env = {
+      SLACK_BOT_TOKEN: "test-only",
+      THREAD_STATE: { idFromName: (name: string) => name, get: () => ({ prepareReportExpiry: store.prepareReportExpiry, acknowledgeReportExpiry: store.acknowledgeReportExpiry }) },
+    } as unknown as Env;
+    expiryEdits.length = 0;
+    expiryFetchResponse({ ok: false, error: "fatal_error" });
+    await assert.rejects(onRunnerJob(env, { kind: "report-expiry", messageTs: "1700.9" }), /fatal_error/);
+    const logged: string[] = [];
+    const error = console.error;
+    console.error = (...args: unknown[]) => void logged.push(args.join(" "));
+    try {
+      expiryFetchResponse({ ok: false, error: "message_not_found" });
+      assert.equal(await onRunnerJob(env, { kind: "report-expiry", messageTs: "1700.9" }), "handled");
+      assert.equal(logged.filter((line) => /report expiry.*message_not_found/.test(line)).length, 1);
+      logged.length = 0;
+      await onRunnerJob(env, { kind: "report-expiry", messageTs: "1700.9" });
+    } finally {
+      console.error = error;
+      expiryFetchResponse({ ok: true });
+    }
+    assert.equal(expiryEdits.length, 2, "the permanent error ends the redraw at once");
+    assert.deepEqual(logged, [], "and is logged once");
+  });
+
+  it("queues one redraw job for two expiries of the same report before it runs", async () => {
+    const runner = createInMemoryRunnerStorage();
+    const env = {
+      AGENT_RUNNER: { idFromName: (name: string) => name, get: () => ({ fetch: async (_url: string, init: { body: string }) => {
+        await enqueueThreadJob(runner, JSON.parse(init.body) as RunnerJob, 0);
+        return new Response(null, { status: 202 });
+      } }) },
+    } as unknown as Env;
+    await handOffExpiredReportsFor(env)([report()]);
+    await handOffExpiredReportsFor(env)([report()]);
+    assert.equal((await runner.list({ prefix: "job:" })).size, 1);
   });
 });
