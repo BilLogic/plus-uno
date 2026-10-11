@@ -262,12 +262,13 @@ export async function applyPressVerdict(
     const at = (deps.now ?? Date.now)();
     const failed = outcomes?.find((o) => !o.ok);
     const as = request.as ? { as: request.as } : {};
+    const done = reportDone(outcomes);
     const state: ReportItemState =
       request.decision === "cancel"
         ? { kind: "rejected", by: request.userId, ...(rejected?.reason ? { reason: rejected.reason } : {}), ...as }
         : failed
           ? { kind: "failed", by: request.userId, at, reason: failureReason(failed.message), ...as }
-          : { kind: "approved", by: request.userId, at, ...as };
+          : { kind: "approved", by: request.userId, at, ...as, ...(done ? { done } : {}) };
     const message = await settleItem(deps.reports, pending.item, state, at);
     if (message) await deps.replaceCard(message);
     return;
@@ -284,6 +285,18 @@ export async function applyPressVerdict(
     ? deps.reword(pending.proposalText, note)
     : { text: pending.proposalText, note };
   await deps.replaceCard(decidedCard(pending, words.note, words.text, { edited: words.edited === true }));
+}
+
+/** A single write may return the actual destination for its report receipt.
+ * Other writes keep their draft's receipt; failures never use this field. */
+function reportDone(outcomes: readonly OperationOutcome[] | undefined): string | undefined {
+  if (outcomes?.length !== 1 || !outcomes[0]!.ok) return;
+  try {
+    const result = JSON.parse(outcomes[0]!.result) as { report_done?: unknown };
+    return typeof result.report_done === "string" ? result.report_done.trim() || undefined : undefined;
+  } catch {
+    return;
+  }
 }
 
 /**
