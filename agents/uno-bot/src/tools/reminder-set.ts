@@ -13,6 +13,8 @@ export async function executeReminderSet(env: Env, input: Record<string, unknown
   const store = commitmentStoreFor(env);
   if (!store) return JSON.stringify({ ok: false, error: "reminders are not available on this Worker (USAGE_DB or HARNESS_KV not bound)" });
   if (!slack.requestedBy) return JSON.stringify({ ok: false, error: "no asker on this turn to remind" });
+  // An ask made outside Slack (a Figma comment) has no thread to remind in.
+  if (!slack.threadTs) return JSON.stringify({ ok: false, error: "reminders are set from a Slack conversation; this ask has no thread to remind in" });
   try {
     const result = await setSelfReminder(
       { when: input.when, what: input.what },

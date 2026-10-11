@@ -109,8 +109,11 @@ export async function executeSlackSearch(
   const query = typeof input.query === "string" ? input.query.trim() : "";
   if (!query) return JSON.stringify({ ok: false, error: "missing query" });
 
-  // Own-visibility is surface-gated: only in the requester's own bot DM.
-  const inOwnDm = Boolean(slack?.channel && turnSurfaceOf(slack.channel) === "assistant");
+  // Own-visibility is surface-gated: only in the requester's own bot DM. A
+  // turn whose answer leaves Slack (`publicOnly`, a Figma comment) is never
+  // that, and below it runs no private pass either: public channels only.
+  const publicOnly = slack?.publicOnly === true;
+  const inOwnDm = !publicOnly && Boolean(slack?.channel && turnSurfaceOf(slack.channel) === "assistant");
   const requester = inOwnDm ? slack?.requestedBy : undefined;
   const credentials = await slackSearchCredentials(env, requester);
   // The connect link, resolved ONCE and above the credential loop.
@@ -142,7 +145,7 @@ export async function executeSlackSearch(
   }
 
   const allowlist = new Set(
-    (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
+    (publicOnly ? "" : (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? ""))
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean),
@@ -218,7 +221,9 @@ export async function executeSlackSearch(
       const visibility =
         c.kind === "own"
           ? "requester-own (their DMs/private included)"
-          : c.kind === "legacy"
+          : c.kind === "legacy" && publicOnly
+            ? "public-only (the answer leaves Slack, so no private channel was searched)"
+            : c.kind === "legacy"
             ? "workspace-filtered (public + team-allowlisted private)"
             : "public-only (no user credential — public channels are the whole search)";
 

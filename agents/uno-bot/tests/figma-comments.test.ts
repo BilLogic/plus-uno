@@ -681,10 +681,10 @@ describe("the morning's thread in #plus-design (#900)", () => {
 describe("what decides what the read sees", () => {
   it("reads a comment created after the watermark, or a root resolved after it, and nothing else", () => {
     const w = SWITCH_ON;
-    assert.equal(readable({ created_at: "2026-09-29T05:00:00Z", resolved_at: null, parent_id: "" }, w), true);
-    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: "2026-09-29T05:00:00Z", parent_id: "" }, w), true);
-    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: "2026-09-29T05:00:00Z", parent_id: "c1" }, w), false);
-    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: null, parent_id: "" }, w), false);
+    assert.equal(readable({ created_at: "2026-09-29T05:00:00Z", resolved_at: null, parent_id: "", message: "" }, w), true);
+    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: "2026-09-29T05:00:00Z", parent_id: "", message: "" }, w), true);
+    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: "2026-09-29T05:00:00Z", parent_id: "c1", message: "" }, w), false);
+    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: null, parent_id: "", message: "" }, w), false);
     const threads = candidateThreads(COMMENTS, { watermark: w, from: w, until: at(30, 4) });
     assert.deepEqual(
       threads.map((t) => [t.root.id, t.replies.map((r) => r.id)]),

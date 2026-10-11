@@ -48,7 +48,7 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 ## Agents — what skills summon
 
-`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates). Roster, anatomy, and the creation rule: `agents/README.md`.
+`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates, save the Worker's labelled reply to an @uno Figma comment: `docs/connectors/figma.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
 
 ## Conventions — what agents obey
 

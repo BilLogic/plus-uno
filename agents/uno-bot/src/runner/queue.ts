@@ -235,7 +235,10 @@ async function drainThreadJob(storage: RunnerStorage, deps: RunnerDeps, jobs: Ma
       // The turn's run-lease is held elsewhere. Deleting here is how killed
       // runs used to go permanently silent — instead KEEP the job and check
       // back: it resolves to "done" (drop) or a stale-lease reclaim (re-run).
-      console.log("[runner] job deferred — run-lease held; retrying in 2 min");
+      // A turn defers on a held run-lease; a Figma event on a budget stop or
+      // rate limit, a bounded number of times (`figma-ask/job.ts`).
+      const why = job.job.kind === "figma-event" ? "waiting for a fresh budget" : "run-lease held";
+      console.log(`[runner] ${job.job.kind} job deferred — ${why}; retrying in 2 min`);
       await storage.setAlarm(deps.now() + DEFER_RETRY_MS);
       return;
     }

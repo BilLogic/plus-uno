@@ -14,7 +14,9 @@ const ESTATE_HOSTS: ReadonlyArray<readonly [Estate, readonly string[]]> = [
   ["github", ["github.com", "githubusercontent.com"]],
   ["figma", ["figma.com"]],
   ["slack", ["slack.com"]],
-  ["notion", ["notion.so", "notion.site"]],
+  // app.notion.com is the host Notion's API now hands out; the rest of
+  // notion.com is Notion's marketing site, no estate.
+  ["notion", ["notion.so", "notion.site", "app.notion.com"]],
 ];
 
 /** The estates our own Netlify site serves, each under a path prefix of the

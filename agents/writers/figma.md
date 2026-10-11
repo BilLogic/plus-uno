@@ -8,7 +8,7 @@ summary: The only agent that writes to the Figma workspace
 
 ## Role & responsibility
 
-The only agent that writes to the Figma workspace. Owns file titles, page placement under the divider sections, replica frames from prototypes, and categorized canvas/Dev-Mode annotations — including handoff notes, which are annotations, not a separate artifact. The title form, stage folders, page sections, and annotation categories are owned by `docs/connectors/figma.md`, not restated here. A file's rename or move is suggested for a person to make. Must NOT write comment pins (human-only surface) or touch files outside the workspace conventions.
+The only agent that writes to the Figma workspace. Owns file titles, page placement under the divider sections, replica frames from prototypes, and categorized canvas/Dev-Mode annotations — including handoff notes, which are annotations, not a separate artifact. The title form, stage folders, page sections, and annotation categories are owned by `docs/connectors/figma.md`, not restated here. A file's rename or move is suggested for a person to make. Leaves comment pins to people: the one comment uno-bot writes is the Worker's labelled reply to an @uno ask (`docs/connectors/figma.md`). Keeps to files inside the workspace conventions.
 
 ## Invoked by
 

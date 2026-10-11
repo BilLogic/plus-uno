@@ -30,6 +30,11 @@ const GENERIC_TEXT_CAP = 8000;
 const BLOCK_INDEX_PREVIEW = 120;
 
 
+/** The link a `source_read` call reads: the first in its `url`, else in its `text`. */
+export function sourceUrlOf(input: Record<string, unknown>): string | null {
+  return firstUrl(input.url) ?? firstUrl(input.text);
+}
+
 function firstUrl(input: unknown): string | null {
   if (typeof input !== "string") return null;
   const m = input.match(/https?:\/\/[^\s<>|)"']+/i);
@@ -61,7 +66,7 @@ export async function executeReadSource(
   slack?: Pick<SlackContext, "sharedCanvasIds">,
   opts: ReadSourceOptions = {},
 ): Promise<string> {
-  const url = firstUrl(input.url) ?? firstUrl(input.text);
+  const url = sourceUrlOf(input);
   if (!url) {
     return JSON.stringify({ ok: false, error: "no http(s) URL found in the input" });
   }

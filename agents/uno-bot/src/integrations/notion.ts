@@ -608,6 +608,9 @@ export interface NotionPageContent {
   parentDatabaseId: string | null;
   /** Notion's `parent.type`: `workspace` for a top-level page. */
   parentType: string | null;
+  /** The name of the page's title property: on a database shared by more than
+   *  one source, which source the row is (a Tasks Tracker row's is `Task name`). */
+  titleProperty: string | null;
   /** More top-level blocks follow the last one read: `blocks` stops short of
    *  the page's end. */
   truncated: boolean;
@@ -731,8 +734,10 @@ export async function readNotionPage(
     const properties: Record<string, string> = {};
     const people: Record<string, string[]> = {};
     let title = "(untitled)";
+    let titleProperty: string | null = null;
     for (const [name, prop] of Object.entries(page.properties ?? {})) {
       const rendered = renderProperty(prop);
+      if (prop.type === "title") titleProperty = name;
       if (prop.type === "title" && rendered) title = rendered;
       if (rendered) properties[name] = rendered;
       if (prop.type === "people") {
@@ -806,6 +811,7 @@ export async function readNotionPage(
       subpages,
       parentDatabaseId: page.parent?.database_id?.replace(/-/g, "") ?? null,
       parentType: page.parent?.type ?? null,
+      titleProperty,
       truncated: truncated || partial,
     };
     // Cache only whole reads (never a throw or a partial one). Clear when
@@ -837,6 +843,8 @@ export interface NotionSearchHit {
   /** Notion's `parent.type`: `workspace`, `page_id`, `block_id`,
    *  `database_id`; null when Notion gave none. */
   parentType: string | null;
+  /** The name of a page hit's title property; null for a database hit. */
+  titleProperty: string | null;
 }
 
 export async function notionSearch(
@@ -879,12 +887,14 @@ export async function notionSearch(
     for (const r of data.results ?? []) {
       if (!r.id) continue;
       let title = "(untitled)";
+      let titleProperty: string | null = null;
       if (r.object === "database" && r.title) {
         const t = plain(r.title);
         if (t) title = t;
       } else {
-        for (const prop of Object.values(r.properties ?? {})) {
+        for (const [name, prop] of Object.entries(r.properties ?? {})) {
           if (prop.type === "title") {
+            titleProperty = name;
             const t = plain(prop.title);
             if (t) title = t;
             break;
@@ -898,6 +908,7 @@ export async function notionSearch(
         url: canonicalNotionUrl(r.url, bareId),
         parentDatabaseId: r.object === "page" ? (r.parent?.database_id?.replace(/-/g, "") ?? null) : null,
         parentType: r.parent?.type ?? null,
+        titleProperty,
       });
     }
     return hits;

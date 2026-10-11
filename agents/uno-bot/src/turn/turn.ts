@@ -1379,8 +1379,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // go at fixing this call inside the loop, so a refusal here is the ask.
   const ask = await preflightCall(result.toolName, result.input);
   if (ask) {
-    await delivery.postNote(ask.ask);
-    await memory.remember(ask.ask);
+    const said = await delivery.postNote(ask.ask);
+    await memory.remember(said.ok ? said.text : ask.ask);
     return {
       disposition: "asked",
       posted: ask.ask,
@@ -1445,8 +1445,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       const bounce =
         `You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
-      await delivery.postNote(bounce);
-      await memory.remember(bounce);
+      const said = await delivery.postNote(bounce);
+      await memory.remember(said.ok ? said.text : bounce);
       return {
         disposition: "asked",
         posted: bounce,
@@ -1699,7 +1699,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
-  await memory.remember(posted.text);
+  await memory.remember(posted.shown ?? posted.text);
 
   return {
     disposition: "staged",
@@ -1843,7 +1843,7 @@ async function dropFromSweepCard(
     ],
     deps.usage.writeTimeoutMs,
   );
-  await memory.remember(posted.text);
+  await memory.remember(posted.shown ?? posted.text);
   return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
 }
 
@@ -1901,8 +1901,8 @@ async function settleVerdict(
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
   if (ctx.aside) {
-    await ctx.deps.delivery.postNote(ctx.aside);
-    await ctx.memory.remember(ctx.aside);
+    const said = await ctx.deps.delivery.postNote(ctx.aside);
+    await ctx.memory.remember(said.ok ? said.text : ctx.aside);
   }
   // A cut-off run's leftovers go back on a card of their own, after the note
   // that explains them — the card holds the buttons, so it comes last.

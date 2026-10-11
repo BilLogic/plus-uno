@@ -396,7 +396,7 @@ describe("the route on the Worker's bindings", () => {
 
 describe("the queued job", () => {
   it("says what it ran on, by id", async () => {
-    const line = await runFigmaEventJob({
+    const { line } = await runFigmaEventJob({
       eventId: "comment:2",
       type: "FILE_COMMENT",
       webhookId: "3301",
@@ -419,14 +419,14 @@ describe("the queued job's readers (#896)", () => {
         return "no live drift question names it";
       },
     };
-    const line = await runFigmaEventJob(CHANGE, readers);
+    const { line } = await runFigmaEventJob(CHANGE, readers);
     await runFigmaEventJob({ eventId: "comment:2", type: "FILE_COMMENT", webhookId: "3301", fileKey: "FILEKEY1", commentId: "2" }, readers);
     assert.deepEqual(seen, ["FILEKEY1"]);
     assert.equal(line, "[figma-notify] FILE_UPDATE on FILEKEY1: a change at 2026-10-03T18:00:00Z — no live drift question names it");
   });
 
   it("logs a re-check that failed rather than throw it, since the scheduled runs look anyway", async () => {
-    const line = await runFigmaEventJob(CHANGE, {
+    const { line } = await runFigmaEventJob(CHANGE, {
       onFileUpdate: async () => {
         throw new Error("KV down");
       },
@@ -435,7 +435,7 @@ describe("the queued job's readers (#896)", () => {
   });
 
   it("says when the backstop queued it", async () => {
-    const line = await runFigmaEventJob({ ...CHANGE, eventId: "backstop:FILEKEY1:2026-10-03T18:00:00Z", via: "backstop" });
+    const { line } = await runFigmaEventJob({ ...CHANGE, eventId: "backstop:FILEKEY1:2026-10-03T18:00:00Z", via: "backstop" });
     assert.match(line, /^\[figma-notify\] FILE_UPDATE on FILEKEY1 \(from the backstop\): a change at /);
   });
 });

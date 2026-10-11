@@ -46,6 +46,7 @@ import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../f
 import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
+import { answerFigmaAskOnEnv } from "../figma-ask/env";
 import { chainReplyHandlers, isUserTurn, runMessageJob, type ReplyHandler } from "./message-job";
 import { cardSentBack } from "./review-door";
 
@@ -250,8 +251,11 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"han
     return "handled";
   }
   if (job.kind === "figma-event") {
-    await runFigmaEventJob(job.event, { onFileUpdate: (fileKey) => recheckOnUpdateOnEnv(env, fileKey) });
-    return "handled";
+    const { outcome } = await runFigmaEventJob(job.event, {
+      onFileUpdate: (fileKey) => recheckOnUpdateOnEnv(env, fileKey),
+      onAsk: (ask) => answerFigmaAskOnEnv(env, ask),
+    });
+    return outcome;
   }
   if (job.kind === "cut-off") {
     await handleCutOffRun(env, job.proposalTs);

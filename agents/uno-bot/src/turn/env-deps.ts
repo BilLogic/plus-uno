@@ -38,7 +38,7 @@ import { fetchFigmaImagePngUrl, parseFigmaUrl, type FigmaRenderOptions } from ".
 import { figmaClientFor } from "../figma/production";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
-import type { Env } from "../types";
+import type { Env, SlackContext } from "../types";
 import { databaseOptions, ROADMAP_STATUS_PROP } from "../integrations/notion";
 import type { TurnOrigin } from "../usage/index";
 import {
@@ -85,24 +85,46 @@ export interface TurnWiring {
   applyVerdict(verdict: GateVerdict): Promise<OperationOutcome[] | void>;
   /** The REAL ts a tool's own posts thread off: the person's message in Slack,
    *  the eval conversation's one ts otherwise. Not the conversation key, which
-   *  the request already carries and cancel reads. */
-  toolThreadTs: string;
-  /** Where the turn came from, for the usage record's test-traffic rule: a
-   *  person in Slack, or a debug route (the eval transport). */
+   *  the request already carries and cancel reads. Absent for an ask made in
+   *  Figma, which has no Slack message to thread under. */
+  toolThreadTs?: string;
+  /** Where the turn came from: a person in Slack, a Figma comment, or a debug
+   *  route (the eval transport). The usage record's test-traffic rule reads
+   *  it, and a Figma turn reads every estate at public scope, because its
+   *  answer lands in a file people outside the team can open. */
   origin: TurnOrigin;
+  /** On a `figma` turn: the asker is no one Team Members maps, so the turn
+   *  reads public facts alone (`agent/public-scope.ts`). */
+  unmappedAsker?: boolean;
+  /** On a `figma` turn: the file the comment sits on, the one Figma file its
+   *  tools may read (`agent/public-scope.ts`). */
+  figmaFileKey?: string;
   reporters?: TurnReporters;
 }
 
-/** `Env` plus a caller's differences, as the dependencies a turn reads. */
-export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring): TurnDeps {
-  const reporters = wiring.reporters ?? {};
-
-  // The tool-side Slack context: where a tool's own posts go and the per-event
-  // facts a tool may use. NOT the conversation key — that is the agent run's own
-  // required argument, below, because the cancel check is its only reader.
-  const slack = {
+/**
+ * The tool-side Slack context every tool of the turn runs with: where a
+ * tool's own posts go and the per-event facts a tool may use. NOT the
+ * conversation key — that is the agent run's own required argument, because
+ * the cancel check is its only reader.
+ *
+ * A `figma` turn's answer lands in a file people outside the team can open, so
+ * its context is `publicOnly`: every tool reads at public scope
+ * (`agent/public-scope.ts`), and an asker Team Members does not map reads
+ * public facts alone. Its own function so
+ * `tests/turn-origin-visibility.test.ts` drives the context `buildTurnDeps`
+ * hands the agent run into the tools themselves.
+ *
+ * @param request - The turn's request
+ * @param wiring - The caller's thread ts and origin
+ */
+export function toolSlackContextFor(request: TurnRequest, wiring: Pick<TurnWiring, "toolThreadTs" | "origin" | "unmappedAsker" | "figmaFileKey">): SlackContext {
+  return {
     channel: request.channel,
-    threadTs: wiring.toolThreadTs,
+    ...(wiring.toolThreadTs ? { threadTs: wiring.toolThreadTs } : {}),
+    ...(wiring.origin === "figma" ? { publicOnly: true } : {}),
+    ...(wiring.origin === "figma" && wiring.unmappedAsker ? { unmappedAsker: true } : {}),
+    ...(wiring.origin === "figma" && wiring.figmaFileKey ? { figmaFileKey: wiring.figmaFileKey } : {}),
     userMsgTs: request.userMsgTs,
     requestedBy: request.userId,
     ...(request.conversationType ? { conversationType: request.conversationType } : {}),
@@ -113,6 +135,13 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     ...(request.prd?.id ? { notionPrdId: request.prd.id } : {}),
     ...(request.prd?.url ? { notionPrdUrl: request.prd.url } : {}),
   };
+}
+
+/** `Env` plus a caller's differences, as the dependencies a turn reads. */
+export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring): TurnDeps {
+  const reporters = wiring.reporters ?? {};
+
+  const slack = toolSlackContextFor(request, wiring);
 
   return {
     threadState: wiring.threadState,

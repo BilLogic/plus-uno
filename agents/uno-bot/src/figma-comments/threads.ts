@@ -19,9 +19,19 @@
 // pinned to no node — left on the page — has nowhere to be in a section, so it
 // is never a candidate (#891).
 //
+// WHAT IS LEFT TO @uno. A comment that asks uno-bot something was answered as
+// it was made (#903, `../figma-ask/`), and a change it asked for went to
+// #plus-design as its own card; uno-bot's own replies carry its label. Its
+// replies are never read here, and an ask in a thread still open is not
+// either, so no open ask becomes a second card at night: such a thread is read
+// by its other replies alone, as an old root is. Once the thread is resolved,
+// an ask in it is read like any other comment — resolving settles it, and a
+// decision worded as an ask to uno-bot is still the team's decision.
+//
 // PURE.
 
 import type { FigmaComment } from "../figma/client";
+import { asksUno, isOwnComment } from "../figma-ask/trigger";
 
 /** The night's bounds, epoch ms. */
 export interface ReadWindow {
@@ -48,12 +58,20 @@ const time = (iso: string | null | undefined): number => (iso ? Date.parse(iso) 
 
 /**
  * Whether a comment may be read at all: created after the watermark, or a
- * root resolved after it.
+ * root resolved after it — and neither uno-bot's own nor an ask in a thread
+ * still open.
  *
  * @param c - The comment
  * @param watermark - Epoch ms
+ * @param threadResolved - Whether its thread is resolved: its root's, for a reply
  */
-export function readable(c: Pick<FigmaComment, "created_at" | "resolved_at" | "parent_id">, watermark: number): boolean {
+export function readable(
+  c: Pick<FigmaComment, "created_at" | "resolved_at" | "parent_id" | "message">,
+  watermark: number,
+  threadResolved = !c.parent_id && !!c.resolved_at,
+): boolean {
+  if (isOwnComment(c.message)) return false;
+  if (asksUno(c.message) && !threadResolved) return false;
   if (time(c.created_at) > watermark) return true;
   return !c.parent_id && time(c.resolved_at) > watermark;
 }
@@ -80,9 +98,10 @@ export function candidateThreads(comments: readonly FigmaComment[], window: Read
     const t = time(iso);
     return t > window.from && t <= window.until;
   };
+  const resolved = new Set(comments.filter((c) => !c.parent_id && c.resolved_at).map((c) => c.id));
   const replies = new Map<string, FigmaComment[]>();
   for (const c of comments) {
-    if (c.parent_id && readable(c, window.watermark)) replies.set(c.parent_id, [...(replies.get(c.parent_id) ?? []), c]);
+    if (c.parent_id && readable(c, window.watermark, resolved.has(c.parent_id))) replies.set(c.parent_id, [...(replies.get(c.parent_id) ?? []), c]);
   }
   const threads: CommentThread[] = [];
   for (const root of comments) {

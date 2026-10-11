@@ -14,6 +14,7 @@
 //
 // A Worker without USAGE_DB or HARNESS_KV keeps no switches and runs no job.
 
+import { teamSurfacesFor } from "../sweep/team-surfaces";
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
@@ -54,17 +55,8 @@ export async function runDmCaptureReadOnEnv(env: Env, job: ScheduledJob, opts: J
     progress: progressIn(env.HARNESS_KV),
     holds,
     sources: { read: (url, kind) => measured(() => readSource(env, url, kind)) },
-    surfaces: {
-      runningNotesDb: env.NOTION_RUNNING_NOTES_DB_ID?.trim() || undefined,
-      // The team surfaces a search hit may come from, as the sweep reads them.
-      teamSurfaceDbs: [
-        env.NOTION_ROADMAP_DB_ID,
-        env.NOTION_HELP_TUTORS_DB_ID,
-        env.NOTION_HELP_TEACHERS_DB_ID,
-        env.NOTION_DECISIONS_DB_ID,
-        env.NOTION_MARKETPLACE_DB_ID,
-      ].flatMap((id) => (id?.trim() ? [id.trim()] : [])),
-    },
+    // The team surfaces a search hit may come from, as the sweep reads them.
+    surfaces: teamSurfacesFor(env),
     detector: { detect: (input) => measured(() => detector.detect(input)) },
     capture: { answers: (input) => measured(() => capture.answers(input)) },
     // Notion only: a DM's words never go to GitHub code search.

@@ -67,13 +67,15 @@ export type ToolBody = (
 export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   roadmap_query: (env, input) => executeRoadmapQuery(env, input),
   notion_search: (env, input) => executeNotionSearch(env, input),
-  source_read: (env, input, slack) => executeReadSource(env, input, slack),
+  // A Figma frame's comments stay unread on a public-scope turn: the file's
+  // other threads are not this ask's to post (`agent/public-scope.ts`).
+  source_read: (env, input, slack) => executeReadSource(env, input, slack, slack.publicOnly ? { figmaComments: false } : {}),
   search_blueprint: (env, input) => executeBlueprintSearch(env, input),
   github_read: (env, input) => executeGithubRead(env, input),
   github_intake_search: (env, input) => executeGithubIntakeSearch(env, input),
   slack_user_profile: (env, input) => executeSlackUserProfile(env, input),
   slack_channel_members: (env, input) => executeSlackChannelMembers(env, input),
-  slack_thread_read: (env, input) => executeSlackThreadRead(env, input),
+  slack_thread_read: (env, input, slack) => executeSlackThreadRead(env, input, slack),
   slack_react: (env, input, slack) => executeSlackReact(env, input, slack),
   reminder_set: (env, input, slack) => executeReminderSet(env, input, slack),
   slack_search: (env, input, slack) => executeSlackSearch(env, input, slack),
