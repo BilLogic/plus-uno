@@ -3,7 +3,8 @@
 // in KV for turns to read. The Figma-id → Slack-id map is kept beside it, so a
 // Figma commenter can be matched to a teammate without a call to Notion, and
 // so is the Notion-user → Slack-id map card follow-ups tag through, with the
-// names of the in-scope rows that matched nobody for Monday's DM to the lead.
+// names of the rows missing an id, for a note to the lead when one costs
+// something (`./gap-notes.ts`).
 //
 // One Notion query, paged, and one users.list read, paged — both inside the
 // run's lookup ceiling. A read that fails or stops short writes nothing, so a
@@ -52,15 +53,15 @@ export interface StoredTeamRoles {
    *  map stored before it was kept. */
   notionPeople?: NotionPeople;
   /** The in-scope rows — a role, not a Past Collaborator — that no active
-   *  Slack member matched, or more than one did (`matchRoster` `gaps`): the
-   *  names Monday's DM to the lead lists (`./team-gaps.ts`). */
+   *  Slack member matched, or more than one did (`matchRoster` `gaps`): a
+   *  card follow-up that cannot tag one asks the lead for its Slack ID
+   *  (`./gap-notes.ts`). */
   gaps?: readonly string[];
-  /** The in-scope rows matched to one member with no Notion Person: the DM's
-   *  second list. */
+  /** The in-scope rows matched to one member with no Notion Person. */
   noNotionPerson?: readonly string[];
-  /** When the read that built the two lists ran, epoch ms — unlike `at`,
-   *  never held back with kept roles. */
-  gapsAt?: number;
+  /** The rows, not Past Collaborators, with no readable Figma User ID: a
+   *  Figma asker whose handle is one of them gets the lead a note. */
+  noFigmaId?: readonly string[];
 }
 
 /** What the sync reads and where it writes. */
@@ -161,7 +162,7 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
         notionPeople: match.notionPeople,
         gaps: match.gaps,
         noNotionPerson: match.noNotionPerson,
-        gapsAt: now,
+        noFigmaId: match.noFigmaId,
       },
       ttlS,
     );

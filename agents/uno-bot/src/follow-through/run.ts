@@ -116,6 +116,7 @@ import {
   type CardCondition,
 } from "./rules";
 import type { CardTodoDetector } from "./todo";
+import type { GapNotes } from "../usage/gap-notes";
 
 /** New card follow-ups one end of day keeps; the rest wait a night. */
 export const MAX_NEW_PER_NIGHT = 15;
@@ -633,6 +634,9 @@ export interface DueDeps {
   store: CommitmentStore;
   markThread(channel: string, thread: string): Promise<void>;
   config: FollowThroughConfig;
+  /** Where someone a posted follow-up could not tag is noted to the lead;
+   *  absent, nobody is. */
+  gaps?: Pick<GapNotes, "untagged">;
   dryRun?: boolean;
 }
 
@@ -686,9 +690,13 @@ export function cardFollowUps(deps: DueDeps): CardFollowUps {
     async flush(now, runDate) {
       const actions: CommitmentAction[] = [];
       for (const [key, group] of morning.groups) {
-        actions.push(...(await postGroup(deps, group, now, runDate)));
+        const posted = await postGroup(deps, group, now, runDate);
+        actions.push(...posted);
         for (const a of group.asked) morning.held.delete(a.c.id);
         morning.groups.delete(key);
+        // Last, once the group is posted, staged and no longer held: a stop
+        // here costs only the note, never a second post.
+        await noteUntagged(deps, group, posted);
       }
       return actions;
     },
@@ -944,6 +952,18 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
     actions.push({ id: a.c.id, action: firstAsk ? "nudged" : "followed-up", text: report.text, ts: sent.ts });
   }
   return [...actions, ...later];
+}
+
+/**
+ * The lead hears of each person a posted follow-up names and could not tag,
+ * when a Team Members cell would let it (`../usage/gap-notes.ts`). Throws a
+ * budget stop.
+ */
+async function noteUntagged(deps: Pick<DueDeps, "gaps" | "dryRun">, group: Group, actions: readonly CommitmentAction[]): Promise<void> {
+  if (!deps.gaps || deps.dryRun) return;
+  const posted = new Set(actions.filter((a) => a.action === "nudged" || a.action === "followed-up").map((a) => a.id));
+  const names = [...new Set(group.asked.filter((a) => posted.has(a.c.id)).flatMap((a) => a.text.unmatched ?? []))];
+  if (names.length) await deps.gaps.untagged(names);
 }
 
 /**
