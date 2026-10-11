@@ -84,7 +84,11 @@ export type ConfidenceVerdict =
   | { kind: "unhedged" }
   /** Factual, nothing fetched this turn, and it never says so. D9 requires a
    *  from-memory answer to admit it; this branch used to be `exempt`. */
-  | { kind: "unsourced" };
+  | { kind: "unsourced" }
+  /** Nothing fetched this turn, yet it speaks of the blueprint as read: it
+   *  claims to be grounded in it, or names blueprint places without saying
+   *  they come from an earlier answer. History is where those came from. */
+  | { kind: "carried" };
 
 /**
  * Sureness the model EARNED by looking: first-person verification, or a named
@@ -114,6 +118,24 @@ const HEDGED = [
   /\bI\s+(?:think|believe|suspect)\b/i,
   /\bworth\s+(?:double-?checking|verifying)\b/i,
   /\bmay\s+be\s+(?:out\s+of\s+date|stale)\b/i,
+  /\b(?:my|the|an?|that)\s+(?:earlier|previous|last)\s+(?:answer|reply|look|lookup|search|read)\b/i,
+];
+
+/**
+ * A claim that the answer stands on the blueprint. Only a lookup of this turn
+ * earns it: an answer carried from an earlier turn of the conversation rests
+ * on that turn's lookups, which are not this one's sources.
+ */
+const GROUNDED_IN_BLUEPRINT = [
+  /\b(?:grounded|based|drawn|built|pulled|taken)\s+(?:directly\s+|straight\s+)?(?:in|on|from)\s+(?:our|the)\s+(?:current\s+|live\s+)?blueprint\b/i,
+  /\baccording\s+to\s+(?:our|the)\s+(?:current\s+|live\s+)?blueprint\b/i,
+];
+
+/** A blueprint place: the reader's breadcrumb (`Phase › Scenario …`) or the
+ *  index's labelled form (`Phase: … · Scenario: …`). */
+const BLUEPRINT_PLACE = [
+  /\S[^\S\n]+›[^\S\n]+\S/,
+  /\b(?:Phase|Scenario):[^\n]*?[·›][^\S\n]*(?:Scenario|Path|Step|Layer|Lane):/,
 ];
 
 /**
@@ -249,6 +271,11 @@ export function judgeConfidence(
     // a hedge does not excuse "I just checked" when nothing was checked.
     // (1) Claiming freshness over data nobody fetched — a false claim.
     if (claimsFreshness(deliveredText)) return { kind: "false-freshness", cause: "unfetched" };
+    // (1b) Speaking of the blueprint as read. A claim of grounding is false
+    // whatever else the prose says; a place named is a current-state claim,
+    // and owes a word on where it came from even inside a suggestion.
+    if (matchesAny(deliveredText, GROUNDED_IN_BLUEPRINT)) return { kind: "carried" };
+    if (matchesAny(deliveredText, BLUEPRINT_PLACE) && !hasHedge(deliveredText)) return { kind: "carried" };
     // (2) Asserting something factual and never saying it came from memory.
     //
     // This returned `exempt`, on the reading that "no retrieval means no
@@ -320,6 +347,14 @@ export function repairInstruction(verdict: ConfidenceVerdict): string | null {
       );
     case "false-freshness":
       return FALSE_FRESHNESS[verdict.cause];
+    case "carried":
+      return (
+        "CARRIED ANSWER. This turn ran no lookup, yet the draft speaks of the blueprint as if it " +
+        "had read it. Take out any claim of being grounded in the blueprint, and weave in one " +
+        "clause saying this goes from the earlier answer in this conversation (or from what you " +
+        "already know), not a fresh look. Name each blueprint place as phase › scenario › path › " +
+        "step (lane). Do NOT invent a source or append a label. Change nothing else."
+      );
     case "trailing-label":
       return (
         "This reply ends with a standalone confidence label, which is retired. " +
