@@ -34,6 +34,16 @@ test("a quoted comment about freshness remains intact", async () => {
   assert.match(posted.text, /Coco wrote: “I read/);
 });
 
+test("the live frame receipt variant is removed while its quoted occurrence is preserved", async () => {
+  const receipt = "I read the comment thread on the frame just now, so this is current.";
+  const answer = `On [node 158-21725](${URL}), Coco wrote: “${receipt}”\n\n${receipt}`;
+  const h = harness({ replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }], toolResult: JSON.stringify({ ok: true, source_type: "figma", url: URL, title: "Session card", content: "Join" }) });
+  await runTurn(request({ text: `${URL} what does this comment say?` }), h.deps);
+  const posted = h.delivery.calls.find((c) => c.kind === "answer");
+  assert.ok(posted?.kind === "answer");
+  assert.equal(posted.text, `On [Session card](${URL}), Coco wrote: “${receipt}”`);
+});
+
 test("frame citations are named without rewriting links inside a quoted comment", async () => {
   const quote = `“Check [node 158-21725](${URL}).”`;
   const answer = `On [node 158-21725](${URL}), Coco wrote: ${quote}`;
@@ -43,4 +53,22 @@ test("frame citations are named without rewriting links inside a quoted comment"
   assert.ok(posted?.kind === "answer");
   assert.match(posted.text, /^On \[Session card\]/);
   assert.ok(posted.text.includes(quote), "quoted source text stays verbatim");
+});
+
+test("closing freshness receipts use their meaning, while quoted receipts remain source text", async () => {
+  for (const receipt of [
+    "I read the Figma frame and its pinned comment thread just now, so this is current.",
+    "I checked the linked frame and comments just now, so the answer is current.",
+  ]) {
+    for (const quote of [`> ${receipt}`, `\`${receipt}\``, `“${receipt}”`]) {
+      const prefix = `On [Session card](${URL}), Coco wrote:\n${quote}`;
+      for (const answer of [prefix, `${prefix}\n\n${receipt}`]) {
+        const h = harness({ replies: [{ toolCalls: [{ name: "source_read", args: { url: URL } }] }, { text: answer }], toolResult: JSON.stringify({ ok: true, source_type: "figma", url: URL, title: "Session card", content: "Join" }) });
+        await runTurn(request({ text: `${URL} what does this comment say?` }), h.deps);
+        const posted = h.delivery.calls.find((c) => c.kind === "answer");
+        assert.ok(posted?.kind === "answer");
+        assert.equal(posted.text, prefix);
+      }
+    }
+  }
 });
