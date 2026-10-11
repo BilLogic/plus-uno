@@ -508,10 +508,15 @@ export function expiredReport(rec: ReportExpiryRecord, look: (key: string) => Re
   return changed ? { ...rec, report: { ...rec.report, entries }, revision: (rec.revision ?? 0) + 1, expiryPending: true } : rec;
 }
 
-/** A report with one change applied, or null when it names no entry. */
+/** A report with one change applied, or null when it names no entry. An
+ *  expiry closes only an item still undecided, checked in the same step that
+ *  writes it, so a decision that lands first is kept: the report comes back
+ *  as it was. */
 export function changedReport(report: DecisionReportRecord, change: ReportChange): DecisionReportRecord | null {
   const at = report.entries.findIndex((e) => e.id === change.id);
   if (at === -1) return null;
+  const was = report.entries[at]!.state.kind;
+  if ("state" in change && change.state.kind === "expired" && was !== "open" && was !== "changes-asked") return report;
   const entries = [...report.entries];
   entries[at] =
     "state" in change

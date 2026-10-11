@@ -549,7 +549,7 @@ export class ThreadState extends DurableObject<Env> {
       if (!rec || at - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) return null;
       const next = changedReport(rec.report, change);
       if (!next) return null;
-      await txn.put<ReportRecord>(reportKey(messageTs), { ...rec, report: next, revision: (rec.revision ?? 0) + 1 });
+      if (next !== rec.report) await txn.put<ReportRecord>(reportKey(messageTs), { ...rec, report: next, revision: (rec.revision ?? 0) + 1 });
       return next;
     });
   }

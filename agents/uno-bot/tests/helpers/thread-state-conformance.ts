@@ -37,6 +37,7 @@ import {
   unfinishedOperations,
   type DecisionReportRecord,
   type PendingProposal,
+  type ReportItemState,
   type ThreadState,
   type ThreadStateDeps,
 } from "../../src/thread-state/store";
@@ -75,6 +76,15 @@ function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
   };
 }
 
+/** The clock every conformance store runs on: a day ahead of the runtime's.
+ *  The Durable Object arms its alarm on the caller's clock and collects on its
+ *  own, so a start in the past fires that alarm at once and its garbage
+ *  collection deletes a record mid-test. TTL assertions advance only this
+ *  clock. */
+export function makeConformanceClock(): TestClock {
+  return makeTestClock(Date.now() + 24 * 60 * 60 * 1000);
+}
+
 /** The one thing the suite needs from its runner: register a named async test.
  *  `node --test`'s `test` and vitest's `it` both satisfy it. */
 export interface ConformanceRunner {
@@ -96,8 +106,7 @@ export function runThreadStateConformance(
   runner: ConformanceRunner,
 ): void {
   function setup(): { store: ThreadState; clock: TestClock } {
-    // Keep runtime alarms in the future; TTL assertions advance only this clock.
-    const clock = makeTestClock(Date.now() + 24 * 60 * 60 * 1000);
+    const clock = makeConformanceClock();
     return { store: makeStore({ now: () => clock.now() }), clock };
   }
 
@@ -1267,6 +1276,42 @@ export function runThreadStateConformance(
     assert.deepEqual(kept?.entries.map((e) => e.state.kind), ["approved", "rejected"]);
     assert.equal(await store.updateReport("1700.9", { id: "zz", state: { kind: "expired" } }), null, "no such item");
     assert.equal(await store.updateReport("1700.0", { id: "a", state: { kind: "expired" } }), null, "no such report");
+  });
+
+  // Every one of a report's decisions lands, however many arrive at once and
+  // in whatever order: none reads the record another is about to write.
+  it("a report keeps every one of many decisions made at once", async () => {
+    const { store } = setup();
+    const ids = Array.from({ length: 24 }, (_, i) => `i${i}`);
+    const verdicts = ["approved", "rejected", "changes-asked"] as const;
+    const decide = (n: number): ReportItemState => {
+      const kind = verdicts[n % 3]!;
+      return kind === "approved" ? { kind, by: `U${n}`, at: n } : { kind, by: `U${n}` };
+    };
+    for (const round of [0, 1, 2]) {
+      const messageTs = `1700.${20 + round}`;
+      await store.putReport({ ...report(), messageTs, entries: ids.map((id) => ({ id, item: { id, title: id, body: id, open: { url: `https://x/${id}` } }, state: { kind: "open" as const } })) });
+      // Interleaved: odd items first, then even, each round shifted.
+      const order = ids.map((id, n) => [id, n] as const).sort(([, a], [, b]) => ((a + round) % 2) - ((b + round) % 2) || b - a);
+      const results = await Promise.all(order.map(([id, n]) => store.updateReport(messageTs, { id, state: decide(n + round) })));
+      assert.ok(results.every(Boolean), "every decision found its report");
+      const kept = await store.getReport(messageTs);
+      assert.deepEqual(kept?.entries.map((e) => e.state.kind), ids.map((_, n) => verdicts[(n + round) % 3]));
+    }
+  });
+
+  // A redraw closes an item it read as undecided; a decision that lands
+  // between that read and the close is the item's state, in either order.
+  it("an item closed as expired keeps a decision made at the same moment", async () => {
+    const { store } = setup();
+    await store.putReport(report());
+    await Promise.all([
+      store.updateReport("1700.9", { id: "a", state: { kind: "approved", by: "U1", at: 5 } }),
+      store.updateReport("1700.9", { id: "a", state: { kind: "expired" } }),
+      store.updateReport("1700.9", { id: "b", state: { kind: "expired" } }),
+      store.updateReport("1700.9", { id: "b", state: { kind: "rejected", by: "U2" } }),
+    ]);
+    assert.deepEqual((await store.getReport("1700.9"))?.entries.map((e) => e.state.kind), ["approved", "rejected"]);
   });
 
   it("expiry preserves a concurrent decision and acknowledges only the version redrawn", async () => {

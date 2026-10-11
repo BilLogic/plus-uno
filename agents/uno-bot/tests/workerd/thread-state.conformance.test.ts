@@ -32,7 +32,7 @@ import {
   type Execution,
   type PendingProposal,
 } from "../../src/thread-state/store";
-import { runThreadStateConformance } from "../helpers/thread-state-conformance";
+import { makeConformanceClock, runThreadStateConformance } from "../helpers/thread-state-conformance";
 
 describe("[durable-object] report expiry alarm", () => {
   const report = (): DecisionReportRecord => ({ channel: "C1", messageTs: "1700.9", parent: "One page.", held: 0, ttlMs: 1000,
@@ -90,6 +90,21 @@ runThreadStateConformance(
     }),
   { it: (name, fn) => it(name, fn) },
 );
+
+// The conformance tests finish in milliseconds, so a fixture clock that armed
+// the alarm in the past would pass them and lose a record only in a slower
+// test. This one waits long enough for such an alarm to have fired.
+describe("[durable-object] the conformance clock", () => {
+  it("keeps a report through a slow test", async () => {
+    const clock = makeConformanceClock();
+    const store = createDurableObjectThreadState({ namespace, instance: `slow-${instanceCounter++}`, now: () => clock.now() });
+    await store.putReport({ channel: "C1", messageTs: "1700.9", parent: "One page.", held: 0, ttlMs: 60 * 60 * 1000,
+      entries: [{ id: "a", item: { id: "a", title: "a", body: "a", open: { url: "https://x/a" } }, state: { kind: "open" } }] });
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    expect(await store.updateReport("1700.9", { id: "a", state: { kind: "approved", by: "U1", at: 5 } })).not.toBeNull();
+    expect((await store.getReport("1700.9"))?.entries[0]?.state.kind).toBe("approved");
+  });
+});
 
 // ADR-022, at the only place a stub call happens. The old client charged one
 // subrequest per hop inside `call()`; the adapter charges one per hop inside

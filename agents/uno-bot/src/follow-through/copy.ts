@@ -182,12 +182,20 @@ export function unownedItem(input: { id: string; creator: string; card: { title:
  * does.
  *
  * @param input.to - The Design Status Done proposes, the schema's spelling
+ * @param input.unmatched - Contributors not found in Slack, named in plain text
  */
-export function staleItem(input: { id: string; people: readonly string[]; card: { title: string; url: string; status: string | null }; to: string }): ReportItem {
+export function staleItem(input: {
+  id: string;
+  people: readonly string[];
+  card: { title: string; url: string; status: string | null };
+  to: string;
+  unmatched?: readonly string[];
+}): ReportItem {
+  const missing = input.unmatched?.length ? ` · not found in Slack: ${input.unmatched.map((n) => escapeSlackText(oneLine(n))).join(", ")}` : "";
   return {
     id: input.id,
     title: oneLine(input.card.title),
-    subtitle: `${mentionsOf(input.people)} · ${statusWords(input.card.status)} · no comments for 3 weeks`,
+    subtitle: `${mentionsOf(input.people)} · ${statusWords(input.card.status)} · no comments for 3 weeks${missing}`,
     body: `Is it still moving? Done moves it to ${oneLine(input.to)} or another status, Still on it checks again in 3 weeks, Drop it archives it.`,
     done: "its Design Status is moved.",
     open: { label: "Open card", url: input.card.url },
