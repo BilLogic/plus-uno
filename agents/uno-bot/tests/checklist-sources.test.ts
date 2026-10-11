@@ -154,7 +154,7 @@ describe("a task card's details, output and sources", () => {
     assert.deepEqual(card!.sources, [{ type: "url", text: "Recap", url }]);
   });
 
-  it("an error card keeps the error as its output and carries no sources", async () => {
+  it("a failed lookup's card keeps the error as its output and carries no sources", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
     await delivery.beginProgress("Working on it");
@@ -164,8 +164,8 @@ describe("a task card's details, output and sources", () => {
     delivery.toolProgress(finishedProgress(base, JSON.stringify({ ok: false, error: "502 from Notion" }), "502 from Notion"));
     await delivery.postAnswer("Done.");
     const card = lastCard(slack, "tool-1");
-    assert.equal(card.status, "error");
-    assert.equal(card.output, "502 from Notion");
+    assert.equal(card.status, "complete");
+    assert.equal(card.output, "Failed: 502 from Notion");
     assert.equal(card.sources, undefined);
   });
 });

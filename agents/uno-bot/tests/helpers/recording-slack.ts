@@ -77,11 +77,16 @@ export type SlackCall =
       ask?: string;
     }
   | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
-  | { kind: "tasks"; channel: string; ts: string; tasks: PlanTask[] }
-  | { kind: "heading"; channel: string; ts: string; title: string }
+  | {
+      kind: "tasks";
+      channel: string;
+      ts: string;
+      tasks: PlanTask[];
+      /** The checklist's heading, when this append retitled it. */
+      title?: string;
+    }
   | { kind: "stopStream"; channel: string; ts: string }
   | { kind: "status"; channel: string; threadTs: string; status: SessionStatus }
-  | { kind: "statusLine"; channel: string; threadTs: string; text: string }
   | { kind: "rename"; channel: string; threadTs: string; title: string };
 
 /** A call Slack would have refused, and the error code it would have said. */
@@ -272,8 +277,6 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
   // `startStream` is the checklist's — and a stopped stream takes nothing more.
   const planStreams = new Set<string>();
   const stopped = new Set<string>();
-  // Threads whose session was last moved off `processing`.
-  const settledThreads = new Set<string>();
   // Every call but a task append lands the moment it is made.
   const record = (call: SlackCall): void => {
     calls.push(call);
@@ -354,8 +357,8 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       if (ts) planStreams.add(ts);
       return ts;
     },
-    async appendTasks(channel, ts, tasks) {
-      const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks] };
+    async appendTasks(channel, ts, tasks, title) {
+      const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks], ...(title === undefined ? {} : { title }) };
       record(call);
       const delay = opts.taskDelayMs?.(appends++) ?? 0;
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
@@ -376,10 +379,6 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       landed.push(call);
       if (opts.taskRejects !== undefined) throw opts.taskRejects;
     },
-    async setPlanTitle(channel, ts, title) {
-      record({ kind: "heading", channel, ts, title });
-      if (stopped.has(ts)) refuse(refused, "plan title on a stopped stream", "message_not_in_streaming_state");
-    },
     async stopStream(channel, ts) {
       record({ kind: "stopStream", channel, ts });
       if (stopped.has(ts)) return refuse(refused, "stop on a stopped stream", "message_not_in_streaming_state");
@@ -387,21 +386,11 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     },
     async setSessionStatus(channel, threadTs, status) {
       record({ kind: "status", channel, threadTs, status });
-      if (status !== "processing") settledThreads.add(threadTs);
-      else settledThreads.delete(threadTs);
       if (opts.statusThrows !== undefined) throw opts.statusThrows;
       return opts.status ?? { ok: true };
     },
     async renameSession(channel, threadTs, title) {
       record({ kind: "rename", channel, threadTs, title });
-    },
-    // Slack would not refuse a status line sent after the settle — it would
-    // do worse: the bridged call moves the session back to `processing`, and
-    // nothing clears it for the hour Slack takes to time it out. Held as a
-    // refusal so a line that lands late fails the test it happened in.
-    async setStatusLine(channel, threadTs, text) {
-      record({ kind: "statusLine", channel, threadTs, text });
-      if (settledThreads.has(threadTs)) refuse(refused, "status line after the settle", "reraised_processing");
     },
   };
 

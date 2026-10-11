@@ -61,7 +61,7 @@ async function threeLookups(delivery: ReturnType<typeof deliveryAdapter>): Promi
 }
 
 describe("the checklist", () => {
-  it("opens each card in progress when its call starts, runs one at a time, and spends one append per transition", async () => {
+  it("opens a group of lookups in progress together, and spends one append as it starts and one as the turn settles", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
@@ -70,22 +70,17 @@ describe("the checklist", () => {
     await delivery.postAnswer("Here it is.");
 
     assert.deepEqual(appends(slack), [
-      ["understand:in_progress"],
-      // The batch arrives as one call: the opening card closed and the first
-      // card running. The two calls announced beside it have no card yet —
-      // Slack refuses a `pending` one — and each appears when it starts.
-      ["understand:complete", "tool-1:in_progress"],
-      ["tool-1:complete", "tool-2:in_progress"],
-      ["tool-2:complete", "tool-3:in_progress"],
-      ["tool-3:complete"],
+      // The group arrives as one call, opening the stream: the opening card
+      // closed and the whole group in progress — Slack refuses a `pending`
+      // card, so a queued call shows in progress with its group.
+      ["understand:complete", "tool-1:in_progress", "tool-2:in_progress", "tool-3:in_progress"],
+      // Nothing between: the group's lookups landing one by one cost no call.
+      ["tool-1:complete", "tool-2:complete", "tool-3:complete"],
     ]);
+    assert.equal(slack.calls[0]!.kind, "startStream", "the stream opens with the group, not before");
     // No status Slack refuses ever leaves.
     for (const call of slack.of("tasks")) {
       assert.ok(call.tasks.every((t) => ["in_progress", "complete", "error"].includes(t.status)));
-    }
-    // Never two cards in progress in the same append.
-    for (const call of slack.of("tasks")) {
-      assert.ok(call.tasks.filter((t) => t.status === "in_progress").length <= 1);
     }
     // Titled from the tool table, in uno's words.
     const titles = new Map(slack.of("tasks").flatMap((c) => c.tasks.map((t) => [t.id, t.title] as const)));
@@ -98,7 +93,7 @@ describe("the checklist", () => {
     );
   });
 
-  it("settles a failed lookup as an error card with a short reason, and a refused one too", async () => {
+  it("settles a failed lookup complete with a short reason, and a refused one as skipped", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
@@ -107,15 +102,18 @@ describe("the checklist", () => {
     await tick();
     delivery.toolProgress(finished(1, `404 not found\n${"stack ".repeat(80)}`));
     delivery.toolProgress(refused(2, "no more lookups available this turn"));
-    await tick();
+    await delivery.postAnswer("Here is what I found.");
 
+    // Never `error` above an answer: Slack titles a plan holding an error card
+    // "Something went wrong".
     const last = slack.of("tasks").at(-1)!.tasks;
     const failed = last.find((t) => t.id === "tool-1")!;
-    assert.equal(failed.status, "error");
-    assert.equal(failed.output, "404 not found", "one line, not the whole error");
+    assert.equal(failed.status, "complete");
+    assert.equal(failed.output, "Failed: 404 not found", "one line, not the whole error");
     const budget = last.find((t) => t.id === "tool-2")!;
-    assert.equal(budget.status, "error");
-    assert.equal(budget.output, "no more lookups available this turn");
+    assert.equal(budget.status, "complete");
+    assert.equal(budget.output, "Skipped");
+    for (const call of slack.of("tasks")) assert.ok(call.tasks.every((t) => t.status !== "error"));
   });
 
   it("settles every open card as an error when the turn dies", async () => {
@@ -128,18 +126,18 @@ describe("the checklist", () => {
     await delivery.endProgress("error");
 
     // The running card settles with the turn; the two that never started
-    // appear for the first time as not run.
+    // say they were skipped.
     assert.deepEqual(appends(slack).at(-1), ["tool-1:error", "tool-2:error", "tool-3:error"]);
     assert.deepEqual(
       slack.of("tasks").at(-1)!.tasks.map((t) => t.output),
-      [undefined, "Not run", "Not run"],
+      [undefined, "Skipped", "Skipped"],
     );
     assert.equal(slack.calls.at(-1)!.kind, "stopStream");
   });
 
-  it("settles a card whose lookup never ran as an error, never as complete", async () => {
+  it("settles a card whose lookup never ran as skipped, with the answered turn", async () => {
     // A stopped turn answers with lookups still queued: the running card
-    // settles with the turn, and a queued one says it was not run.
+    // settles with the turn, and a queued one says it was skipped.
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
@@ -149,8 +147,8 @@ describe("the checklist", () => {
     await delivery.postAnswer("Stopped.");
 
     const last = slack.of("tasks").at(-1)!.tasks;
-    assert.deepEqual(last.map((t) => `${t.id}:${t.status}`), ["tool-1:complete", "tool-2:error"]);
-    assert.equal(last.find((t) => t.id === "tool-2")!.output, "Not run");
+    assert.deepEqual(last.map((t) => `${t.id}:${t.status}`), ["tool-1:complete", "tool-2:complete"]);
+    assert.equal(last.find((t) => t.id === "tool-2")!.output, "Skipped");
     assert.equal(last.find((t) => t.id === "tool-1")!.output, undefined);
   });
 
@@ -162,9 +160,10 @@ describe("the checklist", () => {
     delivery.postInterim("Checking whether this shipped");
     await tick();
     assert.equal(slack.of("message").length, 0, "no ⏳ message beside the checklist");
-    assert.equal(slack.of("tasks").length, 1, "and no card for the narration itself");
+    assert.equal(slack.calls.length, 0, "and no card for the narration itself");
 
     await threeLookups(delivery);
+    await delivery.postAnswer("Here it is.");
 
     const cards = slack.of("tasks").flatMap((c) => c.tasks);
     assert.deepEqual(
@@ -235,7 +234,7 @@ describe("the checklist", () => {
     delivery.toolProgress({ seq: 2, name: "notion_create", args: {}, phase: "announced" });
     await tick();
 
-    assert.deepEqual(appends(slack), [["understand:in_progress"]]);
+    assert.deepEqual(slack.calls, []);
   });
 
   it("sends a card's icon on every update of it, and the opening card none", async () => {

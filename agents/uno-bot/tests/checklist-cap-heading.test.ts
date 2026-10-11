@@ -42,6 +42,9 @@ function lastSeen(slack: RecordingSlack): Map<string, { title: string; status: s
   return out;
 }
 
+/** Every heading the checklist was given: each rides an append. */
+const headings = (slack: RecordingSlack): string[] => slack.of("tasks").flatMap((c) => (c.title ? [c.title] : []));
+
 /** Run `n` lookups the way the loop reports a reply that asks for all of them. */
 async function lookups(
   delivery: ReturnType<typeof deliveryAdapter>,
@@ -65,6 +68,7 @@ describe("the checklist's card cap", () => {
 
     await delivery.beginProgress("Working on it");
     await lookups(delivery, 11);
+    await delivery.postAnswer("Here it is.");
 
     const cards = lastSeen(slack);
     const toolCards = [...cards.keys()].filter((id) => id !== "understand");
@@ -81,19 +85,19 @@ describe("the checklist's card cap", () => {
     for (const call of slack.of("tasks")) {
       for (const t of call.tasks) assert.ok(t.id === "understand" || toolCards.includes(t.id), t.id);
     }
-
-    await delivery.postAnswer("Here it is.");
   });
 
-  it("ends the overflow card in error when any call folded into it erred", async () => {
+  it("ends the overflow card complete, saying how many folded calls failed", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
     await delivery.beginProgress("Working on it");
     await lookups(delivery, 11, new Set([10]));
+    await delivery.postAnswer("Here it is.");
 
     const more = lastSeen(slack).get("tool-more");
-    assert.equal(more?.status, "error");
+    assert.equal(more?.status, "complete");
+    assert.equal(more?.output, "1 failed");
     assert.equal(lastSeen(slack).get("tool-8")?.status, "complete");
   });
 
@@ -125,14 +129,14 @@ describe("the checklist's heading", () => {
         await delivery.beginProgress("Working on it", ask);
         await lookups(delivery, 1);
         await delivery.postAnswer("Here is the answer.");
-        assert.equal(slack.of("heading").length, 0, "a DM checklist does not repeat the ask as a heading");
+        assert.equal(headings(slack).length, 0, "a DM checklist does not repeat the ask as a heading");
         for (const call of slack.calls) assert.ok(!JSON.stringify(call).includes(ask), JSON.stringify(call));
         assert.equal(slack.of("answer").length, 1);
       }
     }
   });
 
-  it("retitles the checklist once, from the ask, after the stream opens", async () => {
+  it("retitles the checklist once, from the ask, in the stream's first append", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
@@ -140,12 +144,8 @@ describe("the checklist's heading", () => {
     await lookups(delivery, 3);
     await delivery.postAnswer("Here it is.");
 
-    const headings = slack.of("heading");
-    assert.equal(headings.length, 1);
-    assert.equal(headings[0]!.title, "Did the session-notes redesign ship? Asking for the Q3 recap.");
-    const order = slack.calls.map((c) => c.kind);
-    assert.ok(order.indexOf("startStream") < order.indexOf("heading"));
-    assert.ok(order.indexOf("heading") < order.indexOf("answer"));
+    assert.deepEqual(headings(slack), ["Did the session-notes redesign ship? Asking for the Q3 recap."]);
+    assert.equal(slack.of("tasks")[0]!.title, headings(slack)[0], "the heading costs no call of its own");
   });
 
   it("keeps the heading within Slack's 256-character cap", async () => {
@@ -153,12 +153,13 @@ describe("the checklist's heading", () => {
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
     await delivery.beginProgress("Working on it", "word ".repeat(200));
+    await lookups(delivery, 1);
     await delivery.endProgress("complete");
 
-    const [heading] = slack.of("heading");
+    const [heading] = headings(slack);
     assert.ok(heading);
-    assert.ok(heading.title.length <= 256, `${heading.title.length}`);
-    assert.ok(heading.title.endsWith("…"));
+    assert.ok(heading.length <= 256, `${heading.length}`);
+    assert.ok(heading.endsWith("…"));
   });
 
   it("titles a top-level DM's static plan from the ask when it settles, at no extra call", async () => {
@@ -169,7 +170,7 @@ describe("the checklist's heading", () => {
     await delivery.beginProgress("Working on it", "Did it ship?");
     await delivery.endProgress("complete");
 
-    assert.equal(slack.of("heading").length, 0);
+    assert.equal(headings(slack).length, 0);
     const [settled] = slack.of("update");
     assert.equal(settled?.text, "Did it ship?");
     assert.match(JSON.stringify(settled?.blocks), /Did it ship\?/);
@@ -180,18 +181,18 @@ describe("the checklist's heading", () => {
     const a = deliveryAdapter(noAsk.deps(true), TARGET);
     await a.beginProgress("Working on it");
     await a.endProgress("complete");
-    assert.equal(noAsk.of("heading").length, 0);
+    assert.equal(headings(noAsk).length, 0);
 
     const off = recordingSlack();
     const b = deliveryAdapter(off.deps(false), TARGET);
     await b.beginProgress("Working on it", "Did it ship?");
     await b.endProgress("complete");
-    assert.equal(off.of("heading").length, 0);
+    assert.equal(headings(off).length, 0);
   });
 });
 
 describe("the checklist's Slack spend", () => {
-  it("never exceeds start + one per transition + one heading + stop, however many calls", async () => {
+  it("is the stream's start, one append per group of lookups and one at settle, however many calls", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
@@ -199,13 +200,20 @@ describe("the checklist's Slack spend", () => {
     await lookups(delivery, 20);
     await delivery.endProgress("complete");
 
-    const spend = slack.calls.filter((c) => ["startStream", "tasks", "heading", "stopStream"].includes(c.kind));
-    // Transitions: the opening card, the batch announced with the first start,
-    // then one per lookup finishing (with the next starting beside it).
-    const transitions = 1 + 1 + 20;
-    assert.ok(spend.length <= 1 + transitions + 1 + 1, `${spend.length}`);
-    assert.equal(slack.of("heading").length, 1);
-    assert.equal(slack.of("startStream").length, 1);
-    assert.equal(slack.of("stopStream").length, 1);
+    assert.deepEqual(
+      slack.calls.map((c) => c.kind),
+      ["startStream", "tasks", "tasks", "stopStream"],
+    );
+    assert.equal(headings(slack).length, 1);
+  });
+
+  it("spends nothing on a turn that looks nothing up", async () => {
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(true), TARGET);
+
+    await delivery.beginProgress("Working on it", "Thanks!");
+    await delivery.postAnswer("Any time.");
+
+    assert.deepEqual(slack.calls.map((c) => c.kind), ["answer"]);
   });
 });
