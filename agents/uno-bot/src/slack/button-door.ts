@@ -27,7 +27,7 @@ import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index
 import { renderGateNote, statedCancelledNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { notedCardBlocks, proposalCardBlocks } from "./proposal-render";
-import { statedCancelOf, type PendingProposal, type ReportItemState } from "../thread-state/index";
+import { statedCancelOf, type ChosenAs, type PendingProposal, type ReportItemState } from "../thread-state/index";
 import type { OperationOutcome } from "../gate/run-batch";
 import { failureReason, settleItem, type ReportStore } from "./decision-cards";
 
@@ -89,6 +89,9 @@ export interface ButtonRequest {
   decision: "confirm" | "cancel";
   /** Who pressed. */
   userId: string;
+  /** The card's own answer it was decided by, from the Review pop-up
+   *  (`PendingProposal.choices`): the decided item names it. */
+  as?: ChosenAs;
 }
 
 /** Where the door speaks: the verdict's own reply thread, against the person's
@@ -258,12 +261,13 @@ export async function applyPressVerdict(
     if (!deps.reports) return;
     const at = (deps.now ?? Date.now)();
     const failed = outcomes?.find((o) => !o.ok);
+    const as = request.as ? { as: request.as } : {};
     const state: ReportItemState =
       request.decision === "cancel"
-        ? { kind: "rejected", by: request.userId, ...(rejected?.reason ? { reason: rejected.reason } : {}) }
+        ? { kind: "rejected", by: request.userId, ...(rejected?.reason ? { reason: rejected.reason } : {}), ...as }
         : failed
-          ? { kind: "failed", by: request.userId, at, reason: failureReason(failed.message) }
-          : { kind: "approved", by: request.userId, at };
+          ? { kind: "failed", by: request.userId, at, reason: failureReason(failed.message), ...as }
+          : { kind: "approved", by: request.userId, at, ...as };
     const message = await settleItem(deps.reports, pending.item, state, at);
     if (message) await deps.replaceCard(message);
     return;

@@ -348,7 +348,18 @@ export function fewShotExamples(
  * evidence and say their own words. Absent, a card row due is left alone.
  */
 export type NudgeDeps = Omit<CommitmentDeps, "detector"> & {
-  cards?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
+  /** `flush`, when present, runs once every row due has been handed over:
+   *  what `due` held back to post together goes up then, and each action it
+   *  returns replaces `due`'s for that row. */
+  cards?: {
+    due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction>;
+    flush?(now: number, runDate: string): Promise<CommitmentAction[]>;
+    /** How many rows `due` holds for `flush` that have not posted. */
+    held?(): number;
+    /** A stop before `flush` finished: the held rows go back to due, so the
+     *  next run posts them. */
+    release?(): Promise<void>;
+  };
   /** The handler for the DM kinds (`../dm-sweep/`), which post only in their
    *  own DM. Absent, a DM row due is left alone. */
   dm?: { due(c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> };
@@ -400,18 +411,39 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   const reminded = await deps.store.remindedOn(runDate);
   const limit: Record<ReminderBudget, number> = { asked: MAX_REMINDERS_PER_PERSON, cards: MAX_CARD_REMINDERS_PER_PERSON };
   const capped = (b: ReminderBudget) => Object.keys(reminded[b]).filter((p) => reminded[b][p]! >= limit[b]);
-  for (;;) {
-    ensureHeadroom(deps, COMMITMENT_COST);
-    const c = await deps.store.nextDue(now, runDate, { asked: capped("asked"), cards: capped("cards") });
-    if (!c) break;
-    const action = await handleDue(deps, c, now, runDate);
-    if (action.action === "nudged" || action.action === "followed-up") {
-      const counts = reminded[budgetOf(c.kind)];
-      counts[c.promiserId] = (counts[c.promiserId] ?? 0) + 1;
+  // Card rows held for `flush` keep the D1 writes that hand them back
+  // (`release`) in reserve, so a budget stop before they post can still
+  // return them to the next run rather than leave them checked for today.
+  const reserved = () => ({ ...COMMITMENT_COST, d1Queries: COMMITMENT_COST.d1Queries + (deps.cards?.held?.() ?? 0) });
+  try {
+    for (;;) {
+      ensureHeadroom(deps, reserved());
+      const c = await deps.store.nextDue(now, runDate, { asked: capped("asked"), cards: capped("cards") });
+      if (!c) break;
+      const action = await handleDue(deps, c, now, runDate);
+      if (action.action === "nudged" || action.action === "followed-up") {
+        const counts = reminded[budgetOf(c.kind)];
+        counts[c.promiserId] = (counts[c.promiserId] ?? 0) + 1;
+      }
+      actions.push(action);
+      // A rehearsal marks nothing, so the same row would come back: it shows one.
+      if (deps.dryRun) break;
     }
-    actions.push(action);
-    // A rehearsal marks nothing, so the same row would come back: it shows one.
-    if (deps.dryRun) break;
+    if (deps.cards?.flush && !deps.dryRun) {
+      ensureHeadroom(deps, reserved());
+      for (const flushed of await deps.cards.flush(now, runDate)) {
+        const i = actions.findIndex((a) => a.id === flushed.id);
+        if (i >= 0) actions[i] = flushed;
+        else actions.push(flushed);
+      }
+    }
+  } catch (err) {
+    if (deps.cards?.release) {
+      await deps.cards.release().catch((e: unknown) => {
+        console.error(`[commitments] held card rows not handed back: ${e instanceof Error ? e.message : String(e)}`);
+      });
+    }
+    throw err;
   }
   return report("handled", null);
 }

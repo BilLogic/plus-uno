@@ -40,6 +40,7 @@ import type {
   Execution,
   PendingProposal,
   ProposalOperation,
+  ProposalLookup,
   StatedCardWords,
   ThreadState,
 } from "../thread-state/index";
@@ -257,6 +258,9 @@ export interface GateDeps {
    *  a second opinion about whether a proposal is live is how "already
    *  expired" and "already resolved" start disagreeing. */
   threadState: ThreadState;
+  /** The Review door's read for this submission, before checking its own
+   * answers. Reused once; the store's atomic claim still decides the winner. */
+  proposalRead?: { ts: string; lookup: ProposalLookup };
   /** Slack ids who may resolve any card with a confirmer set, beside its own
    *  set (`cardConfirmers`). Absent or empty, a card's own set is the whole
    *  of it. Read from `STANDING_CONFIRMER_IDS` where `Env` becomes the deps. */
@@ -751,7 +755,9 @@ async function locate(
   | { state: "none" }
 > {
   if (signal.kind !== "typed") {
-    const byTs = await deps.threadState
+    const byTs = signal.kind === "review" && deps.proposalRead?.ts === signal.messageTs
+      ? deps.proposalRead.lookup
+      : await deps.threadState
       .getProposalByTs(signal.messageTs)
       .catch(() => ({ state: "none" }) as const);
     if (byTs.state === "found") return { state: "found", proposal: byTs.proposal };

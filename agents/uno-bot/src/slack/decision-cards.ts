@@ -189,12 +189,21 @@ function shownAs(entry: ReportEntry): { subtitle?: string; body: string; button:
       return { ...(item.subtitle ? { subtitle: item.subtitle } : {}), body: item.body, button: "Review" };
     case "changes-asked":
       return { subtitle: `Changes asked by ${by(state.by)}`, body: item.body, button: "Review" };
+    // Decided by one of the card's own answers: "<label> · <@who>".
     case "approved":
-      return { subtitle: `Approved by ${by(state.by)} · written ${etClock(state.at)}`, body: `Written: ${item.done ?? item.body}`, button: "View" };
+      return state.as
+        ? { subtitle: `${state.as.label} · ${by(state.by)}`, body: state.as.decided ?? `Written: ${item.done ?? item.body}`, button: "View" }
+        : { subtitle: `Approved by ${by(state.by)} · written ${etClock(state.at)}`, body: `Written: ${item.done ?? item.body}`, button: "View" };
     case "failed":
-      return { subtitle: `Approved by ${by(state.by)} · not written: ${state.reason}`, body: "Nothing written.", button: "View" };
+      return {
+        subtitle: `${state.as ? `${state.as.label} · ${by(state.by)}` : `Approved by ${by(state.by)}`} · not written: ${state.reason}`,
+        body: "Nothing written.",
+        button: "View",
+      };
     case "rejected":
-      return { subtitle: `Rejected by ${by(state.by)}`, body: state.reason ? `Nothing written. Reason: ${state.reason}` : "Nothing written.", button: "View" };
+      return state.as
+        ? { subtitle: `${state.as.label} · ${by(state.by)}`, body: state.as.decided ?? "Nothing written.", button: "View" }
+        : { subtitle: `Rejected by ${by(state.by)}`, body: state.reason ? `Nothing written. Reason: ${state.reason}` : "Nothing written.", button: "View" };
     case "noted":
       return { subtitle: `Noted by ${by(state.by)}`, body: `Note: ${state.note}`, button: "View" };
     case "expired":
