@@ -42,6 +42,7 @@ import {
   replacementProblem,
 } from "../sweep/detector";
 import type { SweepBlock, SweepSource } from "../sweep/finding";
+import { parseKeyDecision, ROW_INSTRUCTIONS, shownRows, type DecisionRow, type KeyDecision } from "../decisions-db/row";
 import type { Section } from "./sections";
 
 /** A decision restated past this is refused. */
@@ -108,6 +109,9 @@ export interface DecisionInput {
    * kept.
    */
   rewording?: { threadId: string; route: DecisionRoute; wording: string };
+  /** Each card's Decisions DB rows, by card number: what a key decision's
+   *  row is weighed against. Absent, no row is drafted. */
+  rows?: Record<number, DecisionRow[]>;
 }
 
 /** One validated decision. */
@@ -125,6 +129,8 @@ export interface DetectedDecision {
   card?: { card: ShownCard; field: string; from: string | null; to: string };
   /** `design-system`: the intake. */
   intake?: { title: string; body: string };
+  /** A key decision: the card it is tied to, and its Decisions DB row (`../decisions-db/row.ts`). */
+  row?: { card: ShownCard; key: KeyDecision };
 }
 
 export type DecisionResult = { ok: true; decisions: DetectedDecision[] } | { ok: false; error: string };
@@ -151,6 +157,8 @@ export const DECISION_DETECTOR_SYSTEM = [
   "- With no PRD listed, a behaviour or scope decision still takes route prd, with no block_id, section_block_id or text: it is reported, not written.",
   "- confidence: 0 to 1 that this thread settled what you say, and that it belongs where you put it.",
   'Nothing → {"decisions":[]}.',
+  ROW_INSTRUCTIONS,
+  '- With more than one card listed, give the row "card": its card\'s number.',
 ].join("\n");
 
 /** The detector over a ModelProvider. */
@@ -181,6 +189,14 @@ export function decisionPrompt(input: DecisionInput): string {
     }
   } else {
     lines.push("CARDS: none — the card route is not available");
+  }
+  if (input.rows && input.cards.length) {
+    for (const c of input.cards) {
+      const rows = shownRows(input.rows[c.number] ?? []);
+      lines.push(rows.length ? `DECISIONS DB — Card ${c.number}:` : `DECISIONS DB — Card ${c.number}: none yet`, ...rows);
+    }
+  } else {
+    lines.push("DECISIONS DB: not read — leave row out");
   }
   lines.push("");
   if (input.prd) {
@@ -238,6 +254,8 @@ export function parseDecisionReply(text: string, input: DecisionInput): Detected
     else if (route === "card") found = cardDecision(f, input.cards, base);
     else if (route === "design-system") found = intakeDecision(f, base);
     if (!found) continue;
+    const row = keyRow(f.row, input, threadId);
+    if (row) found.row = row;
     if (input.rewording && (found.threadId !== input.rewording.threadId || found.route !== input.rewording.route)) continue;
     decided.add(threadId);
     out.push(found);
@@ -246,6 +264,17 @@ export function parseDecisionReply(text: string, input: DecisionInput): Detected
 }
 
 type Base = Pick<DetectedDecision, "threadId" | "decision" | "confidence">;
+
+/** A key decision's row, against its card's rows and the thread's people; null when there is none to draft. */
+function keyRow(raw: unknown, input: DecisionInput, threadId: string): DetectedDecision["row"] | null {
+  if (!input.rows || !raw || typeof raw !== "object") return null;
+  const asked = (raw as { card?: unknown }).card;
+  const card = asked === undefined ? input.cards[0] : input.cards.find((c) => c.number === Number(asked));
+  const thread = input.threads.find((t) => t.id === threadId);
+  if (!card || !thread) return null;
+  const key = parseKeyDecision(raw, input.rows[card.number] ?? [], [...new Set(thread.comments.map((c) => c.by))]);
+  return key ? { card, key } : null;
+}
 
 function prdDecision(f: Record<string, unknown>, prd: SweepSource | null, base: Base): DetectedDecision | null {
   if (!prd?.writable) return null;

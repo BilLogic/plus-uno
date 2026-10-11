@@ -20,7 +20,8 @@ import type { ReportStore } from "../slack/decision-cards";
 import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
-import type { TeamRoles } from "../usage/roles";
+import type { FigmaPeople, NotionPeople, TeamRoles } from "../usage/roles";
+import type { DecisionRow, RowUpdate } from "../decisions-db/row";
 
 /** One decision waiting for its morning. */
 export interface QueuedDecision {
@@ -44,6 +45,8 @@ export interface QueuedDecision {
   /** What its card says the ✅ does. */
   update: DecisionUpdate;
   confidence: number;
+  /** A key decision's Decisions DB row, run by the same ✅ after the update (`../decisions-db/row.ts`). */
+  row?: { operations: ProposalOperation[]; update: RowUpdate };
 }
 
 /** Who a file's thread asks. */
@@ -122,6 +125,11 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   /** The team's roles by Slack id (`usage/roles.ts`): how a card's design
    *  owner is told from its other Contributors. Empty when unread. */
   roles(): Promise<TeamRoles>;
+  /** A card's Decisions DB rows, by its page URL. Absent, no key decision gets a row. */
+  decisionRows?(cardUrl: string): Promise<DecisionRow[]>;
+  /** The Figma and Notion people maps, each to Slack ids (`usage/roles.ts`):
+   *  how a commenter becomes a row's Owner or Sign-off. */
+  people?(): Promise<{ figma: FigmaPeople; notion: NotionPeople }>;
   detector: DecisionDetector;
   /** MISC's team id, from `FIGMA_TEAM_IDS`; absent, nothing is skipped as MISC. */
   miscTeamId?: string;
@@ -142,6 +150,11 @@ export interface SweepFigmaComments extends FigmaCommentStores {
     read(ts: string): Promise<DecisionThread | null>;
     write(thread: DecisionThread): Promise<void>;
   };
+}
+
+/** Everything a decision's ✅ runs: its update, then its row. Empty for a decision said only in the thread. */
+export function operationsOf(d: Pick<QueuedDecision, "operation" | "row">): ProposalOperation[] {
+  return [...(d.operation ? [d.operation] : []), ...(d.row?.operations ?? [])];
 }
 
 /**

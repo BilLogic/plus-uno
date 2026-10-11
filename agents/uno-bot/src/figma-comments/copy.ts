@@ -29,7 +29,8 @@ import type { ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { dayWords } from "../figma-drift/copy";
 import type { DecisionUpdate } from "./draft";
-import type { FileOwner, QueuedDecision, QueuedFile } from "./queue";
+import { operationsOf, type FileOwner, type QueuedDecision, type QueuedFile } from "./queue";
+import { rowWords } from "../decisions-db/row";
 
 /** The file's name, on one line. */
 function fileName(file: Pick<QueuedFile, "title">): string {
@@ -74,10 +75,11 @@ function saidLine(d: Pick<QueuedDecision, "by" | "section" | "resolvedAt" | "cre
 /** The decision's lead: the quote, who said it where and when, and what the write does. */
 export function decisionLead(
   n: number,
-  d: Pick<QueuedDecision, "quote" | "by" | "section" | "resolvedAt" | "createdAt" | "update">,
+  d: Pick<QueuedDecision, "quote" | "by" | "section" | "resolvedAt" | "createdAt" | "update" | "row">,
   commentUrl: string,
 ): string {
-  return [`*${n} · "${escapeSlackText(d.quote)}"*`, saidLine(d, commentUrl), `• ${updateLine(d.update)}`].join("\n");
+  const row = d.row ? [`• ${escapeSlackText(rowWords(d.row.update))}`] : [];
+  return [`*${n} · "${escapeSlackText(d.quote)}"*`, saidLine(d, commentUrl), `• ${updateLine(d.update)}`, ...row].join("\n");
 }
 
 /** What the write does, in one line. */
@@ -138,7 +140,7 @@ export function decisionCard(n: number, d: QueuedDecision, commentUrl: string): 
     footer: "",
     fields: [],
     caveats: [],
-    operations: d.operation ? [d.operation] : [],
+    operations: operationsOf(d),
   };
 }
 
@@ -148,17 +150,19 @@ export function decisionCard(n: number, d: QueuedDecision, commentUrl: string): 
  * goes to the comment, and a PRD or card decision's page is the third button.
  *
  * @param n - Its number in the thread
- * @param d - A decision with an operation
+ * @param d - A decision with an operation or a row
  * @param commentUrl - Its comment's link
  */
 export function decisionItem(n: number, d: QueuedDecision, commentUrl: string): ReportItem {
   const drafted = draftedText(d);
+  // The row's line before the drafted words, so a cut card still shows it.
+  const update = d.row ? `${updateWords(d.update)}. ${rowWords(d.row.update)}` : updateWords(d.update);
   const target = d.update.kind === "prd" ? { label: "Open page", url: d.update.page.url } : d.update.kind === "card" ? { label: "Open card", url: d.update.url } : null;
   return {
     id: d.commentId,
     title: `${n} · ${d.quote}`,
     subtitle: `${escapeSlackText(d.by)} · ${d.section} page · ${whenWords(d)}`,
-    body: drafted ? `${updateWords(d.update)}. ${drafted}` : updateWords(d.update),
+    body: drafted ? `${update}. ${drafted}` : update,
     // Once written, the card says what the write made.
     ...(drafted ? { done: drafted } : {}),
     open: { label: "Open comment", url: commentUrl },

@@ -25,6 +25,7 @@ import type { SearchHit } from "../../src/sweep/search";
 import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../../src/usage/index";
 import type { InMemoryFigma } from "../../src/figma/in-memory";
+import type { DecisionRow } from "../../src/integrations/notion";
 import type { TeamRoles } from "../../src/usage/roles";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
@@ -224,6 +225,10 @@ export function sweepHarness(opts: {
     members?: string[] | null;
     /** The team's roles by Slack id: who is a designer. None unless set. */
     roles?: TeamRoles;
+    /** Each card's Decisions DB rows, by card URL. Unset, rows are not wired. */
+    decisionRows?: Record<string, DecisionRow[]>;
+    /** The Figma and Notion people maps, each to Slack ids. None unless set. */
+    people?: { figma: Record<string, string>; notion: Record<string, string> };
   };
 }): SweepHarness {
   const clock = { now: opts.now };
@@ -297,6 +302,14 @@ export function sweepHarness(opts: {
           return opts.figma!.cards?.[number] ?? null;
         },
         roles: async () => opts.figma!.roles ?? {},
+        ...(opts.figma.decisionRows
+          ? {
+              async decisionRows(cardUrl: string) {
+                return structuredClone(opts.figma!.decisionRows![cardUrl] ?? []);
+              },
+            }
+          : {}),
+        people: async () => opts.figma!.people ?? { figma: {}, notion: {} },
         detector: modelDecisionDetector(provider),
         ...(opts.figma.miscTeamId ? { miscTeamId: opts.figma.miscTeamId } : {}),
         queue: {
