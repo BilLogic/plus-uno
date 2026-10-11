@@ -30,6 +30,7 @@ import {
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
+  reportItemLook,
   type ReportExpiryRecord,
   claimedFiling,
   proposalReplyThread,
@@ -301,10 +302,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async prepareReportExpiry(messageTs) {
       const rec = liveReport(messageTs);
       if (!rec) return null;
-      const next = expiredReport(rec, (key) => {
+      const next = expiredReport(rec, reportItemLook((key) => {
         const proposal = proposals.get(key);
-        return proposal || executions.has(key) ? { expiresAt: proposal ? proposal.createdAt + proposalTtlMs(proposal.proposal) + 1 : rec.createdAt + rec.report.ttlMs + 1, executing: executions.has(key) } : undefined;
-      }, now());
+        return proposal && { createdAt: proposal.createdAt, ttlMs: proposalTtlMs(proposal.proposal) };
+      }, (key) => executions.has(key)), now());
       reports.set(messageTs, next);
       return next.expiryPending ? structuredClone({ report: next.report, revision: next.revision ?? 0 }) : null;
     },
