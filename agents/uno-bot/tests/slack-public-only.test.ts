@@ -96,3 +96,20 @@ describe("slack_thread_read on a public-only turn", () => {
     assert.match(out, /"ok":true/);
   });
 });
+
+describe("the DM-watch evidence search on a person's own token", () => {
+  it("asks for public channels only, and hands back each hit's channel and link", async () => {
+    const sent = stubSlack();
+    const { searchPublicChannels } = await tools();
+    const hits = await searchPublicChannels("xoxp-own-test", "goal-setting");
+    assert.deepEqual(hits, [{ channel: PUBLIC, ts: "1700000000.000100", text: "the progress bar ships hidden", permalink: `https://plus.slack.com/archives/${PUBLIC}/p1700000000000100` }]);
+    assert.equal(sent.length, 1);
+    assert.equal(new URLSearchParams(sent[0]!.split(" ")[1]).get("channel_types"), "public_channel");
+  });
+
+  it("a refused search is null, never an empty result", async () => {
+    route = (async () => Response.json({ ok: false, error: "ratelimited" })) as typeof fetch;
+    const { searchPublicChannels } = await tools();
+    assert.equal(await searchPublicChannels("xoxp-own-test", "goal-setting"), null);
+  });
+});

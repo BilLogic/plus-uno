@@ -36,6 +36,7 @@ import {
   type DmWatchFeature,
   type InMemoryDmWatchRecords,
   type OwnerSlack,
+  type PublicHit,
   answerDmReminderPress,
 } from "../src/dm-watch/index";
 import { homeView } from "../src/slack/home";
@@ -72,9 +73,13 @@ interface FakeSlack {
   ims: { id: string; user: string }[];
   /** auth.test says the token is refused. */
   refused: boolean;
+  /** What public-channel search can find; a hit matches a query term in its text. */
+  published: PublicHit[];
+  /** Public-channel search fails. */
+  searchDown: boolean;
 }
 
-function fakeSlack(scopes: string[] = ["im:read", "im:history", "search:read"]): FakeSlack {
+function fakeSlack(scopes: string[] = ["im:read", "im:history", "search:read", "search:read.public"]): FakeSlack {
   const calls: string[] = [];
   const messages = new Map<string, SweepSlackMessage[]>([
     [DM_BEA, dmMessages()],
@@ -85,7 +90,16 @@ function fakeSlack(scopes: string[] = ["im:read", "im:history", "search:read"]):
     messages,
     ims: [{ id: DM_BEA, user: BEA }, { id: "D0UNO", user: BOT }],
     refused: false,
+    published: [],
+    searchDown: false,
     api: {
+      // Slack may ignore `after`: the fake does, so the run's own filter is what is tested.
+      async searchPublic(query) {
+        calls.push(`search:${query}`);
+        if (fake.searchDown) return null;
+        const words = query.toLowerCase().split(/\s+/);
+        return fake.published.filter((h) => words.every((w) => h.text.toLowerCase().includes(w)));
+      },
       async identity() {
         calls.push("auth.test");
         return fake.refused ? null : { scopes, url: URL, userId: MAYA };
@@ -347,7 +361,7 @@ describe("the morning reminder", () => {
     assert.ok(!post.text.includes(`<@${BEA}>`), "the promiser is named, never mentioned");
     assert.equal(footerLabels(post.blocks), MADE_TO_CHOICES.map((c) => c.label).join(" · "));
     // The only writes the owner's token could make: none — its port has reads only.
-    assert.deepEqual(Object.keys(w.slack.api).sort(), ["history", "identity", "ims"]);
+    assert.deepEqual(Object.keys(w.slack.api).sort(), ["history", "identity", "ims", "searchPublic"]);
     const row = w.records.rows()[0]!;
     assert.equal(row.state, "nudged");
     assert.ok(row.nudgeTs);
@@ -399,13 +413,111 @@ describe("the morning reminder", () => {
     const w = world();
     await turnOn(w, ["promises_to_me"]);
     await runDmPromiseRead(READ, readDeps(w, EOD));
-    const narrowed = world({ scopes: ["im:read"] });
+    const narrowed = world({ scopes: ["im:read", "search:read.public"] });
     const deps = { ...nudgeDeps(narrowed, THU), records: w.records };
     const report = await runDmPromiseNudges(NUDGE, deps);
     assert.equal(report.outcome, "skipped");
     assert.deepEqual(narrowed.logs, [`[dm-watch] ${MAYA}: the token lacks im:history, job skipped`]);
     assert.equal(w.records.rows()[0]!.state, "open");
     assert.deepEqual(narrowed.posts, []);
+  });
+});
+
+describe("evidence beyond the DM", () => {
+  // Bea promised in the DM, then posted the doc in a public channel.
+  const POSTED = ts(30, 15);
+  const keptInChannel: PublicHit = {
+    channel: "C0DESIGN",
+    ts: POSTED,
+    authorName: "Bea",
+    text: "Here are the tokens for review",
+    permalink: "https://plus.slack.com/archives/C0DESIGN/p1759244400000000",
+  };
+  /** A judge that keeps what it is shown, and calls it done when shown `evidence`. */
+  function judgeDoneOn(evidence: string, seen: string[][]): EvidenceJudge {
+    return {
+      judge: async (input) => {
+        seen.push(input.messages.map((m) => `${m.ts} ${m.user} ${m.text}`));
+        const hit = input.messages.some((m) => m.ts === evidence);
+        return { ok: true, done: hit, evidenceTs: hit ? [evidence] : [] };
+      },
+    };
+  }
+
+  it("a promise kept by the promiser's post in a public channel is not nudged", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    w.slack.published.push(keptInChannel);
+    const seen: string[][] = [];
+    const report = await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU, judgeDoneOn(POSTED, seen)));
+    assert.equal(report.summary, "1 auto_done");
+    assert.deepEqual(w.posts, []);
+    assert.equal(w.records.rows()[0]!.state, "auto_done");
+    assert.ok(w.slack.calls.includes("search:tokens"), "searched on what was promised");
+    // The judge saw the channel post as Bea's, with where it was posted.
+    assert.ok(seen[0]!.some((line) => line.startsWith(`${POSTED} ${BEA} `) && line.includes(keptInChannel.permalink)));
+  });
+
+  it("someone else's post, one from before the promise, and anything outside a public channel are never evidence", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    w.slack.published.push(
+      { ...keptInChannel, authorName: "Cal", user: "U0CAL" },
+      { ...keptInChannel, ts: ts(29, 9), permalink: "https://plus.slack.com/archives/C0DESIGN/p1" },
+      { ...keptInChannel, channel: "D0OTHER", permalink: "https://plus.slack.com/archives/D0OTHER/p1" },
+      { ...keptInChannel, channel: "G0PRIVATE", permalink: "https://plus.slack.com/archives/G0PRIVATE/p1" },
+    );
+    const seen: string[][] = [];
+    const report = await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU, judgeDoneOn(POSTED, seen)));
+    assert.equal(report.summary, "1 nudged");
+    assert.match(w.posts[0]!.text, /I haven't spotted it yet/);
+    assert.ok(seen.flat().every((line) => !line.includes("archives/")), "no hit reached the judge");
+  });
+
+  it("a promise with no evidence anywhere is still nudged as today, after a search", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    const report = await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU));
+    assert.equal(report.summary, "1 nudged");
+    assert.ok(w.slack.calls.some((c) => c.startsWith("search:")));
+  });
+
+  it("a search that fails holds the row rather than nudging blind", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    w.slack.searchDown = true;
+    const report = await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU));
+    assert.equal(report.summary, "1 held");
+    assert.deepEqual(w.posts, []);
+    assert.equal(w.records.rows()[0]!.holds, 1);
+  });
+
+  it("a run without the headroom for the search stops before it, posting nothing", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    // Enough for everything a reminder spent before the search existed, not for the search.
+    const tight = { ...nudgeDeps(w, THU), meter: { headroom: () => ({ subrequests: 8, d1Queries: 40 }) } };
+    await assert.rejects(runDmPromiseNudges(NUDGE, tight), /budget/);
+    assert.deepEqual(w.posts, []);
+    assert.ok(!w.slack.calls.some((c) => c.startsWith("search:")));
+    assert.equal(w.records.rows()[0]!.state, "open");
+  });
+
+  it("a token without public search skips the morning with one log line, rows untouched", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    const narrowed = world({ scopes: ["im:read", "im:history"] });
+    const report = await runDmPromiseNudges(NUDGE, { ...nudgeDeps(narrowed, THU), records: w.records });
+    assert.equal(report.outcome, "skipped");
+    assert.deepEqual(narrowed.logs, [`[dm-watch] ${MAYA}: the token lacks search:read.public, job skipped`]);
+    assert.deepEqual(narrowed.posts, []);
+    assert.equal(w.records.rows()[0]!.state, "open");
   });
 });
 
