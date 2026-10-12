@@ -1708,6 +1708,9 @@ export function sweepProposal(
     stated: sweepItemWords(),
     // A group DM's fix: what its write shares (`./share.ts`).
     ...(share ? { sweepShare: share } : {}),
+    // The block as the sweep read it: Review's Before. An added answer
+    // replaces nothing.
+    ...(f.add ? {} : { before: { "0.replace.0.content": f.original } }),
   };
 }
 

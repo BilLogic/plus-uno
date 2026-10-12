@@ -44,6 +44,8 @@ export interface QueuedDecision {
   operation: ProposalOperation | null;
   /** What its card says the ✅ does. */
   update: DecisionUpdate;
+  /** What the write replaces, as the night read it (`PendingProposal.before`). */
+  before?: Record<string, string>;
   confidence: number;
   /** A key decision's Decisions DB row, run by the same ✅ after the update (`../decisions-db/row.ts`). */
   row?: { operations: ProposalOperation[]; update: RowUpdate };

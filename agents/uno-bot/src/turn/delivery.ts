@@ -171,6 +171,11 @@ export interface CardRevision {
   /** What an append adds: the section headings it writes, or — with none — a
    *  bare note on the page. */
   append?: { headings: string[] };
+  /** What the page says now, by the value's path in the tool input
+   *  (`replace.0.content`, `properties.Status`): each value the write
+   *  replaces that the read found. Kept on the staged proposal as Review's
+   *  Before, not drawn on the card. */
+  before?: Record<string, string>;
 }
 
 /**

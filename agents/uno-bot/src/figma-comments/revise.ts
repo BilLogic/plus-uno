@@ -282,7 +282,7 @@ async function redraft(deps: ReviseDeps, thread: DecisionThread, d: QueuedDecisi
   });
   const found = result.ok ? result.decisions[0] : undefined;
   if (!found) return null;
-  const { operation, update } = draftDecision(found, {
+  const { operation, update, before } = draftDecision(found, {
     prd,
     card: d.update.kind === "card" ? d.update.card : null,
     file: { title: thread.title },
@@ -292,5 +292,7 @@ async function redraft(deps: ReviseDeps, thread: DecisionThread, d: QueuedDecisi
     where: `${d.section} › ${d.page}`,
   });
   if (!operation) return null;
-  return { ...d, decision: found.decision, operation, update, confidence: found.confidence };
+  // The reworded write's own Before, never the one it replaces.
+  const { before: _was, ...kept } = d;
+  return { ...kept, decision: found.decision, operation, update, confidence: found.confidence, ...(before ? { before } : {}) };
 }

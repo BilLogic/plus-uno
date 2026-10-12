@@ -212,6 +212,9 @@ export function harness(opts: {
   classifyAsk?: (text: string) => Promise<SubType | null>;
   /** The stored role map a staged card reads. Absent, none is stored. */
   teamRoles?: () => Promise<TeamRoles>;
+  /** What a `notion_update` card's read finds. Absent, a page whose Design
+   *  Status moves from WIP. */
+  notionRevision?: TurnDeps["cards"]["notionRevision"];
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -331,7 +334,8 @@ export function harness(opts: {
     // The three reads a card needs, answering with the STRUCTURES the turn
     // puts on the card — never words, which are the adapter's (#623).
     cards: {
-      async notionRevision() {
+      async notionRevision(input) {
+        if (opts.notionRevision) return opts.notionRevision(input);
         return {
           page: { url: "https://notion.so/a-card", title: "A card", parent: "Roadmap" },
           properties: [{ label: "Design Status", from: "WIP", to: "Ready for QA" }],

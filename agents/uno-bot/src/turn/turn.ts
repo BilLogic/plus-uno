@@ -1637,6 +1637,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     requesterUserId: request.userId,
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
+    // What the page says now, as the card's read found it: Review's Before.
+    // The read is of the first operation, the one the card is drawn from.
+    ...beforeOf(card.revision),
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
     ...inheritedTerms(replaced),
@@ -1711,6 +1714,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     wrote: memory.wrote(),
     telemetry,
   };
+}
+
+/** A card read's Before values, keyed as the staged batch's first operation
+ *  (`PendingProposal.before`); nothing when the read found none. */
+function beforeOf(revision: CardRevision | undefined): { before?: Record<string, string> } {
+  const found = Object.entries(revision?.before ?? {});
+  return found.length ? { before: Object.fromEntries(found.map(([path, value]) => [`0.${path}`, value])) } : {};
 }
 
 /** What a revision of a sweep card that has closed meanwhile is told. */
