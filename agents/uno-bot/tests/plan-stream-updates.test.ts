@@ -32,6 +32,17 @@ const TARGET: SlackDeliveryTarget = {
 /** Early updates slow, later ones fast: a client that resolves out of order. */
 const outOfOrder = (index: number): number => Math.max(0, 40 - index * 10);
 
+/** A client whose first append stays in flight until `release`, and whose
+ *  later ones come straight back: out of order, with "still in flight" held
+ *  by the test rather than by a timer the test's own steps have to beat. */
+function firstAppendHeld(): { taskHold: (index: number) => Promise<unknown> | undefined; release: () => void } {
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  return { taskHold: (index) => (index === 0 ? held : undefined), release };
+}
+
 /** An append as its cards' `id:status`, so an order reads as one line. */
 const step = (call: SlackCall): string =>
   call.kind === "tasks" ? call.tasks.map((t) => `${t.id}:${t.status}`).join(" ") : call.kind;
@@ -80,11 +91,13 @@ async function unhandledDuring(run: () => Promise<void>): Promise<unknown[]> {
 
 describe("plan-stream updates", () => {
   it("land in the order the adapter issued them, even on a client that resolves out of order", async () => {
-    const slack = recordingSlack({ taskDelayMs: outOfOrder });
+    const first = firstAppendHeld();
+    const slack = recordingSlack({ taskHold: first.taskHold });
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
     await delivery.beginProgress("Working on it");
     await twoLookups(delivery);
+    first.release();
     await delivery.postAnswer("Here it is.");
 
     // Updates issued while an earlier append is still in flight wait for it,
@@ -102,12 +115,14 @@ describe("plan-stream updates", () => {
   });
 
   it("never let a refused update escape, and the turn still answers and closes the stream", async () => {
-    const slack = recordingSlack({ taskRejects: new Error("invalid_arguments"), taskDelayMs: outOfOrder });
+    const first = firstAppendHeld();
+    const slack = recordingSlack({ taskRejects: new Error("invalid_arguments"), taskHold: first.taskHold });
     const delivery = deliveryAdapter(slack.deps(true), TARGET);
 
     const escaped = await unhandledDuring(async () => {
       await delivery.beginProgress("Working on it");
       await twoLookups(delivery);
+      first.release();
       const posted = await delivery.postAnswer("Here it is.");
       assert.equal(posted.ok, true);
     });

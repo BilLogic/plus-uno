@@ -251,6 +251,11 @@ export interface RecordingSlackOptions {
    *  that resolves out of order — the shape that let a card's "complete" land
    *  after the next card's "in progress" while updates were fire-and-forget. */
   taskDelayMs?: (index: number) => number;
+  /** Hold the Nth task append (0-based) until the promise returned settles.
+   *  Where a test needs an update to be issued while an earlier one is still
+   *  in flight, a hold says so outright; a delay only says it while the test's
+   *  own steps beat the timer, which a loaded machine does not promise. */
+  taskHold?: (index: number) => Promise<unknown> | undefined;
   /** Reject every task update, the way a refused or thrown append arrives. */
   taskRejects?: unknown;
 }
@@ -388,8 +393,10 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     async appendTasks(channel, ts, tasks, title) {
       const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks], ...(title === undefined ? {} : { title }) };
       record(call);
-      const delay = opts.taskDelayMs?.(appends++) ?? 0;
+      const index = appends++;
+      const delay = opts.taskDelayMs?.(index) ?? 0;
       if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
+      await opts.taskHold?.(index);
       const why = taskRefusal(tasks);
       if (why) return refuse(refused, why, "invalid_arguments");
       if (stopped.has(ts)) return refuse(refused, "task update on a stopped stream", "message_not_in_streaming_state");
