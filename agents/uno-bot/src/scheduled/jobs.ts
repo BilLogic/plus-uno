@@ -26,6 +26,7 @@ import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv } from "../figma-tidy/env";
+import { runQueuedPrLinksOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
@@ -111,6 +112,11 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: link each posted card's PR, and close its intake on merge.
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
+  // Morning, after the tracker: a Dev Mode links card for each merged
+  // library PR it queued, once FIGMA_DEV_LINKS is on (src/figma-links/).
+  "figma-dev-links-pr": async (env, _job, { dryRun }) => {
+    console.log(`[figma-links] PR links: ${(await runQueuedPrLinksOnEnv(env, { dryRun })).summary}`);
   },
   // End of day, last of the Figma jobs: a publish the poll found starts the
   // refresh of the repo's library snapshot, and again each night until it

@@ -49,6 +49,7 @@ import { executeGithubWorkflowRun } from "../tools/github-workflow";
 import { executeSweepSharePost } from "../tools/sweep-share-post";
 import { executeDsPrecedenceIntake } from "../tools/ds-precedence-intake";
 import { executeTidyLeaveAsIs } from "../tools/figma-tidy-up";
+import { executeDevLinks } from "../tools/figma-dev-links";
 import type { ToolName } from "./tool-table";
 
 /**
@@ -95,6 +96,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   sweep_share_post: (env, input) => executeSweepSharePost(env, input),
   ds_precedence_intake: (env, input, slack) => executeDsPrecedenceIntake(env, input, slack),
   figma_tidy_up: (env, input) => executeTidyLeaveAsIs(env, input),
+  figma_dev_links: (env, input) => executeDevLinks(env, input),
   // Answered by Turn's presentation step from the turn's own lookups, which
   // replaces this result before the model reads it (`turn/presentation.ts`).
   // A run with no presentation step — none today — gets the plain refusal.

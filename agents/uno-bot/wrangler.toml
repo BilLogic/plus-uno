@@ -234,6 +234,12 @@ PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # posts in #plus-design (PLUS_DESIGN_CHANNEL_ID). Reset it to blank when Bill
 # signs the Figma flows off.
 FIGMA_ASK_CHANNEL_ID = "D0APTB20SK0"
+# Dev Mode links (src/figma-links/): blank, `/debug/figma-dev-links` posts the
+# Review card for ONE named component (the live check on Button with Bill),
+# every registry component waits, and a merged library PR's link stays queued.
+# Set to "on" once that check passes: `?all=1` then posts the rest, and the
+# morning run posts each merged PR's card. A card writes only on Approve.
+FIGMA_DEV_LINKS = ""
 # ── End-of-day sweep (src/sweep/) ────────────────────────────────────────────
 # The channels the end-of-day run reads for Notion drift, one job per channel:
 # comma-separated channel ids. THIS IS THE ONE LINE TO GROW — add a design

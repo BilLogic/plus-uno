@@ -21,6 +21,7 @@ import { proposalEventLogFor } from "../usage/production";
 import { GithubRequestError, githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
+import { PR_QUEUE_KV_KEY, queuePrLinks, type QueuedPrLinks } from "../figma-links/queue";
 import { repositoryDispatch } from "../tools/github-dispatch";
 import {
   BLOCKED_LABEL,
@@ -177,6 +178,8 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
         const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
         if (!res.ok) throw new Error(res.error ?? "chat.update failed");
       },
+      // A merged PR's link waits for its Dev Mode links card (src/figma-links/).
+      merged: (pr, components) => queuePrLinks(kvJson<QueuedPrLinks[]>(env, PR_QUEUE_KV_KEY, []), { pr, components }),
       now: () => Date.now(),
     },
     opts,

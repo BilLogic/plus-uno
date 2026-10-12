@@ -123,6 +123,9 @@ export interface TrackDeps {
   /** Edit a card's message in place: its report redrawn closed, or a
    *  pre-shared card's own blocks with a closing line and no buttons. */
   closeCard(channel: string, ts: string, message: { text: string; blocks: unknown[] }): Promise<void>;
+  /** A card's PR merged: its link is offered on the components it changed,
+   *  in Dev Mode (`figma-links/queue.ts`). */
+  merged?(pr: { number: number; url: string }, components: string[]): Promise<void>;
   now(): number;
 }
 
@@ -381,6 +384,13 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
           await deps.github.close(card.intake.number);
         }
         await deps.postToThread(card.channel, card.ts, prMergedLine(pr, card.implement, card.intake));
+        const components = (card.implement ?? "").split(",").map((n) => n.trim()).filter(Boolean);
+        if (deps.merged && components.length) {
+          await deps.merged({ number: pr.number, url: pr.url }, components).catch((err: unknown) => {
+            rethrowIfBudget(err);
+            console.error(`[figma-library] PR #${pr.number}: Dev Mode link not queued — ${err instanceof Error ? err.message : String(err)}`);
+          });
+        }
       }
       continue;
     }
