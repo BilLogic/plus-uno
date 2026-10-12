@@ -1656,13 +1656,15 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...(replaced?.supersedeKey ? { supersedeKey: replaced.supersedeKey } : {}),
     // A revision of a sweep card stays a sweep card, in the sweep's slot, so
     // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
-    // deadline, and its outcome joins the row the Worker's staging wrote.
+    // deadline, and its outcome joins the row the Worker's staging wrote. A
+    // rewording answers the same thread, so it keeps the fix's Issue.
     ...(replaced?.sweepRun
       ? {
           sweepRun: replaced.sweepRun,
           supersedeKey: replaced.supersedeKey ?? SWEEP_KEY,
           ttlMs: sweepLeftMs,
           originProposalTs: stagingCardOf(replaced),
+          ...(replaced.issue ? { issue: replaced.issue } : {}),
         }
       : {}),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision

@@ -172,10 +172,10 @@ describe("the draft reads as a draft", () => {
     );
     const words = all.join("\n");
     assert.match(words, /\*Page:\* <https:\/\/www\.notion\.so\/Reflection-/);
-    assert.match(words, /\*Design Status:\* In Review/);
+    assert.match(words, /\*Design Status\*\n[^\n]*\n\*New content:\* In Review/);
     assert.ok(indexOf(all, /^header: Open questions$/) < indexOf(all, /Does the mentor/));
     // The text it writes is a field in place, for the confirmer reading it.
-    assert.match(words, /header: Rewritten block\n(context: [^\n]*\n)?input: Text = Tutors answer three questions\./);
+    assert.match(words, /header: Rewritten block\nsection: \*Current content\*\n(context: [^\n]*\n)?input: New content = Tutors answer three questions\./);
     assert.doesNotMatch(words, /block_id|last_edited_time|page_url|append|replace/);
   });
 
