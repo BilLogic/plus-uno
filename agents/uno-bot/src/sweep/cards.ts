@@ -261,20 +261,21 @@ const QUOTE_CHARS = 84;
 const ADD_QUOTE_CHARS = 160;
 
 /**
- * One fix as its card in the report: the page names it, its owner and where
- * it was said under that, and what the page says beside what was decided.
- * Its id is its block, unique on a card (`itemRecord`). Open goes to the page.
+ * One fix as its card in the report: the page names it, where it was said
+ * under that, and what the page says beside what was decided; its owner is
+ * pinged from the parent line (`owners`). Its id is its block, unique on a card (`itemRecord`). Open goes to the page.
  *
  * @param f - The finding
  * @param destination - Where the report posts
  */
 export function sweepItem(f: PendingFinding, destination: Destination): ReportItem {
-  const where = [`<@${f.owner}>`, `from ${saidIn(f, inThread(destination))}`, ...(f.target.foundBy === "search" ? [FOUND_BY_SEARCH] : [])];
+  const where = [`from ${saidIn(f, inThread(destination))}`, ...(f.target.foundBy === "search" ? [FOUND_BY_SEARCH] : [])];
   return {
     // Carded findings always name a block (`planSweepCards`).
     id: f.blockId!,
     title: flat(f.target.title) || "untitled",
     subtitle: where.join(" · "),
+    owners: [{ slack: f.owner }],
     // Each half clipped on its own, so the decision always shows; View and
     // Review show both whole.
     body: f.add

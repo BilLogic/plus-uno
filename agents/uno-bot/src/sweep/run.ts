@@ -1266,6 +1266,7 @@ export function sweepReport(plan: SweepCardPlan): DecisionReport {
   return decisionReport(
     all.map((f) => sweepItem(f, plan.destination)),
     sweepParent(all, plan.destination),
+    { channel: plan.destination.channel },
   );
 }
 

@@ -393,13 +393,22 @@ export interface ProposalSelect {
 export type ChosenAs = Pick<ReviewChoice, "value" | "label" | "decided">;
 
 /** One item a report asks someone to decide, as its card shows it. */
+/** Whom a card is for: a Slack person, or by name alone when Team Members
+ *  maps them to no Slack person. */
+export type CardOwner = { slack: string } | { name: string };
+
 export interface ReportItem {
   /** Stable within the report. No `#` or `~`: the builder uses both. */
   id: string;
   /** The page, file, component or comment the item is about. Plain text. */
   title: string;
-  /** Who and where — owner · source — as mrkdwn, so a mention resolves. */
+  /** Where it came from, and its state once decided, as mrkdwn. Slack
+   *  notifies nobody from a card's subtitle, so whom the card is for goes in
+   *  `owners`. */
   subtitle?: string;
+  /** Whose answer the card needs. The shared card opens its parent line on
+   *  them, where Slack notifies (`decision-cards.ts`). */
+  owners?: CardOwner[];
   /** What changes, plain: "Page says X · decision says Y". */
   body: string;
   /** The item's source. Label defaults to "Open". */

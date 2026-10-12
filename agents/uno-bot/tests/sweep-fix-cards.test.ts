@@ -19,6 +19,7 @@ import type { GateVerdict } from "../src/gate/index";
 import { recordingDelivery } from "../src/turn/index";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { notified } from "./helpers/notified";
 import { recordingViews } from "./helpers/recording-slack";
 import { at, DESIGN, drift, msg, notionPage, reply, sweepHarness, ts } from "./helpers/sweep-harness";
 
@@ -83,7 +84,8 @@ test("three fixes post as a parent line and three cards in a carousel, each with
   assert.equal(messageBlocksRefusal(blocks), null);
   assert.equal(blocks.length, 2, "the parent line, then the carousel: nothing else");
   assert.equal(blocks[0]!.type, "section");
-  assert.match(String(blocks[0]!.text.text), /^\*Reflection PRD\* still states 3 things its thread changed\.$/);
+  assert.equal(String(blocks[0]!.text.text), "*Reflection PRD* still states 3 things its thread changed.\n• <@U0ADE> — Reflection PRD\n• <@U0BEA> — Reflection PRD", "one bullet per owner, each page once");
+  assert.deepEqual(notified(post), ["U0ADE", "U0BEA"], "each owner pinged from the main text");
 
   const carousel = blocks[1]!;
   assert.equal(carousel.type, "carousel");
@@ -97,8 +99,8 @@ test("three fixes post as a parent line and three cards in a carousel, each with
     assert.equal(card.actions[1].url, PAGE.url, "Open goes to the page");
     assert.match(card.icon.image_url, /notion/, "the Notion logo");
   });
-  assert.equal(plainOf(cards[0]!.subtitle), "<@U0ADE> · from this thread", "who and where");
-  assert.equal(plainOf(cards[1]!.subtitle), "<@U0BEA> · from this thread");
+  assert.equal(plainOf(cards[0]!.subtitle), "from this thread", "where; whom it is for is the parent line's");
+  assert.equal(plainOf(cards[1]!.subtitle), "from this thread");
 
   assert.equal(blocks.some((b) => b.type === "container" || b.type === "actions"), false, "no folded box, no card-wide button");
   assert.doesNotMatch(JSON.stringify(blocks), GATE_WORDS);
@@ -120,7 +122,8 @@ test("one fix posts as a parent line naming its page, and one card", async () =>
 
   const blocks = h.posted[0]!.blocks as Block[];
   assert.equal(messageBlocksRefusal(blocks), null);
-  assert.equal(String(blocks[0]!.text.text), "This thread settled something that *Reflection PRD* still states the old way.");
+  assert.equal(String(blocks[0]!.text.text), "<@U0ADE>, this thread settled something that *Reflection PRD* still states the old way.");
+  assert.deepEqual(notified(h.posted[0]!), ["U0ADE"]);
   assert.equal(blocks.length, 2);
   assert.equal(blocks[1]!.type, "card", "one card stands alone, no carousel");
   assert.equal(plainOf(blocks[1]!.title), "Reflection PRD");
@@ -184,7 +187,7 @@ test("where Slack refuses cards, the report posts as sections that each keep the
   fixes.forEach((b, i) => {
     assert.equal(b.type, "section");
     assert.equal(b.accessory.action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);
-    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\n<@U0`));
+    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\nfrom this thread\\n`));
   });
 });
 

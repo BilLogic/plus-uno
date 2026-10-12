@@ -220,7 +220,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
   const before = (await deps.reports.getReport(item.messageTs))?.entries.find((e) => e.id === item.id)?.item;
   // In place: the same card in the report, under the same number, open again
   // as a new proposal.
-  const replaced = before ? await replaceItem(deps.reports, item.messageTs, item.id, decisionItem(n, revised, link)) : null;
+  const replaced = before ? await replaceItem(deps.reports, item.messageTs, item.id, { ...decisionItem(n, revised, link, null), ...(before.owners ? { owners: before.owners } : {}) }) : null;
   let staged = false;
   if (replaced) {
     try {

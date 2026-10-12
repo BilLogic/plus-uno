@@ -963,7 +963,7 @@ test("a dry run returns the findings and the card text, and writes and posts not
   real.clock.now = at(30, 13);
   const morning = await runSweepJob(MORNING, { ...real.deps, dryRun: true });
   assert.equal(morning.cards.length, 1);
-  assert.match(morning.cards[0]!.text, /^This thread settled something that \*Page aaaa\* still states the old way\./);
+  assert.match(morning.cards[0]!.text, /^<@U0ADE>, this thread settled something that \*Page aaaa\* still states the old way\./);
   assert.deepEqual(real.posted, []);
   assert.deepEqual(real.staged, []);
   assert.equal((await real.store.pendingFindings()).length, 1, "the queue is untouched");

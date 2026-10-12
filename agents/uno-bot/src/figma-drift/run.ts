@@ -519,8 +519,8 @@ interface Drafted {
   lane: FileDriftFinding["lane"];
   /** Why its Product Pillar was left off, or null. */
   note: string | null;
-  /** Its file's last publisher's Slack id, when the directory maps them. */
-  publisher: { slackId: string } | null;
+  /** Its file's last publisher's Slack id and Figma handle, when the directory maps them. */
+  publisher: { slackId: string; handle: string } | null;
 }
 
 /**
@@ -596,7 +596,7 @@ async function askWithCards(
           )
         : { pillar: null, note: null };
     const intake = draftIntake({ findings: d.all, pillar: choice.pillar, publisher, permalinks });
-    // A publisher the directory maps is @-mentioned on the card and may
+    // A publisher the directory maps is named on the card and may
     // decide it; one it does not map is named on the intake alone.
     const publisherSlack =
       publisher?.userId && deps.figmaPeople
@@ -614,7 +614,7 @@ async function askWithCards(
       operation: intake.operation,
       lane: intake.lane,
       note: choice.note ? pillarNote(choice.note) : null,
-      publisher: publisherSlack ? { slackId: publisherSlack } : null,
+      publisher: publisherSlack && publisher ? { slackId: publisherSlack, handle: publisher.handle } : null,
     });
   }
   // Files this thread discussed whose intake is drafted elsewhere: a pointer each.

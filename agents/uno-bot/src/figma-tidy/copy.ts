@@ -1,5 +1,5 @@
 // The weekly Figma tidy-up's words (#886 § 3.6): the parent line, each
-// owner's reply, one Review card per finding, and the all-clear post.
+// owner's reply (the owner tagged once, by the shared card), one Review card per finding, and the all-clear post.
 //
 // Bill's ruling (2026-10-11): one shared decision card per finding, whose
 // Review pop-up offers "Moved it" and "Leave as is". No API moves or renames a
@@ -39,7 +39,9 @@ export function tidyParent(runDate: string, fresh: number, stillOpen: number): s
 }
 
 /**
- * One owner's reply: the owner mentioned once, and how many wait past the five shown.
+ * One owner's reply: how many of their files need a tidy, and how many wait
+ * past the five shown. The shared card opens it on the owner (`tidyItem`'s
+ * `owners`), mentioned once.
  *
  * @param owner - A Slack id, or null for the unassigned reply
  * @param total - Their items this week
@@ -51,8 +53,7 @@ export function ownerLine(owner: string | null, total: number, shown: number): s
     const files = plural(total, "file has", "files have");
     return `${files} no owner I could find${more}.`;
   }
-  const files = total === 1 ? "1 of your files needs" : `${total} of your files need`;
-  return `<@${owner}>, ${files} a tidy${more}.`;
+  return `${total === 1 ? "1 file needs" : `${total} files need`} a tidy${more}.`;
 }
 
 /** Where a finding says to move the file: the team's folder, by its own name. */
@@ -107,6 +108,7 @@ export function tidyItem(finding: TidyFinding, likely: { number: number; title: 
     id: itemId(finding),
     title: finding.file.name,
     subtitle: finding.card === null ? SUBTITLE[finding.check] : `${SUBTITLE[finding.check]} · Card ${finding.card}`,
+    ...(finding.owner ? { owners: [{ slack: finding.owner }] } : {}),
     body: findingBody(finding, likely),
     open: { label: "Open file", url: figmaFileUrl(finding.file.key) },
     ...(card ? { also: card } : {}),

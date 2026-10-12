@@ -38,6 +38,7 @@ import { isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
 import { TOOL_TABLE } from "../src/agent/tool-table";
 import type { Env } from "../src/types";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { notified } from "./helpers/notified";
 import { recordingViews } from "./helpers/recording-slack";
 import type { OperationOutcome } from "../src/gate/run-batch";
 import { itemProposal } from "../src/slack/decision-cards";
@@ -435,6 +436,7 @@ describe("the morning post", () => {
     assert.equal(posts.length, 1, "one message, nothing in a thread");
     const [message] = posts;
     assert.equal(messageBlocksRefusal(message!.blocks!), null);
+    assert.deepEqual(notified(message!), [], "anyone can settle precedence: nobody is tagged");
     assert.match(
       JSON.stringify(message!.blocks![0]),
       new RegExp(

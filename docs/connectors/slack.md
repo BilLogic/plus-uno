@@ -235,6 +235,18 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 - A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
 - **A `/uno-*` slash command runs as a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
 - **Mention only who must act** (`<@U…>`). Never spray `<!here>` / `<!channel>` / `<!everyone>` — they need installer permission and read as noise. Batch related updates into one message, not five.
+<!-- ide-only -->
+
+### Who a Worker card pings
+
+Slack notifies from a message's main text, not from a card's subtitle. A card kind passes whom each item is for as `ReportItem.owners`, and the shared decision card (`decisionReport` in `agents/uno-bot/src/slack/decision-cards.ts`) builds the opener from them, so the ping lives in one place:
+
+- **Who:** the owner whose answer the card needs: the page owner on a sweep fix, the file owner on Figma drift and comment decisions, the tidy-up owner, the person a follow-up asks. A Figma drift card's other publisher is named in its subtitle in plain text.
+- **Anyone-can-settle cards** (library publish, DS precedence, Dev Mode links) carry no owners, so they tag nobody.
+- **Shape:** one card for one owner reads `<@owner>, <parent line>`. Otherwise the parent line, then one bullet per owner listing that owner's cards (`• <@Max> — Tutor profile cleanup + Tutor Admin tutor detail`), each owner tagged once, in one message. A bulleted list, since mrkdwn has no tables.
+- **A DM** (channel `D…`) tags nobody. **An owner Team Members does not map** is `{ name }`, written in plain text; the Monday unmatched-people DM covers them.
+- **One ping per card.** Redraws edit the message, which notifies nobody, and a card that lapses at 72 h is not posted again.
+<!-- /ide-only -->
 
 ## Writing style (all Slack output)
 

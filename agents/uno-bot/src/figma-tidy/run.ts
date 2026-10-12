@@ -380,6 +380,7 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
     const report = decisionReport(
       shown.map((s) => tidyItem(s.finding, s.likely)),
       ownerLine(owner, total, shown.length),
+      { channel: deps.channel },
     );
     const sent = await deps.post({ text: report.text, blocks: report.blocks }, parentTs);
     if (!sent.ok || !sent.ts) continue;

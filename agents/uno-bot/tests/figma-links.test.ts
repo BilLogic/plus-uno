@@ -35,6 +35,7 @@ import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door
 import type { CardMessage } from "../src/slack/button-door";
 import { recordingDelivery } from "../src/turn/index";
 import { recordingViews } from "./helpers/recording-slack";
+import { notified } from "./helpers/notified";
 import { createInMemoryThreadState, type PendingProposal, type ReportItemState } from "../src/thread-state/index";
 import { trackLibraryIntakes, implementPrTitle, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
 import { runQueuedPrLinks, type QueuedPrLinks } from "../src/figma-links/queue";
@@ -250,6 +251,7 @@ describe("only registry components", () => {
     assert.equal(result.cards, 1, result.summary);
     assert.equal(w.posts.length, 1);
     assert.equal(w.posts[0]!.text.split("\n")[0], "Dev Mode links for 3 components are ready for Review, on one card.");
+    assert.deepEqual(notified(w.posts[0]!), [], "anyone can settle Dev Mode links: nobody is tagged");
     const [c] = cardsIn(w.posts[0]!.blocks!);
     assert.equal(c!.title.text, "3 components");
     assert.equal(w.staged.length, 1);
