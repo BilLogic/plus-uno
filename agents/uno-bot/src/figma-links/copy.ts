@@ -204,6 +204,16 @@ export function devLinksStopped(reason: string): string {
   return `The Dev Mode links stopped before the last one: ${reason}. Run it again to post a fresh card for what is missing.`;
 }
 
+/** Why a write stopped: a component's comment is already on Figma more than once. */
+export function devLinksDoubled(components: readonly string[]): string {
+  return `the comment on ${namesInWords(components)} is already on Figma twice, so no more will post`;
+}
+
+/** Why a write stopped: it came back this many times and landed nothing. */
+export function devLinksIdle(steps: number): string {
+  return `${steps} tries in a row added nothing`;
+}
+
 /**
  * The comment Approve leaves on a component's first library component, the
  * first time it gets its links. Plain text: Figma shows a comment as typed.

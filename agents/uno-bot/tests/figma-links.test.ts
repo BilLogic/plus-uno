@@ -12,12 +12,14 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { createInMemoryFigma, type InMemoryFigma } from "../src/figma/in-memory";
-import type { FigmaDevResource } from "../src/figma/client";
+import { FigmaRateLimitError, type FigmaDevResource } from "../src/figma/client";
+import { devLinksComment } from "../src/figma-links/copy";
 import {
   runDevLinksPost,
   writeDevLinks,
   approveDevLinks,
   runDevLinksWriteJob,
+  DEV_LINKS_IDLE_STEPS,
   type DevLinksWriteJob,
   type DevLinkRegistry,
   type DevLinksDeps,
@@ -511,6 +513,18 @@ describe("a decided card stops counting as open", () => {
   });
 });
 
+/** Run a handed-on write the way the runner does: a deferred job comes back as it handed itself on. */
+async function steps(deps: Parameters<typeof runDevLinksWriteJob>[0], job: DevLinksWriteJob, most = 20): Promise<string[]> {
+  const outcomes: string[] = [];
+  for (let i = 0; i < most; i++) {
+    const outcome = await runDevLinksWriteJob(deps, job);
+    if (outcome === "handled") return [...outcomes, "handled"];
+    outcomes.push("deferred");
+    job = outcome.deferred;
+  }
+  return outcomes;
+}
+
 describe("Approve on the batch card", () => {
   const twelve: DevLinkRegistry = {
     components: Object.fromEntries(
@@ -533,7 +547,8 @@ describe("Approve on the batch card", () => {
     assert.equal(result.ok, true);
     assert.equal(result.left, true);
     assert.match(result.message, /a reply in this thread says when/);
-    assert.deepEqual(handed, [{ kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW }]);
+    // What this press commented goes with the job, so no later step posts it again.
+    assert.deepEqual(handed, [{ kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW, commented: ["C0", "C1", "C2"] }]);
   });
 
   it("a hand-off that fails is said, never left silent", async () => {
@@ -559,17 +574,79 @@ describe("Approve on the batch card", () => {
     const replies: string[] = [];
     const job: DevLinksWriteJob = { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW };
     const deps = { figma: w.figma, calls: () => 6, reply: async (text: string) => void replies.push(text), now: () => NOW };
-    const outcomes: string[] = [];
-    for (let i = 0; i < 20; i++) {
-      const outcome = await runDevLinksWriteJob(deps, job);
-      outcomes.push(outcome);
-      if (outcome === "handled") break;
-    }
+    const outcomes = await steps(deps, job);
     assert.equal(outcomes.at(-1), "handled");
     assert.ok(outcomes.length > 2);
     assert.deepEqual(replies, ["The rest of the Dev Mode links are in: 24 links on 12 components, with 12 comments."]);
     assert.equal((await w.figma.devResources(LIB)).dev_resources.length, 24);
     assert.equal((await w.figma.comments(LIB)).comments.length, 12);
+  });
+
+  it("once every link is in and Figma reads its comments back as :goat:, the job finishes and never comments twice", async () => {
+    const { w, input } = await batch();
+    // The incident (2026-10-12): every link landed, then each step re-posted the comments.
+    const replies: string[] = [];
+    const deps = { figma: w.figma, calls: () => 30, reply: async (text: string) => void replies.push(text), now: () => NOW };
+    const outcomes = await steps(deps, { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW });
+    assert.equal(outcomes.at(-1), "handled");
+    const comments = (await w.figma.comments(LIB)).comments;
+    assert.ok(comments.every((c) => c.message.startsWith(":goat:\n")), "Figma holds them as shortcodes");
+    assert.equal(comments.length, 12);
+    assert.equal(new Set(comments.map((c) => c.client_meta?.node_id)).size, 12);
+    assert.match(replies.at(-1)!, /24 links on 12 components, with 12 comments/);
+  });
+
+  it("a comment the job posted is never posted again, though Figma's read misses it", async () => {
+    const { w, input } = await batch();
+    const blind = { ...w.figma, comments: async () => ({ comments: [] }) } as unknown as typeof w.figma;
+    const replies: string[] = [];
+    const outcomes = await steps(
+      { figma: blind, calls: () => 6, reply: async (t: string) => void replies.push(t), now: () => NOW },
+      { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW },
+    );
+    assert.equal(outcomes.at(-1), "handled");
+    const posted = w.figma.calls().filter((c) => c.method === "postComment").map((c) => (c.args[2] as { node_id: string }).node_id);
+    assert.equal(posted.length, 12);
+    assert.equal(new Set(posted).size, 12, "one comment per component");
+    assert.match(replies.at(-1)!, /with 12 comments/);
+  });
+
+  it("a component whose comment is already on Figma twice stops the job, which says so in the thread and posts nothing more", async () => {
+    const { w, input } = await batch();
+    const finish = { figma: w.figma, calls: () => 100, reply: async () => {}, now: () => NOW };
+    await steps(finish, { kind: "figma-dev-links-write", input, channel: CHANNEL, since: NOW });
+    await w.figma.postComment(LIB, devLinksComment("C3"), { node_id: "1:3", node_offset: { x: 0, y: 0 } });
+    const before = w.figma.writes().length;
+    const replies: string[] = [];
+    const outcome = await runDevLinksWriteJob(
+      { figma: w.figma, calls: () => 100, reply: async (t) => void replies.push(t), now: () => NOW },
+      { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW },
+    );
+    assert.equal(outcome, "handled");
+    assert.equal(w.figma.writes().length, before, "nothing more written");
+    assert.equal(replies.length, 1);
+    assert.match(replies[0]!, /stopped/);
+    assert.match(replies[0]!, /C3/);
+  });
+
+  it("a job that lands nothing new step after step stops and says so, rather than coming back all day", async () => {
+    const { w, input } = await batch();
+    const stuck = {
+      ...w.figma,
+      addDevResources: async () => {
+        throw new FigmaRateLimitError("Figma 429", 60_000);
+      },
+    } as unknown as typeof w.figma;
+    const replies: string[] = [];
+    const outcomes = await steps(
+      { figma: stuck, calls: () => 30, reply: async (t: string) => void replies.push(t), now: () => NOW },
+      { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW },
+      50,
+    );
+    assert.equal(outcomes.at(-1), "handled");
+    assert.equal(outcomes.length, DEV_LINKS_IDLE_STEPS);
+    assert.equal(replies.length, 1);
+    assert.match(replies[0]!, /stopped/);
   });
 
   it("a job past a day stops, and says what never landed", async () => {

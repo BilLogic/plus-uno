@@ -1,4 +1,5 @@
 import type { Env } from "../types";
+import type { ThreadJobOutcome } from "../runner/queue";
 import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
 import { DM_CONVERSATION, type DecisionReportRecord, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
@@ -240,7 +241,7 @@ export function handOffExpiredReportsFor(env: Env): (due: DecisionReportRecord[]
 // cutoff, fresh subrequest budget per alarm invocation. Returns "deferred" when
 // the turn's run-lease is held by another (possibly killed) invocation — the
 // runner must then KEEP the job and retry later instead of deleting it.
-export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
+export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<ThreadJobOutcome> {
   if (job.kind === "report-expiry") {
     await redrawExpiredReport(job.messageTs, {
       store: threadStateFor(env),

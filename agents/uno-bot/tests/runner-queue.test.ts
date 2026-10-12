@@ -216,6 +216,23 @@ test("thread jobs keep their behaviour: one per alarm, a deferred one kept", asy
   assert.deepEqual(h.threadRan, ["reaction", "reaction", "cut-off"]);
 });
 
+test("a deferred job that hands itself back runs next time as it handed itself back", async () => {
+  const h = harness();
+  const seen: unknown[] = [];
+  h.deps.runThreadJob = async (job) => {
+    seen.push(job);
+    const tries = (job as { tries?: number }).tries ?? 0;
+    if (tries < 2) return { deferred: { ...job, tries: tries + 1 } as unknown as RunnerJobPayload };
+    return "handled";
+  };
+  await enqueueThreadJob(h.storage, { job: { kind: "cut-off", proposalTs: "1.2" }, enqueuedAt: 1 }, h.clock.t);
+  assert.equal(await drain(h), 3);
+  assert.deepEqual(
+    seen.map((j) => (j as { tries?: number }).tries ?? 0),
+    [0, 1, 2],
+  );
+});
+
 // ── once per key (#895) ──────────────────────────────────────────────────────
 
 const figmaJob = (eventId: string): RunnerJobPayload => ({

@@ -69,11 +69,14 @@ export const SEEN_KEEP_MS = 2 * 24 * 60 * 60 * 1000;
 /** What a job resolves to. `deferred` keeps it; `handled` drops it. */
 export type JobOutcome = "handled" | "deferred";
 
+/** What a thread job resolves to: also `deferred` with the job as it should run next time, carrying what it got done. */
+export type ThreadJobOutcome = JobOutcome | { deferred: RunnerJobPayload };
+
 /** The job bodies and clock the queue runs with, by name. */
 export interface RunnerDeps {
   now(): number;
   /** A person's turn, a reaction or a cut-off run. */
-  runThreadJob(job: RunnerJobPayload): Promise<JobOutcome>;
+  runThreadJob(job: RunnerJobPayload): Promise<ThreadJobOutcome>;
   /** One scheduled job, with the date of the run it was queued under.
    *  Resolving is done; a budget stop is caught here. */
   runScheduledJob(job: ScheduledJob, runDate: string): Promise<void>;
@@ -231,21 +234,24 @@ export async function runOneJob(storage: RunnerStorage, deps: RunnerDeps): Promi
 
 async function drainThreadJob(storage: RunnerStorage, deps: RunnerDeps, jobs: Map<string, RunnerJob>): Promise<void> {
   for (const [key, job] of jobs) {
-    let outcome: JobOutcome = "handled";
+    let outcome: ThreadJobOutcome = "handled";
     try {
       outcome = await deps.runThreadJob(job.job);
     } catch (err) {
       // Never rethrow: alarm retries would re-run the agent turn.
       console.error(`[runner] job failed: ${err instanceof Error ? err.message : String(err)}`);
     }
-    if (outcome === "deferred") {
+    if (outcome !== "handled") {
       // The turn's run-lease is held elsewhere. Deleting here is how killed
       // runs used to go permanently silent — instead KEEP the job and check
       // back: it resolves to "done" (drop) or a stale-lease reclaim (re-run).
       // A turn defers on a held run-lease; a Figma event on a budget stop or
-      // rate limit, a bounded number of times (`figma-ask/job.ts`).
+      // rate limit, a bounded number of times (`figma-ask/job.ts`). A job
+      // that hands itself back is kept as it handed itself back, so its next
+      // try carries what this one got done (`figma-links/run.ts`).
       const why = job.job.kind === "figma-event" || job.job.kind === "figma-dev-links-write" ? "waiting for a fresh budget" : "run-lease held";
       console.log(`[runner] ${job.job.kind} job deferred — ${why}; retrying in 2 min`);
+      if (outcome !== "deferred") await storage.put(key, { ...job, job: outcome.deferred });
       await storage.setAlarm(deps.now() + DEFER_RETRY_MS);
       return;
     }
