@@ -13,6 +13,7 @@ import {
   failureReason,
   itemProposal,
   itemText,
+  plainReportBlocks,
   reportMessage,
   reportRecord,
   reviewPressOf,
@@ -21,7 +22,7 @@ import { CONFIRM_FOOTER } from "../src/slack/proposal-render";
 import { renderGateNote } from "../src/slack/gate-note";
 import type { ReportItem, ReportItemState } from "../src/thread-state/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
-import { notified } from "./helpers/notified";
+import { mentionCount, notified } from "./helpers/notified";
 
 const item = (n: number, over: Partial<ReportItem> = {}): ReportItem => ({
   id: `c${n}`,
@@ -234,6 +235,28 @@ describe("whom a report pings", () => {
     const record = reportRecord("C1", "1790000000.000100", report, 3_600_000);
     const decided = reportMessage({ ...record, entries: [{ ...record.entries[0]!, state: { kind: "rejected", by: "U0BILL" } }] });
     assert.equal(cardsOf(decided.blocks)[0]!.subtitle!.text, "Rejected by <@U0BILL>");
+  });
+
+  it("where Slack refuses cards, each owner is still mentioned once: the plain sections leave the opener's tag off", () => {
+    const report = decisionReport(
+      [owned(1, [{ slack: "U0MAX" }]), owned(2, [{ slack: "U0MAX" }, { slack: "U0SURAJ" }]), owned(3, [{ name: "Ana" }])],
+      "3 pages.",
+    );
+    const plain = { text: report.text, blocks: plainReportBlocks(report.blocks) };
+    assert.deepEqual(notified(plain), ["U0MAX", "U0SURAJ"]);
+    assert.equal(mentionCount(plain, "U0MAX"), 1, "Max once, on his bullet");
+    assert.equal(mentionCount(plain, "U0SURAJ"), 1);
+    assert.deepEqual(
+      (plain.blocks.slice(1) as Array<{ text: { text: string } }>).map((b) => b.text.text.split("\n")[1]),
+      ["from this thread", "from this thread", "Ana · from this thread"],
+    );
+  });
+
+  it("a plain redraw keeps who decided on the card", () => {
+    const report = decisionReport([owned(1, [{ slack: "U0MAX" }])], "1 page.");
+    const record = reportRecord("C1", "1790000000.000100", report, 3_600_000);
+    const decided = reportMessage({ ...record, plain: true, entries: [{ ...record.entries[0]!, state: { kind: "rejected", by: "U0BILL" } }] });
+    assert.match((decided.blocks[1] as { text: { text: string } }).text.text, /\nRejected by <@U0BILL>\n/);
   });
 });
 

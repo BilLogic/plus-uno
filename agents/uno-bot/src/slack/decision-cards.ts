@@ -262,6 +262,9 @@ function parentLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entr
   return `${record.parent} Showing ${shown} of ${shown + record.held}; the rest come in the next report.`;
 }
 
+/** A user mention, as mrkdwn writes it. */
+const USER_MENTION = /<@[A-Z0-9]+>/g;
+
 /** Characters of an item's title on its owner's bullet. */
 const BULLET_TITLE_CHARS = 60;
 
@@ -332,11 +335,24 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
  * A report's plain rung, for a workspace whose Slack refuses `card` blocks:
  * the parent line, then each card as a section of its title, subtitle and
  * body with its own Review (or View) beside it, so every item stays
- * decidable from its own button; Open is the title's link.
+ * decidable from its own button; Open is the title's link. A section
+ * notifies where a card's subtitle does not, so an owner tag the opener
+ * already makes is left off the subtitle: each owner is mentioned once.
  *
  * @param blocks - The report's blocks (`decisionReport`)
  */
 export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
+  const opener = new Set<string>();
+  for (const block of blocks) {
+    const b = block as Record<string, any>;
+    if (b.type === "section") for (const m of String(b.text?.text ?? "").matchAll(USER_MENTION)) opener.add(m[0]);
+  }
+  const untagged = (subtitle: string) => {
+    const lead = /^(?:<@[A-Z0-9]+>\s*)+(?:·\s*)?/.exec(subtitle)?.[0];
+    if (!lead) return subtitle;
+    const kept = [...lead.matchAll(USER_MENTION)].map((m) => m[0]).filter((m) => !opener.has(m));
+    return [kept.join(" "), subtitle.slice(lead.length)].filter(Boolean).join(" · ");
+  };
   return blocks.flatMap((block) => {
     const b = block as Record<string, any>;
     const cards: Record<string, any>[] = b.type === "card" ? [b] : b.type === "carousel" ? b.elements : [];
@@ -348,7 +364,7 @@ export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
       const title = escapeSlackText(String(card.title?.text ?? ""));
       const lines = [
         open ? `*<${open.url}|${title}>*` : `*${title}*`,
-        ...(card.subtitle?.text ? [String(card.subtitle.text)] : []),
+        ...(card.subtitle?.text ? [untagged(String(card.subtitle.text))].filter(Boolean) : []),
         escapeSlackText(String(card.body?.text ?? "")),
       ];
       return { type: "section", text: { type: "mrkdwn", text: lines.join("\n") }, ...(review ? { accessory: review } : {}) };
