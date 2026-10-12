@@ -9,10 +9,13 @@
 // and never shows an input's own key. A tool this file has no reading for
 // returns null, and the pop-up shows the card's text as before.
 //
-// BEFORE AND AFTER. A change to what a page already says shows the value as
-// it read when the card was staged (`PendingProposal.before`) above the value
-// it will have. Keyed as the editable fields are, `<op>.<path>`, so a field
-// drawn as an input finds its Before by the same key.
+// CURRENT CONTENT, ISSUE, NEW CONTENT. A change to what a page already says
+// reads in three parts, in that order: the value as it read when the card was
+// staged (`PendingProposal.before`), why it changes (`PendingProposal.issue`,
+// left out when the card holds no reason), and the value it will have. Keyed
+// as the editable fields are, `<op>.<path>`, so a field drawn as an input
+// finds its current content by the same key. A block, and a property, read
+// the same three labels.
 //
 // PURE: blocks out, nothing posted, nothing read.
 import { textSections } from "./render";
@@ -199,10 +202,27 @@ export interface DraftDetail {
   /** The reader may decide: a value too long for an input says why it is not
    *  one. */
   editing?: boolean;
+  /** Why the change is proposed, mrkdwn; shown once, at the first change. */
+  issue?: string;
 }
+
+/** What one change is drawn with: the draft's detail, and whether the Issue
+ *  goes here. */
+type ChangeDetail = DraftDetail & { issueHere?: boolean };
 
 /** Said where a replaced block's text was not read when the card was staged. */
 export const BEFORE_NOT_CAPTURED = "This block's current text wasn't captured when the change was staged.";
+
+/** A property's current value, where it was not read when the card was staged. */
+const VALUE_NOT_CAPTURED = "_wasn't captured when the change was staged_";
+
+/** The three parts' labels. */
+const CURRENT = "Current content";
+const ISSUE = "Issue";
+const NEW = "New content";
+
+/** Slack's cap on a section's text. */
+const SECTION_CHARS = 3000;
 
 /** Said where a value is too long to be an input. */
 export const TOO_LONG_TO_EDIT =
@@ -223,6 +243,7 @@ export function readableDraft(
 ): unknown[] | null {
   const read = operations.map((op) => READERS[op.toolName]?.(op.input) ?? null);
   if (!read.length || read.some((r) => !r)) return null;
+  const issueAt = detail.issue ? firstChange(read as ReadOperation[]) : undefined;
   const blocks: unknown[] = [];
   const many = read.length > 1;
   read.forEach((op, i) => {
@@ -231,8 +252,9 @@ export function readableDraft(
       blocks.push({ type: "section", text: { type: "mrkdwn", text: `*${i + 1}. ${escapeSlackText(op!.headline)}*` } });
     }
     const keyOf = (path?: string) => (path ? `${i}.${path}` : undefined);
-    blocks.push(...propertyBlocks(op!.properties.map(([label, value, path]) => [label, value, keyOf(path)]), detail));
-    for (const part of op!.body) blocks.push(...partBlocks({ ...part, key: keyOf(part.key) }, detail));
+    const at = (key?: string) => ({ ...detail, issueHere: key !== undefined && key === issueAt });
+    blocks.push(...propertyBlocks(op!.properties.map(([label, value, path]) => [label, value, keyOf(path)]), detail, issueAt));
+    for (const part of op!.body) blocks.push(...partBlocks({ ...part, key: keyOf(part.key) }, at(keyOf(part.key))));
   });
   if (caveats.length) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: caveats.join("\n") }] });
   return blocks;
@@ -246,27 +268,55 @@ export function draftHeadline(operations: readonly ProposalOperation[]): string 
   return reader ? reader(op!.input).headline : null;
 }
 
-/** One stretch of prose: its heading, then Before and After where the page
- *  already says something, the After an input when its field is in place. */
-function partBlocks(part: Part, detail: DraftDetail): unknown[] {
+/**
+ * The key the Issue is shown at: the batch's first changed block, or where no
+ * block changes, its first changed property. One reason per card, said once.
+ */
+function firstChange(read: readonly ReadOperation[]): string | undefined {
+  const keyed = (i: number, path?: string) => (path ? `${i}.${path}` : undefined);
+  for (const [i, op] of read.entries()) {
+    const part = op.body.find((p) => p.key && p.replaces);
+    if (part) return keyed(i, part.key);
+  }
+  for (const [i, op] of read.entries()) {
+    const prop = op.properties.find(([, , path]) => path);
+    if (prop) return keyed(i, prop[2]);
+  }
+  return undefined;
+}
+
+/** One stretch of prose: its heading, then, where it changes what the page
+ *  already says, Current content, Issue and New content, the new content an
+ *  input when its field is in place. */
+function partBlocks(part: Part, detail: ChangeDetail): unknown[] {
   const blocks: unknown[] = [];
   if (part.heading) blocks.push(header(part.heading));
   const was = part.key ? detail.before?.[part.key] : undefined;
   const field = part.key ? detail.inline?.get(part.key) : undefined;
-  if (was !== undefined) blocks.push(bold("Before"), ...(was.trim() ? textSections(was) : [context("Empty.")]));
-  else if (part.replaces) blocks.push(context(BEFORE_NOT_CAPTURED));
+  const change = was !== undefined || !!part.replaces;
+  if (change) {
+    blocks.push(bold(CURRENT));
+    if (was === undefined) blocks.push(context(BEFORE_NOT_CAPTURED));
+    else blocks.push(...(was.trim() ? textSections(was) : [context("Empty.")]));
+    if (detail.issueHere && detail.issue) blocks.push(bold(ISSUE), section(detail.issue));
+  }
   // Under its heading the input needs no name of its own beyond what it is.
-  if (field) return [...blocks, inputOf(field, was !== undefined ? "After" : part.heading ? "Text" : field.label)];
-  if (was !== undefined) blocks.push(bold("After"));
+  if (field) return [...blocks, inputOf(field, change ? NEW : part.heading ? "Text" : field.label)];
+  if (change) blocks.push(bold(NEW));
   if (part.text) blocks.push(...textSections(part.text));
   if (detail.editing && part.key && part.text.length > MAX_INPUT_CHARS) blocks.push(context(TOO_LONG_TO_EDIT));
   return blocks;
 }
 
-/** A field drawn in place. Optional to Slack, so Reject and Needs changes are
- *  never held up by it; Approve's guards hold a required one to a value. */
+/** A field drawn in place, required as its field is: the change's own text,
+ *  so Slack holds it to a value and draws no "(optional)" beside it. */
 function inputOf(field: EditableField, label: string): unknown {
-  return { ...(fieldInputBlocks([{ ...field, label }])[0] as object), optional: true };
+  return fieldInputBlocks([{ ...field, label }])[0];
+}
+
+function section(text: string): unknown {
+  const clipped = text.length > SECTION_CHARS ? `${text.slice(0, SECTION_CHARS - 1)}…` : text;
+  return { type: "section", text: { type: "mrkdwn", text: clipped } };
 }
 
 function bold(text: string): unknown {
@@ -279,9 +329,14 @@ function context(text: string): unknown {
 
 /** The key properties as `*Label:* value` lines. Short values share one
  *  section; a value with a line break gets its own, so it reads as prose. A
- *  value the page holds now reads `now → then`, and one whose Before was not
- *  captured says so; a field in place is an input under its value now. */
-function propertyBlocks(properties: ReadonlyArray<[string, string, string?]>, detail: DraftDetail = {}): unknown[] {
+ *  value a change replaces — one with a path — reads in three parts under its
+ *  label, Current content, Issue and New content, saying so where its current
+ *  value was not captured; a field in place is the New content input. */
+function propertyBlocks(
+  properties: ReadonlyArray<[string, string, string?]>,
+  detail: DraftDetail = {},
+  issueAt?: string,
+): unknown[] {
   const blocks: unknown[] = [];
   let lines: string[] = [];
   const flush = () => {
@@ -289,29 +344,30 @@ function propertyBlocks(properties: ReadonlyArray<[string, string, string?]>, de
     lines = [];
   };
   for (const [label, value, key] of properties) {
-    const was = key ? detail.before?.[key] : undefined;
-    const field = key ? detail.inline?.get(key) : undefined;
-    // A value with a path is one a change replaces, so a missing Before is
-    // said rather than left to read like a value set for the first time.
-    const missed = key !== undefined && was === undefined;
+    if (key === undefined) {
+      if (value.includes("\n")) {
+        flush();
+        blocks.push(...textSections(`**${label}:** ${value}`));
+      } else lines.push(`*${label}:* ${valueText(value)}`);
+      continue;
+    }
+    const was = detail.before?.[key];
+    const field = detail.inline?.get(key);
+    flush();
+    lines.push(`*${label}*`, `*${CURRENT}:* ${was === undefined ? VALUE_NOT_CAPTURED : was ? valueText(was) : "_empty_"}`);
+    if (key === issueAt && detail.issue) lines.push(`*${ISSUE}:* ${detail.issue}`);
     if (field) {
-      if (was !== undefined) lines.push(`*${label} now:* ${was ? valueText(was) : "_empty_"}`);
-      else if (missed) lines.push(`*${label} now:* _not captured_`);
       flush();
-      blocks.push(inputOf(field, field.label));
+      blocks.push(inputOf(field, NEW));
       continue;
     }
-    if (was !== undefined && was !== value && !value.includes("\n")) {
-      lines.push(`*${label}:* ${was ? valueText(was) : "_empty_"} → ${valueText(value)}`);
-      continue;
-    }
-    const line = `*${label}:* ${valueText(value)}${missed ? " _(before not captured)_" : ""}`;
     if (value.includes("\n")) {
       flush();
-      blocks.push(...textSections(`**${label}:** ${value}`));
+      blocks.push(...textSections(`**${NEW}:** ${value}`));
       continue;
     }
-    lines.push(line);
+    lines.push(`*${NEW}:* ${valueText(value)}`);
+    flush();
   }
   flush();
   return blocks;

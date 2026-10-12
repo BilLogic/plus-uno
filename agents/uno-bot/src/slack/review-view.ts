@@ -182,7 +182,12 @@ export function draftView(
       .filter((f) => inline.has(f.key))
       .map((f) => [f.key, { ...f, value: opts.typed?.get(f.key) ?? edits[f.key] ?? f.value }] as const),
   );
-  const detail = { ...(proposal.before ? { before: proposal.before } : {}), inline: inPlace, editing: access.mayDecide };
+  const detail = {
+    ...(proposal.before ? { before: proposal.before } : {}),
+    ...(proposal.issue ? { issue: proposal.issue } : {}),
+    inline: inPlace,
+    editing: access.mayDecide,
+  };
   const body = readableDraft(operations, caveatsOf(text), detail) ?? textSections(text);
 
   const headline = draftHeadline(operations);

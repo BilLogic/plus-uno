@@ -109,6 +109,7 @@ import {
   operationsDigest,
   planSweepCards,
   sweepItem,
+  sweepIssue,
   sweepItemText,
   sweepItemWords,
   sweepParent,
@@ -1711,7 +1712,7 @@ export function sweepProposal(
     ...(share ? { sweepShare: share } : {}),
     // The block as the sweep read it: Review's Before. An added answer
     // replaces nothing.
-    ...(f.add ? {} : { before: { "0.replace.0.content": f.original } }),
+    ...(f.add ? {} : { before: { "0.replace.0.content": f.original }, issue: sweepIssue(f) }),
   };
 }
 

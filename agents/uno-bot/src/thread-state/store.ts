@@ -356,6 +356,13 @@ export interface PendingProposal {
    * Absent where the stager read nothing, or on a card staged before it.
    */
   before?: Record<string, string>;
+  /**
+   * Why the change is proposed, mrkdwn, as the stager has it: what a thread
+   * settled, for a sweep fix; the decision, for a Figma comment's. Review
+   * shows it as Issue, between a change's current and new content. Absent
+   * where the stager holds no reason; none is made up.
+   */
+  issue?: string;
 }
 
 /**

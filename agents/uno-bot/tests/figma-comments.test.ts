@@ -533,6 +533,10 @@ describe("the morning's thread in #plus-design (#900)", () => {
     // An added line and a new issue replace nothing.
     assert.equal(added!.before, undefined);
     assert.equal(issue!.before, undefined);
+    // The decision is the change's reason, for Review's Issue, beside what it replaces.
+    assert.equal(rewrite!.issue, "Decided in a Figma comment: The bar shows once the first goal is set.");
+    assert.equal(card!.issue, "Decided in a Figma comment: The card moves to Under Review.");
+    assert.equal(added!.issue, undefined);
   });
 
   it("never cards a thread twice, whatever is said in it later", async () => {

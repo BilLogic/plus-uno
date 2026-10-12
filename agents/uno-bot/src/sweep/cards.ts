@@ -298,15 +298,20 @@ export function sweepItem(f: PendingFinding, destination: Destination): ReportIt
  * @param f - The finding
  */
 export function sweepItemText(f: PendingFinding): string {
-  const at = saidAt(f);
-  const quoted = `“${escapeSlackText(flat(f.threadSays))}”`;
-  const why = `Why: ${capitalised(saidIn(f, true))} said ${quoted}${at ? ` · <${at}|see it>` : ""}`;
+  const why = `Why: ${sweepIssue(f)}`;
   const page = `*${escapeSlackText(flat(f.target.title) || "untitled")}* · owner <@${f.owner}>`;
   if (f.add) {
     const place = f.add.section ? `Goes under: ${escapeSlackText(flat(f.add.section))}` : `Opens a new section: ${escapeSlackText(flat(f.add.newSection ?? ""))}`;
     return [page, place, `Adds: ${escapeSlackText(f.replacement)}`, why].join("\n");
   }
   return [page, `Page says now: ${escapeSlackText(f.original)}`, `Will say: ${escapeSlackText(f.replacement)}`, why].join("\n");
+}
+
+/** Why a fix is proposed, mrkdwn: where it was said and what, with a link to
+ *  it. Its card's Why line, and Review's Issue (`PendingProposal.issue`). */
+export function sweepIssue(f: PendingFinding): string {
+  const at = saidAt(f);
+  return `${capitalised(saidIn(f, true))} said “${escapeSlackText(flat(f.threadSays))}”${at ? ` · <${at}|see it>` : ""}`;
 }
 
 /** What a sweep fix says at the gate (`PendingProposal.stated`). */

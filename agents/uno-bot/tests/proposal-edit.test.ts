@@ -361,9 +361,10 @@ describe("a notion_update draft", () => {
     assert.deepEqual(
       fields.map((f) => [f.block_id, f.label?.text, f.element?.initial_value]),
       [
-        // In the draft's order, each under its own heading.
-        ["uno_field:0.properties.Name", "Title", "Reflection redesign v2"],
-        ["uno_field:0.replace.0.content", "Text", "Tutors answer three questions."],
+        // In the draft's order, each under its own heading: a change to what
+        // the page says is its New content, an addition its Text.
+        ["uno_field:0.properties.Name", "New content", "Reflection redesign v2"],
+        ["uno_field:0.replace.0.content", "New content", "Tutors answer three questions."],
         ["uno_field:0.append.sections.0.body", "Text", "Does the mentor see the answers?"],
         ["uno_field:0.append.text", "Text", "Progress: the form is down to three questions."],
       ],
