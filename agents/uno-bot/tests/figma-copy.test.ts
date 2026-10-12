@@ -834,7 +834,7 @@ describe("@uno in a Figma comment (#903)", () => {
   it("every reply leads with the label, the one emoji, and holds to the vocabulary", () => {
     for (const reply of REPLIES) {
       const text = figmaReplyText(reply);
-      assert.equal(text.split("\n")[0], "🐐 le goat (uno-bot) · AI-generated", text);
+      assert.equal(text.split("\n")[0], "🐐", text);
       passesChecklist(text);
       assert.equal([...text.matchAll(/\p{Extended_Pictographic}/gu)].length, 1, `🐐 only in the label:\n${text}`);
     }
@@ -843,7 +843,7 @@ describe("@uno in a Figma comment (#903)", () => {
   it("a change that could not be drafted says so, and points at #plus-design", () => {
     assert.equal(
       figmaReplyText({ kind: "not-drafted" }),
-      ["🐐 le goat (uno-bot) · AI-generated", "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
+      ["🐐", "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
     );
   });
 
