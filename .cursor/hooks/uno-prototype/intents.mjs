@@ -63,6 +63,22 @@ export function hasPrototypeIntent(prompt) {
   return hasBuildIntent(lower);
 }
 
+// A turn the runtime wrote rather than the person: Claude Code fires
+// UserPromptSubmit for a background agent's <task-notification>, a
+// <system-reminder>, and messages relayed from other sessions or teammates,
+// and each arrives wrapped in a hyphenated tag. A person typing a prompt does
+// not open it with one.
+const MACHINE_TURN = /^\s*<[a-z]+(?:-[a-z]+)+[\s>]/;
+
+/**
+ * True when the prompt is a machine-written turn — never the person's answer.
+ * @param {string} prompt
+ * @returns {boolean}
+ */
+export function isMachineTurn(prompt) {
+  return MACHINE_TURN.test(prompt);
+}
+
 /**
  * @param {string} prompt
  * @returns {boolean}

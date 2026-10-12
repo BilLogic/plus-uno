@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FLOW_MAP } from './constants.mjs';
+import { FLOW_MAP, INTAKE_TTL_MS } from './constants.mjs';
 import { resolveQuestion } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -63,7 +63,37 @@ export function buildIntakePayload(conversationId, session, state) {
 export function writeIntakeQuestion(conversationId, session, state) {
   fs.mkdirSync(BRIEFING_DIR, { recursive: true });
   const payload = buildIntakePayload(conversationId, session, state);
+  payload.writtenAt = new Date().toISOString();
   fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify(payload, null, 2));
+}
+
+/**
+ * The active briefing, if it binds this session; otherwise null.
+ *
+ * The briefing is one fixed path shared by every session in the checkout, so
+ * a session's own state file saying "mid-intake" is not enough: the briefing
+ * on disk must name this session as its `conversationId`. A briefing written
+ * by another session is ignored here, never read as this session's gate. A
+ * briefing older than INTAKE_TTL_MS, or with no `writtenAt`, binds nobody.
+ *
+ * @param {string} conversationId
+ * @returns {Record<string, unknown> | null}
+ */
+export function readActiveIntake(conversationId) {
+  if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return null;
+  let payload;
+  try {
+    payload = JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'));
+  } catch {
+    return null;
+  }
+  if (payload?.conversationId !== conversationId) return null;
+  const writtenAt = Date.parse(String(payload.writtenAt));
+  if (!(Date.now() - writtenAt <= INTAKE_TTL_MS)) {
+    fs.unlinkSync(ACTIVE_INTAKE_FILE); // stale, and this session's own: release it
+    return null;
+  }
+  return payload;
 }
 
 /**

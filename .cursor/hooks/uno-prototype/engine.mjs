@@ -3,11 +3,13 @@ import {
   hasPrototypeIntent,
   hasNewPrdIntent,
   isBypassRequest,
+  isMachineTurn,
 } from './intents.mjs';
 import { getState, STATES } from './states.mjs';
 import {
   buildAgentIntakeInstruction,
   clearIntakeQuestion,
+  readActiveIntake,
   writeIntakeQuestion,
 } from './intake-question.mjs';
 import {
@@ -145,6 +147,18 @@ function buildHandoffMessage(context = {}) {
 }
 
 /**
+ * This conversation's session, but only while the active briefing on disk is
+ * its own. A session whose briefing another session has since replaced (or
+ * that has none) is not mid-intake, so no turn is read as its answer.
+ * @param {string} conversationId
+ */
+function loadBoundSession(conversationId) {
+  const session = loadSession(conversationId);
+  if (session?.status !== 'active') return session;
+  return readActiveIntake(conversationId) ? session : null;
+}
+
+/**
  * @param {HookInput} input
  * @returns {{ continue: boolean; user_message?: string }}
  */
@@ -155,6 +169,7 @@ export function handleSubmit(input) {
   const repoRoot = resolveRepoRoot(input.workspace_roots);
 
   if (!prompt) return result(true);
+  if (isMachineTurn(prompt)) return result(true);
 
   if (!isPrdGateEnabled(repoRoot)) return result(true);
 
@@ -166,7 +181,7 @@ export function handleSubmit(input) {
   }
 
   const cachedPrd = loadPrdCache(conversationId);
-  const session = loadSession(conversationId);
+  const session = loadBoundSession(conversationId);
 
   // An override that pre-empts even an active session (mid-reflection, "actually
   // let's use a different PRD" should restart rather than be read as a reflection
@@ -224,7 +239,7 @@ export function handleGateAnswer(input) {
   if (!answer) return result(true);
   if (!isPrdGateEnabled(repoRoot)) return result(true);
 
-  const session = loadSession(conversationId);
+  const session = loadBoundSession(conversationId);
   if (session?.status !== 'active') return result(true);
 
   return handleActiveSession(conversationId, session, answer, []);

@@ -20,7 +20,7 @@ brief → build.
 | Situation | How to tell | What to do |
 |---|---|---|
 | Hook-gated (Cursor · Claude Code · Codex) | `.cursor/hooks/briefings/active-intake-question.json` exists, its `conversationId` matches this session | Render the file's **current** step (`stateId`/`type`), per the rules below |
-| Stale hook file | `conversationId` mismatch, or older than a day | Ignore the file; take the manual path |
+| Stale hook file | `conversationId` mismatch, or `writtenAt` missing or older than two hours | Ignore the file; take the manual path |
 | Gate off | `.cursor/settings.json` → `"uno": { "prdGate": false }` | Skip the interview; PRD gate still applies as an ordinary rule (method §0) |
 | Manual (no adapter, hook failed) | No JSON appears, but there is a person to answer | Run the SAME eight steps yourself, in order, tracking your own position — the hook automates this procedure, it does not own it |
 | Non-interactive (headless, CI, cron, scripted driver) | No turn exists in which anyone could answer | Same eight steps, answered from the PRD, declared as assumptions on an **ASSUMED** brief card — see § When no answer can come back at all |
@@ -164,4 +164,4 @@ A failed review or an iteration by choice re-enters at the reflection
 
 ## One step per turn
 
-When `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly that one hook step — AskQuestion with `questions.length === 1`, or one plain question. One step per turn, even when context already answers a later one: the interview's value is the order, and each step is weighed in its own turn.
+When `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly that one hook step — AskQuestion with `questions.length === 1`, or one plain question. One step per turn, even when context already answers a later one: the interview's value is the order, and each step is weighed in its own turn. Only the person's own turn answers a step: a `<task-notification>`, a `<system-reminder>`, a subagent hand-back or a message relayed from another session leaves the step where it is, and the hook skips those turns too.

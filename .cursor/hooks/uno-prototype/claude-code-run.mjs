@@ -44,9 +44,13 @@ async function main() {
     process.exit(0);
   }
 
+  // No session id, no gate: the briefing is scoped to the session that wrote
+  // it, and a shared fallback id is how unrelated sessions met on one gate.
+  if (!input.session_id) process.exit(0);
+
   const output = handleSubmit({
     prompt: input.prompt || '',
-    conversation_id: input.session_id || 'default',
+    conversation_id: input.session_id,
     workspace_roots: input.cwd ? [input.cwd] : [],
     attachments: [],
   });

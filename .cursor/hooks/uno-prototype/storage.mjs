@@ -91,7 +91,7 @@ export function saveSession(conversationId, session) {
 export function clearSession(conversationId) {
   const file = statePath(conversationId);
   if (fs.existsSync(file)) fs.unlinkSync(file);
-  clearIntakeQuestion();
+  clearIntakeQuestion(conversationId); // never another session's briefing
 }
 
 /**
