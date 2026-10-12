@@ -19,7 +19,7 @@ function stripQuoted(text) {
 // "uno-prototype:" label, or "use/run/invoke the uno-prototype skill". Prose
 // about the skill ("the uno-prototype gate") is none of these.
 const EXPLICIT_INVOCATION =
-  /(^|\s)\/uno-prototype\b|\/uno:prototype\b|(^|[\s(])@?skills\/uno-prototype(?![\w/.-])|^\s*uno-prototype\s*:|\b(use|run|invoke|start)\s+(the\s+)?uno-prototype(\s+skill)?\b(?!-)/;
+  /(^|[\s>])\/uno-prototype\b|\/uno:prototype\b|(^|[\s(])@?skills\/uno-prototype(?![\w/.-])|^\s*uno-prototype\s*:|\b(use|run|invoke|start)\s+(the\s+)?uno-prototype(\s+skill)?\b(?!-)/;
 
 // A request to build something new. The `(?<!uno-)` lookbehind matters: a
 // hyphen is a non-word character, so plain `\b` would let "prototype" inside
@@ -61,6 +61,25 @@ export function hasPrototypeIntent(prompt) {
   if (upkeep && !hasBuildIntent(lower.slice(0, upkeep.index))) return false;
 
   return hasBuildIntent(lower);
+}
+
+// Messages the runtime injects into the prompt stream rather than the person
+// typing them: a block opening with a hyphenated tag (`<task-notification>`,
+// `<system-reminder>`, `<ci-monitor-event>`, a cross-session message), or a
+// bracketed relay header such as `[Artifact comment sent to Claude]`. The
+// `<command-*>` tags are the exception — they wrap a slash command the person
+// typed.
+const MACHINE_TURN = /^\s*(<(?!command-)[a-z]+(-[a-z]+)+[\s>/]|\[[^\]\n]*\bsent to claude\])/i;
+
+/**
+ * Whether the prompt is the person's own chat turn. Only those may start the
+ * gate or answer a step; a subagent hand-back, a task notification or a relayed
+ * comment is never an answer, even when it quotes one.
+ * @param {string} prompt
+ * @returns {boolean}
+ */
+export function isPersonTurn(prompt) {
+  return !MACHINE_TURN.test(prompt);
 }
 
 /**

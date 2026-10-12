@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FLOW_MAP } from './constants.mjs';
+import { FLOW_MAP, INTAKE_TTL_MS } from './constants.mjs';
 import { resolveQuestion } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,17 +62,44 @@ export function buildIntakePayload(conversationId, session, state) {
  */
 export function writeIntakeQuestion(conversationId, session, state) {
   fs.mkdirSync(BRIEFING_DIR, { recursive: true });
-  const payload = buildIntakePayload(conversationId, session, state);
+  const payload = {
+    ...buildIntakePayload(conversationId, session, state),
+    updatedAt: new Date().toISOString(),
+  };
   fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify(payload, null, 2));
 }
 
 /**
- * Remove the active question file — but only if it belongs to this conversation.
- *
- * The file is a single fixed path while sessions are per-conversation, so an
- * unguarded delete let conversation A's session-end wipe conversation B's live
- * question mid-intake (two Cursor tabs, or Cursor + Claude Code at once). The
- * payload already carries `conversationId`; this makes the delete respect it.
+ * Whether a briefing binds this conversation: it must be the one that wrote
+ * it, and written within the intake TTL. The file is a single fixed path while
+ * sessions are per-conversation, so another session's briefing — or one left
+ * behind hours ago — is somebody else's interview, not this one's.
+ * @param {{ conversationId?: string; updatedAt?: string } | null} briefing
+ * @param {string} conversationId
+ * @param {number} [now]
+ */
+export function isIntakeQuestionApplicable(briefing, conversationId, now = Date.now()) {
+  return Boolean(briefing) && briefing.conversationId === conversationId && !isStale(briefing, now);
+}
+
+/** Without a timestamp a briefing cannot show it is fresh, so it counts as stale. */
+function isStale(briefing, now) {
+  const writtenAt = Date.parse(briefing?.updatedAt ?? '');
+  return !Number.isFinite(writtenAt) || now - writtenAt > INTAKE_TTL_MS;
+}
+
+function readIntakeQuestion() {
+  try {
+    return JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'));
+  } catch {
+    return null; // missing or corrupt — a corrupt file helps nobody
+  }
+}
+
+/**
+ * Remove the active question file — unless a fresh one belongs to another
+ * conversation, so conversation A's session-end cannot wipe conversation B's
+ * live question mid-intake (two Cursor tabs, or Cursor + Claude Code at once).
  * Pass no id to force (the FSM's own terminal transitions).
  *
  * @param {string} [conversationId]
@@ -80,14 +107,18 @@ export function writeIntakeQuestion(conversationId, session, state) {
 export function clearIntakeQuestion(conversationId) {
   if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return;
   if (conversationId) {
-    try {
-      const owner = JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'))?.conversationId;
-      if (owner && owner !== conversationId) return; // another conversation owns it
-    } catch {
-      // unreadable → fall through and clear it; a corrupt file helps nobody
+    const briefing = readIntakeQuestion();
+    if (briefing && !isStale(briefing, Date.now()) && briefing.conversationId !== conversationId) {
+      return; // another conversation's live question
     }
   }
   fs.unlinkSync(ACTIVE_INTAKE_FILE);
+}
+
+/** Remove the briefing once it has outlived the TTL, whoever wrote it. */
+export function pruneStaleIntakeQuestion(now = Date.now()) {
+  if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return;
+  if (isStale(readIntakeQuestion(), now)) fs.unlinkSync(ACTIVE_INTAKE_FILE);
 }
 
 /**

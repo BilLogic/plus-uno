@@ -17,8 +17,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleSubmit } from './engine.mjs';
-import { hasPrototypeIntent } from './intents.mjs';
-import { ACTIVE_INTAKE_FILE, buildAgentIntakeInstruction } from './intake-question.mjs';
+import { INTAKE_TTL_MS } from './constants.mjs';
+import { hasPrototypeIntent, isPersonTurn } from './intents.mjs';
+import {
+  ACTIVE_INTAKE_FILE,
+  buildAgentIntakeInstruction,
+  isIntakeQuestionApplicable,
+} from './intake-question.mjs';
+import { clearSession } from './storage.mjs';
 import { STATES } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -342,6 +348,77 @@ assert.match(yesReflect.agent_message || '', /PRD received/i);
 const emptyReflect = run('   ', 'yes-conv');
 assert.equal(emptyReflect.continue, true);
 assert.equal(readIntake().stateId, 'reflect_learn');
+
+// Only the person's own turns reach the gate. A subagent hand-back, a task
+// notification or any other injected message is not an answer, and quoting an
+// invocation inside one does not start an intake (the live miss walked a whole
+// reflection on hand-backs and confirmed a brief built from them).
+const TASK_NOTIFICATION =
+  '<task-notification>\n<task-id>a1b2</task-id>\n<status>completed</status>\n<result>Done. Next: /uno-prototype build the tutor dashboard</result>\n</task-notification>';
+for (const machine of [
+  TASK_NOTIFICATION,
+  '<system-reminder>The briefing file changed.</system-reminder>',
+  '<ci-monitor-event>check "test" failed on #42</ci-monitor-event>',
+  '<cross-session-message from="session-b">prototype a tutor inbox</cross-session-message>',
+  '[Artifact comment sent to Claude] prototype this card',
+]) {
+  assert.equal(isPersonTurn(machine), false, `expected a machine turn: ${machine.slice(0, 40)}`);
+}
+for (const person of [
+  'q1 a, q2 b, go ahead',
+  'Yes',
+  '/uno-prototype build the parent portal',
+  '<command-name>/uno-prototype</command-name>\n<command-args>parent portal</command-args>',
+  '<div> in the header looks off, prototype a fix',
+]) {
+  assert.equal(isPersonTurn(person), true, `expected a person turn: ${person}`);
+}
+
+cleanup('machine-conv');
+assert.equal(run(TASK_NOTIFICATION, 'machine-conv').agent_message, undefined);
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a hand-back must not start an intake');
+run('/uno-prototype build the parent portal', 'machine-conv');
+run('Yes', 'machine-conv');
+run('https://notion.so/acme/parent-portal-prd', 'machine-conv');
+assert.equal(readIntake().stateId, 'reflect_learn');
+const notified = run(TASK_NOTIFICATION, 'machine-conv');
+assert.equal(notified.agent_message, undefined, 'a notification gets no intake context');
+assert.equal(readIntake().stateId, 'reflect_learn', 'a notification never advances the gate');
+
+// Another session's intake does not bind this one: its answers-shaped turn
+// passes through, gets no context, and leaves the owner's briefing alone.
+const idle = run('q1 a, q2 b, go ahead', 'idle-conv');
+assert.equal(idle.agent_message, undefined);
+assert.equal(readIntake().conversationId, 'machine-conv');
+assert.equal(readIntake().stateId, 'reflect_learn');
+clearSession('idle-conv');
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, "one session's cleanup keeps another's briefing");
+
+// The briefing binds only its own session, and only while fresh.
+{
+  const now = Date.parse('2026-10-12T12:00:00Z');
+  const fresh = { conversationId: 'a', updatedAt: new Date(now - 60_000).toISOString() };
+  const old = { conversationId: 'a', updatedAt: new Date(now - INTAKE_TTL_MS - 1).toISOString() };
+  assert.equal(isIntakeQuestionApplicable(fresh, 'a', now), true);
+  assert.equal(isIntakeQuestionApplicable(fresh, 'b', now), false, 'another session');
+  assert.equal(isIntakeQuestionApplicable(old, 'a', now), false, 'older than the TTL');
+  assert.equal(isIntakeQuestionApplicable({ conversationId: 'a' }, 'a', now), false, 'no timestamp');
+  assert.equal(isIntakeQuestionApplicable(null, 'a', now), false);
+}
+
+// An intake idle past the TTL is abandoned: its own session's next turn is not
+// consumed as an answer, and any hook run prunes the stale briefing.
+{
+  const stale = new Date(Date.now() - INTAKE_TTL_MS - 60_000).toISOString();
+  const stateFile = path.join(STATE_DIR, 'machine-conv.json');
+  fs.writeFileSync(stateFile, JSON.stringify({ ...JSON.parse(fs.readFileSync(stateFile, 'utf8')), updatedAt: stale }));
+  fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify({ ...readIntake(), updatedAt: stale }));
+  assert.equal(run('help me fix this button style', 'idle-conv').agent_message, undefined);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a stale briefing is pruned');
+  assert.equal(run('validate usability', 'machine-conv').agent_message, undefined);
+}
+cleanup('machine-conv');
+cleanup('idle-conv');
 
 cleanup();
 cleanup('nl-conv');

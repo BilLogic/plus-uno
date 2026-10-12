@@ -24,6 +24,15 @@ export const BYPASS_PATTERNS = [
   /stop (this )?(process|workflow)/i,
 ];
 
+/**
+ * How long an intake stays live without a turn. The interview is one sitting
+ * of eight short questions, so a gap of hours means it was abandoned; past this
+ * age neither the session state nor the briefing binds anyone, and the next
+ * prompt is read fresh instead of as the pending answer. Re-entry is cheap —
+ * the PRD stays cached, so a new request resumes at the reflection.
+ */
+export const INTAKE_TTL_MS = 4 * 60 * 60 * 1000;
+
 /** First intake step — a single choice question when prototype intent is detected. */
 export const PRD_CHECK_QUESTION = 'Do you have a PRD?';
 

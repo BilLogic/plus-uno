@@ -3,11 +3,13 @@ import {
   hasPrototypeIntent,
   hasNewPrdIntent,
   isBypassRequest,
+  isPersonTurn,
 } from './intents.mjs';
 import { getState, STATES } from './states.mjs';
 import {
   buildAgentIntakeInstruction,
   clearIntakeQuestion,
+  pruneStaleIntakeQuestion,
   writeIntakeQuestion,
 } from './intake-question.mjs';
 import {
@@ -157,6 +159,12 @@ export function handleSubmit(input) {
   if (!prompt) return result(true);
 
   if (!isPrdGateEnabled(repoRoot)) return result(true);
+
+  pruneStaleIntakeQuestion();
+
+  // Only the person's own turn may start the gate or answer a step. Injected
+  // messages pass through untouched, with no intake context attached.
+  if (!isPersonTurn(prompt)) return result(true);
 
   if (isBypassRequest(prompt)) {
     clearSession(conversationId);
