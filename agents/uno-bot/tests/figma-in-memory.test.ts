@@ -120,7 +120,7 @@ describe("comments in the fake", () => {
     const reply = await figma.replyToComment(KEY, root.id, "on it");
     assert.equal(reply.parent_id, root.id);
     assert.equal(reply.client_meta, null, "a reply inherits its root's pin");
-    assert.deepEqual((await figma.comments(KEY)).comments.map((c) => c.message), ["🐐", "on it"]);
+    assert.deepEqual((await figma.comments(KEY)).comments.map((c) => c.message), [":goat:", "on it"], "an emoji reads back as Figma's shortcode");
   });
 
   it("refuses a reply to a reply, as Figma does, and a reply to nothing", async () => {

@@ -11,7 +11,7 @@ import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { namesInWords, windowInWords } from "../slack/copy-words";
 import type { ToolName } from "../agent/tool-table";
-import { FIGMA_LABEL } from "../figma-ask/trigger";
+import { FIGMA_LABEL, asPosted } from "../figma-ask/trigger";
 import type { DevLink } from "./links";
 
 /** The tool a card names: Approve runs it. */
@@ -215,8 +215,8 @@ export function devLinksComment(component: string): string {
   ].join("\n");
 }
 
-/** Whether a comment is the one Approve leaves for this component, in any wording it has had. */
+/** Whether a comment is the one Approve leaves for this component, in any wording it has had, as posted or as Figma reads it back. */
 export function isDevLinksComment(message: string, component: string): boolean {
-  const [label, line] = message.split("\n");
-  return label === FIGMA_LABEL && (line ?? "").startsWith(`Added Dev Mode links to ${component}:`);
+  const [label, line] = asPosted(message).split("\n");
+  return label?.trim() === FIGMA_LABEL && (line ?? "").startsWith(`Added Dev Mode links to ${component}:`);
 }

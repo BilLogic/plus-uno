@@ -15,7 +15,7 @@ import { runFigmaEventJob } from "../src/figma-notify/job";
 import { readFigmaEvent, jobOf, eventIdOf, type FigmaEventJob } from "../src/figma-notify/event";
 import { answerFigmaAsk, MAX_ASK_TRIES, type AskMark, type FigmaAskDeps } from "../src/figma-ask/job";
 import type { FigmaAskDelivery } from "../src/figma-ask/delivery";
-import { FIGMA_LABEL } from "../src/figma-ask/trigger";
+import { FIGMA_LABEL, isOwnComment } from "../src/figma-ask/trigger";
 import { CANT_FIND_LINE } from "../src/figma-ask/copy";
 import { candidateThreads } from "../src/figma-comments/threads";
 import { recordingDelivery, runTurn, type RecordingDelivery } from "../src/turn/index";
@@ -579,6 +579,26 @@ describe("the loop guards", () => {
     const result = await answerFigmaAsk({ fileKey: FILE, commentId: "200" }, w.deps);
     assert.equal(result.said, "uno-bot's own comment");
     assert.deepEqual(w.replies(), []);
+  });
+
+  it("knows its own comment as Figma reads it back, the label as the :goat: shortcode", async () => {
+    const w = world();
+    const own = comment("200", ":goat:\nAsk @uno again with the card number.", { user: BILL, parent_id: "100" });
+    w.figma.seedFile(FILE, { comments: [comment("100", "a question"), own] });
+    await w.run(own);
+    const result = await answerFigmaAsk({ fileKey: FILE, commentId: "200" }, w.deps);
+    assert.equal(result.said, "uno-bot's own comment");
+    assert.deepEqual(w.replies(), []);
+    assert.equal(isOwnComment(":goat: le goat (uno-bot) · AI-generated\nhi"), true, "the old label read back");
+  });
+
+  it("the end-of-day decision read leaves a reply read back with the shortcode label to this path", () => {
+    const window = { watermark: 0, from: 0, until: Date.parse("2026-10-10T00:00:00Z") };
+    const threads = candidateThreads(
+      [comment("100", "@uno should we hide the bar?"), comment("101", ":goat:\nThe PRD says hidden.", { parent_id: "100", user: BILL, client_meta: null })],
+      window,
+    );
+    assert.deepEqual(threads, [], "no reply but uno-bot's own, so no thread to read");
   });
 
   it("still knows a reply it wrote under the old label", async () => {

@@ -65,7 +65,7 @@ import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
 import type { GapNotes } from "../usage/gap-notes";
 import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply, type FigmaSource } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
-import { askText, asksUno, isOwnComment } from "./trigger";
+import { askText, asksUno, asPosted, isOwnComment } from "./trigger";
 import { figmaFileUrl } from "../figma/links";
 
 /** How long a comment's mark is kept: past every Figma redelivery and runner retry. */
@@ -542,12 +542,13 @@ function sameFigmaPlace(a: string, b: string): boolean {
 
 /**
  * Whether the thread already holds this reply under its root. Figma hands a
- * posted message back with `&`, `<` and `>` as entities, and the drafted reply
- * may still carry a markdown backslash escape, so both sides are compared
- * unescaped and with their whitespace collapsed.
+ * posted message back with its label as a shortcode and `&`, `<` and `>` as
+ * entities, and the drafted reply may still carry a markdown backslash escape,
+ * so both sides are compared as posted, unescaped, and with their whitespace
+ * collapsed.
  */
 function alreadyPosted(comments: readonly FigmaComment[], rootId: string, reply: string): boolean {
-  const flat = (text: string) => unescaped(text).replace(/\s+/g, " ").trim();
+  const flat = (text: string) => unescaped(asPosted(text)).replace(/\s+/g, " ").trim();
   return comments.some((c) => c.parent_id === rootId && isOwnComment(c.message) && flat(c.message) === flat(reply));
 }
 

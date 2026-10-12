@@ -27,7 +27,7 @@ import {
 import { devLinksRequestOf } from "../src/figma-links/gate";
 import { figmaDevLinksProbe } from "../src/diagnostics/probes/figma";
 import type { Env } from "../src/types";
-import { FIGMA_LABEL } from "../src/figma-ask/trigger";
+import { isOwnComment } from "../src/figma-ask/trigger";
 import { itemProposal, settleItem } from "../src/slack/decision-cards";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import type { CardMessage } from "../src/slack/button-door";
@@ -389,7 +389,7 @@ describe("Approve on a card", () => {
     ]);
     const comments = (await w.figma.comments(LIB)).comments;
     assert.equal(comments.length, 1);
-    assert.equal(comments[0]!.message.split("\n")[0], FIGMA_LABEL);
+    assert.ok(isOwnComment(comments[0]!.message), comments[0]!.message);
     assert.deepEqual(comments[0]!.client_meta, { node_id: "33:2470", node_offset: { x: 0, y: 0 } });
 
     // The same operation again — a second card, or a retry — adds nothing, and comments once only.

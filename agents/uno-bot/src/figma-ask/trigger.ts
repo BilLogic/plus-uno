@@ -10,7 +10,10 @@
 // THE LOOP GUARD. uno-bot posts as Bill — his token is the only one — so a
 // reply's author says nothing about who wrote it. Its label does: everything
 // uno-bot writes into Figma leads with `FIGMA_LABEL` on a line of its own, and a
-// comment that does is never read as an ask, whatever it quotes.
+// comment that does is never read as an ask, whatever it quotes. Figma keeps
+// a comment's emoji as shortcodes, so the label it hands back is `:goat:`
+// (`asPosted` turns it back); every matcher of uno-bot's own comments reads
+// through that.
 //
 // PURE.
 
@@ -28,9 +31,23 @@ const OLD_LABEL_HEAD = "🐐 le goat";
 const TRIGGER = /(?<![\w.@])@(?:uno(?:-?bot| bot)?|(?:le[- ]?|the )?goat)(?![\w-]|\.\w)/i;
 const TRIGGERS = new RegExp(TRIGGER.source, "gi");
 
-/** Whether a comment is one uno-bot wrote: its first line is the label, or it opens with the old one. */
-export function isOwnComment(message: string): boolean {
+/** The label as Figma reads a comment back: the emoji's shortcode (seen live, 2026-10-12). */
+const LABEL_READ_BACK = ":goat:";
+
+/**
+ * A comment as uno-bot posted it: the label Figma hands back as its shortcode
+ * becomes the emoji again. Anything after the label is left as Figma has it.
+ *
+ * @param message - A comment's message, as a Figma read returns it
+ */
+export function asPosted(message: string): string {
   const text = message.trimStart();
+  return text.startsWith(LABEL_READ_BACK) ? FIGMA_LABEL + text.slice(LABEL_READ_BACK.length) : text;
+}
+
+/** Whether a comment is one uno-bot wrote: its first line is the label, or it opens with the old one — either as posted or as Figma reads it back. */
+export function isOwnComment(message: string): boolean {
+  const text = asPosted(message);
   return text.split("\n", 1)[0]!.trim() === FIGMA_LABEL || text.startsWith(OLD_LABEL_HEAD);
 }
 

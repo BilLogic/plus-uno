@@ -13,6 +13,8 @@
 //   • a webhook's delivery history is what the test seeded, and an unknown
 //     webhook's is a 404;
 //   • a comment is posted as the token's owner (`me`), whoever asked;
+//   • a comment's emoji read back as Figma stores them, as shortcodes: a
+//     posted `🐐` comes back `:goat:` (seen live, 2026-10-12);
 //   • a file read to a `depth` stops that many levels below the document (1
 //     is the pages alone), and one read for `ids` holds only the paths down to
 //     those nodes, with their subtrees.
@@ -35,6 +37,12 @@ import {
   type FigmaWebhook,
   type FigmaWebhookRequest,
 } from "./client";
+
+/** Emoji Figma stores as shortcodes, and reads back that way. */
+const SHORTCODES: Record<string, string> = { "🐐": ":goat:" };
+
+/** A comment's text as Figma keeps it. */
+const asStored = (message: string) => message.replace(/🐐/gu, (e) => SHORTCODES[e] ?? e);
 
 /** A Dev Mode link limit: Figma's, per node. */
 const MAX_LINKS_PER_NODE = 10;
@@ -251,7 +259,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         user: me,
         created_at: new Date(now()).toISOString(),
         resolved_at: null,
-        message,
+        message: asStored(message),
         client_meta: at ?? null,
         order_id: String(f.comments.filter((c) => !c.parent_id).length + 1),
       };
@@ -273,7 +281,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         user: me,
         created_at: new Date(now()).toISOString(),
         resolved_at: null,
-        message,
+        message: asStored(message),
         client_meta: null,
         order_id: null,
       };
