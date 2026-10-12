@@ -74,7 +74,7 @@ export const FIELD_BLOCK_PREFIX = "uno_field:";
 const FIELD_ACTION_ID = "value";
 
 /** `plain_text_input`'s own cap; a longer value is not offered for editing. */
-const MAX_INPUT_CHARS = 3000;
+export const MAX_INPUT_CHARS = 3000;
 /** A `static_select` takes at most 100 options of at most 75 characters. */
 const MAX_OPTIONS = 100;
 const MAX_OPTION_CHARS = 75;
@@ -244,6 +244,22 @@ function draftFields(proposal: PendingProposal): Array<{ field: EditableField; s
     }
   }
   return out;
+}
+
+/** The tools whose text fields the draft holds as inputs in place: a change
+ *  to a page that already exists. A create's fields stay under Edit fields. */
+const IN_PLACE_TOOLS = new Set(["notion_update"]);
+
+/**
+ * The fields the Review draft holds as inputs in place, each with the draft's
+ * value, with nothing read: every text field of a change to an existing page.
+ * Selects need their options read, so they stay under Edit fields.
+ */
+export function inlineFields(proposal: PendingProposal): EditableField[] {
+  const operations = proposalOperations(proposal);
+  return draftFields(proposal)
+    .map(({ field }) => field)
+    .filter((field) => field.kind !== "select" && IN_PLACE_TOOLS.has(operations[Number(field.key.split(".")[0])]?.toolName ?? ""));
 }
 
 /**

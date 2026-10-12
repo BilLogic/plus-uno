@@ -351,17 +351,21 @@ describe("a notion_update draft", () => {
     proposalText: ":warning: About to *update a Notion page*",
   };
 
-  it("offers the title it sets and the text it writes, and never where it writes", async () => {
+  it("offers the title it sets and the text it writes in the draft itself, and never where it writes", async () => {
     const { deps, views } = harness(await staged(UPDATE));
-    const edit = await editFields(deps, views);
-    const fields = inputs(edit);
+    await runReviewOpen(open(), deps);
+    const draft = views.calls[1]!.view;
+    // In place, so there is nothing left for Edit fields.
+    assert.doesNotMatch(JSON.stringify(draft), /"uno_review_edit"/);
+    const fields = inputs(draft);
     assert.deepEqual(
       fields.map((f) => [f.block_id, f.label?.text, f.element?.initial_value]),
       [
+        // In the draft's order, each under its own heading.
         ["uno_field:0.properties.Name", "Title", "Reflection redesign v2"],
-        ["uno_field:0.append.text", "Text to append", "Progress: the form is down to three questions."],
-        ["uno_field:0.append.sections.0.body", "Section to append: Open questions", "Does the mentor see the answers?"],
-        ["uno_field:0.replace.0.content", "Replacement text", "Tutors answer three questions."],
+        ["uno_field:0.replace.0.content", "Text", "Tutors answer three questions."],
+        ["uno_field:0.append.sections.0.body", "Text", "Does the mentor see the answers?"],
+        ["uno_field:0.append.text", "Text", "Progress: the form is down to three questions."],
       ],
     );
     // The page, the block and its stamp, and any other property stay locked.
@@ -404,8 +408,8 @@ describe("a notion_update draft", () => {
     const { deps, views } = harness(
       await staged({ ...UPDATE, input: { page_url: UPDATE.input!.page_url, append: { text: "A dated pulse." } } }),
     );
-    const edit = await editFields(deps, views);
-    assert.deepEqual(inputs(edit).map((f) => f.label?.text), ["Text to append"]);
+    await runReviewOpen(open(), deps);
+    assert.deepEqual(inputs(views.calls[1]!.view).map((f) => f.label?.text), ["Text"]);
   });
 
   it("writes the edited text to the same page, and the card says who edited what", async () => {

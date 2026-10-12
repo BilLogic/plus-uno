@@ -46,6 +46,7 @@ import {
   draftView,
   editLoadingView,
   editView,
+  inlineKeysOf,
   loadingView,
   noticeView,
   reviewMetadata,
@@ -242,7 +243,9 @@ export async function runReviewPush(request: ReviewPushRequest, deps: ReviewDoor
     await deps.views.update(viewId, look.state === "live" ? noticeView(card, "This proposal can't be edited from here now.") : closedView(card, look));
     return;
   }
-  const fields = await reviewFields(look.proposal, deps.fieldOptions);
+  // What the draft holds in place is edited there, not here.
+  const inPlace = inlineKeysOf(look.proposal);
+  const fields = (await reviewFields(look.proposal, deps.fieldOptions)).filter((f) => !inPlace.has(f.key));
   await deps.views.update(viewId, editView(card, fields, new Map(Object.entries(card.edits ?? {}))));
 }
 
@@ -588,12 +591,12 @@ export async function reviewEdits(
   | { ok: false; view: Record<string, unknown> }
 > {
   const saved = request.edits && Object.keys(request.edits).length ? request.edits : undefined;
-  const state = saved ? stateOf(saved) : request.state;
-  if (!state) return { ok: true, edited: [], changes: [] };
-  const changed = saved
-    ? new Set(Object.keys(saved))
-    : request.fields
-      ? changedKeys(request.fields, state)
+  if (!saved && !request.state) return { ok: true, edited: [], changes: [] };
+  // Saved edits and the fields in place together; a field in place wins.
+  const state: ReviewViewState = { ...(saved ? stateOf(saved) : {}), ...(request.state ?? {}) };
+  const changed =
+    saved || request.fields
+      ? new Set([...Object.keys(saved ?? {}), ...(request.fields && request.state ? changedKeys(request.fields, request.state) : [])])
       : undefined;
   if (changed && !changed.size) return { ok: true, edited: [], changes: [] };
   const look = await lookAtProposal(request.messageTs, request.userId, {
@@ -611,7 +614,12 @@ export async function reviewEdits(
         card,
         look.proposal,
         { mayDecide: true, confirmers: look.confirmers },
-        { edits: saved ?? {}, editable: true, alert: { level: "error", text: checked.alert } },
+        {
+          edits: saved ?? {},
+          ...(request.fields && request.state ? { typed: stateValues(request.fields, request.state) } : {}),
+          editable: true,
+          alert: { level: "error", text: checked.alert },
+        },
       ),
     };
   }

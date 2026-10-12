@@ -97,9 +97,14 @@ async function draftOf(over: Partial<PendingProposal> = {}) {
   return views.calls[1]!.view as { blocks: Array<Record<string, unknown>> };
 }
 
-/** Each block's words, in order: a header's text, a section's, a context's. */
+/** Each block's words, in order: a header's text, a section's, a context's,
+ *  and an input's label and the value it opens with. */
 function lines(view: { blocks: Array<Record<string, unknown>> }): string[] {
   return view.blocks.map((b) => {
+    if (b.type === "input") {
+      const element = b.element as { initial_value?: string } | undefined;
+      return `input: ${(b.label as { text?: string } | undefined)?.text ?? ""}${element?.initial_value ? ` = ${element.initial_value}` : ""}`;
+    }
     const text = (b.text as { text?: string } | undefined)?.text;
     if (text) return `${b.type}: ${text}`;
     const elements = (b.elements as Array<{ text?: string | { text: string } }> | undefined) ?? [];
@@ -169,7 +174,8 @@ describe("the draft reads as a draft", () => {
     assert.match(words, /\*Page:\* <https:\/\/www\.notion\.so\/Reflection-/);
     assert.match(words, /\*Design Status:\* In Review/);
     assert.ok(indexOf(all, /^header: Open questions$/) < indexOf(all, /Does the mentor/));
-    assert.match(words, /header: Rewritten block\nsection: Tutors answer three questions\./);
+    // The text it writes is a field in place, for the confirmer reading it.
+    assert.match(words, /header: Rewritten block\n(context: [^\n]*\n)?input: Text = Tutors answer three questions\./);
     assert.doesNotMatch(words, /block_id|last_edited_time|page_url|append|replace/);
   });
 
