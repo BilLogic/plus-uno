@@ -15,15 +15,18 @@
 //   • the POST — `figma-tidy-post`, after the reads: the cards the titles name,
 //     read from the Roadmap in one query; the checks (`./checks.ts`); then the
 //     week's report on the shared decision card (`slack/decision-cards.ts`):
-//     a parent line in the channel, and in its thread one reply per owner,
-//     mentioning them once, with at most five cards and "and N more". Items
-//     with no owner the Roadmap names go in one unassigned reply. Each card is
-//     its own proposal, answered in its Review pop-up with "Moved it" or
-//     "Leave as is"; neither writes to Figma (`./copy.ts`).
+//     a parent line in the channel, and in its thread one combined reply: a
+//     bullet per owner, mentioning them once, with their count and how many
+//     wait for next week, the files with no owner the Roadmap names last;
+//     then one carousel of at most ten cards (Slack's limit), grouped by
+//     owner in bullet order. Past ten, the cards are filled round-robin, so
+//     every owner has one before anyone has a second. Each card is its own
+//     proposal, answered in its Review pop-up with "Moved it" or "Leave as
+//     is"; neither writes to Figma (`./copy.ts`).
 //
 // WHAT THE WEEKS REMEMBER. Every card shown is remembered by its fingerprint
 // (file, check and card) for five weeks. A later week shows only what is new,
-// and counts what is still open; an item held back past an owner's five is not
+// and counts what is still open; an item held back past the ten is not
 // remembered, so it is new the next week. A week with nothing new posts
 // nothing; the first week with nothing open at all, after a week that had
 // some, posts one all-clear and then goes quiet.
@@ -34,7 +37,7 @@
 //         the job's budget is nearly spent.
 //   post: the Roadmap (one query per 100 cards) + a likely card for each
 //         unknown one shown (at most `LIKELY_LOOKUPS`) + members (at most 3
-//         pages) + the parent and one reply per owner. The report records and
+//         pages) + the parent and its one reply. The report record and
 //         stagings are Durable Object hops; the listing and memory are KV.
 //
 // PURE: `Env` enters in `./env.ts`.
@@ -44,7 +47,15 @@ import { FigmaRequestError, type FigmaClient } from "../figma/client";
 import type { FigmaTeam } from "../figma-notify/teams";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import { renderProposalCard } from "../slack/proposal-render";
-import { decisionReport, itemProposal, markNotStaged, reportRecord, type ReportMessage, type ReportStore } from "../slack/decision-cards";
+import {
+  decisionReport,
+  itemProposal,
+  markNotStaged,
+  MAX_REPORT_ITEMS,
+  reportRecord,
+  type ReportMessage,
+  type ReportStore,
+} from "../slack/decision-cards";
 import { pagesOf } from "../figma-comments/sections";
 import { collectTextLayers } from "../integrations/figma-reading";
 import {
@@ -64,7 +75,6 @@ import {
 } from "./checks";
 import {
   allClearText,
-  MAX_ITEMS_PER_OWNER,
   ownerLine,
   tidyCard,
   tidyCardWords,
@@ -300,7 +310,7 @@ export interface TidyPostResult {
   summary: string;
 }
 
-/** A finding as its owner's reply carries it. */
+/** A finding as the week's reply carries it. */
 interface Shown {
   finding: TidyFinding;
   likely: TidyCard | null;
@@ -347,25 +357,21 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
   if (!members) return { posted: false, summary: "the channel's members unread — no report this week" };
 
   const groups = byOwner(fresh);
+  const picked = roundRobin(groups, MAX_REPORT_ITEMS);
   let lookups = 0;
-  const shownBy = new Map<string | null, Shown[]>();
-  for (const [owner, items] of groups) {
-    const shown: Shown[] = [];
-    for (const finding of items.slice(0, MAX_ITEMS_PER_OWNER)) {
-      let likely: TidyCard | null = null;
-      if (finding.check === "unknown-card" && lookups < LIKELY_LOOKUPS) {
-        lookups += 1;
-        likely = await deps.roadmap.likely(projectOf(finding.file.name)).catch((err: unknown) => {
-          rethrowIfBudget(err);
-          return null;
-        });
-      }
-      shown.push({ finding, likely });
+  const shown: Shown[] = [];
+  for (const finding of [...picked.values()].flat()) {
+    let likely: TidyCard | null = null;
+    if (finding.check === "unknown-card" && lookups < LIKELY_LOOKUPS) {
+      lookups += 1;
+      likely = await deps.roadmap.likely(projectOf(finding.file.name)).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
     }
-    shownBy.set(owner, shown);
+    shown.push({ finding, likely });
   }
-  const cardCount = [...shownBy.values()].reduce((n, s) => n + s.length, 0);
-  if (opts.dryRun) return { posted: false, summary: `would post ${cardCount} card(s) for ${groups.size} owner(s), ${fresh.length} new, ${stillOpen} still open` };
+  if (opts.dryRun) return { posted: false, summary: `would post ${shown.length} card(s) for ${groups.size} owner(s), ${fresh.length} new, ${stillOpen} still open` };
 
   const parentText = tidyParent(deps.runDate, fresh.length, stillOpen);
   const parent = await deps.post({ text: parentText, blocks: [{ type: "section", text: { type: "mrkdwn", text: parentText } }] });
@@ -374,48 +380,54 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
   await deps.markThread(parentTs).catch((err: unknown) => rethrowIfBudget(err));
 
   const next: TidyMemory = { shown: { ...memory.shown }, open: findings.length };
+  const report = decisionReport(
+    shown.map((s) => tidyItem(s.finding, s.likely)),
+    "",
+    {
+      channel: deps.channel,
+      ownerLines: [...groups].map(([owner, items]) => ({
+        owner: owner ? { slack: owner } : null,
+        says: ownerLine(owner, items.length, picked.get(owner)!.length),
+      })),
+    },
+  );
+  const sent = await deps.post({ text: report.text, blocks: report.blocks }, parentTs);
+  if (!sent.ok || !sent.ts) {
+    await keep(next);
+    return { posted: true, summary: `the parent posted and its reply did not; ${fresh.length} new come back next week` };
+  }
+  const ts = sent.ts;
+  const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, TIDY_CARD_TTL_MS)).then(
+    () => true,
+    () => false,
+  );
   let staged = 0;
-  for (const [owner, shown] of shownBy) {
-    const total = groups.get(owner)!.length;
-    const report = decisionReport(
-      shown.map((s) => tidyItem(s.finding, s.likely)),
-      ownerLine(owner, total, shown.length),
-      { channel: deps.channel },
-    );
-    const sent = await deps.post({ text: report.text, blocks: report.blocks }, parentTs);
-    if (!sent.ok || !sent.ts) continue;
-    const ts = sent.ts;
-    const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, TIDY_CARD_TTL_MS)).then(
-      () => true,
-      () => false,
-    );
-    const failed: string[] = [];
-    for (const s of shown) {
-      try {
-        if (!recorded) throw new Error("no report record");
-        await deps.stage(stagedFinding(deps.channel, parentTs, ts, s, members));
-        next.shown[s.finding.fingerprint] = deps.runDate;
-        staged += 1;
-      } catch (err) {
-        rethrowIfBudget(err);
-        failed.push(tidyItem(s.finding, s.likely).id);
-      }
+  const failed: string[] = [];
+  for (const s of shown) {
+    try {
+      if (!recorded) throw new Error("no report record");
+      await deps.stage(stagedFinding(deps.channel, parentTs, ts, s, members));
+      next.shown[s.finding.fingerprint] = deps.runDate;
+      staged += 1;
+    } catch (err) {
+      rethrowIfBudget(err);
+      failed.push(tidyItem(s.finding, s.likely).id);
     }
-    if (failed.length) {
-      const marked = recorded ? await markNotStaged(deps.reports, ts, failed, TIDY_NOT_STAGED).catch(() => null) : null;
-      if (marked) await deps.edit(ts, marked).catch(() => {});
-    }
+  }
+  if (failed.length) {
+    const marked = recorded ? await markNotStaged(deps.reports, ts, failed, TIDY_NOT_STAGED).catch(() => null) : null;
+    if (marked) await deps.edit(ts, marked).catch(() => {});
   }
   await keep(next);
   return { posted: true, summary: `posted ${staged} card(s) for ${groups.size} owner(s); ${fresh.length} new, ${stillOpen} still open` };
 }
 
 /**
- * One finding's card as ThreadState stages it: one item of its owner's reply.
+ * One finding's card as ThreadState stages it: one item of the week's reply.
  *
  * @param channel - Where the report posted
  * @param parentTs - The parent line: the thread
- * @param replyTs - The owner's reply
+ * @param replyTs - The week's reply
  * @param shown - The finding, and the likely card it names
  * @param confirmers - Who may answer it
  */
@@ -505,4 +517,24 @@ function byOwner(findings: readonly TidyFinding[]): Map<string | null, TidyFindi
   const none = findings.filter((f) => f.owner === null);
   if (none.length) groups.set(null, none);
   return groups;
+}
+
+/**
+ * At most `max` of the groups' items, a round at a time in the groups' order,
+ * so every owner has a card before anyone has a second; kept by group.
+ */
+function roundRobin<K, T>(groups: ReadonlyMap<K, readonly T[]>, max: number): Map<K, T[]> {
+  const picked = new Map<K, T[]>([...groups.keys()].map((k) => [k, []]));
+  let left = max;
+  for (let round = 0; left > 0; round += 1) {
+    let any = false;
+    for (const [key, items] of groups) {
+      if (left === 0 || round >= items.length) continue;
+      picked.get(key)!.push(items[round]!);
+      left -= 1;
+      any = true;
+    }
+    if (!any) break;
+  }
+  return picked;
 }

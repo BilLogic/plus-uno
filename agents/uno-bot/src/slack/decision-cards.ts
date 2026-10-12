@@ -27,7 +27,9 @@ import { textSections } from "./render";
 import { itemProposalKey } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import type {
+  CardOwner,
   DecisionReportRecord,
+  OwnerLine,
   PendingProposal,
   ReportEntry,
   ReportItem,
@@ -85,6 +87,8 @@ export interface DecisionReport extends ReportMessage {
   held: ReportItem[];
   /** Blocks below the cards, kept on the record (`DecisionReportRecord.after`). */
   after?: unknown[];
+  /** The opener's bullets, kept on the record (`DecisionReportRecord.ownerLines`). */
+  ownerLines?: OwnerLine[];
 }
 
 /**
@@ -96,14 +100,19 @@ export interface DecisionReport extends ReportMessage {
  * @param parent - What the job found, in one plain sentence: no emoji, no
  *   mark, no instructions. mrkdwn.
  * @param opts - `after`: blocks posted below the cards, such as a table;
- *   `channel`: where it posts, so a DM tags nobody
+ *   `channel`: where it posts, so a DM tags nobody; `ownerLines`: what the
+ *   opener says of each owner, in place of their cards' titles
  */
-export function decisionReport(allItems: readonly ReportItem[], parent: string, opts: { after?: unknown[]; channel?: string } = {}): DecisionReport {
+export function decisionReport(
+  allItems: readonly ReportItem[],
+  parent: string,
+  opts: { after?: unknown[]; channel?: string; ownerLines?: OwnerLine[] } = {},
+): DecisionReport {
   const shown = allItems.slice(0, MAX_REPORT_ITEMS);
   const held = allItems.slice(MAX_REPORT_ITEMS);
-  const after = opts.after?.length ? { after: opts.after } : {};
-  const message = reportMessage(reportRecord(opts.channel ?? "", "", { parent, shown, held, ...after }, 0));
-  return { ...message, parent, shown, held, ...after };
+  const extra = { ...(opts.after?.length ? { after: opts.after } : {}), ...(opts.ownerLines?.length ? { ownerLines: opts.ownerLines } : {}) };
+  const message = reportMessage(reportRecord(opts.channel ?? "", "", { parent, shown, held, ...extra }, 0));
+  return { ...message, parent, shown, held, ...extra };
 }
 
 /**
@@ -117,7 +126,7 @@ export function decisionReport(allItems: readonly ReportItem[], parent: string, 
 export function reportRecord(
   channel: string,
   messageTs: string,
-  report: Pick<DecisionReport, "parent" | "shown" | "held" | "after">,
+  report: Pick<DecisionReport, "parent" | "shown" | "held" | "after" | "ownerLines">,
   ttlMs: number,
 ): DecisionReportRecord {
   return {
@@ -128,6 +137,7 @@ export function reportRecord(
     entries: report.shown.map((item) => ({ id: item.id, item, state: { kind: "open" } })),
     ttlMs,
     ...(report.after?.length ? { after: report.after } : {}),
+    ...(report.ownerLines?.length ? { ownerLines: report.ownerLines } : {}),
   };
 }
 
@@ -278,6 +288,13 @@ function readOn(sentence: string): string {
   return sentence.charAt(0).toLowerCase() + sentence.slice(1);
 }
 
+/** How the opener names an owner: tagged, by name when Slack has no such
+ *  person, and not at all for a Slack person in a DM. */
+function ownerWho(owner: CardOwner, dm: boolean): string | null {
+  if ("slack" in owner) return dm ? null : `<@${owner.slack}>`;
+  return escapeSlackText(owner.name);
+}
+
 /** Names a parent line may open on. */
 const NAMES = new Set(["Figma", "Notion", "Slack", "Storybook", "Roadmap", "I"]);
 
@@ -285,12 +302,24 @@ const NAMES = new Set(["Figma", "Notion", "Slack", "Storybook", "Roadmap", "I"])
  * The head of the message: the parent line opened on whom the cards are for,
  * where Slack notifies (#1143). One card for one owner reads "<@owner>, the
  * parent line"; otherwise the parent line, then one bullet per owner listing
- * that owner's cards, each owner mentioned once. An owner with no Slack
- * person is named in plain text. A DM tags nobody.
+ * that owner's cards, each owner mentioned once. A report that says what it
+ * has for each owner (`ownerLines`) bullets those words in their place,
+ * "<@owner>, 4 files need a tidy.", and one such bullet with no parent line
+ * is the opener alone. An owner with no Slack person is named in plain text.
+ * A DM tags nobody.
  */
-function headLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entries" | "channel">): string {
+function headLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entries" | "channel" | "ownerLines">): string {
   const line = parentLine(record);
-  if (record.channel.startsWith("D")) return line;
+  const dm = record.channel.startsWith("D");
+  if (record.ownerLines?.length) {
+    const said = record.ownerLines.map(({ owner, says }) => {
+      const who = owner ? ownerWho(owner, dm) : null;
+      return who ? `${who}, ${readOn(says)}` : says;
+    });
+    if (!line && said.length === 1) return said[0]!;
+    return [...(line ? [line] : []), ...said.map((s) => `• ${s}`)].join("\n");
+  }
+  if (dm) return line;
   const byOwner = new Map<string, { who: string; titles: string[] }>();
   for (const { item } of record.entries) {
     for (const owner of item.owners ?? []) {
