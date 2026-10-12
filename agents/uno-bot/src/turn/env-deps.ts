@@ -30,7 +30,7 @@ import type { GateRestage, GateVerdict, OperationOutcome } from "../gate/index";
 import { conversationsHistoryBefore, updateMessage } from "../slack/api";
 import { reportItems } from "../slack/decision-cards";
 import { formatAssistantContext } from "../slack/assistant";
-import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
+import { buildNotionBefore, buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
 import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { recordSweepRestageFor } from "../sweep/env";
@@ -294,6 +294,7 @@ export const PREVIEW_UNDER_WAIT_UNTIL: FigmaRenderOptions = { maxWaitMs: 5_000, 
 export function cardReadsFor(env: Env, preview: FigmaRenderOptions = PREVIEW_IN_RUNNER): TurnDeps["cards"] {
   return {
     notionRevision: (input) => buildNotionRevision(env, input),
+    notionBefore: (input, opts) => buildNotionBefore(env, input, opts),
     notionTarget: (input) => buildNotionTarget(env, input),
     // The Figma render behind a `prototype_scaffold` card. Best-effort by
     // contract: no url, an unparseable one or a failed render all mean no

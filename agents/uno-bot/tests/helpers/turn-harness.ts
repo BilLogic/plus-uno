@@ -215,6 +215,9 @@ export function harness(opts: {
   /** What a `notion_update` card's read finds. Absent, a page whose Design
    *  Status moves from WIP. */
   notionRevision?: TurnDeps["cards"]["notionRevision"];
+  /** What a later `notion_update` operation's Before read finds. Absent,
+   *  nothing. */
+  notionBefore?: TurnDeps["cards"]["notionBefore"];
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -340,6 +343,10 @@ export function harness(opts: {
           page: { url: "https://notion.so/a-card", title: "A card", parent: "Roadmap" },
           properties: [{ label: "Design Status", from: "WIP", to: "Ready for QA" }],
         };
+      },
+      async notionBefore(input, readOpts) {
+        if (opts.notionBefore) return opts.notionBefore(input, readOpts);
+        return { before: {}, read: false };
       },
       async notionTarget() {
         return { title: "A card", parent: "Roadmap" };

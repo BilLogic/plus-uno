@@ -1231,6 +1231,57 @@ test("a page change keeps what the page says now, read as its card was staged", 
   assert.deepEqual(outcome.staged!.proposal.before, { "0.replace.0.content": "Launch date: October 1" });
 });
 
+// A batch of page changes keeps a Before for each operation, not only the
+// first: the card's read covers the first, and each later one is read on its
+// own, from the turn's read cache where the turn already read that page.
+test("a batch of page changes keeps what each page says now, by operation", async () => {
+  const asked: Array<{ page: unknown; mayRead: boolean }> = [];
+  const h = harness({
+    replies: [{ text: "Fixed both.", toolCalls: [{ name: "notion_update", args: FIX_ONE }, { name: "notion_update", args: FIX_TWO }] }],
+    notionRevision: async () => ({ properties: [], before: { "replace.0.content": "Launch date: October 1" } }),
+    notionBefore: async (input, opts) => {
+      asked.push({ page: input.page_url, mayRead: opts.mayRead });
+      return { before: { "replace.0.content": "Owner: Ade" }, read: false };
+    },
+  });
+  const outcome = await runTurn(request({ text: "fix the date and the owner" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.before, {
+    "0.replace.0.content": "Launch date: October 1",
+    "1.replace.0.content": "Owner: Ade",
+  });
+  // The first operation's Before came off the card's read, so only the second
+  // is read here.
+  assert.deepEqual(asked, [{ page: FIX_TWO.page_url, mayRead: true }]);
+});
+
+test("a batch's fresh page reads for Before stop at the bound; the rest leave none", async () => {
+  const pages = ["1", "2", "3", "4", "5", "6"].map((d) => ({
+    page_url: `https://www.notion.so/${d.repeat(32)}`,
+    replace: [{ block_id: `blk-${d}`, last_edited_time: "2026-09-01T10:00:00.000Z", content: `Text ${d}` }],
+  }));
+  const allowed: boolean[] = [];
+  const h = harness({
+    replies: [{ text: "Fixed them all.", toolCalls: pages.map((args) => ({ name: "notion_update", args })) }],
+    notionRevision: async () => ({ properties: [], before: { "replace.0.content": "Text 1 now" } }),
+    notionBefore: async (input, opts) => {
+      allowed.push(opts.mayRead);
+      // Every page is a fresh read when one is allowed, and none is cached.
+      const before: Record<string, string> = opts.mayRead ? { "replace.0.content": `${String(input.page_url).slice(-1)} now` } : {};
+      return { before, read: opts.mayRead };
+    },
+  });
+  const outcome = await runTurn(request({ text: "fix all six" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(allowed, [true, true, true, false, false]);
+  assert.deepEqual(outcome.staged!.proposal.before, {
+    "0.replace.0.content": "Text 1 now",
+    "1.replace.0.content": "2 now",
+    "2.replace.0.content": "3 now",
+    "3.replace.0.content": "4 now",
+  });
+});
+
 // A confirmer's revision of a sweep card stays a sweep card, in the sweep's
 // slot — and the model is told what a reply under one usually means.
 test("a confirmer's revision of a sweep card keeps its sweep run and retires the card", async () => {

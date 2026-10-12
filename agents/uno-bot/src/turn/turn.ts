@@ -530,6 +530,14 @@ export interface TurnDeps {
   cards: {
     /** The `notion_update` diff: the page, and `current → new` per field. */
     notionRevision(input: Record<string, unknown>): Promise<CardRevision>;
+    /** What a later `notion_update` operation of the batch replaces, by its
+     *  input path, for Review's Before: served from a read the turn already
+     *  made, and read fresh only where `mayRead`. `read` says a fresh read was
+     *  spent. */
+    notionBefore(
+      input: Record<string, unknown>,
+      opts: { mayRead: boolean },
+    ): Promise<{ before: Record<string, string>; read: boolean }>;
     /** The `notion_archive` target: page title and parent database. */
     notionTarget(input: Record<string, unknown>): Promise<CardTarget | undefined>;
     /** A render of the Figma node a `prototype_scaffold` implements, or null
@@ -1588,6 +1596,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // the sweep's rule.
   // A report's fix is redrawn in its report instead.
   const card = replaced?.sweepRun && !replaced.item ? asSweepRevision(built) : built;
+  // What each page says now: Review's Before, by operation. Read before the
+  // card posts, so the proposal is saved the moment it does.
+  const before = await batchBefore(result.operations, card.revision, deps.cards);
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
@@ -1637,9 +1648,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     requesterUserId: request.userId,
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
-    // What the page says now, as the card's read found it: Review's Before.
-    // The read is of the first operation, the one the card is drawn from.
-    ...beforeOf(card.revision),
+    ...before,
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
     ...inheritedTerms(replaced),
@@ -1716,11 +1725,35 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   };
 }
 
-/** A card read's Before values, keyed as the staged batch's first operation
- *  (`PendingProposal.before`); nothing when the read found none. */
-function beforeOf(revision: CardRevision | undefined): { before?: Record<string, string> } {
-  const found = Object.entries(revision?.before ?? {});
-  return found.length ? { before: Object.fromEntries(found.map(([path, value]) => [`0.${path}`, value])) } : {};
+/** Fresh page reads a batch may spend on Before beyond the card's own read.
+ *  Each is a page and its blocks, so the bound keeps a long batch from eating
+ *  the subrequests its card still needs; a read the turn already made is
+ *  free and not counted. */
+export const BEFORE_READS_PER_BATCH = 3;
+
+/**
+ * Each value the batch replaces, as the pages say now, keyed `<op>.<path>`
+ * (`PendingProposal.before`). The first operation's comes off the card's own
+ * read; every later `notion_update` is read on its own, up to
+ * `BEFORE_READS_PER_BATCH` fresh reads. An operation past the bound keeps
+ * what a cached read finds, and Review says what was not captured.
+ */
+async function batchBefore(
+  operations: readonly ProposalOperation[],
+  revision: CardRevision | undefined,
+  cards: TurnDeps["cards"],
+): Promise<{ before?: Record<string, string> }> {
+  const found: Array<[string, string]> = Object.entries(revision?.before ?? {}).map(([path, value]) => [`0.${path}`, value]);
+  let reads = 0;
+  for (const [i, op] of operations.entries()) {
+    if (op.toolName !== "notion_update" || (i === 0 && revision)) continue;
+    const mayRead = reads < BEFORE_READS_PER_BATCH;
+    const got = await cards.notionBefore(op.input, { mayRead });
+    if (got.read) reads += 1;
+    for (const [path, value] of Object.entries(got.before)) found.push([`${i}.${path}`, value]);
+  }
+  if (operations.length > 1) console.log(`[turn] before: ${reads} fresh page read(s) for ${operations.length} operations`);
+  return found.length ? { before: Object.fromEntries(found) } : {};
 }
 
 /** What a revision of a sweep card that has closed meanwhile is told. */
@@ -1982,6 +2015,7 @@ export async function restageExecution(
   // The warning rides the card, not only the note before it: a note that
   // failed to post must not leave a card that reads like any other.
   const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };
+  const before = await batchBefore(restage.operations, built.revision, deps.cards);
   const posted = await deps.delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] re-staged card was not posted (${first.toolName})`);
@@ -1994,7 +2028,9 @@ export async function restageExecution(
   // it. Nor are a sweep card's fixes: the fresh card holds
   // what never ran, so they no longer line up with its operations. Nor are
   // the old card's blocks: the fresh card went up with its own.
-  const { sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, ...kept } = original;
+  // Nor is its Before: it was keyed on the old batch's operations, so the
+  // fresh one is read for the batch that will run.
+  const { sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, before: _before, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,
@@ -2003,6 +2039,7 @@ export async function restageExecution(
     proposalTs: posted.ts,
     proposalText: posted.text,
     ...ownBlocks(posted),
+    ...before,
     // The ask's own card, carried across however many re-stagings.
     originProposalTs: stagingCardOf(original),
   };

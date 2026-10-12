@@ -184,6 +184,44 @@ test("the card's read keeps what each changed property and rewritten block says 
   assert.deepEqual(revision.before, { "properties.Status": "WIP", "replace.0.content": "Owner: Ade." });
 });
 
+// A later operation of a batch is read for its Before only where the turn
+// allows a fresh read, and a page already read answers for nothing.
+test("a batch operation's Before reads the page once, and only when allowed", async () => {
+  const run = (text: string) => ({ type: "text", plain_text: text, text: { content: text, link: null }, href: null });
+  serve({
+    "GET /v1/pages/": {
+      body: {
+        id: "5b2c7cca498281009b41000000000932",
+        url: "https://www.notion.so/Owners-5b2c7cca498281009b41000000000932",
+        parent: { type: "workspace" },
+        properties: { Name: title("Owners"), Status: { type: "status", status: { name: "WIP" } } },
+      },
+    },
+    "GET /v1/blocks/": {
+      body: {
+        has_more: false,
+        results: [{ id: "b-one", type: "paragraph", last_edited_time: "2026-10-01T09:00:00.000Z", paragraph: { rich_text: [run("Owner: Ade.")] } }],
+      },
+    },
+  });
+  const { buildNotionBefore } = await import("../src/slack/notion-card.js");
+  const input = {
+    page_url: "https://www.notion.so/Owners-5b2c7cca498281009b41000000000932",
+    properties: { status: "Done" },
+    replace: [{ block_id: "b-one", last_edited_time: "2026-10-01T09:00:00.000Z", content: "Owner: Bea." }],
+  };
+  const want = { "properties.status": "WIP", "replace.0.content": "Owner: Ade." };
+
+  assert.deepEqual(await buildNotionBefore(ENV, input, { mayRead: false }), { before: {}, read: false });
+  assert.deepEqual(calls, []);
+  assert.deepEqual(await buildNotionBefore(ENV, input, { mayRead: true }), { before: want, read: true });
+  const spent = calls.length;
+  assert.ok(spent > 0);
+  // Read already: the cache answers, even where no fresh read is allowed.
+  assert.deepEqual(await buildNotionBefore(ENV, input, { mayRead: false }), { before: want, read: false });
+  assert.equal(calls.length, spent);
+});
+
 test("when the page read fails, the card still links the page that opens", async () => {
   serve({ "GET /v1/pages/": { status: 404, body: { object: "error", code: "object_not_found" } } });
   const { buildNotionRevision } = await import("../src/slack/notion-card.js");

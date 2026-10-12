@@ -18,14 +18,18 @@
 import type { CardRevision, CardTarget } from "../turn/index";
 import type { Env } from "../types";
 import {
+  cachedNotionPage,
   canonicalNotionUrl,
   describeNotionTarget,
   normalizeName,
   parseNotionPageId,
   fetchPageTitles,
   readNotionPage,
+  READ_BLOCK_PAGES,
+  type NotionPageContent,
 } from "../integrations/notion";
-import { rethrowIfBudget } from "../net";
+import { budgetHeadroom, rethrowIfBudget } from "../net";
+import { DELIVERY_RESERVE } from "../agent/loop-policy";
 
 function humanizeFieldName(key: string): string {
   return key.replace(/[_\s]+/g, " ").trim().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -133,6 +137,42 @@ export async function buildNotionRevision(
 }
 
 /**
+ * What a later `notion_update` of a batch replaces, as the page says now, by
+ * input path (`properties.<name>`, `replace.<i>.content`): Review's Before for
+ * an operation the card's own read did not cover. A read the turn already
+ * made answers it for nothing; a fresh one is made only where `mayRead` and
+ * the invocation still has the card's delivery to spare after it. A value the
+ * read did not find is left out rather than guessed.
+ */
+export async function buildNotionBefore(
+  env: Env,
+  input: Record<string, unknown>,
+  opts: { mayRead: boolean },
+): Promise<{ before: Record<string, string>; read: boolean }> {
+  const pageId = typeof input.page_url === "string" ? parseNotionPageId(input.page_url) : null;
+  if (!pageId) return { before: {}, read: false };
+  let page: NotionPageContent | null = cachedNotionPage(pageId);
+  let read = false;
+  if (!page && opts.mayRead && budgetHeadroom().subrequests > DELIVERY_RESERVE + READ_BLOCK_PAGES) {
+    read = true;
+    page = await readNotionPage(env, pageId).catch((err: unknown) => {
+      rethrowIfBudget(err);
+      return null;
+    });
+  }
+  if (!page) return { before: {}, read };
+  const before: Record<string, string> = {};
+  const named = new Map(Object.entries(page.properties).map(([name, value]) => [normalizeName(name), value] as const));
+  const properties = input.properties && typeof input.properties === "object" ? (input.properties as Record<string, unknown>) : {};
+  for (const [name, value] of Object.entries(properties)) {
+    const now = named.get(normalizeName(name));
+    if (typeof value === "string" && now !== undefined) before[`properties.${name}`] = now;
+  }
+  Object.assign(before, blocksOf(page, input.replace));
+  return { before, read };
+}
+
+/**
  * Each rewritten block's text as the page reads now, by `replace.<i>.content`.
  * The page read is the one the model drafted the rewrite from, so it is
  * usually served from the read cache at no cost. A block the read did not
@@ -145,7 +185,13 @@ async function blocksNow(env: Env, pageUrl: string, replace: unknown): Promise<R
     rethrowIfBudget(err);
     return null;
   });
-  if (!page) return {};
+  return page ? blocksOf(page, replace) : {};
+}
+
+/** Each rewritten block's text in `page`, by `replace.<i>.content`; a block
+ *  the read did not find is left out. */
+function blocksOf(page: NotionPageContent, replace: unknown): Record<string, string> {
+  if (!Array.isArray(replace)) return {};
   const text = new Map(page.blocks.map((b) => [b.id.replace(/-/g, ""), b.text] as const));
   const out: Record<string, string> = {};
   replace.forEach((entry, i) => {
