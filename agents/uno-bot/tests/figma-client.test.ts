@@ -117,11 +117,11 @@ const SHAPES: Shape[] = [
   { method: "comments", call: (f) => f.comments(KEY), send: { method: "GET", url: `${API}/v1/files/${KEY}/comments` } },
   {
     method: "postComment",
-    call: (f) => f.postComment(KEY, "🐐 le goat (uno-bot) · AI-generated", { node_id: A, node_offset: { x: 4, y: 8 } }),
+    call: (f) => f.postComment(KEY, "🐐", { node_id: A, node_offset: { x: 4, y: 8 } }),
     send: {
       method: "POST",
       url: `${API}/v1/files/${KEY}/comments`,
-      body: { message: "🐐 le goat (uno-bot) · AI-generated", client_meta: { node_id: A, node_offset: { x: 4, y: 8 } } },
+      body: { message: "🐐", client_meta: { node_id: A, node_offset: { x: 4, y: 8 } } },
     },
   },
   {

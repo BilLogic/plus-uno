@@ -402,7 +402,7 @@ describe("a change request", () => {
     await ask(w, comment("100", "@uno add it to the PRD", { user: STRANGER }));
     assert.deepEqual(w.leads, []);
     assert.deepEqual(w.cards, []);
-    assert.match(w.replies()[0]!.message, /^🐐 le goat \(uno-bot\) · AI-generated\nI draft changes only for teammates/);
+    assert.match(w.replies()[0]!.message, /^🐐\nI draft changes only for teammates/);
   });
 
   it("asks the file's creator when no design owner resolves, and the asker when nobody does", async () => {
@@ -501,7 +501,7 @@ describe("a change request", () => {
     assert.equal(w.cards[0]!.stagedCards.length, 1);
     const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
     assert.equal(staged!.toolName, "notion_update");
-    assert.match(w.replies()[0]!.message, /^🐐 le goat \(uno-bot\) · AI-generated\nI drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
+    assert.match(w.replies()[0]!.message, /^🐐\nI drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
   });
 
   for (const [write, args, ask_] of [
@@ -579,6 +579,22 @@ describe("the loop guards", () => {
     const result = await answerFigmaAsk({ fileKey: FILE, commentId: "200" }, w.deps);
     assert.equal(result.said, "uno-bot's own comment");
     assert.deepEqual(w.replies(), []);
+  });
+
+  it("still knows a reply it wrote under the old label", async () => {
+    const w = world();
+    const own = comment("200", "🐐 le goat (uno-bot) · AI-generated\nAsk @uno again with the card number.", { user: BILL, parent_id: "100" });
+    w.figma.seedFile(FILE, { comments: [comment("100", "a question"), own] });
+    await w.run(own);
+    const result = await answerFigmaAsk({ fileKey: FILE, commentId: "200" }, w.deps);
+    assert.equal(result.said, "uno-bot's own comment");
+    assert.deepEqual(w.replies(), []);
+  });
+
+  it("reads a comment that only opens with 🐐 as a teammate's ask", async () => {
+    const w = world();
+    await ask(w, comment("100", "🐐 @uno when does the bar show?"));
+    assert.equal(w.replies().length, 1);
   });
 
   it("answers Bill himself: the label decides, not the author", async () => {

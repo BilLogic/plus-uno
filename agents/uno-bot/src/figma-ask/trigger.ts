@@ -9,16 +9,16 @@
 //
 // THE LOOP GUARD. uno-bot posts as Bill — his token is the only one — so a
 // reply's author says nothing about who wrote it. Its label does: everything
-// uno-bot writes into Figma leads with `FIGMA_LABEL`, and a comment that leads
-// with it is never read as an ask, whatever it quotes.
+// uno-bot writes into Figma leads with `FIGMA_LABEL` on a line of its own, and a
+// comment that does is never read as an ask, whatever it quotes.
 //
 // PURE.
 
-/** What everything uno-bot writes into Figma leads with (docs/connectors/slack.md § Figma messages, rule 7). */
-export const FIGMA_LABEL = "🐐 le goat (uno-bot) · AI-generated";
+/** What everything uno-bot writes into Figma leads with, on a line of its own (docs/connectors/slack.md § Figma messages, rule 7). */
+export const FIGMA_LABEL = "🐐";
 
-/** The label's head: a comment opening with it is uno-bot's own. */
-const LABEL_HEAD = "🐐 le goat";
+/** The label replies carried before it was the emoji alone, still on comments already posted. */
+const OLD_LABEL_HEAD = "🐐 le goat";
 
 /**
  * One trigger. Not after a word character, `.` or `@` (an address, `@@`); not
@@ -28,9 +28,10 @@ const LABEL_HEAD = "🐐 le goat";
 const TRIGGER = /(?<![\w.@])@(?:uno(?:-?bot| bot)?|(?:le[- ]?|the )?goat)(?![\w-]|\.\w)/i;
 const TRIGGERS = new RegExp(TRIGGER.source, "gi");
 
-/** Whether a comment is one uno-bot wrote: it leads with the label. */
+/** Whether a comment is one uno-bot wrote: its first line is the label, or it opens with the old one. */
 export function isOwnComment(message: string): boolean {
-  return message.trimStart().startsWith(LABEL_HEAD);
+  const text = message.trimStart();
+  return text.split("\n", 1)[0]!.trim() === FIGMA_LABEL || text.startsWith(OLD_LABEL_HEAD);
 }
 
 /** Whether a comment asks uno-bot something: a trigger, in a comment uno-bot did not write. */
