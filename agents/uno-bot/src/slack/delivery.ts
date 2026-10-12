@@ -309,8 +309,9 @@ export async function postTextVerified(
   // The box is drawn from the prose as the model wrote it, inline source list
   // included: that list is what names some of the sources the box keeps.
   const box = sourcesBox(presentation?.sources, text);
-  // With a box beneath it, the prose carries no list of its own.
-  const body = renderDeliveredBody(box ? withoutInlineSources(text) : text);
+  // With a box beneath it, the prose carries no list of its own; nor on a turn
+  // that read no source, whose list could only be an earlier turn's links.
+  const body = renderDeliveredBody(box || !presentation?.sources?.length ? withoutInlineSources(text) : text);
   const resultTable = presentation?.table;
   const charts = presentation?.charts ?? [];
   const cards = presentation?.cards;
