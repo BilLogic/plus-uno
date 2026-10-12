@@ -1,5 +1,5 @@
-// A change to existing content, reviewed as Before and After, with the
-// proposed text edited in the Review pop-up itself.
+// A change to existing content, reviewed in three parts — Current content,
+// Issue, New content — with the new content edited in the Review pop-up itself.
 //
 // Driven at the review door, as `tests/review-popup.test.ts` drives it: the
 // in-memory ThreadState, a views client that refuses what Slack refuses, and
@@ -105,53 +105,79 @@ function submitted(view: View, decision: string, typed: Record<string, string> =
   return { ...view, state: { values } };
 }
 
-describe("a change to existing content shows Before and After", () => {
-  it("shows a rewritten block as it reads now, then the proposed text", async () => {
-    const all = lines(await draftFor(await harness()));
-    const words = all.join("\n");
-    const before = all.findIndex((l) => l.includes(NOW_SAYS));
-    const after = all.findIndex((l) => l.includes(WILL_SAY));
-    assert.ok(before >= 0 && after > before, words);
-    assert.match(words, /Before/);
-    assert.match(all[after]!, /^input: After = /);
+const WHY = "#plus-design said “three questions, not five”";
+
+describe("a change to existing content reads as Current content, Issue, New content", () => {
+  it("shows a rewritten block as it reads now, why it changes, then the new content", async () => {
+    const all = lines(await draftFor(await harness({ issue: WHY })));
+    const at = (pattern: RegExp) => all.findIndex((l) => pattern.test(l));
+    const current = at(/^section: \*Current content\*$/);
+    const issue = at(/^section: \*Issue\*$/);
+    const fresh = at(/^input: New content = /);
+    assert.ok(current >= 0 && issue > current && fresh > issue, all.join("\n"));
+    assert.match(all[current + 1]!, new RegExp(NOW_SAYS));
+    assert.match(all[issue + 1]!, /three questions, not five/);
+    assert.equal(all[fresh], `input: New content = ${WILL_SAY}`);
+    assert.doesNotMatch(all.join("\n"), /\*Before\*|\*After\*|input: After/);
   });
 
-  it("shows a property's value now beside the value it will have", async () => {
+  it("leaves Issue out when the card carries no reason", async () => {
     const words = lines(await draftFor(await harness())).join("\n");
-    assert.match(words, /\*Design Status:\* In Progress → In Review/);
+    assert.match(words, /\*Current content\*/);
+    assert.doesNotMatch(words, /Issue/);
   });
 
-  it("says so when the block's current text was not captured at staging", async () => {
-    const words = lines(await draftFor(await harness({ before: {} }))).join("\n");
-    assert.match(words, /current text wasn't captured/);
-    assert.match(words, new RegExp(`input: Text = ${WILL_SAY}`));
+  it("reads a property change in the same three parts", async () => {
+    const words = lines(await draftFor(await harness({ issue: WHY }))).join("\n");
+    assert.match(words, /\*Design Status\*\n\*Current content:\* In Progress\n\*New content:\* In Review/);
   });
 
-  it("opens with nothing read from Notion: Before comes off the staged card", async () => {
+  it("puts the Issue between a property's current and new value on a card that changes only a property", async () => {
+    const words = lines(
+      await draftFor(
+        await harness({
+          input: { page_url: PAGE, properties: { "Design Status": "In Review" } },
+          before: { "0.properties.Design Status": "In Progress" },
+          issue: "Decided in a Figma comment: the flow is ready for review",
+        }),
+      ),
+    ).join("\n");
+    assert.match(words, /\*Design Status\*\n\*Current content:\* In Progress\n\*Issue:\* Decided in a Figma comment: the flow is ready for review\n\*New content:\* In Review/);
+  });
+
+  it("says so under Current content when the block's text was not captured at staging", async () => {
+    const all = lines(await draftFor(await harness({ before: {} })));
+    const current = all.findIndex((l) => l === "section: *Current content*");
+    assert.ok(current >= 0, all.join("\n"));
+    assert.match(all[current + 1]!, /current text wasn't captured when the change was staged/);
+    assert.ok(all.includes(`input: New content = ${WILL_SAY}`), all.join("\n"));
+  });
+
+  it("opens with nothing read from Notion: Current content comes off the staged card", async () => {
     const h = await harness();
     await draftFor(h);
     // Open, then one update: no options read, nothing fetched in between.
     assert.deepEqual(h.views.calls.map((c) => c.kind), ["open", "update"]);
   });
 
-  it("shows a non-confirmer Before and After as text, with nothing to edit", async () => {
-    const view = await draftFor(await harness({ confirmers: ["U07CONFIRM"] }));
+  it("shows a non-confirmer all three parts as text, with nothing to edit", async () => {
+    const view = await draftFor(await harness({ confirmers: ["U07CONFIRM"], issue: WHY }));
     const words = lines(view).join("\n");
-    assert.match(words, new RegExp(NOW_SAYS));
-    assert.match(words, new RegExp(WILL_SAY));
+    assert.match(words, new RegExp(`Current content[\\s\\S]*${NOW_SAYS}[\\s\\S]*Issue[\\s\\S]*New content[\\s\\S]*${WILL_SAY}`));
     assert.equal(view.blocks.filter((b) => b.type === "input").length, 0);
   });
 });
 
 describe("the proposed text is edited in the pop-up itself", () => {
-  it("is a prefilled field in the draft, with no Edit fields to press", async () => {
+  it("is a prefilled, required field in the draft, with no Edit fields to press", async () => {
     const view = await draftFor(await harness());
     const field = view.blocks.find((b) => b.block_id === REPLACEMENT_BLOCK)!;
     assert.equal(field.element?.type, "plain_text_input");
     assert.equal(field.element?.multiline, true);
     assert.equal(field.element?.initial_value, WILL_SAY);
-    // Optional to Slack, so Reject and Needs changes are never blocked by it.
-    assert.equal(field.optional, true);
+    // Required, so Slack draws no "(optional)": clearing it never writes nothing.
+    assert.equal(field.optional, false);
+    assert.equal(field.label?.text, "New content");
     assert.doesNotMatch(JSON.stringify(view), /uno_review_edit"/);
   });
 
@@ -218,7 +244,7 @@ describe("text too long for a pop-up field", () => {
   });
 });
 
-describe("a card of several changes shows Before for each", () => {
+describe("a card of several changes shows Current content for each", () => {
   const PAGE_TWO = "https://www.notion.so/Owners-fedcba9876543210fedcba9876543210";
   const op = (page: string, status: string, block: string, content: string) => ({
     toolName: "notion_update",
@@ -241,7 +267,7 @@ describe("a card of several changes shows Before for each", () => {
     return all.slice(start, end < 0 ? undefined : end).join("\n");
   }
 
-  it("shows each operation's own Before above its After, where staging captured it", async () => {
+  it("shows each operation's own Current content above its New content, where staging captured it", async () => {
     const all = lines(
       await draftFor(
         await harness({
@@ -257,14 +283,14 @@ describe("a card of several changes shows Before for each", () => {
     );
     const first = operation(all, 1);
     const second = operation(all, 2);
-    assert.match(first, /\*Design Status:\* In Progress → In Review/);
-    assert.match(first, new RegExp(`Before[\\s\\S]*${NOW_SAYS}[\\s\\S]*input: After = ${WILL_SAY}`));
-    assert.match(second, /\*Design Status:\* In Review → Done/);
-    assert.match(second, /Before[\s\S]*Owner: Ade\.[\s\S]*input: After = Owner: Bea\./);
+    assert.match(first, /\*Design Status\*\n\*Current content:\* In Progress\n\*New content:\* In Review/);
+    assert.match(first, new RegExp(`Current content\\*[\\s\\S]*${NOW_SAYS}[\\s\\S]*input: New content = ${WILL_SAY}`));
+    assert.match(second, /\*Design Status\*\n\*Current content:\* In Review\n\*New content:\* Done/);
+    assert.match(second, /Current content\*[\s\S]*Owner: Ade\.[\s\S]*input: New content = Owner: Bea\./);
     assert.doesNotMatch(first + second, /wasn't captured|not captured/);
   });
 
-  it("says Before was not captured for an operation staging could not read", async () => {
+  it("says Current content was not captured for an operation staging could not read", async () => {
     const all = lines(
       await draftFor(
         await harness({
@@ -276,7 +302,7 @@ describe("a card of several changes shows Before for each", () => {
     const third = operation(all, 3);
     // Neither its block nor its property reads like something new.
     assert.match(third, /current text wasn't captured/);
-    assert.match(third, /\*Design Status:\* Shipped _\(before not captured\)_/);
-    assert.match(operation(all, 1), /\*Design Status:\* In Review _\(before not captured\)_/);
+    assert.match(third, /\*Design Status\*\n\*Current content:\* _wasn't captured when the change was staged_\n\*New content:\* Shipped/);
+    assert.match(operation(all, 1), /\*Design Status\*\n\*Current content:\* _wasn't captured when the change was staged_\n\*New content:\* In Review/);
   });
 });

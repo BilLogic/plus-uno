@@ -41,6 +41,7 @@ import type { PendingProposal } from "../thread-state/index";
 import { renderProposalCard } from "../slack/proposal-render";
 import { MAX_REPORT_ITEMS, decisionReport, itemProposal, markNotStaged, reportRecord } from "../slack/decision-cards";
 import { textSections } from "../slack/render";
+import { escapeSlackText } from "../slack/mrkdwn";
 import type { SweepRunOutcome } from "../sweep/store";
 import { readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sweep/run";
 import { decisionCard, decisionCardWords, decisionItem, decisionParent, decisionParentWaiting, noPrdNote, rewordInstead } from "./copy";
@@ -288,6 +289,7 @@ export function stagedDecision(
     confirmers: [...thread.confirmers],
     stated: decisionCardWords(),
     refuseRevision: rewordInstead(n),
-    ...(d.before ? { before: d.before } : {}),
+    // Review's Issue, beside what the change replaces.
+    ...(d.before ? { before: d.before, issue: `Decided in a Figma comment: ${escapeSlackText(d.decision)}` } : {}),
   };
 }

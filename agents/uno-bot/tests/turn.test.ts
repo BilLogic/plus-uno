@@ -1379,6 +1379,7 @@ async function sweepReportThread(replies: NonNullable<Parameters<typeof harness>
       ttlMs: 72 * 60 * 60 * 1000,
       confirmers: ["U0OWNER"],
       sweepRun: "2026-09-30",
+      issue: `This thread said “line ${f.block} changed”`,
     };
     await h.threadState.putProposal(fix);
     fixes.push(fix);
@@ -1431,6 +1432,7 @@ test("Needs changes on a sweep fix rewords its own line in place: same card, new
   const revised = outcome.staged!.proposal;
   assert.deepEqual(revised.item, { messageTs: REPORT_TS, id: "blk-2~1" });
   assert.equal(revised.sweepRun, "2026-09-30", "its outcome is still recorded on the sweep's items");
+  assert.equal(revised.issue, "This thread said “line blk-2 changed”", "a reworded fix keeps the reason it was proposed for");
   assert.deepEqual(revised.operations, [{ toolName: "notion_update", input: reworded(1, "Line 2, reworded") }]);
   assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0, "no card of its own");
   assert.deepEqual(edits, [REPORT_TS], "the report's message is redrawn");
