@@ -71,6 +71,10 @@ async function main() {
     process.exit(0);
   }
 
+  // No session id, no gate: the briefing is scoped to the session that wrote
+  // it, and a shared fallback id is how unrelated sessions met on one gate.
+  if (!input.session_id) process.exit(0);
+
   // Only AskUserQuestion carries gate answers; ignore every other tool.
   if (!/^askuserquestion$/i.test(String(input.tool_name || ''))) process.exit(0);
 
@@ -78,7 +82,7 @@ async function main() {
   if (!answer) process.exit(0);
 
   const output = handleGateAnswer({
-    conversation_id: input.session_id || 'default',
+    conversation_id: input.session_id,
     answer,
     workspace_roots: input.cwd ? [input.cwd] : [],
   });

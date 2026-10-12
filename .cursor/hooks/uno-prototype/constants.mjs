@@ -11,6 +11,14 @@ export const GLOBAL_COMMANDS = {
   restart: /^(restart|start over)$/i,
 };
 
+/**
+ * How long a written briefing keeps binding its session. Every step rewrites
+ * the briefing, so this is the longest pause between two answers; past it the
+ * gate releases, and a fresh prototype request re-enters at reflection step 1
+ * with the cached PRD.
+ */
+export const INTAKE_TTL_MS = 2 * 60 * 60 * 1000;
+
 /** User phrases that exit the workflow without invoking uno-prototype. */
 export const BYPASS_PATTERNS = [
   /#skip-prd-gate/i,
