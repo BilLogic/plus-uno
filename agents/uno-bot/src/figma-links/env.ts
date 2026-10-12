@@ -7,7 +7,8 @@
 //   • Figma: the one client (`figmaClientFor`), paced and backing off on 429;
 //   • Slack: where the Figma Review cards post (`figmaReviewChannel`) — Bill's
 //     DM while the Figma flows are in testing; its members decide;
-//   • KV: the cards still open, so a later run never offers one twice, and
+//   • KV: the cards posted and the message each is in, so a later run never
+//     offers one twice while it is undecided (`./run.ts` reads its report), and
 //     merged library PRs waiting for their card (`./queue.ts`), queued by the
 //     library tracker (`figma-library/env.ts`, through `prQueueFor`);
 //   • the meter: a run stages its one card only when its D1 and subrequest
@@ -34,6 +35,7 @@ import { PR_QUEUE_KV_KEY, runQueuedPrLinks, type QueuedPrLinks } from "./queue";
 import {
   runDevLinksPost,
   runDevLinksWriteJob,
+  type CardedMark,
   type DevLinkRegistry,
   type DevLinksDeps,
   type DevLinksRequest,
@@ -41,7 +43,7 @@ import {
   type DevLinksWriteJob,
 } from "./run";
 
-/** The cards still open, by card id: when each closes. */
+/** The cards posted, by card id: when each closes, and its message. */
 const CARDED_KV_KEY = "figma-links:carded";
 
 /** Where merged library PRs wait for their card. */
@@ -86,7 +88,7 @@ function devLinksDepsFor(env: Env): DevLinksDeps | { refused: string } {
         stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
       ]);
     },
-    carded: kvJson<Record<string, number> | null>(env, CARDED_KV_KEY, null),
+    carded: kvJson<Record<string, CardedMark> | null>(env, CARDED_KV_KEY, null),
     headroom: budgetHeadroom,
     channel,
     now: () => Date.now(),
