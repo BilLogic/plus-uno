@@ -288,7 +288,7 @@ Every Figma message passes these eight:
 4. ✅ and ⛔ each say what they do, in one footer.
 5. No decorative emoji: 🎉 appears only on a ship, and 🐐 only in the label.
 6. The words match the table above.
-7. Anything written into Figma leads with `🐐 le goat (uno-bot) · AI-generated`.
+7. Anything written into Figma leads with `🐐` on a line of its own.
 8. Under 1,500 characters; a longer list goes in the thread. One exception carries its list as a result table in one message: the library publish post, whose decision card has a table of every changed component under it, so its thread gets the list only when the table could not post.
 
 **At the gate,** the library card and the drift card answer in their own words, because the gate's shared lines assume a card someone asked for. A ⛔ closes the drift card with what it did ("No intake filed") and who decided. The library card is decided in its Review pop-up: Reject files nothing, its card reads "Rejected by" whoever decided, and its thread is told "Rejected, nothing filed." A ✅ or ⛔ after the window is told the card closed and what happens next. A replaced card, or a reaction beside one, points at the card itself, with no ⚠️ to name. Each card's lines sit beside its copy (`PendingProposal.stated`), and the same test holds them to this section.

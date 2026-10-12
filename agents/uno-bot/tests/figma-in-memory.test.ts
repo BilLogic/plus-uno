@@ -113,14 +113,14 @@ describe("the shared fake Figma", () => {
 describe("comments in the fake", () => {
   it("posts as the token's owner, pinned where asked, and replies to a root", async () => {
     const figma = seeded();
-    const root = await figma.postComment(KEY, "🐐 le goat (uno-bot) · AI-generated", { node_id: FRAME, node_offset: { x: 0, y: 0 } });
+    const root = await figma.postComment(KEY, "🐐", { node_id: FRAME, node_offset: { x: 0, y: 0 } });
     assert.deepEqual(root.user, ME);
     assert.equal(root.client_meta?.node_id, FRAME);
     assert.equal(root.created_at, new Date(NOW).toISOString());
     const reply = await figma.replyToComment(KEY, root.id, "on it");
     assert.equal(reply.parent_id, root.id);
     assert.equal(reply.client_meta, null, "a reply inherits its root's pin");
-    assert.deepEqual((await figma.comments(KEY)).comments.map((c) => c.message), ["🐐 le goat (uno-bot) · AI-generated", "on it"]);
+    assert.deepEqual((await figma.comments(KEY)).comments.map((c) => c.message), ["🐐", "on it"]);
   });
 
   it("refuses a reply to a reply, as Figma does, and a reply to nothing", async () => {
