@@ -14,7 +14,9 @@ function stripQuoted(text) {
     .replace(/"[^"\n]*"|\u201c[^\u201d\n]*\u201d/g, ' ');
 }
 
-// Explicit invocation: the slash command, the skill path AGENTS.md routes by
+// Explicit invocation: the slash command (typed, or in the
+// `<command-name>/uno-prototype</command-name>` tag Claude Code may wrap it in,
+// hence `>` before the slash), the skill path AGENTS.md routes by
 // (with or without `@`, but not a file inside the skill's folder), a leading
 // "uno-prototype:" label, or "use/run/invoke the uno-prototype skill". Prose
 // about the skill ("the uno-prototype gate") is none of these.
@@ -63,13 +65,24 @@ export function hasPrototypeIntent(prompt) {
   return hasBuildIntent(lower);
 }
 
-// Messages the runtime injects into the prompt stream rather than the person
-// typing them: a block opening with a hyphenated tag (`<task-notification>`,
-// `<system-reminder>`, `<ci-monitor-event>`, a cross-session message), or a
-// bracketed relay header such as `[Artifact comment sent to Claude]`. The
-// `<command-*>` tags are the exception — they wrap a slash command the person
-// typed.
-const MACHINE_TURN = /^\s*(<(?!command-)[a-z]+(-[a-z]+)+[\s>/]|\[[^\]\n]*\bsent to claude\])/i;
+// The known envelopes a runtime injects into the prompt stream: task and
+// subagent hand-backs, system and CI notices, cross-session messages, relayed
+// artifact comments and hook feedback. A hand-back can open with a line of
+// prose before its envelope, so each is matched at the start of any of the
+// first few lines. An envelope missing from this list falls through as a
+// person turn — the list grows when a new one is seen in the wild.
+const INJECTED_ENVELOPES = [
+  /^<task-notification>/,
+  /^<system-reminder>/,
+  /^<agent-message[\s>]/,
+  /^<cross-session-message[\s>]/,
+  /^<ci-monitor-event>/,
+  /^Another Claude session sent a message/,
+  /^\[SYSTEM NOTIFICATION/,
+  /^\[Artifact comment sent to Claude\]/,
+  /^Stop hook feedback:/,
+];
+const ENVELOPE_LINES = 3;
 
 /**
  * Whether the prompt is the person's own chat turn. Only those may start the
@@ -79,7 +92,8 @@ const MACHINE_TURN = /^\s*(<(?!command-)[a-z]+(-[a-z]+)+[\s>/]|\[[^\]\n]*\bsent 
  * @returns {boolean}
  */
 export function isPersonTurn(prompt) {
-  return !MACHINE_TURN.test(prompt);
+  const lines = prompt.trimStart().split('\n', ENVELOPE_LINES).map((line) => line.trimStart());
+  return !lines.some((line) => INJECTED_ENVELOPES.some((envelope) => envelope.test(line)));
 }
 
 /**

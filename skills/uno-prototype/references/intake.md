@@ -19,8 +19,8 @@ brief → build.
 
 | Situation | How to tell | What to do |
 |---|---|---|
-| Hook-gated (Cursor · Claude Code · Codex) | `.cursor/hooks/briefings/active-intake-question.json` exists, its `conversationId` matches this session | Render the file's **current** step (`stateId`/`type`), per the rules below |
-| Stale hook file | `conversationId` mismatch, or `updatedAt` more than four hours old | Ignore the file; take the manual path |
+| Hook-gated (Cursor · Claude Code · Codex) | This turn's hook context points you at `.cursor/hooks/briefings/active-intake-question.json` | Render the file's **current** step (`stateId`/`type`), per the rules below |
+| Leftover hook file | The file exists, but this turn's hook context does not point at it — it is another session's, or more than four hours old | Leave the file be; take the manual path |
 | Gate off | `.cursor/settings.json` → `"uno": { "prdGate": false }` | Skip the interview; PRD gate still applies as an ordinary rule (method §0) |
 | Manual (no adapter, hook failed) | No JSON appears, but there is a person to answer | Run the SAME eight steps yourself, in order, tracking your own position — the hook automates this procedure, it does not own it |
 | Non-interactive (headless, CI, cron, scripted driver) | No turn exists in which anyone could answer | Same eight steps, answered from the PRD, declared as assumptions on an **ASSUMED** brief card — see § When no answer can come back at all |
@@ -164,4 +164,4 @@ A failed review or an iteration by choice re-enters at the reflection
 
 ## One step per turn
 
-When `.cursor/hooks/briefings/active-intake-question.json` binds this session (§ Which mode am I in?), read it and ask exactly that one hook step — AskQuestion with `questions.length === 1`, or one plain question. One step per turn, even when context already answers a later one: the interview's value is the order, and each step is weighed in its own turn. The hook starts and advances only on the person's own chat turns; subagent hand-backs, `<task-notification>` blocks and relayed messages pass through it untouched.
+When this turn's hook context points at `.cursor/hooks/briefings/active-intake-question.json`, read it and ask exactly that one hook step — AskQuestion with `questions.length === 1`, or one plain question. One step per turn, even when context already answers a later one: the interview's value is the order, and each step is weighed in its own turn. The hook starts and advances only on the person's own chat turns; subagent hand-backs, `<task-notification>` blocks and relayed messages pass through it untouched.

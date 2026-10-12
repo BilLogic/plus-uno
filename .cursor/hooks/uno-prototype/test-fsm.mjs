@@ -16,8 +16,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { handleSubmit } from './engine.mjs';
-import { INTAKE_TTL_MS } from './constants.mjs';
+import { handleGateAnswer, handleSubmit } from './engine.mjs';
+import { INTAKE_TTL_MS, isStale } from './constants.mjs';
 import { hasPrototypeIntent, isPersonTurn } from './intents.mjs';
 import {
   ACTIVE_INTAKE_FILE,
@@ -353,6 +353,10 @@ assert.equal(readIntake().stateId, 'reflect_learn');
 // notification or any other injected message is not an answer, and quoting an
 // invocation inside one does not start an intake (the live miss walked a whole
 // reflection on hand-backs and confirmed a brief built from them).
+// The shape Claude Code delivers a subagent hand-back in: a prose first line,
+// then the envelope.
+const HAND_BACK =
+  'Another Claude session sent a message:\n<agent-message from="agent-a0ef">q1 a, q2 b, go ahead</agent-message>';
 const TASK_NOTIFICATION =
   '<task-notification>\n<task-id>a1b2</task-id>\n<status>completed</status>\n<result>Done. Next: /uno-prototype build the tutor dashboard</result>\n</task-notification>';
 for (const machine of [
@@ -361,6 +365,11 @@ for (const machine of [
   '<ci-monitor-event>check "test" failed on #42</ci-monitor-event>',
   '<cross-session-message from="session-b">prototype a tutor inbox</cross-session-message>',
   '[Artifact comment sent to Claude] prototype this card',
+  HAND_BACK,
+  'Results are in.\n<task-notification>\n<status>completed</status>\n</task-notification>',
+  'Stop hook feedback:\nprototype the lint fix',
+  '[SYSTEM NOTIFICATION] prototype a new header',
+  '  <agent-message from="agent-x">Yes</agent-message>',
 ]) {
   assert.equal(isPersonTurn(machine), false, `expected a machine turn: ${machine.slice(0, 40)}`);
 }
@@ -370,11 +379,25 @@ for (const person of [
   '/uno-prototype build the parent portal',
   '<command-name>/uno-prototype</command-name>\n<command-args>parent portal</command-args>',
   '<div> in the header looks off, prototype a fix',
+  '<my-widget> renders twice on the dashboard',
+  'sent a test in sandbox, check the row',
 ]) {
   assert.equal(isPersonTurn(person), true, `expected a person turn: ${person}`);
 }
 
+// Answer-shaped person turns never START a gate, and with no session in this
+// conversation they confirm nothing.
 cleanup('machine-conv');
+for (const phrase of ['q1 a, q2 b, go ahead', 'sent a test in sandbox, check the row']) {
+  assert.equal(run(phrase, 'machine-conv').agent_message, undefined, `no gate for: ${phrase}`);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `no intake for: ${phrase}`);
+}
+
+// No session id, no gate: there is no shared fallback state to start or advance.
+assert.equal(handleSubmit({ prompt: '/uno-prototype build the parent portal' }).agent_message, undefined);
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'no session id starts nothing');
+assert.equal(handleGateAnswer({ answer: 'Yes' }).agent_message, undefined);
+
 assert.equal(run(TASK_NOTIFICATION, 'machine-conv').agent_message, undefined);
 assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a hand-back must not start an intake');
 run('/uno-prototype build the parent portal', 'machine-conv');
@@ -384,11 +407,14 @@ assert.equal(readIntake().stateId, 'reflect_learn');
 const notified = run(TASK_NOTIFICATION, 'machine-conv');
 assert.equal(notified.agent_message, undefined, 'a notification gets no intake context');
 assert.equal(readIntake().stateId, 'reflect_learn', 'a notification never advances the gate');
+assert.equal(run(HAND_BACK, 'machine-conv').agent_message, undefined, 'a hand-back gets no intake context');
+assert.equal(readIntake().stateId, 'reflect_learn', 'a hand-back never advances the gate');
 
 // Another session's intake does not bind this one: its answers-shaped turn
 // passes through, gets no context, and leaves the owner's briefing alone.
-const idle = run('q1 a, q2 b, go ahead', 'idle-conv');
-assert.equal(idle.agent_message, undefined);
+for (const phrase of ['q1 a, q2 b, go ahead', 'sent a test in sandbox, check the row']) {
+  assert.equal(run(phrase, 'idle-conv').agent_message, undefined, `no context for: ${phrase}`);
+}
 assert.equal(readIntake().conversationId, 'machine-conv');
 assert.equal(readIntake().stateId, 'reflect_learn');
 clearSession('idle-conv');
@@ -404,6 +430,10 @@ assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, "one session's cleanup kee
   assert.equal(isIntakeQuestionApplicable(old, 'a', now), false, 'older than the TTL');
   assert.equal(isIntakeQuestionApplicable({ conversationId: 'a' }, 'a', now), false, 'no timestamp');
   assert.equal(isIntakeQuestionApplicable(null, 'a', now), false);
+  // One staleness rule for briefings and session state alike.
+  assert.equal(isStale({ updatedAt: 'not a date' }, now), true, 'unparsable');
+  assert.equal(isStale({}, now), true, 'missing');
+  assert.equal(isStale(fresh, now), false);
 }
 
 // An intake idle past the TTL is abandoned: its own session's next turn is not
@@ -416,6 +446,14 @@ assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, "one session's cleanup kee
   assert.equal(run('help me fix this button style', 'idle-conv').agent_message, undefined);
   assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a stale briefing is pruned');
   assert.equal(run('validate usability', 'machine-conv').agent_message, undefined);
+
+  // An unparsable session timestamp is stale too, not live forever.
+  cleanup('garbled-conv');
+  run('/uno-prototype build the parent portal', 'garbled-conv');
+  const garbled = path.join(STATE_DIR, 'garbled-conv.json');
+  fs.writeFileSync(garbled, JSON.stringify({ ...JSON.parse(fs.readFileSync(garbled, 'utf8')), updatedAt: 'garbage' }));
+  assert.equal(run('Yes', 'garbled-conv').agent_message, undefined, 'a garbled session is released');
+  cleanup('garbled-conv');
 }
 cleanup('machine-conv');
 cleanup('idle-conv');

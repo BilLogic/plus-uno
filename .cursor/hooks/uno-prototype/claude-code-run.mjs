@@ -46,7 +46,7 @@ async function main() {
 
   const output = handleSubmit({
     prompt: input.prompt || '',
-    conversation_id: input.session_id || 'default',
+    conversation_id: input.session_id,
     workspace_roots: input.cwd ? [input.cwd] : [],
     attachments: [],
   });

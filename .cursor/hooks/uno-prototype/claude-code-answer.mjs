@@ -78,7 +78,7 @@ async function main() {
   if (!answer) process.exit(0);
 
   const output = handleGateAnswer({
-    conversation_id: input.session_id || 'default',
+    conversation_id: input.session_id,
     answer,
     workspace_roots: input.cwd ? [input.cwd] : [],
   });

@@ -33,6 +33,18 @@ export const BYPASS_PATTERNS = [
  */
 export const INTAKE_TTL_MS = 4 * 60 * 60 * 1000;
 
+/**
+ * The one staleness rule for session state and the briefing alike: a record
+ * whose `updatedAt` is missing or unparsable cannot show it is fresh, so it
+ * counts as stale.
+ * @param {{ updatedAt?: string } | null | undefined} record
+ * @param {number} [now]
+ */
+export function isStale(record, now = Date.now()) {
+  const updatedAt = Date.parse(record?.updatedAt ?? '');
+  return !Number.isFinite(updatedAt) || now - updatedAt > INTAKE_TTL_MS;
+}
+
 /** First intake step — a single choice question when prototype intent is detected. */
 export const PRD_CHECK_QUESTION = 'Do you have a PRD?';
 

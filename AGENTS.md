@@ -98,7 +98,7 @@ Each rule is one line here and its body lives in the document it names; the lead
 11. **Generated files** (`no-hand-edited-generated-files`) are regenerated from their source, and `npm run check:harness` says which one is stale: `docs/engineering/setup.md` § The harness gate.
 12. **Storybook** (`Storybook-validation`) validates a component behaviour change — the story and its tests, not just the build: `docs/connectors/storybook-mcp.md`.
 13. **Large or risky edits** get the plan and the touched files confirmed first.
-14. **Intake** runs one step per message when the briefing file binds this session: `skills/uno-prototype/references/intake.md` § One step per turn.
+14. **Intake** runs one step per message when the hook points at the briefing file: `skills/uno-prototype/references/intake.md` § One step per turn.
 15. **Figma write-back** goes through the DS gate: `design-system/guidelines/figma/component-alignment.md` § Write-back gate.
 <!-- /ide-only -->
 

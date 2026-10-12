@@ -9,7 +9,9 @@ import { getState, STATES } from './states.mjs';
 import {
   buildAgentIntakeInstruction,
   clearIntakeQuestion,
+  isIntakeQuestionApplicable,
   pruneStaleIntakeQuestion,
+  readIntakeQuestion,
   writeIntakeQuestion,
 } from './intake-question.mjs';
 import {
@@ -28,7 +30,7 @@ import { isNoPrdAnswer, looksLikePrdContent, parseChoice } from './validators.mj
 /**
  * @typedef {object} HookInput
  * @property {string} [prompt]
- * @property {string} [conversation_id]
+ * @property {string} [conversation_id] required — without it the gate passes through
  * @property {Array<{ type?: string; file_path?: string }>} [attachments]
  * @property {string[]} [workspace_roots]
  */
@@ -47,6 +49,19 @@ function result(continueSubmit, userMessage, agentMessage) {
     return out;
   }
   return { continue: false, user_message: userMessage };
+}
+
+/**
+ * Send an instruction that points the agent at the briefing — only while the
+ * briefing on disk is this conversation's own and fresh. The file is one fixed
+ * path, so another session can overwrite it between this write and the
+ * agent's read; then the agent gets no pointer at someone else's interview.
+ * @param {string} conversationId
+ * @param {string} message
+ */
+function intakeResult(conversationId, message) {
+  if (!isIntakeQuestionApplicable(readIntakeQuestion(), conversationId)) return result(true);
+  return result(true, undefined, message);
 }
 
 /**
@@ -152,11 +167,13 @@ function buildHandoffMessage(context = {}) {
  */
 export function handleSubmit(input) {
   const prompt = (input.prompt || '').trim();
-  const conversationId = input.conversation_id || 'default';
+  const conversationId = input.conversation_id;
   const attachments = input.attachments || [];
   const repoRoot = resolveRepoRoot(input.workspace_roots);
 
-  if (!prompt) return result(true);
+  // No session id, no gate: a shared fallback id would let every session
+  // start and answer the same intake.
+  if (!prompt || !conversationId) return result(true);
 
   if (!isPrdGateEnabled(repoRoot)) return result(true);
 
@@ -226,11 +243,13 @@ export function handleSubmit(input) {
  */
 export function handleGateAnswer(input) {
   const answer = (input.answer || '').trim();
-  const conversationId = input.conversation_id || 'default';
+  const conversationId = input.conversation_id;
   const repoRoot = resolveRepoRoot(input.workspace_roots);
 
-  if (!answer) return result(true);
+  if (!answer || !conversationId) return result(true);
   if (!isPrdGateEnabled(repoRoot)) return result(true);
+
+  pruneStaleIntakeQuestion();
 
   const session = loadSession(conversationId);
   if (session?.status !== 'active') return result(true);
@@ -329,9 +348,8 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
       } else {
         writeIntakeQuestion(conversationId, session, state);
         saveSession(conversationId, session);
-        return result(
-          true,
-          undefined,
+        return intakeResult(
+          conversationId,
           `Invalid choice for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
         );
       }
@@ -343,9 +361,8 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
   if (state.validate && !state.validate(answer, session.context, attachments)) {
     writeIntakeQuestion(conversationId, session, state);
     saveSession(conversationId, session);
-    return result(
-      true,
-      undefined,
+    return intakeResult(
+      conversationId,
       `Input validation failed for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
     );
   }
@@ -416,7 +433,7 @@ function presentState(conversationId, session) {
   }
 
   writeIntakeQuestion(conversationId, session, state);
-  return result(true, undefined, buildAgentIntakeInstruction(state));
+  return intakeResult(conversationId, buildAgentIntakeInstruction(state));
 }
 
 export { STATES };

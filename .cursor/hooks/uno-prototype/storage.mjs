@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { INTAKE_TTL_MS } from './constants.mjs';
+import { isStale } from './constants.mjs';
 import { clearIntakeQuestion } from './intake-question.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,7 +68,7 @@ export function loadSession(conversationId) {
   try {
     const session = JSON.parse(fs.readFileSync(file, 'utf8'));
     if (session?.conversationId && session.conversationId !== conversationId) return null;
-    if (!session?.updatedAt || Date.now() - Date.parse(session.updatedAt) > INTAKE_TTL_MS) {
+    if (isStale(session)) {
       clearSession(conversationId); // stale — release the gate rather than eat a prompt
       return null;
     }

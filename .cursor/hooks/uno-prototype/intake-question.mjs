@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FLOW_MAP, INTAKE_TTL_MS } from './constants.mjs';
+import { FLOW_MAP, isStale } from './constants.mjs';
 import { resolveQuestion } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -82,13 +82,7 @@ export function isIntakeQuestionApplicable(briefing, conversationId, now = Date.
   return Boolean(briefing) && briefing.conversationId === conversationId && !isStale(briefing, now);
 }
 
-/** Without a timestamp a briefing cannot show it is fresh, so it counts as stale. */
-function isStale(briefing, now) {
-  const writtenAt = Date.parse(briefing?.updatedAt ?? '');
-  return !Number.isFinite(writtenAt) || now - writtenAt > INTAKE_TTL_MS;
-}
-
-function readIntakeQuestion() {
+export function readIntakeQuestion() {
   try {
     return JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'));
   } catch {
@@ -108,7 +102,7 @@ export function clearIntakeQuestion(conversationId) {
   if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return;
   if (conversationId) {
     const briefing = readIntakeQuestion();
-    if (briefing && !isStale(briefing, Date.now()) && briefing.conversationId !== conversationId) {
+    if (briefing && !isStale(briefing) && briefing.conversationId !== conversationId) {
       return; // another conversation's live question
     }
   }
