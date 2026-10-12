@@ -42,7 +42,7 @@ import { resolveSignal } from "../src/gate/index";
 import { renderGateNote } from "../src/slack/gate-note";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
-import { notified } from "./helpers/notified";
+import { mentionCount, notified } from "./helpers/notified";
 import { at, DESIGN, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
 
 type Card = {
@@ -286,6 +286,7 @@ describe("a Figma drift at the morning run", () => {
       "the parent line, opened on the file's owner",
     );
     assert.deepEqual(notified(card!), ["U0BEA"], "the owner is pinged from the main text");
+    assert.equal(mentionCount(card!, "U0BEA"), 1, "once");
     const [one] = cardsOf(card!.blocks);
     assert.equal(cardsOf(card!.blocks).length, 1, "one card for the one file");
     assert.equal(one!.title!.text, "Session Recap");
