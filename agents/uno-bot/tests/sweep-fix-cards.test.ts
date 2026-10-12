@@ -19,7 +19,7 @@ import type { GateVerdict } from "../src/gate/index";
 import { recordingDelivery } from "../src/turn/index";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
-import { notified } from "./helpers/notified";
+import { mentionCount, notified } from "./helpers/notified";
 import { recordingViews } from "./helpers/recording-slack";
 import { at, DESIGN, drift, msg, notionPage, reply, sweepHarness, ts } from "./helpers/sweep-harness";
 
@@ -86,6 +86,7 @@ test("three fixes post as a parent line and three cards in a carousel, each with
   assert.equal(blocks[0]!.type, "section");
   assert.equal(String(blocks[0]!.text.text), "*Reflection PRD* still states 3 things its thread changed.\n• <@U0ADE> — Reflection PRD\n• <@U0BEA> — Reflection PRD", "one bullet per owner, each page once");
   assert.deepEqual(notified(post), ["U0ADE", "U0BEA"], "each owner pinged from the main text");
+  for (const owner of ["U0ADE", "U0BEA"]) assert.equal(mentionCount(post, owner), 1, "once per owner");
 
   const carousel = blocks[1]!;
   assert.equal(carousel.type, "carousel");
@@ -189,8 +190,10 @@ test("where Slack refuses cards, the report posts as sections that each keep the
   fixes.forEach((b, i) => {
     assert.equal(b.type, "section");
     assert.equal(b.accessory.action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);
-    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\n<@U0[A-Z]+> · from this thread\\n`));
+    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\nfrom this thread\\n`), "the opener's bullet says whose it is");
   });
+  assert.deepEqual(notified(post), ["U0ADE", "U0BEA"]);
+  for (const owner of ["U0ADE", "U0BEA"]) assert.equal(mentionCount(post, owner), 1, "each owner mentioned once in the sections that notify");
 });
 
 test("a decision on a report that posted plain redraws it plain", async () => {
