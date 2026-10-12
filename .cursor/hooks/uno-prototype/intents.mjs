@@ -66,16 +66,17 @@ export function hasPrototypeIntent(prompt) {
 }
 
 // The known envelopes a runtime injects into the prompt stream: task and
-// subagent hand-backs, system and CI notices, cross-session messages, relayed
-// artifact comments and hook feedback. A hand-back can open with a line of
-// prose before its envelope, so each is matched at the start of any of the
-// first few lines. An envelope missing from this list falls through as a
-// person turn — the list grows when a new one is seen in the wild.
+// subagent hand-backs, system and CI notices, cross-session and teammate
+// messages, relayed artifact comments and hook feedback. A hand-back can open
+// with a line of prose before its envelope, so each is matched at the start of
+// any of the first few lines. An envelope missing from this list falls through
+// as a person turn — the list grows when a new one is seen in the wild.
 const INJECTED_ENVELOPES = [
   /^<task-notification>/,
   /^<system-reminder>/,
   /^<agent-message[\s>]/,
   /^<cross-session-message[\s>]/,
+  /^<teammate-message[\s>]/,
   /^<ci-monitor-event>/,
   /^Another Claude session sent a message/,
   /^\[SYSTEM NOTIFICATION/,
@@ -85,15 +86,14 @@ const INJECTED_ENVELOPES = [
 const ENVELOPE_LINES = 3;
 
 /**
- * Whether the prompt is the person's own chat turn. Only those may start the
- * gate or answer a step; a subagent hand-back, a task notification or a relayed
- * comment is never an answer, even when it quotes one.
+ * True when the prompt is a machine-written turn — never the person's answer,
+ * even when it quotes one. Only the person's own turns start or answer the gate.
  * @param {string} prompt
  * @returns {boolean}
  */
-export function isPersonTurn(prompt) {
+export function isMachineTurn(prompt) {
   const lines = prompt.trimStart().split('\n', ENVELOPE_LINES).map((line) => line.trimStart());
-  return !lines.some((line) => INJECTED_ENVELOPES.some((envelope) => envelope.test(line)));
+  return lines.some((line) => INJECTED_ENVELOPES.some((envelope) => envelope.test(line)));
 }
 
 /**

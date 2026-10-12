@@ -3,15 +3,14 @@ import {
   hasPrototypeIntent,
   hasNewPrdIntent,
   isBypassRequest,
-  isPersonTurn,
+  isMachineTurn,
 } from './intents.mjs';
 import { getState, STATES } from './states.mjs';
 import {
   buildAgentIntakeInstruction,
   clearIntakeQuestion,
-  isIntakeQuestionApplicable,
   pruneStaleIntakeQuestion,
-  readIntakeQuestion,
+  readActiveIntake,
   writeIntakeQuestion,
 } from './intake-question.mjs';
 import {
@@ -53,14 +52,14 @@ function result(continueSubmit, userMessage, agentMessage) {
 
 /**
  * Send an instruction that points the agent at the briefing — only while the
- * briefing on disk is this conversation's own and fresh. The file is one fixed
- * path, so another session can overwrite it between this write and the
- * agent's read; then the agent gets no pointer at someone else's interview.
+ * briefing on disk binds this conversation. The file is one fixed path, so
+ * another session can overwrite it between this write and the agent's read;
+ * then the agent gets no pointer at someone else's interview.
  * @param {string} conversationId
  * @param {string} message
  */
 function intakeResult(conversationId, message) {
-  if (!isIntakeQuestionApplicable(readIntakeQuestion(), conversationId)) return result(true);
+  if (!readActiveIntake(conversationId)) return result(true);
   return result(true, undefined, message);
 }
 
@@ -162,6 +161,18 @@ function buildHandoffMessage(context = {}) {
 }
 
 /**
+ * This conversation's session, but only while the active briefing on disk is
+ * its own. A session whose briefing another session has since replaced (or
+ * that has none) is not mid-intake, so no turn is read as its answer.
+ * @param {string} conversationId
+ */
+function loadBoundSession(conversationId) {
+  const session = loadSession(conversationId);
+  if (session?.status !== 'active') return session;
+  return readActiveIntake(conversationId) ? session : null;
+}
+
+/**
  * @param {HookInput} input
  * @returns {{ continue: boolean; user_message?: string }}
  */
@@ -174,14 +185,11 @@ export function handleSubmit(input) {
   // No session id, no gate: a shared fallback id would let every session
   // start and answer the same intake.
   if (!prompt || !conversationId) return result(true);
+  if (isMachineTurn(prompt)) return result(true);
 
   if (!isPrdGateEnabled(repoRoot)) return result(true);
 
   pruneStaleIntakeQuestion();
-
-  // Only the person's own turn may start the gate or answer a step. Injected
-  // messages pass through untouched, with no intake context attached.
-  if (!isPersonTurn(prompt)) return result(true);
 
   if (isBypassRequest(prompt)) {
     clearSession(conversationId);
@@ -191,7 +199,7 @@ export function handleSubmit(input) {
   }
 
   const cachedPrd = loadPrdCache(conversationId);
-  const session = loadSession(conversationId);
+  const session = loadBoundSession(conversationId);
 
   // An override that pre-empts even an active session (mid-reflection, "actually
   // let's use a different PRD" should restart rather than be read as a reflection
@@ -251,7 +259,7 @@ export function handleGateAnswer(input) {
 
   pruneStaleIntakeQuestion();
 
-  const session = loadSession(conversationId);
+  const session = loadBoundSession(conversationId);
   if (session?.status !== 'active') return result(true);
 
   return handleActiveSession(conversationId, session, answer, []);

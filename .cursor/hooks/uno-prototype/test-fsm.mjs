@@ -13,19 +13,20 @@
  * options; the FSM guarantees the sequence is asked, in order, never skipped.
  */
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleGateAnswer, handleSubmit } from './engine.mjs';
-import { INTAKE_TTL_MS, isStale } from './constants.mjs';
-import { hasPrototypeIntent, isPersonTurn } from './intents.mjs';
+import { hasPrototypeIntent, isMachineTurn } from './intents.mjs';
 import {
   ACTIVE_INTAKE_FILE,
   buildAgentIntakeInstruction,
   isIntakeQuestionApplicable,
 } from './intake-question.mjs';
-import { clearSession } from './storage.mjs';
+import { INTAKE_TTL_MS, isStale } from './constants.mjs';
 import { STATES } from './states.mjs';
+import { clearSession } from './storage.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = path.join(__dirname, '..', 'state');
@@ -349,6 +350,168 @@ const emptyReflect = run('   ', 'yes-conv');
 assert.equal(emptyReflect.continue, true);
 assert.equal(readIntake().stateId, 'reflect_learn');
 
+cleanup();
+cleanup('nl-conv');
+cleanup('handoff-conv');
+cleanup('noprd-conv');
+cleanup('yes-conv');
+cleanup('terminate-proto-conv');
+cleanup('quit-conv');
+
+console.log('All uno-prototype FSM smoke tests passed.');
+
+// ---------------------------------------------------------------------------
+// Portability: no injected instruction may name a runtime-specific tool.
+// The intake used to ship "AskQuestion with questions.length === 1" — Claude
+// Code's API shape — to every model, leaving runtimes without that tool no
+// good option. The contract is one-question-per-message; the rendering is the
+// runtime's business.
+// ---------------------------------------------------------------------------
+{
+  const TOOL_NAMES = /AskQuestion|AskUserQuestion|questions\.length|questions array/i;
+  for (const [id, state] of Object.entries(STATES)) {
+    const text = buildAgentIntakeInstruction(state);
+    assert.ok(
+      !TOOL_NAMES.test(text),
+      `injected instruction for "${id}" names a runtime-specific tool — state the contract instead`,
+    );
+  }
+}
+
+console.log('Portability guard passed — no runtime tool names in injected instructions.');
+
+// ---------------------------------------------------------------------------
+// Only the person's own chat turns reach the gate. UserPromptSubmit also fires
+// for machine-written turns — a background agent's <task-notification>, a
+// <system-reminder>, a message relayed from another session — and the hook
+// once walked a whole reflection on those, then "confirmed" a brief built
+// from them. Such a turn neither starts the gate nor answers a step.
+// ---------------------------------------------------------------------------
+const PRD_TEXT = 'PRD: Student Dashboard\nAcceptance criteria: join in one click\nUser flows: view sessions';
+
+/** Walk a conversation from its first prompt to reflection step 1. */
+function startReflection(conversationId) {
+  cleanup(conversationId);
+  run('prototype this student dashboard', conversationId);
+  run('Yes', conversationId);
+  run(PRD_TEXT, conversationId);
+  assert.equal(readIntake().stateId, 'reflect_learn');
+}
+
+{
+  const MACHINE_TURNS = [
+    '<task-notification>\n<task-id>a1</task-id>\n<status>completed</status>\n<result>prototype this student dashboard next</result>\n</task-notification>',
+    '<system-reminder>prototype a tutor inbox</system-reminder>',
+    '<cross-session-message from="other">make a hi-fi prototype of the parent portal</cross-session-message>',
+    '<teammate-message teammate_id="impl">build a prototype for the onboarding flow</teammate-message>',
+  ];
+
+  for (const turn of MACHINE_TURNS) {
+    cleanup('machine-start');
+    const out = run(turn, 'machine-start');
+    assert.equal(out.agent_message, undefined, `a machine turn started the gate: ${turn.slice(0, 40)}`);
+    assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false);
+  }
+  cleanup('machine-start');
+
+  startReflection('machine-advance');
+  for (const turn of MACHINE_TURNS) {
+    const out = run(turn, 'machine-advance');
+    assert.equal(out.agent_message, undefined, `a machine turn answered a step: ${turn.slice(0, 40)}`);
+    assert.equal(readIntake().stateId, 'reflect_learn');
+  }
+  // The person's own answer still advances.
+  run('validate usability', 'machine-advance');
+  assert.equal(readIntake().stateId, 'reflect_artifact_open');
+  cleanup('machine-advance');
+}
+
+console.log('Machine-turn guard passed — only human turns start or answer the gate.');
+
+// ---------------------------------------------------------------------------
+// A briefing binds only the session that wrote it. The briefing is one fixed
+// path shared by every session in the checkout, so a session whose own state
+// says "mid-intake" must still find ITS briefing on disk before a turn is read
+// as an answer — otherwise it advances, and overwrites, another session's gate.
+// ---------------------------------------------------------------------------
+{
+  startReflection('scope-b');
+  cleanup('scope-a');
+  run('prototype a tutor inbox', 'scope-a');
+  const owned = readIntake();
+  assert.equal(owned.conversationId, 'scope-a');
+  assert.equal(owned.stateId, 'prd_check');
+
+  const elsewhere = run('validate usability', 'scope-b');
+  assert.equal(elsewhere.agent_message, undefined, 'a session advanced on a briefing it does not own');
+  assert.deepEqual(readIntake(), owned, "another session's briefing was overwritten");
+
+  // Ending the other session leaves this one's briefing in place.
+  clearSession('scope-b');
+  assert.deepEqual(readIntake(), owned, "ending one session deleted another session's briefing");
+
+  cleanup('scope-a');
+  cleanup('scope-b');
+}
+
+// The Claude Code adapters bind nothing without a session id: there is no
+// session to scope the briefing to, and a shared "default" id is how unrelated
+// sessions used to land on one gate.
+{
+  const adapter = path.join(__dirname, 'claude-code-run.mjs');
+  cleanup('default');
+  const noId = spawnSync(process.execPath, [adapter], {
+    input: JSON.stringify({ prompt: 'prototype this student dashboard', cwd: path.join(__dirname, '..', '..', '..') }),
+    encoding: 'utf8',
+  });
+  assert.equal(noId.status, 0);
+  assert.equal(noId.stdout.trim(), '', 'the adapter opened a gate with no session id');
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false);
+  cleanup('default');
+}
+
+console.log('Session-scope guard passed — a briefing binds only the session that wrote it.');
+
+// ---------------------------------------------------------------------------
+// A stale briefing never binds. A briefing left behind — the session crashed,
+// the worktree was recycled, the designer walked away — must not read the
+// next prompt as an answer, even in the session that wrote it.
+// ---------------------------------------------------------------------------
+{
+  const backdate = (mutate) => {
+    const payload = readIntake();
+    mutate(payload);
+    fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify(payload, null, 2));
+  };
+
+  startReflection('ttl-conv');
+  backdate((p) => {
+    p.writtenAt = new Date(Date.now() - INTAKE_TTL_MS - 60_000).toISOString();
+  });
+  const stale = run('validate usability', 'ttl-conv');
+  assert.equal(stale.agent_message, undefined, 'a stale briefing read a prompt as an answer');
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a stale briefing was left in place');
+
+  // A briefing with no timestamp predates the TTL and is stale too.
+  startReflection('ttl-conv');
+  backdate((p) => {
+    delete p.writtenAt;
+  });
+  assert.equal(run('validate usability', 'ttl-conv').agent_message, undefined);
+
+  // A fresh one still binds.
+  startReflection('ttl-conv');
+  assert.match(run('validate usability', 'ttl-conv').agent_message || '', /reflection step 2/i);
+  cleanup('ttl-conv');
+}
+
+console.log('TTL guard passed — a stale briefing never binds.');
+
+// ---------------------------------------------------------------------------
+// Injected envelopes, session binding and the TTL, case by case: the real
+// hand-back shape, answer-shaped person turns, a missing session id, and one
+// staleness rule for session state and briefing alike.
+// ---------------------------------------------------------------------------
 // Only the person's own turns reach the gate. A subagent hand-back, a task
 // notification or any other injected message is not an answer, and quoting an
 // invocation inside one does not start an intake (the live miss walked a whole
@@ -371,7 +534,7 @@ for (const machine of [
   '[SYSTEM NOTIFICATION] prototype a new header',
   '  <agent-message from="agent-x">Yes</agent-message>',
 ]) {
-  assert.equal(isPersonTurn(machine), false, `expected a machine turn: ${machine.slice(0, 40)}`);
+  assert.equal(isMachineTurn(machine), true, `expected a machine turn: ${machine.slice(0, 40)}`);
 }
 for (const person of [
   'q1 a, q2 b, go ahead',
@@ -382,7 +545,7 @@ for (const person of [
   '<my-widget> renders twice on the dashboard',
   'sent a test in sandbox, check the row',
 ]) {
-  assert.equal(isPersonTurn(person), true, `expected a person turn: ${person}`);
+  assert.equal(isMachineTurn(person), false, `expected a person turn: ${person}`);
 }
 
 // Answer-shaped person turns never START a gate, and with no session in this
@@ -423,17 +586,17 @@ assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, "one session's cleanup kee
 // The briefing binds only its own session, and only while fresh.
 {
   const now = Date.parse('2026-10-12T12:00:00Z');
-  const fresh = { conversationId: 'a', updatedAt: new Date(now - 60_000).toISOString() };
-  const old = { conversationId: 'a', updatedAt: new Date(now - INTAKE_TTL_MS - 1).toISOString() };
+  const fresh = { conversationId: 'a', writtenAt: new Date(now - 60_000).toISOString() };
+  const old = { conversationId: 'a', writtenAt: new Date(now - INTAKE_TTL_MS - 1).toISOString() };
   assert.equal(isIntakeQuestionApplicable(fresh, 'a', now), true);
   assert.equal(isIntakeQuestionApplicable(fresh, 'b', now), false, 'another session');
   assert.equal(isIntakeQuestionApplicable(old, 'a', now), false, 'older than the TTL');
   assert.equal(isIntakeQuestionApplicable({ conversationId: 'a' }, 'a', now), false, 'no timestamp');
   assert.equal(isIntakeQuestionApplicable(null, 'a', now), false);
   // One staleness rule for briefings and session state alike.
-  assert.equal(isStale({ updatedAt: 'not a date' }, now), true, 'unparsable');
-  assert.equal(isStale({}, now), true, 'missing');
-  assert.equal(isStale(fresh, now), false);
+  assert.equal(isStale('not a date', now), true, 'unparsable');
+  assert.equal(isStale(undefined, now), true, 'missing');
+  assert.equal(isStale(fresh.writtenAt, now), false);
 }
 
 // An intake idle past the TTL is abandoned: its own session's next turn is not
@@ -442,7 +605,7 @@ assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, "one session's cleanup kee
   const stale = new Date(Date.now() - INTAKE_TTL_MS - 60_000).toISOString();
   const stateFile = path.join(STATE_DIR, 'machine-conv.json');
   fs.writeFileSync(stateFile, JSON.stringify({ ...JSON.parse(fs.readFileSync(stateFile, 'utf8')), updatedAt: stale }));
-  fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify({ ...readIntake(), updatedAt: stale }));
+  fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify({ ...readIntake(), writtenAt: stale }));
   assert.equal(run('help me fix this button style', 'idle-conv').agent_message, undefined);
   assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a stale briefing is pruned');
   assert.equal(run('validate usability', 'machine-conv').agent_message, undefined);
@@ -458,32 +621,4 @@ assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, "one session's cleanup kee
 cleanup('machine-conv');
 cleanup('idle-conv');
 
-cleanup();
-cleanup('nl-conv');
-cleanup('handoff-conv');
-cleanup('noprd-conv');
-cleanup('yes-conv');
-cleanup('terminate-proto-conv');
-cleanup('quit-conv');
-
-console.log('All uno-prototype FSM smoke tests passed.');
-
-// ---------------------------------------------------------------------------
-// Portability: no injected instruction may name a runtime-specific tool.
-// The intake used to ship "AskQuestion with questions.length === 1" — Claude
-// Code's API shape — to every model, leaving runtimes without that tool no
-// good option. The contract is one-question-per-message; the rendering is the
-// runtime's business.
-// ---------------------------------------------------------------------------
-{
-  const TOOL_NAMES = /AskQuestion|AskUserQuestion|questions\.length|questions array/i;
-  for (const [id, state] of Object.entries(STATES)) {
-    const text = buildAgentIntakeInstruction(state);
-    assert.ok(
-      !TOOL_NAMES.test(text),
-      `injected instruction for "${id}" names a runtime-specific tool — state the contract instead`,
-    );
-  }
-}
-
-console.log('Portability guard passed — no runtime tool names in injected instructions.');
+console.log('Envelope and binding cases passed.');

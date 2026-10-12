@@ -68,7 +68,7 @@ export function loadSession(conversationId) {
   try {
     const session = JSON.parse(fs.readFileSync(file, 'utf8'));
     if (session?.conversationId && session.conversationId !== conversationId) return null;
-    if (isStale(session)) {
+    if (isStale(session?.updatedAt)) {
       clearSession(conversationId); // stale — release the gate rather than eat a prompt
       return null;
     }
@@ -95,7 +95,7 @@ export function saveSession(conversationId, session) {
 export function clearSession(conversationId) {
   const file = statePath(conversationId);
   if (fs.existsSync(file)) fs.unlinkSync(file);
-  clearIntakeQuestion(conversationId);
+  clearIntakeQuestion(conversationId); // never another session's briefing
 }
 
 /**
