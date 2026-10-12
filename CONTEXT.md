@@ -41,9 +41,9 @@ Use these terms consistently across all design system work, prototypes, and docu
 | Term | Meaning |
 |------|---------|
 | **Context Level** | Atomic hierarchy: Element → Card → Section → Page |
-| **Spec** | Full page composition (e.g., `specs/Home/Pages/`) |
-| **Prompt-spec** | The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0): the deliverable of the low/mid-fi lane, not the artifact the tool returns. Distinct from **Spec** and from the **PRD** it is written from | bare "spec" |
-| **Component docs page** | The tabbed page a human reads for one component. Distinct from **Page** (a Context Level), from **Spec**, and from a page story | bare "docs page" |
+| **Spec** | Full page composition |
+| **Prompt-spec** | The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0): the deliverable of the low/mid-fi lane, not the artifact the tool returns. Distinct from **Spec** and from the **PRD** it is written from. Avoid bare "spec" |
+| **Component docs page** | The tabbed page a human reads for one component. Distinct from **Page** (a Context Level), from **Spec**, and from a page story. Avoid bare "docs page" |
 | **Token** | Design value: color, spacing, typography, elevation, radius |
 | **Foundation** | Fundamental design primitive (color palette, type scale, grid) |
 
@@ -67,12 +67,12 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **check registry** | the one list of the repo's checks: each row says what a check runs and where it runs, and every place that runs checks is held to agree with it | "the check list", "COMPOSED" |
 | **persona** | uno-bot's own always-loaded document: voice, audience, gate and etiquette, beside what every embodiment obeys | "system prompt", "soul" |
 | **pointer** | a line held in context that names material outside it and when to reach it — a skill description, a progressive-loading row. Its wording, not its target, decides whether the agent gets there | "link", "reference" (a reference is what a pointer points AT) |
-| **ladder** / **disclosed** | where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires | "hidden", "optional" |
+| **ladder** / **disclosed** | where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires | "hidden" or "optional" for disclosed |
 | **leading word** | a compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers | — |
 | **sprawl** | a document too long even when every line is live — attention thins across it; the cure is the ladder, not a shorter sentence | "bloat" (bloat is dead weight; sprawl is live weight) |
 | **ThreadState** | uno-bot's memory of one thread, behind one typed interface: its history, the pending proposal, the assistant context, the cancel flag, the events already handled and the run lease | "the DO", "thread-state client" |
 | **ModelProvider** | the seam between uno-bot's one agent loop and a model: one adapter per model, each answering a turn or a one-shot prompt on a named tier | "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row) |
-| **tool table** | the one typed row per uno-bot tool saying what the tool is: its **access** (`ungated` · `gated` · `worker` · `control`, a dispatch distinction, not read/write) and how it is shown to people | "the tool registry", "the tool list" |
+| **tool table** | the one typed row per uno-bot tool: its **access**, which says whether a call runs at once, waits for approval on a proposal card, or settles a card already standing (a dispatch distinction, not read/write), plus what the rest of the bot reads off it: the words on its task or proposal card, whether an answer can cite it, and what review a run asks for | "the tool registry", "the tool list" |
 | **Turn** | one uno-bot turn: one request in (who, where, the text, the images, the pending proposal), one outcome out (what was posted, what is staged, what the conversation remembers). What a person sees while it runs goes through its **Delivery** port | "the handler", "the message pipeline" |
 | **Gate** | the one place a staged proposal is resolved: any of five approval signals in, one verdict out (won, stale or none), and only a won verdict runs the tool | "the confirmation gate", "the ✅ handler" |
 | **proposal card** | the ⚠️ card holding a side-effect tool call until someone approves it — what **Gate**'s signals resolve; short in the thread, decided in its Review pop-up | "confirmation dialog", "prompt" |

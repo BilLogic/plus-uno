@@ -264,6 +264,8 @@ function parentLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entr
 
 /** A user mention, as mrkdwn writes it. */
 const USER_MENTION = /<@[A-Z0-9]+>/g;
+/** The run of mentions a subtitle leads with, and the `·` after it. */
+const OPENING_MENTIONS = new RegExp(`^(?:${USER_MENTION.source}\\s*)+(?:·\\s*)?`);
 
 /** Characters of an item's title on its owner's bullet. */
 const BULLET_TITLE_CHARS = 60;
@@ -348,7 +350,7 @@ export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
     if (b.type === "section") for (const m of String(b.text?.text ?? "").matchAll(USER_MENTION)) opener.add(m[0]);
   }
   const untagged = (subtitle: string) => {
-    const lead = /^(?:<@[A-Z0-9]+>\s*)+(?:·\s*)?/.exec(subtitle)?.[0];
+    const lead = OPENING_MENTIONS.exec(subtitle)?.[0];
     if (!lead) return subtitle;
     const kept = [...lead.matchAll(USER_MENTION)].map((m) => m[0]).filter((m) => !opener.has(m));
     return [kept.join(" "), subtitle.slice(lead.length)].filter(Boolean).join(" · ");
