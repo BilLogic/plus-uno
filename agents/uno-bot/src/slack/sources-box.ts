@@ -161,8 +161,10 @@ const LIST_ITEM = /^\s*(?:[-*•]|\d+[.)])\s+/;
 /**
  * The prose without the source list it carries inline — a `Sources:` line,
  * or a `Sources:` heading and the list under it — for an answer whose Sources
- * box lists them. Each source shows once, in the box (live 2026-10-11: a
- * revised draft ended in its own `Sources:` line above the box). A sentence
+ * box lists them, or whose turn read no source at all. Each source shows once,
+ * in the box (live 2026-10-11: a revised draft ended in its own `Sources:` line
+ * above the box); and a turn with no lookup has none, so a list there is an
+ * earlier turn's links (live on r569). A sentence
  * that only mentions sources is prose and stays.
  *
  * @param prose - The answer as the model wrote it

@@ -502,3 +502,23 @@ test("without a box the inline Sources line stays: it is then the answer's only 
   assert.equal(box, undefined);
   assert.match(JSON.stringify(last.blockList), /Sources: \[Page 1\]/);
 });
+
+test("a turn with no lookup lists no sources: an inline Sources line goes, and the prose keeps its links", async () => {
+  // Live on r569 (2026-10-11): a recap answered from an earlier answer ended in
+  // a `Sources:` line linking cells read on an earlier turn. A source is a link
+  // a lookup of the same turn returned, so a turn with none has none to list.
+  const earlier = "https://www.notion.so/page-1";
+  const prose =
+    `**From my earlier answer, not a fresh look.** [Page 1](${earlier}) covers onboarding.\n\n` +
+    `Sources: [Page 1](${earlier}) · [Page 2](https://www.notion.so/page-2)`;
+  const presentation = await turn([], prose);
+  assert.equal(presentation?.sources, undefined, "no lookup ran, so the turn read no source");
+
+  const { box, last, result } = await post(presentation, {}, prose);
+
+  assert.equal(box, undefined);
+  const markdown = JSON.stringify(last.blockList?.find((b) => (b as Block).type === "markdown"));
+  assert.doesNotMatch(markdown, /Sources:/);
+  assert.match(markdown, /\[Page 1\]\(https:\/\/www\.notion\.so\/page-1\) covers onboarding/);
+  assert.doesNotMatch(result.text, /Sources:|page-2/);
+});
