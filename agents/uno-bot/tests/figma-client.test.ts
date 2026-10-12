@@ -146,6 +146,11 @@ const SHAPES: Shape[] = [
     send: { method: "POST", url: `${API}/v1/dev_resources`, body: { dev_resources: [LINK] } },
   },
   {
+    method: "updateDevResources",
+    call: (f) => f.updateDevResources([{ id: "dev 1", name: "Code (plus-uno): Button", url: LINK.url }]),
+    send: { method: "PUT", url: `${API}/v1/dev_resources`, body: { dev_resources: [{ id: "dev 1", name: "Code (plus-uno): Button", url: LINK.url }] } },
+  },
+  {
     method: "removeDevResource",
     call: (f) => f.removeDevResource(KEY, "dev 1"),
     send: { method: "DELETE", url: `${API}/v1/files/${KEY}/dev_resources/dev%201` },

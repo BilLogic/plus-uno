@@ -68,6 +68,7 @@ import {
   type FigmaCommentsResponse,
   type FigmaComponentsResponse,
   type FigmaDevResourcesCreated,
+  type FigmaDevResourcesUpdated,
   type FigmaDevResourcesResponse,
   type FigmaFileMetaResponse,
   type FigmaFileResponse,
@@ -130,7 +131,7 @@ interface FigmaRequest {
   /** How errors name it: `Figma <what> <status>`. */
   what: string;
   tier: FigmaTier;
-  method: "GET" | "POST" | "DELETE";
+  method: "GET" | "POST" | "PUT" | "DELETE";
   /** From the API root, query included and already encoded. */
   path: string;
   body?: unknown;
@@ -306,6 +307,11 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
     addDevResources: (links, opts) =>
       call<FigmaDevResourcesCreated>(
         { what: "dev resource add", tier: 2, method: "POST", path: "/v1/dev_resources", body: { dev_resources: links } },
+        opts,
+      ),
+    updateDevResources: (links, opts) =>
+      call<FigmaDevResourcesUpdated>(
+        { what: "dev resource update", tier: 2, method: "PUT", path: "/v1/dev_resources", body: { dev_resources: links } },
         opts,
       ),
     removeDevResource: (key, devResourceId, opts) =>

@@ -5,6 +5,7 @@
 // importers (index.ts, agent-runner.ts).
 
 import type { FigmaEventJob } from "../figma-notify/event";
+import type { DevLinksWriteJob } from "../figma-links/run";
 
 /** Slack file attachment metadata as delivered on message/app_mention events.
  *  Only the fields the vision path reads — everything else is ignored. */
@@ -192,4 +193,6 @@ export type RunnerJobPayload =
   | { kind: "cut-off"; proposalTs: string }
   | { kind: "report-expiry"; messageTs: string }
   /** A Figma notification, kept as ids and times (`figma-notify/event.ts`). */
-  | { kind: "figma-event"; event: FigmaEventJob };
+  | { kind: "figma-event"; event: FigmaEventJob }
+  /** The rest of an approved Dev Mode links write (`figma-links/run.ts`). */
+  | DevLinksWriteJob;

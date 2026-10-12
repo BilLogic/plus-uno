@@ -193,6 +193,15 @@ export interface FigmaDevResourcesCreated {
   errors: { file_key?: string | null; node_id?: string | null; error: string }[];
 }
 
+/** One link's new name and URL, by id: what PUT /v1/dev_resources takes. */
+export type FigmaDevResourceUpdate = Pick<FigmaDevResource, "id" | "name" | "url">;
+
+/** PUT /v1/dev_resources: the ids Figma updated, and one error per id it would not. */
+export interface FigmaDevResourcesUpdated {
+  links_updated: string[];
+  errors: { id?: string | null; error: string }[];
+}
+
 export type FigmaWebhookEvent =
   | "PING"
   | "FILE_UPDATE"
@@ -290,6 +299,8 @@ export interface FigmaClient {
   devResources(fileKey: string, nodeIds?: readonly string[], opts?: FigmaCallOptions): Promise<FigmaDevResourcesResponse>;
   /** Add Dev Mode links. A partial refusal is a 200 carrying `errors`. Tier 2. */
   addDevResources(links: readonly FigmaNewDevResource[], opts?: FigmaCallOptions): Promise<FigmaDevResourcesCreated>;
+  /** Rename Dev Mode links in place, by id. A partial refusal is a 200 carrying `errors`. Tier 2. */
+  updateDevResources(links: readonly FigmaDevResourceUpdate[], opts?: FigmaCallOptions): Promise<FigmaDevResourcesUpdated>;
   /** Remove one Dev Mode link. Tier 2. */
   removeDevResource(fileKey: string, devResourceId: string, opts?: FigmaCallOptions): Promise<void>;
   /** A team's notification subscriptions. Tier 2. */
