@@ -72,11 +72,15 @@ import { askLeadText, figmaReplyText, type FigmaReply } from "../src/figma-ask/c
 import { FIGMA_LABEL } from "../src/figma-ask/trigger";
 import {
   DEV_LINKS_REVISION_REFUSAL,
-  devLinksBatchLine,
   devLinksCard,
+  devLinksCarryOn,
   devLinksComment,
+  devLinksFinished,
+  devLinksGaveUp,
   devLinksItem,
+  devLinksNotCarried,
   devLinksParent,
+  devLinksStopped,
   type DevLinksSubject,
   type DevLinksWrite,
 } from "../src/figma-links/copy";
@@ -924,18 +928,35 @@ describe("Dev Mode links (#904)", () => {
   const button: DevLinksSubject = { kind: "component", component: "Button", figmaUrl: "https://www.figma.com/design/L?node-id=33-2470", storybook: "https://sb/button" };
   const pr: DevLinksSubject = { kind: "pr", number: 1200, url: "https://github.com/o/r/pull/1200", components: ["Button", "Card"] };
   const links = (name: string) => [
-    { file_key: "L", node_id: "33:2470", name: `Code: ${name}`, url: "https://gh/code" },
-    { file_key: "L", node_id: "979:1", name: `Code: ${name}`, url: "https://gh/code" },
+    { file_key: "L", node_id: "33:2470", name: `Code (plus-uno): ${name}`, url: "https://gh/code" },
+    { file_key: "L", node_id: "979:1", name: `Code (plus-uno): ${name}`, url: "https://gh/code" },
   ];
   const first = { links: links("Button"), introduce: [{ file_key: "L", node_id: "33:2470", component: "Button" }] };
+  const batch: DevLinksSubject = {
+    kind: "batch",
+    figmaUrl: "https://www.figma.com/design/L?node-id=25-568",
+    components: [
+      { component: "Badge", adds: [{ name: "Code (plus-uno): Badge", url: "https://gh/badge" }, { name: "Storybook: Badge", url: "https://sb/badge" }], renamed: false },
+      { component: "Button", adds: [], renamed: true },
+    ],
+  };
 
   it("the parent lines, the cards and what Review shows hold to the checklist", () => {
-    passesChecklist(devLinksParent([button], 1));
-    passesChecklist(devLinksParent([button, button, button], 2));
-    passesChecklist(devLinksParent([pr], 1));
-    passesChecklist(devLinksBatchLine(11, 20, 68));
+    passesChecklist(devLinksParent(button));
+    passesChecklist(devLinksParent(batch));
+    passesChecklist(devLinksParent(pr));
+    for (const line of [
+      devLinksCarryOn(12, 2),
+      devLinksNotCarried("the runner refused it (500)"),
+      devLinksFinished({ links: 198, components: 67, comments: 66 }),
+      devLinksFinished({ links: 198, components: 67, comments: 66 }, "1 link(s) held back"),
+      devLinksGaveUp(),
+      devLinksStopped("Figma 403"),
+    ]) passesChecklist(line);
     const cases: Array<[DevLinksSubject, DevLinksWrite]> = [
       [button, first],
+      [button, { links: links("Button"), introduce: [], renames: 2 }],
+      [batch, { links: [...links("Badge"), ...links("Button")], introduce: [{ file_key: "L", node_id: "25:568", component: "Badge" }], renames: 2 }],
       [pr, { links: links("Button"), introduce: [] }],
     ];
     for (const [subject, write] of cases) {
@@ -945,7 +966,10 @@ describe("Dev Mode links (#904)", () => {
     }
     passesChecklist(DEV_LINKS_REVISION_REFUSAL);
     assert.equal(devLinksItem(button, first).body, "Adds 2 links in Dev Mode to 2 library components, and one comment on the first saying what they are.");
-    assert.equal(devLinksParent([button], 1), "Dev Mode links for Button are ready for Review.");
+    assert.equal(devLinksParent(button), "Dev Mode links for Button are ready for Review.");
+    const item = devLinksItem(batch, cases[2]![1]);
+    assert.ok(item.title.length <= 150 && item.body.length <= 200, item.body);
+    assert.equal(item.body, "Adds 2 links and renames 2 in Dev Mode on 2 library components, and one comment on each new component's first saying what they are.");
   });
 
   it("the one comment written into Figma leads with the label, the one emoji", () => {

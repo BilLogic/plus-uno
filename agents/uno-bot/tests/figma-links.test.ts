@@ -16,13 +16,15 @@ import type { FigmaDevResource } from "../src/figma/client";
 import {
   runDevLinksPost,
   writeDevLinks,
+  approveDevLinks,
+  runDevLinksWriteJob,
+  type DevLinksWriteJob,
   type DevLinkRegistry,
   type DevLinksDeps,
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
 import { figmaDevLinksProbe } from "../src/diagnostics/probes/figma";
 import type { Env } from "../src/types";
-import { D1QueryBudgetError, D1_QUERY_CAP } from "../src/net";
 import { FIGMA_LABEL } from "../src/figma-ask/trigger";
 import { itemProposal } from "../src/slack/decision-cards";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
@@ -83,7 +85,6 @@ function world(opts: { figma?: InMemoryFigma; members?: string[] | null } = {}) 
   const store = createInMemoryThreadState({ now: () => NOW });
   const posts: Posted[] = [];
   const staged: PendingProposal[] = [];
-  const marked: string[] = [];
   const carded: { value: Record<string, number> | null } = { value: null };
   let n = 0;
   const deps: DevLinksDeps = {
@@ -91,8 +92,8 @@ function world(opts: { figma?: InMemoryFigma; members?: string[] | null } = {}) 
     figma,
     repo: REPO,
     members: async () => (opts.members === undefined ? [BILL] : opts.members),
-    post: async (message, threadTs) => {
-      posts.push({ ...message, ...(threadTs ? { threadTs } : {}) });
+    post: async (message) => {
+      posts.push({ ...message });
       n += 1;
       return { ok: true, ts: `1760360400.00000${n}` };
     },
@@ -102,12 +103,11 @@ function world(opts: { figma?: InMemoryFigma; members?: string[] | null } = {}) 
       staged.push(proposal);
       await store.putProposal(proposal);
     },
-    markThread: async (ts) => void marked.push(ts),
     carded: { read: async () => carded.value, write: async (v) => void (carded.value = v) },
     channel: CHANNEL,
     now: () => NOW,
   };
-  return { deps, figma, store, posts, staged, marked, carded };
+  return { deps, figma, store, posts, staged, carded };
 }
 
 /** A Figma with the two files seeded, and these links already on them. */
@@ -138,9 +138,9 @@ describe("a run for one component", () => {
     assert.equal(w.staged[0]!.channel, CHANNEL);
     assert.deepEqual(w.staged[0]!.confirmers, [BILL]);
     assert.deepEqual(linksOf(w.staged[0]!), [
-      { file_key: LIB, node_id: "33:2470", name: "Code: Button", url: BUTTON_CODE },
+      { file_key: LIB, node_id: "33:2470", name: "Code (plus-uno): Button", url: BUTTON_CODE },
       { file_key: LIB, node_id: "33:2470", name: "Storybook: Button", url: BUTTON_STORYBOOK },
-      { file_key: LIB, node_id: "979:20977", name: "Code: Button", url: BUTTON_CODE },
+      { file_key: LIB, node_id: "979:20977", name: "Code (plus-uno): Button", url: BUTTON_CODE },
       { file_key: LIB, node_id: "979:20977", name: "Storybook: Button", url: BUTTON_STORYBOOK },
     ]);
     assert.deepEqual(w.figma.writes(), [], "posting the card writes nothing to Figma");
@@ -152,9 +152,9 @@ const link = (node: string, name: string, url: string, file = LIB, id = `${node}
 describe("a re-run", () => {
   it("adds no duplicate: a component whose links are all there gets no card", async () => {
     const figma = seeded([
-      link("33:2470", "Code: Button", BUTTON_CODE),
+      link("33:2470", "Code (plus-uno): Button", BUTTON_CODE),
       link("33:2470", "Storybook: Button", BUTTON_STORYBOOK),
-      link("979:20977", "Code: Button", BUTTON_CODE),
+      link("979:20977", "Code (plus-uno): Button", BUTTON_CODE),
       link("979:20977", "Storybook: Button", BUTTON_STORYBOOK),
     ]);
     const w = world({ figma });
@@ -165,11 +165,11 @@ describe("a re-run", () => {
   });
 
   it("offers only what is missing, and no comment once the component has had its links", async () => {
-    const w = world({ figma: seeded([link("33:2470", "Code: Button", BUTTON_CODE), link("979:20977", "Old name", BUTTON_STORYBOOK)]) });
+    const w = world({ figma: seeded([link("33:2470", "Code (plus-uno): Button", BUTTON_CODE), link("979:20977", "Old name", BUTTON_STORYBOOK)]) });
     await runDevLinksPost(w.deps, { components: ["Button"] });
     assert.deepEqual(linksOf(w.staged[0]!), [
       { file_key: LIB, node_id: "33:2470", name: "Storybook: Button", url: BUTTON_STORYBOOK },
-      { file_key: LIB, node_id: "979:20977", name: "Code: Button", url: BUTTON_CODE },
+      { file_key: LIB, node_id: "979:20977", name: "Code (plus-uno): Button", url: BUTTON_CODE },
     ]);
     assert.deepEqual((w.staged[0]!.operations![0]!.input as { introduce: unknown[] }).introduce, []);
   });
@@ -183,6 +183,54 @@ describe("a re-run", () => {
   });
 });
 
+describe("the Code link's new name", () => {
+  const OLD = [
+    link("33:2470", "Code: Button", BUTTON_CODE, LIB, "old-1"),
+    link("33:2470", "Storybook: Button", BUTTON_STORYBOOK, LIB, "sb-1"),
+    link("979:20977", "Code: Button", BUTTON_CODE, LIB, "old-2"),
+    link("979:20977", "Storybook: Button", BUTTON_STORYBOOK, LIB, "sb-2"),
+  ];
+
+  it("a Code link uno-bot added under the old name gets a card that renames it, and no comment", async () => {
+    const w = world({ figma: seeded(OLD) });
+    const result = await runDevLinksPost(w.deps, { components: ["Button"] });
+    assert.equal(result.cards, 1, result.summary);
+    assert.deepEqual(linksOf(w.staged[0]!), [
+      { file_key: LIB, node_id: "33:2470", name: "Code (plus-uno): Button", url: BUTTON_CODE },
+      { file_key: LIB, node_id: "979:20977", name: "Code (plus-uno): Button", url: BUTTON_CODE },
+    ]);
+    assert.deepEqual((w.staged[0]!.operations![0]!.input as { introduce: unknown[] }).introduce, []);
+    const [c] = cardsIn(w.posts[0]!.blocks!);
+    assert.equal(c!.body.text, "Renames 2 links in Dev Mode on 2 library components.");
+  });
+
+  it("Approve renames the link in place — same link, same URL, new name — rather than adding a second", async () => {
+    const figma = seeded(OLD);
+    const w = world({ figma });
+    await runDevLinksPost(w.deps, { components: ["Button"] });
+    const result = JSON.parse(await writeDevLinks(figma, w.staged[0]!.operations![0]!.input)) as Record<string, unknown>;
+    assert.deepEqual(result, { ok: true, added: 0, renamed: 2, already: 0, commented: [] });
+    assert.deepEqual(
+      (await figma.devResources(LIB)).dev_resources.map((r) => [r.id, r.name]),
+      [
+        ["old-1", "Code (plus-uno): Button"],
+        ["sb-1", "Storybook: Button"],
+        ["old-2", "Code (plus-uno): Button"],
+        ["sb-2", "Storybook: Button"],
+      ],
+    );
+    assert.deepEqual((await figma.comments(LIB)).comments, []);
+    const after = await runDevLinksPost(world({ figma }).deps, { components: ["Button"] });
+    assert.match(after.summary, /already linked: Button/);
+  });
+
+  it("a link someone else named, on the same URL, is left as it is", async () => {
+    const w = world({ figma: seeded([link("33:2470", "Source", BUTTON_CODE), link("33:2470", "Storybook: Button", BUTTON_STORYBOOK), link("979:20977", "Source", BUTTON_CODE), link("979:20977", "Storybook: Button", BUTTON_STORYBOOK)]) });
+    const result = await runDevLinksPost(w.deps, { components: ["Button"] });
+    assert.match(result.summary, /already linked: Button/);
+  });
+});
+
 describe("only registry components", () => {
   it("a name the registry does not map gets no card, and the summary names it", async () => {
     const w = world();
@@ -192,40 +240,47 @@ describe("only registry components", () => {
     assert.deepEqual(w.posts, []);
   });
 
-  it("every registry component gets a card, each in its own file", async () => {
+  it("every registry component goes on ONE batch card, which lists each component and its links", async () => {
     const w = world();
     const result = await runDevLinksPost(w.deps, { all: true });
-    assert.equal(result.cards, 3);
+    assert.equal(result.cards, 1, result.summary);
     assert.equal(w.posts.length, 1);
-    assert.equal(w.posts[0]!.text.split("\n")[0], "Dev Mode links for 3 components are ready for Review.");
-    const chip = w.staged.find((p) => p.item!.id === "links-OptionChip")!;
+    assert.equal(w.posts[0]!.text.split("\n")[0], "Dev Mode links for 3 components are ready for Review, on one card.");
+    const [c] = cardsIn(w.posts[0]!.blocks!);
+    assert.equal(c!.title.text, "3 components");
+    assert.equal(w.staged.length, 1);
+    const card = w.staged[0]!;
+    assert.equal(card.item!.id, "links-batch");
+    const chip = linksOf(card).filter((l) => l.file_key === SPECS);
     assert.deepEqual(
-      linksOf(chip).map((l) => [l.file_key, l.url]),
+      chip.map((l) => [l.name, l.url]),
       [
-        [SPECS, "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip.jsx"],
-        [SPECS, "https://plus-uno.netlify.app/storybook/?path=/docs/specs-toolkit-post-session-elements-option-chip--toolkit-docs-optionchip"],
+        ["Code (plus-uno): OptionChip", "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip.jsx"],
+        ["Storybook: OptionChip", "https://plus-uno.netlify.app/storybook/?path=/docs/specs-toolkit-post-session-elements-option-chip--toolkit-docs-optionchip"],
       ],
     );
+    assert.equal(linksOf(card).length, 8);
+    assert.deepEqual(
+      (card.operations![0]!.input as { introduce: Array<{ component: string }> }).introduce.map((i) => i.component),
+      ["Button", "Badge", "OptionChip"],
+    );
+    for (const name of ["Button", "Badge", "OptionChip"]) assert.ok(card.proposalText.includes(`*${name}*`), name);
+    assert.ok(card.proposalText.includes(`<${BUTTON_CODE}|Code (plus-uno)>`), card.proposalText);
   });
 
-  it("past ten, the first message carries ten and its thread the rest", async () => {
-    const many: DevLinkRegistry = {
-      components: Object.fromEntries(
-        Array.from({ length: 12 }, (_, i) => [`C${i}`, { code: { source: `src/C${i}.jsx`, storybookId: `c${i}--docs` }, figma: { fileKey: LIB, sets: [{ componentSetNodeId: `1:${i}` }] } }]),
-      ),
-    };
+  it("a second batch run while the card is open posts nothing; a component whose own card is open stays off the batch", async () => {
     const w = world();
-    w.deps.registry = async () => many;
-    await runDevLinksPost(w.deps, { all: true });
-    assert.equal(w.posts.length, 2);
-    assert.equal(w.posts[0]!.text.split("\n")[0], "Dev Mode links for 12 components are ready for Review: 10 here, the rest in the thread.");
-    assert.equal(w.posts[1]!.threadTs, FIRST_TS);
-    assert.equal(w.posts[1]!.text.split("\n")[0], "Components 11–12 of 12.");
-    assert.equal(w.staged.length, 12);
-    assert.deepEqual(w.marked, [FIRST_TS]);
+    await runDevLinksPost(w.deps, { components: ["Button"] });
+    const batch = await runDevLinksPost(w.deps, { all: true });
+    assert.equal(batch.cards, 1);
+    assert.match(batch.summary, /card already open: Button/);
+    assert.ok(linksOf(w.staged[1]!).every((l) => !l.name.endsWith(": Button")));
+    const again = await runDevLinksPost(w.deps, { all: true });
+    assert.equal(again.posted, false);
+    assert.match(again.summary, /card already open: .*the batch/);
   });
 
-  it("all 68 fit no one invocation's D1 budget: each run stages what its budget allows, and the next run carries on without re-offering a card", async () => {
+  it("all 68 on one card: Approve writes them in steps through the one Figma client, each step within its calls, and never adds or comments twice", async () => {
     const sixtyEight: DevLinkRegistry = {
       components: Object.fromEntries(
         Array.from({ length: 68 }, (_, i) => [`C${i}`, { code: { source: `src/C${i}.jsx`, storybookId: `c${i}--docs` }, figma: { fileKey: LIB, sets: [{ componentSetNodeId: `1:${i}` }] } }]),
@@ -233,29 +288,24 @@ describe("only registry components", () => {
     };
     const w = world();
     w.deps.registry = async () => sixtyEight;
-    // One invocation's meter: each staged card records one D1 event, and the cap is 40.
-    let d1 = 0;
-    w.deps.headroom = () => ({ d1Queries: D1_QUERY_CAP - d1, subrequests: 1000 });
-    const stage = w.deps.stage;
-    w.deps.stage = async (p) => {
-      if (d1 >= D1_QUERY_CAP) throw new D1QueryBudgetError(D1_QUERY_CAP);
-      d1 += 1;
-      await stage(p);
-    };
-    const runs: string[] = [];
-    for (let i = 0; i < 6 && w.staged.length < 68; i++) {
-      d1 = 0;
-      const result = await runDevLinksPost(w.deps, { all: true });
-      runs.push(result.summary);
-      assert.ok(d1 <= D1_QUERY_CAP);
+    const posted = await runDevLinksPost(w.deps, { all: true });
+    assert.equal(posted.cards, 1);
+    const input = w.staged[0]!.operations![0]!.input;
+    const steps: Array<{ ok: boolean; added: number; commented: string[]; left?: true }> = [];
+    for (let i = 0; i < 10; i++) {
+      const before = w.figma.calls().length;
+      const step = JSON.parse(await writeDevLinks(w.figma, input, { calls: 30 })) as (typeof steps)[number];
+      assert.ok(w.figma.calls().length - before <= 30, "a step spends no more than its calls");
+      assert.equal(step.ok, true);
+      steps.push(step);
+      if (!step.left) break;
     }
-    assert.equal(w.staged.length, 68, runs.join("\n"));
-    assert.equal(new Set(w.staged.map((p) => p.item!.id)).size, 68, "no card offered twice");
-    assert.ok(runs.length > 1, "it took more than one invocation");
-    assert.match(runs[0]!, /left for the next run/);
-    const again = await runDevLinksPost(w.deps, { all: true });
-    assert.equal(again.posted, false);
-    assert.match(again.summary, /card already open/);
+    assert.ok(steps.length > 1, "it took more than one step");
+    assert.equal(steps.at(-1)!.left, undefined);
+    assert.equal(steps.reduce((n, s) => n + s.added, 0), 136);
+    assert.equal(steps.flatMap((s) => s.commented).length, 68);
+    assert.equal((await w.figma.devResources(LIB)).dev_resources.length, 136);
+    assert.equal((await w.figma.comments(LIB)).comments.length, 68);
   });
 
   it("the registry carries a source file and a Storybook id for every component, and each source file exists", () => {
@@ -327,12 +377,12 @@ describe("Approve on a card", () => {
     assert.equal(ran.length, 1);
     assert.equal(ran[0]!.toolName, "figma_dev_links");
     const result = JSON.parse(await writeDevLinks(w.figma, ran[0]!.input)) as Record<string, unknown>;
-    assert.deepEqual(result, { ok: true, added: 4, already: 0, commented: ["Button"] });
+    assert.deepEqual(result, { ok: true, added: 4, renamed: 0, already: 0, commented: ["Button"] });
     const on = (await w.figma.devResources(LIB)).dev_resources.map((r) => [r.node_id, r.name, r.url]);
     assert.deepEqual(on, [
-      ["33:2470", "Code: Button", BUTTON_CODE],
+      ["33:2470", "Code (plus-uno): Button", BUTTON_CODE],
       ["33:2470", "Storybook: Button", BUTTON_STORYBOOK],
-      ["979:20977", "Code: Button", BUTTON_CODE],
+      ["979:20977", "Code (plus-uno): Button", BUTTON_CODE],
       ["979:20977", "Storybook: Button", BUTTON_STORYBOOK],
     ]);
     const comments = (await w.figma.comments(LIB)).comments;
@@ -374,6 +424,79 @@ describe("Approve on a card", () => {
 
   it("an input that is not a card's is refused", async () => {
     assert.equal(JSON.parse(await writeDevLinks(seeded(), { links: [] })).ok, false);
+  });
+});
+
+describe("Approve on the batch card", () => {
+  const twelve: DevLinkRegistry = {
+    components: Object.fromEntries(
+      Array.from({ length: 12 }, (_, i) => [`C${i}`, { code: { source: `src/C${i}.jsx`, storybookId: `c${i}--docs` }, figma: { fileKey: LIB, sets: [{ componentSetNodeId: `1:${i}` }] } }]),
+    ),
+  };
+  async function batch() {
+    const w = world();
+    w.deps.registry = async () => twelve;
+    await runDevLinksPost(w.deps, { all: true });
+    return { w, input: w.staged[0]!.operations![0]!.input };
+  }
+
+  it("writes what this press can, hands the rest on to carry on later, and says so", async () => {
+    const { w, input } = await batch();
+    const handed: DevLinksWriteJob[] = [];
+    const result = JSON.parse(
+      await approveDevLinks({ figma: w.figma, calls: 6, handOff: async (job) => void handed.push(job), now: () => NOW }, input, { channel: CHANNEL, replyTs: FIRST_TS }),
+    ) as { ok: boolean; message: string; left?: true };
+    assert.equal(result.ok, true);
+    assert.equal(result.left, true);
+    assert.match(result.message, /a reply in this thread says when/);
+    assert.deepEqual(handed, [{ kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW }]);
+  });
+
+  it("a hand-off that fails is said, never left silent", async () => {
+    const { w, input } = await batch();
+    const result = JSON.parse(
+      await approveDevLinks({ figma: w.figma, calls: 6, handOff: async () => { throw new Error("runner down"); }, now: () => NOW }, input, { channel: CHANNEL, replyTs: FIRST_TS }),
+    ) as { ok: boolean; error: string };
+    assert.equal(result.ok, false);
+    assert.match(result.error, /the rest did not start/);
+  });
+
+  it("a write that fits writes it all at once and hands nothing on", async () => {
+    const { w, input } = await batch();
+    const handed: unknown[] = [];
+    const result = JSON.parse(await approveDevLinks({ figma: w.figma, calls: 100, handOff: async (j) => void handed.push(j), now: () => NOW }, input, { channel: CHANNEL })) as { added: number; left?: true };
+    assert.equal(result.added, 24);
+    assert.equal(result.left, undefined);
+    assert.deepEqual(handed, []);
+  });
+
+  it("the job carries on with a fresh budget each time, and when the last link is in says so in the thread", async () => {
+    const { w, input } = await batch();
+    const replies: string[] = [];
+    const job: DevLinksWriteJob = { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW };
+    const deps = { figma: w.figma, calls: () => 6, reply: async (text: string) => void replies.push(text), now: () => NOW };
+    const outcomes: string[] = [];
+    for (let i = 0; i < 20; i++) {
+      const outcome = await runDevLinksWriteJob(deps, job);
+      outcomes.push(outcome);
+      if (outcome === "handled") break;
+    }
+    assert.equal(outcomes.at(-1), "handled");
+    assert.ok(outcomes.length > 2);
+    assert.deepEqual(replies, ["The rest of the Dev Mode links are in: 24 links on 12 components, with 12 comments."]);
+    assert.equal((await w.figma.devResources(LIB)).dev_resources.length, 24);
+    assert.equal((await w.figma.comments(LIB)).comments.length, 12);
+  });
+
+  it("a job past a day stops, and says what never landed", async () => {
+    const { w, input } = await batch();
+    const replies: string[] = [];
+    const job: DevLinksWriteJob = { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW - 25 * 3_600_000 };
+    const outcome = await runDevLinksWriteJob({ figma: w.figma, calls: () => 6, reply: async (t) => void replies.push(t), now: () => NOW }, job);
+    assert.equal(outcome, "handled");
+    assert.deepEqual(w.figma.writes(), []);
+    assert.equal(replies.length, 1);
+    assert.match(replies[0]!, /stopped after a day/);
   });
 });
 

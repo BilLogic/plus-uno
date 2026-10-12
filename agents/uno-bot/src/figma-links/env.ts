@@ -1,4 +1,6 @@
 // Dev Mode links bound to `Env` — the only file in the folder that names it.
+// (Approve's binding is `tools/figma-dev-links.ts`: the tool table imports it,
+// and this file's imports reach back into that table.)
 //
 //   • the registry: `component-registry.json` read from the harness repo
 //     (`GITHUB_REPO`), which is also where the Code links point;
@@ -8,11 +10,15 @@
 //   • KV: the cards still open, so a later run never offers one twice, and
 //     merged library PRs waiting for their card (`./queue.ts`), queued by the
 //     library tracker (`figma-library/env.ts`, through `prQueueFor`);
-//   • the meter: each run stages only what its D1 and subrequest budget allow
-//     (`budgetHeadroom`), and the next run carries on.
+//   • the meter: a run stages its one card only when its D1 and subrequest
+//     budget allow (`budgetHeadroom`), and Approve writes only the Figma calls
+//     this invocation has room for;
+//   • the AgentRunner: the rest of an approved write, a runner job of its own
+//     (`runDevLinksWriteJobOnEnv`), so it never queues behind a person's turn.
 
 import type { Env } from "../types";
 import { budgetHeadroom } from "../net";
+import { devLinksStopped } from "./copy";
 import { postMessage, updateMessage } from "../slack/api";
 import { figmaClientFor } from "../figma/production";
 import { figmaReviewChannel } from "../figma-ask/env";
@@ -20,13 +26,20 @@ import { channelMembers } from "../slack/channel-members";
 import { REGISTRY_PATH } from "../figma/registry";
 import { githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { kvJson } from "../figma-poll";
-import { markSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { devLinksOn } from "./gate";
 import { PR_QUEUE_KV_KEY, runQueuedPrLinks, type QueuedPrLinks } from "./queue";
-import { runDevLinksPost, type DevLinkRegistry, type DevLinksDeps, type DevLinksRequest, type DevLinksResult } from "./run";
+import {
+  runDevLinksPost,
+  runDevLinksWriteJob,
+  type DevLinkRegistry,
+  type DevLinksDeps,
+  type DevLinksRequest,
+  type DevLinksResult,
+  type DevLinksWriteJob,
+} from "./run";
 
 /** The cards still open, by card id: when each closes. */
 const CARDED_KV_KEY = "figma-links:carded";
@@ -57,8 +70,8 @@ function devLinksDepsFor(env: Env): DevLinksDeps | { refused: string } {
     figma,
     repo: target.entry.repo,
     members: () => (members ??= channelMembers(env, channel)),
-    async post(message, threadTs) {
-      const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, ...(threadTs ? { thread_ts: threadTs } : {}) });
+    async post(message) {
+      const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
       return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
     },
     async edit(ts, message) {
@@ -72,9 +85,6 @@ function devLinksDepsFor(env: Env): DevLinksDeps | { refused: string } {
         ...supersededEvents(retired, now, "worker"),
         stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
       ]);
-    },
-    markThread: async (ts) => {
-      if (env.HARNESS_KV) await markSweepThread(env.HARNESS_KV, channel, ts);
     },
     carded: kvJson<Record<string, number> | null>(env, CARDED_KV_KEY, null),
     headroom: budgetHeadroom,
@@ -115,5 +125,34 @@ export function runQueuedPrLinksOnEnv(env: Env, opts: { dryRun?: boolean }): Pro
       },
     },
     opts,
+  );
+}
+
+/** Subrequests a runner step leaves for its reply. */
+const JOB_RESERVE = 3;
+
+/**
+ * One step of an approved write carried on, on `Env`: the runner job's body.
+ *
+ * @param env - Worker bindings
+ * @param job - The handed-on write
+ */
+export async function runDevLinksWriteJobOnEnv(env: Env, job: DevLinksWriteJob): Promise<"handled" | "deferred"> {
+  const figma = figmaClientFor(env);
+  if (!figma) {
+    await postMessage(env, { channel: job.channel, text: devLinksStopped("FIGMA_ACCESS_TOKEN is not set"), ...(job.threadTs ? { thread_ts: job.threadTs } : {}) });
+    return "handled";
+  }
+  return runDevLinksWriteJob(
+    {
+      figma,
+      calls: () => budgetHeadroom().subrequests - JOB_RESERVE,
+      async reply(text) {
+        const res = await postMessage(env, { channel: job.channel, text, ...(job.threadTs ? { thread_ts: job.threadTs } : {}) });
+        if (!res.ok) console.warn(`[figma-links] the finishing reply did not post: ${res.error ?? "no error code"}`);
+      },
+      now: () => Date.now(),
+    },
+    job,
   );
 }

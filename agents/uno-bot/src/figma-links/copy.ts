@@ -1,7 +1,8 @@
-// The Dev Mode links' words: the parent line, one Review card per write, what
-// the gate says, and the one comment Approve leaves in Figma the first time a
-// component gets its links. Figma messages (docs/connectors/slack.md
-// § Figma messages): "component", never "component set" or "node".
+// The Dev Mode links' words: the parent line, the one Review card a run posts,
+// what the gate says, the replies a batch write leaves in its thread, and the
+// one comment Approve leaves in Figma the first time a component gets its
+// links. Figma messages (docs/connectors/slack.md § Figma messages):
+// "component", never "component set" or "node".
 //
 // PURE.
 
@@ -20,30 +21,60 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
 
 /** One card's write: the links, and the components whose first links they are. */
 export interface DevLinksWrite {
+  /** Every link the card leaves on Figma: the ones it adds, and the ones it renames to. */
   links: DevLink[];
   /** Each gets one comment, on its first library component. */
   introduce: Array<{ file_key: string; node_id: string; component: string }>;
+  /** How many of `links` are renames of a link already there. Words only: Approve plans again. */
+  renames?: number;
 }
 
-/** What a card is for: a component's Code and Storybook links, or a merged PR's. */
+/** One component on a batch card: what its links add, and whether its Code link is renamed. */
+export interface DevLinksBatchEntry {
+  component: string;
+  adds: Array<{ name: string; url: string }>;
+  renamed: boolean;
+}
+
+/** What a card is for: one component's links, several on one card, or a merged PR's. */
 export type DevLinksSubject =
   | { kind: "component"; component: string; figmaUrl: string; storybook: string | null }
+  | { kind: "batch"; figmaUrl: string; components: DevLinksBatchEntry[] }
   | { kind: "pr"; number: number; url: string; components: string[] };
 
 /** A card's id: Slack-safe, unique in its report. */
 export function devLinksItemId(subject: DevLinksSubject): string {
-  return subject.kind === "pr" ? `pr-${subject.number}` : `links-${subject.component.replace(/[^A-Za-z0-9_-]+/g, "-")}`;
+  if (subject.kind === "pr") return `pr-${subject.number}`;
+  if (subject.kind === "batch") return "links-batch";
+  return `links-${subject.component.replace(/[^A-Za-z0-9_-]+/g, "-")}`;
 }
 
 /** How many of the component's library components the write touches. */
 const touched = (write: DevLinksWrite) => new Set(write.links.map((l) => `${l.file_key}|${l.node_id}`)).size;
 
-/** What a card says it adds, plain. */
-export function devLinksBody(subject: DevLinksSubject, write: DevLinksWrite): string {
+/** What a write changes, in words: "adds 2 links in Dev Mode to 2 library components". */
+function changeWords(write: DevLinksWrite): string {
+  const renames = write.renames ?? 0;
+  const adds = write.links.length - renames;
   const where = plural(touched(write), "library component", "library components");
-  if (subject.kind === "pr") return `Adds the PR's link to ${namesInWords(subject.components)} in Dev Mode, on ${where}.`;
-  const comment = write.introduce.length ? ", and one comment on the first saying what they are" : "";
-  return `Adds ${plural(write.links.length, "link", "links")} in Dev Mode to ${where}${comment}.`;
+  if (!renames) return `adds ${plural(adds, "link", "links")} in Dev Mode to ${where}`;
+  if (!adds) return `renames ${plural(renames, "link", "links")} in Dev Mode on ${where}`;
+  return `adds ${plural(adds, "link", "links")} and renames ${renames} in Dev Mode on ${where}`;
+}
+
+const capital = (s: string) => `${s[0]!.toUpperCase()}${s.slice(1)}`;
+
+/** What a card says it does, plain. */
+export function devLinksBody(subject: DevLinksSubject, write: DevLinksWrite): string {
+  if (subject.kind === "pr") {
+    return `Adds the PR's link to ${namesInWords(subject.components)} in Dev Mode, on ${plural(touched(write), "library component", "library components")}.`;
+  }
+  const comment = !write.introduce.length
+    ? ""
+    : subject.kind === "batch"
+      ? ", and one comment on each new component's first saying what they are"
+      : ", and one comment on the first saying what they are";
+  return `${capital(changeWords(write))}${comment}.`;
 }
 
 /** One write as its card. */
@@ -58,10 +89,20 @@ export function devLinksItem(subject: DevLinksSubject, write: DevLinksWrite): Re
       done: "PR link added in Dev Mode.",
     };
   }
+  if (subject.kind === "batch") {
+    return {
+      id: devLinksItemId(subject),
+      title: plural(subject.components.length, "component", "components"),
+      subtitle: "Dev Mode links · Code (plus-uno) and Storybook",
+      body: devLinksBody(subject, write),
+      open: { label: "Open in Figma", url: subject.figmaUrl },
+      done: "Links going into Dev Mode.",
+    };
+  }
   return {
     id: devLinksItemId(subject),
     title: subject.component,
-    subtitle: "Dev Mode links · Code and Storybook",
+    subtitle: "Dev Mode links · Code (plus-uno) and Storybook",
     body: devLinksBody(subject, write),
     open: { label: "Open in Figma", url: subject.figmaUrl },
     ...(subject.storybook ? { also: { label: "Storybook", url: subject.storybook } } : {}),
@@ -69,23 +110,42 @@ export function devLinksItem(subject: DevLinksSubject, write: DevLinksWrite): Re
   };
 }
 
-/** What Review shows: every distinct link, where it goes, and what Approve does. */
+/** A link's label on a batch card: its name without the component. */
+const labelOf = (name: string) => name.slice(0, name.indexOf(": "));
+
+/** One component's line on a batch card. */
+function batchLine(entry: DevLinksBatchEntry): string {
+  const parts = entry.adds.map((l) => `<${l.url}|${escapeSlackText(labelOf(l.name))}>`);
+  if (entry.renamed) parts.push("renames its Code link to Code (plus-uno)");
+  return `• *${escapeSlackText(entry.component)}* · ${parts.join(" · ")}`;
+}
+
+/** What Review shows: every link, where it goes, and what Approve does. */
 export function devLinksCard(subject: DevLinksSubject, write: DevLinksWrite): ProposalCard {
-  const distinct = [...new Map(write.links.map((l) => [l.name, l.url])).entries()];
-  const head =
-    subject.kind === "pr"
-      ? `*PR #${subject.number}* · <${subject.url}|open PR>`
-      : `*${escapeSlackText(subject.component)}* · <${subject.figmaUrl}|open in Figma>`;
-  const where = plural(touched(write), "library component", "library components");
-  const comment = write.introduce.length ? ` and leaves one comment on ${namesInWords(write.introduce.map((i) => i.component))}'s first saying what they are` : "";
+  const comment = !write.introduce.length
+    ? ""
+    : subject.kind === "batch"
+      ? ", and leaves one comment on each new component's first library component saying what they are"
+      : ` and leaves one comment on ${namesInWords(write.introduce.map((i) => i.component))}'s first saying what they are`;
+  let lines: string[];
+  if (subject.kind === "batch") {
+    lines = [
+      `*${plural(subject.components.length, "component", "components")}* · <${subject.figmaUrl}|open in Figma>`,
+      ...subject.components.map(batchLine),
+      `Approving ${changeWords(write)}${comment}. A link already there is not added twice. A batch this size writes in steps; a reply in this thread says when the last link is in. Reject adds nothing.`,
+    ];
+  } else {
+    const distinct = [...new Map(write.links.map((l) => [l.name, l.url])).entries()];
+    lines = [
+      subject.kind === "pr" ? `*PR #${subject.number}* · <${subject.url}|open PR>` : `*${escapeSlackText(subject.component)}* · <${subject.figmaUrl}|open in Figma>`,
+      ...distinct.map(([name, url]) => `• <${url}|${escapeSlackText(name)}>`),
+      `Approving ${changeWords(write)}${comment}. A link already there is not added twice. Reject adds nothing.`,
+    ];
+  }
   return {
     kind: "stated",
     verb: "add these Dev Mode links",
-    lead: [
-      head,
-      ...distinct.map(([name, url]) => `• <${url}|${escapeSlackText(name)}>`),
-      `Approving adds ${plural(write.links.length, "link", "links")} in Dev Mode on ${where}${comment}. A link already there is not added twice. Reject adds nothing.`,
-    ].join("\n"),
+    lead: lines.join("\n"),
     footer: "",
     fields: [],
     caveats: [],
@@ -107,25 +167,41 @@ export const DEV_LINKS_REVISION_REFUSAL = "A Dev Mode links card is decided as i
 /** A card that showed and did not stage says this in its place. */
 export const DEV_LINKS_NOT_STAGED = "Didn't go through. Run it again to post a fresh card.";
 
-/**
- * The parent line: the first message's, above its cards.
- *
- * @param subjects - Every card the run posts, in order
- * @param shown - How many the first message carries
- */
-export function devLinksParent(subjects: readonly DevLinksSubject[], shown: number): string {
-  const first = subjects[0]!;
-  if (first.kind === "pr") {
-    return `PR #${first.number} merged, so its link is ready for Review on ${namesInWords(first.components)} in Dev Mode.`;
+/** The parent line, above the run's one card. */
+export function devLinksParent(subject: DevLinksSubject): string {
+  if (subject.kind === "pr") {
+    return `PR #${subject.number} merged, so its link is ready for Review on ${namesInWords(subject.components)} in Dev Mode.`;
   }
-  if (subjects.length === 1) return `Dev Mode links for ${first.component} are ready for Review.`;
-  const rest = subjects.length > shown ? `: ${shown} here, the rest in the thread` : "";
-  return `Dev Mode links for ${subjects.length} components are ready for Review${rest}.`;
+  if (subject.kind === "batch") return `Dev Mode links for ${plural(subject.components.length, "component", "components")} are ready for Review, on one card.`;
+  return `Dev Mode links for ${subject.component} are ready for Review.`;
 }
 
-/** A reply's line in the thread, above its cards. */
-export function devLinksBatchLine(from: number, to: number, total: number): string {
-  return `Components ${from}–${to} of ${total}.`;
+/** Approve's account when the write carries on past this press. */
+export function devLinksCarryOn(added: number, renamed: number): string {
+  const done = renamed ? `Added ${plural(added, "link", "links")} and renamed ${renamed} so far` : `Added ${plural(added, "link", "links")} so far`;
+  return `${done}; the rest carry on in the background, and a reply in this thread says when the last link is in.`;
+}
+
+/** Said when the rest of a batch could not be handed on. */
+export function devLinksNotCarried(reason: string): string {
+  return `Some links went in, but the rest did not start: ${reason}. Run it again to post a fresh card for what is missing.`;
+}
+
+/** The reply once the last of a batch is in. */
+export function devLinksFinished(total: { links: number; components: number; comments: number }, problem?: string): string {
+  const comments = total.comments ? `, with ${plural(total.comments, "comment", "comments")}` : "";
+  const lead = `The rest of the Dev Mode links are in: ${plural(total.links, "link", "links")} on ${plural(total.components, "component", "components")}${comments}.`;
+  return problem ? `${lead} Not everything landed: ${problem}.` : lead;
+}
+
+/** The reply when a batch is still unfinished a day after Approve. */
+export function devLinksGaveUp(): string {
+  return "The Dev Mode links stopped after a day without finishing. Run it again to post a fresh card for what is missing.";
+}
+
+/** The reply when the rest of a batch failed for a reason a retry would meet again. */
+export function devLinksStopped(reason: string): string {
+  return `The Dev Mode links stopped before the last one: ${reason}. Run it again to post a fresh card for what is missing.`;
 }
 
 /**
@@ -135,6 +211,12 @@ export function devLinksBatchLine(from: number, to: number, total: number): stri
 export function devLinksComment(component: string): string {
   return [
     FIGMA_LABEL,
-    `Added Dev Mode links to ${component}: Code opens its source on GitHub, and Storybook opens its docs page. They're under Dev resources in Dev Mode.`,
+    `Added Dev Mode links to ${component}: Code (plus-uno) opens its source on GitHub, and Storybook opens its docs page. They're under Dev resources in Dev Mode.`,
   ].join("\n");
+}
+
+/** Whether a comment is the one Approve leaves for this component, in any wording it has had. */
+export function isDevLinksComment(message: string, component: string): boolean {
+  const [label, line] = message.split("\n");
+  return label === FIGMA_LABEL && (line ?? "").startsWith(`Added Dev Mode links to ${component}:`);
 }

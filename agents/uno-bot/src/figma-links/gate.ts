@@ -5,8 +5,10 @@
 // reaches its variants is Figma behaviour no fixture can show. Bill named the
 // component: Button. So until the `FIGMA_DEV_LINKS` setting reads `on`, a run
 // names Button alone, the 68 do not run, and a merged library PR's link waits
-// in its queue. Every run
-// still posts Review cards and writes nothing until one is approved.
+// in its queue. Bill confirmed the check on 2026-10-12, and the setting is on:
+// `all=1` posts the rest on one batch card. Only a manual run asks for it —
+// no scheduled job does. Every run still posts a Review card and writes
+// nothing until it is approved.
 //
 // PURE.
 

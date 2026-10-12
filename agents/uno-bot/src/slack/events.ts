@@ -14,6 +14,7 @@ import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { cutOffRunJob, handleCutOffRun } from "./cut-off-sweep";
 import { redrawExpiredReport } from "./report-expiry";
+import { runDevLinksWriteJobOnEnv } from "../figma-links/env";
 import { extractPrdFromThreadRoot } from "./notion-prd";
 import {
   type SlackMessageEvent,
@@ -189,7 +190,7 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // A cut-off job has nobody waiting on it: the record stays untaken, and
     // the ThreadState alarm hands it over again. A Figma event has no thread
     // to speak in, and never comes this way: its route enqueues it once.
-    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry") return;
+    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "figma-dev-links-write") return;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -257,6 +258,7 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"han
     });
     return outcome;
   }
+  if (job.kind === "figma-dev-links-write") return runDevLinksWriteJobOnEnv(env, job);
   if (job.kind === "cut-off") {
     await handleCutOffRun(env, job.proposalTs);
     return "handled";

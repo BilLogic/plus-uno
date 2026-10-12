@@ -4,52 +4,67 @@
 //
 //   • THE POST — `runDevLinksPost`: read the registry and the links the
 //     components' library components already carry (one Tier 2 read per file:
-//     two files hold all 68), then post one Review card per component that
-//     still lacks a link — or, for a merged library PR, one card that adds the
-//     PR's link to every component it names. Cards post where the Figma
-//     Review-card setting says; a run with more than ten posts the rest in the
-//     first message's thread, ten to a reply. Posting writes nothing to Figma.
+//     two files hold all 68), then post ONE Review card: a named component's,
+//     a batch card listing every component a run of several still has to
+//     link, or a merged library PR's. Cards post where the Figma Review-card
+//     setting says. Posting writes nothing to Figma.
 //   • THE WRITE — `writeDevLinks`, the card's one operation past Approve:
-//     read the nodes' links again, add only what is still missing (a re-run
-//     or a second card never doubles one), and leave one labelled comment on
-//     a component's first library component the first time it gets its links.
+//     read the nodes' links again, rename a Code link still under its old
+//     name, add only what is still missing (a re-run or a second card never
+//     doubles one), and leave one labelled comment on a component's first
+//     library component the first time it gets its links — unless that
+//     comment is already there. Every step re-reads what Figma has, so a write
+//     may stop between any two calls and the next one carries on.
+//   • THE CARRY-ON — a batch's write is more calls than one invocation holds
+//     (a comment each, on Workers Free's 50). `approveDevLinks` writes what
+//     this press can and hands the rest to a runner job; `runDevLinksWriteJob`
+//     carries on with a fresh budget each time, and replies in the card's
+//     thread once the last link is in. Nothing ends partial without a line
+//     saying so.
 //
 // Which components a run may name, and when the 68 may run at all, is
 // `./gate.ts`.
 //
 // PURE: `Env` enters in `./env.ts`.
 
-import { rethrowIfBudget } from "../net";
-import type { FigmaClient, FigmaDevResource } from "../figma/client";
+import { isSubrequestBudgetError, rethrowIfBudget } from "../net";
+import { FigmaRateLimitError, type FigmaClient, type FigmaDevResource } from "../figma/client";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import { renderProposalCard } from "../slack/proposal-render";
 import {
   decisionReport,
   itemProposal,
   markNotStaged,
-  MAX_REPORT_ITEMS,
   reportRecord,
   type ReportMessage,
   type ReportStore,
 } from "../slack/decision-cards";
 import {
+  componentOfLink,
   devLinkTargets,
   linkedBefore,
   planDevLinks,
   wantedLinks,
   type DevLink,
+  type DevLinkPlan,
   type DevLinkRegistry,
 } from "./links";
 import {
   DEV_LINKS_NOT_STAGED,
   DEV_LINKS_REVISION_REFUSAL,
-  devLinksBatchLine,
   devLinksCard,
   devLinksCardWords,
+  devLinksCarryOn,
   devLinksComment,
+  devLinksFinished,
+  devLinksGaveUp,
   devLinksItem,
   devLinksItemId,
+  devLinksNotCarried,
   devLinksParent,
+  devLinksStopped,
+  isDevLinksComment,
+  type DevLinksBatchEntry,
   type DevLinksSubject,
   type DevLinksWrite,
 } from "./copy";
@@ -73,14 +88,12 @@ export interface DevLinksDeps {
   repo: string;
   /** The channel's member ids — who may decide a card — or null when Slack would not say. */
   members(): Promise<string[] | null>;
-  /** Post top level, or in a thread. */
-  post(message: ReportMessage, threadTs?: string): Promise<{ ok: boolean; ts?: string }>;
+  /** Post top level. */
+  post(message: ReportMessage): Promise<{ ok: boolean; ts?: string }>;
   /** Edit a posted message in place. */
   edit(ts: string, message: ReportMessage): Promise<void>;
   reports: ReportStore & Pick<ThreadState, "putReport">;
   stage(proposal: PendingProposal): Promise<void>;
-  /** Mark the first message's thread, so replies there are not all turns. */
-  markThread(ts: string): Promise<void>;
   /** Cards already posted and still open, by card id: when each closes (epoch ms). */
   carded: Store<Record<string, number> | null>;
   /** What this invocation has left (`net.ts` `budgetHeadroom`); unbounded when absent. */
@@ -94,42 +107,53 @@ interface Store<T> {
   write(value: T): Promise<void>;
 }
 
-/** D1 queries one staged card may record: its staged event, and one it supersedes. */
+/** D1 queries the card may record: its staged event, and one it supersedes. */
 const CARD_D1 = 2;
-/** Subrequests one staged card may take beyond its message: the proposal and its event. */
-const CARD_SUBREQUESTS = 2;
-/** Subrequests a message takes: the post, its report record and the thread mark. */
-const MESSAGE_SUBREQUESTS = 3;
+/** Subrequests the card takes: the post, its report record, the proposal and its event. */
+const CARD_SUBREQUESTS = 4;
 
 export interface DevLinksResult {
   posted: boolean;
-  /** Cards staged. */
+  /** Cards staged: 0 or 1. */
   cards: number;
   summary: string;
   /** Nothing posted for a reason a later run may not meet: Figma, Slack or the post failed. */
   retry?: true;
 }
 
-/** One card's write, and what it is for. */
+/** The card's write, and what it is for. */
 interface Planned {
   subject: DevLinksSubject;
   write: DevLinksWrite;
 }
 
 /** The Dev Mode links already on these nodes, read once per file. */
-async function existingLinks(figma: Pick<FigmaClient, "devResources">, nodes: ReadonlyArray<{ fileKey: string; nodeId: string }>): Promise<FigmaDevResource[]> {
+async function existingLinks(
+  figma: Pick<FigmaClient, "devResources">,
+  nodes: ReadonlyArray<{ fileKey: string; nodeId: string }>,
+  spend: () => void = () => {},
+): Promise<FigmaDevResource[]> {
   const byFile = new Map<string, Set<string>>();
   for (const n of nodes) byFile.set(n.fileKey, (byFile.get(n.fileKey) ?? new Set()).add(n.nodeId));
   const found: FigmaDevResource[] = [];
-  for (const [fileKey, ids] of byFile) found.push(...(await figma.devResources(fileKey, [...ids])).dev_resources);
+  for (const [fileKey, ids] of byFile) {
+    spend();
+    found.push(...(await figma.devResources(fileKey, [...ids])).dev_resources);
+  }
   return found;
 }
 
+/** What a plan leaves on Figma: what it adds, and what it renames to. */
+const changesOf = (plan: DevLinkPlan): DevLink[] => [
+  ...plan.add,
+  ...plan.rename.map(({ file_key, node_id, name, url }) => ({ file_key, node_id, name, url })),
+];
+
 /**
- * Post the Review cards a request needs.
+ * Post the Review card a request needs.
  *
  * @param deps - The registry, the Figma client, the channel and the store
- * @param request - Named components, all of them, or a merged PR's
+ * @param request - One component, several or all of them (one batch card), or a merged PR's
  * @param opts - `dryRun` reads and plans, and posts and stages nothing
  */
 export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksRequest, opts: { dryRun?: boolean } = {}): Promise<DevLinksResult> {
@@ -154,7 +178,7 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
 
   const now = deps.now();
   const carded = Object.fromEntries(Object.entries((await deps.carded.read()) ?? {}).filter(([, closes]) => closes > now));
-  const planned: Planned[] = [];
+  let planned: Planned | null = null;
   const already: string[] = [];
   const atCap: string[] = [];
   const open: string[] = [];
@@ -171,22 +195,37 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
     }
     const subject: DevLinksSubject = { kind: "pr", ...request.pr, components: named };
     if (links.length && carded[devLinksItemId(subject)]) open.push(`PR #${request.pr.number}`);
-    else if (links.length) planned.push({ subject, write: { links, introduce: [] } });
+    else if (links.length) planned = { subject, write: { links, introduce: [] } };
   } else {
+    // A run naming one component gets that component's card; any more, one batch card.
+    const single = "components" in request && chosen.length === 1;
+    const write: Required<DevLinksWrite> = { links: [], introduce: [], renames: 0 };
+    const entries: DevLinksBatchEntry[] = [];
+    let figmaUrl = "";
     for (const t of chosen) {
       const plan = planDevLinks(wantedLinks(t, [{ kind: "code" }, { kind: "storybook" }]), existing);
       if (plan.atCap.length) atCap.push(t.component);
-      if (!plan.add.length) {
+      const changes = changesOf(plan);
+      if (!changes.length) {
         if (!plan.atCap.length) already.push(t.component);
         continue;
       }
-      const subject: DevLinksSubject = { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook };
-      if (carded[devLinksItemId(subject)]) {
+      const own: DevLinksSubject = { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook };
+      if (carded[devLinksItemId(own)]) {
         open.push(t.component);
         continue;
       }
-      const introduce = linkedBefore(t.component, existing, t.nodeIds) ? [] : [{ file_key: t.fileKey, node_id: plan.add[0]!.node_id, component: t.component }];
-      planned.push({ subject, write: { links: plan.add, introduce } });
+      figmaUrl ||= t.figmaUrl;
+      write.links.push(...changes);
+      write.renames += plan.rename.length;
+      if (!linkedBefore(t.component, existing, t.nodeIds)) write.introduce.push({ file_key: t.fileKey, node_id: changes[0]!.node_id, component: t.component });
+      entries.push({ component: t.component, adds: [...new Map(plan.add.map((l) => [l.name, { name: l.name, url: l.url }])).values()], renamed: plan.rename.length > 0 });
+      if (single) planned = { subject: own, write };
+    }
+    if (!single && entries.length) {
+      const subject: DevLinksSubject = { kind: "batch", figmaUrl, components: entries };
+      if (carded[devLinksItemId(subject)]) open.push("the batch");
+      else planned = { subject, write };
     }
   }
   if (already.length) notes.push(`already linked: ${already.join(", ")}`);
@@ -194,81 +233,47 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
   if (open.length) notes.push(`card already open: ${open.join(", ")}`);
   const tail = notes.length ? ` — ${notes.join("; ")}` : "";
 
-  if (!planned.length) return { posted: false, cards: 0, summary: `nothing to add${tail}` };
-  if (opts.dryRun) return { posted: false, cards: 0, summary: `would post ${planned.length} card(s)${tail}` };
+  if (!planned) return { posted: false, cards: 0, summary: `nothing to add${tail}` };
+  if (opts.dryRun) return { posted: false, cards: 0, summary: `would post 1 card for ${planned.write.links.length} link(s)${tail}` };
 
   const members = await deps.members();
   if (!members) return { posted: false, cards: 0, retry: true, summary: `the channel's members unread, so nothing posted${tail}` };
 
-  // What this invocation can stage without crossing its D1 or subrequest
-  // budget; the rest wait for the next run, which skips the cards this one
-  // posted (`carded`), so none is offered twice and none is dropped.
+  // The card stages whole or not at all: a run without the budget for it
+  // posts nothing, and the next run offers it.
   const room = deps.headroom?.() ?? { d1Queries: Infinity, subrequests: Infinity };
-  const messages = Math.ceil(planned.length / MAX_REPORT_ITEMS);
-  const fits = Math.max(
-    0,
-    Math.min(planned.length, Math.floor(room.d1Queries / CARD_D1), Math.floor((room.subrequests - messages * MESSAGE_SUBREQUESTS) / CARD_SUBREQUESTS)),
-  );
-  const thisRun = planned.slice(0, fits);
-  const left = planned.length - thisRun.length;
-  const leftLine = left ? `; ${left} left for the next run` : "";
-  if (!thisRun.length) return { posted: false, cards: 0, retry: true, summary: `no budget left this run; ${left} left for the next run${tail}` };
-
-  const chunks: Planned[][] = [];
-  for (let i = 0; i < thisRun.length; i += MAX_REPORT_ITEMS) chunks.push(thisRun.slice(i, i + MAX_REPORT_ITEMS));
-  const subjects = thisRun.map((p) => p.subject);
-  let threadTs: string | undefined;
-  let staged = 0;
-  try {
-    for (const [n, chunk] of chunks.entries()) {
-      const line = n === 0 ? devLinksParent(subjects, chunk.length) : devLinksBatchLine(n * MAX_REPORT_ITEMS + 1, n * MAX_REPORT_ITEMS + chunk.length, thisRun.length);
-      const report = decisionReport(
-        chunk.map((p) => devLinksItem(p.subject, p.write)),
-        line,
-      );
-      const sent = await deps.post({ text: report.text, blocks: report.blocks }, threadTs);
-      if (!sent.ok || !sent.ts) {
-        if (n === 0) return { posted: false, cards: 0, retry: true, summary: `the first message did not post${tail}` };
-        continue;
-      }
-      const ts = sent.ts;
-      if (n === 0) {
-        threadTs = ts;
-        if (chunks.length > 1) await deps.markThread(ts).catch((err: unknown) => rethrowIfBudget(err));
-      }
-      const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, DEV_LINKS_CARD_TTL_MS)).then(
-        () => true,
-        () => false,
-      );
-      const failed: string[] = [];
-      for (const p of chunk) {
-        try {
-          if (!recorded) throw new Error("no report record");
-          await deps.stage(stagedDevLinks(deps.channel, threadTs ?? ts, ts, p.subject, p.write, members));
-          carded[devLinksItemId(p.subject)] = now + DEV_LINKS_CARD_TTL_MS;
-          staged += 1;
-        } catch (err) {
-          rethrowIfBudget(err);
-          failed.push(devLinksItemId(p.subject));
-        }
-      }
-      if (failed.length) {
-        const marked = recorded ? await markNotStaged(deps.reports, ts, failed, DEV_LINKS_NOT_STAGED).catch(() => null) : null;
-        if (marked) await deps.edit(ts, marked).catch(() => {});
-      }
-    }
-  } finally {
-    // Kept even when a budget stop ends the run: what posted is never offered again.
-    if (staged) await deps.carded.write(carded);
+  if (room.d1Queries < CARD_D1 || room.subrequests < CARD_SUBREQUESTS) {
+    return { posted: false, cards: 0, retry: true, summary: `no budget left this run, so nothing posted${tail}` };
   }
-  return { posted: true, cards: staged, summary: `posted ${staged} card(s)${leftLine}${tail}` };
+
+  const { subject, write } = planned;
+  const report = decisionReport([devLinksItem(subject, write)], devLinksParent(subject));
+  const sent = await deps.post({ text: report.text, blocks: report.blocks });
+  if (!sent.ok || !sent.ts) return { posted: false, cards: 0, retry: true, summary: `the message did not post${tail}` };
+  const ts = sent.ts;
+  const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, DEV_LINKS_CARD_TTL_MS)).then(
+    () => true,
+    () => false,
+  );
+  try {
+    if (!recorded) throw new Error("no report record");
+    await deps.stage(stagedDevLinks(deps.channel, ts, ts, subject, write, members));
+  } catch (err) {
+    rethrowIfBudget(err);
+    const marked = recorded ? await markNotStaged(deps.reports, ts, [devLinksItemId(subject)], DEV_LINKS_NOT_STAGED).catch(() => null) : null;
+    if (marked) await deps.edit(ts, marked).catch(() => {});
+    return { posted: true, cards: 0, retry: true, summary: `the card posted but did not stage${tail}` };
+  }
+  carded[devLinksItemId(subject)] = now + DEV_LINKS_CARD_TTL_MS;
+  await deps.carded.write(carded);
+  return { posted: true, cards: 1, summary: `posted 1 card for ${write.links.length} link(s)${tail}` };
 }
 
 /**
- * One card as ThreadState stages it: one item of its message.
+ * The card as ThreadState stages it: the one item of its message.
  *
  * @param channel - Where it posted
- * @param threadTs - The first message: the thread
+ * @param threadTs - The message: the thread
  * @param messageTs - The message the card is in
  * @param subject - What it is for
  * @param write - The links it adds
@@ -311,58 +316,222 @@ function writeOf(input: Record<string, unknown>): DevLinksWrite | null {
   const ok =
     links.every((l: Record<string, unknown>) => isText(l?.file_key) && isText(l?.node_id) && isText(l?.name) && isText(l?.url)) &&
     introduce.every((i: Record<string, unknown>) => isText(i?.file_key) && isText(i?.node_id) && isText(i?.component));
-  return ok ? (input as unknown as DevLinksWrite) : null;
+  return ok ? { links: links as DevLink[], introduce: introduce as DevLinksWrite["introduce"] } : null;
+}
+
+/** Links one add call carries. */
+const ADD_CHUNK = 50;
+
+/** Thrown when a step has spent its calls: the next step carries on. */
+const SPENT = Symbol("spent");
+
+/** One step of a write, as it came back. */
+interface WriteStep {
+  added: number;
+  renamed: number;
+  already: number;
+  commented: string[];
+  /** The step spent its calls before the write was done. */
+  left: boolean;
+  problems: string[];
+  notes: string[];
+  /** Once done: what the card's write left on Figma. */
+  total: { links: number; components: number; comments: number };
 }
 
 /**
- * Approve on a card: add its links that are still missing, then the first
- * time a component gets its links, one labelled comment on its first library
- * component. The body of the card's one operation (`DEV_LINKS_TOOL`).
+ * One step of a card's write, within `calls` Figma calls. Every step
+ * re-reads what Figma has, so it may stop between any two calls.
+ */
+async function writeStep(
+  figma: Pick<FigmaClient, "devResources" | "addDevResources" | "updateDevResources" | "comments" | "postComment">,
+  write: DevLinksWrite,
+  calls: number,
+): Promise<WriteStep> {
+  let room = calls;
+  const spend = () => {
+    if (room < 1) throw SPENT;
+    room -= 1;
+  };
+  const step: WriteStep = { added: 0, renamed: 0, already: 0, commented: [], left: false, problems: [], notes: [], total: { links: 0, components: 0, comments: 0 } };
+  try {
+    const existing = await existingLinks(
+      figma,
+      write.links.map((l) => ({ fileKey: l.file_key, nodeId: l.node_id })),
+      spend,
+    );
+    const plan = planDevLinks(write.links, existing);
+    step.already = plan.present.length;
+    const landed = new Set([...plan.present, ...plan.rename].map((l) => `${l.file_key}|${l.node_id}|${componentOfLink(l.name)}`));
+
+    if (plan.rename.length) {
+      spend();
+      const updated = await figma.updateDevResources(plan.rename.map(({ id, name, url }) => ({ id, name, url })));
+      step.renamed = updated.links_updated.length;
+      step.problems.push(...updated.errors.map((e) => e.error));
+    }
+    for (let i = 0; i < plan.add.length; i += ADD_CHUNK) {
+      spend();
+      const created = await figma.addDevResources(plan.add.slice(i, i + ADD_CHUNK));
+      step.added += created.links_created.length;
+      for (const r of created.links_created) landed.add(`${r.file_key}|${r.node_id}|${componentOfLink(r.name)}`);
+      step.problems.push(...created.errors.map((e) => e.error));
+    }
+    if (plan.atCap.length) step.problems.push(`${plan.atCap.length} link(s) held back: the component already has Figma's 10`);
+
+    // A component's comment goes on once its links are on its first library
+    // component, and only if it is not there already.
+    const due = write.introduce.filter((i) => landed.has(`${i.file_key}|${i.node_id}|${i.component}`));
+    let comments = 0;
+    for (const fileKey of new Set(due.map((i) => i.file_key))) {
+      spend();
+      const there = (await figma.comments(fileKey)).comments;
+      for (const i of due.filter((d) => d.file_key === fileKey)) {
+        if (there.some((c) => isDevLinksComment(c.message, i.component))) {
+          comments += 1;
+          continue;
+        }
+        spend();
+        try {
+          await figma.postComment(i.file_key, devLinksComment(i.component), { node_id: i.node_id, node_offset: { x: 0, y: 0 } });
+          step.commented.push(i.component);
+          comments += 1;
+        } catch (err) {
+          rethrowIfBudget(err);
+          if (err instanceof FigmaRateLimitError) throw err;
+          step.notes.push(`the comment on ${i.component} did not post: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
+    }
+    step.total = {
+      links: plan.present.length + step.renamed + step.added,
+      components: new Set(write.links.map((l) => componentOfLink(l.name))).size,
+      comments,
+    };
+  } catch (err) {
+    if (err !== SPENT) throw err;
+    step.left = true;
+  }
+  return step;
+}
+
+/** A step as the executor's JSON result. */
+function resultOf(step: WriteStep, extra: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    ok: step.problems.length === 0,
+    added: step.added,
+    renamed: step.renamed,
+    already: step.already,
+    commented: step.commented,
+    ...(step.left ? { left: true } : {}),
+    ...(step.problems.length ? { error: step.problems.join("; ") } : {}),
+    ...(step.notes.length ? { notes: step.notes } : {}),
+    ...extra,
+  };
+}
+
+const NOT_A_CARD = JSON.stringify({ ok: false, error: "a Dev Mode links card needs links and introduce" });
+
+/**
+ * A card's write — renames, adds and the first-time comment — within `calls`
+ * Figma calls when given. `left: true` says it stopped there; calling it again
+ * carries on, and a finished write called again adds nothing.
  *
  * @param figma - The one Figma client
  * @param input - The operation's input: `links` and `introduce`
+ * @param opts - `calls`: the most Figma calls this step may make
  * @returns The executor's JSON result
  */
 export async function writeDevLinks(
-  figma: Pick<FigmaClient, "devResources" | "addDevResources" | "postComment">,
+  figma: Pick<FigmaClient, "devResources" | "addDevResources" | "updateDevResources" | "comments" | "postComment">,
   input: Record<string, unknown>,
+  opts: { calls?: number } = {},
 ): Promise<string> {
   const write = writeOf(input);
-  if (!write) return JSON.stringify({ ok: false, error: "a Dev Mode links card needs links and introduce" });
+  if (!write) return NOT_A_CARD;
+  return JSON.stringify(resultOf(await writeStep(figma, write, opts.calls ?? Infinity)));
+}
 
-  const existing = await existingLinks(
-    figma,
-    write.links.map((l) => ({ fileKey: l.file_key, nodeId: l.node_id })),
-  );
+/** The rest of an approved write, waiting for a fresh budget. */
+export interface DevLinksWriteJob {
+  kind: "figma-dev-links-write";
+  input: Record<string, unknown>;
+  channel: string;
+  /** Where the finishing reply goes: the card's message. */
+  threadTs?: string;
+  /** When Approve handed it on, epoch ms. */
+  since: number;
+}
 
-  const plan = planDevLinks(write.links, existing);
-  const created = plan.add.length ? await figma.addDevResources(plan.add) : { links_created: [], errors: [] };
-
-  const commented: string[] = [];
-  const notes: string[] = [];
-  for (const i of write.introduce) {
-    const nodes = write.links.filter((l) => l.file_key === i.file_key).map((l) => l.node_id);
-    const own = existing.filter((r) => r.file_key === i.file_key);
-    if (linkedBefore(i.component, own, nodes)) continue;
-    if (!created.links_created.some((r) => r.file_key === i.file_key && nodes.includes(r.node_id))) continue;
-    try {
-      await figma.postComment(i.file_key, devLinksComment(i.component), { node_id: i.node_id, node_offset: { x: 0, y: 0 } });
-      commented.push(i.component);
-    } catch (err) {
-      rethrowIfBudget(err);
-      notes.push(`the comment on ${i.component} did not post: ${err instanceof Error ? err.message : String(err)}`);
-    }
+/**
+ * Approve on a card: write what this press can, and hand the rest to a
+ * runner job, saying so. The body of the card's one operation (`DEV_LINKS_TOOL`).
+ *
+ * @param deps - The Figma client, the calls this press may make, and the hand-off
+ * @param input - The operation's input
+ * @param where - The card's channel, and the message to reply under
+ * @returns The executor's JSON result
+ */
+export async function approveDevLinks(
+  deps: {
+    figma: Parameters<typeof writeDevLinks>[0];
+    calls: number;
+    handOff(job: DevLinksWriteJob): Promise<void>;
+    now(): number;
+  },
+  input: Record<string, unknown>,
+  where: { channel: string; replyTs?: string; threadTs?: string },
+): Promise<string> {
+  const write = writeOf(input);
+  if (!write) return NOT_A_CARD;
+  const step = await writeStep(deps.figma, write, Math.max(0, deps.calls));
+  if (!step.left) return JSON.stringify(resultOf(step));
+  const threadTs = where.replyTs ?? where.threadTs;
+  try {
+    await deps.handOff({ kind: "figma-dev-links-write", input, channel: where.channel, ...(threadTs ? { threadTs } : {}), since: deps.now() });
+  } catch (err) {
+    rethrowIfBudget(err);
+    return JSON.stringify({ ...resultOf(step), ok: false, error: devLinksNotCarried(err instanceof Error ? err.message : String(err)) });
   }
+  return JSON.stringify(resultOf(step, { message: devLinksCarryOn(step.added, step.renamed) }));
+}
 
-  const refused = created.errors.map((e) => e.error);
-  const held = plan.atCap.length ? [`${plan.atCap.length} link(s) held back: the component already has Figma's 10`] : [];
-  const problems = [...refused, ...held];
-  return JSON.stringify({
-    ok: problems.length === 0,
-    added: created.links_created.length,
-    already: plan.present.length,
-    commented,
-    ...(problems.length ? { error: problems.join("; ") } : {}),
-    ...(notes.length ? { notes } : {}),
-  });
+/** How long a handed-on write may keep coming back. */
+const CARRY_ON_FOR_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The runner job: one more step of a handed-on write, with this invocation's
+ * budget. `deferred` brings it back with a fresh one; once the last link is in
+ * it replies in the card's thread.
+ *
+ * @param deps - The Figma client, the calls this invocation may make, and the reply
+ * @param job - The handed-on write
+ */
+export async function runDevLinksWriteJob(
+  deps: {
+    figma: Parameters<typeof writeDevLinks>[0];
+    calls(): number;
+    reply(text: string): Promise<void>;
+    now(): number;
+  },
+  job: DevLinksWriteJob,
+): Promise<"handled" | "deferred"> {
+  if (deps.now() - job.since > CARRY_ON_FOR_MS) {
+    await deps.reply(devLinksGaveUp());
+    return "handled";
+  }
+  const write = writeOf(job.input);
+  if (!write) return "handled";
+  let step: WriteStep;
+  try {
+    step = await writeStep(deps.figma, write, Math.max(0, deps.calls()));
+  } catch (err) {
+    if (isSubrequestBudgetError(err) || err instanceof FigmaRateLimitError) return "deferred";
+    await deps.reply(devLinksStopped(err instanceof Error ? err.message : String(err)));
+    return "handled";
+  }
+  if (step.left) return "deferred";
+  const problems = [...step.problems, ...step.notes];
+  await deps.reply(devLinksFinished(step.total, problems.length ? problems.join("; ") : undefined));
+  return "handled";
 }
