@@ -622,3 +622,51 @@ cleanup('machine-conv');
 cleanup('idle-conv');
 
 console.log('Envelope and binding cases passed.');
+
+// ---------------------------------------------------------------------------
+// In Claude Code the gate starts only on an explicit invocation: a build
+// request in plain words is engineering talk as often as it is a design ask
+// ("spin up a prototype script"). Cursor keeps the natural-language start.
+// ---------------------------------------------------------------------------
+{
+  const claudeCode = (prompt, conversationId) =>
+    handleSubmit({
+      prompt,
+      conversation_id: conversationId,
+      workspace_roots: [path.join(__dirname, '..', '..', '..')],
+      explicit_start_only: true,
+    });
+
+  for (const phrase of [
+    'make a quick prototype of the webhook handler',
+    'draft a prototype of the retry logic',
+    'spin up a prototype script to test the D1 query',
+  ]) {
+    cleanup('cc-conv');
+    assert.equal(claudeCode(phrase, 'cc-conv').agent_message, undefined, `Claude Code started on: ${phrase}`);
+    assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `no intake in Claude Code for: ${phrase}`);
+  }
+
+  for (const phrase of [
+    '/uno-prototype build the parent portal',
+    '<command-name>/uno-prototype</command-name>\n<command-args>parent portal</command-args>',
+  ]) {
+    cleanup('cc-conv');
+    assert.match(claudeCode(phrase, 'cc-conv').agent_message || '', /intake/i, `Claude Code missed: ${phrase}`);
+    assert.equal(readIntake().stateId, 'prd_check');
+  }
+  cleanup('cc-conv');
+
+  // A cached PRD re-enters only on an explicit invocation too.
+  startReflection('cc-cached');
+  clearSession('cc-cached');
+  assert.equal(claudeCode('draft a prototype of the retry logic', 'cc-cached').agent_message, undefined);
+  cleanup('cc-cached');
+
+  // Cursor (no flag) still starts on a natural-language build request.
+  cleanup('cursor-conv');
+  assert.match(run('make a quick prototype of the webhook handler', 'cursor-conv').agent_message || '', /intake/i);
+  cleanup('cursor-conv');
+}
+
+console.log('Start-trigger guard passed — Claude Code starts only on an explicit invocation.');

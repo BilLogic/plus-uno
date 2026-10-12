@@ -53,6 +53,9 @@ async function main() {
     conversation_id: input.session_id,
     workspace_roots: input.cwd ? [input.cwd] : [],
     attachments: [],
+    // In Claude Code the gate starts only on `/uno-prototype`; Cursor keeps the
+    // plain-words start.
+    explicit_start_only: true,
   });
 
   // The gate never hard-blocks the user prompt — it injects the intake/reflection

@@ -41,6 +41,16 @@ const MAINTENANCE =
 const hasBuildIntent = (text) => BUILD_INTENTS.some((re) => re.test(text));
 
 /**
+ * Whether the prompt explicitly invokes the skill — the start trigger where a
+ * plain-words build request is not enough (see `explicit_start_only`).
+ * @param {string} prompt
+ * @returns {boolean}
+ */
+export function isExplicitInvocation(prompt) {
+  return EXPLICIT_INVOCATION.test(stripQuoted(prompt.toLowerCase()));
+}
+
+/**
  * @param {string} prompt
  * @returns {boolean}
  */

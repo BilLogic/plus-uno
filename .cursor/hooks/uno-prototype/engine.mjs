@@ -3,6 +3,7 @@ import {
   hasPrototypeIntent,
   hasNewPrdIntent,
   isBypassRequest,
+  isExplicitInvocation,
   isMachineTurn,
 } from './intents.mjs';
 import { getState, STATES } from './states.mjs';
@@ -32,6 +33,9 @@ import { isNoPrdAnswer, looksLikePrdContent, parseChoice } from './validators.mj
  * @property {string} [conversation_id] required — without it the gate passes through
  * @property {Array<{ type?: string; file_path?: string }>} [attachments]
  * @property {string[]} [workspace_roots]
+ * @property {boolean} [explicit_start_only] start only on an explicit invocation,
+ *   never on a plain-words build request — set by the Claude Code adapter, where
+ *   "spin up a prototype script" is engineering talk as often as a design ask
  */
 
 /**
@@ -221,15 +225,19 @@ export function handleSubmit(input) {
     return handleActiveSession(conversationId, session, prompt, attachments);
   }
 
+  const startRequested = input.explicit_start_only
+    ? isExplicitInvocation(prompt)
+    : hasPrototypeIntent(prompt);
+
   // Re-entry: a fresh prototype request when a PRD is already cached skips the
   // PRD gate and hands off to the agent to re-run the reflection workflow.
-  if (hasPrototypeIntent(prompt) && cachedPrd) {
+  if (startRequested && cachedPrd) {
     const resumed = createSession(cachedPrd);
     saveSession(conversationId, resumed);
     return presentState(conversationId, resumed);
   }
 
-  if (!hasPrototypeIntent(prompt)) return result(true);
+  if (!startRequested) return result(true);
 
   const newSession = createSession();
   saveSession(conversationId, newSession);
