@@ -808,6 +808,9 @@ describe("a re-staged card still resolves the ask that staged the first one", ()
         async notionRevision() {
           return null;
         },
+        async notionBefore() {
+          return { before: {}, read: false };
+        },
         async notionTarget() {
           return null;
         },

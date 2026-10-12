@@ -279,8 +279,8 @@ function context(text: string): unknown {
 
 /** The key properties as `*Label:* value` lines. Short values share one
  *  section; a value with a line break gets its own, so it reads as prose. A
- *  value the page holds now reads `now → then`; a field in place is an input
- *  under its value now. */
+ *  value the page holds now reads `now → then`, and one whose Before was not
+ *  captured says so; a field in place is an input under its value now. */
 function propertyBlocks(properties: ReadonlyArray<[string, string, string?]>, detail: DraftDetail = {}): unknown[] {
   const blocks: unknown[] = [];
   let lines: string[] = [];
@@ -291,8 +291,12 @@ function propertyBlocks(properties: ReadonlyArray<[string, string, string?]>, de
   for (const [label, value, key] of properties) {
     const was = key ? detail.before?.[key] : undefined;
     const field = key ? detail.inline?.get(key) : undefined;
+    // A value with a path is one a change replaces, so a missing Before is
+    // said rather than left to read like a value set for the first time.
+    const missed = key !== undefined && was === undefined;
     if (field) {
       if (was !== undefined) lines.push(`*${label} now:* ${was ? valueText(was) : "_empty_"}`);
+      else if (missed) lines.push(`*${label} now:* _not captured_`);
       flush();
       blocks.push(inputOf(field, field.label));
       continue;
@@ -301,7 +305,7 @@ function propertyBlocks(properties: ReadonlyArray<[string, string, string?]>, de
       lines.push(`*${label}:* ${was ? valueText(was) : "_empty_"} → ${valueText(value)}`);
       continue;
     }
-    const line = `*${label}:* ${valueText(value)}`;
+    const line = `*${label}:* ${valueText(value)}${missed ? " _(before not captured)_" : ""}`;
     if (value.includes("\n")) {
       flush();
       blocks.push(...textSections(`**${label}:** ${value}`));

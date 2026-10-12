@@ -168,6 +168,9 @@ function harness(
           properties: [{ label: "Design Status", from: "WIP", to: "Ready for QA" }],
         };
       },
+      async notionBefore() {
+        return { before: {}, read: false };
+      },
       async notionTarget() {
         return { title: "A card", parent: "Roadmap" };
       },

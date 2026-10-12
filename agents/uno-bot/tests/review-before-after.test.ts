@@ -217,3 +217,66 @@ describe("text too long for a pop-up field", () => {
     assert.match(lines(view).join("\n"), /over the 3,000 characters/);
   });
 });
+
+describe("a card of several changes shows Before for each", () => {
+  const PAGE_TWO = "https://www.notion.so/Owners-fedcba9876543210fedcba9876543210";
+  const op = (page: string, status: string, block: string, content: string) => ({
+    toolName: "notion_update",
+    input: {
+      page_url: page,
+      properties: { "Design Status": status },
+      replace: [{ block_id: block, last_edited_time: "2026-10-01T09:00:00.000Z", content }],
+    },
+  });
+  const BATCH = [
+    op(PAGE, "In Review", "b1", WILL_SAY),
+    op(PAGE_TWO, "Done", "b2", "Owner: Bea."),
+    op(PAGE_TWO, "Shipped", "b3", "Due: Nov 1."),
+  ];
+
+  /** The draft's lines from operation `n`'s headline to the next one's. */
+  function operation(all: string[], n: number): string {
+    const start = all.findIndex((l) => l.includes(`*${n}. `));
+    const end = all.findIndex((l, i) => i > start && /\*\d+\. /.test(l));
+    return all.slice(start, end < 0 ? undefined : end).join("\n");
+  }
+
+  it("shows each operation's own Before above its After, where staging captured it", async () => {
+    const all = lines(
+      await draftFor(
+        await harness({
+          operations: BATCH,
+          before: {
+            "0.properties.Design Status": "In Progress",
+            "0.replace.0.content": NOW_SAYS,
+            "1.properties.Design Status": "In Review",
+            "1.replace.0.content": "Owner: Ade.",
+          },
+        }),
+      ),
+    );
+    const first = operation(all, 1);
+    const second = operation(all, 2);
+    assert.match(first, /\*Design Status:\* In Progress → In Review/);
+    assert.match(first, new RegExp(`Before[\\s\\S]*${NOW_SAYS}[\\s\\S]*input: After = ${WILL_SAY}`));
+    assert.match(second, /\*Design Status:\* In Review → Done/);
+    assert.match(second, /Before[\s\S]*Owner: Ade\.[\s\S]*input: After = Owner: Bea\./);
+    assert.doesNotMatch(first + second, /wasn't captured|not captured/);
+  });
+
+  it("says Before was not captured for an operation staging could not read", async () => {
+    const all = lines(
+      await draftFor(
+        await harness({
+          operations: BATCH,
+          before: { "0.replace.0.content": NOW_SAYS, "1.replace.0.content": "Owner: Ade." },
+        }),
+      ),
+    );
+    const third = operation(all, 3);
+    // Neither its block nor its property reads like something new.
+    assert.match(third, /current text wasn't captured/);
+    assert.match(third, /\*Design Status:\* Shipped _\(before not captured\)_/);
+    assert.match(operation(all, 1), /\*Design Status:\* In Review _\(before not captured\)_/);
+  });
+});

@@ -583,6 +583,17 @@ function evictReadCache(pageId: string): void {
   readCache.delete(pageId);
 }
 
+/**
+ * A page's read as this isolate cached it, or null: what a page read costs
+ * nothing to answer. Read-only; the cache stays this module's to clear.
+ *
+ * @param pageId - The page's id, as `parseNotionPageId` gives it
+ */
+export function cachedNotionPage(pageId: string): NotionPageContent | null {
+  const cached = readCache.get(pageId);
+  return cached && Date.now() - cached.at < READ_CACHE_TTL_MS ? cached.value : null;
+}
+
 export interface NotionPageContent {
   id: string;
   title: string;
