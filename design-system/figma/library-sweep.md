@@ -57,10 +57,12 @@ file:
 - **`size` vs `type` for head-or-body.** The borderless table sets (`10:473`,
   `10:507`) call the axis `size`; the bordered set (`10:502`) calls it `type`.
   Neither is a size.
-- **Trailing spaces.** `Input Group` `13671:3218` and `Input Group Text`
-  `13659:1414` both define `leadingVisual ` and `trailingVisual ` **with a
-  trailing space**, which is how they read in the panel and in any Code Connect
-  mapping.
+- **Not trailing spaces (corrected 2026-10-12).** This bullet first said
+  `Input Group` `13671:3218` and `Input Group Text` `13659:1414` define
+  `leadingVisual ` and `trailingVisual ` with a trailing space. They do not: the
+  names are `leadingVisual #1`, `leadingVisual #2`, `trailingVisual #1` and
+  `trailingVisual #2`. The space came from splitting the property key
+  `leadingVisual #1#13671:1` at its first `#`. Split a key at its *last* `#`.
 
 ### Vocabulary drift against the code — the #265 question, concretely
 
