@@ -139,7 +139,7 @@ const JOB_RESERVE = 3;
  * @param env - Worker bindings
  * @param job - The handed-on write
  */
-export async function runDevLinksWriteJobOnEnv(env: Env, job: DevLinksWriteJob): Promise<"handled" | "deferred"> {
+export async function runDevLinksWriteJobOnEnv(env: Env, job: DevLinksWriteJob): Promise<"handled" | { deferred: DevLinksWriteJob }> {
   const figma = figmaClientFor(env);
   if (!figma) {
     await postMessage(env, { channel: job.channel, text: devLinksStopped("FIGMA_ACCESS_TOKEN is not set"), ...(job.threadTs ? { thread_ts: job.threadTs } : {}) });

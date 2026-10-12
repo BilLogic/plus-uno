@@ -11,7 +11,7 @@ import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { namesInWords, windowInWords } from "../slack/copy-words";
 import type { ToolName } from "../agent/tool-table";
-import { FIGMA_LABEL } from "../figma-ask/trigger";
+import { FIGMA_LABEL, asPosted } from "../figma-ask/trigger";
 import type { DevLink } from "./links";
 
 /** The tool a card names: Approve runs it. */
@@ -204,6 +204,16 @@ export function devLinksStopped(reason: string): string {
   return `The Dev Mode links stopped before the last one: ${reason}. Run it again to post a fresh card for what is missing.`;
 }
 
+/** Why a write stopped: a component's comment is already on Figma more than once. */
+export function devLinksDoubled(components: readonly string[]): string {
+  return `the comment on ${namesInWords(components)} is already on Figma twice, so no more will post`;
+}
+
+/** Why a write stopped: it came back this many times and landed nothing. */
+export function devLinksIdle(steps: number): string {
+  return `${steps} tries in a row added nothing`;
+}
+
 /**
  * The comment Approve leaves on a component's first library component, the
  * first time it gets its links. Plain text: Figma shows a comment as typed.
@@ -215,8 +225,8 @@ export function devLinksComment(component: string): string {
   ].join("\n");
 }
 
-/** Whether a comment is the one Approve leaves for this component, in any wording it has had. */
+/** Whether a comment is the one Approve leaves for this component, in any wording it has had, as posted or as Figma reads it back. */
 export function isDevLinksComment(message: string, component: string): boolean {
-  const [label, line] = message.split("\n");
-  return label === FIGMA_LABEL && (line ?? "").startsWith(`Added Dev Mode links to ${component}:`);
+  const [label, line] = asPosted(message).split("\n");
+  return label?.trim() === FIGMA_LABEL && (line ?? "").startsWith(`Added Dev Mode links to ${component}:`);
 }

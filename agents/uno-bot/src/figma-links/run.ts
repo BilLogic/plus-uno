@@ -13,14 +13,17 @@
 //     name, add only what is still missing (a re-run or a second card never
 //     doubles one), and leave one labelled comment on a component's first
 //     library component the first time it gets its links — unless that
-//     comment is already there. Every step re-reads what Figma has, so a write
-//     may stop between any two calls and the next one carries on.
+//     comment is already there, or this write already posted it. Every step
+//     re-reads what Figma has, so a write may stop between any two calls and
+//     the next one carries on.
 //   • THE CARRY-ON — a batch's write is more calls than one invocation holds
 //     (a comment each, on Workers Free's 50). `approveDevLinks` writes what
 //     this press can and hands the rest to a runner job; `runDevLinksWriteJob`
-//     carries on with a fresh budget each time, and replies in the card's
-//     thread once the last link is in. Nothing ends partial without a line
-//     saying so.
+//     carries on with a fresh budget each time, carrying the comments it has
+//     posted, and replies in the card's thread once the last link is in. It
+//     stops, and says so there, when a component's comment is on Figma twice
+//     or `DEV_LINKS_IDLE_STEPS` steps in a row land nothing. Nothing ends
+//     partial without a line saying so.
 //
 // Which components a run may name, and when the 68 may run at all, is
 // `./gate.ts`.
@@ -56,6 +59,8 @@ import {
   devLinksCardWords,
   devLinksCarryOn,
   devLinksComment,
+  devLinksDoubled,
+  devLinksIdle,
   devLinksFinished,
   devLinksGaveUp,
   devLinksItem,
@@ -367,6 +372,8 @@ interface WriteStep {
   renamed: number;
   already: number;
   commented: string[];
+  /** Components whose comment Figma already holds more than once. */
+  doubled: string[];
   /** The step spent its calls before the write was done. */
   left: boolean;
   problems: string[];
@@ -375,21 +382,35 @@ interface WriteStep {
   total: { links: number; components: number; comments: number };
 }
 
+/** What a step got done before it threw: the error, and the step as far as it went. */
+class StepThrew extends Error {
+  constructor(
+    readonly cause: unknown,
+    readonly step: WriteStep,
+  ) {
+    super(cause instanceof Error ? cause.message : String(cause));
+  }
+}
+
 /**
  * One step of a card's write, within `calls` Figma calls. Every step
- * re-reads what Figma has, so it may stop between any two calls.
+ * re-reads what Figma has, so it may stop between any two calls. A comment in
+ * `posted` went on in an earlier step and is never posted again, whatever
+ * Figma's read shows. An error is thrown as `StepThrew`, with what the step
+ * got done.
  */
 async function writeStep(
   figma: Pick<FigmaClient, "devResources" | "addDevResources" | "updateDevResources" | "comments" | "postComment">,
   write: DevLinksWrite,
   calls: number,
+  posted: ReadonlySet<string> = new Set(),
 ): Promise<WriteStep> {
   let room = calls;
   const spend = () => {
     if (room < 1) throw SPENT;
     room -= 1;
   };
-  const step: WriteStep = { added: 0, renamed: 0, already: 0, commented: [], left: false, problems: [], notes: [], total: { links: 0, components: 0, comments: 0 } };
+  const step: WriteStep = { added: 0, renamed: 0, already: 0, commented: [], doubled: [], left: false, problems: [], notes: [], total: { links: 0, components: 0, comments: 0 } };
   try {
     const existing = await existingLinks(
       figma,
@@ -423,7 +444,9 @@ async function writeStep(
       spend();
       const there = (await figma.comments(fileKey)).comments;
       for (const i of due.filter((d) => d.file_key === fileKey)) {
-        if (there.some((c) => isDevLinksComment(c.message, i.component))) {
+        const found = there.filter((c) => isDevLinksComment(c.message, i.component)).length;
+        if (found > 1) step.doubled.push(i.component);
+        if (found || posted.has(i.component)) {
           comments += 1;
           continue;
         }
@@ -445,10 +468,19 @@ async function writeStep(
       comments,
     };
   } catch (err) {
-    if (err !== SPENT) throw err;
+    if (err !== SPENT) throw new StepThrew(err, step);
     step.left = true;
   }
   return step;
+}
+
+/** A step's write, its error unwrapped for a caller with no use for its progress. */
+async function writeOnce(...args: Parameters<typeof writeStep>): Promise<WriteStep> {
+  try {
+    return await writeStep(...args);
+  } catch (err) {
+    throw err instanceof StepThrew ? err.cause : err;
+  }
 }
 
 /** A step as the executor's JSON result. */
@@ -485,7 +517,7 @@ export async function writeDevLinks(
 ): Promise<string> {
   const write = writeOf(input);
   if (!write) return NOT_A_CARD;
-  return JSON.stringify(resultOf(await writeStep(figma, write, opts.calls ?? Infinity)));
+  return JSON.stringify(resultOf(await writeOnce(figma, write, opts.calls ?? Infinity)));
 }
 
 /** The rest of an approved write, waiting for a fresh budget. */
@@ -497,7 +529,14 @@ export interface DevLinksWriteJob {
   threadTs?: string;
   /** When Approve handed it on, epoch ms. */
   since: number;
+  /** Components whose comment this write has posted: never posted again. */
+  commented?: string[];
+  /** Steps in a row that landed nothing: no link, rename or comment. */
+  idle?: number;
 }
+
+/** Steps in a row that land nothing before a handed-on write stops: about ten minutes of the runner's retries. */
+export const DEV_LINKS_IDLE_STEPS = 5;
 
 /**
  * Approve on a card: write what this press can, and hand the rest to a
@@ -520,11 +559,18 @@ export async function approveDevLinks(
 ): Promise<string> {
   const write = writeOf(input);
   if (!write) return NOT_A_CARD;
-  const step = await writeStep(deps.figma, write, Math.max(0, deps.calls));
+  const step = await writeOnce(deps.figma, write, Math.max(0, deps.calls));
   if (!step.left) return JSON.stringify(resultOf(step));
   const threadTs = where.replyTs ?? where.threadTs;
   try {
-    await deps.handOff({ kind: "figma-dev-links-write", input, channel: where.channel, ...(threadTs ? { threadTs } : {}), since: deps.now() });
+    await deps.handOff({
+      kind: "figma-dev-links-write",
+      input,
+      channel: where.channel,
+      ...(threadTs ? { threadTs } : {}),
+      since: deps.now(),
+      ...(step.commented.length ? { commented: step.commented } : {}),
+    });
   } catch (err) {
     rethrowIfBudget(err);
     return JSON.stringify({ ...resultOf(step), ok: false, error: devLinksNotCarried(err instanceof Error ? err.message : String(err)) });
@@ -537,8 +583,11 @@ const CARRY_ON_FOR_MS = 24 * 60 * 60 * 1000;
 
 /**
  * The runner job: one more step of a handed-on write, with this invocation's
- * budget. `deferred` brings it back with a fresh one; once the last link is in
- * it replies in the card's thread.
+ * budget. `deferred` brings it back with a fresh one, as the job it hands
+ * back: the comments posted so far, and how many steps in a row landed
+ * nothing. Once the last link is in it replies in the card's thread; it stops
+ * and replies there instead when a component's comment is on Figma twice, or
+ * after `DEV_LINKS_IDLE_STEPS` steps that landed nothing.
  *
  * @param deps - The Figma client, the calls this invocation may make, and the reply
  * @param job - The handed-on write
@@ -551,22 +600,41 @@ export async function runDevLinksWriteJob(
     now(): number;
   },
   job: DevLinksWriteJob,
-): Promise<"handled" | "deferred"> {
+): Promise<"handled" | { deferred: DevLinksWriteJob }> {
   if (deps.now() - job.since > CARRY_ON_FOR_MS) {
     await deps.reply(devLinksGaveUp());
     return "handled";
   }
   const write = writeOf(job.input);
   if (!write) return "handled";
+  const posted = new Set(job.commented ?? []);
   let step: WriteStep;
+  let waiting = false;
   try {
-    step = await writeStep(deps.figma, write, Math.max(0, deps.calls()));
+    step = await writeStep(deps.figma, write, Math.max(0, deps.calls()), posted);
   } catch (err) {
-    if (isSubrequestBudgetError(err) || err instanceof FigmaRateLimitError) return "deferred";
-    await deps.reply(devLinksStopped(err instanceof Error ? err.message : String(err)));
+    if (!(err instanceof StepThrew)) throw err;
+    if (!isSubrequestBudgetError(err.cause) && !(err.cause instanceof FigmaRateLimitError)) {
+      await deps.reply(devLinksStopped(err.message));
+      return "handled";
+    }
+    step = err.step;
+    waiting = true;
+  }
+  if (step.doubled.length) {
+    await deps.reply(devLinksStopped(devLinksDoubled(step.doubled)));
     return "handled";
   }
-  if (step.left) return "deferred";
+  if (step.left || waiting) {
+    const landed = step.added + step.renamed + step.commented.length > 0;
+    const idle = landed ? 0 : (job.idle ?? 0) + 1;
+    if (idle >= DEV_LINKS_IDLE_STEPS) {
+      await deps.reply(devLinksStopped(devLinksIdle(idle)));
+      return "handled";
+    }
+    const commented = [...posted, ...step.commented];
+    return { deferred: { ...job, ...(commented.length ? { commented } : {}), idle } };
+  }
   const problems = [...step.problems, ...step.notes];
   await deps.reply(devLinksFinished(step.total, problems.length ? problems.join("; ") : undefined));
   return "handled";
