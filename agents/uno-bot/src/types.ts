@@ -130,6 +130,9 @@ export interface Env {
   // Channel for operational alerts (capacity/quota outages). Unset → defaults to
   // #uno-bot. See slack/delivery.ts alertCapacity.
   UNO_BOT_ALERT_CHANNEL?: string;
+  // Channel the Slack probes may post raw test messages to besides a DM and the
+  // alert channel. Unset → DMs and the alert channel only. See diagnostics/probes/slack.ts.
+  UNO_BOT_SANDBOX_CHANNEL?: string;
   // Gmail send (D6 connector). All optional — when unset, send_email fails
   // gracefully with a "not configured" error instead of sending.
   GMAIL_SENDER?: string;

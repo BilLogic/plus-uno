@@ -54,10 +54,11 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   // append these chunks AS GIVEN in one call, close it, and return every raw
   // response, `response_metadata` included. A card field Slack refuses comes
   // back named here, one payload at a time, with the plan switch left off.
-  // Same reach as ?text=: a DM or the alert channel, and only so much of it.
+  // Same reach as ?text=: a DM, the alert channel or the sandbox channel, and
+  // only so much of it.
   const chunksParam = url.searchParams.get("chunks");
   if (chunksParam !== null) {
-    const refusal = probeTextRefusal(channel, chunksParam, env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL, "chunks");
+    const refusal = probeTextRefusal(channel, chunksParam, probeReach(env), "chunks");
     if (refusal) return { body: { ok: false, error: refusal }, status: 400 };
     let chunks: unknown;
     try {
@@ -70,7 +71,7 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   }
   const text = url.searchParams.get("text");
   if (text !== null) {
-    const refusal = probeTextRefusal(channel, text, env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL);
+    const refusal = probeTextRefusal(channel, text, probeReach(env));
     if (refusal) return { body: { ok: false, error: refusal }, status: 400 };
   }
   const payload: Record<string, unknown> = { channel };
@@ -95,7 +96,8 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   // so the answer is in the channel, not in this response.
   //
   // Raw text is the one thing this route sends that the Worker would not, so
-  // it goes only to a DM or the alert channel, and only so much of it.
+  // it goes only to a DM, the alert channel or the sandbox channel, and only so
+  // much of it.
   if (text && slack.ok && slack.ts) {
     const append = (await (await call("chat.appendStream", { channel, ts: slack.ts, markdown_text: text })).json()) as {
       ok?: boolean;
@@ -117,14 +119,13 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
 // Worker would mend is not the shape being asked about.
 //
 // ?channel= (required) ?blocks=<JSON array> (required) ?text= (the plain-text
-// copy) ?thread_ts=. Same reach as the stream probe's ?text=: a DM or the alert
-// channel, and only so much of it. Token-gated: it posts a real message.
+// copy) ?thread_ts=. Same reach as the stream probe's ?text=: a DM, the alert
+// channel or the sandbox channel, and only so much of it. Token-gated: it posts a real message.
 export const slackPostProbe: ProbeRun = async (env, url) => {
   const channel = url.searchParams.get("channel");
   if (!channel) return { body: { ok: false, error: "channel required" }, status: 400 };
-  const alertChannel = env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL;
   const blocksParam = url.searchParams.get("blocks") ?? "";
-  const refusal = probeTextRefusal(channel, blocksParam, alertChannel, "blocks");
+  const refusal = probeTextRefusal(channel, blocksParam, probeReach(env), "blocks");
   if (refusal) return { body: { ok: false, error: refusal }, status: 400 };
   const text = url.searchParams.get("text");
   if (text && text.length > PROBE_TEXT_LIMIT)
@@ -207,17 +208,33 @@ async function probeChunks(env: Env, channel: string, url: URL, chunks: unknown[
 /** The longest raw text the markup probe streams. */
 export const PROBE_TEXT_LIMIT = 2_000;
 
+/** The channels other than a DM that a probe may send raw text to: the alert
+ *  channel always, and the sandbox channel when one is configured. */
+export interface ProbeReach {
+  alert: string;
+  sandbox?: string;
+}
+
+/** The probes' reach in this deployment. */
+function probeReach(env: Env): ProbeReach {
+  return { alert: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL, sandbox: env.UNO_BOT_SANDBOX_CHANNEL || undefined };
+}
+
 /**
  * Why a probe will not send raw `text` to `channel`, or null if it will.
  *
  * @param label - The parameter the text came in on (`text`, `chunks`,
  *   `blocks`), which the refusal names
  */
-export function probeTextRefusal(channel: string, text: string, alertChannel: string, label = "text"): string | null {
+export function probeTextRefusal(channel: string, text: string, reach: ProbeReach, label = "text"): string | null {
   if (!text) return `${label} is empty`;
   if (text.length > PROBE_TEXT_LIMIT) return `${label} is ${text.length} chars; the probe takes at most ${PROBE_TEXT_LIMIT}`;
-  if (!channel.startsWith("D") && channel !== alertChannel)
-    return `${label}= streams raw text only to a DM (D…) or the alert channel ${alertChannel}, not ${channel}`;
+  if (!channel.startsWith("D") && channel !== reach.alert && channel !== reach.sandbox) {
+    const targets = reach.sandbox
+      ? `a DM (D…), the alert channel ${reach.alert} or the sandbox channel ${reach.sandbox}`
+      : `a DM (D…) or the alert channel ${reach.alert}`;
+    return `${label}= streams raw text only to ${targets}, not ${channel}`;
+  }
   return null;
 }
 

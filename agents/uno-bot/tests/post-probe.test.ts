@@ -20,10 +20,10 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
 type Env = import("../src/types").Env;
 const ENV = { SLACK_BOT_TOKEN: "xoxb-test" } as Env;
 
-async function probe(q: string): Promise<{ body: Record<string, unknown>; status?: number }> {
+async function probe(q: string, env: Env = ENV): Promise<{ body: Record<string, unknown>; status?: number }> {
   const { slackPostProbe } = await import("../src/diagnostics/probes/slack.js");
   const url = `https://w/debug/slack-post?${q}`;
-  return (await slackPostProbe(ENV, new URL(url), new Request(url))) as {
+  return (await slackPostProbe(env, new URL(url), new Request(url))) as {
     body: Record<string, unknown>;
     status?: number;
   };
@@ -106,4 +106,28 @@ test("the post probe posts the blocks raw, in a thread if asked, and returns Sla
   reply = { ok: true, ts: "2.0" };
   await probe(`channel=C0ARJ2A3A69&text=t&${blocksParam}`);
   assert.deepEqual(Object.keys(sent[0]!.body).sort(), ["blocks", "channel", "text"]);
+});
+
+test("the sandbox channel takes raw posts once it is configured, and not before", async () => {
+  const { probeTextRefusal } = await import("../src/diagnostics/probes/slack.js");
+  const sandbox = "C0SANDBOX1";
+  assert.equal(probeTextRefusal(sandbox, "t", { alert: "C0ALERT", sandbox }), null);
+  assert.match(String(probeTextRefusal(sandbox, "t", { alert: "C0ALERT" })), /^text= .*DM \(D…\) or the alert channel C0ALERT, not C0SANDBOX1$/);
+  assert.match(String(probeTextRefusal("C0OTHER", "t", { alert: "C0ALERT", sandbox })), /the alert channel C0ALERT or the sandbox channel C0SANDBOX1, not C0OTHER$/);
+
+  sent = [];
+  reply = { ok: true, ts: "3.0" };
+  const refused = await probe(`channel=${sandbox}&text=t&${blocksParam}`);
+  assert.equal(refused.status, 400);
+  assert.equal(sent.length, 0, "unset, the sandbox is just another channel");
+  await probe(`channel=${sandbox}&text=t&${blocksParam}`, { ...ENV, UNO_BOT_SANDBOX_CHANNEL: sandbox } as Env);
+  assert.deepEqual(sent.map((s) => s.method), ["chat.postMessage"]);
+  assert.equal(sent[0]!.body.channel, sandbox);
+
+  // Report fixtures stay DM-only, sandbox or not.
+  sent = [];
+  const metadata = { event_type: "uno_preview_report", event_payload: {} };
+  const fixture = await probe(`channel=${sandbox}&${blocksParam}&metadata=${encodeURIComponent(JSON.stringify(metadata))}`, { ...ENV, UNO_BOT_SANDBOX_CHANNEL: sandbox } as Env);
+  assert.equal(fixture.body.error, "report fixtures use a DM");
+  assert.equal(sent.length, 0);
 });
