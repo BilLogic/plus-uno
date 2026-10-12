@@ -20,6 +20,9 @@ import {
   type DevLinksDeps,
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
+import { figmaDevLinksProbe } from "../src/diagnostics/probes/figma";
+import type { Env } from "../src/types";
+import { D1QueryBudgetError, D1_QUERY_CAP } from "../src/net";
 import { FIGMA_LABEL } from "../src/figma-ask/trigger";
 import { itemProposal } from "../src/slack/decision-cards";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
@@ -81,6 +84,7 @@ function world(opts: { figma?: InMemoryFigma; members?: string[] | null } = {}) 
   const posts: Posted[] = [];
   const staged: PendingProposal[] = [];
   const marked: string[] = [];
+  const carded: { value: Record<string, number> | null } = { value: null };
   let n = 0;
   const deps: DevLinksDeps = {
     registry: async () => REGISTRY,
@@ -99,9 +103,11 @@ function world(opts: { figma?: InMemoryFigma; members?: string[] | null } = {}) 
       await store.putProposal(proposal);
     },
     markThread: async (ts) => void marked.push(ts),
+    carded: { read: async () => carded.value, write: async (v) => void (carded.value = v) },
     channel: CHANNEL,
+    now: () => NOW,
   };
-  return { deps, figma, store, posts, staged, marked };
+  return { deps, figma, store, posts, staged, marked, carded };
 }
 
 /** A Figma with the two files seeded, and these links already on them. */
@@ -219,6 +225,39 @@ describe("only registry components", () => {
     assert.deepEqual(w.marked, [FIRST_TS]);
   });
 
+  it("all 68 fit no one invocation's D1 budget: each run stages what its budget allows, and the next run carries on without re-offering a card", async () => {
+    const sixtyEight: DevLinkRegistry = {
+      components: Object.fromEntries(
+        Array.from({ length: 68 }, (_, i) => [`C${i}`, { code: { source: `src/C${i}.jsx`, storybookId: `c${i}--docs` }, figma: { fileKey: LIB, sets: [{ componentSetNodeId: `1:${i}` }] } }]),
+      ),
+    };
+    const w = world();
+    w.deps.registry = async () => sixtyEight;
+    // One invocation's meter: each staged card records one D1 event, and the cap is 40.
+    let d1 = 0;
+    w.deps.headroom = () => ({ d1Queries: D1_QUERY_CAP - d1, subrequests: 1000 });
+    const stage = w.deps.stage;
+    w.deps.stage = async (p) => {
+      if (d1 >= D1_QUERY_CAP) throw new D1QueryBudgetError(D1_QUERY_CAP);
+      d1 += 1;
+      await stage(p);
+    };
+    const runs: string[] = [];
+    for (let i = 0; i < 6 && w.staged.length < 68; i++) {
+      d1 = 0;
+      const result = await runDevLinksPost(w.deps, { all: true });
+      runs.push(result.summary);
+      assert.ok(d1 <= D1_QUERY_CAP);
+    }
+    assert.equal(w.staged.length, 68, runs.join("\n"));
+    assert.equal(new Set(w.staged.map((p) => p.item!.id)).size, 68, "no card offered twice");
+    assert.ok(runs.length > 1, "it took more than one invocation");
+    assert.match(runs[0]!, /left for the next run/);
+    const again = await runDevLinksPost(w.deps, { all: true });
+    assert.equal(again.posted, false);
+    assert.match(again.summary, /card already open/);
+  });
+
   it("the registry carries a source file and a Storybook id for every component, and each source file exists", () => {
     const root = join(process.cwd(), "..", "..");
     const registry = JSON.parse(readFileSync(join(root, "design-system", "figma", "component-registry.json"), "utf8")) as DevLinkRegistry;
@@ -234,11 +273,22 @@ describe("only registry components", () => {
 });
 
 describe("when a run may go", () => {
-  it("until FIGMA_DEV_LINKS is on: one component at a time, never all", () => {
+  it("until FIGMA_DEV_LINKS is on: Button alone, the live check's component", () => {
     assert.deepEqual(devLinksRequestOf({ component: "Button" }, undefined), { request: { components: ["Button"] } });
+    assert.ok("refused" in devLinksRequestOf({ component: "Badge" }, undefined));
     assert.ok("refused" in devLinksRequestOf({ component: "Button,Badge" }, ""));
     assert.ok("refused" in devLinksRequestOf({ all: true }, "off"));
     assert.ok("refused" in devLinksRequestOf({}, "on"));
+  });
+
+  it("the debug route rehearses unless asked to post", async () => {
+    const probe = async (query: string) => {
+      const url = new URL(`https://w/debug/figma-dev-links?${query}`);
+      const report = await figmaDevLinksProbe({} as Env, url, new Request(url));
+      return (report as { body: { dryRun: boolean } }).body.dryRun;
+    };
+    assert.equal(await probe("component=Button"), true);
+    assert.equal(await probe("component=Button&post=1"), false);
   });
 
   it("once it is on: all of them, or several named", () => {

@@ -23,7 +23,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { toId } from 'storybook/internal/csf';
+import { storybookId } from './lib/storybook-id.mjs';
 
 import { documents } from './lib/corpus.mjs';
 
@@ -144,7 +144,7 @@ function developerLinks(mdxPath, content, name) {
   const source = own ?? stories?.file;
   return {
     ...(source ? { source: path.relative(REPO_ROOT, source).replace(/\\/g, '/') } : {}),
-    ...(title ? { storybookId: toId(title[1], stories.docsName) } : {}),
+    ...(title ? { storybookId: storybookId(title[1], stories.docsName) } : {}),
   };
 }
 

@@ -39,7 +39,6 @@ import {
   wantedLinks,
   type DevLink,
   type DevLinkRegistry,
-  type DevLinkTarget,
 } from "./links";
 import {
   DEV_LINKS_NOT_STAGED,
@@ -82,8 +81,25 @@ export interface DevLinksDeps {
   stage(proposal: PendingProposal): Promise<void>;
   /** Mark the first message's thread, so replies there are not all turns. */
   markThread(ts: string): Promise<void>;
+  /** Cards already posted and still open, by card id: when each closes (epoch ms). */
+  carded: Store<Record<string, number> | null>;
+  /** What this invocation has left (`net.ts` `budgetHeadroom`); unbounded when absent. */
+  headroom?(): { d1Queries: number; subrequests: number };
   channel: string;
+  now(): number;
 }
+
+interface Store<T> {
+  read(): Promise<T>;
+  write(value: T): Promise<void>;
+}
+
+/** D1 queries one staged card may record: its staged event, and one it supersedes. */
+const CARD_D1 = 2;
+/** Subrequests one staged card may take beyond its message: the proposal and its event. */
+const CARD_SUBREQUESTS = 2;
+/** Subrequests a message takes: the post, its report record and the thread mark. */
+const MESSAGE_SUBREQUESTS = 3;
 
 export interface DevLinksResult {
   posted: boolean;
@@ -100,10 +116,10 @@ interface Planned {
   write: DevLinksWrite;
 }
 
-/** The Dev Mode links already on these targets' library components, by file. */
-async function existingLinks(figma: DevLinksDeps["figma"], targets: readonly DevLinkTarget[]): Promise<FigmaDevResource[]> {
+/** The Dev Mode links already on these nodes, read once per file. */
+async function existingLinks(figma: Pick<FigmaClient, "devResources">, nodes: ReadonlyArray<{ fileKey: string; nodeId: string }>): Promise<FigmaDevResource[]> {
   const byFile = new Map<string, Set<string>>();
-  for (const t of targets) byFile.set(t.fileKey, new Set([...(byFile.get(t.fileKey) ?? []), ...t.nodeIds]));
+  for (const n of nodes) byFile.set(n.fileKey, (byFile.get(n.fileKey) ?? new Set()).add(n.nodeId));
   const found: FigmaDevResource[] = [];
   for (const [fileKey, ids] of byFile) found.push(...(await figma.devResources(fileKey, [...ids])).dev_resources);
   return found;
@@ -127,44 +143,55 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
 
   let existing: FigmaDevResource[];
   try {
-    existing = await existingLinks(deps.figma, chosen);
+    existing = await existingLinks(
+      deps.figma,
+      chosen.flatMap((t) => t.nodeIds.map((nodeId) => ({ fileKey: t.fileKey, nodeId }))),
+    );
   } catch (err) {
     rethrowIfBudget(err);
     return { posted: false, cards: 0, retry: true, summary: `Figma's links unread, so nothing posted: ${err instanceof Error ? err.message : String(err)}` };
   }
 
+  const now = deps.now();
+  const carded = Object.fromEntries(Object.entries((await deps.carded.read()) ?? {}).filter(([, closes]) => closes > now));
   const planned: Planned[] = [];
   const already: string[] = [];
-  const full: string[] = [];
+  const atCap: string[] = [];
+  const open: string[] = [];
   if ("pr" in request) {
     const links: DevLink[] = [];
     const named: string[] = [];
     for (const t of chosen) {
       const plan = planDevLinks(wantedLinks(t, [{ kind: "pr", ...request.pr }]), existing);
-      if (plan.full.length) full.push(t.component);
+      if (plan.atCap.length) atCap.push(t.component);
       if (plan.add.length) {
         links.push(...plan.add);
         named.push(t.component);
-      } else if (!plan.full.length) already.push(t.component);
+      } else if (!plan.atCap.length) already.push(t.component);
     }
-    if (links.length) planned.push({ subject: { kind: "pr", ...request.pr, components: named }, write: { links, introduce: [] } });
+    const subject: DevLinksSubject = { kind: "pr", ...request.pr, components: named };
+    if (links.length && carded[devLinksItemId(subject)]) open.push(`PR #${request.pr.number}`);
+    else if (links.length) planned.push({ subject, write: { links, introduce: [] } });
   } else {
     for (const t of chosen) {
       const plan = planDevLinks(wantedLinks(t, [{ kind: "code" }, { kind: "storybook" }]), existing);
-      if (plan.full.length) full.push(t.component);
+      if (plan.atCap.length) atCap.push(t.component);
       if (!plan.add.length) {
-        if (!plan.full.length) already.push(t.component);
+        if (!plan.atCap.length) already.push(t.component);
+        continue;
+      }
+      const subject: DevLinksSubject = { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook };
+      if (carded[devLinksItemId(subject)]) {
+        open.push(t.component);
         continue;
       }
       const introduce = linkedBefore(t.component, existing, t.nodeIds) ? [] : [{ file_key: t.fileKey, node_id: plan.add[0]!.node_id, component: t.component }];
-      planned.push({
-        subject: { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook },
-        write: { links: plan.add, introduce },
-      });
+      planned.push({ subject, write: { links: plan.add, introduce } });
     }
   }
   if (already.length) notes.push(`already linked: ${already.join(", ")}`);
-  if (full.length) notes.push(`at Figma's 10 links, so some held back: ${full.join(", ")}`);
+  if (atCap.length) notes.push(`at Figma's 10 links, so some held back: ${atCap.join(", ")}`);
+  if (open.length) notes.push(`card already open: ${open.join(", ")}`);
   const tail = notes.length ? ` — ${notes.join("; ")}` : "";
 
   if (!planned.length) return { posted: false, cards: 0, summary: `nothing to add${tail}` };
@@ -173,48 +200,68 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
   const members = await deps.members();
   if (!members) return { posted: false, cards: 0, retry: true, summary: `the channel's members unread, so nothing posted${tail}` };
 
+  // What this invocation can stage without crossing its D1 or subrequest
+  // budget; the rest wait for the next run, which skips the cards this one
+  // posted (`carded`), so none is offered twice and none is dropped.
+  const room = deps.headroom?.() ?? { d1Queries: Infinity, subrequests: Infinity };
+  const messages = Math.ceil(planned.length / MAX_REPORT_ITEMS);
+  const fits = Math.max(
+    0,
+    Math.min(planned.length, Math.floor(room.d1Queries / CARD_D1), Math.floor((room.subrequests - messages * MESSAGE_SUBREQUESTS) / CARD_SUBREQUESTS)),
+  );
+  const thisRun = planned.slice(0, fits);
+  const left = planned.length - thisRun.length;
+  const leftLine = left ? `; ${left} left for the next run` : "";
+  if (!thisRun.length) return { posted: false, cards: 0, retry: true, summary: `no budget left this run; ${left} left for the next run${tail}` };
+
   const chunks: Planned[][] = [];
-  for (let i = 0; i < planned.length; i += MAX_REPORT_ITEMS) chunks.push(planned.slice(i, i + MAX_REPORT_ITEMS));
-  const subjects = planned.map((p) => p.subject);
+  for (let i = 0; i < thisRun.length; i += MAX_REPORT_ITEMS) chunks.push(thisRun.slice(i, i + MAX_REPORT_ITEMS));
+  const subjects = thisRun.map((p) => p.subject);
   let threadTs: string | undefined;
   let staged = 0;
-  for (const [n, chunk] of chunks.entries()) {
-    const line = n === 0 ? devLinksParent(subjects, chunk.length) : devLinksBatchLine(n * MAX_REPORT_ITEMS + 1, n * MAX_REPORT_ITEMS + chunk.length, planned.length);
-    const report = decisionReport(
-      chunk.map((p) => devLinksItem(p.subject, p.write)),
-      line,
-    );
-    const sent = await deps.post({ text: report.text, blocks: report.blocks }, threadTs);
-    if (!sent.ok || !sent.ts) {
-      if (n === 0) return { posted: false, cards: 0, retry: true, summary: `the first message did not post${tail}` };
-      continue;
-    }
-    const ts = sent.ts;
-    if (n === 0) {
-      threadTs = ts;
-      if (chunks.length > 1) await deps.markThread(ts).catch((err: unknown) => rethrowIfBudget(err));
-    }
-    const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, DEV_LINKS_CARD_TTL_MS)).then(
-      () => true,
-      () => false,
-    );
-    const failed: string[] = [];
-    for (const p of chunk) {
-      try {
-        if (!recorded) throw new Error("no report record");
-        await deps.stage(stagedDevLinks(deps.channel, threadTs ?? ts, ts, p.subject, p.write, members));
-        staged += 1;
-      } catch (err) {
-        rethrowIfBudget(err);
-        failed.push(devLinksItemId(p.subject));
+  try {
+    for (const [n, chunk] of chunks.entries()) {
+      const line = n === 0 ? devLinksParent(subjects, chunk.length) : devLinksBatchLine(n * MAX_REPORT_ITEMS + 1, n * MAX_REPORT_ITEMS + chunk.length, thisRun.length);
+      const report = decisionReport(
+        chunk.map((p) => devLinksItem(p.subject, p.write)),
+        line,
+      );
+      const sent = await deps.post({ text: report.text, blocks: report.blocks }, threadTs);
+      if (!sent.ok || !sent.ts) {
+        if (n === 0) return { posted: false, cards: 0, retry: true, summary: `the first message did not post${tail}` };
+        continue;
+      }
+      const ts = sent.ts;
+      if (n === 0) {
+        threadTs = ts;
+        if (chunks.length > 1) await deps.markThread(ts).catch((err: unknown) => rethrowIfBudget(err));
+      }
+      const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, DEV_LINKS_CARD_TTL_MS)).then(
+        () => true,
+        () => false,
+      );
+      const failed: string[] = [];
+      for (const p of chunk) {
+        try {
+          if (!recorded) throw new Error("no report record");
+          await deps.stage(stagedDevLinks(deps.channel, threadTs ?? ts, ts, p.subject, p.write, members));
+          carded[devLinksItemId(p.subject)] = now + DEV_LINKS_CARD_TTL_MS;
+          staged += 1;
+        } catch (err) {
+          rethrowIfBudget(err);
+          failed.push(devLinksItemId(p.subject));
+        }
+      }
+      if (failed.length) {
+        const marked = recorded ? await markNotStaged(deps.reports, ts, failed, DEV_LINKS_NOT_STAGED).catch(() => null) : null;
+        if (marked) await deps.edit(ts, marked).catch(() => {});
       }
     }
-    if (failed.length) {
-      const marked = recorded ? await markNotStaged(deps.reports, ts, failed, DEV_LINKS_NOT_STAGED).catch(() => null) : null;
-      if (marked) await deps.edit(ts, marked).catch(() => {});
-    }
+  } finally {
+    // Kept even when a budget stop ends the run: what posted is never offered again.
+    if (staged) await deps.carded.write(carded);
   }
-  return { posted: true, cards: staged, summary: `posted ${staged} card(s)${tail}` };
+  return { posted: true, cards: staged, summary: `posted ${staged} card(s)${leftLine}${tail}` };
 }
 
 /**
@@ -283,10 +330,10 @@ export async function writeDevLinks(
   const write = writeOf(input);
   if (!write) return JSON.stringify({ ok: false, error: "a Dev Mode links card needs links and introduce" });
 
-  const byFile = new Map<string, Set<string>>();
-  for (const l of write.links) byFile.set(l.file_key, new Set([...(byFile.get(l.file_key) ?? []), l.node_id]));
-  const existing: FigmaDevResource[] = [];
-  for (const [fileKey, ids] of byFile) existing.push(...(await figma.devResources(fileKey, [...ids])).dev_resources);
+  const existing = await existingLinks(
+    figma,
+    write.links.map((l) => ({ fileKey: l.file_key, nodeId: l.node_id })),
+  );
 
   const plan = planDevLinks(write.links, existing);
   const created = plan.add.length ? await figma.addDevResources(plan.add) : { links_created: [], errors: [] };
@@ -308,7 +355,7 @@ export async function writeDevLinks(
   }
 
   const refused = created.errors.map((e) => e.error);
-  const held = plan.full.length ? [`${plan.full.length} link(s) held back: the component already has Figma's 10`] : [];
+  const held = plan.atCap.length ? [`${plan.atCap.length} link(s) held back: the component already has Figma's 10`] : [];
   const problems = [...refused, ...held];
   return JSON.stringify({
     ok: problems.length === 0,

@@ -22,11 +22,12 @@ export const figmaPollProbe: ProbeRun = async (env, url) => {
 
 // Manual run of Dev Mode links (src/figma-links/): posts Review cards where
 // the Figma Review-card setting says, and writes nothing to Figma — a card's
-// Approve does. `?component=Button` is one component; `?all=1`, every registry
+// Approve does. `?component=Button` is the live check's component; `?all=1`, every registry
 // component, only once FIGMA_DEV_LINKS is on (`figma-links/gate.ts`).
-// `?dry_run=1` reads and plans, and posts nothing.
+// A run reads and plans and posts nothing unless `post=1` says to: the cards
+// land in someone's channel, so posting is asked for, never defaulted.
 export const figmaDevLinksProbe: ProbeRun = async (env, url) => {
-  const dryRun = url.searchParams.get("dry_run") === "1";
+  const dryRun = url.searchParams.get("post") !== "1";
   const asked = devLinksRequestOf(
     { component: url.searchParams.get("component"), all: url.searchParams.get("all") === "1" },
     env.FIGMA_DEV_LINKS,

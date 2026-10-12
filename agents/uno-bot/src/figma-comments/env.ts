@@ -33,7 +33,7 @@ import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
 import { decisionRowsOf, queryRoadmapCards } from "../integrations/notion";
 import { postMessage, updateMessage } from "../slack/api";
-import { channelMembers } from "../figma-library/env";
+import { channelMembers } from "../slack/channel-members";
 import { threadStateFor } from "../thread-state/production";
 import type { PendingProposal } from "../thread-state/index";
 import { figmaPeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";

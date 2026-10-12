@@ -131,8 +131,8 @@ export interface DevLinkPlan {
   add: DevLink[];
   /** Links left out because the node already has them, by URL or name. */
   present: DevLink[];
-  /** Links held back because their node would pass 10. */
-  full: DevLink[];
+  /** Links held back because their node is at Figma's 10. */
+  atCap: DevLink[];
 }
 
 /**
@@ -145,11 +145,11 @@ export function planDevLinks(wanted: readonly DevLink[], existing: readonly Figm
   const on = new Map<string, Array<{ name: string; url: string }>>();
   const key = (l: { file_key: string; node_id: string }) => `${l.file_key}|${l.node_id}`;
   for (const r of existing) on.set(key(r), [...(on.get(key(r)) ?? []), { name: r.name, url: r.url }]);
-  const plan: DevLinkPlan = { add: [], present: [], full: [] };
+  const plan: DevLinkPlan = { add: [], present: [], atCap: [] };
   for (const link of wanted) {
     const node = on.get(key(link)) ?? [];
     if (node.some((r) => r.url === link.url || r.name === link.name)) plan.present.push(link);
-    else if (node.length >= MAX_LINKS_PER_NODE) plan.full.push(link);
+    else if (node.length >= MAX_LINKS_PER_NODE) plan.atCap.push(link);
     else {
       plan.add.push(link);
       on.set(key(link), [...node, { name: link.name, url: link.url }]);
