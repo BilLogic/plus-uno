@@ -223,6 +223,10 @@ PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
 # Nothing about the Figma library posts here any more. Leave blank → there is
 # no intake channel.
 UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
+# #uno-bot-sandbox channel id — where the Slack probes (/debug/slack-post,
+# /debug/slack-stream) may post raw test messages besides a DM and the alert
+# channel. Leave blank → DMs and the alert channel only.
+UNO_BOT_SANDBOX_CHANNEL = "C0B4QBWAUJU"
 # #plus-design channel id — reviewable artifacts (component_implement /
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
