@@ -2,7 +2,7 @@
 //
 // The three things the module made shared are exactly the three that were
 // previously re-decided in every probe body, so they are asserted once here
-// rather than trusted thirteen times:
+// rather than trusted fourteen times:
 //
 //   the GATE — a token-gated probe answers an unauthenticated caller with the
 //   same `404 not found` the Worker entry's fall-through gave, so a closed
@@ -65,7 +65,7 @@ const ask = (route: ProbeRoute, headers: Record<string, string> = {}) =>
 
 test("every token-gated probe refuses an unauthenticated request with 404 not found", async () => {
   const gated = ROUTE_LIST.filter((r) => r.auth === "debug-token");
-  assert.equal(gated.length, 13, "thirteen /debug/* probes are registered");
+  assert.equal(gated.length, 14, "fourteen /debug/* probes are registered");
   for (const route of gated) {
     const probes = [fake(route, { body: { reached: true } })];
     const res = await routeProbes(probes, ask(route), new URL(`https://w${route.path}`), env, ctx());
@@ -221,7 +221,7 @@ test("an unknown path and a wrong method both get the fall-through 404", async (
 
 test("the probe table claims each address once", () => {
   assert.deepEqual(duplicateRoutes(DIAGNOSTIC_ROUTES), []);
-  assert.equal(Object.keys(DIAGNOSTIC_ROUTES).length, 14, "thirteen /debug/* probes + /health/blueprint");
+  assert.equal(Object.keys(DIAGNOSTIC_ROUTES).length, 15, "fourteen /debug/* probes + /health/blueprint");
   assert.deepEqual(DIAGNOSTIC_ROUTES["slack-post"], { method: "GET", path: "/debug/slack-post", auth: "debug-token" });
 
   // The check has teeth: a second claim on one address is reported.
