@@ -19,6 +19,18 @@ export const GLOBAL_COMMANDS = {
  */
 export const INTAKE_TTL_MS = 2 * 60 * 60 * 1000;
 
+/**
+ * The one staleness rule for session state (`updatedAt`) and the briefing
+ * (`writtenAt`) alike: a timestamp that is missing or unparsable cannot show
+ * the record is fresh, so it counts as stale.
+ * @param {string | undefined} timestamp
+ * @param {number} [now]
+ */
+export function isStale(timestamp, now = Date.now()) {
+  const at = Date.parse(timestamp ?? '');
+  return !Number.isFinite(at) || now - at > INTAKE_TTL_MS;
+}
+
 /** User phrases that exit the workflow without invoking uno-prototype. */
 export const BYPASS_PATTERNS = [
   /#skip-prd-gate/i,

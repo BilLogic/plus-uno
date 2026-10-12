@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FLOW_MAP, INTAKE_TTL_MS } from './constants.mjs';
+import { FLOW_MAP, isStale } from './constants.mjs';
 import { resolveQuestion } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,41 +68,44 @@ export function writeIntakeQuestion(conversationId, session, state) {
 }
 
 /**
- * The active briefing, if it binds this session; otherwise null.
- *
- * The briefing is one fixed path shared by every session in the checkout, so
- * a session's own state file saying "mid-intake" is not enough: the briefing
- * on disk must name this session as its `conversationId`. A briefing written
- * by another session is ignored here, never read as this session's gate. A
- * briefing older than INTAKE_TTL_MS, or with no `writtenAt`, binds nobody.
- *
+ * Whether a briefing binds this session: it must name this session as its
+ * `conversationId`, and its `writtenAt` must be within INTAKE_TTL_MS. The
+ * briefing is one fixed path shared by every session in the checkout, so
+ * another session's briefing — or one left behind hours ago — is somebody
+ * else's interview, never this session's gate.
+ * @param {{ conversationId?: string; writtenAt?: string } | null} briefing
+ * @param {string} conversationId
+ * @param {number} [now]
+ */
+export function isIntakeQuestionApplicable(briefing, conversationId, now = Date.now()) {
+  return Boolean(briefing) && briefing.conversationId === conversationId && !isStale(briefing.writtenAt, now);
+}
+
+function readIntakeQuestion() {
+  try {
+    return JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'));
+  } catch {
+    return null; // missing or corrupt — a corrupt file helps nobody
+  }
+}
+
+/**
+ * The active briefing, if it binds this session; otherwise null. A stale
+ * briefing of this session's own is released on the way.
  * @param {string} conversationId
  * @returns {Record<string, unknown> | null}
  */
 export function readActiveIntake(conversationId) {
-  if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return null;
-  let payload;
-  try {
-    payload = JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'));
-  } catch {
-    return null;
-  }
-  if (payload?.conversationId !== conversationId) return null;
-  const writtenAt = Date.parse(String(payload.writtenAt));
-  if (!(Date.now() - writtenAt <= INTAKE_TTL_MS)) {
-    fs.unlinkSync(ACTIVE_INTAKE_FILE); // stale, and this session's own: release it
-    return null;
-  }
-  return payload;
+  const briefing = readIntakeQuestion();
+  if (isIntakeQuestionApplicable(briefing, conversationId)) return briefing;
+  if (briefing?.conversationId === conversationId) clearIntakeQuestion();
+  return null;
 }
 
 /**
- * Remove the active question file — but only if it belongs to this conversation.
- *
- * The file is a single fixed path while sessions are per-conversation, so an
- * unguarded delete let conversation A's session-end wipe conversation B's live
- * question mid-intake (two Cursor tabs, or Cursor + Claude Code at once). The
- * payload already carries `conversationId`; this makes the delete respect it.
+ * Remove the active question file — unless a fresh one belongs to another
+ * conversation, so conversation A's session-end cannot wipe conversation B's
+ * live question mid-intake (two Cursor tabs, or Cursor + Claude Code at once).
  * Pass no id to force (the FSM's own terminal transitions).
  *
  * @param {string} [conversationId]
@@ -110,14 +113,18 @@ export function readActiveIntake(conversationId) {
 export function clearIntakeQuestion(conversationId) {
   if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return;
   if (conversationId) {
-    try {
-      const owner = JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'))?.conversationId;
-      if (owner && owner !== conversationId) return; // another conversation owns it
-    } catch {
-      // unreadable → fall through and clear it; a corrupt file helps nobody
+    const briefing = readIntakeQuestion();
+    if (briefing && !isStale(briefing.writtenAt) && briefing.conversationId !== conversationId) {
+      return; // another conversation's live question
     }
   }
   fs.unlinkSync(ACTIVE_INTAKE_FILE);
+}
+
+/** Remove the briefing once it has outlived the TTL, whoever wrote it. */
+export function pruneStaleIntakeQuestion(now = Date.now()) {
+  if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return;
+  if (isStale(readIntakeQuestion()?.writtenAt, now)) fs.unlinkSync(ACTIVE_INTAKE_FILE);
 }
 
 /**

@@ -3,12 +3,14 @@ import {
   hasPrototypeIntent,
   hasNewPrdIntent,
   isBypassRequest,
+  isExplicitInvocation,
   isMachineTurn,
 } from './intents.mjs';
 import { getState, STATES } from './states.mjs';
 import {
   buildAgentIntakeInstruction,
   clearIntakeQuestion,
+  pruneStaleIntakeQuestion,
   readActiveIntake,
   writeIntakeQuestion,
 } from './intake-question.mjs';
@@ -28,9 +30,12 @@ import { isNoPrdAnswer, looksLikePrdContent, parseChoice } from './validators.mj
 /**
  * @typedef {object} HookInput
  * @property {string} [prompt]
- * @property {string} [conversation_id]
+ * @property {string} [conversation_id] required — without it the gate passes through
  * @property {Array<{ type?: string; file_path?: string }>} [attachments]
  * @property {string[]} [workspace_roots]
+ * @property {boolean} [explicit_start_only] start only on an explicit invocation,
+ *   never on a plain-words build request — set by the Claude Code adapter, where
+ *   "spin up a prototype script" is engineering talk as often as a design ask
  */
 
 /**
@@ -47,6 +52,19 @@ function result(continueSubmit, userMessage, agentMessage) {
     return out;
   }
   return { continue: false, user_message: userMessage };
+}
+
+/**
+ * Send an instruction that points the agent at the briefing — only while the
+ * briefing on disk binds this conversation. The file is one fixed path, so
+ * another session can overwrite it between this write and the agent's read;
+ * then the agent gets no pointer at someone else's interview.
+ * @param {string} conversationId
+ * @param {string} message
+ */
+function intakeResult(conversationId, message) {
+  if (!readActiveIntake(conversationId)) return result(true);
+  return result(true, undefined, message);
 }
 
 /**
@@ -164,14 +182,18 @@ function loadBoundSession(conversationId) {
  */
 export function handleSubmit(input) {
   const prompt = (input.prompt || '').trim();
-  const conversationId = input.conversation_id || 'default';
+  const conversationId = input.conversation_id;
   const attachments = input.attachments || [];
   const repoRoot = resolveRepoRoot(input.workspace_roots);
 
-  if (!prompt) return result(true);
+  // No session id, no gate: a shared fallback id would let every session
+  // start and answer the same intake.
+  if (!prompt || !conversationId) return result(true);
   if (isMachineTurn(prompt)) return result(true);
 
   if (!isPrdGateEnabled(repoRoot)) return result(true);
+
+  pruneStaleIntakeQuestion();
 
   if (isBypassRequest(prompt)) {
     clearSession(conversationId);
@@ -203,15 +225,19 @@ export function handleSubmit(input) {
     return handleActiveSession(conversationId, session, prompt, attachments);
   }
 
+  const startRequested = input.explicit_start_only
+    ? isExplicitInvocation(prompt)
+    : hasPrototypeIntent(prompt);
+
   // Re-entry: a fresh prototype request when a PRD is already cached skips the
   // PRD gate and hands off to the agent to re-run the reflection workflow.
-  if (hasPrototypeIntent(prompt) && cachedPrd) {
+  if (startRequested && cachedPrd) {
     const resumed = createSession(cachedPrd);
     saveSession(conversationId, resumed);
     return presentState(conversationId, resumed);
   }
 
-  if (!hasPrototypeIntent(prompt)) return result(true);
+  if (!startRequested) return result(true);
 
   const newSession = createSession();
   saveSession(conversationId, newSession);
@@ -233,11 +259,13 @@ export function handleSubmit(input) {
  */
 export function handleGateAnswer(input) {
   const answer = (input.answer || '').trim();
-  const conversationId = input.conversation_id || 'default';
+  const conversationId = input.conversation_id;
   const repoRoot = resolveRepoRoot(input.workspace_roots);
 
-  if (!answer) return result(true);
+  if (!answer || !conversationId) return result(true);
   if (!isPrdGateEnabled(repoRoot)) return result(true);
+
+  pruneStaleIntakeQuestion();
 
   const session = loadBoundSession(conversationId);
   if (session?.status !== 'active') return result(true);
@@ -336,9 +364,8 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
       } else {
         writeIntakeQuestion(conversationId, session, state);
         saveSession(conversationId, session);
-        return result(
-          true,
-          undefined,
+        return intakeResult(
+          conversationId,
           `Invalid choice for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
         );
       }
@@ -350,9 +377,8 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
   if (state.validate && !state.validate(answer, session.context, attachments)) {
     writeIntakeQuestion(conversationId, session, state);
     saveSession(conversationId, session);
-    return result(
-      true,
-      undefined,
+    return intakeResult(
+      conversationId,
       `Input validation failed for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
     );
   }
@@ -423,7 +449,7 @@ function presentState(conversationId, session) {
   }
 
   writeIntakeQuestion(conversationId, session, state);
-  return result(true, undefined, buildAgentIntakeInstruction(state));
+  return intakeResult(conversationId, buildAgentIntakeInstruction(state));
 }
 
 export { STATES };

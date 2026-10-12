@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isStale } from './constants.mjs';
 import { clearIntakeQuestion } from './intake-question.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +15,7 @@ const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
  * @property {string[]} history
  * @property {Record<string, unknown>} context
  * @property {'active' | 'awaiting_execute' | 'completed'} status
+ * @property {string} [conversationId] the session that created it
  * @property {string} updatedAt
  */
 
@@ -51,21 +53,22 @@ function briefingPath(conversationId) {
 }
 
 /**
+ * The session for this conversation, or null. A session idle past the intake
+ * TTL is released rather than resumed — otherwise a conversation left
+ * mid-reflection silently consumes the next unrelated prompt as the answer
+ * (ce:review 064). One whose recorded owner differs (two ids that sanitise to
+ * the same file name) is not this conversation's.
  * @param {string} conversationId
  * @returns {SessionState | null}
  */
-/** Sessions older than this are treated as abandoned, not resumed. Without it,
- *  a conversation left mid-reflection days ago silently consumes the next
- *  unrelated prompt as the reflection answer (ce:review 064). */
-const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
-
 export function loadSession(conversationId) {
   ensureDirs();
   const file = statePath(conversationId);
   if (!fs.existsSync(file)) return null;
   try {
     const session = JSON.parse(fs.readFileSync(file, 'utf8'));
-    if (session?.updatedAt && Date.now() - Date.parse(session.updatedAt) > SESSION_TTL_MS) {
+    if (session?.conversationId && session.conversationId !== conversationId) return null;
+    if (isStale(session?.updatedAt)) {
       clearSession(conversationId); // stale — release the gate rather than eat a prompt
       return null;
     }
@@ -81,6 +84,7 @@ export function loadSession(conversationId) {
  */
 export function saveSession(conversationId, session) {
   ensureDirs();
+  session.conversationId = conversationId;
   session.updatedAt = new Date().toISOString();
   fs.writeFileSync(statePath(conversationId), JSON.stringify(session, null, 2));
 }

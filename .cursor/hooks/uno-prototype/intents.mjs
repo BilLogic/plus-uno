@@ -14,12 +14,14 @@ function stripQuoted(text) {
     .replace(/"[^"\n]*"|\u201c[^\u201d\n]*\u201d/g, ' ');
 }
 
-// Explicit invocation: the slash command, the skill path AGENTS.md routes by
+// Explicit invocation: the slash command (typed, or in the
+// `<command-name>/uno-prototype</command-name>` tag Claude Code may wrap it in,
+// hence `>` before the slash), the skill path AGENTS.md routes by
 // (with or without `@`, but not a file inside the skill's folder), a leading
 // "uno-prototype:" label, or "use/run/invoke the uno-prototype skill". Prose
 // about the skill ("the uno-prototype gate") is none of these.
 const EXPLICIT_INVOCATION =
-  /(^|\s)\/uno-prototype\b|\/uno:prototype\b|(^|[\s(])@?skills\/uno-prototype(?![\w/.-])|^\s*uno-prototype\s*:|\b(use|run|invoke|start)\s+(the\s+)?uno-prototype(\s+skill)?\b(?!-)/;
+  /(^|[\s>])\/uno-prototype\b|\/uno:prototype\b|(^|[\s(])@?skills\/uno-prototype(?![\w/.-])|^\s*uno-prototype\s*:|\b(use|run|invoke|start)\s+(the\s+)?uno-prototype(\s+skill)?\b(?!-)/;
 
 // A request to build something new. The `(?<!uno-)` lookbehind matters: a
 // hyphen is a non-word character, so plain `\b` would let "prototype" inside
@@ -37,6 +39,16 @@ const MAINTENANCE =
   /\b(fix|debug|modify|change|update|edit|tweak|adjust|configure|iterate on|continue|keep working on|resume|improve|correct|patch|polish|refine|rework)(e?s|e?d|ing)?\b[^.!?]{0,60}?\b(uno-prototype|the hook|this hook|the gate|the prd gate|prd[- ]gate|the regex|intent detection|the prototype|this prototype|the existing prototype|that prototype)(?![\w-])/;
 
 const hasBuildIntent = (text) => BUILD_INTENTS.some((re) => re.test(text));
+
+/**
+ * Whether the prompt explicitly invokes the skill — the start trigger where a
+ * plain-words build request is not enough (see `explicit_start_only`).
+ * @param {string} prompt
+ * @returns {boolean}
+ */
+export function isExplicitInvocation(prompt) {
+  return EXPLICIT_INVOCATION.test(stripQuoted(prompt.toLowerCase()));
+}
 
 /**
  * @param {string} prompt
@@ -63,20 +75,35 @@ export function hasPrototypeIntent(prompt) {
   return hasBuildIntent(lower);
 }
 
-// A turn the runtime wrote rather than the person: Claude Code fires
-// UserPromptSubmit for a background agent's <task-notification>, a
-// <system-reminder>, and messages relayed from other sessions or teammates,
-// and each arrives wrapped in a hyphenated tag. A person typing a prompt does
-// not open it with one.
-const MACHINE_TURN = /^\s*<[a-z]+(?:-[a-z]+)+[\s>]/;
+// The known envelopes a runtime injects into the prompt stream: task and
+// subagent hand-backs, system and CI notices, cross-session and teammate
+// messages, relayed artifact comments and hook feedback. A hand-back can open
+// with a line of prose before its envelope, so each is matched at the start of
+// any of the first few lines. An envelope missing from this list falls through
+// as a person turn — the list grows when a new one is seen in the wild.
+const INJECTED_ENVELOPES = [
+  /^<task-notification>/,
+  /^<system-reminder>/,
+  /^<agent-message[\s>]/,
+  /^<cross-session-message[\s>]/,
+  /^<teammate-message[\s>]/,
+  /^<ci-monitor-event>/,
+  /^Another Claude session sent a message/,
+  /^\[SYSTEM NOTIFICATION/,
+  /^\[Artifact comment sent to Claude\]/,
+  /^Stop hook feedback:/,
+];
+const ENVELOPE_LINES = 3;
 
 /**
- * True when the prompt is a machine-written turn — never the person's answer.
+ * True when the prompt is a machine-written turn — never the person's answer,
+ * even when it quotes one. Only the person's own turns start or answer the gate.
  * @param {string} prompt
  * @returns {boolean}
  */
 export function isMachineTurn(prompt) {
-  return MACHINE_TURN.test(prompt);
+  const lines = prompt.trimStart().split('\n', ENVELOPE_LINES).map((line) => line.trimStart());
+  return lines.some((line) => INJECTED_ENVELOPES.some((envelope) => envelope.test(line)));
 }
 
 /**

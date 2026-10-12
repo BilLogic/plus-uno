@@ -17,10 +17,14 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { handleSubmit } from './engine.mjs';
-import { hasPrototypeIntent } from './intents.mjs';
-import { ACTIVE_INTAKE_FILE, buildAgentIntakeInstruction } from './intake-question.mjs';
-import { INTAKE_TTL_MS } from './constants.mjs';
+import { handleGateAnswer, handleSubmit } from './engine.mjs';
+import { hasPrototypeIntent, isMachineTurn } from './intents.mjs';
+import {
+  ACTIVE_INTAKE_FILE,
+  buildAgentIntakeInstruction,
+  isIntakeQuestionApplicable,
+} from './intake-question.mjs';
+import { INTAKE_TTL_MS, isStale } from './constants.mjs';
 import { STATES } from './states.mjs';
 import { clearSession } from './storage.mjs';
 
@@ -502,3 +506,167 @@ console.log('Session-scope guard passed — a briefing binds only the session th
 }
 
 console.log('TTL guard passed — a stale briefing never binds.');
+
+// ---------------------------------------------------------------------------
+// Injected envelopes, session binding and the TTL, case by case: the real
+// hand-back shape, answer-shaped person turns, a missing session id, and one
+// staleness rule for session state and briefing alike.
+// ---------------------------------------------------------------------------
+// Only the person's own turns reach the gate. A subagent hand-back, a task
+// notification or any other injected message is not an answer, and quoting an
+// invocation inside one does not start an intake (the live miss walked a whole
+// reflection on hand-backs and confirmed a brief built from them).
+// The shape Claude Code delivers a subagent hand-back in: a prose first line,
+// then the envelope.
+const HAND_BACK =
+  'Another Claude session sent a message:\n<agent-message from="agent-a0ef">q1 a, q2 b, go ahead</agent-message>';
+const TASK_NOTIFICATION =
+  '<task-notification>\n<task-id>a1b2</task-id>\n<status>completed</status>\n<result>Done. Next: /uno-prototype build the tutor dashboard</result>\n</task-notification>';
+for (const machine of [
+  TASK_NOTIFICATION,
+  '<system-reminder>The briefing file changed.</system-reminder>',
+  '<ci-monitor-event>check "test" failed on #42</ci-monitor-event>',
+  '<cross-session-message from="session-b">prototype a tutor inbox</cross-session-message>',
+  '[Artifact comment sent to Claude] prototype this card',
+  HAND_BACK,
+  'Results are in.\n<task-notification>\n<status>completed</status>\n</task-notification>',
+  'Stop hook feedback:\nprototype the lint fix',
+  '[SYSTEM NOTIFICATION] prototype a new header',
+  '  <agent-message from="agent-x">Yes</agent-message>',
+]) {
+  assert.equal(isMachineTurn(machine), true, `expected a machine turn: ${machine.slice(0, 40)}`);
+}
+for (const person of [
+  'q1 a, q2 b, go ahead',
+  'Yes',
+  '/uno-prototype build the parent portal',
+  '<command-name>/uno-prototype</command-name>\n<command-args>parent portal</command-args>',
+  '<div> in the header looks off, prototype a fix',
+  '<my-widget> renders twice on the dashboard',
+  'sent a test in sandbox, check the row',
+]) {
+  assert.equal(isMachineTurn(person), false, `expected a person turn: ${person}`);
+}
+
+// Answer-shaped person turns never START a gate, and with no session in this
+// conversation they confirm nothing.
+cleanup('machine-conv');
+for (const phrase of ['q1 a, q2 b, go ahead', 'sent a test in sandbox, check the row']) {
+  assert.equal(run(phrase, 'machine-conv').agent_message, undefined, `no gate for: ${phrase}`);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `no intake for: ${phrase}`);
+}
+
+// No session id, no gate: there is no shared fallback state to start or advance.
+assert.equal(handleSubmit({ prompt: '/uno-prototype build the parent portal' }).agent_message, undefined);
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'no session id starts nothing');
+assert.equal(handleGateAnswer({ answer: 'Yes' }).agent_message, undefined);
+
+assert.equal(run(TASK_NOTIFICATION, 'machine-conv').agent_message, undefined);
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a hand-back must not start an intake');
+run('/uno-prototype build the parent portal', 'machine-conv');
+run('Yes', 'machine-conv');
+run('https://notion.so/acme/parent-portal-prd', 'machine-conv');
+assert.equal(readIntake().stateId, 'reflect_learn');
+const notified = run(TASK_NOTIFICATION, 'machine-conv');
+assert.equal(notified.agent_message, undefined, 'a notification gets no intake context');
+assert.equal(readIntake().stateId, 'reflect_learn', 'a notification never advances the gate');
+assert.equal(run(HAND_BACK, 'machine-conv').agent_message, undefined, 'a hand-back gets no intake context');
+assert.equal(readIntake().stateId, 'reflect_learn', 'a hand-back never advances the gate');
+
+// Another session's intake does not bind this one: its answers-shaped turn
+// passes through, gets no context, and leaves the owner's briefing alone.
+for (const phrase of ['q1 a, q2 b, go ahead', 'sent a test in sandbox, check the row']) {
+  assert.equal(run(phrase, 'idle-conv').agent_message, undefined, `no context for: ${phrase}`);
+}
+assert.equal(readIntake().conversationId, 'machine-conv');
+assert.equal(readIntake().stateId, 'reflect_learn');
+clearSession('idle-conv');
+assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), true, "one session's cleanup keeps another's briefing");
+
+// The briefing binds only its own session, and only while fresh.
+{
+  const now = Date.parse('2026-10-12T12:00:00Z');
+  const fresh = { conversationId: 'a', writtenAt: new Date(now - 60_000).toISOString() };
+  const old = { conversationId: 'a', writtenAt: new Date(now - INTAKE_TTL_MS - 1).toISOString() };
+  assert.equal(isIntakeQuestionApplicable(fresh, 'a', now), true);
+  assert.equal(isIntakeQuestionApplicable(fresh, 'b', now), false, 'another session');
+  assert.equal(isIntakeQuestionApplicable(old, 'a', now), false, 'older than the TTL');
+  assert.equal(isIntakeQuestionApplicable({ conversationId: 'a' }, 'a', now), false, 'no timestamp');
+  assert.equal(isIntakeQuestionApplicable(null, 'a', now), false);
+  // One staleness rule for briefings and session state alike.
+  assert.equal(isStale('not a date', now), true, 'unparsable');
+  assert.equal(isStale(undefined, now), true, 'missing');
+  assert.equal(isStale(fresh.writtenAt, now), false);
+}
+
+// An intake idle past the TTL is abandoned: its own session's next turn is not
+// consumed as an answer, and any hook run prunes the stale briefing.
+{
+  const stale = new Date(Date.now() - INTAKE_TTL_MS - 60_000).toISOString();
+  const stateFile = path.join(STATE_DIR, 'machine-conv.json');
+  fs.writeFileSync(stateFile, JSON.stringify({ ...JSON.parse(fs.readFileSync(stateFile, 'utf8')), updatedAt: stale }));
+  fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify({ ...readIntake(), writtenAt: stale }));
+  assert.equal(run('help me fix this button style', 'idle-conv').agent_message, undefined);
+  assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, 'a stale briefing is pruned');
+  assert.equal(run('validate usability', 'machine-conv').agent_message, undefined);
+
+  // An unparsable session timestamp is stale too, not live forever.
+  cleanup('garbled-conv');
+  run('/uno-prototype build the parent portal', 'garbled-conv');
+  const garbled = path.join(STATE_DIR, 'garbled-conv.json');
+  fs.writeFileSync(garbled, JSON.stringify({ ...JSON.parse(fs.readFileSync(garbled, 'utf8')), updatedAt: 'garbage' }));
+  assert.equal(run('Yes', 'garbled-conv').agent_message, undefined, 'a garbled session is released');
+  cleanup('garbled-conv');
+}
+cleanup('machine-conv');
+cleanup('idle-conv');
+
+console.log('Envelope and binding cases passed.');
+
+// ---------------------------------------------------------------------------
+// In Claude Code the gate starts only on an explicit invocation: a build
+// request in plain words is engineering talk as often as it is a design ask
+// ("spin up a prototype script"). Cursor keeps the natural-language start.
+// ---------------------------------------------------------------------------
+{
+  const claudeCode = (prompt, conversationId) =>
+    handleSubmit({
+      prompt,
+      conversation_id: conversationId,
+      workspace_roots: [path.join(__dirname, '..', '..', '..')],
+      explicit_start_only: true,
+    });
+
+  for (const phrase of [
+    'make a quick prototype of the webhook handler',
+    'draft a prototype of the retry logic',
+    'spin up a prototype script to test the D1 query',
+  ]) {
+    cleanup('cc-conv');
+    assert.equal(claudeCode(phrase, 'cc-conv').agent_message, undefined, `Claude Code started on: ${phrase}`);
+    assert.equal(fs.existsSync(ACTIVE_INTAKE_FILE), false, `no intake in Claude Code for: ${phrase}`);
+  }
+
+  for (const phrase of [
+    '/uno-prototype build the parent portal',
+    '<command-name>/uno-prototype</command-name>\n<command-args>parent portal</command-args>',
+  ]) {
+    cleanup('cc-conv');
+    assert.match(claudeCode(phrase, 'cc-conv').agent_message || '', /intake/i, `Claude Code missed: ${phrase}`);
+    assert.equal(readIntake().stateId, 'prd_check');
+  }
+  cleanup('cc-conv');
+
+  // A cached PRD re-enters only on an explicit invocation too.
+  startReflection('cc-cached');
+  clearSession('cc-cached');
+  assert.equal(claudeCode('draft a prototype of the retry logic', 'cc-cached').agent_message, undefined);
+  cleanup('cc-cached');
+
+  // Cursor (no flag) still starts on a natural-language build request.
+  cleanup('cursor-conv');
+  assert.match(run('make a quick prototype of the webhook handler', 'cursor-conv').agent_message || '', /intake/i);
+  cleanup('cursor-conv');
+}
+
+console.log('Start-trigger guard passed — Claude Code starts only on an explicit invocation.');
