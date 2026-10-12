@@ -370,7 +370,7 @@ describe("F3: a to-do to make a card", () => {
     assert.deepEqual(mentions(offer!.text), [MAYA]);
     const [c] = offer!.cards;
     assert.equal(c!.title.text, "The facelift last stage");
-    assert.equal(c!.subtitle!.text, "from this thread");
+    assert.equal(c!.subtitle!.text, "<@U0MAYA> · from this thread");
     assert.equal(c!.body.text, "No Roadmap card found for this. Review holds the drafted card.");
     assert.deepEqual(c!.actions.map((x) => x.text.text), ["Review", "Open source"]);
     assert.equal(c!.actions[1]!.url, `https://plus.slack.com/archives/${DESIGN}/p${TODO.replace(".", "")}`);
@@ -472,7 +472,7 @@ describe("F3: a to-do to make a card", () => {
     assert.deepEqual(mentions(m.posts[0]!.text), [BEA, ADE]);
     assert.ok(!mentions(m.posts[0]!.text).includes(LEAD));
     const [c] = m.posts[0]!.cards;
-    assert.equal(c!.subtitle!.text, "from the running note");
+    assert.equal(c!.subtitle!.text, "<@U0BEA> <@U0ADE> · from the running note");
     assert.match(m.posts[0]!.text, /\n• <@U0BEA> — .*\n• <@U0ADE> — /, "one bullet per taker");
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open source", "https://www.notion.so/note1"]]);
   });
@@ -519,7 +519,7 @@ describe("F4: an active card with no owner", () => {
     assert.deepEqual(mentions(m.posts[0]!.text), [BEA]);
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.title.text, "Facelift — last stage");
-    assert.equal(c!.subtitle!.text, "WIP · no Contributor for a week");
+    assert.equal(c!.subtitle!.text, "<@U0BEA> · WIP · no Contributor for a week");
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
     // Posted at the channel's top, it starts a thread that is uno-bot's own:
     // nothing is marked, so a reply there engages uno-bot with no @mention.
@@ -724,7 +724,7 @@ describe("F5: a stuck card", () => {
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.title.text, "Facelift — last stage");
-    assert.equal(c!.subtitle!.text, "Under Review · no comments for 3 weeks");
+    assert.equal(c!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
     assert.equal(c!.body.text, "Is it still moving? Done moves it to Under Dev or another status, Still on it checks again in 3 weeks, Drop it archives it.");
     // Two buttons: Review and Open card. No one-tap Still on it.
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
@@ -1950,7 +1950,7 @@ describe("tagging through the Team Members directory", () => {
     const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
-    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
+    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
     assert.match(m.posts[0]!.text, /\n• Kai Lo — /, "named on their own bullet, not tagged");
     assert.deepEqual(notified(m.posts[0]!), [MAYA]);
   });
@@ -2091,7 +2091,7 @@ describe("tagging through the Team Members directory", () => {
     assert.ok(report.notes.some((n) => n.includes("n-nameless")), report.summary);
     const m = morning(store, rm, at(30, 13));
     await m.run();
-    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "Under Review · no comments for 3 weeks");
+    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
     assert.doesNotMatch(JSON.stringify(m.posts[0]!.blocks), /n-nameless/);
   });
 

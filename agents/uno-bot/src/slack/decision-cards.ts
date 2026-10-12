@@ -181,13 +181,32 @@ function etClock(at: number): string {
   return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit", hourCycle: "h23" }).format(new Date(at));
 }
 
+/**
+ * An open card's subtitle: whom it is for, then where it came from. The tag
+ * shows whose card it is; Slack notifies nobody from a subtitle, so the
+ * opener does the notifying (`headLine`). In a DM nobody is tagged, so a
+ * Slack owner is left off and only a named owner shows, in plain text. A
+ * name the subtitle already says ("not found in Slack: Kai") is not said
+ * twice.
+ */
+function openSubtitle(item: ReportItem, channel: string): string | undefined {
+  const dm = channel.startsWith("D");
+  const who = (item.owners ?? [])
+    .flatMap((o) => ("slack" in o ? (dm ? [] : [`<@${o.slack}>`]) : [escapeSlackText(o.name)]))
+    .filter((w, i, all) => all.indexOf(w) === i && !(item.subtitle ?? "").includes(w))
+    .join(" ");
+  return [who, item.subtitle].filter(Boolean).join(" · ") || undefined;
+}
+
 /** What a card shows in each state: its subtitle and body, and its button. */
-function shownAs(entry: ReportEntry): { subtitle?: string; body: string; button: "Review" | "View" | null } {
+function shownAs(entry: ReportEntry, channel: string): { subtitle?: string; body: string; button: "Review" | "View" | null } {
   const { item, state } = entry;
   const by = (id: string) => `<@${id}>`;
   switch (state.kind) {
-    case "open":
-      return { ...(item.subtitle ? { subtitle: item.subtitle } : {}), body: item.body, button: "Review" };
+    case "open": {
+      const subtitle = openSubtitle(item, channel);
+      return { ...(subtitle ? { subtitle } : {}), body: item.body, button: "Review" };
+    }
     case "changes-asked":
       return { subtitle: `Changes asked by ${by(state.by)}`, body: item.body, button: "Review" };
     // Decided by one of the card's own answers: "<label> · <@who>".
@@ -216,9 +235,9 @@ function shownAs(entry: ReportEntry): { subtitle?: string; body: string; button:
 }
 
 /** One entry's card. */
-function entryCard(entry: ReportEntry): Record<string, unknown> {
+function entryCard(entry: ReportEntry, channel: string): Record<string, unknown> {
   const { item } = entry;
-  const shown = shownAs(entry);
+  const shown = shownAs(entry, channel);
   const logo = logoFor(item.open.url);
   return {
     type: "card",
@@ -298,14 +317,14 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
   const head = headLine(record);
   const drawn = [
     ...textSections(head),
-    ...(record.entries.length ? [carouselOf(record.entries.map(entryCard))] : []),
+    ...(record.entries.length ? [carouselOf(record.entries.map((e) => entryCard(e, record.channel)))] : []),
     ...(record.after ?? []),
   ];
   // A report that posted plain stays plain: Slack refused its cards once.
   const blocks = record.plain ? plainReportBlocks(drawn) : drawn;
   // The fallback is mrkdwn and a card's words are plain text: escaped, so a
   // title holding `<!channel>` pings nobody from the notification either.
-  const text = [head, ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Closed, no decision. " : ""}${escapeSlackText(shownAs(e).body)}`)].join("\n");
+  const text = [head, ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Closed, no decision. " : ""}${escapeSlackText(shownAs(e, record.channel).body)}`)].join("\n");
   return { text, blocks, ...(record.metadata ? { metadata: record.metadata } : {}) };
 }
 
@@ -342,7 +361,7 @@ export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
 export function itemText(record: DecisionReportRecord, id: string): string | null {
   const entry = record.entries.find((e) => e.id === id);
   if (!entry) return null;
-  const shown = shownAs(entry);
+  const shown = shownAs(entry, record.channel);
   return [entry.item.title, shown.subtitle, shown.body, entry.item.detail].filter(Boolean).join("\n");
 }
 

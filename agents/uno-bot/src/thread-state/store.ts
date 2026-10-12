@@ -414,7 +414,8 @@ export interface ReportItem {
    *  `owners`. */
   subtitle?: string;
   /** Whose answer the card needs. The shared card opens its parent line on
-   *  them, where Slack notifies (`decision-cards.ts`). */
+   *  them, where Slack notifies, and leads the open card's subtitle with
+   *  them, so the card shows whose it is (`decision-cards.ts`). */
   owners?: CardOwner[];
   /** What changes, plain: "Page says X · decision says Y". */
   body: string;

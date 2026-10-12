@@ -99,8 +99,8 @@ test("three fixes post as a parent line and three cards in a carousel, each with
     assert.equal(card.actions[1].url, PAGE.url, "Open goes to the page");
     assert.match(card.icon.image_url, /notion/, "the Notion logo");
   });
-  assert.equal(plainOf(cards[0]!.subtitle), "from this thread", "where; whom it is for is the parent line's");
-  assert.equal(plainOf(cards[1]!.subtitle), "from this thread");
+  assert.equal(plainOf(cards[0]!.subtitle), "<@U0ADE> · from this thread", "whose it is, and where");
+  assert.equal(plainOf(cards[1]!.subtitle), "<@U0BEA> · from this thread");
 
   assert.equal(blocks.some((b) => b.type === "container" || b.type === "actions"), false, "no folded box, no card-wide button");
   assert.doesNotMatch(JSON.stringify(blocks), GATE_WORDS);
@@ -189,7 +189,7 @@ test("where Slack refuses cards, the report posts as sections that each keep the
   fixes.forEach((b, i) => {
     assert.equal(b.type, "section");
     assert.equal(b.accessory.action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);
-    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\nfrom this thread\\n`));
+    assert.match(b.text.text, new RegExp(`^\\*<${PAGE.url}\\|Reflection PRD>\\*\\n<@U0[A-Z]+> · from this thread\\n`));
   });
 });
 

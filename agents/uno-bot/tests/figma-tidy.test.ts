@@ -185,7 +185,7 @@ describe("the checks", () => {
     assert.deepEqual(notified(w.posts[0]!), [], "the parent line pings nobody");
     const [c] = cardsIn(reply.blocks!);
     assert.equal(c!.title.text, "AI Indicator / Card 733 / Sarah");
-    assert.equal(c!.subtitle!.text, "Wrong folder · Card 733");
+    assert.equal(c!.subtitle!.text, "<@U0SARAH> · Wrong folder · Card 733");
     assert.equal(c!.body.text, "In ⏳ WIP, but Card 733 is Shipped. Move it to Universal › 📐 Specs.");
     assert.deepEqual(c!.actions.map((a) => a.text.text), ["Review", "Open file", "Card 733"]);
     assert.equal(c!.actions[1]!.url, "https://www.figma.com/design/F1");
@@ -310,7 +310,7 @@ describe("the title check", () => {
     assert.equal(w.posts.length, 2);
     assert.match(JSON.stringify(w.posts[1]!.blocks![0]), /<@U0SARAH>, 1 file needs a tidy\./);
     const [c] = cardsIn(w.posts[1]!.blocks!);
-    assert.equal(c!.subtitle!.text, "Title misses a card · Card 812");
+    assert.equal(c!.subtitle!.text, "<@U0SARAH> · Title misses a card · Card 812");
     assert.equal(
       c!.body.text,
       'Its pages or Cover name Card 812 and Card 1002, which the title leaves out. Rename it to "AI Indicator / Card 733 & 812 & 1002 / Sarah".',
@@ -371,7 +371,7 @@ describe("an item left as is", () => {
       skips: { "F1|wrong-folder": "733", "F9|title": "1" },
     });
     await runTidyPost(w.deps);
-    assert.equal(cardsIn(w.posts[1]!.blocks!)[0]!.subtitle!.text, "Wrong folder · Card 734");
+    assert.equal(cardsIn(w.posts[1]!.blocks!)[0]!.subtitle!.text, "<@U0SARAH> · Wrong folder · Card 734");
     assert.deepEqual(w.skips.b.value, { "F9|title": "1" });
   });
 });

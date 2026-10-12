@@ -462,7 +462,7 @@ describe("the morning's thread in #plus-design (#900)", () => {
         "4 · Show the bar only once there is a goal",
       ],
     );
-    assert.equal(cards[0]!.subtitle!.text, "sarah · Specs page · resolved Sep 29");
+    assert.equal(cards[0]!.subtitle!.text, "<@U0SARAH> · sarah · Specs page · resolved Sep 29");
     assert.equal(cards[0]!.body.text, "PRD › Goal states: add this rule. The progress bar stays hidden until the first goal is set.");
     assert.equal(cards[1]!.body.text, "Card 2482 › Design Status: WIP → Under Review");
     assert.match(cards[2]!.body.text, /^Intake: "Goal chips use the Badge pill variant"\. Agreed in Figma/);
