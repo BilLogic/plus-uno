@@ -21,6 +21,7 @@ import { CONFIRM_FOOTER } from "../src/slack/proposal-render";
 import { renderGateNote } from "../src/slack/gate-note";
 import type { ReportItem, ReportItemState } from "../src/thread-state/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { notified } from "./helpers/notified";
 
 const item = (n: number, over: Partial<ReportItem> = {}): ReportItem => ({
   id: `c${n}`,
@@ -138,6 +139,69 @@ describe("the shared decision card", () => {
       item: { messageTs: "1790000000.000100", id: "c2" },
     });
     assert.equal(reviewPressOf("uno_proposal_review", "1790000000.000100"), null, "a turn's card keeps its own Review");
+  });
+});
+
+describe("whom a report pings", () => {
+  const owned = (n: number, owners: ReportItem["owners"], title = `Page ${n}`) => item(n, { title, subtitle: "from this thread", owners });
+
+  it("one card for one owner: the owner opens the parent line, in the text and the blocks", () => {
+    const report = decisionReport([owned(1, [{ slack: "U0MAX" }])], "This thread settled something that *Page 1* still states the old way.");
+    assert.equal(parentOf(report.blocks), "<@U0MAX>, this thread settled something that *Page 1* still states the old way.");
+    assert.match(report.text, /^<@U0MAX>, this thread settled/);
+    assert.deepEqual(notified(report), ["U0MAX"]);
+  });
+
+  it("a parent that opens on a digit or a name keeps its first word as written", () => {
+    assert.equal(parentOf(decisionReport([owned(1, [{ slack: "U0MAX" }])], "1 page still states it.").blocks), "<@U0MAX>, 1 page still states it.");
+    assert.equal(parentOf(decisionReport([owned(1, [{ slack: "U0MAX" }])], "Figma says so.").blocks), "<@U0MAX>, Figma says so.");
+  });
+
+  it("several owners: one bullet each, listing that owner's items, each owner mentioned once", () => {
+    const report = decisionReport(
+      [
+        owned(1, [{ slack: "U0MAX" }], "Tutor profile cleanup"),
+        owned(2, [{ slack: "U0SURAJ" }], "Teacher Insights Report — Part 2"),
+        owned(3, [{ slack: "U0MAX" }], "Tutor Admin tutor detail"),
+      ],
+      "2 pages still state what their threads changed.",
+    );
+    assert.equal(
+      parentOf(report.blocks),
+      "2 pages still state what their threads changed.\n• <@U0MAX> — Tutor profile cleanup + Tutor Admin tutor detail\n• <@U0SURAJ> — Teacher Insights Report — Part 2",
+    );
+    assert.deepEqual(notified(report), ["U0MAX", "U0SURAJ"]);
+    assert.equal(report.text.split("\n").filter((l) => l.includes("<@U0MAX>")).length, 1, "one ping per owner");
+  });
+
+  it("several cards for one owner: one bullet listing them all", () => {
+    const report = decisionReport([owned(1, [{ slack: "U0MAX" }]), owned(2, [{ slack: "U0MAX" }])], "2 pages still state what their threads changed.");
+    assert.equal(parentOf(report.blocks), "2 pages still state what their threads changed.\n• <@U0MAX> — Page 1 + Page 2");
+  });
+
+  it("an owner not in Team Members is named in plain text, never tagged", () => {
+    const report = decisionReport([owned(1, [{ name: "Max <!channel>" }])], "1 comment in File reads like a decision.");
+    assert.equal(parentOf(report.blocks), "Max &lt;!channel&gt;, 1 comment in File reads like a decision.");
+    assert.deepEqual(notified(report), []);
+  });
+
+  it("tags nobody in a DM", () => {
+    const report = decisionReport([owned(1, [{ slack: "U0MAX" }]), owned(2, [{ slack: "U0SURAJ" }])], "2 pages.", { channel: "D0BILL" });
+    assert.equal(parentOf(report.blocks), "2 pages.");
+    assert.deepEqual(notified(report), []);
+  });
+
+  it("a report with no owners pings nobody", () => {
+    const report = decisionReport([item(1, { subtitle: "Dev Mode links" }), item(2, { subtitle: "Code" })], "Two links.");
+    assert.equal(parentOf(report.blocks), "Two links.");
+    assert.deepEqual(notified(report), []);
+  });
+
+  it("a redraw keeps the opener, so an edit never drops who it is for", () => {
+    const report = decisionReport([owned(1, [{ slack: "U0MAX" }])], "1 page still states it.");
+    const record = reportRecord("C1", "1790000000.000100", report, 3_600_000);
+    const decided = reportMessage({ ...record, entries: [{ ...record.entries[0]!, state: { kind: "rejected", by: "U0BILL" } }] });
+    assert.equal(parentOf(decided.blocks), "<@U0MAX>, 1 page still states it.");
   });
 });
 

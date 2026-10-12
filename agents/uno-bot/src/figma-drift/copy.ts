@@ -17,9 +17,10 @@
 // pointer to it. Once a file catches up, its card (or a pointer-only message)
 // is edited in place to say so.
 //
-// MENTIONS: each card's subtitle @-mentions its file's owner, and its last
-// publisher when the Team Members directory maps their Figma id to a Slack
-// person other than the owner. Nobody else is mentioned.
+// MENTIONS: the parent line tags each card's file owner, where Slack
+// notifies (`owners`, drawn by the shared card). A last publisher the Team
+// Members directory maps to a Slack person other than the owner is named on
+// the card's subtitle by Figma handle, in plain text. Nobody is tagged else.
 //
 // EVERY NOTION- AND FIGMA-SOURCED STRING IN mrkdwn IS ESCAPED
 // (`escapeSlackText`): a file title or a thread paraphrase holding
@@ -126,21 +127,22 @@ export function elsewhereLine(file: Pick<AskedFileWords, "title" | "url">, cardL
  * @param input.id - The card's id in its report
  * @param input.owner - The file's owner's Slack id, or null
  * @param input.publisher - Its last publisher, when the Team Members
- *   directory maps their Figma id; @-mentioned, and only when not the owner
+ *   directory maps their Figma id; named by handle, and only when not the owner
  * @param input.lane - What Approve files
  */
 export function driftItem(
-  input: DriftFileWords & { id: string; owner: string | null; publisher?: { slackId: string } | null; lane: IntakeLane },
+  input: DriftFileWords & { id: string; owner: string | null; publisher?: { slackId: string; handle: string } | null; lane: IntakeLane },
 ): ReportItem {
   const { file, change } = input;
   const title = fileName(file);
   const when = change.kind === "unknown" ? null : `last changed ${dayWords(change.at)}`;
-  const publisher = input.publisher && input.publisher.slackId !== input.owner ? `published by <@${input.publisher.slackId}>` : null;
-  const subtitle = [input.owner ? `<@${input.owner}>` : null, publisher, when].filter(Boolean).join(" · ");
+  const publisher = input.publisher && input.publisher.slackId !== input.owner ? `published by ${escapeSlackText(input.publisher.handle)}` : null;
+  const subtitle = [publisher, when].filter(Boolean).join(" · ");
   return {
     id: input.id,
     title,
     ...(subtitle ? { subtitle } : {}),
+    ...(input.owner ? { owners: [{ slack: input.owner }] } : {}),
     body: `Thread settled "${quoted(input.threadSays, CARD_SAID_CHARS)}" on ${dayWords(input.decidedAt)} · ${sinceWords(file.kind, change)}.`,
     open: { label: openLabel(file.kind), url: file.url },
     done: `${input.lane === "roadmap" ? "a Roadmap card" : "an intake"} to update ${title}`,

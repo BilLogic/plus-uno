@@ -65,7 +65,7 @@ import {
 } from "../src/figma-drift/copy";
 import type { GateNote } from "../src/turn/index";
 import { STANDING_TOO } from "../src/sweep/capture-lines";
-import { decisionCard, decisionCardWords, decisionParent, rewordInstead, whichOne } from "../src/figma-comments/copy";
+import { decisionCard, decisionCardWords, decisionItem, decisionParent, rewordInstead, whichOne } from "../src/figma-comments/copy";
 import { DECISION_CARD_TTL_MS } from "../src/figma-comments/post";
 import type { QueuedDecision } from "../src/figma-comments/queue";
 import { askLeadText, figmaReplyText, type FigmaReply } from "../src/figma-ask/copy";
@@ -659,21 +659,24 @@ describe("the drift card (#886 § 3.3)", () => {
     passesChecklist(elsewhereLine(FILE, null));
   });
 
-  it("each file's card: the file, its owner and last change, what the thread settled, and Open to the frame", () => {
+  it("each file's card: the file and last change, its owner to ping, what the thread settled, and Open to the frame", () => {
     const item = driftItem({ id: "1", ...one, owner: MERYEM, lane: "roadmap" });
     assert.deepEqual(item, {
       id: "1",
       title: "Goal Setting — Goal states",
-      subtitle: "<@U0MERYEM1> · last changed Sep 20",
+      subtitle: "last changed Sep 20",
+      owners: [{ slack: "U0MERYEM1" }],
       body: 'Thread settled "tooltips on option chips" on Sep 24 · the file has not changed since Sep 20.',
       open: { label: "Open in Figma", url: FILE.url },
       done: "a Roadmap card to update Goal Setting — Goal states",
     });
     const changed = driftItem({ id: "2", ...one, change: { kind: "changed", at: Date.UTC(2026, 8, 26, 18) }, owner: null, lane: "roadmap" });
     assert.equal(changed.subtitle, "last changed Sep 26");
+    assert.equal(changed.owners, undefined, "no owner, nobody to ping");
     assert.equal(changed.body, 'Thread settled "tooltips on option chips" on Sep 24 · the file changed Sep 26, unconfirmed.');
     const code = driftItem({ id: "3", ...one, file: CODE, change: { kind: "unknown" }, owner: MERYEM, lane: "maintain" });
-    assert.equal(code.subtitle, "<@U0MERYEM1>");
+    assert.equal(code.subtitle, undefined);
+    assert.deepEqual(code.owners, [{ slack: "U0MERYEM1" }]);
     assert.equal(code.body, 'Thread settled "tooltips on option chips" on Sep 24 · the code may not show it yet.');
     assert.deepEqual(code.open, { label: "Open on GitHub", url: CODE.url });
     assert.equal(code.done, "an intake to update Button.jsx");
@@ -778,14 +781,16 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
     update: { kind: "intake", title: "Goal chips use the Badge pill variant" },
   };
 
-  it("the parent names the file and the count, for one named person, in one plain sentence", () => {
-    const three = decisionParent({ ...FILE, owner: { slack: "U0AAAAAA1" } }, 3);
-    assert.equal(three, "<@U0AAAAAA1>, 3 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions.");
+  it("the parent names the file and the count in one plain sentence, and each card names whom it is for", () => {
+    const three = decisionParent(FILE, 3);
+    assert.equal(three, "3 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions.");
     passesChecklist(three);
-    assert.equal(three.match(/<@U/g)?.length, 1, "the owner, once");
-    const one = decisionParent({ ...FILE, owner: { figma: "bea" } }, 1);
-    assert.equal(one, "bea, 1 comment in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> reads like a decision.");
+    const one = decisionParent(FILE, 1);
+    assert.equal(one, "1 comment in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> reads like a decision.");
     passesChecklist(one);
+    assert.deepEqual(decisionItem(1, base, COMMENT, { slack: "U0AAAAAA1" }).owners, [{ slack: "U0AAAAAA1" }]);
+    assert.deepEqual(decisionItem(1, base, COMMENT, { figma: "bea" }).owners, [{ name: "bea" }], "a Figma handle, never tagged");
+    assert.equal(decisionItem(1, base, COMMENT, null).owners, undefined);
   });
 
   it("what Review shows leads with the number and the quote, says who said it where and when, and has no footer", () => {

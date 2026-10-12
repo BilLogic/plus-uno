@@ -834,7 +834,7 @@ async function askFor(deps: DueDeps, c: CommitmentRecord, text: CommitmentText, 
         c,
         text,
         people,
-        item: todoItem({ id: c.id, owner: c.promiserId, what: text.what, sourceUrl, fromNote }),
+        item: todoItem({ id: c.id, people, what: text.what, sourceUrl, fromNote }),
         card: statedCard("file this Roadmap card", todoReviewLead(String(drafted.input.title ?? text.what)), drafted),
       };
     }
@@ -894,7 +894,8 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
   const first = group.asked.every((a) => a.c.nudges === 0);
   const report = decisionReport(
     group.asked.map((a) => a.item),
-    followUpParent(kinds, people, first),
+    followUpParent(kinds, first),
+    { channel: group.to.channel },
   );
   // Checked this morning already, so each comes back with the next report.
   const later: CommitmentAction[] = waiting.map((a) => ({ id: a.c.id, action: "held", note: "past this report's cards; asked in the next report" }));

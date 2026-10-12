@@ -42,6 +42,7 @@ import { resolveSignal } from "../src/gate/index";
 import { renderGateNote } from "../src/slack/gate-note";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { notified } from "./helpers/notified";
 import { at, DESIGN, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
 
 type Card = {
@@ -281,13 +282,14 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(messageBlocksRefusal(card!.blocks!), null, "Slack takes it");
     assert.equal(
       card!.text.split("\n")[0],
-      "This thread settled a decision that its Figma file has not caught up with.",
-      "the parent line: one plain sentence",
+      "<@U0BEA>, this thread settled a decision that its Figma file has not caught up with.",
+      "the parent line, opened on the file's owner",
     );
+    assert.deepEqual(notified(card!), ["U0BEA"], "the owner is pinged from the main text");
     const [one] = cardsOf(card!.blocks);
     assert.equal(cardsOf(card!.blocks).length, 1, "one card for the one file");
     assert.equal(one!.title!.text, "Session Recap");
-    assert.equal(one!.subtitle!.text, "<@U0BEA> · last changed Sep 20", "the owner, and the file's last change");
+    assert.equal(one!.subtitle!.text, "last changed Sep 20", "the file's last change");
     assert.equal(
       one!.body!.text,
       'Thread settled "The recap drops the Share button; tutors see it automatically" on Sep 29 · the file has not changed since Sep 20.',
@@ -355,13 +357,14 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(m.posted.length, 1, "the report goes out");
     const [card] = cardsOf(m.posted[0]!.blocks);
     assert.match(card!.body!.text, / · the file may not show it yet\.$/);
-    assert.equal(card!.subtitle!.text, "<@U0BEA>", "no last change it could not read");
+    assert.equal(card!.subtitle, undefined, "no last change it could not read");
+    assert.deepEqual(notified(m.posted[0]!), ["U0BEA"]);
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
     assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/);
     assert.equal(m.figma.calls().length, 1, "a failed read is not tried again for the publisher");
   });
 
-  it("@-mentions a publisher the Team Members directory maps to someone other than the owner, and lets them decide the card", async () => {
+  it("names a publisher the Team Members directory maps to someone other than the owner in plain text, tags the owner only, and lets them decide the card", async () => {
     const t = await sweptRecap();
     const m = morning(t.h, t.drifts, {
       publisher: { handle: "cy<designs>", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" },
@@ -369,8 +372,9 @@ describe("a Figma drift at the morning run", () => {
     });
     await runDriftAsks(MORNING, m.deps);
     const [card] = cardsOf(m.posted[0]!.blocks);
-    assert.equal(card!.subtitle!.text, "<@U0BEA> · published by <@U0CY> · last changed Sep 20", "the publisher is @-mentioned beside the owner");
-    assert.doesNotMatch(JSON.stringify(m.posted[0]!.blocks), /cy&lt;designs/, "the mention replaces the Figma handle");
+    assert.equal(card!.subtitle!.text, "published by cy&lt;designs&gt; · last changed Sep 20", "the publisher by name");
+    assert.deepEqual(notified(m.posted[0]!), ["U0BEA"], "the owner pinged, the publisher not");
+    assert.doesNotMatch(JSON.stringify(m.posted[0]!.blocks), /U0CY/, "the publisher is tagged nowhere");
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
     assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE", "U0CY"], "the publisher may decide the card");
   });
@@ -382,7 +386,8 @@ describe("a Figma drift at the morning run", () => {
       figmaPeople: { "1105000000000000002": "U0BEA" },
     });
     await runDriftAsks(MORNING, m.deps);
-    assert.equal(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, "<@U0BEA> · last changed Sep 20");
+    assert.equal(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, "last changed Sep 20");
+    assert.deepEqual(notified(m.posted[0]!), ["U0BEA"]);
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
     assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE"], "no confirmer twice");
   });
@@ -391,7 +396,7 @@ describe("a Figma drift at the morning run", () => {
     const t = await sweptRecap();
     const m = morning(t.h, t.drifts, { publisher: { handle: "cy<designs>", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" }, figmaPeople: {} });
     await runDriftAsks(MORNING, m.deps);
-    assert.equal(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, "<@U0BEA> · last changed Sep 20");
+    assert.equal(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, "last changed Sep 20");
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
     assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE"]);
     assert.match(JSON.stringify(proposal!.operations), /Last published by cy<designs>/);
@@ -494,9 +499,9 @@ describe("a Figma drift at the morning run", () => {
     const m = morning(h, drifts);
     await runDriftAsks(MORNING, m.deps);
 
-    assert.match(m.posted[0]!.text, /^This thread settled a decision that the code has not caught up with\.\n/);
+    assert.match(m.posted[0]!.text, /^<@U0ADE>, this thread settled a decision that the code has not caught up with\.\n/);
     const [card] = cardsOf(m.posted[0]!.blocks);
-    assert.equal(card!.subtitle!.text, "<@U0ADE>");
+    assert.equal(card!.subtitle, undefined);
     assert.match(card!.body!.text, / · the code may not show it yet\.$/);
     assert.deepEqual(labels(card!), ["Review", "Open on GitHub"]);
     assert.doesNotMatch(m.posted[0]!.text, GATE_WORDS);
@@ -810,7 +815,7 @@ describe("the drift check, before the ask (#897)", () => {
     await runDriftAsks(MORNING, m.deps);
     assert.equal(m.posted.length, 1);
     const [card] = cardsOf(m.posted[0]!.blocks);
-    assert.equal(card!.subtitle!.text, "<@U0BEA> · last changed Sep 29");
+    assert.equal(card!.subtitle!.text, "last changed Sep 29");
     assert.match(card!.body!.text, / · the file changed Sep 29, unconfirmed\.$/);
     const [live] = await drifts.liveAsks();
     assert.equal(live!.files[0]!.checkedThrough, Date.parse(CHANGED_AFTER), "the version judged is not judged again");
@@ -1003,7 +1008,7 @@ describe("the drift check, while the report is live (#897)", () => {
     const first = recheck(h, drifts, m.figma, { judge: async () => "shows" });
     await recheckLiveAsks(RECHECK, first.deps);
     const after = cardsOf(first.edits[0]!.blocks);
-    assert.deepEqual(after.map((c) => c.subtitle!.text), ["Updated Sep 30. Nothing to do.", "<@U0ADE> · last changed Sep 20"]);
+    assert.deepEqual(after.map((c) => c.subtitle!.text), ["Updated Sep 30. Nothing to do.", "last changed Sep 20"]);
     assert.deepEqual(labels(after[1]!), ["Review", "Open in Figma"], "the other file's card stays to decide");
 
     m.figma.seedFile("ZzOther9", {

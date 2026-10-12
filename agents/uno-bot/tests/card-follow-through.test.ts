@@ -66,6 +66,7 @@ import { recordingDelivery } from "../src/turn/index";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import { currentReport, itemProposal } from "../src/slack/decision-cards";
 import { ANSWER_ON_CARD } from "../src/follow-through/copy";
+import { notified } from "./helpers/notified";
 
 const SCAN: ScheduledJob = { key: "card-follow-through", kind: "card-follow-through" };
 const NUDGE: ScheduledJob = { key: "commitment-nudge", kind: "commitment-nudge" };
@@ -364,11 +365,12 @@ describe("F3: a to-do to make a card", () => {
     assert.equal(offer!.channel, DESIGN);
     assert.equal(offer!.threadTs, ROOT);
     assert.equal(messageBlocksRefusal(offer!.blocks), null);
-    assert.match(offer!.text, /^<@U0MAYA> A to-do to make a Roadmap card came up, and I couldn't find the card\./);
+    assert.match(offer!.text, /^<@U0MAYA>, a to-do to make a Roadmap card came up, and I couldn't find the card\./);
+    assert.deepEqual(notified(offer!), [MAYA], "the person asked is pinged from the main text");
     assert.deepEqual(mentions(offer!.text), [MAYA]);
     const [c] = offer!.cards;
     assert.equal(c!.title.text, "The facelift last stage");
-    assert.equal(c!.subtitle!.text, "<@U0MAYA> · from this thread");
+    assert.equal(c!.subtitle!.text, "from this thread");
     assert.equal(c!.body.text, "No Roadmap card found for this. Review holds the drafted card.");
     assert.deepEqual(c!.actions.map((x) => x.text.text), ["Review", "Open source"]);
     assert.equal(c!.actions[1]!.url, `https://plus.slack.com/archives/${DESIGN}/p${TODO.replace(".", "")}`);
@@ -438,7 +440,7 @@ describe("F3: a to-do to make a card", () => {
     const second = morning(store, rm, at(42, 13)); // Mon Oct 12, the first morning past a week
     await second.run();
     assert.equal(second.posts.length, 1);
-    assert.match(second.posts[0]!.text, /^<@U0MAYA> Checking in once more on this to-do\./);
+    assert.match(second.posts[0]!.text, /^<@U0MAYA>, checking in once more on this to-do\./);
     assert.equal(second.posts[0]!.threadTs, ROOT);
     assert.deepEqual(second.posts[0]!.cards[0]!.actions.map((x) => x.text.text), ["Review", "Open source"]);
     assert.equal(only(store).followupTs, second.posts[0]!.ts);
@@ -470,7 +472,8 @@ describe("F3: a to-do to make a card", () => {
     assert.deepEqual(mentions(m.posts[0]!.text), [BEA, ADE]);
     assert.ok(!mentions(m.posts[0]!.text).includes(LEAD));
     const [c] = m.posts[0]!.cards;
-    assert.equal(c!.subtitle!.text, "<@U0BEA> · from the running note");
+    assert.equal(c!.subtitle!.text, "from the running note");
+    assert.match(m.posts[0]!.text, /\n• <@U0BEA> — .*\n• <@U0ADE> — /, "one bullet per taker");
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open source", "https://www.notion.so/note1"]]);
   });
 
@@ -511,11 +514,12 @@ describe("F4: an active card with no owner", () => {
     assert.equal(m.posts.length, 1);
     assert.equal(m.posts[0]!.channel, DESIGN);
     assert.equal(m.posts[0]!.threadTs, null);
-    assert.match(m.posts[0]!.text, /^<@U0BEA> A Roadmap card has been worked for over a week with no Contributor\./);
+    assert.match(m.posts[0]!.text, /^<@U0BEA>, a Roadmap card has been worked for over a week with no Contributor\./);
+    assert.deepEqual(notified(m.posts[0]!), [BEA]);
     assert.deepEqual(mentions(m.posts[0]!.text), [BEA]);
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.title.text, "Facelift — last stage");
-    assert.equal(c!.subtitle!.text, "<@U0BEA> · WIP · no Contributor for a week");
+    assert.equal(c!.subtitle!.text, "WIP · no Contributor for a week");
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
     // Posted at the channel's top, it starts a thread that is uno-bot's own:
     // nothing is marked, so a reply there engages uno-bot with no @mention.
@@ -632,7 +636,7 @@ describe("F4: an active card with no owner", () => {
     await later.run();
     assert.equal(later.posts.length, 1);
     assert.equal(later.posts[0]!.threadTs, m.posts[0]!.ts);
-    assert.match(later.posts[0]!.text, /^<@U0BEA> Checking in once more on this card\./);
+    assert.match(later.posts[0]!.text, /^<@U0BEA>, checking in once more on this card\./);
     assert.deepEqual(later.posts[0]!.cards[0]!.actions.map((x) => x.text.text), ["Review", "Open card"]);
     // Its own thread still: asking again there marks nothing either.
     assert.deepEqual(later.marked, []);
@@ -715,11 +719,12 @@ describe("F5: a stuck card", () => {
     const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.equal(m.posts[0]!.channel, UNIVERSAL);
-    assert.match(m.posts[0]!.text, /^<@U0MAYA> Checking in on a Roadmap card that has gone quiet\./);
+    assert.match(m.posts[0]!.text, /^<@U0MAYA>, checking in on a Roadmap card that has gone quiet\./);
+    assert.deepEqual(notified(m.posts[0]!), [MAYA]);
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.title.text, "Facelift — last stage");
-    assert.equal(c!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
+    assert.equal(c!.subtitle!.text, "Under Review · no comments for 3 weeks");
     assert.equal(c!.body.text, "Is it still moving? Done moves it to Under Dev or another status, Still on it checks again in 3 weeks, Drop it archives it.");
     // Two buttons: Review and Open card. No one-tap Still on it.
     assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
@@ -1040,7 +1045,7 @@ describe("shared rules", () => {
     assert.equal(m.posts.length, 2);
     const bea = m.posts.find((p) => mentions(p.text).includes(BEA))!;
     const maya = m.posts.find((p) => mentions(p.text).includes(MAYA))!;
-    assert.match(bea.text, /^<@U0BEA> Checking in on 2 Roadmap cards\./);
+    assert.match(bea.text, /^Checking in on 2 Roadmap cards\.\n• <@U0BEA> — /);
     assert.equal((bea.blocks as Array<{ type: string }>).at(-1)!.type, "carousel");
     assert.deepEqual(bea.cards.map((c) => c.actions.map((x) => x.text.text)), [["Review", "Open card"], ["Review", "Open card"]]);
     assert.equal(maya.cards.length, 1);
@@ -1945,7 +1950,9 @@ describe("tagging through the Team Members directory", () => {
     const m = morning(store, rm, at(30, 13));
     await m.run();
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
-    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
+    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
+    assert.match(m.posts[0]!.text, /\n• Kai Lo — /, "named on their own bullet, not tagged");
+    assert.deepEqual(notified(m.posts[0]!), [MAYA]);
   });
 
   /** The lead's notes about Team Members gaps, over a stored map and 30-day marks kept across mornings. */
@@ -2084,7 +2091,7 @@ describe("tagging through the Team Members directory", () => {
     assert.ok(report.notes.some((n) => n.includes("n-nameless")), report.summary);
     const m = morning(store, rm, at(30, 13));
     await m.run();
-    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
+    assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "Under Review · no comments for 3 weeks");
     assert.doesNotMatch(JSON.stringify(m.posts[0]!.blocks), /n-nameless/);
   });
 

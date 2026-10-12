@@ -36,6 +36,7 @@ import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
 import type { DecisionRow } from "../src/integrations/notion";
 import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness } from "./helpers/sweep-harness";
+import { mentionCount, notified } from "./helpers/notified";
 
 /** One card of a decision report, as Slack is handed it. */
 type Card = {
@@ -443,7 +444,13 @@ describe("the morning's thread in #plus-design (#900)", () => {
     const [parent] = h.figma.messages;
     assert.equal(parent!.threadTs, null);
     const blocks = parent!.blocks as Array<{ type: string; text?: { text: string }; elements?: Card[] }>;
-    assert.equal(blocks[0]!.text!.text, "<@U0SARAH>, 4 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions.");
+    assert.equal(
+      blocks[0]!.text!.text,
+      "4 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions.\n• <@U0SARAH> — 1 · Keep the progress bar hidden until the first goal is set + 2 · States are all in, moving this card to Under Review + 3 · Goal chips use Badge's pill variant everywhere + 4 · Show the bar only once there is a goal",
+      "the owner's bullet lists their cards",
+    );
+    assert.deepEqual(notified(parent!), ["U0SARAH"]);
+    assert.equal(mentionCount(parent!, "U0SARAH"), 1, "pinged once");
     assert.equal(blocks[1]!.type, "carousel");
     const cards = blocks[1]!.elements!;
     assert.deepEqual(
@@ -672,7 +679,7 @@ describe("the morning's thread in #plus-design (#900)", () => {
     await runSweepJob(MORNING, h.deps);
     const [first] = h.figma.messages;
     const blocks = first!.blocks as Array<{ text?: { text: string }; elements?: Card[] }>;
-    assert.match(blocks[0]!.text!.text, /12 comments in .* read like decisions\. Showing 10 of 12; the rest come in the next report\.$/);
+    assert.match(blocks[0]!.text!.text, /12 comments in .* read like decisions\. Showing 10 of 12; the rest come in the next report\.\n• <@U0SARAH> — 1 · Decision 1 \+ .* \+ 10 · Decision 10$/);
     assert.equal(blocks[1]!.elements!.length, 10);
     assert.equal(h.staged.length, 10);
     assert.deepEqual(h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId), ["m11", "m12"], "held in the file's queue entry");

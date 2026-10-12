@@ -51,6 +51,7 @@ import { at, BOT, notionPage, ts } from "./helpers/sweep-harness";
 import { harness, request } from "./helpers/turn-harness";
 import { runTurn } from "../src/turn/index";
 import { resultMetadataFor } from "../src/agent/resolve-proposal";
+import { notified } from "./helpers/notified";
 
 const MAYA = "U0MAYA";
 const BEA = "U0BEA";
@@ -775,6 +776,8 @@ describe("a fix on the card, held to the sweep's rules", () => {
     assert.deepEqual(w.staged.map((p) => p.sweepRun), ["2026-09-30", "2026-09-30"]);
     assert.equal(new Set(w.staged.map((p) => p.supersedeKey)).size, 2);
     assert.equal((await liveIn(w)).length, 2, "both stay live");
+    assert.ok(w.posts.length > 0);
+    for (const p of w.posts) assert.deepEqual(notified(p), [], "a card in a DM tags nobody");
   });
 
   it("a Needs changes revision that adds a write past the drafted edit is refused, and the fix stays", async () => {

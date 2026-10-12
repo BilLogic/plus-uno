@@ -2,10 +2,12 @@
 // on the shared decision card (`slack/decision-cards.ts`).
 //
 // The thread opens with one message: a parent line naming the file and the
-// count for its owner, then one card per decision — a carousel when there are
-// several — each with Review and Open comment:
+// count, with its owner's bullet the shared card adds (`owners`), then one
+// card per decision — a carousel when there are several — each with Review
+// and Open comment:
 //
-//   <@sarah>, 2 comments in Goal Setting read like decisions.
+//   2 comments in Goal Setting read like decisions.
+//   • <@sarah> — 1 · Keep the progress bar hidden… + 2 · …
 //   ┌ 1 · Keep the progress bar hidden until the first goal is set
 //   │ sarah · Specs page · resolved Sep 29
 //   │ PRD › Goal states: add this rule. The progress bar stays hidden until…
@@ -25,7 +27,7 @@
 // PURE.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import type { ReportItem, StatedCardWords } from "../thread-state/index";
+import type { CardOwner, ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { dayWords } from "../figma-drift/copy";
 import type { DecisionUpdate } from "./draft";
@@ -38,16 +40,16 @@ function fileName(file: Pick<QueuedFile, "title">): string {
 }
 
 /**
- * The thread's parent line: whom it is for, the file and the count, in one
- * plain sentence.
+ * The thread's parent line: the file and the count, in one plain sentence.
+ * Whom it is for, the shared card opens it on (`decisionItem`'s owner).
  *
  * @param file - The file
  * @param count - How many decisions it has, held-back ones included
  */
-export function decisionParent(file: Pick<QueuedFile, "title" | "url" | "owner">, count: number): string {
+export function decisionParent(file: Pick<QueuedFile, "title" | "url">, count: number): string {
   const what = count === 1 ? "1 comment in" : `${count} comments in`;
   const reads = count === 1 ? "reads like a decision" : "read like decisions";
-  return `${ownerOf(file.owner)}${what} <${file.url}|${fileName(file)}> ${reads}.`;
+  return `${what} <${file.url}|${fileName(file)}> ${reads}.`;
 }
 
 /** The parent, edited, when none of its cards went up this morning. */
@@ -55,11 +57,10 @@ export function decisionParentWaiting(file: Pick<QueuedFile, "title" | "url">): 
   return `Comments in <${file.url}|${fileName(file)}> read like decisions. Their cards didn't go through this morning, so they'll post here tomorrow morning.`;
 }
 
-/** Whom the parent is for: the owner by Slack mention, else by Figma handle. */
-function ownerOf(owner: FileOwner | null): string {
-  if (owner && "slack" in owner) return `<@${owner.slack}>, `;
-  if (owner) return `${escapeSlackText(owner.figma)}, `;
-  return "";
+/** Whom a card is for: the owner as a Slack person, else by Figma handle. */
+function ownerOf(owner: FileOwner | null): CardOwner[] {
+  if (owner && "slack" in owner) return [{ slack: owner.slack }];
+  return owner ? [{ name: owner.figma }] : [];
 }
 
 /** When the comment was resolved or made. */
@@ -152,8 +153,10 @@ export function decisionCard(n: number, d: QueuedDecision, commentUrl: string): 
  * @param n - Its number in the thread
  * @param d - A decision with an operation or a row
  * @param commentUrl - Its comment's link
+ * @param owner - Whom it is for: the file's owner, or null
  */
-export function decisionItem(n: number, d: QueuedDecision, commentUrl: string): ReportItem {
+export function decisionItem(n: number, d: QueuedDecision, commentUrl: string, owner: FileOwner | null): ReportItem {
+  const owners = ownerOf(owner);
   const drafted = draftedText(d);
   // The row's line before the drafted words, so a cut card still shows it.
   const update = d.row ? `${updateWords(d.update)}. ${rowWords(d.row.update)}` : updateWords(d.update);
@@ -162,6 +165,7 @@ export function decisionItem(n: number, d: QueuedDecision, commentUrl: string): 
     id: d.commentId,
     title: `${n} · ${d.quote}`,
     subtitle: `${escapeSlackText(d.by)} · ${d.section} page · ${whenWords(d)}`,
+    ...(owners.length ? { owners } : {}),
     body: drafted ? `${update}. ${drafted}` : update,
     // Once written, the card says what the write made.
     ...(drafted ? { done: drafted } : {}),

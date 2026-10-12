@@ -28,6 +28,7 @@ import { recordingViews } from "./helpers/recording-slack";
 import { recordingDelivery } from "../src/turn/index";
 import { cardWords } from "./helpers/card-message";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { notified } from "./helpers/notified";
 
 const FILE_KEY = "zAecJNRdvJzAUOcjV32tRX";
 const CHANNEL = "C072E8SFLKV";
@@ -384,6 +385,7 @@ describe("the morning post", () => {
     const posted = morning.posts[0]!;
     const blocks = posted.blocks as Array<Record<string, any>>;
     assert.deepEqual(blocks.map((b) => b.type), ["section", "card", "data_table"]);
+    assert.deepEqual(notified(posted), [], "anyone can settle a publish: nobody is tagged");
 
     // The parent line: what the job found, one plain sentence.
     assert.equal(blocks[0]!.text.text, 'coco published "Badge sizes + accordion copy" to the library: 3 components changed, 2 of them have code.');

@@ -35,6 +35,7 @@ import type { CardMessage } from "../src/slack/button-door";
 import { recordingDelivery } from "../src/turn/index";
 import { recordingViews } from "./helpers/recording-slack";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { notified } from "./helpers/notified";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../src/thread-state/index";
 
 const CHANNEL = "C03FC8AS69K";
@@ -179,7 +180,9 @@ describe("the checks", () => {
     const reply = w.posts[1]!;
     assert.equal(reply.threadTs, PARENT);
     assert.equal(messageBlocksRefusal(reply.blocks!), null);
-    assert.match(JSON.stringify(reply.blocks![0]), /<@U0SARAH>, 1 of your files needs a tidy\./);
+    assert.match(JSON.stringify(reply.blocks![0]), /<@U0SARAH>, 1 file needs a tidy\./);
+    assert.deepEqual(notified(reply), ["U0SARAH"], "the owner is pinged from the main text");
+    assert.deepEqual(notified(w.posts[0]!), [], "the parent line pings nobody");
     const [c] = cardsIn(reply.blocks!);
     assert.equal(c!.title.text, "AI Indicator / Card 733 / Sarah");
     assert.equal(c!.subtitle!.text, "Wrong folder · Card 733");
@@ -305,7 +308,7 @@ describe("the title check", () => {
     });
     await runTidyPost(w.deps);
     assert.equal(w.posts.length, 2);
-    assert.match(JSON.stringify(w.posts[1]!.blocks![0]), /<@U0SARAH>, 1 of your files needs a tidy\./);
+    assert.match(JSON.stringify(w.posts[1]!.blocks![0]), /<@U0SARAH>, 1 file needs a tidy\./);
     const [c] = cardsIn(w.posts[1]!.blocks!);
     assert.equal(c!.subtitle!.text, "Title misses a card · Card 812");
     assert.equal(
@@ -389,12 +392,15 @@ describe("the post", () => {
     const replies = w.posts.slice(1);
     assert.equal(replies.length, 3);
     const lines = replies.map((r) => JSON.stringify(r.blocks![0]));
-    assert.match(lines[0]!, /<@U0SARAH>, 7 of your files need a tidy: here are 5, and 2 more next week\./);
+    assert.match(lines[0]!, /7 files need a tidy: here are 5, and 2 more next week\.\\n• <@U0SARAH> — /);
     assert.equal(lines[0]!.match(/<@/g)!.length, 1, "mentioned once");
+    assert.deepEqual(notified(replies[0]!), ["U0SARAH"]);
     assert.equal(cardsIn(replies[0]!.blocks!).length, 5);
-    assert.match(lines[1]!, /<@U0MERYEM>, 1 of your files needs a tidy\./);
+    assert.match(lines[1]!, /<@U0MERYEM>, 1 file needs a tidy\./);
+    assert.deepEqual(notified(replies[1]!), ["U0MERYEM"]);
     assert.match(lines[2]!, /1 file has no owner I could find\./);
     assert.doesNotMatch(JSON.stringify(replies[2]), /<@/);
+    assert.deepEqual(notified(replies[2]!), [], "no owner, nobody pinged");
     for (const r of replies) assert.equal(r.threadTs, PARENT);
     assert.deepEqual(w.marked, [PARENT], "the thread is marked, so replies there are not all turns");
   });

@@ -202,8 +202,8 @@ async function postReport(
   const open = file.threadTs ? await threads.read(file.threadTs) : null;
   const known = open && open.channel === slack.channel ? open : null;
   const base = known ? (known.numbered ?? known.decisions.length) : 0;
-  const items = cardable.map((d, i) => decisionItem(base + i + 1, d, commentUrl(file.fileKey, d.nodeId, d.commentId)));
-  const report = decisionReport(items, decisionParent(file, cardable.length || notes));
+  const items = cardable.map((d, i) => decisionItem(base + i + 1, d, commentUrl(file.fileKey, d.nodeId, d.commentId), file.owner));
+  const report = decisionReport(items, decisionParent(file, cardable.length || notes), { channel: slack.channel });
   const sent = await slack.post({ text: report.text, blocks: report.blocks, ...(known ? { thread_ts: known.ts } : {}) });
   if (!sent.ok || !sent.ts) return null;
   const thread: DecisionThread = known

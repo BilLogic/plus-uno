@@ -20,7 +20,7 @@
 
 import { escapeSlackText } from "../slack/mrkdwn";
 import { reminderAnswer } from "../commitments/copy";
-import type { ReportItem, ReviewChoice } from "../thread-state/index";
+import type { CardOwner, ReportItem, ReviewChoice } from "../thread-state/index";
 
 /** F3's draft is asked for with ✅ (or ✔️) alone — not 👍, which reads as a
  *  nod rather than "draft it". */
@@ -77,8 +77,9 @@ export function answeredBy(user: string): string {
  *  live, so another tap tries again. */
 export const DRAFT_NOT_POSTED = "The draft card didn't go up, so nothing changed. Try again in a moment.";
 
-function mentionsOf(people: readonly string[]): string {
-  return [...new Set(people.filter(Boolean))].map((p) => `<@${p}>`).join(" ");
+/** The people a card asks, each once, as its owners. */
+function ownersOf(people: readonly string[]): CardOwner[] {
+  return [...new Set(people.filter(Boolean))].map((slack) => ({ slack }));
 }
 
 function cardLink(card: { title: string; url: string }): string {
@@ -105,7 +106,8 @@ export function draftTitle(what: string): string {
 
 // ── On the shared decision card ──────────────────────────────────────────────
 //
-// A parent line naming the people asked, then one card per follow-up, each
+// A parent line, opened on the people asked by the shared card (each card's
+// `owners`), then one card per follow-up, each
 // with Review and Open (`slack/decision-cards.ts`). Review is the only way to
 // answer: no glyph, nothing to type. A card's title and body are plain text,
 // so nothing in them is escaped; its subtitle and the parent line are mrkdwn.
@@ -113,34 +115,32 @@ export function draftTitle(what: string): string {
 type Kind = "card_todo" | "card_unowned" | "card_stale";
 
 /**
- * The parent line: whom it is for, and what the job found, in one sentence.
+ * The parent line: what the job found, in one sentence. Whom it is for, the
+ * shared card opens it on.
  *
  * @param kinds - Each card's kind, in the order shown
- * @param people - Everyone it mentions
  * @param first - The first ask, or the one follow-up a week on
  */
-export function followUpParent(kinds: readonly Kind[], people: readonly string[], first: boolean): string {
+export function followUpParent(kinds: readonly Kind[], first: boolean): string {
   const n = kinds.length;
   const one = new Set(kinds).size === 1 ? kinds[0]! : null;
-  const who = mentionsOf(people);
-  const lead = who ? `${who} ` : "";
   if (!first) {
     const noun = one === "card_todo" ? (n === 1 ? "this to-do" : `these ${n} to-dos`) : n === 1 ? "this card" : `these ${n} cards`;
-    return `${lead}Checking in once more on ${noun}.`;
+    return `Checking in once more on ${noun}.`;
   }
   switch (one) {
     case "card_todo":
       return n === 1
-        ? `${lead}A to-do to make a Roadmap card came up, and I couldn't find the card.`
-        : `${lead}${n} to-dos to make Roadmap cards came up, and I couldn't find the cards.`;
+        ? `A to-do to make a Roadmap card came up, and I couldn't find the card.`
+        : `${n} to-dos to make Roadmap cards came up, and I couldn't find the cards.`;
     case "card_unowned":
       return n === 1
-        ? `${lead}A Roadmap card has been worked for over a week with no Contributor.`
-        : `${lead}${n} Roadmap cards have been worked for over a week with no Contributor.`;
+        ? `A Roadmap card has been worked for over a week with no Contributor.`
+        : `${n} Roadmap cards have been worked for over a week with no Contributor.`;
     case "card_stale":
-      return n === 1 ? `${lead}Checking in on a Roadmap card that has gone quiet.` : `${lead}Checking in on ${n} Roadmap cards that have gone quiet.`;
+      return n === 1 ? `Checking in on a Roadmap card that has gone quiet.` : `Checking in on ${n} Roadmap cards that have gone quiet.`;
     default:
-      return `${lead}Checking in on ${n} Roadmap cards.`;
+      return `Checking in on ${n} Roadmap cards.`;
   }
 }
 
@@ -152,12 +152,14 @@ function statusWords(status: string | null): string {
   return status ? escapeSlackText(oneLine(status)) : "no Design Status";
 }
 
-/** F3's card: the to-do, who and where, and the drafted card behind Review. */
-export function todoItem(input: { id: string; owner: string; what: string; sourceUrl: string; fromNote: boolean }): ReportItem {
+/** F3's card: the to-do, where it came from, the people asked, and the
+ *  drafted card behind Review. */
+export function todoItem(input: { id: string; people: readonly string[]; what: string; sourceUrl: string; fromNote: boolean }): ReportItem {
   return {
     id: input.id,
     title: draftTitle(input.what) || "untitled",
-    subtitle: `<@${input.owner}> · from ${input.fromNote ? "the running note" : "this thread"}`,
+    subtitle: `from ${input.fromNote ? "the running note" : "this thread"}`,
+    owners: ownersOf(input.people),
     body: "No Roadmap card found for this. Review holds the drafted card.",
     done: "the drafted Roadmap card is filed.",
     open: { label: "Open source", url: input.sourceUrl },
@@ -170,7 +172,8 @@ export function unownedItem(input: { id: string; creator: string; card: { title:
   return {
     id: input.id,
     title: oneLine(input.card.title),
-    subtitle: `<@${input.creator}> · ${statusWords(input.card.status)} · no Contributor for a week`,
+    subtitle: `${statusWords(input.card.status)} · no Contributor for a week`,
+    owners: ownersOf([input.creator]),
     body: "Who should take it? Assign makes the person asked its Contributor. Leave it sets nobody, and I won't ask again until the card changes.",
     done: "the person asked is its Contributor.",
     open: { label: "Open card", url: input.card.url },
@@ -195,7 +198,8 @@ export function staleItem(input: {
   return {
     id: input.id,
     title: oneLine(input.card.title),
-    subtitle: `${mentionsOf(input.people)} · ${statusWords(input.card.status)} · no comments for 3 weeks${missing}`,
+    subtitle: `${statusWords(input.card.status)} · no comments for 3 weeks${missing}`,
+    owners: [...ownersOf(input.people), ...(input.unmatched ?? []).map((n) => ({ name: oneLine(n) }))],
     body: `Is it still moving? Done moves it to ${oneLine(input.to)} or another status, Still on it checks again in 3 weeks, Drop it archives it.`,
     done: "its Design Status is moved.",
     open: { label: "Open card", url: input.card.url },

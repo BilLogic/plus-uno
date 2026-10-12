@@ -95,13 +95,14 @@ export interface DecisionReport extends ReportMessage {
  * @param allItems - Every item waiting, oldest first
  * @param parent - What the job found, in one plain sentence: no emoji, no
  *   mark, no instructions. mrkdwn.
- * @param opts - `after`: blocks posted below the cards, such as a table
+ * @param opts - `after`: blocks posted below the cards, such as a table;
+ *   `channel`: where it posts, so a DM tags nobody
  */
-export function decisionReport(allItems: readonly ReportItem[], parent: string, opts: { after?: unknown[] } = {}): DecisionReport {
+export function decisionReport(allItems: readonly ReportItem[], parent: string, opts: { after?: unknown[]; channel?: string } = {}): DecisionReport {
   const shown = allItems.slice(0, MAX_REPORT_ITEMS);
   const held = allItems.slice(MAX_REPORT_ITEMS);
   const after = opts.after?.length ? { after: opts.after } : {};
-  const message = reportMessage(reportRecord("", "", { parent, shown, held, ...after }, 0));
+  const message = reportMessage(reportRecord(opts.channel ?? "", "", { parent, shown, held, ...after }, 0));
   return { ...message, parent, shown, held, ...after };
 }
 
@@ -242,6 +243,47 @@ function parentLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entr
   return `${record.parent} Showing ${shown} of ${shown + record.held}; the rest come in the next report.`;
 }
 
+/** Characters of an item's title on its owner's bullet. */
+const BULLET_TITLE_CHARS = 60;
+
+/** A sentence's first word lowered, to read on after "<@owner>, " — unless
+ *  it is a name or an acronym ("Figma", "PRD"), kept as written. */
+function readOn(sentence: string): string {
+  const word = /^[A-Z][a-z]*\b/.exec(sentence)?.[0];
+  if (!word || NAMES.has(word)) return sentence;
+  return sentence.charAt(0).toLowerCase() + sentence.slice(1);
+}
+
+/** Names a parent line may open on. */
+const NAMES = new Set(["Figma", "Notion", "Slack", "Storybook", "Roadmap", "I"]);
+
+/**
+ * The head of the message: the parent line opened on whom the cards are for,
+ * where Slack notifies (#1143). One card for one owner reads "<@owner>, the
+ * parent line"; otherwise the parent line, then one bullet per owner listing
+ * that owner's cards, each owner mentioned once. An owner with no Slack
+ * person is named in plain text. A DM tags nobody.
+ */
+function headLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entries" | "channel">): string {
+  const line = parentLine(record);
+  if (record.channel.startsWith("D")) return line;
+  const byOwner = new Map<string, { who: string; titles: string[] }>();
+  for (const { item } of record.entries) {
+    for (const owner of item.owners ?? []) {
+      const key = "slack" in owner ? `@${owner.slack}` : owner.name;
+      const who = "slack" in owner ? `<@${owner.slack}>` : escapeSlackText(owner.name);
+      const mine = byOwner.get(key) ?? { who, titles: [] };
+      const title = escapeSlackText(clip(item.title, BULLET_TITLE_CHARS));
+      if (!mine.titles.includes(title)) mine.titles.push(title);
+      byOwner.set(key, mine);
+    }
+  }
+  const owners = [...byOwner.values()];
+  if (!owners.length) return line;
+  if (owners.length === 1 && record.entries.length === 1) return `${owners[0]!.who}, ${readOn(line)}`;
+  return [line, ...owners.map((o) => `• ${o.who} — ${o.titles.join(" + ")}`)].join("\n");
+}
+
 /**
  * A report's message as its record stands: the parent line, then each card in
  * its state, one card or a carousel, then any blocks it posted below them. A
@@ -253,7 +295,7 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
   if (record.entries.length > MAX_REPORT_ITEMS) {
     throw new Error(`a decision report holds at most ${MAX_REPORT_ITEMS} items; hold the rest back (decisionReport)`);
   }
-  const head = parentLine(record);
+  const head = headLine(record);
   const drawn = [
     ...textSections(head),
     ...(record.entries.length ? [carouselOf(record.entries.map(entryCard))] : []),
