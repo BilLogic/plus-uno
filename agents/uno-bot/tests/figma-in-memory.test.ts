@@ -155,6 +155,17 @@ describe("Dev Mode links in the fake", () => {
   });
 });
 
+describe("renaming a Dev Mode link in the fake", () => {
+  it("renames by id in place, and refuses an id it does not have on a 200", async () => {
+    const figma = seeded();
+    const { links_created: [first] } = await figma.addDevResources([link("https://example.com/a")]);
+    const renamed = await figma.updateDevResources([{ id: first!.id, name: "Code (plus-uno): Button", url: first!.url }, { id: "nope", name: "x", url: "https://example.com/x" }]);
+    assert.deepEqual(renamed.links_updated, [first!.id]);
+    assert.equal(renamed.errors.length, 1);
+    assert.deepEqual((await figma.devResources(KEY)).dev_resources.map((r) => [r.id, r.name, r.url]), [[first!.id, "Code (plus-uno): Button", "https://example.com/a"]]);
+  });
+});
+
 describe("webhooks in the fake", () => {
   const hook = (n: number) => ({
     event_type: "FILE_COMMENT" as const,

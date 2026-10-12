@@ -85,6 +85,7 @@ const WRITES: ReadonlySet<FigmaMethod> = new Set<FigmaMethod>([
   "postComment",
   "replyToComment",
   "addDevResources",
+  "updateDevResources",
   "removeDevResource",
   "createWebhook",
 ]);
@@ -322,6 +323,22 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         created.push(resource);
       }
       return landed(entry, { links_created: created, errors });
+    },
+    async updateDevResources(links, o) {
+      const entry = enter("updateDevResources", [links, o]);
+      const updated: string[] = [];
+      const errors: { id: string; error: string }[] = [];
+      for (const link of links) {
+        const found = [...files.values()].flatMap((f) => f.devResources).find((r) => r.id === link.id);
+        if (!found) {
+          errors.push({ id: link.id, error: "Dev resource not found" });
+          continue;
+        }
+        found.name = link.name;
+        found.url = link.url;
+        updated.push(link.id);
+      }
+      return landed(entry, { links_updated: updated, errors });
     },
     async removeDevResource(key, devResourceId, o) {
       const entry = enter("removeDevResource", [key, devResourceId, o]);
