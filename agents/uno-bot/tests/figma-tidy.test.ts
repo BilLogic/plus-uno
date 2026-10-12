@@ -1,8 +1,8 @@
 // The weekly Figma tidy-up, end to end on fakes: Monday's read jobs list the
 // teams' stage folders, and the post job checks each file against its
-// Roadmap cards, then posts one parent line in the channel and one reply per
-// owner, each a shared decision report of Review cards whose pop-up answers
-// are "Moved it" and "Leave as is".
+// Roadmap cards, then posts one parent line in the channel and one combined
+// reply in its thread, a shared decision report of Review cards whose pop-up
+// answers are "Moved it" and "Leave as is".
 //
 // What an outsider sees: which files are flagged and what each card tells the
 // owner to do, who is mentioned where, what is remembered from week to week,
@@ -41,7 +41,7 @@ import { createInMemoryThreadState, type PendingProposal, type ThreadState } fro
 const CHANNEL = "C03FC8AS69K";
 const MEMBERS = ["U0SARAH", "U0MERYEM", "U0BILL"];
 const PARENT = "1760360400.000001";
-/** The first owner's reply, posted second. */
+/** The week's reply, posted second. */
 const REPLY = "1760360400.000002";
 const NOW = Number(PARENT) * 1000 + 10 * 60_000;
 const RUN_DATE = "2026-10-12";
@@ -380,29 +380,101 @@ describe("the post", () => {
   const many = (n: number, owner: string, base: number) =>
     Array.from({ length: n }, (_, i) => ({ f: file("u-wip", `${owner}${i}`, `P${base + i} / Card ${base + i} / x`), c: card(base + i, "Shipped", owner) }));
 
-  it("one reply per owner, each mentioned once, five cards at most and the rest counted; the unassigned last", async () => {
-    const sarah = many(7, "U0SARAH", 100);
-    const meryem = many(1, "U0MERYEM", 200);
+  /** The opener's words: the reply's first block. */
+  const opener = (reply: Posted) => (reply.blocks![0] as { text: { text: string } }).text.text;
+
+  it("one combined reply: a bullet per owner, each mentioned once, the unassigned last, and every card in one carousel", async () => {
+    const sarah = many(4, "U0SARAH", 100);
+    const meryem = many(2, "U0MERYEM", 200);
     const w = postWorld({
-      files: [...sarah.map((s) => s.f), file("u-wip", "Z", "Loose file"), ...meryem.map((s) => s.f)],
+      files: [sarah[0]!.f, file("u-wip", "Z", "Loose file"), ...meryem.map((s) => s.f), ...sarah.slice(1).map((s) => s.f)],
       cards: [...sarah, ...meryem].map((s) => s.c),
     });
     await runTidyPost(w.deps);
-    assert.equal(w.posts[0]!.text, "Figma tidy-up for the week of Oct 12: 9 new items.");
-    const replies = w.posts.slice(1);
-    assert.equal(replies.length, 3);
-    const lines = replies.map((r) => JSON.stringify(r.blocks![0]));
-    assert.match(lines[0]!, /7 files need a tidy: here are 5, and 2 more next week\.\\n• <@U0SARAH> — /);
-    assert.equal(lines[0]!.match(/<@/g)!.length, 1, "mentioned once");
-    assert.deepEqual(notified(replies[0]!), ["U0SARAH"]);
-    assert.equal(cardsIn(replies[0]!.blocks!).length, 5);
-    assert.match(lines[1]!, /<@U0MERYEM>, 1 file needs a tidy\./);
-    assert.deepEqual(notified(replies[1]!), ["U0MERYEM"]);
-    assert.match(lines[2]!, /1 file has no owner I could find\./);
-    assert.doesNotMatch(JSON.stringify(replies[2]), /<@/);
-    assert.deepEqual(notified(replies[2]!), [], "no owner, nobody pinged");
-    for (const r of replies) assert.equal(r.threadTs, PARENT);
+    assert.equal(w.posts[0]!.text, "Figma tidy-up for the week of Oct 12: 7 new items.");
+    assert.equal(w.posts.length, 2, "the parent, and one reply in its thread");
+    const reply = w.posts[1]!;
+    assert.equal(reply.threadTs, PARENT);
+    assert.equal(opener(reply), "• <@U0SARAH>, 4 files need a tidy.\n• <@U0MERYEM>, 2 files need a tidy.\n• 1 file has no owner I could find.");
+    assert.deepEqual(notified(reply), ["U0SARAH", "U0MERYEM"]);
+    assert.deepEqual(
+      cardsIn(reply.blocks!).map((c) => c.title.text),
+      [...sarah.map((s) => s.f.name), ...meryem.map((s) => s.f.name), "Loose file"],
+      "grouped by owner, in bullet order",
+    );
+    assert.match(cardsIn(reply.blocks!)[4]!.subtitle!.text, /^<@U0MERYEM> · /, "each card's subtitle tags its owner");
     assert.deepEqual(w.marked, [PARENT], "the thread is marked, so replies there are not all turns");
+    assert.equal(w.staged.length, 7);
+    for (const p of w.staged) assert.equal(p.item!.messageTs, REPLY);
+  });
+
+  it("a single-owner week reads as one opener line", async () => {
+    const sarah = many(7, "U0SARAH", 100);
+    const w = postWorld({ files: sarah.map((s) => s.f), cards: sarah.map((s) => s.c) });
+    await runTidyPost(w.deps);
+    assert.equal(opener(w.posts[1]!), "<@U0SARAH>, 7 files need a tidy.");
+    const loose = postWorld({ files: [file("u-wip", "Z", "Loose file"), file("u-wip", "Y", "Other loose")] });
+    await runTidyPost(loose.deps);
+    assert.equal(opener(loose.posts[1]!), "2 files have no owner I could find.");
+    assert.deepEqual(notified(loose.posts[1]!), [], "no owner, nobody pinged");
+  });
+
+  it("more than ten: ten cards, filled round-robin across owners with the unassigned last, and each bullet counts what waits", async () => {
+    const sarah = many(8, "U0SARAH", 100);
+    const meryem = many(5, "U0MERYEM", 200);
+    const w = postWorld({
+      files: [...sarah.map((s) => s.f), file("u-wip", "Z", "Loose file"), file("u-wip", "Y", "Other loose"), ...meryem.map((s) => s.f)],
+      cards: [...sarah, ...meryem].map((s) => s.c),
+    });
+    await runTidyPost(w.deps);
+    assert.equal(w.posts.length, 2);
+    const reply = w.posts[1]!;
+    assert.equal(
+      opener(reply),
+      [
+        "• <@U0SARAH>, 8 files need a tidy: here are 4, and 4 more next week.",
+        "• <@U0MERYEM>, 5 files need a tidy: here are 4, and 1 more next week.",
+        "• 2 files have no owner I could find.",
+      ].join("\n"),
+    );
+    assert.deepEqual(
+      cardsIn(reply.blocks!).map((c) => c.title.text),
+      [...sarah.slice(0, 4).map((s) => s.f.name), ...meryem.slice(0, 4).map((s) => s.f.name), "Loose file", "Other loose"],
+    );
+    assert.equal(Object.keys(w.memory.b.value!.shown).length, 10, "a held item is not remembered");
+
+    const next = postWorld({ files: w.list.b.value!.files, cards: [...sarah, ...meryem].map((s) => s.c), memory: w.memory.b.value, runDate: "2026-10-19" });
+    next.list.b.value!.runDate = "2026-10-19";
+    await runTidyPost(next.deps);
+    assert.equal(next.posts[0]!.text, "Figma tidy-up for the week of Oct 19: 5 new items, and 10 still open from earlier weeks.");
+    assert.equal(opener(next.posts[1]!), "• <@U0SARAH>, 4 files need a tidy.\n• <@U0MERYEM>, 1 file needs a tidy.");
+  });
+
+  it("every owner gets a card before anyone gets a second, and one shown of several reads \"here is 1\"", async () => {
+    const owners = Array.from({ length: 11 }, (_, i) => `U0OWNER${String.fromCharCode(65 + i)}`);
+    const all = owners.flatMap((o, i) => many(2, o, 100 + i * 10));
+    const w = postWorld({ files: all.map((s) => s.f), cards: all.map((s) => s.c) });
+    await runTidyPost(w.deps);
+    const lines = opener(w.posts[1]!).split("\n");
+    assert.equal(lines.length, 11);
+    assert.equal(lines[0], "• <@U0OWNERA>, 2 files need a tidy: here is 1, and 1 more next week.");
+    assert.equal(lines[10], "• <@U0OWNERK>, 2 files need a tidy: they come next week.");
+    assert.equal(cardsIn(w.posts[1]!.blocks!).length, 10);
+  });
+
+  it("a DM run tags nobody, and names each owner in plain text", async () => {
+    const sarah = many(2, "U0SARAH", 100);
+    const meryem = many(1, "U0MERYEM", 200);
+    const w = postWorld({
+      files: [...sarah.map((s) => s.f), ...meryem.map((s) => s.f), file("u-wip", "Z", "Loose file")],
+      cards: [...sarah.map((s) => ({ ...s.c, ownerName: "Sarah Lee" })), ...meryem.map((s) => ({ ...s.c, ownerName: "Meryem Ali" }))],
+    });
+    w.deps.channel = "D0APTB20SK0";
+    await runTidyPost(w.deps);
+    assert.equal(w.posts.length, 2);
+    assert.doesNotMatch(JSON.stringify(w.posts[1]), /<@/);
+    assert.equal(opener(w.posts[1]!), "• Sarah Lee, 2 files need a tidy.\n• Meryem Ali, 1 file needs a tidy.\n• 1 file has no owner I could find.");
+    assert.match(cardsIn(w.posts[1]!.blocks!)[0]!.subtitle!.text, /^Sarah Lee · /, "the subtitle names the owner too");
   });
 
   it("stages each card as its own proposal, answered Moved it or Leave as is, by the channel's members, for six days", async () => {
@@ -445,12 +517,7 @@ describe("the post", () => {
     assert.deepEqual(cardsIn(next.posts[1]!.blocks!).map((c) => c.title.text), ["New / Card 734 / Sarah"]);
   });
 
-  it("an item held past an owner's five is new the next week, and a fingerprint is forgotten after five weeks", async () => {
-    const sarah = many(6, "U0SARAH", 100);
-    const w = postWorld({ files: sarah.map((s) => s.f), cards: sarah.map((s) => s.c) });
-    await runTidyPost(w.deps);
-    assert.equal(Object.keys(w.memory.b.value!.shown).length, 5);
-
+  it("a fingerprint is forgotten after five weeks", async () => {
     const old = postWorld({
       files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")],
       cards: [card(733, "Shipped", "U0SARAH")],

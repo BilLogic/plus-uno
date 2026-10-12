@@ -1,5 +1,6 @@
 // The weekly Figma tidy-up's words (#886 § 3.6): the parent line, each
-// owner's reply (the owner tagged once, by the shared card), one Review card per finding, and the all-clear post.
+// owner's bullet in the week's reply (the owner tagged once, by the shared
+// card), one Review card per finding, and the all-clear post.
 //
 // Bill's ruling (2026-10-11): one shared decision card per finding, whose
 // Review pop-up offers "Moved it" and "Leave as is". No API moves or renames a
@@ -17,9 +18,6 @@ import { shortDate, windowInWords } from "../slack/copy-words";
 import type { ToolName } from "../agent/tool-table";
 import { figmaFileUrl } from "../figma/links";
 import { cardKey, isDeployed, type TidyCard, type TidyFinding, type TidyMove } from "./checks";
-
-/** A reply's cards at most; the rest wait for next week's. */
-export const MAX_ITEMS_PER_OWNER = 5;
 
 /** The tool a card names: "Leave as is" runs it, "Moved it" decides as a cancel. */
 export const TIDY_TOOL: ToolName = "figma_tidy_up";
@@ -39,16 +37,18 @@ export function tidyParent(runDate: string, fresh: number, stillOpen: number): s
 }
 
 /**
- * One owner's reply: how many of their files need a tidy, and how many wait
- * past the five shown. The shared card opens it on the owner (`tidyItem`'s
- * `owners`), mentioned once.
+ * One owner's bullet in the week's reply: how many of their files need a
+ * tidy, and how many wait past the cards shown. The shared card opens it on
+ * the owner, mentioned once (`decisionReport`'s `ownerLines`).
  *
- * @param owner - A Slack id, or null for the unassigned reply
+ * @param owner - A Slack id, or null for the files with no owner
  * @param total - Their items this week
  * @param shown - How many the reply carries
  */
 export function ownerLine(owner: string | null, total: number, shown: number): string {
-  const more = total > shown ? `: here are ${shown}, and ${total - shown} more next week` : "";
+  let more = "";
+  if (shown === 0) more = ": they come next week";
+  else if (shown < total) more = `: here ${shown === 1 ? "is" : "are"} ${shown}, and ${total - shown} more next week`;
   if (!owner) {
     const files = plural(total, "file has", "files have");
     return `${files} no owner I could find${more}.`;
@@ -99,16 +99,17 @@ export function itemId(finding: TidyFinding): string {
 
 /**
  * One finding as its card: the file, the check and card, what to do, and the
- * file and its card (or the likely one) as buttons.
+ * file and its card (or the likely one) as buttons. `ownerName` names the
+ * owner where a DM tags nobody.
  */
-export function tidyItem(finding: TidyFinding, likely: { number: number; title: string; url: string } | null): ReportItem {
+export function tidyItem(finding: TidyFinding, likely: { number: number; title: string; url: string } | null, ownerName?: string): ReportItem {
   const known = "known" in finding ? finding.known : likely;
   const card = known ? { label: `Card ${known.number}`, url: known.url } : null;
   return {
     id: itemId(finding),
     title: finding.file.name,
     subtitle: finding.card === null ? SUBTITLE[finding.check] : `${SUBTITLE[finding.check]} · Card ${finding.card}`,
-    ...(finding.owner ? { owners: [{ slack: finding.owner }] } : {}),
+    ...(finding.owner ? { owners: [{ slack: finding.owner, ...(ownerName ? { name: ownerName } : {}) }] } : {}),
     body: findingBody(finding, likely),
     open: { label: "Open file", url: figmaFileUrl(finding.file.key) },
     ...(card ? { also: card } : {}),

@@ -400,9 +400,16 @@ export interface ProposalSelect {
 export type ChosenAs = Pick<ReviewChoice, "value" | "label" | "decided">;
 
 /** One item a report asks someone to decide, as its card shows it. */
-/** Whom a card is for: a Slack person, or by name alone when Team Members
- *  maps them to no Slack person. */
-export type CardOwner = { slack: string } | { name: string };
+/** Whom a card is for: a Slack person, with their name when the report has
+ *  it for a DM, or by name alone when Team Members maps them to no Slack
+ *  person. */
+export type CardOwner = { slack: string; name?: string } | { name: string };
+
+/** One owner's bullet in a report's opener: whom, and what it says of them. */
+export interface OwnerLine {
+  owner: CardOwner | null;
+  says: string;
+}
 
 export interface ReportItem {
   /** Stable within the report. No `#` or `~`: the builder uses both. */
@@ -471,6 +478,10 @@ export interface DecisionReportRecord {
   /** Blocks the report posted below its cards — the library release's table
    *  of changed components — drawn again under them on every redraw. */
   after?: unknown[];
+  /** What the opener says of each owner, in order, in place of the titles of
+   *  their cards: one bullet each, the owner tagged once, `owner: null` for
+   *  the cards with no owner. */
+  ownerLines?: OwnerLine[];
   /** Set when Slack refused its cards and it posted as plain sections: every
    *  redraw is plain too. */
   plain?: boolean;

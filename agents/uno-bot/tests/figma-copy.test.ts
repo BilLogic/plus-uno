@@ -908,9 +908,11 @@ describe("the weekly Figma tidy-up (#886 § 3.6)", () => {
     },
   ];
 
-  it("the parent, each owner's reply and the all-clear hold to the checklist", () => {
+  it("the parent, each owner's bullet and the all-clear hold to the checklist", () => {
     passesChecklist(tidyParent("2026-10-12", 9, 3));
     passesChecklist(ownerLine("U1", 7, 5));
+    passesChecklist(ownerLine("U1", 2, 1));
+    passesChecklist(ownerLine("U1", 2, 0));
     passesChecklist(ownerLine(null, 2, 2));
     const clear = allClearText(12);
     assert.equal(clear, "*Figma tidy-up: all clear* 🎉 Last week's 12 items are fixed. Nice work.");
