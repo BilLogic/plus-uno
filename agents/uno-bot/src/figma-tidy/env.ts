@@ -7,7 +7,7 @@
 //     first Contributor, through the Team Members map's Notion people, whom
 //     the team's roles name a designer (the rule `figma-comments/read.ts` uses).
 //   • Slack: where the Figma Review cards post (`figmaReviewChannel`) —
-//     Bill's DM while the Figma flows are in testing; its members answer. The
+//     #plus-design unless `FIGMA_ASK_CHANNEL_ID` names another; its members answer. The
 //     parent's thread is marked as a sweep card's is, so the team's replies
 //     there are not all turns.
 //   • KV: the week's listing, what the weeks remember, what each file's pages
