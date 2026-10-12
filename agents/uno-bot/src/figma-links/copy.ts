@@ -11,7 +11,7 @@ import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { namesInWords, windowInWords } from "../slack/copy-words";
 import type { ToolName } from "../agent/tool-table";
-import { FIGMA_LABEL, asPosted } from "../figma-ask/trigger";
+import { isOwnComment, labelled, withoutLabel } from "../figma-ask/trigger";
 import type { DevLink } from "./links";
 
 /** The tool a card names: Approve runs it. */
@@ -219,14 +219,12 @@ export function devLinksIdle(steps: number): string {
  * first time it gets its links. Plain text: Figma shows a comment as typed.
  */
 export function devLinksComment(component: string): string {
-  return [
-    FIGMA_LABEL,
+  return labelled([
     `Added Dev Mode links to ${component}: Code (plus-uno) opens its source on GitHub, and Storybook opens its docs page. They're under Dev resources in Dev Mode.`,
-  ].join("\n");
+  ]);
 }
 
 /** Whether a comment is the one Approve leaves for this component, in any wording it has had, as posted or as Figma reads it back. */
 export function isDevLinksComment(message: string, component: string): boolean {
-  const [label, line] = asPosted(message).split("\n");
-  return label?.trim() === FIGMA_LABEL && (line ?? "").startsWith(`Added Dev Mode links to ${component}:`);
+  return isOwnComment(message) && withoutLabel(message).startsWith(`Added Dev Mode links to ${component}:`);
 }

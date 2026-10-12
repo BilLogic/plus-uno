@@ -40,6 +40,7 @@ export interface ContextSearchMessage {
   channel_id?: string;
   channel_name?: string;
   author_name?: string;
+  author_user_id?: string;
   message_ts?: string;
   content?: string;
   permalink?: string;

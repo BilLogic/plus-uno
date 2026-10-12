@@ -152,6 +152,11 @@ function ownerSlack(w: World) {
         w.calls.push(`${user} users.conversations`);
         return { channels: user === MAYA ? [{ id: DM_BEA, user: BEA }, { id: "D0UNO", user: BOT }] : [] };
       },
+      // Capture never searches: a call would show up here.
+      async searchPublic(query) {
+        w.calls.push(`${user} search:${query}`);
+        return [];
+      },
       async history(channel, range) {
         w.calls.push(`${user} history:${channel}`);
         const all = (w.messages.get(channel) ?? [])

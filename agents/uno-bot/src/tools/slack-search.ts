@@ -101,6 +101,44 @@ async function searchPass(
   return (await res.json()) as SearchContextPayload;
 }
 
+/** One public-channel hit, with the ids a caller attributes it by. */
+export interface PublicChannelHit {
+  channel: string;
+  ts: string;
+  user?: string;
+  authorName?: string;
+  text: string;
+  permalink: string;
+}
+
+/**
+ * One search of PUBLIC channels only, on `token` — a person's own token, for a
+ * job with no triggering event (a bot-token search needs one). The pass is
+ * pinned to `public_channel` server-side, so a user token's DMs and private
+ * channels are never asked for. Null when Slack refuses the search.
+ */
+export async function searchPublicChannels(token: string, query: string): Promise<PublicChannelHit[] | null> {
+  try {
+    const data = await searchPass(token, query, "public_channel");
+    if (!data.ok) return null;
+    return (data.results?.messages ?? []).flatMap((m) =>
+      m.channel_id && m.message_ts && m.permalink
+        ? [{
+            channel: m.channel_id,
+            ts: m.message_ts,
+            ...(m.author_user_id ? { user: m.author_user_id } : {}),
+            ...(m.author_name ? { authorName: m.author_name } : {}),
+            text: (m.content ?? "").slice(0, 400),
+            permalink: m.permalink,
+          }]
+        : [],
+    );
+  } catch (err) {
+    rethrowIfBudget(err);
+    return null;
+  }
+}
+
 export async function executeSlackSearch(
   env: Env,
   input: Record<string, unknown>,

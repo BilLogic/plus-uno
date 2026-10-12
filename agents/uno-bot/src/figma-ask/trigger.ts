@@ -9,19 +9,34 @@
 //
 // THE LOOP GUARD. uno-bot posts as Bill — his token is the only one — so a
 // reply's author says nothing about who wrote it. Its label does: everything
-// uno-bot writes into Figma leads with `FIGMA_LABEL` on a line of its own, and a
-// comment that does is never read as an ask, whatever it quotes. Figma keeps
-// a comment's emoji as shortcodes, so the label it hands back is `:goat:`
-// (`asPosted` turns it back); every matcher of uno-bot's own comments reads
-// through that.
+// uno-bot writes into Figma opens `🐐: ` with its first line beside it, and a
+// comment that does is never read as an ask, whatever it quotes. Comments
+// posted earlier carry `🐐` on a line of its own, or `🐐 le goat`, and still
+// count. Figma keeps a comment's emoji as shortcodes, so the label it hands
+// back is `:goat::` (`asPosted` turns it back); every matcher of uno-bot's own
+// comments reads through that.
 //
 // PURE.
 
-/** What everything uno-bot writes into Figma leads with, on a line of its own (docs/connectors/slack.md § Figma messages, rule 7). */
-export const FIGMA_LABEL = "🐐";
+/** The emoji the label is, and the whole of the label comments carried before it took the colon. */
+const GOAT = "🐐";
+
+/** What everything uno-bot writes into Figma opens with, its first line beside it (docs/connectors/slack.md § Figma messages, rule 7). */
+export const FIGMA_LABEL = `${GOAT}:`;
 
 /** The label replies carried before it was the emoji alone, still on comments already posted. */
-const OLD_LABEL_HEAD = "🐐 le goat";
+const OLD_LABEL_HEAD = `${GOAT} le goat`;
+
+/**
+ * A comment as uno-bot writes it into Figma: the label, then the first line
+ * beside it, and the rest each on its own line.
+ *
+ * @param lines - What the comment says, at least one line
+ */
+export function labelled(lines: readonly string[]): string {
+  const [first = "", ...rest] = lines;
+  return [`${FIGMA_LABEL} ${first}`, ...rest].join("\n");
+}
 
 /**
  * One trigger. Not after a word character, `.` or `@` (an address, `@@`); not
@@ -42,13 +57,26 @@ const LABEL_READ_BACK = ":goat:";
  */
 export function asPosted(message: string): string {
   const text = message.trimStart();
-  return text.startsWith(LABEL_READ_BACK) ? FIGMA_LABEL + text.slice(LABEL_READ_BACK.length) : text;
+  return text.startsWith(LABEL_READ_BACK) ? GOAT + text.slice(LABEL_READ_BACK.length) : text;
 }
 
-/** Whether a comment is one uno-bot wrote: its first line is the label, or it opens with the old one — either as posted or as Figma reads it back. */
+/** Whether a comment is one uno-bot wrote: it opens with the label, or with one it has had (`🐐` alone on the first line, `🐐 le goat`) — either as posted or as Figma reads it back. */
 export function isOwnComment(message: string): boolean {
   const text = asPosted(message);
-  return text.split("\n", 1)[0]!.trim() === FIGMA_LABEL || text.startsWith(OLD_LABEL_HEAD);
+  return text.startsWith(`${FIGMA_LABEL} `) || text.split("\n", 1)[0]!.trim() === GOAT || text.startsWith(OLD_LABEL_HEAD);
+}
+
+/**
+ * What one of uno-bot's comments says under its label, in either form it has
+ * posted (`🐐: ` beside the first line, or `🐐` on a line of its own); any
+ * other comment comes back as Figma has it.
+ *
+ * @param message - A comment's message, as a Figma read returns it
+ */
+export function withoutLabel(message: string): string {
+  const text = asPosted(message);
+  if (text.startsWith(`${FIGMA_LABEL} `)) return text.slice(FIGMA_LABEL.length + 1);
+  return text.split("\n", 1)[0]!.trim() === GOAT ? text.slice(text.indexOf("\n") + 1) : text;
 }
 
 /** Whether a comment asks uno-bot something: a trigger, in a comment uno-bot did not write. */

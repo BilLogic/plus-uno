@@ -32,7 +32,10 @@
 //   Each due row's message is read again from its permalink with the same
 //   token and the summary regenerated from it; a message that is gone, or no
 //   longer reads as a promise, lapses silently, and so does a row whose switch
-//   is off. The messages after it are judged for completion. Otherwise the
+//   is off. The messages after it are judged for completion, beside the
+//   promiser's later posts in public channels that match what was promised
+//   (one or two searches on the same token, pinned to public channels; a
+//   failed search holds the row). Otherwise the
 //   reminder goes to the person's DM with uno-bot — never a thread, a card, or
 //   anyone else's DM, and never to the other person. Unanswered, it gets one
 //   follow-up two working days later, then lapses. A ⏳ earns a check-back
@@ -109,9 +112,16 @@ export const DM_READ_COST = { subrequests: 1, d1Queries: 2 };
 /** What one detector window may spend: the model call, the insert, and what a
  *  stop saves. */
 export const DM_DETECT_COST = { subrequests: 1, d1Queries: 3 };
-/** What one reminder may spend: two DM reads, the detector, the judge, the
- *  name, the bot DM and the post, and the D1 statements around them. */
-export const DM_NUDGE_COST = { subrequests: 8, d1Queries: 3 };
+/** The morning's scopes: the DM reads, and public-channel search for the
+ *  promised work wherever it was done. */
+export const NUDGE_SCOPES = [...REQUIRED_SCOPES, "search:read.public"] as const;
+/** Public-channel searches one reminder may run, one term each, stopping at
+ *  the first that finds the promiser's post. */
+export const MAX_EVIDENCE_SEARCHES = 2;
+/** What one reminder may spend: two DM reads, the public searches, the
+ *  detector, the judge, the name, the bot DM and the post, one spare, and
+ *  the D1 statements around them. */
+export const DM_NUDGE_COST = { subrequests: 11, d1Queries: 3 };
 
 const PROMISE_KINDS: readonly DmCommitmentKind[] = ["made", "made_to"];
 
@@ -130,6 +140,22 @@ export interface OwnerSlack {
     channel: string,
     range: { oldest?: string; latest?: string; inclusive?: boolean; limit: number; cursor?: string },
   ): Promise<{ messages: SweepSlackMessage[]; hasMore: boolean; nextCursor?: string } | null>;
+  /** Messages in PUBLIC channels matching `query` (`assistant.search.context`,
+   *  `channel_types=public_channel`), by Slack's relevance, any date — the run
+   *  keeps only what came after the promise; null when the search failed.
+   *  Private channels and DMs are outside what it asks for. */
+  searchPublic(query: string): Promise<PublicHit[] | null>;
+}
+
+/** One public-channel search hit. `user` is the author's id when Slack gives
+ *  it; otherwise only `authorName` names them. */
+export interface PublicHit {
+  channel: string;
+  ts: string;
+  user?: string;
+  authorName?: string;
+  text: string;
+  permalink: string;
 }
 
 /** Where tonight's read stops, kept for the run so a retried job reads to the
@@ -255,12 +281,16 @@ export async function saveDmWatchAction(
 
 /** Whether this person's own token can run the jobs: theirs, and granted the
  *  scopes they read with, as Slack reports them live (ADR-024). */
-export async function accessOf(userId: string, ownerSlack: Common["ownerSlack"]): Promise<DmAccess> {
+export async function accessOf(
+  userId: string,
+  ownerSlack: Common["ownerSlack"],
+  required: readonly string[] = REQUIRED_SCOPES,
+): Promise<DmAccess> {
   const api = await ownerSlack(userId);
   if (!api) return { ok: false, reason: "no-token" };
   const id = await api.identity();
   if (!id || id.userId !== userId) return { ok: false, reason: "refused" };
-  const missing = REQUIRED_SCOPES.filter((s) => !id.scopes.includes(s));
+  const missing = required.filter((s) => !id.scopes.includes(s));
   if (missing.length) return { ok: false, reason: "missing-scopes", missing };
   return { ok: true, api, url: id.url };
 }
@@ -536,7 +566,7 @@ export async function runDmPromiseNudges(job: ScheduledJob, deps: DmNudgeDeps): 
     ensureHeadroom(deps, DM_NUDGE_COST);
     const c = await deps.records.nextDue(user, now, runDate);
     if (!c) break;
-    slack ??= await ready(user, deps);
+    slack ??= await ready(user, deps, NUDGE_SCOPES);
     // A missing scope skips the whole job, rows untouched (ADR-024). No token,
     // or a refused one, holds each row, and a row held long enough lapses.
     if (!slack.ok && slack.reason === "missing-scopes") return report("skipped", slack.note);
@@ -599,7 +629,14 @@ async function remind(
 
   const later = await slack.api.history(at.channel, { oldest: at.ts, limit: EVIDENCE_MESSAGES });
   if (!later) return hold("the DM could not be read");
-  const after = humans(later.messages, deps.botUserId).filter((m) => Number(m.ts) > Number(at.ts));
+  const inDm = humans(later.messages, deps.botUserId).filter((m) => Number(m.ts) > Number(at.ts));
+  // The work may have been done anywhere public: a channel post by the
+  // promiser, after the promise, on what was promised.
+  let promiserName: string | null | undefined;
+  const nameOf = async () => (promiserName === undefined ? (promiserName = await deps.bot.userName(promise.promiser)) : promiserName);
+  const elsewhere = await publicEvidence(slack.api, promise, at.ts, nameOf);
+  if (!elsewhere) return hold("the public-channel search failed");
+  const after = [...inDm, ...elsewhere].sort((a, b) => Number(a.ts) - Number(b.ts));
   if (after.length) {
     const verdict = await deps.judge.judge({ promiser: promise.promiser, what: promise.what, promiseTs: at.ts, messages: after, sources: [] });
     if (!verdict.ok) return hold("the judge did not answer");
@@ -623,7 +660,7 @@ async function remind(
       : madeFollowUpText(c.ownerId, c.permalink);
   } else {
     body = full
-      ? madeToText({ name: await deps.bot.userName(promise.promiser), what: promise.what, byLabel, promisedLabel, permalink: c.permalink })
+      ? madeToText({ name: await nameOf(), what: promise.what, byLabel, promisedLabel, permalink: c.permalink })
       : madeToFollowUpText(c.ownerId, c.permalink);
   }
   const action = c.nudges === 0 ? "nudged" : "followed-up";
@@ -650,6 +687,50 @@ async function remind(
       : { followupTs: posted.ts, earlierFollowupTs: c.followupTs ? [...c.earlierFollowupTs, c.followupTs] : c.earlierFollowupTs }),
   });
   return action;
+}
+
+/** Words too common to find a promised piece of work by. */
+const EVIDENCE_STOPWORDS = new Set(
+  ("a an and are as at be by for from get give go have in into it its let look make of on or out over put reach review "
+    + "see send set share so take that the their them then this to up with do done check follow back about").split(" "),
+);
+
+/** The terms a promise's work is searched by: its longest distinctive words,
+ *  longest first, at most `MAX_EVIDENCE_SEARCHES`. */
+export function evidenceTerms(what: string): string[] {
+  const words = what.toLowerCase().match(/[a-z0-9][a-z0-9'-]*[a-z0-9]/g) ?? [];
+  const distinct = [...new Set(words)].filter((w) => w.length > 2 && !EVIDENCE_STOPWORDS.has(w));
+  return distinct.sort((a, b) => b.length - a.length).slice(0, MAX_EVIDENCE_SEARCHES);
+}
+
+/**
+ * The promiser's posts in public channels after the promise that match what
+ * was promised, as messages the judge reads beside the DM's; null when a
+ * search failed, so the morning holds rather than nudging blind. A hit in a
+ * DM or a legacy private group (`D…`, `G…`) is dropped even if Slack sent it.
+ */
+async function publicEvidence(
+  api: OwnerSlack,
+  promise: DetectedCommitment,
+  promiseTs: string,
+  nameOf: () => Promise<string | null>,
+): Promise<SweepMessage[] | null> {
+  for (const term of evidenceTerms(promise.what)) {
+    const hits = await api.searchPublic(term);
+    if (!hits) return null;
+    const kept: SweepMessage[] = [];
+    for (const h of hits) {
+      if (!/^C[A-Z0-9]+$/.test(h.channel) || !(Number(h.ts) > Number(promiseTs))) continue;
+      const author = h.authorName?.trim().toLowerCase();
+      const theirs = h.user
+        ? h.user === promise.promiser
+        : Boolean(author) && author === (await nameOf())?.trim().toLowerCase();
+      if (!theirs) continue;
+      kept.push({ ts: h.ts, user: promise.promiser, text: `[posted in <#${h.channel}>, ${h.permalink}] ${h.text}` });
+    }
+    if (kept.length) return kept;
+  }
+  return [];
 }
 
 // ── Reactions ────────────────────────────────────────────────────────────────
@@ -738,8 +819,8 @@ export type Ready = { ok: true; api: OwnerSlack; url: string } | { ok: false; re
 
 /** The owner's reads when their token can run the job; otherwise why not,
  *  logged once. */
-export async function ready(user: string, deps: Pick<Common, "ownerSlack" | "log">): Promise<Ready> {
-  const access = await accessOf(user, deps.ownerSlack);
+export async function ready(user: string, deps: Pick<Common, "ownerSlack" | "log">, required: readonly string[] = REQUIRED_SCOPES): Promise<Ready> {
+  const access = await accessOf(user, deps.ownerSlack, required);
   if (access.ok) return access;
   let note = "no connected token";
   if (access.reason === "refused") note = "the token was refused or is not theirs";

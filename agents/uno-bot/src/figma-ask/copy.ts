@@ -17,7 +17,7 @@
 // PURE.
 
 import { escapeSlackText, toPlainText } from "../slack/mrkdwn";
-import { FIGMA_LABEL } from "./trigger";
+import { labelled } from "./trigger";
 
 /** Lines of answer a reply carries, at most. */
 export const MAX_ANSWER_LINES = 3;
@@ -45,12 +45,12 @@ export type FigmaReply =
   | { kind: "failed" };
 
 /**
- * A reply as Figma shows it: the label, then what it says.
+ * A reply as Figma shows it: the label, then what it says, its first line beside the label.
  *
  * @param reply - What the turn came to
  */
 export function figmaReplyText(reply: FigmaReply): string {
-  return [FIGMA_LABEL, ...figmaReplyLines(reply)].join("\n");
+  return labelled(figmaReplyLines(reply));
 }
 
 /** `Source: <name> — <link>`: Figma posts plain text, so the name sits beside

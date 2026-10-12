@@ -21,6 +21,7 @@ import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
+import { searchPublicChannels } from "../tools/slack-search";
 import { conversationsOpen, conversationsReplies, deleteMessage, getBotIdentity, postMessage, slackReadAs, updateMessage, usersInfo } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
 import { itemProposalKey } from "../slack/decision-cards";
@@ -161,6 +162,9 @@ export function ownerSlackFor(env: Env): (userId: string) => Promise<OwnerSlack 
         const next = res.response_metadata?.next_cursor;
         return { messages: res.messages, hasMore: res.has_more === true, ...(next ? { nextCursor: next } : {}) };
       },
+      // Their own token, pinned to public channels: their DMs and private
+      // channels are never searched.
+      searchPublic: (query) => searchPublicChannels(token, query),
     };
   };
 }
