@@ -288,5 +288,6 @@ export function stagedDecision(
     confirmers: [...thread.confirmers],
     stated: decisionCardWords(),
     refuseRevision: rewordInstead(n),
+    ...(d.before ? { before: d.before } : {}),
   };
 }

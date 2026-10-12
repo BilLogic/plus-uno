@@ -518,6 +518,16 @@ describe("the morning's thread in #plus-design (#900)", () => {
     );
   });
 
+  it("keeps what a change replaces, as the night read it, for Review's Before", async () => {
+    const { h } = await postedMorning();
+    const [added, card, issue, rewrite] = h.staged;
+    assert.deepEqual(rewrite!.before, { "0.replace.0.content": "Show the progress bar on every goal screen." });
+    assert.deepEqual(Object.keys(card!.before ?? {}), ["0.properties.Design Status"]);
+    // An added line and a new issue replace nothing.
+    assert.equal(added!.before, undefined);
+    assert.equal(issue!.before, undefined);
+  });
+
   it("never cards a thread twice, whatever is said in it later", async () => {
     const { h, client } = await postedMorning();
     client.seedFile(FILE, {

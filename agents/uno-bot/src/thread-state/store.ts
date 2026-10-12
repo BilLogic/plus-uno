@@ -348,6 +348,14 @@ export interface PendingProposal {
    * 0), from a database's live options, exact-matched again on Approve.
    */
   selects?: ProposalSelect[];
+  /**
+   * What the page says now, read when the card was staged: each value a write
+   * replaces, keyed `<op>.<path in its input>` as Review's fields are
+   * (`0.replace.0.content`, `0.properties.Status`). Review shows it as Before,
+   * since its pop-up opens inside Slack's three seconds and reads nothing.
+   * Absent where the stager read nothing, or on a card staged before it.
+   */
+  before?: Record<string, string>;
 }
 
 /**

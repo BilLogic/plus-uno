@@ -23,7 +23,9 @@ import {
   normalizeName,
   parseNotionPageId,
   fetchPageTitles,
+  readNotionPage,
 } from "../integrations/notion";
+import { rethrowIfBudget } from "../net";
 
 function humanizeFieldName(key: string): string {
   return key.replace(/[_\s]+/g, " ").trim().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -105,10 +107,15 @@ export async function buildNotionRevision(
     revision.page = { url: canonicalNotionUrl(pageUrl) };
   }
 
+  // What the page says now, by input path: Review's Before, kept at staging
+  // because the pop-up reads nothing as it opens.
+  const before: Record<string, string> = {};
+
   // One entry per changed field, always — what it says now, what it will say.
   for (const [reqName, rawVal] of Object.entries(properties)) {
     if (typeof rawVal !== "string") continue;
     const cur = target?.current?.[normalizeName(reqName)];
+    if (cur) before[`properties.${reqName}`] = cur.value;
     revision.properties.push({
       label: cur?.label ?? humanizeFieldName(reqName),
       ...(cur?.value ? { from: cur.value } : {}),
@@ -118,9 +125,35 @@ export async function buildNotionRevision(
 
   const rewrite = rewriteOf(input.replace);
   if (rewrite) revision.rewrite = rewrite;
+  if (rewrite && pageUrl) Object.assign(before, await blocksNow(env, pageUrl, input.replace));
   const append = appendOf(input.append);
   if (append) revision.append = append;
+  if (Object.keys(before).length) revision.before = before;
   return revision;
+}
+
+/**
+ * Each rewritten block's text as the page reads now, by `replace.<i>.content`.
+ * The page read is the one the model drafted the rewrite from, so it is
+ * usually served from the read cache at no cost. A block the read did not
+ * find, or a read that fails, leaves no Before rather than a guessed one.
+ */
+async function blocksNow(env: Env, pageUrl: string, replace: unknown): Promise<Record<string, string>> {
+  const pageId = parseNotionPageId(pageUrl);
+  if (!pageId || !Array.isArray(replace)) return {};
+  const page = await readNotionPage(env, pageId).catch((err: unknown) => {
+    rethrowIfBudget(err);
+    return null;
+  });
+  if (!page) return {};
+  const text = new Map(page.blocks.map((b) => [b.id.replace(/-/g, ""), b.text] as const));
+  const out: Record<string, string> = {};
+  replace.forEach((entry, i) => {
+    const id = entry && typeof entry === "object" ? String((entry as Record<string, unknown>).block_id ?? "") : "";
+    const now = text.get(id.replace(/-/g, ""));
+    if (now !== undefined) out[`replace.${i}.content`] = now;
+  });
+  return out;
 }
 
 /**

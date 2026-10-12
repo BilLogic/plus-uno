@@ -360,7 +360,7 @@ async function readFile(
     const said = readComments(at.thread)[0]!;
     const quote = quoteOf(said.message);
     const link = commentUrl(fileKey, at.thread.nodeId, root.id);
-    const { operation, update } = draftDecision(d, {
+    const { operation, update, before } = draftDecision(d, {
       prd,
       card: cards[0]?.number ?? null,
       file: { title },
@@ -395,6 +395,7 @@ async function readFile(
       update,
       confidence: d.confidence,
       ...(row ? { row } : {}),
+      ...(before ? { before } : {}),
     });
   }
   if (!decisions.length) return none;

@@ -9,9 +9,15 @@
 // and never shows an input's own key. A tool this file has no reading for
 // returns null, and the pop-up shows the card's text as before.
 //
+// BEFORE AND AFTER. A change to what a page already says shows the value as
+// it read when the card was staged (`PendingProposal.before`) above the value
+// it will have. Keyed as the editable fields are, `<op>.<path>`, so a field
+// drawn as an input finds its Before by the same key.
+//
 // PURE: blocks out, nothing posted, nothing read.
 import { textSections } from "./render";
 import { escapeSlackText } from "./mrkdwn";
+import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { createdDesignStatus } from "../integrations/notion";
 import type { ProposalOperation } from "../thread-state/index";
@@ -30,11 +36,16 @@ const DEFAULT_REPO = "BilLogic/plus-uno";
 interface ReadOperation {
   /** What it does and where, one line. */
   headline: string;
-  /** Label → value, in the order a person checks them. */
-  properties: Array<[string, string]>;
+  /** Label → value, in the order a person checks them, and the value's path
+   *  in the tool input where it has one. */
+  properties: Array<[string, string, string?]>;
   /** The prose it writes, in order; a heading opens a section. */
-  body: Array<{ heading?: string; text: string }>;
+  body: Part[];
 }
+
+/** One stretch of prose. `key` is its path in the tool input; `replaces`
+ *  marks text that overwrites a block a person wrote. */
+type Part = { heading?: string; text: string; key?: string; replaces?: boolean };
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 const obj = (v: unknown): Input => (v && typeof v === "object" && !Array.isArray(v) ? (v as Input) : {});
@@ -108,15 +119,16 @@ function notionCreate(input: Input): ReadOperation {
 
 function notionUpdate(input: Input): ReadOperation {
   const page = str(input.page_url);
-  const properties: Array<[string, string]> = page ? [["Page", page]] : [];
+  const properties: ReadOperation["properties"] = page ? [["Page", page]] : [];
   for (const [key, value] of Object.entries(obj(input.properties))) {
-    if (str(value)) properties.push([labelOf(key), str(value)]);
+    if (str(value)) properties.push([labelOf(key), str(value), `properties.${key}`]);
   }
   const body: ReadOperation["body"] = [];
   const replace = Array.isArray(input.replace) ? input.replace : [];
   replace.forEach((entry, i) => {
     const text = str(obj(entry).content);
-    if (text) body.push({ heading: replace.length > 1 ? `Rewritten block ${i + 1}` : "Rewritten block", text });
+    const heading = replace.length > 1 ? `Rewritten block ${i + 1}` : "Rewritten block";
+    if (text) body.push({ heading, text, key: `replace.${i}.content`, replaces: true });
   });
   const inserts = Array.isArray(input.insert) ? input.insert : [];
   for (const entry of inserts) {
@@ -124,9 +136,14 @@ function notionUpdate(input: Input): ReadOperation {
     if (text) body.push({ heading: "Added after a block", text });
   }
   const append = obj(input.append);
-  body.push(...sectionsOf(append.sections));
+  // By index, so each section keeps the path its field is keyed on.
+  (Array.isArray(append.sections) ? append.sections : []).forEach((s, i) => {
+    const heading = str(obj(s).heading);
+    const text = str(obj(s).body);
+    if (heading || text) body.push({ ...(heading ? { heading } : {}), text, key: `append.sections.${i}.body` });
+  });
   const note = str(append.text);
-  if (note) body.push({ heading: "Added to the end of the page", text: note });
+  if (note) body.push({ heading: "Added to the end of the page", text: note, key: "append.text" });
   return { headline: "Changes to a Notion page", properties, body };
 }
 
@@ -168,14 +185,42 @@ const READERS: Record<string, (input: Input) => ReadOperation> = {
   dm_relay: dmRelay,
 };
 
+/** Whether every operation of the batch has a reading here. */
+export function isReadable(operations: readonly ProposalOperation[]): boolean {
+  return operations.length > 0 && operations.every((op) => !!READERS[op.toolName]);
+}
+
+/** What the draft is drawn with beyond the batch itself. */
+export interface DraftDetail {
+  /** Each value as the page read when the card was staged, by `<op>.<path>`. */
+  before?: Readonly<Record<string, string>>;
+  /** The fields drawn as inputs in place, by key, each holding its value now. */
+  inline?: ReadonlyMap<string, EditableField>;
+  /** The reader may decide: a value too long for an input says why it is not
+   *  one. */
+  editing?: boolean;
+}
+
+/** Said where a replaced block's text was not read when the card was staged. */
+export const BEFORE_NOT_CAPTURED = "This block's current text wasn't captured when the change was staged.";
+
+/** Said where a value is too long to be an input. */
+export const TOO_LONG_TO_EDIT =
+  "This text is over the 3,000 characters a pop-up field holds, so it can't be edited here. Choose Needs changes to ask for a different wording.";
+
 /**
  * The draft as a person reads it, or null when any operation is a tool this
  * file has no reading for.
  *
  * @param operations - The batch as it would run, saved edits applied
  * @param caveats - The card's ⚠️ lines, kept last
+ * @param detail - Before values, and the fields drawn as inputs in place
  */
-export function readableDraft(operations: readonly ProposalOperation[], caveats: readonly string[] = []): unknown[] | null {
+export function readableDraft(
+  operations: readonly ProposalOperation[],
+  caveats: readonly string[] = [],
+  detail: DraftDetail = {},
+): unknown[] | null {
   const read = operations.map((op) => READERS[op.toolName]?.(op.input) ?? null);
   if (!read.length || read.some((r) => !r)) return null;
   const blocks: unknown[] = [];
@@ -185,11 +230,9 @@ export function readableDraft(operations: readonly ProposalOperation[], caveats:
       if (i) blocks.push({ type: "divider" });
       blocks.push({ type: "section", text: { type: "mrkdwn", text: `*${i + 1}. ${escapeSlackText(op!.headline)}*` } });
     }
-    blocks.push(...propertyBlocks(op!.properties));
-    for (const part of op!.body) {
-      if (part.heading) blocks.push(header(part.heading));
-      if (part.text) blocks.push(...textSections(part.text));
-    }
+    const keyOf = (path?: string) => (path ? `${i}.${path}` : undefined);
+    blocks.push(...propertyBlocks(op!.properties.map(([label, value, path]) => [label, value, keyOf(path)]), detail));
+    for (const part of op!.body) blocks.push(...partBlocks({ ...part, key: keyOf(part.key) }, detail));
   });
   if (caveats.length) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: caveats.join("\n") }] });
   return blocks;
@@ -203,16 +246,61 @@ export function draftHeadline(operations: readonly ProposalOperation[]): string 
   return reader ? reader(op!.input).headline : null;
 }
 
+/** One stretch of prose: its heading, then Before and After where the page
+ *  already says something, the After an input when its field is in place. */
+function partBlocks(part: Part, detail: DraftDetail): unknown[] {
+  const blocks: unknown[] = [];
+  if (part.heading) blocks.push(header(part.heading));
+  const was = part.key ? detail.before?.[part.key] : undefined;
+  const field = part.key ? detail.inline?.get(part.key) : undefined;
+  if (was !== undefined) blocks.push(bold("Before"), ...(was.trim() ? textSections(was) : [context("Empty.")]));
+  else if (part.replaces) blocks.push(context(BEFORE_NOT_CAPTURED));
+  // Under its heading the input needs no name of its own beyond what it is.
+  if (field) return [...blocks, inputOf(field, was !== undefined ? "After" : part.heading ? "Text" : field.label)];
+  if (was !== undefined) blocks.push(bold("After"));
+  if (part.text) blocks.push(...textSections(part.text));
+  if (detail.editing && part.key && part.text.length > MAX_INPUT_CHARS) blocks.push(context(TOO_LONG_TO_EDIT));
+  return blocks;
+}
+
+/** A field drawn in place. Optional to Slack, so Reject and Needs changes are
+ *  never held up by it; Approve's guards hold a required one to a value. */
+function inputOf(field: EditableField, label: string): unknown {
+  return { ...(fieldInputBlocks([{ ...field, label }])[0] as object), optional: true };
+}
+
+function bold(text: string): unknown {
+  return { type: "section", text: { type: "mrkdwn", text: `*${text}*` } };
+}
+
+function context(text: string): unknown {
+  return { type: "context", elements: [{ type: "mrkdwn", text }] };
+}
+
 /** The key properties as `*Label:* value` lines. Short values share one
- *  section; a value with a line break gets its own, so it reads as prose. */
-function propertyBlocks(properties: ReadonlyArray<[string, string]>): unknown[] {
+ *  section; a value with a line break gets its own, so it reads as prose. A
+ *  value the page holds now reads `now → then`; a field in place is an input
+ *  under its value now. */
+function propertyBlocks(properties: ReadonlyArray<[string, string, string?]>, detail: DraftDetail = {}): unknown[] {
   const blocks: unknown[] = [];
   let lines: string[] = [];
   const flush = () => {
     if (lines.length) blocks.push({ type: "section", text: { type: "mrkdwn", text: lines.join("\n") } });
     lines = [];
   };
-  for (const [label, value] of properties) {
+  for (const [label, value, key] of properties) {
+    const was = key ? detail.before?.[key] : undefined;
+    const field = key ? detail.inline?.get(key) : undefined;
+    if (field) {
+      if (was !== undefined) lines.push(`*${label} now:* ${was ? valueText(was) : "_empty_"}`);
+      flush();
+      blocks.push(inputOf(field, field.label));
+      continue;
+    }
+    if (was !== undefined && was !== value && !value.includes("\n")) {
+      lines.push(`*${label}:* ${was ? valueText(was) : "_empty_"} → ${valueText(value)}`);
+      continue;
+    }
     const line = `*${label}:* ${valueText(value)}`;
     if (value.includes("\n")) {
       flush();
