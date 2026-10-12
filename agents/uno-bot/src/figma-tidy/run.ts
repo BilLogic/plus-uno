@@ -380,13 +380,15 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
   await deps.markThread(parentTs).catch((err: unknown) => rethrowIfBudget(err));
 
   const next: TidyMemory = { shown: { ...memory.shown }, open: findings.length };
+  // Each owner's name, from the Roadmap cards read above: what a DM says in place of a tag.
+  const names = new Map(cards.flatMap((c) => (c.owner && c.ownerName ? [[c.owner, c.ownerName] as const] : [])));
   const report = decisionReport(
-    shown.map((s) => tidyItem(s.finding, s.likely)),
+    shown.map((s) => tidyItem(s.finding, s.likely, s.finding.owner ? names.get(s.finding.owner) : undefined)),
     "",
     {
       channel: deps.channel,
       ownerLines: [...groups].map(([owner, items]) => ({
-        owner: owner ? { slack: owner } : null,
+        owner: owner ? { slack: owner, ...(names.has(owner) ? { name: names.get(owner)! } : {}) } : null,
         says: ownerLine(owner, items.length, picked.get(owner)!.length),
       })),
     },

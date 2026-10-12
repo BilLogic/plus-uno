@@ -46,7 +46,9 @@ export function tidyParent(runDate: string, fresh: number, stillOpen: number): s
  * @param shown - How many the reply carries
  */
 export function ownerLine(owner: string | null, total: number, shown: number): string {
-  const more = total === shown ? "" : shown ? `: here ${shown === 1 ? "is" : "are"} ${shown}, and ${total - shown} more next week` : ": they come next week";
+  let more = "";
+  if (shown === 0) more = ": they come next week";
+  else if (shown < total) more = `: here ${shown === 1 ? "is" : "are"} ${shown}, and ${total - shown} more next week`;
   if (!owner) {
     const files = plural(total, "file has", "files have");
     return `${files} no owner I could find${more}.`;
@@ -97,16 +99,17 @@ export function itemId(finding: TidyFinding): string {
 
 /**
  * One finding as its card: the file, the check and card, what to do, and the
- * file and its card (or the likely one) as buttons.
+ * file and its card (or the likely one) as buttons. `ownerName` names the
+ * owner where a DM tags nobody.
  */
-export function tidyItem(finding: TidyFinding, likely: { number: number; title: string; url: string } | null): ReportItem {
+export function tidyItem(finding: TidyFinding, likely: { number: number; title: string; url: string } | null, ownerName?: string): ReportItem {
   const known = "known" in finding ? finding.known : likely;
   const card = known ? { label: `Card ${known.number}`, url: known.url } : null;
   return {
     id: itemId(finding),
     title: finding.file.name,
     subtitle: finding.card === null ? SUBTITLE[finding.check] : `${SUBTITLE[finding.check]} · Card ${finding.card}`,
-    ...(finding.owner ? { owners: [{ slack: finding.owner }] } : {}),
+    ...(finding.owner ? { owners: [{ slack: finding.owner, ...(ownerName ? { name: ownerName } : {}) }] } : {}),
     body: findingBody(finding, likely),
     open: { label: "Open file", url: figmaFileUrl(finding.file.key) },
     ...(card ? { also: card } : {}),

@@ -908,7 +908,7 @@ describe("the weekly Figma tidy-up (#886 § 3.6)", () => {
     },
   ];
 
-  it("the parent, each owner's reply and the all-clear hold to the checklist", () => {
+  it("the parent, each owner's bullet and the all-clear hold to the checklist", () => {
     passesChecklist(tidyParent("2026-10-12", 9, 3));
     passesChecklist(ownerLine("U1", 7, 5));
     passesChecklist(ownerLine("U1", 2, 1));

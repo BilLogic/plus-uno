@@ -400,9 +400,10 @@ export interface ProposalSelect {
 export type ChosenAs = Pick<ReviewChoice, "value" | "label" | "decided">;
 
 /** One item a report asks someone to decide, as its card shows it. */
-/** Whom a card is for: a Slack person, or by name alone when Team Members
- *  maps them to no Slack person. */
-export type CardOwner = { slack: string } | { name: string };
+/** Whom a card is for: a Slack person, with their name when the report has
+ *  it for a DM, or by name alone when Team Members maps them to no Slack
+ *  person. */
+export type CardOwner = { slack: string; name?: string } | { name: string };
 
 /** One owner's bullet in a report's opener: whom, and what it says of them. */
 export interface OwnerLine {

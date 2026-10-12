@@ -462,13 +462,19 @@ describe("the post", () => {
     assert.equal(cardsIn(w.posts[1]!.blocks!).length, 10);
   });
 
-  it("a DM run tags nobody", async () => {
+  it("a DM run tags nobody, and names each owner in plain text", async () => {
     const sarah = many(2, "U0SARAH", 100);
-    const w = postWorld({ files: [...sarah.map((s) => s.f), file("u-wip", "Z", "Loose file")], cards: sarah.map((s) => s.c) });
+    const meryem = many(1, "U0MERYEM", 200);
+    const w = postWorld({
+      files: [...sarah.map((s) => s.f), ...meryem.map((s) => s.f), file("u-wip", "Z", "Loose file")],
+      cards: [...sarah.map((s) => ({ ...s.c, ownerName: "Sarah Lee" })), ...meryem.map((s) => ({ ...s.c, ownerName: "Meryem Ali" }))],
+    });
     w.deps.channel = "D0APTB20SK0";
     await runTidyPost(w.deps);
     assert.equal(w.posts.length, 2);
     assert.doesNotMatch(JSON.stringify(w.posts[1]), /<@/);
+    assert.equal(opener(w.posts[1]!), "• Sarah Lee, 2 files need a tidy.\n• Meryem Ali, 1 file needs a tidy.\n• 1 file has no owner I could find.");
+    assert.match(cardsIn(w.posts[1]!.blocks!)[0]!.subtitle!.text, /^Sarah Lee · /, "the subtitle names the owner too");
   });
 
   it("stages each card as its own proposal, answered Moved it or Leave as is, by the channel's members, for six days", async () => {

@@ -55,12 +55,15 @@ function tidyCardOf(
 ): TidyCard {
   const designers = contributors.flatMap((p) => {
     const slack = slackPersonOfNotion(p.id, team.notionPeople);
-    return slack && roleOf(slack, team.roles) === "design" ? [{ slack, name: p.name.trim().split(/\s+/)[0] ?? "" }] : [];
+    return slack && roleOf(slack, team.roles) === "design" ? [{ slack, name: p.name.trim() }] : [];
   });
+  const owner = designerAmong(designers.map((d) => d.slack), team.roles);
+  const ownerName = designers.find((d) => d.slack === owner)?.name;
   return {
     ...fields,
-    owner: designerAmong(designers.map((d) => d.slack), team.roles),
-    designers: [...new Set(designers.map((d) => d.name).filter(Boolean))],
+    owner,
+    ...(ownerName ? { ownerName } : {}),
+    designers: [...new Set(designers.map((d) => d.name.split(/\s+/)[0] ?? "").filter(Boolean))],
   };
 }
 

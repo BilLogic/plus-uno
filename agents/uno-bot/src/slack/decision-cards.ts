@@ -98,7 +98,8 @@ export interface DecisionReport extends ReportMessage {
  *
  * @param allItems - Every item waiting, oldest first
  * @param parent - What the job found, in one plain sentence: no emoji, no
- *   mark, no instructions. mrkdwn.
+ *   mark, no instructions. mrkdwn. Empty when `ownerLines` say it all: the
+ *   opener is then their bullets alone.
  * @param opts - `after`: blocks posted below the cards, such as a table;
  *   `channel`: where it posts, so a DM tags nobody; `ownerLines`: what the
  *   opener says of each owner, in place of their cards' titles
@@ -195,14 +196,14 @@ function etClock(at: number): string {
  * An open card's subtitle: whom it is for, then where it came from. The tag
  * shows whose card it is; Slack notifies nobody from a subtitle, so the
  * opener does the notifying (`headLine`). In a DM nobody is tagged, so a
- * Slack owner is left off and only a named owner shows, in plain text. A
+ * Slack owner shows by the name the report gave, or is left off (`ownerWho`). A
  * name the subtitle already says ("not found in Slack: Kai") is not said
  * twice.
  */
 function openSubtitle(item: ReportItem, channel: string): string | undefined {
   const dm = channel.startsWith("D");
   const who = (item.owners ?? [])
-    .flatMap((o) => ("slack" in o ? (dm ? [] : [`<@${o.slack}>`]) : [escapeSlackText(o.name)]))
+    .flatMap((o) => ownerWho(o, dm) ?? [])
     .filter((w, i, all) => all.indexOf(w) === i && !(item.subtitle ?? "").includes(w))
     .join(" ");
   return [who, item.subtitle].filter(Boolean).join(" · ") || undefined;
@@ -288,11 +289,11 @@ function readOn(sentence: string): string {
   return sentence.charAt(0).toLowerCase() + sentence.slice(1);
 }
 
-/** How the opener names an owner: tagged, by name when Slack has no such
- *  person, and not at all for a Slack person in a DM. */
+/** How the opener and subtitle name an owner: tagged, or in a DM, which tags
+ *  nobody, by name; null for a Slack person with no name in a DM. */
 function ownerWho(owner: CardOwner, dm: boolean): string | null {
-  if ("slack" in owner) return dm ? null : `<@${owner.slack}>`;
-  return escapeSlackText(owner.name);
+  if ("slack" in owner && !dm) return `<@${owner.slack}>`;
+  return owner.name ? escapeSlackText(owner.name) : null;
 }
 
 /** Names a parent line may open on. */
@@ -324,7 +325,7 @@ function headLine(record: Pick<DecisionReportRecord, "parent" | "held" | "entrie
   for (const { item } of record.entries) {
     for (const owner of item.owners ?? []) {
       const key = "slack" in owner ? `@${owner.slack}` : owner.name;
-      const who = "slack" in owner ? `<@${owner.slack}>` : escapeSlackText(owner.name);
+      const who = ownerWho(owner, false)!;
       const mine = byOwner.get(key) ?? { who, titles: [] };
       const title = escapeSlackText(clip(item.title, BULLET_TITLE_CHARS));
       if (!mine.titles.includes(title)) mine.titles.push(title);

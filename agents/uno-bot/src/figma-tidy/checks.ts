@@ -49,7 +49,8 @@ export interface TidyFile {
 }
 
 /** A Roadmap card, as the checks read it. `owner` is its design owner's Slack
- *  id; `designers` its designer Contributors' first names, for a title. */
+ *  id, and `ownerName` their name, for a DM, which tags nobody; `designers`
+ *  its designer Contributors' first names, for a title. */
 export interface TidyCard {
   number: number;
   title: string;
@@ -57,6 +58,7 @@ export interface TidyCard {
   designStatus: string | null;
   devStatus: string | null;
   owner: string | null;
+  ownerName?: string;
   designers: string[];
 }
 
