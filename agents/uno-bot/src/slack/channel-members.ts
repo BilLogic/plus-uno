@@ -4,7 +4,8 @@
 // Mode links.
 
 import type { Env } from "../types";
-import { conversationsInfo, conversationsMembers } from "./api";
+import { conversationsMembers } from "./api";
+import { standingConfirmersOf } from "./standing-confirmers";
 
 /** Pages of 200 members — a channel of up to 600 people. */
 const MEMBER_PAGES = 3;
@@ -13,15 +14,17 @@ const MEMBER_PAGES = 3;
  * A channel's member ids, or null when Slack would not say — or when there are
  * more than the pages read, since a card must not quietly leave out anyone who
  * may decide it. The design-ops team is whoever is in #plus-universal. Slack
- * will not list a 1:1 DM's members, so a DM (a `D` id) is the person it is with.
+ * will not list a 1:1 DM's members, and the bot holds no `im:read` to ask who
+ * a DM is with, so a card in a DM (a `D` id) is decided by the deployment's
+ * standing confirmers — the only DM a card is sent to is one of theirs.
  *
  * @param env - Worker bindings
  * @param channel - The channel
  */
 export async function channelMembers(env: Env, channel: string): Promise<string[] | null> {
   if (channel.startsWith("D")) {
-    const res = await conversationsInfo(env, channel).catch(() => null);
-    return res?.ok && res.channel?.user ? [res.channel.user] : null;
+    const confirmers = standingConfirmersOf(env);
+    return confirmers.length ? confirmers : null;
   }
   const ids: string[] = [];
   let cursor: string | undefined;

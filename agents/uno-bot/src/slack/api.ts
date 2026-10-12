@@ -247,7 +247,7 @@ export async function botConversations(env: Env, types: string, cursor?: string)
 /** conversations.info via the bot token — what kind of conversation this is. */
 export async function conversationsInfo(env: Env, channel: string) {
   return slackGet<
-    SlackResponse & { channel?: { id?: string; is_private?: boolean; is_im?: boolean; is_mpim?: boolean; user?: string } }
+    SlackResponse & { channel?: { id?: string; is_private?: boolean; is_im?: boolean; is_mpim?: boolean } }
   >(env, "conversations.info", { channel });
 }
 
