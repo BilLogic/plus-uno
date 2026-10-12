@@ -203,6 +203,38 @@ describe("whom a report pings", () => {
     const decided = reportMessage({ ...record, entries: [{ ...record.entries[0]!, state: { kind: "rejected", by: "U0BILL" } }] });
     assert.equal(parentOf(decided.blocks), "<@U0MAX>, 1 page still states it.");
   });
+
+  it("each open card's subtitle leads with its owner's tag, so a reader sees whose it is", () => {
+    const report = decisionReport(
+      [owned(1, [{ slack: "U0MAX" }]), owned(2, [{ slack: "U0MAX" }, { slack: "U0SURAJ" }]), owned(3, [{ name: "Ana <!here>" }])],
+      "3 pages.",
+    );
+    assert.deepEqual(
+      cardsOf(report.blocks).map((c) => c.subtitle!.text),
+      ["<@U0MAX> · from this thread", "<@U0MAX> <@U0SURAJ> · from this thread", "Ana &lt;!here&gt; · from this thread"],
+    );
+    assert.deepEqual(notified(report), ["U0MAX", "U0SURAJ"], "the opener still does the notifying");
+  });
+
+  it("a card with an owner and no subtitle shows the owner alone", () => {
+    const report = decisionReport([item(1, { subtitle: undefined, owners: [{ slack: "U0MAX" }] })], "1 file.");
+    assert.equal(cardsOf(report.blocks)[0]!.subtitle!.text, "<@U0MAX>");
+  });
+
+  it("in a DM the subtitle tags nobody: a named owner stays as plain text", () => {
+    const report = decisionReport([owned(1, [{ slack: "U0MAX" }]), owned(2, [{ name: "Ana" }])], "2 pages.", { channel: "D0BILL" });
+    assert.deepEqual(
+      cardsOf(report.blocks).map((c) => c.subtitle!.text),
+      ["from this thread", "Ana · from this thread"],
+    );
+  });
+
+  it("a decided card's subtitle says who decided, not whose it was", () => {
+    const report = decisionReport([owned(1, [{ slack: "U0MAX" }])], "1 page.");
+    const record = reportRecord("C1", "1790000000.000100", report, 3_600_000);
+    const decided = reportMessage({ ...record, entries: [{ ...record.entries[0]!, state: { kind: "rejected", by: "U0BILL" } }] });
+    assert.equal(cardsOf(decided.blocks)[0]!.subtitle!.text, "Rejected by <@U0BILL>");
+  });
 });
 
 describe("what a card shows once decided", () => {

@@ -108,7 +108,7 @@ test("a note's decision that contradicts a PRD becomes one card in #plus-design,
   assert.equal(card!.channel, DESIGN, "no thread, not the design system: #plus-design");
   assert.equal(card!.threadTs, null);
   const [staged] = h.staged;
-  assert.match(JSON.stringify(card!.blocks), /"<@U0ADE>, the running notes settled.*"from the running notes"/, "the PRD card's Contributor is the owner, pinged from the parent line");
+  assert.match(JSON.stringify(card!.blocks), /"<@U0ADE>, the running notes settled.*"<@U0ADE> · from the running notes"/, "the PRD card's Contributor is the owner, pinged from the parent line");
   assert.ok(staged!.proposalText.includes(`${NOTE_URL}#ndec`), "its Review cites the note block");
   assert.deepEqual((staged!.operations![0]!.input.replace as unknown[])[0], {
     block_id: PRD.blocks[0]!.id,
@@ -167,7 +167,7 @@ test("a Universal-pillar card's comment contradicting its PRD lands in #plus-uni
 
   assert.equal(h.posted.length, 1);
   assert.equal(h.posted[0]!.channel, UNIVERSAL);
-  assert.match(JSON.stringify(h.posted[0]!.blocks), /"<@U0CY>, a card comment settled.*"from a card comment"/);
+  assert.match(JSON.stringify(h.posted[0]!.blocks), /"<@U0CY>, a card comment settled.*"<@U0CY> · from a card comment"/);
 });
 
 test("a thread's answer no page holds becomes a card in that thread naming the page, the section and the text", async () => {
