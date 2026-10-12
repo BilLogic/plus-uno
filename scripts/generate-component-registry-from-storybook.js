@@ -23,6 +23,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { toId } from 'storybook/internal/csf';
+
 import { documents } from './lib/corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -109,6 +111,43 @@ function extractFigmaMeta(content) {
   }
 }
 
+/**
+ * The stories file an MDX page is attached to (`<Meta of={X} />` and
+ * `import * as X from './X.stories'`), and the docs entry's name when `<Meta>`
+ * gives one. Null when the page is not attached to a stories file.
+ */
+function attachedStories(mdxPath, content) {
+  const meta = content.match(/<Meta\s([^>]*)>/);
+  const of = meta?.[1].match(/of=\{(\w+)\}/);
+  if (!of) return null;
+  const imported = content.match(new RegExp(`import\\s+\\*\\s+as\\s+${of[1]}\\s+from\\s+['"]([^'"]+)['"]`));
+  if (!imported) return null;
+  const base = path.resolve(path.dirname(mdxPath), imported[1]);
+  const file = [base, `${base}.jsx`, `${base}.js`, `${base}.tsx`].find((f) => fs.existsSync(f) && fs.statSync(f).isFile());
+  if (!file) return null;
+  const name = meta[1].match(/\bname=["']([^"']+)["']/);
+  return { file, docsName: name ? name[1] : 'Docs' };
+}
+
+/**
+ * Where a developer opens the component: its live Storybook docs page's id, as
+ * Storybook derives it from the stories file's `title` and the docs entry's
+ * name, and its source file, repo-relative — the component's own file, or the
+ * stories file for a page with no component file of its own. Dev Mode's Code
+ * and Storybook links are built from these (agents/uno-bot/src/figma-links/).
+ */
+function developerLinks(mdxPath, content, name) {
+  const stories = attachedStories(mdxPath, content);
+  const title = stories && fs.readFileSync(stories.file, 'utf8').match(/\btitle:\s*['"]([^'"]+)['"]/);
+  const dir = path.dirname(mdxPath);
+  const own = ['.jsx', '.js', '.tsx'].map((ext) => path.join(dir, `${name}${ext}`)).find((f) => fs.existsSync(f));
+  const source = own ?? stories?.file;
+  return {
+    ...(source ? { source: path.relative(REPO_ROOT, source).replace(/\\/g, '/') } : {}),
+    ...(title ? { storybookId: toId(title[1], stories.docsName) } : {}),
+  };
+}
+
 function extractFromMdx(mdxPath) {
   const content = fs.readFileSync(mdxPath, 'utf8');
   const figmaMeta = extractFigmaMeta(content);
@@ -123,6 +162,7 @@ function extractFromMdx(mdxPath) {
     export: 'default',
     mdxPath: path.relative(REPO_ROOT, mdxPath).replace(/\\/g, '/'),
     githubLink: githubMatch ? githubMatch[1] : null,
+    ...developerLinks(mdxPath, content, name),
   };
   if (figmaMeta.props) code.props = figmaMeta.props;
 
