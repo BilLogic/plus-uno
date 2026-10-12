@@ -15,7 +15,7 @@ import { runFigmaEventJob } from "../src/figma-notify/job";
 import { readFigmaEvent, jobOf, eventIdOf, type FigmaEventJob } from "../src/figma-notify/event";
 import { answerFigmaAsk, MAX_ASK_TRIES, type AskMark, type FigmaAskDeps } from "../src/figma-ask/job";
 import type { FigmaAskDelivery } from "../src/figma-ask/delivery";
-import { FIGMA_LABEL, isOwnComment } from "../src/figma-ask/trigger";
+import { isOwnComment } from "../src/figma-ask/trigger";
 import { CANT_FIND_LINE } from "../src/figma-ask/copy";
 import { candidateThreads } from "../src/figma-comments/threads";
 import { recordingDelivery, runTurn, type RecordingDelivery } from "../src/turn/index";
@@ -262,7 +262,7 @@ describe("the reply", () => {
     assert.deepEqual(w.replies(), [
       {
         root: "100",
-        message: [FIGMA_LABEL, "Hidden until the first goal is set.", "It shows once a goal exists.", `Source: Goal Setting PRD — ${PRD}`].join("\n"),
+        message: ["🐐: Hidden until the first goal is set.", "It shows once a goal exists.", `Source: Goal Setting PRD — ${PRD}`].join("\n"),
       },
     ]);
   });
@@ -271,14 +271,13 @@ describe("the reply", () => {
     const w = world({ replies: reads(`One.\nTwo.\nThree.\nFour.\nFive. [PRD](${PRD})`) });
     await ask(w, comment("100", "@uno list them"));
     const lines = w.replies()[0]!.message.split("\n");
-    assert.equal(lines[0], FIGMA_LABEL);
-    assert.deepEqual(lines.slice(1), ["One.", "Two.", "Three.", `Source: Goal Setting PRD — ${PRD}`]);
+    assert.deepEqual(lines, ["🐐: One.", "Two.", "Three.", `Source: Goal Setting PRD — ${PRD}`]);
   });
 
   it("says it couldn't find this, pointing at #plus-design, when nothing answers it", async () => {
     const w = world({ replies: [{ text: "Probably after the first goal, I think." }] });
     await ask(w, comment("100", "@goat when does the bar show?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
     assert.match(CANT_FIND_LINE, /^I couldn't find this.*#plus-design/);
   });
 
@@ -308,13 +307,13 @@ describe("the reply", () => {
     };
     await ask(w, comment("100", "@uno when does the bar show?"));
     assert.ok(read.includes(PRD), `the turn read the PRD: ${read.join(", ")}`);
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 
   it("carries no Slack link a public thread may not: a cited permalink no public search vouched for is no source", async () => {
     const w = world({ replies: [{ text: "Hidden, per <https://plus.slack.com/archives/C0PRIV1/p1700000000000100|the thread>." }] });
     await ask(w, comment("100", "@uno when does the bar show?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 
   it("reads the ask, the file and the thread so far, and answers from #plus-design's public view", async () => {
@@ -359,7 +358,7 @@ describe("a change request", () => {
 
     const link = `https://plus.slack.com/archives/${DESIGN}/p1760000000000001`;
     assert.deepEqual(w.replies().map((r) => r.message), [
-      [FIGMA_LABEL, `I drafted this change for approval in #plus-design: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n"),
+      [`🐐: I drafted this change for approval in #plus-design: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n"),
     ]);
   });
 
@@ -402,7 +401,7 @@ describe("a change request", () => {
     await ask(w, comment("100", "@uno add it to the PRD", { user: STRANGER }));
     assert.deepEqual(w.leads, []);
     assert.deepEqual(w.cards, []);
-    assert.match(w.replies()[0]!.message, /^🐐\nI draft changes only for teammates/);
+    assert.match(w.replies()[0]!.message, /^🐐: I draft changes only for teammates/);
   });
 
   it("asks the file's creator when no design owner resolves, and the asker when nobody does", async () => {
@@ -431,7 +430,7 @@ describe("a change request", () => {
     const w = world({ replies: STAGES, design: false });
     await ask(w, comment("100", "@uno add it to the PRD"));
     assert.deepEqual(w.replies().map((r) => r.message), [
-      [FIGMA_LABEL, "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
+      ["🐐: I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
     ]);
   });
 
@@ -501,7 +500,7 @@ describe("a change request", () => {
     assert.equal(w.cards[0]!.stagedCards.length, 1);
     const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
     assert.equal(staged!.toolName, "notion_update");
-    assert.match(w.replies()[0]!.message, /^🐐\nI drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
+    assert.match(w.replies()[0]!.message, /^🐐: I drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
   });
 
   for (const [write, args, ask_] of [
@@ -571,7 +570,7 @@ describe("a change request", () => {
 describe("the loop guards", () => {
   it("never replies to its own comment, though it is Bill's and names @uno", async () => {
     const w = world();
-    const own = comment("200", `${FIGMA_LABEL}\nAsk @uno again with the card number.`, { user: BILL, parent_id: "100" });
+    const own = comment("200", "🐐: Ask @uno again with the card number.", { user: BILL, parent_id: "100" });
     w.figma.seedFile(FILE, { comments: [comment("100", "a question"), own] });
     // The route does not even queue the read…
     await w.run(own);
@@ -582,6 +581,16 @@ describe("the loop guards", () => {
   });
 
   it("knows its own comment as Figma reads it back, the label as the :goat: shortcode", async () => {
+    const w = world();
+    const own = comment("200", ":goat:: Ask @uno again with the card number.", { user: BILL, parent_id: "100" });
+    w.figma.seedFile(FILE, { comments: [comment("100", "a question"), own] });
+    await w.run(own);
+    const result = await answerFigmaAsk({ fileKey: FILE, commentId: "200" }, w.deps);
+    assert.equal(result.said, "uno-bot's own comment");
+    assert.deepEqual(w.replies(), []);
+  });
+
+  it("still knows a reply read back with the label on a line of its own", async () => {
     const w = world();
     const own = comment("200", ":goat:\nAsk @uno again with the card number.", { user: BILL, parent_id: "100" });
     w.figma.seedFile(FILE, { comments: [comment("100", "a question"), own] });
@@ -617,6 +626,12 @@ describe("the loop guards", () => {
     assert.equal(w.replies().length, 1);
   });
 
+  it("reads a comment Figma hands back opening :goat: as a teammate's ask", async () => {
+    const w = world();
+    await ask(w, comment("100", ":goat: @uno when does the bar show?"));
+    assert.equal(w.replies().length, 1);
+  });
+
   it("answers Bill himself: the label decides, not the author", async () => {
     const w = world();
     await ask(w, comment("100", "@uno when does the bar show?", { user: BILL }));
@@ -637,7 +652,7 @@ describe("the loop guards", () => {
     const threads = candidateThreads(
       [
         comment("100", "@uno should we hide the bar until the first goal?"),
-        comment("101", `${FIGMA_LABEL}\nThe PRD says hidden.`, { parent_id: "100", user: BILL, client_meta: null }),
+        comment("101", ":goat:: The PRD says hidden.", { parent_id: "100", user: BILL, client_meta: null }),
         comment("102", "Agreed, hidden it is.", { parent_id: "100", client_meta: null }),
         comment("110", "@goat what spacing is this?"),
       ],
@@ -698,7 +713,7 @@ describe("the budget", () => {
     for (let i = 1; i < MAX_ASK_TRIES; i++) outcomes.push((await w.run(c)).outcome);
     assert.deepEqual(outcomes, [...Array(MAX_ASK_TRIES - 1).fill("deferred"), "handled"]);
     assert.equal(MAX_ASK_TRIES, 5);
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, "I couldn't answer this just now. Ask in #plus-design."].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [["🐐: I couldn't answer this just now. Ask in #plus-design."].join("\n")]);
     assert.equal((await w.run(c)).line.includes("already replied"), true, "and is never tried again");
   });
 });
@@ -715,7 +730,7 @@ describe("a frame's title in the reply", () => {
     });
     await ask(w, comment("100", "@uno when does the bar show?"));
     assert.deepEqual(w.replies().map((r) => r.message), [
-      [FIGMA_LABEL, "It is hidden until the first goal, per Bar [v2] <draft>.", `Source: Bar [v2] <draft> — ${OTHER}`].join("\n"),
+      ["🐐: It is hidden until the first goal, per Bar [v2] <draft>.", `Source: Bar [v2] <draft> — ${OTHER}`].join("\n"),
     ]);
   });
 });
@@ -726,7 +741,7 @@ describe("the source must have been read", () => {
   it("an answer citing a link no lookup of the turn returned says it couldn't find this", async () => {
     const w = world({ replies: [{ text: `Hidden until the first goal is set. [Goal Setting PRD](${PRD})` }] });
     await ask(w, comment("100", "@uno when does the bar show?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 
   it("the frame asked on is no source, though the turn read it", async () => {
@@ -738,7 +753,7 @@ describe("the source must have been read", () => {
       toolResultFor: (name) => (name === "source_read" ? JSON.stringify({ ok: true, title: "Progress bar", url: FRAME }) : PRD_FOUND),
     });
     await ask(w, comment("100", "@uno when does the bar show?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 });
 
@@ -768,7 +783,7 @@ describe("a GitHub file the turn read directly", () => {
     const w = await answered(BUTTON, await readResult("BilLogic/plus-uno", BUTTON_PATH));
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
     assert.deepEqual(w.replies().map((r) => r.message), [
-      [FIGMA_LABEL, "It comes in small, medium and large. Button.jsx", `Source: Button.jsx — ${BUTTON}`].join("\n"),
+      ["🐐: It comes in small, medium and large. Button.jsx", `Source: Button.jsx — ${BUTTON}`].join("\n"),
     ]);
   });
 
@@ -844,26 +859,26 @@ describe("a GitHub file the turn read directly", () => {
       toolResultFor: (name) => (name === "github_read" ? read : PRD_FOUND),
     });
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 
   it("says it couldn't find this when the cited file is not the one read", async () => {
     const w = await answered(BUTTON, await readResult("BilLogic/plus-uno", BUTTON_PATH.replace("Button.jsx", "Button.stories.jsx")));
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 
   it("says it couldn't find this when the same path was read in another repo", async () => {
     const w = await answered(BUTTON, await readResult("BilLogic/other-repo", BUTTON_PATH));
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 
   it("says it couldn't find this when the read was refused as a private repo", async () => {
     const refused = JSON.stringify({ ok: false, error: "that repo is private, so it is not read for an answer posted outside Slack" });
     const w = await answered(BUTTON, refused);
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [[FIGMA_LABEL, CANT_FIND_LINE].join("\n")]);
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
   });
 });
 
@@ -896,8 +911,7 @@ describe("a try stopped while the card was posting", () => {
     assert.equal(w.cards.length, 1, "one card");
     assert.deepEqual(w.replies().map((r) => r.message), [
       [
-        FIGMA_LABEL,
-        `I drafted this change for approval in #plus-design: https://plus.slack.com/archives/${DESIGN}/p1760000000000001`,
+        `🐐: I drafted this change for approval in #plus-design: https://plus.slack.com/archives/${DESIGN}/p1760000000000001`,
         "Nothing changes in the file or anywhere else until a teammate approves it there.",
       ].join("\n"),
     ]);
@@ -910,7 +924,7 @@ describe("a try stopped while the card was posting", () => {
     assert.equal((await w.run(c)).outcome, "handled");
     assert.equal(w.cards.length, 0);
     assert.deepEqual(w.replies().map((r) => r.message), [
-      [FIGMA_LABEL, "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
+      ["🐐: I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
     ]);
   });
 });
@@ -940,13 +954,13 @@ describe("a reply on its way", () => {
   });
 
   it("knows its reply on the comment when Figma stored it escaped", async () => {
-    const reply = [FIGMA_LABEL, "Tutors \\& teachers see the bar <after> the first goal."].join("\n");
+    const reply = ["🐐: Tutors \\& teachers see the bar <after> the first goal."].join("\n");
     const w = world();
     w.marks.set("100", { state: "replying", tries: 0, reply, at: NOW });
     w.figma.seedFile(FILE, {
       comments: [
         comment("100", "@uno when does the bar show?"),
-        comment("101", [FIGMA_LABEL, "Tutors &amp; teachers see the bar &lt;after&gt; the first goal."].join("\n"), { parent_id: "100", user: BILL, client_meta: null }),
+        comment("101", [":goat:: Tutors &amp; teachers see the bar &lt;after&gt; the first goal."].join("\n"), { parent_id: "100", user: BILL, client_meta: null }),
       ],
     });
     const retry = await answerFigmaAsk({ fileKey: FILE, commentId: "100" }, w.deps);
@@ -981,7 +995,7 @@ describe("the decision read and the asks", () => {
     const threads = candidateThreads(
       [
         comment("100", "@uno we decided: hide the bar until the first goal. Add it to the PRD.", { resolved_at: "2026-10-09T16:00:00Z" }),
-        comment("101", `${FIGMA_LABEL}\nI drafted this change for approval in #plus-design.`, { parent_id: "100", user: BILL, client_meta: null }),
+        comment("101", ":goat:: I drafted this change for approval in #plus-design.", { parent_id: "100", user: BILL, client_meta: null }),
         comment("102", "@goat agreed, hidden it is.", { parent_id: "100", client_meta: null }),
       ],
       window,
@@ -1074,7 +1088,7 @@ describe("where a change request's card posts", () => {
       const link = `https://plus.slack.com/archives/${channel}/p1760000000000001`;
       assert.deepEqual(
         w.replies().map((r) => r.message),
-        [[FIGMA_LABEL, `${drafted}: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n")],
+        [[`🐐: ${drafted}: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n")],
         "the reply names only the channel the card is in, and links it there",
       );
 

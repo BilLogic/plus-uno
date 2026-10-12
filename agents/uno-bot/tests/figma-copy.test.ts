@@ -69,12 +69,12 @@ import { decisionCard, decisionCardWords, decisionParent, rewordInstead, whichOn
 import { DECISION_CARD_TTL_MS } from "../src/figma-comments/post";
 import type { QueuedDecision } from "../src/figma-comments/queue";
 import { askLeadText, figmaReplyText, type FigmaReply } from "../src/figma-ask/copy";
-import { FIGMA_LABEL } from "../src/figma-ask/trigger";
 import {
   DEV_LINKS_REVISION_REFUSAL,
   devLinksCard,
   devLinksCarryOn,
   devLinksComment,
+  isDevLinksComment,
   devLinksFinished,
   devLinksGaveUp,
   devLinksItem,
@@ -838,7 +838,7 @@ describe("@uno in a Figma comment (#903)", () => {
   it("every reply leads with the label, the one emoji, and holds to the vocabulary", () => {
     for (const reply of REPLIES) {
       const text = figmaReplyText(reply);
-      assert.equal(text.split("\n")[0], "🐐", text);
+      assert.match(text, /^🐐: \S/u, text);
       passesChecklist(text);
       assert.equal([...text.matchAll(/\p{Extended_Pictographic}/gu)].length, 1, `🐐 only in the label:\n${text}`);
     }
@@ -847,7 +847,7 @@ describe("@uno in a Figma comment (#903)", () => {
   it("a change that could not be drafted says so, and points at #plus-design", () => {
     assert.equal(
       figmaReplyText({ kind: "not-drafted" }),
-      ["🐐", "I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
+      "🐐: I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design.",
     );
   });
 
@@ -974,8 +974,15 @@ describe("Dev Mode links (#904)", () => {
 
   it("the one comment written into Figma leads with the label, the one emoji", () => {
     const text = devLinksComment("Button");
-    assert.equal(text.split("\n")[0], FIGMA_LABEL);
+    assert.match(text, /^🐐: Added Dev Mode links to Button: /u);
     passesChecklist(text);
     assert.equal([...text.matchAll(/\p{Extended_Pictographic}/gu)].length, 1, text);
+  });
+
+  it("knows the Dev Mode links comment as Figma reads it back, in each label it has had", () => {
+    assert.equal(isDevLinksComment(":goat:: Added Dev Mode links to Button: Code (plus-uno) opens…", "Button"), true);
+    assert.equal(isDevLinksComment(":goat:\nAdded Dev Mode links to Button: Code (plus-uno) opens…", "Button"), true);
+    assert.equal(isDevLinksComment(":goat:: Added Dev Mode links to Badge: Code (plus-uno) opens…", "Button"), false);
+    assert.equal(isDevLinksComment("Added Dev Mode links to Button: by hand", "Button"), false);
   });
 });

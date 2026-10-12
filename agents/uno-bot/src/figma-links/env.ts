@@ -5,8 +5,8 @@
 //   • the registry: `component-registry.json` read from the harness repo
 //     (`GITHUB_REPO`), which is also where the Code links point;
 //   • Figma: the one client (`figmaClientFor`), paced and backing off on 429;
-//   • Slack: where the Figma Review cards post (`figmaReviewChannel`) — Bill's
-//     DM while the Figma flows are in testing; its members decide;
+//   • Slack: where the Figma Review cards post (`figmaReviewChannel`) — #plus-design
+//     unless `FIGMA_ASK_CHANNEL_ID` names another; its members decide;
 //   • KV: the cards posted and the message each is in, so a later run never
 //     offers one twice while it is undecided (`./run.ts` reads its report), and
 //     merged library PRs waiting for their card (`./queue.ts`), queued by the

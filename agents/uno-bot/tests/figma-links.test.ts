@@ -590,7 +590,7 @@ describe("Approve on the batch card", () => {
     const outcomes = await steps(deps, { kind: "figma-dev-links-write", input, channel: CHANNEL, threadTs: FIRST_TS, since: NOW });
     assert.equal(outcomes.at(-1), "handled");
     const comments = (await w.figma.comments(LIB)).comments;
-    assert.ok(comments.every((c) => c.message.startsWith(":goat:\n")), "Figma holds them as shortcodes");
+    assert.ok(comments.every((c) => c.message.startsWith(":goat:: Added Dev Mode links to ")), "Figma holds them as shortcodes");
     assert.equal(comments.length, 12);
     assert.equal(new Set(comments.map((c) => c.client_meta?.node_id)).size, 12);
     assert.match(replies.at(-1)!, /24 links on 12 components, with 12 comments/);
