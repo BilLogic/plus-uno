@@ -21,17 +21,19 @@ import {
   type DevLinksWriteJob,
   type DevLinkRegistry,
   type DevLinksDeps,
+  DEV_LINKS_CARD_TTL_MS,
+  type CardedMark,
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
 import { figmaDevLinksProbe } from "../src/diagnostics/probes/figma";
 import type { Env } from "../src/types";
 import { FIGMA_LABEL } from "../src/figma-ask/trigger";
-import { itemProposal } from "../src/slack/decision-cards";
+import { itemProposal, settleItem } from "../src/slack/decision-cards";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import type { CardMessage } from "../src/slack/button-door";
 import { recordingDelivery } from "../src/turn/index";
 import { recordingViews } from "./helpers/recording-slack";
-import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
+import { createInMemoryThreadState, type PendingProposal, type ReportItemState } from "../src/thread-state/index";
 import { trackLibraryIntakes, implementPrTitle, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
 import { runQueuedPrLinks, type QueuedPrLinks } from "../src/figma-links/queue";
 
@@ -85,7 +87,7 @@ function world(opts: { figma?: InMemoryFigma; members?: string[] | null } = {}) 
   const store = createInMemoryThreadState({ now: () => NOW });
   const posts: Posted[] = [];
   const staged: PendingProposal[] = [];
-  const carded: { value: Record<string, number> | null } = { value: null };
+  const carded: { value: Record<string, CardedMark> | null } = { value: null };
   let n = 0;
   const deps: DevLinksDeps = {
     registry: async () => REGISTRY,
@@ -424,6 +426,88 @@ describe("Approve on a card", () => {
 
   it("an input that is not a card's is refused", async () => {
     assert.equal(JSON.parse(await writeDevLinks(seeded(), { links: [] })).ok, false);
+  });
+});
+
+describe("a decided card stops counting as open", () => {
+  /** Decide one item of a posted report, as the Review pop-up records it. */
+  const settle = (w: ReturnType<typeof world>, ts: string, id: string, state: ReportItemState) => settleItem(w.store, { messageTs: ts, id }, state, NOW);
+
+  it("a re-run before the card is decided still says it is open, and posts nothing", async () => {
+    const w = world();
+    await runDevLinksPost(w.deps, { components: ["Button"] });
+    const again = await runDevLinksPost(w.deps, { components: ["Button"] });
+    assert.equal(again.posted, false);
+    assert.match(again.summary, /card already open: Button/);
+    assert.equal(w.posts.length, 1);
+  });
+
+  it("once Approved in Review, a re-run with links still to write posts a new card", async () => {
+    const w = world();
+    await runDevLinksPost(w.deps, { components: ["Button"] });
+    const deps: ReviewDoorDeps = {
+      threadState: w.store,
+      views: recordingViews({ alreadyOpen: ["V1"] }).client,
+      delivery: () => recordingDelivery(),
+      applyVerdict: async () => [],
+      updateCard: async () => {},
+      restage: async () => {},
+      revise: async () => {},
+      now: () => NOW,
+    };
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: itemProposal(FIRST_TS, "links-Button").proposalTs, userId: BILL, decision: "confirm" }, deps);
+    const again = await runDevLinksPost(w.deps, { components: ["Button"] });
+    assert.equal(again.cards, 1, again.summary);
+    assert.equal(w.posts.length, 2);
+  });
+
+  for (const [name, state] of [
+    ["Needs changes", { kind: "changes-asked", by: BILL }],
+    ["Reject", { kind: "rejected", by: BILL }],
+  ] as const) {
+    it(`once decided with ${name}, a re-run posts a new card`, async () => {
+      const w = world();
+      await runDevLinksPost(w.deps, { components: ["Button"] });
+      await settle(w, FIRST_TS, "links-Button", state);
+      const again = await runDevLinksPost(w.deps, { components: ["Button"] });
+      assert.equal(again.cards, 1, again.summary);
+    });
+  }
+
+  it("a batch card decided lets the next batch run post", async () => {
+    const w = world();
+    await runDevLinksPost(w.deps, { all: true });
+    assert.match((await runDevLinksPost(w.deps, { all: true })).summary, /card already open: the batch/);
+    await settle(w, FIRST_TS, "links-batch", { kind: "approved", by: BILL, at: NOW });
+    const again = await runDevLinksPost(w.deps, { all: true });
+    assert.equal(again.cards, 1, again.summary);
+  });
+
+  it("a component's decided card no longer keeps it off the batch", async () => {
+    const w = world();
+    await runDevLinksPost(w.deps, { components: ["Button"] });
+    await settle(w, FIRST_TS, "links-Button", { kind: "rejected", by: BILL });
+    const batch = await runDevLinksPost(w.deps, { all: true });
+    assert.doesNotMatch(batch.summary, /already open/);
+    assert.ok(linksOf(w.staged[1]!).some((l) => l.name.endsWith(": Button")));
+  });
+
+  it("a merged PR's card decided lets the PR's links be offered again", async () => {
+    const pr = { number: 77, url: "https://github.com/BilLogic/plus-uno/pull/77" };
+    const w = world();
+    await runDevLinksPost(w.deps, { pr, components: ["Button"] });
+    assert.match((await runDevLinksPost(w.deps, { pr, components: ["Button"] })).summary, /card already open: PR #77/);
+    await settle(w, FIRST_TS, "pr-77", { kind: "rejected", by: BILL });
+    const again = await runDevLinksPost(w.deps, { pr, components: ["Button"] });
+    assert.equal(again.cards, 1, again.summary);
+  });
+
+  it("a card past its time stops counting as open", async () => {
+    const w = world();
+    await runDevLinksPost(w.deps, { components: ["Button"] });
+    w.deps.now = () => NOW + DEV_LINKS_CARD_TTL_MS + 1;
+    const again = await runDevLinksPost(w.deps, { components: ["Button"] });
+    assert.equal(again.cards, 1, again.summary);
   });
 });
 

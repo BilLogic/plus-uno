@@ -94,12 +94,48 @@ export interface DevLinksDeps {
   edit(ts: string, message: ReportMessage): Promise<void>;
   reports: ReportStore & Pick<ThreadState, "putReport">;
   stage(proposal: PendingProposal): Promise<void>;
-  /** Cards already posted and still open, by card id: when each closes (epoch ms). */
-  carded: Store<Record<string, number> | null>;
+  /** Cards already posted, by card id: when each closes, and its message. */
+  carded: Store<Record<string, CardedMark> | null>;
   /** What this invocation has left (`net.ts` `budgetHeadroom`); unbounded when absent. */
   headroom?(): { d1Queries: number; subrequests: number };
   channel: string;
   now(): number;
+}
+
+/**
+ * A posted card: when it closes (epoch ms) and the message it is in. A bare
+ * number is a mark from before the message was kept, open until it closes.
+ */
+export type CardedMark = number | { closes: number; ts: string };
+
+const closesOf = (mark: CardedMark) => (typeof mark === "number" ? mark : mark.closes);
+
+/**
+ * The cards still open: neither past their time nor decided. A card counts as
+ * decided once its report item is anything but open (Approved, Needs changes,
+ * Rejected, failed), so the next run may offer its links again; an undecided
+ * one is never offered twice. A report that cannot be read leaves its card
+ * open.
+ *
+ * @param reports - The thread store holding each card's report
+ * @param marks - The cards posted, by card id
+ * @param now - The clock
+ */
+async function openCards(reports: ReportStore, marks: Record<string, CardedMark>, now: number): Promise<Record<string, CardedMark>> {
+  const open: Record<string, CardedMark> = {};
+  for (const [id, mark] of Object.entries(marks)) {
+    if (closesOf(mark) <= now) continue;
+    if (typeof mark !== "number") {
+      const record = await reports.getReport(mark.ts).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      const state = record?.entries.find((e) => e.id === id)?.state.kind;
+      if (state && state !== "open") continue;
+    }
+    open[id] = mark;
+  }
+  return open;
 }
 
 interface Store<T> {
@@ -177,7 +213,7 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
   }
 
   const now = deps.now();
-  const carded = Object.fromEntries(Object.entries((await deps.carded.read()) ?? {}).filter(([, closes]) => closes > now));
+  const carded = await openCards(deps.reports, (await deps.carded.read()) ?? {}, now);
   let planned: Planned | null = null;
   const already: string[] = [];
   const atCap: string[] = [];
@@ -264,7 +300,7 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
     if (marked) await deps.edit(ts, marked).catch(() => {});
     return { posted: true, cards: 0, retry: true, summary: `the card posted but did not stage${tail}` };
   }
-  carded[devLinksItemId(subject)] = now + DEV_LINKS_CARD_TTL_MS;
+  carded[devLinksItemId(subject)] = { closes: now + DEV_LINKS_CARD_TTL_MS, ts };
   await deps.carded.write(carded);
   return { posted: true, cards: 1, summary: `posted 1 card for ${write.links.length} link(s)${tail}` };
 }
