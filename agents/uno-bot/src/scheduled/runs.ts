@@ -91,6 +91,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * the end-of-day `dm-capture-read` reads their DMs for drift and undocumented
  * answers, and the morning `dm-capture-post` offers each fix on a decision card in
  * their DM with uno-bot that only they can decide (src/dm-watch/capture.ts).
+ * The morning `figma-dev-links-pr`, after the tracker, posts a Dev Mode links
+ * card for each merged library PR it queued (src/figma-links/).
  * The weekly Figma tidy-up's two, Monday morning: `figma-tidy-read` lists the
  * teams' stage folders, and `figma-tidy-post` checks each file against its
  * cards and posts the week's Review cards (src/figma-tidy/).
@@ -126,7 +128,8 @@ export type ScheduledJobKind =
   | "dm-capture-read"
   | "dm-capture-post"
   | "figma-tidy-read"
-  | "figma-tidy-post";
+  | "figma-tidy-post"
+  | "figma-dev-links-pr";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -208,6 +211,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
+    { key: "figma-dev-links-pr", kind: "figma-dev-links-pr", after: ["figma-library-track"] },
     { key: "sweep-post", kind: "sweep-post" },
     { key: FIGMA_DECISIONS_POST_KEY, kind: "sweep-figma-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },

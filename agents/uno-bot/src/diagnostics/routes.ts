@@ -41,6 +41,7 @@ export const DIAGNOSTIC_ROUTES = {
   "blueprint-search": { method: "GET", path: "/debug/blueprint-search", auth: "debug-token" },
   "blueprint-subject": { method: "GET", path: "/debug/blueprint-subject", auth: "debug-token" },
   "figma-poll": { method: "GET", path: "/debug/figma-poll", auth: "debug-token" },
+  "figma-dev-links": { method: "GET", path: "/debug/figma-dev-links", auth: "debug-token" },
   sweep: { method: "GET", path: "/debug/sweep", auth: "debug-token" },
 } as const satisfies Record<string, ProbeRoute>;
 

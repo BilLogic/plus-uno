@@ -156,6 +156,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
   assert.deepEqual(morning.jobs.map((j) => [j.key, j.kind]), [
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
+    // A merged library PR's Dev Mode links card, once the tracker has queued it.
+    ["figma-dev-links-pr", "figma-dev-links-pr"],
     ["sweep-post", "sweep-post"],
     // The night's Figma comment decisions, one #plus-design thread per file (#900).
     ["sweep:figma-post", "sweep-figma-post"],

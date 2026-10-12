@@ -24,7 +24,7 @@ import { blueprintHealthProbe } from "./probes/blueprint-health";
 import { geminiCacheProbe, geminiProbe, vertexClaudeProbe } from "./probes/providers";
 import { blueprintProbe, blueprintSearchProbe, blueprintSubjectProbe } from "./probes/blueprint";
 import { homeProbe, slackPostProbe, slackSearchProbe, slackStreamProbe } from "./probes/slack";
-import { figmaPollProbe } from "./probes/figma";
+import { figmaDevLinksProbe, figmaPollProbe } from "./probes/figma";
 import { turnEvalProbe } from "./probes/turn";
 import { sweepProbe } from "./probes/sweep";
 
@@ -42,6 +42,7 @@ const PROBE_BODIES: Record<ProbeName, ProbeRun> = {
   "blueprint-search": blueprintSearchProbe,
   "blueprint-subject": blueprintSubjectProbe,
   "figma-poll": figmaPollProbe,
+  "figma-dev-links": figmaDevLinksProbe,
   sweep: sweepProbe,
 };
 

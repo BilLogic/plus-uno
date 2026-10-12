@@ -14,7 +14,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Accordion/Accordion.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Accordion"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Accordion",
+        "source": "design-system/src/components/layout-and-structure/Accordion/Accordion.jsx",
+        "storybookId": "components-layout-and-structure-accordion--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -37,6 +39,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/AiLabel/AiLabel.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/AiLabel",
+        "source": "design-system/src/components/status-and-loading/AiLabel/AiLabel.jsx",
+        "storybookId": "components-status-and-loading-ai-label-ai-label--docs",
         "props": {
           "origin": {
             "type": "enum",
@@ -77,7 +81,9 @@
         "import": "@/components/messaging",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Alert/Alert.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Alert"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Alert",
+        "source": "design-system/src/components/messaging/Alert/Alert.jsx",
+        "storybookId": "components-messaging-alert--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -100,6 +106,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Badge/Badge.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Badge",
+        "source": "design-system/src/components/status-and-loading/Badge/Badge.jsx",
+        "storybookId": "components-status-and-loading-status-count-tag-status-deprecated-badge--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -196,7 +204,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Breadcrumb"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Breadcrumb",
+        "source": "design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx",
+        "storybookId": "components-navigation-breadcrumb--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -219,6 +229,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/actions/Button/Button.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/Button",
+        "source": "design-system/src/components/actions/Button/Button.jsx",
+        "storybookId": "components-actions-button--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -513,7 +525,9 @@
         "import": "@/components/actions",
         "export": "default",
         "mdxPath": "design-system/src/components/actions/ButtonGroup/ButtonGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/ButtonGroup"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/ButtonGroup",
+        "source": "design-system/src/components/actions/ButtonGroup/ButtonGroup.jsx",
+        "storybookId": "components-actions-button-group--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -535,7 +549,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Card/Card.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Card"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Card",
+        "source": "design-system/src/components/layout-and-structure/Card/Card.jsx",
+        "storybookId": "components-layout-and-structure-card--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -566,7 +582,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Carousel/Carousel.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Carousel"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Carousel",
+        "source": "design-system/src/components/layout-and-structure/Carousel/Carousel.jsx",
+        "storybookId": "components-layout-and-structure-carousel--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -588,7 +606,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Cascader.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Cascader.jsx",
+        "storybookId": "components-forms-and-inputs-cascader--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -610,7 +630,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Checkbox.jsx",
+        "storybookId": "components-forms-and-inputs-checkbox--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -632,7 +654,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/ChoiceGrid.jsx",
+        "storybookId": "components-forms-and-inputs-choice-grid--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -662,7 +686,9 @@
         "import": "@/components/actions",
         "export": "default",
         "mdxPath": "design-system/src/components/actions/CloseButton/CloseButton.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/CloseButton"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/CloseButton",
+        "source": "design-system/src/components/actions/CloseButton/CloseButton.jsx",
+        "storybookId": "components-actions-close-button--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -684,7 +710,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Collapse/Collapse.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Collapse"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Collapse",
+        "source": "design-system/src/components/layout-and-structure/Collapse/Collapse.jsx",
+        "storybookId": "components-layout-and-structure-collapse--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -707,6 +735,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Count/Count.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Count",
+        "source": "design-system/src/components/status-and-loading/Count/Count.jsx",
+        "storybookId": "components-status-and-loading-status-count-tag-count--docs",
         "props": {
           "appearance": {
             "type": "enum",
@@ -762,7 +792,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DateAndTimePicker.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/DateAndTimePicker.jsx",
+        "storybookId": "components-forms-and-inputs-date-time-picker--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -792,7 +824,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker",
+        "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
+        "storybookId": "components-forms-and-inputs-date-picker--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -839,7 +873,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Divider/Divider.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Divider"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Divider",
+        "source": "design-system/src/components/layout-and-structure/Divider/Divider.jsx",
+        "storybookId": "components-layout-and-structure-divider--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -861,7 +897,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/Dropdown"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/Dropdown",
+        "source": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx",
+        "storybookId": "components-forms-and-inputs-dropdown--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -900,7 +938,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/FileUpload.jsx",
+        "storybookId": "components-forms-and-inputs-file-upload--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -922,7 +962,9 @@
         "import": "@/specs/Universal/Sections/Footer/Footer",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Sections/Footer/Footer.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Footer"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Footer",
+        "source": "design-system/src/specs/Universal/Sections/Footer/Footer.jsx",
+        "storybookId": "specs-universal-sections-footer--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -946,7 +988,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Input.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Input.jsx",
+        "storybookId": "components-forms-and-inputs-input--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -968,7 +1012,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/InputGroup"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/InputGroup",
+        "source": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.jsx",
+        "storybookId": "components-forms-and-inputs-input-group--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -990,7 +1036,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Jumbotron"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Jumbotron",
+        "source": "design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.jsx",
+        "storybookId": "components-layout-and-structure-jumbotron--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1012,7 +1060,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/LabelAndCaption.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.jsx",
+        "storybookId": "components-forms-and-inputs-label-caption--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1042,7 +1092,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/ListGroup/ListGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/ListGroup"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/ListGroup",
+        "source": "design-system/src/components/layout-and-structure/ListGroup/ListGroup.jsx",
+        "storybookId": "components-layout-and-structure-list-group--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1073,6 +1125,8 @@
         "export": "default",
         "mdxPath": "design-system/src/assets/Logo/Logo.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/assets/Logo",
+        "source": "design-system/src/assets/Logo/Logo.jsx",
+        "storybookId": "foundations-logos--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -1128,7 +1182,9 @@
         "import": "@/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/MaintenanceAlert"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/MaintenanceAlert",
+        "source": "design-system/src/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert.jsx",
+        "storybookId": "specs-universal-elements-maintenance-alert--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -1152,7 +1208,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/MediaObject/MediaObject.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/MediaObject"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/MediaObject",
+        "source": "design-system/src/components/layout-and-structure/MediaObject/MediaObject.jsx",
+        "storybookId": "components-layout-and-structure-media-object--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1182,7 +1240,9 @@
         "import": "@/components/messaging",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Modal/Modal.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Modal"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Modal",
+        "source": "design-system/src/components/messaging/Modal/Modal.jsx",
+        "storybookId": "components-messaging-modal--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1204,7 +1264,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/MultipleChoice.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/MultipleChoice.jsx",
+        "storybookId": "components-forms-and-inputs-multiple-choice--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1235,6 +1297,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/_internal/Navbar/Navbar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Navbar",
+        "source": "design-system/src/components/_internal/Navbar/Navbar.jsx",
+        "storybookId": "components-navigation-navbar--docs",
         "props": {
           "backgroundColor": {
             "type": "enum",
@@ -1276,7 +1340,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/NavPills/NavPills.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavPills"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavPills",
+        "source": "design-system/src/components/navigation/NavPills/NavPills.jsx",
+        "storybookId": "components-navigation-nav-pills--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1306,7 +1372,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/NavTabs/NavTabs.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavTabs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavTabs",
+        "source": "design-system/src/components/navigation/NavTabs/NavTabs.jsx",
+        "storybookId": "components-navigation-nav-tabs--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1336,7 +1404,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/NumberInput.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/NumberInput.jsx",
+        "storybookId": "components-forms-and-inputs-number-input--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1358,7 +1428,9 @@
         "import": "@/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip",
         "export": "default",
         "mdxPath": "design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip",
+        "source": "design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip.jsx",
+        "storybookId": "specs-toolkit-post-session-elements-option-chip--toolkit-docs-optionchip"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -1378,7 +1450,9 @@
         "import": "@/specs/Universal/Cards/OverviewCard/OverviewCard",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Cards/OverviewCard"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Cards/OverviewCard",
+        "source": "design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.jsx",
+        "storybookId": "specs-universal-cards-overview-card--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -1421,7 +1495,9 @@
         "import": "@/specs/Universal/Pages/PageLayout/PageLayout",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Pages/PageLayout"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Pages/PageLayout",
+        "source": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx",
+        "storybookId": "specs-universal-pages-page-layout--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -1445,7 +1521,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Pagination/Pagination.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Pagination"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Pagination",
+        "source": "design-system/src/components/navigation/Pagination/Pagination.jsx",
+        "storybookId": "components-navigation-pagination--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1467,7 +1545,9 @@
         "import": "@/components/overlays",
         "export": "default",
         "mdxPath": "design-system/src/components/overlays/Popover/Popover.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Popover"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Popover",
+        "source": "design-system/src/components/overlays/Popover/Popover.jsx",
+        "storybookId": "components-overlays-popover--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1489,7 +1569,9 @@
         "import": "@/components/status-and-loading",
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Progress/Progress.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Progress"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Progress",
+        "source": "design-system/src/components/status-and-loading/Progress/Progress.jsx",
+        "storybookId": "components-status-and-loading-progress--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1511,7 +1593,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Radio.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Radio.jsx",
+        "storybookId": "components-forms-and-inputs-radio--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1533,7 +1617,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RadioButtonGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/RadioButtonGroup.jsx",
+        "storybookId": "components-forms-and-inputs-scale--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1575,7 +1661,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Range.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Range.jsx",
+        "storybookId": "components-forms-and-inputs-range--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1597,7 +1685,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Rating.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Rating.jsx",
+        "storybookId": "components-forms-and-inputs-rating--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1629,7 +1719,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor",
+        "source": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx",
+        "storybookId": "components-forms-and-inputs-rich-text-editor--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1652,7 +1744,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/ScrollBar"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/ScrollBar",
+        "source": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.jsx",
+        "storybookId": "components-layout-and-structure-scroll-bar--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1676,7 +1770,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Scrollspy/Scrollspy.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Scrollspy"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Scrollspy",
+        "source": "design-system/src/components/navigation/Scrollspy/Scrollspy.jsx",
+        "storybookId": "components-navigation-scrollspy--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1698,7 +1794,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Select.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Select.jsx",
+        "storybookId": "components-forms-and-inputs-select--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1720,7 +1818,9 @@
         "import": "@/specs/Universal/Sections/Sidebar/Sidebar",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Sections/Sidebar/Sidebar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Sidebar"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Sidebar",
+        "source": "design-system/src/specs/Universal/Sections/Sidebar/Sidebar.jsx",
+        "storybookId": "specs-universal-sections-sidebar--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -1751,7 +1851,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/SidebarTab/SidebarTab.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/SidebarTab"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/SidebarTab",
+        "source": "design-system/src/components/navigation/SidebarTab/SidebarTab.jsx",
+        "storybookId": "components-navigation-sidebar-tab--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1774,6 +1876,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Skeleton",
+        "source": "design-system/src/components/status-and-loading/Skeleton/Skeleton.jsx",
+        "storybookId": "components-status-and-loading-skeleton--docs",
         "props": {
           "shape": {
             "type": "enum",
@@ -1822,7 +1926,9 @@
         "import": "@/specs/Universal/Elements/SmartBadges/SmartBadges",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/SmartBadges"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/SmartBadges",
+        "source": "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.stories.jsx",
+        "storybookId": "specs-universal-elements-smart-badges--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -1868,7 +1974,9 @@
         "import": "@/components/status-and-loading",
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Spinner/Spinner.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Spinner"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Spinner",
+        "source": "design-system/src/components/status-and-loading/Spinner/Spinner.jsx",
+        "storybookId": "components-status-and-loading-loading--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1915,6 +2023,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Status/Status.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Status",
+        "source": "design-system/src/components/status-and-loading/Status/Status.jsx",
+        "storybookId": "components-status-and-loading-status-count-tag-status--docs",
         "props": {
           "type": {
             "type": "enum",
@@ -1972,6 +2082,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Suggestion/Suggestion.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Suggestion",
+        "source": "design-system/src/components/status-and-loading/Suggestion/Suggestion.jsx",
+        "storybookId": "components-status-and-loading-ai-label-suggestion--docs",
         "props": {
           "type": {
             "type": "enum",
@@ -2004,7 +2116,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Switch.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Switch.jsx",
+        "storybookId": "components-forms-and-inputs-switch--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2027,6 +2141,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/_internal/Table/Table.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Table",
+        "source": "design-system/src/components/_internal/Table/Table.jsx",
+        "storybookId": "components-layout-and-structure-table--docs",
         "props": {
           "density": {
             "type": "enum",
@@ -2154,6 +2270,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Tag/Tag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag",
+        "source": "design-system/src/components/status-and-loading/Tag/Tag.jsx",
+        "storybookId": "components-status-and-loading-status-count-tag-tag--docs",
         "props": {
           "behavior": {
             "type": "enum",
@@ -2234,6 +2352,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/TagGroup",
+        "source": "design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx",
+        "storybookId": "components-status-and-loading-status-count-tag-tag-group--docs",
         "props": {
           "overflow": {
             "type": "enum",
@@ -2276,6 +2396,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Textarea.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/Textarea.jsx",
+        "storybookId": "components-forms-and-inputs-textarea--docs",
         "props": {
           "variant": {
             "type": "enum",
@@ -2355,6 +2477,8 @@
         "export": "default",
         "mdxPath": "design-system/src/components/status-and-loading/Tile/Tile.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tile",
+        "source": "design-system/src/components/status-and-loading/Tile/Tile.jsx",
+        "storybookId": "foundations-tile--docs",
         "props": {
           "content": {
             "type": "enum",
@@ -2425,7 +2549,9 @@
         "import": "@/components/messaging",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Toast/Toast.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Toast"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Toast",
+        "source": "design-system/src/components/messaging/Toast/Toast.jsx",
+        "storybookId": "components-messaging-toast--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2447,7 +2573,9 @@
         "import": "@/components/overlays",
         "export": "default",
         "mdxPath": "design-system/src/components/overlays/Tooltip/Tooltip.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Tooltip"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Tooltip",
+        "source": "design-system/src/components/overlays/Tooltip/Tooltip.jsx",
+        "storybookId": "components-overlays-tooltip--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2469,7 +2597,9 @@
         "import": "@/specs/Universal/Sections/TopBar/TopBar",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Sections/TopBar/TopBar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/TopBar"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/TopBar",
+        "source": "design-system/src/specs/Universal/Sections/TopBar/TopBar.jsx",
+        "storybookId": "specs-universal-sections-top-bar--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -2507,7 +2637,9 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TreeSelect.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/TreeSelect.jsx",
+        "storybookId": "components-forms-and-inputs-tree-select--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2551,7 +2683,9 @@
         "import": "@/specs/Universal/Elements/UserAvatar/UserAvatar",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/UserAvatar/UserAvatar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserAvatar"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserAvatar",
+        "source": "design-system/src/specs/Universal/Elements/UserAvatar/UserAvatar.jsx",
+        "storybookId": "specs-universal-elements-user-avatar--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
@@ -2582,7 +2716,9 @@
         "import": "@/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator",
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserTypeIndicator"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserTypeIndicator",
+        "source": "design-system/src/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator.jsx",
+        "storybookId": "specs-universal-elements-user-type-indicator--docs"
       },
       "figma": {
         "fileKey": "W0qzhXWxFsMwSJzkdV2yal",

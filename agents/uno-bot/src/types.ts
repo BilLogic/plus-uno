@@ -116,6 +116,10 @@ export interface Env {
    *  a change asked for in a Figma comment (`figma-ask/`) and the weekly
    *  tidy-up (`figma-tidy/`). Blank or unset → #plus-design. */
   FIGMA_ASK_CHANNEL_ID?: string;
+  /** `on` lets Dev Mode links run for every registry component and post a
+   *  merged library PR's card (`figma-links/gate.ts`). Unset → one component
+   *  per manual run, and merged PRs wait. */
+  FIGMA_DEV_LINKS?: string;
   /** The channels the end-of-day sweep reads, comma-separated ids
    *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
   SWEEP_CHANNELS?: string;

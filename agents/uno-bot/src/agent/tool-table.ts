@@ -432,6 +432,20 @@ export const TOOL_TABLE = {
       nouns: ["tidy-up", "file", "item"],
     },
   },
+  // A Dev Mode links card's one operation (src/figma-links/): add the
+  // card's Code, Storybook or PR links in Figma, and the first time a
+  // component gets its links, one labelled comment. The Worker stages it; the
+  // model is never offered it.
+  figma_dev_links: {
+    access: "worker",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "add these Dev Mode links",
+      kind: "add Dev Mode links",
+      nouns: ["dev mode", "link", "figma"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 

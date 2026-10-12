@@ -13,7 +13,9 @@
 // `figma-implement.yml` opens its PR there.
 
 import type { Env } from "../types";
-import { conversationsMembers, getPermalink, postMessage, updateMessage } from "../slack/api";
+import { getPermalink, postMessage, updateMessage } from "../slack/api";
+import { channelMembers } from "../slack/channel-members";
+import { REGISTRY_PATH } from "../figma/registry";
 import { threadStateFor } from "../thread-state/production";
 import { figmaClientFor } from "../figma/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
@@ -21,6 +23,8 @@ import { proposalEventLogFor } from "../usage/production";
 import { GithubRequestError, githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
+import { queuePrLinks } from "../figma-links/queue";
+import { prQueueFor } from "../figma-links/env";
 import { repositoryDispatch } from "../tools/github-dispatch";
 import {
   BLOCKED_LABEL,
@@ -42,32 +46,6 @@ export const TRACKED_KV_KEY = "figma-poll:tracked";
 const UNPUBLISHED_KV_KEY = "figma-poll:unpublished";
 /** Who an expired card's intake was filed for, as its footer says it. */
 const EXPIRED_REQUESTER = `the #plus-universal library card, after ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)} with no decision`;
-export const REGISTRY_PATH = "design-system/figma/component-registry.json";
-/** Pages of 200 members — a channel of up to 600 people. */
-const MEMBER_PAGES = 3;
-
-/**
- * A channel's member ids, or null when Slack would not say — or when there are
- * more than the pages read, since a card must not quietly leave out anyone who
- * may decide it. The design-ops team is whoever is in #plus-universal.
- *
- * @param env - Worker bindings
- * @param channel - The channel
- */
-export async function channelMembers(env: Env, channel: string): Promise<string[] | null> {
-  const ids: string[] = [];
-  let cursor: string | undefined;
-  for (let page = 0; page < MEMBER_PAGES; page++) {
-    const res = await conversationsMembers(env, channel, 200, cursor).catch(() => null);
-    if (!res?.ok) return null;
-    ids.push(...(res.members ?? []));
-    cursor = res.response_metadata?.next_cursor || undefined;
-    if (!cursor) return ids;
-  }
-  console.error(`[figma-library] ${channel} has more than ${MEMBER_PAGES * 200} members`);
-  return null;
-}
-
 function trackedStore(env: Env) {
   return kvJson<TrackedPublish[]>(env, TRACKED_KV_KEY, []);
 }
@@ -177,6 +155,8 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
         const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
         if (!res.ok) throw new Error(res.error ?? "chat.update failed");
       },
+      // A merged PR's link waits for its Dev Mode links card (src/figma-links/).
+      merged: (pr, components) => queuePrLinks(prQueueFor(env), { pr, components }),
       now: () => Date.now(),
     },
     opts,

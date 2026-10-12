@@ -18,7 +18,7 @@ import { budgetHeadroom } from "../net";
 import { postMessage, updateMessage } from "../slack/api";
 import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
-import { channelMembers } from "../figma-library/env";
+import { channelMembers } from "../slack/channel-members";
 import { figmaReviewChannel } from "../figma-ask/env";
 import { queryRoadmapByNumbers, queryRoadmapCards } from "../integrations/notion";
 import { storedTeamRoles } from "../usage/production";

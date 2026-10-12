@@ -69,6 +69,17 @@ import { decisionCard, decisionCardWords, decisionParent, rewordInstead, whichOn
 import { DECISION_CARD_TTL_MS } from "../src/figma-comments/post";
 import type { QueuedDecision } from "../src/figma-comments/queue";
 import { askLeadText, figmaReplyText, type FigmaReply } from "../src/figma-ask/copy";
+import { FIGMA_LABEL } from "../src/figma-ask/trigger";
+import {
+  DEV_LINKS_REVISION_REFUSAL,
+  devLinksBatchLine,
+  devLinksCard,
+  devLinksComment,
+  devLinksItem,
+  devLinksParent,
+  type DevLinksSubject,
+  type DevLinksWrite,
+} from "../src/figma-links/copy";
 
 // ── The doc ──────────────────────────────────────────────────────────────────
 
@@ -906,5 +917,41 @@ describe("the weekly Figma tidy-up (#886 § 3.6)", () => {
     }
     passesChecklist(TIDY_REVISION_REFUSAL);
     assert.equal(findingBody(findings[2]!, null), "Not on an active card, and not in 🗂️ Archive. Move it to Universal › 🗂️ Archive.");
+  });
+});
+
+describe("Dev Mode links (#904)", () => {
+  const button: DevLinksSubject = { kind: "component", component: "Button", figmaUrl: "https://www.figma.com/design/L?node-id=33-2470", storybook: "https://sb/button" };
+  const pr: DevLinksSubject = { kind: "pr", number: 1200, url: "https://github.com/o/r/pull/1200", components: ["Button", "Card"] };
+  const links = (name: string) => [
+    { file_key: "L", node_id: "33:2470", name: `Code: ${name}`, url: "https://gh/code" },
+    { file_key: "L", node_id: "979:1", name: `Code: ${name}`, url: "https://gh/code" },
+  ];
+  const first = { links: links("Button"), introduce: [{ file_key: "L", node_id: "33:2470", component: "Button" }] };
+
+  it("the parent lines, the cards and what Review shows hold to the checklist", () => {
+    passesChecklist(devLinksParent([button], 1));
+    passesChecklist(devLinksParent([button, button, button], 2));
+    passesChecklist(devLinksParent([pr], 1));
+    passesChecklist(devLinksBatchLine(11, 20, 68));
+    const cases: Array<[DevLinksSubject, DevLinksWrite]> = [
+      [button, first],
+      [pr, { links: links("Button"), introduce: [] }],
+    ];
+    for (const [subject, write] of cases) {
+      const item = devLinksItem(subject, write);
+      passesChecklist([item.title, item.subtitle ?? "", item.body].join("\n"));
+      passesChecklist(renderProposalCard(devLinksCard(subject, write)).text);
+    }
+    passesChecklist(DEV_LINKS_REVISION_REFUSAL);
+    assert.equal(devLinksItem(button, first).body, "Adds 2 links in Dev Mode to 2 library components, and one comment on the first saying what they are.");
+    assert.equal(devLinksParent([button], 1), "Dev Mode links for Button are ready for Review.");
+  });
+
+  it("the one comment written into Figma leads with the label, the one emoji", () => {
+    const text = devLinksComment("Button");
+    assert.equal(text.split("\n")[0], FIGMA_LABEL);
+    passesChecklist(text);
+    assert.equal([...text.matchAll(/\p{Extended_Pictographic}/gu)].length, 1, text);
   });
 });

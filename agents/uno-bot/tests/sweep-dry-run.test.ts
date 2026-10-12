@@ -140,10 +140,12 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 10);
+  assert.equal(body.planned.length, 11);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["figma-library-post", "handled", 0],
     ["figma-library-track", "handled", 0],
+    // No KV bound: no merged PR waits for its Dev Mode links card.
+    ["figma-dev-links-pr", "handled", 0],
     ["sweep-post", "handled", 0],
     // No sweep store bound: the Figma decision post says so and spends nothing.
     ["sweep:figma-post", "handled", 0],
