@@ -246,11 +246,13 @@ export interface RecordingSlackOptions {
   /** Throw out of the answer post, so the adapter's "close the stream nobody
    *  else holds" path is reachable. */
   answerThrows?: unknown;
-  /** How long the Nth task append (0-based) takes to come back, in ms. A
-   *  schedule where an early update is slow and a later one fast is a client
-   *  that resolves out of order — the shape that let a card's "complete" land
-   *  after the next card's "in progress" while updates were fire-and-forget. */
-  taskDelayMs?: (index: number) => number;
+  /** Hold the Nth task append (0-based) until the promise returned settles.
+   *  An early update held and a later one let through is a client that
+   *  resolves out of order — the shape that let a card's "complete" land after
+   *  the next card's "in progress" while updates were fire-and-forget. A hold,
+   *  not a delay: a timer only keeps an append in flight while the test's own
+   *  steps beat it, which a loaded machine does not promise. */
+  taskHold?: (index: number) => Promise<unknown> | undefined;
   /** Reject every task update, the way a refused or thrown append arrives. */
   taskRejects?: unknown;
 }
@@ -388,8 +390,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     async appendTasks(channel, ts, tasks, title) {
       const call: SlackCall = { kind: "tasks", channel, ts, tasks: [...tasks], ...(title === undefined ? {} : { title }) };
       record(call);
-      const delay = opts.taskDelayMs?.(appends++) ?? 0;
-      if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
+      await opts.taskHold?.(appends++);
       const why = taskRefusal(tasks);
       if (why) return refuse(refused, why, "invalid_arguments");
       if (stopped.has(ts)) return refuse(refused, "task update on a stopped stream", "message_not_in_streaming_state");
