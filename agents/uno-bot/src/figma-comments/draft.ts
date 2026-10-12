@@ -57,7 +57,10 @@ export interface DraftContext {
  * @param d - A validated decision
  * @param ctx - The page it writes to, and where it was said
  */
-export function draftDecision(d: DetectedDecision, ctx: DraftContext): { operation: ProposalOperation | null; update: DecisionUpdate } {
+export function draftDecision(
+  d: DetectedDecision,
+  ctx: DraftContext,
+): { operation: ProposalOperation | null; update: DecisionUpdate; before?: Record<string, string> } {
   if (d.route === "prd" && !ctx.prd) return { operation: null, update: { kind: "no-prd", card: ctx.card } };
   if (d.route === "prd" && d.prd && ctx.prd) {
     const page = { title: ctx.prd.title, url: ctx.prd.url };
@@ -71,6 +74,8 @@ export function draftDecision(d: DetectedDecision, ctx: DraftContext): { operati
           },
         },
         update: { kind: "prd", change: "change", section: d.prd.section, page },
+        // The block as the night read it: Review's Before.
+        before: { "0.replace.0.content": d.prd.block.text },
       };
     }
     return {
@@ -89,6 +94,7 @@ export function draftDecision(d: DetectedDecision, ctx: DraftContext): { operati
     return {
       operation: { toolName: "notion_update", input: { page_url: card.url, properties: { [field]: to } } },
       update: { kind: "card", card: card.number, field, from, to, url: card.url },
+      before: { [`0.properties.${field}`]: from ?? "" },
     };
   }
   const intake = d.intake ?? { title: d.decision, body: d.decision };

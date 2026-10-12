@@ -146,6 +146,44 @@ test("the proposal card from the thread names the page and links the one that op
   assert.deepEqual(revision.page, { url: OPENS, title: "Running Notes", parent: "Design Running Notes" });
 });
 
+// Review shows what a change replaces without reading anything as it opens,
+// so the card's own read at staging keeps it.
+test("the card's read keeps what each changed property and rewritten block says now", async () => {
+  const run = (text: string) => ({ type: "text", plain_text: text, text: { content: text, link: null }, href: null });
+  serve({
+    "GET /v1/pages/": {
+      body: {
+        id: "5b2c7cca498281009b41000000000731",
+        url: "https://www.notion.so/Launch-plan-5b2c7cca498281009b41000000000731",
+        parent: { type: "workspace" },
+        properties: { Name: title("Launch plan"), Status: { type: "status", status: { name: "WIP" } } },
+      },
+    },
+    "GET /v1/blocks/": {
+      body: {
+        has_more: false,
+        results: [
+          { id: "b-one", type: "paragraph", last_edited_time: "2026-10-01T09:00:00.000Z", paragraph: { rich_text: [run("Launch is Nov 1.")] } },
+          { id: "b-two", type: "paragraph", last_edited_time: "2026-10-01T09:00:00.000Z", paragraph: { rich_text: [run("Owner: Ade.")] } },
+        ],
+      },
+    },
+  });
+  const { buildNotionRevision } = await import("../src/slack/notion-card.js");
+
+  const revision = await buildNotionRevision(ENV, {
+    page_url: "https://www.notion.so/Launch-plan-5b2c7cca498281009b41000000000731",
+    properties: { Status: "Done" },
+    replace: [
+      { block_id: "b-two", last_edited_time: "2026-10-01T09:00:00.000Z", content: "Owner: Bea." },
+      { block_id: "b-gone", last_edited_time: "2026-10-01T09:00:00.000Z", content: "Nowhere." },
+    ],
+  });
+
+  // A block the read did not find has no Before, rather than a guessed one.
+  assert.deepEqual(revision.before, { "properties.Status": "WIP", "replace.0.content": "Owner: Ade." });
+});
+
 test("when the page read fails, the card still links the page that opens", async () => {
   serve({ "GET /v1/pages/": { status: 404, body: { object: "error", code: "object_not_found" } } });
   const { buildNotionRevision } = await import("../src/slack/notion-card.js");

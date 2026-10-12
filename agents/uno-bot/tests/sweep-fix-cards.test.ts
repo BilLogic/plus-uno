@@ -141,6 +141,8 @@ test("each fix is its own proposal: one operation, keyed by the message and its 
     assert.match(p.proposalText, new RegExp(`Page says now: ${PAGE.blocks[i]!.text}`));
     assert.match(p.proposalText, new RegExp(`Will say: ${FIXES[i]}`));
     assert.doesNotMatch(p.proposalText, GATE_WORDS);
+    // The block as the sweep read it, for Review's Before.
+    assert.deepEqual(p.before, { "0.replace.0.content": PAGE.blocks[i]!.text });
   });
   for (const p of h.staged) assert.equal((await h.threadState.getProposalByTs(p.proposalTs)).state, "found", "every fix is live at once");
   const record = await h.threadState.getReport(post.ts);

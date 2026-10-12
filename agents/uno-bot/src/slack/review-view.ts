@@ -13,10 +13,14 @@
 // fixed foot of the pop-up, however long the draft. Needs changes needs the
 // note; Reject takes it as an optional reason. A card with answers of its
 // own (`PendingProposal.choices`: a follow-up's Done · Still on it · Drop it)
-// offers those in the same input instead, each deciding as its verdict. The
-// fields are an Edit fields
-// button at the top, which pushes a view of its own (`views.push`) with Save
-// edits as its submit.
+// offers those in the same input instead, each deciding as its verdict.
+//
+// A CHANGE TO A PAGE IS EDITED IN PLACE. Its text fields are inputs in the
+// draft itself, prefilled, each under the value it replaces (`review-draft.ts`
+// § Before and after), and they ride the Submit with the decision; Approve
+// holds what changed to the same guards as Edit fields. Every other field — a
+// create's, and every select — sits behind an Edit fields button at the top,
+// which pushes a view of its own (`views.push`) with Save edits as its submit.
 //
 // SAVED EDITS RIDE IN THE DRAFT'S `private_metadata`. Edit fields' Save edits
 // writes the values that differ from the draft into the parent view's
@@ -31,8 +35,17 @@
 import { textSections } from "./render";
 import { CONFIRM_FOOTER } from "./proposal-render";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
-import { fieldInputBlocks, labelsOf, withValues, type EditableField } from "./review-fields";
-import { caveatsOf, draftHeadline, readableDraft } from "./review-draft";
+import {
+  draftValuesOf,
+  fieldInputBlocks,
+  fieldsFromBlocks,
+  inlineFields,
+  labelsOf,
+  withValues,
+  type EditableField,
+  type ReviewViewState,
+} from "./review-fields";
+import { caveatsOf, draftHeadline, isReadable, readableDraft } from "./review-draft";
 import type { PendingProposal, ReviewChoice, StatedCardWords } from "../thread-state/index";
 import type { ReviewDecision } from "../gate/index";
 
@@ -151,17 +164,33 @@ export function draftView(
   card: ReviewedCard,
   proposal: PendingProposal,
   access: DraftAccess,
-  opts: { edits?: Readonly<Record<string, string>>; editable?: boolean; alert?: { level: "error" | "success"; text: string } } = {},
+  opts: {
+    edits?: Readonly<Record<string, string>>;
+    /** What was typed into the fields in place, kept when the draft is redrawn
+     *  around an alert: shown, never carried in the metadata. */
+    typed?: ReadonlyMap<string, string>;
+    editable?: boolean;
+    alert?: { level: "error" | "success"; text: string };
+  } = {},
 ): View {
   const edits = access.mayDecide ? (opts.edits ?? {}) : {};
   const operations = withValues(proposal, new Map(Object.entries(edits)));
   const text = draftBody(proposal.proposalText);
-  const body = readableDraft(operations, caveatsOf(text)) ?? textSections(text);
+  const inline = access.mayDecide ? inlineKeysOf(proposal) : new Set<string>();
+  const inPlace = new Map(
+    inlineFields(proposal)
+      .filter((f) => inline.has(f.key))
+      .map((f) => [f.key, { ...f, value: opts.typed?.get(f.key) ?? edits[f.key] ?? f.value }] as const),
+  );
+  const detail = { ...(proposal.before ? { before: proposal.before } : {}), inline: inPlace, editing: access.mayDecide };
+  const body = readableDraft(operations, caveatsOf(text), detail) ?? textSections(text);
 
   const headline = draftHeadline(operations);
   const head: unknown[] = [];
   if (opts.alert) head.push(alertBlock(opts.alert.level, opts.alert.text));
-  const editable = access.mayDecide && opts.editable !== false;
+  // Edit fields only for what the draft does not already hold in place.
+  const editable =
+    access.mayDecide && opts.editable !== false && [...draftValuesOf(proposal).keys()].some((key) => !inline.has(key));
   head.push({
     type: "section",
     text: { type: "mrkdwn", text: headline ? `*${escapeSlackText(headline)}*` : "*The draft*" },
@@ -179,6 +208,12 @@ export function draftView(
     [...head, ...fitted, ...tail],
     access.mayDecide ? { submit: SUBMIT } : {},
   );
+}
+
+/** The keys of the fields the draft holds as inputs in place: none unless the
+ *  whole batch has a reading to draw them in. */
+export function inlineKeysOf(proposal: PendingProposal): Set<string> {
+  return isReadable(withValues(proposal, new Map())) ? new Set(inlineFields(proposal).map((f) => f.key)) : new Set();
 }
 
 /** The draft's footer submit, which decides it. */
@@ -258,6 +293,43 @@ export function draftSubmitOf(
     return { ok: false, errors: { [NOTE_BLOCK_ID]: "Write what to change, so I can revise the draft." } };
   }
   return { ok: true, decision, note };
+}
+
+/** A decision, as the draft's Submit sends it. */
+export interface ReviewSubmit {
+  decision: ReviewDecision;
+  note?: string;
+  choice?: string;
+  /** Approve only: the edits Save edits kept on the draft. */
+  edits?: Readonly<Record<string, string>>;
+  /** Approve only: the state holding the fields in place, and those fields
+   *  with the values they opened with. */
+  state?: ReviewViewState;
+  fields?: EditableField[];
+}
+
+/**
+ * The draft's Submit, read off the submitted view: the decision and its note,
+ * and for Approve every edit it carries — saved ones from the metadata, and
+ * the fields in place from the state, read against the blocks they were
+ * offered in. Only Approve writes, so only Approve carries edits. Or the
+ * errors Slack shows under the input that needs one.
+ */
+export function reviewSubmitOf(
+  view: { state?: unknown; blocks?: unknown; private_metadata?: string },
+): { ok: true; request: ReviewSubmit } | { ok: false; errors: Record<string, string> } {
+  const submitted = draftSubmitOf(view.state);
+  if (!submitted.ok) return submitted;
+  const { decision, note, choice } = submitted;
+  const request: ReviewSubmit = { decision, ...(note ? { note } : {}), ...(choice ? { choice } : {}) };
+  if (decision !== "confirm") return { ok: true, request };
+  const edits = reviewedCardOf(view.private_metadata ?? undefined)?.edits;
+  const fields = fieldsFromBlocks(Array.isArray(view.blocks) ? view.blocks : []);
+  const values = (view.state as { values?: ReviewViewState } | undefined)?.values;
+  return {
+    ok: true,
+    request: { ...request, ...(edits ? { edits } : {}), ...(fields.length && values ? { state: values, fields } : {}) },
+  };
 }
 
 /** Edit fields, pushed over the draft, while the fields' options are read. */

@@ -1219,6 +1219,18 @@ const SWEEP_CARD: PendingProposal = {
   sweepRun: "2026-09-30",
 };
 
+// Review opens inside Slack's three seconds and reads nothing, so what a page
+// change replaces is read when its card is staged and kept on the proposal.
+test("a page change keeps what the page says now, read as its card was staged", async () => {
+  const h = harness({
+    replies: [{ text: "Fixed the date.", toolCalls: [{ name: "notion_update", args: FIX_ONE }] }],
+    notionRevision: async () => ({ properties: [], before: { "replace.0.content": "Launch date: October 1" } }),
+  });
+  const outcome = await runTurn(request({ text: "the launch moved to November 1" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.before, { "0.replace.0.content": "Launch date: October 1" });
+});
+
 // A confirmer's revision of a sweep card stays a sweep card, in the sweep's
 // slot — and the model is told what a reply under one usually means.
 test("a confirmer's revision of a sweep card keeps its sweep run and retires the card", async () => {

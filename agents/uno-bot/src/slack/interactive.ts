@@ -43,8 +43,8 @@ import {
   REVIEW_CALLBACK_ID,
   REVIEW_EDIT_ACTION_ID,
   REVIEW_EDIT_CALLBACK_ID,
-  draftSubmitOf,
   noticeView,
+  reviewSubmitOf,
   reviewedCardOf,
 } from "./review-view";
 import type { OptionSource } from "./review-fields";
@@ -328,9 +328,11 @@ async function submitReview(env: Env, payload: InteractionPayload, ctx: Executio
     return ack ? Response.json(ack) : new Response("", { status: 200 });
   }
 
-  const submitted = draftSubmitOf(view.state);
+  // The decision, its note and — on Approve only — the saved edits and the
+  // fields the draft holds in place.
+  const submitted = reviewSubmitOf(view);
   if (!submitted.ok) return Response.json({ response_action: "errors", errors: submitted.errors });
-  const { decision, note, choice } = submitted;
+  const { decision } = submitted.request;
   const underWay = { confirm: "Approving…", revise: "Sending your note…", cancel: "Rejecting…" }[decision];
   ctx.waitUntil(
     runReviewDecision(
@@ -340,11 +342,7 @@ async function submitReview(env: Env, payload: InteractionPayload, ctx: Executio
         channel: card.channel,
         messageTs: card.ts,
         userId,
-        decision,
-        ...(note ? { note } : {}),
-        ...(choice ? { choice } : {}),
-        // Only the draft carries saved edits, and only Approve writes them.
-        ...(decision === "confirm" && card.edits ? { edits: card.edits } : {}),
+        ...submitted.request,
       },
       deps,
     ).catch((err) => {
