@@ -26,6 +26,7 @@ import { fileURLToPath } from 'url';
 import { storybookId } from './lib/storybook-id.mjs';
 
 import { documents } from './lib/corpus.mjs';
+import { isEntry } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -154,7 +155,7 @@ function developerLinks(mdxPath, content, name) {
  * declares any. A malformed record fails the generator rather than silently
  * muting the check.
  */
-function deliberateOf(deliberate, name, props) {
+export function deliberateOf(deliberate, name, props) {
   if (!deliberate || typeof deliberate !== 'object' || Array.isArray(deliberate)) {
     throw new Error(`${name}: figmaMeta.deliberate must be an object of code prop → reason`);
   }
@@ -262,4 +263,4 @@ function main() {
   }
 }
 
-main();
+if (isEntry(import.meta.url)) main();

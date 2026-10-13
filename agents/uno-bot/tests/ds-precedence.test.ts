@@ -151,7 +151,9 @@ function check(inFlight: ReadonlySet<string> = new Set()) {
 }
 
 // Textarea as #1157 found it: one code component, two library sets with the
-// same axes, neither mapped to a code prop but by name.
+// same axes, neither mapped to a code prop but by name. The value map is
+// Textarea.mdx's: the library's `validation` axis says invalid and valid.
+const TEXTAREA_VALUE_MAP = { validation: { invalid: "error", valid: "success" } };
 const TEXTAREA_INDEX_MD = `- [Textarea](../../src/components/forms-and-inputs/Textarea.md)\n`;
 
 function textareaSet(set: string, setNode: string, n: number, validationDefault: string) {
@@ -194,8 +196,20 @@ function textareaRegistry(): PrecedenceRegistry {
         },
         figma: {
           sets: [
-            { name: "Form Textarea", componentSetNodeId: "13541:10731", codeDefaults: { variant: "long" }, status: "verified" },
-            { name: "Form Short Textarea", componentSetNodeId: "13543:5904", codeDefaults: { variant: "short" }, status: "verified" },
+            {
+              name: "Form Textarea",
+              componentSetNodeId: "13541:10731",
+              codeDefaults: { variant: "long" },
+              variantValueMap: TEXTAREA_VALUE_MAP,
+              status: "verified",
+            },
+            {
+              name: "Form Short Textarea",
+              componentSetNodeId: "13543:5904",
+              codeDefaults: { variant: "short" },
+              variantValueMap: TEXTAREA_VALUE_MAP,
+              status: "verified",
+            },
           ],
         },
       },
@@ -280,16 +294,46 @@ describe("the comparison", () => {
     assert.equal(check().some((d) => d.component === "Button" && d.kind === "axis-values"), false);
   });
 
-  it("finds a code value on any axis of the set, not only the one its prop maps to (#1157's Textarea)", () => {
+  it("finds a code value on an axis no code prop carries, through the set's value map (#1157's Textarea)", () => {
     // The library as it stood on 2026-10-13: error and success live on a
-    // `validation` axis as BS4's invalid and valid, and read-only is spelled
-    // with a hyphen. No `state` row is left: the two that remain are a
-    // person's to settle, or to record as deliberate.
+    // `validation` axis as invalid and valid, and read-only is spelled with a
+    // hyphen. No `state` row is left: the two that remain are a person's to
+    // settle, or to record as deliberate.
     const found = textareaCheck().filter((d) => d.component === "Textarea");
     assert.deepEqual(
       found.map((d) => d.key),
       ["Textarea:variant:prop-as-sets", "Textarea:size:missing-axis"],
     );
+  });
+
+  it("reads invalid and valid as error and success only where the registry's value map says so", () => {
+    const registry = textareaRegistry();
+    for (const s of registry.components.Textarea!.figma!.sets!) delete s.variantValueMap;
+    assert.deepEqual(
+      textareaCheck(registry).filter((d) => d.kind === "axis-values").map((d) => d.summary),
+      ['code has `state="error"` and `state="success"`, the library doesn\'t'],
+    );
+  });
+
+  it("a value on another prop's axis does not hide a gap", () => {
+    const registry = textareaRegistry();
+    const props = registry.components.Textarea!.code!.props!;
+    props.input = { type: "enum", values: ["placeholder", "value"] };
+    props.state!.values!.push("placeholder");
+    assert.deepEqual(
+      textareaCheck(registry).filter((d) => d.kind === "axis-values").map((d) => d.summary),
+      ['code has `state="placeholder"`, the library doesn\'t'],
+    );
+  });
+
+  it("matches a value map's Figma labels whatever their separators", () => {
+    const registry = textareaRegistry();
+    const state = registry.components.Textarea!.code!.props!.state!;
+    state.values = state.values!.map((v) => (v === "readonly" ? "locked" : v));
+    for (const s of registry.components.Textarea!.figma!.sets!) {
+      s.variantValueMap = { ...TEXTAREA_VALUE_MAP, state: { "Read Only": "locked" } };
+    }
+    assert.deepEqual(textareaCheck(registry).filter((d) => d.kind === "axis-values"), []);
   });
 
   it("still reports a value no axis of the set has", () => {

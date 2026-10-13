@@ -25,11 +25,10 @@
 //   • axis-values / missing-axis — an enum prop whose values a Figma axis
 //     lacks or adds, or which no axis carries at all.
 //
-// A code value counts as present when any axis of the set has it, not only
-// the axis its prop maps to, and values match whatever their separators
-// (`read-only` is `readonly`). BS4 names its validation states `invalid` and
-// `valid` where code says `error` and `success`; the library itself spells
-// `valid` both ways, so each pair is read as one value.
+// A code value counts as present when its prop's own axis has it, or an axis
+// that carries no code prop at all (Textarea's `validation`, whose
+// `invalid`/`valid` its value map reads as `error`/`success`). Values match
+// whatever their separators: `read-only` is `readonly`.
 //
 // A difference a person decided is deliberate is recorded in the component's
 // MDX `figmaMeta.deliberate` — the code prop, then a one-line reason — which
@@ -215,13 +214,8 @@ export function liveLibraryFrom(result: FigmaComponentsResponse): LiveLibrary {
 const norm = (s: string) => s.trim().toLowerCase();
 /** A value as both sides compare it: Figma's "(default)" marker dropped. */
 const normValue = (s: string) => norm(s.replace(/\(default\)/i, ""));
-/** BS4's validation words, in code's: the library spells `valid` both ways. */
-const SAME_VALUE: Record<string, string> = { invalid: "error", valid: "success" };
-/** A value as the comparison matches it: separators gone, BS4's words in code's. */
-const valueKey = (s: string) => {
-  const key = normValue(s).replace(/[\s_-]+/g, "");
-  return SAME_VALUE[key] ?? key;
-};
+/** A value as the comparison matches it: "(default)" and separators gone. */
+const valueKey = (s: string) => normValue(s).replace(/[\s_-]+/g, "");
 /** A name as the loose existence match reads it: letters and digits only. */
 const loose = (s: string) => norm(s).replace(/[^a-z0-9]/g, "").replace(/s$/, "");
 
@@ -258,7 +252,7 @@ function propOfAxis(s: RegistrySet, axis: string, props: readonly string[]): str
 /** A Figma value in code's words: the registry's value map, when it names one. */
 function codeValueOf(s: RegistrySet, axis: string, value: string): string {
   const map = Object.entries(s.variantValueMap ?? {}).find(([a]) => norm(a) === norm(axis))?.[1];
-  const hit = map ? Object.entries(map).find(([v]) => norm(v) === norm(value) || normValue(v) === normValue(value)) : undefined;
+  const hit = map ? Object.entries(map).find(([v]) => valueKey(v) === valueKey(value)) : undefined;
   return typeof hit?.[1] === "string" ? normValue(hit[1]) : normValue(value);
 }
 
@@ -327,10 +321,14 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
     const propNames = props.map(([p]) => p);
     const withAxes = resolved.filter((r) => r.live && Object.keys(r.live.axes).length);
     const deliberate = reg?.figma?.deliberate ?? {};
-    /** Every value on every axis of the component's sets, as the comparison matches it. */
-    const anywhere = new Set(
+    /** Every value on an axis that carries no code prop, as the comparison
+     *  matches it. A mapped axis's values belong to its own prop, so a common
+     *  `default` there cannot hide another prop's gap. */
+    const unmapped = new Set(
       withAxes.flatMap((r) =>
-        Object.entries(r.live!.axes).flatMap(([axis, values]) => values.map((v) => valueKey(codeValueOf(r.registrySet, axis, v)))),
+        Object.entries(r.live!.axes)
+          .filter(([axis]) => propOfAxis(r.registrySet, axis, propNames) === null)
+          .flatMap(([axis, values]) => values.map((v) => valueKey(codeValueOf(r.registrySet, axis, v)))),
       ),
     );
     for (const [prop, def] of props) {
@@ -371,7 +369,7 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
       }
       if (!carried && pinnedValues.length === 1) figmaValues.set(valueKey(pinnedValues[0]!), pinnedValues[0]!);
       if (carried || pinnedValues.length === 1) {
-        const lacks = codeValues.filter((v) => !figmaValues.has(valueKey(v)) && !anywhere.has(valueKey(v)));
+        const lacks = codeValues.filter((v) => !figmaValues.has(valueKey(v)) && !unmapped.has(valueKey(v)));
         const adds = [...figmaValues].filter(([key]) => !codeKeys.has(key)).map(([, value]) => value);
         if (lacks.length || adds.length) {
           report(
