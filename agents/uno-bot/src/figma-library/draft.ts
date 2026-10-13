@@ -238,12 +238,12 @@ function proposalFor(group: Group, code: { name: string; dir: string } | null): 
       "Map it (the component MDX's `figmaMeta`) or confirm it is Figma-only."
     );
   }
-  if (onlyDeprecated(group)) return `deprecated in Figma (renamed with a \`_\`), so no change is drafted: \`${code.name}\` is unaffected.`;
   const where = `\`${code.name}\` (\`${code.dir}\`)`;
   const parts: string[] = [];
   if (group.created.length) parts.push(`add the new variant(s) ${listed(group.created)} to ${where}`);
   if (group.modified.length) parts.push(`update ${where} to match the published ${listed(group.modified)}`);
   if (group.deleted.length) parts.push(`remove or deprecate ${listed(group.deleted)} in ${where}, deleted from Figma`);
+  if (!parts.length) return "No change is drafted.";
   const sentence = parts.join("; ");
   return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`;
 }
@@ -404,6 +404,7 @@ export function firstLine(text: string): string {
 
 const HAS_CODE = "Has code";
 export const NO_CODE_YET = "No code mapping yet";
+const DEPRECATED = "Deprecated";
 
 /** The library file itself: what an edited-not-published post links, and
  *  the card's Open. */
@@ -411,11 +412,19 @@ export function libraryUrl(fileKey: string): string {
   return figmaFileUrl(fileKey);
 }
 
-/** The card's two groups, every row's name in each, in row order. */
+/** Code work: a mapped row the library did not just deprecate. */
+function hasCodeWork(r: IntakeRow): boolean {
+  return !!r.code && r.change !== "deprecated";
+}
+
+/** The card's groups, every row's name in one, in row order. A deprecated
+ *  row is no code work, mapped or not, so it has a group of its own. */
 function codeGroups(intake: PublishIntake): Array<{ label: string; names: string[] }> {
+  const names = (rows: IntakeRow[]) => rows.map((r) => escapeSlackText(r.figmaName));
   const groups = [
-    { label: HAS_CODE, names: intake.rows.filter((r) => r.code).map((r) => escapeSlackText(r.figmaName)) },
-    { label: NO_CODE_YET, names: intake.rows.filter((r) => !r.code).map((r) => escapeSlackText(r.figmaName)) },
+    { label: HAS_CODE, names: names(intake.rows.filter(hasCodeWork)) },
+    { label: NO_CODE_YET, names: names(intake.rows.filter((r) => !r.code && r.change !== "deprecated")) },
+    { label: DEPRECATED, names: names(intake.rows.filter((r) => r.change === "deprecated")) },
   ];
   return groups.filter((g) => g.names.length);
 }
@@ -459,7 +468,7 @@ export function releaseParent(changeSet: LibraryChangeSet, intake: PublishIntake
   const newest = changeSet.versions[0];
   const who = newest ? `${escapeSlackText(newest.user)} published "${escapeSlackText(versionName(newest))}"` : "A version was published";
   const n = intake.rows.length;
-  const coded = intake.rows.filter((r) => r.code).length;
+  const coded = intake.rows.filter(hasCodeWork).length;
   if (!n) return `${who} to the library, with no changed components found.`;
   const code = n === 1 ? (coded ? "and it has code" : "with no code yet") : coded ? `${coded} of them ${coded === 1 ? "has" : "have"} code` : "none of them has code yet";
   return `${who} to the library: ${n} component${n === 1 ? "" : "s"} changed, ${code}.`;
@@ -617,7 +626,9 @@ const DONE_TO: Record<IntakeRow["change"], string> = { new: "added", updated: "u
 /**
  * What a publish with nothing to do in code posts: no card and no intake,
  * because every changed component was deprecated or maps to no code. One
- * line: who published what, what changed, and that code is unaffected.
+ * line: who published what, and what changed, by name. Deprecations leave
+ * code unaffected; a component with no code mapping still asks to be mapped
+ * or confirmed Figma-only.
  *
  * @param changeSet - What the poll found; it carries a published version
  * @param intake - Its drafted intake, whose `needsIntake` is false
@@ -630,8 +641,13 @@ export function noCodeChange(changeSet: LibraryChangeSet, intake: PublishIntake)
   const what =
     kinds.length === 1
       ? `${n} component${n === 1 ? "" : "s"} ${DONE_TO[kinds[0]!]}`
-      : `${n} components changed (${changeParts(intake.rows)})`;
-  return `${who} to the <${libraryUrl(changeSet.fileKey)}|library>: ${what}. Code is unaffected, so nothing is filed.`;
+      : `${n} components changed, ${changeParts(intake.rows)}`;
+  const names = listed(intake.rows.map((r) => escapeSlackText(r.figmaName)));
+  const m = intake.unmapped.length;
+  const tail = !m
+    ? "Code is unaffected, so nothing is filed."
+    : `${m === 1 ? "It has" : `${m} have`} no code mapping, so nothing is filed: map ${m === 1 ? "it in its" : "each in its"} MDX's \`figmaMeta\`, or confirm ${m === 1 ? "it is" : "they are"} Figma-only.`;
+  return `${who} to the <${libraryUrl(changeSet.fileKey)}|library>: ${what} (${names}). ${tail}`;
 }
 
 /**

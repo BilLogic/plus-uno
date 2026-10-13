@@ -232,6 +232,30 @@ const RETIRED: FigmaComponentsResponse = {
   meta: { components: [...BEFORE.meta!.components!, ...RETIRING.map(([key, name, node, set, setNode]) => variant(key, name, node, `_${set}`, setNode))] },
 };
 
+/** Two sets as the library holds them on 2026-10-13, read with the Figma MCP:
+ *  `_Input Group Checkbox` (53:20502) and `_Input Group Text` (13636:78189),
+ *  their variants unrenamed. Yesterday's snapshot had them without the `_`;
+ *  today's /components no longer lists them, since Figma does not publish a
+ *  `_` set, so only /nodes can say they are still there. */
+const LIVE_SETS = [
+  { set: "Input Group Checkbox", setNode: "53:20502", variants: [["k-igc-1", "state=default, size=medium (default), check type=check", "53:20500"], ["k-igc-2", "state=default, size=medium (default), check type=indeterminate", "53:20499"]] },
+  { set: "Input Group Text", setNode: "13636:78189", variants: [["k-igt-s", "size=small", "13636:78190"], ["k-igt-m", "size=medium (default)", "13636:78192"]] },
+] as const;
+const WITH_LIVE_SETS: FigmaComponentsResponse = {
+  meta: {
+    components: [
+      ...BEFORE.meta!.components!,
+      ...LIVE_SETS.flatMap(({ set, setNode, variants }) => variants.map(([key, name, node]) => variant(key, name, node, set, setNode))),
+    ],
+  },
+};
+const LIVE_NODES: Record<string, FigmaNode> = Object.fromEntries(
+  LIVE_SETS.flatMap(({ set, setNode, variants }) => [
+    [setNode, { name: `_${set}`, type: "COMPONENT_SET", children: variants.map(([, name, node]) => ({ id: node, name, type: "COMPONENT" })) }],
+    ...variants.map(([, name, node]) => [node, { name, type: "COMPONENT" }] as const),
+  ]),
+);
+
 /** The publish that renamed every retiring set `_`, and changed nothing else. */
 async function foundDeprecations(today: FigmaComponentsResponse = RETIRED): Promise<LibraryChangeSet> {
   const { deps, findings } = pollDeps(today, kv<LibraryChangeSet[]>([]), WITH_RETIRING);
@@ -398,7 +422,56 @@ describe("the drafted intake", () => {
 // ── Deprecations ─────────────────────────────────────────────────────────────
 
 describe("a component retired with a `_` name", () => {
-  it("reads as deprecated, not deleted, when its node is still in the file under the `_` name", async () => {
+  it("reads as deprecated when /components no longer lists it and /nodes finds its set under the `_` name", async () => {
+    const { deps, findings, figma } = pollDeps(BEFORE, kv<LibraryChangeSet[]>([]), WITH_LIVE_SETS);
+    figma.seedFile(FILE_KEY, { nodes: LIVE_NODES });
+    await pollFigmaLibrary(deps);
+    const [changeSet] = findings.value;
+    assert.deepEqual(changeSet!.deleted, []);
+    assert.deepEqual(changeSet!.deprecated?.map((c) => c.nodeId).sort(), ["13636:78190", "13636:78192", "53:20499", "53:20500"]);
+    // One /nodes call reads every gone node and its set, and no hashes follow.
+    const nodeCalls = figma.calls().filter((c) => c.method === "nodes");
+    assert.equal(nodeCalls.length, 1);
+    assert.deepEqual([...(nodeCalls[0]!.args[1] as string[])].sort(), ["13636:78189", "13636:78190", "13636:78192", "53:20499", "53:20500", "53:20502"]);
+    const intake = draftPublishIntake(changeSet!, REGISTRY);
+    assert.deepEqual(intake.rows.map((r) => [r.figmaName, r.change]), [
+      ["Input Group Checkbox", "deprecated"],
+      ["Input Group Text", "deprecated"],
+    ]);
+    assert.equal(intake.needsIntake, false);
+  });
+
+  it("reads as deleted when /nodes no longer finds its node", async () => {
+    const { deps, findings, figma } = pollDeps(BEFORE, kv<LibraryChangeSet[]>([]), WITH_LIVE_SETS);
+    // The Text set is still there, renamed; the Checkbox set is gone.
+    figma.seedFile(FILE_KEY, { nodes: Object.fromEntries(Object.entries(LIVE_NODES).filter(([id]) => !id.startsWith("53:"))) });
+    await pollFigmaLibrary(deps);
+    const [changeSet] = findings.value;
+    assert.deepEqual(changeSet!.deleted.map((c) => c.nodeId).sort(), ["53:20499", "53:20500"]);
+    assert.deepEqual(changeSet!.deprecated?.map((c) => c.nodeId).sort(), ["13636:78190", "13636:78192"]);
+  });
+
+  it("files a deleted sibling of a `_` variant: a variant's own `_` name marks nothing beside it", async () => {
+    // Badge keeps its set name and gains a `_draft` variant, listed; its sm
+    // variant is deleted outright.
+    const today: FigmaComponentsResponse = {
+      meta: {
+        components: [
+          ...BEFORE.meta!.components!.filter((c) => c.key !== "k-badge-1"),
+          variant("k-badge-draft", "_draft", "20:9", "badge", "200:1"),
+        ],
+      },
+    };
+    const { deps, findings, figma } = pollDeps(today);
+    figma.seedFile(FILE_KEY, { nodes: { "200:1": { name: "badge", type: "COMPONENT_SET" } } });
+    await pollFigmaLibrary(deps);
+    const [changeSet] = findings.value;
+    assert.deepEqual(changeSet!.deleted.map((c) => c.key), ["k-badge-1"]);
+    assert.deepEqual(changeSet!.deprecated, []);
+    assert.equal(draftPublishIntake(changeSet!, REGISTRY).needsIntake, true);
+  });
+
+  it("reads as deprecated, not deleted, when /components still lists it under the `_` name", async () => {
     const changeSet = await foundDeprecations();
     assert.deepEqual(changeSet.deleted, []);
     assert.deepEqual(changeSet.deprecated?.map((c) => c.key).sort(), ["k-igt-1", "k-igt-2", "k-igt-3", "k-md-1"]);
@@ -457,6 +530,32 @@ describe("a component retired with a `_` name", () => {
     assert.match(items[2]!, /gauge, sparkline/);
   });
 
+  it("asks to map a new component with no code mapping, rather than calling code unaffected", async () => {
+    const sparkline = componentsFrom(AFTER).find((c) => c.key === "k-spark-1")!;
+    const only: LibraryChangeSet = { ...(await foundDeprecations()), created: [sparkline], deprecated: [], newComponentIds: ["400:1"] };
+    const morning = postDeps([only]);
+    await postLibraryFindings(morning.deps);
+    assert.equal(
+      morning.posts[0]!.text,
+      `coco published "Badge sizes + accordion copy" to the <https://www.figma.com/design/${FILE_KEY}|library>: 1 component added (sparkline). ` +
+        "It has no code mapping, so nothing is filed: map it in its MDX's `figmaMeta`, or confirm it is Figma-only.",
+    );
+    assert.deepEqual(morning.staged, []);
+  });
+
+  it("keeps deprecated rows out of Has code in a publish that also has code work", async () => {
+    const deprecations = await foundDeprecations();
+    const publish = await foundPublish();
+    const mixed: LibraryChangeSet = { ...publish, deprecated: deprecations.deprecated };
+    const morning = postDeps([mixed]);
+    await postLibraryFindings(morning.deps);
+    const blocks = morning.posts[0]!.blocks as Array<Record<string, any>>;
+    assert.equal(blocks[0]!.text.text, 'coco published "Badge sizes + accordion copy" to the library: 5 components changed, 2 of them have code.');
+    const review = morning.staged[0]!.proposalText;
+    assert.match(review, /^• \*Has code:\* accordion, badge$/m);
+    assert.match(review, /^• \*Deprecated:\* Input Group Text, Multiple Dropdown$/m);
+  });
+
   it("posts one line saying what changed and that code is unaffected, and stages and tracks nothing", async () => {
     const morning = postDeps([await foundDeprecations()]);
     const result = await postLibraryFindings(morning.deps);
@@ -464,7 +563,7 @@ describe("a component retired with a `_` name", () => {
     assert.equal(morning.posts.length, 1);
     assert.equal(
       morning.posts[0]!.text,
-      `coco published "Badge sizes + accordion copy" to the <https://www.figma.com/design/${FILE_KEY}|library>: 2 components deprecated. Code is unaffected, so nothing is filed.`,
+      `coco published "Badge sizes + accordion copy" to the <https://www.figma.com/design/${FILE_KEY}|library>: 2 components deprecated (Input Group Text, Multiple Dropdown). Code is unaffected, so nothing is filed.`,
     );
     assert.ok(!JSON.stringify(morning.posts[0]!.blocks).includes('"actions"'));
     assert.deepEqual(morning.staged, []);
