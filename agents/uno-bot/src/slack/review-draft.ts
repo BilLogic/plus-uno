@@ -18,7 +18,7 @@
 // the same three labels.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { textSections } from "./render";
+import { reviewSections, textSections } from "./render";
 import { escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
@@ -47,8 +47,9 @@ interface ReadOperation {
 }
 
 /** One stretch of prose. `key` is its path in the tool input; `replaces`
- *  marks text that overwrites a block a person wrote. */
-type Part = { heading?: string; text: string; key?: string; replaces?: boolean };
+ *  marks text that overwrites a block a person wrote; `markdown` marks text a
+ *  renderer downstream reads as Markdown, drawn through `reviewSections`. */
+type Part = { heading?: string; text: string; key?: string; replaces?: boolean; markdown?: boolean };
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 const obj = (v: unknown): Input => (v && typeof v === "object" && !Array.isArray(v) ? (v as Input) : {});
@@ -158,7 +159,8 @@ function githubIssue(input: Input): ReadOperation {
       ["Title", str(input.title)],
       ["Repository", repo],
     ],
-    body: str(input.body) ? [{ text: str(input.body) }] : [],
+    // Markdown GitHub renders itself, so the pop-up tidies it the same way.
+    body: str(input.body) ? [{ text: str(input.body), markdown: true }] : [],
   };
 }
 
@@ -303,7 +305,7 @@ function partBlocks(part: Part, detail: ChangeDetail): unknown[] {
   // Under its heading the input needs no name of its own beyond what it is.
   if (field) return [...blocks, inputOf(field, change ? NEW : part.heading ? "Text" : field.label)];
   if (change) blocks.push(bold(NEW));
-  if (part.text) blocks.push(...textSections(part.text));
+  if (part.text) blocks.push(...(part.markdown ? reviewSections : textSections)(part.text));
   if (detail.editing && part.key && part.text.length > MAX_INPUT_CHARS) blocks.push(context(TOO_LONG_TO_EDIT));
   return blocks;
 }

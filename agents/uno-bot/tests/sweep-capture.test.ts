@@ -139,7 +139,7 @@ test("a Universal-pillar card's comment contradicting its PRD lands in #plus-uni
           title: card.title,
           lastEditedTime: TONIGHT,
           parentDatabaseId: ROADMAP_DB,
-          properties: { "Product Pillar": "Universal" },
+          properties: { "Product Pillar": "Universal", "Current Team": "Design" },
           people: { Contributor: ["Cy Contributor"] },
         },
       ],
@@ -494,7 +494,7 @@ test("Thursday's new decision on a card about the same page is its own item, aft
     title: card.title,
     lastEditedTime: "2026-09-28T20:00:00.000Z",
     parentDatabaseId: ROADMAP_DB,
-    properties: {},
+    properties: { "Current Team": "Design" },
     people: { Contributor: ["Cy Contributor"] },
   };
   const comments = [{ id: "cm-1", createdTime: "2026-09-28T20:00:00.000Z", text: "Decided: secondary buttons.", links: [], byBot: false }];
@@ -551,7 +551,7 @@ test("eighty cards edited in one minute are all read across nights, and the job 
       title: `Card ${i}`,
       lastEditedTime: TONIGHT,
       parentDatabaseId: ROADMAP_DB,
-      properties: {},
+      properties: { "Current Team": "Design" },
       people: {},
     };
   });
@@ -566,6 +566,33 @@ test("eighty cards edited in one minute are all read across nights, and the job 
   assert.deepEqual(nights, [25, 25, 25, 5, 0, 0]);
   assert.equal(new Set(h.sourceReads).size, 80);
   assert.equal(h.sourceReads.length, 80, "none read twice");
+});
+
+test("only Design cards are read: another team's card or one with no team is passed over, and the cursor moves past it", async () => {
+  const row = (n: number, team: string | null, minute: number): EditedRecordRow => {
+    const id = `e${n.toString(16).padStart(31, "0")}`;
+    return {
+      id,
+      url: `https://www.notion.so/${id}`,
+      title: `Card ${n}`,
+      lastEditedTime: `2026-09-29T20:0${minute}:00.000Z`,
+      parentDatabaseId: ROADMAP_DB,
+      properties: team ? { "Current Team": team } : {},
+      people: {},
+    };
+  };
+  const rows = [row(1, "Design", 1), row(2, "Product, Design", 2), row(3, "Product", 3), row(4, null, 4)];
+  const h = sweepHarness({ channels: quiet, capture: true, notion: { cards: rows }, now: at(29, 22) });
+
+  const first = await runSweepJob(CARDS, h.deps);
+  assert.equal(first.threads, 2);
+  assert.deepEqual(h.sourceReads, [rows[0]!.url, rows[1]!.url], "Design alone, or beside another team");
+  assert.match((await h.store.cursor("notion:roadmap-cards")) ?? "", /^2026-09-29T20:04:00\.000Z\|e0+4$/, "past the last card, skipped or not");
+
+  h.clock.now = at(30, 22);
+  const second = await runSweepJob(CARDS, h.deps);
+  assert.equal(second.threads, 0);
+  assert.equal(h.sourceReads.length, 2, "a skipped card is not read the next night either");
 });
 
 test("a searched page is a team surface only as a database row or a top-level spec, and never when its title reads as a 1:1", () => {

@@ -2439,6 +2439,12 @@
             "codeDefaults": {
               "variant": "short"
             },
+            "variantValueMap": {
+              "validation": {
+                "invalid": "error",
+                "valid": "success"
+              }
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13",
             "notes": "Verified 2026-06-13: MDX figmaLink points directly to Form Short Textarea component set (not a docs page)."
@@ -2451,6 +2457,12 @@
             "codeDefaults": {
               "variant": "long"
             },
+            "variantValueMap": {
+              "validation": {
+                "invalid": "error",
+                "valid": "success"
+              }
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13",
             "notes": "variantProps TBD — add from Figma variant inspection."
@@ -2462,6 +2474,12 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
             "codeDefaults": {
               "variant": "short"
+            },
+            "variantValueMap": {
+              "validation": {
+                "invalid": "error",
+                "valid": "success"
+              }
             },
             "status": "verified",
             "verifiedAt": "2026-06-13",
