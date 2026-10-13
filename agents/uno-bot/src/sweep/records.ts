@@ -143,7 +143,7 @@ const EDGE_IDS = 200;
  * @param row - The row: its parent and select values by property name
  * @param roadmapDb - `NOTION_ROADMAP_DB_ID`
  */
-export function isDesignCard(
+function isDesignCard(
   row: { parentDatabaseId?: string | null; properties?: Record<string, string> },
   roadmapDb: string,
 ): boolean {
