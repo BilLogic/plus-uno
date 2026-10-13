@@ -14,6 +14,11 @@
 // already moved past the change, so without this a real publish read as an
 // edit would never reach a card.
 //
+// A PUBLISH WITH NOTHING TO DO IN CODE posts no card either: when every
+// changed component was deprecated (renamed `_`) or maps to no code, one
+// plain line says what changed and that code is unaffected (`noCodeChange`),
+// and nothing is staged, filed or tracked.
+//
 // THE CARD. A publish is one decision, so it is one card, not one per
 // component. Its Review opens the publish in the pop-up: Approve files the
 // intake (`github_issue_create`) and, when any changed component maps to code,
@@ -61,6 +66,7 @@ import {
   editedNotPublished,
   libraryCardWords,
   mergeChangeSets,
+  noCodeChange,
   publishLead,
   releaseItem,
   releaseParent,
@@ -200,6 +206,24 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
     // A publish: any edit announced before it is part of it now.
     const changeSet = carried ? mergeChangeSets(carried, found) : found;
     const intake = draftPublishIntake(changeSet, registry);
+    if (!intake.needsIntake) {
+      // Nothing to do in code: every changed component was deprecated or
+      // maps to no code. One line says so; no card, no intake, no tracking.
+      const text = noCodeChange(changeSet, intake);
+      const sent = await deps.post({ text, blocks: textSections(text) });
+      if (!sent.ok) {
+        console.error(`[figma-library] no-code-change post for ${intake.key} failed — kept for tomorrow`);
+        break;
+      }
+      waiting.shift();
+      posted += 1;
+      await deps.findings.write(waiting);
+      if (carried) {
+        carried = null;
+        await deps.unpublished.write(null);
+      }
+      continue;
+    }
     const operations = libraryOperations(intake);
     // Every change set is the same library file: its name is read once.
     if (!(changeSet.fileKey in fileNames)) {
