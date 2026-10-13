@@ -150,6 +150,70 @@ function check(inFlight: ReadonlySet<string> = new Set()) {
   });
 }
 
+// Textarea as #1157 found it: one code component, two library sets with the
+// same axes, neither mapped to a code prop but by name.
+const TEXTAREA_INDEX_MD = `- [Textarea](../../src/components/forms-and-inputs/Textarea.md)\n`;
+
+function textareaSet(set: string, setNode: string, n: number, validationDefault: string) {
+  const at = (name: string, i: number) => ({
+    key: `k-${n}:${i}`,
+    name,
+    node_id: `${n}:${i}`,
+    containing_frame: { name: "Forms", nodeId: "1:2", containingComponentSet: { name: set, nodeId: setNode } },
+  });
+  return [
+    at(`state=default, input=placeholder, validation=${validationDefault}`, 1),
+    at(`state=focus, input=value, validation=${validationDefault}`, 2),
+    at("state=focus, input=value, validation=invalid", 3),
+    at("state=focus, input=value, validation=valid", 4),
+    at(`state=read-only, input=value, validation=${validationDefault}`, 5),
+    at(`state=disabled, input=value, validation=${validationDefault}`, 6),
+  ];
+}
+
+const TEXTAREA_LIBRARY: FigmaComponentsResponse = {
+  meta: {
+    components: [
+      ...textareaSet("Form Textarea", "13541:10731", 700, "default"),
+      ...textareaSet("Form Short Textarea", "13543:5904", 800, "Default"),
+    ],
+  },
+};
+
+function textareaRegistry(): PrecedenceRegistry {
+  return {
+    components: {
+      Textarea: {
+        code: {
+          mdxPath: "design-system/src/components/forms-and-inputs/Textarea.mdx",
+          props: {
+            variant: { type: "enum", values: ["long", "short"] },
+            size: { type: "enum", values: ["small", "medium", "large"] },
+            state: { type: "enum", values: ["default", "focus", "error", "success", "readonly", "disabled"] },
+          },
+        },
+        figma: {
+          sets: [
+            { name: "Form Textarea", componentSetNodeId: "13541:10731", codeDefaults: { variant: "long" }, status: "verified" },
+            { name: "Form Short Textarea", componentSetNodeId: "13543:5904", codeDefaults: { variant: "short" }, status: "verified" },
+          ],
+        },
+      },
+    },
+  };
+}
+
+function textareaCheck(registry: PrecedenceRegistry = textareaRegistry()) {
+  return findDisagreements({
+    index: parseComponentIndex(TEXTAREA_INDEX_MD),
+    registry,
+    library: liveLibraryFrom(TEXTAREA_LIBRARY),
+    fileKey: FILE_KEY,
+    repo: REPO,
+    inFlight: new Set(),
+  });
+}
+
 // ── The comparison ───────────────────────────────────────────────────────────
 
 describe("the comparison", () => {
@@ -214,6 +278,61 @@ describe("the comparison", () => {
     assert.equal(found[0]!.summary, 'code has `placement="start"`, the library doesn\'t');
     // Button's `size` maps "medium (default)" to medium, so it is not reported.
     assert.equal(check().some((d) => d.component === "Button" && d.kind === "axis-values"), false);
+  });
+
+  it("finds a code value on any axis of the set, not only the one its prop maps to (#1157's Textarea)", () => {
+    // The library as it stood on 2026-10-13: error and success live on a
+    // `validation` axis as BS4's invalid and valid, and read-only is spelled
+    // with a hyphen. No `state` row is left: the two that remain are a
+    // person's to settle, or to record as deliberate.
+    const found = textareaCheck().filter((d) => d.component === "Textarea");
+    assert.deepEqual(
+      found.map((d) => d.key),
+      ["Textarea:variant:prop-as-sets", "Textarea:size:missing-axis"],
+    );
+  });
+
+  it("still reports a value no axis of the set has", () => {
+    const registry = textareaRegistry();
+    registry.components.Textarea!.code!.props!.state!.values!.push("loading");
+    const found = textareaCheck(registry).filter((d) => d.kind === "axis-values");
+    assert.deepEqual(
+      found.map((d) => d.summary),
+      ['code has `state="loading"`, the library doesn\'t'],
+    );
+  });
+
+  it("matches values whatever their separators: read-only, readonly and Read Only are one value", () => {
+    for (const spelling of ["read-only", "readonly", "Read Only", "read_only"]) {
+      const library: FigmaComponentsResponse = {
+        meta: { components: [variant(`placement=${spelling}`, "500:9", "Tooltip", "300:1"), variant("placement=top", "500:1", "Tooltip", "300:1")] },
+      };
+      const registry = structuredClone(REGISTRY);
+      registry.components.Tooltip!.code!.props = { placement: { type: "enum", values: ["top", "readonly"] } };
+      const found = findDisagreements({
+        index: parseComponentIndex(INDEX_MD),
+        registry,
+        library: liveLibraryFrom(library),
+        fileKey: FILE_KEY,
+        repo: REPO,
+        inFlight: new Set(),
+      }).filter((d) => d.component === "Tooltip");
+      assert.deepEqual(found, [], spelling);
+    }
+  });
+
+  it("never reports a difference figmaMeta records as deliberate, and reports it again once the record goes", () => {
+    const registry = textareaRegistry();
+    registry.components.Textarea!.figma!.deliberate = {
+      variant: "The library draws the long and short textareas as two sets with the same axes.",
+      size: "Code sizes the textarea; the library sizes it by its frame.",
+    };
+    assert.deepEqual(textareaCheck(registry), []);
+    delete registry.components.Textarea!.figma!.deliberate!.size;
+    assert.deepEqual(
+      textareaCheck(registry).map((d) => d.key),
+      ["Textarea:size:missing-axis"],
+    );
   });
 
   it("leaves out a component a library publish is still carrying, where code follows", () => {
