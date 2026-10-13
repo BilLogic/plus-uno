@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **168,826 chars from 16 files**, against an assembled budget of 175,500 (6,674 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 148,442 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **168,778 chars from 16 files**, against an assembled budget of 175,500 (6,722 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 148,394 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,310 (−7,704 ide-only) | 10,310 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 13,713 | 24,051 | 20,000 (constitution) |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,968 | 52,060 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 58,453 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 65,398 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 72,152 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 77,355 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 84,002 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 90,390 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 94,951 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 109,632 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,750 (−9,320 ide-only) | 144,424 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,892 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 154,408 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 159,041 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,737 (−605 ide-only) | 168,826 | — |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,301 | 58,405 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 65,350 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 72,104 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 77,307 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 83,954 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 90,342 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 94,903 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 109,584 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,750 (−9,320 ide-only) | 144,376 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,844 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 154,360 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 158,993 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,737 (−605 ide-only) | 168,778 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,13 +46,13 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 101,895 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 101,854 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 33,590 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
-| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
+| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,358 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
@@ -425,7 +425,7 @@ Keep the harness current from Slack. A designer flags that the agent system is w
 2. **Inspect the evidence yourself.** A linked frame, doc, PRD or thread → `source_read` / `slack_thread_read` it and confirm what is actually wrong. Done when you can quote the offending line, frame or behaviour — or have said plainly that you could not reach it and are recording the intake on the designer's report.
 3. **Classify** (method §1): trigger type, estate, target, suggested severity. A flag spanning two targets is two intakes; two estates that disagree is one intake marked cross-estate, routed to the side believed wrong by the method's precedence. Done when each intake has a type, a target and a severity.
 4. **Draft the fix before judging it** (method §2): the concrete change, quoted — the corrected sentence, the property to move, the token to swap. Harness prose gets the writing-for-agents pass the method names: cut what the model does by default, state the target behaviour. Done when whoever reads the draft could apply it.
-5. **Bring the human the gate** (method §3): the draft plus a three-line brief — impact · effort · risk — and the question *worth incorporating?* The spotter answers (fallback: the maintainer); the bot waits. Done when the brief is posted and the thread is theirs.
+5. **Bring the human the gate** (method §3): the draft and the question *worth incorporating?* The spotter answers (fallback: the maintainer); the bot waits. Done when the question is posted and the thread is theirs.
 6. **On yes, classify its severity** (method §4). A direct fix — typos, links, dates, pure formatting, and only those — is repo work: hand it to the in-IDE agent with the digest line it will log. Everything else, including any edit to a skill, the persona, a DS component or a requirement, is a gated change → step 7.
 7. **Package the gated change** (method §5), one gated tool per message:
    - Draft the PRD as text in-thread first — Title · Summary · Problem/Context · Goals & Non-goals · Users & Scenarios · Requirements/Scope · Acceptance Criteria · Open Questions — and let them refine it. The compact-PRD size wall from `skills/uno-synthesize/bot.md` holds here too; expansion is IDE work.
@@ -2046,7 +2046,7 @@ the no-op test is judgement and lives here.
 
 ## 3 · The human gate — "worth incorporating?"
 
-Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix with a **three-line brief: impact / effort / risk**.
+Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix and ask it.
 
 - **No** → end: no change needed. Discard the draft; keep the intake card trail.
 - **Yes** → classify its severity (§4).
