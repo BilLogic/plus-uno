@@ -16,10 +16,10 @@
 //   node scripts/check-worker-host.mjs --host=uno-bot.old-account.workers.dev
 //
 // ALLOWED does not apply to that scan. Those entries are exceptions for the host
-// this repo currently deploys to — wrangler.toml, the two Slack manifests, the
-// two workflow fallbacks — and they are exactly the files a cutover has to
-// rewrite, so exempting them there would report the move complete while five
-// files still point at a dead account.
+// this repo currently deploys to — wrangler.toml and the two Slack manifests —
+// and they are exactly the files a cutover has to rewrite, so exempting them
+// there would report the move complete while three files still point at a dead
+// account.
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
@@ -63,14 +63,6 @@ export const ALLOWED = new Map([
     "agents/uno-bot/slack-app-manifest-commands.yaml",
     "the command half of the same manifest, same reason",
   ],
-  [
-    ".github/workflows/uno-bot-evals.yml",
-    "fallback for vars.UNO_BOT_WORKER_URL — a workflow cannot import the module",
-  ],
-  [
-    ".github/workflows/uno-bot-retrieval-evals.yml",
-    "fallback for vars.UNO_BOT_WORKER_URL — a workflow cannot import the module",
-  ],
 ]);
 
 /**
@@ -79,10 +71,7 @@ export const ALLOWED = new Map([
  * An eval run artifact says which Worker it scored. Editing that to the new
  * host would be falsifying the record — the run really did hit the old one.
  */
-// A recording is the same kind of record: what the model SAID, verbatim, on the
-// day it was captured — S3's reply carries the connect link, host and all.
-// Rewriting a reply would replay a draw nobody observed.
-const HISTORY = [/^docs\/evals\/runs\//, /^docs\/plans\//, /^docs\/evals\/fixtures\/recordings\//];
+const HISTORY = [/^docs\/evals\/runs\//, /^docs\/plans\//];
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "storybook-static", ".test-build"]);
 

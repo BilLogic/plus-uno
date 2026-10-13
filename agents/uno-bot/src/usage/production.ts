@@ -47,8 +47,8 @@ export function usageLogFor(env: Pick<Env, "USAGE_DB">): UsageLog {
   return NO_USAGE_LOG;
 }
 
-/** A proposal-event log that keeps nothing — the eval transport's, whose cards
- *  live in an in-memory store and must never reach the production table. */
+/** A proposal-event log that keeps nothing — a debug-origin turn's, whose cards
+ *  are nobody's writes and must never reach the production table. */
 export const NO_PROPOSAL_EVENT_LOG: ProposalEventLog = {
   async record() {},
   async eventsOf() {

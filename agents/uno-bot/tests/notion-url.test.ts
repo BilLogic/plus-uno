@@ -11,9 +11,8 @@
 // The same host broke the way in. source_read matched notion.so and notion.site
 // only, so an app.notion.com link, which is now what teammates paste and what
 // the bot's own earlier replies carry, went to the generic web fetch and never
-// reached the Notion API. The model does make that call: the recorded runs in
-// docs/evals/fixtures/recordings (S1, C1, M1) pass source_read an
-// app.notion.com link.
+// reached the Notion API. The model does make that call: recorded runs passed
+// source_read an app.notion.com link.
 //
 // The PRD poll root had the same gap: figma-poll posts the created PRD's link,
 // and `implement` reads the page id back out of it, so a root posted with an

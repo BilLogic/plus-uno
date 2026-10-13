@@ -28,7 +28,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ensureTestBuild } from "./eval-transport-local.mjs";
+import { ensureTestBuild } from "./test-build.mjs";
 import { varValueInWrangler } from "./secrets.mjs";
 import { workerOrigin } from "./worker-url.mjs";
 import { isEntry } from "../../../scripts/lib/findings.mjs";
@@ -76,7 +76,7 @@ async function main() {
   const token = process.env.FIGMA_ACCESS_TOKEN;
   if (!token) throw new Error("FIGMA_ACCESS_TOKEN is not set");
 
-  ensureTestBuild({ pkg: PKG, log: (line) => console.error(line.replace("[evals]", "[figma-subscriptions]")) });
+  ensureTestBuild({ pkg: PKG, log: (line) => console.error(`[figma-subscriptions] ${line}`) });
   const require = createRequire(import.meta.url);
   const { createFigmaRestClient } = require(path.join(PKG, ".test-build/src/figma/rest.js"));
   const { figmaTeamsFrom, selectTeams } = require(path.join(PKG, ".test-build/src/figma-notify/teams.js"));
