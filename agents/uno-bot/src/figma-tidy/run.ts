@@ -53,6 +53,7 @@ import {
   markNotStaged,
   MAX_REPORT_ITEMS,
   reportRecord,
+  roundRobin,
   type ReportMessage,
   type ReportStore,
 } from "../slack/decision-cards";
@@ -519,24 +520,4 @@ function byOwner(findings: readonly TidyFinding[]): Map<string | null, TidyFindi
   const none = findings.filter((f) => f.owner === null);
   if (none.length) groups.set(null, none);
   return groups;
-}
-
-/**
- * At most `max` of the groups' items, a round at a time in the groups' order,
- * so every owner has a card before anyone has a second; kept by group.
- */
-function roundRobin<K, T>(groups: ReadonlyMap<K, readonly T[]>, max: number): Map<K, T[]> {
-  const picked = new Map<K, T[]>([...groups.keys()].map((k) => [k, []]));
-  let left = max;
-  for (let round = 0; left > 0; round += 1) {
-    let any = false;
-    for (const [key, items] of groups) {
-      if (left === 0 || round >= items.length) continue;
-      picked.get(key)!.push(items[round]!);
-      left -= 1;
-      any = true;
-    }
-    if (!any) break;
-  }
-  return picked;
 }

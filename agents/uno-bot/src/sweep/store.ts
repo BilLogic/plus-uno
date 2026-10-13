@@ -150,6 +150,9 @@ export interface CardSnapshot {
   items: PendingFinding[];
   /** `operationsDigest` of the card's operations, also on its Slack tag. */
   digest: string;
+  /** The card follow-ups it showed beside its fixes, by item id
+   *  (`SweepFollowUps`): what a retry stages again. */
+  followUps?: string[];
 }
 
 /** The KV half. */

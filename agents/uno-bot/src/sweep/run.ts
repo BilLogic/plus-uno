@@ -45,6 +45,19 @@
 //   place: a place whose report is still live gets none, and what does not
 //   fit waits in the queue. A quiet day posts nothing.
 //
+//   ONE MESSAGE A CHANNEL. The card follow-ups the commitment job handed over
+//   for the top of a channel (`SweepDeps.followUps`, `../follow-through/`) go
+//   up on that channel's report: an opener with one bullet per Slack owner,
+//   each mentioned once and saying how many of theirs wait, then one carousel
+//   of both kinds, filled round-robin across the people past ten
+//   (`sharedReport`). A fix past the ten stays queued; a follow-up past it is
+//   asked the next morning. The report claims the channel's follow-ups before
+//   it posts and keeps their ids on its snapshot, so a retry rebuilds the
+//   same report and stages what it showed. A channel the sweep posts nothing
+//   at gets its follow-ups alone, as the commitment job posted them. Each
+//   card keeps its own proposal, Review and writes. A rehearsal shows the
+//   sweep's part only.
+//
 // THE AUDIENCE RULE (ADR-031). A run with no requester has no one whose
 // visibility bounds it, so the evidence's own audience does: a finding only
 // reaches people who could already see its evidence.
@@ -67,11 +80,17 @@
 //     posted in.
 //
 // THE BUDGET. Each alarm runs one job on a fresh subrequest budget, under the
-// lookup ceiling (ADR-022). A channel's threads are processed oldest activity
-// first and the cursor is saved after each one, so a budget stop keeps every
-// thread already done: the job records where it stopped and rethrows the stop,
-// and the runner keeps the job under its key and runs it again on a fresh
-// budget (`runner/queue.ts`). A retried job is idempotent — the cursor skips
+// lookup ceiling (ADR-022). The morning's external calls are a permalink a
+// fix, at most `MAX_PERMALINKS` a job, then one post a place with one Slack
+// call held back for an edit — a report's, and a channel's follow-ups posted
+// alone, the same two each: 20 + 2 a place, in a job capped at 50. The
+// follow-ups' rows, records, stagings and hand-off are D1 and Durable Object
+// hops, internal. A channel with both kinds is one post where it was two:
+// `commitment-nudge` spends no Slack call on a card it hands over. A channel's
+// threads are processed oldest activity first and the cursor is saved after
+// each one, so a budget stop keeps every thread already done: the job records
+// where it stopped and rethrows the stop, and the runner keeps the job under
+// its key and runs it again on a fresh budget (`runner/queue.ts`). A retried job is idempotent — the cursor skips
 // what is done and the queue replaces a finding by its id. A history read
 // that stops at its page cap never moves the cursor past the oldest root it
 // read, and a thread too long to read whole is left with a note.
@@ -99,13 +118,14 @@
 
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
-import { proposalReplyThread, type PendingProposal, type ProposalOperation, type ThreadState } from "../thread-state/index";
+import { proposalReplyThread, type OwnerLine, type PendingProposal, type ProposalOperation, type ReportItem, type ThreadState } from "../thread-state/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import {
   cardPlan,
   destinationKey,
   itemOperation,
+  MAX_ITEMS_PER_CARD,
   operationsDigest,
   planSweepCards,
   sweepItem,
@@ -125,6 +145,7 @@ import {
   markNotStaged,
   plainReportBlocks,
   reportRecord,
+  roundRobin,
   type DecisionReport,
   type ReportStore,
 } from "../slack/decision-cards";
@@ -319,6 +340,49 @@ export interface SweepDelivery {
   permalink(channel: string, ts: string): Promise<string | null>;
 }
 
+/** One channel's card follow-ups, handed over for its morning report. */
+export interface FollowUpCards {
+  /** The morning they were handed over. */
+  date: string;
+  channel: string;
+  /** Each card and the person it asks, in the order asked. */
+  cards: Array<{ person: string; item: ReportItem }>;
+  /** What the opener says of a person's cards, by their item ids. */
+  says(ids: readonly string[]): string;
+}
+
+/**
+ * The card follow-ups the commitment job handed over for the top of a
+ * channel (`../follow-through/run.ts` `followUpsForSweep`). A report claims
+ * its channel's before it posts; posting, staging or holding takes them out
+ * of the hand-off before anything is sent.
+ */
+export interface SweepFollowUps {
+  /** Each channel's follow-ups waiting this morning, unclaimed. */
+  waiting(): Promise<FollowUpCards[]>;
+  /** A report takes a channel's follow-ups, by its card key. */
+  claim(place: FollowUpCards, cardKey: string): Promise<void>;
+  /** The follow-ups a report claimed, still to stage; null when none. */
+  claimed(cardKey: string): Promise<FollowUpCards | null>;
+  /** A report that never went up gives its follow-ups back. */
+  unclaim(cardKey: string): Promise<void>;
+  /** A channel the sweep posts nothing at: its follow-ups go up alone. */
+  postAlone(place: FollowUpCards): Promise<void>;
+  /** The channel's report posted and its record kept: the cards it showed
+   *  are staged and their rows asked; the rest are asked the next morning. */
+  posted(place: FollowUpCards, shown: readonly string[], report: { ts: string; text: string }): Promise<void>;
+  /** The channel's report did not go up, or was withdrawn: every row is held
+   *  for the next morning. */
+  notPosted(place: FollowUpCards, why: string): Promise<void>;
+}
+
+/** D1 statements each follow-up costs once it posts: its staging's event,
+ *  its row and its text. */
+const FOLLOW_UP_D1_QUERIES = 3;
+/** Slack calls a channel's follow-ups posted alone cost: the post, and an
+ *  edit held back for a card that does not stage. */
+const ALONE_SUBREQUESTS = 2;
+
 export interface SweepConfig {
   plusDesign?: string;
   plusUniversal?: string;
@@ -364,6 +428,9 @@ export interface SweepDeps extends Pick<JobContext, "runDate"> {
   store: SweepStore;
   delivery: SweepDelivery;
   config: SweepConfig;
+  /** The card follow-ups for the top of a channel, posted on its morning
+   *  report (`sweep-post` only). Absent, there are none. */
+  followUps?: SweepFollowUps;
   /** The invocation's meter: spend for the run record, and what is left
    *  before a card starts. Zeros and no limit without one. */
   meter?: {
@@ -1158,9 +1225,24 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
     if (already.length && !deps.dryRun) await deps.store.removeFindings(already.map((f) => f.id));
 
     const plans = planSweepCards(fresh, postDate, (where) => live.has(where));
-    const waiting = fresh.length - plans.reduce((n, p) => n + p.items.length, 0);
+    // A rehearsal shows the sweep's own part: the follow-ups are the
+    // commitment job's, and it hands none over on a dry run.
+    const followUps = deps.followUps && !deps.dryRun ? await deps.followUps.waiting() : [];
+    let onCards = 0;
+    for (const plan of plans) {
+      const to = resolveDestination(plan.destination, deps.config);
+      const i = to && !to.threadTs ? followUps.findIndex((f) => f.channel === to.channel) : -1;
+      const shared = i >= 0 ? followUps.splice(i, 1)[0] : undefined;
+      const posted = await postCard(ctx, plan, postDate, shared);
+      onCards += posted.items;
+      if (shared && !posted.tookFollowUps) followUps.push(shared);
+    }
+    const waiting = fresh.length - onCards;
     if (waiting > 0) notes.push(`${waiting} fix(es) wait in the queue for a live card to resolve or for room on a card`);
-    for (const plan of plans) await postCard(ctx, plan, postDate);
+    for (const place of followUps) {
+      ensureHeadroom(deps, { subrequests: ALONE_SUBREQUESTS, d1Queries: place.cards.length * FOLLOW_UP_D1_QUERIES });
+      await deps.followUps!.postAlone(place);
+    }
   } catch (err) {
     if (isSubrequestBudgetError(err)) {
       notes.push(`budget stopped it; retried under ${job.key}`);
@@ -1189,20 +1271,33 @@ interface MorningCtx {
   permalinks: number;
 }
 
-/** Post one planned report, stage each of its fixes, and mark its items posted. */
-async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string): Promise<void> {
+/**
+ * Post one planned report, stage each of its fixes, and mark its items
+ * posted — with the channel's card follow-ups on it, when it has some.
+ *
+ * @returns How many fixes it showed, and whether it took the follow-ups;
+ *   when it did not, they go up alone
+ */
+async function postCard(
+  ctx: MorningCtx,
+  planned: SweepCardPlan,
+  postDate: string,
+  followUps?: FollowUpCards,
+): Promise<{ items: number; tookFollowUps: boolean }> {
   const { deps, now, notes } = ctx;
-  const to = resolveDestination(plan.destination, deps.config);
+  const to = resolveDestination(planned.destination, deps.config);
   if (!to) {
-    notes.push(`${plan.key}: its channel is not configured`);
-    return;
+    notes.push(`${planned.key}: its channel is not configured`);
+    return { items: planned.items.length, tookFollowUps: false };
   }
   if (to.channel === deps.config.unoBot) {
     // Unreachable while #uno-bot is never swept; stated so it stays true.
-    notes.push(`${plan.key}: not posted in #uno-bot`);
-    if (!deps.dryRun) await deps.store.removeFindings(plan.items.map((f) => f.id));
-    return;
+    notes.push(`${planned.key}: not posted in #uno-bot`);
+    if (!deps.dryRun) await deps.store.removeFindings(planned.items.map((f) => f.id));
+    return { items: planned.items.length, tookFollowUps: false };
   }
+  const shared = followUps ? sharedReport(planned, followUps, to.channel) : null;
+  const plan = shared?.plan ?? planned;
 
   // Everything the report will send, counted before any of it is: a report
   // that cannot finish does not start, and the job defers instead.
@@ -1210,7 +1305,8 @@ async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string):
   const links = plan.items.filter((f) => f.evidence.messageTs[0]).length;
   const affordable = Math.min(links, MAX_PERMALINKS - ctx.permalinks);
   if (!deps.dryRun) {
-    ensureHeadroom(deps, { subrequests: affordable + posts + CARD_COST.reserveSubrequests, d1Queries: CARD_COST.d1Queries });
+    const followUpQueries = (shared?.followUps.length ?? 0) * FOLLOW_UP_D1_QUERIES;
+    ensureHeadroom(deps, { subrequests: affordable + posts + CARD_COST.reserveSubrequests, d1Queries: CARD_COST.d1Queries + followUpQueries });
   }
   for (const item of plan.items) {
     const first = item.evidence.messageTs[0];
@@ -1222,7 +1318,7 @@ async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string):
     });
     if (link) item.evidence.permalinks = [link];
   }
-  const report = sweepReport(plan);
+  const report = shared?.report ?? sweepReport(plan);
   const card: SweepCardReport = {
     key: plan.key,
     destination: plan.destination,
@@ -1231,14 +1327,17 @@ async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string):
     items: plan.items.length,
     text: reportText(plan, report),
   };
+  const done = { items: plan.items.length, tookFollowUps: !!shared };
   if (deps.dryRun) {
     ctx.cards.push(card);
     ctx.carded.push(...plan.items);
-    return;
+    return done;
   }
 
   const digest = operationsDigest(plan.operations);
-  await deps.store.saveCard({ key: plan.key, destination: plan.destination, items: plan.items, digest });
+  await deps.store.saveCard({ key: plan.key, destination: plan.destination, items: plan.items, digest, ...(shared ? { followUps: shared.followUps } : {}) });
+  // Claimed before the post: a retry finds them by the card's key.
+  if (shared) await deps.followUps!.claim(followUps!, plan.key);
   await deps.store.addItems(plan.items.map((f) => itemRecord(f, plan, now)));
   const tag = { cardKey: plan.key, digest };
   let sent = await deps.delivery.post(to, { text: report.text, blocks: report.blocks }, tag);
@@ -1249,13 +1348,93 @@ async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string):
   if (!sent.ok || !sent.ts) {
     await release(deps, plan.key);
     notes.push(`${plan.key}: the post failed — kept for tomorrow`);
-    return;
+    if (shared) await deps.followUps!.notPosted(followUps!, "Slack refused the post");
+    return done;
   }
-  const staged = await stageReport(ctx, plan, report, { channel: to.channel, root: to.threadTs ?? sent.ts, ts: sent.ts, postDate, ...(plain ? { plain: true } : {}) }, now);
-  if (!staged.length) return;
+  const sentTs = sent.ts;
+  const staged = await stageReport(
+    ctx,
+    plan,
+    report,
+    { channel: to.channel, root: to.threadTs ?? sentTs, ts: sentTs, postDate, ...(plain ? { plain: true } : {}) },
+    now,
+    new Set(),
+    shared
+      ? {
+          // Once the record their decisions land on is kept, before the fixes.
+          kept: () => deps.followUps!.posted(followUps!, shared.followUps, { ts: sentTs, text: report.text }),
+          withdrawn: (why) => deps.followUps!.notPosted(followUps!, why),
+        }
+      : undefined,
+  );
+  if (!staged.length) return done;
   await deps.store.removeFindings(staged.map((f) => f.id));
-  ctx.cards.push({ ...card, proposalTs: sent.ts });
+  ctx.cards.push({ ...card, proposalTs: sentTs });
   ctx.carded.push(...staged);
+  return done;
+}
+
+/**
+ * A channel's report with its card follow-ups on it: an opener with one
+ * bullet per Slack owner — the sweep's first, then the follow-ups', a card's
+ * co-owners among them — each mentioned once and saying what is theirs and
+ * how many wait, then one carousel of at most `MAX_ITEMS_PER_CARD`, filled a
+ * round at a time across the people each card is for, so each has a card
+ * before anyone has a second, each person's together in bullet order. A DM
+ * tags nobody.
+ *
+ * @param plan - The sweep's report for the channel, its overflow among `rest`
+ * @param followUps - The channel's follow-ups
+ * @param channel - Where it posts
+ * @returns The plan cut to the fixes shown (the rest stay queued), the
+ *   report, and the follow-ups shown, by item id
+ */
+function sharedReport(
+  plan: SweepCardPlan,
+  followUps: FollowUpCards,
+  channel: string,
+): { plan: SweepCardPlan; report: DecisionReport; followUps: string[] } {
+  type Entry = { fix: PendingFinding } | { card: { person: string; item: ReportItem } };
+  const fixes = [...plan.items, ...(plan.rest ?? [])];
+  const byPerson = new Map<string, Entry[]>();
+  const add = (person: string, entry: Entry) => byPerson.set(person, [...(byPerson.get(person) ?? []), entry]);
+  for (const fix of fixes) add(fix.owner, { fix });
+  for (const card of followUps.cards) add(card.person, { card });
+  const picked = roundRobin(byPerson, MAX_ITEMS_PER_CARD);
+  const shown = new Set([...picked.values()].flat());
+  const shownFixes = fixes.filter((fix) => [...shown].some((e) => "fix" in e && e.fix === fix));
+  const rest = fixes.filter((fix) => !shownFixes.includes(fix));
+  const cut = { ...cardPlan(plan.key, plan.destination, shownFixes), ...(rest.length ? { rest } : {}) };
+  const items = [...picked.values()].flat().map((e) => ("fix" in e ? sweepItem(e.fix, plan.destination) : e.card.item));
+  // Every Slack owner of an entry, in the order first named, with theirs.
+  const owned = new Map<string, Entry[]>();
+  for (const entry of [...byPerson.values()].flat()) {
+    const owners = "fix" in entry ? [entry.fix.owner] : (entry.card.item.owners ?? []).flatMap((o) => ("slack" in o ? [o.slack] : []));
+    for (const owner of new Set(owners)) owned.set(owner, [...(owned.get(owner) ?? []), entry]);
+  }
+  const ownerLines: OwnerLine[] = [...owned].map(([owner, entries]) => {
+    const theirFixes = entries.flatMap((e) => ("fix" in e ? [e.fix] : []));
+    const theirCards = entries.flatMap((e) => ("card" in e ? [e.card.item.id] : []));
+    const here = entries.filter((e) => shown.has(e)).length;
+    const says = [
+      ...(theirFixes.length ? [sweepParent(theirFixes, plan.destination)] : []),
+      ...(theirCards.length ? [followUps.says(theirCards)] : []),
+      ...(here < entries.length ? [waitWords(here, entries.length)] : []),
+    ];
+    return { owner: { slack: owner }, says: says.join(" ") };
+  });
+  return {
+    plan: cut,
+    report: decisionReport(items, "", { channel, ownerLines }),
+    followUps: [...shown].flatMap((e) => ("card" in e ? [e.card.item.id] : [])),
+  };
+}
+
+/** What a person's bullet says when some of theirs wait. */
+function waitWords(shown: number, total: number): string {
+  if (shown === 0) return total === 1 ? "It comes in the next report." : "They come in the next report.";
+  const here = shown === 1 ? "Here is 1" : `Here are ${shown}`;
+  return `${here}; ${total - shown} more come in the next report.`;
 }
 
 /**
@@ -1290,6 +1469,10 @@ export const NOT_STAGED = "Didn't go through, so it comes back in tomorrow's rep
  *
  * @param skip - Fixes an earlier try already staged, by block id, which are
  *   not staged again
+ * @param followUps - A report with the channel's card follow-ups on it: what
+ *   to do with them once its record is kept, and when it is withdrawn. Such a
+ *   report is withdrawn only when its record is not kept; a fix that does not
+ *   stage is marked on its card, so the follow-ups beside it stay decidable.
  * @returns The findings staged now
  */
 async function stageReport(
@@ -1299,6 +1482,7 @@ async function stageReport(
   posted: { channel: string; root: string; ts: string; postDate: string; plain?: boolean },
   postedAt: number,
   skip: ReadonlySet<string> = new Set(),
+  followUps?: { kept(): Promise<void>; withdrawn(why: string): Promise<void> },
 ): Promise<PendingFinding[]> {
   const { deps } = ctx;
   const keys = plan.items.map((f) => itemProposalKey(posted.ts, f.blockId!));
@@ -1307,6 +1491,7 @@ async function stageReport(
     await deps.delivery.withdraw(posted.channel, posted.ts, WITHDRAWN_TEXT, plan.key, keys).catch(rethrowIfBudget);
     await release(deps, plan.key);
     ctx.notes.push(`${plan.key}: posted but not staged (${reason}) — withdrawn, kept for tomorrow`);
+    await followUps?.withdrawn("its report was withdrawn");
     return [];
   };
   try {
@@ -1322,6 +1507,7 @@ async function stageReport(
     if (isSubrequestBudgetError(err)) throw err;
     return withdraw(`its record was not kept: ${why(err)}`);
   }
+  await followUps?.kept();
   const staged: PendingFinding[] = [];
   const failed: PendingFinding[] = [];
   let reason = "";
@@ -1336,7 +1522,7 @@ async function stageReport(
       failed.push(f);
     }
   }
-  if (!staged.length && !skip.size) return withdraw(reason);
+  if (!staged.length && !skip.size && !followUps) return withdraw(reason);
   await deps.store.markPosted(plan.key, posted.ts, postedAt);
   await deps.store.dropCard(plan.key);
   if (failed.length) {
@@ -1351,10 +1537,12 @@ async function stageReport(
 }
 
 /** A report that did not go through: its unposted items and its snapshot go;
- *  its findings, still queued, are carded again. */
-async function release(deps: SweepDeps, cardKey: string): Promise<void> {
+ *  its findings, still queued, are carded again — and, with `giveBack`, the
+ *  follow-ups it claimed go back to waiting, for this run to post. */
+async function release(deps: SweepDeps, cardKey: string, giveBack = false): Promise<void> {
   await deps.store.releaseCard(cardKey);
   await deps.store.dropCard(cardKey);
+  if (giveBack) await deps.followUps?.unclaim(cardKey);
 }
 
 /** What a report that did not go through is edited to say. */
@@ -1385,13 +1573,13 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
   if (!snapshot || !to) {
     // Nothing to stage from, so nothing is staged; the fixes, still queued,
     // go out on a fresh report.
-    await release(deps, cardKey);
+    await release(deps, cardKey, true);
     notes.push(`${cardKey}: recorded without a snapshot — released`);
     return "released";
   }
   const plan = cardPlan(cardKey, snapshot.destination, snapshot.items);
   if (operationsDigest(plan.operations) !== snapshot.digest) {
-    await release(deps, cardKey);
+    await release(deps, cardKey, true);
     notes.push(`${cardKey}: its snapshot does not match its digest — released`);
     return "released";
   }
@@ -1400,7 +1588,7 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
   const posted = await deps.delivery.findPosted(to, cardKey, tsOf(Date.parse(`${postDate}T00:00:00Z`)));
   if (posted.state === "unknown") {
     if (now > Date.parse(`${postDate}T00:00:00Z`) + SWEEP_CARD_TTL_MS) {
-      await release(deps, cardKey);
+      await release(deps, cardKey, true);
       notes.push(`${cardKey}: still not found after its 72 h (${posted.why}) — released`);
       return "released";
     }
@@ -1408,13 +1596,13 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
     return "held";
   }
   if (posted.state === "absent") {
-    await release(deps, cardKey);
+    await release(deps, cardKey, true);
     return "released";
   }
   const keys = plan.items.map((f) => itemProposalKey(posted.ts, f.blockId!));
   if (posted.digest !== snapshot.digest) {
     await deps.delivery.withdraw(to.channel, posted.ts, WITHDRAWN_TEXT, cardKey, keys).catch(rethrowIfBudget);
-    await release(deps, cardKey);
+    await release(deps, cardKey, true);
     notes.push(`${cardKey}: the posted report shows other fixes than its snapshot — withdrawn`);
     return "released";
   }
@@ -1428,13 +1616,24 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
   }
   const already = new Set([...states].filter(([, s]) => s.state !== "unstaged").map(([block]) => block));
   const postedAt = msOf(posted.ts);
+  // The follow-ups it showed, still claimed: the report is rebuilt as it
+  // posted, and they are staged beside its fixes.
+  const shown = snapshot.followUps ?? [];
+  const claimed = shown.length ? await deps.followUps?.claimed(cardKey) : null;
+  const followUps = claimed ? { ...claimed, cards: claimed.cards.filter((c) => shown.includes(c.item.id)) } : null;
   const staged = await stageReport(
     ctx,
     plan,
-    sweepReport(plan),
+    followUps ? sharedReport(plan, followUps, to.channel).report : sweepReport(plan),
     { channel: to.channel, root: to.threadTs ?? posted.ts, ts: posted.ts, postDate, ...(posted.plain ? { plain: true } : {}) },
     Number.isFinite(postedAt) ? postedAt : now,
     already,
+    followUps
+      ? {
+          kept: () => deps.followUps!.posted(followUps, shown, { ts: posted.ts, text: posted.text }),
+          withdrawn: (why) => deps.followUps!.notPosted(followUps, why),
+        }
+      : undefined,
   );
   if (!staged.length && !already.size) return "released";
   // A fix decided meanwhile, while its item had no ts to be found by, takes

@@ -14,6 +14,10 @@
 //     way (`stageSweepCard`) so it lands on the usage record as staged. A
 //     follow-up posted before the shared card stages its proposal card the
 //     same way, posted in its thread.
+//   • The hand-off: the cards for a channel's top wait in the morning run's
+//     own runner storage (`JobContext.runStorage`, `handOffIn`), read by exact
+//     key, for the sweep's morning post to put on that channel's report
+//     (`morningFollowUpsFor`). A rehearsal has none, and posts as before.
 //   • The thread marks: the sweep card's (`markSweepThread`), so the team's
 //     replies under a follow-up don't start turns; and the follow-up reply
 //     mark (`./reply-mark.ts`), so only a reply in a thread holding an older
@@ -34,6 +38,7 @@ import { threadStateFor } from "../thread-state/production";
 import { gapNotesFor, notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { throughDirectory } from "./people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
+import type { SweepFollowUps } from "../sweep/run";
 import type { CommitmentRecord } from "../commitments/store";
 import { TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import type { ReminderReaction } from "../commitments/run";
@@ -59,7 +64,9 @@ import {
   cardTodoNoteHook,
   cardTodoThreadHook,
   followThroughProposal,
+  followUpsForSweep,
   handleCardReplySafely,
+  handOffIn,
   type ReadNote,
   runCardFollowThroughScan,
   type AnswerDeps,
@@ -67,6 +74,7 @@ import {
   type CardPeople,
   type CardProposal,
   type CardReads,
+  type DueDeps,
   type FollowThroughConfig,
   type ScanReport,
 } from "./run";
@@ -181,18 +189,37 @@ export function cardTodoThreadHookFor(env: Env, opts: JobContext): ((thread: Swe
 }
 
 /**
- * The morning's handler for card rows, for the commitment job.
+ * The morning's handler for card rows, for the commitment job. The cards for
+ * a channel's top are handed off for the sweep's post.
  *
  * @param env - Worker bindings
- * @param opts - `dryRun` reads and posts nothing
+ * @param opts - `dryRun` reads and posts nothing; `runStorage` holds the
+ *   hand-off
  * @param botUserId - The bot's own id
  */
-export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?: string | null): CardFollowUps | undefined {
+export function cardFollowUpsFor(env: Env, opts: Pick<JobContext, "dryRun" | "runStorage">, botUserId?: string | null): CardFollowUps | undefined {
+  const deps = dueDepsFor(env, opts, botUserId);
+  return deps ? cardFollowUps(deps) : undefined;
+}
+
+/**
+ * The cards the commitment job handed off, for the sweep's morning post, or
+ * undefined without the bindings.
+ *
+ * @param env - Worker bindings
+ * @param opts - The sweep job's run
+ */
+export function morningFollowUpsFor(env: Env, opts: JobContext): SweepFollowUps | undefined {
+  const deps = dueDepsFor(env, opts);
+  return deps ? followUpsForSweep(deps, Date.now(), opts.runDate) : undefined;
+}
+
+function dueDepsFor(env: Env, opts: Pick<JobContext, "dryRun" | "runStorage">, botUserId?: string | null): DueDeps | undefined {
   const store = storeFor(env);
   if (!store || !env.HARNESS_KV) return undefined;
   const kv = env.HARNESS_KV;
   const threadState = threadStateFor(env);
-  return cardFollowUps({
+  return {
     reads: readsFor(env),
     people: peopleFor(env),
     slack: {
@@ -222,8 +249,9 @@ export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?
     markThread: (channel, thread) => markSweepThread(kv, channel, thread),
     config: configFor(env, botUserId),
     gaps: gapNotesFor(env),
+    ...(opts.runStorage ? { handOff: handOffIn(opts.runStorage) } : {}),
     dryRun: opts.dryRun,
-  });
+  };
 }
 
 /**

@@ -54,9 +54,13 @@ import {
   type CardProposal,
   type DueDeps,
   type FollowThroughConfig,
+  type FollowUpHandOff,
   type ScanDeps,
+  followUpsForSweep,
+  handOffIn,
 } from "../src/follow-through/index";
-import { at, BOT, DESIGN, NOTES_DB, notionPage, sweepHarness, ts, UNIVERSAL, UNO_BOT, utcDay } from "./helpers/sweep-harness";
+import { at, BOT, DESIGN, drift, msg, NOTES_DB, notionPage, reply, sweepHarness, ts, UNIVERSAL, UNO_BOT, utcDay } from "./helpers/sweep-harness";
+import { createInMemoryRunnerStorage } from "../src/runner/storage";
 import { recordingViews } from "./helpers/recording-slack";
 import { gapNotes, type GapNotes, type StoredTeamRoles } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
@@ -149,7 +153,7 @@ function morning(
   store: InMemoryCommitmentStore,
   rm: ReturnType<typeof roadmap>,
   now: number,
-  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean; meter?: NudgeDeps["meter"]; gaps?: GapNotes } = {},
+  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean; meter?: NudgeDeps["meter"]; gaps?: GapNotes; handOff?: FollowUpHandOff } = {},
 ) {
   const posts: Array<{ channel: string; threadTs: string | null; text: string; blocks: unknown[]; cards: Card[]; ts: string }> = [];
   const edits: Array<{ ts: string; text: string; cards: Card[] }> = [];
@@ -182,6 +186,7 @@ function morning(
     markThread: async (channel, t) => void marked.push(`${channel}:${t}`),
     config: CONFIG,
     ...(opts.gaps ? { gaps: opts.gaps } : {}),
+    ...(opts.handOff ? { handOff: opts.handOff } : {}),
   };
   const deps: NudgeDeps = {
     slack: {
@@ -201,7 +206,7 @@ function morning(
     cards: cardFollowUps(due),
     ...(opts.meter ? { meter: opts.meter } : {}),
   };
-  return { run: () => runCommitmentNudges(NUDGE, deps), cards: deps.cards!, posts, edits, marked, staged, threadState };
+  return { run: () => runCommitmentNudges(NUDGE, deps), cards: deps.cards!, due, posts, edits, marked, staged, threadState };
 }
 
 /**
@@ -992,7 +997,8 @@ describe("shared rules", () => {
     await keptTodo(store);
     const m = morning(store, rm, at(32, 13));
     await m.run();
-    assert.equal(m.posts.length, 3);
+    // Bea's and Maya's cards share the channel's one message; the to-do is in its thread.
+    assert.equal(m.posts.length, 2);
     for (const p of m.posts) {
       assert.equal(messageBlocksRefusal(p.blocks), null);
       assert.doesNotMatch(JSON.stringify(p.blocks), GATE_WORDS);
@@ -1028,7 +1034,7 @@ describe("shared rules", () => {
     assert.equal([...store.rows.values()].filter((r) => r.state === "nudged").length, 2);
   });
 
-  it("one person's cards from the same morning share one carousel; another person's go in a message of their own", async () => {
+  it("cards group by place: a channel's cards from one morning share one carousel, and another channel's go in a message of their own", async () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({
       cards: [
@@ -1433,7 +1439,10 @@ describe("replies under a follow-up", () => {
     assert.equal(store.rows.size, 3);
     const m = morning(store, rm, at(30, 13));
     await m.run();
-    assert.equal(m.posts.length, 2);
+    // The two asked share the channel's one message, a bullet each.
+    assert.equal(m.posts.length, 1);
+    assert.equal(m.posts[0]!.cards.length, 2);
+    assert.equal(new Set(mentions(m.posts[0]!.text)).size, 2);
     assert.equal([...store.rows.values()].filter((r) => r.state === "open").length, 1, "the third waits a morning");
   });
 });
@@ -2121,5 +2130,179 @@ describe("tagging through the Team Members directory", () => {
     const rm = withDirectory(roadmap({ cards: [card({ creatorId: "n-zoe" })] }));
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     assert.equal(only(store).promiserId, ZOE);
+  });
+});
+
+// ── One message a channel ────────────────────────────────────────────────────
+
+describe("the morning's one message a channel", () => {
+  const SWEEP_POST: ScheduledJob = { key: "sweep-post", kind: "sweep-post" };
+  const STARTER = "U0STARTER";
+
+  /**
+   * `n` fixes on one page, settled in a #plus-design thread the starter
+   * opened and queued for the top of the channel — where a fix the Roadmap
+   * or the running notes recorded goes — ready for the morning at `now`.
+   */
+  async function fixesAtTop(n: number, now: number) {
+    const blocks = Array.from({ length: n }, (_, i) => ({ id: `blk-${String(i).padStart(2, "0")}`, lastEditedTime: "2026-09-01T10:00:00.000Z", text: `Line ${i}` }));
+    const page = notionPage("cccccccccccccccccccccccccccccccc", { blocks });
+    const root = msg(STARTER, ts(29, 15), `Update on this: <${page.url}|page>`, { reply_count: 1, latest_reply: ts(29, 16) });
+    const answer = msg(ADE, ts(29, 16), "Agreed — Nov 1.", { thread_ts: root.ts });
+    const h = sweepHarness({
+      channels: { [DESIGN]: { kind: "public", history: [root], threads: { [root.ts]: [root, answer] } } },
+      sources: [page],
+      detectorReplies: n ? [reply(...blocks.map((b) => drift({ source: page, block: b.id, evidence: [answer.ts], replacement: `${b.text} (fixed)` })))] : [],
+      now: EOD,
+    });
+    await runSweepJob({ key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN }, h.deps);
+    const queued = await h.store.pendingFindings();
+    assert.equal(queued.length, n);
+    await h.store.addFindings(queued.map((f) => ({ ...f, evidence: { ...f.evidence, threadTs: null } })));
+    h.clock.now = now;
+    return h;
+  }
+
+  /** Bea's quiet cards in #plus-design, kept at the end of day: one she
+   *  created with no Contributor, and, with `two`, one she is stuck on. */
+  async function beasCards(two = false) {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({
+      cards: [
+        card({ pageId: "a" }),
+        ...(two ? [card({ pageId: "b", designStatus: "Under Review", contributors: [{ id: "n-bea", name: "Bea Ruiz" }], lastEditedAt: EOD - 22 * DAY })] : []),
+      ],
+    });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    return { store, rm };
+  }
+
+  /** The morning: the commitment job hands the channel's cards off, then the
+   *  sweep's post puts them up. */
+  async function morningOf(store: InMemoryCommitmentStore, rm: ReturnType<typeof roadmap>, h: ReturnType<typeof sweepHarness>, now: number) {
+    const stage = handOffIn(createInMemoryRunnerStorage());
+    const m = morning(store, rm, now, { handOff: stage, threadState: h.threadState });
+    const nudged = await m.run();
+    assert.equal(m.posts.length, 0, "the commitment job posts none of a channel's top cards");
+    assert.ok(nudged.actions.length > 0);
+    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    await runSweepJob(SWEEP_POST, h.deps);
+    return { m, stage };
+  }
+
+  const head = (text: string) => text.split("\n").filter((l) => l.startsWith("• <@"));
+
+  it("a fix and a quiet card for one channel go up as one message: a bullet a person, one carousel", async () => {
+    const now = at(30, 13);
+    const { store, rm } = await beasCards();
+    const h = await fixesAtTop(1, now);
+    const { m, stage } = await morningOf(store, rm, h, now);
+
+    assert.equal(h.posted.length + m.posts.length, 1, "one top-level message");
+    const [post] = h.posted;
+    assert.equal(post!.channel, DESIGN);
+    assert.equal(post!.threadTs, null);
+    assert.deepEqual(post!.text.split("\n").slice(0, 2), [
+      `• <@${STARTER}>, a thread settled something that *Page cccc* still states the old way.`,
+      `• <@${BEA}>, a Roadmap card has been worked for over a week with no Contributor.`,
+    ]);
+    // Each person is mentioned once, in the bullets: what Slack notifies from
+    // (a card's subtitle notifies nobody).
+    for (const who of [STARTER, BEA]) assert.equal(mentions(post!.text).filter((x) => x === who).length, 1);
+    const blocks = post!.blocks as Array<{ type: string }>;
+    assert.equal(blocks.at(-1)!.type, "carousel");
+    assert.deepEqual(cardsOf(post!.blocks).map((c) => c.actions[0]!.text.text), ["Review", "Review"]);
+
+    // Each card keeps its own proposal on the one message.
+    assert.equal(h.staged.length, 1);
+    assert.equal(m.staged.length, 1);
+    assert.equal(m.staged[0]!.item?.messageTs, post!.ts);
+    const row = only(store);
+    assert.equal(row.state, "nudged");
+    assert.equal(row.nudgeTs, post!.ts);
+    assert.deepEqual(await h.store.pendingFindings(), []);
+    assert.equal((await stage.places(utcDay(now))).size, 0, "the hand-off is spent");
+  });
+
+  it("a morning with only the cards posts them as one message, as they read before", async () => {
+    const now = at(30, 13);
+    const { store, rm } = await beasCards();
+    const h = await fixesAtTop(0, now);
+    const { m } = await morningOf(store, rm, h, now);
+    assert.equal(h.posted.length, 0);
+    assert.equal(m.posts.length, 1);
+    assert.match(m.posts[0]!.text, /^<@U0BEA>, a Roadmap card has been worked for over a week with no Contributor\./);
+    assert.equal(only(store).nudgeTs, m.posts[0]!.ts);
+  });
+
+  it("past ten cards: ten show, filled round-robin, and each bullet says how many wait", async () => {
+    const now = at(30, 13);
+    const { store, rm } = await beasCards(true);
+    const h = await fixesAtTop(12, now);
+    const { m } = await morningOf(store, rm, h, now);
+
+    assert.equal(h.posted.length + m.posts.length, 1);
+    const [post] = h.posted;
+    const cards = cardsOf(post!.blocks);
+    assert.equal(cards.length, 10);
+    const lines = head(post!.text);
+    assert.equal(lines.length, 2);
+    assert.match(lines[0]!, /^• <@U0STARTER>, .* Here are 8; 4 more come in the next report\.$/);
+    assert.match(lines[1]!, /^• <@U0BEA>, checking in on 2 Roadmap cards\.$/);
+    // Grouped by person, in bullet order: the starter's eight, then Bea's two.
+    assert.deepEqual(cards.slice(8).map((c) => c.actions[1]!.text.text), ["Open card", "Open card"]);
+    assert.equal(h.staged.length, 8);
+    assert.equal((await h.store.pendingFindings()).length, 4, "the fixes past ten stay queued");
+    assert.equal(m.staged.length, 2);
+    assert.deepEqual([...store.rows.values()].map((r) => r.nudgeTs), [post!.ts, post!.ts]);
+  });
+
+  it("a stop after the shared post: the retry stages what it showed, and posts nothing again", async () => {
+    const now = at(30, 13);
+    const { store, rm } = await beasCards();
+    const h = await fixesAtTop(1, now);
+    const stage = handOffIn(createInMemoryRunnerStorage());
+    const m = morning(store, rm, now, { handOff: stage, threadState: h.threadState });
+    await m.run();
+    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    // Slack took the post; the job heard nothing back.
+    h.faults.post = new SubrequestBudgetError(38);
+    await assert.rejects(runSweepJob(SWEEP_POST, h.deps), SubrequestBudgetError);
+    assert.equal(h.posted.length, 1);
+    assert.equal(m.staged.length, 0);
+    assert.equal(only(store).state, "open", "not asked until it is staged");
+
+    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    await runSweepJob(SWEEP_POST, h.deps);
+    assert.equal(h.posted.length + m.posts.length, 1, "nothing goes up twice");
+    const [post] = h.posted;
+    assert.equal(h.staged.length, 1);
+    assert.equal(m.staged.length, 1);
+    assert.equal(m.staged[0]!.item?.messageTs, post!.ts);
+    assert.equal(only(store).nudgeTs, post!.ts);
+    assert.equal((await stage.places(utcDay(now))).size, 0);
+  });
+
+  it("the hand-off keeps a morning's places under one key: merged by row, claimed, given back, cleared", async () => {
+    const now = at(30, 13);
+    const { store, rm } = await beasCards(true);
+    const storage = createInMemoryRunnerStorage();
+    const kept: FollowUpHandOff = handOffIn(storage);
+    const m = morning(store, rm, now, { handOff: kept });
+    await m.run();
+    const day = utcDay(now);
+    const [place] = [...(await kept.places(day)).values()];
+    assert.equal(place!.group.asked.length, 2);
+    // A retried commitment job adds its rows again: each is kept once.
+    await kept.put(day, { ...place!.group, asked: [place!.group.asked[0]!] });
+    assert.equal((await kept.places(day)).get(DESIGN)!.group.asked.length, 2);
+
+    await kept.claim(day, DESIGN, `${day}:x:y`);
+    assert.equal((await kept.places(day)).get(DESIGN)!.claimedBy, `${day}:x:y`);
+    await kept.unclaim(day, `${day}:x:y`);
+    assert.equal((await kept.places(day)).get(DESIGN)!.claimedBy, undefined);
+
+    await kept.clear(day, DESIGN);
+    assert.equal(await storage.get(`follow-ups:${day}`), undefined, "an empty morning leaves no key");
   });
 });

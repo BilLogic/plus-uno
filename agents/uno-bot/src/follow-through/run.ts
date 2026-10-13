@@ -29,10 +29,21 @@
 //   nothing is sent; declined in its last card's Review, it is answered and
 //   nothing is sent. Otherwise its card is held, and `flush` posts the
 //   morning's cards on the shared decision card (`slack/decision-cards.ts`):
-//   one message per person and place, a carousel when there are several,
-//   mentioning only the owners. The one follow-up is armed a week out — so a
-//   card never gets two messages in one week. A stop before `flush` hands the
-//   held rows back (`release`), so the next run posts them.
+//   one message per place, a carousel when there are several, mentioning
+//   only the owners and filled round-robin across them past ten. The one
+//   follow-up is armed a week out — so a card never gets two messages in one
+//   week. A stop before `flush` hands the held rows back (`release`), so the
+//   next run posts them.
+//
+//   ONE MESSAGE A CHANNEL. With a hand-off (`DueDeps.handOff`: the morning
+//   run's own runner storage, one key a morning, `handOffIn`), `flush` leaves
+//   the cards for a channel's top there, and `sweep-post`, queued after this
+//   job, puts them on that channel's report beside its fixes: a bullet per
+//   person, one carousel (`followUpsForSweep`, `sweep/run.ts`). A channel the
+//   sweep has no report for gets them alone, as this job would have posted
+//   them. A sweep report claims a channel's cards before it posts, so a
+//   retried post finds them by its card key and never sends them twice. A
+//   card in a thread still posts here.
 //
 // WHAT REVIEW HOLDS. Each card is its own proposal, one item of its report.
 // F3's is the drafted Roadmap card (`notion_create`, PRD template), decided
@@ -69,7 +80,9 @@ import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalCard } from "../turn/index";
 import type { PendingProposal, ProposalOperation, ProposalSelect, ReportItem, ReviewChoice, ThreadState } from "../thread-state/index";
-import { decisionReport, itemProposal, markNotStaged, MAX_REPORT_ITEMS, reportRecord, type ReportStore } from "../slack/decision-cards";
+import { decisionReport, itemProposal, markNotStaged, MAX_REPORT_ITEMS, reportRecord, roundRobin, type ReportStore } from "../slack/decision-cards";
+import type { RunnerStorage } from "../runner/storage";
+import type { FollowUpCards, SweepFollowUps } from "../sweep/run";
 import { renderProposalCard } from "../slack/proposal-render";
 import { reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, maySnooze, TEXT_KEEP_MS } from "../commitments/due";
@@ -637,7 +650,77 @@ export interface DueDeps {
   /** Where someone a posted follow-up could not tag is noted to the lead;
    *  absent, nobody is. */
   gaps?: Pick<GapNotes, "untagged">;
+  /** Where the cards for a channel's top wait for the sweep's morning post;
+   *  absent, `flush` posts them itself. */
+  handOff?: FollowUpHandOff;
   dryRun?: boolean;
+}
+
+/** The morning's cards for the top of a channel, held for the sweep's post. */
+export interface FollowUpHandOff {
+  /** Keep a place's cards, beside any an earlier try kept. */
+  put(runDate: string, group: FollowUpGroup): Promise<void>;
+  /** Every place's cards kept for a morning, by channel. */
+  places(runDate: string): Promise<Map<string, HandedOff>>;
+  /** A sweep report takes a place's cards, before it posts. */
+  claim(runDate: string, channel: string, cardKey: string): Promise<void>;
+  /** A report that never went up gives its place's cards back. */
+  unclaim(runDate: string, cardKey: string): Promise<void>;
+  /** A place's cards are posted, or given up: they are not kept. */
+  clear(runDate: string, channel: string): Promise<void>;
+}
+
+/** One place's handed-off cards, and the sweep report that claimed them. */
+export interface HandedOff {
+  group: FollowUpGroup;
+  claimedBy?: string;
+}
+
+/** Where a morning's hand-off is kept in the run's storage. */
+const HAND_OFF_PREFIX = "follow-ups:";
+
+/**
+ * The hand-off in the morning run's runner storage: one key a morning, its
+ * places by channel, read and written whole by that exact key — consistent
+ * between the run's alarms, which share the instance.
+ *
+ * @param storage - The run's storage (`JobContext.runStorage`)
+ */
+export function handOffIn(storage: Pick<RunnerStorage, "get" | "put" | "delete">): FollowUpHandOff {
+  const keyOf = (runDate: string) => `${HAND_OFF_PREFIX}${runDate}`;
+  const read = async (runDate: string) => new Map(Object.entries((await storage.get<Record<string, HandedOff>>(keyOf(runDate))) ?? {}));
+  const write = async (runDate: string, places: Map<string, HandedOff>) => {
+    if (places.size) await storage.put(keyOf(runDate), Object.fromEntries(places));
+    else await storage.delete(keyOf(runDate));
+  };
+  const change = async (runDate: string, edit: (places: Map<string, HandedOff>) => void) => {
+    const places = await read(runDate);
+    edit(places);
+    await write(runDate, places);
+  };
+  return {
+    put: (runDate, group) =>
+      change(runDate, (places) => {
+        const was = places.get(group.to.channel);
+        const ids = new Set(group.asked.map((a) => a.c.id));
+        const asked = [...(was?.group.asked ?? []).filter((a) => !ids.has(a.c.id)), ...group.asked];
+        places.set(group.to.channel, { ...was, group: { ...group, asked } });
+      }),
+    places: read,
+    claim: (runDate, channel, cardKey) =>
+      change(runDate, (places) => {
+        const place = places.get(channel);
+        if (place) places.set(channel, { ...place, claimedBy: cardKey });
+      }),
+    unclaim: (runDate, cardKey) =>
+      change(runDate, (places) => {
+        for (const [channel, place] of places) if (place.claimedBy === cardKey) places.set(channel, { group: place.group });
+      }),
+    clear: (runDate, channel) =>
+      change(runDate, (places) => {
+        places.delete(channel);
+      }),
+  };
 }
 
 /** The morning's handler for card rows, handed to the commitment job: `due`
@@ -654,7 +737,7 @@ export interface CardFollowUps {
 
 /** One follow-up held for the morning's post: its row, its card, and the
  *  proposal its Review stages, with the card's own answers. */
-interface Asked {
+export interface Asked {
   c: CommitmentRecord;
   text: CommitmentText;
   people: string[];
@@ -664,8 +747,8 @@ interface Asked {
   selects?: ProposalSelect[];
 }
 
-/** Follow-ups that go up together: one person's, in one place, one morning. */
-interface Group {
+/** Follow-ups that go up together: one place's, one morning. */
+export interface FollowUpGroup {
   to: { channel: string; threadTs: string | null };
   channelKind: ChannelKind;
   asked: Asked[];
@@ -673,7 +756,7 @@ interface Group {
 
 /** What the morning holds between `due` and `flush`. */
 interface Morning {
-  groups: Map<string, Group>;
+  groups: Map<string, FollowUpGroup>;
   /** Held rows by id, with the `checkedOn` each had before. */
   held: Map<string, string | null>;
 }
@@ -690,6 +773,16 @@ export function cardFollowUps(deps: DueDeps): CardFollowUps {
     async flush(now, runDate) {
       const actions: CommitmentAction[] = [];
       for (const [key, group] of morning.groups) {
+        if (deps.handOff && !group.to.threadTs) {
+          // The sweep's post puts them on the channel's one message.
+          await deps.handOff.put(runDate, group);
+          for (const a of group.asked) {
+            morning.held.delete(a.c.id);
+            actions.push({ id: a.c.id, action: "held", note: HANDED_OFF });
+          }
+          morning.groups.delete(key);
+          continue;
+        }
         const posted = await postGroup(deps, group, now, runDate);
         actions.push(...posted);
         for (const a of group.asked) morning.held.delete(a.c.id);
@@ -713,15 +806,15 @@ export function cardFollowUps(deps: DueDeps): CardFollowUps {
 
 /**
  * One due card row: settle it on its evidence, or hold it for the morning's
- * post (`flush`), beside the same person's other follow-ups in the same
- * place — one message, a carousel when there are several.
+ * post (`flush`), beside the other follow-ups in the same place — one
+ * message, a carousel when there are several.
  *
  * @param c - The row
  * @param deps - Its reads, Slack, store and config
  * @param now - Now, epoch ms
  * @param runDate - The morning's date
- * @param morning - The morning's posts so far, by place and person, and the
- *   rows held for them
+ * @param morning - The morning's posts so far, by place, and the rows held
+ *   for them
  */
 export async function cardFollowUpDue(
   c: CommitmentRecord,
@@ -779,7 +872,7 @@ export async function cardFollowUpDue(
 
   const first = c.nudges === 0;
   const to = { channel: c.channel, threadTs: c.threadTs || c.nudgeTs || null };
-  const key = `${to.channel} ${to.threadTs ?? ""} ${c.promiserId}`;
+  const key = `${to.channel} ${to.threadTs ?? ""}`;
   const group = groups.get(key);
   // A card's question and a note's offer open a thread at the channel's top,
   // at most a few cards a morning; the rest wait a morning, which is no hold.
@@ -883,25 +976,23 @@ function statedCard(verb: string, lead: string, operation: ProposalOperation): P
  * The morning's post for one group: the parent line and a card each, posted,
  * its record kept, and each card's proposal staged. A card that showed and
  * did not stage says so, and its row comes back the next morning; a post
- * Slack refused holds every row in it. Past `MAX_REPORT_ITEMS`, the parent
- * line says how many wait, and their rows are asked in the next report.
+ * Slack refused holds every row in it. Past `MAX_REPORT_ITEMS`, the cards are
+ * filled round-robin across the people asked, the parent line says how many
+ * wait, and their rows are asked in the next report.
  */
-async function postGroup(deps: DueDeps, group: Group, now: number, runDate: string): Promise<CommitmentAction[]> {
+async function postGroup(deps: DueDeps, group: FollowUpGroup, now: number, runDate: string): Promise<CommitmentAction[]> {
   const kinds = group.asked.map((a) => a.c.kind as CardKind);
-  const shown = group.asked.slice(0, MAX_REPORT_ITEMS);
-  const waiting = group.asked.slice(MAX_REPORT_ITEMS);
-  const people = [...new Set(shown.flatMap((a) => a.people))];
+  const { shown, waiting } = pickAsked(group.asked);
   const first = group.asked.every((a) => a.c.nudges === 0);
   const report = decisionReport(
-    group.asked.map((a) => a.item),
+    [...shown, ...waiting].map((a) => a.item),
     followUpParent(kinds, first),
     { channel: group.to.channel },
   );
   // Checked this morning already, so each comes back with the next report.
-  const later: CommitmentAction[] = waiting.map((a) => ({ id: a.c.id, action: "held", note: "past this report's cards; asked in the next report" }));
+  const later = waiting.map(heldForNext);
   const sent = await deps.slack.post(group.to, { text: report.text, blocks: report.blocks });
   if (!sent.ok || !sent.ts) return [...(await Promise.all(shown.map((a) => holdCard(deps, a.c, now, runDate, "Slack refused the post")))), ...later];
-  const thread = group.to.threadTs ?? sent.ts;
   const kept = await deps.reports.putReport(reportRecord(group.to.channel, sent.ts, report, FOLLOW_THROUGH_CARD_TTL_MS)).then(
     () => true,
     (err: unknown) => {
@@ -910,21 +1001,57 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
       return false;
     },
   );
+  return [...(await askedOn(deps, group, shown, { ts: sent.ts, text: report.text, kept }, now, runDate)), ...later];
+}
 
+/** What a row past a report's ten comes to: checked this morning, asked in
+ *  the next report. */
+function heldForNext(a: Asked): CommitmentAction {
+  return { id: a.c.id, action: "held", note: "past this report's cards; asked in the next report" };
+}
+
+/** A group's cards for one report: at most `MAX_REPORT_ITEMS`, a round at a
+ *  time across the people asked, each person's together in the order asked;
+ *  and the rest. */
+function pickAsked(asked: readonly Asked[]): { shown: Asked[]; waiting: Asked[] } {
+  const byPerson = new Map<string, Asked[]>();
+  for (const a of asked) byPerson.set(a.c.promiserId, [...(byPerson.get(a.c.promiserId) ?? []), a]);
+  const shown = [...roundRobin(byPerson, MAX_REPORT_ITEMS).values()].flat();
+  return { shown, waiting: asked.filter((a) => !shown.includes(a)) };
+}
+
+/**
+ * The cards a posted report showed, after the post: each card's proposal
+ * staged, a card that did not stage marked so on the report, the team's
+ * thread marked, and each row asked — or held, its card not staged.
+ *
+ * @param shown - The group's cards the report showed
+ * @param posted - The report's message, its fallback text, and whether its
+ *   record was kept: without it nothing stages
+ */
+async function askedOn(
+  deps: DueDeps,
+  group: FollowUpGroup,
+  shown: readonly Asked[],
+  posted: { ts: string; text: string; kept: boolean },
+  now: number,
+  runDate: string,
+): Promise<CommitmentAction[]> {
+  const thread = group.to.threadTs ?? posted.ts;
   const failed: Asked[] = [];
   for (const a of shown) {
     try {
-      if (!kept) throw new Error("its report's record was not kept");
-      await deps.stage(itemProposalFor(a, group, thread, sent.ts), group.channelKind);
+      if (!posted.kept) throw new Error("its report's record was not kept");
+      await deps.stage(itemProposalFor(a, group, thread, posted.ts), group.channelKind);
     } catch (err) {
       rethrowIfBudget(err);
       console.error(`[follow-through] ${a.c.id}: posted, not staged: ${err instanceof Error ? err.message : String(err)}`);
       failed.push(a);
     }
   }
-  if (failed.length && kept) {
-    const message = await markNotStaged(deps.reports, sent.ts, failed.map((a) => a.c.id), FOLLOW_UP_NOT_STAGED).catch(() => null);
-    if (message) await deps.slack.edit(group.to.channel, sent.ts, message).catch(() => {});
+  if (failed.length && posted.kept) {
+    const message = await markNotStaged(deps.reports, posted.ts, failed.map((a) => a.c.id), FOLLOW_UP_NOT_STAGED).catch(() => null);
+    if (message) await deps.slack.edit(group.to.channel, posted.ts, message).catch(() => {});
   }
   // Marked only when the follow-up went into the team's own thread (a to-do's):
   // there replies are the team talking to each other. One at the channel's top,
@@ -947,12 +1074,81 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
       holds: 0,
       remindedOn: runDate,
       dueAt: endOfEtDay(addWorkingDays(etDayOf(now), CARD_REARM_WORKING_DAYS)),
-      ...(firstAsk ? { nudgeTs: sent.ts } : { followupTs: sent.ts }),
+      ...(firstAsk ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
     });
     await deps.store.saveText(a.c.id, { ...a.text, onCard: true }, now + TEXT_KEEP_MS);
-    actions.push({ id: a.c.id, action: firstAsk ? "nudged" : "followed-up", text: report.text, ts: sent.ts });
+    actions.push({ id: a.c.id, action: firstAsk ? "nudged" : "followed-up", text: posted.text, ts: posted.ts });
   }
-  return [...actions, ...later];
+  return actions;
+}
+
+/** What the commitment job's report says of a card it handed over: asked
+ *  once the sweep's post puts it up. */
+const HANDED_OFF = "handed to the sweep's morning post";
+
+/**
+ * The cards the commitment job handed over, for the sweep's morning post
+ * (`SweepFollowUps`): each channel's cards, and what the opener says of a
+ * person's. A sweep report claims a place before it posts, and finds it again
+ * by its card key on a retry; a place is cleared from the hand-off before its
+ * rows are asked, so a stop past that point leaves them checked and not
+ * asked, and they come back the next morning.
+ *
+ * @param deps - Its reads, Slack, store and the hand-off
+ * @param now - Now, epoch ms
+ * @param runDate - The morning's date
+ */
+export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): SweepFollowUps {
+  const handOff = deps.handOff;
+  const dateOf = (cardKey: string) => cardKey.slice(0, 10);
+  const cardsOf = (date: string, group: FollowUpGroup): FollowUpCards => ({
+    date,
+    channel: group.to.channel,
+    cards: group.asked.map((a) => ({ person: a.c.promiserId, item: a.item })),
+    says(ids) {
+      const mine = group.asked.filter((a) => ids.includes(a.c.id));
+      return followUpParent(
+        mine.map((a) => a.c.kind as CardKind),
+        mine.every((a) => a.c.nudges === 0),
+      );
+    },
+  });
+  /** The place's cards, out of the hand-off; null when already taken. */
+  const take = async (place: FollowUpCards): Promise<FollowUpGroup | null> => {
+    const kept = (await handOff?.places(place.date))?.get(place.channel);
+    if (!kept) return null;
+    await handOff!.clear(place.date, place.channel);
+    return kept.group;
+  };
+  return {
+    async waiting() {
+      const places = (await handOff?.places(runDate)) ?? new Map<string, HandedOff>();
+      return [...places.values()].filter((p) => !p.claimedBy).map((p) => cardsOf(runDate, p.group));
+    },
+    claim: (place, cardKey) => handOff?.claim(place.date, place.channel, cardKey) ?? Promise.resolve(),
+    async claimed(cardKey) {
+      const date = dateOf(cardKey);
+      const place = [...((await handOff?.places(date))?.values() ?? [])].find((p) => p.claimedBy === cardKey);
+      return place ? cardsOf(date, place.group) : null;
+    },
+    unclaim: (cardKey) => handOff?.unclaim(dateOf(cardKey), cardKey) ?? Promise.resolve(),
+    async postAlone(place) {
+      const group = await take(place);
+      if (!group) return;
+      const actions = await postGroup(deps, group, now, runDate);
+      await noteUntagged(deps, group, actions);
+    },
+    async posted(place, shown, posted) {
+      const group = await take(place);
+      if (!group) return;
+      const actions = await askedOn(deps, group, group.asked.filter((a) => shown.includes(a.c.id)), { ...posted, kept: true }, now, runDate);
+      await noteUntagged(deps, group, actions);
+    },
+    async notPosted(place, why) {
+      const group = await take(place);
+      for (const a of group?.asked ?? []) await holdCard(deps, a.c, now, runDate, why);
+    },
+  };
 }
 
 /**
@@ -960,7 +1156,7 @@ async function postGroup(deps: DueDeps, group: Group, now: number, runDate: stri
  * when a Team Members cell would let it (`../usage/gap-notes.ts`). Throws a
  * budget stop.
  */
-async function noteUntagged(deps: Pick<DueDeps, "gaps" | "dryRun">, group: Group, actions: readonly CommitmentAction[]): Promise<void> {
+async function noteUntagged(deps: Pick<DueDeps, "gaps" | "dryRun">, group: FollowUpGroup, actions: readonly CommitmentAction[]): Promise<void> {
   if (!deps.gaps || deps.dryRun) return;
   const posted = new Set(actions.filter((a) => a.action === "nudged" || a.action === "followed-up").map((a) => a.id));
   const names = [...new Set(group.asked.filter((a) => posted.has(a.c.id)).flatMap((a) => a.text.unmatched ?? []))];
@@ -972,7 +1168,7 @@ async function noteUntagged(deps: Pick<DueDeps, "gaps" | "dryRun">, group: Group
  * the follow-up's thread, for 72 hours. No confirmer set: a card is the
  * team's, so whoever knows where it stands decides it.
  */
-function itemProposalFor(a: Asked, group: Group, thread: string, messageTs: string): PendingProposal {
+function itemProposalFor(a: Asked, group: FollowUpGroup, thread: string, messageTs: string): PendingProposal {
   const card = a.card;
   const first = card.operations[0]!;
   return {

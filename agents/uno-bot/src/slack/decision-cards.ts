@@ -41,6 +41,26 @@ import type {
  *  report's next run, wherever that report keeps its queue. */
 export const MAX_REPORT_ITEMS = 10;
 
+/**
+ * At most `max` of the groups' items, a round at a time in the groups' order,
+ * so every owner has a card before anyone has a second; kept by group.
+ */
+export function roundRobin<K, T>(groups: ReadonlyMap<K, readonly T[]>, max: number): Map<K, T[]> {
+  const picked = new Map<K, T[]>([...groups.keys()].map((k) => [k, []]));
+  let left = max;
+  for (let round = 0; left > 0; round += 1) {
+    let any = false;
+    for (const [key, items] of groups) {
+      if (left === 0 || round >= items.length) continue;
+      picked.get(key)!.push(items[round]!);
+      left -= 1;
+      any = true;
+    }
+    if (!any) break;
+  }
+  return picked;
+}
+
 /** Each card's Review (View once decided) action id: this, then the item's
  *  entry id — unique within the message, as Slack asks of action ids. */
 export const DECISION_REVIEW_ACTION_PREFIX = "uno_decision_review:";

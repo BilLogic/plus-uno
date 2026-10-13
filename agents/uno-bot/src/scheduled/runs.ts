@@ -17,6 +17,7 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import type { RunnerStorage } from "../runner/storage";
 import { END_OF_DAY_RUN_HOUR_ET, etDayOf, etParts, MORNING_RUN_HOUR_ET, sweptDayOf } from "../sweep/schedule";
 import { CLASSIFY_BATCHES } from "../usage/classify-run";
 import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
@@ -164,6 +165,13 @@ export interface JobContext {
   readonly dryRun: boolean;
   /** The date of the run the job was queued under (`ScheduledRun.date`). */
   readonly runDate: string;
+  /**
+   * The run's own runner storage, where one job leaves what a later job of
+   * the same run takes, read by exact key and consistent between alarms
+   * (the card follow-ups `sweep-post` puts on a channel's report). Absent on
+   * a rehearsal.
+   */
+  readonly runStorage?: Pick<RunnerStorage, "get" | "put" | "delete">;
 }
 
 /** A run, planned for one date. */
@@ -212,10 +220,12 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
     { key: "figma-dev-links-pr", kind: "figma-dev-links-pr", after: ["figma-library-track"] },
-    { key: "sweep-post", kind: "sweep-post" },
+    // Before the sweep's post, which puts the card follow-ups it hands off
+    // for a channel's top on that channel's one message.
+    { key: "commitment-nudge", kind: "commitment-nudge" },
+    { key: "sweep-post", kind: "sweep-post", after: ["commitment-nudge"] },
     { key: FIGMA_DECISIONS_POST_KEY, kind: "sweep-figma-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
-    { key: "commitment-nudge", kind: "commitment-nudge" },
     // Before the post, so a question its file caught up with overnight is
     // withdrawn first.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },

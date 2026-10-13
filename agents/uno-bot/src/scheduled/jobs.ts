@@ -20,7 +20,7 @@ import { runLibraryPost, runLibraryTrack, runSnapshotRefreshOnEnv } from "../fig
 import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
-import { cardTodoNoteHookFor, cardTodoThreadHookFor, runCardFollowThroughOnEnv } from "../follow-through/env";
+import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
 import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
@@ -57,9 +57,13 @@ const sweepBody: JobBody = async (env, job, ctx) => {
     job.kind === "sweep-post" || job.kind === "sweep-dms" || job.kind === "sweep-figma-comments" || job.kind === "sweep-figma-post"
       ? undefined
       : fileDriftSinkFor(env);
+  // The morning's post takes the card follow-ups handed off for a channel's
+  // top, so the channel gets one message (src/follow-through/).
+  const followUps = job.kind === "sweep-post" ? morningFollowUpsFor(env, ctx) : undefined;
   const report = await runSweepJobOnEnv(env, job, ctx, {
     ...sweepHooks(env, job, ctx),
     ...(fileDrift ? { fileDrift } : {}),
+    ...(followUps ? { followUps } : {}),
   });
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
@@ -138,7 +142,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // edited that day (src/sweep/records.ts).
   "sweep-notes": sweepBody,
   "sweep-cards": sweepBody,
-  // Morning: the findings whose morning has come become proposal cards.
+  // Morning: the findings whose morning has come become proposal cards, on
+  // each channel's one report beside its handed-off card follow-ups.
   "sweep-post": sweepBody,
   // End of day: decisions in the day's Figma comments, kept for the morning;
   // morning: one #plus-design thread per file (src/figma-comments/).
@@ -181,7 +186,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, ctx)).summary}`);
   },
   // Morning: each due commitment is checked for completion, then nudged in its
-  // thread (src/commitments/).
+  // thread; card follow-ups for a channel's top are handed to sweep-post
+  // (src/commitments/, src/follow-through/).
   "commitment-nudge": async (env, job, ctx) => {
     const report = await runCommitmentNudgesOnEnv(env, job, ctx);
     console.log(`[commitments] ${job.key}: ${report.summary}`);
