@@ -24,6 +24,17 @@
 //     (#339's Button: one `fill` prop, a set per fill);
 //   • axis-values / missing-axis — an enum prop whose values a Figma axis
 //     lacks or adds, or which no axis carries at all.
+//
+// A code value counts as present when its prop's own axis has it, or an axis
+// that carries no code prop at all (Textarea's `validation`, whose
+// `invalid`/`valid` its value map reads as `error`/`success`). Values match
+// whatever their separators: `read-only` is `readonly`.
+//
+// A difference a person decided is deliberate is recorded in the component's
+// MDX `figmaMeta.deliberate` — the code prop, then a one-line reason — which
+// the registry carries as `figma.deliberate`. Every disagreement on that prop
+// is skipped while the record stands, and comes back when it goes.
+//
 // A Figma set nothing in code maps to is NOT reported: #339 found most are
 // internal parts, documentation sets or archived, and the registry has no
 // marker telling those from a real gap, so every week would repeat them.
@@ -93,6 +104,8 @@ export interface PrecedenceRegistry {
         props?: Record<string, { type?: string; values?: string[] }>;
       };
       figma?: {
+        /** Code prop → why its difference from the library is deliberate. */
+        deliberate?: Record<string, string>;
         sets?: Array<{
           name?: string;
           componentSetNodeId?: string;
@@ -201,6 +214,8 @@ export function liveLibraryFrom(result: FigmaComponentsResponse): LiveLibrary {
 const norm = (s: string) => s.trim().toLowerCase();
 /** A value as both sides compare it: Figma's "(default)" marker dropped. */
 const normValue = (s: string) => norm(s.replace(/\(default\)/i, ""));
+/** A value as the comparison matches it: "(default)" and separators gone. */
+const valueKey = (s: string) => normValue(s).replace(/[\s_-]+/g, "");
 /** A name as the loose existence match reads it: letters and digits only. */
 const loose = (s: string) => norm(s).replace(/[^a-z0-9]/g, "").replace(/s$/, "");
 
@@ -237,7 +252,7 @@ function propOfAxis(s: RegistrySet, axis: string, props: readonly string[]): str
 /** A Figma value in code's words: the registry's value map, when it names one. */
 function codeValueOf(s: RegistrySet, axis: string, value: string): string {
   const map = Object.entries(s.variantValueMap ?? {}).find(([a]) => norm(a) === norm(axis))?.[1];
-  const hit = map ? Object.entries(map).find(([v]) => norm(v) === norm(value) || normValue(v) === normValue(value)) : undefined;
+  const hit = map ? Object.entries(map).find(([v]) => valueKey(v) === valueKey(value)) : undefined;
   return typeof hit?.[1] === "string" ? normValue(hit[1]) : normValue(value);
 }
 
@@ -305,24 +320,42 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
     const props = Object.entries(reg?.code?.props ?? {});
     const propNames = props.map(([p]) => p);
     const withAxes = resolved.filter((r) => r.live && Object.keys(r.live.axes).length);
+    const deliberate = reg?.figma?.deliberate ?? {};
+    /** Every value on an axis that carries no code prop, as the comparison
+     *  matches it. A mapped axis's values belong to its own prop, so a common
+     *  `default` there cannot hide another prop's gap. */
+    const unmapped = new Set(
+      withAxes.flatMap((r) =>
+        Object.entries(r.live!.axes)
+          .filter(([axis]) => propOfAxis(r.registrySet, axis, propNames) === null)
+          .flatMap(([axis, values]) => values.map((v) => valueKey(codeValueOf(r.registrySet, axis, v)))),
+      ),
+    );
     for (const [prop, def] of props) {
       if (def.type !== "enum" || !def.values?.length) continue;
+      if (Object.hasOwn(deliberate, prop)) continue;
       const codeValues = def.values.map(normValue);
-      const figmaValues = new Set<string>();
+      const codeKeys = new Set(codeValues.map(valueKey));
+      /** The prop's own axes' values by match key, each as Figma spells it. */
+      const figmaValues = new Map<string, string>();
       let carried = false;
       for (const r of withAxes) {
         for (const [axis, values] of Object.entries(r.live!.axes)) {
           if (propOfAxis(r.registrySet, axis, propNames) !== prop) continue;
           carried = true;
-          for (const v of values) figmaValues.add(codeValueOf(r.registrySet, axis, v));
+          for (const v of values) {
+            const value = codeValueOf(r.registrySet, axis, v);
+            if (!figmaValues.has(valueKey(value))) figmaValues.set(valueKey(value), value);
+          }
         }
       }
       const pinned = resolved.filter((r) => typeof r.registrySet.codeDefaults?.[prop] === "string");
       const pinnedValues = [...new Set(pinned.map((r) => normValue(String(r.registrySet.codeDefaults![prop]))))];
+      const pinnedKeys = new Set(pinnedValues.map(valueKey));
       const firstUrl = setUrl(pinned[0] ?? withAxes[0] ?? resolved[0]!);
 
       if (!carried && pinnedValues.length >= 2) {
-        const uncovered = codeValues.filter((v) => !pinnedValues.includes(v));
+        const uncovered = codeValues.filter((v) => !pinnedKeys.has(valueKey(v)));
         const sets = [...new Set(pinned.map((r) => r.live?.name ?? r.registrySet.name ?? "?"))];
         report(
           "prop-as-sets",
@@ -334,10 +367,10 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
         );
         continue;
       }
-      if (!carried && pinnedValues.length === 1) pinnedValues.forEach((v) => figmaValues.add(v));
+      if (!carried && pinnedValues.length === 1) figmaValues.set(valueKey(pinnedValues[0]!), pinnedValues[0]!);
       if (carried || pinnedValues.length === 1) {
-        const lacks = codeValues.filter((v) => !figmaValues.has(v));
-        const adds = [...figmaValues].filter((v) => !codeValues.includes(v));
+        const lacks = codeValues.filter((v) => !figmaValues.has(valueKey(v)) && !unmapped.has(valueKey(v)));
+        const adds = [...figmaValues].filter(([key]) => !codeKeys.has(key)).map(([, value]) => value);
         if (lacks.length || adds.length) {
           report(
             "axis-values",

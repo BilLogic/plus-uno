@@ -53,11 +53,13 @@ export const figmaMeta = {
       variantValueMap: { /* Figma enum label → code value */ },
       status: "verified"
     }
-  ]
+  ],
+  deliberate: { /* optional: code prop → one-line reason it differs from the library on purpose */ }
 };
 ```
 
 - To change a mapping (node ID, variants, props), **edit the component's MDX `figmaMeta`**, not the registry.
+- `deliberate` is where a person settles a DS precedence row as intended: one entry per code prop, its value the reason in one line, e.g. `deliberate: { "size": "Code sizes the textarea; the library sizes it by its frame." }`. The registry carries it as `figma.deliberate`, and the weekly DS precedence check skips every disagreement on that prop while the entry stands; delete the entry and the row comes back.
 - `component-registry.json` is regenerated from all `figmaMeta` exports.
 - `export const figmaMeta` is placed after imports and before `<Meta>`; Storybook does not render it.
 
