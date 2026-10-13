@@ -158,11 +158,12 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-library-track", "figma-library-track"],
     // A merged library PR's Dev Mode links card, once the tracker has queued it.
     ["figma-dev-links-pr", "figma-dev-links-pr"],
+    // Before the sweep's post, which takes the card follow-ups it hands off.
+    ["commitment-nudge", "commitment-nudge"],
     ["sweep-post", "sweep-post"],
     // The night's Figma comment decisions, one #plus-design thread per file (#900).
     ["sweep:figma-post", "sweep-figma-post"],
     ["ds-precedence-post", "ds-precedence-post"],
-    ["commitment-nudge", "commitment-nudge"],
     // A live drift question is looked at again before the morning asks anew.
     ["figma-drift-recheck", "figma-drift-recheck"],
     ["figma-drift-post", "figma-drift-post"],

@@ -133,13 +133,14 @@ const RECORDS_PER_JOB = 25;
  * @param opts - `dryRun` reads and detects, and writes, posts and stages
  *   nothing; `runDate` dates its records
  * @param extra - The per-thread hook other jobs read the sweep's threads with,
- *   and where file drift goes (`figma-drift/`)
+ *   where file drift goes (`figma-drift/`), and the card follow-ups the
+ *   morning's post takes (`follow-through/`)
  */
 export async function runSweepJobOnEnv(
   env: Env,
   job: ScheduledJob,
   opts: JobContext,
-  extra: Pick<SweepDeps, "onThread" | "onNote" | "onDmThread" | "fileDrift"> = {},
+  extra: Pick<SweepDeps, "onThread" | "onNote" | "onDmThread" | "fileDrift" | "followUps"> = {},
 ): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
     // No cursor store means every run would re-read the day; nothing is safer.

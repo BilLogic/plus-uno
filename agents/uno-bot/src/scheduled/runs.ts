@@ -212,10 +212,12 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
     { key: "figma-dev-links-pr", kind: "figma-dev-links-pr", after: ["figma-library-track"] },
-    { key: "sweep-post", kind: "sweep-post" },
+    // Before the sweep's post, which puts the card follow-ups it hands off
+    // for a channel's top on that channel's one message.
+    { key: "commitment-nudge", kind: "commitment-nudge" },
+    { key: "sweep-post", kind: "sweep-post", after: ["commitment-nudge"] },
     { key: FIGMA_DECISIONS_POST_KEY, kind: "sweep-figma-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
-    { key: "commitment-nudge", kind: "commitment-nudge" },
     // Before the post, so a question its file caught up with overnight is
     // withdrawn first.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },

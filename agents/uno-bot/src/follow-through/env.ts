@@ -14,6 +14,10 @@
 //     way (`stageSweepCard`) so it lands on the usage record as staged. A
 //     follow-up posted before the shared card stages its proposal card the
 //     same way, posted in its thread.
+//   • The hand-off: the cards for a channel's top wait in HARNESS_KV, one key
+//     a morning and channel under `follow-through:morning:`, kept two days,
+//     for the sweep's morning post to put on that channel's report
+//     (`morningFollowUpsFor`). Each read or write is one internal call.
 //   • The thread marks: the sweep card's (`markSweepThread`), so the team's
 //     replies under a follow-up don't start turns; and the follow-up reply
 //     mark (`./reply-mark.ts`), so only a reply in a thread holding an older
@@ -25,7 +29,7 @@
 
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
-import { budgetHeadroom } from "../net";
+import { budgetHeadroom, charge } from "../net";
 import { getBotIdentity, getPermalink, postMessage, updateMessage, usersInfo } from "../slack/api";
 import type { SlackMessageEvent } from "../slack/types";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
@@ -34,6 +38,7 @@ import { threadStateFor } from "../thread-state/production";
 import { gapNotesFor, notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { throughDirectory } from "./people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
+import type { SweepFollowUps } from "../sweep/run";
 import type { CommitmentRecord } from "../commitments/store";
 import { TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import type { ReminderReaction } from "../commitments/run";
@@ -56,6 +61,7 @@ import {
 import {
   answerCardFollowUp,
   cardFollowUps,
+  followUpsForSweep,
   cardTodoNoteHook,
   cardTodoThreadHook,
   followThroughProposal,
@@ -65,6 +71,9 @@ import {
   type AnswerDeps,
   type CardFollowUps,
   type CardPeople,
+  type DueDeps,
+  type FollowUpGroup,
+  type FollowUpHandOff,
   type CardProposal,
   type CardReads,
   type FollowThroughConfig,
@@ -181,18 +190,36 @@ export function cardTodoThreadHookFor(env: Env, opts: JobContext): ((thread: Swe
 }
 
 /**
- * The morning's handler for card rows, for the commitment job.
+ * The morning's handler for card rows, for the commitment job. The cards for
+ * a channel's top are handed off for the sweep's post.
  *
  * @param env - Worker bindings
  * @param opts - `dryRun` reads and posts nothing
  * @param botUserId - The bot's own id
  */
 export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?: string | null): CardFollowUps | undefined {
+  const deps = dueDepsFor(env, opts, botUserId);
+  return deps ? cardFollowUps(deps) : undefined;
+}
+
+/**
+ * The cards the commitment job handed off, for the sweep's morning post, or
+ * undefined without the bindings.
+ *
+ * @param env - Worker bindings
+ * @param opts - The sweep job's run
+ */
+export function morningFollowUpsFor(env: Env, opts: JobContext): SweepFollowUps | undefined {
+  const deps = dueDepsFor(env, opts);
+  return deps ? followUpsForSweep(deps, Date.now(), opts.runDate) : undefined;
+}
+
+function dueDepsFor(env: Env, opts: { dryRun: boolean }, botUserId?: string | null): DueDeps | undefined {
   const store = storeFor(env);
   if (!store || !env.HARNESS_KV) return undefined;
   const kv = env.HARNESS_KV;
   const threadState = threadStateFor(env);
-  return cardFollowUps({
+  return {
     reads: readsFor(env),
     people: peopleFor(env),
     slack: {
@@ -222,8 +249,48 @@ export function cardFollowUpsFor(env: Env, opts: { dryRun: boolean }, botUserId?
     markThread: (channel, thread) => markSweepThread(kv, channel, thread),
     config: configFor(env, botUserId),
     gaps: gapNotesFor(env),
+    handOff: kvHandOff(kv),
     dryRun: opts.dryRun,
-  });
+  };
+}
+
+/** Where the hand-off's keys start. */
+const HAND_OFF_PREFIX = "follow-through:morning:";
+/** A morning's hand-off outlives its sweep post by a day, then goes. */
+const HAND_OFF_TTL_SECONDS = 2 * 24 * 60 * 60;
+
+/** The hand-off in KV: one key a morning and channel, so two channels never
+ *  overwrite each other's cards. */
+function kvHandOff(kv: KVNamespace): FollowUpHandOff {
+  const key = (runDate: string, channel: string) => `${HAND_OFF_PREFIX}${runDate}:${channel}`;
+  const read = async (k: string): Promise<FollowUpGroup | null> => {
+    charge(1, "kv");
+    return kv.get<FollowUpGroup>(k, "json");
+  };
+  return {
+    async put(runDate, group) {
+      const k = key(runDate, group.to.channel);
+      const kept = await read(k);
+      const ids = new Set(group.asked.map((a) => a.c.id));
+      const asked = [...(kept?.asked ?? []).filter((a) => !ids.has(a.c.id)), ...group.asked];
+      charge(1, "kv");
+      await kv.put(k, JSON.stringify({ ...group, asked }), { expirationTtl: HAND_OFF_TTL_SECONDS });
+    },
+    async list(runDate) {
+      charge(1, "kv");
+      const { keys } = await kv.list({ prefix: `${HAND_OFF_PREFIX}${runDate}:` });
+      const groups: FollowUpGroup[] = [];
+      for (const { name } of keys) {
+        const group = await read(name);
+        if (group?.asked.length) groups.push(group);
+      }
+      return groups;
+    },
+    async clear(runDate, channel) {
+      charge(1, "kv");
+      await kv.delete(key(runDate, channel));
+    },
+  };
 }
 
 /**

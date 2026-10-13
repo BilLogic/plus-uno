@@ -146,11 +146,11 @@ test("the probe dry-runs the named run's jobs", async () => {
     ["figma-library-track", "handled", 0],
     // No KV bound: no merged PR waits for its Dev Mode links card.
     ["figma-dev-links-pr", "handled", 0],
+    ["commitment-nudge", "handled", 0],
     ["sweep-post", "handled", 0],
     // No sweep store bound: the Figma decision post says so and spends nothing.
     ["sweep:figma-post", "handled", 0],
     ["ds-precedence-post", "handled", 0],
-    ["commitment-nudge", "handled", 0],
     ["figma-drift-recheck", "handled", 0],
     ["figma-drift-post", "handled", 0],
     // No Notion key: the roster read refuses before spending anything.
