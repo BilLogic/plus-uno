@@ -208,9 +208,6 @@ export interface Env {
    *  probe is what would. The working signal is agents.sessions.setStatus
    *  either way (#574). */
   SLACK_STREAMING?: string;
-  /** Comma-separated channel ids answer streaming is held to while it is on
-   *  trial; blank or unset means every channel. Plan streams ignore it. */
-  SLACK_STREAMING_CHANNELS?: string;
   /** "on" opens the turn's stream UP FRONT in `task_display_mode: "plan"` and
    *  routes the between-tool narration into it as task cards, instead of
    *  posting them as loose :hourglass: messages. Off by default: an early

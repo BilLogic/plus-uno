@@ -89,9 +89,6 @@ export interface PostingDeps {
   slack: PostingClient;
   /** `SLACK_STREAMING === "on"` — whether a new answer stream may open. */
   streamingOn: boolean;
-  /** `SLACK_STREAMING_CHANNELS` — the only channels an answer may stream in,
-   *  or `null` for every channel. */
-  streamChannels: ReadonlySet<string> | null;
   /** Where a capacity outage pings the team. */
   alertChannel: string;
   /** Best-effort throttle; absent means every capacity failure alerts. */
@@ -348,8 +345,6 @@ export async function postTextVerified(
   const ok = await deliverAnswer(answerMessages(body), {
     async stream(piece, withFooter, marker) {
       if (!(deps.streamingOn && threadTs)) return false;
-      // A channel off the trial list posts the ordinary way.
-      if (deps.streamChannels && !deps.streamChannels.has(channel)) return false;
       // An answer carrying a chart, a table, cards or a box posts as an
       // ordinary message: Slack does not document them in a stream, and a
       // stream's first part is not where they ride on a split answer anyway.
