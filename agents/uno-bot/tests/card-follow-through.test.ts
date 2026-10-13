@@ -54,14 +54,13 @@ import {
   type CardProposal,
   type DueDeps,
   type FollowThroughConfig,
-  type FollowUpGroup,
   type FollowUpHandOff,
   type ScanDeps,
   followUpsForSweep,
+  handOffIn,
 } from "../src/follow-through/index";
 import { at, BOT, DESIGN, drift, msg, NOTES_DB, notionPage, reply, sweepHarness, ts, UNIVERSAL, UNO_BOT, utcDay } from "./helpers/sweep-harness";
-import { sharedReport } from "../src/sweep/run";
-import { cardPlan } from "../src/sweep/cards";
+import { createInMemoryRunnerStorage } from "../src/runner/storage";
 import { recordingViews } from "./helpers/recording-slack";
 import { gapNotes, type GapNotes, type StoredTeamRoles } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
@@ -1035,7 +1034,7 @@ describe("shared rules", () => {
     assert.equal([...store.rows.values()].filter((r) => r.state === "nudged").length, 2);
   });
 
-  it("one person's cards from the same morning share one carousel; another channel's go in a message of their own", async () => {
+  it("cards group by place: a channel's cards from one morning share one carousel, and another channel's go in a message of their own", async () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({
       cards: [
@@ -2140,21 +2139,6 @@ describe("the morning's one message a channel", () => {
   const SWEEP_POST: ScheduledJob = { key: "sweep-post", kind: "sweep-post" };
   const STARTER = "U0STARTER";
 
-  /** The hand-off in memory, as KV keeps it: one group a channel. */
-  function handOff(): FollowUpHandOff & { kept: Map<string, FollowUpGroup> } {
-    const kept = new Map<string, FollowUpGroup>();
-    return {
-      kept,
-      async put(runDate, group) {
-        const was = kept.get(`${runDate}:${group.to.channel}`);
-        const ids = new Set(group.asked.map((a) => a.c.id));
-        kept.set(`${runDate}:${group.to.channel}`, structuredClone({ ...group, asked: [...(was?.asked ?? []).filter((a) => !ids.has(a.c.id)), ...group.asked] }));
-      },
-      list: async (runDate) => [...kept].filter(([k]) => k.startsWith(`${runDate}:`)).map(([, g]) => structuredClone(g)),
-      clear: async (runDate, channel) => void kept.delete(`${runDate}:${channel}`),
-    };
-  }
-
   /**
    * `n` fixes on one page, settled in a #plus-design thread the starter
    * opened and queued for the top of the channel — where a fix the Roadmap
@@ -2196,7 +2180,7 @@ describe("the morning's one message a channel", () => {
   /** The morning: the commitment job hands the channel's cards off, then the
    *  sweep's post puts them up. */
   async function morningOf(store: InMemoryCommitmentStore, rm: ReturnType<typeof roadmap>, h: ReturnType<typeof sweepHarness>, now: number) {
-    const stage = handOff();
+    const stage = handOffIn(createInMemoryRunnerStorage());
     const m = morning(store, rm, now, { handOff: stage, threadState: h.threadState });
     const nudged = await m.run();
     assert.equal(m.posts.length, 0, "the commitment job posts none of a channel's top cards");
@@ -2237,7 +2221,7 @@ describe("the morning's one message a channel", () => {
     assert.equal(row.state, "nudged");
     assert.equal(row.nudgeTs, post!.ts);
     assert.deepEqual(await h.store.pendingFindings(), []);
-    assert.equal(stage.kept.size, 0, "the hand-off is spent");
+    assert.equal((await stage.places(utcDay(now))).size, 0, "the hand-off is spent");
   });
 
   it("a morning with only the cards posts them as one message, as they read before", async () => {
@@ -2273,21 +2257,52 @@ describe("the morning's one message a channel", () => {
     assert.deepEqual([...store.rows.values()].map((r) => r.nudgeTs), [post!.ts, post!.ts]);
   });
 
-  it("a DM tags nobody", async () => {
-    const h = await fixesAtTop(1, at(30, 13));
-    const [fix] = await h.store.pendingFindings();
-    const plan = cardPlan("2026-09-30:D0DM:x", { rung: "private", channel: "D0DM", threadTs: null }, [fix!]);
-    const { report } = sharedReport(
-      plan,
-      {
-        channel: "D0DM",
-        cards: [{ person: BEA, item: { id: "card-a", title: "Card a", body: "Worked for a week.", owners: [{ slack: BEA }], open: { label: "Open card", url: "https://www.notion.so/a" } } }],
-        says: () => "A Roadmap card has been worked for over a week with no Contributor.",
-      },
-      "D0DM",
-    );
-    assert.equal(cardsOf(report.blocks).length, 2);
-    assert.doesNotMatch(JSON.stringify(report.blocks), /<@/);
-    assert.doesNotMatch(report.text, /<@/);
+  it("a stop after the shared post: the retry stages what it showed, and posts nothing again", async () => {
+    const now = at(30, 13);
+    const { store, rm } = await beasCards();
+    const h = await fixesAtTop(1, now);
+    const stage = handOffIn(createInMemoryRunnerStorage());
+    const m = morning(store, rm, now, { handOff: stage, threadState: h.threadState });
+    await m.run();
+    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    // Slack took the post; the job heard nothing back.
+    h.faults.post = new SubrequestBudgetError(38);
+    await assert.rejects(runSweepJob(SWEEP_POST, h.deps), SubrequestBudgetError);
+    assert.equal(h.posted.length, 1);
+    assert.equal(m.staged.length, 0);
+    assert.equal(only(store).state, "open", "not asked until it is staged");
+
+    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    await runSweepJob(SWEEP_POST, h.deps);
+    assert.equal(h.posted.length + m.posts.length, 1, "nothing goes up twice");
+    const [post] = h.posted;
+    assert.equal(h.staged.length, 1);
+    assert.equal(m.staged.length, 1);
+    assert.equal(m.staged[0]!.item?.messageTs, post!.ts);
+    assert.equal(only(store).nudgeTs, post!.ts);
+    assert.equal((await stage.places(utcDay(now))).size, 0);
+  });
+
+  it("the hand-off keeps a morning's places under one key: merged by row, claimed, given back, cleared", async () => {
+    const now = at(30, 13);
+    const { store, rm } = await beasCards(true);
+    const storage = createInMemoryRunnerStorage();
+    const kept: FollowUpHandOff = handOffIn(storage);
+    const m = morning(store, rm, now, { handOff: kept });
+    await m.run();
+    const day = utcDay(now);
+    const [place] = [...(await kept.places(day)).values()];
+    assert.equal(place!.group.asked.length, 2);
+    // A retried commitment job adds its rows again: each is kept once.
+    await kept.put(day, { ...place!.group, asked: [place!.group.asked[0]!] });
+    assert.equal((await kept.places(day)).get(DESIGN)!.group.asked.length, 2);
+
+    await kept.claim(day, DESIGN, `${day}:x:y`);
+    assert.equal((await kept.places(day)).get(DESIGN)!.claimedBy, `${day}:x:y`);
+    await kept.unclaim(day, `${day}:x:y`);
+    assert.equal((await kept.places(day)).get(DESIGN)!.claimedBy, undefined);
+
+    await kept.clear(day, DESIGN);
+    assert.equal(await storage.get(`follow-ups:${day}`), undefined, "an empty morning leaves no key");
   });
 });

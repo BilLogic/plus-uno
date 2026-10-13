@@ -11,6 +11,7 @@ import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { itemProposalKey } from "../src/slack/decision-cards";
 import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
+import type { FollowUpCards, SweepFollowUps } from "../src/sweep/run";
 import { recordSweepResolution } from "../src/sweep/outcomes";
 import { resolveSignal } from "../src/gate/index";
 import { recordProposalEvents, verdictEvents } from "../src/usage/index";
@@ -967,4 +968,73 @@ test("a dry run returns the findings and the card text, and writes and posts not
   assert.deepEqual(real.posted, []);
   assert.deepEqual(real.staged, []);
   assert.equal((await real.store.pendingFindings()).length, 1, "the queue is untouched");
+});
+
+// ── A channel's card follow-ups on its report ────────────────────────────────
+
+/** One channel's handed-off follow-ups, as the commitment job leaves them,
+ *  and what the morning did with them. */
+function handedOff(place: FollowUpCards) {
+  const calls: string[] = [];
+  let waiting = true;
+  const port: SweepFollowUps = {
+    waiting: async () => (waiting ? [place] : []),
+    claim: async (_place, cardKey) => void calls.push(`claim ${cardKey}`),
+    claimed: async () => null,
+    unclaim: async () => {},
+    postAlone: async () => void ((waiting = false), calls.push("alone")),
+    posted: async (_place, shown) => void ((waiting = false), calls.push(`posted ${shown.join(",")}`)),
+    notPosted: async () => void ((waiting = false), calls.push("not posted")),
+  };
+  return { port, calls };
+}
+
+/** A fix settled in a #plus-design thread, queued for `where` instead. */
+async function fixAt(where: { channel: string; channelKind: "public" | "dm" }) {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  const queued = await h.store.pendingFindings();
+  await h.store.addFindings(queued.map((f) => ({ ...f, evidence: { ...f.evidence, ...where, threadTs: null } })));
+  h.clock.now = at(30, 13);
+  return h;
+}
+
+const cardFor = (channel: string, owners: string[]): FollowUpCards => ({
+  date: "2026-09-30",
+  channel,
+  cards: [{ person: owners[0]!, item: { id: "card-a", title: "Card a", body: "Worked for a week.", owners: owners.map((slack) => ({ slack })), open: { label: "Open card", url: "https://www.notion.so/a" } } }],
+  says: () => "A Roadmap card has been worked for over a week with no Contributor.",
+});
+
+test("a follow-up card's co-owners each get a bullet on the channel's report, as its owner does", async () => {
+  const h = await fixAt({ channel: DESIGN, channelKind: "public" });
+  const { port, calls } = handedOff(cardFor(DESIGN, ["U0BEA", "U0MAYA"]));
+  h.deps.followUps = port;
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1);
+  const head = h.posted[0]!.text.split("\n").filter((l) => l.startsWith("• <@"));
+  assert.deepEqual(head.map((l) => /^• <@(U[A-Z0-9]+)>/.exec(l)![1]), ["U0ADE", "U0BEA", "U0MAYA"]);
+  assert.equal(head[2], "• <@U0MAYA>, a Roadmap card has been worked for over a week with no Contributor.");
+  // Claimed before it posted, staged once it did.
+  assert.deepEqual(calls, [`claim ${h.posted[0]!.cardKey}`, "posted card-a"]);
+});
+
+test("a DM's report with a follow-up on it tags nobody", async () => {
+  const h = await fixAt({ channel: "D0DM", channelKind: "dm" });
+  const { port, calls } = handedOff(cardFor("D0DM", ["U0BEA"]));
+  h.deps.followUps = port;
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1);
+  assert.equal(h.posted[0]!.channel, "D0DM");
+  assert.doesNotMatch(h.posted[0]!.text, /<@/);
+  assert.doesNotMatch(JSON.stringify(h.posted[0]!.blocks), /<@/);
+  assert.equal(calls.at(-1), "posted card-a");
 });

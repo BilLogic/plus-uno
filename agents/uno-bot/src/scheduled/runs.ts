@@ -17,6 +17,7 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import type { RunnerStorage } from "../runner/storage";
 import { END_OF_DAY_RUN_HOUR_ET, etDayOf, etParts, MORNING_RUN_HOUR_ET, sweptDayOf } from "../sweep/schedule";
 import { CLASSIFY_BATCHES } from "../usage/classify-run";
 import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
@@ -164,6 +165,13 @@ export interface JobContext {
   readonly dryRun: boolean;
   /** The date of the run the job was queued under (`ScheduledRun.date`). */
   readonly runDate: string;
+  /**
+   * The run's own runner storage, where one job leaves what a later job of
+   * the same run takes, read by exact key and consistent between alarms
+   * (the card follow-ups `sweep-post` puts on a channel's report). Absent on
+   * a rehearsal.
+   */
+  readonly runStorage?: Pick<RunnerStorage, "get" | "put" | "delete">;
 }
 
 /** A run, planned for one date. */

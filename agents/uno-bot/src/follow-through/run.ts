@@ -35,13 +35,15 @@
 //   week. A stop before `flush` hands the held rows back (`release`), so the
 //   next run posts them.
 //
-//   ONE MESSAGE A CHANNEL. The cards for the top of a channel do not post
-//   from the commitment job when it has a hand-off (`DueDeps.handOff`, KV):
-//   `flush` leaves them there, and the sweep's morning post, which runs after
-//   it, puts them on that channel's report beside its own fixes — a bullet
-//   per person, one carousel (`followUpsForSweep`, `sweep/run.ts`). A channel
-//   the sweep has no report for gets them alone, as this job would have
-//   posted them. A card in a thread still posts here.
+//   ONE MESSAGE A CHANNEL. With a hand-off (`DueDeps.handOff`: the morning
+//   run's own runner storage, one key a morning, `handOffIn`), `flush` leaves
+//   the cards for a channel's top there, and `sweep-post`, queued after this
+//   job, puts them on that channel's report beside its fixes: a bullet per
+//   person, one carousel (`followUpsForSweep`, `sweep/run.ts`). A channel the
+//   sweep has no report for gets them alone, as this job would have posted
+//   them. A sweep report claims a channel's cards before it posts, so a
+//   retried post finds them by its card key and never sends them twice. A
+//   card in a thread still posts here.
 //
 // WHAT REVIEW HOLDS. Each card is its own proposal, one item of its report.
 // F3's is the drafted Roadmap card (`notion_create`, PRD template), decided
@@ -79,7 +81,8 @@ import { escapeSlackText } from "../slack/mrkdwn";
 import type { ProposalCard } from "../turn/index";
 import type { PendingProposal, ProposalOperation, ProposalSelect, ReportItem, ReviewChoice, ThreadState } from "../thread-state/index";
 import { decisionReport, itemProposal, markNotStaged, MAX_REPORT_ITEMS, reportRecord, roundRobin, type ReportStore } from "../slack/decision-cards";
-import type { SweepFollowUps } from "../sweep/run";
+import type { RunnerStorage } from "../runner/storage";
+import type { FollowUpCards, SweepFollowUps } from "../sweep/run";
 import { renderProposalCard } from "../slack/proposal-render";
 import { reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, maySnooze, TEXT_KEEP_MS } from "../commitments/due";
@@ -653,15 +656,71 @@ export interface DueDeps {
   dryRun?: boolean;
 }
 
-/** The morning's cards for the top of a channel, held for the sweep's post
- *  (KV in production, one key a channel and morning). */
+/** The morning's cards for the top of a channel, held for the sweep's post. */
 export interface FollowUpHandOff {
   /** Keep a place's cards, beside any an earlier try kept. */
   put(runDate: string, group: FollowUpGroup): Promise<void>;
-  /** Every place's cards kept for this morning. */
-  list(runDate: string): Promise<FollowUpGroup[]>;
+  /** Every place's cards kept for a morning, by channel. */
+  places(runDate: string): Promise<Map<string, HandedOff>>;
+  /** A sweep report takes a place's cards, before it posts. */
+  claim(runDate: string, channel: string, cardKey: string): Promise<void>;
+  /** A report that never went up gives its place's cards back. */
+  unclaim(runDate: string, cardKey: string): Promise<void>;
   /** A place's cards are posted, or given up: they are not kept. */
   clear(runDate: string, channel: string): Promise<void>;
+}
+
+/** One place's handed-off cards, and the sweep report that claimed them. */
+export interface HandedOff {
+  group: FollowUpGroup;
+  claimedBy?: string;
+}
+
+/** Where a morning's hand-off is kept in the run's storage. */
+const HAND_OFF_PREFIX = "follow-ups:";
+
+/**
+ * The hand-off in the morning run's runner storage: one key a morning, its
+ * places by channel, read and written whole by that exact key — consistent
+ * between the run's alarms, which share the instance.
+ *
+ * @param storage - The run's storage (`JobContext.runStorage`)
+ */
+export function handOffIn(storage: Pick<RunnerStorage, "get" | "put" | "delete">): FollowUpHandOff {
+  const keyOf = (runDate: string) => `${HAND_OFF_PREFIX}${runDate}`;
+  const read = async (runDate: string) => new Map(Object.entries((await storage.get<Record<string, HandedOff>>(keyOf(runDate))) ?? {}));
+  const write = async (runDate: string, places: Map<string, HandedOff>) => {
+    if (places.size) await storage.put(keyOf(runDate), Object.fromEntries(places));
+    else await storage.delete(keyOf(runDate));
+  };
+  const change = async (runDate: string, edit: (places: Map<string, HandedOff>) => void) => {
+    const places = await read(runDate);
+    edit(places);
+    await write(runDate, places);
+  };
+  return {
+    put: (runDate, group) =>
+      change(runDate, (places) => {
+        const was = places.get(group.to.channel);
+        const ids = new Set(group.asked.map((a) => a.c.id));
+        const asked = [...(was?.group.asked ?? []).filter((a) => !ids.has(a.c.id)), ...group.asked];
+        places.set(group.to.channel, { ...was, group: { ...group, asked } });
+      }),
+    places: read,
+    claim: (runDate, channel, cardKey) =>
+      change(runDate, (places) => {
+        const place = places.get(channel);
+        if (place) places.set(channel, { ...place, claimedBy: cardKey });
+      }),
+    unclaim: (runDate, cardKey) =>
+      change(runDate, (places) => {
+        for (const [channel, place] of places) if (place.claimedBy === cardKey) places.set(channel, { group: place.group });
+      }),
+    clear: (runDate, channel) =>
+      change(runDate, (places) => {
+        places.delete(channel);
+      }),
+  };
 }
 
 /** The morning's handler for card rows, handed to the commitment job: `due`
@@ -719,7 +778,7 @@ export function cardFollowUps(deps: DueDeps): CardFollowUps {
           await deps.handOff.put(runDate, group);
           for (const a of group.asked) {
             morning.held.delete(a.c.id);
-            actions.push({ id: a.c.id, action: a.c.nudges === 0 ? "nudged" : "followed-up", note: HANDED_OFF });
+            actions.push({ id: a.c.id, action: "held", note: HANDED_OFF });
           }
           morning.groups.delete(key);
           continue;
@@ -1023,59 +1082,71 @@ async function askedOn(
   return actions;
 }
 
-/** What the commitment job's report says of a card it handed over. */
-export const HANDED_OFF = "goes up on the channel's morning report, beside the sweep's fixes";
+/** What the commitment job's report says of a card it handed over: asked
+ *  once the sweep's post puts it up. */
+const HANDED_OFF = "handed to the sweep's morning post";
 
 /**
  * The cards the commitment job handed over, for the sweep's morning post
  * (`SweepFollowUps`): each channel's cards, and what the opener says of a
- * person's; posted alone, or on the channel's report beside the sweep's
- * fixes. A place leaves the hand-off before anything of it is sent, so a
- * retried sweep never posts it twice: a stop past that point leaves its rows
- * checked and not asked, and they come back the next morning.
+ * person's. A sweep report claims a place before it posts, and finds it again
+ * by its card key on a retry; a place is cleared from the hand-off before its
+ * rows are asked, so a stop past that point leaves them checked and not
+ * asked, and they come back the next morning.
  *
  * @param deps - Its reads, Slack, store and the hand-off
  * @param now - Now, epoch ms
  * @param runDate - The morning's date
  */
 export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): SweepFollowUps {
-  const groups = new Map<string, FollowUpGroup>();
-  const take = async (channel: string): Promise<FollowUpGroup> => {
-    const group = groups.get(channel);
-    if (!group) throw new Error(`no follow-ups for ${channel} this morning`);
-    groups.delete(channel);
-    await deps.handOff?.clear(runDate, channel);
-    return group;
+  const handOff = deps.handOff;
+  const dateOf = (cardKey: string) => cardKey.slice(0, 10);
+  const cardsOf = (date: string, group: FollowUpGroup): FollowUpCards => ({
+    date,
+    channel: group.to.channel,
+    cards: group.asked.map((a) => ({ person: a.c.promiserId, item: a.item })),
+    says(ids) {
+      const mine = group.asked.filter((a) => ids.includes(a.c.id));
+      return followUpParent(
+        mine.map((a) => a.c.kind as CardKind),
+        mine.every((a) => a.c.nudges === 0),
+      );
+    },
+  });
+  /** The place's cards, out of the hand-off; null when already taken. */
+  const take = async (place: FollowUpCards): Promise<FollowUpGroup | null> => {
+    const kept = (await handOff?.places(place.date))?.get(place.channel);
+    if (!kept) return null;
+    await handOff!.clear(place.date, place.channel);
+    return kept.group;
   };
   return {
     async waiting() {
-      groups.clear();
-      for (const g of (await deps.handOff?.list(runDate)) ?? []) groups.set(g.to.channel, g);
-      return [...groups.values()].map((g) => ({
-        channel: g.to.channel,
-        cards: g.asked.map((a) => ({ person: a.c.promiserId, item: a.item })),
-        says(ids) {
-          const mine = g.asked.filter((a) => ids.includes(a.c.id));
-          return followUpParent(
-            mine.map((a) => a.c.kind as CardKind),
-            mine.every((a) => a.c.nudges === 0),
-          );
-        },
-      }));
+      const places = (await handOff?.places(runDate)) ?? new Map<string, HandedOff>();
+      return [...places.values()].filter((p) => !p.claimedBy).map((p) => cardsOf(runDate, p.group));
     },
+    claim: (place, cardKey) => handOff?.claim(place.date, place.channel, cardKey) ?? Promise.resolve(),
+    async claimed(cardKey) {
+      const date = dateOf(cardKey);
+      const place = [...((await handOff?.places(date))?.values() ?? [])].find((p) => p.claimedBy === cardKey);
+      return place ? cardsOf(date, place.group) : null;
+    },
+    unclaim: (cardKey) => handOff?.unclaim(dateOf(cardKey), cardKey) ?? Promise.resolve(),
     async postAlone(place) {
-      const group = await take(place.channel);
+      const group = await take(place);
+      if (!group) return;
       const actions = await postGroup(deps, group, now, runDate);
       await noteUntagged(deps, group, actions);
     },
     async posted(place, shown, posted) {
-      const group = await take(place.channel);
+      const group = await take(place);
+      if (!group) return;
       const actions = await askedOn(deps, group, group.asked.filter((a) => shown.includes(a.c.id)), { ...posted, kept: true }, now, runDate);
       await noteUntagged(deps, group, actions);
     },
     async notPosted(place, why) {
-      const group = await take(place.channel);
-      for (const a of group.asked) await holdCard(deps, a.c, now, runDate, why);
+      const group = await take(place);
+      for (const a of group?.asked ?? []) await holdCard(deps, a.c, now, runDate, why);
     },
   };
 }
