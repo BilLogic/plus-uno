@@ -74,6 +74,13 @@ export function streamFlagOn(
   return false;
 }
 
+/** The channel ids in `SLACK_STREAMING_CHANNELS`, or `null` — every channel —
+ *  when it names none. */
+function streamChannels(list: string | undefined): ReadonlySet<string> | null {
+  const ids = (list ?? "").split(",").map((id) => id.trim()).filter(Boolean);
+  return ids.length ? new Set(ids) : null;
+}
+
 /** A recorded probe pass: `pass:` and an ISO date, then anything. */
 const PROBE_PASS = /^pass:\d{4}-\d{2}-\d{2}(?:\s|$)/;
 
@@ -103,6 +110,7 @@ export function postingDeps(env: Env): PostingDeps {
   return {
     slack: postingClientFor(env),
     streamingOn: streamFlagOn(env, "SLACK_STREAMING"),
+    streamChannels: streamChannels(env.SLACK_STREAMING_CHANNELS),
     alertChannel: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL,
     throttle: env.HARNESS_KV ?? null,
   };

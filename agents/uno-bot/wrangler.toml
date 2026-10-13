@@ -89,7 +89,15 @@ crons = ["0 4,5 * * TUE-SAT", "0 13,14 * * MON-FRI"]
 # then "on" is refused at runtime, logged once per isolate —
 # docs/connectors/slack.md § Streamed text.
 SLACK_STREAM_MARKUP_PROBE = "pass:2026-09-22 r393 DM: raw bare <@teammate> + fenced <@teammate> <@U…> streamed via markdown_text, not blank; both shown literally, fenced one as code, real id in code did not ping"
-SLACK_STREAMING = "off"
+#
+# ON TRIAL (2026-10-12), held to #uno-bot-sandbox and Bill's DM by
+# SLACK_STREAMING_CHANNELS: every other channel posts the ordinary way. What it
+# looks like: the answer is generated whole, then its first part goes into a
+# stream in one append — a short typing bubble, then the full text, footer on
+# the stop. It is not word-by-word. To revert, set SLACK_STREAMING back to
+# "off"; to give it to the team, clear the channel list.
+SLACK_STREAMING = "on"
+SLACK_STREAMING_CHANNELS = "C0B4QBWAUJU,D0APTB20SK0"
 #
 # Plan-mode streaming: opens the turn's stream up front in
 # `task_display_mode: "plan"` and routes the between-tool narration into it as
