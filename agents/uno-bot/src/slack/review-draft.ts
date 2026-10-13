@@ -18,7 +18,7 @@
 // the same three labels.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { textSections } from "./render";
+import { reviewSections } from "./render";
 import { escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
@@ -297,13 +297,13 @@ function partBlocks(part: Part, detail: ChangeDetail): unknown[] {
   if (change) {
     blocks.push(bold(CURRENT));
     if (was === undefined) blocks.push(context(BEFORE_NOT_CAPTURED));
-    else blocks.push(...(was.trim() ? textSections(was) : [context("Empty.")]));
+    else blocks.push(...(was.trim() ? reviewSections(was) : [context("Empty.")]));
     if (detail.issueHere && detail.issue) blocks.push(bold(ISSUE), section(detail.issue));
   }
   // Under its heading the input needs no name of its own beyond what it is.
   if (field) return [...blocks, inputOf(field, change ? NEW : part.heading ? "Text" : field.label)];
   if (change) blocks.push(bold(NEW));
-  if (part.text) blocks.push(...textSections(part.text));
+  if (part.text) blocks.push(...reviewSections(part.text));
   if (detail.editing && part.key && part.text.length > MAX_INPUT_CHARS) blocks.push(context(TOO_LONG_TO_EDIT));
   return blocks;
 }
@@ -347,7 +347,7 @@ function propertyBlocks(
     if (key === undefined) {
       if (value.includes("\n")) {
         flush();
-        blocks.push(...textSections(`**${label}:** ${value}`));
+        blocks.push(...reviewSections(`**${label}:** ${value}`));
       } else lines.push(`*${label}:* ${valueText(value)}`);
       continue;
     }
@@ -363,7 +363,7 @@ function propertyBlocks(
     }
     if (value.includes("\n")) {
       flush();
-      blocks.push(...textSections(`**${NEW}:** ${value}`));
+      blocks.push(...reviewSections(`**${NEW}:** ${value}`));
       continue;
     }
     lines.push(`*${NEW}:* ${valueText(value)}`);

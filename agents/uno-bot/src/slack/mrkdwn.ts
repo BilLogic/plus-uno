@@ -365,3 +365,82 @@ function splitRow(line: string): string[] {
     .split("|")
     .map((c) => c.trim());
 }
+
+// ── The Review pop-up's tidy-up ─────────────────────────────────────────────
+
+/**
+ * A drafted body, Markdown still, made to read cleanly in the Review pop-up
+ * before `toSlackMrkdwn` converts it. A modal takes `section` blocks and
+ * nothing else Markdown needs: Slack offers its table block to messages and
+ * Home tabs only, and a section's text has no comment, rule or task syntax.
+ * So, outside code fences:
+ *
+ *  • an HTML comment goes — GitHub hides it, a section shows it verbatim, and
+ *    the Figma library poll opens every issue with one as its marker;
+ *  • a table row becomes one bullet: the first cell bold, then the rest joined
+ *    by ` · `, with an empty cell, or one whose visible text repeats an earlier
+ *    cell's, dropped. A dropped repeat that carries a link hands the link to
+ *    the cell it repeats, so a name and its Figma link read as one linked name;
+ *  • `- [ ]` and `- [x]` become ☐ and ☑, and a rule line goes.
+ *
+ * Every row stays: splitting a long body is `textSections`' job. This is the
+ * pop-up's pass alone — the answer path's tables keep `convertTables`, and
+ * the text a tool writes never passes through here.
+ */
+export function reviewMarkdown(input: string): string {
+  if (!input) return input;
+  return input
+    .split(/(```[\s\S]*?```)/g)
+    .map((seg, i) => (i % 2 === 1 ? seg : tidyForReview(seg)))
+    .join("");
+}
+
+function tidyForReview(seg: string): string {
+  const lines = seg.replace(/<!--[\s\S]*?-->/g, "").split("\n");
+  const out: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const cur = lines[i]!;
+    if (cur.includes("|") && isSeparatorRow(lines[i + 1] ?? "")) {
+      i += 2; // the header names columns a bullet has no room for
+      while (i < lines.length && lines[i]!.includes("|") && lines[i]!.trim() !== "") {
+        const row = rowBullet(splitRow(lines[i]!));
+        if (row) out.push(row);
+        i++;
+      }
+      continue;
+    }
+    i++;
+    if (/^\s{0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(cur)) continue;
+    out.push(cur.replace(/^(\s*)[-*+]\s+\[([ xX])\]\s+/, (_, indent: string, mark: string) => `${indent}${mark === " " ? "☐" : "☑"} `));
+  }
+  return out.join("\n");
+}
+
+const MD_LINK = /\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/;
+
+/** A cell as a reader sees it: link labels, without emphasis or code marks. */
+function visibleText(cell: string): string {
+  return cell
+    .replace(new RegExp(MD_LINK.source, "g"), "$1")
+    .replace(/\*\*|__|`/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function rowBullet(cells: readonly string[]): string | null {
+  const kept: string[] = [];
+  const seen: string[] = [];
+  for (const cell of cells) {
+    const visible = visibleText(cell);
+    if (!visible) continue;
+    const at = seen.indexOf(visible);
+    if (at < 0) {
+      kept.push(cell);
+      seen.push(visible);
+    } else if (MD_LINK.test(cell) && !MD_LINK.test(kept[at]!)) kept[at] = cell;
+  }
+  if (!kept.length) return null;
+  const [first, ...rest] = kept;
+  return `- ${[`**${first!.replace(/^\*\*(.*)\*\*$/, "$1")}**`, ...rest].join(" · ")}`;
+}

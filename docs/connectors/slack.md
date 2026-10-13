@@ -165,6 +165,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 | Fallback rung 2 (Slack refused the sections too, or refused the first post for anything other than its blocks) | bare `text`, no footer | `toSlackMrkdwn` in `postMessage` |
 | `chat.postMessage` `text`, every rung | the whole part as mrkdwn, for notifications and screen readers | `toSlackMrkdwn` in `postMessage` |
 | Proposal card, Figma library posts | a turn's card: a summary section, two context lines and Review (`proposalCardBlocks`); a stated card: mrkdwn sections + Review | `toSlackMrkdwn` via `textSections` |
+| Review pop-up (the draft's body) | mrkdwn sections, as many as the body fills; a modal takes no `table` or collapsible block | `reviewMarkdown` then `toSlackMrkdwn`, via `reviewSections`: comments dropped, a table row as one bullet (first cell bold, the rest after ` · `, repeats and empty cells dropped), task items as ☐ / ☑ |
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 

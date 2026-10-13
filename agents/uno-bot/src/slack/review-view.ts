@@ -32,7 +32,7 @@
 // Every view carries the card it is about in `private_metadata`, as the
 // card's own buttons carry it in the message they sit on: that ts is the
 // identity, and the decision is resolved against it and nothing else.
-import { textSections } from "./render";
+import { reviewSections } from "./render";
 import { CONFIRM_FOOTER } from "./proposal-render";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import {
@@ -188,7 +188,7 @@ export function draftView(
     inline: inPlace,
     editing: access.mayDecide,
   };
-  const body = readableDraft(operations, caveatsOf(text), detail) ?? textSections(text);
+  const body = readableDraft(operations, caveatsOf(text), detail) ?? reviewSections(text);
 
   const headline = draftHeadline(operations);
   const head: unknown[] = [];
@@ -375,7 +375,7 @@ function reviewNoteOf(state: unknown): string {
  */
 export function decidedView(card: ReviewedCard, cardText: string): View {
   return modal(card, [
-    ...textSections(draftBody(cardText)),
+    ...reviewSections(draftBody(cardText)),
     context("Read-only. This proposal has already been decided."),
   ]);
 }
