@@ -4,13 +4,18 @@
 //
 // Driven at the render seam, `readableDraft`, with a body the Figma library
 // poll filed live. The issue it creates is not touched: the body on the
-// operation stays exactly as staged.
+// operation stays exactly as staged. The tidy-up is the issue's alone: an
+// email, a DM and a Notion append preview the text that is sent, and the
+// pop-up's card-text paths (an unread tool, a decided card) are untouched.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { readableDraft } from "../src/slack/review-draft";
+import { decidedView, draftView } from "../src/slack/review-view";
+import { textSections } from "../src/slack/render";
 import { toSlackMrkdwn } from "../src/slack/mrkdwn";
-import { FIGMA_PUBLISH_ISSUE_BODY } from "./fixtures/figma-publish-issue";
+import type { PendingProposal } from "../src/thread-state/index";
+import { FIGMA_PUBLISH_ISSUE_BODY } from "./helpers/figma-publish-issue";
 
 type Block = { type: string; text?: { text: string } };
 
@@ -54,9 +59,18 @@ describe("a drafted GitHub issue in the Review pop-up", () => {
     assert.doesNotMatch(text, /\| *Component *\|/);
   });
 
-  it("drops an empty cell and a cell that repeats an earlier one", () => {
-    const table = ["| A | B | C | D |", "|---|---|---|---|", "| x | | `y` | y |"].join("\n");
-    assert.equal(rendered(table), "• *x* · `y`");
+  it("drops an empty cell and a cell that repeats the first", () => {
+    const table = ["| A | B | C | D |", "|---|---|---|---|", "| `x` | | y | x |"].join("\n");
+    assert.equal(rendered(table), "• *`x`* · y");
+  });
+
+  it("keeps later cells that match each other, and a repeat in another case", () => {
+    const table = ["| Name | Before | After | Note |", "|---|---|---|---|", "| Card | 2 variants | 2 variants | card |"].join("\n");
+    assert.equal(rendered(table), "• *Card* · 2 variants · 2 variants · card");
+  });
+
+  it("keeps a comment inside code", () => {
+    assert.equal(rendered("Tag it `<!-- marker -->` first.\n```\n<!-- kept -->\n```"), "Tag it `<!-- marker -->` first.\n```\n<!-- kept -->\n```");
   });
 
   it("keeps a link on a cell that does not repeat", () => {
@@ -88,5 +102,57 @@ describe("a drafted GitHub issue in the Review pop-up", () => {
   it("leaves the answer path's table bullets as they were", () => {
     const table = ["| A | B |", "|---|---|", "| x | [x](https://example.com) |"].join("\n");
     assert.equal(toSlackMrkdwn(table), "• x — <https://example.com|x>");
+  });
+});
+
+/** Markdown the tidy-up would change: a comment, a table, a task item. */
+const SENT_AS_WRITTEN = ["<!-- note -->", "| Name | Link |", "|---|---|", "| Card | Card |", "- [ ] Open"].join("\n");
+
+/** The sections a body draws with no tidy-up at all. */
+const plain = (text: string) => textSections(text).map((s) => (s as Block).text!.text);
+
+describe("text the pop-up previews as it is sent", () => {
+  const sectionsOf = (blocks: unknown[] | null) =>
+    (blocks as Block[]).filter((b) => b.type === "section").map((b) => b.text!.text);
+
+  it("an email body", () => {
+    const blocks = readableDraft([{ toolName: "email_send", input: { to: "a@example.com", subject: "Hi", body: SENT_AS_WRITTEN } }]);
+    assert.deepEqual(sectionsOf(blocks).slice(1), plain(SENT_AS_WRITTEN));
+  });
+
+  it("a relayed DM", () => {
+    const blocks = readableDraft([{ toolName: "dm_relay", input: { recipient: "U0123456789", text: SENT_AS_WRITTEN } }]);
+    assert.deepEqual(sectionsOf(blocks).slice(1), plain(SENT_AS_WRITTEN));
+  });
+
+  it("a Notion append", () => {
+    const blocks = readableDraft([{ toolName: "notion_update", input: { page_url: "https://www.notion.so/x", append: { text: SENT_AS_WRITTEN } } }]);
+    assert.ok(sectionsOf(blocks).join("\n").includes(plain(SENT_AS_WRITTEN).join("\n")));
+  });
+});
+
+describe("the pop-up's card-text paths", () => {
+  const CARD = { channel: "C1", ts: "1700000000.000195" };
+  const viewSections = (view: { blocks: unknown[] }) =>
+    (view.blocks as Block[]).filter((b) => b.type === "section").map((b) => b.text!.text);
+
+  it("a tool with no reading shows its card's text as the card has it", () => {
+    const proposal: PendingProposal = {
+      toolName: "figma_comment_reply",
+      input: {},
+      channel: "C1",
+      threadTs: "1700000000.000100",
+      userMsgTs: "1700000000.000190",
+      proposalTs: CARD.ts,
+      proposalText: SENT_AS_WRITTEN,
+      requesterUserId: "U0123456789",
+    };
+    const view = draftView(CARD, proposal, { mayDecide: false, confirmers: [] }) as unknown as { blocks: unknown[] };
+    assert.ok(viewSections(view).join("\n").includes(plain(SENT_AS_WRITTEN).join("\n")));
+  });
+
+  it("a decided card shows its own words", () => {
+    const view = decidedView(CARD, SENT_AS_WRITTEN) as unknown as { blocks: unknown[] };
+    assert.deepEqual(viewSections(view), plain(SENT_AS_WRITTEN));
   });
 });

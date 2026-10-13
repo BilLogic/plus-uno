@@ -18,7 +18,7 @@
 // the same three labels.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { reviewSections } from "./render";
+import { reviewSections, textSections } from "./render";
 import { escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
@@ -47,8 +47,9 @@ interface ReadOperation {
 }
 
 /** One stretch of prose. `key` is its path in the tool input; `replaces`
- *  marks text that overwrites a block a person wrote. */
-type Part = { heading?: string; text: string; key?: string; replaces?: boolean };
+ *  marks text that overwrites a block a person wrote; `markdown` marks text a
+ *  renderer downstream reads as Markdown, drawn through `reviewSections`. */
+type Part = { heading?: string; text: string; key?: string; replaces?: boolean; markdown?: boolean };
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 const obj = (v: unknown): Input => (v && typeof v === "object" && !Array.isArray(v) ? (v as Input) : {});
@@ -158,7 +159,8 @@ function githubIssue(input: Input): ReadOperation {
       ["Title", str(input.title)],
       ["Repository", repo],
     ],
-    body: str(input.body) ? [{ text: str(input.body) }] : [],
+    // Markdown GitHub renders itself, so the pop-up tidies it the same way.
+    body: str(input.body) ? [{ text: str(input.body), markdown: true }] : [],
   };
 }
 
@@ -297,13 +299,13 @@ function partBlocks(part: Part, detail: ChangeDetail): unknown[] {
   if (change) {
     blocks.push(bold(CURRENT));
     if (was === undefined) blocks.push(context(BEFORE_NOT_CAPTURED));
-    else blocks.push(...(was.trim() ? reviewSections(was) : [context("Empty.")]));
+    else blocks.push(...(was.trim() ? textSections(was) : [context("Empty.")]));
     if (detail.issueHere && detail.issue) blocks.push(bold(ISSUE), section(detail.issue));
   }
   // Under its heading the input needs no name of its own beyond what it is.
   if (field) return [...blocks, inputOf(field, change ? NEW : part.heading ? "Text" : field.label)];
   if (change) blocks.push(bold(NEW));
-  if (part.text) blocks.push(...reviewSections(part.text));
+  if (part.text) blocks.push(...(part.markdown ? reviewSections : textSections)(part.text));
   if (detail.editing && part.key && part.text.length > MAX_INPUT_CHARS) blocks.push(context(TOO_LONG_TO_EDIT));
   return blocks;
 }
@@ -347,7 +349,7 @@ function propertyBlocks(
     if (key === undefined) {
       if (value.includes("\n")) {
         flush();
-        blocks.push(...reviewSections(`**${label}:** ${value}`));
+        blocks.push(...textSections(`**${label}:** ${value}`));
       } else lines.push(`*${label}:* ${valueText(value)}`);
       continue;
     }
@@ -363,7 +365,7 @@ function propertyBlocks(
     }
     if (value.includes("\n")) {
       flush();
-      blocks.push(...reviewSections(`**${NEW}:** ${value}`));
+      blocks.push(...textSections(`**${NEW}:** ${value}`));
       continue;
     }
     lines.push(`*${NEW}:* ${valueText(value)}`);

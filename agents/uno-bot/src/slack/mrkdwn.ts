@@ -330,6 +330,22 @@ function convertLine(line: string): string {
 
 /** A markdown table (header row + |---| separator + rows) → `• a — b — c` lines. */
 function convertTables(seg: string): string {
+  return walkTables(seg, (cells) => {
+    const kept = cells.filter((c) => c !== "");
+    return kept.length ? `• ${kept.join(" — ")}` : null;
+  });
+}
+
+/**
+ * Each markdown table in a segment, header and separator dropped, its rows
+ * through `row` (null drops one); every other line through `line` (null drops
+ * it). The one walk both the answer path and the Review pop-up use.
+ */
+function walkTables(
+  seg: string,
+  row: (cells: string[]) => string | null,
+  line: (text: string) => string | null = (text) => text,
+): string {
   const lines = seg.split("\n");
   const out: string[] = [];
   let i = 0;
@@ -339,13 +355,14 @@ function convertTables(seg: string): string {
     if (cur.includes("|") && isSeparatorRow(next)) {
       i += 2; // skip the header + separator rows
       while (i < lines.length && lines[i]!.includes("|") && lines[i]!.trim() !== "") {
-        const cells = splitRow(lines[i]!).filter((c) => c !== "");
-        if (cells.length) out.push(`• ${cells.join(" — ")}`);
+        const text = row(splitRow(lines[i]!));
+        if (text !== null) out.push(text);
         i++;
       }
       continue;
     }
-    out.push(cur);
+    const text = line(cur);
+    if (text !== null) out.push(text);
     i++;
   }
   return out.join("\n");
@@ -369,52 +386,38 @@ function splitRow(line: string): string[] {
 // ── The Review pop-up's tidy-up ─────────────────────────────────────────────
 
 /**
- * A drafted body, Markdown still, made to read cleanly in the Review pop-up
- * before `toSlackMrkdwn` converts it. A modal takes `section` blocks and
- * nothing else Markdown needs: Slack offers its table block to messages and
- * Home tabs only, and a section's text has no comment, rule or task syntax.
- * So, outside code fences:
+ * A drafted GitHub issue body, Markdown still, made to read cleanly in the
+ * Review pop-up before `toSlackMrkdwn` converts it. A modal takes `section`
+ * blocks and nothing else Markdown needs: Slack offers its table block to
+ * messages and Home tabs only, and a section's text has no comment, rule or
+ * task syntax. So, outside code:
  *
  *  • an HTML comment goes — GitHub hides it, a section shows it verbatim, and
  *    the Figma library poll opens every issue with one as its marker;
  *  • a table row becomes one bullet: the first cell bold, then the rest joined
- *    by ` · `, with an empty cell, or one whose visible text repeats an earlier
- *    cell's, dropped. A dropped repeat that carries a link hands the link to
- *    the cell it repeats, so a name and its Figma link read as one linked name;
+ *    by ` · `, empty cells dropped, and a cell whose visible text is the first
+ *    cell's dropped too, its link handed to the first — so a name and its
+ *    Figma link read as one linked name. Two later cells that match each
+ *    other both stay: a Before and an After can say the same thing;
  *  • `- [ ]` and `- [x]` become ☐ and ☑, and a rule line goes.
  *
- * Every row stays: splitting a long body is `textSections`' job. This is the
- * pop-up's pass alone — the answer path's tables keep `convertTables`, and
- * the text a tool writes never passes through here.
+ * Every row stays: splitting a long body is `textSections`' job. GitHub
+ * renders this Markdown itself, which is why the pass is the issue's alone:
+ * an email, a DM or a Notion append previews exactly the text that is sent.
  */
 export function reviewMarkdown(input: string): string {
   if (!input) return input;
   return input
+    .replace(/(```[\s\S]*?```|`[^`\n]*`)|<!--[\s\S]*?-->/g, (_, code?: string) => code ?? "")
     .split(/(```[\s\S]*?```)/g)
-    .map((seg, i) => (i % 2 === 1 ? seg : tidyForReview(seg)))
+    .map((seg, i) => (i % 2 === 1 ? seg : walkTables(seg, rowBullet, reviewLine)))
     .join("");
 }
 
-function tidyForReview(seg: string): string {
-  const lines = seg.replace(/<!--[\s\S]*?-->/g, "").split("\n");
-  const out: string[] = [];
-  let i = 0;
-  while (i < lines.length) {
-    const cur = lines[i]!;
-    if (cur.includes("|") && isSeparatorRow(lines[i + 1] ?? "")) {
-      i += 2; // the header names columns a bullet has no room for
-      while (i < lines.length && lines[i]!.includes("|") && lines[i]!.trim() !== "") {
-        const row = rowBullet(splitRow(lines[i]!));
-        if (row) out.push(row);
-        i++;
-      }
-      continue;
-    }
-    i++;
-    if (/^\s{0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(cur)) continue;
-    out.push(cur.replace(/^(\s*)[-*+]\s+\[([ xX])\]\s+/, (_, indent: string, mark: string) => `${indent}${mark === " " ? "☐" : "☑"} `));
-  }
-  return out.join("\n");
+/** A line outside a table: a rule dropped, a task item as its box. */
+function reviewLine(line: string): string | null {
+  if (/^\s{0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(line)) return null;
+  return line.replace(/^(\s*)[-*+]\s+\[([ xX])\]\s+/, (_, indent: string, mark: string) => `${indent}${mark === " " ? "☐" : "☑"} `);
 }
 
 const MD_LINK = /\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/;
@@ -424,23 +427,18 @@ function visibleText(cell: string): string {
   return cell
     .replace(new RegExp(MD_LINK.source, "g"), "$1")
     .replace(/\*\*|__|`/g, "")
-    .trim()
-    .toLowerCase();
+    .trim();
 }
 
-function rowBullet(cells: readonly string[]): string | null {
-  const kept: string[] = [];
-  const seen: string[] = [];
-  for (const cell of cells) {
-    const visible = visibleText(cell);
-    if (!visible) continue;
-    const at = seen.indexOf(visible);
-    if (at < 0) {
-      kept.push(cell);
-      seen.push(visible);
-    } else if (MD_LINK.test(cell) && !MD_LINK.test(kept[at]!)) kept[at] = cell;
-  }
-  if (!kept.length) return null;
-  const [first, ...rest] = kept;
-  return `- ${[`**${first!.replace(/^\*\*(.*)\*\*$/, "$1")}**`, ...rest].join(" · ")}`;
+function rowBullet(cells: string[]): string | null {
+  const filled = cells.filter((c) => visibleText(c));
+  if (!filled.length) return null;
+  let [first, ...rest] = filled as [string, ...string[]];
+  const name = visibleText(first);
+  rest = rest.filter((cell) => {
+    if (visibleText(cell) !== name) return true;
+    if (MD_LINK.test(cell) && !MD_LINK.test(first)) first = cell;
+    return false;
+  });
+  return `- ${[`**${first.replace(/^\*\*(.*)\*\*$/, "$1")}**`, ...rest].join(" · ")}`;
 }
