@@ -117,10 +117,10 @@ function kv<T>(initial: T) {
   };
 }
 
-function pollDeps(today: FigmaComponentsResponse, findings = kv<LibraryChangeSet[]>([])) {
+function pollDeps(today: FigmaComponentsResponse, findings = kv<LibraryChangeSet[]>([]), before: FigmaComponentsResponse = BEFORE) {
   const yesterday: Snapshot = {
     lastChecked: "2026-09-28T22:00:00Z",
-    components: componentsFrom(BEFORE),
+    components: componentsFrom(before),
     versionIds: ["2210000000000000001"],
     nodeHashes: {},
   };
@@ -211,6 +211,30 @@ async function foundEditOnly(): Promise<LibraryChangeSet> {
 
 async function foundPublish(): Promise<LibraryChangeSet> {
   const { deps, findings } = pollDeps(AFTER);
+  await pollFigmaLibrary(deps);
+  assert.equal(findings.value.length, 1);
+  return findings.value[0]!;
+}
+
+/** A library that retires sets the way the library does: renamed with `_`,
+ *  same node, same key. Two sets share the name "Input Group Text", and a
+ *  third, "Multiple Dropdown", has no code mapping either. */
+const RETIRING = [
+  ["k-igt-1", "Size=sm", "50:1", "Input Group Text", "500:1"],
+  ["k-igt-2", "Size=lg", "50:2", "Input Group Text", "500:1"],
+  ["k-igt-3", "Type=addon", "51:1", "Input Group Text", "510:1"],
+  ["k-md-1", "State=open", "60:1", "Multiple Dropdown", "600:1"],
+] as const;
+const WITH_RETIRING: FigmaComponentsResponse = {
+  meta: { components: [...BEFORE.meta!.components!, ...RETIRING.map(([key, name, node, set, setNode]) => variant(key, name, node, set, setNode))] },
+};
+const RETIRED: FigmaComponentsResponse = {
+  meta: { components: [...BEFORE.meta!.components!, ...RETIRING.map(([key, name, node, set, setNode]) => variant(key, name, node, `_${set}`, setNode))] },
+};
+
+/** The publish that renamed every retiring set `_`, and changed nothing else. */
+async function foundDeprecations(today: FigmaComponentsResponse = RETIRED): Promise<LibraryChangeSet> {
+  const { deps, findings } = pollDeps(today, kv<LibraryChangeSet[]>([]), WITH_RETIRING);
   await pollFigmaLibrary(deps);
   assert.equal(findings.value.length, 1);
   return findings.value[0]!;
@@ -368,6 +392,84 @@ describe("the drafted intake", () => {
     // variants: every one of Badge's changed variants is new, so it reads new.
     const { newComponentIds: _n, removedComponentIds: _r, ...older } = changeSet;
     assert.deepEqual(draftPublishIntake(older, REGISTRY).rows.map((r) => r.change), ["updated", "new", "new"]);
+  });
+});
+
+// ── Deprecations ─────────────────────────────────────────────────────────────
+
+describe("a component retired with a `_` name", () => {
+  it("reads as deprecated, not deleted, when its node is still in the file under the `_` name", async () => {
+    const changeSet = await foundDeprecations();
+    assert.deepEqual(changeSet.deleted, []);
+    assert.deepEqual(changeSet.deprecated?.map((c) => c.key).sort(), ["k-igt-1", "k-igt-2", "k-igt-3", "k-md-1"]);
+    assert.deepEqual(changeSet.removedComponentIds, []);
+  });
+
+  it("still reads as deleted when its node is gone from the file", async () => {
+    const gone: FigmaComponentsResponse = { meta: { components: BEFORE.meta!.components! } };
+    const changeSet = await foundDeprecations(gone);
+    assert.deepEqual(changeSet.deprecated, []);
+    assert.equal(changeSet.deleted.length, 4);
+  });
+
+  it("merges two sets of one name into one row, with every node linked", async () => {
+    const intake = draftPublishIntake(await foundDeprecations(), REGISTRY);
+    assert.deepEqual(intake.rows.map((r) => [r.figmaName, r.change, r.deprecated.length]), [
+      ["Input Group Text", "deprecated", 3],
+      ["Multiple Dropdown", "deprecated", 1],
+    ]);
+    const row = intake.body.split("\n").find((l) => l.startsWith("| Input Group Text "))!;
+    assert.match(row, /node-id=500-1/);
+    assert.match(row, /node-id=510-1/);
+    assert.match(row, /\| deprecated: 3 variants \|$/);
+    assert.doesNotMatch(intake.body, /deleted:/);
+  });
+
+  it("asks for no intake when every changed row is deprecated or unmapped", async () => {
+    const deprecations = await foundDeprecations();
+    assert.equal(draftPublishIntake(deprecations, REGISTRY).needsIntake, false);
+    // Sparkline is new and unmapped; nothing else changed.
+    const sparkline = componentsFrom(AFTER).find((c) => c.key === "k-spark-1")!;
+    const unmapped: LibraryChangeSet = { ...deprecations, created: [sparkline], newComponentIds: ["400:1"] };
+    const intake = draftPublishIntake(unmapped, REGISTRY);
+    assert.equal(intake.needsIntake, false);
+    assert.deepEqual(intake.implement, []);
+  });
+
+  it("still asks for an intake when a mapped component is deleted outright", async () => {
+    const shrunk: FigmaComponentsResponse = { meta: { components: BEFORE.meta!.components!.filter((c) => c.key !== "k-tip-1") } };
+    const { deps, findings } = pollDeps(shrunk);
+    await pollFigmaLibrary(deps);
+    const intake = draftPublishIntake(findings.value[0]!, REGISTRY);
+    assert.deepEqual(intake.rows.map((r) => [r.figmaName, r.change]), [["tooltip", "removed"]]);
+    assert.equal(intake.needsIntake, true);
+    assert.deepEqual(intake.implement, ["Tooltip"]);
+  });
+
+  it("lists every unmapped component on one line of the proposal", async () => {
+    const changeSet = await foundPublish();
+    const extra = { key: "k-gauge-1", name: "Default", description: "", nodeId: "70:1", containingFrame: "gauge", setNodeId: "700:1" };
+    const intake = draftPublishIntake({ ...changeSet, created: [...changeSet.created, extra] }, REGISTRY);
+    const proposal = intake.body.split("## Proposed code change")[1]!.split("## Done when")[0]!;
+    const items = proposal.split("\n").filter((l) => /^\d+\. /.test(l));
+    assert.equal(items.length, 3, proposal);
+    assert.equal(items.filter((l) => /no code mapping/i.test(l)).length, 1);
+    assert.match(items[2]!, /gauge, sparkline/);
+  });
+
+  it("posts one line saying what changed and that code is unaffected, and stages and tracks nothing", async () => {
+    const morning = postDeps([await foundDeprecations()]);
+    const result = await postLibraryFindings(morning.deps);
+    assert.equal(result.posted, 1);
+    assert.equal(morning.posts.length, 1);
+    assert.equal(
+      morning.posts[0]!.text,
+      `coco published "Badge sizes + accordion copy" to the <https://www.figma.com/design/${FILE_KEY}|library>: 2 components deprecated. Code is unaffected, so nothing is filed.`,
+    );
+    assert.ok(!JSON.stringify(morning.posts[0]!.blocks).includes('"actions"'));
+    assert.deepEqual(morning.staged, []);
+    assert.deepEqual(morning.store.tracked.value, []);
+    assert.deepEqual(morning.store.findings.value, []);
   });
 });
 

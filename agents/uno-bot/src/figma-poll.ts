@@ -77,6 +77,8 @@ export interface PollResult {
   created?: number;
   modified?: number;
   deleted?: number;
+  /** Components renamed `_`: retired from the library, not deleted. */
+  deprecated?: number;
   newVersions?: number;
   /** Change sets now waiting for the morning post. */
   pending?: number;
@@ -103,19 +105,37 @@ interface ComponentDiff {
   created: LibraryComponent[];
   modified: LibraryComponent[];
   deleted: LibraryComponent[];
+  deprecated: LibraryComponent[];
 }
 
-function diffComponents(oldComponents: LibraryComponent[], newComponents: LibraryComponent[]): ComponentDiff {
+/**
+ * What changed between the snapshot and today's components. A component gone
+ * from the list is deprecated, not deleted, when its node is still in the file
+ * under a `_` name (`renamedNodeIds`): renaming a set `_X` is how the library
+ * retires it, and the ignore list then drops it from the published list. The
+ * node id is the match, since a rename keeps it and a name can repeat.
+ *
+ * @param oldComponents - The snapshot's components
+ * @param newComponents - Today's, ignore list applied
+ * @param renamedNodeIds - Node ids of today's `_`-named components and sets
+ */
+function diffComponents(
+  oldComponents: LibraryComponent[],
+  newComponents: LibraryComponent[],
+  renamedNodeIds: ReadonlySet<string> = new Set(),
+): ComponentDiff {
   const oldMap = new Map(oldComponents.map((c) => [c.key, c]));
   const newMap = new Map(newComponents.map((c) => [c.key, c]));
-  const diff: ComponentDiff = { created: [], modified: [], deleted: [] };
+  const diff: ComponentDiff = { created: [], modified: [], deleted: [], deprecated: [] };
   for (const [key, comp] of newMap) {
     const old = oldMap.get(key);
     if (!old) diff.created.push(comp);
     else if (old.name !== comp.name || old.description !== comp.description) diff.modified.push(comp);
   }
   for (const [key, comp] of oldMap) {
-    if (!newMap.has(key)) diff.deleted.push(comp);
+    if (newMap.has(key)) continue;
+    const renamed = renamedNodeIds.has(comp.nodeId) || (!!comp.setNodeId && renamedNodeIds.has(comp.setNodeId));
+    diff[renamed ? "deprecated" : "deleted"].push(comp);
   }
   return diff;
 }
@@ -132,10 +152,11 @@ function diffComponents(oldComponents: LibraryComponent[], newComponents: Librar
  * @param opts - `dryRun` reads and diffs, and writes nothing
  */
 export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean } = {}): Promise<PollResult> {
-  const [components, versionsResponse] = await Promise.all([
-    deps.figma.components(deps.fileKey).then(componentsFrom),
+  const [componentsResponse, versionsResponse] = await Promise.all([
+    deps.figma.components(deps.fileKey),
     deps.figma.versions(deps.fileKey),
   ]);
+  const components = componentsFrom(componentsResponse);
   const versions = versionsFrom(versionsResponse);
   const everyVersionId = everyVersionIdIn(versionsResponse);
   console.log(`[figma-poll] ${components.length} components, ${versions.length} recent published versions`);
@@ -150,7 +171,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
     return { ran: true, summary: `initialized snapshot: ${components.length} components, ${Object.keys(nodeHashes).length} node hashes` };
   }
 
-  const diff = diffComponents(snapshot.components, components);
+  const diff = diffComponents(snapshot.components, components, renamedNodeIdsIn(componentsResponse));
   const known = new Set(snapshot.versionIds);
   const newVersions = versions.filter((v) => !known.has(v.id));
 
@@ -158,7 +179,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   // hashes. No stored hashes → store a baseline now and diff from the NEXT
   // publish (see the subrequest math above).
   let refreshedHashes: Record<string, string> | null = null;
-  const metadataChanged = diff.created.length + diff.modified.length + diff.deleted.length > 0;
+  const metadataChanged = diff.created.length + diff.modified.length + diff.deleted.length + diff.deprecated.length > 0;
   if (!metadataChanged && newVersions.length > 0) {
     refreshedHashes = await fetchNodeHashes(deps.figma, deps.fileKey, components);
     const oldHashes = snapshot.nodeHashes ?? {};
@@ -175,7 +196,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
     }
   }
 
-  const changed = diff.created.length + diff.modified.length + diff.deleted.length + newVersions.length > 0;
+  const changed = diff.created.length + diff.modified.length + diff.deleted.length + diff.deprecated.length + newVersions.length > 0;
   let pending: number | undefined;
   if (changed) {
     // A component is new when none of its variants was in the snapshot, and
@@ -189,6 +210,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
       created: diff.created,
       modified: diff.modified,
       deleted: diff.deleted,
+      deprecated: diff.deprecated,
       newComponentIds: [...new Set(diff.created.map(componentIdOf))].filter((id) => !before.has(id)),
       removedComponentIds: [...new Set(diff.deleted.map(componentIdOf))].filter((id) => !after.has(id)),
     };
@@ -229,10 +251,11 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   if (!changed) return { ran: true, summary: "no changes since last check", ...(refreshOwed !== undefined ? { refreshOwed } : {}) };
   return {
     ran: true,
-    summary: `changes detected — created:${diff.created.length} modified:${diff.modified.length} deleted:${diff.deleted.length} versions:${newVersions.length}`,
+    summary: `changes detected — created:${diff.created.length} modified:${diff.modified.length} deleted:${diff.deleted.length} deprecated:${diff.deprecated.length} versions:${newVersions.length}`,
     created: diff.created.length,
     modified: diff.modified.length,
     deleted: diff.deleted.length,
+    deprecated: diff.deprecated.length,
     newVersions: newVersions.length,
     ...(pending !== undefined ? { pending } : {}),
     ...(refreshOwed !== undefined ? { refreshOwed } : {}),
@@ -275,6 +298,24 @@ export function componentsFrom(result: FigmaComponentsResponse): LibraryComponen
     };
   });
   return mapped.filter((c) => !isIgnoredComponent(c));
+}
+
+/**
+ * The node ids of the components a /components response lists under a `_`
+ * name, the variant's own or its set's, with the ids of those sets — the
+ * retired components `diffComponents` tells apart from deleted ones.
+ */
+export function renamedNodeIdsIn(result: FigmaComponentsResponse): Set<string> {
+  const ids = new Set<string>();
+  for (const c of result.meta?.components ?? []) {
+    const set = c.containing_frame?.containingComponentSet;
+    const setName = set?.name ?? c.containing_frame?.name ?? "";
+    if (!c.name.startsWith("_") && !setName.startsWith("_")) continue;
+    ids.add(c.node_id);
+    const setNodeId = set?.nodeId ?? c.containing_frame?.nodeId;
+    if (setNodeId) ids.add(setNodeId);
+  }
+  return ids;
 }
 
 /** Recent labelled publishes only, newest first — what the release card

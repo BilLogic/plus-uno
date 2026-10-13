@@ -50,6 +50,10 @@ export interface LibraryChangeSet {
   /** Each as it now reads. */
   modified: LibraryComponent[];
   deleted: LibraryComponent[];
+  /** Gone under their old name and still in the file under a `_` one: the
+   *  library retired them. Absent on a change set kept from before the poll
+   *  told the two apart. */
+  deprecated?: LibraryComponent[];
   /**
    * The components (by `componentIdOf`) that are new to the library as a
    * whole, and the ones gone from it — so a new variant on an existing
@@ -72,18 +76,22 @@ export interface ComponentRegistry {
   >;
 }
 
-/** One changed component (a set, with its variants), as the intake lists it. */
+/** One changed component (its sets of one name, with their variants), as the
+ *  intake lists it. */
 export interface IntakeRow {
   /** The Figma set or component name. */
   figmaName: string;
   figmaUrl: string;
+  /** Every set of this name the change touched, one link each. */
+  figmaUrls: string[];
   /** The registry's component and its directory; null is "no code mapping". */
   code: { name: string; dir: string } | null;
   /** What happened to the component as a whole, as the card counts it. */
-  change: "new" | "updated" | "removed";
+  change: "new" | "updated" | "removed" | "deprecated";
   created: string[];
   modified: string[];
   deleted: string[];
+  deprecated: string[];
   /** The proposed change, or the plain statement that none is drafted. */
   proposal: string;
 }
@@ -100,10 +108,14 @@ export interface PublishIntake {
   title: string;
   body: string;
   rows: IntakeRow[];
-  /** The registry names an Approve drafts code for, sorted — every mapped row. */
+  /** The registry names an Approve drafts code for, sorted — every mapped
+   *  row the library did not just deprecate. */
   implement: string[];
-  /** Figma names with no code mapping. */
+  /** Figma names with no code mapping, deprecated ones aside. */
   unmapped: string[];
+  /** Whether anything here is work in code: false when every row is
+   *  deprecated or has no code mapping, and then no intake is filed. */
+  needsIntake: boolean;
 }
 
 const LIST_CAP = 6;
@@ -136,14 +148,16 @@ function listed(names: readonly string[]): string {
     : unique.join(", ");
 }
 
+type Kind = "created" | "modified" | "deleted" | "deprecated";
+
 interface Group {
-  id: string;
   figmaName: string;
-  setNodeId?: string;
-  firstNodeId: string;
+  /** Each set of this name (by `componentIdOf`), with the node it links to. */
+  sets: Map<string, { setNodeId?: string; linkNodeId: string }>;
   created: string[];
   modified: string[];
   deleted: string[];
+  deprecated: string[];
 }
 
 /**
@@ -157,31 +171,35 @@ export function componentIdOf(c: LibraryComponent): string {
   return c.setNodeId ?? `name:${(c.containingFrame || c.name).toLowerCase()}`;
 }
 
-/** The change set by component set: variants of one set are one row. */
+/**
+ * The change set by component name: the variants of every set of one name
+ * are one row. Figma lets two sets share a name, and a reader sees one
+ * component, so the row counts both and links each.
+ */
 function groupsOf(changeSet: LibraryChangeSet): Group[] {
   const groups = new Map<string, Group>();
-  const add = (c: LibraryComponent, kind: "created" | "modified" | "deleted") => {
+  const add = (c: LibraryComponent, kind: Kind) => {
     const figmaName = c.containingFrame || c.name;
-    const id = componentIdOf(c);
-    let group = groups.get(id);
+    const name = figmaName.trim().toLowerCase();
+    let group = groups.get(name);
     if (!group) {
-      group = {
-        id,
-        figmaName,
-        ...(c.setNodeId ? { setNodeId: c.setNodeId } : {}),
-        firstNodeId: c.nodeId,
-        created: [],
-        modified: [],
-        deleted: [],
-      };
-      groups.set(id, group);
+      group = { figmaName, sets: new Map(), created: [], modified: [], deleted: [], deprecated: [] };
+      groups.set(name, group);
     }
+    const id = componentIdOf(c);
+    if (!group.sets.has(id)) group.sets.set(id, { ...(c.setNodeId ? { setNodeId: c.setNodeId } : {}), linkNodeId: c.setNodeId ?? c.nodeId });
     group[kind].push(c.name);
   };
   for (const c of changeSet.created) add(c, "created");
   for (const c of changeSet.modified) add(c, "modified");
   for (const c of changeSet.deleted) add(c, "deleted");
+  for (const c of changeSet.deprecated ?? []) add(c, "deprecated");
   return [...groups.values()].sort((a, b) => a.figmaName.localeCompare(b.figmaName));
+}
+
+/** The set node ids a group's sets carry. */
+function setNodeIdsOf(group: Group): string[] {
+  return [...group.sets.values()].flatMap((s) => (s.setNodeId ? [s.setNodeId] : []));
 }
 
 /**
@@ -195,10 +213,10 @@ function mappingOf(
 ): { name: string; dir: string; url?: string } | null {
   const entries = Object.entries(registry.components ?? {});
   const wanted = group.figmaName.trim().toLowerCase();
+  const setNodeIds = setNodeIdsOf(group);
+  const bySetNode = (s: { componentSetNodeId?: string }) => !!s.componentSetNodeId && setNodeIds.includes(s.componentSetNodeId);
   const hit =
-    (group.setNodeId
-      ? entries.find(([, e]) => (e.figma?.sets ?? []).some((s) => s.componentSetNodeId === group.setNodeId))
-      : undefined) ??
+    entries.find(([, e]) => (e.figma?.sets ?? []).some(bySetNode)) ??
     entries.find(
       ([name, e]) =>
         name.toLowerCase() === wanted ||
@@ -209,9 +227,7 @@ function mappingOf(
   const mdxPath = entry.code?.mdxPath;
   if (!mdxPath) return null;
   const dir = mdxPath.slice(0, mdxPath.lastIndexOf("/") + 1);
-  const set = (entry.figma?.sets ?? []).find(
-    (s) => s.componentSetNodeId === group.setNodeId || (s.name ?? "").trim().toLowerCase() === wanted,
-  );
+  const set = (entry.figma?.sets ?? []).find((s) => bySetNode(s) || (s.name ?? "").trim().toLowerCase() === wanted);
   return { name, dir, ...(set?.url ? { url: set.url } : {}) };
 }
 
@@ -222,6 +238,7 @@ function proposalFor(group: Group, code: { name: string; dir: string } | null): 
       "Map it (the component MDX's `figmaMeta`) or confirm it is Figma-only."
     );
   }
+  if (onlyDeprecated(group)) return `deprecated in Figma (renamed with a \`_\`), so no change is drafted: \`${code.name}\` is unaffected.`;
   const where = `\`${code.name}\` (\`${code.dir}\`)`;
   const parts: string[] = [];
   if (group.created.length) parts.push(`add the new variant(s) ${listed(group.created)} to ${where}`);
@@ -238,9 +255,11 @@ function proposalFor(group: Group, code: { name: string; dir: string } | null): 
  * every one deleted is removed.
  */
 function changeOf(group: Group, changeSet: LibraryChangeSet): IntakeRow["change"] {
+  if (onlyDeprecated(group)) return "deprecated";
   if (changeSet.newComponentIds || changeSet.removedComponentIds) {
-    if (changeSet.newComponentIds?.includes(group.id)) return "new";
-    if (changeSet.removedComponentIds?.includes(group.id)) return "removed";
+    const ids = [...group.sets.keys()];
+    if (ids.every((id) => changeSet.newComponentIds?.includes(id))) return "new";
+    if (ids.every((id) => changeSet.removedComponentIds?.includes(id))) return "removed";
     return "updated";
   }
   if (!group.modified.length && !group.deleted.length) return "new";
@@ -248,12 +267,18 @@ function changeOf(group: Group, changeSet: LibraryChangeSet): IntakeRow["change"
   return "updated";
 }
 
-function changeCell(row: Pick<IntakeRow, "created" | "modified" | "deleted">): string {
+/** Every variant the row lists was deprecated, and nothing else changed. */
+function onlyDeprecated(group: Pick<Group, Kind>): boolean {
+  return group.deprecated.length > 0 && !group.created.length && !group.modified.length && !group.deleted.length;
+}
+
+function changeCell(row: Pick<IntakeRow, Kind>): string {
   const cells: string[] = [];
   const n = (xs: string[]) => `${xs.length} variant${xs.length === 1 ? "" : "s"}`;
   if (row.created.length) cells.push(`new: ${n(row.created)}`);
   if (row.modified.length) cells.push(`modified: ${n(row.modified)}`);
   if (row.deleted.length) cells.push(`deleted: ${n(row.deleted)}`);
+  if (row.deprecated.length) cells.push(`deprecated: ${n(row.deprecated)}`);
   return cells.join(", ");
 }
 
@@ -275,19 +300,25 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
   const rows: IntakeRow[] = groupsOf(changeSet).map((group) => {
     const mapped = mappingOf(group, registry);
     const code = mapped ? { name: mapped.name, dir: mapped.dir } : null;
+    const figmaUrls = [...group.sets.values()].map((s) => figmaNodeUrl(changeSet.fileKey, s.linkNodeId));
     return {
       figmaName: group.figmaName,
-      figmaUrl: mapped?.url ?? figmaNodeUrl(changeSet.fileKey, group.setNodeId ?? group.firstNodeId),
+      figmaUrl: mapped?.url ?? figmaUrls[0]!,
+      figmaUrls,
       code,
       change: changeOf(group, changeSet),
       created: group.created,
       modified: group.modified,
       deleted: group.deleted,
+      deprecated: group.deprecated,
       proposal: proposalFor(group, code),
     };
   });
-  const implement = [...new Set(rows.flatMap((r) => (r.code ? [r.code.name] : [])))].sort();
-  const unmapped = rows.filter((r) => !r.code).map((r) => r.figmaName);
+  const deprecated = rows.filter((r) => r.change === "deprecated");
+  const coded = rows.filter((r) => r.code && r.change !== "deprecated");
+  const unmappedRows = rows.filter((r) => !r.code && r.change !== "deprecated");
+  const implement = [...new Set(coded.map((r) => r.code!.name))].sort();
+  const unmapped = unmappedRows.map((r) => r.figmaName);
 
   const what = newest ? newest.label || firstLine(newest.description) || "untitled publish" : "component metadata change";
   const title = `Figma library publish: ${what} — ${rows.length} component${rows.length === 1 ? "" : "s"}`;
@@ -304,9 +335,10 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
   if (rows.length) {
     lines.push("| Component | Figma | Code | Change |", "|---|---|---|---|");
     for (const r of rows) {
-      lines.push(
-        `| ${cell(r.code?.name ?? r.figmaName)} | [${cell(r.figmaName)}](${r.figmaUrl}) | ${r.code ? `\`${r.code.dir}\`` : NO_MAPPING} | ${changeCell(r)} |`,
-      );
+      // Two sets of one name: the name links the first, and the rest are numbered.
+      const others = r.figmaUrls.slice(1);
+      const links = [`[${cell(r.figmaName)}](${r.figmaUrl})`, ...others.map((u, i) => `[${i + 2}](${u})`)].join(", ");
+      lines.push(`| ${cell(r.code?.name ?? r.figmaName)} | ${links} | ${r.code ? `\`${r.code.dir}\`` : NO_MAPPING} | ${changeCell(r)} |`);
     }
   } else {
     lines.push("No component metadata changed and no visual baseline could be compared, so nothing is itemised. Check the version in Figma.");
@@ -314,8 +346,23 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
   lines.push("");
 
   lines.push("## Proposed code change", "");
-  rows.forEach((r, i) => lines.push(`${i + 1}. **${r.code?.name ?? r.figmaName}** — ${r.proposal}`));
-  if (!rows.length) lines.push("None drafted.");
+  // One numbered item per mapped component; the components with no code
+  // mapping share one line, and so do the deprecated ones.
+  const items = coded.map((r) => `**${r.code!.name}** — ${r.proposal}`);
+  if (unmappedRows.length) {
+    items.push(
+      `**No code mapping** — ${unmapped.join(", ")}: \`component-registry.json\` maps no code to ` +
+        `${unmapped.length === 1 ? "it" : "these"}, so no change is drafted. Map ${unmapped.length === 1 ? "it in its" : "each in its"} MDX's \`figmaMeta\`, or confirm it is Figma-only.`,
+    );
+  }
+  if (deprecated.length) {
+    items.push(
+      `**Deprecated in Figma** — ${deprecated.map((r) => r.figmaName).join(", ")}: renamed with a \`_\`, so ` +
+        `${deprecated.length === 1 ? "it no longer publishes" : "they no longer publish"}. Code is unaffected, and no change is drafted.`,
+    );
+  }
+  items.forEach((item, i) => lines.push(`${i + 1}. ${item}`));
+  if (!items.length) lines.push("None drafted.");
   lines.push("");
 
   lines.push(
@@ -340,6 +387,8 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
     rows,
     implement: newest ? implement : [],
     unmapped,
+    // A publish nothing could be itemised for still asks a person to look.
+    needsIntake: !rows.length || coded.length > 0,
   };
 }
 
@@ -373,7 +422,7 @@ function codeGroups(intake: PublishIntake): Array<{ label: string; names: string
 
 /** "2 new, 5 updated" — what happened to the rows, by kind. */
 function changeParts(rows: readonly IntakeRow[]): string {
-  return (["new", "updated", "removed"] as const)
+  return (["new", "updated", "removed", "deprecated"] as const)
     .map((change) => ({ change, n: rows.filter((r) => r.change === change).length }))
     .filter((p) => p.n)
     .map((p) => `${p.n} ${p.change}`)
@@ -562,6 +611,29 @@ export function editedNotPublished(changeSet: LibraryChangeSet, intake: PublishI
   return textWith(largestFitting(1, names.length - 1, (k) => textWith(k).length <= ONE_POST_CHARS));
 }
 
+/** What a row's change reads as after "N components". */
+const DONE_TO: Record<IntakeRow["change"], string> = { new: "added", updated: "updated", removed: "removed", deprecated: "deprecated" };
+
+/**
+ * What a publish with nothing to do in code posts: no card and no intake,
+ * because every changed component was deprecated or maps to no code. One
+ * line: who published what, what changed, and that code is unaffected.
+ *
+ * @param changeSet - What the poll found; it carries a published version
+ * @param intake - Its drafted intake, whose `needsIntake` is false
+ */
+export function noCodeChange(changeSet: LibraryChangeSet, intake: PublishIntake): string {
+  const newest = changeSet.versions[0];
+  const who = newest ? `${escapeSlackText(newest.user)} published "${escapeSlackText(versionName(newest))}"` : "A version was published";
+  const n = intake.rows.length;
+  const kinds = [...new Set(intake.rows.map((r) => r.change))];
+  const what =
+    kinds.length === 1
+      ? `${n} component${n === 1 ? "" : "s"} ${DONE_TO[kinds[0]!]}`
+      : `${n} components changed (${changeParts(intake.rows)})`;
+  return `${who} to the <${libraryUrl(changeSet.fileKey)}|library>: ${what}. Code is unaffected, so nothing is filed.`;
+}
+
 /**
  * Two change sets as one, the newer on top — how an edit posted as "edited,
  * not published" rides into the next publish's card, so the card lists it
@@ -574,15 +646,15 @@ export function editedNotPublished(changeSet: LibraryChangeSet, intake: PublishI
  * @param newer - The one now being posted
  */
 export function mergeChangeSets(older: LibraryChangeSet, newer: LibraryChangeSet): LibraryChangeSet {
-  type Kind = "created" | "modified" | "deleted";
   const byKey = new Map<string, { kind: Kind; component: LibraryComponent }>();
+  const gone = (kind: Kind | undefined) => kind === "deleted" || kind === "deprecated";
   for (const set of [older, newer]) {
-    for (const kind of ["created", "modified", "deleted"] as const) {
-      for (const component of set[kind]) {
+    for (const kind of ["created", "modified", "deleted", "deprecated"] as const) {
+      for (const component of set[kind] ?? []) {
         const before = byKey.get(component.key)?.kind;
-        if (before === "created" && kind === "deleted") byKey.delete(component.key);
+        if (before === "created" && gone(kind)) byKey.delete(component.key);
         else if (before === "created") byKey.set(component.key, { kind: "created", component });
-        else if (before === "deleted" && kind !== "deleted") byKey.set(component.key, { kind: "modified", component });
+        else if (gone(before) && !gone(kind)) byKey.set(component.key, { kind: "modified", component });
         else byKey.set(component.key, { kind, component });
       }
     }
@@ -595,11 +667,12 @@ export function mergeChangeSets(older: LibraryChangeSet, newer: LibraryChangeSet
     created: of("created"),
     modified: of("modified"),
     deleted: of("deleted"),
+    ...(older.deprecated || newer.deprecated ? { deprecated: of("deprecated") } : {}),
   };
   if (older.newComponentIds || newer.newComponentIds || older.removedComponentIds || newer.removedComponentIds) {
     // A component is still new while a created variant of it is left, and
     // still removed while a deleted one is.
-    const ids = (kind: Kind) => new Set(merged[kind].map(componentIdOf));
+    const ids = (kind: "created" | "deleted") => new Set(merged[kind].map(componentIdOf));
     const created = ids("created");
     const deleted = ids("deleted");
     merged.newComponentIds = [...new Set([...(older.newComponentIds ?? []), ...(newer.newComponentIds ?? [])])].filter((id) => created.has(id));
