@@ -604,7 +604,6 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
     deps: (over = {}) => ({
       slack: client,
       streamingOn: over.streamingOn ?? true,
-      streamChannels: over.streamChannels ?? null,
       alertChannel: over.alertChannel ?? "C_ALERT",
       ...(over.throttle === undefined ? {} : { throttle: over.throttle }),
     }),
