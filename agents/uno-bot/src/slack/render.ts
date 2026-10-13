@@ -9,7 +9,7 @@
 // all. Splitting the render from the posting is the whole change; `delivery.ts`
 // re-exports both for its existing callers.
 
-import { toSlackMrkdwn } from "./mrkdwn";
+import { reviewMarkdown, toSlackMrkdwn } from "./mrkdwn";
 import { splitBalanced } from "./split";
 
 // A section's text field caps at 3000 chars, below the 11,000 a single message
@@ -34,6 +34,15 @@ export function textSections(body: string): Array<Record<string, unknown>> {
     type: "section",
     text: { type: "mrkdwn", text: chunk },
   }));
+}
+
+/**
+ * A body as the Review pop-up's sections: `textSections`, after the pop-up's
+ * own tidy-up (`reviewMarkdown` — no comments, a table row as one bullet, task
+ * items as boxes). Every row is kept; a long body runs on into more sections.
+ */
+export function reviewSections(body: string): Array<Record<string, unknown>> {
+  return textSections(reviewMarkdown(body));
 }
 
 // ── The delivered body ──────────────────────────────────────────────────────

@@ -26,6 +26,7 @@ import { fileURLToPath } from 'url';
 import { storybookId } from './lib/storybook-id.mjs';
 
 import { documents } from './lib/corpus.mjs';
+import { isEntry } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -148,6 +149,27 @@ function developerLinks(mdxPath, content, name) {
   };
 }
 
+/**
+ * `figmaMeta.deliberate`, checked: an object of code prop → a non-empty
+ * one-line reason, each prop one the component's `props` declares when it
+ * declares any. A malformed record fails the generator rather than silently
+ * muting the check.
+ */
+export function deliberateOf(deliberate, name, props) {
+  if (!deliberate || typeof deliberate !== 'object' || Array.isArray(deliberate)) {
+    throw new Error(`${name}: figmaMeta.deliberate must be an object of code prop → reason`);
+  }
+  for (const [prop, reason] of Object.entries(deliberate)) {
+    if (typeof reason !== 'string' || !reason.trim() || reason.includes('\n')) {
+      throw new Error(`${name}: figmaMeta.deliberate.${prop} needs a one-line reason`);
+    }
+    if (props && !Object.hasOwn(props, prop)) {
+      throw new Error(`${name}: figmaMeta.deliberate.${prop} names no prop in figmaMeta.props`);
+    }
+  }
+  return deliberate;
+}
+
 function extractFromMdx(mdxPath) {
   const content = fs.readFileSync(mdxPath, 'utf8');
   const figmaMeta = extractFigmaMeta(content);
@@ -172,6 +194,9 @@ function extractFromMdx(mdxPath) {
   };
   // The Figma link shown in each docs page's Resources card (ResourcesBlock figmaLink prop).
   if (figmaLinkMatch) figma.docsPageUrl = figmaLinkMatch[1];
+  // Differences from the library a person settled as intended: code prop →
+  // one-line reason. The weekly DS precedence check skips them.
+  if (figmaMeta.deliberate !== undefined) figma.deliberate = deliberateOf(figmaMeta.deliberate, name, figmaMeta.props);
 
   return {
     name,
@@ -238,4 +263,4 @@ function main() {
   }
 }
 
-main();
+if (isEntry(import.meta.url)) main();

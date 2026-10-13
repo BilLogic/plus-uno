@@ -11,7 +11,9 @@
 //
 //   `sweep-notes` reads the Design Running Notes rows edited since its cursor,
 //   oldest edit first. The record is each note's blocks edited since then.
-//   `sweep-cards` reads the Roadmap cards edited since its cursor. The record
+//   `sweep-cards` reads the Roadmap cards edited since its cursor that the
+//   Design team owns (`isDesignCard`); another team's card, or one with no
+//   team, is passed over and the cursor moves past it. The record
 //   is each card's comments made since then and its body blocks edited since
 //   then; the card itself is among the pages its fix may rewrite, never at the
 //   blocks that record the decision.
@@ -133,6 +135,22 @@ export const QUERY_PAGES = 3;
 /** Row ids kept at the cursor's minute; past this the oldest drop off. */
 const EDGE_IDS = 200;
 
+/**
+ * Whether a Roadmap row is a Design card — the only kind the cards job reads:
+ * its own parent is the Roadmap, and its `Current Team` holds `Design`, the
+ * value a filed PRD card carries and the Design kanban routes on.
+ *
+ * @param row - The row: its parent and select values by property name
+ * @param roadmapDb - `NOTION_ROADMAP_DB_ID`
+ */
+function isDesignCard(
+  row: { parentDatabaseId?: string | null; properties?: Record<string, string> },
+  roadmapDb: string,
+): boolean {
+  if (!row.parentDatabaseId || row.parentDatabaseId !== bare(roadmapDb)) return false;
+  return (row.properties?.["Current Team"] ?? "").split(",").some((v) => v.trim() === "Design");
+}
+
 /** Where a job left off: the last edit time it reached, the rows it handled
  *  at that time, and the query page it was working through there. A bare
  *  time (no `|`) reads as none handled, from the first page. */
@@ -233,7 +251,7 @@ export async function sweepRecords(job: ScheduledJob, deps: SweepDeps): Promise<
     }
     const failing = new Set(rows.length && !deps.dryRun ? await deps.store.failingThreads(source.cursor) : []);
     for (const row of rows) {
-      const allowed = kind === "note" ? isTeamNote(row, db) : row.parentDatabaseId === bare(db);
+      const allowed = kind === "note" ? isTeamNote(row, db) : isDesignCard(row, db);
       if (allowed) {
         const found = await sweepRecord(deps, { kind, row, since: cursor, runDate, now, resolved });
         if (!found.ok) {

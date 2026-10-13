@@ -265,12 +265,12 @@ describe("the library publish report", () => {
     passesChecklist(text);
   });
 
-  it("names two components that share a name twice, so the count still matches", () => {
+  it("counts two sets that share a name as one component, so the count still matches", () => {
     const twins = changeSet({
       modified: [component("Button"), { ...component("Button", "Other"), setNodeId: "9:Button-2" }],
     });
     const text = card(twins);
-    assert.match(text, /^2 components changed: 2 updated\.$/m);
+    assert.match(text, /^1 component changed: 1 updated\.$/m);
     countMatchesNames(text);
   });
 
