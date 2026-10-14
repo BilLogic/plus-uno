@@ -239,7 +239,7 @@ export async function raiseUnanswered(
       if (sent.notIn) {
         result.notes.push(`uno-bot is not in ${sent.notIn}, so the question ${q.commentId} on ${file.fileKey} waits for the invite`);
       } else {
-        result.notes.push(`the question ${q.commentId} on ${file.fileKey} did not post, so it waits for tomorrow`);
+        result.notes.push(`the question ${q.commentId} on ${file.fileKey} did not reach everyone it is for, so the rest wait for tomorrow`);
       }
     }
     if (!opts.dryRun && (done.size || progressed.size)) {
@@ -310,17 +310,15 @@ async function raise(
 ): Promise<{ ok: true } | { ok: false; question: WatchedQuestion; notIn?: string }> {
   const link = commentUrl(file.fileKey, q.nodeId, q.commentId);
   const dmed = new Set(q.dmed ?? []);
-  let sent = false;
   for (const person of named.mapped) {
     if (dmed.has(person.slack)) continue;
-    if (await ports.dm(person.slack, questionDm(file, q, root.message, link))) {
-      dmed.add(person.slack);
-      sent = true;
-    }
+    if (await ports.dm(person.slack, questionDm(file, q, root.message, link))) dmed.add(person.slack);
   }
+  // A person whose DM failed stays owed it: the next morning tries them alone.
+  const allDmed = named.mapped.every((p) => dmed.has(p.slack));
   const reached = (carded: boolean): WatchedQuestion => ({ ...q, ...(dmed.size ? { dmed: [...dmed] } : {}), ...(carded ? { carded: true } : {}) });
   const cardDue = !(named.mapped.length && !named.unmapped.length) && !q.carded;
-  if (!cardDue) return sent || q.carded || dmed.size ? { ok: true } : { ok: false, question: reached(!!q.carded) };
+  if (!cardDue) return allDmed ? { ok: true } : { ok: false, question: reached(!!q.carded) };
 
   const team = file.pillars.length ? null : await ports.fileTeam(file.fileKey);
   const { destination, addressee } = routeFinding({
@@ -338,7 +336,7 @@ async function raise(
         rethrowIfBudget(err);
         console.error(`[figma-triage] ${card.ts} posted but is not on the usage record: ${err instanceof Error ? err.message : String(err)}`);
       });
-    return { ok: true };
+    return allDmed ? { ok: true } : { ok: false, question: reached(true) };
   }
   return { ok: false, question: reached(false), ...(card.error === "not_in_channel" ? { notIn: where.channel } : {}) };
 }

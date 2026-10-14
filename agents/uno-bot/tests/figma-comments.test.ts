@@ -863,6 +863,28 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.equal(h.figma.triage.watch.size, 0);
   });
 
+  it("retries next morning only the mapped person whose DM failed", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, {
+      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K @bea should the bar animate?" } : c)),
+    });
+    const dmFails = ["U0BEA"];
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH,bea=U0BEA", dmFails } });
+    await runSweepJob(NIGHT, h.deps);
+    const friday = await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
+    assert.doesNotMatch(friday.summary, /raised 1 unanswered/);
+    assert.equal(h.figma.triage.watch.get(FILE)?.questions.length, 1, "bea is still owed her DM");
+
+    dmFails.length = 0;
+    await morning(h, MONDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH", "U0BEA"], "only bea is DMed on the retry");
+    assert.deepEqual(h.figma.triage.posts, []);
+    assert.equal(h.figma.triage.watch.size, 0);
+    await morning(h, at(36, 13));
+    assert.equal(h.figma.triage.dms.length, 2);
+  });
+
   it("with no card, goes to the Figma file's team channel and names its creator by handle, untagged", async () => {
     const client = createInMemoryFigma();
     client.seedFile("ToolFile1", {
