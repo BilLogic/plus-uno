@@ -19,7 +19,7 @@ Keep the harness current from Slack. A designer flags that the agent system is w
 7. **Package the gated change** (method §5), one gated tool per message:
    - Draft the PRD as text in-thread first — Title · Summary · Problem/Context · Goals & Non-goals · Users & Scenarios · Requirements/Scope · Acceptance Criteria · Open Questions — and let them refine it. The compact-PRD size wall from `skills/uno-synthesize/bot.md` holds here too; expansion is IDE work.
    - On approval → `notion_create` (gated); post the Notion link.
-   - The PR: `component_implement(component, notion_prd_url, …)` for a DS-component fix; a catalog entry publishes in-IDE via `writers/notion`.
+   - The PR: a DS-component fix is IDE work — hand off a ready-to-paste prompt naming the PRD; a catalog entry publishes in-IDE via `writers/notion`.
    - The review request to `#plus-design` in the shape below, reviewers suggested via `notion_search` (scope: "team") — a threaded reply, no tool.
    Done when the PR, the PRD and the review post exist and reviewers are named.
 8. **Carry the verdict** (method §5). ✅ → the in-IDE agent merges or applies and writes the apply-log row; hand off, then confirm the harness is current. 🔁 → fold the feedback in and re-propose; a heavy revision escalates. ❌ → record why in the thread. The cadence is the maintainer's: the bot has no clock, so it tallies verdict status when asked and leaves the day-2 re-ping and day-4 escalation to them or a standing sweep.

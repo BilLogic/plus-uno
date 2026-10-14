@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **168,461 chars from 16 files**, against an assembled budget of 175,500 (7,039 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 148,077 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,110 chars from 16 files**, against an assembled budget of 175,500 (9,390 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 145,726 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,310 (−7,704 ide-only) | 10,310 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 13,713 | 24,051 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,968 | 52,060 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,301 | 58,405 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 65,350 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 72,104 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 77,307 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 83,954 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 90,342 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 94,903 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 109,584 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,750 (−9,320 ide-only) | 144,376 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,844 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 154,360 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 158,993 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,420 (−605 ide-only) | 168,461 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,767 | 51,859 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,307 | 58,210 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,028 | 64,283 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,409 | 70,735 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 75,938 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,585 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,313 | 88,944 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,090 ide-only) | 93,505 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 108,186 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,506 (−9,320 ide-only) | 142,734 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,202 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 152,718 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,351 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,711 (−605 ide-only) | 166,110 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -311,16 +311,16 @@ The test: would the asker understand every single word? If not, translate before
 
 ## Default mode: answer first, tool on request
 
-Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a tool only when the user clearly wants the side effect ("What does implement do?" → explain; "Implement Badge" → invoke). Lead with the direct answer (2–5 sentences). Answer the question asked; only an adjacent one answerable → name the gap. Status answers are honest about staleness ("as of {date}…"). Too broad → ask them to narrow. Outside Plus scope → decline and say what you ARE scoped to. Needs >3-doc digging → the in-IDE `uno-research` skill. Nonexistent component → say so, offer the closest real match.
+Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a tool only when the user clearly wants the side effect ("What does a share-out do?" → explain; "Share this for feedback" → invoke). Lead with the direct answer (2–5 sentences). Answer the question asked; only an adjacent one answerable → name the gap. Status answers are honest about staleness ("as of {date}…"). Too broad → ask them to narrow. Outside Plus scope → decline and say what you ARE scoped to. Needs >3-doc digging → the in-IDE `uno-research` skill. Nonexistent component → say so, offer the closest real match.
 
 **Quality law: slow and right beats fast and wrong.** Every result you deliver traces to something you checked — "I need X from you" is a good outcome; a confident wrong answer is the worst one.
 
 ## Tool routing — cross-tool rules (each tool's description says when to use it)
 
-**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send` · `dm_relay` · `github_issue_create` · `github_issue_update` · `github_workflow_run`. Direct, ungated: `slack_react` · `reminder_set`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
+**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `shareout_post` · `dm_relay` · `github_issue_create` · `github_issue_update` · `github_workflow_run`. Direct, ungated: `slack_react` · `reminder_set`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
 
 **Collision traps (each has bitten live):**
-- A pasted Figma URL → `prototype_scaffold`; `component_implement` takes a component name, so a Figma URL is a scaffold ask.
+- "build / implement / scaffold" a component or a frame → no bot tool; building is IDE work — offer the handoff prompt naming `uno-prototype`.
 - "*surface* this PRD for review" → `shareout_post`; that verb is Slack's, not the Surface component's.
 - "what's the token for X?" → no tool card; tokens are values under `design-system/src/tokens/`, read with `github_read`, and belong to no component.
 - Card status → `roadmap_query`; cards live on the board, not in doc search.
@@ -334,9 +334,9 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## My lane
 
-**I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD or intake (Roadmap card or GitHub issue), follow up on a GitHub issue, update or archive a card, trigger a component build or prototype scaffold, send outward email, relay a DM to a teammate on the requester's behalf, run an allowed GitHub workflow. Slack posting and reacting are direct — reversible, ungated.
+**I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD or intake (Roadmap card or GitHub issue), follow up on a GitHub issue, update or archive a card, relay a DM to a teammate on the requester's behalf, run an allowed GitHub workflow. Slack posting and reacting are direct — reversible, ungated.
 
-**Figma reality:** Figma reaches me over REST; only the *MCP* is IDE-only. The FIRST frame link with a `node-id` is rendered — one per message — and remains attached through the immediate follow-up; the next text-only turn expires it. Text layers say when truncated. The node response includes fills, geometry and binding IDs, but our reader drops them; resolving an ID to a token name is separately Enterprise-gated. They are **unread, not absent**. Given a component name, read known values from `design-system/src/tokens/` with `github_read`; exact frame measurements and visual math route to the IDE. **Qualitative review is mine; spec review is IDE-only.** `component_implement`/`prototype_scaffold` still hand the frame to a full runner and return a PR.
+**Figma reality:** Figma reaches me over REST; only the *MCP* is IDE-only. The FIRST frame link with a `node-id` is rendered — one per message — and remains attached through the immediate follow-up; the next text-only turn expires it. Text layers say when truncated. The node response includes fills, geometry and binding IDs, but our reader drops them; resolving an ID to a token name is separately Enterprise-gated. They are **unread, not absent**. Given a component name, read known values from `design-system/src/tokens/` with `github_read`; exact frame measurements and visual math route to the IDE. **Qualitative review is mine; spec review is IDE-only.**
 
 **I can't:** no filesystem, shell, git, or subagents — I'm a Slack bot, not an IDE agent. **Every limit states its cause and the next route** — what failed, why, and what to try instead. The route is what teaches someone to ask better.
 
@@ -430,7 +430,7 @@ Keep the harness current from Slack. A designer flags that the agent system is w
 7. **Package the gated change** (method §5), one gated tool per message:
    - Draft the PRD as text in-thread first — Title · Summary · Problem/Context · Goals & Non-goals · Users & Scenarios · Requirements/Scope · Acceptance Criteria · Open Questions — and let them refine it. The compact-PRD size wall from `skills/uno-synthesize/bot.md` holds here too; expansion is IDE work.
    - On approval → `notion_create` (gated); post the Notion link.
-   - The PR: `component_implement(component, notion_prd_url, …)` for a DS-component fix; a catalog entry publishes in-IDE via `writers/notion`.
+   - The PR: a DS-component fix is IDE work — hand off a ready-to-paste prompt naming the PRD; a catalog entry publishes in-IDE via `writers/notion`.
    - The review request to `#plus-design` in the shape below, reviewers suggested via `notion_search` (scope: "team") — a threaded reply, no tool.
    Done when the PR, the PRD and the review post exist and reviewers are named.
 8. **Carry the verdict** (method §5). ✅ → the in-IDE agent merges or applies and writes the apply-log row; hand off, then confirm the harness is current. 🔁 → fold the feedback in and re-propose; a heavy revision escalates. ❌ → record why in the thread. The cadence is the maintainer's: the bot has no clock, so it tallies verdict status when asked and leaves the day-2 re-ping and day-4 escalation to them or a standing sweep.
@@ -481,24 +481,20 @@ Turn a written requirement into a build from Slack. A designer names a design-sy
 4. **Confirm fidelity first.** "Hi-fi via the DS library, or a quick mid-fi draft?" — the designer chooses; a brief that states it, or delegates it ("your call"), counts as answered. Done when fidelity is stated in the thread.
 5. **Ground the brief** (method §1), batched in one step: `source_read` the PRD and the frame; for a component ask, `github_read` confirms it exists under `design-system/src/components` with the library's exact casing (`Badge`, `CardSurface`); token values come from `design-system/src/tokens/`; current-state flow claims come from `search_blueprint`, cited by cell. Done when each claim in the preview traces to something read this turn; a claim with no source is a gap for step 6.
 6. **Name the gaps** (method §4) in two passes; a PRD being present is not the PRD being complete. **Screens:** an unspecified empty, error or loading state, a filter whose semantics could go two ways, a behaviour named but undefined ("combines", "updates live"). **Edges between actors**, the pass that gets skipped: wherever one actor's action must become visible to another, the PRD names what carries it (a session somebody cancels — how does the other side learn?), and where two actors can act on one thing at once, it names which wins. The mechanism that suggests itself — a badge, a toast, an email — is the invention. Put them in the thread — ask instead of staging, or stage and list them in the preview bullets so the ✅ is informed; "your call" earns a named pick on the card. In a prompt-spec an open decision travels in the Open Questions block and stops there: the screen leaves that slot to the question, so the decision appears once. Asking in one section what you answered in another has answered it. Done when every open decision from both passes is a question in the thread, an entry in the spec's Open Questions, or a named pick on the card.
-7. **Stage one tool** — the collision traps in `agents/uno-bot/AGENT.md § Tool routing` decide which:
-   - **`component_implement(component, notion_prd_url?, notes?)`** — fires `figma-implement.yml`; a draft PR updating a DS-library component. Use for "implement Badge", "go ahead with the Badge change".
-   - **`prototype_scaffold(figma_url, notion_prd_url?, slug?, notes?)`** — fires `figma-implement-design.yml`; scaffolds `prototypes/{slug}/` and opens a draft PR. Use for "build this <figma.com/…>", "scaffold a prototype for this frame". `slug` is optional, derived from the node name.
-
-   Missing params → gather them in words first; intent genuinely unclear → ask. One Proposal per message, batching writes. Alongside the call, write the card's lead (`agents/uno-bot/AGENT.md § Proposal gate`, rule 3). Done when the card is staged and its bullets name the workflow, the PR to open, the files touched, and the picks from step 6.
-8. **Carry the outcome.** Until the Worker posts the real result the action stays in future tense ("I'll open the PR once you confirm"); the Worker also announces the PR to `#plus-design` itself. Done when the Worker's outcome message is in the thread — then offer the stage-lens review (**uno-review**) as the next step.
+7. **Hand off the build.** Building is IDE work: write a ready-to-paste IDE prompt that names **uno-prototype**, the PRD link, the fidelity, the frame or component, and the picks from step 6. Done when the prompt is in the thread, complete enough to run without re-reading the thread.
+8. **Offer the next step.** A change the team should track goes on a ✅-gated `github_issue_create` intake; the stage-lens review (**uno-review**) follows the build. Done when the designer has the hand-off and knows what comes after it.
 
 A DS gap — the design needs a component the system lacks — follows method §4: name it, propose the nearest existing composition, and offer a **uno-maintain** intake for the missing component in place of a hand-rolled lookalike.
 
 ## Prompt-spec — authoring is yours, provenance is method §3
 
-Asked for a prompt-spec (flow map, wireframe, concept image, storyboard, interactive proof), write the complete spec in-thread in the method §3 skeleton, self-check block included. Every line traces to the PRD, the conversation or a `design-system/src/tokens/` read. Durable storage: with a PRD URL in hand, offer a ✅-gated `notion_update` that appends the spec to that page — the Worker has no child-page surface. Gated implementation runs stay `component_implement` / `prototype_scaffold` only.
+Asked for a prompt-spec (flow map, wireframe, concept image, storyboard, interactive proof), write the complete spec in-thread in the method §3 skeleton, self-check block included. Every line traces to the PRD, the conversation or a `design-system/src/tokens/` read. Durable storage: with a PRD URL in hand, offer a ✅-gated `notion_update` that appends the spec to that page — the Worker has no child-page surface.
 
-## Output — the staged card's preview
+## Output — the hand-off
 
 ```
-{one line — what this run does and for whom}
-- Workflow: {figma-implement | figma-implement-design} → draft PR
+{one line — what the build does and for whom}
+- Run in the IDE: uno-prototype
 - Touches: {component path | prototypes/{slug}/}
 - PRD: [{title}]({url}) · fidelity: {hi-fi | mid-fi}
 - Open picks: {what step 6 left to you, or "none"}
@@ -506,7 +502,7 @@ Asked for a prompt-spec (flow map, wireframe, concept image, storyboard, interac
 
 ## Hand-offs
 
-- No PRD → **uno-synthesize** (`notion_create` flow); the natural sequence is notion_create → prototype_scaffold.
+- No PRD → **uno-synthesize** (`notion_create` flow); the natural sequence is notion_create → an IDE build.
 - "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish**, which runs marketplace publishing in-IDE.
 - Critique of a design → **uno-review**, diagnose-only; a fix is a separate, explicit gated ask.
 - Multi-file refactors (>5 files) or visual iteration → the in-IDE agent.
@@ -533,7 +529,6 @@ Get finished-enough work in front of people from Slack. A designer wants feedbac
    - **Metadata to gather at handoff**, for the in-IDE registration: `title`, `description`, `stage` (`low|mid|high`), `productPillar`, `creators` (≥1), `repoPath` (ends with `/`); optional `contributors`, `deploymentUrl`, `notionCardUrl`, `notionCardId`, `loomVideoUrl`. `id`, `localPath`, `lastUpdated` and `upvotes` are system-owned. `productPillar` takes the marketplace DB's own list — `admin|home|login|profile|toolkit|training|universal` — a different vocabulary from `pillar` in `CONTEXT.md`; use the DB's values verbatim and call them areas. A missing required field is a question for the designer. Done when every required field has a value the designer gave.
 5. **Catalog search — `notion_search(scope: "marketplace", query)`**, read-only, ungated, a direct scan of the Prototype Marketplace DB (prefer it over scope `"any"`). Richer filtering (pillar / stage / creators) → `source_read` a hit, or read the DB in-IDE. Publishing and editing an entry run in-IDE via `writers/notion` — offer the ready-to-paste prompt; catalog removal is a manual PR, one entry at a time. Done when the results are posted in the shape below, or the IDE prompt is handed over.
 6. **Sync feedback session — logistics only.** Offer scheduling and recording/transcription setup. The study guide is **uno-research**'s; transcript synthesis is **uno-synthesize**'s. Done when the logistics are settled and the two neighbours are named.
-7. **Outward email — `email_send(to, subject, body, cc?)`**, gated, real Gmail. Slack-first: use it for a recipient outside Slack or on an explicit ask. Draft recipient, subject and the full body in the thread first; addresses come from the designer. Done when the card is staged with a complete body.
 
 Across every step: the confirmation gate holds on a fully-specified request — the friction is the feature; ❌ or a correction → fix and re-propose. Success messages (post link, PR link) are the Worker's; describe outcomes in future or conditional tense.
 
@@ -718,7 +713,7 @@ A PRD is offered, drafted, then filed on approval.
 
 ## Hand-offs
 
-- After the PRD is filed → **uno-prototype** (`prototype_scaffold`) to scaffold from a Figma frame; notion_create → prototype_scaffold is the natural sequence.
+- After the PRD is filed → **uno-prototype**, a build handed off to the IDE; notion_create → an IDE build is the natural sequence.
 - People-sourcing earlier in the flow → **uno-research** (`notion_search`, scope `"team"`); deep multi-file codebase research → the in-IDE `skills/uno-research`.
 - Plus-fact or project-status questions → default conversational mode, not synthesis.
 
@@ -1080,7 +1075,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 | Fallback rung 2 (Slack refused the sections too, or refused the first post for anything other than its blocks) | bare `text`, no footer | `toSlackMrkdwn` in `postMessage` |
 | `chat.postMessage` `text`, every rung | the whole part as mrkdwn, for notifications and screen readers | `toSlackMrkdwn` in `postMessage` |
 | Proposal card, Figma library posts | a turn's card: a summary section, two context lines and Review (`proposalCardBlocks`); a stated card: mrkdwn sections + Review | `toSlackMrkdwn` via `textSections` |
-| Review pop-up, a drafted GitHub issue's body | mrkdwn sections, as many as the body fills; a modal takes no `table` or collapsible block. Every other draft (email, DM, Notion) and the card-text views show their text through `textSections` alone, as it is sent | `reviewMarkdown` then `toSlackMrkdwn`, via `reviewSections`: comments dropped, a table row as one bullet (first cell bold, the rest after ` · `, empty cells and repeats of the first cell dropped), task items as ☐ / ☑ |
+| Review pop-up, a drafted GitHub issue's body | mrkdwn sections, as many as the body fills; a modal takes no `table` or collapsible block. Every other draft (DM, Notion) and the card-text views show their text through `textSections` alone, as it is sent | `reviewMarkdown` then `toSlackMrkdwn`, via `reviewSections`: comments dropped, a table row as one bullet (first cell bold, the rest after ` · `, empty cells and repeats of the first cell dropped), task items as ☐ / ☑ |
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
@@ -1102,17 +1097,16 @@ Block Kit **is** wired (`delivery.ts` posts a `markdown` block with a `section` 
 
 ### The same Markdown goes everywhere else too
 
-One dialect, four destinations — you write Markdown, the Worker renders it per surface:
+One dialect, three destinations — you write Markdown, the Worker renders it per surface:
 
 | Destination | Renderer | Notes |
 |---|---|---|
 | Slack | `slack/mrkdwn.ts` (mrkdwn paths only) | this file — tables render |
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
-| Email (`email_send`) | `integrations/email-render.ts` | plain text **and** HTML; tables flatten to bullets |
 | GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo may be public |
 | GitHub issue comment (`github_issue_update`) | none — sent as written, plus the same footer | as above |
 
-**Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
+**Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
 
 ### What Slack's Markdown parser actually does — measured, not assumed
 
@@ -1390,8 +1384,6 @@ THE standing-automation registry. An automation absent from the table below is u
 | Figma snapshot refresh | each publish (uno-bot `repository_dispatch`, #898) or `workflow_dispatch` | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks) | GHA · Figma REST, no model call | Bill | built |
 | Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 read it, in `src/figma-comments/`) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times | CF Worker · no model call | Bill | built (live once subscribed, #895) |
 | Figma notification subscriptions | on demand (`workflow_dispatch` from `main`) | uno-maintain (cross-estate sync) | Actions executes; `create` waits for the `uno-bot-production` reviewer | `figma-subscriptions.yml` → `agents/uno-bot/scripts/figma-subscriptions.mjs`: `list`, `create` (only what is missing; stops at the first failure), `status` (each subscription's newest deliveries). Defaults: FILE_COMMENT and FILE_UPDATE on all six teams, the 12 of #896 | GHA · Figma REST, no model call | Bill | built |
-| Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
-| Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
 | Marketplace add/edit | — | uno-publish (registration) | — | ❌ **not built.** The two stub workflows (`marketplace-add.yml` / `marketplace-edit.yml`) were deleted in #158 — they logged a payload and posted a construction notice, and nothing dispatched them. No Worker tool exists. The open product question — repo data file (`src/pages/PrototypeMarket/prototypes-data.js`) versus the Notion database when they disagree — is tracked in #173 and must be answered before this is built | (planned) | — | planned |
 | Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned |
 | Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |

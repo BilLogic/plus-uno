@@ -51,7 +51,7 @@ A PRD is offered, drafted, then filed on approval.
 
 ## Hand-offs
 
-- After the PRD is filed → **uno-prototype** (`prototype_scaffold`) to scaffold from a Figma frame; notion_create → prototype_scaffold is the natural sequence.
+- After the PRD is filed → **uno-prototype**, a build handed off to the IDE; notion_create → an IDE build is the natural sequence.
 - People-sourcing earlier in the flow → **uno-research** (`notion_search`, scope `"team"`); deep multi-file codebase research → the in-IDE `skills/uno-research`.
 - Plus-fact or project-status questions → default conversational mode, not synthesis.
 
