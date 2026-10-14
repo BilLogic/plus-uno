@@ -17,7 +17,7 @@ last touched in April. The re-read cost more than every entry was worth.
 |---|---|---|
 | **rule** | An agent would behave differently knowing it. That is the whole test — a rule that restates the model's default is noise, and it is re-read on every turn that loads its doc. | The doc that already owns the subject: `docs/engineering/coding.md`, `docs/engineering/setup.md`, a `docs/connectors/*.md`, a design-system guideline. Never a new rules file. |
 | **adr** | Hard to reverse · surprising without the context · a real trade-off. All three, not one. | `docs/adr/NNN-slug.md`, per `docs/adr/overview.md`. |
-| **archive** | A record of a superseded era, kept for the trail rather than for use. | `docs/knowledge/archive/`. |
+| **archive** | A superseded doc that something live still cites as its decision trail. | `docs/knowledge/archive/`. |
 
 **Deleting is the fourth outcome and the most common one.** It needs no
 frontmatter because it leaves no file. Git keeps the trail; a finding worth less
@@ -29,10 +29,10 @@ avoid the delete is how the folder filled up the first time.
 `npm run check:knowledge-disposition` fails when a file under `docs/knowledge/`
 carries no `disposition:`. Two exclusions, both structural:
 
-- **`docs/knowledge/archive/`** is out of scope. It is the graveyard for
-  superseded docs, a folder per retired era plus a few loose files, and
-  "promote, convert or delete" means nothing there. Archiving
-  *is* a disposition; the archive's own contents do not need one.
+- **`docs/knowledge/archive/`** is out of scope. It holds a superseded doc only
+  while a live doc, ADR or code comment cites it as its decision trail; once
+  nothing does, the doc is deleted. Archiving *is* a disposition; the archive's
+  own contents do not need one.
 - **This file and `changelog.md`** govern the folder rather than sitting in it.
   They are named in the script, not exempted by a magic frontmatter value, so
   the exemption cannot spread.

@@ -104,7 +104,7 @@ Each rule is one line here and its body lives in the document it names; the lead
 
 ## Knowledge
 
-Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` when a superseded era's own trail matters, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. What is already in the archive stays as it is (#172).
+Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` while a live doc, ADR or code comment cites it as its decision trail, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. The same test clears `docs/plans/`, `todos/` and the archive itself: a plan, todo or archived doc whose work has landed or been abandoned is deleted once nothing live cites it.
 
 <!-- ide-only -->
 ## Progressive loading

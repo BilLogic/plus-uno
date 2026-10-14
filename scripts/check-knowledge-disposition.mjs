@@ -15,9 +15,9 @@
  *
  * Two structural exclusions, both deliberate and both narrow:
  *
- *  - docs/knowledge/archive/ — the graveyard for superseded docs. Archiving IS a
- *    disposition, so its contents do not need to declare one. #172 answered this
- *    explicitly: the 30 archived files are out of scope and stay as they are.
+ *  - docs/knowledge/archive/ — superseded docs that something live still cites
+ *    as a decision trail. Archiving IS a disposition, so its contents do not
+ *    need to declare one; a doc nothing cites is deleted rather than kept here.
  *  - INDEX.md and changelog.md — the folder's contract and its ledger. They
  *    govern the folder rather than sitting in it. Named here rather than
  *    exempted by a frontmatter value, so the exemption cannot spread to the next

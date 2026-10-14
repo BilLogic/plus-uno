@@ -4,7 +4,7 @@ embodiment: ide
 
 # Example Audit: uno-research
 
-A worked example of the audit format, kept for its shape. It audits an earlier revision of the skill: the `references/learning.md` it cites was retired and lives on only in `docs/knowledge/archive/mode-era/`.
+A worked example of the audit format, kept for its shape. It audits an earlier revision of the skill: the `references/learning.md` it cites was retired and lives on only in git history.
 
 ## Executive Summary
 - Overall result: `Needs Revision`
