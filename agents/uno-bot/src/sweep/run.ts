@@ -1613,7 +1613,11 @@ function composeReport(
       }),
       ...(here < entries.length ? [waitWords(here, entries.length)] : []),
     ];
-    return { owner: { slack: owner }, says: says.join(" ") };
+    // A name a card carries for its owner, which a DM says in place of a tag.
+    const name = entries
+      .flatMap((e) => (isFix(e) ? [] : (e.card.item.owners ?? [])))
+      .flatMap((o) => ("slack" in o && o.slack === owner && o.name ? [o.name] : []))[0];
+    return { owner: { slack: owner, ...(name ? { name } : {}) }, says: says.join(" ") };
   });
   // A section's cards nobody owns, and its lines with no card.
   handed.forEach((h, at) => {

@@ -6,16 +6,20 @@
 //     title search for a likely card. A card's owner is its design owner: the
 //     first Contributor, through the Team Members map's Notion people, whom
 //     the team's roles name a designer (the rule `figma-comments/read.ts` uses).
-//   • Slack: where the Figma Review cards post (`figmaReviewChannel`) —
-//     #plus-design unless `FIGMA_ASK_CHANNEL_ID` names another; its members answer. The
-//     parent's thread is marked as a sweep card's is, so the team's replies
-//     there are not all turns.
+//   • Slack: where the Figma Review cards go up (`figmaReviewChannel`) —
+//     #plus-design unless `FIGMA_ASK_CHANNEL_ID` names another — as a section
+//     of the sweep's morning message there; its members answer. The message's
+//     thread is marked as a sweep card's is, so the team's replies there are
+//     not all turns.
+//   • The hand-off: the morning run's own storage (`JobContext.runStorage`),
+//     read by the sweep's post (`tidySectionFor`).
 //   • KV: the week's listing, what the weeks remember, what each file's pages
 //     named and what was left as is (`./store.ts`).
 
 import type { Env } from "../types";
 import { budgetHeadroom } from "../net";
-import { postMessage, updateMessage } from "../slack/api";
+import { updateMessage } from "../slack/api";
+import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
 import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
 import { channelMembers } from "../slack/channel-members";
@@ -34,6 +38,9 @@ import { likelyCard, projectWords, type TidyCard } from "./checks";
 import {
   runTidyPost,
   runTidyRead,
+  tidySection,
+  TIDY_SECTION,
+  type TidyHanded,
   type TidyPostResult,
   type TidyReadResult,
 } from "./run";
@@ -97,19 +104,18 @@ export async function runTidyReadOnEnv(env: Env, ctx: JobContext): Promise<TidyR
 }
 
 /**
- * The post job on `Env`.
+ * The week's hand-over on `Env`.
  *
  * @param env - Worker bindings
- * @param ctx - `dryRun` posts, stages and keeps nothing; `runDate` is the Monday
+ * @param ctx - `dryRun` hands over and keeps nothing; `runDate` is the Monday
  */
 export async function runTidyPostOnEnv(env: Env, ctx: JobContext): Promise<TidyPostResult> {
   const channel = figmaReviewChannel(env);
-  if (!channel) return { posted: false, summary: "no FIGMA_ASK_CHANNEL_ID or PLUS_DESIGN_CHANNEL_ID — nothing posted" };
+  if (!channel) return { posted: false, summary: "no FIGMA_ASK_CHANNEL_ID or PLUS_DESIGN_CHANNEL_ID — nothing handed over" };
   const kv = env.HARNESS_KV;
   if (!kv) return { posted: false, summary: "HARNESS_KV not bound — no listing" };
   const stored = await storedTeamRoles(env);
   const team = { ...(stored?.notionPeople ? { notionPeople: stored.notionPeople } : {}), roles: stored?.roles ?? {} };
-  const threadState = threadStateFor(env);
   return runTidyPost(
     {
       listing: tidyStore(env, "listing"),
@@ -153,21 +159,38 @@ export async function runTidyPostOnEnv(env: Env, ctx: JobContext): Promise<TidyP
         },
       },
       members: () => channelMembers(env, channel),
-      async post(message, threadTs) {
-        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks, ...(threadTs ? { thread_ts: threadTs } : {}) });
-        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
-      },
-      async edit(ts, message) {
-        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
-      },
-      reports: threadState,
-      stage: (proposal) => stageTidyCard(env, proposal),
-      markThread: (ts) => markSweepThread(kv, channel, ts),
+      ...(ctx.runStorage ? { handOff: sectionHandOffIn<TidyHanded>(ctx.runStorage, TIDY_SECTION) } : {}),
       channel,
       runDate: ctx.runDate,
       now: () => Date.now(),
     },
     ctx,
+  );
+}
+
+/**
+ * The week's tidy-up as a section of the sweep's morning message, or
+ * undefined without the channel, HARNESS_KV or the run's storage.
+ *
+ * @param env - Worker bindings
+ * @param ctx - The morning run
+ */
+export function tidySectionFor(env: Env, ctx: JobContext): SweepSection | undefined {
+  const channel = figmaReviewChannel(env);
+  const kv = env.HARNESS_KV;
+  if (!channel || !kv || !ctx.runStorage) return undefined;
+  return tidySection(
+    {
+      memory: tidyStore(env, "memory"),
+      async edit(ts, message) {
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      },
+      reports: threadStateFor(env),
+      stage: (proposal) => stageTidyCard(env, proposal),
+      markThread: (ts) => markSweepThread(kv, channel, ts),
+    },
+    sectionHandOffIn<TidyHanded>(ctx.runStorage, TIDY_SECTION),
+    ctx.runDate,
   );
 }
 

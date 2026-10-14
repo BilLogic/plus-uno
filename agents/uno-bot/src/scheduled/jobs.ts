@@ -27,7 +27,7 @@ import type { SweepDeps } from "../sweep/run";
 import type { SweepSection } from "../sweep/sections";
 import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { runBackstopOnEnv } from "../figma-notify/env";
-import { runTidyPostOnEnv, runTidyReadOnEnv } from "../figma-tidy/env";
+import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
@@ -72,12 +72,12 @@ const sweepBody: JobBody = async (env, job, ctx) => {
 
 /**
  * What the morning's other jobs handed the sweep's post, one port a job: the
- * card follow-ups, the weekly DS precedence report and the Figma comment
- * decisions (src/sweep/sections.ts). Each is absent without its bindings or
+ * card follow-ups, the weekly DS precedence report, the Figma comment
+ * decisions and the weekly Figma tidy-up (src/sweep/sections.ts). Each is absent without its bindings or
  * the run's storage.
  */
 export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
-  return [morningFollowUpsFor(env, ctx), dsPrecedenceSectionFor(env, ctx), figmaDecisionsSectionFor(env, ctx)].filter(
+  return [morningFollowUpsFor(env, ctx), dsPrecedenceSectionFor(env, ctx), figmaDecisionsSectionFor(env, ctx), tidySectionFor(env, ctx)].filter(
     (s): s is SweepSection => !!s,
   );
 }
