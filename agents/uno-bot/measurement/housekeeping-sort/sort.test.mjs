@@ -1,15 +1,15 @@
 // @ts-check
-// Offline tests for the housekeeping sort. Nothing here reaches the network:
-// the one full run goes through a fake fetch.
+// Offline tests for the housekeeping sort. Nothing here reaches the network,
+// and the CLI runs read and write through a fake filesystem.
 
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
-  BOT_FIT_TO_WHAT_IT_TOOK, JUDGMENT, KINDS, MODEL, NOT_A_REQUEST, SPRING_2026,
-  buildRequest, calibrationReport, corpusCalibrationRows, countPerWorkday,
-  estimateCost, localDate, parseExport, parseLabels, toBatches, workdays,
+  BOT_FIT_TO_WHAT_IT_TOOK, JUDGMENT, KINDS, LABEL_SCHEMA, NOT_A_REQUEST, SPRING_2026,
+  buildBatch, calibrationReport, corpusCalibrationRows, countPerWorkday,
+  localDate, parseExport, parseLabels, toBatches, workdays,
 } from "./lib.mjs";
 import { PROMPT_FILE, gitRootOf, run, sha256 } from "./sort.mjs";
 
@@ -65,14 +65,16 @@ test("toBatches splits into fixed-size batches with a short last one", () => {
   assert.throws(() => toBatches([1], 0), /positive integer/);
 });
 
-test("buildRequest pins the model, sends no temperature, and carries every row", () => {
+test("buildBatch carries the rubric, every row, their ids and the label schema", () => {
   const rows = parseExport([row("a", "dm", "2026-10-14"), row("b", "channel", "2026-10-14")].join("\n"));
-  const body = buildRequest(rows, "RUBRIC");
-  assert.equal(body.model, MODEL);
-  assert.equal("temperature" in body, false);
-  assert.equal(body.system[0].text, "RUBRIC");
-  assert.match(body.messages[0].content, /"id":"a"/);
-  assert.match(body.messages[0].content, /"id":"b"/);
+  const b = buildBatch(rows, "RUBRIC");
+  assert.equal(b.system, "RUBRIC");
+  assert.deepEqual(b.ids, ["a", "b"]);
+  assert.match(b.user, /^Label each of these 2 messages/);
+  assert.match(b.user, /"id":"a"/);
+  assert.match(b.user, /"id":"b"/);
+  assert.deepEqual(b.output_schema, LABEL_SCHEMA);
+  assert.equal("model" in b, false, "the model is the session's, not the batch's");
 });
 
 // ---------------------------------------------------------------- counting
@@ -159,14 +161,6 @@ test("calibrationReport compares the model with the corpus per workday and per r
   assert.equal(r.published.perWorkday, 9);
 });
 
-test("estimateCost prices batches at the pinned model's list price", () => {
-  const e = estimateCost({ promptChars: 8000, rowChars: Array(50).fill(400), batchSize: 25, outputTokensPerRow: 40 });
-  assert.equal(e.requests, 2);
-  assert.equal(e.inputTokens, 2 * 2000 + 50 * 125);
-  assert.equal(e.outputTokens, 2000);
-  assert.equal(e.usd, Math.round(((10250 * 2 + 2000 * 10) / 1e6) * 100) / 100);
-});
-
 // ---------------------------------------------------------------- the CLI
 
 const exportText = [row("a", "dm", "2026-10-12T15:00:00Z", "where is the file?"), row("b", "dm", "2026-10-13T15:00:00Z", "thanks!"), row("c", "meeting", "2026-10-13")].join("\n");
@@ -176,75 +170,118 @@ const fakeIo = (files, extra = {}) => {
   return {
     lines, written,
     io: {
-      env: {},
       log: (l) => lines.push(l),
-      readFile: (p) => (p === PROMPT_FILE ? readFileSync(PROMPT_FILE, "utf8") : files[p]),
+      readFile: (p) => {
+        if (p === PROMPT_FILE) return readFileSync(PROMPT_FILE, "utf8");
+        if (!(p in files)) throw new Error(`no file ${p}`);
+        return files[p];
+      },
       writeFile: (p, d) => { written[p] = d; },
       mkdir: () => {},
-      fetch: () => { throw new Error("network touched"); },
       now: () => new Date("2026-10-20T12:00:00Z"),
       gitRootOf: () => null,
       ...extra,
     },
   };
 };
+const promptHash = () => sha256(readFileSync(PROMPT_FILE, "utf8"));
+const asLines = (labels) => labels.map((l) => JSON.stringify(l)).join("\n") + "\n";
 
-test("--dry-run prints the model, prompt hash and the request for 2 rows, and sends nothing", async () => {
+test("--prepare writes one batch file per batch, holding the prompt and the rows, and prints the sha256", async () => {
   const { io, lines, written } = fakeIo({ "export.jsonl": exportText });
-  const out = await run(["export.jsonl", "--dry-run"], io);
+  const out = await run(["--prepare", "export.jsonl", "--batch-size", "2", "--out-dir", "/out"], io);
   const text = lines.join("\n");
-  const promptHash = sha256(readFileSync(PROMPT_FILE, "utf8"));
-  assert.match(text, new RegExp(`model ${MODEL} · prompt sha256 ${promptHash} · batch size 25`));
-  assert.match(text, /3 rows, 1 requests; window 2026-10-12 to 2026-10-13/);
-  assert.match(text, /estimated cost: ~\$/);
-  const body = JSON.parse(text.slice(text.indexOf("{")));
-  assert.equal(body.model, MODEL);
-  assert.match(body.messages[0].content, /Label each of these 2 messages/);
-  assert.doesNotMatch(body.messages[0].content, /"id":"c"/);
-  assert.equal(out.dryRun, true);
-  assert.deepEqual(written, {});
+  assert.match(text, new RegExp(`prompt sha256 ${promptHash()}`));
+  assert.match(text, /3 rows, 2 batches; window 2026-10-12 to 2026-10-13/);
+  const files = Object.keys(written).sort();
+  assert.deepEqual(files, ["/out/batches-2026-10-20T12-00-00-000Z/batch-1-of-2.json", "/out/batches-2026-10-20T12-00-00-000Z/batch-2-of-2.json"]);
+  assert.match(text, /\/out\/batches-2026-10-20T12-00-00-000Z/);
+  assert.match(text, /\/out\/labels-2026-10-20T12-00-00-000Z\.jsonl/, "names the labels file to append to");
+  const first = JSON.parse(written[files[0]]);
+  assert.equal(first.prompt_sha256, promptHash());
+  assert.deepEqual(first.ids, ["a", "b"]);
+  assert.equal(first.system, readFileSync(PROMPT_FILE, "utf8"));
+  assert.match(first.user, /Label each of these 2 messages/);
+  assert.match(first.user, /where is the file\?/);
+  assert.doesNotMatch(first.user, /"id":"c"/);
+  assert.deepEqual(JSON.parse(written[files[1]]).ids, ["c"]);
+  assert.equal(out.batches, 2);
 });
 
-test("--dry-run works on the calibration rows too, with no key", async () => {
+test("--prepare keeps to the window it is given", async () => {
+  const { io, written } = fakeIo({ "export.jsonl": exportText });
+  await run(["--prepare", "export.jsonl", "--from", "2026-10-13", "--out-dir", "/out"], io);
+  const [only] = Object.values(written).map((d) => JSON.parse(d));
+  assert.deepEqual(only.ids, ["b", "c"]);
+});
+
+test("--calibrate --prepare batches the Spring 2026 corpus rows", async () => {
   const corpus = [corpusLine({ _id: 1, bot_fit: "Lookup" }), corpusLine({ _id: 2, bot_fit: "Stays human" }), corpusLine({ _id: 3, bot_fit: "Lookup" })].join("\n");
-  const { io, lines } = fakeIo({ "rows.jsonl": corpus });
-  await run(["--calibrate", "rows.jsonl", "--dry-run", "--batch-size", "2"], io);
-  assert.match(lines.join("\n"), /3 rows, 2 requests; window 2026-01-12 to 2026-05-01/);
+  const { io, lines, written } = fakeIo({ "rows.jsonl": corpus });
+  await run(["--calibrate", "--prepare", "rows.jsonl", "--batch-size", "2", "--out-dir", "/out"], io);
+  assert.match(lines.join("\n"), /3 rows, 2 batches; window 2026-01-12 to 2026-05-01/);
+  assert.ok(Object.keys(written).every((f) => f.startsWith("/out/calibration-batches-")));
 });
 
-test("a real run refuses without a key, and never prints one", async () => {
-  const { io } = fakeIo({ "export.jsonl": exportText });
-  await assert.rejects(run(["export.jsonl"], io), /ANTHROPIC_API_KEY is not set/);
-
-  const calls = [];
-  const fetchFake = async (_url, init) => {
-    calls.push(init);
-    return new Response(JSON.stringify({
-      stop_reason: "end_turn",
-      usage: { input_tokens: 100, output_tokens: 50 },
-      content: [{ type: "text", text: JSON.stringify({ labels: [
-        label("a", true, "Could be looked up"),
-        { ...label("b", false, NOT_A_REQUEST, { is_thanks: true }), what_it_took: NOT_A_REQUEST },
-        label("c", true, "Needs prep, then a person"),
-      ] }) }],
-    }), { status: 200 });
-  };
-  const run2 = fakeIo({ "export.jsonl": exportText }, { env: { ANTHROPIC_API_KEY: "test-key-not-real" }, fetch: fetchFake });
-  const out = await run(["export.jsonl", "--out-dir", "/out"], run2.io);
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].headers["x-api-key"], "test-key-not-real");
-  assert.doesNotMatch(run2.lines.join("\n"), /test-key-not-real/);
-  const files = Object.keys(run2.written);
-  assert.equal(files.length, 2);
-  const labelsFile = /** @type {string} */ (files.find((f) => f.endsWith(".jsonl")));
-  const [first, ...rest] = run2.written[labelsFile].trim().split("\n").map((l) => JSON.parse(l));
-  assert.equal(first.header.model, MODEL);
-  assert.equal(first.header.batch_size, 25);
-  assert.equal(first.header.prompt_sha256, sha256(readFileSync(PROMPT_FILE, "utf8")));
-  assert.equal(rest.length, 3);
-  assert.doesNotMatch(run2.written[labelsFile], /where is the file/, "labels carry no message text");
+test("--count prints housekeeping requests per workday and the prompt sha256", async () => {
+  const labels = asLines([
+    label("a", true, "Could be looked up"),
+    { ...label("b", false, NOT_A_REQUEST, { is_thanks: true }), what_it_took: NOT_A_REQUEST },
+    label("c", true, "Needs prep, then a person"),
+  ]);
+  const { io, lines, written } = fakeIo({ "export.jsonl": exportText, "/out/labels.jsonl": labels });
+  const out = await run(["--count", "/out/labels.jsonl", "export.jsonl"], io);
+  const text = lines.join("\n");
+  assert.match(text, new RegExp(`prompt sha256 ${promptHash()}`));
+  assert.match(text, /labelled in a Claude Code session/);
+  assert.match(text, /housekeeping per workday: 1 \(2 in all/);
   assert.equal(/** @type {any} */ (out.result).housekeeping, 2);
-  assert.equal(/** @type {any} */ (out.result).housekeepingPerWorkday, 1);
+  assert.deepEqual(written, {}, "count writes nothing");
+});
+
+test("--count reads a batch's whole response on one line, as the prompt returns it", async () => {
+  const labels = JSON.stringify({ labels: [label("a", true, "Could be looked up"), label("b", true, JUDGMENT)] }) + "\n" + JSON.stringify(label("c", true, "Could be looked up")) + "\n";
+  const { io } = fakeIo({ "export.jsonl": exportText, "/out/labels.jsonl": labels });
+  const out = await run(["--count", "/out/labels.jsonl", "export.jsonl"], io);
+  assert.equal(/** @type {any} */ (out.result).housekeeping, 2);
+});
+
+test("--count refuses a missing, a duplicate or a stranger's label", async () => {
+  const a = label("a", true, "Could be looked up");
+  const b = label("b", true, "Could be looked up");
+  const c = label("c", true, "Could be looked up");
+  const cases = [
+    [asLines([a, b]), /no label for 1 id\(s\): c/],
+    [asLines([a, b, c, a]), /two labels for id a/],
+    [asLines([a, b, c, label("z", true, "Could be looked up")]), /unknown id z/],
+    [`${JSON.stringify(a)}\n{"id":`, /labels line 2: not JSON/],
+  ];
+  for (const [labels, err] of cases) {
+    const { io } = fakeIo({ "export.jsonl": exportText, "/out/labels.jsonl": labels });
+    await assert.rejects(run(["--count", "/out/labels.jsonl", "export.jsonl"], io), err);
+  }
+});
+
+test("--count only asks for labels inside the window", async () => {
+  const { io } = fakeIo({ "export.jsonl": exportText, "/out/labels.jsonl": asLines([label("b", true, "Could be looked up"), label("c", true, JUDGMENT)]) });
+  const out = await run(["--count", "/out/labels.jsonl", "export.jsonl", "--from", "2026-10-13"], io);
+  assert.equal(/** @type {any} */ (out.result).housekeeping, 1);
+});
+
+test("--calibrate --count prints the calibration report", async () => {
+  const corpus = [corpusLine({ _id: 1, bot_fit: "Lookup" }), corpusLine({ _id: 2, bot_fit: "Stays human" })].join("\n");
+  const { io, lines } = fakeIo({ "rows.jsonl": corpus, "/out/cal.jsonl": asLines([label("1", true, "Could be looked up"), label("2", true, "Could be looked up")]) });
+  const out = await run(["--calibrate", "--count", "/out/cal.jsonl", "rows.jsonl"], io);
+  const text = lines.join("\n");
+  assert.match(text, /calibration over 2 corpus rows/);
+  assert.match(text, new RegExp(`prompt sha256 ${promptHash()}`));
+  assert.equal(/** @type {any} */ (out.result).whatItTookAgreementPercent, 50);
+});
+
+test("a run names one mode", async () => {
+  const { io } = fakeIo({ "export.jsonl": exportText });
+  await assert.rejects(run(["export.jsonl"], io), /--prepare or --count/);
+  await assert.rejects(run(["--prepare", "--count", "x", "export.jsonl"], io), /--prepare or --count/);
 });
 
 test("gitRootOf finds the nearest ancestor holding .git, as a directory or a worktree's file", () => {
@@ -253,14 +290,19 @@ test("gitRootOf finds the nearest ancestor holding .git, as a directory or a wor
   assert.equal(gitRootOf("/elsewhere/out", (p) => has.has(p)), null);
 });
 
-test("an --out-dir inside a git working tree is refused before anything is read or sent", async () => {
-  const { io, written } = fakeIo({ "export.jsonl": exportText }, { env: { ANTHROPIC_API_KEY: "test-key-not-real" }, gitRootOf: (p) => (p.startsWith("/repo") ? "/repo" : null) });
-  await assert.rejects(run(["export.jsonl", "--out-dir", "/repo/agents/uno-bot/out"], io), /inside the git working tree \/repo/);
+test("an --out-dir inside a git working tree is refused before anything is read or written", async () => {
+  const { io, written } = fakeIo({ "export.jsonl": exportText }, { gitRootOf: (p) => (p.startsWith("/repo") ? "/repo" : null) });
+  await assert.rejects(run(["--prepare", "export.jsonl", "--out-dir", "/repo/agents/uno-bot/out"], io), /inside the git working tree \/repo/);
   assert.deepEqual(written, {});
+});
+
+test("a labels file inside a git working tree is refused", async () => {
+  const { io } = fakeIo({ "export.jsonl": exportText, "/repo/labels.jsonl": "" }, { gitRootOf: (p) => (p.startsWith("/repo") ? "/repo" : null) });
+  await assert.rejects(run(["--count", "/repo/labels.jsonl", "export.jsonl"], io), /inside the git working tree \/repo/);
 });
 
 test("this repo itself is refused as an --out-dir, with the real git lookup", async () => {
   const here = new URL(".", import.meta.url).pathname;
   const { io } = fakeIo({ "export.jsonl": exportText }, { gitRootOf: (p) => gitRootOf(p) });
-  await assert.rejects(run(["export.jsonl", "--dry-run", "--out-dir", here], io), /inside the git working tree/);
+  await assert.rejects(run(["--prepare", "export.jsonl", "--out-dir", here], io), /inside the git working tree/);
 });
