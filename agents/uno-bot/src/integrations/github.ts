@@ -624,6 +624,10 @@ export interface GithubLibraryReads {
    *  whether that was all of them — so a caller about to file can tell "none
    *  carries the marker" from "the page ran out". */
   intakesSince(since: string): Promise<{ intakes: Array<{ number: number; url: string; body: string }>; complete: boolean }>;
+  /** The merged pulls among the 50 most recently updated closed into `base`. */
+  mergedPulls(base: string): Promise<Array<{ number: number; url: string; mergedAt: string }>>;
+  /** A pull's changed file paths — its first 100, where a component change sits. */
+  pullFiles(number: number): Promise<string[]>;
 }
 
 const LIBRARY_PAGE = 50;
@@ -703,6 +707,26 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
         ),
         complete: page.length < 100,
       };
+    },
+    async mergedPulls(base) {
+      const url =
+        `https://api.github.com/repos/${repo}/pulls?state=closed&base=${encodeURIComponent(base)}` +
+        `&sort=updated&direction=desc&per_page=${LIBRARY_PAGE}`;
+      const data = (await (await get("pull list", url)).json().catch(() => [])) as Array<{
+        number?: unknown;
+        html_url?: unknown;
+        merged_at?: unknown;
+      }>;
+      return (Array.isArray(data) ? data : []).flatMap((p) =>
+        typeof p.number === "number" && typeof p.html_url === "string" && typeof p.merged_at === "string" && p.merged_at
+          ? [{ number: p.number, url: p.html_url, mergedAt: p.merged_at }]
+          : [],
+      );
+    },
+    async pullFiles(number) {
+      const url = `https://api.github.com/repos/${repo}/pulls/${number}/files?per_page=100`;
+      const data = (await (await get("pull files", url)).json().catch(() => [])) as Array<{ filename?: unknown }>;
+      return (Array.isArray(data) ? data : []).flatMap((f) => (typeof f.filename === "string" ? [f.filename] : []));
     },
   };
 }
