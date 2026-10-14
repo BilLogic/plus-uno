@@ -183,7 +183,8 @@ export function tidySectionFor(env: Env, ctx: JobContext): SweepSection | undefi
     {
       memory: tidyStore(env, "memory"),
       async edit(ts, message) {
-        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+        // The message's own tag, kept: it is the sweep's.
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
       },
       reports: threadStateFor(env),
       stage: (proposal) => stageTidyCard(env, proposal),

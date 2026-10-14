@@ -313,3 +313,11 @@ export function withAskLabel(record: TurnRecord, subType: SubType | null, at: nu
     classifiedAt: at,
   };
 }
+
+/** `TEST_CHANNEL_IDS`, parsed: comma-separated channel ids, blanks dropped. */
+export function testChannelIdsOf(env: { TEST_CHANNEL_IDS?: string }): string[] {
+  return (env.TEST_CHANNEL_IDS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}

@@ -13,8 +13,7 @@
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
-import { teamPostChannel } from "../usage/record";
-import { testChannelIdsOf } from "../usage/production";
+import { teamPostChannel, testChannelIdsOf } from "../usage/record";
 import { fieldsFromInput, renderShareout } from "./share-out-render";
 
 /** Where a share-out posts: the channel, the thread when it stays in the asking

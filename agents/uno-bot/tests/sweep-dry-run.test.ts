@@ -143,12 +143,12 @@ test("the probe dry-runs the named run's jobs", async () => {
   assert.equal(body.planned.length, 8);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["commitment-nudge", "handled", 0],
-    ["sweep-post", "handled", 0],
-    // No sweep store bound: the Figma decision post says so and spends nothing.
-    ["sweep:figma-post", "handled", 0],
     ["ds-precedence-post", "handled", 0],
+    // No sweep store bound: the Figma decision hand-over says so and spends nothing.
+    ["sweep:figma-post", "handled", 0],
     ["figma-drift-recheck", "handled", 0],
     ["figma-drift-post", "handled", 0],
+    ["sweep-post", "handled", 0],
     // No Notion key: the roster read refuses before spending anything.
     ["team-roles-sync", "handled", 0],
     // No usage database bound: nothing to purge, nothing spent.

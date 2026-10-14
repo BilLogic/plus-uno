@@ -67,17 +67,18 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * Figma comment decisions, a sweep source too: the end-of-day
  * `sweep-figma-comments` reads the day's commented and changed files for
  * decisions under Specs and For Review, and the morning `sweep-figma-post`
- * opens one #plus-design thread per file, a card per decision
+ * hands a card per decision to the sweep's message in #plus-design
  * (src/figma-comments/).
  * The weekly DS precedence check's two: Friday's end-of-day check, and the
  * morning hand-over that puts its report on the sweep's message in
  * #plus-universal (src/ds-precedence/).
  * The morning `commitment-nudge` reminds each promiser whose commitment is due,
  * in the promise's thread (src/commitments/).
- * The morning `figma-drift-post` asks each thread whose decision may have left
- * a Figma file or code stale whether it is up to date, with a drafted intake,
- * once it has looked at the file; `figma-drift-recheck`, in both runs, edits a
- * live question in place once its file shows the decision (src/figma-drift/).
+ * The morning `figma-drift-post` hands the sweep's post a card for each
+ * thread whose decision may have left a Figma file or code stale, with a
+ * drafted intake, once it has looked at the file; `figma-drift-recheck`, in
+ * both runs, edits a live card in place once its file shows the decision
+ * (src/figma-drift/).
  * The end-of-day `figma-backstop` jobs list every Figma team's folders and
  * queue a change no notification reported (src/figma-notify/backstop.ts).
  * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
@@ -94,7 +95,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * their DM with uno-bot that only they can decide (src/dm-watch/capture.ts).
  * The weekly Figma tidy-up's two, Monday morning: `figma-tidy-read` lists the
  * teams' stage folders, and `figma-tidy-post` checks each file against its
- * cards and posts the week's Review cards (src/figma-tidy/).
+ * cards and hands the week's Review cards to the sweep's post (src/figma-tidy/).
+ * Every morning job that finds cards for a team channel hands them to
+ * `sweep-post`, which runs after them all, so a place gets one message.
  */
 export type ScheduledJobKind =
   | "noop"
@@ -193,6 +196,10 @@ export const BACKSTOP_JOBS = 3;
  *  while the rest last — about 15 files a job. */
 export const TIDY_JOBS = 5;
 
+/** The morning jobs that hand their cards to the sweep's post, which runs
+ *  after them all (src/sweep/sections.ts). */
+const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post"] as const;
+
 /** Monday and Friday, as `Date.getUTCDay` numbers them. */
 const MONDAY = 1;
 const FRIDAY = 5;
@@ -211,18 +218,16 @@ const FRIDAY = 5;
  */
 const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
-    // Before the sweep's post, which puts what each hands off for a place on
-    // that place's one message (src/sweep/sections.ts).
+    // Each of these hands its cards to the sweep's post, which puts what a
+    // place was handed on that place's one message (src/sweep/sections.ts).
     { key: "commitment-nudge", kind: "commitment-nudge" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
-    { key: "sweep-post", kind: "sweep-post", after: ["commitment-nudge", "ds-precedence-post"] },
     { key: FIGMA_DECISIONS_POST_KEY, kind: "sweep-figma-post" },
-    // Before the post, so a question its file caught up with overnight is
-    // withdrawn first.
+    // Before the drift hand-over, so a question its file caught up with
+    // overnight is withdrawn first.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
     { key: "figma-drift-post", kind: "figma-drift-post" },
-    { key: "team-roles-sync", kind: "team-roles-sync" },
-    // Monday: the week's Figma tidy-up, its listing cut into jobs, then the post.
+    // Monday: the week's Figma tidy-up, its listing cut into jobs, then the hand-over.
     ...Array.from({ length: TIDY_JOBS }, (_, i) => ({ key: `figma-tidy-read-${i + 1}`, kind: "figma-tidy-read" as const, weekday: MONDAY })),
     {
       key: "figma-tidy-post",
@@ -230,6 +235,9 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
       weekday: MONDAY,
       after: Array.from({ length: TIDY_JOBS }, (_, i) => `figma-tidy-read-${i + 1}`),
     },
+    // After every hand-over: a job not planned today counts as done.
+    { key: "sweep-post", kind: "sweep-post", after: [...MORNING_SECTIONS] },
+    { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },

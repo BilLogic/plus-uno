@@ -25,7 +25,7 @@ import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCar
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
 import type { SweepSection } from "../sweep/sections";
-import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
+import { driftSectionFor, fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
@@ -73,11 +73,18 @@ const sweepBody: JobBody = async (env, job, ctx) => {
 /**
  * What the morning's other jobs handed the sweep's post, one port a job: the
  * card follow-ups, the weekly DS precedence report, the Figma comment
- * decisions and the weekly Figma tidy-up (src/sweep/sections.ts). Each is absent without its bindings or
+ * decisions, the weekly Figma tidy-up and the Figma drift questions
+ * (src/sweep/sections.ts). Each is absent without its bindings or
  * the run's storage.
  */
 export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
-  return [morningFollowUpsFor(env, ctx), dsPrecedenceSectionFor(env, ctx), figmaDecisionsSectionFor(env, ctx), tidySectionFor(env, ctx)].filter(
+  return [
+    morningFollowUpsFor(env, ctx),
+    dsPrecedenceSectionFor(env, ctx),
+    figmaDecisionsSectionFor(env, ctx),
+    tidySectionFor(env, ctx),
+    driftSectionFor(env, ctx),
+  ].filter(
     (s): s is SweepSection => !!s,
   );
 }
@@ -195,8 +202,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   },
   // Morning: each file drift the sweep kept is asked about in its thread, with
   // one drafted intake per file (src/figma-drift/).
-  "figma-drift-post": async (env, job, { dryRun }) => {
-    const report = await runDriftAsksOnEnv(env, job, { dryRun });
+  "figma-drift-post": async (env, job, ctx) => {
+    const report = await runDriftAsksOnEnv(env, job, ctx);
     console.log(`[figma-drift] ${job.key}: ${report.summary}`);
     return report;
   },

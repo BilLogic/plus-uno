@@ -154,15 +154,15 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
   const morning = planRun("morning", MORNING);
   assert.equal(morning.date, "2026-09-29");
   assert.deepEqual(morning.jobs.map((j) => [j.key, j.kind]), [
-    // Before the sweep's post, which takes the card follow-ups it hands off.
+    // Each hands its cards to the sweep's post, which takes them all.
     ["commitment-nudge", "commitment-nudge"],
-    ["sweep-post", "sweep-post"],
-    // The night's Figma comment decisions, one #plus-design thread per file (#900).
-    ["sweep:figma-post", "sweep-figma-post"],
     ["ds-precedence-post", "ds-precedence-post"],
+    // The night's Figma comment decisions, on the sweep's #plus-design message.
+    ["sweep:figma-post", "sweep-figma-post"],
     // A live drift question is looked at again before the morning asks anew.
     ["figma-drift-recheck", "figma-drift-recheck"],
     ["figma-drift-post", "figma-drift-post"],
+    ["sweep-post", "sweep-post"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],
@@ -348,4 +348,13 @@ test("wrangler.toml holds the two triggers these tests walk, with named weekdays
   // helper the schedule tests walk (helpers/cron.ts) models exactly these.
   const toml = readFileSync(resolve(process.cwd(), "wrangler.toml"), "utf8");
   assert.match(toml, /^crons = \["0 4,5 \* \* TUE-SAT", "0 13,14 \* \* MON-FRI"\]$/m);
+});
+
+test("the sweep's post runs after every morning job that hands it cards, Monday's tidy-up included", () => {
+  const monday = planRun("morning", Date.parse("2026-10-12T13:00:00Z"));
+  const keys = monday.jobs.map((j) => j.key);
+  const post = monday.jobs.find((j) => j.kind === "sweep-post")!;
+  const handOvers = ["commitment-nudge", "ds-precedence-post", "sweep:figma-post", "figma-drift-post", "figma-tidy-post"];
+  assert.deepEqual(post.after, handOvers);
+  for (const key of handOvers) assert.ok(keys.indexOf(key) < keys.indexOf("sweep-post"), `${key} is planned before the post`);
 });

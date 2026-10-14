@@ -173,7 +173,14 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
               return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
             },
             async edit(ts, message) {
-              await updateMessage(env, { channel, ts, text: message.text, ...(message.blocks ? { blocks: message.blocks } : {}) });
+              // A message's own tag, kept: the morning's is the sweep's.
+              await updateMessage(env, {
+                channel,
+                ts,
+                text: message.text,
+                ...(message.blocks ? { blocks: message.blocks } : {}),
+                ...(message.metadata ? { metadata: message.metadata } : {}),
+              });
             },
             members: () => channelMembers(env, channel),
             stage: (proposal) => stageDecisionCard(env, proposal),

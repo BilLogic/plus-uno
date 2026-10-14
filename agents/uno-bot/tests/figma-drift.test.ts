@@ -1,14 +1,14 @@
 // File drift, a day at a time: the end-of-day sweep finds a decision a Figma
 // file (or code) may not show yet, and the weekday morning run — once it has
-// looked at the file — posts the thread a report on the shared decision card:
-// a parent line, then one card per file with its drafted intake, decided in
+// looked at the file — hands the thread's cards to the sweep's morning message
+// for it: a line, then one card per file with its drafted intake, decided in
 // Review alone. The file catching up withdraws its card (#897); nothing typed
 // in the thread decides one.
 //
 // The night runs through the sweep harness — its fake Slack, the real
 // detector over recorded replies — with the in-memory drift store as its
-// sink. The morning runs `runDriftAsks` against a small Slack of its own and
-// the same in-memory ThreadState and usage record the harness stages into.
+// sink. The morning runs `runDriftAsks`, then the sweep's post with the drift
+// as its section, on the same harness, ThreadState and usage record.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
@@ -23,10 +23,15 @@ import {
   MAX_RECHECKS_PER_RUN,
   recheckLiveAsks,
   recheckOnUpdate,
+  driftSection,
+  DRIFT_SECTION,
   runDriftAsks,
+  type DriftHanded,
   type DriftPostDeps,
   type DriftRecheckDeps,
+  type DriftSectionDeps,
 } from "../src/figma-drift/run";
+import { sectionHandOffIn } from "../src/sweep/sections";
 import { DRIFT_CARD_TTL_MS, DRIFT_NO_REVISION, driftCardWords, LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
 import { FRAME_MATCH_SYSTEM, frameMatchPrompt, modelFrameJudge, parseFrameMatch } from "../src/figma-drift/judge";
 import { fakeProvider, type FakeProvider } from "../src/agent/providers/fake";
@@ -43,7 +48,7 @@ import { renderGateNote } from "../src/slack/gate-note";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { mentionCount, notified } from "./helpers/notified";
-import { at, DESIGN, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
+import { at, DESIGN, memoryRunStorage, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
 
 type Card = {
   type: string;
@@ -68,6 +73,7 @@ const GATE_WORDS = /:white_check_mark:|:no_entry:|✅|⛔|`skip`|\bskip\b|\bdrop
 
 const EOD: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN };
 const MORNING = { key: "figma-drift-post" };
+const SWEEP_POST: ScheduledJob = { key: "sweep-post", kind: "sweep-post" };
 
 const FILE_KEY = "AbC123xyz";
 /** A Figma file, read-only, as the sweep reads a node link. */
@@ -199,47 +205,41 @@ function seedFigmaFile(figma: InMemoryFigma, opts: FileOpts): void {
 const SHOWS = JSON.stringify({ shows: true, confidence: 0.92 });
 const NOT_SHOWN = JSON.stringify({ shows: false, confidence: 0.9 });
 
-/** The morning: `runDriftAsks` over the night's store, ThreadState and record. */
+/**
+ * The morning: `runDriftAsks` hands each thread over, then the sweep's post
+ * puts it on the place's one message, over the night's store, ThreadState and
+ * record. `posted` is every message the sweep's post sent, as a drift report
+ * reads it: `card` when it carries a card.
+ */
 function morning(
   h: SweepHarness,
   drifts: InMemoryDriftStore,
   opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[]; figmaPeople?: Record<string, string> } = {},
-): { deps: DriftPostDeps; posted: Posted[]; marked: string[]; figma: InMemoryFigma; provider: FakeProvider } {
+): {
+  deps: DriftPostDeps;
+  run(): Promise<Awaited<ReturnType<typeof runDriftAsks>>>;
+  hooks: { stage: DriftSectionDeps["stage"] };
+  posted: Posted[];
+  marked: string[];
+  figma: InMemoryFigma;
+  provider: FakeProvider;
+} {
   const posted: Posted[] = [];
+  const seen = new Map<object, Posted>();
   const marked: string[] = [];
-  let seq = 0;
   const figma = createInMemoryFigma();
   seedFigmaFile(figma, opts);
   const provider = fakeProvider({ generateReplies: opts.judge ?? [] });
+  const storage = memoryRunStorage();
+  const handOff = sectionHandOffIn<DriftHanded>(storage, DRIFT_SECTION);
   const deps: DriftPostDeps = {
     store: drifts,
     slack: {
-      async post(to, message) {
-        seq += 1;
-        const ts = `${Math.floor(h.clock.now / 1000)}.${String(800000 + seq)}`;
-        posted.push({ channel: to.channel, threadTs: to.threadTs, text: message.text, ts, card: message.card, ...(message.blocks ? { blocks: message.blocks } : {}) });
-        return { ok: true, ts };
-      },
       async permalink(channel, ts) {
         return `https://plus.slack.com/archives/${channel}/p${ts.replace(".", "")}`;
       },
-      async edit(channel, ts, message) {
-        const p = posted.find((m) => m.channel === channel && m.ts === ts);
-        if (p) p.edited = message;
-      },
-      async markThread(channel, threadTs) {
-        marked.push(`${channel}:${threadTs}`);
-      },
     },
-    reports: h.threadState,
-    async stage(proposal, channelKind) {
-      await stageSweepCard(
-        proposal,
-        { threadState: h.threadState, proposalEvents: h.proposalEvents, markThread: async (c, t) => void marked.push(`${c}:${t}`) },
-        h.clock.now,
-        channelKind,
-      );
-    },
+    handOff: { date: "", to: handOff },
     async cardLive(ts) {
       return (await h.threadState.getProposalByTs(ts)).state === "found";
     },
@@ -253,7 +253,57 @@ function morning(
     ...(opts.dryRun ? { dryRun: true } : {}),
     ...(opts.figmaPeople ? { figmaPeople: async () => opts.figmaPeople! } : {}),
   };
-  return { deps, posted, marked, figma, provider };
+  const hooks: { stage: DriftSectionDeps["stage"] } = {
+    async stage(proposal, channelKind) {
+      await stageSweepCard(
+        proposal,
+        { threadState: h.threadState, proposalEvents: h.proposalEvents, markThread: async (c, t) => void marked.push(`${c}:${t}`) },
+        h.clock.now,
+        channelKind,
+      );
+    },
+  };
+  const sync = () => {
+    for (const p of h.posted) {
+      if (seen.has(p)) continue;
+      const view: Posted = { channel: p.channel, threadTs: p.threadTs, text: p.text, ts: p.ts, card: cardsOf(p.blocks).length > 0, blocks: p.blocks };
+      seen.set(p, view);
+      posted.push(view);
+    }
+  };
+  const run = async () => {
+    const date = h.deps.runDate;
+    deps.handOff = { date, to: handOff };
+    const report = await runDriftAsks(MORNING, deps);
+    if (deps.dryRun) return report;
+    h.deps.sections = [
+      driftSection(
+        {
+          store: drifts,
+          stage: (proposal, kind) => hooks.stage(proposal, kind),
+          reports: h.threadState,
+          async edit(channel, ts, message) {
+            sync();
+            const p = posted.find((m) => m.channel === channel && m.ts === ts);
+            if (p) p.edited = message;
+          },
+          async markThread(channel, threadTs) {
+            marked.push(`${channel}:${threadTs}`);
+          },
+          now: () => h.clock.now,
+        },
+        handOff,
+        date,
+      ),
+    ];
+    try {
+      await runSweepJob(SWEEP_POST, h.deps);
+    } finally {
+      sync();
+    }
+    return report;
+  };
+  return { deps, run, hooks, posted, marked, figma, provider };
 }
 
 describe("a Figma drift at the morning run", () => {
@@ -272,7 +322,7 @@ describe("a Figma drift at the morning run", () => {
 
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    const report = await runDriftAsks(MORNING, m.deps);
+    const report = await m.run();
 
     assert.equal(m.posted.length, 1, "one report");
     const [card] = m.posted;
@@ -303,8 +353,8 @@ describe("a Figma drift at the morning run", () => {
     const staged = await h.threadState.getProposalsByChannel(DESIGN);
     assert.equal(staged.length, 1);
     const proposal = staged[0]!;
-    assert.equal(proposal.proposalTs, itemProposalKey(card!.ts, "1"), "the card's own proposal, which its Review opens");
-    assert.deepEqual(proposal.item, { messageTs: card!.ts, id: "1" });
+    assert.equal(proposal.proposalTs, itemProposalKey(card!.ts, "drift-1"), "the card's own proposal, which its Review opens");
+    assert.deepEqual(proposal.item, { messageTs: card!.ts, id: "drift-1" });
     assert.equal(proposal.operations!.length, 1, "one intake operation");
     assert.equal(proposal.operations![0]!.toolName, "notion_create");
     const input = proposal.operations![0]!.input as Record<string, unknown>;
@@ -326,7 +376,7 @@ describe("a Figma drift at the morning run", () => {
     assert.match(sections, /Last published by bea\.designs on 2026-09-20\./, "the publisher is on the intake");
 
     const record = await h.threadState.getReport(card!.ts);
-    assert.deepEqual(record?.entries.map((e) => [e.id, e.state.kind]), [["1", "open"]], "the report's record, where the card's decision lands");
+    assert.deepEqual(record?.entries.map((e) => [e.id, e.state.kind]), [["drift-1", "open"]], "the report's record, where the card's decision lands");
     const events = await h.proposalEvents.eventsOf(proposal.proposalTs);
     assert.deepEqual(events.map((e) => [e.event, e.via]), [["staged", "worker"]], "staging is on the usage record");
     assert.deepEqual(await drifts.pending(), [], "an asked finding leaves the queue");
@@ -354,7 +404,7 @@ describe("a Figma drift at the morning run", () => {
   it("still asks when Figma will not answer, says the file may not show it yet, and names no one", async () => {
     const { h, m } = await sweptRecap();
     m.figma.failNext("versions", new FigmaRequestError(503, "Figma versions 503: Service unavailable"));
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1, "the report goes out");
     const [card] = cardsOf(m.posted[0]!.blocks);
     assert.match(card!.body!.text, / · the file may not show it yet\.$/);
@@ -371,7 +421,7 @@ describe("a Figma drift at the morning run", () => {
       publisher: { handle: "cy<designs>", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" },
       figmaPeople: { "1105000000000000003": "U0CY" },
     });
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     const [card] = cardsOf(m.posted[0]!.blocks);
     assert.equal(card!.subtitle!.text, "<@U0BEA> · published by cy&lt;designs&gt; · last changed Sep 20", "the owner tagged, the publisher by name");
     assert.deepEqual(notified(m.posted[0]!), ["U0BEA"], "the owner pinged, the publisher not");
@@ -386,7 +436,7 @@ describe("a Figma drift at the morning run", () => {
       publisher: { handle: "bea.designs", at: "2026-09-20T10:00:00Z", id: "1105000000000000002" },
       figmaPeople: { "1105000000000000002": "U0BEA" },
     });
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, "<@U0BEA> · last changed Sep 20");
     assert.deepEqual(notified(m.posted[0]!), ["U0BEA"]);
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
@@ -396,7 +446,7 @@ describe("a Figma drift at the morning run", () => {
   it("leaves a publisher the directory does not map off the card: named in plain text on the intake alone, with no say", async () => {
     const t = await sweptRecap();
     const m = morning(t.h, t.drifts, { publisher: { handle: "cy<designs>", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" }, figmaPeople: {} });
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, "<@U0BEA> · last changed Sep 20");
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
     assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE"]);
@@ -406,7 +456,7 @@ describe("a Figma drift at the morning run", () => {
   it("names no one for a file with no named version", async () => {
     const t = await sweptRecap();
     const m = morning(t.h, t.drifts, { publisher: null });
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1);
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
     assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/);
@@ -415,7 +465,7 @@ describe("a Figma drift at the morning run", () => {
   it("stops on a budget stop reading the publisher, and posts nothing", async () => {
     const { m } = await sweptRecap();
     m.figma.failNext("versions", new SubrequestBudgetError(38));
-    await assert.rejects(runDriftAsks(MORNING, m.deps), SubrequestBudgetError);
+    await assert.rejects(m.run(), SubrequestBudgetError);
     assert.deepEqual(m.posted, []);
   });
 
@@ -432,7 +482,7 @@ describe("a Figma drift at the morning run", () => {
 
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
 
     assert.deepEqual(
       m.posted.map((p) => [p.channel, p.threadTs, p.card]),
@@ -446,12 +496,12 @@ describe("a Figma drift at the morning run", () => {
     assert.equal(
       m.posted[1]!.text,
       [
-        "This thread settled a decision that its Figma file has not caught up with.",
-        `The intake for <${FIGMA_B.url}|Session Recap> is drafted <https://plus.slack.com/archives/C0DESIGN/p${m.posted[0]!.ts.replace(".", "")}|in another thread>.`,
+        "• This thread settled a decision that its Figma file has not caught up with.",
+        `• The intake for <${FIGMA_B.url}|Session Recap> is drafted <https://plus.slack.com/archives/C0DESIGN/p${one.root.ts.replace(".", "")}|in another thread>.`,
       ].join("\n"),
-      "no card here: the parent line and a one-line pointer",
+      "no card here: the thread's line and a one-line pointer to the card's thread",
     );
-    assert.equal(m.posted[1]!.blocks, undefined, "nothing to decide in this thread");
+    assert.deepEqual(cardsOf(m.posted[1]!.blocks), [], "nothing to decide in this thread");
     assert.doesNotMatch(m.posted[1]!.text, /<@U/, "a pointer pings nobody");
     assert.deepEqual(staged[0]!.confirmers, ["U0STARTER", "U0ADE", "U0BEA", "U0CY"], "both threads' people may decide");
     assert.ok(m.marked.includes(`${DESIGN}:${two.root.ts}`), "the asked thread is marked, so its replies stay the team's");
@@ -463,7 +513,7 @@ describe("a Figma drift at the morning run", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1);
 
     // The next night re-reads the same thread (a reply under the card), and a
@@ -474,7 +524,7 @@ describe("a Figma drift at the morning run", () => {
       { ...(await pendingOf(h, drifts, later, FIGMA_B))!, detectedAt: at(30, 22) },
     ]);
     h.clock.now = at(31, 13);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
 
     assert.equal(m.posted.length, 2, "the first thread is not asked again");
     assert.equal(m.posted[1]!.threadTs, later.root.ts);
@@ -498,7 +548,7 @@ describe("a Figma drift at the morning run", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
 
     assert.match(m.posted[0]!.text, /^<@U0ADE>, this thread settled a decision that the code has not caught up with\.\n/);
     const [card] = cardsOf(m.posted[0]!.blocks);
@@ -521,7 +571,7 @@ describe("a Figma drift at the morning run", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
 
     assert.deepEqual(m.posted.map((p) => [p.channel, p.threadTs]), [[DESIGN, t.root.ts]]);
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
@@ -538,7 +588,7 @@ describe("a Figma drift at the morning run", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts, { dryRun: true });
-    const report = await runDriftAsks(MORNING, m.deps);
+    const report = await m.run();
     assert.equal(report.asks.length, 1);
     assert.match(report.summary, /would ask 1 thread/);
     assert.deepEqual(m.posted, []);
@@ -552,7 +602,7 @@ describe("a Figma drift at the morning run", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 12, 59);
     const m = morning(h, drifts);
-    const report = await runDriftAsks(MORNING, m.deps);
+    const report = await m.run();
     assert.deepEqual(m.posted, []);
     assert.equal(report.summary, "no file drift due this morning");
   });
@@ -587,7 +637,7 @@ describe("the Product Pillar on a Roadmap intake", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts, { options });
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
     return { input: proposal!.operations![0]!.input as Record<string, unknown>, text: proposal!.proposalText, posted: m.posted[0]!.text };
   }
@@ -638,7 +688,7 @@ describe("two files discussed in one thread", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     return { h, drifts, m, t };
   }
 
@@ -648,19 +698,19 @@ describe("two files discussed in one thread", () => {
     const [report] = m.posted;
     assert.equal(report!.threadTs, t.root.ts);
     assert.equal(messageBlocksRefusal(report!.blocks!), null);
-    assert.equal(report!.text.split("\n")[0], "This thread settled two decisions that their files have not caught up with.");
+    assert.equal(report!.text.split("\n")[0], "<@U0ADE>, this thread settled two decisions that their files have not caught up with.");
     assert.equal((report!.blocks![1] as { type: string }).type, "carousel");
     const cards = cardsOf(report!.blocks);
     assert.deepEqual(cards.map((c) => c.title!.text), ["Session Recap", "Button.jsx"]);
-    assert.deepEqual(cards.map((c) => c.actions![0]!.action_id), ["uno_decision_review:1", "uno_decision_review:2"], "each Review opens its own card");
+    assert.deepEqual(cards.map((c) => c.actions![0]!.action_id), ["uno_decision_review:drift-1", "uno_decision_review:drift-2"], "each Review opens its own card");
     assert.doesNotMatch(report!.text + JSON.stringify(report!.blocks), GATE_WORDS, "no `drop 2`, no footer");
 
     const staged = (await h.threadState.getProposalsByChannel(DESIGN)).sort((a, b) => a.proposalTs.localeCompare(b.proposalTs));
     assert.deepEqual(
       staged.map((p) => [p.proposalTs, p.operations!.map((op) => op.toolName)]),
       [
-        [itemProposalKey(report!.ts, "1"), ["notion_create"]],
-        [itemProposalKey(report!.ts, "2"), ["github_issue_create"]],
+        [itemProposalKey(report!.ts, "drift-1"), ["notion_create"]],
+        [itemProposalKey(report!.ts, "drift-2"), ["github_issue_create"]],
       ],
       "one intake per card, so deciding one leaves the other",
     );
@@ -674,16 +724,16 @@ describe("two files discussed in one thread", () => {
     assert.equal(typed.outcome, "none");
     assert.equal(renderGateNote(typed.post!.note), "Each card here is decided from its own Review button, so nothing ran.");
 
-    const key = itemProposalKey(report!.ts, "2");
+    const key = itemProposalKey(report!.ts, "drift-2");
     const approved = await resolveSignal({ kind: "review", messageTs: key, decision: "confirm", userId: "U0ADE" }, { threadState: h.threadState });
     assert.equal(approved.outcome, "won");
     assert.deepEqual(approved.execute?.operations.map((op) => op.toolName), ["github_issue_create"], "Approve files that card's intake alone");
-    const message = await settleItem(h.threadState, { messageTs: report!.ts, id: "2" }, { kind: "approved", by: "U0ADE", at: h.clock.now }, h.clock.now);
+    const message = await settleItem(h.threadState, { messageTs: report!.ts, id: "drift-2" }, { kind: "approved", by: "U0ADE", at: h.clock.now }, h.clock.now);
     const cards = cardsOf(message!.blocks);
     assert.match(cards[1]!.subtitle!.text, /^Approved by <@U0ADE> · written /);
     assert.equal(cards[1]!.body!.text, "Written: an intake to update Button.jsx");
     assert.deepEqual(labels(cards[0]!), ["Review", "Open in Figma"], "the other card is still open");
-    assert.equal((await h.threadState.getProposalByTs(itemProposalKey(report!.ts, "1"))).state, "found");
+    assert.equal((await h.threadState.getProposalByTs(itemProposalKey(report!.ts, "drift-1"))).state, "found");
   });
 
   it("wait while the thread's card is live, rather than stage a second card over it", async () => {
@@ -695,7 +745,7 @@ describe("two files discussed in one thread", () => {
     assert.ok(found);
     await drifts.add([{ ...found, detectedAt: at(30, 22) }]);
     h.clock.now = at(31, 13);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1, "nothing new in a thread whose card is live");
     assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 2);
     assert.equal((await drifts.pending()).length, 1, "the new file waits in the queue");
@@ -707,7 +757,7 @@ describe("what a GitHub issue carries from a private place", () => {
     const { h, drifts } = night({ threads: [t], sources: [CODE], replies: [reply(fileDrift(CODE, [ts(29, 16)], "U0ADE"))], channelKind: "private" });
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
-    await runDriftAsks(MORNING, morning(h, drifts).deps);
+    await morning(h, drifts).run();
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
     const input = card!.operations![0]!.input as { title: string; body: string };
     assert.equal(input.title, "Update Button.jsx in code");
@@ -723,7 +773,7 @@ describe("what a GitHub issue carries from a private place", () => {
     const { h, drifts } = night({ threads: [t], sources: [CODE], replies: [reply(mention)] });
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
-    await runDriftAsks(MORNING, morning(h, drifts).deps);
+    await morning(h, drifts).run();
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
     const input = card!.operations![0]!.input as { title: string; body: string };
     assert.doesNotMatch(input.body, /(^|[^`])@octocat/);
@@ -792,7 +842,7 @@ const RECHECK = { key: "figma-drift-recheck" };
 describe("the drift check, before the ask (#897)", () => {
   it("asks nobody when the file changed after the decision and the frame now shows it", async () => {
     const { h, drifts, m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED, judge: [SHOWS] });
-    const report = await runDriftAsks(MORNING, m.deps);
+    const report = await m.run();
 
     assert.deepEqual(m.posted, [], "no question");
     assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 0, "no card staged");
@@ -813,7 +863,7 @@ describe("the drift check, before the ask (#897)", () => {
 
   it("asks, saying when the file last changed, when the frame doesn't show the decision", async () => {
     const { h, drifts, m } = await recapMorning({ changedAt: CHANGED_AFTER, judge: [NOT_SHOWN] });
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1);
     const [card] = cardsOf(m.posted[0]!.blocks);
     assert.equal(card!.subtitle!.text, "<@U0BEA> · last changed Sep 29");
@@ -827,18 +877,18 @@ describe("the drift check, before the ask (#897)", () => {
     const unsure = [JSON.stringify({ shows: true, confidence: 0.5 }), "the frame looks updated", JSON.stringify({ shows: "yes", confidence: 1 })];
     for (const answer of unsure) {
       const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED, judge: [answer] });
-      await runDriftAsks(MORNING, m.deps);
+      await m.run();
       assert.equal(m.posted.length, 1, answer);
     }
     for (const provider of [fakeProvider({ generateFailMessage: "Gemini 429" }), fakeProvider({ generateUnavailableMessage: "no key" })]) {
       const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED });
       m.deps.judge = modelFrameJudge(provider);
-      await runDriftAsks(MORNING, m.deps);
+      await m.run();
       assert.equal(m.posted.length, 1);
     }
     const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED });
     delete m.deps.judge;
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1, "with no judge, nothing is ever found shown");
     assert.deepEqual(m.figma.calls().map((c) => c.method), ["versions"], "and no frame is read for it");
   });
@@ -850,7 +900,7 @@ describe("the drift check, before the ask (#897)", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts, { changedAt: CHANGED_AFTER, judge: [SHOWS] });
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1);
     assert.match(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, /last changed Sep 29$/);
     assert.equal(m.provider.generated.length, 0);
@@ -860,7 +910,7 @@ describe("the drift check, before the ask (#897)", () => {
   it("stops on a budget stop reading the frame, and posts nothing", async () => {
     const { m } = await recapMorning({ changedAt: CHANGED_AFTER, frameA: UPDATED, judge: [SHOWS] });
     m.figma.failNext("nodes", new SubrequestBudgetError(38));
-    await assert.rejects(runDriftAsks(MORNING, m.deps), SubrequestBudgetError);
+    await assert.rejects(m.run(), SubrequestBudgetError);
     assert.deepEqual(m.posted, []);
   });
 
@@ -877,7 +927,7 @@ describe("the drift check, before the ask (#897)", () => {
     // Node 1-2 was updated; node 3-4 still shows the button.
     const m = morning(h, drifts, { changedAt: CHANGED_AFTER, frameA: UPDATED });
     m.deps.judge = async (input) => (input.frame.texts.includes("Shared with tutor automatically") ? "shows" : "unsure");
-    const report = await runDriftAsks(MORNING, m.deps);
+    const report = await m.run();
 
     assert.deepEqual(m.posted.map((p) => [p.threadTs, p.card]), [[two.root.ts, true]]);
     assert.deepEqual(report.settled, [{ channel: DESIGN, threadTs: one.root.ts, fileKey: `figma:${FILE_KEY}` }]);
@@ -894,13 +944,13 @@ describe("the drift check, before the ask (#897)", () => {
 
   it("waits for the drift card a thread already holds before looking at its file", async () => {
     const { h, drifts, m, t } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     const other = figmaFile("9-9", { url: "https://www.figma.com/design/ZzOther9/Onboarding?node-id=9-9", title: "Onboarding" });
     const again = thread({ user: "U0STARTER", when: t.root.ts, urls: [other.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     await drifts.add([{ ...(await pendingOf(h, drifts, again, other))!, detectedAt: at(30, 22) }]);
     h.clock.now = at(31, 13);
     const calls = m.figma.calls().length;
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.figma.calls().length, calls, "no read for a finding that waits");
   });
 });
@@ -908,13 +958,13 @@ describe("the drift check, before the ask (#897)", () => {
 describe("the drift check, while the report is live (#897)", () => {
   it("redraws the file's card in place, retires it, and posts nothing, once the frame shows the decision", async () => {
     const { h, drifts, m, t } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     const [report] = m.posted;
-    const key = itemProposalKey(report!.ts, "1");
+    const key = itemProposalKey(report!.ts, "drift-1");
     const [live] = await drifts.liveAsks();
     assert.deepEqual(
       { role: live!.role, ts: live!.ts, threadTs: live!.threadTs, itemId: live!.files[0]!.itemId },
-      { role: "card", ts: report!.ts, threadTs: t.root.ts, itemId: "1" },
+      { role: "card", ts: report!.ts, threadTs: t.root.ts, itemId: "drift-1" },
     );
 
     // The designer updates the frame on Sep 30; the end-of-day run looks again.
@@ -939,7 +989,7 @@ describe("the drift check, while the report is live (#897)", () => {
     assert.match(result.summary, /^looked at 1 decision\(s\), withdrew 1 question\(s\)$/);
   });
 
-  it("edits the pointer in the other thread too", async () => {
+  it("leaves the pointer in the other thread as it is: the morning's message is shared", async () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const two = thread({ user: "U0BEA", when: ts(29, 17), urls: [FIGMA_B.url] }, [{ user: "U0CY", when: ts(29, 18) }]);
     const { h, drifts } = night({
@@ -950,22 +1000,21 @@ describe("the drift check, while the report is live (#897)", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.deepEqual(m.posted.map((p) => p.card), [true, false]);
 
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: async () => "shows" });
     await recheckLiveAsks(RECHECK, r.deps);
-    assert.deepEqual(r.edits.map((e) => e.ts), m.posted.map((p) => p.ts));
+    assert.deepEqual(r.edits.map((e) => e.ts), [m.posted[0]!.ts], "the card only");
     assert.equal(cardsOf(r.edits[0]!.blocks)[0]!.subtitle!.text, "Updated Sep 30. Nothing to do.");
-    assert.equal(r.edits[1]!.text, "The file now shows this thread's decision, updated Sep 30. Nothing to do.");
     assert.equal(m.posted.length, 2, "nothing posted");
   });
 
   it("leaves a card whose frame doesn't show it, judges each change once, and withdraws it when one does", async () => {
     const { h, drifts, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z" });
     h.clock.now = at(31, 4);
     const first = recheck(h, drifts, m.figma, { judge: [NOT_SHOWN] });
@@ -1001,8 +1050,8 @@ describe("the drift check, while the report is live (#897)", () => {
       versions: { versions: [{ id: "1", label: "v1", description: "", created_at: "2026-09-20T10:00:00Z", user: { handle: "bea.designs" } }] },
       nodes: { "9:9": frame(["Onboarding"]) },
     });
-    await runDriftAsks(MORNING, m.deps);
-    assert.equal(m.posted[0]!.text.split("\n")[0], "This thread settled two decisions that their Figma files have not caught up with.");
+    await m.run();
+    assert.equal(m.posted[0]!.text.split("\n")[0], "<@U0ADE>, this thread settled two decisions that their Figma files have not caught up with.");
 
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
@@ -1032,7 +1081,7 @@ describe("the drift check, while the report is live (#897)", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: async () => "shows" });
@@ -1046,8 +1095,8 @@ describe("the drift check, while the report is live (#897)", () => {
 
   it("leaves a card someone already decided", async () => {
     const { h, drifts, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
-    await h.threadState.retireProposal(itemProposalKey(m.posted[0]!.ts, "1"));
+    await m.run();
+    await h.threadState.retireProposal(itemProposalKey(m.posted[0]!.ts, "drift-1"));
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
@@ -1059,8 +1108,8 @@ describe("the drift check, while the report is live (#897)", () => {
 
   it("looks and judges on a dry run, and edits, retires and writes nothing", async () => {
     const { h, drifts, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
-    const key = itemProposalKey(m.posted[0]!.ts, "1");
+    await m.run();
+    const key = itemProposalKey(m.posted[0]!.ts, "drift-1");
     const before = await drifts.liveAsks();
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
@@ -1077,7 +1126,7 @@ describe("the drift check, while the report is live (#897)", () => {
 describe("no re-ping (#897)", () => {
   it("after 72 h with no answer, later mornings ask nothing and the file catching up edits nothing", async () => {
     const { h, drifts, m, t } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(m.posted.length, 1);
 
     // The thread stays busy, so the sweep finds the same drift on later nights.
@@ -1088,7 +1137,7 @@ describe("no re-ping (#897)", () => {
     ] as const) {
       await drifts.add([{ ...again, detectedAt: found }]);
       h.clock.now = askedAt;
-      await runDriftAsks(MORNING, m.deps);
+      await m.run();
       assert.equal(m.posted.length, 1, `nothing posted on ${new Date(askedAt).toISOString().slice(0, 10)}`);
       assert.deepEqual(await drifts.pending(), [], "the thread was asked: the finding leaves");
     }
@@ -1161,7 +1210,7 @@ describe("the drift check's limits (#897 review)", () => {
     assert.equal((await drifts.pending()).length, MAX_LOOKS_PER_MORNING + 1);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    const report = await runDriftAsks(MORNING, m.deps);
+    const report = await m.run();
 
     assert.match(report.note ?? "", /1 thread\(s\) wait for tomorrow's look at their files/);
     const newest = threads[threads.length - 1]!;
@@ -1209,7 +1258,7 @@ describe("the drift check's limits (#897 review)", () => {
 describe("a caught-up card's withdrawal and the budget (#897 review)", () => {
   it("stops before the look when the withdrawal after it would not fit, and finishes on the retry", async () => {
     const { h, drifts, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
     seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
     h.clock.now = at(31, 4);
@@ -1241,7 +1290,7 @@ describe("a question whose card was filed (#897 review)", () => {
     await runSweepJob(EOD, h.deps);
     h.clock.now = at(30, 13);
     const m = morning(h, drifts);
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
     // Someone approves the card in Review: the intake is filed.
     await recordProposalEvents(h.proposalEvents, [proposalEvent(card!.proposalTs, "confirmed", at(30, 15), "button")]);
@@ -1259,7 +1308,7 @@ describe("a question whose card was filed (#897 review)", () => {
 describe("a file-change notification (#896)", () => {
   it("withdraws a caught-up question within its own job, the way the scheduled runs do", async () => {
     const { h, drifts, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     assert.equal(await drifts.liveFileUntil(`figma:${FILE_KEY}`), at(30, 13) + DRIFT_CARD_TTL_MS, "the ask marked its file");
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
 
@@ -1278,7 +1327,7 @@ describe("a file-change notification (#896)", () => {
 
   it("costs one read for a file no live question names: no list, no Figma call", async () => {
     const { h, drifts, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     const calls = m.figma.calls().length;
     let listed = 0;
     const store = { ...drifts, liveAsks: async () => ((listed += 1), drifts.liveAsks()) };
@@ -1291,7 +1340,7 @@ describe("a file-change notification (#896)", () => {
 
   it("looks no further once the question's 72 h are up", async () => {
     const { h, drifts, m } = await recapMorning();
-    await runDriftAsks(MORNING, m.deps);
+    await m.run();
     seedFigmaFile(m.figma, { changedAt: "2026-10-03T15:00:00Z", frameA: UPDATED });
     h.clock.now = at(30, 13) + DRIFT_CARD_TTL_MS + 1;
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
@@ -1308,12 +1357,12 @@ describe("a drift card decided in Review", () => {
   ] as const) {
     it(`records ${label} and runs ${writes} intake writes`, async () => {
       const { h, m } = await recapMorning();
-      await runDriftAsks(MORNING, m.deps);
+      await m.run();
       const report = m.posted[0]!;
       const updates: Array<{ blocks: unknown[] }> = [];
       let ran = 0;
       await runReviewDecision(
-        { viewId: "V1", channel: DESIGN, messageTs: itemProposalKey(report.ts, "1"), userId: "U0BEA", decision: "confirm", choice },
+        { viewId: "V1", channel: DESIGN, messageTs: itemProposalKey(report.ts, "drift-1"), userId: "U0BEA", decision: "confirm", choice },
         {
           threadState: h.threadState,
           views: recordingViews({ alreadyOpen: ["V1"] }).client,
@@ -1339,7 +1388,9 @@ describe("a drift card decided in Review", () => {
   it("keeps a Reject's reason on the card and in View", async () => {
     const { h, m } = await recapMorning();
     // A report posted before custom choices keeps its original Reject path.
-    await runDriftAsks(MORNING, { ...m.deps, stage: (proposal, kind) => m.deps.stage({ ...proposal, choices: undefined }, kind) });
+    const stage = m.hooks.stage;
+    m.hooks.stage = (proposal, kind) => stage({ ...proposal, choices: undefined }, kind);
+    await m.run();
     const [report] = m.posted;
     const updates: Array<{ ts: string; message: { blocks: unknown[] } }> = [];
     const deps: ReviewDoorDeps = {
@@ -1353,7 +1404,7 @@ describe("a drift card decided in Review", () => {
       now: () => h.clock.now,
     };
     await runReviewDecision(
-      { viewId: "V1", channel: DESIGN, messageTs: itemProposalKey(report!.ts, "1"), userId: "U0BEA", decision: "cancel", note: "Already updated" },
+      { viewId: "V1", channel: DESIGN, messageTs: itemProposalKey(report!.ts, "drift-1"), userId: "U0BEA", decision: "cancel", note: "Already updated" },
       deps,
     );
     assert.deepEqual(updates.map((u) => u.ts), [report!.ts], "the report, redrawn");
@@ -1361,7 +1412,7 @@ describe("a drift card decided in Review", () => {
     assert.equal(card!.subtitle!.text, "Rejected by <@U0BEA>");
     assert.equal(card!.body!.text, "Nothing written. Reason: Already updated");
     assert.deepEqual(labels(card!), ["View", "Open in Figma"]);
-    assert.match(itemText((await h.threadState.getReport(report!.ts))!, "1") ?? "", /Reason: Already updated$/, "View shows it too");
+    assert.match(itemText((await h.threadState.getReport(report!.ts))!, "drift-1") ?? "", /Reason: Already updated$/, "View shows it too");
   });
 });
 

@@ -16,7 +16,7 @@
 
 import type { FigmaClient } from "../figma/client";
 import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
-import type { ReportStore } from "../slack/decision-cards";
+import type { ReportMessage, ReportStore } from "../slack/decision-cards";
 import type { SectionHandOff } from "../sweep/sections";
 import type { FigmaDecisionsHanded } from "./post";
 import type { DecisionDetector, DecisionRoute } from "./detector";
@@ -147,7 +147,7 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   /** The morning's Slack side. Absent, the post skips. */
   slack?: {
     post(message: { text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
-    edit(ts: string, message: { text: string; blocks?: unknown[] }): Promise<void>;
+    edit(ts: string, message: { text: string; blocks?: unknown[]; metadata?: ReportMessage["metadata"] }): Promise<void>;
     /** #plus-design's members, or null when they cannot be read. */
     members(): Promise<string[] | null>;
     /** Stage a card the Worker posted, and put it on the usage record. */
