@@ -111,8 +111,8 @@ function* files(dir) {
  * .gitignore covers.
  *
  * Preferred over the walk because the walk sees a working copy, not a repo. A
- * local `eval-results.json` — an artifact of `npm run evals`, written to the
- * root and never committed — records the WORKER_URL it hit, so the walk flagged
+ * local `eval-results.json` — what the eval runner used to write to the root,
+ * never committed — records the WORKER_URL it hit, so the walk flagged
  * it on the one machine that had run evals and nowhere else. A guard that is red
  * only for the person who used the repo hardest is a guard that gets ignored.
  *

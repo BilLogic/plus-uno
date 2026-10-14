@@ -189,7 +189,7 @@ test("every exception carries a reason, so the list cannot grow silently", () =>
 });
 
 test("a gitignored artifact is not a finding — it is not part of the repo", () => {
-  // `npm run evals` writes eval-results.json to the root, and it records the
+  // The eval runner used to write eval-results.json to the root, recording the
   // WORKER_URL it hit. Walking the working copy flagged it on the one machine
   // that had run evals, and nowhere else.
   const root = mkdtempSync(path.join(tmpdir(), "worker-host-git-"));
