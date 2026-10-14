@@ -21,6 +21,7 @@ import type { ReportStore } from "../slack/decision-cards";
 import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
+import type { TriagePorts } from "./triage";
 import type { FigmaPeople, NotionPeople, TeamRoles } from "../usage/roles";
 import type { DecisionRow, RowUpdate } from "../decisions-db/row";
 
@@ -119,8 +120,9 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   /** Keys under a prefix of the notification route's KV notes, each with the
    *  time it records (null when it cannot be read). */
   notes: { list(prefix: string): Promise<Array<{ key: string; at: string | null }>> };
-  /** A Roadmap card by its number, or null when the Roadmap has none. */
-  card(number: number): Promise<{ url: string; title: string } | null>;
+  /** A Roadmap card by its number, with its Product Pillar values, or null
+   *  when the Roadmap has none. */
+  card(number: number): Promise<{ url: string; title: string; pillars?: string[] } | null>;
   /** The team's roles by Slack id (`usage/roles.ts`): how a card's design
    *  owner is told from its other Contributors. Empty when unread. */
   roles(): Promise<TeamRoles>;
@@ -149,6 +151,8 @@ export interface SweepFigmaComments extends FigmaCommentStores {
     read(ts: string): Promise<DecisionThread | null>;
     write(thread: DecisionThread): Promise<void>;
   };
+  /** The unanswered-question triage (`./triage.ts`). Absent, no question is kept or raised. */
+  triage?: TriagePorts;
 }
 
 /** Everything a decision's ✅ runs: its update, then its row. Empty for a decision said only in the thread. */

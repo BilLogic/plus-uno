@@ -15,6 +15,8 @@
 //   • a comment is posted as the token's owner (`me`), whoever asked;
 //   • a comment's emoji read back as Figma stores them, as shortcodes: a
 //     posted `🐐` comes back `:goat:` (seen live, 2026-10-12);
+//   • a reaction is sent as a shortcode: the emoji character is a 400, and
+//     `:goat:` is taken and reads back as `:goat:` (probed live, 2026-10-14);
 //   • a file read to a `depth` stops that many levels below the document (1
 //     is the pages alone), and one read for `ids` holds only the paths down to
 //     those nodes, with their subtrees.
@@ -32,6 +34,7 @@ import {
   type FigmaFolder,
   type FigmaFolderFile,
   type FigmaMethod,
+  type FigmaReaction,
   type FigmaUser,
   type FigmaVersionsResponse,
   type FigmaWebhook,
@@ -92,6 +95,7 @@ export interface InMemoryFigma extends FigmaClient {
 const WRITES: ReadonlySet<FigmaMethod> = new Set<FigmaMethod>([
   "postComment",
   "replyToComment",
+  "postReaction",
   "addDevResources",
   "updateDevResources",
   "removeDevResource",
@@ -108,6 +112,8 @@ interface StoredFile {
   comments: FigmaComment[];
   devResources: FigmaDevResource[];
   creator: FigmaUser | null;
+  /** Each comment's reactions, by comment id. */
+  reactions: Map<string, FigmaReaction[]>;
 }
 
 /** The tree cut `depth` levels below `node`, as Figma's `depth` cuts it. */
@@ -180,6 +186,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         comments: [],
         devResources: [],
         creator: null,
+        reactions: new Map(),
       };
       files.set(fileKey, {
         name: seed.name ?? current.name,
@@ -191,6 +198,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         comments: clone(seed.comments ?? current.comments),
         devResources: clone(seed.devResources ?? current.devResources),
         creator: clone(seed.creator ?? current.creator),
+        reactions: current.reactions,
       });
     },
     seedTeam(teamId, list) {
@@ -287,6 +295,22 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
       };
       f.comments.push(reply);
       return landed(entry, reply);
+    },
+    async reactions(key, commentId, o) {
+      const entry = enter("reactions", [key, commentId, o]);
+      const f = fileOf("comment reactions", key);
+      if (!f.comments.some((c) => c.id === commentId)) throw new FigmaRequestError(404, "Figma comment reactions 404: Comment not found");
+      return landed(entry, { reactions: f.reactions.get(commentId) ?? [] });
+    },
+    async postReaction(key, commentId, emoji, o) {
+      const entry = enter("postReaction", [key, commentId, emoji, o]);
+      const f = fileOf("comment reaction", key);
+      if (!f.comments.some((c) => c.id === commentId)) throw new FigmaRequestError(404, "Figma comment reaction 404: Comment not found");
+      if (!/^:[\w+-]+:$/.test(emoji)) throw new FigmaRequestError(400, "Figma comment reaction 400: Invalid emoji");
+      const list = f.reactions.get(commentId) ?? [];
+      if (!list.some((r) => r.emoji === emoji && r.user.id === me.id)) list.push({ emoji, user: me });
+      f.reactions.set(commentId, list);
+      landed(entry, undefined);
     },
     async teamFolders(teamId, o) {
       const entry = enter("teamFolders", [teamId, o]);

@@ -24,6 +24,10 @@
 // the file's queue entry in HARNESS_KV (`./queue.ts`), the parent line says
 // how many wait, and the next morning posts them in the same thread.
 //
+// THEN THE QUESTIONS. Once the threads are posted, any Figma question nobody
+// answered in two workdays is raised once through the posting ladder
+// (`./triage.ts`), on the budget the threads left.
+//
 // NOTHING IS WRITTEN HERE. A card's Approve runs its one operation through the
 // gate, like any card; this job posts and stages.
 //
@@ -46,6 +50,7 @@ import type { SweepRunOutcome } from "../sweep/store";
 import { readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sweep/run";
 import { decisionCard, decisionCardWords, decisionItem, decisionParent, decisionParentWaiting, noPrdNote, rewordInstead } from "./copy";
 import { commentUrl } from "./draft";
+import { raiseUnanswered } from "./triage";
 import { operationsOf, type DecisionThread, type QueuedDecision, type QueuedFile } from "./queue";
 
 /** How long a decision card stays confirmable. */
@@ -69,7 +74,17 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
   const posted: QueuedFile[] = [];
   const notes: string[] = [];
   let cards = 0;
-  const finish = async (outcome: SweepRunOutcome, note: string | null): Promise<SweepJobReport> => {
+  const finish = async (outcome: SweepRunOutcome, decided: string | null): Promise<SweepJobReport> => {
+    // Then the questions nobody answered, on what budget the threads left.
+    const triage = deps.figmaComments?.triage
+      ? await raiseUnanswered(deps.figmaComments.figma, deps.figmaComments.triage, {
+          now: deps.now(),
+          ...(deps.dryRun ? { dryRun: true } : {}),
+          ...(deps.meter ? { meter: deps.meter } : {}),
+        })
+      : null;
+    const said = [decided, ...(triage?.notes ?? [])].filter((n): n is string => !!n);
+    const note = said.length ? said.join("; ") : null;
     await recordRun(deps, {
       runName: "morning",
       jobKey: job.key,
@@ -82,7 +97,8 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
       meterStart,
     });
     const verb = deps.dryRun ? "would post" : "posted";
-    const counted = `${verb} ${posted.length} Figma decision thread(s), ${cards} card(s)`;
+    const raised = triage ? `, ${deps.dryRun ? "would raise" : "raised"} ${triage.raised} unanswered Figma question(s)` : "";
+    const counted = `${verb} ${posted.length} Figma decision thread(s), ${cards} card(s)${raised}`;
     const summary = note ? `${counted} — ${note}` : counted;
     return { kind: "sweep-figma-post", key: job.key, outcome, note, threads: posted.length, findings: [], cards: [], figmaFiles: posted, summary };
   };

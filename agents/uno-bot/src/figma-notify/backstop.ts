@@ -83,6 +83,11 @@ export interface BackstopState {
   sweep: BackstopSweep | null;
   /** The last finished sweep's `until`: where the next one's window starts. */
   lastUntil: number | null;
+  /** Each file the listing has seen, by key, and the team it sits in: how a
+   *  Figma file with no Roadmap card finds its team channel
+   *  (`../figma-comments/triage.ts`). Kept in the state the job already
+   *  reads and writes, so it costs no call. */
+  fileTeams?: Record<string, string>;
 }
 
 export interface BackstopDeps {
@@ -181,6 +186,8 @@ export async function runBackstop(job: { key: string }, deps: BackstopDeps): Pro
         sweep.tasks.unshift(...(listing.folders ?? []).map((f): BackstopTask => ({ kind: "folder", team: task.team, folderId: f.id })));
         continue;
       }
+      state.fileTeams ??= {};
+      for (const f of listing.files ?? []) state.fileTeams[f.key] = task.team;
       const stop = await compareFolder(listing.files ?? [], sweep, deps, missed, notes);
       inWindow += stop.inWindow;
       if (stop.refused) break;

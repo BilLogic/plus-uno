@@ -129,6 +129,17 @@ describe("the backstop catches what no notification reported", () => {
     assert.match(report.summary, /listed 2 .*: 1 file\(s\) changed, 1 with no notification, queued; sweep finished$/);
   });
 
+  it("keeps each listed file's team, changed or not, and costs no more listings for it", async () => {
+    const figma = teamsWith([UNIVERSAL, TRAINING], {
+      Universal: { F1: [{ key: "FILEA", at: AFTERNOON }] },
+      Training: { F2: [{ key: "FILEB", at: AFTERNOON - 30 * 24 * HOUR }] },
+    });
+    const w = world(figma, [UNIVERSAL, TRAINING]);
+    const report = await runBackstop(JOB, w.deps);
+    assert.deepEqual(w.state()!.fileTeams, { FILEA: "Universal", FILEB: "Training" });
+    assert.equal(report.listed, 4, "two teams and their two folders");
+  });
+
   it("queues nothing for a change its notification already covers", async () => {
     // FILE_UPDATE's time is when Figma sent it, about 30 minutes after the edit.
     const figma = teamsWith([UNIVERSAL], { Universal: { F1: [{ key: "FILEA", at: AFTERNOON }] } });

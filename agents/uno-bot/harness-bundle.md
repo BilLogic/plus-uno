@@ -45,11 +45,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 113,145 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 114,016 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 33,940 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 34,811 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 11,509 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,864 |
@@ -1632,6 +1632,7 @@ A decision settled in a Figma comment reaches the PRD, the Roadmap card or the d
 - **Changing the wording:** Review's **Needs changes** on a card takes its note as the new wording: decision N is drafted again on the same route against its page as it reads now, and the revised card replaces it in place in the carousel, under the same number, as a new proposal with the same confirmers and time left. A typed reply rewords only on an explicit cue — `2: <new wording>`, `#2 …`, or `reword 2: …` — from one of the card's confirmers. Every other reply in the thread, and any reply that @mentions uno-bot, is left to the ordinary path: there uno-bot answers an @mention, and a typed ✅ or ⛔ decides no card.
 - **Key decisions:** a build rule tied to a Roadmap card, settled or concretely proposed, also drafts its Decisions DB row (`notion.md` § Decisions DB), run by the same card's Review after the update; a swept thread's fix carries one the same way, from a public channel only. The detector weighs it against the card's rows: one row per decision area, so a decision that widens a row renames it and adds a dated line, keeping its Owner and Evidence; one that replaces a row's adds a row linking it and marks the older Superseded; one a row already records adds nothing. Status follows the stage (Proposed, Accepted, Rejected). Owner is the proposer, and Sign-off only someone the evidence shows approving an Accepted decision, each placed through the Notion people map; the row's Evidence is the comment's link or the thread's permalink. The code is `agents/uno-bot/src/decisions-db/row.ts`.
 - **Terms:** a card's confirmers are the file's cards' Contributors (#plus-design's members for a file with no card). It's open for 72 h, with no re-ping. A thread is carded once: a later reply in it is not read again. A morning starts a file only when its budget covers every card; a parent whose cards all failed says so and is reused the next morning, so a file has one parent.
+- **Unanswered questions:** the same night read keeps each open question under Specs or For Review — a root asking something (a `?`), unresolved, with no reply from anyone but its asker; an @uno ask is answered as it is made instead. The first weekday morning after two whole workdays, the morning post re-reads the file's comments and raises a question still unanswered once, through the posting ladder (`slack.md`): the card's team channel, else the Figma file's team channel, else #plus-design, tagging the card's design owner, else naming the file's creator by Figma handle. A person the question @-names gets a DM when the hand-kept `FIGMA_HANDLE_SLACK_IDS` map has their Figma handle; anyone it does not have is named on the channel card. A question whose every named person was DMed gets no channel card. The code is `agents/uno-bot/src/figma-comments/triage.ts`.
 
 ## Commitment reminders
 

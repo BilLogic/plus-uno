@@ -29,6 +29,8 @@ import type { DecisionRow } from "../../src/integrations/notion";
 import type { TeamRoles } from "../../src/usage/roles";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
+import { figmaHandlesFrom, type TriagePorts, type WatchedFile } from "../../src/figma-comments/triage";
+import type { ChannelIds } from "../../src/destination/index";
 
 export const DESIGN = "C0DESIGN";
 export const UNIVERSAL = "C0UNIVERSAL";
@@ -176,6 +178,22 @@ export interface FigmaRecords {
   messages: Array<{ ts: string; text: string; threadTs: string | null; blocks?: unknown[]; edited?: string; editedBlocks?: unknown[] }>;
   /** Every KV note prefix listed, in order. */
   listed: string[];
+  /** The unanswered-question triage's records and sends, when `figma.triage` is set. */
+  triage: {
+    watch: Map<string, WatchedFile>;
+    raised: Set<string>;
+    posts: Array<{ channel: string; text: string }>;
+    dms: Array<{ to: string; text: string }>;
+  };
+}
+
+/** The triage's wiring: the handle map as the Worker's config spells it, each
+ *  file's Figma team, and the ladder's channel ids (#plus-design, #plus-universal
+ *  and `C0TOOLKIT` unless set). */
+export interface TriageOptions {
+  handles?: string;
+  fileTeams?: Record<string, string>;
+  channels?: ChannelIds;
 }
 
 export function sweepHarness(opts: {
@@ -223,8 +241,10 @@ export function sweepHarness(opts: {
   figma?: {
     client: InMemoryFigma;
     notes?: Array<{ key: string; at: string | null }>;
-    cards?: Record<number, { url: string; title: string }>;
+    cards?: Record<number, { url: string; title: string; pillars?: string[] }>;
     miscTeamId?: string;
+    /** Wire the unanswered-question triage. Unset, it is not wired. */
+    triage?: TriageOptions;
     members?: string[] | null;
     /** The team's roles by Slack id: who is a designer. None unless set. */
     roles?: TeamRoles;
@@ -291,7 +311,41 @@ export function sweepHarness(opts: {
   const sourceReads: string[] = [];
   const searches: string[] = [];
   let nextTs = 0;
-  const figmaRecords: FigmaRecords = { queue: new Map(), carded: new Set(), misc: null, threads: new Map(), messages: [], listed: [] };
+  const figmaRecords: FigmaRecords = {
+    queue: new Map(),
+    carded: new Set(),
+    misc: null,
+    threads: new Map(),
+    messages: [],
+    listed: [],
+    triage: { watch: new Map(), raised: new Set(), posts: [], dms: [] },
+  };
+  const triageOpts = opts.figma?.triage;
+  const triage: TriagePorts | undefined = triageOpts
+    ? {
+        watch: {
+          list: async () => [...figmaRecords.triage.watch.values()].map((f) => structuredClone(f)),
+          read: async (fileKey) => structuredClone(figmaRecords.triage.watch.get(fileKey) ?? null),
+          write: async (file) => void figmaRecords.triage.watch.set(file.fileKey, structuredClone(file)),
+          remove: async (fileKey) => void figmaRecords.triage.watch.delete(fileKey),
+        },
+        raised: {
+          has: async (id) => figmaRecords.triage.raised.has(id),
+          add: async (id) => void figmaRecords.triage.raised.add(id),
+        },
+        fileTeam: async (fileKey) => triageOpts.fileTeams?.[fileKey] ?? null,
+        handles: figmaHandlesFrom(triageOpts.handles),
+        channels: triageOpts.channels ?? { plusDesign: DESIGN, plusUniversal: UNIVERSAL, plusToolkit: "C0TOOLKIT" },
+        post: async (channel, text) => {
+          figmaRecords.triage.posts.push({ channel, text });
+          return true;
+        },
+        dm: async (to, text) => {
+          figmaRecords.triage.dms.push({ to, text });
+          return true;
+        },
+      }
+    : undefined;
   const figmaComments: SweepFigmaComments | undefined = opts.figma
     ? {
         figma: opts.figma.client,
@@ -359,6 +413,7 @@ export function sweepHarness(opts: {
           read: async (ts) => structuredClone(figmaRecords.threads.get(ts) ?? null),
           write: async (thread) => void figmaRecords.threads.set(thread.ts, structuredClone(thread)),
         },
+        ...(triage ? { triage } : {}),
       }
     : undefined;
 

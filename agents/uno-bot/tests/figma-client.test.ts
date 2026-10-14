@@ -130,6 +130,17 @@ const SHAPES: Shape[] = [
     send: { method: "POST", url: `${API}/v1/files/${KEY}/comments`, body: { message: "on it", comment_id: "1234" } },
   },
   {
+    method: "reactions",
+    call: (f) => f.reactions(KEY, "1234"),
+    send: { method: "GET", url: `${API}/v1/files/${KEY}/comments/1234/reactions` },
+  },
+  {
+    // The shortcode: Figma refuses the emoji character with a 400.
+    method: "postReaction",
+    call: (f) => f.postReaction(KEY, "1234", ":goat:"),
+    send: { method: "POST", url: `${API}/v1/files/${KEY}/comments/1234/reactions`, body: { emoji: ":goat:" } },
+  },
+  {
     method: "teamFolders",
     call: (f) => f.teamFolders("1279226364199713409"),
     send: { method: "GET", url: `${API}/v2/teams/1279226364199713409/folders` },

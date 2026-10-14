@@ -142,6 +142,18 @@ export interface FigmaCommentsResponse {
   comments: FigmaComment[];
 }
 
+/** One reaction on a comment: its shortcode and who left it. */
+export interface FigmaReaction {
+  emoji: string;
+  user: FigmaUser;
+  created_at?: string;
+}
+
+/** GET /v1/files/:key/comments/:comment_id/reactions */
+export interface FigmaReactionsResponse {
+  reactions: FigmaReaction[];
+}
+
 export interface FigmaFolder {
   id: string;
   name: string;
@@ -291,6 +303,14 @@ export interface FigmaClient {
   postComment(fileKey: string, message: string, at?: FigmaCommentPin, opts?: FigmaCallOptions): Promise<FigmaComment>;
   /** A reply. `rootCommentId` must be a root: Figma refuses a reply to a reply. Tier 2. */
   replyToComment(fileKey: string, rootCommentId: string, message: string, opts?: FigmaCallOptions): Promise<FigmaComment>;
+  /** A comment's reactions. Tier 2. */
+  reactions(fileKey: string, commentId: string, opts?: FigmaCallOptions): Promise<FigmaReactionsResponse>;
+  /**
+   * React to a comment as the token's owner. `emoji` is a shortcode
+   * (`":goat:"`): Figma refuses the emoji character with a 400, and reads a
+   * reaction back as its shortcode (probed live, 2026-10-14). Tier 2.
+   */
+  postReaction(fileKey: string, commentId: string, emoji: string, opts?: FigmaCallOptions): Promise<void>;
   /** A team's top-level folders. Tier 2. */
   teamFolders(teamId: string, opts?: FigmaCallOptions): Promise<FigmaTeamFoldersResponse>;
   /** The files in one folder. Tier 2. */

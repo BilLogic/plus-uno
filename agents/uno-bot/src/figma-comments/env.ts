@@ -16,6 +16,11 @@
 //   • Slack: `chat.postMessage` and `chat.update` in #plus-design
 //     (`PLUS_DESIGN_CHANNEL_ID`), its members, and a card staged in ThreadState
 //     and put on the usage record as staged by the Worker.
+//   • The unanswered-question triage (`./triage.ts`): its watch list and
+//     raised marks in HARNESS_KV with an expiry; each file's Figma team from
+//     the nightly backstop's state, one KV read a morning; the hand-kept
+//     handle map, `FIGMA_HANDLE_SLACK_IDS`; the ladder's channel ids; and
+//     `chat.postMessage`, to a channel or, after `conversations.open`, a DM.
 //   • New wording for a decision (`./revise.ts`) — Review's Needs changes, or
 //     a reply on an explicit cue: the thread's record, the card in
 //     ThreadState and its Needs changes lock, the page read fresh as the
@@ -32,7 +37,10 @@ import { charge, rethrowIfBudget } from "../net";
 import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
 import { decisionRowsOf, queryRoadmapCards } from "../integrations/notion";
-import { postMessage, updateMessage } from "../slack/api";
+import { openConversation, postMessage, updateMessage } from "../slack/api";
+import { channelIdsFor } from "../destination/env";
+import { BACKSTOP_STATE_KEY, type BackstopState } from "../figma-notify/backstop";
+import { figmaHandlesFrom, type TriagePorts, type WatchedFile } from "./triage";
 import { channelMembers } from "../slack/channel-members";
 import { threadStateFor } from "../thread-state/production";
 import type { PendingProposal } from "../thread-state/index";
@@ -111,7 +119,7 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
     async card(number) {
       const { rows } = await queryRoadmapCards(env, { cardNumber: number });
       const card = rows.find((r) => r.card_number === number);
-      return card ? { url: card.url, title: card.title } : null;
+      return card ? { url: card.url, title: card.title, pillars: card.pillars } : null;
     },
     roles: () => teamRolesFor(env),
     ...(env.NOTION_DECISIONS_DB_ID ? { decisionRows: (cardUrl: string) => decisionRowsOf(env, cardUrl) } : {}),
@@ -176,6 +184,83 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
         }
       : {}),
     threads: decisionThreadsOn(kv),
+    triage: triageOn(env, kv),
+  };
+}
+
+/** A question's file, waiting for the morning that raises it. */
+export const TRIAGE_PREFIX = "figma-comments:triage:";
+/** Two workdays, a long weekend and the mornings a stop costs. */
+export const TRIAGE_TTL_S = 10 * DAY_S;
+/** A question raised once is never raised again, for this long. */
+export const RAISED_PREFIX = "figma-comments:raised:";
+export const RAISED_TTL_S = 90 * DAY_S;
+
+/** The triage's ports on HARNESS_KV and Slack. */
+export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
+  let handles: Record<string, string> = {};
+  try {
+    handles = figmaHandlesFrom(env.FIGMA_HANDLE_SLACK_IDS);
+  } catch (err) {
+    console.warn(`[figma-comments] FIGMA_HANDLE_SLACK_IDS unread, so nobody is DMed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+  let teams: Promise<Record<string, string>> | null = null;
+  const post = async (channel: string, text: string) => (await postMessage(env, { channel, text })).ok;
+  return {
+    watch: {
+      async list() {
+        const files: WatchedFile[] = [];
+        let cursor: string | undefined;
+        for (let page = 0; page < LIST_PAGES; page++) {
+          charge(1, "kv");
+          const res = await kv.list({ prefix: TRIAGE_PREFIX, ...(cursor ? { cursor } : {}) });
+          for (const k of res.keys) {
+            charge(1, "kv");
+            const file = await kv.get<WatchedFile>(k.name, "json");
+            if (file) files.push(file);
+          }
+          if (res.list_complete) break;
+          cursor = res.cursor;
+        }
+        return files;
+      },
+      async read(fileKey) {
+        charge(1, "kv");
+        return kv.get<WatchedFile>(`${TRIAGE_PREFIX}${fileKey}`, "json");
+      },
+      async write(file) {
+        charge(1, "kv");
+        await kv.put(`${TRIAGE_PREFIX}${file.fileKey}`, JSON.stringify(file), { expirationTtl: TRIAGE_TTL_S });
+      },
+      async remove(fileKey) {
+        charge(1, "kv");
+        await kv.delete(`${TRIAGE_PREFIX}${fileKey}`);
+      },
+    },
+    raised: {
+      async has(commentId) {
+        charge(1, "kv");
+        return (await kv.get(`${RAISED_PREFIX}${commentId}`)) !== null;
+      },
+      async add(commentId) {
+        charge(1, "kv");
+        await kv.put(`${RAISED_PREFIX}${commentId}`, String(Date.now()), { expirationTtl: RAISED_TTL_S });
+      },
+    },
+    async fileTeam(fileKey) {
+      teams ??= (async () => {
+        charge(1, "kv");
+        return (await kv.get<BackstopState>(BACKSTOP_STATE_KEY, "json"))?.fileTeams ?? {};
+      })();
+      return (await teams)[fileKey] ?? null;
+    },
+    handles,
+    channels: channelIdsFor(env),
+    post,
+    async dm(slackId, text) {
+      const open = await openConversation(env, slackId);
+      return open.ok ? post(open.channel, text) : false;
+    },
   };
 }
 

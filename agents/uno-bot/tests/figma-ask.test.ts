@@ -10,7 +10,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { createInMemoryFigma, type InMemoryFigma } from "../src/figma/in-memory";
-import { FigmaRateLimitError, type FigmaComment } from "../src/figma/client";
+import { FigmaRateLimitError, FigmaRequestError, type FigmaComment } from "../src/figma/client";
 import { runFigmaEventJob } from "../src/figma-notify/job";
 import { readFigmaEvent, jobOf, eventIdOf, type FigmaEventJob } from "../src/figma-notify/event";
 import { answerFigmaAsk, MAX_ASK_TRIES, type AskMark, type FigmaAskDeps } from "../src/figma-ask/job";
@@ -386,10 +386,10 @@ describe("a change request", () => {
     assert.deepEqual(remembered, [["Which PRD should this go in?", "The goal-setting one or the onboarding one?", "Or both?"].join("\n")]);
   });
 
-  it("writes nothing from Figma: the card waits in #plus-design's thread, and Figma gets only the reply", async () => {
+  it("writes nothing from Figma: the card waits in #plus-design's thread, and Figma gets only the 🐐 and the reply", async () => {
     const w = world({ replies: STAGES });
     await ask(w, comment("100", "@uno add it to the PRD"));
-    assert.deepEqual(w.figma.writes().map((c) => c.method), ["replyToComment"]);
+    assert.deepEqual(w.figma.writes().map((c) => c.method), ["postReaction", "replyToComment"]);
     const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
     assert.ok(staged, "the card is found from its thread in #plus-design");
     assert.equal(staged!.toolName, "notion_create");
@@ -1119,4 +1119,61 @@ describe("where a change request's card posts", () => {
       assert.deepEqual(redrawn, [channel], "the card is redrawn where it posted");
     });
   }
+});
+
+describe("the 🐐 on an ask", () => {
+  const reactions = (w: World) =>
+    w.figma
+      .writes()
+      .filter((x) => x.method === "postReaction")
+      .map((x) => ({ comment: x.args[1] as string, emoji: x.args[2] as string }));
+
+  it("reacts to the ask it picked up, sent as :goat:, before the reply lands", async () => {
+    const w = world();
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(reactions(w), [{ comment: "100", emoji: ":goat:" }]);
+    assert.deepEqual(w.figma.writes().map((x) => x.method), ["postReaction", "replyToComment"]);
+  });
+
+  it("reacts to a reply that asks, not to its root", async () => {
+    const w = world();
+    const root = comment("100", "Should the bar show before a goal?");
+    await ask(w, comment("101", "@goat what does the PRD say?", { parent_id: "100", client_meta: null }), [root]);
+    assert.deepEqual(reactions(w), [{ comment: "101", emoji: ":goat:" }]);
+  });
+
+  it("never reacts to its own comment, read back as :goat:, nor to one that asks nothing", async () => {
+    const w = world();
+    await ask(w, comment("100", ":goat:: The PRD says hidden. @uno", { user: BILL }));
+    await ask(w, comment("102", "hey @Meryem can you check the bar?"));
+    assert.deepEqual(reactions(w), []);
+  });
+
+  it("reacts once, though the ask is retried", async () => {
+    const w = world();
+    w.figma.failNext("replyToComment", new FigmaRateLimitError("Figma comment reply 429", 30_000));
+    const c = comment("100", "@uno when does the bar show?");
+    assert.equal((await ask(w, c)).outcome, "deferred");
+    assert.equal((await w.run(c)).outcome, "handled");
+    assert.equal(reactions(w).length, 1);
+    assert.equal(w.replies().length, 1);
+  });
+
+  it("still replies when Figma refuses the reaction", async () => {
+    const w = world();
+    w.figma.failNext("postReaction", new FigmaRequestError(400, "Figma comment reaction 400: Invalid emoji"));
+    await ask(w, comment("100", "@uno when does the bar show?"));
+    assert.deepEqual(reactions(w), []);
+    assert.equal(w.replies().length, 1);
+  });
+});
+
+describe("Figma's reactions, as the fake keeps them", () => {
+  it("refuses the emoji character and takes the shortcode, as Figma does", async () => {
+    const figma = createInMemoryFigma();
+    figma.seedFile(FILE, { comments: [comment("100", "Should the bar show?")] });
+    await assert.rejects(figma.postReaction(FILE, "100", "🐐"), (err: unknown) => err instanceof FigmaRequestError && err.status === 400);
+    await figma.postReaction(FILE, "100", ":goat:");
+    assert.deepEqual((await figma.reactions(FILE, "100")).reactions, [{ emoji: ":goat:", user: { id: "1000000001", handle: "token owner" } }]);
+  });
 });
