@@ -35,7 +35,14 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { cardConfirmers, mayConfirm, proposalOperations, statedCancelOf, unfinishedOperations } from "../thread-state/index";
+import {
+  cardConfirmers,
+  editedOnConfirm,
+  mayConfirm,
+  proposalOperations,
+  statedCancelOf,
+  unfinishedOperations,
+} from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -212,6 +219,12 @@ export interface GateVerdict {
    * door posts the note into the thread and the revision turn does the rest.
    */
   revise?: { note: string };
+  /**
+   * Set, and only ever true, on a ✅ won from the Review pop-up whose Edit
+   * fields changed the batch (`editedOnConfirm`) — what the usage record
+   * counts as approved with edits. Absent on every other verdict.
+   */
+  edited?: true;
 }
 
 /**
@@ -443,7 +456,8 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       const reason = signal.note?.trim();
       return claim(proposal, decision, signal.userId, deps, { byCard: true, rejected: reason ? { reason } : {} });
     }
-    return claim(edited(proposal, signal.operations), decision, signal.userId, deps, { byCard: true });
+    const verdict = await claim(edited(proposal, signal.operations), decision, signal.userId, deps, { byCard: true });
+    return verdict.outcome === "won" && editedOnConfirm(proposal, signal.operations) ? { ...verdict, edited: true } : verdict;
   }
   return claim(proposal, decision, signal.userId, deps, { byCard: signal.kind !== "typed" });
 }

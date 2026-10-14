@@ -793,6 +793,54 @@ export function proposalOperations(
 }
 
 /**
+ * Each operation with a card's own answer's args merged into its input:
+ * objects key by key, anything else replaced (`ReviewChoice.args`).
+ */
+export function withArgs(operations: readonly ProposalOperation[], args: Record<string, unknown>): ProposalOperation[] {
+  return operations.map((op) => ({ ...op, input: merged(op.input, args) }));
+}
+
+function merged(base: Record<string, unknown>, over: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(over)) {
+    const was = out[key];
+    out[key] =
+      value && typeof value === "object" && !Array.isArray(value) && was && typeof was === "object" && !Array.isArray(was)
+        ? merged(was as Record<string, unknown>, value as Record<string, unknown>)
+        : value;
+  }
+  return out;
+}
+
+/**
+ * Whether a batch confirmed from the Review pop-up differs from the card as
+ * staged: another tool, another order, or any input value changed, added or
+ * taken away. Keys are compared in any order. Picking one of the card's own
+ * answers is not an edit — the batch with that answer's args merged in counts
+ * as the card as staged.
+ */
+export function editedOnConfirm(proposal: PendingProposal, operations: readonly ProposalOperation[] | undefined): boolean {
+  if (!operations?.length) return false;
+  const staged = proposalOperations(proposal);
+  const untouched = [
+    staged,
+    ...(proposal.choices ?? []).flatMap((c) => (c.verdict === "confirm" && c.args ? [withArgs(staged, c.args)] : [])),
+  ];
+  const confirmed = canonical(operations);
+  return !untouched.some((batch) => canonical(batch) === confirmed);
+}
+
+/** A value as JSON with every object's keys sorted, so key order never reads
+ *  as a difference. */
+function canonical(value: unknown): string {
+  return JSON.stringify(value, (_key, v: unknown) =>
+    v && typeof v === "object" && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+      : v,
+  );
+}
+
+/**
  * A won ✅ that has started executing and not yet reported back.
  *
  * The claim consumes the card, so once it is won nothing about the card is

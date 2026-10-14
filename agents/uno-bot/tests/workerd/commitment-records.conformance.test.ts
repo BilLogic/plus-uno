@@ -37,13 +37,15 @@ async function insertAsBefore0009(row: ReturnType<typeof commitmentRow>): Promis
 
 /** The schema as 0005 left it, so a case can apply 0006 onward itself: the
  *  commitments table gone, and the columns later files add to tables that
- *  stay — 0010's on `sweep_items`, 0013's on `turns` and `proposal_events` —
+ *  stay — 0010's on `sweep_items`, 0013's on `turns` and `proposal_events`,
+ *  0014's on `proposal_events` —
  *  since re-applying a file adds its columns again. */
 async function rewindTo0005(): Promise<void> {
   await bindings.USAGE_DB.prepare("DROP TABLE commitments").run();
   await bindings.USAGE_DB.prepare("ALTER TABLE sweep_items DROP COLUMN surface").run();
   await bindings.USAGE_DB.prepare("ALTER TABLE turns DROP COLUMN thanks").run();
   await bindings.USAGE_DB.prepare("ALTER TABLE proposal_events DROP COLUMN revises_proposal_id").run();
+  await bindings.USAGE_DB.prepare("ALTER TABLE proposal_events DROP COLUMN confirmed_edited").run();
   await bindings.USAGE_DB.prepare("DELETE FROM d1_migrations WHERE name >= '0006'").run();
 }
 

@@ -46,6 +46,7 @@ import {
   PROPOSAL_TTL_MS,
   createInMemoryThreadState,
   type PendingProposal,
+  type ProposalOperation,
   type ThreadState,
 } from "../src/thread-state/index";
 import {
@@ -106,6 +107,15 @@ const review = (decision: "confirm" | "cancel" = "confirm"): GateSignal => ({
   messageTs: CARD_TS,
   decision,
   userId: "U2",
+});
+
+/** The pop-up's Approve, carrying the batch as its Edit fields left it. */
+const edit = (operations: ProposalOperation[]): GateSignal => ({
+  kind: "review",
+  messageTs: CARD_TS,
+  decision: "confirm",
+  userId: "U2",
+  operations,
 });
 
 const typed = (text = "✅"): GateSignal => ({
@@ -200,6 +210,55 @@ describe("five signals, one verdict", () => {
         [[CARD_TS, "confirmed", via, actor, actor === null ? null : true]],
         door.name,
       );
+      // No door here carries an edit, so none is approved with edits.
+      assert.deepEqual(events.map((e) => e.confirmedEdited), [false], door.name);
+    }
+  });
+
+  it("records a pop-up Approve as edited only when its batch differs from the staged one", async () => {
+    // What "approved with edits" is counted from (`proposal-outcomes.sql`):
+    // tool names and inputs, compared as structures, and nothing else kept.
+    const asStaged = edit([{ toolName: "notion_create", input: { title: "Reflection redesign" } }]);
+    const retitled = edit([{ toolName: "notion_create", input: { title: "Reflection, redesigned" } }]);
+    const extraField = edit([{ toolName: "notion_create", input: { title: "Reflection redesign", icon: "📝" } }]);
+    const otherTool = edit([{ toolName: "notion_update", input: { title: "Reflection redesign" } }]);
+    const cases: Array<[string, GateSignal, boolean]> = [
+      ["no edits", review(), false],
+      ["the staged batch handed back unchanged", asStaged, false],
+      ["a changed value", retitled, true],
+      ["an added field", extraField, true],
+      ["another tool", otherTool, true],
+    ];
+    for (const [name, signal, edited] of cases) {
+      const verdict = await resolveSignal(signal, { threadState: await staged() });
+      assert.equal(verdict.outcome, "won", name);
+      assert.deepEqual(verdictEvents(verdict, 1_000).map((e) => [e.event, e.confirmedEdited]), [["confirmed", edited]], name);
+    }
+  });
+
+  it("reads an input's keys in any order as the same input", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal({ ...PROPOSAL, input: { title: "T", parent: { id: "p", kind: "page" } } });
+    const verdict = await resolveSignal(
+      edit([{ toolName: "notion_create", input: { parent: { kind: "page", id: "p" }, title: "T" } }]),
+      { threadState },
+    );
+    assert.equal(verdictEvents(verdict, 1_000)[0]?.confirmedEdited, false);
+  });
+
+  it("does not count a card's own answer as an edit, but does an edit made beside it", async () => {
+    // A choice card merges the chosen answer's args into the batch; picking
+    // one of the card's own answers changes nothing the stager did not offer.
+    const choices = [{ value: "keep", label: "Keep", verdict: "confirm" as const, args: { status: "Kept" } }];
+    const card = { ...PROPOSAL, input: { title: "T" }, choices };
+    for (const [name, input, edited] of [
+      ["the answer alone", { title: "T", status: "Kept" }, false],
+      ["the answer and a retitle", { title: "T2", status: "Kept" }, true],
+    ] as const) {
+      const threadState = createInMemoryThreadState();
+      await threadState.putProposal(card);
+      const verdict = await resolveSignal(edit([{ toolName: "notion_create", input }]), { threadState });
+      assert.equal(verdictEvents(verdict, 1_000)[0]?.confirmedEdited, edited, name);
     }
   });
 
@@ -214,8 +273,8 @@ describe("five signals, one verdict", () => {
     for (const signal of cancels) {
       const verdict = await resolveSignal(signal, { threadState: await staged() });
       assert.deepEqual(
-        verdictEvents(verdict, 1_000).map((e) => [e.event, e.via, e.confirmedByOther]),
-        [["cancelled", signal.kind, null]],
+        verdictEvents(verdict, 1_000).map((e) => [e.event, e.via, e.confirmedByOther, e.confirmedEdited]),
+        [["cancelled", signal.kind, null, null]],
         signal.kind,
       );
     }

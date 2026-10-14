@@ -36,6 +36,7 @@ export function stagedRow(over: Partial<ProposalEvent> = {}): ProposalEvent {
     ticketUrl: null,
     actorId: null,
     confirmedByOther: null,
+    confirmedEdited: null,
     ...over,
   };
 }
@@ -90,9 +91,28 @@ export function runProposalEventConformance(
 
   it("empty columns read back as null and empty — never undefined — and a false stays false", async () => {
     const { events } = make();
-    const bare = eventRow("confirmed", { channelId: null, actorId: "U1", confirmedByOther: false });
+    const bare = eventRow("confirmed", { channelId: null, actorId: "U1", confirmedByOther: false, confirmedEdited: false });
     await events.record(bare);
     assert.deepEqual(await events.eventsOf(bare.proposalId), [bare]);
+  });
+
+  it("keeps whether a confirm came with edits, and nothing on a row that is not a confirm", async () => {
+    const { events } = make();
+    const edited = eventRow("confirmed", { via: "review", actorId: "U2", confirmedByOther: true, confirmedEdited: true });
+    await events.record(stagedRow());
+    await events.record(edited);
+    assert.deepEqual(
+      (await events.eventsOf(edited.proposalId)).map((e) => [e.event, e.confirmedEdited]),
+      [["staged", null], ["confirmed", true]],
+    );
+    // An expiry copies its card's staged row, and never a confirm's flag.
+    const other = stagedRow({ proposalId: "1700000000.000600" });
+    await events.record(other);
+    await events.expireOverdue(1_800_000_000_000);
+    assert.deepEqual(
+      (await events.eventsOf(other.proposalId)).map((e) => [e.event, e.confirmedEdited]),
+      [["staged", null], ["expired", null]],
+    );
   });
 
   it("keeps the first write of an event and ignores the second", async () => {

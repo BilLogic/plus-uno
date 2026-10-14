@@ -366,13 +366,24 @@ describe("metric queries on the seed", () => {
 
   metric("proposal-outcomes", async () => {
     // Cards, counted as the last of each chain: P1r (P1 re-staged), P8, P2
-    // and P9 approved; P6r — r1's "drop 2" of P6 — approved with edits; P3
+    // and P9 approved (and P11, below); P6r — r1's "drop 2" of P6 — approved with edits; P3
     // rejected; P5 expired. P7's revision is not in the seed, so P7 is
     // nowhere; P4 is test traffic. P1r's refused write is still a ✅.
     // Fixes carded in the window: f1 confirmed, f2 refused stale (f3 was
     // never carded). Reminders (the seed's thread promises): k1 done, k4 not
     // a promise, k2 and k3 never answered. Added for this case: a card
     // follow-up snoozed and one still nudged; a DM follow-up that lapsed.
+    // And two cards approved from the Review pop-up: P10 after its Edit
+    // fields changed it (approved with edits, with no revision in its chain),
+    // P11 unchanged (approved). The seed's confirms predate the column, so
+    // theirs is null and counts as approved without edits.
+    const cards = [
+      { proposal_id: "P10", event: "staged", at: T(13, 14), via: "worker", tools: '["notion_update"]', ttl_ms: 72 * HOUR },
+      { proposal_id: "P10", event: "confirmed", at: T(13, 15), via: "review", actor_id: "UA", confirmed_edited: 1 },
+      { proposal_id: "P11", event: "staged", at: T(13, 14), via: "worker", tools: '["notion_update"]', ttl_ms: 72 * HOUR },
+      { proposal_id: "P11", event: "confirmed", at: T(13, 15), via: "review", actor_id: "UA", confirmed_edited: 0 },
+    ];
+    for (const e of cards) await insert("proposal_events", e);
     const extra = [
       { commitment_id: "C1:x1", kind: "card_todo", run_date: "2026-08-11", state: "snoozed" },
       { commitment_id: "C1:x2", kind: "card_stale", run_date: "2026-08-12", state: "nudged" },
@@ -386,7 +397,7 @@ describe("metric queries on the seed", () => {
     }
     try {
       expect(await run("proposal-outcomes")).toEqual([
-        { kind: "card", approved: 4, approved_with_edits: 1, rejected: 1, refused: null, expired: 1, still_live: 0, total: 7 },
+        { kind: "card", approved: 5, approved_with_edits: 2, rejected: 1, refused: null, expired: 1, still_live: 0, total: 9 },
         { kind: "upkeep_fix", approved: 1, approved_with_edits: null, rejected: 0, refused: 1, expired: 0, still_live: 0, total: 2 },
         { kind: "reminders", approved: 1, approved_with_edits: null, rejected: 1, refused: null, expired: 2, still_live: 0, total: 4 },
         { kind: "card follow-ups", approved: 1, approved_with_edits: null, rejected: 0, refused: null, expired: 0, still_live: 1, total: 2 },
@@ -394,6 +405,7 @@ describe("metric queries on the seed", () => {
       ]);
     } finally {
       await bindings.USAGE_DB.prepare("DELETE FROM commitments WHERE commitment_id IN ('C1:x1', 'C1:x2', 'D1:x3')").run();
+      await bindings.USAGE_DB.prepare("DELETE FROM proposal_events WHERE proposal_id IN ('P10', 'P11')").run();
     }
   });
 
