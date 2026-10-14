@@ -456,6 +456,29 @@ describe("F3: a to-do to make a card", () => {
     assert.equal(only(store).state, "lapsed");
   });
 
+  it("found in a test channel's thread, is asked in that thread, never in a team channel", async () => {
+    const SANDBOX = "C0SANDBOX";
+    const store = createInMemoryCommitmentStore();
+    const provider = fakeProvider({
+      generateReplies: [JSON.stringify({ todos: [{ message_ts: TODO, assignee: MAYA, what: "the facelift last stage", confidence: 0.9 }] })],
+    });
+    await recordThreadCardTodos({ ...todoThread, channel: SANDBOX }, ts(29, 0), {
+      detector: modelCardTodoDetector(provider),
+      store,
+      config: CONFIG,
+      now: () => EOD,
+      runDate: utcDay(EOD),
+    });
+    const rm = roadmap({ titles: ["Facelift kickoff"] });
+    const m = morning(store, rm, at(32, 13));
+    await m.run();
+    assert.deepEqual(m.posts.map((p) => [p.channel, p.threadTs]), [[SANDBOX, ROOT]]);
+    // A week on, its one follow-up stays in the same thread.
+    const later = morning(store, rm, at(39, 13));
+    await later.run();
+    assert.ok(later.posts.every((p) => p.channel === SANDBOX && p.threadTs === ROOT));
+  });
+
   it("a running note's to-do with nobody named mentions the note's takers, in #plus-design", async () => {
     const store = createInMemoryCommitmentStore();
     await recordNoteCardTodos(

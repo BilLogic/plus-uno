@@ -1225,3 +1225,12 @@ test("a place's job that runs out of budget holds up no other place", async () =
   assert.notEqual(h.posted[0]!.channel, UNIVERSAL);
   assert.deepEqual(report.calls, [], "the heavy place's section waits for its job's retry");
 });
+
+test("a fix found in a test channel's thread goes up in that thread, never in a team channel", async () => {
+  const SANDBOX = "C0SANDBOX";
+  const h = await fixAt({ channel: DESIGN, channelKind: "public" });
+  const queued = await h.store.pendingFindings();
+  await h.store.addFindings(queued.map((f) => ({ ...f, evidence: { ...f.evidence, channel: SANDBOX, channelKind: "public", threadTs: "1759150000.000100" } })));
+  await runSweepJob(MORNING, h.deps);
+  assert.deepEqual(h.posted.map((p) => [p.channel, p.threadTs]), [[SANDBOX, "1759150000.000100"]]);
+});
