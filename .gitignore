@@ -75,14 +75,14 @@ docs/knowledge/research/2026-07-12-field-scan-improvements.md
 docs/knowledge/research/2026-07-12-request-corpus-expansion.md
 docs/knowledge/research/2026-07-12-uno-bot-cost-analysis.md
 
-# uno-bot eval output — full agent transcripts, may quote Slack/Notion content
+# Leftover output of the removed uno-bot eval suites, which an older working
+# copy may still hold — full agent transcripts that can quote Slack/Notion
+# content, and the embedding A/B's working file.
 eval-results.json
 retrieval-eval-results.json
-.cutover.env
-
-# Working output of agents/uno-bot/scripts/embed-model-ab.mjs, which writes
-# beside the fixture it reads rather than wherever the shell happens to be.
 embed-model-ab.json
+
+.cutover.env
 
 # The harness bundler's manifest (#510) — build output, not a committed artifact.
 # `agents/uno-bot/scripts/bundle-harness.mjs --manifest` writes it, and the root

@@ -16,7 +16,7 @@ name: Weekly Direct-Fix Digest
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "0 9 * * 1" # Mondays 09:00 UTC — lands after the Monday evals run (08:00)
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
 
 permissions:
   contents: read
