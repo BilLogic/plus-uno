@@ -24,8 +24,8 @@ import type { PainCategory, SubType } from "./categories";
 export interface TurnRecord {
   // ── identity and place ──
   /** `<channel>:<the asker's message ts>` — stable across a retried alarm, so
-   *  a turn that runs twice still leaves one row. An ask with no Slack ts (a
-   *  headless conversation) adds `@<when it began>` (`./record.ts` `turnIdOf`). */
+   *  a turn that runs twice still leaves one row. An ask with no Slack ts (a row the
+   *  removed eval runner wrote) adds `@<when it began>` (`./record.ts` `turnIdOf`). */
   turnId: string;
   /** The deployed build stamp (`version.ts`). */
   build: string;

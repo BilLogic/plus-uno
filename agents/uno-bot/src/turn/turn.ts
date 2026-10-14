@@ -2419,7 +2419,7 @@ async function buildCard(
   fromDm: boolean,
 ): Promise<ProposalCard> {
   const card = await cardOf(result, deps, implementPrdUrl, fromDm);
-  // Who wrote the opening line, for the debug envelope: the model when its own
+  // Who wrote the opening line (no reader since the eval envelope went): the model when its own
   // reply leads, the Worker for everything else — its ask, its PRD line, or a
   // lead that is only its "I could not stage …" note.
   const modelLed = !card.ask && !!result.replyText && card.lead === result.previewText;

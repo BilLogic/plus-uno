@@ -88,7 +88,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **source** / **Sources box** | a **source** is a link a lookup of the same turn returned, which an answer stands on; the **Sources box** lists them beneath the answer in Slack, and is a single `Source:` line in Figma | "citation", "reference", "Sources:" line in the answer text |
 | **corpus** | the harness's one reader of repo files: what documents exist and what each one says. Checks ask it rather than the filesystem | "the walker", "the parser" (there is one of each) |
 | **ratchet** | a check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly | "the whitelist", "the exceptions file", "the allow-list" |
-| **judge** | the Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail` or `skip`. A skip fails open, so it carries its reason | "the rubric" (that is the document a judge grades against) |
+| **judge** | the Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail`, `skip` or `error`. A skip fails open, so it carries its reason | "the rubric" (that is the document a judge grades against) |
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 

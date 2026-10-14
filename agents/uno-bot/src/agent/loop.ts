@@ -366,7 +366,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
           refused(text);
         }
       }
-      // The result's own honesty fields, for the debug transcript. Reported for
+      // The result's own honesty fields, for a transcript reader — the eval runner was the only one, and it is gone. Reported for
       // every outcome including the budget refusal above — "the lookup never
       // ran" is the answer to a whole class of failure (#452).
       input.onToolResult?.(toolResultDigest(call.name, text));

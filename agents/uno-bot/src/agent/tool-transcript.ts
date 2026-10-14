@@ -1,7 +1,7 @@
 // What a turn's transcript records about a tool call — the ARGUMENTS the model
 // sent, and the small honesty fields the tool sent back.
 //
-// WHY THIS EXISTS. The debug transcript used to record tool calls and nothing about
+// WHY THIS EXISTS. The eval transcript (since removed) used to record tool calls and nothing about
 // their results, so a search-shaped failure was undiagnosable from the
 // artifact. S3 (the connect-link case) read 0/3 across three samples with all
 // three replies saying workspace search "isn't available on this turn" — and
