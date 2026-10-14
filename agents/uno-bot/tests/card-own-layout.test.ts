@@ -1,7 +1,7 @@
 // A note or a decision edited onto a card keeps the card's own layout.
 //
-// A sweep card is a carousel of fixes, a Figma library card leads with a
-// release card and a table, and a Figma preview card carries its screenshot.
+// A sweep card is a carousel of fixes, a card can lead with a release card and
+// a table, and a Figma preview card carries its screenshot.
 // Each is posted with blocks of its own, and the record keeps them
 // (`PendingProposal.proposalBlocks`): a late reaction, a gate note or a
 // decision edits the note line and the right button onto THOSE blocks rather

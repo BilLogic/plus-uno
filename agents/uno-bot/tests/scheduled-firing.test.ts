@@ -298,7 +298,7 @@ test("the enqueue reaches the run's own runner, and costs one charged hop", asyn
   assert.equal(hops, 1);
 });
 
-test("the DS precedence check runs on Friday's end-of-day run only — Saturday 00:00 ET — second, after the library poll", () => {
+test("the DS precedence check runs on Friday's end-of-day run only — Saturday 00:00 ET — second, before the batches spend the ceiling", () => {
   // 2026-10-03 04:00 UTC is Saturday 00:00 EDT, the run that sweeps Friday 2 Oct.
   const friday = planRun("end-of-day", Date.UTC(2026, 9, 3, 4, 0));
   assert.equal(friday.date, "2026-10-02");

@@ -16,9 +16,9 @@ summary: Pillar → channel map (group announcements; all private — uno-bot mu
 | #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot |
 | #plus-universal | `C072E8SFLKV` | the sweep's morning message for design-system fixes, with the weekly DS precedence report |
 
-**One message a place each morning.** Every morning job with cards for a team channel — the card follow-ups, the weekly DS precedence report, the Figma comment decisions, the Figma drift questions and Monday's tidy-up — hands them to the sweep's post, which puts everything a place has on that place's one message (`docs/connectors/slack-sweep.md` § One message a place). None of them posts on its own.
+**One message a place each morning.** Every morning job with cards for a team channel — the card follow-ups, the weekly DS precedence report, the Figma comment decisions, the Dev Mode links card, the Figma drift questions and the week's tidy-up — hands them to the sweep's post, which puts everything a place has on that place's one message (`docs/connectors/slack-sweep.md` § One message a place). None of them posts on its own.
 
-**Test traffic stays in the test channel.** A run asked for in a `TEST_CHANNEL_IDS` channel, or through the debug route, posts only in a test channel, by the usage record's test-traffic rule (`teamPostChannel` in `agents/uno-bot/src/usage/record.ts`): a share-out stays in its thread, and the debug route's Dev Mode links card goes to the first test channel.
+**Test traffic stays in the test channel.** A run asked for in a `TEST_CHANNEL_IDS` channel, or through the debug route, posts only in a test channel, by the usage record's test-traffic rule (`teamPostChannel` in `agents/uno-bot/src/usage/record.ts`): a share-out stays in its thread, and the debug route's Dev Mode links card goes to the first test channel. A follow-up or a sweep fix found in a test channel's thread is asked in that thread.
 
 #uno-bot is where the team reports problems with uno-bot and asks for changes. A top-level post engages with no @mention. A report or change request becomes a drafted GitHub intake (`harness-intake`), or a comment on the open intake it matches, staged in the post's thread; a ✅ from the poster or anyone who has replied there files it. A plain question is just answered. #uno-bot-sandbox posts stay test traffic.
 

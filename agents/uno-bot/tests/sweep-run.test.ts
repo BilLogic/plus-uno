@@ -1192,7 +1192,7 @@ test("the run's post spreads over one job a place, and posts nothing itself", as
   const report = handedOff(weekly(UNIVERSAL, 2));
   h.deps.sections = [report.port];
   const spawned: ScheduledJob[] = [];
-  h.deps.spawn = async (jobs) => void spawned.push(...jobs);
+  Object.assign(h.deps, { spawn: async (jobs: readonly ScheduledJob[]) => void spawned.push(...jobs) });
   const planned = await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 0);
   assert.deepEqual(report.calls, []);
@@ -1214,7 +1214,7 @@ test("a place's job that runs out of budget holds up no other place", async () =
   const report = handedOff({ ...weekly(UNIVERSAL, 2), cost: () => ({ subrequests: 30, d1Queries: 0 }) });
   h.deps.sections = [report.port];
   const spawned: ScheduledJob[] = [];
-  h.deps.spawn = async (jobs) => void spawned.push(...jobs);
+  Object.assign(h.deps, { spawn: async (jobs: readonly ScheduledJob[]) => void spawned.push(...jobs) });
   await runSweepJob(MORNING, h.deps);
   h.headroom.subrequests = 20;
   const heavy = spawned.find((j) => j.place!.channel === UNIVERSAL)!;

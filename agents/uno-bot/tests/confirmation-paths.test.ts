@@ -1170,8 +1170,8 @@ describe("Gate imports no Slack module", () => {
   }
 });
 
-// A card the Worker states itself — the library card, the weekly DS
-// precedence card — answers the gate in its own words (`PendingProposal.stated`).
+// A card the Worker states itself — the weekly DS precedence card, a Figma
+// tidy-up card — answers the gate in its own words (`PendingProposal.stated`).
 // The generic lines assume a card someone asked for: "tell me what to change",
 // "ask me again", "the newest card". None of that is true here.
 describe("a stated card answers in its own words", () => {
