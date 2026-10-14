@@ -2,9 +2,10 @@
 // pasted so the bot answers from the actual source instead of its priors
 // (fixes the "doesn't read what it's linked" cluster). Dispatches by domain:
 //   notion.so / app.notion.com → page title + properties (incl. Owner/people) + block text
-//   figma.com  → node name/type + text layers (for review/inspection), and
-//                the comment threads pinned to the frame or a layer inside it
-//                (#899)
+//   figma.com  → node name/type, text layers, annotations and fills (for
+//                review/inspection), the comment threads pinned to the frame
+//                or a layer inside it (#899), and with `since` what changed
+//                in the frame since that date
 //                (the frame IMAGE arrives separately — slack/vision.ts renders
 //                 the first frame link in the message and attaches it to the
 //                 turn, so this branch is not the model's only view of it)
@@ -39,6 +40,19 @@ function firstUrl(input: unknown): string | null {
   if (typeof input !== "string") return null;
   const m = input.match(/https?:\/\/[^\s<>|)"']+/i);
   return m ? m[0] : null;
+}
+
+/**
+ * A Figma read's `since`, as epoch ms: a date alone is the start of that day
+ * (UTC), a date with a time is that moment. Undefined when none was given,
+ * null when what was given is not a date.
+ */
+export function sinceOf(value: unknown): number | undefined | null {
+  if (value === undefined || value === null || value === "") return undefined;
+  if (typeof value !== "string") return null;
+  const text = value.trim();
+  const at = /^\d{4}-\d{2}-\d{2}$/.test(text) ? Date.parse(`${text}T00:00:00Z`) : Date.parse(text);
+  return Number.isFinite(at) ? at : null;
 }
 
 // github.com/owner/repo/blob/branch/path -> raw.githubusercontent.com/...
@@ -154,8 +168,13 @@ export async function executeReadSource(
     if (/(^|\.)figma\.com$/.test(host)) {
       const parts = parseFigmaUrl(url);
       if (!parts) return JSON.stringify({ ok: false, error: "couldn't parse a Figma file/node from that URL (need a node-id)" });
+      const since = sinceOf(input.since);
+      if (since === null) {
+        return JSON.stringify({ ok: false, error: `since must be a date such as 2026-10-01, not ${JSON.stringify(input.since)}` });
+      }
       const frame = await fetchFigmaFrame(figmaClientFor(env), parts.fileKey, parts.nodeId, {
         comments: opts.figmaComments !== false,
+        ...(since !== undefined ? { since } : {}),
       });
       return JSON.stringify(describeFigmaFrame(url, frame));
     }

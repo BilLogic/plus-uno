@@ -132,10 +132,10 @@ describe("the note the model is handed", () => {
   });
 
   it("names what the payload drops, and forbids reading the drop as an absence", () => {
-    // The Figma response DOES carry fills, boundVariables and geometry;
-    // fetchFigmaNode keeps name/type/text. "No token on this frame" would be a
-    // claim about our reader dressed as a claim about the design.
-    for (const dropped of ["fills", "tokens", "variable bindings", "measurements"]) {
+    // The Figma response DOES carry variable ids and geometry; the reader
+    // keeps fills as they render and drops the rest. "No token on this frame"
+    // would be a claim about our reader dressed as a claim about the design.
+    for (const dropped of ["token", "variable names", "measurements"]) {
       assert.ok(FIGMA_NOTE.includes(dropped), `note should name ${dropped}`);
     }
     assert.match(FIGMA_NOTE, /unread here rather than missing/i);
@@ -363,6 +363,8 @@ describe("the comments pinned to a pasted frame (#899)", () => {
     content: "Today's session\nJoin",
     text_layers: 2,
     text_layers_truncated: false,
+    annotations: [],
+    fills: [],
   };
 
   it("returns the threads pinned to the frame, with author, date and resolved state (AC 1)", async () => {
@@ -454,16 +456,12 @@ describe("the comments pinned to a pasted frame (#899)", () => {
     const { note: noteBefore, ...fieldsBefore } = BEFORE_899;
     for (const comments of [[], [comment("sibling", { client_meta: pinnedTo("200:1") }), comment("page", {})]]) {
       const { note, ...fields } = await pasted(comments);
-      assert.deepEqual(fields, fieldsBefore, "every field but the note is the one a read carried before #899");
-      // The note is the one deliberate change. Its opening scopes "name, node
-      // type and text layers" to the frame itself, since the payload can now
-      // carry comments; the rest of it is unchanged; and it gains one sentence
-      // saying no comment is pinned.
-      const reworded = FIGMA_NOTE.replace(
-        "Of the frame itself, this payload carries its name, node type and text layers only: no fills, tokens, variable bindings or measurements. Never",
-        "The frame's name, node type and text layers — nothing else. This payload carries no fills, tokens, variable bindings or measurements: never",
-      );
-      assert.equal(reworded, noteBefore, "only the opening of the note was reworded");
+      // Every field a read carried before #899, plus the frame's annotations
+      // and fills, which a frame without either lists as empty.
+      assert.deepEqual(fields, { ...fieldsBefore, annotations: [], fills: [] });
+      // The note's closing sentences are the ones it carried then; it gains
+      // one sentence saying no comment is pinned.
+      assert.ok(noteBefore.endsWith(FIGMA_NOTE.slice(FIGMA_NOTE.indexOf("Visual judgement"))));
       assert.equal(note, `${FIGMA_NOTE} ${FIGMA_NO_COMMENTS_NOTE}`);
     }
     // The text read itself is the drift check's, unchanged.
