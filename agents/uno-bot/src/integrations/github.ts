@@ -624,8 +624,13 @@ export interface GithubLibraryReads {
    *  whether that was all of them — so a caller about to file can tell "none
    *  carries the marker" from "the page ran out". */
   intakesSince(since: string): Promise<{ intakes: Array<{ number: number; url: string; body: string }>; complete: boolean }>;
-  /** The merged pulls among the 50 most recently updated closed into `base`. */
-  mergedPulls(base: string): Promise<Array<{ number: number; url: string; mergedAt: string }>>;
+  /** The merged pulls among the 50 most recently updated closed into `base`,
+   *  whether the page came back full, and its oldest `updated_at`. */
+  mergedPulls(base: string): Promise<{
+    pulls: Array<{ number: number; url: string; mergedAt: string }>;
+    full: boolean;
+    oldestUpdatedAt: string | null;
+  }>;
   /** A pull's changed file paths — its first 100, where a component change sits. */
   pullFiles(number: number): Promise<string[]>;
 }
@@ -716,12 +721,19 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
         number?: unknown;
         html_url?: unknown;
         merged_at?: unknown;
+        updated_at?: unknown;
       }>;
-      return (Array.isArray(data) ? data : []).flatMap((p) =>
-        typeof p.number === "number" && typeof p.html_url === "string" && typeof p.merged_at === "string" && p.merged_at
-          ? [{ number: p.number, url: p.html_url, mergedAt: p.merged_at }]
-          : [],
-      );
+      const page = Array.isArray(data) ? data : [];
+      const updated = page.flatMap((p) => (typeof p.updated_at === "string" ? [p.updated_at] : [])).sort();
+      return {
+        pulls: page.flatMap((p) =>
+          typeof p.number === "number" && typeof p.html_url === "string" && typeof p.merged_at === "string" && p.merged_at
+            ? [{ number: p.number, url: p.html_url, mergedAt: p.merged_at }]
+            : [],
+        ),
+        full: page.length >= LIBRARY_PAGE,
+        oldestUpdatedAt: updated[0] ?? null,
+      };
     },
     async pullFiles(number) {
       const url = `https://api.github.com/repos/${repo}/pulls/${number}/files?per_page=100`;

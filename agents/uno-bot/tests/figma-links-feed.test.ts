@@ -22,14 +22,26 @@ const pull = (number: number, mergedAt: string): MergedPull => ({
   mergedAt,
 });
 
-function world(opts: { pulls: MergedPull[]; files: Record<number, string[]>; mark?: SeenMark | null }) {
+function world(opts: {
+  pulls: MergedPull[];
+  files: Record<number, string[]>;
+  mark?: SeenMark | null;
+  /** The page came back full, its oldest pull updated then. */
+  full?: string;
+  failing?: number[];
+}) {
   let queue: QueuedPrLinks[] = [];
   let mark: SeenMark | null = opts.mark === undefined ? { mergedAt: "2026-10-13T00:00:00Z", number: 0 } : opts.mark;
   const filesAsked: number[] = [];
   const deps: FeedDeps = {
-    mergedPulls: async () => opts.pulls,
+    mergedPulls: async () => ({
+      pulls: opts.pulls,
+      full: !!opts.full,
+      oldestUpdatedAt: opts.full ?? opts.pulls.map((p) => p.mergedAt).sort()[0] ?? null,
+    }),
     pullFiles: async (n) => {
       filesAsked.push(n);
+      if (opts.failing?.includes(n)) throw new Error("GitHub 502");
       return opts.files[n] ?? [];
     },
     registry: async () => REGISTRY,
@@ -108,5 +120,32 @@ describe("the merged-PR feed", () => {
     assert.deepEqual(w.filesAsked, [1311, 1312, 1313, 1314, 1315]);
     assert.deepEqual(w.mark(), { mergedAt: "2026-10-14T15:00:00Z", number: 1315 });
     assert.match(summary, /2 more merged PR\(s\) wait for the next run/);
+  });
+
+  it("counts as waiting only the PRs after the one whose files failed", async () => {
+    const pulls = [1, 2, 3, 4].map((i) => pull(1320 + i, `2026-10-14T1${i}:00:00Z`));
+    const w = world({ pulls, files: {}, failing: [1322] });
+    const { summary } = await feedMergedPrs(w.deps);
+    assert.deepEqual(w.filesAsked, [1321, 1322]);
+    assert.deepEqual(w.mark(), { mergedAt: "2026-10-14T11:00:00Z", number: 1321 }, "the mark stops before the failed PR");
+    assert.match(summary, /#1322: files not read, kept for the next run/);
+    assert.match(summary, /2 more merged PR\(s\) wait for the next run/);
+  });
+
+  it("a full page that does not reach back to the mark says PRs merged in the gap may be missed", async () => {
+    const w = world({
+      pulls: [pull(1331, "2026-10-14T12:00:00Z")],
+      files: { 1331: ["design-system/src/components/actions/Button/Button.jsx"] },
+      full: "2026-10-14T09:00:00Z",
+    });
+    const { summary } = await feedMergedPrs(w.deps);
+    assert.deepEqual(w.queue().map((q) => q.pr.number), [1331], "what the page holds is still read");
+    assert.match(summary, /PRs merged between 2026-10-13T00:00:00Z and 2026-10-14T09:00:00Z may be missing/);
+  });
+
+  it("a full page that reaches back past the mark covers every merge since, and says nothing of a gap", async () => {
+    const w = world({ pulls: [pull(1332, "2026-10-14T12:00:00Z")], files: {}, full: "2026-10-12T09:00:00Z" });
+    const { summary } = await feedMergedPrs(w.deps);
+    assert.doesNotMatch(summary, /may be missing/);
   });
 });

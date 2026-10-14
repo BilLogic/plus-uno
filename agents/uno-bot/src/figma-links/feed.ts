@@ -15,7 +15,10 @@
 // THE MARK — the last merged PR seen (its merge time and number). It moves
 // past each PR whose files were read, so a PR is never queued twice; a first
 // run sets it at the newest merge and queues nothing, so the feed starts from
-// the day it is deployed rather than from the repo's history.
+// the day it is deployed rather than from the repo's history. A PR merged
+// after the mark was updated after it, so the page covers every one unless it
+// came back full with its oldest update still past the mark; then the run
+// note names that gap for a person to check, and the page is read as usual.
 //
 // THE BUDGET — one pull-list read, then one files read per PR, at most
 // `FILES_PER_RUN`; PRs past that wait for the next morning behind the mark.
@@ -35,6 +38,16 @@ export interface MergedPull {
   mergedAt: string;
 }
 
+/** One page of the pulls most recently updated among those closed into main. */
+export interface MergedPullPage {
+  /** The merged ones. */
+  pulls: MergedPull[];
+  /** Whether the page came back full, so older pulls may lie past it. */
+  full: boolean;
+  /** The oldest `updated_at` on the page, merged or not; null for an empty page. */
+  oldestUpdatedAt: string | null;
+}
+
 /** The last merged PR the feed has seen. */
 export interface SeenMark {
   mergedAt: string;
@@ -47,8 +60,8 @@ interface Store<T> {
 }
 
 export interface FeedDeps {
-  /** One page of the pulls most recently closed into main, merged ones only. */
-  mergedPulls(): Promise<MergedPull[]>;
+  /** One page of the pulls most recently updated among those closed into main. */
+  mergedPulls(): Promise<MergedPullPage>;
   /** A pull's changed file paths. */
   pullFiles(number: number): Promise<string[]>;
   registry(): Promise<DevLinkRegistry>;
@@ -102,7 +115,8 @@ const order = (a: MergedPull, b: MergedPull) => (a.mergedAt === b.mergedAt ? a.n
  * @param opts - `dryRun` reads and says what it would queue, and writes nothing
  */
 export async function feedMergedPrs(deps: FeedDeps, opts: { dryRun?: boolean } = {}): Promise<{ summary: string }> {
-  const pulls = [...(await deps.mergedPulls())].sort(order);
+  const page = await deps.mergedPulls();
+  const pulls = [...page.pulls].sort(order);
   const mark = await deps.mark.read();
   if (!mark) {
     const newest = pulls.at(-1);
@@ -111,12 +125,19 @@ export async function feedMergedPrs(deps: FeedDeps, opts: { dryRun?: boolean } =
     return { summary: `starting after #${newest.number}` };
   }
   const fresh = pulls.filter((p) => after(p, mark));
-  if (!fresh.length) return { summary: "no PR merged since the last run" };
+  // A PR merged after the mark was updated after it too, so a page whose
+  // oldest update is at or before the mark holds every one. A full page that
+  // stops short of it may have left some behind; what it holds is still read.
+  const gap = page.full && page.oldestUpdatedAt && page.oldestUpdatedAt > mark.mergedAt ? page.oldestUpdatedAt : null;
+  const gapNote = gap ? `PRs merged between ${mark.mergedAt} and ${gap} may be missing from the page read, so check them by hand` : null;
+  if (!fresh.length) return { summary: gapNote ?? "no PR merged since the last run" };
 
   const byFolder = componentsByFolder(await deps.registry());
   const lines: string[] = [];
   let seen = mark;
+  let tried = 0;
   for (const p of fresh.slice(0, FILES_PER_RUN)) {
+    tried += 1;
     let files: string[];
     try {
       files = await deps.pullFiles(p.number);
@@ -135,8 +156,10 @@ export async function feedMergedPrs(deps: FeedDeps, opts: { dryRun?: boolean } =
     if (unknown.length) lines.push(`#${p.number}: no registry component for ${unknown.join(", ")}, skipped`);
     seen = { mergedAt: p.mergedAt, number: p.number };
   }
-  const waiting = fresh.length - FILES_PER_RUN;
+  // The PRs no file read reached: after a failed one, or past the cap.
+  const waiting = fresh.length - tried;
   if (waiting > 0) lines.push(`${waiting} more merged PR(s) wait for the next run`);
+  if (gapNote) lines.push(gapNote);
   if (!opts.dryRun && seen !== mark) await deps.mark.write(seen);
   return { summary: lines.join("; ") || `${fresh.length} merged PR(s), none touching a component` };
 }
