@@ -19,9 +19,9 @@ export const figmaPollProbe: ProbeRun = async (env, url) => {
   }
 };
 
-// Manual run of Dev Mode links (src/figma-links/): posts Review cards where
-// the Figma Review-card setting says, and writes nothing to Figma — a card's
-// Approve does. `?component=Button` is the live check's component; `?all=1`, every registry
+// Manual run of Dev Mode links (src/figma-links/): posts Review cards in a
+// test channel (`TEST_CHANNEL_IDS`) — a debug route's post never reaches a
+// team channel — and writes nothing to Figma; a card's Approve does. `?component=Button` is the live check's component; `?all=1`, every registry
 // component still to link on one batch card, only once FIGMA_DEV_LINKS is on
 // (`figma-links/gate.ts`) — this route is the only way the batch is asked for.
 // A run reads and plans and posts nothing unless `post=1` says to: the cards

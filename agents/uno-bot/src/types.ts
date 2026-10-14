@@ -192,7 +192,9 @@ export interface Env {
    *  Optional — unbound, turns are answered as before and recorded nowhere. */
   USAGE_DB?: D1Database;
   /** Comma-separated channel ids whose turns are test traffic on the usage
-   *  record — #uno-bot-sandbox. */
+   *  record — #uno-bot-sandbox. A post one of them, or a debug route, sets off
+   *  stays in that test channel and never reaches a team channel
+   *  (`usage/record.ts` `teamPostChannel`). */
   TEST_CHANNEL_IDS?: string;
   /** Slack user id of the lead: whose thread replies, and DMs from an asker,
    *  count as an ask escalated (src/usage/resolution.ts). Their own connected

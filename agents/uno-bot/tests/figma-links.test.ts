@@ -27,6 +27,7 @@ import {
   type CardedMark,
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
+import { devLinksDebugChannel } from "../src/figma-links/env";
 import { figmaDevLinksProbe } from "../src/diagnostics/probes/figma";
 import type { Env } from "../src/types";
 import { isOwnComment } from "../src/figma-ask/trigger";
@@ -343,6 +344,12 @@ describe("when a run may go", () => {
     };
     assert.equal(await probe("component=Button"), true);
     assert.equal(await probe("component=Button&post=1"), false);
+  });
+
+  it("a debug route's card posts in a test channel, never the Figma Review-card channel", () => {
+    const env = { PLUS_DESIGN_CHANNEL_ID: "C_DESIGN", FIGMA_ASK_CHANNEL_ID: "C_ASK", TEST_CHANNEL_IDS: "C_SANDBOX, C_OTHER" } as Env;
+    assert.equal(devLinksDebugChannel(env), "C_SANDBOX");
+    assert.deepEqual(devLinksDebugChannel({ ...env, TEST_CHANNEL_IDS: "" }), { refused: "no TEST_CHANNEL_IDS — a debug route's card posts only in a test channel" });
   });
 
   it("once it is on: all of them, or several named", () => {

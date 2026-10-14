@@ -337,7 +337,9 @@ CLAUDE_MODEL = "claude-sonnet-5"
 # Channels whose turns are flagged test traffic on the usage record, so they
 # never count toward adoption: #uno-bot-sandbox. Comma-separated channel ids.
 # Every /debug/* and /health/* route and a
-# greeting with no ask are test traffic without being listed here.
+# greeting with no ask are test traffic without being listed here. A post test
+# traffic sets off stays in the test channel — a debug route's goes to the first
+# one listed — and never reaches a team channel (src/usage/record.ts).
 #   uno-bot-sandbox C0B4QBWAUJU
 TEST_CHANNEL_IDS = "C0B4QBWAUJU"
 # The lead: a reply of theirs in an ask's thread, or a DM to them from the asker

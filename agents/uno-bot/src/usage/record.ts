@@ -98,9 +98,41 @@ export function isTestTraffic(facts: {
   disposition: TurnDisposition;
   question: string;
 }): boolean {
-  if (facts.origin === "debug") return true;
-  if (facts.testChannelIds.includes(facts.channel)) return true;
+  if (isTestOrigin(facts)) return true;
   return facts.disposition === "reacted" && !facts.question.includes("?");
+}
+
+/** Where something came from, as the test-traffic rule reads a place. */
+export interface PostOrigin {
+  origin: TurnOrigin;
+  /** The conversation it came from; empty for a debug route. */
+  channel: string;
+  /** `TEST_CHANNEL_IDS`, parsed. */
+  testChannelIds: readonly string[];
+}
+
+/**
+ * The test-traffic rule's place clauses — a debug route, or a channel on
+ * `TEST_CHANNEL_IDS` — for what has no turn to read: a post a tool, a probe or
+ * an Approve makes on its own.
+ */
+export function isTestOrigin(facts: PostOrigin): boolean {
+  return facts.origin === "debug" || facts.testChannelIds.includes(facts.channel);
+}
+
+/**
+ * The channel a post aimed at a team channel goes to (#1223): its target for
+ * real traffic; for test traffic, the test channel it came from, or the first
+ * test channel for a debug route, which has none. Null when a debug route
+ * would post and no test channel is set: nothing posts.
+ *
+ * @param from - Where the post was set off
+ * @param target - The team channel it was aimed at
+ */
+export function teamPostChannel(from: PostOrigin, target: string): string | null {
+  if (!isTestOrigin(from)) return target;
+  if (from.testChannelIds.includes(from.channel)) return from.channel;
+  return from.testChannelIds[0] ?? null;
 }
 
 /** A thanks word, standing as a word of its own: "type" and "goatee" are not
